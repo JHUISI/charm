@@ -24,6 +24,7 @@ setup(name = 'Charm-Crypto-Module',
 	author_email = "waldoayo@gmail.com",
 	url = "http://code.google.com/p/charm-crypto/",
 	packages = ['charm'],
-	package_data = {'charm':['__init__.py', 'engine/*.py'] }
+	package_data = {'charm':['__init__.py', 'engine/*.py'] },
+        license = 'GPL'
      )
 

@@ -1,28 +1,6 @@
 import struct
 import io, pickle
 from base64 import *
-# This function takes an arbitrary object structure such as tuple or dictionary
-# and returns the (the format, packed bytes object). Procedure:
-# 1. make sure group has been initialized
-# 2. if dict: iterate thru all the keys and for each key call
-# group.serialize(
-#def getPackerObject(object):
-#    # do stuff
-#    fmt = "<" # left-endian
-#    packed_object = [] 
-#    if isinstance(object, dict):
-#        for i in object.keys():
-#            print("key: ", i, ", value: ", object[i])
-#            # s = group.serialize(object[i])
-#            if type(object[i]) == bytes:
-#                cnt = len(object[i])+len(bytes(i, 'utf8'))+2
-#                fmt += "%ss" % cnt
-#                packed_object.append(bytes(i, 'utf8') + b':' + object[i])
-#        packer = struct.Struct(fmt)
-#        print("format => ", packer.format)
-#        return packer
-#    return None
-#
 
 def serializeDict(object, group):
     bytes_object = {}
