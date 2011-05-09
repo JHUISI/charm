@@ -1,7 +1,6 @@
-# From: "Ciphertext-Policy Attribute-Based Encryption".
-# Published in: 2007
-# Available from: 
-# Notes: Security Assumption: 
+# From: "Rivest-Shamir-Adleman Standard algorithm".
+# Published in: 1978
+# Security Assumption: RSA factoring
 
 # type:           public-key encryption
 # setting:        Integer
