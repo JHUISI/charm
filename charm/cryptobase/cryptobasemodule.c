@@ -6,6 +6,7 @@ static PyObject *BaseError;
 #define PyBase_Check(obj) PyObject_TypeCheck(obj, &BaseType)
 #define TRUE	1
 #define FALSE	0
+#define PKG  "charm."
 enum MOP {NONE = 0, MODE_ECB, MODE_CBC, MODE_CFB, MODE_PGP, MODE_OFB, MODE_CTR};
 enum ALG {AES, DES, DES3};
 
@@ -29,10 +30,10 @@ static PyObject *selectPRF(Base *self, PyObject *args) {
 	}
 
 	switch(alg) {
-		case AES: ALG = "AES"; break;
-		case DES: ALG = "DES"; break;
-		case DES3: ALG = "DES3"; break;
-		default: ALG = "AES"; break; /* default */
+		case AES: ALG = PKG"AES"; break;
+		case DES: ALG = PKG"DES"; break;
+		case DES3: ALG = PKG"DES3"; break;
+		default: ALG = PKG"AES"; break; /* default */
 	}
 
 	module = PyImport_ImportModule(ALG);
@@ -64,10 +65,10 @@ static PyObject *selectPRP(Base *self, PyObject *args) {
 	}
 
 	switch(alg) {
-		case AES: ALG = "AES"; break;
-		case DES: ALG = "DES"; break;
-		case DES3: ALG = "DES3"; break;
-		default: ALG = "AES"; break; /* default */
+		case AES: ALG = PKG"AES"; break;
+		case DES: ALG = PKG"DES"; break;
+		case DES3: ALG = PKG"DES3"; break;
+		default: ALG = PKG"AES"; break; /* default */
 	}
 
 	module = PyImport_ImportModule(ALG);

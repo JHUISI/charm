@@ -1,4 +1,4 @@
-from modules.engine.util import *
+from charm.engine.util import *
 MAX_SIZE = 2048
 
 class Protocol:
