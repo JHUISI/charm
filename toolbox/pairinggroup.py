@@ -1,4 +1,3 @@
-#import charm 
 from charm.pairing import *
 from charm.integer import *
 

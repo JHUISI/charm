@@ -3,7 +3,7 @@
 # Notes: This class implements an interface for a standard attribute-based encryption scheme.
 #        A public key attribute-based encryption scheme consists of four algorithms: 
 #        (setup, keygen, encrypt, decrypt).
-from schemebase import *
+from toolbox.schemebase import *
 
 class ABEnc(SchemeBase):
     def __init__(self):

@@ -1,4 +1,4 @@
-from library.enum import *
+from toolbox.enum import *
 # Base class for all crypto, which defines certain attributes
 
 class SchemeBase:

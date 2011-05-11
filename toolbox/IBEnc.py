@@ -3,7 +3,7 @@
 # Notes: This class implements an interface for a standard identity-based encryption scheme.
 #        Identity-based encryption consists of three algorithms: (setup, extract, encrypt, and decrypt).
 #
-from schemebase import *
+from toolbox.schemebase import *
 
 class IBEnc(SchemeBase):
     def __init__(self):

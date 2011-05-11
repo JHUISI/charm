@@ -3,7 +3,7 @@
 # Notes: This class implements an interface for a standard public-key signature scheme.
 #	 A public key signature consists of three algorithms: (keygen, sign, verify).
 #
-from schemebase import *
+from toolbox.schemebase import *
 
 class PKSig(SchemeBase):
     def __init__(self):
