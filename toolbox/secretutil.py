@@ -1,5 +1,6 @@
 # Contains all the auxillary functions to do linear secret sharing (LSS) over an access structure. Mainly, we represent the 
 # access structure as a binary tree. This could also support matrices for representing access structures.
+from charm.pairing import *
 from toolbox.policytree import *
 
 class SecretUtil:
@@ -16,9 +17,11 @@ class SecretUtil:
 
     def genShares(self, secret, k, n):
         if(k <= n):
-            a = [self.elem.random(ZR) for i in range(0, k)]
+            rand = self.elem.random
+            a = [rand(ZR) for i in range(0, k)]
             a[0] = secret
-            shares = [self.P(a, i) for i in range(0, n+1)]
+            Pfunc = self.P
+            shares = [Pfunc(a, i) for i in range(0, n+1)]
         return shares
     
     # shares is a dictionary
@@ -50,25 +53,25 @@ class SecretUtil:
         return secret
 
     
-    def getCoeffs(self, tree, coeff_list, coeff=1):   
+    def getCoefficients(self, tree, coeff_list, coeff=1):   
         if tree:
             node = tree.getNodeType()
             if(node == tree.AND):
                 this_coeff = self.recoverCoefficients([1,2])
                 # left child => coeff[1], right child => coeff[2]
-                self.getCoeffs(tree.getLeft(), coeff_list, coeff * this_coeff[1])
-                self.getCoeffs(tree.getRight(), coeff_list, coeff * this_coeff[2])
+                self.getCoefficients(tree.getLeft(), coeff_list, coeff * this_coeff[1])
+                self.getCoefficients(tree.getRight(), coeff_list, coeff * this_coeff[2])
             elif(node == tree.OR):
                 this_coeff = self.recoverCoefficients([1])
-                self.getCoeffs(tree.getLeft(), coeff_list, coeff * this_coeff[1])
-                self.getCoeffs(tree.getRight(), coeff_list, coeff * this_coeff[1])
+                self.getCoefficients(tree.getLeft(), coeff_list, coeff * this_coeff[1])
+                self.getCoefficients(tree.getRight(), coeff_list, coeff * this_coeff[1])
             elif(node == tree.ATTR):
                 attr = tree.getAttribute()
                 coeff_list[ attr ] = coeff
             else:
                 return None
             
-    def calcShares(self, secret, tree, _type=dict):
+    def calculateShares(self, secret, tree, _type=dict):
         attr_list = []
         self.compute_shares(secret, tree, attr_list)
         if _type == list:
@@ -108,14 +111,14 @@ class SecretUtil:
     def prune(self, policy, attributes):
         return self.parser.prune(policy, attributes)
     
-    def getAttrList(self, Node, List):
+    def getAttributeList(self, Node, List):
         if(Node == None):
             return None
         # V, L, R
         if(Node.getNodeType() == Node.ATTR):
             List.append(Node.getAttribute())
         else:
-            self.getAttrList(Node.getLeft(), List)
-            self.getAttrList(Node.getRight(), List)
+            self.getAttributeList(Node.getLeft(), List)
+            self.getAttributeList(Node.getRight(), List)
         return None
         
