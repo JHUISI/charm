@@ -10,10 +10,12 @@
 #
 # Implementer:    J Ayo Akinyele
 # Date:           12/2010
-from pairinggroup import *
+from toolbox.pairinggroup import *
+from toolbox.PKSig import *
 
-class ShortSig:
+class ShortSig(PKSig):
     def __init__(self, groupObj):
+        PKSig.__init__(self)
         global group
         group = groupObj
         
@@ -22,17 +24,11 @@ class ShortSig:
         h = group.random(G1)
         xi1, xi2 = group.random(), group.random()
 
-        u = h ** ~xi1
-        v = h ** ~xi2
+        u,v = h ** ~xi1, h ** ~xi2
         gamma = group.random(ZR)
         w = g2 ** gamma
         gpk = { 'g1':g1, 'g2':g2, 'h':h, 'u':u, 'v':v, 'w':w }
         gmsk = { 'xi1':xi1, 'xi2':xi2 }
-    
-        print('Group Public parameters...')
-        self.debug(gpk)
-        print('\nGroup Secret parameters...')
-        self.debug(gmsk)
                 
         x = [group.random(ZR) for i in range(n)]
         A = [gpk['g1'] ** ~(gamma + x[i]) for i in range(n)]
@@ -61,26 +57,17 @@ class ShortSig:
         R5 = (T2 ** r[2]) * (gpk['v'] ** -r[4])
         
         c = group.hash((M, T1, T2, T3, R1, R2, R3, R4, R5), ZR)
-        s1 = r[0] + c * alpha
-        s2 = r[1] + c * beta
-        s3 = r[2] + c * x
-        s4 = r[3] + c * delta1
+        s1, s2 = r[0] + c * alpha, r[1] + c * beta
+        s3, s4 = r[2] + c * x, r[3] + c * delta1
         s5 = r[4] + c * delta2
-        
         return {'T1':T1, 'T2':T2, 'T3':T3, 'c':c, 's_alpha':s1, 's_beta':s2, 's_x':s3, 's_delta1':s4, 's_delta2':s5}
     
     def verify(self, gpk, M, sigma):
         validSignature = False
         
-        c = sigma['c']
-        t1 = sigma['T1']
-        t2 = sigma['T2']
-        t3 = sigma['T3']
-        s_alpha = sigma['s_alpha']
-        s_beta = sigma['s_beta']
-        s_x = sigma['s_x']
-        s_delta1 = sigma['s_delta1']
-        s_delta2 = sigma['s_delta2']
+        c, t1, t2, t3 = sigma['c'], sigma['T1'], sigma['T2'], sigma['T3']
+        s_alpha, s_beta = sigma['s_alpha'], sigma['s_beta']
+        s_x, s_delta1, s_delta2 = sigma['s_x'], sigma['s_delta1'], sigma['s_delta2']
         
         R1_ = (gpk['u'] ** s_alpha) * (t1 ** -c)
         R2_ = (gpk['v'] ** s_beta) * (t2 ** -c)
@@ -104,17 +91,8 @@ class ShortSig:
         A_prime = t3 / ((t1 ** xi1) * (t2 ** xi2))
         return A_prime
         
-    def debug(self, data):
-        # expecting data to be a dictionary
-        for k in data.keys():
-            print(k, data[k])
-        return None
-
-    
 if __name__ == '__main__':
-    groupObj = PairingGroup('library/d224.param')
-#    bID = InitBenchmark()
-#    StartBenchmark(bID, [NativeTime, CpuTime])
+    groupObj = PairingGroup('d224.param')
     n = 3    # how manu users in the group
     user = 1 # which user's key to sign a message with
     
@@ -129,14 +107,13 @@ if __name__ == '__main__':
     
     result = sigTest.verify(gpk, message, signature)
     
-    if result:
-        print("Verify signers identity...")
-        index = sigTest.open(gpk, gmsk, message, signature)
-        i = 0
-        while i < n:
-            if gsk[i][0] == index:
-                print('Found index of signer: %d' % i)
-                print('A = %s' % index)
-            i += 1
-#    EndBenchmark(bID)
+    #if result:
+    #    print("Verify signers identity...")
+    #    index = sigTest.open(gpk, gmsk, message, signature)
+    #    i = 0
+    #    while i < n:
+    #        if gsk[i][0] == index:
+    #            print('Found index of signer: %d' % i)
+    #            print('A = %s' % index)
+    #        i += 1
     print('Complete!')
