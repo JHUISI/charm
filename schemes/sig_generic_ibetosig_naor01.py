@@ -18,9 +18,9 @@
 # Implementer:	Matthew Green
 # Date:			05/2011
 
-from pairinggroup import *
-from enc_bm_ibe_bb03 import *
-from PKSig import *
+from toolbox.pairinggroup import *
+from toolbox.ibe_bb03 import *
+from toolbox.PKSig import *
 
 class Sig_Generic_ibetosig_Naor01(PKSig):
     def __init__(self, ibe_scheme, groupObj):
@@ -30,7 +30,6 @@ class Sig_Generic_ibetosig_Naor01(PKSig):
 				
     def keygen(self, secparam=None):
         (mpk, msk) = ibe.setup(secparam)
-#        pk = { 'mpk' : mpk, 'secparam':secparam }
         print("Keygen...")
         group.debug(mpk)
         group.debug(msk)
@@ -45,16 +44,11 @@ class Sig_Generic_ibetosig_Naor01(PKSig):
             result = ibe.verify(pk, sig)
             if result == False: return False
 		
-        # TODO: get the plaintext space, find its entropy, and repeat the following test
-        # enough times to reduce the probability of coincidence to 1/securityparam
-		
         # Encrypt a random message in the IBE's message space and try to decrypt it
         message = group.random(GT)
         print("\nRandom message =>", message)
-        # pk = pub params, sig['id'] == m == identity, and message (GT)
+
         C = ibe.encrypt(pk, sig['id'], message) 
-        # treat 'sig' as the key to decrypt the random message
-        # if successful then, the message has a valid signature, sigma
         if (ibe.decrypt(sig, C) == message):
             return True
         else:
