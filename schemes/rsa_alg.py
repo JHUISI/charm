@@ -9,7 +9,7 @@
 # Date:            05/2011
 
 from charm.integer import *
-from PKEnc import *
+from toolbox.PKEnc import *
 
 class RSA(PKEnc):
     def __init__(self):
