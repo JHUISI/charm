@@ -8,23 +8,21 @@
 # type:			encryption (identity-based)
 # setting:		bilinear groups (asymmetric)
 #
-# Implementer:	Joseph Ayo Akinyele
+# Implementer:	J Ayo Akinyele
 # Date:			11/2010
 
 from toolbox.pairinggroup import *
-from charm.pairing import pair,hash as sha1
+#from charm.pairing import pair,hash as sha1
 from charm.cryptobase import *
 from toolbox.IBEnc import *
 
 class IBE_BB04(IBEnc):
-    def __init__(self, groupObj, key_size=16, alg=AES):
+    def __init__(self, groupObj):
         IBEnc.__init__(self)
         IBEnc.setProperty(self, secdef='IND_sID_CPA', assumption='DBDH', 
                           message_space=[GT, 'KEM'], secmodel='ROM', other={'id':ZR})
-        global group, prf
+        global group
         group = groupObj
-        #global bID1
-        #bID1 = InitBenchmark()
         
     def setup(self, secparam=None):
         #StartBenchmark(bID1, [CpuTime, NativeTime])
@@ -41,12 +39,8 @@ class IBE_BB04(IBEnc):
     # Note: ID is in Zp* and is the public key ID for the user
     def extract(self, mk, ID):
         r = group.random()
-        # verify we have an appropriate 'r' value for ID
-        if type(ID) == pairing: id = ID
-        else:
-            assert False, "ID has invalid type!"
         # compute K
-        K = mk['h'] ** ~(id + mk['x'] + r*mk['y'])
+        K = mk['h'] ** ~(ID + mk['x'] + r*mk['y'])
         return { 'id':id, 'r':r, 'K':K }
 
     # assume that M is in GT
@@ -79,20 +73,17 @@ class IBE_BB04(IBEnc):
                 
 if __name__ == '__main__':
     # initialize the element object so that object references have global scope
-    #elem = pairing('library/d224.param')
-    groupObj = PairingGroup('library/d224.param')
+    groupObj = PairingGroup('d224.param')
     ibe = IBE_BB04(groupObj)
     print("Running through IBE setup...")
     (params, mk) = ibe.setup()
 
-    kID = 'ayo@email.com'
+    # represents public identity
+    kID = groupObj.random(ZR)
     key = ibe.extract(mk, kID)
 
-    #kID2 = 'adversary@email.com'
-    #key2 = ibe.extract(mk, kID2)
-
     M = groupObj.random(GT)
-    cipher = ibe.encrypt(params, key['id'], M)
+    cipher = ibe.encrypt(params, kID, M)
     m = ibe.decrypt(params, key, cipher)
 
     if m == M:
