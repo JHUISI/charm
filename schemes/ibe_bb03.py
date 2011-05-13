@@ -12,7 +12,6 @@
 # Date:			11/2010
 
 from toolbox.pairinggroup import *
-#from charm.pairing import pair,hash as sha1
 from charm.cryptobase import *
 from toolbox.IBEnc import *
 
@@ -41,7 +40,7 @@ class IBE_BB04(IBEnc):
         r = group.random()
         # compute K
         K = mk['h'] ** ~(ID + mk['x'] + r*mk['y'])
-        return { 'id':id, 'r':r, 'K':K }
+        return { 'id':ID, 'r':r, 'K':K }
 
     # assume that M is in GT
     def encrypt(self, params, ID, M):
