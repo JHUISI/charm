@@ -26,7 +26,7 @@ setup(name = 'Charm-Crypto-Module',
 	packages = ['charm'],
 	package_data = {'charm':['__init__.py', 'engine/*.py']},
         py_modules = ['toolbox.ecgroup', 'toolbox.integergroup', 'toolbox.pairinggroup', 'toolbox.enum', 'toolbox.schemebase', 'toolbox.IBEnc', 'toolbox.PKEnc', 'toolbox.PKSig', 'toolbox.ABEnc', 'toolbox.secretutil', 
-                     'toolbox.node', 'toolbox.zknode', 'toolbox.policytree'],
+                     'toolbox.node', 'toolbox.zknode', 'toolbox.policytree', 'toolbox.sigmaprotocol', 'toolbox.Commit'],
         license = 'GPL'
      )
 
