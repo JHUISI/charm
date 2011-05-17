@@ -13,19 +13,36 @@ from toolbox.integergroup import *
 from toolbox.ecgroup import *
 from toolbox.PKEnc import *
 
-class Ciphertext(dict):
-    def __init__(self, ct, pk):
+class ElGamalCipher(dict):
+    def __init__(self, ct):
+        if type(ct) != dict: assert False, "Not a dictionary!"
+        if not set(ct).issubset(['c1', 'c2']): assert False, "'c1','c2' keys not present."
         dict.__init__(self, ct)
-        self.pk = pk
 
     def __add__(self, other):
-        pass
+        if type(other) == int:
+           lhs_c1 = dict.__getitem__(self, 'c1')
+           lhs_c2 = dict.__getitem__(self, 'c2')
+           return ElGamalCipher({'c1':lhs_c1, 'c2':lhs_c2 + other})
+        else:
+           pass 
 
     def __mul__(self, other):
-        pass
+        if type(other) == int:
+           lhs_c1 = dict.__getitem__(self, 'c1')
+           lhs_c2 = dict.__getitem__(self, 'c2')
+           return ElGamalCipher({'c1':lhs_c1, 'c2':lhs_c2 * other})
+        else:
+           lhs_c1 = dict.__getitem__(self, 'c1') 
+           rhs_c1 = dict.__getitem__(other, 'c1')
+
+           lhs_c2 = dict.__getitem__(self, 'c2') 
+           rhs_c2 = dict.__getitem__(other, 'c2')
+           return ElGamalCipher({'c1':lhs_c1 * rhs_c1, 'c2':lhs_c2 * rhs_c2})
+        return None
 
 class ElGamal(PKEnc):
-    def __init__(self, group_type='int', builtin_cv=410):
+    def __init__(self, group_type=int, builtin_cv=410):
         PKEnc.__init__(self)
         global _type
         _type = group_type
@@ -33,18 +50,18 @@ class ElGamal(PKEnc):
 
     def paramgen(self, _type, _cv):
         global group
-        if _type == 'int':
+        if _type == int:
             group = IntegerGroupQ()
-        elif _type == 'ecc':
+        elif _type == ecc:
             group = ECGroup(_cv)
         else:
             raise InvalidTypeException
 
     def keygen(self, secparam=1024):
-        if _type == 'int':
+        if _type == int:
             group.paramgen(secparam)
             g = group.randomGen()
-        elif _type == 'ecc':
+        elif _type == ecc:
             g = group.random(G)
         # x is private, g is public param
         x = group.random(); h = g ** x
@@ -63,7 +80,7 @@ class ElGamal(PKEnc):
         s = pk['h'] ** y
         # check M and make sure it's right size
         c2 = group.encode(M) * s
-        return {'c1':c1, 'c2':c2}
+        return ElGamalCipher({'c1':c1, 'c2':c2})
     
     def decrypt(self, pk, sk, c):
         s = c['c1'] ** sk['x']
@@ -74,13 +91,13 @@ class ElGamal(PKEnc):
         return M
         
 if __name__ == "__main__":
-    el = ElGamal('ecc', 410)    
+    el = ElGamal(ecc, 410)    
     (pk, sk) = el.keygen()
     msg = "hello world!"
     size = len(msg)
-    ciphertext = el.encrypt(pk, msg)
+    cipher1 = el.encrypt(pk, msg)
     
-    m = el.decrypt(pk, sk, ciphertext)    
+    m = el.decrypt(pk, sk, cipher1)    
     if m[0:size] == msg[0:size]:
         print("SUCCESSFULLY DECRYPTED!!!")
     else:
