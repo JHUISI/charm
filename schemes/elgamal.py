@@ -13,6 +13,17 @@ from toolbox.integergroup import *
 from toolbox.ecgroup import *
 from toolbox.PKEnc import *
 
+class Ciphertext(dict):
+    def __init__(self, ct, pk):
+        dict.__init__(self, ct)
+        self.pk = pk
+
+    def __add__(self, other):
+        pass
+
+    def __mul__(self, other):
+        pass
+
 class ElGamal(PKEnc):
     def __init__(self, group_type='int', builtin_cv=410):
         PKEnc.__init__(self)

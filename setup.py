@@ -1,4 +1,15 @@
 from distutils.core import setup, Extension
+import os,platform
+
+print("Platform =>", platform.system())
+print("Default Arch =>", platform.architecture()) 
+
+if platform.system() == 'Darwin':
+   # idea is to set the below parameters automatically if mac
+   os.environ['CFLAGS'] = "-arch i386 -arch x86_64"
+   os.environ['LDFLAGS'] = "-arch i386 -arch x86_64"
+   print("Environ CFLAGS =>", os.environ.get('CFLAGS'))
+   print("Environ LDFLAGS =>", os.environ.get('LDFLAGS'))
 
 path = 'charm/'
 _macros = []
@@ -29,4 +40,5 @@ setup(name = 'Charm-Crypto-Module',
                      'toolbox.node', 'toolbox.zknode', 'toolbox.policytree', 'toolbox.sigmaprotocol', 'toolbox.Commit'],
         license = 'GPL'
      )
+
 
