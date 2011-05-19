@@ -38,7 +38,7 @@ class PairingGroup():
                 return self.Pairing.random(type, seed)
             return self.Pairing.random(type)
         else:
-            return long(self.rand.randomPrime(self.secparam))
+            return int(self.rand.randomPrime(self.secparam))
     def __randomGT(self):
         if not hasattr(self, 'gt'):
             self.gt = pair(self.Pairing.random(G1), self.Pairing.random(G2))

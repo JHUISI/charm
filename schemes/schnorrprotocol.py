@@ -1,14 +1,13 @@
-from charm.engine.protocol import *
-from charm.engine.util import *
+from toolbox.sigmaprotocol import *
 from toolbox.ecgroup import *
 from socket import *
 import sys
-#error = {'OK':1, 'ERROR':2} 
+
 PROVER,VERIFIER = 1,2
 HOST, PORT = "", 8082
 
-class SchnorrProtocol(Protocol):
-    def __init__(self, builtin_cv=410):
+class SchnorrZK(Protocol):
+    def __init__(self, builtin_cv, common_input=None):
         Protocol.__init__(self, None)        
         verifier_states = { 2:self.verifier_state2, 4:self.verifier_state4, 6:self.verifier_state6 }
         prover_states = { 1:self.prover_state1, 3:self.prover_state3, 5:self.prover_state5 }
@@ -18,42 +17,26 @@ class SchnorrProtocol(Protocol):
         # describe the parties involved and the valid transitions
         Protocol.addPartyType(self, VERIFIER, verifier_states, verifier_trans)
         Protocol.addPartyType(self, PROVER, prover_states, prover_trans, True)
-#        Protocol.setSerializers(self, self.serialize, self.deserialize)
+
         self.group = ECGroup(builtin_cv)
         db = {}
         Protocol.setSubclassVars(self, self.group, db)
         
-    def serialize(self, object):
-        #print("input object... => ", object)
-        bytes_object = serializeDict(object, self.group)
-        #print("serializing... => ", bytes_object)
-        return pickleObject(bytes_object)
-    
-    def deserialize(self, bytes_object):
-        object = unpickleObject(bytes_object)
-
-        if isinstance(object, dict):
-            result = deserializeDict(object, self.group)        
-            return result
-        return object
-    
     # PROVER states
     def prover_state1(self):
         x = self.group.random()
         r, g = self.group.random(), self.group.random(G)
         t = g ** r 
         print('prover: ',"hello to verifier.")
-        self.db['r'], self.db['x'] = r, x
-        self.db['t'], self.db['g'] = t, g
+        Protocol.store(self, ('r',r), ('x',x), ('t',t), ('g',g))
         Protocol.setState(self, 3)
         return {'t':t, 'g':g, 'y':g ** x } # output goes to the next state.
      
     def prover_state3( self, input):
         print("state3 input => ", input)
+        (r, x) = Protocol.get(self, ['r', 'x'])
         c = input['c']
-        s = self.db['r'] + c * self.db['x']
-        print("s => '%s'" % s)
-        output = "prover: message 1"
+        s = r + c * x
         Protocol.setState(self, 5)
         return {'s':s}
 
@@ -66,21 +49,17 @@ class SchnorrProtocol(Protocol):
     # VERIFIER states
     def verifier_state2( self, input ):
         print("state2 input => ", input)
-        # save the protocol values
-        self.db['t'], self.db['g'] = input['t'], input['g']
-        self.db['y'] = input['y']
         # compute challenge c and send to prover
         c = self.group.random()
-        self.db['c'] = c
+        Protocol.store(self, ('c',c),('t',input['t']),('g',input['g']),('y',input['y']))
         Protocol.setState(self, 4)        
         return {'c':c}
 
     def verifier_state4( self, input ):
         print("state4 input => ", input) # read input off of socket, right?
-        t, g, y, c = self.db['t'], self.db['g'], self.db['y'], self.db['c']
+        (t,g,y,c) = Protocol.get(self, ['t','g','y','c'])
         s = input['s']
         
-        print("s => '%s'" % s)
         if (g ** s == t * (y ** c)):
            print("SUCCESSFUL VERIFICATION!!!")
            output = "verifier: ACCEPTED!"
@@ -92,12 +71,11 @@ class SchnorrProtocol(Protocol):
     
     def verifier_state6(self, input ):
         print("state6 input => ", input)
-#        output = "verifier: Ack End state."        
         Protocol.setState(self, None)
         return None
     
 if __name__ == "__main__":
-    sp = SchnorrProtocol()
+    sp = SchnorrZK(409)
 
     if sys.argv[1] == "-v":
         print("Operating as verifier...")

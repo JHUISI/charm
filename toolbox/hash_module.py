@@ -1,9 +1,7 @@
 import charm.cryptobase
 from charm.pairing import *
 from charm.integer import *
-from bitstring import *
-
-import hashlib
+import hashlib, base64
 
 class Hash():
     def __init__(self, htype='sha1', pairingElement=None, integerElement=None):        
@@ -14,14 +12,14 @@ class Hash():
     def hashToZn(self, value):
         if type(value) == pairing:
             h = hashlib.new(self.hash_type)
-            h.update(value.serialize())
+            h.update(self.e.serialize(value))
             #print "digest => %s" % h.hexdigest()
             # get raw bytes of digest and hash to Zr
             val = h.digest()
             return int(self.e.H(val, ZR))
             # do something related to that
-        if type(value) == long:
-            val = BitString(bin(value)).bin
+        if type(value) == int:
+            val = bin(value)
             return int(self.e.H(val, ZR))
         return None
     
@@ -31,9 +29,9 @@ class Hash():
             strs = ""
             for i in args:
                 if type(i) == str:
-                    strs += BitString(bytes=i).bin
+                    strs += str(base64.encodebytes(bytes(i, 'utf8')))
                 else:
-                    strs += BitString(bin(i)).bin
+                    strs += str(base64.encodebytes(bytes(bin(i), 'utf8')))
             if len(strs) > 0:
-                return self.e.H(strs, 'Zr')
+                return self.e.H(strs, ZR)
             return None
