@@ -37,7 +37,7 @@ if(user == 'prover'):
     sk = {'x':x, 'y':y}
 #    pk = {'h':g**x, 'g':g}
 #    sk = {'x':x, 'y':y}
-    result = executeNonIntZKProof(pk, sk, '(h = g^x) and (j = g^y)', party_info)
+    result = executeIntZKProof(pk, sk, '(h = g^x) and (j = g^y)', party_info)
     print("Results for PROVER =>", result)
 
 elif(user == 'verifier'):
@@ -46,6 +46,6 @@ elif(user == 'verifier'):
 #    sk = {'x':1, 'y':1} 
     pk = {'h':1, 'g':1, 'j':1}
     sk = {'x':1}
-    result = executeNonIntZKProof(pk, sk, '(h = g^x) and (j = g^y)', party_info)
+    result = executeIntZKProof(pk, sk, '(h = g^x) and (j = g^y)', party_info)
     print("Results for VERIFIER =>", result)
 
