@@ -3,12 +3,12 @@
 # statement to be proved/verified.  It outputs the  
 
 from pyparsing import *
-#from zkparser import *
+from zkparser import *
 from charm.engine.protocol import *
 from charm.engine.util import *
 from charm.pairing import *
 
-interactive = None
+int_default = True
 
 def newStateFunction(func_name, args=True):
     if args:
@@ -28,7 +28,7 @@ def addToCode(lines):
 
 PROVER, VERIFIER = 1,2
 # Handle a Schnorr HVZK proof-of-knowledge of a discrete logarithm
-def KoDLFixedBase(publicDict, secretDict, baseVarKey, expVarKey, statesCode):
+def KoDLFixedBase(publicDict, secretDict, baseVarKey, expVarKey, statesCode, interactive):
     if type(publicDict) != dict or type(secretDict) != dict: 
         print("Type Error!"); return None
     
@@ -37,7 +37,7 @@ def KoDLFixedBase(publicDict, secretDict, baseVarKey, expVarKey, statesCode):
  #   stateDef += addToCode(["print('State PROVER 1:')"]) # DEBUG
     stateDef += addToCode(["pk = Protocol.get(self, "+str(list(publicDict.keys()))+", dict)"])
     prov_keys, obj_ret, ver_keys2, ver_keys4 = "","", "", []
-    rand_elems,dl_elems,store_elems,non_int_def2 = [],[],[],[]
+    rand_elems,dl_elems,store_elems,non_int_def2 = [],[],[],""
     for i in range(len(expVarKey)):
         k = 'k' + str(i)
         prov_keys += expVarKey[i]+","
@@ -48,7 +48,7 @@ def KoDLFixedBase(publicDict, secretDict, baseVarKey, expVarKey, statesCode):
         ver_keys2 += ", ('val_"+k+"', input['val_"+k+"'])"
         four = 'val_'+k
         ver_keys4.append('%s' % four) # used in verify_state4
-        non_int_def2.append("pk['%s']," % four) # used for non-interactive in state def2   
+        non_int_def2 += "input['%s']," % four # used for non-interactive in state def2   
     stateDef += addToCode(["("+prov_keys+") = Protocol.get(self, "+str(list(expVarKey))+")"])
     stateDef += addToCode(rand_elems)
     stateDef += addToCode(dl_elems)
@@ -60,10 +60,10 @@ def KoDLFixedBase(publicDict, secretDict, baseVarKey, expVarKey, statesCode):
     stateDef2 = newStateFunction("verifier_state2")
     c = 'c'
  #   stateDef2 += addToCode(["print('State VERIFIER 2:')"]) # DEBUG
-    if interactive:
+    if interactive == True:
        stateDef2 += addToCode(["c = self.group.random(ZR)"])
     else:
-       stateDef2 += addToCode(["c = self.group.hash("+non_int_def2+")"])
+       stateDef2 += addToCode(["c = self.group.hash("+str(non_int_def2)+" ZR)"])
     stateDef2 += addToCode(["Protocol.store(self, ('c',c), ('pk',input['pk'])"+ ver_keys2 +" )", 
                             "Protocol.setState(self, 4)", "return {'c':c}"])
     statesCode += stateDef2 + "\n"
@@ -126,11 +126,10 @@ def KoDLFixedBase(publicDict, secretDict, baseVarKey, expVarKey, statesCode):
 # Return a fixed preamble for an interactive ZK proof protocol.
 def genIZKPreamble():
     return """\
-\nfrom modules.engine.protocol import *
-from modules.engine.util import *
+\nfrom charm.engine.protocol import *
+from charm.engine.util import *
 from socket import *
-import modules
-from pairing import *
+from charm.pairing import *
 
 class %s(Protocol):
     def __init__(self, groupObj, common_input=None):
@@ -160,7 +159,7 @@ class %s(Protocol):
 # secret contains a dictionary of the secret elements (keys must be appropriately labeled)
 # statement is the statement for which we would like to prove via ZK and thus code 
 # we need to generate to prove the statement.
-def parseAndGenerateCode(public, secretDict, statement, party_ID):
+def parseAndGenerateCode(public, secretDict, statement, party_ID, interactive):
     # parse the statement such that we know the baseVar, expName (secret)
     output = genIZKPreamble()
     output = output % ('ZKProof', PROVER, VERIFIER)
@@ -182,7 +181,7 @@ def parseAndGenerateCode(public, secretDict, statement, party_ID):
 #    print("Input public =>", public)
 #    print("Input private =>", secret)
 
-    final_src = KoDLFixedBase(public, secret, baseVar, expSecret, output)
+    final_src = KoDLFixedBase(public, secret, baseVar, expSecret, output, interactive)
     return final_src
     
 def extract(node, pk, sk, sk_pk_map, gen):
@@ -237,9 +236,8 @@ def write_out(name, prefix, value):
 # Generate an interactive ZK proof from a statement and variables.  The output
 # of this function is a subclass of Protocol.  To execute the proof, first
 # set it up using the Protocol API and run Execute().
-def executeIntZKProof(public, secret, statement, party_info):
+def executeIntZKProof(public, secret, statement, party_info, interactive=int_default):
     print("Executing Interactive ZK proof...")
-    interactive = True    
     # verify that party_info contains wellformed dictionary
     party_keys = set(['party', 'setting', 'socket'])
     if not party_keys.issubset(set(party_info.keys())):
@@ -253,7 +251,7 @@ def executeIntZKProof(public, secret, statement, party_info):
     else: print("Unrecognized party!"); return None
 
     # Parse through the statement and insert code into each state of the prover and/or verifier
-    ZKClass = parseAndGenerateCode(public, secret, statement, partyID)    
+    ZKClass = parseAndGenerateCode(public, secret, statement, partyID, interactive)    
     dummy_class = '<string>'
     proof_code = compile(ZKClass, dummy_class, 'exec')
     print("Proof code object =>", proof_code)    
@@ -273,6 +271,5 @@ def executeIntZKProof(public, secret, statement, party_info):
 
 def executeNonIntZKProof(public, secret, statement, party_info):
     print("Executing Non-interactive ZK proof...")
-    interactive = False
-    return executeIntZKProof(public, secret, statement, party_info)
+    return executeIntZKProof(public, secret, statement, party_info, interactive=False)
     

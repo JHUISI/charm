@@ -1,4 +1,4 @@
-import charm 
+from toolbox.pairinggroup import * 
 from zkp_generator import *
 from socket import *
 import sys
@@ -25,7 +25,7 @@ else:
     print("ERROR!")
     exit(-1)
 
-group = pairing('a.param')
+group = PairingGroup('a.param')
 party_info['party'] = user
 party_info['setting'] = group
 # statement: '(h = g^x) and (j = g^y)'
@@ -37,7 +37,7 @@ if(user == 'prover'):
     sk = {'x':x, 'y':y}
 #    pk = {'h':g**x, 'g':g}
 #    sk = {'x':x, 'y':y}
-    result = executeIntZKProof(pk, sk, '(h = g^x) and (j = g^y)', party_info)
+    result = executeNonIntZKProof(pk, sk, '(h = g^x) and (j = g^y)', party_info)
     print("Results for PROVER =>", result)
 
 elif(user == 'verifier'):
@@ -46,6 +46,6 @@ elif(user == 'verifier'):
 #    sk = {'x':1, 'y':1} 
     pk = {'h':1, 'g':1, 'j':1}
     sk = {'x':1}
-    result = executeIntZKProof(pk, sk, '(h = g^x) and (j = g^y)', party_info)
+    result = executeNonIntZKProof(pk, sk, '(h = g^x) and (j = g^y)', party_info)
     print("Results for VERIFIER =>", result)
 
