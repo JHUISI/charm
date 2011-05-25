@@ -63,7 +63,7 @@ def KoDLFixedBase(publicDict, secretDict, baseVarKey, expVarKey, statesCode, int
     if interactive == True:
        stateDef2 += addToCode(["c = self.group.random(ZR)"])
     else:
-       stateDef2 += addToCode(["c = self.group.hash("+str(non_int_def2)+" ZR)"])
+       stateDef2 += addToCode(["c = self.group.hash(("+str(non_int_def2)+"), ZR)"])
     stateDef2 += addToCode(["Protocol.store(self, ('c',c), ('pk',input['pk'])"+ ver_keys2 +" )", 
                             "Protocol.setState(self, 4)", "return {'c':c}"])
     statesCode += stateDef2 + "\n"
