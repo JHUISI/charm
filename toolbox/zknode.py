@@ -3,7 +3,6 @@
 import string
 
 class BinNode:
-	
 	def __init__(self, value, left=None, right=None):		
 		#types of node
 		self.OR = 1
@@ -55,8 +54,6 @@ class BinNode:
 		return self.right
 
 	def addSubNode(self, left, right):
-#		print("left =>", left)
-#		print("right =>", right)
 		# set subNodes appropriately
 		self.left = left if left != None else None
 		self.right = right if left != None else None
@@ -72,11 +69,5 @@ class BinNode:
 			return None
 		self.right.traverse(function)
 		return None	
-
-#n = BinNode(1, BinNode('one'), BinNode('two'))
-#n1 = BinNode(0, None, BinNode('three'))
-#n2 = BinNode(1, n1, n)
-
-#print n1
 
 

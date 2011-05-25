@@ -2,13 +2,13 @@
 # This compiler takes as input a set of public and secret inputs as well as a
 # statement to be proved/verified.  It outputs the  
 
-import modules
 from pyparsing import *
-from zkparser import *
-from modules.engine.protocol import *
-from modules.engine.util import *
-from pairing import *
-from time import *
+#from zkparser import *
+from charm.engine.protocol import *
+from charm.engine.util import *
+from charm.pairing import *
+
+interactive = None
 
 def newStateFunction(func_name, args=True):
     if args:
@@ -37,7 +37,7 @@ def KoDLFixedBase(publicDict, secretDict, baseVarKey, expVarKey, statesCode):
  #   stateDef += addToCode(["print('State PROVER 1:')"]) # DEBUG
     stateDef += addToCode(["pk = Protocol.get(self, "+str(list(publicDict.keys()))+", dict)"])
     prov_keys, obj_ret, ver_keys2, ver_keys4 = "","", "", []
-    rand_elems,dl_elems,store_elems = [],[],[]
+    rand_elems,dl_elems,store_elems,non_int_def2 = [],[],[],[]
     for i in range(len(expVarKey)):
         k = 'k' + str(i)
         prov_keys += expVarKey[i]+","
@@ -47,7 +47,8 @@ def KoDLFixedBase(publicDict, secretDict, baseVarKey, expVarKey, statesCode):
         obj_ret += "'val_"+k+"':val_"+k+", "
         ver_keys2 += ", ('val_"+k+"', input['val_"+k+"'])"
         four = 'val_'+k
-        ver_keys4.append('%s' % four) # used in verify_state4                
+        ver_keys4.append('%s' % four) # used in verify_state4
+        non_int_def2.append("pk['%s']," % four) # used for non-interactive in state def2   
     stateDef += addToCode(["("+prov_keys+") = Protocol.get(self, "+str(list(expVarKey))+")"])
     stateDef += addToCode(rand_elems)
     stateDef += addToCode(dl_elems)
@@ -59,7 +60,10 @@ def KoDLFixedBase(publicDict, secretDict, baseVarKey, expVarKey, statesCode):
     stateDef2 = newStateFunction("verifier_state2")
     c = 'c'
  #   stateDef2 += addToCode(["print('State VERIFIER 2:')"]) # DEBUG
-    stateDef2 += addToCode(["c = self.group.random(ZR)"])
+    if interactive:
+       stateDef2 += addToCode(["c = self.group.random(ZR)"])
+    else:
+       stateDef2 += addToCode(["c = self.group.hash("+non_int_def2+")"])
     stateDef2 += addToCode(["Protocol.store(self, ('c',c), ('pk',input['pk'])"+ ver_keys2 +" )", 
                             "Protocol.setState(self, 4)", "return {'c':c}"])
     statesCode += stateDef2 + "\n"
@@ -112,9 +116,9 @@ def KoDLFixedBase(publicDict, secretDict, baseVarKey, expVarKey, statesCode):
     statesCode += stateDef6 + "\n"
     
 #    print("Finishing state 1 =>", statesCode)    
-#    f = open('tmpGenCode.py', 'w')
-#    f.write(statesCode)
-#    f.close()
+    f = open('tmpGenCode.py', 'w')
+    f.write(statesCode)
+    f.close()
 
     return statesCode
 
@@ -233,8 +237,9 @@ def write_out(name, prefix, value):
 # Generate an interactive ZK proof from a statement and variables.  The output
 # of this function is a subclass of Protocol.  To execute the proof, first
 # set it up using the Protocol API and run Execute().
-
-def executeIntZKProof(public, secret, statement, party_info):    
+def executeIntZKProof(public, secret, statement, party_info):
+    print("Executing Interactive ZK proof...")
+    interactive = True    
     # verify that party_info contains wellformed dictionary
     party_keys = set(['party', 'setting', 'socket'])
     if not party_keys.issubset(set(party_info.keys())):
@@ -248,40 +253,26 @@ def executeIntZKProof(public, secret, statement, party_info):
     else: print("Unrecognized party!"); return None
 
     # Parse through the statement and insert code into each state of the prover and/or verifier
-    gen_start = time()
-    ZKClass = parseAndGenerateCode(public, secret, statement, partyID)
-    gen_stop = time()
-    result = ((gen_stop - gen_start)*1000); write_out('msmt.txt', 'Generate', result)
-    print("Gen protocol => '%f' ms" % result)
-    
+    ZKClass = parseAndGenerateCode(public, secret, statement, partyID)    
     dummy_class = '<string>'
-    com_start = time() # time to compile into python byte code
     proof_code = compile(ZKClass, dummy_class, 'exec')
-    com_stop = time()
-    result = ((com_stop - com_start)*1000); write_out('msmt.txt', 'Compile', result)
-    print("Compile protocol => '%f' ms" % result)
-
     print("Proof code object =>", proof_code)    
 #    return proof_code
-    exe_start = time()
     ns = {} 
-    exec(proof_code, globals(), ns)
-    exe_stop = time()
-    result = ((exe_stop - exe_start)*1000); write_out('msmt.txt', 'Exec', result)
-    print("Exec protocol => '%f' ms" % result)
-    
+    exec(proof_code, globals(), ns)    
     ZKProof = ns['ZKProof']
-    #print("proof =>", ZKProof)
+
     prov_db = None
     if(partyID == PROVER):
         prov_db = {}; prov_db.update(public); prov_db.update(secret)
-        #print("Prover DB =>", prov_db.keys())    
     zkp = ZKProof(groupObj, prov_db)
-    run_start = time()
     zkp.setup( {'name':p_name.lower(), 'type':partyID, 'socket':p_socket}) 
     # is there a way to check type of socket?
     zkp.execute(partyID)
-    run_stop = time()
-    result = ((run_stop - run_start)*1000); write_out('msmt.txt', 'Run', str(result)+"\n")
-    print("Run protocol => '%f' ms" % result)
     return zkp.result
+
+def executeNonIntZKProof(public, secret, statement, party_info):
+    print("Executing Non-interactive ZK proof...")
+    interactive = False
+    return executeIntZKProof(public, secret, statement, party_info)
+    
