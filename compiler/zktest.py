@@ -48,3 +48,4 @@ elif(user == 'verifier'):
     sk = {'x':1}
     result = executeIntZKProof(pk, sk, '(h = g^x) and (j = g^y)', party_info)
     print("Results for VERIFIER =>", result)
+

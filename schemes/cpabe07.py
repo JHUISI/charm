@@ -72,7 +72,7 @@ class CPabe_BSW07(ABEnc):
         return ct['C_tilde'] / (pair(ct['C'], sk['D']) / A)
     
 if __name__ == "__main__":
-    groupObj = PairingGroup('a.param', verbose=True)
+    groupObj = PairingGroup('a.param')
     
     cpabe = CPabe_BSW07(groupObj)
     attrs = ['ONE', 'TWO', 'THREE']
