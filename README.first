@@ -1,0 +1,23 @@
+Charm Documentation
+-------------------
+
+[Intro]
+
+Dependencies
+------------
+To build the Charm framework, you will need to install at a minimum openssl, gmp, and pbc. Openssl is a dependency for Python so you should already have this library installed already. We have provided a make target for automatically building gmp and pbc. Just executing a 'make build' will build and install gmp and pbc in /usr/local directory. Change the install destination for pbc and gmp by specifying DESTDIR with 'make build'.
+
+Note that 'make build' may require super user privileges to install the dependencies.
+ 
+Installation Steps
+------------------
+To install the Python package, simply execute the following:
+- make install 
+
+Note that this command may also require super user privileges.
+
+Schemes
+-------
+We have provided several cryptographic scheme examples to get you going. However a few of the schemes (e.g. ABE) we provide require an additional Python package. The only package necessary for our Zero-Knowledge compiler and ABE schemes is the pyparsing package. Pyparsing can be easily installed using the 'easy_install' package:
+- easy_install http://cheeseshop.python.org/packages/source/p/pyparsing/pyparsing-1.5.5.tar.gz
+

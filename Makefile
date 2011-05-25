@@ -3,7 +3,6 @@
 setup1=$(shell mkdir -p /tmp/build-charm)
 setup2=$(shell mkdir -p /tmp/local)
 dest_build=/tmp/build-charm
-dest_install=/tmp/local
 
 # gmp source
 gmp_version=gmp-5.0.2
@@ -15,6 +14,7 @@ pbc_version=pbc-0.5.11
 pbc_url=http://crypto.stanford.edu/pbc/files/${pbc_version}.tar.gz
 pbc_options=
 PYTHON=python
+DESTDIR=/usr/local
 
 all:
 	@echo "make build - Build the charm framework"
@@ -37,7 +37,7 @@ build-gmp:
 	if [ ! -f ${gmp_version}.tar.gz ]; then \
 	wget ${gmp_url}; fi;
 	tar -zxf ${gmp_version}.tar.gz -C ${dest_build};
-	cd ${dest_build}/${gmp_version}; ./configure ${gmp_options} --prefix=${dest_install}; ${MAKE} install
+	cd ${dest_build}/${gmp_version}; ./configure ${gmp_options} --prefix=${DESTDIR}; ${MAKE} install
 	set +x
 	@echo "GMP install: OK"
 
@@ -48,7 +48,7 @@ build-pbc:
 	if [ ! -f ${pbc_version}.tar.gz ]; then \
 	wget ${pbc_url}; fi;
 	tar -zxf ${pbc_version}.tar.gz -C ${dest_build}
-	cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${dest_install}; ${MAKE} install
+	cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR}; ${MAKE} install
 	set +x
 	@echo "PBC install: OK"
 	
@@ -83,7 +83,7 @@ install:
 clean:
 	$(PYTHON) setup.py clean
 #        $(MAKE) -f $(CURDIR)/debian/rules clean
-	rm -rf build/ dist/
+	rm -rf build/ dist/ ${dest_build}
 	find . -name '*.pyc' -delete
 
 
