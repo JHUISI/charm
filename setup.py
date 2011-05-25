@@ -1,22 +1,21 @@
 from distutils.core import setup, Extension
 import os,platform
 
-print("Platform =>", platform.system())
-print("Default Arch =>", platform.architecture()) 
-
-if platform.system() == 'Darwin':
-   # idea is to set the below parameters automatically if mac
-   os.environ['CFLAGS'] = "-arch i386 -arch x86_64"
-   os.environ['LDFLAGS'] = "-arch i386 -arch x86_64"
-   print("Environ CFLAGS =>", os.environ.get('CFLAGS'))
-   print("Environ LDFLAGS =>", os.environ.get('LDFLAGS'))
+print("Platform:", platform.system())
+# print("Default Arch =>", platform.architecture()) 
+# if platform.system() == 'Darwin':
+   # idea is to set the below parameters automatically if mac multi-arch
+#   os.environ['CFLAGS'] = "-arch i386 -arch x86_64"
+#   os.environ['LDFLAGS'] = "-arch i386 -arch x86_64"
+#   print("Environ CFLAGS =>", os.environ.get('CFLAGS'))
+#   print("Environ LDFLAGS =>", os.environ.get('LDFLAGS'))
 
 path = 'charm/'
 _macros = []
-pairing_module = Extension('pairing', include_dirs = [path+'utils/'], sources = [path+'pairingmath/pairingmodule.c', path+'utils/sha1.c', path+'utils/base64.c', path+'utils/benchmarkmodule.c'], libraries=['pbc', 'gmp'])
-integer_module = Extension('integer', include_dirs = [path+'utils/'], sources = [path+'integermath/integermodule.c', path+'utils/sha1.c', path+'utils/base64.c', path+'utils/benchmarkmodule.c'], libraries=['gmp', 'crypto'])
+pairing_module = Extension('pairing', include_dirs = [path+'utils/'], sources = [path+'pairingmath/pairingmodule.c', path+'utils/sha1.c', path+'utils/base64.c'], libraries=['pbc', 'gmp'])
+integer_module = Extension('integer', include_dirs = [path+'utils/'], sources = [path+'integermath/integermodule.c', path+'utils/sha1.c', path+'utils/base64.c'], libraries=['gmp', 'crypto'])
 ecc_module = Extension('ecc', include_dirs = [path+'utils/'], 
-				sources = [path+'ecmath/ecmodule.c', path+'utils/sha1.c', path+'utils/base64.c', path+'utils/benchmarkmodule.c'], 
+				sources = [path+'ecmath/ecmodule.c', path+'utils/sha1.c', path+'utils/base64.c'], 
 				libraries=['gmp', 'crypto'])
 benchmark_module = Extension('benchmark', sources = [path+'utils/benchmarkmodule.c'])
 cryptobase = Extension('cryptobase', sources = [path+'cryptobase/cryptobasemodule.c'])
