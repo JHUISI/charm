@@ -83,7 +83,7 @@ install:
 clean:
 	$(PYTHON) setup.py clean
 #        $(MAKE) -f $(CURDIR)/debian/rules clean
-	rm -rf build/ dist/ ${dest_build}
+	rm -rf build/ dist/ ${dest_build} MANIFEST
 	find . -name '*.pyc' -delete
 
 
