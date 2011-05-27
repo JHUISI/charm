@@ -10,7 +10,7 @@ print("Platform:", platform.system())
 #   print("Environ CFLAGS =>", os.environ.get('CFLAGS'))
 #   print("Environ LDFLAGS =>", os.environ.get('LDFLAGS'))
 
-path = 'charm/'
+path = 'charm-src/'
 _macros = []
 pairing_module = Extension('pairing', include_dirs = [path+'utils/'], sources = [path+'pairingmath/pairingmodule.c', path+'utils/sha1.c', path+'utils/base64.c'], libraries=['pbc', 'gmp'])
 integer_module = Extension('integer', include_dirs = [path+'utils/'], sources = [path+'integermath/integermodule.c', path+'utils/sha1.c', path+'utils/base64.c'], libraries=['gmp', 'crypto'])
@@ -34,7 +34,8 @@ setup(name = 'Charm-Crypto-Module',
 	author_email = "waldoayo@gmail.com",
 	url = "http://code.google.com/p/charm-crypto/",
 	packages = ['charm'],
-	package_data = {'Charm':['__init__.py', 'engine/*.py']},
+	package_dir = {'charm': 'charm-src/charm'},
+	package_data = {'charm':['__init__.py', 'engine/*.py']},
         py_modules = ['toolbox.ecgroup', 'toolbox.integergroup', 'toolbox.pairinggroup', 'toolbox.enum', 'toolbox.schemebase', 'toolbox.IBEnc', 'toolbox.PKEnc', 'toolbox.PKSig', 'toolbox.ABEnc', 'toolbox.hash_module', 'toolbox.secretutil', 
                      'toolbox.node', 'toolbox.zknode', 'toolbox.policytree', 'toolbox.sigmaprotocol', 'toolbox.Commit'],
         license = 'GPL'
