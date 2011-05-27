@@ -33,11 +33,9 @@ setup(name = 'Charm-Crypto-Module',
 	author = "J Ayo Akinyele",
 	author_email = "waldoayo@gmail.com",
 	url = "http://code.google.com/p/charm-crypto/",
-	packages = ['charm'],
+	packages = ['charm', 'toolbox', 'compiler', 'schemes'],
 	package_dir = {'charm': 'charm-src/charm'},
-	package_data = {'charm':['__init__.py', 'engine/*.py']},
-        py_modules = ['toolbox.ecgroup', 'toolbox.integergroup', 'toolbox.pairinggroup', 'toolbox.enum', 'toolbox.schemebase', 'toolbox.IBEnc', 'toolbox.PKEnc', 'toolbox.PKSig', 'toolbox.ABEnc', 'toolbox.hash_module', 'toolbox.secretutil', 
-                     'toolbox.node', 'toolbox.zknode', 'toolbox.policytree', 'toolbox.sigmaprotocol', 'toolbox.Commit'],
+	package_data = {'charm':['__init__.py', 'engine/*.py'], 'toolbox':['*.py'], 'compiler':['*.py'], 'schemes':['*.py']},
         license = 'GPL'
      )
 
