@@ -1019,35 +1019,61 @@ static PyObject *ECE_long(PyObject *o1) {
 }
 
 static PyObject *ECE_convertToZR(ECElement *self, PyObject *args) {
-	Group_NULL(self)
-	Group_Init(self)
+	Group_NULL(self);
+	Group_Init(self);
 	ECElement *obj = NULL;
+	PyObject *retXY = NULL;
 
-	if(PyArg_ParseTuple(args, "O", &obj)) {
+	/* obj - ecc point object on an elliptic curve */
+	/* retXY => whether to return just x (Py_True) or x and y (Py_False) */
+	if(PyArg_ParseTuple(args, "OO", &obj, &retXY)) {
 		if(PyEC_Check(obj)) {
 			// convert to
-			Point_Init(obj)
+			Point_Init(obj);
 			if(obj->type == G) {
 				BIGNUM *x = BN_new(), *y = BN_new();
-//				START_CLOCK(dBench);
 				EC_POINT_get_affine_coordinates_GFp(self->group, obj->P, x, y, self->ctx);
-//				STOP_CLOCK(dBench);
-				BN_free(y);
-
-				ECElement *newObj = createNewPoint(ZR, self->group, self->ctx);
-				BN_copy(newObj->elemZ, x);
-				BN_free(x);
-
-				return (PyObject *) newObj;
+				if(PyBool_Check(retXY)) {
+					// see if retXY is Py_True or Py_False
+					if(retXY == Py_True) {
+						debug("Py_True detected.\n");
+						ECElement *X = createNewPoint(ZR, self->group, self->ctx);
+						ECElement *Y = createNewPoint(ZR, self->group, self->ctx);
+						BN_copy(X->elemZ, x);
+						BN_copy(Y->elemZ, y);
+						BN_free(x); BN_free(y);
+						return (PyObject *) PyTuple_Pack(2, (PyObject *) X, (PyObject *) Y);
+					}
+					else {
+						BN_free(y);
+						ECElement *newObj = createNewPoint(ZR, self->group, self->ctx);
+						BN_copy(newObj->elemZ, x);
+						BN_free(x);
+						return (PyObject *) newObj;
+					}
+				}
 			}
 		}
 
-		ErrorMsg("invalid type.")
+		ErrorMsg("invalid type.");
 	}
-
-
-	ErrorMsg("invalid argument.")
+	ErrorMsg("invalid argument.");
 }
+//
+//static PyObject *ECE_convertToZR(ECElement *self, PyObject *args) {
+//	Group_NULL(self);
+//	Group_Init(self);
+//	ECElement *obj = NULL;
+//
+//	if(PyArg_ParseTuple(args, "O", &obj)) {
+//		if(PyEC_Check(obj)) {
+//			Point_Init(obj);
+//			if(obj->type == G) {
+//
+//			}
+//		}
+//	}
+//}
 
 static PyObject *ECE_getOrder(ECElement *self) {
 	Group_Init(self)
@@ -1476,7 +1502,7 @@ PyMethodDef ECElement_methods[] = {
 		{"hash", (PyCFunction)ECE_hash, METH_VARARGS, "Perform a hash of a string to a group element of G."},
 		{"encode", (PyCFunction)ECE_encode, METH_VARARGS, "Encode string as a group element of G"},
 		{"decode", (PyCFunction)ECE_decode, METH_VARARGS, "Decode group element to a string."},
-		{"toInt", (PyCFunction)ECE_convertToZR, METH_VARARGS, "Returns the x coordinate of point on an elliptic curve."},
+		{"getXY", (PyCFunction)ECE_convertToZR, METH_VARARGS, "Returns the x and/or y coordinates of point on an elliptic curve."},
 		{NULL}
 };
 
@@ -1569,15 +1595,8 @@ struct module_state {
 #define GETSTATE(m) (&_state)
 static struct module_state _state;
 #endif
-//
-//static PyObject *error_out(PyObject *m) {
-//	struct module_state *st = GETSTATE(m);
-//	PyErr_SetString(st->error, "something BAD happened.");
-//	return NULL;
-//}
 
 static PyMethodDef ecc_methods[] = {
-//		{"error_out", (PyCFunction)error_out, METH_NOARGS, NULL},
 		{"InitBenchmark", (PyCFunction)_init_benchmark, METH_NOARGS, "Initialize a benchmark object"},
 		{"StartBenchmark", (PyCFunction)_start_benchmark, METH_VARARGS, "Start a new benchmark with some options"},
 		{"EndBenchmark", (PyCFunction)_end_benchmark, METH_VARARGS, "End a given benchmark"},

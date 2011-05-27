@@ -1,9 +1,8 @@
 # EC-MQV authenticated key agreement protocol
-from modules.engine.protocol import *
-from modules.engine.util import *
-from ecgroup import *
+from toolbox.ecgroup import *
+from charm.engine.protocol import *
+from charm.engine.util import *
 
-# UNTESTED CODE
 class ECMQV(Protocol):
     def __init__(self, builtin_cv=410):
         Protocol.__init__(self, None)        
@@ -86,3 +85,31 @@ class ECMQV(Protocol):
     # data is a tuple of various elements
     def mac(self, data, key):
         pass
+    
+    def hmac(self, data, key):
+        pass
+
+if __name___ == "__main__":
+    mqv = ECMQV()
+    if sys.argv[1] == "-v":
+        print("Operating as verifier...")
+        svr = socket(AF_INET, SOCK_STREAM)
+        svr.bind((HOST, PORT))
+        svr.listen(1)
+        svr_sock, addr = svr.accept()
+        print("Connected by ", addr)
+        _name, _type, _sock = "verifier", VERIFIER, svr_sock
+#       sp.setup( {'name':"verifier", 'type':_type, 'socket':svr_sock} )
+    elif sys.argv[1] == "-p":
+        print("Operating as prover...")
+        clt = socket(AF_INET, SOCK_STREAM)
+        clt.connect((HOST, PORT))
+        clt.settimeout(15)
+        _name, _type, _sock = "prover", PROVER, clt
+    else:
+        print("Usage: %s [-v or -p]" % sys.argv[0])
+        exit(-1)
+    mqv.setup( {'name':_name, 'type':_type, 'socket':_sock} )
+    # run as a thread...
+    mqv.execute(_type)
+    

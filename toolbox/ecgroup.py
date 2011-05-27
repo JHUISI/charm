@@ -52,8 +52,12 @@ class ECGroup():
     
     def zr(self, point):
         if type(point) == ecc:
-            return self.elem.toInt(point)
+            return self.elem.getXY(point, False)
         return None
+
+    def coordinates(self, point):
+        if type(point) == ecc:
+            return self.elem.getXY(point, True)
         
     def debug(self, data, prefix=None):
         if type(data) == dict and self._verbose:

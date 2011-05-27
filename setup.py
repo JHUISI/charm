@@ -34,7 +34,7 @@ setup(name = 'Charm-Crypto-Module',
 	author_email = "waldoayo@gmail.com",
 	url = "http://code.google.com/p/charm-crypto/",
 	packages = ['charm'],
-	package_data = {'charm':['__init__.py', 'engine/*.py']},
+	package_data = {'Charm':['__init__.py', 'engine/*.py']},
         py_modules = ['toolbox.ecgroup', 'toolbox.integergroup', 'toolbox.pairinggroup', 'toolbox.enum', 'toolbox.schemebase', 'toolbox.IBEnc', 'toolbox.PKEnc', 'toolbox.PKSig', 'toolbox.ABEnc', 'toolbox.hash_module', 'toolbox.secretutil', 
                      'toolbox.node', 'toolbox.zknode', 'toolbox.policytree', 'toolbox.sigmaprotocol', 'toolbox.Commit'],
         license = 'GPL'
