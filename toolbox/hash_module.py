@@ -35,3 +35,4 @@ class Hash():
             if len(strs) > 0:
                 return self.e.H(strs, ZR)
             return None
+        
