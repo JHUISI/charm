@@ -1,7 +1,8 @@
 # A collection of encryption and signature padding schemes
 import charm.cryptobase
-import hashlib, random
-import string, math, struct
+import hashlib, math, struct
+from toolbox.bitstring import *
+
 # OAEPEncryptionPadding
 #
 # Implements the OAEP padding scheme.  Appropriate for RSA-OAEP encryption.
@@ -14,8 +15,6 @@ class OAEPEncryptionPadding:
     def encode(self, message, outputBytes, label=None):
         # First, make sure the message isn't too long.  Skipped: label input length checking.
         if (len(message) > (outputBytes - (2 * self.hashFnOutputBytes) - 2)):
-            print("Message Len: ", len(message))
-            print("Required Min Len: ", (outputBytes - (2 * self.hashFnOutputBytes) - 2))
             assert False, "message too long"
         
         # Hash the label
@@ -25,13 +24,13 @@ class OAEPEncryptionPadding:
         lHash = self.hashFn(label)        
         # Let PS be a string of length (outputBytes - mLen - 2hLen - 2) containing only zero octets.
         # Compute DB = lHash || PS || 0x01 || M.
-        DB = lHash + fillBytes('\x00', outputBytes - len(message) - (2 * self.hashFnOutputBytes) - 2) + b'\x01' + bytes(message, 'utf8')
+        DB = lHash + Bytes.fill('\x00', outputBytes - len(message) - (2 * self.hashFnOutputBytes) - 2) + b'\x01' + bytes(message, 'utf8')
         
 #        print("DB =>", DB)
 #        print("DB len =>", len(DB))
         # Generate a random octet string seed of length hLen and compute 
         # maskedDB = MGF1(seed, outputBytes - self.hashFnOutputBytes - 1)
-        seed = randomBytes(self.hashFnOutputBytes)
+        seed = Bytes.random(self.hashFnOutputBytes)
         dbMask = MGF1(seed, len(DB), self.hashFn, self.hashFnOutputBytes)
         maskedDB = DB ^ dbMask
         
@@ -79,27 +78,6 @@ class OAEPEncryptionPadding:
         M = DB[DB.find('\x01')+1 : self.hashFnOutputBytes]
         return M
 
-class Bytes(bytes):
-    def __init__(self, value, enc=None):
-        #print("value =>", value, ", type =>", type(value))
-        if enc != None:
-           bytes.__init__(value, enc)
-        else:
-           bytes.__init__(value)
-
-    def __xor__(self, other):
-        #print("self =>", self); print("others =>", others)
-        if len(self) != len(other):
-            assert False, "Xor: operands differ in length."
-        res = b''
-        for i in range(0,len(self)):
-            s,t = self[i], other[i]
-            res += Bytes(chr(s ^ t), 'utf8') # should be a string
-        # print("res =>", res)
-        return Bytes(res)            
-        
-    def __add__(self, other):
-        return Bytes(bytes.__add__(self, other))
 # MGF1 Mask Generation Function
 #
 # Implemented according to PKCS #1 specification, see appendix B.2.1:
@@ -116,19 +94,6 @@ def MGF1(seed, maskBytes, hashFn, hashOutputBytes):
     diff = maskBytes - len(result)
     result2 = result + fillBytes('\x00', diff)
     return Bytes(result2)
-
-def fillBytes(prefix, length):
-    bits = b''
-    for i in range(0, length):
-        bits += Bytes(prefix, 'utf8')
-    return Bytes(bits)
-
-def randomBytes(length):
-    bits = random.sample(string.printable, length)
-    rand = ""
-    for i in bits: rand += i
-    return Bytes(rand, 'utf8')
-
 
 class hashFunc:
     def __init__(self, _hash_type=None):
