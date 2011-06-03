@@ -2,13 +2,6 @@ from distutils.core import setup, Extension
 import os,platform
 
 print("Platform:", platform.system())
-# print("Default Arch =>", platform.architecture()) 
-# if platform.system() == 'Darwin':
-   # idea is to set the below parameters automatically if mac multi-arch
-#   os.environ['CFLAGS'] = "-arch i386 -arch x86_64"
-#   os.environ['LDFLAGS'] = "-arch i386 -arch x86_64"
-#   print("Environ CFLAGS =>", os.environ.get('CFLAGS'))
-#   print("Environ LDFLAGS =>", os.environ.get('LDFLAGS'))
 
 path = 'charm-src/'
 _macros = []
@@ -23,6 +16,12 @@ cryptobase = Extension('cryptobase', sources = [path+'cryptobase/cryptobasemodul
 aes = Extension('AES', sources = [path+'cryptobase/AES.c'])
 des  = Extension('DES', include_dirs = [path+'cryptobase/libtom/'], sources = [path+'cryptobase/DES.c'])
 des3  = Extension('DES3', include_dirs = [path+'cryptobase/libtom/'], sources = [path+'cryptobase/DES3.c'])
+
+if platform.system() == 'Linux':
+   # add benchmark module to pairing, integer and ecc 
+   pairing_module.sources.append(path+'utils/benchmarkmodule.c')
+   integer_module.sources.append(path+'utils/benchmarkmodule.c')
+   ecc_module.sources.append(path+'utils/benchmarkmodule.c')
 
 setup(name = 'Charm-Crypto-Module',
 	ext_package = 'charm',

@@ -1,7 +1,6 @@
 
 # user config options
 setup1=$(shell mkdir -p /tmp/build-charm)
-setup2=$(shell mkdir -p /tmp/local)
 dest_build=/tmp/build-charm
 
 # gmp source
@@ -10,7 +9,7 @@ gmp_url=http://ftp.gnu.org/gnu/gmp/${gmp_version}.tar.gz
 gmp_options=
 
 # pbc source
-pbc_version=pbc-0.5.11
+pbc_version=pbc-0.5.12
 pbc_url=http://crypto.stanford.edu/pbc/files/${pbc_version}.tar.gz
 pbc_options=
 PYTHON=python
@@ -27,7 +26,6 @@ setup:
 	@echo "Setup build/staging directories"
 	set -x
 	${setup1}
-	${setup2}
 	set +x
 
 .PHONY: build-gmp
@@ -57,14 +55,20 @@ build: setup build-gmp build-pbc
 	@echo "Building the Charm Framework"
 	$(PYTHON) setup.py build
 	@echo "Complete"
-	
+
+.PHONY: rebuild
+rebuild:
+	@echo "Building the Charm Framework"
+	$(PYTHON) setup.py build
+	@echo "Complete"
+
 .PHONY: source
 source:
 	$(PYTHON) setup.py sdist $(COMPILE)
 
 .PHONY: install
 install:
-	$(PYTHON) setup.py install $(COMPILE) # --root $(DESTDIR) $(COMPILE)
+	$(PYTHON) setup.py install # $(COMPILE)
 
 # .PHONY: buildrpm
 # buildrpm:
