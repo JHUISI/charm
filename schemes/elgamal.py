@@ -55,7 +55,7 @@ class ElGamal(PKEnc):
         elif _type == ecc:
             group = ECGroup(_cv)
         else:
-            raise InvalidTypeException
+            assert False, "Invalid Type Exception!"
 
     def keygen(self, secparam=1024):
         if _type == int:

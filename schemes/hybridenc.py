@@ -2,7 +2,7 @@
 
 import random, string
 # Works for ElGamal and CS98 schemes
-from ec_cs98_enc import *
+#from ec_cs98_enc import *
 from elgamal import *
 from toolbox.PKEnc import *
 from charm.cryptobase import *
@@ -32,7 +32,8 @@ class HybridEnc(PKEnc):
         # encrypt session key using PKEnc
         c1 = self.pkenc.encrypt(pk, key)
         # use symmetric key encryption to enc actual message
-        prp = selectPRP(self.alg, (key, MODE_ECB))
+        iv  = '6543210987654321' # static IV (for testing)    
+        prp = selectPRP(self.alg, (key, MODE_CBC, iv))
         c2 = prp.encrypt(self.pad(M))
         print("Ciphertext 2...")
         print(c2)
@@ -65,8 +66,8 @@ class HybridEnc(PKEnc):
         return rand
 
 if __name__ == "__main__":
-    pkenc = EC_CS98(409)
-#    pkenc = ElGamal('ecc', 409)
+#    pkenc = EC_CS98(409)
+    pkenc = ElGamal(ecc, 409)
     hyenc = HybridEnc(pkenc)
    
     (pk, sk) = hyenc.keygen()
