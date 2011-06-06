@@ -1,13 +1,12 @@
 # Takes an public-key encryption scheme and builds a hybrid encryption scheme.
 
-import random
+import random, string
 # Works for ElGamal and CS98 schemes
 from ec_cs98_enc import *
 from elgamal import *
 from toolbox.PKEnc import *
 from charm.cryptobase import *
 from math import ceil
-from string import *
 
 # Adapter class for Hybrid Encryption Schemes
 class HybridEnc(PKEnc):
@@ -43,7 +42,8 @@ class HybridEnc(PKEnc):
         c1, c2 = ct['c1'], ct['c2']
         key = pkenc.decrypt(pk, sk, c1)[:self.key_len]
         print("Rec key =>", key,", len =", len(key))
-        prp = selectPRP(self.alg, (key, MODE_ECB))
+        iv  = '6543210987654321' # static IV (for testing)    
+        prp = selectPRP(self.alg, (key, MODE_CBC, iv))
         msg = prp.decrypt(c2)
         print("Rec msg =>", msg)
         return msg.decode('utf8').strip('\x00')
@@ -58,7 +58,7 @@ class HybridEnc(PKEnc):
         return message
     
     def randomBits(self):
-        bits = random.sample(printable, self.key_len)
+        bits = random.sample(string.printable, self.key_len)
         rand = ""
         for i in bits:
             rand += i
