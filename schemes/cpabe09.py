@@ -1,6 +1,6 @@
 # Brent Waters (Pairing-based)
 # 
-# From: "Ciphertext-Policy Attribute-Based Encryption: An Ecpressive, Efficient, and Provably Secure Realization", Appendix C.
+# From: "Ciphertext-Policy Attribute-Based Encryption: An Expressive, Efficient, and Provably Secure Realization", Appendix C.
 # Published in: 2008
 # Available from: http://eprint.iacr.org/2008/290.pdf
 # Notes: Security Assumption: parallel q-DBDHE. The sole disadvantage of this scheme is the high number of pairings
@@ -84,6 +84,7 @@ class CPabe(ABEnc):
         return cipher['C_tilde'] / (numerator / denominator)
 
 if __name__ == '__main__':
+    #Get the eliptic curve with the bilinear mapping feature needed.
     groupObj = PairingGroup('a.param', verbose=True)
 
     cpabe = CPabe(groupObj)

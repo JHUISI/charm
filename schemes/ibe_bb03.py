@@ -58,7 +58,7 @@ class IBE_BB04(IBEnc):
         C = (params['X'] ** s) * (params['g'] ** (s * ID))
         # use prf here?
         ciph = { 'B': B, 'C': C }
-        return (A, ciph) # user must destory A since it protects the msg
+        return (A, ciph) # user must destroy A since it protects the msg
 
     def decrypt(self, pk, dID, CT):
         A, B, C = CT['A'], CT['B'], CT['C']
