@@ -34,21 +34,20 @@ class Dabe(ABEnc):
         #H = group.hash     # The oracle that maps global identites GID onto elements of G
         #the prime order p is contained somewhere within the group object
         g1, g2 = group.random(G1), group.random(G2)
-        GP = {'g1': g1, 'g2': g2, 'H': group.hash}
+        GP = {'g1': g1, 'g2': g2, 'H': g1.H}
 
         return GP
 
     def auth_setup(self, GP, attributes):
-        ''' Authority Setup '''
+        '''Authority Setup for a given set of attributes'''
         #For each attribute i belonging to the authority, the authority chooses two random exponents, 
         #alpha_i, y_i and publishes PK={e(g,g)^alpha_i, g^y_i} for each attribute 
         #it keeps SK = {alpha_i, y_i} as its secret key
         SK = {} #dictionary of {s: {alpha_i, y_i}} 
         PK = {} #dictionary of {s: {e(g,g)^alpha_i, g^y}}
         for i in attributes :
-            # When using prime order groups, G1 is equiv to G2
             #TODO: Is ZR an appropriate choice for a random element in Zp?
-            alpha_i, y_i = group.random(ZR), group.random(ZR)
+            alpha_i, y_i = group.random(), group.random()
             e_gg_alpha_i = pair(GP['g1'],GP['g2']) ** alpha_i
             g_y_i = GP['g2'] ** y_i
             SK[i] = {'alpha_i': alpha_i, 'y_i': y_i}
@@ -57,11 +56,12 @@ class Dabe(ABEnc):
         return (SK, PK)
         
     def keygen(self, gp, sk, gid):
-        '''Create a GID for attribute i belonging to an authority'''
+        '''Create a key for GID on attribute i belonging to authority sk'''
         #sk is the tuple for the specific attribute {'alpha_i': , 'y_i'}
         #To create a key for GID for attribute i belonging to an authority, the authority computes K_{i,GID} = g^alpha_i * H(GID)^y_
     
         K = (gp['g1'] ** sk['alpha_i']) * (gp['H'](gid) ** sk['y_i'])
+        print("H(GID): %s" % gp['H'](gid))
         return {'k': K, 'gid': gid}
 
     def encrypt(self, pk, gp, M, policy_str):
@@ -73,7 +73,9 @@ class Dabe(ABEnc):
         s = group.random()
         w = group.init(ZR, 0)
         C0 = M * pair(gp['g1'], gp['g2']) ** s
+        print("e(gg)^s: %s" % pair(gp['g1'], gp['g2']) ** s )
         C1, C2, C3 = {}, {}, {}
+        C4 = {}
         
         #Parse the policy string into a tree
         plist = []
@@ -82,17 +84,19 @@ class Dabe(ABEnc):
         wshares = util.calculateShares(w, policy, list) 
         util.getAttributeList(policy, plist)
     
-        w_shares = dict([(x[0], x) for x in wshares])
+        w_shares = dict([(x[0], x[1]) for x in wshares])
     
         for x in sshares:
             attr, s_share = x[0], x[1]
-            w_share = w_shares[attr][1]
+            w_share = w_shares[attr]
             r_x = group.random()
             C1[attr] = (pair(gp['g1'],gp['g2']) ** s_share) * (pk[attr]['e(gg)^alpha_i'] ** r_x)
-            C2[attr] = gp['g1'] ** r_x
+            C2[attr] = gp['g2'] ** r_x
             C3[attr] = (pk[attr]['g^y_i'] ** r_x) * (gp['g2'] ** w_share)
+            #C4[attr] = pair(gp['g1'], gp['g2']) ** s_share
+            C4[attr] = (pair(gp['g1'], gp['g2']) ** s_share) * (pair(gp['H']('bob'),gp['g2']) ** w_share)
         
-        return { 'C0':C0, 'C1':C1, 'C2':C2, 'C3':C3, 'policy':policy, 'attributes':plist }
+        return { 'C0':C0, 'C1':C1, 'C2':C2, 'C3':C3, 'C4':C4, 'policy':policy, 'attributes':plist }
 
     def decrypt(self, gp, sk, ct):
         #sk is a dictionary of attribute private keys {attr: { xxx , xxx }} 
@@ -102,12 +106,19 @@ class Dabe(ABEnc):
         coeffs = {}; util.getCoefficients(ct['policy'], coeffs)
     
         h_gid = gp['H'](sk['gid'])  #find H(GID)
+        print("H(GID): %s" % h_gid)
         egg_s = group.init(GT, 1)
+        temp  = group.init(GT, 1)
         for x in pruned:
             num = ct['C1'][x] * pair(h_gid, ct['C3'][x])
             dem = pair(sk[x]['k'], ct['C2'][x])
             egg_s *= ( (num / dem) ** coeffs[x] )
+            #temp  *= ct['C4'][x] ** coeffs[x]
+            print("temp: %s" % ct['C4'][x])
+            print("n/d : %s" % (num/dem))
+            #print("coeffs[%s]: %s" % (x, coeffs[x]))
     
+        print("e(gg)^s: %s" % egg_s)
         return ct['C0'] / egg_s
 
 if __name__ == '__main__':
@@ -131,12 +142,12 @@ if __name__ == '__main__':
     K = dict([(i, dabe.keygen(GP, SK[i], gid)) for i in usr_attrs])
     K['gid'] = gid
     K['attributes'] = usr_attrs
-    print("\nSecret key: %s" % K)
-    groupObj.debug(K)
+    #print("\nSecret key: %s" % K)
+    #groupObj.debug(K)
 
     CT = dabe.encrypt(PK, GP, m, policy)
     print("\nCiphertext...")
-    groupObj.debug(CT)    
+    #groupObj.debug(CT)    
     
     orig_m = dabe.decrypt(GP, K, CT)
    
