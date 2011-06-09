@@ -75,7 +75,7 @@ class Dabe(ABEnc):
         C0 = M * pair(gp['g1'], gp['g2']) ** s
         print("e(gg)^s: %s" % pair(gp['g1'], gp['g2']) ** s )
         C1, C2, C3 = {}, {}, {}
-        C4 = {}
+        C4, C5 = {}, {}  #testing variables
         
         #Parse the policy string into a tree
         plist = []
@@ -94,11 +94,13 @@ class Dabe(ABEnc):
             C2[attr] = gp['g2'] ** r_x
             C3[attr] = (pk[attr]['g^y_i'] ** r_x) * (gp['g2'] ** w_share)
             #C4[attr] = pair(gp['g1'], gp['g2']) ** s_share
-            C4[attr] = (pair(gp['g1'], gp['g2']) ** s_share) * (pair(gp['H']('bob'),gp['g2']) ** w_share)
-        
-        return { 'C0':C0, 'C1':C1, 'C2':C2, 'C3':C3, 'C4':C4, 'policy':policy, 'attributes':plist }
+            #C4[attr] = (pair(gp['g1'], gp['g2']) ** s_share) * (pair(gp['H']('bob'),gp['g2']) ** w_share)
+            C4[attr] = (pair(gp['g1'],gp['g2']) ** r_x ) 
+            C5[attr] = (pair(gp['H']('bob'), gp['g2']) ** r_x)       
 
-    def decrypt(self, gp, sk, ct):
+        return { 'C0':C0, 'C1':C1, 'C2':C2, 'C3':C3, 'C4':C4, 'C5':C5, 'policy':policy, 'attributes':plist }
+
+    def decrypt(self, gp, sk, ct, SK):
         #sk is a dictionary of attribute private keys {attr: { xxx , xxx }} 
         #ct is ciphertext
     
@@ -112,10 +114,13 @@ class Dabe(ABEnc):
         for x in pruned:
             num = ct['C1'][x] * pair(h_gid, ct['C3'][x])
             dem = pair(sk[x]['k'], ct['C2'][x])
+            dem2 = (ct['C4'] ** SK['alpha_i'] ) * ( ct['C5'] ** SK['y_i'])
+            print("dem: %s" % dem)
+            print("dem2:%s" % dem2)
             egg_s *= ( (num / dem) ** coeffs[x] )
             #temp  *= ct['C4'][x] ** coeffs[x]
-            print("temp: %s" % ct['C4'][x])
-            print("n/d : %s" % (num/dem))
+            #print("temp: %s" % ct['C4'][x])
+            #print("n/d : %s" % (num/dem))
             #print("coeffs[%s]: %s" % (x, coeffs[x]))
     
         print("e(gg)^s: %s" % egg_s)
@@ -149,7 +154,7 @@ if __name__ == '__main__':
     print("\nCiphertext...")
     #groupObj.debug(CT)    
     
-    orig_m = dabe.decrypt(GP, K, CT)
+    orig_m = dabe.decrypt(GP, K, CT,SK)
    
     if m == orig_m: 
         print('Successful Decryption!')
