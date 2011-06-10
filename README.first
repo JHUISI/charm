@@ -5,7 +5,8 @@ Charm Documentation
 
 Dependencies
 ------------
-To build the Charm framework, you will need to install at a minimum openssl, gmp, and pbc. Openssl is a dependency for Python so you should already have this library installed already. We have provided a make target for automatically building gmp and pbc. Just executing a 'make build' will build and install gmp and pbc in /usr/local directory. Change the install destination for pbc and gmp by specifying DESTDIR with 'make build'.
+To build the Charm framework, you will need to install at a minimum openssl, gmp, and pbc, python3, and its development package.
+Openssl is a dependency for Python so you should already have this library installed already. We have provided a make target for automatically building gmp and pbc. Just executing a 'make build' will build and install gmp and pbc in /usr/local directory. Change the install destination for pbc and gmp by specifying DESTDIR with 'make build'.
 
 Note that 'make build' may require super user privileges to install the dependencies.
  
