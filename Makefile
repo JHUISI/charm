@@ -16,10 +16,11 @@ PYTHON=python
 DESTDIR=/usr/local
 
 all:
-	@echo "make build - Build the charm framework"
-	@echo "make source - Create source package"
-	@echo "make install - Install on local system"
-	@echo "make clean - Get rid of scratch and byte files"
+	@echo "make build - Build the charm framework and install dependencies."
+	@echo "make rebuild - Build the charm framework ONLY"
+	@echo "make source - Create source package."
+	@echo "make install - Install on local system."
+	@echo "make clean - Get rid of scratch and byte files."
 
 .PHONY: setup
 setup:
