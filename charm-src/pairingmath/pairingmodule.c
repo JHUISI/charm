@@ -1034,6 +1034,18 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 		return NULL;
 	}
 	
+	if(pairing_is_symmetric(lhs->pairing)) {
+		debug("Pairing is symmetric.\n");
+		debug_e("LHS: '%B'\n", lhs->e);
+		debug_e("RHS: '%B'\n", rhs->e);
+		START_CLOCK(dBench);
+		newObject = createNewElement(GT, lhs->pairing);
+		pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing);
+		STOP_CLOCK(dBench);
+		UPDATE_BENCHMARK(PAIRINGS, dBench);
+		return (PyObject *) newObject;
+	}
+
 	if(Check_Types(lhs->element_type, rhs->element_type, 'e')) {
 		// apply pairing
 		debug_e("LHS: '%B'\n", lhs->e);
