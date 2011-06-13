@@ -1,6 +1,6 @@
 # Lewko-Waters Decentralized Attribute-Based Encryption 
 # 
-# ﻿Lewko, Allison, and Brent Waters, "Decentralizing Attribute-Based Encryption.", Appendix D
+# Lewko, Allison, and Brent Waters, "Decentralizing Attribute-Based Encryption.", Appendix D
 # Published in: Eurocrypt 2011
 # Available from: http://eprint.iacr.org/2010/351.pdf
 #
