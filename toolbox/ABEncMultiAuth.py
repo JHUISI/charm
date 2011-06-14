@@ -20,10 +20,8 @@ class ABEncMultiAuth(SchemeBase):
     def keygen(self, gp, sk, gid):
         raise NotImplementedError
 
-    # pk, gp, M, object
     def encrypt(self, pk, gp, M, object):
         raise NotImplementedError
 
-    # args: gp, sk, ct, SK
-    def decrypt(self, *args):
+    def decrypt(self, gp, sk, ct, SK):
         raise NotImplementedError
