@@ -1054,7 +1054,7 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 		newObject = createNewElement(GT, lhs->pairing);
 		pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing);
 		STOP_CLOCK(dBench);
-		UPDATE_BENCHMARK(PAIRINGS, dBench)
+		UPDATE_BENCHMARK(PAIRINGS, dBench);
 		return (PyObject *) newObject;
 	}
 	

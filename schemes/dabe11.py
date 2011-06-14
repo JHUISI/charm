@@ -12,15 +12,15 @@
 
 from toolbox.pairinggroup import *
 from toolbox.secretutil import *
-from toolbox.ABEnc import *
+from toolbox.ABEncMultiAuth import *
 
-class Dabe(ABEnc):
+class Dabe(ABEncMultiAuth):
     '''
     Decentralized Attribute-Based Encryption by Lewko and Waters
     '''
 
     def __init__(self, groupObj):
-        ABEnc.__init__(self)
+        ABEncMultiAuth.__init__(self)
         global util, group
         util = SecretUtil(groupObj.Pairing, verbose=False)  #Create Secret Sharing Scheme
         group = groupObj    #Prime order group                  
@@ -28,18 +28,18 @@ class Dabe(ABEnc):
     def setup(self):
         '''Global Setup'''
         #In global setup, a bilinear group G of prime order p is chosen
-        #The gloabl public parameters, GP and p, and a generator g of G. A random oracle H maps global identites GID to elements of G
+        #The global public parameters, GP and p, and a generator g of G. A random oracle H maps global identities GID to elements of G
     
         #group contains 
         #the prime order p is contained somewhere within the group object
         g = group.random(G1)
-        # The oracle that maps global identites GID onto elements of G
+        # The oracle that maps global identities GID onto elements of G
         H = lambda str: g** group.hash(str)
         GP = {'g':g, 'H': H, 'debug':False}
 
         return GP
 
-    def auth_setup(self, GP, attributes):
+    def authsetup(self, GP, attributes):
         '''Authority Setup for a given set of attributes'''
         #For each attribute i belonging to the authority, the authority chooses two random exponents, 
         #alpha_i, y_i and publishes PK={e(g,g)^alpha_i, g^y_i} for each attribute 
@@ -142,7 +142,7 @@ if __name__ == '__main__':
     print('Acces Policy: %s' % policy)
     print('User credential list: %s' % usr_attrs)
 
-    (SK, PK) = dabe.auth_setup(GP, auth_attrs)
+    (SK, PK) = dabe.authsetup(GP, auth_attrs)
     print("Authority SK")
     print(SK)
 
@@ -157,7 +157,7 @@ if __name__ == '__main__':
     print("\nCiphertext...")
     groupObj.debug(CT)    
     
-    orig_m = dabe.decrypt(GP, K, CT,SK)
+    orig_m = dabe.decrypt(GP, K, CT, SK)
    
     if m == orig_m: 
         print('Successful Decryption!')
