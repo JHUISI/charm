@@ -23,5 +23,5 @@ class ABEncMultiAuth(SchemeBase):
     def encrypt(self, pk, gp, M, object):
         raise NotImplementedError
 
-    def decrypt(self, gp, sk, ct, SK):
+    def decrypt(self, gp, sk, ct):
         raise NotImplementedError
