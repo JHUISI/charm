@@ -16,8 +16,11 @@ class HybridABEncMA(ABEncMultiAuth):
     def setup(self):
         return abencma.setup()
     
-    def authsetup(self, *args):
-        return abencma.authsetup(args)
+    def authsetup(self, gp, attributes):
+        return abencma.authsetup(gp, attributes)
+    
+    def keygen(self, gp, sk, i, gid, pkey):
+        return abencma.keygen(gp, sk, i, gid, pkey)
     
     def encrypt(self, pk, gp, M, policy_str):
         if type(M) != str and type(policy_str) != str: raise "message and policy not right type!"        
@@ -28,9 +31,9 @@ class HybridABEncMA(ABEncMultiAuth):
         c2 = cipher.encrypt(self.pad(M))
         return { 'c1':c1, 'c2':c2 }
     
-    def decrypt(self, gp, sk, ct, SK):
+    def decrypt(self, gp, sk, ct):
         c1, c2 = ct['c1'], ct['c2']
-        key = abencma.decrypt(gp, sk, c1, SK)        
+        key = abencma.decrypt(gp, sk, c1)
         cipher = self.instantiateCipher(MODE_CBC, key)
         msg = cipher.decrypt(c2)
         return msg
@@ -58,22 +61,33 @@ if __name__ == "__main__":
         
     hyb_abema = HybridABEncMA(dabe, groupObj)
     
-    # add dabe main code as is using below pattern for data encryption
+    #Setup global parameters for all new authorities
+    gp = hyb_abema.setup()
     
-#    (pk, mk) = hyb_ibe.setup()
-#
-#    kID = 'waldoayo@gmail.com'
-#    sk = hyb_ibe.extract(mk, kID)
-#
-#    msg = "Hello World My name is blah blah!!!! Word!"
-#    
-#    ct = hyb_ibe.encrypt(pk, sk['id'], msg)
-#    print("Ciphertext")
-#    print("c1 =>", ct['c1'])
-#    print("c2 =>", ct['c2'])
-#    
-#    orig_msg = hyb_ibe.decrypt(pk, sk, ct)
-#    print("Result =>", orig_msg)
+    #Instantiate a few authorities 
+    #Attribute names must be globally unique.  
+    #Two authorities may not issue keys for the same attribute. 
+    #Otherwise, the decryption algorithm will not know which private key to use   
+    jhu_attributes = ['jhuprofessor', 'jhustaff', 'jhustudent']
+    jhmi_attributes = ['jhmidoctor', 'jhminurse', 'jhmistaff', 'jhmiresearcher']
+    (jhuSK, jhuPK) = hyb_abema.authsetup(gp, jhu_attributes)
+    (jhmiSK, jhmiPK) = hyb_abema.authsetup(gp, jhmi_attributes)
+    allAuthPK = {}; allAuthPK.update(jhuPK); allAuthPK.update(jhmiPK)
+    
+    #Setup a user with a few keys
+    bobs_gid = "20110615 bob@gmail.com cryptokey"
+    K = {}
+    hyb_abema.keygen(gp, jhuSK,'jhuprofessor', bobs_gid, K)
+    hyb_abema.keygen(gp, jhmiSK,'jhmiresearcher', bobs_gid, K)
+    
+    
+    msg = "Hello World, I am a sensitive record!"
+    policy_str = "(jhmidoctor or (jhmiresearcher and jhuprofessor))"
+    ct = hyb_abema.encrypt(allAuthPK, gp, msg, policy_str)    
 
+    print("Ciphertext")
+    print("c1 =>", ct['c1'])
+    print("c2 =>", ct['c2'])
     
-    
+    orig_msg = hyb_abema.decrypt(gp, K, ct)
+    print("Result =>", orig_msg)

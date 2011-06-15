@@ -21,9 +21,10 @@ class Dabe(ABEncMultiAuth):
 
     def __init__(self, groupObj):
         ABEncMultiAuth.__init__(self)
-        global util, group
+        global util, group, debug
         util = SecretUtil(groupObj.Pairing, verbose=False)  #Create Secret Sharing Scheme
-        group = groupObj    #Prime order group                  
+        group = groupObj    #Prime order group
+        debug = False                  
    
     def setup(self):
         '''Global Setup'''
@@ -34,8 +35,9 @@ class Dabe(ABEncMultiAuth):
         #the prime order p is contained somewhere within the group object
         g = group.random(G1)
         # The oracle that maps global identities GID onto elements of G
-        H = lambda str: g** group.hash(str)
-        GP = {'g':g, 'H': H, 'debug':False}
+        #H = lambda str: g** group.hash(str)
+        H = lambda x: group.hash(x, G1)
+        GP = {'g':g, 'H': H}
 
         return GP
 
@@ -51,10 +53,10 @@ class Dabe(ABEncMultiAuth):
             alpha_i, y_i = group.random(), group.random()
             e_gg_alpha_i = pair(GP['g'],GP['g']) ** alpha_i
             g_y_i = GP['g'] ** y_i
-            SK[i] = {'alpha_i': alpha_i, 'y_i': y_i, 'i':i}
-            PK[i] = {'e(gg)^alpha_i': e_gg_alpha_i, 'g^y_i': g_y_i}
+            SK[i.upper()] = {'alpha_i': alpha_i, 'y_i': y_i}
+            PK[i.upper()] = {'e(gg)^alpha_i': e_gg_alpha_i, 'g^y_i': g_y_i}
         
-        if(GP['debug']):
+        if(debug):
             print("Authority Setup fo %s" % attributes)
             print("SK = {alpha_i, y_i}")
             print(SK)
@@ -63,19 +65,23 @@ class Dabe(ABEncMultiAuth):
              
         return (SK, PK)
         
-    def keygen(self, gp, sk, gid):
-        '''Create a key for GID on attribute i belonging to authority sk'''
-        #sk is the tuple for the specific attribute {'alpha_i': , 'y_i'}
+    def keygen(self, gp, sk, i, gid, pkey):
+        '''Create a key for GID on attribute i belonging to authority sk
+        sk is the private key for the releveant authority
+        i is the attribute to give bob
+        pkey is bob's private key dictionary, to which the appropriate private key is added
+        '''
         #To create a key for GID for attribute i belonging to an authority, the authority computes K_{i,GID} = g^alpha_i * H(GID)^y_
         h = gp['H'](gid) 
-        K = (gp['g'] ** sk['alpha_i']) * (h ** sk['y_i'])
+        K = (gp['g'] ** sk[i.upper()]['alpha_i']) * (h ** sk[i.upper()]['y_i'])
         
-        if(GP['debug']):
-            print("Key gen for %s on %s" % (gid, sk['i']))
+        pkey[i.upper()] = {'k': K}
+        pkey['gid'] = gid
+        
+        if(debug):
+            print("Key gen for %s on %s" % (gid, i))
             print("H(GID): '%s'" % h)
             print("K = g^alpha_i * H(GID) ^ y_i: %s" % K)
-         
-        return {'k': K, 'gid': gid}
 
     def encrypt(self, pk, gp, M, policy_str):
         '''Encrypt'''
@@ -90,11 +96,11 @@ class Dabe(ABEncMultiAuth):
         C1, C2, C3 = {}, {}, {}
         
         #Parse the policy string into a tree
-        plist = []
+
         policy = util.createPolicy(policy_str)
         sshares = util.calculateShares(s, policy, list) #Shares of the secret 
         wshares = util.calculateShares(w, policy, list) #Shares of 0
-        util.getAttributeList(policy, plist)
+        
     
         wshares = dict([(x[0], x[1]) for x in wshares])
         sshares = dict([(x[0], x[1]) for x in sshares])
@@ -104,25 +110,29 @@ class Dabe(ABEncMultiAuth):
             C1[attr] = (pair(gp['g'],gp['g']) ** s_share) * (pk[attr]['e(gg)^alpha_i'] ** r_x)
             C2[attr] = gp['g'] ** r_x
             C3[attr] = (pk[attr]['g^y_i'] ** r_x) * (gp['g'] ** w_share)
+            
+        #plist = []
+        #util.getAttributeList(policy, plist)
+        return { 'C0':C0, 'C1':C1, 'C2':C2, 'C3':C3, 'policy':policy}  #'attributes':plist 
 
-        return { 'C0':C0, 'C1':C1, 'C2':C2, 'C3':C3, 'policy':policy, 'attributes':plist }
-
-    def decrypt(self, gp, sk, ct, SK):
-        #sk is a dictionary of attribute private keys {attr: { xxx , xxx }} 
-        #ct is ciphertext
+    def decrypt(self, gp, sk, ct):
+        '''Decrypt a ciphertext
+        SK is the user's private key dictionary {attr: { xxx , xxx }}
+        ''' 
     
-        pruned = util.prune(ct['policy'], sk['attributes'])
+        usr_attribs = list(sk.keys())
+        usr_attribs.remove('gid')
+        pruned = util.prune(ct['policy'], usr_attribs)
         coeffs = {}; util.getCoefficients(ct['policy'], coeffs)
     
         h_gid = gp['H'](sk['gid'])  #find H(GID)
         egg_s = group.init(GT, 1)
-        temp  = group.init(GT, 1)
         for x in pruned:
             num = ct['C1'][x] * pair(h_gid, ct['C3'][x])
             dem = pair(sk[x]['k'], ct['C2'][x])
             egg_s *= ( (num / dem) ** coeffs[x] )
    
-        if(GP['debug']):
+        if(debug):
             print("e(gg)^s: %s" % egg_s)
 
         return ct['C0'] / egg_s
@@ -132,32 +142,30 @@ if __name__ == '__main__':
 
     dabe = Dabe(groupObj)
     GP = dabe.setup()
-    
-    gid = "bob"
+
+    #Setup an authority
     auth_attrs= ['ONE', 'TWO', 'THREE', 'FOUR']
-    usr_attrs = ['THREE', 'ONE', 'TWO']
-    policy = '((one or three) and (TWO or FOUR))'
-    m = groupObj.random(GT)
-
-    print('Acces Policy: %s' % policy)
-    print('User credential list: %s' % usr_attrs)
-
     (SK, PK) = dabe.authsetup(GP, auth_attrs)
     print("Authority SK")
     print(SK)
 
-    #Get keys for each attribute
-    K = dict([(i, dabe.keygen(GP, SK[i], gid)) for i in usr_attrs])
-    K['gid'] = gid
-    K['attributes'] = usr_attrs
+    #Setup a user and give him some keys
+    gid, K = "bob", {}
+    usr_attrs = ['THREE', 'ONE', 'TWO']
+    for i in usr_attrs: dabe.keygen(GP, SK, i, gid, K)
+    print('User credential list: %s' % usr_attrs)    
     print("\nSecret key:")
     groupObj.debug(K)
 
+    #Encrypt a random element in GT
+    m = groupObj.random(GT)
+    policy = '((one or three) and (TWO or FOUR))'
+    print('Acces Policy: %s' % policy)
     CT = dabe.encrypt(PK, GP, m, policy)
     print("\nCiphertext...")
     groupObj.debug(CT)    
     
-    orig_m = dabe.decrypt(GP, K, CT, SK)
+    orig_m = dabe.decrypt(GP, K, CT)
    
     if m == orig_m: 
         print('Successful Decryption!')
