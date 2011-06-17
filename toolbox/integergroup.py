@@ -108,5 +108,8 @@ class IntegerGroupQ:
     def hash(self, *args):
         if isinstance(args, tuple):
             return hash(args, self.p, self.q, True)
-        return None
+        List = []
+        for i in args:
+            List.append(i)
+        return hash(tuple(List), self.p, self.q, True)
     

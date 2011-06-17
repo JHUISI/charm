@@ -1,7 +1,7 @@
-# Base class for public-key signatures
+# Base class for Hash functions
 # 
-# Notes: This class implements an interface for a standard public-key signature scheme.
-#	 A public key signature consists of three algorithms: (keygen, sign, verify).
+# Notes: This class implements an interface for a standard hash function scheme.
+#	 A hash function consists of two algorithms: (paramgen or keygen and hash).
 #
 from toolbox.schemebase import *
 
@@ -10,9 +10,26 @@ class Hash(SchemeBase):
         SchemeBase.__init__(self)
         SchemeBase.setProperty(self, scheme='Hash')
         self.baseSecDefs = None # Enum('EU_CMA')
+    # base methods?
+    def paramgen(self, *args):
+        raise NotImplementedError
+    
+    def hash(self, *args):
+        raise NotImplementedError
+
+# Notes: This class implements an interface for a chameleon hash function. 
+# A standard charmeleon hash scheme has two algorithms paramgen and hash.
+# paramgen accepts a security parameter and the length of p and q. Hash accepts
+# public key, label, a message and a random element.
+
+class ChamHash(Hash):
+    def __init__(self):
+        Hash.__init__(self)
+        Hash.setProperty(self, scheme='ChamHash')
+        self.baseSecDefs = None # Enum('EU_CMA')
         
-    def paramgen(self, secparam, p = 0, q = 0):
+    def paramgen(self, secparam, p=None, q=None):
         raise NotImplementedError		
 
-    def hash(self, message, r):
+    def hash(self, pk, prefix, message, r):
         raise NotImplementedError
