@@ -68,8 +68,8 @@ if __name__ == "__main__":
     #Attribute names must be globally unique.  
     #Two authorities may not issue keys for the same attribute. 
     #Otherwise, the decryption algorithm will not know which private key to use   
-    jhu_attributes = ['jhuprofessor', 'jhustaff', 'jhustudent']
-    jhmi_attributes = ['jhmidoctor', 'jhminurse', 'jhmistaff', 'jhmiresearcher']
+    jhu_attributes = ['jhu_professor', 'jhu_staff', 'jhu_student']
+    jhmi_attributes = ['jhmi_doctor', 'jhm_inurse', 'jhmi_staff', 'jhmi_researcher']
     (jhuSK, jhuPK) = hyb_abema.authsetup(gp, jhu_attributes)
     (jhmiSK, jhmiPK) = hyb_abema.authsetup(gp, jhmi_attributes)
     allAuthPK = {}; allAuthPK.update(jhuPK); allAuthPK.update(jhmiPK)
@@ -77,12 +77,12 @@ if __name__ == "__main__":
     #Setup a user with a few keys
     bobs_gid = "20110615 bob@gmail.com cryptokey"
     K = {}
-    hyb_abema.keygen(gp, jhuSK,'jhuprofessor', bobs_gid, K)
-    hyb_abema.keygen(gp, jhmiSK,'jhmiresearcher', bobs_gid, K)
+    hyb_abema.keygen(gp, jhuSK,'jhu_professor', bobs_gid, K)
+    hyb_abema.keygen(gp, jhmiSK,'jhmi_researcher', bobs_gid, K)
     
     
     msg = "Hello World, I am a sensitive record!"
-    policy_str = "(jhmidoctor or (jhmiresearcher and jhuprofessor))"
+    policy_str = "(jhmi_doctor or (jhmi_researcher and jhu_professor))"
     ct = hyb_abema.encrypt(allAuthPK, gp, msg, policy_str)    
 
     print("Ciphertext")

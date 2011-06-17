@@ -57,7 +57,7 @@ class Dabe(ABEncMultiAuth):
             PK[i.upper()] = {'e(gg)^alpha_i': e_gg_alpha_i, 'g^y_i': g_y_i}
         
         if(debug):
-            print("Authority Setup fo %s" % attributes)
+            print("Authority Setup for %s" % attributes)
             print("SK = {alpha_i, y_i}")
             print(SK)
             print("PK = {e(g,g) ^ alpha_i, g ^ y_i}")

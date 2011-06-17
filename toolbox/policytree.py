@@ -53,7 +53,7 @@ class PolicyParser:
         BinOperator = Literal("<=") | Literal(">=") | Literal("==") | Word("<>", max=1)
 
         # describes an individual leaf node
-        leafNode =  (Optional("!") + Word(alphanums)).setParseAction( createNode )
+        leafNode =  (Optional("!") + Word(alphanums+'_./\?!@#$^&*%')).setParseAction( createNode )
         # describes expressions such as (attr < value)
         leafConditional = (Word(alphanums) + BinOperator + Word(nums)).setParseAction( parseNumConditional )
 
