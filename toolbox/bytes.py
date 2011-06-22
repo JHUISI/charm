@@ -26,9 +26,9 @@ class Bytes(bytes):
         
         if(printable):
             #Nice printable characters for testing purposes
-            return bytes(random.randrange(0x20, 0x7E) for i in range(length))
+            return Bytes(random.randrange(0x20, 0x7E) for i in range(length))
         else:
-            return bytes(random.randrange(0, 256) for i in range(length))
+            return Bytes(random.randrange(0, 256) for i in range(length))
     
     @classmethod
     def fill(self, prefix, length):

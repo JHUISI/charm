@@ -6,20 +6,16 @@ Created on Jun 17, 2011
 import unittest
 import paddingschemes
 from binascii import a2b_hex
-import dbm
 
 class Test(unittest.TestCase):
 
 
     def testOEAPVector1(self):
-        # RSA-OAEP encryption of 6 random messages with random seeds
-        # -----------------------------------------------------------
+        # OAEP Test vector taken from Appendix C 
+        #ftp://ftp.rsa.com/pub/rsalabs/rsa_algorithm/rsa-oaep_spec.pdf
         
-        # OAEP Example 1.1
-        # ------------------
-        
+        # --------------------------------------------------------------------------------
         # Message:
-        
         m     = a2b_hex('d4 36 e9 95 69 fd 32 a7 c8 a0 5b bc 90 d3 2c 49'.replace(' ',''))
         label = ""
         lhash = a2b_hex("da 39 a3 ee 5e 6b 4b 0d 32 55 bf ef 95 60 18 90 af d8 07 09".replace(' ',""))
@@ -96,7 +92,6 @@ class Test(unittest.TestCase):
         
     def testSHA1Vector(self):
         hashFn = paddingschemes.hashFunc('sha1')
-        hLen =  20
         V0 = (b"", a2b_hex("da39a3ee5e6b4b0d3255bfef95601890afd80709"))
         V1 = (bytes("The quick brown fox jumps over the lazy dog", 'utf-8'), a2b_hex("2fd4e1c67a2d28fced849ee1bb76e7391b93eb12")) #ASCII encoding
         V2 = (b'The quick brown fox jumps over the lazy dog', a2b_hex("2fd4e1c67a2d28fced849ee1bb76e7391b93eb12")) #binary data
@@ -107,7 +102,6 @@ class Test(unittest.TestCase):
         self.assertEqual(hashFn(V0[0]), V0[1], 'empty string')
         self.assertEqual(hashFn(V1[0]), V1[1], 'quick fox')
         self.assertEqual(hashFn(V2[0]), V2[1])
-        
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

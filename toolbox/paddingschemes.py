@@ -126,17 +126,18 @@ class hashFunc:
         return Bytes(h.digest())  
 # PSSSignaturePadding
 #
-# Implements the PSS signature padding scheme.  Appropriate for RSA-PSS signing.
-
-#class PSSPadding
-#    def __init__(self, outputBits, randomBits)
-#        self.outputBits = outputBits
-#        self.randomBits = randomBits
-#        
-#    def encode(self, N, message)
-#        # Pick 'randomBits' random bits
-#        return encoded
+# Implements the PSS signature padding scheme.  Appropriate for RSA-PSS signing
+# Implemented according to section 8 of PKCS1v2-1.pdf.
+#
+class PSSPadding
+    def __init__(self, outputBits, randomBits)
+        self.outputBits = outputBits
+        self.randomBits = randomBits
         
-#    def validate(self)
-#        # undo the result
-#        return decoded
+    def encode(self, N, message)
+        # Pick 'randomBits' random bits
+        return encoded
+       
+    def validate(self)
+        # undo the result
+        return decoded
