@@ -1,8 +1,9 @@
 # A collection of encryption and signature padding schemes
 import charm.cryptobase
 import hashlib, math, struct
-from toolbox.bitstring import *
-from toolbox import bitstring
+from bitstring import *
+from SecureRandom import *
+from weakrandom import WeakRandom
 
 # OAEPEncryptionPadding
 #
@@ -36,7 +37,9 @@ class OAEPEncryptionPadding:
         # Generate a random octet string seed of length hLen and compute 
         # maskedDB = MGF1(seed, emLen - self.hashFnOutputBytes - 1)
         if (seed is None):
-            seed = Bytes.random(hLen, True)   #TODO: how secure is Bytes.random?
+            rand = SecureRandomFactory.getInstance()
+            seed = rand.getRandomBits(hLen)
+            
         dbMask = MGF1(seed, len(DB), self.hashFn, hLen)
         maskedDB = DB ^ dbMask
         
@@ -129,15 +132,15 @@ class hashFunc:
 # Implements the PSS signature padding scheme.  Appropriate for RSA-PSS signing
 # Implemented according to section 8 of PKCS1v2-1.pdf.
 #
-class PSSPadding
-    def __init__(self, outputBits, randomBits)
+class PSSPadding:
+    def __init__(self, outputBits, randomBits):
         self.outputBits = outputBits
         self.randomBits = randomBits
         
-    def encode(self, N, message)
+    def encode(self, N, message):
         # Pick 'randomBits' random bits
-        return encoded
+        pass
        
-    def validate(self)
+    def validate(self):
         # undo the result
-        return decoded
+        pass

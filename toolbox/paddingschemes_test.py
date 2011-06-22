@@ -9,7 +9,6 @@ from binascii import a2b_hex
 
 class Test(unittest.TestCase):
 
-
     def testOEAPVector1(self):
         # OAEP Test vector taken from Appendix C 
         #ftp://ftp.rsa.com/pub/rsalabs/rsa_algorithm/rsa-oaep_spec.pdf
@@ -59,16 +58,15 @@ class Test(unittest.TestCase):
         E = c.encode(m, 128,"",seed)
         self.assertEqual(EM, E)
     
-    def xtestRoundTripEquiv(self):
+    def testRoundTripEquiv(self):
         oaep = paddingschemes.OAEPEncryptionPadding()
         m = b'This is a test message'
-        ct = oaep.encode(m, 64, None)
-        pt = oaep.decode(ct, None)
-        print(ct)
+        ct = oaep.encode(m, 64)
+        pt = oaep.decode(ct)
         self.assertEqual(m, pt, 'Decoded message is not equal to encoded message\n'\
                          'ct: %s\nm:  %s\npt: %s' % (ct, m, pt))
         
-    def xtestMFG(self):
+    def testMFG(self):
         seed = ""
         hashFn = paddingschemes.OAEPEncryptionPadding().hashFn
         hLen =  paddingschemes.OAEPEncryptionPadding().hashFnOutputBytes
@@ -102,6 +100,12 @@ class Test(unittest.TestCase):
         self.assertEqual(hashFn(V0[0]), V0[1], 'empty string')
         self.assertEqual(hashFn(V1[0]), V1[1], 'quick fox')
         self.assertEqual(hashFn(V2[0]), V2[1])
+        
+    
+    @classmethod
+    def suite(self):
+        suite = unittest.TestLoader().loadTestsFromTestCase(Test)
+        return suite
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
