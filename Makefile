@@ -12,7 +12,7 @@ gmp_options=
 pbc_version=pbc-0.5.12
 pbc_url=http://crypto.stanford.edu/pbc/files/${pbc_version}.tar.gz
 pbc_options=
-PYTHON=python
+PYTHON=python3
 DESTDIR=/usr/local
 
 all:
@@ -21,6 +21,7 @@ all:
 	@echo "make source - Create source package."
 	@echo "make install - Install on local system."
 	@echo "make clean - Get rid of scratch and byte files."
+	@echo "make test  - Run Unit Tests."
 
 .PHONY: setup
 setup:
@@ -70,6 +71,10 @@ source:
 .PHONY: install
 install:
 	$(PYTHON) setup.py install # $(COMPILE)
+	
+.PHONY: test
+test:
+	$(PYTHON) all_tests.py
 
 # .PHONY: buildrpm
 # buildrpm:

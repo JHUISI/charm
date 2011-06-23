@@ -24,7 +24,7 @@ class Dabe(ABEncMultiAuth):
         global util, group, debug
         util = SecretUtil(groupObj.Pairing, verbose=False)  #Create Secret Sharing Scheme
         group = groupObj    #Prime order group
-        debug = False                  
+        debug = True                  
    
     def setup(self):
         '''Global Setup'''

@@ -4,10 +4,12 @@ Created on Jun 22, 2011
 @author: Gary Belvin
 '''
 import unittest
-import os, imp, re
+import os, imp, re, sys
 
 #A list of all the directories to search
-unittestpaths = ['.', '../schemes/']
+unittestpaths = ['toolbox/', 'schemes/']
+for p in unittestpaths:
+	sys.path.append(p)
 
 def find_modules(path="."):
     """Return names of modules in a directory.
@@ -41,10 +43,10 @@ if __name__ == "__main__":
     #Collect test cases
     for path in unittestpaths:
         testmodules = [mod for mod in find_modules(path) if re.match(".*_test$", mod)]
-        modules = [load_module(name) for name in testmodules]
-        for mod in modules:
-            print("Loading .. %s" % mod.__name__)
-            suite_n = unittest.TestLoader().loadTestsFromModule(mod)
+        for name in testmodules:
+            m = load_module(name, unittestpaths)
+            print("Loading .. %s" % m.__file__)
+            suite_n = unittest.TestLoader().loadTestsFromModule(m)
             suite.addTests(suite_n)
     
     #Run all tests 
