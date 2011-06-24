@@ -137,7 +137,7 @@ class Dabe(ABEncMultiAuth):
 
         return ct['C0'] / egg_s
 
-if __name__ == '__main__':
+def main():
     groupObj = PairingGroup('a.param', verbose=True)
 
     dabe = Dabe(groupObj)
@@ -167,8 +167,9 @@ if __name__ == '__main__':
     
     orig_m = dabe.decrypt(GP, K, CT)
    
-    if m == orig_m: 
-        print('Successful Decryption!')
-    else:
-        print('FAILED Decryption!!!')
+    assert m == orig_m, 'FAILED Decryption!!!' 
+    print('Successful Decryption!')
+
+if __name__ == '__main__':
+    main()
              

@@ -9,7 +9,7 @@ import imp, inspect, os, re
 import unittest
 from schemes.ibe_bb03 import IBE_BB04
 from schemes.ibe_bf03 import IBE_BonehFranklin
-import all_tests
+import all_unittests
 
 #def suite():
 #    suite = unittest.TestSuite()
@@ -24,13 +24,13 @@ import all_tests
 
 def autoDiscoverSchemes():
     '''Dynamically add a test method for each class'''
-    ibe_names   = all_tests.find_modules()
-    ibe_classes = all_tests.collectSubClasses(IBEnc, ibe_names)
+    ibe_names   = all_unittests.find_modules()
+    ibe_classes = all_unittests.collectSubClasses(IBEnc, ibe_names)
     
     for c in ibe_classes:
         name = "test" + c.__name__
         M = "test message"
-        group = PairingGroup('../schemes/d224.param', 1024)
+        group = PairingGroup('d224.param', 1024)
         func = lambda *args, **kwargs : Test.myCorrectnessTest(c, group, M)
         setattr(Test, name, func)
 
@@ -42,31 +42,23 @@ def autoDiscoverSchemes():
 #
 # * Multiple instantiations of PairingGroup results in segmentation faults
 
-class Test(unittest.TestCase):
-    def setUp(self):
-        global group
-        #group = PairingGroup('../schemes/d224.param', 1024)
-    
-    def tearDown(self):
-        unittest.TestCase.tearDown(self)
-    
+class Test(unittest.TestCase):    
     def testIBE_bb03(self):
-        group = PairingGroup('../schemes/d224.param', 1024)
+        group = PairingGroup('d224.param', 1024)
         M = group.random(GT)
         self.myCorrectnessTest(IBE_BB04, group, M)
     
     def testIBE_Franklin(self):
-        group = PairingGroup('../schemes/d224.param', 1024)
+        group = PairingGroup('d224.param', 1024)
         M = "hello world!!"
         self.myCorrectnessTest(IBE_BonehFranklin, group, M)
     
     #@unittest.skip('automated discovery')
     def testAllIBEnc(self):
-        path = '../schemes'
-        ibe_names = all_tests.find_modules(path)
-        ibe_classes = all_tests.collectSubClasses(IBEnc, ibe_names,[path])
+        ibe_names = all_unittests.find_modules()
+        ibe_classes = all_unittests.collectSubClasses(IBEnc, ibe_names)
         
-        group = PairingGroup('../schemes/d224.param', 1024)
+        group = PairingGroup('d224.param', 1024)
         for c in ibe_classes:
             print("Testing ", c)
             M = "test message"
@@ -90,8 +82,9 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
-    #runner = unittest.TextTestRunner()
-    #runner.run(suite())
-    all_tests.adjustPYPATH()
+    if os.access("schemes/", os.R_OK):
+        os.chdir('schemes/')
+    elif os.access("../schemes/", os.R_OK):
+        os.chdir('../schemes/')
     #autoDiscoverSchemes()
     unittest.main()

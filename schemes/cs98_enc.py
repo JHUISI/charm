@@ -60,19 +60,19 @@ class CS98(PKEnc):
         print("c['v'] => %s" % c['v'])
         print("v' => %s" % v_prime)
         return group.decode(c['e'] / (c['u1'] ** sk['z']))
+
+def main():
+    pkenc = CS98()
+    
+    (pk, sk) = pkenc.keygen(1024)
+    M = "hello world. test message"
+    size = len(M)
+    ciphertext = pkenc.encrypt(pk, M)
+    
+    message = pkenc.decrypt(pk, sk, ciphertext)
+    
+    assert M[0:size] == message[0:size], "UNSUCCESSFUL!!!! :-( why?"
+    print("SUCCESSFULLY RECOVERED => %s" % message)
        
 if __name__ == "__main__":
-   pkenc = CS98()
-   
-   (pk, sk) = pkenc.keygen(1024)
-   M = "hello world. test message"
-   size = len(M)
-   ciphertext = pkenc.encrypt(pk, M)
-   
-   message = pkenc.decrypt(pk, sk, ciphertext)
-   
-   if M[0:size] == message[0:size]:
-      print("SUCCESSFULLY RECOVERED => %s" % message)
-   else:
-      print("UNSUCCESSFUL!!!! :-( why?")
-   
+    main()

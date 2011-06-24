@@ -76,7 +76,7 @@ install:
 test:
 	$(PYTHON) tests/all_unittests.py
 	$(PYTHON) tests/all_schemes.py
-#find ./schemes/ -name '*.py' -execdir python3 '{}' \;
+	#find ./tests/ -name '*.py' -exec python3 '{}' \;
 
 # .PHONY: buildrpm
 # buildrpm:

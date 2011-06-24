@@ -65,8 +65,8 @@ class HybridEnc(PKEnc):
             rand += i
         return rand
 
-if __name__ == "__main__":
-#    pkenc = EC_CS98(409)
+def main():
+    #    pkenc = EC_CS98(409)
     pkenc = ElGamal(ecc, 409)
     hyenc = HybridEnc(pkenc)
    
@@ -76,7 +76,8 @@ if __name__ == "__main__":
     cipher = hyenc.encrypt(pk, m)
     orig_m = hyenc.decrypt(pk, sk, cipher)
    
-    if m == orig_m:
-        print("Successful Decryption!!")
-    else:
-        print("FAILED Decryption!!!")
+    assert m == orig_m
+    print("Successful Decryption!!")
+
+if __name__ == "__main__":
+    main()

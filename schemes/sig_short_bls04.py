@@ -41,8 +41,7 @@ class IBSig():
             return True  
         return False 
 
-
-if __name__ == "__main__":
+def main():
     groupObj = PairingGroup('d224.param')
     
     m = { 'a':"hello world!!!" , 'b':"test message" }
@@ -54,8 +53,9 @@ if __name__ == "__main__":
     
     print("Message: '%s'" % m)
     print("Signature: '%s'" % sig)     
-    if bls.verify(pk, sig, m):
-        print('SUCCESS!!!')
-    else:
-        print('FAILED!!!')
+    assert bls.verify(pk, sig, m)
+    print('SUCCESS!!!')
+    
+if __name__ == "__main__":
+    main()
     

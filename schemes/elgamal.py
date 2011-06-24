@@ -89,8 +89,8 @@ class ElGamal(PKEnc):
         print('m => %s' % m)
         print('dec M => %s' % M)
         return M
-        
-if __name__ == "__main__":
+
+def main():
     el = ElGamal(ecc, 410)    
     (pk, sk) = el.keygen()
     msg = "hello world!"
@@ -98,9 +98,8 @@ if __name__ == "__main__":
     cipher1 = el.encrypt(pk, msg)
     
     m = el.decrypt(pk, sk, cipher1)    
-    if m[0:size] == msg[0:size]:
-        print("SUCCESSFULLY DECRYPTED!!!")
-    else:
-        print("FAILED TO DECRYPT :(")
+    assert m[0:size] == msg[0:size]
+    print("SUCCESSFULLY DECRYPTED!!!")
         
-    
+if __name__ == "__main__":
+    main()

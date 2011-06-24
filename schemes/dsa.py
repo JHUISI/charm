@@ -37,16 +37,17 @@ class DSA():
             return True
         else:
             return False
-
-if __name__ == "__main__":
+        
+def main():
     dsa = DSA()
 
     (pk, sk) = dsa.keygen(1024)
     m = "hello world test message!!!"
     sig = dsa.sign(pk, sk, m)
 
-    if dsa.verify(pk, sig, m):
-       print("Signature Verified!!!")
-    else:
-       print("Signature FAILED!!!")
+    assert dsa.verify(pk, sig, m)
+    print("Signature Verified!!!")
+
+if __name__ == "__main__":
+    main()
     

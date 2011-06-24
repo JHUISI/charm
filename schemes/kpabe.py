@@ -101,8 +101,8 @@ class KPabe(ABEnc):
             #print('Z val for %s: %s\n' % (x, Z[x]))
        
         return E['E1'] / prodT 
-    
-if __name__ == "__main__":
+
+def main():
     groupObj = PairingGroup('d224.param')
     kpabe = KPabe(groupObj)
     
@@ -118,8 +118,9 @@ if __name__ == "__main__":
     
     rec_msg = kpabe.decrypt(ciphertext, mykey)
    
-    if msg == rec_msg: 
-       print("Successful Decryption!")
-    else:
-       print("FAILED Decryption!!!")
+    assert msg == rec_msg 
+    print("Successful Decryption!")    
+    
+if __name__ == "__main__":
+    main()
     

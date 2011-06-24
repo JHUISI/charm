@@ -38,7 +38,7 @@ class SchnorrSig(PKSig):
             return False
         return None
     
-if __name__ == "__main__":
+def main():
     pksig = SchnorrSig()
     
     pksig.params()
@@ -48,8 +48,9 @@ if __name__ == "__main__":
     M = "hello world."
     sig = pksig.sign(pk, sk, M)
     
-    if pksig.verify(pk, sig, M):
-        print("Signature verified!!!!")
-    else:
-        print("Signature FAILED!!!")
+    assert pksig.verify(pk, sig, M)
+    print("Signature verified!!!!")
+    
+if __name__ == "__main__":
+    main()
     

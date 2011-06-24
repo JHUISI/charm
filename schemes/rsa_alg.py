@@ -56,8 +56,8 @@ class RSA(PKEnc):
     def decode(self, m, n):
         # add padding routine here to recover message
         return m % n
-        
-if __name__ == "__main__":
+
+def main():
     rsa = RSA()
     
     (pk, sk) = rsa.keygen(1024)
@@ -68,7 +68,8 @@ if __name__ == "__main__":
     orig_m = rsa.decrypt(pk, sk, c)
     print("recovered m =>", orig_m)
 
-    if m == orig_m:
-        print("Successful Decryption!!!")
-    else:
-        print("FAILED Decryption!")
+    assert m == orig_m
+    print("Successful Decryption!!!")
+        
+if __name__ == "__main__":
+    main()

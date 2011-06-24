@@ -70,8 +70,8 @@ class CPabe_BSW07(ABEnc):
             A *= ( pair(ct['Cy'][i], sk['Dj'][i]) / pair(sk['Djp'][i], ct['Cyp'][i]) ) ** z[i]
         
         return ct['C_tilde'] / (pair(ct['C'], sk['D']) / A)
-    
-if __name__ == "__main__":
+
+def main():
     groupObj = PairingGroup('a.param')
     
     cpabe = CPabe_BSW07(groupObj)
@@ -93,8 +93,9 @@ if __name__ == "__main__":
     print("\n\nDecrypt...\n")
     print("Rec msg =>", rec_msg)
 
-    if rand_msg == rec_msg:
-        print("Successful Decryption!!!")
-    else:
-        print("FAILED Decryption!!!")
+    assert rand_msg == rec_msg, "FAILED Decryption!!!"
+    print("Successful Decryption!!!")
+    
+if __name__ == "__main__":
+    main()
     

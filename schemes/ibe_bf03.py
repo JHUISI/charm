@@ -102,9 +102,8 @@ class IBE_BonehFranklin(IBEnc):
             return binascii.a2b_hex(str_hex)
         # take element and map it back to what? how?
         return None
-        
-if __name__ == "__main__":
-    
+
+def main():
     groupObj = PairingGroup('d224.param', 1024)    
     ibe = IBE_BonehFranklin(groupObj)
     
@@ -117,3 +116,7 @@ if __name__ == "__main__":
     ciphertext = ibe.encrypt(pk, id, m)
 
     msg = ibe.decrypt(pk, key, ciphertext)
+    assert msg == m
+        
+if __name__ == "__main__":
+    main()

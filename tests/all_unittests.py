@@ -7,8 +7,13 @@ import unittest
 import os, imp, re, sys, inspect
 
 #A list of all the directories to search
-unittestpaths = ['../toolbox/', '../schemes/']
-unittestpaths = ['toolbox/', 'schemes/']
+unittestpaths1 = ['toolbox/', 'schemes/']
+unittestpaths2 = ['../toolbox/', '../schemes/']
+
+if os.access("schemes/", os.R_OK):
+    unittestpaths = unittestpaths1
+elif os.access("../schemes/", os.R_OK):
+    unittestpaths = unittestpaths2
 
 def adjustPYPATH(paths):
     for p in paths:

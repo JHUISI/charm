@@ -1,10 +1,10 @@
 
-from toolbox.pairinggroup import *
-from charm.pairing import hash as sha1
-from toolbox.ABEncMultiAuth import *
-from dabe11 import *
 from charm.cryptobase import *
+from charm.pairing import hash as sha1
 from math import ceil
+from schemes.dabe11 import Dabe
+from toolbox.ABEncMultiAuth import ABEncMultiAuth
+from toolbox.pairinggroup import *
 
 class HybridABEncMA(ABEncMultiAuth):
     def __init__(self, scheme, groupObj):
@@ -55,7 +55,7 @@ class HybridABEncMA(ABEncMultiAuth):
             message += '\x00'
         return message
 
-if __name__ == "__main__":
+def main():
     groupObj = PairingGroup('a.param')
     dabe = Dabe(groupObj)
         
@@ -91,3 +91,7 @@ if __name__ == "__main__":
     
     orig_msg = hyb_abema.decrypt(gp, K, ct)
     print("Result =>", orig_msg)
+    assert orig_msg == msg
+
+if __name__ == "__main__":
+    main()

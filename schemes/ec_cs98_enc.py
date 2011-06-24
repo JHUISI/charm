@@ -56,18 +56,19 @@ class EC_CS98(PKEnc):
         print("c['v'] => %s" % c['v'])
         print("v' => %s" % v_prime)
         return group.decode(c['e'] / (c['u1'] ** sk['z']))
-       
+
+def main():
+    pkenc = EC_CS98(409)
+    
+    (pk, sk) = pkenc.keygen()
+    M = "hello world!!!"
+    ciphertext = pkenc.encrypt(pk, M)
+    
+    message = pkenc.decrypt(pk, sk, ciphertext)
+    
+    assert M == message
+    print("SUCCESSFUL DECRYPTION!!! => %s" % message)
+   
 if __name__ == "__main__":
-   pkenc = EC_CS98(409)
-   
-   (pk, sk) = pkenc.keygen()
-   M = "hello world!!!"
-   ciphertext = pkenc.encrypt(pk, M)
-   
-   message = pkenc.decrypt(pk, sk, ciphertext)
-   
-   if M == message:
-      print("SUCCESSFUL DECRYPTION!!! => %s" % message)
-   else:
-      print("FAILED Decryption!")
+    main()
    

@@ -1,7 +1,6 @@
 
 from toolbox.pairinggroup import *
 from charm.pairing import hash as sha1
-from ibe_bb03 import *
 from hashIDAdapt import *
 from toolbox.IBEnc import *
 from charm.cryptobase import *
@@ -52,7 +51,7 @@ class HybridIBEnc(IBEnc):
             message += '\x00'
         return message
 
-if __name__ == "__main__":
+def main():
     groupObj = PairingGroup('a.param')
     ibe = IBE_BB04(groupObj)
     
@@ -74,6 +73,10 @@ if __name__ == "__main__":
     
     orig_msg = hyb_ibe.decrypt(pk, sk, ct)
     print("Result =>", orig_msg)
+    assert orig_msg == msg
+
+if __name__ == "__main__":
+    main()
 
     
     

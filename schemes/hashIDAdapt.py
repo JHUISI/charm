@@ -1,6 +1,6 @@
-from toolbox.pairinggroup import *
+from schemes.ibe_bb03 import IBE_BB04
 from toolbox.IBEnc import *
-from ibe_bb03 import *
+from toolbox.pairinggroup import *
 
 class HashIDAdapter(IBEnc):
     def __init__(self, scheme, group):
@@ -40,8 +40,8 @@ class HashIDAdapter(IBEnc):
     def decrypt(self, pk, sk, ct):
         if not self.ibe_good: return IBEnc.decrypt(self, pk, sk, ct)
         return self.ibenc.decrypt(pk, sk, ct)
-    
-if __name__ == "__main__":
+
+def main():
     group = PairingGroup('a.param')
     
     ibe = IBE_BB04(group)
@@ -60,10 +60,11 @@ if __name__ == "__main__":
     
     orig_m = hashID.decrypt(pk, sk, ct)
     
-    if m == orig_m:
-        print("Successful Decryption!!!")
-        print("Result =>", orig_m)
-    else:
-        print("FAILED Decryption!")
+    assert m == orig_m
+    print("Successful Decryption!!!")
+    print("Result =>", orig_m)
+    
+if __name__ == "__main__":
+    main()
     
         

@@ -86,8 +86,8 @@ class Pai99(PKEnc):
         
     def decode(self, pk, element):
         pass
-    
-if __name__ == "__main__":
+
+def main():
     pai = Pai99()
     
     (pk, sk) = pai.keygen()
@@ -106,10 +106,9 @@ if __name__ == "__main__":
     orig_m = pai.decrypt(pk, sk, c3)
     print("orig_m =>", orig_m)
     
-    if m3 == orig_m: # m3 = m1 + m2
-       print("Successful Decryption!")
-    else:
-       print("FAILED Decryption!!!")
+    # m3 = m1 + m2
+    assert m3 == orig_m, "FAILED Decryption!!!" 
+    print("Successful Decryption!")
     
     print("Homomorphic Mul Test...\n")
     c4 = c1 + 200
@@ -121,4 +120,7 @@ if __name__ == "__main__":
     print("c5 = c2 * 2021 =>", c5, "\n")
     orig_m = pai.decrypt(pk, sk, c5)
     print("m5 =>", orig_m, "\n")
+    
+if __name__ == "__main__":
+    main()
     

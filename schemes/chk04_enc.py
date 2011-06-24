@@ -58,7 +58,7 @@ class CHK04(PKEnc):
         # Return the decryption of the ciphertext element "C" under key dk
         return ibe.decrypt(pk, dk, c['C'])
 
-if __name__ == "__main__":
+def main():
     groupObj = PairingGroup('a.param')
     # instantiate an Identity-Based Encryption scheme
     ibe = IBE_BB04(groupObj)
@@ -76,9 +76,10 @@ if __name__ == "__main__":
     ciphertext = pkenc.encrypt(pk, msg)
     
     rec_msg = pkenc.decrypt(pk, sk, ciphertext)
-    if rec_msg == msg:
-       print("Successful Decryption!")
-    else:
-       print("FAILED Decryption!!!") 
+    assert rec_msg == msg, "FAILED Decryption!!!"
+    print("Successful Decryption!")       
+        
+if __name__ == "__main__":
+    main()
      
     

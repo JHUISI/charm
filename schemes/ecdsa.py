@@ -35,8 +35,7 @@ class ECDSA():
             return True
         else:
             return False
-
-if __name__ == "__main__":
+def main():
     groupObj = ECGroup(409)
     ecdsa = ECDSA(groupObj)
     
@@ -44,8 +43,9 @@ if __name__ == "__main__":
     m = "hello world! this is a test message."
 
     sig = ecdsa.sign(pk, sk, m)
-    if ecdsa.verify(pk, sig, m):
-        print("Signature Verified!!!")
-    else:
-        print("Signature FAILED!!!")
+    assert ecdsa.verify(pk, sig, m)
+    print("Signature Verified!!!")
+    
+if __name__ == "__main__":
+    main()
 

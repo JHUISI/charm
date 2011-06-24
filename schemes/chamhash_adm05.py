@@ -47,6 +47,7 @@ class Adm05(ChamHash):
 if __name__ == "__main__":    
     chamHash = Adm05()
     
+    #TODO: how long is paramgen supposed to take?
     (pk, sk) = chamHash.paramgen()
     
     msg = "hello world this is the message"

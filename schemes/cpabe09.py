@@ -83,7 +83,7 @@ class CPabe(ABEnc):
             denominator *= ( pair(C[i] ** w_i[i], sk['L']) * pair(k_x[i] ** w_i[i], D[i]) )   
         return cipher['C_tilde'] / (numerator / denominator)
 
-if __name__ == '__main__':
+def main():
     #Get the eliptic curve with the bilinear mapping feature needed.
     groupObj = PairingGroup('a.param', verbose=True)
 
@@ -105,9 +105,8 @@ if __name__ == '__main__':
     groupObj.debug(cipher)    
     orig_m = cpabe.decrypt(cpkey, cipher)
    
-    if m == orig_m: 
-        print('Successful Decryption!')
-    else:
-        print('FAILED Decryption!!!')
+    assert m == orig_m, 'FAILED Decryption!!!' 
+    print('Successful Decryption!')    
     
-    
+if __name__ == '__main__':
+    main()

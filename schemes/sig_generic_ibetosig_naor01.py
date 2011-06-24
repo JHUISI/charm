@@ -56,8 +56,7 @@ class Sig_Generic_ibetosig_Naor01(PKSig):
             return True
         else:
             return False
-
-if __name__ == "__main__":
+def main():
     groupObj = PairingGroup('d224.param')
     
     ibe = IBE_BB04(groupObj)
@@ -74,10 +73,10 @@ if __name__ == "__main__":
     print("\nMessage =>", M)
     print("Sigma =>", sigma)
     
-    result = ibsig.verify(mpk, M, sigma)
-    if result:
-        print("Successful Verification!!!")
-    else:
-        print("FAILED Verification!")
+    assert ibsig.verify(mpk, M, sigma)
+    print("Successful Verification!!!")
+
+if __name__ == "__main__":
+    main()
     
     

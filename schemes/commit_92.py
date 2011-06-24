@@ -19,18 +19,20 @@ class CM_Ped92(Commitment):
     def decommit(self, pk, c, d, msg):
         return c == (pk['g'] ** msg) * (pk['h'] ** d)
 
+def main():
+    groupObj = ECGroup(410)
+    
+    cm = CM_Ped92(groupObj)
+    
+    pk = cm.setup()
+    
+    m = groupObj.random()
+    print("Commiting to =>", m)
+    (c, d) = cm.commit(pk, m)
+    
+    assert cm.decommit(pk, c, d, m), "FAILED to decommit"
+    print("Successful and Verified decommitment!!!")
+   
+      
 if __name__ == "__main__":
-   groupObj = ECGroup(410)
-   
-   cm = CM_Ped92(groupObj)
-   
-   pk = cm.setup()
-   
-   m = groupObj.random()
-   print("Commiting to =>", m)
-   (c, d) = cm.commit(pk, m)
-
-   if cm.decommit(pk, c, d, m):
-      print("Successful and Verified decommitment!!!")
-   else:
-      print("FAILED to decommit") 
+    main()
