@@ -17,12 +17,13 @@ from toolbox.IBEnc import *
 import binascii
 
 class IBE_BonehFranklin(IBEnc):
-    def __init__(self, params, secparam=1024):
+    def __init__(self, groupObj):
         IBEnc.__init__(self)
-        global group,h,ZN
-        group = PairingGroup(params, secparam)
+        global group,h,ZN,debug
+        group = groupObj
         h = Hash('sha1', group.Pairing)
         ZN = -1
+        debug = False
         
     def setup(self):
         s, P = group.random(), group.random(G2)
@@ -30,25 +31,29 @@ class IBE_BonehFranklin(IBEnc):
         # choose H1, H2 hash functions
         pk = { 'P':P, 'P2':P2 }
         sk = { 's':s }
-        print("Public parameters...")
-        group.debug(pk)
-        print("Secret parameters...")
-        group.debug(sk)
+        if(debug):
+            print("Public parameters...")
+            group.debug(pk)
+            print("Secret parameters...")
+            group.debug(sk)
         return (pk, sk)
     
     def extract(self, sk, ID):        
         d_ID = sk['s'] * group.hash(ID, G1)
-        print("Key for id => '%s'" % ID)
         k = { 'id':d_ID }
-        group.debug(k)
+        if(debug):
+            print("Key for id => '%s'" % ID)
+            group.debug(k)
         return k
         
+    
     def encrypt(self, pk, ID, M): # check length to make sure it is within n bits
         Q_id = group.hash(ID, G1) #standard
         g_id = pair(Q_id, pk['P2']) 
         #choose sig = {0,1}^n where n is # bits
         sig = group.random(ZN)
         r = h.hashToZr(sig, M) # hash Long, Str => not working yet. (DONE)
+
 
         enc_M = self.encodeToZn(M)
         if group.validSize(enc_M):
@@ -57,11 +62,12 @@ class IBE_BonehFranklin(IBEnc):
             print("Message cannot be encoded.")
             return None
 
-        print('\nEncrypt...')
-        print('r => %s' % r)
-        print('sig => %s' % sig)
-        print('enc_M => %s' % enc_M)
-        group.debug(C)
+        if(debug):
+            print('\nEncrypt...')
+            print('r => %s' % r)
+            print('sig => %s' % sig)
+            print('enc_M => %s' % enc_M)
+            group.debug(C)
         return C
     
     def decrypt(self, pk, sk, ct):
@@ -71,20 +77,23 @@ class IBE_BonehFranklin(IBEnc):
         M = self.decodeFromZn(dec_M)
 
         r = h.hashToZr(sig, M)
-        print('\nDecrypt....')
-        print('r => %s' % r)
-        print('sig => %s' % sig)
-        if U == r * pk['P']:
-            print("Decryption successful!!!")
-            return M
-        print("Decryption Failed!!!")
+        if(debug):
+            print('\nDecrypt....')
+            print('r => %s' % r)
+            print('sig => %s' % sig)
+            if U == r * pk['P']:
+                print("Decryption successful!!!")
+                return M
+            print("Decryption Failed!!!")
         return None
 
+    #TODO: should encode be able to handle elements from GT or just strings?
     def encodeToZn(self, message):
+        #print("Message =>", message)
         hex_val = binascii.b2a_hex(bytes(message, 'utf8'))
-        print("hex val =>", hex_val)
+        #print("hex val =>", hex_val)
         # convert message to uint here
-        return hex_val
+        return int(hex_val, 16)
     
     def decodeFromZn(self, element):
         if type(element) == int:
@@ -96,7 +105,8 @@ class IBE_BonehFranklin(IBEnc):
         
 if __name__ == "__main__":
     
-    ibe = IBE_BonehFranklin('d224.param')
+    groupObj = PairingGroup('d224.param', 1024)    
+    ibe = IBE_BonehFranklin(groupObj)
     
     (pk, sk) = ibe.setup()
     

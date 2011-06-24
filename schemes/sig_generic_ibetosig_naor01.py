@@ -18,9 +18,10 @@
 # Implementer:	Matthew Green
 # Date:			05/2011
 
-from toolbox.pairinggroup import *
-from toolbox.ibe_bb03 import *
+from schemes.ibe_bb03 import IBE_BB04
 from toolbox.PKSig import *
+from toolbox.pairinggroup import *
+#from toolbox.ibe_bb03 import *
 
 class Sig_Generic_ibetosig_Naor01(PKSig):
     def __init__(self, ibe_scheme, groupObj):
@@ -38,6 +39,7 @@ class Sig_Generic_ibetosig_Naor01(PKSig):
     def sign(self, sk, message):
         return ibe.extract(sk, message)
 		
+    #TODO: this method does NOT validate the message it is given
     def verify(self, pk, m, sig):
         # Some IBE scheme support a native method for validating IBE keys.  Use this if it exists.
         if hasattr(ibe, 'verify'):
@@ -48,23 +50,26 @@ class Sig_Generic_ibetosig_Naor01(PKSig):
         message = group.random(GT)
         print("\nRandom message =>", message)
 
-        C = ibe.encrypt(pk, sig['id'], message) 
-        if (ibe.decrypt(sig, C) == message):
+        C = ibe.encrypt(pk, sig['id'], message)
+         
+        if (ibe.decrypt(pk, sig, C) == message):
             return True
         else:
             return False
 
 if __name__ == "__main__":
-    groupObj = PairingGroup('library/d224.param')
+    groupObj = PairingGroup('d224.param')
     
-    ibe = IBE(groupObj)
+    ibe = IBE_BB04(groupObj)
     
     ibsig = Sig_Generic_ibetosig_Naor01(ibe, groupObj)
 
     (mpk, msk) = ibsig.keygen()
     
-    M = "I want a signature on this message!"
-    
+    #M = "I want a signature on this message!"
+    M = groupObj.random(ZR)
+
+    #TODO: M must be in Zp
     sigma = ibsig.sign(msk, M)
     print("\nMessage =>", M)
     print("Sigma =>", sigma)

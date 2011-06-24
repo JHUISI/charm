@@ -14,14 +14,17 @@
 from toolbox.pairinggroup import *
 from charm.cryptobase import *
 from toolbox.IBEnc import *
+from charm.pairing import hash as sha1
+
 
 class IBE_BB04(IBEnc):
     def __init__(self, groupObj):
         IBEnc.__init__(self)
         IBEnc.setProperty(self, secdef='IND_sID_CPA', assumption='DBDH', 
                           message_space=[GT, 'KEM'], secmodel='ROM', other={'id':ZR})
-        global group
+        global group, debug
         group = groupObj
+        debug = True
         
     def setup(self, secparam=None):
         #StartBenchmark(bID1, [CpuTime, NativeTime])
@@ -69,8 +72,8 @@ class IBE_BB04(IBEnc):
         A, B, C = CT['A'], CT['B'], CT['C']
         v_s = pair(((B ** dID['r']) * C), dID['K'])
         return sha1(v_s)
-                
-if __name__ == '__main__':
+
+def main():
     # initialize the element object so that object references have global scope
     groupObj = PairingGroup('d224.param')
     ibe = IBE_BB04(groupObj)
@@ -85,8 +88,8 @@ if __name__ == '__main__':
     cipher = ibe.encrypt(params, kID, M)
     m = ibe.decrypt(params, key, cipher)
 
-    if m == M:
-        print("Successful Decryption!!! M => '%s'" % m)
-    else:
-        print("FAILED Decryption!")
-
+    assert m == M, "FAILED Decryption!"
+    print("Successful Decryption!!! M => '%s'" % m)
+                
+if __name__ == '__main__':
+    main()

@@ -4,43 +4,43 @@ Created on Jun 22, 2011
 @author: Gary Belvin
 '''
 import unittest
-import os, imp, re, sys
+import os, imp, re, sys, inspect
 
 #A list of all the directories to search
+unittestpaths = ['../toolbox/', '../schemes/']
 unittestpaths = ['toolbox/', 'schemes/']
-for p in unittestpaths:
-	sys.path.append(p)
+
+def adjustPYPATH(paths):
+    for p in paths:
+        if p not in sys.path:
+            sys.path.append(p)
 
 def find_modules(path="."):
-    """Return names of modules in a directory.
-    http://wiki.python.org/moin/ModulesAsPlugins
-    Returns module names in a list. Filenames that end in ".py" or
-    ".pyc" are considered to be modules. The extension is not included
-    in the returned list.
-    """
     modules = set()
     for filename in os.listdir(path):
-        module = None
-        if filename.endswith(".py"):
+        if re.match(".*py$", filename):
             module = filename[:-3]
-        elif filename.endswith(".pyc"):
-            module = filename[:-4]
-        if module is not None:
             modules.add(module)
-    return list(modules)
-
+    return modules
 
 def load_module(name, path=["."]):
     """Return a named module found in a given path."""
     (file, pathname, description) = imp.find_module(name, path)
     return imp.load_module(name, file, pathname, description)
-
-
-if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
-    suite = unittest.TestSuite()
     
+def collectSubClasses(baseclass, mod_list, path=['.']):
+    '''Given a set of modules, returns only those classes that inherit from baseclass'''    
+    for name in mod_list:
+        (file, pathname, description) = imp.find_module(name, path)
+        mod = imp.load_module(name, file, pathname, description)
+        for name, obj in inspect.getmembers(mod):
+            if inspect.isclass(obj) and issubclass(obj, baseclass)\
+            and obj != baseclass:
+                yield obj
+
+def getAllTestsSuite():
     #Collect test cases
+    suite = unittest.TestSuite()
     for path in unittestpaths:
         testmodules = [mod for mod in find_modules(path) if re.match(".*_test$", mod)]
         for name in testmodules:
@@ -48,6 +48,11 @@ if __name__ == "__main__":
             print("Loading .. %s" % m.__file__)
             suite_n = unittest.TestLoader().loadTestsFromModule(m)
             suite.addTests(suite_n)
+    return suite
+
+if __name__ == "__main__":
+    #import sys;sys.argv = ['', 'Test.testName']
+    adjustPYPATH(unittestpaths)
     
     #Run all tests 
-    unittest.TextTestRunner(verbosity=2).run(suite)
+    unittest.TextTestRunner(verbosity=2).run(getAllTestsSuite())

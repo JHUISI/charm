@@ -26,12 +26,23 @@ class Hash():
     # takes two arbitrary strings and hashes to an element of Zr
     def hashToZr(self, *args):
         if isinstance(args, tuple):
+            #print("Hashing =>", args)
             strs = ""
             for i in args:
                 if type(i) == str:
                     strs += str(base64.encodebytes(bytes(i, 'utf8')))
-                else:
+                elif type(i) == bytes:
+                    strs += str(base64.encodebytes(i))
+                elif type(i) == int:
                     strs += str(base64.encodebytes(bytes(bin(i), 'utf8')))
+                elif type(i) == pairing:
+                    strs += str(base64.encodebytes(i.serialize(i)))
+                else:
+                    print("Failed to hash unknown Type =>", type(i))
+                    strs += str(base64.encodebytes(i.serialize(i)))
+                
+
+                        
             if len(strs) > 0:
                 return self.e.H(strs, ZR)
             return None
