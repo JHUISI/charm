@@ -22,15 +22,11 @@ def markSecret(s, loc, toks):
     return toks
         
 def pushFirst( s, loc, toks ):
-    if debug:
+    if debug >= levels.some:
        print("Pushing first =>", toks[0])
     objStack.append( toks[0] )
 
 def createTree(op, node1, node2):
-#    if(op == "OR"):
-#        node = BinNode(1)
-#    elif(op == "AND"):
-#        node = BinNode(2)
     if(op == "^"):
         node = BinaryNode(ops.EXP)
     elif(op == "*"):
@@ -41,6 +37,13 @@ def createTree(op, node1, node2):
         node = BinaryNode(ops.EQ_TST)
     elif(op == "e("):
         node = BinaryNode(ops.PAIR)
+    elif(op == "H("):
+        node = BinaryNode(ops.HASH)
+    elif(op == "prod{"):
+        node = BinaryNode(ops.PROD)
+    elif(op == "on"):
+        # can only be used in conjunction w/ PROD (e.g. PROD must precede it)        
+        node = BinaryNode(ops.ON) 
     # elif e( ... )
     else:    
         return None
@@ -53,34 +56,32 @@ class BatchParser:
         self.verbose = verbose
 
     def getBNF(self):
-        # supported operators => (OR, AND, <
+        # supported operators => (OR, AND, <, prod{
         OperatorOR = Literal("OR") | Literal("or").setParseAction(upcaseTokens)
         OperatorAND = Literal("AND") | Literal("and").setParseAction(upcaseTokens)
         lpar = Literal("(").suppress()
         rpar = Literal(")").suppress()
+        rcurly = Literal("}").suppress()
 
         ExpOp = Literal("^")
         MulOp = Literal("*")
         Equality = Literal(":=") | Literal("==") # | Word("<>", max=1)
-        Pairing = Literal('e(') 
-        Token = Equality | ExpOp | MulOp
+        Pairing = Literal('e(') # Pairing token
+        Hash = Literal('H(')
+        Prod = Literal("prod{") # dot product token
+        ProdOf = Literal("on")
+        Token = Equality | ExpOp | MulOp | ProdOf
         Operator = OperatorAND | OperatorOR | Token
 
         # describes an individual leaf node
-        leafNode = Word(alphanums).setParseAction( createNode )
-        # describes expressions such as (attr < value)
-#        leafConditional = (Word(alphanums) + ExpOp + Word(nums)).setParseAction( parseNumConditional )
-
-        # describes the node concept
-        node = leafNode
-#        secret = variable.setParseAction( markSecret )
-#        public = variable.setParseAction( markPublic )
-
-#        expr = public + Equality + public + ExpOp + secret.setParseAction( pushFirst )
+        leafNode = Word(alphanums + '_').setParseAction( createNode )
         expr = Forward()
         term = Forward()
         factor = Forward()
-        atom = (Pairing + expr + ',' + expr + rpar).setParseAction(pushFirst) | lpar + expr + rpar | (leafNode).setParseAction( pushFirst )
+        atom = (Hash + expr + rpar).setParseAction( pushFirst ) | \
+               (Pairing + expr + ',' + expr + rpar).setParseAction( pushFirst ) | \
+               (Prod + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
+               lpar + expr + rpar | (leafNode).setParseAction( pushFirst )
 
         # NEED TO UNDERSTAND THIS SEQUENCE AND WHY IT WORKS FOR PARSING ^ and = in logical order?!?
         # Place more value on atom [ ^ factor}, so gets pushed on the stack before atom [ = factor], right?
@@ -101,12 +102,15 @@ class BatchParser:
     # method for evaluating stack assumes operators have two operands and pops them accordingly
     def evalStack(self, stack):
         op = stack.pop()
-        if debug:
+        if debug >= levels.some:
             print("op: %s" % op)
-        if op in ["*", "^", ":=", "==", "e("]: # == "AND" or op == "OR" or op == "^" or op == "=":
+        if op in ["*", "^", ":=", "==", "e(", "prod{", "on"]: # == "AND" or op == "OR" or op == "^" or op == "=":
             op2 = self.evalStack(stack)
             op1 = self.evalStack(stack)
             return createTree(op, op1, op2)
+        elif op in ["H("]:
+            op1 = self.evalStack(stack)
+            return createTree(op, op1, None)
         else:
             # Node value
             return op
@@ -115,12 +119,15 @@ class BatchParser:
     # the tokens from the string (not used for anything). 3) evaluate the stack which is in a post
     # fix format so that we can pop an OR, AND, ^ or = nodes then pull 2 subsequent variables off the stack. Then,
     # recursively evaluate those variables whether they are internal nodes or leaf nodes, etc.
-    def parse(self, str):
+    def parse(self, line):
         # use lineCtr to track line of code.
+        if len(line) == 0 or line[0] == '#': 
+#            print("comments or empty strings will be ignored.")
+            return None 
         global objStack
         del objStack[:]
-        tokens = self.finalPol.parseString(str)
-        if debug:
+        tokens = self.finalPol.parseString(line)
+        if debug >= levels.some:
            print("stack =>", objStack)
         return self.evalStack(objStack)
    
@@ -136,9 +143,9 @@ class BatchParser:
 #        elif node.type == node.AND:
 #            self.type_check(node.getLeft())
 #            self.type_check(node.getRight())
-        else:
-            return None
-        return None
+#        else:
+#            return None
+#        return None
     
 if __name__ == "__main__":
     print(sys.argv[1:])
