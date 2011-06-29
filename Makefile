@@ -12,7 +12,7 @@ gmp_options=
 pbc_version=pbc-0.5.12
 pbc_url=http://crypto.stanford.edu/pbc/files/${pbc_version}.tar.gz
 pbc_options=
-PYTHON=python3
+PYTHON=python
 DESTDIR=/usr/local
 
 all:

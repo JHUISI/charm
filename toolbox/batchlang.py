@@ -104,12 +104,11 @@ class BinaryNode:
 			return node
 		return value
 
-    # need a way 		
-	def addProdAttr(self, start, end):
-		if self.type == ops.PROD:
-			self.start = start
-			self.end = end 
-		return None
+#	def addProdAttr(self, start, end):
+#		if self.type == ops.PROD:
+#			self.start = start
+#			self.end = end 
+#		return None
 
 	# only applies function on leaf nodes
 	def traverse(self, function):

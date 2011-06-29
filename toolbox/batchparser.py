@@ -74,7 +74,7 @@ class BatchParser:
         Operator = OperatorAND | OperatorOR | Token
 
         # describes an individual leaf node
-        leafNode = Word(alphanums + '_').setParseAction( createNode )
+        leafNode = Word(alphanums + '_|').setParseAction( createNode )
         expr = Forward()
         term = Forward()
         factor = Forward()
@@ -146,12 +146,41 @@ class BatchParser:
 #        else:
 #            return None
 #        return None
-    
+def parseFile(filename):
+    fd = open(filename, 'r')
+    ast_tree = {}
+    parser = BatchParser()
+    code = fd.readlines(); i = 1
+    for line in code:
+        line = line.strip('\n')
+        if len(line) == 0 or line[0] == '#':
+            print(line)
+            continue
+        ast_node = parser.parse(line)
+        print(i, ":", ast_node)
+        ast_tree[i] = ast_node # store for later processing
+        i += 1
+    fd.close()
+    return ast_tree
+
+# Takes the tree and iterates through each line 
+# and verifies X # of rules. This serves to notify
+# the user on any errors that might have been made in
+# specifying the batch inputs.
+def syntaxChecker(astTree):
+    pass
+
+
+
 if __name__ == "__main__":
     print(sys.argv[1:])
-    statement = sys.argv[1]
-
-    parser = BatchParser()
-    final = parser.parse(statement)
-    print("Final statement:  '%s'" % final)
-
+#    statement = sys.argv[1]
+#
+#    parser = BatchParser()
+#    final = parser.parse(statement)
+#    print("Final statement:  '%s'" % final)
+    file = sys.argv[1]
+    
+    ast = parseFile(file)
+    print(ast)
+    
