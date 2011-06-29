@@ -1,7 +1,7 @@
 '''
 Created on Jun 17, 2011
 
-@author: urbanus
+@author: Gary Belvin
 '''
 import unittest
 import paddingschemes
@@ -58,15 +58,16 @@ class Test(unittest.TestCase):
         E = c.encode(m, 128,"",seed)
         self.assertEqual(EM, E)
     
-    def testRoundTripEquiv(self):
+    def testOAEPRoundTripEquiv(self):
         oaep = paddingschemes.OAEPEncryptionPadding()
         m = b'This is a test message'
         ct = oaep.encode(m, 64)
         pt = oaep.decode(ct)
         self.assertEqual(m, pt, 'Decoded message is not equal to encoded message\n'\
                          'ct: %s\nm:  %s\npt: %s' % (ct, m, pt))
-        
-    def testMFG(self):
+    
+    @unittest.skip("Unnecessary length test")
+    def testMFGLength(self):
         seed = ""
         hashFn = paddingschemes.OAEPEncryptionPadding().hashFn
         hLen =  paddingschemes.OAEPEncryptionPadding().hashFnOutputBytes
@@ -100,7 +101,110 @@ class Test(unittest.TestCase):
         self.assertEqual(hashFn(V0[0]), V0[1], 'empty string')
         self.assertEqual(hashFn(V1[0]), V1[1], 'quick fox')
         self.assertEqual(hashFn(V2[0]), V2[1])
+    
+    
+    def testPSSRountTripEquiv(self):
+        pss = paddingschemes.PSSPadding()
+        m = b'This is a test message'
+        em = pss.encode(m)
+        self.assertTrue(pss.verify(m, em))
+    
+    def testPSSTestVector(self):
+        # Test vector taken from http://www.rsa.com/rsalabs/node.asp?id=2125
+        # ---------------------------------
+        # Step-by-step RSASSA-PSS Signature
+        # ---------------------------------
         
+        # Message M to be signed:
+        m = a2b_hex('85 9e ef 2f d7 8a ca 00 30 8b dc 47 11 93 bf 55\
+        bf 9d 78 db 8f 8a 67 2b 48 46 34 f3 c9 c2 6e 64\
+        78 ae 10 26 0f e0 dd 8c 08 2e 53 a5 29 3a f2 17\
+        3c d5 0c 6d 5d 35 4f eb f7 8b 26 02 1c 25 c0 27\
+        12 e7 8c d4 69 4c 9f 46 97 77 e4 51 e7 f8 e9 e0\
+        4c d3 73 9c 6b bf ed ae 48 7f b5 56 44 e9 ca 74\
+        ff 77 a5 3c b7 29 80 2f 6e d4 a5 ff a8 ba 15 98\
+        90 fc'.replace(" ", ""))
+        
+        # mHash    = Hash(M)
+        # salt     = random string of octets
+        # M'       = Padding || mHash || salt
+        # H        = Hash(M')
+        # DB       = Padding || salt 
+        # dbMask   = MGF(H, length(DB))
+        # maskedDB = DB xor dbMask (leftmost bit set to
+        #            zero)
+        # EM       = maskedDB || H || 0xbc
+        
+        # mHash:
+        mHash = a2b_hex('37 b6 6a e0 44 58 43 35 3d 47 ec b0 b4 fd 14 c1\
+        10 e6 2d 6a'.replace(" ", ""))
+        
+        # salt:
+        salt = a2b_hex('e3 b5 d5 d0 02 c1 bc e5 0c 2b 65 ef 88 a1 88 d8\
+        3b ce 7e 61'.replace(" ", ""))
+        
+        # M':
+        mPrime = a2b_hex('00 00 00 00 00 00 00 00 37 b6 6a e0 44 58 43 35\
+        3d 47 ec b0 b4 fd 14 c1 10 e6 2d 6a e3 b5 d5 d0\
+        02 c1 bc e5 0c 2b 65 ef 88 a1 88 d8 3b ce 7e 61'.replace(" ", ""))
+        
+        # H:
+        H = a2b_hex('df 1a 89 6f 9d 8b c8 16 d9 7c d7 a2 c4 3b ad 54\
+        6f be 8c fe'.replace(" ", ""))
+        
+        # DB:
+        DB = a2b_hex('00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00\
+        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00\
+        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00\
+        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00\
+        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00\
+        00 00 00 00 00 00 01 e3 b5 d5 d0 02 c1 bc e5 0c\
+        2b 65 ef 88 a1 88 d8 3b ce 7e 61'.replace(" ", ""))
+        
+        # dbMask:
+        dbMask = a2b_hex('66 e4 67 2e 83 6a d1 21 ba 24 4b ed 65 76 b8 67\
+        d9 a4 47 c2 8a 6e 66 a5 b8 7d ee 7f bc 7e 65 af\
+        50 57 f8 6f ae 89 84 d9 ba 7f 96 9a d6 fe 02 a4\
+        d7 5f 74 45 fe fd d8 5b 6d 3a 47 7c 28 d2 4b a1\
+        e3 75 6f 79 2d d1 dc e8 ca 94 44 0e cb 52 79 ec\
+        d3 18 3a 31 1f c8 97 39 a9 66 43 13 6e 8b 0f 46\
+        5e 87 a4 53 5c d4 c5 9b 10 02 8d'.replace(" ", ""))
+        
+        # maskedDB:
+        maskedDB = a2b_hex('66 e4 67 2e 83 6a d1 21 ba 24 4b ed 65 76 b8 67\
+        d9 a4 47 c2 8a 6e 66 a5 b8 7d ee 7f bc 7e 65 af\
+        50 57 f8 6f ae 89 84 d9 ba 7f 96 9a d6 fe 02 a4\
+        d7 5f 74 45 fe fd d8 5b 6d 3a 47 7c 28 d2 4b a1\
+        e3 75 6f 79 2d d1 dc e8 ca 94 44 0e cb 52 79 ec\
+        d3 18 3a 31 1f c8 96 da 1c b3 93 11 af 37 ea 4a\
+        75 e2 4b db fd 5c 1d a0 de 7c ec'.replace(" ", ""))
+        
+        # Encoded message EM:
+        EM = a2b_hex('66 e4 67 2e 83 6a d1 21 ba 24 4b ed 65 76 b8 67\
+        d9 a4 47 c2 8a 6e 66 a5 b8 7d ee 7f bc 7e 65 af\
+        50 57 f8 6f ae 89 84 d9 ba 7f 96 9a d6 fe 02 a4\
+        d7 5f 74 45 fe fd d8 5b 6d 3a 47 7c 28 d2 4b a1\
+        e3 75 6f 79 2d d1 dc e8 ca 94 44 0e cb 52 79 ec\
+        d3 18 3a 31 1f c8 96 da 1c b3 93 11 af 37 ea 4a\
+        75 e2 4b db fd 5c 1d a0 de 7c ec df 1a 89 6f 9d\
+        8b c8 16 d9 7c d7 a2 c4 3b ad 54 6f be 8c fe bc'.replace(" ", ""))
+        
+        if False:
+            print("PSS Test Vector:")
+            print("M     =>", m) 
+            print("mHash =>", mHash)
+            print("salt  =>", salt)
+            print("M'    =>", mPrime)
+            print("H     =>", H)
+            print("DB    =>", DB)
+            print("dbmask=>", dbMask)
+            print("masked=>", maskedDB)
+            print("EM    =>", EM)
+        
+        pss = paddingschemes.PSSPadding()
+        realEM = pss.encode(m,len(EM),salt)
+        self.assertEqual(EM, realEM)
+
     
     @classmethod
     def suite(self):
