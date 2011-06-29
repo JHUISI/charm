@@ -11,7 +11,7 @@ extern "C" {
 #include <structmember.h>
 #include <sys/time.h>
 
-// #define DEBUG   1
+//#define DEBUG   1
 #define TRUE	1
 #define FALSE	0
 

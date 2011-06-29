@@ -34,9 +34,11 @@ typedef enum Group GroupType;
 #endif
 
 PyTypeObject ElementType;
+PyTypeObject PairingType;
 static PyObject *ElementError;
 static Benchmark *dBench;
 #define PyElement_Check(obj) PyObject_TypeCheck(obj, &ElementType)
+#define PyPairing_Check(obj) PyObject_TypeCheck(obj, &PairingType)
 // static Benchmark *dObjects[MAX_BENCH_OBJECTS], *activeObject = NULL;
 
 PyMethodDef Element_methods[];
@@ -45,10 +47,17 @@ PyMemberDef Element_members[];
 PyNumberMethods element_number;
 
 typedef struct {
+	PyObject_HEAD
+	pairing_t pair_obj;
+	int safe;
+} Pairing;
+
+typedef struct {
     PyObject_HEAD
 	char *params;
 	char *param_buf;
-	pairing_ptr pairing;
+//	pairing_ptr pairing;
+	Pairing *pairing;
 	element_t e;
 	GroupType element_type;
     int elem_initialized;

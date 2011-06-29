@@ -144,23 +144,23 @@ int Check_Types(GroupType l_type, GroupType r_type, char op)
 }
 
 // assumes that pairing structure has been initialized
-static Element *createNewElement(GroupType element_type, pairing_ptr pairing) {
+static Element *createNewElement(GroupType element_type, Pairing *pairing) {
 	debug("Create an object of type Element\n");
 	Element *retObject = PyObject_New(Element, &ElementType);
 	if(element_type == ZR) {
-		element_init_Zr(retObject->e, pairing); 
+		element_init_Zr(retObject->e, pairing->pair_obj);
 		retObject->element_type = ZR;
 	}
 	else if(element_type == G1) {
-		element_init_G1(retObject->e, pairing); 
+		element_init_G1(retObject->e, pairing->pair_obj);
 		retObject->element_type = G1;
 	}
 	else if(element_type == G2) {
-		element_init_G2(retObject->e, pairing); 
+		element_init_G2(retObject->e, pairing->pair_obj);
 		retObject->element_type = G2;
 	}
 	else if(element_type == GT) {
-		element_init_GT(retObject->e, pairing); 
+		element_init_GT(retObject->e, pairing->pair_obj);
 		retObject->element_type = GT;
 	}
 	
@@ -168,18 +168,24 @@ static Element *createNewElement(GroupType element_type, pairing_ptr pairing) {
 	retObject->pairing = pairing;
 	retObject->safe_pairing_clear = FALSE;
 	retObject->param_buf = NULL;		
-	//retObject->bench_enabled = FALSE;
-	//retObject->data = NULL;
 	
 	return retObject;	
 }
 
+void 	Pairing_dealloc(Pairing *self)
+{
+	if(self->safe) {
+		debug("Clear pairing => 0x%p\n", self->pair_obj);
+		pairing_clear(self->pair_obj);
+	}
+
+	debug("Releasing pairing object!\n");
+	Py_TYPE(self)->tp_free((PyObject *) self);
+}
 
 void	Element_dealloc(Element* self)
 {
 	// add reference count to objects
-    // Py_XDECREF(self->first);
-    // Py_XDECREF(self->last);		
 	if(self->elem_initialized && self->e) {
 		debug_e("Clear element_t => '%B'\n", self->e);
 		element_clear(self->e);
@@ -190,9 +196,12 @@ void	Element_dealloc(Element* self)
 		free(self->param_buf);
 	}
 	
-	if(self->safe_pairing_clear && self->pairing) {
-		debug("Clear pairing => 0x%p\n", self->pairing);
-		pairing_clear(self->pairing);
+//	if(self->safe_pairing_clear && self->pairing) {
+//		debug("Clear pairing => 0x%p\n", self->pairing);
+//		pairing_clear(self->pairing);
+//	}
+	if(self->safe_pairing_clear) {
+		PyObject_Del(self->pairing);
 	}
 		// dealloc each object, PyObject_Del?
 //		int i;
@@ -220,7 +229,7 @@ void	Element_dealloc(Element* self)
 
 // helper method 
 ssize_t read_file(FILE *f, char** out) 
-{	
+{
 	if(f != NULL) {
 		/* See how big the file is */
 		fseek(f, 0L, SEEK_END);
@@ -406,12 +415,26 @@ PyObject *Element_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 		self->pairing = NULL;
 		self->element_type = NONE_G;
 		self->param_buf = NULL;
-		// self->data = NULL;
-		// self->bench_enabled = FALSE;
     }
 	
     return (PyObject *)self;
 }
+
+PyObject *Pairing_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+	Pairing *self = (Pairing *) type->tp_alloc(type, 0);
+	if(self != NULL) {
+		self->safe = TRUE;
+	}
+
+	return (PyObject *) self;
+}
+
+int Pairing_init(Pairing *self, PyObject *args)
+{
+	return 0;
+}
+
 
 int Element_init(Element *self, PyObject *args, PyObject *kwds)
 {
@@ -419,7 +442,8 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 	// they will be deallocated!
 	// int i;
 	pbc_param_t p;
-	static pairing_t pairing;
+//	static pairing_t pairing;
+	Pairing *pairing;
 	static char *buf;
 	char *buf2 = NULL;
 	PyObject *n = NULL, *short_val = NULL;
@@ -435,7 +459,8 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
         return -1; 
 	}
 	if (self->params && !n && !qbits && !rbits && !short_val && !buf2) {
-		buf = init_pbc_param(self->params, &pairing);
+		pairing = PyObject_New(Pairing, &PairingType);
+		buf = init_pbc_param(self->params, &pairing->pair_obj);
 		
 		if(buf != NULL) {
 			debug("Initialized pairings type: '%s'\n", self->params);
@@ -456,9 +481,10 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 	}
 	else if(buf2 && !n && !qbits && !rbits && !short_val) {
 		// parameters is provided in string
+		pairing = PyObject_New(Pairing, &PairingType);
 		debug("Paramter String => '%s'\n", buf2);
 		pbc_param_init_set_buf(p, buf2, b_len);
-		pairing_init_pbc_param(pairing, p);
+		pairing_init_pbc_param(pairing->pair_obj, p);
 	}
 	else if (n && !(qbits || rbits)) {
 		// if n is provided, and qbits and rbits are not
@@ -486,7 +512,8 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 			pbc_param_init_a1_gen(p, n_val);
 			mpz_clear(n_val);
 		}
-		pairing_init_pbc_param(pairing, p);
+		pairing = PyObject_New(Pairing, &PairingType);
+		pairing_init_pbc_param(pairing->pair_obj, p);
 	}
     // if qbits and rbits are provided, and n is not
 	else if (qbits && rbits && !n) {
@@ -495,7 +522,8 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 			pbc_param_init_e_gen(p, rbits, qbits);
 		else
 			pbc_param_init_a_gen(p, rbits, qbits);
-		pairing_init_pbc_param(pairing, p);
+		pairing = PyObject_New(Pairing, &PairingType);
+		pairing_init_pbc_param(pairing->pair_obj, p);
 	}
 	// figure out how to expose func to find type d and g curves
 	else {
@@ -546,7 +574,7 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 		return NULL;
 	}
 	
-	debug("init an element in '%d'\n", arg1);
+	debug("init an element.\n");
 //	retObject = PyObject_New(Element, &ElementType);
 //	if(arg1 == ZR) {
 //		element_init_Zr(retObject->e, self->pairing);
@@ -626,15 +654,15 @@ static PyObject *Element_random(Element* self, PyObject* args)
 	retObject = PyObject_New(Element, &ElementType);
 	debug("init random element in '%d'\n", arg1);
 	if(arg1 == ZR) {
-		element_init_Zr(retObject->e, self->pairing);
+		element_init_Zr(retObject->e, self->pairing->pair_obj);
 		e_type = ZR; 
 	}
 	else if(arg1 == G1) {
-		element_init_G1(retObject->e, self->pairing);
+		element_init_G1(retObject->e, self->pairing->pair_obj);
 		e_type = G1;
 	}
 	else if(arg1 == G2) {
-		element_init_G2(retObject->e, self->pairing);
+		element_init_G2(retObject->e, self->pairing->pair_obj);
 		e_type = G2;
 	}
 	else if(arg1 == GT) {
@@ -1034,13 +1062,13 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 		return NULL;
 	}
 	
-	if(pairing_is_symmetric(lhs->pairing)) {
+	if(pairing_is_symmetric(lhs->pairing->pair_obj)) {
 		debug("Pairing is symmetric.\n");
 		debug_e("LHS: '%B'\n", lhs->e);
 		debug_e("RHS: '%B'\n", rhs->e);
 		START_CLOCK(dBench);
 		newObject = createNewElement(GT, lhs->pairing);
-		pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing);
+		pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing->pair_obj);
 		STOP_CLOCK(dBench);
 		UPDATE_BENCHMARK(PAIRINGS, dBench);
 		return (PyObject *) newObject;
@@ -1052,7 +1080,7 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 		debug_e("RHS: '%B'\n", rhs->e);
 		START_CLOCK(dBench);
 		newObject = createNewElement(GT, lhs->pairing);
-		pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing);
+		pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing->pair_obj);
 		STOP_CLOCK(dBench);
 		UPDATE_BENCHMARK(PAIRINGS, dBench);
 		return (PyObject *) newObject;
@@ -1358,7 +1386,6 @@ UNARY(instance_negate, 'i', Element_negate)
 UNARY(instance_invert, 'i', Element_invert)
 BINARY(instance_add, 'a', Element_add)
 BINARY(instance_sub, 's', Element_sub)
-// BINARY3(instance_pow, 'p', Element_pow)
 
 static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 
@@ -1565,6 +1592,47 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 //	return Py_BuildValue("i", errcode);
 //}
 
+PyTypeObject PairingType = {
+	PyVarObject_HEAD_INIT(NULL, 0)
+	"pairing.Pairing",             /*tp_name*/
+	sizeof(Pairing),         /*tp_basicsize*/
+	0,                         /*tp_itemsize*/
+	(destructor)Pairing_dealloc, /*tp_dealloc*/
+	0,                         /*tp_print*/
+	0,                         /*tp_getattr*/
+	0,                         /*tp_setattr*/
+	0,			   				/*tp_reserved*/
+	0, /*tp_repr*/
+	0,               /*tp_as_number*/
+	0,                         /*tp_as_sequence*/
+	0,                         /*tp_as_mapping*/
+	0,                         /*tp_hash */
+	0,                         /*tp_call*/
+	0,                         /*tp_str*/
+	0,                         /*tp_getattro*/
+	0,                         /*tp_setattro*/
+	0,                         /*tp_as_buffer*/
+	Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+	"Pairing group parameters",           /* tp_doc */
+	0,		               /* tp_traverse */
+	0,		               /* tp_clear */
+	0,		       /* tp_richcompare */
+	0,		               /* tp_weaklistoffset */
+	0,		               /* tp_iter */
+	0,		               /* tp_iternext */
+	0,             		  /* tp_methods */
+	0,             	      /* tp_members */
+	0,                         /* tp_getset */
+	0,                         /* tp_base */
+	0,                         /* tp_dict */
+	0,                         /* tp_descr_get */
+	0,                         /* tp_descr_set */
+	0,                         /* tp_dictoffset */
+	(initproc)Pairing_init,      /* tp_init */
+	0,                         /* tp_alloc */
+	Pairing_new,                 /* tp_new */
+};
+
 InitBenchmark_CAPI(_init_benchmark, dBench, 1)
 StartBenchmark_CAPI(_start_benchmark, dBench)
 EndBenchmark_CAPI(_end_benchmark, dBench)
@@ -1729,6 +1797,8 @@ void initpairing(void) 		{
 #endif
     PyObject* m;
 	
+    if(PyType_Ready(&PairingType) < 0)
+    	INITERROR;
     if(PyType_Ready(&ElementType) < 0)
         INITERROR;
 #if PY_MAJOR_VERSION >= 3
@@ -1756,6 +1826,8 @@ void initpairing(void) 		{
     dBench->bench_initialized = FALSE;
     // TODO: callibrate timer here?
 
+    Py_INCREF(&PairingType);
+    PyModule_AddObject(m, "params", (PyObject *)&PairingType);
     Py_INCREF(&ElementType);
     PyModule_AddObject(m, "pairing", (PyObject *)&ElementType);
 //	int i;
