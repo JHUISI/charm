@@ -3,7 +3,7 @@
 # From: "D. Boneh, X. Boyen.  Efficient Selective Identity-Based Encryption Without Random Oracles", Section 5.1.
 # Published in: Eurocrypt 2004
 # Available from: http://crypto.stanford.edu/~dabo/pubs/papers/bbibe.pdf
-# Notes: This is the IBE (2-level HIBE) implementation of the HIBE scheme BB_2.
+# Notes: This is the IBE (1-level HIBE) implementation of the HIBE scheme BB_2.
 #
 # type:			encryption (identity-based)
 # setting:		bilinear groups (asymmetric)
