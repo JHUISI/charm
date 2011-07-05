@@ -1,28 +1,30 @@
 # A collection of encryption and signature padding schemes
+from toolbox.bitstring import Bytes
+from toolbox.securerandom import SecureRandomFactory
 import charm.cryptobase
-import hashlib, math, struct
-from bitstring import *
-from SecureRandom import *
-from weakrandom import WeakRandom
+import hashlib
+import math
+import struct
 
 # OAEPEncryptionPadding
 #
 # Implements the OAEP padding scheme.  Appropriate for RSA-OAEP encryption.
 # Implemented according to PKCS#1 v2.1 Section 7 ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf
 
+debug = False
+
 class OAEPEncryptionPadding:
     def __init__(self, _hash_type ='sha1'):
         self.hashFn = hashFunc(_hash_type)
         self.hashFnOutputBytes = len(hashlib.new(_hash_type).digest())
-        global debug
-        debug = False
         
     # outputBytes - the length in octets of the RSA modulus used
     #             - the intended length of the encoded message 
-    # label = 'X'    
+    # emLen = the length of the rsa modulus in bits
     def encode(self, message, emLen, label="", seed=None):
         # Skipped: label input length checking. (L must be less than 2^61 octets for SHA1)
-        # First, make sure the message isn't too long.    
+        # First, make sure the message isn't too long.    emLen
+        '''Returns a Bytes object'''
         hLen = self.hashFnOutputBytes
         if (len(message) > (emLen - (2 * hLen) - 2)):
             assert False, "message too long"
