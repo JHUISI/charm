@@ -10,12 +10,14 @@
 
 from charm.integer import *
 from toolbox.PKEnc import *
+from toolbox.paddingschemes import *
+from toolbox.conversion import Conversion
 
-class RSA(PKEnc):
-    def __init__(self):
+debug = False
+class RSA_Enc(PKEnc):
+    def __init__(self, padding=OAEPEncryptionPadding()):
         self.rand = init()
-        global encode, decode
-        encode, decode = self.encode, self.decode
+        self.paddingscheme = padding 
                 
     # generate p,q and n
     def paramgen(self, secparam):
@@ -40,36 +42,39 @@ class RSA(PKEnc):
         sk = { 'phi_N':phi_N, 'd':d }
         return (pk, sk)
     
-    def encrypt(self, pk, m):
-        M = encode(m, pk['N'])
-        return (m ** pk['e']) % pk['N']
+    def encrypt(self, pk, m:Bytes):
+        octetlen = math.ceil(int(pk['N']).bit_length() / 8)
+        EM = self.paddingscheme.encode(m, octetlen)
+        if debug: print("EM == >", EM)
+        i = Conversion.OS2IP(EM)
+        ip = integer(i) % pk['N']  #Convert to modular integer
+        return (ip ** pk['e']) % pk['N']
     
     def decrypt(self, pk, sk, c):
+        octetlen = math.ceil(int(pk['N']).bit_length() / 8)
         M = (c ** (sk['d'] % sk['phi_N'])) % pk['N']
-        return decode(M, pk['N'])
+        os = Conversion.IP2OS(int(M), octetlen)
+        if debug: print("OS  =>", os)
+        return self.paddingscheme.decode(os)
     
-    def encode(self, m, n):
-        # apply padding scheme to encode message s.t. (0 < m < N).
-        # add padding routine here to encode message as integer
-        return m % n
-    
-    def decode(self, m, n):
-        # add padding routine here to recover message
-        return m % n
+class RSA_Sig():
+    pass
 
 def main():
-    rsa = RSA()
+    rsa = RSA_Enc()
     
     (pk, sk) = rsa.keygen(1024)
     
-    m = integer(34567890981234556498) % pk['N']
+    #m = integer(34567890981234556498) % pk['N']
+    m = b'This is a test'
     c = rsa.encrypt(pk, m)
     
     orig_m = rsa.decrypt(pk, sk, c)
-    print("recovered m =>", orig_m)
+    if debug: print("recovered m =>", orig_m)
 
     assert m == orig_m
-    print("Successful Decryption!!!")
+    if debug: print("Successful Decryption!!!")
         
 if __name__ == "__main__":
+    debug = True
     main()
