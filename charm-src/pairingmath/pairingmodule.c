@@ -561,37 +561,21 @@ PyObject *Element_call(Element *elem, PyObject *args, PyObject *kwds)
 static PyObject *Element_elem(Element* self, PyObject* args)
 {
 	Element *retObject;
-	int type, init_value;
-//	GroupType e_type = NONE_G;
+	int type;
+	PyObject *long_obj = NULL;
 	
 	if(self->pairing == NULL) {
 		PyErr_SetString(ElementError, "pairing object is not set.");
 		return NULL;
 	}
 	
-	if(!PyArg_ParseTuple(args, "i|i", &type, &init_value)) {
+	if(!PyArg_ParseTuple(args, "i|O", &type, &long_obj)) {
 		PyErr_SetString(ElementError, "invalid arguments.\n");
 		return NULL;
 	}
 	
 	debug("init an element.\n");
-//	retObject = PyObject_New(Element, &ElementType);
-//	if(arg1 == ZR) {
-//		element_init_Zr(retObject->e, self->pairing);
-//		e_type = ZR;
-//	}
-//	else if(arg1 == G1) {
-//		element_init_G1(retObject->e, self->pairing);
-//		e_type = G1;
-//	}
-//	else if(arg1 == G2) {
-//		element_init_G2(retObject->e, self->pairing);
-//		e_type = G2;
-//	}
-//	else if(arg1 == GT) {
-//		element_init_GT(retObject->e, self->pairing);
-//		e_type = GT;
-//	}
+
 	if(type >= ZR && type <= GT) {
 		retObject = createNewElement(type, self->pairing);
 	}
@@ -600,16 +584,15 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 		return NULL;
 	}
 
-	if(init_value >= 0) {
-		element_set_si(retObject->e, (signed int) init_value);
+	if(PyLong_Check(long_obj)) {
+		mpz_t m;
+		mpz_init(m);
+		longObjToMPZ(m, (PyLongObject *) long_obj);
+		element_set_mpz(retObject->e, m);
+		mpz_clear(m);
 	}
 	
-	/* create new Element object */
-//	retObject->elem_initialized = TRUE;
-//	retObject->pairing = self->pairing;
-//	retObject->safe_pairing_clear = FALSE;
-//	retObject->param_buf = NULL;
-//	retObject->element_type = e_type;
+	/* return Element object */
 	return (PyObject *) retObject;		
 }
 
