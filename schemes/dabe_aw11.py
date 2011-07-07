@@ -14,6 +14,7 @@ from toolbox.pairinggroup import *
 from toolbox.secretutil import *
 from toolbox.ABEncMultiAuth import *
 
+debug = False
 class Dabe(ABEncMultiAuth):
     '''
     Decentralized Attribute-Based Encryption by Lewko and Waters
@@ -146,29 +147,29 @@ def main():
     #Setup an authority
     auth_attrs= ['ONE', 'TWO', 'THREE', 'FOUR']
     (SK, PK) = dabe.authsetup(GP, auth_attrs)
-    print("Authority SK")
-    print(SK)
+    if debug: print("Authority SK")
+    if debug: print(SK)
 
     #Setup a user and give him some keys
     gid, K = "bob", {}
     usr_attrs = ['THREE', 'ONE', 'TWO']
     for i in usr_attrs: dabe.keygen(GP, SK, i, gid, K)
-    print('User credential list: %s' % usr_attrs)    
-    print("\nSecret key:")
+    if debug: print('User credential list: %s' % usr_attrs)    
+    if debug: print("\nSecret key:")
     groupObj.debug(K)
 
     #Encrypt a random element in GT
     m = groupObj.random(GT)
     policy = '((one or three) and (TWO or FOUR))'
-    print('Acces Policy: %s' % policy)
+    if debug: print('Acces Policy: %s' % policy)
     CT = dabe.encrypt(PK, GP, m, policy)
-    print("\nCiphertext...")
+    if debug: print("\nCiphertext...")
     groupObj.debug(CT)    
     
     orig_m = dabe.decrypt(GP, K, CT)
    
     assert m == orig_m, 'FAILED Decryption!!!' 
-    print('Successful Decryption!')
+    if debug: print('Successful Decryption!')
 
 if __name__ == '__main__':
     main()

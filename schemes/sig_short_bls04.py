@@ -13,6 +13,7 @@
 from toolbox.pairinggroup import *
 from charm.engine.util import *
 
+debug = False
 class IBSig():
     def __init__(self, groupObj):
         global group
@@ -31,7 +32,7 @@ class IBSig():
         
     def sign(self, x, message):
         M = self.dump(message)
-        print("Message => '%s'" % M)
+        if debug: print("Message => '%s'" % M)
         return group.hash(M, G1) ** x
         
     def verify(self, pk, sig, message):
@@ -51,10 +52,10 @@ def main():
     
     sig = bls.sign(sk['x'], m)
     
-    print("Message: '%s'" % m)
-    print("Signature: '%s'" % sig)     
+    if debug: print("Message: '%s'" % m)
+    if debug: print("Signature: '%s'" % sig)     
     assert bls.verify(pk, sig, m)
-    print('SUCCESS!!!')
+    if debug: print('SUCCESS!!!')
     
 if __name__ == "__main__":
     main()

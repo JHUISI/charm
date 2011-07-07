@@ -15,6 +15,7 @@
 from toolbox.ecgroup import *
 from toolbox.PKEnc import *
 
+debug = False
 class EC_CS98(PKEnc):	
     def __init__(self, builtin_cv):
         PKEnc.__init__(self)
@@ -53,8 +54,8 @@ class EC_CS98(PKEnc):
         if (c['v'] != v_prime):
             return 'ERROR' 
 
-        print("c['v'] => %s" % c['v'])
-        print("v' => %s" % v_prime)
+        if debug: print("c['v'] => %s" % c['v'])
+        if debug: print("v' => %s" % v_prime)
         return group.decode(c['e'] / (c['u1'] ** sk['z']))
 
 def main():
@@ -67,7 +68,7 @@ def main():
     message = pkenc.decrypt(pk, sk, ciphertext)
     
     assert M == message
-    print("SUCCESSFUL DECRYPTION!!! => %s" % message)
+    if debug: print("SUCCESSFUL DECRYPTION!!! => %s" % message)
    
 if __name__ == "__main__":
     main()

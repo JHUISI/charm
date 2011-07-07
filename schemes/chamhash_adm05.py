@@ -16,6 +16,7 @@
 from toolbox.Hash import *
 from toolbox.integergroup import *
 
+debug = True
 class Adm05(ChamHash):
     def __init__(self):
         ChamHash.__init__(self)
@@ -28,8 +29,9 @@ class Adm05(ChamHash):
         g, x = group.randomGen(), group.random() # g, [1,q-1]
         y = g ** x
         
-        print("Public params")
-        print("g =>", g); print("y =>", y)
+        if debug:
+            print("Public params")
+            print("g =>", g); print("y =>", y)
         
         pk = { 'g':g, 'y':y }
         sk = { 'x':x }        

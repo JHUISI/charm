@@ -6,6 +6,7 @@ from schemes.dabe11 import Dabe
 from toolbox.ABEncMultiAuth import ABEncMultiAuth
 from toolbox.pairinggroup import *
 
+debug = False
 class HybridABEncMA(ABEncMultiAuth):
     def __init__(self, scheme, groupObj):
         global abencma, group
@@ -85,13 +86,15 @@ def main():
     policy_str = "(jhmi_doctor or (jhmi_researcher and jhu_professor))"
     ct = hyb_abema.encrypt(allAuthPK, gp, msg, policy_str)    
 
-    print("Ciphertext")
-    print("c1 =>", ct['c1'])
-    print("c2 =>", ct['c2'])
+    if debug:
+        print("Ciphertext")
+        print("c1 =>", ct['c1'])
+        print("c2 =>", ct['c2'])
     
     orig_msg = hyb_abema.decrypt(gp, K, ct)
-    print("Result =>", orig_msg)
+    if debug: print("Result =>", orig_msg)
     assert orig_msg == msg
 
 if __name__ == "__main__":
+    debug = True
     main()

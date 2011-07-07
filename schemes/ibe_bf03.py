@@ -16,14 +16,15 @@ from toolbox.hash_module import *
 from toolbox.IBEnc import *
 import binascii
 
+debug = False
+
 class IBE_BonehFranklin(IBEnc):
     def __init__(self, groupObj):
         IBEnc.__init__(self)
-        global group,h,ZN,debug
+        global group,h,ZN
         group = groupObj
         h = Hash('sha1', group.Pairing)
         ZN = -1
-        debug = False
         
     def setup(self):
         s, P = group.random(), group.random(G2)

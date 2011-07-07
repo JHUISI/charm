@@ -15,6 +15,7 @@ from toolbox.pairinggroup import *
 from toolbox.secretutil import *
 from toolbox.ABEnc import *
 
+debug = False
 class CPabe(ABEnc):
     def __init__(self, groupObj):
         ABEnc.__init__(self)
@@ -62,7 +63,7 @@ class CPabe(ABEnc):
                C[ p_list[i] ] = ((pk['g1^a'] ** shares[i][1]) * (group.hash(p_list[i], G1) ** -r))
                D[ p_list[i] ] = (pk['g2'] ** r)
         
-        print("SessionKey: %s" % C_tilde)
+        if debug: print("SessionKey: %s" % C_tilde)
         return { 'C0':C_0, 'C':C, 'D':D , 'C_tilde':C_tilde, 'policy':policy, 'attribute':p_list }
     
     def decrypt(self, sk, ct):
@@ -92,21 +93,22 @@ def main():
     policy = '((one or three) and (TWO or FOUR))'
     attr_list = ['THREE', 'ONE', 'TWO']
 
-    print('Acces Policy: %s' % policy)
-    print('User credential list: %s' % attr_list)
+    if debug: print('Acces Policy: %s' % policy)
+    if debug: print('User credential list: %s' % attr_list)
     m = groupObj.random(GT)
     
     cpkey = cpabe.keygen(pk, msk, attr_list)
-    print("\nSecret key: %s" % attr_list)
+    if debug: print("\nSecret key: %s" % attr_list)
     groupObj.debug(cpkey)
     cipher = cpabe.encrypt(pk, m, policy)
 
-    print("\nCiphertext...")
+    if debug: print("\nCiphertext...")
     groupObj.debug(cipher)    
     orig_m = cpabe.decrypt(cpkey, cipher)
    
     assert m == orig_m, 'FAILED Decryption!!!' 
-    print('Successful Decryption!')    
+    if debug: print('Successful Decryption!')    
     
 if __name__ == '__main__':
+    debug = True
     main()

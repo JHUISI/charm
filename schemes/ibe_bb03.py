@@ -77,7 +77,6 @@ def main():
     # initialize the element object so that object references have global scope
     groupObj = PairingGroup('d224.param')
     ibe = IBE_BB04(groupObj)
-    print("Running through IBE setup...")
     (params, mk) = ibe.setup()
 
     # represents public identity
