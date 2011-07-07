@@ -572,7 +572,7 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 		return NULL;
 	}
 
-	if(PyLong_Check(long_obj)) {
+	if(long_obj != NULL && PyLong_Check(long_obj)) {
 		mpz_t m;
 		mpz_init(m);
 		longObjToMPZ(m, (PyLongObject *) long_obj);
