@@ -25,35 +25,35 @@ class Commitment_GS08(Commitment):
     # Generates commitment parameters for either G1 or G2 (specified by groupChoice).
     # By default this generates the binding commitment parameters.  Set commitType to 'hiding'
     # in order to generate hiding parameters.
-    def setup(self, secparam=None, groupChoice=G1, commitType='binding')
+    def setup(self, secparam=None, groupChoice=G1, commitType='binding'):
         g1, h1 = group.random(groupChoice), group.random(groupChoice)
-        s, t = group.random(Zr), group.random(Zr)
-        if (commitType == 'binding')
+        s, t = group.random(ZR), group.random(ZR)
+        if (commitType == 'binding'):
             g2, h2 = g1 ** s, h1 ** s
-        else     
+        else:
             g2, h2 = g1 ** s, h1 ** t
         
         return (g1, g2, h1, h2)
         
-    def commit(self, params, msg):
+    def commit(self, params, msg : ZR):
         # TODO: check that the message is in the same group as the params
         (g1, g2, h1, g2) = params
-        r1, r2 = group.random(Zr), group.random(Zr)
+        r1, r2 = group.random(ZR), group.random(ZR)
         
         c1 = (g1 ** r1) * (h1 ** r2)
-        c2 = message * (g2 ** r1) * (h2 ** r2)
+        c2 = msg * (g2 ** r1) * (h2 ** r2)
         
         return ({ 'c1':c1, 'c2':c2 }, { 'r1':r1, 'r2':r2 })
         
-    def decommit(self, params, c, d, msg):
+    def decommit(self, params, c, d, msg : ZR):
         # TODO: check that the message is in the same group as the params
         (g1, g2, h1, g2) = params
         
-        if (c['c1'] != ((g1 ** d['r1']) * (h1 ** d['r2'])))
-            return false
+        if (c['c1'] != ((g1 ** d['r1']) * (h1 ** d['r2']))):
+            return False
         
-        if ((c['c2'] / msg) != ((g2 ** d['r1']) * (h2 ** d['r2'])))
-            return false
+        if ((c['c2'] / msg) != ((g2 ** d['r1']) * (h2 ** d['r2']))):
+            return False
         
-        return true
+        return True
         
