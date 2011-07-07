@@ -48,6 +48,7 @@ PyNumberMethods element_number;
 
 typedef struct {
 	PyObject_HEAD
+	pbc_param_t p;
 	pairing_t pair_obj;
 	int safe;
 } Pairing;

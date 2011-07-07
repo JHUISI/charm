@@ -440,9 +440,7 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 {
 	// NOTE: if you want variables to stick around, make sure you declare them as static or else
 	// they will be deallocated!
-	// int i;
-	pbc_param_t p;
-//	static pairing_t pairing;
+//	pbc_param_t p;
 	Pairing *pairing;
 	static char *buf;
 	char *buf2 = NULL;
@@ -464,15 +462,7 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 		
 		if(buf != NULL) {
 			debug("Initialized pairings type: '%s'\n", self->params);
-			//self->pairing = pairing;
 			self->param_buf = buf;
-			// self->safe_pairing_clear = TRUE;
-			// self->elem_initialized = FALSE;
-//			for(i = 0; i < MAX_BENCH_OBJECTS; i++) {
-//				//dObjects[i] = NULL;
-//				debug("Init dObject[%d] => %p to %p\n", i, &(dObjects[i]), dObjects[i]);
-//			}
-//			self->data = NULL;
 		}
 		else {
 			PyErr_SetString(ElementError, "failed to read params file.");
@@ -483,24 +473,27 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 		// parameters is provided in string
 		pairing = PyObject_New(Pairing, &PairingType);
 		debug("Paramter String => '%s'\n", buf2);
-		pbc_param_init_set_buf(p, buf2, b_len);
-		pairing_init_pbc_param(pairing->pair_obj, p);
+		pbc_param_init_set_buf(pairing->p, buf2, b_len);
+		pairing_init_pbc_param(pairing->pair_obj, pairing->p);
 	}
 	else if (n && !(qbits || rbits)) {
 		// if n is provided, and qbits and rbits are not
 		debug("n set, but q and r are NOT set!\n");
+		pairing = PyObject_New(Pairing, &PairingType);
 		if(short_val == Py_True) {
 			// type f curve
 			if(!PyLong_Check(n)) {
 				PyErr_SetString(ElementError, "n is expected to be short and an int or long type.");
+				PyObject_Del(pairing);
 				return -1;
 			}
 			long bits = PyLong_AsLong(n);
-			pbc_param_init_f_gen(p, (int) bits);
+			pbc_param_init_f_gen(pairing->p, (int) bits);
 		}
 		else {
 			if(!PyLong_Check(n)) {
 				PyErr_SetString(ElementError, "n is expected to be large and a long type.");
+				PyObject_Del(pairing);
 				return -1;
 			}
 
@@ -509,35 +502,30 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 			mpz_init(n_val);
 			longObjToMPZ(n_val, (PyLongObject *) n);
 
-			pbc_param_init_a1_gen(p, n_val);
+			pbc_param_init_a1_gen(pairing->p, n_val);
 			mpz_clear(n_val);
 		}
-		pairing = PyObject_New(Pairing, &PairingType);
-		pairing_init_pbc_param(pairing->pair_obj, p);
+		pairing_init_pbc_param(pairing->pair_obj, pairing->p);
 	}
     // if qbits and rbits are provided, and n is not
 	else if (qbits && rbits && !n) {
 		debug("q and r set, but NOT n!\n");
-		if(short_val == Py_True)
-			pbc_param_init_e_gen(p, rbits, qbits);
-		else
-			pbc_param_init_a_gen(p, rbits, qbits);
 		pairing = PyObject_New(Pairing, &PairingType);
-		pairing_init_pbc_param(pairing->pair_obj, p);
+		if(short_val == Py_True)
+			pbc_param_init_e_gen(pairing->p, rbits, qbits);
+		else
+			pbc_param_init_a_gen(pairing->p, rbits, qbits);
+		pairing_init_pbc_param(pairing->pair_obj, pairing->p);
 	}
 	// figure out how to expose func to find type d and g curves
 	else {
 		PyErr_SetString(ElementError, "cannot derive curve type and parameters.");
 		return -1;
 	}
-//
-//	if(seed > -1) {
-//	}
 
 	self->pairing = pairing;
 	self->elem_initialized = FALSE;
 	self->safe_pairing_clear = TRUE;
-//	if(dBench->bench_initialized) printf("dBench->init => %d\n", dBench->identifier);
     return 0;
 }
 
@@ -612,7 +600,11 @@ PyObject *Element_print(Element* self)
 	}
 
 	if(self->pairing && self->safe_pairing_clear) {
-		return PyUnicode_FromString((char *) self->param_buf);
+		if(self->param_buf != NULL) return PyUnicode_FromString((char *) self->param_buf);
+		else {
+			pbc_param_out_str(stdout, self->pairing->p);
+			return PyUnicode_FromString("");
+		}
 	}
 
 	return PyUnicode_FromString("");
@@ -1716,6 +1708,8 @@ static struct module_state _state;
 PyMemberDef Element_members[] = {
 	{"params", T_STRING, offsetof(Element, params), 0,
 		"pairing type"},
+	{"type", T_INT, offsetof(Element, element_type), 0,
+		"group type"},
 //    {"first", T_OBJECT_EX, offsetof(Element, first), 0,
 //		"first name"},
 //    {"last", T_OBJECT_EX, offsetof(Element, last), 0,
@@ -1755,7 +1749,7 @@ static int pairings_traverse(PyObject *m, visitproc visit, void *arg) {
 static int pairings_clear(PyObject *m) {
 	Py_CLEAR(GETSTATE(m)->error);
 	Py_CLEAR(GETSTATE(m)->dBench);
-//	PyObject_Del(GETSTATE(m)->dBench);
+
 	return 0;
 }
 
@@ -1807,31 +1801,17 @@ void initpairing(void) 		{
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);
     dBench = st->dBench;
     dBench->bench_initialized = FALSE;
-    // TODO: callibrate timer here?
 
     Py_INCREF(&PairingType);
     PyModule_AddObject(m, "params", (PyObject *)&PairingType);
     Py_INCREF(&ElementType);
     PyModule_AddObject(m, "pairing", (PyObject *)&ElementType);
-//	int i;
-//    for(i = 0; i < MAX_BENCH_OBJECTS; i++) {
-//    	dObjects[i] = PyObject_New(Benchmark, &BenchmarkType);
-//    	dObjects[i]->bench_initialized = FALSE;
-//    	//Py_INCREF(dObjects[i]);
-//    }
 
-	// define exception object for custom element errors
-//	ElementError = PyErr_NewException("pairing.error", NULL, NULL);
-//	BenchmarkError = PyErr_NewException("benchmark.error", NULL, NULL);
-//	Py_INCREF(ElementError);
-//	Py_INCREF(BenchmarkError);
-//	PyModule_AddObject(m, "pairing.error", ElementError);
 	PyModule_AddIntConstant(m, "ZR", ZR);
 	PyModule_AddIntConstant(m, "G1", G1);
 	PyModule_AddIntConstant(m, "G2", G2);
 	PyModule_AddIntConstant(m, "GT", GT);
-//	PyModule_AddObject(m, "benchmark.error", BenchmarkError);
-//	// add constants from benchmark interface
+
 	PyModule_AddIntConstant(m, "CpuTime", CPU_TIME);
 	PyModule_AddIntConstant(m, "RealTime", REAL_TIME);
 	PyModule_AddIntConstant(m, "NativeTime", NATIVE_TIME);
