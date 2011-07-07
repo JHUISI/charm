@@ -12,12 +12,12 @@
 # Date:			6/2011
 
 from toolbox.pairinggroup import *
-from toolbox.Commitment import *
+from toolbox.Commit import *
 
 class Commitment_GS08(Commitment):
     def __init__(self, groupObj, setting='SXDH'):
         Commitment.__init__(self)
-        Commitment.setProperty(self, secdef='CM_PHCB', assumption='SXDH', assumption='DLIN', 
+        Commitment.setProperty(self, secdef='CM_PHCB', assumption=['SXDH','DLIN'], 
                           message_space=[G1, 'KEM'], secmodel='SM')
         global group
         group = groupObj

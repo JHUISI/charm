@@ -21,17 +21,20 @@ class CM_Ped92(Commitment):
 
 def main():
     groupObj = ECGroup(410)
+    print("hello world!");
     
-    cm = CM_Ped92(groupObj)
+#    cm = CM_Ped92(groupObj)
+   
+#    pk = cm.setup()
+#    print("Public parameters...")
+#    print("pk =>", pk)
     
-    pk = cm.setup()
+#   m = groupObj.random()
+#    print("Commiting to =>", m)
+#    (c, d) = cm.commit(pk, m)
     
-    m = groupObj.random()
-    print("Commiting to =>", m)
-    (c, d) = cm.commit(pk, m)
-    
-    assert cm.decommit(pk, c, d, m), "FAILED to decommit"
-    print("Successful and Verified decommitment!!!")
+#    assert cm.decommit(pk, c, d, m), "FAILED to decommit"
+#    print("Successful and Verified decommitment!!!")
    
       
 if __name__ == "__main__":

@@ -23,7 +23,7 @@ types = Enum('G1', 'G2', 'GT', 'ZR', 'str')
 declarator = Enum('constants', 'verify')
 ops = Enum('BEGIN', 'MUL', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'PROD', 'ON', 'END')
 levels = Enum('none', 'some', 'all')
-debug = levels.none
+debug = levels.some
 
 class BinaryNode:
 	def __init__(self, value, left=None, right=None):		
