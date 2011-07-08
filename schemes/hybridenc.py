@@ -8,6 +8,7 @@ from toolbox.PKEnc import *
 from charm.cryptobase import *
 from math import ceil
 
+debug = False
 # Adapter class for Hybrid Encryption Schemes
 class HybridEnc(PKEnc):
     def __init__(self, pkenc, key_len=16, mode=AES): 
@@ -17,7 +18,7 @@ class HybridEnc(PKEnc):
             self.pkenc = pkenc
             self.key_len = key_len # 128-bit session key by default
             self.alg = mode
-            print("PKEnc satisfied.")
+            if debug: print("PKEnc satisfied.")
     
     def keygen(self, secparam=None):
         if secparam == None:
@@ -35,18 +36,18 @@ class HybridEnc(PKEnc):
         iv  = '6543210987654321' # static IV (for testing)    
         prp = selectPRP(self.alg, (key, MODE_CBC, iv))
         c2 = prp.encrypt(self.pad(M))
-        print("Ciphertext 2...")
-        print(c2)
+        if debug: print("Ciphertext 2...")
+        if debug: print(c2)
         return { 'c1':c1, 'c2':c2 }
     
     def decrypt(self, pk, sk, ct):
         c1, c2 = ct['c1'], ct['c2']
         key = pkenc.decrypt(pk, sk, c1)[:self.key_len]
-        print("Rec key =>", key,", len =", len(key))
+        if debug: print("Rec key =>", key,", len =", len(key))
         iv  = '6543210987654321' # static IV (for testing)    
         prp = selectPRP(self.alg, (key, MODE_CBC, iv))
         msg = prp.decrypt(c2)
-        print("Rec msg =>", msg)
+        if debug: print("Rec msg =>", msg)
         return msg.decode('utf8').strip('\x00')
     
     def pad(self, message):
@@ -77,7 +78,8 @@ def main():
     orig_m = hyenc.decrypt(pk, sk, cipher)
    
     assert m == orig_m
-    print("Successful Decryption!!")
+    if debug: print("Successful Decryption!!")
 
 if __name__ == "__main__":
+    debug = True
     main()

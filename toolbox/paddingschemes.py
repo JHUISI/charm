@@ -196,7 +196,7 @@ class PSSPadding:
             print("EM    =>", EM)
         return EM
     
-    def verify(self, M, EM):
+    def verify(self, M, EM, emLen=None):
         '''
         Verifies that EM is a correct encoding for M
         M - the message to verify

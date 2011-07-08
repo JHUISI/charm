@@ -61,7 +61,7 @@ class Test(unittest.TestCase):
     def testOAEPRoundTripEquiv(self):
         oaep = paddingschemes.OAEPEncryptionPadding()
         m = b'This is a test message'
-        ct = oaep.encode(m)
+        ct = oaep.encode(m, 64)
         pt = oaep.decode(ct)
         self.assertEqual(m, pt, 'Decoded message is not equal to encoded message\n'\
                          'ct: %s\nm:  %s\npt: %s' % (ct, m, pt))

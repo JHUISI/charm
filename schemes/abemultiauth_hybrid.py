@@ -2,7 +2,7 @@
 from charm.cryptobase import *
 from charm.pairing import hash as sha1
 from math import ceil
-from schemes.dabe11 import Dabe
+from schemes.dabe_aw11 import Dabe
 from toolbox.ABEncMultiAuth import ABEncMultiAuth
 from toolbox.pairinggroup import *
 
@@ -66,7 +66,7 @@ def main():
     gp = hyb_abema.setup()
     
     #Instantiate a few authorities 
-    #Attribute names must be globally unique.  
+    #Attribute names must be globally unique.  HybridABEncMA
     #Two authorities may not issue keys for the same attribute. 
     #Otherwise, the decryption algorithm will not know which private key to use   
     jhu_attributes = ['jhu_professor', 'jhu_staff', 'jhu_student']

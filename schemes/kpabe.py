@@ -15,6 +15,7 @@ from toolbox.secretutil import *
 from toolbox.policytree import *
 from toolbox.ABEnc import *
 
+debug = False
 class KPabe(ABEnc):
     def __init__(self, groupObj, verbose=False):
         ABEnc.__init__(self)
@@ -59,19 +60,19 @@ class KPabe(ABEnc):
             #    d.append((pk['g_G1^b'] ** (r * H(x, 'Zr'))) * (mk['h_G1'] ** r)) # compute D4 (not quite right)
             #    d.append(pk['g_G2'] ** -r)
             D[x] = d
-        print("Policy: %s" % policy)
-        print("Attribute list: %s" % attr_list)
+        if debug: print("Policy: %s" % policy)
+        if debug: print("Attribute list: %s" % attr_list)
         D['policy'] = policy
         return D
     
     def negatedAttr(self, attribute):
         if attribute[0] == '!':
-            print("Checking... => %s" % attribute[0])
+            if debug: print("Checking... => %s" % attribute[0])
             return True
         return False    
     
     def encrypt(self, pk, M, attr_list):   
-        print('Encryption Algorithm...')    
+        if debug: print('Encryption Algorithm...')    
         # s will hold secret
         t = group.init(ZR, 0)
         s = group.random(); sx = [s]
@@ -119,8 +120,9 @@ def main():
     rec_msg = kpabe.decrypt(ciphertext, mykey)
    
     assert msg == rec_msg 
-    print("Successful Decryption!")    
+    if debug: print("Successful Decryption!")    
     
 if __name__ == "__main__":
+    debug = True
     main()
     

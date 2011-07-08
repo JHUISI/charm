@@ -17,7 +17,6 @@ from toolbox.IBEnc import *
 import binascii
 
 debug = False
-
 class IBE_BonehFranklin(IBEnc):
     def __init__(self, groupObj):
         IBEnc.__init__(self)
@@ -120,4 +119,5 @@ def main():
     assert msg == m
         
 if __name__ == "__main__":
+    debug = True
     main()

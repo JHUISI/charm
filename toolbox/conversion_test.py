@@ -19,6 +19,12 @@ class Test(unittest.TestCase):
         #9,202,000 = (0x)8c 69 50. 
         os = Conversion.IP2OS(9202000)
         self.assertEqual(os, b'\x8c\x69\x50')
+    
+    def testIP2OSLen(self):
+        i = 9202000
+        os = Conversion.IP2OS(i, 200)
+        i2 = Conversion.OS2IP(os)
+        self.assertEqual(i, i2)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testOS2IP']

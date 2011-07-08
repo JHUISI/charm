@@ -13,22 +13,20 @@ from toolbox.PKEnc import *
 from toolbox.paddingschemes import *
 from toolbox.conversion import Conversion
 
-debug = False
-class RSA_Enc(PKEnc):
-    def __init__(self, padding=OAEPEncryptionPadding()):
+debug = True
+class RSA():
+    def __init__(self):
         self.rand = init()
-        self.paddingscheme = padding 
-                
     # generate p,q and n
     def paramgen(self, secparam):
         while True:
-           p, q = self.rand.randomPrime(secparam), self.rand.randomPrime(secparam)
-           if isPrime(p) and isPrime(q):
-              N = p * q
-              phi_N = (p - 1) * (q - 1)
-              break
+            p, q = self.rand.randomPrime(secparam), self.rand.randomPrime(secparam)
+            if isPrime(p) and isPrime(q):
+                N = p * q
+                phi_N = (p - 1) * (q - 1)
+                break
         return (p, q, N, phi_N)
-        
+    
     def keygen(self, secparam=1024):
         (p, q, N, phi_N) = self.paramgen(secparam)
         
@@ -38,9 +36,15 @@ class RSA_Enc(PKEnc):
                 continue
             d = e ** -1
             break
+        print("D:", d)
         pk = { 'N':N, 'e':e }
-        sk = { 'phi_N':phi_N, 'd':d }
+        sk = { 'phi_N':phi_N, 'd':d , 'N':N}
         return (pk, sk)
+
+class RSA_Enc(RSA,PKEnc):
+    def __init__(self, padding=OAEPEncryptionPadding()):
+        super().__init__()
+        self.paddingscheme = padding 
     
     def encrypt(self, pk, m:Bytes):
         octetlen = math.ceil(int(pk['N']).bit_length() / 8)
@@ -57,9 +61,52 @@ class RSA_Enc(PKEnc):
         if debug: print("OS  =>", os)
         return self.paddingscheme.decode(os)
     
-class RSA_Sig():
-    pass
+class RSA_Sig(RSA):
+    '''RSASSA-PSS'''
+    def __init__(self, padding=PSSPadding()):
+        super().__init__()
+        self.paddingscheme = padding 
 
+    def sign(self,sk, M, salt=None):
+        #apply encoding
+        k = math.ceil(int(sk['N']).bit_length() / 8)
+        emLen = math.ceil((int(sk['N']).bit_length() -1) / 8)
+        em = self.paddingscheme.encode(M, emLen, salt)
+        m = Conversion.OS2IP(em)
+        m = integer(m) % sk['N']  #ERRROR m is larger than N
+        s =  (m ** sk['d']) % sk['N']
+        S = Conversion.IP2OS(s, k)
+        if debug:
+            print("Signing")
+            #print("k     =>", k)
+            #print("emLen =>", emLen) 
+            print("em    =>", em)
+            print("m     =>", m)
+            #print("s     =>", s)
+            #print("S     =>", S)
+        return S
+    
+    def verify(self, pk, M, S):
+        k = math.ceil(int(pk['N']).bit_length() / 8)
+        emLen = math.ceil((int(pk['N']).bit_length() -1) / 8)
+        if len(S) != k:
+            if debug: print("Sig is %s octets long, not %" %(len(S), k))
+            return False
+        s = Conversion.OS2IP(S)
+        s = integer(s) % pk['N']  #Convert to modular integer
+        m = (s ** pk['e']) % pk['N']
+        EM = Conversion.IP2OS(m, emLen)
+        if debug:
+            print("Verifying")
+            #print("k     =>", k)
+            #print("emLen =>", emLen)
+            #print("s     =>", s)
+            print("m     =>", m)
+            print("em    =>", bin(EM))
+            #print("S     =>", S)
+        return self.paddingscheme.verify(M, EM)
+        
+    
 def main():
     rsa = RSA_Enc()
     
@@ -74,7 +121,14 @@ def main():
 
     assert m == orig_m
     if debug: print("Successful Decryption!!!")
+    
+def main2():
+    M = b'Test message'
+    rsa = RSA_Sig()
+    (pk, sk) = rsa.keygen(1024)
+    S = rsa.sign(sk, M) 
+    assert rsa.verify(pk, M, S)
         
 if __name__ == "__main__":
     debug = True
-    main()
+    main2()

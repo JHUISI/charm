@@ -99,11 +99,11 @@ def main():
     
     cpkey = cpabe.keygen(pk, msk, attr_list)
     if debug: print("\nSecret key: %s" % attr_list)
-    groupObj.debug(cpkey)
+    if debug:groupObj.debug(cpkey)
     cipher = cpabe.encrypt(pk, m, policy)
 
     if debug: print("\nCiphertext...")
-    groupObj.debug(cipher)    
+    if debug:groupObj.debug(cipher)    
     orig_m = cpabe.decrypt(cpkey, cipher)
    
     assert m == orig_m, 'FAILED Decryption!!!' 

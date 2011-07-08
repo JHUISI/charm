@@ -58,5 +58,6 @@ def main():
     if debug: print('SUCCESS!!!')
     
 if __name__ == "__main__":
+    debug = True
     main()
     

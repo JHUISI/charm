@@ -6,6 +6,7 @@ from toolbox.IBEnc import *
 from charm.cryptobase import *
 from math import ceil
 
+debug = False
 class HybridIBEnc(IBEnc):
     def __init__(self, scheme, groupObj):
         global ibenc, group
@@ -67,15 +68,17 @@ def main():
     msg = "Hello World My name is blah blah!!!! Word!"
     
     ct = hyb_ibe.encrypt(pk, sk['id'], msg)
-    print("Ciphertext")
-    print("c1 =>", ct['c1'])
-    print("c2 =>", ct['c2'])
+    if debug:
+        print("Ciphertext")
+        print("c1 =>", ct['c1'])
+        print("c2 =>", ct['c2'])
     
     orig_msg = hyb_ibe.decrypt(pk, sk, ct)
-    print("Result =>", orig_msg)
+    if debug: print("Result =>", orig_msg)
     assert orig_msg == msg
 
 if __name__ == "__main__":
+    debug = True
     main()
 
     

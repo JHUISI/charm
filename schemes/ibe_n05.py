@@ -14,8 +14,7 @@ from toolbox.IBEnc import *
 from toolbox.bitstring import Bytes
 from toolbox.conversion import Conversion
 from toolbox.pairinggroup import *
-import hashlib
-import math
+import hashlib, math
 
 debug = False
 
@@ -140,7 +139,7 @@ def main():
     #print('m    =>', m)
 
     assert m == M, "FAILED Decryption!"
-    if debug: print("Successful Decryption!!! M => '%s'" % m)
+    if debug: print("Successful Decryption!!! m => '%s'" % m)
                 
 if __name__ == '__main__':
     debug = True

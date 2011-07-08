@@ -13,6 +13,7 @@
 from charm.integer import *
 from toolbox.PKEnc import *
 
+debug = False
 """A ciphertext class with homomorphic properties"""
 class Ciphertext(dict):
     def __init__(self, ct, pk, key):
@@ -98,29 +99,30 @@ def main():
     c1 = pai.encrypt(pk, m1)
     c2 = pai.encrypt(pk, m2)
         
-    print("c1 =>", c1, "\n")
-    print("c2 =>", c2, "\n")
+    if debug: print("c1 =>", c1, "\n")
+    if debug: print("c2 =>", c2, "\n")
     c3 = c1 + c2
-    print("Homomorphic Add Test...\nc1 + c2 =>", c3, "\n")
+    if debug: print("Homomorphic Add Test...\nc1 + c2 =>", c3, "\n")
             
     orig_m = pai.decrypt(pk, sk, c3)
-    print("orig_m =>", orig_m)
+    if debug: print("orig_m =>", orig_m)
     
     # m3 = m1 + m2
     assert m3 == orig_m, "FAILED Decryption!!!" 
-    print("Successful Decryption!")
+    if debug: print("Successful Decryption!")
     
-    print("Homomorphic Mul Test...\n")
+    if debug: print("Homomorphic Mul Test...\n")
     c4 = c1 + 200
-    print("c4 = c1 + 200 =>", c4, "\n")        
+    if debug: print("c4 = c1 + 200 =>", c4, "\n")        
     orig_m = pai.decrypt(pk, sk, c4)
-    print("m4 =>", orig_m, "\n")
+    if debug: print("m4 =>", orig_m, "\n")
     
     c5 = c2 * 20201
-    print("c5 = c2 * 2021 =>", c5, "\n")
+    if debug: print("c5 = c2 * 2021 =>", c5, "\n")
     orig_m = pai.decrypt(pk, sk, c5)
-    print("m5 =>", orig_m, "\n")
+    if debug: print("m5 =>", orig_m, "\n")
     
 if __name__ == "__main__":
+    debug = True
     main()
     

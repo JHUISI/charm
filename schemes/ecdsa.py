@@ -1,6 +1,7 @@
 from toolbox.ecgroup import *
 from toolbox.PKSig import *
 
+debug = False
 class ECDSA():
     def __init__(self, groupObj):
         global group
@@ -44,8 +45,9 @@ def main():
 
     sig = ecdsa.sign(pk, sk, m)
     assert ecdsa.verify(pk, sig, m)
-    print("Signature Verified!!!")
+    if debug: print("Signature Verified!!!")
     
 if __name__ == "__main__":
+    debug = True
     main()
 

@@ -23,6 +23,7 @@ from toolbox.PKSig import *
 from toolbox.pairinggroup import *
 #from toolbox.ibe_bb03 import *
 
+debug = False
 class Sig_Generic_ibetosig_Naor01(PKSig):
     def __init__(self, ibe_scheme, groupObj):
         global ibe, group
@@ -31,7 +32,7 @@ class Sig_Generic_ibetosig_Naor01(PKSig):
 				
     def keygen(self, secparam=None):
         (mpk, msk) = ibe.setup(secparam)
-        print("Keygen...")
+        if debug: print("Keygen...")
         group.debug(mpk)
         group.debug(msk)
         return (mpk, msk)
@@ -48,7 +49,7 @@ class Sig_Generic_ibetosig_Naor01(PKSig):
 		
         # Encrypt a random message in the IBE's message space and try to decrypt it
         message = group.random(GT)
-        print("\nRandom message =>", message)
+        if debug: print("\nRandom message =>", message)
 
         C = ibe.encrypt(pk, sig['id'], message)
          
@@ -70,13 +71,14 @@ def main():
 
     #TODO: M must be in Zp
     sigma = ibsig.sign(msk, M)
-    print("\nMessage =>", M)
-    print("Sigma =>", sigma)
+    if debug: print("\nMessage =>", M)
+    if debug: print("Sigma =>", sigma)
     
     assert ibsig.verify(mpk, M, sigma)
-    print("Successful Verification!!!")
+    if debug: print("Successful Verification!!!")
 
 if __name__ == "__main__":
+    debug = True
     main()
     
     

@@ -18,6 +18,7 @@
 from toolbox.integergroup import *
 from toolbox.PKEnc import *
 
+debug = False
 class CS98(PKEnc):	
     def __init__(self):
         global group
@@ -57,8 +58,8 @@ class CS98(PKEnc):
            return 'ERROR' 
 
         c['v'].reduce(); v_prime.reduce()
-        print("c['v'] => %s" % c['v'])
-        print("v' => %s" % v_prime)
+        if debug: print("c['v'] => %s" % c['v'])
+        if debug: print("v' => %s" % v_prime)
         return group.decode(c['e'] / (c['u1'] ** sk['z']))
 
 def main():
@@ -72,7 +73,8 @@ def main():
     message = pkenc.decrypt(pk, sk, ciphertext)
     
     assert M[0:size] == message[0:size], "UNSUCCESSFUL!!!! :-( why?"
-    print("SUCCESSFULLY RECOVERED => %s" % message)
+    if debug: print("SUCCESSFULLY RECOVERED => %s" % message)
        
 if __name__ == "__main__":
+    debug = True
     main()

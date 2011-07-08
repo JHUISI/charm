@@ -17,6 +17,7 @@ from ibe_bb03 import *
 from sig_short_bls04 import *
 from hashIDAdapt import *
 
+debug = False
 class CHK04(PKEnc):
     def __init__(self, ibe_scheme, ots_scheme, groupObj):
         global ibe, ots, group
@@ -77,9 +78,10 @@ def main():
     
     rec_msg = pkenc.decrypt(pk, sk, ciphertext)
     assert rec_msg == msg, "FAILED Decryption!!!"
-    print("Successful Decryption!")       
+    if debug: print("Successful Decryption!")       
         
 if __name__ == "__main__":
+    debug = True
     main()
      
     

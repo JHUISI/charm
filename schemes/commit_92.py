@@ -1,6 +1,7 @@
 from toolbox.Commit import *
 from toolbox.ecgroup import *
 
+debug = False
 class CM_Ped92(Commitment):
     def __init__(self, groupObj):
         Commitment.__init__(self)
@@ -21,7 +22,7 @@ class CM_Ped92(Commitment):
 
 def main():
     groupObj = ECGroup(410)
-    print("hello world!");
+    if debug: print("hello world!");
     
 #    cm = CM_Ped92(groupObj)
    
@@ -38,4 +39,5 @@ def main():
    
       
 if __name__ == "__main__":
+    debug = True
     main()

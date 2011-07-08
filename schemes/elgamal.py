@@ -13,6 +13,7 @@ from toolbox.integergroup import *
 from toolbox.ecgroup import *
 from toolbox.PKEnc import *
 
+debug = False
 class ElGamalCipher(dict):
     def __init__(self, ct):
         if type(ct) != dict: assert False, "Not a dictionary!"
@@ -65,11 +66,12 @@ class ElGamal(PKEnc):
             g = group.random(G)
         # x is private, g is public param
         x = group.random(); h = g ** x
-        print('Public parameters...')
-        print('h => %s' % h)
-        print('g => %s' % g)
-        print('Secret key...')
-        print('x => %s' % x)
+        if debug:
+            print('Public parameters...')
+            print('h => %s' % h)
+            print('g => %s' % g)
+            print('Secret key...')
+            print('x => %s' % x)
         pk = {'g':g, 'h':h }
         sk = {'x':x}
         return (pk, sk)
@@ -86,8 +88,8 @@ class ElGamal(PKEnc):
         s = c['c1'] ** sk['x']
         m = c['c2'] * ~s
         M = group.decode(m)
-        print('m => %s' % m)
-        print('dec M => %s' % M)
+        if debug: print('m => %s' % m)
+        if debug: print('dec M => %s' % M)
         return M
 
 def main():
@@ -99,7 +101,8 @@ def main():
     
     m = el.decrypt(pk, sk, cipher1)    
     assert m[0:size] == msg[0:size]
-    print("SUCCESSFULLY DECRYPTED!!!")
+    if debug: print("SUCCESSFULLY DECRYPTED!!!")
         
 if __name__ == "__main__":
+    debug = True
     main()

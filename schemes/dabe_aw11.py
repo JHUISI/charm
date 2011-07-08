@@ -22,10 +22,9 @@ class Dabe(ABEncMultiAuth):
 
     def __init__(self, groupObj):
         ABEncMultiAuth.__init__(self)
-        global util, group, debug
+        global util, group
         util = SecretUtil(groupObj.Pairing, verbose=False)  #Create Secret Sharing Scheme
-        group = groupObj    #Prime order group
-        debug = True                  
+        group = groupObj    #Prime order group        
    
     def setup(self):
         '''Global Setup'''
@@ -133,8 +132,7 @@ class Dabe(ABEncMultiAuth):
             dem = pair(sk[x]['k'], ct['C2'][x])
             egg_s *= ( (num / dem) ** coeffs[x] )
    
-        if(debug):
-            print("e(gg)^s: %s" % egg_s)
+        if(debug): print("e(gg)^s: %s" % egg_s)
 
         return ct['C0'] / egg_s
 
@@ -156,7 +154,7 @@ def main():
     for i in usr_attrs: dabe.keygen(GP, SK, i, gid, K)
     if debug: print('User credential list: %s' % usr_attrs)    
     if debug: print("\nSecret key:")
-    groupObj.debug(K)
+    if debug: groupObj.debug(K)
 
     #Encrypt a random element in GT
     m = groupObj.random(GT)
@@ -164,7 +162,7 @@ def main():
     if debug: print('Acces Policy: %s' % policy)
     CT = dabe.encrypt(PK, GP, m, policy)
     if debug: print("\nCiphertext...")
-    groupObj.debug(CT)    
+    if debug: groupObj.debug(CT)    
     
     orig_m = dabe.decrypt(GP, K, CT)
    
@@ -172,5 +170,6 @@ def main():
     if debug: print('Successful Decryption!')
 
 if __name__ == '__main__':
+    debug = True
     main()
              

@@ -1,6 +1,7 @@
 from toolbox.integergroup import *
 from toolbox.PKSig import *
 
+debug = False
 class DSA():
     def __init__(self):
         global group
@@ -46,8 +47,9 @@ def main():
     sig = dsa.sign(pk, sk, m)
 
     assert dsa.verify(pk, sig, m)
-    print("Signature Verified!!!")
+    if debug: print("Signature Verified!!!")
 
 if __name__ == "__main__":
+    debug = True
     main()
     

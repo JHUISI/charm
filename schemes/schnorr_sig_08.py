@@ -1,6 +1,7 @@
 from toolbox.integergroup import *
 from toolbox.PKSig import *
 
+debug = False
 class SchnorrSig(PKSig):
     def __init__(self):
         PKSig.__init__(self)
@@ -28,10 +29,10 @@ class SchnorrSig(PKSig):
     def verify(self, pk, sig, M):
         p = group.p
         r = ((pk['g'] ** sig['s']) * (pk['y'] ** sig['e'])) % p
-        print("Verifying...")
+        if debug: print("Verifying...")
         e = group.hash(M, r)
-        print("e => %s" % e)
-        print("r => %s" % r)
+        if debug: print("e => %s" % e)
+        if debug: print("r => %s" % r)
         if e == sig['e']:
             return True
         else:
@@ -49,8 +50,9 @@ def main():
     sig = pksig.sign(pk, sk, M)
     
     assert pksig.verify(pk, sig, M)
-    print("Signature verified!!!!")
+    if debug: print("Signature verified!!!!")
     
 if __name__ == "__main__":
+    debug = True
     main()
     

@@ -2,6 +2,7 @@ from schemes.ibe_bb03 import IBE_BB04
 from toolbox.IBEnc import *
 from toolbox.pairinggroup import *
 
+debug = False
 class HashIDAdapter(IBEnc):
     def __init__(self, scheme, group):
         IBEnc.__init__(self)
@@ -52,8 +53,8 @@ def main():
     
     kID = 'waldoayo@email.com'
     sk = hashID.extract(mk, kID)
-    print("Keygen for %s" % kID)
-    print(sk)
+    if debug: print("Keygen for %s" % kID)
+    if debug: print(sk)
     
     m = group.random(GT)
     ct = hashID.encrypt(pk, sk['id'], m)
@@ -61,10 +62,11 @@ def main():
     orig_m = hashID.decrypt(pk, sk, ct)
     
     assert m == orig_m
-    print("Successful Decryption!!!")
-    print("Result =>", orig_m)
+    if debug: print("Successful Decryption!!!")
+    if debug: print("Result =>", orig_m)
     
 if __name__ == "__main__":
+    debug = True
     main()
     
         

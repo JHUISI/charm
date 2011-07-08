@@ -16,15 +16,14 @@ from charm.cryptobase import *
 from toolbox.IBEnc import *
 from charm.pairing import hash as sha1
 
-
+debug = False
 class IBE_BB04(IBEnc):
     def __init__(self, groupObj):
         IBEnc.__init__(self)
         IBEnc.setProperty(self, secdef='IND_sID_CPA', assumption='DBDH', 
                           message_space=[GT, 'KEM'], secmodel='ROM', other={'id':ZR})
-        global group, debug
+        global group
         group = groupObj
-        debug = True
         
     def setup(self, secparam=None):
         #StartBenchmark(bID1, [CpuTime, NativeTime])
@@ -88,7 +87,8 @@ def main():
     m = ibe.decrypt(params, key, cipher)
 
     assert m == M, "FAILED Decryption!"
-    print("Successful Decryption!!! M => '%s'" % m)
+    if debug: print("Successful Decryption!! M => '%s'" % m)
                 
 if __name__ == '__main__':
+    debug = True
     main()
