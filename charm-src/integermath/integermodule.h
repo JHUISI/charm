@@ -70,6 +70,7 @@ PyTypeObject IntegerType;
 static PyObject *IntegerError;
 static Benchmark *dBench;
 #define PyInteger_Check(obj) PyObject_TypeCheck(obj, &IntegerType)
+#define PyInteger_Init(obj1, obj2) obj1->initialized && obj2->initialized
 
 typedef struct {
 	PyObject_HEAD

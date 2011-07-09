@@ -1,6 +1,14 @@
 
 #include "integermodule.h"
 
+#define CAST_TO_LONG(obj, lng) 	\
+	if(PyInt_Check(obj)) { 			\
+		lng = PyInt_AS_LONG(obj); }	\
+	else {							\
+	  Py_INCREF(Py_NotImplemented);	\
+	  return Py_NotImplemented; }	\
+
+
 inline size_t size(mpz_t n)
 {
 	return mpz_sizeinbase (n, 2);
@@ -190,6 +198,18 @@ int Integer_init(Integer *self, PyObject *args, PyObject *kwds)
     // check if they are of type long
     if(PyLong_Check(num)) { longObjToMPZ(self->e, (PyLongObject *) num); }
 	// raise error
+    else if(PyBytes_Check(num)) {
+    	// convert directly to a char string of bytes
+    	char *bytes = PyBytes_AS_STRING(num);
+    	int bytes_len = strlen(bytes);
+		mpz_import(self->e, bytes_len, 1, sizeof(bytes[0]), 0, 0, bytes);
+    }
+    else if(PyUnicode_Check(num)) {
+    	// cast to a bytes object, then interpret as a string of bytes
+    	const char *bytes = PyBytes_AS_STRING(PyUnicode_AsUTF8String(num));
+    	int bytes_len = strlen(bytes);
+    	mpz_import(self->e, bytes_len, 1, sizeof(bytes[0]), 0, 0, bytes);
+    }
     else { return -1; }
 
     if(mod != NULL) {
@@ -1532,7 +1552,58 @@ static PyObject *deserialize(PyObject *self, PyObject *args) {
 		ErrorMsg("invalid argument.");
 	}
 
-	ErrorMsg("Not impelemnted yet");
+	ErrorMsg("Not implemented yet");
+}
+
+// class method for conversion
+// integer.toString(x) => 'blah blah'
+//static PyObject *toString(PyObject *self, PyObject *args) {
+//	Integer *intObj = NULL;
+//
+//	if(PyInteger_Check(args)) {
+//		intObj = (Integer *) args;
+//		size_t count = 0;
+//		unsigned char *Rop = (unsigned char *) mpz_export(NULL, &count, 1, sizeof(char),0, 0, intObj->e);
+//		debug("Rop => '%s', len =>'%d'\n", Rop, count);
+//		// need a way to convert to a proper string?
+//		return PyUnicode_DecodeASCII( (const char *) Rop, (Py_ssize_t) count, NULL);
+//	}
+//
+//	ErrorMsg("invalid type.");
+//}
+
+// class method for conversion
+// integer.toBytes(x) => b'blah blah'
+static PyObject *toBytes(PyObject *self, PyObject *args) {
+	Integer *intObj = NULL;
+
+	if(PyInteger_Check(args)) {
+		intObj = (Integer *) args;
+		size_t count = 0;
+		unsigned char *Rop = (unsigned char *) mpz_export(NULL, &count, 1, sizeof(char),0, 0, intObj->e);
+		debug("Rop => '%s', len =>'%d'\n", Rop, count);
+		return PyBytes_FromStringAndSize((const char *) Rop, (Py_ssize_t) count);
+	}
+
+	ErrorMsg("invalid type.");
+}
+
+static PyObject *Integer_xor(PyObject *self, PyObject *other) {
+	Integer *rop = NULL, *op1 = NULL, *op2 = NULL;
+
+	if(PyInteger_Check(self)) op1 = (Integer *) self;
+	if(PyInteger_Check(other)) op2 = (Integer *) other;
+
+	if(op1 == NULL || op2 == NULL) {
+		ErrorMsg("both types are not of charm integer types.");
+	}
+	else if(PyInteger_Init(op1, op2)) {
+		rop = createNewIntegerNoMod();
+		mpz_xor(rop->e, op1->e, op2->e);
+		return (PyObject *) rop;
+	}
+
+	ErrorMsg("objects not initialized properly.");
 }
 
 /* END: helper function definition */
@@ -1550,7 +1621,7 @@ EndBenchmark_CAPI(_end_benchmark, dBench)
 GetBenchmark_CAPI(_get_benchmark, dBench)
 
 PyMethodDef Integer_methods[] = {
-	{"set", (PyCFunction)Integer_set, METH_VARARGS, "Initialize with another integer object."},
+	{"set", (PyCFunction)Integer_set, METH_VARARGS, "initialize with another integer object."},
 	{"randomBits", (PyCFunction)genRandomBits, METH_VARARGS, "generate a random number of bits from 0 to 2^n-1."},
 	{"random", (PyCFunction)genRandom, METH_VARARGS, "generate a random number in range of 0 to n-1 where n is large number."},
 	{"randomPrime", (PyCFunction)genRandomPrime, METH_VARARGS, "generate a probabilistic random prime number that is n-bits."},
@@ -1575,7 +1646,7 @@ PyNumberMethods integer_number = {
 	    0,                    /* nb_lshift */
 	    0,                    /* nb_rshift */
 	    0,                       /* nb_and */
-	    0,                       /* nb_xor */
+	    Integer_xor,                       /* nb_xor */
 	    0,                        /* nb_or */
 	    (unaryfunc)Integer_long,           /* nb_int */
 	    0,						/* nb_reserved */
@@ -1667,6 +1738,8 @@ static PyMethodDef module_methods[] = {
 	{"StartBenchmark", (PyCFunction)_start_benchmark, METH_VARARGS, "Start a new benchmark with some options"},
 	{"EndBenchmark", (PyCFunction)_end_benchmark, METH_VARARGS, "End a given benchmark"},
 	{"GetBenchmark", (PyCFunction)_get_benchmark, METH_VARARGS, "Returns contents of a benchmark object"},
+//	{"int2String", (PyCFunction)toString, METH_O, "convert an integer object to a string object."},
+	{"int2Bytes", (PyCFunction)toBytes, METH_O, "convert an integer object to a bytes object."},
 	{NULL, NULL}
 };
 

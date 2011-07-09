@@ -16,14 +16,13 @@ class PairingGroup():
         size = bitsize(value)
         if size <= self.messageSize():
             return True
-        print("ERROR: max msg size => %s" % self.messageSize())
+        print("ERROR: max len => %s, input len => %s" % (self.messageSize(), size))
         return False
 
     def groupType(self): 
         return 'PairingGroup'     
         
     def messageSize(self):
-        # TODO: is this correct?
         return self.secparam / 8        
 
     def init(self, type, value=None):
@@ -38,7 +37,8 @@ class PairingGroup():
                 return self.Pairing.random(type, seed)
             return self.Pairing.random(type)
         else:
-            return int(self.rand.randomPrime(self.secparam))
+            return self.rand.randomPrime(self.secparam)
+        
     def __randomGT(self):
         if not hasattr(self, 'gt'):
             self.gt = pair(self.Pairing.random(G1), self.Pairing.random(G2))

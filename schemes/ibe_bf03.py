@@ -14,7 +14,6 @@
 from toolbox.pairinggroup import *
 from toolbox.hash_module import *
 from toolbox.IBEnc import *
-import binascii
 
 debug = False
 class IBE_BonehFranklin(IBEnc):
@@ -52,8 +51,7 @@ class IBE_BonehFranklin(IBEnc):
         g_id = pair(Q_id, pk['P2']) 
         #choose sig = {0,1}^n where n is # bits
         sig = group.random(ZN)
-        r = h.hashToZr(sig, M) # hash Long, Str => not working yet. (DONE)
-
+        r = h.hashToZr(sig, M)
 
         enc_M = self.encodeToZn(M)
         if group.validSize(enc_M):
@@ -81,27 +79,21 @@ class IBE_BonehFranklin(IBEnc):
             print('\nDecrypt....')
             print('r => %s' % r)
             print('sig => %s' % sig)
-            if U == r * pk['P']:
-                print("Decryption successful!!!")
-                return M
-            print("Decryption Failed!!!")
+        if U == r * pk['P']:
+            print("Successful Decryption!!!")
+            return M
+        print("Decryption Failed!!!")
         return None
 
-    #TODO: should encode be able to handle elements from GT or just strings?
     def encodeToZn(self, message):
-        #print("Message =>", message)
-        hex_val = binascii.b2a_hex(bytes(message, 'utf8'))
-        #print("hex val =>", hex_val)
-        # convert message to uint here
-        return int(hex_val, 16)
-    
+        return integer(message)
+        
     def decodeFromZn(self, element):
-        if type(element) == int:
-            val_hex = hex(element)
-            str_hex = val_hex[2:].strip('L')
-            return binascii.a2b_hex(str_hex)
-        # take element and map it back to what? how?
+        if type(element) == integer:
+            msg = int2Bytes(element)
+            return bytes.decode(msg, 'utf8') # convert back to string
         return None
+     
 
 def main():
     groupObj = PairingGroup('d224.param', 1024)    
@@ -112,7 +104,7 @@ def main():
     id = 'ayo@email.com'
     key = ibe.extract(sk, id)
     
-    m = "hello world!!"
+    m = "hello world!!!!!"
     ciphertext = ibe.encrypt(pk, id, m)
 
     msg = ibe.decrypt(pk, key, ciphertext)
