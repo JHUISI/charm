@@ -1,6 +1,12 @@
 
 #include "pairingmodule.h"
 
+/*const char *getStr(PyObject *o) {
+	return PyUnicode_AS_DATA(PyObject_Type(o));
+}*/
+
+#define ERROR_TYPE(operand, ...) "unsupported "#operand" operand types: "#__VA_ARGS__
+
 #define UNARY(f, m, n) \
 static PyObject *f(PyObject *v) { \
 	if(PyElement_Check(v)) {  \
@@ -13,12 +19,14 @@ static PyObject *f(PyObject *v) { \
 static PyObject *f(PyObject *v, PyObject *w) { \
 	Element *obj1 = NULL, *obj2 = NULL;				\
 	debug("Performing the '%s' operation.\n", __func__); \
-	if(PyElement_Check(v)) {			\
+	if(PyElement_Check(v)) {	\
 		obj1 = (Element *) v; } \
-	else { return NULL; }		\
+	else { PyErr_SetString(ElementError, ERROR_TYPE(left, int,bytes,str)); \
+		return NULL; }			\
 	if(PyElement_Check(w)) {	\
 		obj2 = (Element *) w; } \
-	else { return NULL; }		\
+ 	else { PyErr_SetString(ElementError, ERROR_TYPE(right, int,bytes,str)); \
+		return NULL; }		\
 	if(Check_Types(obj1->element_type, obj2->element_type, m))	\
 		return (n)(obj1, obj2); \
 	return NULL;				\
@@ -916,16 +924,15 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 	Element *newObject = NULL, *lhs_o1 = NULL, *rhs_o2 = NULL;
 	int longFoundLHS = FALSE, longFoundRHS = FALSE;
 
-	Check_Types2(o1, o2, lhs_o1, rhs_o2, longFoundLHS, longFoundRHS)
+	Check_Types2(o1, o2, lhs_o1, rhs_o2, longFoundLHS, longFoundRHS);
 
-
-	if(longFoundLHS) {
+	if(longFoundLHS || longFoundRHS) {
 		// o1 is a long type
 	}
-	else if(longFoundRHS) {
+//	else if(longFoundRHS) {
 		// o2 is a long type
-	}
-	else {
+//	}
+	else if(Check_Elements(o1, o2)) {
 		debug("Starting '%s'\n", __func__);
 		debug_e("LHS: e => '%B'\n", lhs_o1->e);
 		debug_e("RHS: e => '%B'\n", rhs_o2->e);
@@ -945,10 +952,14 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 			// we have a problem
 		}
 	}
-	
+	else {
+		if(!PyElement_Check(o1)) PyErr_SetString(ElementError, ERROR_TYPE(left, int, bytes, str));
+		if(!PyElement_Check(o2)) PyErr_SetString(ElementError, ERROR_TYPE(right, int, bytes, str));
+		return NULL;
+	}
 	
 	// STOP_CLOCK
-	UPDATE_BENCHMARK(EXPONENTIATION, dBench)
+	UPDATE_BENCHMARK(EXPONENTIATION, dBench);
 	return (PyObject *) newObject;
 }
 
@@ -958,70 +969,39 @@ they have the opportunity to set the
  */
 static PyObject *Element_set(Element *self, PyObject *args)
 {
-	Element *object;
-	long int value;
-	// char *str = NULL;
-	int errcode = TRUE;
-	
+	PyObject *value;
 	if(self->elem_initialized == FALSE) {
 		PyErr_SetString(ElementError, "must initialize element to a field (G1,G2,GT, or Zr)");
-		errcode = FALSE;
-		return Py_BuildValue("i", errcode);
+		return NULL;
 	}
 	
 	debug("Creating a new element\n");
-	if(PyArg_ParseTuple(args, "l", &value)) {
+	if(PyArg_ParseTuple(args, "O", &value)) {
 		// convert into an int using PyArg_Parse(...)
 		// set the element
 		debug("Setting element to '%li'\n", value);
 		START_CLOCK(dBench);
-		if(value == 0)
-			element_set0(self->e);
-		else if(value == 1)
-			element_set1(self->e);
+		if(PyLong_Check(value)) {
+			mpz_t m;
+			mpz_init(m);
+			longObjToMPZ(m, (PyLongObject *) value);
+			element_set_mpz(self->e, m);
+			mpz_clear(m);
+		}
+		else if(PyElement_Check(value)) {
+			Element *value2 = (Element *) value;
+			if(value2->element_type == self->element_type)
+				element_set(self->e, value2->e);
+		}
 		else {
-			debug("Value '%i'\n", (signed int) value);
-			element_set_si(self->e, (signed int) value);
+			PyErr_SetString(ElementError, ERROR_TYPE(""));
+			Py_RETURN_NONE;
 		}
 		STOP_CLOCK(dBench);
-	}
-	else if(PyArg_ParseTuple(args, "O", &object)){
-		START_CLOCK(dBench);
-		element_set(self->e, object->e);
-		STOP_CLOCK(dBench);
-	}
-	else { // 
-		PyErr_SetString(ElementError, "type not supported: signed int or Element object");
-		errcode = FALSE;
 	}
 	
-	return Py_BuildValue("i", errcode);
+	Py_RETURN_TRUE;
 }
-/*
-static PyObject *Element_dlog(Element *self, PyObject *args)
-{
-	Element *newObject, *lhs, *rhs;
-	int errcode = TRUE;
-
-	// make sure element has been initialized
-	if(PyArg_ParseTuple(args, "OO", &lhs, &rhs)) {
-		if(lhs->elem_initialized == TRUE && rhs->elem_initialized == TRUE) {
-			newObject = createNewElement(ZR, self->pairing);
-			element_dlog_pollard_rho(newObject->e, lhs->e, rhs->e);
-			element_printf("x => '%B'\n", newObject->e);
-		}
-		else {
-			errcode = FALSE;
-		}
-	}
-
-	if(!errcode) {
-		PyErr_SetString(ElementError, "must initialize lhs and rhs elements to G1,G2 or Zr.");
-		return Py_BuildValue("i", errcode);
-	}
-
-	return (PyObject *) newObject;
-}*/
 
 /* this is a type method that is visible on the global or class level. Therefore,
    the function prototype needs the self (element class) and the args (tuple of Element objects).
@@ -1049,7 +1029,7 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 		return (PyObject *) newObject;
 	}
 
-	if(Check_Types(lhs->element_type, rhs->element_type, 'e')) {
+	if(Check_Elements(lhs, rhs) && Check_Types(lhs->element_type, rhs->element_type, 'e')) {
 		// apply pairing
 		debug_e("LHS: '%B'\n", lhs->e);
 		debug_e("RHS: '%B'\n", rhs->e);

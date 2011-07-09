@@ -380,7 +380,7 @@ static PyObject *Integer_add(PyObject *o1, PyObject *o2) {
 	int foundLHS = FALSE, foundRHS = FALSE;
 	unsigned long int lhs_value = 0, rhs_value = 0;
 
-	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value)
+	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value);
 	// perform operation
 	if(foundLHS) {
 		// debug("foundLHS\n");
@@ -409,7 +409,7 @@ static PyObject *Integer_add(PyObject *o1, PyObject *o2) {
 		}
 	}
 
-	UPDATE_BENCHMARK(ADDITION, dBench)
+	UPDATE_BENCHMARK(ADDITION, dBench);
 	return (PyObject *) rop;
 }
 
@@ -419,7 +419,7 @@ static PyObject *Integer_sub(PyObject *o1, PyObject *o2) {
 	int foundLHS = FALSE, foundRHS = FALSE;
 	unsigned long int lhs_value = 0, rhs_value = 0;
 
-	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value)
+	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value);
 	// perform operation
 	if(foundLHS) {
 		// debug("foundLHS\n");
@@ -447,11 +447,7 @@ static PyObject *Integer_sub(PyObject *o1, PyObject *o2) {
 		}
 	}
 
-	// if rop contains a negative value, we might as well reduce further.
-//	if(mpz_sgn(rop->e) == -1) {
-//		_reduce(rop);
-//	}
-	UPDATE_BENCHMARK(SUBTRACTION, dBench)
+	UPDATE_BENCHMARK(SUBTRACTION, dBench);
 	return (PyObject *) rop;
 }
 
@@ -461,7 +457,7 @@ static PyObject *Integer_mul(PyObject *o1, PyObject *o2) {
 	int foundLHS = FALSE, foundRHS = FALSE;
 	unsigned long int lhs_value = 0, rhs_value = 0;
 
-	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value)
+	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value);
 	// perform operation
 	if(foundLHS) {
 		// debug("foundLHS\n");
@@ -487,7 +483,7 @@ static PyObject *Integer_mul(PyObject *o1, PyObject *o2) {
 		}
 	}
 
-	UPDATE_BENCHMARK(MULTIPLICATION, dBench)
+	UPDATE_BENCHMARK(MULTIPLICATION, dBench);
 	return (PyObject *) rop;
 }
 
@@ -528,7 +524,7 @@ static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 	int foundLHS = FALSE, foundRHS = FALSE;
 	unsigned long int lhs_value = 0, rhs_value = 0;
 
-	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value)
+	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value);
 
 //	printf("does this really work?!?\n");
 	if(foundRHS && rhs_value > 0) {
@@ -582,7 +578,7 @@ static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 		return NULL;
 	}
 
-	UPDATE_BENCHMARK(DIVISION, dBench)
+	UPDATE_BENCHMARK(DIVISION, dBench);
 	return (PyObject *) rop;
 }
 
@@ -590,7 +586,7 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 	Integer *lhs = NULL, *rhs = NULL, *rop = NULL;
 	int foundLHS = FALSE, foundRHS = FALSE;
 
-	Check_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS)
+	Check_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS);
 
 	// TODO: handle foundLHS (e.g. 2 ** <int.Elem>)
 	if(foundRHS) {
@@ -675,7 +671,7 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 		}
 	}
 
-	UPDATE_BENCHMARK(EXPONENTIATION, dBench)
+	UPDATE_BENCHMARK(EXPONENTIATION, dBench);
 	return (PyObject *) rop;
 }
 
@@ -933,7 +929,7 @@ static PyObject *Integer_remainder(PyObject *o1, PyObject *o2) {
 	int foundLHS = FALSE, foundRHS = FALSE;
 	unsigned long int lhs_value, rhs_value;
 
-	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value)
+	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value);
 
 	if(foundLHS) {
 		rop = createNewInteger(rhs->m);

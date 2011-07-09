@@ -65,6 +65,8 @@ typedef struct {
 	int safe_pairing_clear;
 } Element;
 
+#define Check_Elements(o1, o2)  PyElement_Check(o1) && PyElement_Check(o2)
+
 #define Check_Types2(o1, o2, lhs_o1, rhs_o2, longLHS_o1, longRHS_o2)  \
 	if(PyElement_Check(o1)) { \
 		lhs_o1 = (Element *) o1; \
@@ -72,14 +74,13 @@ typedef struct {
     } \
 	else if(PyLong_Check(o1)) { \
 		longLHS_o1 = TRUE;  } \
-							\
+							  \
 	if(PyElement_Check(o2)) {  \
 		rhs_o2 = (Element *) o2; \
 		debug("found a rhs element.\n"); \
     } \
 	else if(PyLong_Check(o2)) {  \
-		longRHS_o2 = TRUE; }
-
+		longRHS_o2 = TRUE; }	\
 
 PyObject *Element_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int Element_init(Element *self, PyObject *args, PyObject *kwds);
