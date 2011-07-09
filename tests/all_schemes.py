@@ -31,9 +31,9 @@ def getAllSchemes():
 def testSchemes():
     suite = unittest.TestSuite()
     # ECC and Pairing 
-    modules = ['abemultiauth_hybrid', 'sig_short_bls04', 'kpabe', 'cpabe07', 'cpabe09', 'ecdsa', 'elgamal', 'ibe_bb03', 'hashIDAdapt', 'hybridenc', 'hybridibenc', 'dabe_aw11', 'commit_92', 'chk04_enc', 'sig_generic_ibetosig_naor01', 'ibe_n05']
+    modules = ['ibe_bf03','abemultiauth_hybrid', 'sig_short_bls04', 'kpabe', 'cpabe07', 'cpabe09', 'ecdsa', 'elgamal', 'ibe_bb03', 'hashIDAdapt', 'hybridenc', 'hybridibenc', 'dabe_aw11', 'commit_92', 'chk04_enc', 'sig_generic_ibetosig_naor01', 'ibe_n05']
     #,'cpabe09','cpabe07','schnorr_sig_08','commit_92','ec_cs98_enc','abemultiauth_hybrid','ecdsa','dsa','elgamal','sig_generic_ibetosig_naor01','hashIDAdapt','hybridenc','paillier','ibe_aw11','cs98_enc','rsa_alg','kpabe','hybridibenc','ibe_bb03','chk04_enc']
-    testing, skipped = [],['ibe_bf03']
+    testing, skipped = [],[]
     for name in modules:
         mod = all_unittests.load_module(name)
         if hasattr(mod, 'main'):

@@ -19,7 +19,6 @@ class Hash():
             return integer(int(self.e.H(val, ZR)))
             # do something related to that
         if type(value) == integer:
-            print("value =>", value)
             str_value = int2Bytes(value)
             return integer(int(self.e.H(str_value, ZR)))
         return None

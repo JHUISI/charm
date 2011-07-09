@@ -80,9 +80,9 @@ class IBE_BonehFranklin(IBEnc):
             print('r => %s' % r)
             print('sig => %s' % sig)
         if U == r * pk['P']:
-            print("Successful Decryption!!!")
+            if debug: print("Successful Decryption!!!")
             return M
-        print("Decryption Failed!!!")
+        if debug: print("Decryption Failed!!!")
         return None
 
     def encodeToZn(self, message):
