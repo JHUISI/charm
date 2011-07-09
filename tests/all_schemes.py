@@ -26,9 +26,6 @@ def getAllSchemes():
     print("Skipping ", skipped)
     return suite
 
-def my_tearDown():
-    print("clean what...")
-
 #Temp method to figure out what's causing the segmentation faults.
 #Current theory: any more than one test in a test suite causes the segmentation fault due to calls to PairingGroup()
 def testSchemes():
@@ -41,7 +38,7 @@ def testSchemes():
         mod = all_unittests.load_module(name)
         if hasattr(mod, 'main'):
             testing.append(mod.__name__)
-            case = unittest.FunctionTestCase(mod.main, None, my_tearDown, mod.__name__)
+            case = unittest.FunctionTestCase(mod.main, None, None, mod.__name__)
             suite.addTest(case)
         else:
             skipped.append(mod.__name__)
