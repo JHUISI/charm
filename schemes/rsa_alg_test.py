@@ -123,8 +123,12 @@ class Test(unittest.TestCase):
     
     
     def testRSASig(self):
-        len = Random().randrange(1, 1024)
-        M = WeakRandom().myrandom(len, True)
+        length = Random().randrange(1, 1024)
+        length = 128
+        M = WeakRandom().myrandom(length, True)
+        print("len =>", length)
+        print("Message => ", M)
+        print("Type =>", type(M))
         rsa = RSA_Sig()
         (pk, sk) = rsa.keygen(1024)
         S = rsa.sign(pk, sk, M)

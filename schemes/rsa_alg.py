@@ -10,6 +10,7 @@
 
 from charm.integer import *
 from toolbox.PKEnc import *
+from toolbox.PKSig import *
 from toolbox.paddingschemes import *
 from toolbox.conversion import Conversion
 
@@ -43,7 +44,8 @@ class RSA():
 
 class RSA_Enc(RSA,PKEnc):
     def __init__(self, padding=OAEPEncryptionPadding()):
-        super().__init__()
+        RSA.__init__(self)
+        PKEnc.__init__(self)
         self.paddingscheme = padding 
     
     def encrypt(self, pk, m:Bytes):
@@ -61,16 +63,18 @@ class RSA_Enc(RSA,PKEnc):
         if debug: print("OS  =>", os)
         return self.paddingscheme.decode(os)
     
-class RSA_Sig(RSA):
+class RSA_Sig(RSA, PKSig):
     '''RSASSA-PSS'''
     def __init__(self, padding=PSSPadding()):
-        super().__init__()
+        RSA.__init__(self)
+        PKSig.__init__(self)
         self.paddingscheme = padding 
 
     def sign(self,sk, M, salt=None):
         #apply encoding
         k = math.ceil(int(sk['N']).bit_length() / 8)
         emLen = math.ceil((int(sk['N']).bit_length() -1) / 8)
+        print("emLen =>", emLen)
         em = self.paddingscheme.encode(M, emLen, salt)
         m = Conversion.OS2IP(em)
         m = integer(m) % sk['N']  #ERRROR m is larger than N
@@ -78,12 +82,12 @@ class RSA_Sig(RSA):
         S = Conversion.IP2OS(s, k)
         if debug:
             print("Signing")
-            #print("k     =>", k)
-            #print("emLen =>", emLen) 
-            print("em    =>", em)
+            print("k     =>", k)
+            print("emLen =>", emLen) 
             print("m     =>", m)
-            #print("s     =>", s)
-            #print("S     =>", S)
+            print("em    =>", em)
+            print("s     =>", s)
+            print("S     =>", S)
         return S
     
     def verify(self, pk, M, S):
@@ -98,12 +102,13 @@ class RSA_Sig(RSA):
         EM = Conversion.IP2OS(m, emLen)
         if debug:
             print("Verifying")
-            #print("k     =>", k)
-            #print("emLen =>", emLen)
-            #print("s     =>", s)
-            print("m     =>", m)
-            print("em    =>", bin(EM))
-            #print("S     =>", S)
+            print("k     =>", k)
+            print("emLen =>", emLen)
+            print("s     =>", s)
+            print("m       =>", m)
+            print("em      =>", EM)
+#            print("bin_em  =>", bin(EM))
+            print("S     =>", S)
         return self.paddingscheme.verify(M, EM)
         
     
@@ -122,11 +127,11 @@ def main():
     assert m == orig_m
     if debug: print("Successful Decryption!!!")
     
-def main2():
-    M = b'Test message'
+def main2(): # NEEDS DEBUGGING
+    M = b'This is a test message.'
     rsa = RSA_Sig()
     (pk, sk) = rsa.keygen(1024)
-    S = rsa.sign(sk, M) 
+    S = rsa.sign(sk, M)
     assert rsa.verify(pk, M, S)
         
 if __name__ == "__main__":

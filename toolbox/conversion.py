@@ -30,6 +30,11 @@ class Conversion(object):
         pass
    
     @classmethod
+    def bytes2integer(self, bytestr):
+        '''Converts a bytes string to an int of a particular bit-length?'''
+        pass
+   
+    @classmethod
     def str2bytes(self, str):
         return Bytes(str, 'utf-8')
      

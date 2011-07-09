@@ -127,9 +127,12 @@ class hashFunc:
             self.hashObj = hashlib.new(_hash_type)
         
     #message must be a binary string
-    def __call__(self, message):
+    def __call__(self, message : [str, bytes]):
         h = self.hashObj.copy()
-        h.update(bytes(message))
+        if type(message) == str:
+            h.update(bytes(message))
+        elif type(message) in [bytes, Bytes]:
+            h.update(bytes(message)) # bytes or custom Bytes
         return Bytes(h.digest())  
     
 # PSSSignaturePadding
@@ -137,7 +140,7 @@ class hashFunc:
 # Implements the PSS signature padding scheme.  Appropriate for RSA-PSS signing
 # Implemented according to section 8 of PKCS1v2-1.pdf.
 #
-class PSSPadding:
+class PSSPadding: # NEEDS DEBUGGING FOR RSASig
     def __init__(self, _hash_type ='sha1'):
         self.hashFn = hashFunc(_hash_type)
         self.hLen = len(hashlib.new(_hash_type).digest())

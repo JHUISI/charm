@@ -124,7 +124,7 @@ class Test(unittest.TestCase):
         4c d3 73 9c 6b bf ed ae 48 7f b5 56 44 e9 ca 74\
         ff 77 a5 3c b7 29 80 2f 6e d4 a5 ff a8 ba 15 98\
         90 fc'.replace(" ", ""))
-        
+
         # mHash    = Hash(M)
         # salt     = random string of octets
         # M'       = Padding || mHash || salt
@@ -191,7 +191,8 @@ class Test(unittest.TestCase):
         
         if False:
             print("PSS Test Vector:")
-            print("M     =>", m) 
+            print("M     =>", m)
+            print("Mlen  =>", len(m))
             print("mHash =>", mHash)
             print("salt  =>", salt)
             print("M'    =>", mPrime)
@@ -200,6 +201,7 @@ class Test(unittest.TestCase):
             print("dbmask=>", dbMask)
             print("masked=>", maskedDB)
             print("EM    =>", EM)
+            print("EMLen =>", len(EM))
         
         pss = paddingschemes.PSSPadding()
         realEM = pss.encode(m,len(EM),salt)
