@@ -82,7 +82,7 @@ class CPabe(ABEnc):
         denominator = group.init(GT, 1)
         for i in pruned:
             denominator *= ( pair(C[i] ** w_i[i], sk['L']) * pair(k_x[i] ** w_i[i], D[i]) )   
-        return cipher['C_tilde'] / (numerator / denominator)
+        return ct['C_tilde'] / (numerator / denominator)
 
 def main():
     #Get the eliptic curve with the bilinear mapping feature needed.
@@ -108,6 +108,7 @@ def main():
    
     assert m == orig_m, 'FAILED Decryption!!!' 
     if debug: print('Successful Decryption!')    
+    del groupObj
     
 if __name__ == '__main__':
     debug = True

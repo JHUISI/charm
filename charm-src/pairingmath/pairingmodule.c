@@ -969,38 +969,44 @@ they have the opportunity to set the
  */
 static PyObject *Element_set(Element *self, PyObject *args)
 {
-	PyObject *value;
-	if(self->elem_initialized == FALSE) {
-		PyErr_SetString(ElementError, "must initialize element to a field (G1,G2,GT, or Zr)");
-		return NULL;
-	}
-	
-	debug("Creating a new element\n");
-	if(PyArg_ParseTuple(args, "O", &value)) {
-		// convert into an int using PyArg_Parse(...)
-		// set the element
-		debug("Setting element to '%li'\n", value);
-		START_CLOCK(dBench);
-		if(PyLong_Check(value)) {
-			mpz_t m;
-			mpz_init(m);
-			longObjToMPZ(m, (PyLongObject *) value);
-			element_set_mpz(self->e, m);
-			mpz_clear(m);
-		}
-		else if(PyElement_Check(value)) {
-			Element *value2 = (Element *) value;
-			if(value2->element_type == self->element_type)
-				element_set(self->e, value2->e);
-		}
-		else {
-			PyErr_SetString(ElementError, ERROR_TYPE(""));
-			Py_RETURN_NONE;
-		}
-		STOP_CLOCK(dBench);
-	}
-	
-	Py_RETURN_TRUE;
+    Element *object;
+    long int value;
+    // char *str = NULL;
+    int errcode = TRUE;
+
+    if(self->elem_initialized == FALSE) {
+    	PyErr_SetString(ElementError, "must initialize element to a field (G1,G2,GT, or Zr)");
+    	errcode = FALSE;
+    	return Py_BuildValue("i", errcode);
+    }
+
+    debug("Creating a new element\n");
+    if(PyArg_ParseTuple(args, "l", &value)) {
+            // convert into an int using PyArg_Parse(...)
+            // set the element
+            debug("Setting element to '%li'\n", value);
+            START_CLOCK(dBench);
+            if(value == 0)
+                    element_set0(self->e);
+            else if(value == 1)
+                    element_set1(self->e);
+            else {
+                    debug("Value '%i'\n", (signed int) value);
+                    element_set_si(self->e, (signed int) value);
+            }
+            STOP_CLOCK(dBench);
+    }
+    else if(PyArg_ParseTuple(args, "O", &object)){
+            START_CLOCK(dBench);
+            element_set(self->e, object->e);
+            STOP_CLOCK(dBench);
+    }
+    else { //
+            PyErr_SetString(ElementError, "type not supported: signed int or Element object");
+            errcode = FALSE;
+    }
+
+    return Py_BuildValue("i", errcode);
 }
 
 /* this is a type method that is visible on the global or class level. Therefore,

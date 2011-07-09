@@ -19,7 +19,7 @@ class HybridIBEnc(IBEnc):
     def extract(self, mk, ID):
         return ibenc.extract(mk, ID)
     
-    def encrypt(self, pk, ID, M):
+    def encrypt(self, pk, ID, M : str):
         if type(M) != str: raise "message not right type!"        
         key = group.random(GT)
         c1 = ibenc.encrypt(pk, ID, key)
@@ -33,7 +33,7 @@ class HybridIBEnc(IBEnc):
         key = ibenc.decrypt(pk, ID, c1)        
         prp = self.getPRP(key)
         msg = prp.decrypt(c2)
-        return msg
+        return bytes.decode(msg, 'utf8').strip('\x00')
         
     def getPRP(self, message):
         self.mode, self.key_len = AES, 16
@@ -76,6 +76,7 @@ def main():
     orig_msg = hyb_ibe.decrypt(pk, sk, ct)
     if debug: print("Result =>", orig_msg)
     assert orig_msg == msg
+    del groupObj
 
 if __name__ == "__main__":
     debug = True

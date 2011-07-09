@@ -76,6 +76,7 @@ def main():
     
     assert ibsig.verify(mpk, M, sigma)
     if debug: print("Successful Verification!!!")
+    del groupObj
 
 if __name__ == "__main__":
     debug = True

@@ -21,22 +21,21 @@ class CM_Ped92(Commitment):
         return c == (pk['g'] ** msg) * (pk['h'] ** d)
 
 def main():
-    groupObj = ECGroup(410)
-    if debug: print("hello world!");
-    
-#    cm = CM_Ped92(groupObj)
+    groupObj = ECGroup(410)    
+    cm = CM_Ped92(groupObj)
    
-#    pk = cm.setup()
-#    print("Public parameters...")
-#    print("pk =>", pk)
+    pk = cm.setup()
+    if debug: 
+        print("Public parameters...")
+        print("pk =>", pk)
     
-#   m = groupObj.random()
-#    print("Commiting to =>", m)
-#    (c, d) = cm.commit(pk, m)
+    m = groupObj.random(ZR)
+    if debug: print("Commiting to =>", m)
+    (c, d) = cm.commit(pk, m)
     
-#    assert cm.decommit(pk, c, d, m), "FAILED to decommit"
-#    print("Successful and Verified decommitment!!!")
-   
+    assert cm.decommit(pk, c, d, m), "FAILED to decommit"
+    if debug: print("Successful and Verified decommitment!!!")
+    del groupObj   
       
 if __name__ == "__main__":
     debug = True

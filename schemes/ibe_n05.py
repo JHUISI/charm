@@ -140,7 +140,7 @@ def main():
 
     assert m == M, "FAILED Decryption!"
     if debug: print("Successful Decryption!!! m => '%s'" % m)
-                
+    del groupObj
 if __name__ == '__main__':
     debug = True
     main()

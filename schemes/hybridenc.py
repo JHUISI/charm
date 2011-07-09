@@ -42,7 +42,7 @@ class HybridEnc(PKEnc):
     
     def decrypt(self, pk, sk, ct):
         c1, c2 = ct['c1'], ct['c2']
-        key = pkenc.decrypt(pk, sk, c1)[:self.key_len]
+        key = self.pkenc.decrypt(pk, sk, c1)[:self.key_len]
         if debug: print("Rec key =>", key,", len =", len(key))
         iv  = '6543210987654321' # static IV (for testing)    
         prp = selectPRP(self.alg, (key, MODE_CBC, iv))
