@@ -204,7 +204,7 @@ class Test(unittest.TestCase):
             print("EMLen =>", len(EM))
         
         pss = paddingschemes.PSSPadding()
-        realEM = pss.encode(m,len(EM),salt)
+        realEM = pss.encode(m,len(EM)*8,salt)
         self.assertEqual(EM, realEM)
 
     

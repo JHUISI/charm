@@ -144,45 +144,60 @@ class PSSPadding: # NEEDS DEBUGGING FOR RSASig
     def __init__(self, _hash_type ='sha1'):
         self.hashFn = hashFunc(_hash_type)
         self.hLen = len(hashlib.new(_hash_type).digest())
-        self.sLen = self.hLen # The length of the salt
-        global debug
-        debug = False
+        self.sLen = self.hLen # The length of the default salt
     
-    def encode(self, M, emLen=None, salt=None):
+    def encode(self, M, emBits=None, salt=None):
         '''Encodes a message with PSS padding
         emLen will be set to the minimum allowed length if not explicitly set
         '''
-        #Max length of output message
-        if emLen is None:
-            emBits =  8*self.hLen + 8 * self.sLen + 9
-            emLen = math.ceil(emBits / 8)
-        #Make sure the the message is long enough to be valid
-        assert emLen >= self.hLen + self.sLen + 2, " Error"
-        
         # assert len(M) < (2^61 -1), Message too long
         
-        mHash = self.hashFn(M)
+        #Let H’ = Hash (M’), an octet string of length hLen.#Max length of output message
+        if emBits is None:
+            emBits =  8*self.hLen + 8 * self.sLen + 9
+            #Round to the next byte
+            emBits = math.ceil(emBits / 8) * 8
+        assert emBits >= 8*self.hLen + 8 * self.sLen + 9, "Not enough emBits"
+        
+        #Make sure the the message is long enough to be valid
+        emLen = math.ceil(emBits / 8)        
+        assert emLen >= self.hLen + self.sLen + 2, "emLen too small"
         
         if salt is None:
             if self.sLen > 0: 
                 salt = SecureRandomFactory.getInstance().getRandomBits(self.sLen)
             else:
                 salt = b''
+        assert len(salt) == self.sLen, "Salt wrong size"
         
+        #Let M’ = (0x)00 00 00 00 00 00 00 00 || mHash || salt;
         eightzerobytes = Bytes.fill(b'\x00', 8)
+        mHash = self.hashFn(M)        
         Mprime = eightzerobytes + mHash + salt
+        
+        #Let H = Hash (M’), an octet string of length hLen.
         H = self.hashFn(Mprime)
         
+        #Generate an octet string PS consisting of emLen – sLen – hLen – 2 zero octets.
+        #The length of PS may be 0.
         pslen = emLen - self.sLen - self.hLen - 2
         ps = Bytes.fill(b'\x00', pslen)        
+        
+        #Let DB = PS || 0x01 || salt; DB is an octet string of length emLen – hLen – 1.
         DB = ps + Bytes(b'\x01') + salt
 
+        #Let dbMask = MGF (H, emLen – hLen – 1).
         masklen = emLen - self.hLen - 1
-        dbMask = MGF1(H, masklen, self.hashFn, self.hLen)  
+        dbMask = MGF1(H, masklen, self.hashFn, self.hLen)
+        #Let maskedDB = DB ⊕ dbMask.
         maskedDB = DB ^ dbMask
         
-        # Set 8emLen - emBits bits of the left most octet in maskedDB to zero
-        # This is not needed because we only pad byte aligned messages?
+        #Set the leftmost 8emLen – emBits bits of the leftmost octet in maskedDB to zero
+        numzeros = 8 * emLen - emBits
+        bitmask  = int('0'*numzeros + '1'*(8-numzeros), 2)
+        ba = bytearray(maskedDB)
+        ba[0] &= bitmask
+        maskedDB = Bytes(ba)
         
         EM = maskedDB + H + Bytes(b'\xbc')
         
@@ -199,48 +214,84 @@ class PSSPadding: # NEEDS DEBUGGING FOR RSASig
             print("EM    =>", EM)
         return EM
     
-    def verify(self, M, EM, emLen=None):
+    def verify(self, M, EM, emBits=None):
         '''
         Verifies that EM is a correct encoding for M
         M - the message to verify
         EM - the encoded message
-        return true or false
+        return true for 'consistent' or false for 'inconsistent'
         '''
         if debug: print("PSS Decoding:")
-            
-        emLen = len(EM) 
+        
+        #Preconditions
+        if emBits == None:
+            emBits = 8 * len(EM)
+        assert emBits >= 8* self.hLen + 8* self.sLen + 9, "Not enough emBits"
+        
+        emLen = math.ceil(emBits / 8)
+        assert len(EM) == emLen, "EM length not equivalent to bits provided"
+        
         # assert len(M) < (2^61 -1), Message too long
+        
+        #Let mHash = Hash (M), an octet string of length hLen
         mHash = self.hashFn(M)
+        
+        #if emLen < hLen + sLen + 2, output “inconsistent” and stop.
         if emLen < self.hLen + self.sLen + 2:
             if debug: print("emLen too short") 
             return False
         
+        #If the rightmost octet of EM does not have hexadecimal value 0xbc, output
+        #“inconsistent” and stop.
         if EM[len(EM)-1:] != b'\xbc':
             if debug: print("0xbc not found") 
             return False
         
+        #Let maskedDB be the leftmost emLen - hLen - 1 octets of EM, and let H be the
+        #next hLen octets.
         maskeDBlen = emLen - self.hLen - 1
         maskedDB = Bytes(EM[:maskeDBlen])
         H = EM[maskeDBlen:maskeDBlen+self.hLen]
         
-        #if the leftmost 8emLen - emBits of the leftmost octet in maskedDB are not equal to zero return false
+        #If the leftmost 8emLen – emBits bits of the leftmost octet in maskedDB are not all
+        #equal to zero, output “inconsistent” and stop.
+        numzeros = 8 * emLen - emBits
+        bitmask  = int('1'*numzeros + '0'*(8-numzeros), 2)
+        if (maskedDB[0] & bitmask != 0):
+            if debug: print("right % bits of masked db not zero, found %" % (numzeros, bin(maskedDB[0])))
+            return False 
         
+        #Let dbMask = MGF (H, emLen – hLen – 1).
         masklen = emLen - self.hLen - 1
         dbMask = MGF1(H, masklen, self.hashFn, self.hLen)
+        #Let DB = maskedDB ⊕ dbMask.
         DB = maskedDB ^ dbMask
-        #Set the leftmost 8emLen - emBits of the leftmost octet in DB to zero
         
+        #Set the leftmost 8emLen – emBits bits of the leftmost octet in DB to zero.
+        numzeros = 8 * emLen - emBits
+        bitmask  = int('0'*numzeros + '1'*(8-numzeros), 2)
+        ba = bytearray(DB)
+        ba[0] &= bitmask
+        DB = Bytes(ba)
+
+        #If the emLen – hLen – sLen – 2 leftmost octets of DB are not zero
         zerolen = emLen - self.hLen - self.sLen - 2
         if DB[:zerolen] != Bytes.fill(b'\x00', zerolen):
             if debug: print("DB did not start with % zero octets" % zerolen) 
             return False
         
+        #or if the octet at position emLen – hLen – sLen – 1 (the leftmost position is “position 1”) does not
+        #have hexadecimal value 0x01, output “inconsistent” and stop.
         if DB[zerolen] != 0x01:
-            if debug: print("DB did not have 0x01") 
+            if debug: print("DB did not have 0x01 at %s, found %s instead" % (zerolen,DB[zerolen])) 
             return False
         
+        #Let salt be the last sLen octets of DB.
         salt = DB[len(DB)-self.sLen:]
+        #Let M’ = (0x)00 00 00 00 00 00 00 00 || mHash || salt ;
         mPrime = Bytes.fill(b'\x00', 8) + mHash + salt
+        
+        #Let H’ = Hash (M’), an octet string of length hLen.
         HPrime = self.hashFn(mPrime)
         
         if debug:
@@ -254,4 +305,5 @@ class PSSPadding: # NEEDS DEBUGGING FOR RSASig
             print("masked=>", maskedDB)
             print("EM    =>", EM)
         
+        #If H = H’, output “consistent.” Otherwise, output “inconsistent.”
         return H == HPrime

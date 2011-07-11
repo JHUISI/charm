@@ -23,7 +23,7 @@ def adjustPYPATH(paths):
 def find_modules(path="."):
     modules = set()
     for filename in os.listdir(path):
-        if re.match(".*py$", filename):
+        if re.match("[\w]+\.py$", filename):
             module = filename[:-3]
             modules.add(module)
     return modules

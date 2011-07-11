@@ -1,7 +1,7 @@
 '''
 Created on Jul 1, 2011
 
-@author: urbanus
+@author: Gary Belvin
 '''
 from binascii import a2b_hex
 from rsa_alg import RSA_Enc, RSA_Sig
@@ -10,10 +10,9 @@ from toolbox.securerandom import SecureRandomFactory, WeakRandom
 import unittest
 from random import Random
 
-debug = True
+debug = False
 class Test(unittest.TestCase):
 
-    @unittest.skip("")
     def testRSAEnc(self):
         rsa = RSA_Enc()
         (pk, sk) = rsa.keygen(1024)
@@ -25,8 +24,7 @@ class Test(unittest.TestCase):
         orig_m = rsa.decrypt(pk, sk, c)
     
         assert m == orig_m
-        
-    @unittest.skip("")
+            
     def testRSAVector(self):
         # ==================================
         # Example 1: A 1024-bit RSA Key Pair
@@ -120,21 +118,16 @@ class Test(unittest.TestCase):
         d6 e8 81 ea a9 1a 99 61 70 e6 57 a0 5a 26 64 26\
         d9 8c 88 00 3f 84 77 c1 22 70 94 a0 d9 fa 1e 8c\
         40 24 30 9c e1 ec cc b5 21 00 35 d4 7a c7 2e 8a'.replace(' ',''))
-    
-    
+      
     def testRSASig(self):
         length = Random().randrange(1, 1024)
         length = 128
         M = WeakRandom().myrandom(length, True)
-        print("len =>", length)
-        print("Message => ", M)
-        print("Type =>", type(M))
         rsa = RSA_Sig()
         (pk, sk) = rsa.keygen(1024)
-        S = rsa.sign(pk, sk, M)
+        S = rsa.sign(sk, M)
         assert rsa.verify(pk, M, S)
     
-    @unittest.skip("")
     def testPSSVector(self):
         # ==================================
         # Example 1: A 1024-bit RSA Key Pair
@@ -287,7 +280,6 @@ class Test(unittest.TestCase):
         sk = { 'phi_N':phi_N, 'd':d , 'N': n}
         sig = rsa.sign(sk, m, salt)
         assert S == sig
-            
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

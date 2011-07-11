@@ -14,7 +14,7 @@ from toolbox.PKSig import *
 from toolbox.paddingschemes import *
 from toolbox.conversion import Conversion
 
-debug = True
+debug = False
 class RSA():
     def __init__(self):
         self.rand = init()
@@ -37,7 +37,6 @@ class RSA():
                 continue
             d = e ** -1
             break
-        print("D:", d)
         pk = { 'N':N, 'e':e }
         sk = { 'phi_N':phi_N, 'd':d , 'N':N}
         return (pk, sk)
@@ -72,10 +71,12 @@ class RSA_Sig(RSA, PKSig):
 
     def sign(self,sk, M, salt=None):
         #apply encoding
-        k = math.ceil(int(sk['N']).bit_length() / 8)
-        emLen = math.ceil((int(sk['N']).bit_length() -1) / 8)
-        print("emLen =>", emLen)
-        em = self.paddingscheme.encode(M, emLen, salt)
+        modbits = int(sk['N']).bit_length()
+        k = math.ceil(modbits / 8)
+        emLen = math.ceil((modbits -1) / 8)
+        
+        
+        em = self.paddingscheme.encode(M, modbits - 1, salt)
         m = Conversion.OS2IP(em)
         m = integer(m) % sk['N']  #ERRROR m is larger than N
         s =  (m ** sk['d']) % sk['N']
@@ -91,8 +92,9 @@ class RSA_Sig(RSA, PKSig):
         return S
     
     def verify(self, pk, M, S):
-        k = math.ceil(int(pk['N']).bit_length() / 8)
-        emLen = math.ceil((int(pk['N']).bit_length() -1) / 8)
+        modbits = int(pk['N']).bit_length()
+        k = math.ceil(modbits / 8)
+        emLen = math.ceil((modbits -1) / 8)
         if len(S) != k:
             if debug: print("Sig is %s octets long, not %" %(len(S), k))
             return False
@@ -109,7 +111,7 @@ class RSA_Sig(RSA, PKSig):
             print("em      =>", EM)
 #            print("bin_em  =>", bin(EM))
             print("S     =>", S)
-        return self.paddingscheme.verify(M, EM)
+        return self.paddingscheme.verify(M, EM, modbits-1)
         
     
 def main():
@@ -127,7 +129,7 @@ def main():
     assert m == orig_m
     if debug: print("Successful Decryption!!!")
     
-def main2(): # NEEDS DEBUGGING
+def main2():
     M = b'This is a test message.'
     rsa = RSA_Sig()
     (pk, sk) = rsa.keygen(1024)
@@ -136,4 +138,5 @@ def main2(): # NEEDS DEBUGGING
         
 if __name__ == "__main__":
     debug = True
+    main()
     main2()
