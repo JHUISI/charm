@@ -167,10 +167,12 @@ def parseFile(filename):
 # and verifies X # of rules. This serves to notify
 # the user on any errors that might have been made in
 # specifying the batch inputs.
-def syntaxChecker(astTree):
+def astSyntaxChecker(astTree):
     pass
 
-
+# Perform some type checking here?
+def astParser(obj):
+    pass
 
 if __name__ == "__main__":
     print(sys.argv[1:])
