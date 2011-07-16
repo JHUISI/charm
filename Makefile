@@ -1,4 +1,7 @@
-include ./config.mk
+
+CONFIG=config.mk
+include ./${CONFIG}
+export CONFIG_FILE=${CONFIG}
 
 # user config options
 setup1=$(shell mkdir -p /tmp/build-charm)
@@ -48,6 +51,7 @@ build-gmp:
 	   echo "GMP install: OK"; \
 	fi
 	set +x
+	sed "s/HAVE_LIBGMP=no/HAVE_LIBGMP=yes/g" ${CONFIG} > ${CONFIG}.new; mv ${CONFIG}.new ${CONFIG} 
 
 .PHONY: build-pbc
 build-pbc:
@@ -68,11 +72,12 @@ build-pbc:
 	   echo "PBC install: OK"; \
 	fi
 	set +x
+	sed "s/HAVE_LIBPBC=no/HAVE_LIBPBC=yes/g" ${CONFIG} > ${CONFIG}.new; mv ${CONFIG}.new ${CONFIG} 
 	
 .PHONY: build
 build: setup build-gmp build-pbc
 	@echo "Building the Charm Framework"
-	$(PYTHON) setup.py build
+	${PYTHON} setup.py build
 	@echo "Complete"
 
 #.PHONY: rebuild
@@ -83,11 +88,11 @@ build: setup build-gmp build-pbc
 
 .PHONY: source
 source:
-	$(PYTHON) setup.py sdist $(COMPILE)
+	$(PYTHON) setup.py sdist
 
 .PHONY: install
 install:
-	$(PYTHON) setup.py install # $(COMPILE)
+	$(PYTHON) setup.py install
 	
 .PHONY: test
 test:
