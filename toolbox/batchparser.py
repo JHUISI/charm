@@ -171,7 +171,7 @@ def astSyntaxChecker(astTree):
     pass
 
 # Perform some type checking here?
-def astParser(obj):
+def astParser(objtree):
     pass
 
 if __name__ == "__main__":

@@ -20,6 +20,7 @@ def testSchemes(modules=None):
     if modules==None:
         #Exclude unit tests
         modules = [mod for mod in all_unittests.find_modules() if not re.match(".*_test$", mod)]
+        print("Modules found: ", modules)
     
     for name in modules:
         mod = all_unittests.load_module(name)
@@ -41,11 +42,11 @@ if __name__ == "__main__":
     elif os.access("../schemes/", os.R_OK):
         os.chdir('../schemes/')
         
-    
-    modules = None 
-    #Uncomment to restrict the tests to these modules
+    #modules = None 
+    # Uncomment to restrict the tests to these modules
     # ECC and Pairing 
-    #modules = ['ibe_bf03','abemultiauth_hybrid', 'sig_short_bls04', 'kpabe', 'cpabe07', 'cpabe09', 'ecdsa', 'elgamal', 'ibe_bb03', 'hashIDAdapt', 'hybridenc', 'hybridibenc', 'dabe_aw11', 'commit_92', 'chk04_enc', 'sig_generic_ibetosig_naor01', 'ibe_n05']
+    # Restrict modules to these schemes (which actually work) until further notice.
+    modules = ['ibe_bf03','abemultiauth_hybrid', 'sig_short_bls04', 'kpabe', 'cpabe07', 'cpabe09', 'ecdsa', 'elgamal', 'ibe_bb03', 'hashIDAdapt', 'hybridenc', 'hybridibenc', 'dabe_aw11', 'commit_92', 'chk04_enc', 'sig_generic_ibetosig_naor01', 'ibe_n05']
      
     TesterInstance = unittest.TextTestRunner(verbosity=3)
     TesterInstance.run(testSchemes(modules))#Run tests
