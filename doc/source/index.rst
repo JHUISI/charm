@@ -17,10 +17,14 @@ Contents:
 
 Available Schemes
 -----------------------------------------
+
+.. begin_auto_scheme_list
 .. toctree::
    :maxdepth: 1
 
    schemes/dabe_w11
+.. end_auto_scheme_list
+   
 
 .. todo::
    Make a list
