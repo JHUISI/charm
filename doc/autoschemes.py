@@ -5,7 +5,6 @@ Author: Gary Belvin
 '''
 import os, re
 
-
 rstschemesdir = "source/schemes"
 indexfile     = "source/index.rst"
 indexrelschemes= "schemes"
@@ -40,14 +39,11 @@ def gen_doc_stub(module):
    out ="""
 %s
 =========================================
-.. todo::
-   Document %s
-
 .. automodule:: %s
     :show-inheritance:
-    :synopsis:
     :members:
-""" %(module, module, module)
+    :undoc-members:
+""" %(module, module)
    return out
  
 def auto_add_scheme_rst(modules):

@@ -1,13 +1,14 @@
-# David Naccache based Identity-Based Encryption
-# 
-# From: "David Naccache Secure and Practical Identity-Based Encryption Section 4"
-# Available from: eprint.iacr.org/2005/369.pdf
-#
-# type:			encryption (identity-based)
-# setting:		bilinear groups (asymmetric)
-#
-# Implementer:	Gary Belvin
-# Date:			06/2011
+'''David Naccache based Identity-Based Encryption
+ 
+| From: "David Naccache Secure and Practical Identity-Based Encryption Section 4"
+| Available from: http://eprint.iacr.org/2005/369.pdf
+|
+| type:			encryption (identity-based)
+| setting:		bilinear groups (asymmetric)
+|
+| Implementer:	Gary Belvin
+| Date:			06/2011
+''' 
 
 from charm.cryptobase import *
 from toolbox.IBEnc import *
@@ -17,8 +18,8 @@ from toolbox.pairinggroup import *
 import hashlib, math
 
 debug = False
-
 class IBE_N04(IBEnc):
+    """Implementation of David Naccahe Identity Based Encryption"""
     def __init__(self, groupObj):
         IBEnc.__init__(self)
         IBEnc.setProperty(self, secdef='IND_ID_CPA', assumption='DBDH', secmodel='Standard')

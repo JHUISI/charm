@@ -24,6 +24,7 @@ all:
 	@echo "make install - Install on local system."
 	@echo "make clean - Get rid of scratch and byte files."
 	@echo "make test  - Run Unit Tests."
+	@echo "make doc   - Compile documentation"
 
 .PHONY: setup
 setup:
@@ -98,7 +99,10 @@ install:
 test:
 	$(PYTHON) tests/all_unittests.py
 	$(PYTHON) tests/all_schemes.py
-	#find ./tests/ -name '*.py' -exec python3 '{}' \;
+
+.PHONY: doc
+doc:
+	cd doc; ${MAKE} html	
 
 # .PHONY: buildrpm
 # buildrpm:
@@ -116,6 +120,7 @@ test:
 .PHONY: clean
 clean:
 	$(PYTHON) setup.py clean
+	cd doc; $(MAKE) clean
 #        $(MAKE) -f $(CURDIR)/debian/rules clean
 	rm -rf build/ dist/ ${dest_build} MANIFEST
 	find . -name '*.pyc' -delete
