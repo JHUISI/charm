@@ -1,14 +1,16 @@
-# Lewko-Waters Decentralized Attribute-Based Encryption 
-# 
-# Lewko, Allison, and Brent Waters, "Decentralizing Attribute-Based Encryption.", Appendix D
-# Published in: Eurocrypt 2011
-# Available from: http://eprint.iacr.org/2010/351.pdf
-#
-# type:           encryption (identity-based)
-# setting:        bilinear groups (asymmetric)
-#
-# Implementer:    Gary Belvin
-# Date:           06/2011 
+'''
+Lewko-Waters Decentralized Attribute-Based Encryption 
+ 
+Lewko, Allison, and Brent Waters, "Decentralizing Attribute-Based Encryption.", Appendix D
+Published in: Eurocrypt 2011
+Available from: http://eprint.iacr.org/2010/351.pdf
+
+type:           encryption (identity-based)
+setting:        bilinear groups (asymmetric)
+
+Implementer:    Gary Belvin
+Date:           06/2011 
+'''
 
 from toolbox.pairinggroup import *
 from toolbox.secretutil import *
@@ -24,18 +26,19 @@ class Dabe(ABEncMultiAuth):
         ABEncMultiAuth.__init__(self)
         global util, group
         util = SecretUtil(groupObj.Pairing, verbose=False)  #Create Secret Sharing Scheme
-        group = groupObj    #Prime order group        
+        group = groupObj    #:Prime order group        
+	#Another comment
    
     def setup(self):
         '''Global Setup'''
-        #In global setup, a bilinear group G of prime order p is chosen
-        #The global public parameters, GP and p, and a generator g of G. A random oracle H maps global identities GID to elements of G
+        #:In global setup, a bilinear group G of prime order p is chosen
+        #:The global public parameters, GP and p, and a generator g of G. A random oracle H maps global identities GID to elements of G
     
-        #group contains 
-        #the prime order p is contained somewhere within the group object
+        #:group contains 
+        #:the prime order p is contained somewhere within the group object
         g = group.random(G1)
-        # The oracle that maps global identities GID onto elements of G
-        #H = lambda str: g** group.hash(str)
+        #: The oracle that maps global identities GID onto elements of G
+        #:H = lambda str: g** group.hash(str)
         H = lambda x: group.hash(x, G1)
         GP = {'g':g, 'H': H}
 

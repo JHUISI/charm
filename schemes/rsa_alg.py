@@ -6,6 +6,7 @@
 # setting:        Integer
 #
 # Implementer:    J Ayo Akinyele
+#                 Gary Belvin
 # Date:            05/2011
 
 from charm.integer import *
@@ -16,6 +17,7 @@ from toolbox.conversion import Conversion
 
 debug = False
 class RSA():
+    '''RSA Module'''
     def __init__(self):
         self.rand = init()
     # generate p,q and n
@@ -109,7 +111,6 @@ class RSA_Sig(RSA, PKSig):
             print("s     =>", s)
             print("m       =>", m)
             print("em      =>", EM)
-#            print("bin_em  =>", bin(EM))
             print("S     =>", S)
         return self.paddingscheme.verify(M, EM, modbits-1)
         
@@ -135,6 +136,7 @@ def main2():
     (pk, sk) = rsa.keygen(1024)
     S = rsa.sign(sk, M)
     assert rsa.verify(pk, M, S)
+    if debug: print("Successful Signature!")
         
 if __name__ == "__main__":
     debug = True

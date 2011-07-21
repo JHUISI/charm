@@ -548,7 +548,8 @@ else:
 EOF
 python3_found="no"
 $python_path $TMPC
-if [ $? == 0 ]; then
+result=$?
+if test ${result} = 0 ; then
 	python3_found="yes"
 fi
 
