@@ -5,6 +5,7 @@
 
 Welcome to Charm-Crypto's documentation!
 ========================================
+.. sectionauthor:: My Name
 
 Contents:
 
@@ -12,23 +13,18 @@ Contents:
    :maxdepth: 2
 
    sample.rst
-my list
+   todo.rst
+
+Available Schemes
 -----------------------------------------
+.. toctree::
+   :maxdepth: 1
+
+   schemes/dabe_w11
+
 .. todo::
    Make a list
    with some things
-   
-.. todolist::
-   thing 1
-   thing 2
-   thing 3
-
-Decentralized Attribute Based Encryption
-=========================================
-.. automodule:: dabe_aw11
-   :show-inheritance:
-   :synopsis:
-   :members:
 
 .. automodule:: ibe_n05
    :members:
