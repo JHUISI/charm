@@ -37,7 +37,7 @@ check_library() {
    lib_test="$1"
    tmp_file="$2"
    $cc $lib_test 2> $tmp_file
-   grep "_main" $tmp_file > /dev/null
+   grep "main" $tmp_file > /dev/null
    result=$?
 #   echo "Result => $result"
    return $result
