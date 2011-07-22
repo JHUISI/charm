@@ -1,7 +1,7 @@
 '''
 This script searches for python modules named *_test, and runs all the unit tests it finds
 Created on Jun 22, 2011
-@author: Gary Belvin
+:authors: Gary Belvin
 '''
 import unittest
 import os, imp, re, sys, inspect

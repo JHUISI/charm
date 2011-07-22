@@ -1,7 +1,7 @@
 '''
 Created on Jun 23, 2011
 
-@author: urbanus
+:authors: urbanus
 '''
 from toolbox.IBEnc import IBEnc
 from toolbox.pairinggroup import *

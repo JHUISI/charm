@@ -1,7 +1,7 @@
 '''
 Iterates through all the charm-crypto schemes, and runs them to see if they work
 
-@author: Gary Belvin
+:authors: Gary Belvin
 '''
 import os, re
 import unittest
