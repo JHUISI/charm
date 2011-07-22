@@ -30,8 +30,13 @@ Once configure runs successfully, proceed to build and install Charm. Depending 
    make build
    make install
    
-At this point to verify that Charm has been installed properly, launch your python 3 interpreter::
+At this point to verify that Charm has been installed properly, launch your python 3 interpreter and import the pairing base module::
 
    >>> from charm.pairing import *
    
 If there are no errors or exceptions, Charm has successfully been installed in your environment. Proceed to testing out one of our existing cryptographic scheme implementations in the schemes source directory or learn how to write your own. Refer to the implement a scheme tutorial. 
+
+Implement a Scheme
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Interested in implementing your cryptographic scheme in Charm? Here's a guide to navigate Charm to implement your cryptosystem. We go through an example implementation and compare with what was written in the research paper describing the cryptographic algorithm.

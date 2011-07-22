@@ -81,12 +81,6 @@ build: setup build-gmp build-pbc
 	${PYTHON} setup.py build
 	@echo "Complete"
 
-#.PHONY: rebuild
-#rebuild:
-#	@echo "Building the Charm Framework"
-#	${PYTHON} setup.py build
-#	@echo "Complete"
-
 .PHONY: source
 source:
 	$(PYTHON) setup.py sdist
@@ -108,14 +102,14 @@ doc:
 # buildrpm:
 #        $(PYTHON) setup.py bdist_rpm # --post-install=rpm/postinstall --pre-uninstall=rpm/preuninstall
 
-# .PHONY: builddeb
-# builddeb:
+.PHONY: builddeb
+builddeb:
         # build the source package in the parent directory
         # then rename it to project_version.orig.tar.gz
-#        $(PYTHON) setup.py sdist $(COMPILE) --dist-dir=../ --prune
-#        rename -f 's/$(PROJECT)-(.*)\.tar\.gz/$(PROJECT)_$$1\.orig\.tar\.gz/' ../*
+	$(PYTHON) setup.py sdist --dist-dir=../ --prune
+	#rename -f 's/$(PROJECT)-(.*)\.tar\.gz/$(PROJECT)_$$1\.orig\.tar\.gz/' ../*
         # build the package
-#        dpkg-buildpackage -i -I -rfakeroot
+	#dpkg-buildpackage -i -I -rfakeroot
 
 .PHONY: clean
 clean:
