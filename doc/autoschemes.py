@@ -5,11 +5,6 @@ Author: Gary Belvin
 '''
 import os, re
 
-rstschemesdir = "source/schemes"
-indexfile     = "source/index.rst"
-indexrelschemes= "schemes"
-schemesdir    = "../schemes/"
-
 def find_modules(path="."):
     modules = set()
     for filename in os.listdir(path):
@@ -22,18 +17,32 @@ def find_modules(path="."):
     modules.sort()
     return modules
 
-def gen_toc(modules):
+def gen_toc(modules, keyword, rel_mod_dir=""):
    scheme_list = ""
    for m in modules:
-       scheme_list += "   " + indexrelschemes + "/" + m + '\n'
+       scheme_list += "   " + rel_mod_dir + m + '\n'
 
-   replacement=""".. begin_auto_scheme_list
+   replacement=\
+""".. begin_%s
 .. toctree::
    :maxdepth: 1
 
 %s
-.. end_auto_scheme_list""" % scheme_list
+.. end_%s""" % (keyword, scheme_list, keyword)
    return replacement
+
+def replace_toc(thefile, keyword, modules, rel_mod_dir):
+   pattern = "\.\. begin_%s.*\.\. end_%s" % (keyword, keyword)
+   replacement= gen_toc(mods, keyword, rel_mod_dir)
+
+   index_contents = ""
+   with open(thefile, mode='r', encoding='utf-8') as index:
+      index_contents = index.read()
+
+   new_contents = re.sub(pattern, replacement, index_contents, flags=re.S)
+   with open(thefile, mode='w', encoding='utf-8') as newindex:
+      newindex.write(new_contents)
+
 
 def gen_doc_stub(module):
    out ="""
@@ -46,11 +55,11 @@ def gen_doc_stub(module):
 """ %(module, module)
    return out
  
-def auto_add_scheme_rst(modules):
+def auto_add_rst(modules, rstdir=""):
    #Create files for undocumented modules
    for m in mods:
        #only create stubs if the scheme hasn't already been documented
-       rstpath = rstschemesdir + '/' + m + ".rst"
+       rstpath = rstdir + m + ".rst"
        if not os.path.isfile(rstpath):
            with open(rstpath, mode='w',  encoding='utf-8') as f:
                print("Writing new file ", rstpath)
@@ -58,27 +67,14 @@ def auto_add_scheme_rst(modules):
 
 
 if __name__ == "__main__": 
-   mods = find_modules(schemesdir)
-   auto_add_scheme_rst(mods)        
+   #Auto add new schemes
+   mods = find_modules('../schemes')
+   auto_add_rst(mods, 'schemes/')        
+   replace_toc('source/schemes.rst', 'auto_scheme_list', mods, 'schemes/')
    
-   #Add modules to main table of contents
-   pattern = "\.\. begin_auto_scheme_list.*\.\. end_auto_scheme_list"
-   replacement= gen_toc(mods)
-
-   index_contents = ""
-   with open(indexfile, mode='r', encoding='utf-8') as index:
-      index_contents = index.read()
-   
-   new_contents = re.sub(pattern, replacement, index_contents, flags=re.S)
-   with open(indexfile, mode='w', encoding='utf-8') as newindex:
-      newindex.write(new_contents)
-
-   
-   #print("Modules  =>", mods)
-   #print("TOC      =>",gen_toc(mods))
-   #print("module   =>", mods[1])
-   #print(gen_doc_stub(mods[1]))
+   #Auto add toolbox classes
+   mods = find_modules('../toolbox')
+   auto_add_rst(mods, 'toolbox/')
+   replace_toc('source/toolbox.rst', 'auto_toolbox_list', mods, 'toolbox/')
 
   
-
-
