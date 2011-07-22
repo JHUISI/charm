@@ -6,15 +6,15 @@ Author: Gary Belvin
 import os, re
 
 def find_modules(path="."):
-    modules = set()
+    modules = list()
     for filename in os.listdir(path):
         if re.match("^[^_][\w]+\.py$", filename):
             module = filename[:-3]
-            modules.add(module)
+            modules.append(module)
 
     #Exclude unit tests
     modules = [mod for mod in modules if not re.match(".*_test$", mod)]
-    modules.sort()
+    modules.sort(key=str.lower)
     return modules
 
 def gen_toc(modules, keyword, rel_mod_dir=""):
