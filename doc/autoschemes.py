@@ -69,12 +69,12 @@ def auto_add_rst(modules, rstdir=""):
 if __name__ == "__main__": 
    #Auto add new schemes
    mods = find_modules('../schemes')
-   auto_add_rst(mods, 'schemes/')        
+   auto_add_rst(mods, 'source/schemes/')        
    replace_toc('source/schemes.rst', 'auto_scheme_list', mods, 'schemes/')
    
    #Auto add toolbox classes
    mods = find_modules('../toolbox')
-   auto_add_rst(mods, 'toolbox/')
+   auto_add_rst(mods, 'source/toolbox/')
    replace_toc('source/toolbox.rst', 'auto_toolbox_list', mods, 'toolbox/')
 
   
