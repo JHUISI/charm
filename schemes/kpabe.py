@@ -1,15 +1,18 @@
-# Allison Lewko, Amit Sahai and Brent Waters (Pairing-based)
-# 
-# From: "Revocation Systems with Very Small Private Keys", Large Universe Construction
-# Published in: IEEE S&P 2010
-# Available from: http://eprint.iacr.org/2009/309.pdf
-# Notes: 
+'''
+Allison Lewko, Amit Sahai and Brent Waters (Pairing-based)
+ 
+| From: "Revocation Systems with Very Small Private Keys", Large Universe Construction
+| Published in: IEEE S&P 2010
+| Available from: http://eprint.iacr.org/2009/309.pdf
+| Notes: 
 
-# type:           key-policy attribute-based encryption (public key)
-# setting:        Pairing
-#
-# Implementer:    J Ayo Akinyele
-# Date:            12/2010
+* type:           key-policy attribute-based encryption (public key)
+* setting:        Pairing
+
+:Authors:    J Ayo Akinyele
+:Date:            12/2010
+'''
+
 from toolbox.pairinggroup import *
 from toolbox.secretutil import *
 from toolbox.policytree import *

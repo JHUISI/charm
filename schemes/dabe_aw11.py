@@ -5,11 +5,11 @@ Lewko, Allison, and Brent Waters, "Decentralizing Attribute-Based Encryption.", 
 Published in: Eurocrypt 2011
 Available from: http://eprint.iacr.org/2010/351.pdf
 
-type:           encryption (identity-based)
-setting:        bilinear groups (asymmetric)
+* type:           encryption (identity-based)
+* setting:        bilinear groups (asymmetric)
 
-Implementer:    Gary Belvin
-Date:           06/2011 
+:Authors:    Gary Belvin
+:Date:           06/2011 
 '''
 
 from toolbox.pairinggroup import *

@@ -1,17 +1,17 @@
+''' Ateneise-Medeiros (Schnorr group-based)
+ 
+ | From: "Ateneise-Breno de Medeiros On the Key Exposure Problem in Chameleon Hashes", Section 4.
+ | Published in: SCN 2004
+ | Available from:
+ | Notes: 
 
-# Ateneise-Medeiros (Schnorr group-based)
-# 
-# From: "Ateneise-Breno de Medeiros On the Key Exposure Problem in Chameleon Hashes", Section 4.
-# Published in: SCN 2004
-# Available from:
-# Notes: 
-#
-# type:         hash function (chameleon)
-# setting:      Schnorr groups
-# assumption:   DL-Hard
-#
-# Implementer:    J Ayo Akinyele
-# Date:           4/2011
+ * type:         hash function (chameleon)
+ * setting:      Schnorr groups
+ * assumption:   DL-Hard
+
+:Authors: J Ayo Akinyele
+:Date:    4/2011
+'''
 
 from toolbox.Hash import *
 from toolbox.integergroup import *

@@ -1,16 +1,18 @@
-# Brent Waters (Pairing-based)
-# 
-# From: "Ciphertext-Policy Attribute-Based Encryption: An Expressive, Efficient, and Provably Secure Realization", Appendix C.
-# Published in: 2008
-# Available from: http://eprint.iacr.org/2008/290.pdf
-# Notes: Security Assumption: parallel q-DBDHE. The sole disadvantage of this scheme is the high number of pairings
-# that must be computed during the decryption process (2 + N) for N attributes mathing in the key.
-#
-# type:            ciphertext-policy attribute-based encryption (public key)
-# setting:        Pairing
-#
-# Implementer:    J Ayo Akinyele
-# Date:            11/2010
+'''
+Brent Waters (Pairing-based)
+ 
+| From: "Ciphertext-Policy Attribute-Based Encryption: An Expressive, Efficient, and Provably Secure Realization", Appendix C.
+| Published in: 2008
+| Available from: http://eprint.iacr.org/2008/290.pdf
+| Notes: Security Assumption: parallel q-DBDHE. The sole disadvantage of this scheme is the high number of pairings
+| that must be computed during the decryption process (2 + N) for N attributes mathing in the key.
+
+* type:            ciphertext-policy attribute-based encryption (public key)
+* setting:        Pairing
+
+:Authors:    J Ayo Akinyele
+:Date:            11/2010
+'''
 from toolbox.pairinggroup import *
 from toolbox.secretutil import *
 from toolbox.ABEnc import *

@@ -1,17 +1,18 @@
-# John Bethencourt, Brent Waters (Pairing-based)
-# 
-# From: "Ciphertext-Policy Attribute-Based Encryption".
-# Published in: 2007
-# Available from: 
-# Notes: 
-# Security Assumption: 
+'''
+John Bethencourt, Brent Waters (Pairing-based)
+ 
+| From: "Ciphertext-Policy Attribute-Based Encryption".
+| Published in: 2007
+| Available from: 
+| Notes: 
+| Security Assumption: 
+|
+| type:           ciphertext-policy attribute-based encryption (public key)
+| setting:        Pairing
 
-# type:           ciphertext-policy attribute-based encryption (public key)
-# setting:        Pairing
-#
-# Implementer:    J Ayo Akinyele
-# Date:            04/2011
-
+:Authors:    J Ayo Akinyele
+:Date:            04/2011
+'''
 from toolbox.pairinggroup import *
 from toolbox.secretutil import *
 from toolbox.ABEnc import *

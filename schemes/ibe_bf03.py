@@ -1,16 +1,17 @@
-# Boneh-Franklin Identity Based Encryption (NEED TO REWRITE)
-# 
-# From: "D. Boneh, M. Franklin Identity-Based Encryption from the Weil Pairing", Section 4.2.
-# Published in: Crypto 2003
-# Available from: http://.../bfibe.pdf
-# Notes: This is the IBE .
-#
-# type:           encryption (identity-based)
-# setting:        bilinear groups (asymmetric)
-#
-# Implementer:    Joseph Ayo Akinyele
-# Date:            2/2011
+'''
+Boneh-Franklin Identity Based Encryption (NEED TO REWRITE)
+ 
+| From: "D. Boneh, M. Franklin Identity-Based Encryption from the Weil Pairing", Section 4.2.
+| Published in: Crypto 2003
+| Available from: http://.../bfibe.pdf
+| Notes: This is the IBE .
 
+* type:           encryption (identity-based)
+* setting:        bilinear groups (asymmetric)
+
+:Authors:    Joseph Ayo Akinyele
+:Date:            2/2011
+'''
 from toolbox.pairinggroup import *
 from toolbox.hash_module import *
 from toolbox.IBEnc import *

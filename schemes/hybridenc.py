@@ -1,4 +1,4 @@
-# Takes an public-key encryption scheme and builds a hybrid encryption scheme.
+'''Takes an public-key encryption scheme and builds a hybrid encryption scheme.'''
 
 import random, string
 # Works for ElGamal and CS98 schemes

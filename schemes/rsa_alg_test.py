@@ -1,7 +1,6 @@
 '''
-Created on Jul 1, 2011
-
-@author: Gary Belvin
+:Date: Jul 1, 2011
+:authors: Gary Belvin
 '''
 from binascii import a2b_hex
 from rsa_alg import RSA_Enc, RSA_Sig

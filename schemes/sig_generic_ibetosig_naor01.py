@@ -1,23 +1,25 @@
-# Naor's generic IBE-to-Signature transform (generic composition)
-# 
-# From: "B. Franklin, M. Franklin: Identity-based encryption from the Weil pairing"
-# Published in: Eurocrypt 2009
-# Available from: http://eprint.iacr.org/2009/028.pdf
-# Notes:	This transform was first described by Boneh and Franklin but credited to Moni Naor.  It
-#			converts any fully-secure IBE sheme into a signature by repurposing the identity key extraction
-#			as a signing algorithm.  To verify, encrypt a random value under the message/identity,
-#			and attempt to decrypt it using the signature/key.  It may be necessary to repeat this process,
-#			depending on the size of the IBE's plaintext space.  Some IBE schemes support a more efficient
-#			algorithm for verifying the structure of an identity key --- we will use it if it's available. 
-#			Warning: this transform is not secure for selectively-secure schemes!
-#
-# type:			signature (public key)
-# setting:		n/a (any fully-secure IBE scheme)
-# assumption:	n/a (dependent on the IBE scheme)
-#
-# Implementer:	Matthew Green
-# Date:			05/2011
+'''
+Naor's generic IBE-to-Signature transform (generic composition)
+ 
+| From: "B. Franklin, M. Franklin: Identity-based encryption from the Weil pairing"
+| Published in: Eurocrypt 2009
+| Available from: http://eprint.iacr.org/2009/028.pdf
+ 
+Notes:	This transform was first described by Boneh and Franklin but credited to Moni Naor.  It
+   converts any fully-secure IBE sheme into a signature by repurposing the identity key extraction
+   as a signing algorithm.  To verify, encrypt a random value under the message/identity,
+   and attempt to decrypt it using the signature/key.  It may be necessary to repeat this process,
+   depending on the size of the IBE's plaintext space.  Some IBE schemes support a more efficient
+   algorithm for verifying the structure of an identity key --- we will use it if it's available. 
+   *Warning*: this transform is not secure for selectively-secure schemes!
 
+* type:			signature (public key)
+* setting:		n/a (any fully-secure IBE scheme)
+* assumption:	n/a (dependent on the IBE scheme)
+
+:Authors:	Matthew Green
+:Date:			05/2011
+'''
 from schemes.ibe_bb03 import IBE_BB04
 from toolbox.PKSig import *
 from toolbox.pairinggroup import *

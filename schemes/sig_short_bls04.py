@@ -1,15 +1,17 @@
-# Boneh-Lynn-Shacham Identity Based Signature
-# 
-# From: "D. Boneh, B. Lynn, H. Shacham Short Signatures from the Weil Pairing"
-# Published in: Journal of Cryptology 2004
-# Available from: http://
-# Notes: This is the IBE (2-level HIBE) implementation of the HIBE scheme BB_2.
-#
-# type:           signature (identity-based)
-# setting:        bilinear groups (asymmetric)
-#
-# Implementer:    Joseph Ayo Akinyele
-# Date:            1/2011
+'''
+Boneh-Lynn-Shacham Identity Based Signature
+ 
+| From: "D. Boneh, B. Lynn, H. Shacham Short Signatures from the Weil Pairing"
+| Published in: Journal of Cryptology 2004
+| Available from: http://
+| Notes: This is the IBE (2-level HIBE) implementation of the HIBE scheme BB_2.
+
+* type:           signature (identity-based)
+* setting:        bilinear groups (asymmetric)
+
+:Authors:    Joseph Ayo Akinyele
+:Date:            1/2011
+ '''
 from toolbox.pairinggroup import *
 from charm.engine.util import *
 

@@ -1,20 +1,20 @@
 #!/usr/bin/python
 
-# Cramer-Shoup Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption in groups of prime order)
-# 
-# From: "R. Cramer, V. Shoup: A practical public key cryptosystem provably secure against adaptive chosen ciphertext attack"
-# Published in: CRYPTO 1998
-# Available from: http://knot.kaist.ac.kr/seminar/archive/46/46.pdf
-# Notes: 
-#
-# type:			encryption (public key)
-# setting:		DDH-hard prime order group
-# assumption:	DDH
-#
-# Implementer:	Matthew Green
-# Date:			1/2011
-# Name:         PKEnc_DDH_CCA_CS98
+'''
+Cramer-Shoup Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption in groups of prime order)
+ 
+| From: "R. Cramer, V. Shoup: A practical public key cryptosystem provably secure against adaptive chosen ciphertext attack"
+| Published in: CRYPTO 1998
+| Available from: http://knot.kaist.ac.kr/seminar/archive/46/46.pdf
+| Notes: 
 
+* type:			encryption (public key)
+* setting:		DDH-hard prime order group
+* assumption:	DDH
+
+:Authors:	Matthew Green
+:Date:			1/2011
+'''
 from toolbox.integergroup import *
 from toolbox.PKEnc import *
 

@@ -1,15 +1,17 @@
-# Pascal Paillier (Public-Key)
-# 
-# From: "Public-Key Cryptosystems Based on Composite Degree Residuosity Classes" 
-# Published in: EUROCRYPT 1999
-# Available from: http://eprint.iacr.org/2009/309.pdf
-# Notes: 
+'''
+Pascal Paillier (Public-Key)
+ 
+| From: "Public-Key Cryptosystems Based on Composite Degree Residuosity Classes" 
+| Published in: EUROCRYPT 1999
+| Available from: http://eprint.iacr.org/2009/309.pdf
+| Notes: 
 
-# type:           public-key encryption (public key)
-# setting:        Integer
-#
-# Implementer:    J Ayo Akinyele
-# Date:            4/2011
+* type:           public-key encryption (public key)
+* setting:        Integer
+
+:Authors:    J Ayo Akinyele
+:Date:            4/2011
+'''
 from charm.integer import *
 from toolbox.PKEnc import *
 

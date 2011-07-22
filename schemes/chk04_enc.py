@@ -1,16 +1,18 @@
-# Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform (generic composition of IBE+signature -> PKE)
-# 
-# From: "R. Canneti, S. Halevi, J. Katz: Chosen-Ciphertext Security from Identity-Based Encryption"
-# Published in: CRYPTO 2004
-# Available from: http://eprint.iacr.org/2003/182
-# Notes: 
-#
-# type:         encryption (public key)
-# setting:      n/a --- requires a selective-ID secure IBE scheme an EU-CMA one-time signature (OTS) scheme
-# assumption:   n/a --- dependent on the underlying primitives
-#
-# Implementer:  Matthew Green
-# Date:         1/2011
+'''
+Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform (generic composition of IBE+signature -> PKE)
+ 
+| From: "R. Canneti, S. Halevi, J. Katz: Chosen-Ciphertext Security from Identity-Based Encryption"
+| Published in: CRYPTO 2004
+| Available from: http://eprint.iacr.org/2003/182
+| Notes: 
+
+* type:         encryption (public key)
+* setting:      n/a --- requires a selective-ID secure IBE scheme an EU-CMA one-time signature (OTS) scheme
+* assumption:   n/a --- dependent on the underlying primitives
+
+:Authors:  Matthew Green
+:Date:         1/2011
+'''
 from toolbox.pairinggroup import *
 from toolbox.PKEnc import *
 from ibe_bb03 import *

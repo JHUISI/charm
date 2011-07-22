@@ -1,13 +1,14 @@
-# From: "Rivest-Shamir-Adleman Standard algorithm".
-# Published in: 1978
-# Security Assumption: RSA factoring
+'''
+| From: "Rivest-Shamir-Adleman Standard algorithm".
+| Published in: 1978
+| Security Assumption: RSA factoring
 
-# type:           public-key encryption
-# setting:        Integer
-#
-# Implementer:    J Ayo Akinyele
-#                 Gary Belvin
-# Date:            05/2011
+* type:           public-key encryption
+* setting:        Integer
+
+:Authors: J Ayo Akinyele, Gary Belvin
+:Date:            07/2011
+'''
 
 from charm.integer import *
 from toolbox.PKEnc import *

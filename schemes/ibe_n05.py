@@ -2,12 +2,12 @@
  
 | From: "David Naccache Secure and Practical Identity-Based Encryption Section 4"
 | Available from: http://eprint.iacr.org/2005/369.pdf
-|
-| type:			encryption (identity-based)
-| setting:		bilinear groups (asymmetric)
-|
-| Implementer:	Gary Belvin
-| Date:			06/2011
+
+* type:			encryption (identity-based)
+* setting:		bilinear groups (asymmetric)
+
+:Authors:	Gary Belvin
+:Date:			06/2011
 ''' 
 
 from charm.cryptobase import *

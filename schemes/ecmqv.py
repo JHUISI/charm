@@ -1,4 +1,4 @@
-# EC-MQV authenticated key agreement protocol
+"""EC-MQV authenticated key agreement protocol"""
 from toolbox.ecgroup import *
 from charm.engine.protocol import *
 from charm.engine.util import *

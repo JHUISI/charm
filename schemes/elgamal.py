@@ -1,13 +1,16 @@
-# El Gamal Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption in groups of prime order)
-# Available from: http://en.wikipedia.org/wiki/ElGamal_encryption
-# Notes: 
-#
-# type:          encryption (public key)
-# setting:       DDH-hard prime order group
-# assumption:    DDH
-#
-# Implementer:    J Ayo Akinyele
-# Date:           3/2011
+'''
+El Gamal Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption in groups of prime order)
+
+| Available from: http://en.wikipedia.org/wiki/ElGamal_encryption
+| Notes: 
+
+* type:          encryption (public key)
+* setting:       DDH-hard prime order group
+* assumption:    DDH
+
+:Authors: J Ayo Akinyele
+:Date:           3/2011
+'''
 
 from toolbox.integergroup import *
 from toolbox.ecgroup import *

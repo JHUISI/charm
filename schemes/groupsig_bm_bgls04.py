@@ -1,15 +1,17 @@
-# Dan Boneh, Xavier Boyen, and Hovav Shacham
-#
-# From: "Short Group Signatures
-# Published in: CRYPTO 2004
-# Available from: n/a
-# Notes: An extended abstract of this paper appeared in Advances in Cryptology (2004)
+'''
+Dan Boneh, Xavier Boyen, and Hovav Shacham
 
-# type:           digital signature scheme
-# setting:        Pairing
-#
-# Implementer:    J Ayo Akinyele
-# Date:           12/2010
+| From: "Short Group Signatures
+| Published in: CRYPTO 2004
+| Available from: n/a
+| Notes: An extended abstract of this paper appeared in Advances in Cryptology (2004)
+
+* type:           digital signature scheme
+* setting:        Pairing
+
+:Authors:    J Ayo Akinyele
+:Date:           12/2010
+'''
 from toolbox.pairinggroup import *
 from toolbox.PKSig import *
 

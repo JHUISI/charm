@@ -1,15 +1,17 @@
-# Groth-Sahai Commitment Scheme
-# 
-# From: "J. Groth, A. Sahai.  Efficient Non-interactive Proof Systems for Bilinear Groups".
-# Published in: Eurocrypt 2008
-# Available from: http://www.cs.ucl.ac.uk/staff/J.Groth/WImoduleFull.pdf
-# Notes: This implements only the SXDH and DLIN instantiations, in prime-order groups.
-#
-# type:			commitment
-# setting:		bilinear groups
-#
-# Implementer:	M Green
-# Date:			6/2011
+''' 
+Groth-Sahai Commitment Scheme
+ 
+| From: "J. Groth, A. Sahai.  Efficient Non-interactive Proof Systems for Bilinear Groups".
+| Published in: Eurocrypt 2008
+| Available from: http://www.cs.ucl.ac.uk/staff/J.Groth/WImoduleFull.pdf
+| Notes: This implements only the SXDH and DLIN instantiations, in prime-order groups.
+
+* type:			commitment
+* setting:		bilinear groups
+
+:Authors:	M Green
+:Date:			6/2011
+'''
 
 from toolbox.pairinggroup import *
 from toolbox.Commit import *
