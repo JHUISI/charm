@@ -1,7 +1,7 @@
 '''
 Created on Jul 5, 2011
 
-@author: urbanus
+:authors: Gary belvin
 '''
 from toolbox.conversion import Conversion
 import unittest

@@ -1,8 +1,9 @@
-# Base class for public-key encryption
-# 
-# Notes: This class implements an interface for a standard public-key encryption scheme.
-#	 A public key encryption consists of four algorithms: (paramgen, keygen, encrypt, decrypt).
-#
+'''
+Base class for public-key encryption
+ 
+Notes: This class implements an interface for a standard public-key encryption scheme.
+A public key encryption consists of four algorithms: (paramgen, keygen, encrypt, decrypt).
+'''
 from toolbox.schemebase import *
 
 class PKEnc(SchemeBase):

@@ -1,8 +1,9 @@
-# Base class for public-key signatures
-# 
-# Notes: This class implements an interface for a standard public-key signature scheme.
-#	 A public key signature consists of three algorithms: (keygen, sign, verify).
-#
+'''
+Base class for public-key signatures
+ 
+Notes: This class implements an interface for a standard public-key signature scheme.
+A public key signature consists of three algorithms: (keygen, sign, verify).
+'''
 from toolbox.schemebase import *
 
 class PKSig(SchemeBase):

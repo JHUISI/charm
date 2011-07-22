@@ -1,7 +1,6 @@
 '''
-Created on Jun 17, 2011
-
-@author: Gary Belvin
+:Date: Jun 17, 2011
+:Authors: Gary Belvin
 '''
 import unittest
 import paddingschemes

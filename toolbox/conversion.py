@@ -1,7 +1,8 @@
 '''
+:Date: Jul 5, 2011
+:Authors: Gary Belvin
+
 This class facilitates conversion between domain spaces
-Created on Jul 5, 2011
-@author: Gary Belvin
 '''
 from charm.integer import *
 import charm.integer
@@ -10,18 +11,22 @@ import math
 
 class Conversion(object):
     '''
+    The goal is to convert arbitrarily between any of the following types 
+    
     Input types:
-        bytes
-        Bytes
-        int
-        Integer Element
-        Modular Integer Element
+    
+    * bytes
+    * Bytes
+    * int
+    * Integer Element
+    * Modular Integer Element
     
     Output types:
-        int
-        Group element
-        Integer element
-        Integer element mod N
+    
+    * int
+    * Group element
+    * Integer element
+    * Integer element mod N
     '''
     
     @classmethod
@@ -40,9 +45,11 @@ class Conversion(object):
      
     @classmethod    
     def OS2IP(self, bytestr, element = False):
-        '''Converts a byte string to an integer'''
-        '''Returns a python int if element is False.
-           Returns a integer.Element if element is True'''
+        '''
+        :Return: A python ``int`` if element is False. An ``integer.Element`` if element is True
+        
+        Converts a byte string to an integer
+        '''
         
         val = 0 
         for i in range(len(bytestr)):
@@ -59,9 +66,13 @@ class Conversion(object):
     
     @classmethod    
     def IP2OS(self, number, xLen=None):
-        '''integer is a normal integer - not modular'''
-        '''xLen is the intended length of the resulting octet string'''
-        '''Converts an integer into a byte string'''
+        '''
+        :Parameters:
+          - ``number``: is a normal integer, not modular
+          - ``xLen``: is the intended length of the resulting octet string
+        
+        Converts an integer into a byte string'''
+        
         ba = bytearray()
         
         if xLen == None:

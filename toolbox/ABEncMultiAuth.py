@@ -1,8 +1,10 @@
-# Base class for attribute-based encryption multi-authority
-# 
-# Notes: This class implements an interface for a standard attribute-based encryption scheme.
-#        A public key attribute-based encryption scheme consists of four algorithms: 
-#        (setup, authsetup, keygen, encrypt, decrypt).
+''' Base class for attribute-based encryption multi-authority
+ 
+ Notes: This class implements an interface for a standard attribute-based encryption scheme.
+ 
+A public key attribute-based encryption scheme consists of four algorithms: 
+(setup, authsetup, keygen, encrypt, decrypt).
+'''
 from toolbox.schemebase import *
 
 class ABEncMultiAuth(SchemeBase):

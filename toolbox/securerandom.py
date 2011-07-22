@@ -1,6 +1,6 @@
 '''
 Base class for cryptographic secure random number generation
-@author: Gary Belvin
+:authors: Gary Belvin
 '''
 import random
 from toolbox.bitstring import Bytes
@@ -24,12 +24,16 @@ class SecureRandomFactory():
     '''
     This class provides a central place to swap out the randomness engine
     used by the charm framework.
-    Classes should call rand = SecureRandomFactory.getInstance() 
+    Classes should call ``rand = SecureRandomFactory.getInstance()`` 
     to acquire a randomnesss generator
     '''
     
     @classmethod
     def getInstance(self):
+        '''getInstance currently returns a *completely* broken random number generator.
+        
+        .. todo:: replace with a secure, hash-based PRNG
+        '''
         return WeakRandom()
     
     
@@ -46,8 +50,8 @@ class WeakRandom(SecureRandom):
     @classmethod
     def myrandom(self, length, printable=False):
         '''
-        This method does NOT provide cryptographically secure random numbers
-        This should NOT be used for production code
+        This method does **NOT** provide cryptographically secure random numbers.
+        This should **NOT** be used for production code
         '''
         
         if(printable):

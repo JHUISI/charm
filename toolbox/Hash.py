@@ -1,11 +1,12 @@
-# Base class for Hash functions
-# 
-# Notes: This class implements an interface for a standard hash function scheme.
-#	 A hash function consists of two algorithms: (paramgen or keygen and hash).
-#
 from toolbox.schemebase import *
 
 class Hash(SchemeBase):
+    ''' Base class for Hash functions
+
+    Notes: This class implements an interface for a standard hash function scheme.
+    A hash function consists of two algorithms: (paramgen or keygen and hash).
+    '''
+    
     def __init__(self):
         SchemeBase.__init__(self)
         SchemeBase.setProperty(self, scheme='Hash')
@@ -17,12 +18,15 @@ class Hash(SchemeBase):
     def hash(self, *args):
         raise NotImplementedError
 
-# Notes: This class implements an interface for a chameleon hash function. 
-# A standard charmeleon hash scheme has two algorithms paramgen and hash.
-# paramgen accepts a security parameter and the length of p and q. Hash accepts
-# public key, label, a message and a random element.
 
 class ChamHash(Hash):
+    '''
+    Notes: This class implements an interface for a chameleon hash function. 
+    A standard charmeleon hash scheme has two algorithms paramgen and hash.
+    paramgen accepts a security parameter and the length of p and q. Hash accepts
+    public key, label, a message and a random element.
+    '''
+    
     def __init__(self):
         Hash.__init__(self)
         Hash.setProperty(self, scheme='ChamHash')

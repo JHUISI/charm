@@ -1,24 +1,27 @@
-from enum import *
-import string
+''' Operators in Batch language:
 
-''' Operators in Batch language: 
-EXP - '^' for exponent
-EQ - ':=' for assignment
-EQ_TST - '==' for equality testing
-PAIR - 'e(' arg1, arg2 ')'
-CONST - 'constant' declarator?
-VARIABLE - 'variable' declarator?
-PROD - 'prod{i:=1,N}' applied to 
-ARR - 'a_1' for an array, a, with index = 1
+* EXP - '^' for exponent
+* EQ - ':=' for assignment
+* EQ_TST - '==' for equality testing
+* PAIR - 'e(' arg1, arg2 ')'
+* CONST - 'constant' declarator?
+* VARIABLE - 'variable' declarator?
+* PROD - 'prod{i:=1,N}' applied to 
+* ARR - 'a_1' for an array, a, with index = 1
 
 e.g., prod{i:=1,N} on pk_i ^ del_i 
 
 AST simple rules
-- check constraints assignment node exists.
-- check verify assignment node exists.
-- check variables have appropriate assignment types.
-- support batch for different messages/signers/public keys.
+
+* check constraints assignment node exists.
+* check verify assignment node exists.
+* check variables have appropriate assignment types.
+* support batch for different messages/signers/public keys.
 '''
+
+from enum import *
+import string
+
 types = Enum('G1', 'G2', 'GT', 'ZR', 'str')
 declarator = Enum('constants', 'verify')
 ops = Enum('BEGIN', 'MUL', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'PROD', 'ON', 'END')

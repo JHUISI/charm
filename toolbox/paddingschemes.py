@@ -1,4 +1,4 @@
-# A collection of encryption and signature padding schemes
+'''A collection of encryption and signature padding schemes'''
 from toolbox.bitstring import Bytes
 from toolbox.securerandom import SecureRandomFactory
 import charm.cryptobase
@@ -6,14 +6,17 @@ import hashlib
 import math
 import struct
 
-# OAEPEncryptionPadding
-#
-# Implements the OAEP padding scheme.  Appropriate for RSA-OAEP encryption.
-# Implemented according to PKCS#1 v2.1 Section 7 ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf
-
 debug = False
 
 class OAEPEncryptionPadding:
+    '''
+    :Authors: Gary Belvin
+    
+    OAEPEncryptionPadding
+    
+    Implements the OAEP padding scheme.  Appropriate for RSA-OAEP encryption.
+    Implemented according to PKCS#1 v2.1 Section 7 ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf
+    '''
     def __init__(self, _hash_type ='sha1'):
         self.hashFn = hashFunc(_hash_type)
         self.hashFnOutputBytes = len(hashlib.new(_hash_type).digest())
@@ -22,9 +25,9 @@ class OAEPEncryptionPadding:
     #             - the intended length of the encoded message 
     # emLen = the length of the rsa modulus in bits
     def encode(self, message, emLen, label="", seed=None):
+        ''':Return: a Bytes object'''
         # Skipped: label input length checking. (L must be less than 2^61 octets for SHA1)
         # First, make sure the message isn't too long.    emLen
-        '''Returns a Bytes object'''
         hLen = self.hashFnOutputBytes
         if (len(message) > (emLen - (2 * hLen) - 2)):
             assert False, "message too long"
@@ -97,12 +100,15 @@ class OAEPEncryptionPadding:
         M = DB[DB.find(b'\x01')+1 : ]
         return M
 
-# MGF1 Mask Generation Function
-#
-# Implemented according to PKCS #1 specification, see appendix B.2.1:
-# hLen is the output length of the hash functionA\x87\x0bZ\xb0)\xe6W\xd9WP\xb5L(<\x08r]\xbe\xa9
-# maskBytes - the number of mask bytes to return
 def MGF1(seed:Bytes, maskBytes:int, hashFn, hLen:int):
+    ''' MGF1 Mask Generation Function
+    
+    Implemented according to PKCS #1 specification, see appendix B.2.1:
+    
+    :Parameters:
+       - ``hLen``: is the output length of the hash function
+       - ``maskBytes``: the number of mask bytes to return
+    '''
     debug = False
     # Skipped output size checking.  Must be less than 2^32 * hLen
     #result = b''.join([hashFn(struct.pack(">sI", seed, i)) for i in range(math.ceil(maskBytes / hashOutputBytes) - 1)])
@@ -135,12 +141,15 @@ class hashFunc:
             h.update(bytes(message)) # bytes or custom Bytes
         return Bytes(h.digest())  
     
-# PSSSignaturePadding
-#
-# Implements the PSS signature padding scheme.  Appropriate for RSA-PSS signing
-# Implemented according to section 8 of PKCS1v2-1.pdf.
-#
-class PSSPadding: # NEEDS DEBUGGING FOR RSASig
+class PSSPadding:
+    '''
+    :Authors: Gary Belvin
+    
+    PSSSignaturePadding
+    
+    Implements the PSS signature padding scheme.  Appropriate for RSA-PSS signing. 
+    Implemented according to section 8 of ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf.
+    '''
     def __init__(self, _hash_type ='sha1'):
         self.hashFn = hashFunc(_hash_type)
         self.hLen = len(hashlib.new(_hash_type).digest())
@@ -217,9 +226,11 @@ class PSSPadding: # NEEDS DEBUGGING FOR RSASig
     def verify(self, M, EM, emBits=None):
         '''
         Verifies that EM is a correct encoding for M
-        M - the message to verify
-        EM - the encoded message
-        return true for 'consistent' or false for 'inconsistent'
+        
+        :Parameters:
+           - M - the message to verify
+           - EM - the encoded message
+        :Return: true for 'consistent' or false for 'inconsistent'
         '''
         if debug: print("PSS Decoding:")
         

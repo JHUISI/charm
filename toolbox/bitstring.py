@@ -1,3 +1,7 @@
+'''
+``bistring.Bytes`` is a replacement for Python's ``byte``.
+'''
+
 import string
 
 class Bytes(bytes):
@@ -8,6 +12,7 @@ class Bytes(bytes):
            bytes.__init__(value)
 
     def __xor__(self, other):
+        '''Overload the ``^`` operator to provide xor '''
         if len(self) != len(other):
             assert False, "Xor: operands differ in length."
         res = bytearray()
@@ -20,6 +25,7 @@ class Bytes(bytes):
     
     @classmethod
     def fill(self, prefix, length):
+        '''Provides an easy way to create a byte array of a specified length and content'''
         bits = b''
         for i in range(0, length):
             bits += prefix

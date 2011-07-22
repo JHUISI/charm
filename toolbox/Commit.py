@@ -1,10 +1,11 @@
-# Base class for commitment schemes 
-# 
-# Notes: This class implements an interface for a standard commitment scheme.
-#	 A commitment scheme consists of three algorithms: (setup, commit, decommit).
-# Allows one to commit to a value while keeping it hidden, with the ability
-# to reveal the committed value later (wiki).
-#
+''' Base class for commitment schemes 
+ 
+ Notes: This class implements an interface for a standard commitment scheme.
+	 A commitment scheme consists of three algorithms: (setup, commit, decommit).
+	 
+ Allows one to commit to a value while keeping it hidden, with the ability
+ to reveal the committed value later (wiki).
+'''
 from toolbox.schemebase import *
 
 class Commitment(SchemeBase):

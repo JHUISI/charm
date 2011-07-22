@@ -1,8 +1,10 @@
-# Base class for attribute-based encryption
-# 
-# Notes: This class implements an interface for a standard attribute-based encryption scheme.
-#        A public key attribute-based encryption scheme consists of four algorithms: 
-#        (setup, keygen, encrypt, decrypt).
+''' Base class for attribute-based encryption
+ 
+ Notes: This class implements an interface for a standard attribute-based encryption scheme.
+ 
+ A public key attribute-based encryption scheme consists of four algorithms: 
+ (setup, keygen, encrypt, decrypt).
+'''
 from toolbox.schemebase import *
 
 class ABEnc(SchemeBase):

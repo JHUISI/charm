@@ -1,7 +1,8 @@
 from toolbox.enum import *
-# Base class for all crypto, which defines certain attributes
+
 
 class SchemeBase:
+    '''Base class for all crypto, which defines certain attributes'''
     def __init__(self):
         self.baseSchemeTypes = Enum('PKEnc', 'PKSig', 'IBEnc', 'IBSig', 'ABEnc', 'Commitment', 'Hash', 'Protocol')
 	    # self.baseSecDefs defined by derived scheme types
