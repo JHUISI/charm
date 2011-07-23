@@ -29,18 +29,24 @@
 //#define debug(...)
 //#endif
 
+#define ErrorMsg(msg) \
+	PyErr_SetString(IntegerError, msg); \
+	return NULL;
+
 #define Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value)  \
 	if(PyInteger_Check(o1)) { \
 		lhs = (Integer *) o1; } \
 	else if(PyLong_Check(o1)) { \
 		lhs_value = PyLong_AsLong(o1); \
 		foundLHS = TRUE;  } \
+	else { ErrorMsg("invalid left operand type."); } \
 							\
 	if(PyInteger_Check(o2)) {  \
 		rhs = (Integer *) o2; } \
 	else if(PyLong_Check(o2)) {  \
 		rhs_value = PyLong_AsLong(o2); \
-		foundRHS = TRUE; }
+		foundRHS = TRUE; }  \
+	else { ErrorMsg("invalid right operand type."); }
 
 
 #define Check_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS)  \
@@ -48,15 +54,14 @@
 		lhs = (Integer *) o1; } \
 	else if(PyLong_Check(o1)) { \
 		foundLHS = TRUE;  } \
+	else { ErrorMsg("invalid left operand type."); } \
 							\
 	if(PyInteger_Check(o2)) {  \
 		rhs = (Integer *) o2; } \
 	else if(PyLong_Check(o2)) {  \
-		foundRHS = TRUE; }
+		foundRHS = TRUE; }  \
+	else { ErrorMsg("invalid right operand type."); }
 
-#define ErrorMsg(msg) \
-	PyErr_SetString(IntegerError, msg); \
-	return NULL;
 
 /* Index numbers for different hash functions.  These are all implemented as SHA1(index || message).	*/
 #define HASH_FUNCTION_STR_TO_Zr_CRH		0

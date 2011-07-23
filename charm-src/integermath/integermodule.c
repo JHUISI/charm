@@ -267,7 +267,7 @@ static PyObject *Integer_equals(PyObject *o1, PyObject *o2, int opid) {
 		return NULL;
 	}
 
-	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value)
+	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value);
 	mpz_t l,r;
 	if(foundLHS) {
 		debug("foundLHS\n");
@@ -310,7 +310,7 @@ static PyObject *Integer_equals(PyObject *o1, PyObject *o2, int opid) {
 				mpz_clear(r);
 			}
 			else {
-				ErrorMsg("cannot compare integers with different modulus.")
+				ErrorMsg("cannot compare integers with different modulus.");
 			}
 		}
 	}
@@ -405,13 +405,11 @@ static PyObject *Integer_add(PyObject *o1, PyObject *o2) {
 	if(foundLHS) {
 		// debug("foundLHS\n");
 		rop = createNewInteger(rhs->m);
-//		_reduce(rhs);
 		mpz_add_ui(rop->e, rhs->e, lhs_value);
 	}
 	else if(foundRHS) {
 		// debug("foundRHS!\n");
 		rop = createNewInteger(lhs->m);
-//		_reduce(lhs);
 		mpz_add_ui(rop->e, lhs->e, rhs_value);
 	}
 	else {
@@ -419,7 +417,6 @@ static PyObject *Integer_add(PyObject *o1, PyObject *o2) {
 			debug("Modulus equal? %d =?= 0\n", mpz_cmp(lhs->m, rhs->m));
 			if(mpz_cmp(lhs->m, rhs->m) == 0) {
 				rop = createNewInteger(lhs->m);
-//				_reduce(lhs);
 				mpz_add(rop->e, lhs->e, rhs->e);
 			}
 			else {
@@ -444,13 +441,11 @@ static PyObject *Integer_sub(PyObject *o1, PyObject *o2) {
 	if(foundLHS) {
 		// debug("foundLHS\n");
 		rop = createNewInteger(rhs->m);
-//		_reduce(rhs);
 		mpz_ui_sub(rop->e, lhs_value, rhs->e);
 	}
 	else if(foundRHS) {
 		// debug("foundRHS!\n");
 		rop = createNewInteger(lhs->m);
-//		_reduce(lhs);
 		mpz_sub_ui(rop->e, lhs->e, rhs_value);
 	}
 	else {
@@ -650,16 +645,16 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 			mpz_clear(exp);
 		}
 	}
-/*	else if(foundRHS && rhs_value == -1) {
+	else if(foundLHS) {
 		// find modular inverse
-		debug("find modular inverse?\n");
-		PyObject *obj = Integer_invert((PyObject *) lhs);
-		if(obj == NULL) {
-			return NULL;
-		}
-		rop = (Integer *) obj;
+//		debug("find modular inverse?\n");
+//		PyObject *obj = Integer_invert((PyObject *) lhs);
+//		if(obj == NULL) {
+//			return NULL;
+//		}
+//		rop = (Integer *) obj;
+		ErrorMsg("left operand should be a charm.integer type.");
 	}
-*/
 	else {
 		if(lhs->initialized && rhs->initialized) {
 				// result takes modulus of base
@@ -712,10 +707,7 @@ static PyObject *Integer_hash(PyObject *self, PyObject *args) {
 
 	if(PyArg_ParseTuple(args, "OOO|i", &object, &order, &order2, &modP)) {
 		// one single integer group element
-//		if(PyLong_Check(order) && PyLong_Check(order2)) {
 		if(PyInteger_Check(order) && PyInteger_Check(order2)) {
-//			longObjToMPZ(p, (PyLongObject *) order);
-//			longObjToMPZ(q, (PyLongObject *) order2);
 			pObj = (Integer *) order;
 			qObj = (Integer *) order2;
 			mpz_set(p, pObj->e);
@@ -918,8 +910,7 @@ static PyObject *Integer_hash(PyObject *self, PyObject *args) {
 		// a tuple of various elements
 
 	}
-//	PyErr_SetString(IntegerError, "invalid input.");
-//	return NULL;
+
 cleanup:
 	mpz_clear(v);
 	mpz_clear(p);
@@ -1062,7 +1053,6 @@ static PyObject *genRandom(Integer *self, PyObject *args) {
 	PyObject *obj = NULL;
 	Integer *rop = NULL;
 	mpz_t N;
-//	gmp_randstate_t state;
 
 	if(!self->state_init) {
 		PyErr_SetString(IntegerError, "random number generator not initialized.");
@@ -1205,7 +1195,7 @@ static PyObject *encode_message(PyObject *self, PyObject *args) {
 				debug("true case: just return y.\n");
 				print_mpz(p, 10);
 				print_mpz(tmp, 10);
-//				rop2 = mpzToLongObj(tmp);
+
 				rop2 = createNewInteger(p);
 				mpz_set(rop2->e, tmp);
 		}
@@ -1219,7 +1209,7 @@ static PyObject *encode_message(PyObject *self, PyObject *args) {
 				print_mpz(tmp, 10);
 				debug("p...\n");
 				print_mpz(p, 10);
-				// rop2 = mpzToLongObj(tmp);
+
 				rop2 = createNewInteger(p);
 				mpz_set(rop2->e, tmp);
 		}
@@ -1245,7 +1235,6 @@ static PyObject *decode_message(PyObject *self, PyObject *args)
 			mpz_init(q);
 
 			// convert to mpz_t types...
-			// longObjToMPZ(elem, (PyLongObject *) element);
 			elem = (Integer *) element;
 			pObj = (Integer *) order;
 			qObj = (Integer *) order2;
@@ -1268,7 +1257,6 @@ static PyObject *decode_message(PyObject *self, PyObject *args)
 			unsigned char *Rop = (unsigned char *) mpz_export(NULL, &count, 1, sizeof(char),0, 0, elem->e);
 			debug("rop => '%s'\n", Rop);
 			debug("count => '%zd'\n", count);
-			// mpz_clear(elem);
 			mpz_clear(p);
 			mpz_clear(q);
 			return PyUnicode_FromFormat("%s", (const char *) Rop);
@@ -1427,7 +1415,7 @@ static PyObject *legendre(PyObject *self, PyObject *args)
 		}
 	}
 
-	ErrorMsg("invalid input.")
+	ErrorMsg("invalid input.");
 }
 
 static PyObject *gcdCall(PyObject *self, PyObject *args) {
@@ -1444,7 +1432,7 @@ static PyObject *gcdCall(PyObject *self, PyObject *args) {
 			Integer *tmp = (Integer *) obj1;
 			mpz_set(op1, tmp->e);
 		}
-		else { ErrorMsg("invalid argument type: 1") }
+		else { ErrorMsg("invalid argument type: 1"); }
 
 		if(PyLong_Check(obj2)) {
 			mpz_init(op2);
@@ -1455,7 +1443,7 @@ static PyObject *gcdCall(PyObject *self, PyObject *args) {
 			Integer *tmp = (Integer *) obj2;
 			mpz_set(op2, tmp->e);
 		}
-		else { mpz_clear(op1); ErrorMsg("invalid argument type: 2") }
+		else { mpz_clear(op1); ErrorMsg("invalid argument type: 2"); }
 
 		Integer *rop = createNewIntegerNoMod();
 		mpz_gcd(rop->e, op1, op2);
@@ -1464,7 +1452,7 @@ static PyObject *gcdCall(PyObject *self, PyObject *args) {
 		return (PyObject *) rop;
 	}
 
-	ErrorMsg("invalid input.")
+	ErrorMsg("invalid input.");
 }
 
 static PyObject *lcmCall(PyObject *self, PyObject *args) {
@@ -1481,7 +1469,7 @@ static PyObject *lcmCall(PyObject *self, PyObject *args) {
 			Integer *tmp = (Integer *) obj1;
 			mpz_set(op1, tmp->e);
 		}
-		else { ErrorMsg("invalid argument type: 1") }
+		else { ErrorMsg("invalid argument type: 1"); }
 
 		if(PyLong_Check(obj2)) {
 			mpz_init(op2);
@@ -1492,7 +1480,7 @@ static PyObject *lcmCall(PyObject *self, PyObject *args) {
 			Integer *tmp = (Integer *) obj2;
 			mpz_set(op2, tmp->e);
 		}
-		else { mpz_clear(op1); ErrorMsg("invalid argument type: 2") }
+		else { mpz_clear(op1); ErrorMsg("invalid argument type: 2"); }
 
 		Integer *rop = createNewIntegerNoMod();
 		mpz_lcm(rop->e, op1, op2);
@@ -1501,7 +1489,7 @@ static PyObject *lcmCall(PyObject *self, PyObject *args) {
 		return (PyObject *) rop;
 	}
 
-	ErrorMsg("invalid input.")
+	ErrorMsg("invalid input.");
 }
 
 static PyObject *serialize(PyObject *self, PyObject *args) {
@@ -1545,32 +1533,16 @@ static PyObject *serialize(PyObject *self, PyObject *args) {
 }
 
 static PyObject *deserialize(PyObject *self, PyObject *args) {
-//	Integer *obj = NULL;
 	PyObject *bytesObj = NULL;
 
 	if(!PyArg_ParseTuple(args, "O", &bytesObj)) {
 		ErrorMsg("invalid argument.");
 	}
 
-	ErrorMsg("Not implemented yet");
+	/* TODO: need to finish this method. */
+	Py_INCREF(Py_NotImplemented);
+	return Py_NotImplemented;
 }
-
-// class method for conversion
-// integer.toString(x) => 'blah blah'
-//static PyObject *toString(PyObject *self, PyObject *args) {
-//	Integer *intObj = NULL;
-//
-//	if(PyInteger_Check(args)) {
-//		intObj = (Integer *) args;
-//		size_t count = 0;
-//		unsigned char *Rop = (unsigned char *) mpz_export(NULL, &count, 1, sizeof(char),0, 0, intObj->e);
-//		debug("Rop => '%s', len =>'%d'\n", Rop, count);
-//		// need a way to convert to a proper string?
-//		return PyUnicode_DecodeASCII( (const char *) Rop, (Py_ssize_t) count, NULL);
-//	}
-//
-//	ErrorMsg("invalid type.");
-//}
 
 // class method for conversion
 // integer.toBytes(x) => b'blah blah'
@@ -1607,18 +1579,10 @@ static PyObject *Integer_xor(PyObject *self, PyObject *other) {
 }
 
 /* END: helper function definition */
-
-/*static PyMemberDef Integer_members[] = {
-	{"initialized", T_INT, offsetof(Integer, initialized), 0,
-			"determine initialization status"},
-	{NULL}
-};
-*/
-
-InitBenchmark_CAPI(_init_benchmark, dBench, 3)
-StartBenchmark_CAPI(_start_benchmark, dBench)
-EndBenchmark_CAPI(_end_benchmark, dBench)
-GetBenchmark_CAPI(_get_benchmark, dBench)
+InitBenchmark_CAPI(_init_benchmark, dBench, 3);
+StartBenchmark_CAPI(_start_benchmark, dBench);
+EndBenchmark_CAPI(_end_benchmark, dBench);
+GetBenchmark_CAPI(_get_benchmark, dBench);
 
 PyMethodDef Integer_methods[] = {
 	{"set", (PyCFunction)Integer_set, METH_VARARGS, "initialize with another integer object."},
@@ -1738,7 +1702,6 @@ static PyMethodDef module_methods[] = {
 	{"StartBenchmark", (PyCFunction)_start_benchmark, METH_VARARGS, "Start a new benchmark with some options"},
 	{"EndBenchmark", (PyCFunction)_end_benchmark, METH_VARARGS, "End a given benchmark"},
 	{"GetBenchmark", (PyCFunction)_get_benchmark, METH_VARARGS, "Returns contents of a benchmark object"},
-//	{"int2String", (PyCFunction)toString, METH_O, "convert an integer object to a string object."},
 	{"int2Bytes", (PyCFunction)toBytes, METH_O, "convert an integer object to a bytes object."},
 	{NULL, NULL}
 };
@@ -1801,7 +1764,6 @@ void initinteger(void) 		{
     PyModule_AddObject(m, "integer", (PyObject *)&IntegerType);
 
 	// add integer error to module
-//    PyModule_AddObject(m, "integer.error", IntegerError);
 	PyModule_AddIntConstant(m, "CpuTime", CPU_TIME);
 	PyModule_AddIntConstant(m, "RealTime", REAL_TIME);
 	PyModule_AddIntConstant(m, "NativeTime", NATIVE_TIME);
