@@ -56,9 +56,9 @@ if platform.system() == 'Linux':
    if opt.get('INT_MOD') == 'yes': integer_module.sources.append(path+'utils/benchmarkmodule.c')
    if opt.get('ECC_MOD') == 'yes': ecc_module.sources.append(path+'utils/benchmarkmodule.c')
 
-setup(name = 'Charm-Crypto-Module',
+setup(name = 'Charm-Crypto',
 	ext_package = 'charm',
-	version = _charm_version,
+	version =  _charm_version,
 	description = 'Charm is a framework for rapid prototyping of cryptosystems',
 	ext_modules = _ext_modules,
 	author = "J Ayo Akinyele",

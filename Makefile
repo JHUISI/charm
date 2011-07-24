@@ -106,7 +106,7 @@ build: setup build-gmp build-pbc build-pyparse
 
 .PHONY: source
 source:
-	$(PYTHON) setup.py sdist
+	$(PYTHON) setup.py sdist # --manifest-only
 
 .PHONY: install
 install:
