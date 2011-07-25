@@ -1,5 +1,7 @@
 include VERSION README INSTALL configure Makefile
+recursive-include param/ *.param
 recursive-include tests/ *.py
 recursive-include charm-src/ *.h *.c *.py
 prune build
 graft doc
+graft doc/build
