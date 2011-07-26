@@ -28,7 +28,7 @@ all:
 	@echo "make install - Install on local system."
 	@echo "make clean - Get rid of scratch and byte files."
 	@echo "make test  - Run Unit Tests."
-	@echo "make doc   - Compile documentation"
+	@echo "make docs   - Compile documentation"
 
 .PHONY: setup
 setup:
@@ -44,7 +44,7 @@ build-pyparse:
 	if test "${PYPARSING}" = "yes" ; then \
 	   echo "Pyparsing installed already."; \
 	elif [ ! -f ${pyparse_version}.tar.gz ]; then \
-	   wget ${pyparse_url}; \
+	   ${wget} ${pyparse_url}; \
 	   tar -zxf ${pyparse_version}.tar.gz -C ${dest_build}; \
 	   cd ${dest_build}/${pyparse_version}; \
 	   ${PYTHON} setup.py install; \
@@ -63,7 +63,7 @@ build-gmp:
 	if test "${HAVE_LIBGMP}" = "yes" ; then \
            echo "GMP installed already."; \
 	elif [ ! -f ${gmp_version}.tar.gz ]; then \
-	   wget ${gmp_url}; \
+	   ${wget} ${gmp_url}; \
 	   tar -zxf ${gmp_version}.tar.gz -C ${dest_build}; \
 	   cd ${dest_build}/${gmp_version}; ./configure ${gmp_options} --prefix=${DESTDIR}; \
 	   ${MAKE} install; \
@@ -84,7 +84,7 @@ build-pbc:
 	if test "${HAVE_LIBPBC}" = "yes" ; then \
 	   echo "PBC installed already."; \
 	elif [ ! -f ${pbc_version}.tar.gz ]; then \
-	   wget ${pbc_url}; \
+	   ${wget} ${pbc_url}; \
 	   tar -zxf ${pbc_version}.tar.gz -C ${dest_build} \
 	   cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR}; \
 	   ${MAKE} install; \
@@ -106,7 +106,7 @@ build: setup build-gmp build-pbc build-pyparse
 
 .PHONY: source
 source:
-	$(PYTHON) setup.py sdist # --manifest-only
+	$(PYTHON) setup.py sdist --formats=gztar,zip # --manifest-only
 
 .PHONY: install
 install:
@@ -117,9 +117,11 @@ test:
 	$(PYTHON) tests/all_unittests.py
 	$(PYTHON) tests/all_schemes.py
 
-.PHONY: doc
-doc:
-	cd doc; ${MAKE} html	
+.PHONY: docs
+docs:
+	if test "${BUILD_DOCS}" = "yes" ; then \
+	${MAKE} -C doc html; \
+	fi
 
 # .PHONY: buildrpm
 # buildrpm:

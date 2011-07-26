@@ -128,6 +128,7 @@ sysconfdir="\${prefix}/etc"
 confsuffix="/charm"
 profiler="no"
 python_path=`which python`
+wget="$(which wget)"
 
 # set -x
 
@@ -671,6 +672,7 @@ echo "python            $python_path"
 echo "python v3         $python3_found"
 echo "install           $install"
 echo "host CPU          $cpu"
+echo "wget              $wget"
 echo "gprof enabled     $gprof"
 echo "profiler          $profiler"
 echo "static build      $static"
@@ -805,6 +807,12 @@ if test "$pairing_pbc" = "yes" ; then
 elif test "$pairing_miracl" = "yes" ; then
     echo "USE_MIRACL=$pairing_miracl" >> $config_mk
     echo "USE_PBC=" >> $config_mk
+fi
+
+if test "$wget" = "" ; then
+   echo "wget not found. Please install first, its required if installing dependencies."
+   rm $config_mk
+   exit -1
 fi
 
 if test "$libm_found" = "no" ; then
