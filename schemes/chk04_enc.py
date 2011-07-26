@@ -62,7 +62,7 @@ class CHK04(PKEnc):
         return ibe.decrypt(pk, dk, c['C'])
 
 def main():
-    groupObj = PairingGroup('a.param')
+    groupObj = PairingGroup('../param/a.param')
     # instantiate an Identity-Based Encryption scheme
     ibe = IBE_BB04(groupObj)
     hash_ibe = HashIDAdapter(ibe, groupObj)

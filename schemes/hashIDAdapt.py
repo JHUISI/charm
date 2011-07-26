@@ -43,7 +43,7 @@ class HashIDAdapter(IBEnc):
         return self.ibenc.decrypt(pk, sk, ct)
 
 def main():
-    group = PairingGroup('a.param')
+    group = PairingGroup('../param/a.param')
     
     ibe = IBE_BB04(group)
     

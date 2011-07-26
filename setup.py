@@ -66,7 +66,7 @@ setup(name = 'Charm-Crypto',
 	url = "http://code.google.com/p/charm-crypto/",
 	packages = ['charm', 'toolbox', 'compiler', 'schemes'],
 	package_dir = {'charm': 'charm-src/charm'},
-	package_data = {'charm':['__init__.py', 'engine/*.py'], 'toolbox':['*.py'], 'compiler':['*.py'], 'schemes':['*.py']},
+    package_data = {'charm':['__init__.py', 'engine/*.py'], 'toolbox':['*.py'], 'compiler':['*.py'], 'schemes':['*.py'], 'param':['*.param']},
         license = 'GPL'
      )
 

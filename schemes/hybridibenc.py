@@ -53,7 +53,7 @@ class HybridIBEnc(IBEnc):
         return message
 
 def main():
-    groupObj = PairingGroup('a.param')
+    groupObj = PairingGroup('../param/a.param')
     ibe = IBE_BB04(groupObj)
     
     hashID = HashIDAdapter(ibe, groupObj)

@@ -6,15 +6,6 @@ Created on Jun 22, 2011
 import unittest
 import os, imp, re, sys, inspect
 
-#A list of all the directories to search
-unittestpaths1 = ['toolbox/', 'schemes/']
-unittestpaths2 = ['../toolbox/', '../schemes/']
-
-if os.access("schemes/", os.R_OK):
-    unittestpaths = unittestpaths1
-elif os.access("../schemes/", os.R_OK):
-    unittestpaths = unittestpaths2
-
 def adjustPYPATH(paths):
     for p in paths:
         if p not in sys.path:
@@ -43,21 +34,29 @@ def collectSubClasses(baseclass, mod_list, path=['.']):
             and obj != baseclass:
                 yield obj
 
-def getAllTestsSuite():
+def getAllTestsSuite(unittestpaths):
     #Collect test cases
     suite = unittest.TestSuite()
     for path in unittestpaths:
         testmodules = [mod for mod in find_modules(path) if re.match(".*_test$", mod)]
         for name in testmodules:
             m = load_module(name, unittestpaths)
-            print("Loading .. %s" % m.__file__)
+            #print("Loading .. %s" % m.__file__)
             suite_n = unittest.TestLoader().loadTestsFromModule(m)
             suite.addTests(suite_n)
     return suite
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
+    #A list of all the directories to search
+    unittestpaths1 = ['toolbox/', 'schemes/']
+    unittestpaths2 = ['../toolbox/', '../schemes/']
+    
+    if os.access("schemes/", os.R_OK):
+        unittestpaths = unittestpaths1
+    elif os.access("../schemes/", os.R_OK):
+        unittestpaths = unittestpaths2
     adjustPYPATH(unittestpaths)
     
     #Run all tests 
-    unittest.TextTestRunner(verbosity=2).run(getAllTestsSuite())
+    unittest.TextTestRunner(verbosity=2).run(getAllTestsSuite(unittestpaths))

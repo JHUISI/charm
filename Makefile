@@ -114,8 +114,7 @@ install:
 	
 .PHONY: test
 test:
-	$(PYTHON) tests/all_unittests.py
-	$(PYTHON) tests/all_schemes.py
+	$(PYTHON) tests/all_tests.py
 
 .PHONY: docs
 docs:

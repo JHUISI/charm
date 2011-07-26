@@ -57,7 +57,7 @@ class HybridABEncMA(ABEncMultiAuth):
         return message
 
 def main():
-    groupObj = PairingGroup('a.param')
+    groupObj = PairingGroup('../param/a.param')
     dabe = Dabe(groupObj)
         
     hyb_abema = HybridABEncMA(dabe, groupObj)

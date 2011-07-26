@@ -1,5 +1,7 @@
 '''
-Boneh-Franklin Identity Based Encryption (NEED TO REWRITE)
+Boneh-Franklin Identity Based Encryption
+ 
+.. todo:: (NEED TO REWRITE Boneh-Franklin Identity Based Encryption)
  
 | From: "D. Boneh, M. Franklin Identity-Based Encryption from the Weil Pairing", Section 4.2.
 | Published in: Crypto 2003
@@ -16,7 +18,7 @@ from toolbox.pairinggroup import *
 from toolbox.hash_module import *
 from toolbox.IBEnc import *
 
-debug = False
+debug = True
 class IBE_BonehFranklin(IBEnc):
     def __init__(self, groupObj):
         IBEnc.__init__(self)
@@ -65,6 +67,7 @@ class IBE_BonehFranklin(IBEnc):
             print('\nEncrypt...')
             print('r => %s' % r)
             print('sig => %s' % sig)
+            print("V'  =>", g_id ** r)
             print('enc_M => %s' % enc_M)
             group.debug(C)
         return C
@@ -78,8 +81,10 @@ class IBE_BonehFranklin(IBEnc):
         r = h.hashToZr(sig, M)
         if(debug):
             print('\nDecrypt....')
-            print('r => %s' % r)
+            print('V   =>', V)
+            print("V'  =>", pair(sk['id'], U))
             print('sig => %s' % sig)
+            print('r => %s' % r)
         if U == r * pk['P']:
             if debug: print("Successful Decryption!!!")
             return M
@@ -97,7 +102,7 @@ class IBE_BonehFranklin(IBEnc):
      
 
 def main():
-    groupObj = PairingGroup('d224.param', 1024)    
+    groupObj = PairingGroup('../param/d224.param', 1024)    
     ibe = IBE_BonehFranklin(groupObj)
     
     (pk, sk) = ibe.setup()
@@ -109,7 +114,8 @@ def main():
     ciphertext = ibe.encrypt(pk, id, m)
 
     msg = ibe.decrypt(pk, key, ciphertext)
-    assert msg == m
+    assert msg == m,  "failed decrypt: \n%s\n%s" % (msg, m)
+    
         
 if __name__ == "__main__":
     debug = True

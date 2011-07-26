@@ -88,7 +88,7 @@ class CPabe(ABEnc):
 
 def main():
     #Get the eliptic curve with the bilinear mapping feature needed.
-    groupObj = PairingGroup('a.param', verbose=True)
+    groupObj = PairingGroup('../param/a.param', verbose=True)
 
     cpabe = CPabe(groupObj)
     (msk, pk) = cpabe.setup()
