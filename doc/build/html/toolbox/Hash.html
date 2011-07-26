@@ -1,0 +1,160 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Hash &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
+    <link rel="next" title="hash_module" href="hash_module.html" />
+    <link rel="prev" title="enum" href="enum.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="hash_module.html" title="hash_module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="enum.html" title="enum"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-Hash">
+<span id="hash"></span><h1>Hash<a class="headerlink" href="#module-Hash" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="Hash.ChamHash">
+<em class="property">class </em><tt class="descclassname">Hash.</tt><tt class="descname">ChamHash</tt><a class="reference internal" href="../_modules/Hash.html#ChamHash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Hash.ChamHash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#Hash.Hash" title="Hash.Hash"><tt class="xref py py-class docutils literal"><span class="pre">Hash.Hash</span></tt></a></p>
+<p>Notes: This class implements an interface for a chameleon hash function. 
+A standard charmeleon hash scheme has two algorithms paramgen and hash.
+paramgen accepts a security parameter and the length of p and q. Hash accepts
+public key, label, a message and a random element.</p>
+<dl class="method">
+<dt id="Hash.ChamHash.hash">
+<tt class="descname">hash</tt><big>(</big><em>pk</em>, <em>prefix</em>, <em>message</em>, <em>r</em><big>)</big><a class="reference internal" href="../_modules/Hash.html#ChamHash.hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Hash.ChamHash.hash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Hash.ChamHash.paramgen">
+<tt class="descname">paramgen</tt><big>(</big><em>secparam</em>, <em>p=None</em>, <em>q=None</em><big>)</big><a class="reference internal" href="../_modules/Hash.html#ChamHash.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Hash.ChamHash.paramgen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Hash.Hash">
+<em class="property">class </em><tt class="descclassname">Hash.</tt><tt class="descname">Hash</tt><a class="reference internal" href="../_modules/Hash.html#Hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Hash.Hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.schemebase.SchemeBase</span></tt></p>
+<p>Base class for Hash functions</p>
+<p>Notes: This class implements an interface for a standard hash function scheme.
+A hash function consists of two algorithms: (paramgen or keygen and hash).</p>
+<dl class="method">
+<dt id="Hash.Hash.hash">
+<tt class="descname">hash</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/Hash.html#Hash.hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Hash.Hash.hash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Hash.Hash.paramgen">
+<tt class="descname">paramgen</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/Hash.html#Hash.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Hash.Hash.paramgen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="enum.html"
+                        title="previous chapter">enum</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="hash_module.html"
+                        title="next chapter">hash_module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/toolbox/Hash.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="hash_module.html" title="hash_module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="enum.html" title="enum"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

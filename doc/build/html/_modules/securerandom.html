@@ -1,0 +1,153 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>securerandom &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for securerandom</h1><pre>
+:authors: Gary Belvin
+'''
+import random
+from toolbox.bitstring import Bytes
+
+class SecureRandom():
+    def __init__(self):
+<div class="viewcode-block" id="SecureRandom"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.SecureRandom">[docs]</a>        pass
+    
+    def getRandomBits(self, length):
+        '''Returns a random bit string of length bytes'''
+<div class="viewcode-block" id="SecureRandom.getRandomBits"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.SecureRandom.getRandomBits">[docs]</a>        raise NotImplementedError
+
+    def addSeedMaterial(self, seed):
+        '''</div>
+<div class="viewcode-block" id="SecureRandom.addSeedMaterial"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.SecureRandom.addSeedMaterial">[docs]</a>        Add randomness to the generator.  
+        Always increases entropy
+        '''
+        raise NotImplementedError
+
+class SecureRandomFactory():
+    '''</div></div>
+<div class="viewcode-block" id="SecureRandomFactory"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.SecureRandomFactory">[docs]</a>    This class provides a central place to swap out the randomness engine
+    used by the charm framework.
+    Classes should call ``rand = SecureRandomFactory.getInstance()`` 
+    to acquire a randomnesss generator
+    '''
+    
+    @classmethod
+    def getInstance(self):
+        '''getInstance currently returns a *completely* broken random number generator.
+<div class="viewcode-block" id="SecureRandomFactory.getInstance"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.SecureRandomFactory.getInstance">[docs]</a>        
+        .. todo:: replace with a secure, hash-based PRNG
+        '''
+        return WeakRandom()
+    
+    
+class WeakRandom(SecureRandom):
+    def __init__(self):</div></div>
+<div class="viewcode-block" id="WeakRandom"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.WeakRandom">[docs]</a>        SecureRandom.__init__(self)
+        
+    def getRandomBits(self, length):
+        return self.myrandom(length, False)
+<div class="viewcode-block" id="WeakRandom.getRandomBits"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.WeakRandom.getRandomBits">[docs]</a>    
+    def addSeedMaterial(self, seed):
+        raise NotImplementedError()</div>
+<div class="viewcode-block" id="WeakRandom.addSeedMaterial"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.WeakRandom.addSeedMaterial">[docs]</a>
+    @classmethod
+    def myrandom(self, length, printable=False):</div>
+        '''
+<div class="viewcode-block" id="WeakRandom.myrandom"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.WeakRandom.myrandom">[docs]</a>        This method does **NOT** provide cryptographically secure random numbers.
+        This should **NOT** be used for production code
+        '''
+        
+        if(printable):
+            #Nice printable characters for testing purposes
+            return Bytes(random.randrange(0x20, 0x7E) for i in range(length))
+        else:
+            return Bytes(random.randrange(0, 256) for i in range(length))
+    </pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

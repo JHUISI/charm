@@ -1,0 +1,191 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>dabe_aw11 &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
+    <link rel="next" title="dsa" href="dsa.html" />
+    <link rel="prev" title="cs98_enc" href="cs98_enc.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dsa.html" title="dsa"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="cs98_enc.html" title="cs98_enc"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-dabe_aw11">
+<span id="dabe-aw11"></span><h1>dabe_aw11<a class="headerlink" href="#module-dabe_aw11" title="Permalink to this headline">¶</a></h1>
+<p>Lewko-Waters Decentralized Attribute-Based Encryption</p>
+<p>Lewko, Allison, and Brent Waters, &#8220;Decentralizing Attribute-Based Encryption.&#8221;, Appendix D
+Published in: Eurocrypt 2011
+Available from: <a class="reference external" href="http://eprint.iacr.org/2010/351.pdf">http://eprint.iacr.org/2010/351.pdf</a></p>
+<ul class="simple">
+<li>type:           encryption (identity-based)</li>
+<li>setting:        bilinear groups (asymmetric)</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Gary Belvin</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">06/2011</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="dabe_aw11.Dabe">
+<em class="property">class </em><tt class="descclassname">dabe_aw11.</tt><tt class="descname">Dabe</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../_modules/dabe_aw11.html#Dabe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dabe_aw11.Dabe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.ABEncMultiAuth.ABEncMultiAuth</span></tt></p>
+<p>Decentralized Attribute-Based Encryption by Lewko and Waters</p>
+<dl class="method">
+<dt id="dabe_aw11.Dabe.authsetup">
+<tt class="descname">authsetup</tt><big>(</big><em>GP</em>, <em>attributes</em><big>)</big><a class="reference internal" href="../_modules/dabe_aw11.html#Dabe.authsetup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dabe_aw11.Dabe.authsetup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Authority Setup for a given set of attributes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dabe_aw11.Dabe.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>gp</em>, <em>sk</em>, <em>ct</em><big>)</big><a class="reference internal" href="../_modules/dabe_aw11.html#Dabe.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dabe_aw11.Dabe.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decrypt a ciphertext
+SK is the user&#8217;s private key dictionary {attr: { xxx , xxx }}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dabe_aw11.Dabe.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>gp</em>, <em>M</em>, <em>policy_str</em><big>)</big><a class="reference internal" href="../_modules/dabe_aw11.html#Dabe.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dabe_aw11.Dabe.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encrypt</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dabe_aw11.Dabe.group">
+<tt class="descname">group</tt><em class="property"> = None</em><a class="headerlink" href="#dabe_aw11.Dabe.group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prime order group</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dabe_aw11.Dabe.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>gp</em>, <em>sk</em>, <em>i</em>, <em>gid</em>, <em>pkey</em><big>)</big><a class="reference internal" href="../_modules/dabe_aw11.html#Dabe.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dabe_aw11.Dabe.keygen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a key for GID on attribute i belonging to authority sk
+sk is the private key for the releveant authority
+i is the attribute to give bob
+pkey is bob&#8217;s private key dictionary, to which the appropriate private key is added</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dabe_aw11.Dabe.setup">
+<tt class="descname">setup</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/dabe_aw11.html#Dabe.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dabe_aw11.Dabe.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Global Setup</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="dabe_aw11.main">
+<tt class="descclassname">dabe_aw11.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/dabe_aw11.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dabe_aw11.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="cs98_enc.html"
+                        title="previous chapter">cs98_enc</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="dsa.html"
+                        title="next chapter">dsa</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/schemes/dabe_aw11.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dsa.html" title="dsa"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="cs98_enc.html" title="cs98_enc"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

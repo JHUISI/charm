@@ -1,0 +1,132 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>schemebase &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for schemebase</h1><div class="highlight"><pre>
+<span class="k">class</span> <span class="nc">SchemeBase</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;Base class for all crypto, which defines certain attributes&#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SchemeBase"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.SchemeBase">[docs]</a>        <span class="bp">self</span><span class="o">.</span><span class="n">baseSchemeTypes</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;PKEnc&#39;</span><span class="p">,</span> <span class="s">&#39;PKSig&#39;</span><span class="p">,</span> <span class="s">&#39;IBEnc&#39;</span><span class="p">,</span> <span class="s">&#39;IBSig&#39;</span><span class="p">,</span> <span class="s">&#39;ABEnc&#39;</span><span class="p">,</span> <span class="s">&#39;Commitment&#39;</span><span class="p">,</span> <span class="s">&#39;Hash&#39;</span><span class="p">,</span> <span class="s">&#39;Protocol&#39;</span><span class="p">)</span>
+	    <span class="c"># self.baseSecDefs defined by derived scheme types</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">baseAssumptions</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;DH&#39;</span><span class="p">,</span> <span class="s">&#39;DBDH&#39;</span><span class="p">,</span> <span class="s">&#39;DL&#39;</span><span class="p">)</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">baseSecModels</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;SM&#39;</span><span class="p">,</span> <span class="s">&#39;ROM&#39;</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">secdef</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">assumption</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">message_space</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">secmodel</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">scheme</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">schemeType</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseSchemeTypes</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">secdef</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">secdef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseSecDefs</span><span class="p">[</span><span class="n">secdef</span><span class="p">]</span>
+<div class="viewcode-block" id="SchemeBase.setProperty"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.SchemeBase.setProperty">[docs]</a>        <span class="k">if</span> <span class="n">assumption</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">assumption</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseAssumptions</span><span class="p">[</span><span class="n">assumption</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_space</span> <span class="o">=</span> <span class="n">message_space</span>
+        <span class="k">if</span> <span class="n">secmodel</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">secmodel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseSecModels</span><span class="p">[</span><span class="n">secmodel</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">other</span> <span class="o">=</span> <span class="n">other</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">getProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;schemeType&#39;</span><span class="p">):</span> <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schemeType</span><span class="p">)</span></div>
+<div class="viewcode-block" id="SchemeBase.getProperty"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.SchemeBase.getProperty">[docs]</a>        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;secdef&#39;</span><span class="p">):</span> <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secdef</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;assumption&#39;</span><span class="p">):</span> <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assumption</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;message_space&#39;</span><span class="p">):</span> <span class="n">props</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message_space</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;secmodel&#39;</span><span class="p">):</span> <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secmodel</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span> <span class="n">props</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">other</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">checkProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="p">,</span> <span class="n">prop</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+           <span class="n">values</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>           </div>
+<div class="viewcode-block" id="SchemeBase.checkProperty"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.SchemeBase.checkProperty">[docs]</a>           <span class="c">#print(&quot;values =&gt;&quot;, values)</span>
+           <span class="n">check</span> <span class="o">=</span> <span class="n">scheme</span><span class="o">.</span><span class="n">getProperty</span><span class="p">()</span>
+           <span class="c">#print(&quot;check list =&gt;&quot;, check)</span>
+           <span class="k">if</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">check</span><span class="p">)):</span>
+               <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="bp">False</span>
+</pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,140 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sigma1 &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for sigma1</h1><div class="highlight"><pre>
+<span class="k">class</span> <span class="nc">SigmaProtocol1</span><span class="p">(</span><span class="n">Sigma</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">,</span> <span class="n">common_input</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">Sigma</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">,</span> <span class="n">common_input</span><span class="p">)</span>
+<div class="viewcode-block" id="SigmaProtocol1"><a class="viewcode-back" href="../schemes/sigma1.html#sigma1.SigmaProtocol1">[docs]</a>    
+    <span class="k">def</span> <span class="nf">prover_state1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span> <span class="o">=</span> <span class="n">Sigma</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;h&#39;</span><span class="p">,</span> <span class="s">&#39;H&#39;</span><span class="p">])</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
+<div class="viewcode-block" id="SigmaProtocol1.prover_state1"><a class="viewcode-back" href="../schemes/sigma1.html#sigma1.SigmaProtocol1.prover_state1">[docs]</a>        <span class="n">a</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+        <span class="n">Sigma</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="n">r</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">,</span><span class="n">a</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;h&#39;</span><span class="p">,</span> <span class="n">h</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;H&#39;</span><span class="p">,</span><span class="n">H</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">Sigma</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;r&#39;</span><span class="p">:</span><span class="n">r</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">:</span><span class="n">a</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s">&#39;h&#39;</span><span class="p">:</span><span class="n">h</span><span class="p">,</span> <span class="s">&#39;H&#39;</span><span class="p">:</span><span class="n">H</span> <span class="p">}</span>        
+    
+    <span class="k">def</span> <span class="nf">prover_state3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> <span class="o">=</span> <span class="n">Sigma</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;r&#39;</span><span class="p">,</span><span class="s">&#39;h&#39;</span><span class="p">])</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;c&#39;</span><span class="p">]</span></div>
+<div class="viewcode-block" id="SigmaProtocol1.prover_state3"><a class="viewcode-back" href="../schemes/sigma1.html#sigma1.SigmaProtocol1.prover_state3">[docs]</a>        <span class="n">z</span> <span class="o">=</span> <span class="n">r</span> <span class="o">*</span> <span class="p">(</span><span class="n">h</span> <span class="o">**</span> <span class="o">-</span><span class="n">c</span><span class="p">)</span>
+        <span class="n">Sigma</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;z&#39;</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">Sigma</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;z&#39;</span><span class="p">:</span><span class="n">z</span> <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">prover_state5</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="n">Sigma</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">Sigma</span><span class="o">.</span><span class="n">setErrorCode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span></div>
+<div class="viewcode-block" id="SigmaProtocol1.prover_state5"><a class="viewcode-back" href="../schemes/sigma1.html#sigma1.SigmaProtocol1.prover_state5">[docs]</a>        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">verifier_state2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="n">Sigma</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;g&#39;</span><span class="p">,</span><span class="nb">input</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]),</span> <span class="p">(</span><span class="s">&#39;h&#39;</span><span class="p">,</span><span class="nb">input</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">]),</span> <span class="p">(</span><span class="s">&#39;H&#39;</span><span class="p">,</span><span class="nb">input</span><span class="p">[</span><span class="s">&#39;H&#39;</span><span class="p">])</span> <span class="p">)</span> 
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span></div>
+<div class="viewcode-block" id="SigmaProtocol1.verifier_state2"><a class="viewcode-back" href="../schemes/sigma1.html#sigma1.SigmaProtocol1.verifier_state2">[docs]</a>        <span class="n">Sigma</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;r&#39;</span><span class="p">]),</span> <span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;a&#39;</span><span class="p">]),</span> <span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">Sigma</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;c&#39;</span><span class="p">:</span><span class="n">c</span> <span class="p">}</span>
+        
+    <span class="k">def</span> <span class="nf">verifier_state4</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;z&#39;</span><span class="p">]</span>
+        <span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">Sigma</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">,</span><span class="s">&#39;H&#39;</span><span class="p">,</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;c&#39;</span><span class="p">])</span></div>
+<div class="viewcode-block" id="SigmaProtocol1.verifier_state4"><a class="viewcode-back" href="../schemes/sigma1.html#sigma1.SigmaProtocol1.verifier_state4">[docs]</a>        <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">g</span><span class="p">,</span><span class="n">z</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">H</span> <span class="o">**</span> <span class="n">c</span><span class="p">)):</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;SUCCESS!!!!!!!&quot;</span><span class="p">);</span> <span class="n">result</span> <span class="o">=</span> <span class="s">&#39;OK&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Failed!!!&quot;</span><span class="p">);</span> <span class="n">result</span> <span class="o">=</span> <span class="s">&#39;FAIL&#39;</span>
+        <span class="n">Sigma</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+        <span class="n">Sigma</span><span class="o">.</span><span class="n">setErrorCode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">verifier_state6</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="n">Sigma</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span></div>
+<div class="viewcode-block" id="SigmaProtocol1.verifier_state6"><a class="viewcode-back" href="../schemes/sigma1.html#sigma1.SigmaProtocol1.verifier_state6">[docs]</a></pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,177 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sig_generic_ibetosig_naor01 &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for sig_generic_ibetosig_naor01</h1><div class="highlight"><pre>
+<span class="c"># From: &quot;B. Franklin, M. Franklin: Identity-based encryption from the Weil pairing&quot;</span>
+<span class="c"># Published in: Eurocrypt 2009</span>
+<span class="c"># Available from: http://eprint.iacr.org/2009/028.pdf</span>
+<span class="c"># Notes:	This transform was first described by Boneh and Franklin but credited to Moni Naor.  It</span>
+<span class="c">#			converts any fully-secure IBE sheme into a signature by repurposing the identity key extraction</span>
+<span class="c">#			as a signing algorithm.  To verify, encrypt a random value under the message/identity,</span>
+<span class="c">#			and attempt to decrypt it using the signature/key.  It may be necessary to repeat this process,</span>
+<span class="c">#			depending on the size of the IBE&#39;s plaintext space.  Some IBE schemes support a more efficient</span>
+<span class="c">#			algorithm for verifying the structure of an identity key --- we will use it if it&#39;s available. </span>
+<span class="c">#			Warning: this transform is not secure for selectively-secure schemes!</span>
+<span class="c">#</span>
+<span class="c"># type:			signature (public key)</span>
+<span class="c"># setting:		n/a (any fully-secure IBE scheme)</span>
+<span class="c"># assumption:	n/a (dependent on the IBE scheme)</span>
+<span class="c">#</span>
+<span class="c"># Implementer:	Matthew Green</span>
+<span class="c"># Date:			05/2011</span>
+
+<span class="kn">from</span> <span class="nn">schemes.ibe_bb03</span> <span class="kn">import</span> <span class="n">IBE_BB04</span>
+<span class="kn">from</span> <span class="nn">toolbox.PKSig</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">toolbox.pairinggroup</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="c">#from toolbox.ibe_bb03 import *</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="k">class</span> <span class="nc">Sig_Generic_ibetosig_Naor01</span><span class="p">(</span><span class="n">PKSig</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ibe_scheme</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+<div class="viewcode-block" id="Sig_Generic_ibetosig_Naor01"><a class="viewcode-back" href="../schemes/sig_generic_ibetosig_naor01.html#sig_generic_ibetosig_naor01.Sig_Generic_ibetosig_Naor01">[docs]</a>        <span class="k">global</span> <span class="n">ibe</span><span class="p">,</span> <span class="n">group</span>
+        <span class="n">ibe</span> <span class="o">=</span> <span class="n">ibe_scheme</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+				
+    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">secparam</span><span class="p">)</span>
+<div class="viewcode-block" id="Sig_Generic_ibetosig_Naor01.keygen"><a class="viewcode-back" href="../schemes/sig_generic_ibetosig_naor01.html#sig_generic_ibetosig_naor01.Sig_Generic_ibetosig_Naor01.keygen">[docs]</a>        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Keygen...&quot;</span><span class="p">)</span>
+        <span class="n">group</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">mpk</span><span class="p">)</span>
+        <span class="n">group</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msk</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ibe</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Sig_Generic_ibetosig_Naor01.sign"><a class="viewcode-back" href="../schemes/sig_generic_ibetosig_naor01.html#sig_generic_ibetosig_naor01.Sig_Generic_ibetosig_Naor01.sign">[docs]</a>		
+    <span class="c">#TODO: this method does NOT validate the message it is given</span>
+    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+        <span class="c"># Some IBE scheme support a native method for validating IBE keys.  Use this if it exists.</span></div>
+<div class="viewcode-block" id="Sig_Generic_ibetosig_Naor01.verify"><a class="viewcode-back" href="../schemes/sig_generic_ibetosig_naor01.html#sig_generic_ibetosig_naor01.Sig_Generic_ibetosig_Naor01.verify">[docs]</a>        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ibe</span><span class="p">,</span> <span class="s">&#39;verify&#39;</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
+		
+        <span class="c"># Encrypt a random message in the IBE&#39;s message space and try to decrypt it</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">Random message =&gt;&quot;</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+
+        <span class="n">C</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">],</span> <span class="n">message</span><span class="p">)</span>
+         
+        <span class="k">if</span> <span class="p">(</span><span class="n">ibe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">C</span><span class="p">)</span> <span class="o">==</span> <span class="n">message</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;d224.param&#39;</span><span class="p">)</span></div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/sig_generic_ibetosig_naor01.html#sig_generic_ibetosig_naor01.main">[docs]</a>    
+    <span class="n">ibe</span> <span class="o">=</span> <span class="n">IBE_BB04</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+    
+    <span class="n">ibsig</span> <span class="o">=</span> <span class="n">Sig_Generic_ibetosig_Naor01</span><span class="p">(</span><span class="n">ibe</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">)</span>
+
+    <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span> <span class="o">=</span> <span class="n">ibsig</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+    
+    <span class="c">#M = &quot;I want a signature on this message!&quot;</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+
+    <span class="c">#TODO: M must be in Zp</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">ibsig</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">msk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">Message =&gt;&quot;</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Sigma =&gt;&quot;</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+    
+    <span class="k">assert</span> <span class="n">ibsig</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Verification!!!&quot;</span><span class="p">)</span>
+    <span class="k">del</span> <span class="n">groupObj</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span></div>
+    <span class="n">main</span><span class="p">()</span>
+    
+    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,158 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>hybridenc &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
+    <link rel="next" title="hybridibenc" href="hybridibenc.html" />
+    <link rel="prev" title="hashIDAdapt" href="hashIDAdapt.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="hybridibenc.html" title="hybridibenc"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="hashIDAdapt.html" title="hashIDAdapt"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-hybridenc">
+<span id="hybridenc"></span><h1>hybridenc<a class="headerlink" href="#module-hybridenc" title="Permalink to this headline">¶</a></h1>
+<p>Takes an public-key encryption scheme and builds a hybrid encryption scheme.</p>
+<dl class="class">
+<dt id="hybridenc.HybridEnc">
+<em class="property">class </em><tt class="descclassname">hybridenc.</tt><tt class="descname">HybridEnc</tt><big>(</big><em>pkenc</em>, <em>key_len=16</em>, <em>mode=0</em><big>)</big><a class="reference internal" href="../_modules/hybridenc.html#HybridEnc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hybridenc.HybridEnc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.PKEnc.PKEnc</span></tt></p>
+<dl class="method">
+<dt id="hybridenc.HybridEnc.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>ct</em><big>)</big><a class="reference internal" href="../_modules/hybridenc.html#HybridEnc.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hybridenc.HybridEnc.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hybridenc.HybridEnc.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>M</em><big>)</big><a class="reference internal" href="../_modules/hybridenc.html#HybridEnc.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hybridenc.HybridEnc.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hybridenc.HybridEnc.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>secparam=None</em><big>)</big><a class="reference internal" href="../_modules/hybridenc.html#HybridEnc.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hybridenc.HybridEnc.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hybridenc.HybridEnc.pad">
+<tt class="descname">pad</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="../_modules/hybridenc.html#HybridEnc.pad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hybridenc.HybridEnc.pad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hybridenc.HybridEnc.randomBits">
+<tt class="descname">randomBits</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/hybridenc.html#HybridEnc.randomBits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hybridenc.HybridEnc.randomBits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="hybridenc.main">
+<tt class="descclassname">hybridenc.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/hybridenc.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hybridenc.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="hashIDAdapt.html"
+                        title="previous chapter">hashIDAdapt</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="hybridibenc.html"
+                        title="next chapter">hybridibenc</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/schemes/hybridenc.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="hybridibenc.html" title="hybridibenc"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="hashIDAdapt.html" title="hashIDAdapt"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

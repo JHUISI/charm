@@ -1,0 +1,150 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>PKEnc &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
+    <link rel="next" title="PKSig" href="PKSig.html" />
+    <link rel="prev" title="pairinggroup" href="pairinggroup.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="PKSig.html" title="PKSig"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pairinggroup.html" title="pairinggroup"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-PKEnc">
+<span id="pkenc"></span><h1>PKEnc<a class="headerlink" href="#module-PKEnc" title="Permalink to this headline">¶</a></h1>
+<p>Base class for public-key encryption</p>
+<p>Notes: This class implements an interface for a standard public-key encryption scheme.
+A public key encryption consists of four algorithms: (paramgen, keygen, encrypt, decrypt).</p>
+<dl class="class">
+<dt id="PKEnc.PKEnc">
+<em class="property">class </em><tt class="descclassname">PKEnc.</tt><tt class="descname">PKEnc</tt><a class="reference internal" href="../_modules/PKEnc.html#PKEnc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PKEnc.PKEnc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.schemebase.SchemeBase</span></tt></p>
+<dl class="method">
+<dt id="PKEnc.PKEnc.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>ciphertext</em><big>)</big><a class="reference internal" href="../_modules/PKEnc.html#PKEnc.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PKEnc.PKEnc.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="PKEnc.PKEnc.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>message</em><big>)</big><a class="reference internal" href="../_modules/PKEnc.html#PKEnc.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PKEnc.PKEnc.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="PKEnc.PKEnc.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>securityparam</em><big>)</big><a class="reference internal" href="../_modules/PKEnc.html#PKEnc.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PKEnc.PKEnc.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="PKEnc.PKEnc.paramgen">
+<tt class="descname">paramgen</tt><big>(</big><em>param1=None</em>, <em>param2=None</em><big>)</big><a class="reference internal" href="../_modules/PKEnc.html#PKEnc.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PKEnc.PKEnc.paramgen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pairinggroup.html"
+                        title="previous chapter">pairinggroup</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="PKSig.html"
+                        title="next chapter">PKSig</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/toolbox/PKEnc.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="PKSig.html" title="PKSig"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pairinggroup.html" title="pairinggroup"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,229 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ecmqv &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for ecmqv</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">charm.engine.protocol</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">charm.engine.util</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">socket</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">hmac</span><span class="o">,</span> <span class="nn">sys</span>
+
+<span class="n">SENDER</span><span class="p">,</span> <span class="n">RECEIVER</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="mi">2</span>
+<span class="n">HOST</span><span class="p">,</span> <span class="n">PORT</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="mi">8090</span>
+
+<span class="k">class</span> <span class="nc">ECMQV</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">builtin_cv</span><span class="o">=</span><span class="mi">410</span><span class="p">):</span>
+<div class="viewcode-block" id="ECMQV"><a class="viewcode-back" href="../schemes/ecmqv.html#ecmqv.ECMQV">[docs]</a>        <span class="n">Protocol</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>        
+        <span class="n">receiver_states</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">2</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver_state2</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver_state4</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver_state6</span> <span class="p">}</span>
+        <span class="n">sender_states</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">sender_state1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">sender_state3</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">sender_state5</span> <span class="p">}</span>
+
+        <span class="n">receiver_trans</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">6</span> <span class="p">}</span>
+        <span class="n">sender_trans</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span><span class="mi">5</span> <span class="p">}</span>
+        <span class="c"># describe the parties involved and the valid transitions</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">addPartyType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">RECEIVER</span><span class="p">,</span> <span class="n">receiver_states</span><span class="p">,</span> <span class="n">receiver_trans</span><span class="p">)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">addPartyType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SENDER</span><span class="p">,</span> <span class="n">sender_states</span><span class="p">,</span> <span class="n">sender_trans</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">builtin_cv</span><span class="p">)</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="p">{};</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">setSubclassVars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">sender_state1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># generate private key</span>
+<div class="viewcode-block" id="ECMQV.sender_state1"><a class="viewcode-back" href="../schemes/ecmqv.html#ecmqv.ECMQV.sender_state1">[docs]</a>        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Sender state 1 =&gt;&quot;</span><span class="p">)</span>
+        <span class="n">a</span><span class="p">,</span><span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">g</span><span class="o">**</span><span class="n">a</span><span class="p">;</span> <span class="n">Ra</span> <span class="o">=</span> <span class="n">g</span><span class="o">**</span><span class="n">k</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;A =&gt;&quot;</span><span class="p">,</span> <span class="n">A</span><span class="p">);</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Ra =&gt;&quot;</span><span class="p">,</span> <span class="n">Ra</span><span class="p">);</span> 
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;k&#39;</span><span class="p">,</span><span class="n">k</span><span class="p">),(</span><span class="s">&#39;a&#39;</span><span class="p">,</span><span class="n">a</span><span class="p">),(</span><span class="s">&#39;A&#39;</span><span class="p">,</span><span class="n">A</span><span class="p">),(</span><span class="s">&#39;Ra&#39;</span><span class="p">,</span><span class="n">Ra</span><span class="p">))</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;A&#39;</span><span class="p">:</span><span class="n">A</span><span class="p">,</span> <span class="s">&#39;Ra&#39;</span><span class="p">:</span><span class="n">Ra</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">}</span>
+    
+    <span class="k">def</span> <span class="nf">receiver_state2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="c"># generate private key</span></div>
+<div class="viewcode-block" id="ECMQV.receiver_state2"><a class="viewcode-back" href="../schemes/ecmqv.html#ecmqv.ECMQV.receiver_state2">[docs]</a>        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Receiver state 2 =&gt;&quot;</span><span class="p">)</span>
+        <span class="n">g</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">Ra</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">],</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">],</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;Ra&#39;</span><span class="p">]</span> 
+        <span class="n">b</span><span class="p">,</span><span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">b</span>
+        <span class="n">Rb</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">k</span>
+        <span class="n">sb</span> <span class="o">=</span> <span class="n">k</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">zr</span><span class="p">(</span><span class="o">-</span><span class="n">Rb</span><span class="p">)</span> <span class="o">*</span> <span class="n">b</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;sb =&gt;&quot;</span><span class="p">,</span> <span class="n">sb</span><span class="p">)</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="p">(</span><span class="n">Ra</span> <span class="o">*</span> <span class="n">A</span><span class="p">)</span> <span class="o">**</span> <span class="n">sb</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;receiver Z =&gt;&quot;</span><span class="p">,</span> <span class="n">Z</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">G</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;key =&gt;&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> 
+        <span class="p">(</span><span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">coordinates</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;k1 =&gt;&quot;</span><span class="p">,</span> <span class="n">k1</span><span class="p">);</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;k2 =&gt;&quot;</span><span class="p">,</span> <span class="n">k2</span><span class="p">)</span>
+        <span class="n">tb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mac</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">Rb</span><span class="p">,</span> <span class="n">Ra</span><span class="p">),</span> <span class="n">k1</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;tb =&gt;&quot;</span><span class="p">,</span> <span class="n">tb</span><span class="p">)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;A&#39;</span><span class="p">,</span><span class="n">A</span><span class="p">),(</span><span class="s">&#39;Ra&#39;</span><span class="p">,</span><span class="n">Ra</span><span class="p">),(</span><span class="s">&#39;B&#39;</span><span class="p">,</span><span class="n">B</span><span class="p">),(</span><span class="s">&#39;Rb&#39;</span><span class="p">,</span><span class="n">Rb</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;k1&#39;</span><span class="p">,</span><span class="n">k1</span><span class="p">),(</span><span class="s">&#39;k2&#39;</span><span class="p">,</span><span class="n">k2</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;B&#39;</span><span class="p">:</span><span class="n">B</span><span class="p">,</span> <span class="s">&#39;Rb&#39;</span><span class="p">:</span><span class="n">Rb</span><span class="p">,</span> <span class="s">&#39;tb&#39;</span><span class="p">:</span><span class="n">tb</span><span class="p">}</span>
+        
+    <span class="k">def</span> <span class="nf">sender_state3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Sender state 2 =&gt;&quot;</span><span class="p">)</span></div>
+<div class="viewcode-block" id="ECMQV.sender_state3"><a class="viewcode-back" href="../schemes/ecmqv.html#ecmqv.ECMQV.sender_state3">[docs]</a>        <span class="n">B</span><span class="p">,</span> <span class="n">Rb</span><span class="p">,</span> <span class="n">tb</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;B&#39;</span><span class="p">],</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;Rb&#39;</span><span class="p">],</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;tb&#39;</span><span class="p">]</span>
+        <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">Ra</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">,</span><span class="s">&#39;Ra&#39;</span><span class="p">,</span><span class="s">&#39;A&#39;</span><span class="p">,</span><span class="s">&#39;a&#39;</span><span class="p">])</span>
+        <span class="n">sa</span> <span class="o">=</span> <span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">zr</span><span class="p">(</span><span class="o">-</span><span class="n">Ra</span><span class="p">)</span> <span class="o">*</span> <span class="n">a</span><span class="p">)</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="p">(</span><span class="n">Rb</span> <span class="o">*</span> <span class="n">B</span><span class="p">)</span> <span class="o">**</span> <span class="n">sa</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;sender Z =&gt;&quot;</span><span class="p">,</span> <span class="n">Z</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">G</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;recovered key? =&gt;&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">coordinates</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;k1 =&gt;&quot;</span><span class="p">,</span> <span class="n">k1</span><span class="p">);</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;k2 =&gt;&quot;</span><span class="p">,</span> <span class="n">k2</span><span class="p">)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mac</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">Rb</span><span class="p">,</span> <span class="n">Ra</span><span class="p">),</span> <span class="n">k1</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;t =&gt;&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;tb =&gt;&quot;</span><span class="p">,</span> <span class="n">tb</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="n">tb</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Good so far.&quot;</span><span class="p">)</span>
+            <span class="n">ta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mac</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Ra</span><span class="p">,</span> <span class="n">Rb</span><span class="p">),</span> <span class="n">k1</span><span class="p">)</span>
+            <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;ta&#39;</span><span class="p">:</span><span class="n">ta</span> <span class="p">}</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>            
+    
+    <span class="k">def</span> <span class="nf">receiver_state4</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="n">ta</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;ta&#39;</span><span class="p">]</span></div>
+<div class="viewcode-block" id="ECMQV.receiver_state4"><a class="viewcode-back" href="../schemes/ecmqv.html#ecmqv.ECMQV.receiver_state4">[docs]</a>        <span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Ra</span><span class="p">,</span> <span class="n">Rb</span><span class="p">,</span> <span class="n">k1</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">,</span><span class="s">&#39;B&#39;</span><span class="p">,</span><span class="s">&#39;Ra&#39;</span><span class="p">,</span><span class="s">&#39;Rb&#39;</span><span class="p">,</span><span class="s">&#39;k1&#39;</span><span class="p">])</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mac</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Ra</span><span class="p">,</span> <span class="n">Rb</span><span class="p">),</span> <span class="n">k1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="n">ta</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature verified and key agreed.&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;k1 =&gt;&quot;</span><span class="p">,</span> <span class="n">k1</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="s">&#39;OK&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="s">&#39;FAIL&#39;</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+    
+    <span class="k">def</span> <span class="nf">sender_state5</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span></div>
+<div class="viewcode-block" id="ECMQV.sender_state5"><a class="viewcode-back" href="../schemes/ecmqv.html#ecmqv.ECMQV.sender_state5">[docs]</a>        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">receiver_state6</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Result =&gt;&quot;</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span></div>
+<div class="viewcode-block" id="ECMQV.receiver_state6"><a class="viewcode-back" href="../schemes/ecmqv.html#ecmqv.ECMQV.receiver_state6">[docs]</a>        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    
+    <span class="c"># key is an element of ZR</span>
+    <span class="c"># data is a tuple of various elements</span>
+    <span class="k">def</span> <span class="nf">mac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tupl_arg</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">key</span><span class="p">))</span></div>
+<div class="viewcode-block" id="ECMQV.mac"><a class="viewcode-back" href="../schemes/ecmqv.html#ecmqv.ECMQV.mac">[docs]</a>        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tupl_arg</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span> <span class="n">b</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span> <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">ZR</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;-r&quot;</span><span class="p">:</span></div></div>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Operating as receiver...&quot;</span><span class="p">)</span>
+        <span class="n">svr</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">)</span>
+        <span class="n">svr</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="n">HOST</span><span class="p">,</span> <span class="n">PORT</span><span class="p">))</span>
+        <span class="n">svr</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">svr_sock</span><span class="p">,</span> <span class="n">addr</span> <span class="o">=</span> <span class="n">svr</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Connected by &quot;</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span>
+        <span class="n">_name</span><span class="p">,</span> <span class="n">_type</span><span class="p">,</span> <span class="n">_sock</span> <span class="o">=</span> <span class="s">&quot;receiver&quot;</span><span class="p">,</span> <span class="n">RECEIVER</span><span class="p">,</span> <span class="n">svr_sock</span>
+    <span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;-s&quot;</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Operating as sender...&quot;</span><span class="p">)</span>
+        <span class="n">clt</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">)</span>
+        <span class="n">clt</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="n">HOST</span><span class="p">,</span> <span class="n">PORT</span><span class="p">))</span>
+        <span class="n">clt</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+        <span class="n">_name</span><span class="p">,</span> <span class="n">_type</span><span class="p">,</span> <span class="n">_sock</span> <span class="o">=</span> <span class="s">&quot;sender&quot;</span><span class="p">,</span> <span class="n">SENDER</span><span class="p">,</span> <span class="n">clt</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Usage: </span><span class="si">%s</span><span class="s"> [-v or -p]&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="nb">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        
+    <span class="n">mqv</span> <span class="o">=</span> <span class="n">ECMQV</span><span class="p">()</span>        
+    <span class="n">mqv</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="n">_name</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="n">_type</span><span class="p">,</span> <span class="s">&#39;socket&#39;</span><span class="p">:</span><span class="n">_sock</span><span class="p">}</span> <span class="p">)</span>
+    <span class="c"># run as a thread...</span>
+    <span class="n">mqv</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">_type</span><span class="p">)</span>
+    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

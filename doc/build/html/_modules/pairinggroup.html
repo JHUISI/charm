@@ -1,0 +1,165 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pairinggroup &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pairinggroup</h1><div class="highlight"><pre>
+<span class="k">class</span> <span class="nc">PairingGroup</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_file</span><span class="p">,</span> <span class="n">secparam</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Pairing</span> <span class="o">=</span> <span class="n">pairing</span><span class="p">(</span><span class="n">param_file</span><span class="p">)</span>
+<div class="viewcode-block" id="PairingGroup"><a class="viewcode-back" href="../toolbox/pairinggroup.html#pairinggroup.PairingGroup">[docs]</a>        <span class="bp">self</span><span class="o">.</span><span class="n">secparam</span> <span class="o">=</span> <span class="n">secparam</span> <span class="c"># number of bits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rand</span> <span class="o">=</span> <span class="n">init</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+
+    <span class="c"># will be used to define curve parameters and such</span>
+    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qbits</span><span class="p">,</span> <span class="n">rbits</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+<div class="viewcode-block" id="PairingGroup.paramgen"><a class="viewcode-back" href="../toolbox/pairinggroup.html#pairinggroup.PairingGroup.paramgen">[docs]</a>    <span class="k">def</span> <span class="nf">validSize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">bitsize</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">size</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">messageSize</span><span class="p">():</span></div>
+<div class="viewcode-block" id="PairingGroup.validSize"><a class="viewcode-back" href="../toolbox/pairinggroup.html#pairinggroup.PairingGroup.validSize">[docs]</a>            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;ERROR: max len =&gt; </span><span class="si">%s</span><span class="s">, input len =&gt; </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">messageSize</span><span class="p">(),</span> <span class="n">size</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">def</span> <span class="nf">groupType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="k">return</span> <span class="s">&#39;PairingGroup&#39;</span>     
+        </div>
+<div class="viewcode-block" id="PairingGroup.groupType"><a class="viewcode-back" href="../toolbox/pairinggroup.html#pairinggroup.PairingGroup.groupType">[docs]</a>    <span class="k">def</span> <span class="nf">messageSize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">secparam</span> <span class="o">/</span> <span class="mi">8</span>        
+</div>
+<div class="viewcode-block" id="PairingGroup.messageSize"><a class="viewcode-back" href="../toolbox/pairinggroup.html#pairinggroup.PairingGroup.messageSize">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pairing</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+<div class="viewcode-block" id="PairingGroup.init"><a class="viewcode-back" href="../toolbox/pairinggroup.html#pairinggroup.PairingGroup.init">[docs]</a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pairing</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
+            
+    <span class="k">def</span> <span class="nf">random</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">ZR</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="n">GT</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__randomGT</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="n">ZR</span> <span class="ow">or</span> <span class="nb">type</span> <span class="o">==</span> <span class="n">G1</span> <span class="ow">or</span> <span class="nb">type</span> <span class="o">==</span> <span class="n">G2</span><span class="p">:</span></div>
+<div class="viewcode-block" id="PairingGroup.random"><a class="viewcode-back" href="../toolbox/pairinggroup.html#pairinggroup.PairingGroup.random">[docs]</a>            <span class="k">if</span> <span class="n">seed</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pairing</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pairing</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rand</span><span class="o">.</span><span class="n">randomPrime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secparam</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">__randomGT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;gt&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gt</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Pairing</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pairing</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">))</span></div>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pairing</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gt</span> <span class="o">**</span> <span class="n">z</span>
+    
+    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">NotImplementedException</span>
+    
+<div class="viewcode-block" id="PairingGroup.encode"><a class="viewcode-back" href="../toolbox/pairinggroup.html#pairinggroup.PairingGroup.encode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">NotImplementedException</span> 
+    </div>
+<div class="viewcode-block" id="PairingGroup.decode"><a class="viewcode-back" href="../toolbox/pairinggroup.html#pairinggroup.PairingGroup.decode">[docs]</a>    <span class="k">def</span> <span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">ZR</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pairing</span><span class="o">.</span><span class="n">H</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="PairingGroup.hash"><a class="viewcode-back" href="../toolbox/pairinggroup.html#pairinggroup.PairingGroup.hash">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pairing</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="PairingGroup.serialize"><a class="viewcode-back" href="../toolbox/pairinggroup.html#pairinggroup.PairingGroup.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pairing</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="PairingGroup.deserialize"><a class="viewcode-back" href="../toolbox/pairinggroup.html#pairinggroup.PairingGroup.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
+           <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span></div>
+<div class="viewcode-block" id="PairingGroup.debug"><a class="viewcode-back" href="../toolbox/pairinggroup.html#pairinggroup.PairingGroup.debug">[docs]</a>               <span class="k">print</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
+           <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)):</span>
+               <span class="k">print</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span><span class="s">&#39;:&#39;</span><span class="p">,</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>            
+           <span class="k">print</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
+           <span class="k">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    
+</pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

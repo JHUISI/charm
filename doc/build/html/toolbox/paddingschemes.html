@@ -1,0 +1,227 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>paddingschemes &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
+    <link rel="next" title="pairinggroup" href="pairinggroup.html" />
+    <link rel="prev" title="node" href="node.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pairinggroup.html" title="pairinggroup"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="node.html" title="node"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-paddingschemes">
+<span id="paddingschemes"></span><h1>paddingschemes<a class="headerlink" href="#module-paddingschemes" title="Permalink to this headline">¶</a></h1>
+<p>A collection of encryption and signature padding schemes</p>
+<dl class="function">
+<dt id="paddingschemes.MGF1">
+<tt class="descclassname">paddingschemes.</tt><tt class="descname">MGF1</tt><big>(</big><em>seed</em>, <em>maskBytes</em>, <em>hashFn</em>, <em>hLen</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#MGF1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.MGF1" title="Permalink to this definition">¶</a></dt>
+<dd><p>MGF1 Mask Generation Function</p>
+<p>Implemented according to PKCS #1 specification, see appendix B.2.1:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">hLen</span></tt>: is the output length of the hash function</li>
+<li><tt class="docutils literal"><span class="pre">maskBytes</span></tt>: the number of mask bytes to return</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="paddingschemes.OAEPEncryptionPadding">
+<em class="property">class </em><tt class="descclassname">paddingschemes.</tt><tt class="descname">OAEPEncryptionPadding</tt><big>(</big><em>_hash_type='sha1'</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#OAEPEncryptionPadding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.OAEPEncryptionPadding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors :</th><td class="field-body">Gary Belvin</td>
+</tr>
+</tbody>
+</table>
+<p>OAEPEncryptionPadding</p>
+<p>Implements the OAEP padding scheme.  Appropriate for RSA-OAEP encryption.
+Implemented according to PKCS#1 v2.1 Section 7 <a class="reference external" href="ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf">ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf</a></p>
+<dl class="method">
+<dt id="paddingschemes.OAEPEncryptionPadding.decode">
+<tt class="descname">decode</tt><big>(</big><em>encMessage</em>, <em>label=''</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#OAEPEncryptionPadding.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.OAEPEncryptionPadding.decode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="paddingschemes.OAEPEncryptionPadding.encode">
+<tt class="descname">encode</tt><big>(</big><em>message</em>, <em>emLen</em>, <em>label=''</em>, <em>seed=None</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#OAEPEncryptionPadding.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.OAEPEncryptionPadding.encode" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return :</th><td class="field-body">a Bytes object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="paddingschemes.PSSPadding">
+<em class="property">class </em><tt class="descclassname">paddingschemes.</tt><tt class="descname">PSSPadding</tt><big>(</big><em>_hash_type='sha1'</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#PSSPadding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.PSSPadding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors :</th><td class="field-body">Gary Belvin</td>
+</tr>
+</tbody>
+</table>
+<p>PSSSignaturePadding</p>
+<p>Implements the PSS signature padding scheme.  Appropriate for RSA-PSS signing. 
+Implemented according to section 8 of <a class="reference external" href="ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf">ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf</a>.</p>
+<dl class="method">
+<dt id="paddingschemes.PSSPadding.encode">
+<tt class="descname">encode</tt><big>(</big><em>M</em>, <em>emBits=None</em>, <em>salt=None</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#PSSPadding.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.PSSPadding.encode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encodes a message with PSS padding
+emLen will be set to the minimum allowed length if not explicitly set</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="paddingschemes.PSSPadding.verify">
+<tt class="descname">verify</tt><big>(</big><em>M</em>, <em>EM</em>, <em>emBits=None</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#PSSPadding.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.PSSPadding.verify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verifies that EM is a correct encoding for M</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><ul class="first simple">
+<li>M - the message to verify</li>
+<li>EM - the encoded message</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return :</th><td class="field-body"><p class="first last">true for &#8216;consistent&#8217; or false for &#8216;inconsistent&#8217;</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="paddingschemes.hashFunc">
+<em class="property">class </em><tt class="descclassname">paddingschemes.</tt><tt class="descname">hashFunc</tt><big>(</big><em>_hash_type=None</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#hashFunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.hashFunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="node.html"
+                        title="previous chapter">node</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pairinggroup.html"
+                        title="next chapter">pairinggroup</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/toolbox/paddingschemes.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pairinggroup.html" title="pairinggroup"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="node.html" title="node"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

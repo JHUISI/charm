@@ -1,0 +1,117 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>PKEnc &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for PKEnc</h1><pre>
+ 
+Notes: This class implements an interface for a standard public-key encryption scheme.
+A public key encryption consists of four algorithms: (paramgen, keygen, encrypt, decrypt).
+'''
+from toolbox.schemebase import *
+
+class PKEnc(SchemeBase):
+    def __init__(self):
+<div class="viewcode-block" id="PKEnc"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc">[docs]</a>        SchemeBase.__init__(self)
+        SchemeBase.setProperty(self, scheme="PKEnc")
+        self.baseSecDefs = Enum('IND_CPA', 'IND_CCA1', 'IND_CCA2')
+          
+    def paramgen(self, param1=None, param2=None):
+        return NotImplemented
+<div class="viewcode-block" id="PKEnc.paramgen"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc.paramgen">[docs]</a>
+    def keygen(self, securityparam):
+        return NotImplemented</div>
+<div class="viewcode-block" id="PKEnc.keygen"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc.keygen">[docs]</a>
+    def encrypt(self, pk, message):
+        return NotImplemented</div>
+<div class="viewcode-block" id="PKEnc.encrypt"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc.encrypt">[docs]</a>
+    def decrypt(self, pk, sk, ciphertext):
+        return NotImplemented</div>
+<div class="viewcode-block" id="PKEnc.decrypt"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc.decrypt">[docs]</a></pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

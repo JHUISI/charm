@@ -1,0 +1,151 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>enum &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for enum</h1><div class="highlight"><pre>
+      <span class="k">class</span> <span class="nc">EnumClass</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Enum"><a class="viewcode-back" href="../toolbox/enum.html#enum.Enum">[docs]</a>         <span class="n">__slots__</span> <span class="o">=</span> <span class="n">names</span>
+         <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="n">constants</span><span class="p">)</span>
+         <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">constants</span><span class="p">)</span>
+         <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>  
+             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span> <span class="k">return</span> <span class="n">constants</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+             <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span> 
+                 <span class="n">index</span> <span class="o">=</span> <span class="n">lookup</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> 
+                 <span class="k">if</span> <span class="n">index</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> <span class="k">return</span> <span class="n">constants</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+                 <span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="bp">None</span>
+             <span class="k">else</span><span class="p">:</span> <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;Invalid input type.&quot;</span>
+         <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>        <span class="k">return</span> <span class="s">&#39;Enum&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+         <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>         <span class="k">return</span> <span class="s">&#39;enum &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">constants</span><span class="p">)</span>
+
+      <span class="k">class</span> <span class="nc">EnumValue</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+         <span class="n">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;__value&#39;</span><span class="p">)</span>
+         <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">value</span>
+         <span class="n">Value</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="p">)</span>
+         <span class="n">EnumType</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="n">EnumType</span><span class="p">)</span>
+         <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="p">)</span>
+         <span class="k">def</span> <span class="nf">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span> 
+             <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">__value</span><span class="p">)</span>
+         <span class="k">def</span> <span class="nf">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span> 
+             <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">&gt;</span> <span class="n">other</span><span class="o">.</span><span class="n">__value</span><span class="p">)</span>
+         <span class="k">def</span> <span class="nf">__le__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span> 
+             <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">&lt;=</span> <span class="n">other</span><span class="o">.</span><span class="n">__value</span><span class="p">)</span>
+         <span class="k">def</span> <span class="nf">__ge__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span> 
+             <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">&gt;=</span> <span class="n">other</span><span class="o">.</span><span class="n">__value</span><span class="p">)</span>
+         <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span> 
+             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span> <span class="n">lhs</span> <span class="o">=</span> <span class="bp">self</span>
+             <span class="k">else</span><span class="p">:</span> <span class="n">lhs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span>
+             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span> <span class="n">rhs</span> <span class="o">=</span> <span class="n">other</span>
+             <span class="k">else</span><span class="p">:</span> <span class="n">rhs</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">__value</span>
+             <span class="k">return</span> <span class="p">(</span><span class="n">lhs</span> <span class="o">==</span> <span class="n">rhs</span><span class="p">)</span>
+         <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span> 
+             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span> <span class="n">lhs</span> <span class="o">=</span> <span class="bp">self</span>
+             <span class="k">else</span><span class="p">:</span> <span class="n">lhs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span>
+             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span> <span class="n">rhs</span> <span class="o">=</span> <span class="n">other</span>
+             <span class="k">else</span><span class="p">:</span> <span class="n">rhs</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">__value</span>
+             <span class="k">return</span> <span class="p">(</span><span class="n">lhs</span> <span class="o">!=</span> <span class="n">rhs</span><span class="p">)</span>
+         <span class="k">def</span> <span class="nf">__invert__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>      <span class="k">return</span> <span class="n">constants</span><span class="p">[</span><span class="n">maximum</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="p">]</span>
+         <span class="k">def</span> <span class="nf">__nonzero__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>     <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="p">)</span>
+         <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">names</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="p">])</span>
+
+      <span class="n">maximum</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+      <span class="n">constants</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+      <span class="n">lookup</span> <span class="o">=</span> <span class="p">{}</span>
+      <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">each</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+          <span class="n">val</span> <span class="o">=</span> <span class="n">EnumValue</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+          <span class="nb">setattr</span><span class="p">(</span><span class="n">EnumClass</span><span class="p">,</span> <span class="n">each</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+          <span class="c"># create list of int =&gt; &#39;str&#39;</span>
+          <span class="n">constants</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+          <span class="c"># create reverse lookup </span>
+          <span class="n">lookup</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)]</span> <span class="o">=</span> <span class="n">i</span>
+      <span class="n">constants</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">constants</span><span class="p">)</span>
+      <span class="n">EnumType</span> <span class="o">=</span> <span class="n">EnumClass</span><span class="p">()</span>
+      <span class="k">return</span> <span class="n">EnumType</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>
