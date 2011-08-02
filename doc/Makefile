@@ -1,4 +1,4 @@
-# Makefile for Sphinx documentation
+#Makefile for Sphinx documentation
 #
 include ../config.mk
 # You can set these variables from the command line.
@@ -40,6 +40,10 @@ help:
 
 clean:
 	-rm -rf $(BUILDDIR)/*
+
+publish: html
+	cd build; git clone -b gh-pages git@github.com:mdgreen98/charm.git; cp -r html/* charm/; cd charm; git add .; git commit -m '`date`'; git push
+	
 
 autoscheme:
 	$(PYTHON) autoschemes.py

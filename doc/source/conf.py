@@ -30,6 +30,7 @@ sys.path.insert(0, os.path.abspath('../../toolbox/'))
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.pngmath', 'sphinx.ext.ifconfig', 'sphinx.ext.viewcode']
 todo_include_todos = True
+#jsmath_path="jsMath/easy/load.js"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -128,7 +129,7 @@ html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
-#html_last_updated_fmt = '%b %d, %Y'
+html_last_updated_fmt = '%b %d, %Y'
 
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.

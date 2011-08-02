@@ -26,6 +26,7 @@ Demonstration Schemes
    schemes/ibe_bb03
    schemes/ibe_bf03
    schemes/ibe_n05
+   schemes/ibe_sw05
    schemes/kpabe
    schemes/ot_adapt_07
    schemes/paillier
