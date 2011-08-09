@@ -5,36 +5,37 @@ Demonstration Schemes
 .. toctree::
    :maxdepth: 1
 
-   schemes/abemultiauth_hybrid
+   schemes/abenc_bsw07
+   schemes/abenc_lsw08
+   schemes/abenc_waters09
+   schemes/ake_ecmqv
    schemes/chamhash_adm05
-   schemes/chk04_enc
-   schemes/commit_92
+   schemes/chamhash_rsa_hw09
    schemes/commit_gs08
-   schemes/cpabe07
-   schemes/cpabe09
-   schemes/cs98_enc
+   schemes/commit_pedersen92
    schemes/dabe_aw11
-   schemes/dsa
-   schemes/ec_cs98_enc
-   schemes/ecdsa
-   schemes/ecmqv
-   schemes/elgamal
-   schemes/groupsig_bm_bgls04
-   schemes/hashIDAdapt
-   schemes/hybridenc
-   schemes/hybridibenc
-   schemes/ibe_bb03
-   schemes/ibe_bf03
-   schemes/ibe_n05
+   schemes/dabenc_adapt_hybrid
+   schemes/groupsig_bgls04
    schemes/ibe_sw05
-   schemes/kpabe
-   schemes/ot_adapt_07
-   schemes/paillier
-   schemes/rsa_alg
-   schemes/schnorr_sig_08
-   schemes/schnorrprotocol
-   schemes/sig_generic_ibetosig_naor01
-   schemes/sig_short_bls04
+   schemes/ibenc_adapt_hybrid
+   schemes/ibenc_adapt_identityhash
+   schemes/ibenc_bb03
+   schemes/ibenc_bf01
+   schemes/ibenc_waters05
+   schemes/pkenc_adapt_chk04
+   schemes/pkenc_adapt_hybridenc
+   schemes/pkenc_cs98
+   schemes/pkenc_cs98_ec
+   schemes/pkenc_elgamal85
+   schemes/pkenc_paillier99
+   schemes/pkenc_rsa
+   schemes/pksig_adapt_naor01
+   schemes/pksig_bls04
+   schemes/pksig_dsa
+   schemes/pksig_ecdsa
+   schemes/pksig_schnorr91
+   schemes/protocol_cns07
+   schemes/protocol_schnorr91
    schemes/sigma1
    schemes/sigma2
    schemes/sigma3

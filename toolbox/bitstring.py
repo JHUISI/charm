@@ -30,5 +30,6 @@ class Bytes(bytes):
         for i in range(0, length):
             bits += prefix
         return Bytes(bits)
+        
 
 # TODO: add left and right bit shifting

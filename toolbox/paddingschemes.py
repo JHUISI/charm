@@ -43,7 +43,7 @@ class OAEPEncryptionPadding:
         # maskedDB = MGF1(seed, emLen - self.hashFnOutputBytes - 1)
         if (seed is None):
             rand = SecureRandomFactory.getInstance()
-            seed = rand.getRandomBits(hLen)
+            seed = rand.getRandomBytes(hLen)
             
         dbMask = MGF1(seed, len(DB), self.hashFn, hLen)
         maskedDB = DB ^ dbMask
@@ -174,7 +174,7 @@ class PSSPadding:
         
         if salt is None:
             if self.sLen > 0: 
-                salt = SecureRandomFactory.getInstance().getRandomBits(self.sLen)
+                salt = SecureRandomFactory.getInstance().getRandomBytes(self.sLen)
             else:
                 salt = b''
         assert len(salt) == self.sLen, "Salt wrong size"

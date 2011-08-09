@@ -6,7 +6,7 @@ Runs all known tests on charm-crypto
 '''
 import unittest, os, sys
 from all_unittests import getAllTestsSuite
-from all_schemes import testSchemes, modules
+from all_schemes import testSchemes, modules, skip
 
 if __name__ == '__main__':
     if os.access("schemes/", os.R_OK):
@@ -18,12 +18,10 @@ if __name__ == '__main__':
     for p in paths:
         if p not in sys.path:
             sys.path.append(os.path.abspath(p))
-        
-    print (sys.path)
     
     suite = unittest.TestSuite()
     suite.addTests(getAllTestsSuite(paths))
-    suite.addTests(testSchemes(modules))
+    suite.addTests(testSchemes(modules, skip))
     
-    unittest.TextTestRunner(verbosity=12).run(suite)
+    unittest.TextTestRunner(verbosity=1).run(suite)
     

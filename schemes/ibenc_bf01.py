@@ -16,7 +16,7 @@ from toolbox.pairinggroup import *
 from toolbox.hash_module import *
 from toolbox.IBEnc import *
 
-debug = True
+debug = False
 class IBE_BonehFranklin(IBEnc):
     def __init__(self, groupObj):
         IBEnc.__init__(self)

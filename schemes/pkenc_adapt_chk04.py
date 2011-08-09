@@ -13,11 +13,11 @@ Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform (generic composi
 :Authors:  Matthew Green
 :Date:         1/2011
 '''
-from toolbox.pairinggroup import *
-from toolbox.PKEnc import *
 from ibenc_bb03 import *
 from pksig_bls04 import *
-from hashIDAdapt import *
+from schemes.hashIDAdapt import HashIDAdapter
+from toolbox.PKEnc import *
+from toolbox.pairinggroup import *
 
 debug = False
 class CHK04(PKEnc):

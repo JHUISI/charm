@@ -28,7 +28,7 @@ all:
 	@echo "make install - Install on local system."
 	@echo "make clean - Get rid of scratch and byte files."
 	@echo "make test  - Run Unit Tests."
-	@echo "make docs   - Compile documentation"
+	@echo "make doc   - Compile documentation"
 
 .PHONY: setup
 setup:
@@ -116,8 +116,8 @@ install:
 test:
 	$(PYTHON) tests/all_tests.py
 
-.PHONY: docs
-docs:
+.PHONY: doc
+doc:
 	if test "${BUILD_DOCS}" = "yes" ; then \
 	${MAKE} -C doc html; \
 	fi

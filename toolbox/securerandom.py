@@ -2,17 +2,19 @@
 Base class for cryptographic secure random number generation
 :authors: Gary Belvin
 '''
-import random
 from toolbox.bitstring import Bytes
+from toolbox.conversion import Conversion
+import charm.integer
+import datetime
+import math
+import random
 
 class SecureRandom():
     def __init__(self):
         pass
-    
-    def getRandomBits(self, length):
+    def getRandomBytes(self, length):
         '''Returns a random bit string of length bytes'''
         raise NotImplementedError
-
     def addSeedMaterial(self, seed):
         '''
         Add randomness to the generator.  
@@ -27,33 +29,43 @@ class SecureRandomFactory():
     Classes should call ``rand = SecureRandomFactory.getInstance()`` 
     to acquire a randomnesss generator
     '''
-    
     @classmethod
     def getInstance(self):
-        '''getInstance currently returns a *completely* broken random number generator.
-        
-        .. todo:: replace with a secure, hash-based PRNG
-        '''
-        return WeakRandom()
+        return OpenSSLRand()
     
+
+class OpenSSLRand(SecureRandom):
+    '''Uses the OpenSSL PRNG for random bits'''
+    def __init__(self):
+        SecureRandom.__init__(self)
+        #seed with a little bit of random data. This is not the only source
+        #of randomness. Internally, OpenSSL samples additional physical randomness.
+        self.rand = charm.integer.init(datetime.datetime.now().microsecond)
     
+    def getRandomBytes(self, length):
+        bits = length * 8;
+        val = self.rand.randomBits(bits)
+        return Conversion.IP2OS(val, length)    
+    
+    def getRandomBits(self, length):
+        i = self.rand.randomBits(length)
+        len = math.ceil(length / 8)
+        return Conversion.IP2OS(i, len)
+
+
 class WeakRandom(SecureRandom):
     def __init__(self):
         SecureRandom.__init__(self)
-        
-    def getRandomBits(self, length):
+    def getRandomBytes(self, length):
         return self.myrandom(length, False)
-    
     def addSeedMaterial(self, seed):
         raise NotImplementedError()
-
     @classmethod
     def myrandom(self, length, printable=False):
         '''
         This method does **NOT** provide cryptographically secure random numbers.
         This should **NOT** be used for production code
         '''
-        
         if(printable):
             #Nice printable characters for testing purposes
             return Bytes(random.randrange(0x20, 0x7E) for i in range(length))

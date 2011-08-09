@@ -11,9 +11,11 @@ modules = None
 # Uncomment to restrict the tests to these modules
 # ECC and Pairing 
 # Restrict modules to these schemes (which actually work) until further notice.
-modules = ['ibe_bf03','abemultiauth_hybrid', 'sig_short_bls04', 'kpabe', 'cpabe07', 'cpabe09', 'ecdsa', 'elgamal', 'ibe_bb03', 'hashIDAdapt', 'hybridenc', 'hybridibenc', 'dabe_aw11', 'commit_92', 'chk04_enc', 'sig_generic_ibetosig_naor01', 'ibe_n05']
+#modules = ['ibenc_bf03', 'abemultiauth_hybrid', 'sig_short_bls04', 'kpabe', 'cpabe07', 'cpabe09', 'ecdsa', 'elgamal', 'ibe_bb03',
+ #           'hashIDAdapt', 'hybridenc', 'hybridibenc', 'dabe_aw11', 'commit_92', 'chk04_enc', 'sig_generic_ibetosig_naor01', 'ibe_n05']
+skip = ['ibe_sw05', 'pksig_dsa', 'pkenc_cs98']
 
-def testSchemes(modules=None):
+def testSchemes(modules=None, skip=None):
     '''
     Searches the given modules for methods named 'main'
     returns a test suite with one test for each main method
@@ -21,24 +23,26 @@ def testSchemes(modules=None):
     '''
     
     suite = unittest.TestSuite()
-    testing, skipped = [],[]
     
     if modules==None:
         #Exclude unit tests
         modules = [mod for mod in all_unittests.find_modules() if not re.match(".*_test$", mod)]
-        print("Modules found: ", modules)
+        
+    if skip==None:
+        skip = []
+    else:
+        modules = list(set(modules).difference(set(skip)))        
     
     for name in modules:
         mod = all_unittests.load_module(name)
         if hasattr(mod, 'main'):
-            testing.append(mod.__name__)
             case = unittest.FunctionTestCase(mod.main, None, None, mod.__name__)
             suite.addTest(case)
         else:
-            skipped.append(mod.__name__)
+            skip.append(mod.__name__)
             
-    #print("Testing  ", testing)
-    print("Skipping ", skipped)
+    #print("Testing  ", modules)
+    #print("Skipping ", skip)
     return suite
 
 if __name__ == "__main__":
@@ -48,4 +52,4 @@ if __name__ == "__main__":
         os.chdir('../schemes/')
      
     TesterInstance = unittest.TextTestRunner(verbosity=3)
-    TesterInstance.run(testSchemes(modules))#Run tests
+    TesterInstance.run(testSchemes(modules, skip)) #Run tests

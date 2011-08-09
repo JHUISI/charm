@@ -42,6 +42,7 @@ class RSA():
             break
         pk = { 'N':N, 'e':e }
         sk = { 'phi_N':phi_N, 'd':d , 'N':N}
+
         return (pk, sk)
 
 class RSA_Enc(RSA,PKEnc):
@@ -50,9 +51,9 @@ class RSA_Enc(RSA,PKEnc):
         PKEnc.__init__(self)
         self.paddingscheme = padding 
     
-    def encrypt(self, pk, m:Bytes):
+    def encrypt(self, pk, m:Bytes, salt=None):
         octetlen = math.ceil(int(pk['N']).bit_length() / 8)
-        EM = self.paddingscheme.encode(m, octetlen)
+        EM = self.paddingscheme.encode(m, octetlen, "", salt)
         if debug: print("EM == >", EM)
         i = Conversion.OS2IP(EM)
         ip = integer(i) % pk['N']  #Convert to modular integer
@@ -124,6 +125,7 @@ def main():
     #m = integer(34567890981234556498) % pk['N']
     m = b'This is a test'
     c = rsa.encrypt(pk, m)
+    if debug: print("ct =>", c)
     
     orig_m = rsa.decrypt(pk, sk, c)
     if debug: print("recovered m =>", orig_m)

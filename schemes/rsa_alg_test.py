@@ -5,13 +5,14 @@
 from binascii import a2b_hex
 from pkenc_rsa import RSA_Enc, RSA_Sig
 from toolbox.conversion import Conversion
-from toolbox.securerandom import SecureRandomFactory, WeakRandom
+from toolbox.securerandom import WeakRandom
 import unittest
 from random import Random
 
 debug = False
 class Test(unittest.TestCase):
 
+    
     def testRSAEnc(self):
         rsa = RSA_Enc()
         (pk, sk) = rsa.keygen(1024)
@@ -22,7 +23,7 @@ class Test(unittest.TestCase):
         
         orig_m = rsa.decrypt(pk, sk, c)
     
-        assert m == orig_m
+        assert m == orig_m, 'o: =>%s\nm: =>%s' % (orig_m, m)
             
     def testRSAVector(self):
         # ==================================
@@ -35,89 +36,142 @@ class Test(unittest.TestCase):
         
         # RSA modulus n:
         n = a2b_hex('\
-        a8 b3 b2 84 af 8e b5 0b 38 70 34 a8 60 f1 46 c4\
-        91 9f 31 87 63 cd 6c 55 98 c8 ae 48 11 a1 e0 ab\
-        c4 c7 e0 b0 82 d6 93 a5 e7 fc ed 67 5c f4 66 85\
-        12 77 2c 0c bc 64 a7 42 c6 c6 30 f5 33 c8 cc 72\
-        f6 2a e8 33 c4 0b f2 58 42 e9 84 bb 78 bd bf 97\
-        c0 10 7d 55 bd b6 62 f5 c4 e0 fa b9 84 5c b5 14\
-        8e f7 39 2d d3 aa ff 93 ae 1e 6b 66 7b b3 d4 24\
-        76 16 d4 f5 ba 10 d4 cf d2 26 de 88 d3 9f 16 fb'.replace(' ',''))
+        bb f8 2f 09 06 82 ce 9c 23 38 ac 2b 9d a8 71 f7 \
+        36 8d 07 ee d4 10 43 a4 40 d6 b6 f0 74 54 f5 1f \
+        b8 df ba af 03 5c 02 ab 61 ea 48 ce eb 6f cd 48 \
+        76 ed 52 0d 60 e1 ec 46 19 71 9d 8a 5b 8b 80 7f \
+        af b8 e0 a3 df c7 37 72 3e e6 b4 b7 d9 3a 25 84 \
+        ee 6a 64 9d 06 09 53 74 88 34 b2 45 45 98 39 4e \
+        e0 aa b1 2d 7b 61 a5 1f 52 7a 9a 41 f6 c1 68 7f \
+        e2 53 72 98 ca 2a 8f 59 46 f8 e5 fd 09 1d bd cb '.replace(' ',''))
+        n = Conversion.OS2IP(n, True)
         
         # RSA public exponent e:
-        e = a2b_hex('010001') 
-        
-        # RSA private exponent d:
-        d = a2b_hex('\
-        53 33 9c fd b7 9f c8 46 6a 65 5c 73 16 ac a8 5c\
-        55 fd 8f 6d d8 98 fd af 11 95 17 ef 4f 52 e8 fd\
-        8e 25 8d f9 3f ee 18 0f a0 e4 ab 29 69 3c d8 3b\
-        15 2a 55 3d 4a c4 d1 81 2b 8b 9f a5 af 0e 7f 55\
-        fe 73 04 df 41 57 09 26 f3 31 1f 15 c4 d6 5a 73\
-        2c 48 31 16 ee 3d 3d 2d 0a f3 54 9a d9 bf 7c bf\
-        b7 8a d8 84 f8 4d 5b eb 04 72 4d c7 36 9b 31 de\
-        f3 7d 0c f5 39 e9 cf cd d3 de 65 37 29 ea d5 d1'.replace(' ',''))
+        e = a2b_hex('11')
+        e = Conversion.OS2IP(e, True)
         
         # Prime p: 
         p = a2b_hex('\
-        d3 27 37 e7 26 7f fe 13 41 b2 d5 c0 d1 50 a8 1b\
-        58 6f b3 13 2b ed 2f 8d 52 62 86 4a 9c b9 f3 0a\
-        f3 8b e4 48 59 8d 41 3a 17 2e fb 80 2c 21 ac f1\
-        c1 1c 52 0c 2f 26 a4 71 dc ad 21 2e ac 7c a3 9d'.replace(' ',''))
+        ee cf ae 81 b1 b9 b3 c9 08 81 0b 10 a1 b5 60 01 \
+        99 eb 9f 44 ae f4 fd a4 93 b8 1a 9e 3d 84 f6 32 \
+        12 4e f0 23 6e 5d 1e 3b 7e 28 fa e7 aa 04 0a 2d \
+        5b 25 21 76 45 9d 1f 39 75 41 ba 2a 58 fb 65 99 '.replace(' ',''))
+        p = Conversion.OS2IP(p, True)
         
         # Prime q: 
         q = a2b_hex('\
-        cc 88 53 d1 d5 4d a6 30 fa c0 04 f4 71 f2 81 c7\
-        b8 98 2d 82 24 a4 90 ed be b3 3d 3e 3d 5c c9 3c\
-        47 65 70 3d 1d d7 91 64 2f 1f 11 6a 0d d8 52 be\
-        24 19 b2 af 72 bf e9 a0 30 e8 60 b0 28 8b 5d 77'.replace(' ',''))
+        c9 7f b1 f0 27 f4 53 f6 34 12 33 ea aa d1 d9 35 \
+        3f 6c 42 d0 88 66 b1 d0 5a 0f 20 35 02 8b 9d 86 \
+        98 40 b4 16 66 b4 2e 92 ea 0d a3 b4 32 04 b5 cf \
+        ce 33 52 52 4d 04 16 a5 a4 41 e7 00 af 46 15 03'.replace(' ',''))
+        q = Conversion.OS2IP(q, True)
         
-        # p's CRT exponent dP: 
-        dP = a2b_hex('\
-        0e 12 bf 17 18 e9 ce f5 59 9b a1 c3 88 2f e8 04\
-        6a 90 87 4e ef ce 8f 2c cc 20 e4 f2 74 1f b0 a3\
-        3a 38 48 ae c9 c9 30 5f be cb d2 d7 68 19 96 7d\
-        46 71 ac c6 43 1e 40 37 96 8d b3 78 78 e6 95 c1'.replace(' ',''))
+        phi_N = (p - 1) * (q - 1)
+        e = e % phi_N
+
+        d = e ** -1
         
-        # q's CRT exponent dQ: 
-        dQ = a2b_hex('\
-        95 29 7b 0f 95 a2 fa 67 d0 07 07 d6 09 df d4 fc\
-        05 c8 9d af c2 ef 6d 6e a5 5b ec 77 1e a3 33 73\
-        4d 92 51 e7 90 82 ec da 86 6e fe f1 3c 45 9e 1a\
-        63 13 86 b7 e3 54 c8 99 f5 f1 12 ca 85 d7 15 83'.replace(' ',''))
-        
-        # CRT coefficient qInv: 
-        qInv = a2b_hex('\
-        4f 45 6c 50 24 93 bd c0 ed 2a b7 56 a3 a6 ed 4d\
-        67 35 2a 69 7d 42 16 e9 32 12 b1 27 a6 3d 54 11\
-        ce 6f a9 8d 5d be fd 73 26 3e 37 28 14 27 43 81\
-        81 66 ed 7d d6 36 87 dd 2a 8c a1 d2 f4 fb d8 e1'.replace(' ',''))
-        
-        # ---------------------------------
-        # RSAES-OAEP Encryption Example 1.1
-        # ---------------------------------
+        # ----------------------------------
+        # Step-by-step RSAES-OAEP Encryption
+        # ----------------------------------
         
         # Message to be encrypted:
         M = a2b_hex('\
-        66 28 19 4e 12 07 3d b0 3b a9 4c da 9e f9 53 23\
-        97 d5 0d ba 79 b9 87 00 4a fe fe 34'.replace(' ',''))
+        d4 36 e9 95 69 fd 32 a7 c8 a0 5b bc 90 d3 2c 49'.replace(' ',''))
+        
+        lhash = a2b_hex('\
+        da 39 a3 ee 5e 6b 4b 0d 32 55 bf ef 95 60 18 90 \
+        af d8 07 09'.replace(' ', ''))
+        
+        # DB:
+        db = a2b_hex('\
+        da 39 a3 ee 5e 6b 4b 0d 32 55 bf ef 95 60 18 90 \
+        af d8 07 09 00 00 00 00 00 00 00 00 00 00 00 00 \
+        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \
+        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \
+        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \
+        00 00 00 00 00 00 00 00 00 00 01 d4 36 e9 95 69 \
+        fd 32 a7 c8 a0 5b bc 90 d3 2c 49'.replace(' ', '')) 
         
         # Seed:
         seed = a2b_hex('\
-        18 b7 76 ea 21 06 9d 69 77 6a 33 e9 6b ad 48 e1\
-        dd a0 a5 ef'.replace(' ',''))
+        aa fd 12 f6 59 ca e6 34 89 b4 79 e5 07 6d de c2 \
+        f0 6c b5 8f '.replace(' ',''))
         
+        # dbMask:
+        dbmask = a2b_hex('\
+        06 e1 de b2 36 9a a5 a5 c7 07 d8 2c 8e 4e 93 24 \
+        8a c7 83 de e0 b2 c0 46 26 f5 af f9 3e dc fb 25 \
+        c9 c2 b3 ff 8a e1 0e 83 9a 2d db 4c dc fe 4f f4 \
+        77 28 b4 a1 b7 c1 36 2b aa d2 9a b4 8d 28 69 d5 \
+        02 41 21 43 58 11 59 1b e3 92 f9 82 fb 3e 87 d0 \
+        95 ae b4 04 48 db 97 2f 3a c1 4e af f4 9c 8c 3b \
+        7c fc 95 1a 51 ec d1 dd e6 12 64'.replace(' ','')) 
+        
+        # maskedDB:
+        maskeddb = a2b_hex('\
+        dc d8 7d 5c 68 f1 ee a8 f5 52 67 c3 1b 2e 8b b4 \
+        25 1f 84 d7 e0 b2 c0 46 26 f5 af f9 3e dc fb 25 \
+        c9 c2 b3 ff 8a e1 0e 83 9a 2d db 4c dc fe 4f f4 \
+        77 28 b4 a1 b7 c1 36 2b aa d2 9a b4 8d 28 69 d5 \
+        02 41 21 43 58 11 59 1b e3 92 f9 82 fb 3e 87 d0 \
+        95 ae b4 04 48 db 97 2f 3a c1 4f 7b c2 75 19 52 \
+        81 ce 32 d2 f1 b7 6d 4d 35 3e 2d '.replace(' ',''))
+        
+        # seedMask:
+        seedmask = a2b_hex('\
+        41 87 0b 5a b0 29 e6 57 d9 57 50 b5 4c 28 3c 08 \
+        72 5d be a9 '.replace(' ',''))
+        
+        # maskedSeed:
+        maskedseed = a2b_hex('\
+        eb 7a 19 ac e9 e3 00 63 50 e3 29 50 4b 45 e2 ca \
+        82 31 0b 26 '.replace(' ',''))
+        
+        # EM = 00 || maskedSeed || maskedDB:
+        em = a2b_hex('\
+        00 eb 7a 19 ac e9 e3 00 63 50 e3 29 50 4b 45 e2 \
+        ca 82 31 0b 26 dc d8 7d 5c 68 f1 ee a8 f5 52 67 \
+        c3 1b 2e 8b b4 25 1f 84 d7 e0 b2 c0 46 26 f5 af \
+        f9 3e dc fb 25 c9 c2 b3 ff 8a e1 0e 83 9a 2d db \
+        4c dc fe 4f f4 77 28 b4 a1 b7 c1 36 2b aa d2 9a \
+        b4 8d 28 69 d5 02 41 21 43 58 11 59 1b e3 92 f9 \
+        82 fb 3e 87 d0 95 ae b4 04 48 db 97 2f 3a c1 4f \
+        7b c2 75 19 52 81 ce 32 d2 f1 b7 6d 4d 35 3e 2d '.replace(' ',''))
+            
         # Encryption:
         enc = a2b_hex('\
-        35 4f e6 7b 4a 12 6d 5d 35 fe 36 c7 77 79 1a 3f\
-        7b a1 3d ef 48 4e 2d 39 08 af f7 22 fa d4 68 fb\
-        21 69 6d e9 5d 0b e9 11 c2 d3 17 4f 8a fc c2 01\
-        03 5f 7b 6d 8e 69 40 2d e5 45 16 18 c2 1a 53 5f\
-        a9 d7 bf c5 b8 dd 9f c2 43 f8 cf 92 7d b3 13 22\
-        d6 e8 81 ea a9 1a 99 61 70 e6 57 a0 5a 26 64 26\
-        d9 8c 88 00 3f 84 77 c1 22 70 94 a0 d9 fa 1e 8c\
-        40 24 30 9c e1 ec cc b5 21 00 35 d4 7a c7 2e 8a'.replace(' ',''))
+        12 53 e0 4d c0 a5 39 7b b4 4a 7a b8 7e 9b f2 a0 \
+        39 a3 3d 1e 99 6f c8 2a 94 cc d3 00 74 c9 5d f7 \
+        63 72 20 17 06 9e 52 68 da 5d 1c 0b 4f 87 2c f6 \
+        53 c1 1d f8 23 14 a6 79 68 df ea e2 8d ef 04 bb \
+        6d 84 b1 c3 1d 65 4a 19 70 e5 78 3b d6 eb 96 a0 \
+        24 c2 ca 2f 4a 90 fe 9f 2e f5 c9 c1 40 e5 bb 48 \
+        da 95 36 ad 87 00 c8 4f c9 13 0a de a7 4e 55 8d \
+        51 a7 4d df 85 d8 b5 0d e9 68 38 d6 06 3e 09 55 '.replace(' ',''))
+        
+        rsa = RSA_Enc()
+        pk = { 'N':n, 'e':e }
+        sk = { 'phi_N':phi_N, 'd':d , 'N': n}
+        
+        c = rsa.encrypt(pk, M, seed)
+        C = Conversion.IP2OS(c)
+        
+        if debug: 
+            print("RSA OEAP step by step")
+            print("Label L  = empty string")
+            print("lHash      = ", lhash)
+            print("DB         = ", db)
+            print("seed       = ", seed)
+            print("dbMask     = ", dbmask)
+            print("maskedDB   = ", maskeddb)
+            print("seedMask   = ", seedmask)
+            print("maskedSeed = ", maskedseed)
+            print("EM         = ", em)
+        
+        assert C == enc
       
+    
     def testRSASig(self):
         length = Random().randrange(1, 1024)
         length = 128
@@ -126,6 +180,7 @@ class Test(unittest.TestCase):
         (pk, sk) = rsa.keygen(1024)
         S = rsa.sign(sk, M)
         assert rsa.verify(pk, M, S)
+    
     
     def testPSSVector(self):
         # ==================================
