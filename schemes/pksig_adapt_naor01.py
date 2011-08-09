@@ -20,7 +20,7 @@ Notes:	This transform was first described by Boneh and Franklin but credited to 
 :Authors:	Matthew Green
 :Date:			05/2011
 '''
-from schemes.ibe_bb03 import IBE_BB04
+from schemes.pkenc_bb03 import IBE_BB04
 from toolbox.PKSig import *
 from toolbox.pairinggroup import *
 #from toolbox.ibe_bb03 import *

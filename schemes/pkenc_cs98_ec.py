@@ -19,6 +19,12 @@ Cramer-Shoup Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption 
 from toolbox.ecgroup import *
 from toolbox.PKEnc import *
 
+# type definitions
+pk_t = { 'g1' : G, 'g2' : G, 'c' : G, 'd' : G, 'h' : G }
+sk_t = { 'x1' : ZR, 'x2' : ZR, 'y1' : ZR, 'y2' : ZR, 'z' : ZR }
+c_t = { 'u1' : G, 'u2' : G, 'e' : G, 'v' : G }
+str_t = str
+
 debug = False
 class EC_CS98(PKEnc):	
     def __init__(self, builtin_cv):
@@ -40,7 +46,7 @@ class EC_CS98(PKEnc):
         sk = { 'x1' : x1, 'x2' : x2, 'y1' : y1, 'y2' : y2, 'z' : z }
         return (pk, sk)
 
-    def encrypt(self, pk, M):	
+    def _encrypt(self, pk : pk_t, M : str_t):
         r     = group.random()
         u1    = (pk['g1'] ** r)
         u2    = (pk['g2'] ** r)
@@ -52,8 +58,8 @@ class EC_CS98(PKEnc):
         c = { 'u1' : u1, 'u2' : u2, 'e' : e, 'v' : v }
         return c
     
-    def decrypt(self, pk, sk, c):	
-        alpha = group.hash((c['u1'], c['u2'], c['e']))        
+    def _decrypt(self, pk : pk_t, sk : sk_t, c : c_t):
+        alpha = group.hash((c['u1'], c['u2'], c['e']))
         v_prime = (c['u1'] ** (sk['x1'] + (sk['y1'] * alpha))) * (c['u2'] ** (sk['x2'] + (sk['y2'] * alpha)))
         if (c['v'] != v_prime):
             return 'ERROR' 
@@ -75,5 +81,6 @@ def main():
     if debug: print("SUCCESSFUL DECRYPTION!!! => %s" % message)
    
 if __name__ == "__main__":
+    debug=True
     main()
    

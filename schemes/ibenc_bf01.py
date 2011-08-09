@@ -1,8 +1,6 @@
 '''
 Boneh-Franklin Identity Based Encryption
- 
-.. todo:: (NEED TO REWRITE Boneh-Franklin Identity Based Encryption)
- 
+  
 | From: "D. Boneh, M. Franklin Identity-Based Encryption from the Weil Pairing", Section 4.2.
 | Published in: Crypto 2003
 | Available from: http://.../bfibe.pdf

@@ -1,4 +1,4 @@
-from schemes.ibe_bb03 import IBE_BB04
+from pkenc_bb03 import IBE_BB04
 from toolbox.IBEnc import *
 from toolbox.pairinggroup import *
 

@@ -9,9 +9,13 @@ import charm.integer
 from toolbox.bitstring import Bytes
 import math
 
+# define dict of conversion possibilities
+conversion_types = {'byte2str':Conversion.byte2str, 'byte2intE':Conversion.bytes2integer, 'byte2pairE':None, 'byte2eccE':3 
+          ,'str2byte':Conversion.str2bytes,'str2intE':4, 'str2pairE':None, 'str2eccE':None }
+
 class Conversion(object):
     '''
-    The goal is to convert arbitrarily between any of the following types 
+    The goal is to convert arbitrarily between any of the following types
     
     Input types:
     
@@ -30,6 +34,10 @@ class Conversion(object):
     '''
     
     @classmethod
+    def convert(self, source, target):
+        return source
+    
+    @classmethod
     def bytes2element(self, bytestr):
         '''Converts a byte string to a group element'''
         pass
@@ -40,8 +48,12 @@ class Conversion(object):
         return integer(bytestr)
    
     @classmethod
-    def str2bytes(self, str):
-        return Bytes(str, 'utf-8')
+    def str2bytes(self, strobj):
+        return Bytes(strobj, 'utf-8')
+    
+    @classmethod
+    def byte2str(self, byteobj):
+        return Bytes.decode(byteobj, 'utf-8')
      
     @classmethod    
     def OS2IP(self, bytestr, element = False):

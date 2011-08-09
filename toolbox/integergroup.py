@@ -93,8 +93,11 @@ class IntegerGroupQ:
     def isMember(self, x):
         return x.isCongruent()
        
-    def random(self):
-        return self.randObj.random(self.q)
+    def random(self, max=0):
+        if max == 0:
+            return self.randObj.random(self.q)
+        else:
+            return self.randObj.random(max)
 
     def randomPrime(self, bits):
         return self.randObj.randomPrime(bits)

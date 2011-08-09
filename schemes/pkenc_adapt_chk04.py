@@ -15,8 +15,8 @@ Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform (generic composi
 '''
 from toolbox.pairinggroup import *
 from toolbox.PKEnc import *
-from ibe_bb03 import *
-from sig_short_bls04 import *
+from ibenc_bb03 import *
+from pksig_bls04 import *
 from hashIDAdapt import *
 
 debug = False

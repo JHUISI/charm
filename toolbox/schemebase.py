@@ -39,3 +39,21 @@ class SchemeBase:
            if(values.issubset(check)):
                return True
         return False
+    
+    def verifyTypeDict(self, source, target):
+        for i in target.keys():            
+            if hasattr(source[i], 'type'):
+                assert source[i].type == target[i], "invalid type: '%s' should be '%s' not '%s'" % (i, target[i], source[i].type)
+            else:
+                if source[i] != target[i]:
+                    return False
+        return True
+    
+    def verifyType(self, source, target):
+        if hasattr(source, 'type'):
+            # source must be one of our base module types
+            if source.type == target: return True
+            else: return False
+        elif type(source) == target:
+            return True
+        

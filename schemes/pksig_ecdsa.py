@@ -2,8 +2,9 @@ from toolbox.ecgroup import *
 from toolbox.PKSig import *
 
 debug = False
-class ECDSA():
+class ECDSA(PKSig):
     def __init__(self, groupObj):
+        PKSig.__init__(self)
         global group
         group = groupObj
         

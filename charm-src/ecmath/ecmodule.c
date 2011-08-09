@@ -323,7 +323,7 @@ PyObject *ECE_init(ECElement *self, PyObject *args) {
 PyObject *ECE_random(ECElement *self, PyObject *args) {
 
 	GroupType type = NONE_G;
-	Group_Init(self)
+	Group_Init(self);
 
 	if(PyArg_ParseTuple(args, "i", &type)) {
 		if(type == G) {
@@ -1490,6 +1490,14 @@ StartBenchmark_CAPI(_start_benchmark, dBench)
 EndBenchmark_CAPI(_end_benchmark, dBench)
 GetBenchmark_CAPI(_get_benchmark, dBench)
 
+PyMemberDef ECElement_members[] = {
+	{"type", T_INT, offsetof(ECElement, type), 0,
+		"group type"},
+    {"initialized", T_INT, offsetof(ECElement, point_init), 0,
+		"determine initialization status"},
+    {NULL}  /* Sentinel */
+};
+
 PyMethodDef ECElement_methods[] = {
 		{"init", (PyCFunction)ECE_init, METH_VARARGS, "Create an element in a specific group G or ZR."},
 		{"random", (PyCFunction)ECE_random, METH_VARARGS, "Return a random element in a specific group G or ZR."},
@@ -1572,7 +1580,7 @@ PyTypeObject ECType = {
 	0,		               /* tp_iter */
 	0,		               /* tp_iternext */
 	ECElement_methods,             /* tp_methods */
-	0,             /* tp_members */
+	ECElement_members,             /* tp_members */
 	0,                         /* tp_getset */
 	0,                         /* tp_base */
 	0,                         /* tp_dict */
@@ -1603,6 +1611,7 @@ static PyMethodDef ecc_methods[] = {
 		{"GetBenchmark", (PyCFunction)_get_benchmark, METH_VARARGS, "Returns contents of a benchmark object"},
 		{NULL, NULL}
 };
+
 
 #if PY_MAJOR_VERSION >= 3
 static int ecc_traverse(PyObject *m, visitproc visit, void *arg) {
