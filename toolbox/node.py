@@ -1,6 +1,7 @@
-#!/usr/bin/python
-
 import string
+from toolbox.enum import *
+
+OpType = Enum('or', 'and', 'attr')
 
 class BinNode:
   def __init__(self, value, left=None, right=None):		

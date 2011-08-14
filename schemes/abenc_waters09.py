@@ -18,11 +18,11 @@ from toolbox.secretutil import *
 from toolbox.ABEnc import *
 
 debug = False
-class CPabe(ABEnc):
+class CPabe09(ABEnc):
     def __init__(self, groupObj):
         ABEnc.__init__(self)
         global util, group
-        util = SecretUtil(groupObj.Pairing, groupObj._verbose)
+        util = SecretUtil(groupObj.Pairing, groupObj._verbose)        
         group = groupObj
                         
     def setup(self):
@@ -33,7 +33,7 @@ class CPabe(ABEnc):
         pk = {'g1':g1, 'g2':g2, 'e(gg)^alpha':e_gg_alpha, 'g1^a':g1 ** a, 'g2^a':g2 ** a}
         return (msk, pk)
     
-    def keygen(self, pk, msk, attributes):
+    def keygen(self, pk, msk, attributes):        
         t = group.random()
         K = msk['g2^alpha'] * (pk['g2^a'] ** t)
         L = pk['g2'] ** t
@@ -42,15 +42,14 @@ class CPabe(ABEnc):
         K_x = {}
         for i in range(0, len(k_x)):
             K_x[ attributes[i] ] = k_x[i]    
-        
+
         key = { 'K':K, 'L':L, 'K_x':K_x, 'attributes':attributes }
         return key
     
     def encrypt(self, pk, M, policy_str):
         # Extract the attributes as a list
-        policy = util.createPolicy(policy_str)
-        p_list = []
-        util.getAttributeList(policy, p_list)
+        policy = util.createPolicy(policy_str)        
+        p_list = []; util.getAttributeList(policy, p_list)
         s = group.random()
         C_tilde = (pk['e(gg)^alpha'] ** s) * M
         C_0 = pk['g1'] ** s
@@ -68,7 +67,7 @@ class CPabe(ABEnc):
         if debug: print("SessionKey: %s" % C_tilde)
         return { 'C0':C_0, 'C':C, 'D':D , 'C_tilde':C_tilde, 'policy':policy, 'attribute':p_list }
     
-    def decrypt(self, sk, ct):
+    def decrypt(self, pk, sk, ct):
         pruned = util.prune(ct['policy'], sk['attributes'])
         coeffs = {}; util.getCoefficients(ct['policy'], coeffs)
         numerator = pair(ct['C0'], sk['K'])
@@ -90,23 +89,23 @@ def main():
     #Get the eliptic curve with the bilinear mapping feature needed.
     groupObj = PairingGroup('../param/a.param', verbose=True)
 
-    cpabe = CPabe(groupObj)
+    cpabe = CPabe09(groupObj)
     (msk, pk) = cpabe.setup()
-    policy = '((one or three) and (TWO or FOUR))'
+    pol = '((ONE or THREE) and (TWO or FOUR))'
     attr_list = ['THREE', 'ONE', 'TWO']
 
-    if debug: print('Acces Policy: %s' % policy)
+    if debug: print('Acces Policy: %s' % pol)
     if debug: print('User credential list: %s' % attr_list)
     m = groupObj.random(GT)
     
     cpkey = cpabe.keygen(pk, msk, attr_list)
     if debug: print("\nSecret key: %s" % attr_list)
-    if debug:groupObj.debug(cpkey)
-    cipher = cpabe.encrypt(pk, m, policy)
+#    if debug:groupObj.debug(cpkey)
+    cipher = cpabe.encrypt(pk, m, pol)
 
     if debug: print("\nCiphertext...")
     if debug:groupObj.debug(cipher)    
-    orig_m = cpabe.decrypt(cpkey, cipher)
+    orig_m = cpabe.decrypt(pk, cpkey, cipher)
    
     assert m == orig_m, 'FAILED Decryption!!!' 
     if debug: print('Successful Decryption!')    

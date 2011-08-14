@@ -27,9 +27,9 @@ def pushFirst( s, loc, toks ):
     objStack.append( toks[0] )
 
 def createTree(op, node1, node2):
-    if(op == "OR"):
+    if(op == OpType['or']):
         node = BinNode(1)
-    elif(op == "AND"):
+    elif(op == OpType['and']):
         node = BinNode(2)
     else:
         return None
@@ -70,18 +70,18 @@ class PolicyParser:
     
     def evalStack(self, stack):
         op = stack.pop()
-        if op == "AND" or op == "OR":
+        if op in ["OR", "AND"]:
             op2 = self.evalStack(stack)
             op1 = self.evalStack(stack)
-            return createTree(op, op1, op2)
+            return createTree(OpType[op.lower()], op1, op2)
         else:
             # Node value
             return op
     
-    def parse(self, str):
+    def parse(self, string):
         global objStack
         del objStack[:]
-        policy = self.finalPol.parseString(str)
+        self.finalPol.parseString(string)
         return self.evalStack(objStack)
 
     # determine whether subset will satisfy

@@ -102,7 +102,7 @@ def main():
     if debug: print("\n\nDecrypt...\n")
     if debug: print("Rec msg =>", rec_msg)
 
-    assert rand_msg == rec_msg, "FAILED Decryption!!!"
+    assert rand_msg == rec_msg, "FAILED Decryption: message is incorrect"
     if debug: print("Successful Decryption!!!")
     
 if __name__ == "__main__":
