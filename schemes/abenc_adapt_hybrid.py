@@ -2,8 +2,8 @@
 from charm.cryptobase import *
 from charm.pairing import hash as sha1
 from math import ceil
-from schemes.abenc_bsw07 import *
-from toolbox.ABEnc import *
+from schemes.abenc_bsw07 import CPabe_BSW07
+from toolbox.ABEnc import ABEnc
 from toolbox.pairinggroup import *
 from toolbox.conversion import *
 
@@ -38,11 +38,11 @@ class HybridABEnc(ABEnc):
         return Conversion.byte2str(msg).strip('\x00')
     
     def instantiateCipher(self, mode, message):
-        self.mode, self.key_len = AES, 16
+        self.alg, self.key_len = AES, 16
         # hash GT msg into a hex string
         key = sha1(message)[0:self.key_len]
         iv  = '6543210987654321' # static IV (for testing)    
-        PRP_method = selectPRP(AES, (key, mode, iv))        
+        PRP_method = selectPRP(self.alg, (key, mode, iv))        
         return PRP_method
     
     def __pad(self, message):
@@ -60,15 +60,14 @@ def main():
     cpabe = CPabe_BSW07(groupObj)
     hyb_abe = HybridABEnc(cpabe, groupObj)
         
-    attrs = ['ONE', 'TWO', 'THREE']
     access_policy = '((four or three) and (two or one))'
     message = "hello world this is an important message."
     if debug: 
-        print("Attributes =>", attrs); print("Policy =>", access_policy)
+        print("Policy =>", access_policy)
     
     (pk, mk) = hyb_abe.setup()
     
-    sk = hyb_abe.keygen(pk, mk, attrs)
+    sk = hyb_abe.keygen(pk, mk, ['ONE', 'TWO', 'THREE'])
 
     ct = hyb_abe.encrypt(pk, message, access_policy)
     if debug: print("\nCiphertext: ", ct)
@@ -77,8 +76,8 @@ def main():
     if debug: print("\n\nDecrypt...\n")
     if debug: print("Rec msg =>", rec_msg)
     assert message == rec_msg, "FAILED Decryption: message is incorrect"
-    if debug: print("Successful Decryption!!!")    
-    
+    if debug: print("Successful Decryption!!!")
+
 if __name__ == "__main__":
     debug = True
     main()

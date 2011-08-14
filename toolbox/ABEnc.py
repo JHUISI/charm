@@ -35,7 +35,7 @@ class ABEnc(SchemeBase):
             assert SchemeBase.verifyTypeDict(self, pk, targ_pk), "invalid pk type."
             if not SchemeBase.verifyType(self, M, targ_m):
                 # cast M into target type
-                M = Conversion.convert(self, M, targ_m)
+                M = Conversion.convert(M, targ_m)
             result = self._encrypt(pk, M, object)        
             assert SchemeBase.verifyTypeDict(self, result, targ_result), "invalid ciphertext type."
             return result

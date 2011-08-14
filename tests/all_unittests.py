@@ -41,7 +41,7 @@ def getAllTestsSuite(unittestpaths):
         testmodules = [mod for mod in find_modules(path) if re.match(".*_test$", mod)]
         for name in testmodules:
             m = load_module(name, unittestpaths)
-            #print("Loading .. %s" % m.__file__)
+            print("Loading .. %s" % m.__file__)
             suite_n = unittest.TestLoader().loadTestsFromModule(m)
             suite.addTests(suite_n)
     return suite

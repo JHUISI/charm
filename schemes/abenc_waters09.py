@@ -100,7 +100,7 @@ def main():
     
     cpkey = cpabe.keygen(pk, msk, attr_list)
     if debug: print("\nSecret key: %s" % attr_list)
-#    if debug:groupObj.debug(cpkey)
+    if debug:groupObj.debug(cpkey)
     cipher = cpabe.encrypt(pk, m, pol)
 
     if debug: print("\nCiphertext...")
