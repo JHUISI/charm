@@ -1031,7 +1031,7 @@ static PyObject *genRandomBits(Integer *self, PyObject *args) {
 				}
 
 			}
-			return v;
+			return (PyObject *) v;
 		}
 	}
 
@@ -1572,63 +1572,52 @@ StartBenchmark_CAPI( _start_benchmark, dBench);
 EndBenchmark_CAPI( _end_benchmark, dBench);
 GetBenchmark_CAPI( _get_benchmark, dBench);
 
-PyMethodDef
-		Integer_methods[] =
-				{
-						{ "set", (PyCFunction) Integer_set, METH_VARARGS,
-								"initialize with another integer object." },
-						{ "randomBits", (PyCFunction) genRandomBits,
-								METH_VARARGS,
-								"generate a random number of bits from 0 to 2^n-1." },
-						{ "random", (PyCFunction) genRandom, METH_VARARGS,
-								"generate a random number in range of 0 to n-1 where n is large number." },
-						{ "randomPrime", (PyCFunction) genRandomPrime,
-								METH_VARARGS,
-								"generate a probabilistic random prime number that is n-bits." },
-						{ "isCoPrime", (PyCFunction) testCoPrime, METH_O
-								| METH_NOARGS,
-								"determine whether two integers a and b are relatively prime." },
-						{ "isCongruent", (PyCFunction) testCongruency,
-								METH_VARARGS,
-								"determine whether two integers are congruent mod n." },
-						{ "reduce", (PyCFunction) Integer_reduce, METH_NOARGS,
-								"reduce an integer object modulo N." },
-						{ NULL } };
+PyMethodDef Integer_methods[] = {
+	{ "set", (PyCFunction) Integer_set, METH_VARARGS, "initialize with another integer object." },
+	{ "randomBits", (PyCFunction) genRandomBits, METH_VARARGS, "generate a random number of bits from 0 to 2^n-1." },
+	{ "random", (PyCFunction) genRandom, METH_VARARGS, "generate a random number in range of 0 to n-1 where n is large number." },
+	{ "randomPrime", (PyCFunction) genRandomPrime, METH_VARARGS, "generate a probabilistic random prime number that is n-bits." },
+	{ "isCoPrime", (PyCFunction) testCoPrime, METH_O | METH_NOARGS, "determine whether two integers a and b are relatively prime." },
+	{ "isCongruent", (PyCFunction) testCongruency, METH_VARARGS, "determine whether two integers are congruent mod n." },
+	{ "reduce", (PyCFunction) Integer_reduce, METH_NOARGS, "reduce an integer object modulo N." },
+	{ NULL }
+};
 
-PyNumberMethods integer_number = { Integer_add, /* nb_add */
-Integer_sub, /* nb_subtract */
-Integer_mul, /* nb_multiply */
-Integer_remainder, /* nb_remainder */
-0, /* nb_divmod */
-Integer_pow, /* nb_power */
-0, /* nb_negative */
-0, /* nb_positive */
-0, /* nb_absolute */
-0, /* nb_bool */
-(unaryfunc) Integer_invert, /* nb_invert */
-0, /* nb_lshift */
-0, /* nb_rshift */
-0, /* nb_and */
-Integer_xor, /* nb_xor */
-0, /* nb_or */
-(unaryfunc) Integer_long, /* nb_int */
-0, /* nb_reserved */
-0, /* nb_float */
-Integer_add, /* nb_inplace_add */
-Integer_sub, /* nb_inplace_subtract */
-Integer_mul, /* nb_inplace_multiply */
-Integer_remainder, /* nb_inplace_remainder */
-Integer_pow, /* nb_inplace_power */
-0, /* nb_inplace_lshift */
-0, /* nb_inplace_rshift */
-0, /* nb_inplace_and */
-0, /* nb_inplace_xor */
-0, /* nb_inplace_or */
-0, /* nb_floor_divide */
-Integer_div, /* nb_true_divide */
-0, /* nb_inplace_floor_divide */
-Integer_div, /* nb_inplace_true_divide */
-0, /* nb_index */
+PyNumberMethods integer_number = {
+	Integer_add, /* nb_add */
+	Integer_sub, /* nb_subtract */
+	Integer_mul, /* nb_multiply */
+	Integer_remainder, /* nb_remainder */
+	0, /* nb_divmod */
+	Integer_pow, /* nb_power */
+	0, /* nb_negative */
+	0, /* nb_positive */
+	0, /* nb_absolute */
+	0, /* nb_bool */
+	(unaryfunc) Integer_invert, /* nb_invert */
+	0, /* nb_lshift */
+	0, /* nb_rshift */
+	0, /* nb_and */
+	Integer_xor, /* nb_xor */
+	0, /* nb_or */
+	(unaryfunc) Integer_long, /* nb_int */
+	0, /* nb_reserved */
+	0, /* nb_float */
+	Integer_add, /* nb_inplace_add */
+	Integer_sub, /* nb_inplace_subtract */
+	Integer_mul, /* nb_inplace_multiply */
+	Integer_remainder, /* nb_inplace_remainder */
+	Integer_pow, /* nb_inplace_power */
+	0, /* nb_inplace_lshift */
+	0, /* nb_inplace_rshift */
+	0, /* nb_inplace_and */
+	0, /* nb_inplace_xor */
+	0, /* nb_inplace_or */
+	0, /* nb_floor_divide */
+	Integer_div, /* nb_true_divide */
+	0, /* nb_inplace_floor_divide */
+	Integer_div, /* nb_inplace_true_divide */
+	0, /* nb_index */
 };
 
 PyTypeObject IntegerType = {
@@ -1685,46 +1674,25 @@ static struct module_state _state;
 #endif
 
 /* global module methods (include isPrime, randomPrime, etc. here). */
-static PyMethodDef
-		module_methods[] =
-				{
-						{ "init", (PyCFunction) Integer_randinit, METH_O
-								| METH_NOARGS,
-								"initialize random number generator" },
-						{ "isPrime", (PyCFunction) testPrimality, METH_O,
-								"probabilistic algorithm to whether a given integer is prime." },
-						{ "encode", (PyCFunction) encode_message, METH_VARARGS,
-								"encode a message as a group element where p = 2*q + 1 only." },
-						{ "decode", (PyCFunction) decode_message, METH_VARARGS,
-								"decode a message from a group element where p = 2*q + 1 to a message." },
-						{ "hash", (PyCFunction) Integer_hash, METH_VARARGS,
-								"hash to group elements in which p = 2*q+1." },
-						{ "bitsize", (PyCFunction) bitsize, METH_VARARGS,
-								"determine how many bits required to represent a given value." },
-						{ "legendre", (PyCFunction) legendre, METH_VARARGS,
-								"given a and a positive prime p compute the legendre symbol." },
-						{ "gcd", (PyCFunction) gcdCall, METH_VARARGS,
-								"compute the gcd of two integers a and b." },
-						{ "lcm", (PyCFunction) lcmCall, METH_VARARGS,
-								"compute the lcd of two integers a and b." },
-						{ "serialize", (PyCFunction) serialize, METH_VARARGS,
-								"Serialize an integer type into bytes." },
-						{ "deserialize", (PyCFunction) deserialize,
-								METH_VARARGS,
-								"De-serialize an bytes object into an integer object" },
-						{ "InitBenchmark", (PyCFunction) _init_benchmark,
-								METH_NOARGS, "Initialize a benchmark object" },
-						{ "StartBenchmark", (PyCFunction) _start_benchmark,
-								METH_VARARGS,
-								"Start a new benchmark with some options" },
-						{ "EndBenchmark", (PyCFunction) _end_benchmark,
-								METH_VARARGS, "End a given benchmark" },
-						{ "GetBenchmark", (PyCFunction) _get_benchmark,
-								METH_VARARGS,
-								"Returns contents of a benchmark object" },
-						{ "int2Bytes", (PyCFunction) toBytes, METH_O,
-								"convert an integer object to a bytes object." },
-						{ NULL, NULL } };
+static PyMethodDef module_methods[] = {
+	{ "init", (PyCFunction) Integer_randinit, METH_O | METH_NOARGS, "initialize random number generator" },
+	{ "isPrime", (PyCFunction) testPrimality, METH_O, "probabilistic algorithm to whether a given integer is prime." },
+	{ "encode", (PyCFunction) encode_message, METH_VARARGS, "encode a message as a group element where p = 2*q + 1 only." },
+	{ "decode", (PyCFunction) decode_message, METH_VARARGS, "decode a message from a group element where p = 2*q + 1 to a message." },
+	{ "hash", (PyCFunction) Integer_hash, METH_VARARGS, "hash to group elements in which p = 2*q+1." },
+	{ "bitsize", (PyCFunction) bitsize, METH_VARARGS, "determine how many bits required to represent a given value." },
+	{ "legendre", (PyCFunction) legendre, METH_VARARGS, "given a and a positive prime p compute the legendre symbol." },
+	{ "gcd", (PyCFunction) gcdCall, METH_VARARGS, "compute the gcd of two integers a and b." },
+	{ "lcm", (PyCFunction) lcmCall, METH_VARARGS, "compute the lcd of two integers a and b." },
+	{ "serialize", (PyCFunction) serialize, METH_VARARGS, "Serialize an integer type into bytes." },
+	{ "deserialize", (PyCFunction) deserialize, METH_VARARGS, "De-serialize an bytes object into an integer object" },
+	{ "InitBenchmark", (PyCFunction) _init_benchmark, METH_NOARGS, "Initialize a benchmark object" },
+	{ "StartBenchmark", (PyCFunction) _start_benchmark, METH_VARARGS, "Start a new benchmark with some options" },
+	{ "EndBenchmark", (PyCFunction) _end_benchmark, METH_VARARGS, "End a given benchmark" },
+	{ "GetBenchmark", (PyCFunction) _get_benchmark, METH_VARARGS, "Returns contents of a benchmark object" },
+	{ "int2Bytes", (PyCFunction) toBytes, METH_O, "convert an integer object to a bytes object." },
+	{ NULL, NULL }
+};
 
 #if PY_MAJOR_VERSION >= 3
 static int int_traverse(PyObject *m, visitproc visit, void *arg) {

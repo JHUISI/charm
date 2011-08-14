@@ -26,7 +26,7 @@ class PKEnc(SchemeBase):
             assert SchemeBase.verifyTypeDict(self, pk, targ_pk),  "invalid pk target type."
             if not SchemeBase.verifyType(self, M, targ_m):
                 # cast M into target type
-                M = Conversion.convert(M, targ_m)
+                M = Conversion.convert(self, M, targ_m)
             return self._encrypt(pk, M)
         return NotImplemented
 

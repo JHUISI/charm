@@ -42,11 +42,17 @@ class SchemeBase:
     
     def verifyTypeDict(self, source, target):
         for i in target.keys():            
-            if hasattr(source[i], 'type'):
+            if hasattr(source[i], 'type'): # check for charm elements
                 assert source[i].type == target[i], "invalid type: '%s' should be '%s' not '%s'" % (i, target[i], source[i].type)
-            else:
-                if source[i] != target[i]:
-                    return False
+            elif type(source[i]) in [dict, list]: # all dict elements (charm or python) must match target type
+                keys = source[i].keys() if type(source[i]) == dict else range(len(source[i]))
+                for j in keys:
+                    if hasattr(source[i][j ], 'type'):
+                        assert source[i][j].type == target[i], "invalid type: '%s' should be '%s' not '%s'" % (j, target[i], source[i][j].type)
+                    else:
+                        assert type(source[i][j]) == target[i], "invalid type: %s" % (target[i], type(source[i][j]))
+            else: # normal python type
+                assert type(source[i]) == target[i], "invalid type: %s not %s" % (target[i], type(source[i]))
         return True
     
     def verifyType(self, source, target):
@@ -56,4 +62,19 @@ class SchemeBase:
             else: return False
         elif type(source) == target:
             return True
-        
+    
+    @classmethod
+    def getTypes(self, object, keys, _type=tuple):
+        if _type == tuple:
+            ret = []
+        else: ret = {}
+        # get the data 
+        for i in keys:
+            if _type == tuple:
+                ret.append(object.__annotations__[i])
+            else: # dict
+                ret[ i ] = object.__annotations__[i]            
+        # return data
+        if _type == tuple:                
+            return tuple(ret)
+        return ret

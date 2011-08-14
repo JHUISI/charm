@@ -17,6 +17,12 @@ from toolbox.pairinggroup import *
 from toolbox.secretutil import *
 from toolbox.ABEnc import *
 
+# type annotations
+pk_t = { 'g':G1, 'g2':G2, 'h':G1, 'f':G1, 'e_gg_alpha':GT }
+mk_t = {'beta':ZR, 'g2_alpha':G2 }
+sk_t = { 'D':G2, 'Dj':G2, 'Djp':G1, 'S':str }
+ct_t = { 'C_tilde':GT, 'C':G1, 'Cy':G1, 'Cyp':G2 }
+
 debug = False
 class CPabe_BSW07(ABEnc):
     def __init__(self, groupObj):
@@ -37,18 +43,18 @@ class CPabe_BSW07(ABEnc):
         mk = {'beta':beta, 'g2_alpha':gp ** alpha }
         return (pk, mk)
     
-    def keygen(self, pk, mk, S):
-        r = group.random()    
+    def _keygen(self, pk: pk_t, mk: mk_t, S: str) -> sk_t:
+        r = group.random() 
         g_r = (pk['g2'] ** r)    
         D = (mk['g2_alpha'] * g_r) ** (1 / mk['beta'])        
         D_j, D_j_pr = {}, {}
         for j in S:
             r_j = group.random()
             D_j[j] = g_r * (group.hash(j, G2) ** r_j)
-            D_j_pr[j] = pk['g'] ** r_j        
+            D_j_pr[j] = pk['g'] ** r_j
         return { 'D':D, 'Dj':D_j, 'Djp':D_j_pr, 'S':S }
     
-    def encrypt(self, pk, M, policy_str): 
+    def _encrypt(self, pk: pk_t, M: GT, policy_str : str) -> ct_t: 
         policy = util.createPolicy(policy_str)
         a_list = []; util.getAttributeList(policy, a_list)
         s = group.random()
@@ -63,7 +69,7 @@ class CPabe_BSW07(ABEnc):
         return { 'C_tilde':(pk['e_gg_alpha'] ** s) * M,
                  'C':C, 'Cy':C_y, 'Cyp':C_y_pr, 'policy':policy, 'attributes':a_list }
     
-    def decrypt(self, pk, sk, ct):
+    def _decrypt(self, pk: pk_t, sk: sk_t, ct: ct_t) -> GT:
         pruned_list = util.prune(ct['policy'], sk['S'])
         z = {}; util.getCoefficients(ct['policy'], z)
 
