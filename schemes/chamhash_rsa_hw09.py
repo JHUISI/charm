@@ -48,7 +48,7 @@ class RSA_HW09(ChamHash):
        
         print("Message =>", message)    
         msg_int = 0
-        # iterate over bits?
+        # TODO: iterate over bits (not working yet)
         for b in message:
             msg_int = msg_int << 8
             msg_int += ord(b)
