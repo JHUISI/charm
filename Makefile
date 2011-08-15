@@ -139,7 +139,7 @@ builddeb:
 .PHONY: clean
 clean:
 	$(PYTHON) setup.py clean
-	cd doc; $(MAKE) clean
+#	cd doc; $(MAKE) clean
 #        $(MAKE) -f $(CURDIR)/debian/rules clean
 	rm -rf build/ dist/ ${dest_build} MANIFEST
 	find . -name '*.pyc' -delete

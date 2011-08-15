@@ -24,7 +24,7 @@ class ObliviousTransfer(Protocol):
 #        Protocol.setSerializers(self, self.serialize, self.deserialize)
         # make sure 
         if groupObj == None:
-            self.group = PairingGroup('a.param')
+            self.group = PairingGroup('../param/a.param')
         else:
             self.group = groupObj
         # proof parameter generation

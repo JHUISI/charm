@@ -35,7 +35,7 @@ class HybridABEnc(ABEnc):
         key = abenc.decrypt(pk, sk, c1)
         cipher = self.instantiateCipher(MODE_CBC, key)
         msg = cipher.decrypt(c2)
-        return Conversion.byte2str(msg).strip('\x00')
+        return Conversion.bytes2str(msg).strip('\x00')
     
     def instantiateCipher(self, mode, message):
         self.alg, self.key_len = AES, 16

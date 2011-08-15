@@ -29,7 +29,18 @@ class Conversion(object):
     * Integer element mod N
     '''
     @classmethod
-    def convert(self, source, target):
+    def extractType(self, value):
+        value_t = str(type(value))
+        start, stop = value_t.find("'"), value_t.rfind("'")
+        return value_t[start+1:stop] 
+    
+    # TODO: may need to track the setting as well so that target type makes sense?
+    # valid mappings are recorded in the corresponding conversion type dict
+    # if a func doesn't exist then return invalid conversion, right?
+    # convertForEcc, convertForPair, convertForInt?
+    @classmethod
+    def convert(self, source, target):     
+        key = Conversion.extractType(source) + '2' + target
         return source
     @classmethod
     def bytes2element(self, bytestr):
@@ -43,7 +54,7 @@ class Conversion(object):
     def str2bytes(self, strobj):
         return Bytes(strobj, 'utf-8')
     @classmethod
-    def byte2str(self, byteobj):
+    def bytes2str(self, byteobj):
         return Bytes.decode(byteobj, 'utf-8')
     @classmethod    
     def OS2IP(self, bytestr, element = False):
@@ -87,12 +98,12 @@ class Conversion(object):
         ba.reverse()
         return Bytes(ba)
 
-# define dict of conversion possibilities
-conversion_types = {'byte2str': Conversion.byte2str, 
-                    'byte2intE':Conversion.bytes2integer, 
-                    'byte2pairE':None, 
-                    'byte2eccE':3,
-                    'str2byte':Conversion.str2bytes,
-                    'str2intE':4, 
+# define dict of conversions
+conversion_types = {'bytes2str': Conversion.bytes2str, 
+                    'bytes2intE':Conversion.bytes2integer, 
+                    'bytes2pairE':None, 
+                    'bytes2eccE':None,
+                    'str2bytes':Conversion.str2bytes,
+                    'str2intE':None, 
                     'str2pairE':None, 
                     'str2eccE':None }
