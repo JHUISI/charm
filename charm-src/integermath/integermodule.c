@@ -1005,33 +1005,43 @@ static PyObject *genRandomBits(Integer *self, PyObject *args) {
 	if (PyArg_ParseTuple(args, "i", &bits)) {
 		if (bits > 0) {
 			// generate random number that is in 0 to 2^n-1 range.
-			PyLongObject *v;
-			unsigned char buff[sizeof(long)];
-			long t;
-			int ndigits = (bits + PyLong_SHIFT - 1) / PyLong_SHIFT;
-			int digitsleft = ndigits;
-			int bitsleft = bits;
+// TODO: fix code very very soon!
+//			PyLongObject *v;
+//			unsigned char buff[sizeof(long)];
+//			long t;
+//			int ndigits = (bits + PyLong_SHIFT - 1) / PyLong_SHIFT;
+//			int digitsleft = ndigits;
+//			int bitsleft = bits;
+//
+//			v = _PyLong_New(ndigits);
+//			if (v != NULL) {
+//				digit *p = v->ob_digit;
+//				while (digitsleft > 1) {
+//					RAND_bytes(buff, sizeof(long));
+//					memcpy(&t, buff, sizeof(long));
+//					*p++ = (digit)(t & PyLong_MASK);
+//					digitsleft--;
+//					bitsleft -= PyLong_SHIFT;
+//				}
+//
+//				if (digitsleft == 1) {
+//					RAND_bytes(buff, sizeof(long));
+//					memcpy(&t, buff, sizeof(long));
+//					unsigned long mask = (1 << bitsleft) - 1;
+//					*p++ = (digit)(t & PyLong_MASK & mask);
+//				}
+//
+//			}
+//			return (PyObject *) v;
+			mp_bitcnt_t n = bits;
 
-			v = _PyLong_New(ndigits);
-			if (v != NULL) {
-				digit *p = v->ob_digit;
-				while (digitsleft > 1) {
-					RAND_bytes(buff, sizeof(long));
-					memcpy(&t, buff, sizeof(long));
-					*p++ = (digit)(t & PyLong_MASK);
-					digitsleft--;
-					bitsleft -= PyLong_SHIFT;
-				}
+			mpz_t rop;
+			mpz_init(rop);
+			mpz_urandomb(rop, self->state, n);
 
-				if (digitsleft == 1) {
-					RAND_bytes(buff, sizeof(long));
-					memcpy(&t, buff, sizeof(long));
-					unsigned long mask = (1 << bitsleft) - 1;
-					*p++ = (digit)(t & PyLong_MASK & mask);
-				}
-
-			}
-			return (PyObject *) v;
+			PyObject *rop2 = mpzToLongObj(rop);
+			mpz_clear(rop);
+			return rop2;
 		}
 	}
 
