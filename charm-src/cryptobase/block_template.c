@@ -821,7 +821,7 @@ static PyTypeObject ALGtype =
 //PyMODINIT_FUNC
 //_MODULE_NAME (void)
 //{
-#ifdef PY_MAJOR_VERSION >= 3
+#if PY_MAJOR_VERSION >= 3
 static int block_traverse(PyObject *m, visitproc visit, void *arg) {
 	Py_VISIT(GETSTATE(m)->error);
 	return 0;
@@ -882,7 +882,7 @@ void _MODULE_NAME(void) 		{
 	/* Check for errors */
 	if (PyErr_Occurred())
 		Py_FatalError("can't initialize module " _MODULE_STRING);
-#ifdef PY_MAJOR_VERSION >= 3
+#if PY_MAJOR_VERSION >= 3
 	return m;
 #endif
 }

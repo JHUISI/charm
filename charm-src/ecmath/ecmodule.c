@@ -1515,13 +1515,13 @@ PyMethodDef ECElement_methods[] = {
 };
 
 PyNumberMethods ecc_number = {
-	    ECE_add,            /* nb_add */
-	    ECE_sub,            /* nb_subtract */
-	    ECE_mul,            /* nb_multiply */
-	    ECE_rem,      		    /* nb_remainder */
+		(binaryfunc) ECE_add,            /* nb_add */
+	    (binaryfunc) ECE_sub,            /* nb_subtract */
+	    (binaryfunc) ECE_mul,            /* nb_multiply */
+	    (binaryfunc) ECE_rem,      		    /* nb_remainder */
 	    0,					/* nb_divmod */
-	    ECE_pow,			/* nb_power */
-	    ECE_neg,            /* nb_negative */
+	    (ternaryfunc) ECE_pow,			/* nb_power */
+	    (unaryfunc) ECE_neg,            /* nb_negative */
 	    0,            /* nb_positive */
 	    0,            /* nb_absolute */
 	    0,          	/* nb_bool */
@@ -1534,11 +1534,11 @@ PyNumberMethods ecc_number = {
 	    (unaryfunc)ECE_long,           /* nb_int */
 	    0,						/* nb_reserved */
 	    0,          			/* nb_float */
-	    ECE_add,            /* nb_inplace_add */
-	    ECE_sub,            /* nb_inplace_subtract */
-	    ECE_mul,            /* nb_inplace_multiply */
-	    ECE_rem,      			/* nb_inplace_remainder */
-	    ECE_pow,		    /* nb_inplace_power */
+	    (binaryfunc) ECE_add,            /* nb_inplace_add */
+	    (binaryfunc) ECE_sub,            /* nb_inplace_subtract */
+	    (binaryfunc) ECE_mul,            /* nb_inplace_multiply */
+	    (binaryfunc) ECE_rem,      			/* nb_inplace_remainder */
+	    (binaryfunc) ECE_pow,		    /* nb_inplace_power */
 	    0,                   /* nb_inplace_lshift */
 	    0,                   /* nb_inplace_rshift */
 	    0,                      /* nb_inplace_and */

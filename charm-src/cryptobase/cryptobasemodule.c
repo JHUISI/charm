@@ -134,7 +134,7 @@ static PyMethodDef module_methods[] = {
 	{NULL}
 };
 
-#ifdef PY_MAJOR_VERSION >= 3
+#if PY_MAJOR_VERSION >= 3
 static int base_traverse(PyObject *m, visitproc visit, void *arg) {
 	Py_VISIT(GETSTATE(m)->error);
 	return 0;
@@ -200,7 +200,7 @@ void initcryptobase(void) 		{
     BaseError = st->error;
 //    Py_INCREF(BaseError);
 //    PyModule_AddObject(m, "base.error", BaseError);
-#ifdef PY_MAJOR_VERSION >= 3
+#if PY_MAJOR_VERSION >= 3
 	return m;
 #endif
 }
