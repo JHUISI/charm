@@ -1539,7 +1539,7 @@ PyNumberMethods ecc_number = {
 	    (binaryfunc) ECE_sub,            /* nb_inplace_subtract */
 	    (binaryfunc) ECE_mul,            /* nb_inplace_multiply */
 	    (binaryfunc) ECE_rem,      			/* nb_inplace_remainder */
-	    (binaryfunc) ECE_pow,		    /* nb_inplace_power */
+	    (ternaryfunc) ECE_pow,		    /* nb_inplace_power */
 	    0,                   /* nb_inplace_lshift */
 	    0,                   /* nb_inplace_rshift */
 	    0,                      /* nb_inplace_and */

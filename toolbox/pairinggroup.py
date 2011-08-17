@@ -1,11 +1,11 @@
 from charm.pairing import *
-from charm.integer import *
+#from charm.integer import * 
 
 class PairingGroup():
     def __init__(self, param_file, secparam=512, verbose=False):
         self.Pairing = pairing(param_file)
         self.secparam = secparam # number of bits
-        self.rand = init()
+#        self.rand = init()
         self._verbose = verbose
 
     # will be used to define curve parameters and such
@@ -37,7 +37,9 @@ class PairingGroup():
                 return self.Pairing.random(type, seed)
             return self.Pairing.random(type)
         else:
-            return self.rand.randomPrime(self.secparam)
+            #return self.rand.randomPrime(self.secparam)
+            return None
+
         
     def __randomGT(self):
         if not hasattr(self, 'gt'):

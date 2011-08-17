@@ -30,29 +30,29 @@ class ABEnc(SchemeBase):
     def encrypt(self, pk, M, object):
         if hasattr(self, '_encrypt'):
             # do some arg type checking here?
-            (targ_pk, targ_m, targ_result) = \
-                SchemeBase.getTypes(self._encrypt, ['pk', 'M', 'return'])
-            assert SchemeBase.verifyTypeDict(self, pk, targ_pk), "invalid pk type."
-            if not SchemeBase.verifyType(self, M, targ_m):
+            #(targ_pk, targ_m, targ_result) = \
+            #    SchemeBase.getTypes(self._encrypt, ['pk', 'M', 'return'])
+            #assert SchemeBase.verifyTypeDict(self, pk, targ_pk), "invalid pk type."
+            #if not SchemeBase.verifyType(self, M, targ_m):
                 # cast M into target type
-                M = Conversion.convert(M, targ_m)
+            #    M = Conversion.convert(M, targ_m)
             result = self._encrypt(pk, M, object)        
-            assert SchemeBase.verifyTypeDict(self, result, targ_result), "invalid ciphertext type."
+            #assert SchemeBase.verifyTypeDict(self, result, targ_result), "invalid ciphertext type."
             return result
         raise NotImplementedError
 
     def decrypt(self, pk, sk, ct):
         if hasattr(self, '_decrypt'):
-            (targ_pk, targ_sk, targ_ct, targ_result) = \
-                SchemeBase.getTypes(self._decrypt, ['pk', 'sk', 'ct', 'return'])
-            assert SchemeBase.verifyTypeDict(self, pk, targ_pk), "invalid pk type."
-            assert SchemeBase.verifyTypeDict(self, sk, targ_sk), "invalid sk type."
-            assert SchemeBase.verifyTypeDict(self, ct, targ_ct), "invalid ciphertext type."
+            #(targ_pk, targ_sk, targ_ct, targ_result) = \
+            #    SchemeBase.getTypes(self._decrypt, ['pk', 'sk', 'ct', 'return'])
+            #assert SchemeBase.verifyTypeDict(self, pk, targ_pk), "invalid pk type."
+            #assert SchemeBase.verifyTypeDict(self, sk, targ_sk), "invalid sk type."
+            #assert SchemeBase.verifyTypeDict(self, ct, targ_ct), "invalid ciphertext type."
 
             result = self._decrypt(pk, sk, ct)
-            if type(result) == dict:
-                assert SchemeBase.verifyTypeDict(self, result, targ_result), "invalid message type."
-            else:
-                assert SchemeBase.verifyType(self, result, targ_result), "invalid ciphertext type."  
+            #if type(result) == dict:
+            #    assert SchemeBase.verifyTypeDict(self, result, targ_result), "invalid message type."
+            #else:
+            #    assert SchemeBase.verifyType(self, result, targ_result), "invalid ciphertext type."  
             return result
         raise NotImplementedError
