@@ -1593,6 +1593,7 @@ PyMethodDef Integer_methods[] = {
 	{ NULL }
 };
 
+#if PY_MAJOR_VERSION >= 3
 PyNumberMethods integer_number = {
 	Integer_add, /* nb_add */
 	Integer_sub, /* nb_subtract */
@@ -1670,6 +1671,93 @@ PyTypeObject IntegerType = {
 	0, /* tp_alloc */
 	Integer_new, /* tp_new */
 };
+#else
+/* python 2.x series */
+PyNumberMethods integer_number = {
+    Integer_add,                       /* nb_add */
+    Integer_sub,                       /* nb_subtract */
+    Integer_mul,                        /* nb_multiply */
+    Integer_div,                       /* nb_divide */
+    Integer_remainder,                      /* nb_remainder */
+    0,						/* nb_divmod */
+    Integer_pow,						/* nb_power */
+    0,            		/* nb_negative */
+    0,            /* nb_positive */
+    0,            /* nb_absolute */
+    0,          	/* nb_nonzero */
+    (unaryfunc)Integer_invert,         /* nb_invert */
+    0,                    /* nb_lshift */
+    0,                    /* nb_rshift */
+    0,                       /* nb_and */
+    Integer_xor,                       /* nb_xor */
+    0,                        /* nb_or */
+    0,                    				/* nb_coerce */
+    0,            /* nb_int */
+    (unaryfunc)Integer_long,           /* nb_long */
+    0,          /* nb_float */
+    0,            /* nb_oct */
+    0,            /* nb_hex */
+    Integer_add,                      /* nb_inplace_add */
+    Integer_sub,                      /* nb_inplace_subtract */
+    Integer_mul,                      /* nb_inplace_multiply */
+    Integer_div,                      /* nb_inplace_divide */
+    0,                      /* nb_inplace_remainder */
+    0,								/* nb_inplace_power */
+    0,                   /* nb_inplace_lshift */
+    0,                   /* nb_inplace_rshift */
+    0,                      /* nb_inplace_and */
+    0,                      /* nb_inplace_xor */
+    0,                       /* nb_inplace_or */
+    0,                  /* nb_floor_divide */
+    0,                   /* nb_true_divide */
+    0,                 /* nb_inplace_floor_divide */
+    0,                  /* nb_inplace_true_divide */
+    0,          /* nb_index */
+};
+
+PyTypeObject IntegerType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                         /*ob_size*/
+    "integer.Element",             /*tp_name*/
+    sizeof(Integer),             /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    (destructor)Integer_dealloc, /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    &integer_number,       /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0, 						/*tp_call*/
+    (reprfunc)Integer_print,   /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_CHECKTYPES, /*tp_flags*/
+    "Modular Integer objects",           /* tp_doc */
+    0,		               /* tp_traverse */
+    0,		               /* tp_clear */
+    Integer_equals,		   /* tp_richcompare */
+    0,		               /* tp_weaklistoffset */
+    0,		               /* tp_iter */
+    0,		               /* tp_iternext */
+    Integer_methods,           /* tp_methods */
+    0,           /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    (initproc) Integer_init,      /* tp_init */
+    0,                         /* tp_alloc */
+    Integer_new,                 /* tp_new */
+};
+
+#endif
 
 struct module_state {
 	PyObject *error;

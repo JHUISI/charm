@@ -1514,6 +1514,7 @@ PyMethodDef ECElement_methods[] = {
 		{NULL}
 };
 
+#if PY_MAJOR_VERSION >= 3
 PyNumberMethods ecc_number = {
 		(binaryfunc) ECE_add,            /* nb_add */
 	    (binaryfunc) ECE_sub,            /* nb_subtract */
@@ -1591,6 +1592,93 @@ PyTypeObject ECType = {
 	0,                         /* tp_alloc */
 	ECElement_new,                 /* tp_new */
 };
+#else
+/* python 2.x series */
+PyNumberMethods ecc_number = {
+    ECE_add,                       /* nb_add */
+    ECE_sub,                       /* nb_subtract */
+    ECE_mul,                        /* nb_multiply */
+    ECE_div,                       /* nb_divide */
+    ECE_rem,                      /* nb_remainder */
+    0,						/* nb_divmod */
+    ECE_pow,						/* nb_power */
+    ECE_neg,            		/* nb_negative */
+    0,            /* nb_positive */
+    0,            /* nb_absolute */
+    0,          	/* nb_nonzero */
+    (unaryfunc)ECE_invert,         /* nb_invert */
+    0,                    /* nb_lshift */
+    0,                    /* nb_rshift */
+    0,                       /* nb_and */
+    0,                       /* nb_xor */
+    0,                        /* nb_or */
+    0,                    				/* nb_coerce */
+    0,            /* nb_int */
+    (unaryfunc)ECE_long,           /* nb_long */
+    0,          /* nb_float */
+    0,            /* nb_oct */
+    0,            /* nb_hex */
+    ECE_add,                      /* nb_inplace_add */
+    ECE_sub,                      /* nb_inplace_subtract */
+    ECE_mul,                      /* nb_inplace_multiply */
+    ECE_div,                      /* nb_inplace_divide */
+    0,                      /* nb_inplace_remainder */
+    0,								/* nb_inplace_power */
+    0,                   /* nb_inplace_lshift */
+    0,                   /* nb_inplace_rshift */
+    0,                      /* nb_inplace_and */
+    0,                      /* nb_inplace_xor */
+    0,                       /* nb_inplace_or */
+    0,                  /* nb_floor_divide */
+    0,                   /* nb_true_divide */
+    0,                 /* nb_inplace_floor_divide */
+    0,                  /* nb_inplace_true_divide */
+    0,          /* nb_index */
+};
+
+PyTypeObject ECType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                         /*ob_size*/
+    "ecc.Element",             /*tp_name*/
+    sizeof(ECElement),             /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    (destructor)ECElement_dealloc, /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    &ecc_number,       /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0, 						/*tp_call*/
+    (reprfunc)ECElement_print,   /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_CHECKTYPES, /*tp_flags*/
+    "Elliptic Curve objects",           /* tp_doc */
+    0,		               /* tp_traverse */
+    0,		               /* tp_clear */
+    ECE_equals,		   /* tp_richcompare */
+    0,		               /* tp_weaklistoffset */
+    0,		               /* tp_iter */
+    0,		               /* tp_iternext */
+    ECElement_methods,           /* tp_methods */
+    ECElement_members,           /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    (initproc) ECElement_init,      /* tp_init */
+    0,                         /* tp_alloc */
+    ECElement_new,                 /* tp_new */
+};
+
+#endif
 
 struct module_state {
 	PyObject *error;

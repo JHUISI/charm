@@ -46,7 +46,7 @@ class EC_CS98(PKEnc):
         sk = { 'x1' : x1, 'x2' : x2, 'y1' : y1, 'y2' : y2, 'z' : z }
         return (pk, sk)
 
-    def _encrypt(self, pk : pk_t, M : str_t):
+    def encrypt(self, pk, M):
         r     = group.random()
         u1    = (pk['g1'] ** r)
         u2    = (pk['g2'] ** r)
@@ -58,7 +58,7 @@ class EC_CS98(PKEnc):
         c = { 'u1' : u1, 'u2' : u2, 'e' : e, 'v' : v }
         return c
     
-    def _decrypt(self, pk : pk_t, sk : sk_t, c : c_t):
+    def decrypt(self, pk, sk, c):
         alpha = group.hash((c['u1'], c['u2'], c['e']))
         v_prime = (c['u1'] ** (sk['x1'] + (sk['y1'] * alpha))) * (c['u2'] ** (sk['x2'] + (sk['y2'] * alpha)))
         if (c['v'] != v_prime):

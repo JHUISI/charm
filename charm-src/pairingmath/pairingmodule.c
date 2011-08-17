@@ -1460,98 +1460,7 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 	return NULL;
 }
 
-///**
-// * Define the 3 benchmark methods here...
-// */
-//static PyObject *_init_benchmark(Element *self, PyObject *args) {
-//	int i, id = -1;
-//	// find the first unused identifier
-//	for(i = 0; i < MAX_BENCH_OBJECTS; i++) {
-//		if(dObjects[i]->bench_initialized == FALSE) {
-//			id = i;
-//			break;
-//		}
-//	}
-//	// fail here if we cant find an unused identifier. basically, user has to delete some benchmarks in progress
-//	if(id == -1) {
-//		PyErr_SetString(BenchmarkError, "failed to find an unused benchmark object.");
-//		return NULL;
-//	}
-//
-//	debug("Using id=%d\n", id);
-//	dObjects[id]->identifier = id;
-//	// static Operations operations;
-//
-//	if(dObjects[id]->bench_initialized == FALSE) {
-//		// self->bench_enabled = TRUE;
-//		dObjects[id]->bench_initialized = TRUE;
-//		dObjects[id]->op_add = dObjects[id]->op_sub = dObjects[id]->op_mult = 0;
-//		dObjects[id]->op_div = dObjects[id]->op_exp = dObjects[id]->op_pair = 0;
-//		dObjects[id]->aux_time_ms = dObjects[id]->real_time_ms = 0.0;
-//		debug("Initialized benchmark object.\n");
-//		debug("dObject[%d] with %p which points to: %p\n", dObjects[id]->identifier, &(dObjects[id]), dObjects[id]);
-//		return Py_BuildValue("i", dObjects[id]->identifier);
-//	}
-//
-//	PyErr_SetString(BenchmarkError, "failed to create benchmark object.");
-//	return NULL;
-//}
-//
-///*
-// * Description: finds the benchmark object and only sets vars if not initialized, but allocated.
-// * 1) get options and set
-// */
-//static PyObject *_start_benchmark(Element *self, PyObject *args) {
-//	Benchmark *bObject = NULL;
-//	PyObject *list = NULL;
-//	int id = -1;
-//
-//	// check whether self is a valid ptr?
-//	if(PyArg_ParseTuple(args, "iO", &id, &list)) {
-//		if(id >= 0 && id < MAX_BENCH_OBJECTS) {
-//			if(dObjects[id] != NULL && dObjects[id]->identifier == id) {
-//				bObject = dObjects[id];
-//
-//				if(bObject->bench_initialized) {
-//					size_t size = PyList_Size(list);
-//					debug("list size => %d\n", size);
-//					size_t result = PyStartBenchmark(bObject, list, size);
-//					activeObject = bObject;
-//					debug("data now points to: %p =?= %p\n", activeObject, bObject);
-//					debug("benchmark enabled and initialized!!!\n");
-//					return Py_BuildValue("i", result);
-//				}
-//			}
-//		}
-//		else {
-//			PyErr_SetString(BenchmarkError, "invalid benchmark object.\n");
-//			return NULL;
-//		}
-//	}
-//	return NULL;
-//}
-//
-//static PyObject *_end_benchmark(Element *self, PyObject *args) {
-//	int errcode = FALSE;
-//	if(activeObject != NULL) {
-//		int id;
-//		if(PyArg_ParseTuple(args, "i", &id)) {
-//			if(id >= 0 && id < MAX_BENCH_OBJECTS) {
-//				if(dObjects[id] != NULL && dObjects[id]->identifier == id) {
-//					// bObject = dObjects[id];
-//					PyEndBenchmark(dObjects[id]);
-//					errcode = TRUE;
-//					dObjects[id]->bench_initialized = FALSE;
-//					debug("data now points to: %p =?= %p\n", activeObject, dObjects[id]);
-//					activeObject = NULL;
-//					return Py_BuildValue("i", errcode);
-//				}
-//			}
-//		}
-//	}
-//	PyErr_SetString(BenchmarkError, "benchmarking not enabled.");
-//	return Py_BuildValue("i", errcode);
-//}
+#if PY_MAJOR_VERSION >= 3
 
 PyTypeObject PairingType = {
 	PyVarObject_HEAD_INIT(NULL, 0)
@@ -1593,13 +1502,58 @@ PyTypeObject PairingType = {
 	0,                         /* tp_alloc */
 	Pairing_new,                 /* tp_new */
 };
+#else
+/* python 2.x series */
+PyTypeObject PairingType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                         /*ob_size*/
+    "pairing.Pairing",             /*tp_name*/
+    sizeof(Pairing),             /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    (destructor)Pairing_dealloc, /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    0,       /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0, 						/*tp_call*/
+    (reprfunc)Element_print,   /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+    "Pairing group parameters",           /* tp_doc */
+    0,		               /* tp_traverse */
+    0,		               /* tp_clear */
+    0,		   /* tp_richcompare */
+    0,		               /* tp_weaklistoffset */
+    0,		               /* tp_iter */
+    0,		               /* tp_iternext */
+    0,           /* tp_methods */
+    0,           /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    (initproc) Pairing_init,      /* tp_init */
+    0,                         /* tp_alloc */
+    Pairing_new,                 /* tp_new */
+};
 
+#endif
 InitBenchmark_CAPI(_init_benchmark, dBench, 1)
 StartBenchmark_CAPI(_start_benchmark, dBench)
 EndBenchmark_CAPI(_end_benchmark, dBench)
 GetBenchmark_CAPI(_get_benchmark, dBench)
 
 // new
+#if PY_MAJOR_VERSION >= 3
 PyNumberMethods element_number = {
 	    instance_add,            /* nb_add */
 	    instance_sub,            /* nb_subtract */
@@ -1677,6 +1631,94 @@ PyTypeObject ElementType = {
 	0,                         /* tp_alloc */
 	Element_new,                 /* tp_new */
 };
+#else
+/* python 2.x series */
+PyNumberMethods element_number = {
+    instance_add,                       /* nb_add */
+    instance_sub,                       /* nb_subtract */
+    Element_mul,                        /* nb_multiply */
+    Element_div,                       /* nb_divide */
+    0,                      /* nb_remainder */
+    0,						/* nb_divmod */
+    Element_pow,						/* nb_power */
+    instance_negate,            		/* nb_negative */
+    0,            /* nb_positive */
+    0,            /* nb_absolute */
+    0,          	/* nb_nonzero */
+    (unaryfunc)instance_invert,         /* nb_invert */
+    0,                    /* nb_lshift */
+    0,                    /* nb_rshift */
+    0,                       /* nb_and */
+    0,                       /* nb_xor */
+    0,                        /* nb_or */
+    0,                    				/* nb_coerce */
+    0,            /* nb_int */
+    (unaryfunc)Element_long,           /* nb_long */
+    0,          /* nb_float */
+    0,            /* nb_oct */
+    0,            /* nb_hex */
+    instance_add,                      /* nb_inplace_add */
+    instance_sub,                      /* nb_inplace_subtract */
+    Element_mul,                      /* nb_inplace_multiply */
+    Element_div,                      /* nb_inplace_divide */
+    0,                      /* nb_inplace_remainder */
+    0,								/* nb_inplace_power */
+    0,                   /* nb_inplace_lshift */
+    0,                   /* nb_inplace_rshift */
+    0,                      /* nb_inplace_and */
+    0,                      /* nb_inplace_xor */
+    0,                       /* nb_inplace_or */
+    0,                  /* nb_floor_divide */
+    0,                   /* nb_true_divide */
+    0,                 /* nb_inplace_floor_divide */
+    0,                  /* nb_inplace_true_divide */
+    0,          /* nb_index */
+};
+
+PyTypeObject ElementType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                         /*ob_size*/
+    "pairing.Element",             /*tp_name*/
+    sizeof(Element),             /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    (destructor)Element_dealloc, /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    &element_number,       /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0, 						/*tp_call*/
+    (reprfunc)Element_print,   /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_CHECKTYPES, /*tp_flags*/
+    "Pairing objects",           /* tp_doc */
+    0,		               /* tp_traverse */
+    0,		               /* tp_clear */
+    Element_equals,		   /* tp_richcompare */
+    0,		               /* tp_weaklistoffset */
+    0,		               /* tp_iter */
+    0,		               /* tp_iternext */
+    Element_methods,           /* tp_methods */
+    Element_members,           /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    (initproc) Element_init,      /* tp_init */
+    0,                         /* tp_alloc */
+    Element_new,                 /* tp_new */
+};
+
+#endif
+
 
 struct module_state {
 	PyObject *error;
