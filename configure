@@ -537,14 +537,14 @@ fi
 #fi
 
 ##########################################
-# python 3 probe
+# python 2.7 or 3 probe
 cat > $TMPC << EOF
 import sys
 
-if sys.version_info >= (3,):
+if sys.hexversion >= int(0x2070000):
    exit(0)
 else:
-   print("Need Python 3 or greater. Specify --python=/path/to/python3")
+   print("Need Python 2.7 or 3.x. Specify --python=/path/to/pythonX")
    exit(-1)
 EOF
 python3_found="no"
@@ -669,7 +669,7 @@ echo "CHARM_CFLAGS       $CHARM_CFLAGS"
 echo "LDFLAGS           $LDFLAGS"
 echo "make              $make"
 echo "python            $python_path"
-echo "python v3         $python3_found"
+echo "pythonv2.7 or 3   $python3_found"
 echo "install           $install"
 echo "host CPU          $cpu"
 echo "wget              $wget"
