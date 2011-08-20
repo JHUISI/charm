@@ -1,10 +1,11 @@
 '''A collection of encryption and signature padding schemes'''
-from toolbox.bitstring import Bytes
+from toolbox.bitstring import Bytes,py3
 from toolbox.securerandom import SecureRandomFactory
 import charm.cryptobase
 import hashlib
 import math
 import struct
+import sys
 
 debug = False
 
@@ -32,7 +33,8 @@ class OAEPEncryptionPadding:
         if (len(message) > (emLen - (2 * hLen) - 2)):
             assert False, "message too long"
         
-        lHash = self.hashFn(Bytes(label, 'utf-8'))  
+        if py3: lHash = self.hashFn(Bytes(label, 'utf8'))
+        else: lHash = self.hashFn(Bytes(label))  
               
         # Let PS be a string of length (emLen - mLen - 2hLen - 2) containing only zero octets.
         # Compute DB = lHash || PS || 0x01 || M.
@@ -71,8 +73,8 @@ class OAEPEncryptionPadding:
         # Make sure the encoded string is at least L bytes long
         if len(encMessage) < (2 * hLen + 2):
             assert False, "encoded string not long enough."
-        lHash = self.hashFn(Bytes(label, 'utf-8'))
-        
+        if py3: lHash = self.hashFn(Bytes(label, 'utf-8'))
+        else: lHash = self.hashFn(Bytes(label))
         # Parse the encoded string as (0x00 || maskedSeed || maskedDB)
         #Y = encMessage[0]
         maskedSeed = Bytes(encMessage[1:(1+hLen)])
@@ -100,7 +102,8 @@ class OAEPEncryptionPadding:
         M = DB[DB.find(b'\x01')+1 : ]
         return M
 
-def MGF1(seed:Bytes, maskBytes:int, hashFn, hLen:int):
+#def MGF1(seed:Bytes, maskBytes:int, hashFn, hLen:int):
+def MGF1(seed, maskBytes, hashFn, hLen):
     ''' MGF1 Mask Generation Function
     
     Implemented according to PKCS #1 specification, see appendix B.2.1:
@@ -112,9 +115,9 @@ def MGF1(seed:Bytes, maskBytes:int, hashFn, hLen:int):
     debug = False
     # Skipped output size checking.  Must be less than 2^32 * hLen
     #result = b''.join([hashFn(struct.pack(">sI", seed, i)) for i in range(math.ceil(maskBytes / hashOutputBytes) - 1)])
-    ran = range(math.ceil(maskBytes / hLen))
+    ran = range(int(math.ceil(maskBytes / float(hLen))))
     if debug:
-        print("calc =>", math.ceil(maskBytes / hLen))
+        print("calc =>", math.ceil(maskBytes / float(hLen)))
         print("Range =>", ran)
     test = [hashFn(struct.pack(">%dsI" % (len(seed)), seed, i)) for i in ran]
     if debug: 
@@ -133,7 +136,8 @@ class hashFunc:
             self.hashObj = hashlib.new(_hash_type)
         
     #message must be a binary string
-    def __call__(self, message : [str, bytes]):
+    #def __call__(self, message : [str, bytes]):
+    def __call__(self, message):
         h = self.hashObj.copy()
         if type(message) == str:
             h.update(bytes(message))
@@ -165,11 +169,11 @@ class PSSPadding:
         if emBits is None:
             emBits =  8*self.hLen + 8 * self.sLen + 9
             #Round to the next byte
-            emBits = math.ceil(emBits / 8) * 8
+            emBits = int(math.ceil(emBits / 8.0)) * 8
         assert emBits >= 8*self.hLen + 8 * self.sLen + 9, "Not enough emBits"
         
         #Make sure the the message is long enough to be valid
-        emLen = math.ceil(emBits / 8)        
+        emLen = int(math.ceil(emBits / 8.0))        
         assert emLen >= self.hLen + self.sLen + 2, "emLen too small"
         
         if salt is None:
@@ -239,7 +243,7 @@ class PSSPadding:
             emBits = 8 * len(EM)
         assert emBits >= 8* self.hLen + 8* self.sLen + 9, "Not enough emBits"
         
-        emLen = math.ceil(emBits / 8)
+        emLen = int(math.ceil(emBits / 8.0))
         assert len(EM) == emLen, "EM length not equivalent to bits provided"
         
         # assert len(M) < (2^61 -1), Message too long
@@ -268,7 +272,9 @@ class PSSPadding:
         #equal to zero, output “inconsistent” and stop.
         numzeros = 8 * emLen - emBits
         bitmask  = int('1'*numzeros + '0'*(8-numzeros), 2)
-        if (maskedDB[0] & bitmask != 0):
+        _mask_check = maskedDB[0]
+        if not py3: _mask_check = ord(_mask_check)
+        if (_mask_check & bitmask != 0):
             if debug: print("right % bits of masked db not zero, found %" % (numzeros, bin(maskedDB[0])))
             return False 
         
@@ -293,7 +299,9 @@ class PSSPadding:
         
         #or if the octet at position emLen – hLen – sLen – 1 (the leftmost position is “position 1”) does not
         #have hexadecimal value 0x01, output “inconsistent” and stop.
-        if DB[zerolen] != 0x01:
+        _db_check = DB[zerolen]
+        if not py3: _db_check = ord(_db_check)
+        if _db_check != 0x01:
             if debug: print("DB did not have 0x01 at %s, found %s instead" % (zerolen,DB[zerolen])) 
             return False
         

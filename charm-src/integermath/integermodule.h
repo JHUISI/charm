@@ -33,6 +33,15 @@
 	PyErr_SetString(IntegerError, msg); \
 	return NULL;
 
+#if PY_MAJOR_VERSION >= 3
+	#define _PyLong_Check(o1) PyLong_Check(o1)
+#else
+	#define _PyLong_Check(o1) PyLong_Check(o1) || PyInt_Check(o1)
+#endif
+
+
+#if PY_MAJOR_VERSION >= 3
+
 #define Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value)  \
 	if(PyInteger_Check(o1)) { \
 		lhs = (Integer *) o1; } \
@@ -62,6 +71,41 @@
 		foundRHS = TRUE; }  \
 	else { ErrorMsg("invalid right operand type."); }
 
+#else
+/* python 2.x series */
+#define Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value)  \
+	if(PyInteger_Check(o1)) { \
+		lhs = (Integer *) o1; } \
+	else if(PyLong_Check(o1) || PyInt_Check(o1)) { \
+		lhs_value = PyLong_AsLong(PyNumber_Long(o1)); \
+		foundLHS = TRUE;  } \
+	else { ErrorMsg("invalid left operand type."); } \
+							\
+	if(PyInteger_Check(o2)) {  \
+		rhs = (Integer *) o2; } \
+	else if(PyLong_Check(o2) || PyInt_Check(o2)) {  \
+		rhs_value = PyLong_AsLong(PyNumber_Long(o2)); \
+		foundRHS = TRUE; }  \
+	else { ErrorMsg("invalid right operand type."); }
+
+
+#define Check_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS)  \
+	if(PyInteger_Check(o1)) { \
+		lhs = (Integer *) o1; } \
+	else if(PyLong_Check(o1) || PyInt_Check(o1)) { \
+		o1 = PyNumber_Long(o1); \
+		foundLHS = TRUE;  } \
+	else { ErrorMsg("invalid left operand type."); } \
+							\
+	if(PyInteger_Check(o2)) {  \
+		rhs = (Integer *) o2; } \
+	else if(PyLong_Check(o2) || PyInt_Check(o2)) {  \
+		o2 = PyNumber_Long(o2); \
+		foundRHS = TRUE; }  \
+	else { ErrorMsg("invalid right operand type."); }
+
+
+#endif
 
 /* Index numbers for different hash functions.  These are all implemented as SHA1(index || message).	*/
 #define HASH_FUNCTION_STR_TO_Zr_CRH		0

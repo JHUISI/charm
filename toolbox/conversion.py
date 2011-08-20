@@ -4,9 +4,8 @@
 
 This class facilitates conversion between domain spaces
 '''
-from charm.integer import *
-from toolbox.bitstring import Bytes
-import charm.integer
+from charm.integer import integer
+from toolbox.bitstring import Bytes,py3
 import math
 
 class Conversion(object):
@@ -65,7 +64,10 @@ class Conversion(object):
         '''
         val = 0 
         for i in range(len(bytestr)):
-            val += bytestr[len(bytestr)-1-i] << (8 *i)
+            byt = bytestr[len(bytestr)-1-i]
+            if not py3: byt = ord(byt)
+            val += byt << (8 *i)
+
         #These lines convert val into a binary string of 1's and 0's 
         #bstr = bin(val)[2:]   #cut out the 0b header
         #val = int(bstr, 2)
@@ -84,14 +86,17 @@ class Conversion(object):
         Converts an integer into a byte string'''
         
         ba = bytearray()
-        
+        x = 0
         if type(number) == integer:
             x = int(number)
         elif type(number) == int:
             x = number
-            
+        elif not py3 and type(number) == long:
+            x = number  
+
         if xLen == None:
-            xLen = math.ceil(math.log(x, 2) / 8.0)
+            xLen = int(math.ceil(math.log(x, 2) / 8.0))
+            
         for i in range(xLen):
             ba.append(x % 256)
             x = x >> 8

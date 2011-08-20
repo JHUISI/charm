@@ -3,6 +3,12 @@
 '''
 
 import string
+import sys
+
+py3 = False
+if sys.hexversion >= int(0x03000000):
+    py3 = True
+
 
 class Bytes(bytes):
     def __init__(self, value, enc=None):
@@ -13,11 +19,12 @@ class Bytes(bytes):
 
     def __xor__(self, other):
         '''Overload the ``^`` operator to provide xor '''
-        if len(self) != len(other):
-            assert False, "Xor: operands differ in length."
+        assert len(self) == len(other), "xor: operands differ in length."
         res = bytearray()
         for i in range(0,len(self)):
-            res.append(self[i] ^ other[i])
+            if py3: res.append(self[i] ^ other[i])
+            else: res.append(chr(ord(self[i]) ^ ord(other[i])))
+            #print("res[%s] = %s" % (i, res[i]))
         return Bytes(res)            
 
     def __add__(self, other):
@@ -27,7 +34,7 @@ class Bytes(bytes):
     def fill(self, prefix, length):
         '''Provides an easy way to create a byte array of a specified length and content'''
         bits = b''
-        for i in range(0, length):
+        for i in range(0, int(length)):
             bits += prefix
         return Bytes(bits)
         

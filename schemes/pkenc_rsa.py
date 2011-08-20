@@ -10,11 +10,12 @@
 :Date:            07/2011
 '''
 
-from charm.integer import *
-from toolbox.PKEnc import *
-from toolbox.PKSig import *
-from toolbox.paddingschemes import *
+from charm.integer import init,integer,isPrime,gcd
+from toolbox.PKEnc import PKEnc
+from toolbox.PKSig import PKSig
+from toolbox.paddingschemes import OAEPEncryptionPadding,PSSPadding
 from toolbox.conversion import Conversion
+from math import ceil
 
 debug = False
 class RSA():
@@ -31,7 +32,14 @@ class RSA():
                 break
         return (p, q, N, phi_N)
     
-    def keygen(self, secparam=1024):
+    def keygen(self, secparam=1024, params=None):
+        if params: 
+            (N, e, d, p, q) = self.convert(params)
+            phi_N = (p - 1) * (q - 1)
+            pk = { 'N':N, 'e':e }
+            sk = { 'phi_N':phi_N, 'd':d , 'N':N}
+            return (pk, sk)
+
         (p, q, N, phi_N) = self.paramgen(secparam)
         
         while True:
@@ -44,15 +52,19 @@ class RSA():
         sk = { 'phi_N':phi_N, 'd':d , 'N':N}
 
         return (pk, sk)
-
+    
+    def convert(self, N, e, d, p, q):
+        return (integer(N), integer(e), integer(d), 
+                integer(p), integer(q))
+    
 class RSA_Enc(RSA,PKEnc):
     def __init__(self, padding=OAEPEncryptionPadding()):
         RSA.__init__(self)
         PKEnc.__init__(self)
         self.paddingscheme = padding 
-    
-    def encrypt(self, pk, m:Bytes, salt=None):
-        octetlen = math.ceil(int(pk['N']).bit_length() / 8)
+    # m : Bytes
+    def encrypt(self, pk, m, salt=None):
+        octetlen = int(ceil(int(pk['N']).bit_length() / 8.0))
         EM = self.paddingscheme.encode(m, octetlen, "", salt)
         if debug: print("EM == >", EM)
         i = Conversion.OS2IP(EM)
@@ -60,7 +72,7 @@ class RSA_Enc(RSA,PKEnc):
         return (ip ** pk['e']) % pk['N']
     
     def decrypt(self, pk, sk, c):
-        octetlen = math.ceil(int(pk['N']).bit_length() / 8)
+        octetlen = int(ceil(int(pk['N']).bit_length() / 8.0))
         M = (c ** (sk['d'] % sk['phi_N'])) % pk['N']
         os = Conversion.IP2OS(int(M), octetlen)
         if debug: print("OS  =>", os)
@@ -76,8 +88,8 @@ class RSA_Sig(RSA, PKSig):
     def sign(self,sk, M, salt=None):
         #apply encoding
         modbits = int(sk['N']).bit_length()
-        k = math.ceil(modbits / 8)
-        emLen = math.ceil((modbits -1) / 8)
+        k = int(ceil(modbits / 8.0))
+        emLen = int(ceil((modbits -1) / 8.0))
         
         
         em = self.paddingscheme.encode(M, modbits - 1, salt)
@@ -97,8 +109,8 @@ class RSA_Sig(RSA, PKSig):
     
     def verify(self, pk, M, S):
         modbits = int(pk['N']).bit_length()
-        k = math.ceil(modbits / 8)
-        emLen = math.ceil((modbits -1) / 8)
+        k = int(ceil(modbits / 8.0))
+        emLen = int(ceil((modbits -1) / 8.0))
         if len(S) != k:
             if debug: print("Sig is %s octets long, not %" %(len(S), k))
             return False
@@ -144,4 +156,4 @@ def main2():
 if __name__ == "__main__":
     debug = True
     main()
-    main2()
+    main2()    

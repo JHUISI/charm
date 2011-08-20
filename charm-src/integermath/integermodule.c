@@ -12,7 +12,8 @@ inline size_t size(mpz_t n) {
 	return mpz_sizeinbase(n, 2);
 }
 
-void longObjToMPZ(mpz_t m, PyLongObject * p) {
+void longObjToMPZ(mpz_t m, PyObject * o) {
+	PyLongObject *p = (PyLongObject *) PyNumber_Long(o);
 	int size, i, tmp = Py_SIZE(p);
 	mpz_t temp, temp2;
 	mpz_init(temp);
@@ -190,8 +191,8 @@ int Integer_init(Integer *self, PyObject *args, PyObject *kwds) {
 	}
 
 	// check if they are of type long
-	if (PyLong_Check(num)) {
-		longObjToMPZ(self->e, (PyLongObject *) num);
+	if(_PyLong_Check(num)) {
+		longObjToMPZ(self->e, num);
 	}
 	// raise error
 	else if (PyBytes_Check(num)) {
@@ -209,8 +210,8 @@ int Integer_init(Integer *self, PyObject *args, PyObject *kwds) {
 	}
 
 	if (mod != NULL) {
-		if (PyLong_Check(mod)) {
-			longObjToMPZ(self->m, (PyLongObject *) mod);
+		if (_PyLong_Check(mod)) {
+			longObjToMPZ(self->m, mod);
 		}
 	}
 	// else leave self->m set to 0.
@@ -234,7 +235,7 @@ static PyObject *Integer_randinit(Integer *self, PyObject *arg) {
 		BN_free(s);
 		BN_free(range);
 		gmp_randseed_ui(newObject->state, seed);
-	} else if (PyLong_Check(arg)) {
+	} else if (_PyLong_Check(arg)) {
 		unsigned long seed2 = PyLong_AsUnsignedLongMask(arg);
 		gmp_randseed_ui(newObject->state, seed2);
 	}
@@ -588,7 +589,7 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 	// TODO: handle foundLHS (e.g. 2 ** <int.Elem>)
 	if (foundRHS) {
 		debug("foundRHS!\n");
-		if (PyLong_Check(o2)) {
+		if (_PyLong_Check(o2)) {
 			long long exp = PyLong_AsLongLong(o2);
 			debug("Value => %lld\n", exp);
 			if (exp == -1) {
@@ -618,7 +619,7 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 		} else {
 			mpz_t exp;
 			mpz_init(exp);
-			longObjToMPZ(exp, (PyLongObject *) PyNumber_Long(o2));
+			longObjToMPZ(exp, o2);
 			rop = createNewInteger(lhs->m);
 			print_mpz(exp, 10);
 			mpz_powm_sec(rop->e, lhs->e, exp, rop->m);
@@ -921,11 +922,11 @@ static PyObject *Integer_remainder(PyObject *o1, PyObject *o2) {
 
 	if (foundLHS) {
 		rop = createNewInteger(rhs->m);
-		if (PyLong_Check(o1)) {
+		if (_PyLong_Check(o1)) {
 			PyObject *tmp = PyNumber_Long(o1);
 			mpz_t modulus;
 			mpz_init(modulus);
-			longObjToMPZ(modulus, (PyLongObject *) tmp);
+			longObjToMPZ(modulus, tmp);
 			mpz_mod(rop->e, rhs->e, modulus);
 			mpz_set(rop->m, modulus);
 			mpz_clear(modulus);
@@ -937,11 +938,11 @@ static PyObject *Integer_remainder(PyObject *o1, PyObject *o2) {
 		}
 	} else if (foundRHS) {
 		rop = createNewInteger(lhs->m);
-		if (PyLong_Check(o2)) {
+		if (_PyLong_Check(o2)) {
 			PyObject *tmp = PyNumber_Long(o2);
 			mpz_t modulus;
 			mpz_init(modulus);
-			longObjToMPZ(modulus, (PyLongObject *) tmp);
+			longObjToMPZ(modulus, tmp);
 			mpz_mod(rop->e, lhs->e, modulus);
 			mpz_set(rop->m, modulus);
 			mpz_clear(modulus);
@@ -965,11 +966,11 @@ static PyObject *testPrimality(PyObject *self, PyObject *arg) {
 	int result = -1;
 
 	if (arg != NULL) {
-		if (PyLong_Check(arg)) {
+		if (_PyLong_Check(arg)) {
 			PyObject *obj = PyNumber_Long(arg);
 			mpz_t value;
 			mpz_init(value);
-			longObjToMPZ(value, (PyLongObject *) obj);
+			longObjToMPZ(value, obj);
 			result = mpz_probab_prime_p(value, MAX_RUN);
 			mpz_clear(value);
 		} else if (PyInteger_Check(arg)) {
@@ -1062,9 +1063,9 @@ static PyObject *genRandom(Integer *self, PyObject *args) {
 
 	if (PyArg_ParseTuple(args, "O", &obj)) {
 
-		if (PyLong_Check(obj)) {
+		if (_PyLong_Check(obj)) {
 			mpz_init(N);
-			longObjToMPZ(N, (PyLongObject *) obj);
+			longObjToMPZ(N, obj);
 		} else if (PyInteger_Check(obj)) {
 			Integer *obj1 = (Integer *) obj;
 			mpz_init_set(N, obj1->e);
@@ -1272,10 +1273,10 @@ static PyObject *bitsize(PyObject *self, PyObject *args) {
 	int tmp_size;
 
 	if (PyArg_ParseTuple(args, "O", &object)) {
-		if (PyLong_Check(object)) {
+		if (_PyLong_Check(object)) {
 			mpz_t tmp;
 			mpz_init(tmp);
-			longObjToMPZ(tmp, (PyLongObject *) object);
+			longObjToMPZ(tmp, object);
 			tmp_size = size(tmp);
 			mpz_clear(tmp);
 			return Py_BuildValue("i", tmp_size);
@@ -1305,7 +1306,7 @@ static PyObject *testCoPrime(Integer *self, PyObject *arg) {
 		PyObject *obj = PyNumber_Long(arg);
 		if (obj != NULL) {
 			mpz_init(tmp);
-			longObjToMPZ(tmp, (PyLongObject *) obj);
+			longObjToMPZ(tmp, obj);
 			mpz_gcd(rop, self->e, tmp);
 			print_mpz(rop, 1);
 			result = (mpz_cmp_ui(rop, 1) == 0) ? TRUE : FALSE;
@@ -1340,12 +1341,12 @@ static PyObject *testCongruency(Integer *self, PyObject *args) {
 	}
 
 	if (PyArg_ParseTuple(args, "O", &obj)) {
-		if (PyLong_Check(obj)) {
+		if (_PyLong_Check(obj)) {
 			PyObject *obj2 = PyNumber_Long(obj);
 			if (obj2 != NULL) {
 				mpz_t rop;
 				mpz_init(rop);
-				longObjToMPZ(rop, (PyLongObject *) obj2);
+				longObjToMPZ(rop, obj2);
 				if (mpz_congruent_p(rop, self->e, self->m) != 0) {
 					mpz_clear(rop);
 					Py_INCREF(Py_True);
@@ -1381,15 +1382,15 @@ static PyObject *legendre(PyObject *self, PyObject *args) {
 	mpz_init(p);
 
 	if (PyArg_ParseTuple(args, "OO", &obj1, &obj2)) {
-		if (PyLong_Check(obj1)) {
-			longObjToMPZ(a, (PyLongObject *) PyNumber_Long(obj1));
+		if (_PyLong_Check(obj1)) {
+			longObjToMPZ(a, obj1);
 		} else if (PyInteger_Check(obj1)) {
 			Integer *tmp = (Integer *) obj1;
 			mpz_set(a, tmp->e);
 		}
 
-		if (PyLong_Check(obj2)) {
-			longObjToMPZ(p, (PyLongObject *) PyNumber_Long(obj2));
+		if (_PyLong_Check(obj2)) {
+			longObjToMPZ(p, obj2);
 		} else if (PyInteger_Check(obj2)) {
 			Integer *tmp2 = (Integer *) obj2;
 			mpz_set(p, tmp2->e);
@@ -1415,9 +1416,9 @@ static PyObject *gcdCall(PyObject *self, PyObject *args) {
 	mpz_t op1, op2;
 
 	if (PyArg_ParseTuple(args, "OO", &obj1, &obj2)) {
-		if (PyLong_Check(obj1)) {
+		if (_PyLong_Check(obj1)) {
 			mpz_init(op1);
-			longObjToMPZ(op1, (PyLongObject *) PyNumber_Long(obj1));
+			longObjToMPZ(op1, obj1);
 		} else if (PyInteger_Check(obj1)) {
 			mpz_init(op1);
 			Integer *tmp = (Integer *) obj1;
@@ -1426,9 +1427,9 @@ static PyObject *gcdCall(PyObject *self, PyObject *args) {
 			ErrorMsg("invalid argument type: 1");
 		}
 
-		if (PyLong_Check(obj2)) {
+		if (_PyLong_Check(obj2)) {
 			mpz_init(op2);
-			longObjToMPZ(op2, (PyLongObject *) PyNumber_Long(obj2));
+			longObjToMPZ(op2, obj2);
 		} else if (PyInteger_Check(obj2)) {
 			mpz_init(op2);
 			Integer *tmp = (Integer *) obj2;
@@ -1453,9 +1454,9 @@ static PyObject *lcmCall(PyObject *self, PyObject *args) {
 	mpz_t op1, op2;
 
 	if (PyArg_ParseTuple(args, "OO", &obj1, &obj2)) {
-		if (PyLong_Check(obj1)) {
+		if (_PyLong_Check(obj1)) {
 			mpz_init(op1);
-			longObjToMPZ(op1, (PyLongObject *) PyNumber_Long(obj1));
+			longObjToMPZ(op1, obj1);
 		} else if (PyInteger_Check(obj1)) {
 			mpz_init(op1);
 			Integer *tmp = (Integer *) obj1;
@@ -1464,9 +1465,9 @@ static PyObject *lcmCall(PyObject *self, PyObject *args) {
 			ErrorMsg("invalid argument type: 1");
 		}
 
-		if (PyLong_Check(obj2)) {
+		if (_PyLong_Check(obj2)) {
 			mpz_init(op2);
-			longObjToMPZ(op2, (PyLongObject *) PyNumber_Long(obj2));
+			longObjToMPZ(op2, obj2);
 		} else if (PyInteger_Check(obj2)) {
 			mpz_init(op2);
 			Integer *tmp = (Integer *) obj2;
@@ -1692,7 +1693,7 @@ PyNumberMethods integer_number = {
     Integer_xor,                       /* nb_xor */
     0,                        /* nb_or */
     0,                    				/* nb_coerce */
-    0,            /* nb_int */
+    (unaryfunc)Integer_long,            /* nb_int */
     (unaryfunc)Integer_long,           /* nb_long */
     0,          /* nb_float */
     0,            /* nb_oct */
