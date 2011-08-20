@@ -58,7 +58,7 @@ class RSA():
                 integer(p), integer(q))
     
 class RSA_Enc(RSA,PKEnc):
-    def __init__(self, padding=OAEPEncryptionPadding()):
+    def __init__(self, padding=OAEPEncryptionPadding(), params=None):
         RSA.__init__(self)
         PKEnc.__init__(self)
         self.paddingscheme = padding 

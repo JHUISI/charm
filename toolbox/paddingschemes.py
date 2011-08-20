@@ -9,6 +9,7 @@ import sys
 
 debug = False
 
+
 class OAEPEncryptionPadding:
     '''
     :Authors: Gary Belvin
@@ -114,7 +115,6 @@ def MGF1(seed, maskBytes, hashFn, hLen):
     '''
     debug = False
     # Skipped output size checking.  Must be less than 2^32 * hLen
-    #result = b''.join([hashFn(struct.pack(">sI", seed, i)) for i in range(math.ceil(maskBytes / hashOutputBytes) - 1)])
     ran = range(int(math.ceil(maskBytes / float(hLen))))
     if debug:
         print("calc =>", math.ceil(maskBytes / float(hLen)))
@@ -124,9 +124,6 @@ def MGF1(seed, maskBytes, hashFn, hLen):
         print("test =>", test)
     result = b''.join(test)
     return Bytes(result[0:maskBytes])
-    #diff = maskBytes - len(result)
-    #result2 = result + Bytes.fill(b'\x00', diff)  #NOT CORRECT
-    #return Bytes(result2)
 
 class hashFunc:
     def __init__(self, _hash_type=None):
@@ -165,7 +162,8 @@ class PSSPadding:
         '''
         # assert len(M) < (2^61 -1), Message too long
         
-        #Let H’ = Hash (M’), an octet string of length hLen.#Max length of output message
+        #Let H' = Hash (M'), an octet string of length hLen.
+        #Max length of output message
         if emBits is None:
             emBits =  8*self.hLen + 8 * self.sLen + 9
             #Round to the next byte
@@ -183,29 +181,29 @@ class PSSPadding:
                 salt = b''
         assert len(salt) == self.sLen, "Salt wrong size"
         
-        #Let M’ = (0x)00 00 00 00 00 00 00 00 || mHash || salt;
+        #Let M' = (0x)00 00 00 00 00 00 00 00 || mHash || salt;
         eightzerobytes = Bytes.fill(b'\x00', 8)
         mHash = self.hashFn(M)        
         Mprime = eightzerobytes + mHash + salt
         
-        #Let H = Hash (M’), an octet string of length hLen.
+        #Let H = Hash (M'), an octet string of length hLen.
         H = self.hashFn(Mprime)
         
-        #Generate an octet string PS consisting of emLen – sLen – hLen – 2 zero octets.
+        #Generate an octet string PS consisting of emLen - sLen - hLen - 2 zero octets.
         #The length of PS may be 0.
         pslen = emLen - self.sLen - self.hLen - 2
         ps = Bytes.fill(b'\x00', pslen)        
         
-        #Let DB = PS || 0x01 || salt; DB is an octet string of length emLen – hLen – 1.
+        #Let DB = PS || 0x01 || salt; DB is an octet string of length emLen - hLen - 1.
         DB = ps + Bytes(b'\x01') + salt
 
-        #Let dbMask = MGF (H, emLen – hLen – 1).
+        #Let dbMask = MGF (H, emLen - hLen - 1).
         masklen = emLen - self.hLen - 1
         dbMask = MGF1(H, masklen, self.hashFn, self.hLen)
-        #Let maskedDB = DB ⊕ dbMask.
+        #Let maskedDB = DB ^ dbMask.
         maskedDB = DB ^ dbMask
         
-        #Set the leftmost 8emLen – emBits bits of the leftmost octet in maskedDB to zero
+        #Set the leftmost 8emLen - emBits bits of the leftmost octet in maskedDB to zero
         numzeros = 8 * emLen - emBits
         bitmask  = int('0'*numzeros + '1'*(8-numzeros), 2)
         ba = bytearray(maskedDB)
@@ -251,13 +249,13 @@ class PSSPadding:
         #Let mHash = Hash (M), an octet string of length hLen
         mHash = self.hashFn(M)
         
-        #if emLen < hLen + sLen + 2, output “inconsistent” and stop.
+        #if emLen < hLen + sLen + 2, output 'inconsistent' and stop.
         if emLen < self.hLen + self.sLen + 2:
             if debug: print("emLen too short") 
             return False
         
         #If the rightmost octet of EM does not have hexadecimal value 0xbc, output
-        #“inconsistent” and stop.
+        #'inconsistent' and stop.
         if EM[len(EM)-1:] != b'\xbc':
             if debug: print("0xbc not found") 
             return False
@@ -268,8 +266,8 @@ class PSSPadding:
         maskedDB = Bytes(EM[:maskeDBlen])
         H = EM[maskeDBlen:maskeDBlen+self.hLen]
         
-        #If the leftmost 8emLen – emBits bits of the leftmost octet in maskedDB are not all
-        #equal to zero, output “inconsistent” and stop.
+        #If the leftmost 8emLen - emBits bits of the leftmost octet in maskedDB are not all
+        #equal to zero, output 'inconsistent' and stop.
         numzeros = 8 * emLen - emBits
         bitmask  = int('1'*numzeros + '0'*(8-numzeros), 2)
         _mask_check = maskedDB[0]
@@ -278,27 +276,27 @@ class PSSPadding:
             if debug: print("right % bits of masked db not zero, found %" % (numzeros, bin(maskedDB[0])))
             return False 
         
-        #Let dbMask = MGF (H, emLen – hLen – 1).
+        #Let dbMask = MGF (H, emLen - hLen - 1).
         masklen = emLen - self.hLen - 1
         dbMask = MGF1(H, masklen, self.hashFn, self.hLen)
-        #Let DB = maskedDB ⊕ dbMask.
+        #Let DB = maskedDB ^ dbMask.
         DB = maskedDB ^ dbMask
         
-        #Set the leftmost 8emLen – emBits bits of the leftmost octet in DB to zero.
+        #Set the leftmost 8emLen - emBits bits of the leftmost octet in DB to zero.
         numzeros = 8 * emLen - emBits
         bitmask  = int('0'*numzeros + '1'*(8-numzeros), 2)
         ba = bytearray(DB)
         ba[0] &= bitmask
         DB = Bytes(ba)
 
-        #If the emLen – hLen – sLen – 2 leftmost octets of DB are not zero
+        #If the emLen - hLen - sLen - 2 leftmost octets of DB are not zero
         zerolen = emLen - self.hLen - self.sLen - 2
         if DB[:zerolen] != Bytes.fill(b'\x00', zerolen):
             if debug: print("DB did not start with % zero octets" % zerolen) 
             return False
         
-        #or if the octet at position emLen – hLen – sLen – 1 (the leftmost position is “position 1”) does not
-        #have hexadecimal value 0x01, output “inconsistent” and stop.
+        #or if the octet at position emLen - hLen - sLen - 1 (the leftmost position is 'position 1') does not
+        #have hexadecimal value 0x01, output 'inconsistent' and stop.
         _db_check = DB[zerolen]
         if not py3: _db_check = ord(_db_check)
         if _db_check != 0x01:
@@ -307,10 +305,10 @@ class PSSPadding:
         
         #Let salt be the last sLen octets of DB.
         salt = DB[len(DB)-self.sLen:]
-        #Let M’ = (0x)00 00 00 00 00 00 00 00 || mHash || salt ;
+        #Let M' = (0x)00 00 00 00 00 00 00 00 || mHash || salt ;
         mPrime = Bytes.fill(b'\x00', 8) + mHash + salt
         
-        #Let H’ = Hash (M’), an octet string of length hLen.
+        #Let H' = Hash (M'), an octet string of length hLen.
         HPrime = self.hashFn(mPrime)
         
         if debug:
@@ -324,5 +322,5 @@ class PSSPadding:
             print("masked=>", maskedDB)
             print("EM    =>", EM)
         
-        #If H = H’, output “consistent.” Otherwise, output “inconsistent.”
+        #If H = H', output 'consistent'. Otherwise, output 'inconsistent'.
         return H == HPrime
