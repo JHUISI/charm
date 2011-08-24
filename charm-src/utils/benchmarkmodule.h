@@ -21,6 +21,14 @@ extern "C" {
 #define debug(...)
 #endif
 
+#if PY_MAJOR_VERSION >= 3
+	#define _PyLong_Check(o1) PyLong_Check(o1)
+	#define ConvertToInt(o) PyLong_AsLong(o)
+#else
+	#define _PyLong_Check(o) (PyInt_Check(o) || PyLong_Check(o))
+	#define ConvertToInt(o) PyInt_AsLong(o)
+#endif
+
 // define new benchmark type for benchmark module
 PyTypeObject BenchmarkType;
 // define new benchmark error type (will be used for notifying errors)
@@ -28,7 +36,7 @@ PyObject *BenchmarkError;
 // define a macro to help determine whether an object is of benchmark type
 #define PyBenchmark_Check(obj) PyObject_TypeCheck(obj, &BenchmarkType)
 /* header file for benchmark module */
-#define MAX_MEASURE 7
+#define MAX_MEASURE 10
 enum Measure {CPU_TIME = 0, REAL_TIME, NATIVE_TIME, ADDITION, SUBTRACTION, MULTIPLICATION, DIVISION, EXPONENTIATION, PAIRINGS, NONE};
 typedef enum Measure MeasureType;
 

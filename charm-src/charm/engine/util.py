@@ -9,18 +9,31 @@ def serializeDict(object, group):
     if isinstance(object, dict):
         for i in object.keys():
             # check the type of the object[i]
-            if type(object[i]) == str:
+            if type(object[i]) in [str, int]:
                 bytes_object[i] = object[i] # don't convert to bytes, if string
             elif type(object[i]) == dict:                
                 bytes_object[i] = serializeDict(object[i], group) #; print("dict found in ser => '%s'" % i); 
+            elif type(object[i]) == list:
+                bytes_object[i] = serializeList(object[i], group)                
             else: # typically group object
-#               print("DEBUG = k: %s, v: %s" % (i, object[i]))
+               #print("DEBUG = k: %s, v: %s" % (i, object[i]))
                bytes_object[i] = group.serialize(object[i])
         return bytes_object
     else:
         # just one bytes object and it's a string
         if type(object) == str: return bytes(object, 'utf8')
         else: return group.serialize(object)
+
+def serializeList(object, group):
+    bytes_object_ = []
+    if not hasattr(group, 'serialize'):
+        return None
+    
+    if isinstance(object, list):
+        for i in object:
+            bytes_object_.append(group.serialize(i))
+        return bytes_object_
+    return None
 
 def deserializeDict(object, group):
     bytes_object = {}
@@ -34,6 +47,8 @@ def deserializeDict(object, group):
                bytes_object[i] = group.deserialize(object[i])
             elif _type == dict:
                bytes_object[i] = deserializeDict(object[i], group) # ; print("dict found in des => '%s'" % i);
+            elif _type == list:
+                bytes_object[i] = deserializeList(object[i], group)
             elif _type == str:
                bytes_object[i] = object[i]
         return bytes_object
@@ -41,8 +56,18 @@ def deserializeDict(object, group):
         # just one bytes object
         return object
     
+def deserializeList(object, group):
+    _bytes_object = []
+    if not hasattr(group, 'deserialize'):
+       return None
+
+    if isinstance(object, list):
+        for i in object:
+            _bytes_object.append(group.deserialize(i))
+        return _bytes_object 
+    
 def pickleObject(object):
-    valid_types = [bytes, dict, str]    
+    valid_types = [bytes, dict, list, str, int]    
     file = io.BytesIO()
     # check that dictionary is all bytes (if not, return None)
     if isinstance(object, dict):

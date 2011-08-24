@@ -33,7 +33,7 @@
 #define _PASTE2(x,y) _PASTE(x,y)
 #define _MODULE_STRING _XSTR(MODULE_NAME)
 
-#ifdef PY_MAJOR_VERSION >= 3
+#if PY_MAJOR_VERSION >= 3
 #define _MODULE_NAME _PASTE2(PyInit_, MODULE_NAME)
 #else
 #define _MODULE_NAME _PASTE2(init,MODULE_NAME)

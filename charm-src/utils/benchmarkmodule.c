@@ -98,11 +98,12 @@ static int PyStartBenchmark(Benchmark *data, PyObject *opList, int opListSize)
 		int cnt = 0;
 		for(i = 0; i < opListSize; i++) {
 			PyObject *item = PyList_GetItem(opList, i);
-			if(!PyLong_Check(item)) continue;
-			MeasureType option = PyLong_AsLong(item);
+			if(!_PyLong_Check(item)) continue;
+			MeasureType option = ConvertToInt(item);
 			if(option >= 0 && option < NONE) {
 				data->options_selected[cnt] = option;
 				cnt++;
+				debug("Option '%d' selected...\n", option);
 				switch(option) {
 					case CPU_TIME:  data->cpu_option = TRUE; break;
 					case REAL_TIME:	data->real_option = TRUE; break;
@@ -147,11 +148,11 @@ static int PyEndBenchmark(Benchmark *data)
 								data->cpu_time_ms = ((double)(data->stop_clock - data->start_clock))/CLOCKS_PER_SEC;
 								debug("CPU Time:\t%f\n", data->cpu_time_ms);
 								break;
-				case NATIVE_TIME: debug("Native time in C:\t%0.2f\n", data->native_time_ms); break;
+				case NATIVE_TIME: debug("Native time in C:\t%f\n", data->native_time_ms); break;
 				case REAL_TIME:	// time(&data->stop_time);
 								// data->real_time_ms = difftime(stop_t, data->start_time);
 								data->real_time_ms = CalcUsecs(&data->start_time, &stop_t);
-								debug("Real Time:\t%0.4f\n", data->real_time_ms);
+								debug("Real Time:\t%f\n", data->real_time_ms);
 								break;
 				case ADDITION: 		debug("add operations:\t\t%d\n", data->op_add); break;
 				case SUBTRACTION:  debug("sub operations:\t\t%d\n", data->op_sub); break;
@@ -220,19 +221,18 @@ static PyObject *_startBenchmark(Benchmark *self, PyObject *args) {
 		// retrieve options
 		int size = PyList_Size(list);
 		if(size > 0) {
-/*
-			MeasureType options[size];
+
+#if PY_MAJOR_VERSION < 3
+			int i;
 			for(i = 0; i < size; i++) {
 				PyObject *item = PyList_GetItem(list, i);
 				if(!PyInt_Check(item)) continue;
 				int option = PyInt_AsLong(item);
-				if(option >= 0 && option < NONE) {
-					options[cnt] = option;
-					debug("Option selected: %d\n", options[cnt]);
-					cnt++;
+				if(option >= CPU_TIME && option < NONE) {
+					debug("Option selected: %d\n", option);
 				}
 			}
-*/
+#endif
 			int result = PyStartBenchmark(self, list, size);
 			if(!result) {
 				PyErr_SetString(BenchmarkError, "invalid benchmark object.");
@@ -246,16 +246,19 @@ static PyObject *_startBenchmark(Benchmark *self, PyObject *args) {
 			return NULL;
 		}
 	}
-	return Py_BuildValue("i", errcode);
+	if(errcode) Py_RETURN_TRUE;
+	Py_RETURN_FALSE;
 }
 
 static PyObject *_endBenchmark(Benchmark *self, PyObject *args) {
 	if(self->bench_initialized == TRUE) {
 		PyEndBenchmark(self);
-		return Py_BuildValue("i", TRUE);
+//		return Py_BuildValue("i", TRUE);
+		Py_RETURN_TRUE;
 	}
 	PyErr_SetString(BenchmarkError, "benchmark object not initialized.");
-	return Py_BuildValue("i", FALSE);
+//	return Py_BuildValue("i", FALSE);
+	Py_RETURN_FALSE;
 }
 
 static PyObject *_updateBenchmark(Benchmark *self, PyObject *args) {
@@ -283,8 +286,41 @@ PyObject *Benchmark_print(Benchmark *self) {
 		PyClearBenchmark(self);
 		return results;
 	}
+	return PyUnicode_FromString("Benchmark object has not been initialized properly.");
+}
 
-	return PyUnicode_FromString("<--- Results --->");
+PyObject *_benchmark_print(Benchmark *self) {
+	return PyUnicode_FromString("");
+}
+
+PyObject *_get_results(Benchmark *self) {
+	if(self != NULL) {
+		PyObject *results;
+		PyObject *cpu = PyFloat_FromDouble(self->cpu_time_ms);
+		PyObject *native = PyFloat_FromDouble(self->native_time_ms);
+		PyObject *real = PyFloat_FromDouble(self->real_time_ms);
+#if PY_MAJOR_VERSION >= 3
+		results = PyUnicode_FromFormat("<--- Results --->\nCPU Time:  %Sms\nReal Time: %Ss\nNative Time: %Ss\nAdd:\t%i\nSub:\t%i\nMul:\t%i\nDiv:\t%i\nExp:\t%i\nPair:\t%i\n",
+								cpu, real, native, self->op_add, self->op_sub, self->op_mult, self->op_div, self->op_exp, self->op_pair);
+#else
+		char cpu_buf[100];
+		char real_buf[100];
+		char native_buf[100];
+		PyFloat_AsString(cpu_buf, (PyFloatObject *) cpu);
+		PyFloat_AsString(real_buf, (PyFloatObject *) real);
+		PyFloat_AsString(native_buf, (PyFloatObject *) native);
+		results = PyString_FromFormat("<--- Results --->\nCPU Time:  %sms\n"
+									  "Real Time: %ss\nNative Time: %ss\n"
+									  "Add:\t%i\nSub:\t%i\nMul:\t%i\nDiv:\t%i\nExp:\t%i\nPair:\t%i\n",
+								cpu_buf, real_buf, native_buf,
+								self->op_add, self->op_sub, self->op_mult, self->op_div,
+								self->op_exp, self->op_pair);
+#endif
+		PyClearBenchmark(self);
+		return results;
+	}
+
+	return PyUnicode_FromString("Benchmark object has not been initialized properly.");
 }
 
 // for attributes and what not
@@ -294,8 +330,10 @@ PyObject *Benchmark_print(Benchmark *self) {
 
 // benchmark object methods (object instance scope)
 PyMethodDef Benchmark_methods[] = {
+//	{"InitBenchmark", (PyCFunction)_initBenchmark, METH_NOARGS, "Initialize the benchmark object with an identifier"}
 	{"StartBenchmark", (PyCFunction)_startBenchmark, METH_VARARGS, "Start a new benchmark with some options"},
 	{"EndBenchmark", (PyCFunction)_endBenchmark, METH_VARARGS, "End a given benchmark"},
+	{"GetResults", (PyCFunction)_get_results, METH_NOARGS, "Print results of benchmark object."},
 	{"UpdateBenchmark", (PyCFunction)_updateBenchmark, METH_VARARGS, "Update a given option counter for a benchmark object"},
 	{NULL}
 };
@@ -310,7 +348,7 @@ PyTypeObject BenchmarkType = {
 	0,                         /*tp_getattr*/
 	0,                         /*tp_setattr*/
 	0,			   				/*tp_reserved*/
-	(reprfunc)Benchmark_print, /*tp_repr*/
+	(reprfunc)_benchmark_print, /*tp_repr*/
 	0,               		   /*tp_as_number*/
 	0,                         /*tp_as_sequence*/
 	0,                         /*tp_as_mapping*/

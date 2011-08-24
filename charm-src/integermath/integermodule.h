@@ -33,11 +33,11 @@
 	PyErr_SetString(IntegerError, msg); \
 	return NULL;
 
-#if PY_MAJOR_VERSION >= 3
-	#define _PyLong_Check(o1) PyLong_Check(o1)
-#else
-	#define _PyLong_Check(o1) PyLong_Check(o1) || PyInt_Check(o1)
-#endif
+//#if PY_MAJOR_VERSION >= 3
+//	#define _PyLong_Check(o1) PyLong_Check(o1)
+//#else
+//	#define _PyLong_Check(o1) PyLong_Check(o1) || PyInt_Check(o1)
+//#endif
 
 
 #if PY_MAJOR_VERSION >= 3

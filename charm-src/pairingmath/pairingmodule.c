@@ -1369,6 +1369,7 @@ static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 	uint8_t *data_buf = NULL;
 	size_t bytes_written;
 	START_CLOCK(dBench);
+
 	if(self->element_type == ZR || self->element_type == GT) {
 //		PyErr_SetString(ElementError, "cannot compress elements of Zr any further. Use 'serialize'.");
 //		return NULL;

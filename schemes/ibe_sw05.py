@@ -20,9 +20,8 @@ from charm.pairing import hash as sha1
 import operator
 from functools import reduce
 
-debug = True
-class IBE_BB04(IBEnc):
-    
+debug = False
+class IBE_SW05(IBEnc):
     def legrange_coeff(self, i, S, x):
         '''
         Legrange Coefficient
@@ -101,7 +100,7 @@ class IBE_BB04(IBEnc):
 def main():
     # initialize the element object so that object references have global scope
     groupObj = PairingGroup('../param/d224.param')
-    ibe = IBE_BB04(groupObj)
+    ibe = IBE_SW05(groupObj)
     (params, mk) = ibe.setup()
 
     # represents public identity
