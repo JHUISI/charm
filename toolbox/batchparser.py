@@ -59,18 +59,20 @@ class BatchParser:
         # supported operators => (OR, AND, <, prod{
         OperatorOR = Literal("OR") | Literal("or").setParseAction(upcaseTokens)
         OperatorAND = Literal("AND") | Literal("and").setParseAction(upcaseTokens)
-        lpar = Literal("(").suppress()
-        rpar = Literal(")").suppress()
+        lpar = Literal("(").suppress() | Literal("{").suppress()
+        rpar = Literal(")").suppress() | Literal("}").suppress()
         rcurly = Literal("}").suppress()
 
         ExpOp = Literal("^")
         MulOp = Literal("*")
-        Equality = Literal(":=") | Literal("==") # | Word("<>", max=1)
+        Concat = Literal("|")
+        Equality = Literal("==") | Literal(":=") # | Word("<>", max=1)
         Pairing = Literal('e(') # Pairing token
         Hash = Literal('H(')
         Prod = Literal("prod{") # dot product token
         ProdOf = Literal("on")
-        Token = Equality | ExpOp | MulOp | ProdOf
+        # captures order of parsing token operators
+        Token = Equality | ExpOp | MulOp | ProdOf | Concat
         Operator = OperatorAND | OperatorOR | Token
 
         # describes an individual leaf node
@@ -148,7 +150,7 @@ class BatchParser:
 #        return None
 def parseFile(filename):
     fd = open(filename, 'r')
-    ast_tree = {}
+    ast_tree = []
     parser = BatchParser()
     code = fd.readlines(); i = 1
     for line in code:
@@ -158,7 +160,8 @@ def parseFile(filename):
             continue
         ast_node = parser.parse(line)
         print(i, ":", ast_node)
-        ast_tree[i] = ast_node # store for later processing
+        ast_tree.append(ast_node)
+        # ast_tree[i] = ast_node # store for later processing        
         i += 1
     fd.close()
     return ast_tree
@@ -171,18 +174,153 @@ def astSyntaxChecker(astTree):
     pass
 
 # Perform some type checking here?
-def astParser(objtree):
-    pass
+# rules: find constants, verify, variable definitions
+def astParser(astList):
+    constants = []
+    verify_eq = None
+    variables = {}
+    
+    for i in astList:
+        s = str(i.left)
+        if s == 'constant':
+            constants.append(i)
+        elif s == 'verify':
+            verify_eq = i
+        else:
+            variables[s] = str(i.right)
 
+    return (constants, verify_eq, variables)
+
+class ASTIterator:
+    def __init__(self, _node, _type):
+        self.cur_node = _node
+        self.of_type = _type
+    
+    def __iter__(self):
+        # if we've found a match
+        if self.cur_node.type == _type:
+            return self.cur_node
+        else:
+            self.cur_node = self.cur_node.right
+    
+    def next(self):
+        if self.cur_node:
+            raise StopIteration
+        else:
+            self.cur_node = _node.right
+
+# decorator for selecting which operation to call on 
+# each node visit...
+class dispatch(object):
+    def __init__(self, target=None):
+        print("initialized dispatcher...")
+        self.target = target
+        self.default = 'visit'        
+        self.meths = {}; 
+        self.hit = 0
+    
+    def __call__(self, visitor, *args):
+        def wrapped_func(*args):
+            try:
+                name = str(args[0].type)
+                #print("dispatch for => visit_", name.lower())
+                func_name = 'visit_' + name.lower()
+                if self.meths.get(func_name) == None:
+                    meth = getattr(visitor, func_name, self.default)
+                    if meth == self.default:
+                        meth = getattr(visitor, self.default)
+                    self.meths[func_name] = meth # cache for next call
+                    meth(*args)
+                else:
+                    # call cached function
+                    self.hit += 1
+                    # print("hitting cache: ", self.hit) 
+                    self.meths[func_name](*args)
+            except Exception as e:
+                print(e)
+
+        return wrapped_func(*args)
+
+class ASTVisitor(object):
+    def __init__(self, visitor):
+        self.visitor = visitor
+        if not hasattr(self.visitor, 'visit'):
+            raise Exception("No generic visit method defined in AST operation class")
+        # pointers to other parts of the tree
+        # allows for keeping track of where we are in
+        # AST.
+
+    @dispatch
+    def visit(self, visitor, node, info):
+        """Generic visit function or sub nodes"""
+        return
+        
+    def preorder(self, root_node, parent_node=None, sib_node=None):
+        if root_node == None: return None
+        # if parent_node == None: parent_node = root_node
+        info = { 'parent': parent_node, 'sibling': sib_node }
+        self.visit(self.visitor, root_node, info) 
+        self.preorder(root_node.left, root_node, root_node.right)
+        self.preorder(root_node.right, root_node, root_node.left)
+    
+    def postorder(self, root_node, parent_node=None, sib_node=None):
+        if root_node == None: return None
+        # if parent_node == None: parent_node = root_node        
+        info = { 'parent': parent_node, 'sibling': sib_node }
+        self.postorder(root_node.left, root_node, root_node.right)
+        self.postorder(root_node.right, root_node, root_node.left)
+        self.visit(self.visitor, root_node, info)
+    
+    def inorder(self, root_node, parent_node=None, sib_node=None):
+        if root_node == None: return None
+        # if parent_node == None: parent_node = root_node        
+        info = { 'parent': parent_node, 'sibling': sib_node }
+        self.inorder(root_node.left, root_node, root_node.right)
+        self.visit(self.visitor, root_node, info)
+        self.inorder(root_node.right, root_node, root_node.left)
+
+class ASTOperations:
+    def __init__(self):
+        pass
+
+    def visit(self, node, data):
+        pass
+
+    def visit_pair(self, node, data):
+        print("Visit : pair =>", node.type)
+        if data['parent']: print("my parent =>", data['parent'].type, "\n")        
+        return None
+
+    def visit_exp(self, node, data):
+        print("Visit : exp =>", node.type)
+        if data['parent']: print("my parent =>", data['parent'].type, "\n")        
+        return None
+        
+#    def visit_attr(self, node, data):
+#        print("Visit : attr =>", node.type)
+#        if data['parent']: print("my parent =>", data['parent'].type, "\n")        
+#        return None
+
+#    def visit_eq(self, node, data):
+#        print("Visit : eq =>", node.type)
+#        if data['parent']: print("my parent =>", data['parent'].type, "\n")        
+#        return None
+        
 if __name__ == "__main__":
     print(sys.argv[1:])
 #    statement = sys.argv[1]
-#
 #    parser = BatchParser()
 #    final = parser.parse(statement)
 #    print("Final statement:  '%s'" % final)
     file = sys.argv[1]
     
     ast = parseFile(file)
-    print(ast)
-    
+    # print(ast)
+    (const, verify, vars) = astParser(ast)
+    print("Constants =>", const)
+    print("Variables =>", vars)
+
+    print("\nVERIFY EQUATION =>", verify, "\n")
+    ASTVisitor(ASTOperations()).preorder(verify)
+    # TODO: need operation deep tree copy, then build technique 1 & 2 ast operator
+    # TODO: need 3 & 4 ast operator
