@@ -8,6 +8,7 @@
 #include <structmember.h>
 #include <longintrepr.h>				/* for conversions */
 #include <math.h>
+#include <string.h>
 #include <gmp.h>
 #include "sha1.h"
 #include "benchmarkmodule.h"

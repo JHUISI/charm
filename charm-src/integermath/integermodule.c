@@ -1504,9 +1504,10 @@ static PyObject *serialize(PyObject *self, PyObject *args) {
 		// convert string to base64 encoding
 		size_t length = 0;
 		base64_rop = NewBase64Encode(rop, count1, FALSE, &length);
-		// convert to bytes
+		// convert to bytes (length : base64 integer)
 		bytes1 = PyBytes_FromFormat("%d:%s:", (int) length,
 				(const char *) base64_rop);
+		free(base64_rop);
 	}
 
 	if (mpz_sgn(obj->m) > 0) {
@@ -1517,6 +1518,7 @@ static PyObject *serialize(PyObject *self, PyObject *args) {
 		// convert to bytes
 		bytes2 = PyBytes_FromFormat("%d:%s:", (int) length2,
 				(const char *) base64_rop2);
+		free(base64_rop2);
 	}
 
 	if (bytes2 != NULL && bytes1 != NULL) {
@@ -1529,6 +1531,17 @@ static PyObject *serialize(PyObject *self, PyObject *args) {
 	}
 }
 
+void deserialize_helper(int length, char *encoded_value, mpz_t target)
+{
+	debug("encoded_value len => '%d'", strlen(encoded_value));
+
+	size_t deserialized_len = 0;
+	uint8_t *buf = NewBase64Decode((const char *) encoded_value, length, &deserialized_len);
+
+	mpz_import(target, deserialized_len, 1, sizeof(buf[0]), 0, 0, buf);
+	free(buf);
+}
+
 static PyObject *deserialize(PyObject *self, PyObject *args) {
 	PyObject *bytesObj = NULL;
 
@@ -1536,9 +1549,47 @@ static PyObject *deserialize(PyObject *self, PyObject *args) {
 		ErrorMsg("invalid argument.");
 	}
 
-	/* TODO: need to finish this method. */
-	Py_INCREF(Py_NotImplemented);
-	return Py_NotImplemented;
+	unsigned char *serial_buf = (unsigned char *) PyBytes_AsString(bytesObj);
+	/* get integer value */
+	char delim[] = ":";
+	char *token = NULL;
+	token = strtok((char *) serial_buf, delim);
+	// length
+	int int_len = atoi((const char *) token);
+	debug("length => '%d'\n", int_len);
+	mpz_t x,m;
+	mpz_init(x);
+	mpz_init(m);
+
+	// parse the first half of the bytes/str object
+	token = strtok(NULL, delim);
+	debug("encoded value x => '%s'\n", token);
+	if(token != NULL) {
+		deserialize_helper(int_len, token, x);
+		debug("decoded value x => ");
+		print_mpz(x, 10);
+	}
+
+	// parse modulus (if indeed modular integer)
+	token = strtok(NULL, delim);
+	if(token != NULL) {
+		int_len = atoi((const char *) token);
+		token = strtok(NULL, delim);
+		deserialize_helper(int_len, token, m);
+		debug("decoded value m => ");
+		print_mpz(m, 10);
+	}
+
+	Integer *obj = NULL;
+	if(mpz_sgn(m) > 0)
+		obj = createNewInteger(m);
+	else
+		obj = createNewIntegerNoMod();
+	mpz_set(obj->e, x);
+
+	mpz_clear(x);
+	mpz_clear(m);
+	return (PyObject *) obj;
 }
 
 // class method for conversion

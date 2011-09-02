@@ -32,7 +32,8 @@ class EC_CS98(PKEnc):
         global group
         group = ECGroup(builtin_cv)
         self.groupObj = group
-           
+
+    @output(pk_t, sk_t)
     def keygen(self, secparam=0):
         group.paramgen(secparam)
         g1, g2 = group.random(G), group.random(G)
@@ -46,6 +47,8 @@ class EC_CS98(PKEnc):
         sk = { 'x1' : x1, 'x2' : x2, 'y1' : y1, 'y2' : y2, 'z' : z }
         return (pk, sk)
 
+    @input(pk_t, str)
+    @output(c_t)
     def encrypt(self, pk, M):
         r     = group.random()
         u1    = (pk['g1'] ** r)
@@ -58,6 +61,8 @@ class EC_CS98(PKEnc):
         c = { 'u1' : u1, 'u2' : u2, 'e' : e, 'v' : v }
         return c
     
+    @input(pk_t, sk_t, c_t)
+    @output(str)
     def decrypt(self, pk, sk, c):
         alpha = group.hash((c['u1'], c['u2'], c['e']))
         v_prime = (c['u1'] ** (sk['x1'] + (sk['y1'] * alpha))) * (c['u2'] ** (sk['x2'] + (sk['y2'] * alpha)))
