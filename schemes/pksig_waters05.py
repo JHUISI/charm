@@ -113,9 +113,9 @@ def main():
     msg = ibe.stringtoidentity(pk, M)    
     sig = ibe.sign(pk, sk, msg)
     if debug: 
-	print("original msg => '%s'" % M)
-    	print("msg => '%s'" % msg)
-    	print "sig => '%s'" % sig
+        print("original msg => '%s'" % M)
+        print("msg => '%s'" % msg)
+        print("sig => '%s'" % sig)
     
     assert ibe.verify(pk, msg, sig)
     if debug: print("Successful Verification!!! msg => '%s'" % msg)

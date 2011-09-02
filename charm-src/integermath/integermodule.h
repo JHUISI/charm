@@ -24,11 +24,11 @@
 //#define DEBUG   1
 //#define TRUE	1
 //#define FALSE	0
-//#ifdef DEBUG
-//#define debug(...)	printf("DEBUG: "__VA_ARGS__)
-//#else
-//#define debug(...)
-//#endif
+#if DEBUG
+#define debug(...)	printf("DEBUG: "__VA_ARGS__)
+#else
+#define debug(...)
+#endif
 
 #define ErrorMsg(msg) \
 	PyErr_SetString(IntegerError, msg); \

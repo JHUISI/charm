@@ -763,8 +763,8 @@ static PyObject *Integer_hash(PyObject *self, PyObject *args) {
 			int i, blocks = ceil((double) size(q) / (HASH_LEN * 8));
 			debug("blocks => '%d'\n", blocks);
 			size_t out_len = HASH_LEN * blocks;
-			uint8_t out_buf[out_len + 4];
-			memset(out_buf, 0, out_len);
+			uint8_t out_buf[(out_len * 2) + 1];
+			memset(out_buf, 0, out_len*2);
 
 			if (blocks > 1) {
 				for (i = 1; i <= blocks; i++) {
@@ -780,6 +780,7 @@ static PyObject *Integer_hash(PyObject *self, PyObject *args) {
 				hash_to_group_element(tmp, -1, out_buf);
 			}
 
+			debug("print out_len => '%zd'\n", out_len);
 			debug("print out_buf...\n");
 			printf_buffer_as_hex(out_buf, out_len);
 			// convert v' to mpz_t type mod q => v
@@ -809,7 +810,7 @@ static PyObject *Integer_hash(PyObject *self, PyObject *args) {
 			mpz_clear(tmp);
 			mpz_clear(modulus);
 			return (PyObject *) rop;
-		} else {
+		} else { /* non-tuple element - maybe single element? */
 			Integer *obj = (Integer *) object;
 
 			// make sure object was initialized
