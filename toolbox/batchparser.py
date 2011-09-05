@@ -183,7 +183,7 @@ def astParser(astList):
     for i in astList:
         s = str(i.left)
         if s == 'constant':
-            constants.append(i)
+            constants.append(i.right)
         elif s == 'verify':
             verify_eq = i
         else:
@@ -216,7 +216,7 @@ class dispatch(object):
         print("initialized dispatcher...")
         self.target = target
         self.default = 'visit'        
-        self.meths = {}; 
+        #self.meths = {}; 
         self.hit = 0
     
     def __call__(self, visitor, *args):
@@ -225,27 +225,29 @@ class dispatch(object):
                 name = str(args[0].type)
                 #print("dispatch for => visit_", name.lower())
                 func_name = 'visit_' + name.lower()
-                if self.meths.get(func_name) == None:
+                if hasattr(visitor, 'cache') and visitor.cache.get(func_name) == None:
                     meth = getattr(visitor, func_name, self.default)
                     if meth == self.default:
                         meth = getattr(visitor, self.default)
-                    self.meths[func_name] = meth # cache for next call
+                    visitor.cache[func_name] = meth # cache for next call
                     meth(*args)
                 else:
                     # call cached function
                     self.hit += 1
                     # print("hitting cache: ", self.hit) 
-                    self.meths[func_name](*args)
+                    visitor.cache[func_name](*args)
             except Exception as e:
                 print(e)
 
         return wrapped_func(*args)
 
 class ASTVisitor(object):
-    def __init__(self, visitor):
+    def __init__(self, visitor):    
         self.visitor = visitor
         if not hasattr(self.visitor, 'visit'):
             raise Exception("No generic visit method defined in AST operation class")
+        if not hasattr(self.visitor, 'cache'):
+            self.visitor.cache = {} # for caching funcs
         # pointers to other parts of the tree
         # allows for keeping track of where we are in
         # AST.
@@ -265,7 +267,7 @@ class ASTVisitor(object):
     
     def postorder(self, root_node, parent_node=None, sib_node=None):
         if root_node == None: return None
-        # if parent_node == None: parent_node = root_node        
+        # if parent_node == None: parent_node = root_node
         info = { 'parent': parent_node, 'sibling': sib_node }
         self.postorder(root_node.left, root_node, root_node.right)
         self.postorder(root_node.right, root_node, root_node.left)
@@ -279,32 +281,188 @@ class ASTVisitor(object):
         self.visit(self.visitor, root_node, info)
         self.inorder(root_node.right, root_node, root_node.left)
 
+
+def addAsChildNodeToParent(data, target_node):
+    if data['parent'].right == data['sibling']:
+        data['parent'].left = target_node
+    else:
+        data['parent'].right = target_node              
+
 class ASTOperations:
     def __init__(self):
         pass
 
     def visit(self, node, data):
         pass
-
-    def visit_pair(self, node, data):
-        print("Visit : pair =>", node.type)
-        if data['parent']: print("my parent =>", data['parent'].type, "\n")        
-        return None
-
-    def visit_exp(self, node, data):
-        print("Visit : exp =>", node.type)
-        if data['parent']: print("my parent =>", data['parent'].type, "\n")        
-        return None
-        
-#    def visit_attr(self, node, data):
-#        print("Visit : attr =>", node.type)
+#    def visit_pair(self, node, data):
+#        print("Visit : pair =>", node.type)
 #        if data['parent']: print("my parent =>", data['parent'].type, "\n")        
 #        return None
+#
+#    def visit_exp(self, node, data):
+#        print("Visit : exp =>", node.type)
+#        if data['parent']: print("my parent =>", data['parent'].type, "\n")        
+#        return None
+        
+    def visit_attr(self, node, data):
+#        node.attr_index = 'j'
+#        print("Visit : attr =>", node.type)
+#        if data['parent']: print("my parent =>", data['parent'].type, "\n")        
+        return None
 
 #    def visit_eq(self, node, data):
 #        print("Visit : eq =>", node.type)
 #        if data['parent']: print("my parent =>", data['parent'].type, "\n")        
 #        return None
+        
+class CombineVerifyEq:
+    def __init__(self, constants, variables):
+        self.consts = constants
+        self.vars = variables
+    
+    def visit(self, node, data):
+        pass
+    
+    def visit_pair(self, node, data):
+        prod = self.newProdNode()
+        prod.right = node
+        addAsChildNodeToParent(data, prod)
+    
+    def visit_hash(self, node, data):
+        if node.left.type == ops.ATTR:
+            # save me and parent for future use
+            self.hash_node = { 'node': node, 'parent':data['parent'], 
+                               'sibling':data['sibling'] }
+            
+    def visit_attr(self, node, data):
+        if not self.isConstant(node):
+            node.setAttrIndex('i') # add index to each attr that isn't constant
+#            prod = self.newProdNode()
+#            if data['parent'].type != ops.HASH:
+#                prod.right = node
+#                # add new node to prod{i=1, N} on cur_node            
+#                addAsChildNodeToParent(data, prod)
+#            else:
+#                # if hash node above is parent we visited: then proceed
+#                # to retrieve the parent of that hash node
+#                if self.hash_node['node'] == data['parent']:
+#                    prod.right = data['parent']
+#                    addAsChildNodeToParent(self.hash_node, prod)                    
+    
+    def newProdNode(self):
+        p = BatchParser()
+        new_node = p.parse("prod{i:=1, N} on x")
+        return new_node
+
+    def isConstant(self, node):        
+        for n in self.consts:
+            if n.getAttribute() == node.getAttribute(): return True
+        return False
+
+# Adds an exponent to a \delta to every pairing node
+class SmallExponent:
+    def __init__(self, constants, variables):
+        self.consts = constants
+        self.vars   = variables
+    
+    def visit(self, node, data):
+        pass
+
+    def visit_pair(self, node, data):
+        if data['parent'].type != ops.EXP:
+            new_node = self.newExpNode()
+            new_node.left = node
+            new_node.right = BinaryNode("delta_i")
+            #print("new node =>", new_node)  
+            addAsChildNodeToParent(data, new_node)
+    
+    def newExpNode(self):
+        p = BatchParser()
+        _node = p.parse("a ^ b_i")
+        return _node
+
+class Technique2:
+    def __init__(self, constants, variables, group='G1'):
+        self.consts = constants
+        self.vars   = variables
+        print("Rule 2: Move the exponent(s) into the pairing")
+        self.group = group # can orogrammatically set which group we move exponent into
+        # TODO: pre-processing to determine context of how to apply technique 2...here?
+        # TODO: in cases of chp.bv, where you have multiple exponents outside a pairing, move them all into the e().
+    
+    def visit(self, node, data):
+        pass
+
+    # detect rule: e(g, h)^d_i ==> e(g^d_i, h)
+    def visit_exp(self, node, data):
+        if(node.left.type == ops.PAIR) and (node.right.getAttribute() == 'delta'): # or (node.right.type == ops.PAIR):
+            pair_node = node.left
+            addAsChildNodeToParent(data, pair_node) # move pair node one level up
+                                  # make cur node the left child of pair node
+            # G1 : pair.left, G2 : pair.right
+            self.isConstInSubtree(pair_node.left)
+            if not self.const_result:
+                node.left = pair_node.left
+                pair_node.left = node
+            
+            self.isConstInSubtree(pair_node.right)
+            if not self.const_result:
+                node.left = pair_node.right
+                pair_node.right = node    
+
+    def isConstInSubtree(self, node): # check whether left or right node is constant  
+        if not node: return
+        if node.type == ops.ATTR:
+            self.const_result = self.isConstant(node)
+            return
+        self.isConstInSubtree(node.left)
+        self.isConstInSubtree(node.right)
+
+    def isConstant(self, node):        
+        for n in self.consts:
+            if n.getAttribute() == node.getAttribute(): return True
+        return False
+
+
+class Technique3:
+    def __init__(self, constants, variables, group='G1'):
+        self.consts = constants
+        self.vars   = variables
+        self.group  = group
+        print("Rule 3: When two pairings with common 1st or 2nd element appear, then can be combined. n pairs to 1.")
+    
+    def visit(self, node, data):
+        pass
+    
+    def visit_on(self, node, data):
+        if node.right.type == ops.PAIR:
+            pair_node = node.right
+            addAsChildNodeToParent(data, pair_node) # move pair one level up
+            
+            self.isConstInSubtree(pair_node.left)
+            if not self.const_result:  # if F, then can apply prod node to left child of pair node              
+                node.right = pair_node.left
+                pair_node.left = node # pair points to 'on' node
+            
+            self.isConstInSubtree(pair_node.right)
+            if not self.const_result:
+                node.right = pair_node.right
+                pair_node.right = node
+    
+    def isConstInSubtree(self, node): # check whether left or right node is constant  
+        if not node: return
+        if node.type == ops.ATTR:
+            self.const_result = self.isConstant(node)
+            return
+        self.isConstInSubtree(node.left)
+        self.isConstInSubtree(node.right)
+
+    def isConstant(self, node):        
+        for n in self.consts:
+            if n.getAttribute() == node.getAttribute(): return True
+        return False
+   
+            
         
 if __name__ == "__main__":
     print(sys.argv[1:])
@@ -320,7 +478,17 @@ if __name__ == "__main__":
     print("Constants =>", const)
     print("Variables =>", vars)
 
-    print("\nVERIFY EQUATION =>", verify, "\n")
+    verify2 = BinaryNode.copy(verify)
+    ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
     ASTVisitor(ASTOperations()).preorder(verify)
+    print("\nVERIFY EQUATION =>", verify, "\n")
+    print("\nStage 1: Combined Equation =>", verify2, "\n")
+    ASTVisitor(SmallExponent(const, vars)).preorder(verify2.right)
+    print("\nStage 2: Small Exp Test =>", verify2, "\n")
+    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)
+    print("\nStage 3: Apply tech 2 =>", verify2, "\n")
+    ASTVisitor(Technique3(const, vars)).preorder(verify2.right)
+    print("\nStage 4: Apply tech 3 =>", verify2, "\n")    
+    
     # TODO: need operation deep tree copy, then build technique 1 & 2 ast operator
     # TODO: need 3 & 4 ast operator

@@ -24,7 +24,7 @@ import string
 
 types = Enum('G1', 'G2', 'GT', 'ZR', 'str')
 declarator = Enum('constants', 'verify')
-ops = Enum('BEGIN', 'MUL', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'PROD', 'ON', 'END')
+ops = Enum('BEGIN', 'MUL', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'PROD', 'ON', 'END', 'NONE')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
 
@@ -40,11 +40,12 @@ class BinaryNode:
 				self.attr_index = None
 		elif value > ops.BEGIN and value < ops.END:
 			self.type = value
-			self.attr = ''
+			self.attr = None
+			self.attr_index = None
 		else:
 			self.type = ops.NONE
-			self.attr = ''
-			
+			self.attr = None
+			self.attr_index = None
 		self.left = left
 		self.right = right
 
@@ -77,8 +78,15 @@ class BinaryNode:
 			elif(self.type == ops.PROD):
 				return ('prod{' + left + ',' + right + '}')
 			elif(self.type == ops.ON):
-				return ('(' + left + ' on ' + right + ')')
+				# return ('(' + left + ' on ' + right + ')')
+				return ( left + ' on ' + right )				
 		return None
+	
+	def setAttrIndex(self, value):
+		if(self.type == ops.ATTR):
+			self.attr_index = value
+			return True
+		return False			
 	
 	def getAttribute(self):
 		if (self.type == ops.ATTR):
@@ -107,6 +115,17 @@ class BinaryNode:
 			return node
 		return value
 
+	@classmethod
+	def copy(self, this):
+		if this == None: return None
+		new_node = BinaryNode(this.type)
+		new_node.attr = this.attr
+		new_node.attr_index = this.attr_index
+		
+		# recursively call copy on left 
+		new_node.left = self.copy(this.left)
+		new_node.right = self.copy(this.right)		
+		return new_node	
 #	def addProdAttr(self, start, end):
 #		if self.type == ops.PROD:
 #			self.start = start
