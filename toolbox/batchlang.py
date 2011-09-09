@@ -6,8 +6,9 @@
 * PAIR - 'e(' arg1, arg2 ')'
 * CONST - 'constant' declarator?
 * VARIABLE - 'variable' declarator?
-* PROD - 'prod{i:=1,N}' applied to 
+* PROD - 'prod{i:=1,N} on' applied to 
 * ARR - 'a_1' for an array, a, with index = 1
+* LIST - '[ x, y, z,...]' 
 
 e.g., prod{i:=1,N} on pk_i ^ del_i 
 
@@ -24,9 +25,9 @@ import string
 
 types = Enum('G1', 'G2', 'GT', 'ZR', 'str')
 declarator = Enum('constants', 'verify')
-ops = Enum('BEGIN', 'MUL', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'PROD', 'ON', 'END', 'NONE')
+ops = Enum('BEGIN', 'MUL', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'PROD', 'ON', 'CONCAT','LIST','END', 'NONE')
 levels = Enum('none', 'some', 'all')
-debug = levels.none
+debug = levels.all
 
 class BinaryNode:
 	def __init__(self, value, left=None, right=None):		
@@ -66,7 +67,7 @@ class BinaryNode:
 			if(self.type == ops.EXP):
 				return (left + '^' + right)
 			elif(self.type == ops.MUL):
-				return (left + ' * ' + right)
+				return ('(' + left + ' * ' + right + ')')
 			elif(self.type == ops.EQ):
 				return (left + ' := ' + right)
 			elif(self.type == ops.EQ_TST):
@@ -78,8 +79,12 @@ class BinaryNode:
 			elif(self.type == ops.PROD):
 				return ('prod{' + left + ',' + right + '}')
 			elif(self.type == ops.ON):
-				# return ('(' + left + ' on ' + right + ')')
-				return ( left + ' on ' + right )				
+				 return ('(' + left + ' on ' + right + ')')
+			elif(self.type == ops.LIST):
+				 return ('[' + left + ']' )
+			elif(self.type == ops.CONCAT):
+				 return (left + ' | ' + right)
+				# return ( left + ' on ' + right )				
 		return None
 	
 	def setAttrIndex(self, value):

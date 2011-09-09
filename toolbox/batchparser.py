@@ -44,6 +44,8 @@ def createTree(op, node1, node2):
     elif(op == "on"):
         # can only be used in conjunction w/ PROD (e.g. PROD must precede it)        
         node = BinaryNode(ops.ON) 
+    elif(op == "|"):
+        node = BinaryNode(ops.CONCAT)
     # elif e( ... )
     else:    
         return None
@@ -76,7 +78,7 @@ class BatchParser:
         Operator = OperatorAND | OperatorOR | Token
 
         # describes an individual leaf node
-        leafNode = Word(alphanums + '_|').setParseAction( createNode )
+        leafNode = Word(alphanums + '_').setParseAction( createNode )
         expr = Forward()
         term = Forward()
         factor = Forward()
@@ -106,7 +108,7 @@ class BatchParser:
         op = stack.pop()
         if debug >= levels.some:
             print("op: %s" % op)
-        if op in ["*", "^", ":=", "==", "e(", "prod{", "on"]: # == "AND" or op == "OR" or op == "^" or op == "=":
+        if op in ["*", "^", ":=", "==", "e(", "prod{", "on", "|"]: # == "AND" or op == "OR" or op == "^" or op == "=":
             op2 = self.evalStack(stack)
             op1 = self.evalStack(stack)
             return createTree(op, op1, op2)
@@ -323,10 +325,19 @@ class CombineVerifyEq:
     def visit(self, node, data):
         pass
     
+    def visit_exp(self, node, data):
+        if node.left.type == ops.PAIR:
+            prod = self.newProdNode()
+            prod.right = node
+            addAsChildNodeToParent(data, prod)
+    
     def visit_pair(self, node, data):
-        prod = self.newProdNode()
-        prod.right = node
-        addAsChildNodeToParent(data, prod)
+        if data['parent'].type == ops.EXP:
+            pass
+        else:
+            prod = self.newProdNode()
+            prod.right = node
+            addAsChildNodeToParent(data, prod)
     
     def visit_hash(self, node, data):
         if node.left.type == ops.ATTR:
@@ -369,12 +380,12 @@ class SmallExponent:
         pass
 
     def visit_pair(self, node, data):
-        if data['parent'].type != ops.EXP:
-            new_node = self.newExpNode()
-            new_node.left = node
-            new_node.right = BinaryNode("delta_i")
+#        if data['parent'].type != ops.EXP:
+        new_node = self.newExpNode()
+        new_node.left = node
+        new_node.right = BinaryNode("delta_i")
             #print("new node =>", new_node)  
-            addAsChildNodeToParent(data, new_node)
+        addAsChildNodeToParent(data, new_node)
     
     def newExpNode(self):
         p = BatchParser()
@@ -395,7 +406,8 @@ class Technique2:
 
     # detect rule: e(g, h)^d_i ==> e(g^d_i, h)
     def visit_exp(self, node, data):
-        if(node.left.type == ops.PAIR) and (node.right.getAttribute() == 'delta'): # or (node.right.type == ops.PAIR):
+        # print("left node =>", node.left.type,"target right node =>", node.right)
+        if(node.left.type == ops.PAIR):   # and (node.right.attr_index == 'i'): # (node.right.getAttribute() == 'delta'):
             pair_node = node.left
             addAsChildNodeToParent(data, pair_node) # move pair node one level up
                                   # make cur node the left child of pair node
@@ -409,6 +421,16 @@ class Technique2:
             if not self.const_result:
                 node.left = pair_node.right
                 pair_node.right = node    
+        elif(node.left.type == ops.ON):
+            # check whether prod right
+            prod_node = node.left
+            addAsChildNodeToParent(data, prod_node)
+            
+            # blindly make the exp node the right child of whatever
+            # node
+            some_node = prod_node.right
+            prod_node.right = node
+            node.left = some_node
 
     def isConstInSubtree(self, node): # check whether left or right node is constant  
         if not node: return
@@ -452,6 +474,7 @@ class Technique3:
     def isConstInSubtree(self, node): # check whether left or right node is constant  
         if not node: return
         if node.type == ops.ATTR:
+            # set appropriate field when we've found an attribute we can check
             self.const_result = self.isConstant(node)
             return
         self.isConstInSubtree(node.left)
@@ -466,29 +489,30 @@ class Technique3:
         
 if __name__ == "__main__":
     print(sys.argv[1:])
-#    statement = sys.argv[1]
-#    parser = BatchParser()
-#    final = parser.parse(statement)
-#    print("Final statement:  '%s'" % final)
-    file = sys.argv[1]
-    
-    ast = parseFile(file)
+    statement = sys.argv[1]
+    parser = BatchParser()
+    final = parser.parse(statement)
+    print("Final statement:  '%s'" % final)
     # print(ast)
-    (const, verify, vars) = astParser(ast)
-    print("Constants =>", const)
-    print("Variables =>", vars)
 
-    verify2 = BinaryNode.copy(verify)
-    ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
-    ASTVisitor(ASTOperations()).preorder(verify)
-    print("\nVERIFY EQUATION =>", verify, "\n")
-    print("\nStage 1: Combined Equation =>", verify2, "\n")
-    ASTVisitor(SmallExponent(const, vars)).preorder(verify2.right)
-    print("\nStage 2: Small Exp Test =>", verify2, "\n")
-    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)
-    print("\nStage 3: Apply tech 2 =>", verify2, "\n")
-    ASTVisitor(Technique3(const, vars)).preorder(verify2.right)
-    print("\nStage 4: Apply tech 3 =>", verify2, "\n")    
+#    file = sys.argv[1]
+#    ast = parseFile(file)
+#    (const, verify, vars) = astParser(ast)
+#    print("Constants =>", const)
+#    print("Variables =>", vars)
+#
+#    verify2 = BinaryNode.copy(verify)
+#    ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
+#    ASTVisitor(ASTOperations()).preorder(verify)
+#    print("\nVERIFY EQUATION =>", verify, "\n")
+#    print("\nStage 1: Combined Equation =>", verify2, "\n")
+#    ASTVisitor(SmallExponent(const, vars)).preorder(verify2.right)
+#    print("\nStage 2: Small Exp Test =>", verify2, "\n")
+#    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)
+#    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)    
+#    print("\nStage 3: Apply tech 2 =>", verify2, "\n")
+#    ASTVisitor(Technique3(const, vars)).preorder(verify2.right)
+#    print("\nStage 4: Apply tech 3 =>", verify2, "\n")    
     
     # TODO: need operation deep tree copy, then build technique 1 & 2 ast operator
     # TODO: need 3 & 4 ast operator
