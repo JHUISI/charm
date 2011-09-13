@@ -1,5 +1,5 @@
 from charm.pairing import *
-from charm.integer import init
+from charm.integer import randomBits,bitsize,integer
 
 class PairingGroup():
     def __init__(self, param_file, secparam=512, verbose=False):
@@ -37,7 +37,7 @@ class PairingGroup():
                 return self.Pairing.random(type, seed)
             return self.Pairing.random(type)
         else:
-            return randomPrime(self.secparam)
+            return integer(randomBits(self.secparam))
 
         
     def __randomGT(self):

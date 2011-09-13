@@ -50,11 +50,10 @@ class Ciphertext(dict):
 class Pai99(PKEnc):
     def __init__(self):
         PKEnc.__init__(self)
-        self.rand = init()
     
     def paramgen(self, secparam):
         while True:
-           p, q = self.rand.randomPrime(secparam), self.rand.randomPrime(secparam)
+           p, q = randomPrime(secparam), randomPrime(secparam)
            if isPrime(p) and isPrime(q) and gcd(p * q, (p - 1) * (q - 1)) == 1:
               break
         return (p, q)    
@@ -74,7 +73,7 @@ class Pai99(PKEnc):
 
     def encrypt(self, pk, m):
         g, n, n2 = pk['g'], pk['n'], pk['n2']
-        r = self.rand.random(pk['n'])
+        r = random(pk['n'])
         c = ((g % n2) ** m) * ((r % n2) ** n)
         return Ciphertext({'c':c}, pk, 'c')
     

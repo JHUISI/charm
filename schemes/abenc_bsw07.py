@@ -43,7 +43,7 @@ class CPabe_BSW07(ABEnc):
         mk = {'beta':beta, 'g2_alpha':gp ** alpha }
         return (pk, mk)
     
-    def _keygen(self, pk: pk_t, mk: mk_t, S: str) -> sk_t:
+    def keygen(self, pk: pk_t, mk: mk_t, S: str) -> sk_t:
         r = group.random() 
         g_r = (pk['g2'] ** r)    
         D = (mk['g2_alpha'] * g_r) ** (1 / mk['beta'])        
@@ -54,7 +54,7 @@ class CPabe_BSW07(ABEnc):
             D_j_pr[j] = pk['g'] ** r_j
         return { 'D':D, 'Dj':D_j, 'Djp':D_j_pr, 'S':S }
     
-    def _encrypt(self, pk: pk_t, M: GT, policy_str : str) -> ct_t: 
+    def encrypt(self, pk: pk_t, M: GT, policy_str : str) -> ct_t: 
         policy = util.createPolicy(policy_str)
         a_list = []; util.getAttributeList(policy, a_list)
         s = group.random()
@@ -69,7 +69,7 @@ class CPabe_BSW07(ABEnc):
         return { 'C_tilde':(pk['e_gg_alpha'] ** s) * M,
                  'C':C, 'Cy':C_y, 'Cyp':C_y_pr, 'policy':policy, 'attributes':a_list }
     
-    def _decrypt(self, pk: pk_t, sk: sk_t, ct: ct_t) -> GT:
+    def decrypt(self, pk: pk_t, sk: sk_t, ct: ct_t) -> GT:
         pruned_list = util.prune(ct['policy'], sk['S'])
         z = {}; util.getCoefficients(ct['policy'], z)
 

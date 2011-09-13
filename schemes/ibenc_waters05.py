@@ -64,7 +64,7 @@ class IBE_N04(IBEnc):
     
     def stringtoidentity(self, pk, strID):
         '''Hash the identity string and break it up in to l bit pieces'''
-        hash = self.sha1(Bytes(strID)) # 'utf-8'
+        hash = self.sha1(Bytes(strID, 'utf-8'))
         val = Conversion.OS2IP(hash) #Convert to integer format
         bstr = bin(val)[2:]   #cut out the 0b header
         

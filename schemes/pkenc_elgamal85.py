@@ -12,7 +12,7 @@ El Gamal Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption in g
 :Date:           3/2011
 '''
 
-from toolbox.integergroup import *
+from toolbox.integergroup import IntegerGroupQ
 from toolbox.ecgroup import *
 from toolbox.PKEnc import *
 
