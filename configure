@@ -821,6 +821,7 @@ if test "$libm_found" = "no" ; then
    exit -1
 fi 
 
+echo "wget=$wget" >> $config_mk
 echo "HAVE_LIBM=$libm_found" >> $config_mk
 echo "HAVE_LIBGMP=$libgmp_found" >> $config_mk
 echo "HAVE_LIBPBC=$libpbc_found" >> $config_mk

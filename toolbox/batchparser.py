@@ -59,23 +59,26 @@ class BatchParser:
 
     def getBNF(self):
         # supported operators => (OR, AND, <, prod{
-        OperatorOR = Literal("OR") | Literal("or").setParseAction(upcaseTokens)
-        OperatorAND = Literal("AND") | Literal("and").setParseAction(upcaseTokens)
+        #OperatorOR = Literal("OR") | Literal("or").setParseAction(upcaseTokens)
+        #OperatorAND = Literal("AND") | Literal("and").setParseAction(upcaseTokens)
         lpar = Literal("(").suppress() | Literal("{").suppress()
         rpar = Literal(")").suppress() | Literal("}").suppress()
         rcurly = Literal("}").suppress()
 
-        ExpOp = Literal("^")
         MulOp = Literal("*")
         Concat = Literal("|")
-        Equality = Literal("==") | Literal(":=") # | Word("<>", max=1)
+        ExpOp = Literal("^")
+        BinOp = ExpOp | MulOp | Concat
+        Equality = Literal("==") # | Word("<>", max=1)
+        Assignment =  Literal(":=")
         Pairing = Literal('e(') # Pairing token
         Hash = Literal('H(')
         Prod = Literal("prod{") # dot product token
         ProdOf = Literal("on")
         # captures order of parsing token operators
-        Token = Equality | ExpOp | MulOp | ProdOf | Concat
-        Operator = OperatorAND | OperatorOR | Token
+        Token = Equality | ExpOp | MulOp | ProdOf | Concat | Assignment
+        Operator = Token 
+        #Operator = OperatorAND | OperatorOR | Token
 
         # describes an individual leaf node
         leafNode = Word(alphanums + '_').setParseAction( createNode )
@@ -91,7 +94,8 @@ class BatchParser:
         # Place more value on atom [ ^ factor}, so gets pushed on the stack before atom [ = factor], right?
         # In other words, adds order of precedence to how we parse the string. This means we are parsing from right
         # to left. a^b has precedence over b = c essentially
-        factor << atom + ZeroOrMore( ( ExpOp + factor ).setParseAction( pushFirst ) )
+        #factor << atom + ZeroOrMore( ( ExpOp + factor ).setParseAction( pushFirst ) )
+        factor << atom + ZeroOrMore( ( BinOp + factor ).setParseAction( pushFirst ) )
         
         term = atom + ZeroOrMore((Operator + factor).setParseAction( pushFirst ))
         # define placeholder set earlier with a 'term' + Operator + another term, where there can be
@@ -484,35 +488,105 @@ class Technique3:
         for n in self.consts:
             if n.getAttribute() == node.getAttribute(): return True
         return False
-   
+
+
+class CodeGenerator:
+    def __init__(self, constants, variables, verify_stmt):
+        self.consts = constants
+        self.vars   = variables
+        self.verify  = verify_stmt
+    
+    def print_batchverify(self):
+        return self.print_statement(self.verify)
+    
+    def print_statement(self, node):
+        if node == None:
+            return None
+        elif(node.type == ops.ATTR):
+            msg = node.attr
+            if node.attr_index != None:
+                msg += '[' + str(node.attr_index) + ']'
+            return msg
+        else:
+            left = self.print_statement(node.left)
+            right = self.print_statement(node.right)
             
+            if debug >= levels.some:
+               print("Operation: ", node.type)
+               print("Left operand: ", left)
+               print("Right operand: ", right)            
+            if(node.type == ops.EXP):
+                return ("(" + left + ' ** ' + right + ")")
+            elif(node.type == ops.MUL):
+                return ('(' + left + ' * ' + right + ')')
+            elif(node.type == ops.EQ):
+                return (left + ' = ' + right)
+            elif(node.type == ops.EQ_TST):
+                return (left + ' == ' + right)
+            elif(node.type == ops.PAIR):
+                return ('pair(' + left + ',' + right + ')')
+            elif(node.type == ops.HASH):
+                return ('group.hash(' + left + ')')
+            elif(node.type == ops.PROD):
+                return ('group.dotprod(' + left + ', ' + right)
+            elif(node.type == ops.ON):
+                 return (left + ", stmt=" + right + ")")
+            elif(node.type == ops.CONCAT):
+                 return (left + ' + ' + right)
+                # return ( left + ' on ' + right )                
+        return None
+
+    
+#    def visit_pair(self, node, data):
+#        l = str(node.left)
+#        r = str(node.right)
+#        print("pair(" + x + "," + y + ")")
+#    
+#    def visit_exp(self, node, data):
+#        pass
+#    
+#    def visit_on(self, node, data):
+#        pass
+#    
+#    def visit_prod(self, node, data):
+#        pass
+#    
+#    def visit_attr(self, node, data):
+#        pass
+    
         
 if __name__ == "__main__":
-    print(sys.argv[1:])
-    statement = sys.argv[1]
-    parser = BatchParser()
-    final = parser.parse(statement)
-    print("Final statement:  '%s'" % final)
+#    print(sys.argv[1:])
+#    statement = sys.argv[1]
+#    parser = BatchParser()
+#    final = parser.parse(statement)
+#    print("Final statement:  '%s'" % final)
     # print(ast)
 
-#    file = sys.argv[1]
-#    ast = parseFile(file)
-#    (const, verify, vars) = astParser(ast)
-#    print("Constants =>", const)
-#    print("Variables =>", vars)
-#
-#    verify2 = BinaryNode.copy(verify)
-#    ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
-#    ASTVisitor(ASTOperations()).preorder(verify)
-#    print("\nVERIFY EQUATION =>", verify, "\n")
-#    print("\nStage 1: Combined Equation =>", verify2, "\n")
-#    ASTVisitor(SmallExponent(const, vars)).preorder(verify2.right)
-#    print("\nStage 2: Small Exp Test =>", verify2, "\n")
-#    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)
+    file = sys.argv[1]
+    ast = parseFile(file)
+    (const, verify, vars) = astParser(ast)
+    print("Constants =>", const)
+    print("Variables =>", vars)
+
+    verify2 = BinaryNode.copy(verify)
+    ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
+    ASTVisitor(ASTOperations()).preorder(verify)
+    print("\nVERIFY EQUATION =>", verify, "\n")
+    print("\nStage 1: Combined Equation =>", verify2, "\n")
+    ASTVisitor(SmallExponent(const, vars)).preorder(verify2.right)
+    print("\nStage 2: Small Exp Test =>", verify2, "\n")
+    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)
 #    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)    
-#    print("\nStage 3: Apply tech 2 =>", verify2, "\n")
-#    ASTVisitor(Technique3(const, vars)).preorder(verify2.right)
-#    print("\nStage 4: Apply tech 3 =>", verify2, "\n")    
+    print("\nStage 3: Apply tech 2 =>", verify2, "\n")
+    ASTVisitor(Technique3(const, vars)).preorder(verify2.right)
+    print("\nStage 4: Apply tech 3 =>", verify2, "\n")    
+    
+    cg = CodeGenerator(const, vars, verify2.right)
+    result = cg.print_batchverify()
+#    result = cg.print_statement(verify2.right)
+    
+    print("code => '%s'" % result)
     
     # TODO: need operation deep tree copy, then build technique 1 & 2 ast operator
     # TODO: need 3 & 4 ast operator
