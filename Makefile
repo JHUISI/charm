@@ -23,6 +23,7 @@ pyparse_version=pyparsing-1.5.5
 pyparse_url=http://cheeseshop.python.org/packages/source/p/pyparsing/${pyparse_version}.tar.gz
 
 all:
+	@echo "make deps - Build the charm dependencies."
 	@echo "make build - Build the charm framework and install dependencies."
 	@echo "make source - Create source package."
 	@echo "make install - Install on local system."
@@ -85,12 +86,12 @@ build-pbc:
 	   echo "PBC installed already."; \
 	elif [ ! -f ${pbc_version}.tar.gz ]; then \
 	   ${wget} ${pbc_url}; \
-	   tar -zxf ${pbc_version}.tar.gz -C ${dest_build} \
+	   tar -zxf ${pbc_version}.tar.gz -C ${dest_build}; \
 	   cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR}; \
 	   ${MAKE} install; \
 	   echo "PBC install: OK"; \
 	else \
-	   tar -zxf ${pbc_version}.tar.gz -C ${dest_build} \
+	   tar -zxf ${pbc_version}.tar.gz -C ${dest_build}; \
 	   cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR}; \
 	   ${MAKE} install; \
 	   echo "PBC install: OK"; \
@@ -98,6 +99,10 @@ build-pbc:
 	set +x
 	sed "s/HAVE_LIBPBC=no/HAVE_LIBPBC=yes/g" ${CONFIG} > ${CONFIG}.new; mv ${CONFIG}.new ${CONFIG} 
 	
+.PHONY: deps
+deps: build-gmp build-pbc
+	@echo "Dependencies build complete."
+
 .PHONY: build
 build: setup build-gmp build-pbc build-pyparse
 	@echo "Building the Charm Framework"
