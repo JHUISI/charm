@@ -32,6 +32,98 @@ void longObjToMPZ(mpz_t m, PyObject * o) {
 	mpz_clear(temp2);
 }
 
+//void longObjToBN(BIGNUM *m, PyObject *o) {
+//	PyLongObject *p = (PyLongObject *) PyNumber_Long(o);
+//	int size, i, tmp = Py_SIZE(p);
+//	BIGNUM *temp = BN_new(), *temp2 = BN_new();
+//	BN_init(temp);
+//	BN_init(temp2);
+//	if (tmp > 0)
+//		size = tmp;
+//	else
+//		size = -tmp;
+//	BN_zero(m, 0);
+//	for (i = 0; i < size; i++) {
+//		BN_set_word(temp, p->ob_digit[i]);
+//		mpz_mul_2exp(temp2, temp, PyLong_SHIFT * i);
+//		mpz_add(m, m, temp2);
+//	}
+//	mpz_clear(temp);
+//	mpz_clear(temp2);
+//}
+
+PyObject *bnToLongObj(BIGNUM *m) {
+	PyLongObject *v = NULL;
+	BN_ULONG t;
+	int bits = BN_num_bits(m), i = 0;
+	int ndigits = (bits + PyLong_SHIFT - 1) / PyLong_SHIFT;
+	int digitsleft = ndigits;
+	int bitsleft = bits;
+
+	v = _PyLong_New(ndigits);
+	if (v != NULL) {
+		digit *p = v->ob_digit;
+		for(i = 0; i < m->dmax; i++) {
+			t = m->d[i];
+			*p++ = (digit)(t & PyLong_MASK);
+			i++;
+			digitsleft--;
+			bitsleft -= PyLong_SHIFT;
+		}
+//
+//		if (digitsleft == 1) {
+//			RAND_bytes(buff, sizeof(long));
+//			memcpy(&t, buff, sizeof(long));
+//			unsigned long mask = (1 << bitsleft) - 1;
+//			*p++ = (digit)(t & PyLong_MASK & mask);
+//		}
+	}
+
+	return (PyObject *) v;
+}
+
+int bnToMPZ(BIGNUM *p, mpz_t m) {
+	int size;
+//	mpz_t temp, temp2;
+//	mpz_init(temp);
+//	mpz_init(temp2);
+	if (!BN_is_negative(p))
+		size = p->top;
+	else
+		size = -(p->top);
+
+	if(BN_BITS2 == GMP_NUMB_BITS) {
+		// expand the mpz_t type
+		if(!_mpz_realloc(m, size))
+			return FALSE;
+		memcpy(&m->_mp_d[0], &p->d[0], size * sizeof(p->d[0]));
+		m->_mp_size = size;
+	}
+
+	return TRUE;
+}
+
+// generate a BN from an mpz_t type
+int mpzToBN(mpz_t m, BIGNUM *b) {
+	int size = (m->_mp_size >= 0) ? m->_mp_size : -m->_mp_size;
+
+	// make sure mpz will fit into BN
+	if(BN_BITS2 == GMP_NUMB_BITS) {
+		BN_zero(b);
+		if(bn_expand2(b, size) == NULL)
+			return FALSE;
+		b->top = size;
+		memcpy(&b->d[0], &m->_mp_d[0], size * sizeof(b->d[0]));
+		bn_correct_top(b);
+	}
+
+	debug("Original input m => ");
+	print_mpz(m, 10);
+	debug("GMP num bits => '%i'\n", GMP_NUMB_BITS);
+	debug("BN num bits => '%i'\n", BN_BITS2);
+	return TRUE;
+}
+
 PyObject *mpzToLongObj(mpz_t m) {
 	/* borrowed from gmpy */
 	int size = (mpz_sizeinbase(m, 2) + PyLong_SHIFT - 1) / PyLong_SHIFT;
@@ -62,6 +154,15 @@ void print_mpz(mpz_t x, int base) {
 	debug("Element => '%s'\n", x_str);
 	debug("Order of Element => '%zd'\n", x_size);
 	free(x_str);
+#endif
+}
+
+void print_bn_dec(const BIGNUM *bn) {
+#ifdef DEBUG
+	printf("BIGNUM *bn => ");
+	char *pstr = BN_bn2dec(bn);
+	printf("%s\n", pstr);
+	OPENSSL_free(pstr);
 #endif
 }
 
@@ -163,9 +264,9 @@ void Integer_dealloc(Integer* self) {
 	/* clear structure */
 	mpz_clear(self->m);
 	mpz_clear(self->e);
-	if (self->state_init) {
-		gmp_randclear(self->state);
-	}
+//	if (self->state_init) {
+//		gmp_randclear(self->state);
+//	}
 	Py_TYPE(self)->tp_free((PyObject*) self);
 }
 
@@ -219,31 +320,50 @@ int Integer_init(Integer *self, PyObject *args, PyObject *kwds) {
 	return 0;
 }
 
-// TODO: add ability to set the seed
-static PyObject *Integer_randinit(Integer *self, PyObject *arg) {
-	Integer *newObject = PyObject_New(Integer, &IntegerType);
-
-	mpz_init(newObject->e);
-	mpz_init(newObject->m);
-	// for the purposes of
-	gmp_randinit_mt(newObject->state);
-	if (arg == NULL) {
-		BIGNUM *s = BN_new(), *range = BN_new();
-		BN_set_word(range, SEED_RANGE);
-		BN_pseudo_rand_range(s, range);
-		BN_ULONG seed = BN_get_word(s);
-		BN_free(s);
-		BN_free(range);
-		gmp_randseed_ui(newObject->state, seed);
-	} else if (_PyLong_Check(arg)) {
-		unsigned long seed2 = PyLong_AsUnsignedLongMask(arg);
-		gmp_randseed_ui(newObject->state, seed2);
-	}
-	newObject->state_init = TRUE;
-	newObject->initialized = FALSE;
-
-	return (PyObject *) newObject;
-}
+//// TODO: add ability to set the seed
+//static PyObject *Integer_randinit(Integer *self, PyObject *arg) {
+//	Integer *newObject = PyObject_New(Integer, &IntegerType);
+//
+//	mpz_init(newObject->e);
+//	mpz_init(newObject->m);
+//	// for the purposes of
+//	gmp_randinit_mt(newObject->state);
+//	if (arg == NULL) {
+//		BIGNUM *s = BN_new(), *range = BN_new();
+//		BN_set_word(range, SEED_RANGE);
+//		BN_pseudo_rand_range(s, range);
+//
+//		mpz_t m;
+//		mpz_init(m);
+//		bnToMPZ(s, m);
+//		printf("created m =>\n");
+//		print_mpz(m, 10);
+//		BIGNUM *s2 = BN_new();
+//		mpzToBN(m, s2);
+//		print_bn_dec(s2);
+//		BN_free(s2);
+//
+//		mpz_clear(m);
+//		printf("done for good!\n");
+//
+//
+//		PyObject *result = bnToLongObj(s);
+//
+//		BN_ULONG seed = BN_get_word(s);
+//		BN_free(s);
+//		BN_free(range);
+//		gmp_randseed_ui(newObject->state, seed);
+//
+////		return result;
+//	} else if (_PyLong_Check(arg)) {
+//		unsigned long seed2 = PyLong_AsUnsignedLongMask(arg);
+//		gmp_randseed_ui(newObject->state, seed2);
+//	}
+//	newObject->state_init = TRUE;
+//	newObject->initialized = FALSE;
+//
+//	return (PyObject *) newObject;
+//}
 //
 //static PyObject *Integer_call(Integer *intObject, PyObject *args, PyObject *kwds) {
 //	PyObject *obj = NULL;
@@ -336,10 +456,10 @@ PyObject *Integer_print(Integer *self) {
 		free(e_str);
 		return strObject;
 	}
-
-	if (self->state_init) {
-		return PyUnicode_FromString("");
-	}
+//
+//	if (self->state_init) {
+//		return PyUnicode_FromString("");
+//	}
 
 	PyErr_SetString(IntegerError, "invalid integer object.");
 	return NULL;
@@ -351,7 +471,7 @@ Integer *createNewInteger(mpz_t m) {
 	mpz_init(newObject->e);
 	mpz_init_set(newObject->m, m);
 	newObject->initialized = TRUE;
-	newObject->state_init = FALSE;
+//	newObject->state_init = FALSE;
 
 	return newObject;
 }
@@ -362,7 +482,7 @@ Integer *createNewIntegerNoMod(void) {
 	mpz_init(newObject->e);
 	mpz_init(newObject->m);
 	newObject->initialized = TRUE;
-	newObject->state_init = FALSE;
+//	newObject->state_init = FALSE;
 
 	return newObject;
 }
@@ -998,52 +1118,47 @@ static PyObject *testPrimality(PyObject *self, PyObject *arg) {
 static PyObject *genRandomBits(Integer *self, PyObject *args) {
 	unsigned int bits;
 
-	if (!self->state_init) {
-		PyErr_SetString(IntegerError,
-				"random number generator not initialized.");
-		return NULL;
-	}
-
 	if (PyArg_ParseTuple(args, "i", &bits)) {
 		if (bits > 0) {
 			// generate random number that is in 0 to 2^n-1 range.
 // TODO: fix code very very soon!
-//			PyLongObject *v;
-//			unsigned char buff[sizeof(long)];
-//			long t;
-//			int ndigits = (bits + PyLong_SHIFT - 1) / PyLong_SHIFT;
-//			int digitsleft = ndigits;
-//			int bitsleft = bits;
-//
-//			v = _PyLong_New(ndigits);
-//			if (v != NULL) {
-//				digit *p = v->ob_digit;
-//				while (digitsleft > 1) {
-//					RAND_bytes(buff, sizeof(long));
-//					memcpy(&t, buff, sizeof(long));
-//					*p++ = (digit)(t & PyLong_MASK);
-//					digitsleft--;
-//					bitsleft -= PyLong_SHIFT;
-//				}
-//
-//				if (digitsleft == 1) {
-//					RAND_bytes(buff, sizeof(long));
-//					memcpy(&t, buff, sizeof(long));
-//					unsigned long mask = (1 << bitsleft) - 1;
-//					*p++ = (digit)(t & PyLong_MASK & mask);
-//				}
-//
-//			}
-//			return (PyObject *) v;
-			mp_bitcnt_t n = bits;
+			PyLongObject *v;
+			unsigned char buff[sizeof(long)];
+			long t;
+			int ndigits = (bits + PyLong_SHIFT - 1) / PyLong_SHIFT;
+			int digitsleft = ndigits;
+			int bitsleft = bits;
 
-			mpz_t rop;
-			mpz_init(rop);
-			mpz_urandomb(rop, self->state, n);
+			v = _PyLong_New(ndigits);
+			if (v != NULL) {
+				digit *p = v->ob_digit;
+				while (digitsleft > 1) {
+					RAND_bytes(buff, sizeof(long));
+					memcpy(&t, buff, sizeof(long));
+					*p++ = (digit)(t & PyLong_MASK);
+					digitsleft--;
+					bitsleft -= PyLong_SHIFT;
+				}
 
-			PyObject *rop2 = mpzToLongObj(rop);
-			mpz_clear(rop);
-			return rop2;
+				if (digitsleft == 1) {
+					RAND_bytes(buff, sizeof(long));
+					memcpy(&t, buff, sizeof(long));
+					unsigned long mask = (1 << bitsleft) - 1;
+					*p++ = (digit)(t & PyLong_MASK & mask);
+				}
+
+			}
+			return (PyObject *) v;
+
+//			mp_bitcnt_t n = bits;
+//
+//			mpz_t rop;
+//			mpz_init(rop);
+//			mpz_urandomb(rop, self->state, n);
+//
+//			PyObject *rop2 = mpzToLongObj(rop);
+//			mpz_clear(rop);
+//			return rop2;
 		}
 	}
 
@@ -1055,12 +1170,6 @@ static PyObject *genRandom(Integer *self, PyObject *args) {
 	PyObject *obj = NULL;
 	Integer *rop = NULL;
 	mpz_t N;
-
-	if (!self->state_init) {
-		PyErr_SetString(IntegerError,
-				"random number generator not initialized.");
-		return NULL;
-	}
 
 	if (PyArg_ParseTuple(args, "O", &obj)) {
 
@@ -1076,13 +1185,18 @@ static PyObject *genRandom(Integer *self, PyObject *args) {
 			return NULL;
 		}
 
+		BIGNUM *s = BN_new(), *bN = BN_new();
+		BN_one(s);
+		mpzToBN(N, bN);
 		rop = createNewInteger(N);
-		// generate random number (1 to N-1).
-		//		BN_pseudo_rand_range();
-		//		gmp_randinit_mt(state);
-		//		gmp_randseed_ui(state, seed);
-		while (mpz_cmp_ui(rop->e, 0) == 0)
-			mpz_urandomm(rop->e, self->state, N);
+
+		BN_rand_range(s, bN);
+		bnToMPZ(s, rop->e);
+		print_bn_dec(s);
+		BN_free(s);
+		BN_free(bN);
+//		while (mpz_cmp_ui(rop->e, 0) == 0)
+//			mpz_urandomm(rop->e, self->state, N);
 		mpz_clear(N);
 		return (PyObject *) rop;
 	}
@@ -1091,26 +1205,27 @@ static PyObject *genRandom(Integer *self, PyObject *args) {
 
 /* takes as input the number of bits and produces a prime number of that size. */
 static PyObject *genRandomPrime(Integer *self, PyObject *args) {
-	int bits;
+	int bits, safe = FALSE;
 
-	if (!self->state_init) {
-		PyErr_SetString(IntegerError,
-				"random number generator not initialized.");
-		return NULL;
-	}
-
-	if (PyArg_ParseTuple(args, "i", &bits)) {
-		mp_bitcnt_t n = bits;
-
+	if (PyArg_ParseTuple(args, "i|i", &bits, &safe)) {
 		if (bits > 0) {
-			mpz_t tmp;
+			// mpz_t tmp;
 			Integer *rop = createNewIntegerNoMod();
-			mpz_init(tmp);
-			mpz_urandomb(tmp, self->state, n);
-			mpz_nextprime(rop->e, tmp);
 
-			// PyObject *rop2 = mpzToLongObj(rop);
-			mpz_clear(tmp);
+			BIGNUM *bn = BN_new();
+			/* This routine generates safe prime only when safe=TRUE in which prime, p is selected
+			 * iff (p-1)/2 is also prime.
+			 */
+			if(safe == TRUE) // safe is non-zero
+				BN_generate_prime(bn, bits, safe, NULL, NULL, NULL, NULL);
+			else
+				/* generate strong primes only */
+				BN_generate_prime(bn, bits, FALSE, NULL, NULL, NULL, NULL);
+
+			debug("Safe prime => ");
+			print_bn_dec(bn);
+			bnToMPZ(bn, rop->e);
+			BN_free(bn);
 			return (PyObject *) rop;
 		}
 	}
@@ -1534,7 +1649,7 @@ static PyObject *serialize(PyObject *self, PyObject *args) {
 
 void deserialize_helper(int length, char *encoded_value, mpz_t target)
 {
-	debug("encoded_value len => '%d'", strlen(encoded_value));
+	debug("encoded_value len => '%zd'", strlen(encoded_value));
 
 	size_t deserialized_len = 0;
 	uint8_t *buf = NewBase64Decode((const char *) encoded_value, length, &deserialized_len);
@@ -1603,7 +1718,7 @@ static PyObject *toBytes(PyObject *self, PyObject *args) {
 		size_t count = 0;
 		unsigned char *Rop = (unsigned char *) mpz_export(NULL, &count, 1,
 				sizeof(char), 0, 0, intObj->e);
-		debug("Rop => '%s', len =>'%d'\n", Rop, count);
+		debug("Rop => '%s', len =>'%zd'\n", Rop, count);
 		return PyBytes_FromStringAndSize((const char *) Rop, (Py_ssize_t) count);
 	}
 
@@ -1637,9 +1752,9 @@ GetBenchmark_CAPI( _get_benchmark, dBench);
 
 PyMethodDef Integer_methods[] = {
 	{ "set", (PyCFunction) Integer_set, METH_VARARGS, "initialize with another integer object." },
-	{ "randomBits", (PyCFunction) genRandomBits, METH_VARARGS, "generate a random number of bits from 0 to 2^n-1." },
-	{ "random", (PyCFunction) genRandom, METH_VARARGS, "generate a random number in range of 0 to n-1 where n is large number." },
-	{ "randomPrime", (PyCFunction) genRandomPrime, METH_VARARGS, "generate a probabilistic random prime number that is n-bits." },
+//	{ "randomBits", (PyCFunction) genRandomBits, METH_VARARGS, "generate a random number of bits from 0 to 2^n-1." },
+//	{ "random", (PyCFunction) genRandom, METH_VARARGS, "generate a random number in range of 0 to n-1 where n is large number." },
+//	{ "randomPrime", (PyCFunction) genRandomPrime, METH_VARARGS, "generate a probabilistic random prime number that is n-bits." },
 	{ "isCoPrime", (PyCFunction) testCoPrime, METH_O | METH_NOARGS, "determine whether two integers a and b are relatively prime." },
 	{ "isCongruent", (PyCFunction) testCongruency, METH_VARARGS, "determine whether two integers are congruent mod n." },
 	{ "reduce", (PyCFunction) Integer_reduce, METH_NOARGS, "reduce an integer object modulo N." },
@@ -1826,7 +1941,10 @@ static struct module_state _state;
 
 /* global module methods (include isPrime, randomPrime, etc. here). */
 static PyMethodDef module_methods[] = {
-	{ "init", (PyCFunction) Integer_randinit, METH_O | METH_NOARGS, "initialize random number generator" },
+//	{ "init", (PyCFunction) Integer_randinit, METH_O | METH_NOARGS, "initialize random number generator" },
+	{ "randomBits", (PyCFunction) genRandomBits, METH_VARARGS, "generate a random number of bits from 0 to 2^n-1." },
+	{ "random", (PyCFunction) genRandom, METH_VARARGS, "generate a random number in range of 0 to n-1 where n is large number." },
+	{ "randomPrime", (PyCFunction) genRandomPrime, METH_VARARGS, "generate a probabilistic random prime number that is n-bits." },
 	{ "isPrime", (PyCFunction) testPrimality, METH_O, "probabilistic algorithm to whether a given integer is prime." },
 	{ "encode", (PyCFunction) encode_message, METH_VARARGS, "encode a message as a group element where p = 2*q + 1 only." },
 	{ "decode", (PyCFunction) decode_message, METH_VARARGS, "decode a message from a group element where p = 2*q + 1 to a message." },
@@ -1914,6 +2032,17 @@ void initinteger(void) {
 	PyModule_AddIntConstant(m, "Mul", MULTIPLICATION);
 	PyModule_AddIntConstant(m, "Div", DIVISION);
 	PyModule_AddIntConstant(m, "Exp", EXPONENTIATION);
+
+	// initialize PRNG
+	// replace with read from some source of randomness
+#ifndef MS_WINDOWS
+	debug("Linux: seeding openssl prng.\n");
+	char *rand_file = "/dev/urandom";
+	RAND_load_file(rand_file, RAND_MAX_BYTES);
+#else
+	debug("Windows: seeding openssl prng.\n");
+	RAND_screen();
+#endif
 
 #if PY_MAJOR_VERSION >= 3
 	return m;

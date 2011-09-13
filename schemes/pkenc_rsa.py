@@ -10,7 +10,7 @@
 :Date:            07/2011
 '''
 
-from charm.integer import init,integer,isPrime,gcd
+from charm.integer import integer,isPrime,gcd,random,randomPrime
 from toolbox.PKEnc import PKEnc
 from toolbox.PKSig import PKSig
 from toolbox.paddingschemes import OAEPEncryptionPadding,PSSPadding
@@ -21,11 +21,11 @@ debug = False
 class RSA():
     '''RSA Module'''
     def __init__(self):
-        self.rand = init()
+        pass
     # generate p,q and n
     def paramgen(self, secparam):
         while True:
-            p, q = self.rand.randomPrime(secparam), self.rand.randomPrime(secparam)
+            p, q = randomPrime(secparam), randomPrime(secparam)
             if isPrime(p) and isPrime(q):
                 N = p * q
                 phi_N = (p - 1) * (q - 1)
@@ -43,7 +43,7 @@ class RSA():
         (p, q, N, phi_N) = self.paramgen(secparam)
         
         while True:
-            e = self.rand.random(phi_N) # or use 65537 for testing
+            e = random(phi_N)
             if not gcd(e, phi_N) == 1:
                 continue
             d = e ** -1

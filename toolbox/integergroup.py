@@ -2,16 +2,17 @@ from charm.integer import *
 
 class IntegerGroup:
     def __init__(self, start=0):
-        if start != 0:   
-            fixed = start 
-            self.randObj = init(fixed)
-        self.randObj = init()
+        pass
+#        if start != 0:   
+#            fixed = start 
+#            self.randObj = init(fixed)
+#        self.randObj = init()
         
     def paramgen(self, bits, r=2):
         # determine which group
         while True:
-            self.q = self.randObj.randomPrime(bits)
-            self.p = r*self.q + 1
+            self.p = randomPrime(bits, 1)
+            self.q = (self.p - 1) / 2
             if (isPrime(self.p) and isPrime(self.q)):
                 break
         self.r = r
@@ -19,7 +20,7 @@ class IntegerGroup:
     
     def randomGen(self):
         while True:
-            h = self.randObj.random(self.p)
+            h = random(self.p)
             g = (h ** self.r) % self.p
             if not g == 1:
                 break
@@ -37,11 +38,14 @@ class IntegerGroup:
     def isMember(self, x):
         return x.isCongruent()
        
-    def random(self):
-        return self.randObj.random(self.p)        
+    def random(self, max=0):
+        if max == 0:
+            return random(self.p)        
+        else:
+            return random(max)
 
-    def randomPrime(self, bits):
-        return self.randObj.randomPrime(bits)
+#    def randomPrime(self, bits):
+#        return randomPrime(bits)
     
     def encode(self, M):
         return encode(M, self.p, self.q)
@@ -57,16 +61,17 @@ class IntegerGroup:
 
 class IntegerGroupQ:
     def __init__(self, start=0):
-        if start != 0:   
-            fixed = start 
-            self.randObj = init(fixed)
-        self.randObj = init()
+        pass
+#        if start != 0:   
+#            fixed = start 
+#            self.randObj = init(fixed)
+#        self.randObj = init()
         
     def paramgen(self, bits, r=2):
         # determine which group
         while True:
-            self.q = self.randObj.randomPrime(bits)
-            self.p = r*self.q + 1
+            self.p = randomPrime(bits, 1)
+            self.q = (self.p - 1) / 2
             if (isPrime(self.p) and isPrime(self.q)):
                 break
         self.r = r
@@ -74,7 +79,7 @@ class IntegerGroupQ:
     
     def randomGen(self):
         while True:
-            h = self.randObj.random(self.p)
+            h = random(self.p)
             g = (h ** self.r) % self.p
             if not g == 1:
                 #print "g => %s" % g 
@@ -95,12 +100,9 @@ class IntegerGroupQ:
        
     def random(self, max=0):
         if max == 0:
-            return self.randObj.random(self.q)
+            return random(self.q)
         else:
-            return self.randObj.random(max)
-
-    def randomPrime(self, bits):
-        return self.randObj.randomPrime(bits)
+            return random(max)
     
     def encode(self, M):
         return encode(M, self.p, self.q)

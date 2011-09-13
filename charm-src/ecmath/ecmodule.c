@@ -1775,6 +1775,17 @@ void initecc(void) 		{
 	PyModule_AddIntConstant(module, "Div", DIVISION);
 	PyModule_AddIntConstant(module, "Exp", EXPONENTIATION);
 
+	// initialize PRNG
+	// replace with read from some source of randomness
+#ifndef MS_WINDOWS
+	debug("Linux: seeding openssl prng.\n");
+	char *rand_file = "/dev/urandom";
+	RAND_load_file(rand_file, RAND_MAX_BYTES);
+#else
+	debug("Windows: seeding openssl prng.\n");
+	RAND_screen();
+#endif
+
 #if PY_MAJOR_VERSION >= 3
 	return module;
 #endif

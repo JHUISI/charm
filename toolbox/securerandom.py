@@ -4,7 +4,7 @@ Base class for cryptographic secure random number generation
 '''
 from toolbox.bitstring import Bytes
 from toolbox.conversion import Conversion
-import charm.integer
+from charm.integer import randomBits
 import datetime
 import math
 import random
@@ -15,7 +15,7 @@ class SecureRandom():
     def getRandomBytes(self, length):
         '''Returns a random bit string of length bytes'''
         raise NotImplementedError
-    def addSeedMaterial(self, seed):
+    def addSeed(self, seed):
         '''
         Add randomness to the generator.  
         Always increases entropy
@@ -40,15 +40,14 @@ class OpenSSLRand(SecureRandom):
         SecureRandom.__init__(self)
         #seed with a little bit of random data. This is not the only source
         #of randomness. Internally, OpenSSL samples additional physical randomness.
-        self.rand = charm.integer.init(datetime.datetime.now().microsecond)
     
     def getRandomBytes(self, length):
         bits = length * 8;
-        val = self.rand.randomBits(bits)
+        val = randomBits(bits)
         return Conversion.IP2OS(val, length)    
     
     def getRandomBits(self, length):
-        i = self.rand.randomBits(length)
+        i = randomBits(length)
         len = math.ceil(length / 8)
         return Conversion.IP2OS(i, len)
 
@@ -58,7 +57,7 @@ class WeakRandom(SecureRandom):
         SecureRandom.__init__(self)
     def getRandomBytes(self, length):
         return self.myrandom(length, False)
-    def addSeedMaterial(self, seed):
+    def addSeed(self, seed):
         raise NotImplementedError()
     @classmethod
     def myrandom(self, length, printable=False):

@@ -14,11 +14,12 @@
 #include "benchmarkmodule.h"
 #include "base64.h"
 /* used to initialize the RNG */
+#include "openssl/objects.h"
 #include "openssl/rand.h"
 #include "openssl/bn.h"
 
 /* integermath */
-#define MAX_RUN 25
+#define MAX_RUN 20
 #define HASH_LEN 20
 
 //#define DEBUG   1
@@ -112,7 +113,7 @@
 #define HASH_FUNCTION_STR_TO_Zr_CRH		0
 #define HASH_FUNCTION_Zr_TO_G1_ROM		1
 #define HASH_FUNCTION_KEM_DERIVE		2
-#define SEED_RANGE			    999999999
+#define RAND_MAX_BYTES					2048
 
 // declare global gmp_randstate_t state object. Initialize based on /dev/random if linux
 // then make available to all random functions
@@ -126,8 +127,8 @@ typedef struct {
 	PyObject_HEAD
 	mpz_t m;
 	mpz_t e;
-	gmp_randstate_t state;
-	int state_init;
+//	gmp_randstate_t state;
+//	int state_init;
 	int initialized;
 } Integer;
 
@@ -140,5 +141,7 @@ int Integer_init(Integer *self, PyObject *args, PyObject *kwds);
 PyObject *Integer_print(Integer *self);
 Integer *createNewInteger(mpz_t m);
 Integer *createNewIntegerNoMod(void);
+void print_mpz(mpz_t x, int base);
+void print_bn_dec(const BIGNUM *bn);
 
 #endif

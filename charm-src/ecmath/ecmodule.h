@@ -31,6 +31,7 @@
 #define FALSE	0
 #define BYTE	8
 #define MAX_BUF  256
+#define RAND_MAX_BYTES	2048
 /* Index numbers for different hash functions.  These are all implemented as SHA1(index || message).	*/
 #define HASH_FUNCTION_STR_TO_G_CRH		0
 #define HASH_FUNCTION_STR_TO_ZR_CRH		1
