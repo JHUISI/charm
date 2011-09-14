@@ -1,0 +1,12 @@
+# variables
+M := str
+g := G2
+a := H(t1)
+h := H(t2)
+b := H(M | t3)
+
+constant := a
+constant := g
+constant := h
+
+verify := { e(sig, g) == e(a, pk) * e(h, pk)^b }

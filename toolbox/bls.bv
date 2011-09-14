@@ -1,0 +1,19 @@
+# bls batch inputs
+# variables
+sig := G1
+M := str
+g := G2
+pk := G2
+
+# declared constants
+# todo: parse as a list (e.g. constant := [g, pk,...])
+constant := g
+constant := pk
+
+# sig setting (two possible values: same or diff)
+#signer := same 
+#message := diff
+#public := same
+
+# verify equation
+verify := { e(H(M), pk) == e(sig, g) }
