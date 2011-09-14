@@ -3,7 +3,6 @@ from pyparsing import *
 from batchgen import *
 import string,sys
 
-test_run = False
 objStack = []
 
 def createNode(s, loc, toks):
@@ -70,8 +69,8 @@ class BatchParser:
         MulOp = Literal("*")
         Concat = Literal("|")
         ExpOp = Literal("^")
-        BinOp = ExpOp | MulOp | Concat
         Equality = Literal("==") # | Word("<>", max=1)
+        BinOp = ExpOp | MulOp | Concat | Equality
         Assignment =  Literal(":=")
         Pairing = Literal('e(') # Pairing token
         Hash = Literal('H(')
@@ -493,12 +492,14 @@ class Technique3:
 
         
 if __name__ == "__main__":
-    if test_run:
-        print(sys.argv[1:])
-        statement = sys.argv[1]
+    print(sys.argv[1:])
+    if sys.argv[1] == '-t':
+        debug = levels.some
+        statement = sys.argv[2]
         parser = BatchParser()
         final = parser.parse(statement)
         print("Final statement:  '%s'" % final)
+        exit(0)
 
     
     # print(ast)
