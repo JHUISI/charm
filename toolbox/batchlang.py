@@ -109,7 +109,7 @@ class BinaryNode:
 		# set subNodes appropriately
 		self.left = self.createSubNode(left) if left != None else None
 		self.right = self.createSubNode(right) if left != None else None
-		if debug >= levels.all:
+		if debug == levels.all:
 			print("addSubNode: ");
 			print("left type =>", type(self.left), ' =>', self.left)
 			print("right type =>", type(self.right), ' =>', self.right)
@@ -131,11 +131,6 @@ class BinaryNode:
 		new_node.left = self.copy(this.left)
 		new_node.right = self.copy(this.right)		
 		return new_node	
-#	def addProdAttr(self, start, end):
-#		if self.type == ops.PROD:
-#			self.start = start
-#			self.end = end 
-#		return None
 
 	# only applies function on leaf nodes
 	def traverse(self, function):
