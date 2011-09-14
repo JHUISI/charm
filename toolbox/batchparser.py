@@ -489,6 +489,55 @@ class Technique3:
             if n.getAttribute() == node.getAttribute(): return True
         return False
 
+class PrintLambdaStatement:
+    def __init__(self, constants):
+        self.consts = constants
+        self.var_key = string.ascii_lowercase 
+        self.var_dict = {}
+        self.order = []
+        self.ctr = 0
+    
+    def visit(self, node, data):
+        pass
+
+    def visit_attr(self, node, data):
+        if node.attr_index:
+            # extract attribute
+#           print("replace => ", node.attr)
+           self.var_dict[self.var_key[self.ctr]] = node.attr
+           self.order.append(node.attr)
+           node.attr = self.var_key[self.ctr]
+           self.ctr += 1 # move on to next alphabet 
+        # for constants the variables get mapped when the lambda is defined, thus we do not require
+        # special processing to make anything work.
+    
+    def isConstant(self, node):        
+        for n in self.consts:
+            if n.getAttribute() == node.getAttribute(): return True
+        return False
+
+
+    def args(self):
+        if self.order:
+            result = ""
+            for i in self.order:
+                result += i + ","
+            result = result.rstrip(',')
+            return result
+        return None
+    
+    # handles arguments used to instantiate the lambda
+    # i, a, b, c,... where i represents the counter to N (signatures), and
+    # a,b,c represents the number of arguments expected by the labmda.
+    def vars(self):
+        if self.ctr > 0:
+            result = "i," # to account for iterating through list
+            for i in range(0, self.ctr):
+                result += self.var_key[i] + ","
+            result = result.rstrip(',') # remove last comma
+            result += ": " # denotes end of argument list for lambda arguments
+            return result
+        return None
 
 class CodeGenerator:
     def __init__(self, constants, variables, verify_stmt):
@@ -497,6 +546,7 @@ class CodeGenerator:
         self.verify  = verify_stmt
     
     def print_batchverify(self):
+        # 
         return self.print_statement(self.verify)
     
     def print_statement(self, node):
@@ -528,32 +578,16 @@ class CodeGenerator:
             elif(node.type == ops.HASH):
                 return ('group.hash(' + left + ')')
             elif(node.type == ops.PROD):
-                return ('group.dotprod(' + left + ', ' + right)
+                left = str(node.left.right) # we don't need the EQ node here
+                return ('dotprod(' + left + ', ' + right)
             elif(node.type == ops.ON):
-                 return (left + ", stmt=" + right + ")")
+                 pls = PrintLambdaStatement(self.consts)
+                 ASTVisitor(pls).inorder(node.right)
+                 right = self.print_statement(node.right)
+                 return (left + ", lambda " + pls.vars()  + right + ", " + pls.args() + ")")
             elif(node.type == ops.CONCAT):
                  return (left + ' + ' + right)
-                # return ( left + ' on ' + right )                
-        return None
-
-    
-#    def visit_pair(self, node, data):
-#        l = str(node.left)
-#        r = str(node.right)
-#        print("pair(" + x + "," + y + ")")
-#    
-#    def visit_exp(self, node, data):
-#        pass
-#    
-#    def visit_on(self, node, data):
-#        pass
-#    
-#    def visit_prod(self, node, data):
-#        pass
-#    
-#    def visit_attr(self, node, data):
-#        pass
-    
+        return None    
         
 if __name__ == "__main__":
 #    print(sys.argv[1:])
@@ -573,14 +607,14 @@ if __name__ == "__main__":
     ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
     ASTVisitor(ASTOperations()).preorder(verify)
     print("\nVERIFY EQUATION =>", verify, "\n")
-    print("\nStage 1: Combined Equation =>", verify2, "\n")
-    ASTVisitor(SmallExponent(const, vars)).preorder(verify2.right)
-    print("\nStage 2: Small Exp Test =>", verify2, "\n")
-    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)
+#    print("\nStage 1: Combined Equation =>", verify2, "\n")
+#    ASTVisitor(SmallExponent(const, vars)).preorder(verify2.right)
+#    print("\nStage 2: Small Exp Test =>", verify2, "\n")
+#    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)
 #    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)    
-    print("\nStage 3: Apply tech 2 =>", verify2, "\n")
-    ASTVisitor(Technique3(const, vars)).preorder(verify2.right)
-    print("\nStage 4: Apply tech 3 =>", verify2, "\n")    
+#    print("\nStage 3: Apply tech 2 =>", verify2, "\n")
+#    ASTVisitor(Technique3(const, vars)).preorder(verify2.right)
+#    print("\nStage 4: Apply tech 3 =>", verify2, "\n")    
     
     cg = CodeGenerator(const, vars, verify2.right)
     result = cg.print_batchverify()
