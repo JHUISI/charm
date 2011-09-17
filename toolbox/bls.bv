@@ -16,4 +16,4 @@ constant := pk
 #public := same
 
 # verify equation
-verify := { e(H(M), pk) == e(sig, g) }
+verify := { e(H(M, G1), pk) == e(sig, g) }

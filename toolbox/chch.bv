@@ -6,7 +6,7 @@ pk := G1
 S1 := G1
 S2 := G2
 #sig := (S1, S2)
-a := H(M | S1)
+a := H(M | S1, ZR)
 
 # declared constants
 # todo: parse as a list (e.g. constant := [g, pk,...])

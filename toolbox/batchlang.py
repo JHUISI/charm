@@ -25,20 +25,25 @@ import string
 
 types = Enum('G1', 'G2', 'GT', 'ZR', 'str')
 declarator = Enum('constants', 'verify')
-ops = Enum('BEGIN', 'MUL', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'PROD', 'ON', 'CONCAT','LIST','END', 'NONE')
+ops = Enum('BEGIN', 'TYPE', 'ADD', 'MUL', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'PROD', 'ON', 'CONCAT','LIST','END', 'NONE')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
 
 class BinaryNode:
 	def __init__(self, value, left=None, right=None):		
 		if(isinstance(value, str)):
-			self.type = ops.ATTR
-			arr = value.split('_')
-			self.attr = arr[0]
-			if len(arr) > 1: # True means a_b form
-				self.attr_index = arr[1]
-			else: # False means a and no '_' present
+			if value in ['G1', 'G2', 'GT', 'ZR', 'str']:
+				self.type = ops.TYPE
+				self.attr = types[value]
 				self.attr_index = None
+			else:
+				self.type = ops.ATTR
+				arr = value.split('_')
+				self.attr = arr[0]
+				if len(arr) > 1: # True means a_b form
+					self.attr_index = arr[1]
+				else: # False means a and no '_' present
+					self.attr_index = None
 		elif value > ops.BEGIN and value < ops.END:
 			self.type = value
 			self.attr = None
@@ -53,21 +58,29 @@ class BinaryNode:
 	def __str__(self):
 		if(self.type == ops.ATTR):
 			msg = self.attr
-			if self.attr_index != None:
-				msg += '_' + str(self.attr_index)
+			if self.attr_index != None and type(self.attr_index) == list:
+				token = ""
+				for t in self.attr_index:
+					token += t + ","
+				token.rstrip(',')
+				msg += '_' + token
 			return msg
+		elif(self.type == ops.TYPE):
+			return str(self.attr)
 		else:			
 			left = str(self.left)
 			right = str(self.right)
 			
 			if debug >= levels.some:
 			   print("Operation: ", self.type)
-			   print("Left operand: ", left)
-			   print("Right operand: ", right)			
+			   print("Left operand: ", left, "type: ", self.left.type)
+			   print("Right operand: ", right, "type: ", self.right.type)
 			if(self.type == ops.EXP):
 				return (left + '^' + right)
 			elif(self.type == ops.MUL):
 				return ('(' + left + ' * ' + right + ')')
+			elif(self.type == ops.ADD):
+				return ('(' + left + ' + ' + right + ')')
 			elif(self.type == ops.EQ):
 				return (left + ' := ' + right)
 			elif(self.type == ops.EQ_TST):
@@ -75,7 +88,7 @@ class BinaryNode:
 			elif(self.type == ops.PAIR):
 				return ('e(' + left + ',' + right + ')')
 			elif(self.type == ops.HASH):
-				return ('H(' + left + ')')
+				return ('H(' + left + ',' + right + ')')
 			elif(self.type == ops.PROD):
 				return ('prod{' + left + ',' + right + '}')
 			elif(self.type == ops.ON):
@@ -88,10 +101,13 @@ class BinaryNode:
 		return None
 	
 	def setAttrIndex(self, value):
-		if(self.type == ops.ATTR):
-			self.attr_index = value
+		if(self.type in [ops.ATTR, ops.HASH]):
+			if self.attr_index == None: # could be a list of indices
+				self.attr_index = [value]
+			else:
+				self.attr_index.append(value)
 			return True
-		return False			
+		return False
 	
 	def getAttribute(self):
 		if (self.type == ops.ATTR):

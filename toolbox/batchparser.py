@@ -1,6 +1,7 @@
 from pyparsing import *
 #from batchlang import *
 from batchgen import *
+from batchstats import *
 import string,sys
 
 objStack = []
@@ -32,6 +33,8 @@ def createTree(op, node1, node2):
         node = BinaryNode(ops.EXP)
     elif(op == "*"):
         node = BinaryNode(ops.MUL)
+    elif(op == "+"):
+        node = BinaryNode(ops.ADD)
     elif(op == ":="):
         node = BinaryNode(ops.EQ)
     elif(op == "=="):
@@ -44,7 +47,7 @@ def createTree(op, node1, node2):
         node = BinaryNode(ops.PROD)
     elif(op == "on"):
         # can only be used in conjunction w/ PROD (e.g. PROD must precede it)        
-        node = BinaryNode(ops.ON) 
+        node = BinaryNode(ops.ON)
     elif(op == "|"):
         node = BinaryNode(ops.CONCAT)
     # elif e( ... )
@@ -69,15 +72,16 @@ class BatchParser:
         MulOp = Literal("*")
         Concat = Literal("|")
         ExpOp = Literal("^")
+        AddOp = Literal("+")
         Equality = Literal("==") # | Word("<>", max=1)
-        BinOp = ExpOp | MulOp | Concat | Equality
+        BinOp = ExpOp | MulOp | AddOp | Concat | Equality
         Assignment =  Literal(":=")
         Pairing = Literal('e(') # Pairing token
         Hash = Literal('H(')
         Prod = Literal("prod{") # dot product token
         ProdOf = Literal("on")
         # captures order of parsing token operators
-        Token = Equality | ExpOp | MulOp | ProdOf | Concat | Assignment
+        Token = Equality | ExpOp | MulOp | AddOp | ProdOf | Concat | Assignment
         Operator = Token 
         #Operator = OperatorAND | OperatorOR | Token
 
@@ -86,12 +90,12 @@ class BatchParser:
         expr = Forward()
         term = Forward()
         factor = Forward()
-        atom = (Hash + expr + rpar).setParseAction( pushFirst ) | \
+        atom = (Hash + expr + ',' + expr + rpar).setParseAction( pushFirst ) | \
                (Pairing + expr + ',' + expr + rpar).setParseAction( pushFirst ) | \
                (Prod + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
                lpar + expr + rpar | (leafNode).setParseAction( pushFirst )
 
-        # NEED TO UNDERSTAND THIS SEQUENCE AND WHY IT WORKS FOR PARSING ^ and = in logical order?!?
+        # Represents the order of operations (^, *, |, ==)
         # Place more value on atom [ ^ factor}, so gets pushed on the stack before atom [ = factor], right?
         # In other words, adds order of precedence to how we parse the string. This means we are parsing from right
         # to left. a^b has precedence over b = c essentially
@@ -113,13 +117,14 @@ class BatchParser:
         op = stack.pop()
         if debug >= levels.some:
             print("op: %s" % op)
-        if op in ["*", "^", ":=", "==", "e(", "prod{", "on", "|"]: # == "AND" or op == "OR" or op == "^" or op == "=":
+        if op in ["+", "*", "^", ":=", "==", "e(", "prod{", "on", "|"]: # == "AND" or op == "OR" or op == "^" or op == "=":
             op2 = self.evalStack(stack)
             op1 = self.evalStack(stack)
             return createTree(op, op1, op2)
         elif op in ["H("]:
+            op2 = self.evalStack(stack)
             op1 = self.evalStack(stack)
-            return createTree(op, op1, None)
+            return createTree(op, op1, op2)
         else:
             # Node value
             return op
@@ -494,7 +499,7 @@ class Technique3:
 if __name__ == "__main__":
     print(sys.argv[1:])
     if sys.argv[1] == '-t':
-        debug = levels.some
+        debug = levels.all
         statement = sys.argv[2]
         parser = BatchParser()
         final = parser.parse(statement)
@@ -522,7 +527,11 @@ if __name__ == "__main__":
     ASTVisitor(Technique3(const, vars)).preorder(verify2.right)
     print("\nStage 4: Apply tech 3 =>", verify2, "\n")    
     
-    cg = CodeGenerator(const, vars, verify2.right)
-    result = cg.print_batchverify()
+#    cg = CodeGenerator(const, vars, verify2.right)
+#    result = cg.print_batchverify()
 #    result = cg.print_statement(verify2.right)    
-    print("Python => '%s'" % result) # should be able to compile this
+
+    #print("Python => '%s'" % result) # should be able to compile this
+    rop = RecordOperations(vars)
+    ASTVisitor(rop).preorder(verify2.right)
+    print("Results: ", rop)

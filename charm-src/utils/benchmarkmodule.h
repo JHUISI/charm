@@ -72,6 +72,7 @@ PyObject *Benchmark_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 void Benchmark_dealloc(Benchmark *self);
 int Benchmark_init(Benchmark *self, PyObject *args, PyObject *kwds);
 PyObject *Benchmark_print(Benchmark *self);
+PyObject *Retrieve_result(Benchmark *self, MeasureType option);
 
 /* c api functions */
 #define PyBenchmark_Start 		  0
@@ -159,8 +160,10 @@ static PyObject *func_name(PyObject *self, PyObject *args) {		\
 #define GetBenchmark_CAPI(func_name, bench)		\
 static PyObject *_get_benchmark(PyObject *self, PyObject *args) {	\
 	int id = -1;													\
-	if(PyArg_ParseTuple(args, "i", &id)) {							\
-		if(id == bench->identifier) return Benchmark_print(dBench); \
+	MeasureType option = NONE;										\
+	if(PyArg_ParseTuple(args, "i|i", &id, &option)) {					\
+		if(option != NONE) return Retrieve_result(dBench, option);		\
+		else if(id == bench->identifier) return Benchmark_print(dBench); \
 		Py_RETURN_FALSE;	}										\
 	Py_RETURN_FALSE;	}
 

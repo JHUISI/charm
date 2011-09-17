@@ -69,6 +69,8 @@ class CodeGenerator:
             if node.attr_index != None:
                 msg += '[' + str(node.attr_index) + ']'
             return msg
+        elif(node.type == ops.TYPE):
+            return str(node.attr)
         else:
             left = self.print_statement(node.left)
             right = self.print_statement(node.right)
@@ -88,7 +90,8 @@ class CodeGenerator:
             elif(node.type == ops.PAIR):
                 return ('pair(' + left + ',' + right + ')')
             elif(node.type == ops.HASH):
-                return ('group.hash(' + left + ')')
+                return ('group.hash(' + left + "," + right + ')')
+#                return ('group.hash(' + left + ')')
             elif(node.type == ops.PROD):
                 left = str(node.left.right) # we don't need the EQ node here
                 return ('dotprod(' + left + ', ' + right)

@@ -323,6 +323,37 @@ PyObject *_get_results(Benchmark *self) {
 	return PyUnicode_FromString("Benchmark object has not been initialized properly.");
 }
 
+PyObject *Retrieve_result(Benchmark *self, MeasureType option) {
+	PyObject *result = NULL;
+	if(self != NULL) {
+
+		switch(option) {
+			case REAL_TIME:	result = PyFloat_FromDouble(self->real_time_ms); break;
+			case NATIVE_TIME: result = PyFloat_FromDouble(self->native_time_ms); break;
+			case CPU_TIME: result = PyFloat_FromDouble(self->cpu_time_ms); break;
+#if PY_MAJOR_VERSION >= 3
+			case ADDITION: 	result = PyLong_FromLong(self->op_add); break;
+			case SUBTRACTION:  	result = PyLong_FromLong(self->op_sub); break;
+			case MULTIPLICATION: result = PyLong_FromLong(self->op_mult); break;
+			case DIVISION:		 result = PyLong_FromLong(self->op_div); break;
+			case EXPONENTIATION: result = PyLong_FromLong(self->op_exp); break;
+			case PAIRINGS: 		 result = PyLong_FromLong(self->op_pair); break;
+#else
+			case ADDITION: 	result = PyInt_FromSize_t((size_t) self->op_add); break;
+			case SUBTRACTION:  	result = PyInt_FromSize_t((size_t) self->op_sub); break;
+			case MULTIPLICATION: result = PyInt_FromSize_t((size_t) self->op_mult); break;
+			case DIVISION:		 result = PyInt_FromSize_t((size_t) self->op_div); break;
+			case EXPONENTIATION: result = PyInt_FromSize_t((size_t) self->op_exp); break;
+			case PAIRINGS: 		 result = PyInt_FromSize_t((size_t) self->op_pair); break;
+#endif
+			default: debug("not a valid option.\n");
+					 break;
+		}
+	}
+	return result;
+}
+
+
 // for attributes and what not
 //static PyMemberDef Benchmark_members[] = {
 //		{NULL}
