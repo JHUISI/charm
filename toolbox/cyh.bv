@@ -1,0 +1,11 @@
+
+r := ZR
+g2 := G2
+S := G1
+h := H(M | L | u, ZR)
+S := sk^(h + r)
+
+constant := g2
+constant := P
+
+verify := e( (prod{j:=1, l} on (u_j * (pk_j^h_j))) , P) == e(S, g2)

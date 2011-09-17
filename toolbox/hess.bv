@@ -1,0 +1,12 @@
+
+s := ZR
+h := G1
+S1 := e(h, g2)
+S2 := (sk^a) * (h^s)
+# sig := (S1, S2)
+a := H(M | S1, ZR)
+
+constant := g2
+constant := P
+
+verify := e(S2, g2) == ( e(pk, P)^a ) * S1 
