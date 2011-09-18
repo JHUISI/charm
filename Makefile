@@ -10,12 +10,12 @@ dest_build=/tmp/build-charm
 # gmp source
 gmp_version=gmp-5.0.2
 gmp_url=http://ftp.gnu.org/gnu/gmp/${gmp_version}.tar.gz
-gmp_options=
+gmp_options=CC="${CC}" CPP="${CPP}"
 
 # pbc source
 pbc_version=pbc-0.5.12
 pbc_url=http://crypto.stanford.edu/pbc/files/${pbc_version}.tar.gz
-pbc_options=
+pbc_options=CC="${CC}" CPP="${CPP}"
 DESTDIR=${prefix}
 
 # python packages
@@ -147,6 +147,7 @@ clean:
 #	cd doc; $(MAKE) clean
 #        $(MAKE) -f $(CURDIR)/debian/rules clean
 	rm -rf build/ dist/ ${dest_build} MANIFEST
+	rm ${CONFIG}
 	find . -name '*.pyc' -delete
 
 

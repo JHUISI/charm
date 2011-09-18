@@ -344,6 +344,8 @@ for opt do
       # Enable debugging options that aren't excessively noisy
       debug="yes"
   ;;
+  --enable-darwin) darwin="yes"
+  ;;
   --enable-profiler) profiler="yes"
   ;;
   --enable-werror) werror="yes"
@@ -362,6 +364,7 @@ for opt do
   ;;
   esac
 done
+
 
 #
 # If cpu ~= sparc and  sparc_cpu hasn't been defined, plug in the right
@@ -662,8 +665,8 @@ echo "binary directory  `eval echo $bindir`"
 echo "library directory `eval echo $libdir`"
 echo "config directory  `eval echo $sysconfdir`"
 echo "Source path       $source_path"
-echo "C compiler        $cc"
-echo "Host C compiler   $host_cc"
+#echo "C compiler        $CC"
+#echo "Host C compiler   $HOST_CC"
 echo "CFLAGS            $CFLAGS"
 echo "CHARM_CFLAGS       $CHARM_CFLAGS"
 echo "LDFLAGS           $LDFLAGS"
@@ -686,9 +689,9 @@ echo "libgmp found      $libgmp_found"
 echo "libpbc found      $libpbc_found"
 echo "libcrypto found   $libcrypto_found"
 
-if test "$darwin" = "yes" ; then
-    echo "Cocoa support     $cocoa"
-fi
+#if test "$darwin" = "yes" ; then
+#    echo "Cocoa support     $cocoa"
+#fi
 echo "Documentation     $docs"
 [ ! -z "$uname_release" ] && \
 echo "uname -r          $uname_release"
@@ -751,8 +754,23 @@ echo "INSTALL=$install" >> $config_mk
 echo "INSTALL_DIR=$install -d -m0755 -p" >> $config_mk
 echo "INSTALL_DATA=$install -m0644 -p" >> $config_mk
 echo "INSTALL_PROG=$install -m0755 -p" >> $config_mk
-echo "CC=$cc" >> $config_mk
-echo "HOST_CC=$host_cc" >> $config_mk
+
+if test "$darwin" = "yes" ; then
+   mac_ver=`sw_vers | grep "ProductVersion:" | cut -d. -f2`
+   if test "$mac_ver" = "7"; then 
+      echo "CC=gcc-4.2" >> $config_mk
+      echo "CPP=gcc-4.2 -E" >> $config_mk
+      echo "CXX=gcc-4.2" >> $config_mk 
+      echo "HOST_CC=gcc-4.2" >> $config_mk
+   else
+      echo "CC=$cc" >> $config_mk
+      echo "HOST_CC=$host_cc" >> $config_mk
+   fi
+else
+echo "CC=gcc" >> $config_mk
+echo "CPP=gcc -E" >> $config_mk
+echo "HOST_CC=gcc" >> $config_mk
+fi
 echo "AR=$ar" >> $config_mk
 echo "LD=$ld" >> $config_mk
 echo "LIBTOOL=$libtool" >> $config_mk

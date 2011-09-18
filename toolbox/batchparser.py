@@ -335,27 +335,41 @@ class CombineVerifyEq:
     def visit(self, node, data):
         pass
     
-    def visit_exp(self, node, data):
-        if node.left.type == ops.PAIR:
-            prod = self.newProdNode()
-            prod.right = node
-            addAsChildNodeToParent(data, prod)
-    
-    def visit_pair(self, node, data):
-        if data['parent'].type == ops.EXP:
-            pass
-        else:
-            prod = self.newProdNode()
-            prod.right = node
-            addAsChildNodeToParent(data, prod)
-    
-    def visit_hash(self, node, data):
-        if node.left.type == ops.ATTR:
-            # save me and parent for future use
-            self.hash_node = { 'node': node, 'parent':data['parent'], 
-                               'sibling':data['sibling'] }
+    def visit_eq_tst(self, node, data):
+        # distribute prod to left and right side
+        if node.left.type != ops.ON:
+            prodL = self.newProdNode()
+            prodL.right = node.left
+            node.left = prodL
+        
+        if node.right.type != ops.ON:
+            prodR = self.newProdNode()
+            prodR.right = node.right
+            node.right = prodR
+        
+#    def visit_exp(self, node, data):
+#        if node.left.type == ops.PAIR:
+#            prod = self.newProdNode()
+#            prod.right = node
+#            addAsChildNodeToParent(data, prod)
+#    
+#    def visit_pair(self, node, data):
+#        if data['parent'].type == ops.EXP:
+#            pass
+#        else:
+#            prod = self.newProdNode()
+#            prod.right = node
+#            addAsChildNodeToParent(data, prod)
+#    
+#    def visit_hash(self, node, data):
+#        if node.left.type == ops.ATTR:
+#            # save me and parent for future use
+#            self.hash_node = { 'node': node, 'parent':data['parent'], 
+#                               'sibling':data['sibling'] }
             
     def visit_attr(self, node, data):
+        if data['parent'].type in [ops.PROD, ops.EQ]:
+            return
         if not self.isConstant(node):
             node.setAttrIndex('i') # add index to each attr that isn't constant
 #            prod = self.newProdNode()
@@ -389,13 +403,18 @@ class SmallExponent:
     def visit(self, node, data):
         pass
 
-    def visit_pair(self, node, data):
+#    def visit_pair(self, node, data):
 #        if data['parent'].type != ops.EXP:
+    def visit_on(self, node, data):
         new_node = self.newExpNode()
-        new_node.left = node
-        new_node.right = BinaryNode("delta_i")
+#        new_node.left = node
+        new_node.left = node.right
+        new_node.right = BinaryNode("delta")
+        new_node.right.setAttrIndex('i')
             #print("new node =>", new_node)  
-        addAsChildNodeToParent(data, new_node)
+#        addAsChildNodeToParent(data, new_node)
+        node.right = new_node
+
     
     def newExpNode(self):
         p = BatchParser()
@@ -521,11 +540,12 @@ if __name__ == "__main__":
     print("\nStage 1: Combined Equation =>", verify2, "\n")
     ASTVisitor(SmallExponent(const, vars)).preorder(verify2.right)
     print("\nStage 2: Small Exp Test =>", verify2, "\n")
-    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)
-    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)    
-    print("\nStage 3: Apply tech 2 =>", verify2, "\n")
-    ASTVisitor(Technique3(const, vars)).preorder(verify2.right)
-    print("\nStage 4: Apply tech 3 =>", verify2, "\n")    
+#    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)
+#    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)    
+#    print("\nStage 3: Apply tech 2 =>", verify2, "\n")
+#    ASTVisitor(Technique3(const, vars)).preorder(verify2.right)
+#    print("\nStage 4: Apply tech 3 =>", verify2, "\n")    
+
     
 #    cg = CodeGenerator(const, vars, verify2.right)
 #    result = cg.print_batchverify()

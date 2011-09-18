@@ -15,9 +15,15 @@ class RecordOperations:
     
     def visit(self, node, data):
         pass
+
+    def visit_on(self, node, data):
+        # prod = node.left
+        pass
     
     def visit_pair(self, node, data):
+        # check for 'on' parent, which means pairing is done N times
         self.ops['pair'] += 1
+            
 
     # track operations in G1, G2, GT      
     def visit_mul(self, node, data):

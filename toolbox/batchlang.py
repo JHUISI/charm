@@ -62,7 +62,8 @@ class BinaryNode:
 				token = ""
 				for t in self.attr_index:
 					token += t + ","
-				token.rstrip(',')
+				l = len(token) 
+				token = token[:l-1]
 				msg += '_' + token
 			return msg
 		elif(self.type == ops.TYPE):
