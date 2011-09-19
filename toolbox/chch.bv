@@ -1,5 +1,6 @@
 # bls batch inputs
 # variables
+N := 10
 M := str
 g2 := G2
 pk := G1

@@ -1,6 +1,6 @@
 # bls batch inputs
 # variables
-N := 200
+N := 10
 sig := G1
 M := str
 g := G2

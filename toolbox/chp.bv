@@ -1,4 +1,5 @@
 # variables
+N := 10
 M := str
 g := G2
 a := H(t1, G1)

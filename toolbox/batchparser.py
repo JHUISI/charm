@@ -394,6 +394,36 @@ class CombineVerifyEq:
             if n.getAttribute() == node.getAttribute(): return True
         return False
 
+
+class SimplifyDotProducts:
+    def __init__(self):
+        pass
+    
+    def visit(self, node, data):
+        pass
+    
+    def visit_on(self, node, data):
+        print("right node of prod =>", node.right)
+        _type = node.right.type
+        print("type =>", _type)
+        if _type == ops.MUL:
+            # must distribute prod to both children of mul
+            mul_node = node.right
+            node.right = None
+            prod_node2 = BinaryNode.copy(node)
+            
+            # add prod nodes to children of mul_node
+            prod_node2.right = mul_node.right
+            mul_node.right = prod_node2
+            
+            node.right = mul_node.left
+            mul_node.left = node
+            
+            # move mul_node one level up to replace the "on" node.
+            addAsChildNodeToParent(data, mul_node)
+            
+        
+
 # Adds an exponent to a \delta to every pairing node
 class SmallExponent:
     def __init__(self, constants, variables):
@@ -535,11 +565,12 @@ if __name__ == "__main__":
 
     verify2 = BinaryNode.copy(verify)
     ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
-    ASTVisitor(ASTOperations()).preorder(verify)
+    ASTVisitor(SimplifyDotProducts()).preorder(verify2.right)
+#    ASTVisitor(ASTOperations()).preorder(verify)
     print("\nVERIFY EQUATION =>", verify, "\n")
     print("\nStage 1: Combined Equation =>", verify2, "\n")
-    ASTVisitor(SmallExponent(const, vars)).preorder(verify2.right)
-    print("\nStage 2: Small Exp Test =>", verify2, "\n")
+#    ASTVisitor(SmallExponent(const, vars)).preorder(verify2.right)
+#    print("\nStage 2: Small Exp Test =>", verify2, "\n")
 #    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)
 #    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)    
 #    print("\nStage 3: Apply tech 2 =>", verify2, "\n")
@@ -553,5 +584,6 @@ if __name__ == "__main__":
 
     #print("Python => '%s'" % result) # should be able to compile this
     rop = RecordOperations(vars)
-    ASTVisitor(rop).preorder(verify2.right)
+    rop.visit(verify2.right, {})
+#    ASTVisitor(rop).preorder(verify2.right)
     print("Results: ", rop)
