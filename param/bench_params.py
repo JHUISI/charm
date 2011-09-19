@@ -1,58 +1,100 @@
 from toolbox.pairinggroup import *
 import sys
 
-trials = 200
-time_per_curve = {'pair':0.0, 'mul':{G1:0.0, G2:0.0, GT:0.0}, 'exp':{G1:0.0, G2:0.0, GT:0.0} }
-curve = {'a.param':time_per_curve.copy(), 'd224.param': time_per_curve.copy() }
+paramList = ['a.param', 'd224.param']
+trials = 1
+curve = {}
+
+def getGroupConst(groupStr):
+    if (groupStr == 'G1'):
+        return G1
+    elif (groupStr == 'G2'):
+        return G2
+    elif (groupStr == 'GT'):
+        return GT
+    else:
+        return NULL
 
 def mul_in_grp(group, grpChoice):
-    # test 2: mul in 'G1'
     bID1 = InitBenchmark()
-    a, b = group.random(grpChoice), group.random(grpChoice)
-    #start
+    a, b = group.random(getGroupConst(grpChoice)), group.random(getGroupConst(grpChoice))
+
     StartBenchmark(bID1, [RealTime])
     for i in range(0, trials):
         c = a * b
-    #stop
+
     EndBenchmark(bID1)
     result = GetBenchmark(bID1, RealTime) / trials
     return result
 
 def exp_in_grp(group, grpChoice):
     bID2 = InitBenchmark()
-    a, b = group.random(grpChoice), group.random(ZR)
-    #start
+    a, b = group.random(getGroupConst(grpChoice)), group.random(ZR)
+
     StartBenchmark(bID2, [RealTime])
     for i in range(0, trials):
         c = a ** b
-    #stop
+
     EndBenchmark(bID2)
     result = GetBenchmark(bID2, RealTime) / trials
     return result
 
+def bench(param):
+    group = PairingGroup(param)
 
-def bench(file):
-    group = PairingGroup(file)
-    
-    # test 1: pair time
     bID = InitBenchmark()
     a, b = group.random(G1), group.random(G2)
-    # start
+
     StartBenchmark(bID, [RealTime])
     for i in range(0, trials):
         c = pair(a, b)
     EndBenchmark(bID)
-    curve[file]['pair'] = GetBenchmark(bID, RealTime) / trials
-    
-    for i in [G1, G2, GT]:
-        curve[file]['mul'][i] = mul_in_grp(group, i)    
-        curve[file]['exp'][i] = exp_in_grp(group, i)
 
-    print("<= Benchmark Results => ")
-    print(curve[file])
+    curve[param]['pair'] = GetBenchmark(bID, RealTime) / trials
     
+    for i in ['G1', 'G2', 'GT']:
+        curve[param]['mul'][i] = mul_in_grp(group, i)        
+        curve[param]['exp'][i] = exp_in_grp(group, i)
+
+def generateOutput(outputFile):
+    file = open(outputFile, 'w')
+
+    outputString = ""
+
+    outputString += "\n<= Benchmark Results =>\n\n"
+    outputString += "Raw Output:\n"
+    outputString += str(curve)
+    outputString += "\n\n"
+    outputString += "Formatted Output:\n\n"
+
+    for param in curve:
+        outputString += "\t" + param + "\n"
+        for benchmark in curve[param]:
+            if (benchmark == "pair"):
+                outputString += "\t\tpair:  " + str(curve[param]['pair']) + "\n"
+            else:
+                outputString += "\t\t" + benchmark + ":" + "\n"
+                for i in ['G1', 'G2', 'GT']:
+                    outputString += "\t\t\t" + i + ":  " + str(curve[param][benchmark][i]) + "\n"
+        outputString += "\n"
+
+    outputString += "Done.\n"
+
+    print(outputString)
+    file.write(outputString)
+    file.close()
+
 if __name__ == "__main__":
-    file = sys.argv[1]
-    
-    bench(file)
-    print("Done.")
+    if ( (len(sys.argv) != 3) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
+        sys.exit("Usage:  python bench_params_dir.py [number of trials] [output file]")
+
+    trials = int(sys.argv[1])
+    outputFile = sys.argv[2]
+
+    for paramEntry in paramList:
+        curve[paramEntry] = {'pair':0.0, 'mul':{'G1':0.0, 'G2':0.0, 'GT':0.0}, 'exp':{'G1':0.0, 'G2':0.0, 'GT':0.0} }
+
+    for key in curve:
+        bench(key)
+
+    generateOutput(outputFile)
