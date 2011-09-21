@@ -7,6 +7,8 @@ if install_system == 'Darwin':
    # get the path to site-packages for operating system
    path_to_charm = distutils.sysconfig.get_python_lib()
    # add 'install' package dest to our path 
+elif install_system == 'Windows':
+	path_to_charm = distutils.sysconfig.get_python_lib()
 elif install_system == 'Linux':
    path_to_charm = distutils.sysconfig.get_python_lib(1, 1, '/usr/local') + "/dist-packages"
    #print("python path =>", path_to_charm)

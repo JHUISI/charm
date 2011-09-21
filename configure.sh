@@ -828,9 +828,21 @@ elif test "$pairing_miracl" = "yes" ; then
 fi
 
 if test "$wget" = "" ; then
-   echo "wget not found. Please install first, its required if installing dependencies."
-   rm $config_mk
-   exit -1
+	if [ "$targetos" == "MINGW32" ] ; then
+		printf "wget not found!\n\n.Will now run Internet Explorer to download wget for windows.\n\n Please be sure to add the GNU32 bin directory to your path! Right-click Computer, Properties, Advanced System Settings, Advanced, Environment Variables, Path."
+		/c/Program\ Files/Internet\ Explorer/iexplore.exe http://downloads.sourceforge.net/gnuwin32/wget-1.11.4-1-setup.exe
+		rm $config_mk
+		exit -1
+	else
+		echo "wget not found. Please install first, its required if installing dependencies."
+		rm $config_mk
+		exit -1
+	fi
+fi
+
+if [ "$targetos" == "MINGW32" ] ; then
+	echo "PYTHON-FLAGS=--compile=mingw32" >> $config_mk
+	echo "OS-FLAGS=--disable-static --enable-shared"
 fi
 
 if test "$libm_found" = "no" ; then

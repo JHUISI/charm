@@ -50,7 +50,7 @@ des  = Extension('DES', include_dirs = [path+'cryptobase/libtom/'], sources = [p
 des3  = Extension('DES3', include_dirs = [path+'cryptobase/libtom/'], sources = [path+'cryptobase/DES3.c'])
 _ext_modules.extend([benchmark_module, cryptobase, aes, des, des3])
 
-if platform.system() == 'Linux':
+if platform.system() in ['Linux', 'Windows']:
    # add benchmark module to pairing, integer and ecc 
    if opt.get('PAIR_MOD') == 'yes': pairing_module.sources.append(path+'utils/benchmarkmodule.c')
    if opt.get('INT_MOD') == 'yes': integer_module.sources.append(path+'utils/benchmarkmodule.c')

@@ -48,11 +48,11 @@ build-pyparse:
 	   ${wget} ${pyparse_url}; \
 	   tar -zxf ${pyparse_version}.tar.gz -C ${dest_build}; \
 	   cd ${dest_build}/${pyparse_version}; \
-	   ${PYTHON} setup.py install; \
+	   ${PYTHON} setup.py install ${PYTHON-FLAGS}; \
 	else \
 	   tar -zxf ${pyparse_version}.tar.gz -C ${dest_build}; \
 	   cd ${dest_build}/${pyparse_version}; \
-	   ${PYTHON} setup.py install; \
+	   ${PYTHON} setup.py install ${PYTHON-FLAGS}; \
 	fi
 	set +x
 	sed "s/PYPARSING=no/PYPARSING=yes/g" ${CONFIG} > ${CONFIG}.new; mv ${CONFIG}.new ${CONFIG} 
@@ -66,12 +66,12 @@ build-gmp:
 	elif [ ! -f ${gmp_version}.tar.gz ]; then \
 	   ${wget} ${gmp_url}; \
 	   tar -zxf ${gmp_version}.tar.gz -C ${dest_build}; \
-	   cd ${dest_build}/${gmp_version}; ./configure ${gmp_options} --prefix=${DESTDIR}; \
+	   cd ${dest_build}/${gmp_version}; ./configure ${gmp_options} --prefix=${DESTDIR} ${OS-FLAGS}; \
 	   ${MAKE} install; \
 	   echo "GMP install: OK"; \
         else \
 	   tar -zxf ${gmp_version}.tar.gz -C ${dest_build}; \
-	   cd ${dest_build}/${gmp_version}; ./configure ${gmp_options} --prefix=${DESTDIR}; \
+	   cd ${dest_build}/${gmp_version}; ./configure ${gmp_options} --prefix=${DESTDIR} ${OS-FLAGS}; \
 	   ${MAKE} install; \
 	   echo "GMP install: OK"; \
 	fi
@@ -87,12 +87,12 @@ build-pbc:
 	elif [ ! -f ${pbc_version}.tar.gz ]; then \
 	   ${wget} ${pbc_url}; \
 	   tar -zxf ${pbc_version}.tar.gz -C ${dest_build}; \
-	   cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR}; \
+	   cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR} ${MINGW32-FLAGS}; \
 	   ${MAKE} install; \
 	   echo "PBC install: OK"; \
 	else \
 	   tar -zxf ${pbc_version}.tar.gz -C ${dest_build}; \
-	   cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR}; \
+	   cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR} ${MINGW32-FLAGS}; \
 	   ${MAKE} install; \
 	   echo "PBC install: OK"; \
 	fi
@@ -106,7 +106,7 @@ deps: build-gmp build-pbc
 .PHONY: build
 build: setup build-gmp build-pbc build-pyparse
 	@echo "Building the Charm Framework"
-	${PYTHON} setup.py build
+	${PYTHON} setup.py build ${PYTHON-FLAGS}
 	@echo "Complete"
 
 .PHONY: source

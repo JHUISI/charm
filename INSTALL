@@ -1,0 +1,117 @@
+Charm-Crypto: Installation Documentation
+-------------------------------------------------------------------------------------------
+
+Charm has done a great job at automating the installation process such that the end-user
+does not have to directly handle dependencies, linking, compiler flag setting, and the
+like.  However, there is always the corner case in which an end-user is using a currently
+unsupported platform, and thus may need to build and install using a very manual process.
+
+We would like to support you in this case, and have written this documentation to get 
+you started on your path using Charm.  This installation file will contain some n
+installation blocks highlighting each respective implementation.  
+
+Before we begin, please note the current dependencies:
+    
+	Python3 or Python2.7
+	Pyparsing http://pyparsing.wikispaces.com/
+    GMP http://www.swox.com/gmp/
+    PBC http://crypto.stanford.edu/pbc/news.html 
+    OPENSSL http://www.openssl.org/
+
+	---
+	See ./configure --help for other options.
+	
+	
+BUILDING IN LINUX
+------------------------
+
+Note that the entire compilation process is supported by the Charm configure/make scripts.
+The steps for building in linux this way are:
+	1. In a terminal, run configure.sh
+	2. The process will fail out at wget, and will ask you to install.
+	3. Using your package manager of choice (e.g., sudo apt-get install wget), install wget.
+    4. With wget installed, run the configure.sh script again, and it should set up your
+       Make dependencies for you.  
+    5. Make build.
+    6. Make install.	
+    *. Another way to install dependencies is to use your package manager of choice.
+	
+[Debian / Crunchbang / Ubuntu / Mint]
+
+[Fedora] 
+
+[Fedora x86_64]
+
+
+
+BUILDING IN WINDOWS
+------------------------
+
+Note that the entire compilation process is now supported by the Charm configure/make scripts.
+The steps for building in mingw32 this way are:
+    1. Download the latest source version of openssl.
+	2. Run MinGW Shell.
+    3. Extract openssl, configure and install as shown below.	
+	4. Extract Charm, and navigate to the top directory.
+	5. Run configure.sh as shown below.
+	6. The process will fail out at wget, and open Internet Explorer to the wget download 
+	   page.
+	7. Install wget, and set it's bin directory on your PATH.  To do this, right-click My 
+	   Computer, Select Properties, Select Advanced System Settings, Select Advanced, Select
+       Environment Variables, and than PATH.  Scroll to the end, and enter a ; followed by 
+       the absolute path to the bin directory (e.g., C:\Program Files\etc).
+    8. With wget installed, run the configure.sh script again, and it should set up your
+       Make dependencies for you.  
+    9. Make build.
+   10. Make install.
+    *. Another way to install dependencies is to follow the Windows blocks below.	
+
+[MinGW32]
+
+Let's first build our dependencies with the following scripts:
+	
+	#GMP
+	./configure --prefix=/mingw --disable-static --enable-shared
+	make
+	make install
+	
+	#OPENSSL
+	./config --openssldir=/mingw --shared # This gets us around installing perl.
+	make
+	make install
+
+	#PBC
+	./configure --prefix=/mingw --disable-static --enable-shared
+	make
+	make install
+	
+	#Building Charm
+	./configure --prefix=/mingw --python=/c/Python32/python.exe 
+	
+[MinGW64]
+
+	Coming Soon*
+
+[Cygwin]
+
+	Coming Soon*
+
+
+BUILDING IN OS X 
+------------------------
+
+Note that the entire compilation process is supported by the Charm configure/make scripts.
+The steps for building in os x this way are:
+	1. In a terminal, run configure.sh
+	2. The process will fail out at wget, and will ask you to install.
+	3. Using your package manager of choice (e.g., sudo port install wget), install wget.
+    4. With wget installed, run the configure.sh script again, and it should set up your
+       Make dependencies for you.  
+    5. Make build.
+    6. Make install.	
+    *. Another way to install dependencies is to use macports or fink.
+	
+[Snow Leopard]
+
+[Lion]
+
