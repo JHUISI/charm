@@ -337,12 +337,12 @@ class CombineVerifyEq:
     
     def visit_eq_tst(self, node, data):
         # distribute prod to left and right side
-        if node.left.type != ops.ON:
+        if node.left.type != ops.EQ:
             prodL = self.newProdNode()
             prodL.right = node.left
             node.left = prodL
         
-        if node.right.type != ops.ON:
+        if node.right.type != ops.EQ:
             prodR = self.newProdNode()
             prodR.right = node.right
             node.right = prodR
@@ -403,12 +403,16 @@ class SimplifyDotProducts:
         pass
     
     def visit_on(self, node, data):
-        print("right node of prod =>", node.right)
+#        print("right node of prod =>", node.right)
+#        print("type =>", _type)
         _type = node.right.type
-        print("type =>", _type)
         if _type == ops.MUL:
             # must distribute prod to both children of mul
             mul_node = node.right
+            # in case we're delaying with prod on attr1 * attr2 
+            # no need to simply further, so we can simply return
+            if mul_node.left.type == ops.ATTR or mul_node.right.type == ops.ATTR:
+                return
             node.right = None
             prod_node2 = BinaryNode.copy(node)
             

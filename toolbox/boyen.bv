@@ -1,0 +1,10 @@
+N := 10
+l := 5
+M := ZR
+t := ZR
+A := G2
+B := G2
+C := G2
+D := e(g1, g2)
+
+verify :=  { prod{j:=1, l} on e(S_j, A_j * (B_j^M) * (C_j^t_j)) } == D 

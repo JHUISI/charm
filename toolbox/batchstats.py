@@ -39,8 +39,10 @@ class RecordOperations:
                 keys = data.get('key')
                 # exp node a child of a product node
                 if keys != None:
+                    _exp = 1
                     for i in keys:
-                        self.ops['exp'][ base_type ] += data[i]
+                        _exp *= data[i]
+                    self.ops['exp'][ base_type ] += _exp
                 else: 
                     self.ops['exp'][ base_type ] += 1
                 self.visit(node.left, data)
@@ -50,8 +52,10 @@ class RecordOperations:
                 keys = data.get('key')
                 
                 if keys != None:
+                    _mul = 1
                     for i in keys:
-                        self.ops[ 'mul' ][ base_type ] += data[i]
+                        _mul *= data[i]
+                    self.ops[ 'mul' ][ base_type ] += _mul
                 else:
                     self.ops['mul'][ base_type ] += 1
                 
@@ -68,8 +72,10 @@ class RecordOperations:
                 keys = data.get('key')
                 # print("pair: data =>", data)
                 if keys != None:
+                    _pair = 1
                     for i in keys:
-                        self.ops['pair'] += data[i]
+                        _pair *= data[i]
+                    self.ops['pair'] += _pair
                 else:
                     self.ops['pair'] += 1
                 
@@ -139,7 +145,7 @@ class RecordOperations:
             return None
         else:
             return self.deriveNodeType(node.left)
-        print("printing type =>", _type)
-        print("node =>", node)
+        #print("printing type =>", _type)
+        #print("node =>", node)
         return self.vars_def[_type]
             

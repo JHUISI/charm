@@ -41,7 +41,7 @@ class BinaryNode:
 				arr = value.split('_')
 				self.attr = arr[0]
 				if len(arr) > 1: # True means a_b form
-					self.attr_index = arr[1]
+					self.attr_index = [arr[1]]
 				else: # False means a and no '_' present
 					self.attr_index = None
 		elif value > ops.BEGIN and value < ops.END:

@@ -1,0 +1,7 @@
+N := 10
+l := 15
+pk := G2
+g2 := G2
+sig := { prod{i:=1, l} on sig_i }
+
+verify := e(sig, g2) == (prod{j := 1, l} on e(H(M_j, G1), pk_j))
