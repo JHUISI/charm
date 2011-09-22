@@ -114,7 +114,7 @@ class input:
                    if _res_type in [list, dict]: # make sure it's either a dict, list or tuple
                      assert SchemeBase.verifyTypeStruct(inputs[i], self._types[i], _res_type), "invalid '%s' type for '%s'" % (self._types[i], i)
                    else:
-                     assert SchemeBase.verifyType(inputs[i], self._types[i]), "invalid '%s' type for '%s'" % (self._types[i].__name__ , i)
+                     assert SchemeBase.verifyType(inputs[i], self._types[i]), "invalid '%s' type for '%s'" % (self._types[i], i)
                 result = func(*args)
             except Exception as e:
                 print(e)
