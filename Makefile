@@ -87,12 +87,12 @@ build-pbc:
 	elif [ ! -f ${pbc_version}.tar.gz ]; then \
 	   ${wget} ${pbc_url}; \
 	   tar -zxf ${pbc_version}.tar.gz -C ${dest_build}; \
-	   cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR} ${MINGW32-FLAGS}; \
+	   cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR} ${OS-FLAGS}; \
 	   ${MAKE} install; \
 	   echo "PBC install: OK"; \
 	else \
 	   tar -zxf ${pbc_version}.tar.gz -C ${dest_build}; \
-	   cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR} ${MINGW32-FLAGS}; \
+	   cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR} ${OS-FLAGS}; \
 	   ${MAKE} install; \
 	   echo "PBC install: OK"; \
 	fi
