@@ -40,8 +40,20 @@ class SchemeBase:
         return False
     
     @classmethod
-    def verifyTypeDict(self, source, target):
-        for i in target.keys():            
+    def verifyTypeStruct(self, source, target, _types=dict):
+        # make sure src and targ the same type otherwise raise error
+        if type(source) != type(target): 
+           assert False, "type mismatch between src='%s' and targ='%s'" % (type(source), type(target)) 
+        if _types == dict: _iter = target.keys()
+        elif _types in [list, tuple]: 
+           _iter = range(len(source))
+           target = [target[0] for i in _iter] 
+           #print("target =>", target)
+        #if struct unknown, then we shouldn't be calling this method
+        else:
+           assert False, "invalid structure type. wrong method"
+
+        for i in _iter:            
             if hasattr(source[i], 'type'): # check for charm elements
                 assert source[i].type == target[i], "invalid type: '%s' should be '%s' not '%s'" % (i, target[i], source[i].type)
             elif type(source[i]) in [dict, tuple, list]: # all dict elements (charm or python) must match target type
@@ -56,14 +68,11 @@ class SchemeBase:
         return True
     
     @classmethod
-    def verifyTypeTuple(self, source, target):
-        return self.verifyTypeDict(source, target)
-    
-    @classmethod
     def verifyType(self, source, target):
         if hasattr(source, 'type'):
             # source must be one of our base module types
-            if source.type == target: return True
+            if source.type == target: 
+               return True
             else: return False
         elif type(source) == target:
             return True
@@ -84,6 +93,11 @@ class SchemeBase:
             return tuple(ret)
         return ret
 
+"""
+Decorator to handle checking an algorithms inputs and validating that types
+match. The only requirement other than structure def matching is that the type
+associated with the elements match target type (both python and charm types).
+"""
 class input:
     def __init__(self, *_types):
         self._types = _types
@@ -91,18 +105,16 @@ class input:
     
     def __call__(self, func, *args):
         def check_input(*args):
-            #print("func =>", func)
-            #print("func name =>", func.__name__)
-            #print("cur arguments =>", args[1:])
-            #print("type arguments =>", self._types)
+            result = None
             try:
                 # check inputs
                 inputs = args[1:]
                 for i in range(0, len(self._types)):
-                    if type(self._types[i]) == dict:
-                        assert SchemeBase.verifyTypeDict(inputs[i], self._types[i]), "invalid '%s' target type" % self._types[i].__name__
-                    else:
-                        assert SchemeBase.verifyType(inputs[i], self._types[i]), "invalid '%s' target type" % self._types[i].__name__ 
+                   _res_type = type(self._types[i])
+                   if _res_type in [list, dict]: # make sure it's either a dict, list or tuple
+                     assert SchemeBase.verifyTypeStruct(inputs[i], self._types[i], _res_type), "invalid '%s' type for '%s'" % (self._types[i], i)
+                   else:
+                     assert SchemeBase.verifyType(inputs[i], self._types[i]), "invalid '%s' type for '%s'" % (self._types[i].__name__ , i)
                 result = func(*args)
             except Exception as e:
                 print(e)
@@ -110,13 +122,18 @@ class input:
         
         return check_input
 
+"""
+Decorator to handle checking an algorithms outputs and validating that types
+match. Similar to input, the only requirement other than structure def matching is that the type
+associated with the elements match target type (both python and charm types).
+"""
 class output:
     def __init__(self, *_types):
         self._types = _types
         self._type_len = len(_types)
         self.check_first = True
         if self._type_len > 1: self.check_first = False
-#        print("OUTPUT TYPE: ", self._types)
+        #print("OUTPUT TYPE: ", self._types)
 
     def __call__(self, func, *args):
         def check_output(*args):
@@ -124,19 +141,20 @@ class output:
                 output = func(*args)
                 # check the output        
                 if self.check_first:
-                    # situation where only one type is defined and it could be a single dict of many types, 
+                    # situation where only one type is defined and it could be a single dict or list of many types, 
                     # or a single object with one type  
-                    if type(self._types[0]) == dict:
-                        assert SchemeBase.verifyTypeDict(output, self._types[0]), "invalid return type"
+                    _res_type = type(self._types[0])
+                    if _res_type in [list, dict]:
+                        assert SchemeBase.verifyTypeStruct(output, self._types[0], _res_type), "invalid return type"
                     else:
-                        assert SchemeBase.verifyType(output, self._types[0])
+                        assert SchemeBase.verifyType(output, self._types[0]), "invalid return output for '%s'" % func.__name__
                 else:        
                     # situation where a list of types is defined and mirrors how we look at inputs
                     for i in range(0, self._type_len):              
                         if type(self._types[i]) == dict:
-                            assert SchemeBase.verifyTypeDict(output[i], self._types[i]), "invalid return type"
+                            assert SchemeBase.verifyTypeStruct(output[i], self._types[i]), "invalid return type"
                         elif type(self._types[i]) == tuple:
-                            assert SchemeBase.verifyTypeDict(output[i], self._types[i])
+                            assert SchemeBase.verifyTypeStruct(output[i], self._types[i], list)
                         else:
                             assert SchemeBase.verifyType(output[i], self._types[i]), "invalid return type"
             except Exception as e:

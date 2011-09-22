@@ -36,8 +36,8 @@ class Commitment_GS08(Commitment):
             g2, h2 = g1 ** s, h1 ** t
         
         return (g1, g2, h1, h2)
-        
-    def commit(self, params, msg : ZR):
+    # msg => ZR    
+    def commit(self, params, msg):
         # TODO: check that the message is in the same group as the params
         (g1, g2, h1, g2) = params
         r1, r2 = group.random(ZR), group.random(ZR)
