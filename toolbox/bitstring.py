@@ -13,7 +13,8 @@ if sys.hexversion >= int(0x03000000):
 class Bytes(bytes):
     def __init__(self, value, enc=None):
         if enc != None:
-           bytes.__init__(value, enc)
+           if py3: bytes.__init__(value, enc)
+           else: bytes.__init__(value)
         else:
            bytes.__init__(value)
 

@@ -19,7 +19,7 @@ class HybridIBEnc(IBEnc):
     def extract(self, mk, ID):
         return ibenc.extract(mk, ID)
     
-    def encrypt(self, pk, ID, M : str):
+    def encrypt(self, pk, ID, M):
         if type(M) != str: raise "message not right type!"        
         key = group.random(GT)
         c1 = ibenc.encrypt(pk, ID, key)

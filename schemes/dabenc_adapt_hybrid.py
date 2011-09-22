@@ -22,8 +22,8 @@ class HybridABEncMA(ABEncMultiAuth):
     
     def keygen(self, gp, sk, i, gid, pkey):
         return abencma.keygen(gp, sk, i, gid, pkey)
-    
-    def encrypt(self, pk, gp, M : str, policy_str):
+
+    def encrypt(self, pk, gp, M, policy_str):
         if type(M) != str and type(policy_str) != str: raise "message and policy not right type!"        
         key = group.random(GT)
         c1 = abencma.encrypt(pk, gp, key, policy_str)
