@@ -45,7 +45,7 @@ build-pyparse:
 	if test "${PYPARSING}" = "yes" ; then \
 	   echo "Pyparsing installed already."; \
 	elif [ ! -f ${pyparse_version}.tar.gz ]; then \
-	   ${wget} ${pyparse_url}; \
+	   ${WGET} ${pyparse_url}; \
 	   tar -zxf ${pyparse_version}.tar.gz -C ${dest_build}; \
 	   cd ${dest_build}/${pyparse_version}; \
 	   ${PYTHON} setup.py install ${PYTHON-FLAGS}; \
@@ -64,7 +64,7 @@ build-gmp:
 	if test "${HAVE_LIBGMP}" = "yes" ; then \
            echo "GMP installed already."; \
 	elif [ ! -f ${gmp_version}.tar.gz ]; then \
-	   ${wget} ${gmp_url}; \
+	   ${WGET} ${gmp_url}; \
 	   tar -zxf ${gmp_version}.tar.gz -C ${dest_build}; \
 	   cd ${dest_build}/${gmp_version}; ./configure ${gmp_options} --prefix=${DESTDIR} ${OS-FLAGS}; \
 	   ${MAKE} install; \
@@ -85,7 +85,7 @@ build-pbc:
 	if test "${HAVE_LIBPBC}" = "yes" ; then \
 	   echo "PBC installed already."; \
 	elif [ ! -f ${pbc_version}.tar.gz ]; then \
-	   ${wget} ${pbc_url}; \
+	   ${WGET} ${pbc_url}; \
 	   tar -zxf ${pbc_version}.tar.gz -C ${dest_build}; \
 	   cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR} ${OS-FLAGS}; \
 	   ${MAKE} install; \

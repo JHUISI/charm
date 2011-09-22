@@ -38,7 +38,119 @@ The steps for building in linux this way are:
 	
 [Debian / Crunchbang / Ubuntu / Mint]
 
+Ubuntu 10.04 LTS
+
+1. Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
+	1. Subversion
+		sudo apt-get install subversion
+	2. Python 3 (By default, Ubuntu 10.04 LTS comes with 2.6 and does not officially support 2.7. Charm requires 2.7 or 3.x) and header files/static library
+		sudo apt-get install python3 python3-dev
+	3. m4
+		sudo apt-get install m4
+	4. libssl-dev
+		sudo apt-get install libssl-dev
+
+2. Now we need to obtain a copy of Charm:
+	svn checkout http://charm-crypto.googlecode.com/svn/trunk/ charm-crypto-read-only
+
+3. Next, we will install Charm. Navigate to the Charm directory.
+	1. We must first run the configuration script:
+		sudo ./configure.sh –python=/path/to/python3
+	2. Now we will build and install Charm:
+		sudo make build
+		sudo make install
+	3. And finally we must rebuild the searchpath for libraries
+		sudo ldconfig
+
+Ubuntu 11.04
+
+1. Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
+	1. Subversion
+		sudo apt-get install subversion
+	2. m4
+		sudo apt-get install m4
+	3. Python 3 (this is an optional, though recommended, step)
+		sudo apt-get install python3
+	4. Header files/static library
+		sudo apt-get install python-dev (if you did not install Python 3)
+		sudo apt-get install python3-dev (if you did install Python 3)
+	5. libssl-dev (only necessary if you did not install Python 3)
+		sudo apt-get install libssl-dev
+
+2. Now we need to obtain a copy of Charm:
+	svn checkout http://charm-crypto.googlecode.com/svn/trunk/ charm-crypto-read-only
+
+3. Next, we will install Charm. Navigate to the Charm directory.
+	1. We must first run the configuration script:
+		sudo ./configure.sh
+		[If you installed Python 3 and would like to use that, you will need to add –python=/path/to/python3]
+	2. Now we will build and install Charm:
+		sudo make build
+		sudo make install
+	3. And finally we must rebuild the searchpath for libraries
+		sudo ldconfig
+
 [Fedora] 
+
+1. Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
+	1. m4
+		su -c "yum install m4"
+	3. Python 3 (this is an optional, though recommended, step)
+		su -c "yum install python3"
+	4. Header files/static library
+		su -c "yum install python-devel" (if you did not install Python 3)
+		su -c "yum install python3-devel" (if you did install Python 3)
+	5. openssl-devel (only necessary if you did not install Python 3)
+		su -c "yum install openssl-devel"
+
+2. Red Hat/Fedora has decided not to support ECC in OpenSSL due to patent concerns, so we now need to remove their restriction and manually import the required files.
+	1. Remove the ECC restriction
+		1. Navigate to /usr/include/openssl
+			cd /usr/include/openssl
+		2. Open the OpenSSL configuration file for editing using your editor of choice
+			su -c "vi opensslconf-i386.h"
+		3. Remove the flags that restrict the use of ECC
+			Delete (at the beginning of file)
+				#ifndef OPENSSL_NO_EC
+				# define OPENSSL_NO_EC
+				#endif
+				#ifndef OPENSSL_NO_ECDH
+				# define OPENSSL_NO_ECDH
+				#endif
+				#ifndef OPENSSL_NO_ECDSA
+				# define OPENSSL_NO_ECDSA
+				#endif
+			Delete (later on the file)
+				# if defined(OPENSSL_NO_EC) && !defined(NO_EC)
+				#  define NO_EC
+				# endif
+				# if defined(OPENSSL_NO_ECDH) && !defined(NO_ECDH)
+				#  define NO_ECDH
+				# endif
+				# if defined(OPENSSL_NO_ECDSA) && !defined(NO_ECDSA)
+				#  define NO_ECDSA
+				# endif
+		4. Save the file and close it
+	2. Add the ECC files
+		1. Navigate to http://www.openssl.org/source/ and download the latest version of openssl source
+		2. Untar it
+		3. Navigate to /path/to/openssl-[version]/include/openssl (ie inside the untarred file)
+			cd /path/to/openssl-[version]/include/openssl
+		4. Add the new files to the current OpenSSL installation
+			su -c "yes n | cp * /usr/include/openssl"
+
+3. Now we need to obtain a copy of Charm:
+	svn checkout http://charm-crypto.googlecode.com/svn/trunk/ charm-crypto-read-only
+
+4. Next, we will install Charm. Navigate to the Charm directory.
+	1. We must first run the configuration script:
+		su -c "./configure.sh"
+		[If you installed Python 3 and would like to use that, you will need to add –python=/path/to/python3]
+	2. Now we will build and install Charm:
+		su -c "make build"
+		su -c "make install"
+	3. And finally we must rebuild the searchpath for libraries
+		su -c "ldconfig"
 
 [Fedora x86_64]
 
