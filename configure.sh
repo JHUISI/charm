@@ -254,13 +254,13 @@ fi
 : ${make=${MAKE-make}}
 : ${install=${INSTALL-install}}
 
-if test "$mingw32" = "yes" ; then
+if [ "$targetos" == "MINGW32" ] ; then
   EXESUF=".exe"
   CHARM_CFLAGS="-DWIN32_LEAN_AND_MEAN -DWINVER=0x501 $CHARM_CFLAGS"
   # enable C99/POSIX format strings (needs mingw32-runtime 3.15 or later)
   CHARM_CFLAGS="-D__USE_MINGW_ANSI_STDIO=1 $CHARM_CFLAGS"
   LIBS="-lwinmm -lws2_32 -liberty -liphlpapi $LIBS"
-  prefix="c:/Program Files/CHARM"
+  prefix="\"c:/Program Files/CHARM\""
   mandir="\${prefix}"
   datadir="\${prefix}"
   docdir="\${prefix}"
@@ -851,7 +851,12 @@ if test "$libm_found" = "no" ; then
    exit -1
 fi 
 
-echo "wget=$wget" >> $config_mk
+if [ "$targetos" == "MINGW32" ] ; then
+	# Windows allowing spaces in directories is a no-no.
+	echo "wget=\"$wget\"" >> $config_mk
+else
+	echo "wget=$wget" >> $config_mk
+fi
 echo "HAVE_LIBM=$libm_found" >> $config_mk
 echo "HAVE_LIBGMP=$libgmp_found" >> $config_mk
 echo "HAVE_LIBPBC=$libpbc_found" >> $config_mk
