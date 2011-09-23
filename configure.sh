@@ -842,7 +842,7 @@ fi
 
 if [ "$targetos" == "MINGW32" ] ; then
 	echo "PYTHON-FLAGS=--compile=mingw32" >> $config_mk
-	echo "OS-FLAGS=--disable-static --enable-shared"
+	echo "OS-FLAGS=--disable-static --enable-shared" >> $config_mk
 fi
 
 if test "$libm_found" = "no" ; then
