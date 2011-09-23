@@ -260,7 +260,7 @@ if [ "$targetos" == "MINGW32" ] ; then
   # enable C99/POSIX format strings (needs mingw32-runtime 3.15 or later)
   CHARM_CFLAGS="-D__USE_MINGW_ANSI_STDIO=1 $CHARM_CFLAGS"
   LIBS="-lwinmm -lws2_32 -liberty -liphlpapi $LIBS"
-  prefix="\"c:/Program Files/CHARM\""
+  prefix="/c/CHARM"
   mandir="\${prefix}"
   datadir="\${prefix}"
   docdir="\${prefix}"
