@@ -1,10 +1,6 @@
 
 #include "pairingmodule.h"
 
-/*const char *getStr(PyObject *o) {
-	return PyUnicode_AS_DATA(PyObject_Type(o));
-}*/
-
 #define ERROR_TYPE(operand, ...) "unsupported "#operand" operand types: "#__VA_ARGS__
 
 #define UNARY(f, m, n) \
@@ -358,24 +354,37 @@ int hash_element_to_bytes(element_t *element, int hash_size, uint8_t* output_buf
 	return TRUE;
 }
 
+// take a previous hash and concatenate with serialized bytes of element and hashes into output buf
 int hash2_element_to_bytes(element_t *element, uint8_t* last_buf, int hash_size, uint8_t* output_buf) {
 	int result = TRUE;
-	unsigned int last_buflen = strlen((char *) last_buf);
-
+	// assume last buf contains a hash
+	unsigned int last_buflen = hash_size;
 	unsigned int buf_len = element_length_in_bytes(*element);
+
 	uint8_t* temp_buf = (uint8_t *) malloc(buf_len + 1);
+	memset(temp_buf, '\0', buf_len);
 	if(temp_buf == NULL) {
 		return FALSE;
 	}
 
 	element_to_bytes((unsigned char *) temp_buf, *element);
 	// create output buffer
-	uint8_t* temp2_buf = (uint8_t *) malloc(last_buflen + buf_len + 1);
+	uint8_t* temp2_buf = (uint8_t *) malloc(last_buflen + buf_len + 4);
 	memset(temp2_buf, 0, (last_buflen + buf_len));
 	// copy first input buffer (last_buf) into target buffer
 	strncat((char *) temp2_buf, (char *) last_buf, last_buflen);
 	// copy element buffer (temp_buf) into target buffer
 	strncat((char *) temp2_buf, (char *) temp_buf, buf_len);
+//	int i;
+//	for(i = 0; i < last_buflen; i++) {
+//		temp2_buf[i] = last_buf[i];
+//	}
+//
+//	int j = 0;
+//	for(i = last_buflen; i < (last_buflen + buf_len); i++) {
+//		temp2_buf[i] = temp_buf[j];
+//		j++;
+//	}
 	// hash the temp2_buf to bytes
 	result = hash_to_bytes(temp2_buf, (last_buflen + buf_len), hash_size, output_buf, HASH_FUNCTION_ELEMENTS);
 
@@ -1103,7 +1112,8 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 	Element *newObject = NULL, *object = NULL;
 	PyObject *objList = NULL, *tmpObject = NULL;
 	// hashing element to Zr
-	uint8_t hash_buf[HASH_LEN];
+	uint8_t hash_buf[HASH_LEN+1];
+	memset(hash_buf, '\0', HASH_LEN);
 	int result, i;
 	GroupType type = ZR;
 	
@@ -1172,6 +1182,8 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 				START_CLOCK(dBench);
 				result = hash_to_bytes((uint8_t *) str, strlen((char *) str), HASH_LEN, hash_buf, HASH_FUNCTION_STR_TO_Zr_CRH);
 				STOP_CLOCK(dBench);
+				debug("hash str element =>");
+				printf_buffer_as_hex(hash_buf, HASH_LEN);
 			}
 			Py_DECREF(tmpObject);
 
@@ -1181,9 +1193,14 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 				if(PyElement_Check(tmpObject)) {
 					object = (Element *) tmpObject;
 					START_CLOCK(dBench);
+					uint8_t out_buf[HASH_LEN+1];
+					memset(out_buf, '\0', HASH_LEN);
 					// current hash_buf output concatenated with object are sha1 hashed into hash_buf
-					result = hash2_element_to_bytes(&object->e, hash_buf, HASH_LEN, hash_buf);
+					result = hash2_element_to_bytes(&object->e, hash_buf, HASH_LEN, out_buf);
 					STOP_CLOCK(dBench);
+					debug("hash element => ");
+					printf_buffer_as_hex(out_buf, HASH_LEN);
+					memcpy(hash_buf, out_buf, HASH_LEN);
 				}
 				else if(PyUnicode_Check(tmpObject)) {
 					char *str = PyBytes_AS_STRING(PyUnicode_AsUTF8String(tmpObject));
@@ -1203,6 +1220,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 				tmp = "invalid object type";
 				goto cleanup;
 			}
+
 			element_from_hash(newObject->e, hash_buf, HASH_LEN);
 			STOP_CLOCK(dBench);
 		}
