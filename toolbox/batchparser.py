@@ -401,11 +401,19 @@ class SmallExponent:
 
     # find  'prod{i} on x' transform into ==> 'prod{i} on (x)^delta_i'
     def visit_on(self, node, data):
-        new_node = self.newExpNode()
-        new_node.left = node.right
-        new_node.right = BinaryNode("delta")
-        new_node.right.setAttrIndex('i') # make more programmatic
-        node.right = new_node
+        if node.right.type == ops.EXP:
+            print("found a winner!")
+            exp = node.right
+            mul = BinaryNode(ops.MUL)
+            mul.right = BinaryNode("delta_i")
+            mul.left = exp.right
+            exp.right = mul
+        else:
+            new_node = self.newExpNode()
+            new_node.left = node.right
+            new_node.right = BinaryNode("delta")
+            new_node.right.setAttrIndex('i') # make more programmatic
+            node.right = new_node
     
     def newExpNode(self):
         p = BatchParser()

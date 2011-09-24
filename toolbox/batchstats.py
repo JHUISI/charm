@@ -13,8 +13,8 @@ class RecordOperations:
         if N == None:
             assert False, "number of signatures not specified!" 
         # need to have type assignments 
-        grps = {'G1':0, 'G2':0, 'GT':0 }
-        self.ops = {'pair':0, 'mul':grps.copy(), 'exp':grps.copy(), 'hash':grps.copy()}
+        grps = {'ZR':0, 'G1':0, 'G2':0, 'GT':0 }
+        self.ops = {'pair':0, 'mul':grps.copy(), 'exp':grps.copy()} # , 'hash':grps.copy()}
         # track prng for small exponents
     
     def visit(self, node, data):
@@ -46,7 +46,8 @@ class RecordOperations:
                     self.ops['exp'][ base_type ] += _exp
                 else: 
                     self.ops['exp'][ base_type ] += 1
-                self.visit(node.left, data)
+                self.visit(node.left, data.copy())
+                self.visit(node.right, data.copy())
 
             elif(node.type == ops.MUL):
                 base_type = self.deriveNodeType(node.left)
