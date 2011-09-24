@@ -1,9 +1,12 @@
 N:= 10
 s := ZR
 h := G1
-S1 := e(h, g2)^s
-S2 := (sk^a) * (h^s)
-# sig := (S1, S2)
+S1 := GT
+S2 := G1
+pk := G1
+#S1 := e(h, g2)^s
+#S2 := (sk^a) * (h^s)
+#sig := (S1, S2)
 a := H(M | S1, ZR)
 
 constant := g2

@@ -300,32 +300,24 @@ def addAsChildNodeToParent(data, target_node):
     else:
         data['parent'].right = target_node              
 
-class ASTOperations:
-    def __init__(self):
-        pass
+class ASTAddIndex:
+    def __init__(self, constants, variables):
+        self.consts = constants
+        self.vars   = variables 
 
     def visit(self, node, data):
         pass
-#    def visit_pair(self, node, data):
-#        print("Visit : pair =>", node.type)
-#        if data['parent']: print("my parent =>", data['parent'].type, "\n")        
-#        return None
-#
-#    def visit_exp(self, node, data):
-#        print("Visit : exp =>", node.type)
-#        if data['parent']: print("my parent =>", data['parent'].type, "\n")        
-#        return None
         
     def visit_attr(self, node, data):
-#        node.attr_index = 'j'
-#        print("Visit : attr =>", node.type)
-#        if data['parent']: print("my parent =>", data['parent'].type, "\n")        
-        return None
-
-#    def visit_eq(self, node, data):
-#        print("Visit : eq =>", node.type)
-#        if data['parent']: print("my parent =>", data['parent'].type, "\n")        
-#        return None
+        if data['parent'].type in [ops.PROD, ops.EQ]:
+            return
+        if not self.isConstant(node):
+            node.setAttrIndex('i') # add index to each attr that isn't constant
+    
+    def isConstant(self, node):        
+        for n in self.consts:
+            if n.getAttribute() == node.getAttribute(): return True
+        return False
         
 class CombineVerifyEq:
     def __init__(self, constants, variables):
@@ -346,43 +338,12 @@ class CombineVerifyEq:
             prodR = self.newProdNode()
             prodR.right = node.right
             node.right = prodR
-        
-#    def visit_exp(self, node, data):
-#        if node.left.type == ops.PAIR:
-#            prod = self.newProdNode()
-#            prod.right = node
-#            addAsChildNodeToParent(data, prod)
-#    
-#    def visit_pair(self, node, data):
-#        if data['parent'].type == ops.EXP:
-#            pass
-#        else:
-#            prod = self.newProdNode()
-#            prod.right = node
-#            addAsChildNodeToParent(data, prod)
-#    
-#    def visit_hash(self, node, data):
-#        if node.left.type == ops.ATTR:
-#            # save me and parent for future use
-#            self.hash_node = { 'node': node, 'parent':data['parent'], 
-#                               'sibling':data['sibling'] }
-            
+                    
     def visit_attr(self, node, data):
         if data['parent'].type in [ops.PROD, ops.EQ]:
             return
         if not self.isConstant(node):
             node.setAttrIndex('i') # add index to each attr that isn't constant
-#            prod = self.newProdNode()
-#            if data['parent'].type != ops.HASH:
-#                prod.right = node
-#                # add new node to prod{i=1, N} on cur_node            
-#                addAsChildNodeToParent(data, prod)
-#            else:
-#                # if hash node above is parent we visited: then proceed
-#                # to retrieve the parent of that hash node
-#                if self.hash_node['node'] == data['parent']:
-#                    prod.right = data['parent']
-#                    addAsChildNodeToParent(self.hash_node, prod)                    
     
     def newProdNode(self):
         p = BatchParser()
@@ -403,16 +364,16 @@ class SimplifyDotProducts:
         pass
     
     def visit_on(self, node, data):
-#        print("right node of prod =>", node.right)
-#        print("type =>", _type)
+#        print("right node of prod =>", node.right, ": type =>", node.right.type)
         _type = node.right.type
         if _type == ops.MUL:
             # must distribute prod to both children of mul
             mul_node = node.right
-            # in case we're delaying with prod on attr1 * attr2 
+            # in case we're dealing with prod{} on attr1 * attr2 
             # no need to simply further, so we can simply return
-            if mul_node.left.type == ops.ATTR or mul_node.right.type == ops.ATTR:
+            if mul_node.left.type == ops.ATTR and mul_node.right.type == ops.ATTR:
                 return
+
             node.right = None
             prod_node2 = BinaryNode.copy(node)
             
@@ -425,10 +386,11 @@ class SimplifyDotProducts:
             
             # move mul_node one level up to replace the "on" node.
             addAsChildNodeToParent(data, mul_node)
-            
         
 
 # Adds an exponent to a \delta to every pairing node
+# TODO: when you discover that a node already has an EXP node, then change right node
+# to a MUL between that value and delta. e.g. prod{} on x^b => prod{} on x^(b * delta).
 class SmallExponent:
     def __init__(self, constants, variables):
         self.consts = constants
@@ -437,18 +399,13 @@ class SmallExponent:
     def visit(self, node, data):
         pass
 
-#    def visit_pair(self, node, data):
-#        if data['parent'].type != ops.EXP:
+    # find  'prod{i} on x' transform into ==> 'prod{i} on (x)^delta_i'
     def visit_on(self, node, data):
         new_node = self.newExpNode()
-#        new_node.left = node
         new_node.left = node.right
         new_node.right = BinaryNode("delta")
-        new_node.right.setAttrIndex('i')
-            #print("new node =>", new_node)  
-#        addAsChildNodeToParent(data, new_node)
+        new_node.right.setAttrIndex('i') # make more programmatic
         node.right = new_node
-
     
     def newExpNode(self):
         p = BatchParser()
@@ -461,13 +418,14 @@ class Technique2:
         self.vars   = variables
         print("Rule 2: Move the exponent(s) into the pairing")
         self.group = group # can orogrammatically set which group we move exponent into
-        # TODO: pre-processing to determine context of how to apply technique 2...here?
+        # TODO: pre-processing to determine context of how to apply technique 2
         # TODO: in cases of chp.bv, where you have multiple exponents outside a pairing, move them all into the e().
     
     def visit(self, node, data):
         pass
 
-    # detect rule: e(g, h)^d_i ==> e(g^d_i, h)
+    # find: 'e(g, h)^d_i' transform into ==> 'e(g^d_i, h)' iff g or h is constant
+    # move exponent towards the non-constant attribute
     def visit_exp(self, node, data):
         # print("left node =>", node.left.type,"target right node =>", node.right)
         if(node.left.type == ops.PAIR):   # and (node.right.attr_index == 'i'): # (node.right.getAttribute() == 'delta'):
@@ -548,6 +506,16 @@ class Technique3:
             if n.getAttribute() == node.getAttribute(): return True
         return False
 
+class Technique4:
+    def __init__(self, constants, variables):
+        self.consts = constants
+        self.vars   = variables
+    
+    def visit(self, node, data):
+        pass
+    
+    def visit_on(self, node, data):
+        pass
         
 if __name__ == "__main__":
     print(sys.argv[1:])
@@ -567,19 +535,19 @@ if __name__ == "__main__":
     print("Constants =>", const)
     print("Variables =>", vars)
 
+    print("\nVERIFY EQUATION =>", verify, "\n")
     verify2 = BinaryNode.copy(verify)
     ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
     ASTVisitor(SimplifyDotProducts()).preorder(verify2.right)
-#    ASTVisitor(ASTOperations()).preorder(verify)
-    print("\nVERIFY EQUATION =>", verify, "\n")
+
     print("\nStage 1: Combined Equation =>", verify2, "\n")
-#    ASTVisitor(SmallExponent(const, vars)).preorder(verify2.right)
-#    print("\nStage 2: Small Exp Test =>", verify2, "\n")
-#    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)
-#    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)    
-#    print("\nStage 3: Apply tech 2 =>", verify2, "\n")
-#    ASTVisitor(Technique3(const, vars)).preorder(verify2.right)
-#    print("\nStage 4: Apply tech 3 =>", verify2, "\n")    
+    ASTVisitor(SmallExponent(const, vars)).preorder(verify2.right)
+    print("\nStage 2: Small Exp Test =>", verify2, "\n")
+    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)
+    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)    
+    print("\nStage 3: Apply tech 2 =>", verify2, "\n")
+    ASTVisitor(Technique3(const, vars)).preorder(verify2.right)
+    print("\nStage 4: Apply tech 3 =>", verify2, "\n")    
 
     
 #    cg = CodeGenerator(const, vars, verify2.right)
@@ -587,7 +555,19 @@ if __name__ == "__main__":
 #    result = cg.print_statement(verify2.right)    
 
     #print("Python => '%s'" % result) # should be able to compile this
-    rop = RecordOperations(vars)
-    rop.visit(verify2.right, {})
-#    ASTVisitor(rop).preorder(verify2.right)
-    print("Results: ", rop)
+    print("<===== Benchmark Results =====>")    
+    rop_ind = RecordOperations(vars)
+    # add attrIndex to non constants
+    ASTVisitor(ASTAddIndex(const, vars)).preorder(verify.right)
+    print("Individual => ", verify.right)
+    rop_ind.visit(verify.right, {'key':['N'], 'N': int(vars['N']) })
+    print("Results for individual verification")
+    print(rop_ind)
+    print()
+        
+    # Apply results on optimized batch algorithm
+    rop_batch = RecordOperations(vars)
+    rop_batch.visit(verify2.right, {})
+    print("Batch =>", verify2.right)
+    print("Results for batch verification:")
+    print(rop_batch)

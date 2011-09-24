@@ -6,7 +6,7 @@ from batchlang import *
 
 class RecordOperations:
     def __init__(self, vars):
-        print("vars =>", vars)
+        #print("vars =>", vars)
         self.debug = False
         self.vars_def = vars
         N = self.vars_def.get('N')
@@ -14,7 +14,8 @@ class RecordOperations:
             assert False, "number of signatures not specified!" 
         # need to have type assignments 
         grps = {'G1':0, 'G2':0, 'GT':0 }
-        self.ops = {'pair':0, 'mul':grps.copy(), 'exp':grps.copy() }
+        self.ops = {'pair':0, 'mul':grps.copy(), 'exp':grps.copy(), 'hash':grps.copy()}
+        # track prng for small exponents
     
     def visit(self, node, data):
         if node == None:
