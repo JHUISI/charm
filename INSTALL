@@ -36,9 +36,7 @@ The steps for building in linux this way are:
     6. Make install.	
     *. Another way to install dependencies is to use your package manager of choice.
 	
-[Debian / Crunchbang / Ubuntu / Mint]
-
-Ubuntu 10.04 LTS
+[Ubuntu 10.04 LTS]
 
 1. Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
 	1. Subversion
@@ -62,7 +60,7 @@ Ubuntu 10.04 LTS
 	3. And finally we must rebuild the searchpath for libraries
 		sudo ldconfig
 
-Ubuntu 11.04
+[Ubuntu 11.04]
 
 1. Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
 	1. Subversion
@@ -153,6 +151,34 @@ Ubuntu 11.04
 		su -c "ldconfig"
 
 [Fedora x86_64]
+
+[Mint x86_64]
+1. Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
+        1. Subversion
+                sudo apt-get install subversion
+        2. m4
+                sudo apt-get install m4
+        3. Python 3 (this is an optional, though recommended, step)
+                sudo apt-get install python3
+        4. Header files/static library
+                sudo apt-get install python-dev (if you did not install Python 3)
+                sudo apt-get install python3-dev (if you did install Python 3)
+        5. libssl-dev (only necessary if you did not install Python 3)
+                sudo apt-get install libssl-dev
+        6. This distro doesn't seem to come with binutils or gcc, install those.
+
+2. Now we need to obtain a copy of Charm:
+        svn checkout http://charm-crypto.googlecode.com/svn/trunk/ charm-crypto-read-only
+
+3. Next, we will install Charm. Navigate to the Charm directory.
+        1. We must first run the configuration script:
+                sudo bash ./configure.sh                * Bash to avoid unexpected operator error.
+                [If you installed Python 3 and would like to use that, you will need to add –python=/path/to/python3]
+        2. Now we will build and install Charm:
+                sudo make build
+                sudo make install
+        3. And finally we must rebuild the searchpath for libraries
+                sudo ldconfig
 
 
 
