@@ -66,12 +66,12 @@ build-gmp:
 	elif [ ! -f ${gmp_version}.tar.gz ]; then \
 	   ${wget} ${gmp_url}; \
 	   tar -zxf ${gmp_version}.tar.gz -C ${dest_build}; \
-	   cd ${dest_build}/${gmp_version}; ./configure ${gmp_options} --prefix=${DESTDIR} ${OS-FLAGS}; \
+	   cd ${dest_build}/${gmp_version}; ./configure ${gmp_options} --prefix=${DESTDIR} ${OSFLAGS}; \
 	   ${MAKE} install; \
 	   echo "GMP install: OK"; \
         else \
 	   tar -zxf ${gmp_version}.tar.gz -C ${dest_build}; \
-	   cd ${dest_build}/${gmp_version}; ./configure ${gmp_options} --prefix=${DESTDIR} ${OS-FLAGS}; \
+	   cd ${dest_build}/${gmp_version}; ./configure ${gmp_options} --prefix=${DESTDIR} ${OSFLAGS}; \
 	   ${MAKE} install; \
 	   echo "GMP install: OK"; \
 	fi
@@ -87,12 +87,12 @@ build-pbc:
 	elif [ ! -f ${pbc_version}.tar.gz ]; then \
 	   ${wget} ${pbc_url}; \
 	   tar -zxf ${pbc_version}.tar.gz -C ${dest_build}; \
-	   cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR} ${OS-FLAGS}; \
+	   cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR} ${OSFLAGS}; \
 	   ${MAKE} install; \
 	   echo "PBC install: OK"; \
 	else \
 	   tar -zxf ${pbc_version}.tar.gz -C ${dest_build}; \
-	   cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR} ${OS-FLAGS}; \
+	   cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR} ${OSFLAGS}; \
 	   ${MAKE} install; \
 	   echo "PBC install: OK"; \
 	fi

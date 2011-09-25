@@ -260,7 +260,7 @@ if [ "$targetos" == "MINGW32" ] ; then
   # enable C99/POSIX format strings (needs mingw32-runtime 3.15 or later)
   CHARM_CFLAGS="-D__USE_MINGW_ANSI_STDIO=1 $CHARM_CFLAGS"
   LIBS="-lwinmm -lws2_32 -liberty -liphlpapi $LIBS"
-  #prefix=/c/CHARM
+  #If you are building for NSIS executable, set prefix to /c/CHARM
   prefix="/mingw"
   mandir="\${prefix}"
   datadir="\${prefix}"
@@ -358,6 +358,8 @@ for opt do
   --enable-docs) docs="yes"
   ;;
   --python=*) python_path="$optarg"
+  ;;
+  --build-win-exe) OSFLAGS="LDFLAGS=\"-L/c/CHARM/lib\" CPPFLAGS=\"-I/c/CHARM/include -I/c/CHARM/include/openssl/\"" prefix=/c/CHARM
   ;;
   --*dir)
   ;;
@@ -843,7 +845,7 @@ fi
 
 if [ "$targetos" == "MINGW32" ] ; then
 	echo "PYTHON-FLAGS=--compile=mingw32" >> $config_mk
-	echo "OS-FLAGS=--disable-static --enable-shared" >> $config_mk
+	echo "OSFLAGS=--disable-static --enable-shared $OSFLAGS" >> $config_mk
 fi
 
 if test "$libm_found" = "no" ; then
