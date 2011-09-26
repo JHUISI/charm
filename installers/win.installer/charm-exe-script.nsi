@@ -1878,6 +1878,7 @@ tryPython27:
     ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\2.7\InstallPath" ""
     StrCmp $8 "" noPython hasPython27
 noPython:
+    MessageBox MB_OK "Python version(s) 3.2 / 2.7 not found, the installation will now abort."
     Abort ; We obviously don't want to install if python isn't installed.
 hasPython32:
     StrCpy $Python32Dir $8$9
