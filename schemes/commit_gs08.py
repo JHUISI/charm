@@ -47,7 +47,7 @@ class Commitment_GS08(Commitment):
         
         return ({ 'c1':c1, 'c2':c2 }, { 'r1':r1, 'r2':r2 })
         
-    def decommit(self, params, c, d, msg : ZR):
+    def decommit(self, params, c, d, msg):
         # TODO: check that the message is in the same group as the params
         (g1, g2, h1, g2) = params
         
