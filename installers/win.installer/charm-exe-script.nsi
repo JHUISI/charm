@@ -1591,55 +1591,19 @@ FunctionEnd
 
 
 
+; My first attempt to make this less painful than the installation bulk above...
+; simple remove the top most dir, and be done with it.
 Section Uninstall
   Delete "$INSTDIR\uninst.exe"
-  Delete "$INSTDIR\Charm_Crypto-0.2-py2.7.egg-info"
-  Delete "$INSTDIR\__init__.pyc"
-  Delete "$INSTDIR\__init__.py"
-  Delete "$INSTDIR\pairing.pyd"
-  Delete "$INSTDIR\integer.pyd"
-  Delete "$INSTDIR\engine\__init__.pyc"
-  Delete "$INSTDIR\engine\__init__.py"
-  Delete "$INSTDIR\engine\util.pyc"
-  Delete "$INSTDIR\engine\util.py"
-  Delete "$INSTDIR\engine\protocol.pyc"
-  Delete "$INSTDIR\engine\protocol.py"
-  Delete "$INSTDIR\ecc.pyd"
-  Delete "$INSTDIR\DES3.pyd"
-  Delete "$INSTDIR\DES.pyd"
-  Delete "$INSTDIR\cryptobase.pyd"
-  Delete "$INSTDIR\benchmark.pyd"
-  Delete "$INSTDIR\AES.pyd"
-  Delete "$INSTDIR\Charm_Crypto-0.2-py3.2.egg-info"
-  Delete "$INSTDIR\__pycache__\__init__.cpython-32.pyc"
-  Delete "$INSTDIR\__init__.pyc"
-  Delete "$INSTDIR\__init__.py"
-  Delete "$INSTDIR\pairing.pyd"
-  Delete "$INSTDIR\integer.pyd"
-  Delete "$INSTDIR\engine\__pycache__\__init__.cpython-32.pyc"
-  Delete "$INSTDIR\engine\__pycache__\util.cpython-32.pyc"
-  Delete "$INSTDIR\engine\__pycache__\protocol.cpython-32.pyc"
-  Delete "$INSTDIR\engine\__init__.pyc"
-  Delete "$INSTDIR\engine\__init__.py"
-  Delete "$INSTDIR\engine\util.pyc"
-  Delete "$INSTDIR\engine\util.py"
-  Delete "$INSTDIR\engine\protocol.pyc"
-  Delete "$INSTDIR\engine\protocol.py"
-  Delete "$INSTDIR\ecc.pyd"
-  Delete "$INSTDIR\DES3.pyd"
-  Delete "$INSTDIR\DES.pyd"
-  Delete "$INSTDIR\cryptobase.pyd"
-  Delete "$INSTDIR\benchmark.pyd"
-  Delete "$INSTDIR\AES.pyd"
-
+  Delete "$Python27Dir\Charm_Crypto-0.2-py2.7.egg-info"
+  Delete "$Python32Dir\Charm_Crypto-0.2-py3.2.egg-info"
   Delete "$SMPROGRAMS\CHARM\Uninstall.lnk"
 
   RMDir "$SMPROGRAMS\CHARM"
-  RMDir "$INSTDIR\engine\__pycache__"
-  RMDir "$INSTDIR\engine"
-  RMDir "$INSTDIR\__pycache__"
   RMDir "$INSTDIR"
-
+  RMDir  "$Python27Dir\charm\"
+  RMDir  "$Python32Dir\charm\"
+  
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   SetAutoClose true
 SectionEnd
