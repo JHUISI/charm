@@ -20,9 +20,9 @@ class InMessageRedundancy:
     def encode(self, message):
         #print("In redundancy encoding...")
         str_message = message.decode("utf-8")
-        print(type(str_message))
-        print(str_message)
-        print(str_message[-8:].encode("utf-8"))
+        #print(type(str_message))
+        #print(str_message)
+        #print(str_message[-8:].encode("utf-8"))
         str_message += str_message[-8:]
 
         return str_message.encode("utf-8")

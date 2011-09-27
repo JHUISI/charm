@@ -13,8 +13,8 @@ Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform (generic composi
 :Authors:  Matthew Green
 :Date:         1/2011
 '''
-from ibenc_bb03 import IBE_BB04
-from pksig_bls04 import IBSig
+from schemes.ibenc_bb03 import IBE_BB04
+from schemes.pksig_bls04 import IBSig
 from schemes.ibenc_adapt_identityhash import HashIDAdapter
 from toolbox.PKEnc import PKEnc
 from toolbox.pairinggroup import * #PairingGroup,GT

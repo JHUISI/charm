@@ -7,8 +7,8 @@ from toolbox.IBEnc import IBEnc
 from toolbox.pairinggroup import *
 import imp, inspect, os, re
 import unittest
-from schemes.ibe_bb03 import IBE_BB04
-from schemes.ibe_bf03 import IBE_BonehFranklin
+from schemes.ibenc_bb03 import IBE_BB04
+from schemes.ibenc_bf01 import IBE_BonehFranklin
 import all_unittests
 
 #def suite():
@@ -30,7 +30,7 @@ def autoDiscoverSchemes():
     for c in ibe_classes:
         name = "test" + c.__name__
         M = "test message"
-        group = PairingGroup('d224.param', 1024)
+        group = PairingGroup('../param/d224.param', 1024)
         func = lambda *args, **kwargs : Test.myCorrectnessTest(c, group, M)
         setattr(Test, name, func)
 
@@ -44,12 +44,12 @@ def autoDiscoverSchemes():
 
 class Test(unittest.TestCase):    
     def testIBE_bb03(self):
-        group = PairingGroup('d224.param', 1024)
+        group = PairingGroup('../param/d224.param', 1024)
         M = group.random(GT)
         self.myCorrectnessTest(IBE_BB04, group, M)
     
     def testIBE_Franklin(self):
-        group = PairingGroup('d224.param', 1024)
+        group = PairingGroup('../param/d224.param', 1024)
         M = "hello world!!"
         self.myCorrectnessTest(IBE_BonehFranklin, group, M)
     
@@ -58,7 +58,7 @@ class Test(unittest.TestCase):
         ibe_names = all_unittests.find_modules()
         ibe_classes = all_unittests.collectSubClasses(IBEnc, ibe_names)
         
-        group = PairingGroup('d224.param', 1024)
+        group = PairingGroup('../param/d224.param', 1024)
         for c in ibe_classes:
             print("Testing ", c)
             M = "test message"
@@ -68,7 +68,12 @@ class Test(unittest.TestCase):
     def myCorrectnessTest(self, scheme, group, M):
         '''Verifies that decrypt(encrypt(m)) == m'''
         # initialize the element object so that object references have global scope
-        ibe = scheme(group)
+        print(str(scheme))
+        if re.match(".*adapt*.", str(scheme)):
+            ibe = scheme(IBE_BB04(group), group)
+        else:
+            ibe = scheme(group)
+        
         (params, mk) = ibe.setup()
     
         # represents public identity
