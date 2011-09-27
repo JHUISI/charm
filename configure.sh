@@ -260,7 +260,7 @@ if [ "$targetos" == "MINGW32" ] ; then
   # enable C99/POSIX format strings (needs mingw32-runtime 3.15 or later)
   CHARM_CFLAGS="-D__USE_MINGW_ANSI_STDIO=1 $CHARM_CFLAGS"
   LIBS="-lwinmm -lws2_32 -liberty -liphlpapi $LIBS"
-  #If you are building for NSIS executable, set prefix to /c/CHARM
+  #If you are building for NSIS executable, set prefix to /c/charm-crypto
   prefix="/mingw"
   mandir="\${prefix}"
   datadir="\${prefix}"
@@ -359,7 +359,7 @@ for opt do
   ;;
   --python=*) python_path="$optarg"
   ;;
-  --build-win-exe) OSFLAGS="LDFLAGS=\"-L/c/CHARM/lib\" CPPFLAGS=\"-I/c/CHARM/include -I/c/CHARM/include/openssl/\"" prefix=/c/CHARM
+  --build-win-exe) OSFLAGS="LDFLAGS=\"-L/c/charm-crypto/lib\" CPPFLAGS=\"-I/c/charm-crypto/include -I/c/charm-crypto/include/openssl/\"" prefix=/c/charm-crypto
   ;;
   --*dir)
   ;;

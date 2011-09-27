@@ -240,14 +240,14 @@ Let's first build our dependencies with the following scripts:
 	pass the --build-win-exe flag to configure:  
 	
 		./configure.sh --python=/c/Python32/python.exe --extra-ldflags=" \
-		-L/c/CHARM/lib" --extra-cflags="-I/c/CHARM/include -I/c/CHARM/include/openssl" \
-		--build-win-exe
+		-L/c/charm-crypto/lib" --extra-cflags="-I/c/charm-crypto/include \
+		-I/c/charm-crypto/include/openssl" --build-win-exe
 	
 	This process automates
 	the compilation and installation of pbc and gmp only.  You will have
 	to build openssl with the following: 
 	
-		./config --openssldir=/c/CHARM --shared
+		./config --openssldir=/c/charm-crypto --shared
 
 BUILDING IN OS X 
 ------------------------
