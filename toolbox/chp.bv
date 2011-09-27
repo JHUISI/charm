@@ -1,10 +1,11 @@
 # variables
-N := 10
+N := 200
 M := str
 g := G2
 a := H(t1, G1)
 h := H(t2, G1)
-b := H(M | t3, ZR)
+b := ZR
+#b := H(M | t3, ZR)
 pk := G2
 sig := G1
 

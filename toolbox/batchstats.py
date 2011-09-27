@@ -14,23 +14,13 @@ class RecordOperations:
             assert False, "number of signatures not specified!" 
         # need to have type assignments 
         grps = {'ZR':0, 'G1':0, 'G2':0, 'GT':0 }
-        self.ops = {'pair':0, 'mul':grps.copy(), 'exp':grps.copy()} # , 'hash':grps.copy()}
+        self.ops = {'pair':0, 'mul':grps.copy(), 'exp':grps.copy(), 'hash':grps.copy()}
         # track prng for small exponents
     
     def visit(self, node, data):
         if node == None:
             return None
-#        elif(node.type == ops.ATTR):
-#            msg = node.attr
-#            if node.attr_index != None:
-#                msg += '[' + str(node.attr_index) + ']'
-#            return msg
-#        elif(node.type == ops.TYPE):
-#            return str(node.attr)
-        else:
-#            left = self.print_statement(node.left)
-#            right = self.print_statement(node.right)
-            
+        else:            
             if debug >= levels.some:
                print("Operation: ", node.type)
                print("Left operand: ", left)
@@ -97,6 +87,18 @@ class RecordOperations:
                 
                 self.visit(node.right, data.copy())
 #                 return (left + ", lambda " + pls.vars()  + right + ", " + pls.args() + ")")
+            elif(node.type == ops.HASH):
+                if node.right.attr == types.G1:
+                    print("value =>", node.right.attr)
+                    keys = data.get('key')
+                # print("pair: data =>", data)
+                    if keys != None:
+                        _hash = 1
+                        for i in keys:
+                            _hash *= data[i]
+                        self.ops['hash']['G1'] += _hash
+                    else:
+                        self.ops['hash']['G1'] += 1
             else:
                 return None
         return None    
@@ -150,4 +152,3 @@ class RecordOperations:
         #print("printing type =>", _type)
         #print("node =>", node)
         return self.vars_def[_type]
-            

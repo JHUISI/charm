@@ -402,7 +402,6 @@ class SmallExponent:
     # find  'prod{i} on x' transform into ==> 'prod{i} on (x)^delta_i'
     def visit_on(self, node, data):
         if node.right.type == ops.EXP:
-            print("found a winner!")
             exp = node.right
             mul = BinaryNode(ops.MUL)
             mul.right = BinaryNode("delta_i")
@@ -416,6 +415,7 @@ class SmallExponent:
             node.right = new_node
     
     def newExpNode(self):
+#        exp = BinaryNode(ops.EXP)
         p = BatchParser()
         _node = p.parse("a ^ b_i")
         return _node
@@ -524,6 +524,30 @@ class Technique4:
     
     def visit_on(self, node, data):
         pass
+
+def calculate_times(opcount, curve, N):
+    result = {}
+    total_time = 0
+    for i in opcount.keys():
+        if i == 'pair':
+            result[i] = opcount[i] * curve[i]
+            total_time += result[i]
+        else: # probably another dictionary
+            result[i] = {}
+            for j in opcount[i].keys():
+                result[i][j] = opcount[i][j] * curve[i][j]
+                total_time += result[i][j]
+    print("Measurements => ", result)
+    print("Per Signature =>", total_time / N)
+    return result
+
+def print_results(data):
+    line = "-----------------------------\n"
+    head = "|  ZR  |  G1  |  G2  |  GT  |\n"
+    msmt = head
+    msmt +=
+    
+    
         
 if __name__ == "__main__":
     print(sys.argv[1:])
@@ -561,17 +585,27 @@ if __name__ == "__main__":
 #    cg = CodeGenerator(const, vars, verify2.right)
 #    result = cg.print_batchverify()
 #    result = cg.print_statement(verify2.right)    
-
+    #curve = {'a.param': {'pair': 1.90786, 'mul': {'GT': 0.00328, 'G2': 0.0092, 'G1': 0.0093, 'ZR':0}, 
+    #                     'exp': {'GT': 0.37146, 'G2': 2.41154, 'G1': 2.40242, 'ZR':0}, 'hash':{'ZR':0, 'G1':0, 'G2':0, 'GT':0}}}
     #print("Python => '%s'" % result) # should be able to compile this
-    print("<===== Benchmark Results =====>")    
+    try:
+        import benchmarks
+        curve = benchmarks.benchmarks
+    except:
+        print("Could not find the 'benchmarks' file that has measurement results! Generate and re-run.")
+        exit(0)
+    
+    print("<===== Benchmark Results =====>")
     rop_ind = RecordOperations(vars)
     # add attrIndex to non constants
     ASTVisitor(ASTAddIndex(const, vars)).preorder(verify.right)
     print("Individual => ", verify.right)
-    rop_ind.visit(verify.right, {'key':['N'], 'N': int(vars['N']) })
+    N = int(vars['N'])
+    rop_ind.visit(verify.right, {'key':['N'], 'N': N })
     print("Results for individual verification")
     print(rop_ind)
     print()
+    calculate_times(rop_ind.ops, curve['d224.param'], N)
         
     # Apply results on optimized batch algorithm
     rop_batch = RecordOperations(vars)
@@ -579,3 +613,6 @@ if __name__ == "__main__":
     print("Batch =>", verify2.right)
     print("Results for batch verification:")
     print(rop_batch)
+
+    calculate_times(rop_batch.ops, curve['d224.param'], N)
+    

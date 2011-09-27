@@ -162,3 +162,8 @@ class output:
             return output
         return check_output
 
+"""Defining the security properties for a particular"""
+class security_properties:
+    def __init__(self, *args):
+        pass
+

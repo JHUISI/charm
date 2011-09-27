@@ -1276,6 +1276,8 @@ static PyObject *encode_message(PyObject *self, PyObject *args) {
 		debug("Message => '%s'\n", m);
 		debug("Size => '%d'\n", m_size);
 
+		// TODO: encode message into [size] + [message]
+
 		// p and q values valid
 		mpz_init(tmp);
 		mpz_import(tmp, m_size, 1, sizeof(m[0]), 0, 0, m);

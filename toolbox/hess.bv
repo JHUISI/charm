@@ -1,5 +1,5 @@
 # types {
-N := 10
+N := 200
 s := ZR
 h := G1
 S1 := GT
