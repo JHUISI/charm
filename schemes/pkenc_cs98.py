@@ -67,12 +67,11 @@ def main():
     
     (pk, sk) = pkenc.keygen(1024)
     M = "hello world. test message"
-    size = len(M)
     ciphertext = pkenc.encrypt(pk, M)
     
     message = pkenc.decrypt(pk, sk, ciphertext)
     
-    assert M[0:size] == message[0:size], "UNSUCCESSFUL!!!! :-( why?"
+    assert M == message, "UNSUCCESSFUL!!!! :-( why?"
     if debug: print("SUCCESSFULLY RECOVERED => %s" % message)
        
 if __name__ == "__main__":

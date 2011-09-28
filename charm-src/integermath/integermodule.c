@@ -1235,7 +1235,8 @@ static PyObject *genRandomPrime(Integer *self, PyObject *args) {
 }
 
 static PyObject *encode_message(PyObject *self, PyObject *args) {
-	char *m; // handle arbitrary messages
+	//char *m; // handle arbitrary messages
+	char *old_m;
 	int m_size;
 	PyObject *order, *order2;
 	Integer *pObj, *qObj;
@@ -1243,7 +1244,7 @@ static PyObject *encode_message(PyObject *self, PyObject *args) {
 	mpz_t tmp, exp, rop;
 	Integer *rop2;
 
-	if (PyArg_ParseTuple(args, "s#OO", &m, &m_size, &order, &order2)) {
+	if (PyArg_ParseTuple(args, "s#OO", &old_m, &m_size, &order, &order2)) {
 		// make sure p = 2 * q + 1
 		if (PyInteger_Check(order) && PyInteger_Check(order2)) {
 			mpz_init(p);
@@ -1273,8 +1274,16 @@ static PyObject *encode_message(PyObject *self, PyObject *args) {
 		mpz_clear(q);
 		mpz_clear(result);
 
-		debug("Message => '%s'\n", m);
+		debug("Message => '%s'\n", old_m);
 		debug("Size => '%d'\n", m_size);
+
+		char int_str[4] = "";//three digits (plus null byte) to represent length
+		snprintf(int_str, 4, "%d", m_size);
+
+		//longest message can be is 128 characters (1024 bits) => check on this!!!
+		char m[129];
+		snprintf(m, 128, "%03d%s", m_size, old_m); //3 digit number (always)
+		m_size = m_size + 3;
 
 		// TODO: encode message into [size] + [message]
 
@@ -1286,7 +1295,7 @@ static PyObject *encode_message(PyObject *self, PyObject *args) {
 		size_t e_size = mpz_sizeinbase(tmp, 2) + 2;
 		size_t p_size = mpz_sizeinbase(p, 2) + 2;
 
-		if (e_size <= p_size) {
+		if (e_size <= (p_size - 8)) {
 			print_mpz(tmp, 10);
 			debug("Order of p => '%zd'\n", p_size);
 		} else {
@@ -1377,9 +1386,27 @@ static PyObject *decode_message(PyObject *self, PyObject *args) {
 					sizeof(char), 0, 0, elem->e);
 			debug("rop => '%s'\n", Rop);
 			debug("count => '%zd'\n", count);
+
+			char int_str[4];
+			//strncpy(int_str, (const char *)Rop, 3);
+			//int_str[4] = '\0';
+
+			*int_str = '\0';
+			strncat(int_str, (const char *)Rop, 3);
+
+			int size_Rop = atoi(int_str);
+
+			char m[129];
+
+			*m = '\0';
+			strncat(m, (const char *)(Rop+3), size_Rop);
+			//strncpy(m, (const char *)(Rop+3), size_Rop);
+			//m[size_Rop] = '\0';
+
 			mpz_clear(p);
 			mpz_clear(q);
-			return PyUnicode_FromFormat("%s", (const char *) Rop);
+
+			return PyUnicode_FromFormat("%s", m);
 		}
 	}
 
