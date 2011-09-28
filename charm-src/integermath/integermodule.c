@@ -1277,12 +1277,9 @@ static PyObject *encode_message(PyObject *self, PyObject *args) {
 		debug("Message => '%s'\n", old_m);
 		debug("Size => '%d'\n", m_size);
 
-		char int_str[4] = "";//three digits (plus null byte) to represent length
-		snprintf(int_str, 4, "%d", m_size);
-
 		//longest message can be is 128 characters (1024 bits) => check on this!!!
 		char m[129];
-		snprintf(m, 128, "%03d%s", m_size, old_m); //3 digit number (always)
+		snprintf(m, 129, "%03d%s", m_size, old_m); //3 digit number (always)
 		m_size = m_size + 3;
 
 		// TODO: encode message into [size] + [message]
@@ -1295,7 +1292,7 @@ static PyObject *encode_message(PyObject *self, PyObject *args) {
 		size_t e_size = mpz_sizeinbase(tmp, 2) + 2;
 		size_t p_size = mpz_sizeinbase(p, 2) + 2;
 
-		if (e_size <= (p_size - 8)) {
+		if (e_size <= (p_size - 8)) {//I don't think this check is consistent...3 extra chars = 24 bits (not 8 even though 8 bits = 128)
 			print_mpz(tmp, 10);
 			debug("Order of p => '%zd'\n", p_size);
 		} else {

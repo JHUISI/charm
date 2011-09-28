@@ -2,9 +2,9 @@
 #ifndef INTEGERMODULE_H
 #define INTEGERMODULE_H
 
+#include <Python.h>
 #include <stdio.h>
 #include <string.h>
-#include <Python.h>
 #include <structmember.h>
 #include <longintrepr.h>				/* for conversions */
 #include <math.h>

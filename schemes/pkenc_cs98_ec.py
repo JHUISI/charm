@@ -78,6 +78,7 @@ def main():
     
     (pk, sk) = pkenc.keygen()
     M = "hello world!!!"
+
     ciphertext = pkenc.encrypt(pk, M)
     
     message = pkenc.decrypt(pk, sk, ciphertext)
