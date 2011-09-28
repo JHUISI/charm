@@ -10,7 +10,7 @@ class IBEnc(SchemeBase):
     def __init__(self):
         SchemeBase.__init__(self)
         SchemeBase.setProperty(self, scheme='IBEnc')
-        self.baseSecDefs = Enum('IND_sID_CPA', 'IND_ID_CPA', 'IND_ID_CCA1', 'IND_ID_CCA2')
+        self.baseSecDefs = Enum('IND_ID_CPA','sIND_ID_CPA','IND_ID_CCA','sIND_ID_CCA')
     
     def setup(self):
         raise NotImplementedError

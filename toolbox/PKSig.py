@@ -10,7 +10,7 @@ class PKSig(SchemeBase):
     def __init__(self):
         SchemeBase.__init__(self)
         SchemeBase.setProperty(self, scheme='PKSig')
-        self.baseSecDefs = Enum('EU_CMA')
+        self.baseSecDefs = Enum('EU_CMA', 'wEU_CMA', 'sEU_CMA')
         
     def keygen(self, securityparam):
         raise NotImplementedError		

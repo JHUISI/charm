@@ -11,7 +11,7 @@ class HashIDAdapter(IBEnc):
         # validate that we have the appropriate object
         
         if IBEnc.checkProperty(self, scheme, {'scheme':self.baseSchemeTypes.IBEnc, 
-                                        'secdef':self.baseSecDefs.IND_sID_CPA, 
+                                        'secdef':self.baseSecDefs.sIND_ID_CPA, 
                                         'id':ZR}):
             self.ibenc = scheme
             # change our property as well

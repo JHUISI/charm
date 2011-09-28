@@ -5,7 +5,8 @@ class SchemeBase:
     def __init__(self):
         self.baseSchemeTypes = Enum('PKEnc', 'PKSig', 'IBEnc', 'IBSig', 'ABEnc', 'Commitment', 'Hash', 'Protocol')
 	    # self.baseSecDefs defined by derived scheme types
-        self.baseAssumptions = Enum('DH', 'DBDH', 'DL') 
+        self.baseSecDefs = None
+        self.baseAssumptions = Enum('RSA','StrongRSA','DL','DH','CDH','DDH','DBDH','q_SDH','LRSW') 
         self.baseSecModels = Enum('SM', 'ROM')
         
     def setProperty(self, scheme=None, secdef=None, assumption=None, message_space=None, secmodel=None, other=None):
@@ -161,9 +162,3 @@ class output:
                 print(e)
             return output
         return check_output
-
-"""Defining the security properties for a particular"""
-class security_properties:
-    def __init__(self, *args):
-        pass
-

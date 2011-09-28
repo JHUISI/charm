@@ -1,11 +1,12 @@
 # bls batch inputs
 # variables
-N := 200
+N := 100
 M := str
 g2 := G2
 pk := G1
 S1 := G1
 S2 := G1
+P := G2
 #sig := (S1, S2)
 a := H(M | S1, ZR)
 
