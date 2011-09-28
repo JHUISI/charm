@@ -89,7 +89,7 @@ class RecordOperations:
 #                 return (left + ", lambda " + pls.vars()  + right + ", " + pls.args() + ")")
             elif(node.type == ops.HASH):
                 if node.right.attr == types.G1:
-                    print("value =>", node.right.attr)
+#                    print("value =>", node.right.attr)
                     keys = data.get('key')
                 # print("pair: data =>", data)
                     if keys != None:

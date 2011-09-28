@@ -5,7 +5,7 @@ M := str
 g2 := G2
 pk := G1
 S1 := G1
-S2 := G2
+S2 := G1
 #sig := (S1, S2)
 a := H(M | S1, ZR)
 

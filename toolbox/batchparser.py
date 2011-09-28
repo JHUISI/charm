@@ -525,9 +525,26 @@ class Technique4:
     def visit_on(self, node, data):
         pass
 
+def print_results(data):
+    line = "------------------------------------------------------------------------\n"
+    head = " Keys\t|\tZR\t|\tG1\t|\tG2\t|\tGT\t|\n"
+    msmt = line + head + line
+    for k in data.keys():
+        if k in ['mul', 'exp', 'hash']:
+            msmt += k + "\t|"
+            for i in ['ZR', 'G1', 'G2', 'GT']:
+                msmt += "\t" + str(data[k][i]) + "\t|"
+            msmt += "\n" + line
+    for k in data.keys():
+        if k in ['pair', 'prng']:
+            msmt += k + " => " + str(data[k]) + "  \n"
+            msmt += line            
+    print(msmt)
+    return
+
 def calculate_times(opcount, curve, N):
     result = {}
-    total_time = 0
+    total_time = 0.0
     for i in opcount.keys():
         if i == 'pair':
             result[i] = opcount[i] * curve[i]
@@ -537,18 +554,13 @@ def calculate_times(opcount, curve, N):
             for j in opcount[i].keys():
                 result[i][j] = opcount[i][j] * curve[i][j]
                 total_time += result[i][j]
-    print("Measurements => ", result)
+    print("Measurements are recorded in milliseconds.")
+    print_results(result)
+    print("Total Verification Time =>", total_time)
     print("Per Signature =>", total_time / N)
+    print()
     return result
 
-def print_results(data):
-    line = "-----------------------------\n"
-    head = "|  ZR  |  G1  |  G2  |  GT  |\n"
-    msmt = head
-    msmt +=
-    
-    
-        
 if __name__ == "__main__":
     print(sys.argv[1:])
     if sys.argv[1] == '-t':
@@ -558,8 +570,9 @@ if __name__ == "__main__":
         final = parser.parse(statement)
         print("Final statement:  '%s'" % final)
         exit(0)
-
-    
+    elif sys.argv[1] == '-p':
+        print_results(None)
+        exit(0)
     # print(ast)
     file = sys.argv[1]
     ast = parseFile(file)
@@ -576,7 +589,7 @@ if __name__ == "__main__":
     ASTVisitor(SmallExponent(const, vars)).preorder(verify2.right)
     print("\nStage 2: Small Exp Test =>", verify2, "\n")
     ASTVisitor(Technique2(const, vars)).preorder(verify2.right)
-    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)    
+    #ASTVisitor(Technique2(const, vars)).preorder(verify2.right)    
     print("\nStage 3: Apply tech 2 =>", verify2, "\n")
     ASTVisitor(Technique3(const, vars)).preorder(verify2.right)
     print("\nStage 4: Apply tech 3 =>", verify2, "\n")    
@@ -595,24 +608,25 @@ if __name__ == "__main__":
         print("Could not find the 'benchmarks' file that has measurement results! Generate and re-run.")
         exit(0)
     
+    N = int(vars['N'])
     print("<===== Benchmark Results =====>")
+    print("Assumption is N =", N)
     rop_ind = RecordOperations(vars)
     # add attrIndex to non constants
     ASTVisitor(ASTAddIndex(const, vars)).preorder(verify.right)
-    print("Individual => ", verify.right)
-    N = int(vars['N'])
+    print("<====\tINDIVIDUAL\t====>")
+    print("Equation =>", verify.right)
     rop_ind.visit(verify.right, {'key':['N'], 'N': N })
-    print("Results for individual verification")
-    print(rop_ind)
-    print()
+    print("<===\tOperations count\t===>")
+    print_results(rop_ind.ops)
     calculate_times(rop_ind.ops, curve['d224.param'], N)
-        
+    
     # Apply results on optimized batch algorithm
     rop_batch = RecordOperations(vars)
     rop_batch.visit(verify2.right, {})
-    print("Batch =>", verify2.right)
-    print("Results for batch verification:")
-    print(rop_batch)
-
+    print("<====\tBATCH\t====>")    
+    print("Equation =>", verify2.right)
+    print("<===\tOperations count\t===>")
+    print_results(rop_batch.ops)
     calculate_times(rop_batch.ops, curve['d224.param'], N)
     
