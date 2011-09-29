@@ -120,7 +120,7 @@ install:
 .PHONY: test
 test:
 	$(PYTHON) tests/all_tests.py
-#	find . -name '*.pyc' -delete
+	find . -name '*.pyc' -delete
 
 .PHONY: doc
 doc:

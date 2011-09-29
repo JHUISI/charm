@@ -31,13 +31,17 @@ def testSchemes(modules=None, skip=None):
     if skip==None:
         skip = []
     else:
-        modules = list(set(modules).difference(set(skip)))        
+        modules = list(set(modules).difference(set(skip)))
+        modules.sort() 
     
     for name in modules:
         mod = all_unittests.load_module(name)
         if hasattr(mod, 'main'):
-            case = unittest.FunctionTestCase(mod.main, None, None, mod.__name__)
-            suite.addTest(case)
+            try:
+               case = unittest.FunctionTestCase(mod.main, None, None, mod.__name__)
+               suite.addTest(case)
+            except Exception as e:
+               print("Stack Trace =>", e)
         else:
             skip.append(mod.__name__)
             

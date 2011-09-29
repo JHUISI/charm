@@ -20,8 +20,8 @@ if __name__ == '__main__':
             sys.path.append(os.path.abspath(p))
     
     suite = unittest.TestSuite()
-    suite.addTests(getAllTestsSuite(paths))
     suite.addTests(testSchemes(modules, skip))
+    suite.addTests(getAllTestsSuite(paths))
     
-    unittest.TextTestRunner(verbosity=1).run(suite)
+    unittest.TextTestRunner(verbosity=3).run(suite)
     
