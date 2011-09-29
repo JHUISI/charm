@@ -1276,11 +1276,13 @@ static PyObject *encode_message(PyObject *self, PyObject *args) {
 
 		debug("Message => '%s'\n", old_m);
 		debug("Size => '%d'\n", m_size);
-
+		
 		//longest message can be is 128 characters (1024 bits) => check on this!!!
-		char m[129];
-		snprintf(m, 129, "%03d%s", m_size, old_m); //3 digit number (always)
-		m_size = m_size + 3;
+		char m[130]; //128 byte message, 1 byte length, null byte
+		m[0] = m_size & 0xFF; //->this one works too...results in order 207
+		//snprintf(m, 3, "%02x", m_size); //-> this line works! -> results in order 208
+		snprintf((m+1), 129, "%s", old_m); //copying message over
+		m_size = m_size + 1; //we added an extra byte
 
 		// TODO: encode message into [size] + [message]
 
@@ -1289,10 +1291,11 @@ static PyObject *encode_message(PyObject *self, PyObject *args) {
 		mpz_import(tmp, m_size, 1, sizeof(m[0]), 0, 0, m);
 		// bytes_to_mpz(tmp2, (const unsigned char *) m, (size_t) m_size);
 		// print out object
-		size_t e_size = mpz_sizeinbase(tmp, 2) + 2;
+		size_t e_size = mpz_sizeinbase(tmp, 2) + 2; //was 224 with 3 decimal chars, 201 originally
 		size_t p_size = mpz_sizeinbase(p, 2) + 2;
 
-		if (e_size <= (p_size - 8)) {//I don't think this check is consistent...3 extra chars = 24 bits (not 8 even though 8 bits = 128)
+		//if (e_size <= (p_size - 8)) {//Do I even need this check??? Because I've already updated the size of the message...
+		if (e_size <= p_size) {
 			print_mpz(tmp, 10);
 			debug("Order of p => '%zd'\n", p_size);
 		} else {
@@ -1384,21 +1387,11 @@ static PyObject *decode_message(PyObject *self, PyObject *args) {
 			debug("rop => '%s'\n", Rop);
 			debug("count => '%zd'\n", count);
 
-			char int_str[4];
-			//strncpy(int_str, (const char *)Rop, 3);
-			//int_str[4] = '\0';
-
-			*int_str = '\0';
-			strncat(int_str, (const char *)Rop, 3);
-
-			int size_Rop = atoi(int_str);
+			int size_Rop = Rop[0];
 
 			char m[129];
-
 			*m = '\0';
-			strncat(m, (const char *)(Rop+3), size_Rop);
-			//strncpy(m, (const char *)(Rop+3), size_Rop);
-			//m[size_Rop] = '\0';
+			strncat(m, (const char *)(Rop+1), size_Rop);
 
 			mpz_clear(p);
 			mpz_clear(q);

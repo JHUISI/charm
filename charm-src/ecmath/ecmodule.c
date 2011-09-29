@@ -1267,7 +1267,6 @@ static PyObject *ECE_hash(ECElement *self, PyObject *args) {
  */
 static PyObject *ECE_encode(ECElement *self, PyObject *args) {
 	char *old_msg;
-	//char *msg = NULL;
 	int msg_len, bits = -1, ctr = 0;
 	BIGNUM *x = NULL, *y = NULL;
 	Group_Init(self)
@@ -1285,10 +1284,10 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
 
 		debug("max msg len => '%d'\n", max_len);
 
-		//longest message can be is 128 characters (1024 bits) => check on this!!!
-		char msg[max_len+1];
-		snprintf(msg, max_len+1, "%02d%s", msg_len, old_msg); //2 digit number (always)
-		msg_len = msg_len + 2;
+		char msg[max_len+2];
+		msg[0] = msg_len & 0xFF;
+		snprintf((msg+1), max_len+1, "%s", old_msg); //copying message over
+		msg_len = msg_len + 1; //we added an extra byte
 
 		BN_free(order);
 
@@ -1378,19 +1377,12 @@ static PyObject *ECE_decode(ECElement *self, PyObject *args) {
 			BN_free(x);
 			BN_free(y);
 
-			char int_str[3];//two character representation of size (w/ null byte)
-			//strncpy(int_str, (const char *)Rop, 3);
-			//int_str[4] = '\0';
-
-			*int_str = '\0';
-			strncat(int_str, (char*)msg, 2);
-
-			int size_msg = atoi(int_str);
+			int size_msg = msg[0];
 
 			char m[129];
 
 			*m = '\0';
-			strncat(m, (char*)(msg+2), size_msg);
+			strncat(m, (char*)(msg+1), size_msg);
 
 			return PyUnicode_FromFormat("%s", m);
 		}
