@@ -1,7 +1,7 @@
 
 from toolbox.pairinggroup import *
 from charm.pairing import hash as sha1
-from ibenc_adapt_identityhash import *
+from schemes.ibenc_adapt_identityhash import *
 from toolbox.IBEnc import *
 from charm.cryptobase import *
 from math import ceil
