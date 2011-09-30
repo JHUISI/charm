@@ -239,9 +239,7 @@ Let's first build our dependencies with the following scripts:
 	If you are building to make an executable with NSIS, than be sure to
 	pass the --build-win-exe flag to configure:  
 	
-		./configure.sh --python=/c/Python32/python.exe --extra-ldflags=" \
-		-L/c/charm-crypto/lib" --extra-cflags="-I/c/charm-crypto/include \
-		-I/c/charm-crypto/include/openssl" --build-win-exe
+		./configure.sh --python=/c/Python32/python.exe --build-win-exe
 	
 	This process automates
 	the compilation and installation of pbc and gmp only.  You will have

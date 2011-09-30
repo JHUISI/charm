@@ -10,12 +10,12 @@ dest_build=/tmp/build-charm
 # gmp source
 gmp_version=gmp-5.0.2
 gmp_url=http://ftp.gnu.org/gnu/gmp/${gmp_version}.tar.gz
-gmp_options=CC="${CC}" CPP="${CPP}" LDFLAGS=${LDFLAGS} CPPFLAGS=${CPPFLAGS} ${OSFLAGS}
+gmp_options=CC="${CC}" CPP="${CPP}" LDFLAGS="${LDFLAGS}" CPPFLAGS="${CPPFLAGS}" ${OSFLAGS}
 
 # pbc source
 pbc_version=pbc-0.5.12
 pbc_url=http://crypto.stanford.edu/pbc/files/${pbc_version}.tar.gz
-pbc_options=CC="${CC}" CPP="${CPP}"
+pbc_options=CC="${CC}" CPP="${CPP}" LDFLAGS="${LDFLAGS}" CPPFLAGS="${CPPFLAGS}" ${OSFLAGS}
 DESTDIR=${prefix}
 
 # python packages
@@ -48,11 +48,11 @@ build-pyparse:
 	   ${wget} ${pyparse_url}; \
 	   tar -zxf ${pyparse_version}.tar.gz -C ${dest_build}; \
 	   cd ${dest_build}/${pyparse_version}; \
-	   ${PYTHON} setup.py install ${PYTHON-FLAGS}; \
+	   ${PYTHON} setup.py install ${PYTHONFLAGS}; \
 	else \
 	   tar -zxf ${pyparse_version}.tar.gz -C ${dest_build}; \
 	   cd ${dest_build}/${pyparse_version}; \
-	   ${PYTHON} setup.py install ${PYTHON-FLAGS}; \
+	   ${PYTHON} setup.py install ${PYTHONFLAGS}; \
 	fi
 	set +x
 	sed "s/PYPARSING=no/PYPARSING=yes/g" ${CONFIG} > ${CONFIG}.new; mv ${CONFIG}.new ${CONFIG} 
@@ -106,7 +106,7 @@ deps: build-gmp build-pbc
 .PHONY: build
 build: setup build-gmp build-pbc build-pyparse
 	@echo "Building the Charm Framework"
-	${PYTHON} setup.py build ${PYTHON-FLAGS}
+	${PYTHON} setup.py build ${PYTHONFLAGS}
 	@echo "Complete"
 
 .PHONY: source
