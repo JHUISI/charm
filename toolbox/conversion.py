@@ -55,6 +55,15 @@ class Conversion(object):
     @classmethod
     def bytes2str(self, byteobj):
         return Bytes.decode(byteobj, 'utf-8')
+    
+    @classmethod
+    def int2bin(self, intobj):
+        _str = bin(int(intobj))
+        _array = []
+        for i in range(2, len(_str)):
+            _array.append(int(_str[i])) 
+        return _array
+        
     @classmethod    
     def OS2IP(self, bytestr, element = False):
         '''

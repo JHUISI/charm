@@ -21,6 +21,7 @@
 /* integermath */
 #define MAX_RUN 20
 #define HASH_LEN 20
+#define MSG_LEN 128
 
 //#define DEBUG   1
 //#define TRUE	1

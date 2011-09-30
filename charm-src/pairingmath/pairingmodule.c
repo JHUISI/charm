@@ -1086,7 +1086,7 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 	hash_hex = convert_buffer_to_hex(hash_buf, hash_size);
 	printf_buffer_as_hex(hash_buf, hash_size);
 	
-	str = PyUnicode_FromString((const char *) hash_hex);
+	str = PyBytes_FromString((const char *) hash_hex);
 	free(hash_hex);
 	STOP_CLOCK(dBench);
 	return str;

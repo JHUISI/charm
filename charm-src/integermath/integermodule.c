@@ -70,13 +70,6 @@ PyObject *bnToLongObj(BIGNUM *m) {
 			digitsleft--;
 			bitsleft -= PyLong_SHIFT;
 		}
-//
-//		if (digitsleft == 1) {
-//			RAND_bytes(buff, sizeof(long));
-//			memcpy(&t, buff, sizeof(long));
-//			unsigned long mask = (1 << bitsleft) - 1;
-//			*p++ = (digit)(t & PyLong_MASK & mask);
-//		}
 	}
 
 	return (PyObject *) v;
@@ -84,9 +77,6 @@ PyObject *bnToLongObj(BIGNUM *m) {
 
 int bnToMPZ(BIGNUM *p, mpz_t m) {
 	int size;
-//	mpz_t temp, temp2;
-//	mpz_init(temp);
-//	mpz_init(temp2);
 	if (!BN_is_negative(p))
 		size = p->top;
 	else
@@ -1278,10 +1268,10 @@ static PyObject *encode_message(PyObject *self, PyObject *args) {
 		debug("Size => '%d'\n", m_size);
 		
 		//longest message can be is 128 characters (1024 bits) => check on this!!!
-		char m[130]; //128 byte message, 1 byte length, null byte
+		char m[MSG_LEN+2]; //128 byte message, 1 byte length, null byte
 		m[0] = m_size & 0xFF; //->this one works too...results in order 207
 		//snprintf(m, 3, "%02x", m_size); //-> this line works! -> results in order 208
-		snprintf((m+1), 129, "%s", old_m); //copying message over
+		snprintf((m+1), MSG_LEN+1, "%s", old_m); //copying message over
 		m_size = m_size + 1; //we added an extra byte
 
 		// TODO: encode message into [size] + [message]
@@ -1389,7 +1379,7 @@ static PyObject *decode_message(PyObject *self, PyObject *args) {
 
 			int size_Rop = Rop[0];
 
-			char m[129];
+			char m[MSG_LEN+1];
 			*m = '\0';
 			strncat(m, (const char *)(Rop+1), size_Rop);
 
