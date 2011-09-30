@@ -10,7 +10,7 @@ dest_build=/tmp/build-charm
 # gmp source
 gmp_version=gmp-5.0.2
 gmp_url=http://ftp.gnu.org/gnu/gmp/${gmp_version}.tar.gz
-gmp_options=CC="${CC}" CPP="${CPP}"
+gmp_options=CC="${CC}" CPP="${CPP}" LDFLAGS=${LDFLAGS} CPPFLAGS=${CPPFLAGS} ${OSFLAGS}
 
 # pbc source
 pbc_version=pbc-0.5.12
@@ -66,12 +66,12 @@ build-gmp:
 	elif [ ! -f ${gmp_version}.tar.gz ]; then \
 	   ${wget} ${gmp_url}; \
 	   tar -zxf ${gmp_version}.tar.gz -C ${dest_build}; \
-	   cd ${dest_build}/${gmp_version}; ./configure ${gmp_options} --prefix=${DESTDIR} ${OSFLAGS}; \
+	   cd ${dest_build}/${gmp_version}; ./configure ${gmp_options} --prefix=${DESTDIR}; \
 	   ${MAKE} install; \
 	   echo "GMP install: OK"; \
         else \
 	   tar -zxf ${gmp_version}.tar.gz -C ${dest_build}; \
-	   cd ${dest_build}/${gmp_version}; ./configure ${gmp_options} --prefix=${DESTDIR} ${OSFLAGS}; \
+	   cd ${dest_build}/${gmp_version}; ./configure ${gmp_options} --prefix=${DESTDIR}; \
 	   ${MAKE} install; \
 	   echo "GMP install: OK"; \
 	fi
@@ -87,12 +87,12 @@ build-pbc:
 	elif [ ! -f ${pbc_version}.tar.gz ]; then \
 	   ${wget} ${pbc_url}; \
 	   tar -zxf ${pbc_version}.tar.gz -C ${dest_build}; \
-	   cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR} ${OSFLAGS}; \
+	   cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR}; \
 	   ${MAKE} install; \
 	   echo "PBC install: OK"; \
 	else \
 	   tar -zxf ${pbc_version}.tar.gz -C ${dest_build}; \
-	   cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR} ${OSFLAGS}; \
+	   cd ${dest_build}/${pbc_version}; ./configure ${pbc_options} --prefix=${DESTDIR}; \
 	   ${MAKE} install; \
 	   echo "PBC install: OK"; \
 	fi

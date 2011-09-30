@@ -36,7 +36,7 @@ compile_prog() {
 check_library() {
    lib_test="$1"
    tmp_file="$2"
-   $cc $lib_test 2> $tmp_file
+   $cc $LDFLAGS $lib_test 2> $tmp_file
    grep "main" $tmp_file > /dev/null
    result=$?
 #   echo "Result => $result"
@@ -148,6 +148,7 @@ for opt do
   ;;
   --extra-ldflags=*) LDFLAGS="$optarg $LDFLAGS"
   ;;
+  --extra-cppflags=*) CPPFLAGS="$optarg $CPPFLAGS"
   esac
 done
 # OS specific
@@ -170,7 +171,8 @@ CHARM_CFLAGS="-Wall -Wundef -Wwrite-strings -Wmissing-prototypes $CHARM_CFLAGS"
 #CHARM_CFLAGS="-D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE $CHARM_CFLAGS"
 #CHARM_CFLAGS="-D_FORTIFY_SOURCE=2 $CHARM_CFLAGS"
 CHARM_INCLUDES="-I. -I\$(SRC_PATH)"
-LDFLAGS="-g $LDFLAGS"
+# Need to add an --enable-debugging flag.
+#LDFLAGS="-g $LDFLAGS"
 
 # make source path absolute
 source_path=`cd "$source_path"; pwd`
@@ -359,7 +361,7 @@ for opt do
   ;;
   --python=*) python_path="$optarg"
   ;;
-  --build-win-exe) OSFLAGS="LDFLAGS=\"-L/c/charm-crypto/lib\" CPPFLAGS=\"-I/c/charm-crypto/include -I/c/charm-crypto/include/openssl/\"" prefix=/c/charm-crypto
+  --build-win-exe) LDFLAGS="-L/c/charm-crypto/lib $LDFLAGS" CPPFLAGS="-I/c/charm-crypto/include -I/c/charm-crypto/include/openssl/ $CPPFLAGS" prefix="/c/charm-crypto"
   ;;
   --*dir)
   ;;
@@ -410,6 +412,7 @@ echo "  --host-cc=CC             use C compiler CC [$host_cc] for code run at"
 echo "                           build time"
 echo "  --extra-cflags=CFLAGS    append extra C compiler flags CHARM_CFLAGS"
 echo "  --extra-ldflags=LDFLAGS  append extra linker flags LDFLAGS"
+echo "  --extra-cppflags=CPPFLAGS append extra preprocessor flasg CPPFLAGS"
 echo "  --make=MAKE              use specified make [$make]"
 echo "  --python=PATH            use specified path to python 3, if not standard"
 echo "  --install=INSTALL        use specified install [$install]"
@@ -783,6 +786,7 @@ echo "CHARM_INCLUDES=$CHARM_INCLUDES" >> $config_mk
 
 echo "HELPER_CFLAGS=$helper_cflags" >> $config_mk
 echo "LDFLAGS=$LDFLAGS" >> $config_mk
+echo "CPPFLAGS=$CPPFFLAGS" >> $config_mk
 echo "ARLIBS_BEGIN=$arlibs_begin" >> $config_mk
 echo "ARLIBS_END=$arlibs_end" >> $config_mk
 echo "LIBS+=$LIBS" >> $config_mk
