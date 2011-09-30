@@ -361,7 +361,7 @@ for opt do
   ;;
   --python=*) python_path="$optarg"
   ;;
-  --build-win-exe) LDFLAGS="-L/c/charm-crypto/lib $LDFLAGS" CPPFLAGS="-I/c/charm-crypto/include -I/c/charm-crypto/include/openssl/ $CPPFLAGS" prefix="/c/charm-crypto"
+  --build-win-exe) LDFLAGS="-L/c/charm-crypto/lib $LDFLAGS" CPPFLAGS="-I/c/charm-crypto/include -I/c/charm-crypto/include/openssl/ $CPPFLAGS" prefix="/c/charm-crypto" PYTHONFLAGS="build_ext -L/c/charm-crypto/lib -I/c/charm-crypto/include/"
   ;;
   --*dir)
   ;;
@@ -786,7 +786,7 @@ echo "CHARM_INCLUDES=$CHARM_INCLUDES" >> $config_mk
 
 echo "HELPER_CFLAGS=$helper_cflags" >> $config_mk
 echo "LDFLAGS=$LDFLAGS" >> $config_mk
-echo "CPPFLAGS=$CPPFFLAGS" >> $config_mk
+echo "CPPFLAGS=$CPPFLAGS" >> $config_mk
 echo "ARLIBS_BEGIN=$arlibs_begin" >> $config_mk
 echo "ARLIBS_END=$arlibs_end" >> $config_mk
 echo "LIBS+=$LIBS" >> $config_mk
@@ -848,7 +848,7 @@ if test "$wget" = "" ; then
 fi
 
 if [ "$targetos" == "MINGW32" ] ; then
-	echo "PYTHON-FLAGS=--compile=mingw32" >> $config_mk
+	echo "PYTHONFLAGS=--compile=mingw32 $PYTHONFLAGS" >> $config_mk
 	echo "OSFLAGS=--disable-static --enable-shared $OSFLAGS" >> $config_mk
 fi
 
