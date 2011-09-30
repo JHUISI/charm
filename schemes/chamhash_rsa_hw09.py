@@ -17,6 +17,7 @@ based on the scheme of Ateneise and de Medeiros
 
 from toolbox.Hash import *
 from toolbox.integergroup import *
+from toolbox.conversion import *
 
 class RSA_HW09(ChamHash):
     def __init__(self):
@@ -44,15 +45,13 @@ class RSA_HW09(ChamHash):
     def hash(self, pk, message, r = 0):
         N, J, e = pk['N'], pk['J'], pk['e']
         if r == 0:
-           r = group.random(N)
-       
-        print("Message =>", message)    
-        msg_int = 0
-        # TODO: iterate over bits (not working yet)
-        for b in message:
-            msg_int = msg_int << 8
-            msg_int += ord(b)
-            h = (J ** msg_int) * (r ** e)
+           r = group.random(N)       
+#        msg_int = 0
+#        for b in Conversion.int2bin(message):
+#            msg_int = msg_int << 8
+#            msg_int += ord(b)
+        M = group.encode(message)
+        h = ((J ** M) * (r ** e)) % N
         return (h, r)
 
 if __name__ == "__main__":    
@@ -60,7 +59,12 @@ if __name__ == "__main__":
     
     (pk, sk) = chamHash.paramgen(1024)
     
-    msg = 12345678
-    c = chamHash.hash(pk, msg)
-    
-    print("sig =>", c)
+    msg = "Hello world my name is joe!"
+    (h, r) = chamHash.hash(pk, msg)
+    print("Hash...")
+    print("sig =>", (h, r))
+
+    (h1, r) = chamHash.hash(pk, msg, r)
+    print("sig 2 =>", c1)
+
+    assert h == h1, "Signature generated correctly!"

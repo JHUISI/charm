@@ -10,7 +10,8 @@ Sahai-Waters Fuzzy Identity-Based Encryption, Large Universe Construction
 * setting:        bilinear groups
 
 :Authors:    Gary Belvin
-:Date:        8/2011
+:Date:       8/2011
+:Status:     Broken
 '''
 
 from toolbox.pairinggroup import *
@@ -37,8 +38,8 @@ class IBE_SW05(IBEnc):
     
     def __init__(self, groupObj):
         IBEnc.__init__(self)
-        IBEnc.setProperty(self, secdef='IND_sID_CPA', assumption='DBDH', 
-                          message_space=[GT, 'KEM'], secmodel='STANDARD', other={'id':ZR})
+        IBEnc.setProperty(self, secdef='sIND_ID_CPA', assumption='DBDH', 
+                          message_space=[GT, 'KEM'], secmodel='SM', other={'id':ZR})
         global group
         group = groupObj
         
@@ -51,8 +52,8 @@ class IBE_SW05(IBEnc):
         '''
         
         g = group.random(G1)
-        y = group.random(G1)
-        g1, g2 = g ** y, group.random(G1)
+        y = group.random(ZR)
+        g1, g2 = g ** y, group.random(G2)
         t = [group.random(G1) for x in range(n + 1)]
         
         
@@ -78,14 +79,14 @@ class IBE_SW05(IBEnc):
     def encrypt(self, pk, Wprime, M):
         '''       
         Encryption with the public key, Wprime and the message M in G2
-        E = (ω,E =Me(g1, g2)s,E = gs, {Ei = T(i)s}i∈ω ).
         '''
+        eight = group.init(ZR, 8)
         A = Wprime
-        B = M * pair(pk['g1'], pk['g2']) ** 8;
-        C = pk['g'] ** 8
+        B = M * pair(pk['g1'], pk['g2']) ** eight;
+        C = pk['g'] ** eight
         D = []
         for i in range (0):
-            D[i] = Wprime['T'](i) ** 8 # for all i in Wprime
+            D[i] = Wprime['T'](i) ** eight # for all i in Wprime
         return { 'A':A, 'B':B, 'C':C, 'D': D}
 
     def decrypt(self, pk, dID, CT):
@@ -99,17 +100,22 @@ class IBE_SW05(IBEnc):
 
 def main():
     # initialize the element object so that object references have global scope
-    groupObj = PairingGroup('../param/d224.param')
+    groupObj = PairingGroup('../param/a.param')
+    n = 10; l = 5
     ibe = IBE_SW05(groupObj)
-    (params, mk) = ibe.setup()
+    (pk, mk) = ibe.setup(n, l)
+    print("Paramter Setup...")
+    print("pk =>", pk)
+    print("mk =>", mk)
 
     # represents public identity
     kID = groupObj.random(ZR)
-    key = ibe.extract(mk, kID)
+    print("public identity =>", kID)
+    key = ibe.extract(mk, kID, pk)
 
     M = groupObj.random(GT)
-    cipher = ibe.encrypt(params, kID, M)
-    m = ibe.decrypt(params, key, cipher)
+    cipher = ibe.encrypt(pk, kID, M)
+    m = ibe.decrypt(pk, key, cipher)
 
     assert m == M, "FAILED Decryption!"
     if debug: print("Successful Decryption!! M => '%s'" % m)
