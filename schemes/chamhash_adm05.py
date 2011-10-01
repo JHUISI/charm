@@ -17,7 +17,7 @@ from toolbox.Hash import *
 from toolbox.integergroup import *
 
 debug = True
-class Adm05(ChamHash):
+class ChamHash_Adm05(ChamHash):
     def __init__(self):
         ChamHash.__init__(self)
         global group; 
@@ -47,7 +47,7 @@ class Adm05(ChamHash):
         return C
 
 if __name__ == "__main__":    
-    chamHash = Adm05()
+    chamHash = ChamHash_Adm05()
     
     #TODO: how long is paramgen supposed to take?
     (pk, sk) = chamHash.paramgen()

@@ -38,8 +38,8 @@ class KPabe(ABEnc):
         e_gg_alpha = pair(g_G1,g_G2) ** alpha
         
         #public parameters # 'g_G2^b':(g_G2 ** b), 'g_G2^b2':g_G2 ** (b * b),
-        pk = { 'g_G1':g_G1, 'g_G2':g_G2, 'g_G1^b':g1b,
-              'g_G1^b2':g1b ** b, 'h_G1^b':h_G1 ** b, 'e(gg)^alpha':e_gg_alpha }
+        pk = { 'g_G1':g_G1, 'g_G2':g_G2, 'g_G1_b':g1b,
+              'g_G1_b2':g1b ** b, 'h_G1_b':h_G1 ** b, 'e(gg)_alpha':e_gg_alpha }
         #secret parameters
         mk = { 'alpha1':alpha1, 'alpha2':alpha2, 'b':b, 'h_G1':h_G1, 'h_G2':h_G2 }
         return (pk, mk)
@@ -59,7 +59,7 @@ class KPabe(ABEnc):
                 d.append((pk['g_G1'] ** (mk['alpha2'] * shares[x])) * (group.hash(x, G1) ** r))   # compute D1 for attribute x
                 d.append((pk['g_G2'] ** r))  # compute D2 for attribute x
             #else:
-            #    d.append((pk['g2_G1'] ** shares[x]) * (pk['g_G1^b2'] ** r)) # compute D3
+            #    d.append((pk['g2_G1'] ** shares[x]) * (pk['g_G1_b2'] ** r)) # compute D3
             #    d.append((pk['g_G1^b'] ** (r * H(x, 'Zr'))) * (mk['h_G1'] ** r)) # compute D4 (not quite right)
             #    d.append(pk['g_G2'] ** -r)
             D[x] = d
@@ -86,9 +86,9 @@ class KPabe(ABEnc):
         # compute E3
         E3 = [group.hash(x, G1) ** s for x in attr_list]
         # compute E4
-        E4 = [pk['g_G1^b'] ** sx[i] for i in range(len(attr_list))]
-        E5 = [(pk['g_G1^b2'] ** (sx[i] * group.hash(attr_list[i]))) * (pk['h_G1^b'] ** sx[i]) for i in range(len(attr_list))]                
-        return {'E1':(pk['e(gg)^alpha'] ** s) * M, 'E2':pk['g_G2'] ** s, 'E3':E3, 'E4':E4, 'E5':E5, 'attributes':attr_list }
+        E4 = [pk['g_G1_b'] ** sx[i] for i in range(len(attr_list))]
+        E5 = [(pk['g_G1_b2'] ** (sx[i] * group.hash(attr_list[i]))) * (pk['h_G1_b'] ** sx[i]) for i in range(len(attr_list))]                
+        return {'E1':(pk['e(gg)_alpha'] ** s) * M, 'E2':pk['g_G2'] ** s, 'E3':E3, 'E4':E4, 'E5':E5, 'attributes':attr_list }
     
     def decrypt(self, E, D):
         attrs = E['attributes']

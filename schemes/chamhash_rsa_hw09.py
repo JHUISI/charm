@@ -19,14 +19,14 @@ from toolbox.Hash import *
 from toolbox.integergroup import *
 from toolbox.conversion import *
 
-class RSA_HW09(ChamHash):
+class ChamHash_HW09(ChamHash):
     def __init__(self):
         global group
         group = IntegerGroupQ(0)
     
     def paramgen(self, secparam, p = 0, q = 0):
         # If we're given p, q, compute N = p*q.  Otherwise select random p, q
-        if p != 0 and q != 0:
+        if not (p == 0 and q == 0):
             N = p * q
         else:
             group.paramgen(secparam)
@@ -45,21 +45,17 @@ class RSA_HW09(ChamHash):
     def hash(self, pk, message, r = 0):
         N, J, e = pk['N'], pk['J'], pk['e']
         if r == 0:
-           r = group.random(N)       
-#        msg_int = 0
-#        for b in Conversion.int2bin(message):
-#            msg_int = msg_int << 8
-#            msg_int += ord(b)
-        M = group.encode(message)
+           r = group.random(N)
+        M = Conversion.bytes2integer(message)
         h = ((J ** M) * (r ** e)) % N
         return (h, r)
 
 if __name__ == "__main__":    
-    chamHash = RSA_HW09()
+    chamHash = ChamHash_HW09()
     
     (pk, sk) = chamHash.paramgen(1024)
     
-    msg = "Hello world my name is joe!"
+    msg = "Hello world this is the message!"
     (h, r) = chamHash.hash(pk, msg)
     print("Hash...")
     print("sig =>", (h, r))

@@ -1228,7 +1228,6 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 	// third case: a tuple with one element and
 	else if(PyElement_Check(objList)) {
 			// one element
-		printf("third case is being executed...\n");
 		object = (Element *) objList;
 		if(object->elem_initialized == FALSE) {
 			tmp = "element not initialized.";

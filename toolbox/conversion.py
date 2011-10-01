@@ -27,27 +27,14 @@ class Conversion(object):
     * Integer element
     * Integer element mod N
     '''
-    @classmethod
-    def extractType(self, value):
-        value_t = str(type(value))
-        start, stop = value_t.find("'"), value_t.rfind("'")
-        return value_t[start+1:stop] 
-    
-    # TODO: may need to track the setting as well so that target type makes sense?
-    # valid mappings are recorded in the corresponding conversion type dict
-    # if a func doesn't exist then return invalid conversion, right?
-    # convertForEcc, convertForPair, convertForInt?
-    @classmethod
-    def convert(self, source, target):     
-        key = Conversion.extractType(source) + '2' + target
-        return source
+
     @classmethod
     def bytes2element(self, bytestr):
         '''Converts a byte string to a group element'''
         pass
     @classmethod
     def bytes2integer(self, bytestr):
-        '''Converts a bytes string to an int of a particular bit-length?'''
+        '''Converts a bytes string to an integer object'''
         return integer(bytestr)
     @classmethod
     def str2bytes(self, strobj):
@@ -111,13 +98,3 @@ class Conversion(object):
             x = x >> 8
         ba.reverse()
         return Bytes(ba)
-
-# define dict of conversions
-conversion_types = {'bytes2str': Conversion.bytes2str, 
-                    'bytes2intE':Conversion.bytes2integer, 
-                    'bytes2pairE':None, 
-                    'bytes2eccE':None,
-                    'str2bytes':Conversion.str2bytes,
-                    'str2intE':None, 
-                    'str2pairE':None, 
-                    'str2eccE':None }
