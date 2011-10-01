@@ -14,7 +14,8 @@ El Gamal Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption in g
 
 from toolbox.integergroup import IntegerGroupQ
 from toolbox.ecgroup import *
-from toolbox.PKEnc import *
+from toolbox.PKEnc import PKEnc
+from toolbox.eccurve import prime192v2
 
 debug = False
 class ElGamalCipher(dict):
@@ -96,7 +97,7 @@ class ElGamal(PKEnc):
         return M
 
 def main():
-    el = ElGamal(ecc, 410)    
+    el = ElGamal(ecc, prime192v2)    
     (pk, sk) = el.keygen()
     msg = "hello world!"
     size = len(msg)

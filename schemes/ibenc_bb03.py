@@ -15,7 +15,7 @@ Boneh-Boyen Identity Based Encryption
 
 from toolbox.pairinggroup import *
 from charm.cryptobase import *
-from toolbox.IBEnc import *
+from toolbox.IBEnc import IBEnc
 from charm.pairing import hash as sha1
 
 debug = False

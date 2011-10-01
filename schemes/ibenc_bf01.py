@@ -14,7 +14,7 @@ Boneh-Franklin Identity Based Encryption
 '''
 from toolbox.pairinggroup import *
 from toolbox.hash_module import *
-from toolbox.IBEnc import *
+from toolbox.IBEnc import IBEnc
 
 debug = False
 class IBE_BonehFranklin(IBEnc):

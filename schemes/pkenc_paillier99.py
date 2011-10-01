@@ -13,7 +13,7 @@ Pascal Paillier (Public-Key)
 :Date:            4/2011
 '''
 from charm.integer import *
-from toolbox.PKEnc import *
+from toolbox.PKEnc import PKEnc
 
 debug = False
 """A ciphertext class with homomorphic properties"""

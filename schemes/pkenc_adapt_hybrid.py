@@ -4,7 +4,7 @@ import random, string
 # Works for ElGamal and CS98 schemes
 #from ec_cs98_enc import *
 from schemes.pkenc_elgamal85 import *
-from toolbox.PKEnc import *
+from toolbox.PKEnc import PKEnc
 from charm.cryptobase import *
 from math import ceil
 

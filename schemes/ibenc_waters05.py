@@ -11,7 +11,7 @@
 ''' 
 
 from charm.cryptobase import *
-from toolbox.IBEnc import *
+from toolbox.IBEnc import IBEnc
 from toolbox.bitstring import Bytes
 from toolbox.conversion import Conversion
 from toolbox.pairinggroup import *

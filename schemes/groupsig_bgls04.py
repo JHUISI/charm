@@ -13,7 +13,7 @@ Dan Boneh, Xavier Boyen, and Hovav Shacham
 :Date:           12/2010
 '''
 from toolbox.pairinggroup import *
-from toolbox.PKSig import *
+from toolbox.PKSig import PKSig
 
 class ShortSig(PKSig):
     def __init__(self, groupObj):

@@ -1,5 +1,6 @@
 from toolbox.ecgroup import *
-from toolbox.PKSig import *
+from toolbox.PKSig import PKSig
+from toolbox.eccurve import prime192v2
 
 debug = False
 class ECDSA(PKSig):
@@ -38,7 +39,7 @@ class ECDSA(PKSig):
         else:
             return False
 def main():
-    groupObj = ECGroup(409)
+    groupObj = ECGroup(prime192v2)
     ecdsa = ECDSA(groupObj)
     
     (pk, sk) = ecdsa.keygen(0)

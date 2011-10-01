@@ -18,6 +18,7 @@ Cramer-Shoup Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption 
 '''
 from toolbox.ecgroup import *
 from toolbox.PKEnc import *
+from toolbox.eccurve import prime192v1
 
 # type definitions
 pk_t = { 'g1' : G, 'g2' : G, 'c' : G, 'd' : G, 'h' : G }
@@ -74,7 +75,7 @@ class EC_CS98(PKEnc):
         return group.decode(c['e'] / (c['u1'] ** sk['z']))
 
 def main():
-    pkenc = EC_CS98(409)
+    pkenc = EC_CS98(prime192v1)
     
     (pk, sk) = pkenc.keygen()
     M = "hello world!!!"
