@@ -19,6 +19,7 @@ from toolbox.IBEnc import *
 from charm.pairing import hash as sha1
 import operator
 from functools import reduce
+import sys
 
 debug = False
 class IBE_SW05(IBEnc):
@@ -52,6 +53,10 @@ class IBE_SW05(IBEnc):
             for j in range(len(wPrime)):
                 if(w[i] == wPrime[j]):
                     S.append(w[i])
+
+        if(len(S) < d):
+            print("Cannot decrypt.  w and w' do not have enough attributes in common.")
+            sys.exit()
 
         S_sub  = [S[k] for k in range(d)]
         return S_sub
