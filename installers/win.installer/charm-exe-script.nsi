@@ -90,7 +90,6 @@ ShowUnInstDetails show
 
 ; This section, dependencies, must be installed.  So no user option control!
 Section # Install Charm Dependencies
-MessageBox MB_OK $INSTDIR
   SetOutPath "$INSTDIR\bin"
   SetOverwrite try
   File /r "C:\charm-crypto\bin\"
