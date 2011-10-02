@@ -81,6 +81,11 @@ class IBE_SW05(IBEnc):
         return (pk, mk)
     
     def extract(self, mk, ID, pk, dOver, n):
+        prefix = '0'
+        w_hash = []
+        for i in range(len(ID)):
+            w_hash.append(group.hash((prefix,ID[i]), ZR))
+
         #a d-1 degree polynomial q is generated such that q(0) = y
         q = [group.random(ZR) for x in range(dOver)]
         q[0] = mk['y']
@@ -90,7 +95,7 @@ class IBE_SW05(IBEnc):
         D = []
         d = []
         q_i = group.init(ZR,0)
-        for i in ID:
+        for i in w_hash:
             #evaluate q(i)
             for x in range(dOver):
                 j = group.init(ZR,x)
@@ -99,12 +104,17 @@ class IBE_SW05(IBEnc):
             D.append((pk['g2'] ** q_i) * (self.eval_T(pk,n,i) ** r_i))
             d.append(pk['g'] ** r_i)
 
-        return { 'D':D, 'd':d }        
+        return (w_hash, { 'D':D, 'd':d })
 
     def encrypt(self, pk, Wprime, M, n):
         '''       
         Encryption with the public key, Wprime and the message M in G2
         '''
+        prefix = '0'
+        wprime_hash = []
+        for i in range(len(Wprime)):
+            wprime_hash.append(group.hash((prefix,Wprime[i]), ZR))
+
         s = group.random(ZR)
 
         Eprime = M * (pair(pk['g1'],pk['g2']) ** s)
@@ -112,10 +122,10 @@ class IBE_SW05(IBEnc):
         Eprimeprime = pk['g'] ** s
 
         E = []
-        for i in Wprime:
+        for i in wprime_hash:
             E.append(self.eval_T(pk,n,i) ** s)
 
-        return { 'wPrime':Wprime, 'Eprime':Eprime, 'Eprimeprime':Eprimeprime, 'E':E}
+        return { 'wPrime':wprime_hash, 'Eprime':Eprime, 'Eprimeprime':Eprimeprime, 'E':E}
 
     def decrypt(self, pk, dID, CT, w, d):
         '''dID must have an intersection overlap of at least d with Wprime to decrypt
@@ -143,10 +153,13 @@ def main():
     print("pk =>", pk)
     print("mk =>", mk)
 
-    w = [group.init(ZR,1), group.init(ZR,3), group.init(ZR,5), group.init(ZR,7), group.init(ZR,9)] #private identity
-    wPrime = [group.init(ZR,1), group.init(ZR,2), group.init(ZR,3), group.init(ZR,7), group.init(ZR,9)] #public identity
+    #w = [group.init(ZR,1), group.init(ZR,3), group.init(ZR,5), group.init(ZR,7), group.init(ZR,9)] #private identity
+    #wPrime = [group.init(ZR,1), group.init(ZR,2), group.init(ZR,3), group.init(ZR,7), group.init(ZR,9)] #public identity
 
-    key = ibe.extract(mk, w, pk, d, n)
+    w = ["doctor","nurse","JHU","oncology","id=12345"] #private identity
+    wPrime = ["id=12345","insurance","oncology","JHU","misc"] #public identity
+
+    (w, key) = ibe.extract(mk, w, pk, d, n)
 
     M = groupObj.random(G2)
     cipher = ibe.encrypt(pk, wPrime, M, n)
