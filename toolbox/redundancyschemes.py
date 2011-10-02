@@ -18,17 +18,12 @@ class InMessageRedundancy:
         pass        
 
     def encode(self, message):
-        #print("In redundancy encoding...")
         str_message = message.decode("utf-8")
-        #print(type(str_message))
-        #print(str_message)
-        #print(str_message[-8:].encode("utf-8"))
         str_message += str_message[-8:]
 
         return str_message.encode("utf-8")
     
     def decode(self, encMessage):
-        #print("In redundancy decoding...")
         byte_message = bytearray(encMessage)
 
         if(byte_message[-8:] ==  byte_message[-16:-8]):
@@ -40,10 +35,7 @@ class ExtraBitsRedundancy:
     '''
     :Authors: Christina Garman
     
-    OAEPEncryptionPadding
-    
-    Implements the OAEP padding scheme.  Appropriate for RSA-OAEP encryption.
-    Implemented according to PKCS#1 v2.1 Section 7 ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf
+    TODO    
     '''
     def __init__(self):
         pass        
@@ -58,11 +50,8 @@ class ExtraBitsRedundancy:
 class WilliamsRedundancy:
     '''
     :Authors: Christina Garman
-    
-    OAEPEncryptionPadding
-    
-    Implements the OAEP padding scheme.  Appropriate for RSA-OAEP encryption.
-    Implemented according to PKCS#1 v2.1 Section 7 ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf
+
+    TODO    
     '''
     def __init__(self):
         pass        

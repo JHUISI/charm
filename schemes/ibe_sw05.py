@@ -1,7 +1,7 @@
 '''
-Sahai-Waters Fuzzy Identity-Based Encryption, Large Universe Construction
+Sahai-Waters Fuzzy Identity-Based Encryption
  
-| From: "A. Sahai, B. Waters Fuzy Identity-Based Encryption, Section 6.
+| From: "A. Sahai, B. Waters Fuzy Identity-Based Encryption, Section 4.
 | Published in: Eurocrypt 2005
 | Available from: eprint.iacr.org/2004/086.pdf
 | 
@@ -9,8 +9,8 @@ Sahai-Waters Fuzzy Identity-Based Encryption, Large Universe Construction
 * type:            encryption (identity-based)
 * setting:        bilinear groups
 
-:Authors:    Gary Belvin
-:Date:       8/2011
+:Authors:    Gary Belvin & Christina Garman
+:Date:       10/2011
 :Status:     Broken
 '''
 
@@ -30,11 +30,21 @@ class IBE_SW05(IBEnc):
            - ``i`` in Zp
            - ``S`` a set of elements in Zp
         '''
-        result = 1
+        result = group.init(ZR,1)
         for j in S:
-            if j != i:
-                result *= (x - i) / (i - j)
+            if not(j == i):
+                result = result * ((x - j) / (i - j))
         return result
+
+    def intersection_subset(self, w, wPrime, d):
+        S = []
+        for i in range(len(w)):
+            for j in range(len(wPrime)):
+                if(w[i] == wPrime[j]):
+                    S.append(w[i])
+
+        S_sub  = [S[k] for k in range(d)]
+        return S_sub
     
     def __init__(self, groupObj):
         IBEnc.__init__(self)
@@ -43,79 +53,81 @@ class IBE_SW05(IBEnc):
         global group
         group = groupObj
         
-    def setup(self, n, d):
-        '''
-        :Parameters:
-           - ``n``: the maximum number of attributes in the system.
-                    OR the maximum length of an identity
-           - ``d``: the set overlap required to decrypt
-        '''
-        
+    def setup(self, u):
         g = group.random(G1)
         y = group.random(ZR)
-        g1, g2 = g ** y, group.random(G2)
-        t = [group.random(G1) for x in range(n + 1)]
+        Y = pair(g,g) ** y
+        t = [group.random(ZR) for x in range(u)]
         
-        
-        N = [(x + 1) for x in range(n + 1)] 
-        #The Legrange Coefficient
-        Delta = lambda i, S, x : reduce(operator.mul, [(x - i) / (i - j) for j in filter(lambda a: a!=i, S)])     
-        T = lambda x: (g2**x)**n * reduce(operator.mul, [t[i-1]**Delta(i,N,x) for i in N])
+        T = [g ** t[x] for x in range(u)]
          
-        pk = { 'g':g, 'g1':g1, 'g2': g2, 't':t} 
-        mk = { 'y':y }         # master secret
+        pk = { 'g':g, 'T':T, 'Y':Y } 
+        mk = { 't':t, 'y':y }         # master secret
+
         return (pk, mk)
     
-    def extract(self, mk, ID, pk):
-        #a d-1 degree polynomial q is generated such that q(0) = y
-        q = 0
-        r_i = group.random(G1)
+    def extract(self, mk, ID, pk, d):
+        q = [group.random(ZR) for x in range(d)]
+        q[0] = mk['y']
+
         D=[]
-        for i in range (0):
-            D[i] = pk['g2'] ** q(i) * pk['T'](i) ** r_i
-            D[i] = pk['g'] ** r_i 
+        q_i = group.init(ZR,0)
+        for i in ID:
+            #evaluate q(i)
+            for x in range(d):
+                j = group.init(ZR,x)
+                q_i = q_i + (q[x] * (i ** j))
+            D.append(pk['g'] ** (q_i/mk['t'][int(i)]))
+
+        return D
         
 
     def encrypt(self, pk, Wprime, M):
         '''       
         Encryption with the public key, Wprime and the message M in G2
         '''
-        eight = group.init(ZR, 8)
-        A = Wprime
-        B = M * pair(pk['g1'], pk['g2']) ** eight;
-        C = pk['g'] ** eight
-        D = []
-        for i in range (0):
-            D[i] = Wprime['T'](i) ** eight # for all i in Wprime
-        return { 'A':A, 'B':B, 'C':C, 'D': D}
+        s = group.random(ZR)
+        Eprime = M * (pk['Y'] ** s);
 
-    def decrypt(self, pk, dID, CT):
+        E = []
+        for i in Wprime:
+            E.append(pk['T'][int(i)] ** s)
+
+        return { 'wPrime':Wprime, 'Eprime':Eprime, 'E':E}
+
+    def decrypt(self, pk, dID, CT, w, d):
         '''dID must have an intersection overlap of at least d with Wprime to decrypt
         '''
-        S = set()#Verify set overlap
-        Delta = pk['delta']
-        M = CT['B'] * reduce(operator.mul, [(pair(dID['d'][i], CT['D'][i])/pair(dID['D'][i], CT['C']))**Delta(i,S,0) for i in S])
-        
+        S = self.intersection_subset(w, CT['wPrime'], d)
+
+        prod = 1
+        for i in S:
+            j = w.index(i)
+            k = CT['wPrime'].index(i)
+            prod = prod * pair(dID[j], CT['E'][k]) ** self.legrange_coeff(i, S, group.init(ZR,0))
+
+        M = CT['Eprime']/prod
+
         return M
 
 def main():
     # initialize the element object so that object references have global scope
     groupObj = PairingGroup('../param/a.param')
-    n = 10; l = 5
     ibe = IBE_SW05(groupObj)
-    (pk, mk) = ibe.setup(n, l)
-    print("Paramter Setup...")
-    print("pk =>", pk)
-    print("mk =>", mk)
 
-    # represents public identity
-    kID = groupObj.random(ZR)
-    print("public identity =>", kID)
-    key = ibe.extract(mk, kID, pk)
+    u = 10 #universe
+    d = 3 #overlap
 
-    M = groupObj.random(GT)
-    cipher = ibe.encrypt(pk, kID, M)
-    m = ibe.decrypt(pk, key, cipher)
+    (pk, mk) = ibe.setup(u)
+
+    w = [group.init(ZR,1), group.init(ZR,3), group.init(ZR,5), group.init(ZR,7), group.init(ZR,9)] #private identity
+    key = ibe.extract(mk, w, pk, d)
+    wPrime = [group.init(ZR,1), group.init(ZR,2), group.init(ZR,3), group.init(ZR,4), group.init(ZR,7), group.init(ZR,9)]
+
+    M = groupObj.random(G2)
+
+    cipher = ibe.encrypt(pk, wPrime, M)
+    m = ibe.decrypt(pk, key, cipher, w, d)
 
     assert m == M, "FAILED Decryption!"
     if debug: print("Successful Decryption!! M => '%s'" % m)
