@@ -107,22 +107,22 @@ Section # Install Charm Dependencies
   ;File "C:\charm-crypto\private"
   SetOutPath "$INSTDIR\share"
   File /r "C:\charm-crypto\share\"
-  ;SetOutPath "$INSTDIR\tests"
-  ;File /r /x "C:\MinGW\msys\1.0\home\dev\charm-crypto\tests\.svn\" "C:\MinGW\msys\1.0\home\dev\charm-crypto\tests\"
+  ;SetOutPath "$INSTDIR\schemes"
+  ;File /r /x "C:\MinGW\msys\1.0\home\dev\charm-crypto\schemes\.svn\" "C:\MinGW\msys\1.0\home\dev\charm-crypto\schemes\"
   SetOutPath "$INSTDIR"
   File "C:\charm-crypto\openssl.cnf"  
   ; Using EnvVarUpdate here:
   ; http://nsis.sourceforge.net/Environmental_Variables:_append,_prepend,_and_remove_entries
   ; Warning about setting path, if you already have a crowded PATH it could mess it up.
   ; So I am going to write the original path to charm-crypto  
-  nsExec::Exec 'echo %PATH% > $INSTDIR\old-path.txt'
+  Exec "echo %PATH% > $INSTDIR\old-path.txt"
   ${EnvVarUpdate} $0 "PATH" "A" "HKLM" "$INSTDIR\bin"
   
   CreateDirectory "$SMPROGRAMS\charm-crypto"
   CreateShortCut "$SMPROGRAMS\charm-crypto\uninstall.lnk" "$INSTDIR\uninst.exe"
 SectionEnd
 
-Section /o "Python32" python32_detected
+Section /o "" python32_detected
   SetOutPath "$Python32Dir\charm"
   SetOverwrite try
   File /r "C:\Python32\Lib\site-packages\charm\"
@@ -136,9 +136,11 @@ Section /o "Python32" python32_detected
   SetOverwrite ifnewer
   ; CHANGEME on every new release.
   File "C:\Python32\Lib\site-packages\Charm_Crypto-0.2-py3.2.egg-info"
+  ;CreateShortcut "$SMPROGRAMS\charm-crypto\schemes-py32.lnk" "$windir\explorer.exe" '/e,"$Python32Dir\schemes"'
+  CreateShortCut "$SMPROGRAMS\charm-crypto\schemes-py32.lnk" "$Python32Dir\schemes"
 SectionEnd
 
-Section /o "Python27" python27_detected
+Section /o "" python27_detected
   SetOutPath "$Python27Dir\charm"
   SetOverwrite try
   File /r "C:\Python27\Lib\site-packages\charm\"
@@ -152,6 +154,8 @@ Section /o "Python27" python27_detected
   SetOverwrite ifnewer
   ; CHANGEME on every new release.
   File "C:\Python27\Lib\site-packages\Charm_Crypto-0.2-py2.7.egg-info"
+  ;CreateShortcut "$SMPROGRAMS\charm-crypto\schemes-py27.lnk" "$windir\explorer.exe" '/e,"$Python27Dir\schemes"'
+  CreateShortCut "$SMPROGRAMS\charm-crypto\schemes-py27.lnk" "$Python27Dir\schemes"  
 SectionEnd
 
 Section -AdditionalIcons
@@ -183,7 +187,26 @@ SectionEnd
 ; we can identify a python directory for installation.  This should
 ; allow Windows users to install for both 3.2 and 2.7.
 Function .onInit
-    StrCpy $9 "Lib\site-packages\"
+  ; Always uninstall before installing the latest version.
+  ReadRegStr $R0 HKLM \
+  "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" \
+  "UninstallString"
+  StrCmp $R0 "" checkPython
+ 
+  MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
+  "${PRODUCT_NAME} is already installed. $\n$\nClick `OK` to remove the \
+  previous version or `Cancel` to cancel this upgrade." \
+  IDOK uninst
+  Abort
+ 
+; Run the uninstaller.
+uninst:
+  ClearErrors
+  Exec $INSTDIR\uninst.exe ; instead of the ExecWait line
+
+; Check for python installation and version.
+checkPython:
+    StrCpy $9 "Lib\site-packages"
     ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\3.2\InstallPath" ""
     StrCmp $8 "" tryPython27 hasPython32
 tryPython27:
@@ -194,11 +217,13 @@ noPython:
     Abort ; We obviously don't want to install if python isn't installed.
 hasPython32:
     StrCpy $Python32Dir $8$9
+	SectionSetText ${python32_detected} "Python32"
     !insertmacro SelectSection ${python32_detected}
     ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\2.7\InstallPath" ""
     StrCmp $8 "" done hasPython27
 hasPython27:
     StrCpy $Python27Dir $8$9
+	SectionSetText ${python27_detected} "Python27"	
     !insertmacro SelectSection ${python27_detected}
 done:
     ;Debug =)
@@ -215,11 +240,11 @@ FunctionEnd
 
 ; Callback function to query the user to check out the website.
 ; TODO
-;Function .onInstSuccess
-;     MessageBox MB_YESNO "You have successfully installed Charm-Crypto!  Would you like to visit the home page?" IDNO NoReadme
-;          Exec 'C:\Program Files\Internet Explorer\iexplore.exe '
-;     NoReadme:
-;FunctionEnd
+Function .onInstSuccess
+     MessageBox MB_YESNO "You have successfully installed Charm-Crypto!  Would you like to visit the home page?" IDNO NoReadme
+          Exec 'C:\Program Files\Internet Explorer\iexplore.exe ${PRODUCT_WEB_SITE}'
+     NoReadme:
+FunctionEnd
 ; Installation Callback Functions end ------
 
 
@@ -244,28 +269,34 @@ Section Uninstall
 
   ; Uninstall charm directory.
   Delete "$INSTDIR\uninst.exe"
-  Delete "$SMPROGRAMS\charm-crypto\Uninstall.lnk"
+  Delete "$SMPROGRAMS\charm-crypto\Uninstall.lnk" 
   RMDir /r "$SMPROGRAMS\charm-crypto"
   RMDir /r "$INSTDIR"
   ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\bin" 
   
+  StrCpy $9 "Lib\site-packages"
+  ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\3.2\InstallPath" ""
   ; Depending on what version of python you installed, uninstall.
-  StrCmp $Python32Dir "" tryPython27 hasPython32
+  StrCmp $8 "" tryPython27 hasPython32
   tryPython27:
-      StrCmp $Python27Dir "" done hasPython27
+	  ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\3.2\InstallPath" ""
+	  StrCmp $8 "" done hasPython27
   hasPython32:
-      RMDir /r "$Python32Dir\charm\"
-	  RMDir /r "$Python32Dir\compiler\"
-	  RMDir /r "$Python32Dir\schemes\"
-	  RMDir /r "$Python32Dir\toolbox\"
-      Delete "$Python32Dir\Charm_Crypto-0.2-py3.2.egg-info"
-	  StrCmp $Python27Dir "" done hasPython27
+      RMDir /r "$8$9\charm\"
+	  RMDir /r "$8$9\compiler\"
+	  RMDir /r "$8$9\schemes\"
+	  RMDir /r "$8$9\toolbox\"
+      Delete "$8$9\Charm_Crypto-0.2-py3.2.egg-info"
+      Delete "$SMPROGRAMS\charm-crypto\schemes-py32.lnk" 	  
+	  ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\3.2\InstallPath" ""
+	  StrCmp $8 "" done hasPython27
   hasPython27:
-      RMDir /r "$Python27Dir\charm\"
-	  RMDir /r "$Python27Dir\compiler\"
-	  RMDir /r "$Python27Dir\schemes\"
-	  RMDir /r "$Python27Dir\toolbox\"  
-      Delete "$Python27Dir\Charm_Crypto-0.2-py2.7.egg-info"
+      RMDir /r "$8$9\charm\"
+	  RMDir /r "$8$9\compiler\"
+	  RMDir /r "$8$9\schemes\"
+	  RMDir /r "$8$9\toolbox\"  
+      Delete "$8$9\Charm_Crypto-0.2-py2.7.egg-info"
+	  Delete "$SMPROGRAMS\charm-crypto\schemes-py27.lnk"
   done:
       ;Don't do anything when done.
   
