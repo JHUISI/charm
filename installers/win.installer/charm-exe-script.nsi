@@ -90,21 +90,37 @@ ShowUnInstDetails show
 
 ; This section, dependencies, must be installed.  So no user option control!
 Section # Install Charm Dependencies
+MessageBox MB_OK $INSTDIR
   SetOutPath "$INSTDIR\bin"
   SetOverwrite try
-  ; This should make life easier, don't have to statically include all files.
-  File /r "C:\charm-crypto"
-  CreateDirectory "$SMPROGRAMS\charm-crypto"
-  CreateShortCut "$SMPROGRAMS\charm-crypto\uninstall.lnk" "$INSTDIR\uninst.exe"
+  File /r "C:\charm-crypto\bin\"
+  ;SetOutPath "$INSTDIR\certs"
+  ;File "C:\charm-crypto\certs"
+  SetOutPath "$INSTDIR\include"
+  File /r "C:\charm-crypto\include\"  
+  SetOutPath "$INSTDIR\lib"
+  File /r "C:\charm-crypto\lib\"
+  SetOutPath "$INSTDIR\man"
+  File /r "C:\charm-crypto\man\"
+  SetOutPath "$INSTDIR\misc"
+  File /r "C:\charm-crypto\misc\"
+  ;SetOutPath "$INSTDIR\private"
+  ;File "C:\charm-crypto\private"
+  SetOutPath "$INSTDIR\share"
+  File /r "C:\charm-crypto\share\"
+  ;SetOutPath "$INSTDIR\tests"
+  ;File /r /x "C:\MinGW\msys\1.0\home\dev\charm-crypto\tests\.svn\" "C:\MinGW\msys\1.0\home\dev\charm-crypto\tests\"
+  SetOutPath "$INSTDIR"
+  File "C:\charm-crypto\openssl.cnf"  
   ; Using EnvVarUpdate here:
   ; http://nsis.sourceforge.net/Environmental_Variables:_append,_prepend,_and_remove_entries
   ; Warning about setting path, if you already have a crowded PATH it could mess it up.
-  ; So I am going to write the original path to charm-crypto
-  FileOpen $4 "$INSTDIR\original-path.txt" w
-  FileWrite $4 `nsExec:ExecToLog "echo %PATH%`
-  FileClose $4
+  ; So I am going to write the original path to charm-crypto  
+  nsExec::Exec 'echo %PATH% > $INSTDIR\old-path.txt'
   ${EnvVarUpdate} $0 "PATH" "A" "HKLM" "$INSTDIR\bin"
   
+  CreateDirectory "$SMPROGRAMS\charm-crypto"
+  CreateShortCut "$SMPROGRAMS\charm-crypto\uninstall.lnk" "$INSTDIR\uninst.exe"
 SectionEnd
 
 Section /o "Python32" python32_detected
@@ -115,7 +131,7 @@ Section /o "Python32" python32_detected
   File /r "C:\Python32\Lib\site-packages\compiler\"
   SetOutPath "$Python32Dir\schemes"
   File /r "C:\Python32\Lib\site-packages\schemes\"
-  SetOutPath "$Python32Dir\schemes\toolbox"
+  SetOutPath "$Python32Dir\toolbox"
   File /r "C:\Python32\Lib\site-packages\toolbox\"
   SetOutPath "$Python32Dir"
   SetOverwrite ifnewer
@@ -127,10 +143,6 @@ Section /o "Python27" python27_detected
   SetOutPath "$Python27Dir\charm"
   SetOverwrite try
   File /r "C:\Python27\Lib\site-packages\charm\"
-  ;SetOutPath "$Python27Dir\charm\engine\__pycache__"
-  ;File "C:\Python27\Lib\site-packages\charm\engine\__pycache__\protocol.cpython-27.pyc"
-  ;File "C:\Python27\Lib\site-packages\charm\engine\__pycache__\util.cpython-27.pyc"
-  ;File "C:\Python27\Lib\site-packages\charm\engine\__pycache__\__init__.cpython-27.pyc"
   SetOutPath "$Python27Dir\compiler"
   File /r "C:\Python27\Lib\site-packages\compiler\"
   SetOutPath "$Python27Dir\schemes"
@@ -206,7 +218,7 @@ FunctionEnd
 ; TODO
 ;Function .onInstSuccess
 ;     MessageBox MB_YESNO "You have successfully installed Charm-Crypto!  Would you like to visit the home page?" IDNO NoReadme
-;          Exec explorer.exe
+;          Exec 'C:\Program Files\Internet Explorer\iexplore.exe '
 ;     NoReadme:
 ;FunctionEnd
 ; Installation Callback Functions end ------
@@ -234,8 +246,8 @@ Section Uninstall
   ; Uninstall charm directory.
   Delete "$INSTDIR\uninst.exe"
   Delete "$SMPROGRAMS\charm-crypto\Uninstall.lnk"
-  RMDir "$SMPROGRAMS\charm-crypto"
-  RMDir "$INSTDIR"
+  RMDir /r "$SMPROGRAMS\charm-crypto"
+  RMDir /r "$INSTDIR"
   ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\bin" 
   
   ; Depending on what version of python you installed, uninstall.
@@ -243,17 +255,17 @@ Section Uninstall
   tryPython27:
       StrCmp $Python27Dir "" done hasPython27
   hasPython32:
-      RMDir "$Python32Dir\charm\"
-	  RMDir "$Python32Dir\compiler\"
-	  RMDir "$Python32Dir\schemes\"
-	  RMDir "$Python32Dir\toolbox\"
+      RMDir /r "$Python32Dir\charm\"
+	  RMDir /r "$Python32Dir\compiler\"
+	  RMDir /r "$Python32Dir\schemes\"
+	  RMDir /r "$Python32Dir\toolbox\"
       Delete "$Python32Dir\Charm_Crypto-0.2-py3.2.egg-info"
 	  StrCmp $Python27Dir "" done hasPython27
   hasPython27:
-      RMDir "$Python27Dir\charm\"
-	  RMDir "$Python27Dir\compiler\"
-	  RMDir "$Python27Dir\schemes\"
-	  RMDir "$Python27Dir\toolbox\"  
+      RMDir /r "$Python27Dir\charm\"
+	  RMDir /r "$Python27Dir\compiler\"
+	  RMDir /r "$Python27Dir\schemes\"
+	  RMDir /r "$Python27Dir\toolbox\"  
       Delete "$Python27Dir\Charm_Crypto-0.2-py2.7.egg-info"
   done:
       ;Don't do anything when done.
