@@ -37,6 +37,7 @@ SetCompressor lzma
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
 !include "Sections.nsh"
+!include "EnvVarUpdate.nsh"
 
 ; MUI Settings
 !define MUI_ABORTWARNING
@@ -95,6 +96,15 @@ Section # Install Charm Dependencies
   File /r "C:\charm-crypto"
   CreateDirectory "$SMPROGRAMS\charm-crypto"
   CreateShortCut "$SMPROGRAMS\charm-crypto\uninstall.lnk" "$INSTDIR\uninst.exe"
+  ; Using EnvVarUpdate here:
+  ; http://nsis.sourceforge.net/Environmental_Variables:_append,_prepend,_and_remove_entries
+  ; Warning about setting path, if you already have a crowded PATH it could mess it up.
+  ; So I am going to write the original path to charm-crypto
+  FileOpen $4 "$INSTDIR\original-path.txt" w
+  FileWrite $4 `nsExec:ExecToLog "echo %PATH%`
+  FileClose $4
+  ${EnvVarUpdate} $0 "PATH" "A" "HKLM" "$INSTDIR\bin"
+  
 SectionEnd
 
 Section /o "Python32" python32_detected
@@ -226,6 +236,7 @@ Section Uninstall
   Delete "$SMPROGRAMS\charm-crypto\Uninstall.lnk"
   RMDir "$SMPROGRAMS\charm-crypto"
   RMDir "$INSTDIR"
+  ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\bin" 
   
   ; Depending on what version of python you installed, uninstall.
   StrCmp $Python32Dir "" tryPython27 hasPython32
