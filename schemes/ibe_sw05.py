@@ -55,7 +55,7 @@ class IBE_SW05(IBEnc):
                     S.append(w[i])
 
         if(len(S) < d):
-            print("Cannot decrypt.  w and w' do not have enough attributes in common.")
+            assert False, "Cannot decrypt.  w and w' do not have enough attributes in common."
             sys.exit()
 
         S_sub  = [S[k] for k in range(d)]
@@ -154,9 +154,10 @@ def main():
     n = 5; d = 3
     ibe = IBE_SW05(groupObj)
     (pk, mk) = ibe.setup(n, d)
-    print("Parameter Setup...")
-    print("pk =>", pk)
-    print("mk =>", mk)
+    if debug:
+        print("Parameter Setup...")
+        print("pk =>", pk)
+        print("mk =>", mk)
 
     #w = [group.init(ZR,1), group.init(ZR,3), group.init(ZR,5), group.init(ZR,7), group.init(ZR,9)] #private identity
     #wPrime = [group.init(ZR,1), group.init(ZR,2), group.init(ZR,3), group.init(ZR,7), group.init(ZR,9)] #public identity
