@@ -12,14 +12,14 @@ installation blocks highlighting each respective implementation.
 
 Before we begin, please note the current dependencies:
     
-	Python3 or Python2.7
+	Python2.7 or Python3
 	Pyparsing http://pyparsing.wikispaces.com/
     GMP http://www.swox.com/gmp/
     PBC http://crypto.stanford.edu/pbc/news.html 
     OPENSSL http://www.openssl.org/
 
 	---
-	See ./configure --help for other options.
+	See ./configure.sh --help for other options.
 	
 	
 BUILDING IN LINUX
@@ -263,5 +263,8 @@ The steps for building in os x this way are:
 	
 [Snow Leopard]
 
+
 [Lion]
+
+For Lion, run ./configure.sh --enable-darwin in step 1 and follow the steps above for OS X.
 

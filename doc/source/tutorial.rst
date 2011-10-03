@@ -6,7 +6,7 @@ Before we begin using Charm, make sure you have the following libraries installe
 
 - Openssl library [v0.9 or greater]
 
-- Python [v3 or greater]
+- Python [v2.7, v3 or greater]
 
 - 'easy_install' python setup tool
 
@@ -17,14 +17,14 @@ Install Charm
 
 Now, to get things going simply execute the configure script packaged with Charm::
 
-   ./configure
+   ./configure.sh
    
 .. note::
 	there are several build options you may set for your environment. For instance, if your python 3 installation is in a non-standard location, then add --python=/path/to/python/3 to configure. 
 	
 For other build options, execute::
 
-	./configure --help
+	./configure.sh --help
    
 Once configure runs successfully, proceed to build and install Charm. Depending on your environment, these commands may require you have super user privileges. So, prepend the following with 'sudo' or 'su'::
 
@@ -48,6 +48,7 @@ Typical implementations follow an object-oriented model such that an implementat
 ::
 
 	from toolbox.ecgroup import *
+	from toolbox.PKEnc import *	
 
 	class CS98(PKEnc):
 	     def __init__(self, curve):
@@ -62,7 +63,7 @@ Thus, at the beginning of the scheme, you must import the corresponding group se
 	
 	from toolbox.ecgroup import *
 
-Next, let's explain what goes on during class initialization. During ``__init__``, you define the basic security properties of the ``PKEnc`` scheme and in this case accept as input a NIST standard elliptic curve identifier. The group object can either be defined globally or defined as a class member. The idea is that any routine within this scheme will have access to the group object to perform any operation. In our example, we define group as a global variable. Alternatively, you could define group as ``self.group = ECGroup(curve)``.
+Next, let's explain what goes on during class initialization. During ``__init__``, you define the basic security properties of the ``PKEnc`` scheme and in this case accept as input a NIST standard elliptic curve identifier. With respect to elliptic curve parameters, see ``toolbox.eccurve.py`` for a full list of possible curves that can be used to instantiate the ``ECGroup`` object. The group object can either be defined globally or defined as a class member. The idea is that any routine within this scheme will have access to the group object to perform any operation. In our example, we define group as a global variable. Alternatively, you could define group as ``self.group = ECGroup(prime192v1)``.
 
 .. note::
 	Also, the ``init`` routine arguments can vary depending on the scheme and group setting. What is shown above is only an example and see other schemes we have implemented for other possibilities.

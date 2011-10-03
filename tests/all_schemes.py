@@ -13,7 +13,7 @@ modules = None
 # Restrict modules to these schemes (which actually work) until further notice.
 #modules = ['ibenc_bf03', 'abemultiauth_hybrid', 'sig_short_bls04', 'kpabe', 'cpabe07', 'cpabe09', 'ecdsa', 'elgamal', 'ibe_bb03',
  #           'hashIDAdapt', 'hybridenc', 'hybridibenc', 'dabe_aw11', 'commit_92', 'chk04_enc', 'sig_generic_ibetosig_naor01', 'ibe_n05']
-skip = ['pksig_rsa_hw09', 'pksig_dsa', 'ake_ecmqv']
+skip = ['pksig_rsa_hw09', 'pkenc_cs98', 'ake_ecmqv']
 
 def testSchemes(modules=None, skip=None):
     '''
