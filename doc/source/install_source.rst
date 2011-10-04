@@ -180,7 +180,7 @@ Next, we will install Charm. Navigate to the Charm directory.
         3. And finally we must rebuild the searchpath for libraries
                 ``su -c "ldconfig"``
 
-Fedora/Mint x86_64
+Mint x86_64
 --------------------------------------
 
 Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
