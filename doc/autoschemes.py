@@ -5,6 +5,8 @@ Author: Gary Belvin
 '''
 import os, re
 
+skipList = ['ake_ecmqv', 'pksig_rsa_hw09', 'bls04']
+
 def find_modules(path="."):
     modules = list()
     for filename in os.listdir(path):
@@ -14,7 +16,15 @@ def find_modules(path="."):
 
     #Exclude unit tests
     modules = [mod for mod in modules if not re.match(".*_test$", mod)]
+    modules = [mod for mod in modules if not re.match("batch.*", mod)]
+    modules = [mod for mod in modules if not re.match("bench.*", mod)]
+    try:
+        for i in skipList:
+            modules.remove(i)    
+    except:
+        pass
     modules.sort(key=str.lower)
+    print("Modules selected =>", modules)
     return modules
 
 def gen_toc(modules, keyword, rel_mod_dir=""):

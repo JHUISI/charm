@@ -1,4 +1,4 @@
-How To Get Started
+Quick Start Guide
 ==================
 
 
@@ -10,7 +10,6 @@ Before we begin using Charm, make sure you have the following libraries installe
 
 - 'easy_install' python setup tool
 
-- the pyparsing package
 
 Install Charm
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -20,7 +19,7 @@ Now, to get things going simply execute the configure script packaged with Charm
    ./configure.sh
    
 .. note::
-	there are several build options you may set for your environment. For instance, if your python 3 installation is in a non-standard location, then add --python=/path/to/python/3 to configure. 
+	there are several build options you may set for your environment. For instance, if your python 3 installation is in a non-standard location, then add ``--python=/path/to/python/3`` to configure. See Platform Install Manual for more details for your respective platform.
 	
 For other build options, execute::
 
@@ -62,6 +61,7 @@ Thus, at the beginning of the scheme, you must import the corresponding group se
 ::
 	
 	from toolbox.ecgroup import *
+	from toolbox.eccurve import prime192v1
 
 Next, let's explain what goes on during class initialization. During ``__init__``, you define the basic security properties of the ``PKEnc`` scheme and in this case accept as input a NIST standard elliptic curve identifier. With respect to elliptic curve parameters, see ``toolbox.eccurve.py`` for a full list of possible curves that can be used to instantiate the ``ECGroup`` object. The group object can either be defined globally or defined as a class member. The idea is that any routine within this scheme will have access to the group object to perform any operation. In our example, we define group as a global variable. Alternatively, you could define group as ``self.group = ECGroup(prime192v1)``.
 

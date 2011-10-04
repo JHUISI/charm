@@ -3,7 +3,8 @@
 include ../config.mk
 # You can set these variables from the command line.
 SPHINXOPTS    =
-SPHINXBUILD   = sphinx-build
+#SPHINXBUILD   = sphinx-build
+SPHINXBUILD   = $(SPHINX)
 PAPER         =
 BUILDDIR      = build
 

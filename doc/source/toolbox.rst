@@ -7,11 +7,10 @@ Toolbox Classes
 
    toolbox/ABEnc
    toolbox/ABEncMultiAuth
-   toolbox/batchlang
-   toolbox/batchparser
    toolbox/bitstring
    toolbox/Commit
    toolbox/conversion
+   toolbox/eccurve
    toolbox/ecgroup
    toolbox/enum
    toolbox/Hash
@@ -24,6 +23,7 @@ Toolbox Classes
    toolbox/PKEnc
    toolbox/PKSig
    toolbox/policytree
+   toolbox/redundancyschemes
    toolbox/schemebase
    toolbox/secretutil
    toolbox/securerandom
