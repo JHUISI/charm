@@ -24,7 +24,7 @@ def find_modules(path="."):
     except:
         pass
     modules.sort(key=str.lower)
-    print("Modules selected =>", modules)
+    #print("Modules selected =>", modules)
     return modules
 
 def gen_toc(modules, keyword, rel_mod_dir=""):

@@ -1,6 +1,9 @@
 
-# Openssl Elliptic Curve Parameters
-# `openssl ecparam -list_curve`
+""" Openssl Elliptic Curve Parameters
+Run ``openssl ecparam -list_curve`` for a quick glance at the identifiers.
+
+import the ``toolbox.eccurve`` module to see the full listing for Charm.
+"""
 
 prime192v1 = 409
 prime192v2 = 410

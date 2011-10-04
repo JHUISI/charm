@@ -40,7 +40,7 @@ help:
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
 
 clean:
-	-rm -rf $(BUILDDIR)/*
+	-rm -rf $(BUILDDIR)/html/*.html
 
 publish: html
 	cd build; git clone -b gh-pages git@github.com:mdgreen98/charm.git; cp -r html/* charm/; cd charm; git add .; git commit -m '`date`'; git push

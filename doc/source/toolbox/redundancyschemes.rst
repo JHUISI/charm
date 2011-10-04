@@ -1,7 +1,7 @@
 
-pkenc_adapt_hybridenc
+redundancyschemes
 =========================================
-.. automodule:: pkenc_adapt_hybridenc
+.. automodule:: redundancyschemes
     :show-inheritance:
     :members:
     :undoc-members:

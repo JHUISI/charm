@@ -1,7 +1,7 @@
 
-batchparser
+eccurve
 =========================================
-.. automodule:: batchparser
+.. automodule:: eccurve
     :show-inheritance:
     :members:
     :undoc-members:
