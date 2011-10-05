@@ -256,7 +256,7 @@ fi
 : ${make=${MAKE-make}}
 : ${install=${INSTALL-install}}
 
-if [ "$targetos" == "MINGW32" ] ; then
+if [ "$targetos" = "MINGW32" ] ; then
   EXESUF=".exe"
   CHARM_CFLAGS="-DWIN32_LEAN_AND_MEAN -DWINVER=0x501 $CHARM_CFLAGS"
   # enable C99/POSIX format strings (needs mingw32-runtime 3.15 or later)
@@ -835,7 +835,7 @@ elif test "$pairing_miracl" = "yes" ; then
 fi
 
 if test "$wget" = "" ; then
-	if [ "$targetos" == "MINGW32" ] ; then
+	if [ "$targetos" = "MINGW32" ] ; then
 		printf "wget not found!\n\n.Will now run Internet Explorer to download wget for windows.\n\n Please be sure to add the GNU32 bin directory to your path! Right-click Computer, Properties, Advanced System Settings, Advanced, Environment Variables, Path."
 		/c/Program\ Files/Internet\ Explorer/iexplore.exe http://downloads.sourceforge.net/gnuwin32/wget-1.11.4-1-setup.exe
 		rm $config_mk
@@ -847,7 +847,7 @@ if test "$wget" = "" ; then
 	fi
 fi
 
-if [ "$targetos" == "MINGW32" ] ; then
+if [ "$targetos" = "MINGW32" ] ; then
 	echo "PYTHONFLAGS=--compile=mingw32 $PYTHONFLAGS" >> $config_mk
 	echo "OSFLAGS=--disable-static --enable-shared $OSFLAGS" >> $config_mk
 fi
@@ -858,7 +858,7 @@ if test "$libm_found" = "no" ; then
    exit -1
 fi 
 
-if [ "$targetos" == "MINGW32" ] ; then
+if [ "$targetos" = "MINGW32" ] ; then
 	# Windows allowing spaces in directories is a no-no.
 	echo "wget=\"$wget\"" >> $config_mk
 else
