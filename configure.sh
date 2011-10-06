@@ -106,6 +106,7 @@ cc_i386=i386-pc-linux-gnu-gcc
 # Distributions want to ensure that several features are compiled in, and it
 # is impossible without a --enable-foo that exits if a feature is not found.
 docs=""
+sphinx_build="$(which sphinx-build)"
 integer_module="yes"
 ecc_module="yes"
 pairing_module="yes"
@@ -359,6 +360,8 @@ for opt do
   ;;
   --enable-docs) docs="yes"
   ;;
+  --sphinx-build=*) sphinx_build="$optarg"
+  ;;
   --python=*) python_path="$optarg"
   ;;
   --build-win-exe) LDFLAGS="-L/c/charm-crypto/lib $LDFLAGS" CPPFLAGS="-I/c/charm-crypto/include -I/c/charm-crypto/include/openssl/ $CPPFLAGS" prefix="/c/charm-crypto" PYTHONFLAGS="build_ext -L/c/charm-crypto/lib -I/c/charm-crypto/include/"
@@ -434,6 +437,7 @@ echo "  --disable-werror         disable compilation abort on warning"
 echo "  --enable-cocoa           enable COCOA (Mac OS X only)"
 echo "  --enable-docs            enable documentation build"
 echo "  --disable-docs           disable documentation build"
+echo "	--sphinx-build=PATH      overide the defualt sphinx-build which is \`which sphinx-build\`"       
 echo ""
 echo "NOTE: The object files are built at the place where configure is launched"
 exit 1
@@ -694,6 +698,7 @@ echo "libm found        $libm_found"
 echo "libgmp found      $libgmp_found"
 echo "libpbc found      $libpbc_found"
 echo "libcrypto found   $libcrypto_found"
+echo "sphinx path       $sphinx_"
 
 #if test "$darwin" = "yes" ; then
 #    echo "Cocoa support     $cocoa"
@@ -810,9 +815,12 @@ if test "$gprof" = "yes" ; then
 fi
 
 if test "$docs" = "yes" ; then
+  if test "$sphinx_build" = ""; then 
+    echo "ERROR: sphinx-build not found"
+    exit -1 
+  fi
   mkdir -p docs;
 fi
-
 if test "$python3_found" = "no" ; then
    echo "ERROR: python 3 not found."
    exit -1
@@ -869,5 +877,7 @@ echo "HAVE_LIBGMP=$libgmp_found" >> $config_mk
 echo "HAVE_LIBPBC=$libpbc_found" >> $config_mk
 echo "HAVE_LIBCRYPTO=$libcrypto_found" >> $config_mk
 echo "PYPARSING=$pyparse_found" >> $config_mk
-
+if test "$docs" = "yes" ; then
+    echo "SPHINX=$sphinx_build" >> $config_mk
+fi
 exit 0
