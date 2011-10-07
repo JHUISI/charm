@@ -1,3 +1,5 @@
+.. _platform-install-manual:
+
 Platform Install Manual 
 ===========================================
 
@@ -130,6 +132,7 @@ Red Hat/Fedora has decided not to support ECC in OpenSSL due to patent concerns,
                 2. Open the OpenSSL configuration file for editing using your editor of choice
                         ``su -c "vi opensslconf-i386.h"``
                 3. Remove the flags that restrict the use of ECC
+
 Delete (at the beginning of file):
 ::
 
@@ -219,8 +222,7 @@ Next, we will install Charm. Navigate to the Charm directory.
 Building in Windows
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Note that the entire compilation process is now supported by the Charm configure/make scripts.
-The steps for building in mingw32 this way are:
+Note that the entire compilation process is now supported by the Charm configure/make scripts. The steps for building in mingw32 this way are:
         1. Download the latest source version of openssl.
         2. Run MinGW Shell.
     	3. Extract openssl, configure and install as shown below.
@@ -232,6 +234,7 @@ The steps for building in mingw32 this way are:
     	    ``Make build``
 
             ``Make install``
+
 .. note::
 	Another way to install dependencies is to follow the Windows blocks below.
 
@@ -274,8 +277,7 @@ Building in Mac OS X
 
 Leopard v10.6
 -------------------------------------
-Note that the entire compilation process is supported by the Charm configure/make scripts.
-The steps for building in os x this way are:
+Note that the entire compilation process is supported by the Charm configure/make scripts. The steps for building in os x this way are:
     1. In a terminal, run ``configure.sh``
     2. Make sure you have ``wget`` installed otherwise this process may fail at the ``wget`` check, and will ask you to install.
     3. Using your package manager of choice (e.g., ``sudo port install wget``), install wget.
@@ -295,6 +297,7 @@ Lion v10.7
 In Lion, Apple has made the decision to deprecate the openssl library in favor of their Common-Crypto library implementation. As a result, you'll have to make some modifications to the library in order to use it with Charm. Please follow the steps below then proceed to install Charm:
     1. Edit the ``crypto.h`` header file at ``/usr/include/openssl/crypto.h``
     2. Add the following before the ``crypto.h`` header definition:
+
 ::
 
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"

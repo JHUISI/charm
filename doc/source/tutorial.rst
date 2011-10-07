@@ -1,40 +1,8 @@
-Quick Start Guide
+How To Get Started
 ==================
-
-
-Before we begin using Charm, make sure you have the following libraries installed:
-
-- Openssl library [v0.9 or greater]
-
-- Python [v2.7, v3 or greater]
-
-- 'easy_install' python setup tool
-
-
-Install Charm
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Now, to get things going simply execute the configure script packaged with Charm::
-
-   ./configure.sh
-   
-.. note::
-	there are several build options you may set for your environment. For instance, if your python 3 installation is in a non-standard location, then add ``--python=/path/to/python/3`` to configure. See Platform Install Manual for more details for your respective platform.
-	
-For other build options, execute::
-
-	./configure.sh --help
-   
-Once configure runs successfully, proceed to build and install Charm. Depending on your environment, these commands may require you have super user privileges. So, prepend the following with 'sudo' or 'su'::
-
-   make build
-   make install
-   
-At this point to verify that Charm has been installed properly, launch your python 3 interpreter and import the pairing base module::
-
-   >>> from charm.pairing import *
-   
-If there are no errors or exceptions, Charm has successfully been installed in your environment. Proceed to testing out one of our existing cryptographic scheme implementations in the schemes source directory or learn how to write your own. Refer to the implement a scheme tutorial. 
+Instalation and dependencies
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+See :ref:`platform-install-manual` for instructions instalation instructions
 
 Implement a Scheme
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -47,7 +15,6 @@ Typical implementations follow an object-oriented model such that an implementat
 ::
 
 	from toolbox.ecgroup import *
-	from toolbox.PKEnc import *	
 
 	class CS98(PKEnc):
 	     def __init__(self, curve):
@@ -61,9 +28,8 @@ Thus, at the beginning of the scheme, you must import the corresponding group se
 ::
 	
 	from toolbox.ecgroup import *
-	from toolbox.eccurve import prime192v1
 
-Next, let's explain what goes on during class initialization. During ``__init__``, you define the basic security properties of the ``PKEnc`` scheme and in this case accept as input a NIST standard elliptic curve identifier. With respect to elliptic curve parameters, see ``toolbox.eccurve.py`` for a full list of possible curves that can be used to instantiate the ``ECGroup`` object. The group object can either be defined globally or defined as a class member. The idea is that any routine within this scheme will have access to the group object to perform any operation. In our example, we define group as a global variable. Alternatively, you could define group as ``self.group = ECGroup(prime192v1)``.
+Next, let's explain what goes on during class initialization. During ``__init__``, you define the basic security properties of the ``PKEnc`` scheme and in this case accept as input a NIST standard elliptic curve identifier. The group object can either be defined globally or defined as a class member. The idea is that any routine within this scheme will have access to the group object to perform any operation. In our example, we define group as a global variable. Alternatively, you could define group as ``self.group = ECGroup(curve)``.
 
 .. note::
 	Also, the ``init`` routine arguments can vary depending on the scheme and group setting. What is shown above is only an example and see other schemes we have implemented for other possibilities.
@@ -146,5 +112,8 @@ Finally, the decryption routine as described by the paper. Given a ciphertext, t
 .. note::
    Since the scheme defines messages as a group element, it is important to use the encode/decode methods to convert the message string into a member of the group, G. This helps transform a cryptographic scheme usable for a real application.  However, the pairing group does not currently implement the routines for encoding/decoding messages as group elements. We utilize other techniques for pairings to provide the ability to convert from/to different message spaces.
 
-This concludes the tutorial on a straightforward implementation of the Cramer-Shoup public-key encryption cryptosystem. Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at support@charm-crypto.com. Thank you!
+Using a Scheme
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+This section is incomplete
 
+This concludes the tutorial on a straightforward implementation of the Cramer-Shoup public-key encryption cryptosystem. Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at support@charm-crypto.com. Thank you!
