@@ -1,5 +1,5 @@
 
-from batchparser import addAsChildNodeToParent
+from batchparser import *
 from batchlang import *
 import string
 
@@ -42,7 +42,8 @@ class InstanceFinder:
         return
                     
 
-
+# substitute nodes that can be precomputed with a stub
+# variable that is computed later
 class Subsitute:
     def __init__(self, op_instance, precomp):
         # assert input is not equal to None

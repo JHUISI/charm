@@ -1,5 +1,6 @@
 from batchlang import *
 from batchparser import *
+import sys
 
 class PrintLambdaStatement:
     def __init__(self, constants):
@@ -115,3 +116,14 @@ def dotprod(i, n, func, *args):
 """
         # compile func and return ref?
         return func
+
+if __name__ == "__main__":
+    file = sys.argv[1]
+    ast = parseFile(file)
+    (const, verify, vars) = astParser(ast)
+
+    cg = CodeGenerator(const, vars, verify.right)
+    result = cg.print_batchverify()
+    result = cg.print_statement(verify.right)
+    
+    print("Result =>", result)
