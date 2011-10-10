@@ -288,7 +288,7 @@ def astParser(astList):
     for i in astList:
         s = str(i.left)
         if s == 'constant':
-            constants.append(i.right)
+            constants.append(str(i.right))
         elif s == 'verify':
             verify_eq = i
         else:
@@ -711,8 +711,9 @@ if __name__ == "__main__":
     # test
     Instfind = InstanceFinder()
     ASTVisitor(Instfind).preorder(verify2.right)
-    # Instfind.checkDuplicate()
-    
+    print("Instances found =>", Instfind.instance)
+
+        
     exit(0)
 #    cg = CodeGenerator(const, vars, verify2.right)
 #    result = cg.print_batchverify()

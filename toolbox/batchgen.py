@@ -122,8 +122,24 @@ if __name__ == "__main__":
     ast = parseFile(file)
     (const, verify, vars) = astParser(ast)
 
-    cg = CodeGenerator(const, vars, verify.right)
+    # START
+    print("\nVERIFY EQUATION =>", verify, "\n")
+    verify2 = BinaryNode.copy(verify)
+    ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
+    ASTVisitor(SimplifyDotProducts()).preorder(verify2.right)
+
+    print("\nStage 1: Combined Equation =>", verify2, "\n")
+    ASTVisitor(SmallExponent(const, vars)).preorder(verify2.right)
+    print("\nStage 2: Small Exp Test =>", verify2, "\n")
+    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)
+    #ASTVisitor(Technique2(const, vars)).preorder(verify2.right)    
+    print("\nStage 3: Apply tech 2 =>", verify2, "\n")
+    ASTVisitor(Technique3(const, vars)).preorder(verify2.right)
+    print("\nStage 4: Apply tech 3 =>", verify2, "\n")    
+    # END 
+
+    cg = CodeGenerator(const, vars, verify2.right)
     result = cg.print_batchverify()
-    result = cg.print_statement(verify.right)
+    result = cg.print_statement(verify2.right)
     
     print("Result =>", result)

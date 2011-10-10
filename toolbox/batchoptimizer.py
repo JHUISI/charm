@@ -40,7 +40,7 @@ class InstanceFinder:
 
         self.instance[ key ] = { value: 1 }
         return
-                    
+
 
 # substitute nodes that can be precomputed with a stub
 # variable that is computed later
@@ -73,10 +73,13 @@ class Subsitute:
         if left.type == ops.ATTR:
             if right.type == ops.ATTR:
                 key = self.canBePrecomputed(left, right)
-                if key:
-                    # make substitution
-                    new_node = BinaryNode(key)
-                    addAsChildNodeToParent(data, new_node)
-                else:
-                    pass # no need to apply any substitutions
+#                if key:
+#                    # make substitution
+#                    new_node = BinaryNode(key)
+#                    addAsChildNodeToParent(data, new_node)
+#                else:
+#                    pass # no need to apply any substitutions
+            elif right.type == ops.MUL:
+                node_1 = right.left
+                node_2 = right.right
                     
