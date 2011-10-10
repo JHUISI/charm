@@ -2,6 +2,7 @@ from pyparsing import *
 #from batchlang import *
 from batchgen import *
 from batchstats import *
+from batchoptimizer import *
 import string,sys
 
 objStack = []
@@ -178,6 +179,98 @@ def parseFile(filename):
     fd.close()
     return ast_tree
 
+# keywords
+START_TOKEN, END_TOKEN = 'BEGIN', 'END'
+TYPE, CONST, PRECOMP, OTHER = 'types', 'constant', 'precompute', 'other'
+
+def clean(arr):
+    return [i.strip() for i in arr]
+
+def handle(lines, target):
+    parser = BatchParser()
+    if type(lines) != list:
+        return parser.parse(lines)
+
+    # check that right hand side is a node for all
+#    if target == PRECOMP:
+#        _ast = {}
+#        for line in lines:
+#            ast_node = parser.parse(line)
+#                _ast.append(ast_node)
+#        print("Precomputation =>")
+#        return _ast
+    if target == CONST:
+        # parse differently 'a, b, etc.\n'
+        _ast = []
+        for line in lines:
+            l = line.split(',')
+            _ast = [i.strip() for i in l]
+        print(target, " =>", _ast)
+        return _ast
+    elif target in [TYPE, PRECOMP]:
+        _ast = {}
+        for line in lines:
+            ast_node = parser.parse(line)
+            # make sure it's an assignment node
+            # otherwise, ignore the node
+            if ast_node.type == ops.EQ:
+                left = str(ast_node.left)
+                right = str(ast_node.right)
+                _ast[ left ] = right
+        print(target, " =>", _ast)
+        return _ast
+    return None
+
+debugs = levels.all
+
+def parseFile2(filename):
+    fd = open(filename, 'r')
+    ast = {TYPE: None, CONST: None, PRECOMP: None, OTHER: [] }
+    
+    # parser = BatchParser()
+    code = fd.readlines(); i = 1
+    inStruct = (False, None)
+    queue = []
+    for line in code:
+        if line.find('::') != -1: # parse differently
+            token = clean(line.split('::'))
+            if token[0] == START_TOKEN and (token[1] in [TYPE, CONST, PRECOMP]):
+                inStruct = (True, token[1])
+                if debugs == levels.all: print("Got a section!!!")
+                continue
+            elif inStruct[0]:
+                # continue until we reach an end token, then
+                # test if end token matches the start token, if so can handle queue 
+                key = token[1]
+                if token[0] == END_TOKEN and inStruct[1] == key:
+                    ast[ key ] = handle(queue, key)
+                    if debugs == levels.all:
+                        print("section =>", key)
+                        # print("queue =>", queue)
+                        # print("result =>", ast[key])
+                    # check for global syntax error and exit
+                    queue = [] # tmp remove everything
+                    inStruct = (False, None)  
+            else:
+                print("Syntax Error while parsing section: ", line)
+
+        else: # if not, keep going and assume that we can safely add lines to queue
+            if inStruct[0]:
+                queue.append(line)
+            elif len(line.strip()) == 0 or line[0] == '#':
+                print(line)
+                continue
+            else:
+                if debugs == levels.all: 
+                    print("Not in a type enclosure: ", line)
+                result = handle(line, None)
+                print("result =>", result)
+                print("type =>", type(result))
+                ast[ OTHER ].append(result)                
+                
+    fd.close()
+    return ast
+
 # Takes the tree and iterates through each line 
 # and verifies X # of rules. This serves to notify
 # the user on any errors that might have been made in
@@ -316,7 +409,7 @@ class ASTAddIndex:
     
     def isConstant(self, node):        
         for n in self.consts:
-            if n.getAttribute() == node.getAttribute(): return True
+            if n == node.getAttribute(): return True
         return False
         
 class CombineVerifyEq:
@@ -352,7 +445,8 @@ class CombineVerifyEq:
 
     def isConstant(self, node):        
         for n in self.consts:
-            if n.getAttribute() == node.getAttribute(): return True
+            if n == node.getAttribute(): return True            
+            #if n.getAttribute() == node.getAttribute(): return True
         return False
 
 
@@ -471,7 +565,7 @@ class Technique2:
 
     def isConstant(self, node):        
         for n in self.consts:
-            if n.getAttribute() == node.getAttribute(): return True
+            if n == node.getAttribute(): return True
         return False
 
 
@@ -511,7 +605,7 @@ class Technique3:
 
     def isConstant(self, node):        
         for n in self.consts:
-            if n.getAttribute() == node.getAttribute(): return True
+            if n == node.getAttribute(): return True
         return False
 
 class Technique4:
@@ -573,11 +667,31 @@ if __name__ == "__main__":
     elif sys.argv[1] == '-p':
         print_results(None)
         exit(0)
+    elif sys.argv[1] == '-n':
+        file = sys.argv[2]
+        ast_struct = parseFile2(file)
+        const, types = ast_struct[ CONST ], ast_struct[ TYPE ]
+        precompute = ast_struct[ PRECOMP ]
+        verify, N = None, None
+        for n in ast_struct[ OTHER ]:
+            if str(n.left) == 'verify':
+                verify = n
+            elif str(n.left) == 'N':
+                N = int(str(n.right))
+#        print("types =>", types)
+#        print("constants =>", const)
+#        print("precompute =>", precompute)
+#        print("verify =>", verify)
+#        print("N =>", N)
+#        exit(0)
+
     # print(ast)
-    file = sys.argv[1]
-    ast = parseFile(file)
-    (const, verify, vars) = astParser(ast)
+#    file = sys.argv[1]
+#    ast = parseFile(file)
+#    (const, verify, vars) = astParser(ast)
     print("Constants =>", const)
+    vars = types
+    vars['N'] = N
     print("Variables =>", vars)
 
     print("\nVERIFY EQUATION =>", verify, "\n")
@@ -593,8 +707,13 @@ if __name__ == "__main__":
     print("\nStage 3: Apply tech 2 =>", verify2, "\n")
     ASTVisitor(Technique3(const, vars)).preorder(verify2.right)
     print("\nStage 4: Apply tech 3 =>", verify2, "\n")    
-
     
+    # test
+    Instfind = InstanceFinder()
+    ASTVisitor(Instfind).preorder(verify2.right)
+    # Instfind.checkDuplicate()
+    
+    exit(0)
 #    cg = CodeGenerator(const, vars, verify2.right)
 #    result = cg.print_batchverify()
 #    result = cg.print_statement(verify2.right)    
@@ -608,7 +727,6 @@ if __name__ == "__main__":
         print("Could not find the 'benchmarks' file that has measurement results! Generate and re-run.")
         exit(0)
     
-    N = int(vars['N'])
     print("<===== Benchmark Results =====>")
     print("Assumption is N =", N)
     rop_ind = RecordOperations(vars)
@@ -629,4 +747,5 @@ if __name__ == "__main__":
     print("<===\tOperations count\t===>")
     print_results(rop_batch.ops)
     calculate_times(rop_batch.ops, curve['d224.param'], N)
+    exit(0)
     

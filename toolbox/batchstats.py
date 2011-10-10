@@ -4,6 +4,8 @@
 
 from batchlang import *
 
+SmallExp = 'delta'
+
 class RecordOperations:
     def __init__(self, vars):
         #print("vars =>", vars)
@@ -14,7 +16,7 @@ class RecordOperations:
             assert False, "number of signatures not specified!" 
         # need to have type assignments 
         grps = {'ZR':0, 'G1':0, 'G2':0, 'GT':0 }
-        self.ops = {'pair':0, 'mul':grps.copy(), 'exp':grps.copy(), 'hash':grps.copy()}
+        self.ops = {'pair':0, 'mul':grps.copy(), 'exp':grps.copy(), 'hash':grps.copy() }
         # track prng for small exponents
     
     def visit(self, node, data):
@@ -27,10 +29,16 @@ class RecordOperations:
                print("Right operand: ", right)            
             if(node.type == ops.EXP):
                 base_type = self.deriveNodeType(node.left)
+                # check if node.right ==> 'delta' keyword, modify cost to half of full exp
+                right = node.right
+                if right != None and right.getAttribute() == SmallExp:
+                    cost = 0.5
+                else:
+                    cost = 1
                 keys = data.get('key')
                 # exp node a child of a product node
                 if keys != None:
-                    _exp = 1
+                    _exp = cost
                     for i in keys:
                         _exp *= data[i]
                     self.ops['exp'][ base_type ] += _exp

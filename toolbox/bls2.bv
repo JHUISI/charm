@@ -1,0 +1,22 @@
+# bls batch inputs
+# variables
+N := 200
+
+BEGIN :: types
+  sig := G1
+  M := str
+  g := G2
+  pk := G2
+  h := G1
+END :: types
+
+BEGIN :: constant
+  g, pk
+END :: constant
+
+BEGIN :: precompute
+   h := H(M, G1)
+END :: precompute
+
+# verify equation
+verify := { e(h, pk) == e(sig, g) }

@@ -1,0 +1,22 @@
+# variables
+N := 100
+
+BEGIN :: types
+M := str
+g := G2
+pk := G2
+sig := G1
+b := ZR
+END :: types
+
+BEGIN :: precompute
+a := H(t1, G1)
+h := H(t2, G1)
+b := H(M | t3, ZR)
+END :: precompute
+
+BEGIN :: constant
+a, g, h
+END :: constant
+
+verify := { e(sig, g) == e(a, pk) * e(h, pk)^b }
