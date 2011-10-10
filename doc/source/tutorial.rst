@@ -2,7 +2,7 @@ How To Get Started
 ==================
 Instalation and dependencies
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-See :ref:`platform-install-manual` for instructions instalation instructions
+See :ref:`platform-install-manual` for instalation instructions.
 
 Implement a Scheme
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
