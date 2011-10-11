@@ -712,9 +712,14 @@ if __name__ == "__main__":
     Instfind = InstanceFinder()
     ASTVisitor(Instfind).preorder(verify2.right)
     print("Instances found =>", Instfind.instance)
+    
+    ASTVisitor(Substitute(Instfind.instance, precompute, vars)).preorder(verify2.right)
+    print("Precomputation =>", precompute)
+    print("Type information =>", vars)
+    print("\nFinal Equation =>", verify2)
+    
+#    exit(0)
 
-        
-    exit(0)
 #    cg = CodeGenerator(const, vars, verify2.right)
 #    result = cg.print_batchverify()
 #    result = cg.print_statement(verify2.right)    
