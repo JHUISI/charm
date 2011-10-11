@@ -1,0 +1,221 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>batchlang &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for batchlang</h1><pre>
+* EXP - '^' for exponent
+* EQ - ':=' for assignment
+* EQ_TST - '==' for equality testing
+* PAIR - 'e(' arg1, arg2 ')'
+* CONST - 'constant' declarator?
+* VARIABLE - 'variable' declarator?
+* PROD - 'prod{i:=1,N}' applied to 
+* ARR - 'a_1' for an array, a, with index = 1
+
+e.g., prod{i:=1,N} on pk_i ^ del_i 
+
+AST simple rules
+
+* check constraints assignment node exists.
+* check verify assignment node exists.
+* check variables have appropriate assignment types.
+* support batch for different messages/signers/public keys.
+'''
+
+from enum import *
+import string
+
+types = Enum('G1', 'G2', 'GT', 'ZR', 'str')
+declarator = Enum('constants', 'verify')
+ops = Enum('BEGIN', 'MUL', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'PROD', 'ON', 'END')
+levels = Enum('none', 'some', 'all')
+debug = levels.some
+
+class BinaryNode:
+	def __init__(self, value, left=None, right=None):		
+<div class="viewcode-block" id="BinaryNode"><a class="viewcode-back" href="../toolbox/batchlang.html#batchlang.BinaryNode">[docs]</a>		if(isinstance(value, str)):
+			self.type = ops.ATTR
+			arr = value.split('_')
+			self.attr = arr[0]
+			if len(arr) &gt; 1: # True means a_b form
+				self.attr_index = arr[1]
+			else: # False means a and no '_' present
+				self.attr_index = None
+		elif value &gt; ops.BEGIN and value &lt; ops.END:
+			self.type = value
+			self.attr = ''
+		else:
+			self.type = ops.NONE
+			self.attr = ''
+			
+		self.left = left
+		self.right = right
+
+	def __str__(self):
+		if(self.type == ops.ATTR):
+			msg = self.attr
+			if self.attr_index != None:
+				msg += '_' + str(self.attr_index)
+			return msg
+		else:			
+			left = str(self.left)
+			right = str(self.right)
+			
+			if debug &gt;= levels.some:
+			   print("Operation: ", self.type)
+			   print("Left operand: ", left)
+			   print("Right operand: ", right)			
+			if(self.type == ops.EXP):
+				return (left + '^' + right)
+			elif(self.type == ops.MUL):
+				return (left + ' * ' + right)
+			elif(self.type == ops.EQ):
+				return (left + ' := ' + right)
+			elif(self.type == ops.EQ_TST):
+				return (left + ' == ' + right)
+			elif(self.type == ops.PAIR):
+				return ('e(' + left + ',' + right + ')')
+			elif(self.type == ops.HASH):
+				return ('H(' + left + ')')
+			elif(self.type == ops.PROD):
+				return ('prod{' + left + ',' + right + '}')
+			elif(self.type == ops.ON):
+				return ('(' + left + ' on ' + right + ')')
+		return None
+	
+	def getAttribute(self):
+		if (self.type == ops.ATTR):
+<div class="viewcode-block" id="BinaryNode.getAttribute"><a class="viewcode-back" href="../toolbox/batchlang.html#batchlang.BinaryNode.getAttribute">[docs]</a>			return self.attr
+		else:
+			return None
+	
+	def getLeft(self):
+		return self.left</div>
+<div class="viewcode-block" id="BinaryNode.getLeft"><a class="viewcode-back" href="../toolbox/batchlang.html#batchlang.BinaryNode.getLeft">[docs]</a>	
+	def getRight(self):
+		return self.right</div>
+<div class="viewcode-block" id="BinaryNode.getRight"><a class="viewcode-back" href="../toolbox/batchlang.html#batchlang.BinaryNode.getRight">[docs]</a>
+	def addSubNode(self, left, right):
+		# set subNodes appropriately</div>
+<div class="viewcode-block" id="BinaryNode.addSubNode"><a class="viewcode-back" href="../toolbox/batchlang.html#batchlang.BinaryNode.addSubNode">[docs]</a>		self.left = self.createSubNode(left) if left != None else None
+		self.right = self.createSubNode(right) if left != None else None
+		if debug &gt;= levels.all:
+			print("addSubNode: ");
+			print("left type =&gt;", type(self.left), ' =&gt;', self.left)
+			print("right type =&gt;", type(self.right), ' =&gt;', self.right)
+
+	def createSubNode(self, value):
+		if isinstance(value, str):</div>
+<div class="viewcode-block" id="BinaryNode.createSubNode"><a class="viewcode-back" href="../toolbox/batchlang.html#batchlang.BinaryNode.createSubNode">[docs]</a>			node = BinaryNode(value)		   
+			return node
+		return value
+
+#	def addProdAttr(self, start, end):
+#		if self.type == ops.PROD:
+#			self.start = start
+#			self.end = end 
+#		return None
+
+	# only applies function on leaf nodes
+	def traverse(self, function):
+		# visit node then traverse left and right</div>
+<div class="viewcode-block" id="BinaryNode.traverse"><a class="viewcode-back" href="../toolbox/batchlang.html#batchlang.BinaryNode.traverse">[docs]</a>		function(self.type, self)
+		if(self.left == None):
+			return None
+		self.left.traverse(function)
+		if(self.right == None):
+			return None
+		self.right.traverse(function)
+		return None	
+	
+	
+	
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

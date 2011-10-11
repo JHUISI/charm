@@ -1,0 +1,131 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Hash &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for Hash</h1><div class="highlight"><pre>
+<span class="k">class</span> <span class="nc">Hash</span><span class="p">(</span><span class="n">SchemeBase</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Base class for Hash functions</span>
+<div class="viewcode-block" id="Hash"><a class="viewcode-back" href="../toolbox/Hash.html#Hash.Hash">[docs]</a>
+<span class="sd">    Notes: This class implements an interface for a standard hash function scheme.</span>
+<span class="sd">    A hash function consists of two algorithms: (paramgen or keygen and hash).</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">&#39;Hash&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">baseSecDefs</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># Enum(&#39;EU_CMA&#39;)</span>
+    <span class="c"># base methods?</span>
+    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<div class="viewcode-block" id="Hash.paramgen"><a class="viewcode-back" href="../toolbox/Hash.html#Hash.Hash.paramgen">[docs]</a>    
+    <span class="k">def</span> <span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+<div class="viewcode-block" id="Hash.hash"><a class="viewcode-back" href="../toolbox/Hash.html#Hash.Hash.hash">[docs]</a>
+
+<span class="k">class</span> <span class="nc">ChamHash</span><span class="p">(</span><span class="n">Hash</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span></div></div>
+<div class="viewcode-block" id="ChamHash"><a class="viewcode-back" href="../toolbox/Hash.html#Hash.ChamHash">[docs]</a><span class="sd">    Notes: This class implements an interface for a chameleon hash function. </span>
+<span class="sd">    A standard charmeleon hash scheme has two algorithms paramgen and hash.</span>
+<span class="sd">    paramgen accepts a security parameter and the length of p and q. Hash accepts</span>
+<span class="sd">    public key, label, a message and a random element.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">Hash</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">Hash</span><span class="o">.</span><span class="n">setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">&#39;ChamHash&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">baseSecDefs</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># Enum(&#39;EU_CMA&#39;)</span>
+        
+    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>		
+<div class="viewcode-block" id="ChamHash.paramgen"><a class="viewcode-back" href="../toolbox/Hash.html#Hash.ChamHash.paramgen">[docs]</a>
+    <span class="k">def</span> <span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+<div class="viewcode-block" id="ChamHash.hash"><a class="viewcode-back" href="../toolbox/Hash.html#Hash.ChamHash.hash">[docs]</a></pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

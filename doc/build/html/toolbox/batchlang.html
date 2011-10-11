@@ -1,0 +1,176 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>batchlang &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
+    <link rel="next" title="batchparser" href="batchparser.html" />
+    <link rel="prev" title="ABEncMultiAuth" href="ABEncMultiAuth.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="batchparser.html" title="batchparser"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ABEncMultiAuth.html" title="ABEncMultiAuth"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-batchlang">
+<span id="batchlang"></span><h1>batchlang<a class="headerlink" href="#module-batchlang" title="Permalink to this headline">¶</a></h1>
+<p>Operators in Batch language:</p>
+<ul class="simple">
+<li>EXP - &#8216;^&#8217; for exponent</li>
+<li>EQ - &#8216;:=&#8217; for assignment</li>
+<li>EQ_TST - &#8216;==&#8217; for equality testing</li>
+<li>PAIR - &#8216;e(&#8216; arg1, arg2 &#8216;)&#8217;</li>
+<li>CONST - &#8216;constant&#8217; declarator?</li>
+<li>VARIABLE - &#8216;variable&#8217; declarator?</li>
+<li>PROD - &#8216;prod{i:=1,N}&#8217; applied to</li>
+<li>ARR - &#8216;a_1&#8217; for an array, a, with index = 1</li>
+</ul>
+<p>e.g., prod{i:=1,N} on pk_i ^ del_i</p>
+<p>AST simple rules</p>
+<ul class="simple">
+<li>check constraints assignment node exists.</li>
+<li>check verify assignment node exists.</li>
+<li>check variables have appropriate assignment types.</li>
+<li>support batch for different messages/signers/public keys.</li>
+</ul>
+<dl class="class">
+<dt id="batchlang.BinaryNode">
+<em class="property">class </em><tt class="descclassname">batchlang.</tt><tt class="descname">BinaryNode</tt><big>(</big><em>value</em>, <em>left=None</em>, <em>right=None</em><big>)</big><a class="reference internal" href="../_modules/batchlang.html#BinaryNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batchlang.BinaryNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dl class="method">
+<dt id="batchlang.BinaryNode.addSubNode">
+<tt class="descname">addSubNode</tt><big>(</big><em>left</em>, <em>right</em><big>)</big><a class="reference internal" href="../_modules/batchlang.html#BinaryNode.addSubNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batchlang.BinaryNode.addSubNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="batchlang.BinaryNode.createSubNode">
+<tt class="descname">createSubNode</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="../_modules/batchlang.html#BinaryNode.createSubNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batchlang.BinaryNode.createSubNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="batchlang.BinaryNode.getAttribute">
+<tt class="descname">getAttribute</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/batchlang.html#BinaryNode.getAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batchlang.BinaryNode.getAttribute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="batchlang.BinaryNode.getLeft">
+<tt class="descname">getLeft</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/batchlang.html#BinaryNode.getLeft"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batchlang.BinaryNode.getLeft" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="batchlang.BinaryNode.getRight">
+<tt class="descname">getRight</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/batchlang.html#BinaryNode.getRight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batchlang.BinaryNode.getRight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="batchlang.BinaryNode.traverse">
+<tt class="descname">traverse</tt><big>(</big><em>function</em><big>)</big><a class="reference internal" href="../_modules/batchlang.html#BinaryNode.traverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batchlang.BinaryNode.traverse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ABEncMultiAuth.html"
+                        title="previous chapter">ABEncMultiAuth</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="batchparser.html"
+                        title="next chapter">batchparser</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/toolbox/batchlang.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="batchparser.html" title="batchparser"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ABEncMultiAuth.html" title="ABEncMultiAuth"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,149 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Commit &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
+    <link rel="next" title="conversion" href="conversion.html" />
+    <link rel="prev" title="bitstring" href="bitstring.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="conversion.html" title="conversion"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="bitstring.html" title="bitstring"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-Commit">
+<span id="commit"></span><h1>Commit<a class="headerlink" href="#module-Commit" title="Permalink to this headline">¶</a></h1>
+<p>Base class for commitment schemes</p>
+<dl class="docutils">
+<dt>Notes: This class implements an interface for a standard commitment scheme.</dt>
+<dd>A commitment scheme consists of three algorithms: (setup, commit, decommit).</dd>
+</dl>
+<p>Allows one to commit to a value while keeping it hidden, with the ability
+to reveal the committed value later (wiki).</p>
+<dl class="class">
+<dt id="Commit.Commitment">
+<em class="property">class </em><tt class="descclassname">Commit.</tt><tt class="descname">Commitment</tt><a class="reference internal" href="../_modules/Commit.html#Commitment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Commit.Commitment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.schemebase.SchemeBase</span></tt></p>
+<dl class="method">
+<dt id="Commit.Commitment.commit">
+<tt class="descname">commit</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/Commit.html#Commitment.commit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Commit.Commitment.commit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Commit.Commitment.decommit">
+<tt class="descname">decommit</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/Commit.html#Commitment.decommit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Commit.Commitment.decommit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Commit.Commitment.setup">
+<tt class="descname">setup</tt><big>(</big><em>securityparam</em><big>)</big><a class="reference internal" href="../_modules/Commit.html#Commitment.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Commit.Commitment.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="bitstring.html"
+                        title="previous chapter">bitstring</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="conversion.html"
+                        title="next chapter">conversion</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/toolbox/Commit.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="conversion.html" title="conversion"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="bitstring.html" title="bitstring"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

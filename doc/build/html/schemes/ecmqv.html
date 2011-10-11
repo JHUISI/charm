@@ -1,0 +1,163 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ecmqv &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
+    <link rel="next" title="elgamal" href="elgamal.html" />
+    <link rel="prev" title="ecdsa" href="ecdsa.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="elgamal.html" title="elgamal"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ecdsa.html" title="ecdsa"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-ecmqv">
+<span id="ecmqv"></span><h1>ecmqv<a class="headerlink" href="#module-ecmqv" title="Permalink to this headline">¶</a></h1>
+<p>EC-MQV authenticated key agreement protocol</p>
+<dl class="class">
+<dt id="ecmqv.ECMQV">
+<em class="property">class </em><tt class="descclassname">ecmqv.</tt><tt class="descname">ECMQV</tt><big>(</big><em>builtin_cv=410</em><big>)</big><a class="reference internal" href="../_modules/ecmqv.html#ECMQV"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecmqv.ECMQV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">charm.engine.protocol.Protocol</span></tt></p>
+<dl class="method">
+<dt id="ecmqv.ECMQV.mac">
+<tt class="descname">mac</tt><big>(</big><em>tupl_arg</em>, <em>key</em><big>)</big><a class="reference internal" href="../_modules/ecmqv.html#ECMQV.mac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecmqv.ECMQV.mac" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ecmqv.ECMQV.receiver_state2">
+<tt class="descname">receiver_state2</tt><big>(</big><em>input</em><big>)</big><a class="reference internal" href="../_modules/ecmqv.html#ECMQV.receiver_state2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecmqv.ECMQV.receiver_state2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ecmqv.ECMQV.receiver_state4">
+<tt class="descname">receiver_state4</tt><big>(</big><em>input</em><big>)</big><a class="reference internal" href="../_modules/ecmqv.html#ECMQV.receiver_state4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecmqv.ECMQV.receiver_state4" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ecmqv.ECMQV.receiver_state6">
+<tt class="descname">receiver_state6</tt><big>(</big><em>input</em><big>)</big><a class="reference internal" href="../_modules/ecmqv.html#ECMQV.receiver_state6"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecmqv.ECMQV.receiver_state6" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ecmqv.ECMQV.sender_state1">
+<tt class="descname">sender_state1</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ecmqv.html#ECMQV.sender_state1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecmqv.ECMQV.sender_state1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ecmqv.ECMQV.sender_state3">
+<tt class="descname">sender_state3</tt><big>(</big><em>input</em><big>)</big><a class="reference internal" href="../_modules/ecmqv.html#ECMQV.sender_state3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecmqv.ECMQV.sender_state3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ecmqv.ECMQV.sender_state5">
+<tt class="descname">sender_state5</tt><big>(</big><em>input</em><big>)</big><a class="reference internal" href="../_modules/ecmqv.html#ECMQV.sender_state5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecmqv.ECMQV.sender_state5" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ecdsa.html"
+                        title="previous chapter">ecdsa</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="elgamal.html"
+                        title="next chapter">elgamal</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/schemes/ecmqv.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="elgamal.html" title="elgamal"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ecdsa.html" title="ecdsa"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

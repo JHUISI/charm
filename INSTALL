@@ -1,0 +1,270 @@
+Charm-Crypto: Installation Documentation
+-------------------------------------------------------------------------------------------
+
+Charm has done a great job at automating the installation process such that the end-user
+does not have to directly handle dependencies, linking, compiler flag setting, and the
+like.  However, there is always the corner case in which an end-user is using a currently
+unsupported platform, and thus may need to build and install using a very manual process.
+
+We would like to support you in this case, and have written this documentation to get 
+you started on your path using Charm.  This installation file will contain some n
+installation blocks highlighting each respective implementation.  
+
+Before we begin, please note the current dependencies:
+    
+	Python2.7 or Python3
+	Pyparsing http://pyparsing.wikispaces.com/
+    GMP http://www.swox.com/gmp/
+    PBC http://crypto.stanford.edu/pbc/news.html 
+    OPENSSL http://www.openssl.org/
+
+	---
+	See ./configure.sh --help for other options.
+	
+	
+BUILDING IN LINUX
+------------------------
+
+Note that the entire compilation process is supported by the Charm configure/make scripts.
+The steps for building in linux this way are:
+	1. In a terminal, run configure.sh
+	2. The process will fail out at wget, and will ask you to install.
+	3. Using your package manager of choice (e.g., sudo apt-get install wget), install wget.
+    4. With wget installed, run the configure.sh script again, and it should set up your
+       Make dependencies for you.  
+    5. Make build.
+    6. Make install.	
+    *. Another way to install dependencies is to use your package manager of choice.
+	
+[Ubuntu 10.04 LTS]
+
+1. Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
+	1. Subversion
+		sudo apt-get install subversion
+	2. Python 3 (By default, Ubuntu 10.04 LTS comes with 2.6 and does not officially support 2.7. Charm requires 2.7 or 3.x) and header files/static library
+		sudo apt-get install python3 python3-dev
+	3. m4
+		sudo apt-get install m4
+	4. libssl-dev
+		sudo apt-get install libssl-dev
+
+2. Now we need to obtain a copy of Charm:
+	svn checkout http://charm-crypto.googlecode.com/svn/trunk/ charm-crypto-read-only
+
+3. Next, we will install Charm. Navigate to the Charm directory.
+	1. We must first run the configuration script:
+		sudo ./configure.sh –python=/path/to/python3
+	2. Now we will build and install Charm:
+		sudo make build
+		sudo make install
+	3. And finally we must rebuild the searchpath for libraries
+		sudo ldconfig
+
+[Ubuntu 11.04]
+
+1. Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
+	1. Subversion
+		sudo apt-get install subversion
+	2. m4
+		sudo apt-get install m4
+	3. Python 3 (this is an optional, though recommended, step)
+		sudo apt-get install python3
+	4. Header files/static library
+		sudo apt-get install python-dev (if you did not install Python 3)
+		sudo apt-get install python3-dev (if you did install Python 3)
+	5. libssl-dev (only necessary if you did not install Python 3)
+		sudo apt-get install libssl-dev
+
+2. Now we need to obtain a copy of Charm:
+	svn checkout http://charm-crypto.googlecode.com/svn/trunk/ charm-crypto-read-only
+
+3. Next, we will install Charm. Navigate to the Charm directory.
+	1. We must first run the configuration script:
+		sudo ./configure.sh
+		[If you installed Python 3 and would like to use that, you will need to add –python=/path/to/python3]
+	2. Now we will build and install Charm:
+		sudo make build
+		sudo make install
+	3. And finally we must rebuild the searchpath for libraries
+		sudo ldconfig
+
+[Fedora] 
+
+1. Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
+	1. m4
+		su -c "yum install m4"
+	3. Python 3 (this is an optional, though recommended, step)
+		su -c "yum install python3"
+	4. Header files/static library
+		su -c "yum install python-devel" (if you did not install Python 3)
+		su -c "yum install python3-devel" (if you did install Python 3)
+	5. openssl-devel (only necessary if you did not install Python 3)
+		su -c "yum install openssl-devel"
+
+2. Red Hat/Fedora has decided not to support ECC in OpenSSL due to patent concerns, so we now need to remove their restriction and manually import the required files.
+	1. Remove the ECC restriction
+		1. Navigate to /usr/include/openssl
+			cd /usr/include/openssl
+		2. Open the OpenSSL configuration file for editing using your editor of choice
+			su -c "vi opensslconf-i386.h"
+		3. Remove the flags that restrict the use of ECC
+			Delete (at the beginning of file)
+				#ifndef OPENSSL_NO_EC
+				# define OPENSSL_NO_EC
+				#endif
+				#ifndef OPENSSL_NO_ECDH
+				# define OPENSSL_NO_ECDH
+				#endif
+				#ifndef OPENSSL_NO_ECDSA
+				# define OPENSSL_NO_ECDSA
+				#endif
+			Delete (later on the file)
+				# if defined(OPENSSL_NO_EC) && !defined(NO_EC)
+				#  define NO_EC
+				# endif
+				# if defined(OPENSSL_NO_ECDH) && !defined(NO_ECDH)
+				#  define NO_ECDH
+				# endif
+				# if defined(OPENSSL_NO_ECDSA) && !defined(NO_ECDSA)
+				#  define NO_ECDSA
+				# endif
+		4. Save the file and close it
+	2. Add the ECC files
+		1. Navigate to http://www.openssl.org/source/ and download the latest version of openssl source
+		2. Untar it
+		3. Navigate to /path/to/openssl-[version]/include/openssl (ie inside the untarred file)
+			cd /path/to/openssl-[version]/include/openssl
+		4. Add the new files to the current OpenSSL installation
+			su -c "yes n | cp * /usr/include/openssl"
+
+3. Now we need to obtain a copy of Charm:
+	svn checkout http://charm-crypto.googlecode.com/svn/trunk/ charm-crypto-read-only
+
+4. Next, we will install Charm. Navigate to the Charm directory.
+	1. We must first run the configuration script:
+		su -c "./configure.sh"
+		[If you installed Python 3 and would like to use that, you will need to add –python=/path/to/python3]
+	2. Now we will build and install Charm:
+		su -c "make build"
+		su -c "make install"
+	3. And finally we must rebuild the searchpath for libraries
+		su -c "ldconfig"
+
+[Fedora x86_64]
+
+[Mint x86_64]
+1. Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
+        1. Subversion
+                sudo apt-get install subversion
+        2. m4
+                sudo apt-get install m4
+        3. Python 3 (this is an optional, though recommended, step)
+                sudo apt-get install python3
+        4. Header files/static library
+                sudo apt-get install python-dev (if you did not install Python 3)
+                sudo apt-get install python3-dev (if you did install Python 3)
+        5. libssl-dev (only necessary if you did not install Python 3)
+                sudo apt-get install libssl-dev
+        6. This distro doesn't seem to come with binutils or gcc, install those.
+
+2. Now we need to obtain a copy of Charm:
+        svn checkout http://charm-crypto.googlecode.com/svn/trunk/ charm-crypto-read-only
+
+3. Next, we will install Charm. Navigate to the Charm directory.
+        1. We must first run the configuration script:
+                sudo bash ./configure.sh                * Bash to avoid unexpected operator error.
+                [If you installed Python 3 and would like to use that, you will need to add –python=/path/to/python3]
+        2. Now we will build and install Charm:
+                sudo make build
+                sudo make install
+        3. And finally we must rebuild the searchpath for libraries
+                sudo ldconfig
+
+
+
+BUILDING IN WINDOWS
+------------------------
+
+Note that the entire compilation process is now supported by the Charm configure/make scripts.
+The steps for building in mingw32 this way are:
+    1. Download the latest source version of openssl.
+	2. Run MinGW Shell.
+    3. Extract openssl, configure and install as shown below.	
+	4. Extract Charm, and navigate to the top directory.
+	5. Run configure.sh as shown below.
+	6. The process will fail out at wget, and open Internet Explorer to the wget download 
+	   page.
+	7. Install wget, and set it's bin directory on your PATH.  To do this, right-click My 
+	   Computer, Select Properties, Select Advanced System Settings, Select Advanced, Select
+       Environment Variables, and than PATH.  Scroll to the end, and enter a ; followed by 
+       the absolute path to the bin directory (e.g., C:\Program Files\etc).
+    8. With wget installed, run the configure.sh script again, and it should set up your
+       Make dependencies for you.  
+    9. Make build.
+   10. Make install.
+    *. Another way to install dependencies is to follow the Windows blocks below.	
+
+[MinGW32]
+
+Let's first build our dependencies with the following scripts:
+	
+	#GMP
+	./configure --prefix=/mingw --disable-static --enable-shared
+	make
+	make install
+	
+	#OPENSSL
+	./config --openssldir=/mingw --shared # This gets us around installing perl.
+	make
+	make install
+
+	#PBC
+	./configure --prefix=/mingw --disable-static --enable-shared
+	make
+	make install
+	
+	#Building Charm
+	./configure --prefix=/mingw --python=/c/Python32/python.exe 
+	
+[MinGW64]
+
+	Coming Soon*
+
+[Cygwin]
+
+	Coming Soon*
+
+[Building Executable]
+
+	If you are building to make an executable with NSIS, than be sure to
+	pass the --build-win-exe flag to configure:  
+	
+		./configure.sh --python=/c/Python32/python.exe --build-win-exe
+	
+	This process automates
+	the compilation and installation of pbc and gmp only.  You will have
+	to build openssl with the following: 
+	
+		./config --openssldir=/c/charm-crypto --shared
+
+BUILDING IN OS X 
+------------------------
+
+Note that the entire compilation process is supported by the Charm configure/make scripts.
+The steps for building in os x this way are:
+	1. In a terminal, run configure.sh
+	2. The process will fail out at wget, and will ask you to install.
+	3. Using your package manager of choice (e.g., sudo port install wget), install wget.
+    4. With wget installed, run the configure.sh script again, and it should set up your
+       Make dependencies for you.  
+    5. Make build.
+    6. Make install.	
+    *. Another way to install dependencies is to use macports or fink.
+	
+[Snow Leopard]
+
+
+[Lion]
+
+For Lion, run ./configure.sh --enable-darwin in step 1 and follow the steps above for OS X.
+

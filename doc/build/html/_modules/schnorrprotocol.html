@@ -1,0 +1,192 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>schnorrprotocol &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for schnorrprotocol</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">socket</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">PROVER</span><span class="p">,</span><span class="n">VERIFIER</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="mi">2</span>
+<span class="n">HOST</span><span class="p">,</span> <span class="n">PORT</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="mi">8082</span>
+
+<span class="k">class</span> <span class="nc">SchnorrZK</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">builtin_cv</span><span class="p">,</span> <span class="n">common_input</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SchnorrZK"><a class="viewcode-back" href="../schemes/schnorrprotocol.html#schnorrprotocol.SchnorrZK">[docs]</a>        <span class="n">Protocol</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>        
+        <span class="n">verifier_states</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">2</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">verifier_state2</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">verifier_state4</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">verifier_state6</span> <span class="p">}</span>
+        <span class="n">prover_states</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">prover_state1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">prover_state3</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">prover_state5</span> <span class="p">}</span>
+
+        <span class="n">verifier_trans</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">6</span> <span class="p">}</span>
+        <span class="n">prover_trans</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span><span class="mi">5</span> <span class="p">}</span>
+        <span class="c"># describe the parties involved and the valid transitions</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">addPartyType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">VERIFIER</span><span class="p">,</span> <span class="n">verifier_states</span><span class="p">,</span> <span class="n">verifier_trans</span><span class="p">)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">addPartyType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">PROVER</span><span class="p">,</span> <span class="n">prover_states</span><span class="p">,</span> <span class="n">prover_trans</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">builtin_cv</span><span class="p">)</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setSubclassVars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
+        
+    <span class="c"># PROVER states</span>
+    <span class="k">def</span> <span class="nf">prover_state1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+<div class="viewcode-block" id="SchnorrZK.prover_state1"><a class="viewcode-back" href="../schemes/schnorrprotocol.html#schnorrprotocol.SchnorrZK.prover_state1">[docs]</a>        <span class="n">r</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">r</span> 
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;prover: &#39;</span><span class="p">,</span><span class="s">&quot;hello to verifier.&quot;</span><span class="p">)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;r&#39;</span><span class="p">,</span><span class="n">r</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">,</span><span class="n">x</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;t&#39;</span><span class="p">,</span><span class="n">t</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;g&#39;</span><span class="p">,</span><span class="n">g</span><span class="p">))</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;t&#39;</span><span class="p">:</span><span class="n">t</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s">&#39;y&#39;</span><span class="p">:</span><span class="n">g</span> <span class="o">**</span> <span class="n">x</span> <span class="p">}</span> <span class="c"># output goes to the next state.</span>
+     
+    <span class="k">def</span> <span class="nf">prover_state3</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;state3 input =&gt; &quot;</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span></div>
+<div class="viewcode-block" id="SchnorrZK.prover_state3"><a class="viewcode-back" href="../schemes/schnorrprotocol.html#schnorrprotocol.SchnorrZK.prover_state3">[docs]</a>        <span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="s">&#39;x&#39;</span><span class="p">])</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;c&#39;</span><span class="p">]</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">x</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;s&#39;</span><span class="p">:</span><span class="n">s</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">prover_state5</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="nb">input</span> <span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;state5 input =&gt; &quot;</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span></div>
+<div class="viewcode-block" id="SchnorrZK.prover_state5"><a class="viewcode-back" href="../schemes/schnorrprotocol.html#schnorrprotocol.SchnorrZK.prover_state5">[docs]</a>        <span class="n">output</span> <span class="o">=</span> <span class="s">&quot;prover: End state.&quot;</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="c"># VERIFIER states</span>
+    <span class="k">def</span> <span class="nf">verifier_state2</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="nb">input</span> <span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;state2 input =&gt; &quot;</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span></div>
+<div class="viewcode-block" id="SchnorrZK.verifier_state2"><a class="viewcode-back" href="../schemes/schnorrprotocol.html#schnorrprotocol.SchnorrZK.verifier_state2">[docs]</a>        <span class="c"># compute challenge c and send to prover</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">,</span><span class="n">c</span><span class="p">),(</span><span class="s">&#39;t&#39;</span><span class="p">,</span><span class="nb">input</span><span class="p">[</span><span class="s">&#39;t&#39;</span><span class="p">]),(</span><span class="s">&#39;g&#39;</span><span class="p">,</span><span class="nb">input</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]),(</span><span class="s">&#39;y&#39;</span><span class="p">,</span><span class="nb">input</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">]))</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>        
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;c&#39;</span><span class="p">:</span><span class="n">c</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">verifier_state4</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="nb">input</span> <span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;state4 input =&gt; &quot;</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span> <span class="c"># read input off of socket, right?</span></div>
+<div class="viewcode-block" id="SchnorrZK.verifier_state4"><a class="viewcode-back" href="../schemes/schnorrprotocol.html#schnorrprotocol.SchnorrZK.verifier_state4">[docs]</a>        <span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">g</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;t&#39;</span><span class="p">,</span><span class="s">&#39;g&#39;</span><span class="p">,</span><span class="s">&#39;y&#39;</span><span class="p">,</span><span class="s">&#39;c&#39;</span><span class="p">])</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;s&#39;</span><span class="p">]</span>
+        
+        <span class="k">if</span> <span class="p">(</span><span class="n">g</span> <span class="o">**</span> <span class="n">s</span> <span class="o">==</span> <span class="n">t</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">**</span> <span class="n">c</span><span class="p">)):</span>
+           <span class="k">print</span><span class="p">(</span><span class="s">&quot;SUCCESSFUL VERIFICATION!!!&quot;</span><span class="p">)</span>
+           <span class="n">output</span> <span class="o">=</span> <span class="s">&quot;verifier: ACCEPTED!&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;FAILED TO VERIFY!!!&quot;</span><span class="p">)</span>            
+            <span class="n">output</span> <span class="o">=</span> <span class="s">&quot;verifier: FAILED!&quot;</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span>
+    
+    <span class="k">def</span> <span class="nf">verifier_state6</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span> <span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;state6 input =&gt; &quot;</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span></div>
+<div class="viewcode-block" id="SchnorrZK.verifier_state6"><a class="viewcode-back" href="../schemes/schnorrprotocol.html#schnorrprotocol.SchnorrZK.verifier_state6">[docs]</a>        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">sp</span> <span class="o">=</span> <span class="n">SchnorrZK</span><span class="p">(</span><span class="mi">409</span><span class="p">)</span></div></div>
+
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;-v&quot;</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Operating as verifier...&quot;</span><span class="p">)</span>
+        <span class="n">svr</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">)</span>
+        <span class="n">svr</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="n">HOST</span><span class="p">,</span> <span class="n">PORT</span><span class="p">))</span>
+        <span class="n">svr</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">svr_sock</span><span class="p">,</span> <span class="n">addr</span> <span class="o">=</span> <span class="n">svr</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Connected by &quot;</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span>
+        <span class="n">_name</span><span class="p">,</span> <span class="n">_type</span><span class="p">,</span> <span class="n">_sock</span> <span class="o">=</span> <span class="s">&quot;verifier&quot;</span><span class="p">,</span> <span class="n">VERIFIER</span><span class="p">,</span> <span class="n">svr_sock</span>
+<span class="c">#       sp.setup( {&#39;name&#39;:&quot;verifier&quot;, &#39;type&#39;:_type, &#39;socket&#39;:svr_sock} )</span>
+    <span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;-p&quot;</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Operating as prover...&quot;</span><span class="p">)</span>
+        <span class="n">clt</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">)</span>
+        <span class="n">clt</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="n">HOST</span><span class="p">,</span> <span class="n">PORT</span><span class="p">))</span>
+        <span class="n">clt</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+        <span class="n">_name</span><span class="p">,</span> <span class="n">_type</span><span class="p">,</span> <span class="n">_sock</span> <span class="o">=</span> <span class="s">&quot;prover&quot;</span><span class="p">,</span> <span class="n">PROVER</span><span class="p">,</span> <span class="n">clt</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Usage: </span><span class="si">%s</span><span class="s"> [-v or -p]&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="nb">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">sp</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="n">_name</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="n">_type</span><span class="p">,</span> <span class="s">&#39;socket&#39;</span><span class="p">:</span><span class="n">_sock</span><span class="p">}</span> <span class="p">)</span>
+    <span class="c"># run as a thread...</span>
+    <span class="n">sp</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">_type</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

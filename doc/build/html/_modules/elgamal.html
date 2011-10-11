@@ -1,0 +1,200 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>elgamal &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for elgamal</h1><div class="highlight"><pre>
+<span class="c"># Notes: </span>
+<span class="c">#</span>
+<span class="c"># type:          encryption (public key)</span>
+<span class="c"># setting:       DDH-hard prime order group</span>
+<span class="c"># assumption:    DDH</span>
+<span class="c">#</span>
+<span class="c"># Implementer:    J Ayo Akinyele</span>
+<span class="c"># Date:           3/2011</span>
+
+<span class="kn">from</span> <span class="nn">toolbox.integergroup</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">toolbox.ecgroup</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">toolbox.PKEnc</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="k">class</span> <span class="nc">ElGamalCipher</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ct</span><span class="p">):</span>
+<div class="viewcode-block" id="ElGamalCipher"><a class="viewcode-back" href="../schemes/elgamal.html#elgamal.ElGamalCipher">[docs]</a>        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">dict</span><span class="p">:</span> <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;Not a dictionary!&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">([</span><span class="s">&#39;c1&#39;</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">]):</span> <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;&#39;c1&#39;,&#39;c2&#39; keys not present.&quot;</span>
+        <span class="nb">dict</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ct</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+           <span class="n">lhs_c1</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;c1&#39;</span><span class="p">)</span>
+           <span class="n">lhs_c2</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">)</span>
+           <span class="k">return</span> <span class="n">ElGamalCipher</span><span class="p">({</span><span class="s">&#39;c1&#39;</span><span class="p">:</span><span class="n">lhs_c1</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">:</span><span class="n">lhs_c2</span> <span class="o">+</span> <span class="n">other</span><span class="p">})</span>
+        <span class="k">else</span><span class="p">:</span>
+           <span class="k">pass</span> 
+
+    <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+           <span class="n">lhs_c1</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;c1&#39;</span><span class="p">)</span>
+           <span class="n">lhs_c2</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">)</span>
+           <span class="k">return</span> <span class="n">ElGamalCipher</span><span class="p">({</span><span class="s">&#39;c1&#39;</span><span class="p">:</span><span class="n">lhs_c1</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">:</span><span class="n">lhs_c2</span> <span class="o">*</span> <span class="n">other</span><span class="p">})</span>
+        <span class="k">else</span><span class="p">:</span>
+           <span class="n">lhs_c1</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;c1&#39;</span><span class="p">)</span> 
+           <span class="n">rhs_c1</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s">&#39;c1&#39;</span><span class="p">)</span>
+
+           <span class="n">lhs_c2</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">)</span> 
+           <span class="n">rhs_c2</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">)</span>
+           <span class="k">return</span> <span class="n">ElGamalCipher</span><span class="p">({</span><span class="s">&#39;c1&#39;</span><span class="p">:</span><span class="n">lhs_c1</span> <span class="o">*</span> <span class="n">rhs_c1</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">:</span><span class="n">lhs_c2</span> <span class="o">*</span> <span class="n">rhs_c2</span><span class="p">})</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+<span class="k">class</span> <span class="nc">ElGamal</span><span class="p">(</span><span class="n">PKEnc</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">builtin_cv</span><span class="o">=</span><span class="mi">410</span><span class="p">):</span></div>
+<div class="viewcode-block" id="ElGamal"><a class="viewcode-back" href="../schemes/elgamal.html#elgamal.ElGamal">[docs]</a>        <span class="n">PKEnc</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">global</span> <span class="n">_type</span>
+        <span class="n">_type</span> <span class="o">=</span> <span class="n">group_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="n">_type</span><span class="p">,</span> <span class="n">builtin_cv</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_type</span><span class="p">,</span> <span class="n">_cv</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">group</span>
+<div class="viewcode-block" id="ElGamal.paramgen"><a class="viewcode-back" href="../schemes/elgamal.html#elgamal.ElGamal.paramgen">[docs]</a>        <span class="k">if</span> <span class="n">_type</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+            <span class="n">group</span> <span class="o">=</span> <span class="n">IntegerGroupQ</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">_type</span> <span class="o">==</span> <span class="n">ecc</span><span class="p">:</span>
+            <span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">_cv</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;Invalid Type Exception!&quot;</span>
+
+    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="o">=</span><span class="mi">1024</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">_type</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span></div>
+<div class="viewcode-block" id="ElGamal.keygen"><a class="viewcode-back" href="../schemes/elgamal.html#elgamal.ElGamal.keygen">[docs]</a>            <span class="n">group</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="n">secparam</span><span class="p">)</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">randomGen</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">_type</span> <span class="o">==</span> <span class="n">ecc</span><span class="p">:</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="c"># x is private, g is public param</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">();</span> <span class="n">h</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">x</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;Public parameters...&#39;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;h =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">h</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;g =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">g</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;Secret key...&#39;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;x =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s">&#39;h&#39;</span><span class="p">:</span><span class="n">h</span> <span class="p">}</span>
+        <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;x&#39;</span><span class="p">:</span><span class="n">x</span><span class="p">}</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>    
+        <span class="n">y</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span></div>
+<div class="viewcode-block" id="ElGamal.encrypt"><a class="viewcode-back" href="../schemes/elgamal.html#elgamal.ElGamal.encrypt">[docs]</a>        <span class="n">c1</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">y</span> 
+        <span class="n">s</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">y</span>
+        <span class="c"># check M and make sure it&#39;s right size</span>
+        <span class="n">c2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">M</span><span class="p">)</span> <span class="o">*</span> <span class="n">s</span>
+        <span class="k">return</span> <span class="n">ElGamalCipher</span><span class="p">({</span><span class="s">&#39;c1&#39;</span><span class="p">:</span><span class="n">c1</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">:</span><span class="n">c2</span><span class="p">})</span>
+    
+    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;c1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">]</span></div>
+<div class="viewcode-block" id="ElGamal.decrypt"><a class="viewcode-back" href="../schemes/elgamal.html#elgamal.ElGamal.decrypt">[docs]</a>        <span class="n">m</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;c2&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="o">~</span><span class="n">s</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&#39;m =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">m</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&#39;dec M =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">M</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">M</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">el</span> <span class="o">=</span> <span class="n">ElGamal</span><span class="p">(</span><span class="n">ecc</span><span class="p">,</span> <span class="mi">410</span><span class="p">)</span>    </div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/elgamal.html#elgamal.main">[docs]</a>    <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;hello world!&quot;</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="n">cipher1</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+    
+    <span class="n">m</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">cipher1</span><span class="p">)</span>    
+    <span class="k">assert</span> <span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">size</span><span class="p">]</span> <span class="o">==</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">size</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;SUCCESSFULLY DECRYPTED!!!&quot;</span><span class="p">)</span>
+        
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span></div>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

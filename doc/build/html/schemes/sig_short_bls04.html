@@ -1,0 +1,173 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sig_short_bls04 &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
+    <link rel="next" title="sigma1" href="sigma1.html" />
+    <link rel="prev" title="sig_generic_ibetosig_naor01" href="sig_generic_ibetosig_naor01.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sigma1.html" title="sigma1"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="sig_generic_ibetosig_naor01.html" title="sig_generic_ibetosig_naor01"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-sig_short_bls04">
+<span id="sig-short-bls04"></span><h1>sig_short_bls04<a class="headerlink" href="#module-sig_short_bls04" title="Permalink to this headline">¶</a></h1>
+<p>Boneh-Lynn-Shacham Identity Based Signature</p>
+<div class="line-block">
+<div class="line">From: &#8220;D. Boneh, B. Lynn, H. Shacham Short Signatures from the Weil Pairing&#8221;</div>
+<div class="line">Published in: Journal of Cryptology 2004</div>
+<div class="line">Available from: <a class="reference external" href="http://">http://</a></div>
+<div class="line">Notes: This is the IBE (2-level HIBE) implementation of the HIBE scheme BB_2.</div>
+</div>
+<ul class="simple">
+<li>type:           signature (identity-based)</li>
+<li>setting:        bilinear groups (asymmetric)</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Joseph Ayo Akinyele</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">1/2011</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="sig_short_bls04.IBSig">
+<em class="property">class </em><tt class="descclassname">sig_short_bls04.</tt><tt class="descname">IBSig</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../_modules/sig_short_bls04.html#IBSig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sig_short_bls04.IBSig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dl class="method">
+<dt id="sig_short_bls04.IBSig.dump">
+<tt class="descname">dump</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="../_modules/sig_short_bls04.html#IBSig.dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sig_short_bls04.IBSig.dump" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sig_short_bls04.IBSig.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>secparam=None</em><big>)</big><a class="reference internal" href="../_modules/sig_short_bls04.html#IBSig.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sig_short_bls04.IBSig.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sig_short_bls04.IBSig.sign">
+<tt class="descname">sign</tt><big>(</big><em>x</em>, <em>message</em><big>)</big><a class="reference internal" href="../_modules/sig_short_bls04.html#IBSig.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sig_short_bls04.IBSig.sign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sig_short_bls04.IBSig.verify">
+<tt class="descname">verify</tt><big>(</big><em>pk</em>, <em>sig</em>, <em>message</em><big>)</big><a class="reference internal" href="../_modules/sig_short_bls04.html#IBSig.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sig_short_bls04.IBSig.verify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="sig_short_bls04.main">
+<tt class="descclassname">sig_short_bls04.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/sig_short_bls04.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sig_short_bls04.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="sig_generic_ibetosig_naor01.html"
+                        title="previous chapter">sig_generic_ibetosig_naor01</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="sigma1.html"
+                        title="next chapter">sigma1</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/schemes/sig_short_bls04.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sigma1.html" title="sigma1"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="sig_generic_ibetosig_naor01.html" title="sig_generic_ibetosig_naor01"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

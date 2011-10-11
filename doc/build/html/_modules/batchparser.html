@@ -1,0 +1,280 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>batchparser &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for batchparser</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">string</span><span class="o">,</span><span class="nn">sys</span>
+
+<span class="n">objStack</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">def</span> <span class="nf">createNode</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">toks</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;createNode =&gt; &#39;</span><span class="p">,</span> <span class="n">toks</span><span class="p">)</span>
+<div class="viewcode-block" id="createNode"><a class="viewcode-back" href="../toolbox/batchparser.html#batchparser.createNode">[docs]</a>    <span class="k">return</span> <span class="n">BinaryNode</span><span class="p">(</span><span class="n">toks</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c"># convert &#39;attr &lt; value&#39; to a binary tree based on &#39;or&#39; and &#39;and&#39;</span>
+<span class="k">def</span> <span class="nf">parseNumConditional</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">toks</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;print: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">toks</span><span class="p">)</span></div>
+<div class="viewcode-block" id="parseNumConditional"><a class="viewcode-back" href="../toolbox/batchparser.html#batchparser.parseNumConditional">[docs]</a>    <span class="k">return</span> <span class="n">BinaryNode</span><span class="p">(</span><span class="n">toks</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="k">def</span> <span class="nf">markPublic</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">toks</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;public: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">toks</span><span class="p">)</span></div>
+<div class="viewcode-block" id="markPublic"><a class="viewcode-back" href="../toolbox/batchparser.html#batchparser.markPublic">[docs]</a>    <span class="k">return</span> <span class="n">toks</span>
+
+<span class="k">def</span> <span class="nf">markSecret</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">toks</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;secret: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">toks</span><span class="p">)</span></div>
+<div class="viewcode-block" id="markSecret"><a class="viewcode-back" href="../toolbox/batchparser.html#batchparser.markSecret">[docs]</a>    <span class="k">return</span> <span class="n">toks</span>
+        
+<span class="k">def</span> <span class="nf">pushFirst</span><span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">toks</span> <span class="p">):</span>
+    <span class="k">if</span> <span class="n">debug</span> <span class="o">&gt;=</span> <span class="n">levels</span><span class="o">.</span><span class="n">some</span><span class="p">:</span></div>
+<div class="viewcode-block" id="pushFirst"><a class="viewcode-back" href="../toolbox/batchparser.html#batchparser.pushFirst">[docs]</a>       <span class="k">print</span><span class="p">(</span><span class="s">&quot;Pushing first =&gt;&quot;</span><span class="p">,</span> <span class="n">toks</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">objStack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">toks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">createTree</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">node1</span><span class="p">,</span> <span class="n">node2</span><span class="p">):</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">op</span> <span class="o">==</span> <span class="s">&quot;^&quot;</span><span class="p">):</span></div>
+<div class="viewcode-block" id="createTree"><a class="viewcode-back" href="../toolbox/batchparser.html#batchparser.createTree">[docs]</a>        <span class="n">node</span> <span class="o">=</span> <span class="n">BinaryNode</span><span class="p">(</span><span class="n">ops</span><span class="o">.</span><span class="n">EXP</span><span class="p">)</span>
+    <span class="k">elif</span><span class="p">(</span><span class="n">op</span> <span class="o">==</span> <span class="s">&quot;*&quot;</span><span class="p">):</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">BinaryNode</span><span class="p">(</span><span class="n">ops</span><span class="o">.</span><span class="n">MUL</span><span class="p">)</span>
+    <span class="k">elif</span><span class="p">(</span><span class="n">op</span> <span class="o">==</span> <span class="s">&quot;:=&quot;</span><span class="p">):</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">BinaryNode</span><span class="p">(</span><span class="n">ops</span><span class="o">.</span><span class="n">EQ</span><span class="p">)</span>
+    <span class="k">elif</span><span class="p">(</span><span class="n">op</span> <span class="o">==</span> <span class="s">&quot;==&quot;</span><span class="p">):</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">BinaryNode</span><span class="p">(</span><span class="n">ops</span><span class="o">.</span><span class="n">EQ_TST</span><span class="p">)</span>
+    <span class="k">elif</span><span class="p">(</span><span class="n">op</span> <span class="o">==</span> <span class="s">&quot;e(&quot;</span><span class="p">):</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">BinaryNode</span><span class="p">(</span><span class="n">ops</span><span class="o">.</span><span class="n">PAIR</span><span class="p">)</span>
+    <span class="k">elif</span><span class="p">(</span><span class="n">op</span> <span class="o">==</span> <span class="s">&quot;H(&quot;</span><span class="p">):</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">BinaryNode</span><span class="p">(</span><span class="n">ops</span><span class="o">.</span><span class="n">HASH</span><span class="p">)</span>
+    <span class="k">elif</span><span class="p">(</span><span class="n">op</span> <span class="o">==</span> <span class="s">&quot;prod{&quot;</span><span class="p">):</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">BinaryNode</span><span class="p">(</span><span class="n">ops</span><span class="o">.</span><span class="n">PROD</span><span class="p">)</span>
+    <span class="k">elif</span><span class="p">(</span><span class="n">op</span> <span class="o">==</span> <span class="s">&quot;on&quot;</span><span class="p">):</span>
+        <span class="c"># can only be used in conjunction w/ PROD (e.g. PROD must precede it)        </span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">BinaryNode</span><span class="p">(</span><span class="n">ops</span><span class="o">.</span><span class="n">ON</span><span class="p">)</span> 
+    <span class="c"># elif e( ... )</span>
+    <span class="k">else</span><span class="p">:</span>    
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="n">node</span><span class="o">.</span><span class="n">addSubNode</span><span class="p">(</span><span class="n">node1</span><span class="p">,</span> <span class="n">node2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">node</span>
+
+<span class="k">class</span> <span class="nc">BatchParser</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span></div>
+<div class="viewcode-block" id="BatchParser"><a class="viewcode-back" href="../toolbox/batchparser.html#batchparser.BatchParser">[docs]</a>        <span class="bp">self</span><span class="o">.</span><span class="n">finalPol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getBNF</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+
+    <span class="k">def</span> <span class="nf">getBNF</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># supported operators =&gt; (OR, AND, &lt;, prod{</span>
+<div class="viewcode-block" id="BatchParser.getBNF"><a class="viewcode-back" href="../toolbox/batchparser.html#batchparser.BatchParser.getBNF">[docs]</a>        <span class="n">OperatorOR</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">(</span><span class="s">&quot;OR&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">(</span><span class="s">&quot;or&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span><span class="n">upcaseTokens</span><span class="p">)</span>
+        <span class="n">OperatorAND</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">(</span><span class="s">&quot;AND&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">(</span><span class="s">&quot;and&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span><span class="n">upcaseTokens</span><span class="p">)</span>
+        <span class="n">lpar</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">(</span><span class="s">&quot;(&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">suppress</span><span class="p">()</span>
+        <span class="n">rpar</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">(</span><span class="s">&quot;)&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">suppress</span><span class="p">()</span>
+        <span class="n">rcurly</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">(</span><span class="s">&quot;}&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">suppress</span><span class="p">()</span>
+
+        <span class="n">ExpOp</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">(</span><span class="s">&quot;^&quot;</span><span class="p">)</span>
+        <span class="n">MulOp</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">(</span><span class="s">&quot;*&quot;</span><span class="p">)</span>
+        <span class="n">Equality</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">(</span><span class="s">&quot;:=&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">(</span><span class="s">&quot;==&quot;</span><span class="p">)</span> <span class="c"># | Word(&quot;&lt;&gt;&quot;, max=1)</span>
+        <span class="n">Pairing</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">(</span><span class="s">&#39;e(&#39;</span><span class="p">)</span> <span class="c"># Pairing token</span>
+        <span class="n">Hash</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">(</span><span class="s">&#39;H(&#39;</span><span class="p">)</span>
+        <span class="n">Prod</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">(</span><span class="s">&quot;prod{&quot;</span><span class="p">)</span> <span class="c"># dot product token</span>
+        <span class="n">ProdOf</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">(</span><span class="s">&quot;on&quot;</span><span class="p">)</span>
+        <span class="n">Token</span> <span class="o">=</span> <span class="n">Equality</span> <span class="o">|</span> <span class="n">ExpOp</span> <span class="o">|</span> <span class="n">MulOp</span> <span class="o">|</span> <span class="n">ProdOf</span>
+        <span class="n">Operator</span> <span class="o">=</span> <span class="n">OperatorAND</span> <span class="o">|</span> <span class="n">OperatorOR</span> <span class="o">|</span> <span class="n">Token</span>
+
+        <span class="c"># describes an individual leaf node</span>
+        <span class="n">leafNode</span> <span class="o">=</span> <span class="n">Word</span><span class="p">(</span><span class="n">alphanums</span> <span class="o">+</span> <span class="s">&#39;_|&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span> <span class="n">createNode</span> <span class="p">)</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="n">Forward</span><span class="p">()</span>
+        <span class="n">term</span> <span class="o">=</span> <span class="n">Forward</span><span class="p">()</span>
+        <span class="n">factor</span> <span class="o">=</span> <span class="n">Forward</span><span class="p">()</span>
+        <span class="n">atom</span> <span class="o">=</span> <span class="p">(</span><span class="n">Hash</span> <span class="o">+</span> <span class="n">expr</span> <span class="o">+</span> <span class="n">rpar</span><span class="p">)</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span> <span class="n">pushFirst</span> <span class="p">)</span> <span class="o">|</span> \
+               <span class="p">(</span><span class="n">Pairing</span> <span class="o">+</span> <span class="n">expr</span> <span class="o">+</span> <span class="s">&#39;,&#39;</span> <span class="o">+</span> <span class="n">expr</span> <span class="o">+</span> <span class="n">rpar</span><span class="p">)</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span> <span class="n">pushFirst</span> <span class="p">)</span> <span class="o">|</span> \
+               <span class="p">(</span><span class="n">Prod</span> <span class="o">+</span> <span class="n">expr</span> <span class="o">+</span> <span class="s">&#39;,&#39;</span> <span class="o">+</span> <span class="n">expr</span> <span class="o">+</span> <span class="n">rcurly</span><span class="p">)</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span> <span class="n">pushFirst</span> <span class="p">)</span> <span class="o">|</span> \
+               <span class="n">lpar</span> <span class="o">+</span> <span class="n">expr</span> <span class="o">+</span> <span class="n">rpar</span> <span class="o">|</span> <span class="p">(</span><span class="n">leafNode</span><span class="p">)</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span> <span class="n">pushFirst</span> <span class="p">)</span>
+
+        <span class="c"># NEED TO UNDERSTAND THIS SEQUENCE AND WHY IT WORKS FOR PARSING ^ and = in logical order?!?</span>
+        <span class="c"># Place more value on atom [ ^ factor}, so gets pushed on the stack before atom [ = factor], right?</span>
+        <span class="c"># In other words, adds order of precedence to how we parse the string. This means we are parsing from right</span>
+        <span class="c"># to left. a^b has precedence over b = c essentially</span>
+        <span class="n">factor</span> <span class="o">&lt;&lt;</span> <span class="n">atom</span> <span class="o">+</span> <span class="n">ZeroOrMore</span><span class="p">(</span> <span class="p">(</span> <span class="n">ExpOp</span> <span class="o">+</span> <span class="n">factor</span> <span class="p">)</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span> <span class="n">pushFirst</span> <span class="p">)</span> <span class="p">)</span>
+        
+        <span class="n">term</span> <span class="o">=</span> <span class="n">atom</span> <span class="o">+</span> <span class="n">ZeroOrMore</span><span class="p">((</span><span class="n">Operator</span> <span class="o">+</span> <span class="n">factor</span><span class="p">)</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span> <span class="n">pushFirst</span> <span class="p">))</span>
+        <span class="c"># define placeholder set earlier with a &#39;term&#39; + Operator + another term, where there can be</span>
+        <span class="c"># more than zero or more of the latter. Once we find a term, we first push that into</span>
+        <span class="c"># the stack, then if ther&#39;s an operand + term, then we first push the term, then the Operator.</span>
+        <span class="c"># so on and so forth (follows post fix notation).</span>
+        <span class="n">expr</span> <span class="o">&lt;&lt;</span> <span class="n">term</span> <span class="o">+</span> <span class="n">ZeroOrMore</span><span class="p">((</span><span class="n">Operator</span> <span class="o">+</span> <span class="n">term</span><span class="p">)</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span> <span class="n">pushFirst</span> <span class="p">))</span>
+        <span class="c"># final bnf object</span>
+        <span class="n">finalPol</span> <span class="o">=</span> <span class="n">expr</span><span class="c">#.setParseAction( debug )</span>
+        <span class="k">return</span> <span class="n">finalPol</span>
+    
+    <span class="c"># method for evaluating stack assumes operators have two operands and pops them accordingly</span>
+    <span class="k">def</span> <span class="nf">evalStack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stack</span><span class="p">):</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span></div>
+<div class="viewcode-block" id="BatchParser.evalStack"><a class="viewcode-back" href="../toolbox/batchparser.html#batchparser.BatchParser.evalStack">[docs]</a>        <span class="k">if</span> <span class="n">debug</span> <span class="o">&gt;=</span> <span class="n">levels</span><span class="o">.</span><span class="n">some</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;op: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">op</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;*&quot;</span><span class="p">,</span> <span class="s">&quot;^&quot;</span><span class="p">,</span> <span class="s">&quot;:=&quot;</span><span class="p">,</span> <span class="s">&quot;==&quot;</span><span class="p">,</span> <span class="s">&quot;e(&quot;</span><span class="p">,</span> <span class="s">&quot;prod{&quot;</span><span class="p">,</span> <span class="s">&quot;on&quot;</span><span class="p">]:</span> <span class="c"># == &quot;AND&quot; or op == &quot;OR&quot; or op == &quot;^&quot; or op == &quot;=&quot;:</span>
+            <span class="n">op2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evalStack</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span>
+            <span class="n">op1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evalStack</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">createTree</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;H(&quot;</span><span class="p">]:</span>
+            <span class="n">op1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evalStack</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">createTree</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># Node value</span>
+            <span class="k">return</span> <span class="n">op</span>
+    
+    <span class="c"># main loop for parser. 1) declare new stack, then parse the string (using defined BNF) to extract all</span>
+    <span class="c"># the tokens from the string (not used for anything). 3) evaluate the stack which is in a post</span>
+    <span class="c"># fix format so that we can pop an OR, AND, ^ or = nodes then pull 2 subsequent variables off the stack. Then,</span>
+    <span class="c"># recursively evaluate those variables whether they are internal nodes or leaf nodes, etc.</span>
+    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="c"># use lineCtr to track line of code.</span></div>
+<div class="viewcode-block" id="BatchParser.parse"><a class="viewcode-back" href="../toolbox/batchparser.html#batchparser.BatchParser.parse">[docs]</a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;#&#39;</span><span class="p">:</span> 
+<span class="c">#            print(&quot;comments or empty strings will be ignored.&quot;)</span>
+            <span class="k">return</span> <span class="bp">None</span> 
+        <span class="k">global</span> <span class="n">objStack</span>
+        <span class="k">del</span> <span class="n">objStack</span><span class="p">[:]</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">finalPol</span><span class="o">.</span><span class="n">parseString</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span> <span class="o">&gt;=</span> <span class="n">levels</span><span class="o">.</span><span class="n">some</span><span class="p">:</span>
+           <span class="k">print</span><span class="p">(</span><span class="s">&quot;stack =&gt;&quot;</span><span class="p">,</span> <span class="n">objStack</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evalStack</span><span class="p">(</span><span class="n">objStack</span><span class="p">)</span>
+   
+    <span class="c"># experimental - type checking </span>
+<span class="c">#    def type_check(self, node):</span>
+<span class="c">#        if node.type == node.EXP:</span>
+<span class="c">#            print(&quot;public =&gt;&quot;, node.getLeft(), &quot;in pk?&quot;)</span>
+<span class="c">#            print(&quot;secret =&gt;&quot;, node.getRight(), &quot;in sk?&quot;)</span>
+            
+<span class="c">#        elif node.type == node.EQ:</span>
+<span class="c">#            print(&quot;public =&gt;&quot;, node.getLeft(), &quot;in pk?&quot;)</span>
+<span class="c">#            self.type_check(node.getRight())</span>
+<span class="c">#        elif node.type == node.AND:</span>
+<span class="c">#            self.type_check(node.getLeft())</span>
+<span class="c">#            self.type_check(node.getRight())</span>
+<span class="c">#        else:</span>
+<span class="c">#            return None</span>
+<span class="c">#        return None</span>
+<span class="k">def</span> <span class="nf">parseFile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="n">fd</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span></div></div>
+<div class="viewcode-block" id="parseFile"><a class="viewcode-back" href="../toolbox/batchparser.html#batchparser.parseFile">[docs]</a>    <span class="n">ast_tree</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">BatchParser</span><span class="p">()</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">readlines</span><span class="p">();</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">code</span><span class="p">:</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;#&#39;</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">ast_node</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="s">&quot;:&quot;</span><span class="p">,</span> <span class="n">ast_node</span><span class="p">)</span>
+        <span class="n">ast_tree</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast_node</span> <span class="c"># store for later processing</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">fd</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">ast_tree</span>
+
+<span class="c"># Takes the tree and iterates through each line </span>
+<span class="c"># and verifies X # of rules. This serves to notify</span>
+<span class="c"># the user on any errors that might have been made in</span>
+<span class="c"># specifying the batch inputs.</span>
+<span class="k">def</span> <span class="nf">astSyntaxChecker</span><span class="p">(</span><span class="n">astTree</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+<div class="viewcode-block" id="astSyntaxChecker"><a class="viewcode-back" href="../toolbox/batchparser.html#batchparser.astSyntaxChecker">[docs]</a>
+<span class="c"># Perform some type checking here?</span>
+<span class="k">def</span> <span class="nf">astParser</span><span class="p">(</span><span class="n">objtree</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+<div class="viewcode-block" id="astParser"><a class="viewcode-back" href="../toolbox/batchparser.html#batchparser.astParser">[docs]</a>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span></div>
+<span class="c">#    statement = sys.argv[1]</span>
+<span class="c">#</span>
+<span class="c">#    parser = BatchParser()</span>
+<span class="c">#    final = parser.parse(statement)</span>
+<span class="c">#    print(&quot;Final statement:  &#39;%s&#39;&quot; % final)</span>
+    <span class="nb">file</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    
+    <span class="n">ast</span> <span class="o">=</span> <span class="n">parseFile</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">ast</span><span class="p">)</span>
+    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

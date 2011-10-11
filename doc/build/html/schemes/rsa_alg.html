@@ -1,0 +1,200 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rsa_alg &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
+    <link rel="next" title="schnorr_sig_08" href="schnorr_sig_08.html" />
+    <link rel="prev" title="paillier" href="paillier.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="schnorr_sig_08.html" title="schnorr_sig_08"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="paillier.html" title="paillier"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-rsa_alg">
+<span id="rsa-alg"></span><h1>rsa_alg<a class="headerlink" href="#module-rsa_alg" title="Permalink to this headline">¶</a></h1>
+<div class="line-block">
+<div class="line">From: &#8220;Rivest-Shamir-Adleman Standard algorithm&#8221;.</div>
+<div class="line">Published in: 1978</div>
+<div class="line">Security Assumption: RSA factoring</div>
+</div>
+<ul class="simple">
+<li>type:           public-key encryption</li>
+<li>setting:        Integer</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">J Ayo Akinyele, Gary Belvin</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">07/2011</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="rsa_alg.RSA">
+<em class="property">class </em><tt class="descclassname">rsa_alg.</tt><tt class="descname">RSA</tt><a class="reference internal" href="../_modules/rsa_alg.html#RSA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rsa_alg.RSA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<p>RSA Module</p>
+<dl class="method">
+<dt id="rsa_alg.RSA.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>secparam=1024</em><big>)</big><a class="reference internal" href="../_modules/rsa_alg.html#RSA.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rsa_alg.RSA.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rsa_alg.RSA.paramgen">
+<tt class="descname">paramgen</tt><big>(</big><em>secparam</em><big>)</big><a class="reference internal" href="../_modules/rsa_alg.html#RSA.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rsa_alg.RSA.paramgen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="rsa_alg.RSA_Enc">
+<em class="property">class </em><tt class="descclassname">rsa_alg.</tt><tt class="descname">RSA_Enc</tt><big>(</big><em>padding=&lt;toolbox.paddingschemes.OAEPEncryptionPadding object at 0x418ad90&gt;</em><big>)</big><a class="reference internal" href="../_modules/rsa_alg.html#RSA_Enc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rsa_alg.RSA_Enc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rsa_alg.RSA" title="rsa_alg.RSA"><tt class="xref py py-class docutils literal"><span class="pre">rsa_alg.RSA</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">toolbox.PKEnc.PKEnc</span></tt></p>
+<dl class="method">
+<dt id="rsa_alg.RSA_Enc.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>c</em><big>)</big><a class="reference internal" href="../_modules/rsa_alg.html#RSA_Enc.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rsa_alg.RSA_Enc.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rsa_alg.RSA_Enc.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>m</em><big>)</big><a class="reference internal" href="../_modules/rsa_alg.html#RSA_Enc.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rsa_alg.RSA_Enc.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="rsa_alg.RSA_Sig">
+<em class="property">class </em><tt class="descclassname">rsa_alg.</tt><tt class="descname">RSA_Sig</tt><big>(</big><em>padding=&lt;toolbox.paddingschemes.PSSPadding object at 0x418ae50&gt;</em><big>)</big><a class="reference internal" href="../_modules/rsa_alg.html#RSA_Sig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rsa_alg.RSA_Sig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rsa_alg.RSA" title="rsa_alg.RSA"><tt class="xref py py-class docutils literal"><span class="pre">rsa_alg.RSA</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">toolbox.PKSig.PKSig</span></tt></p>
+<p>RSASSA-PSS</p>
+<dl class="method">
+<dt id="rsa_alg.RSA_Sig.sign">
+<tt class="descname">sign</tt><big>(</big><em>sk</em>, <em>M</em>, <em>salt=None</em><big>)</big><a class="reference internal" href="../_modules/rsa_alg.html#RSA_Sig.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rsa_alg.RSA_Sig.sign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rsa_alg.RSA_Sig.verify">
+<tt class="descname">verify</tt><big>(</big><em>pk</em>, <em>M</em>, <em>S</em><big>)</big><a class="reference internal" href="../_modules/rsa_alg.html#RSA_Sig.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rsa_alg.RSA_Sig.verify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="rsa_alg.main">
+<tt class="descclassname">rsa_alg.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/rsa_alg.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rsa_alg.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="rsa_alg.main2">
+<tt class="descclassname">rsa_alg.</tt><tt class="descname">main2</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/rsa_alg.html#main2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rsa_alg.main2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="paillier.html"
+                        title="previous chapter">paillier</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="schnorr_sig_08.html"
+                        title="next chapter">schnorr_sig_08</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/schemes/rsa_alg.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="schnorr_sig_08.html" title="schnorr_sig_08"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="paillier.html" title="paillier"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,185 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>securerandom &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
+    <link rel="next" title="sigmaprotocol" href="sigmaprotocol.html" />
+    <link rel="prev" title="secretutil" href="secretutil.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sigmaprotocol.html" title="sigmaprotocol"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="secretutil.html" title="secretutil"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-securerandom">
+<span id="securerandom"></span><h1>securerandom<a class="headerlink" href="#module-securerandom" title="Permalink to this headline">¶</a></h1>
+<p>Base class for cryptographic secure random number generation
+:authors: Gary Belvin</p>
+<dl class="class">
+<dt id="securerandom.SecureRandom">
+<em class="property">class </em><tt class="descclassname">securerandom.</tt><tt class="descname">SecureRandom</tt><a class="reference internal" href="../_modules/securerandom.html#SecureRandom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.SecureRandom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dl class="method">
+<dt id="securerandom.SecureRandom.addSeedMaterial">
+<tt class="descname">addSeedMaterial</tt><big>(</big><em>seed</em><big>)</big><a class="reference internal" href="../_modules/securerandom.html#SecureRandom.addSeedMaterial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.SecureRandom.addSeedMaterial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add randomness to the generator.  
+Always increases entropy</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="securerandom.SecureRandom.getRandomBits">
+<tt class="descname">getRandomBits</tt><big>(</big><em>length</em><big>)</big><a class="reference internal" href="../_modules/securerandom.html#SecureRandom.getRandomBits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.SecureRandom.getRandomBits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a random bit string of length bytes</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="securerandom.SecureRandomFactory">
+<em class="property">class </em><tt class="descclassname">securerandom.</tt><tt class="descname">SecureRandomFactory</tt><a class="reference internal" href="../_modules/securerandom.html#SecureRandomFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.SecureRandomFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<p>This class provides a central place to swap out the randomness engine
+used by the charm framework.
+Classes should call <tt class="docutils literal"><span class="pre">rand</span> <span class="pre">=</span> <span class="pre">SecureRandomFactory.getInstance()</span></tt> 
+to acquire a randomnesss generator</p>
+<dl class="classmethod">
+<dt id="securerandom.SecureRandomFactory.getInstance">
+<em class="property">classmethod </em><tt class="descname">getInstance</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/securerandom.html#SecureRandomFactory.getInstance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.SecureRandomFactory.getInstance" title="Permalink to this definition">¶</a></dt>
+<dd><p>getInstance currently returns a <em>completely</em> broken random number generator.</p>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">replace with a secure, hash-based PRNG</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="securerandom.WeakRandom">
+<em class="property">class </em><tt class="descclassname">securerandom.</tt><tt class="descname">WeakRandom</tt><a class="reference internal" href="../_modules/securerandom.html#WeakRandom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.WeakRandom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#securerandom.SecureRandom" title="securerandom.SecureRandom"><tt class="xref py py-class docutils literal"><span class="pre">securerandom.SecureRandom</span></tt></a></p>
+<dl class="method">
+<dt id="securerandom.WeakRandom.addSeedMaterial">
+<tt class="descname">addSeedMaterial</tt><big>(</big><em>seed</em><big>)</big><a class="reference internal" href="../_modules/securerandom.html#WeakRandom.addSeedMaterial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.WeakRandom.addSeedMaterial" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="securerandom.WeakRandom.getRandomBits">
+<tt class="descname">getRandomBits</tt><big>(</big><em>length</em><big>)</big><a class="reference internal" href="../_modules/securerandom.html#WeakRandom.getRandomBits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.WeakRandom.getRandomBits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="securerandom.WeakRandom.myrandom">
+<em class="property">classmethod </em><tt class="descname">myrandom</tt><big>(</big><em>length</em>, <em>printable=False</em><big>)</big><a class="reference internal" href="../_modules/securerandom.html#WeakRandom.myrandom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.WeakRandom.myrandom" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method does <strong>NOT</strong> provide cryptographically secure random numbers.
+This should <strong>NOT</strong> be used for production code</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="secretutil.html"
+                        title="previous chapter">secretutil</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="sigmaprotocol.html"
+                        title="next chapter">sigmaprotocol</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/toolbox/securerandom.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sigmaprotocol.html" title="sigmaprotocol"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="secretutil.html" title="secretutil"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

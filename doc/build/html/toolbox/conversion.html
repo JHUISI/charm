@@ -1,0 +1,203 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>conversion &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
+    <link rel="next" title="ecgroup" href="ecgroup.html" />
+    <link rel="prev" title="Commit" href="Commit.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ecgroup.html" title="ecgroup"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Commit.html" title="Commit"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-conversion">
+<span id="conversion"></span><h1>conversion<a class="headerlink" href="#module-conversion" title="Permalink to this headline">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Date:</th><td class="field-body">Jul 5, 2011</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Authors:</th><td class="field-body">Gary Belvin</td>
+</tr>
+</tbody>
+</table>
+<p>This class facilitates conversion between domain spaces</p>
+<dl class="class">
+<dt id="conversion.Conversion">
+<em class="property">class </em><tt class="descclassname">conversion.</tt><tt class="descname">Conversion</tt><a class="reference internal" href="../_modules/conversion.html#Conversion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conversion.Conversion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<p>The goal is to convert arbitrarily between any of the following types</p>
+<p>Input types:</p>
+<ul class="simple">
+<li>bytes</li>
+<li>Bytes</li>
+<li>int</li>
+<li>Integer Element</li>
+<li>Modular Integer Element</li>
+</ul>
+<p>Output types:</p>
+<ul class="simple">
+<li>int</li>
+<li>Group element</li>
+<li>Integer element</li>
+<li>Integer element mod N</li>
+</ul>
+<dl class="classmethod">
+<dt id="conversion.Conversion.IP2OS">
+<em class="property">classmethod </em><tt class="descname">IP2OS</tt><big>(</big><em>number</em>, <em>xLen=None</em><big>)</big><a class="reference internal" href="../_modules/conversion.html#Conversion.IP2OS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conversion.Conversion.IP2OS" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">number</span></tt>: is a normal integer, not modular</li>
+<li><tt class="docutils literal"><span class="pre">xLen</span></tt>: is the intended length of the resulting octet string</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Converts an integer into a byte string</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="conversion.Conversion.OS2IP">
+<em class="property">classmethod </em><tt class="descname">OS2IP</tt><big>(</big><em>bytestr</em>, <em>element=False</em><big>)</big><a class="reference internal" href="../_modules/conversion.html#Conversion.OS2IP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conversion.Conversion.OS2IP" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return :</th><td class="field-body">A python <tt class="docutils literal"><span class="pre">int</span></tt> if element is False. An <tt class="docutils literal"><span class="pre">integer.Element</span></tt> if element is True</td>
+</tr>
+</tbody>
+</table>
+<p>Converts a byte string to an integer</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="conversion.Conversion.bytes2element">
+<em class="property">classmethod </em><tt class="descname">bytes2element</tt><big>(</big><em>bytestr</em><big>)</big><a class="reference internal" href="../_modules/conversion.html#Conversion.bytes2element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conversion.Conversion.bytes2element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a byte string to a group element</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="conversion.Conversion.bytes2integer">
+<em class="property">classmethod </em><tt class="descname">bytes2integer</tt><big>(</big><em>bytestr</em><big>)</big><a class="reference internal" href="../_modules/conversion.html#Conversion.bytes2integer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conversion.Conversion.bytes2integer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a bytes string to an int of a particular bit-length?</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="conversion.Conversion.str2bytes">
+<em class="property">classmethod </em><tt class="descname">str2bytes</tt><big>(</big><em>str</em><big>)</big><a class="reference internal" href="../_modules/conversion.html#Conversion.str2bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conversion.Conversion.str2bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Commit.html"
+                        title="previous chapter">Commit</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ecgroup.html"
+                        title="next chapter">ecgroup</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/toolbox/conversion.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ecgroup.html" title="ecgroup"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Commit.html" title="Commit"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

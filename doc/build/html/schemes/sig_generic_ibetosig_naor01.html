@@ -1,0 +1,177 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sig_generic_ibetosig_naor01 &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
+    <link rel="next" title="sig_short_bls04" href="sig_short_bls04.html" />
+    <link rel="prev" title="schnorrprotocol" href="schnorrprotocol.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sig_short_bls04.html" title="sig_short_bls04"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="schnorrprotocol.html" title="schnorrprotocol"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-sig_generic_ibetosig_naor01">
+<span id="sig-generic-ibetosig-naor01"></span><h1>sig_generic_ibetosig_naor01<a class="headerlink" href="#module-sig_generic_ibetosig_naor01" title="Permalink to this headline">¶</a></h1>
+<p>Naor&#8217;s generic IBE-to-Signature transform (generic composition)</p>
+<div class="line-block">
+<div class="line">From: &#8220;B. Franklin, M. Franklin: Identity-based encryption from the Weil pairing&#8221;</div>
+<div class="line">Published in: Eurocrypt 2009</div>
+<div class="line">Available from: <a class="reference external" href="http://eprint.iacr.org/2009/028.pdf">http://eprint.iacr.org/2009/028.pdf</a></div>
+</div>
+<dl class="docutils">
+<dt>Notes:  This transform was first described by Boneh and Franklin but credited to Moni Naor.  It</dt>
+<dd>converts any fully-secure IBE sheme into a signature by repurposing the identity key extraction
+as a signing algorithm.  To verify, encrypt a random value under the message/identity,
+and attempt to decrypt it using the signature/key.  It may be necessary to repeat this process,
+depending on the size of the IBE&#8217;s plaintext space.  Some IBE schemes support a more efficient
+algorithm for verifying the structure of an identity key &#8212; we will use it if it&#8217;s available. 
+<em>Warning</em>: this transform is not secure for selectively-secure schemes!</dd>
+</dl>
+<ul class="simple">
+<li>type:                 signature (public key)</li>
+<li>setting:              n/a (any fully-secure IBE scheme)</li>
+<li>assumption:   n/a (dependent on the IBE scheme)</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Matthew Green</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">05/2011</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="sig_generic_ibetosig_naor01.Sig_Generic_ibetosig_Naor01">
+<em class="property">class </em><tt class="descclassname">sig_generic_ibetosig_naor01.</tt><tt class="descname">Sig_Generic_ibetosig_Naor01</tt><big>(</big><em>ibe_scheme</em>, <em>groupObj</em><big>)</big><a class="reference internal" href="../_modules/sig_generic_ibetosig_naor01.html#Sig_Generic_ibetosig_Naor01"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sig_generic_ibetosig_naor01.Sig_Generic_ibetosig_Naor01" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.PKSig.PKSig</span></tt></p>
+<dl class="method">
+<dt id="sig_generic_ibetosig_naor01.Sig_Generic_ibetosig_Naor01.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>secparam=None</em><big>)</big><a class="reference internal" href="../_modules/sig_generic_ibetosig_naor01.html#Sig_Generic_ibetosig_Naor01.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sig_generic_ibetosig_naor01.Sig_Generic_ibetosig_Naor01.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sig_generic_ibetosig_naor01.Sig_Generic_ibetosig_Naor01.sign">
+<tt class="descname">sign</tt><big>(</big><em>sk</em>, <em>message</em><big>)</big><a class="reference internal" href="../_modules/sig_generic_ibetosig_naor01.html#Sig_Generic_ibetosig_Naor01.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sig_generic_ibetosig_naor01.Sig_Generic_ibetosig_Naor01.sign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sig_generic_ibetosig_naor01.Sig_Generic_ibetosig_Naor01.verify">
+<tt class="descname">verify</tt><big>(</big><em>pk</em>, <em>m</em>, <em>sig</em><big>)</big><a class="reference internal" href="../_modules/sig_generic_ibetosig_naor01.html#Sig_Generic_ibetosig_Naor01.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sig_generic_ibetosig_naor01.Sig_Generic_ibetosig_Naor01.verify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="sig_generic_ibetosig_naor01.main">
+<tt class="descclassname">sig_generic_ibetosig_naor01.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/sig_generic_ibetosig_naor01.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sig_generic_ibetosig_naor01.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="schnorrprotocol.html"
+                        title="previous chapter">schnorrprotocol</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="sig_short_bls04.html"
+                        title="next chapter">sig_short_bls04</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/schemes/sig_generic_ibetosig_naor01.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sig_short_bls04.html" title="sig_short_bls04"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="schnorrprotocol.html" title="schnorrprotocol"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>
