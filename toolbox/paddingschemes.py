@@ -20,6 +20,7 @@ class OAEPEncryptionPadding:
     Implemented according to PKCS#1 v2.1 Section 7 ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf
     '''
     def __init__(self, _hash_type ='sha1'):
+        self.name = "OAEPEncryptionPadding"
         self.hashFn = hashFunc(_hash_type)
         self.hashFnOutputBytes = len(hashlib.new(_hash_type).digest())
         
@@ -333,6 +334,7 @@ class SAEPEncryptionPadding:
     SAEPEncryptionPadding
     '''
     def __init__(self, _hash_type ='sha384'):
+        self.name = "SAEPEncryptionPadding"
         self.hashFn = hashFunc(_hash_type)
         self.hashFnOutputBytes = len(hashlib.new(_hash_type).digest())
         

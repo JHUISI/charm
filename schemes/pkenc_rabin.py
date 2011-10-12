@@ -64,8 +64,14 @@ class Rabin_Enc(Rabin,PKEnc):
         self.paddingscheme = padding 
         self.redundancyscheme = redundancy
     # m : Bytes
-    def encrypt(self, pk, m):
-        EM = self.paddingscheme.encode(m, pk['n'], pk['s0'])
+    def encrypt(self, pk, m, salt=None):
+        if(self.paddingscheme.name == "SAEPEncryptionPadding"):
+            EM = self.paddingscheme.encode(m, pk['n'], pk['s0'])
+        else:
+            m = self.redundancyscheme.encode(m)
+            octetlen = int(ceil(int(pk['N']).bit_length() / 8.0))
+            EM = self.paddingscheme.encode(m, octetlen, "", salt)
+
         if debug: print("EM == >", EM)
         i = Conversion.OS2IP(EM)
         ip = integer(i) % pk['N']  #Convert to modular integer
@@ -95,43 +101,60 @@ class Rabin_Enc(Rabin,PKEnc):
         m3 = s1 % int(sk['N'])
         m4 = s2 % int(sk['N'])
 
-        if(m1 < int(sk['N']/2)):
-            os1 = Conversion.IP2OS(int(m1))
-            if(m2 < int(sk['N']/2)):
-                os2 = Conversion.IP2OS(int(m2))
-            else:
-                if(m3 < int(sk['N']/2)):
-                    os2 = Conversion.IP2OS(int(m3))
+        if(self.paddingscheme.name == "SAEPEncryptionPadding"):        
+            if(m1 < int(sk['N']/2)):
+                os1 = Conversion.IP2OS(int(m1))
+                if(m2 < int(sk['N']/2)):
+                    os2 = Conversion.IP2OS(int(m2))
                 else:
-                    os2 = Conversion.IP2OS(int(m4))
-        else:
-            if(m2 < int(sk['N']/2)):
-                os1 = Conversion.IP2OS(int(m2))
-                if(m3 < int(sk['N']/2)):
-                    os2 = Conversion.IP2OS(int(m3))
+                    if(m3 < int(sk['N']/2)):
+                        os2 = Conversion.IP2OS(int(m3))
+                    else:
+                        os2 = Conversion.IP2OS(int(m4))
+            else:
+                if(m2 < int(sk['N']/2)):
+                    os1 = Conversion.IP2OS(int(m2))
+                    if(m3 < int(sk['N']/2)):
+                        os2 = Conversion.IP2OS(int(m3))
+                    else:
+                        os2 = Conversion.IP2OS(int(m4))
                 else:
+                    os1 = Conversion.IP2OS(int(m3))
                     os2 = Conversion.IP2OS(int(m4))
-            else:
-                os1 = Conversion.IP2OS(int(m3))
-                os2 = Conversion.IP2OS(int(m4))
-            
-        if debug:
-            print("OS1  =>", os1)
-            print("OS2  =>", os2)
+                
+            if debug:
+                print("OS1  =>", os1)
+                print("OS2  =>", os2)
 
-        (m1, t1) = self.paddingscheme.decode(os1, pk['n'], pk['s0'])
-        (m2, t2) = self.paddingscheme.decode(os2, pk['n'], pk['s0'])
+            (m1, t1) = self.paddingscheme.decode(os1, pk['n'], pk['s0'])
+            (m2, t2) = self.paddingscheme.decode(os2, pk['n'], pk['s0'])
 
-        if((t1 == Bytes.fill(b'\x00', pk['s0']/8)) and (t2 == Bytes.fill(b'\x00', pk['s0']/8))):
-            assert False, "invalid ciphertext"
-
-        if(t1 == Bytes.fill(b'\x00', pk['s0']/8)):
-            return m1
-        else:
-            if(t2 == Bytes.fill(b'\x00', pk['s0']/8)):
-                return m2
-            else:
+            if((t1 == Bytes.fill(b'\x00', pk['s0']/8)) and (t2 == Bytes.fill(b'\x00', pk['s0']/8))):
                 assert False, "invalid ciphertext"
+
+            if(t1 == Bytes.fill(b'\x00', pk['s0']/8)):
+                return m1
+            else:
+                if(t2 == Bytes.fill(b'\x00', pk['s0']/8)):
+                    return m2
+                else:
+                    assert False, "invalid ciphertext"
+        else:
+            octetlen = int(ceil(int(pk['N']).bit_length() / 8.0))
+            os1 = Conversion.IP2OS(int(m1), octetlen)
+            os2 = Conversion.IP2OS(int(m2), octetlen)
+            os3 = Conversion.IP2OS(int(m3), octetlen)
+            os4 = Conversion.IP2OS(int(m4), octetlen)
+            if debug:
+                print("OS1  =>", os1)
+                print("OS2  =>", os2)
+                print("OS3  =>", os3)
+                print("OS4  =>", os4)
+
+            for i in [os1, os2, os3, os4]:
+                (isMessage, message) = self.redundancyscheme.decode(self.paddingscheme.decode(i))
+                if(isMessage):
+                   return message        
 
 class Rabin_Sig(Rabin, PKSig):
     '''RSASSA-PSS'''
