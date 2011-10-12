@@ -1,22 +1,24 @@
-# types {
+
 N := 200
+
+BEGIN :: types
 s := ZR
 h := G1
 S1 := GT
 S2 := G1
 pk := G1
 a := ZR
-# }
+END :: types
 
-# variables {
 #S1 := e(h, g2)^s
 #S2 := (sk^a) * (h^s)
-#sig := (S1, S2)
-# precomputation
-#a := H(M | S1, ZR)
-# }
 
-constant := g2
-constant := P
+BEGIN :: precompute
+a := H(M_i | S1_i, ZR)
+END :: precompute
 
-verify := e(S2, g2) == ( e(pk, P)^a ) * S1 
+BEGIN :: constant
+P, g2
+END :: constant
+
+verify := { e(S2, g2) == ( e(pk, P)^a ) * S1 }

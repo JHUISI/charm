@@ -443,9 +443,10 @@ class CombineVerifyEq:
         new_node = p.parse("prod{i:=1, N} on x")
         return new_node
 
-    def isConstant(self, node):        
-        for n in self.consts:
-            if n == node.getAttribute(): return True            
+    def isConstant(self, node):
+        if self.consts:        
+            for n in self.consts:
+                if n == node.getAttribute(): return True            
             #if n.getAttribute() == node.getAttribute(): return True
         return False
 
@@ -458,6 +459,8 @@ class SimplifyDotProducts:
         pass
     
     def visit_on(self, node, data):
+        if data['parent'].type == ops.PAIR:
+            return
 #        print("right node of prod =>", node.right, ": type =>", node.right.type)
         _type = node.right.type
         if _type == ops.MUL:
@@ -495,6 +498,12 @@ class SmallExponent:
 
     # find  'prod{i} on x' transform into ==> 'prod{i} on (x)^delta_i'
     def visit_on(self, node, data):
+        prod = node.left
+        # Restrict to only product nodes that we've introduced for 
+        # iterating over the N signatures
+        if str(prod.right) != 'N':
+            return
+        
         if node.right.type == ops.EXP:
             exp = node.right
             mul = BinaryNode(ops.MUL)
@@ -579,6 +588,22 @@ class Technique3:
     def visit(self, node, data):
         pass
     
+    # rare case: split a \single\ pairing into two or more pairings to allow for application of 
+    # other techniques. pair(a, b * c * d?) => p(a, b) * p(a, c) * p(a, d)
+    # pair with a child node with more than two mult's?
+    def visit_pair(self, node, data):
+        left = node.left
+        right = node.right
+        if left.type == ops.MUL:
+            pass
+        elif right.type == ops.MUL:
+            _nodes = []
+            self.getNodes(right, _nodes)
+            if len(_nodes) > 2: # candidate for 
+                pass
+        else:
+            return None
+
     def visit_on(self, node, data):
         if node.right.type == ops.PAIR:
             pair_node = node.right
@@ -718,8 +743,7 @@ if __name__ == "__main__":
     print("Type information =>", vars)
     print("\nFinal Equation =>", verify2)
     
-#    exit(0)
-
+    exit(0)
 #    cg = CodeGenerator(const, vars, verify2.right)
 #    result = cg.print_batchverify()
 #    result = cg.print_statement(verify2.right)    
