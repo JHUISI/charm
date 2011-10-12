@@ -49,6 +49,7 @@ class OAEPEncryptionPadding:
             seed = rand.getRandomBytes(hLen)
             
         dbMask = MGF1(seed, len(DB), self.hashFn, hLen)
+
         maskedDB = DB ^ dbMask
         
         # Let seedMask = MGF(maskedDB, self.hashFnOutputBytes) and
@@ -324,3 +325,79 @@ class PSSPadding:
         
         #If H = H', output 'consistent'. Otherwise, output 'inconsistent'.
         return H == HPrime
+
+class SAEPEncryptionPadding:
+    '''
+    :Authors: Christina Garman
+    
+    SAEPEncryptionPadding
+    '''
+    def __init__(self, _hash_type ='sha384'):
+        self.hashFn = hashFunc(_hash_type)
+        self.hashFnOutputBytes = len(hashlib.new(_hash_type).digest())
+        
+    def encode(self, message, n, s0):
+        #n = m + s0 + s1
+        m = int(n/4) #usually 256 bits
+
+        if(len(message) > (m/8)):
+            assert False, "message too long"
+
+        if(len(message) != m):
+            message_ext = bytes(message) + Bytes.fill(b'\x80', 1)
+            if(len(message_ext) != m):
+                message_ext = bytes(message_ext) + Bytes.fill(b'\x00', ((m/8)-2)-len(message))
+            message_ext = bytes(message_ext) + Bytes.fill(b'\x80', 1)
+
+        s1 = n - m - s0
+        t = Bytes.fill(b'\x00', s0/8)
+
+        rand = SecureRandomFactory.getInstance()
+        r = rand.getRandomBytes(int(s1/8))
+
+        v = Bytes(bytes(message_ext) + t)
+
+        x = v ^ self.hashFn(r)
+
+        y = x + r
+
+        if(debug):
+            print("Encoding")
+            print("m        =>", m)
+            print("s0       =>", s0)
+            print("s1       =>", s1)
+            print("t        =>", t, len(t))
+            print("r        =>", r, len(r))
+            print("v        =>", v, len(v))
+            print("x        =>", x)
+            print("y        =>", y, len(y))
+      
+        return y
+    
+    def decode(self, encMessage, n, s0):
+        m = int(n/4)
+
+        x = encMessage[:int((m+s0)/8)]
+        r = encMessage[int((m+s0)/8):int(n-m-s0)]
+
+        v = Bytes(x) ^ self.hashFn(r)
+
+        M = v[:int(m/8)]
+        t = v[int(m/8):int(m+s0/8)]
+
+        if(M[-1] == 128 and (M[-2] == 0 or M[-2] == 128)):
+            index = M[:(len(M)-1)].rindex(b'\x80')
+            M = M[:index]
+        else:
+            M = M[:len(M)-1]
+
+        if(debug):
+            print("decoding:")
+            print("x    => ", x)
+            print("r    => ", r)
+            print("v    => ", v)
+            print("M    => ", M)
+            print("t    => ", t)
+            print("r DB   =>", DB)
+
+        return (M, t)

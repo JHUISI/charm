@@ -13,9 +13,10 @@
 from charm.integer import integer,isPrime,gcd,random,randomPrime
 from toolbox.PKEnc import PKEnc
 from toolbox.PKSig import PKSig
-from toolbox.paddingschemes import OAEPEncryptionPadding,PSSPadding
+from toolbox.paddingschemes import OAEPEncryptionPadding,PSSPadding,SAEPEncryptionPadding
 from toolbox.redundancyschemes import InMessageRedundancy
 from toolbox.conversion import Conversion
+from toolbox.bitstring import Bytes
 from math import ceil, floor
 
 debug = False
@@ -39,16 +40,16 @@ class Rabin():
 
         return (p, yp, q, yq, N)
     
-    def keygen(self, secparam=1024, params=None):
+    def keygen(self, s0, secparam=1024, params=None):
         if params: 
             (N, p, q, yp, yq) = self.convert(params)
-            pk = { 'N':N }
+            pk = { 'N':N, 'n':secparam, 's0':s0 }
             sk = { 'p':p, 'q':q, 'N':N , 'yp':yp, 'yq':yq }
             return (pk, sk)
 
         (p, yp, q, yq, N) = self.paramgen(secparam)
         
-        pk = { 'N':N }
+        pk = { 'N':N, 'n':secparam, 's0':s0 }
         sk = { 'p':p, 'q':q, 'N':N , 'yp':yp, 'yq':yq }
 
         return (pk, sk)
@@ -57,24 +58,21 @@ class Rabin():
         return (integer(N), integer(p), integer(q), integer(yp), integer(yq))
     
 class Rabin_Enc(Rabin,PKEnc):
-    def __init__(self, padding=OAEPEncryptionPadding(), redundancy=InMessageRedundancy(), params=None):
+    def __init__(self, padding=SAEPEncryptionPadding(), redundancy=InMessageRedundancy(), params=None):
         Rabin.__init__(self)
         PKEnc.__init__(self)
         self.paddingscheme = padding 
         self.redundancyscheme = redundancy
     # m : Bytes
-    def encrypt(self, pk, m, salt=None):
-        m = self.redundancyscheme.encode(m)
-        octetlen = int(ceil(int(pk['N']).bit_length() / 8.0))
-        EM = self.paddingscheme.encode(m, octetlen, "", salt)
+    def encrypt(self, pk, m):
+        EM = self.paddingscheme.encode(m, pk['n'], pk['s0'])
         if debug: print("EM == >", EM)
         i = Conversion.OS2IP(EM)
         ip = integer(i) % pk['N']  #Convert to modular integer
+
         return (ip ** 2) % pk['N']
     
     def decrypt(self, pk, sk, c):
-        octetlen = int(ceil(int(pk['N']).bit_length() / 8.0))
-
         p = sk['p']
         q = sk['q']
         yp = sk['yp']
@@ -82,6 +80,9 @@ class Rabin_Enc(Rabin,PKEnc):
 
         mp = (c ** ((p+1)/4)) % p
         mq = (c ** ((q+1)/4)) % q
+
+        if(not(((c % p) == (mp ** 2)) and ((c % q) == (mq ** 2)))):
+            assert False, "invalid ciphertext"
 
         r1 = ((int(yp)*int(p)*int(mq)) + ((int(yq)*int(q)*int(mp)))) % int(sk['N'])
         r2 = int(sk['N']) - int(r1)
@@ -94,20 +95,43 @@ class Rabin_Enc(Rabin,PKEnc):
         m3 = s1 % int(sk['N'])
         m4 = s2 % int(sk['N'])
 
-        os1 = Conversion.IP2OS(int(m1), octetlen)
-        os2 = Conversion.IP2OS(int(m2), octetlen)
-        os3 = Conversion.IP2OS(int(m3), octetlen)
-        os4 = Conversion.IP2OS(int(m4), octetlen)
+        if(m1 < int(sk['N']/2)):
+            os1 = Conversion.IP2OS(int(m1))
+            if(m2 < int(sk['N']/2)):
+                os2 = Conversion.IP2OS(int(m2))
+            else:
+                if(m3 < int(sk['N']/2)):
+                    os2 = Conversion.IP2OS(int(m3))
+                else:
+                    os2 = Conversion.IP2OS(int(m4))
+        else:
+            if(m2 < int(sk['N']/2)):
+                os1 = Conversion.IP2OS(int(m2))
+                if(m3 < int(sk['N']/2)):
+                    os2 = Conversion.IP2OS(int(m3))
+                else:
+                    os2 = Conversion.IP2OS(int(m4))
+            else:
+                os1 = Conversion.IP2OS(int(m3))
+                os2 = Conversion.IP2OS(int(m4))
+            
         if debug:
             print("OS1  =>", os1)
             print("OS2  =>", os2)
-            print("OS3  =>", os3)
-            print("OS4  =>", os4)
 
-        for i in [os1, os2, os3, os4]:
-            (isMessage, message) = self.redundancyscheme.decode(self.paddingscheme.decode(i))
-            if(isMessage):
-               return message
+        (m1, t1) = self.paddingscheme.decode(os1, pk['n'], pk['s0'])
+        (m2, t2) = self.paddingscheme.decode(os2, pk['n'], pk['s0'])
+
+        if((t1 == Bytes.fill(b'\x00', pk['s0']/8)) and (t2 == Bytes.fill(b'\x00', pk['s0']/8))):
+            assert False, "invalid ciphertext"
+
+        if(t1 == Bytes.fill(b'\x00', pk['s0']/8)):
+            return m1
+        else:
+            if(t2 == Bytes.fill(b'\x00', pk['s0']/8)):
+                return m2
+            else:
+                assert False, "invalid ciphertext"
 
 class Rabin_Sig(Rabin, PKSig):
     '''RSASSA-PSS'''
@@ -174,7 +198,7 @@ class Rabin_Sig(Rabin, PKSig):
 def main():
     rabin = Rabin_Enc()
     
-    (pk, sk) = rabin.keygen(1024)
+    (pk, sk) = rabin.keygen(128, 1024)
     
     m = b'This is a test'
     #m = 55
