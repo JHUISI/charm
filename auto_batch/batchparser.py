@@ -1,5 +1,4 @@
 from pyparsing import *
-#from batchlang import *
 from batchgen import *
 from batchstats import *
 from batchoptimizer import *
