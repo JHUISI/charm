@@ -12,7 +12,7 @@ Allison Lewko, Amit Sahai and Brent Waters (Pairing-based)
 :Authors:    J Ayo Akinyele
 :Date:            12/2010
 '''
-
+from __future__ import print_function
 from toolbox.pairinggroup import *
 from toolbox.secretutil import *
 from toolbox.policytree import *

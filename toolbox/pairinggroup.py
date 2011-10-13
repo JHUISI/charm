@@ -1,3 +1,4 @@
+from __future__ import print_function
 from charm.pairing import *
 from charm.integer import randomBits,bitsize,integer
 
@@ -52,8 +53,10 @@ class PairingGroup():
     def decode(self, element):
         raise NotImplementedException 
     
-    def hash(self, args, type=ZR):
-        return self.Pairing.H(args, type)
+    def hash(self, args, type1=ZR):
+        if(type(args) == str):
+            args = unicode(args)
+        return self.Pairing.H(args, type1)
     
     def serialize(self, obj):
         return self.Pairing.serialize(obj)
@@ -64,7 +67,15 @@ class PairingGroup():
     def debug(self, data, prefix=None):
         if type(data) == dict and self._verbose:
            for k,v in data.items():
-               print(k,v)
+               if type(v) == dict and self._verbose:
+                   print(k + " ", end='')
+                   print("{",end='')
+                   for i, (a,b) in enumerate(v.items()):
+                       if i: print(", '%s': %s" % (a, b), end='')
+                       else: print("'%s': %s" % (a, b), end='')
+                   print("}")
+               else:
+                   print(k,v)
         elif type(data) == list and self._verbose:
            for i in range(0, len(data)):
                print(prefix, (i+1),':',data[i])            

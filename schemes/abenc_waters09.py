@@ -13,8 +13,9 @@ Brent Waters (Pairing-based)
 :Authors:    J Ayo Akinyele
 :Date:            11/2010
 '''
-from toolbox.pairinggroup import *
-from toolbox.secretutil import *
+from __future__ import print_function
+from toolbox.pairinggroup27 import *
+from toolbox.secretutil27 import *
 from toolbox.ABEnc import *
 
 debug = False
@@ -27,7 +28,7 @@ class CPabe09(ABEnc):
                         
     def setup(self):
         g1, g2 = group.random(G1), group.random(G2)
-        alpha, a = group.random(), group.random()        
+        alpha, a = group.random(), group.random()
         e_gg_alpha = pair(g1,g2) ** alpha
         msk = {'g1^alpha':g1 ** alpha, 'g2^alpha':g2 ** alpha}        
         pk = {'g1':g1, 'g2':g2, 'e(gg)^alpha':e_gg_alpha, 'g1^a':g1 ** a, 'g2^a':g2 ** a}
@@ -97,16 +98,16 @@ def main():
     if debug: print('Acces Policy: %s' % pol)
     if debug: print('User credential list: %s' % attr_list)
     m = groupObj.random(GT)
-    
+
     cpkey = cpabe.keygen(pk, msk, attr_list)
-    if debug: print("\nSecret key: %s" % attr_list)
+    if debug: print("\nSecret key: ", attr_list)
     if debug:groupObj.debug(cpkey)
     cipher = cpabe.encrypt(pk, m, pol)
 
     if debug: print("\nCiphertext...")
-    if debug:groupObj.debug(cipher)    
+    if debug:groupObj.debug(cipher)
     orig_m = cpabe.decrypt(pk, cpkey, cipher)
-   
+
     assert m == orig_m, 'FAILED Decryption!!!' 
     if debug: print('Successful Decryption!')    
     del groupObj
