@@ -60,7 +60,7 @@ def prng_bits(group, bits=80):
     bID4 = InitBenchmark()
     StartBenchmark(bID4, [RealTime])
     for i in range(trials):
-        a = randomBits(bits)
+        a = group.init(ZR, randomBits(bits))
     EndBenchmark(bID4)
     result = (GetBenchmark(bID4, RealTime) / trials) * time_in_ms
     return result
