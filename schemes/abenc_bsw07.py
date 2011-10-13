@@ -32,7 +32,7 @@ class CPabe_BSW07(ABEnc):
         util = SecretUtil(groupObj.Pairing, verbose=False)
         group = groupObj
 
-    #@output(pk_t, mk_t)    
+    @output(pk_t, mk_t)    
     def setup(self):
         g, gp = group.random(G1), group.random(G2)
         alpha, beta = group.random(), group.random()
@@ -44,8 +44,8 @@ class CPabe_BSW07(ABEnc):
         mk = {'beta':beta, 'g2_alpha':gp ** alpha }
         return (pk, mk)
     
-    #@input(pk_t, mk_t, [str])
-    #@output(sk_t)
+    @input(pk_t, mk_t, [str])
+    @output(sk_t)
     def keygen(self, pk, mk, S):
         r = group.random() 
         g_r = (pk['g2'] ** r)    
@@ -58,8 +58,8 @@ class CPabe_BSW07(ABEnc):
             D_j_pr[j] = pk['g'] ** r_j
         return { 'D':D, 'Dj':D_j, 'Djp':D_j_pr, 'S':S }
     
-    #@input(pk_t, GT, str)
-    #@output(ct_t)
+    @input(pk_t, GT, str)
+    @output(ct_t)
     def encrypt(self, pk, M, policy_str): 
         policy = util.createPolicy(policy_str)
         a_list = []; util.getAttributeList(policy, a_list)
@@ -75,8 +75,8 @@ class CPabe_BSW07(ABEnc):
         return { 'C_tilde':(pk['e_gg_alpha'] ** s) * M,
                  'C':C, 'Cy':C_y, 'Cyp':C_y_pr, 'policy':policy, 'attributes':a_list }
     
-    #@input(pk_t, sk_t, ct_t)
-    #@output(GT)
+    @input(pk_t, sk_t, ct_t)
+    @output(GT)
     def decrypt(self, pk, sk, ct):
         pruned_list = util.prune(ct['policy'], sk['S'])
         z = {}; util.getCoefficients(ct['policy'], z)
