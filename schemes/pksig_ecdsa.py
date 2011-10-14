@@ -1,3 +1,4 @@
+from __future__ import print_function
 from toolbox.ecgroup import *
 from toolbox.PKSig import PKSig
 from toolbox.eccurve import prime192v2
@@ -21,11 +22,13 @@ class ECDSA(PKSig):
             r = group.zr(pk['g'] ** k)
             e = group.hash(M)
             s = (~k) * (e + x * r)
-            if (r == 0 or s == 0):
-                print ("unlikely error r = %s, s = %s" % (r,s))
+
+            if (r == long(0) or s == long(0)):
+                print("unlikely error r = %s, s = %s" % (r,s))
                 continue
             else:
                 break
+
         return { 'r':r, 's':s }
         
     def verify(self, pk, sig, M):
