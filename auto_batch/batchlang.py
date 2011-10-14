@@ -20,7 +20,7 @@ AST simple rules
 * support batch for different messages/signers/public keys.
 '''
 
-from enum import *
+from toolbox.enum import *
 import string
 
 types = Enum('G1', 'G2', 'GT', 'ZR', 'str')
