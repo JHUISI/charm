@@ -1,4 +1,5 @@
-
+from __future__ import division
+#from __future__ import print_function
 from charm.cryptobase import MODE_CBC,AES,selectPRP
 from toolbox.ABEnc import ABEnc
 from schemes.abenc_bsw07 import CPabe_BSW07
@@ -25,6 +26,7 @@ class HybridABEnc(ABEnc):
     def encrypt(self, pk, M, object):
         key = self.group.random(GT)
         c1 = abenc.encrypt(pk, key, object)
+
         # instantiate a symmetric enc scheme from this key
         cipher = self.instantiateCipher(MODE_CBC, key)        
         c2 = cipher.encrypt(self.__pad(M))
@@ -42,14 +44,15 @@ class HybridABEnc(ABEnc):
         # hash GT msg into a hex string
         key = sha1(message)[0:self.key_len]
         iv  = '6543210987654321' # static IV (for testing)    
-        PRP_method = selectPRP(self.alg, (key, mode, iv))        
+        PRP_method = selectPRP(self.alg, (key, mode, iv))
         return PRP_method
     
     def __pad(self, message):
         # calculate the ceiling of
-        msg_len = ceil(len(message) / self.key_len) * self.key_len 
+        msg_len = int(ceil(len(message) / self.key_len)) * self.key_len
         extra = msg_len - len(message)
         # append 'extra' bytes to message
+        message = message
         for i in range(0, extra):
             message += '\x00'
         return message
@@ -70,8 +73,8 @@ def main():
     sk = hyb_abe.keygen(pk, mk, ['ONE', 'TWO', 'THREE'])
 
     ct = hyb_abe.encrypt(pk, message, access_policy)
-    if debug: print("\nCiphertext: ", ct)
-    
+    if debug: print("Ciphertext: ", ct)
+
     rec_msg = hyb_abe.decrypt(pk, sk, ct)
     if debug: print("\n\nDecrypt...\n")
     if debug: print("Rec msg =>", rec_msg)

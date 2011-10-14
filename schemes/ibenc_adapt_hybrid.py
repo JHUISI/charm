@@ -1,4 +1,4 @@
-
+from __future__ import division
 from toolbox.pairinggroup import *
 from charm.pairing import hash as sha1
 from schemes.ibenc_adapt_identityhash import *
@@ -45,7 +45,7 @@ class HybridIBEnc(IBEnc):
     
     def pad(self, message):
         # calculate the ceiling of
-        msg_len = ceil(len(message) / self.key_len) * self.key_len 
+        msg_len = int(ceil(len(message) / self.key_len)) * self.key_len 
         extra = msg_len - len(message)
         # append 'extra' bytes to message
         for i in range(0, extra):

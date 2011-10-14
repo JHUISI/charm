@@ -1,4 +1,4 @@
-
+from __future__ import division
 from charm.cryptobase import *
 from charm.pairing import hash as sha1
 from math import ceil
@@ -49,7 +49,7 @@ class HybridABEncMA(ABEncMultiAuth):
     
     def pad(self, message):
         # calculate the ceiling of
-        msg_len = ceil(len(message) / self.key_len) * self.key_len 
+        msg_len = int(ceil(len(message) / self.key_len)) * self.key_len 
         extra = msg_len - len(message)
         # append 'extra' bytes to message
         for i in range(0, extra):

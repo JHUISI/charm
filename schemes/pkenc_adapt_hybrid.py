@@ -1,5 +1,5 @@
 '''Takes an public-key encryption scheme and builds a hybrid encryption scheme.'''
-
+from __future__ import division
 import random, string
 # Works for ElGamal and CS98 schemes
 #from ec_cs98_enc import *
@@ -52,7 +52,7 @@ class HybridEnc(PKEnc):
     
     def pad(self, message):
         # calculate the ceiling of
-        msg_len = ceil(len(message) / self.key_len) * self.key_len 
+        msg_len = int(ceil(len(message) / self.key_len)) * self.key_len 
         extra = msg_len - len(message)
         # append 'extra' bytes to message
         for i in range(0, extra):
