@@ -1,0 +1,24 @@
+N := 200
+l := 5
+
+BEGIN :: types
+M := ZR
+t := ZR
+A := G2
+B := G2
+C := G2
+D := GT
+END :: types
+
+BEGIN :: precompute
+D := e(g1, g2)
+END :: precompute
+
+BEGIN :: constant
+D
+END :: constant
+
+verify :=  { prod{j:=1, l} on e(S_j, A_j * (B_j^M) * (C_j^t_j)) } == D
+
+
+# T3 reverse split => e(S_j, A_j) * e(S_j, B_j^M) * e(S_j, C_j^t_j) == D 
