@@ -72,7 +72,8 @@ class EC_CS98(PKEnc):
 
         if debug: print("c['v'] => %s" % c['v'])
         if debug: print("v' => %s" % v_prime)
-        return group.decode(c['e'] / (c['u1'] ** sk['z']))
+
+        return str(group.decode(c['e'] / (c['u1'] ** sk['z'])))
 
 def main():
     pkenc = EC_CS98(prime192v1)

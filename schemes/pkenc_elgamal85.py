@@ -104,7 +104,7 @@ def main():
     cipher1 = el.encrypt(pk, msg)
     
     m = el.decrypt(pk, sk, cipher1)    
-    assert m[0:size] == msg[0:size]
+    assert m == msg
     if debug: print("SUCCESSFULLY DECRYPTED!!!")
         
 if __name__ == "__main__":

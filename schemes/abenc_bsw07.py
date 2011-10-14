@@ -52,7 +52,6 @@ class CPabe_BSW07(ABEnc):
         D = (mk['g2_alpha'] * g_r) ** (1 / mk['beta'])        
         D_j, D_j_pr = {}, {}
         for j in S:
-            print(type(j))
             r_j = group.random()
             D_j[j] = g_r * (group.hash(j, G2) ** r_j)
             D_j_pr[j] = pk['g'] ** r_j

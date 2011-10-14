@@ -14,8 +14,8 @@ Brent Waters (Pairing-based)
 :Date:            11/2010
 '''
 from __future__ import print_function
-from toolbox.pairinggroup27 import *
-from toolbox.secretutil27 import *
+from toolbox.pairinggroup import *
+from toolbox.secretutil import *
 from toolbox.ABEnc import *
 
 debug = False
@@ -81,7 +81,7 @@ class CPabe09(ABEnc):
             #print('Attribute %s: coeff=%s, k_x=%s' % (j, w_i[j], k_x[j]))
             
         C, D = ct['C'], ct['D']
-        denominator = group.init(GT, 1)
+        denominator = group.init(GT, long(1))
         for i in pruned:
             denominator *= ( pair(C[i] ** w_i[i], sk['L']) * pair(k_x[i] ** w_i[i], D[i]) )   
         return ct['C_tilde'] / (numerator / denominator)

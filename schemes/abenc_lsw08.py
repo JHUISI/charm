@@ -95,7 +95,7 @@ class KPabe(ABEnc):
         policy = D['policy']
         coeff = {}; util.getCoefficients(policy, coeff)
         
-        Z = {}; prodT = group.init(GT, 1)
+        Z = {}; prodT = group.init(GT, long(1))
         for i in range(len(attrs)):
             x = attrs[i]
             #print("Coeff[%s] = %s" % (x, coeff[x]))
@@ -128,4 +128,3 @@ def main():
 if __name__ == "__main__":
     debug = True
     main()
-    

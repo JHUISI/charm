@@ -9,7 +9,7 @@
 :Authors: Christina Garman
 :Date:            09/2011
 '''
-
+from __future__ import print_function
 from charm.integer import integer,isPrime,gcd,random,randomPrime
 from toolbox.PKEnc import PKEnc
 from toolbox.PKSig import PKSig

@@ -9,7 +9,7 @@
 :Authors:	Gary Belvin
 :Date:			06/2011
 ''' 
-
+from __future__ import print_function
 from charm.cryptobase import *
 from toolbox.PKSig import *
 from toolbox.bitstring import Bytes
@@ -66,7 +66,7 @@ class IBE_N04_Sig(PKSig):
     
     def stringtoidentity(self, pk, strID):
         '''Hash the identity string and break it up in to l bit pieces'''
-        hash = self.sha1(Bytes(strID, 'utf-8'))
+        hash = self.sha1(strID)
         val = Conversion.OS2IP(hash) #Convert to integer format
         bstr = bin(val)[2:]   #cut out the 0b header
         
@@ -74,7 +74,7 @@ class IBE_N04_Sig(PKSig):
         for i in range(pk['n']):  #n must be greater than or equal to 1
             binsubstr = bstr[pk['l']*i : pk['l']*(i+1)]
             intval = int(binsubstr, 2)
-            intelement = group.init(ZR, intval) 
+            intelement = group.init(ZR, long(intval)) 
             v.append(intelement)
                      
         return v

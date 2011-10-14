@@ -12,6 +12,7 @@ Boneh-Franklin Identity Based Encryption
 :Authors:    Joseph Ayo Akinyele
 :Date:            2/2011
 '''
+from __future__ import print_function
 from toolbox.pairinggroup import *
 from toolbox.hash_module import *
 from toolbox.IBEnc import IBEnc
