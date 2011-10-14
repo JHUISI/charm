@@ -7,7 +7,7 @@ import math
 import struct
 import sys
 
-debug = False
+debug = True
 
 
 class OAEPEncryptionPadding:
@@ -385,6 +385,7 @@ class SAEPEncryptionPadding:
         v = Bytes(x) ^ self.hashFn(r)
 
         M = v[:int(m/8)]
+        print("M: ", M, M[-1], M[-2])
         t = v[int(m/8):int(m+s0/8)]
 
         if(M[-1] == 128 and (M[-2] == 0 or M[-2] == 128)):
@@ -400,6 +401,6 @@ class SAEPEncryptionPadding:
             print("v    => ", v)
             print("M    => ", M)
             print("t    => ", t)
-            print("r DB   =>", DB)
+            print("r    =>" , r)
 
         return (M, t)
