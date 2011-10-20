@@ -31,7 +31,11 @@ def serializeList(object, group):
     
     if isinstance(object, list):
         for i in object:
-            bytes_object_.append(group.serialize(i))
+            if type(i) == str:
+                x = i
+            else:
+                x = group.serialize(i)
+            bytes_object_.append(x)
         return bytes_object_
     return None
 
