@@ -9,7 +9,7 @@
 :Authors: Christina Garman
 :Date:            09/2011
 '''
-#from __future__ import print_function
+
 from charm.integer import integer,isPrime,gcd,random,randomPrime
 from toolbox.PKEnc import PKEnc
 from toolbox.PKSig import PKSig
@@ -17,24 +17,19 @@ from toolbox.paddingschemes import OAEPEncryptionPadding,PSSPadding,SAEPEncrypti
 from toolbox.redundancyschemes import InMessageRedundancy
 from toolbox.conversion import Conversion
 from toolbox.bitstring import Bytes
+from toolbox.specialprimes import BlumWilliamsInteger
 from math import ceil, floor
 
 debug = False
 class Rabin():
     '''Rabin Module'''
-    def __init__(self):
-        pass
+    def __init__(self, modulus=BlumWilliamsInteger()):
+        self.modulustype = modulus
+
     # generate p,q and n
     def paramgen(self, secparam):
-        while True:
-            p = randomPrime(secparam)
-            if isPrime(p) and (((p-3)%4) == 0):
-                break
-        while True:
-            q = randomPrime(secparam)
-            if isPrime(q) and (((q-3)%4) == 0) and not(q == p):
-                break
-        N = p * q
+        (p, q, N) = self.modulustype.generateBlumWilliamsInteger(secparam)
+
         yp = (p % q) ** -1
         yq = (q % p) ** -1
 
