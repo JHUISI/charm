@@ -15,8 +15,12 @@ D := e(g1, g2)
 END :: precompute
 
 BEGIN :: constant
-D
+A, B, C, D
 END :: constant
+
+BEGIN :: signature
+S, t
+END :: signature
 
 verify :=  { prod{j:=1, l} on e(S_j, A_j * (B_j^M) * (C_j^t_j)) } == D
 

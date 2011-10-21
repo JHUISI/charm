@@ -20,6 +20,7 @@ from toolbox.PKSig import PKSig
 from chamhash_rsa_hw09 import ChamHash_HW09
 from toolbox.conversion import Conversion
 from toolbox.bitstring import Bytes
+from toolbox.specialprimes import BlumWilliamsInteger
 import hmac, hashlib, math
 
 def SHA1(bytes):

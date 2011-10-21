@@ -83,7 +83,7 @@ if __name__ == "__main__":
    M = 'please sign this new message!'
    sig = boyen.sign(mpk, L_pk, sk, M)
    print("\nSignature...")
-   print("sig =>", sig)
+   #print("sig =>", sig)
 
    assert boyen.verify(mpk, L_pk, M, sig), "invalid signature!"
    print("Verification successful!")
