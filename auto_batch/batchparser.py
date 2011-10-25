@@ -531,8 +531,9 @@ class Technique2:
     def __init__(self, constants, variables, group='G1'):
         self.consts = constants
         self.vars   = variables
-        print("Rule 2: Move the exponent(s) into the pairing")
         self.group = group # can orogrammatically set which group we move exponent into
+        #print("Rule 2: Move the exponent(s) into the pairing")
+        self.rule   = "Rule 2: "
         # TODO: pre-processing to determine context of how to apply technique 2
         # TODO: in cases of chp.bv, where you have multiple exponents outside a pairing, move them all into the e().
     
@@ -548,15 +549,15 @@ class Technique2:
             addAsChildNodeToParent(data, pair_node) # move pair node one level up
                                   # make cur node the left child of pair node
             # G1 : pair.left, G2 : pair.right
-            self.isConstInSubtree(pair_node.left)
-            if not self.const_result:
+            if not self.isConstInSubtreeT(pair_node.left):
                 node.left = pair_node.left
                 pair_node.left = node
+                self.rule += "Move '" + str(node.right) + "' exponent into the pairing. "
             
-            self.isConstInSubtree(pair_node.right)
-            if not self.const_result:
+            if not self.isConstInSubtreeT(pair_node.right):                
                 node.left = pair_node.right
                 pair_node.right = node 
+                self.rule += "Move '" + str(node.right) + "' exponent into the pairing. "
         # blindly move the right node of prod{} on x^delta regardless    
         elif(node.left.type == ops.ON):
             # (prod{} on x) ^ y => prod{} on x^y
@@ -585,8 +586,10 @@ class Technique2:
                                     muls[i].right = self.createExp(_subnodes[i+1], BinaryNode.copy(node.right))
                             #print("root =>", muls[0])
                             pair_node.right = muls[0]
+                            self.rule += "distributed exponent into the pairing: right side. "
                         else:
                             self.setNodeAs(pair_node, 'right', node, 'left')
+                            self.rule += "moved exponent into the pairing: less than 2 mul nodes. "
 
                     elif Type(pair_node.right) == ops.ATTR:
                         self.setNodeAs(pair_node, 'right', node, 'left')
@@ -746,11 +749,11 @@ class Technique3:
                 if not self.isConstInSubtreeT(pair_node.left): # if F, then can apply prod node to left child of pair node              
                     node.right = pair_node.left
                     pair_node.left = node # pair points to 'on' node
-                    self.rule += "common 1st (left) node appears, so can reduce n pairings to 1."
+                    self.rule += "common 1st (left) node appears, so can reduce n pairings to 1. "
                 elif not self.isConstInSubtreeT(pair_node.right):
                     node.right = pair_node.right
                     pair_node.right = node
-                    self.rule += "common 2nd (right) node appears, so can reduce n pairings to 1."
+                    self.rule += "common 2nd (right) node appears, so can reduce n pairings to 1. "
 
     
     def isConstInSubtree(self, node): # check whether left or right node is constant  
@@ -914,15 +917,17 @@ if __name__ == "__main__":
     print("\nStage A: Combined Equation =>", verify2, "\n")
     ASTVisitor(SmallExponent(const, vars)).preorder(verify2.right)
     print("\nStage B: Small Exp Test =>", verify2, "\n")
-    ASTVisitor(Technique2(const, vars)).preorder(verify2.right)
-    #ASTVisitor(Technique2(const, vars)).preorder(verify2.right)    
+    T2 = Technique2(const, vars)
+    ASTVisitor(T2).preorder(verify2.right)
     print("\nApply tech 2 =>", verify2, "\n")
+    print(T2.rule)
+    
     T3 = Technique3(const, vars)
     ASTVisitor(T3).preorder(verify2.right)
     print("\nApply tech 3 =>", verify2, "\n")
     print(T3.rule)    
     
-#    ASTVisitor(Technique4(const, vars, metadata)).preorder(verify2.right)
+    ASTVisitor(Technique4(const, vars, metadata)).preorder(verify2.right)
 #    ASTVisitor(SimplifyDotProducts()).preorder(verify2.right)
 #    ASTVisitor(Technique3(const, vars)).preorder(verify2.right)    
     print("\nApply tech 4 =>", verify2, "\n")
