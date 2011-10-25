@@ -1,12 +1,12 @@
-N := 200
+N := 50
 l := 5
 
 BEGIN :: types
 M := ZR
 t := ZR
-A := G2
-B := G2
-C := G2
+At := G2
+Bt := G2
+Ct := G2
 D := GT
 END :: types
 
@@ -15,14 +15,10 @@ D := e(g1, g2)
 END :: precompute
 
 BEGIN :: constant
-A, B, C, D
+At, Bt, Ct, D
 END :: constant
 
-BEGIN :: signature
-S, t
-END :: signature
-
-verify :=  { prod{j:=1, l} on e(S_j, A_j * (B_j^M) * (C_j^t_j)) } == D
+verify :=  { prod{i:=1, l} on e(S_i, At_i * (Bt_i^M_i) * (Ct_i^t_i)) } == D
 
 
 # T3 reverse split => e(S_j, A_j) * e(S_j, B_j^M) * e(S_j, C_j^t_j) == D 

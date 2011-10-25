@@ -29,6 +29,35 @@ ops = Enum('BEGIN', 'TYPE', 'ADD', 'MUL', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR',
 levels = Enum('none', 'some', 'all')
 debug = levels.none
 
+# utilities over binary node structures
+# list: 
+# - searchNode => find a particular type of node (ops.PAIR) in a given subtree (node)
+
+def getListNodes(subtree, parent_type, _list):
+	if subtree == None: return None
+	elif parent_type == ops.MUL:
+		if subtree.type == ops.ATTR: _list.append(subtree)
+		elif subtree.type == ops.EXP: _list.append(subtree)
+		elif subtree.type == ops.HASH: _list.append(subtree)
+		
+	if subtree.left: getListNodes(subtree.left, subtree.type, _list)
+	if subtree.right: getListNodes(subtree.right, subtree.type, _list)
+	return
+
+
+def searchNode(node, target):
+	if node == None: return None
+	elif node.type == target: return node		
+	result = searchNode(node.left)
+	if result: return result
+	result = searchNode(node.right)		
+	return result
+
+def Type(node):
+	return node.type
+
+
+
 class BinaryNode:
 	def __init__(self, value, left=None, right=None):		
 		if(isinstance(value, str)):
