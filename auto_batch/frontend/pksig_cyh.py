@@ -4,12 +4,14 @@ from charm.pairing import *
 from toolbox.PKSig import PKSig
 from toolbox.iterate import dotprod
 
+N = 10
+
 debug = False
 
 class CYH(PKSig):
-    def __init__(self, groupObj):
+    def __init__(self):
         global group
-        group = groupObj
+        group = pairing('/Users/matt/Documents/charm/param/a.param')
     
     def concat(self, L_id):
         result = ""
@@ -22,7 +24,8 @@ class CYH(PKSig):
         H1 = lambda x: group.H(('1', str(x)), G1)
         H2 = lambda a, b, c: group.H(('2', a, b, c), ZR)
         lam_func = lambda i,a,b,c: a[i] * (b[i] ** c[i]) # => u * (pk ** h) for all signers
-        g, alpha = group.random(G2), group.random(ZR)
+        g = group.random(G2) 
+        alpha = group.random(ZR)
         P = g ** alpha
         msk = alpha
         mpk = {'Pub':P, 'g':g }
@@ -57,24 +60,24 @@ class CYH(PKSig):
         return sig
     
     def verify(self, mpk, L, M, sig):
-        u, S = sig['u'], sig['S']
+        uu = sig['u'] 
+        SS = sig['S']
         Lt = self.concat(L) 
         num_signers = len(L)
         h = [group.init(ZR, 1) for i in range(num_signers)]
         for i in range(num_signers):
-            h[i] = H2(M, Lt, u[i])
+            h[i] = H2(M, Lt, uu[i])
 
         pk = [ H1(i) for i in L] # get all signers pub keys
-        result = dotprod(group.init(G1), -1, num_signers, lam_func, u, pk, h) 
-        if pair(result, mpk['Pub']) == pair(S, mpk['g']):
+        result = dotprod(group.init(G1), -1, num_signers, lam_func, uu, pk, h) 
+        if pair(result, mpk['Pub']) == pair(SS, mpk['g']):
             return True
         return False
 
 if __name__ == "__main__":
    L = [ "alice", "bob", "carlos", "dexter", "eddie"] 
    ID = "bob"
-   groupObj = pairing('../param/a.param')
-   cyh = CYH(groupObj)
+   cyh = CYH()
    (mpk, msk) = cyh.setup()
 
    (ID, Pk, Sk) = cyh.keygen(msk, ID)  

@@ -1,9 +1,7 @@
 from charm.pairing import *
 from toolbox.PKSig import PKSig
-group = pairing('/Users/matt/Documents/Charm_From_Git/charm/param/a.param')
-H2 = lambda x,y: group.H((x,y), ZR)
-s = group.random(ZR)
-pk = group.random(G1)
-S1 = pk ** s
-M = "string"
-a = H2(M, S1)
+from toolbox.iterate import dotprod
+group = pairing('/Users/matt/Documents/charm/param/a.param')
+L = [ "alice", "bob", "carlos", "dexter", "eddie"] 
+num_signers = len(L)
+u = [group.init(G1) for i in range(num_signers)]

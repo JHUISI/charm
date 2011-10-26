@@ -81,6 +81,7 @@ callRepInAST = 'Call'
 funcRepInAST = 'func'
 attrRepInAST = 'attr'
 hashRepInAST = ['hash', 'H']
+initRepInAST = 'init'
 argsRepInAST = 'args'
 randomRepInAST = 'random'
 typeKey = 'type'
@@ -143,12 +144,19 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 
 	def recursiveNodeVisit(self, node):		
 		if (type(node).__name__ == callRepInAST):			
-			if (funcRepInAST in node._fields):				
-				if (attrRepInAST in node.func._fields):					
+			if (funcRepInAST in node._fields):
+				#print(ast.dump(node))
+				#print("\n")				
+				if (attrRepInAST in node.func._fields):
+					#print(ast.dump(node))					
 					if (node.func.attr in hashRepInAST):						
 						if (argsRepInAST in node._fields):							
 							if (len(node.args) == 2):
 								return node.args[1].id
+					elif (node.func.attr in initRepInAST):
+						if (argsRepInAST in node._fields):							
+							if (len(node.args) == 2):
+								return node.args[0].id
 					elif (node.func.attr == randomRepInAST):						
 						if (argsRepInAST in node._fields):							
 							if (len(node.args) == 1):
@@ -156,7 +164,9 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 
 				elif (idRepInAST in node.func._fields):
 					topLevelKey = node.func.id
+					#print(topLevelKey)
 					if (topLevelKey in self.groupTypes):
+						print(topLevelKey)
 						lineNos = list(self.groupTypes[topLevelKey].keys())
 						lineNos.sort()
 						lineNos.reverse()
@@ -241,7 +251,7 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 							funcName = node.value.func.id
 							#print(ast.dump(node))
 							if (funcName in self.groupTypes):
-								print(ast.dump(node))
+								#print(ast.dump(node))
 								lineNos = list(self.groupTypes[funcName].keys())
 								lineNos.sort()
 								lineNos.reverse()
@@ -249,6 +259,44 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 								if (hashFunction in self.groupTypes[funcName][lineNo]):
 									if (groupType in self.groupTypes[funcName][lineNo][hashFunction]):
 										if (argsRepInAST in node.value._fields):
+											numOfArgs = len(node.value.args)
+											#print(numOfArgs)
+											argConcatString = ""
+											for argIndex in range(0, numOfArgs):
+												#print(ast.dump(node))
+												#print(type(node.value.args[argIndex]))
+												#print(node.value.args[argIndex]._fields)
+												if (idRepInAST in node.value.args[argIndex]._fields):
+													argConcatString += node.value.args[argIndex].id + " | "
+
+												elif (sliceRepInAST in node.value.args[argIndex]._fields):
+													if (type(node.value.args[argIndex].slice).__name__ == indexRepInAST):
+														if (valueRepInAST in node.value.args[argIndex].slice._fields):
+															if (type(node.value.args[argIndex].slice.value).__name__ == strRepInAST):
+																argConcatString += node.value.args[argIndex].slice.value.s + " | "
+
+											argConcatString = argConcatString.rstrip(" | ")
+											#print(argConcatString)
+											self.groupTypes[topLevelKey][node.lineno] = {hashBase:argConcatString, groupType:self.groupTypes[funcName][lineNo][hashFunction][groupType]}
+											return
+
+											'''
+												if (sliceRepInAST in node.value.args[argIndex]._fields):
+													print("1")
+													if (type(node.value.args[argIndex].slice).__name__ == indexRepInAST):
+														print("2")
+														if (valueRepInAST in node.value.args[argIndex].slice._fields):
+															print("3")
+															if (type(node.value.args[argIndex].slice.value).__name__ == strRepInAST):
+																#print("here")
+																argConcatString += node.value.args[argIndex].slice.value.s + " | "
+																print(argConcatString)
+																#self.groupTypes[topLevelKey][node.lineno] = {hashBase:node.value.args[1].slice.value.s, groupType:self.groupTypes[funcName][lineNo][hashFunction][groupType]}
+											'''
+
+											#return
+
+											'''
 											if (len(node.value.args) == 2):
 												if (sliceRepInAST in node.value.args[1]._fields):
 													if (type(node.value.args[1].slice).__name__ == indexRepInAST):
@@ -256,6 +304,7 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 															if (type(node.value.args[1].slice.value).__name__ == strRepInAST):
 																self.groupTypes[topLevelKey][node.lineno] = {hashBase:node.value.args[1].slice.value.s, groupType:self.groupTypes[funcName][lineNo][hashFunction][groupType]}
 																return
+											'''
 
 				if (type(node.value).__name__ == lambdaRepInAST):
 					if (bodyRepInAST in node.value._fields):
@@ -437,7 +486,7 @@ def replaceDictVars(verifyEqLn, assignmentsDict, variableNames, variableTypes):
 
 	return verifyEqLn
 
-def expandHashesInVerify(verifyEqLn, hashAssignmentsDict, variableNames, variableTypes, precomputeTypes, verifyEndPrecomputeLine):
+def expandHashesInVerify(verifyEqLn, hashAssignmentsDict, variableNames, variableTypes, precomputeTypes, verifyEndPrecomputeLine, verifyFuncLineStart, verifyFuncLineEnd):
 	for varName in variableNames:		
 		if varName not in hashAssignmentsDict.keys():
 			continue
@@ -447,6 +496,8 @@ def expandHashesInVerify(verifyEqLn, hashAssignmentsDict, variableNames, variabl
 		linenums.sort()
 		linenums.reverse()
 		if (hashBase not in hashAssignmentsDict[varName][linenums[0]].keys()):
+			continue
+		if ( (linenums[0] < verifyFuncLineStart) or (linenums[0] > verifyFuncLineEnd) ):
 			continue
 
 		hashExpansion = ""
@@ -722,7 +773,7 @@ if __name__ == '__main__':
 
 	cleanVerifyEqLn = replaceDictVars(cleanVerifyEqLn, astAssignDict, variableNames, variableTypes)
 	cleanVerifyEqLn = ensureSpacesBtwnTokens(cleanVerifyEqLn)
-	cleanVerifyEqLn = expandHashesInVerify(cleanVerifyEqLn, astAssignDict, variableNames, variableTypes, precomputeTypes, verifyEndPrecomputeLine)
+	cleanVerifyEqLn = expandHashesInVerify(cleanVerifyEqLn, astAssignDict, variableNames, variableTypes, precomputeTypes, verifyEndPrecomputeLine, verifyFuncLineStart, verifyFuncLineEnd)
 
 	#print(variableTypes)
 
@@ -735,4 +786,4 @@ if __name__ == '__main__':
 	writeBVFile(outputFileName, variableTypes, precomputeTypes, cleanVerifyEqLn)
 
 	#print("\n\n")
-	#print(astAssignDict)
+	print(astAssignDict)

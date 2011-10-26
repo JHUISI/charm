@@ -2,7 +2,8 @@ import sys, ast
 
 class AST_Visitor(ast.NodeVisitor):
 	def visit_ImportFrom(self, node):
-		print(node.lineno)
+		#print(node.lineno)
+		pass
 
 f = open(sys.argv[1], 'r').readlines()
 c = ""
