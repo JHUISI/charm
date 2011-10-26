@@ -457,6 +457,16 @@ class CombineVerifyEq:
 class SimplifyDotProducts:
     def __init__(self):
         pass
+
+    def getMulTokens(self, subtree, parent_type, target_type, _list):
+        if subtree == None: return None
+        elif parent_type == ops.EXP and subtree.type == ops.MUL:
+            return
+        elif parent_type == ops.MUL:
+            if subtree.type in target_type: _list.append(subtree)
+        if subtree.left: self.getMulTokens(subtree.left, subtree.type, target_type, _list)
+        if subtree.right: self.getMulTokens(subtree.right, subtree.type, target_type, _list)
+        return
     
     def visit(self, node, data):
         pass
@@ -466,28 +476,50 @@ class SimplifyDotProducts:
             return
         #print("test: right node of prod =>", node.right, ": type =>", node.right.type)
         #print("parent type =>", Type(data['parent']))
-        _type = node.right.type
-        if _type == ops.MUL:
+#        _type = node.right.type
+        if Type(node.right) == ops.MUL:            
             # must distribute prod to both children of mul
+            r = []
             mul_node = node.right
+            self.getMulTokens(mul_node, ops.NONE, [ops.EXP, ops.HASH, ops.PAIR, ops.ATTR], r)
+            
+            if len(r) <= 2:
             # in case we're dealing with prod{} on attr1 * attr2 
             # no need to simply further, so we can simply return
-            if mul_node.left.type == ops.ATTR and mul_node.right.type == ops.ATTR:
-                return
+                if mul_node.left.type == ops.ATTR and mul_node.right.type == ops.ATTR:
+                    return
 
-            node.right = None
-            prod_node2 = BinaryNode.copy(node)
+                node.right = None
+                prod_node2 = BinaryNode.copy(node)
             
             # add prod nodes to children of mul_node
-            prod_node2.right = mul_node.right
-            mul_node.right = prod_node2
+                prod_node2.right = mul_node.right
+                mul_node.right = prod_node2
             
-            node.right = mul_node.left
-            mul_node.left = node
+                node.right = mul_node.left
+                mul_node.left = node
             
-            # move mul_node one level up to replace the "on" node.
-            addAsChildNodeToParent(data, mul_node)
-        
+                # move mul_node one level up to replace the "on" node.
+                addAsChildNodeToParent(data, mul_node)
+            elif len(r) > 2:
+                #print("original node =>", node)
+                muls = [BinaryNode(ops.MUL) for i in range(len(r)-1)]
+                prod = [BinaryNode.copy(node) for i in r]
+                # distribute the products to all nodes in r
+                for i in range(len(r)):
+                    prod[i].right = r[i]
+#                    print("n =>", prod[i])
+                # combine prod nodes into mul nodes                     
+                for i in range(len(muls)):
+                    muls[i].left = prod[i]
+                    if i < len(muls)-1:
+                        muls[i].right = muls[i+1]
+                    else:
+                        muls[i].right = prod[i+1]
+#                print("final node =>", muls[0])
+                addAsChildNodeToParent(data, muls[0])                
+            else:
+               return 
 
 # Adds an exponent to a \delta to every pairing node
 # TODO: when you discover that a node already has an EXP node, then change right node
@@ -681,17 +713,31 @@ class Technique3:
     
     def visit(self, node, data):
         pass
-    
-    # rare case: split a \single\ pairing into two or more pairings to allow for application of 
-    # other techniques. pair(a, b * c * d?) => p(a, b) * p(a, c) * p(a, d)
-    # pair with a child node with more than two mult's?
+
+    # once a     
     def visit_pair(self, node, data):
+        #print("State: ", node)
         left = node.left
         right = node.right
-        if left.type == ops.MUL:
-            pass
-        elif right.type == ops.MUL:
-            pass
+        if left.type == ops.ON:
+            # assume well-formed prod node construct
+            # prod {var := 1, N} on v : to get var => left.left.left.left
+            index = str(left.left.left.left)
+            #print("left ON node =>", index)
+            exp_node = self.findExpWithIndex(right, index)
+            if exp_node:
+                base_node = left.right
+                left.right = self.createExp(base_node, exp_node)
+                self.deleteFromTree(right, node, exp_node, 'right') # cleanup right side tree?
+            
+        if right.type == ops.ON:
+            index = str(right.left.left.left)
+            #print("right ON node =>", index)
+            exp_node = self.findExpWithIndex(left, index)
+            if exp_node:
+                base_node = right.right
+                right.right = self.createExp(base_node, exp_node)
+                self.deleteFromTree(left, node, exp_node, 'left')
 #            _nodes = []
 #            self.getNodes(right, ops.NONE, _nodes)
 #            if len(_nodes) > 2: # candidate for expanding
@@ -702,24 +748,14 @@ class Technique3:
 #                        muls[i].right = muls[i+1]
 #                    else:
 #                        muls[i].right = self.createPair(left, _nodes[i+1])
-                    
-#                mul = BinaryNode(ops.MUL)
-#                mulrt = BinaryNode(ops.MUL)
-#                i = 0
-#                mulrt.left = self.createPair(left , _nodes[i])
-#                mulrt.right = mul
-#                i += 1
-#                mul.left = self.createPair(left , _nodes[i])
-#                i += 1
-#                mul.right = self.createPair(left, _nodes[i])
-
+#                    
 #                print("mul root =>", muls[0])
 #                addAsChildNodeToParent(data, muls[0])
         else:
             return None
 
     # transform prod{} on pair(x,y) => pair( prod{} on x, y) OR pair(x, prod{} on y)
-    # n pairings to 1
+    # n pairings to 1 and considers the split reverse case
     def visit_on(self, node, data):
         if Type(node.right) == ops.PAIR:
             pair_node = node.right
@@ -731,7 +767,9 @@ class Technique3:
                 print("T3: Need to code this case!")
                 pass
             elif len(r) > 2:
-            # special case: check whether we could apply the reverse split here, if there are multiple elements in             
+                # special case: reverse split a \single\ pairing into two or more pairings to allow for application of 
+                # other techniques. pair(a, b * c * d?) => p(a, b) * p(a, c) * p(a, d)
+                # pair with a child node with more than two mult's?
                 left = pair_node.left
                 muls = [ BinaryNode(ops.MUL) for i in range(len(r)-1) ]
                 for i in range(len(muls)):
@@ -750,10 +788,14 @@ class Technique3:
                     node.right = pair_node.left
                     pair_node.left = node # pair points to 'on' node
                     self.rule += "common 1st (left) node appears, so can reduce n pairings to 1. "
+                    self.visit_pair(pair_node, data)
+                    
                 elif not self.isConstInSubtreeT(pair_node.right):
                     node.right = pair_node.right
                     pair_node.right = node
                     self.rule += "common 2nd (right) node appears, so can reduce n pairings to 1. "
+                    self.visit_pair(pair_node, data)                
+            return
 
     
     def isConstInSubtree(self, node): # check whether left or right node is constant  
@@ -803,6 +845,49 @@ class Technique3:
         pair.left = left
         pair.right = right
         return pair
+    
+    def createExp(self, left, right):
+        exp = BinaryNode(ops.EXP)
+        exp.left = left
+        exp.right = right
+        return exp
+
+    def deleteFromTree(self, node, parent, target, branch=None):
+        if node == None: return None
+        elif str(node) == str(target):
+            if branch == 'left': 
+                BinaryNode.setNodeAs(parent, parent.right)
+                parent.left = parent.right = None 
+                return                
+            elif branch == 'right': 
+                BinaryNode.setNodeAs(parent, parent.left)
+                parent.left = parent.right = None
+                return 
+        else:
+            self.deleteFromTree(node.left, node, target, 'left')
+            self.deleteFromTree(node.right, node, target, 'right')
+            
+    def findExpWithIndex(self, node, index):
+        node_type = Type(node)
+        #print("node_type = ", node_type)
+        if node == None: return None
+        elif node_type == ops.EXP:
+            #print("node.right type =>", Type(node.right))
+            if Type(node.right) == ops.MUL:
+                return self.findExpWithIndex(node.right, index)                
+            elif index in node.right.attr_index:
+                #print("node =>", node)            
+                return node.right
+        elif node_type == ops.MUL:
+            if index in node.left.attr_index and index in node.right.attr_index: 
+                return node
+            elif index in node.left.attr_index: return node.left
+            elif index in node.right.attr_index: return node.right            
+        else:
+            result = self.findExpWithIndex(node.left, index)
+            if result: return node
+            result = self.findExpWithIndex(node.right, index)
+            return result
         
 class Technique4:
     def __init__(self, constants, variables, meta):
@@ -927,10 +1012,14 @@ if __name__ == "__main__":
     print("\nApply tech 3 =>", verify2, "\n")
     print(T3.rule)    
     
-    ASTVisitor(Technique4(const, vars, metadata)).preorder(verify2.right)
+#    T4 = Technique4(const, vars, metadata)
+#    ASTVisitor(T4).preorder(verify2.right)
+#    print("\nApply tech 4 =>", verify2, "\n")
 #    ASTVisitor(SimplifyDotProducts()).preorder(verify2.right)
-#    ASTVisitor(Technique3(const, vars)).preorder(verify2.right)    
-    print("\nApply tech 4 =>", verify2, "\n")
+#    T3 = Technique3(const, vars)
+#    ASTVisitor(T3).preorder(verify2.right)
+#    print("\nApply tech 3 =>", verify2, "\n")
+#    print(T3.rule)
         
     # Further precomputations
     #Instfind = InstanceFinder()

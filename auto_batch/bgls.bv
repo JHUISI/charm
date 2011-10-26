@@ -1,7 +1,13 @@
 N := 200
 l := 5
+
+BEGIN :: types
 pk := G2
 g2 := G2
-sig := { prod{i:=1, l} on sig_i }
+END :: types
 
-verify := e(sig, g2) == (prod{j := 1, l} on e(H(M_j, G1), pk_j))
+BEGIN :: signature
+sig := { prod{i:=1, l} on sig_i }
+END :: signature
+
+verify := e(sig, g2) == (prod{i := 1, l} on e(H(M_i, G1), pk_i))

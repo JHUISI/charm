@@ -18,4 +18,4 @@ BEGIN :: constant
 P, g2
 END :: constant
 
-verify := { e((prod{j:=1, l} on (u_j * (pk_j^h_j))) , P) == e(S, g2) }
+verify := { e((prod{i:=1, l} on (u_i * (pk_i^h_i))) , P) == e(S, g2) }

@@ -54,9 +54,14 @@ def searchNode(node, target):
 	return result
 
 def Type(node):
+	if node == None: return None
 	return node.type
 
-
+def createNode(_type, left=None, right=None):
+	node = BinaryNode(_type)
+	node.left = left
+	node.right = right
+	return node
 
 class BinaryNode:
 	def __init__(self, value, left=None, right=None):		
@@ -146,10 +151,10 @@ class BinaryNode:
 			return None
 	
 	def getLeft(self):
-		return self.left
+		return self.left if self.left != None else None
 	
 	def getRight(self):
-		return self.right
+		return self.right if self.right != None else None
 
 	def addSubNode(self, left, right):
 		# set subNodes appropriately
@@ -177,6 +182,13 @@ class BinaryNode:
 		new_node.left = self.copy(this.left)
 		new_node.right = self.copy(this.right)		
 		return new_node	
+
+	@classmethod
+	def setNodeAs(self, dest, src):
+		dest.type = src.type
+		dest.attr = src.attr
+		dest.attr_index = src.attr_index
+		return
 
 	# only applies function on leaf nodes
 	def traverse(self, function):
