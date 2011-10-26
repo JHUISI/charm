@@ -9,6 +9,18 @@ from math import ceil
 
 debug = False
 class HybridABEnc(ABEnc):
+    """
+    >>> groupObj = PairingGroup('../param/a.param')
+    >>> cpabe = CPabe_BSW07(groupObj)
+    >>> hyb_abe = HybridABEnc(cpabe, groupObj)
+    >>> access_policy = '((four or three) and (two or one))'
+    >>> message = "hello world this is an important message."
+    >>> (pk, mk) = hyb_abe.setup()
+    >>> sk = hyb_abe.keygen(pk, mk, ['ONE', 'TWO', 'THREE'])
+    >>> ct = hyb_abe.encrypt(pk, message, access_policy)
+    >>> hyb_abe.decrypt(pk, sk, ct)
+    'hello world this is an important message.'
+    """
     def __init__(self, scheme, groupObj):
         ABEnc.__init__(self)
         global abenc
@@ -53,32 +65,3 @@ class HybridABEnc(ABEnc):
         for i in range(0, extra):
             message += '\x00'
         return message
-    
-def main():
-    groupObj = PairingGroup('../param/a.param')
-    
-    cpabe = CPabe_BSW07(groupObj)
-    hyb_abe = HybridABEnc(cpabe, groupObj)
-        
-    access_policy = '((four or three) and (two or one))'
-    message = "hello world this is an important message."
-    if debug: 
-        print("Policy =>", access_policy)
-    
-    (pk, mk) = hyb_abe.setup()
-    
-    sk = hyb_abe.keygen(pk, mk, ['ONE', 'TWO', 'THREE'])
-
-    ct = hyb_abe.encrypt(pk, message, access_policy)
-    if debug: print("\nCiphertext: ", ct)
-    
-    rec_msg = hyb_abe.decrypt(pk, sk, ct)
-    if debug: print("\n\nDecrypt...\n")
-    if debug: print("Rec msg =>", rec_msg)
-    assert message == rec_msg, "FAILED Decryption: message is incorrect"
-    if debug: print("Successful Decryption!!!")
-
-if __name__ == "__main__":
-    debug = True
-    main()
-        
