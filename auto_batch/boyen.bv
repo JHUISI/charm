@@ -20,5 +20,3 @@ END :: constant
 
 verify :=  { prod{i:=1, l} on e(S_i, At_i * (Bt_i^M_i) * (Ct_i^t_i)) } == D
 
-
-# T3 reverse split => e(S_j, A_j) * e(S_j, B_j^M) * e(S_j, C_j^t_j) == D 
