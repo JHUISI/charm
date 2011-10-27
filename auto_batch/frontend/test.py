@@ -1,7 +1,8 @@
 from charm.pairing import *
-from toolbox.PKSig import PKSig
-from toolbox.iterate import dotprod
+#from toolbox.PKSig import PKSig
 group = pairing('/Users/matt/Documents/charm/param/a.param')
-L = [ "alice", "bob", "carlos", "dexter", "eddie"] 
-num_signers = len(L)
-u = [group.init(G1) for i in range(num_signers)]
+H1 = lambda x: group.H(('1', str(x)), G1)
+ID = "bob"
+msk = group.random(ZR)
+sk = H1(ID) ** msk
+(IDs, IDpk, IDsk) = sk

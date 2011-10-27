@@ -5,6 +5,7 @@ from toolbox.PKSig import PKSig
 from toolbox.iterate import dotprod
 
 N = 10
+num_signers = 5
 
 debug = False
 

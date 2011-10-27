@@ -23,6 +23,10 @@ We will use the value for "N" that comes from the first time "N" is assigned
 in the code, so make sure the value for "N" that is desired comes before
 all other uses of "N" in the code.  "N" can be used freely after that.
 
+- Same as above, but for "num_signers."  This variable must be the number
+of signers in the signature scheme.  I plan on deducing this information from
+the code in the future.
+
 - There can only be one variable assignment per line.  For example, you
 CANNOT have the following:
 "x = 5, y = 6"
@@ -74,6 +78,7 @@ import ast, codegen, compiler, sys
 nameOfVerifyFunc = 'verify'
 equalityOperator = 'Eq()'
 N_name = 'N'
+numSignersName = 'num_signers'
 numRepInAST = 'Num'
 nameRepInAST = 'Name'
 idRepInAST = 'id'
@@ -83,7 +88,9 @@ attrRepInAST = 'attr'
 hashRepInAST = ['hash', 'H']
 initRepInAST = 'init'
 argsRepInAST = 'args'
+argRepInAST = 'arg'
 randomRepInAST = 'random'
+subscriptRepInAST = 'Subscript'
 typeKey = 'type'
 groupType = 'groupType'
 binOpRepInAST = 'BinOp'
@@ -91,6 +98,7 @@ leftNodeRepInAST = 'left'
 opRepInAST = 'op'
 rightNodeRepInAST = 'right'
 expRepInAST = 'Pow'
+multRepInAST = 'Mult'
 dictRepInAST = 'Dict'
 strRepInAST = 'Str'
 strRepInBV = 'str'
@@ -106,7 +114,12 @@ noneType = 'None'
 newSliceNameKey = 'NewSliceName'
 hashBase = 'HashBase'
 hashFunction = 'HashFunction'
+lambdaFunction = 'LambdaFunction'
 lambdaRepInAST = 'Lambda'
+lambdaArgPlaceholder = 'lambdaArgPlaceholder'
+lambdaArgBegin = 'LAMBDA_ARG_BEGIN'
+lambdaArgEnd = 'LAMBDA_ARG_END'
+dotProductFuncName = 'dotprod'
 bodyRepInAST = 'body'
 verifyEndPrecomputeString = '# END_PRECOMPUTE'
 sRepInAST = 's'
@@ -142,6 +155,120 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 		except:
 			return unknownType
 
+	def getLambdaArgs(self, lambdaNode):
+		lambdaArgs = []
+		if (argsRepInAST in lambdaNode._fields):
+			if (argsRepInAST in lambdaNode.args._fields):
+				numLambdaArgs = len(lambdaNode.args.args) - 1
+				for lambdaIndex in range(0, numLambdaArgs):
+					if (argRepInAST in lambdaNode.args.args[lambdaIndex + 1]._fields):
+						lambdaArgs.append(lambdaNode.args.args[lambdaIndex + 1].arg)
+		return lambdaArgs
+
+	def getLambdaArgOrderStatement(self, lambdaArgs, argName):
+		lambdaArgOrder = -1
+		try:
+			lambdaArgOrder = lambdaArgs.index(argName)
+		except:
+			return ""
+
+		return lambdaArgBegin + str(lambdaArgOrder) + lambdaArgEnd
+
+	def getLambdaFuncExpression(self, node, lambdaArgs):
+		#print(lambdaArgs)
+		if (type(node).__name__ == binOpRepInAST):
+			left = self.getLambdaFuncExpression(node.left, lambdaArgs)
+			right = self.getLambdaFuncExpression(node.right, lambdaArgs)
+			op = self.getLambdaFuncExpression(node.op, lambdaArgs)
+			return left + " " + op + " " + right
+		elif (type(node).__name__ == subscriptRepInAST):
+			if (valueRepInAST in node._fields):
+				if (idRepInAST in node.value._fields):
+					return self.getLambdaArgOrderStatement(lambdaArgs, node.value.id)
+			'''
+			if (sliceRepInAST in node._fields):
+				if (valueRepInAST in node.slice._fields):
+					if (idRepInAST in node.slice.value._fields):
+						retString += node.slice.value.id + "]"
+						return retString
+			'''
+			return ""
+		elif (type(node).__name__ == expRepInAST):
+			return "^"
+		elif (type(node).__name__ == multRepInAST):
+			return "*"
+		else:
+			print(type(node).__name__)
+			return ""
+
+	def recordDotProductVariable(self, dotProdNode, variableName):
+		dotProdString = "prod{ j := 1 , "
+
+		if (argsRepInAST not in dotProdNode._fields):
+			return
+
+		numArgs = len(dotProdNode.args)
+		if (numArgs < 5):
+			return
+
+		if (idRepInAST not in dotProdNode.args[2]._fields):
+			return
+				
+		dotProdString += dotProdNode.args[2].id + " } on ( "
+
+		if (idRepInAST not in dotProdNode.args[3]._fields):
+			return
+
+		funcName = dotProdNode.args[3].id
+
+		if (funcName not in self.groupTypes):
+			return
+
+		lineNos = list(self.groupTypes[funcName].keys())
+		lineNos.sort()
+		lineNos.reverse()
+		lineNo = lineNos[0]
+
+		if (lambdaFunction not in self.groupTypes[funcName][lineNo]):
+			return
+
+		funcString = self.groupTypes[funcName][lineNo][lambdaFunction]
+
+		numDotProdArgs = numArgs - 4
+		if (numDotProdArgs < 1):
+			return
+
+		dotProdArgNames = []
+
+		for dotProdArgIndex in range(4, numArgs):
+			if (idRepInAST not in dotProdNode.args[dotProdArgIndex]._fields):
+				return
+			dotProdArgNames.append(dotProdNode.args[dotProdArgIndex].id)
+
+		#print(dotProdArgNames)
+
+		argStartIndex = funcString.find(lambdaArgBegin)
+		while (argStartIndex != -1):
+			argStartIndex += len(lambdaArgBegin)
+			argEndIndex = funcString.find(lambdaArgEnd, argStartIndex)
+			argNumber = int(funcString[argStartIndex:argEndIndex])
+			#print(argNumber)
+			stringToReplace = lambdaArgBegin + str(argNumber) + lambdaArgEnd
+			#print(stringToReplace)
+			replacementString = dotProdArgNames[argNumber] + "_j"
+			#print(replacementString)
+			#print(funcString)
+			#print("\n\n")
+			funcString = funcString.replace(stringToReplace, replacementString)
+			argStartIndex = funcString.find(lambdaArgBegin)
+
+		dotProdString += funcString
+		dotProdString += " )"
+
+		#print(dotProdString)
+
+		return dotProdString
+
 	def recursiveNodeVisit(self, node):		
 		if (type(node).__name__ == callRepInAST):			
 			if (funcRepInAST in node._fields):
@@ -155,7 +282,7 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 								return node.args[1].id
 					elif (node.func.attr in initRepInAST):
 						if (argsRepInAST in node._fields):							
-							if (len(node.args) == 2):
+							if (len(node.args) >= 1):
 								return node.args[0].id
 					elif (node.func.attr == randomRepInAST):						
 						if (argsRepInAST in node._fields):							
@@ -166,7 +293,7 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 					topLevelKey = node.func.id
 					#print(topLevelKey)
 					if (topLevelKey in self.groupTypes):
-						print(topLevelKey)
+						#print(topLevelKey)
 						lineNos = list(self.groupTypes[topLevelKey].keys())
 						lineNos.sort()
 						lineNos.reverse()
@@ -214,8 +341,11 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 			if (idRepInAST in node.targets[0]._fields):
 				topLevelKey = node.targets[0].id
 				if (topLevelKey not in self.groupTypes.keys()):
-					self.groupTypes[topLevelKey] = {}				
+					self.groupTypes[topLevelKey] = {}
 				if ( (topLevelKey == N_name) and (type(node.value).__name__ == numRepInAST) ):
+					self.groupTypes[topLevelKey][node.lineno] = {valueRepInAST:node.value.n}
+					return
+				if ( (topLevelKey == numSignersName) and (type(node.value).__name__ == numRepInAST) ):
 					self.groupTypes[topLevelKey][node.lineno] = {valueRepInAST:node.value.n}
 					return
 				if (type(node.value).__name__ == dictRepInAST):
@@ -249,9 +379,7 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 
 						elif (idRepInAST in node.value.func._fields):
 							funcName = node.value.func.id
-							#print(ast.dump(node))
 							if (funcName in self.groupTypes):
-								#print(ast.dump(node))
 								lineNos = list(self.groupTypes[funcName].keys())
 								lineNos.sort()
 								lineNos.reverse()
@@ -260,57 +388,28 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 									if (groupType in self.groupTypes[funcName][lineNo][hashFunction]):
 										if (argsRepInAST in node.value._fields):
 											numOfArgs = len(node.value.args)
-											#print(numOfArgs)
 											argConcatString = ""
 											for argIndex in range(0, numOfArgs):
-												#print(ast.dump(node))
-												#print(type(node.value.args[argIndex]))
-												#print(node.value.args[argIndex]._fields)
 												if (idRepInAST in node.value.args[argIndex]._fields):
 													argConcatString += node.value.args[argIndex].id + " | "
-
 												elif (sliceRepInAST in node.value.args[argIndex]._fields):
 													if (type(node.value.args[argIndex].slice).__name__ == indexRepInAST):
 														if (valueRepInAST in node.value.args[argIndex].slice._fields):
 															if (type(node.value.args[argIndex].slice.value).__name__ == strRepInAST):
 																argConcatString += node.value.args[argIndex].slice.value.s + " | "
-
 											argConcatString = argConcatString.rstrip(" | ")
-											#print(argConcatString)
 											self.groupTypes[topLevelKey][node.lineno] = {hashBase:argConcatString, groupType:self.groupTypes[funcName][lineNo][hashFunction][groupType]}
 											return
-
-											'''
-												if (sliceRepInAST in node.value.args[argIndex]._fields):
-													print("1")
-													if (type(node.value.args[argIndex].slice).__name__ == indexRepInAST):
-														print("2")
-														if (valueRepInAST in node.value.args[argIndex].slice._fields):
-															print("3")
-															if (type(node.value.args[argIndex].slice.value).__name__ == strRepInAST):
-																#print("here")
-																argConcatString += node.value.args[argIndex].slice.value.s + " | "
-																print(argConcatString)
-																#self.groupTypes[topLevelKey][node.lineno] = {hashBase:node.value.args[1].slice.value.s, groupType:self.groupTypes[funcName][lineNo][hashFunction][groupType]}
-											'''
-
-											#return
-
-											'''
-											if (len(node.value.args) == 2):
-												if (sliceRepInAST in node.value.args[1]._fields):
-													if (type(node.value.args[1].slice).__name__ == indexRepInAST):
-														if (valueRepInAST in node.value.args[1].slice._fields):
-															if (type(node.value.args[1].slice.value).__name__ == strRepInAST):
-																self.groupTypes[topLevelKey][node.lineno] = {hashBase:node.value.args[1].slice.value.s, groupType:self.groupTypes[funcName][lineNo][hashFunction][groupType]}
-																return
-											'''
-
+							elif (funcName == dotProductFuncName):
+								self.groupTypes[topLevelKey][node.lineno] = {}
+								self.groupTypes[topLevelKey][node.lineno][dotProductFuncName] = self.recordDotProductVariable(node.value, topLevelKey)
+								return
 				if (type(node.value).__name__ == lambdaRepInAST):
+					#print(ast.dump(node))
 					if (bodyRepInAST in node.value._fields):
-						#print(node.value._fields)
+						#print(ast.dump(node))
 						if (funcRepInAST in node.value.body._fields):
-							#print(node.value.body._fields)
+							#print(ast.dump(node))
 							if (attrRepInAST in node.value.body.func._fields):
 								#print(node.value.body.func._fields)
 								if (node.value.body.func.attr in hashRepInAST):
@@ -323,6 +422,13 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 												self.groupTypes[topLevelKey][node.lineno][hashFunction][groupType] = node.value.body.args[1].id
 												return
 												#pass
+						#elif (binOpRepInAST in node.value.body._fields):
+							#print(ast.dump(node))
+						else:
+							#print(type(node.value.body).__name__)
+							self.groupTypes[topLevelKey][node.lineno] = {}
+							lambdaArgs = self.getLambdaArgs(node.value)
+							self.groupTypes[topLevelKey][node.lineno][lambdaFunction] = self.getLambdaFuncExpression(node.value.body, lambdaArgs)
 
 						#print(node.value._fields)
 
@@ -661,12 +767,16 @@ def writeBVFile(outputFileName, variableTypes, precomputeTypes, cleanVerifyEqLn)
 	outputString += "# variables\n"
 	outputString += "N := "
 	outputString += str(variableTypes[N_name])
+	outputString += "\n"
+
+	outputString += "numSigners := "
+	outputString += str(variableTypes[numSignersName])
 	outputString += "\n\n"
 
 	outputString += "BEGIN :: types\n"
 
 	for variable in variableTypes:
-		if (variable == N_name):
+		if ( (variable == N_name) or (variable == numSignersName) ):
 			continue
 		outputString += variable
 		outputString += " := "
@@ -694,18 +804,18 @@ def writeBVFile(outputFileName, variableTypes, precomputeTypes, cleanVerifyEqLn)
 
 	#print(outputString)
 
-def findN(astAssignDict):
-	if (N_name not in astAssignDict.keys()):
+def findVariable(astAssignDict, variableName):
+	if (variableName not in astAssignDict.keys()):
 		return unknownType
 	
-	lineNos = list(astAssignDict[N_name].keys())
+	lineNos = list(astAssignDict[variableName].keys())
 	lineNos.sort()
 	lineNo = lineNos[0]
 	
-	if (valueRepInAST not in astAssignDict[N_name][lineNo].keys()):
+	if (valueRepInAST not in astAssignDict[variableName][lineNo].keys()):
 		return unknownType
 
-	return astAssignDict[N_name][lineNo][valueRepInAST]
+	return astAssignDict[variableName][lineNo][valueRepInAST]
 
 def getLineOfTextFromSource(lineString, linesOfCode, startLine, endLine):
 	lineNo = 1
@@ -721,6 +831,27 @@ def getLineOfTextFromSource(lineString, linesOfCode, startLine, endLine):
 		lineNo += 1
 
 	return 0
+
+def replaceDotProdVars(verifyEq, astAssignDict, variableNames):
+	#print(verifyEq)
+	#print(variableNames)
+
+	for varName in variableNames:
+		if (varName not in astAssignDict):
+			continue
+		lineNos = list(astAssignDict[varName].keys())
+		lineNos.sort()
+		lineNos.reverse()
+		lineNo = lineNos[0]
+
+		if (dotProductFuncName not in astAssignDict[varName][lineNo]):
+			continue
+
+		stringToBeReplaced = " " + varName + " "
+		replacementString = " " + astAssignDict[varName][lineNo][dotProductFuncName] + " "
+		verifyEq = verifyEq.replace(stringToBeReplaced, replacementString)
+		
+	return verifyEq
 
 if __name__ == '__main__':
 	if ( (len(sys.argv) != 3) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
@@ -774,6 +905,7 @@ if __name__ == '__main__':
 	cleanVerifyEqLn = replaceDictVars(cleanVerifyEqLn, astAssignDict, variableNames, variableTypes)
 	cleanVerifyEqLn = ensureSpacesBtwnTokens(cleanVerifyEqLn)
 	cleanVerifyEqLn = expandHashesInVerify(cleanVerifyEqLn, astAssignDict, variableNames, variableTypes, precomputeTypes, verifyEndPrecomputeLine, verifyFuncLineStart, verifyFuncLineEnd)
+	cleanVerifyEqLn = replaceDotProdVars(cleanVerifyEqLn, astAssignDict, variableNames)
 
 	#print(variableTypes)
 
@@ -781,7 +913,8 @@ if __name__ == '__main__':
 
 	#print(variableTypes)
 
-	variableTypes[N_name] = findN(astAssignDict)
+	variableTypes[N_name] = findVariable(astAssignDict, N_name)
+	variableTypes[numSignersName] = findVariable(astAssignDict, numSignersName)
 
 	writeBVFile(outputFileName, variableTypes, precomputeTypes, cleanVerifyEqLn)
 
