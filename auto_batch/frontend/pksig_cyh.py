@@ -35,10 +35,11 @@ class CYH(PKSig):
     def keygen(self, msk, ID):
         sk = H1(ID) ** msk
         pk = H1(ID)
-        return (ID, pk, sk)
+        fullKey = (ID, pk, sk)
+        return fullKey
     
-    def sign(self, sk, L, M):
-        (IDs, IDpk, IDsk) = sk
+    def sign(self, fullKey, L, M):
+        (IDs, IDpk, IDsk) = fullKey
         assert IDs in L, "signer should be an element in L"
         Lt = self.concat(L) 
         num_signers = len(L)

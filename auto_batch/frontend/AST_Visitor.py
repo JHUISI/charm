@@ -91,6 +91,8 @@ argsRepInAST = 'args'
 argRepInAST = 'arg'
 randomRepInAST = 'random'
 subscriptRepInAST = 'Subscript'
+tupleRepInAST = 'Tuple'
+eltsRepInAST = 'elts'
 typeKey = 'type'
 groupType = 'groupType'
 binOpRepInAST = 'BinOp'
@@ -114,6 +116,8 @@ noneType = 'None'
 newSliceNameKey = 'NewSliceName'
 hashBase = 'HashBase'
 hashFunction = 'HashFunction'
+tupleKey = 'Tuple'
+varNamesKey = 'VariableNamesList'
 lambdaFunction = 'LambdaFunction'
 lambdaRepInAST = 'Lambda'
 lambdaArgPlaceholder = 'lambdaArgPlaceholder'
@@ -201,7 +205,7 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 			print(type(node).__name__)
 			return ""
 
-	def recordDotProductVariable(self, dotProdNode, variableName):
+	def recordDotProductVariable(self, dotProdNode, variableName, dotProductVariableNames):
 		dotProdString = "prod{ j := 1 , "
 
 		if (argsRepInAST not in dotProdNode._fields):
@@ -238,12 +242,12 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 		if (numDotProdArgs < 1):
 			return
 
-		dotProdArgNames = []
-
 		for dotProdArgIndex in range(4, numArgs):
 			if (idRepInAST not in dotProdNode.args[dotProdArgIndex]._fields):
 				return
-			dotProdArgNames.append(dotProdNode.args[dotProdArgIndex].id)
+			dotProductVariableNames.append(dotProdNode.args[dotProdArgIndex].id)
+
+		#dotProductVariableNames = dotProdArgNames
 
 		#print(dotProdArgNames)
 
@@ -255,7 +259,7 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 			#print(argNumber)
 			stringToReplace = lambdaArgBegin + str(argNumber) + lambdaArgEnd
 			#print(stringToReplace)
-			replacementString = dotProdArgNames[argNumber] + "_j"
+			replacementString = dotProductVariableNames[argNumber] + "_j"
 			#print(replacementString)
 			#print(funcString)
 			#print("\n\n")
@@ -402,7 +406,9 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 											return
 							elif (funcName == dotProductFuncName):
 								self.groupTypes[topLevelKey][node.lineno] = {}
-								self.groupTypes[topLevelKey][node.lineno][dotProductFuncName] = self.recordDotProductVariable(node.value, topLevelKey)
+								dotProductVariableNames = []
+								self.groupTypes[topLevelKey][node.lineno][dotProductFuncName] = self.recordDotProductVariable(node.value, topLevelKey, dotProductVariableNames)
+								self.groupTypes[topLevelKey][node.lineno][varNamesKey] = dotProductVariableNames
 								return
 				if (type(node.value).__name__ == lambdaRepInAST):
 					#print(ast.dump(node))
@@ -429,6 +435,35 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 							self.groupTypes[topLevelKey][node.lineno] = {}
 							lambdaArgs = self.getLambdaArgs(node.value)
 							self.groupTypes[topLevelKey][node.lineno][lambdaFunction] = self.getLambdaFuncExpression(node.value.body, lambdaArgs)
+							return
+
+				if (type(node.value).__name__ == tupleRepInAST):
+					if (eltsRepInAST in node.value._fields):
+						lenOfTupleItems = len(node.value.elts)
+						self.groupTypes[topLevelKey][node.lineno] = {}
+						self.groupTypes[topLevelKey][node.lineno][tupleKey] = {}
+						for tupleIndex in range(0, lenOfTupleItems):
+							if (idRepInAST in node.value.elts[tupleIndex]._fields):
+								tupleArgName = node.value.elts[tupleIndex].id
+								self.groupTypes[topLevelKey][node.lineno][tupleKey][tupleArgName] = {}
+								self.groupTypes[topLevelKey][node.lineno][tupleKey][tupleArgName] = self.getGroupType(tupleArgName)
+						return
+
+				if (type(node.value).__name__ == 'Subscript'):
+					if (valueRepInAST in node.value._fields):
+						if (idRepInAST in node.value.value._fields):
+							dictEntryName = node.value.value.id
+							if (sliceRepInAST in node.value._fields):
+								if (valueRepInAST in node.value.slice._fields):
+									#print(node.value.slice.value._fields)
+									if (sRepInAST in node.value.slice.value._fields):
+										dictEntrySlice = node.value.slice.value.s
+										#print(dictEntrySlice)
+										self.groupTypes[topLevelKey][node.lineno] = {}
+										self.groupTypes[topLevelKey][node.lineno][groupType] = self.getGroupType(dictEntryName, dictEntrySlice)
+
+
+						#print(node.value.elts)
 
 						#print(node.value._fields)
 
@@ -832,7 +867,7 @@ def getLineOfTextFromSource(lineString, linesOfCode, startLine, endLine):
 
 	return 0
 
-def replaceDotProdVars(verifyEq, astAssignDict, variableNames):
+def replaceDotProdVars(verifyEq, astAssignDict, variableNames, variableTypes):
 	#print(verifyEq)
 	#print(variableNames)
 
@@ -850,6 +885,13 @@ def replaceDotProdVars(verifyEq, astAssignDict, variableNames):
 		stringToBeReplaced = " " + varName + " "
 		replacementString = " " + astAssignDict[varName][lineNo][dotProductFuncName] + " "
 		verifyEq = verifyEq.replace(stringToBeReplaced, replacementString)
+
+		if (varNamesKey not in astAssignDict[varName][lineNo]):
+			continue
+
+		for dotProdVarName in astAssignDict[varName][lineNo][varNamesKey]:
+			#print(dotProdVarName)
+			pass
 		
 	return verifyEq
 
@@ -905,7 +947,7 @@ if __name__ == '__main__':
 	cleanVerifyEqLn = replaceDictVars(cleanVerifyEqLn, astAssignDict, variableNames, variableTypes)
 	cleanVerifyEqLn = ensureSpacesBtwnTokens(cleanVerifyEqLn)
 	cleanVerifyEqLn = expandHashesInVerify(cleanVerifyEqLn, astAssignDict, variableNames, variableTypes, precomputeTypes, verifyEndPrecomputeLine, verifyFuncLineStart, verifyFuncLineEnd)
-	cleanVerifyEqLn = replaceDotProdVars(cleanVerifyEqLn, astAssignDict, variableNames)
+	cleanVerifyEqLn = replaceDotProdVars(cleanVerifyEqLn, astAssignDict, variableNames, variableTypes)
 
 	#print(variableTypes)
 
