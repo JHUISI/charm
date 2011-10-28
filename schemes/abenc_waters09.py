@@ -44,6 +44,8 @@ class CPabe09(ABEnc):
         for i in range(0, len(k_x)):
             K_x[ attributes[i] ] = k_x[i]    
 
+        attributes = [unicode(a) for a in attributes]
+
         key = { 'K':K, 'L':L, 'K_x':K_x, 'attributes':attributes }
         return key
     
@@ -66,11 +68,12 @@ class CPabe09(ABEnc):
                D[ p_list[i] ] = (pk['g2'] ** r)
         
         if debug: print("SessionKey: %s" % C_tilde)
-        return { 'C0':C_0, 'C':C, 'D':D , 'C_tilde':C_tilde, 'policy':policy, 'attribute':p_list }
+        return { 'C0':C_0, 'C':C, 'D':D , 'C_tilde':C_tilde, 'policy':unicode(policy_str), 'attribute':p_list }
     
     def decrypt(self, pk, sk, ct):
-        pruned = util.prune(ct['policy'], sk['attributes'])
-        coeffs = {}; util.getCoefficients(ct['policy'], coeffs)
+        policy = util.createPolicy(ct['policy'])
+        pruned = util.prune(policy, sk['attributes'])
+        coeffs = {}; util.getCoefficients(policy, coeffs)
         numerator = pair(ct['C0'], sk['K'])
         
         # create list for attributes in order...

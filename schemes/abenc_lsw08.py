@@ -65,7 +65,7 @@ class KPabe(ABEnc):
             D[x] = d
         if debug: print("Policy: %s" % policy)
         if debug: print("Attribute list: %s" % attr_list)
-        D['policy'] = policy
+        D['policy'] = unicode(policy_str)
         return D
     
     def negatedAttr(self, attribute):
@@ -88,11 +88,12 @@ class KPabe(ABEnc):
         # compute E4
         E4 = [pk['g_G1_b'] ** sx[i] for i in range(len(attr_list))]
         E5 = [(pk['g_G1_b2'] ** (sx[i] * group.hash(attr_list[i]))) * (pk['h_G1_b'] ** sx[i]) for i in range(len(attr_list))]                
+        attr_list = [unicode(a) for a in attr_list]
         return {'E1':(pk['e(gg)_alpha'] ** s) * M, 'E2':pk['g_G2'] ** s, 'E3':E3, 'E4':E4, 'E5':E5, 'attributes':attr_list }
     
     def decrypt(self, E, D):
         attrs = E['attributes']
-        policy = D['policy']
+        policy = util.createPolicy(D['policy'])
         coeff = {}; util.getCoefficients(policy, coeff)
         
         Z = {}; prodT = group.init(GT, long(1))
