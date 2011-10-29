@@ -20,3 +20,6 @@ END :: constant
 
 verify :=  { prod{i:=1, l} on e(S_i, At_i * (Bt_i^M_i) * (Ct_i^t_i)) } == D
 
+BEGIN :: transform
+2, 3, 4, S, 3
+END :: transform

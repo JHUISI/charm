@@ -1,16 +1,16 @@
 ''' Operators in Batch language:
 
-* EXP - '^' for exponent
+* MUL, EXP - '*' for multiply,'^' for exponent
 * EQ - ':=' for assignment
 * EQ_TST - '==' for equality testing
 * PAIR - 'e(' arg1, arg2 ')'
 * CONST - 'constant' declarator?
 * VARIABLE - 'variable' declarator?
-* PROD - 'prod{i:=1,N} on' applied to 
+* PROD - 'prod{i:=1,N} on' applied to dot products
 * ARR - 'a_1' for an array, a, with index = 1
-* LIST - '[ x, y, z,...]' 
+* LIST - '[ x, y, z,...]' # not implemented yet
 
-e.g., prod{i:=1,N} on pk_i ^ del_i 
+e.g., prod{i:=1,N} on (pk_i ^ del_i) 
 
 AST simple rules
 
@@ -25,7 +25,7 @@ import string
 
 types = Enum('G1', 'G2', 'GT', 'ZR', 'str')
 declarator = Enum('constants', 'verify')
-ops = Enum('BEGIN', 'TYPE', 'ADD', 'MUL', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'PROD', 'ON', 'CONCAT','LIST','END', 'NONE')
+ops = Enum('BEGIN', 'TYPE', 'ADD', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'PROD', 'ON', 'CONCAT','LIST','END', 'NONE')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
 
@@ -44,24 +44,71 @@ def getListNodes(subtree, parent_type, _list):
 	if subtree.right: getListNodes(subtree.right, subtree.type, _list)
 	return
 
+# checks whether a target node exists in a subtree
+# note: returns True when it finds the first match 
+def isNodeInSubtree(node, target):
+	if node == None: return False
+	else:
+		if str(node) == str(target): return True
+	result = isNodeInSubtree(node.left, target)
+	if result: return result
+	result = isNodeInSubtree(node.right, target)
+	return result
 
-def searchNode(node, target):
+# searches a subtree for a target node type
+# it returns the first node that matches the target type.
+# note: doesn't return all istances of a given type in the subtree
+def searchNodeType(node, target_type):
 	if node == None: return None
-	elif node.type == target: return node		
+	elif node.type == target_type: return node		
 	result = searchNode(node.left)
 	if result: return result
 	result = searchNode(node.right)		
 	return result
 
+# simplifies checking the type of a given node
 def Type(node):
-	if node == None: return None
+	if node == None: return ops.NONE
 	return node.type
 
-def createNode(_type, left=None, right=None):
-	node = BinaryNode(_type)
+# short cut to creating a binary node of a given type
+# with given children nodes.
+def createNode(node_type, left=None, right=None):
+	node = BinaryNode(node_type)
 	node.left = left
 	node.right = right
 	return node
+
+# binds a string representation of the operation to 
+# the symbolic representation (Enums) above 
+def createTree(op, node1, node2):
+    if(op == "^"):
+        node = BinaryNode(ops.EXP)
+    elif(op == "*"):
+        node = BinaryNode(ops.MUL)
+    elif(op == "+"):
+        node = BinaryNode(ops.ADD)
+    elif(op == ":="):
+        node = BinaryNode(ops.EQ)
+    elif(op == "=="):
+        node = BinaryNode(ops.EQ_TST)
+    elif(op == "e("):
+        node = BinaryNode(ops.PAIR)
+    elif(op == "H("):
+        node = BinaryNode(ops.HASH)
+    elif(op == "prod{"):
+        node = BinaryNode(ops.PROD)
+    elif(op == "on"):
+        # can only be used in conjunction w/ PROD (e.g. PROD must precede it)        
+        node = BinaryNode(ops.ON)
+    elif(op == "|"):
+        node = BinaryNode(ops.CONCAT)
+    # elif e( ... )
+    else:    
+        return None
+    node.addSubNode(node1, node2)
+    return node
+
 
 class BinaryNode:
 	def __init__(self, value, left=None, right=None):		
