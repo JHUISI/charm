@@ -191,7 +191,7 @@ debugs = levels.none
 
 def parseFile2(filename):
     fd = open(filename, 'r')
-    ast = {TYPE: None, CONST: None, PRECOMP: None, OTHER: [] }
+    ast = {TYPE: None, CONST: None, PRECOMP: None, TRANSFORM: None, SIGNATURE: None, OTHER: [] }
     
     # parser = BatchParser()
     code = fd.readlines(); i = 1
@@ -442,7 +442,9 @@ class SimplifyDotProducts:
     
     def visit(self, node, data):
         pass
-    
+
+    # visit all the ON nodes and test whether we can distribute the product to children nodes
+    # e.g., prod{} on (x * y) => prod{} on x * prod{} on y    
     def visit_on(self, node, data):
         if Type(data['parent']) == ops.PAIR:
             self.rule += "False"
@@ -537,10 +539,9 @@ class SmallExponent:
         return _node
 
 class Technique2:
-    def __init__(self, constants, variables, group='G1'):
+    def __init__(self, constants, variables, meta):
         self.consts = constants
         self.vars   = variables
-        self.group = group # can orogrammatically set which group we move exponent into
         #print("Rule 2: Move the exponent(s) into the pairing")
         self.rule   = "Rule 2: "
         # TODO: pre-processing to determine context of how to apply technique 2
@@ -685,10 +686,9 @@ class Technique2:
         return False
 
 class Technique3:
-    def __init__(self, constants, variables, group='G1'):
+    def __init__(self, constants, variables, meta):
         self.consts = constants
         self.vars   = variables
-        self.group  = group
         self.rule   = "Rule 3: "
         #print("Rule 3: When two pairings with common 1st or 2nd element appear, then can be combined. n pairs to 1.")
     
@@ -1074,6 +1074,7 @@ if __name__ == "__main__":
     ast_struct = parseFile2(file)
     const, types = ast_struct[ CONST ], ast_struct[ TYPE ]
     precompute = ast_struct[ PRECOMP ]
+    algorithm = ast_struct [ TRANSFORM ]
     verify, N = None, None
     metadata = {}
     for n in ast_struct[ OTHER ]:
@@ -1088,6 +1089,7 @@ if __name__ == "__main__":
     vars = types
     vars['N'] = N
     print("variables =>", vars)
+    print("batch algorithm =>", algorithm)
 
     print("\nVERIFY EQUATION =>", verify, "\n")
     verify2 = BinaryNode.copy(verify)
@@ -1098,15 +1100,15 @@ if __name__ == "__main__":
     ASTVisitor(SmallExponent(const, vars)).preorder(verify2.right)
     print("\nStage B: Small Exp Test =>", verify2, "\n")
 
-    T2 = Technique2(const, vars)
-    ASTVisitor(T2).preorder(verify2.right)
-    print("\nApply tech 2 =>", verify2, "\n")
-    print(T2.rule)
-    
-    T3 = Technique3(const, vars)
-    ASTVisitor(T3).preorder(verify2.right)
-    print("\nApply tech 3 =>", verify2, "\n")
-    print(T3.rule)    
+#    T2 = Technique2(const, vars)
+#    ASTVisitor(T2).preorder(verify2.right)
+#    print("\nApply tech 2 =>", verify2, "\n")
+#    print(T2.rule)
+#    
+#    T3 = Technique3(const, vars)
+#    ASTVisitor(T3).preorder(verify2.right)
+#    print("\nApply tech 3 =>", verify2, "\n")
+#    print(T3.rule)    
 
 #    T2 = Technique2(const, vars)
 #    ASTVisitor(T2).preorder(verify2.right)
@@ -1115,17 +1117,17 @@ if __name__ == "__main__":
 #    ASTVisitor(SimplifyDotProducts()).preorder(verify2.right)
 #    print("\nSimplify dot prod =>", verify2, "\n")
     
-    T4 = Technique4(const, vars, metadata)
-    ASTVisitor(T4).preorder(verify2.right)
-    print("\nApply tech 4 =>", verify2, "\n")
-    print(T4.rule)
-
-    ASTVisitor(SimplifyDotProducts()).preorder(verify2.right)
-    print("\nSimplify dot prod =>", verify2, "\n")
-    T3 = Technique3(const, vars)
-    ASTVisitor(T3).preorder(verify2.right)
-    print("\nApply tech 3 =>", verify2, "\n")
-    print(T3.rule)
+#    T4 = Technique4(const, vars, metadata)
+#    ASTVisitor(T4).preorder(verify2.right)
+#    print("\nApply tech 4 =>", verify2, "\n")
+#    print(T4.rule)
+#
+#    ASTVisitor(SimplifyDotProducts()).preorder(verify2.right)
+#    print("\nSimplify dot prod =>", verify2, "\n")
+#    T3 = Technique3(const, vars)
+#    ASTVisitor(T3).preorder(verify2.right)
+#    print("\nApply tech 3 =>", verify2, "\n")
+#    print(T3.rule)
         
     # Further precomputations
     #Instfind = InstanceFinder()
