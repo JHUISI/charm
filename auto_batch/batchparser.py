@@ -557,7 +557,7 @@ class Technique2:
     # find: 'e(g, h)^d_i' transform into ==> 'e(g^d_i, h)' iff g or h is constant
     # move exponent towards the non-constant attribute
     def visit_exp(self, node, data):
-        # print("left node =>", node.left.type,"target right node =>", node.right)
+        #print("left node =>", node.left.type,"target right node =>", node.right)
         if(Type(node.left) == ops.PAIR):   # and (node.right.attr_index == 'i'): # (node.right.getAttribute() == 'delta'):
             pair_node = node.left
             addAsChildNodeToParent(data, pair_node) # move pair node one level up
@@ -572,6 +572,8 @@ class Technique2:
                 node.left = pair_node.right
                 pair_node.right = node 
                 self.rule += "Right := Move '" + str(node.right) + "' exponent into the pairing. "
+            else:
+                pass
         # blindly move the right node of prod{} on x^delta regardless    
         elif(Type(node.left) == ops.ON):
             # (prod{} on x) ^ y => prod{} on x^y
@@ -582,6 +584,7 @@ class Technique2:
             # look into x: does x contain a PAIR node?
             pair_node = searchNodeType(prod_node.right, ops.PAIR)
             # if yes: 
+            #print("found pair =>", pair_node)
             if pair_node:
                 # move exp inside the pair node
                 # check whether left side is constant
@@ -606,7 +609,10 @@ class Technique2:
                             self.rule += "moved exponent into the pairing: less than 2 mul nodes. "
 
                     elif Type(pair_node.right) == ops.ATTR:
+                        # set pair node right child to node left
                         self.setNodeAs(pair_node, 'right', node, 'left')
+                    else:
+                        pass
 
                 # check whether right side is constant
                 elif not self.isConstInSubtreeT(pair_node.right):
@@ -677,8 +683,10 @@ class Technique2:
 
     def isConstInSubtreeT(self, node): # check whether left or right node is constant  
         if node == None: return None
-        if node.type == ops.ATTR:
+        if Type(node) == ops.ATTR:
             return self.isConstant(node)
+        elif Type(node) == ops.HASH:
+            return self.isConstant(node.left)
         result = self.isConstInSubtree(node.left)
         if result: return result
         result = self.isConstInSubtree(node.right)
@@ -925,10 +933,24 @@ class Technique4:
                 else:
                     print("Not applying any transformation for: ", Type(node2_parent))
 
-    def adjustProdNodes(self, node):        
+    def adjustProdNodes(self, node): 
         if Type(node.left) == ops.ON:
             prod = node.left
-            index = str(prod.left.left.left)            
+            index = str(prod.left.left.left)              
+            # check the following
+            #print("prod =>", prod.right)
+            #print("other =>", node.right)
+            if not self.allNodesWithIndex(index, prod.right):
+                print("TODO: need to handle this case 1.")
+            elif not self.allNodesWithIndex(index, node.right):
+                result = self.findExpWithIndex(node.right, index)
+                new_prod = BinaryNode.copy(prod)
+                new_prod.right = self.createExp(prod.right, result)
+                # add new_prod into current node left
+                node.left = new_prod
+                self.deleteFromTree(node.right, node, result, 'right')
+                #print("updated node =>", node)
+                
         elif Type(node.right) == ops.ON:
             prod = node.right
             index = str(prod.left.left.left)
@@ -942,11 +964,12 @@ class Technique4:
                 node.right = prod.right
                 result = self.findExpWithIndex(node.right, index)
                 new_prod.right = self.createExp(node.left, result)
+                # add new_prod into current node left                
                 node.left = new_prod    
                 self.deleteFromTree(node.right, node, result, 'right')
-                #print("update =>", node)
+                #print("updated node =>", node)
                  
-            elif not self.allNodesTheSame(index, node.left):
+            elif not self.allNodesWithIndex(index, node.left):
                 print("adjustProdNodes: need to handle the other case.")
         # first check the right side for product
         
@@ -958,10 +981,11 @@ class Technique4:
             exp = BinaryNode(ops.EXP)
             exp.left = left.left
             exp.right = mul
-        elif left.type in [ops.ATTR, ops.PAIR]: # left: attr ^ right
+        elif left.type in [ops.ATTR, ops.PAIR, ops.HASH]: # left: attr ^ right
             exp = BinaryNode(ops.EXP)
             exp.left = left
             exp.right = right
+        else: return None
         return exp
     
     def allNodesWithIndex(self, index, subtree):
