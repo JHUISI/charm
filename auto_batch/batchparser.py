@@ -451,7 +451,7 @@ class SimplifyDotProducts:
     # e.g., prod{} on (x * y) => prod{} on x * prod{} on y    
     def visit_on(self, node, data):
         if Type(data['parent']) == ops.PAIR:
-            self.rule += "False"
+            self.rule += "False "
             return
         #print("test: right node of prod =>", node.right, ": type =>", node.right.type)
         #print("parent type =>", Type(data['parent']))
@@ -479,7 +479,7 @@ class SimplifyDotProducts:
             
                 node.right = mul_node.left
                 mul_node.left = node
-                self.rule += "True"
+                self.rule += "True "
                 # move mul_node one level up to replace the "on" node.
                 addAsChildNodeToParent(data, mul_node)
             elif len(r) > 2:
@@ -499,9 +499,9 @@ class SimplifyDotProducts:
                         muls[i].right = prod[i+1]
 #                print("final node =>", muls[0])
                 addAsChildNodeToParent(data, muls[0])                
-                self.rule += "True"
+                self.rule += "True "
             else:
-                self.rule += "False"
+                self.rule += "False "
                 return
 
 # Adds an exponent to a \delta to every pairing node
@@ -608,11 +608,11 @@ class Technique2:
                             self.rule += "moved exponent into the pairing: less than 2 mul nodes. "
 
                     elif Type(pair_node.right) == ops.ATTR:
-                        # set pair node right child to node left
-                        print("Hit snag here!!")
+                        # set pair node left child to node left since we've determined
+                        # that the left side of pair node is not a constant
                         self.setNodeAs(pair_node, 'left', node, 'left')
                     else:
-                        pass
+                        print("T2: missing case?")
 
                 # check whether right side is constant
                 elif not self.isConstInSubtreeT(pair_node.right):
@@ -673,23 +673,15 @@ class Technique2:
         else: return None
         return True
         
-    def isConstInSubtree(self, node): # check whether left or right node is constant  
-        if not node: return
-        if node.type == ops.ATTR:
-            self.const_result = self.isConstant(node)
-            return
-        self.isConstInSubtree(node.left)
-        self.isConstInSubtree(node.right)
-
     def isConstInSubtreeT(self, node): # check whether left or right node is constant  
         if node == None: return None
         if Type(node) == ops.ATTR:
             return self.isConstant(node)
         elif Type(node) == ops.HASH:
             return self.isConstant(node.left)
-        result = self.isConstInSubtree(node.left)
+        result = self.isConstInSubtreeT(node.left)
         if result: return result
-        result = self.isConstInSubtree(node.right)
+        result = self.isConstInSubtreeT(node.right)
         return result
 
     def isConstant(self, node):        
@@ -746,19 +738,8 @@ class Technique3:
                 #print("new node =+>", mul)
                 addAsChildNodeToParent(data, mul)
                 self.rule += "split one pairing into two pairings. "
-#            _nodes = []
-#            self.getNodes(right, ops.NONE, _nodes)
-#            if len(_nodes) > 2: # candidate for expanding
-#                muls = [ BinaryNode(ops.MUL) for i in range(len(_nodes)-1) ]
-#                for i in range(len(muls)):
-#                    muls[i].left = self.createPair(left, _nodes[i])
-#                    if i < len(muls)-1:
-#                        muls[i].right = muls[i+1]
-#                    else:
-#                        muls[i].right = self.createPair(left, _nodes[i+1])
-#                    
-#                print("mul root =>", muls[0])
-#                addAsChildNodeToParent(data, muls[0])
+            else:
+                print("T3: missing case?")
         else:
             return None
 
@@ -773,7 +754,6 @@ class Technique3:
             self.getMulTokens(pair_node.right, ops.NONE, [ops.EXP, ops.HASH], r)
             if len(l) > 2: 
                 print("T3: Need to code this case!")
-                pass
             elif len(r) > 2:
                 # special case: reverse split a \single\ pairing into two or more pairings to allow for application of 
                 # other techniques. pair(a, b * c * d?) => p(a, b) * p(a, c) * p(a, d)
@@ -802,26 +782,16 @@ class Technique3:
                     node.right = pair_node.right
                     pair_node.right = node
                     self.rule += "common 2nd (right) node appears, so can reduce n pairings to 1. "
-                    self.visit_pair(pair_node, data)                
+                    self.visit_pair(pair_node, data)
             return
-
-    
-    def isConstInSubtree(self, node): # check whether left or right node is constant  
-        if not node: return
-        if node.type == ops.ATTR:
-            # set appropriate field when we've found an attribute we can check
-            self.const_result = self.isConstant(node)
-            return
-        self.isConstInSubtree(node.left)
-        self.isConstInSubtree(node.right)
 
     def isConstInSubtreeT(self, node): # check whether left or right node is constant  
         if node == None: return None
         if node.type == ops.ATTR:
             return self.isConstant(node)
-        result = self.isConstInSubtree(node.left)
+        result = self.isConstInSubtreeT(node.left)
         if result: return result
-        result = self.isConstInSubtree(node.right)
+        result = self.isConstInSubtreeT(node.right)
         return result
 
     def isConstant(self, node): 

@@ -42,7 +42,7 @@ if __name__ == "__main__":
     print("variables =>", vars)
     print("batch algorithm =>", algorithm)
 
-    print("\nVERIFY EQUATION =>", verify, "\n")
+    print("\nVERIFY EQUATION =>", verify)
     verify2 = BinaryNode.copy(verify)
     ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
     ASTVisitor(SimplifyDotProducts()).preorder(verify2.right)
