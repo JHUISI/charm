@@ -75,6 +75,8 @@ def deserializeDict(object, group):
             elif _type == int:
                 bytes_object[i] = object[i]
         return bytes_object
+    elif type(object) == bytes:
+        return group.deserialize(object)
     else:
         # just one bytes object
         return object

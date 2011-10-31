@@ -196,7 +196,7 @@ void	Element_dealloc(Element* self)
 	}
 	
 	if(self->param_buf) {
-		debug("param_buf => 0x%p\n", self->param_buf);
+		debug("param_buf => %p\n", self->param_buf);
 		free(self->param_buf);
 	}
 	
@@ -227,8 +227,8 @@ void	Element_dealloc(Element* self)
 //				}
 //			}
 //		}
-
 	Py_TYPE(self)->tp_free((PyObject*)self);
+	Py_CLEAR(self);
 }
 
 // helper method 
@@ -248,10 +248,11 @@ ssize_t read_file(FILE *f, char** out)
 			}
 		}
 	}
+
 	return 0;
 }
 
-static char * init_pbc_param(char *file, pairing_t *pairing)
+char * init_pbc_param(char *file, pairing_t *pairing)
 {
 	pbc_param_t params;
 	FILE *fp;
@@ -260,7 +261,7 @@ static char * init_pbc_param(char *file, pairing_t *pairing)
 	fp = fopen(file, "r");
 	
 	if(fp == NULL) {
-		printf("Error reading file.\n");
+		fprintf(stderr, "Error reading file!\n");
 		return NULL;
 	}
 	
@@ -474,16 +475,19 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
         return -1; 
 	}
 	if (self->params && !n && !qbits && !rbits && !short_val && !buf2) {
+		// check if file exists
+		int f = open(self->params, O_RDONLY);
+		if(f < 0) {
+			PyErr_SetString(ElementError, "failed to read params file.");
+			return 0;
+		}
+		close(f);
 		pairing = PyObject_New(Pairing, &PairingType);
 		buf = init_pbc_param(self->params, &pairing->pair_obj);
 		
 		if(buf != NULL) {
 			debug("Initialized pairings type: '%s'\n", self->params);
 			self->param_buf = buf;
-		}
-		else {
-			PyErr_SetString(ElementError, "failed to read params file.");
-			return -1;
 		}
 	}
 	else if(buf2 && !n && !qbits && !rbits && !short_val) {

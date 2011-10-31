@@ -9,7 +9,7 @@ debug = False
 class IBSig():
     def __init__(self):
         global group
-        group = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
+        group = PairingGroup('../../param/d224.param')
   
     def dump(self, obj):
         ser_a = serializeDict(obj, group)

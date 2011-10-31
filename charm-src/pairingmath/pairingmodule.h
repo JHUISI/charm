@@ -7,6 +7,9 @@
 #include <stdlib.h>
 #include <gmp.h>
 #include <pbc/pbc.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "sha1.h"
 #include "benchmarkmodule.h"
 #include "base64.h"

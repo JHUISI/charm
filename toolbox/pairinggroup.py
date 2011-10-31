@@ -1,9 +1,11 @@
 from charm.pairing import *
 from charm.integer import randomBits,bitsize,integer
+import os.path
 
 class PairingGroup():
     def __init__(self, param_file, secparam=512, verbose=False):
-        self.Pairing = pairing(param_file)
+        assert os.path.isfile(param_file), "Param file '%s' does not exist!" % param_file 
+        self.Pairing = pairing(param_file)            
         self.secparam = secparam # number of bits
 #        self.rand = init()
         self._verbose = verbose
