@@ -2,12 +2,23 @@ N := 200
 l := 5
 
 BEGIN :: types
+sig := G1
+M := str
 pk := G2
 g2 := G2
 END :: types
 
 BEGIN :: signature
-sig := { prod{i:=1, l} on sig_i }
+sig
 END :: signature
 
-verify := e(sig, g2) == (prod{i := 1, l} on e(H(M_i, G1), pk_i))
+# dot product of BLS signatures [i=1, L]
+BEGIN :: precompute
+sig := { prod{i:=1, l} on bsig_i }
+END :: precompute
+
+BEGIN :: transform
+2
+END :: transform
+
+verify := { e(sig, g2) == (prod{i := 1, l} on e(H(M_i, G1), pk_i)) }

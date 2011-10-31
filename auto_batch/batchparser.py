@@ -45,6 +45,7 @@ class BatchParser:
         rcurly = Literal("}").suppress()
 
         MulOp = Literal("*")
+        DivOp = Literal("/")
         Concat = Literal("|")
         ExpOp = Literal("^")
         AddOp = Literal("+")
@@ -54,9 +55,11 @@ class BatchParser:
         Pairing = Literal('e(') # Pairing token
         Hash = Literal('H(')
         Prod = Literal("prod{") # dot product token
+        For = Literal("for{")
         ProdOf = Literal("on")
+        ForDo = Literal("do") # for{x,y} do y
         # captures order of parsing token operators
-        Token = Equality | ExpOp | MulOp | AddOp | ProdOf | Concat | Assignment
+        Token = Equality | ExpOp | MulOp | DivOp | AddOp | ForDo | ProdOf | Concat | Assignment
         Operator = Token 
         #Operator = OperatorAND | OperatorOR | Token
 
@@ -68,6 +71,7 @@ class BatchParser:
         atom = (Hash + expr + ',' + expr + rpar).setParseAction( pushFirst ) | \
                (Pairing + expr + ',' + expr + rpar).setParseAction( pushFirst ) | \
                (Prod + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
+               (For + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
                lpar + expr + rpar | (leafNode).setParseAction( pushFirst )
 
         # Represents the order of operations (^, *, |, ==)
@@ -92,7 +96,7 @@ class BatchParser:
         op = stack.pop()
         if debug >= levels.some:
             print("op: %s" % op)
-        if op in ["+", "*", "^", ":=", "==", "e(", "prod{", "on", "|"]: # == "AND" or op == "OR" or op == "^" or op == "=":
+        if op in ["+", "*", "^", ":=", "==", "e(", "for{", "do","prod{", "on", "|"]: # == "AND" or op == "OR" or op == "^" or op == "=":
             op2 = self.evalStack(stack)
             op1 = self.evalStack(stack)
             return createTree(op, op1, op2)

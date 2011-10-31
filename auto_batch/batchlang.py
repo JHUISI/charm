@@ -6,7 +6,8 @@
 * PAIR - 'e(' arg1, arg2 ')'
 * CONST - 'constant' declarator?
 * VARIABLE - 'variable' declarator?
-* PROD - 'prod{i:=1,N} on' applied to dot products
+* FOR - 'for{i:=1,X} do x' loop from 1 to X on statement x
+* PROD - 'prod{i:=1,N} on n' apply dot product to statement n
 * ARR - 'a_1' for an array, a, with index = 1
 * LIST - '[ x, y, z,...]' # not implemented yet
 
@@ -25,7 +26,7 @@ import string
 
 types = Enum('G1', 'G2', 'GT', 'ZR', 'str')
 declarator = Enum('constants', 'verify')
-ops = Enum('BEGIN', 'TYPE', 'ADD', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'PROD', 'ON', 'CONCAT','LIST','END', 'NONE')
+ops = Enum('BEGIN', 'TYPE', 'ADD', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'FOR','DO','PROD', 'ON', 'CONCAT','END', 'NONE')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
 
@@ -101,6 +102,10 @@ def createTree(op, node1, node2):
     elif(op == "on"):
         # can only be used in conjunction w/ PROD (e.g. PROD must precede it)        
         node = BinaryNode(ops.ON)
+    elif(op == "for{"):
+    	node = BinaryNode(ops.FOR)
+    elif(op == "do"):
+    	node = BinaryNode(ops.DO)
     elif(op == "|"):
         node = BinaryNode(ops.CONCAT)
     # elif e( ... )
@@ -161,6 +166,8 @@ class BinaryNode:
 				return (left + '^' + right)
 			elif(self.type == ops.MUL):
 				return ('(' + left + ' * ' + right + ')')
+			elif(self.type == ops.DIV):
+				return ('(' + left + ' / ' + right + ')')
 			elif(self.type == ops.ADD):
 				return ('(' + left + ' + ' + right + ')')
 			elif(self.type == ops.EQ):
@@ -175,8 +182,10 @@ class BinaryNode:
 				return ('prod{' + left + ',' + right + '}')
 			elif(self.type == ops.ON):
 				 return ('(' + left + ' on ' + right + ')')
-			elif(self.type == ops.LIST):
-				 return ('[' + left + ']' )
+			elif(self.type == ops.FOR):
+				return ('for{' + left + ',' + right + '}')
+			elif(self.type == ops.DO):
+				 return ( left + ' do ' + right)
 			elif(self.type == ops.CONCAT):
 				 return (left + ' | ' + right)
 				# return ( left + ' on ' + right )				

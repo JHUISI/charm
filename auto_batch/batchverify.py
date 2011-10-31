@@ -1,5 +1,14 @@
 from batchparser import *
 
+def benchIndivVerification(equation):
+    pass
+
+def benchBatchVerification(equation):
+    pass
+
+def codeGenerator(Struct):
+    pass
+
 if __name__ == "__main__":
     if len(sys.argv) == 1:
         print("%s [ batch-input.bv ]" % sys.argv[0])
@@ -56,3 +65,9 @@ if __name__ == "__main__":
         ASTVisitor(Tech).preorder(verify2.right)
         print(Tech.rule, "\n")
         print(option_str, ":",verify2, "\n")
+    
+    # TODO: fill in the blanks here
+    #benchIndivVerification(verify)
+    #benchBatchVerification()
+    # TODO: generate code for both which includes the detecting of invalid signatures from a batch
+    #codeGenerator()
