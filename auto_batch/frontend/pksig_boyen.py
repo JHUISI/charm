@@ -1,29 +1,35 @@
-""" TODO: Description of Scheme here.
-"""
 from charm.pairing import *
 from toolbox.PKSig import PKSig
 from toolbox.iterate import dotprod
 
+N = 200
+num_signers = 5
+
 debug = False
 
 class Boyen(PKSig):
-    def __init__(self, groupObj):
+    def __init__(self):
         global group
-        group = groupObj
-    
+        group = pairing('/Users/matt/Documents/charm/param/a.param')
+
     def setup(self):
         global H
         H = lambda a: group.H(('1', str(a)), ZR)
         g1 = group.random(G1)
         g2 = group.random(G2)
-        return {'g1':g1, 'g2':g2}
+        mpk = {'g1':g1, 'g2':g2}
+        return mpk
     
     def keygen(self, mpk):
         a = group.random(ZR)
         b = group.random(ZR)
         c = group.random(ZR)
-        A = mpk['g1'] ** a; B = mpk['g1'] ** b; C = mpk['g1'] ** c 
-        At = mpk['g2'] ** a; Bt = mpk['g2'] ** b; Ct = mpk['g2'] ** c
+        A = mpk['g1'] ** a
+        B = mpk['g1'] ** b
+        C = mpk['g1'] ** c 
+        At = mpk['g2'] ** a
+        Bt = mpk['g2'] ** b
+        Ct = mpk['g2'] ** c
         sk = {'a':a, 'b':b, 'c':c}
         pk = {'A':A, 'B':B, 'C':C, 'At':At, 'Bt':Bt, 'Ct':Ct}
         return (pk, sk)
@@ -33,7 +39,6 @@ class Boyen(PKSig):
         B = [ i['B'] for i in pk ]
         C = [ i['C'] for i in pk ]
         m = H(M)
-        num_signers = len(pk)
         l = len(pk) - 1
         s = [group.random(ZR) for i in range(l)]
         t = [group.random(ZR) for i in range(num_signers)]
@@ -50,12 +55,12 @@ class Boyen(PKSig):
         return sig
     
     def verify(self, mpk, pk, M, sig):
-        num_signers = len(pk)
         At = [ i['At'] for i in pk ]
         Bt = [ i['Bt'] for i in pk ]
         Ct = [ i['Ct'] for i in pk ]
         D = pair(mpk['g1'], mpk['g2'])
-        S, t = sig['S'], sig['t']
+        S = sig['S']
+        t = sig['t']
         m = H(M)
         lam_func2 = lambda i,a,b,c,d: pair(S[i], a[i] * (b[i] * m) * (c[i] * t[i]))
         result = dotprod(group.init(GT), -1, num_signers, lam_func2, S, At, Bt, Ct)
@@ -64,13 +69,11 @@ class Boyen(PKSig):
         return False
 
 if __name__ == "__main__":
-   groupObj = pairing('../param/a.param')
-   boyen = Boyen(groupObj)
+   boyen = Boyen()
    mpk = boyen.setup()
    print("Pub parameters")
    print(mpk)
    
-   num_signers = 5
    L_keys = [ boyen.keygen(mpk) for i in range(num_signers)]  
    L_pk = [ x for x,y in L_keys ]
    L_sk = [ y for x,y in L_keys ]

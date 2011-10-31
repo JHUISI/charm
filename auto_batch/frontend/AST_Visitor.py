@@ -73,7 +73,7 @@ Then this program would assume that group.hash(M, G1) ** x is the
 signature.
 '''
 
-import ast, codegen, compiler, sys
+import ast, compiler, sys
 
 nameOfVerifyFunc = 'verify'
 equalityOperator = 'Eq()'
@@ -112,7 +112,7 @@ pairingName = 'pair'
 input = 'input'
 unknownType = 'Unknown'
 otherType = 'other'
-noneType = 'None'
+#noneType = 'None'
 newSliceNameKey = 'NewSliceName'
 hashBase = 'HashBase'
 hashFunction = 'HashFunction'
@@ -130,6 +130,30 @@ sRepInAST = 's'
 G1 = 'G1'
 G2 = 'G2'
 GT = 'GT'
+
+def getGroupType(astAssignDict, varName, dictKey = ""):
+	try:
+		lineNos = list(astAssignDict[varName].keys())
+	except:
+		return unknownType
+			
+	if (len(lineNos) == 0):
+		return unknownType
+	
+	lineNos.sort()
+	lineNos.reverse()
+	lineNo = lineNos[0]
+
+	if (dictKey == ""):
+		try:
+			return astAssignDict[varName][lineNo][groupType]
+		except:
+			return unknownType
+
+	try:			
+		return astAssignDict[varName][lineNo][dictRepInAST][dictKey][groupType]
+	except:
+		return unknownType
 
 class ASTFindGroupTypes(ast.NodeVisitor):
 	def __init__(self):
@@ -340,8 +364,43 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 
 	def visit_Assign(self, node):
 		topLevelKey = ""
+
+		if (ast.dump(node.targets[0]).startswith('Tuple(')):
+			if (eltsRepInAST in node.targets[0]._fields):
+				tupleObjects = node.targets[0].elts
+				tupleNames = []
+				for tupleObject in tupleObjects:
+					if (idRepInAST in tupleObject._fields):
+						tupleNames.append(tupleObject.id)
+				if (valueRepInAST in node._fields):
+					if (idRepInAST in node.value._fields):
+						if (node.value.id in self.groupTypes):
+							tupleGroupTypes = getTupleGroupTypes(self.groupTypes, node.value.id)
+							if (len(tupleNames) == len(tupleGroupTypes) ):
+
+								for tupleName,tupleGroupType in zip(tupleNames,tupleGroupTypes):
+
+
+
+									self.groupTypes[tupleName] = {}
+									self.groupTypes[tupleName][node.lineno] = {}
+
+
+
+									self.groupTypes[tupleName][node.lineno][groupType] = tupleGroupType
+
+		FIXME = False
+
+		if (ast.dump(node.targets[0]).startswith('Subscript(')):
+			if (valueRepInAST in node.targets[0]._fields):
+				if (idRepInAST in node.targets[0].value._fields):
+					topLevelKey = node.targets[0].value.id
+					if (topLevelKey not in self.groupTypes):
+						self.groupTypes[topLevelKey] = {}
+					FIXME = True
+					
 		
-		if (ast.dump(node.targets[0]).startswith('Name(')):			
+		if ( (ast.dump(node.targets[0]).startswith('Name(')) or (FIXME == True)):			
 			if (idRepInAST in node.targets[0]._fields):
 				topLevelKey = node.targets[0].id
 				if (topLevelKey not in self.groupTypes.keys()):
@@ -352,6 +411,8 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 				if ( (topLevelKey == numSignersName) and (type(node.value).__name__ == numRepInAST) ):
 					self.groupTypes[topLevelKey][node.lineno] = {valueRepInAST:node.value.n}
 					return
+				FIXME = True
+			if (FIXME == True):
 				if (type(node.value).__name__ == dictRepInAST):
 					keysList = node.value.keys
 					if (len(keysList) > 0):
@@ -394,6 +455,8 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 											numOfArgs = len(node.value.args)
 											argConcatString = ""
 											for argIndex in range(0, numOfArgs):
+												print(ast.dump(node))
+												print("\n")
 												if (idRepInAST in node.value.args[argIndex]._fields):
 													argConcatString += node.value.args[argIndex].id + " | "
 												elif (sliceRepInAST in node.value.args[argIndex]._fields):
@@ -401,6 +464,14 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 														if (valueRepInAST in node.value.args[argIndex].slice._fields):
 															if (type(node.value.args[argIndex].slice.value).__name__ == strRepInAST):
 																argConcatString += node.value.args[argIndex].slice.value.s + " | "
+
+
+												#print(node.value.args[argIndex]._fields)
+
+												elif (valueRepInAST in node.value.args[argIndex]._fields):
+													#print(node.value.args[argIndex].value._fields)
+													print("success")
+
 											argConcatString = argConcatString.rstrip(" | ")
 											self.groupTypes[topLevelKey][node.lineno] = {hashBase:argConcatString, groupType:self.groupTypes[funcName][lineNo][hashFunction][groupType]}
 											return
@@ -439,14 +510,17 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 
 				if (type(node.value).__name__ == tupleRepInAST):
 					if (eltsRepInAST in node.value._fields):
+						#print(ast.dump(node))
 						lenOfTupleItems = len(node.value.elts)
 						self.groupTypes[topLevelKey][node.lineno] = {}
 						self.groupTypes[topLevelKey][node.lineno][tupleKey] = {}
+						self.groupTypes[topLevelKey][node.lineno][tupleKey][varNamesKey] = []
+						self.groupTypes[topLevelKey][node.lineno][tupleKey][groupType] = []
 						for tupleIndex in range(0, lenOfTupleItems):
 							if (idRepInAST in node.value.elts[tupleIndex]._fields):
 								tupleArgName = node.value.elts[tupleIndex].id
-								self.groupTypes[topLevelKey][node.lineno][tupleKey][tupleArgName] = {}
-								self.groupTypes[topLevelKey][node.lineno][tupleKey][tupleArgName] = self.getGroupType(tupleArgName)
+								self.groupTypes[topLevelKey][node.lineno][tupleKey][varNamesKey].append(tupleArgName)
+								self.groupTypes[topLevelKey][node.lineno][tupleKey][groupType].append(self.getGroupType(tupleArgName))
 						return
 
 				if (type(node.value).__name__ == 'Subscript'):
@@ -628,7 +702,8 @@ def replaceDictVars(verifyEqLn, assignmentsDict, variableNames, variableTypes):
 	return verifyEqLn
 
 def expandHashesInVerify(verifyEqLn, hashAssignmentsDict, variableNames, variableTypes, precomputeTypes, verifyEndPrecomputeLine, verifyFuncLineStart, verifyFuncLineEnd):
-	for varName in variableNames:		
+	for varName in variableNames:
+		#print(varName)
 		if varName not in hashAssignmentsDict.keys():
 			continue
 		linenums = list(hashAssignmentsDict[varName].keys())
@@ -661,6 +736,8 @@ def expandHashesInVerify(verifyEqLn, hashAssignmentsDict, variableNames, variabl
 			#del variableTypes[varName]
 		if (inputVariable not in variableTypes.keys()):
 			variableTypes[inputVariable] = 0
+
+	#print(precomputeTypes)
 
 	return verifyEqLn
 
@@ -871,6 +948,11 @@ def replaceDotProdVars(verifyEq, astAssignDict, variableNames, variableTypes):
 	#print(verifyEq)
 	#print(variableNames)
 
+	varsToAdd = []
+	varsToRemove = []
+
+	#print(variableNames)
+
 	for varName in variableNames:
 		if (varName not in astAssignDict):
 			continue
@@ -886,14 +968,61 @@ def replaceDotProdVars(verifyEq, astAssignDict, variableNames, variableTypes):
 		replacementString = " " + astAssignDict[varName][lineNo][dotProductFuncName] + " "
 		verifyEq = verifyEq.replace(stringToBeReplaced, replacementString)
 
+		#if (
+
 		if (varNamesKey not in astAssignDict[varName][lineNo]):
 			continue
+
+		dotProdVarNames = astAssignDict[varName][lineNo][varNamesKey]
+		#print(dotProdVarNames)
+
+		#print(astAssignDict)
+
+		for dotProdVarName in dotProdVarNames:
+			variableTypes[dotProdVarName] = getGroupType(astAssignDict, dotProdVarName)
+			varsToAdd.append(dotProdVarName)
+
+		varsToRemove.append(varName)
 
 		for dotProdVarName in astAssignDict[varName][lineNo][varNamesKey]:
 			#print(dotProdVarName)
 			pass
+
+	for varName in varsToRemove:
+		del variableNames[varName]
+
+	for varName in varsToAdd:
+		variableNames[varName] = {}
+
+	#print(variableNames)		
 		
 	return verifyEq
+
+def printDictionary(dict):
+	for key in dict:
+		print(key + ":\t" + str(dict[key]))
+		print("\n")
+
+def getTupleGroupTypes(astAssignDict, varName):
+	if (varName not in astAssignDict):
+		return []
+
+	tupleGroupTypes = []
+
+	lineNos = list(astAssignDict[varName].keys())
+	lineNos.sort()
+	lineNos.reverse()
+	lineNo = lineNos[0]
+	if (tupleKey not in astAssignDict[varName][lineNo]):
+		return []
+
+	if (groupType not in astAssignDict[varName][lineNo][tupleKey]):
+		return []
+
+	for groupTypeEntry in astAssignDict[varName][lineNo][tupleKey][groupType]:
+		tupleGroupTypes.append(groupTypeEntry)
+
+	return tupleGroupTypes
 
 if __name__ == '__main__':
 	if ( (len(sys.argv) != 3) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
@@ -946,8 +1075,12 @@ if __name__ == '__main__':
 
 	cleanVerifyEqLn = replaceDictVars(cleanVerifyEqLn, astAssignDict, variableNames, variableTypes)
 	cleanVerifyEqLn = ensureSpacesBtwnTokens(cleanVerifyEqLn)
-	cleanVerifyEqLn = expandHashesInVerify(cleanVerifyEqLn, astAssignDict, variableNames, variableTypes, precomputeTypes, verifyEndPrecomputeLine, verifyFuncLineStart, verifyFuncLineEnd)
+
 	cleanVerifyEqLn = replaceDotProdVars(cleanVerifyEqLn, astAssignDict, variableNames, variableTypes)
+
+	cleanVerifyEqLn = expandHashesInVerify(cleanVerifyEqLn, astAssignDict, variableNames, variableTypes, precomputeTypes, verifyEndPrecomputeLine, verifyFuncLineStart, verifyFuncLineEnd)
+
+
 
 	#print(variableTypes)
 
@@ -961,4 +1094,5 @@ if __name__ == '__main__':
 	writeBVFile(outputFileName, variableTypes, precomputeTypes, cleanVerifyEqLn)
 
 	#print("\n\n")
-	print(astAssignDict)
+	#printDictionary(astAssignDict)
+	#getTupleGroupTypes(astAssignDict, 'sk_tuple')
