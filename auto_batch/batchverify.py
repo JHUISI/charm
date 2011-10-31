@@ -16,6 +16,7 @@ if __name__ == "__main__":
     # main for batch input parser    
     try:
         file = sys.argv[1]
+        print(sys.argv[1:])
         ast_struct = parseFile2(file)
     except:
         print("An error occured while processing batch inputs.")

@@ -12,6 +12,10 @@ BEGIN :: signature
 sig
 END :: signature
 
+BEGIN :: constant
+g2, pk
+END :: constant
+
 # dot product of BLS signatures [i=1, L]
 BEGIN :: precompute
 sig := { prod{i:=1, l} on bsig_i }

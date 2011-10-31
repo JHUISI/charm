@@ -584,7 +584,6 @@ class Technique2:
             # look into x: does x contain a PAIR node?
             pair_node = searchNodeType(prod_node.right, ops.PAIR)
             # if yes: 
-            #print("found pair =>", pair_node)
             if pair_node:
                 # move exp inside the pair node
                 # check whether left side is constant
@@ -610,7 +609,8 @@ class Technique2:
 
                     elif Type(pair_node.right) == ops.ATTR:
                         # set pair node right child to node left
-                        self.setNodeAs(pair_node, 'right', node, 'left')
+                        print("Hit snag here!!")
+                        self.setNodeAs(pair_node, 'left', node, 'left')
                     else:
                         pass
 
@@ -944,12 +944,13 @@ class Technique4:
                 print("TODO: need to handle this case 1.")
             elif not self.allNodesWithIndex(index, node.right):
                 result = self.findExpWithIndex(node.right, index)
-                new_prod = BinaryNode.copy(prod)
-                new_prod.right = self.createExp(prod.right, result)
-                # add new_prod into current node left
-                node.left = new_prod
-                self.deleteFromTree(node.right, node, result, 'right')
-                #print("updated node =>", node)
+                if result:
+                    new_prod = BinaryNode.copy(prod)
+                    new_prod.right = self.createExp(prod.right, result)
+                    # add new_prod into current node left
+                    node.left = new_prod
+                    self.deleteFromTree(node.right, node, result, 'right')
+                    #print("updated node =>", node)
                 
         elif Type(node.right) == ops.ON:
             prod = node.right
@@ -959,15 +960,16 @@ class Technique4:
             if not self.allNodesWithIndex(index, prod.right):
                 # get all the nodes that match index on right
                 # first move the prod node
-                new_prod = BinaryNode.copy(prod)
-                new_prod.right = node.left
-                node.right = prod.right
                 result = self.findExpWithIndex(node.right, index)
-                new_prod.right = self.createExp(node.left, result)
-                # add new_prod into current node left                
-                node.left = new_prod    
-                self.deleteFromTree(node.right, node, result, 'right')
-                #print("updated node =>", node)
+                if result:
+                    new_prod = BinaryNode.copy(prod)
+                    new_prod.right = node.left
+                    node.right = prod.right
+                    new_prod.right = self.createExp(node.left, result)
+                    # add new_prod into current node left                
+                    node.left = new_prod    
+                    self.deleteFromTree(node.right, node, result, 'right')
+                    #print("updated node =>", node)
                  
             elif not self.allNodesWithIndex(index, node.left):
                 print("adjustProdNodes: need to handle the other case.")
