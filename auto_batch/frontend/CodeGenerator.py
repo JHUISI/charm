@@ -429,6 +429,8 @@ if __name__ == '__main__':
 	numTabsOnVerifyFuncLine = determineNumTabs(indentationList[0])
 	#print(numTabsOnVerifyFuncLine)
 
+	individualOutputString += "\tfrom charm.engine.util import *\n"
+
 	importFromLines = getImportFromLines(pythonCodeNode, pythonCodeLines)
 	for importFromLine in importFromLines:
 		#for numTab in range(0, numTabsOnVerifyFuncLine):

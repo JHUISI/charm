@@ -103,7 +103,7 @@ class IBE_N04_Sig(PKSig):
     
 def main():
     # initialize the element object so that object references have global scope
-    groupObj = PairingGroup('../param/a.param')
+    groupObj = PairingGroup('../../param/a.param')
     ibe = IBE_N04_Sig(groupObj)
     (pk, sk) = ibe.keygen()
 

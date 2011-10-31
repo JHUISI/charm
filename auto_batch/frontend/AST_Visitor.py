@@ -455,14 +455,18 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 											numOfArgs = len(node.value.args)
 											argConcatString = ""
 											for argIndex in range(0, numOfArgs):
-												print(ast.dump(node))
-												print("\n")
+												#print(ast.dump(node))
+												#print("\n")
 												if (idRepInAST in node.value.args[argIndex]._fields):
 													argConcatString += node.value.args[argIndex].id + " | "
 												elif (sliceRepInAST in node.value.args[argIndex]._fields):
+													print(ast.dump(node))
+													#print("\n")
 													if (type(node.value.args[argIndex].slice).__name__ == indexRepInAST):
 														if (valueRepInAST in node.value.args[argIndex].slice._fields):
 															if (type(node.value.args[argIndex].slice.value).__name__ == strRepInAST):
+																print(ast.dump(node))
+																print("\n")
 																argConcatString += node.value.args[argIndex].slice.value.s + " | "
 
 
