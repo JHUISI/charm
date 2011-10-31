@@ -126,8 +126,13 @@ def pickleObject(object):
     file.close()
     return encoded
 
-def unpickleObject(byte_object):
-#    print("bytes_object =>", byte_object)
+def unpickleObject(object):
+    if type(object) == str:
+       byte_object = bytes(object, 'utf-8')
+    elif type(object) == bytes:
+       byte_object = object
+    else:
+       return None
     decoded = b64decode(byte_object)
 #    print("Result dec =>", decoded)
 #    print("len =>", len(decoded))
@@ -141,7 +146,7 @@ if __name__ == "__main__":
     #packer = getPackerObject(data)    
     #print("packed => ", packer.pack())
     result = pickleObject(data)
-    
+
     data2 = unpickleObject(result)
     
     print("data2 => ", data2)
