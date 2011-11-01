@@ -1,11 +1,11 @@
-import pickle, sys
+import sys
 from charm.engine.util import *
-from charm.pairing import *
 from toolbox.pairinggroup import *
 
 sigNumKey = 'Signature_Number'
 bodyKey = 'Body'
-pickleSuffix = '.pickle'
+charmPickleSuffix = '.charmPickle'
+pythonPickleSuffix = '.pythonPickle'
 repeatSuffix = '.repeat'
 
 if __name__ == '__main__':
@@ -25,9 +25,12 @@ if __name__ == '__main__':
 		for arg in verifyFuncArgs:
 			verifyArgsDict[sigIndex][arg] = {}
 			verifyParamFile = str(verifyParamFilesDict[sigIndex][arg])
-			if (verifyParamFile.endswith(pickleSuffix)):
+			if (verifyParamFile.endswith(charmPickleSuffix)):
 				verifyParamPickle = open(verifyParamFile, 'rb').read()
 				verifyArgsDict[sigIndex][arg][bodyKey] = deserializeDict( unpickleObject( verifyParamPickle ) , groupParamArg )
+			elif (verifyParamFile.endswith(pythonPickleSuffix)):
+				verifyParamPickle = open(verifyParamFile, 'rb')
+				verifyArgsDict[sigIndex][arg][bodyKey] = pickle.load(verifyParamPickle)
 			elif (verifyParamFile.endswith(repeatSuffix)):
 				verifyArgsDict[sigIndex][arg][sigNumKey] = verifyParamFile[0:(len(verifyParamFile) - lenRepeatSuffix)]
 			else:
