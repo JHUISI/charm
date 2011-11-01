@@ -8,7 +8,7 @@ SmallExp = 'delta'
 
 class RecordOperations:
     def __init__(self, vars):
-        #print("vars =>", vars)
+        print("vars =>", vars)
         self.debug = False
         self.vars_def = vars
         N = self.vars_def.get('N')
@@ -89,7 +89,9 @@ class RecordOperations:
                     data['key'] = [key]
                 else: # incase there are 
                     data['key'].append(key)
-                data[key] = int(self.vars_def.get(key))         
+
+                assert self.vars_def.get(key) != None, "key = '%s' not found in vars db." % key
+                data[key] = int(self.vars_def.get(key)) # need to handle error
                 if debug >= levels.some:
                    print("ON key => ", data['key'], data[key])
                 
@@ -110,33 +112,6 @@ class RecordOperations:
             else:
                 return None
         return None    
-
-
-#    def visit_on(self, node, data):
-#        # prod = node.left
-#        pass
-#    
-#    def visit_pair(self, node, data):
-#        # check for 'on' parent, which means pairing is done N times
-#        self.ops['pair'] += 1            
-#
-#    # track operations in G1, G2, GT      
-#    def visit_mul(self, node, data):
-#        if node.left:
-#            base_type = self.deriveNodeType(node.left)
-#            self.ops[ 'mul' ][ base_type ] += 1
-#            if self.debug: 
-#                print("mul: node.left =>", node.left)            
-#                print("mul: type =>", base_type)
-#
-#    # track operations in G1, G2, GT    
-#    def visit_exp(self, node, data):
-#        if node.left:
-#            base_type = self.deriveNodeType(node.left)
-#            self.ops[ 'exp' ][ base_type ] += 1
-#            if self.debug:
-#                print("exp: node.left =>", node.left)
-#                print("exp: type =>", base_type)
     
     def __str__(self):
         return str(self.ops)
@@ -159,4 +134,5 @@ class RecordOperations:
             return self.deriveNodeType(node.left)
         #print("printing type =>", _type)
         #print("node =>", node)
+        assert self.vars_def.get(_type) != None, "Key error in vars db => '%s'" % _type
         return self.vars_def[_type]

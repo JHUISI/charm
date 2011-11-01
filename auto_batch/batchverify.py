@@ -1,5 +1,13 @@
 from batchparser import *
 
+try:
+    import benchmarks
+    curve = benchmarks.benchmarks
+except:
+    print("Could not find the 'benchmarks' file that has measurement results! Generate and re-run.")
+    exit(0)
+
+
 def countInstances(equation):
     Instfind = InstanceFinder()
     ASTVisitor(Instfind).preorder(equation)
@@ -15,12 +23,31 @@ def isOptimized(data):
             if data[i][j] > 1: return False
     return True
 
-def benchIndivVerification(equation):
-    pass
+def benchIndivVerification(N, equation, const, vars):
+    rop_ind = RecordOperations(vars)
+    # add attrIndex to non constants
+    ASTVisitor(ASTAddIndex(const, vars)).preorder(equation)
+    print("<====\tINDIVIDUAL\t====>")
+    print("vars =>", vars)
+    print("Equation =>", equation)
+    data = {'key':['N'], 'N': N }
 
-def benchBatchVerification(equation):
-    pass
+    rop_ind.visit(verify.right, data)
+    print("<===\tOperations count\t===>")
+    print_results(rop_ind.ops)
+    calculate_times(rop_ind.ops, curve['d224.param'], N)    
+    return
 
+def benchBatchVerification(N, equation, const, vars):
+    rop_batch = RecordOperations(vars)
+    rop_batch.visit(equation, {})
+    print("<====\tBATCH\t====>")    
+    print("Equation =>", equation)
+    print("<===\tOperations count\t===>")
+    print_results(rop_batch.ops)
+    calculate_times(rop_batch.ops, curve['d224.param'], N)
+    return
+    
 def codeGenerator(Struct):
     pass
 
@@ -51,9 +78,11 @@ if __name__ == "__main__":
             metadata['N'] = str(n.right)
         else:
             metadata[ str(n.left) ] = str(n.right)
+    
 
     vars = types
     vars['N'] = N
+    vars.update(metadata)
     print("variables =>", vars)
     print("batch algorithm =>", algorithm)
 
@@ -91,7 +120,7 @@ if __name__ == "__main__":
         print("Final batch eq:", verify2.right)
     
     # TODO: fill in the blanks here
-    #benchIndivVerification(verify)
-    #benchBatchVerification()
+    benchIndivVerification(N, verify.right, const, vars)
+    benchBatchVerification(N, verify2.right, const, vars)
     # TODO: generate code for both which includes the detecting of invalid signatures from a batch
     #codeGenerator()

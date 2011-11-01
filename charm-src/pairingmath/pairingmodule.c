@@ -207,28 +207,8 @@ void	Element_dealloc(Element* self)
 	if(self->safe_pairing_clear) {
 		PyObject_Del(self->pairing);
 	}
-		// dealloc each object, PyObject_Del?
-//		int i;
-//		for(i = 0; i < MAX_BENCH_OBJECTS; i++) {
-//			activeObject = NULL;
-//			if(dObjects[i] != NULL) {
-//				if(dObjects[i]->bench_initialized) { // if initialized
-//					debug("dObject with identifier: %d\n", dObjects[i]->identifier);
-//					debug("Dealloc dObject[%d] with %p which points to: %p\n", dObjects[i]->identifier, &(dObjects[i]), dObjects[i]);
-//					// printf("Add ctr = %d\n", dObjects[i]->op_add);
-//					//Py_DECREF(dObjects[i]);
-//					PyObject_Del(dObjects[i]);
-//				}
-//				else {
-//					// not initialized, but has been allocated
-//					debug("object allocated, but not initialized.\n");
-//					//Py_DECREF(dObjects[i]);
-//					PyObject_Del(dObjects[i]);
-//				}
-//			}
-//		}
+
 	Py_TYPE(self)->tp_free((PyObject*)self);
-	Py_CLEAR(self);
 }
 
 // helper method 

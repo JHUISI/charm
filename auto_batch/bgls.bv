@@ -19,6 +19,7 @@ END :: constant
 # dot product of BLS signatures [i=1, L]
 BEGIN :: precompute
 sig := { prod{i:=1, l} on bsig_i }
+abc := b-a
 END :: precompute
 
 BEGIN :: transform

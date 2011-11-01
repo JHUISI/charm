@@ -7,6 +7,7 @@ sig := G1
 M := str
 pk := G2
 g2 := G2
+M1 := G1
 END :: types
 
 BEGIN :: constant
