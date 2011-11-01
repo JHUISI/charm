@@ -8,6 +8,7 @@ At := G2
 Bt := G2
 Ct := G2
 D := GT
+S := G1
 END :: types
 
 BEGIN :: precompute

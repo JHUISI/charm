@@ -59,19 +59,19 @@ class Substitute:
         for i in self.instance.keys():
             for j in self.instance[ i ].keys():
                 if self.instance[ i ][ j ] > 1 and (i == str(base) and j == str(exp)):
-                    print(i, "^", j, " : can be precomputed!")
-                    if base.attr_index: index = base.attr_index[0] 
-                    elif exp.attr_index: index = exp.attr_index[0]
+                    # combine sets: TODO
+                    #if base.attr_index: index = base.attr_index[0] 
+                    if exp.attr_index: index = exp.attr_index[0]
                     else: index = None
                     _key = self.record(str(i), str(j), index)
-
-# COMMENT OUT FOR NOW => STRINGS FOR NOW                    
+                    #print("_key =>", _key, "\n\n")
                     k = BinaryNode(_key)
-#                    n = BinaryNode(ops.EXP)
-#                    n.left = base
-#                    n.right = exp
+
                     self.precomp[ _key ] = str(i) + "^" + str(j)
-                    self.vars[ k.getAttribute() ] = self.vars[ base.getAttribute() ]  
+                    if self.vars.get(base.getAttribute()) == None:
+                        print("Need to define variable: ", base.getAttribute())
+                    else:
+                        self.vars[ k.getAttribute() ] = self.vars[ base.getAttribute() ]
                     # can we find a precomp key for this? if so, return it
                     # otherwise, create one and return it.(IMPORTANT!!!!)
                     return _key
@@ -82,7 +82,7 @@ class Substitute:
         if self.inst_map.get( key ):
             if self.inst_map[ key ].get( value ):
                 var = self.inst_map[ key ][ value ]
-                print("recovered key =>", var)
+                #print("recovered key =>", var)
                 return var
             else:
                 self.cnt += 1
@@ -96,7 +96,7 @@ class Substitute:
         else: var_index = ''
         self.inst_map[ key ] = { value: self.prefix + self.alpha[self.cnt] + '_' + var_index }
         self.cnt += 1
-        print("found key =>", self.inst_map[ key ][ value ])
+        #print("found key =>", self.inst_map[ key ][ value ])
         return self.inst_map[ key ][ value ]
 
     def visit(self, node, data):
@@ -105,19 +105,26 @@ class Substitute:
     def visit_exp(self, node, data):
         left = node.left
         right = node.right
-        if left.type == ops.ATTR:
-            if right.type == ops.ATTR:
+        #print("left type =>", Type(left))
+        if Type(left) == ops.ATTR:
+            if Type(right) == ops.ATTR:
                 key = self.canExpBePrecomputed(left, right)
                 if key:
                     # make substitution
                     new_node = BinaryNode(key)
                     batchparser.addAsChildNodeToParent(data, new_node)
                 else:
-                    pass # no need to apply any substitutions
-            elif right.type == ops.MUL:
+                    pass
+                    #print("left =>", left)
+                    #print("right =>", right) 
+                    # no need to apply any substitutions
+            elif Type(right) == ops.MUL:
                 node_1 = right.left
                 node_2 = right.right
-                if node_1.type == ops.ATTR:
+#                print("left =>", left)
+#                print("node1 =>", node_1)
+#                print("node2 =>", node_2)
+                if Type(node_1) == ops.ATTR:
                     key = self.canExpBePrecomputed(left, node_1)
                     if key:
                         # a ^ (b * c) ==> A ^ c (if a^b can be precomputed)
@@ -126,7 +133,7 @@ class Substitute:
                         new_node1.right = node_2                        
                         batchparser.addAsChildNodeToParent(data, new_node1)
                 
-                if node_2.type == ops.ATTR:
+                if Type(node_2) == ops.ATTR:
                     key = self.canExpBePrecomputed(left, node_2)
                     if key:
                         # a ^ (b * c) ==> A ^ b (if a^c can be precomputed)                        
@@ -134,3 +141,5 @@ class Substitute:
                         new_node2.left = BinaryNode(key)
                         new_node2.right = node_1
                         batchparser.addAsChildNodeToParent(data, new_node2)
+            else:
+                print("Substitute: missing some cases.")

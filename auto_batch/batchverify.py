@@ -1,5 +1,20 @@
 from batchparser import *
 
+def countInstances(equation):
+    Instfind = InstanceFinder()
+    ASTVisitor(Instfind).preorder(equation)
+    print("Instances found =>", Instfind.instance, "\n")
+    return Instfind.instance
+
+def isOptimized(data):
+    # check for counts greater than 1
+    for i in data.keys():
+        for j in data[i]:
+            # if condition is true, then more optimizations are possible
+            # effectively, a ^ b occurs more than once
+            if data[i][j] > 1: return False
+    return True
+
 def benchIndivVerification(equation):
     pass
 
@@ -66,6 +81,14 @@ if __name__ == "__main__":
         ASTVisitor(Tech).preorder(verify2.right)
         print(Tech.rule, "\n")
         print(option_str, ":",verify2, "\n")
+    
+    countDict = countInstances(verify2) 
+    if not isOptimized(countDict):
+        ASTVisitor(Substitute(countDict, precompute, vars)).preorder(verify2.right)
+        print("\nPrecompute:", precompute)
+        print("Final batch eq:", verify2.right)
+    else:
+        print("Final batch eq:", verify2.right)
     
     # TODO: fill in the blanks here
     #benchIndivVerification(verify)
