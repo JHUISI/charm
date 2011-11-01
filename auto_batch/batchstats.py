@@ -6,6 +6,16 @@ from batchlang import *
 
 SmallExp = 'delta'
 
+def Copy(obj):
+    new_obj = None
+    key = obj.get('key')
+    if type(obj) == dict:
+        new_obj = obj.copy()
+    if key != None and type(key) == list:
+        new_obj['key'] = list(key)
+    return new_obj
+
+
 class RecordOperations:
     def __init__(self, vars):
         print("vars =>", vars)
@@ -19,7 +29,7 @@ class RecordOperations:
         self.ops = {'pair':0, 'mul':grps.copy(), 'exp':grps.copy(), 'hash':grps.copy() }
         # track prng for small exponents
     
-    def visit(self, node, data):
+    def visit(self, node, data, parent=None):
         if node == None:
             return None
         else:            
@@ -44,13 +54,13 @@ class RecordOperations:
                     self.ops['exp'][ base_type ] += _exp
                 else: 
                     self.ops['exp'][ base_type ] += 1
-                self.visit(node.left, data.copy())
-                self.visit(node.right, data.copy())
+                self.visit(node.left, data.copy(), node)
+                self.visit(node.right, data.copy(), node)
 
             elif(node.type == ops.MUL):
                 base_type = self.deriveNodeType(node.left)
                 keys = data.get('key')
-                
+
                 if keys != None:
                     _mul = 1
                     for i in keys:
@@ -59,14 +69,14 @@ class RecordOperations:
                 else:
                     self.ops['mul'][ base_type ] += 1
                 
-                self.visit(node.left, data.copy())
-                self.visit(node.right, data.copy())
+                self.visit(node.left, Copy(data), node)
+                self.visit(node.right, Copy(data), node)
 
             elif(node.type == ops.EQ):
                 pass
             elif(node.type == ops.EQ_TST):
-                self.visit(node.left, data.copy())
-                self.visit(node.right, data.copy())
+                self.visit(node.left, Copy(data), node)
+                self.visit(node.right, Copy(data), node)
                 
             elif(node.type == ops.PAIR):
                 keys = data.get('key')
@@ -78,13 +88,14 @@ class RecordOperations:
                     self.ops['pair'] += _pair
                 else:
                     self.ops['pair'] += 1
-                
-                self.visit(node.left, data)
-                self.visit(node.right, data)
+
+                self.visit(node.left, Copy(data), node)
+                self.visit(node.right, Copy(data), node)
             
             # for every 
             elif(node.type == ops.ON):
                 key = node.left.right.attr
+
                 if data.get('key') == None:
                     data['key'] = [key]
                 else: # incase there are 
@@ -92,10 +103,11 @@ class RecordOperations:
 
                 assert self.vars_def.get(key) != None, "key = '%s' not found in vars db." % key
                 data[key] = int(self.vars_def.get(key)) # need to handle error
+
                 if debug >= levels.some:
                    print("ON key => ", data['key'], data[key])
-                
-                self.visit(node.right, data.copy())
+
+                self.visit(node.right, data.copy(), node)
 #                 return (left + ", lambda " + pls.vars()  + right + ", " + pls.args() + ")")
             elif(node.type == ops.HASH):
                 if node.right.attr == types.G1:
@@ -109,6 +121,9 @@ class RecordOperations:
                         self.ops['hash']['G1'] += _hash
                     else:
                         self.ops['hash']['G1'] += 1
+            elif(node.type == ops.ATTR):
+                print("TODO: account for attribute nodes.")
+                print("data =>", data)
             else:
                 return None
         return None    

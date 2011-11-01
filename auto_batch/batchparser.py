@@ -378,7 +378,7 @@ class ASTAddIndex:
         if data['parent'].type in [ops.PROD, ops.EQ]:
             return
         if not self.isConstant(node):
-            node.setAttrIndex('i') # add index to each attr that isn't constant
+            node.setAttrIndex('j') # add index to each attr that isn't constant
     
     def isConstant(self, node):        
         for n in self.consts:

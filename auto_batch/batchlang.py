@@ -196,7 +196,8 @@ class BinaryNode:
 			if self.attr_index == None: # could be a list of indices
 				self.attr_index = [value]
 			else:
-				self.attr_index.append(value)
+				if not value in self.attr_index:
+					self.attr_index.append(value)
 			return True
 		return False
 	
