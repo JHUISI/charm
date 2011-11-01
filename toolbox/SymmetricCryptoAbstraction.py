@@ -4,6 +4,8 @@ from charm.pairing import hash as sha1
 from toolbox.conversion import *
 from math import ceil
 from os import urandom
+import json
+from base64 import b64encode,b64decode
 class SymmetricCryptoAbstracton(object):
     def __init__(self,key, alg = AES, mode = MODE_CBC):
         self._alg = alg
@@ -17,7 +19,19 @@ class SymmetricCryptoAbstracton(object):
         self._IV = IV 
         return selectPRP(self._alg,(self._key,self._mode,IV))
 
-    def encrypt(self,message):
+    def __encode_decode(self,data,func):
+        data['IV'] = func(data['IV'])
+        data['CipherText'] = func(data['CipherText'])
+        return data
+    def _encode(self,data):
+        return self.__encode_decode(data,lambda x:b64encode(x).decode('utf-8'))
+    def _decode(self,data):
+        return self.__encode_decode(data,lambda x:b64decode(bytes(x,'utf-8')))
+
+    def encrypt(self, message):
+        ct = self._encrypt(message)
+        return json.dumps(self._encode(ct))
+    def _encrypt(self,message):
         self._IV = urandom(self._block_size)
         #Because the IV cannot be set after instantiation, decrypt and encrypt 
         # must operate on their own instances of the cipher 
@@ -27,8 +41,14 @@ class SymmetricCryptoAbstracton(object):
             'IV':self._IV,
             'CipherText':cipher.encrypt(self.__pad(message))
             }
+        import pdb; pdb.set_trace()
+
         return ct
     def decrypt(self,cipherText):
+        f = json.loads(cipherText)
+        import pdb; pdb.set_trace()
+        return self._decrypt(self._decode(f))
+    def _decrypt(self,cipherText):
         cipher = self._initCipher(cipherText['IV'])
         
         msg = cipher.decrypt(cipherText['CipherText'])
@@ -36,7 +56,7 @@ class SymmetricCryptoAbstracton(object):
         
     def __pad(self, message):
         # calculate the ceiling of
-        msg_len = ceil(len(message) / self.key_len) * self.key_len
+        msg_len =16 # ceil(len(message) / float(self.key_len)) * self.key_len
         extra = msg_len - len(message)
         # append 'extra' bytes to message
         for i in range(0, extra):
@@ -47,7 +67,9 @@ class SymmetricCryptoAbstracton(object):
 if __name__ =="__main__":
     groupObj = PairingGroup('../param/a.param')
     a = SymmetricCryptoAbstracton(groupObj.random(GT))
+    #import pdb; pdb.set_trace()
     ct = a.encrypt("as")
-    print(ct)    
+    print(ct)   
+    print("asd") 
     m = a.decrypt(ct)
     print(m)
