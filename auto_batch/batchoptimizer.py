@@ -50,11 +50,13 @@ class Substitute:
         self.instance = op_instance
         self.inst_map = {}
         self.precomp = precomp
+        self.precomp_code = {} # for new optimizations we find
         self.vars = variables
         self.prefix = 'pre' # self.prefix + self.alpha[cnt]; cnt += 1
         self.alpha = string.ascii_uppercase
         self.cnt = 0
 
+    # TODO: clean-up this implementation
     def canExpBePrecomputed(self, base, exp):
         for i in self.instance.keys():
             for j in self.instance[ i ].keys():
@@ -68,6 +70,9 @@ class Substitute:
                     k = BinaryNode(_key)
 
                     self.precomp[ _key ] = str(i) + "^" + str(j)
+                    if index == 'j': # "j => N", "i => whatever"
+                        bp = batchparser.BatchParser()
+                        self.precomp_code[ _key ] = bp.parse("for{j:=1, N} do " + str(i) + "^" + str(j))   
                     if self.vars.get(base.getAttribute()) == None:
                         print("Need to define variable: ", base.getAttribute())
                     else:

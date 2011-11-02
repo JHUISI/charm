@@ -48,13 +48,23 @@ def benchBatchVerification(N, equation, const, vars, precompute):
     print("<====\tBATCH\t====>")    
     print("Equation =>", equation)
     print("<===\tOperations count\t===>")
-    for i in precompute.keys():        
+    for i in precompute.keys():
         if type(i) != str:
             rop_batch.visit(precompute[i], {})
             print("Precompute:", i, ":=", precompute[i])
         else:
-            if i == 'delta': rop_batch.ops['prng'] += N
-            else: print("TODO: need to account for this: ", i, ":=", precompute[i])
+            if i == 'delta': # estimate cost of random small exponents
+                rop_batch.ops['prng'] += N
+                print("Precompute:", i, ":=", precompute[i])
+            else:  # estimate cost of some precomputations
+                bp = BatchParser()
+                index = BinaryNode( i )
+                if 'j' in index.attr_index:
+                    compute = bp.parse( "for{j:=1, N} do " + precompute[i] )
+                    rop_batch.visit(compute, {})
+                    print("Precompute:", i, ":=", compute)
+                else:
+                    print("TODO: need to account for this: ", i, ":=", precompute[i])
     print_results(rop_batch.ops)
     calculate_times(rop_batch.ops, curve['d224.param'], N)
     return
@@ -76,7 +86,7 @@ if __name__ == "__main__":
         exit(-1)
     const, types = ast_struct[ CONST ], ast_struct[ TYPE ]
     (indiv_precompute, batch_precompute) = ast_struct[ PRECOMP ]
-    batch_precompute[ "delta" ] = "for{i:=1, N} do prng_i"
+    batch_precompute[ "delta" ] = "for{j := 1, N} do prng_j"
     
     algorithm = ast_struct [ TRANSFORM ]
     if not algorithm: algorithm = ['2', '3'] # standard transform that applies to most signature schemes we've tested

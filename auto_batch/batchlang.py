@@ -154,7 +154,7 @@ class BinaryNode:
 			return msg
 		elif(self.type == ops.TYPE):
 			return str(self.attr)
-		else:			
+		else:
 			left = str(self.left)
 			right = str(self.right)
 			

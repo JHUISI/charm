@@ -1035,14 +1035,14 @@ class Technique4:
 
 
 def print_results(data):
-    line = "------------------------------------------------------------------------\n"
-    head = " Keys\t|\tZR\t|\tG1\t|\tG2\t|\tGT\t|\n"
+    line = "-----------------------------------------------------------------------------------------------------------------------------------------\n"
+    head = "Keys\t|\t\tZR\t\t|\t\tG1\t\t|\t\tG2\t\t|\t\tGT\t\t|\n"
     msmt = line + head + line
     for k in data.keys():
         if k in ['mul', 'exp', 'hash']:
             msmt += k + "\t|"
             for i in ['ZR', 'G1', 'G2', 'GT']:
-                msmt += "\t" + str(data[k][i]) + "\t|"
+                msmt += "\t\t" + "%.2f" % data[k][i] + "\t\t|"
             msmt += "\n" + line
     for k in data.keys():
         if k in ['pair', 'prng']:

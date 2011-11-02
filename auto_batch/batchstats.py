@@ -91,7 +91,35 @@ class RecordOperations:
 
                 self.visit(node.left, Copy(data), node)
                 self.visit(node.right, Copy(data), node)
-            
+            elif(node.type == ops.DO):
+                key = node.left.right.attr
+                
+                if data.get('key') == None:
+                    data['key'] = [key]
+                else: # incase there are 
+                    data['key'].append(key)
+
+                assert self.vars_def.get(key) != None, "key = '%s' not found in vars db." % key
+                data[key] = int(self.vars_def.get(key)) # need to handle error
+
+                if debug >= levels.some:
+                   print("DO key => ", data['key'], data[key])
+                
+                cost = 1
+                if Type(node.right) == ops.MUL: op = 'mul'
+                elif Type(node.right) == ops.EXP: 
+                    op = 'exp'
+                    # Note: exponentiation to small exp is half an exponentiation
+                    exp = node.right
+                    if exp.right.getAttribute() == SmallExp: cost = 0.5
+                elif Type(node.right) == ops.HASH: op = 'hash'
+                else:
+                    return
+                right_type = self.deriveNodeType(node.right)
+                _for = data[key] * cost
+                print("Looping over '%s' node in '%s' => %s" % (op, right_type, _for))
+                if right_type: self.ops[ op ][ right_type ] += _for
+                
             # for every 
             elif(node.type == ops.ON):
                 key = node.left.right.attr
