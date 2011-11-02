@@ -1,0 +1,109 @@
+['bls2.bv']
+types  => {'M': 'str', 'h': 'G1', 'sig': 'G1', 'g': 'G2', 'pk': 'G2'}
+constant  => ['g', 'pk']
+precompute  => {'h': 'H(M,G1)'}
+variables => {'g': 'G2', 'h': 'G1', 'M': 'str', 'N': '50', 'sig': 'G1', 'pk': 'G2'}
+batch algorithm => ['2', '3']
+
+VERIFY EQUATION => verify := e(h,pk) == e(sig,g)
+
+Stage A: Combined Equation => verify := (prod{j := 1,N} on e(h_j,pk)) == (prod{j := 1,N} on e(sig_j,g))
+
+Stage B: Small Exp Test => verify := (prod{j := 1,N} on e(h_j,pk)^delta_j) == (prod{j := 1,N} on e(sig_j,g)^delta_j) 
+
+Rule 2: Left := Move 'delta_j' exponent into the pairing. Left := Move 'delta_j' exponent into the pairing.  
+
+Applying technique 2 => : verify := (prod{j := 1,N} on e(h_j^delta_j,pk)) == (prod{j := 1,N} on e(sig_j^delta_j,g)) 
+
+Rule 3: common 1st (left) node appears, so can reduce n pairings to 1. common 1st (left) node appears, so can reduce n pairings to 1.  
+
+Applying technique 3 => : verify := e((prod{j := 1,N} on h_j^delta_j),pk) == e((prod{j := 1,N} on sig_j^delta_j),g) 
+
+Instances found => {'sig_j': {'delta_j': 1}, 'h_j': {'delta_j': 1}} 
+
+Final batch eq: e((prod{j := 1,N} on h_j^delta_j),pk) == e((prod{j := 1,N} on sig_j^delta_j),g)
+vars => {'g': 'G2', 'h': 'G1', 'M': 'str', 'N': '50', 'sig': 'G1', 'pk': 'G2'}
+<====	INDIVIDUAL	====>
+vars => {'g': 'G2', 'h': 'G1', 'M': 'str', 'N': '50', 'sig': 'G1', 'pk': 'G2'}
+Equation => e(h_j,pk) == e(sig_j,g)
+TODO: account for attribute nodes.
+data => {'key': ['N'], 'N': 50}
+TODO: account for attribute nodes.
+data => {'key': ['N'], 'N': 50}
+TODO: account for attribute nodes.
+data => {'key': ['N'], 'N': 50}
+TODO: account for attribute nodes.
+data => {'key': ['N'], 'N': 50}
+<===	Operations count	===>
+------------------------------------------------------------------------
+ Keys	|	ZR	|	G1	|	G2	|	GT	|
+------------------------------------------------------------------------
+mul	|	0	|	0	|	0	|	0	|
+------------------------------------------------------------------------
+hash	|	0	|	0	|	0	|	0	|
+------------------------------------------------------------------------
+exp	|	0	|	0	|	0	|	0	|
+------------------------------------------------------------------------
+pair => 100  
+------------------------------------------------------------------------
+
+Measurements are recorded in milliseconds.
+------------------------------------------------------------------------
+ Keys	|	ZR	|	G1	|	G2	|	GT	|
+------------------------------------------------------------------------
+mul	|	0.0	|	0.0	|	0.0	|	0.0	|
+------------------------------------------------------------------------
+hash	|	0.0	|	0.0	|	0	|	0	|
+------------------------------------------------------------------------
+exp	|	0.0	|	0.0	|	0.0	|	0.0	|
+------------------------------------------------------------------------
+pair => 1442.247  
+------------------------------------------------------------------------
+
+Total Verification Time => 1442.247
+Per Signature => 28.84494
+
+vars => {'g': 'G2', 'h': 'G1', 'M': 'str', 'N': '50', 'sig': 'G1', 'pk': 'G2'}
+TODO: account for attribute nodes.
+data => {'key': ['N'], 'N': 50}
+TODO: account for attribute nodes.
+data => {'key': ['N'], 'N': 50}
+TODO: account for attribute nodes.
+data => {}
+TODO: account for attribute nodes.
+data => {'key': ['N'], 'N': 50}
+TODO: account for attribute nodes.
+data => {'key': ['N'], 'N': 50}
+TODO: account for attribute nodes.
+data => {}
+<====	BATCH	====>
+Equation => e((prod{j := 1,N} on h_j^delta_j),pk) == e((prod{j := 1,N} on sig_j^delta_j),g)
+<===	Operations count	===>
+------------------------------------------------------------------------
+ Keys	|	ZR	|	G1	|	G2	|	GT	|
+------------------------------------------------------------------------
+mul	|	0	|	0	|	0	|	0	|
+------------------------------------------------------------------------
+hash	|	0	|	0	|	0	|	0	|
+------------------------------------------------------------------------
+exp	|	0	|	50.0	|	0	|	0	|
+------------------------------------------------------------------------
+pair => 2  
+------------------------------------------------------------------------
+
+Measurements are recorded in milliseconds.
+------------------------------------------------------------------------
+ Keys	|	ZR	|	G1	|	G2	|	GT	|
+------------------------------------------------------------------------
+mul	|	0.0	|	0.0	|	0.0	|	0.0	|
+------------------------------------------------------------------------
+hash	|	0.0	|	0.0	|	0	|	0	|
+------------------------------------------------------------------------
+exp	|	0.0	|	89.147	|	0.0	|	0.0	|
+------------------------------------------------------------------------
+pair => 28.84494  
+------------------------------------------------------------------------
+
+Total Verification Time => 117.99194
+Per Signature => 2.3598388
+

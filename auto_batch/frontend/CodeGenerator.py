@@ -26,8 +26,8 @@ callRepInAST = 'Call'
 funcRepInAST = 'func'
 sigNumKey = 'Signature_Number'
 bodyKey = 'Body'
-individualTemplate = 'IndividualVerifyTemplate.py'
-batchTemplate = 'BatchVerifyTemplate.py'
+individualTemplate = '/Users/matt/Documents/charm/auto_batch/frontend/IndividualVerifyTemplate.py'
+batchTemplate = '/Users/matt/Documents/charm/auto_batch/frontend/BatchVerifyTemplate.py'
 equalityOperator = 'Eq()'
 printPrefix = 'print('
 commentPrefix = '#'
@@ -38,6 +38,10 @@ numSpacesPerTab = 4
 pairFuncNames = ['pairing', 'PairingGroup']
 selfDump = 'self.dump('
 selfDumpLen = len(selfDump)
+batchVerifierPythonFile = '/Users/matt/Documents/charm/auto_batch/batchverify.py'
+batchVerifierOutputFile = '/Users/matt/Documents/charm/auto_batch/frontend/batchVerifierOutput'
+finalBatchEqTag = 'Final batch eq'
+numBitsOfSecurity = 80
 
 class ImportFromVisitor(ast.NodeVisitor):
 	def __init__(self):
@@ -142,6 +146,33 @@ class ASTEqCompareVisitor(ast.NodeVisitor):
 		lineNumsList.reverse()
 		return self.eqCompareNodes[lineNumsList[0]]
 
+def isPreviousCharAlpha(line, currIndex):
+	if (currIndex == 0):
+		return False
+	
+	if (line[currIndex - 1].isalpha() == True):
+		return True
+	
+	return False
+
+
+def isNextCharAlpha(line, currIndex):
+	lastCharIndex = len(line) - 1
+	if (currIndex == lastCharIndex):
+		return False
+	
+	if (line[currIndex + 1].isalpha() == True):
+		return True
+	
+	return False
+
+
+def isLineOnlyWhiteSpace(line):
+	line = line.lstrip().rstrip()
+	if (line == ""):
+		return True
+	return False
+
 def getVerifyEqNode(verifyFuncNode):
 	astEqVisitor = ASTEqCompareVisitor()
 	astEqVisitor.visit(verifyFuncNode)
@@ -232,6 +263,20 @@ def ensureSpacesBtwnTokens(lineOfCode):
 			currChars = lineOfCode[R_index]
 			L_index = R_index
 			checkForSpace = True
+			
+			
+		elif ( (lineOfCode[R_index] == 'e') and (isPreviousCharAlpha(lineOfCode, R_index) == False) ):
+			currChars = lineOfCode[R_index]
+			L_index = R_index
+			checkForSpace = True
+			
+			
+				
+		#elif ( (lineOfCode[R_index] == '[') and (isPreviousCharAlpha(lineOfCode, R_index) == False) ):
+			#currChars = lineOfCode[R_index]
+			#L_index = R_index
+			#checkForSpace = True
+
 		elif (lineOfCode[R_index] in ['>', '<', ':', '!', '=']):
 			if (lineOfCode[R_index+1] == '='):
 				L_index = R_index
@@ -291,7 +336,7 @@ def ensureSpacesBtwnTokens(lineOfCode):
 			else:
 				checkForSpace = False
 		elif (lineOfCode[R_index] == 'e'):
-			if (lineOfCode[R_index+1] == '('):
+			if ( (lineOfCode[R_index+1] == '(') and (isPreviousCharAlpha(lineOfCode, R_index) == False) ):
 				L_index = R_index
 				R_index += 1
 				currChars = lineOfCode[L_index:(R_index+1)]
@@ -326,6 +371,14 @@ def ensureSpacesBtwnTokens(lineOfCode):
 			R_index += 1
 
 		lenOfLine = len(lineOfCode)
+
+		#CHEAP HACK!!!!  THIS MUST BE FIXED
+		if (R_index == (lenOfLine - 1)):
+			if (lineOfCode[R_index] == ']'):
+				lineOfCode = lineOfCode[0:R_index] + ' ]'
+				break
+		
+		
 		if (R_index >= (lenOfLine - 1)):
 			break
 
@@ -385,24 +438,72 @@ def removeSelfDump(line):
 	line = line.rstrip(')')
 	return line
 
+def cleanFinalBatchEq(finalBatchEq):
+	#print(finalBatchEq)
+	finalBatchEq = finalBatchEq.lstrip(finalBatchEqTag).lstrip(':').lstrip()
+	
+	
+	finalBatchEq = ensureSpacesBtwnTokens(finalBatchEq)
+	
+	#finalBatchEq = finalBatchEq.rstrip()
+	
+	return finalBatchEq
+	
+	#print(finalBatchEq)
+
+def addDeltas(batchOutputString):
+	batchOutputString += "\n\tdeltas = []\n\n"
+	batchOutputString += "\tfor sigIndex in range(1, (numSigs+1)):\n"
+	batchOutputString += "\t\tdeltas.append(prng_bits(ZR, " + str(numBitsOfSecurity) + "))\n\n"
+	return batchOutputString
+
+def addIfElse(batchOutputString, finalBatchEq):
+	finalBatchEq = finalBatchEq.rstrip()
+	batchOutputString += "\tif " + finalBatchEq
+	batchOutputString += " :\n"
+	batchOutputString += "\t\tpass\n"
+	batchOutputString += "\telse:\n"
+	batchOutputString += "\t\tprint(\"Batch signature verification failed.\\n\")"
+	return batchOutputString
+
 if __name__ == '__main__':
-	if ( (len(sys.argv) != 5) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
-		sys.exit("\nUsage:  python Code_Generator.py \n [individual verification output filename] \n [batch verification output filename] \n [filename of Python code for signature scheme] \n [filename of pickled Python dictionary with verify function arguments] \n")
+	if ( (len(sys.argv) != 6) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
+		sys.exit("\nUsage:  python Code_Generator.py \n [individual verification output filename] \n [batch verification output filename] \n [filename of Python code for signature scheme] \n [filename of pickled Python dictionary with verify function arguments] \n [filename of .bv file that will be input for the batch verifier] \n")
 
 	individualVerArg = sys.argv[1]
 	batchVerArg = sys.argv[2]
 	pythonCodeArg = sys.argv[3]
 	verifyParamFilesArg = sys.argv[4]
+	batchVerifierInputFile = sys.argv[5]
 
-	os.system("cp " + individualTemplate + " " + individualVerArg)
-	os.system("cp " + batchTemplate + " " + batchVerArg)
+	#os.system("cp " + individualTemplate + " " + individualVerArg)
+	#os.system("cp " + batchTemplate + " " + batchVerArg)
 
-	individualVerFile = open(individualVerArg, 'a')
-	batchVerFile = open(batchVerArg, 'a')
+	individualVerFile = open(individualVerArg, 'w')
+	batchVerFile = open(batchVerArg, 'w')
 
 	pythonCodeLines = open(pythonCodeArg, 'r').readlines()
 
 	pythonCodeNode = getRootASTNode(pythonCodeLines)
+	
+	
+	importFromLines = getImportFromLines(pythonCodeNode, pythonCodeLines)
+	for importFromLine in importFromLines:			
+		#individualOutputString += "\t" + str(importFromLine) + "\n"
+		individualVerFile.write(importFromLine)
+		individualVerFile.write("\n")
+		batchVerFile.write(importFromLine)
+		batchVerFile.write("\n")
+
+	individualTemplateLines = open(individualTemplate, 'r').readlines()
+	batchTemplateLines = open(batchTemplate, 'r').readlines()
+
+	for line in individualTemplateLines:
+		individualVerFile.write(line)
+		
+	for line in batchTemplateLines:
+		batchVerFile.write(line)
+	
 	verifyFuncNode = getVerifyFuncNode(pythonCodeNode)
 	verifyFuncArgs = getVerifyFuncArgs(verifyFuncNode)
 
@@ -419,6 +520,7 @@ if __name__ == '__main__':
 	batchOutputString = ""
 
 	individualOutputString += "\n"
+	batchOutputString += "\n"
 
 	indentationList = []
 
@@ -429,13 +531,8 @@ if __name__ == '__main__':
 	numTabsOnVerifyFuncLine = determineNumTabs(indentationList[0])
 	#print(numTabsOnVerifyFuncLine)
 
-	individualOutputString += "\tfrom charm.engine.util import *\n"
+	#individualOutputString += "\tfrom charm.engine.util import *\n"
 
-	importFromLines = getImportFromLines(pythonCodeNode, pythonCodeLines)
-	for importFromLine in importFromLines:
-		#for numTab in range(0, numTabsOnVerifyFuncLine):
-			#individualOutputString += "\t"
-		individualOutputString += "\t" + str(importFromLine) + "\n"
 
 	prereqVisitor = PrereqAssignVisitor()
 	prereqVisitor.visit(pythonCodeNode)
@@ -447,6 +544,7 @@ if __name__ == '__main__':
 		for prereqLineNo in prereqAssignLineNos:
 			prereqLine = getLinesFromSourceCode(pythonCodeLines, prereqLineNo, prereqLineNo, indentationList)
 			individualOutputString += "\t" + str(prereqLine[0]) + "\n"
+			batchOutputString += "\t" + str(prereqLine[0]) + "\n"
 
 	indentationList = []
 
@@ -463,6 +561,8 @@ if __name__ == '__main__':
 
 	for line in verifyLines:
 		lineNumber += 1
+		if (isLineOnlyWhiteSpace(line) == True):
+			continue
 		line = ensureSpacesBtwnTokens(line)
 		#print(line)
 		for arg in verifyFuncArgs:
@@ -498,6 +598,19 @@ if __name__ == '__main__':
 	individualOutputString += "\t\t\tpass\n"
 	individualOutputString += "\t\telse:\n"
 	individualOutputString += "\t\t\tprint(\"Verification of signature \" + str(sigIndex) + \" failed.\\n\")\n"
+
+	#os.system("python " + batchVerifierPythonFile + " " + batchVerifierInputFile + " > " + batchVerifierOutputFile)
+	batchVerifierOutput = open(batchVerifierOutputFile, 'r').readlines()
+	for line in batchVerifierOutput:
+		if (line.startswith(finalBatchEqTag) == True):
+			finalBatchEq = line
+			break
+
+	finalBatchEq = cleanFinalBatchEq(finalBatchEq)
+	
+	batchOutputString = addDeltas(batchOutputString)
+	
+	batchOutputString = addIfElse(batchOutputString, finalBatchEq)
 
 	individualVerFile.write(individualOutputString)
 	batchVerFile.write(batchOutputString)
