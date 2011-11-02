@@ -42,6 +42,13 @@ batchVerifierPythonFile = '/Users/matt/Documents/charm/auto_batch/batchverify.py
 batchVerifierOutputFile = '/Users/matt/Documents/charm/auto_batch/frontend/batchVerifierOutput'
 finalBatchEqTag = 'Final batch eq'
 numBitsOfSecurity = 80
+deltasGroupType = 'ZR'
+batchEqRemoveVars = ['e', '(', 'j', '1', 'prod', '{', '}', 'N', ':=', '^', ',', 'on', ')', '==']
+dotProdSuffix = '_j'
+deltaString = 'delta'
+idRepInAST = 'id'
+eltsRepInAST = 'elts'
+unknownType = 'Unknown'
 
 class ImportFromVisitor(ast.NodeVisitor):
 	def __init__(self):
@@ -92,6 +99,50 @@ class GetLastLineOfFunction(ast.NodeVisitor):
 
 	def getLastLine(self):
 		return self.lastLine
+
+class BuildAssignMap(ast.NodeVisitor):
+	def __init__(self):
+		self.assignMap = {}
+
+	def getName(self, node):
+		if (idRepInAST in node._fields):
+			return node.id
+		else:
+			return unknownType
+
+	'''
+		for childNode in ast.iter_child_nodes(node):
+			retVal = self.getTargetName(childNode)
+			if (retVal != unknownType):
+				return retVal
+		
+		return unknownType
+	'''
+		
+	def buildNameDictEntry(self, node):
+		targetName = self.getName(node)
+		if (targetName == unknownType):
+			return
+		self.assignMap[targetName] = {}
+		self.assignMap[targetName][node.lineno] = {}
+		
+	#def buildValuesDictEntries(self, node, targetName):
+
+	def visit_Assign(self, node):
+		if (eltsRepInAST in node.targets[0]._fields):
+			for eltsIndex in range(0, len(node.targets[0].elts)):
+				targetName = self.buildNameDictEntry(node.targets[0].elts[eltsIndex])
+				if (targetName == unknownType):
+					return 
+				#valuesResult = self.buildValuesDictEntries(node.)
+				
+
+				
+		
+		
+		#targetNames = []
+		#targetNames = self.getTargetNames(node.targets[0], targetNames)
+		#print(targetNames)
 
 class PrereqAssignVisitor(ast.NodeVisitor):
 	def __init__(self):
@@ -454,7 +505,7 @@ def cleanFinalBatchEq(finalBatchEq):
 def addDeltas(batchOutputString):
 	batchOutputString += "\n\tdeltas = []\n\n"
 	batchOutputString += "\tfor sigIndex in range(1, (numSigs+1)):\n"
-	batchOutputString += "\t\tdeltas.append(prng_bits(ZR, " + str(numBitsOfSecurity) + "))\n\n"
+	batchOutputString += "\t\tdeltas.append(prng_bits(" + deltasGroupType + ", " + str(numBitsOfSecurity) + "))\n\n"
 	return batchOutputString
 
 def addIfElse(batchOutputString, finalBatchEq):
@@ -465,6 +516,24 @@ def addIfElse(batchOutputString, finalBatchEq):
 	batchOutputString += "\telse:\n"
 	batchOutputString += "\t\tprint(\"Batch signature verification failed.\\n\")"
 	return batchOutputString
+
+def getBatchEqVars(finalBatchEq):
+	batchEqVarsSplit = finalBatchEq.split()
+	for removeVar in batchEqRemoveVars:
+		while (batchEqVarsSplit.count(removeVar) > 0):
+			batchEqVarsSplit.remove(removeVar)
+
+	for varIndex in range(0, len(batchEqVarsSplit)):
+		batchEqVarsSplit[varIndex] = batchEqVarsSplit[varIndex].rstrip(dotProdSuffix)
+	
+	for dupVar in batchEqVarsSplit:
+		while (batchEqVarsSplit.count(dupVar) > 1):
+			batchEqVarsSplit.remove(dupVar)
+			
+	if (batchEqVarsSplit.count(deltaString) == 1):
+		batchEqVarsSplit.remove(deltaString)
+
+	return batchEqVarsSplit
 
 if __name__ == '__main__':
 	if ( (len(sys.argv) != 6) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
@@ -607,6 +676,15 @@ if __name__ == '__main__':
 			break
 
 	finalBatchEq = cleanFinalBatchEq(finalBatchEq)
+	
+	batchEqVars = getBatchEqVars(finalBatchEq)
+	
+	test = BuildAssignMap()
+	test.visit(verifyFuncNode)
+	
+	#print(batchEqVars)
+    
+	#print(finalBatchEq.split())
 	
 	batchOutputString = addDeltas(batchOutputString)
 	
