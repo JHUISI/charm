@@ -1,16 +1,20 @@
-import pickle, sys
+import sys
+from charm.engine.util import *
+from toolbox.pairinggroup import *
 
 sigNumKey = 'Signature_Number'
 bodyKey = 'Body'
-pickleSuffix = '.pickle'
+charmPickleSuffix = '.charmPickle'
+pythonPickleSuffix = '.pythonPickle'
 repeatSuffix = '.repeat'
 
 if __name__ == '__main__':
-	if ( (len(sys.argv) != 2) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
-		sys.exit("\nUsage:  python IndividualVerifyTemplate.py [filename of pickled Python dictionary with verify function arguments]\n")
+	if ( (len(sys.argv) != 3) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
+		sys.exit("\nUsage:  python BatchVerifyTemplate.py [filename of pickled Python dictionary with verify function arguments] [path and filename of group param file]\n")
 	verifyParamFilesArg = sys.argv[1]
-	with open(verifyParamFilesArg, 'rb') as verifyParamFiles:
-		verifyParamFilesDict = pickle.load(verifyParamFiles)
+	verifyParamFiles = open(verifyParamFilesArg, 'rb').read()
+	groupParamArg = PairingGroup(sys.argv[2])
+	verifyParamFilesDict = deserializeDict( unpickleObject( verifyParamFiles ) , groupParamArg )
 	verifyArgsDict = {}
 	numSigs = len(verifyParamFilesDict)
 	lenRepeatSuffix = len(repeatSuffix)
@@ -21,9 +25,12 @@ if __name__ == '__main__':
 		for arg in verifyFuncArgs:
 			verifyArgsDict[sigIndex][arg] = {}
 			verifyParamFile = str(verifyParamFilesDict[sigIndex][arg])
-			if (verifyParamFile.endswith(pickleSuffix)):
-				with open(verifyParamFile, 'rb') as verifyParamPickle:
-					verifyArgsDict[sigIndex][arg][bodyKey] = pickle.load(verifyParamPickle)
+			if (verifyParamFile.endswith(charmPickleSuffix)):
+				verifyParamPickle = open(verifyParamFile, 'rb').read()
+				verifyArgsDict[sigIndex][arg][bodyKey] = deserializeDict( unpickleObject( verifyParamPickle ) , groupParamArg )
+			elif (verifyParamFile.endswith(pythonPickleSuffix)):
+				verifyParamPickle = open(verifyParamFile, 'rb')
+				verifyArgsDict[sigIndex][arg][bodyKey] = pickle.load(verifyParamPickle)
 			elif (verifyParamFile.endswith(repeatSuffix)):
 				verifyArgsDict[sigIndex][arg][sigNumKey] = verifyParamFile[0:(len(verifyParamFile) - lenRepeatSuffix)]
 			else:
