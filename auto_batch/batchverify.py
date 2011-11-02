@@ -23,7 +23,7 @@ def isOptimized(data):
             if data[i][j] > 1: return False
     return True
 
-def benchIndivVerification(N, equation, const, vars):
+def benchIndivVerification(N, equation, const, vars, precompute):
     rop_ind = RecordOperations(vars)
     # add attrIndex to non constants
     ASTVisitor(ASTAddIndex(const, vars)).preorder(equation)
@@ -34,16 +34,27 @@ def benchIndivVerification(N, equation, const, vars):
 
     rop_ind.visit(verify.right, data)
     print("<===\tOperations count\t===>")
+    for i in precompute.keys():
+            # if a str, then was precompute introduced programmatically and should skip for individual verification case. 
+            rop_ind.visit(precompute[i], {})
+            print("Precompute:", i, ":=", precompute[i])
     print_results(rop_ind.ops)
-    calculate_times(rop_ind.ops, curve['d224.param'], N)    
+    calculate_times(rop_ind.ops, curve['d224.param'], N)
     return
 
-def benchBatchVerification(N, equation, const, vars):
+def benchBatchVerification(N, equation, const, vars, precompute):
     rop_batch = RecordOperations(vars)
     rop_batch.visit(equation, {})
     print("<====\tBATCH\t====>")    
     print("Equation =>", equation)
     print("<===\tOperations count\t===>")
+    for i in precompute.keys():        
+        if type(i) != str:
+            rop_batch.visit(precompute[i], {})
+            print("Precompute:", i, ":=", precompute[i])
+        else:
+            if i == 'delta': rop_batch.ops['prng'] += N
+            else: print("TODO: need to account for this: ", i, ":=", precompute[i])
     print_results(rop_batch.ops)
     calculate_times(rop_batch.ops, curve['d224.param'], N)
     return
@@ -64,7 +75,9 @@ if __name__ == "__main__":
         print("An error occured while processing batch inputs.")
         exit(-1)
     const, types = ast_struct[ CONST ], ast_struct[ TYPE ]
-    precompute = ast_struct[ PRECOMP ]
+    (indiv_precompute, batch_precompute) = ast_struct[ PRECOMP ]
+    batch_precompute[ "delta" ] = "for{i:=1, N} do prng_i"
+    
     algorithm = ast_struct [ TRANSFORM ]
     if not algorithm: algorithm = ['2', '3'] # standard transform that applies to most signature schemes we've tested
     
@@ -113,14 +126,13 @@ if __name__ == "__main__":
     
     countDict = countInstances(verify2) 
     if not isOptimized(countDict):
-        ASTVisitor(Substitute(countDict, precompute, vars)).preorder(verify2.right)
-        print("\nPrecompute:", precompute)
+        ASTVisitor(Substitute(countDict, batch_precompute, vars)).preorder(verify2.right)
         print("Final batch eq:", verify2.right)
     else:
         print("Final batch eq:", verify2.right)
     
     # TODO: fill in the blanks here
-    benchIndivVerification(N, verify.right, const, vars)
-    benchBatchVerification(N, verify2.right, const, vars)
+    benchIndivVerification(N, verify.right, const, vars, indiv_precompute)
+    benchBatchVerification(N, verify2.right, const, vars, batch_precompute)
     # TODO: generate code for both which includes the detecting of invalid signatures from a batch
     #codeGenerator()

@@ -26,7 +26,7 @@ class RecordOperations:
             assert False, "number of signatures not specified!" 
         # need to have type assignments 
         grps = {'ZR':0, 'G1':0, 'G2':0, 'GT':0 }
-        self.ops = {'pair':0, 'mul':grps.copy(), 'exp':grps.copy(), 'hash':grps.copy() }
+        self.ops = {'prng':0,'pair':0, 'mul':grps.copy(), 'exp':grps.copy(), 'hash':grps.copy() }
         # track prng for small exponents
     
     def visit(self, node, data, parent=None):
@@ -107,6 +107,11 @@ class RecordOperations:
                 if debug >= levels.some:
                    print("ON key => ", data['key'], data[key])
 
+                right_type = self.deriveNodeType(node.right)
+#                print("Doing ", right_type, " of dot products to ", data[key])
+                _prod = int(data[key])
+#                print("Dot prod count =>", _prod, "in", right_type)
+                if right_type: self.ops[ 'mul' ][ right_type ] += _prod
                 self.visit(node.right, data.copy(), node)
 #                 return (left + ", lambda " + pls.vars()  + right + ", " + pls.args() + ")")
             elif(node.type == ops.HASH):
@@ -121,9 +126,10 @@ class RecordOperations:
                         self.ops['hash']['G1'] += _hash
                     else:
                         self.ops['hash']['G1'] += 1
-            elif(node.type == ops.ATTR):
-                print("TODO: account for attribute nodes.")
-                print("data =>", data)
+#            elif(node.type == ops.ATTR):
+#                if Type(parent) == ops.ON:
+#                    print("TODO: account for attribute nodes.")
+#                print("data =>", data)
             else:
                 return None
         return None    

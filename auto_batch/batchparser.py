@@ -177,7 +177,7 @@ def handle(lines, target):
             _ast = [i.strip() for i in l]
         print(target, " =>", _ast)
         return _ast
-    elif target in [TYPE, PRECOMP]:
+    elif target == TYPE:
         _ast = {}
         for line in lines:
             ast_node = parser.parse(line)
@@ -189,6 +189,21 @@ def handle(lines, target):
                 _ast[ left ] = right
         print(target, " =>", _ast)
         return _ast
+    elif target == PRECOMP:
+        indiv_ast = {}
+        batch_ast = {}
+        for line in lines:
+            ast_node = parser.parse(line)
+            # make sure it's an assignment node
+            # otherwise, ignore the node
+            if ast_node.type == ops.EQ:
+                left = ast_node.left
+                right = ast_node.right
+                indiv_ast[ left ] = right
+                batch_ast[ BinaryNode.copy(left) ] = BinaryNode.copy(right)
+        print(target, " =>", indiv_ast)
+        return (indiv_ast, batch_ast)
+    
     return None
 
 debugs = levels.none
@@ -1040,7 +1055,7 @@ def calculate_times(opcount, curve, N):
     result = {}
     total_time = 0.0
     for i in opcount.keys():
-        if i == 'pair':
+        if i in ['pair', 'prng']:
             result[i] = opcount[i] * curve[i]
             total_time += result[i]
         else: # probably another dictionary

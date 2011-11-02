@@ -1,4 +1,4 @@
-N := 10
+N := 100
 l := 5
 
 BEGIN :: types
@@ -7,6 +7,7 @@ g2 := G2
 S := G1
 u := G1
 pk := G1
+sk := G1
 END :: types
 
 BEGIN :: precompute
