@@ -18,7 +18,8 @@ def Copy(obj):
 
 class RecordOperations:
     def __init__(self, vars):
-        print("vars =>", vars)
+        if debug >= levels.some:
+            print("vars =>", vars)
         self.debug = False
         self.vars_def = vars
         N = self.vars_def.get('N')

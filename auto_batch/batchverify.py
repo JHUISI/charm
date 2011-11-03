@@ -144,5 +144,13 @@ if __name__ == "__main__":
     # TODO: fill in the blanks here
     benchIndivVerification(N, verify.right, const, vars, indiv_precompute)
     benchBatchVerification(N, verify2.right, const, vars, batch_precompute)
+    
+    print("<====\tPREP FOR CODE GEN\t====>")
+    subProds = SubstituteSigDotProds()
+    ASTVisitor(subProds).preorder(verify2.right)
+    print("\nFinal version =>", verify2.right, "\n")
+    print("Dot prod =>", subProds.dotprod)
+    for i in subProds.dotprod['list']:
+        print("Compute: ", subProds.dotprod['dict'][i])
     # TODO: generate code for both which includes the detecting of invalid signatures from a batch
     #codeGenerator()

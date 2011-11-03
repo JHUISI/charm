@@ -201,7 +201,7 @@ def handle(lines, target):
                 right = ast_node.right
                 indiv_ast[ left ] = right
                 batch_ast[ BinaryNode.copy(left) ] = BinaryNode.copy(right)
-        print(target, " =>", indiv_ast)
+        #print(target, " =>", indiv_ast)
         return (indiv_ast, batch_ast)
     
     return None

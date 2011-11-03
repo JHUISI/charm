@@ -70,9 +70,9 @@ class Substitute:
                     k = BinaryNode(_key)
 
                     self.precomp[ _key ] = str(i) + "^" + str(j)
-                    if index == 'j': # "j => N", "i => whatever"
-                        bp = batchparser.BatchParser()
-                        self.precomp_code[ _key ] = bp.parse("for{j:=1, N} do " + str(i) + "^" + str(j))   
+#                    if index == 'j': # "j => N", "i => whatever"
+#                        bp = batchparser.BatchParser()
+#                        self.precomp_code[ _key ] = bp.parse("for{j:=1, N} do " + str(i) + "^" + str(j))   
                     if self.vars.get(base.getAttribute()) == None:
                         print("Need to define variable: ", base.getAttribute())
                     else:
@@ -148,3 +148,34 @@ class Substitute:
                         batchparser.addAsChildNodeToParent(data, new_node2)
             else:
                 print("Substitute: missing some cases.")
+
+class SubstituteSigDotProds:
+    def __init__(self ):
+        self.prefix = 'dot' # self.prefix + self.alpha[cnt]; cnt += 1
+        self.alpha = string.ascii_uppercase
+        self.cnt = 0        
+        self.sig = 'N' # should be an input 
+        self.index = 'j' 
+        self.dotprod = { 'start':'1', 'stop':self.sig, 'index':self.index, 'list':[], 'dict':{} }
+    
+    def getkey(self):
+        key = self.prefix + self.alpha[self.cnt]
+        self.cnt += 1
+        #print('key =>', key)
+        return key
+    
+    def store(self, key, value):
+        self.dotprod[ 'dict' ][ key ] = value.right
+        self.dotprod[ 'list' ].append( key )
+    
+    def visit(self, node, data):
+        pass
+    
+    def visit_on(self, node, data):
+        index = str(node.left.right.attr)
+        #print("index =>", index)
+
+        if index == self.sig:
+            key = BinaryNode(self.getkey())
+            self.store(key, node)
+            batchparser.addAsChildNodeToParent(data, key)
