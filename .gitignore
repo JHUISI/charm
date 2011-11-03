@@ -1,1 +1,6 @@
 doc/build/*
+*.pyc 
+*.swp
+toolbox/__pycache__
+config.log
+config.mk
