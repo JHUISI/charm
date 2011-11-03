@@ -4,3 +4,5 @@ doc/build/*
 toolbox/__pycache__
 config.log
 config.mk
+MANIFEST
+dist/
