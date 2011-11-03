@@ -1,6 +1,7 @@
 import unittest 
 from SymmetricCryptoAbstraction import SymmetricCryptoAbstraction
 from toolbox.pairinggroup import PairingGroup,GT
+from charm.pairing import hash as sha1
 class TesSymmetricCryptoAbstraction(unittest.TestCase):
     
     def testAESCBC(self):
@@ -18,7 +19,7 @@ class TesSymmetricCryptoAbstraction(unittest.TestCase):
 
     def MsgtestAESCBC(sef,msg):
         groupObj = PairingGroup('../param/a.param')
-        a =  SymmetricCryptoAbstraction(groupObj.random(GT))
+        a =  SymmetricCryptoAbstraction(sha1(groupObj.random(GT)))
         ct = a.encrypt(msg)
         dmsg = a.decrypt(ct);
         assert msg == dmsg , 'o: =>%s\nm: =>%s' % (msg, dmsg)
@@ -26,9 +27,9 @@ class TesSymmetricCryptoAbstraction(unittest.TestCase):
     def MsgTestAESCBCSeperate(self,msg):
         groupObj = PairingGroup('../param/a.param')
         ran = groupObj.random(GT)
-        a =  SymmetricCryptoAbstraction(ran)
+        a =  SymmetricCryptoAbstraction(sha1(ran))
         ct = a.encrypt(msg)        
-        b =  SymmetricCryptoAbstraction(ran)
+        b =  SymmetricCryptoAbstraction(sha1(ran))
         dmsg = b.decrypt(ct);
         assert msg == dmsg , 'o: =>%s\nm: =>%s' % (msg, dmsg)
 

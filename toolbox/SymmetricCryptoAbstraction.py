@@ -14,10 +14,11 @@ class SymmetricCryptoAbstraction(object):
     usage:
     >>> from toolbox.pairinggroup import PairingGroup,GT
     >>> groupObj = PairingGroup('../param/a.param')
-    >>> a = SymmetricCryptoAbstraction(groupObj.random(GT))
+    >>> from charm.pairing import hash as sha1
+    >>> a = SymmetricCryptoAbstraction(sha1(groupObj.random(GT)))
     >>> ct = a.encrypt("Friendly Fire Isn't")
     >>> a.decrypt(ct)
-    "Friendly Fire Isn't"        
+    "Friendly Fire Isn't"
     """
 
     def __init__(self,key, alg = AES, mode = MODE_CBC):
@@ -25,7 +26,7 @@ class SymmetricCryptoAbstraction(object):
         self.key_len = 16
         self._block_size = 16 
         self._mode = mode
-        self._key = sha1(key)[0:self.key_len]
+        self._key = key[0:self.key_len]
  
     def _initCipher(self,IV = None):
         if IV == None :
@@ -48,6 +49,7 @@ class SymmetricCryptoAbstraction(object):
         ct = self._encrypt(message)
         cte = json.dumps(self._encode(ct))
         return cte
+
     def _encrypt(self,message):
         self._IV = urandom(self._block_size)
         #Because the IV cannot be set after instantiation, decrypt and encrypt 
