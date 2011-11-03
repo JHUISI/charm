@@ -28,7 +28,7 @@ class MessageAuthenticator(object):
         return {
                 "alg": self._algorithm,
                 "msg": msg, 
-                "digest": hmac.new(self._key,bytes(msg,'utf-8'),digestmod=sha1).hexdigest()
+                "digest": hmac.new(self._key,bytes(self._algorithm+msg,'utf-8'),digestmod=sha1).hexdigest()
                }
 
     def verify(self,msgAndDigest):
