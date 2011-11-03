@@ -1,13 +1,13 @@
 import hmac 
 from hashlib import sha1 
-from charm.pairing import hash as extractor
 class MessageAuthenticator(object):
     """ Abstraction for constructing and verifying authenticated messages 
         
     >>> from toolbox.pairinggroup import PairingGroup,GT
+    >>> from charm.pairing import hash as extractor
     >>> groupObj = PairingGroup('../param/a.param')
     >>> key = groupObj.random(GT)
-    >>> m = MessageAuthenticator(key)
+    >>> m = MessageAuthenticator(extractor(key))
     >>> AuthenticatedMessage = m.mac('Hello World')
     >>> m.verify(AuthenticatedMessage)
     True
@@ -19,7 +19,7 @@ class MessageAuthenticator(object):
         if alg != "HMAC_SHA1":
             raise ValueError("Currently only HMAC_SHA1 is supportated as an algorithm")
         self._algorithm = alg
-        self._key = sha1(b'Poor Mans Key Extractor'+extractor(key)).digest() # warning only valid in the random oracle
+        self._key = sha1(b'Poor Mans Key Extractor'+key).digest() # warning only valid in the random oracle
     
     def mac(self,msg):
         """
