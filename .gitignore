@@ -6,3 +6,4 @@ config.log
 config.mk
 MANIFEST
 dist/
+build/
