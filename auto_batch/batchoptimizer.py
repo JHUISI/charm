@@ -152,7 +152,7 @@ class Substitute:
                 print("Substitute: missing some cases: ", Type(right))
 
 class SubstituteSigDotProds:
-    def __init__(self ):
+    def __init__(self, index, sig ):
         self.prefix = 'dot' # self.prefix + self.alpha[cnt]; cnt += 1
         self.alpha = string.ascii_uppercase
         self.cnt = 0        
@@ -167,7 +167,7 @@ class SubstituteSigDotProds:
         return key
     
     def store(self, key, value):
-        self.dotprod[ 'dict' ][ key ] = value.right
+        self.dotprod[ 'dict' ][ key ] = value
         self.dotprod[ 'list' ].append( key )
     
     def visit(self, node, data):
@@ -177,7 +177,28 @@ class SubstituteSigDotProds:
         index = str(node.left.right.attr)
         #print("index =>", index)
 
+        n = self.searchProd(node.right, node)
+        if n:
+            (t, p) = n
+#            print("Found it:", t)
+            # perform substition
+            subkey = BinaryNode(self.getkey())
+            self.store(subkey, t)
+            if p.left == t:
+                p.left = subkey
+#                print("p =>", p)
+        
         if index == self.sig:
             key = BinaryNode(self.getkey())
             self.store(key, node)
             batchparser.addAsChildNodeToParent(data, key)
+            
+    def searchProd(self, node, parent):
+        if node == None: return None
+        elif node.type == ops.ON:
+            return (node, parent)
+        else:
+            result = self.searchProd(node.left, node)
+            if result: return result            
+            result = self.searchProd(node.right, node)
+            return result
