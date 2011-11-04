@@ -3,7 +3,7 @@
 rm *.dat *.log
 main=batchverify.py
 
-for sch in bls2 chp2 chch cyh hess boyen waters bgls
+for sch in bls chp chch cyh hess boyen waters bgls
 do
    echo -n "Running signature scheme: $sch..."
    python $main "$sch".bv > "$sch".log
