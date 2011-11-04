@@ -24,7 +24,7 @@ class IBSig():
         return sig
         
     def verify(self, pk, sig, message):
-        A, B = 4, 5
+        A, B = pk, sig
         h = group.hash(message, G1)
         if pair(sig, pk['g']) == pair(h, pk['g^x']):
             return True  
