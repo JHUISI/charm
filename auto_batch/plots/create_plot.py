@@ -3,9 +3,9 @@ import os
 N = 100
 x = 100
 xx = 1000
-files = { 'bls': x , 'chp': xx, 'chch': x, 'cyh' : xx, 'bgls':700, 'boyen':xx, 'waters':xx }
+files = { 'bls': x , 'chp': xx, 'chch': x, 'cyh' : xx, 'bgls':700, 'boyen':500, 'waters':xx }
 # cyh => (ring size = 20)
-# boyen => (ring size = 5)
+# boyen => (ring size = 2)
 
 intro = """\n
 #!/bin/sh

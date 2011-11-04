@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm *.dat *.log
+rm -f *.log
 main=batchverify.py
 
 for sch in bls chp chch cyh hess boyen waters bgls

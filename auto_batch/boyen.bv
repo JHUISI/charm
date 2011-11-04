@@ -1,5 +1,5 @@
 N := 100
-l := 5
+l := 2
 
 BEGIN :: types
 M := ZR
