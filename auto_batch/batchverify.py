@@ -165,14 +165,15 @@ if __name__ == "__main__":
     # STOP BENCHMARK : THRESHOLD ESTIMATOR 
     # TODO: check avg for when batch is more efficient than 
     
-    print("<====\tPREP FOR CODE GEN\t====>")
-#    subProds = SubstituteSigDotProds('i', 'l')
     subProds = SubstituteSigDotProds('j', 'N')
     ASTVisitor(subProds).preorder(verify2.right)
-    print("\nFinal version =>", verify2.right, "\n")
     print("Dot prod =>", subProds.dotprod)
+    print("<====\tPREP FOR CODE GEN\t====>")
+    print("\nFinal version =>", verify2.right, "\n")
     for i in subProds.dotprod['list']:
         print("Compute: ", i,":=", subProds.dotprod['dict'][i])
+    for i in batch_precompute.keys():
+        print("Precompute:", i, ":=", batch_precompute[i])
 
     # TODO: generate code for both which includes the detecting of invalid signatures from a batch
     #codeGenerator()
