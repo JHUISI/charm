@@ -1,5 +1,5 @@
 # variables
-N := 50
+N := 100
 
 BEGIN :: types
 M := str

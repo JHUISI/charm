@@ -1,5 +1,5 @@
 
-N := 200
+N := 100
 
 BEGIN :: types
 s := ZR

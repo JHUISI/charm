@@ -1,6 +1,6 @@
 # bls batch inputs
 # variables
-N := 50
+N := 100
 
 BEGIN :: types
   sig := G1

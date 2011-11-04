@@ -1070,7 +1070,7 @@ def print_results(data):
     print(msmt)
     return
 
-def calculate_times(opcount, curve, N):
+def calculate_times(opcount, curve, N, debugging=False):
     result = {}
     total_time = 0.0
     for i in opcount.keys():
@@ -1082,12 +1082,12 @@ def calculate_times(opcount, curve, N):
             for j in opcount[i].keys():
                 result[i][j] = opcount[i][j] * curve[i][j]
                 total_time += result[i][j]
-    print("Measurements are recorded in milliseconds.")
-    print_results(result)
-    print("Total Verification Time =>", total_time)
-    print("Per Signature =>", total_time / N)
-    print()
-    return result
+    if debugging: 
+        print("Measurements are recorded in milliseconds.")
+        print_results(result)
+        print("Total Verification Time =>", total_time)
+        print("Per Signature =>", total_time / N, "\n")
+    return (result, total_time / N)
 
 if __name__ == "__main__":
     print(sys.argv[1:])

@@ -3,6 +3,7 @@ l := 5
 
 BEGIN :: types
 sig := G1
+bsig := G1
 M := str
 pk := G2
 g2 := G2
