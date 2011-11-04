@@ -14,7 +14,7 @@ def verify(pk, sig, M):
 This must all be on one line.
 '''
 
-import ast, os, sys
+import ast, os, sys, copy
 
 nameOfVerifyFunc = 'verify'
 argsRepInAST = 'args'
@@ -43,12 +43,22 @@ batchVerifierOutputFile = '/Users/matt/Documents/charm/auto_batch/frontend/batch
 finalBatchEqTag = 'Final batch eq'
 numBitsOfSecurity = 80
 deltasGroupType = 'ZR'
-batchEqRemoveVars = ['e', '(', 'j', '1', 'prod', '{', '}', 'N', ':=', '^', ',', 'on', ')', '==']
-dotProdSuffix = '_j'
+batchEqRemoveVars = ['e', '(', 'j', '1', 'prod', '{', '}', 'N', ':=', '^', ',', 'on', ')', '==', '*', 'i', 'l']
+dotProdSymbol = '_'
 deltaString = 'delta'
+deltaDotProdString = 'delta_j'
 idRepInAST = 'id'
 eltsRepInAST = 'elts'
+numRepInAST = 'n'
+sliceRepInAST = 'slice'
 unknownType = 'Unknown'
+reservedWords = ['prod', 'group', 'G1', 'G2', 'GT', 'dotprod', 'range', 'lam_func', 'ZR', 'self', 'for', 'in', 'while', 'if', 'pass']
+reservedSymbols = ['(', ')', '{', '}', ':=', '=', '-', '*', '^', '/', ',', '==', ':', '[', ']' ]
+numSpacesPerTab = 4
+commentChar = '#'
+indentedBlockStartLineNo = 'startLineNo'
+indentedBlockEndLineNo = 'endLineNo'
+indentedBlockVars = 'Variable_Names'
 
 class ImportFromVisitor(ast.NodeVisitor):
 	def __init__(self):
@@ -103,46 +113,76 @@ class GetLastLineOfFunction(ast.NodeVisitor):
 class BuildAssignMap(ast.NodeVisitor):
 	def __init__(self):
 		self.assignMap = {}
-
+		
 	def getName(self, node):
 		if (idRepInAST in node._fields):
-			return node.id
+			name = node.id
+			if name in reservedWords:
+				return unknownType
+			else:
+				return name
 		else:
 			return unknownType
 
-	'''
+	def getAllIDs(self, node, allIDs):
+		name = self.getName(node)
+		if ( (name != unknownType) and (node.id not in allIDs) ):
+			allIDs.append(node.id)
+			return
+
 		for childNode in ast.iter_child_nodes(node):
-			retVal = self.getTargetName(childNode)
-			if (retVal != unknownType):
-				return retVal
-		
-		return unknownType
-	'''
+			self.getAllIDs(childNode, allIDs)
 		
 	def buildNameDictEntry(self, node):
 		targetName = self.getName(node)
 		if (targetName == unknownType):
 			return
-		self.assignMap[targetName] = {}
-		self.assignMap[targetName][node.lineno] = {}
+		if (targetName not in self.assignMap):
+			self.assignMap[targetName] = {}		
+		return targetName
 		
-	#def buildValuesDictEntries(self, node, targetName):
+	def buildValuesDictEntries(self, node, targetName):
+		allIDs = []
+		self.getAllIDs(node, allIDs)
+		return allIDs
 
 	def visit_Assign(self, node):
 		if (eltsRepInAST in node.targets[0]._fields):
-			for eltsIndex in range(0, len(node.targets[0].elts)):
-				targetName = self.buildNameDictEntry(node.targets[0].elts[eltsIndex])
+			for eltsTargetIndex in range(0, len(node.targets[0].elts)):
+				targetName = self.buildNameDictEntry(node.targets[0].elts[eltsTargetIndex])
 				if (targetName == unknownType):
-					return 
-				#valuesResult = self.buildValuesDictEntries(node.)
-				
+					return
+				allIDs = self.buildValuesDictEntries(node.value.elts[eltsTargetIndex], targetName)
+				self.assignMap[targetName][node.lineno] = allIDs
+		elif (idRepInAST in node.targets[0]._fields):
+			targetName = self.buildNameDictEntry(node.targets[0])
+			if (targetName == unknownType):
+				return
+			allIDs = self.buildValuesDictEntries(node.value, targetName)
+			self.assignMap[targetName][node.lineno] = allIDs
+		elif (sliceRepInAST in node.targets[0]._fields):
+			targetName = self.buildNameDictEntry(node.targets[0].value)
+			if (targetName == unknownType):
+				return
+			#print(targetName)
+			#print(node.targets[0].slice._fields)
+			#print(ast.dump(node))
+			
+			allIDs = self.buildValuesDictEntries(node.value, targetName)
+			self.assignMap[targetName][node.lineno] = allIDs
 
-				
+
+
+
+		else:
+			print(node.targets[0]._fields)
+		#print(self.assignMap)
 		
+	def getAssignMap(self):
+		if (len(self.assignMap) == 0):
+			return {}
 		
-		#targetNames = []
-		#targetNames = self.getTargetNames(node.targets[0], targetNames)
-		#print(targetNames)
+		return self.assignMap
 
 class PrereqAssignVisitor(ast.NodeVisitor):
 	def __init__(self):
@@ -498,6 +538,8 @@ def cleanFinalBatchEq(finalBatchEq):
 	
 	#finalBatchEq = finalBatchEq.rstrip()
 	
+	#print(finalBatchEq)
+	
 	return finalBatchEq
 	
 	#print(finalBatchEq)
@@ -518,22 +560,202 @@ def addIfElse(batchOutputString, finalBatchEq):
 	return batchOutputString
 
 def getBatchEqVars(finalBatchEq):
-	batchEqVarsSplit = finalBatchEq.split()
+	batchEqVars = finalBatchEq.split()
 	for removeVar in batchEqRemoveVars:
-		while (batchEqVarsSplit.count(removeVar) > 0):
-			batchEqVarsSplit.remove(removeVar)
+		while (batchEqVars.count(removeVar) > 0):
+			batchEqVars.remove(removeVar)
 
-	for varIndex in range(0, len(batchEqVarsSplit)):
-		batchEqVarsSplit[varIndex] = batchEqVarsSplit[varIndex].rstrip(dotProdSuffix)
+	'''
+	for varIndex in range(0, len(batchEqVars)):
+		batchEqVars[varIndex] = batchEqVars[varIndex].rstrip(dotProdSuffix)
+	'''
 	
-	for dupVar in batchEqVarsSplit:
-		while (batchEqVarsSplit.count(dupVar) > 1):
-			batchEqVarsSplit.remove(dupVar)
+	for dupVar in batchEqVars:
+		while (batchEqVars.count(dupVar) > 1):
+			batchEqVars.remove(dupVar)
 			
-	if (batchEqVarsSplit.count(deltaString) == 1):
-		batchEqVarsSplit.remove(deltaString)
+	if (batchEqVars.count(deltaString) == 1):
+		batchEqVars.remove(deltaString)
+	
+	if (batchEqVars.count(deltaDotProdString) == 1):
+		batchEqVars.remove(deltaDotProdString)
 
-	return batchEqVarsSplit
+	return batchEqVars
+
+def getBatchEqDotProdVars(batchEqVars):
+	batchEqDotProdVars = []
+	
+	for varIndex in range(0, len(batchEqVars)):
+		dotProdSymbolIndex = batchEqVars[varIndex].find(dotProdSymbol)
+		if (dotProdSymbolIndex != -1):
+			batchEqDotProdVars.append(batchEqVars[varIndex][0:dotProdSymbolIndex])
+	return batchEqDotProdVars
+
+'''
+def removeDupsFromList(list):
+	for listIndex in range(0, len(list)):
+		while ()
+'''
+
+def getIndentedBlockIndex(listOfIndentedBlocks, lineNo):
+	for counter in range(0, len(listOfIndentedBlocks)):
+		indentedBlock = listOfIndentedBlocks[counter]
+		startLineNo = indentedBlock[indentedBlockStartLineNo]
+		endLineNo = indentedBlock[indentedBlockEndLineNo]
+		if ( (lineNo >= startLineNo) and (lineNo <= endLineNo) ):
+			#print(counter)
+			return counter
+		
+	return -1
+
+def addIndentedBlockDataToDotProdVars(indentedBlock, varsNeededForDotProds, lineNosNeededForDotProds):
+	startLineNo = indentedBlock[indentedBlockStartLineNo]
+	endLineNo = indentedBlock[indentedBlockEndLineNo]
+	for lineIndex in range( (startLineNo - 1) , (endLineNo + 1)):
+		if lineIndex not in lineNosNeededForDotProds:
+			lineNosNeededForDotProds.append(lineIndex)
+			
+	namesOfVarsInBlock = indentedBlock[indentedBlockVars]
+	for nameOfVarsInBlock in namesOfVarsInBlock:
+		if nameOfVarsInBlock not in varsNeededForDotProds:
+			varsNeededForDotProds.append(nameOfVarsInBlock)
+
+def getLinesForDotProds(batchEqDotProdVars, assignMap, pythonCodeLines, listOfIndentedBlocks):
+	varsNeededForDotProds = []
+	lineNosNeededForDotProds = []
+	linesForDotProds = []
+
+	#print(assignMap)
+	
+	for batchEqVarName in batchEqDotProdVars:
+		varsNeededForDotProds.append(batchEqVarName)
+		lineNos = list(assignMap[batchEqVarName].keys())
+		#print(lineNos)
+		for lineNo in lineNos:
+			#print(lineNo)
+			for varName in assignMap[batchEqVarName][lineNo]:
+				if varName not in varsNeededForDotProds:
+					varsNeededForDotProds.append(varName)
+
+	tempVarsToAdd = []
+					
+	for varNeededForDotProds in varsNeededForDotProds:
+		if varNeededForDotProds in assignMap:
+			lineNos = list(assignMap[varNeededForDotProds].keys())
+			for lineNo in lineNos:
+				indentedBlockIndex = getIndentedBlockIndex(listOfIndentedBlocks, lineNo)
+				if (indentedBlockIndex != -1):
+					addIndentedBlockDataToDotProdVars(listOfIndentedBlocks[indentedBlockIndex], varsNeededForDotProds, lineNosNeededForDotProds)
+					
+	
+	for varNeededForDotProds in varsNeededForDotProds:
+		if varNeededForDotProds in assignMap:
+			nextLines = list(assignMap[varNeededForDotProds].keys())
+			for nextLine in nextLines:
+				if nextLine not in lineNosNeededForDotProds:
+					lineNosNeededForDotProds.append(nextLine)
+
+	lineNosNeededForDotProds.sort()
+	#print(lineNosNeededForDotProds)
+	#print(varsNeededForDotProds)
+
+	#dfdfd
+				
+	#lineNosNeededForDotProds.sort()
+	#print(lineNosNeededForDotProds)
+		
+		#print(nextLines)
+		#print(assignMap)
+		#pass
+	
+	#print(batchEqDotProdVars)
+	#print(assignMap)
+	
+	return lineNosNeededForDotProds
+
+def determineNumSpacesBeforeText(line):
+	if (line[0] != ' '):
+		return 0
+	
+	numSpaces = 0
+	
+	for index in range(0, len(line)):
+		if (line[index] == ' '):
+			numSpaces += 1
+		else:
+			return numSpaces
+			
+	return numSpaces
+
+def getVarsOfLine(linesOfCode, lineNo):
+	line = linesOfCode[lineNo - 1]
+	line = line.lstrip().rstrip().rstrip('\n')
+	if ( (line.startswith(commentChar)) or (line == "") ):
+		return []
+	line = ensureSpacesBtwnTokens(line)
+
+	vars = []
+	
+	for token in line.split():
+		if ( (token not in reservedSymbols) and (token not in reservedWords) and (token.isdigit() == False) ):
+			vars.append(token)
+
+	#print(vars)			
+	return vars
+
+def buildMapOfControlFlow(pythonCodeLines, funcDefLineNo, endLineNo):
+	withinIndentedBlock = False
+	indentedBlockPairs = []
+	
+	for lineIndex in range(0, len(pythonCodeLines)):
+		realLineNo = lineIndex + 1
+		lineWithNoSpaces = pythonCodeLines[lineIndex].lstrip().rstrip()
+		
+		if (realLineNo < funcDefLineNo):
+			continue
+		elif (realLineNo > endLineNo):
+			break
+		elif (realLineNo == funcDefLineNo):
+			baseNumSpacesBeforeText = determineNumSpacesBeforeText(pythonCodeLines[lineIndex]) + numSpacesPerTab
+		elif ( (lineWithNoSpaces.startswith(commentChar)) or (lineWithNoSpaces == "") ):
+			continue
+		else:
+			numSpacesBeforeText = determineNumSpacesBeforeText(pythonCodeLines[lineIndex])
+			if (withinIndentedBlock == True):
+				if (numSpacesBeforeText == baseNumSpacesBeforeText):
+					withinIndentedBlock = False
+					indentedBlockPairs.append(realLineNo - 1)
+			else:
+				if (numSpacesBeforeText == (baseNumSpacesBeforeText + numSpacesPerTab) ):
+					withinIndentedBlock = True
+					indentedBlockPairs.append(realLineNo)
+					
+	if ( (len(indentedBlockPairs) % 2) == 1):
+		indentedBlockPairs.append(endLineNo)
+		
+	listOfIndentedBlocks = []
+	indentedBlockDict = {}
+	numIndentedBlocks = int(len(indentedBlockPairs) / 2)
+	
+	for indentedBlockIndex in range(0, numIndentedBlocks):
+		indentedBlockDict[indentedBlockStartLineNo] = indentedBlockPairs[indentedBlockIndex * 2]
+		indentedStart = indentedBlockDict[indentedBlockStartLineNo]
+		indentedBlockDict[indentedBlockEndLineNo] = indentedBlockPairs[(indentedBlockIndex * 2) + 1]
+		indentedEnd = indentedBlockDict[indentedBlockEndLineNo]
+		varsInBlock = []
+		for indentedLineNo in range( (indentedStart - 1), (indentedEnd + 1) ):
+			varsOfLine = getVarsOfLine(pythonCodeLines, indentedLineNo)
+			if (varsOfLine != []):
+				for varOfLine in varsOfLine:
+					if varOfLine not in varsInBlock:
+						varsInBlock.append(varOfLine)
+		indentedBlockDict[indentedBlockVars] = varsInBlock
+		listOfIndentedBlocks.append(copy.deepcopy(indentedBlockDict))
+		
+	#print(listOfIndentedBlocks)
+	return listOfIndentedBlocks
+		
+	
 
 if __name__ == '__main__':
 	if ( (len(sys.argv) != 6) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
@@ -575,10 +797,15 @@ if __name__ == '__main__':
 	
 	verifyFuncNode = getVerifyFuncNode(pythonCodeNode)
 	verifyFuncArgs = getVerifyFuncArgs(verifyFuncNode)
+	#print(verifyFuncArgs)
 
 	verifyEqNode = getVerifyEqNode(verifyFuncNode)
 	if (verifyEqNode == 0):
 		sys.exit("Could not locate the verify equation within the \"verify\" function")
+
+
+	#buildMapOfControlFlow(pythonCodeLines, verifyFuncNode.lineno, (verifyEqNode.lineno - 1))
+
 
 	lastLineVisitor = GetLastLineOfFunction()
 	lastLineVisitor.visit(verifyFuncNode)
@@ -678,9 +905,40 @@ if __name__ == '__main__':
 	finalBatchEq = cleanFinalBatchEq(finalBatchEq)
 	
 	batchEqVars = getBatchEqVars(finalBatchEq)
+	batchEqDotProdVars = getBatchEqDotProdVars(batchEqVars)
 	
-	test = BuildAssignMap()
-	test.visit(verifyFuncNode)
+	#print(batchEqVars)
+	#print(batchEqDotProdVars)
+	
+	assignMapVar = BuildAssignMap()
+	assignMapVar.visit(verifyFuncNode)
+	assignMap = assignMapVar.getAssignMap()
+
+	listOfIndentedBlocks = buildMapOfControlFlow(pythonCodeLines, verifyFuncNode.lineno, (verifyEqNode.lineno - 1))
+	#print(listOfIndentedBlocks)
+	
+	linesForDotProds = getLinesForDotProds(batchEqDotProdVars, assignMap, pythonCodeLines, listOfIndentedBlocks)
+
+
+
+
+
+	linesForDotProds = getLinesForDotProds(['uverify'], assignMap, pythonCodeLines, listOfIndentedBlocks)
+
+
+
+
+
+	print(linesForDotProds)
+	
+	#dotProdCodeBlock = formDotProdCodeBlock(pythonCodeLines, linesForDotProds)
+	
+	'''
+	for key in assignMap:
+		print(key)
+		print(assignMap[key])
+		print("\n")
+	'''
 	
 	#print(batchEqVars)
     

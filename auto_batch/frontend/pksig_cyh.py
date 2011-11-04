@@ -58,18 +58,35 @@ class CYH(PKSig):
         return sig
     
     def verify(self, mpk, L, M, sig):
-        u_verify = sig['u_in_dict'] 
-        S_verify = sig['S_in_dict']
+        uverify = sig['u_in_dict']
+        A = uverify 
+        Sverify = sig['S_in_dict']
+        if (1 == 1):
+            pass
+            sig = 4
+            pass
+            Sverify = 5
+            A = 4
         Lt = self.concat(L) 
-        h_verify = [group.init(ZR, 1) for i in range(num_signers)]
+        B = uverify * Sverify * A
+        
+        if 1 == 1:
+            d = 4
+            e = d *28
+        
+        hverify = [group.init(ZR, 1) for i in range(num_signers)]
         for i in range(num_signers):
-            h_verify[i] = H2(M, Lt, u_verify[i])
+            hverify[i] = H2(M, Lt, uverify[i])
+            pass
 
 	# END_PRECOMPUTE
-
-        pk_verify = [ H1(i) for i in L] # get all signers pub keys
-        result = dotprod(group.init(G1), -1, num_signers, lam_func, u_verify, pk_verify, h_verify) 
-        if pair(result, mpk['Pub']) == pair(S_verify, mpk['g']):
+            b = 18
+            pass
+            c = 24
+        pkverify = [ H1(i) for i in L] # get all signers pub keys
+            #test
+        result = dotprod(group.init(G1), -1, num_signers, lam_func, uverify, pkverify, hverify) 
+        if pair(result, mpk['Pub']) == pair(Sverify, mpk['g']):
             return True
         return False
 
