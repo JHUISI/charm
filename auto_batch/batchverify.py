@@ -45,7 +45,7 @@ def benchIndivVerification(N, equation, const, vars, precompute):
 def benchBatchVerification(N, equation, const, vars, precompute):
     rop_batch = RecordOperations(vars)
     rop_batch.visit(equation, {})
-    print("<====\tBATCH\t====>")    
+    print("<====\tBATCH\t====>")
     print("Equation =>", equation)
     print("<===\tOperations count\t===>")
     for i in precompute.keys():
@@ -152,5 +152,6 @@ if __name__ == "__main__":
     print("Dot prod =>", subProds.dotprod)
     for i in subProds.dotprod['list']:
         print("Compute: ", subProds.dotprod['dict'][i])
+
     # TODO: generate code for both which includes the detecting of invalid signatures from a batch
     #codeGenerator()

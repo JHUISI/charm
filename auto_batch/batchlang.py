@@ -26,7 +26,7 @@ import string
 
 types = Enum('G1', 'G2', 'GT', 'ZR', 'str')
 declarator = Enum('constants', 'verify')
-ops = Enum('BEGIN', 'TYPE', 'ADD', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'FOR','DO','PROD', 'ON', 'CONCAT','END', 'NONE')
+ops = Enum('BEGIN', 'TYPE', 'ADD', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT','END', 'NONE')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
 
@@ -106,6 +106,10 @@ def createTree(op, node1, node2):
     	node = BinaryNode(ops.FOR)
     elif(op == "do"):
     	node = BinaryNode(ops.DO)
+    elif(op == "sum{"):
+    	node = BinaryNode(ops.SUM)
+    elif(op == "of"):
+    	node = BinaryNode(ops.OF)
     elif(op == "|"):
         node = BinaryNode(ops.CONCAT)
     # elif e( ... )
@@ -180,12 +184,16 @@ class BinaryNode:
 				return ('H(' + left + ',' + right + ')')
 			elif(self.type == ops.PROD):
 				return ('prod{' + left + ',' + right + '}')
+			elif(self.type == ops.SUM):
+				return ('sum{' + left + ',' + right + '}')			
 			elif(self.type == ops.ON):
 				 return ('(' + left + ' on ' + right + ')')
 			elif(self.type == ops.FOR):
 				return ('for{' + left + ',' + right + '}')
 			elif(self.type == ops.DO):
 				 return ( left + ' do ' + right)
+			elif(self.type == ops.OF):
+				 return ( left + ' of ' + right)
 			elif(self.type == ops.CONCAT):
 				 return (left + ' | ' + right)
 				# return ( left + ' on ' + right )				

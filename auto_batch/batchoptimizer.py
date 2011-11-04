@@ -146,8 +146,10 @@ class Substitute:
                         new_node2.left = BinaryNode(key)
                         new_node2.right = node_1
                         batchparser.addAsChildNodeToParent(data, new_node2)
+            elif Type(right) == ops.OF:
+                pass
             else:
-                print("Substitute: missing some cases.")
+                print("Substitute: missing some cases: ", Type(right))
 
 class SubstituteSigDotProds:
     def __init__(self ):

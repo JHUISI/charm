@@ -56,10 +56,13 @@ class BatchParser:
         Hash = Literal('H(')
         Prod = Literal("prod{") # dot product token
         For = Literal("for{")
+        Sum = Literal("sum{")
         ProdOf = Literal("on")
         ForDo = Literal("do") # for{x,y} do y
+        SumOf = Literal("of")
+        
         # captures order of parsing token operators
-        Token = Equality | ExpOp | MulOp | DivOp | AddOp | ForDo | ProdOf | Concat | Assignment
+        Token = Equality | ExpOp | MulOp | DivOp | AddOp | ForDo | ProdOf | SumOf | Concat | Assignment
         Operator = Token 
         #Operator = OperatorAND | OperatorOR | Token
 
@@ -72,6 +75,7 @@ class BatchParser:
                (Pairing + expr + ',' + expr + rpar).setParseAction( pushFirst ) | \
                (Prod + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
                (For + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
+               (Sum + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
                lpar + expr + rpar | (leafNode).setParseAction( pushFirst )
 
         # Represents the order of operations (^, *, |, ==)
@@ -96,7 +100,7 @@ class BatchParser:
         op = stack.pop()
         if debug >= levels.some:
             print("op: %s" % op)
-        if op in ["+", "*", "^", ":=", "==", "e(", "for{", "do","prod{", "on", "|"]: # == "AND" or op == "OR" or op == "^" or op == "=":
+        if op in ["+", "*", "^", ":=", "==", "e(", "for{", "do","prod{", "on", "sum{", "of", "|"]: # == "AND" or op == "OR" or op == "^" or op == "=":
             op2 = self.evalStack(stack)
             op1 = self.evalStack(stack)
             return createTree(op, op1, op2)
@@ -517,7 +521,8 @@ class SimplifyDotProducts:
                 self.rule += "True "
             else:
                 self.rule += "False "
-                return
+                return                
+
 
 # Adds an exponent to a \delta to every pairing node
 # TODO: when you discover that a node already has an EXP node, then change right node
@@ -799,6 +804,20 @@ class Technique3:
                     self.rule += "common 2nd (right) node appears, so can reduce n pairings to 1. "
                     self.visit_pair(pair_node, data)
             return
+        elif Type(node.right) == ops.EXP:
+            exp = node.right
+            isattr = exp.left
+            if Type(isattr) == ops.ATTR and isattr.attr_index == None:
+                bp = BatchParser()
+                prod = node.left
+                sumOf = bp.parse("sum{x,y} of z")
+                sumOf.left = node.left
+                sumOf.right = exp.right
+                sumOf.left.type = ops.SUM
+                exp.right = sumOf
+                #print("output =>", exp)
+                addAsChildNodeToParent(data, exp)
+
 
     def isConstInSubtreeT(self, node): # check whether left or right node is constant  
         if node == None: return None
