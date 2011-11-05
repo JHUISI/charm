@@ -59,11 +59,12 @@ class CYH(PKSig):
     
     def verify(self, mpk, L, M, sig):
         uverify = sig['u_in_dict']
-        A = uverify 
+        #A = uverify 
         Sverify = sig['S_in_dict']
+        sig = 4
         if (1 == 1):
             pass
-            sig = 4
+            #sig = 4
             pass
             Sverify = 5
             A = 4

@@ -1,4 +1,4 @@
-import sys
+import sys, copy
 from charm.engine.util import *
 from toolbox.pairinggroup import *
 
