@@ -1,4 +1,4 @@
-N := 200
+N := 100
 l := 5
 
 BEGIN :: types

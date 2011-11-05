@@ -1,5 +1,5 @@
 N := 100
-l := 20
+l := 30
 
 BEGIN :: types
 r := ZR

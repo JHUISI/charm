@@ -3,7 +3,7 @@ import os
 N = 100
 x = 100
 xx = 1000
-files = { 'bls': x , 'chp': xx, 'chch': x, 'cyh' : xx, 'bgls':700, 'boyen':500, 'waters':xx }
+files = { 'bls':50 , 'chp':80, 'chch':50, 'cyh':100, 'hess':50, 'bgls':120, 'boyen':150, 'waters':300 }
 # cyh => (ring size = 20)
 # boyen => (ring size = 2)
 
