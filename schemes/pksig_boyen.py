@@ -81,10 +81,9 @@ class Boyen(PKSig):
         D = pair(mpk['g1'], mpk['g2'])
         S, t = sig['S'], sig['t']
         m = H(M)
-        prod_result = pair(S[0], (At_pk[0] * (Bt_pk[0] ** m) * (Ct_pk[0] ** t[0])))        
-        for i in range(1, l):
+        prod_result = group.init(GT, 1)
+        for i in range(l):
             prod_result *= pair(S[i], At_pk[i] * (Bt_pk[i] ** m) * (Ct_pk[i] ** t[i]))
-
         print("final result =>", prod_result)
         print("D =>", D )
         if prod_result == D:
