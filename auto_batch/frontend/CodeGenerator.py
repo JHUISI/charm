@@ -16,6 +16,7 @@ This must all be on one line.
 
 import ast, os, sys, copy
 
+pythonDictRep = 'dict'
 multipleSubscriptIndicatorChar = '$'
 finalEqLineString = 'Final version => '
 dotProdPrefix = 'dot'
@@ -25,6 +26,7 @@ computeLineIndex = 'Index_Variable'
 computeLineExp = 'Expression'
 computeLineStartValue = 'Start_Value'
 computeLineEndValue = 'End_Value'
+computeLineRange = 'Range'
 nameOfVerifyFunc = 'verify'
 argsRepInAST = 'args'
 argRepInAST = 'arg'
@@ -847,6 +849,9 @@ def getComputeLineInfo(batchVerifierOutput):
 			tempStringStartEndVals = tempString[0].split(',')
 			computeLineInfo[key][computeLineStartValue] = tempStringStartEndVals[0]
 			computeLineInfo[key][computeLineEndValue] = tempStringStartEndVals[1]
+			
+			computeLineInfo[key][computeLineRange] = str(computeLineInfo[key][computeLineIndex]) + str(computeLineInfo[key][computeLineStartValue]) + str(computeLineInfo[key][computeLineEndValue])
+			
 			tempString = tempString[1].split(' on ')
 			#print(tempString[1].rstrip(')'))
 			tempStringExp = tempString[1]
@@ -937,18 +942,61 @@ def getOuterDotProds(batchVerifierOutput):
 def addDotProdLoops(batchOutputString, computeLineInfo, dotProdLoopOrder, assignMap, pythonCodeLines, listOfIndentedBlocks):
 	batchOutputString += "\ttest\n"
 	
-	print(dotProdLoopOrder)
+	#print(dotProdLoopOrder)
 	
 	return batchOutputString
 
-def dotProdLoopRecursive(computeLineInfo, outerDotProd, dotProdDict):
+def getDotProdListIndex(dotProdList, range):
+	childCounter = 0
+	
+	for child in dotProdList:
+		if type(child).__name__ == pythonDictRep:
+			for key in child:
+				if (key == range):
+					return childCounter
+					
+		childCounter += 1
+		
+	return -1
+					
+
+def dotProdLoopRecursive(computeLineInfo, outerDotProd, dotProdList):
+	'''
 	if (outerDotProd not in dotProdDict):
 		dotProdDict[outerDotProd] = {}
+	'''
+	
+	range = computeLineInfo[outerDotProd][computeLineRange]
+	
+	#if (range not in dotProdList):
+
+	#rangeKeyExists = False
+
+	'''	
+	for child in dotProdList:
+		if child == range:
+			rangeKeyExists = True
+			break
+	'''
+
+	dotProdListIndex = getDotProdListIndex(dotProdList, range)
+		
+	if (dotProdListIndex == -1):
+		newDictEntry = {}
+		dotProdList.append(newDictEntry)
+		newDictEntry[range] = []
+		newDictEntry[range].append(outerDotProd)
+	else:
+		dotProdList[dotProdListIndex][range].append(outerDotProd)
 	
 	for varName in computeLineInfo[outerDotProd][computeLineVarsNoSubscripts]:
 		if ( (varName.startswith(dotProdPrefix)) and (len(varName) ==  4) ):
-			dotProdDict[outerDotProd][varName] = {}
-			dotProdLoopRecursive(computeLineInfo, varName, dotProdDict[outerDotProd])
+			#dotProdDict[outerDotProd][varName] = {}
+			#dotProdLoopRecursive(computeLineInfo, varName, dotProdDict[outerDotProd])
+			
+			dotProdListIndex = getDotProdListIndex(dotProdList, range)
+			
+			dotProdLoopRecursive(computeLineInfo, varName, dotProdList[dotProdListIndex][range])
 
 def getDotProdLoopOrder(computeLineInfo, outerDotProds, dotProdLoopOrder):
 	#dotProdLoopOrder = {}
@@ -957,6 +1005,12 @@ def getDotProdLoopOrder(computeLineInfo, outerDotProds, dotProdLoopOrder):
 		dotProdLoopRecursive(computeLineInfo, outerDotProd, dotProdLoopOrder)
 			
 	return dotProdLoopOrder
+
+def printList(dict):
+	for key in dict:
+		print(key)
+		#print(dict[key])
+		print("\n")
 
 if __name__ == '__main__':
 	if ( (len(sys.argv) != 6) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
@@ -1146,14 +1200,16 @@ if __name__ == '__main__':
 	#print(finalBatchEq.split())
 
 	computeLineInfo = getComputeLineInfo(batchVerifierOutput)
+
+	#print(computeLineInfo)
 	
 	outerDotProds = getOuterDotProds(batchVerifierOutput)
 
-	dotProdLoopOrder = {}
+	dotProdLoopOrder = []
 	
 	dotProdLoopOrder = getDotProdLoopOrder(computeLineInfo, outerDotProds, dotProdLoopOrder)
 	
-	#print(dotProdLoopOrder)
+	printList(dotProdLoopOrder)
 
 	#print(outerDotProds)
 
