@@ -1,15 +1,18 @@
+""" TODO: Description of Scheme here.
+"""
 from charm.pairing import *
 from toolbox.PKSig import PKSig
 from toolbox.iterate import dotprod
 
-N = 10
-num_signers = 5
+N = 100
+numSigners = 5
+
 debug = False
 
 class CYH(PKSig):
     def __init__(self):
         global group
-        group = pairing('/Users/matt/Documents/charm/param/a.param')
+        group = pairing('../param/a.param')
     
     def concat(self, L_id):
         result = ""
@@ -21,8 +24,8 @@ class CYH(PKSig):
         global H1,H2,lam_func
         H1 = lambda x: group.H(('1', str(x)), G1)
         H2 = lambda a, b, c: group.H(('2', a, b, c), ZR)
-        lam_func = lambda i,a,b,c: a[i] * (b[i] ** c[i])
-        g = group.random(G2)
+        lam_func = lambda i,a,b,c: a[i] * (b[i] ** c[i]) # => u * (pk ** h) for all signers
+        g = group.random(G2) 
         alpha = group.random(ZR)
         P = g ** alpha
         msk = alpha
@@ -32,13 +35,13 @@ class CYH(PKSig):
     def keygen(self, msk, ID):
         sk = H1(ID) ** msk
         pk = H1(ID)
-        sk_tuple = (ID, pk, sk)
-        return sk_tuple
+        return (ID, pk, sk)
     
-    def sign(self, sk_tuple, L, M):
-        (IDs, IDpk, IDsk) = sk_tuple
+    def sign(self, sk, L, M):
+        (IDs, IDpk, IDsk) = sk
         assert IDs in L, "signer should be an element in L"
-        Lt = self.concat(L)
+        Lt = self.concat(L) 
+        num_signers = len(L)
  
         u = [group.init(G1) for i in range(num_signers)]
         h = [group.init(ZR, 1) for i in range(num_signers)]
@@ -50,44 +53,25 @@ class CYH(PKSig):
                s = i
         
         r = group.random(ZR)
-        pk_sign = [ H1(i) for i in L] # get all signers pub keys
-        u[s] = (IDpk ** r) * ~dotprod(group.init(G1), s, num_signers, lam_func, u, pk_sign, h)
+        pk = [ H1(i) for i in L] # get all signers pub keys
+        u[s] = (IDpk ** r) * ~dotprod(group.init(G1), s, num_signers, lam_func, u, pk, h)
         h[s] = H2(M, Lt, u[s])
         S = IDsk ** (h[s] + r)
-        sig = { 'u_in_dict':u, 'S_in_dict':S }
+        sig = { 'u':u, 'S':S }
         return sig
     
     def verify(self, mpk, L, M, sig):
-        uverify = sig['u_in_dict']
-        #A = uverify 
-        Sverify = sig['S_in_dict']
-        sig = 4
-        if (1 == 1):
-            pass
-            #sig = 4
-            pass
-            Sverify = 5
-            A = 4
+        u = sig['u'] 
+        S = sig['S']
         Lt = self.concat(L) 
-        B = uverify * Sverify * A
-        
-        if 1 == 1:
-            d = 4
-            e = d *28
-        
-        hverify = [group.init(ZR, 1) for i in range(num_signers)]
+        num_signers = len(L)
+        h = [group.init(ZR, 1) for i in range(num_signers)]
         for i in range(num_signers):
-            hverify[i] = H2(M, Lt, uverify[i])
-            pass
+            h[i] = H2(M, Lt, u[i])
 
-	# END_PRECOMPUTE
-            b = 18
-            pass
-            c = 24
-        pkverify = [ H1(i) for i in L] # get all signers pub keys
-            #test
-        result = dotprod(group.init(G1), -1, num_signers, lam_func, uverify, pkverify, hverify) 
-        if pair(result, mpk['Pub']) == pair(Sverify, mpk['g']):
+        pk = [ H1(i) for i in L] # get all signers pub keys
+        result = dotprod(group.init(G1), -1, num_signers, lam_func, u, pk, h) 
+        if pair(result, mpk['Pub']) == pair(S, mpk['g']):
             return True
         return False
 
@@ -98,12 +82,12 @@ if __name__ == "__main__":
    (mpk, msk) = cyh.setup()
 
    (ID, Pk, Sk) = cyh.keygen(msk, ID)  
-   sk_main = (ID, Pk, Sk)
+   sk = (ID, Pk, Sk)
    print("Keygen...")
-   print("sk =>", sk_main)
+   print("sk =>", sk)
   
    M = 'please sign this new message!'
-   sig = cyh.sign(sk_main, L, M)
+   sig = cyh.sign(sk, L, M)
    print("Signature...")
    print("sig =>", sig)
 

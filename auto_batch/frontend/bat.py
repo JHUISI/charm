@@ -43,22 +43,53 @@ if __name__ == '__main__':
 
 	argSigIndexMap = {}
 
-	group = pairing('/Users/matt/Documents/charm/param/a.param')
+	group = pairing('../param/a.param')
 	H1 = lambda x: group.H(('1', str(x)), G1)
 	H2 = lambda a, b, c: group.H(('2', a, b, c), ZR)
-	lam_func = lambda i,a,b,c: a[i] * (b[i] ** c[i])
+	lam_func = lambda i,a,b,c: a[i] * (b[i] ** c[i]) # => u * (pk ** h) for all signers
+	N = 100
+	numSigners = 5
 
-	Sverifyj = []
-	uverifyi = []
-	uverifyj = []
-	pkverifyi = []
-	pkverifyj = []
-	hverifyi = []
-	hverifyj = []
+	Sb = {}
+	ua = {}
+	uab = {}
+	pka = {}
+	pkab = {}
+	ha = {}
+	hab = {}
+	dotC = {}
+	dotB = {}
+	dotA = {}
 
-	deltas = []
+	deltas = {}
 
 	for sigIndex in range(1, (numSigs+1)):
 		deltas.append(prng_bits(ZR, 80))
 
-	test
+	for b in range(0, N):
+		for arg in verifyFuncArgs:
+			if (sigNumKey in verifyArgsDict[sigIndex][arg]):
+				argSigIndexMap[arg] = int(verifyArgsDict[sigIndex][arg][sigNumKey])
+			else:
+				argSigIndexMap[arg] = sigIndex
+
+		for a in range(0, numSigners):
+			ua[a] = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'u' ]
+			Lt = self.concat( verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] )
+			num_signers = len( verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] )
+			ha[a] = [ group.init( ZR , 1 ) for i in range( num_signers ) ]
+			for i in range( num_signers ) :
+				ha[a] [ i ] = H2( verifyArgsDict[argSigIndexMap['M']]['M'][bodyKey] , Lt ,ua[a] [ i ] )
+			pka[a] = [ H1( i ) for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] ] # get all signers pub keys
+			dotA[a] = 
+
+		uab[b] = copy.deepcopy(ua)
+		pkab[b] = copy.deepcopy(pka)
+		hab[b] = copy.deepcopy(ha)
+		Sb[b] = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'S' ]
+		dotB[b] = 
+
+		Sb[b] = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'S' ]
+		dotC[b] = 
+
+

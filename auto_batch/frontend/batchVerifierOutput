@@ -20,15 +20,15 @@ Applying technique 3 => : verify := e((prod{j := 1,N} on (prod{i := 1,l} on (u_i
 
 Instances found => {'pk_i,j': {'h_i,j': 1}, 'S_j': {'delta_j': 1}} 
 
-Final batch eq: e((prod{j := 1,N} on (prod{i := 1,l} on (uverify_ij * pkverify_ij^hverify_ij))^delta_j),P) == e((prod{j := 1,N} on Sverify_j^delta_j),g2)
-Dot prod => {'start': '1', 'list': [<batchlang.BinaryNode object at 0x103a0f0d0>, <batchlang.BinaryNode object at 0x103a0f4d0>, <batchlang.BinaryNode object at 0x103a0fb50>], 'stop': 'N', 'dict': {<batchlang.BinaryNode object at 0x103a0fb50>: <batchlang.BinaryNode object at 0x103a03210>, <batchlang.BinaryNode object at 0x103a0f0d0>: <batchlang.BinaryNode object at 0x1039ca550>, <batchlang.BinaryNode object at 0x103a0f4d0>: <batchlang.BinaryNode object at 0x1039f4850>}, 'index': 'j'}
+Final batch eq: e((prod{j := 1,N} on (prod{i := 1,l} on (u_i,j * pk_i,j^h_i,j))^delta_j),P) == e((prod{j := 1,N} on S_j^delta_j),g2)
+Dot prod => {'start': '1', 'list': [<batchlang.BinaryNode object at 0x10dbb90d0>, <batchlang.BinaryNode object at 0x10dbb94d0>, <batchlang.BinaryNode object at 0x10dbb9b50>], 'stop': 'N', 'dict': {<batchlang.BinaryNode object at 0x10dbb9b50>: <batchlang.BinaryNode object at 0x10dbaf210>, <batchlang.BinaryNode object at 0x10dbb90d0>: <batchlang.BinaryNode object at 0x10db76550>, <batchlang.BinaryNode object at 0x10dbb94d0>: <batchlang.BinaryNode object at 0x10dba0850>}, 'index': 'j'}
 <====	PREP FOR CODE GEN	====>
 
 Final version => e(dotB,P) == e(dotC,g2) 
 
-Compute:  dotA := (prod{i := 1,l} on (uverify_ij * pkverify_ij^hverify_ij))
-Compute:  dotB := (prod{j := 1,N} on dotA^delta_j)
-Compute:  dotC := (prod{j := 1,N} on Sverify_j^delta_j)
+Compute:  dotA := (prod{a := 1,l} on (u_a$b * pk_a$b^h_a$b))
+Compute:  dotB := (prod{b := 1,N} on dotA^delta_b*S_b)
+Compute:  dotC := (prod{b := 1,N} on S_b^delta_b)
 Precompute: h := H(M | L | u,ZR)
 Precompute: S := sk^(h + r)
 Precompute: delta := for{j := 1, N} do prng_j
