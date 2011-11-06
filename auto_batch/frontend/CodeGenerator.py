@@ -16,6 +16,10 @@ This must all be on one line.
 
 import ast, os, sys, copy
 
+numSignaturesEndValInCode = 'N'
+numSignersEndValInCode = 'numSigners'
+numSignaturesEndVal = 'N'
+numSignersEndVal = 'l'
 pythonDictRep = 'dict'
 multipleSubscriptIndicatorChar = '$'
 finalEqLineString = 'Final version => '
@@ -57,6 +61,7 @@ deltasGroupType = 'ZR'
 batchEqRemoveVars = ['e', '(', 'j', '1', 'prod', '{', '}', 'N', ':=', '^', ',', 'on', ')', '==', '*', 'i', 'l']
 dotProdSymbol = '_'
 deltaString = 'delta'
+deltasString = 'deltas'
 deltaDotProdString = 'delta_j'
 idRepInAST = 'id'
 eltsRepInAST = 'elts'
@@ -350,6 +355,9 @@ def getLinesFromSourceCode(lines, startLine, endLine, indentationList):
 		lineCounter += 1
 
 def ensureSpacesBtwnTokens(lineOfCode):
+	if (lineOfCode == '\n'):
+		return lineOfCode
+	
 	L_index = 1
 	R_index = 1
 	withinApostrophes = False
@@ -559,10 +567,19 @@ def cleanFinalBatchEq(finalBatchEq):
 	
 	#print(finalBatchEq)
 
-def addDeltas(batchOutputString):
-	batchOutputString += "\n\tdeltas = []\n\n"
+def addDeltasAndArgSigIndexMap(batchOutputString):
+	batchOutputString += "\n\t" + deltasString + " = {}\n\n"
 	batchOutputString += "\tfor sigIndex in range(1, (numSigs+1)):\n"
-	batchOutputString += "\t\tdeltas.append(prng_bits(" + deltasGroupType + ", " + str(numBitsOfSecurity) + "))\n\n"
+	batchOutputString += "\t\t" + deltasString + ".append(prng_bits(" + deltasGroupType + ", " + str(numBitsOfSecurity) + "))\n\n"
+
+	'''
+	batchOutputString += "\t\tfor arg in verifyFuncArgs:\n"
+	batchOutputString += "\t\t\tif (sigNumKey in verifyArgsDict[sigIndex][arg]):\n"
+	batchOutputString += "\t\t\t\targSigIndexMap[arg] = int(verifyArgsDict[sigIndex][arg][sigNumKey])\n"
+	batchOutputString += "\t\t\telse:\n"
+	batchOutputString += "\t\t\t\targSigIndexMap[arg] = sigIndex\n\n"
+	'''
+		
 	return batchOutputString
 
 def addIfElse(batchOutputString, finalBatchEq):
@@ -623,9 +640,13 @@ def getIndentedBlockIndex(listOfIndentedBlocks, lineNo):
 		
 	return -1
 
-def addIndentedBlockDataToDotProdVars(indentedBlock, varsNeededForDotProds, lineNosNeededForDotProds):
+def addIndentedBlockDataToDotProdVars(indentedBlock, varsNeededForDotProds, lineNosNeededForDotProds, lastAssignLine):
 	startLineNo = indentedBlock[indentedBlockStartLineNo]
 	endLineNo = indentedBlock[indentedBlockEndLineNo]
+	
+	if ( (startLineNo - 1) > lastAssignLine):
+		return
+	
 	for lineIndex in range( (startLineNo - 1) , (endLineNo + 1)):
 		if lineIndex not in lineNosNeededForDotProds:
 			lineNosNeededForDotProds.append(lineIndex)
@@ -658,6 +679,39 @@ def getLastLineOfControlBlock(lastLine, listOfIndentedBlocks):
 		
 	return lastLine
 
+def getLinesForDotProd_OneVar(dotProdVarName, assignMap, listOfIndentedBlocks, lineNosNeededForDotProds):
+	varsNeededForDotProds = []
+	varsNeededForDotProds.append(dotProdVarName)
+
+	lastAssignLine = 0
+	
+	lineNos = list(assignMap[dotProdVarName].keys())
+	for lineNo in lineNos:
+		if (lineNo > lastAssignLine):
+			lastAssignLine = lineNo
+		for varName in assignMap[dotProdVarName][lineNo]:
+			if varName not in varsNeededForDotProds:
+				varsNeededForDotProds.append(varName)
+
+	tempVarsToAdd = []
+					
+	for varNeededForDotProds in varsNeededForDotProds:
+		if varNeededForDotProds in assignMap:
+			lineNos = list(assignMap[varNeededForDotProds].keys())
+			for lineNo in lineNos:
+				indentedBlockIndex = getIndentedBlockIndex(listOfIndentedBlocks, lineNo)
+				if (indentedBlockIndex != -1):
+					addIndentedBlockDataToDotProdVars(listOfIndentedBlocks[indentedBlockIndex], varsNeededForDotProds, lineNosNeededForDotProds, lastAssignLine)
+	
+	for varNeededForDotProds in varsNeededForDotProds:
+		if varNeededForDotProds in assignMap:
+			nextLines = list(assignMap[varNeededForDotProds].keys())
+			for nextLine in nextLines:
+				if ( (nextLine not in lineNosNeededForDotProds) and (nextLine <= lastAssignLine) ):
+					lineNosNeededForDotProds.append(nextLine)
+
+	return lineNosNeededForDotProds
+
 def getLinesForDotProds(batchEqDotProdVars, assignMap, pythonCodeLines, listOfIndentedBlocks):
 	varsNeededForDotProds = []
 	lineNosNeededForDotProds = []
@@ -666,6 +720,9 @@ def getLinesForDotProds(batchEqDotProdVars, assignMap, pythonCodeLines, listOfIn
 	#print(assignMap)
 	
 	for batchEqVarName in batchEqDotProdVars:
+		lineNosNeededForDotProds = getLinesForDotProd_OneVar(batchEqVarName, assignMap, listOfIndentedBlocks, lineNosNeededForDotProds)
+		
+	'''	
 		varsNeededForDotProds.append(batchEqVarName)
 		lineNos = list(assignMap[batchEqVarName].keys())
 		#print(lineNos)
@@ -693,6 +750,8 @@ def getLinesForDotProds(batchEqDotProdVars, assignMap, pythonCodeLines, listOfIn
 				if nextLine not in lineNosNeededForDotProds:
 					lineNosNeededForDotProds.append(nextLine)
 
+	'''
+		
 	lineNosNeededForDotProds.sort()
 	
 	lastLineAssignOfVarGroup = getLastLineAssignOfVarGroup(batchEqDotProdVars, assignMap)
@@ -886,14 +945,17 @@ def doesVarNeedList(varName, verifyFuncArgs):
 	
 	return True
 
-def addListDeclarations(batchOutputString, computeLineInfo, verifyFuncArgs):
+def addListDeclarations(batchOutputString, computeLineInfo, verifyFuncArgs, declaredLists):
 	listVars = []
+	dotProdListNames = []
 
 	#print(computeLineInfo)
 	
 	batchOutputString += "\n"
 	
 	for key in computeLineInfo:
+		if key not in dotProdListNames:
+			dotProdListNames.append(key)
 		for varIndex in range(0, len(computeLineInfo[key][computeLineVars])):
 			varName = computeLineInfo[key][computeLineVars][varIndex]
 			varNameNoSubscript = computeLineInfo[key][computeLineVarsNoSubscripts][varIndex]
@@ -909,10 +971,24 @@ def addListDeclarations(batchOutputString, computeLineInfo, verifyFuncArgs):
 		listVarSplit = listVar.split(dotProdSymbol)
 		listVarName = listVarSplit[0]
 		listVarSuffixes = listVarSplit[1]
+		suffixes = ""
 		for listVarSuffix in listVarSuffixes:
-			batchOutputString += "\t" + listVarName + listVarSuffix + " = []\n"
+			suffixes += listVarSuffix
+			batchOutputString += "\t" + listVarName + suffixes + " = {}\n"
+			declaredListEntry = listVarName + "_" + suffixes
+			if declaredListEntry not in declaredLists:
+				declaredLists.append(declaredListEntry)
+
+	for dotProdListName in dotProdListNames:
+		batchOutputString += "\t" + dotProdListName + " = {}\n"
+		if dotProdListName not in declaredLists:
+			declaredLists.append(dotProdListName) #IS THIS A PROBLEM?
 
 	#batchOutputString += "\n"
+
+	declaredLists.append(deltasString)
+
+	#print(dotProdListNames)
 
 	return batchOutputString
 
@@ -938,11 +1014,183 @@ def getOuterDotProds(batchVerifierOutput):
 
 #def addDotProdLoops(batchOutputString, computeLineInfo, outerDotProds, assignMap, pythonCodeLines, listOfIndentedBlocks):
 
+def cleanVarsForDotProds(varsForDotProds):
+	if (varsForDotProds.count(deltaString) > 0):
+		varsForDotProds.remove(deltaString)
+	
+	varsToRemove = []
+	
+	for var in varsForDotProds:
+		if ( (var.startswith(dotProdPrefix)) and (len(var) == 4) ):
+			varsToRemove.append(var)
+			
+	for var in varsToRemove:
+		varsForDotProds.remove(var)
 
-def addDotProdLoops(batchOutputString, computeLineInfo, dotProdLoopOrder, assignMap, pythonCodeLines, listOfIndentedBlocks):
-	batchOutputString += "\ttest\n"
+def getListNameFromDeclaredLists(listName):
+	if (listName.count("_") == 0):
+		return listName
+	
+	listName = listName.split("_")
+	return listName[0]
+
+def getSuffixesFromDeclaredLists(listName):
+	if (listName.count("_") == 0):
+		return None
+	
+	listName = listName.split("_")
+	return listName[1]
+
+def writeDotProdLinesToFile(batchOutputString, computeLineInfo, pythonCodeLines, linesForDotProds, baseNumTabs, numTabsBeforeVerify, verifyFuncArgs, declaredLists, indexVar, dotProdListName):
+	#print(declaredLists)
+	
+	for lineNo in linesForDotProds:
+		line = pythonCodeLines[lineNo - 1]
+		if (line.lstrip().rstrip().startswith(commentChar) == True):
+			continue
+		if (line.lstrip().rstrip() == ""):
+			continue		
+		numSpacesBeforeText = determineNumSpacesBeforeText(line)
+		numTabsBeforeText = determineNumTabs(numSpacesBeforeText)
+		extraTabsNeeded = numTabsBeforeText - numTabsBeforeVerify - 1		
+		line = ensureSpacesBtwnTokens(line)
+		
+		
+		for arg in verifyFuncArgs:
+			argWithSpaces = ' ' + arg + ' '
+			numArgMatches = line.count(argWithSpaces)
+			for countIndex in range(0, numArgMatches):				
+				indexOfCharAfterArg = line.index(argWithSpaces) + len(argWithSpaces)
+				if (indexOfCharAfterArg < len(line)):
+					charAfterArg = line[indexOfCharAfterArg]
+				else:
+					charAfterArg = ''
+				replacementString = " verifyArgsDict[argSigIndexMap[\'" + arg + "\']][\'" + arg + "\'][bodyKey]"
+				if (charAfterArg == dictBeginChar):
+					line = line.replace(argWithSpaces + '[', replacementString + '[', 1)
+				else:
+					line = line.replace(argWithSpaces, replacementString + ' ', 1)		
+					
+		for listName in declaredLists:
+			listName = getListNameFromDeclaredLists(listName)
+			listWithSpaces = ' ' + listName + ' '
+			numListMatches = line.count(listWithSpaces)
+			replacementString = listName + indexVar + "[" + indexVar + "] "
+			for countIndex in range(0, numListMatches):
+				line = line.replace(listWithSpaces, replacementString, 1)
+					
+		line = line.lstrip().rstrip()
+		line = removeLeftParanSpaces(line)		
+		line = removeSelfDump(line)
+		numTabs = baseNumTabs + extraTabsNeeded		
+		for tabNumber in range(0, numTabs):
+			batchOutputString += "\t"
+		batchOutputString += line + "\n"
+
+	for tabNumber in range(0, numTabs):
+		batchOutputString += "\t"
+		
+	batchOutputString += dotProdListName + "[" + indexVar + "] = \n"
+
+	batchOutputString += "\n"
+
+	print(computeLineInfo[dotProdListName][computeLineExp])
+		
+	return batchOutputString
+
+def addTabsToFile(file, numTabsToAdd):
+	for tab in range(0, numTabsToAdd):
+		file += "\t"
+	
+	return file
+
+def setUpVerifyFuncArgs(batchOutputString, numTabs):
+	batchOutputString = addTabsToFile(batchOutputString, numTabs)
+	batchOutputString += "for arg in verifyFuncArgs:\n"
+	batchOutputString = addTabsToFile(batchOutputString, numTabs + 1)
+	batchOutputString += "if (sigNumKey in verifyArgsDict[sigIndex][arg]):\n"
+	batchOutputString = addTabsToFile(batchOutputString, numTabs + 2)
+	batchOutputString += "argSigIndexMap[arg] = int(verifyArgsDict[sigIndex][arg][sigNumKey])\n"
+	batchOutputString = addTabsToFile(batchOutputString, numTabs + 1)
+	batchOutputString += "else:\n"
+	batchOutputString = addTabsToFile(batchOutputString, numTabs + 2)
+	batchOutputString += "argSigIndexMap[arg] = sigIndex\n\n"
+		
+	return batchOutputString
+
+def addDotProdLoopRecursive(batchOutputString, computeLineInfo, dotProdList, assignMap, pythonCodeLines, listOfIndentedBlock, numTabs, numTabsBeforeVerify, verifyFuncArgs, declaredLists, parentIndexVar):
+	for key in dotProdList:
+		dotProdRange = key
+	
+	indexVar = dotProdRange[0]
+	startVal = int(dotProdRange[1])
+	startVal = startVal - 1
+	startVal = str(startVal)
+	endVal = dotProdRange[2]
+
+	#print(numTabs + 1)
+
+	for tab in range(0, numTabs):
+		batchOutputString += "\t"
+
+	#for myNewVar in range(0, 10):
+	'''
+	for n in range(2, 10):
+		pass
+		batchOutputString += "\t"
+	'''
+
+	endValInCode = endVal
+
+	if (endVal == numSignaturesEndVal):
+		endValInCode = numSignaturesEndValInCode
+	elif (endVal == numSignersEndVal):
+		endValInCode = numSignersEndValInCode
+		
+	batchOutputString += "for " + indexVar + " in range(" + startVal + ", " + endValInCode + "):\n"
+	if (endValInCode == numSignaturesEndValInCode):
+		batchOutputString = setUpVerifyFuncArgs(batchOutputString, numTabs + 1)
+
+
+	for child in dotProdList[dotProdRange]:
+		if type(child).__name__ == pythonDictRep:
+			batchOutputString = addDotProdLoopRecursive(batchOutputString, computeLineInfo, child, assignMap, pythonCodeLines, listOfIndentedBlocks, numTabs + 1, numTabsBeforeVerify, verifyFuncArgs, declaredLists, indexVar)
+
+	#batchOutputString += "\n " + str(numTabs)
+	
+	for child in dotProdList[dotProdRange]:
+		if ( (type(child).__name__ != pythonDictRep) and (child.startswith(dotProdPrefix)) and (len(child) == 4) ):
+			#print(child)
+			varsForDotProds = computeLineInfo[child][computeLineVarsNoSubscripts]
+			#print(varsForDotProds)
+			cleanVarsForDotProds(varsForDotProds)
+			#print(varsForDotProds)
+			linesForDotProds = getLinesForDotProds(varsForDotProds, assignMap, pythonCodeLines, listOfIndentedBlocks)
+			batchOutputString = writeDotProdLinesToFile(batchOutputString, computeLineInfo, pythonCodeLines, linesForDotProds, numTabs + 1, numTabsBeforeVerify, verifyFuncArgs, declaredLists, indexVar, child)
+
+			
+			#print(linesForDotProds)
+			if (parentIndexVar != None):
+				parentAndChildIndices = indexVar + parentIndexVar
+				for declaredList in declaredLists:
+					if (parentAndChildIndices == getSuffixesFromDeclaredLists(declaredList) ):
+						for numTab in range(0, numTabs):
+							batchOutputString += "\t"
+						listNameFromDL = getListNameFromDeclaredLists(declaredList)
+						batchOutputString += listNameFromDL + parentAndChildIndices + "[" + parentIndexVar + "] = copy.deepcopy(" + listNameFromDL + indexVar + ")\n"
+
+
+	return batchOutputString
+
+def addDotProdLoops(batchOutputString, computeLineInfo, dotProdLoopOrder, assignMap, pythonCodeLines, listOfIndentedBlocks, numTabsBeforeVerify, verifyFuncArgs, declaredLists):
+	#batchOutputString += "\ttest\n"
 	
 	#print(dotProdLoopOrder)
+	
+	for outerDotProd in dotProdLoopOrder:
+		#print(outerDotProd)
+		batchOutputString = addDotProdLoopRecursive(batchOutputString, computeLineInfo, outerDotProd, assignMap, pythonCodeLines, listOfIndentedBlocks, 1, numTabsBeforeVerify, verifyFuncArgs, declaredLists, None)
+		batchOutputString += "\n"
 	
 	return batchOutputString
 
@@ -1008,9 +1256,34 @@ def getDotProdLoopOrder(computeLineInfo, outerDotProds, dotProdLoopOrder):
 
 def printList(dict):
 	for key in dict:
-		print(key)
+		if (type(key).__name__ == 'dict'):
+			print(key)
+			for child in key:
+				print(key)
+				print(key[child])
+			print("\n")
+		else:
+			print(key)
+		#print(key)
 		#print(dict[key])
 		print("\n")
+
+def addNumSigsSignersDefs(batchOutputString, pythonCodeLines):
+	foundNumSignatures = False
+	foundNumSigners = False
+	
+	for line in pythonCodeLines:
+		if (line.lstrip().startswith(numSignaturesEndValInCode + " = ") == True):
+			batchOutputString += "\t" + line.lstrip().rstrip() + "\n"
+			foundNumSignatures = True
+		elif (line.lstrip().startswith(numSignersEndValInCode + " = ") == True):
+			batchOutputString += "\t" + line.lstrip().rstrip() + "\n"
+			foundNumSigners = True
+			
+		if ( (foundNumSignatures == True) and (foundNumSigners == True) ):
+			break
+
+	return batchOutputString
 
 if __name__ == '__main__':
 	if ( (len(sys.argv) != 6) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
@@ -1097,6 +1370,8 @@ if __name__ == '__main__':
 			individualOutputString += "\t" + str(prereqLine[0]) + "\n"
 			batchOutputString += "\t" + str(prereqLine[0]) + "\n"
 
+	batchOutputString = addNumSigsSignersDefs(batchOutputString, pythonCodeLines)
+
 	indentationList = []
 
 	verifyLines = getLinesFromSourceCode(pythonCodeLines, (verifyFuncNode.lineno + 1), verifyEqNode.lineno, indentationList)
@@ -1172,7 +1447,7 @@ if __name__ == '__main__':
 	listOfIndentedBlocks = buildMapOfControlFlow(pythonCodeLines, verifyFuncNode.lineno, (verifyEqNode.lineno - 1))
 	#print(listOfIndentedBlocks)
 	
-	linesForDotProds = getLinesForDotProds(batchEqDotProdVars, assignMap, pythonCodeLines, listOfIndentedBlocks)
+	#linesForDotProds = getLinesForDotProds(batchEqDotProdVars, assignMap, pythonCodeLines, listOfIndentedBlocks)
 
 	#print(linesForDotProds)
 
@@ -1209,15 +1484,21 @@ if __name__ == '__main__':
 	
 	dotProdLoopOrder = getDotProdLoopOrder(computeLineInfo, outerDotProds, dotProdLoopOrder)
 	
-	printList(dotProdLoopOrder)
+	#printList(dotProdLoopOrder)
 
 	#print(outerDotProds)
 
-	batchOutputString = addListDeclarations(batchOutputString, computeLineInfo, verifyFuncArgs)
+	declaredLists = []
 
-	batchOutputString = addDeltas(batchOutputString)
+	batchOutputString = addListDeclarations(batchOutputString, computeLineInfo, verifyFuncArgs, declaredLists)
 	
-	batchOutputString = addDotProdLoops(batchOutputString, computeLineInfo, dotProdLoopOrder, assignMap, pythonCodeLines, listOfIndentedBlocks)
+	#print(declaredLists)
+
+	batchOutputString = addDeltasAndArgSigIndexMap(batchOutputString)
+
+	#numTabsBeforeVerify = determineNumTabsBeforeVerify()
+	
+	batchOutputString = addDotProdLoops(batchOutputString, computeLineInfo, dotProdLoopOrder, assignMap, pythonCodeLines, listOfIndentedBlocks, numTabsOnVerifyFuncLine, verifyFuncArgs, declaredLists)
 
 	#print(computeLineInfo)
 	

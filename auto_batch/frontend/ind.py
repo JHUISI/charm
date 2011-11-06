@@ -43,10 +43,10 @@ if __name__ == '__main__':
 
 	argSigIndexMap = {}
 
-	group = pairing('/Users/matt/Documents/charm/param/a.param')
+	group = pairing('../param/a.param')
 	H1 = lambda x: group.H(('1', str(x)), G1)
 	H2 = lambda a, b, c: group.H(('2', a, b, c), ZR)
-	lam_func = lambda i,a,b,c: a[i] * (b[i] ** c[i])
+	lam_func = lambda i,a,b,c: a[i] * (b[i] ** c[i]) # => u * (pk ** h) for all signers
 
 	for sigIndex in range(1, (numSigs+1)):
 		for arg in verifyFuncArgs:
@@ -54,29 +54,16 @@ if __name__ == '__main__':
 				argSigIndexMap[arg] = int(verifyArgsDict[sigIndex][arg][sigNumKey])
 			else:
 				argSigIndexMap[arg] = sigIndex
-		uverify = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'u_in_dict' ]
-		Sverify = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'S_in_dict' ]
-		verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey] = 4
-		if( 1 == 1 ) :
-			pass
-			pass
-			Sverify = 5
-			A = 4
+		u = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'u' ]
+		S = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'S' ]
 		Lt = self.concat( verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] )
-		B = uverify * Sverify * A
-		if 1 == 1:
-			d = 4
-			e = d * 28
-		hverify = [ group.init( ZR , 1 ) for i in range( num_signers )  ]
+		num_signers = len( verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] )
+		h = [ group.init( ZR , 1 ) for i in range( num_signers )  ]
 		for i in range( num_signers ) :
-			hverify [ i ] = H2( verifyArgsDict[argSigIndexMap['M']]['M'][bodyKey] , Lt , uverify [ i ]  )
-			pass
-			b = 18
-			pass
-			c = 24
-		pkverify = [ H1( i ) for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] ] # get all signers pub keys
-		result = dotprod( group.init( G1 ) , - 1 , num_signers , lam_func , uverify , pkverify , hverify )
-		if pair( result , verifyArgsDict[argSigIndexMap['mpk']]['mpk'][bodyKey][ 'Pub' ] ) == pair( Sverify , verifyArgsDict[argSigIndexMap['mpk']]['mpk'][bodyKey][ 'g' ] ) :
+			h [ i ] = H2( verifyArgsDict[argSigIndexMap['M']]['M'][bodyKey] , Lt , u [ i ]  )
+		pk = [ H1( i ) for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] ] # get all signers pub keys
+		result = dotprod( group.init( G1 ) , - 1 , num_signers , lam_func , u , pk , h )
+		if pair( result , verifyArgsDict[argSigIndexMap['mpk']]['mpk'][bodyKey][ 'Pub' ] ) == pair( S , verifyArgsDict[argSigIndexMap['mpk']]['mpk'][bodyKey][ 'g' ] ) :
 			pass
 		else:
 			print("Verification of signature " + str(sigIndex) + " failed.\n")
