@@ -6,7 +6,6 @@ from toolbox.iterate import dotprod
 
 N = 100
 numSigners = 5
-
 debug = False
 
 class CYH(PKSig):

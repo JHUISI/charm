@@ -114,6 +114,7 @@ unknownType = 'Unknown'
 otherType = 'other'
 #noneType = 'None'
 newSliceNameKey = 'NewSliceName'
+newSliceSymbol = '%'
 hashBase = 'HashBase'
 hashFunction = 'HashFunction'
 tupleKey = 'Tuple'
@@ -419,7 +420,7 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 						self.groupTypes[topLevelKey][node.lineno] = {dictRepInAST:{}}
 						for index in range(0,len(keysList)):
 							if (type(node.value.keys[index]).__name__ == strRepInAST):
-								newSliceName = topLevelKey + str(index)									
+								newSliceName = topLevelKey + newSliceSymbol + str(index)									
 								if (type(node.value.values[index]).__name__ == nameRepInAST):
 									self.groupTypes[topLevelKey][node.lineno][dictRepInAST][keysList[index].s] = {newSliceNameKey:newSliceName, valueRepInAST:node.value.values[index].id}
 									retGroupType = self.getGroupType(node.value.values[index].id)

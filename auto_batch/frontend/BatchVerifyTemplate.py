@@ -8,6 +8,9 @@ charmPickleSuffix = '.charmPickle'
 pythonPickleSuffix = '.pythonPickle'
 repeatSuffix = '.repeat'
 
+def prng_bits(group, bits=80):
+	return group.init(ZR, randomBits(bits))
+
 if __name__ == '__main__':
 	if ( (len(sys.argv) != 3) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
 		sys.exit("\nUsage:  python BatchVerifyTemplate.py [filename of pickled Python dictionary with verify function arguments] [path and filename of group param file]\n")

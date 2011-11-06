@@ -1,9 +1,10 @@
 N := 100
-l := 20
+l := 5
 
 BEGIN :: types
 r := ZR
-g2 := G2
+mpk1 := G2
+mpk0 := G2
 S := G1
 u := G1
 pk := G1
@@ -16,7 +17,7 @@ S := sk^(h + r)
 END :: precompute
 
 BEGIN :: constant
-P, g2
+mpk0, mpk1
 END :: constant
 
-verify := { e((prod{i:=1, l} on (u_i * (pk_i^h_i))) , P) == e(S, g2) }
+verify := { e((prod{i:=1, l} on (u_i * (pk_i^h_i))) , mpk0) == e(S, mpk1) }
