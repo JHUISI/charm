@@ -5,25 +5,27 @@ from charm.engine.util import *
 
 dict = {}
 dict[1] = {}
-dict[1]['pk'] = 'pk1.charmPickle'
-dict[1]['message'] = 'm1.pythonPickle'
+dict[1]['mpk'] = 'mpk1.charmPickle'
+dict[1]['L'] = 'L1.pythonPickle'
+dict[1]['M'] = 'm1.pythonPickle'
 dict[1]['sig'] = 'sig1.charmPickle'
 
 
 dict[2] = {}
-dict[2]['pk'] = 'pk2.charmPickle'
-dict[2]['message'] = 'm2.pythonPickle'
+dict[2]['mpk'] = 'mpk2.charmPickle'
+dict[2]['L'] = 'L2.pythonPickle'
+dict[2]['M'] = 'm2.pythonPickle'
 dict[2]['sig'] = 'sig2.charmPickle'
 
 
 dict[3] = {}
-dict[3]['pk'] = 'pk3.charmPickle'
-dict[3]['message'] = 'm3.pythonPickle'
+dict[3]['mpk'] = 'mpk3.charmPickle'
+dict[3]['L'] = 'L3.pythonPickle'
+dict[3]['M'] = 'm3.pythonPickle'
 dict[3]['sig'] = 'sig3.charmPickle'
 
 
-group = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
-
+group = pairing('/Users/matt/Documents/charm/param/a.param')
 
 
 dict_pickle = pickleObject( serializeDict( dict, group) )

@@ -46,11 +46,11 @@ if __name__ == '__main__':
 
 	argSigIndexMap = {}
 
-	group = pairing('../param/a.param')
+	group = pairing('/Users/matt/Documents/charm/param/a.param')
 	H1 = lambda x: group.H(('1', str(x)), G1)
 	H2 = lambda a, b, c: group.H(('2', a, b, c), ZR)
 	lam_func = lambda i,a,b,c: a[i] * (b[i] ** c[i]) # => u * (pk ** h) for all signers
-	N = 100
+	N = 3
 	numSigners = 5
 
 	Sb = {}
@@ -66,19 +66,19 @@ if __name__ == '__main__':
 	dotA = {}
 
 	for sigIndex in range(1, (numSigs+1)):
-		deltab.append(prng_bits(ZR, 80))
+		deltab[sigIndex] = prng_bits(group, 80)
 
 	dotB_runningProduct = 1
 	dotC_runningProduct = 1
-	for b in range(0, N):
+	for b in range(1, (N+1)):
 		for arg in verifyFuncArgs:
-			if (sigNumKey in verifyArgsDict[sigIndex][arg]):
-				argSigIndexMap[arg] = int(verifyArgsDict[sigIndex][arg][sigNumKey])
+			if (sigNumKey in verifyArgsDict[b][arg]):
+				argSigIndexMap[arg] = int(verifyArgsDict[b][arg][sigNumKey])
 			else:
-				argSigIndexMap[arg] = sigIndex
+				argSigIndexMap[arg] = b
 
 		dotA_runningProduct = 1
-		for a in range(0, numSigners):
+		for a in range(1, (numSigners+1)):
 			ua[a] = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'u' ]
 			Lt = ""
 			for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] :
@@ -89,7 +89,7 @@ if __name__ == '__main__':
 				ha[a] [ i ] = H2( verifyArgsDict[argSigIndexMap['M']]['M'][bodyKey] , Lt ,ua[a] [ i ] )
 			pka[a] = [ H1( i ) for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] ] # get all signers pub keys
 
-			dotA[a] =  ( ua[a]  * pka[a]  ** ha[a]  ) 
+			dotA[a] = (ua[a]) * (pka[a]) ** (ha[a])
 			dotA_runningProduct = dotA_runningProduct * dotA[a]
 
 		uab[b] = copy.deepcopy(ua)
