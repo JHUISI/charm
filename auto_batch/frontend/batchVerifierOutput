@@ -1,0 +1,39 @@
+['frontend/cyh.bv']
+types  => {'sk': 'G1', 'S': 'G1', 'r': 'ZR', 'u': 'G1', 'pk': 'G1', 'mpk0': 'G2', 'mpk1': 'G2'}
+constant  => ['mpk0', 'mpk1']
+variables => {'l': '5', 'N': '100', 'sk': 'G1', 'S': 'G1', 'r': 'ZR', 'u': 'G1', 'pk': 'G1', 'mpk0': 'G2', 'mpk1': 'G2'}
+batch algorithm => ['2', '3']
+
+VERIFY EQUATION => verify := e((prod{i := 1,l} on (u_i * pk_i^h_i)),mpk0) == e(S,mpk1)
+
+Stage A: Combined Equation => verify := (prod{j := 1,N} on e((prod{i := 1,l} on (u_i$j * pk_i$j^h_i$j)),mpk0)) == (prod{j := 1,N} on e(S_j,mpk1))
+
+Stage B: Small Exp Test => verify := (prod{j := 1,N} on e((prod{i := 1,l} on (u_i$j * pk_i$j^h_i$j)),mpk0)^delta_j) == (prod{j := 1,N} on e(S_j,mpk1)^delta_j) 
+
+Rule 2: Left := Move 'delta_j' exponent into the pairing. Left := Move 'delta_j' exponent into the pairing.  
+
+Applying technique 2 => : verify := (prod{j := 1,N} on e((prod{i := 1,l} on (u_i$j * pk_i$j^h_i$j))^delta_j,mpk0)) == (prod{j := 1,N} on e(S_j^delta_j,mpk1)) 
+
+Rule 3: common 1st (left) node appears, so can reduce n pairings to 1. common 1st (left) node appears, so can reduce n pairings to 1.  
+
+Applying technique 3 => : verify := e((prod{j := 1,N} on (prod{i := 1,l} on (u_i$j * pk_i$j^h_i$j))^delta_j),mpk0) == e((prod{j := 1,N} on S_j^delta_j),mpk1) 
+
+Instances found => {'pk_i$j': {'h_i$j': 1}, 'S_j': {'delta_j': 1}} 
+
+Final batch eq: e((prod{b := 1,N} on (prod{a := 1,l} on (u_a$b * pk_a$b^h_a$b))^delta_b),mpk%0) == e((prod{b := 1,N} on S_b^delta_b),mpk%1)
+Individual verif eq => e((prod{i := 1,l} on (u_i$j * pk_i$j^h_i$j)),mpk0) == e(S,mpk1) 
+
+Result N = 100 : 37.8034769
+Result N = 100 : 11.0495463
+Threshold:  2
+Dot prod => {'start': '1', 'list': [<batchlang.BinaryNode object at 0x102d8cc90>, <batchlang.BinaryNode object at 0x102d8cb50>, <batchlang.BinaryNode object at 0x102d8cbd0>], 'stop': 'N', 'dict': {<batchlang.BinaryNode object at 0x102d8cc90>: <batchlang.BinaryNode object at 0x102d431d0>, <batchlang.BinaryNode object at 0x102d8cb50>: <batchlang.BinaryNode object at 0x102d6f750>, <batchlang.BinaryNode object at 0x102d8cbd0>: <batchlang.BinaryNode object at 0x102d7c110>}, 'index': 'j'}
+<====	PREP FOR CODE GEN	====>
+
+Final version => e(dotB,mpk%0) == e(dotC,mpk%1) 
+
+Compute:  dotA := (prod{a := 1,l} on (u_a$b * pk_a$b^h_a$b))
+Compute:  dotB := (prod{b := 1,N} on dotA^delta_b)
+Compute:  dotC := (prod{b := 1,N} on S_b^delta_b)
+Precompute: S := sk^(h + r)
+Precompute: h := H(M | L | u,ZR)
+Precompute: delta := for{j := 1, N} do prng_j
