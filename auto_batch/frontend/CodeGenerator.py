@@ -1225,6 +1225,11 @@ def addResetStatementsForDotProdCalcs(batchOutputString, dotProdList, numTabs):
 
 def writeNumSignersLoop(batchOutputString, numTabs, numTabsBeforeVerify, verifyFuncArgs, declaredLists, pythonCodeLines, listOfIndentedBlocks, indexVar, parentIndexVar, startVal, endVal, dotProdName, computeLineInfo, assignMap):
 	listNamesToReplacementStrings = {}
+
+	for tabNumber in range(0, numTabs):
+		batchOutputString += "\t"
+		
+	batchOutputString += dotProdName + "[" + parentIndexVar + "] = {}\n"
 	
 	varsForDotProds = computeLineInfo[dotProdName][computeLineVarsNoSubscripts]			
 	cleanVarsForDotProds(varsForDotProds)			
@@ -1241,12 +1246,12 @@ def writeNumSignersLoop(batchOutputString, numTabs, numTabsBeforeVerify, verifyF
 	for tabNumber in range(0, (numTabs+1)):
 		batchOutputString += "\t"
 			
-	batchOutputString += dotProdName + "[" + indexVar + "] = " + dotProdCalcString + "\n"
+	batchOutputString += dotProdName + "[" + parentIndexVar + "][" + indexVar + "] = " + dotProdCalcString + "\n"
 		
 	for tabNumber in range(0, (numTabs+1)):
 		batchOutputString += "\t"
 		
-	batchOutputString += dotProdName + "_runningProduct = " + dotProdName + "_runningProduct * " + dotProdName + "[" + indexVar + "]\n"
+	batchOutputString += dotProdName + "_runningProduct = " + dotProdName + "_runningProduct * " + dotProdName + "[" + parentIndexVar + "][" + indexVar + "]\n"
 		
 	batchOutputString += "\n"		
 	
@@ -1408,21 +1413,32 @@ def addNumSigsSignersDefs(batchOutputString, pythonCodeLines):
 
 	return batchOutputString
 
-def addEqualityTestFromFinalBatchEq(batchOutputString, finalBatchEq):
+def addEqualityTestFromFinalBatchEq(verifySigsOutput, finalBatchEq, outerDotProds):
+
+	outerDotProdString = ""
+	
+	for outerDotProd in outerDotProds:
+		outerDotProdString += outerDotProd + ", "
 
 	finalBatchEq = finalBatchEq.lstrip().rstrip()
 
-	batchOutputString += "\tif " + finalBatchEq + ":\n"
-	batchOutputString += "\t\tpass\n"
-	batchOutputString += "\telse:\n"
-	batchOutputString += "\t\tprint(\"Batch verification has failed.\\n\")"
+	verifySigsOutput += "\tif " + finalBatchEq + ":\n"
+	verifySigsOutput += "\t\treturn\n"
+	verifySigsOutput += "\telse:\n"
+	verifySigsOutput += "\t\tmidWay = int( (endIndex - startIndex) / 2)\n"
+	verifySigsOutput += "\t\tif (midWay == 0):\n"
+	verifySigsOutput += "\t\t\tprint(\"sig \" + str(startIndex) + \" failed\\n\")\n"
+	verifySigsOutput += "\t\t\treturn\n"
+	verifySigsOutput += "\t\tmidIndex = startIndex + midWay\n"
+	verifySigsOutput += "\t\tverifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, " + outerDotProdString + "startIndex, midIndex)\n"
+	verifySigsOutput += "\t\tverifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, " + outerDotProdString + "midIndex, endIndex)\n"
 
 	#print(finalBatchEq)
 	'''
 	print(batchEqVars)
 	print(batchEqDotProdVars)
 	'''
-	return batchOutputString
+	return verifySigsOutput
 
 def getSimplifiedFinalBatchEq(batchVerifierOutput, pythonCodeNode, verifyFuncArgs):
 	for line in batchVerifierOutput:
@@ -1496,6 +1512,17 @@ def addLinesForNonDotProdVars(batchOutputString, batchEqNotDotProdVars, assignMa
 	batchOutputString = writeDotProdLinesToFile(batchOutputString, computeLineInfo, pythonCodeLines, lineNos, 0, 0, verifyFuncArgs, [], None, None)
 	
 	return batchOutputString
+
+def addCallToVerifySigs(batchOutputString, outerDotProds):
+	
+	batchOutputString += "\tverifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, "
+	for outerDotProd in outerDotProds:
+		batchOutputString += outerDotProd + ", "
+
+	batchOutputString += "0, N)\n"
+	
+	return batchOutputString
+
 
 if __name__ == '__main__':
 	if ( (len(sys.argv) != 6) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
@@ -1658,26 +1685,54 @@ if __name__ == '__main__':
 	batchOutputString = addListDeclarations(batchOutputString, computeLineInfo, verifyFuncArgs, declaredLists)
 	batchOutputString = addDeltasAndArgSigIndexMap(batchOutputString, declaredLists)	
 	batchOutputString = addDotProdLoops(batchOutputString, computeLineInfo, dotProdLoopOrder, assignMap, pythonCodeLines, listOfIndentedBlocks, numTabsOnVerifyFuncLine, verifyFuncArgs, declaredLists)
+	batchOutputString = addCallToVerifySigs(batchOutputString, outerDotProds)
 
-	batchOutputString = resetArgSigIndexDictTo1s(batchOutputString)
-
-	batchOutputString = addLinesForNonDotProdVars(batchOutputString, batchEqNotDotProdVars, assignMap, pythonCodeLines, listOfIndentedBlocks, computeLineInfo, numTabsOnVerifyFuncLine, verifyFuncArgs)
-
-	#GetKeysOfDictAssign
+	verifySigsFile = open('/Users/matt/Documents/charm/auto_batch/frontend/verifySigs.py', 'w')
+	verifySigsOutput = ""
 	
-	simplifiedFinalBatchEq = getSimplifiedFinalBatchEq(batchVerifierOutput, pythonCodeNode, verifyFuncArgs)
 
-	#print(simplifiedFinalBatchEq)
+	for importFromLine in importFromLines:			
+		verifySigsOutput += importFromLine + "\n"
+		
+	verifySigsOutput += "import sys, copy\n"
+	verifySigsOutput += "from charm.engine.util import *\n"
+	verifySigsOutput += "from toolbox.pairinggroup import *\n\n"
+	verifySigsOutput += "def verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, "
 	
-	#batchVerifyEqVars
+	for outerDotProd in outerDotProds:
+		verifySigsOutput += outerDotProd + ", "
+
+	verifySigsOutput += "startIndex, endIndex):\n"
+
+
+	verifySigsOutput = resetArgSigIndexDictTo1s(verifySigsOutput)
+	verifySigsOutput = addLinesForNonDotProdVars(verifySigsOutput, batchEqNotDotProdVars, assignMap, pythonCodeLines, listOfIndentedBlocks, computeLineInfo, numTabsOnVerifyFuncLine, verifyFuncArgs)	
 	
-	batchOutputString = addEqualityTestFromFinalBatchEq(batchOutputString, simplifiedFinalBatchEq)
+	for outerDotProd in outerDotProds:
+		verifySigsOutput += "\t" + outerDotProd + "_runningProduct = 1\n"
+
+	verifySigsOutput += "\n"
+
+	verifySigsOutput += "\tfor index in range(startIndex, endIndex):\n"
+	
+	for outerDotProd in outerDotProds:
+		verifySigsOutput += "\t\t" + outerDotProd + "_runningProduct = " + outerDotProd + "_runningProduct * " + outerDotProd + "[index]\n"
+
+	verifySigsOutput += "\n"
+	
+	simplifiedFinalBatchEq = getSimplifiedFinalBatchEq(batchVerifierOutput, pythonCodeNode, verifyFuncArgs)	
+	verifySigsOutput = addEqualityTestFromFinalBatchEq(verifySigsOutput, simplifiedFinalBatchEq, outerDotProds)
+
+
+
 
 	individualVerFile.write(individualOutputString)
 	batchVerFile.write(batchOutputString)
-
 	individualVerFile.close()
 	batchVerFile.close()
+
+	verifySigsFile.write(verifySigsOutput)
+	verifySigsFile.close()
 
 	#os.system("python " + individualVerArg)
 	#os.system("python " + batchVerArg)

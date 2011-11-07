@@ -1,6 +1,8 @@
 from charm.pairing import *
 from toolbox.PKSig import PKSig
 from toolbox.iterate import dotprod
+from toolbox.pairinggroup import *
+from charm.engine.util import *
 import sys, copy
 from charm.engine.util import *
 from toolbox.pairinggroup import *
@@ -13,6 +15,20 @@ repeatSuffix = '.repeat'
 
 def prng_bits(group, bits=80):
 	return group.init(ZR, randomBits(bits))
+
+def verifySigs(dotB, dotC, startIndex, endIndex, verifyArgsDict):
+	dotB_runningProduct = 1
+	dotC_runningProduct = 1
+	
+	for i in range(startIndex, endIndex):
+		dotB_runningProduct = dotB_runningProduct * dotB[i]
+		dotC_runningProduct = dotC_runningProduct * dotC[i]
+
+	if pair ( dotB_runningProduct ,  verifyArgsDict[0]['mpk'][bodyKey]['Pub'] ) != pair ( dotC_runningProduct ,  verifyArgsDict[0]['mpk'][bodyKey]['g'] ):
+		print("failed in range" + startIndex + " to " + endIndex + "\n")
+		midIndex = int( (endIndex - startIndex) / 2)
+		verifySigs(dotB, dotC, startIndex, midIndex, verifyArgsDict)
+		verifySigs(dotB, dotC, midIndex, endIndex, verifyArgsDict)
 
 if __name__ == '__main__':
 	if ( (len(sys.argv) != 3) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
@@ -51,16 +67,13 @@ if __name__ == '__main__':
 	H2 = lambda a, b, c: group.H(('2', a, b, c), ZR)
 	lam_func = lambda i,a,b,c: a[i] * (b[i] ** c[i]) # => u * (pk ** h) for all signers
 	N = 3
-	numSigners = 5
+	l = 5
 
 	Sb = {}
 	deltab = {}
-	ua = {}
-	uab = {}
-	pka = {}
-	pkab = {}
-	ha = {}
-	hab = {}
+	ub = {}
+	pkb = {}
+	hb = {}
 	dotC = {}
 	dotB = {}
 	dotA = {}
@@ -78,23 +91,21 @@ if __name__ == '__main__':
 				argSigIndexMap[arg] = b
 
 		dotA_runningProduct = 1
-		for a in range(1, (numSigners+1)):
-			ua[a] = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'u' ]
-			Lt = ""
-			for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] :
-				Lt = Lt + ":" + i
-			num_signers = len( verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] )
-			ha[a] = [ group.init( ZR , 1 ) for i in range( num_signers ) ]
-			for i in range( num_signers ) :
-				ha[a] [ i ] = H2( verifyArgsDict[argSigIndexMap['M']]['M'][bodyKey] , Lt ,ua[a] [ i ] )
-			pka[a] = [ H1( i ) for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] ] # get all signers pub keys
+		dotA[b] = {}
+		ub[b] = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'u' ]
+		Lt = ""
+		for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] :
+			Lt = Lt + ":" + i
+		num_signers = len( verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] )
+		hb[b] = [ group.init( ZR , 1 ) for i in range( num_signers ) ]
+		for i in range( num_signers ) :
+			hb[b] [ i ] = H2( verifyArgsDict[argSigIndexMap['M']]['M'][bodyKey] , Lt ,ub[b] [ i ] )
+		pkb[b] = [ H1( i ) for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] ] # get all signers pub keys
 
-			dotA[a] = (ua[a]) * (pka[a]) ** (ha[a])
-			dotA_runningProduct = dotA_runningProduct * dotA[a]
 
-		uab[b] = copy.deepcopy(ua)
-		pkab[b] = copy.deepcopy(pka)
-		hab[b] = copy.deepcopy(ha)
+		for a in range(0, l):
+			dotA[b][a] =  ( ub[b] [a] * pkb[b] [a] ** hb[b] [a] ) 
+			dotA_runningProduct = dotA_runningProduct * dotA[b][a]
 
 
 		dotB[b] =  dotA_runningProduct ** deltab[b]  
@@ -107,9 +118,6 @@ if __name__ == '__main__':
 
 
 	for arg in verifyFuncArgs:
-		argSigIndexMap[arg] = 1
-
-	if pair ( dotB_runningProduct ,  verifyArgsDict[argSigIndexMap['mpk']]['mpk'][bodyKey]['Pub'] ) == pair ( dotC_runningProduct ,  verifyArgsDict[argSigIndexMap['mpk']]['mpk'][bodyKey]['g'] ):
-		pass
-	else:
-		print("Batch verification has failed.\n")
+		argSigIndexMap[arg] = 0
+		
+	verifySigs(dotB, dotC, 0, N, verifyArgsDict)

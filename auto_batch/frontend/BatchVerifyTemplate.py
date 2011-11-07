@@ -1,6 +1,7 @@
 import sys, copy
 from charm.engine.util import *
 from toolbox.pairinggroup import *
+from verifySigs import verifySigsRecursive
 
 sigNumKey = 'Signature_Number'
 bodyKey = 'Body'

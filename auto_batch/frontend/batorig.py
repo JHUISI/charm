@@ -6,7 +6,6 @@ from charm.engine.util import *
 import sys, copy
 from charm.engine.util import *
 from toolbox.pairinggroup import *
-from verifySigs import verifySigsRecursive
 
 sigNumKey = 'Signature_Number'
 bodyKey = 'Body'
@@ -16,6 +15,28 @@ repeatSuffix = '.repeat'
 
 def prng_bits(group, bits=80):
 	return group.init(ZR, randomBits(bits))
+
+def verifySigs(dotB, dotC, startIndex, endIndex, verifyArgsDict):
+	dotB_runningProduct = 1
+	dotC_runningProduct = 1
+	
+	for i in range(startIndex, endIndex):
+		dotB_runningProduct = dotB_runningProduct * dotB[i]
+		dotC_runningProduct = dotC_runningProduct * dotC[i]
+
+	if pair ( dotB_runningProduct ,  verifyArgsDict[0]['mpk'][bodyKey]['Pub'] ) == pair ( dotC_runningProduct ,  verifyArgsDict[0]['mpk'][bodyKey]['g'] ):
+		return
+	else:
+		#print("failed in range" + str(startIndex) + " to " + str(endIndex - 1) + "\n")
+		#if (startIndex == endIndex):
+			#return
+		midWay = int( (endIndex - startIndex) / 2)
+		if (midWay == 0):
+			print("sig " + str(startIndex) + " failed\n")
+			return
+		midIndex = startIndex + midWay
+		verifySigs(dotB, dotC, startIndex, midIndex, verifyArgsDict)
+		verifySigs(dotB, dotC, midIndex, endIndex, verifyArgsDict)
 
 if __name__ == '__main__':
 	if ( (len(sys.argv) != 3) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
@@ -104,4 +125,7 @@ if __name__ == '__main__':
 		dotC_runningProduct = dotC_runningProduct * dotC[b]
 
 
-	verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotB, dotC, 0, N)
+	for arg in verifyFuncArgs:
+		argSigIndexMap[arg] = 0
+		
+	verifySigs(dotB, dotC, 0, N, verifyArgsDict)
