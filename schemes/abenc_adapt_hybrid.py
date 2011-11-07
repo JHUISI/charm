@@ -3,6 +3,7 @@ from charm.cryptobase import MODE_CBC,AES,selectPRP
 from toolbox.ABEnc import ABEnc
 from schemes.abenc_bsw07 import CPabe_BSW07
 from toolbox.pairinggroup import PairingGroup,GT
+from AuthenticatedCryptoAbstraction import AuthenticatedCryptoAbstraction
 from charm.pairing import hash as sha1
 from toolbox.conversion import *
 from math import ceil
@@ -38,16 +39,15 @@ class HybridABEnc(ABEnc):
         key = self.group.random(GT)
         c1 = abenc.encrypt(pk, key, object)
         # instantiate a symmetric enc scheme from this key
-        cipher = self.instantiateCipher(MODE_CBC, key)        
-        c2 = cipher.encrypt(self.__pad(M))
+        cipher = AuthenticatedCryptoAbstraction(sha1(key))
+        c2 = cipher.encrypt(M)
         return { 'c1':c1, 'c2':c2 }
     
     def decrypt(self, pk, sk, ct):
         c1, c2 = ct['c1'], ct['c2']
         key = abenc.decrypt(pk, sk, c1)
-        cipher = self.instantiateCipher(MODE_CBC, key)
-        msg = cipher.decrypt(c2)
-        return Conversion.bytes2str(msg).strip('\x00')
+        cipher = AuthenticatedCryptoAbstraction(sha1(key))
+        return cipher.decrypt(c2)
     
     def instantiateCipher(self, mode, message):
         self.alg, self.key_len = AES, 16
