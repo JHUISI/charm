@@ -39,7 +39,9 @@ class CYH(PKSig):
     def sign(self, sk, L, M):
         (IDs, IDpk, IDsk) = sk
         assert IDs in L, "signer should be an element in L"
-        Lt = self.concat(L) 
+        Lt = ""
+        for i in L:
+            Lt += ":"+i 
         num_signers = len(L)
  
         u = [group.init(G1) for i in range(num_signers)]
@@ -62,7 +64,9 @@ class CYH(PKSig):
     def verify(self, mpk, L, M, sig):
         u = sig['u'] 
         S = sig['S']
-        Lt = self.concat(L) 
+        Lt = ""
+        for i in L:
+            Lt = Lt + ":"+i
         num_signers = len(L)
         h = [group.init(ZR, 1) for i in range(num_signers)]
         for i in range(num_signers):

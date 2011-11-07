@@ -415,7 +415,7 @@ def ensureSpacesBtwnTokens(lineOfCode):
 
 	while (True):
 		checkForSpace = False
-		if (lineOfCode[R_index] == '\''):
+		if ( (lineOfCode[R_index] == '\'') or (lineOfCode[R_index] == '\"') ):
 			if (withinApostrophes == True):
 				withinApostrophes = False
 			else:
@@ -1056,9 +1056,9 @@ def getSuffixesFromDeclaredLists(listName):
 	listName = listName.split("_")
 	return listName[1]
 
-def getDotProdCalcString(expression, listNamesToReplacementStrings):
-	if (listNamesToReplacementStrings == {}):
-		return ""
+def getDotProdCalcString(expression, listNamesToReplacementStrings, indexVar):
+	#if (listNamesToReplacementStrings == {}):
+		#return ""
 
 	expression = ensureSpacesBtwnTokens(expression)
 	expressionSplit = expression.split()
@@ -1067,7 +1067,13 @@ def getDotProdCalcString(expression, listNamesToReplacementStrings):
 		if (token.count("_") == 1):
 			tokenSplit = token.split("_")
 			listName = tokenSplit[0]
-			replacementString = listNamesToReplacementStrings[listName]
+			if listName in listNamesToReplacementStrings:
+				replacementString = listNamesToReplacementStrings[listName]
+			elif (listName == deltaString):
+				replacementString = listName + indexVar + "[" + indexVar + "] "
+			else:
+				continue
+			
 			expression = expression.replace(token, replacementString)
 			#print(replacementString)
 			#print(listNamesToReplacementStrings)
@@ -1084,6 +1090,8 @@ def getDotProdCalcString(expression, listNamesToReplacementStrings):
 
 def writeDotProdLinesToFile(batchOutputString, computeLineInfo, pythonCodeLines, linesForDotProds, baseNumTabs, numTabsBeforeVerify, verifyFuncArgs, declaredLists, indexVar, dotProdListName):
 	#print(declaredLists)
+
+	numTabs = -1
 	
 	listNamesToReplacementStrings = {}
 	
@@ -1141,9 +1149,11 @@ def writeDotProdLinesToFile(batchOutputString, computeLineInfo, pythonCodeLines,
 		batchOutputString += "\n"
 		return batchOutputString
 
-	dotProdCalcString = getDotProdCalcString(computeLineInfo[dotProdListName][computeLineExp], listNamesToReplacementStrings)
+	dotProdCalcString = getDotProdCalcString(computeLineInfo[dotProdListName][computeLineExp], listNamesToReplacementStrings, indexVar)
 
 	if (dotProdCalcString != ""):
+		if (numTabs == -1):
+			numTabs = baseNumTabs
 		for tabNumber in range(0, numTabs):
 			batchOutputString += "\t"
 		batchOutputString += dotProdListName + "[" + indexVar + "] = " + dotProdCalcString + "\n"
