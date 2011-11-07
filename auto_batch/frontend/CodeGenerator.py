@@ -981,13 +981,18 @@ def addListDeclarations(batchOutputString, computeLineInfo, verifyFuncArgs, decl
 		listVarSplit = listVar.split(dotProdSymbol)
 		listVarName = listVarSplit[0]
 		listVarSuffixes = listVarSplit[1]
-		suffixes = ""
-		for listVarSuffix in listVarSuffixes:
-			suffixes += listVarSuffix
-			batchOutputString += "\t" + listVarName + suffixes + " = {}\n"
-			declaredListEntry = listVarName + "_" + suffixes
-			if declaredListEntry not in declaredLists:
-				declaredLists.append(declaredListEntry)
+		
+		lenOfSuffixes = len(listVarSuffixes)
+		suffix = listVarSuffixes[lenOfSuffixes - 1]
+		
+		#suffixes = ""
+		#for listVarSuffix in listVarSuffixes:
+			#suffixes += listVarSuffix
+			
+		batchOutputString += "\t" + listVarName + suffix + " = {}\n"
+		declaredListEntry = listVarName + "_" + suffix
+		if declaredListEntry not in declaredLists:
+			declaredLists.append(declaredListEntry)
 
 	for dotProdListName in dotProdListNames:
 		batchOutputString += "\t" + dotProdListName + " = {}\n"

@@ -57,12 +57,9 @@ if __name__ == '__main__':
 
 	Sb = {}
 	deltab = {}
-	ua = {}
-	uab = {}
-	pka = {}
-	pkab = {}
-	ha = {}
-	hab = {}
+	ub = {}
+	pkb = {}
+	hb = {}
 	dotC = {}
 	dotB = {}
 	dotA = {}
