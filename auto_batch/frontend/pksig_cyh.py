@@ -5,7 +5,7 @@ from toolbox.pairinggroup import *
 from charm.engine.util import *
 
 N = 3
-numSigners = 5
+l = 5
 debug = False
 
 class CYH(PKSig):

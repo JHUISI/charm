@@ -1,6 +1,8 @@
 from charm.pairing import *
 from toolbox.PKSig import PKSig
 from toolbox.iterate import dotprod
+from toolbox.pairinggroup import *
+from charm.engine.util import *
 import sys
 from charm.engine.util import *
 from toolbox.pairinggroup import *
@@ -23,7 +25,7 @@ if __name__ == '__main__':
 	lenRepeatSuffix = len(repeatSuffix)
 	verifyFuncArgs = list(verifyParamFilesDict[1].keys())
 
-	for sigIndex in range(1, (numSigs+1)):
+	for sigIndex in range(0, numSigs):
 		verifyArgsDict[sigIndex] = {}
 		for arg in verifyFuncArgs:
 			verifyArgsDict[sigIndex][arg] = {}
@@ -43,12 +45,12 @@ if __name__ == '__main__':
 
 	argSigIndexMap = {}
 
-	group = pairing('../param/a.param')
+	group = pairing('/Users/matt/Documents/charm/param/a.param')
 	H1 = lambda x: group.H(('1', str(x)), G1)
 	H2 = lambda a, b, c: group.H(('2', a, b, c), ZR)
 	lam_func = lambda i,a,b,c: a[i] * (b[i] ** c[i]) # => u * (pk ** h) for all signers
 
-	for sigIndex in range(1, (numSigs+1)):
+	for sigIndex in range(0, numSigs):
 		for arg in verifyFuncArgs:
 			if (sigNumKey in verifyArgsDict[sigIndex][arg]):
 				argSigIndexMap[arg] = int(verifyArgsDict[sigIndex][arg][sigNumKey])

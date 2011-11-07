@@ -20,7 +20,7 @@ newSliceSymbol = '%'
 valueRep = 'Value'
 typeRep = 'Type'
 numSignaturesEndValInCode = 'N'
-numSignersEndValInCode = 'l'
+numSignersEndValInCode = 'numSigners'
 numSignaturesEndVal = 'N'
 numSignersEndVal = 'l'
 pythonDictRep = 'dict'
@@ -1056,30 +1056,10 @@ def getSuffixesFromDeclaredLists(listName):
 	listName = listName.split("_")
 	return listName[1]
 
-def getDotProdCalcStringForNumSigners(expression, listNamesToReplacementStrings, indexVar):
-	expression = ensureSpacesBtwnTokens(expression)
-	expressionSplit = expression.split()
-	
-	for token in expressionSplit:
-		if (token.count("_") == 1):
-			tokenSplit = token.split("_")
-			listName = tokenSplit[0]
-			if listName in listNamesToReplacementStrings:
-				replacementString = listNamesToReplacementStrings[listName] + "[" + indexVar + "]"
-			elif (listName == deltaString):
-				replacementString = listName + indexVar + "[" + indexVar + "] "
-			else:
-				continue
-			
-			expression = expression.replace(token, replacementString)			
-		elif ( (token.startswith(dotProdPrefix)) and (len(token) == 4) ):
-			replacementStringForRunningProd = token + "_runningProduct"
-			expression = expression.replace(token, replacementStringForRunningProd)
-
-	expression = expression.replace(" ^ ", " ** ")	
-	return expression
-
 def getDotProdCalcString(expression, listNamesToReplacementStrings, indexVar):
+	#if (listNamesToReplacementStrings == {}):
+		#return ""
+
 	expression = ensureSpacesBtwnTokens(expression)
 	expressionSplit = expression.split()
 	
@@ -1094,15 +1074,21 @@ def getDotProdCalcString(expression, listNamesToReplacementStrings, indexVar):
 			else:
 				continue
 			
-			expression = expression.replace(token, replacementString)			
+			expression = expression.replace(token, replacementString)
+			#print(replacementString)
+			#print(listNamesToReplacementStrings)
 		elif ( (token.startswith(dotProdPrefix)) and (len(token) == 4) ):
 			replacementStringForRunningProd = token + "_runningProduct"
 			expression = expression.replace(token, replacementStringForRunningProd)
-
-	expression = expression.replace(" ^ ", " ** ")	
+	
+	#print(expression)
+	
+	expression = expression.replace(" ^ ", " ** ")
+	
 	return expression
 
-def writeDotProdLinesToFile(batchOutputString, computeLineInfo, pythonCodeLines, linesForDotProds, baseNumTabs, numTabsBeforeVerify, verifyFuncArgs, declaredLists, indexVar, dotProdListName, listToReplacementCopy=None):
+
+def writeDotProdLinesToFile(batchOutputString, computeLineInfo, pythonCodeLines, linesForDotProds, baseNumTabs, numTabsBeforeVerify, verifyFuncArgs, declaredLists, indexVar, dotProdListName):
 	#print(declaredLists)
 
 	numTabs = -1
@@ -1159,10 +1145,6 @@ def writeDotProdLinesToFile(batchOutputString, computeLineInfo, pythonCodeLines,
 
 	batchOutputString += "\n"
 
-	if (listToReplacementCopy != None):
-		for listToRepKey in listNamesToReplacementStrings:
-			listToReplacementCopy[listToRepKey] = listNamesToReplacementStrings[listToRepKey] 
-
 	if (dotProdListName == None):
 		batchOutputString += "\n"
 		return batchOutputString
@@ -1218,35 +1200,6 @@ def addResetStatementsForDotProdCalcs(batchOutputString, dotProdList, numTabs):
 	
 	return batchOutputString
 
-def writeNumSignersLoop(batchOutputString, numTabs, numTabsBeforeVerify, verifyFuncArgs, declaredLists, pythonCodeLines, listOfIndentedBlocks, indexVar, parentIndexVar, startVal, endVal, dotProdName, computeLineInfo, assignMap):
-	listNamesToReplacementStrings = {}
-	
-	varsForDotProds = computeLineInfo[dotProdName][computeLineVarsNoSubscripts]			
-	cleanVarsForDotProds(varsForDotProds)			
-	linesForDotProds = getLinesForDotProds(varsForDotProds, assignMap, pythonCodeLines, listOfIndentedBlocks)
-	batchOutputString = writeDotProdLinesToFile(batchOutputString, computeLineInfo, pythonCodeLines, linesForDotProds, numTabs, numTabsBeforeVerify, verifyFuncArgs, declaredLists, parentIndexVar, None, listNamesToReplacementStrings)
-
-	dotProdCalcString = getDotProdCalcStringForNumSigners(computeLineInfo[dotProdName][computeLineExp], listNamesToReplacementStrings, indexVar)
-
-	for tabNumber in range(0, numTabs):
-		batchOutputString += "\t"
-
-	batchOutputString += "for " + indexVar + " in range(0, " + endVal + "):\n"
-
-	for tabNumber in range(0, (numTabs+1)):
-		batchOutputString += "\t"
-			
-	batchOutputString += dotProdName + "[" + indexVar + "] = " + dotProdCalcString + "\n"
-		
-	for tabNumber in range(0, (numTabs+1)):
-		batchOutputString += "\t"
-		
-	batchOutputString += dotProdName + "_runningProduct = " + dotProdName + "_runningProduct * " + dotProdName + "[" + indexVar + "]\n"
-		
-	batchOutputString += "\n"		
-	
-	return batchOutputString
-
 def addDotProdLoopRecursive(batchOutputString, computeLineInfo, dotProdList, assignMap, pythonCodeLines, listOfIndentedBlock, numTabs, numTabsBeforeVerify, verifyFuncArgs, declaredLists, parentIndexVar):
 	for key in dotProdList:
 		dotProdRange = key
@@ -1267,8 +1220,6 @@ def addDotProdLoopRecursive(batchOutputString, computeLineInfo, dotProdList, ass
 		endValInCode = numSignaturesEndValInCode
 	elif (endVal == numSignersEndVal):
 		endValInCode = numSignersEndValInCode
-		batchOutputString = writeNumSignersLoop(batchOutputString, numTabs, numTabsBeforeVerify, verifyFuncArgs, declaredLists, pythonCodeLines, listOfIndentedBlocks, indexVar, parentIndexVar, startVal, endVal, dotProdList[dotProdRange][0], computeLineInfo, assignMap)
-		return batchOutputString
 
 	for tab in range(0, numTabs):
 		batchOutputString += "\t"

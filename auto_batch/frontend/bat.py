@@ -1,6 +1,8 @@
 from charm.pairing import *
 from toolbox.PKSig import PKSig
 from toolbox.iterate import dotprod
+from toolbox.pairinggroup import *
+from charm.engine.util import *
 import sys, copy
 from charm.engine.util import *
 from toolbox.pairinggroup import *
@@ -51,7 +53,7 @@ if __name__ == '__main__':
 	H2 = lambda a, b, c: group.H(('2', a, b, c), ZR)
 	lam_func = lambda i,a,b,c: a[i] * (b[i] ** c[i]) # => u * (pk ** h) for all signers
 	N = 3
-	numSigners = 5
+	l = 5
 
 	Sb = {}
 	deltab = {}
@@ -78,21 +80,23 @@ if __name__ == '__main__':
 				argSigIndexMap[arg] = b
 
 		dotA_runningProduct = 1
-		ua = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'u' ]
+		ub[b] = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'u' ]
 		Lt = ""
 		for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] :
 			Lt = Lt + ":" + i
 		num_signers = len( verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] )
-		ha = [ group.init( ZR , 1 ) for i in range( num_signers ) ]
+		hb[b] = [ group.init( ZR , 1 ) for i in range( num_signers ) ]
 		for i in range( num_signers ) :
-			ha [ i ] = H2( verifyArgsDict[argSigIndexMap['M']]['M'][bodyKey] , Lt ,ua [ i ] )
-		pka = [ H1( i ) for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] ]
+			hb[b] [ i ] = H2( verifyArgsDict[argSigIndexMap['M']]['M'][bodyKey] , Lt ,ub[b] [ i ] )
+		pkb[b] = [ H1( i ) for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] ] # get all signers pub keys
 
-		for a in range(0, numSigners):
-			dotA = ua[a] * pka[a] ** ha[a]
-			dotA_runningProduct = dotA_runningProduct * dotA
 
-		dotB[b] = dotA_runningProduct ** deltab[b]  
+		for a in range(0, l):
+			dotA[a] =  ( ub[b] [a] * pkb[b] [a] ** hb[b] [a] ) 
+			dotA_runningProduct = dotA_runningProduct * dotA[a]
+
+
+		dotB[b] =  dotA_runningProduct ** deltab[b]  
 		dotB_runningProduct = dotB_runningProduct * dotB[b]
 
 		Sb[b] = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'S' ]

@@ -23,7 +23,7 @@ if __name__ == '__main__':
 	lenRepeatSuffix = len(repeatSuffix)
 	verifyFuncArgs = list(verifyParamFilesDict[1].keys())
 
-	for sigIndex in range(1, (numSigs+1)):
+	for sigIndex in range(0, numSigs):
 		verifyArgsDict[sigIndex] = {}
 		for arg in verifyFuncArgs:
 			verifyArgsDict[sigIndex][arg] = {}
