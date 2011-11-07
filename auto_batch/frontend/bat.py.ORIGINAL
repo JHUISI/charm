@@ -78,21 +78,26 @@ if __name__ == '__main__':
 				argSigIndexMap[arg] = b
 
 		dotA_runningProduct = 1
-		ua = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'u' ]
-		Lt = ""
-		for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] :
-			Lt = Lt + ":" + i
-		num_signers = len( verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] )
-		ha = [ group.init( ZR , 1 ) for i in range( num_signers ) ]
-		for i in range( num_signers ) :
-			ha [ i ] = H2( verifyArgsDict[argSigIndexMap['M']]['M'][bodyKey] , Lt ,ua [ i ] )
-		pka = [ H1( i ) for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] ]
+		for a in range(1, (numSigners+1)):
+			ua[a] = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'u' ]
+			Lt = ""
+			for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] :
+				Lt = Lt + ":" + i
+			num_signers = len( verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] )
+			ha[a] = [ group.init( ZR , 1 ) for i in range( num_signers ) ]
+			for i in range( num_signers ) :
+				ha[a] [ i ] = H2( verifyArgsDict[argSigIndexMap['M']]['M'][bodyKey] , Lt ,ua[a] [ i ] )
+			pka[a] = [ H1( i ) for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] ] # get all signers pub keys
 
-		for a in range(0, numSigners):
-			dotA = ua[a] * pka[a] ** ha[a]
-			dotA_runningProduct = dotA_runningProduct * dotA
+			dotA[a] = (ua[a]) * (pka[a]) ** (ha[a])
+			dotA_runningProduct = dotA_runningProduct * dotA[a]
 
-		dotB[b] = dotA_runningProduct ** deltab[b]  
+		uab[b] = copy.deepcopy(ua)
+		pkab[b] = copy.deepcopy(pka)
+		hab[b] = copy.deepcopy(ha)
+
+
+		dotB[b] =  dotA_runningProduct ** deltab[b]  
 		dotB_runningProduct = dotB_runningProduct * dotB[b]
 
 		Sb[b] = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'S' ]
@@ -102,7 +107,7 @@ if __name__ == '__main__':
 
 
 	for arg in verifyFuncArgs:
-		argSigIndexMap[arg] = 0
+		argSigIndexMap[arg] = 1
 
 	if pair ( dotB_runningProduct ,  verifyArgsDict[argSigIndexMap['mpk']]['mpk'][bodyKey]['Pub'] ) == pair ( dotC_runningProduct ,  verifyArgsDict[argSigIndexMap['mpk']]['mpk'][bodyKey]['g'] ):
 		pass

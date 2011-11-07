@@ -80,109 +80,98 @@ class CYH(PKSig):
 
 if __name__ == "__main__":
 
-   L1 = [ "alice", "bob", "carlos", "dexter", "eddie"] 
-   L2 = [ "adfas", "asd", "asdfas", "asdfdf", "asdfd"]
-   L3 = [ "asdfd", "ase", "kdkdkd", "dkdkdk", "dkdkd"]
+   L0 = [ "alice", "bob", "carlos", "dexter", "eddie"] 
+   #L1 = [ "adfas", "asd", "asdfas", "asdfdf", "asdfd"]
+   #L2 = [ "asdfd", "ase", "kdkdkd", "dkdkdk", "dkdkd"]
 
-   ID1 = "bob"
-   ID2 = "asd"
-   ID3 = "ase"
+   ID0 = "bob"
+   #ID1 = "alice"
+   #ID2 = "carlos"
 
-   cyh1 = CYH()
-   cyh2 = CYH()
-   cyh3 = CYH()
+   cyh0 = CYH()
+   #cyh1 = CYH()
+   #cyh2 = CYH()
 
-   (mpk1, msk1) = cyh1.setup()
-   (mpk2, msk2) = cyh2.setup()
-   (mpk3, msk3) = cyh3.setup()
+   (mpk0, msk0) = cyh0.setup()
+   #(mpk1, msk1) = cyh1.setup()
+   #(mpk2, msk2) = cyh2.setup()
 
-   (ID1, Pk1, Sk1) = cyh1.keygen(msk1, ID1)
-   (ID2, Pk2, Sk2) = cyh2.keygen(msk2, ID2)
-   (ID3, Pk3, Sk3) = cyh3.keygen(msk3, ID3)
+   (ID0, Pk0, Sk0) = cyh0.keygen(msk0, ID0)
+   #(ID1, Pk1, Sk1) = cyh1.keygen(msk1, ID1)
+   #(ID2, Pk2, Sk2) = cyh2.keygen(msk2, ID2)
   
-   sk1 = (ID1, Pk1, Sk1)
-   sk2 = (ID2, Pk2, Sk2)
-   sk3 = (ID3, Pk3, Sk3)
+   sk0 = (ID0, Pk0, Sk0)
+   #sk1 = (ID1, Pk1, Sk1)
+   #sk2 = (ID2, Pk2, Sk2)
   
-   m1 = 'please sign this new message!'
-   m2 = 'asdfk k asdfasdf kasdf'
-   m3 = ' asdf kafl  asdfk '
+   m0 = 'please sign this new message!'
+   m1 = 'asdfk k asdfasdf kasdf'
+   m2 = ' asdf kafl  asdfk '
 
-   sig1 = cyh1.sign(sk1, L1, m1)
-   sig2 = cyh2.sign(sk2, L2, m2)
-   sig3 = cyh3.sign(sk3, L3, m3)
+   sig0 = cyh0.sign(sk0, L0, m0)
+   sig1 = cyh0.sign(sk0, L0, m1)
+   sig2 = cyh0.sign(sk0, L0, m2)
 
-   #print(cyh1.verify(mpk1, L1, m1, sig1))
-   #print(cyh2.verify(mpk2, L2, m2, sig2))
-   #print(cyh3.verify(mpk3, L3, m3, sig3))
+   print(cyh0.verify(mpk0, L0, m0, sig0))
+   print(cyh0.verify(mpk0, L0, m1, sig1))
+   print(cyh0.verify(mpk0, L0, m2, sig2))
 
 
-   f_mpk1 = open('mpk1.charmPickle', 'wb')
-   f_mpk2 = open('mpk2.charmPickle', 'wb')
-   f_mpk3 = open('mpk3.charmPickle', 'wb')
+   f_mpk0 = open('mpk0.charmPickle', 'wb')
+   #f_mpk1 = open('mpk1.charmPickle', 'wb')
+   #f_mpk2 = open('mpk2.charmPickle', 'wb')
 
-   f_L1 = open('L1.pythonPickle', 'wb')
-   f_L2 = open('L2.pythonPickle', 'wb')
-   f_L3 = open('L3.pythonPickle', 'wb')
+   f_L0 = open('L0.pythonPickle', 'wb')
+   #f_L1 = open('L1.pythonPickle', 'wb')
+   #f_L2 = open('L2.pythonPickle', 'wb')
 
+   f_m0 = open('m0.pythonPickle', 'wb')
    f_m1 = open('m1.pythonPickle', 'wb')
    f_m2 = open('m2.pythonPickle', 'wb')
-   f_m3 = open('m3.pythonPickle', 'wb')
 
+   f_sig0 = open('sig0.charmPickle', 'wb')
    f_sig1 = open('sig1.charmPickle', 'wb')
    f_sig2 = open('sig2.charmPickle', 'wb')
-   f_sig3 = open('sig3.charmPickle', 'wb')
 
 
 
-   pick_mpk1 = pickleObject( serializeDict( mpk1, group ) )
+   pick_mpk0 = pickleObject( serializeDict( mpk0, group ) )
+   #pick_mpk1 = pickleObject( serializeDict( mpk1, group ) )
+   #pick_mpk2 = pickleObject( serializeDict( mpk2, group ) )
 
+   pickle.dump(L0, f_L0)
+   #pickle.dump(L1, f_L1)
+   #pickle.dump(L2, f_L2)
 
-   pick_mpk2 = pickleObject( serializeDict( mpk2, group ) )
-   pick_mpk3 = pickleObject( serializeDict( mpk3, group ) )
-
-   pickle.dump(L1, f_L1)
-
-
-
-   pickle.dump(L2, f_L2)
-   pickle.dump(L3, f_L3)
-
+   pickle.dump(m0, f_m0)
    pickle.dump(m1, f_m1)
    pickle.dump(m2, f_m2)
-   pickle.dump(m3, f_m3)
 
+   pick_sig0 = pickleObject( serializeDict( sig0, group ) )
    pick_sig1 = pickleObject( serializeDict( sig1, group ) )
    pick_sig2 = pickleObject( serializeDict( sig2, group ) )
-   pick_sig3 = pickleObject( serializeDict( sig3, group ) )
 
-   f_mpk1.write(pick_mpk1)
+   f_mpk0.write(pick_mpk0)
+   #f_mpk1.write(pick_mpk1)
+   #f_mpk2.write(pick_mpk2)
 
-
-
-   f_mpk2.write(pick_mpk2)
-   f_mpk3.write(pick_mpk3)
-
+   f_sig0.write(pick_sig0)
    f_sig1.write(pick_sig1)
    f_sig2.write(pick_sig2)
-   f_sig3.write(pick_sig3)
 
-   f_mpk1.close()
+   f_mpk0.close()
+   #f_mpk1.close()
+   #f_mpk2.close()
 
- 
+   f_L0.close()
+   #f_L1.close()
+   #f_L2.close()
 
-   f_mpk2.close()
-   f_mpk3.close()
-
-   f_L1.close()
-   f_L2.close()
-   f_L3.close()
-
+   f_m0.close()
    f_m1.close()
    f_m2.close()
-   f_m3.close()
 
+   f_sig0.close()
    f_sig1.close()
    f_sig2.close()
-   f_sig3.close()
 
