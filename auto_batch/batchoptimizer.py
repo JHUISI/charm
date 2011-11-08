@@ -152,14 +152,17 @@ class Substitute:
                 print("Substitute: missing some cases: ", Type(right))
 
 class SubstituteSigDotProds:
-    def __init__(self, index, sig ):
+    def __init__(self, index='j', sig='N' ):
         self.prefix = 'dot' # self.prefix + self.alpha[cnt]; cnt += 1
         self.alpha = string.ascii_uppercase
         self.cnt = 0        
-        self.sig = 'N' # should be an input 
-        self.index = 'j' 
+        self.sig = sig 
+        self.index = index 
         self.dotprod = { 'start':'1', 'stop':self.sig, 'index':self.index, 'list':[], 'dict':{} }
-    
+
+    def setState(self, count):
+        self.cnt = count # allow us to maintain a synchronized alphabet
+        
     def getkey(self):
         key = self.prefix + self.alpha[self.cnt]
         self.cnt += 1
@@ -192,7 +195,16 @@ class SubstituteSigDotProds:
             key = BinaryNode(self.getkey())
             self.store(key, node)
             batchparser.addAsChildNodeToParent(data, key)
+    
+    def visit_of(self, node, data):
+        sig = str(node.left.right.attr)
+
+        if sig == self.sig:
+            key = BinaryNode(self.getkey())
+            self.store(key, node)
+            batchparser.addAsChildNodeToParent(data, key)
             
+                
     def searchProd(self, node, parent):
         if node == None: return None
         elif node.type == ops.ON:

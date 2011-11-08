@@ -151,7 +151,7 @@ class BinaryNode:
 			if self.attr_index != None and type(self.attr_index) == list:
 				token = ""
 				for t in self.attr_index:
-					token += t + "$"
+					token += t + "%"
 				l = len(token) 
 				token = token[:l-1]
 				msg += '_' + token
