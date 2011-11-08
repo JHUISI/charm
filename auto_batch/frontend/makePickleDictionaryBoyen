@@ -1,0 +1,15 @@
+from toolbox.pairinggroup import *
+from charm.engine.util import *
+
+dict = {}
+dict[0] = {}
+dict[0]['mpk'] = '/Users/matt/Documents/charm/auto_batch/frontend/mpkboyen.charmPickle'
+dict[0]['pk'] = '/Users/matt/Documents/charm/auto_batch/frontend/pkboyen.charmPickle'
+dict[0]['M'] = '/Users/matt/Documents/charm/auto_batch/frontend/m1boyen.pythonPickle'
+dict[0]['sig'] = '/Users/matt/Documents/charm/auto_batch/frontend/sig1boyen.charmPickle'
+
+group = pairing('/Users/matt/Documents/charm/param/d224.param')
+dict_pickle = pickleObject( serializeDict( dict, group) )
+f = open('newBoyenDict', 'wb')
+f.write(dict_pickle)
+f.close()

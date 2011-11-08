@@ -16,6 +16,8 @@ This must all be on one line.
 
 import ast, os, sys, copy
 
+sumPrefix = 'sum'
+sumOrDotSymbol = '_'
 newSliceSymbol = '%'
 valueRep = 'Value'
 typeRep = 'Type'
@@ -65,7 +67,7 @@ batchVerifierOutputFile = '/Users/matt/Documents/charm/auto_batch/frontend/batch
 finalBatchEqTag = 'Final batch eq'
 numBitsOfSecurity = 80
 deltasGroupType = 'ZR'
-batchEqRemoveVars = ['e', '(', 'j', '1', 'prod', '{', '}', 'N', ':=', '^', ',', 'on', ')', '==', '*', 'i', 'l']
+batchEqRemoveVars = ['e', '(', 'j', '1', 'prod', '{', '}', 'N', ':=', '^', ',', 'on', ')', '==', '*', 'i', 'l', 'of', 'sum']
 dotProdSymbol = '_'
 deltaString = 'delta'
 deltasString = 'deltas'
@@ -75,7 +77,7 @@ eltsRepInAST = 'elts'
 numRepInAST = 'n'
 sliceRepInAST = 'slice'
 unknownType = 'Unknown'
-reservedWords = ['prod', 'group', 'G1', 'G2', 'GT', 'dotprod', 'range', 'lam_func', 'ZR', 'self', 'for', 'in', 'while', 'if', 'pass']
+reservedWords = ['prod', 'group', 'G1', 'G2', 'GT', 'dotprod', 'range', 'lam_func', 'ZR', 'self', 'for', 'in', 'while', 'if', 'pass', 'sum', 'e']
 reservedSymbols = ['(', ')', '{', '}', ':=', '=', '-', '*', '^', '/', ',', '==', ':', '[', ']' ]
 numSpacesPerTab = 4
 commentChar = '#'
@@ -674,15 +676,22 @@ def getBatchEqVars(finalBatchEq):
 
 	return batchEqVars
 
-def distillBatchEqVars(batchEqVars, batchEqDotProdVars, batchEqNotDotProdVars):
+def distillBatchEqVars(batchEqVars, batchEqNotSumOrDotVars):
 	#batchEqDotProdVars = []
 	
 	for varIndex in range(0, len(batchEqVars)):
-		dotProdSymbolIndex = batchEqVars[varIndex].find(dotProdSymbol)
-		if (dotProdSymbolIndex != -1):
-			batchEqDotProdVars.append(batchEqVars[varIndex][0:dotProdSymbolIndex])
-		else:
-			batchEqNotDotProdVars.append(batchEqVars[varIndex])
+		sumOrDotSymbolIndex = batchEqVars[varIndex].find(sumOrDotSymbol)
+		if (sumOrDotSymbolIndex == -1):
+			batchEqNotSumOrDotVars.append(batchEqVars[varIndex])
+		
+		
+		
+		#if (dotProdSymbolIndex != -1):
+			
+			
+			#batchEqDotProdVars.append(batchEqVars[varIndex][0:dotProdSymbolIndex])
+		#else:
+			#batchEqNotSumOrDotVars.append(batchEqVars[varIndex])
 	#return batchEqDotProdVars
 
 '''
@@ -919,8 +928,11 @@ def getComputeLineInfo(batchVerifierOutput):
 			computeLineInfo[key][computeLineEndValue] = tempStringStartEndVals[1]
 			
 			computeLineInfo[key][computeLineRange] = str(computeLineInfo[key][computeLineIndex]) + str(computeLineInfo[key][computeLineStartValue]) + str(computeLineInfo[key][computeLineEndValue])
-			
-			tempString = tempString[1].split(' on ')
+
+			if (' on ' in tempString[1]):
+				tempString = tempString[1].split(' on ')
+			elif (' of ' in tempString[1]):
+				tempString = tempString[1].split(' of ')
 			#print(tempString[1].rstrip(')'))
 			tempStringExp = tempString[1]
 			lenTempStringExp = len(tempStringExp)
@@ -1022,7 +1034,7 @@ def getOuterDotProds(batchVerifierOutput):
 	line = line.split()
 	
 	for token in line:
-		if ( (token.startswith(dotProdPrefix)) and (len(token) == 4) ):
+		if ( ( (token.startswith(dotProdPrefix) == True) or (token.startswith(sumPrefix) == True)) and (len(token) == 4) ):
 			if (token not in outerDotProds):
 				outerDotProds.append(token)
 	
@@ -1665,10 +1677,11 @@ if __name__ == '__main__':
 	finalBatchEq = cleanFinalBatchEq(finalBatchEq)
 	
 	batchEqVars = getBatchEqVars(finalBatchEq)
-	batchEqDotProdVars = []
-	batchEqNotDotProdVars = []
+	batchEqDotProdVars = [] #not used
+	batchEqSumVars = [] #not used
+	batchEqNotSumOrDotVars = []
 	
-	distillBatchEqVars(batchEqVars, batchEqDotProdVars, batchEqNotDotProdVars)
+	distillBatchEqVars(batchEqVars, batchEqNotSumOrDotVars)
 	#print(batchEqDotProdVars)
 	#print(batchEqNotDotProdVars)
 	
@@ -1697,6 +1710,7 @@ if __name__ == '__main__':
 	verifySigsOutput += "import sys, copy\n"
 	verifySigsOutput += "from charm.engine.util import *\n"
 	verifySigsOutput += "from toolbox.pairinggroup import *\n\n"
+	verifySigsOutput += "bodyKey = \'Body\'\n\n"
 	verifySigsOutput += "def verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, "
 	
 	for outerDotProd in outerDotProds:
@@ -1706,7 +1720,7 @@ if __name__ == '__main__':
 
 
 	verifySigsOutput = resetArgSigIndexDictTo1s(verifySigsOutput)
-	verifySigsOutput = addLinesForNonDotProdVars(verifySigsOutput, batchEqNotDotProdVars, assignMap, pythonCodeLines, listOfIndentedBlocks, computeLineInfo, numTabsOnVerifyFuncLine, verifyFuncArgs)	
+	verifySigsOutput = addLinesForNonDotProdVars(verifySigsOutput, batchEqNotSumOrDotVars, assignMap, pythonCodeLines, listOfIndentedBlocks, computeLineInfo, numTabsOnVerifyFuncLine, verifyFuncArgs)	
 	
 	for outerDotProd in outerDotProds:
 		verifySigsOutput += "\t" + outerDotProd + "_runningProduct = 1\n"

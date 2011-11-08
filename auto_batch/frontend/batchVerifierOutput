@@ -1,39 +1,55 @@
-['frontend/cyh.bv']
-types  => {'sk': 'G1', 'S': 'G1', 'r': 'ZR', 'u': 'G1', 'pk': 'G1', 'mpk0': 'G2', 'mpk1': 'G2'}
-constant  => ['mpk0', 'mpk1']
-variables => {'l': '5', 'N': '100', 'sk': 'G1', 'S': 'G1', 'r': 'ZR', 'u': 'G1', 'pk': 'G1', 'mpk0': 'G2', 'mpk1': 'G2'}
-batch algorithm => ['2', '3']
+['boyen.bv']
+types  => {'D': 'GT', 'M': 'ZR', 'Bt': 'G2', 'S': 'G1', 't': 'ZR', 'At': 'G2', 'Ct': 'G2'}
+constant  => ['At', 'Bt', 'Ct', 'D']
+transform  => ['2', '3', '4', 'S', '3']
+variables => {'D': 'GT', 'M': 'ZR', 'l': '2', 'N': '100', 'Bt': 'G2', 'S': 'G1', 't': 'ZR', 'At': 'G2', 'Ct': 'G2'}
+batch algorithm => ['2', '3', '4', 'S', '3']
 
-VERIFY EQUATION => verify := e((prod{i := 1,l} on (u_i * pk_i^h_i)),mpk0) == e(S,mpk1)
+VERIFY EQUATION => verify := (prod{i := 1,l} on e(S_i,(At_i * (Bt_i^M_i * Ct_i^t_i)))) == D
 
-Stage A: Combined Equation => verify := (prod{j := 1,N} on e((prod{i := 1,l} on (u_i$j * pk_i$j^h_i$j)),mpk0)) == (prod{j := 1,N} on e(S_j,mpk1))
+Stage A: Combined Equation => verify := (prod{j := 1,N} on (prod{i := 1,l} on e(S_i$j,(At_i * (Bt_i^M_i$j * Ct_i^t_i$j))))) == (prod{j := 1,N} on D)
 
-Stage B: Small Exp Test => verify := (prod{j := 1,N} on e((prod{i := 1,l} on (u_i$j * pk_i$j^h_i$j)),mpk0)^delta_j) == (prod{j := 1,N} on e(S_j,mpk1)^delta_j) 
+Stage B: Small Exp Test => verify := (prod{j := 1,N} on (prod{i := 1,l} on e(S_i$j,(At_i * (Bt_i^M_i$j * Ct_i^t_i$j))))^delta_j) == (prod{j := 1,N} on D^delta_j) 
 
-Rule 2: Left := Move 'delta_j' exponent into the pairing. Left := Move 'delta_j' exponent into the pairing.  
+Rule 2: distributed exponent into the pairing: right side.  
 
-Applying technique 2 => : verify := (prod{j := 1,N} on e((prod{i := 1,l} on (u_i$j * pk_i$j^h_i$j))^delta_j,mpk0)) == (prod{j := 1,N} on e(S_j^delta_j,mpk1)) 
+Applying technique 2 => : verify := (prod{j := 1,N} on (prod{i := 1,l} on e(S_i$j,(At_i^delta_j * (Bt_i^(M_i$j * delta_j) * Ct_i^(t_i$j * delta_j)))))) == (prod{j := 1,N} on D^delta_j) 
 
-Rule 3: common 1st (left) node appears, so can reduce n pairings to 1. common 1st (left) node appears, so can reduce n pairings to 1.  
+Rule 3: split one pairing into two or three. 
 
-Applying technique 3 => : verify := e((prod{j := 1,N} on (prod{i := 1,l} on (u_i$j * pk_i$j^h_i$j))^delta_j),mpk0) == e((prod{j := 1,N} on S_j^delta_j),mpk1) 
+Applying technique 3 => : verify := (prod{j := 1,N} on (prod{i := 1,l} on (e(S_i$j,At_i^delta_j) * (e(S_i$j,Bt_i^(M_i$j * delta_j)) * e(S_i$j,Ct_i^(t_i$j * delta_j)))))) == D^sum{j := 1,N} of delta_j 
 
-Instances found => {'pk_i$j': {'h_i$j': 1}, 'S_j': {'delta_j': 1}} 
+Not applying any transformation for:  ON
+Rule 4: waters hash technique.  
 
-Final batch eq: e((prod{b := 1,N} on (prod{a := 1,l} on (u_a$b * pk_a$b^h_a$b))^delta_b),mpk%0) == e((prod{b := 1,N} on S_b^delta_b),mpk%1)
-Individual verif eq => e((prod{i := 1,l} on (u_i$j * pk_i$j^h_i$j)),mpk0) == e(S,mpk1) 
+Applying technique 4 => : verify := (prod{i := 1,l} on (prod{j := 1,N} on (e(S_i$j,At_i^delta_j) * (e(S_i$j,Bt_i^(M_i$j * delta_j)) * e(S_i$j,Ct_i^(t_i$j * delta_j)))))) == D^sum{j := 1,N} of delta_j 
 
-Result N = 100 : 37.8034769
-Result N = 100 : 11.0495463
+simplify dot products: True  
+
+Simplifying => : verify := (prod{i := 1,l} on ((prod{j := 1,N} on e(S_i$j,At_i^delta_j)) * ((prod{j := 1,N} on e(S_i$j,Bt_i^(M_i$j * delta_j))) * (prod{j := 1,N} on e(S_i$j,Ct_i^(t_i$j * delta_j)))))) == D^sum{j := 1,N} of delta_j 
+
+Rule 3: common 1st (left) node appears, so can reduce n pairings to 1. common 1st (left) node appears, so can reduce n pairings to 1. common 1st (left) node appears, so can reduce n pairings to 1.  
+
+Applying technique 3 => : verify := (prod{i := 1,l} on (e((prod{j := 1,N} on S_i$j^delta_j),At_i) * (e((prod{j := 1,N} on S_i$j^(M_i$j * delta_j)),Bt_i) * e((prod{j := 1,N} on S_i$j^(t_i$j * delta_j)),Ct_i)))) == D^sum{j := 1,N} of delta_j 
+
+Instances found => {'S_i$j': {'M_i$j': 1, 't_i$j': 1, 'delta_j': 3}} 
+
+Final batch eq: (prod{i := 1,l} on (e((prod{j := 1,N} on preA_j),At_i) * (e((prod{j := 1,N} on preA_j^M_i$j),Bt_i) * e((prod{j := 1,N} on preA_j^t_i$j),Ct_i)))) == D^sum{j := 1,N} of delta_j
+Individual verif eq => (prod{i := 1,l} on e(S_i$j,(At_i * (Bt_i^M_i$j * Ct_i^t_i$j)))) == D 
+
+Result N = 100 : 111.3121747
+Result N = 100 : 8.2143064
 Threshold:  2
-Dot prod => {'start': '1', 'list': [<batchlang.BinaryNode object at 0x102d8cc90>, <batchlang.BinaryNode object at 0x102d8cb50>, <batchlang.BinaryNode object at 0x102d8cbd0>], 'stop': 'N', 'dict': {<batchlang.BinaryNode object at 0x102d8cc90>: <batchlang.BinaryNode object at 0x102d431d0>, <batchlang.BinaryNode object at 0x102d8cb50>: <batchlang.BinaryNode object at 0x102d6f750>, <batchlang.BinaryNode object at 0x102d8cbd0>: <batchlang.BinaryNode object at 0x102d7c110>}, 'index': 'j'}
+Dot prod => {'start': '1', 'list': [<batchlang.BinaryNode object at 0x102b3a710>, <batchlang.BinaryNode object at 0x102b3ae50>, <batchlang.BinaryNode object at 0x102b3a990>], 'stop': 'N', 'dict': {<batchlang.BinaryNode object at 0x102b3a710>: <batchlang.BinaryNode object at 0x102b53d10>, <batchlang.BinaryNode object at 0x102b3ae50>: <batchlang.BinaryNode object at 0x102b53f90>, <batchlang.BinaryNode object at 0x102b3a990>: <batchlang.BinaryNode object at 0x102b5c690>}, 'index': 'j'}
 <====	PREP FOR CODE GEN	====>
 
-Final version => e(dotB,mpk%0) == e(dotC,mpk%1) 
+Final version => dotE == D^sumD
 
-Compute:  dotA := (prod{a := 1,l} on (u_a$b * pk_a$b^h_a$b))
-Compute:  dotB := (prod{b := 1,N} on dotA^delta_b)
-Compute:  dotC := (prod{b := 1,N} on S_b^delta_b)
-Precompute: S := sk^(h + r)
-Precompute: h := H(M | L | u,ZR)
+Compute:  dotE := (prod{i := 1,l} on (e(dotA,At_i) * (e(dotB,Bt_i) * e(dotC,Ct_i)))
+Compute:  sumD :=  (sum{j := 1,N} of delta_j)
+Compute:  dotA := (prod{j := 1,N} on preA_j)
+Compute:  dotB := (prod{j := 1,N} on preA_j^M_i$j)
+Compute:  dotC := (prod{j := 1,N} on preA_j^t_i$j)
+Precompute: preA_j := S_i$j^delta_j
+Precompute: D := e(g1,g2)
 Precompute: delta := for{j := 1, N} do prng_j

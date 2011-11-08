@@ -7,6 +7,8 @@ import sys, copy
 from charm.engine.util import *
 from toolbox.pairinggroup import *
 
+bodyKey = 'Body'
+
 def verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotB, dotC, startIndex, endIndex):
 	for arg in verifyFuncArgs:
 		argSigIndexMap[arg] = 0

@@ -27,7 +27,7 @@ if __name__ == '__main__':
 	verifyArgsDict = {}
 	numSigs = len(verifyParamFilesDict)
 	lenRepeatSuffix = len(repeatSuffix)
-	verifyFuncArgs = list(verifyParamFilesDict[1].keys())
+	verifyFuncArgs = list(verifyParamFilesDict[0].keys())
 
 	for sigIndex in range(0, numSigs):
 		verifyArgsDict[sigIndex] = {}
@@ -49,59 +49,65 @@ if __name__ == '__main__':
 
 	argSigIndexMap = {}
 
-	group = pairing('/Users/matt/Documents/charm/param/a.param')
-	H1 = lambda x: group.H(('1', str(x)), G1)
-	H2 = lambda a, b, c: group.H(('2', a, b, c), ZR)
-	lam_func = lambda i,a,b,c: a[i] * (b[i] ** c[i]) # => u * (pk ** h) for all signers
-	N = 3
-	l = 5
+	group = pairing('/Users/matt/Documents/charm/param/d224.param')
+	H = lambda a: group.H(('1', str(a)), ZR)
 
-	Sj = {}
+
+	N = 1
+	l = 3
+
 	deltaj = {}
-	uj = {}
-	pkj = {}
-	hj = {}
-	dotC = {}
-	dotB = {}
-	dotA = {}
 
-	for sigIndex in range(0, numSigs):
+	for sigIndex in range(0, N):
 		deltaj[sigIndex] = prng_bits(group, 80)
 
-	dotB_runningProduct = 1
-	dotC_runningProduct = 1
-	for j in range(0, N):
-		for arg in verifyFuncArgs:
-			if (sigNumKey in verifyArgsDict[j][arg]):
-				argSigIndexMap[arg] = int(verifyArgsDict[j][arg][sigNumKey])
-			else:
-				argSigIndexMap[arg] = j
 
-		dotA_runningProduct = 1
-		dotA[j] = {}
-		uj[j] = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'u' ]
-		Lt = ""
-		for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] :
-			Lt = Lt + ":" + i
-		num_signers = len( verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] )
-		hj[j] = [ group.init( ZR , 1 ) for i in range( num_signers ) ]
-		for i in range( num_signers ) :
-			hj[j] [ i ] = H2( verifyArgsDict[argSigIndexMap['M']]['M'][bodyKey] , Lt ,uj[j] [ i ] )
-		pkj[j] = [ H1( i ) for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] ] # get all signers pub keys
+	dotE = group.init(GT, 1)
 
+	At_pk = {}
+	Bt_pk = {}
+	Ct_pk = {}
+	At_pk[ 0 ] = verifyArgsDict[0]['mpk'][bodyKey][ 'At' ]
+	Bt_pk[ 0 ] = verifyArgsDict[0]['mpk'][bodyKey][ 'Bt' ]
+	Ct_pk[ 0 ] = verifyArgsDict[0]['mpk'][bodyKey][ 'Ct' ]
 
-		for i in range(0, l):
-			dotA[j][i] =  ( uj[j] [i] * pkj[j] [i] ** hj[j] [i] ) 
-			dotA_runningProduct = dotA_runningProduct * dotA[j][i]
+	
+	for a in range(0, l):
+		
+		dotA = group.init(G1, 1)
+		dotB = group.init(G1, 1)
+		dotC = group.init(G1, 1)
+		
+		for b in range(0, N):
+			for arg in verifyFuncArgs:
+				if (sigNumKey in verifyArgsDict[b][arg]):
+					argSigIndexMap[arg] = int(verifyArgsDict[b][arg][sigNumKey])
+				else:
+					argSigIndexMap[arg] = b
 
+			for i in verifyArgsDict[argSigIndexMap['pk']]['pk'][bodyKey].keys():
+				At_pk[ i ] = verifyArgsDict[argSigIndexMap['pk']]['pk'][bodyKey][ i ][ 'At' ]
+				Bt_pk[ i ] = verifyArgsDict[argSigIndexMap['pk']]['pk'][bodyKey][ i ][ 'Bt' ]
+				Ct_pk[ i ] = verifyArgsDict[argSigIndexMap['pk']]['pk'][bodyKey][ i ][ 'Ct' ]        
+			l = len(At_pk.keys())
+			D = pair(verifyArgsDict[argSigIndexMap['mpk']]['mpk'][bodyKey]['g1'], verifyArgsDict[argSigIndexMap['mpk']]['mpk'][bodyKey]['g2'])
+			S = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey]['S'] 
+			t = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey]['t']
+			m = H(verifyArgsDict[argSigIndexMap['M']]['M'][bodyKey])
+			dotA = dotA * (S[a] ** deltaj[b])
 
-		dotB[j] =  dotA_runningProduct ** deltaj[j]  
-		dotB_runningProduct = dotB_runningProduct * dotB[j]
+			dotB = dotB * (dotA ** m)
 
-		Sj[j] = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'S' ]
+			dotC = dotC * (dotA ** t[a])
 
-		dotC[j] =  Sj[j]  ** deltaj[j]  
-		dotC_runningProduct = dotC_runningProduct * dotC[j]
+		dotE = dotE * (pair(dotA, At_pk[a]) * pair(dotB, Bt_pk[a]) * pair(dotC, Ct_pk[a]))
 
+	sum = group.init(ZR, 0)
 
-	verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotB, dotC, 0, N)
+	for b in range(0, N):
+		sum = deltaj[b] + sum
+
+	if (dotE) == (D ** sum):
+		print("success")
+	else:
+		print("failure")
