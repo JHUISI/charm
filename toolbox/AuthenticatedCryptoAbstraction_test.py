@@ -1,5 +1,5 @@
 import unittest 
-from AuthenticatedCryptoAbstraction import AuthenticatedCryptoAbstraction
+from toolbox.AuthenticatedCryptoAbstraction import AuthenticatedCryptoAbstraction
 from toolbox.pairinggroup import PairingGroup,GT
 from charm.pairing import hash as sha1
 class TesAuthenticatedCryptoAbstraction(unittest.TestCase):

@@ -1,5 +1,5 @@
-from MessageAuthenticator import MessageAuthenticator
-from SymmetricCryptoAbstraction import SymmetricCryptoAbstraction
+from toolbox.MessageAuthenticator import MessageAuthenticator
+from toolbox.SymmetricCryptoAbstraction import SymmetricCryptoAbstraction
 
 class AuthenticatedCryptoAbstraction(SymmetricCryptoAbstraction):
    def encrypt(self,msg):
