@@ -171,6 +171,7 @@ if __name__ == "__main__":
     ASTVisitor(subProds).preorder(verify2.right)
     print("Dot prod =>", subProds.dotprod)
     # need to check for presence of other variables
+    key = None
     for i in metadata.keys():
         if i != 'N': key = i
     subProds1 = SubstituteSigDotProds('i', key)
