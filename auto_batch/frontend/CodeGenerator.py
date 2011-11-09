@@ -16,6 +16,10 @@ This must all be on one line.
 
 import ast, os, sys, copy
 
+dotProdTypes = {}
+precomputeVarReplacements = {}
+varsThatAreLists = {}
+cleanBatchEqVars = {}
 sumPrefix = 'sum'
 sumOrDotSymbol = '_'
 newSliceSymbol = '%'
@@ -67,7 +71,7 @@ batchVerifierOutputFile = '/Users/matt/Documents/charm/auto_batch/frontend/batch
 finalBatchEqTag = 'Final batch eq'
 numBitsOfSecurity = 80
 deltasGroupType = 'ZR'
-batchEqRemoveVars = ['e', '(', 'j', '1', 'prod', '{', '}', 'N', ':=', '^', ',', 'on', ')', '==', '*', 'i', 'l', 'of', 'sum']
+batchEqRemoveVars = ['e', '(', 'j', '1', 'prod', '{', '}', 'N', ':=', '^', ',', 'on', ')', '==', '*', 'i', 'l', 'of', 'sum', 'a', 'b']
 dotProdSymbol = '_'
 deltaString = 'delta'
 deltasString = 'deltas'
@@ -99,6 +103,33 @@ class ImportFromVisitor(ast.NodeVisitor):
 			return 0
 
 		return self.lineNos
+
+class GetBasicVariableTypes(ast.NodeVisitor):
+	def __init__(self, namesList):
+		self.variableTypes = {}
+		self.namesList = namesList
+		
+	def visit_Assign(self, node):
+		try:
+			nodeName = node.targets[0].id
+		except:
+			return
+		
+		if nodeName not in self.namesList:
+			return
+		
+		try:
+			valueType = type(node.value).__name__
+		except:
+			return
+		
+		if (valueType == 'ListComp'):
+			self.variableTypes[nodeName] = 'Subscript'
+		else:
+			self.variableTypes[nodeName] = 'NoSubscript'
+			
+	def getVariableTypesDict(self):
+		return self.variableTypes
 
 class GetKeysOfDictAssign(ast.NodeVisitor):
 	def __init__(self, dictName):
@@ -606,8 +637,12 @@ def removeSelfDump(line):
 	return line
 
 def cleanFinalBatchEq(finalBatchEq):
-	#print(finalBatchEq)
-	finalBatchEq = finalBatchEq.lstrip(finalBatchEqTag).lstrip(':').lstrip()
+	
+	finalBatchEq = finalBatchEq.replace(finalBatchEqTag, '', 1)
+	finalBatchEq = finalBatchEq.replace(':', '', 1)
+	finalBatchEq = finalBatchEq.lstrip()
+	
+	#finalBatchEq = finalBatchEq.lstrip(finalBatchEqTag).lstrip(':').lstrip()
 	
 	
 	finalBatchEq = ensureSpacesBtwnTokens(finalBatchEq)
@@ -906,13 +941,31 @@ def getComputeLineVars(exp):
 			varList.append(token)
 			
 	return varList
+
+def checkForPrecomputeValues(exp):
+	exp = ensureSpacesBtwnTokens(exp)
+	expSplit = exp.split()
+	for token in expSplit:
+		if token in precomputeVarReplacements:
+			replacementString = precomputeVarReplacements[token]
+			replacementString = replacementString.replace(multipleSubscriptIndicatorChar, '')
+			exp = exp.replace(token, replacementString, 1)
+
+
+	
+			#if tempStringExp in precomputeVarReplacements:
+				#tempStringExp = precomputeVarReplacements[tempStringExp]
+				#tempStringExp = tempStringExp.replace(multipleSubscriptIndicatorChar, '')
+
+	return exp
 		
 def getComputeLineInfo(batchVerifierOutput):
 	computeLineInfo = {}
 	
 	for line in batchVerifierOutput:
 		if (line.startswith(computeLineString)):
-			line = line.lstrip(computeLineString)
+			#line = line.lstrip(computeLineString)
+			line = line.replace(computeLineString, '', 1)
 			line = line.replace(multipleSubscriptIndicatorChar, '')
 			dotProdLine = line.split(dotProdAssignSymbol, 1)
 			key = dotProdLine[0]
@@ -935,8 +988,21 @@ def getComputeLineInfo(batchVerifierOutput):
 				tempString = tempString[1].split(' of ')
 			#print(tempString[1].rstrip(')'))
 			tempStringExp = tempString[1]
+			
+			#if tempStringExp in precomputeVarReplacements:
+				#tempStringExp = precomputeVarReplacements[tempStringExp]
+			
 			lenTempStringExp = len(tempStringExp)
-			computeLineInfo[key][computeLineExp] = tempStringExp[0:(lenTempStringExp - 1)]
+			tempStringExp = tempStringExp[0:(lenTempStringExp - 1)]
+
+
+			tempStringExp = checkForPrecomputeValues(tempStringExp)
+
+			#if tempStringExp in precomputeVarReplacements:
+				#tempStringExp = precomputeVarReplacements[tempStringExp]
+				#tempStringExp = tempStringExp.replace(multipleSubscriptIndicatorChar, '')
+
+			computeLineInfo[key][computeLineExp] = tempStringExp
 			
 			computeLineInfo[key][computeLineVars] = getComputeLineVars( computeLineInfo[key][computeLineExp] )
 
@@ -946,6 +1012,7 @@ def getComputeLineInfo(batchVerifierOutput):
 			for varName in varNames:
 				varNameSplit = varName.split(dotProdSymbol)
 				varNamesNoSubscripts.append(varNameSplit[0])
+				cleanBatchEqVars[varNameSplit[0]] = 0
 
 			computeLineInfo[key][computeLineVarsNoSubscripts] = varNamesNoSubscripts						
 			#print(exp)
@@ -961,7 +1028,7 @@ def doesVarNeedList(varName, verifyFuncArgs):
 	if (varName in verifyFuncArgs):
 		return False
 	
-	if ( (varName.startswith(dotProdPrefix)) and (len(varName) == 4)):
+	if (   ( (varName.startswith(dotProdPrefix)) or (varName.startswith(sumPrefix))  ) and (len(varName) == 4)):
 		return False
 	
 	return True
@@ -983,11 +1050,15 @@ def addListDeclarations(batchOutputString, computeLineInfo, verifyFuncArgs, decl
 			#if (varNameNoSubscript.startswith(deltaString) == True):
 				#print(varName)
 				#continue
-			
-			needsList = doesVarNeedList(varNameNoSubscript, verifyFuncArgs)
-			if (needsList == True):
+
+			if (varNameNoSubscript == deltaString):
 				if varName not in listVars:
 					listVars.append(varName)
+			
+			#needsList = doesVarNeedList(varNameNoSubscript, verifyFuncArgs)
+			#if (needsList == True):
+				#if varName not in listVars:
+					#listVars.append(varName)
 					
 	for listVar in listVars:
 		listVarSplit = listVar.split(dotProdSymbol)
@@ -1053,11 +1124,16 @@ def cleanVarsForDotProds(varsForDotProds):
 	varsToRemove = []
 	
 	for var in varsForDotProds:
-		if ( (var.startswith(dotProdPrefix)) and (len(var) == 4) ):
+		if (    ( (var.startswith(dotProdPrefix)) or (var.startswith(sumPrefix)  )   ) and (len(var) == 4) ):
 			varsToRemove.append(var)
 			
 	for var in varsToRemove:
 		varsForDotProds.remove(var)
+		
+	for var in varsForDotProds:
+		while (varsForDotProds.count(var) > 1):
+			varsForDotProds.remove(var)
+		
 
 def getListNameFromDeclaredLists(listName):
 	if (listName.count("_") == 0):
@@ -1089,14 +1165,14 @@ def getDotProdCalcStringForNumSigners(expression, listNamesToReplacementStrings,
 				continue
 			
 			expression = expression.replace(token, replacementString)			
-		elif ( (token.startswith(dotProdPrefix)) and (len(token) == 4) ):
+		elif (   (  (token.startswith(dotProdPrefix)) or ( token.startswith(sumPrefix)  )    ) and (len(token) == 4) ):
 			replacementStringForRunningProd = token + "_runningProduct"
 			expression = expression.replace(token, replacementStringForRunningProd)
 
 	expression = expression.replace(" ^ ", " ** ")	
 	return expression
 
-def getDotProdCalcString(expression, listNamesToReplacementStrings, indexVar):
+def getDotProdCalcString(expression, listNamesToReplacementStrings, indexVar, verifyFuncArgs):
 	expression = ensureSpacesBtwnTokens(expression)
 	expressionSplit = expression.split()
 	
@@ -1104,27 +1180,65 @@ def getDotProdCalcString(expression, listNamesToReplacementStrings, indexVar):
 		if (token.count("_") == 1):
 			tokenSplit = token.split("_")
 			listName = tokenSplit[0]
-			if listName in listNamesToReplacementStrings:
-				replacementString = listNamesToReplacementStrings[listName]
-			elif (listName == deltaString):
-				replacementString = listName + indexVar + "[" + indexVar + "] "
-			else:
-				continue
 			
-			expression = expression.replace(token, replacementString)			
-		elif ( (token.startswith(dotProdPrefix)) and (len(token) == 4) ):
+			if (listName == deltaString):
+				replacementString = listName + "b[b]"
+			
+			
+			elif listName in listNamesToReplacementStrings:
+				replacementString = listNamesToReplacementStrings[listName] + "[" + indexVar + "]"
+
+
+			elif listName in verifyFuncArgs:
+				replacementString = "verifyArgsDict[argSigIndexMap[\'" + listName + "\']][\'" + listName + "\'][bodyKey]"
+			#	expression = expression.replace(token, replacementString, 1)
+
+				
+			else:
+				if (listName in varsThatAreLists):
+					replacementString = listName + "[" + varsThatAreLists[listName] + "]"
+				else:
+					replacementString = listName
+			
+			expression = expression.replace(token, replacementString, 1)			
+		elif ( ( (token.startswith(dotProdPrefix)) or (token.startswith(sumPrefix))  ) and (len(token) == 4) ):
 			replacementStringForRunningProd = token + "_runningProduct"
-			expression = expression.replace(token, replacementStringForRunningProd)
+			expression = expression.replace(token, replacementStringForRunningProd, 1)
+		#elif token in verifyFuncArgs:
+			#replacementString = "verifyArgsDict[argSigIndexMap[\'" + token + "\']][\'" + token + "\'][bodyKey]"
+			#expression = expression.replace(token, replacementString, 1)
 
 	expression = expression.replace(" ^ ", " ** ")	
 	return expression
 
-def writeDotProdLinesToFile(batchOutputString, computeLineInfo, pythonCodeLines, linesForDotProds, baseNumTabs, numTabsBeforeVerify, verifyFuncArgs, declaredLists, indexVar, dotProdListName, listToReplacementCopy=None):
+def writeDotProdCalculations(batchOutputString, computeLineInfo, listNamesToReplacementStrings, indexVar, numTabs, dotProdListName, outerDotProds, verifyFuncArgs):
+
+	dotProdCalcString = getDotProdCalcString(computeLineInfo[dotProdListName][computeLineExp], listNamesToReplacementStrings, indexVar, verifyFuncArgs)
+
+	if (dotProdCalcString != ""):
+		
+		#if (numTabs == -1):
+			#numTabs = baseNumTabs
+			
+		for tabNumber in range(0, numTabs):
+			batchOutputString += "\t"
+		batchOutputString += dotProdListName + "[" + indexVar + "] = " + dotProdCalcString + "\n"
+		
+		if (dotProdListName not in outerDotProds):
+			for tabNumber in range(0, numTabs):
+				batchOutputString += "\t"
+			batchOutputString += dotProdListName + "_runningProduct = " + dotProdListName + "_runningProduct * " + dotProdListName + "[" + indexVar + "]\n"
+		
+	batchOutputString += "\n"		
+	
+	return batchOutputString
+
+def writeDotProdLinesToFile(batchOutputString, computeLineInfo, pythonCodeLines, linesForDotProds, baseNumTabs, numTabsBeforeVerify, verifyFuncArgs, declaredLists, indexVar, dotProdListName, listNamesToReplacementStrings):
 	#print(declaredLists)
 
 	numTabs = -1
 	
-	listNamesToReplacementStrings = {}
+	#listNamesToReplacementStrings = {}
 	
 	for lineNo in linesForDotProds:
 		line = pythonCodeLines[lineNo - 1]
@@ -1176,27 +1290,13 @@ def writeDotProdLinesToFile(batchOutputString, computeLineInfo, pythonCodeLines,
 
 	batchOutputString += "\n"
 
-	if (listToReplacementCopy != None):
-		for listToRepKey in listNamesToReplacementStrings:
-			listToReplacementCopy[listToRepKey] = listNamesToReplacementStrings[listToRepKey] 
+	#if (listToReplacementCopy != None):
+		#for listToRepKey in listNamesToReplacementStrings:
+			#listToReplacementCopy[listToRepKey] = listNamesToReplacementStrings[listToRepKey] 
 
-	if (dotProdListName == None):
-		batchOutputString += "\n"
-		return batchOutputString
-
-	dotProdCalcString = getDotProdCalcString(computeLineInfo[dotProdListName][computeLineExp], listNamesToReplacementStrings, indexVar)
-
-	if (dotProdCalcString != ""):
-		if (numTabs == -1):
-			numTabs = baseNumTabs
-		for tabNumber in range(0, numTabs):
-			batchOutputString += "\t"
-		batchOutputString += dotProdListName + "[" + indexVar + "] = " + dotProdCalcString + "\n"
-		for tabNumber in range(0, numTabs):
-			batchOutputString += "\t"
-		batchOutputString += dotProdListName + "_runningProduct = " + dotProdListName + "_runningProduct * " + dotProdListName + "[" + indexVar + "]\n"
-		
-	batchOutputString += "\n"		
+	#if (dotProdListName == None):
+	batchOutputString += "\n"
+		#return batchOutputString
 		
 	return batchOutputString
 
@@ -1228,10 +1328,15 @@ def addResetStatementsForDotProdCalcs(batchOutputString, dotProdList, numTabs):
 
 	for key in dotProdList:
 		for child in dotProdList[key]:
-			if ( (type(child).__name__ != pythonDictRep) and (child.startswith(dotProdPrefix)) and (len(child) == 4) ):
-				for tab in range(0, numTabs):
-					batchOutputString += "\t"
-				batchOutputString += child + "_runningProduct = 1\n"
+			if (type(child).__name__ != pythonDictRep) and (len(child) == 4):
+				if (child.startswith(dotProdPrefix)):				
+					for tab in range(0, numTabs):
+						batchOutputString += "\t"
+					batchOutputString += child + "_runningProduct = group.init(" + dotProdTypes[child] + ", 1)\n"
+				elif (child.startswith(sumPrefix)):
+					for tab in range(0, numTabs):
+						batchOutputString += "\t"
+					batchOutputString += child + "_runningProduct = group.init(" + dotProdTypes[child] + ", 0)\n"
 	
 	return batchOutputString
 
@@ -1246,7 +1351,11 @@ def writeNumSignersLoop(batchOutputString, numTabs, numTabsBeforeVerify, verifyF
 	varsForDotProds = computeLineInfo[dotProdName][computeLineVarsNoSubscripts]			
 	cleanVarsForDotProds(varsForDotProds)			
 	linesForDotProds = getLinesForDotProds(varsForDotProds, assignMap, pythonCodeLines, listOfIndentedBlocks)
+	
+	listNamesToReplacementStrings = {}
+	
 	batchOutputString = writeDotProdLinesToFile(batchOutputString, computeLineInfo, pythonCodeLines, linesForDotProds, numTabs, numTabsBeforeVerify, verifyFuncArgs, declaredLists, parentIndexVar, None, listNamesToReplacementStrings)
+	batchOutputString = writeDotProdCalculations(batchOutputString, computeLineInfo, listNamesToReplacementStrings, indexVar, numTabs, dotProdName)
 
 	dotProdCalcString = getDotProdCalcStringForNumSigners(computeLineInfo[dotProdName][computeLineExp], listNamesToReplacementStrings, indexVar)
 
@@ -1269,9 +1378,33 @@ def writeNumSignersLoop(batchOutputString, numTabs, numTabsBeforeVerify, verifyF
 	
 	return batchOutputString
 
-def addDotProdLoopRecursive(batchOutputString, computeLineInfo, dotProdList, assignMap, pythonCodeLines, listOfIndentedBlock, numTabs, numTabsBeforeVerify, verifyFuncArgs, declaredLists, parentIndexVar):
+def getVarsForDotProds(dotProdNames, computeLineInfo, varsForDotProds):
+	#varsForDotProds = []
+
+	#for key in dotProdNames:
+		#range = key
+		#break
+	
+	for child in dotProdNames:
+		if ( (type(child).__name__ != pythonDictRep) and  (   (child.startswith(dotProdPrefix)) or (child.startswith(sumPrefix))      ) and (len(child) == 4) ):
+			currVars = computeLineInfo[child][computeLineVarsNoSubscripts]
+			for varName in currVars:
+				if varName not in varsForDotProds:
+					varsForDotProds.append(varName)
+		elif (type(child).__name__ == pythonDictRep):
+			for key in child:
+				newListKey = key
+				break
+			getVarsForDotProds(child[newListKey], computeLineInfo, varsForDotProds)
+			
+	#cleanVarsForDotProds(varsForDotProds)
+	
+	#return varsForDotProds
+
+def addDotProdLoopRecursive(batchOutputString, computeLineInfo, dotProdList, assignMap, pythonCodeLines, listOfIndentedBlock, numTabs, numTabsBeforeVerify, verifyFuncArgs, declaredLists, parentIndexVar, listNamesToReplacementStrings, outerDotProds, topLevelDotProd):
 	for key in dotProdList:
 		dotProdRange = key
+		break
 
 	#print(dotProdList)
 
@@ -1289,47 +1422,62 @@ def addDotProdLoopRecursive(batchOutputString, computeLineInfo, dotProdList, ass
 		endValInCode = numSignaturesEndValInCode
 	elif (endVal == numSignersEndVal):
 		endValInCode = numSignersEndValInCode
-		batchOutputString = writeNumSignersLoop(batchOutputString, numTabs, numTabsBeforeVerify, verifyFuncArgs, declaredLists, pythonCodeLines, listOfIndentedBlocks, indexVar, parentIndexVar, startVal, endVal, dotProdList[dotProdRange][0], computeLineInfo, assignMap)
-		return batchOutputString
+		#batchOutputString = writeNumSignersLoop(batchOutputString, numTabs, numTabsBeforeVerify, verifyFuncArgs, declaredLists, pythonCodeLines, listOfIndentedBlocks, indexVar, parentIndexVar, startVal, endVal, dotProdList[dotProdRange][0], computeLineInfo, assignMap)
+		#return batchOutputString
 
 	for tab in range(0, numTabs):
 		batchOutputString += "\t"
+
+	#listNamesToReplacementStrings = {}
 		
 	batchOutputString += "for " + indexVar + " in range(" + startVal + ", " + endValInCode + "):\n"
 	if (endValInCode == numSignaturesEndValInCode):
 		batchOutputString = setUpVerifyFuncArgs(batchOutputString, numTabs + 1, indexVar)
+		varsForDotProds = []
+		
+		for topLevelKey in topLevelDotProd:
+			topLevelRange = topLevelKey
+			break
+		
+		getVarsForDotProds(topLevelDotProd[topLevelRange], computeLineInfo, varsForDotProds)
+		cleanVarsForDotProds(varsForDotProds)
+		linesForDotProds = getLinesForDotProds(varsForDotProds, assignMap, pythonCodeLines, listOfIndentedBlocks)
+		#listNamesToReplacementStrings = {}
+		#namesToReplacementsCopy = copy.deepcopy(listNamesToReplacementStrings)
+		batchOutputString = writeDotProdLinesToFile(batchOutputString, computeLineInfo, pythonCodeLines, linesForDotProds, numTabs + 1, numTabsBeforeVerify, verifyFuncArgs, declaredLists, indexVar, None, listNamesToReplacementStrings)
 
 	for child in dotProdList[dotProdRange]:
 		if type(child).__name__ == pythonDictRep:
-			batchOutputString = addDotProdLoopRecursive(batchOutputString, computeLineInfo, child, assignMap, pythonCodeLines, listOfIndentedBlocks, numTabs + 1, numTabsBeforeVerify, verifyFuncArgs, declaredLists, indexVar)
-	
-	for child in dotProdList[dotProdRange]:
-		if ( (type(child).__name__ != pythonDictRep) and (child.startswith(dotProdPrefix)) and (len(child) == 4) ):			
-			varsForDotProds = computeLineInfo[child][computeLineVarsNoSubscripts]			
-			cleanVarsForDotProds(varsForDotProds)			
-			linesForDotProds = getLinesForDotProds(varsForDotProds, assignMap, pythonCodeLines, listOfIndentedBlocks)
-			batchOutputString = writeDotProdLinesToFile(batchOutputString, computeLineInfo, pythonCodeLines, linesForDotProds, numTabs + 1, numTabsBeforeVerify, verifyFuncArgs, declaredLists, indexVar, child)
+			namesToReplacementsCopy = copy.deepcopy(listNamesToReplacementStrings)
+			batchOutputString = addDotProdLoopRecursive(batchOutputString, computeLineInfo, child, assignMap, pythonCodeLines, listOfIndentedBlocks, numTabs + 1, numTabsBeforeVerify, verifyFuncArgs, declaredLists, indexVar, namesToReplacementsCopy, outerDotProds, topLevelDotProd)
 
-			if (parentIndexVar != None):
-				parentAndChildIndices = indexVar + parentIndexVar
-				for declaredList in declaredLists:
-					if (parentAndChildIndices == getSuffixesFromDeclaredLists(declaredList) ):
-						for numTab in range(0, numTabs):
-							batchOutputString += "\t"
-						listNameFromDL = getListNameFromDeclaredLists(declaredList)
+	for child in dotProdList[dotProdRange]:
+		if ( (type(child).__name__ != pythonDictRep) and ( (child.startswith(dotProdPrefix) ) or (child.startswith(sumPrefix))    ) and (len(child) == 4)):
+			batchOutputString = writeDotProdCalculations(batchOutputString, computeLineInfo, listNamesToReplacementStrings, indexVar, numTabs + 1, child, outerDotProds, verifyFuncArgs)
+
+
+
+			#if (parentIndexVar != None):
+				#parentAndChildIndices = indexVar + parentIndexVar
+				#for declaredList in declaredLists:
+					#if (parentAndChildIndices == getSuffixesFromDeclaredLists(declaredList) ):
+						#for numTab in range(0, numTabs):
+							#batchOutputString += "\t"
+						#listNameFromDL = getListNameFromDeclaredLists(declaredList)
 						#batchOutputString += listNameFromDL + parentAndChildIndices + "[" + parentIndexVar + "] = copy.deepcopy(" + listNameFromDL + indexVar + ")\n"
-				batchOutputString += "\n"
+				#batchOutputString += "\n"
 
 	return batchOutputString
 
-def addDotProdLoops(batchOutputString, computeLineInfo, dotProdLoopOrder, assignMap, pythonCodeLines, listOfIndentedBlocks, numTabsBeforeVerify, verifyFuncArgs, declaredLists):
+def addDotProdLoops(batchOutputString, computeLineInfo, dotProdLoopOrder, assignMap, pythonCodeLines, listOfIndentedBlocks, numTabsBeforeVerify, verifyFuncArgs, declaredLists, outerDotProds):
 	#batchOutputString += "\ttest\n"
 	
 	#print(dotProdLoopOrder)
 	
 	for outerDotProd in dotProdLoopOrder:
 		#print(outerDotProd)
-		batchOutputString = addDotProdLoopRecursive(batchOutputString, computeLineInfo, outerDotProd, assignMap, pythonCodeLines, listOfIndentedBlocks, 1, numTabsBeforeVerify, verifyFuncArgs, declaredLists, None)
+		listNamesToReplacementStrings = {}
+		batchOutputString = addDotProdLoopRecursive(batchOutputString, computeLineInfo, outerDotProd, assignMap, pythonCodeLines, listOfIndentedBlocks, 1, numTabsBeforeVerify, verifyFuncArgs, declaredLists, None, listNamesToReplacementStrings, outerDotProds, outerDotProd)
 		batchOutputString += "\n"
 	
 	return batchOutputString
@@ -1378,7 +1526,7 @@ def dotProdLoopRecursive(computeLineInfo, outerDotProd, dotProdList):
 		dotProdList[dotProdListIndex][range].append(outerDotProd)
 	
 	for varName in computeLineInfo[outerDotProd][computeLineVarsNoSubscripts]:
-		if ( (varName.startswith(dotProdPrefix)) and (len(varName) ==  4) ):
+		if (  (  (varName.startswith(dotProdPrefix)) or (varName.startswith(sumPrefix))    ) and (len(varName) ==  4) ):
 			#dotProdDict[outerDotProd][varName] = {}
 			#dotProdLoopRecursive(computeLineInfo, varName, dotProdDict[outerDotProd])
 			
@@ -1457,15 +1605,15 @@ def getSimplifiedFinalBatchEq(batchVerifierOutput, pythonCodeNode, verifyFuncArg
 		if (line.startswith(finalEqLineString) == True):
 			break
 		
-	line = line.replace(finalEqLineString, "")
+	line = line.replace(finalEqLineString, "", 1)
 	line = ensureSpacesBtwnTokens(line)
 	line = line.replace(" e ", " pair ")
 	
 	tokenSplit = line.split()
 	for token in tokenSplit:
-		if ( (token.startswith(dotProdPrefix)) and (len(token) == 4) ):
+		if ( (   (token.startswith(dotProdPrefix)) or (token.startswith(sumPrefix))   ) and (len(token) == 4) ):
 			replacementString = token + "_runningProduct"
-			line = line.replace(token, replacementString)
+			line = line.replace(token, replacementString, 1)
 		elif (token.count(newSliceSymbol) > 0):
 			replacementString = ""
 			dictName = token.split(newSliceSymbol)[0]
@@ -1487,7 +1635,7 @@ def getSimplifiedFinalBatchEq(batchVerifierOutput, pythonCodeNode, verifyFuncArg
 					replacementString += "[" + str(keysDict[sliceIndex][valueRep]) + "]"
 			else:
 				return line
-			line = line.replace(token, replacementString)
+			line = line.replace(token, replacementString, 1)
 	
 	#print(verifyFuncArgs)
 	
@@ -1521,7 +1669,9 @@ def addLinesForNonDotProdVars(batchOutputString, batchEqNotDotProdVars, assignMa
 
 	#batchOutputString = resetArgSigIndexDictTo1s(batchOutputString)
 
-	batchOutputString = writeDotProdLinesToFile(batchOutputString, computeLineInfo, pythonCodeLines, lineNos, 0, 0, verifyFuncArgs, [], None, None)
+	listNamesToReplacementStrings = {}
+
+	batchOutputString = writeDotProdLinesToFile(batchOutputString, computeLineInfo, pythonCodeLines, lineNos, 0, 0, verifyFuncArgs, [], None, None, listNamesToReplacementStrings)
 	
 	return batchOutputString
 
@@ -1535,6 +1685,70 @@ def addCallToVerifySigs(batchOutputString, outerDotProds):
 	
 	return batchOutputString
 
+def getVariableTypes(verifyNode):
+	#variableTypes = {}
+	varsToRemove = []
+
+	#print(cleanBatchEqVars)
+	
+	for varName in cleanBatchEqVars:
+		if (varName == deltaString):
+			varsToRemove.append(varName)
+		if (  (  (varName.startswith(dotProdPrefix)) or (varName.startswith(sumPrefix))   )    and (len(varName) == 4)   ):
+			varsToRemove.append(varName)
+			
+	for varToRemove in varsToRemove:
+		del cleanBatchEqVars[varToRemove]
+
+	#print(cleanBatchEqVars)
+
+	variableNames = list(copy.deepcopy(cleanBatchEqVars).keys())
+
+	basicTypesVar = GetBasicVariableTypes(variableNames)
+	basicTypesVar.visit(verifyNode)
+
+	variableTypes = basicTypesVar.getVariableTypesDict()
+	
+	return variableTypes
+
+def getVarsThatAreLists(line):
+	line = line.replace("List := ", '', 1)
+	line = line.rstrip()
+	#line = line.lstrip("List : = ").rstrip()
+	lineSplit = line.split(' in ')
+	
+	varName = lineSplit[0].lstrip().rstrip()
+	endVal = lineSplit[1].lstrip().rstrip()
+
+	if (endVal == 'N'):
+		varsThatAreLists[varName] = 'b'
+	elif (endVal == 'l'):
+		varsThatAreLists[varName] = 'a'
+
+def getPrecomputeVarReplacements(batchVerifierOutput):
+	for line in batchVerifierOutput:
+		if (line.startswith("Precompute: ")):			
+			line = line[len("Precompute: "):len(line)]
+			line = line.lstrip().rstrip()
+			if (line.startswith("delta := ")):
+				continue
+			#line = line.lstrip("Precompute: ").rstrip()
+			lineSplit = line.split(" := ")
+			key = lineSplit[0].lstrip().rstrip()
+			val = lineSplit[1].lstrip().rstrip()
+			precomputeVarReplacements[key] = val
+			
+			#print(lineSplit[0])
+			#print(lineSplit[1])
+			#print(line)
+
+def getDotProdTypes(batchVerifierOutput):
+	for line in batchVerifierOutput:
+		if (line.startswith("dot")):
+			line = line.split(" := ")
+			dotProdName = line[0].lstrip().rstrip()
+			dotProdType = line[1].lstrip().rstrip().rstrip("\n")
+			dotProdTypes[dotProdName] = dotProdType
 
 if __name__ == '__main__':
 	if ( (len(sys.argv) != 6) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
@@ -1672,8 +1886,11 @@ if __name__ == '__main__':
 	for line in batchVerifierOutput:
 		if (line.startswith(finalBatchEqTag) == True):
 			finalBatchEq = line
-			break
+		elif (line.startswith('List := ') == True):
+			getVarsThatAreLists(line)
 
+	getPrecomputeVarReplacements(batchVerifierOutput)
+	getDotProdTypes(batchVerifierOutput)
 	finalBatchEq = cleanFinalBatchEq(finalBatchEq)
 	
 	batchEqVars = getBatchEqVars(finalBatchEq)
@@ -1696,8 +1913,12 @@ if __name__ == '__main__':
 	dotProdLoopOrder = getDotProdLoopOrder(computeLineInfo, outerDotProds, dotProdLoopOrder)
 	declaredLists = []
 	batchOutputString = addListDeclarations(batchOutputString, computeLineInfo, verifyFuncArgs, declaredLists)
-	batchOutputString = addDeltasAndArgSigIndexMap(batchOutputString, declaredLists)	
-	batchOutputString = addDotProdLoops(batchOutputString, computeLineInfo, dotProdLoopOrder, assignMap, pythonCodeLines, listOfIndentedBlocks, numTabsOnVerifyFuncLine, verifyFuncArgs, declaredLists)
+	batchOutputString = addDeltasAndArgSigIndexMap(batchOutputString, declaredLists)
+	
+	variableTypes = getVariableTypes(verifyFuncNode)
+	#print(variableTypes)
+	
+	batchOutputString = addDotProdLoops(batchOutputString, computeLineInfo, dotProdLoopOrder, assignMap, pythonCodeLines, listOfIndentedBlocks, numTabsOnVerifyFuncLine, verifyFuncArgs, declaredLists, outerDotProds)
 	batchOutputString = addCallToVerifySigs(batchOutputString, outerDotProds)
 
 	verifySigsFile = open('/Users/matt/Documents/charm/auto_batch/frontend/verifySigs.py', 'w')

@@ -20,7 +20,7 @@ Applying technique 3 => : verify := e((prod{j := 1,N} on (prod{i := 1,l} on (u_i
 
 Instances found => {'pk_i$j': {'h_i$j': 1}, 'S_j': {'delta_j': 1}} 
 
-Final batch eq: e((prod{j := 1,N} on (prod{i := 1,l} on (u_i$j * pk_i$j^h_i$j))^delta_j),mpk%0) == e((prod{j := 1,N} on S_j^delta_j),mpk%1)
+Final batch eq: e((prod{b := 1,N} on (prod{a := 1,l} on (u_a$b * pk_a$b^h_a$b))^delta_b),mpk%0) == e((prod{b := 1,N} on S_b^delta_b),mpk%1)
 Individual verif eq => e((prod{i := 1,l} on (u_i$j * pk_i$j^h_i$j)),P) == e(S,g2) 
 
 Result N = 100 : 82.5070144
@@ -31,9 +31,12 @@ Dot prod => {'start': '1', 'list': [<batchlang.BinaryNode object at 0x102fe4e90>
 
 Final version => e(dotB,mpk%0) == e(dotC,mpk%1) 
 
-Compute:  dotA := (prod{i := 1,l} on (u_i$j * pk_i$j^h_i$j))
-Compute:  dotB := (prod{j := 1,N} on dotA^delta_j)
-Compute:  dotC := (prod{j := 1,N} on S_j^delta_j)
+Compute:  dotA := (prod{a := 1,l} on (u_a$b * pk_a$b^h_a$b))
+Compute:  dotB := (prod{b := 1,N} on dotA^delta_b)
+Compute:  dotC := (prod{b := 1,N} on S_b^delta_b)
 Precompute: h := H(M | L | u,ZR)
 Precompute: S := sk^(h + r)
 Precompute: delta := for{j := 1, N} do prng_j
+List := u in l
+List := pk in l
+List := h in l

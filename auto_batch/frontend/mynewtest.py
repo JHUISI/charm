@@ -8,8 +8,8 @@ pickle.dump(m0, f_m0)
 f_m0.close()
 
 
-m1 = 'asdfk k asdfasdf kasdf'
-#m1 = 'instead use this'
+#m1 = 'asdfk k asdfasdf kasdf'
+m1 = 'instead use this'
 f_m1 = open('m1.pythonPickle', 'wb')
 pickle.dump(m1, f_m1)
 f_m1.close()

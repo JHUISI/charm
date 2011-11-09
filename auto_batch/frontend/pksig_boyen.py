@@ -113,17 +113,17 @@ class Boyen(PKSig):
     
     def verify(self, mpk, pk, M, sig):
         print("Verifying...")
-        At_pk = {}
-        Bt_pk = {}
-        Ct_pk = {}
-        At_pk[ 0 ] = mpk[ 'At' ]
-        Bt_pk[ 0 ] = mpk[ 'Bt' ]
-        Ct_pk[ 0 ] = mpk[ 'Ct' ]
+        Atpk = {}
+        Btpk = {}
+        Ctpk = {}
+        Atpk[ 0 ] = mpk[ 'At' ]
+        Btpk[ 0 ] = mpk[ 'Bt' ]
+        Ctpk[ 0 ] = mpk[ 'Ct' ]
         for i in pk.keys():
-            At_pk[ i ] = pk[ i ][ 'At' ]
-            Bt_pk[ i ] = pk[ i ][ 'Bt' ]
-            Ct_pk[ i ] = pk[ i ][ 'Ct' ]        
-        l = len(At_pk.keys())
+            Atpk[ i ] = pk[ i ][ 'At' ]
+            Btpk[ i ] = pk[ i ][ 'Bt' ]
+            Ctpk[ i ] = pk[ i ][ 'Ct' ]        
+        l = len(Atpk.keys())
         print("Length =>", l)
         D = pair(mpk['g1'], mpk['g2'])
         S = sig['S'] 
@@ -131,7 +131,7 @@ class Boyen(PKSig):
         m = H(M)
         prod_result = group.init(GT, 1)
         for i in range(l):
-            prod_result *= pair(S[i], At_pk[i] * (Bt_pk[i] ** m) * (Ct_pk[i] ** t[i]))
+            prod_result *= pair(S[i], Atpk[i] * (Btpk[i] ** m) * (Ctpk[i] ** t[i]))
         print("final result =>", prod_result)
         print("D =>", D )
         if prod_result == D:

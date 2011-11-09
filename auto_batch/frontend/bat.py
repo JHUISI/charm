@@ -56,52 +56,43 @@ if __name__ == '__main__':
 	N = 3
 	l = 5
 
-	Sj = {}
-	deltaj = {}
-	uj = {}
-	pkj = {}
-	hj = {}
+	deltab = {}
 	dotC = {}
 	dotB = {}
 	dotA = {}
 
 	for sigIndex in range(0, numSigs):
-		deltaj[sigIndex] = prng_bits(group, 80)
+		deltab[sigIndex] = prng_bits(group, 80)
 
 	dotB_runningProduct = 1
 	dotC_runningProduct = 1
-	for j in range(0, N):
+	for b in range(0, N):
 		for arg in verifyFuncArgs:
-			if (sigNumKey in verifyArgsDict[j][arg]):
-				argSigIndexMap[arg] = int(verifyArgsDict[j][arg][sigNumKey])
+			if (sigNumKey in verifyArgsDict[b][arg]):
+				argSigIndexMap[arg] = int(verifyArgsDict[b][arg][sigNumKey])
 			else:
-				argSigIndexMap[arg] = j
+				argSigIndexMap[arg] = b
 
-		dotA_runningProduct = 1
-		dotA[j] = {}
-		uj[j] = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'u' ]
+		u = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'u' ]
+		S = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'S' ]
 		Lt = ""
 		for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] :
 			Lt = Lt + ":" + i
 		num_signers = len( verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] )
-		hj[j] = [ group.init( ZR , 1 ) for i in range( num_signers ) ]
+		h = [ group.init( ZR , 1 ) for i in range( num_signers ) ]
 		for i in range( num_signers ) :
-			hj[j] [ i ] = H2( verifyArgsDict[argSigIndexMap['M']]['M'][bodyKey] , Lt ,uj[j] [ i ] )
-		pkj[j] = [ H1( i ) for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] ] # get all signers pub keys
+			h [ i ] = H2( verifyArgsDict[argSigIndexMap['M']]['M'][bodyKey] , Lt , u [ i ] )
+		pk = [ H1( i ) for i in verifyArgsDict[argSigIndexMap['L']]['L'][bodyKey] ] # get all signers pub keys
 
 
-		for i in range(0, l):
-			dotA[j][i] =  ( uj[j] [i] * pkj[j] [i] ** hj[j] [i] ) 
-			dotA_runningProduct = dotA_runningProduct * dotA[j][i]
+		dotA_runningProduct = 1
+		for a in range(0, l):
+			dotA[a] =   ( u[a] * pk[a] ** h[a] )  
+			dotA_runningProduct = dotA_runningProduct * dotA[a]
 
+		dotB[b] =   dotA_runningProduct ** deltab[b]  
 
-		dotB[j] =  dotA_runningProduct ** deltaj[j]  
-		dotB_runningProduct = dotB_runningProduct * dotB[j]
-
-		Sj[j] = verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey][ 'S' ]
-
-		dotC[j] =  Sj[j]  ** deltaj[j]  
-		dotC_runningProduct = dotC_runningProduct * dotC[j]
+		dotC[b] =   S ** deltab[b]  
 
 
 	verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotB, dotC, 0, N)
