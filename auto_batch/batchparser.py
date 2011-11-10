@@ -580,15 +580,16 @@ class Technique2:
         #print("left node =>", node.left.type,"target right node =>", node.right)
         if(Type(node.left) == ops.PAIR):   # and (node.right.attr_index == 'i'): # (node.right.getAttribute() == 'delta'):
             pair_node = node.left
-            addAsChildNodeToParent(data, pair_node) # move pair node one level up
                                   # make cur node the left child of pair node
             # G1 : pair.left, G2 : pair.right
             if not self.isConstInSubtreeT(pair_node.left):
+                addAsChildNodeToParent(data, pair_node) # move pair node one level up
                 node.left = pair_node.left
                 pair_node.left = node
                 self.rule += "Left := Move '" + str(node.right) + "' exponent into the pairing. "
             
-            elif not self.isConstInSubtreeT(pair_node.right):       
+            if not self.isConstInSubtreeT(pair_node.right):       
+                addAsChildNodeToParent(data, pair_node) # move pair node one level up                
                 node.left = pair_node.right
                 pair_node.right = node 
                 self.rule += "Right := Move '" + str(node.right) + "' exponent into the pairing. "
@@ -700,7 +701,7 @@ class Technique2:
         elif Type(node) == ops.HASH:
             return self.isConstant(node.left)
         result = self.isConstInSubtreeT(node.left)
-        if result: return result
+        if not result: return result
         result = self.isConstInSubtreeT(node.right)
         return result
 
