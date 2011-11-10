@@ -67,7 +67,7 @@ class BatchParser:
         #Operator = OperatorAND | OperatorOR | Token
 
         # describes an individual leaf node
-        leafNode = Word(alphanums + '_-').setParseAction( createNode )
+        leafNode = Word(alphanums + '_-#').setParseAction( createNode )
         expr = Forward()
         term = Forward()
         factor = Forward()
