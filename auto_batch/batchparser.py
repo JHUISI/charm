@@ -791,14 +791,16 @@ class Technique3:
                 self.rule += "split one pairing into two or three."
                 #addAsChildNodeToParent(data, muls[0])
             else:        
-                addAsChildNodeToParent(data, pair_node) # move pair one level up            
+                addAsChildNodeToParent(data, pair_node) # move pair one level up  
+# TODO: REVISIT THIS SECTION
+                #print("pair_node left +> ", pair_node.left, self.isConstInSubtreeT(pair_node.left))                              
                 if not self.isConstInSubtreeT(pair_node.left): # if F, then can apply prod node to left child of pair node              
                     node.right = pair_node.left
                     pair_node.left = node # pair points to 'on' node
                     self.rule += "common 1st (left) node appears, so can reduce n pairings to 1. "
                     self.visit_pair(pair_node, data)
                     
-                elif not self.isConstInSubtreeT(pair_node.right):
+                if not self.isConstInSubtreeT(pair_node.right):
                     node.right = pair_node.right
                     pair_node.right = node
                     self.rule += "common 2nd (right) node appears, so can reduce n pairings to 1. "
@@ -822,9 +824,10 @@ class Technique3:
     def isConstInSubtreeT(self, node): # check whether left or right node is constant  
         if node == None: return None
         if node.type == ops.ATTR:
+            #print("node =>", node, node.type, self.isConstant(node))
             return self.isConstant(node)
         result = self.isConstInSubtreeT(node.left)
-        if result: return result
+        if not result: return result
         result = self.isConstInSubtreeT(node.right)
         return result
 
