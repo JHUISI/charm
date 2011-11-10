@@ -32,11 +32,11 @@ class CHCH(PKSig):
         S1 = pk ** s
         a = H2(M, S1)
         S2 = sk ** (s + a)
-        return (S1, S2)
+        return {'S1':S1, 'S2':S2}
     
     def verify(self, mpk, pk, M, sig):
         print("verify...")
-        (S1, S2) = sig
+        (S1, S2) = sig['S1'], sig['S2']
         a = H2(M, S1)
         if pair(S2, mpk['g2']) == pair(S1 * (pk ** a), mpk['P']): 
             return True

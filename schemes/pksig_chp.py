@@ -34,7 +34,7 @@ class CHP(PKSig):
         a = H(1, M['t1'])
         h = H(2, M['t2'])
         b = H3(M['str'], M['t3'])
-        if pair(sig, mpk['g']) == (pair(a, pk) * pair(h, pk ** b)):
+        if pair(sig, mpk['g']) == (pair(a, pk) * (pair(h, pk) ** b):
             return True
         return False
 
