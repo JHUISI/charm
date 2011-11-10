@@ -14,7 +14,7 @@ END :: types
 #S2 := (sk^a) * (h^s)
 
 BEGIN :: precompute
-a := H(M_i | S1_i, ZR)
+a := H(M_z | S1_z, ZR)
 END :: precompute
 
 BEGIN :: constant

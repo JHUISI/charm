@@ -152,13 +152,14 @@ class Substitute:
                 print("Substitute: missing some cases: ", Type(right))
 
 class SubstituteSigDotProds:
-    def __init__(self, index='j', sig='N' ):
+    def __init__(self, vars, index='z', sig='N' ):
         self.prefix = 'dot' # self.prefix + self.alpha[cnt]; cnt += 1
         self.alpha = string.ascii_uppercase
         self.cnt = 0        
         self.sig = sig 
         self.index = index 
-        self.dotprod = { 'start':'1', 'stop':self.sig, 'index':self.index, 'list':[], 'dict':{} }
+        self.vars_def = vars
+        self.dotprod = { 'start':'1', 'stop':self.sig, 'index':self.index, 'list':[], 'dict':{}, 'types':{} }
 
     def setState(self, count):
         self.cnt = count # allow us to maintain a synchronized alphabet
@@ -169,8 +170,9 @@ class SubstituteSigDotProds:
         #print('key =>', key)
         return key
     
-    def store(self, key, value):
+    def store(self, key, value, the_type=None):
         self.dotprod[ 'dict' ][ key ] = value
+        self.dotprod[ 'types' ][ key ] = the_type
         self.dotprod[ 'list' ].append( key )
     
     def visit(self, node, data):
@@ -178,32 +180,36 @@ class SubstituteSigDotProds:
     
     def visit_on(self, node, data):
         index = str(node.left.right.attr)
+        dot_type = self.deriveNodeType(node.right)
+        #print("node.right type +=> ", dot_type, node.right)
         #print("index =>", index)
 
         n = self.searchProd(node.right, node)
         if n:
             (t, p) = n
 #            print("Found it:", t)
+            dot_type2 = self.deriveNodeType(t.right)
             # perform substition
             subkey = BinaryNode(self.getkey())
-            self.store(subkey, t)
+            self.store(subkey, t, dot_type2)
             if p.left == t:
                 p.left = subkey
 #                print("p =>", p)
         
         if index == self.sig:
             key = BinaryNode(self.getkey())
-            self.store(key, node)
+            self.store(key, node, dot_type)
+            
             batchparser.addAsChildNodeToParent(data, key)
     
-    def visit_of(self, node, data):
-        sig = str(node.left.right.attr)
-
-        if sig == self.sig:
-            key = BinaryNode(self.getkey())
-            self.store(key, node)
-            batchparser.addAsChildNodeToParent(data, key)
-            
+#    def visit_of(self, node, data):
+#        sig = str(node.left.right.attr)
+#
+#        if sig == self.sig:
+#            key = BinaryNode(self.getkey())
+#            self.store(key, node)
+#            batchparser.addAsChildNodeToParent(data, key)
+#            
                 
     def searchProd(self, node, parent):
         if node == None: return None
@@ -214,3 +220,24 @@ class SubstituteSigDotProds:
             if result: return result            
             result = self.searchProd(node.right, node)
             return result
+
+    def deriveNodeType(self, node):
+        if node.type == ops.ATTR:
+            _type = node.attr
+        elif node.type == ops.HASH:
+            _type = str(node.right.attr)
+            return _type
+        elif node.type == ops.EXP:
+            return self.deriveNodeType(node.left)
+        elif node.type == ops.PAIR:
+            return 'GT'
+        elif node.type == ops.ON:
+            return self.deriveNodeType(node.right)
+        elif node == None:
+            return None
+        else:
+            return self.deriveNodeType(node.left)
+        #print("printing type =>", _type)
+        #print("node =>", node)
+        assert self.vars_def.get(_type) != None, "Key error in vars db => '%s'" % _type
+        return self.vars_def[_type]

@@ -19,7 +19,7 @@ BEGIN :: constant
 At, Bt, Ct, D
 END :: constant
 
-verify :=  { prod{i:=1, l} on e(S_i, At_i * (Bt_i^M_i) * (Ct_i^t_i)) } == D
+verify :=  { prod{y:=1, l} on e(S_y, At_y * (Bt_y^M_y) * (Ct_y^t_y)) } == D
 
 BEGIN :: transform
 2, 3, 4, S, 3

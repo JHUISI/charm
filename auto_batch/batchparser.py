@@ -397,13 +397,14 @@ class ASTAddIndex:
         if data['parent'].type in [ops.PROD, ops.EQ]:
             return
         if not self.isConstant(node):
-            node.setAttrIndex('j') # add index to each attr that isn't constant
+            node.setAttrIndex('z') # add index to each attr that isn't constant
     
     def isConstant(self, node):        
         for n in self.consts:
             if n == node.getAttribute(): return True
         return False
         
+# for single signer scenario only
 class CombineVerifyEq:
     def __init__(self, constants, variables):
         self.consts = constants
@@ -428,11 +429,11 @@ class CombineVerifyEq:
         if data['parent'].type in [ops.PROD, ops.EQ]:
             return
         if not self.isConstant(node):
-            node.setAttrIndex('j') # add index to each attr that isn't constant
+            node.setAttrIndex('z') # add index to each attr that isn't constant
     
     def newProdNode(self):
         p = BatchParser()
-        new_node = p.parse("prod{j:=1, N} on x")
+        new_node = p.parse("prod{z:=1, N} on x")
         return new_node
 
     def isConstant(self, node):
@@ -546,13 +547,13 @@ class SmallExponent:
         if node.right.type == ops.EXP:
             exp = node.right
             mul = BinaryNode(ops.MUL)
-            mul.right = BinaryNode("delta_j")
+            mul.right = BinaryNode("delta_z")
             mul.left = exp.right
             exp.right = mul
         else:
             new_node = self.newExpNode()
             new_node.left = node.right
-            new_node.right = BinaryNode("delta_j")
+            new_node.right = BinaryNode("delta_z")
             node.right = new_node
 #            new_node.right.setAttrIndex('j') # make more programmatic
     
@@ -588,7 +589,7 @@ class Technique2:
                 pair_node.left = node
                 self.rule += "Left := Move '" + str(node.right) + "' exponent into the pairing. "
             
-            if not self.isConstInSubtreeT(pair_node.right):       
+            elif not self.isConstInSubtreeT(pair_node.right):       
                 addAsChildNodeToParent(data, pair_node) # move pair node one level up                
                 node.left = pair_node.right
                 pair_node.right = node 

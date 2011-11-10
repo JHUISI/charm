@@ -28,6 +28,7 @@ def benchIndivVerification(N, equation, const, vars, precompute):
     rop_ind = RecordOperations(vars)
     # add attrIndex to non constants
     ASTVisitor(ASTAddIndex(const, vars)).preorder(equation)
+    print("Final indiv eq:", equation, "\n")
     if debug:
         print("<====\tINDIVIDUAL\t====>")
         print("vars =>", vars)
@@ -64,7 +65,7 @@ def benchBatchVerification(N, equation, const, vars, precompute):
                 bp = BatchParser()
                 index = BinaryNode( i )
                 if 'j' in index.attr_index:
-                    compute = bp.parse( "for{j:=1, N} do " + precompute[i] )
+                    compute = bp.parse( "for{z:=1, N} do " + precompute[i] )
                     rop_batch.visit(compute, {})
                     if debug: print("Precompute:", i, ":=", compute)
                 else:
@@ -90,7 +91,7 @@ if __name__ == "__main__":
         exit(-1)
     const, types = ast_struct[ CONST ], ast_struct[ TYPE ]
     (indiv_precompute, batch_precompute) = ast_struct[ PRECOMP ]
-    batch_precompute[ "delta" ] = "for{j := 1, N} do prng_j"
+    batch_precompute[ "delta" ] = "for{z := 1, N} do prng_z"
     
     algorithm = ast_struct [ TRANSFORM ]
     if not algorithm: algorithm = ['2', '3'] # standard transform that applies to most signature schemes we've tested
@@ -146,7 +147,6 @@ if __name__ == "__main__":
         print("Final batch eq:", verify2.right)
     
     # START BENCHMARK : THRESHOLD ESTIMATOR
-    print("Individual verif eq =>", verify.right, "\n")
     (indiv_msmt, indiv_avg_msmt) = benchIndivVerification(N, verify.right, const, vars, indiv_precompute)
     print("Result N =",N, ":", indiv_avg_msmt)
 
@@ -167,14 +167,14 @@ if __name__ == "__main__":
     # STOP BENCHMARK : THRESHOLD ESTIMATOR 
     # TODO: check avg for when batch is more efficient than 
     
-    subProds = SubstituteSigDotProds('j', 'N')
+    subProds = SubstituteSigDotProds(vars, 'z', 'N')
     ASTVisitor(subProds).preorder(verify2.right)
-    print("Dot prod =>", subProds.dotprod)
+    # print("Dot prod =>", subProds.dotprod)
     # need to check for presence of other variables
     key = None
     for i in metadata.keys():
         if i != 'N': key = i
-    subProds1 = SubstituteSigDotProds('i', key)
+    subProds1 = SubstituteSigDotProds(vars, 'y', key)
     subProds1.setState(subProds.cnt)
     ASTVisitor(subProds1).preorder(verify2.right)
     
@@ -187,7 +187,9 @@ if __name__ == "__main__":
         print("Compute: ", i,":=", subProds1.dotprod['dict'][i])
     for i in batch_precompute.keys():
         print("Precompute:", i, ":=", batch_precompute[i])
-    
+    for i in subProds.dotprod['list']:
+        print(i,":=", subProds.dotprod['types'][i])    
+
 
     # TODO: generate code for both which includes the detecting of invalid signatures from a batch
     #codeGenerator()
