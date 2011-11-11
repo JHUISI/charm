@@ -4,11 +4,11 @@ N := 100
 
 BEGIN ::types
 M := str
-g2 := G2
+mpk#1 := G2
 pk := G1
 S1 := G1
 S2 := G1
-P := G2
+mpk#0 := G2
 END :: types
 
 #sig := (S1, S2)
@@ -17,8 +17,8 @@ a := H(M | S1, ZR)
 END :: precompute
 
 BEGIN :: constant 
-P, pk, g2
+mpk#0, pk, mpk#1
 END :: constant
 
 # verify equation
-verify := { e(S2, g2) == e(S1 * pk^a, P) }
+verify := { e(S2, mpk#1) == e(S1 * pk^a, mpk#0) }

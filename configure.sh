@@ -860,6 +860,13 @@ if [ "$targetos" = "MINGW32" ] ; then
 	echo "OSFLAGS=--disable-static --enable-shared $OSFLAGS" >> $config_mk
 fi
 
+# For python installers on OS X.
+test_path=`echo $python_path | awk 'BEGIN {FS="."}{print $1}'`
+if [ "$test_path" = "/Library/Frameworks/Python" ] ; then
+echo "PYTHONFLAGS=build_ext -L/usr/local/lib -I/usr/local/include" >> $config_mk
+fi
+
+
 if test "$libm_found" = "no" ; then
    echo "ERROR: libm not found. Please install first, then re-run configure."
    rm $config_mk

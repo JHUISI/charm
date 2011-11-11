@@ -32,6 +32,8 @@ if __name__ == '__main__':
 			if (verifyParamFile.endswith(charmPickleSuffix)):
 				verifyParamPickle = open(verifyParamFile, 'rb').read()
 				verifyArgsDict[sigIndex][arg][bodyKey] = deserializeDict( unpickleObject( verifyParamPickle ) , groupParamArg )
+				if groupParamArg.isMember( verifyArgsDict[sigIndex][arg][bodyKey] ) == False:
+					sys.exit("The " + arg + " member of signature number " + sigIndex + " has failed the group membership check.  Exiting.\n")
 			elif (verifyParamFile.endswith(pythonPickleSuffix)):
 				verifyParamPickle = open(verifyParamFile, 'rb')
 				verifyArgsDict[sigIndex][arg][bodyKey] = pickle.load(verifyParamPickle)

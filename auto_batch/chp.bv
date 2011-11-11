@@ -3,7 +3,7 @@ N := 100
 
 BEGIN :: types
 M := str
-g := G2
+mpk#0 := G2
 pk := G2
 sig := G1
 b := ZR
@@ -16,7 +16,7 @@ b := H(M | t3, ZR)
 END :: precompute
 
 BEGIN :: constant
-a, g, h
+a, mpk#0, h
 END :: constant
 
-verify := { e(sig, g) == e(a, pk) * e(h, pk)^b }
+verify := { e(sig, mpk#0) == e(a, pk) * e(h, pk)^b }
