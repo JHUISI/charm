@@ -57,7 +57,7 @@ class WatersSig:
         print("k =>", k)
         r = group.random(ZR)
         k1 = msk * ((mpk['u1t'] * dotprod(group.init(G1), -1, mpk['z'], lam_func, mpk['u'], k)) ** r)  
-        k2 = mpk['g1'] ** ~r
+        k2 = mpk['g1'] ** -r
         return (k1, k2)
     
     def sign(self, mpk, sk, M):
@@ -68,7 +68,7 @@ class WatersSig:
         s  = group.random(ZR)
         S1 = k1 * ((mpk['u2t'] * dotprod(group.init(G1), -1, mpk['z'], lam_func, mpk['u'], m)) ** s)
         S2 = k2
-        S3 = mpk['g1'] ** ~s
+        S3 = mpk['g1'] ** -s
         return {'S1':S1, 'S2':S2, 'S3':S3}
     
     def verify(self, mpk, ID, M, sig):
