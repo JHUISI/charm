@@ -18,7 +18,7 @@ a := H(M_z | S1_z, ZR)
 END :: precompute
 
 BEGIN :: constant
-P, g2
+mpk#0, mpk#1
 END :: constant
 
-verify := { e(S2, g2) == ( e(pk, P)^a ) * S1 }
+verify := { e(S2, mpk#1) == ( e(pk, mpk#0)^a ) * S1 }

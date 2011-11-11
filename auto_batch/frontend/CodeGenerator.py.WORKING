@@ -16,7 +16,6 @@ This must all be on one line.
 
 import ast, os, sys, copy
 
-tempVerifySigsOutput = ""
 finalEqLineVars = []
 numSignersIndex = 'y'
 numSignaturesIndex = 'z' 

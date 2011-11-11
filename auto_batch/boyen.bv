@@ -4,9 +4,9 @@ l := 2
 BEGIN :: types
 M := ZR
 t := ZR
-At := G2
-Bt := G2
-Ct := G2
+Atpk := G2
+Btpk := G2
+Ctpk := G2
 D := GT
 S := G1
 END :: types
@@ -16,10 +16,10 @@ D := e(g1, g2)
 END :: precompute
 
 BEGIN :: constant
-At, Bt, Ct, D
+Atpk, Btpk, Ctpk, D
 END :: constant
 
-verify :=  { prod{y:=1, l} on e(S_y, At_y * (Bt_y^M_y) * (Ct_y^t_y)) } == D
+verify :=  { prod{y:=1, l} on e(S_y, Atpk_y * (Btpk_y^M_y) * (Ctpk_y^t_y)) } == D
 
 BEGIN :: transform
 2, 3, 4, S, 3
