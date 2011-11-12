@@ -94,4 +94,10 @@ void	Element_dealloc(Element* self);
 PyObject *Apply_pairing(Element *self, PyObject *args);
 PyObject *sha1_hash(Element *self, PyObject *args);
 
+int exp_rule(GroupType lhs, GroupType rhs);
+int mul_rule(GroupType lhs, GroupType rhs);
+int add_rule(GroupType lhs, GroupType rhs);
+int sub_rule(GroupType lhs, GroupType rhs);
+int div_rule(GroupType lhs, GroupType rhs);
+
 #endif

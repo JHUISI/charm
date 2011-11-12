@@ -1,6 +1,40 @@
 
 #include "pairingmodule.h"
 
+int exp_rule(GroupType lhs, GroupType rhs)
+{
+	if(lhs == ZR && rhs == ZR) return TRUE;
+	if(lhs == G1 && rhs == ZR) return TRUE;
+	if(lhs == G2 && rhs == ZR) return TRUE;
+	if(lhs == GT && rhs == ZR) return TRUE;
+	return FALSE; /* Fail all other cases */
+}
+
+int mul_rule(GroupType lhs, GroupType rhs)
+{
+	if(lhs == rhs) return TRUE;
+	if(lhs == ZR || rhs == ZR) return TRUE;
+	return FALSE; /* Fail all other cases */
+}
+
+int add_rule(GroupType lhs, GroupType rhs)
+{
+	if(lhs == rhs && lhs != GT) return TRUE;
+	return FALSE; /* Fail all other cases */
+}
+
+int sub_rule(GroupType lhs, GroupType rhs)
+{
+	if(lhs == rhs && lhs != GT) return TRUE;
+	return FALSE; /* Fail all other cases */
+}
+
+int div_rule(GroupType lhs, GroupType rhs)
+{
+	if(lhs == rhs) return TRUE;
+	return FALSE; /* Fail all other cases */
+}
+
 #define ERROR_TYPE(operand, ...) "unsupported "#operand" operand types: "#__VA_ARGS__
 
 #define UNARY(f, m, n) \
@@ -678,6 +712,10 @@ static PyObject *Element_add(Element *self, Element *other)
 	}
 #endif
 
+	if( add_rule(self->element_type, other->element_type) == FALSE) {
+		PyErr_SetString(ElementError, "invalid add operation");
+		return NULL;
+	}
 	// start micro benchmark
 	START_CLOCK(dBench);
 	newObject = createNewElement(self->element_type, self->pairing);
@@ -701,6 +739,10 @@ static PyObject *Element_sub(Element *self, Element *other)
 		element_printf("Right: e => '%B'\n", other->e);				
 	}
 #endif
+	if( sub_rule(self->element_type, other->element_type) == FALSE) {
+		PyErr_SetString(ElementError, "invalid sub operation");
+		return NULL;
+	}
 	
 	START_CLOCK(dBench);
 	newObject = createNewElement(self->element_type, self->pairing);
@@ -717,7 +759,7 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 	Element *self = NULL, *other = NULL, *newObject = NULL;
 	signed long int z;
 	int found_int = FALSE;
-	
+
 	// lhs or rhs must be an element type
 	if(PyElement_Check(lhs)) {
 		self = (Element *) lhs;		
@@ -756,6 +798,11 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 	}
 	else if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
 		// both are element types
+		if( mul_rule(self->element_type, other->element_type) == FALSE) {
+			PyErr_SetString(ElementError, "invalid mul operation");
+			return NULL;
+		}
+
 		if(self->element_type != ZR && other->element_type == ZR) {
 			START_CLOCK(dBench);
 			newObject = createNewElement(self->element_type, self->pairing);
@@ -840,6 +887,11 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 	}
 	else if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
 		// both are element types
+		if( div_rule(self->element_type, other->element_type) == FALSE) {
+			PyErr_SetString(ElementError, "invalid div operation");
+			return NULL;
+		}
+
 		START_CLOCK(dBench);
 		newObject = createNewElement(self->element_type, self->pairing);
 		element_div(newObject->e, self->e, other->e);
@@ -929,6 +981,10 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		debug("Starting '%s'\n", __func__);
 		debug_e("LHS: e => '%B'\n", lhs_o1->e);
 		debug_e("RHS: e => '%B'\n", rhs_o2->e);
+		if( exp_rule(lhs_o1->element_type, rhs_o2->element_type) == FALSE) {
+			PyErr_SetString(ElementError, "invalid exp operation");
+			return NULL;
+		}
 
 		if(rhs_o2->element_type == ZR) {
 			// element_pow_zn(newObject->e, lhs_o1->e, rhs_o1->e);
