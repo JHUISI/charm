@@ -1125,10 +1125,6 @@ def getOuterDotProds(batchVerifierOutput):
 	
 	return outerDotProds
 
-
-
-#def addDotProdLoops(batchOutputString, computeLineInfo, outerDotProds, assignMap, pythonCodeLines, listOfIndentedBlocks):
-
 def cleanVarsForDotProds(varsForDotProds):
 	#print("this is it")
 	#print(varsForDotProds)
@@ -1240,6 +1236,10 @@ def writeDotProdIndicesString(indexVarsOfDotProdsInOrder):
 	if (numSignaturesIndex not in indexVarsOfDotProdsInOrder):
 		return ""
 
+	if (len(indexVarsOfDotProdsInOrder) == 1) and (indexVarsOfDotProdsInOrder[0] == numSignaturesIndex):
+		return "[" + numSignaturesIndex + "]"
+
+
 	return "[" + numSignaturesIndex + "]"
 	
 	'''
@@ -1279,14 +1279,14 @@ def writeDotProdCalculations(batchOutputString, writeDotProdLines, computeLineIn
 	if (dotProdCalcString != ""):
 		indexString = writeDotProdIndicesString(indexVarsOfDotProdsInOrder)
 
-		if (writeDotProdLines == True) or (dotProdListName in outerDotProds):			
+		if (writeDotProdLines == True): #or (dotProdListName in outerDotProds):			
 			for tabNumber in range(0, numTabs):
 				batchOutputString += "\t"
 			batchOutputString += dotProdListName + indexString + " = " + dotProdCalcString + "\n"
 		
 		
 		
-		if (dotProdListName not in outerDotProds) or (writeDotProdLines == False):
+		if ( (dotProdListName not in outerDotProds) and (writeDotProdLines == True) ) or ( (writeDotProdLines == False) and (indexVar == numSignaturesIndex) ):
 			for tabNumber in range(0, numTabs):
 				batchOutputString += "\t"
 			if (dotProdListName.startswith(dotProdPrefix) == True):	
@@ -1294,6 +1294,15 @@ def writeDotProdCalculations(batchOutputString, writeDotProdLines, computeLineIn
 			elif (dotProdListName.startswith(sumPrefix) == True):
 				batchOutputString += dotProdListName + "_runningProduct = " + dotProdListName + "_runningProduct + " + dotProdListName + indexString + "\n"
 				
+		elif (writeDotProdLines == False) and (indexVar != numSignaturesIndex) :
+			for tabNumber in range(0, numTabs):
+				batchOutputString += "\t"
+			if (dotProdListName.startswith(dotProdPrefix) == True):	
+				batchOutputString += dotProdListName + "_runningProduct = " + dotProdListName + "_runningProduct * " + dotProdCalcString + "\n"
+			elif (dotProdListName.startswith(sumPrefix) == True):
+				batchOutputString += dotProdListName + "_runningProduct = " + dotProdListName + "_runningProduct + " + dotProdCalcString + "\n"
+
+
 
 		
 	batchOutputString += "\n"		
@@ -1508,8 +1517,6 @@ def addDotProdLoopRecursive(batchOutputString, writeDotProdLines, computeLineInf
 		dotProdRange = key
 		break
 
-	#print(dotProdList)
-
 	batchOutputString = addResetStatementsForDotProdCalcs(batchOutputString, dotProdList, numTabs)
 	
 	indexVar = dotProdRange[0]
@@ -1531,24 +1538,42 @@ def addDotProdLoopRecursive(batchOutputString, writeDotProdLines, computeLineInf
 		batchOutputString += "\t"
 
 	#listNamesToReplacementStrings = {}
-		
-	batchOutputString += "for " + indexVar + " in range(" + startVal + ", " + endValInCode + "):\n"
+	
+	if (writeDotProdLines == True) or (indexVar != numSignaturesIndex):	
+		batchOutputString += "for " + indexVar + " in range(" + startVal + ", " + endValInCode + "):\n"
+	else:
+		batchOutputString += "for " + indexVar + " in range(startIndex, EndIndex):\n"
+	
+	
+	
 	if (endValInCode == numSignaturesEndValInCode):
 		batchOutputString = setUpVerifyFuncArgs(batchOutputString, numTabs + 1, indexVar)
 		varsForDotProds = []
+
+		if (writeDotProdLines == True):
+			for topLevelKey in topLevelDotProd:
+				topLevelRange = topLevelKey
+				break
 		
-		for topLevelKey in topLevelDotProd:
-			topLevelRange = topLevelKey
-			break
-		
-		getVarsForDotProds(topLevelDotProd[topLevelRange], computeLineInfo, varsForDotProds)
+			getVarsForDotProds(topLevelDotProd[topLevelRange], computeLineInfo, varsForDotProds)
+		else:
+			topLevelDotProdList = []
+			topLevelDotProdList.append(topLevelDotProd)
+			DC_outerDotProdNoSigs = getDC_outerDotProds(topLevelDotProdList, False)
+			for topLevelKey in DC_outerDotProdNoSigs[0]:
+				topLevelRange = topLevelKey
+				break
+			getVarsForDotProds(DC_outerDotProdNoSigs[0][topLevelRange], computeLineInfo, varsForDotProds)
+
+			
+			
 		cleanVarsForDotProds(varsForDotProds)
 		linesForDotProds = getLinesForDotProds(varsForDotProds, assignMap, pythonCodeLines, listOfIndentedBlocks)
 		#listNamesToReplacementStrings = {}
 		#namesToReplacementsCopy = copy.deepcopy(listNamesToReplacementStrings)
 		
-		if (writeDotProdLines == True):
-			batchOutputString = writeDotProdLinesToFile(batchOutputString, computeLineInfo, pythonCodeLines, linesForDotProds, numTabs + 1, numTabsBeforeVerify, verifyFuncArgs, declaredLists, indexVar, None, listNamesToReplacementStrings)
+		#if (writeDotProdLines == True):
+		batchOutputString = writeDotProdLinesToFile(batchOutputString, computeLineInfo, pythonCodeLines, linesForDotProds, numTabs + 1, numTabsBeforeVerify, verifyFuncArgs, declaredLists, indexVar, None, listNamesToReplacementStrings)
 
 	for child in dotProdList[dotProdRange]:
 		if type(child).__name__ == pythonDictRep:
@@ -1998,7 +2023,7 @@ def getPrecomputeOuterDotProds(precomputeDotProdLoopOrder):
 				
 	return precomputeOuterDotProds
 
-def getDC_outerDotProdsRecursive(outerDotProdOrder, DC_outerDotProds):
+def getDC_outerDotProdsRecursive(outerDotProdOrder, DC_outerDotProds, addSignatureLoopDotProds):
 
 	#if (type(outerDotProdOrder).__name__ != pythonDictRep):
 		#DC_outerDotProds.append(outerDotProdOrder)
@@ -2017,14 +2042,22 @@ def getDC_outerDotProdsRecursive(outerDotProdOrder, DC_outerDotProds):
 
 	for dictChild in outerDotProdOrder[keyName]:
 		if ( (type(dictChild).__name__ != pythonDictRep)  and       ( (dictChild.startswith(dotProdPrefix)) or (dictChild.startswith(sumPrefix)) ) and (len(dictChild) == 4)  ):
-			DC_outerDotProds[keyName].append(dictChild)
-		elif ( (type(dictChild).__name__ == pythonDictRep) and (foundLastOne == False) ):
-			DC_outerDotProds.append{keyName:[]}
-			getDC_outerDotProdsRecursive(dictChild, DC_outerDotProds[len(DC_outerDotProds) - 1] )
+			if ( (foundLastOne == False) or (addSignatureLoopDotProds == True) ):
+				DC_outerDotProds[keyName].append(dictChild)
+			
+	for dictChild in outerDotProdOrder[keyName]:
+		if ( (type(dictChild).__name__ == pythonDictRep) and (foundLastOne == False) ):
+			for childKey in dictChild:
+				childKeyName = childKey
+				break
+
+			DC_outerDotProds[keyName].append({childKeyName:[]})
+			lenOfCurrentDC_OuterProdList = len(DC_outerDotProds[keyName])
+			getDC_outerDotProdsRecursive(dictChild, DC_outerDotProds[keyName][lenOfCurrentDC_OuterProdList - 1], addSignatureLoopDotProds )
 			
 
 
-def getDC_outerDotProds(outerDotProdOrder):
+def getDC_outerDotProds(outerDotProdOrder, addSignatureLoopDotProds):
 	DC_outerDotProds = []
 	
 	for listChild in outerDotProdOrder:
@@ -2037,7 +2070,7 @@ def getDC_outerDotProds(outerDotProdOrder):
 
 		DC_outerDotProds.append({keyName:[]})
 		
-		getDC_outerDotProdsRecursive(listChild, DC_outerDotProds[len(DC_outerDotProds) - 1])
+		getDC_outerDotProdsRecursive(listChild, DC_outerDotProds[len(DC_outerDotProds) - 1], addSignatureLoopDotProds)
 	
 	return DC_outerDotProds
 
@@ -2204,135 +2237,64 @@ if __name__ == '__main__':
 	batchEqNotSumOrDotVars = []
 	
 	distillBatchEqVars(batchEqVars, batchEqNotSumOrDotVars)
-	#print(batchEqDotProdVars)
-	#print(batchEqNotDotProdVars)
-	
 	assignMapVar = BuildAssignMap()
 	assignMapVar.visit(verifyFuncNode)
 	assignMap = assignMapVar.getAssignMap()
-
 	listOfIndentedBlocks = buildMapOfControlFlow(pythonCodeLines, verifyFuncNode.lineno, (verifyEqNode.lineno - 1))
 	computeLineInfo = getComputeLineInfo(batchVerifierOutput)	
 	outerDotProds = getOuterDotProds(batchVerifierOutput)
 	dotProdLoopOrder = []	
-	dotProdLoopOrder = getDotProdLoopOrder(computeLineInfo, outerDotProds, dotProdLoopOrder)
-	
+	dotProdLoopOrder = getDotProdLoopOrder(computeLineInfo, outerDotProds, dotProdLoopOrder)	
 	precomputeDotProdLoopOrder = getSplitDotProdLoopOrder(dotProdLoopOrder)
-
-	#print(dotProdLoopOrder)
-
-	DC_outerDotProds = getDC_outerDotProds(dotProdLoopOrder)
-
-	#print(DC_outerDotProds)
-
-	#print(precomputeDotProdLoopOrder)
+	DC_outerDotProds = getDC_outerDotProds(dotProdLoopOrder, True)
 	
+	mydctest = getDC_outerDotProds(dotProdLoopOrder, False)
+		
 	declaredLists = []
 	batchOutputString = addListDeclarations(batchOutputString, computeLineInfo, verifyFuncArgs, declaredLists)
 	batchOutputString = addDeltasAndArgSigIndexMap(batchOutputString, declaredLists)
-	
 	variableTypes = getVariableTypes(verifyFuncNode)
-	#print(variableTypes)
-
 	verifySigsOutput = ""
-	
 	batchOutputString = addDotProdLoops(batchOutputString, True, computeLineInfo, precomputeDotProdLoopOrder, assignMap, pythonCodeLines, listOfIndentedBlocks, numTabsOnVerifyFuncLine, verifyFuncArgs, declaredLists, outerDotProds)
-	
-	#standAloneVars = getStandAloneVars(batchEqNotSumOrDotVars)
-
-
 	batchOutputString = addLinesForNonDotProdVars(batchOutputString, assignMap, pythonCodeLines, listOfIndentedBlocks, computeLineInfo, 1, verifyFuncArgs)	
-
-
-
 	varNameFuncArgs = []
-	
-	precomputeOuterDotProds = getPrecomputeOuterDotProds(precomputeDotProdLoopOrder)
-	
-	
+	precomputeOuterDotProds = getPrecomputeOuterDotProds(precomputeDotProdLoopOrder)	
 	batchOutputString = addCallToVerifySigs(batchOutputString, precomputeOuterDotProds, varNameFuncArgs, verifyFuncArgs, pythonCodeNode)
-
 	verifySigsFile = open(verifySigsFile, 'w')
 	verifySigsOutput = ""
-	
-
 	for importFromLine in importFromLines:			
 		verifySigsOutput += importFromLine + "\n"
-		
 	verifySigsOutput += "import sys, copy\n"
 	verifySigsOutput += "from charm.engine.util import *\n"
 	verifySigsOutput += "from toolbox.pairinggroup import *\n\n"
 	verifySigsOutput += "bodyKey = \'Body\'\n\n"
 	verifySigsOutput += "def verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, "
-	
 	for precomputeOuterDotProd in precomputeOuterDotProds:
 		verifySigsOutput += precomputeOuterDotProd + ", "
-
 	for varNameFuncArg in varNameFuncArgs:
 		verifySigsOutput += varNameFuncArg + ", "
-
 	verifySigsOutput += "startIndex, endIndex):\n"
-
-
-
 	if (len(prereqAssignLineNos) > 0):
 		for prereqLineNo in prereqAssignLineNos:
 			prereqLine = getLinesFromSourceCode(pythonCodeLines, prereqLineNo, prereqLineNo, indentationList)
 			verifySigsOutput += "\t" + str(prereqLine[0]) + "\n"
 			#batchOutputString += "\t" + str(prereqLine[0]) + "\n"
-
-
-
 	verifySigsOutput = resetArgSigIndexDictTo1s(verifySigsOutput)
-	
-	#finalEqLineVars = getFinalEqLineVars()
-	
-	#verifySigsOutput = addLinesForNonDotProdVars(verifySigsOutput, batchEqNotSumOrDotVars, assignMap, pythonCodeLines, listOfIndentedBlocks, computeLineInfo, numTabsOnVerifyFuncLine, verifyFuncArgs)	
-
-
-	#verifySigsOutput = addLinesForNonDotProdVars(verifySigsOutput, assignMap, pythonCodeLines, listOfIndentedBlocks, computeLineInfo, numTabsOnVerifyFuncLine, verifyFuncArgs)	
-
-
-
 	outerDotProdsDict = {}
 	outerDotProdsDict['key'] = outerDotProds
-	verifySigsOutput = addResetStatementsForDotProdCalcs(verifySigsOutput, outerDotProdsDict, 1)
-
-	
-	#for outerDotProd in outerDotProds:
-		#verifySigsOutput += "\t" + outerDotProd + "_runningProduct = 1\n"
-
-
-	
+	verifySigsOutput = addResetStatementsForDotProdCalcs(verifySigsOutput, outerDotProdsDict, 1)	
 	if (isTopLayerLoopOverNumSignatures(dotProdLoopOrder) == False):	
 		verifySigsOutput = addDotProdLoops(verifySigsOutput, False, computeLineInfo, DC_outerDotProds, assignMap, pythonCodeLines, listOfIndentedBlocks, numTabsOnVerifyFuncLine, verifyFuncArgs, declaredLists, outerDotProds)
-
-
-#DC_outerDotProds
-
-
-	#verifySigsOutput = addDotProdLoops(verifySigsOutput, True, computeLineInfo, DC_outerDotProds, assignMap, pythonCodeLines, listOfIndentedBlocks, numTabsOnVerifyFuncLine, verifyFuncArgs, declaredLists, outerDotProds)
-
-
-
 	verifySigsOutput += "\n"
-
 	verifySigsOutput += "\tfor index in range(startIndex, endIndex):\n"
-	
 	for outerDotProd in outerDotProds:
-		if (outerDotProd.startswith(dotProdPrefix) == True):
+		if (outerDotProd.startswith(dotProdPrefix) == True)  and (outerDotProd in precomputeOuterDotProds):
 			verifySigsOutput += "\t\t" + outerDotProd + "_runningProduct = " + outerDotProd + "_runningProduct * " + outerDotProd + "[index]\n"
-		elif (outerDotProd.startswith(sumPrefix) == True):	
+		elif (outerDotProd.startswith(sumPrefix) == True) and (outerDotProd in precomputeOuterDotProds):	
 			verifySigsOutput += "\t\t" + outerDotProd + "_runningProduct = " + outerDotProd + "_runningProduct + " + outerDotProd + "[index]\n"
-			
-
 	verifySigsOutput += "\n"
-	
 	simplifiedFinalBatchEq = getSimplifiedFinalBatchEq(batchVerifierOutput, pythonCodeNode, verifyFuncArgs, varNameFuncArgs)	
 	verifySigsOutput = addEqualityTestFromFinalBatchEq(verifySigsOutput, simplifiedFinalBatchEq, outerDotProds, varNameFuncArgs)
-
-
-
 
 	individualVerFile.write(individualOutputString)
 	batchVerFile.write(batchOutputString)
