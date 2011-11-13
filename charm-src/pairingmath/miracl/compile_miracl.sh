@@ -1,6 +1,7 @@
 #!/bin/sh
 
-# Just make this do all my work.
+# untar MIRACL source into this directory, then run this script 
+# unzip -j -aa -L miracl.zip
 
 rm -f *.exe
 rm -f miracl.a
@@ -76,11 +77,9 @@ ar r miracl.a mrflsh1.o mrpi.o mrflsh2.o mrflsh3.o mrflsh4.o
 ar r miracl.a mrbrick.o mrebrick.o mrec2m.o mrgf2m.o mrmuldv.o mrshs512.o
 ar r miracl.a big.o zzn.o zzn2.o zzn3.o zzn6a.o ecn.o ecn3.o ec2.o flash.o crt.o mnt_pair.o
 rm mr*.o
-g++ -m64 -O2 ibe_extx.cpp miracl.a -o ibe_extx
 #g++ -m64 -O2 bls_gen.cpp miracl.a -o bls_gen
 #g++ -m64 -O2 bls_sign.cpp miracl.a -o bls_sign
 #g++ -m64 -O2 bls_ver.cpp miracl.a -o bls_ver
-
 #g++ -m64 -O2 bmark.c miracl.a -o bmark
 #g++ -m64 -O2 fact.c miracl.a -o fact
 #g++ -m64 -O2 mersenne.cpp miracl.a -o mersenne
