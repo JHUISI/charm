@@ -24,11 +24,18 @@ if config != None:
 path = 'charm-src/'
 _macros = []
 _charm_version = opt.get('VERSION')
+
 if opt.get('PAIR_MOD') == 'yes':
-   pairing_module = Extension('pairing', include_dirs = [path+'utils/'], 
+    if opt.get('USE_PBC') == 'yes':
+        pairing_module = Extension('pairing', include_dirs = [path+'utils/'], 
                            sources = [path+'pairingmath/pairingmodule.c', path+'utils/sha1.c', path+'utils/base64.c'],
                            libraries=['pbc', 'gmp'])
-   _ext_modules.append(pairing_module)
+    else:
+        # build MIRACL based pairing module - note that this is for experimental use only
+        pairing_module = Extension('pairing', include_dirs = [path+'utils/', path+'pairingmath/miracl/'], 
+                           sources = [path+'pairingmath/pairingmodule2.c', path+'utils/sha1.c', path+'utils/base64.c', path+'pairingmath/miracl/miraclwrapper.cc'],
+                           libraries=['stdc++'], extra_objects=[path+'pairingmath/miracl/miracl.a'], extra_compile_args=['-c -m64 -O2'])
+    _ext_modules.append(pairing_module)
    
 if opt.get('INT_MOD') == 'yes':
    integer_module = Extension('integer', include_dirs = [path+'utils/'],
