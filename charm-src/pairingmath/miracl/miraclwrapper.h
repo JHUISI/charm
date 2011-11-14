@@ -26,7 +26,7 @@ element_t *element_init_ZR(int value);
 element_t *element_init_G1(void);
 // element_t *element_init_G1_with(const pairing_t *pairing);
 element_t *element_init_G2(void);
-element_t *element_init_GT(void);
+element_t *_element_init_GT(const pairing_t *pairing);
 void element_random(Group_t type, const pairing_t *pairing, element_t *e);
 void element_printf(Group_t type, const element_t *e);
 int _element_length_to_str(Group_t type, const element_t *e);

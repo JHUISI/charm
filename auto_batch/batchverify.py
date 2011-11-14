@@ -167,28 +167,28 @@ if __name__ == "__main__":
     # STOP BENCHMARK : THRESHOLD ESTIMATOR 
     # TODO: check avg for when batch is more efficient than 
     
-    subProds = SubstituteSigDotProds(vars, 'z', 'N')
-    ASTVisitor(subProds).preorder(verify2.right)
+    #subProds = SubstituteSigDotProds(vars, 'z', 'N')
+    #ASTVisitor(subProds).preorder(verify2.right)
     # print("Dot prod =>", subProds.dotprod)
     # need to check for presence of other variables
-    key = None
-    for i in metadata.keys():
-        if i != 'N': key = i
-    subProds1 = SubstituteSigDotProds(vars, 'y', key)
-    subProds1.setState(subProds.cnt)
-    ASTVisitor(subProds1).preorder(verify2.right)
+    #key = None
+    #for i in metadata.keys():
+    #    if i != 'N': key = i
+    #subProds1 = SubstituteSigDotProds(vars, 'y', key)
+    #subProds1.setState(subProds.cnt)
+    #ASTVisitor(subProds1).preorder(verify2.right)
     
-    print("<====\tPREP FOR CODE GEN\t====>")
-    print("\nFinal version =>", verify2.right, "\n")
-    for i in subProds.dotprod['list']:
-        print("Compute: ", i,":=", subProds.dotprod['dict'][i])    
+    #print("<====\tPREP FOR CODE GEN\t====>")
+    #print("\nFinal version =>", verify2.right, "\n")
+    #for i in subProds.dotprod['list']:
+    #    print("Compute: ", i,":=", subProds.dotprod['dict'][i])    
 #    print("Dot prod =>", subProds1.dotprod)
-    for i in subProds1.dotprod['list']:
-        print("Compute: ", i,":=", subProds1.dotprod['dict'][i])
-    for i in batch_precompute.keys():
-        print("Precompute:", i, ":=", batch_precompute[i])
-    for i in subProds.dotprod['list']:
-        print(i,":=", subProds.dotprod['types'][i])    
+    #for i in subProds1.dotprod['list']:
+    #    print("Compute: ", i,":=", subProds1.dotprod['dict'][i])
+    #for i in batch_precompute.keys():
+    #    print("Precompute:", i, ":=", batch_precompute[i])
+    #for i in subProds.dotprod['list']:
+    #    print(i,":=", subProds.dotprod['types'][i])    
 
 
     # TODO: generate code for both which includes the detecting of invalid signatures from a batch

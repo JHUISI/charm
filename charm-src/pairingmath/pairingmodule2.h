@@ -124,14 +124,11 @@ typedef struct {
 #define element_from_bytes(o, b)   \
 	o->e = _element_from_bytes(o->pairing->curve, o->element_type, b);
 
-#define element_cmp(a, b) \
-	_element_cmp(a->element_type, a->e, b->e);
-
-#define element_length_to_str(a)	\
-	_element_length_to_str(a->element_type, a->e);
-
-#define element_to_str(d, a)   \
-	_element_to_str(d, a->element_type, a->e);
+#define element_cmp(a, b) _element_cmp(a->element_type, a->e, b->e);
+#define element_length_to_str(a) _element_length_to_str(a->element_type, a->e);
+#define element_to_str(d, a)  _element_to_str(d, a->element_type, a->e);
+#define element_init_GT(a)   _element_init_GT(a->pair_obj);
+#define check_membership(a)  element_is_member(a->pairing->curve, a->element_type, a->pairing->pair_obj, a->e)
 
 #define Check_Elements(o1, o2)  PyElement_Check(o1) && PyElement_Check(o2)
 

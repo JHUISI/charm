@@ -91,7 +91,8 @@ class Boyen(PKSig):
         return False
 
 if __name__ == "__main__":
-   groupObj = pairing('../param/d224.param')
+   #groupObj = pairing('../param/d224.param')
+   groupObj = pairing(80)
    boyen = Boyen(groupObj)
    mpk = boyen.setup()
    print("Pub parameters")

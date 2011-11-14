@@ -64,9 +64,11 @@ element_t *element_init_G2()
 	return (element_t *) g;
 }
 
-element_t *element_init_GT()
+element_t *_element_init_GT(const pairing_t *pairing)
 {
+	PFC *pfc = (PFC *) pairing;
 	GT *g = new GT();
+	*g = pfc->power(*g, Big(0)); // gt ^ 0 = identity element?
 	return (element_t *) g;
 }
 

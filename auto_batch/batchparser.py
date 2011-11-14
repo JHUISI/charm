@@ -800,13 +800,14 @@ class Technique3:
                     node.right = pair_node.left
                     pair_node.left = node # pair points to 'on' node
                     self.rule += "common 1st (left) node appears, so can reduce n pairings to 1. "
-                    self.visit_pair(pair_node, data)
-                    
-                if not self.isConstInSubtreeT(pair_node.right):
+                    self.visit_pair(pair_node, data)                    
+                elif not self.isConstInSubtreeT(pair_node.right):
                     node.right = pair_node.right
                     pair_node.right = node
                     self.rule += "common 2nd (right) node appears, so can reduce n pairings to 1. "
                     self.visit_pair(pair_node, data)
+                else:
+                    pass
             return
         elif Type(node.right) == ops.EXP:
             exp = node.right

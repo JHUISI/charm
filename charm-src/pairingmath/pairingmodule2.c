@@ -214,7 +214,7 @@ static Element *createNewElement(Group_t element_type, Pairing *pairing) {
 	}
 	else if(element_type == GT_t) {
 //		element_init_GT(retObject->e, pairing->pair_obj);
-		retObject->e = element_init_GT();
+		retObject->e = element_init_GT(pairing);
 		retObject->element_type = GT_t;
 	}
 	else {
@@ -1475,6 +1475,33 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 	return NULL;
 }
 
+static PyObject *Group_Check(Element *self, PyObject *args) {
+
+	if(self->pairing == NULL) {
+		PyErr_SetString(ElementError, "pairing params not initialized.");
+		return NULL;
+	}
+
+	PyObject *object = NULL;
+	if(PyArg_ParseTuple(args, "O", &object)) {
+		if(PyElement_Check(object)) {
+			Element *elem = (Element *) object;
+
+			if(check_membership(elem) == TRUE) {
+				Py_INCREF(Py_True);
+				return Py_True;
+			}
+			else {
+				Py_INCREF(Py_False);
+				return Py_False;
+			}
+		}
+	}
+
+	PyErr_SetString(ElementError, "invalid object type.");
+	return NULL;
+}
+
 #if PY_MAJOR_VERSION >= 3
 
 PyTypeObject PairingType = {
@@ -1770,6 +1797,7 @@ PyMethodDef Element_methods[] = {
 	{"H", (PyCFunction)Element_hash, METH_VARARGS, "Hash an element type to a specific field: Zr, G1_t, or G2"},
 	{"serialize", (PyCFunction)Serialize_cmp, METH_VARARGS, "Serialize an element type into bytes."},
 	{"deserialize", (PyCFunction)Deserialize_cmp, METH_VARARGS, "De-serialize an bytes object into an element object"},
+	{"ismember", (PyCFunction) Group_Check, METH_VARARGS, "Group membership test for element objects."},
     {NULL}  /* Sentinel */
 };
 
