@@ -150,7 +150,7 @@ void element_printf(Group_t type, const element_t *e)
 }
 
 // assume data_str is a NULL ptr
-int element_to_str(unsigned char **data_str, Group_t type, const element_t *e)
+int _element_length_to_str(Group_t type, const element_t *e)
 {
 	stringstream ss;
 	string s;
@@ -177,11 +177,40 @@ int element_to_str(unsigned char **data_str, Group_t type, const element_t *e)
 		return FALSE;
 	}
 	s = ss.str();
-	*data_str = (unsigned char *) malloc(s.size()+4);
-	memset(*data_str, 0, s.size()+1);
+	return s.size();
+}
+
+int _element_to_str(unsigned char **data_str, Group_t type, const element_t *e)
+{
+	stringstream ss;
+	string s;
+	if(type == ZR_t) {
+		Big *y = (Big *) e;
+		ss << *y;
+	}
+	else if(type == G1_t) {
+		G1 *point = (G1 *) e;
+		ss << point->g;
+	}
+	else if(type == G2_t) {
+		G2 *point = (G2 *) e;
+		ss << point->g;
+//		cout << "G2 origin => " << point->g << endl;
+	}
+	else if(type == GT_t) {
+		GT *point = (GT *) e;
+		ss << point->g;
+//		cout << "GT origin => " << point->g << endl;
+	}
+	else {
+		cout << "Unrecognized type" << endl;
+		return FALSE;
+	}
+	s = ss.str();
 	memcpy(*data_str, s.c_str(), s.size());
 	return TRUE;
 }
+
 void _element_add(Group_t type, element_t *c, const element_t *a, const element_t *b)
 {
 	if(type == ZR_t) {
@@ -232,7 +261,7 @@ void _element_mul(Group_t type, element_t *c, const element_t *a, const element_
 //		*z = *x * *y;
 		Big *o1 = (Big *) o;
 		*z = modmult(*x, *y, *o1);
-		cout << "Result => " << *z << endl;
+//		cout << "Result => " << *z << endl;
 	}
 	else if(type == G1_t) {
 		G1 *x = (G1 *) a;  G1 *y = (G1 *) b; G1 *z = (G1 *) c;
@@ -584,6 +613,37 @@ void _element_set(Curve_t ctype, Group_t type, element_t *dst, const element_t *
 	}
 }
 
+
+char *print_mpz(mpz_t x, int base) {
+	if(base <= 2 || base > 64) return NULL;
+	size_t x_size = mpz_sizeinbase(x, base) + 2;
+	char *x_str = (char *) malloc(x_size + 1);
+	memset(x_str, 0, x_size);
+	x_str = mpz_get_str(x_str, base, x);
+//	printf("Element => '%s'\n", x_str);
+//	printf("Order of Element => '%zd'\n", x_size);
+	// free(x_str);
+	return x_str;
+}
+
+
+void _element_set_mpz(Group_t type, element_t *dst, mpz_t src)
+{
+	// convert an mpz to a Big (for ZR_t)
+	if(type == ZR_t) {
+		char *x_string = print_mpz(src, 10);
+		big y;
+		y = mirvar(0);
+
+		cinstr(y, x_string);
+		Big *b = new Big(y);
+//		cout << "Converted => " << *b << endl;
+		free(x_string);
+		Big *d = (Big *) dst;
+		*d = *b;
+	}
+}
+
 /* Note the following type definition from MIRACL pairing_3.h
  * G1 is a point over the base field, and G2 is a point over an extension field.
  * GT is a finite field point over the k-th extension, where k is the embedding degree.
@@ -594,11 +654,11 @@ element_t *_element_pairing_type3(const pairing_t *pairing, const element_t *in1
 	G1 *g1 = (G1 *) in1;
 	G2 *g2 = (G2 *) in2;
 
-	GT gt = pfc->pairing(*g2, *g1); // assumes type-3 pairings for now
-	GT *gt_res = new GT(gt);
-//	cout << "Result of pairing => " << gt.g << endl;
+	GT *gt = new GT(pfc->pairing(*g2, *g1)); // assumes type-3 pairings for now
+//	GT *gt_res = new GT(gt);
+//	cout << "Result of pairing => " << gt->g << endl;
 //	cout << "Result of pairing2 => " << gt_res->g << endl;
-	return (element_t *) gt_res;
+	return (element_t *) gt;
 }
 
 string bigToBytes(Big x)

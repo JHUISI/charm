@@ -2,6 +2,9 @@
 """
 from charm.pairing import *
 from toolbox.PKSig import PKSig
+#import gc
+#gc.disable()
+#gc.set_debug(gc.DEBUG_LEAK)
 
 debug = False
 
@@ -32,7 +35,9 @@ class CHCH(PKSig):
         S1 = pair(h,pk['g2']) ** s 
         a = H2(M, S1)
         S2 = (sk ** a) * (h ** s)
+        #return {'S1':S1, 'S2':S2}
         return (S1, S2)
+
     
     def verify(self, mpk, pk, M, sig):
         print("verify...")
@@ -44,7 +49,8 @@ class CHCH(PKSig):
 
 if __name__ == "__main__":
    
-   groupObj = pairing('../param/a.param')
+   #groupObj = pairing('../param/a.param')
+   groupObj = pairing(80)
    chch = CHCH(groupObj)
    (mpk, msk) = chch.setup()
 
@@ -57,7 +63,11 @@ if __name__ == "__main__":
    M = "this is a message!" 
    sig = chch.sign(mpk, sk, M)
    print("Signature...")
-   print("sig =>", sig)
+   #print("sig =>", sig)
+   #for i in sig.keys():
+   #    print("sig['", i, "'] => ", sig[i])
+   #print("sig =>", sig['S1'])
+   #print("sig =>", sig['S2'])
 
    assert chch.verify(mpk, pk, M, sig), "invalid signature!"
    print("Verification successful!")

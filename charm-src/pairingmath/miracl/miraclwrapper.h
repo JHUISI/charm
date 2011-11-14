@@ -1,3 +1,4 @@
+#include <gmp.h>
 
 typedef void pairing_t;
 typedef void element_t;
@@ -28,7 +29,8 @@ element_t *element_init_G2(void);
 element_t *element_init_GT(void);
 void element_random(Group_t type, const pairing_t *pairing, element_t *e);
 void element_printf(Group_t type, const element_t *e);
-int element_to_str(unsigned char **data_str, Group_t type, const element_t *e);
+int _element_length_to_str(Group_t type, const element_t *e);
+int _element_to_str(unsigned char **data_str, Group_t type, const element_t *e);
 
 void _element_add(Group_t type, element_t *c, const element_t *a, const element_t *b); // c = a + b
 void _element_sub(Group_t type, element_t *c, const element_t *a, const element_t *b); // c = a - b
@@ -51,6 +53,8 @@ int element_is_value(Group_t type, element_t *n, int value);
 int _element_cmp(Group_t type, element_t *a, element_t *b);
 void _element_set_si(Group_t type, element_t *dst, const signed long int src);
 void _element_set(Curve_t ctype, Group_t type, element_t *dst, const element_t *src);
+char *print_mpz(mpz_t x, int base);
+void _element_set_mpz(Group_t type, element_t *dst, mpz_t src);
 element_t *_element_pairing_type3(const pairing_t *pairing, const element_t *in1, const element_t *in2);
 
 // I/O functions start

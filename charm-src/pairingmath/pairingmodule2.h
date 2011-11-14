@@ -12,17 +12,17 @@
 #include <longintrepr.h>
 #include <stdlib.h>
 #include "miraclwrapper.h"
+#include <gmp.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "sha1.h"
 #include "benchmarkmodule.h"
-#include "base64.h"
 
 //#define DEBUG	1
 //#define TRUE	1
 //#define FALSE	0
-#define BUF_MAX_LEN 2048
+#define BUF_MAX_LEN 512
 #define HASH_LEN 20
 #define MAX_BENCH_OBJECTS	2
 
@@ -90,14 +90,18 @@ typedef struct {
 #define element_set_si(a, b) \
 	if(a->element_type == ZR_t) { _element_set_si(a->element_type, a->e, b); }
 
+#define element_set_mpz(a, b)  \
+	_element_set_mpz(a->element_type, a->e, b);
+
 #define element_neg(a, b) \
 	a->e = _element_neg(a->element_type, b->e, b->pairing->order);
 
 #define element_invert(a, b) \
 	_element_inv(b->element_type, b->e, a->e, b->pairing->order)
 
-#define element_pow_zr(a, b) \
-	_element_pow_zr(a->element_type, a->pairing->pair_obj, a->e, b->e)
+#define element_pow_zr(c, a, b) \
+	c->e = _element_pow_zr(a->element_type, a->pairing->pair_obj, a->e, b->e); \
+	c->element_type = a->element_type;
 
 #define pairing_apply(c, a, b) \
 	if(a->pairing->curve == MNT) { \
@@ -122,6 +126,12 @@ typedef struct {
 
 #define element_cmp(a, b) \
 	_element_cmp(a->element_type, a->e, b->e);
+
+#define element_length_to_str(a)	\
+	_element_length_to_str(a->element_type, a->e);
+
+#define element_to_str(d, a)   \
+	_element_to_str(d, a->element_type, a->e);
 
 #define Check_Elements(o1, o2)  PyElement_Check(o1) && PyElement_Check(o2)
 

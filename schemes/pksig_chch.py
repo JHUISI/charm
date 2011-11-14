@@ -44,7 +44,8 @@ class CHCH(PKSig):
 
 if __name__ == "__main__":
    
-   groupObj = pairing('../param/a.param')
+   #groupObj = pairing('../param/a.param')
+   groupObj = pairing(80)
    chch = CHCH(groupObj)
    (mpk, msk) = chch.setup()
 
@@ -57,7 +58,8 @@ if __name__ == "__main__":
    M = "this is a message!" 
    sig = chch.sign(pk, sk, M)
    print("Signature...")
-   print("sig =>", sig)
+   print("sig['S1'] =>", sig['S1'])
+   print("sig['S2'] =>", sig['S2'])
 
    assert chch.verify(mpk, pk, M, sig), "invalid signature!"
    print("Verification successful!")

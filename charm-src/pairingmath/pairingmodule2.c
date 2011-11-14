@@ -6,6 +6,7 @@
 
 #include "pairingmodule2.h"
 
+
 int exp_rule(Group_t lhs, Group_t rhs)
 {
 	if(lhs == ZR_t && rhs == ZR_t) return TRUE;
@@ -110,27 +111,27 @@ static PyObject *f(PyObject *v, PyObject *w) { \
 //	mpz_clear (temp);
 //	return (PyObject *) l;
 //}
-//
-//void longObjToMPZ (mpz_t m, PyLongObject * p)
-//{
-//	int size, i, tmp = Py_SIZE(p);
-//	mpz_t temp, temp2;
-//	mpz_init (temp);
-//	mpz_init (temp2);
-//	if (tmp > 0)
-//		size = tmp;
-//	else
-//		size = -tmp;
-//	mpz_set_ui (m, 0);
-//	for (i = 0; i < size; i++)
-//	{
-//		mpz_set_ui (temp, p->ob_digit[i]);
-//		mpz_mul_2exp (temp2, temp, PyLong_SHIFT * i);
-//		mpz_add (m, m, temp2);
-//	}
-//	mpz_clear (temp);
-//	mpz_clear (temp2);
-//}
+
+void longObjToMPZ (mpz_t m, PyLongObject * p)
+{
+	int size, i, tmp = Py_SIZE(p);
+	mpz_t temp, temp2;
+	mpz_init (temp);
+	mpz_init (temp2);
+	if (tmp > 0)
+		size = tmp;
+	else
+		size = -tmp;
+	mpz_set_ui (m, 0);
+	for (i = 0; i < size; i++)
+	{
+		mpz_set_ui (temp, p->ob_digit[i]);
+		mpz_mul_2exp (temp2, temp, PyLong_SHIFT * i);
+		mpz_add (m, m, temp2);
+	}
+	mpz_clear (temp);
+	mpz_clear (temp2);
+}
 
 char *convert_buffer_to_hex(uint8_t * data, size_t len)
 {
@@ -229,21 +230,21 @@ static Element *createNewElement(Group_t element_type, Pairing *pairing) {
 void 	Pairing_dealloc(Pairing *self)
 {
 	if(self->safe) {
-		debug("Clear pairing => 0x%p\n", self->pair_obj);
+//		printf("Clear pairing => 0x%p\n", self->pair_obj);
 		pairing_clear(self->pair_obj);
 		element_delete(ZR_t, self->order);
 		self->pair_obj = NULL;
 		self->order = NULL;
 	}
 
-	debug("Releasing pairing object!\n");
+//	printf("Releasing pairing object!\n");
 	Py_TYPE(self)->tp_free((PyObject *) self);
 }
 
 void	Element_dealloc(Element* self)
 {
 	// add reference count to objects
-	if(self->elem_initialized && self->e) {
+	if(self->elem_initialized) {
 //		debug_e("Clear element_t => '%B'\n", self->e);
 		element_delete(self->element_type, self->e);
 	}
@@ -253,32 +254,36 @@ void	Element_dealloc(Element* self)
 //		pairing_clear(self->pairing);
 //	}
 	if(self->safe_pairing_clear) {
+		pairing_clear(self->pairing->pair_obj);
+		self->pairing->pair_obj = NULL;
+		element_delete(ZR_t, self->pairing->order);
+		self->pairing->order = NULL;
 		PyObject_Del(self->pairing);
 	}
 
 	Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
-// helper method 
-ssize_t read_file(FILE *f, char** out) 
-{
-	if(f != NULL) {
-		/* See how big the file is */
-		fseek(f, 0L, SEEK_END);
-		ssize_t out_len = ftell(f);
-		debug("out_len: %zd\n", out_len);
-		if(out_len <= MAX_LEN) {
-			/* allocate that amount of memory only */
-			if((*out = (char *) malloc(out_len+1)) != NULL) {
-				fseek(f, 0L, SEEK_SET);
-				fread(*out, sizeof(char), out_len, f);
-				return out_len;
-			}
-		}
-	}
-
-	return 0;
-}
+//// helper method
+//ssize_t read_file(FILE *f, char** out)
+//{
+//	if(f != NULL) {
+//		/* See how big the file is */
+//		fseek(f, 0L, SEEK_END);
+//		ssize_t out_len = ftell(f);
+//		debug("out_len: %zd\n", out_len);
+//		if(out_len <= MAX_LEN) {
+//			/* allocate that amount of memory only */
+//			if((*out = (char *) malloc(out_len+1)) != NULL) {
+//				fseek(f, 0L, SEEK_SET);
+//				fread(*out, sizeof(char), out_len, f);
+//				return out_len;
+//			}
+//		}
+//	}
+//
+//	return 0;
+//}
 
 //char * init_pbc_param(char *file, pairing_t *pairing)
 //{
@@ -628,13 +633,13 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 		return NULL;
 	}
 
-//	if(long_obj != NULL && PyLong_Check(long_obj)) {
-//		mpz_t m;
-//		mpz_init(m);
-//		longObjToMPZ(m, (PyLongObject *) long_obj);
-//		element_set_mpz(retObject->e, m);
-//		mpz_clear(m);
-//	}
+	if(long_obj != NULL && PyLong_Check(long_obj)) {
+		mpz_t m;
+		mpz_init(m);
+		longObjToMPZ(m, (PyLongObject *) long_obj);
+		element_set_mpz(retObject, m);
+		mpz_clear(m);
+	}
 	
 	/* return Element object */
 	return (PyObject *) retObject;		
@@ -646,23 +651,16 @@ PyObject *Element_print(Element* self)
 	PyObject *strObj;
 	debug("Contents of element object\n");
 	if(self->elem_initialized) {
-//		element_snprintf(tmp, max, "%B", self->e);
-		// print("Print => ", self->element_type, self->e);
-		unsigned char *tmp = NULL;
-		if(element_to_str(&tmp, self->element_type, self->e) == TRUE) {
-			strObj = PyUnicode_FromString((const char *) tmp);
-			free(tmp);
-			return strObj;
-		}
-	}
+		int len = element_length_to_str(self);
+		unsigned char *tmp = (unsigned char *) malloc(len + 1);
+		memset(tmp, 0, len);
+		element_to_str(&tmp, self);
+		tmp[len] = '\0';
 
-//	if(self->pairing && self->safe_pairing_clear) {
-//		if(self->param_buf != NULL) return PyUnicode_FromString((char *) self->param_buf);
-//		else {
-//			pbc_param_out_str(stdout, self->pairing->p);
-//			return PyUnicode_FromString("");
-//		}
-//	}
+		strObj = PyUnicode_FromString((const char *) tmp);
+		free(tmp);
+		return strObj;
+	}
 
 	return PyUnicode_FromString("");
 }
@@ -981,8 +979,9 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		if(rhs_o2->element_type == ZR_t) {
 			START_CLOCK(dBench);
 			newObject = createNewElement(NONE_G, lhs_o1->pairing);
-			newObject->e = element_pow_zr(lhs_o1, rhs_o2);
-			newObject->element_type = lhs_o1->element_type;
+			element_pow_zr(newObject, lhs_o1, rhs_o2);
+			// newObject->e = element_pow_zr(lhs_o1, rhs_o2);
+			// newObject->element_type = lhs_o1->element_type;
 			STOP_CLOCK(dBench);
 		}
 		else {
