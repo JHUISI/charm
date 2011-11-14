@@ -42,7 +42,7 @@ if __name__ == "__main__":
 	bls = IBSig()
 	(pk, sk) = bls.keygen(0)
 
-	print(pk)
+	#print(pk)
 
 	f_pk = open('pkBLS.charmPickle', 'wb')
 	pick_pk = pickleObject(serializeDict(pk, group))
@@ -65,9 +65,9 @@ if __name__ == "__main__":
 		message = ""
 		for randomChar in range(0, messageSize):
 			message += random.choice(string.printable)
-		print(message)
+		#print(message)
 		sig = bls.sign(sk['x'], message)
-		print(sig)
+		#print(sig)
 		assert bls.verify(pk, sig, message)
 
 		f_message = open(prefixName + str(index) + '_ValidMessage.pythonPickle', 'wb')
@@ -98,7 +98,7 @@ if __name__ == "__main__":
 		for randomChar in range(0, messageSize):
 			message += random.choice(string.printable)
 		sig = bls.sign(sk['x'], message)
-		print(sig)
+		#print(sig)
 		assert bls.verify(pk, sig, message)
 
 		f_message = open(prefixName + str(index) + '_InvalidMessage.pythonPickle', 'wb')
@@ -115,7 +115,7 @@ if __name__ == "__main__":
 		else:
 			message = message[0:randomIndex] + newValue
 
-		print(message)
+		#print(message)
 
 		f_sig = open(prefixName + str(index) + '_InvalidSignature.charmPickle', 'wb')
 		invalidOutputDict[index]['sig'] = prefixName + str(index) + '_InvalidSignature.charmPickle'
