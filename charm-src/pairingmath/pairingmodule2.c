@@ -1051,6 +1051,36 @@ static PyObject *Element_set(Element *self, PyObject *args)
     return Py_BuildValue("i", errcode);
 }
 
+static PyObject *Element_setxy(Element *self, PyObject *args)
+{
+    Element *object1 = NULL, *object2 = NULL;
+    int errcode = TRUE;
+
+    if(self->elem_initialized == FALSE) {
+    	PyErr_SetString(ElementError, "must initialize element to a field (G1_t,G2,GT, or Zr)");
+    	errcode = FALSE;
+    	return Py_BuildValue("i", errcode);
+    }
+//
+    debug("Creating a new element\n");
+    if(PyArg_ParseTuple(args, "|OO", &object1, &object2)) {
+            // convert into an int using PyArg_Parse(...)
+            // set the element
+    	if(self->element_type == G1_t) {
+    		if(object1->element_type == object2->element_type && object1->element_type == ZR_t) {
+    			errcode = element_setG1(self, object1, object2);
+    		}
+    		else {
+    	    	PyErr_SetString(ElementError, "types are not the same!");
+    	    	errcode = FALSE;
+    	    	return Py_BuildValue("i", errcode);
+    		}
+        }
+    }
+
+    return Py_BuildValue("i", errcode);
+}
+
 /* this is a type method that is visible on the global or class level. Therefore,
    the function prototype needs the self (element class) and the args (tuple of Element objects).
  */
@@ -1294,8 +1324,8 @@ static PyObject *Element_equals(PyObject *lhs, PyObject *rhs, int opid) {
 	signed long int z;
 	int found_int = FALSE, result = -1; // , value;
 
-	if(opid != Py_EQ) {
-		PyErr_SetString(ElementError, "only comparison supported is '=='");
+	if(opid != Py_EQ && opid != Py_NE) {
+		PyErr_SetString(ElementError, "only comparison supported is '==' or '!='");
 		goto cleanup;
 	}
 
@@ -1359,13 +1389,19 @@ static PyObject *Element_equals(PyObject *lhs, PyObject *rhs, int opid) {
 	}
 cleanup:
 //	value = (result == 0) ? TRUE : FALSE;
-	if(result == TRUE) {
-		Py_INCREF(Py_True);
-		return Py_True;
-	}
 
-	Py_INCREF(Py_False);
-	return Py_False; // Py_BuildValue("i", value);
+	if(opid == Py_EQ) {
+		if(result == TRUE) {
+			Py_INCREF(Py_True); return Py_True;
+		}
+		Py_INCREF(Py_False); return Py_False;
+	}
+	else { /* Py_NE */
+		if(result == FALSE) {
+			Py_INCREF(Py_True); return Py_True;
+		}
+		Py_INCREF(Py_False); return Py_False;
+	}
 }
 
 static PyObject *Element_long(PyObject *o1) {
@@ -1458,11 +1494,8 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 			uint8_t *serial_buf = (uint8_t *) PyBytes_AsString(object);
 			int type = atoi((const char *) &(serial_buf[0]));
 			uint8_t *base64_buf = (uint8_t *)(serial_buf + 2);
-//			debug("type => %d\n", type);
-//			debug("base64 dec => '%s'\n", base64_buf);
-//			size_t deserialized_len = strlen((char *) binary_buf);
-//			size_t deserialized_len = 0;
-//			uint8_t *binary_buf = NewBase64Decode((const char *) base64_buf, strlen((char *) base64_buf), &deserialized_len);
+//			printf("type => %d\n", type);
+//			printf("base64 dec => '%s'\n", base64_buf);
 
 			if(type != NONE_G && strlen((char *) base64_buf) > 0) {
 //				debug("result => ");
@@ -1801,6 +1834,7 @@ PyMethodDef Element_methods[] = {
 	{"init", (PyCFunction)Element_elem, METH_VARARGS, "Create an element in a specific group: G1, G2, GT or Zr"},
 	{"random", (PyCFunction)Element_random, METH_VARARGS, "Return a random element in a specific group: G1_t, G2, Zr"},
 	{"set", (PyCFunction)Element_set, METH_VARARGS, "Set an element to a fixed value."},
+	{"setPoint", (PyCFunction)Element_setxy, METH_VARARGS, "Set x and y coordinates of a G1 element object."},
 	{"H", (PyCFunction)Element_hash, METH_VARARGS, "Hash an element type to a specific field: Zr, G1_t, or G2"},
 	{"serialize", (PyCFunction)Serialize_cmp, METH_VARARGS, "Serialize an element type into bytes."},
 	{"deserialize", (PyCFunction)Deserialize_cmp, METH_VARARGS, "De-serialize an bytes object into an element object"},

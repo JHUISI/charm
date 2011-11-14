@@ -581,6 +581,17 @@ void _element_set_si(Group_t type, element_t *dst, const signed long int src)
 	}
 }
 
+int _element_setG1(Group_t type, element_t *c, const element_t *a, const element_t *b)
+{
+	if(type == G1_t) {
+		G1 *p = (G1 *) c;
+		Big *x = (Big *) a;
+		Big *y = (Big *) b;
+
+		if(p->g.set(*x, *y)) return TRUE;
+	}
+	return FALSE;
+}
 
 void _element_set(Curve_t ctype, Group_t type, element_t *dst, const element_t *src)
 {
@@ -673,8 +684,12 @@ string bigToBytes(Big x)
 	memset(c, 0, MAX_LEN);
 	int size = to_binary(x, MAX_LEN, c, FALSE);
 	string bytes(c, size);
+//	printf("bigToBytes before => ");
+//	_printf_buffer_as_hex((uint8_t *) bytes.c_str(), size);
 	stringstream ss;
 	ss << size << ":" << bytes << "\0";
+//	printf("bigToBytes after => ");
+//	_printf_buffer_as_hex((uint8_t *) ss.str().c_str(), ss.str().size());
 	return ss.str();
 }
 
@@ -685,8 +700,10 @@ Big *bytesToBig(string str, int *counter)
 	const char *elem = str.substr(pos+1, pos + len).c_str();
 //		cout << "pos of elem => " << pos << endl;
 //		cout << "elem => " << elem << endl;
+//	printf("bytesToBig before => ");
+//	_printf_buffer_as_hex((uint8_t *) elem, len);
 	Big x = from_binary(len, (char *) elem);
-//		cout << "Big => " << x << endl;
+//	cout << "Big => " << x << endl;
 	Big *X  = new Big(x);
 	*counter  = pos + len + 1;
 	return X;
@@ -697,25 +714,25 @@ int _element_length_in_bytes(Curve_t ctype, Group_t type, element_t *e) {
 	memset(c, 0, MAX_LEN);
 	if(type == ZR_t) {
 		Big *s = (Big *) e;
-		int size = to_binary(*s, MAX_LEN, c, FALSE);
-		stringstream o;
-		o << size << ":" << c << "\0";
+		string t;
+		t.append(bigToBytes(*s));
+//		int size = to_binary(*s, MAX_LEN, c, FALSE);
+//		stringstream o;
+//		o << size << ":" << c << "\0";
 		// purely for estimating length
-		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(o.str().c_str()), o.str().size());
+		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
 		return encoded.size();
 	}
 	else if(type == G1_t) {
 		G1 *p = (G1 *) e;
 		Big x, y;
 		p->g.get(x, y);
-		int size_x = to_binary(x, MAX_LEN, c, FALSE);
-		stringstream o;
-		o << size_x << ":" << c;
-		memset(c, 0, MAX_LEN);
-		int size_y = to_binary(y, MAX_LEN, c, FALSE);
-		o << size_y << ":" << c << "\0";
+		string t;
+		t.append(bigToBytes(x));
+		t.append(bigToBytes(y));
+
 		// purely for estimating length
-		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(o.str().c_str()), o.str().size());
+		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
 		return encoded.size();
 	}
 	else if(type == G2_t) {
@@ -732,7 +749,6 @@ int _element_length_in_bytes(Curve_t ctype, Group_t type, element_t *e) {
 		}
 		// base64 encode t and return
 		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
-//		cout << "P(x) 64 => " << encoded << endl;
 		return encoded.size();
 	}
 	else if(type == GT_t) {
@@ -755,7 +771,6 @@ int _element_length_in_bytes(Curve_t ctype, Group_t type, element_t *e) {
 	    }
 		// base64 encode t and return
 		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
-//		cout << "P(x) 64 => " << encoded << endl;
 		return encoded.size();
 	}
 
@@ -766,35 +781,29 @@ int _element_to_bytes(unsigned char *data, Curve_t ctype, Group_t type, element_
 	char c[MAX_LEN+1];
 	memset(c, 0, MAX_LEN);
 	int enc_len;
+	string t;
 
 	if(type == ZR_t) {
 		Big *s = (Big *) e;
-		int size = to_binary(*s, MAX_LEN, c, FALSE);
-
-		stringstream out;
-		string bytes(c), final;
-		out << size << ":" << bytes << "\0";
-//		cout << "" << endl;
-//		cout << "Output => " << out.str() << endl;
-		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(out.str().c_str()), out.str().size());
-		memcpy(data, encoded.c_str(), encoded.size());
+		t.append(bigToBytes(*s));
+		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
+		enc_len = encoded.size();
+		memcpy(data, encoded.c_str(), enc_len);
+		data[enc_len] = '\0';
 //		printf("Result => ");
-//		_printf_buffer_as_hex((uint8_t *) data, final.size());
+//		_printf_buffer_as_hex((uint8_t *) data, enc_len);
 //		printf("\n");
-		return encoded.size();
+		return enc_len;
 	}
 	else if(type == G1_t) {
 		G1 *p = (G1 *) e;
 		Big x, y;
 		p->g.get(x, y);
-		int size_x = to_binary(x, MAX_LEN, c, FALSE);
-		stringstream o;
-		o << size_x << ":" << c;
-		memset(c, 0, MAX_LEN);
-		int size_y = to_binary(y, MAX_LEN, c, FALSE);
-		o << size_y << ":" << c << "\0";
+		string t;
+		t.append(bigToBytes(x));
+		t.append(bigToBytes(y));
 
-		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(o.str().c_str()), o.str().size());
+		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
 		enc_len = encoded.size();
 		memcpy(data, encoded.c_str(), enc_len);
 		data[enc_len] = '\0';
@@ -833,21 +842,13 @@ int _element_to_bytes(unsigned char *data, Curve_t ctype, Group_t type, element_
 			x.get(a[0], a[1]); // get coordinates for each ZZn2
 			y.get(a[2], a[3]);
 		    z.get(a[4], a[5]);
-	//	    cout << "x => " << x << endl;
-	//	    cout << "y => " << y << endl;
-	//	    cout << "z => " << z << endl;
-
+	//	    cout << "Point => (" << x << ", " << y << ", " << z << ")" << endl;
 		    string t;
 		    for(int i = 0; i < 6; i++) {
 		    	t.append( bigToBytes(a[i]) );
 		    }
-//		    	if (i == 4) {
-//					cout << "(" << i << ") to_bytes => ";
-//					_printf_buffer_as_hex((uint8_t *) t.c_str(), t.size());
-//		    	}
 //		    cout << "Pre-encoding => ";
 //		    _printf_buffer_as_hex((uint8_t *) t.c_str(), t.size());
-
 			// base64 encode t and return
 			string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
 			enc_len = encoded.size();
@@ -860,42 +861,26 @@ int _element_to_bytes(unsigned char *data, Curve_t ctype, Group_t type, element_
 	return 0;
 }
 element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data) {
-	int pos, len;
-	const char *elem;
 	if(type == ZR_t) {
 		if(is_base64((unsigned char) data[0])) {
-		string b64_encoded((char *) data);
-		string s = _base64_decode(b64_encoded);
-		pos = s.find_first_of(':');
-		len = atoi( s.substr(0, pos).c_str() );
-		elem = s.substr(pos+1, pos + len).c_str();
-//		cout << "pos of elem => " << pos << endl;
-//		cout << "elem => " << elem << endl;
-		Big x = from_binary(len, (char *) elem);
-//		cout << "Big => " << x << endl;
-		Big *X = new Big(x);
-		return (element_t *) X;
+			string b64_encoded((char *) data);
+			string s = _base64_decode(b64_encoded);
+			int cnt = 0;
+			Big *X = bytesToBig(s, &cnt);
+			return (element_t *) X;
 		}
 	}
 	else if(type == G1_t) {
 		if(is_base64((unsigned char) data[0])) {
 		string b64_encoded((char *) data);
 		string s = _base64_decode(b64_encoded);
-		pos = s.find_first_of(':');
-		len = atoi( s.substr(0, pos).c_str() );
-		elem = s.substr(pos+1, pos + len).c_str();
-		Big x = from_binary(len, (char *) elem);
 
-		// next block
-		string s2 = s.substr(pos+len+1);
-//		cout << "s2 => " << s2 << endl;
-		pos = s2.find_first_of(':');
-		len = atoi( s.substr(0, pos).c_str() );
-		elem = s2.substr(pos+1, pos + len).c_str();
-		Big y = from_binary(len, (char *) elem);
-
-//		cout << "x => " << x << endl;
-//		cout << "y => " << y << endl;
+		int cnt = 0;
+		Big x,y;
+		x = *bytesToBig(s, &cnt);
+		s = s.substr(cnt);
+		y = *bytesToBig(s, &cnt);
+//		cout << "point => (" << x << ", " << y << ")" << endl;
 		G1 *p = new G1();
 		p->g.set(x,y);
 		return (element_t *) p;

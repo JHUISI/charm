@@ -51,6 +51,7 @@ int element_is_value(Group_t type, element_t *n, int value);
 
 int _element_cmp(Group_t type, element_t *a, element_t *b);
 void _element_set_si(Group_t type, element_t *dst, const signed long int src);
+int _element_setG1(Group_t type, element_t *c, const element_t *a, const element_t *b);
 void _element_set(Curve_t ctype, Group_t type, element_t *dst, const element_t *src);
 char *print_mpz(mpz_t x, int base);
 void _element_set_mpz(Group_t type, element_t *dst, mpz_t src);
