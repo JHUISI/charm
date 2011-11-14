@@ -127,6 +127,8 @@ typedef struct {
 #define element_cmp(a, b) _element_cmp(a->element_type, a->e, b->e);
 #define element_length_to_str(a) _element_length_to_str(a->element_type, a->e);
 #define element_to_str(d, a)  _element_to_str(d, a->element_type, a->e);
+#define element_init_G1   _element_init_G1
+#define element_init_G2   _element_init_G2
 #define element_init_GT(a)   _element_init_GT(a->pair_obj);
 #define check_membership(a)  element_is_member(a->pairing->curve, a->element_type, a->pairing->pair_obj, a->e)
 

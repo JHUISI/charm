@@ -52,13 +52,13 @@ element_t *element_init_ZR(int value = 0)
 	return (element_t *) b;
 }
 
-element_t *element_init_G1()
+element_t *_element_init_G1()
 {
-	G1 *g = new G1();
+	G1 *g = new G1(); // infinity by default
 	return (element_t *) g;
 }
 
-element_t *element_init_G2()
+element_t *_element_init_G2()
 {
 	G2 *g = new G2();
 	return (element_t *) g;
@@ -77,7 +77,9 @@ int element_is_member(Curve_t ctype, Group_t type, const pairing_t *pairing, ele
 	PFC *pfc = (PFC *) pairing;
 	// test whether e is in type
 	if(type == ZR_t) {
-
+		Big *x = (Big *) e;
+		if(*x > 0 && *x < pfc->order()) return TRUE;
+		return FALSE;
 	}
 	else if(type == G1_t) {
 		G1 *point = (G1 *) e;
@@ -90,10 +92,11 @@ int element_is_member(Curve_t ctype, Group_t type, const pairing_t *pairing, ele
 		}
 	}
 	else if(type == G2_t) {
-//		G2 *point = (G2 *) e;
-//		if(ctype == MNT) {
-//			// what's the check here?
-//		}
+		G2 *point = (G2 *) e;
+		if(ctype == MNT) {
+			if ((*(pfc->cof) * point->g).iszero() == TRUE) { return FALSE; }
+			else { return TRUE; }
+		}
 	}
 	else if(type == GT_t) {
 		GT *point = (GT *) e;
@@ -346,8 +349,9 @@ void _element_div(Group_t type, element_t *c, const element_t *a, const element_
 		Big *x = (Big *) a;
 		Big *y = (Big *) b;
 		Big *z = (Big *) c;
-		*z = *x / *y;
-		cout << "Result => " << *z << endl;
+		if(!y->iszero()) *z = *x / *y;
+//		cout << "y => " << *y << endl;
+//		cout << "Result => " << *z << endl;
 	}
 	else if(type == G1_t) {
 		G1 *x = (G1 *) a;  G1 *y = (G1 *) b; G1 *z = (G1 *) c;

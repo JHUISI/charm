@@ -885,10 +885,16 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 	if(PyElement_Check(lhs) && found_int) {
 		// lhs is the element type
 		START_CLOCK(dBench);
-		newObject = createNewElement(self->element_type, self->pairing);
-		other = createNewElement(self->element_type, self->pairing);
-		element_set_si(other, z);
-		element_div(newObject, self, other);
+		if(z != 0) {
+			newObject = createNewElement(self->element_type, self->pairing);
+			other = createNewElement(self->element_type, self->pairing);
+			element_set_si(other, z);
+			element_div(newObject, self, other);
+		}
+		else {
+			PyErr_SetString(ElementError, "divide by zero exception!");
+			goto divbyzero;
+		}
 		STOP_CLOCK(dBench);
 	}
 	else if(PyElement_Check(rhs) && found_int) {
@@ -918,6 +924,7 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 	}
 
 	UPDATE_BENCHMARK(DIVISION, dBench);
+divbyzero:
 	return (PyObject *) newObject;
 }
 
