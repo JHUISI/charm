@@ -84,7 +84,11 @@ if __name__ == '__main__':
 	validDictArg = open(sys.argv[1], 'rb').read()
 	invalidDictArg = open(sys.argv[2], 'rb').read()
 	invalidSigDistro = open(sys.argv[3], 'r').readlines()
-	groupParamArg = PairingGroup(sys.argv[4])
+
+
+	groupParamArg = PairingGroup(int(sys.argv[4]))
+	#groupParamArg = PairingGroup(80)
+
 	outputFileName = sys.argv[5]
 
 	testOutputFileName = open('invalidSigsGraph', 'w')

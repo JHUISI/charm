@@ -8,6 +8,7 @@ class IBSig():
     def __init__(self):
         global group
         group = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
+        #group = PairingGroup(80)
   
     def keygen(self, secparam=None):
         g = group.random(G2)
