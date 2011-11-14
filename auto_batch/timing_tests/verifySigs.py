@@ -1,14 +1,9 @@
 from toolbox.pairinggroup import *
 from charm.engine.util import *
-import sys, copy
-from charm.engine.util import *
-from toolbox.pairinggroup import *
 
 bodyKey = 'Body'
 
-def verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotA, dotB, pk_0, pk_1, startIndex, endIndex, group):
-	for arg in verifyFuncArgs:
-		argSigIndexMap[arg] = 0
+def verifySigsRecursive(verifyFuncArgs, verifyArgsDict, dotA, dotB, pk_0, pk_1, startIndex, endIndex, group, incorrectSigIndices):
 
 	dotA_runningProduct = group.init(G1, 1)
 	dotB_runningProduct = group.init(G1, 1)
@@ -22,8 +17,8 @@ def verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotA, do
 	else:
 		midWay = int( (endIndex - startIndex) / 2)
 		if (midWay == 0):
-			print("sig " + str(startIndex) + " failed\n")
+			incorrectSigIndices.append(startIndex)
 			return
 		midIndex = startIndex + midWay
-		verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotA, dotB, pk_0, pk_1, startIndex, midIndex, group)
-		verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotA, dotB, pk_0, pk_1, midIndex, endIndex, group)
+		verifySigsRecursive(verifyFuncArgs, verifyArgsDict, dotA, dotB, pk_0, pk_1, startIndex, midIndex, group, incorrectSigIndices)
+		verifySigsRecursive(verifyFuncArgs, verifyArgsDict, dotA, dotB, pk_0, pk_1, midIndex, endIndex, group, incorrectSigIndices)

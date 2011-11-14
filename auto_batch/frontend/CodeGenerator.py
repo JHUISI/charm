@@ -16,6 +16,7 @@ This must all be on one line.
 
 import ast, os, sys, copy
 
+precomputeOuterDotProds = []
 pythonStringRep = 'str'
 pythonListRep = 'list'
 tempVerifySigsOutput = ""
@@ -1286,7 +1287,12 @@ def writeDotProdCalculations(batchOutputString, writeDotProdLines, computeLineIn
 		
 		
 		
-		if ( (dotProdListName not in outerDotProds) and (writeDotProdLines == True) ) or ( (writeDotProdLines == False) and (indexVar == numSignaturesIndex) ):
+		#if ( (dotProdListName not in outerDotProds) and (writeDotProdLines == True) ) or ( (writeDotProdLines == False) and (indexVar == numSignaturesIndex) ):
+			
+			
+			
+			
+		if ( (dotProdListName not in precomputeOuterDotProds) and (writeDotProdLines == True) ) or ( (writeDotProdLines == False) and (indexVar == numSignaturesIndex) ):	
 			for tabNumber in range(0, numTabs):
 				batchOutputString += "\t"
 			if (dotProdListName.startswith(dotProdPrefix) == True):	
@@ -2010,7 +2016,7 @@ def getSplitDotProdLoopOrder(dotProdLoopOrder):
 	#return precomputeDotProdOrder#, DC_dotProdOrder
 
 def getPrecomputeOuterDotProds(precomputeDotProdLoopOrder):
-	precomputeOuterDotProds = []
+	#precomputeOuterDotProds = []
 	
 	for listChild in precomputeDotProdLoopOrder:
 		for key in listChild:
@@ -2021,7 +2027,7 @@ def getPrecomputeOuterDotProds(precomputeDotProdLoopOrder):
 			if (  (type(dictChild).__name__ != pythonDictRep)  and  ( (dictChild.startswith(dotProdPrefix)) or (dictChild.startswith(sumPrefix)) ) and (len(dictChild) == 4)  ):
 				precomputeOuterDotProds.append(dictChild)
 				
-	return precomputeOuterDotProds
+	#return precomputeOuterDotProds
 
 def getDC_outerDotProdsRecursive(outerDotProdOrder, DC_outerDotProds, addSignatureLoopDotProds):
 
@@ -2255,10 +2261,30 @@ if __name__ == '__main__':
 	batchOutputString = addDeltasAndArgSigIndexMap(batchOutputString, declaredLists)
 	variableTypes = getVariableTypes(verifyFuncNode)
 	verifySigsOutput = ""
+	
+	
+	getPrecomputeOuterDotProds(precomputeDotProdLoopOrder)	
+	
+	
+	
+	
 	batchOutputString = addDotProdLoops(batchOutputString, True, computeLineInfo, precomputeDotProdLoopOrder, assignMap, pythonCodeLines, listOfIndentedBlocks, numTabsOnVerifyFuncLine, verifyFuncArgs, declaredLists, outerDotProds)
 	batchOutputString = addLinesForNonDotProdVars(batchOutputString, assignMap, pythonCodeLines, listOfIndentedBlocks, computeLineInfo, 1, verifyFuncArgs)	
 	varNameFuncArgs = []
-	precomputeOuterDotProds = getPrecomputeOuterDotProds(precomputeDotProdLoopOrder)	
+	
+	
+	
+	#precomputeOuterDotProds = getPrecomputeOuterDotProds(precomputeDotProdLoopOrder)
+	
+	
+	
+	
+		
+	#getPrecomputeOuterDotProds(precomputeDotProdLoopOrder)	
+	
+	
+	
+	
 	batchOutputString = addCallToVerifySigs(batchOutputString, precomputeOuterDotProds, varNameFuncArgs, verifyFuncArgs, pythonCodeNode)
 	verifySigsFile = open(verifySigsFile, 'w')
 	verifySigsOutput = ""
