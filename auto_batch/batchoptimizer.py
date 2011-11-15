@@ -47,6 +47,7 @@ class PairInstanceFinder:
         # keys must match
         self.instance = {}
         self.index = 0
+        self.rule = "Merge pairings with common first or second element."
         
     def visit(self, node, data):
         pass
@@ -55,25 +56,40 @@ class PairInstanceFinder:
         lhs = node.left
         rhs = node.right
         if Type(lhs) == ops.ATTR:
-            key = 'left'
+            key = 'lnode'
 
         if Type(rhs) == ops.ATTR:
-            key = 'right'        
-        self.record(key, lhs, rhs)
+            key = 'rnode'        
+        if Type(data['parent']) == ops.ON:
+            self.record(key, node, data['parent'])
+        else:
+            self.record(key, node)
         return
 
-    def record(self, key, lnode, rnode):
-        print("key =>", key, ", nodes =>", lnode, rnode)
+    def record(self, key, node, parent=None):
+        lnode = node.left
+        rnode = node.right
+        #print("key =>", key, ", nodes =>", lnode, rnode)
         found = False
         for i in self.instance.keys():
             data = self.instance[ i ]
-            if data['key'] == 'left':
+            if data['key'] == 'lnode':
                 if str(lnode) == str(data['lnode']): # found a match
-                    data['instance'] += 1; found = True
+                    data['instance'] += 1; 
+                    data['rnode1'] = rnode 
+                    # save some state to delete this node on second pass                    
+                    if parent: data['rnodePair'] = parent
+                    else: data['rnodePair'] = node                    
+                    found = True
                     break
-            elif data['key'] == 'right':
+            elif data['key'] == 'rnode':
                 if str(rnode) == str(data['rnode']):
-                    data['instance'] += 1; found = True
+                    data['instance'] += 1
+                    data['lnode1'] = lnode
+                    # save some state to delete this node on second pass
+                    if parent: data['lnodePair'] = parent
+                    else: data['lnodePair'] = node                    
+                    found = True
                     break
         # if not found
         if not found:
@@ -81,6 +97,22 @@ class PairInstanceFinder:
             self.index += 1
         return
 
+    def checkForMultiple(self):
+        for i in self.instance.keys():
+            data = self.instance[ i ]
+            if data['instance'] > 1:
+                return data
+        return None
+    
+    def makeSubstitution(self, equation):
+        # first get a node in which 
+        pairDict = self.checkForMultiple()
+        if pairDict != None:
+            #print("Pair =>", pairDict)
+            batchparser.ASTVisitor( SubstitutePairs( pairDict ) ).preorder( equation )
+            #print("Done\n")
+            
+        
 
 # substitute nodes that can be precomputed with a stub
 # variable that is computed later
@@ -192,7 +224,74 @@ class SubstituteExps:
                 print("Substitute: missing some cases: ", Type(right))
 
 class SubstitutePairs:
-    pass
+    def __init__(self, pairDict):
+        self.pairDict = pairDict
+        self.key = pairDict['key']
+        self.left = pairDict['lnode']
+        self.right = pairDict['rnode']
+        if self.key == 'rnode': # if right, then extra left
+            self.extra = pairDict['lnode1'] 
+            self.extra_pair = pairDict['lnodePair']
+        elif self.key == 'lnode':
+            self.extra = pairDict['rnode1']
+            self.extra_pair = pairDict['rnodePair']            
+        
+        self.deleteOtherPair = False
+    
+    def visit(self, node, data):
+        if self.deleteOtherPair:
+            if str(node.left) == str(self.extra_pair):
+                # extra node we are to remove
+                batchparser.addAsChildNodeToParent(data, node.right)                
+            elif str(node.right) == str(self.extra_pair):
+                # extra node we are to remove                
+                batchparser.addAsChildNodeToParent(data, node.left)
+
+        
+        
+    def visit_pair(self, node, data):
+        if self.key == 'rnode':
+            # find the attribute node on the right
+            if str(node.right) == str(self.right) and Type(node.right) == ops.ATTR:
+                #print("Found a right match: ", node)
+                if Type(self.left) == Type(self.extra) and Type(self.left) and ops.ON:
+                    n = self.combine(self.left, self.extra)
+                    self.left.right = n
+                    #print("ans => ", self.left)
+                    node.left = BinaryNode.copy(self.left)
+                    #print("node =>", node)
+                    self.deleteOtherPair = True
+                # find the second pair node
+#                n = BinaryNode(ops.MUL)
+#                n.left = self.left
+#                n.right = self.extra
+                
+                
+        elif self.key == 'lnode':
+            if str(node.left) == str(self.left):
+                print("Found a left match: ", node)
+    def combine(self, subtree1, subtree2, parentOfTarget=None):
+        if subtree2 == None: return None
+        elif subtree2.left == None: pass
+        elif Type(subtree1.left) == Type(subtree2.left):
+            result = self.combine(subtree1.right, subtree2.right, subtree1)
+            if result:                 
+                n = BinaryNode(ops.MUL)
+                n.left = subtree1.right
+                n.right = subtree2.right
+                return n
+            return None    
+        # check if node is a LEAF. if so report that node is different 
+        if Type(subtree2) == ops.ATTR:
+            return True
+
+    def mergeWithMul(self, subtree1, subtree2):
+        checkSubtrees = False
+        self.mergeWithMul(subtree1.left, subtree2.left)
+        #if subtree2 == None: return None
+#        if Type(subtree1) == Type(subtree2):
+#            pass
+        self.mergeWithMul(subtree1.right, subtree2.right)
 
 class SubstituteSigDotProds:
     def __init__(self, vars, index='z', sig='N' ):

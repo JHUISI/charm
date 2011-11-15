@@ -130,12 +130,14 @@ if __name__ == "__main__":
     ASTVisitor(SmallExponent(const, vars)).preorder(verify2.right)
     print("\nStage B: Small Exp Test =>", verify2, "\n")
 
-    techniques = {'2':Technique2, '3':Technique3, '4':Technique4, 'S':SimplifyDotProducts }
+    techniques = {'2':Technique2, '3':Technique3, '4':Technique4, 'S':SimplifyDotProducts, 'P':PairInstanceFinder }
 
     for option in algorithm:
         if option == 'S':
             option_str = "Simplifying =>"
             Tech = techniques[option]()
+        elif option == 'P':
+            Tech = PairInstanceFinder()            
         elif option in techniques.keys():
             option_str = "Applying technique " + option + " =>"
             Tech = techniques[option](const, vars, metadata)
@@ -145,21 +147,19 @@ if __name__ == "__main__":
         ASTVisitor(Tech).preorder(verify2.right)
         print(Tech.rule, "\n")
         print(option_str, ":",verify2, "\n")
+        if option == 'P':
+            Tech.makeSubstitution(verify2.right)
+
     
-#    pif = PairInstanceFinder()
-#    ASTVisitor(pif).preorder(verify2.right)
-#    print("Pairing Instances =>\n\t", pif.instance)
-#    for i in pif.instance.keys():
-#        print("i => ", i, pif.instance[i])
     
     #exit(0)
     
-    countDict = countInstances(verify2) 
-    if not isOptimized(countDict):
-        ASTVisitor(SubstituteExps(countDict, batch_precompute, vars)).preorder(verify2.right)
-        print("Final batch eq:", verify2.right)
-    else:
-        print("Final batch eq:", verify2.right)
+    #countDict = countInstances(verify2) 
+    #if not isOptimized(countDict):
+    #    ASTVisitor(SubstituteExps(countDict, batch_precompute, vars)).preorder(verify2.right)
+    #    print("Final batch eq:", verify2.right)
+    #else:
+    print("Final batch eq:", verify2.right)
     
     # START BENCHMARK : THRESHOLD ESTIMATOR
     if THRESHOLD_FLAG:

@@ -27,7 +27,7 @@ S1, S2, S3
 END :: signature
 
 BEGIN :: transform
-3, 2, S, 4
+3, 2, S, 4, P, 3
 END :: transform
 
 verify := { (e(S1, g2) * e(S2, u1b * (prod{i:=1, l} on ub_i^k_i)) * e(S3, u2b * (prod{i:=1,l} on ub_i^m_i))) == A }

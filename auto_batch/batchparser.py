@@ -768,6 +768,10 @@ class Technique3:
     # transform prod{} on pair(x,y) => pair( prod{} on x, y) OR pair(x, prod{} on y)
     # n pairings to 1 and considers the split reverse case
     def visit_on(self, node, data):
+        index = str(node.left.right)
+        if index != 'N' or Type(data['parent']) == ops.PAIR:
+            return
+        
         if Type(node.right) == ops.PAIR:
             pair_node = node.right
             
