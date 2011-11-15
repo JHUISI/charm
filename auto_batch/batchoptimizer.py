@@ -3,7 +3,7 @@ from batchlang import *
 import batchparser
 import string
 
-class InstanceFinder:
+class ExpInstanceFinder:
     def __init__(self):
         # keys must match
         self.instance = {}
@@ -39,6 +39,57 @@ class InstanceFinder:
             return
 
         self.instance[ key ] = { value: 1 }
+        return
+
+
+class PairInstanceFinder:
+    def __init__(self):
+        # keys must match
+        self.instance = {}
+        self.index = 0
+        
+    def visit(self, node, data):
+        pass
+    
+    def visit_pair(self, node, data):
+        lhs = node.left
+        rhs = node.right
+        if Type(lhs) == ops.ATTR:
+            key = 'left'
+
+        if Type(rhs) == ops.ATTR:
+            key = 'right'        
+        self.record(key, lhs, rhs)
+
+#            if right.type == ops.ATTR:
+#                self.record(str(left), str(right))
+#            elif right.type == ops.MUL:
+#                # a ^ (b * c) ==> a : b, a : c
+#                value_1 = right.left
+#                value_2 = right.right
+#                if value_1.type == ops.ATTR:
+#                    self.record(str(left), str(value_1))
+#                if value_2.type == ops.ATTR:
+#                    self.record(str(left), str(value_2))
+#            else:
+#                # dont care for now
+#                return
+
+    def record(self, key, lnode, rnode):
+        print("key =>", key, ", nodes =>", lnode, rnode)
+        # find pair in list
+        for i in instances.keys():
+            data = self.instances[ i ]
+            if data['key'] == 'left':
+                if lnode == data['lnode'] and Type(lnode) == ops.ATTR: # found a match
+                    data['instance'] += 1
+            elif data['key'] == 'right':
+                if rnode == data['rnode'] and Type(rnode) == ops.ATTR:
+                    data['instance'] += 1
+                
+            
+        # if not found
+        self.instance[ i ] = { 'key':key, 'lnode':lnode, 'rnode':rnode, 'instance':1 }        
         return
 
 

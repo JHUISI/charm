@@ -10,7 +10,7 @@ except:
 debug = False
 
 def countInstances(equation):
-    Instfind = InstanceFinder()
+    Instfind = ExpInstanceFinder()
     ASTVisitor(Instfind).preorder(equation)
     print("Instances found =>", Instfind.instance, "\n")
     return Instfind.instance
@@ -79,13 +79,20 @@ def codeGenerator(Struct):
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
-        print("%s [ batch-input.bv ]" % sys.argv[0])
+        print("%s [ batch-input.bv ] -b -c -p" % sys.argv[0])
+        print("-b : estimate threshold for a given signature scheme with 1 to N signatures.")
+        print("-c : generate the output for the code generator (temporary)")
+        print("-p : generate the proof for the signature scheme.")
         exit(-1)
     # main for batch input parser    
     try:
         file = sys.argv[1]
         print(sys.argv[1:])
         ast_struct = parseFile2(file)
+        THRESHOLD_FLAG = CODEGEN_FLAG = PROOFGEN_FLAG = False # initialization
+        for i in sys.argv:
+            if i == "-b": THRESHOLD_FLAG = True
+            elif i == "-c": CODEGEN_FLAG = True
     except:
         print("An error occured while processing batch inputs.")
         exit(-1)
@@ -147,49 +154,50 @@ if __name__ == "__main__":
         print("Final batch eq:", verify2.right)
     
     # START BENCHMARK : THRESHOLD ESTIMATOR
-    (indiv_msmt, indiv_avg_msmt) = benchIndivVerification(N, verify.right, const, vars, indiv_precompute)
-    print("Result N =",N, ":", indiv_avg_msmt)
+    if THRESHOLD_FLAG:
+        print("<== Running threshold estimator ==>")
+        (indiv_msmt, indiv_avg_msmt) = benchIndivVerification(N, verify.right, const, vars, indiv_precompute)
+        print("Result N =",N, ":", indiv_avg_msmt)
 
-    outfile = file.split('.')[0]
-    indiv, batch = outfile + "_indiv.dat", outfile + "_batch.dat"
+        outfile = file.split('.')[0]
+        indiv, batch = outfile + "_indiv.dat", outfile + "_batch.dat"
     
-    output_indiv = open(indiv, 'w'); output_batch = open(batch, 'w')
-    threshold = -1
-    for i in range(2, N+1):
-        vars['N'] = i
-        (batch_msmt, batch_avg_msmt) = benchBatchVerification(i, verify2.right, const, vars, batch_precompute)
-        output_indiv.write(str(i) + " " + str(indiv_avg_msmt) + "\n")
-        output_batch.write(str(i) + " " + str(batch_avg_msmt) + "\n")
-        if batch_avg_msmt <= indiv_avg_msmt and threshold == -1: threshold = i 
-    output_indiv.close(); output_batch.close()
-    print("Result N =",N, ":", batch_avg_msmt)
-    print("Threshold: ", threshold)
+        output_indiv = open(indiv, 'w'); output_batch = open(batch, 'w')
+        threshold = -1
+        for i in range(2, N+1):
+            vars['N'] = i
+            (batch_msmt, batch_avg_msmt) = benchBatchVerification(i, verify2.right, const, vars, batch_precompute)
+            output_indiv.write(str(i) + " " + str(indiv_avg_msmt) + "\n")
+            output_batch.write(str(i) + " " + str(batch_avg_msmt) + "\n")
+            if batch_avg_msmt <= indiv_avg_msmt and threshold == -1: threshold = i 
+        output_indiv.close(); output_batch.close()
+        print("Result N =",N, ":", batch_avg_msmt)
+        print("Threshold: ", threshold)
     # STOP BENCHMARK : THRESHOLD ESTIMATOR 
     # TODO: check avg for when batch is more efficient than 
+    if CODEGEN_FLAG:
+        subProds = SubstituteSigDotProds(vars, 'z', 'N')
+        ASTVisitor(subProds).preorder(verify2.right)
+        # print("Dot prod =>", subProds.dotprod)
+        # need to check for presence of other variables
+        key = None
+        for i in metadata.keys():
+            if i != 'N': key = i
+        subProds1 = SubstituteSigDotProds(vars, 'y', key)
+        subProds1.setState(subProds.cnt)
+        ASTVisitor(subProds1).preorder(verify2.right)
     
-    #subProds = SubstituteSigDotProds(vars, 'z', 'N')
-    #ASTVisitor(subProds).preorder(verify2.right)
-    # print("Dot prod =>", subProds.dotprod)
-    # need to check for presence of other variables
-    #key = None
-    #for i in metadata.keys():
-    #    if i != 'N': key = i
-    #subProds1 = SubstituteSigDotProds(vars, 'y', key)
-    #subProds1.setState(subProds.cnt)
-    #ASTVisitor(subProds1).preorder(verify2.right)
-    
-    #print("<====\tPREP FOR CODE GEN\t====>")
-    #print("\nFinal version =>", verify2.right, "\n")
-    #for i in subProds.dotprod['list']:
-    #    print("Compute: ", i,":=", subProds.dotprod['dict'][i])    
+        print("<====\tPREP FOR CODE GEN\t====>")
+        print("\nFinal version =>", verify2.right, "\n")
+        for i in subProds.dotprod['list']:
+            print("Compute: ", i,":=", subProds.dotprod['dict'][i])    
 #    print("Dot prod =>", subProds1.dotprod)
-    #for i in subProds1.dotprod['list']:
-    #    print("Compute: ", i,":=", subProds1.dotprod['dict'][i])
-    #for i in batch_precompute.keys():
-    #    print("Precompute:", i, ":=", batch_precompute[i])
-    #for i in subProds.dotprod['list']:
-    #    print(i,":=", subProds.dotprod['types'][i])    
+        for i in subProds1.dotprod['list']:
+            print("Compute: ", i,":=", subProds1.dotprod['dict'][i])
+        for i in batch_precompute.keys():
+            print("Precompute:", i, ":=", batch_precompute[i])
+        for i in subProds.dotprod['list']:
+            print(i,":=", subProds.dotprod['types'][i])    
 
-
-    # TODO: generate code for both which includes the detecting of invalid signatures from a batch
-    #codeGenerator()
+    if PROOFGEN_FLAG:
+        print("generate the proof for the given signature scheme.")

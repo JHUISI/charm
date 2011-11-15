@@ -567,8 +567,8 @@ class Technique2:
     def __init__(self, constants, variables, meta):
         self.consts = constants
         self.vars   = variables
-        #print("Rule 2: Move the exponent(s) into the pairing")
-        self.rule   = "Rule 2: "
+        self.rule   = "Rule 2: Move the exponent(s) into the pairing."
+        #self.rule   = "Rule 2: "
         # TODO: pre-processing to determine context of how to apply technique 2
         # TODO: in cases of chp.bv, where you have multiple exponents outside a pairing, move them all into the e().
     
@@ -587,13 +587,13 @@ class Technique2:
                 addAsChildNodeToParent(data, pair_node) # move pair node one level up
                 node.left = pair_node.left
                 pair_node.left = node
-                self.rule += "Left := Move '" + str(node.right) + "' exponent into the pairing. "
+                #self.rule += "Left := Move '" + str(node.right) + "' exponent into the pairing. "
             
             elif not self.isConstInSubtreeT(pair_node.right):       
                 addAsChildNodeToParent(data, pair_node) # move pair node one level up                
                 node.left = pair_node.right
                 pair_node.right = node 
-                self.rule += "Right := Move '" + str(node.right) + "' exponent into the pairing. "
+                #self.rule += "Right := Move '" + str(node.right) + "' exponent into the pairing. "
             else:
                 pass
         # blindly move the right node of prod{} on x^delta regardless    
@@ -624,10 +624,10 @@ class Technique2:
                                     muls[i].right = self.createExp(_subnodes[i+1], BinaryNode.copy(node.right))
                             #print("root =>", muls[0])
                             pair_node.right = muls[0]
-                            self.rule += "distributed exponent into the pairing: right side. "
+                            #self.rule += "distributed exponent into the pairing: right side. "
                         else:
                             self.setNodeAs(pair_node, 'right', node, 'left')
-                            self.rule += "moved exponent into the pairing: less than 2 mul nodes. "
+                            #self.rule += "moved exponent into the pairing: less than 2 mul nodes. "
 
                     elif Type(pair_node.right) == ops.ATTR:
                         # set pair node left child to node left since we've determined
@@ -654,7 +654,7 @@ class Technique2:
             mul_node.left = self.createExp(mul_node.left, BinaryNode.copy(node.right))
             mul_node.right = self.createExp(mul_node.right, BinaryNode.copy(node.right))
             addAsChildNodeToParent(data, mul_node)            
-            self.rule += " distribute the exp node when applied to a MUL node. "
+            #self.rule += " distributed the exp node when applied to a MUL node. "
             # Note: if the operands of the mul are ATTR or PAIR doesn't matter. If the operands are PAIR nodes, PAIR ^ node.right
             # This is OK b/c of preorder visitation, we will apply transformations to the children once we return.
             # The EXP node of the mul children nodes will be visited, so we can apply technique 2 for that node.
@@ -715,8 +715,8 @@ class Technique3:
     def __init__(self, constants, variables, meta):
         self.consts = constants
         self.vars   = variables
-        self.rule   = "Rule 3: "
-        #print("Rule 3: When two pairings with common 1st or 2nd element appear, then can be combined. n pairs to 1.")
+        #self.rule   = "Rule 3: "
+        self.rule   = "Rule 3: When two pairings with common 1st or 2nd element appear, then can be combined. n pairs to 1."
     
     def visit(self, node, data):
         pass
@@ -759,7 +759,7 @@ class Technique3:
                 mul.right = self.createPair(left, child_node2)
                 #print("new node =+>", mul)
                 addAsChildNodeToParent(data, mul)
-                self.rule += "split one pairing into two pairings. "
+#                self.rule += "split one pairing into two pairings. "
             else:
                 print("T3: missing case?")
         else:
@@ -790,7 +790,7 @@ class Technique3:
                         muls[i].right = self.createPair(left, r[i+1])
                 #print("root =>", muls[0])
                 node.right = muls[0]
-                self.rule += "split one pairing into two or three."
+                #self.rule += "split one pairing into two or three."
                 #addAsChildNodeToParent(data, muls[0])
             else:        
                 addAsChildNodeToParent(data, pair_node) # move pair one level up  
@@ -799,12 +799,12 @@ class Technique3:
                 if not self.isConstInSubtreeT(pair_node.left): # if F, then can apply prod node to left child of pair node              
                     node.right = pair_node.left
                     pair_node.left = node # pair points to 'on' node
-                    self.rule += "common 1st (left) node appears, so can reduce n pairings to 1. "
+                    #self.rule += "common 1st (left) node appears, so can reduce n pairings to 1. "
                     self.visit_pair(pair_node, data)                    
                 elif not self.isConstInSubtreeT(pair_node.right):
                     node.right = pair_node.right
                     pair_node.right = node
-                    self.rule += "common 2nd (right) node appears, so can reduce n pairings to 1. "
+                    #self.rule += "common 2nd (right) node appears, so can reduce n pairings to 1. "
                     self.visit_pair(pair_node, data)
                 else:
                     pass
@@ -912,7 +912,7 @@ class Technique4:
         self.consts = constants
         self.vars   = variables
         self.meta = meta
-        self.rule = "Rule 4:"
+        self.rule = "Rule 4: Applied waters hash technique"
         #print("Metadata =>", meta)
     
     def visit(self, node, data):
@@ -934,7 +934,7 @@ class Technique4:
                 # switch nodes between prod nodes of x (constant) and N
                 node.left = prod2
                 node2.left = prod
-                self.rule += " waters hash technique. "
+                #self.rule += " waters hash technique. "
                 # check if we need to redistribute or simplify?
 #                print("node2 =>", node2)
 #                print("parent =>", node2_parent, ":", Type(node2_parent))

@@ -21,6 +21,9 @@ class PairingGroup():
         print("ERROR: max len => %s, input len => %s" % (self.messageSize(), size))
         return False
 
+    def ismember(self, obj):
+        return self.Pairing.ismember(obj)
+
     def groupType(self): 
         return 'PairingGroup'     
         
