@@ -184,5 +184,6 @@ class RecordOperations:
             return self.deriveNodeType(node.left)
         #print("printing type =>", _type)
         #print("node =>", node)
+        if _type == 'delta': return 'ZR'
         assert self.vars_def.get(_type) != None, "Key error in vars db => '%s'" % _type
         return self.vars_def[_type]
