@@ -58,8 +58,7 @@ if __name__ == "__main__":
    M = "this is a message!" 
    sig = chch.sign(pk, sk, M)
    print("Signature...")
-   print("sig['S1'] =>", sig['S1'])
-   print("sig['S2'] =>", sig['S2'])
+   print("sig =>", sig)
 
    assert chch.verify(mpk, pk, M, sig), "invalid signature!"
    print("Verification successful!")

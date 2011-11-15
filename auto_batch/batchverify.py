@@ -201,12 +201,12 @@ if __name__ == "__main__":
         lcg_data[ lcg_steps-1 ]['preq'] = final_batch_eq
         lcg_data[0]['batch'] = lcg_data[ lcg_steps-1 ]['eq']
         
-    countDict = countInstances(verify2) 
-    if not isOptimized(countDict):
-        ASTVisitor(SubstituteExps(countDict, batch_precompute, vars)).preorder(verify2.right)
-        print("Final batch eq:", verify2.right)
-    else:
-        print("Final batch eq:", verify2.right)
+    #countDict = countInstances(verify2) 
+    #if not isOptimized(countDict):
+    #    ASTVisitor(SubstituteExps(countDict, batch_precompute, vars)).preorder(verify2.right)
+    #    print("Final batch eq:", verify2.right)
+    #else:
+    print("Final batch eq:", verify2.right)
     
     # START BENCHMARK : THRESHOLD ESTIMATOR
     if THRESHOLD_FLAG:

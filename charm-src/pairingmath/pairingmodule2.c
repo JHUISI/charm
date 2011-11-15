@@ -47,6 +47,11 @@ int pair_rule(Group_t lhs, Group_t rhs)
 	return FALSE; /* Fall all other cases : assume MNT? */
 }
 
+int check_type(Group_t type) {
+	if(type == ZR_t || type == G1_t || type == G2_t || type == GT_t) return TRUE;
+	return FALSE;
+}
+
 #define ERROR_TYPE(operand, ...) "unsupported "#operand" operand types: "#__VA_ARGS__
 
 #define UNARY(f, m, n) \
@@ -650,7 +655,8 @@ PyObject *Element_print(Element* self)
 {
 	PyObject *strObj;
 	debug("Contents of element object\n");
-	if(self->elem_initialized) {
+
+	if(check_type(self->element_type) && self->elem_initialized) {
 		int len = element_length_to_str(self);
 		unsigned char *tmp = (unsigned char *) malloc(len + 1);
 		memset(tmp, 0, len);
@@ -941,7 +947,7 @@ static PyObject *Element_invert(Element *self)
 //#endif
 
 	START_CLOCK(dBench);
-	if(self->element_type != NONE_G) {
+	if(check_type(self->element_type)) {
 		newObject = createNewElement(self->element_type, self->pairing);
 		element_invert(newObject, self);
 	}
@@ -1021,7 +1027,7 @@ static PyObject *Element_set(Element *self, PyObject *args)
     	errcode = FALSE;
     	return Py_BuildValue("i", errcode);
     }
-//
+
     debug("Creating a new element\n");
     if(PyArg_ParseTuple(args, "|lO", &value, &object)) {
             // convert into an int using PyArg_Parse(...)
@@ -1061,6 +1067,12 @@ static PyObject *Element_setxy(Element *self, PyObject *args)
     	errcode = FALSE;
     	return Py_BuildValue("i", errcode);
     }
+
+//    if(check_type(self->element_type) == FALSE) {
+//    	PyErr_SetString(ElementError, "must initialize element to a field (G1_t,G2,GT, or Zr)");
+//    	errcode = FALSE;
+//    	return Py_BuildValue("i", errcode);
+//    }
 //
     debug("Creating a new element\n");
     if(PyArg_ParseTuple(args, "|OO", &object1, &object2)) {
@@ -1448,7 +1460,9 @@ static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 	size_t bytes_written;
 	START_CLOCK(dBench);
 
-	if(self->element_type != NONE_G) {
+//	printf("element type => '%d'\n", self->element_type);
+//	print("test output => ", self->element_type, self->e);
+	if(check_type(self->element_type) == TRUE) {
 		// determine size of buffer we need to allocate
 		elem_len = element_length_in_bytes(self);
 		data_buf = (uint8_t *) malloc(elem_len + 1);
@@ -1497,7 +1511,7 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 //			printf("type => %d\n", type);
 //			printf("base64 dec => '%s'\n", base64_buf);
 
-			if(type != NONE_G && strlen((char *) base64_buf) > 0) {
+			if(check_type(type) == TRUE && strlen((char *) base64_buf) > 0) {
 //				debug("result => ");
 //				printf_buffer_as_hex(binary_buf, deserialized_len);
 				origObject = createNewElement(NONE_G, self->pairing);
