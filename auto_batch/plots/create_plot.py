@@ -3,7 +3,7 @@ import os
 N = 100
 x = 100
 xx = 1000
-files = { 'bls':50 , 'chp':80, 'chch':50, 'cyh':100, 'hess':50, 'bgls':120, 'boyen':150, 'waters':300 }
+files = { 'bls':30 , 'chp':80, 'chch':50, 'cyh':100, 'hess':50, 'bgls':120, 'boyen':150, 'waters':300 }
 # cyh => (ring size = 20)
 # boyen => (ring size = 2)
 
@@ -20,9 +20,9 @@ outro = """EOF\n"""
 config = """
 set terminal postscript eps enhanced color 'Helvetica' 10;
 set size 0.425,0.425;
-set output '%s_MNT_224.eps';
-set yrange [0 : %d]; set xrange[2 : 100]; set xtics autofreq 20;
-set title 'MNT224 Threshold Estimator' font 'Helvetica,10';
+set output '%s_MNT_160.eps';
+set yrange [0 : %d]; set xrange[1 : 200]; set xtics autofreq 40;
+set title 'MNT160 Threshold Estimator' font 'Helvetica,10';
 set xlabel 'Number of signatures';
 set ylabel 'ms per signature';
 plot '%s' w lines lw 6 title '%s (%s)', \\
@@ -48,7 +48,7 @@ def build_config(name):
     output += outro + "\n"
         
     for i in files.keys():
-        output += "epstopdf %s_MNT_224.eps\n" % i
+        output += "epstopdf %s_MNT_160.eps\n" % i
     
     print(output)
     f = open(name, 'w')

@@ -144,7 +144,8 @@ class RecordOperations:
                 self.visit(node.right, data.copy(), node)
 #                 return (left + ", lambda " + pls.vars()  + right + ", " + pls.args() + ")")
             elif(node.type == ops.HASH):
-                if node.right.attr == types.G1:
+                if node.right.attr in [types.ZR, types.G1, types.G2]:
+                    _type_id = str(node.right.attr)
 #                    print("value =>", node.right.attr)
                     keys = data.get('key')
                 # print("pair: data =>", data)
@@ -152,9 +153,9 @@ class RecordOperations:
                         _hash = 1
                         for i in keys:
                             _hash *= data[i]
-                        self.ops['hash']['G1'] += _hash
+                        self.ops['hash'][ _type_id ] += _hash
                     else:
-                        self.ops['hash']['G1'] += 1
+                        self.ops['hash'][ _type_id ] += 1
 #            elif(node.type == ops.ATTR):
 #                if Type(parent) == ops.ON:
 #                    print("TODO: account for attribute nodes.")

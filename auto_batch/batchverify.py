@@ -2,8 +2,10 @@ from batchparser import *
 from batchproof import *
 
 try:
-    import benchmarks
-    curve = benchmarks.benchmarks
+    #import benchmarks
+    import miraclbench
+    curve = miraclbench.benchmarks
+    curve_key = 'mnt160'
 except:
     print("Could not find the 'benchmarks' file that has measurement results! Generate and re-run.")
     exit(0)
@@ -25,6 +27,19 @@ def isOptimized(data):
             if data[i][j] > 1: return False
     return True
 
+def checkForSigs(node):
+    if node == None: return None
+    if Type(node) == ops.HASH:
+        return checkForSigs(node.left)
+    elif Type(node) == ops.ATTR:
+        if node.attr_index and 'z' in node.attr_index: return True
+        else: return False
+    else: # not sure about this but will see
+        result = checkForSigs(node.left)
+        if result: return result
+        result = checkForSigs(node.right)
+        return result
+
 def benchIndivVerification(N, equation, const, vars, precompute, _verbose):
     rop_ind = RecordOperations(vars)
     # add attrIndex to non constants
@@ -40,11 +55,13 @@ def benchIndivVerification(N, equation, const, vars, precompute, _verbose):
     if _verbose: print("<===\tOperations count\t===>")
     for i in precompute.keys():
             # if a str, then was precompute introduced programmatically and should skip for individual verification case. 
-            rop_ind.visit(precompute[i], {})
+            if checkForSigs(precompute[i]): data = {'key':['N'], 'N': N }
+            else: data = {}            
+            rop_ind.visit(precompute[i], data)
             if _verbose: print("Precompute:", i, ":=", precompute[i])
     if _verbose:
         print_results(rop_ind.ops)
-    return calculate_times(rop_ind.ops, curve['d224.param'], N)
+    return calculate_times(rop_ind.ops, curve['mnt160'], N)
     
 
 def benchBatchVerification(N, equation, const, vars, precompute, _verbose):
@@ -56,7 +73,9 @@ def benchBatchVerification(N, equation, const, vars, precompute, _verbose):
         print("<===\tOperations count\t===>")
     for i in precompute.keys():
         if type(i) != str:
-            rop_batch.visit(precompute[i], {})
+            if checkForSigs(precompute[i]): data = {'key':['N'], 'N': N }
+            else: data = {}
+            rop_batch.visit(precompute[i], data)
             if _verbose: print("Precompute:", i, ":=", precompute[i])
         else:
             if i == 'delta': # estimate cost of random small exponents
@@ -73,7 +92,7 @@ def benchBatchVerification(N, equation, const, vars, precompute, _verbose):
                     if _verbose: print("TODO: need to account for this: ", i, ":=", precompute[i])
     if _verbose:
         print_results(rop_batch.ops)
-    return calculate_times(rop_batch.ops, curve['d224.param'], N)
+    return calculate_times(rop_batch.ops, curve['mnt160'], N)
 
 def proofHeader(title, const, sigs, indiv_eq, batch_eq):
     const_str = ""; sig_str = ""
@@ -121,12 +140,13 @@ if __name__ == "__main__":
         file = sys.argv[1]
         print(sys.argv[1:])
         ast_struct = parseFile2(file)
-        THRESHOLD_FLAG = CODEGEN_FLAG = PROOFGEN_FLAG = VERBOSE = False # initialization
+        THRESHOLD_FLAG = CODEGEN_FLAG = PROOFGEN_FLAG = PRECOMP_CHECK = VERBOSE = False # initialization
         for i in sys.argv:
             if i == "-b": THRESHOLD_FLAG = True
             elif i == "-c": CODEGEN_FLAG = True
             elif i == "-v": VERBOSE = True
             elif i == "-p": PROOFGEN_FLAG = True
+            elif i == "-d": PRECOMP_CHECK = True
     except:
         print("An error occured while processing batch inputs.")
         exit(-1)
@@ -201,13 +221,14 @@ if __name__ == "__main__":
         lcg_data[ lcg_steps-1 ]['preq'] = final_batch_eq
         lcg_data[0]['batch'] = lcg_data[ lcg_steps-1 ]['eq']
         
-    #countDict = countInstances(verify2) 
-    #if not isOptimized(countDict):
-    #    ASTVisitor(SubstituteExps(countDict, batch_precompute, vars)).preorder(verify2.right)
-    #    print("Final batch eq:", verify2.right)
-    #else:
-    print("Final batch eq:", verify2.right)
-    
+    if PRECOMP_CHECK:
+        countDict = countInstances(verify2) 
+        if not isOptimized(countDict):
+            ASTVisitor(SubstituteExps(countDict, batch_precompute, vars)).preorder(verify2.right)
+            print("Final batch eq:", verify2.right)
+        else:
+            print("Final batch eq:", verify2.right)
+
     # START BENCHMARK : THRESHOLD ESTIMATOR
     if THRESHOLD_FLAG:
         print("<== Running threshold estimator ==>")
@@ -219,7 +240,7 @@ if __name__ == "__main__":
     
         output_indiv = open(indiv, 'w'); output_batch = open(batch, 'w')
         threshold = -1
-        for i in range(2, N+1):
+        for i in range(1, N+1):
             vars['N'] = i
             (batch_msmt, batch_avg_msmt) = benchBatchVerification(i, verify2.right, const, vars, batch_precompute, VERBOSE)
             output_indiv.write(str(i) + " " + str(indiv_avg_msmt) + "\n")
