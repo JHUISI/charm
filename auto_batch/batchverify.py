@@ -1,4 +1,5 @@
 from batchparser import *
+from batchproof import *
 
 try:
     import benchmarks
@@ -73,6 +74,40 @@ def benchBatchVerification(N, equation, const, vars, precompute, _verbose):
     if _verbose:
         print_results(rop_batch.ops)
     return calculate_times(rop_batch.ops, curve['d224.param'], N)
+
+def proofHeader(title, const, sigs, indiv_eq, batch_eq):
+    const_str = ""; sig_str = ""
+    for i in const:
+        const_str += i + ","
+    const_str = const_str[:len(const_str)-1]
+    for i in sigs:
+        sig_str += i + ","
+    sig_str = sig_str[:len(sig_str)-1]
+    result = header % (title, const_str, sig_str, indiv_eq, batch_eq)
+    #print("header =>", result)
+    return result
+
+def proofBody(step, data):
+    pre_eq = data.get('preq')
+    cur_eq = data['eq']
+    if pre_eq != None:
+        result_eq = pre_eq + cur_eq
+    else: result_eq = cur_eq    
+    result = basic_step % (step, data['msg'], result_eq)
+    #print('[STEP', step, ']: ', result)
+    return result
+
+def writeConfig(latex_file, lcg_data, const, vars, sigs):
+    f = open('verification_gen' + latex_file + '.tex', 'w')
+    title = latex_file.upper()
+    outputStr = proofHeader(title, const, sigs, lcg_data[0]['eq'], lcg_data[0]['batch'])
+    for i in lcg_data.keys():
+        if i != 0:
+            outputStr += proofBody(i, lcg_data[i])
+    outputStr += footer
+    f.write(outputStr)
+    f.close()
+    return
     
 if __name__ == "__main__":
     if len(sys.argv) == 1:
@@ -91,10 +126,11 @@ if __name__ == "__main__":
             if i == "-b": THRESHOLD_FLAG = True
             elif i == "-c": CODEGEN_FLAG = True
             elif i == "-v": VERBOSE = True
+            elif i == "-p": PROOFGEN_FLAG = True
     except:
         print("An error occured while processing batch inputs.")
         exit(-1)
-    const, types = ast_struct[ CONST ], ast_struct[ TYPE ]
+    const, types, sigs = ast_struct[ CONST ], ast_struct[ TYPE ], ast_struct[ SIGNATURE ]
     (indiv_precompute, batch_precompute) = ast_struct[ PRECOMP ]
     batch_precompute[ "delta" ] = "for{z := 1, N} do prng_z"
     
@@ -118,15 +154,24 @@ if __name__ == "__main__":
     print("variables =>", vars)
     print("metadata =>", metadata)
     print("batch algorithm =>", algorithm)
+    if PROOFGEN_FLAG:
+        lcg_data = {}
+        lcg_steps = 0
+        lcg = LatexCodeGenerator(const, vars)
+
 
     print("\nVERIFY EQUATION =>", verify)
+    if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Equation', 'eq': lcg.print_statement(verify.right) }; lcg_steps += 1
     verify2 = BinaryNode.copy(verify)
     ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
+    if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Combined Equation', 'eq':lcg.print_statement(verify2.right) }; lcg_steps += 1
     ASTVisitor(SimplifyDotProducts()).preorder(verify2.right)
 
     print("\nStage A: Combined Equation =>", verify2)
     ASTVisitor(SmallExponent(const, vars)).preorder(verify2.right)
     print("\nStage B: Small Exp Test =>", verify2, "\n")
+    if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Apply the small exponents test, using exponents $\delta_1, \dots \delta_\\numsigs \in_R \Zq$', 
+                                               'eq':lcg.print_statement(verify2.right), 'preq':small_exp_label }; lcg_steps += 1
 
     techniques = {'2':Technique2, '3':Technique3, '4':Technique4, 'S':SimplifyDotProducts, 'P':PairInstanceFinder }
 
@@ -135,10 +180,10 @@ if __name__ == "__main__":
             option_str = "Simplifying =>"
             Tech = techniques[option]()
         elif option == 'P':
-            option_str = "Combine Pairings =>"
+            option_str = "Combine Pairings:"
             Tech = techniques[option]()            
         elif option in techniques.keys():
-            option_str = "Applying technique " + option + " =>"
+            option_str = "Applying technique " + option
             Tech = techniques[option](const, vars, metadata)
         else:
             print("Unrecognized technique selection.")
@@ -148,8 +193,13 @@ if __name__ == "__main__":
         print(option_str, ":",verify2, "\n")
         if option == 'P':
             Tech.makeSubstitution(verify2.right)
-
+        if PROOFGEN_FLAG:
+            lcg_data[ lcg_steps ] = { 'msg':Tech.rule, 'eq': lcg.print_statement(verify2.right) }
+            lcg_steps += 1
     
+    if PROOFGEN_FLAG:
+        lcg_data[ lcg_steps-1 ]['preq'] = final_batch_eq
+        lcg_data[0]['batch'] = lcg_data[ lcg_steps-1 ]['eq']
         
     countDict = countInstances(verify2) 
     if not isOptimized(countDict):
@@ -206,3 +256,10 @@ if __name__ == "__main__":
 
     if PROOFGEN_FLAG:
         print("generate the proof for the given signature scheme.")
+        latex_file = metadata['name'].upper()
+        writeConfig(latex_file, lcg_data, const, vars, sigs)
+#        lcg = LatexCodeGenerator(const, vars)
+#        equation = lcg.print_statement(verify2.right)
+#        print("Latex Equation: ", equation)
+        
+        

@@ -567,7 +567,7 @@ class Technique2:
     def __init__(self, constants, variables, meta):
         self.consts = constants
         self.vars   = variables
-        self.rule   = "Rule 2: Move the exponent(s) into the pairing."
+        self.rule   = "Move the exponent(s) into the pairing (technique 2)"
         #self.rule   = "Rule 2: "
         # TODO: pre-processing to determine context of how to apply technique 2
         # TODO: in cases of chp.bv, where you have multiple exponents outside a pairing, move them all into the e().
@@ -716,7 +716,7 @@ class Technique3:
         self.consts = constants
         self.vars   = variables
         #self.rule   = "Rule 3: "
-        self.rule   = "Rule 3: When two pairings with common 1st or 2nd element appear, then can be combined. n pairs to 1."
+        self.rule   = "Combine pairings with common 1st or 2nd element. Reduce N pairings to 1 (technique 3)"
     
     def visit(self, node, data):
         pass
@@ -916,7 +916,7 @@ class Technique4:
         self.consts = constants
         self.vars   = variables
         self.meta = meta
-        self.rule = "Rule 4: Applied waters hash technique"
+        self.rule = "Applied waters hash technique (technique 4)"
         #print("Metadata =>", meta)
     
     def visit(self, node, data):

@@ -306,8 +306,11 @@ class SubstituteSigDotProds:
     def setState(self, count):
         self.cnt = count # allow us to maintain a synchronized alphabet
         
-    def getkey(self):
-        key = self.prefix + self.alpha[self.cnt]
+    def getkey(self, prefix=None):
+        if prefix:
+            key = prefix + self.alpha[self.cnt]
+        else: 
+            key = self.prefix + self.alpha[self.cnt]
         self.cnt += 1
         #print('key =>', key)
         return key
@@ -344,14 +347,17 @@ class SubstituteSigDotProds:
             
             batchparser.addAsChildNodeToParent(data, key)
     
-#    def visit_of(self, node, data):
-#        sig = str(node.left.right.attr)
-#
-#        if sig == self.sig:
-#            key = BinaryNode(self.getkey())
-#            self.store(key, node)
-#            batchparser.addAsChildNodeToParent(data, key)
-#            
+    def visit_of(self, node, data):
+        sig = str(node.left.right.attr)
+
+        if sig == self.sig:
+            key = BinaryNode(self.getkey('sum'))
+            if node.right.getAttribute() == 'delta':
+                self.store(key, node, 'ZR')
+            else:
+                self.store(key, node)
+            batchparser.addAsChildNodeToParent(data, key)
+            
                 
     def searchProd(self, node, parent):
         if node == None: return None
