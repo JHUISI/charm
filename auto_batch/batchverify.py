@@ -146,9 +146,17 @@ if __name__ == "__main__":
         print(Tech.rule, "\n")
         print(option_str, ":",verify2, "\n")
     
+#    pif = PairInstanceFinder()
+#    ASTVisitor(pif).preorder(verify2.right)
+#    print("Pairing Instances =>\n\t", pif.instance)
+#    for i in pif.instance.keys():
+#        print("i => ", i, pif.instance[i])
+    
+    #exit(0)
+    
     countDict = countInstances(verify2) 
     if not isOptimized(countDict):
-        ASTVisitor(Substitute(countDict, batch_precompute, vars)).preorder(verify2.right)
+        ASTVisitor(SubstituteExps(countDict, batch_precompute, vars)).preorder(verify2.right)
         print("Final batch eq:", verify2.right)
     else:
         print("Final batch eq:", verify2.right)

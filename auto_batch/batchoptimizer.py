@@ -60,42 +60,31 @@ class PairInstanceFinder:
         if Type(rhs) == ops.ATTR:
             key = 'right'        
         self.record(key, lhs, rhs)
-
-#            if right.type == ops.ATTR:
-#                self.record(str(left), str(right))
-#            elif right.type == ops.MUL:
-#                # a ^ (b * c) ==> a : b, a : c
-#                value_1 = right.left
-#                value_2 = right.right
-#                if value_1.type == ops.ATTR:
-#                    self.record(str(left), str(value_1))
-#                if value_2.type == ops.ATTR:
-#                    self.record(str(left), str(value_2))
-#            else:
-#                # dont care for now
-#                return
+        return
 
     def record(self, key, lnode, rnode):
         print("key =>", key, ", nodes =>", lnode, rnode)
-        # find pair in list
-        for i in instances.keys():
-            data = self.instances[ i ]
+        found = False
+        for i in self.instance.keys():
+            data = self.instance[ i ]
             if data['key'] == 'left':
-                if lnode == data['lnode'] and Type(lnode) == ops.ATTR: # found a match
-                    data['instance'] += 1
+                if str(lnode) == str(data['lnode']): # found a match
+                    data['instance'] += 1; found = True
+                    break
             elif data['key'] == 'right':
-                if rnode == data['rnode'] and Type(rnode) == ops.ATTR:
-                    data['instance'] += 1
-                
-            
+                if str(rnode) == str(data['rnode']):
+                    data['instance'] += 1; found = True
+                    break
         # if not found
-        self.instance[ i ] = { 'key':key, 'lnode':lnode, 'rnode':rnode, 'instance':1 }        
+        if not found:
+            self.instance[ self.index ] = { 'key':key, 'lnode':lnode, 'rnode':rnode, 'instance':1 }
+            self.index += 1
         return
 
 
 # substitute nodes that can be precomputed with a stub
 # variable that is computed later
-class Substitute:
+class SubstituteExps:
     def __init__(self, op_instance, precomp, variables):
         # assert input is not equal to None
         self.instance = op_instance
@@ -111,9 +100,9 @@ class Substitute:
     def canExpBePrecomputed(self, base, exp):
         for i in self.instance.keys():
             for j in self.instance[ i ].keys():
-                if self.instance[ i ][ j ] > 1 and (i == str(base) and j == str(exp)):
+                if self.instance[ i ][ j ] > 1 and (i == str(base) and j == str(exp)) and len(base.attr_index) == 1:
                     # combine sets: TODO
-                    #if base.attr_index: index = base.attr_index[0] 
+                    if base.attr_index: index = base.attr_index[0] 
                     if exp.attr_index: index = exp.attr_index[0]
                     else: index = None
                     _key = self.record(str(i), str(j), index)
@@ -201,6 +190,9 @@ class Substitute:
                 pass
             else:
                 print("Substitute: missing some cases: ", Type(right))
+
+class SubstitutePairs:
+    pass
 
 class SubstituteSigDotProds:
     def __init__(self, vars, index='z', sig='N' ):
