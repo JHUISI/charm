@@ -134,14 +134,15 @@ class CodeGenerator:
         return None    
     
 class LatexCodeGenerator:
-    def __init__(self, constants, variables):
+    def __init__(self, constants, variables, latex_info):
         self.consts = constants
         self.vars   = variables
-#        self.verify  = verify_stmt
+        self.latex  = latex_info # used for substituting attributes
     
-#    def print_batchverify(self):
-#        # 
-#        return self.print_statement(self.verify)
+    def getLatexVersion(self, name):
+        if self.latex != None and self.latex.get(name):
+            return self.latex[ name ]
+        return name
     
     def print_statement(self, node):
         if node == None:
@@ -152,12 +153,19 @@ class LatexCodeGenerator:
                 msg = '\delta'
             elif str(msg) =='N':
                 msg = '\\numsigs'
+            else:
+                msg = self.getLatexVersion(str(msg))
+                if msg.find('_') != -1: msg = "{" + msg + "}" # prevent subscript
+                
             if node.attr_index != None:
                 keys = ""
                 for i in node.attr_index:
                     keys += i + ","
                 keys = keys[:len(keys)-1]
-                msg += '_{' + keys + '}'
+                if len(node.attr_index) > 1:
+                    msg += '_{' + keys + '}'
+                else:
+                    msg += '_' + keys
             return msg
         elif(node.type == ops.TYPE):
             return str(node.attr)
@@ -170,7 +178,13 @@ class LatexCodeGenerator:
                print("Left operand: ", left)
                print("Right operand: ", right)            
             if(node.type == ops.EXP):
-                return (left + '^{' + right + "}")
+                if Type(node.left) == ops.EXP:
+                    l = self.print_statement(node.left.left)
+                    r = self.print_statement(node.left.right)
+                    return ( l + "^{" + r + ' \cdot ' + right + "}")
+                elif Type(node.left) == ops.ATTR:
+                    return (left + '^{' + right + "}")
+                return ("(" + left + ')^{' + right + "}")
             elif(node.type == ops.MUL):
                 return ( left + ' \cdot ' + right)
             elif(node.type == ops.EQ):
@@ -182,7 +196,7 @@ class LatexCodeGenerator:
             elif(node.type == ops.HASH):
                 return ('H(' + left + ')')
             elif(node.type == ops.SUM):
-                return ('\sum_{' + left + '}^' + right)
+                return ('\sum_{' + left + '}^{' + right + '}')
             elif(node.type == ops.PROD):
                 return ('\prod_{' + left + '}^' + right)
             elif(node.type == ops.ON):

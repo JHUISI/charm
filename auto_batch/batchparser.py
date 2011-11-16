@@ -67,7 +67,7 @@ class BatchParser:
         #Operator = OperatorAND | OperatorOR | Token
 
         # describes an individual leaf node
-        leafNode = Word(alphanums + '_-#').setParseAction( createNode )
+        leafNode = Word(alphanums + '_-#\\').setParseAction( createNode )
         expr = Forward()
         term = Forward()
         factor = Forward()
@@ -163,17 +163,30 @@ def parseFile(filename):
 
 # keywords
 START_TOKEN, END_TOKEN = 'BEGIN', 'END'
-TYPE, CONST, PRECOMP, SIGNATURE, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'signature', 'other', 'transform'
+TYPE, CONST, PRECOMP, SIGNATURE, PUBLIC, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'signature', 'public', 'other', 'transform'
+LATEX = 'latex'
 
 def clean(arr):
     return [i.strip() for i in arr]
 
 def handle(lines, target):
+    if target == LATEX:
+        code = {}; EQ = ':='
+        for line in lines:
+            line = line.rstrip()
+            if line.find(EQ) != -1:
+                x = line.split(EQ)
+                lhs, rhs = x[0].strip(), x[1].strip()
+                code [ lhs ] = rhs
+        print("latex =>", code)
+        return code
+    
+    # parse as usual
     parser = BatchParser()
     if type(lines) != list:
         return parser.parse(lines)
 
-    if target in [CONST, SIGNATURE, TRANSFORM]:
+    if target in [CONST, SIGNATURE, TRANSFORM, PUBLIC]:
         # parse differently 'a, b, etc.\n'
         _ast = []
         for line in lines:
@@ -207,14 +220,13 @@ def handle(lines, target):
                 batch_ast[ BinaryNode.copy(left) ] = BinaryNode.copy(right)
         #print(target, " =>", indiv_ast)
         return (indiv_ast, batch_ast)
-    
     return None
 
 debugs = levels.none
 
 def parseFile2(filename):
     fd = open(filename, 'r')
-    ast = {TYPE: None, CONST: None, PRECOMP: None, TRANSFORM: None, SIGNATURE: None, OTHER: [] }
+    ast = {TYPE: None, CONST: None, PRECOMP: None, TRANSFORM: None, SIGNATURE: None, PUBLIC: None, LATEX: None, OTHER: [] }
     
     # parser = BatchParser()
     code = fd.readlines(); i = 1
@@ -223,7 +235,7 @@ def parseFile2(filename):
     for line in code:
         if line.find('::') != -1: # parse differently
             token = clean(line.split('::'))
-            if token[0] == START_TOKEN and (token[1] in [TYPE, CONST, PRECOMP, SIGNATURE, TRANSFORM]):
+            if token[0] == START_TOKEN and (token[1] in [TYPE, CONST, PRECOMP, SIGNATURE, TRANSFORM, PUBLIC, LATEX]):
                 inStruct = (True, token[1])
                 if debugs == levels.all: print("Got a section!!!")
                 continue
@@ -447,7 +459,7 @@ class CombineVerifyEq:
 # prod{} on (x * y)
 class SimplifyDotProducts:
     def __init__(self):
-        self.rule = "simplify dot products: "
+        self.rule = "Simplify dot products: "
 
     def getMulTokens(self, subtree, parent_type, target_type, _list):
         if subtree == None: return None
@@ -471,7 +483,7 @@ class SimplifyDotProducts:
     # e.g., prod{} on (x * y) => prod{} on x * prod{} on y    
     def visit_on(self, node, data):
         if Type(data['parent']) == ops.PAIR:
-            self.rule += "False "
+            #self.rule += "False "
             return
         #print("test: right node of prod =>", node.right, ": type =>", node.right.type)
         #print("parent type =>", Type(data['parent']))
@@ -499,7 +511,7 @@ class SimplifyDotProducts:
             
                 node.right = mul_node.left
                 mul_node.left = node
-                self.rule += "True "
+                #self.rule += "True "
                 # move mul_node one level up to replace the "on" node.
                 addAsChildNodeToParent(data, mul_node)
             elif len(r) > 2:
@@ -519,9 +531,9 @@ class SimplifyDotProducts:
                         muls[i].right = prod[i+1]
 #                print("final node =>", muls[0])
                 addAsChildNodeToParent(data, muls[0])                
-                self.rule += "True "
+                #self.rule += "True "
             else:
-                self.rule += "False "
+                #self.rule += "False "
                 return                
 
 

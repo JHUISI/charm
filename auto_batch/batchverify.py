@@ -94,13 +94,13 @@ def benchBatchVerification(N, equation, const, vars, precompute, _verbose):
         print_results(rop_batch.ops)
     return calculate_times(rop_batch.ops, curve['mnt160'], N)
 
-def proofHeader(title, const, sigs, indiv_eq, batch_eq):
+def proofHeader(lcg, title, const, sigs, indiv_eq, batch_eq):
     const_str = ""; sig_str = ""
     for i in const:
-        const_str += i + ","
+        const_str += lcg.getLatexVersion(i) + ","
     const_str = const_str[:len(const_str)-1]
     for i in sigs:
-        sig_str += i + ","
+        sig_str += lcg.getLatexVersion(i) + ","
     sig_str = sig_str[:len(sig_str)-1]
     result = header % (title, const_str, sig_str, indiv_eq, batch_eq)
     #print("header =>", result)
@@ -116,10 +116,10 @@ def proofBody(step, data):
     #print('[STEP', step, ']: ', result)
     return result
 
-def writeConfig(latex_file, lcg_data, const, vars, sigs):
+def writeConfig(lcg, latex_file, lcg_data, const, vars, sigs):
     f = open('verification_gen' + latex_file + '.tex', 'w')
     title = latex_file.upper()
-    outputStr = proofHeader(title, const, sigs, lcg_data[0]['eq'], lcg_data[0]['batch'])
+    outputStr = proofHeader(lcg, title, const, sigs, lcg_data[0]['eq'], lcg_data[0]['batch'])
     for i in lcg_data.keys():
         if i != 0:
             outputStr += proofBody(i, lcg_data[i])
@@ -151,6 +151,7 @@ if __name__ == "__main__":
         print("An error occured while processing batch inputs.")
         exit(-1)
     const, types, sigs = ast_struct[ CONST ], ast_struct[ TYPE ], ast_struct[ SIGNATURE ]
+    latex_subs = ast_struct[ LATEX ]
     (indiv_precompute, batch_precompute) = ast_struct[ PRECOMP ]
     batch_precompute[ "delta" ] = "for{z := 1, N} do prng_z"
     
@@ -174,10 +175,11 @@ if __name__ == "__main__":
     print("variables =>", vars)
     print("metadata =>", metadata)
     print("batch algorithm =>", algorithm)
+
     if PROOFGEN_FLAG:
         lcg_data = {}
         lcg_steps = 0
-        lcg = LatexCodeGenerator(const, vars)
+        lcg = LatexCodeGenerator(const, vars, latex_subs)
 
 
     print("\nVERIFY EQUATION =>", verify)
@@ -278,7 +280,7 @@ if __name__ == "__main__":
     if PROOFGEN_FLAG:
         print("Generated the proof for the given signature scheme.")
         latex_file = metadata['name'].upper()
-        writeConfig(latex_file, lcg_data, const, vars, sigs)
+        writeConfig(lcg, latex_file, lcg_data, const, vars, sigs)
 #        lcg = LatexCodeGenerator(const, vars)
 #        equation = lcg.print_statement(verify2.right)
 #        print("Latex Equation: ", equation)
