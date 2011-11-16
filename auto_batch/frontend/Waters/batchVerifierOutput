@@ -1,0 +1,20 @@
+Final batch eq: (e((prod{z := 1,N} on S1_z^delta_z),mpk#1) * ((e((prod{z := 1,N} on S2_z^delta_z),u1b) * (prod{y := 1,l} on e((prod{z := 1,N} on (S2_z^delta_z^k_y%z * S3_z^delta_z^m_y%z)),ub_y))) * e((prod{z := 1,N} on S3_z^delta_z),u2b))) == A^sum{z := 1,N} of delta_z
+
+Final version => (e(dotA,mpk#1) * ((e(dotB,u1b) * dotE) * e(dotD,u2b))) == A^sumF
+
+Compute:  dotA := (prod{z := 1,N} on S1_z^delta_z)
+Compute:  dotB := (prod{z := 1,N} on S2_z^delta_z)
+Compute:  dotD := (prod{z := 1,N} on S3_z^delta_z)
+Compute:  dotE := (prod{y := 1,l} on e((prod{z := 1,N} on (S2_z^delta_z^k_y%z * S3_z^delta_z^m_y%z)),ub_y))
+Compute:  sumF := (sum{z := 1,N} of delta_z)
+Precompute: A := e(h,mpk#1)^alpha
+Precompute: delta := for{z := 1, N} do prng_z
+dotA := G1
+dotB := G1
+dotD := G1
+dotE := GT
+sumF := ZR
+List := u in l
+List := ub in l
+List := k in l
+List := m in l

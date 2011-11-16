@@ -1,0 +1,39 @@
+['chch.bv']
+types  => {'S2': 'G1', 'S1': 'G1', 'M': 'str', 'mpk#0': 'G2', 'mpk#1': 'G2', 'pk': 'G1'}
+constant  => ['mpk#0', 'pk', 'mpk#1']
+variables => {'S2': 'G1', 'S1': 'G1', 'M': 'str', 'mpk#0': 'G2', 'mpk#1': 'G2', 'pk': 'G1', 'N': '100'}
+metadata => {'N': '100'}
+batch algorithm => ['2', '3']
+
+VERIFY EQUATION => verify := e(S2,mpk#1) == e((S1 * pk^a),mpk#0)
+
+Stage A: Combined Equation => verify := (prod{z := 1,N} on e(S2_z,mpk#1)) == (prod{z := 1,N} on e((S1_z * pk^a_z),mpk#0))
+
+Stage B: Small Exp Test => verify := (prod{z := 1,N} on e(S2_z,mpk#1)^delta_z) == (prod{z := 1,N} on e((S1_z * pk^a_z),mpk#0)^delta_z) 
+
+Rule 2: Left := Move 'delta_z' exponent into the pairing. Left := Move 'delta_z' exponent into the pairing.  
+
+Applying technique 2 => : verify := (prod{z := 1,N} on e(S2_z^delta_z,mpk#1)) == (prod{z := 1,N} on e((S1_z * pk^a_z)^delta_z,mpk#0)) 
+
+Rule 3: common 1st (left) node appears, so can reduce n pairings to 1. common 1st (left) node appears, so can reduce n pairings to 1.  
+
+Applying technique 3 => : verify := e((prod{z := 1,N} on S2_z^delta_z),mpk#1) == e((prod{z := 1,N} on (S1_z * pk^a_z)^delta_z),mpk#0) 
+
+Instances found => {'pk': {'a_z': 1}, 'S2_z': {'delta_z': 1}} 
+
+Final batch eq: e((prod{z := 1,N} on S2_z^delta_z),mpk#1) == e((prod{z := 1,N} on (S1_z * pk^a_z)^delta_z),mpk#0)
+Final indiv eq: e(S2_z,mpk#1) == e((S1_z * pk^a_z),mpk#0) 
+
+Result N = 100 : 30.63303
+Result N = 100 : 3.8790994
+Threshold:  2
+<====	PREP FOR CODE GEN	====>
+
+Final version => e(dotA,mpk#1) == e(dotB,mpk#0) 
+
+Compute:  dotA := (prod{z := 1,N} on S2_z^delta_z)
+Compute:  dotB := (prod{z := 1,N} on (S1_z * pk^a_z)^delta_z)
+Precompute: a := H(M | S1,ZR)
+Precompute: delta := for{z := 1, N} do prng_z
+dotA := G1
+dotB := G1

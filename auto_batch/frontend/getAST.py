@@ -1,21 +1,8 @@
 import sys, ast
 
 class AST_Visitor(ast.NodeVisitor):
-	def visit_Assign(self, node):
-		#if (type(node.value).__name__ == "Dict"):
-			#print(node.value.keys[1]._fields)
-		try:
-			print(node.targets[0].id)
-		except:
-			pass
-
-		print(ast.dump(node))
-		print("\n")
-
-	'''
-	def visit_Target(self, node):
-		print(ast.dump(node))
-	'''
+	def visit_Expr(self, node):
+		print((node.value._fields))
 
 f = open(sys.argv[1], 'r').readlines()
 c = ""

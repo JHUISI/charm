@@ -1,14 +1,18 @@
+#MUST CHANGE BACK TO PRINTABLE!!!!!!!!!!
+
 from toolbox.pairinggroup import *
 from charm.engine.util import *
 import sys, random, string
+
+messageKEY = 1337
 
 debug = False
 
 class IBSig():
     def __init__(self):
         global group
-        group = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
-        #group = PairingGroup(80)
+        #group = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
+        group = PairingGroup(80)
   
     def keygen(self, secparam=None):
         g = group.random(G2)
@@ -19,7 +23,11 @@ class IBSig():
         return (pk, sk)
         
     def sign(self, x, message):
+        #print("secret key:  ", x)
+        #print("message:  ", message)
+        #print("message hash:  ", group.hash(message, G1))
         sig = group.hash(message, G1) ** x
+        #print("sig:  ", sig)
         return sig
         
     def verify(self, pk, sig, message):
@@ -28,6 +36,23 @@ class IBSig():
         if pair(sig, pk['g']) == pair(h, pk['g^x']):
             return True  
         return False 
+
+
+def deserialize_test(pick_sig, sig, valid, num, message):
+	depick_sig = deserializeDict(unpickleObject(pick_sig), group)
+	if not (sig == depick_sig):
+		if (valid == True):
+			print("valid")
+		else:
+			print("invalid")
+		print("num:  ", num)
+		print("original sig:  ", sig)
+		print("depick sig:  ", depick_sig)
+		print("pick sig:  ", pick_sig)
+		print("\n")
+
+
+
 
 if __name__ == "__main__":
 	if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
@@ -72,7 +97,7 @@ if __name__ == "__main__":
 		assert bls.verify(pk, sig, message)
 
 		f_message = open(prefixName + str(index) + '_ValidMessage.pythonPickle', 'wb')
-		validOutputDict[index]['message'] = prefixName + str(index) + '_ValidMessage.pythonPickle'
+		validOutputDict[index][messageKEY] = prefixName + str(index) + '_ValidMessage.pythonPickle'
 
 		f_sig = open(prefixName + str(index) + '_ValidSignature.charmPickle', 'wb')
 		validOutputDict[index]['sig'] = prefixName + str(index) + '_ValidSignature.charmPickle'
@@ -81,6 +106,14 @@ if __name__ == "__main__":
 		f_message.close()
 
 		pick_sig = pickleObject(serializeDict(sig, group))
+		deserialize_test(pick_sig, sig, True, index, message)
+
+
+
+
+		#print("pick_sig:  ", pick_sig)
+
+
 		f_sig.write(pick_sig)
 		f_sig.close()
 
@@ -103,12 +136,17 @@ if __name__ == "__main__":
 		assert bls.verify(pk, sig, message)
 
 		f_message = open(prefixName + str(index) + '_InvalidMessage.pythonPickle', 'wb')
-		invalidOutputDict[index]['message'] = prefixName + str(index) + '_InvalidMessage.pythonPickle'
+		invalidOutputDict[index][messageKEY] = prefixName + str(index) + '_InvalidMessage.pythonPickle'
 		randomIndex = random.randint(0, (messageSize - 1))
 		oldValue = message[randomIndex]
+
 		newValue = random.choice(string.printable)
 		while (newValue == oldValue):
+
+
 			newValue = random.choice(string.printable)
+
+
 		if (messageSize == 1):
 			message = newValue
 		elif (randomIndex != (messageSize -1) ):
@@ -125,6 +163,9 @@ if __name__ == "__main__":
 		f_message.close()
 
 		pick_sig = pickleObject(serializeDict(sig, group))
+
+		deserialize_test(pick_sig, sig, False, index, message)
+
 		f_sig.write(pick_sig)
 		f_sig.close()
 
