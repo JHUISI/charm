@@ -1,0 +1,34 @@
+
+name := waters
+N := 100
+l := 5
+
+BEGIN :: types
+alpha := ZR
+S1 := G1
+S2 := G1
+S3 := G1
+ub := G2
+u1b := G2
+u2b := G2
+A := GT
+END :: types
+
+BEGIN :: precompute
+A := e(h, g2)^alpha
+END :: precompute
+
+BEGIN :: constant
+A, g2, ub, u1b, u2b
+END :: constant
+
+# define components of signature
+BEGIN :: signature
+S1, S2, S3
+END :: signature
+
+BEGIN :: transform
+3, 2, S, 4, P, 3
+END :: transform
+
+verify := { (e(S1, g2) * e(S2, u1b * (prod{i:=1, l} on ub_i^k_i)) * e(S3, u2b * (prod{i:=1,l} on ub_i^m_i))) == A }
