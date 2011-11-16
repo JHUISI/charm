@@ -170,9 +170,9 @@ class LatexCodeGenerator:
                print("Left operand: ", left)
                print("Right operand: ", right)            
             if(node.type == ops.EXP):
-                return ("{" + left + '^{' + right + "}}")
+                return (left + '^{' + right + "}")
             elif(node.type == ops.MUL):
-                return ('{' + left + ' \cdot ' + right + '}')
+                return ( left + ' \cdot ' + right)
             elif(node.type == ops.EQ):
                 return (left + ' = ' + right)
             elif(node.type == ops.EQ_TST):
@@ -181,10 +181,14 @@ class LatexCodeGenerator:
                 return ('e(' + left + ',' + right + ')')
             elif(node.type == ops.HASH):
                 return ('H(' + left + ')')
+            elif(node.type == ops.SUM):
+                return ('\sum_{' + left + '}^' + right)
             elif(node.type == ops.PROD):
                 return ('\prod_{' + left + '}^' + right)
             elif(node.type == ops.ON):
-                 return ("{" + left + " " + right + "}")
+                return ("{" + left + " " + right + "}")
+            elif(node.type == ops.OF):
+                return ("{" + left + " " + right + "}")
             elif(node.type == ops.CONCAT):
                  return (left + ' | ' + right)
         return None    

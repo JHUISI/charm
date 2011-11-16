@@ -100,8 +100,11 @@ int element_is_member(Curve_t ctype, Group_t type, const pairing_t *pairing, ele
 	}
 	else if(type == GT_t) {
 		GT *point = (GT *) e;
-		BOOL result = pfc->member(*point);
-		return result;
+//		BOOL result = pfc->member(*point);
+		if(ctype == MNT) {
+			if ((pow(point->g, pfc->order())).iszero() == TRUE) { return FALSE; }
+			else { return TRUE; }
+		}
 	}
 	return -1;
 }

@@ -276,7 +276,7 @@ if __name__ == "__main__":
             print(i,":=", subProds.dotprod['types'][i])    
 
     if PROOFGEN_FLAG:
-        print("generate the proof for the given signature scheme.")
+        print("Generated the proof for the given signature scheme.")
         latex_file = metadata['name'].upper()
         writeConfig(latex_file, lcg_data, const, vars, sigs)
 #        lcg = LatexCodeGenerator(const, vars)
