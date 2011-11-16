@@ -255,6 +255,20 @@ class BuildAssignMap(ast.NodeVisitor):
 		self.getAllIDs(node, allIDs)
 		return allIDs
 
+	def visit_Expr(self, node):
+		try:
+			targetName = node.value.func.value.id
+		except:
+			return
+		
+		targetName = self.buildNameDictEntry(node.value.func.value)
+		if (targetName == unknownType):
+			return
+		
+		#print(ast.dump(node))
+		allIDs = self.buildValuesDictEntries(node.value, targetName)
+		self.assignMap[targetName][node.lineno] = allIDs
+
 	def visit_Assign(self, node):
 		if (eltsRepInAST in node.targets[0]._fields):
 			for eltsTargetIndex in range(0, len(node.targets[0].elts)):

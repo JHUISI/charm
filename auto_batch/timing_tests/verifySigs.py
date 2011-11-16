@@ -1,5 +1,4 @@
 from toolbox.pairinggroup import *
-from charm.engine.util import *
 
 bodyKey = 'Body'
 
