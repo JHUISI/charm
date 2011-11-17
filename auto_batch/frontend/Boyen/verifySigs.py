@@ -9,8 +9,6 @@ from toolbox.pairinggroup import *
 bodyKey = 'Body'
 
 def verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotA, dotB, dotC, sumE, D, startIndex, endIndex):
-	#group = pairing('../../../param/d224.param')
-
 	group = pairing(80)
 	H = lambda a: group.H(('1', str(a)), ZR)
 	for arg in verifyFuncArgs:

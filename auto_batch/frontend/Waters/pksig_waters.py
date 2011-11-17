@@ -1,4 +1,3 @@
-from charm.pairing import *
 from toolbox.iterate import dotprod
 from toolbox.conversion import Conversion
 from toolbox.bitstring import Bytes
@@ -8,13 +7,16 @@ from toolbox.pairinggroup import *
 from charm.engine.util import *
 
 N = 3
+l = 5
+numSigners = 5
+
 debug = False
 
 class WatersSig:
     def __init__(self):
         global group,lam_func,hashObj
         #group = pairing('/Users/matt/Documents/charm/param/a.param')
-        group = pairing(80)
+        group = PairingGroup(80)
         lam_func = lambda i,a,b: a[i] ** b[i]
         hashObj = hashlib.new('sha1')
 

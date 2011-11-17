@@ -2,7 +2,7 @@ from toolbox.pairinggroup import *
 from charm.engine.util import *
 
 m1 = 'm1'
-m2 = 'm2'
+m2 = 'm244'
 m3 = 'm3'
 
 f_m1 = open('m1.pythonPickle', 'wb')

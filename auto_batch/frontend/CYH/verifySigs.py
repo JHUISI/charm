@@ -9,11 +9,8 @@ from toolbox.pairinggroup import *
 
 bodyKey = 'Body'
 
-def verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotB, dotC, mpk_0, mpk_1, startIndex, endIndex, group):
-
-	#group = pairing('/Users/matt/Documents/charm/param/a.param')
-	#group = PairingGroup(80)
-
+def verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotB, dotC, mpk_0, mpk_1, startIndex, endIndex):
+	group = PairingGroup(80)
 	H1 = lambda x: group.hash(('1', str(x)), G1)
 	H2 = lambda a, b, c: group.hash(('2', a, b, c), ZR)
 	lam_func = lambda i,a,b,c: a[i] * (b[i] ** c[i]) # => u * (pk ** h) for all signers
@@ -35,5 +32,5 @@ def verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotB, do
 			print("sig " + str(startIndex) + " failed\n")
 			return
 		midIndex = startIndex + midWay
-		verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotB, dotC, mpk_0, mpk_1, startIndex, midIndex, group)
-		verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotB, dotC, mpk_0, mpk_1, midIndex, endIndex, group)
+		verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotB, dotC, mpk_0, mpk_1, startIndex, midIndex)
+		verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotB, dotC, mpk_0, mpk_1, midIndex, endIndex)

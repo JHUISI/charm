@@ -1,4 +1,3 @@
-from charm.pairing import *
 from toolbox.iterate import dotprod
 from toolbox.conversion import Conversion
 from toolbox.bitstring import Bytes
@@ -6,8 +5,6 @@ from toolbox.PKSig import PKSig
 from toolbox.pairinggroup import *
 from charm.engine.util import *
 import sys
-from charm.engine.util import *
-from toolbox.pairinggroup import *
 
 sigNumKey = 'Signature_Number'
 bodyKey = 'Body'
@@ -49,7 +46,8 @@ if __name__ == '__main__':
 
 	argSigIndexMap = {}
 
-	group = pairing(80)
+	group = groupParamArg
+
 	lam_func = lambda i,a,b: a[i] ** b[i]
 
 	for sigIndex in range(0, numSigs):
