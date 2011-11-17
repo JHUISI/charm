@@ -22,7 +22,7 @@ if __name__ == '__main__':
 		sys.exit("\nUsage:  python BatchVerifyTemplate.py [filename of pickled Python dictionary with verify function arguments] [path and filename of group param file]\n")
 	verifyParamFilesArg = sys.argv[1]
 	verifyParamFiles = open(verifyParamFilesArg, 'rb').read()
-	groupParamArg = PairingGroup(int(sys.argv[2]))
+	groupParamArg = PairingGroup(sys.argv[2])
 	verifyParamFilesDict = deserializeDict( unpickleObject( verifyParamFiles ) , groupParamArg )
 	verifyArgsDict = {}
 	numSigs = len(verifyParamFilesDict)
@@ -37,8 +37,8 @@ if __name__ == '__main__':
 			if (verifyParamFile.endswith(charmPickleSuffix)):
 				verifyParamPickle = open(verifyParamFile, 'rb').read()
 				verifyArgsDict[sigIndex][arg][bodyKey] = deserializeDict( unpickleObject( verifyParamPickle ) , groupParamArg )
-				#if groupParamArg.ismember( verifyArgsDict[sigIndex][arg][bodyKey] ) == False:
-					#sys.exit("The " + arg + " member of signature number " + sigIndex + " has failed the group membership check.  Exiting.\n")
+				if groupParamArg.isMember( verifyArgsDict[sigIndex][arg][bodyKey] ) == False:
+					sys.exit("The " + arg + " member of signature number " + sigIndex + " has failed the group membership check.  Exiting.\n")
 			elif (verifyParamFile.endswith(pythonPickleSuffix)):
 				verifyParamPickle = open(verifyParamFile, 'rb')
 				verifyArgsDict[sigIndex][arg][bodyKey] = pickle.load(verifyParamPickle)
@@ -51,10 +51,7 @@ if __name__ == '__main__':
 
 	argSigIndexMap = {}
 
-	#group = pairing('/Users/matt/Documents/charm/param/a.param')
-
-	group = groupParamArg
-
+	group = PairingGroup(80)
 	H1 = lambda x: group.hash(('1', str(x)), G1)
 	H2 = lambda a, b, c: group.hash(('2', a, b, c), ZR)
 	lam_func = lambda i,a,b,c: a[i] * (b[i] ** c[i]) # => u * (pk ** h) for all signers
@@ -100,6 +97,4 @@ if __name__ == '__main__':
 		dotC[z] =  S ** deltaz[z] 
 
 
-	verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotB, dotC,  verifyArgsDict[argSigIndexMap['mpk']]['mpk'][bodyKey]['Pub'],  verifyArgsDict[argSigIndexMap['mpk']]['mpk'][bodyKey]['g'], 0, N, group)
-
-	print("here")
+	verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotB, dotC,  verifyArgsDict[argSigIndexMap['mpk']]['mpk'][bodyKey]['Pub'],  verifyArgsDict[argSigIndexMap['mpk']]['mpk'][bodyKey]['g'], 0, N)

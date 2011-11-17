@@ -1,6 +1,4 @@
 import sys, copy
-from charm.engine.util import *
-from toolbox.pairinggroup import *
 from verifySigs import verifySigsRecursive
 
 
@@ -51,3 +49,5 @@ if __name__ == '__main__':
 				verifyArgsDict[sigIndex][arg][bodyKey] = tempBuf
 
 	argSigIndexMap = {}
+
+	group = groupParamArg

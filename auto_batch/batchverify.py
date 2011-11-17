@@ -254,6 +254,7 @@ if __name__ == "__main__":
     # STOP BENCHMARK : THRESHOLD ESTIMATOR 
     # TODO: check avg for when batch is more efficient than 
     if CODEGEN_FLAG:
+        print("Final batch eq:", verify2.right)
         subProds = SubstituteSigDotProds(vars, 'z', 'N')
         ASTVisitor(subProds).preorder(verify2.right)
         # print("Dot prod =>", subProds.dotprod)

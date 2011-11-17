@@ -1,4 +1,3 @@
-from charm.pairing import *
 from toolbox.iterate import dotprod
 from toolbox.conversion import Conversion
 from toolbox.bitstring import Bytes
@@ -6,8 +5,6 @@ from toolbox.PKSig import PKSig
 from toolbox.pairinggroup import *
 from charm.engine.util import *
 import sys, copy
-from charm.engine.util import *
-from toolbox.pairinggroup import *
 from verifySigs import verifySigsRecursive
 
 
@@ -59,16 +56,19 @@ if __name__ == '__main__':
 
 	argSigIndexMap = {}
 
-	group = pairing(80)
+	group = groupParamArg
+
 	lam_func = lambda i,a,b: a[i] ** b[i]
 	N = 3
+	l = 5
 
 	deltaz = {}
+	dotC = {}
 	dotB = {}
 	dotA = {}
-	sumF = {}
-	dotE = {}
+	dotF = {}
 	dotD = {}
+	sumE = {}
 
 	for sigIndex in range(0, numSigs):
 		deltaz[sigIndex] = prng_bits(group, 80)
@@ -76,7 +76,7 @@ if __name__ == '__main__':
 	dotA_runningProduct = group.init(G1, 1)
 	dotB_runningProduct = group.init(G1, 1)
 	dotD_runningProduct = group.init(G1, 1)
-	sumF_runningProduct = group.init(ZR, 0)
+	sumE_runningProduct = group.init(ZR, 0)
 	for z in range(0, N):
 		for arg in verifyFuncArgs:
 			if (sigNumKey in verifyArgsDict[z][arg]):
@@ -95,10 +95,10 @@ if __name__ == '__main__':
 
 		dotD[z] =  S3 ** deltaz[z] 
 
-		sumF[z] =  deltaz[z] 
+		sumE[z] =  deltaz[z] 
 
 
 	A = verifyArgsDict[argSigIndexMap['mpk']]['mpk'][bodyKey][ 'A' ]
 
 
-	verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotA, dotB, dotD, sumF,  verifyArgsDict[argSigIndexMap['mpk']]['mpk'][bodyKey]['g2'], u1b, u2b, A, 0, N)
+	verifySigsRecursive(group, deltaz, verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotA, dotB, dotD, sumE,  verifyArgsDict[argSigIndexMap['mpk']]['mpk'][bodyKey]['g2'],  verifyArgsDict[argSigIndexMap['mpk']]['mpk'][bodyKey]['u1b'],  verifyArgsDict[argSigIndexMap['mpk']]['mpk'][bodyKey]['u2b'], A, 0, N)

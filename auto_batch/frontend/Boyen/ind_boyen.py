@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
 	argSigIndexMap = {}
 
-	group = pairing('../../../param/d224.param')
+	group = pairing(80)
 	H = lambda a: group.H(('1', str(a)), ZR)
 
 	for sigIndex in range(0, numSigs):
