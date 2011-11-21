@@ -41,6 +41,11 @@ int pair_rule(GroupType lhs, GroupType rhs)
 	return FALSE; /* Fall all other cases: only for MNT case */
 }
 
+int check_type(GroupType type) {
+	if(type == ZR || type == G1 || type == G2 || type == GT) return TRUE;
+	return FALSE;
+}
+
 #define ERROR_TYPE(operand, ...) "unsupported "#operand" operand types: "#__VA_ARGS__
 
 #define UNARY(f, m, n) \
@@ -1544,7 +1549,7 @@ int check_membership(Element *elementObj) {
 		/* check value is between 1 and order */
 		mpz_t zr;
 		mpz_init(zr);
-		element_set_mpz(elementObj->e, zr);
+		element_to_mpz(zr, elementObj->e);
 		int ans = mpz_cmp(zr, elementObj->pairing->pair_obj->Zr->order);
 		result = ans <= 0 ? TRUE : FALSE;
 		mpz_clear(zr);
@@ -1600,6 +1605,21 @@ static PyObject *Group_Check(Element *self, PyObject *args) {
 	return NULL;
 }
 
+static PyObject *Get_Order(Element *self, PyObject *args) {
+
+	IS_PAIRING_OBJ_NULL(self);
+
+	PyObject *object = (PyObject *) mpzToLongObj(self->pairing->pair_obj->r);
+//	GroupType type = ZR;
+//	if(PyArg_ParseTuple(args, "|i", &type)) {
+//		if(check_type(type) == FALSE) {
+//			PyErr_SetString(ElementError, "invalid type. Choices: ZR, G1, G2 or GT");
+//			return NULL;
+//		}
+//	}
+
+	return object; /* returns a PyInt */
+}
 
 #if PY_MAJOR_VERSION >= 3
 
@@ -1897,6 +1917,7 @@ PyMethodDef Element_methods[] = {
 	{"serialize", (PyCFunction)Serialize_cmp, METH_VARARGS, "Serialize an element type into bytes."},
 	{"deserialize", (PyCFunction)Deserialize_cmp, METH_VARARGS, "De-serialize an bytes object into an element object"},
 	{"ismember", (PyCFunction) Group_Check, METH_VARARGS, "Group membership test for element objects."},
+	{"order", (PyCFunction) Get_Order, METH_NOARGS, "Get the group order for a particular field."},
     {NULL}  /* Sentinel */
 };
 
