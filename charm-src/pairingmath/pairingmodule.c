@@ -35,6 +35,12 @@ int div_rule(GroupType lhs, GroupType rhs)
 	return FALSE; /* Fail all other cases */
 }
 
+int pair_rule(GroupType lhs, GroupType rhs)
+{
+	if(lhs == G1 && rhs == G2) return TRUE;
+	return FALSE; /* Fall all other cases: only for MNT case */
+}
+
 #define ERROR_TYPE(operand, ...) "unsupported "#operand" operand types: "#__VA_ARGS__
 
 #define UNARY(f, m, n) \
@@ -1084,7 +1090,7 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 		return (PyObject *) newObject;
 	}
 
-	if(Check_Elements(lhs, rhs) && Check_Types(lhs->element_type, rhs->element_type, 'e')) {
+	if(Check_Elements(lhs, rhs) && pair_rule(lhs->element_type, rhs->element_type) == TRUE) {
 		// apply pairing
 		debug_e("LHS: '%B'\n", lhs->e);
 		debug_e("RHS: '%B'\n", rhs->e);
@@ -1518,6 +1524,83 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 	return NULL;
 }
 
+void print_mpz(mpz_t x, int base) {
+//#ifdef DEBUG
+	if(base <= 2 || base > 64) return;
+	size_t x_size = mpz_sizeinbase(x, base) + 2;
+	char *x_str = (char *) malloc(x_size);
+	x_str = mpz_get_str(x_str, base, x);
+	printf("Element => '%s'\n", x_str);
+	printf("Order of Element => '%zd'\n", x_size);
+	free(x_str);
+//#endif
+}
+
+int check_membership(Element *elementObj) {
+	int result = -1;
+	element_t e;
+
+	if(elementObj->element_type == ZR) {
+		/* check value is between 1 and order */
+		mpz_t zr;
+		mpz_init(zr);
+		element_set_mpz(elementObj->e, zr);
+		int ans = mpz_cmp(zr, elementObj->pairing->pair_obj->Zr->order);
+		result = ans <= 0 ? TRUE : FALSE;
+		mpz_clear(zr);
+	}
+	/* for G1, G2, and GT test e^q == 1 (mod q)? */
+	else if(elementObj->element_type == G1) {
+		element_init_G1(e, elementObj->pairing->pair_obj);
+		element_pow_mpz(e, elementObj->e, elementObj->pairing->pair_obj->G1->order);
+		result = element_is1(e) ? TRUE : FALSE; // TODO: verify this
+		element_clear(e);
+	}
+	else if(elementObj->element_type == G2) {
+		element_init_G2(e, elementObj->pairing->pair_obj);
+		element_pow_mpz(e, elementObj->e, elementObj->pairing->pair_obj->G2->order);
+		result = element_is1(e) ? TRUE : FALSE; // TODO: verify this
+		element_clear(e);
+	}
+	else if(elementObj->element_type == GT) {
+		element_init_GT(e, elementObj->pairing->pair_obj);
+		element_pow_mpz(e, elementObj->e, elementObj->pairing->pair_obj->GT->order);
+		result = element_is1(e) ? TRUE : FALSE; // TODO: verify this
+		element_clear(e);
+	}
+	else {/* not a valid type */ }
+	return result;
+}
+
+
+static PyObject *Group_Check(Element *self, PyObject *args) {
+
+	IS_PAIRING_OBJ_NULL(self);
+
+	PyObject *object = NULL;
+	if(PyArg_ParseTuple(args, "O", &object)) {
+		if(PyElement_Check(object)) {
+			Element *elem = (Element *) object;
+//
+//			printf("Order of group => ");
+//			print_mpz(elem->pairing->pair_obj->G2->order, 10);
+//			printf("\n");
+			if(check_membership(elem) == TRUE) {
+				Py_INCREF(Py_True);
+				return Py_True;
+			}
+			else {
+				Py_INCREF(Py_False);
+				return Py_False;
+			}
+		}
+	}
+
+	PyErr_SetString(ElementError, "invalid object type.");
+	return NULL;
+}
+
+
 #if PY_MAJOR_VERSION >= 3
 
 PyTypeObject PairingType = {
@@ -1813,6 +1896,7 @@ PyMethodDef Element_methods[] = {
 	{"H", (PyCFunction)Element_hash, METH_VARARGS, "Hash an element type to a specific field: Zr, G1, or G2"},
 	{"serialize", (PyCFunction)Serialize_cmp, METH_VARARGS, "Serialize an element type into bytes."},
 	{"deserialize", (PyCFunction)Deserialize_cmp, METH_VARARGS, "De-serialize an bytes object into an element object"},
+	{"ismember", (PyCFunction) Group_Check, METH_VARARGS, "Group membership test for element objects."},
     {NULL}  /* Sentinel */
 };
 

@@ -1,9 +1,8 @@
-#from toolbox.pairinggroup import *
 from charm.pairing import *
 from toolbox.PKSig import *
 from math import *
 
-class CDH(PKSig):
+class HW(PKSig):
     def __init__(self, groupObj):
         global group
         group = groupObj
@@ -57,20 +56,18 @@ class CDH(PKSig):
             return False
         
 if __name__ == "__main__":
-    AES_SECURITY = 80
-    # can this scheme be implemented in an asymmetric group?
-#    groupObj = PairingGroup(AES_SECURITY)
-    groupObj = pairing(AES_SECURITY)
-    cdh = CDH(groupObj)
+    #AES_SECURITY = 80
+    groupObj = pairing('../param/a.param')
+    hw = HW(groupObj)
     
-    (pk, sk) = cdh.setup()
+    (pk, sk) = hw.setup()
     print("Public parameters")
     print("pk =>", pk)
 
     m = "please sign this message now please!"    
-    sig = cdh.sign(pk, sk, pk['s'], m)
+    sig = hw.sign(pk, sk, pk['s'], m)
     print("Signature...")
     print("sig =>", sig)
 
-    assert cdh.verify(pk, m, sig), "invalid signature"
+    assert hw.verify(pk, m, sig), "invalid signature"
     print("Verification Successful!!")

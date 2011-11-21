@@ -68,6 +68,14 @@ typedef struct {
 	int safe_pairing_clear;
 } Element;
 
+
+#define IS_PAIRING_OBJ_NULL(obj) \
+	if(obj->pairing == NULL) {	\
+		PyErr_SetString(ElementError, "pairing structure not initialized.");	\
+		return NULL;	\
+	}
+
+
 #define Check_Elements(o1, o2)  PyElement_Check(o1) && PyElement_Check(o2)
 
 #define Check_Types2(o1, o2, lhs_o1, rhs_o2, longLHS_o1, longRHS_o2)  \
@@ -99,5 +107,6 @@ int mul_rule(GroupType lhs, GroupType rhs);
 int add_rule(GroupType lhs, GroupType rhs);
 int sub_rule(GroupType lhs, GroupType rhs);
 int div_rule(GroupType lhs, GroupType rhs);
-
+int pair_rule(GroupType lhs, GroupType rhs);
+void print_mpz(mpz_t x, int base);
 #endif

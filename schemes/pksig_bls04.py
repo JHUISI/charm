@@ -45,8 +45,7 @@ class IBSig():
         return False 
 
 def main():
-    #groupObj = PairingGroup('../param/d224.param')
-    groupObj = PairingGroup(80)
+    groupObj = PairingGroup('../param/d224.param')
     
     m = { 'a':"hello world!!!" , 'b':"test message" }
     bls = IBSig(groupObj)

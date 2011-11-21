@@ -40,8 +40,7 @@ class CHP(PKSig):
 
 if __name__ == "__main__":
    
-   #groupObj = pairing('../param/a.param')
-   groupObj = pairing(80)
+   groupObj = pairing('../param/a.param')
    chp = CHP(groupObj)
    mpk = chp.setup()
 

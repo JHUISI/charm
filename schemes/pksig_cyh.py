@@ -73,8 +73,7 @@ class CYH(PKSig):
 if __name__ == "__main__":
    L = [ "alice", "bob", "carlos", "dexter", "eddie"] 
    ID = "bob"
-   #groupObj = pairing('../param/a.param')
-   groupObj = pairing(80)
+   groupObj = pairing('../param/a.param')
    cyh = CYH(groupObj)
    (mpk, msk) = cyh.setup()
 

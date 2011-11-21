@@ -4,7 +4,8 @@ name := cdh
 N := 100
 
 BEGIN :: types
-sig1 := G1, sig2 := G1
+sig1 := G1
+sig2 := G1
 M := ZR 
 D := GT
 V := GT

@@ -85,8 +85,8 @@ class WatersSig:
 
 if __name__ == "__main__":
    z = 5
-   #groupObj = pairing('../param/a.param')
-   groupObj = pairing(80)
+   groupObj = pairing('../param/a.param')
+
    waters = WatersSig(groupObj)
    (mpk, msk) = waters.setup(z)
 
