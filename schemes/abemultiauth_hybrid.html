@@ -1,0 +1,167 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>abemultiauth_hybrid &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
+    <link rel="next" title="chamhash_adm05" href="chamhash_adm05.html" />
+    <link rel="prev" title="Demonstration Schemes" href="../schemes.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="chamhash_adm05.html" title="chamhash_adm05"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../schemes.html" title="Demonstration Schemes"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-abemultiauth_hybrid">
+<span id="abemultiauth-hybrid"></span><h1>abemultiauth_hybrid<a class="headerlink" href="#module-abemultiauth_hybrid" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="abemultiauth_hybrid.HybridABEncMA">
+<em class="property">class </em><tt class="descclassname">abemultiauth_hybrid.</tt><tt class="descname">HybridABEncMA</tt><big>(</big><em>scheme</em>, <em>groupObj</em><big>)</big><a class="reference internal" href="../_modules/abemultiauth_hybrid.html#HybridABEncMA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abemultiauth_hybrid.HybridABEncMA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.ABEncMultiAuth.ABEncMultiAuth</span></tt></p>
+<dl class="method">
+<dt id="abemultiauth_hybrid.HybridABEncMA.authsetup">
+<tt class="descname">authsetup</tt><big>(</big><em>gp</em>, <em>attributes</em><big>)</big><a class="reference internal" href="../_modules/abemultiauth_hybrid.html#HybridABEncMA.authsetup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abemultiauth_hybrid.HybridABEncMA.authsetup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="abemultiauth_hybrid.HybridABEncMA.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>gp</em>, <em>sk</em>, <em>ct</em><big>)</big><a class="reference internal" href="../_modules/abemultiauth_hybrid.html#HybridABEncMA.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abemultiauth_hybrid.HybridABEncMA.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="abemultiauth_hybrid.HybridABEncMA.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>gp</em>, <em>M</em>, <em>policy_str</em><big>)</big><a class="reference internal" href="../_modules/abemultiauth_hybrid.html#HybridABEncMA.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abemultiauth_hybrid.HybridABEncMA.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="abemultiauth_hybrid.HybridABEncMA.instantiateCipher">
+<tt class="descname">instantiateCipher</tt><big>(</big><em>mode</em>, <em>message</em><big>)</big><a class="reference internal" href="../_modules/abemultiauth_hybrid.html#HybridABEncMA.instantiateCipher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abemultiauth_hybrid.HybridABEncMA.instantiateCipher" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="abemultiauth_hybrid.HybridABEncMA.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>gp</em>, <em>sk</em>, <em>i</em>, <em>gid</em>, <em>pkey</em><big>)</big><a class="reference internal" href="../_modules/abemultiauth_hybrid.html#HybridABEncMA.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abemultiauth_hybrid.HybridABEncMA.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="abemultiauth_hybrid.HybridABEncMA.pad">
+<tt class="descname">pad</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="../_modules/abemultiauth_hybrid.html#HybridABEncMA.pad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abemultiauth_hybrid.HybridABEncMA.pad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="abemultiauth_hybrid.HybridABEncMA.setup">
+<tt class="descname">setup</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/abemultiauth_hybrid.html#HybridABEncMA.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abemultiauth_hybrid.HybridABEncMA.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="abemultiauth_hybrid.main">
+<tt class="descclassname">abemultiauth_hybrid.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/abemultiauth_hybrid.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abemultiauth_hybrid.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../schemes.html"
+                        title="previous chapter">Demonstration Schemes</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="chamhash_adm05.html"
+                        title="next chapter">chamhash_adm05</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/schemes/abemultiauth_hybrid.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="chamhash_adm05.html" title="chamhash_adm05"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../schemes.html" title="Demonstration Schemes"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

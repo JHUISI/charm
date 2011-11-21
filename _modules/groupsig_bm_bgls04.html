@@ -1,0 +1,211 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>groupsig_bm_bgls04 &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for groupsig_bm_bgls04</h1><div class="highlight"><pre>
+<span class="c"># From: &quot;Short Group Signatures</span>
+<span class="c"># Published in: CRYPTO 2004</span>
+<span class="c"># Available from: n/a</span>
+<span class="c"># Notes: An extended abstract of this paper appeared in Advances in Cryptology (2004)</span>
+
+<span class="c"># type:           digital signature scheme</span>
+<span class="c"># setting:        Pairing</span>
+<span class="c">#</span>
+<span class="c"># Implementer:    J Ayo Akinyele</span>
+<span class="c"># Date:           12/2010</span>
+<span class="kn">from</span> <span class="nn">toolbox.pairinggroup</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">toolbox.PKSig</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="k">class</span> <span class="nc">ShortSig</span><span class="p">(</span><span class="n">PKSig</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+<div class="viewcode-block" id="ShortSig"><a class="viewcode-back" href="../schemes/groupsig_bm_bgls04.html#groupsig_bm_bgls04.ShortSig">[docs]</a>        <span class="n">PKSig</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">global</span> <span class="n">group</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+        
+    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
+<div class="viewcode-block" id="ShortSig.keygen"><a class="viewcode-back" href="../schemes/groupsig_bm_bgls04.html#groupsig_bm_bgls04.ShortSig.keygen">[docs]</a>        <span class="n">h</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="n">xi1</span><span class="p">,</span> <span class="n">xi2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+        <span class="n">u</span><span class="p">,</span><span class="n">v</span> <span class="o">=</span> <span class="n">h</span> <span class="o">**</span> <span class="o">~</span><span class="n">xi1</span><span class="p">,</span> <span class="n">h</span> <span class="o">**</span> <span class="o">~</span><span class="n">xi2</span>
+        <span class="n">gamma</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">g2</span> <span class="o">**</span> <span class="n">gamma</span>
+        <span class="n">gpk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;g1&#39;</span><span class="p">:</span><span class="n">g1</span><span class="p">,</span> <span class="s">&#39;g2&#39;</span><span class="p">:</span><span class="n">g2</span><span class="p">,</span> <span class="s">&#39;h&#39;</span><span class="p">:</span><span class="n">h</span><span class="p">,</span> <span class="s">&#39;u&#39;</span><span class="p">:</span><span class="n">u</span><span class="p">,</span> <span class="s">&#39;v&#39;</span><span class="p">:</span><span class="n">v</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">:</span><span class="n">w</span> <span class="p">}</span>
+        <span class="n">gmsk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;xi1&#39;</span><span class="p">:</span><span class="n">xi1</span><span class="p">,</span> <span class="s">&#39;xi2&#39;</span><span class="p">:</span><span class="n">xi2</span> <span class="p">}</span>
+                
+        <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="p">[</span><span class="n">gpk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="o">~</span><span class="p">(</span><span class="n">gamma</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+        <span class="n">gsk</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">Secret keys...&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;User </span><span class="si">%d</span><span class="s">: A = </span><span class="si">%s</span><span class="s">, x = </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+            <span class="n">gsk</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> 
+        <span class="k">return</span> <span class="p">(</span><span class="n">gpk</span><span class="p">,</span> <span class="n">gmsk</span><span class="p">,</span> <span class="n">gsk</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gpk</span><span class="p">,</span> <span class="n">gsk</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span></div>
+<div class="viewcode-block" id="ShortSig.sign"><a class="viewcode-back" href="../schemes/groupsig_bm_bgls04.html#groupsig_bm_bgls04.ShortSig.sign">[docs]</a>        <span class="n">A</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">gsk</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">gsk</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">T1</span> <span class="o">=</span> <span class="n">gpk</span><span class="p">[</span><span class="s">&#39;u&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">alpha</span>
+        <span class="n">T2</span> <span class="o">=</span> <span class="n">gpk</span><span class="p">[</span><span class="s">&#39;v&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">beta</span>
+        <span class="n">T3</span> <span class="o">=</span> <span class="n">A</span> <span class="o">*</span> <span class="p">(</span><span class="n">gpk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">+</span> <span class="n">beta</span><span class="p">))</span>
+        
+        <span class="n">delta1</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">alpha</span>
+        <span class="n">delta2</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">beta</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+         
+        <span class="n">R1</span> <span class="o">=</span> <span class="n">gpk</span><span class="p">[</span><span class="s">&#39;u&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">R2</span> <span class="o">=</span> <span class="n">gpk</span><span class="p">[</span><span class="s">&#39;v&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">R3</span> <span class="o">=</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">T3</span><span class="p">,</span> <span class="n">gpk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">gpk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">],</span> <span class="n">gpk</span><span class="p">[</span><span class="s">&#39;w&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">*</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">gpk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">],</span> <span class="n">gpk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">r</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">r</span><span class="p">[</span><span class="mi">4</span><span class="p">]))</span>
+        <span class="n">R4</span> <span class="o">=</span> <span class="p">(</span><span class="n">T1</span> <span class="o">**</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">gpk</span><span class="p">[</span><span class="s">&#39;u&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="o">-</span><span class="n">r</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">R5</span> <span class="o">=</span> <span class="p">(</span><span class="n">T2</span> <span class="o">**</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">gpk</span><span class="p">[</span><span class="s">&#39;v&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="o">-</span><span class="n">r</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+        
+        <span class="n">c</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">((</span><span class="n">M</span><span class="p">,</span> <span class="n">T1</span><span class="p">,</span> <span class="n">T2</span><span class="p">,</span> <span class="n">T3</span><span class="p">,</span> <span class="n">R1</span><span class="p">,</span> <span class="n">R2</span><span class="p">,</span> <span class="n">R3</span><span class="p">,</span> <span class="n">R4</span><span class="p">,</span> <span class="n">R5</span><span class="p">),</span> <span class="n">ZR</span><span class="p">)</span>
+        <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">beta</span>
+        <span class="n">s3</span><span class="p">,</span> <span class="n">s4</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">x</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">delta1</span>
+        <span class="n">s5</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">delta2</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;T1&#39;</span><span class="p">:</span><span class="n">T1</span><span class="p">,</span> <span class="s">&#39;T2&#39;</span><span class="p">:</span><span class="n">T2</span><span class="p">,</span> <span class="s">&#39;T3&#39;</span><span class="p">:</span><span class="n">T3</span><span class="p">,</span> <span class="s">&#39;c&#39;</span><span class="p">:</span><span class="n">c</span><span class="p">,</span> <span class="s">&#39;s_alpha&#39;</span><span class="p">:</span><span class="n">s1</span><span class="p">,</span> <span class="s">&#39;s_beta&#39;</span><span class="p">:</span><span class="n">s2</span><span class="p">,</span> <span class="s">&#39;s_x&#39;</span><span class="p">:</span><span class="n">s3</span><span class="p">,</span> <span class="s">&#39;s_delta1&#39;</span><span class="p">:</span><span class="n">s4</span><span class="p">,</span> <span class="s">&#39;s_delta2&#39;</span><span class="p">:</span><span class="n">s5</span><span class="p">}</span>
+    
+    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gpk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+        <span class="n">validSignature</span> <span class="o">=</span> <span class="bp">False</span></div>
+<div class="viewcode-block" id="ShortSig.verify"><a class="viewcode-back" href="../schemes/groupsig_bm_bgls04.html#groupsig_bm_bgls04.ShortSig.verify">[docs]</a>        
+        <span class="n">c</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">,</span> <span class="n">t3</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">[</span><span class="s">&#39;c&#39;</span><span class="p">],</span> <span class="n">sigma</span><span class="p">[</span><span class="s">&#39;T1&#39;</span><span class="p">],</span> <span class="n">sigma</span><span class="p">[</span><span class="s">&#39;T2&#39;</span><span class="p">],</span> <span class="n">sigma</span><span class="p">[</span><span class="s">&#39;T3&#39;</span><span class="p">]</span>
+        <span class="n">s_alpha</span><span class="p">,</span> <span class="n">s_beta</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">[</span><span class="s">&#39;s_alpha&#39;</span><span class="p">],</span> <span class="n">sigma</span><span class="p">[</span><span class="s">&#39;s_beta&#39;</span><span class="p">]</span>
+        <span class="n">s_x</span><span class="p">,</span> <span class="n">s_delta1</span><span class="p">,</span> <span class="n">s_delta2</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">[</span><span class="s">&#39;s_x&#39;</span><span class="p">],</span> <span class="n">sigma</span><span class="p">[</span><span class="s">&#39;s_delta1&#39;</span><span class="p">],</span> <span class="n">sigma</span><span class="p">[</span><span class="s">&#39;s_delta2&#39;</span><span class="p">]</span>
+        
+        <span class="n">R1_</span> <span class="o">=</span> <span class="p">(</span><span class="n">gpk</span><span class="p">[</span><span class="s">&#39;u&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s_alpha</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">t1</span> <span class="o">**</span> <span class="o">-</span><span class="n">c</span><span class="p">)</span>
+        <span class="n">R2_</span> <span class="o">=</span> <span class="p">(</span><span class="n">gpk</span><span class="p">[</span><span class="s">&#39;v&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s_beta</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">t2</span> <span class="o">**</span> <span class="o">-</span><span class="n">c</span><span class="p">)</span>
+        <span class="n">R3_</span> <span class="o">=</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">t3</span><span class="p">,</span> <span class="n">gpk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="n">s_x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">gpk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">],</span><span class="n">gpk</span><span class="p">[</span><span class="s">&#39;w&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">s_alpha</span> <span class="o">-</span> <span class="n">s_beta</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">gpk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">],</span> <span class="n">gpk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">s_delta1</span> <span class="o">-</span> <span class="n">s_delta2</span><span class="p">))</span> <span class="o">*</span> <span class="p">((</span><span class="n">pair</span><span class="p">(</span><span class="n">t3</span><span class="p">,</span> <span class="n">gpk</span><span class="p">[</span><span class="s">&#39;w&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">pair</span><span class="p">(</span><span class="n">gpk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">],</span> <span class="n">gpk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]))</span> <span class="o">**</span> <span class="n">c</span><span class="p">)</span>
+        <span class="n">R4_</span> <span class="o">=</span> <span class="p">(</span><span class="n">t1</span> <span class="o">**</span> <span class="n">s_x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">gpk</span><span class="p">[</span><span class="s">&#39;u&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="o">-</span><span class="n">s_delta1</span><span class="p">)</span>
+        <span class="n">R5_</span> <span class="o">=</span> <span class="p">(</span><span class="n">t2</span> <span class="o">**</span> <span class="n">s_x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">gpk</span><span class="p">[</span><span class="s">&#39;v&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="o">-</span><span class="n">s_delta2</span><span class="p">)</span>
+        
+        <span class="n">c_prime</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">((</span><span class="n">M</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">,</span> <span class="n">t3</span><span class="p">,</span> <span class="n">R1_</span><span class="p">,</span> <span class="n">R2_</span><span class="p">,</span> <span class="n">R3_</span><span class="p">,</span> <span class="n">R4_</span><span class="p">,</span> <span class="n">R5_</span><span class="p">),</span> <span class="n">ZR</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="n">c_prime</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;c =&gt; &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">c</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Valid Group Signature for message: &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">M</span><span class="p">)</span>
+            <span class="n">validSignature</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Not a valid signature for message!!!&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">validSignature</span>
+    
+    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gpk</span><span class="p">,</span> <span class="n">gmsk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+        <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">,</span> <span class="n">t3</span><span class="p">,</span> <span class="n">xi1</span><span class="p">,</span> <span class="n">xi2</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">[</span><span class="s">&#39;T1&#39;</span><span class="p">],</span> <span class="n">sigma</span><span class="p">[</span><span class="s">&#39;T2&#39;</span><span class="p">],</span> <span class="n">sigma</span><span class="p">[</span><span class="s">&#39;T3&#39;</span><span class="p">],</span> <span class="n">gmsk</span><span class="p">[</span><span class="s">&#39;xi1&#39;</span><span class="p">],</span> <span class="n">gmsk</span><span class="p">[</span><span class="s">&#39;xi2&#39;</span><span class="p">]</span></div>
+<div class="viewcode-block" id="ShortSig.open"><a class="viewcode-back" href="../schemes/groupsig_bm_bgls04.html#groupsig_bm_bgls04.ShortSig.open">[docs]</a>        
+        <span class="n">A_prime</span> <span class="o">=</span> <span class="n">t3</span> <span class="o">/</span> <span class="p">((</span><span class="n">t1</span> <span class="o">**</span> <span class="n">xi1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">t2</span> <span class="o">**</span> <span class="n">xi2</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">A_prime</span>
+        
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;d224.param&#39;</span><span class="p">)</span></div></div>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">3</span>    <span class="c"># how manu users in the group</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="mi">1</span> <span class="c"># which user&#39;s key to sign a message with</span>
+    
+    <span class="n">sigTest</span> <span class="o">=</span> <span class="n">ShortSig</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+    
+    <span class="p">(</span><span class="n">gpk</span><span class="p">,</span> <span class="n">gmsk</span><span class="p">,</span> <span class="n">gsk</span><span class="p">)</span> <span class="o">=</span> <span class="n">sigTest</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="n">message</span> <span class="o">=</span> <span class="s">&#39;Hello World this is a message!&#39;</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">Sign the following M: &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">message</span><span class="p">))</span>
+    
+    <span class="n">signature</span> <span class="o">=</span> <span class="n">sigTest</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">gpk</span><span class="p">,</span> <span class="n">gsk</span><span class="p">[</span><span class="n">user</span><span class="p">],</span> <span class="n">message</span><span class="p">)</span>
+    
+    <span class="n">result</span> <span class="o">=</span> <span class="n">sigTest</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">gpk</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span>
+    
+    <span class="c">#if result:</span>
+    <span class="c">#    print(&quot;Verify signers identity...&quot;)</span>
+    <span class="c">#    index = sigTest.open(gpk, gmsk, message, signature)</span>
+    <span class="c">#    i = 0</span>
+    <span class="c">#    while i &lt; n:</span>
+    <span class="c">#        if gsk[i][0] == index:</span>
+    <span class="c">#            print(&#39;Found index of signer: %d&#39; % i)</span>
+    <span class="c">#            print(&#39;A = %s&#39; % index)</span>
+    <span class="c">#        i += 1</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;Complete!&#39;</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,179 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chk04_enc &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for chk04_enc</h1><div class="highlight"><pre>
+<span class="c"># From: &quot;R. Canneti, S. Halevi, J. Katz: Chosen-Ciphertext Security from Identity-Based Encryption&quot;</span>
+<span class="c"># Published in: CRYPTO 2004</span>
+<span class="c"># Available from: http://eprint.iacr.org/2003/182</span>
+<span class="c"># Notes: </span>
+<span class="c">#</span>
+<span class="c"># type:         encryption (public key)</span>
+<span class="c"># setting:      n/a --- requires a selective-ID secure IBE scheme an EU-CMA one-time signature (OTS) scheme</span>
+<span class="c"># assumption:   n/a --- dependent on the underlying primitives</span>
+<span class="c">#</span>
+<span class="c"># Implementer:  Matthew Green</span>
+<span class="c"># Date:         1/2011</span>
+<span class="kn">from</span> <span class="nn">toolbox.pairinggroup</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">toolbox.PKEnc</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">ibe_bb03</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">sig_short_bls04</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">hashIDAdapt</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="k">class</span> <span class="nc">CHK04</span><span class="p">(</span><span class="n">PKEnc</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ibe_scheme</span><span class="p">,</span> <span class="n">ots_scheme</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+<div class="viewcode-block" id="CHK04"><a class="viewcode-back" href="../schemes/chk04_enc.html#chk04_enc.CHK04">[docs]</a>        <span class="k">global</span> <span class="n">ibe</span><span class="p">,</span> <span class="n">ots</span><span class="p">,</span> <span class="n">group</span>
+        <span class="n">ibe</span> <span class="o">=</span> <span class="n">ibe_scheme</span>
+        <span class="n">ots</span> <span class="o">=</span> <span class="n">ots_scheme</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+		
+    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="p">):</span>
+        <span class="c"># Run the IBE Setup routine to generate (mpk, msk)</span>
+<div class="viewcode-block" id="CHK04.keygen"><a class="viewcode-back" href="../schemes/chk04_enc.html#chk04_enc.CHK04.keygen">[docs]</a>        <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+        
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;mpk&#39;</span> <span class="p">:</span> <span class="n">mpk</span><span class="p">,</span> <span class="s">&#39;secparam&#39;</span><span class="p">:</span><span class="n">secparam</span> <span class="p">}</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="c"># Generate a random keypair for the OTS</span></div>
+<div class="viewcode-block" id="CHK04.encrypt"><a class="viewcode-back" href="../schemes/chk04_enc.html#chk04_enc.CHK04.encrypt">[docs]</a>        <span class="p">(</span><span class="n">svk</span><span class="p">,</span> <span class="n">ssk</span><span class="p">)</span> <span class="o">=</span> <span class="n">ots</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;secparam&#39;</span><span class="p">])</span>		
+
+        <span class="c"># get identity (element of ZR)</span>
+        <span class="n">_id</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">svk</span><span class="p">[</span><span class="s">&#39;identity&#39;</span><span class="p">])</span>
+        <span class="c"># print(&quot;pub identity enc =&gt;&quot;, _id)</span>
+
+        <span class="c"># Encrypt message with the IBE scheme under &#39;identity&#39; vk</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;mpk&#39;</span><span class="p">],</span> <span class="n">_id</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+        <span class="c"># Sign the resulting ciphertext with sk</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="n">ots</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">ssk</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">],</span> <span class="n">C</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;vk&#39;</span> <span class="p">:</span> <span class="n">svk</span><span class="p">,</span> <span class="s">&#39;C&#39;</span> <span class="p">:</span> <span class="n">C</span><span class="p">,</span> <span class="s">&#39;sigma&#39;</span> <span class="p">:</span> <span class="n">sigma</span> <span class="p">}</span>
+		
+    <span class="c"># NOTE: need to transform c[&#39;vk&#39;] into a string to use as key        </span>
+    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="c"># Given a ciphertext (vk, C, sigma), verify that sigma is a signature on C under public key vk</span></div>
+<div class="viewcode-block" id="CHK04.decrypt"><a class="viewcode-back" href="../schemes/chk04_enc.html#chk04_enc.CHK04.decrypt">[docs]</a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">ots</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;vk&#39;</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;sigma&#39;</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+        <span class="n">identity</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;vk&#39;</span><span class="p">][</span><span class="s">&#39;identity&#39;</span><span class="p">]</span>
+        <span class="c"># print(&quot;identity in dec =&gt;&quot;, identity)</span>
+        <span class="c"># Otherwise, extract an IBE key for identity &#39;vk&#39; under the master secret params</span>
+        <span class="n">dk</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">identity</span><span class="p">)</span>
+        <span class="c"># Return the decryption of the ciphertext element &quot;C&quot; under key dk</span>
+        <span class="k">return</span> <span class="n">ibe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">dk</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">])</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;a.param&#39;</span><span class="p">)</span></div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/chk04_enc.html#chk04_enc.main">[docs]</a>    <span class="c"># instantiate an Identity-Based Encryption scheme</span>
+    <span class="n">ibe</span> <span class="o">=</span> <span class="n">IBE_BB04</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+    <span class="n">hash_ibe</span> <span class="o">=</span> <span class="n">HashIDAdapter</span><span class="p">(</span><span class="n">ibe</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">)</span>
+   
+    <span class="c"># instantiate an one-time signature scheme such as BLS04</span>
+    <span class="n">ots</span> <span class="o">=</span> <span class="n">IBSig</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+    
+    <span class="n">pkenc</span> <span class="o">=</span> <span class="n">CHK04</span><span class="p">(</span><span class="n">hash_ibe</span><span class="p">,</span> <span class="n">ots</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">)</span>
+    
+    <span class="c"># not sure how to enforce secparam yet</span>
+    <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+    <span class="n">ciphertext</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+    
+    <span class="n">rec_msg</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ciphertext</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">rec_msg</span> <span class="o">==</span> <span class="n">msg</span><span class="p">,</span> <span class="s">&quot;FAILED Decryption!!!&quot;</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Decryption!&quot;</span><span class="p">)</span>       
+        
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span></div>
+    <span class="n">main</span><span class="p">()</span>
+     
+    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,151 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>commit_gs08 &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for commit_gs08</h1><div class="highlight"><pre>
+<span class="c"># From: &quot;J. Groth, A. Sahai.  Efficient Non-interactive Proof Systems for Bilinear Groups&quot;.</span>
+<span class="c"># Published in: Eurocrypt 2008</span>
+<span class="c"># Available from: http://www.cs.ucl.ac.uk/staff/J.Groth/WImoduleFull.pdf</span>
+<span class="c"># Notes: This implements only the SXDH and DLIN instantiations, in prime-order groups.</span>
+<span class="c">#</span>
+<span class="c"># type:			commitment</span>
+<span class="c"># setting:		bilinear groups</span>
+<span class="c">#</span>
+<span class="c"># Implementer:	M Green</span>
+<span class="c"># Date:			6/2011</span>
+
+<span class="kn">from</span> <span class="nn">toolbox.pairinggroup</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">toolbox.Commit</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="k">class</span> <span class="nc">Commitment_GS08</span><span class="p">(</span><span class="n">Commitment</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">,</span> <span class="n">setting</span><span class="o">=</span><span class="s">&#39;SXDH&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="Commitment_GS08"><a class="viewcode-back" href="../schemes/commit_gs08.html#commit_gs08.Commitment_GS08">[docs]</a>        <span class="n">Commitment</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">Commitment</span><span class="o">.</span><span class="n">setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secdef</span><span class="o">=</span><span class="s">&#39;CM_PHCB&#39;</span><span class="p">,</span> <span class="n">assumption</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;SXDH&#39;</span><span class="p">,</span><span class="s">&#39;DLIN&#39;</span><span class="p">],</span> 
+                          <span class="n">message_space</span><span class="o">=</span><span class="p">[</span><span class="n">G1</span><span class="p">,</span> <span class="s">&#39;KEM&#39;</span><span class="p">],</span> <span class="n">secmodel</span><span class="o">=</span><span class="s">&#39;SM&#39;</span><span class="p">)</span>
+        <span class="k">global</span> <span class="n">group</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+    
+    <span class="c"># Generates commitment parameters for either G1 or G2 (specified by groupChoice).</span>
+    <span class="c"># By default this generates the binding commitment parameters.  Set commitType to &#39;hiding&#39;</span>
+    <span class="c"># in order to generate hiding parameters.</span>
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">groupChoice</span><span class="o">=</span><span class="n">G1</span><span class="p">,</span> <span class="n">commitType</span><span class="o">=</span><span class="s">&#39;binding&#39;</span><span class="p">):</span>
+        <span class="n">g1</span><span class="p">,</span> <span class="n">h1</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">groupChoice</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">groupChoice</span><span class="p">)</span>
+<div class="viewcode-block" id="Commitment_GS08.setup"><a class="viewcode-back" href="../schemes/commit_gs08.html#commit_gs08.Commitment_GS08.setup">[docs]</a>        <span class="n">s</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">commitType</span> <span class="o">==</span> <span class="s">&#39;binding&#39;</span><span class="p">):</span>
+            <span class="n">g2</span><span class="p">,</span> <span class="n">h2</span> <span class="o">=</span> <span class="n">g1</span> <span class="o">**</span> <span class="n">s</span><span class="p">,</span> <span class="n">h1</span> <span class="o">**</span> <span class="n">s</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">g2</span><span class="p">,</span> <span class="n">h2</span> <span class="o">=</span> <span class="n">g1</span> <span class="o">**</span> <span class="n">s</span><span class="p">,</span> <span class="n">h1</span> <span class="o">**</span> <span class="n">t</span>
+        
+        <span class="k">return</span> <span class="p">(</span><span class="n">g1</span><span class="p">,</span> <span class="n">g2</span><span class="p">,</span> <span class="n">h1</span><span class="p">,</span> <span class="n">h2</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">commit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">msg</span> <span class="p">:</span> <span class="n">ZR</span><span class="p">):</span>
+        <span class="c"># TODO: check that the message is in the same group as the params</span></div>
+<div class="viewcode-block" id="Commitment_GS08.commit"><a class="viewcode-back" href="../schemes/commit_gs08.html#commit_gs08.Commitment_GS08.commit">[docs]</a>        <span class="p">(</span><span class="n">g1</span><span class="p">,</span> <span class="n">g2</span><span class="p">,</span> <span class="n">h1</span><span class="p">,</span> <span class="n">g2</span><span class="p">)</span> <span class="o">=</span> <span class="n">params</span>
+        <span class="n">r1</span><span class="p">,</span> <span class="n">r2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        
+        <span class="n">c1</span> <span class="o">=</span> <span class="p">(</span><span class="n">g1</span> <span class="o">**</span> <span class="n">r1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">h1</span> <span class="o">**</span> <span class="n">r2</span><span class="p">)</span>
+        <span class="n">c2</span> <span class="o">=</span> <span class="n">msg</span> <span class="o">*</span> <span class="p">(</span><span class="n">g2</span> <span class="o">**</span> <span class="n">r1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">h2</span> <span class="o">**</span> <span class="n">r2</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="p">({</span> <span class="s">&#39;c1&#39;</span><span class="p">:</span><span class="n">c1</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">:</span><span class="n">c2</span> <span class="p">},</span> <span class="p">{</span> <span class="s">&#39;r1&#39;</span><span class="p">:</span><span class="n">r1</span><span class="p">,</span> <span class="s">&#39;r2&#39;</span><span class="p">:</span><span class="n">r2</span> <span class="p">})</span>
+        
+    <span class="k">def</span> <span class="nf">decommit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">msg</span> <span class="p">:</span> <span class="n">ZR</span><span class="p">):</span>
+        <span class="c"># TODO: check that the message is in the same group as the params</span></div>
+<div class="viewcode-block" id="Commitment_GS08.decommit"><a class="viewcode-back" href="../schemes/commit_gs08.html#commit_gs08.Commitment_GS08.decommit">[docs]</a>        <span class="p">(</span><span class="n">g1</span><span class="p">,</span> <span class="n">g2</span><span class="p">,</span> <span class="n">h1</span><span class="p">,</span> <span class="n">g2</span><span class="p">)</span> <span class="o">=</span> <span class="n">params</span>
+        
+        <span class="k">if</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;c1&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="p">((</span><span class="n">g1</span> <span class="o">**</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;r1&#39;</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">h1</span> <span class="o">**</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;r2&#39;</span><span class="p">]))):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        
+        <span class="k">if</span> <span class="p">((</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;c2&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">msg</span><span class="p">)</span> <span class="o">!=</span> <span class="p">((</span><span class="n">g2</span> <span class="o">**</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;r1&#39;</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">h2</span> <span class="o">**</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;r2&#39;</span><span class="p">]))):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        
+        <span class="k">return</span> <span class="bp">True</span>
+        
+</pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

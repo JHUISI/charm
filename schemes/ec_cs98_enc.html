@@ -1,0 +1,170 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ec_cs98_enc &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
+    <link rel="next" title="ecdsa" href="ecdsa.html" />
+    <link rel="prev" title="dsa" href="dsa.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ecdsa.html" title="ecdsa"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="dsa.html" title="dsa"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-ec_cs98_enc">
+<span id="ec-cs98-enc"></span><h1>ec_cs98_enc<a class="headerlink" href="#module-ec_cs98_enc" title="Permalink to this headline">¶</a></h1>
+<p>Cramer-Shoup Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption in groups of prime order)</p>
+<div class="line-block">
+<div class="line">From: &#8220;R. Cramer, V. Shoup: A practical public key cryptosystem provably secure against adaptive chosen ciphertext attack&#8221;</div>
+<div class="line">Published in: CRYPTO 1998</div>
+<div class="line">Available from: <a class="reference external" href="http://knot.kaist.ac.kr/seminar/archive/46/46.pdf">http://knot.kaist.ac.kr/seminar/archive/46/46.pdf</a></div>
+<div class="line">Notes: </div>
+</div>
+<ul class="simple">
+<li>type:                 encryption (public key)</li>
+<li>setting:              DDH-hard EC groups of prime order (F_p)</li>
+<li>assumption:   DDH</li>
+<li>Name:         PKEnc_DDH_CCA_CS98</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Matthew Green</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">1/2011</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="ec_cs98_enc.EC_CS98">
+<em class="property">class </em><tt class="descclassname">ec_cs98_enc.</tt><tt class="descname">EC_CS98</tt><big>(</big><em>builtin_cv</em><big>)</big><a class="reference internal" href="../_modules/ec_cs98_enc.html#EC_CS98"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ec_cs98_enc.EC_CS98" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.PKEnc.PKEnc</span></tt></p>
+<dl class="method">
+<dt id="ec_cs98_enc.EC_CS98.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>c</em><big>)</big><a class="reference internal" href="../_modules/ec_cs98_enc.html#EC_CS98.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ec_cs98_enc.EC_CS98.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ec_cs98_enc.EC_CS98.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>M</em><big>)</big><a class="reference internal" href="../_modules/ec_cs98_enc.html#EC_CS98.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ec_cs98_enc.EC_CS98.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ec_cs98_enc.EC_CS98.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>secparam=0</em><big>)</big><a class="reference internal" href="../_modules/ec_cs98_enc.html#EC_CS98.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ec_cs98_enc.EC_CS98.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="ec_cs98_enc.main">
+<tt class="descclassname">ec_cs98_enc.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ec_cs98_enc.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ec_cs98_enc.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="dsa.html"
+                        title="previous chapter">dsa</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ecdsa.html"
+                        title="next chapter">ecdsa</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/schemes/ec_cs98_enc.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ecdsa.html" title="ecdsa"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="dsa.html" title="dsa"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

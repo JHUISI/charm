@@ -1,0 +1,174 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cpabe09 &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
+    <link rel="next" title="cs98_enc" href="cs98_enc.html" />
+    <link rel="prev" title="cpabe07" href="cpabe07.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="cs98_enc.html" title="cs98_enc"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="cpabe07.html" title="cpabe07"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-cpabe09">
+<span id="cpabe09"></span><h1>cpabe09<a class="headerlink" href="#module-cpabe09" title="Permalink to this headline">¶</a></h1>
+<p>Brent Waters (Pairing-based)</p>
+<div class="line-block">
+<div class="line">From: &#8220;Ciphertext-Policy Attribute-Based Encryption: An Expressive, Efficient, and Provably Secure Realization&#8221;, Appendix C.</div>
+<div class="line">Published in: 2008</div>
+<div class="line">Available from: <a class="reference external" href="http://eprint.iacr.org/2008/290.pdf">http://eprint.iacr.org/2008/290.pdf</a></div>
+<div class="line">Notes: Security Assumption: parallel q-DBDHE. The sole disadvantage of this scheme is the high number of pairings</div>
+<div class="line">that must be computed during the decryption process (2 + N) for N attributes mathing in the key.</div>
+</div>
+<ul class="simple">
+<li>type:            ciphertext-policy attribute-based encryption (public key)</li>
+<li>setting:        Pairing</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">J Ayo Akinyele</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">11/2010</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="cpabe09.CPabe">
+<em class="property">class </em><tt class="descclassname">cpabe09.</tt><tt class="descname">CPabe</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../_modules/cpabe09.html#CPabe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cpabe09.CPabe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.ABEnc.ABEnc</span></tt></p>
+<dl class="method">
+<dt id="cpabe09.CPabe.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>sk</em>, <em>ct</em><big>)</big><a class="reference internal" href="../_modules/cpabe09.html#CPabe.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cpabe09.CPabe.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cpabe09.CPabe.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>M</em>, <em>policy_str</em><big>)</big><a class="reference internal" href="../_modules/cpabe09.html#CPabe.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cpabe09.CPabe.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cpabe09.CPabe.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>pk</em>, <em>msk</em>, <em>attributes</em><big>)</big><a class="reference internal" href="../_modules/cpabe09.html#CPabe.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cpabe09.CPabe.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cpabe09.CPabe.setup">
+<tt class="descname">setup</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/cpabe09.html#CPabe.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cpabe09.CPabe.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cpabe09.main">
+<tt class="descclassname">cpabe09.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/cpabe09.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cpabe09.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="cpabe07.html"
+                        title="previous chapter">cpabe07</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="cs98_enc.html"
+                        title="next chapter">cs98_enc</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/schemes/cpabe09.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="cs98_enc.html" title="cs98_enc"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="cpabe07.html" title="cpabe07"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

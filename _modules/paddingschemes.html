@@ -1,0 +1,412 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>paddingschemes &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for paddingschemes</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">toolbox.securerandom</span> <span class="kn">import</span> <span class="n">SecureRandomFactory</span>
+<span class="kn">import</span> <span class="nn">charm.cryptobase</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+
+<span class="k">class</span> <span class="nc">OAEPEncryptionPadding</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="OAEPEncryptionPadding"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.OAEPEncryptionPadding">[docs]</a><span class="sd">    :Authors: Gary Belvin</span>
+<span class="sd">    </span>
+<span class="sd">    OAEPEncryptionPadding</span>
+<span class="sd">    </span>
+<span class="sd">    Implements the OAEP padding scheme.  Appropriate for RSA-OAEP encryption.</span>
+<span class="sd">    Implemented according to PKCS#1 v2.1 Section 7 ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_hash_type</span> <span class="o">=</span><span class="s">&#39;sha1&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hashFn</span> <span class="o">=</span> <span class="n">hashFunc</span><span class="p">(</span><span class="n">_hash_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hashFnOutputBytes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">_hash_type</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span>
+        
+    <span class="c"># outputBytes - the length in octets of the RSA modulus used</span>
+    <span class="c">#             - the intended length of the encoded message </span>
+    <span class="c"># emLen = the length of the rsa modulus in bits</span>
+    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">emLen</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:Return: a Bytes object&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="OAEPEncryptionPadding.encode"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.OAEPEncryptionPadding.encode">[docs]</a>        <span class="c"># Skipped: label input length checking. (L must be less than 2^61 octets for SHA1)</span>
+        <span class="c"># First, make sure the message isn&#39;t too long.    emLen</span>
+        <span class="n">hLen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashFnOutputBytes</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">emLen</span> <span class="o">-</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">hLen</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)):</span>
+            <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;message too long&quot;</span>
+        
+        <span class="n">lHash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashFn</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="s">&#39;utf-8&#39;</span><span class="p">))</span>  
+              
+        <span class="c"># Let PS be a string of length (emLen - mLen - 2hLen - 2) containing only zero octets.</span>
+        <span class="c"># Compute DB = lHash || PS || 0x01 || M.</span>
+        <span class="n">PS</span> <span class="o">=</span> <span class="n">Bytes</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;</span><span class="se">\x00</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">emLen</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">hLen</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">DB</span> <span class="o">=</span> <span class="n">lHash</span> <span class="o">+</span> <span class="n">PS</span> <span class="o">+</span> <span class="n">b</span><span class="s">&#39;</span><span class="se">\x01</span><span class="s">&#39;</span> <span class="o">+</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        
+        <span class="c"># Generate a random octet string seed of length hLen and compute </span>
+        <span class="c"># maskedDB = MGF1(seed, emLen - self.hashFnOutputBytes - 1)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">seed</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
+            <span class="n">rand</span> <span class="o">=</span> <span class="n">SecureRandomFactory</span><span class="o">.</span><span class="n">getInstance</span><span class="p">()</span>
+            <span class="n">seed</span> <span class="o">=</span> <span class="n">rand</span><span class="o">.</span><span class="n">getRandomBits</span><span class="p">(</span><span class="n">hLen</span><span class="p">)</span>
+            
+        <span class="n">dbMask</span> <span class="o">=</span> <span class="n">MGF1</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">DB</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashFn</span><span class="p">,</span> <span class="n">hLen</span><span class="p">)</span>
+        <span class="n">maskedDB</span> <span class="o">=</span> <span class="n">DB</span> <span class="o">^</span> <span class="n">dbMask</span>
+        
+        <span class="c"># Let seedMask = MGF(maskedDB, self.hashFnOutputBytes) and</span>
+        <span class="c"># maskedSeed = seedMask XOR seed</span>
+        <span class="n">seedMask</span> <span class="o">=</span> <span class="n">MGF1</span><span class="p">(</span><span class="n">maskedDB</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">seed</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashFn</span><span class="p">,</span> <span class="n">hLen</span><span class="p">)</span>        
+        <span class="n">maskedSeed</span> <span class="o">=</span> <span class="n">seedMask</span> <span class="o">^</span> <span class="n">seed</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">debug</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Encoding&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;label    =&gt;&quot;</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;lhash    =&gt;&quot;</span><span class="p">,</span> <span class="n">lHash</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;seed     =&gt;&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;db       =&gt;&quot;</span><span class="p">,</span> <span class="n">DB</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;db len   =&gt;&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">DB</span><span class="p">))</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;db mask  =&gt;&quot;</span><span class="p">,</span> <span class="n">dbMask</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;maskedDB =&gt;&quot;</span><span class="p">,</span> <span class="n">maskedDB</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;seedMask =&gt;&quot;</span><span class="p">,</span> <span class="n">seedMask</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;maskedSed=&gt;&quot;</span><span class="p">,</span> <span class="n">maskedSeed</span><span class="p">)</span>
+      
+        <span class="k">return</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;</span><span class="se">\x00</span><span class="s">&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">maskedSeed</span> <span class="o">+</span> <span class="n">maskedDB</span>
+    
+    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encMessage</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+        <span class="n">hLen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashFnOutputBytes</span></div>
+<div class="viewcode-block" id="OAEPEncryptionPadding.decode"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.OAEPEncryptionPadding.decode">[docs]</a>        <span class="c"># Make sure the encoded string is at least L bytes long</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">encMessage</span><span class="p">)</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">hLen</span> <span class="o">+</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;encoded string not long enough.&quot;</span>
+        <span class="n">lHash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashFn</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># Parse the encoded string as (0x00 || maskedSeed || maskedDB)</span>
+        <span class="c">#Y = encMessage[0]</span>
+        <span class="n">maskedSeed</span> <span class="o">=</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">encMessage</span><span class="p">[</span><span class="mi">1</span><span class="p">:(</span><span class="mi">1</span><span class="o">+</span><span class="n">hLen</span><span class="p">)])</span>
+        <span class="n">maskedDB</span> <span class="o">=</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">encMessage</span><span class="p">[(</span><span class="mi">1</span><span class="o">+</span><span class="n">hLen</span><span class="p">):])</span>
+
+        <span class="c"># Set seedMask = MGF1(maskedDB, hashFnOutputSize)</span>
+        <span class="n">seedMask</span> <span class="o">=</span> <span class="n">MGF1</span><span class="p">(</span><span class="n">maskedDB</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">maskedSeed</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashFn</span><span class="p">,</span> <span class="n">hLen</span><span class="p">)</span>
+        <span class="n">seed</span> <span class="o">=</span> <span class="n">maskedSeed</span> <span class="o">^</span> <span class="n">seedMask</span>           
+        
+        <span class="c"># Set dbMask = MGF(seed, k - hLen - 1) and</span>
+        <span class="c">#     DB = maskedDB \xor dbMask.</span>
+        <span class="n">dbMask</span> <span class="o">=</span> <span class="n">MGF1</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">maskedDB</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashFn</span><span class="p">,</span> <span class="n">hLen</span><span class="p">)</span>
+        <span class="n">DB</span> <span class="o">=</span> <span class="n">dbMask</span> <span class="o">^</span> <span class="n">maskedDB</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">debug</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;decoding:&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;MaskedSeed =&gt; &quot;</span><span class="p">,</span> <span class="n">maskedSeed</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;maskedDB   =&gt; &quot;</span><span class="p">,</span> <span class="n">maskedDB</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;r seed =&gt;&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;r DB   =&gt;&quot;</span><span class="p">,</span> <span class="n">DB</span><span class="p">)</span>
+                
+        <span class="c"># Parse DB as:</span>
+        <span class="c">#   DB = lHash&#39; || PS || 0x01 || M.</span>
+        <span class="c"># Check that lHash&#39; == lHash, Y == 0x00 and there is an 0x01 after PS</span>
+        <span class="n">lHashPrime</span> <span class="o">=</span> <span class="n">DB</span><span class="p">[</span><span class="mi">0</span> <span class="p">:</span> <span class="n">hLen</span><span class="p">]</span>        
+        <span class="n">M</span> <span class="o">=</span> <span class="n">DB</span><span class="p">[</span><span class="n">DB</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;</span><span class="se">\x01</span><span class="s">&#39;</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span> <span class="p">:</span> <span class="p">]</span>
+        <span class="k">return</span> <span class="n">M</span>
+
+<span class="k">def</span> <span class="nf">MGF1</span><span class="p">(</span><span class="n">seed</span><span class="p">:</span><span class="n">Bytes</span><span class="p">,</span> <span class="n">maskBytes</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">hashFn</span><span class="p">,</span> <span class="n">hLen</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; MGF1 Mask Generation Function</span></div></div>
+<div class="viewcode-block" id="MGF1"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.MGF1">[docs]</a><span class="sd">    </span>
+<span class="sd">    Implemented according to PKCS #1 specification, see appendix B.2.1:</span>
+<span class="sd">    </span>
+<span class="sd">    :Parameters:</span>
+<span class="sd">       - ``hLen``: is the output length of the hash function</span>
+<span class="sd">       - ``maskBytes``: the number of mask bytes to return</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="c"># Skipped output size checking.  Must be less than 2^32 * hLen</span>
+    <span class="c">#result = b&#39;&#39;.join([hashFn(struct.pack(&quot;&gt;sI&quot;, seed, i)) for i in range(math.ceil(maskBytes / hashOutputBytes) - 1)])</span>
+    <span class="n">ran</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">maskBytes</span> <span class="o">/</span> <span class="n">hLen</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;calc =&gt;&quot;</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">maskBytes</span> <span class="o">/</span> <span class="n">hLen</span><span class="p">))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Range =&gt;&quot;</span><span class="p">,</span> <span class="n">ran</span><span class="p">)</span>
+    <span class="n">test</span> <span class="o">=</span> <span class="p">[</span><span class="n">hashFn</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s">&quot;&gt;</span><span class="si">%d</span><span class="s">sI&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">seed</span><span class="p">)),</span> <span class="n">seed</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ran</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> 
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;test =&gt;&quot;</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">b</span><span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">maskBytes</span><span class="p">])</span>
+    <span class="c">#diff = maskBytes - len(result)</span>
+    <span class="c">#result2 = result + Bytes.fill(b&#39;\x00&#39;, diff)  #NOT CORRECT</span>
+    <span class="c">#return Bytes(result2)</span>
+
+<span class="k">class</span> <span class="nc">hashFunc</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_hash_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span></div>
+<div class="viewcode-block" id="hashFunc"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.hashFunc">[docs]</a>        <span class="k">if</span> <span class="n">_hash_type</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hashObj</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&#39;sha1&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hashObj</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">_hash_type</span><span class="p">)</span>
+        
+    <span class="c">#message must be a binary string</span>
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span> <span class="p">:</span> <span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]):</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashObj</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">message</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">]:</span>
+            <span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">message</span><span class="p">))</span> <span class="c"># bytes or custom Bytes</span>
+        <span class="k">return</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span>  
+    
+<span class="k">class</span> <span class="nc">PSSPadding</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span></div>
+<div class="viewcode-block" id="PSSPadding"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.PSSPadding">[docs]</a><span class="sd">    :Authors: Gary Belvin</span>
+<span class="sd">    </span>
+<span class="sd">    PSSSignaturePadding</span>
+<span class="sd">    </span>
+<span class="sd">    Implements the PSS signature padding scheme.  Appropriate for RSA-PSS signing. </span>
+<span class="sd">    Implemented according to section 8 of ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_hash_type</span> <span class="o">=</span><span class="s">&#39;sha1&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hashFn</span> <span class="o">=</span> <span class="n">hashFunc</span><span class="p">(</span><span class="n">_hash_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hLen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">_hash_type</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sLen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hLen</span> <span class="c"># The length of the default salt</span>
+    
+    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">emBits</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">salt</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Encodes a message with PSS padding</span>
+<div class="viewcode-block" id="PSSPadding.encode"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.PSSPadding.encode">[docs]</a><span class="sd">        emLen will be set to the minimum allowed length if not explicitly set</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c"># assert len(M) &lt; (2^61 -1), Message too long</span>
+        
+        <span class="c">#Let H’ = Hash (M’), an octet string of length hLen.#Max length of output message</span>
+        <span class="k">if</span> <span class="n">emBits</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">emBits</span> <span class="o">=</span>  <span class="mi">8</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">hLen</span> <span class="o">+</span> <span class="mi">8</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sLen</span> <span class="o">+</span> <span class="mi">9</span>
+            <span class="c">#Round to the next byte</span>
+            <span class="n">emBits</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">emBits</span> <span class="o">/</span> <span class="mi">8</span><span class="p">)</span> <span class="o">*</span> <span class="mi">8</span>
+        <span class="k">assert</span> <span class="n">emBits</span> <span class="o">&gt;=</span> <span class="mi">8</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">hLen</span> <span class="o">+</span> <span class="mi">8</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sLen</span> <span class="o">+</span> <span class="mi">9</span><span class="p">,</span> <span class="s">&quot;Not enough emBits&quot;</span>
+        
+        <span class="c">#Make sure the the message is long enough to be valid</span>
+        <span class="n">emLen</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">emBits</span> <span class="o">/</span> <span class="mi">8</span><span class="p">)</span>        
+        <span class="k">assert</span> <span class="n">emLen</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hLen</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sLen</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;emLen too small&quot;</span>
+        
+        <span class="k">if</span> <span class="n">salt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sLen</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> 
+                <span class="n">salt</span> <span class="o">=</span> <span class="n">SecureRandomFactory</span><span class="o">.</span><span class="n">getInstance</span><span class="p">()</span><span class="o">.</span><span class="n">getRandomBits</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sLen</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">salt</span> <span class="o">=</span> <span class="n">b</span><span class="s">&#39;&#39;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">salt</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">sLen</span><span class="p">,</span> <span class="s">&quot;Salt wrong size&quot;</span>
+        
+        <span class="c">#Let M’ = (0x)00 00 00 00 00 00 00 00 || mHash || salt;</span>
+        <span class="n">eightzerobytes</span> <span class="o">=</span> <span class="n">Bytes</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;</span><span class="se">\x00</span><span class="s">&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+        <span class="n">mHash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashFn</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>        
+        <span class="n">Mprime</span> <span class="o">=</span> <span class="n">eightzerobytes</span> <span class="o">+</span> <span class="n">mHash</span> <span class="o">+</span> <span class="n">salt</span>
+        
+        <span class="c">#Let H = Hash (M’), an octet string of length hLen.</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashFn</span><span class="p">(</span><span class="n">Mprime</span><span class="p">)</span>
+        
+        <span class="c">#Generate an octet string PS consisting of emLen – sLen – hLen – 2 zero octets.</span>
+        <span class="c">#The length of PS may be 0.</span>
+        <span class="n">pslen</span> <span class="o">=</span> <span class="n">emLen</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">sLen</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">hLen</span> <span class="o">-</span> <span class="mi">2</span>
+        <span class="n">ps</span> <span class="o">=</span> <span class="n">Bytes</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;</span><span class="se">\x00</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">pslen</span><span class="p">)</span>        
+        
+        <span class="c">#Let DB = PS || 0x01 || salt; DB is an octet string of length emLen – hLen – 1.</span>
+        <span class="n">DB</span> <span class="o">=</span> <span class="n">ps</span> <span class="o">+</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;</span><span class="se">\x01</span><span class="s">&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">salt</span>
+
+        <span class="c">#Let dbMask = MGF (H, emLen – hLen – 1).</span>
+        <span class="n">masklen</span> <span class="o">=</span> <span class="n">emLen</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">hLen</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">dbMask</span> <span class="o">=</span> <span class="n">MGF1</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">masklen</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashFn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hLen</span><span class="p">)</span>
+        <span class="c">#Let maskedDB = DB ⊕ dbMask.</span>
+        <span class="n">maskedDB</span> <span class="o">=</span> <span class="n">DB</span> <span class="o">^</span> <span class="n">dbMask</span>
+        
+        <span class="c">#Set the leftmost 8emLen – emBits bits of the leftmost octet in maskedDB to zero</span>
+        <span class="n">numzeros</span> <span class="o">=</span> <span class="mi">8</span> <span class="o">*</span> <span class="n">emLen</span> <span class="o">-</span> <span class="n">emBits</span>
+        <span class="n">bitmask</span>  <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s">&#39;0&#39;</span><span class="o">*</span><span class="n">numzeros</span> <span class="o">+</span> <span class="s">&#39;1&#39;</span><span class="o">*</span><span class="p">(</span><span class="mi">8</span><span class="o">-</span><span class="n">numzeros</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">ba</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">maskedDB</span><span class="p">)</span>
+        <span class="n">ba</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="n">bitmask</span>
+        <span class="n">maskedDB</span> <span class="o">=</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">ba</span><span class="p">)</span>
+        
+        <span class="n">EM</span> <span class="o">=</span> <span class="n">maskedDB</span> <span class="o">+</span> <span class="n">H</span> <span class="o">+</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;</span><span class="se">\xbc</span><span class="s">&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;PSS Encoding:&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;M     =&gt;&quot;</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span> 
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;mHash =&gt;&quot;</span><span class="p">,</span> <span class="n">mHash</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;salt  =&gt;&quot;</span><span class="p">,</span> <span class="n">salt</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;M&#39;    =&gt;&quot;</span><span class="p">,</span> <span class="n">Mprime</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;H     =&gt;&quot;</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;DB    =&gt;&quot;</span><span class="p">,</span> <span class="n">DB</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;dbmask=&gt;&quot;</span><span class="p">,</span> <span class="n">dbMask</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;masked=&gt;&quot;</span><span class="p">,</span> <span class="n">maskedDB</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;EM    =&gt;&quot;</span><span class="p">,</span> <span class="n">EM</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">EM</span>
+    
+    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">EM</span><span class="p">,</span> <span class="n">emBits</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span></div>
+<div class="viewcode-block" id="PSSPadding.verify"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.PSSPadding.verify">[docs]</a><span class="sd">        Verifies that EM is a correct encoding for M</span>
+<span class="sd">        </span>
+<span class="sd">        :Parameters:</span>
+<span class="sd">           - M - the message to verify</span>
+<span class="sd">           - EM - the encoded message</span>
+<span class="sd">        :Return: true for &#39;consistent&#39; or false for &#39;inconsistent&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;PSS Decoding:&quot;</span><span class="p">)</span>
+        
+        <span class="c">#Preconditions</span>
+        <span class="k">if</span> <span class="n">emBits</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">emBits</span> <span class="o">=</span> <span class="mi">8</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">EM</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">emBits</span> <span class="o">&gt;=</span> <span class="mi">8</span><span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">hLen</span> <span class="o">+</span> <span class="mi">8</span><span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sLen</span> <span class="o">+</span> <span class="mi">9</span><span class="p">,</span> <span class="s">&quot;Not enough emBits&quot;</span>
+        
+        <span class="n">emLen</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">emBits</span> <span class="o">/</span> <span class="mi">8</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">EM</span><span class="p">)</span> <span class="o">==</span> <span class="n">emLen</span><span class="p">,</span> <span class="s">&quot;EM length not equivalent to bits provided&quot;</span>
+        
+        <span class="c"># assert len(M) &lt; (2^61 -1), Message too long</span>
+        
+        <span class="c">#Let mHash = Hash (M), an octet string of length hLen</span>
+        <span class="n">mHash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashFn</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+        
+        <span class="c">#if emLen &lt; hLen + sLen + 2, output “inconsistent” and stop.</span>
+        <span class="k">if</span> <span class="n">emLen</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">hLen</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sLen</span> <span class="o">+</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;emLen too short&quot;</span><span class="p">)</span> 
+            <span class="k">return</span> <span class="bp">False</span>
+        
+        <span class="c">#If the rightmost octet of EM does not have hexadecimal value 0xbc, output</span>
+        <span class="c">#“inconsistent” and stop.</span>
+        <span class="k">if</span> <span class="n">EM</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">EM</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:]</span> <span class="o">!=</span> <span class="n">b</span><span class="s">&#39;</span><span class="se">\xbc</span><span class="s">&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;0xbc not found&quot;</span><span class="p">)</span> 
+            <span class="k">return</span> <span class="bp">False</span>
+        
+        <span class="c">#Let maskedDB be the leftmost emLen - hLen - 1 octets of EM, and let H be the</span>
+        <span class="c">#next hLen octets.</span>
+        <span class="n">maskeDBlen</span> <span class="o">=</span> <span class="n">emLen</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">hLen</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">maskedDB</span> <span class="o">=</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">EM</span><span class="p">[:</span><span class="n">maskeDBlen</span><span class="p">])</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="n">EM</span><span class="p">[</span><span class="n">maskeDBlen</span><span class="p">:</span><span class="n">maskeDBlen</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">hLen</span><span class="p">]</span>
+        
+        <span class="c">#If the leftmost 8emLen – emBits bits of the leftmost octet in maskedDB are not all</span>
+        <span class="c">#equal to zero, output “inconsistent” and stop.</span>
+        <span class="n">numzeros</span> <span class="o">=</span> <span class="mi">8</span> <span class="o">*</span> <span class="n">emLen</span> <span class="o">-</span> <span class="n">emBits</span>
+        <span class="n">bitmask</span>  <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s">&#39;1&#39;</span><span class="o">*</span><span class="n">numzeros</span> <span class="o">+</span> <span class="s">&#39;0&#39;</span><span class="o">*</span><span class="p">(</span><span class="mi">8</span><span class="o">-</span><span class="n">numzeros</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">maskedDB</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">bitmask</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;right % bits of masked db not zero, found %&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">numzeros</span><span class="p">,</span> <span class="nb">bin</span><span class="p">(</span><span class="n">maskedDB</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+            <span class="k">return</span> <span class="bp">False</span> 
+        
+        <span class="c">#Let dbMask = MGF (H, emLen – hLen – 1).</span>
+        <span class="n">masklen</span> <span class="o">=</span> <span class="n">emLen</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">hLen</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">dbMask</span> <span class="o">=</span> <span class="n">MGF1</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">masklen</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashFn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hLen</span><span class="p">)</span>
+        <span class="c">#Let DB = maskedDB ⊕ dbMask.</span>
+        <span class="n">DB</span> <span class="o">=</span> <span class="n">maskedDB</span> <span class="o">^</span> <span class="n">dbMask</span>
+        
+        <span class="c">#Set the leftmost 8emLen – emBits bits of the leftmost octet in DB to zero.</span>
+        <span class="n">numzeros</span> <span class="o">=</span> <span class="mi">8</span> <span class="o">*</span> <span class="n">emLen</span> <span class="o">-</span> <span class="n">emBits</span>
+        <span class="n">bitmask</span>  <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s">&#39;0&#39;</span><span class="o">*</span><span class="n">numzeros</span> <span class="o">+</span> <span class="s">&#39;1&#39;</span><span class="o">*</span><span class="p">(</span><span class="mi">8</span><span class="o">-</span><span class="n">numzeros</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">ba</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">DB</span><span class="p">)</span>
+        <span class="n">ba</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="n">bitmask</span>
+        <span class="n">DB</span> <span class="o">=</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">ba</span><span class="p">)</span>
+
+        <span class="c">#If the emLen – hLen – sLen – 2 leftmost octets of DB are not zero</span>
+        <span class="n">zerolen</span> <span class="o">=</span> <span class="n">emLen</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">hLen</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">sLen</span> <span class="o">-</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="n">DB</span><span class="p">[:</span><span class="n">zerolen</span><span class="p">]</span> <span class="o">!=</span> <span class="n">Bytes</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;</span><span class="se">\x00</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">zerolen</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;DB did not start with % zero octets&quot;</span> <span class="o">%</span> <span class="n">zerolen</span><span class="p">)</span> 
+            <span class="k">return</span> <span class="bp">False</span>
+        
+        <span class="c">#or if the octet at position emLen – hLen – sLen – 1 (the leftmost position is “position 1”) does not</span>
+        <span class="c">#have hexadecimal value 0x01, output “inconsistent” and stop.</span>
+        <span class="k">if</span> <span class="n">DB</span><span class="p">[</span><span class="n">zerolen</span><span class="p">]</span> <span class="o">!=</span> <span class="mh">0x01</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;DB did not have 0x01 at </span><span class="si">%s</span><span class="s">, found </span><span class="si">%s</span><span class="s"> instead&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">zerolen</span><span class="p">,</span><span class="n">DB</span><span class="p">[</span><span class="n">zerolen</span><span class="p">]))</span> 
+            <span class="k">return</span> <span class="bp">False</span>
+        
+        <span class="c">#Let salt be the last sLen octets of DB.</span>
+        <span class="n">salt</span> <span class="o">=</span> <span class="n">DB</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">DB</span><span class="p">)</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">sLen</span><span class="p">:]</span>
+        <span class="c">#Let M’ = (0x)00 00 00 00 00 00 00 00 || mHash || salt ;</span>
+        <span class="n">mPrime</span> <span class="o">=</span> <span class="n">Bytes</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;</span><span class="se">\x00</span><span class="s">&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">mHash</span> <span class="o">+</span> <span class="n">salt</span>
+        
+        <span class="c">#Let H’ = Hash (M’), an octet string of length hLen.</span>
+        <span class="n">HPrime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashFn</span><span class="p">(</span><span class="n">mPrime</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;M     =&gt;&quot;</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span> 
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;mHash =&gt;&quot;</span><span class="p">,</span> <span class="n">mHash</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;salt  =&gt;&quot;</span><span class="p">,</span> <span class="n">salt</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;M&#39;    =&gt;&quot;</span><span class="p">,</span> <span class="n">mPrime</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;H     =&gt;&quot;</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;DB    =&gt;&quot;</span><span class="p">,</span> <span class="n">DB</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;dbmask=&gt;&quot;</span><span class="p">,</span> <span class="n">dbMask</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;masked=&gt;&quot;</span><span class="p">,</span> <span class="n">maskedDB</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;EM    =&gt;&quot;</span><span class="p">,</span> <span class="n">EM</span><span class="p">)</span>
+        
+        <span class="c">#If H = H’, output “consistent.” Otherwise, output “inconsistent.”</span>
+        <span class="k">return</span> <span class="n">H</span> <span class="o">==</span> <span class="n">HPrime</span>
+</pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

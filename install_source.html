@@ -1,0 +1,627 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Platform Install Manual &mdash; Charm-Crypto v0.2a documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto v0.2a documentation" href="index.html" />
+    <link rel="next" title="How To Get Started" href="tutorial.html" />
+    <link rel="prev" title="Welcome to Charm-Crypto’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tutorial.html" title="How To Get Started"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Charm-Crypto’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="platform-install-manual">
+<span id="id1"></span><h1>Platform Install Manual<a class="headerlink" href="#platform-install-manual" title="Permalink to this headline">¶</a></h1>
+<p>Charm has automated the installation process such that the end-user
+does not have to directly handle dependencies, linking, compiler flag setting.
+However, there is always the corner case in which an end-user is using a currently
+unsupported platform, and thus may need to build and install using a manual process.</p>
+<p>We would like to support you in this case, and have written this documentation to get
+you started on your path using Charm.  This installation file will contain some
+installation blocks highlighting each respective implementation.</p>
+<p>Before we begin, please note the current dependencies:</p>
+<ul class="simple">
+<li>Python2.7 or Python3</li>
+<li>Pyparsing <a class="reference external" href="http://pyparsing.wikispaces.com/">http://pyparsing.wikispaces.com/</a></li>
+<li>GMP <a class="reference external" href="http://www.swox.com/gmp/">http://www.swox.com/gmp/</a></li>
+<li>PBC <a class="reference external" href="http://crypto.stanford.edu/pbc/news.html">http://crypto.stanford.edu/pbc/news.html</a></li>
+<li>OPENSSL <a class="reference external" href="http://www.openssl.org/">http://www.openssl.org/</a></li>
+</ul>
+<p>See <tt class="docutils literal"><span class="pre">./configure.sh</span> <span class="pre">--help</span></tt> for other options.</p>
+<dl class="docutils">
+<dt>You can obtain a copy of the latest version of Charm here:</dt>
+<dd><a class="reference external" href="http://code.google.com/p/charm-crypto/downloads">http://code.google.com/p/charm-crypto/downloads</a></dd>
+</dl>
+<p>Please let us know at <a class="reference external" href="mailto:support&#37;&#52;&#48;charm-crypto&#46;com">support<span>&#64;</span>charm-crypto<span>&#46;</span>com</a> if you run into any setup or installation problems. We will be happy to offer our assistance.</p>
+<div class="section" id="building-in-linux">
+<h2>Building In Linux<a class="headerlink" href="#building-in-linux" title="Permalink to this headline">¶</a></h2>
+<p>Note that the entire compilation process is supported by the Charm configure/make scripts.
+The steps for building in linux this way are:</p>
+<ul class="simple">
+<li>In a terminal, run configure.sh</li>
+<li>The process will fail out at wget, and will ask you to install.</li>
+<li>Using your package manager of choice (e.g., <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">wget</span></tt>), install wget.</li>
+<li>With wget installed, run the configure.sh script again, and it should set up your Make dependencies for you.<ul>
+<li><tt class="docutils literal"><span class="pre">make</span> <span class="pre">build</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></tt></li>
+</ul>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Another way to install dependencies is to use your package manager of choice.</p>
+</div>
+<div class="section" id="ubuntu-10-04-lts">
+<h3>Ubuntu 10.04 LTS<a class="headerlink" href="#ubuntu-10-04-lts" title="Permalink to this headline">¶</a></h3>
+<p>Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><dl class="first docutils">
+<dt>Subversion</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">subversion</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Python 3 (By default, Ubuntu 10.04 LTS comes with 2.6 and does not officially support 2.7. Charm requires 2.7 or 3.x) and header files/static library</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">python3</span> <span class="pre">python3-dev</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>m4</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">m4</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>libssl-dev</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">libssl-dev</span></tt></p>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<dl class="docutils">
+<dt>Next, we will install Charm. Navigate to the Charm directory.</dt>
+<dd><ol class="first last arabic">
+<li><dl class="first docutils">
+<dt>We must first run the configuration script:</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">./configure.sh</span> <span class="pre">–-python=/path/to/python3</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Now we will build and install Charm:</dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">make</span> <span class="pre">build</span></tt></p>
+<p class="last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">make</span> <span class="pre">install</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>And finally we must rebuild the searchpath for libraries</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">ldconfig</span></tt></p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+</div>
+<div class="section" id="ubuntu-11-04">
+<h3>Ubuntu 11.04<a class="headerlink" href="#ubuntu-11-04" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:</dt>
+<dd><ol class="first last arabic">
+<li><dl class="first docutils">
+<dt>Subversion</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">subversion</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>m4</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">m4</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Python 3 (this is an optional, though recommended, step)</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">python3</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Header files/static library</dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">python-dev</span></tt> (if you did not install Python 3)</p>
+<p class="last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">python3-dev</span></tt> (if you did install Python 3)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>libssl-dev (only necessary if you did not install Python 3)</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">libssl-dev</span></tt></p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+<dt>Next, we will install Charm. Navigate to the Charm directory.</dt>
+<dd><ol class="first last arabic">
+<li><dl class="first docutils">
+<dt>We must first run the configuration script:</dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">./configure.sh</span></tt></p>
+<p class="last">[If you installed Python 3 and would like to use that, you will need to add <tt class="docutils literal"><span class="pre">-–python=/path/to/python3</span></tt>]</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Now we will build and install Charm:</dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">make</span> <span class="pre">build</span></tt></p>
+<p class="last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">make</span> <span class="pre">install</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>And finally we must rebuild the searchpath for libraries</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">ldconfig</span></tt></p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+</div>
+<div class="section" id="fedora">
+<h3>Fedora<a class="headerlink" href="#fedora" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:</dt>
+<dd><ol class="first arabic">
+<li><dl class="first docutils">
+<dt>m4</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">su</span> <span class="pre">-c</span> <span class="pre">&quot;yum</span> <span class="pre">install</span> <span class="pre">m4&quot;</span></tt></p>
+</dd>
+</dl>
+</li>
+</ol>
+<ol class="last arabic" start="3">
+<li><dl class="first docutils">
+<dt>Python 3 (this is an optional, though recommended, step)</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">su</span> <span class="pre">-c</span> <span class="pre">&quot;yum</span> <span class="pre">install</span> <span class="pre">python3&quot;</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Header files/static library</dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">su</span> <span class="pre">-c</span> <span class="pre">&quot;yum</span> <span class="pre">install</span> <span class="pre">python-devel&quot;</span></tt> (if you did not install Python 3)</p>
+<p class="last"><tt class="docutils literal"><span class="pre">su</span> <span class="pre">-c</span> <span class="pre">&quot;yum</span> <span class="pre">install</span> <span class="pre">python3-devel&quot;</span></tt> (if you did install Python 3)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>openssl-devel (only necessary if you did not install Python 3)</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">su</span> <span class="pre">-c</span> <span class="pre">&quot;yum</span> <span class="pre">install</span> <span class="pre">openssl-devel&quot;</span></tt></p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+<dt>Red Hat/Fedora has decided not to support ECC in OpenSSL due to patent concerns, so we now need to remove their restriction and manually import the required files.</dt>
+<dd><ol class="first last arabic">
+<li><dl class="first docutils">
+<dt>Remove the ECC restriction</dt>
+<dd><ol class="first last arabic">
+<li><dl class="first docutils">
+<dt>Navigate to /usr/include/openssl</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">cd</span> <span class="pre">/usr/include/openssl</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Open the OpenSSL configuration file for editing using your editor of choice</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">su</span> <span class="pre">-c</span> <span class="pre">&quot;vi</span> <span class="pre">opensslconf-i386.h&quot;</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><p class="first">Remove the flags that restrict the use of ECC</p>
+</li>
+</ol>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p>Delete (at the beginning of file):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#ifndef OPENSSL_NO_EC</span>
+<span class="c"># define OPENSSL_NO_EC</span>
+<span class="c">#endif</span>
+<span class="c">#ifndef OPENSSL_NO_ECDH</span>
+<span class="c"># define OPENSSL_NO_ECDH</span>
+<span class="c">#endif</span>
+<span class="c">#ifndef OPENSSL_NO_ECDSA</span>
+<span class="c"># define OPENSSL_NO_ECDSA</span>
+<span class="c"># endif</span>
+</pre></div>
+</div>
+<p>Delete (later on the file):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># if defined(OPENSSL_NO_EC) &amp;&amp; !defined(NO_EC)</span>
+<span class="c">#  define NO_EC</span>
+<span class="c"># endif</span>
+<span class="c"># if defined(OPENSSL_NO_ECDH) &amp;&amp; !defined(NO_ECDH)</span>
+<span class="c">#  define NO_ECDH</span>
+<span class="c"># endif</span>
+<span class="c"># if defined(OPENSSL_NO_ECDSA) &amp;&amp; !defined(NO_ECDSA)</span>
+<span class="c">#  define NO_ECDSA</span>
+<span class="c"># endif</span>
+</pre></div>
+</div>
+<p>Save the file and close it</p>
+<blockquote>
+<div><ol class="arabic" start="2">
+<li><dl class="first docutils">
+<dt>Add the ECC files</dt>
+<dd><ol class="first last arabic">
+<li><p class="first">Navigate to <a class="reference external" href="http://www.openssl.org/source/">http://www.openssl.org/source/</a> and download the latest version of openssl source and untar the tar ball.</p>
+</li>
+<li><dl class="first docutils">
+<dt>Navigate to /path/to/openssl-[version]/include/openssl (ie inside the untarred file)</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">cd</span> <span class="pre">/path/to/openssl-[version]/include/openssl</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Add the new files to the current OpenSSL installation</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">su</span> <span class="pre">-c</span> <span class="pre">&quot;yes</span> <span class="pre">n</span> <span class="pre">|</span> <span class="pre">cp</span> <span class="pre">*</span> <span class="pre">/usr/include/openssl&quot;</span></tt></p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<dl class="docutils">
+<dt>Next, we will install Charm. Navigate to the Charm directory.</dt>
+<dd><ol class="first last arabic">
+<li><dl class="first docutils">
+<dt>We must first run the configuration script:</dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">su</span> <span class="pre">-c</span> <span class="pre">&quot;./configure.sh&quot;</span></tt></p>
+<p class="last">[If you installed Python 3 and would like to use that, you will need to add <tt class="docutils literal"><span class="pre">-–python=/path/to/python3</span></tt>]</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Now we will build and install Charm:</dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">su</span> <span class="pre">-c</span> <span class="pre">&quot;make</span> <span class="pre">build&quot;</span></tt></p>
+<p class="last"><tt class="docutils literal"><span class="pre">su</span> <span class="pre">-c</span> <span class="pre">&quot;make</span> <span class="pre">install&quot;</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>And finally we must rebuild the searchpath for libraries</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">su</span> <span class="pre">-c</span> <span class="pre">&quot;ldconfig&quot;</span></tt></p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+</div>
+<div class="section" id="mint-x86-64">
+<h3>Mint x86_64<a class="headerlink" href="#mint-x86-64" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:</dt>
+<dd><ol class="first last arabic">
+<li><dl class="first docutils">
+<dt>Subversion</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">subversion</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>m4</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">m4</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Python 3 (this is an optional, though recommended, step)</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">python3</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Header files/static library</dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">python-dev</span></tt> (if you did not install Python 3)</p>
+<p class="last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">python3-dev</span></tt> (if you did install Python 3)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>libssl-dev (only necessary if you did not install Python 3)</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">libssl-dev</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><p class="first">This distro doesn&#8217;t seem to come with binutils or gcc make sure you install those.</p>
+</li>
+</ol>
+</dd>
+<dt>Next, we will install Charm. Navigate to the Charm directory.</dt>
+<dd><ol class="first last arabic">
+<li><dl class="first docutils">
+<dt>We must first run the configuration script:</dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">bash</span> <span class="pre">./configure.sh</span></tt></p>
+<p class="last">[If you installed Python 3 and would like to use that, you will need to add <tt class="docutils literal"><span class="pre">-–python=/path/to/python3</span></tt>]</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Now we will build and install Charm:</dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">make</span> <span class="pre">build</span></tt></p>
+<p class="last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">make</span> <span class="pre">install</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>And finally we must rebuild the searchpath for libraries</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">ldconfig</span></tt></p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Bash to avoid unexpected operator error.</p>
+</div>
+</div>
+</div>
+<div class="section" id="building-in-windows">
+<h2>Building in Windows<a class="headerlink" href="#building-in-windows" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>Note that the entire compilation process is now supported by the Charm configure/make scripts. The steps for building in mingw32 this way are:</dt>
+<dd><ol class="first last arabic">
+<li><p class="first">Download the latest source version of openssl.</p>
+</li>
+<li><p class="first">Run MinGW Shell.</p>
+</li>
+<li><p class="first">Extract openssl, configure and install as shown below.</p>
+</li>
+<li><p class="first">Extract Charm, and navigate to the top directory.</p>
+</li>
+<li><p class="first">Run configure.sh as shown below.</p>
+</li>
+<li><p class="first">The process will fail out at wget, and open Internet Explorer to the wget download page.</p>
+</li>
+<li><p class="first">Install wget, and set it&#8217;s bin directory on your PATH.  To do this, right-click My Computer, Select Properties, Select Advanced System Settings, Select Advanced, Select Environment Variables, and than PATH.  Scroll to the end, and enter a ; followed by the absolute path to the bin directory (e.g., <tt class="docutils literal"><span class="pre">C:\Program</span> <span class="pre">Files\etc</span></tt>).</p>
+</li>
+<li><dl class="first docutils">
+<dt>With wget installed, run the configure.sh script again, and it should set up your make dependencies for you.</dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">Make</span> <span class="pre">build</span></tt></p>
+<p class="last"><tt class="docutils literal"><span class="pre">Make</span> <span class="pre">install</span></tt></p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Another way to install dependencies is to follow the Windows blocks below.</p>
+</div>
+<div class="section" id="mingw32">
+<h3>MinGW32<a class="headerlink" href="#mingw32" title="Permalink to this headline">¶</a></h3>
+<p>Let&#8217;s first build our dependencies with the following scripts:</p>
+<p>To build the GMP library:</p>
+<div class="highlight-python"><pre>./configure --prefix=/mingw --disable-static --enable-shared
+make
+make install</pre>
+</div>
+<p>To build the openssl library:</p>
+<div class="highlight-python"><pre>./config --openssldir=/mingw --shared # This gets us around installing perl.
+make
+make install</pre>
+</div>
+<p>To build the PBC library:</p>
+<div class="highlight-python"><pre>./configure --prefix=/mingw --disable-static --enable-shared
+make
+make install</pre>
+</div>
+<p>To build the Charm library:</p>
+<div class="highlight-python"><pre>./configure.sh --prefix=/mingw --python=/c/Python32/python.exe</pre>
+</div>
+</div>
+</div>
+<div class="section" id="building-in-mac-os-x">
+<h2>Building in Mac OS X<a class="headerlink" href="#building-in-mac-os-x" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="leopard-v10-6">
+<h3>Leopard v10.6<a class="headerlink" href="#leopard-v10-6" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>Note that the entire compilation process is supported by the Charm configure/make scripts. The steps for building in os x this way are:</dt>
+<dd><ol class="first last arabic">
+<li><p class="first">In a terminal, run <tt class="docutils literal"><span class="pre">configure.sh</span></tt></p>
+</li>
+<li><p class="first">Make sure you have <tt class="docutils literal"><span class="pre">wget</span></tt> installed otherwise this process may fail at the <tt class="docutils literal"><span class="pre">wget</span></tt> check, and will ask you to install.</p>
+</li>
+<li><p class="first">Using your package manager of choice (e.g., <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">port</span> <span class="pre">install</span> <span class="pre">wget</span></tt>), install wget.</p>
+</li>
+<li><p class="first">With wget installed, run the <tt class="docutils literal"><span class="pre">configure.sh</span></tt> script again, and it should set up your make dependencies for you.</p>
+</li>
+<li><dl class="first docutils">
+<dt>The next steps may require super user privileges so prepend a <tt class="docutils literal"><span class="pre">sudo</span></tt> to each command:</dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">make</span> <span class="pre">build</span></tt></p>
+<p class="last"><tt class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></tt></p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Another way to install dependencies is to use <tt class="docutils literal"><span class="pre">macports</span></tt> or <tt class="docutils literal"><span class="pre">fink</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="lion-v10-7">
+<h3>Lion v10.7<a class="headerlink" href="#lion-v10-7" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>In Lion, Apple has made the decision to deprecate the openssl library in favor of their Common-Crypto library implementation. As a result, you&#8217;ll have to make some modifications to the library in order to use it with Charm. Please follow the steps below then proceed to install Charm:</dt>
+<dd><ol class="first last arabic simple">
+<li>Edit the <tt class="docutils literal"><span class="pre">crypto.h</span></tt> header file at <tt class="docutils literal"><span class="pre">/usr/include/openssl/crypto.h</span></tt></li>
+<li>Add the following before the <tt class="docutils literal"><span class="pre">crypto.h</span></tt> header definition:</li>
+</ol>
+</dd>
+</dl>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#pragma GCC diagnostic ignored &quot;-Wdeprecated-declarations&quot;</span>
+<span class="c">#ifndef HEADER_CRYPTO_H</span>
+<span class="c">#define HEADER_CRYPTO_H</span>
+</pre></div>
+</div>
+<blockquote>
+<div><ol class="arabic" start="3">
+<li><dl class="first docutils">
+<dt>Next, we can install Charm. Run the configure script as before, but due to some changes in the default compiler installed we have provided a command line option to account for these changes:</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">./configure.sh</span> <span class="pre">--enable-darwin</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>The next steps may require super user privileges so prepend a <tt class="docutils literal"><span class="pre">sudo</span></tt> to each command:</dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">make</span> <span class="pre">build</span></tt></p>
+<p class="last"><tt class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></tt></p>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Platform Install Manual</a><ul>
+<li><a class="reference internal" href="#building-in-linux">Building In Linux</a><ul>
+<li><a class="reference internal" href="#ubuntu-10-04-lts">Ubuntu 10.04 LTS</a></li>
+<li><a class="reference internal" href="#ubuntu-11-04">Ubuntu 11.04</a></li>
+<li><a class="reference internal" href="#fedora">Fedora</a></li>
+<li><a class="reference internal" href="#mint-x86-64">Mint x86_64</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#building-in-windows">Building in Windows</a><ul>
+<li><a class="reference internal" href="#mingw32">MinGW32</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#building-in-mac-os-x">Building in Mac OS X</a><ul>
+<li><a class="reference internal" href="#leopard-v10-6">Leopard v10.6</a></li>
+<li><a class="reference internal" href="#lion-v10-7">Lion v10.7</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to Charm-Crypto&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tutorial.html"
+                        title="next chapter">How To Get Started</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/install_source.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tutorial.html" title="How To Get Started"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Charm-Crypto’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Johns Hopkins University.
+      Last updated on Nov 21, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+    </div>
+  </body>
+</html>

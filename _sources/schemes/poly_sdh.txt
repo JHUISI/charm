@@ -1,0 +1,7 @@
+
+poly_sdh
+=========================================
+.. automodule:: poly_sdh
+    :show-inheritance:
+    :members:
+    :undoc-members:

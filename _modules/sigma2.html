@@ -1,0 +1,216 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sigma2 &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for sigma2</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">toolbox.pairinggroup</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="k">class</span> <span class="nc">SigmaProtocol2</span><span class="p">(</span><span class="n">Sigma</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">,</span> <span class="n">common_input</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SigmaProtocol2"><a class="viewcode-back" href="../schemes/sigma2.html#sigma2.SigmaProtocol2">[docs]</a>        <span class="n">Sigma</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">,</span> <span class="n">common_input</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__gen_setup</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="c"># dict to hold variables from interaction        </span>
+        
+    <span class="k">def</span> <span class="nf">gen_common</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gen_setup</span><span class="p">:</span>
+<div class="viewcode-block" id="SigmaProtocol2.gen_common"><a class="viewcode-back" href="../schemes/sigma2.html#sigma2.SigmaProtocol2.gen_common">[docs]</a>            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span> 
+            <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span> <span class="c"># , self.group.random(G2)</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="c"># testing message 0 at index 1</span>
+            <span class="n">V</span> <span class="o">=</span> <span class="p">(</span><span class="n">g</span> <span class="o">**</span> <span class="o">~</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">index</span><span class="p">))</span> <span class="o">**</span> <span class="n">v</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">x</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;check: lhs = e(V,y) =&gt;&quot;</span><span class="p">,</span> <span class="n">pair</span><span class="p">(</span><span class="n">V</span><span class="p">,</span><span class="n">y</span><span class="p">))</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;check: rhs = e(V,g)^-o * e(g,g)^v =&gt;&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">V</span><span class="p">,</span><span class="n">g</span><span class="p">)</span> <span class="o">**</span> <span class="o">-</span><span class="n">index</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">g</span><span class="p">,</span><span class="n">g</span><span class="p">)</span> <span class="o">**</span> <span class="n">v</span><span class="p">))</span>
+            <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;V&#39;</span><span class="p">,</span> <span class="n">V</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;v&#39;</span><span class="p">,</span><span class="n">v</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">,</span><span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;sigma&#39;</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span> <span class="p">)</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        
+    <span class="k">def</span> <span class="nf">prover_state1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;PROVER 1: &quot;</span><span class="p">)</span></div>
+<div class="viewcode-block" id="SigmaProtocol2.prover_state1"><a class="viewcode-back" href="../schemes/sigma2.html#sigma2.SigmaProtocol2.prover_state1">[docs]</a>        <span class="bp">self</span><span class="o">.</span><span class="n">gen_common</span><span class="p">()</span>
+<span class="c">#        (g, g2, V) = Protocol.get(self, [&#39;g&#39;, &#39;g2&#39;, &#39;V&#39;])</span>
+        <span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">V</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;V&#39;</span><span class="p">])</span>
+        <span class="n">r1</span><span class="p">,</span> <span class="n">r2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+<span class="c">#        a = (pair(V, g2) ** -r1) * (pair(g, g2) ** r2)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span> <span class="o">**</span> <span class="o">-</span><span class="n">r1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span> <span class="o">**</span> <span class="n">r2</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;send g =&gt;&quot;</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;send V =&gt;&quot;</span><span class="p">,</span> <span class="n">V</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;send r1 =&gt;&quot;</span><span class="p">,</span> <span class="n">r1</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;send r2 =&gt;&quot;</span><span class="p">,</span> <span class="n">r2</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;send a =&gt;&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;r1&#39;</span><span class="p">,</span><span class="n">r1</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;r2&#39;</span><span class="p">,</span><span class="n">r2</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="c">#        pk = Protocol.get(self, [&#39;g&#39;,&#39;g2&#39;,&#39;V&#39;,&#39;y&#39;], dict)</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">,</span><span class="s">&#39;V&#39;</span><span class="p">,</span><span class="s">&#39;y&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;a&#39;</span><span class="p">:</span><span class="n">a</span><span class="p">,</span> <span class="s">&#39;pk&#39;</span><span class="p">:</span><span class="n">pk</span> <span class="p">}</span>
+    
+    <span class="k">def</span> <span class="nf">prover_state3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;PROVER 3: &quot;</span><span class="p">)</span></div>
+<div class="viewcode-block" id="SigmaProtocol2.prover_state3"><a class="viewcode-back" href="../schemes/sigma2.html#sigma2.SigmaProtocol2.prover_state3">[docs]</a>        <span class="p">(</span><span class="n">r1</span><span class="p">,</span> <span class="n">r2</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;r1&#39;</span><span class="p">,</span><span class="s">&#39;r2&#39;</span><span class="p">,</span><span class="s">&#39;v&#39;</span><span class="p">,</span><span class="s">&#39;sigma&#39;</span><span class="p">])</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;c&#39;</span><span class="p">]</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;input c =&gt;&quot;</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+        <span class="n">z1</span> <span class="o">=</span> <span class="n">r1</span> <span class="o">-</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">c</span> <span class="c"># need a way to get sigma index as part of init index (1..N)</span>
+        <span class="n">z2</span> <span class="o">=</span> <span class="n">r2</span> <span class="o">-</span> <span class="n">v</span> <span class="o">*</span> <span class="n">c</span> 
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;send z1 =&gt;&quot;</span><span class="p">,</span> <span class="n">z1</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;send z2 =&gt;&quot;</span><span class="p">,</span> <span class="n">z2</span><span class="p">)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="c"># need store and get functions for db        </span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;z1&#39;</span><span class="p">:</span><span class="n">z1</span><span class="p">,</span> <span class="s">&#39;z2&#39;</span><span class="p">:</span><span class="n">z2</span> <span class="p">}</span>
+    
+    <span class="k">def</span> <span class="nf">prover_state5</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;PROVER 5: result =&gt;&quot;</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span></div>
+<div class="viewcode-block" id="SigmaProtocol2.prover_state5"><a class="viewcode-back" href="../schemes/sigma2.html#sigma2.SigmaProtocol2.prover_state5">[docs]</a>        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setErrorCode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    
+    <span class="k">def</span> <span class="nf">verifier_state2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;VERIFIER 2: &quot;</span><span class="p">)</span></div>
+<div class="viewcode-block" id="SigmaProtocol2.verifier_state2"><a class="viewcode-back" href="../schemes/sigma2.html#sigma2.SigmaProtocol2.verifier_state2">[docs]</a>        <span class="k">print</span><span class="p">(</span><span class="s">&quot;input pk =&gt;&quot;</span><span class="p">,</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;pk&#39;</span><span class="p">])</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;input a =&gt;&quot;</span><span class="p">,</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;a&#39;</span><span class="p">])</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;pk&#39;</span><span class="p">]</span>
+    
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;send c =&gt;&quot;</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">,</span><span class="n">c</span><span class="p">),(</span><span class="s">&#39;g&#39;</span><span class="p">,</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]),(</span><span class="s">&#39;V&#39;</span><span class="p">,</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;V&#39;</span><span class="p">]),</span> <span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">,</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">]),</span> <span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;a&#39;</span><span class="p">])</span> <span class="p">)</span> 
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;c&#39;</span><span class="p">:</span><span class="n">c</span> <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">verifier_state4</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;VERIFIER 4: &quot;</span><span class="p">)</span></div>
+<div class="viewcode-block" id="SigmaProtocol2.verifier_state4"><a class="viewcode-back" href="../schemes/sigma2.html#sigma2.SigmaProtocol2.verifier_state4">[docs]</a>        <span class="n">z1</span><span class="p">,</span><span class="n">z2</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;z1&#39;</span><span class="p">],</span><span class="nb">input</span><span class="p">[</span><span class="s">&#39;z2&#39;</span><span class="p">]</span>
+        <span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;V&#39;</span><span class="p">,</span><span class="s">&#39;y&#39;</span><span class="p">,</span><span class="s">&#39;g&#39;</span><span class="p">,</span><span class="s">&#39;a&#39;</span><span class="p">,</span><span class="s">&#39;c&#39;</span><span class="p">])</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;get a =&gt;&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+        <span class="n">test</span> <span class="o">=</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">V</span><span class="p">,</span><span class="n">y</span><span class="p">)</span> <span class="o">**</span> <span class="n">c</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">V</span><span class="p">,</span><span class="n">g</span><span class="p">)</span> <span class="o">**</span> <span class="o">-</span><span class="n">z1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">g</span><span class="p">,</span><span class="n">g</span><span class="p">)</span> <span class="o">**</span> <span class="n">z2</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;test =&gt;&quot;</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="n">test</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;SUCCESS!!!!!!!&quot;</span><span class="p">);</span> <span class="n">result</span> <span class="o">=</span> <span class="s">&#39;OK&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Failed!!!&quot;</span><span class="p">);</span> <span class="n">result</span> <span class="o">=</span> <span class="s">&#39;FAIL&#39;</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setErrorCode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+    
+    <span class="k">def</span> <span class="nf">verifier_state6</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;VERIFIER 6: done.&quot;</span><span class="p">)</span></div>
+<div class="viewcode-block" id="SigmaProtocol2.verifier_state6"><a class="viewcode-back" href="../schemes/sigma2.html#sigma2.SigmaProtocol2.verifier_state6">[docs]</a>        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+<span class="c">#if __name__ == &quot;__main__&quot;:</span>
+<span class="c">#    if len(sys.argv) != 2:</span>
+<span class="c">#        print(&quot;Usage: %s [-v or -p]&quot; % sys.argv[0])</span>
+<span class="c">#        exit(-1)</span>
+<span class="c">#</span>
+<span class="c">#    if sys.argv[1] == &quot;-v&quot;:</span>
+<span class="c">#        print(&quot;Operating as verifier...&quot;)</span>
+<span class="c">#        svr = socket(AF_INET, SOCK_STREAM)</span>
+<span class="c">#        svr.bind((HOST, PORT))</span>
+<span class="c">#        svr.listen(1)</span>
+<span class="c">#        svr_sock, addr = svr.accept()</span>
+<span class="c">#        print(&quot;Connected by &quot;, addr)</span>
+<span class="c">#        _name, _type, _sock = &quot;verifier&quot;, VERIFIER, svr_sock</span>
+<span class="c">#    elif sys.argv[1] == &quot;-p&quot;:</span>
+<span class="c">#        print(&quot;Operating as prover...&quot;)</span>
+<span class="c">#        clt = socket(AF_INET, SOCK_STREAM)</span>
+<span class="c">#        clt.connect((HOST, PORT))</span>
+<span class="c">#        clt.settimeout(15)</span>
+<span class="c">#        _name, _type, _sock = &quot;prover&quot;, PROVER, clt</span>
+<span class="c">#    else:</span>
+<span class="c">#        print(&quot;Usage: %s -v or -p&quot; % sys.argv[0])</span>
+<span class="c">#        exit(-1)</span>
+<span class="c">#    </span>
+<span class="c">#    group = PairingGroup(&#39;library/a.param&#39;)</span>
+<span class="c">#    sp = SigmaProtocol2(group)</span>
+<span class="c">#    sp.setup( {&#39;name&#39;:_name, &#39;type&#39;:_type, &#39;socket&#39;:_sock} )</span>
+<span class="c">#    # run as a thread...</span>
+<span class="c">#    sp.execute(_type)</span>
+<span class="c">#    print(&quot;Result of protocol =&gt;&quot;, sp.result)</span>
+<span class="c">#    </span>
+</pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

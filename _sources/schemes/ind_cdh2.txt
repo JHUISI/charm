@@ -1,0 +1,7 @@
+
+ind_cdh2
+=========================================
+.. automodule:: ind_cdh2
+    :show-inheritance:
+    :members:
+    :undoc-members:

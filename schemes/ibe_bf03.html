@@ -1,0 +1,187 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ibe_bf03 &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
+    <link rel="next" title="ibe_n05" href="ibe_n05.html" />
+    <link rel="prev" title="ibe_bb03" href="ibe_bb03.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ibe_n05.html" title="ibe_n05"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ibe_bb03.html" title="ibe_bb03"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-ibe_bf03">
+<span id="ibe-bf03"></span><h1>ibe_bf03<a class="headerlink" href="#module-ibe_bf03" title="Permalink to this headline">¶</a></h1>
+<p>Boneh-Franklin Identity Based Encryption</p>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">(NEED TO REWRITE Boneh-Franklin Identity Based Encryption)</p>
+</div>
+<div class="line-block">
+<div class="line">From: &#8220;D. Boneh, M. Franklin Identity-Based Encryption from the Weil Pairing&#8221;, Section 4.2.</div>
+<div class="line">Published in: Crypto 2003</div>
+<div class="line">Available from: <a class="reference external" href="http://.../bfibe.pdf">http://.../bfibe.pdf</a></div>
+<div class="line">Notes: This is the IBE .</div>
+</div>
+<ul class="simple">
+<li>type:           encryption (identity-based)</li>
+<li>setting:        bilinear groups (asymmetric)</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Joseph Ayo Akinyele</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">2/2011</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="ibe_bf03.IBE_BonehFranklin">
+<em class="property">class </em><tt class="descclassname">ibe_bf03.</tt><tt class="descname">IBE_BonehFranklin</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../_modules/ibe_bf03.html#IBE_BonehFranklin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibe_bf03.IBE_BonehFranklin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.IBEnc.IBEnc</span></tt></p>
+<dl class="method">
+<dt id="ibe_bf03.IBE_BonehFranklin.decodeFromZn">
+<tt class="descname">decodeFromZn</tt><big>(</big><em>element</em><big>)</big><a class="reference internal" href="../_modules/ibe_bf03.html#IBE_BonehFranklin.decodeFromZn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibe_bf03.IBE_BonehFranklin.decodeFromZn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibe_bf03.IBE_BonehFranklin.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>ct</em><big>)</big><a class="reference internal" href="../_modules/ibe_bf03.html#IBE_BonehFranklin.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibe_bf03.IBE_BonehFranklin.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibe_bf03.IBE_BonehFranklin.encodeToZn">
+<tt class="descname">encodeToZn</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="../_modules/ibe_bf03.html#IBE_BonehFranklin.encodeToZn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibe_bf03.IBE_BonehFranklin.encodeToZn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibe_bf03.IBE_BonehFranklin.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>ID</em>, <em>M</em><big>)</big><a class="reference internal" href="../_modules/ibe_bf03.html#IBE_BonehFranklin.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibe_bf03.IBE_BonehFranklin.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibe_bf03.IBE_BonehFranklin.extract">
+<tt class="descname">extract</tt><big>(</big><em>sk</em>, <em>ID</em><big>)</big><a class="reference internal" href="../_modules/ibe_bf03.html#IBE_BonehFranklin.extract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibe_bf03.IBE_BonehFranklin.extract" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibe_bf03.IBE_BonehFranklin.setup">
+<tt class="descname">setup</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ibe_bf03.html#IBE_BonehFranklin.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibe_bf03.IBE_BonehFranklin.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="ibe_bf03.main">
+<tt class="descclassname">ibe_bf03.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ibe_bf03.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibe_bf03.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ibe_bb03.html"
+                        title="previous chapter">ibe_bb03</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ibe_n05.html"
+                        title="next chapter">ibe_n05</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/schemes/ibe_bf03.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ibe_n05.html" title="ibe_n05"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ibe_bb03.html" title="ibe_bb03"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

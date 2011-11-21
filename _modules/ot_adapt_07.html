@@ -1,0 +1,362 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ot_adapt_07 &mdash; Charm-Crypto 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for ot_adapt_07</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">socket</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">toolbox.pairinggroup</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">sigma1</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">sigma2</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">sigma3</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">SENDER</span><span class="p">,</span><span class="n">RECEIVER</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="mi">2</span>
+<span class="c">#HOST, PORT = &quot;&quot;, 8083</span>
+
+<span class="k">class</span> <span class="nc">ObliviousTransfer</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">messages</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">groupObj</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">common_input</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>        
+<div class="viewcode-block" id="ObliviousTransfer"><a class="viewcode-back" href="../schemes/ot_adapt_07.html#ot_adapt_07.ObliviousTransfer">[docs]</a>        <span class="n">Protocol</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>        
+        <span class="n">receiver_states</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">2</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver_init2</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver_transfer4</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver_transfer6</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver_transfer8</span> <span class="p">}</span>
+        <span class="n">sender_states</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">sender_init1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">sender_init3</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">sender_transfer5</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">sender_transfer7</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">sender_transfer9</span> <span class="p">}</span>
+
+        <span class="n">receiver_trans</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span><span class="mi">8</span> <span class="p">}</span>
+        <span class="n">sender_trans</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span><span class="mi">9</span> <span class="p">}</span>
+        <span class="c"># describe the parties involved and the valid transitions</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">addPartyType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">RECEIVER</span><span class="p">,</span> <span class="n">receiver_states</span><span class="p">,</span> <span class="n">receiver_trans</span><span class="p">)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">addPartyType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SENDER</span><span class="p">,</span> <span class="n">sender_states</span><span class="p">,</span> <span class="n">sender_trans</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+<span class="c">#        Protocol.setSerializers(self, self.serialize, self.deserialize)</span>
+        <span class="c"># make sure </span>
+        <span class="k">if</span> <span class="n">groupObj</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;a.param&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+        <span class="c"># proof parameter generation</span>
+        <span class="k">if</span> <span class="n">common_input</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span> <span class="c"># generate common parameters to P and V</span>
+            <span class="n">db</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__gen_setup</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c"># can be used as a sub-protocol if common_input is specified by caller</span>
+            <span class="n">db</span> <span class="o">=</span> <span class="n">common_input</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__gen_setup</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setSubclassVars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span> 
+        <span class="k">if</span> <span class="n">messages</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">messages</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">messages</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s">&#39;utf8&#39;</span><span class="p">)</span> <span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;bytes =&gt;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="s">&quot;, message =&gt;&quot;</span><span class="p">,</span> <span class="n">messages</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>                
+<span class="c">#                self.M.append(self.group.hash(messages[i], ZR))</span>
+<span class="c">#                self.sig.append(messages[i])</span>
+        <span class="c"># dict to hold variables from interaction        </span>
+
+    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">pass</span>
+<div class="viewcode-block" id="ObliviousTransfer.encrypt"><a class="viewcode-back" href="../schemes/ot_adapt_07.html#ot_adapt_07.ObliviousTransfer.encrypt">[docs]</a>                        
+    <span class="k">def</span> <span class="nf">get_common</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gen_setup</span><span class="p">:</span></div>
+<div class="viewcode-block" id="ObliviousTransfer.get_common"><a class="viewcode-back" href="../schemes/ot_adapt_07.html#ot_adapt_07.ObliviousTransfer.get_common">[docs]</a>            <span class="n">g</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
+<span class="c">#            g2 = self.group.random(G2)</span>
+            <span class="n">H</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+            <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;h&#39;</span><span class="p">,</span> <span class="n">h</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;H&#39;</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span> <span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c"># common parameters generated already</span>
+            <span class="k">return</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;h&#39;</span><span class="p">,</span> <span class="s">&#39;H&#39;</span><span class="p">])</span>
+    
+    <span class="c"># msgs =&gt; dict of M -&gt; H(M)</span>
+    <span class="k">def</span> <span class="nf">sender_init1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span></div>
+<div class="viewcode-block" id="ObliviousTransfer.sender_init1"><a class="viewcode-back" href="../schemes/ot_adapt_07.html#ot_adapt_07.ObliviousTransfer.sender_init1">[docs]</a>        <span class="k">print</span><span class="p">(</span><span class="s">&quot;SENDER 1: &quot;</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_common</span><span class="p">()</span>  
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">x</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;send g =&gt;&quot;</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;send h =&gt;&quot;</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;send H =&gt;&quot;</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;send x =&gt;&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;send y =&gt;&quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">)):</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;j =&gt;&quot;</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+            <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="o">~</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">j</span><span class="p">)</span>
+            <span class="n">B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">h</span><span class="p">)</span>  <span class="c">#, M[i])</span>
+            <span class="n">C</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;A&#39;</span><span class="p">:</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s">&#39;B&#39;</span><span class="p">:</span><span class="n">B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">}</span>
+        
+        <span class="n">S</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s">&#39;h&#39;</span><span class="p">:</span><span class="n">h</span><span class="p">,</span> <span class="s">&#39;H&#39;</span><span class="p">:</span><span class="n">H</span><span class="p">,</span> <span class="s">&#39;y&#39;</span><span class="p">:</span><span class="n">y</span> <span class="p">}</span>        
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">,</span><span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="n">C</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;S&#39;</span><span class="p">:</span><span class="n">S</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">:</span><span class="n">C</span> <span class="p">,</span> <span class="s">&#39;PoK&#39;</span><span class="p">:</span><span class="s">&#39;SigmaProtocol1&#39;</span> <span class="p">}</span>
+    
+    <span class="k">def</span> <span class="nf">sender_init3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;SENDER 3: &quot;</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span></div>
+<div class="viewcode-block" id="ObliviousTransfer.sender_init3"><a class="viewcode-back" href="../schemes/ot_adapt_07.html#ot_adapt_07.ObliviousTransfer.sender_init3">[docs]</a>        <span class="n">pk</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;H&#39;</span><span class="p">,</span> <span class="s">&#39;h&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">input</span> <span class="o">==</span> <span class="s">&#39;GO&#39;</span><span class="p">:</span>
+            <span class="n">PoK1</span> <span class="o">=</span> <span class="n">SigmaProtocol1</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+            <span class="n">PoK1</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;prover&#39;</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="n">PoK1</span><span class="o">.</span><span class="n">PROVER</span><span class="p">,</span> <span class="s">&#39;socket&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">}</span> <span class="p">)</span>
+            <span class="n">PoK1</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">PoK1</span><span class="o">.</span><span class="n">PROVER</span><span class="p">,</span> <span class="n">close_sock</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;PoK1 prover result =&gt;&quot;</span><span class="p">,</span> <span class="n">PoK1</span><span class="o">.</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">PoK1</span><span class="o">.</span><span class="n">result</span> <span class="o">==</span> <span class="s">&#39;OK&#39;</span><span class="p">:</span>
+           <span class="c"># transition to transfer phase</span>
+           <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="c">#        else: # JAA - something to this effect (Error case doesn&#39;t work yet)</span>
+<span class="c">#           Protocol.setState(self, 3); return {&#39;PoK&#39;: &#39;REDO&#39; }</span>
+        <span class="c"># need store and get functions for db        </span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;PoK&#39;</span><span class="p">:</span> <span class="n">PoK1</span><span class="o">.</span><span class="n">result</span> <span class="p">}</span>
+    
+    <span class="k">def</span> <span class="nf">sender_transfer5</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;SENDER 5: query =&gt;&quot;</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span></div>
+<div class="viewcode-block" id="ObliviousTransfer.sender_transfer5"><a class="viewcode-back" href="../schemes/ot_adapt_07.html#ot_adapt_07.ObliviousTransfer.sender_transfer5">[docs]</a>        
+        <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;PoK&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> <span class="c"># continue</span>
+            <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s">&#39;OK&#39;</span>    
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    
+    <span class="k">def</span> <span class="nf">sender_transfer7</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+<span class="c">#        print(&quot;SENDER 7: input =&gt;&quot;, input)</span></div>
+<div class="viewcode-block" id="ObliviousTransfer.sender_transfer7"><a class="viewcode-back" href="../schemes/ot_adapt_07.html#ot_adapt_07.ObliviousTransfer.sender_transfer7">[docs]</a>        <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;PoK2&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> 
+<span class="c">#            pk = Protocol.get(self, [&#39;g&#39;,&#39;g2&#39;,&#39;y&#39;], dict)           </span>
+            <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;V&#39;</span><span class="p">,</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;V&#39;</span><span class="p">]))</span>
+            <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;V&#39;</span><span class="p">:</span><span class="nb">input</span><span class="p">[</span><span class="s">&#39;V&#39;</span><span class="p">]</span> <span class="p">}</span>
+            <span class="n">PoK2</span> <span class="o">=</span> <span class="n">SigmaProtocol2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+            <span class="n">PoK2</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;verifier&#39;</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="n">PoK2</span><span class="o">.</span><span class="n">VERIFIER</span><span class="p">,</span> <span class="s">&#39;socket&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">}</span> <span class="p">)</span>
+            <span class="n">Protocol</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;GO&#39;</span><span class="p">)</span>
+            <span class="n">PoK2</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">PoK2</span><span class="o">.</span><span class="n">VERIFIER</span><span class="p">,</span> <span class="n">close_sock</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="c">#            print(&quot;PoK2 verifier result =&gt;&quot;, PoK2.result)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">PoK2</span><span class="o">.</span><span class="n">result</span>
+
+        <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="s">&#39;OK&#39;</span><span class="p">:</span>
+<span class="c">#           print(&quot;transitioning to transfer9 result =&gt;&quot;, result)</span>
+           <span class="n">h</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">,</span><span class="s">&#39;V&#39;</span><span class="p">])</span>             
+<span class="c">#           print(&#39;h =&gt;&#39;, h)</span>
+<span class="c">#           print(&#39;V =&gt;&#39;, V)</span>
+           <span class="n">W</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+<span class="c">#           print(&#39;W =&gt;&#39;, W)           </span>
+           <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+           <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;PoK2&#39;</span><span class="p">:</span><span class="n">result</span><span class="p">,</span> <span class="s">&#39;W&#39;</span><span class="p">:</span><span class="n">W</span><span class="p">,</span> <span class="s">&#39;PoM&#39;</span><span class="p">:</span><span class="s">&#39;SigmaProtocol3&#39;</span> <span class="p">}</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    
+    <span class="k">def</span> <span class="nf">sender_transfer9</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+<span class="c">#        print(&quot;SENDER 9: PoM init =&gt;&quot;, input)           </span></div>
+<div class="viewcode-block" id="ObliviousTransfer.sender_transfer9"><a class="viewcode-back" href="../schemes/ot_adapt_07.html#ot_adapt_07.ObliviousTransfer.sender_transfer9">[docs]</a>        
+        <span class="k">if</span> <span class="nb">input</span> <span class="o">==</span> <span class="s">&#39;GO&#39;</span><span class="p">:</span>    
+<span class="c">#           print(&quot;Executing the PoM interactive proof.&quot;)</span>
+           <span class="n">pk</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">,</span><span class="s">&#39;g&#39;</span><span class="p">,</span><span class="s">&#39;H&#39;</span><span class="p">,</span><span class="s">&#39;V&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span> 
+           <span class="n">PoM</span> <span class="o">=</span> <span class="n">SigmaProtocol3</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+           <span class="n">PoM</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;prover&#39;</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="n">PoM</span><span class="o">.</span><span class="n">PROVER</span><span class="p">,</span> <span class="s">&#39;socket&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">}</span> <span class="p">)</span>
+           <span class="n">PoM</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">PoM</span><span class="o">.</span><span class="n">PROVER</span><span class="p">)</span>
+<span class="c">#           print(&quot;PoM prover result =&gt;&quot;, PoM.result)</span>
+            
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+<span class="c">#################################    </span>
+<span class="c"># END of SENDER state functions #</span>
+<span class="c">#################################    </span>
+    
+    <span class="k">def</span> <span class="nf">receiver_init2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+<span class="c">#        print(&quot;RECEIVER 2: &quot;)</span></div>
+<div class="viewcode-block" id="ObliviousTransfer.receiver_init2"><a class="viewcode-back" href="../schemes/ot_adapt_07.html#ot_adapt_07.ObliviousTransfer.receiver_init2">[docs]</a>        <span class="n">pk</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;S&#39;</span><span class="p">]</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;R&#39;</span><span class="p">,</span> <span class="n">pk</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;C&#39;</span><span class="p">,</span><span class="nb">input</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">])</span> <span class="p">)</span> 
+<span class="c">#        print(&quot;input g =&gt;&quot;, pk[&#39;g&#39;])</span>
+<span class="c">#        print(&quot;input h =&gt;&quot;, pk[&#39;h&#39;])</span>
+<span class="c">#        print(&quot;input H =&gt;&quot;, pk[&#39;H&#39;])</span>
+<span class="c">#        print(&quot;input y =&gt;&quot;, pk[&#39;y&#39;])</span>
+
+        <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;PoK&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;SigmaProtocol1&#39;</span><span class="p">:</span>
+            <span class="n">PoK1</span> <span class="o">=</span> <span class="n">SigmaProtocol1</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+            <span class="n">PoK1</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;verifier&#39;</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="n">PoK1</span><span class="o">.</span><span class="n">VERIFIER</span><span class="p">,</span> <span class="s">&#39;socket&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">}</span> <span class="p">)</span>
+            <span class="n">Protocol</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;GO&#39;</span><span class="p">)</span> <span class="c"># important: 1. acknowledges sub-protocol transition, 2. sends a short message using this socket</span>
+            <span class="n">PoK1</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">PoK1</span><span class="o">.</span><span class="n">VERIFIER</span><span class="p">,</span> <span class="n">close_sock</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="c">#            print(&quot;PoK1 verifier result =&gt;&quot;, PoK1.result)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">PoK1</span><span class="o">.</span><span class="n">result</span>
+
+        <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="s">&#39;OK&#39;</span><span class="p">:</span>            
+            <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="c"># desired: 4 (TBD)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;PoK&#39;</span><span class="p">:</span> <span class="n">result</span> <span class="p">}</span> <span class="c"># result should be R0 (state info) for Receiver</span>
+        <span class="c"># let sender know to expect a PoK2 interaction next</span>
+
+    <span class="k">def</span> <span class="nf">receiver_transfer4</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span> <span class="c"># rec_tran4 -&gt; sender_tran5</span>
+<span class="c">#        print(&quot;RECEIVER 4: Get query from end user.&quot;)</span></div>
+<div class="viewcode-block" id="ObliviousTransfer.receiver_transfer4"><a class="viewcode-back" href="../schemes/ot_adapt_07.html#ot_adapt_07.ObliviousTransfer.receiver_transfer4">[docs]</a>        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span> <span class="c"># maps to position 0 in array (+1 indexed)</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span> <span class="c"># secret for Receiver</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">C</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="s">&#39;A&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">v</span> <span class="c"># public value</span>
+<span class="c">#        print(&quot;query index =&gt;&quot;, index)</span>
+<span class="c">#        print(&quot;V =&gt;&quot;, V)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;v&#39;</span><span class="p">,</span><span class="n">v</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;V&#39;</span><span class="p">,</span><span class="n">V</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;query&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;V&#39;</span><span class="p">:</span><span class="n">V</span><span class="p">,</span> <span class="s">&#39;PoK2&#39;</span><span class="p">:</span><span class="s">&#39;SigmaProtocol2&#39;</span> <span class="p">}</span>
+    
+    <span class="k">def</span> <span class="nf">receiver_transfer6</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+<span class="c">#        print(&quot;RECEIVER 6: input =&gt;&quot;,input)</span></div>
+<div class="viewcode-block" id="ObliviousTransfer.receiver_transfer6"><a class="viewcode-back" href="../schemes/ot_adapt_07.html#ot_adapt_07.ObliviousTransfer.receiver_transfer6">[docs]</a>        <span class="k">if</span> <span class="nb">input</span> <span class="o">==</span> <span class="s">&#39;GO&#39;</span><span class="p">:</span>
+            <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;R&#39;</span><span class="p">,</span><span class="s">&#39;V&#39;</span><span class="p">,</span><span class="s">&#39;v&#39;</span><span class="p">,</span><span class="s">&#39;query&#39;</span><span class="p">])</span>
+<span class="c">#            print(&quot;R or pk =&gt;&quot;, pk) </span>
+            <span class="n">pk</span><span class="p">[</span><span class="s">&#39;V&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;v&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;sigma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">V</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">query</span>
+            <span class="c"># set up client end of PoK2</span>
+            <span class="n">PoK2</span> <span class="o">=</span> <span class="n">SigmaProtocol2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+            <span class="n">PoK2</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;prover&#39;</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="n">PoK2</span><span class="o">.</span><span class="n">PROVER</span><span class="p">,</span> <span class="s">&#39;socket&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">}</span> <span class="p">)</span>
+            <span class="n">PoK2</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">PoK2</span><span class="o">.</span><span class="n">PROVER</span><span class="p">,</span> <span class="n">close_sock</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="c">#            print(&quot;PoK2 prover result =&gt;&quot;, PoK2.result)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">PoK2</span><span class="o">.</span><span class="n">result</span>            
+            <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;Pok2&#39;</span><span class="p">:</span><span class="n">result</span><span class="p">}</span>
+        
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>            
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">receiver_transfer8</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+<span class="c">#        print(&quot;RECEIVER 8: input =&gt;&quot;, input)</span></div>
+<div class="viewcode-block" id="ObliviousTransfer.receiver_transfer8"><a class="viewcode-back" href="../schemes/ot_adapt_07.html#ot_adapt_07.ObliviousTransfer.receiver_transfer8">[docs]</a>        <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;PoK2&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;OK&#39;</span><span class="p">:</span>
+            <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        
+        <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;PoM&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>    
+<span class="c">#            print(&quot;Executing the PoM interactive proof.&quot;)</span>
+            <span class="n">W</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;W&#39;</span><span class="p">]</span>
+            <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;W&#39;</span><span class="p">,</span><span class="n">W</span><span class="p">))</span>
+<span class="c">#            print(&quot;W =&gt;&quot;, W)</span>
+            <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;W&#39;</span><span class="p">:</span><span class="n">W</span><span class="p">}</span>
+            <span class="n">PoM</span> <span class="o">=</span> <span class="n">SigmaProtocol3</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+            <span class="n">PoM</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;verifier&#39;</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="n">PoM</span><span class="o">.</span><span class="n">VERIFIER</span><span class="p">,</span> <span class="s">&#39;socket&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">}</span> <span class="p">)</span>
+            <span class="n">Protocol</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;GO&#39;</span><span class="p">)</span> <span class="c"># important: 1. acknowledges sub-protocol transition, 2. sends a short message using this socket</span>
+            <span class="n">PoM</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">PoM</span><span class="o">.</span><span class="n">VERIFIER</span><span class="p">,</span> <span class="n">close_sock</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="c">#            print(&quot;PoM verifier result =&gt;&quot;, PoM.result)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">PoM</span><span class="o">.</span><span class="n">result</span>
+        
+        <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="s">&#39;OK&#39;</span><span class="p">:</span>
+<span class="c">#            print(&quot;Now we recover &quot;)</span>
+            <span class="c"># W allows us to unlock the appropriate keyword, right?</span>
+            <span class="c"># get query, B_query, and v</span>
+            <span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">C</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;v&#39;</span><span class="p">,</span><span class="s">&#39;C&#39;</span><span class="p">])</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">B</span> <span class="o">=</span> <span class="n">C</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="s">&#39;B&#39;</span><span class="p">]</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">W</span> <span class="o">**</span> <span class="o">~</span><span class="n">v</span>
+            <span class="c"># m = self.xor(B, w)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Query =&gt;&quot;</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Corresponding B =&gt;&quot;</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Original message key =&gt;&quot;</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Search complete!!!&quot;</span><span class="p">)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>    
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span></div></div>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Usage: </span><span class="si">%s</span><span class="s"> [-r or -s]&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="nb">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;-r&quot;</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Operating as receiver...&quot;</span><span class="p">)</span>
+        <span class="n">svr</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">)</span>
+        <span class="n">svr</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="n">HOST</span><span class="p">,</span> <span class="n">PORT</span><span class="p">))</span>
+        <span class="n">svr</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">svr_sock</span><span class="p">,</span> <span class="n">addr</span> <span class="o">=</span> <span class="n">svr</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Connected by &quot;</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span>
+        <span class="n">msgs</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">_name</span><span class="p">,</span> <span class="n">_type</span><span class="p">,</span> <span class="n">_sock</span> <span class="o">=</span> <span class="s">&quot;receiver&quot;</span><span class="p">,</span> <span class="n">RECEIVER</span><span class="p">,</span> <span class="n">svr_sock</span>
+<span class="c">#       sp.setup( {&#39;name&#39;:&quot;receiver&quot;, &#39;type&#39;:_type, &#39;socket&#39;:svr_sock} )</span>
+    <span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;-s&quot;</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Operating as sender...&quot;</span><span class="p">)</span>
+        <span class="n">clt</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">)</span>
+        <span class="n">clt</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="n">HOST</span><span class="p">,</span> <span class="n">PORT</span><span class="p">))</span>
+        <span class="n">clt</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+        <span class="n">msgs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;one&#39;</span><span class="p">,</span> <span class="s">&#39;two&#39;</span><span class="p">,</span> <span class="s">&#39;three&#39;</span><span class="p">]</span>
+        <span class="n">_name</span><span class="p">,</span> <span class="n">_type</span><span class="p">,</span> <span class="n">_sock</span> <span class="o">=</span> <span class="s">&quot;sender&quot;</span><span class="p">,</span> <span class="n">SENDER</span><span class="p">,</span> <span class="n">clt</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Usage: </span><span class="si">%s</span><span class="s"> -r or -s&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="nb">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    
+<span class="c">#    group = PairingGroup(&#39;library/a.param&#39;)</span>
+    <span class="n">sp</span> <span class="o">=</span> <span class="n">ObliviousTransfer</span><span class="p">(</span><span class="n">msgs</span><span class="p">)</span>
+    <span class="n">sp</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="n">_name</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="n">_type</span><span class="p">,</span> <span class="s">&#39;socket&#39;</span><span class="p">:</span><span class="n">_sock</span><span class="p">}</span> <span class="p">)</span>
+    <span class="c"># run as a thread...</span>
+    <span class="n">sp</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">_type</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>
