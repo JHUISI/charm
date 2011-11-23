@@ -327,9 +327,9 @@ for opt do
   --disable-pairing) pairing_module="no"
   ;;
   --enable-pairing-miracl) 
-    echo "pairing module using MIRACL not supported yet."
-  	#pairing_miracl="yes" ;
-  	#pairing_pbc="no"
+    echo "Enabling this option assumes you have unzipped the MIRACL library into charm-src/pairingmath/miracl/ and make sure the library is built in that directory."
+  	pairing_pbc="no"
+  	pairing_miracl="yes" ;
   ;;	
   --enable-pairing-pbc)
     pairing_pbc="yes" ;
@@ -836,10 +836,10 @@ echo "PAIR_MOD=$pairing_module" >> $config_mk
 if test "$pairing_pbc" = "yes" ; then
 	echo "USE_PBC=$pairing_pbc" >> $config_mk
 	echo "USE_GMP=$pairing_pbc" >> $config_mk
-    echo "USE_MIRACL=" >> $config_mk
+    echo "USE_MIRACL=no" >> $config_mk
 elif test "$pairing_miracl" = "yes" ; then
     echo "USE_MIRACL=$pairing_miracl" >> $config_mk
-    echo "USE_PBC=" >> $config_mk
+    echo "USE_PBC=no" >> $config_mk
 fi
 
 if test "$wget" = "" ; then
@@ -885,6 +885,6 @@ echo "HAVE_LIBPBC=$libpbc_found" >> $config_mk
 echo "HAVE_LIBCRYPTO=$libcrypto_found" >> $config_mk
 echo "PYPARSING=$pyparse_found" >> $config_mk
 if test "$docs" = "yes" ; then
-    echo "SPHINX=$sphinx_build" >> $config_mk
+    echo "SPHINX=$(which sphinx-build)" >> $config_mk
 fi
 exit 0

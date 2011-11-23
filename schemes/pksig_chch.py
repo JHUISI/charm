@@ -1,4 +1,16 @@
-""" TODO: Description of Scheme here.
+""" 
+Jae Choon Cha and Jung Hee Cheon - Identity-based Signatures
+
+| From: "J. Cha and J. Choen - An identity-based signature from gap Diffie-Hellman groups."
+| Published in: PKC 2003
+| Available from: Vol. 2567. LNCS, pages 18-30
+| Notes: 
+
+* type:           signature (ID-based)
+* setting:        bilinear groups (asymmetric)
+
+:Authors:    J. Ayo Akinyele
+:Date:       11/2011
 """
 from charm.pairing import *
 from toolbox.PKSig import PKSig

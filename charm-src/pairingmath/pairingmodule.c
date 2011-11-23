@@ -1586,10 +1586,7 @@ static PyObject *Group_Check(Element *self, PyObject *args) {
 	if(PyArg_ParseTuple(args, "O", &object)) {
 		if(PyElement_Check(object)) {
 			Element *elem = (Element *) object;
-//
-//			printf("Order of group => ");
-//			print_mpz(elem->pairing->pair_obj->G2->order, 10);
-//			printf("\n");
+
 			if(check_membership(elem) == TRUE) {
 				Py_INCREF(Py_True);
 				return Py_True;
@@ -1608,16 +1605,7 @@ static PyObject *Group_Check(Element *self, PyObject *args) {
 static PyObject *Get_Order(Element *self, PyObject *args) {
 
 	IS_PAIRING_OBJ_NULL(self);
-
 	PyObject *object = (PyObject *) mpzToLongObj(self->pairing->pair_obj->r);
-//	GroupType type = ZR;
-//	if(PyArg_ParseTuple(args, "|i", &type)) {
-//		if(check_type(type) == FALSE) {
-//			PyErr_SetString(ElementError, "invalid type. Choices: ZR, G1, G2 or GT");
-//			return NULL;
-//		}
-//	}
-
 	return object; /* returns a PyInt */
 }
 

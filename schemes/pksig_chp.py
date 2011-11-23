@@ -1,4 +1,16 @@
-""" TODO: Description of Scheme here.
+""" 
+Camenisch-Hohenberger-Pedersen - Identity-based Signatures
+
+| From: "Camenisch, S. Hohenberger, M. Pedersen - Batch Verification of short signatures."
+| Published in: EUROCRYPT 2007
+| Available from: http://epring.iacr.org/2007/172.pdf
+| Notes: 
+
+* type:           signature (ID-based)
+* setting:        bilinear groups (asymmetric)
+
+:Authors:    J. Ayo Akinyele
+:Date:       11/2011
 """
 from charm.pairing import *
 from toolbox.PKSig import PKSig

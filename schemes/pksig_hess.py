@@ -1,4 +1,16 @@
-""" TODO: Description of Scheme here.
+""" 
+Hess - Identity-based Signatures
+
+| From: "Hess - Efficient identity based signature schemes based on pairings."
+| Published in: Selected Areas in Cryptography
+| Available from: Vol. 2595. LNCS, pages 310-324
+| Notes: 
+
+* type:           signature (ID-based)
+* setting:        bilinear groups (asymmetric)
+
+:Authors:    J. Ayo Akinyele
+:Date:       11/2011
 """
 from charm.pairing import *
 from toolbox.PKSig import PKSig
