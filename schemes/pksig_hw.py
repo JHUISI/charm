@@ -1,3 +1,17 @@
+""" 
+Hohenberger-Waters - Realizing hash-and-sign signatures
+
+| From: "S. Hohenberger and B. Waters - Realizing hash-and-sign signatures under standard assumptions."
+| Published in: EUROCRYPT 2009
+| Available from: pages 333-350
+| Notes: CDH construction
+
+* type:           signature
+* setting:        bilinear groups (asymmetric)
+
+:Authors:    J. Ayo Akinyele
+:Date:       11/2011
+"""
 from charm.pairing import *
 from toolbox.PKSig import *
 from math import *

@@ -1,4 +1,16 @@
-""" TODO: Description of Scheme here.
+""" 
+Waters - Identity-based signatures
+
+| From: "B. Waters - Efficient identity-based encryption without random oracles"
+| Published in: EUROCRYPT 2005
+| Available from: Vol 3494 of LNCS, pages 320-329
+| Notes: 
+
+* type:           signature (ID-based)
+* setting:        bilinear groups (asymmetric)
+
+:Authors:    J. Ayo Akinyele
+:Date:       11/2011
 """
 from charm.pairing import *
 from toolbox.iterate import dotprod
