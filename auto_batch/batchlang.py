@@ -1,16 +1,17 @@
 ''' Operators in Batch language:
 
-* EXP - '^' for exponent
+* MUL, EXP - '*' for multiply,'^' for exponent
 * EQ - ':=' for assignment
 * EQ_TST - '==' for equality testing
 * PAIR - 'e(' arg1, arg2 ')'
 * CONST - 'constant' declarator?
 * VARIABLE - 'variable' declarator?
-* PROD - 'prod{i:=1,N} on' applied to 
+* FOR - 'for{i:=1,X} do x' loop from 1 to X on statement x
+* PROD - 'prod{i:=1,N} on n' apply dot product to statement n
 * ARR - 'a_1' for an array, a, with index = 1
-* LIST - '[ x, y, z,...]' 
+* LIST - '[ x, y, z,...]' # not implemented yet
 
-e.g., prod{i:=1,N} on pk_i ^ del_i 
+e.g., prod{i:=1,N} on (pk_i ^ del_i) 
 
 AST simple rules
 
@@ -25,7 +26,7 @@ import string
 
 types = Enum('G1', 'G2', 'GT', 'ZR', 'str')
 declarator = Enum('constants', 'verify')
-ops = Enum('BEGIN', 'TYPE', 'ADD', 'MUL', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'PROD', 'ON', 'CONCAT','LIST','END', 'NONE')
+ops = Enum('BEGIN', 'TYPE', 'ADD', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT','END', 'NONE')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
 
@@ -44,18 +45,78 @@ def getListNodes(subtree, parent_type, _list):
 	if subtree.right: getListNodes(subtree.right, subtree.type, _list)
 	return
 
+# checks whether a target node exists in a subtree
+# note: returns True when it finds the first match 
+def isNodeInSubtree(node, target):
+	if node == None: return False
+	else:
+		if str(node) == str(target): return True
+	result = isNodeInSubtree(node.left, target)
+	if result: return result
+	result = isNodeInSubtree(node.right, target)
+	return result
 
-def searchNode(node, target):
+# searches a subtree for a target node type
+# it returns the first node that matches the target type.
+# note: doesn't return all istances of a given type in the subtree
+def searchNodeType(node, target_type):
 	if node == None: return None
-	elif node.type == target: return node		
+	elif node.type == target_type: return node		
 	result = searchNode(node.left)
 	if result: return result
 	result = searchNode(node.right)		
 	return result
 
+# simplifies checking the type of a given node
 def Type(node):
+	if node == None: return ops.NONE
 	return node.type
 
+# short cut to creating a binary node of a given type
+# with given children nodes.
+def createNode(node_type, left=None, right=None):
+	node = BinaryNode(node_type)
+	node.left = left
+	node.right = right
+	return node
+
+# binds a string representation of the operation to 
+# the symbolic representation (Enums) above 
+def createTree(op, node1, node2):
+    if(op == "^"):
+        node = BinaryNode(ops.EXP)
+    elif(op == "*"):
+        node = BinaryNode(ops.MUL)
+    elif(op == "+"):
+        node = BinaryNode(ops.ADD)
+    elif(op == ":="):
+        node = BinaryNode(ops.EQ)
+    elif(op == "=="):
+        node = BinaryNode(ops.EQ_TST)
+    elif(op == "e("):
+        node = BinaryNode(ops.PAIR)
+    elif(op == "H("):
+        node = BinaryNode(ops.HASH)
+    elif(op == "prod{"):
+        node = BinaryNode(ops.PROD)
+    elif(op == "on"):
+        # can only be used in conjunction w/ PROD (e.g. PROD must precede it)        
+        node = BinaryNode(ops.ON)
+    elif(op == "for{"):
+    	node = BinaryNode(ops.FOR)
+    elif(op == "do"):
+    	node = BinaryNode(ops.DO)
+    elif(op == "sum{"):
+    	node = BinaryNode(ops.SUM)
+    elif(op == "of"):
+    	node = BinaryNode(ops.OF)
+    elif(op == "|"):
+        node = BinaryNode(ops.CONCAT)
+    # elif e( ... )
+    else:    
+        return None
+    node.addSubNode(node1, node2)
+    return node
 
 
 class BinaryNode:
@@ -90,14 +151,14 @@ class BinaryNode:
 			if self.attr_index != None and type(self.attr_index) == list:
 				token = ""
 				for t in self.attr_index:
-					token += t + ","
+					token += t + "%"
 				l = len(token) 
 				token = token[:l-1]
 				msg += '_' + token
 			return msg
 		elif(self.type == ops.TYPE):
 			return str(self.attr)
-		else:			
+		else:
 			left = str(self.left)
 			right = str(self.right)
 			
@@ -109,6 +170,8 @@ class BinaryNode:
 				return (left + '^' + right)
 			elif(self.type == ops.MUL):
 				return ('(' + left + ' * ' + right + ')')
+			elif(self.type == ops.DIV):
+				return ('(' + left + ' / ' + right + ')')
 			elif(self.type == ops.ADD):
 				return ('(' + left + ' + ' + right + ')')
 			elif(self.type == ops.EQ):
@@ -121,10 +184,16 @@ class BinaryNode:
 				return ('H(' + left + ',' + right + ')')
 			elif(self.type == ops.PROD):
 				return ('prod{' + left + ',' + right + '}')
+			elif(self.type == ops.SUM):
+				return ('sum{' + left + ',' + right + '}')			
 			elif(self.type == ops.ON):
 				 return ('(' + left + ' on ' + right + ')')
-			elif(self.type == ops.LIST):
-				 return ('[' + left + ']' )
+			elif(self.type == ops.FOR):
+				return ('for{' + left + ',' + right + '}')
+			elif(self.type == ops.DO):
+				 return ( left + ' do ' + right)
+			elif(self.type == ops.OF):
+				 return ( left + ' of ' + right)
 			elif(self.type == ops.CONCAT):
 				 return (left + ' | ' + right)
 				# return ( left + ' on ' + right )				
@@ -135,7 +204,8 @@ class BinaryNode:
 			if self.attr_index == None: # could be a list of indices
 				self.attr_index = [value]
 			else:
-				self.attr_index.append(value)
+				if not value in self.attr_index:
+					self.attr_index.append(value)
 			return True
 		return False
 	
@@ -146,10 +216,10 @@ class BinaryNode:
 			return None
 	
 	def getLeft(self):
-		return self.left
+		return self.left if self.left != None else None
 	
 	def getRight(self):
-		return self.right
+		return self.right if self.right != None else None
 
 	def addSubNode(self, left, right):
 		# set subNodes appropriately
@@ -177,6 +247,13 @@ class BinaryNode:
 		new_node.left = self.copy(this.left)
 		new_node.right = self.copy(this.right)		
 		return new_node	
+
+	@classmethod
+	def setNodeAs(self, dest, src):
+		dest.type = src.type
+		dest.attr = src.attr
+		dest.attr_index = src.attr_index
+		return
 
 	# only applies function on leaf nodes
 	def traverse(self, function):

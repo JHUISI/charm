@@ -1,4 +1,16 @@
-""" TODO: Description of Scheme here.
+""" 
+Jae Choon Cha and Jung Hee Cheon - Identity-based Signatures
+
+| From: "J. Cha and J. Choen - An identity-based signature from gap Diffie-Hellman groups."
+| Published in: PKC 2003
+| Available from: Vol. 2567. LNCS, pages 18-30
+| Notes: 
+
+* type:           signature (ID-based)
+* setting:        bilinear groups (asymmetric)
+
+:Authors:    J. Ayo Akinyele
+:Date:       11/2011
 """
 from charm.pairing import *
 from toolbox.PKSig import PKSig
@@ -32,11 +44,11 @@ class CHCH(PKSig):
         S1 = pk ** s
         a = H2(M, S1)
         S2 = sk ** (s + a)
-        return (S1, S2)
+        return {'S1':S1, 'S2':S2}
     
     def verify(self, mpk, pk, M, sig):
         print("verify...")
-        (S1, S2) = sig
+        (S1, S2) = sig['S1'], sig['S2']
         a = H2(M, S1)
         if pair(S2, mpk['g2']) == pair(S1 * (pk ** a), mpk['P']): 
             return True

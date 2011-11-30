@@ -78,7 +78,7 @@ def main():
     pkenc = EC_CS98(prime192v1)
     
     (pk, sk) = pkenc.keygen()
-    M = "hello world!!!"
+    M = b"hello world!!!"
 
     ciphertext = pkenc.encrypt(pk, M)
     

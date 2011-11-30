@@ -1,9 +1,11 @@
 from charm.pairing import *
 from charm.integer import randomBits,bitsize,integer
+import os.path
 
 class PairingGroup():
     def __init__(self, param_file, secparam=512, verbose=False):
-        self.Pairing = pairing(param_file)
+        #assert os.path.isfile(param_file), "Param file '%s' does not exist!" % param_file 
+        self.Pairing = pairing(param_file)            
         self.secparam = secparam # number of bits
 #        self.rand = init()
         self._verbose = verbose
@@ -18,6 +20,18 @@ class PairingGroup():
             return True
         print("ERROR: max len => %s, input len => %s" % (self.messageSize(), size))
         return False
+
+    def ismember(self, obj):
+        if type(obj) in [tuple, list]:
+           for i in obj:
+               if self.Pairing.ismember(i) == False: return False 
+           return True
+        elif type(obj) == dict:
+           for i in obj.keys():
+               if self.Pairing.ismember(obj[i]) == False: return False
+           return True
+        else:
+           return self.Pairing.ismember(obj)
 
     def groupType(self): 
         return 'PairingGroup'     

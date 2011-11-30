@@ -65,7 +65,7 @@ class KPabe(ABEnc):
             D[x] = d
         if debug: print("Policy: %s" % policy)
         if debug: print("Attribute list: %s" % attr_list)
-        D['policy'] = policy
+        D['policy'] = policy_str
         return D
     
     def negatedAttr(self, attribute):
@@ -92,7 +92,7 @@ class KPabe(ABEnc):
     
     def decrypt(self, E, D):
         attrs = E['attributes']
-        policy = D['policy']
+        policy = util.createPolicy(D['policy'])
         coeff = {}; util.getCoefficients(policy, coeff)
         
         Z = {}; prodT = group.init(GT, 1)

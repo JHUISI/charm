@@ -1226,15 +1226,16 @@ static PyObject *genRandomPrime(Integer *self, PyObject *args) {
 
 static PyObject *encode_message(PyObject *self, PyObject *args) {
 	//char *m; // handle arbitrary messages
-	char *old_m;
+	uint8_t *old_m;
 	int m_size;
-	PyObject *order, *order2;
+	PyObject *order, *order2, *old_msg;
 	Integer *pObj, *qObj;
 	mpz_t p, q, result;
 	mpz_t tmp, exp, rop;
 	Integer *rop2;
 
-	if (PyArg_ParseTuple(args, "s#OO", &old_m, &m_size, &order, &order2)) {
+//	if (PyArg_ParseTuple(args, "s#OO", &old_m, &m_size, &order, &order2)) {
+	if (PyArg_ParseTuple(args, "OOO", &old_msg, &order, &order2)) {
 		// make sure p = 2 * q + 1
 		if (PyInteger_Check(order) && PyInteger_Check(order2)) {
 			mpz_init(p);
@@ -1264,43 +1265,41 @@ static PyObject *encode_message(PyObject *self, PyObject *args) {
 		mpz_clear(q);
 		mpz_clear(result);
 
-		debug("Message => '%s'\n", old_m);
-		debug("Size => '%d'\n", m_size);
+		// for python 3
+		if(PyBytes_Check(old_msg)) {
+			old_m = (uint8_t *) PyBytes_AS_STRING(old_msg);
+			m_size = strlen((char *) old_m);
+			debug("Message => ");
+			printf_buffer_as_hex(old_m, m_size);
+			debug("Size => '%d'\n", m_size);
 		
+			if(m_size > MSG_LEN-2) {
+				mpz_clear(p);
+				PyErr_SetString(IntegerError, "message too large. Cannot represent as an element of Zp.");
+				return NULL;
+			}
+		}
+		else {
+			mpz_clear(p);
+			PyErr_SetString(IntegerError, "message not a bytes object");
+			return NULL;
+		}
+
 		//longest message can be is 128 characters (1024 bits) => check on this!!!
 		char m[MSG_LEN+2]; //128 byte message, 1 byte length, null byte
 		m[0] = m_size & 0xFF; //->this one works too...results in order 207
-		//snprintf(m, 3, "%02x", m_size); //-> this line works! -> results in order 208
 		snprintf((m+1), MSG_LEN+1, "%s", old_m); //copying message over
 		m_size = m_size + 1; //we added an extra byte
-
-		// TODO: encode message into [size] + [message]
 
 		// p and q values valid
 		mpz_init(tmp);
 		mpz_import(tmp, m_size, 1, sizeof(m[0]), 0, 0, m);
 		// bytes_to_mpz(tmp2, (const unsigned char *) m, (size_t) m_size);
-		// print out object
-		size_t e_size = mpz_sizeinbase(tmp, 2) + 2; //was 224 with 3 decimal chars, 201 originally
-		size_t p_size = mpz_sizeinbase(p, 2) + 2;
 
-		//if (e_size <= (p_size - 8)) {//Do I even need this check??? Because I've already updated the size of the message...
-		if (e_size <= p_size) {
-			print_mpz(tmp, 10);
-			debug("Order of p => '%zd'\n", p_size);
-		} else {
-			/* message too big to be represented as an element of Zp. */
-			mpz_clear(tmp);
-			mpz_clear(p);
-			PyErr_SetString(IntegerError,
-					"message too large. Cannot represent as an element of Zp.");
-			return NULL;
-		}
-
+		// perform encoding...
 		// get the order object (only works for p = 2q + 1)
 		mpz_init(exp);
 		mpz_init(rop);
-		// longObjToMPZ(p, (PyLongObject *) order);
 		mpz_add_ui(tmp, tmp, 1);
 
 		// (p - 1) / 2
@@ -1378,7 +1377,6 @@ static PyObject *decode_message(PyObject *self, PyObject *args) {
 			debug("count => '%zd'\n", count);
 
 			int size_Rop = Rop[0];
-
 			char m[MSG_LEN+1];
 			*m = '\0';
 			strncat(m, (const char *)(Rop+1), size_Rop);
@@ -1386,7 +1384,8 @@ static PyObject *decode_message(PyObject *self, PyObject *args) {
 			mpz_clear(p);
 			mpz_clear(q);
 
-			return PyUnicode_FromFormat("%s", m);
+//			return PyUnicode_FromFormat("%s", m);
+			return PyBytes_FromFormat("%s", m);
 		}
 	}
 

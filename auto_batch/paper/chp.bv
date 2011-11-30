@@ -1,5 +1,6 @@
 # variables
-N := 50
+name := chp
+N := 100
 
 BEGIN :: types
 M := str
@@ -12,11 +13,15 @@ END :: types
 BEGIN :: precompute
 a := H(t1, G1)
 h := H(t2, G1)
-b := H(M | t3, ZR)
+b_z := H(M_z | t3, ZR)
 END :: precompute
 
 BEGIN :: constant
 a, g, h
 END :: constant
+
+BEGIN :: signature
+sig, b
+END :: signature
 
 verify := { e(sig, g) == e(a, pk) * e(h, pk)^b }

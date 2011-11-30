@@ -167,7 +167,7 @@ def main():
 
     (w, key) = ibe.extract(mk, w, pk, d, n)
 
-    M = groupObj.random(G2)
+    M = groupObj.random(GT)
     cipher = ibe.encrypt(pk, wPrime, M, n)
     m = ibe.decrypt(pk, key, cipher, w, d)
 

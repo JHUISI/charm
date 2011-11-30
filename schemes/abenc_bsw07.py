@@ -71,13 +71,14 @@ class CPabe_BSW07(ABEnc):
             C_y_pr[i] = group.hash(i, G2) ** shares[i] 
         
         return { 'C_tilde':(pk['e_gg_alpha'] ** s) * M,
-                 'C':C, 'Cy':C_y, 'Cyp':C_y_pr, 'policy':policy, 'attributes':a_list }
+                 'C':C, 'Cy':C_y, 'Cyp':C_y_pr, 'policy':policy_str, 'attributes':a_list }
     
     @input(pk_t, sk_t, ct_t)
     @output(GT)
     def decrypt(self, pk, sk, ct):
-        pruned_list = util.prune(ct['policy'], sk['S'])
-        z = {}; util.getCoefficients(ct['policy'], z)
+        policy = util.createPolicy(ct['policy'])
+        pruned_list = util.prune(policy, sk['S'])
+        z = {}; util.getCoefficients(policy, z)
 
         A = group.init(GT, 1) 
         for i in pruned_list:

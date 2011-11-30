@@ -17,6 +17,7 @@ Toolbox Classes
    toolbox/hash_module
    toolbox/IBEnc
    toolbox/integergroup
+   toolbox/iterate
    toolbox/node
    toolbox/paddingschemes
    toolbox/pairinggroup
@@ -28,6 +29,7 @@ Toolbox Classes
    toolbox/secretutil
    toolbox/securerandom
    toolbox/sigmaprotocol
+   toolbox/specialprimes
    toolbox/zknode
 
 .. end_auto_toolbox_list
