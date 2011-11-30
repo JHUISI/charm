@@ -19,8 +19,7 @@ class MessageAuthenticator(object):
         if alg != "HMAC_SHA1":
             raise ValueError("Currently only HMAC_SHA1 is supportated as an algorithm")
         self._algorithm = alg
-        self._key = sha1(b'Poor Mans Key Extractor'+key).digest() # warning only valid in the random oracle
-    
+        self._key = key    
     def mac(self,msg):
         """
         authenticates a message 
