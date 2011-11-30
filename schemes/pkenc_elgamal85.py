@@ -99,7 +99,7 @@ class ElGamal(PKEnc):
 def main():
     el = ElGamal(ecc, prime192v2)    
     (pk, sk) = el.keygen()
-    msg = "hello world!"
+    msg = b"hello world!"
     size = len(msg)
     cipher1 = el.encrypt(pk, msg)
     

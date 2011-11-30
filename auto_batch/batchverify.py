@@ -150,7 +150,7 @@ if __name__ == "__main__":
     except:
         print("An error occured while processing batch inputs.")
         exit(-1)
-    const, types, sigs = ast_struct[ CONST ], ast_struct[ TYPE ], ast_struct[ SIGNATURE ]
+    const, types = ast_struct[ CONST ], ast_struct[ TYPE ]
     latex_subs = ast_struct[ LATEX ]
     (indiv_precompute, batch_precompute) = ast_struct[ PRECOMP ]
     batch_precompute[ "delta" ] = "for{z := 1, N} do prng_z"
@@ -159,6 +159,7 @@ if __name__ == "__main__":
     if not algorithm: algorithm = ['2', '3'] # standard transform that applies to most signature schemes we've tested
     
     verify, N = None, None
+    setting = {}
     metadata = {}
     for n in ast_struct[ OTHER ]:
         if str(n.left) == 'verify':
@@ -166,8 +167,24 @@ if __name__ == "__main__":
         elif str(n.left) == 'N':
             N = int(str(n.right))
             metadata['N'] = str(n.right)
+        elif str(n.left) in [SIGNATURE, PUBLIC, MESSAGE]:
+            setting[ str(n.left) ] = str(n.right)
         else:
             metadata[ str(n.left) ] = str(n.right)
+    
+    # process settings
+    sig_vars, pub_vars, msg_vars = ast_struct[ SIGNATURE ], ast_struct[ PUBLIC ], ast_struct[ MESSAGE ]
+    batch_count = {} # F = more than one, T = only one exists
+    if setting.get(MESSAGE) == SAME:
+        batch_count[ MESSAGE ] = SAME 
+    else: # different messages per signer?
+        batch_count[ MESSAGE ] = DIFF
+    
+    # check public key setting (can either be many keys or just one single key)
+    if setting.get(PUBLIC) == SAME:
+        batch_count[ PUBLIC ] = SAME
+    else: # different public keys
+        batch_count[ PUBLIC ] = DIFF
     
     vars = types
     vars['N'] = N
@@ -185,7 +202,8 @@ if __name__ == "__main__":
     print("\nVERIFY EQUATION =>", verify)
     if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Equation', 'eq': lcg.print_statement(verify.right) }; lcg_steps += 1
     verify2 = BinaryNode.copy(verify)
-    ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
+#    ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
+    ASTVisitor(CVForMultiSigner(vars, sig_vars, pub_vars, msg_vars, batch_count)).preorder(verify2.right)
     if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Combined Equation', 'eq':lcg.print_statement(verify2.right) }; lcg_steps += 1
     ASTVisitor(SimplifyDotProducts()).preorder(verify2.right)
 
@@ -218,6 +236,8 @@ if __name__ == "__main__":
         if PROOFGEN_FLAG:
             lcg_data[ lcg_steps ] = { 'msg':Tech.rule, 'eq': lcg.print_statement(verify2.right) }
             lcg_steps += 1
+
+    exit(0)
     
     if PROOFGEN_FLAG:
         lcg_data[ lcg_steps-1 ]['preq'] = final_batch_eq

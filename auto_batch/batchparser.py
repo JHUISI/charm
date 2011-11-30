@@ -161,10 +161,12 @@ def parseFile(filename):
     fd.close()
     return ast_tree
 
-# keywords
+# valid keywords
 START_TOKEN, END_TOKEN = 'BEGIN', 'END'
-TYPE, CONST, PRECOMP, SIGNATURE, PUBLIC, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'signature', 'public', 'other', 'transform'
-LATEX = 'latex'
+TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
+MESSAGE, SIGNATURE, PUBLIC, LATEX = 'message','signature', 'public', 'latex'
+# qualifier (means only one instance of that particular keyword exists)
+SAME, DIFF = 'one', 'many'
 
 def clean(arr):
     return [i.strip() for i in arr]
@@ -186,7 +188,7 @@ def handle(lines, target):
     if type(lines) != list:
         return parser.parse(lines)
 
-    if target in [CONST, SIGNATURE, TRANSFORM, PUBLIC]:
+    if target in [CONST, TRANSFORM, PUBLIC, SIGNATURE, MESSAGE]:
         # parse differently 'a, b, etc.\n'
         _ast = []
         for line in lines:
@@ -226,7 +228,7 @@ debugs = levels.none
 
 def parseFile2(filename):
     fd = open(filename, 'r')
-    ast = {TYPE: None, CONST: None, PRECOMP: None, TRANSFORM: None, SIGNATURE: None, PUBLIC: None, LATEX: None, OTHER: [] }
+    ast = {TYPE: None, CONST: None, PRECOMP: None, TRANSFORM: None, MESSAGE: None, SIGNATURE: None, PUBLIC: None, LATEX: None, OTHER: [] }
     
     # parser = BatchParser()
     code = fd.readlines(); i = 1
@@ -235,7 +237,7 @@ def parseFile2(filename):
     for line in code:
         if line.find('::') != -1: # parse differently
             token = clean(line.split('::'))
-            if token[0] == START_TOKEN and (token[1] in [TYPE, CONST, PRECOMP, SIGNATURE, TRANSFORM, PUBLIC, LATEX]):
+            if token[0] == START_TOKEN and (token[1] in [TYPE, CONST, PRECOMP, TRANSFORM, MESSAGE, SIGNATURE, PUBLIC, LATEX]):
                 inStruct = (True, token[1])
                 if debugs == levels.all: print("Got a section!!!")
                 continue
@@ -454,6 +456,97 @@ class CombineVerifyEq:
                 if n == node.getAttribute(): return True            
             #if n.getAttribute() == node.getAttribute(): return True
         return False
+
+class CVForMultiSigner:
+    def __init__(self, var_types, sig_vars, pub_vars, msg_vars, setting):
+        self.vars = var_types
+        assert type(pub_vars) == list, "public vars needs to be in a list"
+        self.pub  = pub_vars # list of variable names
+        self.pubKey = 'i'; self.pubEnd = 'S' # should be standard
+        assert type(sig_vars) == list, "signature vars need to be in a list"
+        self.sig  = sig_vars # list of variable names
+        assert type(msg_vars) == list, "message vars need to be in a list"
+        self.msg  = msg_vars
+        self.setting = setting
+    
+    def visit(self, node, data):
+        pass
+    
+    def visit_eq_tst(self, node, data):
+        # distribute prod to left and right side
+        if Type(node.left) != ops.EQ:
+            prodL = self.newProdNode() # check if sig vars appear in left side?
+            prodL.right = node.left
+            node.left = prodL
+        
+        if Type(node.right) != ops.EQ:
+            prodR = self.newProdNode()
+            prodR.right = node.right
+            node.right = prodR
+            
+        # check whether the pub vars appear in left subtree
+        if self.setting.get(PUBLIC) == DIFF:
+            if Type(node.left) != ops.EQ and self.isPubInSubtree(node.left):
+                prodL2 = self.newProdNode(self.pubKey, self.pubEnd)
+                prodL2.right = node.left
+                node.left = prodL2
+            elif Type(node.right) != ops.EQ and self.isPubInSubtree(node.right):
+                prodR2 = self.newProdNode(self.pubKey, self.pubEnd)
+                prodR2.right = node.right
+                node.right   = prodR2
+        else:
+            pass
+
+                    
+    def visit_attr(self, node, data):
+        if data['parent'].type in [ops.PROD, ops.EQ]:
+            return
+        if self.isSig(node):
+            node.setAttrIndex('z') # add index to each attr that isn't constant
+        if self.isPub(node) and self.setting.get(PUBLIC) == DIFF:
+            node.setAttrIndex('i')
+        if self.isMsg(node) and self.setting.get(MESSAGE) == DIFF:
+            node.setAttrIndex('z')
+    
+    def newProdNode(self, key=None, end=None):
+        p = BatchParser()
+        if key and end:
+            new_node = p.parse("prod{"+key+":=1,"+end+"} on x")        
+        else:
+            new_node = p.parse("prod{z:=1, N} on x")
+        return new_node
+
+    def isPub(self, node):
+        if self.pub:        
+            for n in self.pub:
+                if n == node.getAttribute(): return True            
+            #if n.getAttribute() == node.getAttribute(): return True
+        return False
+
+    def isSig(self, node):
+        if self.sig:        
+            for n in self.sig:
+                if n == node.getAttribute(): return True            
+            #if n.getAttribute() == node.getAttribute(): return True
+        return False
+
+    def isMsg(self, node):
+        if self.msg:        
+            for n in self.msg:
+                if n == node.getAttribute(): return True            
+            #if n.getAttribute() == node.getAttribute(): return True
+        return False
+
+    def isPubInSubtree(self, tree):
+        if tree == None: return None
+        elif Type(tree) == ops.ATTR and self.isPub(tree):
+            return True
+        else:
+            result = self.isPubInSubtree(tree.left)
+            if result: return result # if True, then end search else continue
+            return self.isPubInSubtree(tree.right)
+            
+
 
 # Focuses on simplifying dot products of the form
 # prod{} on (x * y)
@@ -782,7 +875,7 @@ class Technique3:
     def visit_on(self, node, data):
         index = str(node.left.right)
         if index != 'N' or Type(data['parent']) == ops.PAIR:
-            return
+            return # should check for other things before returning in the multi-signer case
         
         if Type(node.right) == ops.PAIR:
             pair_node = node.right
