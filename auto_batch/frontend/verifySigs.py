@@ -7,11 +7,12 @@ from toolbox.pairinggroup import *
 bodyKey = 'Body'
 
 def verifySigsRecursive(verifyFuncArgs, argSigIndexMap, verifyArgsDict, dotA, dotB, startIndex, endIndex):
+	group = PairingGroup('../../param/d224.param')
 	for arg in verifyFuncArgs:
 		argSigIndexMap[arg] = 0
 
-	dotA_runningProduct = 1
-	dotB_runningProduct = 1
+	dotA_runningProduct = group.init(G1, 1)
+	dotB_runningProduct = group.init(G1, 1)
 
 	for index in range(startIndex, endIndex):
 		dotA_runningProduct = dotA_runningProduct * dotA[index]

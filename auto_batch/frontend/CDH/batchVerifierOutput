@@ -1,0 +1,30 @@
+['frontend/CDH/cdh3.bv', '-c']
+types  => {'A': 'G2', 'r': 'ZR', 'D': 'GT', 'g': 'G2', 'i': 'ZR', 'h': 'G2', 'M': 'ZR', 'n': 'ZR', 'sig1': 'G1', 'sig2': 'G1', 'U': 'GT', 'w': 'G2', 'V': 'GT', 'Z': 'G2'}
+constant  => ['g', 'A', 'U', 'V', 'D', 'w', 'Z', 'h']
+public  => ['D := e(d', 'g^a)']
+signature  => ['sig1', 'sig2', 'r', 'i']
+latex => {'sig1': '\\sigma_1', 'Z': 'z', 'sig2': '\\sigma_2', 'n': '\\lg(i)'}
+variables => {'A': 'G2', 'r': 'ZR', 'D': 'GT', 'g': 'G2', 'i': 'ZR', 'h': 'G2', 'M': 'ZR', 'n': 'ZR', 'sig1': 'G1', 'N': '100', 'sig2': 'G1', 'U': 'GT', 'w': 'G2', 'V': 'GT', 'Z': 'G2', 'name': 'cdh'}
+metadata => {'name': 'cdh', 'N': '100'}
+batch algorithm => ['2', '3']
+
+Final batch eq: e((prod{z := 1,N} on sig1_z^delta_z),g) == (U^sum{z := 1,N} of (M_z * delta_z) * (V^sum{z := 1,N} of (r_z * delta_z) * (D^sum{z := 1,N} of delta_z * (e((prod{z := 1,N} on sig2_z^n_z^delta_z),w) * (e((prod{z := 1,N} on sig2_z^i_z^delta_z),Z) * e((prod{z := 1,N} on sig2_z^delta_z),h))))))
+
+Final version => e(dotA,g) == (U^sumB * (V^sumC * (D^sumD * (e(dotE,w) * (e(dotF,Z) * e(dotG,h)))))) 
+
+Compute:  dotA := (prod{z := 1,N} on sig1_z^delta_z)
+Compute:  sumB := sum{z := 1,N} of (M_z * delta_z)
+Compute:  sumC := sum{z := 1,N} of (r_z * delta_z)
+Compute:  sumD := sum{z := 1,N} of delta_z
+Compute:  dotE := (prod{z := 1,N} on sig2_z^n_z^delta_z)
+Compute:  dotF := (prod{z := 1,N} on sig2_z^i_z^delta_z)
+Compute:  dotG := (prod{z := 1,N} on sig2_z^delta_z)
+Precompute: n := lg_i
+Precompute: delta := for{z := 1, N} do prng_z
+dotA := G1
+sumB := None
+sumC := None
+sumD := ZR
+dotE := G1
+dotF := G1
+dotG := G1

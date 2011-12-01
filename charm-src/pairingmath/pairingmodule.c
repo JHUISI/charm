@@ -1,6 +1,51 @@
 
 #include "pairingmodule.h"
 
+int exp_rule(GroupType lhs, GroupType rhs)
+{
+	if(lhs == ZR && rhs == ZR) return TRUE;
+	if(lhs == G1 && rhs == ZR) return TRUE;
+	if(lhs == G2 && rhs == ZR) return TRUE;
+	if(lhs == GT && rhs == ZR) return TRUE;
+	return FALSE; /* Fail all other cases */
+}
+
+int mul_rule(GroupType lhs, GroupType rhs)
+{
+	if(lhs == rhs) return TRUE;
+	if(lhs == ZR || rhs == ZR) return TRUE;
+	return FALSE; /* Fail all other cases */
+}
+
+int add_rule(GroupType lhs, GroupType rhs)
+{
+	if(lhs == rhs && lhs != GT) return TRUE;
+	return FALSE; /* Fail all other cases */
+}
+
+int sub_rule(GroupType lhs, GroupType rhs)
+{
+	if(lhs == rhs && lhs != GT) return TRUE;
+	return FALSE; /* Fail all other cases */
+}
+
+int div_rule(GroupType lhs, GroupType rhs)
+{
+	if(lhs == rhs) return TRUE;
+	return FALSE; /* Fail all other cases */
+}
+
+int pair_rule(GroupType lhs, GroupType rhs)
+{
+	if(lhs == G1 && rhs == G2) return TRUE;
+	return FALSE; /* Fall all other cases: only for MNT case */
+}
+
+int check_type(GroupType type) {
+	if(type == ZR || type == G1 || type == G2 || type == GT) return TRUE;
+	return FALSE;
+}
+
 #define ERROR_TYPE(operand, ...) "unsupported "#operand" operand types: "#__VA_ARGS__
 
 #define UNARY(f, m, n) \
@@ -678,6 +723,10 @@ static PyObject *Element_add(Element *self, Element *other)
 	}
 #endif
 
+	if( add_rule(self->element_type, other->element_type) == FALSE) {
+		PyErr_SetString(ElementError, "invalid add operation");
+		return NULL;
+	}
 	// start micro benchmark
 	START_CLOCK(dBench);
 	newObject = createNewElement(self->element_type, self->pairing);
@@ -701,6 +750,10 @@ static PyObject *Element_sub(Element *self, Element *other)
 		element_printf("Right: e => '%B'\n", other->e);				
 	}
 #endif
+	if( sub_rule(self->element_type, other->element_type) == FALSE) {
+		PyErr_SetString(ElementError, "invalid sub operation");
+		return NULL;
+	}
 	
 	START_CLOCK(dBench);
 	newObject = createNewElement(self->element_type, self->pairing);
@@ -717,7 +770,7 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 	Element *self = NULL, *other = NULL, *newObject = NULL;
 	signed long int z;
 	int found_int = FALSE;
-	
+
 	// lhs or rhs must be an element type
 	if(PyElement_Check(lhs)) {
 		self = (Element *) lhs;		
@@ -756,6 +809,11 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 	}
 	else if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
 		// both are element types
+		if( mul_rule(self->element_type, other->element_type) == FALSE) {
+			PyErr_SetString(ElementError, "invalid mul operation");
+			return NULL;
+		}
+
 		if(self->element_type != ZR && other->element_type == ZR) {
 			START_CLOCK(dBench);
 			newObject = createNewElement(self->element_type, self->pairing);
@@ -840,6 +898,11 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 	}
 	else if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
 		// both are element types
+		if( div_rule(self->element_type, other->element_type) == FALSE) {
+			PyErr_SetString(ElementError, "invalid div operation");
+			return NULL;
+		}
+
 		START_CLOCK(dBench);
 		newObject = createNewElement(self->element_type, self->pairing);
 		element_div(newObject->e, self->e, other->e);
@@ -929,6 +992,10 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		debug("Starting '%s'\n", __func__);
 		debug_e("LHS: e => '%B'\n", lhs_o1->e);
 		debug_e("RHS: e => '%B'\n", rhs_o2->e);
+		if( exp_rule(lhs_o1->element_type, rhs_o2->element_type) == FALSE) {
+			PyErr_SetString(ElementError, "invalid exp operation");
+			return NULL;
+		}
 
 		if(rhs_o2->element_type == ZR) {
 			// element_pow_zn(newObject->e, lhs_o1->e, rhs_o1->e);
@@ -1028,7 +1095,7 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 		return (PyObject *) newObject;
 	}
 
-	if(Check_Elements(lhs, rhs) && Check_Types(lhs->element_type, rhs->element_type, 'e')) {
+	if(Check_Elements(lhs, rhs) && pair_rule(lhs->element_type, rhs->element_type) == TRUE) {
 		// apply pairing
 		debug_e("LHS: '%B'\n", lhs->e);
 		debug_e("RHS: '%B'\n", rhs->e);
@@ -1462,6 +1529,86 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 	return NULL;
 }
 
+void print_mpz(mpz_t x, int base) {
+//#ifdef DEBUG
+	if(base <= 2 || base > 64) return;
+	size_t x_size = mpz_sizeinbase(x, base) + 2;
+	char *x_str = (char *) malloc(x_size);
+	x_str = mpz_get_str(x_str, base, x);
+	printf("Element => '%s'\n", x_str);
+	printf("Order of Element => '%zd'\n", x_size);
+	free(x_str);
+//#endif
+}
+
+int check_membership(Element *elementObj) {
+	int result = -1;
+	element_t e;
+
+	if(elementObj->element_type == ZR) {
+		/* check value is between 1 and order */
+		mpz_t zr;
+		mpz_init(zr);
+		element_to_mpz(zr, elementObj->e);
+		int ans = mpz_cmp(zr, elementObj->pairing->pair_obj->Zr->order);
+		result = ans <= 0 ? TRUE : FALSE;
+		mpz_clear(zr);
+	}
+	/* for G1, G2, and GT test e^q == 1 (mod q)? */
+	else if(elementObj->element_type == G1) {
+		element_init_G1(e, elementObj->pairing->pair_obj);
+		element_pow_mpz(e, elementObj->e, elementObj->pairing->pair_obj->G1->order);
+		result = element_is1(e) ? TRUE : FALSE; // TODO: verify this
+		element_clear(e);
+	}
+	else if(elementObj->element_type == G2) {
+		element_init_G2(e, elementObj->pairing->pair_obj);
+		element_pow_mpz(e, elementObj->e, elementObj->pairing->pair_obj->G2->order);
+		result = element_is1(e) ? TRUE : FALSE; // TODO: verify this
+		element_clear(e);
+	}
+	else if(elementObj->element_type == GT) {
+		element_init_GT(e, elementObj->pairing->pair_obj);
+		element_pow_mpz(e, elementObj->e, elementObj->pairing->pair_obj->GT->order);
+		result = element_is1(e) ? TRUE : FALSE; // TODO: verify this
+		element_clear(e);
+	}
+	else {/* not a valid type */ }
+	return result;
+}
+
+
+static PyObject *Group_Check(Element *self, PyObject *args) {
+
+	IS_PAIRING_OBJ_NULL(self);
+
+	PyObject *object = NULL;
+	if(PyArg_ParseTuple(args, "O", &object)) {
+		if(PyElement_Check(object)) {
+			Element *elem = (Element *) object;
+
+			if(check_membership(elem) == TRUE) {
+				Py_INCREF(Py_True);
+				return Py_True;
+			}
+			else {
+				Py_INCREF(Py_False);
+				return Py_False;
+			}
+		}
+	}
+
+	PyErr_SetString(ElementError, "invalid object type.");
+	return NULL;
+}
+
+static PyObject *Get_Order(Element *self, PyObject *args) {
+
+	IS_PAIRING_OBJ_NULL(self);
+	PyObject *object = (PyObject *) mpzToLongObj(self->pairing->pair_obj->r);
+	return object; /* returns a PyInt */
+}
+
 #if PY_MAJOR_VERSION >= 3
 
 PyTypeObject PairingType = {
@@ -1757,6 +1904,8 @@ PyMethodDef Element_methods[] = {
 	{"H", (PyCFunction)Element_hash, METH_VARARGS, "Hash an element type to a specific field: Zr, G1, or G2"},
 	{"serialize", (PyCFunction)Serialize_cmp, METH_VARARGS, "Serialize an element type into bytes."},
 	{"deserialize", (PyCFunction)Deserialize_cmp, METH_VARARGS, "De-serialize an bytes object into an element object"},
+	{"ismember", (PyCFunction) Group_Check, METH_VARARGS, "Group membership test for element objects."},
+	{"order", (PyCFunction) Get_Order, METH_NOARGS, "Get the group order for a particular field."},
     {NULL}  /* Sentinel */
 };
 

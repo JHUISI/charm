@@ -3,7 +3,7 @@ from batchlang import *
 import batchparser
 import string
 
-class InstanceFinder:
+class ExpInstanceFinder:
     def __init__(self):
         # keys must match
         self.instance = {}
@@ -42,9 +42,81 @@ class InstanceFinder:
         return
 
 
+class PairInstanceFinder:
+    def __init__(self):
+        # keys must match
+        self.instance = {}
+        self.index = 0
+        self.rule = "Merge pairings with common first or second element."
+        
+    def visit(self, node, data):
+        pass
+    
+    def visit_pair(self, node, data):
+        lhs = node.left
+        rhs = node.right
+        if Type(lhs) == ops.ATTR:
+            key = 'lnode'
+
+        if Type(rhs) == ops.ATTR:
+            key = 'rnode'        
+        if Type(data['parent']) == ops.ON:
+            self.record(key, node, data['parent'])
+        else:
+            self.record(key, node)
+        return
+
+    def record(self, key, node, parent=None):
+        lnode = node.left
+        rnode = node.right
+        #print("key =>", key, ", nodes =>", lnode, rnode)
+        found = False
+        for i in self.instance.keys():
+            data = self.instance[ i ]
+            if data['key'] == 'lnode':
+                if str(lnode) == str(data['lnode']): # found a match
+                    data['instance'] += 1; 
+                    data['rnode1'] = rnode 
+                    # save some state to delete this node on second pass                    
+                    if parent: data['rnodePair'] = parent
+                    else: data['rnodePair'] = node                    
+                    found = True
+                    break
+            elif data['key'] == 'rnode':
+                if str(rnode) == str(data['rnode']):
+                    data['instance'] += 1
+                    data['lnode1'] = lnode
+                    # save some state to delete this node on second pass
+                    if parent: data['lnodePair'] = parent
+                    else: data['lnodePair'] = node                    
+                    found = True
+                    break
+        # if not found
+        if not found:
+            self.instance[ self.index ] = { 'key':key, 'lnode':lnode, 'rnode':rnode, 'instance':1 }
+            self.index += 1
+        return
+
+    def checkForMultiple(self):
+        for i in self.instance.keys():
+            data = self.instance[ i ]
+            if data['instance'] > 1:
+                return data
+        return None
+    
+    def makeSubstitution(self, equation):
+        # first get a node in which 
+        pairDict = self.checkForMultiple()
+        if pairDict != None:
+            #print("Pair =>", pairDict)
+            batchparser.ASTVisitor( SubstitutePairs( pairDict ) ).preorder( equation )
+            #print("Done\n")
+            
+        
+
 # substitute nodes that can be precomputed with a stub
 # variable that is computed later
-class Substitute:
+class SubstituteExps:
     def __init__(self, op_instance, precomp, variables):
         # assert input is not equal to None
         self.instance = op_instance
@@ -60,9 +132,9 @@ class Substitute:
     def canExpBePrecomputed(self, base, exp):
         for i in self.instance.keys():
             for j in self.instance[ i ].keys():
-                if self.instance[ i ][ j ] > 1 and (i == str(base) and j == str(exp)):
+                if self.instance[ i ][ j ] > 1 and (i == str(base) and j == str(exp)) and len(base.attr_index) == 1:
                     # combine sets: TODO
-                    #if base.attr_index: index = base.attr_index[0] 
+                    if base.attr_index: index = base.attr_index[0] 
                     if exp.attr_index: index = exp.attr_index[0]
                     else: index = None
                     _key = self.record(str(i), str(j), index)
@@ -151,26 +223,101 @@ class Substitute:
             else:
                 print("Substitute: missing some cases: ", Type(right))
 
+class SubstitutePairs:
+    def __init__(self, pairDict):
+        self.pairDict = pairDict
+        self.key = pairDict['key']
+        self.left = pairDict['lnode']
+        self.right = pairDict['rnode']
+        if self.key == 'rnode': # if right, then extra left
+            self.extra = pairDict['lnode1'] 
+            self.extra_pair = pairDict['lnodePair']
+        elif self.key == 'lnode':
+            self.extra = pairDict['rnode1']
+            self.extra_pair = pairDict['rnodePair']            
+        
+        self.deleteOtherPair = False
+    
+    def visit(self, node, data):
+        if self.deleteOtherPair:
+            if str(node.left) == str(self.extra_pair):
+                # extra node we are to remove
+                batchparser.addAsChildNodeToParent(data, node.right)                
+            elif str(node.right) == str(self.extra_pair):
+                # extra node we are to remove                
+                batchparser.addAsChildNodeToParent(data, node.left)
+
+        
+        
+    def visit_pair(self, node, data):
+        if self.key == 'rnode':
+            # find the attribute node on the right
+            if str(node.right) == str(self.right) and Type(node.right) == ops.ATTR:
+                #print("Found a right match: ", node)
+                if Type(self.left) == Type(self.extra) and Type(self.left) and ops.ON:
+                    n = self.combine(self.left, self.extra)
+                    self.left.right = n
+                    #print("ans => ", self.left)
+                    node.left = BinaryNode.copy(self.left)
+                    #print("node =>", node)
+                    self.deleteOtherPair = True
+                # find the second pair node
+#                n = BinaryNode(ops.MUL)
+#                n.left = self.left
+#                n.right = self.extra
+                
+                
+        elif self.key == 'lnode':
+            if str(node.left) == str(self.left):
+                print("Found a left match: ", node)
+    def combine(self, subtree1, subtree2, parentOfTarget=None):
+        if subtree2 == None: return None
+        elif subtree2.left == None: pass
+        elif Type(subtree1.left) == Type(subtree2.left):
+            result = self.combine(subtree1.right, subtree2.right, subtree1)
+            if result:                 
+                n = BinaryNode(ops.MUL)
+                n.left = subtree1.right
+                n.right = subtree2.right
+                return n
+            return None    
+        # check if node is a LEAF. if so report that node is different 
+        if Type(subtree2) == ops.ATTR:
+            return True
+
+    def mergeWithMul(self, subtree1, subtree2):
+        checkSubtrees = False
+        self.mergeWithMul(subtree1.left, subtree2.left)
+        #if subtree2 == None: return None
+#        if Type(subtree1) == Type(subtree2):
+#            pass
+        self.mergeWithMul(subtree1.right, subtree2.right)
+
 class SubstituteSigDotProds:
-    def __init__(self, index='j', sig='N' ):
+    def __init__(self, vars, index='z', sig='N' ):
         self.prefix = 'dot' # self.prefix + self.alpha[cnt]; cnt += 1
         self.alpha = string.ascii_uppercase
         self.cnt = 0        
         self.sig = sig 
         self.index = index 
-        self.dotprod = { 'start':'1', 'stop':self.sig, 'index':self.index, 'list':[], 'dict':{} }
+        self.vars_def = vars
+        self.dotprod = { 'start':'1', 'stop':self.sig, 'index':self.index, 'list':[], 'dict':{}, 'types':{} }
 
     def setState(self, count):
         self.cnt = count # allow us to maintain a synchronized alphabet
         
-    def getkey(self):
-        key = self.prefix + self.alpha[self.cnt]
+    def getkey(self, prefix=None):
+        if prefix:
+            key = prefix + self.alpha[self.cnt]
+        else: 
+            key = self.prefix + self.alpha[self.cnt]
         self.cnt += 1
         #print('key =>', key)
         return key
     
-    def store(self, key, value):
+    def store(self, key, value, the_type=None):
         self.dotprod[ 'dict' ][ key ] = value
+        self.dotprod[ 'types' ][ key ] = the_type
         self.dotprod[ 'list' ].append( key )
     
     def visit(self, node, data):
@@ -178,30 +325,37 @@ class SubstituteSigDotProds:
     
     def visit_on(self, node, data):
         index = str(node.left.right.attr)
+        dot_type = self.deriveNodeType(node.right)
+        #print("node.right type +=> ", dot_type, node.right)
         #print("index =>", index)
 
         n = self.searchProd(node.right, node)
         if n:
             (t, p) = n
 #            print("Found it:", t)
+            dot_type2 = self.deriveNodeType(t.right)
             # perform substition
             subkey = BinaryNode(self.getkey())
-            self.store(subkey, t)
+            self.store(subkey, t, dot_type2)
             if p.left == t:
                 p.left = subkey
 #                print("p =>", p)
         
         if index == self.sig:
             key = BinaryNode(self.getkey())
-            self.store(key, node)
+            self.store(key, node, dot_type)
+            
             batchparser.addAsChildNodeToParent(data, key)
     
     def visit_of(self, node, data):
         sig = str(node.left.right.attr)
 
         if sig == self.sig:
-            key = BinaryNode(self.getkey())
-            self.store(key, node)
+            key = BinaryNode(self.getkey('sum'))
+            if node.right.getAttribute() == 'delta':
+                self.store(key, node, 'ZR')
+            else:
+                self.store(key, node)
             batchparser.addAsChildNodeToParent(data, key)
             
                 
@@ -214,3 +368,24 @@ class SubstituteSigDotProds:
             if result: return result            
             result = self.searchProd(node.right, node)
             return result
+
+    def deriveNodeType(self, node):
+        if node.type == ops.ATTR:
+            _type = node.attr
+        elif node.type == ops.HASH:
+            _type = str(node.right.attr)
+            return _type
+        elif node.type == ops.EXP:
+            return self.deriveNodeType(node.left)
+        elif node.type == ops.PAIR:
+            return 'GT'
+        elif node.type == ops.ON:
+            return self.deriveNodeType(node.right)
+        elif node == None:
+            return None
+        else:
+            return self.deriveNodeType(node.left)
+        #print("printing type =>", _type)
+        #print("node =>", node)
+        assert self.vars_def.get(_type) != None, "Key error in vars db => '%s'" % _type
+        return self.vars_def[_type]

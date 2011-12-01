@@ -32,13 +32,18 @@ Demonstration Schemes
    schemes/pkenc_rsa
    schemes/pksig_adapt_naor01
    schemes/pksig_bls04
+   schemes/pksig_boyen
    schemes/pksig_chch
    schemes/pksig_chp
+   schemes/pksig_cyh
    schemes/pksig_dsa
    schemes/pksig_ecdsa
    schemes/pksig_hess
+   schemes/pksig_hw
    schemes/pksig_schnorr91
+   schemes/pksig_waters
    schemes/pksig_waters05
+   schemes/poly_sdh
    schemes/protocol_cns07
    schemes/protocol_schnorr91
    schemes/sigma1

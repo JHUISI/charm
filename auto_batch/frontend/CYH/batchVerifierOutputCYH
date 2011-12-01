@@ -1,0 +1,45 @@
+['cyh.bv']
+types  => {'mpk#1': 'G2', 'sk': 'G1', 'S': 'G1', 'r': 'ZR', 'u': 'G1', 'pk': 'G1'}
+constant  => ['mpk#0', 'mpk#1']
+variables => {'l': '30', 'mpk#1': 'G2', 'sk': 'G1', 'S': 'G1', 'r': 'ZR', 'u': 'G1', 'pk': 'G1', 'N': '100'}
+metadata => {'l': '30', 'N': '100'}
+batch algorithm => ['2', '3']
+
+VERIFY EQUATION => verify := e((prod{y := 1,l} on (u_y * pk_y^h_y)),mpk#0) == e(S,mpk#1)
+
+Stage A: Combined Equation => verify := (prod{z := 1,N} on e((prod{y := 1,l} on (u_y%z * pk_y%z^h_y%z)),mpk#0)) == (prod{z := 1,N} on e(S_z,mpk#1))
+
+Stage B: Small Exp Test => verify := (prod{z := 1,N} on e((prod{y := 1,l} on (u_y%z * pk_y%z^h_y%z)),mpk#0)^delta_z) == (prod{z := 1,N} on e(S_z,mpk#1)^delta_z) 
+
+Rule 2: Left := Move 'delta_z' exponent into the pairing. Left := Move 'delta_z' exponent into the pairing.  
+
+Applying technique 2 => : verify := (prod{z := 1,N} on e((prod{y := 1,l} on (u_y%z * pk_y%z^h_y%z))^delta_z,mpk#0)) == (prod{z := 1,N} on e(S_z^delta_z,mpk#1)) 
+
+Rule 3: common 1st (left) node appears, so can reduce n pairings to 1. common 1st (left) node appears, so can reduce n pairings to 1.  
+
+Applying technique 3 => : verify := e((prod{z := 1,N} on (prod{y := 1,l} on (u_y%z * pk_y%z^h_y%z))^delta_z),mpk#0) == e((prod{z := 1,N} on S_z^delta_z),mpk#1) 
+
+Instances found => {'pk_y%z': {'h_y%z': 1}, 'S_z': {'delta_z': 1}} 
+
+Final batch eq: e((prod{z := 1,N} on (prod{y := 1,l} on (u_y%z * pk_y%z^h_y%z))^delta_z),mpk#0) == e((prod{z := 1,N} on S_z^delta_z),mpk#1)
+Final indiv eq: e((prod{y := 1,l} on (u_y%z * pk_y%z^h_y%z)),mpk#0) == e(S_z,mpk#1) 
+
+Result N = 100 : 82.5070144
+Result N = 100 : 55.7530838
+Threshold:  2
+<====	PREP FOR CODE GEN	====>
+
+Final version => e(dotB,mpk#0) == e(dotC,mpk#1) 
+
+Compute:  dotA := (prod{y := 1,l} on (u_y%z * pk_y%z^h_y%z))
+Compute:  dotB := (prod{z := 1,N} on dotA^delta_z)
+Compute:  dotC := (prod{z := 1,N} on S_z^delta_z)
+Precompute: h := H(M | L | u,ZR)
+Precompute: S := sk^(h + r)
+Precompute: delta := for{z := 1, N} do prng_z
+dotA := G1
+dotB := G1
+dotC := G1
+List := u in l
+List := pk in l
+List := h in l

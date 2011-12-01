@@ -48,7 +48,7 @@ class EC_CS98(PKEnc):
         sk = { 'x1' : x1, 'x2' : x2, 'y1' : y1, 'y2' : y2, 'z' : z }
         return (pk, sk)
 
-    @input(pk_t, str)
+    @input(pk_t, bytes)
     @output(c_t)
     def encrypt(self, pk, M):
         r     = group.random()
@@ -63,7 +63,7 @@ class EC_CS98(PKEnc):
         return c
     
     @input(pk_t, sk_t, c_t)
-    @output(str)
+    @output(bytes)
     def decrypt(self, pk, sk, c):
         alpha = group.hash((c['u1'], c['u2'], c['e']))
         v_prime = (c['u1'] ** (sk['x1'] + (sk['y1'] * alpha))) * (c['u2'] ** (sk['x2'] + (sk['y2'] * alpha)))
@@ -78,7 +78,7 @@ def main():
     pkenc = EC_CS98(prime192v1)
     
     (pk, sk) = pkenc.keygen()
-    M = "hello world!!!"
+    M = b"hello world!!!"
 
     ciphertext = pkenc.encrypt(pk, M)
     

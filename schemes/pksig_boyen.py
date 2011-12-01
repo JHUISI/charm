@@ -1,4 +1,17 @@
-""" TODO: Description of Scheme here.
+""" 
+Xavier Boyen - Anonymous Ring Signatures
+
+| From: "X. Boyen. Mesh Signatures: How to Leak a Secret with Unwitting and Unwilling Participants"
+| Published in: EUROCRYPT 2007
+| Available from: http://eprint.iacr.org/2007/094.pdf
+| Notes: 
+
+* type:           signature (ring-based)
+* setting:        bilinear groups (asymmetric)
+
+:Authors:    J. Ayo Akinyele
+:Date:       11/2011
+
 """
 from charm.pairing import *
 from toolbox.PKSig import PKSig

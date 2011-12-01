@@ -67,7 +67,7 @@ class BatchParser:
         #Operator = OperatorAND | OperatorOR | Token
 
         # describes an individual leaf node
-        leafNode = Word(alphanums + '_-').setParseAction( createNode )
+        leafNode = Word(alphanums + '_-#\\').setParseAction( createNode )
         expr = Forward()
         term = Forward()
         factor = Forward()
@@ -161,19 +161,34 @@ def parseFile(filename):
     fd.close()
     return ast_tree
 
-# keywords
+# valid keywords
 START_TOKEN, END_TOKEN = 'BEGIN', 'END'
-TYPE, CONST, PRECOMP, SIGNATURE, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'signature', 'other', 'transform'
+TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
+MESSAGE, SIGNATURE, PUBLIC, LATEX = 'message','signature', 'public', 'latex'
+# qualifier (means only one instance of that particular keyword exists)
+SAME, DIFF = 'one', 'many'
 
 def clean(arr):
     return [i.strip() for i in arr]
 
 def handle(lines, target):
+    if target == LATEX:
+        code = {}; EQ = ':='
+        for line in lines:
+            line = line.rstrip()
+            if line.find(EQ) != -1:
+                x = line.split(EQ)
+                lhs, rhs = x[0].strip(), x[1].strip()
+                code [ lhs ] = rhs
+        print("latex =>", code)
+        return code
+    
+    # parse as usual
     parser = BatchParser()
     if type(lines) != list:
         return parser.parse(lines)
 
-    if target in [CONST, SIGNATURE, TRANSFORM]:
+    if target in [CONST, TRANSFORM, PUBLIC, SIGNATURE, MESSAGE]:
         # parse differently 'a, b, etc.\n'
         _ast = []
         for line in lines:
@@ -207,14 +222,13 @@ def handle(lines, target):
                 batch_ast[ BinaryNode.copy(left) ] = BinaryNode.copy(right)
         #print(target, " =>", indiv_ast)
         return (indiv_ast, batch_ast)
-    
     return None
 
 debugs = levels.none
 
 def parseFile2(filename):
     fd = open(filename, 'r')
-    ast = {TYPE: None, CONST: None, PRECOMP: None, TRANSFORM: None, SIGNATURE: None, OTHER: [] }
+    ast = {TYPE: None, CONST: None, PRECOMP: None, TRANSFORM: None, MESSAGE: None, SIGNATURE: None, PUBLIC: None, LATEX: None, OTHER: [] }
     
     # parser = BatchParser()
     code = fd.readlines(); i = 1
@@ -223,7 +237,7 @@ def parseFile2(filename):
     for line in code:
         if line.find('::') != -1: # parse differently
             token = clean(line.split('::'))
-            if token[0] == START_TOKEN and (token[1] in [TYPE, CONST, PRECOMP, SIGNATURE, TRANSFORM]):
+            if token[0] == START_TOKEN and (token[1] in [TYPE, CONST, PRECOMP, TRANSFORM, MESSAGE, SIGNATURE, PUBLIC, LATEX]):
                 inStruct = (True, token[1])
                 if debugs == levels.all: print("Got a section!!!")
                 continue
@@ -397,13 +411,14 @@ class ASTAddIndex:
         if data['parent'].type in [ops.PROD, ops.EQ]:
             return
         if not self.isConstant(node):
-            node.setAttrIndex('j') # add index to each attr that isn't constant
+            node.setAttrIndex('z') # add index to each attr that isn't constant
     
     def isConstant(self, node):        
         for n in self.consts:
             if n == node.getAttribute(): return True
         return False
         
+# for single signer scenario only
 class CombineVerifyEq:
     def __init__(self, constants, variables):
         self.consts = constants
@@ -428,11 +443,11 @@ class CombineVerifyEq:
         if data['parent'].type in [ops.PROD, ops.EQ]:
             return
         if not self.isConstant(node):
-            node.setAttrIndex('j') # add index to each attr that isn't constant
+            node.setAttrIndex('z') # add index to each attr that isn't constant
     
     def newProdNode(self):
         p = BatchParser()
-        new_node = p.parse("prod{j:=1, N} on x")
+        new_node = p.parse("prod{z:=1, N} on x")
         return new_node
 
     def isConstant(self, node):
@@ -442,11 +457,102 @@ class CombineVerifyEq:
             #if n.getAttribute() == node.getAttribute(): return True
         return False
 
+class CVForMultiSigner:
+    def __init__(self, var_types, sig_vars, pub_vars, msg_vars, setting):
+        self.vars = var_types
+        assert type(pub_vars) == list, "public vars needs to be in a list"
+        self.pub  = pub_vars # list of variable names
+        self.pubKey = 'i'; self.pubEnd = 'S' # should be standard
+        assert type(sig_vars) == list, "signature vars need to be in a list"
+        self.sig  = sig_vars # list of variable names
+        assert type(msg_vars) == list, "message vars need to be in a list"
+        self.msg  = msg_vars
+        self.setting = setting
+    
+    def visit(self, node, data):
+        pass
+    
+    def visit_eq_tst(self, node, data):
+        # distribute prod to left and right side
+        if Type(node.left) != ops.EQ:
+            prodL = self.newProdNode() # check if sig vars appear in left side?
+            prodL.right = node.left
+            node.left = prodL
+        
+        if Type(node.right) != ops.EQ:
+            prodR = self.newProdNode()
+            prodR.right = node.right
+            node.right = prodR
+            
+        # check whether the pub vars appear in left subtree
+        if self.setting.get(PUBLIC) == DIFF:
+            if Type(node.left) != ops.EQ and self.isPubInSubtree(node.left):
+                prodL2 = self.newProdNode(self.pubKey, self.pubEnd)
+                prodL2.right = node.left
+                node.left = prodL2
+            elif Type(node.right) != ops.EQ and self.isPubInSubtree(node.right):
+                prodR2 = self.newProdNode(self.pubKey, self.pubEnd)
+                prodR2.right = node.right
+                node.right   = prodR2
+        else:
+            pass
+
+                    
+    def visit_attr(self, node, data):
+        if data['parent'].type in [ops.PROD, ops.EQ]:
+            return
+        if self.isSig(node):
+            node.setAttrIndex('z') # add index to each attr that isn't constant
+        if self.isPub(node) and self.setting.get(PUBLIC) == DIFF:
+            node.setAttrIndex('i')
+        if self.isMsg(node) and self.setting.get(MESSAGE) == DIFF:
+            node.setAttrIndex('z')
+    
+    def newProdNode(self, key=None, end=None):
+        p = BatchParser()
+        if key and end:
+            new_node = p.parse("prod{"+key+":=1,"+end+"} on x")        
+        else:
+            new_node = p.parse("prod{z:=1, N} on x")
+        return new_node
+
+    def isPub(self, node):
+        if self.pub:        
+            for n in self.pub:
+                if n == node.getAttribute(): return True            
+            #if n.getAttribute() == node.getAttribute(): return True
+        return False
+
+    def isSig(self, node):
+        if self.sig:        
+            for n in self.sig:
+                if n == node.getAttribute(): return True            
+            #if n.getAttribute() == node.getAttribute(): return True
+        return False
+
+    def isMsg(self, node):
+        if self.msg:        
+            for n in self.msg:
+                if n == node.getAttribute(): return True            
+            #if n.getAttribute() == node.getAttribute(): return True
+        return False
+
+    def isPubInSubtree(self, tree):
+        if tree == None: return None
+        elif Type(tree) == ops.ATTR and self.isPub(tree):
+            return True
+        else:
+            result = self.isPubInSubtree(tree.left)
+            if result: return result # if True, then end search else continue
+            return self.isPubInSubtree(tree.right)
+            
+
+
 # Focuses on simplifying dot products of the form
 # prod{} on (x * y)
 class SimplifyDotProducts:
     def __init__(self):
-        self.rule = "simplify dot products: "
+        self.rule = "Simplify dot products: "
 
     def getMulTokens(self, subtree, parent_type, target_type, _list):
         if subtree == None: return None
@@ -470,7 +576,7 @@ class SimplifyDotProducts:
     # e.g., prod{} on (x * y) => prod{} on x * prod{} on y    
     def visit_on(self, node, data):
         if Type(data['parent']) == ops.PAIR:
-            self.rule += "False "
+            #self.rule += "False "
             return
         #print("test: right node of prod =>", node.right, ": type =>", node.right.type)
         #print("parent type =>", Type(data['parent']))
@@ -498,7 +604,7 @@ class SimplifyDotProducts:
             
                 node.right = mul_node.left
                 mul_node.left = node
-                self.rule += "True "
+                #self.rule += "True "
                 # move mul_node one level up to replace the "on" node.
                 addAsChildNodeToParent(data, mul_node)
             elif len(r) > 2:
@@ -518,9 +624,9 @@ class SimplifyDotProducts:
                         muls[i].right = prod[i+1]
 #                print("final node =>", muls[0])
                 addAsChildNodeToParent(data, muls[0])                
-                self.rule += "True "
+                #self.rule += "True "
             else:
-                self.rule += "False "
+                #self.rule += "False "
                 return                
 
 
@@ -546,13 +652,13 @@ class SmallExponent:
         if node.right.type == ops.EXP:
             exp = node.right
             mul = BinaryNode(ops.MUL)
-            mul.right = BinaryNode("delta_j")
+            mul.right = BinaryNode("delta_z")
             mul.left = exp.right
             exp.right = mul
         else:
             new_node = self.newExpNode()
             new_node.left = node.right
-            new_node.right = BinaryNode("delta_j")
+            new_node.right = BinaryNode("delta_z")
             node.right = new_node
 #            new_node.right.setAttrIndex('j') # make more programmatic
     
@@ -566,8 +672,8 @@ class Technique2:
     def __init__(self, constants, variables, meta):
         self.consts = constants
         self.vars   = variables
-        #print("Rule 2: Move the exponent(s) into the pairing")
-        self.rule   = "Rule 2: "
+        self.rule   = "Move the exponent(s) into the pairing (technique 2)"
+        #self.rule   = "Rule 2: "
         # TODO: pre-processing to determine context of how to apply technique 2
         # TODO: in cases of chp.bv, where you have multiple exponents outside a pairing, move them all into the e().
     
@@ -580,18 +686,19 @@ class Technique2:
         #print("left node =>", node.left.type,"target right node =>", node.right)
         if(Type(node.left) == ops.PAIR):   # and (node.right.attr_index == 'i'): # (node.right.getAttribute() == 'delta'):
             pair_node = node.left
-            addAsChildNodeToParent(data, pair_node) # move pair node one level up
                                   # make cur node the left child of pair node
             # G1 : pair.left, G2 : pair.right
             if not self.isConstInSubtreeT(pair_node.left):
+                addAsChildNodeToParent(data, pair_node) # move pair node one level up
                 node.left = pair_node.left
                 pair_node.left = node
-                self.rule += "Left := Move '" + str(node.right) + "' exponent into the pairing. "
+                #self.rule += "Left := Move '" + str(node.right) + "' exponent into the pairing. "
             
             elif not self.isConstInSubtreeT(pair_node.right):       
+                addAsChildNodeToParent(data, pair_node) # move pair node one level up                
                 node.left = pair_node.right
                 pair_node.right = node 
-                self.rule += "Right := Move '" + str(node.right) + "' exponent into the pairing. "
+                #self.rule += "Right := Move '" + str(node.right) + "' exponent into the pairing. "
             else:
                 pass
         # blindly move the right node of prod{} on x^delta regardless    
@@ -622,10 +729,10 @@ class Technique2:
                                     muls[i].right = self.createExp(_subnodes[i+1], BinaryNode.copy(node.right))
                             #print("root =>", muls[0])
                             pair_node.right = muls[0]
-                            self.rule += "distributed exponent into the pairing: right side. "
+                            #self.rule += "distributed exponent into the pairing: right side. "
                         else:
                             self.setNodeAs(pair_node, 'right', node, 'left')
-                            self.rule += "moved exponent into the pairing: less than 2 mul nodes. "
+                            #self.rule += "moved exponent into the pairing: less than 2 mul nodes. "
 
                     elif Type(pair_node.right) == ops.ATTR:
                         # set pair node left child to node left since we've determined
@@ -652,7 +759,7 @@ class Technique2:
             mul_node.left = self.createExp(mul_node.left, BinaryNode.copy(node.right))
             mul_node.right = self.createExp(mul_node.right, BinaryNode.copy(node.right))
             addAsChildNodeToParent(data, mul_node)            
-            self.rule += " distribute the exp node when applied to a MUL node. "
+            #self.rule += " distributed the exp node when applied to a MUL node. "
             # Note: if the operands of the mul are ATTR or PAIR doesn't matter. If the operands are PAIR nodes, PAIR ^ node.right
             # This is OK b/c of preorder visitation, we will apply transformations to the children once we return.
             # The EXP node of the mul children nodes will be visited, so we can apply technique 2 for that node.
@@ -700,7 +807,7 @@ class Technique2:
         elif Type(node) == ops.HASH:
             return self.isConstant(node.left)
         result = self.isConstInSubtreeT(node.left)
-        if result: return result
+        if not result: return result
         result = self.isConstInSubtreeT(node.right)
         return result
 
@@ -713,8 +820,8 @@ class Technique3:
     def __init__(self, constants, variables, meta):
         self.consts = constants
         self.vars   = variables
-        self.rule   = "Rule 3: "
-        #print("Rule 3: When two pairings with common 1st or 2nd element appear, then can be combined. n pairs to 1.")
+        #self.rule   = "Rule 3: "
+        self.rule   = "Combine pairings with common 1st or 2nd element. Reduce N pairings to 1 (technique 3)"
     
     def visit(self, node, data):
         pass
@@ -757,7 +864,7 @@ class Technique3:
                 mul.right = self.createPair(left, child_node2)
                 #print("new node =+>", mul)
                 addAsChildNodeToParent(data, mul)
-                self.rule += "split one pairing into two pairings. "
+#                self.rule += "split one pairing into two pairings. "
             else:
                 print("T3: missing case?")
         else:
@@ -766,6 +873,10 @@ class Technique3:
     # transform prod{} on pair(x,y) => pair( prod{} on x, y) OR pair(x, prod{} on y)
     # n pairings to 1 and considers the split reverse case
     def visit_on(self, node, data):
+        index = str(node.left.right)
+        if index != 'N' or Type(data['parent']) == ops.PAIR:
+            return # should check for other things before returning in the multi-signer case
+        
         if Type(node.right) == ops.PAIR:
             pair_node = node.right
             
@@ -788,21 +899,24 @@ class Technique3:
                         muls[i].right = self.createPair(left, r[i+1])
                 #print("root =>", muls[0])
                 node.right = muls[0]
-                self.rule += "split one pairing into two or three."
+                #self.rule += "split one pairing into two or three."
                 #addAsChildNodeToParent(data, muls[0])
             else:        
-                addAsChildNodeToParent(data, pair_node) # move pair one level up            
+                addAsChildNodeToParent(data, pair_node) # move pair one level up  
+# TODO: REVISIT THIS SECTION
+                #print("pair_node left +> ", pair_node.left, self.isConstInSubtreeT(pair_node.left))                              
                 if not self.isConstInSubtreeT(pair_node.left): # if F, then can apply prod node to left child of pair node              
                     node.right = pair_node.left
                     pair_node.left = node # pair points to 'on' node
-                    self.rule += "common 1st (left) node appears, so can reduce n pairings to 1. "
-                    self.visit_pair(pair_node, data)
-                    
+                    #self.rule += "common 1st (left) node appears, so can reduce n pairings to 1. "
+                    self.visit_pair(pair_node, data)                    
                 elif not self.isConstInSubtreeT(pair_node.right):
                     node.right = pair_node.right
                     pair_node.right = node
-                    self.rule += "common 2nd (right) node appears, so can reduce n pairings to 1. "
+                    #self.rule += "common 2nd (right) node appears, so can reduce n pairings to 1. "
                     self.visit_pair(pair_node, data)
+                else:
+                    pass
             return
         elif Type(node.right) == ops.EXP:
             exp = node.right
@@ -822,9 +936,10 @@ class Technique3:
     def isConstInSubtreeT(self, node): # check whether left or right node is constant  
         if node == None: return None
         if node.type == ops.ATTR:
+            #print("node =>", node, node.type, self.isConstant(node))
             return self.isConstant(node)
         result = self.isConstInSubtreeT(node.left)
-        if result: return result
+        if not result: return result
         result = self.isConstInSubtreeT(node.right)
         return result
 
@@ -906,7 +1021,7 @@ class Technique4:
         self.consts = constants
         self.vars   = variables
         self.meta = meta
-        self.rule = "Rule 4:"
+        self.rule = "Applied waters hash technique (technique 4)"
         #print("Metadata =>", meta)
     
     def visit(self, node, data):
@@ -928,7 +1043,7 @@ class Technique4:
                 # switch nodes between prod nodes of x (constant) and N
                 node.left = prod2
                 node2.left = prod
-                self.rule += " waters hash technique. "
+                #self.rule += " waters hash technique. "
                 # check if we need to redistribute or simplify?
 #                print("node2 =>", node2)
 #                print("parent =>", node2_parent, ":", Type(node2_parent))

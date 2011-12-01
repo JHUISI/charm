@@ -1,3 +1,8 @@
+# TODO: update transitions dictionary to allow for a list as keys such that we can allow a state to transition to multiple states!
+# TODO: provide a transition checker that prevents a feedback loop, inconsistent state.
+# TODO: automatically store the state of the input keys? basically, input.keys() then loop through and store
+# in user db that way user can eliminate store step on the receive side.
+
 from charm.engine.util import *
 MAX_SIZE = 2048
 

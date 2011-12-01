@@ -1,4 +1,16 @@
-""" TODO: Description of Scheme here.
+""" 
+Chow-Yiu-Hui - Identity-based ring signatures
+
+| From: "S. Chow, S. Yiu and L. Hui - Efficient identity based ring signature."
+| Published in: ACNS 2005
+| Available from: Vol 3531 of LNCS, pages 499-512
+| Notes: 
+
+* type:           signature (ring-based)
+* setting:        bilinear groups (asymmetric)
+
+:Authors:    J. Ayo Akinyele
+:Date:       11/2011
 """
 from charm.pairing import *
 from toolbox.PKSig import PKSig

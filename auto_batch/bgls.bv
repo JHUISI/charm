@@ -19,7 +19,7 @@ END :: constant
 
 # dot product of BLS signatures [i=1, L]
 BEGIN :: precompute
-sig := { prod{i:=1, l} on bsig_i }
+sig := { prod{y := 1, l} on bsig_y }
 abc := b-a
 END :: precompute
 
@@ -27,4 +27,4 @@ BEGIN :: transform
 2, 3, 4
 END :: transform
 
-verify := { e(sig, g2) == (prod{i := 1, l} on e(H(M_i, G1), pk_i)) }
+verify := { e(sig, g2) == (prod{y := 1, l} on e(H(M_y, G1), pk_y)) }

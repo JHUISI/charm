@@ -1,0 +1,37 @@
+# chch batch inputs
+# variables
+name := chch
+N := 100
+
+BEGIN ::types
+M := str
+P := G2
+pk := G1
+S1 := G1
+S2 := G1
+g2 := G2
+END :: types
+
+#sig := (S1, S2)
+BEGIN :: precompute
+a := H(M | S1, ZR)
+END :: precompute
+
+BEGIN :: constant 
+P, pk, g2
+END :: constant
+
+BEGIN :: signature
+S1, S2
+END :: signature
+
+# verify equation
+verify := { e(S2, g2) == e(S1 * pk^a, P) }
+
+BEGIN :: latex
+S1 := S_1
+S2 := S_2
+g2 := g_2
+P := P_{pub}
+END :: latex
+

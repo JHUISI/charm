@@ -3,7 +3,7 @@ l := 30
 
 BEGIN :: types
 r := ZR
-g2 := G2
+mpk#1 := G2
 S := G1
 u := G1
 pk := G1
@@ -16,7 +16,7 @@ S := sk^(h + r)
 END :: precompute
 
 BEGIN :: constant
-P, g2
+mpk#0, mpk#1
 END :: constant
 
-verify := { e((prod{i:=1, l} on (u_i * (pk_i^h_i))) , P) == e(S, g2) }
+verify := { e((prod{y:=1, l} on (u_y * (pk_y^h_y))) , mpk#0) == e(S, mpk#1) }
