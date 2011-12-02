@@ -128,9 +128,15 @@ libdir="\${prefix}/lib"
 sysconfdir="\${prefix}/etc"
 confsuffix="/charm"
 profiler="no"
-python_path=`which python`
+python_path="$(which python3)"
 wget="$(which wget)"
 
+#fall back to python if for some reason python3 does not exist 
+# there is still a version check later so it sitll has to be
+# python 3 
+if !  [ -n "$python_path"  ]; then
+   python_path="$(which python)"
+fi 
 # set -x
 
 # parse CC options first
@@ -550,14 +556,14 @@ fi
 #fi
 
 ##########################################
-# python 2.7 or 3 probe
+# python3 probe
 cat > $TMPC << EOF
 import sys
 
-if sys.hexversion >= int(0x2070000):
+if float(sys.version[:3]) >= 3.0:
    exit(0)
 else:
-   print("Need Python 2.7 or 3.x. Specify --python=/path/to/pythonX")
+   print("Need 3.x. Specify --python=/path/to/python3")
    exit(-1)
 EOF
 python3_found="no"
@@ -682,7 +688,6 @@ echo "CHARM_CFLAGS       $CHARM_CFLAGS"
 echo "LDFLAGS           $LDFLAGS"
 echo "make              $make"
 echo "python            $python_path"
-echo "pythonv2.7 or 3   $python3_found"
 echo "install           $install"
 echo "host CPU          $cpu"
 echo "wget              $wget"
