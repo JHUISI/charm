@@ -105,7 +105,7 @@ cc_i386=i386-pc-linux-gnu-gcc
 # Always add --enable-foo and --disable-foo command line args.
 # Distributions want to ensure that several features are compiled in, and it
 # is impossible without a --enable-foo that exits if a feature is not found.
-docs=""
+docs="no"
 sphinx_build="$(which sphinx-build)"
 integer_module="yes"
 ecc_module="yes"
@@ -421,7 +421,7 @@ echo "  --host-cc=CC             use C compiler CC [$host_cc] for code run at"
 echo "                           build time"
 echo "  --extra-cflags=CFLAGS    append extra C compiler flags CHARM_CFLAGS"
 echo "  --extra-ldflags=LDFLAGS  append extra linker flags LDFLAGS"
-echo "  --extra-cppflags=CPPFLAGS append extra preprocessor flasg CPPFLAGS"
+
 echo "  --make=MAKE              use specified make [$make]"
 echo "  --python=PATH            use specified path to python 3, if not standard"
 echo "  --install=INSTALL        use specified install [$install]"
@@ -703,12 +703,14 @@ echo "libm found        $libm_found"
 echo "libgmp found      $libgmp_found"
 echo "libpbc found      $libpbc_found"
 echo "libcrypto found   $libcrypto_found"
-echo "sphinx path       $sphinx_"
-
 #if test "$darwin" = "yes" ; then
 #    echo "Cocoa support     $cocoa"
 #fi
 echo "Documentation     $docs"
+if test "$docs" = "yes" ; then
+    echo "sphinx path       $sphinx_build"
+fi
+
 [ ! -z "$uname_release" ] && \
 echo "uname -r          $uname_release"
 
@@ -824,7 +826,6 @@ if test "$docs" = "yes" ; then
     echo "ERROR: sphinx-build not found"
     exit -1 
   fi
-  mkdir -p docs;
 fi
 if test "$python3_found" = "no" ; then
    echo "ERROR: python 3 not found."
@@ -890,6 +891,6 @@ echo "HAVE_LIBPBC=$libpbc_found" >> $config_mk
 echo "HAVE_LIBCRYPTO=$libcrypto_found" >> $config_mk
 echo "PYPARSING=$pyparse_found" >> $config_mk
 if test "$docs" = "yes" ; then
-    echo "SPHINX=$(which sphinx-build)" >> $config_mk
+    echo "SPHINX=$sphinx_build" >> $config_mk
 fi
 exit 0
