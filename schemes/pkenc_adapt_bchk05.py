@@ -16,6 +16,7 @@ from toolbox.IBEnc import *
 from charm.cryptobase import *
 from schemes.encap_bchk04 import *
 from schemes.ibenc_bb03 import *
+from charm.pairing import hash as sha1
 
 debug = False
 class BCHKIBEnc(IBEnc):
@@ -31,6 +32,15 @@ class BCHKIBEnc(IBEnc):
                 character = chr(character ^ letter)
             output += character
         return output
+
+    def elmtToString(self, g, length):
+        gH = sha1(g)
+
+        gStr = b''
+        while(len(gStr) < length):
+            gStr += gH
+
+        return gStr[:length]
 
     def __init__(self, scheme, groupObj, encscheme):
         global ibenc, group, encap
@@ -53,7 +63,7 @@ class BCHKIBEnc(IBEnc):
         m2 = m+x
 
         kprime = group.random(GT)
-        kprimeStr = group.serialize(kprime)
+        kprimeStr = self.elmtToString(kprime, len(m2))
 
         C1 = ibenc.encrypt(pk['PK'], ID2, kprime)
 
@@ -72,7 +82,8 @@ class BCHKIBEnc(IBEnc):
         ID2 = group.hash(c['ID'], ZR)
         SK = ibenc.extract(sk['msk'], ID2)
         kprime = ibenc.decrypt(pk, SK, c['C1'])
-        kprimeStr = group.serialize(kprime)
+
+        kprimeStr = self.elmtToString(kprime, len(c['C2']))
 
         m2 = self.str_XOR(c['C2'], kprimeStr)
 
