@@ -100,7 +100,7 @@ class IBE_SW05(IBEnc):
         '''dID must have an intersection overlap of at least d with Wprime to decrypt
         '''
         S = self.intersection_subset(w, CT['wPrime'], d)
-        coeffs = util.recoverCoefficients(CT['wPrime'])
+        coeffs = util.recoverCoefficients(S)
         prod = 1
         for i in S:            
             prod *= pair(sk['D'][i], CT['E'][i]) ** coeffs[i]
@@ -200,8 +200,8 @@ class IBE_SW05_LUC(IBEnc):
         '''dID must have an intersection overlap of at least d with Wprime to decrypt
         '''
         S = self.intersection_subset(w, CT['wPrime'], d)
-        print("S :=", S)
-        coeffs = util.recoverCoefficients(CT['wPrime'])
+        #print("S :=", S)
+        coeffs = util.recoverCoefficients(S)
         prod = 1
         for i in S:
             prod *= (pair(sk['d'][i], CT['E'][i]) / pair(sk['D'][i], CT['Eprimeprime'])) ** coeffs[i]
@@ -223,7 +223,7 @@ def main():
         print("mk =>", mk)
 
     w = ['insurance', 'id=2345', 'oncology', 'doctor', 'nurse', 'JHU'] #private identity
-    wPrime = ['insurance', 'id=2345', 'doctor', 'oncology'] #public identity for encrypt
+    wPrime = ['insurance', 'id=2345', 'doctor', 'oncology', 'JHU', 'billing', 'misc'] #public identity for encrypt
 
     (w_hashed, sk) = ibe.extract(mk, w, pk, d, n)
 
