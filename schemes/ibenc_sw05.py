@@ -73,7 +73,6 @@ class IBE_SW05(IBEnc):
         D = {}; t_index = {};
         for i in w_hash:       
             j = w_hash.index(i)
-#            print("j :=", j, ", share :=", shares[j])
             D[i] = (pk['g'] ** (shares[j][1] / mk['t'][j]))
             # dictionary for finding corresponding T public value when encrypting 
             # this eliminates ordering of attribute issues
@@ -176,7 +175,7 @@ class IBE_SW05_LUC(IBEnc):
         d = {}
         for i in w_hash:       
             j = w_hash.index(i)
-            D[i] = (pk['g2'] ** shares[j][1]) * (self.eval_T(pk, n, i) ** r)  # (pk['g'] ** (shares[j][1] / mk['t'][j]))
+            D[i] = (pk['g2'] ** shares[j][1]) * (self.eval_T(pk, n, i) ** r)
             d[i] = pk['g'] ** r
 
         return (w_hash, { 'D':D, 'd':d })
@@ -201,6 +200,7 @@ class IBE_SW05_LUC(IBEnc):
         '''dID must have an intersection overlap of at least d with Wprime to decrypt
         '''
         S = self.intersection_subset(w, CT['wPrime'], d)
+        print("S :=", S)
         coeffs = util.recoverCoefficients(CT['wPrime'])
         prod = 1
         for i in S:
@@ -223,7 +223,7 @@ def main():
         print("mk =>", mk)
 
     w = ['insurance', 'id=2345', 'oncology', 'doctor', 'nurse', 'JHU'] #private identity
-    wPrime = ['insurance', 'id=2345', 'oncology', 'doctor'] #public identity for encrypt
+    wPrime = ['insurance', 'id=2345', 'doctor', 'oncology'] #public identity for encrypt
 
     (w_hashed, sk) = ibe.extract(mk, w, pk, d, n)
 
