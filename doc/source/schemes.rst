@@ -43,7 +43,6 @@ Demonstration Schemes
    schemes/pksig_schnorr91
    schemes/pksig_waters
    schemes/pksig_waters05
-   schemes/poly_sdh
    schemes/protocol_cns07
    schemes/protocol_schnorr91
    schemes/sigma1
