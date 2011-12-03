@@ -1,3 +1,7 @@
+# batch parser provides majority of the functionality for parsing bv files and the mechanics of the 
+# techniques for generating an optimized batch equation (tech 2, 3, 4 and simplifying products, etc.)
+# 
+
 from pyparsing import *
 #from batchlang import *
 from batchgen import *
@@ -100,7 +104,7 @@ class BatchParser:
         op = stack.pop()
         if debug >= levels.some:
             print("op: %s" % op)
-        if op in ["+", "*", "^", ":=", "==", "e(", "for{", "do","prod{", "on", "sum{", "of", "|"]: # == "AND" or op == "OR" or op == "^" or op == "=":
+        if op in ["+", "*", "^", ":=", "==", "e(", "for{", "do","prod{", "on", "sum{", "of", "|"]:
             op2 = self.evalStack(stack)
             op1 = self.evalStack(stack)
             return createTree(op, op1, op2)
@@ -128,45 +132,15 @@ class BatchParser:
            print("stack =>", objStack)
         return self.evalStack(objStack)
    
-    # experimental - type checking 
-#    def type_check(self, node):
-#        if node.type == node.EXP:
-#            print("public =>", node.getLeft(), "in pk?")
-#            print("secret =>", node.getRight(), "in sk?")
-            
-#        elif node.type == node.EQ:
-#            print("public =>", node.getLeft(), "in pk?")
-#            self.type_check(node.getRight())
-#        elif node.type == node.AND:
-#            self.type_check(node.getLeft())
-#            self.type_check(node.getRight())
-#        else:
-#            return None
-#        return None
-def parseFile(filename):
-    fd = open(filename, 'r')
-    ast_tree = []
-    parser = BatchParser()
-    code = fd.readlines(); i = 1
-    for line in code:
-        line = line.strip('\n')
-        if len(line) == 0 or line[0] == '#':
-            if debug == levels.all: print(line)
-            continue
-        ast_node = parser.parse(line)
-        print(i, ":", ast_node)
-        ast_tree.append(ast_node)
-        # ast_tree[i] = ast_node # store for later processing        
-        i += 1
-    fd.close()
-    return ast_tree
 
 # valid keywords
-START_TOKEN, END_TOKEN = 'BEGIN', 'END'
+START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
 TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
 MESSAGE, SIGNATURE, PUBLIC, LATEX = 'message','signature', 'public', 'latex'
 # qualifier (means only one instance of that particular keyword exists)
 SAME, DIFF = 'one', 'many'
+LINE_DELIM, COMMENT = ';', '#'
+
 
 def clean(arr):
     return [i.strip() for i in arr]
@@ -226,17 +200,19 @@ def handle(lines, target):
 
 debugs = levels.none
 
-def parseFile2(filename):
+def parseFile(filename):
     fd = open(filename, 'r')
-    ast = {TYPE: None, CONST: None, PRECOMP: None, TRANSFORM: None, MESSAGE: None, SIGNATURE: None, PUBLIC: None, LATEX: None, OTHER: [] }
+    ast = {TYPE: None, CONST: None, PRECOMP: None, TRANSFORM: None, 
+           MESSAGE: None, SIGNATURE: None, PUBLIC: None, LATEX: None, 
+           OTHER: [] }
     
     # parser = BatchParser()
     code = fd.readlines(); i = 1
     inStruct = (False, None)
     queue = []
     for line in code:
-        if line.find('::') != -1: # parse differently
-            token = clean(line.split('::'))
+        if line.find(BLOCK_SEP) != -1: # parse differently
+            token = clean(line.split(BLOCK_SEP))
             if token[0] == START_TOKEN and (token[1] in [TYPE, CONST, PRECOMP, TRANSFORM, MESSAGE, SIGNATURE, PUBLIC, LATEX]):
                 inStruct = (True, token[1])
                 if debugs == levels.all: print("Got a section!!!")
@@ -259,8 +235,11 @@ def parseFile2(filename):
 
         else: # if not, keep going and assume that we can safely add lines to queue
             if inStruct[0]:
-                queue.append(line)
-            elif len(line.strip()) == 0 or line[0] == '#':
+                if line.find(LINE_DELIM) != -1: # if a ';' exists in string then we can probably split into two
+                    queue.extend(line.split(LINE_DELIM))
+                else:
+                    queue.append(line)
+            elif len(line.strip()) == 0 or line[0] == COMMENT:
                 if debugs == levels.all:
                     print(line)
                 continue
@@ -1220,7 +1199,7 @@ if __name__ == "__main__":
     
     # main for batch input parser    
     file = sys.argv[1]
-    ast_struct = parseFile2(file)
+    ast_struct = parseFile(file)
     const, types = ast_struct[ CONST ], ast_struct[ TYPE ]
     precompute = ast_struct[ PRECOMP ]
     algorithm = ast_struct [ TRANSFORM ]

@@ -163,7 +163,8 @@ def main():
     #wPrime = [group.init(ZR,1), group.init(ZR,2), group.init(ZR,3), group.init(ZR,7), group.init(ZR,9)] #public identity
 
     w = ["doctor","nurse","JHU","oncology","id=12345"] #private identity
-    wPrime = ["id=12345","insurance","oncology","JHU","misc"] #public identity
+    #wPrime = ["id=12345","insurance","oncology","JHU","misc"] #public identity
+    wPrime = ["id=12345","oncology", "JHU"] #public identity
 
     (w, key) = ibe.extract(mk, w, pk, d, n)
 

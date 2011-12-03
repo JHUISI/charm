@@ -1,4 +1,7 @@
-
+# These classes assist in finding optimizations that can be made in the batch equation.
+# If one is detected, that is, more than one instance of an exponentiation or pairing with
+# the same variables is found, then it is a candidate for further optimization. This is separate
+# from the techniques in batch parser, however.
 from batchlang import *
 import batchparser
 import string

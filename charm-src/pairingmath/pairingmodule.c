@@ -58,35 +58,32 @@ static PyObject *f(PyObject *v) { \
 
 #define BINARY(f, m, n) \
 static PyObject *f(PyObject *v, PyObject *w) { \
-	Element *obj1 = NULL, *obj2 = NULL;				\
+	Element *obj1 = NULL, *obj2 = NULL;			\
+	int obj1_long = FALSE, obj2_long = FALSE; 	\
 	debug("Performing the '%s' operation.\n", __func__); \
 	if(PyElement_Check(v)) {	\
 		obj1 = (Element *) v; } \
+	else if(PyNumber_Check(v)) { obj1 = convertToZR(v, w); obj1_long = TRUE; }  \
 	else { PyErr_SetString(ElementError, ERROR_TYPE(left, int,bytes,str)); \
 		return NULL; }			\
 	if(PyElement_Check(w)) {	\
 		obj2 = (Element *) w; } \
+	else if(PyNumber_Check(w)) { obj2 = convertToZR(w, v); obj2_long = TRUE; }  \
  	else { PyErr_SetString(ElementError, ERROR_TYPE(right, int,bytes,str)); \
 		return NULL; }		\
-	if(Check_Types(obj1->element_type, obj2->element_type, m))	\
-		return (n)(obj1, obj2); \
+	if(Check_Types(obj1->element_type, obj2->element_type, m))	{ \
+		PyObject *obj3 = (n)(obj1, obj2); \
+		if(obj1_long) PyObject_Del(obj1); 	\
+		if(obj2_long) PyObject_Del(obj2);	\
+		return obj3;  }	\
 	return NULL;				\
 }
-
-#define BINARY3(f, m, n) \
-static PyObject *f(PyObject *v, PyObject *w, PyObject *x) { \
-  debug("Performing the '%s' operation.\n", __func__); \
-  if(PyElement_Check(v) && PyElement_Check(w))  {  Element *obj1 = (Element *) v;  \
-	Element *obj2 = (Element *) w; if(Check_Types(obj1->element_type, obj2->element_type, m)) { \
-	return (n)(obj1, obj2);	}		\
-	}				\
-	return NULL;	\
-}		
 
 #define BINARY_NONE(f, m, n) \
 static PyObject *f(PyObject *v, PyObject *w) { \
  Py_INCREF(Py_NotImplemented);	\
  return Py_NotImplemented;  }
+
 
 PyObject *mpzToLongObj (mpz_t m)
 {
@@ -219,6 +216,17 @@ static Element *createNewElement(GroupType element_type, Pairing *pairing) {
 	retObject->param_buf = NULL;		
 	
 	return retObject;	
+}
+
+Element *convertToZR(PyObject *longObj, PyObject *elemObj) {
+	Element *self = (Element *) elemObj;
+	Element *new = createNewElement(ZR, self->pairing);
+
+	mpz_t x;
+	mpz_init(x);
+	longObjToMPZ(x, (PyLongObject *) longObj);
+	element_set_mpz(new->e, x);
+	return new;
 }
 
 void 	Pairing_dealloc(Pairing *self)
@@ -732,7 +740,7 @@ static PyObject *Element_add(Element *self, Element *other)
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_add(newObject->e, self->e, other->e);
 	STOP_CLOCK(dBench);
-	UPDATE_BENCHMARK(ADDITION, dBench)
+	UPDATE_BENCHMARK(ADDITION, dBench);
 	return (PyObject *) newObject;
 }
 
@@ -759,7 +767,7 @@ static PyObject *Element_sub(Element *self, Element *other)
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_sub(newObject->e, self->e, other->e);		
 	STOP_CLOCK(dBench);
-	UPDATE_BENCHMARK(SUBTRACTION, dBench)
+	UPDATE_BENCHMARK(SUBTRACTION, dBench);
 	return (PyObject *) newObject;
 }
 
@@ -840,7 +848,7 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 		return NULL;
 	}
 
-	UPDATE_BENCHMARK(MULTIPLICATION, dBench)
+	UPDATE_BENCHMARK(MULTIPLICATION, dBench);
 	return (PyObject *) newObject;
 }
 
@@ -913,7 +921,7 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 		return NULL;
 	}
 
-	UPDATE_BENCHMARK(DIVISION, dBench)
+	UPDATE_BENCHMARK(DIVISION, dBench);
 	return (PyObject *) newObject;
 }
 /*
@@ -979,15 +987,36 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 {
 	Element *newObject = NULL, *lhs_o1 = NULL, *rhs_o2 = NULL;
 	int longFoundLHS = FALSE, longFoundRHS = FALSE;
+	mpz_t n;
 
 	Check_Types2(o1, o2, lhs_o1, rhs_o2, longFoundLHS, longFoundRHS);
 
-	if(longFoundLHS || longFoundRHS) {
-		// o1 is a long type
+	if(longFoundLHS) {
+		// o1 is a long type and o2 is a element type
+		// o1 should be element and o2 should be mpz
+		if(rhs_o2->element_type == ZR) {
+			START_CLOCK(dBench);
+			mpz_init(n);
+			element_to_mpz(n, rhs_o2->e);
+
+			lhs_o1 = convertToZR(o1, o2);
+			newObject = createNewElement(rhs_o2->element_type, rhs_o2->pairing);
+			element_pow_mpz(newObject->e, lhs_o1->e, n);
+			mpz_clear(n);
+			PyObject_Del(lhs_o1);
+			STOP_CLOCK(dBench);
+		}
 	}
-//	else if(longFoundRHS) {
+	else if(longFoundRHS) {
 		// o2 is a long type
-//	}
+		START_CLOCK(dBench);
+		newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
+		mpz_init(n);
+		longObjToMPZ(n, (PyLongObject *) o2);
+		element_pow_mpz(newObject->e, lhs_o1->e, n);
+		mpz_clear(n);
+		STOP_CLOCK(dBench);
+	}
 	else if(Check_Elements(o1, o2)) {
 		debug("Starting '%s'\n", __func__);
 		debug_e("LHS: e => '%B'\n", lhs_o1->e);
@@ -1001,7 +1030,6 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 			// element_pow_zn(newObject->e, lhs_o1->e, rhs_o1->e);
 			START_CLOCK(dBench);
 			newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
-			mpz_t n;
 			mpz_init(n);
 			element_to_mpz(n, rhs_o2->e);
 			element_pow_mpz(newObject->e, lhs_o1->e, n);
@@ -1411,6 +1439,21 @@ static PyObject *Element_long(PyObject *o1) {
 	return NULL;
 }
 
+static long Element_index(Element *o1) {
+	long result = -1;
+
+	if(o1->element_type == ZR) {
+		mpz_t o;
+		mpz_init(o);
+		element_to_mpz(o, o1->e);
+		PyObject *temp = mpzToLongObj(o);
+		result = PyObject_Hash(temp);
+		mpz_clear(o);
+		PyObject_Del(temp);
+	}
+	return result;
+}
+
 UNARY(instance_negate, 'i', Element_negate)
 UNARY(instance_invert, 'i', Element_invert)
 BINARY(instance_add, 'a', Element_add)
@@ -1754,7 +1797,7 @@ PyTypeObject ElementType = {
 	&element_number,               /*tp_as_number*/
 	0,                         /*tp_as_sequence*/
 	0,                         /*tp_as_mapping*/
-	0,                         /*tp_hash */
+	(hashfunc)Element_index,                         /*tp_hash */
 	0,                         /*tp_call*/
 	0,                         /*tp_str*/
 	0,                         /*tp_getattro*/

@@ -1,3 +1,8 @@
+# Entry point to executing the batcher algorithm. It takes in an input bv file
+# which describes the verification equation, variable types, components of the public, signature
+# and message. Finally, an optional transform section to describe the specific order in which
+# to apply the techniques 2, 3a, 3b and 4.
+
 from batchparser import *
 from batchproof import *
 
@@ -139,7 +144,7 @@ if __name__ == "__main__":
     try:
         file = sys.argv[1]
         print(sys.argv[1:])
-        ast_struct = parseFile2(file)
+        ast_struct = parseFile(file)
         THRESHOLD_FLAG = CODEGEN_FLAG = PROOFGEN_FLAG = PRECOMP_CHECK = VERBOSE = False # initialization
         for i in sys.argv:
             if i == "-b": THRESHOLD_FLAG = True

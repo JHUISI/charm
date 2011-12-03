@@ -1,7 +1,7 @@
+# This class generates the latex macros for the batch verification proofs of security
 from batchlang import *
 from batchparser import *
 import sys
-
 
 header = """\n
 

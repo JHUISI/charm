@@ -93,11 +93,19 @@ typedef struct {
 	else if(PyLong_Check(o2)) {  \
 		longRHS_o2 = TRUE; }	\
 
+#define set_element_ZR(obj, value)  \
+    if(value == 0)		\
+       element_set0(obj);   \
+	else if(value == 1)		\
+	   element_set1(obj);	\
+    else {  element_set_si(obj, (signed int) value); }
+
 PyObject *Element_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int Element_init(Element *self, PyObject *args, PyObject *kwds);
 PyObject *Element_print(Element* self);
 PyObject *Element_call(Element *elem, PyObject *args, PyObject *kwds);
 void	Element_dealloc(Element* self);
+Element *convertToZR(PyObject *LongObj, PyObject *elemObj);
 
 PyObject *Apply_pairing(Element *self, PyObject *args);
 PyObject *sha1_hash(Element *self, PyObject *args);
