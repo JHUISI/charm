@@ -10,11 +10,11 @@ Boneh-Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform
 '''
 from charm.engine.util import *
 from toolbox.pairinggroup import *
-from charm.integer import *
+#from charm.integer import *
 import hmac, hashlib, math
 from toolbox.IBEnc import *
 from charm.cryptobase import *
-from schemes.encap_bchk04 import *
+from schemes.encap_bchk05 import *
 from schemes.ibenc_bb03 import *
 from charm.pairing import hash as sha1
 
