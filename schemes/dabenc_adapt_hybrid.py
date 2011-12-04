@@ -77,7 +77,7 @@ def main():
     orig_msg = hyb_abema.decrypt(gp, K, ct)
     if debug: print("Result =>", orig_msg)
     assert orig_msg == msg, "Failed Decryption!!!"
-    print("Successful Decryption!!!")
+    if debug: print("Successful Decryption!!!")
     del groupObj
 
 if __name__ == "__main__":

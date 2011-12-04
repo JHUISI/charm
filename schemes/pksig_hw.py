@@ -16,6 +16,7 @@ from charm.pairing import *
 from toolbox.PKSig import *
 from math import *
 
+debug=False
 class HW(PKSig):
     def __init__(self, groupObj):
         global group

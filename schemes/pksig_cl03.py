@@ -10,6 +10,7 @@ def SHA1(bytes1):
 def randomQR(n):
     return random(n) ** 2
 
+debug=False
 class Sig_CL03(PKSig):
     def __init__(self, lmin=160, lin=160, secparam=512):
         global ln, lm, le, l
@@ -71,7 +72,7 @@ class Sig_CL03(PKSig):
         return sig
 
     def verify(self, pk, m, sig):
-        print("\nVERIFY\n\n")
+        if debug: print("\nVERIFY\n\n")
 
         lhs = (sig['v'] ** sig['e']) % pk['N']
         rhs = ((pk['a'] ** m)*(pk['b'] ** sig['s'])*pk['c']) % pk['N']
@@ -84,18 +85,24 @@ class Sig_CL03(PKSig):
         return False
 
 
-if __name__ == "__main__":
+def main():
     pksig = Sig_CL03() 
 
     (pk, sk) = pksig.keygen(512)
-    print("Public parameters...")
-    print("pk =>", pk)
-    print("sk =>", sk)
+    if debug:
+        print("Public parameters...")
+        print("pk =>", pk)
+        print("sk =>", sk)
     
     m = integer(SHA1(b'This is the message I want to hash.'))
     sig = pksig.sign(pk, sk, m)
-    print("Signature...")
-    print("sig =>", sig)
+    if debug:
+        print("Signature...")
+        print("sig =>", sig)
     
     assert pksig.verify(pk, m, sig), "FAILED VERIFICATION!!!"
-    print("Successful Verification!!!")
+    if debug: print("Successful Verification!!!")
+
+if __name__ == "__main__":
+    debug = True
+    main()
