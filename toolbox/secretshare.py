@@ -44,22 +44,14 @@ class SecretShare:
     
     # shares is a dictionary
     def recoverCoefficients(self, list):
-        #eTop = self.elem.init(ZR)
-        #eBot = self.elem.init(ZR)
         coeff = {}
-        #list = shares.keys()
-        #print("list :=", list)
         for i in list:
             result = 1
             for j in list:
                 if not (i == j):
                     # lagrange basis poly
-                    #eTop.set(0 - j) # numerator
-                    #eBot.set(i - j) # denominator
-                    #result *= eTop / eBot
                     result *= (0 - j) / (i - j)
-            if self.verbose:
-                print("coeff '%d' => '%s'" % (i, result))
+            if self.verbose: print("coeff '%d' => '%s'" % (i, result))
             coeff[i] = result
         return coeff
         
@@ -67,7 +59,7 @@ class SecretShare:
         list = shares.keys()
         if self.verbose: print(list)
         coeff = self.recoverCoefficients(list)
-        print("coefficients: ", coeff)
+        if self.verbose: print("coefficients: ", coeff)
         secret = 0
         for i in list:
             secret += (coeff[i] * shares[i])

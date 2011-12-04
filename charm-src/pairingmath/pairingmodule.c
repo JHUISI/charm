@@ -369,7 +369,7 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, int hash_size, uint8_t* out
  * @return				FENC_ERROR_NONE or an error code.
  */
 
-int hash_element_to_bytes(element_t *element, int hash_size, uint8_t* output_buf)
+int hash_element_to_bytes(element_t *element, int hash_size, uint8_t* output_buf, int prefix)
 {
 	int result = TRUE;
 	unsigned int buf_len;
@@ -381,8 +381,14 @@ int hash_element_to_bytes(element_t *element, int hash_size, uint8_t* output_buf
 	}
 	
 	element_to_bytes(temp_buf, *element);
-	result = hash_to_bytes(temp_buf, buf_len, hash_size, output_buf, HASH_FUNCTION_ELEMENTS);
-	
+	if(prefix == 0) {
+		prefix = HASH_FUNCTION_ELEMENTS;
+	}
+	else if(prefix < 0) {
+		// convert into a positive number
+		prefix *= -1;
+	}
+	result = hash_to_bytes(temp_buf, buf_len, hash_size, output_buf, prefix);
 	free(temp_buf);
 	
 	return TRUE;
@@ -1143,9 +1149,10 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 	Element *object;
 	PyObject *str;
 	char *hash_hex = NULL;
+	int label = 0;
 	
 	debug("Hashing the element...\n");
-	if(!PyArg_ParseTuple(args, "O", &object)) {
+	if(!PyArg_ParseTuple(args, "O|i", &object, &label)) {
 		PyErr_SetString(ElementError, "missing element object");
 		return NULL;
 	}
@@ -1157,7 +1164,7 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 	START_CLOCK(dBench);
 	int hash_size = HASH_LEN;
 	uint8_t hash_buf[hash_size + 1];
-	if(!hash_element_to_bytes(&object->e, hash_size, hash_buf)) {
+	if(!hash_element_to_bytes(&object->e, hash_size, hash_buf, label)) {
 		PyErr_SetString(ElementError, "failed to hash element");
 		return NULL;
 	}
@@ -1165,6 +1172,8 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 	hash_hex = convert_buffer_to_hex(hash_buf, hash_size);
 	printf_buffer_as_hex(hash_buf, hash_size);
 	
+
+
 	str = PyBytes_FromString((const char *) hash_hex);
 	free(hash_hex);
 	STOP_CLOCK(dBench);
@@ -1253,7 +1262,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 			if(PyElement_Check(tmpObject)) {
 				object = (Element *) tmpObject;
 				START_CLOCK(dBench);
-				result = hash_element_to_bytes(&object->e, HASH_LEN, hash_buf);
+				result = hash_element_to_bytes(&object->e, HASH_LEN, hash_buf, 0);
 				STOP_CLOCK(dBench);
 			}
 			else if(PyUnicode_Check(tmpObject)) {
@@ -1322,7 +1331,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 			debug_e("Hashing element '%B' to G1...\n", object->e);
 			// hash the element to the G1 field (uses sha1 as well)
 			// START_CLOCK
-			result = hash_element_to_bytes(&object->e, HASH_LEN, (unsigned char *) hash_buf);
+			result = hash_element_to_bytes(&object->e, HASH_LEN, (unsigned char *) hash_buf, 0);
 			if(!result) {
 				tmp = "could not hash to bytes";
 				goto cleanup;

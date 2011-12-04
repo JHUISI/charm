@@ -25,9 +25,9 @@ enum Group {ZR, G1, G2, GT, NONE_G};
 typedef enum Group GroupType;
 
 /* Index numbers for different hash functions.  These are all implemented as SHA1(index || message).	*/
-#define HASH_FUNCTION_STR_TO_Zr_CRH		0
-#define HASH_FUNCTION_Zr_TO_G1_ROM		1
-#define HASH_FUNCTION_ELEMENTS			2
+#define HASH_FUNCTION_ELEMENTS			0
+#define HASH_FUNCTION_STR_TO_Zr_CRH		1
+#define HASH_FUNCTION_Zr_TO_G1_ROM		2
 #define HASH_FUNCTION_STRINGS			3
 
 #ifdef DEBUG
