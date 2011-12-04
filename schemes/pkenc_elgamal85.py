@@ -99,12 +99,12 @@ class ElGamal(PKEnc):
 def main():
     el = ElGamal(ecc, prime192v2)    
     (pk, sk) = el.keygen()
-    msg = "hello world!"
+    msg = b"hello world!"
     size = len(msg)
     cipher1 = el.encrypt(pk, msg)
     
     m = el.decrypt(pk, sk, cipher1)    
-    assert m == msg
+    assert m[0:size] == msg[0:size]
     if debug: print("SUCCESSFULLY DECRYPTED!!!")
         
 if __name__ == "__main__":

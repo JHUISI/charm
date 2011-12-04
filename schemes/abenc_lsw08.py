@@ -87,7 +87,7 @@ class KPabe(ABEnc):
         E3 = [group.hash(x, G1) ** s for x in attr_list]
         # compute E4
         E4 = [pk['g_G1_b'] ** sx[i] for i in range(len(attr_list))]
-        E5 = [(pk['g_G1_b2'] ** (sx[i] * group.hash(attr_list[i]))) * (pk['h_G1_b'] ** sx[i]) for i in range(len(attr_list))]                
+        E5 = [(pk['g_G1_b2'] ** (sx[i] * group.hash(attr_list[i]))) * (pk['h_G1_b'] ** sx[i]) for i in range(len(attr_list))]  
         attr_list = [unicode(a) for a in attr_list]
         return {'E1':(pk['e(gg)_alpha'] ** s) * M, 'E2':pk['g_G2'] ** s, 'E3':E3, 'E4':E4, 'E5':E5, 'attributes':attr_list }
     
@@ -96,7 +96,7 @@ class KPabe(ABEnc):
         policy = util.createPolicy(D['policy'])
         coeff = {}; util.getCoefficients(policy, coeff)
         
-        Z = {}; prodT = group.init(GT, long(1))
+        Z = {}; prodT = group.init(GT, 1)
         for i in range(len(attrs)):
             x = attrs[i]
             #print("Coeff[%s] = %s" % (x, coeff[x]))
@@ -129,3 +129,4 @@ def main():
 if __name__ == "__main__":
     debug = True
     main()
+    

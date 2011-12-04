@@ -1,20 +1,22 @@
 # bls batch inputs
 # variables
 N := 200
-sig := G1
-M := str
-g := G2
-pk := G2
 
-# declared constants
-# todo: parse as a list (e.g. constant := [g, pk,...])
-constant := g
-constant := pk
+BEGIN :: types
+  sig := G1
+  M := str
+  pk#1 := G2
+  pk#0 := G2
+  h := G1
+END :: types
 
-# sig setting (two possible values: same or diff)
-#signer := same 
-#message := diff
-#public := same
+BEGIN :: constant
+  pk#1, pk#0
+END :: constant
+
+BEGIN :: precompute
+   h := H(M, G1)
+END :: precompute
 
 # verify equation
-verify := { e(H(M, G1), pk) == e(sig, g) }
+verify := { e(h, pk#0) == e(sig, pk#1) }

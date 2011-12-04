@@ -20,6 +20,18 @@ class PairingGroup():
         print("ERROR: max len => %s, input len => %s" % (self.messageSize(), size))
         return False
 
+    def ismember(self, obj):
+        if type(obj) in [tuple, list]:
+           for i in obj:
+               if self.Pairing.ismember(i) == False: return False 
+           return True
+        elif type(obj) == dict:
+           for i in obj.keys():
+               if self.Pairing.ismember(obj[i]) == False: return False
+           return True
+        else:
+           return self.Pairing.ismember(obj)
+
     def groupType(self): 
         return 'PairingGroup'     
         
@@ -39,7 +51,6 @@ class PairingGroup():
             return self.Pairing.random(type)
         else:
             return integer(randomBits(self.secparam))
-
         
     def __randomGT(self):
         if not hasattr(self, 'gt'):

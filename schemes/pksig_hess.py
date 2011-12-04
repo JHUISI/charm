@@ -1,7 +1,22 @@
-""" TODO: Description of Scheme here.
+""" 
+Hess - Identity-based Signatures
+
+| From: "Hess - Efficient identity based signature schemes based on pairings."
+| Published in: Selected Areas in Cryptography
+| Available from: Vol. 2595. LNCS, pages 310-324
+| Notes: 
+
+* type:           signature (ID-based)
+* setting:        bilinear groups (asymmetric)
+
+:Authors:    J. Ayo Akinyele
+:Date:       11/2011
 """
 from charm.pairing import *
 from toolbox.PKSig import PKSig
+#import gc
+#gc.disable()
+#gc.set_debug(gc.DEBUG_LEAK)
 
 debug = False
 
@@ -32,7 +47,9 @@ class CHCH(PKSig):
         S1 = pair(h,pk['g2']) ** s 
         a = H2(M, S1)
         S2 = (sk ** a) * (h ** s)
+        #return {'S1':S1, 'S2':S2}
         return (S1, S2)
+
     
     def verify(self, mpk, pk, M, sig):
         print("verify...")

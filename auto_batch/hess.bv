@@ -1,5 +1,5 @@
 
-N := 200
+N := 100
 
 BEGIN :: types
 s := ZR
@@ -14,11 +14,11 @@ END :: types
 #S2 := (sk^a) * (h^s)
 
 BEGIN :: precompute
-a := H(M_i | S1_i, ZR)
+a := H(M_z | S1_z, ZR)
 END :: precompute
 
 BEGIN :: constant
-P, g2
+mpk#0, mpk#1
 END :: constant
 
-verify := { e(S2, g2) == ( e(pk, P)^a ) * S1 }
+verify := { e(S2, mpk#1) == ( e(pk, mpk#0)^a ) * S1 }

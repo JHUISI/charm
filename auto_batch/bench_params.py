@@ -66,7 +66,8 @@ def prng_bits(group, bits=80):
     return result
 
 def bench(param):
-    group = PairingGroup(param)
+    path_to_param = "../param/" + param
+    group = PairingGroup(path_to_param)
 
     bID = InitBenchmark()
     a, b = group.random(G1), group.random(G2)
@@ -87,6 +88,7 @@ def bench(param):
     curve[param]['hash']['G2'] = curve[param]['hash']['GT'] = 0
     # how long it takes to generate integers of a certain number of bits
     curve[param]['prng'] = prng_bits(group)
+    return 
 
 def generateOutput(outputFile):
     file = open(outputFile, 'w')

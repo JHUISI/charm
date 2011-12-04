@@ -22,7 +22,7 @@ def serializeDict(object, group):
             elif type(object[i]) == dict:
                 bytes_object[i] = serializeDict(object[i], group) #; print("dict found in ser => '%s'" % i); 
             elif type(object[i]) == list:
-                bytes_object[i] = serializeList(object[i], group)                
+                bytes_object[i] = serializeList(object[i], group)               
             else: # typically group object
                #print("DEBUG = k: %s, v: %s" % (i, object[i]))
                 bytes_object[i] = group.serialize(object[i])
@@ -54,12 +54,37 @@ def serializeList(object, group):
                 bytes_object_.append(serializeList(i, group))
             else: # typically group object
                #print("DEBUG = k: %s, v: %s" % (i, object[i]))
-                    bytes_object_.append(group.serialize(i))
+                bytes_object_.append(group.serialize(i))
         return bytes_object_
+    elif isinstance(object, tuple):
+        for i in object:
+            # check the type of the object[i]
+            if type(i) in [str, int]:
+                if(type(i) == str):
+                    temp = 'str'+i
+                    bytes_object_.append(temp) # don't convert to bytes, if string
+                else:
+                    bytes_object_.append(i)
+            elif type(i) == unicode:
+                bytes_object_.append(i)
+            elif type(i) == dict:
+                bytes_object_.append(serializeDict(i, group)) #; print("dict found in ser => '%s'" % i); 
+            elif type(i) == list:
+                bytes_object_.append(serializeList(i, group))
+            else: # typically group object
+               #print("DEBUG = k: %s, v: %s" % (i, object[i]))
+                bytes_object_.append(group.serialize(i))
+        return tuple(bytes_object_)
     else:
         # just one bytes object and it's a string
         if type(object) == str: return bytes(object, 'utf8')
         else: return group.serialize(object)
+
+def serialize(objects, group):
+    if type(objects) == dict: return serializeDict(objects, group)
+    # handles lists, tuples, sets, and even individual elements
+    else: return serializeList(objects, group)
+
 
 def deserializeDict(object, group):
     bytes_object = {}
@@ -75,16 +100,18 @@ def deserializeDict(object, group):
                else:
                    bytes_object[i] = group.deserialize(object[i])
             elif _type == dict:
-               bytes_object[i] = deserializeDict(object[i], group) # ; print("dict found in des => '%s'" % i);
+                bytes_object[i] = deserializeDict(object[i], group) # ; print("dict found in des => '%s'" % i);
             elif _type == list:
                 bytes_object[i] = deserializeList(object[i], group)
             elif _type == str:
-               bytes_object[i] = object[i]
+                bytes_object[i] = object[i]
             elif _type == int:
-               bytes_object[i] = object[i]
+                bytes_object[i] = object[i]
             elif _type == unicode:
                bytes_object[i] = unicode(object[i])
         return bytes_object
+    elif type(object) == bytes:
+        return group.deserialize(object)
     else:
         # just one bytes object
         return object
@@ -103,19 +130,43 @@ def deserializeList(object, group):
                else:
                    _bytes_object.append(group.deserialize(i))
             elif _typeL == dict:
-               _bytes_object.append(deserializeDict(i, group)) # ; print("dict found in des => '%s'" % i);
+                _bytes_object.append(deserializeDict(i, group)) # ; print("dict found in des => '%s'" % i);
             elif _typeL == list:
                 _bytes_object.append(deserializeList(i, group))
             elif _typeL == str:
-               _bytes_object.append(i)
+                _bytes_object.append(i)
             elif _typeL == int:
-               _bytes_object.append(i)
+                _bytes_object.append(i)
             elif _typeL == unicode:
                _bytes_object.append(unicode(i))
         return _bytes_object
+    elif isinstance(object, tuple):
+        for i in object:
+            _typeL = type(i)
+            if _typeL == bytes:
+               if(i[:3] == 'str'):
+                   _bytes_object.append(i[3:])
+               else:
+                   _bytes_object.append(group.deserialize(i))
+            elif _typeL == dict:
+                _bytes_object.append(deserializeDict(i, group)) # ; print("dict found in des => '%s'" % i);
+            elif _typeL == list:
+                _bytes_object.append(deserializeList(i, group))
+            elif _typeL == str:
+                _bytes_object.append(i)
+            elif _typeL == int:
+                _bytes_object.append(i)
+            elif _typeL == unicode:
+               _bytes_object.append(unicode(i))
+        return tuple(_bytes_object)        
     else:
         # just one bytes object
         return object
+
+def deserialize(objects, group):
+    if type(objects) == dict: return deserializeDict(objects, group)
+    else: return deserializeList(objects, group)
+    
     
 def pickleObject(object):
     valid_types = [bytes, dict, list, str, int, unicode]    
@@ -136,8 +187,22 @@ def pickleObject(object):
     file.close()
     return encoded
 
-def unpickleObject(byte_object):
+def unpickleObject(object):
+'''
 #    print("bytes_object =>", byte_object)
+    decoded = b64decode(byte_object)
+#    print("Result dec =>", decoded)
+#    print("len =>", len(decoded))
+    if type(decoded) == bytes and len(decoded) > 0:
+        return pickle.loads(decoded)
+    return None
+'''
+    if type(object) == str:
+       byte_object = bytes(object, 'utf-8')
+    elif type(object) == bytes:
+       byte_object = object
+    else:
+       return None
     decoded = b64decode(byte_object)
 #    print("Result dec =>", decoded)
 #    print("len =>", len(decoded))
@@ -151,7 +216,7 @@ if __name__ == "__main__":
     #packer = getPackerObject(data)    
     #print("packed => ", packer.pack())
     result = pickleObject(data)
-    
+
     data2 = unpickleObject(result)
     
     print("data2 => ", data2)

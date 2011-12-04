@@ -1,13 +1,14 @@
-N := 200
-l := 5
+N := 100
+l := 2
 
 BEGIN :: types
 M := ZR
 t := ZR
-A := G2
-B := G2
-C := G2
+Atpk := G2
+Btpk := G2
+Ctpk := G2
 D := GT
+S := G1
 END :: types
 
 BEGIN :: precompute
@@ -15,10 +16,11 @@ D := e(g1, g2)
 END :: precompute
 
 BEGIN :: constant
-D
+Atpk, Btpk, Ctpk, D
 END :: constant
 
-verify :=  { prod{j:=1, l} on e(S_j, A_j * (B_j^M) * (C_j^t_j)) } == D
+verify :=  { prod{y:=1, l} on e(S_y, Atpk_y * (Btpk_y^M_y) * (Ctpk_y^t_y)) } == D
 
-
-# T3 reverse split => e(S_j, A_j) * e(S_j, B_j^M) * e(S_j, C_j^t_j) == D 
+BEGIN :: transform
+2, 3, 4, S, 3
+END :: transform

@@ -28,7 +28,7 @@ class CPabe09(ABEnc):
                         
     def setup(self):
         g1, g2 = group.random(G1), group.random(G2)
-        alpha, a = group.random(), group.random()
+        alpha, a = group.random(), group.random()        
         e_gg_alpha = pair(g1,g2) ** alpha
         msk = {'g1^alpha':g1 ** alpha, 'g2^alpha':g2 ** alpha}        
         pk = {'g1':g1, 'g2':g2, 'e(gg)^alpha':e_gg_alpha, 'g1^a':g1 ** a, 'g2^a':g2 ** a}
@@ -84,7 +84,7 @@ class CPabe09(ABEnc):
             #print('Attribute %s: coeff=%s, k_x=%s' % (j, w_i[j], k_x[j]))
             
         C, D = ct['C'], ct['D']
-        denominator = group.init(GT, long(1))
+        denominator = group.init(GT, 1)
         for i in pruned:
             denominator *= ( pair(C[i] ** w_i[i], sk['L']) * pair(k_x[i] ** w_i[i], D[i]) )   
         return ct['C_tilde'] / (numerator / denominator)
@@ -101,16 +101,16 @@ def main():
     if debug: print('Acces Policy: %s' % pol)
     if debug: print('User credential list: %s' % attr_list)
     m = groupObj.random(GT)
-
+    
     cpkey = cpabe.keygen(pk, msk, attr_list)
-    if debug: print("\nSecret key: ", attr_list)
+    if debug: print("\nSecret key: %s" % attr_list)
     if debug:groupObj.debug(cpkey)
     cipher = cpabe.encrypt(pk, m, pol)
 
     if debug: print("\nCiphertext...")
-    if debug:groupObj.debug(cipher)
+    if debug:groupObj.debug(cipher)    
     orig_m = cpabe.decrypt(pk, cpkey, cipher)
-
+   
     assert m == orig_m, 'FAILED Decryption!!!' 
     if debug: print('Successful Decryption!')    
     del groupObj

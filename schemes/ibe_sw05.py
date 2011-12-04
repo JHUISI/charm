@@ -12,7 +12,7 @@ Sahai-Waters Fuzzy Identity-Based Encryption, Large Universe Construction
 :Authors:    Christina Garman
 :Date:       10/2011
 '''
-from __future__ import print_function
+
 from toolbox.pairinggroup import *
 from charm.cryptobase import *
 from toolbox.IBEnc import *
@@ -30,22 +30,21 @@ class IBE_SW05(IBEnc):
            - ``i`` in Zp
            - ``S`` a set of elements in Zp
         '''
-        result = group.init(ZR,long(1))
-        x = group.init(ZR,long(x))
+        result = group.init(ZR,1)
         for j in S:
             if not(j == i):
                 result = result * ((x - j) / (i - j))
         return result
 
     def eval_T(self, pk, n, x):
-        N = [group.init(ZR,long(x + 1)) for x in range(n + 1)]
+        N = [group.init(ZR,(x + 1)) for x in range(n + 1)]
         N_int = [(x + 1) for x in range(n + 1)]
-        result = group.init(ZR,long(1))
+        result = group.init(ZR,1)
 
         for i in N_int:
-            result = result * (pk['t'][i-1] ** self.legrange_coeff(group.init(ZR,long(i)),N,x))
+            result = result * (pk['t'][i-1] ** self.legrange_coeff(group.init(ZR,i),N,x))
 
-        T = ((pk['g2'] ** group.init(ZR,long(x))) ** group.init(ZR,long(n))) * result
+        T = ((pk['g2'] ** x) ** group.init(ZR,n)) * result
         return T
 
     def intersection_subset(self, w, wPrime, d):
@@ -100,11 +99,11 @@ class IBE_SW05(IBEnc):
 
         D = []
         d = []
-        q_i = group.init(ZR,long(0))
+        q_i = group.init(ZR,0)
         for i in w_hash:
             #evaluate q(i)
             for x in range(dOver):
-                j = group.init(ZR,long(x))
+                j = group.init(ZR,x)
                 q_i = q_i + (q[x] * (i ** j))
 
             D.append((pk['g2'] ** q_i) * (self.eval_T(pk,n,i) ** r_i))
@@ -143,7 +142,7 @@ class IBE_SW05(IBEnc):
             j = w.index(i)
             k = CT['wPrime'].index(i)
 
-            prod = prod * ((pair(dID['d'][j],CT['E'][k])/pair(dID['D'][j],CT['Eprimeprime'])) ** (self.legrange_coeff(i,S,group.init(ZR,long(0)))))
+            prod = prod * ((pair(dID['d'][j],CT['E'][k])/pair(dID['D'][j],CT['Eprimeprime'])) ** (self.legrange_coeff(i,S,group.init(ZR,0))))
 
         M = CT['Eprime'] * prod
 
@@ -164,11 +163,12 @@ def main():
     #wPrime = [group.init(ZR,1), group.init(ZR,2), group.init(ZR,3), group.init(ZR,7), group.init(ZR,9)] #public identity
 
     w = ["doctor","nurse","JHU","oncology","id=12345"] #private identity
-    wPrime = ["id=12345","insurance","oncology","JHU","misc"] #public identity
+    #wPrime = ["id=12345","insurance","oncology","JHU","misc"] #public identity
+    wPrime = ["id=12345","oncology", "JHU"] #public identity
 
     (w, key) = ibe.extract(mk, w, pk, d, n)
 
-    M = groupObj.random(G2)
+    M = groupObj.random(GT)
     cipher = ibe.encrypt(pk, wPrime, M, n)
     m = ibe.decrypt(pk, key, cipher, w, d)
 

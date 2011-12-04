@@ -1,0 +1,84 @@
+from toolbox.pairinggroup import *
+from charm.engine.util import *
+import sys, random
+
+debug = False
+
+class IBSig():
+    def __init__(self):
+        global group
+        group = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
+  
+    def keygen(self, secparam=None):
+        g = group.random(G2)
+        x = group.random()
+        g_x = g ** x
+        pk = { 'g^x':g_x, 'g':g, 'identity':str(g_x), 'secparam':secparam }
+        sk = { 'x':x }
+        return (pk, sk)
+        
+    def sign(self, x, message):
+        sig = group.hash(message, G1) ** x
+        return sig
+        
+    def verify(self, pk, sig, message):
+        A, B = pk, sig
+        h = group.hash(message, G1)
+        if pair(sig, pk['g']) == pair(h, pk['g^x']):
+            return True  
+        return False 
+
+if __name__ == "__main__":
+	if ( (len(sys.argv) != 5) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
+		sys.exit("Usage:  python " + sys.argv[0] + " [number of messages to sign] [size of each message] [prefix name of each message] [message number at which to start making bad signatures]")
+
+	numMessages = int(sys.argv[1])
+	messageSize = int(sys.argv[2])
+	prefixName = sys.argv[3]
+	switchIndex = int(sys.argv[4])
+
+	bls = IBSig()
+	(pk, sk) = bls.keygen(0)
+
+	f_pk = open('pkBLS.charmPickle', 'wb')
+	pick_pk = pickleObject(serializeDict(pk, group))
+	f_pk.write(pick_pk)
+	f_pk.close()
+
+	for index in range(0, numMessages):
+		f = open(prefixName + str(index) + "_message", 'rb')
+		message = f.read()
+		f.close()
+		sig = bls.sign(sk['x'], message)
+		assert bls.verify(pk, sig, message)
+		del f
+
+		f = open(prefixName + str(index) + "_messageBAD", 'rb')
+		messageBAD = f.read()
+		f.close()
+		sigBAD = bls.sign(sk['x'], messageBAD)
+		assert bls.verify(pk, sigBAD, messageBAD)
+		del f
+
+		f_message = open(prefixName + str(index) + '_message.pythonPickle', 'wb')
+		f_sig = open(prefixName + str(index) + '_signature.charmPickle', 'wb')
+		pickle.dump(message, f_message)    
+		pick_sig = pickleObject(serializeDict(sig, group))    
+		f_sig.write(pick_sig)
+		f_message.close()
+		f_sig.close()
+
+		f_sigBAD = open(prefixName + str(index) + '_signatureBAD.charmPickle', 'wb')
+		pick_sigBAD = pickleObject(serializeDict(sigBAD, group))    
+		f_sigBAD.write(pick_sigBAD)
+		f_sigBAD.close()
+
+		del message
+		del messageBAD
+		del sig
+		del sigBAD
+		del f_message
+		del f_sig
+		del f_sigBAD
+		del pick_sig
+		del pick_sigBAD
