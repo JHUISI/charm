@@ -24,7 +24,7 @@ class BCHKIBEnc(IBEnc):
             for letter in k:
                 if(not type(character) == int):
                     character = ord(character)
-                elif(not type(letter) == int):
+                if(not type(letter) == int):
                     letter = ord(letter)
 
                 character = chr(character ^ letter)
