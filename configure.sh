@@ -128,7 +128,7 @@ libdir="\${prefix}/lib"
 sysconfdir="\${prefix}/etc"
 confsuffix="/charm"
 profiler="no"
-python_path="$(which python3)"
+python_path="$(which python)"
 wget="$(which wget)"
 
 #fall back to python if for some reason python3 does not exist 
@@ -557,21 +557,21 @@ fi
 
 ##########################################
 # python3 probe
-cat > $TMPC << EOF
-import sys
-
-if float(sys.version[:3]) >= 3.0:
-   exit(0)
-else:
-   print("Need 3.x. Specify --python=/path/to/python3")
-   exit(-1)
-EOF
-python3_found="no"
-$python_path $TMPC
-result=$?
-if test ${result} = 0 ; then
-	python3_found="yes"
-fi
+#cat > $TMPC << EOF
+#import sys
+#
+#if float(sys.version[:3]) >= 3.0:
+#   exit(0)
+#else:
+#   print("Need 3.x. Specify --python=/path/to/python3")
+#   exit(-1)
+#EOF
+#python3_found="no"
+#$python_path $TMPC
+#result=$?
+#if test ${result} = 0 ; then
+#	python3_found="yes"
+#fi
 
 cat > $TMPC << EOF
 try:
@@ -827,12 +827,12 @@ if test "$docs" = "yes" ; then
     exit -1 
   fi
 fi
-if test "$python3_found" = "no" ; then
-   echo "ERROR: python 3 not found."
-   exit -1
-else
-   echo "PYTHON=$python_path" >> $config_mk
-fi
+#if test "$python3_found" = "no" ; then
+#   echo "ERROR: python 3 not found."
+#   exit -1
+#else
+echo "PYTHON=$python_path" >> $config_mk
+#fi
 
 # write the CHARM specific options to the config file
 echo "INT_MOD=$integer_module" >> $config_mk
