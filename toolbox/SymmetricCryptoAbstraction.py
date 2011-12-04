@@ -1,8 +1,8 @@
 from charm.cryptobase import MODE_CBC,AES,selectPRP
 from charm.pairing import hash as sha1
 from toolbox.conversion import *
+from toolbox.securerandom import OpenSSLRand
 from math import ceil
-from os import urandom
 import json
 from base64 import b64encode,b64decode
 class SymmetricCryptoAbstraction(object):
@@ -30,7 +30,7 @@ class SymmetricCryptoAbstraction(object):
  
     def _initCipher(self,IV = None):
         if IV == None :
-            IV =  urandom(self._block_size)
+            IV =  OpenSSLRand().getRandomBytes(self._block_size)
         self._IV = IV
         return selectPRP(self._alg,(self._key,self._mode,self._IV))
 
@@ -51,7 +51,7 @@ class SymmetricCryptoAbstraction(object):
         return cte
 
     def _encrypt(self,message):
-        self._IV = urandom(self._block_size)
+        self._IV = OpenSSLRand().getRandomBytes(self._block_size)
         #Because the IV cannot be set after instantiation, decrypt and encrypt 
         # must operate on their own instances of the cipher 
         cipher = self._initCipher() 
@@ -75,9 +75,9 @@ class SymmetricCryptoAbstraction(object):
     def __pad(self, message):
         # calculate the ceiling of
         msg_len = ceil(len(message) / float(self.key_len)) * self.key_len
-        extra = msg_len - len(message)
+        extra = int(msg_len - len(message))
         # append 'extra' bytes to message
-        for i in range(0, int(extra)):
+        for i in range(0, extra):
             message += '\x00'
         return message
 

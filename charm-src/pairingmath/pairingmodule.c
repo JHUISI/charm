@@ -369,7 +369,7 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, int hash_size, uint8_t* out
  * @return				FENC_ERROR_NONE or an error code.
  */
 
-int hash_element_to_bytes(element_t *element, int hash_size, uint8_t* output_buf)
+int hash_element_to_bytes(element_t *element, int hash_size, uint8_t* output_buf, int prefix)
 {
 	int result = TRUE;
 	unsigned int buf_len;
@@ -381,8 +381,14 @@ int hash_element_to_bytes(element_t *element, int hash_size, uint8_t* output_buf
 	}
 	
 	element_to_bytes(temp_buf, *element);
-	result = hash_to_bytes(temp_buf, buf_len, hash_size, output_buf, HASH_FUNCTION_ELEMENTS);
-	
+	if(prefix == 0) {
+		prefix = HASH_FUNCTION_ELEMENTS;
+	}
+	else if(prefix < 0) {
+		// convert into a positive number
+		prefix *= -1;
+	}
+	result = hash_to_bytes(temp_buf, buf_len, hash_size, output_buf, prefix);
 	free(temp_buf);
 	
 	return TRUE;
@@ -405,20 +411,20 @@ int hash2_element_to_bytes(element_t *element, uint8_t* last_buf, int hash_size,
 	// create output buffer
 	uint8_t* temp2_buf = (uint8_t *) malloc(last_buflen + buf_len + 4);
 	memset(temp2_buf, 0, (last_buflen + buf_len));
-	// copy first input buffer (last_buf) into target buffer
-	strncat((char *) temp2_buf, (char *) last_buf, last_buflen);
-	// copy element buffer (temp_buf) into target buffer
-	strncat((char *) temp2_buf, (char *) temp_buf, buf_len);
-//	int i;
-//	for(i = 0; i < last_buflen; i++) {
-//		temp2_buf[i] = last_buf[i];
-//	}
-//
-//	int j = 0;
-//	for(i = last_buflen; i < (last_buflen + buf_len); i++) {
-//		temp2_buf[i] = temp_buf[j];
-//		j++;
-//	}
+//	// copy first input buffer (last_buf) into target buffer
+//	strncat((char *) temp2_buf, (char *) last_buf, last_buflen);
+//	// copy element buffer (temp_buf) into target buffer
+//	strncat((char *) temp2_buf, (char *) temp_buf, buf_len);
+	int i;
+	for(i = 0; i < last_buflen; i++) {
+		temp2_buf[i] = last_buf[i];
+	}
+
+	int j = 0;
+	for(i = last_buflen; i < (last_buflen + buf_len); i++) {
+		temp2_buf[i] = temp_buf[j];
+		j++;
+	}
 	// hash the temp2_buf to bytes
 	result = hash_to_bytes(temp2_buf, (last_buflen + buf_len), hash_size, output_buf, HASH_FUNCTION_ELEMENTS);
 
@@ -1143,9 +1149,10 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 	Element *object;
 	PyObject *str;
 	char *hash_hex = NULL;
+	int label = 0;
 	
 	debug("Hashing the element...\n");
-	if(!PyArg_ParseTuple(args, "O", &object)) {
+	if(!PyArg_ParseTuple(args, "O|i", &object, &label)) {
 		PyErr_SetString(ElementError, "missing element object");
 		return NULL;
 	}
@@ -1157,7 +1164,7 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 	START_CLOCK(dBench);
 	int hash_size = HASH_LEN;
 	uint8_t hash_buf[hash_size + 1];
-	if(!hash_element_to_bytes(&object->e, hash_size, hash_buf)) {
+	if(!hash_element_to_bytes(&object->e, hash_size, hash_buf, label)) {
 		PyErr_SetString(ElementError, "failed to hash element");
 		return NULL;
 	}
@@ -1165,6 +1172,8 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 	hash_hex = convert_buffer_to_hex(hash_buf, hash_size);
 	printf_buffer_as_hex(hash_buf, hash_size);
 	
+
+
 	str = PyBytes_FromString((const char *) hash_hex);
 	free(hash_hex);
 	STOP_CLOCK(dBench);
@@ -1253,7 +1262,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 			if(PyElement_Check(tmpObject)) {
 				object = (Element *) tmpObject;
 				START_CLOCK(dBench);
-				result = hash_element_to_bytes(&object->e, HASH_LEN, hash_buf);
+				result = hash_element_to_bytes(&object->e, HASH_LEN, hash_buf, 0);
 				STOP_CLOCK(dBench);
 			}
 			else if(PyUnicode_Check(tmpObject)) {
@@ -1322,7 +1331,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 			debug_e("Hashing element '%B' to G1...\n", object->e);
 			// hash the element to the G1 field (uses sha1 as well)
 			// START_CLOCK
-			result = hash_element_to_bytes(&object->e, HASH_LEN, (unsigned char *) hash_buf);
+			result = hash_element_to_bytes(&object->e, HASH_LEN, (unsigned char *) hash_buf, 0);
 			if(!result) {
 				tmp = "could not hash to bytes";
 				goto cleanup;
@@ -1540,9 +1549,7 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 			uint8_t *serial_buf = (uint8_t *) PyBytes_AsString(object);
 			int type = atoi((const char *) &(serial_buf[0]));
 			uint8_t *base64_buf = (uint8_t *)(serial_buf + 2);
-//			debug("type => %d\n", type);
-//			debug("base64 dec => '%s'\n", base64_buf);
-//			size_t deserialized_len = strlen((char *) binary_buf);
+
 			size_t deserialized_len = 0;
 			uint8_t *binary_buf = NewBase64Decode((const char *) base64_buf, strlen((char *) base64_buf), &deserialized_len);
 
@@ -1573,7 +1580,7 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 }
 
 void print_mpz(mpz_t x, int base) {
-//#ifdef DEBUG
+#ifdef DEBUG
 	if(base <= 2 || base > 64) return;
 	size_t x_size = mpz_sizeinbase(x, base) + 2;
 	char *x_str = (char *) malloc(x_size);
@@ -1581,7 +1588,7 @@ void print_mpz(mpz_t x, int base) {
 	printf("Element => '%s'\n", x_str);
 	printf("Order of Element => '%zd'\n", x_size);
 	free(x_str);
-//#endif
+#endif
 }
 
 int check_membership(Element *elementObj) {
@@ -1797,7 +1804,7 @@ PyTypeObject ElementType = {
 	&element_number,               /*tp_as_number*/
 	0,                         /*tp_as_sequence*/
 	0,                         /*tp_as_mapping*/
-	(hashfunc)Element_index,                         /*tp_hash */
+	(hashfunc)Element_index,   /*tp_hash */
 	0,                         /*tp_call*/
 	0,                         /*tp_str*/
 	0,                         /*tp_getattro*/
@@ -1882,7 +1889,7 @@ PyTypeObject ElementType = {
     &element_number,       /*tp_as_number*/
     0,                         /*tp_as_sequence*/
     0,                         /*tp_as_mapping*/
-    0,                         /*tp_hash */
+    (hashfunc)Element_index,   /*tp_hash */
     0, 						/*tp_call*/
     (reprfunc)Element_print,   /*tp_str*/
     0,                         /*tp_getattro*/
@@ -1930,10 +1937,6 @@ PyMemberDef Element_members[] = {
 		"pairing type"},
 	{"type", T_INT, offsetof(Element, element_type), 0,
 		"group type"},
-//    {"first", T_OBJECT_EX, offsetof(Element, first), 0,
-//		"first name"},
-//    {"last", T_OBJECT_EX, offsetof(Element, last), 0,
-//		"last name"},
     {"initialized", T_INT, offsetof(Element, elem_initialized), 0,
 		"determine initialization status"},
     {NULL}  /* Sentinel */

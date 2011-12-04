@@ -1,5 +1,4 @@
-from toolbox.pairinggroup import *
-from charm.integer import *
+from charm.integer import randomBits
 import hmac, hashlib, math
 from toolbox.conversion import Conversion
 

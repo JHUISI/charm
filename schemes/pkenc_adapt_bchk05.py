@@ -2,20 +2,19 @@
 Boneh-Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform
 
 | From: "Improved Efficiency for CCA-Secure Cryptosystems Built Using Identity-Based Encryption", Section 4
+| Published In: Topics in Cryptology in CTRSA 2005
+| Available From: eprint.iacr.org/2004/261.pdf
 
 :Author: Christina Garman
 :Date: 12/2011
 '''
-from __future__ import print_function
 from charm.engine.util import *
 from toolbox.pairinggroup import *
-from charm.integer import *
+from charm.pairing import hash as sha1
 import hmac, hashlib, math
 from toolbox.IBEnc import *
-from charm.cryptobase import *
 from schemes.encap_bchk05 import *
 from schemes.ibenc_bb03 import *
-from charm.pairing import hash as sha1
 
 debug = False
 class BCHKIBEnc(IBEnc):
@@ -33,14 +32,13 @@ class BCHKIBEnc(IBEnc):
         return output
 
     def elmtToString(self, g, length):
-        gH = sha1(g)
-
+        hash_len = 20
+        b = int(math.ceil(length / hash_len))
         gStr = b''
-        while(len(gStr) < length):
-            gStr += gH
-
+        for i in range(1, b+1):
+            gStr += sha1(g, i)
         return gStr[:length]
-
+    
     def __init__(self, scheme, groupObj, encscheme):
         global ibenc, group, encap
         ibenc = scheme
@@ -59,7 +57,7 @@ class BCHKIBEnc(IBEnc):
 
         ID2 = group.hash(ID, ZR)
 
-        m2 = m+x
+        m2 = m + ':' + x
 
         kprime = group.random(GT)
         kprimeStr = self.elmtToString(kprime, len(m2))
@@ -69,12 +67,11 @@ class BCHKIBEnc(IBEnc):
         C2 = self.str_XOR(m2, kprimeStr)
         C2 = C2.encode('utf-8')
 
-        C1prime = pickleObject(serializeDict(C1, group))
+        C1prime = pickleObject(serialize(C1, group))
         
         tag = hmac.new(k, C1prime+C2, hashlib.sha1).digest()
         
         cipher = { 'ID':ID, 'C1':C1, 'C2':C2, 'tag':tag }
-
         return cipher
 
     def decrypt(self, pk, sk, c):
@@ -86,14 +83,13 @@ class BCHKIBEnc(IBEnc):
 
         m2 = self.str_XOR(c['C2'], kprimeStr)
 
-        x = m2[-135:]
-
+        x = m2.split(':')[1]
         k = encap.R(pk['pub'], c['ID'], x)
 
-        C1prime = pickleObject(serializeDict(c['C1'], group))
+        C1prime = pickleObject(serialize(c['C1'], group))
         
         if(c['tag'] == hmac.new(k, C1prime+c['C2'], hashlib.sha1).digest()):
-            return m2[:-135]
+            return m2.split(':')[0]
         else:
             return b'FALSE'
    

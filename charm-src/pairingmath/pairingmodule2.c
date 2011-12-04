@@ -79,16 +79,6 @@ static PyObject *f(PyObject *v, PyObject *w) { \
 	return NULL;				\
 }
 
-#define BINARY3(f, m, n) \
-static PyObject *f(PyObject *v, PyObject *w, PyObject *x) { \
-  debug("Performing the '%s' operation.\n", __func__); \
-  if(PyElement_Check(v) && PyElement_Check(w))  {  Element *obj1 = (Element *) v;  \
-	Element *obj2 = (Element *) w; if(Check_Types(obj1->element_type, obj2->element_type, m)) { \
-	return (n)(obj1, obj2);	}		\
-	}				\
-	return NULL;	\
-}		
-
 #define BINARY_NONE(f, m, n) \
 static PyObject *f(PyObject *v, PyObject *w) { \
  Py_INCREF(Py_NotImplemented);	\
@@ -203,22 +193,18 @@ static Element *createNewElement(Group_t element_type, Pairing *pairing) {
 	debug("Create an object of type Element\n");
 	Element *retObject = PyObject_New(Element, &ElementType);
 	if(element_type == ZR_t) {
-//		element_init_ZR(retObject->e, pairing->pair_obj);
 		retObject->e = element_init_ZR(0);
 		retObject->element_type = ZR_t;
 	}
 	else if(element_type == G1_t) {
-//		element_init_G1(retObject->e, pairing->pair_obj);
 		retObject->e = element_init_G1();
 		retObject->element_type = G1_t;
 	}
 	else if(element_type == G2_t) {
-//		element_init_G2(retObject->e, pairing->pair_obj);
 		retObject->e = element_init_G2();
 		retObject->element_type = G2_t;
 	}
 	else if(element_type == GT_t) {
-//		element_init_GT(retObject->e, pairing->pair_obj);
 		retObject->e = element_init_GT(pairing);
 		retObject->element_type = GT_t;
 	}
@@ -235,14 +221,12 @@ static Element *createNewElement(Group_t element_type, Pairing *pairing) {
 void 	Pairing_dealloc(Pairing *self)
 {
 	if(self->safe) {
-//		printf("Clear pairing => 0x%p\n", self->pair_obj);
 		pairing_clear(self->pair_obj);
 		element_delete(ZR_t, self->order);
 		self->pair_obj = NULL;
 		self->order = NULL;
 	}
 
-//	printf("Releasing pairing object!\n");
 	Py_TYPE(self)->tp_free((PyObject *) self);
 }
 
@@ -254,10 +238,6 @@ void	Element_dealloc(Element* self)
 		element_delete(self->element_type, self->e);
 	}
 	
-//	if(self->safe_pairing_clear && self->pairing) {
-//		debug("Clear pairing => 0x%p\n", self->pairing);
-//		pairing_clear(self->pairing);
-//	}
 	if(self->safe_pairing_clear) {
 		pairing_clear(self->pairing->pair_obj);
 		self->pairing->pair_obj = NULL;
@@ -288,36 +268,6 @@ void	Element_dealloc(Element* self)
 //	}
 //
 //	return 0;
-//}
-
-//char * init_pbc_param(char *file, pairing_t *pairing)
-//{
-//	pbc_param_t params;
-//	FILE *fp;
-//	size_t count;
-//	char *buf = NULL;
-//	fp = fopen(file, "r");
-//
-//	if(fp == NULL) {
-//		fprintf(stderr, "Error reading file!\n");
-//		return NULL;
-//	}
-//
-//	debug("Reading '%s'\n", file);
-//	count = read_file(fp, &buf);
-//	debug("param='%s'\n", buf);
-//
-//	if(pbc_param_init_set_buf(params, buf, count) == 0) {
-//		/* initialize the pairing_t struct with params */
-//		pairing_init_pbc_param(*pairing, params);
-//		debug("Pairing init!\n");
-//	}
-//	else {
-//		printf("Error: could not init pbc_param_t.\n");
-//		return NULL;
-//	}
-//
-//	return buf;
 //}
 
 /*!
@@ -1830,14 +1780,8 @@ static struct module_state _state;
 
 // end
 PyMemberDef Element_members[] = {
-//	{"params", T_STRING, offsetof(Element, params), 0,
-//		"pairing type"},
 	{"type", T_INT, offsetof(Element, element_type), 0,
 		"group type"},
-//    {"first", T_OBJECT_EX, offsetof(Element, first), 0,
-//		"first name"},
-//    {"last", T_OBJECT_EX, offsetof(Element, last), 0,
-//		"last name"},
     {"initialized", T_INT, offsetof(Element, elem_initialized), 0,
 		"determine initialization status"},
     {NULL}  /* Sentinel */
@@ -1853,6 +1797,7 @@ PyMethodDef Element_methods[] = {
 	{"serialize", (PyCFunction)Serialize_cmp, METH_VARARGS, "Serialize an element type into bytes."},
 	{"deserialize", (PyCFunction)Deserialize_cmp, METH_VARARGS, "De-serialize an bytes object into an element object"},
 	{"ismember", (PyCFunction) Group_Check, METH_VARARGS, "Group membership test for element objects."},
+	{"order", (PyCFunction) Get_Order, METH_NOARGS, "Get the group order for a particular field."},
     {NULL}  /* Sentinel */
 };
 
