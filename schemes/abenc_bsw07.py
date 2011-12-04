@@ -21,8 +21,8 @@ from toolbox.ABEnc import *
 # type annotations
 pk_t = { 'g':G1, 'g2':G2, 'h':G1, 'f':G1, 'e_gg_alpha':GT }
 mk_t = {'beta':ZR, 'g2_alpha':G2 }
-sk_t = { 'D':G2, 'Dj':G2, 'Djp':G1, 'S':unicode }
-ct_t = { 'C_tilde':GT, 'C':G1, 'Cy':G1, 'Cyp':G2 }
+sk_t = { 'D':G2, 'Dj':G2, 'Djp':G1, 'S':unicode } 
+ct_t = { 'C_tilde':GT, 'C':G1, 'Cy':G1, 'Cyp':G2, 'policy':unicode, 'attributes':unicode }
 
 debug = False
 class CPabe_BSW07(ABEnc):
@@ -53,7 +53,7 @@ class CPabe_BSW07(ABEnc):
         D_j, D_j_pr = {}, {}
         for j in S:
             r_j = group.random()
-            D_j[j] = g_r * (group.hash(j, G2) ** r_j)
+            D_j[j] = g_r * (group.hash(unicode(j), G2) ** r_j)
             D_j_pr[j] = pk['g'] ** r_j
         S = [unicode(s) for s in S]
         return { 'D':D, 'Dj':D_j, 'Djp':D_j_pr, 'S':S }

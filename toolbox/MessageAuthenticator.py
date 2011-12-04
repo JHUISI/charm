@@ -27,7 +27,7 @@ class MessageAuthenticator(object):
         return {
                 "alg": self._algorithm,
                 "msg": msg, 
-                "digest": hmac.new(self._key,bytes(self._algorithm+msg,'utf-8'),digestmod=sha1).hexdigest()
+                "digest": hmac.new(self._key,self._algorithm+msg,digestmod=sha1).hexdigest()
                }
 
     def verify(self,msgAndDigest):
@@ -36,6 +36,6 @@ class MessageAuthenticator(object):
         """
         if msgAndDigest['alg'] != self._algorithm:
             raise ValueError()
-        expected = bytes(self.mac(msgAndDigest['msg'])['digest'],'utf-8')
-        recieved = bytes(msgAndDigest['digest'],'utf-8')
+        expected = self.mac(msgAndDigest['msg'])['digest']
+        recieved = msgAndDigest['digest']
         return sha1(expected).digest() == sha1(recieved).digest() # we compare the hash instead of the direct value to avoid a timing attack

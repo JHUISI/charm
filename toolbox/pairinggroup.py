@@ -40,7 +40,7 @@ class PairingGroup():
 
     def init(self, type, value=None):
         if value != None:
-            return self.Pairing.init(type, value)
+            return self.Pairing.init(type, long(value))
         return self.Pairing.init(type)
             
     def random(self, type=ZR, seed=None):
@@ -65,8 +65,6 @@ class PairingGroup():
         raise NotImplementedException 
     
     def hash(self, args, type1=ZR):
-        if(type(args) == str):
-            args = unicode(args)
         return self.Pairing.H(args, type1)
     
     def serialize(self, obj):

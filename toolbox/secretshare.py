@@ -1,4 +1,5 @@
 # Implementing the proof of concept secret sharing 
+from __future__ import print_function
 from charm.pairing import *
 
 class SecretShare:
@@ -10,7 +11,8 @@ class SecretShare:
         share = 0
         # evaluate polynomial
         for i in range(0, len(coeff)):
-            share += (coeff[i] * (x ** i))
+            i2 = self.elem.init(ZR, i)
+            share += (coeff[i] * (x ** i2))
         return share
 
     def genShares(self, secret, k, n, q=None, x_points=None):
@@ -48,7 +50,7 @@ class SecretShare:
         #eBot = self.elem.init(ZR)
         coeff = {}
         #list = shares.keys()
-        #print("list :=", list)
+        #print("list :=", list, len(list), list[0])
         for i in list:
             result = 1
             for j in list:
@@ -59,7 +61,8 @@ class SecretShare:
                     #result *= eTop / eBot
                     result *= (0 - j) / (i - j)
             if self.verbose:
-                print("coeff '%d' => '%s'" % (i, result))
+                print("coeff => ", i, result)
+                #print("coeff '%d' => '%s'" % (i, result))
             coeff[i] = result
         return coeff
         
@@ -67,7 +70,6 @@ class SecretShare:
         list = shares.keys()
         if self.verbose: print(list)
         coeff = self.recoverCoefficients(list)
-        print("coefficients: ", coeff)
         secret = 0
         for i in list:
             secret += (coeff[i] * shares[i])

@@ -1,4 +1,4 @@
-from AuthenticatedCryptoAbstraction import AuthenticatedCryptoAbstraction
+from toolbox.AuthenticatedCryptoAbstraction import AuthenticatedCryptoAbstraction
 from charm.cryptobase import *
 from charm.pairing import hash as sha1
 from math import ceil

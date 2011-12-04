@@ -43,7 +43,7 @@ class SymmetricCryptoAbstraction(object):
         return self.__encode_decode(data,lambda x:b64encode(x).decode('utf-8'))
 
     def _decode(self,data):
-        return self.__encode_decode(data,lambda x:b64decode(bytes(x,'utf-8')))
+        return self.__encode_decode(data,lambda x:b64decode(x))
 
     def encrypt(self, message):
         ct = self._encrypt(message)
@@ -77,7 +77,7 @@ class SymmetricCryptoAbstraction(object):
         msg_len = ceil(len(message) / float(self.key_len)) * self.key_len
         extra = msg_len - len(message)
         # append 'extra' bytes to message
-        for i in range(0, extra):
+        for i in range(0, int(extra)):
             message += '\x00'
         return message
 

@@ -56,7 +56,7 @@ class KPabe(ABEnc):
         for x in attr_list:
             d = []; r = group.random()
             if not self.negatedAttr(x): # meaning positive
-                d.append((pk['g_G1'] ** (mk['alpha2'] * shares[x])) * (group.hash(x, G1) ** r))   # compute D1 for attribute x
+                d.append((pk['g_G1'] ** (mk['alpha2'] * shares[x])) * (group.hash(unicode(x), G1) ** r))   # compute D1 for attribute x
                 d.append((pk['g_G2'] ** r))  # compute D2 for attribute x
             #else:
             #    d.append((pk['g2_G1'] ** shares[x]) * (pk['g_G1_b2'] ** r)) # compute D3
@@ -84,7 +84,7 @@ class KPabe(ABEnc):
             sx[0] -= sx[i]
         
         # compute E3
-        E3 = [group.hash(x, G1) ** s for x in attr_list]
+        E3 = [group.hash(unicode(x), G1) ** s for x in attr_list]
         # compute E4
         E4 = [pk['g_G1_b'] ** sx[i] for i in range(len(attr_list))]
         E5 = [(pk['g_G1_b2'] ** (sx[i] * group.hash(attr_list[i]))) * (pk['h_G1_b'] ** sx[i]) for i in range(len(attr_list))]  

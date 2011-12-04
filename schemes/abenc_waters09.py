@@ -38,7 +38,7 @@ class CPabe09(ABEnc):
         t = group.random()
         K = msk['g2^alpha'] * (pk['g2^a'] ** t)
         L = pk['g2'] ** t
-        k_x = [group.hash(s, G1) ** t for s in attributes]
+        k_x = [group.hash(unicode(s), G1) ** t for s in attributes]
         
         K_x = {}
         for i in range(0, len(k_x)):

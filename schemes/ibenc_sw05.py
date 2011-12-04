@@ -12,7 +12,7 @@ Sahai-Waters Fuzzy Identity-Based Encryption, Large Universe Construction
 :Authors:    Christina Garman
 :Date:       10/2011
 '''
-
+from __future__ import print_function
 from toolbox.pairinggroup import *
 from charm.cryptobase import *
 from toolbox.IBEnc import *
@@ -28,7 +28,7 @@ class IBE_SW05(IBEnc):
                           message_space=[GT, 'KEM'], secmodel='SM', other={'id':ZR})
         global group, H, util
         group = groupObj
-        H = lambda x: group.hash(('0', x), ZR)
+        H = lambda x: group.hash((unicode('0'),unicode(x)), ZR)
         util = SecretShare(group, False)
         
     def setup(self, n, d):
@@ -116,7 +116,7 @@ class IBE_SW05_LUC(IBEnc):
                           message_space=[GT, 'KEM'], secmodel='SM', other={'id':ZR})
         global group, H, util
         group = groupObj
-        H = lambda x: group.hash(('0', x), ZR)
+        H = lambda x: group.hash((unicode('0'), unicode(x)), ZR)
         util = SecretShare(group, False)
         
     def setup(self, n, d):
@@ -138,15 +138,17 @@ class IBE_SW05_LUC(IBEnc):
         return (pk, mk)
 
     def eval_T(self, pk, n, x):
-        N = [group.init(ZR,(x + 1)) for x in range(n + 1)]        
-        N_int = [(x + 1) for x in range(n + 1)]
+        N = [group.init(ZR, (y + 1)) for y in range(n + 1)]        
+        N_int = [(y + 1) for y in range(n + 1)]
         
         coeffs = util.recoverCoefficients(N)
+        
         prod_result = 1
         for i in N_int:
             j = group.init(ZR, i)
             prod_result *= (pk['t'][i-1] ** coeffs[j])
-        
+
+        n = group.init(ZR, n)
         T = (pk['g2'] ** (x * n)) * prod_result
         return T
 

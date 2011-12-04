@@ -2,19 +2,18 @@
 Boneh-Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform
 
 | From: "Improved Efficiency for CCA-Secure Cryptosystems Built Using Identity-Based Encryption", Section 4
-| Published In: Topics in Cryptology – CTRSA 2005
-| Available From: eprint.iacr.org/2004/261.pdf
 
 :Author: Christina Garman
 :Date: 12/2011
 '''
+from __future__ import print_function
 from charm.engine.util import *
 from toolbox.pairinggroup import *
 from charm.integer import *
 import hmac, hashlib, math
 from toolbox.IBEnc import *
 from charm.cryptobase import *
-from schemes.encap_bchk04 import *
+from schemes.encap_bchk05 import *
 from schemes.ibenc_bb03 import *
 from charm.pairing import hash as sha1
 
@@ -26,7 +25,7 @@ class BCHKIBEnc(IBEnc):
             for letter in k:
                 if(not type(character) == int):
                     character = ord(character)
-                elif(not type(letter) == int):
+                if(not type(letter) == int):
                     letter = ord(letter)
 
                 character = chr(character ^ letter)
