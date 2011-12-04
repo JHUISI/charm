@@ -11,8 +11,7 @@ Hohenberger-Waters Stateful Signatures (RSA-based)
  * assumption:   RSA
 
 :Author:    J Ayo Akinyele/Christina Garman
-:Date:      1/2011
-:Status:    BROKEN at the moment
+:Date:      12/2011
 """
 
 from charm.integer import *
@@ -22,6 +21,8 @@ from toolbox.conversion import Conversion
 from toolbox.bitstring import Bytes
 from toolbox.specialprimes import BlumWilliamsInteger
 import hmac, hashlib, math
+
+debug = False
 
 def SHA1(bytes1):
   s1 = hashlib.new('sha1')
@@ -52,10 +53,7 @@ class Prf:
     return integer(randomBits(bits))
 
   @classmethod  
-  def eval(self, k, input1, outputLen):
-    if outputLen%8 != 0:
-       return False
-
+  def eval(self, k, input1): 
     if type(k) == integer:
         h = hmac.new(serialize(k), b'', hashlib.sha1)
     else:
@@ -113,6 +111,7 @@ class Sig_RSA_Stateless_HW09(PKSig):
         return (pk, sk);
     
     def sign(self, pk, sk, message, s=0):
+        print("Sign...")
         L, K, c, keyLength, u, h, N = pk['L'], pk['K'], pk['c'], pk['length'], pk['u'], pk['h'], pk['N']
         p, q = sk['p'], sk['q']
         # Use internal state counter if none was provided
@@ -171,10 +170,10 @@ class Sig_RSA_Stateless_HW09(PKSig):
         (x, r2) = self.ChameleonHash.hash(L, message, r)
 
         lhs = (Y ** ei) % N
-        #lhs = Y % N
-        print("lhs =>", lhs)
         rhs = ((u ** x) * h) % N
-        print("rhs =>", rhs)
+        if debug:
+            print("lhs =>", lhs)
+            print("rhs =>", rhs)
         # Verify that Y^e = (u^x h) mod N.  If so, accept the signature
         if lhs == rhs:
             return True
@@ -182,19 +181,18 @@ class Sig_RSA_Stateless_HW09(PKSig):
         return False
     
     def HW_hash(self, key, c, input, keyLen):
+        C = integer(c)
+        input_size = bitsize(c)
+        input_b = Conversion.IP2OS(input, input_size)
+#        print("input :=", input, "\n\n\n")
+#        print("input_b :=", input_b, type(input_b))
         # Return c XOR PRF(k, input), where the output of PRF is keyLength bits
-        if type(input) != str:
-            input_temp = input
-            input_s = ''
-            while input_temp > 0:
-                input_s = chr(input_temp & 0xff) + input_s
-                input_temp = input_temp >> 8
-            input_b = Bytes(input_s, 'utf8')
-        else: 
-            assert False, "Invalid input: need an integer."
-        result = integer(c) ^ self.Prf.eval(key, input_b, keyLen)
+        result = C ^ self.Prf.eval(key, input_b)
         return result
 
+#        result = integer(c) ^ self.Prf.eval(key, input_b, keyLen)
+#        return result
+        
 if __name__ == "__main__":
     pksig = Sig_RSA_Stateless_HW09() 
 
@@ -204,10 +202,17 @@ if __name__ == "__main__":
     print("sk =>", sk)
     
     m = SHA1(b'this is the message I want to hash.')
+    m2 = SHA1(b'please sign this message too!')
     #m = b'This is a message to hash'
     sig = pksig.sign(pk, sk, m)
     print("Signature...")
     print("sig =>", sig)
+    sig2 = pksig.sign(pk, sk, m2)
+    print("Signature 2...")
+    print("sig2 =>", sig2)
     
     assert pksig.verify(pk, m, sig), "FAILED VERIFICATION!!!"
+    assert pksig.verify(pk, m2, sig2), "FAILED VERIFICATION!!!"
     print("Successful Verification!!!")
+
+    
