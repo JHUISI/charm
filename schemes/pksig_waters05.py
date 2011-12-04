@@ -117,7 +117,7 @@ def main():
         print("msg => '%s'" % msg)
         print("sig => '%s'" % sig)
     
-    assert ibe.verify(pk, msg, sig)
+    assert ibe.verify(pk, msg, sig), "Failed verification!"
     if debug: print("Successful Verification!!! msg => '%s'" % msg)
 
 if __name__ == '__main__':

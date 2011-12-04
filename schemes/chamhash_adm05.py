@@ -16,7 +16,7 @@
 from toolbox.Hash import *
 from toolbox.integergroup import *
 
-debug = True
+debug = False
 class ChamHash_Adm05(ChamHash):
     def __init__(self):
         ChamHash.__init__(self)
@@ -46,13 +46,19 @@ class ChamHash_Adm05(ChamHash):
         C = r - (((pk['y'] ** e) * (pk['g'] ** s)) % p) % q
         return C
 
-if __name__ == "__main__":    
+def main():    
     chamHash = ChamHash_Adm05()
     
     #TODO: how long is paramgen supposed to take?
     (pk, sk) = chamHash.paramgen()
-    
+    if debug: print("pk => ", pk)
+    if debug: print("sk => ", sk)    
+
     msg = "hello world this is the message"
     c = chamHash.hash(pk, msg)
     
-    print("sig =>", c)
+    if debug: print("sig =>", c)
+
+if __name__ == "__main__":
+    debug = True
+    main()

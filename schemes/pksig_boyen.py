@@ -58,12 +58,12 @@ class Boyen(PKSig):
         return A_pk, B_pk, C_pk
     
     def sign(self, mpk, pk, sk, M):
-        print("Signing....")
-        print("pk =>", pk.keys())
+        if debug: print("Signing....")
+        if debug: print("pk =>", pk.keys())
         (A_pk, B_pk, C_pk) = self.getPKdict(mpk, pk, ['A', 'B', 'C'])
         m = H(M)
         l = len(A_pk.keys())
-        print("l defined as =>", l)        
+        if debug: print("l defined as =>", l)        
         s = [group.random(ZR) for i in range(l-1)] # 0:l-1
         t = [group.random(ZR) for i in range(l)]
         S = {}
@@ -82,33 +82,33 @@ class Boyen(PKSig):
         final = l-1
         d = (sk['a'] + (sk['b'] * m) + (sk['c'] * t[final]))  # s[l]
         S[final] = (mpk['g1'] * prod) ** ~d # S[l]
-        print("S[", final, "] :=", S[final])
+        if debug: print("S[", final, "] :=", S[final])
         sig = { 'S':S, 't':t }
         return sig
     
     def verify(self, mpk, pk, M, sig):
-        print("Verifying...")
+        if debug: print("Verifying...")
         At_pk, Bt_pk, Ct_pk = self.getPKdict(mpk, pk, ['At', 'Bt', 'Ct'])
         l = len(At_pk.keys())
-        print("Length =>", l)
+        if debug: print("Length =>", l)
         D = pair(mpk['g1'], mpk['g2'])
         S, t = sig['S'], sig['t']
         m = H(M)
         prod_result = group.init(GT, 1)
         for i in range(l):
             prod_result *= pair(S[i], At_pk[i] * (Bt_pk[i] ** m) * (Ct_pk[i] ** t[i]))
-        print("final result =>", prod_result)
-        print("D =>", D )
+        if debug: print("final result =>", prod_result)
+        if debug: print("D =>", D )
         if prod_result == D:
            return True
         return False
 
-if __name__ == "__main__":
+def main():
    groupObj = pairing('../param/d224.param')
    boyen = Boyen(groupObj)
    mpk = boyen.setup()
-   print("Pub parameters")
-   print(mpk, "\n\n")
+   if debug: print("Pub parameters")
+   if debug: print(mpk, "\n\n")
    
    num_signers = 3
    L_keys = [ boyen.keygen(mpk) for i in range(num_signers)]     
@@ -117,16 +117,19 @@ if __name__ == "__main__":
        L_pk[ i+1 ] = L_keys[ i ][ 0 ] # pk
        L_sk[ i+1 ] = L_keys[ i ][ 1 ]
 
-   print("Keygen...")
-   print("sec keys =>", L_sk.keys(),"\n", L_sk) 
+   if debug: print("Keygen...")
+   if debug: print("sec keys =>", L_sk.keys(),"\n", L_sk) 
 
    signer = 3
    sk = L_sk[signer] 
    M = 'please sign this new message!'
    sig = boyen.sign(mpk, L_pk, sk, M)
-   print("\nSignature...")
-   print("sig =>", sig)
+   if debug: print("\nSignature...")
+   if debug: print("sig =>", sig)
 
    assert boyen.verify(mpk, L_pk, M, sig), "invalid signature!"
-   print("Verification successful!")
-   
+   if debug: print("Verification successful!")
+
+if __name__ == "__main__":
+    debug = True
+    main()   

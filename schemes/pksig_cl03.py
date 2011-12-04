@@ -55,6 +55,21 @@ class Sig_CL03(PKSig):
 
         return sig
 
+    def signCommit(self, pk, sk, Cx):
+        e = randomPrime(le)
+
+        ls = ln + lm + l
+        rprime = integer(randomBits(ls))
+
+        phi_N = (sk['p']-1)*(sk['q']-1)
+        e2 = e % phi_N
+    
+        v = (((Cx)*(pk['b'] ** rprime)*pk['c']) ** (e2 ** -1)) % pk['N']
+
+        sig = { 'e':e, 'rprime':rprime, 'v':v }
+
+        return sig
+
     def verify(self, pk, m, sig):
         print("\nVERIFY\n\n")
 

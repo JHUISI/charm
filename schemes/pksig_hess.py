@@ -42,7 +42,7 @@ class CHCH(PKSig):
         return (pk, sk)
     
     def sign(self, pk, sk, M):
-        print("sign...")
+        if debug: print("sign...")
         h, s = group.random(G1), group.random(ZR)
         S1 = pair(h,pk['g2']) ** s 
         a = H2(M, S1)
@@ -52,30 +52,35 @@ class CHCH(PKSig):
 
     
     def verify(self, mpk, pk, M, sig):
-        print("verify...")
+        if debug: print("verify...")
         (S1, S2) = sig
         a = H2(M, S1)
         if pair(S2, mpk['g2']) == (pair(pk, mpk['P']) ** a) * S1: 
             return True
         return False
 
-if __name__ == "__main__":
+def main():
    
    groupObj = pairing('../param/a.param')
    chch = CHCH(groupObj)
    (mpk, msk) = chch.setup()
 
    _id = "janedoe@email.com"
-   (pk, sk) = chch.keygen(msk, _id)  
-   print("Keygen...")
-   print("pk =>", pk)
-   print("sk =>", sk)
+   (pk, sk) = chch.keygen(msk, _id)
+   if debug:  
+    print("Keygen...")
+    print("pk =>", pk)
+    print("sk =>", sk)
  
    M = "this is a message!" 
    sig = chch.sign(mpk, sk, M)
-   print("Signature...")
-   print("sig =>", sig)
+   if debug:
+    print("Signature...")
+    print("sig =>", sig)
 
    assert chch.verify(mpk, pk, M, sig), "invalid signature!"
-   print("Verification successful!")
-   
+   if debug: print("Verification successful!")
+
+if __name__ == "__main__":
+    debug = True
+    main()

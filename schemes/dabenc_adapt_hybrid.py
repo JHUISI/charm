@@ -1,4 +1,4 @@
-from AuthenticatedCryptoAbstraction import AuthenticatedCryptoAbstraction
+from toolbox.AuthenticatedCryptoAbstraction import AuthenticatedCryptoAbstraction
 from charm.cryptobase import *
 from charm.pairing import hash as sha1
 from math import ceil
@@ -76,7 +76,8 @@ def main():
     
     orig_msg = hyb_abema.decrypt(gp, K, ct)
     if debug: print("Result =>", orig_msg)
-    assert orig_msg == msg
+    assert orig_msg == msg, "Failed Decryption!!!"
+    print("Successful Decryption!!!")
     del groupObj
 
 if __name__ == "__main__":

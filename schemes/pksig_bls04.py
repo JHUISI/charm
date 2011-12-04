@@ -56,7 +56,7 @@ def main():
     
     if debug: print("Message: '%s'" % m)
     if debug: print("Signature: '%s'" % sig)     
-    assert bls.verify(pk, sig, m)
+    assert bls.verify(pk, sig, m), "Failure!!!"
     if debug: print('SUCCESS!!!')
     
 if __name__ == "__main__":

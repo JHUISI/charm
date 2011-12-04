@@ -46,7 +46,7 @@ class HW(PKSig):
     def sign(self, pk, sk, s, msg):
         s += 1
         S = group.init(ZR, s)
-        print("S =>", S)
+        if debug: print("S =>", S)
         M = group.H(msg, ZR)
         r, t = group.random(ZR), group.random(ZR)
         sigma1a = ((pk['u'] ** M) * (pk['v'] ** r) * pk['d']) ** sk['a']
@@ -69,19 +69,25 @@ class HW(PKSig):
         else:
             return False
         
-if __name__ == "__main__":
+def main():
     #AES_SECURITY = 80
     groupObj = pairing('../param/a.param')
     hw = HW(groupObj)
     
     (pk, sk) = hw.setup()
-    print("Public parameters")
-    print("pk =>", pk)
+    if debug:
+        print("Public parameters")
+        print("pk =>", pk)
 
     m = "please sign this message now please!"    
     sig = hw.sign(pk, sk, pk['s'], m)
-    print("Signature...")
-    print("sig =>", sig)
+    if debug:
+        print("Signature...")
+        print("sig =>", sig)
 
     assert hw.verify(pk, m, sig), "invalid signature"
-    print("Verification Successful!!")
+    if debug: print("Verification Successful!!")
+
+if __name__ == "__main__":
+    debug = True
+    main()

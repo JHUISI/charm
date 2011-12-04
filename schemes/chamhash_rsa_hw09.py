@@ -19,6 +19,7 @@ from toolbox.Hash import *
 from toolbox.integergroup import *
 from toolbox.conversion import *
 
+debug=False
 class ChamHash_HW09(ChamHash):
     def __init__(self):
         global group
@@ -50,17 +51,22 @@ class ChamHash_HW09(ChamHash):
         h = ((J ** M) * (r ** e)) % N
         return (h, r)
 
-if __name__ == "__main__":    
+def main():    
     chamHash = ChamHash_HW09()
     
     (pk, sk) = chamHash.paramgen(1024)
     
     msg = "Hello world this is the message!"
     (h, r) = chamHash.hash(pk, msg)
-    print("Hash...")
-    print("sig =>", (h, r))
+    if debug: print("Hash...")
+    if debug: print("sig =>", (h, r))
 
     (h1, r) = chamHash.hash(pk, msg, r)
-    print("sig 2 =>", c1)
+    if debug: print("sig 2 =>", h1)
 
-    assert h == h1, "Signature generated correctly!"
+    assert h == h1, "Signature failed!!!"
+    if debug: print("Signature generated correctly!!!")
+
+if __name__ == "__main__":
+    debug = True
+    main()

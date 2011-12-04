@@ -82,7 +82,7 @@ class CYH(PKSig):
             return True
         return False
 
-if __name__ == "__main__":
+def main():
    L = [ "alice", "bob", "carlos", "dexter", "eddie"] 
    ID = "bob"
    groupObj = pairing('../param/a.param')
@@ -91,14 +91,20 @@ if __name__ == "__main__":
 
    (ID, Pk, Sk) = cyh.keygen(msk, ID)  
    sk = (ID, Pk, Sk)
-   print("Keygen...")
-   print("sk =>", sk)
+   if debug:
+    print("Keygen...")
+    print("sk =>", sk)
   
    M = 'please sign this new message!'
    sig = cyh.sign(sk, L, M)
-   print("Signature...")
-   print("sig =>", sig)
+   if debug:
+    print("Signature...")
+    print("sig =>", sig)
 
    assert cyh.verify(mpk, L, M, sig), "invalid signature!"
-   print("Verification successful!")
+   if debug: print("Verification successful!")
+
+if __name__ == "__main__":
+    debug = True
+    main()
    

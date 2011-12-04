@@ -84,7 +84,7 @@ def main():
     
     message = pkenc.decrypt(pk, sk, ciphertext)
     
-    assert M == message
+    assert M == message, "Failed Decryption!!!"
     if debug: print("SUCCESSFUL DECRYPTION!!! => %s" % message)
    
 if __name__ == "__main__":

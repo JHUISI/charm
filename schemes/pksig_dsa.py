@@ -61,7 +61,7 @@ def main():
     m = "hello world test message!!!"
     sig = dsa.sign(pk, sk, m)
 
-    assert dsa.verify(pk, sig, m)
+    assert dsa.verify(pk, sig, m), "Failed verification!"
     if debug: print("Signature Verified!!!")
 
 if __name__ == "__main__":

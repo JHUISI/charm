@@ -60,7 +60,7 @@ def main():
     m = "hello world! this is a test message."
 
     sig = ecdsa.sign(pk, sk, m)
-    assert ecdsa.verify(pk, sig, m)
+    assert ecdsa.verify(pk, sig, m), "Failed verification!"
     if debug: print("Signature Verified!!!")
     
 if __name__ == "__main__":

@@ -95,7 +95,7 @@ class WatersSig:
             return True
         return False
 
-if __name__ == "__main__":
+def main():
    z = 5
    groupObj = pairing('../param/a.param')
 
@@ -104,12 +104,17 @@ if __name__ == "__main__":
 
    ID = 'janedoe@email.com'
    sk = waters.keygen(mpk, msk, ID)  
-   print("Keygen...")
-   print("sk =>", sk)
+   if debug:
+    print("Keygen...")
+    print("sk =>", sk)
  
    M = 'please sign this new message!'
    sig = waters.sign(mpk, sk, M)
-   print("Signature...")
+   if debug: print("Signature...")
 
    assert waters.verify(mpk, ID, M, sig), "invalid signature!"
-   print("Verification successful!")
+   if debug: print("Verification successful!")
+
+if __name__ == "__main__":
+    debug = True
+    main()
