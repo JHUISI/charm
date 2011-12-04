@@ -56,8 +56,7 @@ def main():
         print("c2 =>", ct['c2'])
     
     orig_msg = hyb_ibe.decrypt(pk, sk, ct)
-    #if debug: 
-    print("Result =>", orig_msg)
+    if debug: print("Result =>", orig_msg)
     assert orig_msg == msg
     del groupObj
 

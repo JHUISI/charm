@@ -13,7 +13,6 @@ from toolbox.pairinggroup import *
 from charm.pairing import hash as sha1
 import hmac, hashlib, math
 from toolbox.IBEnc import *
-from base64 import b64encode,b64decode
 from schemes.encap_bchk05 import *
 from schemes.ibenc_bb03 import *
 
@@ -32,15 +31,13 @@ class BCHKIBEnc(IBEnc):
             output += character
         return output
 
-    # TODO: fix this
     def elmtToString(self, g, length):
         hash_len = 20
         b = math.ceil(length / hash_len)
         gStr = b''
         for i in range(1, b+1):
             gStr += sha1(g, i)
-        result = gStr[:length]
-        return result
+        return gStr[:length]
     
     def __init__(self, scheme, groupObj, encscheme):
         global ibenc, group, encap
