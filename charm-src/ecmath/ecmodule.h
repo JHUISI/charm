@@ -66,6 +66,14 @@ typedef struct {
 	int point_init, group_init, nid;
 } ECElement;
 
+#if PY_MAJOR_VERSION >= 3
+#define PyLong_ToUnsignedLong(o) PyLong_AsUnsignedLong(o)
+#define PyLongCheck(o) PyLong_Check(o)
+#else
+#define PyLong_ToUnsignedLong(o) PyInt_AsUnsignedLongMask(o)
+#define PyLongCheck(o) PyInt_Check(o) || PyLong_Check(o)
+#endif
+
 #define ErrorMsg(msg) \
 	PyErr_SetString(PyECErrorObject, msg); \
 	return NULL;
@@ -75,7 +83,7 @@ typedef struct {
 		lhs = (ECElement *) o1; \
 		debug("found a lhs object.\n"); \
     } \
-	else if(PyLong_Check(o1)) { \
+	else if(PyLongCheck(o1)) { \
 		foundLHS = TRUE;  }		\
 	else  {  ErrorMsg("invalid type specified.");   \
 		}				\
@@ -83,7 +91,7 @@ typedef struct {
 		rhs = (ECElement *) o2; \
 		debug("found a rhs object.\n"); \
     } \
-	else if(PyLong_Check(o2)) {  \
+	else if(PyLongCheck(o2)) {  \
 		foundRHS = TRUE; }		\
 	else  {  ErrorMsg("invalid type specified.");   \
 		}
@@ -102,12 +110,6 @@ typedef struct {
 
 #define ElementG(a, b) a->type == G && b->type == G
 #define ElementZR(a, b) a->type == ZR && b->type == ZR
-
-#if PY_MAJOR_VERSION >= 3
-#define PyLong_ToUnsignedLong(o) PyLong_AsUnsignedLong(o)
-#else
-#define PyLong_ToUnsignedLong(o) PyInt_AsUnsignedLongMask(o)
-#endif
 
 void longObjToMPZ (mpz_t m, PyLongObject * p);
 void setBigNum(PyLongObject *obj, BIGNUM **value);
