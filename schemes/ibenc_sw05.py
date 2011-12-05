@@ -148,7 +148,7 @@ class IBE_SW05_LUC(IBEnc):
             j = group.init(ZR, i)
             prod_result *= (pk['t'][i-1] ** coeffs[j])
 
-        n = group.init(ZR, n)
+        #n = group.init(ZR, n)
         T = (pk['g2'] ** (x * n)) * prod_result
         return T
 

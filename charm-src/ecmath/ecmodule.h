@@ -103,6 +103,12 @@ typedef struct {
 #define ElementG(a, b) a->type == G && b->type == G
 #define ElementZR(a, b) a->type == ZR && b->type == ZR
 
+#if PY_MAJOR_VERSION >= 3
+#define PyLong_ToUnsignedLong(o) PyLong_AsUnsignedLong(o)
+#else
+#define PyLong_ToUnsignedLong(o) PyInt_AsUnsignedLongMask(o)
+#endif
+
 void longObjToMPZ (mpz_t m, PyLongObject * p);
 void setBigNum(PyLongObject *obj, BIGNUM **value);
 PyObject *ECElement_new(PyTypeObject *type, PyObject *args, PyObject *kwds);

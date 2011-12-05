@@ -1094,7 +1094,7 @@ static PyObject *ECE_equals(PyObject *o1, PyObject *o2, int opid) {
 	if(foundLongLHS) {
 		if(rhs->type == ZR) {
 			BIGNUM *lhs_val = BN_new();
-			BN_set_word(lhs_val, PyLong_AsUnsignedLong(o1));
+			BN_set_word(lhs_val, PyLong_ToUnsignedLong(o1));
 			START_CLOCK(dBench);
 			if(BN_cmp(lhs_val, rhs->elemZ) == 0) {
 				if(opid == Py_EQ) result = TRUE;
@@ -1109,7 +1109,7 @@ static PyObject *ECE_equals(PyObject *o1, PyObject *o2, int opid) {
 	else if(foundLongRHS) {
 		if(lhs->type == ZR) {
 			BIGNUM *rhs_val = BN_new();
-			BN_set_word(rhs_val, PyLong_AsUnsignedLong(o2));
+			BN_set_word(rhs_val, PyLong_ToUnsignedLong(o2));
 			START_CLOCK(dBench);
 			if(BN_cmp(lhs->elemZ, rhs_val) == 0) {
 				if(opid == Py_EQ) result = TRUE;
