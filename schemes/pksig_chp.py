@@ -50,22 +50,28 @@ class CHP(PKSig):
             return True
         return False
 
-if __name__ == "__main__":
+def main():
    
    groupObj = pairing('../param/a.param')
    chp = CHP(groupObj)
    mpk = chp.setup()
 
-   (pk, sk) = chp.keygen(mpk)  
-   print("Keygen...")
-   print("pk =>", pk)
-   print("sk =>", sk)
+   (pk, sk) = chp.keygen(mpk) 
+   if debug: 
+    print("Keygen...")
+    print("pk =>", pk)
+    print("sk =>", sk)
   
    M = { 't1':'time_1', 't2':'time_2', 't3':'time_3', 'str':'this is the message'}
    sig = chp.sign(pk, sk, M)
-   print("Signature...")
-   print("sig =>", sig)
+   if debug:
+    print("Signature...")
+    print("sig =>", sig)
 
    assert chp.verify(mpk, pk, M, sig), "invalid signature!"
-   print("Verification successful!")
+   if debug: print("Verification successful!")
+
+if __name__ == "__main__":
+    debug = True
+    main()
    

@@ -60,7 +60,7 @@ def main():
     m = 'this is a new message'
     cipher = hyenc.encrypt(pk, m)
     orig_m = hyenc.decrypt(pk, sk, cipher)
-    assert m == orig_m
+    assert m == orig_m, "Failed Decryption"
     if debug: print("Successful Decryption!!")
 
 if __name__ == "__main__":

@@ -12,7 +12,6 @@ Boneh-Franklin Identity Based Encryption
 :Authors:    Joseph Ayo Akinyele
 :Date:            2/2011
 '''
-from __future__ import print_function
 from toolbox.pairinggroup import *
 from toolbox.hash_module import *
 from toolbox.IBEnc import IBEnc
@@ -114,6 +113,7 @@ def main():
 
     msg = ibe.decrypt(pk, key, ciphertext)
     assert msg == m,  "failed decrypt: \n%s\n%s" % (msg, m)
+    if debug: print("Successful Decryption!!!")
     
         
 if __name__ == "__main__":

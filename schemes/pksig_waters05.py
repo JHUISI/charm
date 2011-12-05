@@ -9,7 +9,7 @@
 :Authors:	Gary Belvin
 :Date:			06/2011
 ''' 
-from __future__ import print_function
+
 from charm.cryptobase import *
 from toolbox.PKSig import *
 from toolbox.bitstring import Bytes
@@ -74,7 +74,7 @@ class IBE_N04_Sig(PKSig):
         for i in range(pk['n']):  #n must be greater than or equal to 1
             binsubstr = bstr[pk['l']*i : pk['l']*(i+1)]
             intval = int(binsubstr, 2)
-            intelement = group.init(ZR, long(intval)) 
+            intelement = group.init(ZR, intval) 
             v.append(intelement)
                      
         return v
@@ -117,7 +117,7 @@ def main():
         print("msg => '%s'" % msg)
         print("sig => '%s'" % sig)
     
-    assert ibe.verify(pk, msg, sig)
+    assert ibe.verify(pk, msg, sig), "Failed verification!"
     if debug: print("Successful Verification!!! msg => '%s'" % msg)
 
 if __name__ == '__main__':

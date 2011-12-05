@@ -77,7 +77,7 @@ def main():
     if debug: print("\nMessage =>", M)
     if debug: print("Sigma =>", sigma)
     
-    assert ibsig.verify(mpk, M, sigma)
+    assert ibsig.verify(mpk, M, sigma), "Failed Verification!!!"
     if debug: print("Successful Verification!!!")
     del groupObj
 

@@ -65,3 +65,23 @@ class HybridABEnc(ABEnc):
         for i in range(0, extra):
             message += '\x00'
         return message
+
+def main():
+    groupObj = PairingGroup('../param/a.param')
+    cpabe = CPabe_BSW07(groupObj)
+    hyb_abe = HybridABEnc(cpabe, groupObj)
+    access_policy = '((four or three) and (two or one))'
+    message = "hello world this is an important message."
+    (pk, mk) = hyb_abe.setup()
+    if debug: print("pk => ", pk)
+    if debug: print("mk => ", mk)
+    sk = hyb_abe.keygen(pk, mk, ['ONE', 'TWO', 'THREE'])
+    if debug: print("sk => ", sk)
+    ct = hyb_abe.encrypt(pk, message, access_policy)
+    mdec = hyb_abe.decrypt(pk, sk, ct)
+    assert mdec == message, "Failed Decryption!!!"
+    if debug: print("Successful Decryption!!!")
+
+if __name__ == "__main__":
+    debug = True
+    main()

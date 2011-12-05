@@ -44,7 +44,7 @@ def main():
     
     if debug: print("recovered m =>", rout)
 
-    assert r == rout
+    assert r == rout, "Failed Decryption"
     if debug: print("Successful Decryption!!!")
     
 if __name__ == "__main__":

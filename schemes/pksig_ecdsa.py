@@ -35,7 +35,7 @@ class ECDSA(PKSig):
             r = group.zr(pk['g'] ** k)
             e = group.hash(M)
             s = (~k) * (e + x * r)
-            if ((r == long(0)) or (s == long(0))):
+            if (r == long(0) or s == long(0)):
                 print ("unlikely error r = %s, s = %s" % (r,s))
                 continue
             else:
@@ -60,7 +60,7 @@ def main():
     m = "hello world! this is a test message."
 
     sig = ecdsa.sign(pk, sk, m)
-    assert ecdsa.verify(pk, sig, m)
+    assert ecdsa.verify(pk, sig, m), "Failed verification!"
     if debug: print("Signature Verified!!!")
     
 if __name__ == "__main__":

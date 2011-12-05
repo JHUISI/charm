@@ -15,6 +15,7 @@ Dan Boneh, Xavier Boyen, and Hovav Shacham
 from toolbox.pairinggroup import *
 from toolbox.PKSig import PKSig
 
+debug=False
 class ShortSig(PKSig):
     def __init__(self, groupObj):
         PKSig.__init__(self)
@@ -35,9 +36,9 @@ class ShortSig(PKSig):
         x = [group.random(ZR) for i in range(n)]
         A = [gpk['g1'] ** ~(gamma + x[i]) for i in range(n)]
         gsk = {}
-        print("\nSecret keys...")
+        if debug: print("\nSecret keys...")
         for i in range(n):
-            print("User %d: A = %s, x = %s" % (i, A[i], x[i]))
+            if debug: print("User %d: A = %s, x = %s" % (i, A[i], x[i]))
             gsk[i] = (A[i], x[i]) 
         return (gpk, gmsk, gsk)
     
@@ -80,11 +81,11 @@ class ShortSig(PKSig):
         c_prime = group.hash((M, t1, t2, t3, R1_, R2_, R3_, R4_, R5_), ZR)
         
         if c == c_prime:
-            print("c => '%s'" % c)
-            print("Valid Group Signature for message: '%s'" % M)
+            if debug: print("c => '%s'" % c)
+            if debug: print("Valid Group Signature for message: '%s'" % M)
             validSignature = True
         else:
-            print("Not a valid signature for message!!!")
+            if debug: print("Not a valid signature for message!!!")
         return validSignature
     
     def open(self, gpk, gmsk, M, sigma):
@@ -93,7 +94,7 @@ class ShortSig(PKSig):
         A_prime = t3 / ((t1 ** xi1) * (t2 ** xi2))
         return A_prime
         
-if __name__ == '__main__':
+def main():
     groupObj = PairingGroup('../param/d224.param')
     n = 3    # how manu users in the group
     user = 1 # which user's key to sign a message with
@@ -103,12 +104,11 @@ if __name__ == '__main__':
     (gpk, gmsk, gsk) = sigTest.keygen(n)
 
     message = 'Hello World this is a message!'
-    print("\n\nSign the following M: '%s'" % (message))
+    if debug: print("\n\nSign the following M: '%s'" % (message))
     
     signature = sigTest.sign(gpk, gsk[user], message)
     
     result = sigTest.verify(gpk, message, signature)
-    
     #if result:
     #    print("Verify signers identity...")
     #    index = sigTest.open(gpk, gmsk, message, signature)
@@ -118,4 +118,9 @@ if __name__ == '__main__':
     #            print('Found index of signer: %d' % i)
     #            print('A = %s' % index)
     #        i += 1
-    print('Complete!')
+    assert result, "Signature Failed"
+    if debug: print('Complete!')
+
+if __name__ == "__main__":
+    debug = True
+    main()

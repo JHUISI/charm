@@ -29,7 +29,7 @@ class WatersSig:
 
     def sha1(self, message):
         h = hashObj.copy()
-        h.update(bytes(message, 'utf-8'))
+        h.update(message)
         return Bytes(h.digest())    
 
     def setup(self, z, l=32):
@@ -64,18 +64,18 @@ class WatersSig:
         return v
     
     def keygen(self, mpk, msk, ID):
-        print("Keygen alg...")
+        if debug: print("Keygen alg...")
         k = self.strToId(mpk, ID) # return list from k1,...,kz
-        print("k =>", k)
+        if debug: print("k =>", k)
         r = group.random(ZR)
         k1 = msk * ((mpk['u1t'] * dotprod(group.init(G1), -1, mpk['z'], lam_func, mpk['u'], k)) ** r)  
         k2 = mpk['g1'] ** -r
         return (k1, k2)
     
     def sign(self, mpk, sk, M):
-        print("Sign alg...")
+        if debug: print("Sign alg...")
         m = self.strToId(mpk, M) # return list from m1,...,mz
-        print("m =>", m)
+        if debug: print("m =>", m)
         (k1, k2) = sk
         s  = group.random(ZR)
         S1 = k1 * ((mpk['u2t'] * dotprod(group.init(G1), -1, mpk['z'], lam_func, mpk['u'], m)) ** s)
@@ -84,7 +84,7 @@ class WatersSig:
         return {'S1':S1, 'S2':S2, 'S3':S3}
     
     def verify(self, mpk, ID, M, sig):
-        print("Verify...")
+        if debug: print("Verify...")
         k = self.strToId(mpk, ID)
         m = self.strToId(mpk, M)
         (S1, S2, S3) = sig['S1'], sig['S2'], sig['S3']
@@ -95,7 +95,7 @@ class WatersSig:
             return True
         return False
 
-if __name__ == "__main__":
+def main():
    z = 5
    groupObj = pairing('../param/a.param')
 
@@ -104,12 +104,17 @@ if __name__ == "__main__":
 
    ID = 'janedoe@email.com'
    sk = waters.keygen(mpk, msk, ID)  
-   print("Keygen...")
-   print("sk =>", sk)
+   if debug:
+    print("Keygen...")
+    print("sk =>", sk)
  
    M = 'please sign this new message!'
    sig = waters.sign(mpk, sk, M)
-   print("Signature...")
+   if debug: print("Signature...")
 
    assert waters.verify(mpk, ID, M, sig), "invalid signature!"
-   print("Verification successful!")
+   if debug: print("Verification successful!")
+
+if __name__ == "__main__":
+    debug = True
+    main()
