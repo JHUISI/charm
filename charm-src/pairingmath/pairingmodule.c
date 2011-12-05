@@ -224,6 +224,9 @@ Element *convertToZR(PyObject *longObj, PyObject *elemObj) {
 
 	mpz_t x;
 	mpz_init(x);
+#if PY_MAJOR_VERSION < 3
+	longObj = PyNumber_Long(longObj);
+#endif
 	longObjToMPZ(x, (PyLongObject *) longObj);
 	element_set_mpz(new->e, x);
 	return new;
@@ -1214,7 +1217,11 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 
 	// first case: is a string and type may or may not be set
 	if(PyUnicode_Check(objList)) {
+#if PY_MAJOR_VERSION >= 3
 		char *str = PyBytes_AS_STRING(PyUnicode_AsUTF8String(objList));
+#else
+		char *str = PyString_AsString(objList);
+#endif
 		if(type == ZR) {
 			debug("Hashing string '%s' to Zr...\n", str);
 			// create an element of Zr
@@ -1266,7 +1273,11 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 				STOP_CLOCK(dBench);
 			}
 			else if(PyUnicode_Check(tmpObject)) {
+#if PY_MAJOR_VERSION >= 3
 				char *str = PyBytes_AS_STRING(PyUnicode_AsUTF8String(tmpObject));
+#else
+				char *str = PyString_AsString(tmpObject);
+#endif
 				START_CLOCK(dBench);
 				result = hash_to_bytes((uint8_t *) str, strlen((char *) str), HASH_LEN, hash_buf, HASH_FUNCTION_STR_TO_Zr_CRH);
 				STOP_CLOCK(dBench);
@@ -1291,7 +1302,11 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 					memcpy(hash_buf, out_buf, HASH_LEN);
 				}
 				else if(PyUnicode_Check(tmpObject)) {
-					char *str = PyBytes_AS_STRING(PyUnicode_AsUTF8String(tmpObject));
+#if PY_MAJOR_VERSION >= 3
+				char *str = PyBytes_AS_STRING(PyUnicode_AsUTF8String(tmpObject));
+#else
+				char *str = PyString_AsString(tmpObject);
+#endif
 					START_CLOCK(dBench);
 					// this assumes that the string is the first object (NOT GOOD, change)
 //					result = hash_to_bytes((uint8_t *) str, strlen((char *) str), HASH_LEN, (unsigned char *) hash_buf, HASH_FUNCTION_STR_TO_Zr_CRH);
