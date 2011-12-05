@@ -156,6 +156,8 @@ for opt do
   --extra-ldflags=*) LDFLAGS="$optarg $LDFLAGS"
   ;;
   --extra-cppflags=*) CPPFLAGS="$optarg $CPPFLAGS"
+  ;;
+  --python-build-ext=*) PYTHONBUILDEXT="$optarg" 
   esac
 done
 # OS specific
@@ -306,6 +308,10 @@ for opt do
   ;;
   --extra-ldflags=*)
   ;;
+  --extra-cppflags=*)
+  ;;
+  --python-build-ext=*)
+  ;;
   --cpu=*)
   ;;
   --enable-gprof) gprof="yes"
@@ -370,7 +376,7 @@ for opt do
   ;;
   --python=*) python_path="$optarg"
   ;;
-  --build-win-exe) LDFLAGS="-L/c/charm-crypto/lib $LDFLAGS" CPPFLAGS="-I/c/charm-crypto/include -I/c/charm-crypto/include/openssl/ $CPPFLAGS" prefix="/c/charm-crypto" PYTHONFLAGS="build_ext -L/c/charm-crypto/lib -I/c/charm-crypto/include/"
+  --build-win-exe) LDFLAGS="-L/c/charm-crypto/lib $LDFLAGS" CPPFLAGS="-I/c/charm-crypto/include -I/c/charm-crypto/include/openssl/ $CPPFLAGS" prefix="/c/charm-crypto" PYTHONBUILDEXT="-L/c/charm-crypto/lib -I/c/charm-crypto/include/"
   ;;
   --*dir)
   ;;
@@ -413,17 +419,18 @@ EOF
 echo "Standard options:"
 echo "  --help                   print this message"
 echo "  --prefix=PREFIX          install in PREFIX [$prefix]"
+echo ""
 echo "Advanced options:"
 echo "  --source-path=PATH       path of source code [$source_path]"
 echo "  --cross-prefix=PREFIX    use PREFIX for compile tools [$cross_prefix]"
 echo "  --cc=CC                  use C compiler CC [$cc]"
-echo "  --host-cc=CC             use C compiler CC [$host_cc] for code run at"
-echo "                           build time"
+echo "  --host-cc=CC             use C compiler CC [$host_cc] for code run at build time"
 echo "  --extra-cflags=CFLAGS    append extra C compiler flags CHARM_CFLAGS"
 echo "  --extra-ldflags=LDFLAGS  append extra linker flags LDFLAGS"
-
+echo "  --extra-cppflags=CPPFLAG append extra c pre-processor flags CPPFLAGS"
 echo "  --make=MAKE              use specified make [$make]"
 echo "  --python=PATH            use specified path to python 3, if not standard"
+echo "  --python-build-ext=OPTS  append extra python build_ext options OPTS"
 echo "  --install=INSTALL        use specified install [$install]"
 echo "  --static                 enable static build [$static]"
 echo "  --mandir=PATH            install man pages in PATH"
@@ -443,7 +450,7 @@ echo "  --disable-werror         disable compilation abort on warning"
 echo "  --enable-cocoa           enable COCOA (Mac OS X only)"
 echo "  --enable-docs            enable documentation build"
 echo "  --disable-docs           disable documentation build"
-echo "	--sphinx-build=PATH      overide the defualt sphinx-build which is \`which sphinx-build\`"       
+echo "  --sphinx-build=PATH      overide the default sphinx-build which is \`which sphinx-build\`"       
 echo ""
 echo "NOTE: The object files are built at the place where configure is launched"
 exit 1
@@ -688,6 +695,7 @@ echo "CHARM_CFLAGS       $CHARM_CFLAGS"
 echo "LDFLAGS           $LDFLAGS"
 echo "make              $make"
 echo "python            $python_path"
+echo "build_ext options build_ext $PYTHONBUILDEXT"
 echo "install           $install"
 echo "host CPU          $cpu"
 echo "wget              $wget"
@@ -862,16 +870,19 @@ if test "$wget" = "" ; then
 fi
 
 if [ "$targetos" = "MINGW32" ] ; then
-	echo "PYTHONFLAGS=--compile=mingw32 $PYTHONFLAGS" >> $config_mk
+	echo "PYTHONFLAGS=--compile=mingw32" >> $config_mk
 	echo "OSFLAGS=--disable-static --enable-shared $OSFLAGS" >> $config_mk
 fi
 
 # For python installers on OS X.
 test_path=`echo $python_path | awk 'BEGIN {FS="."}{print $1}'`
 if [ "$test_path" = "/Library/Frameworks/Python" ] ; then
-echo "PYTHONFLAGS=build_ext -L/usr/local/lib -I/usr/local/include" >> $config_mk
+    echo "PYTHONBUILDEXT=-L/usr/local/lib -I/usr/local/include $PYTHONBUILDEXT" >> $config_mk
 fi
 
+if [ "$PYTHONBUILDEXT" != "" ] ; then
+    echo "PYTHONBUILDEXT=build_ext $PYTHONBUILDEXT" >> $config_mk
+fi
 
 if test "$libm_found" = "no" ; then
    echo "ERROR: libm not found. Please install first, then re-run configure."
