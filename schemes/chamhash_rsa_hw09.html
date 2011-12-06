@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>chamhash_rsa_hw09 &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>chamhash_rsa_hw09 &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
     <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
     <link rel="next" title="commit_gs08" href="commit_gs08.html" />
     <link rel="prev" title="chamhash_adm05" href="chamhash_adm05.html" /> 
@@ -43,7 +46,7 @@
         <li class="right" >
           <a href="chamhash_adm05.html" title="chamhash_adm05"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,8 +56,58 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="chamhash-rsa-hw09">
-<h1>chamhash_rsa_hw09<a class="headerlink" href="#chamhash-rsa-hw09" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-chamhash_rsa_hw09">
+<span id="chamhash-rsa-hw09"></span><h1>chamhash_rsa_hw09<a class="headerlink" href="#module-chamhash_rsa_hw09" title="Permalink to this headline">¶</a></h1>
+<p>Hohenberger-Waters Chameleon Hash (RSA-based)
+based on the scheme of Ateneise and de Medeiros</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">From: &#8220;S. Hohenberger, B. Waters. Realizing Hash-and-Sign Signatures under Standard Assumptions&#8221;, Appendix A.</div>
+<div class="line">Published in: Eurocrypt 2009</div>
+<div class="line">Available from: <a class="reference external" href="http://eprint.iacr.org/2009/028.pdf">http://eprint.iacr.org/2009/028.pdf</a></div>
+<div class="line">Notes: </div>
+</div>
+<ul class="simple">
+<li>type:       hash function (chameleon)</li>
+<li>setting:      RSA</li>
+<li>assumption:   RSA</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Author:</th><td class="field-body"><ol class="first upperalpha simple" start="10">
+<li>Ayo Akinyele</li>
+</ol>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body"><p class="first last">1/2011</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="chamhash_rsa_hw09.ChamHash_HW09">
+<em class="property">class </em><tt class="descclassname">chamhash_rsa_hw09.</tt><tt class="descname">ChamHash_HW09</tt><a class="reference internal" href="../_modules/chamhash_rsa_hw09.html#ChamHash_HW09"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chamhash_rsa_hw09.ChamHash_HW09" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.Hash.ChamHash</span></tt></p>
+<dl class="method">
+<dt id="chamhash_rsa_hw09.ChamHash_HW09.hash">
+<tt class="descname">hash</tt><big>(</big><em>pk</em>, <em>message</em>, <em>r=0</em><big>)</big><a class="reference internal" href="../_modules/chamhash_rsa_hw09.html#ChamHash_HW09.hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chamhash_rsa_hw09.ChamHash_HW09.hash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chamhash_rsa_hw09.ChamHash_HW09.paramgen">
+<tt class="descname">paramgen</tt><big>(</big><em>secparam</em>, <em>p=0</em>, <em>q=0</em><big>)</big><a class="reference internal" href="../_modules/chamhash_rsa_hw09.html#ChamHash_HW09.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chamhash_rsa_hw09.ChamHash_HW09.paramgen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="chamhash_rsa_hw09.main">
+<tt class="descclassname">chamhash_rsa_hw09.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/chamhash_rsa_hw09.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chamhash_rsa_hw09.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
@@ -106,14 +159,14 @@
         <li class="right" >
           <a href="chamhash_adm05.html" title="chamhash_adm05"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

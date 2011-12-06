@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pkenc_elgamal85 &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>pkenc_elgamal85 &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
     <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
     <link rel="next" title="pkenc_paillier99" href="pkenc_paillier99.html" />
     <link rel="prev" title="pkenc_cs98_ec" href="pkenc_cs98_ec.html" /> 
@@ -43,7 +46,7 @@
         <li class="right" >
           <a href="pkenc_cs98_ec.html" title="pkenc_cs98_ec"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,8 +56,65 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="pkenc-elgamal85">
-<h1>pkenc_elgamal85<a class="headerlink" href="#pkenc-elgamal85" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-pkenc_elgamal85">
+<span id="pkenc-elgamal85"></span><h1>pkenc_elgamal85<a class="headerlink" href="#module-pkenc_elgamal85" title="Permalink to this headline">¶</a></h1>
+<p>El Gamal Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption in groups of prime order)</p>
+<div class="line-block">
+<div class="line">Available from: <a class="reference external" href="http://en.wikipedia.org/wiki/ElGamal_encryption">http://en.wikipedia.org/wiki/ElGamal_encryption</a></div>
+<div class="line">Notes: </div>
+</div>
+<ul class="simple">
+<li>type:          encryption (public key)</li>
+<li>setting:       DDH-hard prime order group</li>
+<li>assumption:    DDH</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">J Ayo Akinyele</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">3/2011</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="pkenc_elgamal85.ElGamal">
+<em class="property">class </em><tt class="descclassname">pkenc_elgamal85.</tt><tt class="descname">ElGamal</tt><big>(</big><em>group_type=&lt;class 'int'&gt;</em>, <em>builtin_cv=410</em><big>)</big><a class="reference internal" href="../_modules/pkenc_elgamal85.html#ElGamal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_elgamal85.ElGamal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.PKEnc.PKEnc</span></tt></p>
+<dl class="method">
+<dt id="pkenc_elgamal85.ElGamal.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>c</em><big>)</big><a class="reference internal" href="../_modules/pkenc_elgamal85.html#ElGamal.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_elgamal85.ElGamal.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pkenc_elgamal85.ElGamal.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>M</em><big>)</big><a class="reference internal" href="../_modules/pkenc_elgamal85.html#ElGamal.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_elgamal85.ElGamal.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pkenc_elgamal85.ElGamal.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>secparam=1024</em><big>)</big><a class="reference internal" href="../_modules/pkenc_elgamal85.html#ElGamal.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_elgamal85.ElGamal.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pkenc_elgamal85.ElGamal.paramgen">
+<tt class="descname">paramgen</tt><big>(</big><em>_type</em>, <em>_cv</em><big>)</big><a class="reference internal" href="../_modules/pkenc_elgamal85.html#ElGamal.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_elgamal85.ElGamal.paramgen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pkenc_elgamal85.ElGamalCipher">
+<em class="property">class </em><tt class="descclassname">pkenc_elgamal85.</tt><tt class="descname">ElGamalCipher</tt><big>(</big><em>ct</em><big>)</big><a class="reference internal" href="../_modules/pkenc_elgamal85.html#ElGamalCipher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_elgamal85.ElGamalCipher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.dict</span></tt></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pkenc_elgamal85.main">
+<tt class="descclassname">pkenc_elgamal85.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pkenc_elgamal85.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_elgamal85.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
@@ -106,14 +166,14 @@
         <li class="right" >
           <a href="pkenc_cs98_ec.html" title="pkenc_cs98_ec"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

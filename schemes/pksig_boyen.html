@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pksig_boyen &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>pksig_boyen &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
     <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
     <link rel="next" title="pksig_chch" href="pksig_chch.html" />
     <link rel="prev" title="pksig_bls04" href="pksig_bls04.html" /> 
@@ -43,7 +46,7 @@
         <li class="right" >
           <a href="pksig_bls04.html" title="pksig_bls04"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,8 +56,69 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="pksig-boyen">
-<h1>pksig_boyen<a class="headerlink" href="#pksig-boyen" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-pksig_boyen">
+<span id="pksig-boyen"></span><h1>pksig_boyen<a class="headerlink" href="#module-pksig_boyen" title="Permalink to this headline">¶</a></h1>
+<p>Xavier Boyen - Anonymous Ring Signatures</p>
+<div class="line-block">
+<div class="line">From: &#8220;X. Boyen. Mesh Signatures: How to Leak a Secret with Unwitting and Unwilling Participants&#8221;</div>
+<div class="line">Published in: EUROCRYPT 2007</div>
+<div class="line">Available from: <a class="reference external" href="http://eprint.iacr.org/2007/094.pdf">http://eprint.iacr.org/2007/094.pdf</a></div>
+<div class="line">Notes: </div>
+</div>
+<ul class="simple">
+<li>type:           signature (ring-based)</li>
+<li>setting:        bilinear groups (asymmetric)</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body"><ol class="first upperalpha simple" start="10">
+<li>Ayo Akinyele</li>
+</ol>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body"><p class="first last">11/2011</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="pksig_boyen.Boyen">
+<em class="property">class </em><tt class="descclassname">pksig_boyen.</tt><tt class="descname">Boyen</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../_modules/pksig_boyen.html#Boyen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_boyen.Boyen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.PKSig.PKSig</span></tt></p>
+<dl class="method">
+<dt id="pksig_boyen.Boyen.getPKdict">
+<tt class="descname">getPKdict</tt><big>(</big><em>mpk</em>, <em>pk</em>, <em>k</em><big>)</big><a class="reference internal" href="../_modules/pksig_boyen.html#Boyen.getPKdict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_boyen.Boyen.getPKdict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pksig_boyen.Boyen.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>mpk</em><big>)</big><a class="reference internal" href="../_modules/pksig_boyen.html#Boyen.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_boyen.Boyen.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pksig_boyen.Boyen.setup">
+<tt class="descname">setup</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pksig_boyen.html#Boyen.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_boyen.Boyen.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pksig_boyen.Boyen.sign">
+<tt class="descname">sign</tt><big>(</big><em>mpk</em>, <em>pk</em>, <em>sk</em>, <em>M</em><big>)</big><a class="reference internal" href="../_modules/pksig_boyen.html#Boyen.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_boyen.Boyen.sign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pksig_boyen.Boyen.verify">
+<tt class="descname">verify</tt><big>(</big><em>mpk</em>, <em>pk</em>, <em>M</em>, <em>sig</em><big>)</big><a class="reference internal" href="../_modules/pksig_boyen.html#Boyen.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_boyen.Boyen.verify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pksig_boyen.main">
+<tt class="descclassname">pksig_boyen.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pksig_boyen.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_boyen.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
@@ -106,14 +170,14 @@
         <li class="right" >
           <a href="pksig_bls04.html" title="pksig_bls04"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

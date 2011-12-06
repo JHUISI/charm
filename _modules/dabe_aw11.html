@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>dabe_aw11 &mdash; Charm-Crypto 0.1a documentation</title>
+    <title>dabe_aw11 &mdash; Charm-Crypto 0.3a documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,184 +48,186 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for dabe_aw11</h1><pre>
- 
-Lewko, Allison, and Brent Waters, "Decentralizing Attribute-Based Encryption.", Appendix D
-Published in: Eurocrypt 2011
-Available from: http://eprint.iacr.org/2010/351.pdf
+  <h1>Source code for dabe_aw11</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Lewko-Waters Decentralized Attribute-Based Encryption </span>
+<span class="sd"> </span>
+<span class="sd">Lewko, Allison, and Brent Waters, &quot;Decentralizing Attribute-Based Encryption.&quot;, Appendix D</span>
+<span class="sd">Published in: Eurocrypt 2011</span>
+<span class="sd">Available from: http://eprint.iacr.org/2010/351.pdf</span>
 
-type:           encryption (identity-based)
-setting:        bilinear groups (asymmetric)
+<span class="sd">* type:           encryption (identity-based)</span>
+<span class="sd">* setting:        bilinear groups (asymmetric)</span>
 
-Implementer:    Gary Belvin
-Date:           06/2011 
-'''
+<span class="sd">:Authors:    Gary Belvin</span>
+<span class="sd">:Date:           06/2011 </span>
+<span class="sd">&#39;&#39;&#39;</span>
 
-from toolbox.pairinggroup import *
-from toolbox.secretutil import *
-from toolbox.ABEncMultiAuth import *
+<span class="kn">from</span> <span class="nn">toolbox.pairinggroup</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">toolbox.secretutil</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">toolbox.ABEncMultiAuth</span> <span class="kn">import</span> <span class="o">*</span>
 
-debug = False
-class Dabe(ABEncMultiAuth):
-    '''
-<div class="viewcode-block" id="Dabe"><a class="viewcode-back" href="../schemes/dabe_aw11.html#dabe_aw11.Dabe">[docs]</a>    Decentralized Attribute-Based Encryption by Lewko and Waters
-    '''
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<div class="viewcode-block" id="Dabe"><a class="viewcode-back" href="../schemes/dabe_aw11.html#dabe_aw11.Dabe">[docs]</a><span class="k">class</span> <span class="nc">Dabe</span><span class="p">(</span><span class="n">ABEncMultiAuth</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Decentralized Attribute-Based Encryption by Lewko and Waters</span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
-    def __init__(self, groupObj):
-        ABEncMultiAuth.__init__(self)
-        global util, group
-        util = SecretUtil(groupObj.Pairing, verbose=False)  #Create Secret Sharing Scheme
-        group = groupObj    #:Prime order group        
-	#Another comment
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+        <span class="n">ABEncMultiAuth</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">global</span> <span class="n">util</span><span class="p">,</span> <span class="n">group</span>
+        <span class="n">util</span> <span class="o">=</span> <span class="n">SecretUtil</span><span class="p">(</span><span class="n">groupObj</span><span class="o">.</span><span class="n">Pairing</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>  <span class="c">#Create Secret Sharing Scheme</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>    <span class="c">#:Prime order group        </span>
+	<span class="c">#Another comment</span>
    
-    def setup(self):
-        '''Global Setup'''
-<div class="viewcode-block" id="Dabe.setup"><a class="viewcode-back" href="../schemes/dabe_aw11.html#dabe_aw11.Dabe.setup">[docs]</a>        #:In global setup, a bilinear group G of prime order p is chosen
-        #:The global public parameters, GP and p, and a generator g of G. A random oracle H maps global identities GID to elements of G
+<div class="viewcode-block" id="Dabe.setup"><a class="viewcode-back" href="../schemes/dabe_aw11.html#dabe_aw11.Dabe.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Global Setup&#39;&#39;&#39;</span>
+        <span class="c">#:In global setup, a bilinear group G of prime order p is chosen</span>
+        <span class="c">#:The global public parameters, GP and p, and a generator g of G. A random oracle H maps global identities GID to elements of G</span>
     
-        #:group contains 
-        #:the prime order p is contained somewhere within the group object
-        g = group.random(G1)
-        #: The oracle that maps global identities GID onto elements of G
-        #:H = lambda str: g** group.hash(str)
-        H = lambda x: group.hash(x, G1)
-        GP = {'g':g, 'H': H}
+        <span class="c">#:group contains </span>
+        <span class="c">#:the prime order p is contained somewhere within the group object</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="c">#: The oracle that maps global identities GID onto elements of G</span>
+        <span class="c">#:H = lambda str: g** group.hash(str)</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">G1</span><span class="p">)</span>
+        <span class="n">GP</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s">&#39;H&#39;</span><span class="p">:</span> <span class="n">H</span><span class="p">}</span>
 
-        return GP
-
-    def authsetup(self, GP, attributes):
-        '''Authority Setup for a given set of attributes'''</div>
-<div class="viewcode-block" id="Dabe.authsetup"><a class="viewcode-back" href="../schemes/dabe_aw11.html#dabe_aw11.Dabe.authsetup">[docs]</a>        #For each attribute i belonging to the authority, the authority chooses two random exponents, 
-        #alpha_i, y_i and publishes PK={e(g,g)^alpha_i, g^y_i} for each attribute 
-        #it keeps SK = {alpha_i, y_i} as its secret key
-        SK = {} #dictionary of {s: {alpha_i, y_i}} 
-        PK = {} #dictionary of {s: {e(g,g)^alpha_i, g^y}}
-        for i in attributes:
-            #TODO: Is ZR an appropriate choice for a random element in Zp?
-            alpha_i, y_i = group.random(), group.random()
-            e_gg_alpha_i = pair(GP['g'],GP['g']) ** alpha_i
-            g_y_i = GP['g'] ** y_i
-            SK[i.upper()] = {'alpha_i': alpha_i, 'y_i': y_i}
-            PK[i.upper()] = {'e(gg)^alpha_i': e_gg_alpha_i, 'g^y_i': g_y_i}
+        <span class="k">return</span> <span class="n">GP</span>
+</div>
+<div class="viewcode-block" id="Dabe.authsetup"><a class="viewcode-back" href="../schemes/dabe_aw11.html#dabe_aw11.Dabe.authsetup">[docs]</a>    <span class="k">def</span> <span class="nf">authsetup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">GP</span><span class="p">,</span> <span class="n">attributes</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Authority Setup for a given set of attributes&#39;&#39;&#39;</span>
+        <span class="c">#For each attribute i belonging to the authority, the authority chooses two random exponents, </span>
+        <span class="c">#alpha_i, y_i and publishes PK={e(g,g)^alpha_i, g^y_i} for each attribute </span>
+        <span class="c">#it keeps SK = {alpha_i, y_i} as its secret key</span>
+        <span class="n">SK</span> <span class="o">=</span> <span class="p">{}</span> <span class="c">#dictionary of {s: {alpha_i, y_i}} </span>
+        <span class="n">PK</span> <span class="o">=</span> <span class="p">{}</span> <span class="c">#dictionary of {s: {e(g,g)^alpha_i, g^y}}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
+            <span class="c">#TODO: Is ZR an appropriate choice for a random element in Zp?</span>
+            <span class="n">alpha_i</span><span class="p">,</span> <span class="n">y_i</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+            <span class="n">e_gg_alpha_i</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">GP</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">],</span><span class="n">GP</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="n">alpha_i</span>
+            <span class="n">g_y_i</span> <span class="o">=</span> <span class="n">GP</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">y_i</span>
+            <span class="n">SK</span><span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;alpha_i&#39;</span><span class="p">:</span> <span class="n">alpha_i</span><span class="p">,</span> <span class="s">&#39;y_i&#39;</span><span class="p">:</span> <span class="n">y_i</span><span class="p">}</span>
+            <span class="n">PK</span><span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;e(gg)^alpha_i&#39;</span><span class="p">:</span> <span class="n">e_gg_alpha_i</span><span class="p">,</span> <span class="s">&#39;g^y_i&#39;</span><span class="p">:</span> <span class="n">g_y_i</span><span class="p">}</span>
         
-        if(debug):
-            print("Authority Setup for %s" % attributes)
-            print("SK = {alpha_i, y_i}")
-            print(SK)
-            print("PK = {e(g,g) ^ alpha_i, g ^ y_i}")
-            print(PK)
+        <span class="k">if</span><span class="p">(</span><span class="n">debug</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Authority Setup for </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">attributes</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;SK = {alpha_i, y_i}&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">SK</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;PK = {e(g,g) ^ alpha_i, g ^ y_i}&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">PK</span><span class="p">)</span>
              
-        return (SK, PK)
+        <span class="k">return</span> <span class="p">(</span><span class="n">SK</span><span class="p">,</span> <span class="n">PK</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="Dabe.keygen"><a class="viewcode-back" href="../schemes/dabe_aw11.html#dabe_aw11.Dabe.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gp</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">gid</span><span class="p">,</span> <span class="n">pkey</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Create a key for GID on attribute i belonging to authority sk</span>
+<span class="sd">        sk is the private key for the releveant authority</span>
+<span class="sd">        i is the attribute to give bob</span>
+<span class="sd">        pkey is bob&#39;s private key dictionary, to which the appropriate private key is added</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c">#To create a key for GID for attribute i belonging to an authority, the authority computes K_{i,GID} = g^alpha_i * H(GID)^y_</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">gp</span><span class="p">[</span><span class="s">&#39;H&#39;</span><span class="p">](</span><span class="n">gid</span><span class="p">)</span> 
+        <span class="n">K</span> <span class="o">=</span> <span class="p">(</span><span class="n">gp</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sk</span><span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">upper</span><span class="p">()][</span><span class="s">&#39;alpha_i&#39;</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">h</span> <span class="o">**</span> <span class="n">sk</span><span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">upper</span><span class="p">()][</span><span class="s">&#39;y_i&#39;</span><span class="p">])</span>
         
-    def keygen(self, gp, sk, i, gid, pkey):
-        '''Create a key for GID on attribute i belonging to authority sk</div>
-<div class="viewcode-block" id="Dabe.keygen"><a class="viewcode-back" href="../schemes/dabe_aw11.html#dabe_aw11.Dabe.keygen">[docs]</a>        sk is the private key for the releveant authority
-        i is the attribute to give bob
-        pkey is bob's private key dictionary, to which the appropriate private key is added
-        '''
-        #To create a key for GID for attribute i belonging to an authority, the authority computes K_{i,GID} = g^alpha_i * H(GID)^y_
-        h = gp['H'](gid) 
-        K = (gp['g'] ** sk[i.upper()]['alpha_i']) * (h ** sk[i.upper()]['y_i'])
+        <span class="n">pkey</span><span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;k&#39;</span><span class="p">:</span> <span class="n">K</span><span class="p">}</span>
+        <span class="n">pkey</span><span class="p">[</span><span class="s">&#39;gid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gid</span>
         
-        pkey[i.upper()] = {'k': K}
-        pkey['gid'] = gid
+        <span class="k">if</span><span class="p">(</span><span class="n">debug</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Key gen for </span><span class="si">%s</span><span class="s"> on </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;H(GID): &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">h</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;K = g^alpha_i * H(GID) ^ y_i: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">K</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Dabe.encrypt"><a class="viewcode-back" href="../schemes/dabe_aw11.html#dabe_aw11.Dabe.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">gp</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">policy_str</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Encrypt&#39;&#39;&#39;</span>
+        <span class="c">#M is a group element</span>
+        <span class="c">#pk is a dictionary with all the attributes of all authorities put together.</span>
+        <span class="c">#This is legal because no attribute can be shared by more than one authority</span>
+        <span class="c">#{i: {&#39;e(gg)^alpha_i: , &#39;g^y_i&#39;}</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">egg_s</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">gp</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">],</span><span class="n">gp</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="n">s</span>
+        <span class="n">C0</span> <span class="o">=</span> <span class="n">M</span> <span class="o">*</span> <span class="n">egg_s</span>
+        <span class="n">C1</span><span class="p">,</span> <span class="n">C2</span><span class="p">,</span> <span class="n">C3</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
         
-        if(debug):
-            print("Key gen for %s on %s" % (gid, i))
-            print("H(GID): '%s'" % h)
-            print("K = g^alpha_i * H(GID) ^ y_i: %s" % K)
+        <span class="c">#Parse the policy string into a tree</span>
 
-    def encrypt(self, pk, gp, M, policy_str):
-        '''Encrypt'''</div>
-<div class="viewcode-block" id="Dabe.encrypt"><a class="viewcode-back" href="../schemes/dabe_aw11.html#dabe_aw11.Dabe.encrypt">[docs]</a>        #M is a group element
-        #pk is a dictionary with all the attributes of all authorities put together.
-        #This is legal because no attribute can be shared by more than one authority
-        #{i: {'e(gg)^alpha_i: , 'g^y_i'}
-        s = group.random()
-        w = group.init(ZR, 0)
-        egg_s = pair(gp['g'],gp['g']) ** s
-        C0 = M * egg_s
-        C1, C2, C3 = {}, {}, {}
-        
-        #Parse the policy string into a tree
-
-        policy = util.createPolicy(policy_str)
-        sshares = util.calculateShares(s, policy, list) #Shares of the secret 
-        wshares = util.calculateShares(w, policy, list) #Shares of 0
+        <span class="n">policy</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">createPolicy</span><span class="p">(</span><span class="n">policy_str</span><span class="p">)</span>
+        <span class="n">sshares</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">calculateShares</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">policy</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="c">#Shares of the secret </span>
+        <span class="n">wshares</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">calculateShares</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">policy</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="c">#Shares of 0</span>
         
     
-        wshares = dict([(x[0], x[1]) for x in wshares])
-        sshares = dict([(x[0], x[1]) for x in sshares])
-        for attr, s_share in sshares.items():
-            w_share = wshares[attr]
-            r_x = group.random()
-            C1[attr] = (pair(gp['g'],gp['g']) ** s_share) * (pk[attr]['e(gg)^alpha_i'] ** r_x)
-            C2[attr] = gp['g'] ** r_x
-            C3[attr] = (pk[attr]['g^y_i'] ** r_x) * (gp['g'] ** w_share)
+        <span class="n">wshares</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">wshares</span><span class="p">])</span>
+        <span class="n">sshares</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sshares</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">s_share</span> <span class="ow">in</span> <span class="n">sshares</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">w_share</span> <span class="o">=</span> <span class="n">wshares</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
+            <span class="n">r_x</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+            <span class="n">C1</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">gp</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">],</span><span class="n">gp</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="n">s_share</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s">&#39;e(gg)^alpha_i&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r_x</span><span class="p">)</span>
+            <span class="n">C2</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">gp</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r_x</span>
+            <span class="n">C3</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s">&#39;g^y_i&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r_x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">gp</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">w_share</span><span class="p">)</span>
             
-        #plist = []
-        #util.getAttributeList(policy, plist)
-        return { 'C0':C0, 'C1':C1, 'C2':C2, 'C3':C3, 'policy':policy}  #'attributes':plist 
-
-    def decrypt(self, gp, sk, ct):
-        '''Decrypt a ciphertext</div>
-<div class="viewcode-block" id="Dabe.decrypt"><a class="viewcode-back" href="../schemes/dabe_aw11.html#dabe_aw11.Dabe.decrypt">[docs]</a>        SK is the user's private key dictionary {attr: { xxx , xxx }}
-        ''' 
+        <span class="c">#plist = []</span>
+        <span class="c">#util.getAttributeList(policy, plist)</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;C0&#39;</span><span class="p">:</span><span class="n">C0</span><span class="p">,</span> <span class="s">&#39;C1&#39;</span><span class="p">:</span><span class="n">C1</span><span class="p">,</span> <span class="s">&#39;C2&#39;</span><span class="p">:</span><span class="n">C2</span><span class="p">,</span> <span class="s">&#39;C3&#39;</span><span class="p">:</span><span class="n">C3</span><span class="p">,</span> <span class="s">&#39;policy&#39;</span><span class="p">:</span><span class="n">policy</span><span class="p">}</span>  <span class="c">#&#39;attributes&#39;:plist </span>
+</div>
+<div class="viewcode-block" id="Dabe.decrypt"><a class="viewcode-back" href="../schemes/dabe_aw11.html#dabe_aw11.Dabe.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gp</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ct</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Decrypt a ciphertext</span>
+<span class="sd">        SK is the user&#39;s private key dictionary {attr: { xxx , xxx }}</span>
+<span class="sd">        &#39;&#39;&#39;</span> 
     
-        usr_attribs = list(sk.keys())
-        usr_attribs.remove('gid')
-        pruned = util.prune(ct['policy'], usr_attribs)
-        coeffs = {}; util.getCoefficients(ct['policy'], coeffs)
+        <span class="n">usr_attribs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sk</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">usr_attribs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s">&#39;gid&#39;</span><span class="p">)</span>
+        <span class="n">pruned</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">prune</span><span class="p">(</span><span class="n">ct</span><span class="p">[</span><span class="s">&#39;policy&#39;</span><span class="p">],</span> <span class="n">usr_attribs</span><span class="p">)</span>
+        <span class="n">coeffs</span> <span class="o">=</span> <span class="p">{};</span> <span class="n">util</span><span class="o">.</span><span class="n">getCoefficients</span><span class="p">(</span><span class="n">ct</span><span class="p">[</span><span class="s">&#39;policy&#39;</span><span class="p">],</span> <span class="n">coeffs</span><span class="p">)</span>
     
-        h_gid = gp['H'](sk['gid'])  #find H(GID)
-        egg_s = group.init(GT, 1)
-        for x in pruned:
-            num = ct['C1'][x] * pair(h_gid, ct['C3'][x])
-            dem = pair(sk[x]['k'], ct['C2'][x])
-            egg_s *= ( (num / dem) ** coeffs[x] )
+        <span class="n">h_gid</span> <span class="o">=</span> <span class="n">gp</span><span class="p">[</span><span class="s">&#39;H&#39;</span><span class="p">](</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;gid&#39;</span><span class="p">])</span>  <span class="c">#find H(GID)</span>
+        <span class="n">egg_s</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">GT</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pruned</span><span class="p">:</span>
+            <span class="n">num</span> <span class="o">=</span> <span class="n">ct</span><span class="p">[</span><span class="s">&#39;C1&#39;</span><span class="p">][</span><span class="n">x</span><span class="p">]</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">h_gid</span><span class="p">,</span> <span class="n">ct</span><span class="p">[</span><span class="s">&#39;C3&#39;</span><span class="p">][</span><span class="n">x</span><span class="p">])</span>
+            <span class="n">dem</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="s">&#39;k&#39;</span><span class="p">],</span> <span class="n">ct</span><span class="p">[</span><span class="s">&#39;C2&#39;</span><span class="p">][</span><span class="n">x</span><span class="p">])</span>
+            <span class="n">egg_s</span> <span class="o">*=</span> <span class="p">(</span> <span class="p">(</span><span class="n">num</span> <span class="o">/</span> <span class="n">dem</span><span class="p">)</span> <span class="o">**</span> <span class="n">coeffs</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="p">)</span>
    
-        if(debug): print("e(gg)^s: %s" % egg_s)
+        <span class="k">if</span><span class="p">(</span><span class="n">debug</span><span class="p">):</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;e(gg)^s: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">egg_s</span><span class="p">)</span>
 
-        return ct['C0'] / egg_s
+        <span class="k">return</span> <span class="n">ct</span><span class="p">[</span><span class="s">&#39;C0&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">egg_s</span>
+</div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/dabe_aw11.html#dabe_aw11.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;../param/a.param&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
-def main():
-    groupObj = PairingGroup('a.param', verbose=True)</div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/dabe_aw11.html#dabe_aw11.main">[docs]</a>
-    dabe = Dabe(groupObj)
-    GP = dabe.setup()
+    <span class="n">dabe</span> <span class="o">=</span> <span class="n">Dabe</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+    <span class="n">GP</span> <span class="o">=</span> <span class="n">dabe</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
 
-    #Setup an authority
-    auth_attrs= ['ONE', 'TWO', 'THREE', 'FOUR']
-    (SK, PK) = dabe.authsetup(GP, auth_attrs)
-    if debug: print("Authority SK")
-    if debug: print(SK)
+    <span class="c">#Setup an authority</span>
+    <span class="n">auth_attrs</span><span class="o">=</span> <span class="p">[</span><span class="s">&#39;ONE&#39;</span><span class="p">,</span> <span class="s">&#39;TWO&#39;</span><span class="p">,</span> <span class="s">&#39;THREE&#39;</span><span class="p">,</span> <span class="s">&#39;FOUR&#39;</span><span class="p">]</span>
+    <span class="p">(</span><span class="n">SK</span><span class="p">,</span> <span class="n">PK</span><span class="p">)</span> <span class="o">=</span> <span class="n">dabe</span><span class="o">.</span><span class="n">authsetup</span><span class="p">(</span><span class="n">GP</span><span class="p">,</span> <span class="n">auth_attrs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Authority SK&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="n">SK</span><span class="p">)</span>
 
-    #Setup a user and give him some keys
-    gid, K = "bob", {}
-    usr_attrs = ['THREE', 'ONE', 'TWO']
-    for i in usr_attrs: dabe.keygen(GP, SK, i, gid, K)
-    if debug: print('User credential list: %s' % usr_attrs)    
-    if debug: print("\nSecret key:")
-    if debug: groupObj.debug(K)
+    <span class="c">#Setup a user and give him some keys</span>
+    <span class="n">gid</span><span class="p">,</span> <span class="n">K</span> <span class="o">=</span> <span class="s">&quot;bob&quot;</span><span class="p">,</span> <span class="p">{}</span>
+    <span class="n">usr_attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;THREE&#39;</span><span class="p">,</span> <span class="s">&#39;ONE&#39;</span><span class="p">,</span> <span class="s">&#39;TWO&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">usr_attrs</span><span class="p">:</span> <span class="n">dabe</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">GP</span><span class="p">,</span> <span class="n">SK</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">gid</span><span class="p">,</span> <span class="n">K</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&#39;User credential list: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">usr_attrs</span><span class="p">)</span>    
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">Secret key:&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">K</span><span class="p">)</span>
 
-    #Encrypt a random element in GT
-    m = groupObj.random(GT)
-    policy = '((one or three) and (TWO or FOUR))'
-    if debug: print('Acces Policy: %s' % policy)
-    CT = dabe.encrypt(PK, GP, m, policy)
-    if debug: print("\nCiphertext...")
-    if debug: groupObj.debug(CT)    
+    <span class="c">#Encrypt a random element in GT</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+    <span class="n">policy</span> <span class="o">=</span> <span class="s">&#39;((one or three) and (TWO or FOUR))&#39;</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&#39;Acces Policy: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">policy</span><span class="p">)</span>
+    <span class="n">CT</span> <span class="o">=</span> <span class="n">dabe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">PK</span><span class="p">,</span> <span class="n">GP</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">policy</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">Ciphertext...&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">CT</span><span class="p">)</span>    
     
-    orig_m = dabe.decrypt(GP, K, CT)
+    <span class="n">orig_m</span> <span class="o">=</span> <span class="n">dabe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">GP</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">CT</span><span class="p">)</span>
    
-    assert m == orig_m, 'FAILED Decryption!!!' 
-    if debug: print('Successful Decryption!')
-
-if __name__ == '__main__':
-    debug = True</div>
-    main()
+    <span class="k">assert</span> <span class="n">m</span> <span class="o">==</span> <span class="n">orig_m</span><span class="p">,</span> <span class="s">&#39;FAILED Decryption!!!&#39;</span> 
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&#39;Successful Decryption!&#39;</span><span class="p">)</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">main</span><span class="p">()</span>
              
-</pre>
+</pre></div>
 
           </div>
         </div>
@@ -235,7 +237,7 @@ if __name__ == '__main__':
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -258,13 +260,14 @@ if __name__ == '__main__':
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

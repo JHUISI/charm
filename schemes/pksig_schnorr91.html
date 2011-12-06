@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pksig_schnorr91 &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>pksig_schnorr91 &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
     <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
     <link rel="next" title="pksig_waters" href="pksig_waters.html" />
     <link rel="prev" title="pksig_hw" href="pksig_hw.html" /> 
@@ -43,7 +46,7 @@
         <li class="right" >
           <a href="pksig_hw.html" title="pksig_hw"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,8 +56,39 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="pksig-schnorr91">
-<h1>pksig_schnorr91<a class="headerlink" href="#pksig-schnorr91" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-pksig_schnorr91">
+<span id="pksig-schnorr91"></span><h1>pksig_schnorr91<a class="headerlink" href="#module-pksig_schnorr91" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pksig_schnorr91.SchnorrSig">
+<em class="property">class </em><tt class="descclassname">pksig_schnorr91.</tt><tt class="descname">SchnorrSig</tt><a class="reference internal" href="../_modules/pksig_schnorr91.html#SchnorrSig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_schnorr91.SchnorrSig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.PKSig.PKSig</span></tt></p>
+<dl class="method">
+<dt id="pksig_schnorr91.SchnorrSig.keygen">
+<tt class="descname">keygen</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pksig_schnorr91.html#SchnorrSig.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_schnorr91.SchnorrSig.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pksig_schnorr91.SchnorrSig.params">
+<tt class="descname">params</tt><big>(</big><em>bits=160</em><big>)</big><a class="reference internal" href="../_modules/pksig_schnorr91.html#SchnorrSig.params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_schnorr91.SchnorrSig.params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pksig_schnorr91.SchnorrSig.sign">
+<tt class="descname">sign</tt><big>(</big><em>pk</em>, <em>x</em>, <em>M</em><big>)</big><a class="reference internal" href="../_modules/pksig_schnorr91.html#SchnorrSig.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_schnorr91.SchnorrSig.sign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pksig_schnorr91.SchnorrSig.verify">
+<tt class="descname">verify</tt><big>(</big><em>pk</em>, <em>sig</em>, <em>M</em><big>)</big><a class="reference internal" href="../_modules/pksig_schnorr91.html#SchnorrSig.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_schnorr91.SchnorrSig.verify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pksig_schnorr91.main">
+<tt class="descclassname">pksig_schnorr91.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pksig_schnorr91.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_schnorr91.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
@@ -106,14 +140,14 @@
         <li class="right" >
           <a href="pksig_hw.html" title="pksig_hw"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

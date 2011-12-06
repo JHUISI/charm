@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>commit_gs08 &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>commit_gs08 &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
     <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
     <link rel="next" title="commit_pedersen92" href="commit_pedersen92.html" />
     <link rel="prev" title="chamhash_rsa_hw09" href="chamhash_rsa_hw09.html" /> 
@@ -43,7 +46,7 @@
         <li class="right" >
           <a href="chamhash_rsa_hw09.html" title="chamhash_rsa_hw09"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,8 +56,55 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="commit-gs08">
-<h1>commit_gs08<a class="headerlink" href="#commit-gs08" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-commit_gs08">
+<span id="commit-gs08"></span><h1>commit_gs08<a class="headerlink" href="#module-commit_gs08" title="Permalink to this headline">¶</a></h1>
+<p>Groth-Sahai Commitment Scheme</p>
+<div class="line-block">
+<div class="line">From: &#8220;J. Groth, A. Sahai.  Efficient Non-interactive Proof Systems for Bilinear Groups&#8221;.</div>
+<div class="line">Published in: Eurocrypt 2008</div>
+<div class="line">Available from: <a class="reference external" href="http://www.cs.ucl.ac.uk/staff/J.Groth/WImoduleFull.pdf">http://www.cs.ucl.ac.uk/staff/J.Groth/WImoduleFull.pdf</a></div>
+<div class="line">Notes: This implements only the SXDH and DLIN instantiations, in prime-order groups.</div>
+</div>
+<ul class="simple">
+<li>type:                 commitment</li>
+<li>setting:              bilinear groups</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Matthew Green</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">6/2011</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="commit_gs08.Commitment_GS08">
+<em class="property">class </em><tt class="descclassname">commit_gs08.</tt><tt class="descname">Commitment_GS08</tt><big>(</big><em>groupObj</em>, <em>setting='SXDH'</em><big>)</big><a class="reference internal" href="../_modules/commit_gs08.html#Commitment_GS08"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#commit_gs08.Commitment_GS08" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.Commit.Commitment</span></tt></p>
+<dl class="method">
+<dt id="commit_gs08.Commitment_GS08.commit">
+<tt class="descname">commit</tt><big>(</big><em>params</em>, <em>msg</em><big>)</big><a class="reference internal" href="../_modules/commit_gs08.html#Commitment_GS08.commit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#commit_gs08.Commitment_GS08.commit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="commit_gs08.Commitment_GS08.decommit">
+<tt class="descname">decommit</tt><big>(</big><em>params</em>, <em>c</em>, <em>d</em>, <em>msg</em><big>)</big><a class="reference internal" href="../_modules/commit_gs08.html#Commitment_GS08.decommit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#commit_gs08.Commitment_GS08.decommit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="commit_gs08.Commitment_GS08.setup">
+<tt class="descname">setup</tt><big>(</big><em>secparam=None</em>, <em>groupChoice=1</em>, <em>commitType='binding'</em><big>)</big><a class="reference internal" href="../_modules/commit_gs08.html#Commitment_GS08.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#commit_gs08.Commitment_GS08.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="commit_gs08.main">
+<tt class="descclassname">commit_gs08.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/commit_gs08.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#commit_gs08.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
@@ -106,14 +156,14 @@
         <li class="right" >
           <a href="chamhash_rsa_hw09.html" title="chamhash_rsa_hw09"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

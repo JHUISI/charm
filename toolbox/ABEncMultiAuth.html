@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>ABEncMultiAuth &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>ABEncMultiAuth &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,9 +25,9 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
     <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
-    <link rel="next" title="bitstring" href="bitstring.html" />
+    <link rel="next" title="AuthenticatedCryptoAbstraction" href="AuthenticatedCryptoAbstraction.html" />
     <link rel="prev" title="ABEnc" href="ABEnc.html" /> 
   </head>
   <body>
@@ -38,12 +41,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="bitstring.html" title="bitstring"
+          <a href="AuthenticatedCryptoAbstraction.html" title="AuthenticatedCryptoAbstraction"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="ABEnc.html" title="ABEnc"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,8 +56,44 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="abencmultiauth">
-<h1>ABEncMultiAuth<a class="headerlink" href="#abencmultiauth" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-ABEncMultiAuth">
+<span id="abencmultiauth"></span><h1>ABEncMultiAuth<a class="headerlink" href="#module-ABEncMultiAuth" title="Permalink to this headline">¶</a></h1>
+<p>Base class for attribute-based encryption multi-authority</p>
+<blockquote>
+<div>Notes: This class implements an interface for a standard attribute-based encryption scheme.</div></blockquote>
+<p>A public key attribute-based encryption scheme consists of four algorithms: 
+(setup, authsetup, keygen, encrypt, decrypt).</p>
+<dl class="class">
+<dt id="ABEncMultiAuth.ABEncMultiAuth">
+<em class="property">class </em><tt class="descclassname">ABEncMultiAuth.</tt><tt class="descname">ABEncMultiAuth</tt><a class="reference internal" href="../_modules/ABEncMultiAuth.html#ABEncMultiAuth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ABEncMultiAuth.ABEncMultiAuth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.schemebase.SchemeBase</span></tt></p>
+<dl class="method">
+<dt id="ABEncMultiAuth.ABEncMultiAuth.authsetup">
+<tt class="descname">authsetup</tt><big>(</big><em>gp</em>, <em>object</em><big>)</big><a class="reference internal" href="../_modules/ABEncMultiAuth.html#ABEncMultiAuth.authsetup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ABEncMultiAuth.ABEncMultiAuth.authsetup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ABEncMultiAuth.ABEncMultiAuth.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>gp</em>, <em>sk</em>, <em>ct</em><big>)</big><a class="reference internal" href="../_modules/ABEncMultiAuth.html#ABEncMultiAuth.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ABEncMultiAuth.ABEncMultiAuth.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ABEncMultiAuth.ABEncMultiAuth.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>gp</em>, <em>M</em>, <em>object</em><big>)</big><a class="reference internal" href="../_modules/ABEncMultiAuth.html#ABEncMultiAuth.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ABEncMultiAuth.ABEncMultiAuth.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ABEncMultiAuth.ABEncMultiAuth.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>gp</em>, <em>sk</em>, <em>gid</em><big>)</big><a class="reference internal" href="../_modules/ABEncMultiAuth.html#ABEncMultiAuth.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ABEncMultiAuth.ABEncMultiAuth.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ABEncMultiAuth.ABEncMultiAuth.setup">
+<tt class="descname">setup</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ABEncMultiAuth.html#ABEncMultiAuth.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ABEncMultiAuth.ABEncMultiAuth.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 
 
@@ -67,8 +106,8 @@
   <p class="topless"><a href="ABEnc.html"
                         title="previous chapter">ABEnc</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="bitstring.html"
-                        title="next chapter">bitstring</a></p>
+  <p class="topless"><a href="AuthenticatedCryptoAbstraction.html"
+                        title="next chapter">AuthenticatedCryptoAbstraction</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/toolbox/ABEncMultiAuth.txt"
@@ -101,19 +140,19 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="bitstring.html" title="bitstring"
+          <a href="AuthenticatedCryptoAbstraction.html" title="AuthenticatedCryptoAbstraction"
              >next</a> |</li>
         <li class="right" >
           <a href="ABEnc.html" title="ABEnc"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

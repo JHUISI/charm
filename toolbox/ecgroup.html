@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>ecgroup &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>ecgroup &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
     <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
     <link rel="next" title="enum" href="enum.html" />
     <link rel="prev" title="eccurve" href="eccurve.html" /> 
@@ -43,7 +46,7 @@
         <li class="right" >
           <a href="eccurve.html" title="eccurve"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,8 +56,84 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="ecgroup">
-<h1>ecgroup<a class="headerlink" href="#ecgroup" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-ecgroup">
+<span id="ecgroup"></span><h1>ecgroup<a class="headerlink" href="#module-ecgroup" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="ecgroup.ECGroup">
+<em class="property">class </em><tt class="descclassname">ecgroup.</tt><tt class="descname">ECGroup</tt><big>(</big><em>builtin_cv</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dl class="method">
+<dt id="ecgroup.ECGroup.bitsize">
+<tt class="descname">bitsize</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.bitsize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.bitsize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ecgroup.ECGroup.coordinates">
+<tt class="descname">coordinates</tt><big>(</big><em>point</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.coordinates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.coordinates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ecgroup.ECGroup.debug">
+<tt class="descname">debug</tt><big>(</big><em>data</em>, <em>prefix=None</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.debug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.debug" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ecgroup.ECGroup.decode">
+<tt class="descname">decode</tt><big>(</big><em>msg_bytes</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.decode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ecgroup.ECGroup.deserialize">
+<tt class="descname">deserialize</tt><big>(</big><em>bytes_object</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.deserialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ecgroup.ECGroup.encode">
+<tt class="descname">encode</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.encode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ecgroup.ECGroup.groupType">
+<tt class="descname">groupType</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.groupType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.groupType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ecgroup.ECGroup.hash">
+<tt class="descname">hash</tt><big>(</big><em>args</em>, <em>_type=0</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.hash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ecgroup.ECGroup.init">
+<tt class="descname">init</tt><big>(</big><em>type=0</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ecgroup.ECGroup.order">
+<tt class="descname">order</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.order"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.order" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ecgroup.ECGroup.paramgen">
+<tt class="descname">paramgen</tt><big>(</big><em>secparam</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.paramgen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ecgroup.ECGroup.random">
+<tt class="descname">random</tt><big>(</big><em>type=0</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.random" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ecgroup.ECGroup.serialize">
+<tt class="descname">serialize</tt><big>(</big><em>object</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.serialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ecgroup.ECGroup.zr">
+<tt class="descname">zr</tt><big>(</big><em>point</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.zr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.zr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 
 
@@ -106,14 +185,14 @@
         <li class="right" >
           <a href="eccurve.html" title="eccurve"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

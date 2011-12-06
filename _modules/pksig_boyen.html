@@ -1,0 +1,230 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pksig_boyen &mdash; Charm-Crypto 0.3a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.3a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pksig_boyen</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">Xavier Boyen - Anonymous Ring Signatures</span>
+
+<span class="sd">| From: &quot;X. Boyen. Mesh Signatures: How to Leak a Secret with Unwitting and Unwilling Participants&quot;</span>
+<span class="sd">| Published in: EUROCRYPT 2007</span>
+<span class="sd">| Available from: http://eprint.iacr.org/2007/094.pdf</span>
+<span class="sd">| Notes: </span>
+
+<span class="sd">* type:           signature (ring-based)</span>
+<span class="sd">* setting:        bilinear groups (asymmetric)</span>
+
+<span class="sd">:Authors:    J. Ayo Akinyele</span>
+<span class="sd">:Date:       11/2011</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">charm.pairing</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">toolbox.PKSig</span> <span class="kn">import</span> <span class="n">PKSig</span>
+<span class="c">#from toolbox.iterate import dotprod</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+
+<span class="c"># need RingSig</span>
+<div class="viewcode-block" id="Boyen"><a class="viewcode-back" href="../schemes/pksig_boyen.html#pksig_boyen.Boyen">[docs]</a><span class="k">class</span> <span class="nc">Boyen</span><span class="p">(</span><span class="n">PKSig</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">group</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+    
+<div class="viewcode-block" id="Boyen.setup"><a class="viewcode-back" href="../schemes/pksig_boyen.html#pksig_boyen.Boyen.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">H</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">H</span><span class="p">((</span><span class="s">&#39;1&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)),</span> <span class="n">ZR</span><span class="p">)</span>
+        <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="p">[];</span> <span class="n">At</span> <span class="o">=</span> <span class="p">[];</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="n">A</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g1</span> <span class="o">**</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">At</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g2</span> <span class="o">**</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="c"># public verification key &quot;in the sky&quot; for all users</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;g1&#39;</span><span class="p">:</span><span class="n">g1</span><span class="p">,</span> <span class="s">&#39;g2&#39;</span><span class="p">:</span><span class="n">g2</span><span class="p">,</span> <span class="s">&#39;A&#39;</span><span class="p">:</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>    <span class="s">&#39;B&#39;</span><span class="p">:</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>   <span class="s">&#39;C&#39;</span><span class="p">:</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> 
+                                  <span class="s">&#39;At&#39;</span><span class="p">:</span><span class="n">At</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&#39;Bt&#39;</span><span class="p">:</span><span class="n">At</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s">&#39;Ct&#39;</span><span class="p">:</span><span class="n">At</span><span class="p">[</span><span class="mi">2</span><span class="p">]}</span>
+    </div>
+<div class="viewcode-block" id="Boyen.keygen"><a class="viewcode-back" href="../schemes/pksig_boyen.html#pksig_boyen.Boyen.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpk</span><span class="p">):</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">a</span><span class="p">;</span> <span class="n">B</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">b</span><span class="p">;</span> <span class="n">C</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">c</span> 
+        <span class="n">At</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">a</span><span class="p">;</span> <span class="n">Bt</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">b</span><span class="p">;</span> <span class="n">Ct</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">c</span>
+        <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;a&#39;</span><span class="p">:</span><span class="n">a</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">:</span><span class="n">b</span><span class="p">,</span> <span class="s">&#39;c&#39;</span><span class="p">:</span><span class="n">c</span><span class="p">}</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;A&#39;</span><span class="p">:</span><span class="n">A</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">:</span><span class="n">B</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">:</span><span class="n">C</span><span class="p">,</span> <span class="s">&#39;At&#39;</span><span class="p">:</span><span class="n">At</span><span class="p">,</span> <span class="s">&#39;Bt&#39;</span><span class="p">:</span><span class="n">Bt</span><span class="p">,</span> <span class="s">&#39;Ct&#39;</span><span class="p">:</span><span class="n">Ct</span><span class="p">}</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Boyen.getPKdict"><a class="viewcode-back" href="../schemes/pksig_boyen.html#pksig_boyen.Boyen.getPKdict">[docs]</a>    <span class="k">def</span> <span class="nf">getPKdict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="n">A_pk</span><span class="p">,</span> <span class="n">B_pk</span><span class="p">,</span> <span class="n">C_pk</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
+        <span class="n">A_pk</span><span class="p">[</span> <span class="mi">0</span> <span class="p">]</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span> <span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">]</span>
+        <span class="n">B_pk</span><span class="p">[</span> <span class="mi">0</span> <span class="p">]</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span> <span class="n">k</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">]</span>
+        <span class="n">C_pk</span><span class="p">[</span> <span class="mi">0</span> <span class="p">]</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span> <span class="n">k</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">pk</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">A_pk</span><span class="p">[</span> <span class="n">i</span> <span class="p">]</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span> <span class="n">i</span> <span class="p">][</span> <span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">]</span>
+            <span class="n">B_pk</span><span class="p">[</span> <span class="n">i</span> <span class="p">]</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span> <span class="n">i</span> <span class="p">][</span> <span class="n">k</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">]</span>
+            <span class="n">C_pk</span><span class="p">[</span> <span class="n">i</span> <span class="p">]</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span> <span class="n">i</span> <span class="p">][</span> <span class="n">k</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">]</span>        
+        <span class="k">return</span> <span class="n">A_pk</span><span class="p">,</span> <span class="n">B_pk</span><span class="p">,</span> <span class="n">C_pk</span>
+    </div>
+<div class="viewcode-block" id="Boyen.sign"><a class="viewcode-back" href="../schemes/pksig_boyen.html#pksig_boyen.Boyen.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signing....&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;pk =&gt;&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="p">(</span><span class="n">A_pk</span><span class="p">,</span> <span class="n">B_pk</span><span class="p">,</span> <span class="n">C_pk</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getPKdict</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">])</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">A_pk</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;l defined as =&gt;&quot;</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>        
+        <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span> <span class="c"># 0:l-1</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l</span><span class="p">)]</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">S</span><span class="p">[</span> <span class="n">i</span> <span class="p">]</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+<span class="c">#            print(&quot;S[&quot;, i, &quot;] :=&quot;, S[i])         </span>
+        <span class="c"># index=0</span>
+        <span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">)</span> <span class="o">=</span> <span class="n">A_pk</span><span class="p">[</span> <span class="mi">0</span> <span class="p">],</span> <span class="n">B_pk</span><span class="p">[</span> <span class="mi">0</span> <span class="p">],</span> <span class="n">C_pk</span><span class="p">[</span> <span class="mi">0</span> <span class="p">]</span>
+        <span class="n">prod</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span> <span class="o">*</span> <span class="p">(</span><span class="n">B</span> <span class="o">**</span> <span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">C</span> <span class="o">**</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">**</span> <span class="o">-</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="c"># 1 -&gt; l-1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">l</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">)</span> <span class="o">=</span> <span class="n">A_pk</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">B_pk</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">C_pk</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">prod</span> <span class="o">*=</span> <span class="p">((</span><span class="n">A</span> <span class="o">*</span> <span class="p">(</span><span class="n">B</span> <span class="o">**</span> <span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">C</span> <span class="o">**</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span> <span class="o">**</span> <span class="o">-</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>            
+
+        <span class="n">final</span> <span class="o">=</span> <span class="n">l</span><span class="o">-</span><span class="mi">1</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;a&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;b&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">m</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;c&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span><span class="p">[</span><span class="n">final</span><span class="p">]))</span>  <span class="c"># s[l]</span>
+        <span class="n">S</span><span class="p">[</span><span class="n">final</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">prod</span><span class="p">)</span> <span class="o">**</span> <span class="o">~</span><span class="n">d</span> <span class="c"># S[l]</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;S[&quot;</span><span class="p">,</span> <span class="n">final</span><span class="p">,</span> <span class="s">&quot;] :=&quot;</span><span class="p">,</span> <span class="n">S</span><span class="p">[</span><span class="n">final</span><span class="p">])</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;S&#39;</span><span class="p">:</span><span class="n">S</span><span class="p">,</span> <span class="s">&#39;t&#39;</span><span class="p">:</span><span class="n">t</span> <span class="p">}</span>
+        <span class="k">return</span> <span class="n">sig</span>
+    </div>
+<div class="viewcode-block" id="Boyen.verify"><a class="viewcode-back" href="../schemes/pksig_boyen.html#pksig_boyen.Boyen.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verifying...&quot;</span><span class="p">)</span>
+        <span class="n">At_pk</span><span class="p">,</span> <span class="n">Bt_pk</span><span class="p">,</span> <span class="n">Ct_pk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getPKdict</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;At&#39;</span><span class="p">,</span> <span class="s">&#39;Bt&#39;</span><span class="p">,</span> <span class="s">&#39;Ct&#39;</span><span class="p">])</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">At_pk</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Length =&gt;&quot;</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">],</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">])</span>
+        <span class="n">S</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;S&#39;</span><span class="p">],</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;t&#39;</span><span class="p">]</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+        <span class="n">prod_result</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">GT</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+            <span class="n">prod_result</span> <span class="o">*=</span> <span class="n">pair</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">At_pk</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">Bt_pk</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">**</span> <span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">Ct_pk</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">**</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;final result =&gt;&quot;</span><span class="p">,</span> <span class="n">prod_result</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;D =&gt;&quot;</span><span class="p">,</span> <span class="n">D</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">prod_result</span> <span class="o">==</span> <span class="n">D</span><span class="p">:</span>
+           <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="bp">False</span>
+</div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pksig_boyen.html#pksig_boyen.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+   <span class="n">groupObj</span> <span class="o">=</span> <span class="n">pairing</span><span class="p">(</span><span class="s">&#39;../param/d224.param&#39;</span><span class="p">)</span>
+   <span class="n">boyen</span> <span class="o">=</span> <span class="n">Boyen</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+   <span class="n">mpk</span> <span class="o">=</span> <span class="n">boyen</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Pub parameters&quot;</span><span class="p">)</span>
+   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+   
+   <span class="n">num_signers</span> <span class="o">=</span> <span class="mi">3</span>
+   <span class="n">L_keys</span> <span class="o">=</span> <span class="p">[</span> <span class="n">boyen</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">mpk</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_signers</span><span class="p">)]</span>     
+   <span class="n">L_pk</span> <span class="o">=</span> <span class="p">{};</span> <span class="n">L_sk</span> <span class="o">=</span> <span class="p">{}</span>
+   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">L_keys</span><span class="p">)):</span>
+       <span class="n">L_pk</span><span class="p">[</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="p">]</span> <span class="o">=</span> <span class="n">L_keys</span><span class="p">[</span> <span class="n">i</span> <span class="p">][</span> <span class="mi">0</span> <span class="p">]</span> <span class="c"># pk</span>
+       <span class="n">L_sk</span><span class="p">[</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="p">]</span> <span class="o">=</span> <span class="n">L_keys</span><span class="p">[</span> <span class="n">i</span> <span class="p">][</span> <span class="mi">1</span> <span class="p">]</span>
+
+   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Keygen...&quot;</span><span class="p">)</span>
+   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;sec keys =&gt;&quot;</span><span class="p">,</span> <span class="n">L_sk</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">L_sk</span><span class="p">)</span> 
+
+   <span class="n">signer</span> <span class="o">=</span> <span class="mi">3</span>
+   <span class="n">sk</span> <span class="o">=</span> <span class="n">L_sk</span><span class="p">[</span><span class="n">signer</span><span class="p">]</span> 
+   <span class="n">M</span> <span class="o">=</span> <span class="s">&#39;please sign this new message!&#39;</span>
+   <span class="n">sig</span> <span class="o">=</span> <span class="n">boyen</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">L_pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">Signature...&quot;</span><span class="p">)</span>
+   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+
+   <span class="k">assert</span> <span class="n">boyen</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">L_pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s">&quot;invalid signature!&quot;</span>
+   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verification successful!&quot;</span><span class="p">)</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">main</span><span class="p">()</span>   
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

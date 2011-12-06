@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pkenc_paillier99 &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>pkenc_paillier99 &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
     <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
     <link rel="next" title="pkenc_rabin" href="pkenc_rabin.html" />
     <link rel="prev" title="pkenc_elgamal85" href="pkenc_elgamal85.html" /> 
@@ -43,7 +46,7 @@
         <li class="right" >
           <a href="pkenc_elgamal85.html" title="pkenc_elgamal85"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,8 +56,92 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="pkenc-paillier99">
-<h1>pkenc_paillier99<a class="headerlink" href="#pkenc-paillier99" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-pkenc_paillier99">
+<span id="pkenc-paillier99"></span><h1>pkenc_paillier99<a class="headerlink" href="#module-pkenc_paillier99" title="Permalink to this headline">¶</a></h1>
+<p>Pascal Paillier (Public-Key)</p>
+<div class="line-block">
+<div class="line">From: &#8220;Public-Key Cryptosystems Based on Composite Degree Residuosity Classes&#8221; </div>
+<div class="line">Published in: EUROCRYPT 1999</div>
+<div class="line">Available from: <a class="reference external" href="http://eprint.iacr.org/2009/309.pdf">http://eprint.iacr.org/2009/309.pdf</a></div>
+<div class="line">Notes: </div>
+</div>
+<ul class="simple">
+<li>type:           public-key encryption (public key)</li>
+<li>setting:        Integer</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">J Ayo Akinyele</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">4/2011</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="pkenc_paillier99.Ciphertext">
+<em class="property">class </em><tt class="descclassname">pkenc_paillier99.</tt><tt class="descname">Ciphertext</tt><big>(</big><em>ct</em>, <em>pk</em>, <em>key</em><big>)</big><a class="reference internal" href="../_modules/pkenc_paillier99.html#Ciphertext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_paillier99.Ciphertext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.dict</span></tt></p>
+<dl class="method">
+<dt id="pkenc_paillier99.Ciphertext.randomize">
+<tt class="descname">randomize</tt><big>(</big><em>r</em><big>)</big><a class="reference internal" href="../_modules/pkenc_paillier99.html#Ciphertext.randomize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_paillier99.Ciphertext.randomize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pkenc_paillier99.Pai99">
+<em class="property">class </em><tt class="descclassname">pkenc_paillier99.</tt><tt class="descname">Pai99</tt><a class="reference internal" href="../_modules/pkenc_paillier99.html#Pai99"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_paillier99.Pai99" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.PKEnc.PKEnc</span></tt></p>
+<dl class="method">
+<dt id="pkenc_paillier99.Pai99.L">
+<tt class="descname">L</tt><big>(</big><em>u</em>, <em>n</em><big>)</big><a class="reference internal" href="../_modules/pkenc_paillier99.html#Pai99.L"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_paillier99.Pai99.L" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pkenc_paillier99.Pai99.decode">
+<tt class="descname">decode</tt><big>(</big><em>pk</em>, <em>element</em><big>)</big><a class="reference internal" href="../_modules/pkenc_paillier99.html#Pai99.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_paillier99.Pai99.decode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pkenc_paillier99.Pai99.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>ct</em><big>)</big><a class="reference internal" href="../_modules/pkenc_paillier99.html#Pai99.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_paillier99.Pai99.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pkenc_paillier99.Pai99.encode">
+<tt class="descname">encode</tt><big>(</big><em>modulus</em>, <em>message</em><big>)</big><a class="reference internal" href="../_modules/pkenc_paillier99.html#Pai99.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_paillier99.Pai99.encode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pkenc_paillier99.Pai99.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>m</em><big>)</big><a class="reference internal" href="../_modules/pkenc_paillier99.html#Pai99.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_paillier99.Pai99.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pkenc_paillier99.Pai99.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>secparam=1024</em><big>)</big><a class="reference internal" href="../_modules/pkenc_paillier99.html#Pai99.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_paillier99.Pai99.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pkenc_paillier99.Pai99.paramgen">
+<tt class="descname">paramgen</tt><big>(</big><em>secparam</em><big>)</big><a class="reference internal" href="../_modules/pkenc_paillier99.html#Pai99.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_paillier99.Pai99.paramgen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="data">
+<dt id="pkenc_paillier99.debug">
+<tt class="descclassname">pkenc_paillier99.</tt><tt class="descname">debug</tt><em class="property"> = False</em><a class="headerlink" href="#pkenc_paillier99.debug" title="Permalink to this definition">¶</a></dt>
+<dd><p>A ciphertext class with homomorphic properties</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pkenc_paillier99.main">
+<tt class="descclassname">pkenc_paillier99.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pkenc_paillier99.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_paillier99.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
@@ -106,14 +193,14 @@
         <li class="right" >
           <a href="pkenc_elgamal85.html" title="pkenc_elgamal85"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

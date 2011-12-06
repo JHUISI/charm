@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Platform Install Manual &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>Platform Install Manual &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="index.html" />
     <link rel="next" title="How To Get Started" href="tutorial.html" />
     <link rel="prev" title="Welcome to Charm-Crypto’s documentation!" href="index.html" /> 
   </head>
@@ -42,7 +45,7 @@
         <li class="right" >
           <a href="index.html" title="Welcome to Charm-Crypto’s documentation!"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li> 
+        <li><a href="index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -64,14 +67,17 @@ installation blocks highlighting each respective implementation.</p>
 <ul class="simple">
 <li>Python2.7 or Python3</li>
 <li>Pyparsing <a class="reference external" href="http://pyparsing.wikispaces.com/">http://pyparsing.wikispaces.com/</a></li>
-<li>GMP <a class="reference external" href="http://www.swox.com/gmp/">http://www.swox.com/gmp/</a></li>
+<li>GMP <a class="reference external" href="http://gmplib.org/">http://gmplib.org/</a></li>
 <li>PBC <a class="reference external" href="http://crypto.stanford.edu/pbc/news.html">http://crypto.stanford.edu/pbc/news.html</a></li>
 <li>OPENSSL <a class="reference external" href="http://www.openssl.org/">http://www.openssl.org/</a></li>
+<li>(optional) MIRACL <a class="reference external" href="http://www.shamus.ie/">http://www.shamus.ie/</a>. See <a class="reference internal" href="miracl.html#charm-with-miracl"><em>Building MIRACL for Charm</em></a> if interested.</li>
 </ul>
 <p>See <tt class="docutils literal"><span class="pre">./configure.sh</span> <span class="pre">--help</span></tt> for other options.</p>
 <dl class="docutils">
-<dt>You can obtain a copy of the latest version of Charm here:</dt>
-<dd><a class="reference external" href="http://code.google.com/p/charm-crypto/downloads">http://code.google.com/p/charm-crypto/downloads</a></dd>
+<dt>You can obtain a copy of the latest version of Charm from either of the following links:</dt>
+<dd><p class="first"><a class="reference external" href="http://code.google.com/p/charm-crypto/downloads">http://code.google.com/p/charm-crypto/downloads</a></p>
+<p class="last"><a class="reference external" href="https://github.com/JHUISI/charm/downloads">https://github.com/JHUISI/charm/downloads</a></p>
+</dd>
 </dl>
 <p>Please let us know at <a class="reference external" href="mailto:support&#37;&#52;&#48;charm-crypto&#46;com">support<span>&#64;</span>charm-crypto<span>&#46;</span>com</a> if you run into any setup or installation problems. We will be happy to offer our assistance.</p>
 <div class="section" id="building-in-linux">
@@ -217,15 +223,13 @@ The steps for building in linux this way are:</p>
 <h3>Fedora<a class="headerlink" href="#fedora" title="Permalink to this headline">¶</a></h3>
 <dl class="docutils">
 <dt>Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:</dt>
-<dd><ol class="first arabic">
+<dd><ol class="first last arabic">
 <li><dl class="first docutils">
 <dt>m4</dt>
 <dd><p class="first last"><tt class="docutils literal"><span class="pre">su</span> <span class="pre">-c</span> <span class="pre">&quot;yum</span> <span class="pre">install</span> <span class="pre">m4&quot;</span></tt></p>
 </dd>
 </dl>
 </li>
-</ol>
-<ol class="last arabic" start="3">
 <li><dl class="first docutils">
 <dt>Python 3 (this is an optional, though recommended, step)</dt>
 <dd><p class="first last"><tt class="docutils literal"><span class="pre">su</span> <span class="pre">-c</span> <span class="pre">&quot;yum</span> <span class="pre">install</span> <span class="pre">python3&quot;</span></tt></p>
@@ -615,13 +619,13 @@ make install</pre>
         <li class="right" >
           <a href="index.html" title="Welcome to Charm-Crypto’s documentation!"
              >previous</a> |</li>
-        <li><a href="index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li> 
+        <li><a href="index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

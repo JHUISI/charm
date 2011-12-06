@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>abenc_adapt_hybrid &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>abenc_adapt_hybrid &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
     <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
     <link rel="next" title="abenc_bsw07" href="abenc_bsw07.html" />
     <link rel="prev" title="Demonstration Schemes" href="../schemes.html" /> 
@@ -43,7 +46,7 @@
         <li class="right" >
           <a href="../schemes.html" title="Demonstration Schemes"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,8 +56,56 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="abenc-adapt-hybrid">
-<h1>abenc_adapt_hybrid<a class="headerlink" href="#abenc-adapt-hybrid" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-abenc_adapt_hybrid">
+<span id="abenc-adapt-hybrid"></span><h1>abenc_adapt_hybrid<a class="headerlink" href="#module-abenc_adapt_hybrid" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="abenc_adapt_hybrid.HybridABEnc">
+<em class="property">class </em><tt class="descclassname">abenc_adapt_hybrid.</tt><tt class="descname">HybridABEnc</tt><big>(</big><em>scheme</em>, <em>groupObj</em><big>)</big><a class="reference internal" href="../_modules/abenc_adapt_hybrid.html#HybridABEnc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_adapt_hybrid.HybridABEnc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.ABEnc.ABEnc</span></tt></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;../param/a.param&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cpabe</span> <span class="o">=</span> <span class="n">CPabe_BSW07</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyb_abe</span> <span class="o">=</span> <span class="n">HybridABEnc</span><span class="p">(</span><span class="n">cpabe</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">access_policy</span> <span class="o">=</span> <span class="s">&#39;((four or three) and (two or one))&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">message</span> <span class="o">=</span> <span class="s">&quot;hello world this is an important message.&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">)</span> <span class="o">=</span> <span class="n">hyb_abe</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sk</span> <span class="o">=</span> <span class="n">hyb_abe</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;ONE&#39;</span><span class="p">,</span> <span class="s">&#39;TWO&#39;</span><span class="p">,</span> <span class="s">&#39;THREE&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ct</span> <span class="o">=</span> <span class="n">hyb_abe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">access_policy</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyb_abe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ct</span><span class="p">)</span>
+<span class="go">&#39;hello world this is an important message.&#39;</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="abenc_adapt_hybrid.HybridABEnc.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>ct</em><big>)</big><a class="reference internal" href="../_modules/abenc_adapt_hybrid.html#HybridABEnc.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_adapt_hybrid.HybridABEnc.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="abenc_adapt_hybrid.HybridABEnc.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>M</em>, <em>object</em><big>)</big><a class="reference internal" href="../_modules/abenc_adapt_hybrid.html#HybridABEnc.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_adapt_hybrid.HybridABEnc.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="abenc_adapt_hybrid.HybridABEnc.instantiateCipher">
+<tt class="descname">instantiateCipher</tt><big>(</big><em>mode</em>, <em>message</em><big>)</big><a class="reference internal" href="../_modules/abenc_adapt_hybrid.html#HybridABEnc.instantiateCipher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_adapt_hybrid.HybridABEnc.instantiateCipher" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="abenc_adapt_hybrid.HybridABEnc.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>pk</em>, <em>mk</em>, <em>object</em><big>)</big><a class="reference internal" href="../_modules/abenc_adapt_hybrid.html#HybridABEnc.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_adapt_hybrid.HybridABEnc.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="abenc_adapt_hybrid.HybridABEnc.setup">
+<tt class="descname">setup</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/abenc_adapt_hybrid.html#HybridABEnc.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_adapt_hybrid.HybridABEnc.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="abenc_adapt_hybrid.main">
+<tt class="descclassname">abenc_adapt_hybrid.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/abenc_adapt_hybrid.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_adapt_hybrid.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
@@ -106,14 +157,14 @@
         <li class="right" >
           <a href="../schemes.html" title="Demonstration Schemes"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

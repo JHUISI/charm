@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>dabenc_adapt_hybrid &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>dabenc_adapt_hybrid &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,9 +25,9 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
     <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
-    <link rel="next" title="groupsig_bgls04" href="groupsig_bgls04.html" />
+    <link rel="next" title="encap_bchk05" href="encap_bchk05.html" />
     <link rel="prev" title="dabe_aw11" href="dabe_aw11.html" /> 
   </head>
   <body>
@@ -38,12 +41,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="groupsig_bgls04.html" title="groupsig_bgls04"
+          <a href="encap_bchk05.html" title="encap_bchk05"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="dabe_aw11.html" title="dabe_aw11"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,8 +56,44 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="dabenc-adapt-hybrid">
-<h1>dabenc_adapt_hybrid<a class="headerlink" href="#dabenc-adapt-hybrid" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-dabenc_adapt_hybrid">
+<span id="dabenc-adapt-hybrid"></span><h1>dabenc_adapt_hybrid<a class="headerlink" href="#module-dabenc_adapt_hybrid" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="dabenc_adapt_hybrid.HybridABEncMA">
+<em class="property">class </em><tt class="descclassname">dabenc_adapt_hybrid.</tt><tt class="descname">HybridABEncMA</tt><big>(</big><em>scheme</em>, <em>groupObj</em><big>)</big><a class="reference internal" href="../_modules/dabenc_adapt_hybrid.html#HybridABEncMA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dabenc_adapt_hybrid.HybridABEncMA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.ABEncMultiAuth.ABEncMultiAuth</span></tt></p>
+<dl class="method">
+<dt id="dabenc_adapt_hybrid.HybridABEncMA.authsetup">
+<tt class="descname">authsetup</tt><big>(</big><em>gp</em>, <em>attributes</em><big>)</big><a class="reference internal" href="../_modules/dabenc_adapt_hybrid.html#HybridABEncMA.authsetup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dabenc_adapt_hybrid.HybridABEncMA.authsetup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dabenc_adapt_hybrid.HybridABEncMA.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>gp</em>, <em>sk</em>, <em>ct</em><big>)</big><a class="reference internal" href="../_modules/dabenc_adapt_hybrid.html#HybridABEncMA.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dabenc_adapt_hybrid.HybridABEncMA.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dabenc_adapt_hybrid.HybridABEncMA.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>gp</em>, <em>M</em>, <em>policy_str</em><big>)</big><a class="reference internal" href="../_modules/dabenc_adapt_hybrid.html#HybridABEncMA.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dabenc_adapt_hybrid.HybridABEncMA.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dabenc_adapt_hybrid.HybridABEncMA.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>gp</em>, <em>sk</em>, <em>i</em>, <em>gid</em>, <em>pkey</em><big>)</big><a class="reference internal" href="../_modules/dabenc_adapt_hybrid.html#HybridABEncMA.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dabenc_adapt_hybrid.HybridABEncMA.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dabenc_adapt_hybrid.HybridABEncMA.setup">
+<tt class="descname">setup</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/dabenc_adapt_hybrid.html#HybridABEncMA.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dabenc_adapt_hybrid.HybridABEncMA.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="dabenc_adapt_hybrid.main">
+<tt class="descclassname">dabenc_adapt_hybrid.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/dabenc_adapt_hybrid.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dabenc_adapt_hybrid.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
@@ -67,8 +106,8 @@
   <p class="topless"><a href="dabe_aw11.html"
                         title="previous chapter">dabe_aw11</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="groupsig_bgls04.html"
-                        title="next chapter">groupsig_bgls04</a></p>
+  <p class="topless"><a href="encap_bchk05.html"
+                        title="next chapter">encap_bchk05</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/schemes/dabenc_adapt_hybrid.txt"
@@ -101,19 +140,19 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="groupsig_bgls04.html" title="groupsig_bgls04"
+          <a href="encap_bchk05.html" title="encap_bchk05"
              >next</a> |</li>
         <li class="right" >
           <a href="dabe_aw11.html" title="dabe_aw11"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

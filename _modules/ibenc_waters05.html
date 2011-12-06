@@ -1,0 +1,242 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ibenc_waters05 &mdash; Charm-Crypto 0.3a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.3a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for ibenc_waters05</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;David Naccache based Identity-Based Encryption</span>
+<span class="sd"> </span>
+<span class="sd">| From: &quot;David Naccache Secure and Practical Identity-Based Encryption Section 4&quot;</span>
+<span class="sd">| Available from: http://eprint.iacr.org/2005/369.pdf</span>
+
+<span class="sd">* type:			encryption (identity-based)</span>
+<span class="sd">* setting:		bilinear groups (asymmetric)</span>
+
+<span class="sd">:Authors:	Gary Belvin</span>
+<span class="sd">:Date:			06/2011</span>
+<span class="sd">&#39;&#39;&#39;</span> 
+
+<span class="kn">from</span> <span class="nn">charm.cryptobase</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">toolbox.IBEnc</span> <span class="kn">import</span> <span class="n">IBEnc</span>
+<span class="kn">from</span> <span class="nn">toolbox.bitstring</span> <span class="kn">import</span> <span class="n">Bytes</span>
+<span class="kn">from</span> <span class="nn">toolbox.conversion</span> <span class="kn">import</span> <span class="n">Conversion</span>
+<span class="kn">from</span> <span class="nn">toolbox.pairinggroup</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">hashlib</span><span class="o">,</span> <span class="nn">math</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<div class="viewcode-block" id="IBE_N04"><a class="viewcode-back" href="../schemes/ibenc_waters05.html#ibenc_waters05.IBE_N04">[docs]</a><span class="k">class</span> <span class="nc">IBE_N04</span><span class="p">(</span><span class="n">IBEnc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Implementation of David Naccahe Identity Based Encryption&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+        <span class="n">IBEnc</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">IBEnc</span><span class="o">.</span><span class="n">setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secdef</span><span class="o">=</span><span class="s">&#39;IND_ID_CPA&#39;</span><span class="p">,</span> <span class="n">assumption</span><span class="o">=</span><span class="s">&#39;DBDH&#39;</span><span class="p">,</span> <span class="n">secmodel</span><span class="o">=</span><span class="s">&#39;Standard&#39;</span><span class="p">)</span>
+        <span class="c">#, other={&#39;id&#39;:ZR}</span>
+        <span class="c">#message_space=[GT, &#39;KEM&#39;]</span>
+        <span class="k">global</span> <span class="n">group</span><span class="p">,</span> <span class="n">hashObj</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+        <span class="n">hashObj</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&#39;sha1&#39;</span><span class="p">)</span> 
+        
+<div class="viewcode-block" id="IBE_N04.sha1"><a class="viewcode-back" href="../schemes/ibenc_waters05.html#ibenc_waters05.IBE_N04.sha1">[docs]</a>    <span class="k">def</span> <span class="nf">sha1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">hashObj</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">message</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span> 
+        
+        </div>
+<div class="viewcode-block" id="IBE_N04.setup"><a class="viewcode-back" href="../schemes/ibenc_waters05.html#ibenc_waters05.IBE_N04.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="mi">32</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;l is the security parameter</span>
+<span class="sd">        with l = 32, and the hash function at 160 bits = n * l with n = 5&#39;&#39;&#39;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>      <span class="c"># generator for group G of prime order p</span>
+        
+        <span class="n">hLen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">hashObj</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span> <span class="o">*</span> <span class="mi">8</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">hLen</span> <span class="o">/</span> <span class="n">l</span><span class="p">))</span>
+        
+        <span class="c">#nprime = n * int(g).bit_length()</span>
+        <span class="c">#H = self.sha1 # Hash function H :{0,1}* -&gt; {0,1}^{n&#39;}      </span>
+        
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>  <span class="c">#from Zp</span>
+        <span class="n">g1</span>    <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">alpha</span>      <span class="c"># G1</span>
+        <span class="n">g2</span>    <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>    <span class="c">#G2</span>
+        <span class="n">uprime</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
+        <span class="n">U</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+        
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s">&#39;g1&#39;</span><span class="p">:</span><span class="n">g1</span><span class="p">,</span> <span class="s">&#39;g2&#39;</span><span class="p">:</span> <span class="n">g2</span><span class="p">,</span> <span class="s">&#39;uPrime&#39;</span><span class="p">:</span><span class="n">uprime</span><span class="p">,</span> <span class="s">&#39;U&#39;</span><span class="p">:</span> <span class="n">U</span><span class="p">,</span> 
+              <span class="s">&#39;n&#39;</span><span class="p">:</span><span class="n">n</span><span class="p">,</span> <span class="s">&#39;l&#39;</span><span class="p">:</span><span class="n">l</span><span class="p">}</span>
+        
+        <span class="n">mk</span> <span class="o">=</span> <span class="n">pk</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">mk</span><span class="p">[</span><span class="s">&#39;g2^alpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">g2</span> <span class="o">**</span> <span class="n">alpha</span> <span class="c">#master secret</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> 
+            <span class="k">print</span><span class="p">(</span><span class="n">mk</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="IBE_N04.stringtoidentity"><a class="viewcode-back" href="../schemes/ibenc_waters05.html#ibenc_waters05.IBE_N04.stringtoidentity">[docs]</a>    <span class="k">def</span> <span class="nf">stringtoidentity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">strID</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Hash the identity string and break it up in to l bit pieces&#39;&#39;&#39;</span>
+        <span class="nb">hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="n">strID</span><span class="p">,</span> <span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">OS2IP</span><span class="p">(</span><span class="nb">hash</span><span class="p">)</span> <span class="c">#Convert to integer format</span>
+        <span class="n">bstr</span> <span class="o">=</span> <span class="nb">bin</span><span class="p">(</span><span class="n">val</span><span class="p">)[</span><span class="mi">2</span><span class="p">:]</span>   <span class="c">#cut out the 0b header</span>
+        
+        <span class="n">v</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">]):</span>  <span class="c">#n must be greater than or equal to 1</span>
+            <span class="n">binsubstr</span> <span class="o">=</span> <span class="n">bstr</span><span class="p">[</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;l&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">i</span> <span class="p">:</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;l&#39;</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+            <span class="n">intval</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">binsubstr</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">intelement</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="n">intval</span><span class="p">)</span> 
+            <span class="n">v</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">intelement</span><span class="p">)</span>
+                     
+        <span class="k">return</span> <span class="n">v</span>
+    </div>
+<div class="viewcode-block" id="IBE_N04.extract"><a class="viewcode-back" href="../schemes/ibenc_waters05.html#ibenc_waters05.IBE_N04.extract">[docs]</a>    <span class="k">def</span> <span class="nf">extract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;v = (v1, .., vn) is an identity&#39;&#39;&#39;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        
+        <span class="n">d1</span> <span class="o">=</span> <span class="n">mk</span><span class="p">[</span><span class="s">&#39;uPrime&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">]):</span>
+            <span class="n">d1</span> <span class="o">*=</span> <span class="n">mk</span><span class="p">[</span><span class="s">&#39;U&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">**</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            
+        <span class="n">d1</span> <span class="o">=</span> <span class="n">mk</span><span class="p">[</span><span class="s">&#39;g2^alpha&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">d1</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span>
+        <span class="n">d2</span> <span class="o">=</span> <span class="n">mk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span>
+        
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;D1    =&gt;&quot;</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;D2    =&gt;&quot;</span><span class="p">,</span> <span class="n">d2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;d1&#39;</span><span class="p">:</span> <span class="n">d1</span><span class="p">,</span> <span class="s">&#39;d2&#39;</span><span class="p">:</span><span class="n">d2</span><span class="p">}</span>
+</div>
+<div class="viewcode-block" id="IBE_N04.encrypt"><a class="viewcode-back" href="../schemes/ibenc_waters05.html#ibenc_waters05.IBE_N04.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span> <span class="c"># M:GT</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">c1</span> <span class="o">=</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="n">M</span>
+        <span class="n">c2</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">t</span>
+        <span class="n">c3</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;uPrime&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">]):</span>
+            <span class="n">c3</span> <span class="o">*=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;U&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">**</span> <span class="n">ID</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">c3</span> <span class="o">=</span> <span class="n">c3</span> <span class="o">**</span> <span class="n">t</span>
+        
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Encrypting&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;C1    =&gt;&quot;</span><span class="p">,</span> <span class="n">c1</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;C2    =&gt;&quot;</span><span class="p">,</span> <span class="n">c2</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;C3    =&gt;&quot;</span><span class="p">,</span> <span class="n">c3</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;c1&#39;</span><span class="p">:</span><span class="n">c1</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">:</span> <span class="n">c2</span><span class="p">,</span> <span class="s">&#39;c3&#39;</span><span class="p">:</span><span class="n">c3</span><span class="p">}</span>
+</div>
+<div class="viewcode-block" id="IBE_N04.decrypt"><a class="viewcode-back" href="../schemes/ibenc_waters05.html#ibenc_waters05.IBE_N04.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sID</span><span class="p">,</span> <span class="n">ct</span><span class="p">):</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">sID</span><span class="p">[</span><span class="s">&#39;d2&#39;</span><span class="p">],</span> <span class="n">ct</span><span class="p">[</span><span class="s">&#39;c3&#39;</span><span class="p">])</span>
+        <span class="n">dem</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">ct</span><span class="p">[</span><span class="s">&#39;c2&#39;</span><span class="p">],</span> <span class="n">sID</span><span class="p">[</span><span class="s">&#39;d1&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Decrypting&quot;</span><span class="p">)</span>    
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;arg1    =&gt;&quot;</span><span class="p">,</span> <span class="n">sID</span><span class="p">[</span><span class="s">&#39;d2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;arg2    =&gt;&quot;</span><span class="p">,</span> <span class="n">ct</span><span class="p">[</span><span class="s">&#39;c3&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Num:    =&gt;&quot;</span><span class="p">,</span> <span class="n">num</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Dem:    =&gt;&quot;</span><span class="p">,</span> <span class="n">dem</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">ct</span><span class="p">[</span><span class="s">&#39;c1&#39;</span><span class="p">]</span> <span class="o">*</span>  <span class="n">num</span> <span class="o">/</span> <span class="n">dem</span>
+
+    </div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/ibenc_waters05.html#ibenc_waters05.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c"># initialize the element object so that object references have global scope</span>
+    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;../param/a.param&#39;</span><span class="p">)</span>
+    <span class="n">ibe</span> <span class="o">=</span> <span class="n">IBE_N04</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">)</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+
+    <span class="c"># represents public identity</span>
+    <span class="n">ID</span> <span class="o">=</span> <span class="s">&quot;bob@mail.com&quot;</span>
+    <span class="n">kID</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">stringtoidentity</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">ID</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Bob&#39;s key  =&gt;&quot;</span><span class="p">,</span> <span class="n">kID</span><span class="p">)</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">mk</span><span class="p">,</span> <span class="n">kID</span><span class="p">)</span>
+
+    <span class="n">M</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+    <span class="n">cipher</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">kID</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">cipher</span><span class="p">)</span>
+    <span class="c">#print(&#39;m    =&gt;&#39;, m)</span>
+
+    <span class="k">assert</span> <span class="n">m</span> <span class="o">==</span> <span class="n">M</span><span class="p">,</span> <span class="s">&quot;FAILED Decryption!&quot;</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Decryption!!! m =&gt; &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">m</span><span class="p">)</span>
+    <span class="k">del</span> <span class="n">groupObj</span></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>specialprimes &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>specialprimes &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,9 +25,9 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
     <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
-    <link rel="next" title="zknode" href="zknode.html" />
+    <link rel="next" title="SymmetricCryptoAbstraction" href="SymmetricCryptoAbstraction.html" />
     <link rel="prev" title="sigmaprotocol" href="sigmaprotocol.html" /> 
   </head>
   <body>
@@ -38,12 +41,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="zknode.html" title="zknode"
+          <a href="SymmetricCryptoAbstraction.html" title="SymmetricCryptoAbstraction"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="sigmaprotocol.html" title="sigmaprotocol"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,8 +56,26 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="specialprimes">
-<h1>specialprimes<a class="headerlink" href="#specialprimes" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-specialprimes">
+<span id="specialprimes"></span><h1>specialprimes<a class="headerlink" href="#module-specialprimes" title="Permalink to this headline">¶</a></h1>
+<p>Generates a Blum-Williams integer, which is the product of two distinct primes
+each congruent to 3 mod 4</p>
+<dl class="class">
+<dt id="specialprimes.BlumWilliamsInteger">
+<em class="property">class </em><tt class="descclassname">specialprimes.</tt><tt class="descname">BlumWilliamsInteger</tt><a class="reference internal" href="../_modules/specialprimes.html#BlumWilliamsInteger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specialprimes.BlumWilliamsInteger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dl class="method">
+<dt id="specialprimes.BlumWilliamsInteger.generateBlumWilliamsInteger">
+<tt class="descname">generateBlumWilliamsInteger</tt><big>(</big><em>n</em>, <em>p=0</em>, <em>q=0</em><big>)</big><a class="reference internal" href="../_modules/specialprimes.html#BlumWilliamsInteger.generateBlumWilliamsInteger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specialprimes.BlumWilliamsInteger.generateBlumWilliamsInteger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="specialprimes.BlumWilliamsInteger.generatePrimes">
+<tt class="descname">generatePrimes</tt><big>(</big><em>n</em><big>)</big><a class="reference internal" href="../_modules/specialprimes.html#BlumWilliamsInteger.generatePrimes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specialprimes.BlumWilliamsInteger.generatePrimes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 
 
@@ -67,8 +88,8 @@
   <p class="topless"><a href="sigmaprotocol.html"
                         title="previous chapter">sigmaprotocol</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="zknode.html"
-                        title="next chapter">zknode</a></p>
+  <p class="topless"><a href="SymmetricCryptoAbstraction.html"
+                        title="next chapter">SymmetricCryptoAbstraction</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/toolbox/specialprimes.txt"
@@ -101,19 +122,19 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="zknode.html" title="zknode"
+          <a href="SymmetricCryptoAbstraction.html" title="SymmetricCryptoAbstraction"
              >next</a> |</li>
         <li class="right" >
           <a href="sigmaprotocol.html" title="sigmaprotocol"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

@@ -1,0 +1,174 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pkenc_adapt_bchk05 &mdash; Charm-Crypto 0.3a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.3a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
+    <link rel="next" title="pkenc_adapt_chk04" href="pkenc_adapt_chk04.html" />
+    <link rel="prev" title="ibenc_waters05" href="ibenc_waters05.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pkenc_adapt_chk04.html" title="pkenc_adapt_chk04"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ibenc_waters05.html" title="ibenc_waters05"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pkenc_adapt_bchk05">
+<span id="pkenc-adapt-bchk05"></span><h1>pkenc_adapt_bchk05<a class="headerlink" href="#module-pkenc_adapt_bchk05" title="Permalink to this headline">¶</a></h1>
+<p>Boneh-Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform</p>
+<div class="line-block">
+<div class="line">From: &#8220;Improved Efficiency for CCA-Secure Cryptosystems Built Using Identity-Based Encryption&#8221;, Section 4</div>
+<div class="line">Published In: Topics in Cryptology in CTRSA 2005</div>
+<div class="line">Available From: eprint.iacr.org/2004/261.pdf</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Author:</th><td class="field-body">Christina Garman</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">12/2011</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="pkenc_adapt_bchk05.BCHKIBEnc">
+<em class="property">class </em><tt class="descclassname">pkenc_adapt_bchk05.</tt><tt class="descname">BCHKIBEnc</tt><big>(</big><em>scheme</em>, <em>groupObj</em>, <em>encscheme</em><big>)</big><a class="reference internal" href="../_modules/pkenc_adapt_bchk05.html#BCHKIBEnc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_adapt_bchk05.BCHKIBEnc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.IBEnc.IBEnc</span></tt></p>
+<dl class="method">
+<dt id="pkenc_adapt_bchk05.BCHKIBEnc.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>c</em><big>)</big><a class="reference internal" href="../_modules/pkenc_adapt_bchk05.html#BCHKIBEnc.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_adapt_bchk05.BCHKIBEnc.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pkenc_adapt_bchk05.BCHKIBEnc.elmtToString">
+<tt class="descname">elmtToString</tt><big>(</big><em>g</em>, <em>length</em><big>)</big><a class="reference internal" href="../_modules/pkenc_adapt_bchk05.html#BCHKIBEnc.elmtToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_adapt_bchk05.BCHKIBEnc.elmtToString" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pkenc_adapt_bchk05.BCHKIBEnc.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>m</em><big>)</big><a class="reference internal" href="../_modules/pkenc_adapt_bchk05.html#BCHKIBEnc.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_adapt_bchk05.BCHKIBEnc.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pkenc_adapt_bchk05.BCHKIBEnc.keygen">
+<tt class="descname">keygen</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pkenc_adapt_bchk05.html#BCHKIBEnc.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_adapt_bchk05.BCHKIBEnc.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pkenc_adapt_bchk05.BCHKIBEnc.str_XOR">
+<tt class="descname">str_XOR</tt><big>(</big><em>m</em>, <em>k</em><big>)</big><a class="reference internal" href="../_modules/pkenc_adapt_bchk05.html#BCHKIBEnc.str_XOR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_adapt_bchk05.BCHKIBEnc.str_XOR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pkenc_adapt_bchk05.main">
+<tt class="descclassname">pkenc_adapt_bchk05.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pkenc_adapt_bchk05.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_adapt_bchk05.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ibenc_waters05.html"
+                        title="previous chapter">ibenc_waters05</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pkenc_adapt_chk04.html"
+                        title="next chapter">pkenc_adapt_chk04</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/schemes/pkenc_adapt_bchk05.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pkenc_adapt_chk04.html" title="pkenc_adapt_chk04"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ibenc_waters05.html" title="ibenc_waters05"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

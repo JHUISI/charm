@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>ibenc_bb03 &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>ibenc_bb03 &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
     <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
     <link rel="next" title="ibenc_bf01" href="ibenc_bf01.html" />
     <link rel="prev" title="ibenc_adapt_identityhash" href="ibenc_adapt_identityhash.html" /> 
@@ -43,7 +46,7 @@
         <li class="right" >
           <a href="ibenc_adapt_identityhash.html" title="ibenc_adapt_identityhash"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,8 +56,70 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="ibenc-bb03">
-<h1>ibenc_bb03<a class="headerlink" href="#ibenc-bb03" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-ibenc_bb03">
+<span id="ibenc-bb03"></span><h1>ibenc_bb03<a class="headerlink" href="#module-ibenc_bb03" title="Permalink to this headline">¶</a></h1>
+<p>Boneh-Boyen Identity Based Encryption</p>
+<div class="line-block">
+<div class="line">From: &#8220;D. Boneh, X. Boyen.  Efficient Selective Identity-Based Encryption Without Random Oracles&#8221;, Section 5.1.</div>
+<div class="line">Published in: Eurocrypt 2004</div>
+<div class="line">Available from: <a class="reference external" href="http://crypto.stanford.edu/~dabo/pubs/papers/bbibe.pdf">http://crypto.stanford.edu/~dabo/pubs/papers/bbibe.pdf</a></div>
+<div class="line">Notes: This is the IBE (1-level HIBE) implementation of the HIBE scheme BB_2.</div>
+</div>
+<ul class="simple">
+<li>type:                 encryption (identity-based)</li>
+<li>setting:              bilinear groups (asymmetric)</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">J Ayo Akinyele</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">11/2010</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="ibenc_bb03.IBE_BB04">
+<em class="property">class </em><tt class="descclassname">ibenc_bb03.</tt><tt class="descname">IBE_BB04</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../_modules/ibenc_bb03.html#IBE_BB04"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_bb03.IBE_BB04" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.IBEnc.IBEnc</span></tt></p>
+<dl class="method">
+<dt id="ibenc_bb03.IBE_BB04.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>pk</em>, <em>dID</em>, <em>CT</em><big>)</big><a class="reference internal" href="../_modules/ibenc_bb03.html#IBE_BB04.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_bb03.IBE_BB04.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_bb03.IBE_BB04.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>params</em>, <em>ID</em>, <em>M</em><big>)</big><a class="reference internal" href="../_modules/ibenc_bb03.html#IBE_BB04.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_bb03.IBE_BB04.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_bb03.IBE_BB04.extract">
+<tt class="descname">extract</tt><big>(</big><em>mk</em>, <em>ID</em><big>)</big><a class="reference internal" href="../_modules/ibenc_bb03.html#IBE_BB04.extract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_bb03.IBE_BB04.extract" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_bb03.IBE_BB04.keydec">
+<tt class="descname">keydec</tt><big>(</big><em>pk</em>, <em>dID</em>, <em>CT</em><big>)</big><a class="reference internal" href="../_modules/ibenc_bb03.html#IBE_BB04.keydec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_bb03.IBE_BB04.keydec" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_bb03.IBE_BB04.keyenc">
+<tt class="descname">keyenc</tt><big>(</big><em>params</em>, <em>ID</em>, <em>msg</em><big>)</big><a class="reference internal" href="../_modules/ibenc_bb03.html#IBE_BB04.keyenc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_bb03.IBE_BB04.keyenc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_bb03.IBE_BB04.setup">
+<tt class="descname">setup</tt><big>(</big><em>secparam=None</em><big>)</big><a class="reference internal" href="../_modules/ibenc_bb03.html#IBE_BB04.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_bb03.IBE_BB04.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="ibenc_bb03.main">
+<tt class="descclassname">ibenc_bb03.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ibenc_bb03.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_bb03.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
@@ -106,14 +171,14 @@
         <li class="right" >
           <a href="ibenc_adapt_identityhash.html" title="ibenc_adapt_identityhash"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

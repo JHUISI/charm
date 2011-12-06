@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>ibenc_bf01 &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>ibenc_bf01 &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,9 +25,9 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
     <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
-    <link rel="next" title="ibenc_waters05" href="ibenc_waters05.html" />
+    <link rel="next" title="ibenc_sw05" href="ibenc_sw05.html" />
     <link rel="prev" title="ibenc_bb03" href="ibenc_bb03.html" /> 
   </head>
   <body>
@@ -38,12 +41,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="ibenc_waters05.html" title="ibenc_waters05"
+          <a href="ibenc_sw05.html" title="ibenc_sw05"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="ibenc_bb03.html" title="ibenc_bb03"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,8 +56,74 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="ibenc-bf01">
-<h1>ibenc_bf01<a class="headerlink" href="#ibenc-bf01" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-ibenc_bf01">
+<span id="ibenc-bf01"></span><h1>ibenc_bf01<a class="headerlink" href="#module-ibenc_bf01" title="Permalink to this headline">¶</a></h1>
+<p>Boneh-Franklin Identity Based Encryption</p>
+<div class="line-block">
+<div class="line">From: &#8220;D. Boneh, M. Franklin Identity-Based Encryption from the Weil Pairing&#8221;, Section 4.2.</div>
+<div class="line">Published in: Crypto 2003</div>
+<div class="line">Available from: <a class="reference external" href="http://.../bfibe.pdf">http://.../bfibe.pdf</a></div>
+<div class="line">Notes: This is the IBE .</div>
+</div>
+<ul class="simple">
+<li>type:           encryption (identity-based)</li>
+<li>setting:        bilinear groups (asymmetric)</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body"><ol class="first upperalpha simple" start="10">
+<li>Ayo Akinyele</li>
+</ol>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body"><p class="first last">2/2011</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="ibenc_bf01.IBE_BonehFranklin">
+<em class="property">class </em><tt class="descclassname">ibenc_bf01.</tt><tt class="descname">IBE_BonehFranklin</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../_modules/ibenc_bf01.html#IBE_BonehFranklin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_bf01.IBE_BonehFranklin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.IBEnc.IBEnc</span></tt></p>
+<dl class="method">
+<dt id="ibenc_bf01.IBE_BonehFranklin.decodeFromZn">
+<tt class="descname">decodeFromZn</tt><big>(</big><em>element</em><big>)</big><a class="reference internal" href="../_modules/ibenc_bf01.html#IBE_BonehFranklin.decodeFromZn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_bf01.IBE_BonehFranklin.decodeFromZn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_bf01.IBE_BonehFranklin.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>ct</em><big>)</big><a class="reference internal" href="../_modules/ibenc_bf01.html#IBE_BonehFranklin.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_bf01.IBE_BonehFranklin.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_bf01.IBE_BonehFranklin.encodeToZn">
+<tt class="descname">encodeToZn</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="../_modules/ibenc_bf01.html#IBE_BonehFranklin.encodeToZn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_bf01.IBE_BonehFranklin.encodeToZn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_bf01.IBE_BonehFranklin.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>ID</em>, <em>M</em><big>)</big><a class="reference internal" href="../_modules/ibenc_bf01.html#IBE_BonehFranklin.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_bf01.IBE_BonehFranklin.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_bf01.IBE_BonehFranklin.extract">
+<tt class="descname">extract</tt><big>(</big><em>sk</em>, <em>ID</em><big>)</big><a class="reference internal" href="../_modules/ibenc_bf01.html#IBE_BonehFranklin.extract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_bf01.IBE_BonehFranklin.extract" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_bf01.IBE_BonehFranklin.setup">
+<tt class="descname">setup</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ibenc_bf01.html#IBE_BonehFranklin.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_bf01.IBE_BonehFranklin.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="ibenc_bf01.main">
+<tt class="descclassname">ibenc_bf01.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ibenc_bf01.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_bf01.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
@@ -67,8 +136,8 @@
   <p class="topless"><a href="ibenc_bb03.html"
                         title="previous chapter">ibenc_bb03</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="ibenc_waters05.html"
-                        title="next chapter">ibenc_waters05</a></p>
+  <p class="topless"><a href="ibenc_sw05.html"
+                        title="next chapter">ibenc_sw05</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/schemes/ibenc_bf01.txt"
@@ -101,19 +170,19 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="ibenc_waters05.html" title="ibenc_waters05"
+          <a href="ibenc_sw05.html" title="ibenc_sw05"
              >next</a> |</li>
         <li class="right" >
           <a href="ibenc_bb03.html" title="ibenc_bb03"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

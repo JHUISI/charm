@@ -1,0 +1,343 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ibenc_sw05 &mdash; Charm-Crypto 0.3a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.3a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for ibenc_sw05</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Sahai-Waters Fuzzy Identity-Based Encryption, Original Construction</span>
+
+<span class="sd">| From: &quot;A. Sahai, B. Waters Fuzzy Identity-Based Encryption.</span>
+<span class="sd">| Published in: Eurocrypt 2005</span>
+<span class="sd">| Available from: eprint.iacr.org/2004/086.pdf</span>
+<span class="sd">| Notes: Original construction (Section 4) and large universe construction (Section 6). </span>
+
+<span class="sd">* type:            encryption (identity-based)</span>
+<span class="sd">* setting:        bilinear groups</span>
+
+<span class="sd">:Authors:    Christina Garman</span>
+<span class="sd">:Date:       10/2011</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">toolbox.pairinggroup</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">charm.cryptobase</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">toolbox.IBEnc</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">charm.pairing</span> <span class="kn">import</span> <span class="nb">hash</span> <span class="k">as</span> <span class="n">sha1</span>
+<span class="kn">from</span> <span class="nn">toolbox.secretshare</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<div class="viewcode-block" id="IBE_SW05"><a class="viewcode-back" href="../schemes/ibenc_sw05.html#ibenc_sw05.IBE_SW05">[docs]</a><span class="k">class</span> <span class="nc">IBE_SW05</span><span class="p">(</span><span class="n">IBEnc</span><span class="p">):</span>    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+        <span class="n">IBEnc</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">global</span> <span class="n">group</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">util</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">((</span><span class="s">&#39;0&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">ZR</span><span class="p">)</span>
+        <span class="n">util</span> <span class="o">=</span> <span class="n">SecretShare</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+        
+<div class="viewcode-block" id="IBE_SW05.setup"><a class="viewcode-back" href="../schemes/ibenc_sw05.html#ibenc_sw05.IBE_SW05.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        :Parameters:</span>
+<span class="sd">           - ``n``: the maximum number of attributes in the system.</span>
+<span class="sd">                    OR the maximum length of an identity</span>
+<span class="sd">           - ``d``: the set overlap required to decrypt</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span> <span class="o">**</span> <span class="n">y</span>
+
+        <span class="n">t</span> <span class="o">=</span> <span class="p">[</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">n</span> <span class="p">)]</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="p">[</span> <span class="n">g</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">t</span><span class="p">]</span>
+        
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s">&#39;Y&#39;</span><span class="p">:</span><span class="n">Y</span><span class="p">,</span> <span class="s">&#39;T&#39;</span><span class="p">:</span> <span class="n">T</span> <span class="p">}</span> 
+        <span class="n">mk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;y&#39;</span><span class="p">:</span><span class="n">y</span><span class="p">,</span> <span class="s">&#39;t&#39;</span><span class="p">:</span><span class="n">t</span> <span class="p">}</span>         <span class="c"># master secret</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IBE_SW05.intersection_subset"><a class="viewcode-back" href="../schemes/ibenc_sw05.html#ibenc_sw05.IBE_SW05.intersection_subset">[docs]</a>    <span class="k">def</span> <span class="nf">intersection_subset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">wPrime</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wPrime</span><span class="p">)):</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">wPrime</span><span class="p">[</span><span class="n">j</span><span class="p">]):</span>
+                    <span class="n">S</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">d</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;Cannot decrypt.  w and w&#39; do not have enough attributes in common.&quot;</span>
+
+        <span class="n">S_sub</span>  <span class="o">=</span> <span class="p">[</span><span class="n">S</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">d</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">S_sub</span>
+    </div>
+<div class="viewcode-block" id="IBE_SW05.extract"><a class="viewcode-back" href="../schemes/ibenc_sw05.html#ibenc_sw05.IBE_SW05.extract">[docs]</a>    <span class="k">def</span> <span class="nf">extract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">dOver</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">w_hash</span> <span class="o">=</span> <span class="p">[</span><span class="n">H</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ID</span><span class="p">]</span> <span class="c"># assumes ID is a list</span>
+
+        <span class="c">#a d-1 degree polynomial q is generated such that q(0) = y</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dOver</span><span class="p">)]</span>
+        <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">mk</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">]</span>
+        <span class="c"># use secret sharing as building block</span>
+        <span class="n">shares</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">genShares</span><span class="p">(</span><span class="n">mk</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">],</span> <span class="n">dOver</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">w_hash</span><span class="p">)</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="p">{};</span> <span class="n">t_index</span> <span class="o">=</span> <span class="p">{};</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">w_hash</span><span class="p">:</span>       
+            <span class="n">j</span> <span class="o">=</span> <span class="n">w_hash</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">D</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">shares</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">mk</span><span class="p">[</span><span class="s">&#39;t&#39;</span><span class="p">][</span><span class="n">j</span><span class="p">]))</span>
+            <span class="c"># dictionary for finding corresponding T public value when encrypting </span>
+            <span class="c"># this eliminates ordering of attribute issues</span>
+            <span class="n">t_index</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">j</span><span class="p">;</span> 
+            
+        <span class="n">pk</span><span class="p">[</span><span class="s">&#39;T_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t_index</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">w_hash</span><span class="p">,</span> <span class="p">{</span> <span class="s">&#39;D&#39;</span><span class="p">:</span><span class="n">D</span> <span class="p">})</span>
+</div>
+<div class="viewcode-block" id="IBE_SW05.encrypt"><a class="viewcode-back" href="../schemes/ibenc_sw05.html#ibenc_sw05.IBE_SW05.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">w_prime</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;       </span>
+<span class="sd">        Encryption with the public key, Wprime and the message M in G2</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">w_prime_hash</span> <span class="o">=</span> <span class="p">[</span><span class="n">H</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">w_prime</span><span class="p">]</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+
+        <span class="n">Eprime</span> <span class="o">=</span> <span class="n">M</span> <span class="o">*</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;Y&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">)</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">w_prime_hash</span><span class="p">:</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;T_index&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">E</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;T&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span>
+
+        <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;wPrime&#39;</span><span class="p">:</span><span class="n">w_prime_hash</span><span class="p">,</span> <span class="s">&#39;Eprime&#39;</span><span class="p">:</span><span class="n">Eprime</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">:</span><span class="n">E</span><span class="p">}</span>
+</div>
+<div class="viewcode-block" id="IBE_SW05.decrypt"><a class="viewcode-back" href="../schemes/ibenc_sw05.html#ibenc_sw05.IBE_SW05.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">CT</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;dID must have an intersection overlap of at least d with Wprime to decrypt</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intersection_subset</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">CT</span><span class="p">[</span><span class="s">&#39;wPrime&#39;</span><span class="p">],</span> <span class="n">d</span><span class="p">)</span>
+        <span class="n">coeffs</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">recoverCoefficients</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+        <span class="n">prod</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">S</span><span class="p">:</span>            
+            <span class="n">prod</span> <span class="o">*=</span> <span class="n">pair</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;D&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">CT</span><span class="p">[</span><span class="s">&#39;E&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span> <span class="o">**</span> <span class="n">coeffs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            
+        <span class="k">return</span> <span class="n">CT</span><span class="p">[</span><span class="s">&#39;Eprime&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">prod</span>
+ 
+</div></div>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Sahai-Waters Fuzzy Identity-Based Encryption, Large Universe Construction</span>
+
+<span class="sd">| From: &quot;A. Sahai, B. Waters Fuzzy Identity-Based Encryption.</span>
+<span class="sd">| Published in: Eurocrypt 2005</span>
+<span class="sd">| Available from: eprint.iacr.org/2004/086.pdf</span>
+<span class="sd">| Notes: Original construction (Section 4) and large universe construction (Section 6). </span>
+
+<span class="sd">* type:            encryption (identity-based)</span>
+<span class="sd">* setting:        bilinear groups</span>
+
+<span class="sd">:Authors:    Christina Garman</span>
+<span class="sd">:Date:       10/2011</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="IBE_SW05_LUC"><a class="viewcode-back" href="../schemes/ibenc_sw05.html#ibenc_sw05.IBE_SW05_LUC">[docs]</a><span class="k">class</span> <span class="nc">IBE_SW05_LUC</span><span class="p">(</span><span class="n">IBEnc</span><span class="p">):</span>    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+        <span class="n">IBEnc</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">global</span> <span class="n">group</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">util</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">((</span><span class="s">&#39;0&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">ZR</span><span class="p">)</span>
+        <span class="n">util</span> <span class="o">=</span> <span class="n">SecretShare</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+        
+<div class="viewcode-block" id="IBE_SW05_LUC.setup"><a class="viewcode-back" href="../schemes/ibenc_sw05.html#ibenc_sw05.IBE_SW05_LUC.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        :Parameters:</span>
+<span class="sd">           - ``n``: the maximum number of attributes in the system.</span>
+<span class="sd">                    OR the maximum length of an identity</span>
+<span class="sd">           - ``d``: the set overlap required to decrypt</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">g1</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">y</span>
+        <span class="n">g2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        
+        <span class="n">t</span> <span class="o">=</span> <span class="p">[</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span> <span class="p">)]</span>
+        
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s">&#39;g1&#39;</span><span class="p">:</span><span class="n">g1</span><span class="p">,</span> <span class="s">&#39;g2&#39;</span><span class="p">:</span><span class="n">g2</span><span class="p">,</span> <span class="s">&#39;t&#39;</span><span class="p">:</span><span class="n">t</span> <span class="p">}</span> 
+        <span class="n">mk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;y&#39;</span><span class="p">:</span><span class="n">y</span> <span class="p">}</span>         <span class="c"># master secret</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IBE_SW05_LUC.eval_T"><a class="viewcode-back" href="../schemes/ibenc_sw05.html#ibenc_sw05.IBE_SW05_LUC.eval_T">[docs]</a>    <span class="k">def</span> <span class="nf">eval_T</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>        
+        <span class="n">N_int</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+        
+        <span class="n">coeffs</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">recoverCoefficients</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+        <span class="n">prod_result</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">N_int</span><span class="p">:</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="n">prod_result</span> <span class="o">*=</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;t&#39;</span><span class="p">][</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="n">coeffs</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+        
+        <span class="n">T</span> <span class="o">=</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">n</span><span class="p">))</span> <span class="o">*</span> <span class="n">prod_result</span>
+        <span class="k">return</span> <span class="n">T</span>
+</div>
+<div class="viewcode-block" id="IBE_SW05_LUC.intersection_subset"><a class="viewcode-back" href="../schemes/ibenc_sw05.html#ibenc_sw05.IBE_SW05_LUC.intersection_subset">[docs]</a>    <span class="k">def</span> <span class="nf">intersection_subset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">wPrime</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wPrime</span><span class="p">)):</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">wPrime</span><span class="p">[</span><span class="n">j</span><span class="p">]):</span>
+                    <span class="n">S</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">d</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;Cannot decrypt.  w and w&#39; do not have enough attributes in common.&quot;</span>
+
+        <span class="n">S_sub</span>  <span class="o">=</span> <span class="p">[</span><span class="n">S</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">d</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">S_sub</span>
+    </div>
+<div class="viewcode-block" id="IBE_SW05_LUC.extract"><a class="viewcode-back" href="../schemes/ibenc_sw05.html#ibenc_sw05.IBE_SW05_LUC.extract">[docs]</a>    <span class="k">def</span> <span class="nf">extract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">dOver</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">w_hash</span> <span class="o">=</span> <span class="p">[</span><span class="n">H</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ID</span><span class="p">]</span> <span class="c"># assumes ID is a list</span>
+
+        <span class="n">r</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="c">#a d-1 degree polynomial q is generated such that q(0) = y</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dOver</span><span class="p">)]</span>
+        <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">mk</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">]</span>
+        <span class="n">shares</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">genShares</span><span class="p">(</span><span class="n">mk</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">],</span> <span class="n">dOver</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">w_hash</span><span class="p">)</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">w_hash</span><span class="p">:</span>       
+            <span class="n">j</span> <span class="o">=</span> <span class="n">w_hash</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">D</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">shares</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_T</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">w_hash</span><span class="p">,</span> <span class="p">{</span> <span class="s">&#39;D&#39;</span><span class="p">:</span><span class="n">D</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">:</span><span class="n">d</span> <span class="p">})</span>
+</div>
+<div class="viewcode-block" id="IBE_SW05_LUC.encrypt"><a class="viewcode-back" href="../schemes/ibenc_sw05.html#ibenc_sw05.IBE_SW05_LUC.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">w_prime</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;       </span>
+<span class="sd">        Encryption with the public key, Wprime and the message M in G2</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">w_prime_hash</span> <span class="o">=</span> <span class="p">[</span><span class="n">H</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">w_prime</span><span class="p">]</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+
+        <span class="n">Eprime</span> <span class="o">=</span> <span class="n">M</span> <span class="o">*</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="n">s</span><span class="p">)</span>
+        <span class="n">Eprimeprime</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span>
+        
+        <span class="n">E</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">w_prime_hash</span><span class="p">:</span>
+            <span class="n">E</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_T</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="o">**</span> <span class="n">s</span>
+
+        <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;wPrime&#39;</span><span class="p">:</span><span class="n">w_prime_hash</span><span class="p">,</span> <span class="s">&#39;Eprime&#39;</span><span class="p">:</span><span class="n">Eprime</span><span class="p">,</span> <span class="s">&#39;Eprimeprime&#39;</span><span class="p">:</span><span class="n">Eprimeprime</span><span class="p">,</span><span class="s">&#39;E&#39;</span><span class="p">:</span><span class="n">E</span><span class="p">}</span>
+</div>
+<div class="viewcode-block" id="IBE_SW05_LUC.decrypt"><a class="viewcode-back" href="../schemes/ibenc_sw05.html#ibenc_sw05.IBE_SW05_LUC.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">CT</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;dID must have an intersection overlap of at least d with Wprime to decrypt</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intersection_subset</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">CT</span><span class="p">[</span><span class="s">&#39;wPrime&#39;</span><span class="p">],</span> <span class="n">d</span><span class="p">)</span>
+        <span class="c">#print(&quot;S :=&quot;, S)</span>
+        <span class="n">coeffs</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">recoverCoefficients</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+        <span class="n">prod</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">S</span><span class="p">:</span>
+            <span class="n">prod</span> <span class="o">*=</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;d&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">CT</span><span class="p">[</span><span class="s">&#39;E&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span> <span class="o">/</span> <span class="n">pair</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;D&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">CT</span><span class="p">[</span><span class="s">&#39;Eprimeprime&#39;</span><span class="p">]))</span> <span class="o">**</span> <span class="n">coeffs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            
+        <span class="k">return</span> <span class="n">CT</span><span class="p">[</span><span class="s">&#39;Eprime&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">prod</span>
+
+
+ 
+        </div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/ibenc_sw05.html#ibenc_sw05.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c"># initialize the element object so that object references have global scope</span>
+    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;../param/a.param&#39;</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">6</span><span class="p">;</span> <span class="n">d</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">ibe</span> <span class="o">=</span> <span class="n">IBE_SW05_LUC</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">)</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Parameter Setup...&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;pk =&gt;&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;mk =&gt;&quot;</span><span class="p">,</span> <span class="n">mk</span><span class="p">)</span>
+
+    <span class="n">w</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;insurance&#39;</span><span class="p">,</span> <span class="s">&#39;id=2345&#39;</span><span class="p">,</span> <span class="s">&#39;oncology&#39;</span><span class="p">,</span> <span class="s">&#39;doctor&#39;</span><span class="p">,</span> <span class="s">&#39;nurse&#39;</span><span class="p">,</span> <span class="s">&#39;JHU&#39;</span><span class="p">]</span> <span class="c">#private identity</span>
+    <span class="n">wPrime</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;insurance&#39;</span><span class="p">,</span> <span class="s">&#39;id=2345&#39;</span><span class="p">,</span> <span class="s">&#39;doctor&#39;</span><span class="p">,</span> <span class="s">&#39;oncology&#39;</span><span class="p">,</span> <span class="s">&#39;JHU&#39;</span><span class="p">,</span> <span class="s">&#39;billing&#39;</span><span class="p">,</span> <span class="s">&#39;misc&#39;</span><span class="p">]</span> <span class="c">#public identity for encrypt</span>
+
+    <span class="p">(</span><span class="n">w_hashed</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">mk</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+
+    <span class="n">M</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+    <span class="n">cipher</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">wPrime</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">cipher</span><span class="p">,</span> <span class="n">w_hashed</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">m</span> <span class="o">==</span> <span class="n">M</span><span class="p">,</span> <span class="s">&quot;FAILED Decryption: </span><span class="se">\n</span><span class="s">recovered m = </span><span class="si">%s</span><span class="s"> and original m = </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Decryption!! M =&gt; &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">m</span><span class="p">)</span>
+                </div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

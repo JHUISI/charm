@@ -1,0 +1,176 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pksig_chch &mdash; Charm-Crypto 0.3a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.3a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pksig_chch</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">Jae Choon Cha and Jung Hee Cheon - Identity-based Signatures</span>
+
+<span class="sd">| From: &quot;J. Cha and J. Choen - An identity-based signature from gap Diffie-Hellman groups.&quot;</span>
+<span class="sd">| Published in: PKC 2003</span>
+<span class="sd">| Available from: Vol. 2567. LNCS, pages 18-30</span>
+<span class="sd">| Notes: </span>
+
+<span class="sd">* type:           signature (ID-based)</span>
+<span class="sd">* setting:        bilinear groups (asymmetric)</span>
+
+<span class="sd">:Authors:    J. Ayo Akinyele</span>
+<span class="sd">:Date:       11/2011</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">charm.pairing</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">toolbox.PKSig</span> <span class="kn">import</span> <span class="n">PKSig</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+
+<div class="viewcode-block" id="CHCH"><a class="viewcode-back" href="../schemes/pksig_chch.html#pksig_chch.CHCH">[docs]</a><span class="k">class</span> <span class="nc">CHCH</span><span class="p">(</span><span class="n">PKSig</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">group</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+        
+<div class="viewcode-block" id="CHCH.setup"><a class="viewcode-back" href="../schemes/pksig_chch.html#pksig_chch.CHCH.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">H1</span><span class="p">,</span><span class="n">H2</span>
+        <span class="n">H1</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">H</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">G1</span><span class="p">)</span>
+        <span class="n">H2</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">H</span><span class="p">((</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">),</span> <span class="n">ZR</span><span class="p">)</span>
+        <span class="n">g2</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">msk</span> <span class="o">=</span> <span class="n">alpha</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">g2</span> <span class="o">**</span> <span class="n">alpha</span> 
+        <span class="n">mpk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;P&#39;</span><span class="p">:</span><span class="n">P</span><span class="p">,</span> <span class="s">&#39;g2&#39;</span><span class="p">:</span><span class="n">g2</span><span class="p">}</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="CHCH.keygen"><a class="viewcode-back" href="../schemes/pksig_chch.html#pksig_chch.CHCH.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msk</span><span class="p">,</span> <span class="n">ID</span><span class="p">):</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">msk</span>
+        <span class="n">sk</span> <span class="o">=</span> <span class="n">H1</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span> <span class="o">**</span> <span class="n">alpha</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="n">H1</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="CHCH.sign"><a class="viewcode-back" href="../schemes/pksig_chch.html#pksig_chch.CHCH.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;sign...&quot;</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">S1</span> <span class="o">=</span> <span class="n">pk</span> <span class="o">**</span> <span class="n">s</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">H2</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">S1</span><span class="p">)</span>
+        <span class="n">S2</span> <span class="o">=</span> <span class="n">sk</span> <span class="o">**</span> <span class="p">(</span><span class="n">s</span> <span class="o">+</span> <span class="n">a</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;S1&#39;</span><span class="p">:</span><span class="n">S1</span><span class="p">,</span> <span class="s">&#39;S2&#39;</span><span class="p">:</span><span class="n">S2</span><span class="p">}</span>
+    </div>
+<div class="viewcode-block" id="CHCH.verify"><a class="viewcode-back" href="../schemes/pksig_chch.html#pksig_chch.CHCH.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;verify...&quot;</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">S1</span><span class="p">,</span> <span class="n">S2</span><span class="p">)</span> <span class="o">=</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;S1&#39;</span><span class="p">],</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;S2&#39;</span><span class="p">]</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">H2</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">S1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pair</span><span class="p">(</span><span class="n">S2</span><span class="p">,</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="n">pair</span><span class="p">(</span><span class="n">S1</span> <span class="o">*</span> <span class="p">(</span><span class="n">pk</span> <span class="o">**</span> <span class="n">a</span><span class="p">),</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;P&#39;</span><span class="p">]):</span> 
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="bp">False</span>
+</div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pksig_chch.html#pksig_chch.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+   <span class="n">groupObj</span> <span class="o">=</span> <span class="n">pairing</span><span class="p">(</span><span class="s">&#39;../param/a.param&#39;</span><span class="p">)</span>
+   <span class="n">chch</span> <span class="o">=</span> <span class="n">CHCH</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+   <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span> <span class="o">=</span> <span class="n">chch</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+
+   <span class="n">_id</span> <span class="o">=</span> <span class="s">&quot;janedoe@email.com&quot;</span>
+   <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">chch</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">msk</span><span class="p">,</span> <span class="n">_id</span><span class="p">)</span>  
+   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Keygen...&quot;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;pk =&gt;&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;sk =&gt;&quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+ 
+   <span class="n">M</span> <span class="o">=</span> <span class="s">&quot;this is a message!&quot;</span> 
+   <span class="n">sig</span> <span class="o">=</span> <span class="n">chch</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature...&quot;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+
+   <span class="k">assert</span> <span class="n">chch</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s">&quot;invalid signature!&quot;</span>
+   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verification successful!&quot;</span><span class="p">)</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">main</span><span class="p">()</span>
+   
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

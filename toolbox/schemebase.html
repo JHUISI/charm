@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>schemebase &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>schemebase &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,9 +25,9 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
     <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
-    <link rel="next" title="secretutil" href="secretutil.html" />
+    <link rel="next" title="secretshare" href="secretshare.html" />
     <link rel="prev" title="redundancyschemes" href="redundancyschemes.html" /> 
   </head>
   <body>
@@ -38,12 +41,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="secretutil.html" title="secretutil"
+          <a href="secretshare.html" title="secretshare"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="redundancyschemes.html" title="redundancyschemes"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,8 +56,57 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="schemebase">
-<h1>schemebase<a class="headerlink" href="#schemebase" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-schemebase">
+<span id="schemebase"></span><h1>schemebase<a class="headerlink" href="#module-schemebase" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="schemebase.SchemeBase">
+<em class="property">class </em><tt class="descclassname">schemebase.</tt><tt class="descname">SchemeBase</tt><a class="reference internal" href="../_modules/schemebase.html#SchemeBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#schemebase.SchemeBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<p>Base class for all crypto, which defines certain attributes</p>
+<dl class="method">
+<dt id="schemebase.SchemeBase.checkProperty">
+<tt class="descname">checkProperty</tt><big>(</big><em>scheme</em>, <em>prop</em><big>)</big><a class="reference internal" href="../_modules/schemebase.html#SchemeBase.checkProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#schemebase.SchemeBase.checkProperty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="schemebase.SchemeBase.getProperty">
+<tt class="descname">getProperty</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/schemebase.html#SchemeBase.getProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#schemebase.SchemeBase.getProperty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="schemebase.SchemeBase.getTypes">
+<em class="property">classmethod </em><tt class="descname">getTypes</tt><big>(</big><em>object</em>, <em>keys</em>, <em>_type=&lt;class 'tuple'&gt;</em><big>)</big><a class="reference internal" href="../_modules/schemebase.html#SchemeBase.getTypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#schemebase.SchemeBase.getTypes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="schemebase.SchemeBase.setProperty">
+<tt class="descname">setProperty</tt><big>(</big><em>scheme=None</em>, <em>secdef=None</em>, <em>assumption=None</em>, <em>message_space=None</em>, <em>secmodel=None</em>, <em>other=None</em><big>)</big><a class="reference internal" href="../_modules/schemebase.html#SchemeBase.setProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#schemebase.SchemeBase.setProperty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="schemebase.SchemeBase.verifyType">
+<em class="property">classmethod </em><tt class="descname">verifyType</tt><big>(</big><em>source</em>, <em>target</em><big>)</big><a class="reference internal" href="../_modules/schemebase.html#SchemeBase.verifyType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#schemebase.SchemeBase.verifyType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="schemebase.SchemeBase.verifyTypeStruct">
+<em class="property">classmethod </em><tt class="descname">verifyTypeStruct</tt><big>(</big><em>source</em>, <em>target</em>, <em>_types=&lt;class 'dict'&gt;</em><big>)</big><a class="reference internal" href="../_modules/schemebase.html#SchemeBase.verifyTypeStruct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#schemebase.SchemeBase.verifyTypeStruct" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="schemebase.input">
+<em class="property">class </em><tt class="descclassname">schemebase.</tt><tt class="descname">input</tt><big>(</big><em>*_types</em><big>)</big><a class="reference internal" href="../_modules/schemebase.html#input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#schemebase.input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="schemebase.output">
+<em class="property">class </em><tt class="descclassname">schemebase.</tt><tt class="descname">output</tt><big>(</big><em>*_types</em><big>)</big><a class="reference internal" href="../_modules/schemebase.html#output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#schemebase.output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+</dd></dl>
+
 </div>
 
 
@@ -67,8 +119,8 @@
   <p class="topless"><a href="redundancyschemes.html"
                         title="previous chapter">redundancyschemes</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="secretutil.html"
-                        title="next chapter">secretutil</a></p>
+  <p class="topless"><a href="secretshare.html"
+                        title="next chapter">secretshare</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/toolbox/schemebase.txt"
@@ -101,19 +153,19 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="secretutil.html" title="secretutil"
+          <a href="secretshare.html" title="secretshare"
              >next</a> |</li>
         <li class="right" >
           <a href="redundancyschemes.html" title="redundancyschemes"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

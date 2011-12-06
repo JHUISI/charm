@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>node &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>node &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,10 +25,10 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
     <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
     <link rel="next" title="paddingschemes" href="paddingschemes.html" />
-    <link rel="prev" title="iterate" href="iterate.html" /> 
+    <link rel="prev" title="MessageAuthenticator" href="MessageAuthenticator.html" /> 
   </head>
   <body>
     <div class="related">
@@ -41,9 +44,9 @@
           <a href="paddingschemes.html" title="paddingschemes"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="iterate.html" title="iterate"
+          <a href="MessageAuthenticator.html" title="MessageAuthenticator"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,8 +56,44 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="node">
-<h1>node<a class="headerlink" href="#node" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-node">
+<span id="node"></span><h1>node<a class="headerlink" href="#module-node" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="node.BinNode">
+<em class="property">class </em><tt class="descclassname">node.</tt><tt class="descname">BinNode</tt><big>(</big><em>value</em>, <em>left=None</em>, <em>right=None</em><big>)</big><a class="reference internal" href="../_modules/node.html#BinNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#node.BinNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dl class="method">
+<dt id="node.BinNode.addSubNode">
+<tt class="descname">addSubNode</tt><big>(</big><em>left</em>, <em>right</em><big>)</big><a class="reference internal" href="../_modules/node.html#BinNode.addSubNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#node.BinNode.addSubNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="node.BinNode.getAttribute">
+<tt class="descname">getAttribute</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/node.html#BinNode.getAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#node.BinNode.getAttribute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="node.BinNode.getLeft">
+<tt class="descname">getLeft</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/node.html#BinNode.getLeft"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#node.BinNode.getLeft" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="node.BinNode.getNodeType">
+<tt class="descname">getNodeType</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/node.html#BinNode.getNodeType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#node.BinNode.getNodeType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="node.BinNode.getRight">
+<tt class="descname">getRight</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/node.html#BinNode.getRight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#node.BinNode.getRight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="node.BinNode.traverse">
+<tt class="descname">traverse</tt><big>(</big><em>function</em><big>)</big><a class="reference internal" href="../_modules/node.html#BinNode.traverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#node.BinNode.traverse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 
 
@@ -64,8 +103,8 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="iterate.html"
-                        title="previous chapter">iterate</a></p>
+  <p class="topless"><a href="MessageAuthenticator.html"
+                        title="previous chapter">MessageAuthenticator</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="paddingschemes.html"
                         title="next chapter">paddingschemes</a></p>
@@ -104,16 +143,16 @@
           <a href="paddingschemes.html" title="paddingschemes"
              >next</a> |</li>
         <li class="right" >
-          <a href="iterate.html" title="iterate"
+          <a href="MessageAuthenticator.html" title="MessageAuthenticator"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

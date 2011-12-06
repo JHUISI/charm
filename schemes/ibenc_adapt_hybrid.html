@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>ibenc_adapt_hybrid &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>ibenc_adapt_hybrid &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,10 +25,10 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
     <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
     <link rel="next" title="ibenc_adapt_identityhash" href="ibenc_adapt_identityhash.html" />
-    <link rel="prev" title="ibe_sw05" href="ibe_sw05.html" /> 
+    <link rel="prev" title="groupsig_bgls04" href="groupsig_bgls04.html" /> 
   </head>
   <body>
     <div class="related">
@@ -41,9 +44,9 @@
           <a href="ibenc_adapt_identityhash.html" title="ibenc_adapt_identityhash"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="ibe_sw05.html" title="ibe_sw05"
+          <a href="groupsig_bgls04.html" title="groupsig_bgls04"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,8 +56,39 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="ibenc-adapt-hybrid">
-<h1>ibenc_adapt_hybrid<a class="headerlink" href="#ibenc-adapt-hybrid" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-ibenc_adapt_hybrid">
+<span id="ibenc-adapt-hybrid"></span><h1>ibenc_adapt_hybrid<a class="headerlink" href="#module-ibenc_adapt_hybrid" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="ibenc_adapt_hybrid.HybridIBEnc">
+<em class="property">class </em><tt class="descclassname">ibenc_adapt_hybrid.</tt><tt class="descname">HybridIBEnc</tt><big>(</big><em>scheme</em>, <em>groupObj</em><big>)</big><a class="reference internal" href="../_modules/ibenc_adapt_hybrid.html#HybridIBEnc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_adapt_hybrid.HybridIBEnc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.IBEnc.IBEnc</span></tt></p>
+<dl class="method">
+<dt id="ibenc_adapt_hybrid.HybridIBEnc.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>pk</em>, <em>ID</em>, <em>ct</em><big>)</big><a class="reference internal" href="../_modules/ibenc_adapt_hybrid.html#HybridIBEnc.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_adapt_hybrid.HybridIBEnc.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_adapt_hybrid.HybridIBEnc.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>ID</em>, <em>M</em><big>)</big><a class="reference internal" href="../_modules/ibenc_adapt_hybrid.html#HybridIBEnc.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_adapt_hybrid.HybridIBEnc.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_adapt_hybrid.HybridIBEnc.extract">
+<tt class="descname">extract</tt><big>(</big><em>mk</em>, <em>ID</em><big>)</big><a class="reference internal" href="../_modules/ibenc_adapt_hybrid.html#HybridIBEnc.extract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_adapt_hybrid.HybridIBEnc.extract" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_adapt_hybrid.HybridIBEnc.setup">
+<tt class="descname">setup</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ibenc_adapt_hybrid.html#HybridIBEnc.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_adapt_hybrid.HybridIBEnc.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="ibenc_adapt_hybrid.main">
+<tt class="descclassname">ibenc_adapt_hybrid.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ibenc_adapt_hybrid.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_adapt_hybrid.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
@@ -64,8 +98,8 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="ibe_sw05.html"
-                        title="previous chapter">ibe_sw05</a></p>
+  <p class="topless"><a href="groupsig_bgls04.html"
+                        title="previous chapter">groupsig_bgls04</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="ibenc_adapt_identityhash.html"
                         title="next chapter">ibenc_adapt_identityhash</a></p>
@@ -104,16 +138,16 @@
           <a href="ibenc_adapt_identityhash.html" title="ibenc_adapt_identityhash"
              >next</a> |</li>
         <li class="right" >
-          <a href="ibe_sw05.html" title="ibe_sw05"
+          <a href="groupsig_bgls04.html" title="groupsig_bgls04"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

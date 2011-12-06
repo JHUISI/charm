@@ -1,0 +1,339 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pkenc_rabin &mdash; Charm-Crypto 0.3a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.3a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pkenc_rabin</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">| From: &quot;Digitalized Signatures and Public-Key Functions as Intractable as Factorization&quot;.</span>
+<span class="sd">| Published in: 1979</span>
+<span class="sd">| Security Assumption: Integer Factorization</span>
+
+<span class="sd">* type:           public-key encryption</span>
+<span class="sd">* setting:        Integer</span>
+
+<span class="sd">:Authors: Christina Garman</span>
+<span class="sd">:Date:            09/2011</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">charm.integer</span> <span class="kn">import</span> <span class="n">integer</span><span class="p">,</span><span class="n">isPrime</span><span class="p">,</span><span class="n">gcd</span><span class="p">,</span><span class="n">random</span><span class="p">,</span><span class="n">randomPrime</span>
+<span class="kn">from</span> <span class="nn">toolbox.PKEnc</span> <span class="kn">import</span> <span class="n">PKEnc</span>
+<span class="kn">from</span> <span class="nn">toolbox.PKSig</span> <span class="kn">import</span> <span class="n">PKSig</span>
+<span class="kn">from</span> <span class="nn">toolbox.paddingschemes</span> <span class="kn">import</span> <span class="n">OAEPEncryptionPadding</span><span class="p">,</span><span class="n">PSSPadding</span><span class="p">,</span><span class="n">SAEPEncryptionPadding</span>
+<span class="kn">from</span> <span class="nn">toolbox.redundancyschemes</span> <span class="kn">import</span> <span class="n">InMessageRedundancy</span>
+<span class="kn">from</span> <span class="nn">toolbox.conversion</span> <span class="kn">import</span> <span class="n">Conversion</span>
+<span class="kn">from</span> <span class="nn">toolbox.bitstring</span> <span class="kn">import</span> <span class="n">Bytes</span>
+<span class="kn">from</span> <span class="nn">toolbox.specialprimes</span> <span class="kn">import</span> <span class="n">BlumWilliamsInteger</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span><span class="p">,</span> <span class="n">floor</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<div class="viewcode-block" id="Rabin"><a class="viewcode-back" href="../schemes/pkenc_rabin.html#pkenc_rabin.Rabin">[docs]</a><span class="k">class</span> <span class="nc">Rabin</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;Rabin Module&#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modulus</span><span class="o">=</span><span class="n">BlumWilliamsInteger</span><span class="p">()):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modulustype</span> <span class="o">=</span> <span class="n">modulus</span>
+
+    <span class="c"># generate p,q and n</span>
+<div class="viewcode-block" id="Rabin.paramgen"><a class="viewcode-back" href="../schemes/pkenc_rabin.html#pkenc_rabin.Rabin.paramgen">[docs]</a>    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modulustype</span><span class="o">.</span><span class="n">generateBlumWilliamsInteger</span><span class="p">(</span><span class="n">secparam</span><span class="p">)</span>
+
+        <span class="n">yp</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">%</span> <span class="n">q</span><span class="p">)</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">yq</span> <span class="o">=</span> <span class="p">(</span><span class="n">q</span> <span class="o">%</span> <span class="n">p</span><span class="p">)</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">yp</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">yq</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="Rabin.keygen"><a class="viewcode-back" href="../schemes/pkenc_rabin.html#pkenc_rabin.Rabin.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s0</span><span class="p">,</span> <span class="n">secparam</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">params</span><span class="p">:</span> 
+            <span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">yp</span><span class="p">,</span> <span class="n">yq</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+            <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;N&#39;</span><span class="p">:</span><span class="n">N</span><span class="p">,</span> <span class="s">&#39;n&#39;</span><span class="p">:</span><span class="n">secparam</span><span class="p">,</span> <span class="s">&#39;s0&#39;</span><span class="p">:</span><span class="n">s0</span> <span class="p">}</span>
+            <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;p&#39;</span><span class="p">:</span><span class="n">p</span><span class="p">,</span> <span class="s">&#39;q&#39;</span><span class="p">:</span><span class="n">q</span><span class="p">,</span> <span class="s">&#39;N&#39;</span><span class="p">:</span><span class="n">N</span> <span class="p">,</span> <span class="s">&#39;yp&#39;</span><span class="p">:</span><span class="n">yp</span><span class="p">,</span> <span class="s">&#39;yq&#39;</span><span class="p">:</span><span class="n">yq</span> <span class="p">}</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+
+        <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">yp</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">yq</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="n">secparam</span><span class="p">)</span>
+        
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;N&#39;</span><span class="p">:</span><span class="n">N</span><span class="p">,</span> <span class="s">&#39;n&#39;</span><span class="p">:</span><span class="n">secparam</span><span class="p">,</span> <span class="s">&#39;s0&#39;</span><span class="p">:</span><span class="n">s0</span> <span class="p">}</span>
+        <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;p&#39;</span><span class="p">:</span><span class="n">p</span><span class="p">,</span> <span class="s">&#39;q&#39;</span><span class="p">:</span><span class="n">q</span><span class="p">,</span> <span class="s">&#39;N&#39;</span><span class="p">:</span><span class="n">N</span> <span class="p">,</span> <span class="s">&#39;yp&#39;</span><span class="p">:</span><span class="n">yp</span><span class="p">,</span> <span class="s">&#39;yq&#39;</span><span class="p">:</span><span class="n">yq</span> <span class="p">}</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="Rabin.convert"><a class="viewcode-back" href="../schemes/pkenc_rabin.html#pkenc_rabin.Rabin.convert">[docs]</a>    <span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">yp</span><span class="p">,</span> <span class="n">yq</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">integer</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">integer</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">integer</span><span class="p">(</span><span class="n">q</span><span class="p">),</span> <span class="n">integer</span><span class="p">(</span><span class="n">yp</span><span class="p">),</span> <span class="n">integer</span><span class="p">(</span><span class="n">yq</span><span class="p">))</span>
+    </div></div>
+<div class="viewcode-block" id="Rabin_Enc"><a class="viewcode-back" href="../schemes/pkenc_rabin.html#pkenc_rabin.Rabin_Enc">[docs]</a><span class="k">class</span> <span class="nc">Rabin_Enc</span><span class="p">(</span><span class="n">Rabin</span><span class="p">,</span><span class="n">PKEnc</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">SAEPEncryptionPadding</span><span class="p">(),</span> <span class="n">redundancy</span><span class="o">=</span><span class="n">InMessageRedundancy</span><span class="p">(),</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">Rabin</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">PKEnc</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paddingscheme</span> <span class="o">=</span> <span class="n">padding</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">redundancyscheme</span> <span class="o">=</span> <span class="n">redundancy</span>
+    <span class="c"># m : Bytes</span>
+<div class="viewcode-block" id="Rabin_Enc.encrypt"><a class="viewcode-back" href="../schemes/pkenc_rabin.html#pkenc_rabin.Rabin_Enc.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">salt</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paddingscheme</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&quot;SAEPEncryptionPadding&quot;</span><span class="p">):</span>
+            <span class="n">EM</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paddingscheme</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;s0&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redundancyscheme</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+            <span class="n">octetlen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span> <span class="o">/</span> <span class="mf">8.0</span><span class="p">))</span>
+            <span class="n">EM</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paddingscheme</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">octetlen</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">salt</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;EM == &gt;&quot;</span><span class="p">,</span> <span class="n">EM</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">OS2IP</span><span class="p">(</span><span class="n">EM</span><span class="p">)</span>
+        <span class="n">ip</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">%</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span>  <span class="c">#Convert to modular integer</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">ip</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span>
+    </div>
+<div class="viewcode-block" id="Rabin_Enc.decrypt"><a class="viewcode-back" href="../schemes/pkenc_rabin.html#pkenc_rabin.Rabin_Enc.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;p&#39;</span><span class="p">]</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;q&#39;</span><span class="p">]</span>
+        <span class="n">yp</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;yp&#39;</span><span class="p">]</span>
+        <span class="n">yq</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;yq&#39;</span><span class="p">]</span>
+
+        <span class="n">mp</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span> <span class="o">**</span> <span class="p">((</span><span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">4</span><span class="p">))</span> <span class="o">%</span> <span class="n">p</span>
+        <span class="n">mq</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span> <span class="o">**</span> <span class="p">((</span><span class="n">q</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">4</span><span class="p">))</span> <span class="o">%</span> <span class="n">q</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="ow">not</span><span class="p">(((</span><span class="n">c</span> <span class="o">%</span> <span class="n">p</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="n">mp</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="ow">and</span> <span class="p">((</span><span class="n">c</span> <span class="o">%</span> <span class="n">q</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="n">mq</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)))):</span>
+            <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;invalid ciphertext&quot;</span>
+
+        <span class="n">r1</span> <span class="o">=</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">yp</span><span class="p">)</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="n">mq</span><span class="p">))</span> <span class="o">+</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">yq</span><span class="p">)</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="n">mp</span><span class="p">))))</span> <span class="o">%</span> <span class="nb">int</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">])</span>
+        <span class="n">r2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">r1</span><span class="p">)</span>
+
+        <span class="n">s1</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">yp</span><span class="p">)</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="n">mq</span><span class="p">)</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">yq</span><span class="p">)</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="n">mp</span><span class="p">))</span> <span class="o">%</span> <span class="nb">int</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">])</span>
+        <span class="n">s2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">s1</span><span class="p">)</span>
+
+        <span class="n">m1</span> <span class="o">=</span> <span class="n">r1</span> <span class="o">%</span> <span class="nb">int</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">])</span>
+        <span class="n">m2</span> <span class="o">=</span> <span class="n">r2</span> <span class="o">%</span> <span class="nb">int</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">])</span>
+        <span class="n">m3</span> <span class="o">=</span> <span class="n">s1</span> <span class="o">%</span> <span class="nb">int</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">])</span>
+        <span class="n">m4</span> <span class="o">=</span> <span class="n">s2</span> <span class="o">%</span> <span class="nb">int</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paddingscheme</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&quot;SAEPEncryptionPadding&quot;</span><span class="p">):</span>        
+            <span class="k">if</span><span class="p">(</span><span class="n">m1</span> <span class="o">&lt;</span> <span class="nb">int</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">)):</span>
+                <span class="n">os1</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">m1</span><span class="p">))</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">m2</span> <span class="o">&lt;</span> <span class="nb">int</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">)):</span>
+                    <span class="n">os2</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">m2</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span><span class="p">(</span><span class="n">m3</span> <span class="o">&lt;</span> <span class="nb">int</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">)):</span>
+                        <span class="n">os2</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">m3</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">os2</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">m4</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">m2</span> <span class="o">&lt;</span> <span class="nb">int</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">)):</span>
+                    <span class="n">os1</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">m2</span><span class="p">))</span>
+                    <span class="k">if</span><span class="p">(</span><span class="n">m3</span> <span class="o">&lt;</span> <span class="nb">int</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">)):</span>
+                        <span class="n">os2</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">m3</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">os2</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">m4</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">os1</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">m3</span><span class="p">))</span>
+                    <span class="n">os2</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">m4</span><span class="p">))</span>
+                
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;OS1  =&gt;&quot;</span><span class="p">,</span> <span class="n">os1</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;OS2  =&gt;&quot;</span><span class="p">,</span> <span class="n">os2</span><span class="p">)</span>
+
+            <span class="p">(</span><span class="n">m1</span><span class="p">,</span> <span class="n">t1</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paddingscheme</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">os1</span><span class="p">,</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;s0&#39;</span><span class="p">])</span>
+            <span class="p">(</span><span class="n">m2</span><span class="p">,</span> <span class="n">t2</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paddingscheme</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">os2</span><span class="p">,</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;s0&#39;</span><span class="p">])</span>
+
+            <span class="k">if</span><span class="p">((</span><span class="n">t1</span> <span class="o">==</span> <span class="n">Bytes</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;</span><span class="se">\x00</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;s0&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">8</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="n">t2</span> <span class="o">==</span> <span class="n">Bytes</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;</span><span class="se">\x00</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;s0&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">8</span><span class="p">))):</span>
+                <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;invalid ciphertext&quot;</span>
+
+            <span class="k">if</span><span class="p">(</span><span class="n">t1</span> <span class="o">==</span> <span class="n">Bytes</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;</span><span class="se">\x00</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;s0&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">8</span><span class="p">)):</span>
+                <span class="k">return</span> <span class="n">m1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">t2</span> <span class="o">==</span> <span class="n">Bytes</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;</span><span class="se">\x00</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;s0&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">8</span><span class="p">)):</span>
+                    <span class="k">return</span> <span class="n">m2</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;invalid ciphertext&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">octetlen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span> <span class="o">/</span> <span class="mf">8.0</span><span class="p">))</span>
+            <span class="n">os1</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">m1</span><span class="p">),</span> <span class="n">octetlen</span><span class="p">)</span>
+            <span class="n">os2</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">m2</span><span class="p">),</span> <span class="n">octetlen</span><span class="p">)</span>
+            <span class="n">os3</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">m3</span><span class="p">),</span> <span class="n">octetlen</span><span class="p">)</span>
+            <span class="n">os4</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">m4</span><span class="p">),</span> <span class="n">octetlen</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;OS1  =&gt;&quot;</span><span class="p">,</span> <span class="n">os1</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;OS2  =&gt;&quot;</span><span class="p">,</span> <span class="n">os2</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;OS3  =&gt;&quot;</span><span class="p">,</span> <span class="n">os3</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;OS4  =&gt;&quot;</span><span class="p">,</span> <span class="n">os4</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="n">os1</span><span class="p">,</span> <span class="n">os2</span><span class="p">,</span> <span class="n">os3</span><span class="p">,</span> <span class="n">os4</span><span class="p">]:</span>
+                <span class="p">(</span><span class="n">isMessage</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redundancyscheme</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paddingscheme</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">isMessage</span><span class="p">):</span>
+                   <span class="k">return</span> <span class="n">message</span>        
+</div></div>
+<div class="viewcode-block" id="Rabin_Sig"><a class="viewcode-back" href="../schemes/pkenc_rabin.html#pkenc_rabin.Rabin_Sig">[docs]</a><span class="k">class</span> <span class="nc">Rabin_Sig</span><span class="p">(</span><span class="n">Rabin</span><span class="p">,</span> <span class="n">PKSig</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;RSASSA-PSS&#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">OAEPEncryptionPadding</span><span class="p">()):</span>
+        <span class="n">Rabin</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">PKSig</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paddingscheme</span> <span class="o">=</span> <span class="n">padding</span> 
+
+<div class="viewcode-block" id="Rabin_Sig.sign"><a class="viewcode-back" href="../schemes/pkenc_rabin.html#pkenc_rabin.Rabin_Sig.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">salt</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="c">#apply encoding</span>
+
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">octetlen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span> <span class="o">/</span> <span class="mf">8.0</span><span class="p">))</span>
+            <span class="n">em</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paddingscheme</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">octetlen</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">salt</span><span class="p">)</span>
+
+            <span class="n">m</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">OS2IP</span><span class="p">(</span><span class="n">em</span><span class="p">)</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">%</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span>  <span class="c">#ERRROR m is larger than N</span>
+      
+            <span class="n">p</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;p&#39;</span><span class="p">]</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;q&#39;</span><span class="p">]</span>
+            <span class="n">yp</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;yp&#39;</span><span class="p">]</span>
+            <span class="n">yq</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;yq&#39;</span><span class="p">]</span>
+
+            <span class="n">mp</span> <span class="o">=</span> <span class="p">(</span><span class="n">m</span> <span class="o">**</span> <span class="p">((</span><span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">4</span><span class="p">))</span> <span class="o">%</span> <span class="n">p</span>
+            <span class="n">mq</span> <span class="o">=</span> <span class="p">(</span><span class="n">m</span> <span class="o">**</span> <span class="p">((</span><span class="n">q</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">4</span><span class="p">))</span> <span class="o">%</span> <span class="n">q</span>
+
+            <span class="n">r1</span> <span class="o">=</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">yp</span><span class="p">)</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="n">mq</span><span class="p">))</span> <span class="o">+</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">yq</span><span class="p">)</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="n">mp</span><span class="p">))))</span> <span class="o">%</span> <span class="nb">int</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">])</span>
+            <span class="n">r2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">r1</span><span class="p">)</span>
+
+            <span class="n">s1</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">yp</span><span class="p">)</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="n">mq</span><span class="p">)</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">yq</span><span class="p">)</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="n">mp</span><span class="p">))</span> <span class="o">%</span> <span class="nb">int</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">])</span>
+            <span class="n">s2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">s1</span><span class="p">)</span>
+
+            <span class="k">if</span><span class="p">(((</span><span class="nb">int</span><span class="p">((</span><span class="n">integer</span><span class="p">(</span><span class="n">r1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">m</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">((</span><span class="nb">int</span><span class="p">((</span><span class="n">integer</span><span class="p">(</span><span class="n">r2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">m</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">((</span><span class="nb">int</span><span class="p">((</span><span class="n">integer</span><span class="p">(</span><span class="n">s1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">m</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">((</span><span class="nb">int</span><span class="p">((</span><span class="n">integer</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">m</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)):</span>
+                <span class="k">break</span>
+
+        <span class="n">S</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;s1&#39;</span><span class="p">:</span><span class="n">r1</span><span class="p">,</span> <span class="s">&#39;s2&#39;</span><span class="p">:</span><span class="n">r2</span><span class="p">,</span> <span class="s">&#39;s3&#39;</span><span class="p">:</span><span class="n">s1</span><span class="p">,</span> <span class="s">&#39;s4&#39;</span><span class="p">:</span><span class="n">s2</span> <span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signing&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;m     =&gt;&quot;</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;em    =&gt;&quot;</span><span class="p">,</span> <span class="n">em</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;S     =&gt;&quot;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">S</span>
+    </div>
+<div class="viewcode-block" id="Rabin_Sig.verify"><a class="viewcode-back" href="../schemes/pkenc_rabin.html#pkenc_rabin.Rabin_Sig.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">salt</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="c">#M = b&#39;This is a malicious message&#39;</span>
+
+        <span class="n">octetlen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span> <span class="o">/</span> <span class="mf">8.0</span><span class="p">))</span>
+
+        <span class="n">sig_mess</span> <span class="o">=</span> <span class="p">(</span><span class="n">integer</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="s">&#39;s1&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span>
+        <span class="n">sig_mess</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sig_mess</span><span class="p">),</span> <span class="n">octetlen</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;OS1  =&gt;&quot;</span><span class="p">,</span> <span class="n">sig_mess</span><span class="p">)</span>
+        <span class="n">dec_mess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paddingscheme</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">sig_mess</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verifying&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;sig_mess     =&gt;&quot;</span><span class="p">,</span> <span class="n">sig_mess</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;dec_mess    =&gt;&quot;</span><span class="p">,</span> <span class="n">dec_mess</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;S     =&gt;&quot;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">dec_mess</span> <span class="o">==</span> <span class="n">M</span><span class="p">)</span>
+    </div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pkenc_rabin.html#pkenc_rabin.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">rabin</span> <span class="o">=</span> <span class="n">Rabin_Enc</span><span class="p">()</span>
+    
+    <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">rabin</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
+    
+    <span class="n">m</span> <span class="o">=</span> <span class="n">b</span><span class="s">&#39;This is a test&#39;</span>
+    <span class="c">#m = 55</span>
+    <span class="c">#m = b&#39;A&#39;</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">rabin</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;ct =&gt;&quot;</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+    
+    <span class="n">orig_m</span> <span class="o">=</span> <span class="n">rabin</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;recovered m =&gt;&quot;</span><span class="p">,</span> <span class="n">orig_m</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">m</span> <span class="o">==</span> <span class="n">orig_m</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Decryption!!!&quot;</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="main2"><a class="viewcode-back" href="../schemes/pkenc_rabin.html#pkenc_rabin.main2">[docs]</a><span class="k">def</span> <span class="nf">main2</span><span class="p">():</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">b</span><span class="s">&#39;This is a test message.&#39;</span>
+    <span class="n">rabin</span> <span class="o">=</span> <span class="n">Rabin_Sig</span><span class="p">()</span>
+    <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">rabin</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">rabin</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">rabin</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Signature!&quot;</span><span class="p">)</span>
+        </div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">main</span><span class="p">()</span>
+    <span class="n">main2</span><span class="p">()</span>    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,255 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ibenc_sw05 &mdash; Charm-Crypto 0.3a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.3a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
+    <link rel="next" title="ibenc_waters05" href="ibenc_waters05.html" />
+    <link rel="prev" title="ibenc_bf01" href="ibenc_bf01.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ibenc_waters05.html" title="ibenc_waters05"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ibenc_bf01.html" title="ibenc_bf01"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-ibenc_sw05">
+<span id="ibenc-sw05"></span><h1>ibenc_sw05<a class="headerlink" href="#module-ibenc_sw05" title="Permalink to this headline">¶</a></h1>
+<p>Sahai-Waters Fuzzy Identity-Based Encryption, Original Construction</p>
+<div class="line-block">
+<div class="line">From: &#8220;A. Sahai, B. Waters Fuzzy Identity-Based Encryption.</div>
+<div class="line">Published in: Eurocrypt 2005</div>
+<div class="line">Available from: eprint.iacr.org/2004/086.pdf</div>
+<div class="line">Notes: Original construction (Section 4) and large universe construction (Section 6). </div>
+</div>
+<ul class="simple">
+<li>type:            encryption (identity-based)</li>
+<li>setting:        bilinear groups</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Christina Garman</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">10/2011</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="ibenc_sw05.IBE_SW05">
+<em class="property">class </em><tt class="descclassname">ibenc_sw05.</tt><tt class="descname">IBE_SW05</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../_modules/ibenc_sw05.html#IBE_SW05"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_sw05.IBE_SW05" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.IBEnc.IBEnc</span></tt></p>
+<dl class="method">
+<dt id="ibenc_sw05.IBE_SW05.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>CT</em>, <em>w</em>, <em>d</em><big>)</big><a class="reference internal" href="../_modules/ibenc_sw05.html#IBE_SW05.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_sw05.IBE_SW05.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd><p>dID must have an intersection overlap of at least d with Wprime to decrypt</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ibenc_sw05.IBE_SW05.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>w_prime</em>, <em>M</em>, <em>n</em><big>)</big><a class="reference internal" href="../_modules/ibenc_sw05.html#IBE_SW05.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_sw05.IBE_SW05.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encryption with the public key, Wprime and the message M in G2</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ibenc_sw05.IBE_SW05.extract">
+<tt class="descname">extract</tt><big>(</big><em>mk</em>, <em>ID</em>, <em>pk</em>, <em>dOver</em>, <em>n</em><big>)</big><a class="reference internal" href="../_modules/ibenc_sw05.html#IBE_SW05.extract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_sw05.IBE_SW05.extract" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_sw05.IBE_SW05.intersection_subset">
+<tt class="descname">intersection_subset</tt><big>(</big><em>w</em>, <em>wPrime</em>, <em>d</em><big>)</big><a class="reference internal" href="../_modules/ibenc_sw05.html#IBE_SW05.intersection_subset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_sw05.IBE_SW05.intersection_subset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_sw05.IBE_SW05.setup">
+<tt class="descname">setup</tt><big>(</big><em>n</em>, <em>d</em><big>)</big><a class="reference internal" href="../_modules/ibenc_sw05.html#IBE_SW05.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_sw05.IBE_SW05.setup" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">n</span></tt>: the maximum number of attributes in the system.</dt>
+<dd><p class="first last">OR the maximum length of an identity</p>
+</dd>
+</dl>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">d</span></tt>: the set overlap required to decrypt</p>
+</li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ibenc_sw05.IBE_SW05_LUC">
+<em class="property">class </em><tt class="descclassname">ibenc_sw05.</tt><tt class="descname">IBE_SW05_LUC</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../_modules/ibenc_sw05.html#IBE_SW05_LUC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_sw05.IBE_SW05_LUC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.IBEnc.IBEnc</span></tt></p>
+<dl class="method">
+<dt id="ibenc_sw05.IBE_SW05_LUC.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>CT</em>, <em>w</em>, <em>d</em><big>)</big><a class="reference internal" href="../_modules/ibenc_sw05.html#IBE_SW05_LUC.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_sw05.IBE_SW05_LUC.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd><p>dID must have an intersection overlap of at least d with Wprime to decrypt</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ibenc_sw05.IBE_SW05_LUC.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>w_prime</em>, <em>M</em>, <em>n</em><big>)</big><a class="reference internal" href="../_modules/ibenc_sw05.html#IBE_SW05_LUC.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_sw05.IBE_SW05_LUC.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encryption with the public key, Wprime and the message M in G2</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ibenc_sw05.IBE_SW05_LUC.eval_T">
+<tt class="descname">eval_T</tt><big>(</big><em>pk</em>, <em>n</em>, <em>x</em><big>)</big><a class="reference internal" href="../_modules/ibenc_sw05.html#IBE_SW05_LUC.eval_T"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_sw05.IBE_SW05_LUC.eval_T" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_sw05.IBE_SW05_LUC.extract">
+<tt class="descname">extract</tt><big>(</big><em>mk</em>, <em>ID</em>, <em>pk</em>, <em>dOver</em>, <em>n</em><big>)</big><a class="reference internal" href="../_modules/ibenc_sw05.html#IBE_SW05_LUC.extract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_sw05.IBE_SW05_LUC.extract" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_sw05.IBE_SW05_LUC.intersection_subset">
+<tt class="descname">intersection_subset</tt><big>(</big><em>w</em>, <em>wPrime</em>, <em>d</em><big>)</big><a class="reference internal" href="../_modules/ibenc_sw05.html#IBE_SW05_LUC.intersection_subset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_sw05.IBE_SW05_LUC.intersection_subset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_sw05.IBE_SW05_LUC.setup">
+<tt class="descname">setup</tt><big>(</big><em>n</em>, <em>d</em><big>)</big><a class="reference internal" href="../_modules/ibenc_sw05.html#IBE_SW05_LUC.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_sw05.IBE_SW05_LUC.setup" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">n</span></tt>: the maximum number of attributes in the system.</dt>
+<dd><p class="first last">OR the maximum length of an identity</p>
+</dd>
+</dl>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">d</span></tt>: the set overlap required to decrypt</p>
+</li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="ibenc_sw05.main">
+<tt class="descclassname">ibenc_sw05.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ibenc_sw05.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_sw05.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ibenc_bf01.html"
+                        title="previous chapter">ibenc_bf01</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ibenc_waters05.html"
+                        title="next chapter">ibenc_waters05</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/schemes/ibenc_sw05.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ibenc_waters05.html" title="ibenc_waters05"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ibenc_bf01.html" title="ibenc_bf01"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

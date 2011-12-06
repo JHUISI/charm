@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>schemebase &mdash; Charm-Crypto 0.1a documentation</title>
+    <title>schemebase &mdash; Charm-Crypto 0.3a documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.1a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -49,45 +49,171 @@
           <div class="body">
             
   <h1>Source code for schemebase</h1><div class="highlight"><pre>
-<span class="k">class</span> <span class="nc">SchemeBase</span><span class="p">:</span>
+<span class="kn">from</span> <span class="nn">toolbox.enum</span> <span class="kn">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="SchemeBase"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.SchemeBase">[docs]</a><span class="k">class</span> <span class="nc">SchemeBase</span><span class="p">:</span>
     <span class="sd">&#39;&#39;&#39;Base class for all crypto, which defines certain attributes&#39;&#39;&#39;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<div class="viewcode-block" id="SchemeBase"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.SchemeBase">[docs]</a>        <span class="bp">self</span><span class="o">.</span><span class="n">baseSchemeTypes</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;PKEnc&#39;</span><span class="p">,</span> <span class="s">&#39;PKSig&#39;</span><span class="p">,</span> <span class="s">&#39;IBEnc&#39;</span><span class="p">,</span> <span class="s">&#39;IBSig&#39;</span><span class="p">,</span> <span class="s">&#39;ABEnc&#39;</span><span class="p">,</span> <span class="s">&#39;Commitment&#39;</span><span class="p">,</span> <span class="s">&#39;Hash&#39;</span><span class="p">,</span> <span class="s">&#39;Protocol&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">baseSchemeTypes</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;PKEnc&#39;</span><span class="p">,</span> <span class="s">&#39;PKSig&#39;</span><span class="p">,</span> <span class="s">&#39;IBEnc&#39;</span><span class="p">,</span> <span class="s">&#39;IBSig&#39;</span><span class="p">,</span> <span class="s">&#39;ABEnc&#39;</span><span class="p">,</span> <span class="s">&#39;Commitment&#39;</span><span class="p">,</span> <span class="s">&#39;Hash&#39;</span><span class="p">,</span> <span class="s">&#39;Protocol&#39;</span><span class="p">)</span>
 	    <span class="c"># self.baseSecDefs defined by derived scheme types</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">baseAssumptions</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;DH&#39;</span><span class="p">,</span> <span class="s">&#39;DBDH&#39;</span><span class="p">,</span> <span class="s">&#39;DL&#39;</span><span class="p">)</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">baseSecDefs</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">baseAssumptions</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;RSA&#39;</span><span class="p">,</span><span class="s">&#39;StrongRSA&#39;</span><span class="p">,</span><span class="s">&#39;DL&#39;</span><span class="p">,</span><span class="s">&#39;DH&#39;</span><span class="p">,</span><span class="s">&#39;CDH&#39;</span><span class="p">,</span><span class="s">&#39;DDH&#39;</span><span class="p">,</span><span class="s">&#39;DBDH&#39;</span><span class="p">,</span><span class="s">&#39;q_SDH&#39;</span><span class="p">,</span><span class="s">&#39;LRSW&#39;</span><span class="p">)</span> 
         <span class="bp">self</span><span class="o">.</span><span class="n">baseSecModels</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;SM&#39;</span><span class="p">,</span> <span class="s">&#39;ROM&#39;</span><span class="p">)</span>
         
-    <span class="k">def</span> <span class="nf">setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">secdef</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">assumption</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">message_space</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">secmodel</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SchemeBase.setProperty"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.SchemeBase.setProperty">[docs]</a>    <span class="k">def</span> <span class="nf">setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">secdef</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">assumption</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">message_space</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">secmodel</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">scheme</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">schemeType</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseSchemeTypes</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">secdef</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">secdef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseSecDefs</span><span class="p">[</span><span class="n">secdef</span><span class="p">]</span>
-<div class="viewcode-block" id="SchemeBase.setProperty"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.SchemeBase.setProperty">[docs]</a>        <span class="k">if</span> <span class="n">assumption</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">assumption</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseAssumptions</span><span class="p">[</span><span class="n">assumption</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">assumption</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">assumption</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseAssumptions</span><span class="p">[</span><span class="n">assumption</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">message_space</span> <span class="o">=</span> <span class="n">message_space</span>
         <span class="k">if</span> <span class="n">secmodel</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">secmodel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseSecModels</span><span class="p">[</span><span class="n">secmodel</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">other</span> <span class="o">=</span> <span class="n">other</span>
         <span class="k">return</span> <span class="bp">None</span>
-
-    <span class="k">def</span> <span class="nf">getProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</div>
+<div class="viewcode-block" id="SchemeBase.getProperty"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.SchemeBase.getProperty">[docs]</a>    <span class="k">def</span> <span class="nf">getProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">props</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;schemeType&#39;</span><span class="p">):</span> <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schemeType</span><span class="p">)</span></div>
-<div class="viewcode-block" id="SchemeBase.getProperty"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.SchemeBase.getProperty">[docs]</a>        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;secdef&#39;</span><span class="p">):</span> <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secdef</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;schemeType&#39;</span><span class="p">):</span> <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schemeType</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;secdef&#39;</span><span class="p">):</span> <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secdef</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;assumption&#39;</span><span class="p">):</span> <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assumption</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;message_space&#39;</span><span class="p">):</span> <span class="n">props</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message_space</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;secmodel&#39;</span><span class="p">):</span> <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secmodel</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span> <span class="n">props</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">other</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">checkProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="p">,</span> <span class="n">prop</span><span class="p">):</span>
+</div>
+<div class="viewcode-block" id="SchemeBase.checkProperty"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.SchemeBase.checkProperty">[docs]</a>    <span class="k">def</span> <span class="nf">checkProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="p">,</span> <span class="n">prop</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
-           <span class="n">values</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>           </div>
-<div class="viewcode-block" id="SchemeBase.checkProperty"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.SchemeBase.checkProperty">[docs]</a>           <span class="c">#print(&quot;values =&gt;&quot;, values)</span>
+           <span class="n">values</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>           
+           <span class="c">#print(&quot;values =&gt;&quot;, values)</span>
            <span class="n">check</span> <span class="o">=</span> <span class="n">scheme</span><span class="o">.</span><span class="n">getProperty</span><span class="p">()</span>
            <span class="c">#print(&quot;check list =&gt;&quot;, check)</span>
            <span class="k">if</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">check</span><span class="p">)):</span>
                <span class="k">return</span> <span class="bp">True</span>
         <span class="k">return</span> <span class="bp">False</span>
-</pre></div></div></div>
+    </div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="SchemeBase.verifyTypeStruct"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.SchemeBase.verifyTypeStruct">[docs]</a>    <span class="k">def</span> <span class="nf">verifyTypeStruct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">_types</span><span class="o">=</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="c"># make sure src and targ the same type otherwise raise error</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">source</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span><span class="n">target</span><span class="p">):</span> 
+           <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;type mismatch between src=&#39;</span><span class="si">%s</span><span class="s">&#39; and targ=&#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">source</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">target</span><span class="p">))</span> 
+        <span class="k">if</span> <span class="n">_types</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span> <span class="n">_iter</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">_types</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]:</span> 
+           <span class="n">_iter</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">source</span><span class="p">))</span>
+           <span class="n">target</span> <span class="o">=</span> <span class="p">[</span><span class="n">target</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">_iter</span><span class="p">]</span> 
+           <span class="c">#print(&quot;target =&gt;&quot;, target)</span>
+        <span class="c">#if struct unknown, then we shouldn&#39;t be calling this method</span>
+        <span class="k">else</span><span class="p">:</span>
+           <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;invalid structure type. wrong method&quot;</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">_iter</span><span class="p">:</span>            
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s">&#39;type&#39;</span><span class="p">):</span> <span class="c"># check for charm elements</span>
+                <span class="k">assert</span> <span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">target</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s">&quot;invalid type: &#39;</span><span class="si">%s</span><span class="s">&#39; should be &#39;</span><span class="si">%s</span><span class="s">&#39; not &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">target</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span> <span class="c"># all dict elements (charm or python) must match target type</span>
+                <span class="n">keys</span> <span class="o">=</span> <span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">==</span> <span class="nb">dict</span> <span class="k">else</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="p">],</span> <span class="s">&#39;type&#39;</span><span class="p">):</span>
+                        <span class="k">assert</span> <span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">target</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s">&quot;invalid type: &#39;</span><span class="si">%s</span><span class="s">&#39; should be &#39;</span><span class="si">%s</span><span class="s">&#39; not &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">target</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">])</span> <span class="o">==</span> <span class="n">target</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s">&quot;invalid type: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">type</span><span class="p">(</span><span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span> <span class="c"># normal python type</span>
+                <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">==</span> <span class="n">target</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s">&quot;invalid type: </span><span class="si">%s</span><span class="s"> not </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">type</span><span class="p">(</span><span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    </div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="SchemeBase.verifyType"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.SchemeBase.verifyType">[docs]</a>    <span class="k">def</span> <span class="nf">verifyType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">):</span>
+            <span class="c"># source must be one of our base module types</span>
+            <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">target</span><span class="p">:</span> 
+               <span class="k">return</span> <span class="bp">True</span>
+            <span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">source</span><span class="p">)</span> <span class="o">==</span> <span class="n">target</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+    </div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="SchemeBase.getTypes"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.SchemeBase.getTypes">[docs]</a>    <span class="k">def</span> <span class="nf">getTypes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">object</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">_type</span><span class="o">=</span><span class="nb">tuple</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">_type</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span> <span class="n">ret</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c"># get the data </span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">_type</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">:</span>
+                <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="n">__annotations__</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span> <span class="c"># dict</span>
+                <span class="n">ret</span><span class="p">[</span> <span class="n">i</span> <span class="p">]</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="n">__annotations__</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>            
+        <span class="c"># return data</span>
+        <span class="k">if</span> <span class="n">_type</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">:</span>                
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span>
+</div></div>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Decorator to handle checking an algorithms inputs and validating that types</span>
+<span class="sd">match. The only requirement other than structure def matching is that the type</span>
+<span class="sd">associated with the elements match target type (both python and charm types).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="input"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.input">[docs]</a><span class="k">class</span> <span class="nc">input</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">_types</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_types</span> <span class="o">=</span> <span class="n">_types</span>
+        <span class="c">#print(&quot;INPUT TYPE: Defined types: &quot;, self._types)</span>
+    
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c"># check inputs</span>
+                <span class="n">inputs</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_types</span><span class="p">)):</span>
+                   <span class="n">_res_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_types</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                   <span class="k">if</span> <span class="n">_res_type</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span> <span class="c"># make sure it&#39;s either a dict, list or tuple</span>
+                     <span class="k">assert</span> <span class="n">SchemeBase</span><span class="o">.</span><span class="n">verifyTypeStruct</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_types</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">_res_type</span><span class="p">),</span> <span class="s">&quot;invalid &#39;</span><span class="si">%s</span><span class="s">&#39; type for &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_types</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">i</span><span class="p">)</span>
+                   <span class="k">else</span><span class="p">:</span>
+                     <span class="k">assert</span> <span class="n">SchemeBase</span><span class="o">.</span><span class="n">verifyType</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_types</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="s">&quot;invalid &#39;</span><span class="si">%s</span><span class="s">&#39; type for &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_types</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">i</span><span class="p">)</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">result</span>
+        
+        <span class="k">return</span> <span class="n">check_input</span>
+</div>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Decorator to handle checking an algorithms outputs and validating that types</span>
+<span class="sd">match. Similar to input, the only requirement other than structure def matching is that the type</span>
+<span class="sd">associated with the elements match target type (both python and charm types).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="output"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.output">[docs]</a><span class="k">class</span> <span class="nc">output</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">_types</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_types</span> <span class="o">=</span> <span class="n">_types</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_type_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">_types</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_first</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type_len</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_first</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="c">#print(&quot;OUTPUT TYPE: &quot;, self._types)</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">check_output</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+                <span class="c"># check the output        </span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_first</span><span class="p">:</span>
+                    <span class="c"># situation where only one type is defined and it could be a single dict or list of many types, </span>
+                    <span class="c"># or a single object with one type  </span>
+                    <span class="n">_res_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_types</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">_res_type</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+                        <span class="k">assert</span> <span class="n">SchemeBase</span><span class="o">.</span><span class="n">verifyTypeStruct</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_types</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">_res_type</span><span class="p">),</span> <span class="s">&quot;invalid return type&quot;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">assert</span> <span class="n">SchemeBase</span><span class="o">.</span><span class="n">verifyType</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_types</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="s">&quot;invalid return output for &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">func</span><span class="o">.</span><span class="n">__name__</span>
+                <span class="k">else</span><span class="p">:</span>        
+                    <span class="c"># situation where a list of types is defined and mirrors how we look at inputs</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type_len</span><span class="p">):</span>              
+                        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_types</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+                            <span class="k">assert</span> <span class="n">SchemeBase</span><span class="o">.</span><span class="n">verifyTypeStruct</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_types</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="s">&quot;invalid return type&quot;</span>
+                        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_types</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">:</span>
+                            <span class="k">assert</span> <span class="n">SchemeBase</span><span class="o">.</span><span class="n">verifyTypeStruct</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_types</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">list</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">assert</span> <span class="n">SchemeBase</span><span class="o">.</span><span class="n">verifyType</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_types</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="s">&quot;invalid return type&quot;</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">output</span>
+        <span class="k">return</span> <span class="n">check_output</span></div>
+</pre></div>
 
           </div>
         </div>
@@ -97,7 +223,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -120,13 +246,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.1a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Joseph Ayo Akinyele, Gary Belvin, Matt Green.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

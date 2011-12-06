@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pksig_waters05 &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>pksig_waters05 &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,9 +25,9 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
     <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
-    <link rel="next" title="poly_sdh" href="poly_sdh.html" />
+    <link rel="next" title="protocol_cns07" href="protocol_cns07.html" />
     <link rel="prev" title="pksig_waters" href="pksig_waters.html" /> 
   </head>
   <body>
@@ -38,12 +41,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="poly_sdh.html" title="poly_sdh"
+          <a href="protocol_cns07.html" title="protocol_cns07"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="pksig_waters.html" title="pksig_waters"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,8 +56,68 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="pksig-waters05">
-<h1>pksig_waters05<a class="headerlink" href="#pksig-waters05" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-pksig_waters05">
+<span id="pksig-waters05"></span><h1>pksig_waters05<a class="headerlink" href="#module-pksig_waters05" title="Permalink to this headline">¶</a></h1>
+<p>David Naccache based Identity-Based Encryption</p>
+<div class="line-block">
+<div class="line">From: &#8220;David Naccache Secure and Practical Identity-Based Encryption Section 4&#8221;</div>
+<div class="line">Available from: <a class="reference external" href="http://eprint.iacr.org/2005/369.pdf">http://eprint.iacr.org/2005/369.pdf</a></div>
+</div>
+<ul class="simple">
+<li>type:                 encryption (identity-based)</li>
+<li>setting:              bilinear groups (asymmetric)</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Gary Belvin</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">06/2011</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="pksig_waters05.IBE_N04_Sig">
+<em class="property">class </em><tt class="descclassname">pksig_waters05.</tt><tt class="descname">IBE_N04_Sig</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../_modules/pksig_waters05.html#IBE_N04_Sig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_waters05.IBE_N04_Sig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.PKSig.PKSig</span></tt></p>
+<p>Implementation of David Naccahe Identity Based Encryption</p>
+<dl class="method">
+<dt id="pksig_waters05.IBE_N04_Sig.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>l=32</em><big>)</big><a class="reference internal" href="../_modules/pksig_waters05.html#IBE_N04_Sig.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_waters05.IBE_N04_Sig.keygen" title="Permalink to this definition">¶</a></dt>
+<dd><p>l is the security parameter
+with l = 32, and the hash function at 160 bits = n * l with n = 5</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pksig_waters05.IBE_N04_Sig.sha1">
+<tt class="descname">sha1</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="../_modules/pksig_waters05.html#IBE_N04_Sig.sha1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_waters05.IBE_N04_Sig.sha1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pksig_waters05.IBE_N04_Sig.sign">
+<tt class="descname">sign</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>m</em><big>)</big><a class="reference internal" href="../_modules/pksig_waters05.html#IBE_N04_Sig.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_waters05.IBE_N04_Sig.sign" title="Permalink to this definition">¶</a></dt>
+<dd><p>v = (v1, .., vn) is an identity</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pksig_waters05.IBE_N04_Sig.stringtoidentity">
+<tt class="descname">stringtoidentity</tt><big>(</big><em>pk</em>, <em>strID</em><big>)</big><a class="reference internal" href="../_modules/pksig_waters05.html#IBE_N04_Sig.stringtoidentity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_waters05.IBE_N04_Sig.stringtoidentity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hash the identity string and break it up in to l bit pieces</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pksig_waters05.IBE_N04_Sig.verify">
+<tt class="descname">verify</tt><big>(</big><em>pk</em>, <em>msg</em>, <em>sig</em><big>)</big><a class="reference internal" href="../_modules/pksig_waters05.html#IBE_N04_Sig.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_waters05.IBE_N04_Sig.verify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pksig_waters05.main">
+<tt class="descclassname">pksig_waters05.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pksig_waters05.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_waters05.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
@@ -67,8 +130,8 @@
   <p class="topless"><a href="pksig_waters.html"
                         title="previous chapter">pksig_waters</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="poly_sdh.html"
-                        title="next chapter">poly_sdh</a></p>
+  <p class="topless"><a href="protocol_cns07.html"
+                        title="next chapter">protocol_cns07</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/schemes/pksig_waters05.txt"
@@ -101,19 +164,19 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="poly_sdh.html" title="poly_sdh"
+          <a href="protocol_cns07.html" title="protocol_cns07"
              >next</a> |</li>
         <li class="right" >
           <a href="pksig_waters.html" title="pksig_waters"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

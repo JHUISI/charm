@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>policytree &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>policytree &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
     <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
     <link rel="next" title="redundancyschemes" href="redundancyschemes.html" />
     <link rel="prev" title="PKSig" href="PKSig.html" /> 
@@ -43,7 +46,7 @@
         <li class="right" >
           <a href="PKSig.html" title="PKSig"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -53,8 +56,64 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="policytree">
-<h1>policytree<a class="headerlink" href="#policytree" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-policytree">
+<span id="policytree"></span><h1>policytree<a class="headerlink" href="#module-policytree" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="policytree.PolicyParser">
+<em class="property">class </em><tt class="descclassname">policytree.</tt><tt class="descname">PolicyParser</tt><big>(</big><em>verbose=False</em><big>)</big><a class="reference internal" href="../_modules/policytree.html#PolicyParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#policytree.PolicyParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dl class="method">
+<dt id="policytree.PolicyParser.evalStack">
+<tt class="descname">evalStack</tt><big>(</big><em>stack</em><big>)</big><a class="reference internal" href="../_modules/policytree.html#PolicyParser.evalStack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#policytree.PolicyParser.evalStack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="policytree.PolicyParser.getBNF">
+<tt class="descname">getBNF</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/policytree.html#PolicyParser.getBNF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#policytree.PolicyParser.getBNF" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="policytree.PolicyParser.parse">
+<tt class="descname">parse</tt><big>(</big><em>string</em><big>)</big><a class="reference internal" href="../_modules/policytree.html#PolicyParser.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#policytree.PolicyParser.parse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="policytree.PolicyParser.prune">
+<tt class="descname">prune</tt><big>(</big><em>tree</em>, <em>list</em><big>)</big><a class="reference internal" href="../_modules/policytree.html#PolicyParser.prune"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#policytree.PolicyParser.prune" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="policytree.PolicyParser.verifyExistence">
+<tt class="descname">verifyExistence</tt><big>(</big><em>tree</em>, <em>list</em>, <em>n_list</em><big>)</big><a class="reference internal" href="../_modules/policytree.html#PolicyParser.verifyExistence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#policytree.PolicyParser.verifyExistence" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="policytree.createNode">
+<tt class="descclassname">policytree.</tt><tt class="descname">createNode</tt><big>(</big><em>s</em>, <em>loc</em>, <em>toks</em><big>)</big><a class="reference internal" href="../_modules/policytree.html#createNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#policytree.createNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="policytree.createTree">
+<tt class="descclassname">policytree.</tt><tt class="descname">createTree</tt><big>(</big><em>op</em>, <em>node1</em>, <em>node2</em><big>)</big><a class="reference internal" href="../_modules/policytree.html#createTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#policytree.createTree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="policytree.debug">
+<tt class="descclassname">policytree.</tt><tt class="descname">debug</tt><big>(</big><em>s</em>, <em>loc</em>, <em>toks</em><big>)</big><a class="reference internal" href="../_modules/policytree.html#debug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#policytree.debug" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="policytree.parseNumConditional">
+<tt class="descclassname">policytree.</tt><tt class="descname">parseNumConditional</tt><big>(</big><em>s</em>, <em>loc</em>, <em>toks</em><big>)</big><a class="reference internal" href="../_modules/policytree.html#parseNumConditional"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#policytree.parseNumConditional" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="policytree.pushFirst">
+<tt class="descclassname">policytree.</tt><tt class="descname">pushFirst</tt><big>(</big><em>s</em>, <em>loc</em>, <em>toks</em><big>)</big><a class="reference internal" href="../_modules/policytree.html#pushFirst"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#policytree.pushFirst" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
@@ -106,14 +165,14 @@
         <li class="right" >
           <a href="PKSig.html" title="PKSig"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

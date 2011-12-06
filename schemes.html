@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Demonstration Schemes &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>Demonstration Schemes &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="index.html" />
     <link rel="next" title="abenc_adapt_hybrid" href="schemes/abenc_adapt_hybrid.html" />
     <link rel="prev" title="How To Get Started" href="tutorial.html" /> 
   </head>
@@ -42,7 +45,7 @@
         <li class="right" >
           <a href="tutorial.html" title="How To Get Started"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li> 
+        <li><a href="index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -65,13 +68,15 @@
 <li class="toctree-l1"><a class="reference internal" href="schemes/commit_pedersen92.html">commit_pedersen92</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/dabe_aw11.html">dabe_aw11</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/dabenc_adapt_hybrid.html">dabenc_adapt_hybrid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schemes/encap_bchk05.html">encap_bchk05</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/groupsig_bgls04.html">groupsig_bgls04</a></li>
-<li class="toctree-l1"><a class="reference internal" href="schemes/ibe_sw05.html">ibe_sw05</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/ibenc_adapt_hybrid.html">ibenc_adapt_hybrid</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/ibenc_adapt_identityhash.html">ibenc_adapt_identityhash</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/ibenc_bb03.html">ibenc_bb03</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/ibenc_bf01.html">ibenc_bf01</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schemes/ibenc_sw05.html">ibenc_sw05</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/ibenc_waters05.html">ibenc_waters05</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schemes/pkenc_adapt_bchk05.html">pkenc_adapt_bchk05</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/pkenc_adapt_chk04.html">pkenc_adapt_chk04</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/pkenc_adapt_hybrid.html">pkenc_adapt_hybrid</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/pkenc_cs98.html">pkenc_cs98</a></li>
@@ -85,6 +90,7 @@
 <li class="toctree-l1"><a class="reference internal" href="schemes/pksig_boyen.html">pksig_boyen</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/pksig_chch.html">pksig_chch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/pksig_chp.html">pksig_chp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schemes/pksig_cl03.html">pksig_cl03</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/pksig_cyh.html">pksig_cyh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/pksig_dsa.html">pksig_dsa</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/pksig_ecdsa.html">pksig_ecdsa</a></li>
@@ -93,7 +99,6 @@
 <li class="toctree-l1"><a class="reference internal" href="schemes/pksig_schnorr91.html">pksig_schnorr91</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/pksig_waters.html">pksig_waters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/pksig_waters05.html">pksig_waters05</a></li>
-<li class="toctree-l1"><a class="reference internal" href="schemes/poly_sdh.html">poly_sdh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/protocol_cns07.html">protocol_cns07</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/protocol_schnorr91.html">protocol_schnorr91</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes/sigma1.html">sigma1</a></li>
@@ -152,13 +157,13 @@
         <li class="right" >
           <a href="tutorial.html" title="How To Get Started"
              >previous</a> |</li>
-        <li><a href="index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li> 
+        <li><a href="index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

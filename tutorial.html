@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>How To Get Started &mdash; Charm-Crypto v0.2a documentation</title>
+    <title>How To Get Started &mdash; Charm-Crypto 0.3a documentation</title>
+    
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.2a',
+        VERSION:     '0.3a',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto v0.2a documentation" href="index.html" />
+    <link rel="top" title="Charm-Crypto 0.3a documentation" href="index.html" />
     <link rel="next" title="Demonstration Schemes" href="schemes.html" />
     <link rel="prev" title="Platform Install Manual" href="install_source.html" /> 
   </head>
@@ -42,7 +45,7 @@
         <li class="right" >
           <a href="install_source.html" title="Platform Install Manual"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li> 
+        <li><a href="index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -53,8 +56,8 @@
             
   <div class="section" id="how-to-get-started">
 <h1>How To Get Started<a class="headerlink" href="#how-to-get-started" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="instalation-and-dependencies">
-<h2>Instalation and dependencies<a class="headerlink" href="#instalation-and-dependencies" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="installation-and-dependencies">
+<h2>Installation and dependencies<a class="headerlink" href="#installation-and-dependencies" title="Permalink to this headline">¶</a></h2>
 <p>See <a class="reference internal" href="install_source.html#platform-install-manual"><em>Platform Install Manual</em></a> for installation instructions.</p>
 </div>
 <div class="section" id="implement-a-scheme">
@@ -83,15 +86,15 @@
 </div>
 <p>We describe the first algorithm in the paper, <tt class="docutils literal"><span class="pre">keygen</span></tt>. Keygen only accepts a security parameter and generates the public and private keys and returns to the user. The paper description is as follows:</p>
 <div class="math" id="equation-keygen1">
-<p><span class="eqno">(1)</span><img src="_images/math/babfd8689f532a9a2531927e2a0222e1663535ed.png" alt="g_1, g_2 \in G" /></p>
+<p><span class="eqno">(1)</span><span class="math">g_1, g_2 \in G</span></p>
 </div><div class="math" id="equation-keygen2">
-<p><span class="eqno">(2)</span><img src="_images/math/245216c199118f1ba4bf6b397943cfbf49441045.png" alt="x_1, x_2, y_1, y_2, z \in Z_q" /></p>
+<p><span class="eqno">(2)</span><span class="math">x_1, x_2, y_1, y_2, z \in Z_q</span></p>
 </div><div class="math" id="equation-keygen3">
-<p><span class="eqno">(3)</span><img src="_images/math/a1fb6cb03dd9d9d3ba6a62b376cf95b7cfb67ec4.png" alt="c = {g_1}^{x_1} \cdot {g_2}^{x_2}, d = {g_1}^{y_1} \cdot {g_2}^{y_2}, h = {g_1}^z" /></p>
+<p><span class="eqno">(3)</span><span class="math">c = {g_1}^{x_1} \cdot {g_2}^{x_2}, d = {g_1}^{y_1} \cdot {g_2}^{y_2}, h = {g_1}^z</span></p>
 </div><div class="math" id="equation-pk">
-<p><span class="eqno">(4)</span><img src="_images/math/59711f4e0462a5b6ab884ed4e19d7e1892c1a541.png" alt="pk = (g_1, g_2, c, d, h, H)" /></p>
+<p><span class="eqno">(4)</span><span class="math">pk = (g_1, g_2, c, d, h, H)</span></p>
 </div><div class="math" id="equation-sk">
-<p><span class="eqno">(5)</span><img src="_images/math/9f601bd3bc30a1fbeb40505bf46c3c61d38b7497.png" alt="sk = (x_1, x_2, y_1, y_2, z)" /></p>
+<p><span class="eqno">(5)</span><span class="math">sk = (x_1, x_2, y_1, y_2, z)</span></p>
 </div><p>Random elements <a href="#equation-keygen1">(1)</a> are chosen and random elements <a href="#equation-keygen2">(2)</a> are also chosen. Next, the group elements <a href="#equation-keygen3">(3)</a> are computed. Select a hash function H from the family of universal one-way hash functions. The public key is defined by <a href="#equation-pk">(4)</a> and the private key is defined by <a href="#equation-sk">(5)</a>. Below is the Charm <tt class="docutils literal"><span class="pre">keygen</span></tt> function defined in the <tt class="docutils literal"><span class="pre">CS98</span></tt> class:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="p">):</span>
     <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
@@ -106,11 +109,11 @@
 </pre></div>
 </div>
 <div class="math" id="equation-prelim">
-<p><span class="eqno">(6)</span><img src="_images/math/41d2b200a4581da954de6de757f419bfef3ebcef.png" alt="m \in G, r \in Z_q" /></p>
+<p><span class="eqno">(6)</span><span class="math">m \in G, r \in Z_q</span></p>
 </div><div class="math" id="equation-encrypt">
-<p><span class="eqno">(7)</span><img src="_images/math/2d17612f9a0a0b76f35acc7acd3a52dbc2483454.png" alt="u_1 = {g_1}^r, u_2 = {g_2}^r, e = h^r\cdot m, \alpha = H(u_1, u_2, e), v = c^r\cdot d^{r\alpha}" /></p>
+<p><span class="eqno">(7)</span><span class="math">u_1 = {g_1}^r, u_2 = {g_2}^r, e = h^r\cdot m, \alpha = H(u_1, u_2, e), v = c^r\cdot d^{r\alpha}</span></p>
 </div><div class="math" id="equation-ciphertext">
-<p><span class="eqno">(8)</span><img src="_images/math/ce422a7be60e2095d1997ff9f803453171760274.png" alt="(u_1, u_2, e, v)" /></p>
+<p><span class="eqno">(8)</span><span class="math">(u_1, u_2, e, v)</span></p>
 </div><p>We now describe the encrypt routine as described by the paper. Given a message in G, the encryption algorithm first selects a random integer r <a href="#equation-prelim">(6)</a>, then computes <a href="#equation-encrypt">(7)</a> and returns the ciphertext as <a href="#equation-ciphertext">(8)</a>. The <tt class="docutils literal"><span class="pre">encrypt</span></tt> algorithm defined in Charm:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
     <span class="n">r</span>   <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
@@ -124,11 +127,11 @@
 </pre></div>
 </div>
 <div class="math" id="equation-decrypt1">
-<p><span class="eqno">(9)</span><img src="_images/math/b3401ade40bb08743ae6d28562325096d202adbe.png" alt="\alpha = H(u_1, u_2, e)" /></p>
+<p><span class="eqno">(9)</span><span class="math">\alpha = H(u_1, u_2, e)</span></p>
 </div><div class="math" id="equation-decrypt2">
-<p><span class="eqno">(10)</span><img src="_images/math/4c8c6ab5ce5f4c7eb58bb0927e2f398e82e6dcf5.png" alt="{u_1}^{x_1 + y_1\alpha} {u_2}^{x_2 + y_2\alpha} = v" /></p>
+<p><span class="eqno">(10)</span><span class="math">{u_1}^{x_1 + y_1\alpha} {u_2}^{x_2 + y_2\alpha} = v</span></p>
 </div><div class="math" id="equation-decrypt3">
-<p><span class="eqno">(11)</span><img src="_images/math/373ff473647f7fff090a56d6f58c039f0aaeba10.png" alt="m = e / {u_1}^z" /></p>
+<p><span class="eqno">(11)</span><span class="math">m = e / {u_1}^z</span></p>
 </div><p>Finally, the decryption routine as described by the paper. Given a ciphertext, the decryption algorithm runs as follows and first computes <a href="#equation-decrypt1">(9)</a>, and tests if <a href="#equation-decrypt2">(10)</a> condition holds, and if so outputs <a href="#equation-decrypt3">(11)</a> otherwise &#8220;reject&#8221;. The <tt class="docutils literal"><span class="pre">decrypt</span></tt> algorithm defined in Charm:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
     <span class="n">alpha</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;H&#39;</span><span class="p">](</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;u1&#39;</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;u2&#39;</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;e&#39;</span><span class="p">])</span>
@@ -143,11 +146,29 @@
 <p class="first admonition-title">Note</p>
 <p class="last">Since the scheme defines messages as a group element, it is important to use the encode/decode methods to convert the message string into a member of the group, G. This helps transform a cryptographic scheme usable for a real application.  However, the pairing group does not currently implement the routines for encoding/decoding messages as group elements. We utilize other techniques for pairings to provide the ability to convert from/to different message spaces.</p>
 </div>
+<p>This concludes the tutorial on a straightforward implementation of the Cramer-Shoup public-key encryption cryptosystem.</p>
 </div>
 <div class="section" id="using-a-scheme">
 <h2>Using a Scheme<a class="headerlink" href="#using-a-scheme" title="Permalink to this headline">¶</a></h2>
-<p>This section is incomplete</p>
-<p>This concludes the tutorial on a straightforward implementation of the Cramer-Shoup public-key encryption cryptosystem. Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at <a class="reference external" href="mailto:support&#37;&#52;&#48;charm-crypto&#46;com">support<span>&#64;</span>charm-crypto<span>&#46;</span>com</a>. Thank you!</p>
+<p>To use any of our existing schemes in your application, each scheme includes a <tt class="docutils literal"><span class="pre">main</span></tt> routine that runs through every alorithm (with sample inputs) defined for that scheme. Thus, the <tt class="docutils literal"><span class="pre">main</span></tt> function provides a test that the scheme works in addition to demonstrate how to use it. For example, below is an example of how to instantiate the Cramer-Shoup scheme from above within your application:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">schemes.pkenc_cs98_ec.py</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">toolbox.eccurve</span> <span class="kn">import</span> <span class="n">prime192v1</span>
+
+<span class="n">pkenc</span> <span class="o">=</span> <span class="n">EC_CS98</span><span class="p">(</span><span class="n">prime192v1</span><span class="p">)</span>
+
+<span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+
+<span class="n">M</span> <span class="o">=</span> <span class="n">b</span><span class="s">&#39;Hello World!&#39;</span>
+<span class="n">ciphertext</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+
+<span class="n">message</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ciphertext</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">To support serialization of key material and ciphertexts, we have provided a <tt class="docutils literal"><span class="pre">serialize</span></tt> and <tt class="docutils literal"><span class="pre">deserialize</span></tt> routine available in the <tt class="docutils literal"><span class="pre">charm.engine.util</span></tt> package.</p>
+</div>
+<p>Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at <a class="reference external" href="mailto:support&#37;&#52;&#48;charm-crypto&#46;com">support<span>&#64;</span>charm-crypto<span>&#46;</span>com</a>. Thank you!</p>
 </div>
 </div>
 
@@ -160,7 +181,7 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">How To Get Started</a><ul>
-<li><a class="reference internal" href="#instalation-and-dependencies">Instalation and dependencies</a></li>
+<li><a class="reference internal" href="#installation-and-dependencies">Installation and dependencies</a></li>
 <li><a class="reference internal" href="#implement-a-scheme">Implement a Scheme</a></li>
 <li><a class="reference internal" href="#using-a-scheme">Using a Scheme</a></li>
 </ul>
@@ -210,13 +231,13 @@
         <li class="right" >
           <a href="install_source.html" title="Platform Install Manual"
              >previous</a> |</li>
-        <li><a href="index.html">Charm-Crypto v0.2a documentation</a> &raquo;</li> 
+        <li><a href="index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University.
-      Last updated on Nov 21, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Dec 05, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>
