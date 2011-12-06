@@ -1,6 +1,6 @@
 '''
-Sahai-Waters Fuzzy Identity-Based Encryption, Large Universe Construction
- 
+Sahai-Waters Fuzzy Identity-Based Encryption, Original Construction
+
 | From: "A. Sahai, B. Waters Fuzzy Identity-Based Encryption.
 | Published in: Eurocrypt 2005
 | Available from: eprint.iacr.org/2004/086.pdf
@@ -12,6 +12,7 @@ Sahai-Waters Fuzzy Identity-Based Encryption, Large Universe Construction
 :Authors:    Christina Garman
 :Date:       10/2011
 '''
+
 from __future__ import print_function
 from toolbox.pairinggroup import *
 from charm.cryptobase import *
@@ -106,7 +107,20 @@ class IBE_SW05(IBEnc):
         return CT['Eprime'] / prod
  
 
-# Large Universe Construction
+'''
+Sahai-Waters Fuzzy Identity-Based Encryption, Large Universe Construction
+
+| From: "A. Sahai, B. Waters Fuzzy Identity-Based Encryption.
+| Published in: Eurocrypt 2005
+| Available from: eprint.iacr.org/2004/086.pdf
+| Notes: Original construction (Section 4) and large universe construction (Section 6). 
+
+* type:            encryption (identity-based)
+* setting:        bilinear groups
+
+:Authors:    Christina Garman
+:Date:       10/2011
+'''
 class IBE_SW05_LUC(IBEnc):    
     def __init__(self, groupObj):
         IBEnc.__init__(self)
