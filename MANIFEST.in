@@ -4,6 +4,6 @@ recursive-include tests/ *.py
 recursive-include charm-src/ *.h *.c *.py
 recursive-exclude toolbox/ batch*.py *.bv
 recursive-exclude schemes/ ake_ecmqv.py pksig_rsa_hw09.py
-prune build
+prune build auto_batch
 graft doc
-graft doc/build
+graft doc/source
