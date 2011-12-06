@@ -20,4 +20,4 @@ The first step is to obtain the MIRACL library source from http://www.shamus.ie/
                 ``sudo make install``
 
 .. note::
-   At the moment, our support for the MIRACL library is rather limited. Primarily, the MIRACL based pairing module only supports the MNT curve parameters shipped with version 5.5.4. We plan to improve the interface significantly in the next few releases and possibly expand to other base modules (standard elliptic curve and integer module), if there is enough interest. Thank you!
+	At the moment, our support for the MIRACL library is rather limited. Primarily, the MIRACL based pairing module only supports the MNT curve parameters shipped with version 5.5.4. We plan to improve the interface significantly in the next few releases and possibly expand to other base modules (standard elliptic curve and integer module). Thank you!
