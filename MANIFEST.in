@@ -1,8 +1,7 @@
 include VERSION README INSTALL configure.sh Makefile
 recursive-include param/ *.param
 recursive-include tests/ *.py
-recursive-include charm-src/ *.h *.c *.py
-recursive-exclude toolbox/ batch*.py *.bv
+recursive-include charm-src/ *.h *.c *.cc *.py *.sh
 recursive-exclude schemes/ ake_ecmqv.py
 prune build auto_batch
 graft doc
