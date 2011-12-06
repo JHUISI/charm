@@ -1,8 +1,8 @@
 How To Get Started
 ==================
-Instalation and dependencies
+Installation and dependencies
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-See :ref:`platform-install-manual` for instalation instructions.
+See :ref:`platform-install-manual` for installation instructions.
 
 Implement a Scheme
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -112,8 +112,10 @@ Finally, the decryption routine as described by the paper. Given a ciphertext, t
 .. note::
    Since the scheme defines messages as a group element, it is important to use the encode/decode methods to convert the message string into a member of the group, G. This helps transform a cryptographic scheme usable for a real application.  However, the pairing group does not currently implement the routines for encoding/decoding messages as group elements. We utilize other techniques for pairings to provide the ability to convert from/to different message spaces.
 
+This concludes the tutorial on a straightforward implementation of the Cramer-Shoup public-key encryption cryptosystem. 
+
 Using a Scheme
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 This section is incomplete
 
-This concludes the tutorial on a straightforward implementation of the Cramer-Shoup public-key encryption cryptosystem. Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at support@charm-crypto.com. Thank you!
+Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at support@charm-crypto.com. Thank you!

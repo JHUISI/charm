@@ -9,8 +9,8 @@ Boneh-Lynn-Shacham Identity Based Signature
 * type:           signature (identity-based)
 * setting:        bilinear groups (asymmetric)
 
-:Authors:    Joseph Ayo Akinyele
-:Date:            1/2011
+:Authors:    J. Ayo Akinyele
+:Date:       1/2011
  '''
 from toolbox.pairinggroup import *
 from charm.engine.util import *

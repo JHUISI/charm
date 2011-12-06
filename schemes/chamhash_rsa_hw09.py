@@ -11,7 +11,7 @@ based on the scheme of Ateneise and de Medeiros
  * setting:      RSA
  * assumption:   RSA
 
-:Author:    Matthew Green
+:Author:    J. Ayo Akinyele
 :Date:      1/2011
 '''
 

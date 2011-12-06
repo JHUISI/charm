@@ -9,8 +9,8 @@ Groth-Sahai Commitment Scheme
 * type:			commitment
 * setting:		bilinear groups
 
-:Authors:	M Green
-:Date:			6/2011
+:Authors:	Matthew Green
+:Date:		6/2011
 '''
 
 from toolbox.pairinggroup import *
