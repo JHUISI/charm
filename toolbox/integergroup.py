@@ -7,6 +7,15 @@ class IntegerGroup:
 #            fixed = start 
 #            self.randObj = init(fixed)
 #        self.randObj = init()
+    def setparam(self, p, q): 
+        if p == (2 * q) + 1 and isPrime(p) and isPrime(q):
+            self.p = integer(p)
+            self.q = integer(q)
+            return True
+        else:
+            print("p and q are not safe primes!")
+        return False
+
         
     def paramgen(self, bits, r=2):
         # determine which group
@@ -32,7 +41,7 @@ class IntegerGroup:
     def groupOrder(self):
         return bitsize(self.q)    
     
-    def messageSize(self):    
+    def bitsize(self):    
         return bitsize(self.q) / 8 
     
     def isMember(self, x):

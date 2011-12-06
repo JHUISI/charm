@@ -1,4 +1,4 @@
-
+from toolbox.AuthenticatedCryptoAbstraction import AuthenticatedCryptoAbstraction
 from toolbox.pairinggroup import *
 from charm.pairing import hash as sha1
 from schemes.ibenc_adapt_identityhash import *
@@ -24,34 +24,16 @@ class HybridIBEnc(IBEnc):
         key = group.random(GT)
         c1 = ibenc.encrypt(pk, ID, key)
         # instantiate a symmetric enc scheme from this key
-        prp = self.getPRP(key)        
-        c2 = prp.encrypt(self.pad(M))
+        cipher = AuthenticatedCryptoAbstraction(sha1(key))
+        c2 = cipher.encrypt(M)
         return { 'c1':c1, 'c2':c2 }
     
     def decrypt(self, pk, ID, ct):
         c1, c2 = ct['c1'], ct['c2']
         key = ibenc.decrypt(pk, ID, c1)        
-        prp = self.getPRP(key)
-        msg = prp.decrypt(c2)
-        return bytes.decode(msg, 'utf8').strip('\x00')
-        
-    def getPRP(self, message):
-        self.mode, self.key_len = AES, 16
-        # hash GT msg into a hex string
-        key = sha1(message)[0:self.key_len]
-        iv  = '6543210987654321' # static IV (for testing)    
-        PRP_method = selectPRP(AES, (key, MODE_CBC, iv))        
-        return PRP_method
+        cipher = AuthenticatedCryptoAbstraction(sha1(key))
+        return cipher.decrypt(c2)
     
-    def pad(self, message):
-        # calculate the ceiling of
-        msg_len = ceil(len(message) / self.key_len) * self.key_len 
-        extra = msg_len - len(message)
-        # append 'extra' bytes to message
-        for i in range(0, extra):
-            message += '\x00'
-        return message
-
 def main():
     groupObj = PairingGroup('../param/a.param')
     ibe = IBE_BB04(groupObj)

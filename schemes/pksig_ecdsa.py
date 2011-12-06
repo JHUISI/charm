@@ -1,3 +1,17 @@
+""" 
+Digital Signature Algorithm (DSA)
+
+| From: "NIST proposed in Aug 1991 for use in DSS."
+| Published in: FIPS 186
+| Available from: 
+| Notes: 
+
+* type:           signature (ring-based)
+* setting:        integer and elliptic curve groups
+
+:Authors:    J. Ayo Akinyele
+:Date:       5/2011
+"""
 from toolbox.ecgroup import *
 from toolbox.PKSig import PKSig
 from toolbox.eccurve import prime192v2
@@ -46,7 +60,7 @@ def main():
     m = "hello world! this is a test message."
 
     sig = ecdsa.sign(pk, sk, m)
-    assert ecdsa.verify(pk, sig, m)
+    assert ecdsa.verify(pk, sig, m), "Failed verification!"
     if debug: print("Signature Verified!!!")
     
 if __name__ == "__main__":

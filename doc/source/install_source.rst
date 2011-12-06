@@ -18,16 +18,20 @@ Before we begin, please note the current dependencies:
 
 - Pyparsing http://pyparsing.wikispaces.com/
 
-- GMP http://www.swox.com/gmp/
+- GMP http://gmplib.org/ 
 
 - PBC http://crypto.stanford.edu/pbc/news.html
 
 - OPENSSL http://www.openssl.org/
 
+- (optional) MIRACL http://www.shamus.ie/. See :ref:`charm-with-miracl` if interested. 
+
 See ``./configure.sh --help`` for other options.
 
-You can obtain a copy of the latest version of Charm here:
+You can obtain a copy of the latest version of Charm from either of the following links:
         http://code.google.com/p/charm-crypto/downloads
+
+	https://github.com/JHUISI/charm/downloads
 
 Please let us know at support@charm-crypto.com if you run into any setup or installation problems. We will be happy to offer our assistance.
 
@@ -114,15 +118,15 @@ Before installing Charm, there are a few prerequisites that need to be installed
         1. m4
                 ``su -c "yum install m4"``
 
-        3. Python 3 (this is an optional, though recommended, step)
+        2. Python 3 (this is an optional, though recommended, step)
                 ``su -c "yum install python3"``
 
-        4. Header files/static library
+        3. Header files/static library
                 ``su -c "yum install python-devel"`` (if you did not install Python 3)
 
                 ``su -c "yum install python3-devel"`` (if you did install Python 3)
 
-        5. openssl-devel (only necessary if you did not install Python 3)
+        4. openssl-devel (only necessary if you did not install Python 3)
                 ``su -c "yum install openssl-devel"``
 
 Red Hat/Fedora has decided not to support ECC in OpenSSL due to patent concerns, so we now need to remove their restriction and manually import the required files.

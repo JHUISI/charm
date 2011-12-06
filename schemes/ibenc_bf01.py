@@ -9,8 +9,8 @@ Boneh-Franklin Identity Based Encryption
 * type:           encryption (identity-based)
 * setting:        bilinear groups (asymmetric)
 
-:Authors:    Joseph Ayo Akinyele
-:Date:            2/2011
+:Authors:    J. Ayo Akinyele
+:Date:       2/2011
 '''
 from toolbox.pairinggroup import *
 from toolbox.hash_module import *
@@ -113,6 +113,7 @@ def main():
 
     msg = ibe.decrypt(pk, key, ciphertext)
     assert msg == m,  "failed decrypt: \n%s\n%s" % (msg, m)
+    if debug: print("Successful Decryption!!!")
     
         
 if __name__ == "__main__":

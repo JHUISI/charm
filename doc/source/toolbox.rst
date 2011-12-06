@@ -7,6 +7,7 @@ Toolbox Classes
 
    toolbox/ABEnc
    toolbox/ABEncMultiAuth
+   toolbox/AuthenticatedCryptoAbstraction
    toolbox/bitstring
    toolbox/Commit
    toolbox/conversion
@@ -17,6 +18,8 @@ Toolbox Classes
    toolbox/hash_module
    toolbox/IBEnc
    toolbox/integergroup
+   toolbox/iterate
+   toolbox/MessageAuthenticator
    toolbox/node
    toolbox/paddingschemes
    toolbox/pairinggroup
@@ -25,9 +28,12 @@ Toolbox Classes
    toolbox/policytree
    toolbox/redundancyschemes
    toolbox/schemebase
+   toolbox/secretshare
    toolbox/secretutil
    toolbox/securerandom
    toolbox/sigmaprotocol
+   toolbox/specialprimes
+   toolbox/SymmetricCryptoAbstraction
    toolbox/zknode
 
 .. end_auto_toolbox_list

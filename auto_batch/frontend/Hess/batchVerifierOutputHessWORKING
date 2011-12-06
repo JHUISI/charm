@@ -1,0 +1,12 @@
+Final batch eq: e((prod{z := 1,N} on S2_z^delta_z),mpk%1) == (e((prod{z := 1,N} on pk_z^(a_z * delta_z)),mpk%0) * (prod{z := 1,N} on S1_z^delta_z))
+
+Final version => e(dotA,mpk%1) == (e(dotB,mpk%0) * dotC) 
+
+Compute:  dotA := (prod{z := 1,N} on S2_z^delta_z)
+Compute:  dotB := (prod{z := 1,N} on pk_z^(a_z * delta_z))
+Compute:  dotC := (prod{z := 1,N} on S1_z^delta_z)
+Precompute: a := H(M_i | S1_i,ZR)
+Precompute: delta := for{j := 1, N} do prng_j
+dotA := G1
+dotB := G1
+dotC := GT

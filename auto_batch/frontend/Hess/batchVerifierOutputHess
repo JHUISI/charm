@@ -1,0 +1,41 @@
+['hess.bv']
+types  => {'a': 'ZR', 'h': 'G1', 'S1': 'GT', 's': 'ZR', 'S2': 'G1', 'pk': 'G1'}
+constant  => ['mpk#0', 'mpk#1']
+variables => {'a': 'ZR', 'h': 'G1', 'S1': 'GT', 'N': '100', 's': 'ZR', 'S2': 'G1', 'pk': 'G1'}
+metadata => {'N': '100'}
+batch algorithm => ['2', '3']
+
+VERIFY EQUATION => verify := e(S2,mpk#1) == (e(pk,mpk#0)^a * S1)
+
+Stage A: Combined Equation => verify := (prod{z := 1,N} on e(S2_z,mpk#1)) == ((prod{z := 1,N} on e(pk_z,mpk#0)^a_z) * (prod{z := 1,N} on S1_z))
+
+Stage B: Small Exp Test => verify := (prod{z := 1,N} on e(S2_z,mpk#1)^delta_z) == ((prod{z := 1,N} on e(pk_z,mpk#0)^(a_z * delta_z)) * (prod{z := 1,N} on S1_z^delta_z)) 
+
+Rule 2: Left := Move 'delta_z' exponent into the pairing. Left := Move '(a_z * delta_z)' exponent into the pairing.  
+
+Applying technique 2 => : verify := (prod{z := 1,N} on e(S2_z^delta_z,mpk#1)) == ((prod{z := 1,N} on e(pk_z^(a_z * delta_z),mpk#0)) * (prod{z := 1,N} on S1_z^delta_z)) 
+
+Rule 3: common 1st (left) node appears, so can reduce n pairings to 1. common 1st (left) node appears, so can reduce n pairings to 1.  
+
+Applying technique 3 => : verify := e((prod{z := 1,N} on S2_z^delta_z),mpk#1) == (e((prod{z := 1,N} on pk_z^(a_z * delta_z)),mpk#0) * (prod{z := 1,N} on S1_z^delta_z)) 
+
+Instances found => {'pk_z': {'a_z': 1, 'delta_z': 1}, 'S1_z': {'delta_z': 1}, 'S2_z': {'delta_z': 1}} 
+
+Final batch eq: e((prod{z := 1,N} on S2_z^delta_z),mpk#1) == (e((prod{z := 1,N} on pk_z^(a_z * delta_z)),mpk#0) * (prod{z := 1,N} on S1_z^delta_z))
+Final indiv eq: e(S2_z,mpk#1) == (e(pk_z,mpk#0)^a_z * S1_z) 
+
+Result N = 100 : 33.55279
+Result N = 100 : 5.3478794
+Threshold:  2
+<====	PREP FOR CODE GEN	====>
+
+Final version => e(dotA,mpk#1) == (e(dotB,mpk#0) * dotC) 
+
+Compute:  dotA := (prod{z := 1,N} on S2_z^delta_z)
+Compute:  dotB := (prod{z := 1,N} on pk_z^(a_z * delta_z))
+Compute:  dotC := (prod{z := 1,N} on S1_z^delta_z)
+Precompute: a := H(M_z | S1_z,ZR)
+Precompute: delta := for{z := 1, N} do prng_z
+dotA := G1
+dotB := G1
+dotC := GT

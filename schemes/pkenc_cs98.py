@@ -66,7 +66,7 @@ def main():
     pkenc = CS98()
     
     (pk, sk) = pkenc.keygen(1024)
-    M = "hello world. test message"
+    M = b"hello world. test message"
     ciphertext = pkenc.encrypt(pk, M)
     
     message = pkenc.decrypt(pk, sk, ciphertext)

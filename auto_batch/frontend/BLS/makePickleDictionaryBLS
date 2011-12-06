@@ -1,0 +1,26 @@
+from toolbox.pairinggroup import *
+from charm.engine.util import *
+
+dict = {}
+dict[0] = {}
+dict[0]['pk'] = '/Users/matt/Documents/charm/auto_batch/frontend/BLS/pk1BLS.charmPickle'
+dict[0]['message'] = '/Users/matt/Documents/charm/auto_batch/frontend/BLS/m1BLS.pythonPickle'
+dict[0]['sig'] = '/Users/matt/Documents/charm/auto_batch/frontend/BLS/sig1BLS.charmPickle'
+
+
+dict[1] = {}
+dict[1]['pk'] = '0.repeat'
+dict[1]['message'] = '/Users/matt/Documents/charm/auto_batch/frontend/BLS/m2BLS.pythonPickle'
+dict[1]['sig'] = '/Users/matt/Documents/charm/auto_batch/frontend/BLS/sig2BLS.charmPickle'
+
+dict[2] = {}
+dict[2]['pk'] = '0.repeat'
+dict[2]['message'] = '/Users/matt/Documents/charm/auto_batch/frontend/BLS/m3BLS.pythonPickle'
+dict[2]['sig'] = '/Users/matt/Documents/charm/auto_batch/frontend/BLS/sig3BLS.charmPickle'
+
+#group = pairing('/Users/matt/Documents/charm/param/d224.param')
+group = PairingGroup(80)
+dict_pickle = pickleObject( serializeDict( dict, group) )
+f = open('dictPickle2_BLS', 'wb')
+f.write(dict_pickle)
+f.close()

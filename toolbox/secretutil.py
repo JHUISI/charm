@@ -2,6 +2,7 @@
 Contains all the auxillary functions to do linear secret sharing (LSS) over an access structure. Mainly, we represent the 
 access structure as a binary tree. This could also support matrices for representing access structures.
 '''
+from __future__ import print_function
 from charm.pairing import *
 from toolbox.policytree import *
 
@@ -33,14 +34,14 @@ class SecretUtil:
         coeff = {}
         #list = shares.keys()
         for i in list:
-            result = self.elem.init(ZR, 1)
+            result = self.elem.init(ZR, long(1))
             for j in list:
                 if(i != j):
                     # lagrange basis poly
                     eTop.set(0 - j) # numerator
                     eBot.set(i - j) # denominator
-                    result *= eTop / eBot
-#                print("coeff '%d' => '%s'" % (i, result))
+                    result = result * (eTop/eBot)
+                #print("coeff '%d' => '%s'" % (i, result))
             coeff[i] = result
         return coeff
         
@@ -60,6 +61,7 @@ class SecretUtil:
             node = tree.getNodeType()
             if(node == tree.AND):
                 this_coeff = self.recoverCoefficients([1,2])
+
                 # left child => coeff[1], right child => coeff[2]
                 self.getCoefficients(tree.getLeft(), coeff_list, coeff * this_coeff[1])
                 self.getCoefficients(tree.getRight(), coeff_list, coeff * this_coeff[2])
@@ -108,6 +110,8 @@ class SecretUtil:
         self.compute_shares(shares[2], subtree.getRight(), List)
         
     def createPolicy(self, policy_string):
+        if(type(policy_string) == str):
+            policy_string = unicode(policy_string)
         return self.parser.parse(policy_string)
     
     def prune(self, policy, attributes):
@@ -116,6 +120,7 @@ class SecretUtil:
     def getAttributeList(self, Node, List):
         if(Node == None):
             return None
+
         # V, L, R
         if(Node.getNodeType() == Node.ATTR):
             List.append(Node.getAttribute())

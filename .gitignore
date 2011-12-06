@@ -1,0 +1,13 @@
+doc/build/*
+*.pyc 
+*.swp
+schemes/*.pyc
+toolbox/*.pyc
+.project
+.pydevproject
+toolbox/__pycache__
+config.log
+config.mk
+MANIFEST
+dist/
+build/

@@ -387,7 +387,7 @@ class SAEPEncryptionPadding:
         M = v[:int(m/8)]
         t = v[int(m/8):int(m+s0/8)]
 
-        if(M[-1] == 128 and (M[-2] == 0 or M[-2] == 128)):
+        if(M[-1] == '\x80' and (M[-2] == '\x00' or M[-2] == '\x80')):
             index = M[:(len(M)-1)].rindex(b'\x80')
             M = M[:index]
         else:
@@ -400,6 +400,6 @@ class SAEPEncryptionPadding:
             print("v    => ", v)
             print("M    => ", M)
             print("t    => ", t)
-            print("r DB   =>", DB)
+            print("r    => ", r)
 
         return (M, t)

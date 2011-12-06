@@ -1,4 +1,4 @@
-
+from toolbox.AuthenticatedCryptoAbstraction import AuthenticatedCryptoAbstraction
 from charm.cryptobase import *
 from charm.pairing import hash as sha1
 from math import ceil
@@ -28,34 +28,16 @@ class HybridABEncMA(ABEncMultiAuth):
         key = group.random(GT)
         c1 = abencma.encrypt(pk, gp, key, policy_str)
         # instantiate a symmetric enc scheme from this key
-        cipher = self.instantiateCipher(MODE_CBC, key)        
-        c2 = cipher.encrypt(self.pad(M))
+        cipher = AuthenticatedCryptoAbstraction(sha1(key)) 
+        c2 = cipher.encrypt(M)
         return { 'c1':c1, 'c2':c2 }
     
     def decrypt(self, gp, sk, ct):
         c1, c2 = ct['c1'], ct['c2']
         key = abencma.decrypt(gp, sk, c1)
-        cipher = self.instantiateCipher(MODE_CBC, key)
-        msg = cipher.decrypt(c2)
-        return bytes.decode(msg, 'utf8').strip('\x00')
+        cipher = AuthenticatedCryptoAbstraction(sha1(key))
+        return cipher.decrypt(c2)
         
-    def instantiateCipher(self, mode, message):
-        self.mode, self.key_len = AES, 16
-        # hash GT msg into a hex string
-        key = sha1(message)[0:self.key_len]
-        iv  = '6543210987654321' # static IV (for testing)    
-        PRP_method = selectPRP(AES, (key, mode, iv))        
-        return PRP_method
-    
-    def pad(self, message):
-        # calculate the ceiling of
-        msg_len = ceil(len(message) / self.key_len) * self.key_len 
-        extra = msg_len - len(message)
-        # append 'extra' bytes to message
-        for i in range(0, extra):
-            message += '\x00'
-        return message
-
 def main():
     groupObj = PairingGroup('../param/a.param')
     dabe = Dabe(groupObj)
@@ -94,7 +76,8 @@ def main():
     
     orig_msg = hyb_abema.decrypt(gp, K, ct)
     if debug: print("Result =>", orig_msg)
-    assert orig_msg == msg
+    assert orig_msg == msg, "Failed Decryption!!!"
+    if debug: print("Successful Decryption!!!")
     del groupObj
 
 if __name__ == "__main__":

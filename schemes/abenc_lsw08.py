@@ -12,7 +12,7 @@ Allison Lewko, Amit Sahai and Brent Waters (Pairing-based)
 :Authors:    J Ayo Akinyele
 :Date:            12/2010
 '''
-
+from __future__ import print_function
 from toolbox.pairinggroup import *
 from toolbox.secretutil import *
 from toolbox.policytree import *
@@ -56,7 +56,7 @@ class KPabe(ABEnc):
         for x in attr_list:
             d = []; r = group.random()
             if not self.negatedAttr(x): # meaning positive
-                d.append((pk['g_G1'] ** (mk['alpha2'] * shares[x])) * (group.hash(x, G1) ** r))   # compute D1 for attribute x
+                d.append((pk['g_G1'] ** (mk['alpha2'] * shares[x])) * (group.hash(unicode(x), G1) ** r))   # compute D1 for attribute x
                 d.append((pk['g_G2'] ** r))  # compute D2 for attribute x
             #else:
             #    d.append((pk['g2_G1'] ** shares[x]) * (pk['g_G1_b2'] ** r)) # compute D3
@@ -65,7 +65,7 @@ class KPabe(ABEnc):
             D[x] = d
         if debug: print("Policy: %s" % policy)
         if debug: print("Attribute list: %s" % attr_list)
-        D['policy'] = policy
+        D['policy'] = unicode(policy_str)
         return D
     
     def negatedAttr(self, attribute):
@@ -84,15 +84,16 @@ class KPabe(ABEnc):
             sx[0] -= sx[i]
         
         # compute E3
-        E3 = [group.hash(x, G1) ** s for x in attr_list]
+        E3 = [group.hash(unicode(x), G1) ** s for x in attr_list]
         # compute E4
         E4 = [pk['g_G1_b'] ** sx[i] for i in range(len(attr_list))]
-        E5 = [(pk['g_G1_b2'] ** (sx[i] * group.hash(attr_list[i]))) * (pk['h_G1_b'] ** sx[i]) for i in range(len(attr_list))]                
+        E5 = [(pk['g_G1_b2'] ** (sx[i] * group.hash(attr_list[i]))) * (pk['h_G1_b'] ** sx[i]) for i in range(len(attr_list))]  
+        attr_list = [unicode(a) for a in attr_list]
         return {'E1':(pk['e(gg)_alpha'] ** s) * M, 'E2':pk['g_G2'] ** s, 'E3':E3, 'E4':E4, 'E5':E5, 'attributes':attr_list }
     
     def decrypt(self, E, D):
         attrs = E['attributes']
-        policy = D['policy']
+        policy = util.createPolicy(D['policy'])
         coeff = {}; util.getCoefficients(policy, coeff)
         
         Z = {}; prodT = group.init(GT, 1)

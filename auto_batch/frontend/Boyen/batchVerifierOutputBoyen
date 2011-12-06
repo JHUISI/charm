@@ -1,0 +1,21 @@
+Final batch eq: (prod{y := 1,l} on (e((prod{z := 1,N} on preA_z),Atpk_y) * (e((prod{z := 1,N} on preA_z^M_y%z),Btpk_y) * e((prod{z := 1,N} on preA_z^t_y%z),Ctpk_y)))) == D^sum{z := 1,N} of delta_z
+
+Final version => dotD == D^sumE
+
+Compute:  dotA := (prod{z := 1,N} on preA_z)
+Compute:  dotB := (prod{z := 1,N} on preA_z^M_y%z)
+Compute:  dotC := (prod{z := 1,N} on preA_z^t_y%z)
+Compute:  dotD := (prod{y := 1,l} on (e(dotA,Atpk_y) * (e(dotB,Btpk_y) * e(dotC,Ctpk_y))))
+Compute:  sumE := (sum{z := 1,N} of delta_z)
+Precompute: D := e(g1,g2)
+Precompute: preA_z := S_y%z^delta_z
+Precompute: delta := for{z := 1, N} do prng_z
+dotA := G1
+dotB := G1
+dotC := G1
+sumE := ZR
+dotD := GT
+List := Atpk in l
+List := Btpk in l
+List := Ctpk in l
+List := S in l
