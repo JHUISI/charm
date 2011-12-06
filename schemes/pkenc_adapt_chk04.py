@@ -10,7 +10,7 @@ Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform (generic composi
 * setting:      n/a --- requires a selective-ID secure IBE scheme an EU-CMA one-time signature (OTS) scheme
 * assumption:   n/a --- dependent on the underlying primitives
 
-:Authors:  Matthew Green
+:Authors:  J. Ayo Akinyele
 :Date:         1/2011
 '''
 from schemes.ibenc_bb03 import IBE_BB04

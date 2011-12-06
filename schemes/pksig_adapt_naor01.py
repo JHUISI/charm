@@ -17,8 +17,8 @@ Notes:	This transform was first described by Boneh and Franklin but credited to 
 * setting:		n/a (any fully-secure IBE scheme)
 * assumption:	n/a (dependent on the IBE scheme)
 
-:Authors:	Matthew Green
-:Date:			05/2011
+:Authors:	J. Ayo Akinyele
+:Date:		05/2011
 '''
 
 from schemes.ibenc_bb03 import IBE_BB04

@@ -26,8 +26,9 @@ Before we begin, please note the current dependencies:
 
 See ``./configure.sh --help`` for other options.
 
-You can obtain a copy of the latest version of Charm here:
+You can obtain a copy of the latest version of Charm from either of the following links:
         http://code.google.com/p/charm-crypto/downloads
+	https://github.com/JHUISI/charm/downloads
 
 Please let us know at support@charm-crypto.com if you run into any setup or installation problems. We will be happy to offer our assistance.
 

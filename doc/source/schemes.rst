@@ -43,7 +43,6 @@ Demonstration Schemes
    schemes/pksig_ecdsa
    schemes/pksig_hess
    schemes/pksig_hw
-   schemes/pksig_rsa_hw09_new
    schemes/pksig_schnorr91
    schemes/pksig_waters
    schemes/pksig_waters05
