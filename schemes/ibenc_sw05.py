@@ -24,8 +24,6 @@ debug = False
 class IBE_SW05(IBEnc):    
     def __init__(self, groupObj):
         IBEnc.__init__(self)
-        IBEnc.setProperty(self, secdef='sIND_ID_CPA', assumption='DBDH', 
-                          message_space=[GT, 'KEM'], secmodel='SM', other={'id':ZR})
         global group, H, util
         group = groupObj
         H = lambda x: group.hash((unicode('0'),unicode(x)), ZR)
@@ -112,8 +110,6 @@ class IBE_SW05(IBEnc):
 class IBE_SW05_LUC(IBEnc):    
     def __init__(self, groupObj):
         IBEnc.__init__(self)
-        IBEnc.setProperty(self, secdef='sIND_ID_CPA', assumption='DBDH', 
-                          message_space=[GT, 'KEM'], secmodel='SM', other={'id':ZR})
         global group, H, util
         group = groupObj
         H = lambda x: group.hash((unicode('0'), unicode(x)), ZR)
