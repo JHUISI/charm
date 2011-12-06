@@ -1,22 +1,22 @@
 Charm-Crypto: Installation Documentation
 -------------------------------------------------------------------------------------------
 
-Charm has done a great job at automating the installation process such that the end-user
+Charm has automated the installation process such that the end-user
 does not have to directly handle dependencies, linking, compiler flag setting, and the
 like.  However, there is always the corner case in which an end-user is using a currently
 unsupported platform, and thus may need to build and install using a very manual process.
 
 We would like to support you in this case, and have written this documentation to get 
-you started on your path using Charm.  This installation file will contain some n
+you started on your path using Charm.  This installation file will contain some
 installation blocks highlighting each respective implementation.  
 
 Before we begin, please note the current dependencies:
     
 	Python2.7 or Python3
 	Pyparsing http://pyparsing.wikispaces.com/
-    GMP http://www.swox.com/gmp/
-    PBC http://crypto.stanford.edu/pbc/news.html 
-    OPENSSL http://www.openssl.org/
+	GMP http://gmplib.org/ 
+	PBC http://crypto.stanford.edu/pbc/news.html 
+    	OPENSSL http://www.openssl.org/
 
 	---
 	See ./configure.sh --help for other options.
@@ -49,11 +49,11 @@ The steps for building in linux this way are:
 		sudo apt-get install libssl-dev
 
 2. Now we need to obtain a copy of Charm:
-	svn checkout http://charm-crypto.googlecode.com/svn/trunk/ charm-crypto-read-only
+	git clone git://github.com/JHUISI/charm.git
 
 3. Next, we will install Charm. Navigate to the Charm directory.
 	1. We must first run the configuration script:
-		sudo ./configure.sh –python=/path/to/python3
+		sudo ./configure.sh --python=/path/to/python3
 	2. Now we will build and install Charm:
 		sudo make build
 		sudo make install
@@ -76,12 +76,12 @@ The steps for building in linux this way are:
 		sudo apt-get install libssl-dev
 
 2. Now we need to obtain a copy of Charm:
-	svn checkout http://charm-crypto.googlecode.com/svn/trunk/ charm-crypto-read-only
+	git clone git://github.com/JHUISI/charm.git
 
 3. Next, we will install Charm. Navigate to the Charm directory.
 	1. We must first run the configuration script:
 		sudo ./configure.sh
-		[If you installed Python 3 and would like to use that, you will need to add –python=/path/to/python3]
+		[If you installed Python 3 and would like to use that, you will need to add –-python=/path/to/python3]
 	2. Now we will build and install Charm:
 		sudo make build
 		sudo make install
@@ -138,7 +138,7 @@ The steps for building in linux this way are:
 			su -c "yes n | cp * /usr/include/openssl"
 
 3. Now we need to obtain a copy of Charm:
-	svn checkout http://charm-crypto.googlecode.com/svn/trunk/ charm-crypto-read-only
+	git clone git://github.com/JHUISI/charm.git
 
 4. Next, we will install Charm. Navigate to the Charm directory.
 	1. We must first run the configuration script:
@@ -168,7 +168,7 @@ The steps for building in linux this way are:
         6. This distro doesn't seem to come with binutils or gcc, install those.
 
 2. Now we need to obtain a copy of Charm:
-        svn checkout http://charm-crypto.googlecode.com/svn/trunk/ charm-crypto-read-only
+	git clone git://github.com/JHUISI/charm.git
 
 3. Next, we will install Charm. Navigate to the Charm directory.
         1. We must first run the configuration script:
