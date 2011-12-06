@@ -1,3 +1,4 @@
+from __future__ import print_function
 from charm.pairing import *
 from charm.integer import randomBits,bitsize,integer
 
@@ -19,6 +20,18 @@ class PairingGroup():
         print("ERROR: max len => %s, input len => %s" % (self.messageSize(), size))
         return False
 
+    def ismember(self, obj):
+        if type(obj) in [tuple, list]:
+           for i in obj:
+               if self.Pairing.ismember(i) == False: return False 
+           return True
+        elif type(obj) == dict:
+           for i in obj.keys():
+               if self.Pairing.ismember(obj[i]) == False: return False
+           return True
+        else:
+           return self.Pairing.ismember(obj)
+
     def groupType(self): 
         return 'PairingGroup'     
         
@@ -27,7 +40,7 @@ class PairingGroup():
 
     def init(self, type, value=None):
         if value != None:
-            return self.Pairing.init(type, value)
+            return self.Pairing.init(type, long(value))
         return self.Pairing.init(type)
             
     def random(self, type=ZR, seed=None):
@@ -38,7 +51,6 @@ class PairingGroup():
             return self.Pairing.random(type)
         else:
             return integer(randomBits(self.secparam))
-
         
     def __randomGT(self):
         if not hasattr(self, 'gt'):
@@ -52,8 +64,8 @@ class PairingGroup():
     def decode(self, element):
         raise NotImplementedException 
     
-    def hash(self, args, type=ZR):
-        return self.Pairing.H(args, type)
+    def hash(self, args, type1=ZR):
+        return self.Pairing.H(args, type1)
     
     def serialize(self, obj):
         return self.Pairing.serialize(obj)
@@ -64,7 +76,15 @@ class PairingGroup():
     def debug(self, data, prefix=None):
         if type(data) == dict and self._verbose:
            for k,v in data.items():
-               print(k,v)
+               if type(v) == dict and self._verbose:
+                   print(k + " ", end='')
+                   print("{",end='')
+                   for i, (a,b) in enumerate(v.items()):
+                       if i: print(", '%s': %s" % (a, b), end='')
+                       else: print("'%s': %s" % (a, b), end='')
+                   print("}")
+               else:
+                   print(k,v)
         elif type(data) == list and self._verbose:
            for i in range(0, len(data)):
                print(prefix, (i+1),':',data[i])            

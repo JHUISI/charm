@@ -13,6 +13,7 @@ John Bethencourt, Brent Waters (Pairing-based)
 :Authors:    J Ayo Akinyele
 :Date:            04/2011
 '''
+from __future__ import print_function
 from toolbox.pairinggroup import *
 from toolbox.secretutil import SecretUtil
 from toolbox.ABEnc import *
@@ -20,8 +21,8 @@ from toolbox.ABEnc import *
 # type annotations
 pk_t = { 'g':G1, 'g2':G2, 'h':G1, 'f':G1, 'e_gg_alpha':GT }
 mk_t = {'beta':ZR, 'g2_alpha':G2 }
-sk_t = { 'D':G2, 'Dj':G2, 'Djp':G1, 'S':str }
-ct_t = { 'C_tilde':GT, 'C':G1, 'Cy':G1, 'Cyp':G2 }
+sk_t = { 'D':G2, 'Dj':G2, 'Djp':G1, 'S':unicode } 
+ct_t = { 'C_tilde':GT, 'C':G1, 'Cy':G1, 'Cyp':G2, 'policy':unicode, 'attributes':unicode }
 
 debug = False
 class CPabe_BSW07(ABEnc):
@@ -52,8 +53,9 @@ class CPabe_BSW07(ABEnc):
         D_j, D_j_pr = {}, {}
         for j in S:
             r_j = group.random()
-            D_j[j] = g_r * (group.hash(j, G2) ** r_j)
+            D_j[j] = g_r * (group.hash(unicode(j), G2) ** r_j)
             D_j_pr[j] = pk['g'] ** r_j
+        S = [unicode(s) for s in S]
         return { 'D':D, 'Dj':D_j, 'Djp':D_j_pr, 'S':S }
     
     @input(pk_t, GT, str)
@@ -71,13 +73,14 @@ class CPabe_BSW07(ABEnc):
             C_y_pr[i] = group.hash(i, G2) ** shares[i] 
         
         return { 'C_tilde':(pk['e_gg_alpha'] ** s) * M,
-                 'C':C, 'Cy':C_y, 'Cyp':C_y_pr, 'policy':policy, 'attributes':a_list }
+                 'C':C, 'Cy':C_y, 'Cyp':C_y_pr, 'policy':unicode(policy_str), 'attributes':a_list }
     
     @input(pk_t, sk_t, ct_t)
     @output(GT)
     def decrypt(self, pk, sk, ct):
-        pruned_list = util.prune(ct['policy'], sk['S'])
-        z = {}; util.getCoefficients(ct['policy'], z)
+        policy = util.createPolicy(ct['policy'])
+        pruned_list = util.prune(policy, sk['S'])
+        z = {}; util.getCoefficients(policy, z)
 
         A = group.init(GT, 1) 
         for i in pruned_list:

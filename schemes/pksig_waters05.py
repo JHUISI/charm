@@ -66,7 +66,7 @@ class IBE_N04_Sig(PKSig):
     
     def stringtoidentity(self, pk, strID):
         '''Hash the identity string and break it up in to l bit pieces'''
-        hash = self.sha1(Bytes(strID, 'utf-8'))
+        hash = self.sha1(strID)
         val = Conversion.OS2IP(hash) #Convert to integer format
         bstr = bin(val)[2:]   #cut out the 0b header
         
@@ -117,7 +117,7 @@ def main():
         print("msg => '%s'" % msg)
         print("sig => '%s'" % sig)
     
-    assert ibe.verify(pk, msg, sig)
+    assert ibe.verify(pk, msg, sig), "Failed verification!"
     if debug: print("Successful Verification!!! msg => '%s'" % msg)
 
 if __name__ == '__main__':

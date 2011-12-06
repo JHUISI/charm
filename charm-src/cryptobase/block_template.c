@@ -205,7 +205,7 @@ ALG_Encrypt(ALGobject *self, PyObject *args)
 		return NULL;
 	if (len==0)			/* Handle empty string */
 	{
-		return PyUnicode_FromStringAndSize(NULL, 0);
+		return PyString_FromStringAndSize(NULL, 0);
 	}
 	if ( (len % BLOCK_SIZE) !=0 && 
 	     (self->mode!=MODE_CFB) && (self->mode!=MODE_PGP) &&
@@ -397,7 +397,7 @@ ALG_Encrypt(ALGobject *self, PyObject *args)
 					free(buffer);
 					return NULL;
 				}
-				if (!PyUnicode_Check(ctr))
+				if (!PyString_Check(ctr))
 				{
 					PyErr_SetString(PyExc_TypeError,
 							"CTR counter function didn't return a string");
@@ -405,7 +405,7 @@ ALG_Encrypt(ALGobject *self, PyObject *args)
 					free(buffer);
 					return NULL;
 				}
-				if (PyUnicode_GET_SIZE(ctr) != BLOCK_SIZE) {
+				if (PyString_GET_SIZE(ctr) != BLOCK_SIZE) {
 					PyErr_Format(PyExc_TypeError,
 						     "CTR counter function returned "
 						     "string not of length %i",
@@ -415,7 +415,7 @@ ALG_Encrypt(ALGobject *self, PyObject *args)
 					return NULL;
 				}
 				Py_UNBLOCK_THREADS;
-				block_encrypt(&(self->st), (unsigned char *)PyBytes_AsString(PyUnicode_AsASCIIString(ctr)),
+				block_encrypt(&(self->st), (unsigned char *)PyString_AsString(ctr),
 					      self->IV);
 				Py_BLOCK_THREADS;
 				Py_DECREF(ctr);
@@ -437,7 +437,7 @@ ALG_Encrypt(ALGobject *self, PyObject *args)
 		return NULL;
 	}
 	Py_END_ALLOW_THREADS;
-	result=PyBytes_FromStringAndSize((char *) buffer, len);
+	result=PyString_FromStringAndSize((char *) buffer, len);
 	free(buffer);
 	return(result);
 }
@@ -464,11 +464,11 @@ ALG_Decrypt(ALGobject *self, PyObject *args)
 	if (self->mode == MODE_CTR)
 		return ALG_Encrypt(self, args);
 
-	if (!PyArg_ParseTuple(args, "y#", &str, &len))
+	if (!PyArg_ParseTuple(args, "s#", &str, &len))
 		return NULL;
 	if (len==0)			/* Handle empty string */
 	{
-		return PyUnicode_FromStringAndSize(NULL, 0);
+		return PyString_FromStringAndSize(NULL, 0);
 	}
 	if ( (len % BLOCK_SIZE) !=0 && 
 	     (self->mode!=MODE_CFB && self->mode!=MODE_PGP))
@@ -608,7 +608,7 @@ ALG_Decrypt(ALGobject *self, PyObject *args)
 		return NULL;
 	}
 	Py_END_ALLOW_THREADS;
-	result=PyBytes_FromStringAndSize((char *) buffer, len);
+	result=PyString_FromStringAndSize((char *) buffer, len);
 	free(buffer);
 	return(result);
 }

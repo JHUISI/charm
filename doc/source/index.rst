@@ -22,7 +22,6 @@ Developer Resources
 .. toctree::
    :maxdepth: 2
 
-   sample
    todo
 
 Indices and tables

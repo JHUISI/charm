@@ -49,7 +49,7 @@ def main():
     M = "hello world."
     sig = pksig.sign(pk, sk, M)
     
-    assert pksig.verify(pk, sig, M)
+    assert pksig.verify(pk, sig, M), "Failed verification!"
     if debug: print("Signature verified!!!!")
     
 if __name__ == "__main__":

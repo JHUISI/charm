@@ -1,4 +1,16 @@
-""" TODO: Description of Scheme here.
+""" 
+Jae Choon Cha and Jung Hee Cheon - Identity-based Signatures
+
+| From: "J. Cha and J. Choen - An identity-based signature from gap Diffie-Hellman groups."
+| Published in: PKC 2003
+| Available from: Vol. 2567. LNCS, pages 18-30
+| Notes: 
+
+* type:           signature (ID-based)
+* setting:        bilinear groups (asymmetric)
+
+:Authors:    J. Ayo Akinyele
+:Date:       11/2011
 """
 from charm.pairing import *
 from toolbox.PKSig import PKSig
@@ -27,38 +39,43 @@ class CHCH(PKSig):
         return (pk, sk)
     
     def sign(self, pk, sk, M):
-        print("sign...")
+        if debug: print("sign...")
         s = group.random(ZR)
         S1 = pk ** s
         a = H2(M, S1)
         S2 = sk ** (s + a)
-        return (S1, S2)
+        return {'S1':S1, 'S2':S2}
     
     def verify(self, mpk, pk, M, sig):
-        print("verify...")
-        (S1, S2) = sig
+        if debug: print("verify...")
+        (S1, S2) = sig['S1'], sig['S2']
         a = H2(M, S1)
         if pair(S2, mpk['g2']) == pair(S1 * (pk ** a), mpk['P']): 
             return True
         return False
 
-if __name__ == "__main__":
-   
+def main():
    groupObj = pairing('../param/a.param')
    chch = CHCH(groupObj)
    (mpk, msk) = chch.setup()
 
    _id = "janedoe@email.com"
    (pk, sk) = chch.keygen(msk, _id)  
-   print("Keygen...")
-   print("pk =>", pk)
-   print("sk =>", sk)
+   if debug:
+    print("Keygen...")
+    print("pk =>", pk)
+    print("sk =>", sk)
  
    M = "this is a message!" 
    sig = chch.sign(pk, sk, M)
-   print("Signature...")
-   print("sig =>", sig)
+   if debug:
+    print("Signature...")
+    print("sig =>", sig)
 
    assert chch.verify(mpk, pk, M, sig), "invalid signature!"
-   print("Verification successful!")
+   if debug: print("Verification successful!")
+
+if __name__ == "__main__":
+    debug = True
+    main()
    

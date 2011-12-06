@@ -1,0 +1,23 @@
+N := 100
+l := 5
+
+BEGIN :: types
+r := ZR
+mpk1 := G2
+mpk0 := G2
+S := G1
+u := G1
+pk := G1
+sk := G1
+END :: types
+
+BEGIN :: precompute
+h := H(M | L | u, ZR)
+S := sk^(h + r)
+END :: precompute
+
+BEGIN :: constant
+mpk0, mpk1
+END :: constant
+
+verify := { e((prod{i:=1, l} on (u_i * (pk_i^h_i))) , mpk0) == e(S, mpk1) }

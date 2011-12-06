@@ -4,6 +4,12 @@ class ECGroup():
     def __init__(self, builtin_cv):
         self.elem = ecc(nid=builtin_cv)
         self._verbose = True
+
+    def order(self):
+        return self.elem.order()
+
+    def bitsize(self):
+        return self.elem.bitsize()
     
     def paramgen(self, secparam):
         return None

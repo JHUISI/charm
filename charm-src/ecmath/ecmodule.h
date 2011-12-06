@@ -26,7 +26,7 @@
 #define PROFILE_STOP
 #endif
 
-//#define DEBUG
+//#define DEBUG	1
 #define TRUE	1
 #define FALSE	0
 #define BYTE	8
@@ -37,6 +37,7 @@
 #define HASH_FUNCTION_STR_TO_ZR_CRH		1
 #define HASH_FUNCTION_KEM_DERIVE		2
 #define HASH_LEN	20
+#define RESERVED_ENCODING_BYTES			2
 
 #ifdef DEBUG
 #define debug(...)	printf("DEBUG: "__VA_ARGS__)
@@ -48,7 +49,7 @@ PyTypeObject ECType;
 static PyObject *PyECErrorObject;
 static Benchmark *dBench;
 #define PyEC_Check(obj) PyObject_TypeCheck(obj, &ECType)
-enum Group {G = 0, ZR, NONE_G};
+enum Group {ZR = 0, G, NONE_G};
 typedef enum Group GroupType;
 
 PyMethodDef ECElement_methods[];
@@ -65,24 +66,35 @@ typedef struct {
 	int point_init, group_init, nid;
 } ECElement;
 
+#if PY_MAJOR_VERSION >= 3
+#define PyLong_ToUnsignedLong(o) PyLong_AsUnsignedLong(o)
+#define PyLongCheck(o) PyLong_Check(o)
+#else
+#define PyLong_ToUnsignedLong(o) PyInt_AsUnsignedLongMask(o)
+#define PyLongCheck(o) PyInt_Check(o) || PyLong_Check(o)
+#endif
+
+#define ErrorMsg(msg) \
+	PyErr_SetString(PyECErrorObject, msg); \
+	return NULL;
+
 #define Check_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS)  \
 	if(PyEC_Check(o1)) { \
 		lhs = (ECElement *) o1; \
 		debug("found a lhs object.\n"); \
     } \
-	else if(PyLong_Check(o1)) { \
-		foundLHS = TRUE;  } \
-							\
+	else if(PyLongCheck(o1)) { \
+		foundLHS = TRUE;  }		\
+	else  {  ErrorMsg("invalid type specified.");   \
+		}				\
 	if(PyEC_Check(o2)) {  \
 		rhs = (ECElement *) o2; \
 		debug("found a rhs object.\n"); \
     } \
-	else if(PyLong_Check(o2)) {  \
-		foundRHS = TRUE; }
-
-#define ErrorMsg(msg) \
-	PyErr_SetString(PyECErrorObject, msg); \
-	return NULL;
+	else if(PyLongCheck(o2)) {  \
+		foundRHS = TRUE; }		\
+	else  {  ErrorMsg("invalid type specified.");   \
+		}
 
 #define Group_NULL(obj) if(obj->group == NULL) {  \
 	PyErr_SetString(PyECErrorObject, "group object not allocated."); \

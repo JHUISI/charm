@@ -48,11 +48,11 @@ build-pyparse:
 	   ${wget} ${pyparse_url}; \
 	   tar -zxf ${pyparse_version}.tar.gz -C ${dest_build}; \
 	   cd ${dest_build}/${pyparse_version}; \
-	   ${PYTHON} setup.py install ${PYTHONFLAGS}; \
+	   ${PYTHON} setup.py install ${PYTHONFLAGS} ${PYTHONBUILDEXT}; \
 	else \
 	   tar -zxf ${pyparse_version}.tar.gz -C ${dest_build}; \
 	   cd ${dest_build}/${pyparse_version}; \
-	   ${PYTHON} setup.py install ${PYTHONFLAGS}; \
+	   ${PYTHON} setup.py install ${PYTHONFLAGS} ${PYTHONBUILDEXT}; \
 	fi
 	set +x
 	sed "s/PYPARSING=no/PYPARSING=yes/g" ${CONFIG} > ${CONFIG}.new; mv ${CONFIG}.new ${CONFIG} 
@@ -106,7 +106,7 @@ deps: build-gmp build-pbc
 .PHONY: build
 build: setup build-gmp build-pbc build-pyparse
 	@echo "Building the Charm Framework"
-	${PYTHON} setup.py build ${PYTHONFLAGS}
+	${PYTHON} setup.py build ${PYTHONFLAGS} ${PYTHONBUILDEXT}
 	@echo "Complete"
 
 .PHONY: source

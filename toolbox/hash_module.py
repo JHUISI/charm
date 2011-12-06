@@ -1,3 +1,4 @@
+from __future__ import print_function
 import charm.cryptobase
 from charm.pairing import *
 from charm.integer import *
@@ -16,27 +17,27 @@ class Hash():
             #print "digest => %s" % h.hexdigest()
             # get raw bytes of digest and hash to Zr
             val = h.digest()
-            return integer(int(self.e.H(val, ZR)))
+            return integer(int(unicode(self.e.H(val, ZR))))
             # do something related to that
         if type(value) == integer:
             str_value = int2Bytes(value)
-            return integer(int(self.e.H(str_value, ZR)))
+            return integer(int(unicode(self.e.H(str_value, ZR))))
         return None
     
     # takes two arbitrary strings and hashes to an element of Zr
     def hashToZr(self, *args):
         if isinstance(args, tuple):
             #print("Hashing =>", args)
-            strs = ""
+            strs = unicode("")
             for i in args:
-                if type(i) == str:
-                    strs += str(base64.encodebytes(bytes(i, 'utf8')))
+                if type(i) == unicode:
+                    strs += unicode(base64.encodestring(i))
                 elif type(i) == bytes:
-                    strs += str(base64.encodebytes(i))
+                    strs += unicode(base64.encodestring(i))
                 elif type(i) == integer:
-                    strs += str(base64.encodebytes(int2Bytes(i)))
+                    strs += unicode(base64.encodestring(int2Bytes(i)))
                 elif type(i) == pairing:
-                    strs += str(base64.encodebytes(self.e.serialize(i)))
+                    strs += unicode(base64.encodestring(self.e.serialize(i)))
 
             if len(strs) > 0:
                 return self.e.H(strs, ZR)

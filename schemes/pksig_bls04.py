@@ -9,8 +9,8 @@ Boneh-Lynn-Shacham Identity Based Signature
 * type:           signature (identity-based)
 * setting:        bilinear groups (asymmetric)
 
-:Authors:    Joseph Ayo Akinyele
-:Date:            1/2011
+:Authors:    J. Ayo Akinyele
+:Date:       1/2011
  '''
 from toolbox.pairinggroup import *
 from charm.engine.util import *
@@ -56,7 +56,7 @@ def main():
     
     if debug: print("Message: '%s'" % m)
     if debug: print("Signature: '%s'" % sig)     
-    assert bls.verify(pk, sig, m)
+    assert bls.verify(pk, sig, m), "Failure!!!"
     if debug: print('SUCCESS!!!')
     
 if __name__ == "__main__":

@@ -105,7 +105,7 @@ cc_i386=i386-pc-linux-gnu-gcc
 # Always add --enable-foo and --disable-foo command line args.
 # Distributions want to ensure that several features are compiled in, and it
 # is impossible without a --enable-foo that exits if a feature is not found.
-docs=""
+docs="no"
 sphinx_build="$(which sphinx-build)"
 integer_module="yes"
 ecc_module="yes"
@@ -128,9 +128,15 @@ libdir="\${prefix}/lib"
 sysconfdir="\${prefix}/etc"
 confsuffix="/charm"
 profiler="no"
-python_path=`which python`
+python_path="$(which python)"
 wget="$(which wget)"
 
+#fall back to python if for some reason python3 does not exist 
+# there is still a version check later so it sitll has to be
+# python 3 
+#if !  [ -n "$python_path"  ]; then
+#   python_path="$(which python)"
+#fi 
 # set -x
 
 # parse CC options first
@@ -150,6 +156,8 @@ for opt do
   --extra-ldflags=*) LDFLAGS="$optarg $LDFLAGS"
   ;;
   --extra-cppflags=*) CPPFLAGS="$optarg $CPPFLAGS"
+  ;;
+  --python-build-ext=*) PYTHONBUILDEXT="$optarg" 
   esac
 done
 # OS specific
@@ -300,6 +308,10 @@ for opt do
   ;;
   --extra-ldflags=*)
   ;;
+  --extra-cppflags=*)
+  ;;
+  --python-build-ext=*)
+  ;;
   --cpu=*)
   ;;
   --enable-gprof) gprof="yes"
@@ -327,9 +339,9 @@ for opt do
   --disable-pairing) pairing_module="no"
   ;;
   --enable-pairing-miracl) 
-    echo "pairing module using MIRACL not supported yet."
-  	#pairing_miracl="yes" ;
-  	#pairing_pbc="no"
+    echo "Enabling this option assumes you have unzipped the MIRACL library into charm-src/pairingmath/miracl/ and make sure the library is built in that directory."
+  	pairing_pbc="no"
+  	pairing_miracl="yes" ;
   ;;	
   --enable-pairing-pbc)
     pairing_pbc="yes" ;
@@ -364,7 +376,7 @@ for opt do
   ;;
   --python=*) python_path="$optarg"
   ;;
-  --build-win-exe) LDFLAGS="-L/c/charm-crypto/lib $LDFLAGS" CPPFLAGS="-I/c/charm-crypto/include -I/c/charm-crypto/include/openssl/ $CPPFLAGS" prefix="/c/charm-crypto" PYTHONFLAGS="build_ext -L/c/charm-crypto/lib -I/c/charm-crypto/include/"
+  --build-win-exe) LDFLAGS="-L/c/charm-crypto/lib $LDFLAGS" CPPFLAGS="-I/c/charm-crypto/include -I/c/charm-crypto/include/openssl/ $CPPFLAGS" prefix="/c/charm-crypto" PYTHONBUILDEXT="-L/c/charm-crypto/lib -I/c/charm-crypto/include/"
   ;;
   --*dir)
   ;;
@@ -407,17 +419,18 @@ EOF
 echo "Standard options:"
 echo "  --help                   print this message"
 echo "  --prefix=PREFIX          install in PREFIX [$prefix]"
+echo ""
 echo "Advanced options:"
 echo "  --source-path=PATH       path of source code [$source_path]"
 echo "  --cross-prefix=PREFIX    use PREFIX for compile tools [$cross_prefix]"
 echo "  --cc=CC                  use C compiler CC [$cc]"
-echo "  --host-cc=CC             use C compiler CC [$host_cc] for code run at"
-echo "                           build time"
+echo "  --host-cc=CC             use C compiler CC [$host_cc] for code run at build time"
 echo "  --extra-cflags=CFLAGS    append extra C compiler flags CHARM_CFLAGS"
 echo "  --extra-ldflags=LDFLAGS  append extra linker flags LDFLAGS"
-echo "  --extra-cppflags=CPPFLAGS append extra preprocessor flasg CPPFLAGS"
+echo "  --extra-cppflags=CPPFLAG append extra c pre-processor flags CPPFLAGS"
 echo "  --make=MAKE              use specified make [$make]"
 echo "  --python=PATH            use specified path to python 3, if not standard"
+echo "  --python-build-ext=OPTS  append extra python build_ext options OPTS"
 echo "  --install=INSTALL        use specified install [$install]"
 echo "  --static                 enable static build [$static]"
 echo "  --mandir=PATH            install man pages in PATH"
@@ -437,7 +450,7 @@ echo "  --disable-werror         disable compilation abort on warning"
 echo "  --enable-cocoa           enable COCOA (Mac OS X only)"
 echo "  --enable-docs            enable documentation build"
 echo "  --disable-docs           disable documentation build"
-echo "	--sphinx-build=PATH      overide the defualt sphinx-build which is \`which sphinx-build\`"       
+echo "  --sphinx-build=PATH      overide the default sphinx-build which is \`which sphinx-build\`"       
 echo ""
 echo "NOTE: The object files are built at the place where configure is launched"
 exit 1
@@ -550,14 +563,14 @@ fi
 #fi
 
 ##########################################
-# python 2.7 or 3 probe
+# python3 probe
 cat > $TMPC << EOF
 import sys
 
 if sys.hexversion >= int(0x2070000):
    exit(0)
 else:
-   print("Need Python 2.7 or 3.x. Specify --python=/path/to/pythonX")
+   print("Need Python 2.7. Specify --python=/path/to/python")
    exit(-1)
 EOF
 python3_found="no"
@@ -682,7 +695,7 @@ echo "CHARM_CFLAGS       $CHARM_CFLAGS"
 echo "LDFLAGS           $LDFLAGS"
 echo "make              $make"
 echo "python            $python_path"
-echo "pythonv2.7 or 3   $python3_found"
+echo "build_ext options build_ext $PYTHONBUILDEXT"
 echo "install           $install"
 echo "host CPU          $cpu"
 echo "wget              $wget"
@@ -698,12 +711,14 @@ echo "libm found        $libm_found"
 echo "libgmp found      $libgmp_found"
 echo "libpbc found      $libpbc_found"
 echo "libcrypto found   $libcrypto_found"
-echo "sphinx path       $sphinx_"
-
 #if test "$darwin" = "yes" ; then
 #    echo "Cocoa support     $cocoa"
 #fi
 echo "Documentation     $docs"
+if test "$docs" = "yes" ; then
+    echo "sphinx path       $sphinx_build"
+fi
+
 [ ! -z "$uname_release" ] && \
 echo "uname -r          $uname_release"
 
@@ -819,7 +834,6 @@ if test "$docs" = "yes" ; then
     echo "ERROR: sphinx-build not found"
     exit -1 
   fi
-  mkdir -p docs;
 fi
 if test "$python3_found" = "no" ; then
    echo "ERROR: python 3 not found."
@@ -836,10 +850,10 @@ echo "PAIR_MOD=$pairing_module" >> $config_mk
 if test "$pairing_pbc" = "yes" ; then
 	echo "USE_PBC=$pairing_pbc" >> $config_mk
 	echo "USE_GMP=$pairing_pbc" >> $config_mk
-    echo "USE_MIRACL=" >> $config_mk
+    echo "USE_MIRACL=no" >> $config_mk
 elif test "$pairing_miracl" = "yes" ; then
     echo "USE_MIRACL=$pairing_miracl" >> $config_mk
-    echo "USE_PBC=" >> $config_mk
+    echo "USE_PBC=no" >> $config_mk
 fi
 
 if test "$wget" = "" ; then
@@ -856,8 +870,18 @@ if test "$wget" = "" ; then
 fi
 
 if [ "$targetos" = "MINGW32" ] ; then
-	echo "PYTHONFLAGS=--compile=mingw32 $PYTHONFLAGS" >> $config_mk
+	echo "PYTHONFLAGS=--compile=mingw32" >> $config_mk
 	echo "OSFLAGS=--disable-static --enable-shared $OSFLAGS" >> $config_mk
+fi
+
+# For python installers on OS X.
+test_path=`echo $python_path | awk 'BEGIN {FS="."}{print $1}'`
+if [ "$test_path" = "/Library/Frameworks/Python" ] ; then
+    echo "PYTHONBUILDEXT=-L/usr/local/lib -I/usr/local/include $PYTHONBUILDEXT" >> $config_mk
+fi
+
+if [ "$PYTHONBUILDEXT" != "" ] ; then
+    echo "PYTHONBUILDEXT=build_ext $PYTHONBUILDEXT" >> $config_mk
 fi
 
 if test "$libm_found" = "no" ; then

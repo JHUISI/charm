@@ -1,0 +1,26 @@
+
+N := 100
+l := 5
+
+BEGIN :: types
+sig := G1
+M := str
+pk := G2
+g2 := G2
+M1 := G1
+END :: types
+
+BEGIN :: constant
+g2, pkag, pk
+END :: constant
+
+# M_i is a list of messages (TODO)
+BEGIN :: precompute
+M1 := { for{i:=1,l} do H(M_i, G1) } 
+END :: precompute
+
+BEGIN :: transform
+2, 3, 4
+END :: transform
+
+verify := { e(sig, g2) == e(M1, pkag) * (prod{i:=1,l} on e(H(M_i, G1), pk_i)) }

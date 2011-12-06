@@ -3,11 +3,13 @@
 import random, string
 # Works for ElGamal and CS98 schemes
 #from ec_cs98_enc import *
+from toolbox.AuthenticatedCryptoAbstraction import AuthenticatedCryptoAbstraction
 from schemes.pkenc_elgamal85 import *
 from toolbox.PKEnc import PKEnc
 from charm.cryptobase import *
 from math import ceil
-
+from os import urandom
+import base64
 debug = False
 # Adapter class for Hybrid Encryption Schemes
 class HybridEnc(PKEnc):
@@ -29,13 +31,12 @@ class HybridEnc(PKEnc):
     
     def encrypt(self, pk, M):
         # generate a short session key, K and encrypt using pkenc
-        key = self.randomBits()
+        key = urandom(self.key_len)
         # encrypt session key using PKEnc
         c1 = self.pkenc.encrypt(pk, key)
         # use symmetric key encryption to enc actual message
-        iv  = '6543210987654321' # static IV (for testing)    
-        prp = selectPRP(self.alg, (key, MODE_CBC, iv))
-        c2 = prp.encrypt(self.pad(M))
+        cipher = AuthenticatedCryptoAbstraction(key)
+        c2 = cipher.encrypt(M)
         if debug: print("Ciphertext 2...")
         if debug: print(c2)
         return { 'c1':c1, 'c2':c2 }
@@ -44,28 +45,11 @@ class HybridEnc(PKEnc):
         c1, c2 = ct['c1'], ct['c2']
         key = self.pkenc.decrypt(pk, sk, c1)[:self.key_len]
         if debug: print("Rec key =>", key,", len =", len(key))
-        iv  = '6543210987654321' # static IV (for testing)    
-        prp = selectPRP(self.alg, (key, MODE_CBC, iv))
-        msg = prp.decrypt(c2)
+        cipher = AuthenticatedCryptoAbstraction(key)
+        msg = cipher.decrypt(c2)
         if debug: print("Rec msg =>", msg)
-        return msg.decode('utf8').strip('\x00')
+        return msg
     
-    def pad(self, message):
-        # calculate the ceiling of
-        msg_len = ceil(len(message) / self.key_len) * self.key_len 
-        extra = msg_len - len(message)
-        # append 'extra' bytes to message
-        for i in range(0, extra):
-            message += '\x00'
-        return message
-    
-    def randomBits(self):
-        bits = random.sample(string.printable, self.key_len)
-        rand = ""
-        for i in bits:
-            rand += i
-        return rand
-
 def main():
     #    pkenc = EC_CS98(409)
     pkenc = ElGamal(ecc, 409)
@@ -76,8 +60,7 @@ def main():
     m = 'this is a new message'
     cipher = hyenc.encrypt(pk, m)
     orig_m = hyenc.decrypt(pk, sk, cipher)
-   
-    assert m == orig_m
+    assert m == orig_m, "Failed Decryption"
     if debug: print("Successful Decryption!!")
 
 if __name__ == "__main__":

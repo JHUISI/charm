@@ -10,9 +10,9 @@ Hohenberger-Waters Stateful Signatures (RSA-based)
  * setting:      RSA
  * assumption:   RSA
 
-:Author:    J Ayo Akinyele
-:Date:      1/2011
-:Status:    BROKEN at the moment
+:Author:    J Ayo Akinyele/Christina Garman
+:Date:      12/2011
+:Status:    Needs Improvement.
 """
 
 from charm.integer import *
@@ -20,17 +20,20 @@ from toolbox.PKSig import PKSig
 from chamhash_rsa_hw09 import ChamHash_HW09
 from toolbox.conversion import Conversion
 from toolbox.bitstring import Bytes
+from toolbox.specialprimes import BlumWilliamsInteger
 import hmac, hashlib, math
 
-def SHA1(bytes):
+debug = False
+
+def SHA1(bytes1):
   s1 = hashlib.new('sha1')
-  s1.update(bytes)
+  s1.update(bytes1)
   return s1.digest()
 
 
 def randomQR(n):
     return random(n) ** 2
-
+    
 class LogFunction:
   def __init__(self, base=10):
     self.base = base
@@ -51,18 +54,14 @@ class Prf:
     return integer(randomBits(bits))
 
   @classmethod  
-  def eval(self, k, input, outputLen):
-    if outputLen%8 != 0:
-       return False
+  def eval(self, k, input1): 
     if type(k) == integer:
         h = hmac.new(serialize(k), b'', hashlib.sha1)
     else:
         h = hmac.new(serialize(integer(k)), b'', hashlib.sha1)
-    h.update(input)
-    seed = Conversion.bytes2integer(h.hexdigest())
-
-    #print("Prf result =>", seed)
-    return seed
+    
+    h.update(input1)
+    return Conversion.bytes2integer(h.hexdigest())
 
 class BlumIntegerSquareRoot:
   def __init__(self, p, q):
@@ -71,7 +70,6 @@ class BlumIntegerSquareRoot:
     self.q = q
     
   def pow(self, modularInt):
-    # TODO: Verify that this is a blum integer!!!!!!!
     p, q = self.p, self.q
     result = integer(modularInt) % (p * q)
     for repeat in range(self.raisedToThePower):
@@ -85,13 +83,13 @@ class BlumIntegerSquareRoot:
 
 class Sig_RSA_Stateless_HW09(PKSig):
     def __init__(self, CH = ChamHash_HW09):
-#        self.state = 0
+        self.BWInt = BlumWilliamsInteger()
         self.Prf = Prf()
         self.ChameleonHash = CH()
         
     def keygen(self, keyLength=1024):
         # Generate a Blum-Williams integer N of 'key_length' bits with factorization p,q
-        (p, q) = randomPrime(keyLength), randomPrime(keyLength)
+        (p, q) = self.BWInt.generatePrimes(int(keyLength/2))
         # Generate random u,h \in QR_N and a random c \in {0,1}^|N|
         N = p * q
         u = randomQR(N)
@@ -110,72 +108,69 @@ class Sig_RSA_Stateless_HW09(PKSig):
         return (pk, sk);
     
     def sign(self, pk, sk, message, s=0):
+        if debug: print("Sign...")
         L, K, c, keyLength, u, h, N = pk['L'], pk['K'], pk['c'], pk['length'], pk['u'], pk['h'], pk['N']
         p, q = sk['p'], sk['q']
         # Use internal state counter if none was provided
         if (s == 0):
           s = self.state
           self.state += 1
+          s += 1
 
         # Hash the message using the chameleon hash under params L to obtain (x, r)
         (x, r) = self.ChameleonHash.hash(L, message);
-        print("x =>", x)
-        print("r =>", r)
         # Compute e = H_k(s) and check whether it's prime. If not, increment s and repeat.
-        e = self.HW_hash(K, c, s, keyLength)
-        
         phi_N = (p-1)*(q-1)
-        while not (isPrime(e)): # and isPrime(integer(e, (p-1)*(q-1))
+        e = self.HW_hash(K, c, s, keyLength)
+        e1 = e % phi_N
+        e2 = e % N
+        
+        while (not (isPrime(e2))) or (not gcd(e1, phi_N) == 1):
             s += 1
             e = self.HW_hash(K, c, s, keyLength)
-            e = e % phi_N
-#        e = e % phi_N
-        print("sign: e =>", e)
-    
+            e1 = e % phi_N
+            e2 = e % N
+        e = e1
+
         # Compute B = SQRT(u^x * h)^ceil(log_2(s)) mod N
         # Note that SQRT requires the factorization p, q
-        result = (BlumIntegerSquareRoot(p, q) ** (math.ceil(log[2](s))))
-        print("bum-wil result =>", result)
-        B = ((u ** x) * h) ** result
-        # sigma1 = B^{1/e}
-        sigma1 = (B ** (e ** -1))
-    
+        temp = ((u ** x) * h) % N
+        power = ((((p-1)*(q-1))+4)/8) ** int(math.ceil(log[2](s)))
+        B = temp ** power
+        sigma1 = (B ** (e ** -1)) % N
+
         # Update internal state counter and return sig = (sigma1, r, s)
         self.state = s
-        return { 'sigma1': sigma1, 'r': r, 's': s, 'e':e }
+        return { 'sigma1':sigma1, 'r': r, 's': s, 'e':e }
 
 
     def verify(self, pk, message, sig):
-        print("\nVERIFY\n\n")
+        if debug: print("\nVERIFY\n\n")
         sigma1, r, s, e = sig['sigma1'], sig['r'], sig['s'], sig['e']
         K, L, c, keyLength, u, h, N = pk['K'], pk['L'], pk['c'], pk['length'], pk['u'], pk['h'], pk['N']
     
         # Make sure that 0 < s < 2^{keylength/2}, else reject the signature
-        if not (0 < s and s < (2 ** (keyLength/2))):
+        if not (0 < s and s < (2 ** int(keyLength/2))):
             return False
-      
-        # Compute Y = sigma1^{2*ceil(log2(s))}
-        s1 = integer(2 ** math.ceil(math.log(s,2)))
-        print("s1 =>", s1)
-        Y = sigma1 ** s1
-        print("Y =>", Y)
-        # Hash the mesage using the chameleon hash with fixed randomness r
-        (x, r) = self.ChameleonHash.hash(L, message, r)
-        print("x =>", x)
-        print("r =>", r)
-        # Compute e = H_k(s) and reject the signature if it's not prime
-        #e = self.HW_hash(K, c, s, keyLength)
 
-        print("verify: e =>", e)
-        if not isPrime(e):
+        # Compute e = H_k(s) and reject the signature if it's not prime
+        ei = self.HW_hash(K, c, s, keyLength) % N
+        if not isPrime(ei):
+            if debug: print("ei not prime")
             return False
-    
-        print("Final check")
-        print()
-        lhs = (Y ** e) % N
-        print("lhs =>", lhs)
+        
+        # Compute Y = sigma1^{2*ceil(log2(s))}
+        s1 = integer(2 ** int(math.ceil(log[2](s))))
+        Y = (sigma1 ** s1) % N
+        
+        # Hash the mesage using the chameleon hash with fixed randomness r
+        (x, r2) = self.ChameleonHash.hash(L, message, r)
+
+        lhs = (Y ** ei) % N
         rhs = ((u ** x) * h) % N
-        print("rhs =>", rhs)
+        if debug:
+            print("lhs =>", lhs)
+            print("rhs =>", rhs)
         # Verify that Y^e = (u^x h) mod N.  If so, accept the signature
         if lhs == rhs:
             return True
@@ -183,32 +178,38 @@ class Sig_RSA_Stateless_HW09(PKSig):
         return False
     
     def HW_hash(self, key, c, input, keyLen):
+        C = integer(c)
+        input_size = bitsize(c)
+        input_b = Conversion.IP2OS(input, input_size)
         # Return c XOR PRF(k, input), where the output of PRF is keyLength bits
-        if type(input) != str:
-            input_temp = input
-            input_s = ''
-            while input_temp > 0:
-                input_s = chr(input_temp & 0xff) + input_s
-                input_temp = input_temp >> 8
-            input_b = Bytes(input_s, 'utf8')
-        else: 
-            assert False, "Invalid input: need an integer."
-        result = integer(c) ^ self.Prf.eval(key, input_b, keyLen)
-        #print("HW_hash =>", result)
+        result = C ^ self.Prf.eval(key, input_b)
         return result
-
-if __name__ == "__main__":
+        
+def main():
     pksig = Sig_RSA_Stateless_HW09() 
 
     (pk, sk) = pksig.keygen(1024)
-    print("Public parameters...")
-    print("pk =>", pk)
-    print("sk =>", sk)
+    if debug:
+        print("Public parameters...")
+        print("pk =>", pk)
+        print("sk =>", sk)
     
     m = SHA1(b'this is the message I want to hash.')
+    m2 = SHA1(b'please sign this message too!')
+    #m = b'This is a message to hash'
     sig = pksig.sign(pk, sk, m)
-    print("Signature...")
-    print("sig =>", sig)
+    if debug:
+        print("Signature...")
+        print("sig =>", sig)
+    sig2 = pksig.sign(pk, sk, m2)
+    if debug:
+        print("Signature 2...")
+        print("sig2 =>", sig2)
     
     assert pksig.verify(pk, m, sig), "FAILED VERIFICATION!!!"
-    print("Successful Verification!!!")
+    assert pksig.verify(pk, m2, sig2), "FAILED VERIFICATION!!!"
+    if debug: print("Successful Verification!!!")
+
+if __name__ == "__main__":
+    debug = True
+    main()   
