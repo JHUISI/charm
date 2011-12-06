@@ -116,6 +116,23 @@ This concludes the tutorial on a straightforward implementation of the Cramer-Sh
 
 Using a Scheme
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-This section is incomplete
+To use any of our existing schemes in your application, each scheme includes a main routine that runs through every alorithm (with sample inputs) defined for that scheme. Thus, the `main` function provides a test that the scheme works in addition to demonstrate how to use it. For example, below is an example of how to instantiate the Cramer-Shoup scheme from above within your application:
+
+::
+
+	from schemes.pkenc_cs98_ec.py import *
+	from toolbox.eccurve import prime192v1
+	
+	pkenc = EC_CS98(prime192v1)
+	
+	(pk, sk) = pkenc.keygen()
+
+	M = b'Hello World!'	
+	ciphertext = pkenc.encrypt(pk, M)    
+
+    	message = pkenc.decrypt(pk, sk, ciphertext)
+
+.. note::
+	To support serialization of key material and ciphertexts, we have provided a `serialize` and `deserialize` routine available in the `charm.engine.util` package. 	
 
 Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at support@charm-crypto.com. Thank you!
