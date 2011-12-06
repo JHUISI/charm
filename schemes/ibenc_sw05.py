@@ -1,7 +1,7 @@
 '''
 Sahai-Waters Fuzzy Identity-Based Encryption, Large Universe Construction
  
-| From: "A. Sahai, B. Waters Fuzy Identity-Based Encryption.
+| From: "A. Sahai, B. Waters Fuzzy Identity-Based Encryption.
 | Published in: Eurocrypt 2005
 | Available from: eprint.iacr.org/2004/086.pdf
 | Notes: Original construction (Section 4) and large universe construction (Section 6). 
