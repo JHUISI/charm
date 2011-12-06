@@ -23,7 +23,7 @@
 ; --------------------------------
 
 !define PRODUCT_NAME "charm-crypto"
-!define PRODUCT_VERSION "0.2"
+!define PRODUCT_VERSION "0.21"
 !define PRODUCT_PUBLISHER "Johns Hopkins University, HMS Lab"
 !define PRODUCT_WEB_SITE "http://charm-crypto.com/Main.html"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -107,8 +107,12 @@ Section # Install Charm Dependencies
   ;File "C:\charm-crypto\private"
   SetOutPath "$INSTDIR\share"
   File /r "C:\charm-crypto\share\"
-  ;SetOutPath "$INSTDIR\schemes"
-  ;File /r /x "C:\MinGW\msys\1.0\home\dev\charm-crypto\schemes\.svn\" "C:\MinGW\msys\1.0\home\dev\charm-crypto\schemes\"
+  SetOutPath "$INSTDIR\charm-usr\schemes"
+  File /r /x "C:\MinGW\msys\1.0\home\dev\charm-crypto\schemes\.svn\" "C:\MinGW\msys\1.0\home\dev\charm-crypto\schemes\"
+  SetOutPath "$INSTDIR\charm-usr\tests"
+  File /r /x "C:\MinGW\msys\1.0\home\dev\charm-crypto\tests\.svn\" "C:\MinGW\msys\1.0\home\dev\charm-crypto\tests\"
+  SetOutPath "$INSTDIR\charm-usr\param"
+  File /r /x "C:\MinGW\msys\1.0\home\dev\charm-crypto\param\.svn\" "C:\MinGW\msys\1.0\home\dev\charm-crypto\param\"
   SetOutPath "$INSTDIR"
   File "C:\charm-crypto\openssl.cnf"  
   ; Using EnvVarUpdate here:
@@ -120,6 +124,7 @@ Section # Install Charm Dependencies
   
   CreateDirectory "$SMPROGRAMS\charm-crypto"
   CreateShortCut "$SMPROGRAMS\charm-crypto\uninstall.lnk" "$INSTDIR\uninst.exe"
+  CreateShortCut "$SMPROGRAMS\charm-crypto\charm-usr.lnk" "$INSTDIR\charm-usr"
 SectionEnd
 
 Section /o "" python32_detected
@@ -128,8 +133,8 @@ Section /o "" python32_detected
   File /r "C:\Python32\Lib\site-packages\charm\"
   SetOutPath "$Python32Dir\compiler"
   File /r "C:\Python32\Lib\site-packages\compiler\"
-  SetOutPath "$Python32Dir\schemes"
-  File /r "C:\Python32\Lib\site-packages\schemes\"
+  ;SetOutPath "$Python32Dir\schemes"
+  ;File /r "C:\Python32\Lib\site-packages\schemes\"
   SetOutPath "$Python32Dir\toolbox"
   File /r "C:\Python32\Lib\site-packages\toolbox\"
   SetOutPath "$Python32Dir"
@@ -137,7 +142,7 @@ Section /o "" python32_detected
   ; CHANGEME on every new release.
   File "C:\Python32\Lib\site-packages\Charm_Crypto-0.2-py3.2.egg-info"
   ;CreateShortcut "$SMPROGRAMS\charm-crypto\schemes-py32.lnk" "$windir\explorer.exe" '/e,"$Python32Dir\schemes"'
-  CreateShortCut "$SMPROGRAMS\charm-crypto\schemes-py32.lnk" "$Python32Dir\schemes"
+  ;CreateShortCut "$SMPROGRAMS\charm-crypto\schemes-py32.lnk" "$Python32Dir\schemes"
 SectionEnd
 
 Section /o "" python27_detected
@@ -146,8 +151,8 @@ Section /o "" python27_detected
   File /r "C:\Python27\Lib\site-packages\charm\"
   SetOutPath "$Python27Dir\compiler"
   File /r "C:\Python27\Lib\site-packages\compiler\"
-  SetOutPath "$Python27Dir\schemes"
-  File /r "C:\Python27\Lib\site-packages\schemes\"
+  ;SetOutPath "$Python27Dir\schemes"
+  ;File /r "C:\Python27\Lib\site-packages\schemes\"
   SetOutPath "$Python27Dir\toolbox"
   File /r "C:\Python27\Lib\site-packages\toolbox\"
   SetOutPath "$Python27Dir"
@@ -155,7 +160,7 @@ Section /o "" python27_detected
   ; CHANGEME on every new release.
   File "C:\Python27\Lib\site-packages\Charm_Crypto-0.2-py2.7.egg-info"
   ;CreateShortcut "$SMPROGRAMS\charm-crypto\schemes-py27.lnk" "$windir\explorer.exe" '/e,"$Python27Dir\schemes"'
-  CreateShortCut "$SMPROGRAMS\charm-crypto\schemes-py27.lnk" "$Python27Dir\schemes"  
+  ;CreateShortCut "$SMPROGRAMS\charm-crypto\schemes-py27.lnk" "$Python27Dir\schemes"  
 SectionEnd
 
 Section -AdditionalIcons
@@ -284,19 +289,19 @@ Section Uninstall
   hasPython32:
       RMDir /r "$8$9\charm\"
 	  RMDir /r "$8$9\compiler\"
-	  RMDir /r "$8$9\schemes\"
+	  ;RMDir /r "$8$9\schemes\"
 	  RMDir /r "$8$9\toolbox\"
       Delete "$8$9\Charm_Crypto-0.2-py3.2.egg-info"
-      Delete "$SMPROGRAMS\charm-crypto\schemes-py32.lnk" 	  
+      ;Delete "$SMPROGRAMS\charm-crypto\schemes-py32.lnk" 	  
 	  ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\3.2\InstallPath" ""
 	  StrCmp $8 "" done hasPython27
   hasPython27:
       RMDir /r "$8$9\charm\"
 	  RMDir /r "$8$9\compiler\"
-	  RMDir /r "$8$9\schemes\"
+	  ;RMDir /r "$8$9\schemes\"
 	  RMDir /r "$8$9\toolbox\"  
       Delete "$8$9\Charm_Crypto-0.2-py2.7.egg-info"
-	  Delete "$SMPROGRAMS\charm-crypto\schemes-py27.lnk"
+	  ;Delete "$SMPROGRAMS\charm-crypto\schemes-py27.lnk"
   done:
       ;Don't do anything when done.
   
