@@ -12,6 +12,7 @@ Hohenberger-Waters Stateful Signatures (RSA-based)
 
 :Author:    J Ayo Akinyele/Christina Garman
 :Date:      12/2011
+:Status:    Needs Improvement.
 """
 
 from charm.integer import *
@@ -60,9 +61,7 @@ class Prf:
         h = hmac.new(serialize(integer(k)), b'', hashlib.sha1)
     
     h.update(input1)
-    seed = Conversion.bytes2integer(h.hexdigest())
-    #print("Prf result =>", seed)
-    return seed
+    return Conversion.bytes2integer(h.hexdigest())
 
 class BlumIntegerSquareRoot:
   def __init__(self, p, q):
@@ -71,7 +70,6 @@ class BlumIntegerSquareRoot:
     self.q = q
     
   def pow(self, modularInt):
-    # TODO: Verify that this is a blum integer!!!!!!!
     p, q = self.p, self.q
     result = integer(modularInt) % (p * q)
     for repeat in range(self.raisedToThePower):
@@ -85,7 +83,6 @@ class BlumIntegerSquareRoot:
 
 class Sig_RSA_Stateless_HW09(PKSig):
     def __init__(self, CH = ChamHash_HW09):
-#        self.state = 0
         self.BWInt = BlumWilliamsInteger()
         self.Prf = Prf()
         self.ChameleonHash = CH()
@@ -184,14 +181,9 @@ class Sig_RSA_Stateless_HW09(PKSig):
         C = integer(c)
         input_size = bitsize(c)
         input_b = Conversion.IP2OS(input, input_size)
-#        print("input :=", input, "\n\n\n")
-#        print("input_b :=", input_b, type(input_b))
         # Return c XOR PRF(k, input), where the output of PRF is keyLength bits
         result = C ^ self.Prf.eval(key, input_b)
         return result
-
-#        result = integer(c) ^ self.Prf.eval(key, input_b, keyLen)
-#        return result
         
 def main():
     pksig = Sig_RSA_Stateless_HW09() 

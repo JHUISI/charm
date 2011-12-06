@@ -15,13 +15,15 @@ Demonstration Schemes
    schemes/commit_pedersen92
    schemes/dabe_aw11
    schemes/dabenc_adapt_hybrid
+   schemes/encap_bchk05
    schemes/groupsig_bgls04
-   schemes/ibe_sw05
    schemes/ibenc_adapt_hybrid
    schemes/ibenc_adapt_identityhash
    schemes/ibenc_bb03
    schemes/ibenc_bf01
+   schemes/ibenc_sw05
    schemes/ibenc_waters05
+   schemes/pkenc_adapt_bchk05
    schemes/pkenc_adapt_chk04
    schemes/pkenc_adapt_hybrid
    schemes/pkenc_cs98
@@ -35,11 +37,13 @@ Demonstration Schemes
    schemes/pksig_boyen
    schemes/pksig_chch
    schemes/pksig_chp
+   schemes/pksig_cl03
    schemes/pksig_cyh
    schemes/pksig_dsa
    schemes/pksig_ecdsa
    schemes/pksig_hess
    schemes/pksig_hw
+   schemes/pksig_rsa_hw09_new
    schemes/pksig_schnorr91
    schemes/pksig_waters
    schemes/pksig_waters05

@@ -1,6 +1,6 @@
 How To Get Started
 ==================
-Instalation and dependencies
+Installation and dependencies
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 See :ref:`platform-install-manual` for installation instructions.
 
