@@ -2,7 +2,7 @@ import sys, ast
 
 class AST_Visitor(ast.NodeVisitor):
 	def visit_Assign(self, node):
-		print(ast.dump(node))
+		print((node.value.elts))
 
 f = open(sys.argv[1], 'r').readlines()
 c = ""
