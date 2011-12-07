@@ -5,7 +5,7 @@ from math import *
 
 messageSize = 100
 numSigs = 100
-numProgramIterations = 5
+numProgramIterations = 10
 
 
 M_index = 1
@@ -35,47 +35,35 @@ def groupMembershipCheck(group, obj):
 def individualVerification(group, cdhObj, dict, msgs, sigs, N):
 	failed = []
 
-
-
-
-	U = dict[0][pk_index]['U']
-	if group.ismember(U) == False:
-		sys.exit("U")
-	V = dict[0][pk_index]['V']
-	if group.ismember(V) == False:
-		sys.exit("V")
-
-	D = dict[0][pk_index]['D']
-	if group.ismember(D) == False:
-		sys.exit("D")
-
-	g2 = dict[0][pk_index]['g2']
-	if group.ismember(g2) == False:
-		sys.exit("g2")
-
-	z2 = dict[0][pk_index]['z2']
-	if group.ismember(z2) == False:
-		sys.exit("Z")
-
-	w2 = dict[0][pk_index]['w2']
-	if group.ismember(w2) == False:
-		sys.exit("w2")
-
-	h2 = dict[0][pk_index]['h2']
-	if group.ismember(h2) == False:
-		sys.exit("h2")
-
-
-
-
 	for i in range(N):
 
+		U = dict[0][pk_index]['U']
+		if group.ismember(U) == False:
+			sys.exit("U")
 
+		V = dict[0][pk_index]['V']
+		if group.ismember(V) == False:
+			sys.exit("V")
 
+		D = dict[0][pk_index]['D']
+		if group.ismember(D) == False:
+			sys.exit("D")
 
+		g2 = dict[0][pk_index]['g2']
+		if group.ismember(g2) == False:
+			sys.exit("g2")
 
+		z2 = dict[0][pk_index]['z2']
+		if group.ismember(z2) == False:
+			sys.exit("Z")
 
+		w2 = dict[0][pk_index]['w2']
+		if group.ismember(w2) == False:
+			sys.exit("w2")
 
+		h2 = dict[0][pk_index]['h2']
+		if group.ismember(h2) == False:
+			sys.exit("h2")
 
 		r = dict[i][sig_index]['r']
 		if group.ismember(r) == False:
@@ -252,7 +240,7 @@ if __name__ == "__main__":
     
 	CDH_dict = {}
 
-	print("here")
+	#print("here")
 
 	for indexVar in range(0, N):
 		CDH_dict[indexVar] = {}
@@ -302,17 +290,17 @@ if __name__ == "__main__":
 
 
 			startTime = time.clock()
-			#individualVerification(groupObj, cdh, dict, msgListInd, sigListInd, (numSigs + 1))
+			individualVerification(groupObj, cdh, dict, msgListInd, sigListInd, (numSigs + 1))
 			endTime = time.clock()
 
-			#result = (endTime - startTime) * 1000
+			result = (endTime - startTime) * 1000
 
 			#ind
-			#trialsInd[programIteration][numSigs] = float(result) / float(numSigs + 1)
+			trialsInd[programIteration][numSigs] = float(result) / float(numSigs + 1)
 
-			#mystring = str(programIteration) + " " + str(numSigs) + " " + str(result) + " " + str(trialsInd[programIteration][numSigs]) + "\n"
-			#print(mystring)
-			#indInter.write(mystring)
+			mystring = str(programIteration) + " " + str(numSigs) + " " + str(result) + " " + str(trialsInd[programIteration][numSigs]) + "\n"
+			print(mystring)
+			indInter.write(mystring)
 
 
 
@@ -331,7 +319,7 @@ if __name__ == "__main__":
 		for iteration in range(0, numProgramIterations):
 
 			sumBatch = sumBatch + trials[iteration][sigNum]
-			#sumInd = sumInd + trialsInd[iteration][sigNum]
+			sumInd = sumInd + trialsInd[iteration][sigNum]
 
 		valueToWriteBatch = float(sumBatch) / float(numProgramIterations)
 		valueToWriteInd = float(sumInd) / float(numProgramIterations)
