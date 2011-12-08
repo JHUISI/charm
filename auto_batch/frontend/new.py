@@ -1,1 +1,5 @@
-x, y = 5, 4
+def main(c, d):
+	pass
+
+if __name__ == '__main__':
+	main(a, b)

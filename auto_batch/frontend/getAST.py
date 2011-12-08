@@ -1,8 +1,8 @@
 import sys, ast
 
 class AST_Visitor(ast.NodeVisitor):
-	def visit_Assign(self, node):
-		print((node.value.elts))
+	def visit_FunctionDef(self, node):
+		print(node.args.args[1].arg)
 
 f = open(sys.argv[1], 'r').readlines()
 c = ""

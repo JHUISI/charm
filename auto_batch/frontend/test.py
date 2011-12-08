@@ -5,13 +5,18 @@ class AST_Test(ast.NodeVisitor):
 	def __init__(self):
 		self.my = ASTParser()
 
-	def visit_Assign(self, node):
-		left = self.my.getAssignRightSideNode(node)
-		#print(ast.dump(left))
-		isIt = self.my.getTupleNodes(left)
-		print(isIt)
+	def visit_FunctionDef(self, node):
+		print(node.name)
 
-test = ASTParser()
-node = test.getASTNodeFromFile("new.py")
-next = AST_Test()
-next.visit(node)
+def verify():
+	if (1 == 1):
+		pass
+
+def testme(a, b):
+	pass
+
+if __name__ == '__main__':
+	test = ASTParser()
+	node = test.getASTNodeFromFile("new.py")
+	next = AST_Test()
+	next.visit(node)
