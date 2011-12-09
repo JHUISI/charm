@@ -13,7 +13,7 @@
 
 
 # Declare some useful variables.
-VOLName="Charm Crypto 0.21a"
+VOLName="Charm Crypto 0.3a"
 TMPName="charm-temp.dmg"
 SRC="./charmDMG/"
 DMGName="Charm Crypto"
@@ -30,6 +30,7 @@ mkdir -p charmDMG/charm-usr charmDMG/.background
 
 cp -R "./build/Charm Crypto.mpkg" ./charmDMG/"Charm Crypto.mpkg"
 cp -R ../../schemes/ ./charmDMG/charm-usr/schemes
+mv ./charmDMG/charm-usr/schemes/*adapt* ./charmDMG/charm-usr/adapters
 cp -R ../../param/ ./charmDMG/charm-usr/param
 cp -R ../../tests/ ./charmDMG/charm-usr/tests
 cp README-OSX.rtf ./charmDMG/
