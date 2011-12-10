@@ -186,7 +186,7 @@ class ASTParser:
 		if (len(nodeFields) == 0):
 			sys.exit("ASTParser->isNodeATuple:  the fields list of the node passed in has a length of zero.")
 
-		if (nodeFields[0] == con.tuple):
+		if (nodeFields[0] == con.tupleAST):
 			return True
 
 		return False
@@ -249,3 +249,27 @@ class ASTParser:
 			sys.exit("ASTParser->getSourceLineOfNode:  line number of node passed in exceeds the number of lines in self.sourceLinesList.")
 
 		return self.sourceLinesList[lineNo-1]
+
+	def getNodeType(self, node):
+		if (node == None):
+			sys.exit("ASTParser->getNodeType:  node passed in is of None type.")
+
+		try:
+			fieldsTuple = node._fields
+		except:
+			sys.exit("ASTParser->getNodeType:  could not obtain the \"._fields\" tuple from the node")
+
+		if (fieldsTuple[0] == con.strTypeAST):
+			return str
+		if (fieldsTuple[0] == con.numTypeAST):
+			try:
+				nodeNumType = type(node.n)
+			except:
+				sys.exit("ASTParser->getNodeType:  could not obtain the type of the number node.")
+
+			if (nodeNumType == int):
+				return int
+			if (nodeNumType == float):
+				return float
+
+		return None

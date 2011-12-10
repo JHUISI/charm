@@ -1,14 +1,16 @@
-from abc import ABCMeta, abstractmethod
+class Variable():
+	def __init__(self):
+		self.name = None
+		self.value = None
 
-class Variable(metaclass=ABCMeta):
-	@abstractmethod
 	def getName(self):
-		return
+		return self.name
 
-	@abstractmethod
 	def getValue(self):
-		return
+		return self.value
 
-	@abstractmethod
-	def getType(self):
-		return
+	def setName(self, name):
+		self.name = name
+
+	def setValue(self, value):
+		self.value = value

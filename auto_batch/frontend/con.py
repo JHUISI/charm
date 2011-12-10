@@ -1,8 +1,10 @@
 equals = 'Eq()'
 funcNamesNotToTest = ['__init__', 'visit_FunctionDef']
-intType = 'int'
+intTypePython = 'int'
 left = 'left'
+numTypeAST = 'n'
 right = 'right'
-strType = 'str'
-tuple = 'elts'
+strTypeAST = 'id'
+strTypePython = 'str'
+tupleAST = 'elts'
 verifyFuncName = 'verify'
