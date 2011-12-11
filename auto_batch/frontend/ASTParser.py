@@ -273,3 +273,53 @@ class ASTParser:
 				return float
 
 		return None
+
+	def getStringNameFromNode(self, node):
+		if (node == None):
+			sys.exit("ASTParser->getStringNameFromNode:  node passed in is of None type.")
+
+		try:
+			stringName = node.id
+		except:
+			sys.exit("ASTParser->getStringNameFromNode:  could not obtain the \"id\" filed of the node passed in.")
+
+		if (len(stringName) == 0):
+			sys.exit("ASTParser->getStringNameFromNode:  string obtained from node is of length zero.")
+
+		return stringName
+
+	def getStringValueFromNode(self, node):
+		if (node == None):
+			sys.exit("ASTParser->getStringValueFromNode:  node passed in is of None type.")
+
+		try:
+			stringValue = node.s
+		except:
+			sys.exit("ASTParser->getStringValueFromNode:  could not obtain the \"s\" field of the node passed in.")
+
+		if (len(stringValue) == 0):
+			sys.exit("ASTParser->getStringValueFromNode:  string obtained from node is of length zero.")
+
+		return stringValue
+
+	def getIntValueFromNode(self, node):
+		if (node == None):
+			sys.exit("ASTParser->getIntValueFromNode:  node passed in is of None type.")
+
+		try:
+			intValue = node.n
+		except:
+			sys.exit("ASTParser->getIntValueFromNode:  could not obtain the \"n\" field of the node passed in.")
+
+		return intValue
+
+	def getFloatValueFromNode(self, node):
+		if (node == None):
+			sys.exit("ASTParser->getFloatValueFromNode:  node passed in is of None type.")
+
+		try:
+			floatValue = node.n
+		except:
+			sys.exit("ASTParser->getFloatValueFromNode:  could not obtain the \"n\" field of the node passed in.")
+
+		return floatValue

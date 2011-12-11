@@ -1,4 +1,5 @@
 equals = 'Eq()'
+floatTypePython = 'float'
 funcNamesNotToTest = ['__init__', 'visit_FunctionDef']
 intTypePython = 'int'
 left = 'left'

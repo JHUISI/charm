@@ -6,9 +6,13 @@ class AST_Test(ast.NodeVisitor):
 		self.my = ASTParser()
 
 	def visit_Assign(self, node):
-		print(type(node.value.n))
+		x = node.value
+		print(x.n)
 
 def verify():
+	x = 4
+	y = 4.5
+	t = "strings and strings"
 	if (1 == 1):
 		pass
 
