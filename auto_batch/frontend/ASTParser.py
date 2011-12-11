@@ -259,7 +259,7 @@ class ASTParser:
 		except:
 			sys.exit("ASTParser->getNodeType:  could not obtain the \"._fields\" tuple from the node")
 
-		if (fieldsTuple[0] == con.strTypeAST):
+		if (fieldsTuple[0] in con.strTypeAST):
 			return str
 		if (fieldsTuple[0] == con.numTypeAST):
 			try:
