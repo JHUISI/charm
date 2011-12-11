@@ -1,1 +1,1 @@
-x = 4
+x = group.hash("test", G1)

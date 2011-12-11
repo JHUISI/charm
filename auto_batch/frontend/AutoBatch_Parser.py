@@ -5,6 +5,7 @@ from StringName import StringName
 from StringValue import StringValue
 from IntegerValue import IntegerValue
 from FloatValue import FloatValue
+from HashValue import HashValue
 
 def removeSubstringFromEnd(fullString, removeSubstring, leftOrRight):
 	if (len(fullString) == 0):
@@ -122,6 +123,27 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		return floatValueToAdd
 
+	def buildHashValue(self, node):
+		hashArgsList = self.myASTParser.getFuncArgs(node)
+
+		#starthere
+
+		hashValueToAdd = HashValue()
+
+	def buildCallValue(self, node):
+		callType = self.myASTParser.getCallType(node)
+		if (callType == None):
+			sys.exit("ASTVarVisitor->buildCallValue:  return value of myASTParser->getCallType is of None type.")
+
+		if (callType == con.hashType):
+			hashValueToAdd = self.buildHashValue(node)
+			if (hashValueToAdd == None):
+				sys.exit("ASTVarVisitor->buildCallValue:  return value of buildHashValue is of None type."
+
+			return hashValueToAdd
+
+		return None
+
 	def processAssignment(self, leftSideNode, rightSideNode):
 		if (leftSideNode == None):
 			sys.exit("ASTVarVisitor->processAssignment:  left side node passed in is of None type.")
@@ -140,12 +162,14 @@ class ASTVarVisitor(ast.NodeVisitor):
 				sys.exit("ASTVarVisitor->processAssignment:  return value of buildStringName is of None type.")
 
 			variableToAdd.setName(stringNameToAdd)
+
 		if (rightNodeType == str):
 			stringValueToAdd = self.buildStringValue(rightSideNode)
 			if (stringValueToAdd == None):
 				sys.exit("ASTVarVisitor->processAssignment:  return value of buildStringValue is of None type.")
 
 			variableToAdd.setValue(stringValueToAdd)
+
 		if (rightNodeType == int):
 			intValueToAdd = self.buildIntValue(rightSideNode)
 			if (intValueToAdd == None):
@@ -159,6 +183,11 @@ class ASTVarVisitor(ast.NodeVisitor):
 				sys.exit("ASTVarVisitor->processAssignment:  return value of buildFloatValue is of None type.")
 
 			variableToAdd.setValue(floatValueToAdd)
+
+		if (rightNodeType == con.callTypeAST):
+			callValueToAdd = self.buildCallValue(rightSideNode)
+			if (callValueToAdd != None):
+				variableToAdd.setValue(callValueToAdd)
 
 		if ( (variableToAdd.getName() != None) and (variableToAdd.getValue() != None) ):
 			self.varAssignments.append(variableToAdd)

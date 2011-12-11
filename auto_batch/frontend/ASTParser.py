@@ -143,6 +143,19 @@ class ASTParser:
 		myFuncArgNamesVisitor.visit(node)
 		return myFuncArgNamesVisitor.getFunctionArgNames()
 
+	def getCallType(self, node):
+		callType = None
+
+		try:
+			callType = node.func.attr
+		except:
+			pass
+
+		if (callType in con.hashTypesCharm):
+			return con.hashType
+
+		return None
+
 	def getBaseNode(self):
 		return self.baseNode
 
@@ -255,13 +268,14 @@ class ASTParser:
 			sys.exit("ASTParser->getNodeType:  node passed in is of None type.")
 
 		try:
-			fieldsTuple = node._fields
+			nameType = type(node).__name__
 		except:
-			sys.exit("ASTParser->getNodeType:  could not obtain the \"._fields\" tuple from the node")
+			sys.exit("ASTParser->getNodeType:  could not obtain the name type from the node passed in.")
 
-		if (fieldsTuple[0] in con.strTypeAST):
+		if (nameType in con.strTypeAST):
 			return str
-		if (fieldsTuple[0] == con.numTypeAST):
+
+		if (nameType == con.numTypeAST):
 			try:
 				nodeNumType = type(node.n)
 			except:
@@ -271,6 +285,9 @@ class ASTParser:
 				return int
 			if (nodeNumType == float):
 				return float
+
+		if (nameType == con.callTypeAST):
+			return con.callTypeAST
 
 		return None
 
