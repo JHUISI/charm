@@ -5,6 +5,7 @@ class HashValue:
 	def __init__(self):
 		self.argsList = None
 		self.groupType = None
+		self.lineNo = None
 
 	def getArgsList(self):
 		return self.argsList
@@ -26,6 +27,9 @@ class HashValue:
 
 	def getType(self):
 		return con.hashType
+
+	def getLineNo(self):
+		return self.lineNo
 
 	def setArgsList(self, argsList):
 		if (type(argsList) is not list):
@@ -90,5 +94,14 @@ class HashValue:
 			sys.exit("HashValue->setGroupType:  group type passed in is not one of the supported group types.")
 
 		self.groupType = groupType
+
+	def setLineNo(self, lineNo):
+		if (type(lineNo) is not int):
+			sys.exit("HashValue->setLineNo:  line number passed in is not of type " + con.intTypePython)
+
+		if (lineNo < 1):
+			sys.exit("HashValue->setLineNo:  line number passed in is less than one.")
+
+		self.lineNo = lineNo
 
 Value.register(HashValue)

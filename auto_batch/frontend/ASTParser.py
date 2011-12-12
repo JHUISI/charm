@@ -127,6 +127,23 @@ class ASTParser:
 
 		return returnNode
 
+	def getLineNumberOfNode(self, node):
+		if (node == None):
+			sys.exit("ASTParser->getLineNumberOfNode:  node passed in is of None type.")
+
+		try:
+			lineNo = node.lineno
+		except:
+			sys.exit("ASTParser->getLineNumberOfNode:  could not obtain the line number of the node passed in.")
+
+		if (type(lineNo) is not int):
+			sys.exit("ASTParser->getLineNumberOfNode:  line number obtained from node is not of type " + con.intTypePython)
+
+		if (lineNo < 1):
+			sys.exit("ASTParser->getLineNumberOfNode:  line number obtained from node is less than one.")
+
+		return lineNo
+
 	def getFunctionNames(self, node):
 		if (node == None):
 			sys.exit("ASTParser->getFunctionNames:  node passed in is of None type.")
@@ -156,6 +173,8 @@ class ASTParser:
 
 		if (callType in con.hashTypesCharm):
 			return con.hashType
+		if (callType == con.randomType):
+			return con.randomType
 
 		return None
 
@@ -358,6 +377,9 @@ class ASTParser:
 
 		if (nameType == con.callTypeAST):
 			return con.callTypeAST
+
+		if (nameType == con.lambdaType):
+			return con.lambdaType
 
 		return None
 

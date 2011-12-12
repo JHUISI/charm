@@ -6,6 +6,7 @@ from StringValue import StringValue
 from IntegerValue import IntegerValue
 from FloatValue import FloatValue
 from HashValue import HashValue
+from RandomValue import RandomValue
 
 def removeSubstringFromEnd(fullString, removeSubstring, leftOrRight):
 	if (len(fullString) == 0):
@@ -145,6 +146,9 @@ class ASTVarVisitor(ast.NodeVisitor):
 		return hashGroupType
 
 	def buildHashValue(self, node):
+		if (node == None):
+			sys.exit("ASTVarVisitor->buildHashValue:  node passed in is of None type.")
+
 		hashArgsList = self.myASTParser.getCallArgsList(node)
 		if (hashArgsList == None):
 			sys.exit("ASTVarVisitor->buildHashValue:  value returned from getCallArgsList is of None type.")
@@ -161,7 +165,31 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		return hashValueToAdd
 
+	def buildRandomValue(self, node):
+		if (node == None):
+			sys.exit("ASTVarVisitor->buildRandomValue:  node passed in is of None type.")
+
+		randomArgsList = self.myASTParser.getCallArgsList(node)
+		if (randomArgsList == None):
+			groupType = con.ZR
+		else:
+			if (len(randomArgsList) != 1):
+				sys.exit("ASTVarVisitor->buildRandomValue:  length of argument list returned from getCallArgsList is greater than one.")
+
+			if (randomArgsList[0] not in con.groupTypes):
+				sys.exit("ASTVarVisitor->buildRandomValue:  the argument returned from getCallArgsList is not a group type that is supported.")
+
+			groupType = randomArgsList[0]
+
+		randomValueToAdd = RandomValue()
+		randomValueToAdd.setGroupType(groupType)
+
+		return randomValueToAdd
+
 	def buildCallValue(self, node):
+		if (node == None):
+			sys.exit("ASTVarVisitor->buildCallValue:  node passed in is of None type.")
+
 		callType = self.myASTParser.getCallType(node)
 		if (callType == None):
 			sys.exit("ASTVarVisitor->buildCallValue:  return value of myASTParser->getCallType is of None type.")
@@ -172,8 +200,18 @@ class ASTVarVisitor(ast.NodeVisitor):
 				sys.exit("ASTVarVisitor->buildCallValue:  return value of buildHashValue is of None type.")
 
 			return hashValueToAdd
+		if (callType == con.randomType):
+			randomValueToAdd = self.buildRandomValue(node)
+			if (randomValueToAdd == None):
+				sys.exit("ASTVarVisitor->buildCallValue:  return value of buildRandomValue is of None type.")
+
+			return randomValueToAdd
 
 		return None
+
+	def buildLambdaValue(self, node):
+		if (node == None):
+			sys.exit("ASTVarVisitor->buildLambdaValue:  node passed in is of None type.")
 
 	def processAssignment(self, leftSideNode, rightSideNode):
 		if (leftSideNode == None):
@@ -220,7 +258,17 @@ class ASTVarVisitor(ast.NodeVisitor):
 			if (callValueToAdd != None):
 				variableToAdd.setValue(callValueToAdd)
 
+		if (rightNodeType == con.lambdaType):
+			lambdaValueToAdd = self.buildLambdaValue(rightSideNode)
+			if (lambdaValueToAdd != None):
+				variableToAdd.setValue(lambdaValueToAdd)
+
 		if ( (variableToAdd.getName() != None) and (variableToAdd.getValue() != None) ):
+			leftLineNo = self.myASTParser.getLineNumberOfNode(leftSideNode)
+			rightLineNo = self.myASTParser.getLineNumberOfNode(rightSideNode)
+
+			variableToAdd.getName().setLineNo(leftLineNo)
+			variableToAdd.getValue().setLineNo(rightLineNo)
 			self.varAssignments.append(variableToAdd)
 
 	def visit_Assign(self, node):
