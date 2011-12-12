@@ -169,7 +169,7 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if (callType == con.hashType):
 			hashValueToAdd = self.buildHashValue(node)
 			if (hashValueToAdd == None):
-				sys.exit("ASTVarVisitor->buildCallValue:  return value of buildHashValue is of None type."
+				sys.exit("ASTVarVisitor->buildCallValue:  return value of buildHashValue is of None type.")
 
 			return hashValueToAdd
 
