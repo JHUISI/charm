@@ -6,6 +6,7 @@ groupTypes = ['G1', 'G2', 'GT', 'ZR']
 hashType = 'hash'
 hashTypesCharm = ['hash', 'H', 'H2']
 intTypePython = 'int'
+lambdaType = 'lambda'
 left = 'left'
 listTypePython = 'list'
 nameOnlyTypeAST = 'Name'

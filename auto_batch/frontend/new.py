@@ -1,1 +1,1 @@
-x = group.hash("test", G1, 4, 4.5)
+x = lambda i,a,b: a[i] ** b[i]
