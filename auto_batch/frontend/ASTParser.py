@@ -144,6 +144,9 @@ class ASTParser:
 		return myFuncArgNamesVisitor.getFunctionArgNames()
 
 	def getCallType(self, node):
+		if (node == None):
+			sys.exit("ASTParser->getCallType:  node passed in is of None type.")
+
 		callType = None
 
 		try:
@@ -155,6 +158,73 @@ class ASTParser:
 			return con.hashType
 
 		return None
+
+	def getCallArgsList(self, node):
+		if (node == None):
+			sys.exit("ASTParser->getCallArgsList:  node passed in is of None type.")
+
+		try:
+			argsList = node.args
+		except:
+			sys.exit("ASTParser->getCallArgsList:  could not obtain the arguments list of the node passed in.")
+
+		returnArgsList = []
+
+		for callArgNode in argsList:
+			try:
+				argType = type(callArgNode).__name__
+			except:
+				sys.exit("ASTParser->getCallArgsList:  could not obtain the type of one of the arguments of the node passed in.")
+
+			if (argType == con.strOnlyTypeAST):
+				callArg = self.getStrOnly(callArgNode)
+				returnArgsList.append(callArg)
+			elif (argType == con.nameOnlyTypeAST):
+				callArg = self.getNameOnly(callArgNode)
+				returnArgsList.append(callArg)
+			elif (argType == con.numTypeAST):
+				callArg = self.getNumOnly(callArgNode)
+				returnArgsList.append(callArg)
+			else:
+				sys.exit("ASTParser->getCallArgsList:  encountered an argument whose type (" + argType + ") could not be handled.")
+
+		if (returnArgsList == []):
+			return None
+
+		return returnArgsList
+
+	def getNumOnly(self, node):
+		if (node == None):
+			sys.exit("ASTParser->getNumOnly:  node passed in is of None type.")
+
+		try:
+			returnNum = node.n
+		except:
+			sys.exit("ASTParser->getNumOnly:  could not obtain \"n\" parameter of node passed in.")
+
+		return returnNum
+
+	def getNameOnly(self, node):
+		if (node == None):
+			sys.exit("ASTParser->getNameOnly:  node passed in is of None type.")
+
+		try:
+			returnName = node.id
+		except:
+			sys.exit("ASTParser->getNameOnly:  could not obtain \"id\" parameter of node passed in.")
+
+		return returnName
+
+	def getStrOnly(self, node):
+		if (node == None):
+			sys.exit("ASTParser->getStrOnly:  node passed in is of None type.")
+
+		try:
+			returnStr = node.s
+		except:
+			sys.exit("ASTParser->getStrOnly:  could not obtain \"s\" parameter of node passed in.")
+
+		return returnStr
 
 	def getBaseNode(self):
 		return self.baseNode

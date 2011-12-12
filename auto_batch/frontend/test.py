@@ -6,8 +6,12 @@ class AST_Test(ast.NodeVisitor):
 		self.my = ASTParser()
 
 	def visit_Assign(self, node):
-		print(node.value.func.value.id)
-		print(node.value.func.attr)
+		print(type(node.value.args[0]).__name__)
+		print(type(node.value.args[1]).__name__)
+		print(type(node.value.args[2]).__name__)
+		print(type(node.value.args[3]).__name__)
+		print(node.value.args[0].s)
+		print(node.value.args[1]._fields)
 
 def verify():
 	x = 4

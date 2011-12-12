@@ -123,12 +123,17 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		return floatValueToAdd
 
-	def buildHashValue(self, node):
-		hashArgsList = self.myASTParser.getFuncArgs(node)
+	def getHashGroupType(self, hashArgsList):
+		if ( (hashArgsL
 
-		#starthere
+	def buildHashValue(self, node):
+		hashArgsList = self.myASTParser.getCallArgsList(node)
+		hashGroupType = self.getHashGroupType(hashArgsList)
+		if (hashGroupType == None):
+			sys.exit("ASTVarVisitor->buildHashValue:  value returned from getHashGroupType is of None type.")
 
 		hashValueToAdd = HashValue()
+		ddd
 
 	def buildCallValue(self, node):
 		callType = self.myASTParser.getCallType(node)
