@@ -63,6 +63,28 @@ class HashValue:
 
 		self.argsList.insert(index, entry)
 
+	def removeEntryWithValue(self, value):
+		if (value == None):
+			sys.exit("HashValue->removeEntryWithValue:  value passed in is of None type.")
+
+		try:
+			self.argsList.remove(value)
+		except:
+			sys.exit("HashValue->removeEntryWithValue:  value passed in does not exist in the arguments list.")
+
+	def findEntryWithValue(self, value):
+		if (value == None):
+			sys.exit("HashValue->findEntryWithValue:  value passed in is of None type.")
+
+		index = None
+
+		try:
+			index = self.argsList.index(value)
+		except:
+			return None
+
+		return index
+
 	def setGroupType(self, groupType):
 		if (groupType not in con.groupTypes):
 			sys.exit("HashValue->setGroupType:  group type passed in is not one of the supported group types.")

@@ -124,16 +124,42 @@ class ASTVarVisitor(ast.NodeVisitor):
 		return floatValueToAdd
 
 	def getHashGroupType(self, hashArgsList):
-		if ( (hashArgsL
+		if (hashArgsList == None):
+			sys.exit("ASTVarVisitor->getHashGroupType:  arguments list passed in is of None type.")
+
+		if (len(hashArgsList) == 0):
+			sys.exit("ASTVarVisitor->getHashGroupType:  arguments list passed in is empty.")
+
+		hashGroupType = None
+
+		for hashArg in hashArgsList:
+			if hashArg in con.groupTypes:
+				if (hashGroupType != None):
+					sys.exit("ASTVarVisitor->getHashGroupType:  found more than one argument that represents group type.")
+
+				hashGroupType = hashArg
+
+		if (hashGroupType == None):
+			sys.exit("ASTVarVisitor->getHashGroupType:  could not locate a group type from the arguments list.")
+
+		return hashGroupType
 
 	def buildHashValue(self, node):
 		hashArgsList = self.myASTParser.getCallArgsList(node)
+		if (hashArgsList == None):
+			sys.exit("ASTVarVisitor->buildHashValue:  value returned from getCallArgsList is of None type.")
+
 		hashGroupType = self.getHashGroupType(hashArgsList)
 		if (hashGroupType == None):
 			sys.exit("ASTVarVisitor->buildHashValue:  value returned from getHashGroupType is of None type.")
 
+		hashArgsList.remove(hashGroupType)
+
 		hashValueToAdd = HashValue()
-		ddd
+		hashValueToAdd.setArgsList(hashArgsList)
+		hashValueToAdd.setGroupType(hashGroupType)
+
+		return hashValueToAdd
 
 	def buildCallValue(self, node):
 		callType = self.myASTParser.getCallType(node)
