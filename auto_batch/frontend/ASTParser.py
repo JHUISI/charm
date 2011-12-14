@@ -178,6 +178,121 @@ class ASTParser:
 
 		return None
 
+	def getLambdaArgOrder(self, argName, lambdaArgs):
+		if ( (argName == None) or (len(argName) == 0) or (type(argName) is not str) or (lambdaArgs == None) or (len(lambdaArgs) == 0) or (type(lambdaArgs) is not list) ):
+			sys.exit("ASTParser->getLambdaArgOrder:  problem with inputs to function.")
+
+		try:
+			argOrder = lambdaArgs.index(argName)
+		except:
+			sys.exit("ASTParser->getLambdaArgOrder:  the argument name passed in is not in the argument list passed in.")
+
+		return argOrder
+
+	def lambdaExpressionRecursion(self, node, lambdaArgs):
+		if ( (node == None) or (lambdaArgs == None) or (len(lambdaArgs) == 0) ):
+			sys.exit("ASTParser->lambdaExpressionRecursion:  problem with inputs to function.")
+
+		try:
+			fields = node._fields
+		except:
+			fields = None
+
+		if (fields != None):
+			if (fields == con.mathOp):
+				left = self.lambdaExpressionRecursion(node.left, lambdaArgs)
+				right = self.lambdaExpressionRecursion(node.right, lambdaArgs)
+				op = self.lambdaExpressionRecursion(node.op, lambdaArgs)
+				return left + " " + op + " " + right
+			if (fields == con.subscriptFields):
+				try:
+					argName = node.value.id
+				except:
+					argName = None
+
+				if (argName != None):
+					argOrder = self.getLambdaArgOrder(argName, lambdaArgs)
+					return con.lambdaArgBegin + str(argOrder) + con.lambdaArgEnd
+
+		try:
+			nameType = type(node).__name__
+		except:
+			sys.exit("ASTParser->lambdaExpressionRecursion:  could not obtain the name type of a node.")
+
+		if (nameType == con.expTypeAST):
+			return "^"
+		if (nameType == con.multTypeAST):
+			return "*"
+		if (nameType == con.subTypeAST):
+			return "-"
+		if (nameType == con.addTypeAST):
+			return "+"
+		if (nameType == con.divTypeAST):
+			return "/"
+
+		sys.exit("ASTParser->lambdaExpressionRecursion:  could not identify this element of the lambda expression.")
+
+	def getLambdaExpression(self, node, lambdaArgs):
+		if (node == None):
+			sys.exit("ASTParser->getLambdaExpression:  node passed in is of None type.")
+
+		if (lambdaArgs == None):
+			sys.exit("ASTParser->getLambdaExpression:  lambda arguments passed in are of None type.")
+
+		if (len(lambdaArgs) == 0):
+			sys.exit("ASTParser->getLambdaExpression:  lambda arguments are of length zero.")
+
+		for arg in lambdaArgs:
+			if (type(arg) is not str):
+				sys.exit("ASTParser->getLambdaExpression:  one of the lambda arguments passed in is not of type " + con.strTypePython)
+
+		try:
+			lambdaBody = node.body
+		except:
+			sys.exit("ASTParser->getLambdaExpression:  could not obtain the body of the node passed in.")
+
+		expression = self.lambdaExpressionRecursion(lambdaBody, lambdaArgs)
+		if (expression == None):
+			sys.exit("ASTParser->getLambdaExpression:  expression returned from lambdaExpressionRecursion if of None type.")
+
+		if (len(expression) == 0):
+			sys.exit("ASTParser->getLambdaExpression:  expression returned from lambdaExpressionRecursion is of length zero.")
+
+		if (type(expression) is not str):
+			sys.exit("ASTParser->getLambdaExpression:  expression returned from lambdaExpressRecursion is not of type " + con.strTypePython)
+
+		return expression
+
+	def getLambdaArgsList(self, node):
+		if (node == None):
+			sys.exit("ASTParser->getLambdaArgsList:  node passed in is of None type.")
+
+		try:
+			argsList = node.args.args
+		except:
+			sys.exit("ASTParser->getLambdaArgsList:  could not obtain the arguments list of the node passed in.")
+
+		returnArgsList = []
+
+		for argNode in argsList:
+			try:
+				arg = argNode.arg
+			except:
+				sys.exit("ASTParser->getLambdaArgsList:  could not obtain one of the arguments of the node passed in.")
+
+			if (arg == None):
+				sys.exit("ASTParser->getLambdaArgsList:  one of the arguments of the node passed in is of None type.")
+
+			if (type(arg) is not str):
+				sys.exit("ASTParser->getLambdaArgsList:  one of the arguments of the node passed in is not of " + con.strTypePython + " type.")
+
+			returnArgsList.append(arg)
+
+		if (len(returnArgsList) == 0):
+			sys.exit("ASTParser->getLambdaArgsList:  could not obtain any of the arguments of the node passed in.")
+
+		return returnArgsList
+
 	def getCallArgsList(self, node):
 		if (node == None):
 			sys.exit("ASTParser->getCallArgsList:  node passed in is of None type.")
@@ -207,7 +322,7 @@ class ASTParser:
 			else:
 				sys.exit("ASTParser->getCallArgsList:  encountered an argument whose type (" + argType + ") could not be handled.")
 
-		if (returnArgsList == []):
+		if (len(returnArgsList) == 0):
 			return None
 
 		return returnArgsList

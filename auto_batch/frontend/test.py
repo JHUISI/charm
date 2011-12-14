@@ -6,11 +6,10 @@ class AST_Test(ast.NodeVisitor):
 		self.my = ASTParser()
 
 	def visit_Assign(self, node):
-		print(type(node.value).__name__)
+		print(ast.dump(node.value.body))
 
 def verify():
-	x = group.random(G1)
-	y = 18
+	x = lambda i,a,b: a[i] ** b[i]
 	if (1 == 1):
 		pass
 

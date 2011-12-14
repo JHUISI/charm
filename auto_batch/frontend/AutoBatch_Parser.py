@@ -7,6 +7,7 @@ from IntegerValue import IntegerValue
 from FloatValue import FloatValue
 from HashValue import HashValue
 from RandomValue import RandomValue
+from LambdaValue import LambdaValue
 
 def removeSubstringFromEnd(fullString, removeSubstring, leftOrRight):
 	if (len(fullString) == 0):
@@ -213,6 +214,32 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if (node == None):
 			sys.exit("ASTVarVisitor->buildLambdaValue:  node passed in is of None type.")
 
+		lambdaArgsList = self.myASTParser.getLambdaArgsList(node)
+		if (lambdaArgsList == None):
+			sys.exit("ASTVarVisitor->buildLambdaValue:  list returned from getLambdaArgsList is of None type.")
+
+		if (len(lambdaArgsList) == 0):
+			sys.exit("ASTVarVisitor->buildLambdaValue:  list returned from getLambdaArgsList is of length zero.")
+
+		for arg in lambdaArgsList:
+			if (type(arg) is not str):
+				sys.exit("ASTVarVisitor->buildLambdaValue:  one of the arguments returned from getLambdaArgsList is not of type " + con.strTypePython)
+
+		lambdaExpression = self.myASTParser.getLambdaExpression(node, lambdaArgsList)
+		if (lambdaExpression == None):
+			sys.exit("ASTVarVisitor->buildLambdaValue:  expression returned from getLambdaExpression is of None type.")
+
+		if (len(lambdaExpression) == 0):
+			sys.exit("ASTVarVisitor->buildLambdaValue:  expression returned from getLambdaExpression if of length zero.")
+
+		if (type(lambdaExpression) is not str):
+			sys.exit("ASTVarVisitor->buildLambdaValue:  expression returned from getLambdaExpression is not of type " + con.strTypePython)
+
+		returnLambdaValue = LambdaValue()
+		returnLambdaValue.setArgList(lambdaArgsList)
+		returnLambdaValue.setExpression(lambdaExpression)
+		return returnLambdaValue
+
 	def processAssignment(self, leftSideNode, rightSideNode):
 		if (leftSideNode == None):
 			sys.exit("ASTVarVisitor->processAssignment:  left side node passed in is of None type.")
@@ -320,9 +347,12 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		return self.varAssignments
 
-class ASTFindGroupTypes(ast.NodeVisitor):
-	def __init__(self):
-		self.groupTypes = {}
+
+
+
+#------------------------------
+
+
 
 	def getGroupType(self, varName, dictKey = ""):
 		try:
@@ -348,51 +378,8 @@ class ASTFindGroupTypes(ast.NodeVisitor):
 		except:
 			return unknownType
 
-	def getLambdaArgs(self, lambdaNode):
-		lambdaArgs = []
-		if (argsRepInAST in lambdaNode._fields):
-			if (argsRepInAST in lambdaNode.args._fields):
-				numLambdaArgs = len(lambdaNode.args.args) - 1
-				for lambdaIndex in range(0, numLambdaArgs):
-					if (argRepInAST in lambdaNode.args.args[lambdaIndex + 1]._fields):
-						lambdaArgs.append(lambdaNode.args.args[lambdaIndex + 1].arg)
-		return lambdaArgs
 
-	def getLambdaArgOrderStatement(self, lambdaArgs, argName):
-		lambdaArgOrder = -1
-		try:
-			lambdaArgOrder = lambdaArgs.index(argName)
-		except:
-			return ""
 
-		return lambdaArgBegin + str(lambdaArgOrder) + lambdaArgEnd
-
-	def getLambdaFuncExpression(self, node, lambdaArgs):
-		#print(lambdaArgs)
-		if (type(node).__name__ == binOpRepInAST):
-			left = self.getLambdaFuncExpression(node.left, lambdaArgs)
-			right = self.getLambdaFuncExpression(node.right, lambdaArgs)
-			op = self.getLambdaFuncExpression(node.op, lambdaArgs)
-			return left + " " + op + " " + right
-		elif (type(node).__name__ == subscriptRepInAST):
-			if (valueRepInAST in node._fields):
-				if (idRepInAST in node.value._fields):
-					return self.getLambdaArgOrderStatement(lambdaArgs, node.value.id)
-			'''
-			if (sliceRepInAST in node._fields):
-				if (valueRepInAST in node.slice._fields):
-					if (idRepInAST in node.slice.value._fields):
-						retString += node.slice.value.id + "]"
-						return retString
-			'''
-			return ""
-		elif (type(node).__name__ == expRepInAST):
-			return "^"
-		elif (type(node).__name__ == multRepInAST):
-			return "*"
-		else:
-			print(type(node).__name__)
-			return ""
 
 	def recordDotProductVariable(self, dotProdNode, variableName, dotProductVariableNames):
 		dotProdString = "prod{ j := 1 , "
