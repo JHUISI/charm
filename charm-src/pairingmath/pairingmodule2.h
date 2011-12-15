@@ -68,6 +68,12 @@ typedef struct {
 	int safe_pairing_clear;
 } Element;
 
+#define IS_PAIRING_OBJ_NULL(obj) \
+	if(obj->pairing == NULL) {	\
+		PyErr_SetString(ElementError, "pairing structure not initialized.");	\
+		return NULL;	\
+	}
+
 /* miracl macros to simplify interface */
 #define print(msg, type, e)  \
 	printf("%s", msg); 		 \
@@ -87,8 +93,8 @@ typedef struct {
 #define element_set_si(a, b) \
 	if(a->element_type == ZR_t) { _element_set_si(a->element_type, a->e, b); }
 
-#define element_set_mpz(a, b)  \
-	_element_set_mpz(a->element_type, a->e, b);
+#define element_set_mpz(a, b)	_element_set_mpz(a->element_type, a->e, b);
+#define element_to_mpz(a, b)	_element_to_mpz(ZR_t, a, b);
 
 #define element_neg(a, b) \
 	a->e = _element_neg(a->element_type, b->e, b->pairing->order);
