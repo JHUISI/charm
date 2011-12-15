@@ -1,6 +1,7 @@
 addTypeAST = 'Add'
 callTypeAST = 'Call'
 divTypeAST = 'Div'
+dotProdType = 'dotprod'
 equals = 'Eq()'
 expTypeAST = 'Pow'
 floatTypePython = 'float'
@@ -25,6 +26,7 @@ strTypeAST = ['Name', 'Str']
 strTypePython = 'str'
 subTypeAST = 'Sub'
 subscriptFields = ('value', 'slice', 'ctx')
+subscriptTypeAST = 'Subscript'
 tupleAST = 'elts'
 verifyFuncName = 'verify'
 ZR = 'ZR'

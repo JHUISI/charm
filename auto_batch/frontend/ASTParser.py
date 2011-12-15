@@ -167,6 +167,14 @@ class ASTParser:
 		callType = None
 
 		try:
+			callType = node.func.id
+		except:
+			pass
+
+		if (callType == con.dotProdType):
+			return con.dotProdType
+
+		try:
 			callType = node.func.attr
 		except:
 			pass
@@ -318,6 +326,26 @@ class ASTParser:
 
 		return returnArgsList
 
+	def getNameOfNode(self, node):
+		if (node == None):
+			sys.exit("ASTParser->getNameOfNode:  node passed in is of None type.")
+
+		try:
+			nodeType = type(node).__name__
+		except:
+			sys.exit("ASTParser->getNameOfNode:  could not obtain the type of the node passed in.")
+
+		if (nodeType == con.strOnlyTypeAST):
+			return self.getStrOnly(node)
+		if (nodeType == con.nameOnlyTypeAST):
+			return self.getNameOnly(node)
+		if (nodeType == con.numTypeAST):
+			return self.getNumOnly(node)
+		if (nodeType == con.subscriptTypeAST):
+			return self.getSubscriptOnly(node)
+
+		return None
+
 	def getCallArgsList(self, node):
 		if (node == None):
 			sys.exit("ASTParser->getCallArgsList:  node passed in is of None type.")
@@ -330,20 +358,9 @@ class ASTParser:
 		returnArgsList = []
 
 		for callArgNode in argsList:
-			try:
-				argType = type(callArgNode).__name__
-			except:
-				sys.exit("ASTParser->getCallArgsList:  could not obtain the type of one of the arguments of the node passed in.")
-
-			if (argType == con.strOnlyTypeAST):
-				callArg = self.getStrOnly(callArgNode)
-				returnArgsList.append(callArg)
-			elif (argType == con.nameOnlyTypeAST):
-				callArg = self.getNameOnly(callArgNode)
-				returnArgsList.append(callArg)
-			elif (argType == con.numTypeAST):
-				callArg = self.getNumOnly(callArgNode)
-				returnArgsList.append(callArg)
+			nameOfNode = self.getNameOfNode(callArgNode)
+			if (nameOfNode != None):
+				returnArgsList.append(nameOfNode)
 
 		if (len(returnArgsList) == 0):
 			return None
@@ -353,6 +370,9 @@ class ASTParser:
 	def getNumOnly(self, node):
 		if (node == None):
 			sys.exit("ASTParser->getNumOnly:  node passed in is of None type.")
+
+		if (type(node).__name__ != con.numTypeAST):
+			sys.exit("ASTParser->getNumOnly:  type of node passed in is not " + con.numTypeAST)
 
 		try:
 			returnNum = node.n
@@ -365,6 +385,9 @@ class ASTParser:
 		if (node == None):
 			sys.exit("ASTParser->getNameOnly:  node passed in is of None type.")
 
+		if (type(node).__name__ != con.nameOnlyTypeAST):
+			sys.exit("ASTParser->getNameOnly:  type of node passed in is not " + con.nameOnlyTypeAST)
+
 		try:
 			returnName = node.id
 		except:
@@ -376,12 +399,32 @@ class ASTParser:
 		if (node == None):
 			sys.exit("ASTParser->getStrOnly:  node passed in is of None type.")
 
+		if (type(node).__name__ != con.strOnlyTypeAST):
+			sys.exit("ASTParser->getStrOnly:  type of node passed in is not " + con.strOnlyTypeAST)
+
 		try:
 			returnStr = node.s
 		except:
 			sys.exit("ASTParser->getStrOnly:  could not obtain \"s\" parameter of node passed in.")
 
 		return returnStr
+
+	def getSubscriptOnly(self, node):
+		if (node == None):
+			sys.exit("ASTParser->getSubscriptOnly:  node passed in is of None type.")
+
+		if (type(node).__name__ != con.subscriptTypeAST):
+			sys.exit("ASTParser->getSubscriptOnly:  type of node passed in is not " + con.subscriptTypeAST)
+
+		valueName = self.getNameOfNode(node.value)
+		if (valueName == None):
+			sys.exit("ASTParser->getSubscriptOnly:  could not obtain the value name of the node passed in.")
+
+		sliceValueName = self.getNameOfNode(node.slice.value)
+		if (sliceValueName == None):
+			sys.exit("ASTParser->getSubscriptOnly:  could not obtain the slice value name of the node passed in.")
+
+		return valueName + "[" + sliceValueName + "]"
 
 	def getBaseNode(self):
 		return self.baseNode
@@ -518,6 +561,9 @@ class ASTParser:
 
 		if (nameType == con.lambdaType):
 			return con.lambdaType
+
+		if (nameType == con.subscriptTypeAST):
+			return con.subscriptTypeAST
 
 		return None
 

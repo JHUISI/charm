@@ -6,7 +6,7 @@ class AST_Test(ast.NodeVisitor):
 		self.my = ASTParser()
 
 	def visit_Assign(self, node):
-		print(node.value.body.args[0]._fields)
+		print(node.value.func.id)
 
 def verify():
 	H = lambda a: group.H(1, ZR)

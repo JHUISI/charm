@@ -163,6 +163,14 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		return randomValueToAdd
 
+	def buildDotProdValue(self, node):
+		if (node == None):
+			sys.exit("ASTVarVisitor->buildDotProdValue:  node passed in is of None type.")
+
+		dotProdValueToAdd = DotProdValue()
+
+		return dotProdValueToAdd
+
 	def buildCallValue(self, node):
 		if (node == None):
 			sys.exit("ASTVarVisitor->buildCallValue:  node passed in is of None type.")
@@ -183,6 +191,13 @@ class ASTVarVisitor(ast.NodeVisitor):
 				sys.exit("ASTVarVisitor->buildCallValue:  return value of buildRandomValue is of None type.")
 
 			return randomValueToAdd
+
+		if (callType == con.dotProdType):
+			dotProdValueToAdd = self.buildDotProdValue(node)
+			if (dotProdValueToAdd == None):
+				sys.exit("ASTVarVisitor->buildCallValue:  return value of buildDotProdValue is of None type.")
+
+			return dotProdValueToAdd
 
 		return None
 
@@ -280,6 +295,8 @@ class ASTVarVisitor(ast.NodeVisitor):
 			lambdaValueToAdd = self.buildLambdaValue(rightSideNode)
 			if (lambdaValueToAdd != None):
 				variableToAdd.setValue(lambdaValueToAdd)
+
+		if (rightNodeType 
 
 		if ( (variableToAdd.getName() != None) and (variableToAdd.getValue() != None) ):
 			leftLineNo = self.myASTParser.getLineNumberOfNode(leftSideNode)
@@ -478,34 +495,6 @@ class ASTVarVisitor(ast.NodeVisitor):
 		return unknownType
 
 	def visit_Assign(self, node):
-		topLevelKey = ""
-
-		if (ast.dump(node.targets[0]).startswith('Tuple(')):
-			if (eltsRepInAST in node.targets[0]._fields):
-				tupleObjects = node.targets[0].elts
-				tupleNames = []
-				for tupleObject in tupleObjects:
-					if (idRepInAST in tupleObject._fields):
-						tupleNames.append(tupleObject.id)
-				if (valueRepInAST in node._fields):
-					if (idRepInAST in node.value._fields):
-						if (node.value.id in self.groupTypes):
-							tupleGroupTypes = getTupleGroupTypes(self.groupTypes, node.value.id)
-							if (len(tupleNames) == len(tupleGroupTypes) ):
-
-								for tupleName,tupleGroupType in zip(tupleNames,tupleGroupTypes):
-
-
-
-									self.groupTypes[tupleName] = {}
-									self.groupTypes[tupleName][node.lineno] = {}
-
-
-
-									self.groupTypes[tupleName][node.lineno][groupType] = tupleGroupType
-
-		FIXME = False
-
 		if (ast.dump(node.targets[0]).startswith('Subscript(')):
 			if (valueRepInAST in node.targets[0]._fields):
 				if (idRepInAST in node.targets[0].value._fields):
