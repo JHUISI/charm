@@ -35,30 +35,6 @@ def removeSubstringFromEnd(fullString, removeSubstring, leftOrRight):
 
 	return fullString[0:(lenFullString - lenRemoveSubstring)]
 
-def getGroupType(astAssignDict, varName, dictKey = ""):
-	try:
-		lineNos = list(astAssignDict[varName].keys())
-	except:
-		return unknownType
-			
-	if (len(lineNos) == 0):
-		return unknownType
-	
-	lineNos.sort()
-	lineNos.reverse()
-	lineNo = lineNos[0]
-
-	if (dictKey == ""):
-		try:
-			return astAssignDict[varName][lineNo][groupType]
-		except:
-			return unknownType
-
-	try:			
-		return astAssignDict[varName][lineNo][dictRepInAST][dictKey][groupType]
-	except:
-		return unknownType
-
 class ASTVarVisitor(ast.NodeVisitor):
 	def __init__(self, myASTParser):
 		if (myASTParser == None):
@@ -214,6 +190,21 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if (node == None):
 			sys.exit("ASTVarVisitor->buildLambdaValue:  node passed in is of None type.")
 
+		isHashCall = self.myASTParser.isLambdaAHashCall(node)
+		if ( (isHashCall != True) and (isHashCall != False) ):
+			sys.exit("ASTVarVisitor->buildLambdaValue:  return value from isLambdaAHashCall is neither True nor False.")
+
+		if (isHashCall == True):
+			hashNode = self.myASTParser.getHashNodeFromLambda(node)
+			if (hashNode == None):
+				sys.exit("ASTVarVisitor->buildLambdaValue:  return node from getHashNodeFromLambda is of None type.")
+
+			hashValue = self.buildHashValue(hashNode)
+			if (hashValue == None):
+				sys.exit("ASTVarVisitor->buildLambdaValue:  return value from buildHashValue is of None type.")
+
+			return hashValue
+
 		lambdaArgsList = self.myASTParser.getLambdaArgsList(node)
 		if (lambdaArgsList == None):
 			sys.exit("ASTVarVisitor->buildLambdaValue:  list returned from getLambdaArgsList is of None type.")
@@ -352,35 +343,7 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 #------------------------------
 
-
-
-	def getGroupType(self, varName, dictKey = ""):
-		try:
-			lineNos = list(self.groupTypes[varName].keys())
-		except:
-			return unknownType
-			
-		if (len(lineNos) == 0):
-			return unknownType
-	
-		lineNos.sort()
-		lineNos.reverse()
-		lineNo = lineNos[0]
-
-		if (dictKey == ""):
-			try:
-				return self.groupTypes[varName][lineNo][groupType]
-			except:
-				return unknownType
-
-		try:			
-			return self.groupTypes[varName][lineNo][dictRepInAST][dictKey][groupType]
-		except:
-			return unknownType
-
-
-
-
+'''
 	def recordDotProductVariable(self, dotProdNode, variableName, dotProductVariableNames):
 		dotProdString = "prod{ j := 1 , "
 
@@ -711,6 +674,7 @@ class ASTVarVisitor(ast.NodeVisitor):
 			if (self.groupTypes[key] == {}):
 				del self.groupTypes[key]
 		return self.groupTypes
+'''
 
 class ASTFindAllVariables(ast.NodeVisitor):
 	def __init__(self):

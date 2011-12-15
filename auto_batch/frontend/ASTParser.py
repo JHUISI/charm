@@ -178,6 +178,31 @@ class ASTParser:
 
 		return None
 
+	def getHashNodeFromLambda(self, node):
+		if (node == None):
+			sys.exit("ASTParser->getHashNodeFromLambda:  node passed in is of None type.")
+
+		try:
+			returnNode = node.body
+		except:
+			sys.exit("ASTParser->getHashNodeFromLambda:  could not obtain the \"body\" node of the node passed in.")
+
+		return returnNode
+
+	def isLambdaAHashCall(self, node):
+		if (node == None):
+			sys.exit("ASTParser->isLambdaAHashCall:  node passed in is of None type.")
+
+		try:
+			funcAttr = node.body.func.attr
+		except:
+			return False
+
+		if (funcAttr in con.hashTypesCharm):
+			return True
+
+		return False
+
 	def getLambdaArgOrder(self, argName, lambdaArgs):
 		if ( (argName == None) or (len(argName) == 0) or (type(argName) is not str) or (lambdaArgs == None) or (len(lambdaArgs) == 0) or (type(lambdaArgs) is not list) ):
 			sys.exit("ASTParser->getLambdaArgOrder:  problem with inputs to function.")
@@ -319,8 +344,6 @@ class ASTParser:
 			elif (argType == con.numTypeAST):
 				callArg = self.getNumOnly(callArgNode)
 				returnArgsList.append(callArg)
-			else:
-				sys.exit("ASTParser->getCallArgsList:  encountered an argument whose type (" + argType + ") could not be handled.")
 
 		if (len(returnArgsList) == 0):
 			return None

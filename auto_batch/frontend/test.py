@@ -6,10 +6,10 @@ class AST_Test(ast.NodeVisitor):
 		self.my = ASTParser()
 
 	def visit_Assign(self, node):
-		print(ast.dump(node.value.body))
+		print(node.value.body.args[0]._fields)
 
 def verify():
-	x = lambda i,a,b: a[i] ** b[i]
+	H = lambda a: group.H(1, ZR)
 	if (1 == 1):
 		pass
 
