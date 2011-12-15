@@ -84,28 +84,28 @@ static PyObject *f(PyObject *v, PyObject *w) { \
  Py_INCREF(Py_NotImplemented);	\
  return Py_NotImplemented;  }
 
-//PyObject *mpzToLongObj (mpz_t m)
-//{
-//	/* borrowed from gmpy */
-//	int size = (mpz_sizeinbase (m, 2) + PyLong_SHIFT - 1) / PyLong_SHIFT;
-//	int i;
-//	mpz_t temp;
-//	PyLongObject *l = _PyLong_New (size);
-//	if (!l)
-//		return NULL;
-//	mpz_init_set (temp, m);
-//	for (i = 0; i < size; i++)
-//	{
-//		l->ob_digit[i] = (digit) (mpz_get_ui (temp) & PyLong_MASK);
-//		mpz_fdiv_q_2exp (temp, temp, PyLong_SHIFT);
-//	}
-//	i = size;
-//	while ((i > 0) && (l->ob_digit[i - 1] == 0))
-//		i--;
-//	Py_SIZE(l) = i;
-//	mpz_clear (temp);
-//	return (PyObject *) l;
-//}
+PyObject *mpzToLongObj (mpz_t m)
+{
+	/* borrowed from gmpy */
+	int size = (mpz_sizeinbase (m, 2) + PyLong_SHIFT - 1) / PyLong_SHIFT;
+	int i;
+	mpz_t temp;
+	PyLongObject *l = _PyLong_New (size);
+	if (!l)
+		return NULL;
+	mpz_init_set (temp, m);
+	for (i = 0; i < size; i++)
+	{
+		l->ob_digit[i] = (digit) (mpz_get_ui (temp) & PyLong_MASK);
+		mpz_fdiv_q_2exp (temp, temp, PyLong_SHIFT);
+	}
+	i = size;
+	while ((i > 0) && (l->ob_digit[i - 1] == 0))
+		i--;
+	Py_SIZE(l) = i;
+	mpz_clear (temp);
+	return (PyObject *) l;
+}
 
 void longObjToMPZ (mpz_t m, PyLongObject * p)
 {
@@ -324,7 +324,7 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, int hash_size, uint8_t* out
  * @return				FENC_ERROR_NONE or an error code.
  */
 
-int hash_element_to_bytes(Element *element, int hash_size, uint8_t* output_buf)
+int hash_element_to_bytes(Element *element, int hash_size, uint8_t* output_buf, int prefix)
 {
 	int result = TRUE;
 	unsigned int buf_len;
@@ -336,7 +336,7 @@ int hash_element_to_bytes(Element *element, int hash_size, uint8_t* output_buf)
 	}
 
 	element_to_bytes(temp_buf, element);
-	result = hash_to_bytes(temp_buf, buf_len, hash_size, output_buf, HASH_FUNCTION_ELEMENTS);
+	result = hash_to_bytes(temp_buf, buf_len, hash_size, output_buf, prefix);
 
 	free(temp_buf);
 
@@ -1077,9 +1077,10 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 	Element *object;
 	PyObject *str;
 	char *hash_hex = NULL;
+	int label = 0;
 
 	debug("Hashing the element...\n");
-	if(!PyArg_ParseTuple(args, "O", &object)) {
+	if(!PyArg_ParseTuple(args, "O|i", &object, &label)) {
 		PyErr_SetString(ElementError, "missing element object");
 		return NULL;
 	}
@@ -1091,7 +1092,7 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 	START_CLOCK(dBench);
 	int hash_size = HASH_LEN;
 	uint8_t hash_buf[hash_size + 1];
-	if(!hash_element_to_bytes(object, hash_size, hash_buf)) {
+	if(!hash_element_to_bytes(object, hash_size, hash_buf, label)) {
 		PyErr_SetString(ElementError, "failed to hash element");
 		return NULL;
 	}
@@ -1099,6 +1100,8 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 	hash_hex = convert_buffer_to_hex(hash_buf, hash_size);
 	printf_buffer_as_hex(hash_buf, hash_size);
 	
+
+
 	str = PyBytes_FromString((const char *) hash_hex);
 	free(hash_hex);
 	STOP_CLOCK(dBench);
@@ -1183,7 +1186,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 			if(PyElement_Check(tmpObject)) {
 				object = (Element *) tmpObject;
 				START_CLOCK(dBench);
-				result = hash_element_to_bytes(object, HASH_LEN, hash_buf);
+				result = hash_element_to_bytes(object, HASH_LEN, hash_buf, 0);
 				STOP_CLOCK(dBench);
 			}
 			else if(PyUnicode_Check(tmpObject)) {
@@ -1255,7 +1258,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 			// debug_e("Hashing element '%B' to G1_t...\n", object->e);
 			// hash the element to the G1_t field (uses sha1 as well)
 			// START_CLOCK
-			result = hash_element_to_bytes(object, HASH_LEN, (unsigned char *) hash_buf);
+			result = hash_element_to_bytes(object, HASH_LEN, (unsigned char *) hash_buf, 0);
 			if(!result) {
 				tmp = "could not hash to bytes";
 				goto cleanup;
@@ -1505,6 +1508,18 @@ static PyObject *Group_Check(Element *self, PyObject *args) {
 	PyErr_SetString(ElementError, "invalid object type.");
 	return NULL;
 }
+
+static PyObject *Get_Order(Element *self, PyObject *args) {
+
+	IS_PAIRING_OBJ_NULL(self);
+	mpz_t d;
+	mpz_init(d);
+	element_to_mpz(self->pairing->order, d);
+	PyObject *object = (PyObject *) mpzToLongObj(d);
+	mpz_clear(d);
+	return object; /* returns a PyInt */
+}
+
 
 #if PY_MAJOR_VERSION >= 3
 
