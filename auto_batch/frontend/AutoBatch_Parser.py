@@ -167,7 +167,28 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if (node == None):
 			sys.exit("ASTVarVisitor->buildDotProdValue:  node passed in is of None type.")
 
+		dotProdArgsList = self.myASTParser.getCallArgsList(node)
+		if ( (dotProdArgsList == None) or (type(dotProdArgsList) is not list) or (len(dotProdArgsList) < 4) ):
+			sys.exit("ASTVarVisitor->buildDotProdValue:  return value from getCallArgsList does not meet the proper criteria.")
+
 		dotProdValueToAdd = DotProdValue()
+		dotProdValueToAdd.setNumProds(dotProdArgsList[2])
+		dotProdValueToAdd.setFuncName(dotProdArgsList[3])
+
+		if (len(dotProdArgsList) == 4):
+			return dotProdValueToAdd
+
+		lenList = len(dotProdArgsList)
+		funcArgsList = []
+		numFuncArgs = lenList - 4
+
+		for index in range(0, numFuncArgs):
+			funcArgsList.append(dotProdArgsList[index + 4])
+
+		if (len(funcArgsList) == 0):
+			sys.exit("ASTVarVisitor->buildDotProdValue:  could not extract the function arguments from the dot product.")
+
+		dotProdValueToAdd.setArgsList(funcArgsList)
 
 		return dotProdValueToAdd
 
