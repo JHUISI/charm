@@ -8,6 +8,7 @@ from FloatValue import FloatValue
 from HashValue import HashValue
 from RandomValue import RandomValue
 from LambdaValue import LambdaValue
+from DotProdValue import DotProdValue
 
 def removeSubstringFromEnd(fullString, removeSubstring, leftOrRight):
 	if (len(fullString) == 0):
