@@ -317,8 +317,6 @@ class ASTVarVisitor(ast.NodeVisitor):
 			if (lambdaValueToAdd != None):
 				variableToAdd.setValue(lambdaValueToAdd)
 
-		if (rightNodeType 
-
 		if ( (variableToAdd.getName() != None) and (variableToAdd.getValue() != None) ):
 			leftLineNo = self.myASTParser.getLineNumberOfNode(leftSideNode)
 			rightLineNo = self.myASTParser.getLineNumberOfNode(rightSideNode)
