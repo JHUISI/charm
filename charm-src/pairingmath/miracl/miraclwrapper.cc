@@ -664,6 +664,22 @@ void _element_set_mpz(Group_t type, element_t *dst, mpz_t src)
 	}
 }
 
+void _element_to_mpz(Group_t type, element_t *src, mpz_t dst)
+{
+	if(type == ZR_t) {
+		Big *x = (Big *) src;
+
+		// This is a hack: find a better way of convert big to mpz
+		char c[MAX_LEN+1];
+		memset(c, 0, MAX_LEN);
+		int size = to_binary(*x, MAX_LEN, c, FALSE);
+		string bytes(c, size);
+		const char *b = bytes.c_str();
+		mpz_import(dst, size, 1, sizeof(b[0]), 0, 0, b);
+//		char *result = print_mpz(dst, 10);
+//		printf("Result in dec '%s'\n", result);
+	}
+}
 /* Note the following type definition from MIRACL pairing_3.h
  * G1 is a point over the base field, and G2 is a point over an extension field.
  * GT is a finite field point over the k-th extension, where k is the embedding degree.

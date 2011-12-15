@@ -378,7 +378,7 @@ int hash_element_to_bytes(element_t *element, int hash_size, uint8_t* output_buf
 	unsigned int buf_len;
 	
 	buf_len = element_length_in_bytes(*element);
-	uint8_t *temp_buf = (uint8_t *)malloc(buf_len);
+	uint8_t *temp_buf = (uint8_t *)malloc(buf_len+1);
 	if (temp_buf == NULL) {
 		return FALSE;
 	}
