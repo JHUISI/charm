@@ -9,7 +9,7 @@ class AST_Test(ast.NodeVisitor):
 		print(node.value._fields)
 
 def verify():
-	#a["string"] = 1
+	pk = {4:5, 'x':'10'}
 	if (1 == 1):
 		pass
 
