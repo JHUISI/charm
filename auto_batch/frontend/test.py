@@ -6,7 +6,7 @@ class AST_Test(ast.NodeVisitor):
 		self.my = ASTParser()
 
 	def visit_Assign(self, node):
-		print(node.value.keys)
+		print(node.value._fields)
 
 def verify():
 	#a["string"] = 1

@@ -176,7 +176,45 @@ class ASTParser:
 		except:
 			sys.exit("ASTParser->getDictKeys:  could not obtain the keys list from the node passed in.")
 
-		dddd
+		returnKeysList = []
+
+		for key in dictKeys:
+			keyObject = self.buildObjectFromNode(key)
+			if (keyObject == None):
+				sys.exit("ASTParser->getDictKeys:  return value from buildObjectFromNode is of None type.")
+
+			returnKeysList.append(keyObject)
+
+		if (len(returnKeysList) == 0):
+			sys.exit("ASTParser->getDictKeys:  could not extract any of the keys from the node passed in.")
+
+		return returnKeysList
+
+	def getDictValues(self, node):
+		if (node == None):
+			sys.exit("ASTParser->getDictValues:  node passed in is of None type.")
+
+		if (type(node).__name__ != con.dictTypeAST):
+			sys.exit("ASTParser->getDictValues:  node passed in is not of type " + con.dictTypeAST)
+
+		try:
+			dictValues = node.values
+		except:
+			sys.exit("ASTParser->getDictValues:  could not obtain the values list from the node passed in.")
+
+		returnValuesList = []
+
+		for value in dictValues:
+			valueObject = self.buildObjectFromNode(value)
+			if (valueObject == None):
+				sys.exit("ASTParser->getDictValues:  return value from buildObjectFromNode is of None type.")
+
+			returnValuesList.append(valueObject)
+
+		if (len(returnValuesList) == 0):
+			sys.exit("ASTParser->getDictValues:  could not extract any of the values from the node passed in.")
+
+		return returnValuesList
 
 	def getCallType(self, node):
 		if (node == None):
@@ -481,42 +519,38 @@ class ASTParser:
 		try:
 			nodeName = self.getNameOfNode(node)
 		except:
-			sys.exit("ASTParser->getSubscriptSlice:  call to getNameOfNode failed.")
-
-STARTHERE
-
+			sys.exit("ASTParser->buildObjectFromNode:  call to getNameOfNode failed.")
 
 		try:
-			sliceType = type(node.slice.value).__name__
+			nodeType = type(node).__name__
 		except:
-			sys.exit("ASTParser->getSubscriptSlice:  could not obtain the type of the slice of the node passed in.")
+			sys.exit("ASTParser->buildObjectFromNode:  could not obtain the type of the node passed in.")
 
-		if (sliceType == con.nameOnlyTypeAST):
-			returnSlice = StringName()
-			returnSlice.setName(sliceName)
-			returnSlice.setLineNo(node.lineno)
-			return returnSlice
+		if (nodeType == con.nameOnlyTypeAST):
+			returnObject = StringName()
+			returnObject.setName(nodeName)
+			returnObject.setLineNo(node.lineno)
+			return returnObject
 
-		if (sliceType == con.strOnlyTypeAST):
-			returnSlice = StringValue()
-			returnSlice.setValue(sliceName)
-			returnSlice.setLineNo(node.lineno)
-			return returnSlice
+		if (nodeType == con.strOnlyTypeAST):
+			returnObject = StringValue()
+			returnObject.setValue(nodeName)
+			returnObject.setLineNo(node.lineno)
+			return returnObject
 
-		if (sliceType == con.numTypeAST):
-			if (type(sliceName).__name__ == con.intTypePython):
-				returnSlice = IntegerValue()
-				returnSlice.setValue(sliceName)
-				returnSlice.setLineNo(node.lineno)
-				return returnSlice
-			if (type(sliceName).__name__ == con.floatTypePython):
-				returnSlice = FloatValue()
-				returnSlice.setValue(sliceName)
-				returnSlice.setLineNo(node.lineno)
-				return returnSlice
+		if (nodeType == con.numTypeAST):
+			if (type(nodeName).__name__ == con.intTypePython):
+				returnObject = IntegerValue()
+				returnObject.setValue(nodeName)
+				returnObject.setLineNo(node.lineno)
+				return returnObject
+			if (type(nodeName).__name__ == con.floatTypePython):
+				returnObject = FloatValue()
+				returnObject.setValue(nodeName)
+				returnObject.setLineNo(node.lineno)
+				return returnObject
 
-		sys.exit("ASTParser->getSubscriptSlice:  type of slice is not currently supported.")
-
+		sys.exit("ASTParser->buildObjectFromNode:  type of node is not currently supported.")
 
 	def getSubscriptSlice(self, node):
 		if (node == None):

@@ -308,9 +308,13 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if ( (dictKeys == None) or (type(dictKeys).__name__ != con.listTypePython) ):
 			sys.exit("ASTVarVisitor->buildDictValue:  problem with value returned from myASTParser->getDictKeys.")
 
-		dddd
+		dictValues = self.myASTParser.getDictValues(node)
+		if ( (dictValues == None) or (type(dictValues).__name__ != con.listTypePython) ):
+			sys.exit("ASTVarVisitor->buildDictValue:  problem with value returned from myASTParser->getDictValues.")
 
 		returnDictValue = DictValue()
+		returnDictValue.setKeys(dictKeys)
+		returnDictValue.setValues(dictValues)
 
 		return returnDictValue
 
