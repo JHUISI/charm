@@ -2,6 +2,7 @@ import ast, con, copy, sys
 from ASTParser import *
 from Variable import Variable
 from StringName import StringName
+from SubscriptName import SubscriptName
 from StringValue import StringValue
 from IntegerValue import IntegerValue
 from FloatValue import FloatValue
@@ -9,6 +10,7 @@ from HashValue import HashValue
 from RandomValue import RandomValue
 from LambdaValue import LambdaValue
 from DotProdValue import DotProdValue
+from DictValue import DictValue
 
 def removeSubstringFromEnd(fullString, removeSubstring, leftOrRight):
 	if (len(fullString) == 0):
@@ -45,6 +47,9 @@ class ASTVarVisitor(ast.NodeVisitor):
 		self.myASTParser = myASTParser
 
 	def buildStringName(self, node):
+		if (node == None):
+			sys.exit("ASTVarVisitor->buildStringName:  node passed in is of None type.")
+
 		stringName = self.myASTParser.getStringNameFromNode(node)
 		if (stringName == None):
 			sys.exit("ASTVarVisitor->buildStringName:  string name returned from myASTParser->getStringNameFromNode is of None type.")
@@ -61,6 +66,9 @@ class ASTVarVisitor(ast.NodeVisitor):
 		return stringNameToAdd
 
 	def buildStringValue(self, node):
+		if (node == None):
+			sys.exit("ASTVarVisitor->buildStringValue:  node passed in is of None type.")
+
 		stringValue = self.myASTParser.getStringValueFromNode(node)
 		if (stringValue == None):
 			sys.exit("ASTVarVisitor->buildStringValue:  string value returned from myASTParser->getStringValueFromNode is of None type.")
@@ -76,7 +84,28 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		return stringValueToAdd
 
+	def buildSubscriptName(self, node):
+		if (node == None):
+			sys.exit("ASTVarVisitor->buildSubscriptName:  node passed in is of None type.")
+
+		valueAsStringName = self.myASTParser.getSubscriptValueAsStringName(node)
+		if ( (valueAsStringName == None) or (type(valueAsStringName).__name__ != con.stringName) ):
+			sys.exit("ASTVarVisitor->buildSubscriptName:  problem with value returned from myASTParser->getSubscriptValueAsStringName.")
+
+		slice = self.myASTParser.getSubscriptSlice(node)
+		if (slice == None):
+			sys.exit("ASTVarVisitor->buildSubscriptName:  value returned from myASTParser->getSubscriptSlice is of None type.")
+
+		subscriptNameToAdd = SubscriptName()
+		subscriptNameToAdd.setValue(valueAsStringName)
+		subscriptNameToAdd.setSlice(slice)
+
+		return subscriptNameToAdd
+
 	def buildIntValue(self, node):
+		if (node == None):
+			sys.exit("ASTVarVisitor->buildIntValue:  node passed in is of None type.")
+
 		intValue = self.myASTParser.getIntValueFromNode(node)
 		if (intValue == None):
 			sys.exit("ASTVarVisitor->buildIntValue:  int value returned from myASTParser->getIntValueFromNode is of None type.")
@@ -90,6 +119,9 @@ class ASTVarVisitor(ast.NodeVisitor):
 		return intValueToAdd
 
 	def buildFloatValue(self, node):
+		if (node == None):
+			sys.exit("ASTVarVisitor->buildFloatValue:  node passed in is of None type.")
+
 		floatValue = self.myASTParser.getFloatValueFromNode(node)
 		if (floatValue == None):
 			sys.exit("ASTVarVisitor->buildFloatValue:  float value returned from myASTParser->getFloatValueFromNode is of None type.")
@@ -268,6 +300,20 @@ class ASTVarVisitor(ast.NodeVisitor):
 		returnLambdaValue.setExpression(lambdaExpression)
 		return returnLambdaValue
 
+	def buildDictValue(self, node):
+		if (node == None):
+			sys.exit("ASTVarVisitor->buildDictValue:  node passed in is of None type.")
+
+		dictKeys = self.myASTParser.getDictKeys(node)
+		if ( (dictKeys == None) or (type(dictKeys).__name__ != con.listTypePython) ):
+			sys.exit("ASTVarVisitor->buildDictValue:  problem with value returned from myASTParser->getDictKeys.")
+
+		dddd
+
+		returnDictValue = DictValue()
+
+		return returnDictValue
+
 	def processAssignment(self, leftSideNode, rightSideNode):
 		if (leftSideNode == None):
 			sys.exit("ASTVarVisitor->processAssignment:  left side node passed in is of None type.")
@@ -286,6 +332,13 @@ class ASTVarVisitor(ast.NodeVisitor):
 				sys.exit("ASTVarVisitor->processAssignment:  return value of buildStringName is of None type.")
 
 			variableToAdd.setName(stringNameToAdd)
+
+		if (leftNodeType == con.subscriptTypeAST):
+			subscriptNameToAdd = self.buildSubscriptName(leftSideNode)
+			if (subscriptNameToAdd == None):
+				sys.exit("ASTVarVisitor->processAssignment:  return value of buildSubscriptName is of None type.")
+
+			variableToAdd.setName(subscriptNameToAdd)
 
 		if (rightNodeType == str):
 			stringValueToAdd = self.buildStringValue(rightSideNode)
@@ -317,6 +370,11 @@ class ASTVarVisitor(ast.NodeVisitor):
 			lambdaValueToAdd = self.buildLambdaValue(rightSideNode)
 			if (lambdaValueToAdd != None):
 				variableToAdd.setValue(lambdaValueToAdd)
+
+		if (rightNodeType == con.dictTypeAST):
+			dictValueToAdd = self.buildDictValue(rightSideNode)
+			if (dictValueToAdd != None):
+				variableToAdd.setValue(dictValueToAdd)
 
 		if ( (variableToAdd.getName() != None) and (variableToAdd.getValue() != None) ):
 			leftLineNo = self.myASTParser.getLineNumberOfNode(leftSideNode)
@@ -515,28 +573,7 @@ class ASTVarVisitor(ast.NodeVisitor):
 		return unknownType
 
 	def visit_Assign(self, node):
-		if (ast.dump(node.targets[0]).startswith('Subscript(')):
-			if (valueRepInAST in node.targets[0]._fields):
-				if (idRepInAST in node.targets[0].value._fields):
-					topLevelKey = node.targets[0].value.id
-					if (topLevelKey not in self.groupTypes):
-						self.groupTypes[topLevelKey] = {}
-					FIXME = True
-					
-		
-		if ( (ast.dump(node.targets[0]).startswith('Name(')) or (FIXME == True)):			
-			if (idRepInAST in node.targets[0]._fields):
-				topLevelKey = node.targets[0].id
-				if (topLevelKey not in self.groupTypes.keys()):
-					self.groupTypes[topLevelKey] = {}
-				if ( (topLevelKey == N_name) and (type(node.value).__name__ == numRepInAST) ):
-					self.groupTypes[topLevelKey][node.lineno] = {valueRepInAST:node.value.n}
-					return
-				if ( (topLevelKey == numSignersName) and (type(node.value).__name__ == numRepInAST) ):
-					self.groupTypes[topLevelKey][node.lineno] = {valueRepInAST:node.value.n}
-					return
-				FIXME = True
-			if (FIXME == True):
+
 				if (type(node.value).__name__ == dictRepInAST):
 					keysList = node.value.keys
 					if (len(keysList) > 0):

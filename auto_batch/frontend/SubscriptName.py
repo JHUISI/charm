@@ -4,29 +4,48 @@ from Name import Name
 class SubscriptName:
 	def __init__(self):
 		self.lineNo = None
+		self.value = None
+		self.slice = None
+
+	def getValue(self):
+		return self.value
+
+	def getSlice(self):
+		return self.slice
 
 	def getType(self):
-		return str
+		return con.subscriptTypeAST
 
 	def getLineNo(self):
 		return self.lineNo
 
-	def setName(self, name):
-		if (type(name) is not str):
-			sys.exit("Name passed to StringName class is not of type " + con.strTypePython)
+	def setValue(self, value):
+		if (value == None):
+			sys.exit("SubscriptName->setValue:  value passed in is of None type.")
 
-		if (len(name) == 0):
-			sys.exit("Name passed to StringName class is of length zero.")
+		if (type(value).__name__ != con.stringName):
+			sys.exit("SubscriptName->setValue:  value passed in is not of type " + con.stringName)
 
-		self.name = name
+		self.value = value
+
+	def setSlice(self, slice):
+		if (slice == None):
+			sys.exit("SubscriptName->setSlice:  slice passed in is of None type.")
+
+		sliceType = type(slice).__name__
+
+		if ( (sliceType != con.stringName) and (sliceType != con.stringValue) and (sliceType != con.integerValue) and (sliceType != con.floatValue) ):
+			sys.exit("SubscriptName->setSlice:  slice passed in is not one of the supported types (" + con.stringName + ", " + con.stringValue + ", " + con.integerValue + ", or " + con.floatValue + ").")
+
+		self.slice = slice
 
 	def setLineNo(self, lineNo):
 		if (type(lineNo) is not int):
-			sys.exit("StringName->setLineNo:  line number passed in is not of type " + con.intTypePython)
+			sys.exit("SubscriptName->setLineNo:  line number passed in is not of type " + con.intTypePython)
 
 		if (lineNo < 1):
-			sys.exit("StringName->setLineNo:  line number passed in is less than one.")
+			sys.exit("SubscriptName->setLineNo:  line number passed in is less than one.")
 
 		self.lineNo = lineNo
 
-Name.register(StringName)
+Name.register(SubscriptName)
