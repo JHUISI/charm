@@ -1,8 +1,9 @@
-import ast, con, sys
+import ast, con, copy, sys
 from StringName import StringName
 from StringValue import StringValue
 from IntegerValue import IntegerValue
 from FloatValue import FloatValue
+from FunctionArgMap import FunctionArgMap
 
 def getValueOfLastLine(dict):
 	if (len(dict) == 0):
@@ -13,30 +14,13 @@ def getValueOfLastLine(dict):
 	lenKeys = len(keys)
 	return dict[keys[lenKeys-1]]
 
-def getCallArgsList(node):
-	if (node == None):
-		sys.exit("ASTParser->getCallArgsList:  node passed in is of None type.")
-
-	try:
-		argsList = node.args
-	except:
-		sys.exit("ASTParser->getCallArgsList:  could not obtain the arguments list of the node passed in.")
-
-	returnArgsList = []
-
-	for callArgNode in argsList:
-		nameOfNode = getNameOfNode(callArgNode)
-		if (nameOfNode != None):
-			returnArgsList.append(nameOfNode)
-
-	if (len(returnArgsList) == 0):
-		return None
-
-	return returnArgsList
-
 class ASTFuncArgMapsVisitor(ast.NodeVisitor):
-	def __init__(self):
-		self.functionArgMappings = {}
+	def __init__(self, functionArgNames):
+		if ( (functionArgNames == None) or (type(functionArgNames).__name__ != con.dictTypePython) or (len(functionArgNames) == 0) ):
+			sys.exit("ASTFuncArgMapsVisitor->__init__:  problem with the function argument names passed in.")
+
+		self.functionArgNames = functionArgNames
+		self.functionArgMappings = []
 
 	def visit_Call(self, node):
 		try:
@@ -44,7 +28,27 @@ class ASTFuncArgMapsVisitor(ast.NodeVisitor):
 		except:
 			sys.exit("ASTFuncArgMapsVisitor->visit_Call:  could not obtain the name of the destination function.")
 
-		pass
+		if (destFuncName not in self.functionArgNames):
+			sys.exit("ASTFuncArgMapsVisitor->visit_Call:  " + destFuncName + " is not in the function argument names object passed in.")
+
+		destArgNames = self.functionArgNames[destFuncName]
+
+		myASTParser = ASTParser()
+		callerArgsList = myASTParser.getCallArgsList(node)
+
+		if (len(callerArgsList) != len(destArgNames) ):
+			sys.exit("ASTFuncArgMapsVisitor->visit_Call:  length of caller and destination arguments lists are not equal.")
+
+		funcArgMapObject = FunctionArgMap()
+		funcArgMapObject.setDestFuncName(destFuncName)
+
+		if (len(callerArgsList) != 0):
+			funcArgMapObject.setCallerArgsList(callerArgsList)
+			funcArgMapObject.setDestArgsList(destArgNames)
+
+		funcArgMapObject.setLineNo(node.lineno)
+
+		self.functionArgMappings.append(copy.deepcopy(funcArgMapObject))
 
 	def getFunctionArgMappings(self):
 		return self.functionArgMappings
@@ -207,7 +211,7 @@ class ASTParser:
 		if ( (functionArgNames == None) or (type(functionArgNames).__name__ != con.dictTypePython) or (len(functionArgNames) == 0) ):
 			sys.exit("ASTParser->getFunctionArgMappings:  problem with the function argument names passed in.")
 
-		myFuncArgMapsVisitor = ASTFuncArgMapsVisitor()
+		myFuncArgMapsVisitor = ASTFuncArgMapsVisitor(functionArgNames)
 		myFuncArgMapsVisitor.visit(funcNode)
 		return myFuncArgMapsVisitor.getFunctionArgMappings()
 
@@ -426,6 +430,31 @@ class ASTParser:
 
 		if (len(returnArgsList) == 0):
 			sys.exit("ASTParser->getLambdaArgsList:  could not obtain any of the arguments of the node passed in.")
+
+		return returnArgsList
+
+	def getCallArgsList(self, node):
+		if (node == None):
+			sys.exit("ASTParser->getCallArgsList:  node passed in is of None type.")
+
+		try:
+			argsList = node.args
+		except:
+			sys.exit("ASTParser->getCallArgsList:  could not obtain the arguments list of the node passed in.")
+
+		returnArgsList = []
+
+		for callArgNode in argsList:
+			nodeObject = self.buildObjectFromNode(callArgNode)
+			if (nodeObject != None):
+				returnArgsList.append(nodeObject)
+
+			#nameOfNode = self.getNameOfNode(callArgNode)
+			#if (nameOfNode != None):
+				#returnArgsList.append(nameOfNode)
+
+		if (len(returnArgsList) == 0):
+			return None
 
 		return returnArgsList
 

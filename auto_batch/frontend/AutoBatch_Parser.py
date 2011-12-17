@@ -668,11 +668,11 @@ def getFunctionArgMappings(functionNames, functionArgNames, myASTParser):
 	functionArgMappings = {}
 
 	for funcName in functionNames:
-		funcArgMapObject = myASTParser.getFunctionArgMappings(functionNames[funcName], functionArgNames)
-		if ( (funcArgMapObject == None) or (type(funcArgMapObject).__name__ != con.functionArgMap) ):
+		funcArgMapList = myASTParser.getFunctionArgMappings(functionNames[funcName], functionArgNames)
+		if ( (funcArgMapList == None) or (type(funcArgMapList).__name__ != con.listTypePython) ):
 			sys.exit("AutoBatch_Parser->getFunctionArgMappings:  problems with value returned from myASTParser->getFunctionArgMappings.")
 
-		functionArgMappings[funcName] = funcArgMapObject
+		functionArgMappings[funcName] = funcArgMapList
 
 	if (len(functionArgMappings) == 0):
 		sys.exit("AutoBatch_Parser->getFunctionArgMappings:  could not obtain any function argument mappings at all.")

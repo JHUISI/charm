@@ -5,8 +5,8 @@ class AST_Test(ast.NodeVisitor):
 	def __init__(self):
 		self.my = ASTParser()
 
-	def visit_Call(self, node):
-		print(node.func.id)
+	def visit_FunctionDef(self, node):
+		print(type(node.args.args[0].arg).__name__)
 
 def verify():
 	pk = {4:5, 'x':'10'}

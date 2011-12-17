@@ -133,7 +133,7 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if (node == None):
 			sys.exit("ASTVarVisitor->buildHashValue:  node passed in is of None type.")
 
-		hashArgsList = ASTParser.getCallArgsList(node)
+		hashArgsList = self.myASTParser.getCallArgsList(node)
 		if (hashArgsList == None):
 			sys.exit("ASTVarVisitor->buildHashValue:  value returned from getCallArgsList is of None type.")
 
@@ -153,7 +153,7 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if (node == None):
 			sys.exit("ASTVarVisitor->buildRandomValue:  node passed in is of None type.")
 
-		randomArgsList = ASTParser.getCallArgsList(node)
+		randomArgsList = self.myASTParser.getCallArgsList(node)
 		if (randomArgsList == None):
 			groupType = con.ZR
 		else:
@@ -174,7 +174,7 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if (node == None):
 			sys.exit("ASTVarVisitor->buildDotProdValue:  node passed in is of None type.")
 
-		dotProdArgsList = ASTParser.getCallArgsList(node)
+		dotProdArgsList = self.myASTParser.getCallArgsList(node)
 		if ( (dotProdArgsList == None) or (type(dotProdArgsList) is not list) or (len(dotProdArgsList) < 4) ):
 			sys.exit("ASTVarVisitor->buildDotProdValue:  return value from getCallArgsList does not meet the proper criteria.")
 
