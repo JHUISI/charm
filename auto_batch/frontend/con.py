@@ -8,6 +8,7 @@ equals = 'Eq()'
 expTypeAST = 'Pow'
 floatValue = 'FloatValue'
 floatTypePython = 'float'
+functionArgMap = 'FunctionArgMap'
 funcNamesNotToTest = ['__init__', 'visit_FunctionDef']
 groupTypes = ['G1', 'G2', 'GT', 'ZR']
 hashType = 'hash'

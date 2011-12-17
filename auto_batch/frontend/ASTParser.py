@@ -13,6 +13,42 @@ def getValueOfLastLine(dict):
 	lenKeys = len(keys)
 	return dict[keys[lenKeys-1]]
 
+def getCallArgsList(node):
+	if (node == None):
+		sys.exit("ASTParser->getCallArgsList:  node passed in is of None type.")
+
+	try:
+		argsList = node.args
+	except:
+		sys.exit("ASTParser->getCallArgsList:  could not obtain the arguments list of the node passed in.")
+
+	returnArgsList = []
+
+	for callArgNode in argsList:
+		nameOfNode = getNameOfNode(callArgNode)
+		if (nameOfNode != None):
+			returnArgsList.append(nameOfNode)
+
+	if (len(returnArgsList) == 0):
+		return None
+
+	return returnArgsList
+
+class ASTFuncArgMapsVisitor(ast.NodeVisitor):
+	def __init__(self):
+		self.functionArgMappings = {}
+
+	def visit_Call(self, node):
+		try:
+			destFuncName = node.func.id
+		except:
+			sys.exit("ASTFuncArgMapsVisitor->visit_Call:  could not obtain the name of the destination function.")
+
+		pass
+
+	def getFunctionArgMappings(self):
+		return self.functionArgMappings
+
 class ASTFunctionArgNames(ast.NodeVisitor):
 	def __init__(self):
 		self.functionArgNames = {}
@@ -163,6 +199,17 @@ class ASTParser:
 		myFuncArgNamesVisitor = ASTFunctionArgNames()
 		myFuncArgNamesVisitor.visit(node)
 		return myFuncArgNamesVisitor.getFunctionArgNames()
+
+	def getFunctionArgMappings(self, funcNode, functionArgNames):
+		if (funcNode == None):
+			sys.exit("ASTParser->getFunctionArgMappings:  function node passed in is of None type.")
+
+		if ( (functionArgNames == None) or (type(functionArgNames).__name__ != con.dictTypePython) or (len(functionArgNames) == 0) ):
+			sys.exit("ASTParser->getFunctionArgMappings:  problem with the function argument names passed in.")
+
+		myFuncArgMapsVisitor = ASTFuncArgMapsVisitor()
+		myFuncArgMapsVisitor.visit(funcNode)
+		return myFuncArgMapsVisitor.getFunctionArgMappings()
 
 	def getDictKeys(self, node):
 		if (node == None):
@@ -401,27 +448,6 @@ class ASTParser:
 			return self.getSubscriptOnly(node)
 
 		return None
-
-	def getCallArgsList(self, node):
-		if (node == None):
-			sys.exit("ASTParser->getCallArgsList:  node passed in is of None type.")
-
-		try:
-			argsList = node.args
-		except:
-			sys.exit("ASTParser->getCallArgsList:  could not obtain the arguments list of the node passed in.")
-
-		returnArgsList = []
-
-		for callArgNode in argsList:
-			nameOfNode = self.getNameOfNode(callArgNode)
-			if (nameOfNode != None):
-				returnArgsList.append(nameOfNode)
-
-		if (len(returnArgsList) == 0):
-			return None
-
-		return returnArgsList
 
 	def getNumOnly(self, node):
 		if (node == None):
