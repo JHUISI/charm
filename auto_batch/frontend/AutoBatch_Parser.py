@@ -683,7 +683,7 @@ def getVarAssignments(rootNode, functionNames, myASTParser):
 	if (rootNode == None):
 		sys.exit("AutoBatch_Parser->getVarAssignments:  root node passed in is of None type.")
 
-	if ( (functionNames == None) or (type(functionNames).__name__ != con.listTypePython) or (len(functionNames) == 0) ):
+	if ( (functionNames == None) or (type(functionNames).__name__ != con.dictTypePython) or (len(functionNames) == 0) ):
 		sys.exit("AutoBatch_Parser->getVarAssignments:  problem with the function names passed in.")
 
 	if (myASTParser == None):
