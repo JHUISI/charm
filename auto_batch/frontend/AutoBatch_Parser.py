@@ -597,15 +597,7 @@ class ASTVarVisitor(ast.NodeVisitor):
 									retGroupType = self.recursiveNodeVisit(node)
 									self.groupTypes[topLevelKey][node.lineno][dictRepInAST][keysList[index].s] = {newSliceNameKey:newSliceName, groupType:retGroupType}
 					return
-				if (type(node.value).__name__ == callRepInAST):
-					if (funcRepInAST in node.value._fields):
-						#print(ast.dump(node))
-						if (attrRepInAST in node.value.func._fields):
-							if (node.value.func.attr in hashRepInAST):
-								if (argsRepInAST in node.value._fields):
-									if (len(node.value.args) == 2):
-										self.groupTypes[topLevelKey][node.lineno] = {hashBase:node.value.args[0].id, groupType:node.value.args[1].id}
-										return
+
 
 						elif (idRepInAST in node.value.func._fields):
 							funcName = node.value.func.id
@@ -650,65 +642,6 @@ class ASTVarVisitor(ast.NodeVisitor):
 								self.groupTypes[topLevelKey][node.lineno][dotProductFuncName] = self.recordDotProductVariable(node.value, topLevelKey, dotProductVariableNames)
 								self.groupTypes[topLevelKey][node.lineno][varNamesKey] = dotProductVariableNames
 								return
-				if (type(node.value).__name__ == lambdaRepInAST):
-					#print(ast.dump(node))
-					if (bodyRepInAST in node.value._fields):
-						#print(ast.dump(node))
-						if (funcRepInAST in node.value.body._fields):
-							#print(ast.dump(node))
-							if (attrRepInAST in node.value.body.func._fields):
-								#print(node.value.body.func._fields)
-								if (node.value.body.func.attr in hashRepInAST):
-									if (argsRepInAST in node.value.body._fields):
-										if (len(node.value.body.args) == 2):
-											#print(node.value.body.args[0]._fields)
-											if (idRepInAST in node.value.body.args[1]._fields):
-												self.groupTypes[topLevelKey][node.lineno] = {}
-												self.groupTypes[topLevelKey][node.lineno][hashFunction] = {}
-												self.groupTypes[topLevelKey][node.lineno][hashFunction][groupType] = node.value.body.args[1].id
-												return
-												#pass
-						#elif (binOpRepInAST in node.value.body._fields):
-							#print(ast.dump(node))
-						else:
-							#print(type(node.value.body).__name__)
-							self.groupTypes[topLevelKey][node.lineno] = {}
-							lambdaArgs = self.getLambdaArgs(node.value)
-							self.groupTypes[topLevelKey][node.lineno][lambdaFunction] = self.getLambdaFuncExpression(node.value.body, lambdaArgs)
-							return
-
-				if (type(node.value).__name__ == tupleRepInAST):
-					if (eltsRepInAST in node.value._fields):
-						#print(ast.dump(node))
-						lenOfTupleItems = len(node.value.elts)
-						self.groupTypes[topLevelKey][node.lineno] = {}
-						self.groupTypes[topLevelKey][node.lineno][tupleKey] = {}
-						self.groupTypes[topLevelKey][node.lineno][tupleKey][varNamesKey] = []
-						self.groupTypes[topLevelKey][node.lineno][tupleKey][groupType] = []
-						for tupleIndex in range(0, lenOfTupleItems):
-							if (idRepInAST in node.value.elts[tupleIndex]._fields):
-								tupleArgName = node.value.elts[tupleIndex].id
-								self.groupTypes[topLevelKey][node.lineno][tupleKey][varNamesKey].append(tupleArgName)
-								self.groupTypes[topLevelKey][node.lineno][tupleKey][groupType].append(self.getGroupType(tupleArgName))
-						return
-
-				if (type(node.value).__name__ == 'Subscript'):
-					if (valueRepInAST in node.value._fields):
-						if (idRepInAST in node.value.value._fields):
-							dictEntryName = node.value.value.id
-							if (sliceRepInAST in node.value._fields):
-								if (valueRepInAST in node.value.slice._fields):
-									#print(node.value.slice.value._fields)
-									if (sRepInAST in node.value.slice.value._fields):
-										dictEntrySlice = node.value.slice.value.s
-										#print(dictEntrySlice)
-										self.groupTypes[topLevelKey][node.lineno] = {}
-										self.groupTypes[topLevelKey][node.lineno][groupType] = self.getGroupType(dictEntryName, dictEntrySlice)
-
-
-						#print(node.value.elts)
-
-						#print(node.value._fields)
 
 
 				retGroupType = self.recursiveNodeVisit(node)
@@ -1134,12 +1067,27 @@ def getTupleGroupTypes(astAssignDict, varName):
 
 	return tupleGroupTypes
 
+def getFunctionArgMappings(rootNode, functionNames, functionArgNames, myASTParser):
+	if (rootNode == None):
+		sys.exit("AutoBatch_Parser->getFunctionArgMappings:  root node passed in is of None type.")
+
+	if ( (functionNames == None) or (type(functionNames).__name__ != con.listTypePython) ):
+		sys.exit("AutoBatch_Parser->getFunctionArgMappings:  problem with the function names passed in.")
+
+	if ( (functionArgNames == None) or (type(functionArgNames).__name__ != con.dictTypePython) ):
+		sys.exit("AutoBatch_Parser->getFunctionArgMappings:  problem with the function argument names passed in.")
+
+	if (myASTParser == None):
+		sys.exit("AutoBatch_Parser->getFunctionArgMappings:  myASTParser passed in is of None type.")
+
+	STARTHERE
+
 def getVarAssignments(rootNode, functionNames, myASTParser):
 	if (rootNode == None):
 		sys.exit("AutoBatch_Parser->getVarAssignments:  root node passed in is of None type.")
 
-	if (functionNames == None):
-		sys.exit("AutoBatch_Parser->getVarAssignments:  function names passed in are of None type.")
+	if ( (functionNames == None) or (type(functionNames).__name__ != con.listTypePython) ):
+		sys.exit("AutoBatch_Parser->getVarAssignments:  problem with the function names passed in.")
 
 	if (myASTParser == None):
 		sys.exit("AutoBatch_Parser->getVarAssignments:  myASTParser passed in is of None type.")
@@ -1152,7 +1100,7 @@ def getVarAssignments(rootNode, functionNames, myASTParser):
 		varAssignments[funcName] = copy.deepcopy(myVarVisitor.getVarAssignDict())
 		del myVarVisitor
 
-	if (varAssignments == {}):
+	if (len(varAssignments) == 0):
 		sys.exit("AutoBatch_Parser->getVarAssigments:  could not find any variable assignments.")
 
 	return varAssignments
@@ -1188,6 +1136,10 @@ def main():
 			del functionNames[funcName]
 		if (funcName in functionArgNames):
 			del functionArgNames[funcName]
+
+	functionArgMappings = getFunctionArgMappings(rootNode, functionNames, functionArgNames, myASTParser)
+	if (functionArgMappings == None):
+		sys.exit("AutoBatch_Parser->main:  mappings of variables passed between functions from getFunctionArgMappings is of None type.")
 
 	verifyFuncNodeList = myASTParser.getFunctionNode(rootNode, con.verifyFuncName)
 	if (verifyFuncNodeList == None):
