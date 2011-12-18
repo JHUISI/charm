@@ -507,8 +507,12 @@ def getVariableTypes(variableTypes, assignmentsDict):
 
 	return variableTypes
 
-def writeBVFile():
-	print("hello")
+def getNumSignatures(varAssignments)
+
+
+
+def writeBVFile(varAssignments):
+	numSignatures = getNumSignatures(varAssignments)
 
 '''
 def writeBVFile(outputFileName, variableTypes, precomputeTypes, cleanVerifyEqLn):
@@ -762,7 +766,7 @@ def main():
 	if (varAssignments == None):
 		sys.exit("AutoBatch_Parser->main:  getVarAssignments returned None when trying to get the variable assignments.")
 
-	writeBVFile()
+	writeBVFile(varAssignments)
 
 '''
 
