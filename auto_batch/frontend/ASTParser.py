@@ -77,9 +77,12 @@ class ASTFunctionArgNames(ast.NodeVisitor):
 
 		for argItr in argsList:
 			try:
-				argNamesList.append(argItr.arg)
+				argToAdd = argItr.arg
 			except:
 				sys.exit("ASTParser->ASTFunctionArgNames->visit_FunctionDef:  could not extract one of the argument names of function " + nodeName)
+
+			if (argToAdd != con.self):
+				argNamesList.append(argToAdd)
 
 		self.functionArgNames[nodeName] = argNamesList
 
