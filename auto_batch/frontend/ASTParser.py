@@ -22,11 +22,40 @@ class ASTFuncArgMapsVisitor(ast.NodeVisitor):
 		self.functionArgNames = functionArgNames
 		self.functionArgMappings = []
 
-	def visit_Call(self, node):
+	def getDestFuncName(self, node):
+		if ( (node == None) or (type(node).__name__ != con.callTypeAST) ):
+			sys.exit("ASTFuncArgMapsVisitor->getDestFuncName:  problem with node passed in to function.")
+
 		try:
 			destFuncName = node.func.id
 		except:
-			sys.exit("ASTFuncArgMapsVisitor->visit_Call:  could not obtain the name of the destination function.")
+			destFuncName = None
+
+		if (destFuncName != None):
+			return destFuncName
+
+		try:
+			funcValueName = node.func.value.id
+		except:
+			sys.exit("ASTFuncArgMapsVisitor->getDestFuncName:  could not obtain any information about the call represented by the node passed in.")
+
+		if (funcValueName != con.self):
+			return None
+
+		try:
+			funcAttrName = node.func.attr
+		except:
+			sys.exit("ASTFuncArgMapsVisitor->getDestFuncName:  could not obtain the function's attribute name from the node passed in.")
+
+		return funcAttrName
+
+	def visit_Call(self, node):
+		destFuncName = self.getDestFuncName(node)
+		if (destFuncName == None):
+			return
+
+		if (type(destFuncName).__name__ != con.strTypePython):
+			sys.exit("ASTFuncArgMapsVisitor->visit_Call:  function name returned from getDestFuncName function is not of type " + con.strTypePython)
 
 		if (destFuncName not in self.functionArgNames):
 			return

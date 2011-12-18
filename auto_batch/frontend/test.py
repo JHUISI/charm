@@ -5,11 +5,10 @@ class AST_Test(ast.NodeVisitor):
 	def __init__(self):
 		self.my = ASTParser()
 
-	def visit_FunctionDef(self, node):
-		print(type(node.args.args[0].arg).__name__)
+	def visit_Call(self, node):
+		print(node.func.attr)
 
 def verify():
-	pk = {4:5, 'x':'10'}
 	if (1 == 1):
 		pass
 
