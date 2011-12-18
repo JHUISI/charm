@@ -507,7 +507,8 @@ def getVariableTypes(variableTypes, assignmentsDict):
 
 	return variableTypes
 
-def getNumSignatures(varAssignments)
+def getNumSignatures(varAssignments):
+	pass
 
 
 
