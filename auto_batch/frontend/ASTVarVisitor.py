@@ -118,11 +118,15 @@ class ASTVarVisitor(ast.NodeVisitor):
 		hashGroupType = None
 
 		for hashArg in hashArgsList:
-			if hashArg in con.groupTypes:
+			if (type(hashArg).__name__ != con.stringName):
+				continue
+
+			possibleGroupType = hashArg.getName()
+			if (possibleGroupType in con.groupTypes):
 				if (hashGroupType != None):
 					sys.exit("ASTVarVisitor->getHashGroupType:  found more than one argument that represents group type.")
 
-				hashGroupType = hashArg
+				hashGroupType = possibleGroupType
 
 		if (hashGroupType == None):
 			sys.exit("ASTVarVisitor->getHashGroupType:  could not locate a group type from the arguments list.")
@@ -141,7 +145,7 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if (hashGroupType == None):
 			sys.exit("ASTVarVisitor->buildHashValue:  value returned from getHashGroupType is of None type.")
 
-		hashArgsList.remove(hashGroupType)
+		#hashArgsList.remove(hashGroupType)
 
 		hashValueToAdd = HashValue()
 		hashValueToAdd.setArgsList(hashArgsList)
@@ -157,13 +161,13 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if (randomArgsList == None):
 			groupType = con.ZR
 		else:
-			if (len(randomArgsList) != 1):
-				sys.exit("ASTVarVisitor->buildRandomValue:  length of argument list returned from getCallArgsList is greater than one.")
+			if ( (len(randomArgsList) != 1) or (type(randomArgsList[0]).__name__ != con.stringName) ):
+				sys.exit("ASTVarVisitor->buildRandomValue:  problem with the values returned from myASTParser->getCallArgsList.")
 
-			if (randomArgsList[0] not in con.groupTypes):
+			if (randomArgsList[0].getName() not in con.groupTypes):
 				sys.exit("ASTVarVisitor->buildRandomValue:  the argument returned from getCallArgsList is not a group type that is supported.")
 
-			groupType = randomArgsList[0]
+			groupType = randomArgsList[0].getName()
 
 		randomValueToAdd = RandomValue()
 		randomValueToAdd.setGroupType(groupType)
