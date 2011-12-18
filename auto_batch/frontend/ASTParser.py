@@ -29,7 +29,8 @@ class ASTFuncArgMapsVisitor(ast.NodeVisitor):
 			sys.exit("ASTFuncArgMapsVisitor->visit_Call:  could not obtain the name of the destination function.")
 
 		if (destFuncName not in self.functionArgNames):
-			sys.exit("ASTFuncArgMapsVisitor->visit_Call:  " + destFuncName + " is not in the function argument names object passed in.")
+			return
+			#sys.exit("ASTFuncArgMapsVisitor->visit_Call:  " + destFuncName + " is not in the function argument names object passed in.")
 
 		destArgNames = self.functionArgNames[destFuncName]
 

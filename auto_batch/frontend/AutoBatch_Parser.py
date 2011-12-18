@@ -507,6 +507,10 @@ def getVariableTypes(variableTypes, assignmentsDict):
 
 	return variableTypes
 
+def writeBVFile():
+	print("hello")
+
+'''
 def writeBVFile(outputFileName, variableTypes, precomputeTypes, cleanVerifyEqLn):
 	outputFile = open(outputFileName, 'w')
 
@@ -551,6 +555,7 @@ def writeBVFile(outputFileName, variableTypes, precomputeTypes, cleanVerifyEqLn)
 	outputFile.close()
 
 	#print(outputString)
+'''
 
 def findVariable(astAssignDict, variableName):
 	if (variableName not in astAssignDict.keys()):
@@ -757,7 +762,7 @@ def main():
 	if (varAssignments == None):
 		sys.exit("AutoBatch_Parser->main:  getVarAssignments returned None when trying to get the variable assignments.")
 
-	pass
+	writeBVFile()
 
 '''
 
