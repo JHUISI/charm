@@ -7,7 +7,7 @@ class DotProdValue:
 		self.skipValue = None
 		self.numProds = None
 		self.funcName = None
-		self.argsList = None
+		self.argList = None
 		self.lineNo = None
 
 	def getInitialValue(self):
@@ -22,8 +22,8 @@ class DotProdValue:
 	def getFuncName(self):
 		return self.funcName
 
-	def getArgsList(self):
-		return self.argsList
+	def getArgList(self):
+		return self.argList
 
 	def getType(self):
 		return con.dotProdType
@@ -55,11 +55,11 @@ class DotProdValue:
 
 		self.funcName = funcName
 
-	def setArgsList(self, argsList):
-		if ( (argsList == None) or (type(argsList) is not list) or (len(argsList) == 0) ):
-			sys.exit("DotProdValue->setArgsList:  problem with arguments list passed in.")
+	def setArgList(self, argList):
+		if ( (argList == None) or (type(argList) is not list) or (len(argList) == 0) ):
+			sys.exit("DotProdValue->setArgList:  problem with arguments list passed in.")
 
-		self.argsList = argsList
+		self.argList = argList
 
 	def setLineNo(self, lineNo):
 		if (type(lineNo) is not int):

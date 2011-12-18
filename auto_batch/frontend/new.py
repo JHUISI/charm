@@ -1,1 +1,1 @@
-M = self.dump(message)
+M = {'a':str(x)}

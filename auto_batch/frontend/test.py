@@ -6,7 +6,7 @@ class AST_Test(ast.NodeVisitor):
 		self.my = ASTParser()
 
 	def visit_Call(self, node):
-		print(node.func.attr)
+		print(ast.dump(node))
 
 def verify():
 	if (1 == 1):

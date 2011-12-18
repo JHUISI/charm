@@ -108,16 +108,16 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		return floatValueToAdd
 
-	def getHashGroupType(self, hashArgsList):
-		if (hashArgsList == None):
+	def getHashGroupType(self, hashArgList):
+		if (hashArgList == None):
 			sys.exit("ASTVarVisitor->getHashGroupType:  arguments list passed in is of None type.")
 
-		if (len(hashArgsList) == 0):
+		if (len(hashArgList) == 0):
 			sys.exit("ASTVarVisitor->getHashGroupType:  arguments list passed in is empty.")
 
 		hashGroupType = None
 
-		for hashArg in hashArgsList:
+		for hashArg in hashArgList:
 			if (type(hashArg).__name__ != con.stringName):
 				continue
 
@@ -137,18 +137,18 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if (node == None):
 			sys.exit("ASTVarVisitor->buildHashValue:  node passed in is of None type.")
 
-		hashArgsList = self.myASTParser.getCallArgsList(node)
-		if (hashArgsList == None):
-			sys.exit("ASTVarVisitor->buildHashValue:  value returned from getCallArgsList is of None type.")
+		hashArgList = self.myASTParser.getCallArgList(node)
+		if (hashArgList == None):
+			sys.exit("ASTVarVisitor->buildHashValue:  value returned from getCallArgList is of None type.")
 
-		hashGroupType = self.getHashGroupType(hashArgsList)
+		hashGroupType = self.getHashGroupType(hashArgList)
 		if (hashGroupType == None):
 			sys.exit("ASTVarVisitor->buildHashValue:  value returned from getHashGroupType is of None type.")
 
-		#hashArgsList.remove(hashGroupType)
+		#hashArgList.remove(hashGroupType)
 
 		hashValueToAdd = HashValue()
-		hashValueToAdd.setArgsList(hashArgsList)
+		hashValueToAdd.setArgList(hashArgList)
 		hashValueToAdd.setGroupType(hashGroupType)
 
 		return hashValueToAdd
@@ -157,17 +157,17 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if (node == None):
 			sys.exit("ASTVarVisitor->buildRandomValue:  node passed in is of None type.")
 
-		randomArgsList = self.myASTParser.getCallArgsList(node)
-		if (randomArgsList == None):
+		randomArgList = self.myASTParser.getCallArgList(node)
+		if (randomArgList == None):
 			groupType = con.ZR
 		else:
-			if ( (len(randomArgsList) != 1) or (type(randomArgsList[0]).__name__ != con.stringName) ):
-				sys.exit("ASTVarVisitor->buildRandomValue:  problem with the values returned from myASTParser->getCallArgsList.")
+			if ( (len(randomArgList) != 1) or (type(randomArgList[0]).__name__ != con.stringName) ):
+				sys.exit("ASTVarVisitor->buildRandomValue:  problem with the values returned from myASTParser->getCallArgList.")
 
-			if (randomArgsList[0].getName() not in con.groupTypes):
-				sys.exit("ASTVarVisitor->buildRandomValue:  the argument returned from getCallArgsList is not a group type that is supported.")
+			if (randomArgList[0].getName() not in con.groupTypes):
+				sys.exit("ASTVarVisitor->buildRandomValue:  the argument returned from getCallArgList is not a group type that is supported.")
 
-			groupType = randomArgsList[0].getName()
+			groupType = randomArgList[0].getName()
 
 		randomValueToAdd = RandomValue()
 		randomValueToAdd.setGroupType(groupType)
@@ -178,28 +178,28 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if (node == None):
 			sys.exit("ASTVarVisitor->buildDotProdValue:  node passed in is of None type.")
 
-		dotProdArgsList = self.myASTParser.getCallArgsList(node)
-		if ( (dotProdArgsList == None) or (type(dotProdArgsList) is not list) or (len(dotProdArgsList) < 4) ):
-			sys.exit("ASTVarVisitor->buildDotProdValue:  return value from getCallArgsList does not meet the proper criteria.")
+		dotProdArgList = self.myASTParser.getCallArgList(node)
+		if ( (dotProdArgList == None) or (type(dotProdArgList) is not list) or (len(dotProdArgList) < 4) ):
+			sys.exit("ASTVarVisitor->buildDotProdValue:  return value from getCallArgList does not meet the proper criteria.")
 
 		dotProdValueToAdd = DotProdValue()
-		dotProdValueToAdd.setNumProds(dotProdArgsList[2])
-		dotProdValueToAdd.setFuncName(dotProdArgsList[3])
+		dotProdValueToAdd.setNumProds(dotProdArgList[2])
+		dotProdValueToAdd.setFuncName(dotProdArgList[3])
 
-		if (len(dotProdArgsList) == 4):
+		if (len(dotProdArgList) == 4):
 			return dotProdValueToAdd
 
-		lenList = len(dotProdArgsList)
-		funcArgsList = []
+		lenList = len(dotProdArgList)
+		funcArgList = []
 		numFuncArgs = lenList - 4
 
 		for index in range(0, numFuncArgs):
-			funcArgsList.append(dotProdArgsList[index + 4])
+			funcArgList.append(dotProdArgList[index + 4])
 
-		if (len(funcArgsList) == 0):
+		if (len(funcArgList) == 0):
 			sys.exit("ASTVarVisitor->buildDotProdValue:  could not extract the function arguments from the dot product.")
 
-		dotProdValueToAdd.setArgsList(funcArgsList)
+		dotProdValueToAdd.setArgList(funcArgList)
 
 		return dotProdValueToAdd
 
@@ -253,18 +253,18 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 			return hashValue
 
-		lambdaArgsList = self.myASTParser.getLambdaArgsList(node)
-		if (lambdaArgsList == None):
-			sys.exit("ASTVarVisitor->buildLambdaValue:  list returned from getLambdaArgsList is of None type.")
+		lambdaArgList = self.myASTParser.getLambdaArgList(node)
+		if (lambdaArgList == None):
+			sys.exit("ASTVarVisitor->buildLambdaValue:  list returned from getLambdaArgList is of None type.")
 
-		if (len(lambdaArgsList) == 0):
-			sys.exit("ASTVarVisitor->buildLambdaValue:  list returned from getLambdaArgsList is of length zero.")
+		if (len(lambdaArgList) == 0):
+			sys.exit("ASTVarVisitor->buildLambdaValue:  list returned from getLambdaArgList is of length zero.")
 
-		for arg in lambdaArgsList:
+		for arg in lambdaArgList:
 			if (type(arg) is not str):
-				sys.exit("ASTVarVisitor->buildLambdaValue:  one of the arguments returned from getLambdaArgsList is not of type " + con.strTypePython)
+				sys.exit("ASTVarVisitor->buildLambdaValue:  one of the arguments returned from getLambdaArgList is not of type " + con.strTypePython)
 
-		lambdaExpression = self.myASTParser.getLambdaExpression(node, lambdaArgsList)
+		lambdaExpression = self.myASTParser.getLambdaExpression(node, lambdaArgList)
 		if (lambdaExpression == None):
 			sys.exit("ASTVarVisitor->buildLambdaValue:  expression returned from getLambdaExpression is of None type.")
 
@@ -275,7 +275,7 @@ class ASTVarVisitor(ast.NodeVisitor):
 			sys.exit("ASTVarVisitor->buildLambdaValue:  expression returned from getLambdaExpression is not of type " + con.strTypePython)
 
 		returnLambdaValue = LambdaValue()
-		returnLambdaValue.setArgList(lambdaArgsList)
+		returnLambdaValue.setArgList(lambdaArgList)
 		returnLambdaValue.setExpression(lambdaExpression)
 		return returnLambdaValue
 

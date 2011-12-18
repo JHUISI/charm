@@ -3,12 +3,12 @@ from Value import Value
 
 class HashValue:
 	def __init__(self):
-		self.argsList = None
+		self.argList = None
 		self.groupType = None
 		self.lineNo = None
 
-	def getArgsList(self):
-		return self.argsList
+	def getArgList(self):
+		return self.argList
 
 	def getEntryAtIndex(self, index):
 		if (type(index) is not int):
@@ -17,10 +17,10 @@ class HashValue:
 		if (index < 0):
 			sys.exit("HashValue->getEntryAtIndex:  index passed in is less than zero.")
 
-		if ( index >= len(self.argsList) ):
+		if ( index >= len(self.argList) ):
 			sys.exit("HashValue->getEntryAtIndex:  index passed in is greater than or equal to the length of the argument list.")
 
-		return self.argsList[index]
+		return self.argList[index]
 
 	def getGroupType(self):
 		return self.groupType
@@ -31,26 +31,26 @@ class HashValue:
 	def getLineNo(self):
 		return self.lineNo
 
-	def setArgsList(self, argsList):
-		if (type(argsList) is not list):
-			sys.exit("HashValue->setArgsList:  value passed in is not of type list.")
+	def setArgList(self, argList):
+		if (type(argList) is not list):
+			sys.exit("HashValue->setArgList:  value passed in is not of type list.")
 
-		if (len(argsList) == 0):
-			self.argsList = None
+		if (len(argList) == 0):
+			self.argList = None
 		else:
-			self.argsList = argsList
+			self.argList = argList
 
-	def appendEntryToArgsList(self, entry):
+	def appendEntryToArgList(self, entry):
 		if (entry == None):
-			sys.exit("HashValue->addEntryToArgsList:  entry passed in is of None type.")
+			sys.exit("HashValue->addEntryToArgList:  entry passed in is of None type.")
 
-		self.argsList.append(entry)
+		self.argList.append(entry)
 
-	def prependEntryToArgsList(self, entry):
+	def prependEntryToArgList(self, entry):
 		if (entry == None):
-			sys.exit("HashValue->prependEntryToArgsList:  entry passed in is of None type.")
+			sys.exit("HashValue->prependEntryToArgList:  entry passed in is of None type.")
 
-		self.argsList.insert(0, entry)
+		self.argList.insert(0, entry)
 
 	def insertEntryAtIndex(self, index, entry):
 		if (entry == None):
@@ -62,17 +62,17 @@ class HashValue:
 		if (index < 0):
 			sys.exit("HashValue->insertEntryAtIndex:  index passed in is less than zero.")
 
-		if ( index >= len(self.argsList) ):
+		if ( index >= len(self.argList) ):
 			sys.exit("HashValue->insertEntryAtIndex:  index passed in is greater than or equal to the length of the arguments list.")
 
-		self.argsList.insert(index, entry)
+		self.argList.insert(index, entry)
 
 	def removeEntryWithValue(self, value):
 		if (value == None):
 			sys.exit("HashValue->removeEntryWithValue:  value passed in is of None type.")
 
 		try:
-			self.argsList.remove(value)
+			self.argList.remove(value)
 		except:
 			sys.exit("HashValue->removeEntryWithValue:  value passed in does not exist in the arguments list.")
 
@@ -83,7 +83,7 @@ class HashValue:
 		index = None
 
 		try:
-			index = self.argsList.index(value)
+			index = self.argList.index(value)
 		except:
 			return None
 

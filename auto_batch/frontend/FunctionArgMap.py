@@ -3,18 +3,18 @@ import con, sys
 class FunctionArgMap:
 	def __init__(self):
 		self.destFuncName = None
-		self.callerArgsList = None
-		self.destArgsList = None
+		self.callerArgList = None
+		self.destArgList = None
 		self.lineNo = None
 
 	def getDestFuncName(self):
 		return self.destFuncName
 
-	def getCallerArgsList(self):
-		return self.callerArgsList
+	def getCallerArgList(self):
+		return self.callerArgList
 
-	def getDestArgsList(self):
-		return self.destArgsList
+	def getDestArgList(self):
+		return self.destArgList
 
 	def getLineNo(self):
 		return self.lineNo
@@ -25,17 +25,17 @@ class FunctionArgMap:
 
 		self.destFuncName = destFuncName
 
-	def setCallerArgsList(self, callerArgsList):
-		if ( (callerArgsList == None) or (type(callerArgsList).__name__ != con.listTypePython) or (len(callerArgsList) == 0) ):
-			sys.exit("FunctionArgMap->setCallerArgsList:  problem with the caller arguments list passed in.")
+	def setCallerArgList(self, callerArgList):
+		if ( (callerArgList == None) or (type(callerArgList).__name__ != con.listTypePython) or (len(callerArgList) == 0) ):
+			sys.exit("FunctionArgMap->setCallerArgList:  problem with the caller arguments list passed in.")
 
-		self.callerArgsList = callerArgsList
+		self.callerArgList = callerArgList
 
-	def setDestArgsList(self, destArgsList):
-		if ( (destArgsList == None) or (type(destArgsList).__name__ != con.listTypePython) or (len(destArgsList) == 0) ):
-			sys.exit("FunctionArgMap->setDestArgsList:  problem with the destination arguments list passed in.")
+	def setDestArgList(self, destArgList):
+		if ( (destArgList == None) or (type(destArgList).__name__ != con.listTypePython) or (len(destArgList) == 0) ):
+			sys.exit("FunctionArgMap->setDestArgList:  problem with the destination arguments list passed in.")
 
-		self.destArgsList = destArgsList
+		self.destArgList = destArgList
 
 	def setLineNo(self, lineNo):
 		if ( (lineNo == None) or (type(lineNo).__name__ != con.intTypePython) or (lineNo < 1) ):

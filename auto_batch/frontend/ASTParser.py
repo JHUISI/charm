@@ -4,6 +4,7 @@ from StringValue import StringValue
 from IntegerValue import IntegerValue
 from FloatValue import FloatValue
 from FunctionArgMap import FunctionArgMap
+from CallValue import CallValue
 
 def getValueOfLastLine(dict):
 	if (len(dict) == 0):
@@ -64,17 +65,17 @@ class ASTFuncArgMapsVisitor(ast.NodeVisitor):
 		destArgNames = self.functionArgNames[destFuncName]
 
 		myASTParser = ASTParser()
-		callerArgsList = myASTParser.getCallArgsList(node)
+		callerArgList = myASTParser.getCallArgList(node)
 
-		if (len(callerArgsList) != len(destArgNames) ):
+		if (len(callerArgList) != len(destArgNames) ):
 			sys.exit("ASTFuncArgMapsVisitor->visit_Call:  length of caller and destination arguments lists are not equal.")
 
 		funcArgMapObject = FunctionArgMap()
 		funcArgMapObject.setDestFuncName(destFuncName)
 
-		if (len(callerArgsList) != 0):
-			funcArgMapObject.setCallerArgsList(callerArgsList)
-			funcArgMapObject.setDestArgsList(destArgNames)
+		if (len(callerArgList) != 0):
+			funcArgMapObject.setCallerArgList(callerArgList)
+			funcArgMapObject.setDestArgList(destArgNames)
 
 		funcArgMapObject.setLineNo(node.lineno)
 
@@ -94,17 +95,17 @@ class ASTFunctionArgNames(ast.NodeVisitor):
 			sys.exit("ASTParser->ASTFunctionArgNames->visit_FunctionDef:  could not obtain the name of the function.")
 
 		try:
-			argsList = node.args.args
+			argList = node.args.args
 		except:
 			sys.exit("ASTParser->ASTFunctionArgNames->visit_FunctionDef:  could not obtain the arguments list for function " + nodeName)
 
-		if (len(argsList) == 0):
+		if (len(argList) == 0):
 			self.functionArgNames[nodeName] = None
 			return
 
 		argNamesList = []
 
-		for argItr in argsList:
+		for argItr in argList:
 			try:
 				argToAdd = argItr.arg
 			except:
@@ -436,60 +437,60 @@ class ASTParser:
 
 		return expression
 
-	def getLambdaArgsList(self, node):
+	def getLambdaArgList(self, node):
 		if (node == None):
-			sys.exit("ASTParser->getLambdaArgsList:  node passed in is of None type.")
+			sys.exit("ASTParser->getLambdaArgList:  node passed in is of None type.")
 
 		try:
-			argsList = node.args.args
+			argList = node.args.args
 		except:
-			sys.exit("ASTParser->getLambdaArgsList:  could not obtain the arguments list of the node passed in.")
+			sys.exit("ASTParser->getLambdaArgList:  could not obtain the arguments list of the node passed in.")
 
-		returnArgsList = []
+		returnArgList = []
 
-		for argNode in argsList:
+		for argNode in argList:
 			try:
 				arg = argNode.arg
 			except:
-				sys.exit("ASTParser->getLambdaArgsList:  could not obtain one of the arguments of the node passed in.")
+				sys.exit("ASTParser->getLambdaArgList:  could not obtain one of the arguments of the node passed in.")
 
 			if (arg == None):
-				sys.exit("ASTParser->getLambdaArgsList:  one of the arguments of the node passed in is of None type.")
+				sys.exit("ASTParser->getLambdaArgList:  one of the arguments of the node passed in is of None type.")
 
 			if (type(arg) is not str):
-				sys.exit("ASTParser->getLambdaArgsList:  one of the arguments of the node passed in is not of " + con.strTypePython + " type.")
+				sys.exit("ASTParser->getLambdaArgList:  one of the arguments of the node passed in is not of " + con.strTypePython + " type.")
 
-			returnArgsList.append(arg)
+			returnArgList.append(arg)
 
-		if (len(returnArgsList) == 0):
-			sys.exit("ASTParser->getLambdaArgsList:  could not obtain any of the arguments of the node passed in.")
+		if (len(returnArgList) == 0):
+			sys.exit("ASTParser->getLambdaArgList:  could not obtain any of the arguments of the node passed in.")
 
-		return returnArgsList
+		return returnArgList
 
-	def getCallArgsList(self, node):
+	def getCallArgList(self, node):
 		if (node == None):
-			sys.exit("ASTParser->getCallArgsList:  node passed in is of None type.")
+			sys.exit("ASTParser->getCallArgList:  node passed in is of None type.")
 
 		try:
-			argsList = node.args
+			argList = node.args
 		except:
-			sys.exit("ASTParser->getCallArgsList:  could not obtain the arguments list of the node passed in.")
+			sys.exit("ASTParser->getCallArgList:  could not obtain the arguments list of the node passed in.")
 
-		returnArgsList = []
+		returnArgList = []
 
-		for callArgNode in argsList:
+		for callArgNode in argList:
 			nodeObject = self.buildObjectFromNode(callArgNode)
 			if (nodeObject != None):
-				returnArgsList.append(nodeObject)
+				returnArgList.append(nodeObject)
 
 			#nameOfNode = self.getNameOfNode(callArgNode)
 			#if (nameOfNode != None):
-				#returnArgsList.append(nameOfNode)
+				#returnArgList.append(nameOfNode)
 
-		if (len(returnArgsList) == 0):
+		if (len(returnArgList) == 0):
 			return None
 
-		return returnArgsList
+		return returnArgList
 
 	def getNameOfNode(self, node):
 		if (node == None):
@@ -600,6 +601,41 @@ class ASTParser:
 
 		return returnStringName
 
+	def buildCallObjectFromNode(self, node):
+		if ( (node == None) or (type(node).__name__ != con.callTypeAST) ):
+			sys.exit("ASTParser->buildCallObjectFromNode:  problem with node passed in.")
+
+		argList = self.getCallArgList(node)
+
+		try:
+			funcName = node.func.id
+		except:
+			funcName = None
+
+		if (funcName != None):
+			returnCallObject = CallValue()
+			returnCallObject.setFuncName(funcName)
+			returnCallObject.setArgList(argList)
+			returnCallObject.setLineNo(node.lineno)
+			return returnCallObject
+
+		try:
+			funcValueName = node.func.value.id
+		except:
+			sys.exit("ASTParser->buildCallObjectFromNode:  could not extract any information about the call of the node passed in.")
+
+		try:
+			funcAttrName = node.func.attr
+		except:
+			sys.exit("ASTParser->buildCallObjectFromNode:  could not extract attribute name of call from the node passed in.")
+
+		returnCallObject = CallValue()
+		returnCallObject.setFuncName(funcValueName)
+		returnCallObject.setAttrName(funcAttrName)
+		returnCallObject.setArgList(argList)
+		returnCallObject.setLineNo(node.lineno)
+		return returnCallObject
+
 	def buildObjectFromNode(self, node):
 		if (node == None):
 			sys.exit("ASTParser->buildObjectFromNode:  node passed in is of None type.")
@@ -637,6 +673,13 @@ class ASTParser:
 				returnObject.setValue(nodeName)
 				returnObject.setLineNo(node.lineno)
 				return returnObject
+
+		if (nodeType == con.callTypeAST):
+			returnObject = self.buildCallObjectFromNode(node)
+			if (returnObject == None):
+				sys.exit("ASTParser->buildObjectFromNode:  value returned from buildCallObjectFromNode is of None type.")
+
+			return returnObject
 
 		sys.exit("ASTParser->buildObjectFromNode:  type of node is not currently supported.")
 
