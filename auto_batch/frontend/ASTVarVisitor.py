@@ -205,7 +205,8 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		callType = self.myASTParser.getCallType(node)
 		if (callType == None):
-			sys.exit("ASTVarVisitor->buildCallValue:  return value of myASTParser->getCallType is of None type.")
+			return
+			#sys.exit("ASTVarVisitor->buildCallValue:  return value of myASTParser->getCallType is of None type.")
 
 		if (callType == con.hashType):
 			hashValueToAdd = self.buildHashValue(node)
