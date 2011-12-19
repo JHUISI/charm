@@ -15,6 +15,9 @@ class StringName:
 	def getLineNo(self):
 		return self.lineNo
 
+	def getStringVarName(self):
+		return str(self.name)
+
 	def setName(self, name):
 		if (type(name) is not str):
 			sys.exit("Name passed to StringName class is not of type " + con.strTypePython)

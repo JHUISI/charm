@@ -19,6 +19,9 @@ class SubscriptName:
 	def getLineNo(self):
 		return self.lineNo
 
+	def getStringVarName(self):
+		return str(self.value.getStringVarName()) + "[" + str(self.slice.getStringVarName()) + "]"
+
 	def setValue(self, value):
 		if (value == None):
 			sys.exit("SubscriptName->setValue:  value passed in is of None type.")
@@ -32,10 +35,10 @@ class SubscriptName:
 		if (slice == None):
 			sys.exit("SubscriptName->setSlice:  slice passed in is of None type.")
 
-		sliceType = type(slice).__name__
+		#sliceType = type(slice).__name__
 
-		if ( (sliceType != con.stringName) and (sliceType != con.stringValue) and (sliceType != con.integerValue) and (sliceType != con.floatValue) ):
-			sys.exit("SubscriptName->setSlice:  slice passed in is not one of the supported types (" + con.stringName + ", " + con.stringValue + ", " + con.integerValue + ", or " + con.floatValue + ").")
+		#if ( (sliceType != con.stringName) and (sliceType != con.stringValue) and (sliceType != con.integerValue) and (sliceType != con.floatValue) ):
+			#sys.exit("SubscriptName->setSlice:  slice passed in is not one of the supported types (" + con.stringName + ", " + con.stringValue + ", " + con.integerValue + ", or " + con.floatValue + ").")
 
 		self.slice = slice
 

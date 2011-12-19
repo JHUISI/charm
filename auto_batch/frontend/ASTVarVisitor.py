@@ -66,13 +66,18 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if ( (valueAsStringName == None) or (type(valueAsStringName).__name__ != con.stringName) ):
 			sys.exit("ASTVarVisitor->buildSubscriptName:  problem with value returned from myASTParser->getSubscriptValueAsStringName.")
 
-		slice = self.myASTParser.getSubscriptSlice(node)
-		if (slice == None):
-			sys.exit("ASTVarVisitor->buildSubscriptName:  value returned from myASTParser->getSubscriptSlice is of None type.")
+		sliceNode = self.myASTParser.getSubscriptSliceNode(node)
+		if (sliceNode == None):
+			sys.exit("ASTVarVisitor->buildSubscriptName:  problem with value returned from myASTParser->getSubscriptSliceNode.")
+
+		#slice = self.myASTParser.getSubscriptSlice(node)
+		#if (slice == None):
+			#sys.exit("ASTVarVisitor->buildSubscriptName:  value returned from myASTParser->getSubscriptSlice is of None type.")
 
 		subscriptNameToAdd = SubscriptName()
 		subscriptNameToAdd.setValue(valueAsStringName)
-		subscriptNameToAdd.setSlice(slice)
+		#subscriptNameToAdd.setSlice(slice)
+		subscriptNameToAdd.setSlice(self.processNode(sliceNode))
 
 		return subscriptNameToAdd
 
@@ -133,13 +138,35 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		return hashGroupType
 
+	#START HERE.  BREAK UP THE FUNCTION BELOW INTO GET NODES, THEN PROCESS EACH NODE.  THEN FINISH DICTVALUE BUILDING BELOW
+
+	def getArgNodeList(self, node):
+		if (node == None):
+			sys.exit("ASTVarVisitor->getArgNodeList:  node passed in is of None type.")
+
+		argNodeList = self.myASTParser.getArgNodeList(node)
+		if ( (argNodeList == None) or (type(argNodeList).__name__ != con.listTypePython) ):
+			sys.exit("ASTVarVisitor->getArgNodeList:  problem with value returned from ASTParser->getArgNodeList.")
+
+		retArgNodeList = []
+
+		for argNode in argNodeList:
+			retArgNode = self.processNode(argNode)
+			retArgNodeList.append(copy.deepcopy(retArgNode))
+
+		return retArgNodeList
+
 	def buildHashValue(self, node):
 		if (node == None):
 			sys.exit("ASTVarVisitor->buildHashValue:  node passed in is of None type.")
 
-		hashArgList = self.myASTParser.getCallArgList(node)
-		if (hashArgList == None):
-			sys.exit("ASTVarVisitor->buildHashValue:  value returned from getCallArgList is of None type.")
+		hashArgList = self.getArgNodeList(node)
+		if ( (hashArgList == None) or (type(hashArgList).__name__ != con.listTypePython) or (len(hashArgList) == 0) ):
+			sys.exit("ASTVarVisitor->buildHashValue:  problem with value returned from getArgNodeList")
+
+		#hashArgList = self.myASTParser.getCallArgList(node)
+		#if (hashArgList == None):
+			#sys.exit("ASTVarVisitor->buildHashValue:  value returned from getCallArgList is of None type.")
 
 		hashGroupType = self.getHashGroupType(hashArgList)
 		if (hashGroupType == None):
@@ -178,9 +205,13 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if (node == None):
 			sys.exit("ASTVarVisitor->buildDotProdValue:  node passed in is of None type.")
 
-		dotProdArgList = self.myASTParser.getCallArgList(node)
-		if ( (dotProdArgList == None) or (type(dotProdArgList) is not list) or (len(dotProdArgList) < 4) ):
-			sys.exit("ASTVarVisitor->buildDotProdValue:  return value from getCallArgList does not meet the proper criteria.")
+		dotProdArgList = self.getArgNodeList(node)
+		if ( (dotProdArgList == None) or (type(dotProdArgList).__name__ != con.listTypePython) or (len(dotProdArgList) < 4) ):
+			sys.exit("ASTVarVisitor->buildDotProdValue:  return value from getArgNodeList does not meet the proper criteria.")
+
+		#dotProdArgList = self.myASTParser.getCallArgList(node)
+		#if ( (dotProdArgList == None) or (type(dotProdArgList) is not list) or (len(dotProdArgList) < 4) ):
+			#sys.exit("ASTVarVisitor->buildDotProdValue:  return value from getCallArgList does not meet the proper criteria.")
 
 		dotProdValueToAdd = DotProdValue()
 		dotProdValueToAdd.setNumProds(dotProdArgList[2])
@@ -208,8 +239,8 @@ class ASTVarVisitor(ast.NodeVisitor):
 			sys.exit("ASTVarVisitor->buildCallValue:  node passed in is of None type.")
 
 		callType = self.myASTParser.getCallType(node)
-		if (callType == None):
-			return
+		#if (callType == None):
+			#return
 			#sys.exit("ASTVarVisitor->buildCallValue:  return value of myASTParser->getCallType is of None type.")
 
 		if (callType == con.hashType):
@@ -232,7 +263,13 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 			return dotProdValueToAdd
 
-		return None
+		#return None
+
+		callValueToAdd = self.myASTParser.buildCallObjectFromNode(node)
+		if ( (callValueToAdd == None) or (type(callValueToAdd).__name__ != con.callValue) ):
+			sys.exit("ASTVarVisitor->buildCallValue:  problem with return value of buildCallObjectFromNode.")
+
+		return callValueToAdd
 
 	def buildLambdaValue(self, node):
 		if (node == None):
@@ -280,8 +317,8 @@ class ASTVarVisitor(ast.NodeVisitor):
 		return returnLambdaValue
 
 	def buildDictValue(self, node):
-		if (node == None):
-			sys.exit("ASTVarVisitor->buildDictValue:  node passed in is of None type.")
+		if ( (node == None) or (type(node).__name__ != con.dictTypeAST) ):
+			sys.exit("ASTVarVisitor->buildDictValue:  problem with node passed in to function.")
 
 		dictKeys = self.myASTParser.getDictKeys(node)
 		if ( (dictKeys == None) or (type(dictKeys).__name__ != con.listTypePython) ):
@@ -297,6 +334,81 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		return returnDictValue
 
+	def buildBinOpValue(self, node):
+		if ( (node == None) or (type(node).__name__ != con.binOpTypeAST) ):
+			sys.exit("ASTVarVisitor->buildBinOpValue:  problem with node passed in to function.")
+
+		return None
+
+	def processNode(self, node):
+		if (node == None):
+			sys.exit("ASTVarVisitor->processNode:  node passed in is of None type.")
+
+		nodeType = self.myASTParser.getNodeType(node)
+
+		if (nodeType == con.nameOnlyTypeAST):
+			stringNameToAdd = self.buildStringName(node)
+			if (stringNameToAdd == None):
+				sys.exit("ASTVarVisitor->processNode:  return value of buildStringName is of None type.")
+
+			return stringNameToAdd
+
+		if (nodeType == con.subscriptTypeAST):
+			subscriptNameToAdd = self.buildSubscriptName(node)
+			if (subscriptNameToAdd == None):
+				sys.exit("ASTVarVisitor->processNode:  return value of buildSubscriptName is of None type.")
+
+			return subscriptNameToAdd
+
+		if (nodeType == con.strOnlyTypeAST):
+			stringValueToAdd = self.buildStringValue(node)
+			if (stringValueToAdd == None):
+				sys.exit("ASTVarVisitor->processNode:  return value of buildStringValue is of None type.")
+
+			return stringValueToAdd
+
+		if (nodeType == con.intTypePython):
+			intValueToAdd = self.buildIntValue(node)
+			if (intValueToAdd == None):
+				sys.exit("ASTVarVisitor->processNode:  return value of buildIntValue is of None type.")
+
+			return intValueToAdd
+
+		if (nodeType == con.floatTypePython):
+			floatValueToAdd = self.buildFloatValue(node)
+			if (floatValueToAdd == None):
+				sys.exit("ASTVarVisitor->processNode:  return value of buildFloatValue is of None type.")
+
+			return floatValueToAdd
+
+		if (nodeType == con.callTypeAST):
+			callValueToAdd = self.buildCallValue(node)
+			if (callValueToAdd != None):
+				return callValueToAdd
+
+		if (nodeType == con.lambdaType):
+			lambdaValueToAdd = self.buildLambdaValue(node)
+			if (lambdaValueToAdd == None):
+				sys.exit("ASTVarVisitor->processNode:  return value of buildLambdaValue is of None type.")
+
+			return lambdaValueToAdd
+
+		if (nodeType == con.dictTypeAST):
+			dictValueToAdd = self.buildDictValue(node)
+			if (dictValueToAdd == None):
+				sys.exit("ASTVarVisitor->processNode:  return value of buildDictValue is of None type.")
+
+			return dictValueToAdd
+
+		if (nodeType == con.binOpTypeAST):
+			binOpValueToAdd = self.buildBinOpValue(node)
+			if (binOpValueToAdd == None):
+				sys.exit("ASTVarVisitor->processNode:  return value of buildBinOpValue is of None type.")
+
+			return binOpValueToAdd
+
+		return None
+
 	def processAssignment(self, leftSideNode, rightSideNode):
 		if (leftSideNode == None):
 			sys.exit("ASTVarVisitor->processAssignment:  left side node passed in is of None type.")
@@ -304,60 +416,9 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if (rightSideNode == None):
 			sys.exit("ASTVarVisitor->processAssignment:  right side node passed in is of None type.")
 
-		leftNodeType = self.myASTParser.getNodeType(leftSideNode)
-		rightNodeType = self.myASTParser.getNodeType(rightSideNode)
-
 		variableToAdd = Variable()
-
-		if (leftNodeType == str):
-			stringNameToAdd = self.buildStringName(leftSideNode)
-			if (stringNameToAdd == None):
-				sys.exit("ASTVarVisitor->processAssignment:  return value of buildStringName is of None type.")
-
-			variableToAdd.setName(stringNameToAdd)
-
-		if (leftNodeType == con.subscriptTypeAST):
-			subscriptNameToAdd = self.buildSubscriptName(leftSideNode)
-			if (subscriptNameToAdd == None):
-				sys.exit("ASTVarVisitor->processAssignment:  return value of buildSubscriptName is of None type.")
-
-			variableToAdd.setName(subscriptNameToAdd)
-
-		if (rightNodeType == str):
-			stringValueToAdd = self.buildStringValue(rightSideNode)
-			if (stringValueToAdd == None):
-				sys.exit("ASTVarVisitor->processAssignment:  return value of buildStringValue is of None type.")
-
-			variableToAdd.setValue(stringValueToAdd)
-
-		if (rightNodeType == int):
-			intValueToAdd = self.buildIntValue(rightSideNode)
-			if (intValueToAdd == None):
-				sys.exit("ASTVarVisitor->processAssignment:  return value of buildIntValue is of None type.")
-
-			variableToAdd.setValue(intValueToAdd)
-
-		if (rightNodeType == float):
-			floatValueToAdd = self.buildFloatValue(rightSideNode)
-			if (floatValueToAdd == None):
-				sys.exit("ASTVarVisitor->processAssignment:  return value of buildFloatValue is of None type.")
-
-			variableToAdd.setValue(floatValueToAdd)
-
-		if (rightNodeType == con.callTypeAST):
-			callValueToAdd = self.buildCallValue(rightSideNode)
-			if (callValueToAdd != None):
-				variableToAdd.setValue(callValueToAdd)
-
-		if (rightNodeType == con.lambdaType):
-			lambdaValueToAdd = self.buildLambdaValue(rightSideNode)
-			if (lambdaValueToAdd != None):
-				variableToAdd.setValue(lambdaValueToAdd)
-
-		if (rightNodeType == con.dictTypeAST):
-			dictValueToAdd = self.buildDictValue(rightSideNode)
-			if (dictValueToAdd != None):
-				variableToAdd.setValue(dictValueToAdd)
+		variableToAdd.setName(self.processNode(leftSideNode))
+		variableToAdd.setValue(self.processNode(rightSideNode))
 
 		if ( (variableToAdd.getName() != None) and (variableToAdd.getValue() != None) ):
 			leftLineNo = self.myASTParser.getLineNumberOfNode(leftSideNode)

@@ -769,6 +769,37 @@ def getVarAssignments(rootNode, functionNames, myASTParser):
 
 	return varAssignments
 
+def getAllVariableNamesFromVerifyEq(verifyEqNode, myASTParser):
+	if ( (verifyEqNode == None) or (myASTParser == None) ):
+		sys.exit("AutoBatch_Parser->getAllVariableNamesFromVerifyEq:  problem with the variables passed in to the function.")
+
+	varsVerifyEq = myASTParser.getAllVariableNames(verifyEqNode)
+	if ( (varsVerifyEq == None) or (type(varsVerifyEq).__name__ != con.listTypePython) or (len(varsVerifyEq) == 0) ):
+		sys.exit("AutoBatch_Parser->getAllVariableNamesFromVerifyEq:  problem with value returned from ASTParser->getAllVariableNames.")
+
+	varsVerifyEq = myASTParser.removeVarsFromListWithStringName(varsVerifyEq, con.pair)
+	if ( (varsVerifyEq == None) or (type(varsVerifyEq).__name__ != con.listTypePython) or (len(varsVerifyEq) == 0) ):
+		sys.exit("AutoBatch_Parser->getAllVariableNamesFromVerifyEq:  problem with value returned from ASTParser->removeVarsFromListWithName.")
+
+	return varsVerifyEq
+
+def getReturnNodes(functionNames, myASTParser):
+	if ( (functionNames == None) or (type(functionNames).__name__ != con.dictTypePython) or (len(functionNames) == 0) ):
+		sys.exit("AutoBatch_Parser->getReturnNodes:  problem with the function names dictionary passed in.")
+
+	if ( (myASTParser == None) or (type(myASTParser).__name__ != con.ASTParser) ):
+		sys.exit("AutoBatch_Parser->getReturnNodes:  problem with the AST parser passed in.")
+
+	returnNodes = {}
+
+	for funcName in functionNames:
+		returnNodes[funcName] = myASTParser.getReturnNodeList(functionNames[funcName])
+
+	if (len(returnNodes) == 0):
+		sys.exit("AutoBatch_Parser->getReturnNodes:  could not obtain any return nodes for the function names/nodes passed in.")
+
+	return returnNodes
+
 def main():
 	if ( (len(sys.argv) != 3) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
 		sys.exit("Usage:  python " + sys.argv[0] + " [name of input file that runs the cryptosystem] [name of .bls output file]")
@@ -805,6 +836,10 @@ def main():
 	if (functionArgMappings == None):
 		sys.exit("AutoBatch_Parser->main:  mappings of variables passed between functions from getFunctionArgMappings is of None type.")
 
+	returnNodes = getReturnNodes(functionNames, myASTParser)
+	if ( (returnNodes == None) or (type(returnNodes).__name__ != con.dictTypePython) or (len(returnNodes) == 0) ):
+		sys.exit("AutoBatch_Parser->main:  problem with value returned from getReturnNodes.")
+
 	verifyFuncNodeList = myASTParser.getFunctionNode(rootNode, con.verifyFuncName)
 	if (verifyFuncNodeList == None):
 		sys.exit("AutoBatch_Parser->main:  could not locate a function with name " + con.verifyFuncName)
@@ -819,6 +854,10 @@ def main():
 
 	origVerifyEq = myASTParser.getSourceLineOfNode(verifyEqNode)
 	cleanVerifyEqLn = cleanVerifyEq(origVerifyEq)
+
+	varsVerifyEq = getAllVariableNamesFromVerifyEq(verifyEqNode, myASTParser)
+	if ( (varsVerifyEq == None) or (type(varsVerifyEq).__name__ != con.listTypePython) or (len(varsVerifyEq) == 0) ):
+		sys.exit("AutoBatch_Parser->main:  problem with the value returned from getAllVariableNamesFromVerifyEq on the verify equation node.")
 
 	varAssignments = getVarAssignments(rootNode, functionNames, myASTParser)
 	if (varAssignments == None):

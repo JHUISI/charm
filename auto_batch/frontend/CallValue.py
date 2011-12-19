@@ -36,7 +36,7 @@ class CallValue:
 		self.attrName = attrName
 
 	def setArgList(self, argList):
-		if ( (argList == None) or (type(argList).__name__ != con.listTypePython) ):
+		if ( (argList != None) and (type(argList).__name__ != con.listTypePython) ):
 			sys.exit("CallValue->setArgList:  problem with the argument list passed in.")
 
 		self.argList = argList

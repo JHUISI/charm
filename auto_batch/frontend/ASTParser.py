@@ -5,6 +5,7 @@ from IntegerValue import IntegerValue
 from FloatValue import FloatValue
 from FunctionArgMap import FunctionArgMap
 from CallValue import CallValue
+from SubscriptName import SubscriptName
 
 def getValueOfLastLine(dict):
 	if (len(dict) == 0):
@@ -14,6 +15,44 @@ def getValueOfLastLine(dict):
 	keys.sort()
 	lenKeys = len(keys)
 	return dict[keys[lenKeys-1]]
+
+class ASTReturnNodeVisitor(ast.NodeVisitor):
+	def __init__(self):
+		self.returnNodeList = []
+
+	def visit_Return(self, node):
+		self.returnNodeList.append(node)
+
+	def getReturnNodeList(self):
+		if (len(self.returnNodeList) == 0):
+			return None
+
+		return self.returnNodeList
+
+class ASTVariableNamesVisitor(ast.NodeVisitor):
+	def __init__(self):
+		self.variableNames = []
+		self.myASTParser = ASTParser()
+
+	def visit_Subscript(self, node):
+		subscriptObject = self.myASTParser.buildSubscriptObjectFromNode(node)
+		if ( (subscriptObject == None) or (type(subscriptObject).__name__ != con.subscriptName) ):
+			sys.exit("ASTVariableNamesVisitor->visit_Subscript:  problem with value returned from ASTParser->buildSubscriptObjectFromNode.")
+
+		self.variableNames.append(subscriptObject)
+
+	def visit_Name(self, node):
+		variableObject = self.myASTParser.buildObjectFromNode(node)
+		if (variableObject == None):
+			sys.exit("ASTVariableNamesVisitor->visit_Name:  problem with value returned from ASTParser->buildObjectFromNode.")
+
+		self.variableNames.append(variableObject)
+
+	def getVariableNames(self):
+		if (len(self.variableNames) == 0):
+			return None
+
+		return self.variableNames
 
 class ASTFuncArgMapsVisitor(ast.NodeVisitor):
 	def __init__(self, functionArgNames):
@@ -40,8 +79,8 @@ class ASTFuncArgMapsVisitor(ast.NodeVisitor):
 		except:
 			sys.exit("ASTFuncArgMapsVisitor->getDestFuncName:  could not obtain any information about the call represented by the node passed in.")
 
-		if (funcValueName != con.self):
-			return None
+		#if (funcValueName != con.self):
+			#return None
 
 		try:
 			funcAttrName = node.func.attr
@@ -249,6 +288,57 @@ class ASTParser:
 		myFuncArgMapsVisitor.visit(funcNode)
 		return myFuncArgMapsVisitor.getFunctionArgMappings()
 
+	def removeVarsFromListWithStringName(self, varList, varName):
+		if ( (varList == None) or (type(varList).__name__ != con.listTypePython) or (len(varList) == 0) ):
+			sys.exit("ASTParser->removeVarsFromListWithName:  problem with the variable list passed in.")
+
+		if ( (varName == None) or (type(varName).__name__ != con.strTypePython) or (len(varName) == 0) ):
+			sys.exit("ASTParser->removeVarsFromListWithName:  problem with the variable name passed in.")
+
+		returnVarList = []
+
+		for varEntry in varList:
+			if (type(varEntry).__name__ != con.stringName):
+				returnVarList.append(copy.deepcopy(varEntry))
+				continue
+
+			varEntryName = varEntry.getName()
+
+			if (varEntryName != varName):
+				returnVarList.append(copy.deepcopy(varEntry))
+
+		del varList
+		return returnVarList
+
+	def getAllVariableNames(self, node):
+		if (node == None):
+			sys.exit("ASTParser->getAllVariableNames:  node passed in is of None type.")
+
+		varNamesVisitor = ASTVariableNamesVisitor()
+		varNamesVisitor.visit(node)
+		variableNames = varNamesVisitor.getVariableNames()
+
+		return variableNames
+
+	def getReturnNodeList(self, funcNode):
+		if (funcNode == None):
+			sys.exit("ASTParser->getReturnNodeList:  function node passed in is of None type.")
+
+		retNodeVisitor = ASTReturnNodeVisitor()
+		retNodeVisitor.visit(funcNode)
+		return retNodeVisitor.getReturnNodeList()
+
+	def getDictKeyNodes(self, node):
+		if ( (node == None) or (type(node).__name__ != con.dictTypeAST) ):
+			sys.exit("ASTParser->getDictKeyNodes:  problem with node passed in to function.")
+
+		try:
+			keyNodes = node.keys
+		except:
+			sys.exit("ASTParser->getDictKeyNodes:  could not extract dictionary key nodes from node passed in to function.")
+
+		return keyNodes
+
 	def getDictKeys(self, node):
 		if (node == None):
 			sys.exit("ASTParser->getDictKeys:  node passed in is of None type.")
@@ -274,6 +364,17 @@ class ASTParser:
 			sys.exit("ASTParser->getDictKeys:  could not extract any of the keys from the node passed in.")
 
 		return returnKeysList
+
+	def getDictValueNodes(self, node):
+		if ( (node == None) or (type(node).__name__ != con.dictTypeAST) ):
+			sys.exit("ASTParser->getDictValueNodes:  problem with node passed in to function.")
+
+		try:
+			valueNodes = node.values
+		except:
+			sys.exit("ASTParser->getDictValueNodes:  could not extract the dictionary value nodes from the node passed in to the function.")
+
+		return valueNodes
 
 	def getDictValues(self, node):
 		if (node == None):
@@ -437,6 +538,17 @@ class ASTParser:
 
 		return expression
 
+	def getLambdaArgNodeList(self, node):
+		if ( (node == None) or (type(node).__name__ != con.lambdaType) ):
+			sys.exit("ASTParser->getLambdaArgNodeList:  problem with node passed in to function.")
+
+		try:
+			argNodeList = node.args.args
+		except:
+			sys.exit("ASTParser->getLambdaArgNodeList:  could not extract the arguments node list from the node passed in to the function.")
+
+		return argNodeList
+
 	def getLambdaArgList(self, node):
 		if (node == None):
 			sys.exit("ASTParser->getLambdaArgList:  node passed in is of None type.")
@@ -466,6 +578,17 @@ class ASTParser:
 			sys.exit("ASTParser->getLambdaArgList:  could not obtain any of the arguments of the node passed in.")
 
 		return returnArgList
+
+	def getArgNodeList(self, node):
+		if (node == None):
+			sys.exit("ASTParser->getArgNodeList:  node passed in is of None type.")
+
+		try:
+			argNodeList = node.args
+		except:
+			sys.exit("ASTParser->getArgNodeList:  could not extract the arguments node list from the node passed in.")
+
+		return argNodeList
 
 	def getCallArgList(self, node):
 		if (node == None):
@@ -595,11 +718,29 @@ class ASTParser:
 		if (type(valueName).__name__ != con.strTypePython):
 			sys.exit("ASTParser->getSubscriptValueAsStringName:  value name returned from getNameOfNode is not of type " + con.strTypePython)
 
-		returnStringName = self.buildStringName(node, name)
+		returnStringName = self.buildStringName(node, valueName)
 		if ( (returnStringName == None) or (type(returnStringName).__name__ != con.stringName) ):
 			sys.exit("ASTParser->getSubscriptValueAsStringName:  problem with value returned from buildStringName.")
 
 		return returnStringName
+
+	def buildSubscriptObjectFromNode(self, node):
+		if ( (node == None) or (type(node).__name__ != con.subscriptTypeAST) ):
+			sys.exit("ASTParser->buildSubscriptObjectFromNode:  problem with node passed in.")
+
+		subscriptValue = self.getSubscriptValueAsStringName(node)
+		if ( (subscriptValue == None) or (type(subscriptValue).__name__ != con.stringName) ):
+			sys.exit("ASTParser->buildSubscriptObjectFromNode:  problem with value returned from getSubscriptValueAsStringName.")
+
+		subscriptSlice = self.getSubscriptSlice(node)
+		if (subscriptSlice == None):
+			sys.exit("ASTParser->buildSubscriptObjectFromNode:  value returned from getSubscriptSlice is of None type.")
+
+		returnSubscriptObject = SubscriptName()
+		returnSubscriptObject.setValue(subscriptValue)
+		returnSubscriptObject.setSlice(subscriptSlice)
+		returnSubscriptObject.setLineNo(node.lineno)
+		return returnSubscriptObject
 
 	def buildCallObjectFromNode(self, node):
 		if ( (node == None) or (type(node).__name__ != con.callTypeAST) ):
@@ -676,12 +817,30 @@ class ASTParser:
 
 		if (nodeType == con.callTypeAST):
 			returnObject = self.buildCallObjectFromNode(node)
-			if (returnObject == None):
-				sys.exit("ASTParser->buildObjectFromNode:  value returned from buildCallObjectFromNode is of None type.")
+			if ( (returnObject == None) or (type(returnObject).__name__ != con.callValue) ):
+				sys.exit("ASTParser->buildObjectFromNode:  problem with the value returned from buildCallObjectFromNode.")
+
+			return returnObject
+
+		if (nodeType == con.subscriptTypeAST):
+			returnObject = self.buildSubscriptObjectFromNode(node)
+			if ( (returnObject == None) or (type(returnObject).__name__ != con.subscriptName) ):
+				sys.exit("ASTParser->buildObjectFromNode:  problem with the value returned from buildSubscriptObjectFromNode.")
 
 			return returnObject
 
 		sys.exit("ASTParser->buildObjectFromNode:  type of node is not currently supported.")
+
+	def getSubscriptSliceNode(self, node):
+		if ( (node == None) or (type(node).__name__ != con.subscriptTypeAST) ):
+			sys.exit("ASTParser->getSubscriptSliceNode:  problem with node passed in to function.")
+
+		try:
+			retNode = node.slice.value
+		except:
+			sys.exit("ASTParser->getSubscriptSliceNode:  could not extract slice node from the subscript node passed in.")
+
+		return retNode
 
 	def getSubscriptSlice(self, node):
 		if (node == None):
@@ -812,8 +971,14 @@ class ASTParser:
 		except:
 			sys.exit("ASTParser->getNodeType:  could not obtain the name type from the node passed in.")
 
-		if (nameType in con.strTypeAST):
-			return str
+		#if (nameType in con.strTypeAST):
+			#return con.strTypePython
+
+		if (nameType == con.nameOnlyTypeAST):
+			return con.nameOnlyTypeAST
+
+		if (nameType == con.strOnlyTypeAST):
+			return con.strOnlyTypeAST
 
 		if (nameType == con.numTypeAST):
 			try:
@@ -822,9 +987,9 @@ class ASTParser:
 				sys.exit("ASTParser->getNodeType:  could not obtain the type of the number node.")
 
 			if (nodeNumType == int):
-				return int
+				return con.intTypePython
 			if (nodeNumType == float):
-				return float
+				return con.floatTypePython
 
 		if (nameType == con.callTypeAST):
 			return con.callTypeAST
@@ -837,6 +1002,9 @@ class ASTParser:
 
 		if (nameType == con.dictTypeAST):
 			return con.dictTypeAST
+
+		if (nameType == con.binOpTypeAST):
+			return con.binOnTypeAST
 
 		return None
 

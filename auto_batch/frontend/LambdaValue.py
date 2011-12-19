@@ -19,15 +19,6 @@ class LambdaValue:
 	def getExpression(self):
 		return self.expression
 
-	def setLineNo(self, lineNo):
-		if (type(lineNo) is not int):
-			sys.exit("LambdaValue->setLineNo:  line number passed in is not of type " + con.intTypePython)
-
-		if (lineNo < 1):
-			sys.exit("LambdaValue->setLineNo:  line number passed in is less than one.")
-
-		self.lineNo = lineNo
-
 	def setArgList(self, argList):
 		if (argList == None):
 			sys.exit("LambdaValue->setArgList:  list passed in is of None type.")
@@ -49,5 +40,11 @@ class LambdaValue:
 			sys.exit("LambdaValue->setExpression:  expression is of length zero.")
 
 		self.expression = expression
+
+	def setLineNo(self, lineNo):
+		if ( (lineNo == None) or (type(lineNo).__name__ != con.intTypePython) or (lineNo < 1) ):
+			sys.exit("LambdaValue->setLineNo:  problem with the line number passed in.")
+
+		self.lineNo = lineNo
 
 Value.register(LambdaValue)
