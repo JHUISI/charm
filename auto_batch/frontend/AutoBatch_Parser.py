@@ -507,13 +507,70 @@ def getVariableTypes(variableTypes, assignmentsDict):
 
 	return variableTypes
 
-def getNumSignatures(varAssignments):
-	pass
+def getStringNameIntegerValue(varAssignments, stringNameOfVariable, nameOfFunction):
+	if ( (varAssignments == None) or (type(varAssignments).__name__ != con.dictTypePython) or (len(varAssignments) == 0) ):
+		sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  problem with the variable assignments dictionary passed in.")
 
+	if ( (stringNameOfVariable == None) or (type(stringNameOfVariable).__name__ != con.strTypePython) or (len(stringNameOfVariable) == 0) ):
+		sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  problem with the variable name passed in.")
 
+	if ( (nameOfFunction == None) or (type(nameOfFunction).__name__ != con.strTypePython) or (len(nameOfFunction) == 0) ):
+		sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  problem with the function name passed in.")
 
-def writeBVFile(varAssignments):
-	numSignatures = getNumSignatures(varAssignments)
+	if (nameOfFunction not in varAssignments):
+		sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  could not find a function named " + nameOfFunction + " in the varAssignments dictionary passed in.")
+
+	functionVariables = varAssignments[nameOfFunction]
+	if ( (functionVariables == None) or (type(functionVariables).__name__ != con.listTypePython) or (len(functionVariables) == 0) ):
+		sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  problem with the list of variables obtained from varAssignments for the " + nameOfFunction + " function.")
+
+	for var in functionVariables:
+		if (type(var).__name__ != con.variable):
+			sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  one of the entries in varAssignments is not of type " + con.variable)
+
+		varNameObj = var.getName()
+		if (type(varNameObj).__name__ != con.stringName):
+			continue
+
+		varName = varNameObj.getName()
+		if (varName != stringNameOfVariable):
+			continue
+
+		varValueObj = var.getValue()
+		if (type(varValueObj).__name__ != con.integerValue):
+			continue
+
+		varValue = varValueObj.getValue()
+		if ( (varValue == None) or (type(varValue).__name__ != con.intTypePython) ):
+			continue
+
+		return varValue
+
+	sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  could not find a variable named " + stringNameOfVariable + " in the " + nameOfFunction + " function.")
+
+def writeBVFile(varAssignments, outputFileName):
+	try:
+		outputFile = open(outputFileName, 'w')
+	except:
+		sys.exit("AutoBatch_Parser->writeBVFile:  could not obtain a file named " + outputFileName + " for writing.")
+
+	outputString = ""
+
+	numSignatures = getStringNameIntegerValue(varAssignments, con.numSignatures, con.mainFuncName)
+	if ( (numSignatures == None) or (type(numSignatures).__name__ != con.intTypePython) or (numSignatures < 1) ):
+		sys.exit("AutoBatch_Parser->writeBVFile:  problem with the value returned from getNumSignatures.")
+
+	outputString += "N = "
+	outputString += str(numSignatures)
+	outputString += "\n\n"
+
+	outputString += "BEGIN :: types\n"
+
+	try:
+		outputFile.write(outputString)
+		outputFile.close()
+	except:
+		sys.exit("AutoBatch_Parser->writeBVFile:  error when attempting to write to the " + outputFileName + " file and then close it.")
 
 '''
 def writeBVFile(outputFileName, variableTypes, precomputeTypes, cleanVerifyEqLn):
@@ -767,7 +824,7 @@ def main():
 	if (varAssignments == None):
 		sys.exit("AutoBatch_Parser->main:  getVarAssignments returned None when trying to get the variable assignments.")
 
-	writeBVFile(varAssignments)
+	writeBVFile(varAssignments, outputFileName)
 
 '''
 
