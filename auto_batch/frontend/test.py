@@ -6,10 +6,9 @@ class AST_Test(ast.NodeVisitor):
 		self.my = ASTParser()
 
 	def visit_Call(self, node):
-		print(node.func.id)
+		print(ast.dump(node))
 
 def verify():
-	pk = {4:5, 'x':'10'}
 	if (1 == 1):
 		pass
 

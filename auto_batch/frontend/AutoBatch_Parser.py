@@ -507,6 +507,15 @@ def getVariableTypes(variableTypes, assignmentsDict):
 
 	return variableTypes
 
+def getNumSignatures(varAssignments):
+	pass
+
+
+
+def writeBVFile(varAssignments):
+	numSignatures = getNumSignatures(varAssignments)
+
+'''
 def writeBVFile(outputFileName, variableTypes, precomputeTypes, cleanVerifyEqLn):
 	outputFile = open(outputFileName, 'w')
 
@@ -551,6 +560,7 @@ def writeBVFile(outputFileName, variableTypes, precomputeTypes, cleanVerifyEqLn)
 	outputFile.close()
 
 	#print(outputString)
+'''
 
 def findVariable(astAssignDict, variableName):
 	if (variableName not in astAssignDict.keys()):
@@ -668,11 +678,11 @@ def getFunctionArgMappings(functionNames, functionArgNames, myASTParser):
 	functionArgMappings = {}
 
 	for funcName in functionNames:
-		funcArgMapObject = myASTParser.getFunctionArgMappings(functionNames[funcName], functionArgNames)
-		if ( (funcArgMapObject == None) or (type(funcArgMapObject).__name__ != con.functionArgMap) ):
+		funcArgMapList = myASTParser.getFunctionArgMappings(functionNames[funcName], functionArgNames)
+		if ( (funcArgMapList == None) or (type(funcArgMapList).__name__ != con.listTypePython) ):
 			sys.exit("AutoBatch_Parser->getFunctionArgMappings:  problems with value returned from myASTParser->getFunctionArgMappings.")
 
-		functionArgMappings[funcName] = funcArgMapObject
+		functionArgMappings[funcName] = funcArgMapList
 
 	if (len(functionArgMappings) == 0):
 		sys.exit("AutoBatch_Parser->getFunctionArgMappings:  could not obtain any function argument mappings at all.")
@@ -683,7 +693,7 @@ def getVarAssignments(rootNode, functionNames, myASTParser):
 	if (rootNode == None):
 		sys.exit("AutoBatch_Parser->getVarAssignments:  root node passed in is of None type.")
 
-	if ( (functionNames == None) or (type(functionNames).__name__ != con.listTypePython) or (len(functionNames) == 0) ):
+	if ( (functionNames == None) or (type(functionNames).__name__ != con.dictTypePython) or (len(functionNames) == 0) ):
 		sys.exit("AutoBatch_Parser->getVarAssignments:  problem with the function names passed in.")
 
 	if (myASTParser == None):
@@ -757,7 +767,7 @@ def main():
 	if (varAssignments == None):
 		sys.exit("AutoBatch_Parser->main:  getVarAssignments returned None when trying to get the variable assignments.")
 
-	pass
+	writeBVFile(varAssignments)
 
 '''
 

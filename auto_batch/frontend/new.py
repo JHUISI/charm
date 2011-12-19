@@ -1,1 +1,1 @@
-x = test_func(a, b)
+M = {'a':str(x)}
