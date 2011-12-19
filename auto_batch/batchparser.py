@@ -440,12 +440,23 @@ class CombineVerifyEq:
 class CVForMultiSigner:
     def __init__(self, var_types, sig_vars, pub_vars, msg_vars, setting):
         self.vars = var_types
-        assert type(pub_vars) == list, "public vars needs to be in a list"
-        self.pub  = pub_vars # list of variable names
-        assert type(sig_vars) == list, "signature vars need to be in a list"
-        self.sig  = sig_vars # list of variable names
-        assert type(msg_vars) == list, "message vars need to be in a list"
-        self.msg  = msg_vars
+        if pub_vars:
+            assert type(pub_vars) == list, "public vars needs to be in a list"
+            self.pub  = pub_vars # list of variable names
+        else:
+            self.pub = None
+            
+        if sig_vars:
+            assert type(sig_vars) == list, "signature vars need to be in a list"
+            self.sig  = sig_vars # list of variable names
+        else:
+            self.sig = None
+            
+        if msg_vars:
+            assert type(msg_vars) == list, "message vars need to be in a list"
+            self.msg  = msg_vars
+        else:
+            self.msg = None
         self.setting = setting
 
         #TODO: process setting to determine whether we qualify for single or multi-signer mode

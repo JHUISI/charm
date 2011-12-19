@@ -141,19 +141,21 @@ if __name__ == "__main__":
         print("-c : generate the output for the code generator (temporary).")
         print("-d : check for further precomputations in final batch equation.")
         print("-p : generate the proof for the signature scheme.")
+        print("-s : select strategy for the ordering of techniques. Options: basic, score, what else?")
         exit(-1)
     # main for batch input parser    
     try:
         file = sys.argv[1]
         print(sys.argv[1:])
         ast_struct = parseFile(file)
-        THRESHOLD_FLAG = CODEGEN_FLAG = PROOFGEN_FLAG = PRECOMP_CHECK = VERBOSE = False # initialization
+        THRESHOLD_FLAG = CODEGEN_FLAG = PROOFGEN_FLAG = PRECOMP_CHECK = VERBOSE = CHOOSE_STRATEGY = False # initialization
         for i in sys.argv:
             if i == "-b": THRESHOLD_FLAG = True
             elif i == "-c": CODEGEN_FLAG = True
             elif i == "-v": VERBOSE = True
             elif i == "-p": PROOFGEN_FLAG = True
             elif i == "-d": PRECOMP_CHECK = True
+            elif i == "-s": CHOOSE_STRATEGY = True
     except:
         print("An error occured while processing batch inputs.")
         exit(-1)
@@ -163,9 +165,8 @@ if __name__ == "__main__":
     batch_precompute[ "delta" ] = "for{z := 1, N} do prng_z"
     
     algorithm = ast_struct [ TRANSFORM ]
-    ORDER     = False
-    #if not algorithm: algorithm = ['2', '3'] # standard transform that applies to most signature schemes we've tested
-    if not algorithm: algorithm = ['2', '3']; ORDER = True 
+    FIND_ORDER     = False
+    if not algorithm: FIND_ORDER = True #algorithm = ['2', '3'];  
 
     verify, N = None, None
     setting = {}
@@ -237,11 +238,10 @@ if __name__ == "__main__":
 
 
     # figure out order automatically (if not specified in bv file)
-    if ORDER:
-        test = BatchOrder(const, types, vars, BinaryNode.copy(verify2.right)).strategy()
-        #print("strategy combo: ", test)
-        #exit(0)
-    print("batch algorithm =>", algorithm)
+    if FIND_ORDER:
+        result = BatchOrder(const, types, vars, BinaryNode.copy(verify2.right)).strategy()
+        algorithm = [str(x) for x in result]
+        print("found batch algorithm =>", algorithm)
 
     techniques = {'2':Technique2, '3':Technique3, '4':Technique4, 'S':SimplifyDotProducts, 'P':PairInstanceFinder }
 

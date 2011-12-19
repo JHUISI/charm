@@ -58,11 +58,14 @@ class PairInstanceFinder:
     def visit_pair(self, node, data):
         lhs = node.left
         rhs = node.right
+        key = None
+        
         if Type(lhs) == ops.ATTR:
             key = 'lnode'
 
         if Type(rhs) == ops.ATTR:
-            key = 'rnode'        
+            key = 'rnode'
+                    
         if Type(data['parent']) == ops.ON:
             self.record(key, node, data['parent'])
         else:
@@ -76,9 +79,10 @@ class PairInstanceFinder:
         found = False
         for i in self.instance.keys():
             data = self.instance[ i ]
+            #print("data : ", data)
             if data['key'] == 'lnode':
                 if str(lnode) == str(data['lnode']): # found a match
-                    data['instance'] += 1; 
+                    data['instance'] += 1 # increment the finding of an instance
                     data['rnode1'] = rnode 
                     # save some state to delete this node on second pass                    
                     if parent: data['rnodePair'] = parent
