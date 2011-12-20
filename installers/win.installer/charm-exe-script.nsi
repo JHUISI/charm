@@ -23,7 +23,7 @@
 ; --------------------------------
 
 !define PRODUCT_NAME "charm-crypto"
-!define PRODUCT_VERSION "0.21"
+!define PRODUCT_VERSION "0.3"
 !define PRODUCT_PUBLISHER "Johns Hopkins University, HMS Lab"
 !define PRODUCT_WEB_SITE "http://charm-crypto.com/Main.html"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -38,6 +38,9 @@ SetCompressor lzma
 !include "MUI.nsh"
 !include "Sections.nsh"
 !include "EnvVarUpdate.nsh"
+; For conditionals and 64-bit check.
+!include "LogicLib.nsh"
+!include "x64.nsh"
 
 ; MUI Settings
 !define MUI_ABORTWARNING
@@ -107,12 +110,6 @@ Section # Install Charm Dependencies
   ;File "C:\charm-crypto\private"
   SetOutPath "$INSTDIR\share"
   File /r "C:\charm-crypto\share\"
-  SetOutPath "$INSTDIR\charm-usr\schemes"
-  File /r /x "C:\MinGW\msys\1.0\home\dev\charm-crypto\schemes\.svn\" "C:\MinGW\msys\1.0\home\dev\charm-crypto\schemes\"
-  SetOutPath "$INSTDIR\charm-usr\tests"
-  File /r /x "C:\MinGW\msys\1.0\home\dev\charm-crypto\tests\.svn\" "C:\MinGW\msys\1.0\home\dev\charm-crypto\tests\"
-  SetOutPath "$INSTDIR\charm-usr\param"
-  File /r /x "C:\MinGW\msys\1.0\home\dev\charm-crypto\param\.svn\" "C:\MinGW\msys\1.0\home\dev\charm-crypto\param\"
   SetOutPath "$INSTDIR"
   File "C:\charm-crypto\openssl.cnf"  
   ; Using EnvVarUpdate here:
@@ -124,7 +121,6 @@ Section # Install Charm Dependencies
   
   CreateDirectory "$SMPROGRAMS\charm-crypto"
   CreateShortCut "$SMPROGRAMS\charm-crypto\uninstall.lnk" "$INSTDIR\uninst.exe"
-  CreateShortCut "$SMPROGRAMS\charm-crypto\charm-usr.lnk" "$INSTDIR\charm-usr"
 SectionEnd
 
 Section /o "" python32_detected
@@ -133,16 +129,28 @@ Section /o "" python32_detected
   File /r "C:\Python32\Lib\site-packages\charm\"
   SetOutPath "$Python32Dir\compiler"
   File /r "C:\Python32\Lib\site-packages\compiler\"
-  ;SetOutPath "$Python32Dir\schemes"
-  ;File /r "C:\Python32\Lib\site-packages\schemes\"
+  ;
+  ; Notice how we split the schemes up, we should fix this.
+  ; Also need to split out Adapters. 
+  ;
+  SetOutPath "$INSTDIR\charm-usr-3.2\tests"
+  File /r "C:\MinGW\msys\1.0\home\dev\charm-crypto-3.2\tests\"
+  SetOutPath "$INSTDIR\charm-usr-3.2\param"
+  File /r "C:\MinGW\msys\1.0\home\dev\charm-crypto-3.2\param\"
+  SetOutPath "$INSTDIR\charm-usr-3.2\schemes"
+  File /r "C:\MinGW\msys\1.0\home\dev\charm-crypto-3.2\schemes\"  
+  SetOutPath "$INSTDIR\charm-usr-3.2\adapters"
+  File /r "C:\MinGW\msys\1.0\home\dev\charm-crypto-3.2\adapters\"
+  ;
+  ;
   SetOutPath "$Python32Dir\toolbox"
   File /r "C:\Python32\Lib\site-packages\toolbox\"
   SetOutPath "$Python32Dir"
   SetOverwrite ifnewer
   ; CHANGEME on every new release.
-  File "C:\Python32\Lib\site-packages\Charm_Crypto-0.2-py3.2.egg-info"
-  ;CreateShortcut "$SMPROGRAMS\charm-crypto\schemes-py32.lnk" "$windir\explorer.exe" '/e,"$Python32Dir\schemes"'
-  ;CreateShortCut "$SMPROGRAMS\charm-crypto\schemes-py32.lnk" "$Python32Dir\schemes"
+  File "C:\Python32\Lib\site-packages\Charm_Crypto-0.3-py3.2.egg-info"
+  
+  CreateShortCut "$SMPROGRAMS\charm-crypto\charm-usr.lnk" "$INSTDIR\charm-usr-3.2"
 SectionEnd
 
 Section /o "" python27_detected
@@ -151,16 +159,28 @@ Section /o "" python27_detected
   File /r "C:\Python27\Lib\site-packages\charm\"
   SetOutPath "$Python27Dir\compiler"
   File /r "C:\Python27\Lib\site-packages\compiler\"
-  ;SetOutPath "$Python27Dir\schemes"
-  ;File /r "C:\Python27\Lib\site-packages\schemes\"
+  ;
+  ; Notice how we split the schemes up, we should fix this.
+  ; Also need to split out Adapters. 
+  ;
+  SetOutPath "$INSTDIR\charm-usr-2.7\tests"
+  File /r "C:\MinGW\msys\1.0\home\dev\charm-crypto-2.7\tests\"
+  SetOutPath "$INSTDIR\charm-usr-2.7\param"
+  File /r "C:\MinGW\msys\1.0\home\dev\charm-crypto-2.7\param\"  
+  SetOutPath "$INSTDIR\charm-usr-2.7\schemes"
+  File /r "C:\MinGW\msys\1.0\home\dev\charm-crypto-2.7\schemes\"
+  SetOutPath "$INSTDIR\charm-usr-2.7\adapters"
+  File /r "C:\MinGW\msys\1.0\home\dev\charm-crypto-2.7\adapters\"
+  ;
+  ;  
   SetOutPath "$Python27Dir\toolbox"
   File /r "C:\Python27\Lib\site-packages\toolbox\"
   SetOutPath "$Python27Dir"
   SetOverwrite ifnewer
   ; CHANGEME on every new release.
-  File "C:\Python27\Lib\site-packages\Charm_Crypto-0.2-py2.7.egg-info"
-  ;CreateShortcut "$SMPROGRAMS\charm-crypto\schemes-py27.lnk" "$windir\explorer.exe" '/e,"$Python27Dir\schemes"'
-  ;CreateShortCut "$SMPROGRAMS\charm-crypto\schemes-py27.lnk" "$Python27Dir\schemes"  
+  File "C:\Python27\Lib\site-packages\Charm_Crypto-0.3-py2.7.egg-info"  
+  
+  CreateShortCut "$SMPROGRAMS\charm-crypto\charm-usr.lnk" "$INSTDIR\charm-usr-2.7"  
 SectionEnd
 
 Section -AdditionalIcons
@@ -212,10 +232,20 @@ uninst:
 ; Check for python installation and version.
 checkPython:
     StrCpy $9 "Lib\site-packages"
-    ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\3.2\InstallPath" ""
+
+    ; This should allow installation on Windows 8.
+	${If} ${RunningX64}
+		ReadRegStr $8 HKLM "SOFTWARE\Wow6432Node\Python\PythonCore\3.2\InstallPath" ""
+	${Else}
+		ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\3.2\InstallPath" ""
+	${EndIf}
     StrCmp $8 "" tryPython27 hasPython32
 tryPython27:
-    ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\2.7\InstallPath" ""
+	${If} ${RunningX64}
+		ReadRegStr $8 HKLM "SOFTWARE\Wow6432Node\Python\PythonCore\2.7\InstallPath" ""
+	${Else}
+		ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\2.7\InstallPath" ""
+	${EndIf}
     StrCmp $8 "" noPython hasPython27
 noPython:
     MessageBox MB_OK "Python version(s) 3.2 / 2.7 not found, the installation will now abort."
@@ -280,11 +310,19 @@ Section Uninstall
   ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\bin" 
   
   StrCpy $9 "Lib\site-packages"
-  ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\3.2\InstallPath" ""
+	${If} ${RunningX64}
+		ReadRegStr $8 HKLM "SOFTWARE\Wow6432Node\Python\PythonCore\3.2\InstallPath" ""
+	${Else}
+		ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\3.2\InstallPath" ""
+	${EndIf}  
   ; Depending on what version of python you installed, uninstall.
   StrCmp $8 "" tryPython27 hasPython32
   tryPython27:
-	  ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\3.2\InstallPath" ""
+	${If} ${RunningX64}
+		ReadRegStr $8 HKLM "SOFTWARE\Wow6432Node\Python\PythonCore\2.7\InstallPath" ""
+	${Else}
+		ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\2.7\InstallPath" ""
+	${EndIf}  
 	  StrCmp $8 "" done hasPython27
   hasPython32:
       RMDir /r "$8$9\charm\"

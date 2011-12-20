@@ -134,6 +134,7 @@ class BatchParser:
    
 
 # valid keywords
+signer_mode  = Enum('single', 'multi')
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
 TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
 MESSAGE, SIGNATURE, PUBLIC, LATEX = 'message','signature', 'public', 'latex'
@@ -441,30 +442,56 @@ class CVForMultiSigner:
         self.vars = var_types
         assert type(pub_vars) == list, "public vars needs to be in a list"
         self.pub  = pub_vars # list of variable names
-        self.pubKey = 'i'; self.pubEnd = 'S' # should be standard
         assert type(sig_vars) == list, "signature vars need to be in a list"
         self.sig  = sig_vars # list of variable names
         assert type(msg_vars) == list, "message vars need to be in a list"
         self.msg  = msg_vars
         self.setting = setting
-    
+
+        #TODO: process setting to determine whether we qualify for single or multi-signer mode
+        self.sigKey = 'z'; self.sigEnd = setting[SIGNATURE]
+        self.pubEnd = None
+#        if setting[PUBLIC] == SAME and setting[SIGNATURE] == setting[MESSAGE]:
+        if setting[SIGNATURE] == setting[MESSAGE] and setting[PUBLIC] == SAME:
+            self.signer = signer_mode.single
+            self.pubKey = self.sigKey
+            print("Mode: ", self.signer, "signer")
+        elif setting[PUBLIC] == setting[SIGNATURE]:
+            # technically multi-signer, but since there is a 
+            # one-to-one mapping with sigs and public keys
+            # we should just call it single signer. Equation turns out 
+            # to be the same
+            self.signer = signer_mode.single            
+            self.pubKey = self.sigKey
+            self.pubEnd = self.sigEnd
+            print("Mode: multi signer") 
+        elif setting[PUBLIC] != setting[SIGNATURE]:
+            # most likely multi-signer mode
+            self.signer = signer_mode.multi
+            self.pubKey = 'i' # reserved for different amount of signers than signatures
+            self.pubEnd = setting[PUBLIC]
+            print("Mode: ", self.signer, "signer")
+        else:
+            print("error?")
+           
     def visit(self, node, data):
         pass
     
     def visit_eq_tst(self, node, data):
         # distribute prod to left and right side
-        if Type(node.left) != ops.EQ:
-            prodL = self.newProdNode() # check if sig vars appear in left side?
-            prodL.right = node.left
-            node.left = prodL
+        if self.signer >= signer_mode.single:
+            if Type(node.left) != ops.EQ:
+                prodL = self.newProdNode(self.sigKey, self.sigEnd) # check if sig vars appear in left side?
+                prodL.right = node.left
+                node.left = prodL
         
-        if Type(node.right) != ops.EQ:
-            prodR = self.newProdNode()
-            prodR.right = node.right
-            node.right = prodR
+            if Type(node.right) != ops.EQ:
+                prodR = self.newProdNode(self.sigKey, self.sigEnd)
+                prodR.right = node.right
+                node.right = prodR
             
         # check whether the pub vars appear in left subtree
-        if self.setting.get(PUBLIC) == DIFF:
+        if self.signer == signer_mode.multi:
             if Type(node.left) != ops.EQ and self.isPubInSubtree(node.left):
                 prodL2 = self.newProdNode(self.pubKey, self.pubEnd)
                 prodL2.right = node.left
@@ -482,9 +509,17 @@ class CVForMultiSigner:
             return
         if self.isSig(node):
             node.setAttrIndex('z') # add index to each attr that isn't constant
-        if self.isPub(node) and self.setting.get(PUBLIC) == DIFF:
-            node.setAttrIndex('i')
-        if self.isMsg(node) and self.setting.get(MESSAGE) == DIFF:
+        
+        # handle public keys
+        if self.isPub(node):
+            if self.setting[PUBLIC] == SAME:
+                pass
+            elif self.signer == signer_mode.single:
+                node.setAttrIndex('z')
+            elif self.signer == signer_mode.multi:
+                node.setAttrIndex('i')
+                
+        if self.isMsg(node) and self.setting[MESSAGE] == self.setting[SIGNATURE]:
             node.setAttrIndex('z')
     
     def newProdNode(self, key=None, end=None):
@@ -649,9 +684,10 @@ class SmallExponent:
 
 class Technique2:
     def __init__(self, constants, variables, meta):
-        self.consts = constants
-        self.vars   = variables
-        self.rule   = "Move the exponent(s) into the pairing (technique 2)"
+        self.consts  = constants
+        self.vars    = variables
+        self.rule    = "Move the exponent(s) into the pairing (technique 2)"
+        self.applied = False 
         #self.rule   = "Rule 2: "
         # TODO: pre-processing to determine context of how to apply technique 2
         # TODO: in cases of chp.bv, where you have multiple exponents outside a pairing, move them all into the e().
@@ -671,12 +707,14 @@ class Technique2:
                 addAsChildNodeToParent(data, pair_node) # move pair node one level up
                 node.left = pair_node.left
                 pair_node.left = node
+                self.applied = True
                 #self.rule += "Left := Move '" + str(node.right) + "' exponent into the pairing. "
             
             elif not self.isConstInSubtreeT(pair_node.right):       
                 addAsChildNodeToParent(data, pair_node) # move pair node one level up                
                 node.left = pair_node.right
                 pair_node.right = node 
+                self.applied = True                
                 #self.rule += "Right := Move '" + str(node.right) + "' exponent into the pairing. "
             else:
                 pass
@@ -711,12 +749,14 @@ class Technique2:
                             #self.rule += "distributed exponent into the pairing: right side. "
                         else:
                             self.setNodeAs(pair_node, 'right', node, 'left')
+                            self.applied = True                            
                             #self.rule += "moved exponent into the pairing: less than 2 mul nodes. "
 
                     elif Type(pair_node.right) == ops.ATTR:
                         # set pair node left child to node left since we've determined
                         # that the left side of pair node is not a constant
                         self.setNodeAs(pair_node, 'left', node, 'left')
+                        self.applied = True
                     else:
                         print("T2: missing case?")
 
@@ -727,17 +767,19 @@ class Technique2:
                         pass
                     elif Type(pair_node.left) == ops.ATTR:
                         self.setNodeAs(pair_node, 'left', node, 'left')
+                        self.applied = True
 
             else:
             #    blindly make the exp node the right child of whatever node
                 self.setNodeAs(prod_node, 'right', node, 'left')
-
+                self.applied = True
         elif(Type(node.left) == ops.MUL):
             #print("Consider: node.left.type =>", node.left.type)
             mul_node = node.left
             mul_node.left = self.createExp(mul_node.left, BinaryNode.copy(node.right))
             mul_node.right = self.createExp(mul_node.right, BinaryNode.copy(node.right))
             addAsChildNodeToParent(data, mul_node)            
+            self.applied = True
             #self.rule += " distributed the exp node when applied to a MUL node. "
             # Note: if the operands of the mul are ATTR or PAIR doesn't matter. If the operands are PAIR nodes, PAIR ^ node.right
             # This is OK b/c of preorder visitation, we will apply transformations to the children once we return.
@@ -797,10 +839,11 @@ class Technique2:
 
 class Technique3:
     def __init__(self, constants, variables, meta):
-        self.consts = constants
-        self.vars   = variables
+        self.consts  = constants
+        self.vars    = variables
         #self.rule   = "Rule 3: "
-        self.rule   = "Combine pairings with common 1st or 2nd element. Reduce N pairings to 1 (technique 3)"
+        self.rule    = "Combine pairings with common 1st or 2nd element. Reduce N pairings to 1 (technique 3)"
+        self.applied = False
     
     def visit(self, node, data):
         pass
@@ -820,7 +863,7 @@ class Technique3:
                 base_node = left.right
                 left.right = self.createExp(base_node, exp_node)
                 self.deleteFromTree(right, node, exp_node, 'right') # cleanup right side tree?
-            
+                self.applied = True
         elif Type(right) == ops.ON:
             index = str(right.left.left.left)
             #print("right ON node =>", index)
@@ -829,6 +872,7 @@ class Technique3:
                 base_node = right.right
                 right.right = self.createExp(base_node, exp_node)
                 self.deleteFromTree(left, node, exp_node, 'left')
+                self.applied = True
         elif Type(left) == ops.MUL:
             pass
         elif Type(right) == ops.MUL:
@@ -843,6 +887,7 @@ class Technique3:
                 mul.right = self.createPair(left, child_node2)
                 #print("new node =+>", mul)
                 addAsChildNodeToParent(data, mul)
+                self.applied = True
 #                self.rule += "split one pairing into two pairings. "
             else:
                 print("T3: missing case?")
@@ -878,6 +923,7 @@ class Technique3:
                         muls[i].right = self.createPair(left, r[i+1])
                 #print("root =>", muls[0])
                 node.right = muls[0]
+                self.applied = True
                 #self.rule += "split one pairing into two or three."
                 #addAsChildNodeToParent(data, muls[0])
             else:        
@@ -889,11 +935,13 @@ class Technique3:
                     pair_node.left = node # pair points to 'on' node
                     #self.rule += "common 1st (left) node appears, so can reduce n pairings to 1. "
                     self.visit_pair(pair_node, data)                    
+                    self.applied = True
                 elif not self.isConstInSubtreeT(pair_node.right):
                     node.right = pair_node.right
                     pair_node.right = node
                     #self.rule += "common 2nd (right) node appears, so can reduce n pairings to 1. "
                     self.visit_pair(pair_node, data)
+                    self.applied = True
                 else:
                     pass
             return
@@ -910,7 +958,7 @@ class Technique3:
                 exp.right = sumOf
                 #print("output =>", exp)
                 addAsChildNodeToParent(data, exp)
-
+                self.applied = True
 
     def isConstInSubtreeT(self, node): # check whether left or right node is constant  
         if node == None: return None
@@ -1001,6 +1049,7 @@ class Technique4:
         self.vars   = variables
         self.meta = meta
         self.rule = "Applied waters hash technique (technique 4)"
+        self.applied = False
         #print("Metadata =>", meta)
     
     def visit(self, node, data):
@@ -1028,6 +1077,7 @@ class Technique4:
 #                print("parent =>", node2_parent, ":", Type(node2_parent))
                 if Type(node2_parent) == ops.PAIR:
                     self.adjustProdNodes( node2_parent )
+                    self.applied = True
                 else:
                     print("Not applying any transformation for: ", Type(node2_parent))
 

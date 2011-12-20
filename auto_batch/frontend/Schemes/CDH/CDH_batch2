@@ -1,0 +1,337 @@
+from charm.integer import randomBits
+from pksig_cdh import *
+import random, string, time
+from math import *
+
+messageSize = 100
+numSigs = 100
+numProgramIterations = 10
+
+
+M_index = 1
+sig_index = 2
+pk_index = 3
+
+
+def groupMembershipCheck(group, obj):
+    if type(obj) == dict:
+        for i in obj.keys():
+            if type(obj[i]) == int:
+                pass
+            else: 
+                if group.ismember(obj[i]) == False: 
+                    return False
+        return True
+    elif type(obj) in [tuple, list]:
+        for i in obj:
+            if group.ismember(i) == False:
+                return False
+        return True
+    else:
+        return group.ismember(obj)
+    
+
+# does timings, group membership check, verification
+def individualVerification(group, cdhObj, dict, msgs, sigs, N):
+	failed = []
+
+	for i in range(N):
+
+		U = dict[0][pk_index]['U']
+		if group.ismember(U) == False:
+			sys.exit("U")
+
+		V = dict[0][pk_index]['V']
+		if group.ismember(V) == False:
+			sys.exit("V")
+
+		D = dict[0][pk_index]['D']
+		if group.ismember(D) == False:
+			sys.exit("D")
+
+		g2 = dict[0][pk_index]['g2']
+		if group.ismember(g2) == False:
+			sys.exit("g2")
+
+		z2 = dict[0][pk_index]['z2']
+		if group.ismember(z2) == False:
+			sys.exit("Z")
+
+		w2 = dict[0][pk_index]['w2']
+		if group.ismember(w2) == False:
+			sys.exit("w2")
+
+		h2 = dict[0][pk_index]['h2']
+		if group.ismember(h2) == False:
+			sys.exit("h2")
+
+		r = dict[i][sig_index]['r']
+		if group.ismember(r) == False:
+			sys.exit("r failed")
+
+		sig1 = dict[i][sig_index][1]
+		if group.ismember(sig1) == False:
+			sys.exit("sig1 failed")
+
+		sig2 = dict[i][sig_index][2]
+		if group.ismember(sig2) == False:
+			sys.exit("sig2 failed")
+
+		sig_i = dict[i][sig_index]['i']
+		if type(sig_i) != int:
+			sys.exit("i failed")
+
+		if cdhObj.verify(pk, msgs[i], sigs[i]):
+			#print("Verified sig ", i)
+			continue
+#    EndBenchmark(bID)
+	return failed
+        
+
+
+
+
+
+def runCDH_batch(dict, group):
+
+	#print("in batch")
+
+	N = len(dict)
+
+	delta = {}
+
+	for sigIndex in range(0, N):
+		delta[sigIndex] = group.init(ZR, randomBits(80))
+
+	sumB = group.init(ZR, 0)
+	sumD = group.init(ZR, 0)
+	sumC = group.init(ZR, 0)
+	dotA = group.init(G1, 1)
+	dotG = group.init(G1, 1)
+	dotE = group.init(G1, 1)
+	dotF = group.init(G1, 1)
+
+	for i in range(0, N):
+		M = dict[i][M_index]
+		if (type(M) != str):
+			sys.exit("M failed")
+
+		#print("in loop")
+
+		M = group.H(M, ZR)
+
+		r = dict[i][sig_index]['r']
+		if group.ismember(r) == False:
+			sys.exit("r failed")
+
+
+		sig1 = dict[i][sig_index][1]
+		if group.ismember(sig1) == False:
+			sys.exit("sig1 failed")
+
+		sig2 = dict[i][sig_index][2]
+		if group.ismember(sig2) == False:
+			sys.exit("sig2 failed")
+
+		sig_i = dict[i][sig_index]['i']
+		if type(sig_i) != int:
+			sys.exit("i failed")
+
+		#print("after sig2")
+
+		sumD = sumD + delta[i]
+		sumB = sumB + (M * delta[i])
+		sumC = sumC + (r * delta[i])
+		dotA = dotA * (sig1 ** delta[i])
+		dotG = dotG * (sig2 ** delta[i])
+		n = group.init(ZR, ceil(log(sig_i, 2)))
+
+		#print("n is ", n)
+
+		#print("after n")
+
+		dotE = dotE * (sig2 ** (n * delta[i] ) )
+		dotF = dotF * (sig2 ** (sig_i * delta[i] ) )
+
+		#print("ending loop")
+
+	U = dict[0][pk_index]['U']
+	if group.ismember(U) == False:
+		sys.exit("U")
+
+	V = dict[0][pk_index]['V']
+	if group.ismember(V) == False:
+		sys.exit("V")
+
+	D = dict[0][pk_index]['D']
+	if group.ismember(D) == False:
+		sys.exit("D")
+
+	g2 = dict[0][pk_index]['g2']
+	if group.ismember(g2) == False:
+		sys.exit("g2")
+
+	z2 = dict[0][pk_index]['z2']
+	if group.ismember(z2) == False:
+		sys.exit("Z")
+
+	w2 = dict[0][pk_index]['w2']
+	if group.ismember(w2) == False:
+		sys.exit("w2")
+
+	h2 = dict[0][pk_index]['h2']
+	if group.ismember(h2) == False:
+		sys.exit("h2")
+
+	leftSide = pair(dotA, g2)
+	rightSidePair1 = pair(dotE, w2)
+	rightSidePair2 = pair(dotF, z2)
+	rightSidePair3 = pair(dotG, h2)
+	rightSidePairings = rightSidePair1 * rightSidePair2 * rightSidePair3
+
+	U_right = U ** sumB
+	V_right = V ** sumC
+	D_right = D ** sumD
+
+	rightSide = (U_right * (V_right * (D_right * (rightSidePairings))))
+
+	if (leftSide == rightSide):
+		return
+	sys.exit("WTF IS HAPPENING????????")
+
+def randomMessages(count):
+    msgList = []
+    for i in range(0, count):
+        msg = ""
+        for index in range(0, messageSize):
+            msg = msg + random.choice(string.printable)
+        msgList.append(msg)
+    return msgList
+    
+def generateSigs(pk, sk, cdhObj, num_sigs):
+    m = randomMessages(num_sigs)
+    sig = []
+    c = pk['s'] + 1 # set state counter from pk (needs to be consistent, right?)
+    for i in range(num_sigs):
+        sig.append( cdhObj.sign(pk, sk, c, m[i]) )
+        c = c + 1
+    
+    pk['s'] = c # update the state counter
+    return (m, sig)
+
+
+def printAll(m, sig, count):
+    for i in range(count):
+        print("m =>", m[i])
+        print("sig =>", sig[i])
+    
+
+def batchVerification(group, cdhObj):
+    pass
+
+if __name__ == "__main__":
+	groupObj = pairing(80)
+	cdh = CDH(groupObj)
+	N = numSigs
+    
+	(pk, sk) = cdh.setup()
+    
+	(mList, sigList) = generateSigs(pk, sk, cdh, N)
+    
+	CDH_dict = {}
+
+	#print("here")
+
+	for indexVar in range(0, N):
+		CDH_dict[indexVar] = {}
+		CDH_dict[indexVar][M_index] = mList[indexVar]
+		CDH_dict[indexVar][sig_index] = sigList[indexVar]
+		CDH_dict[indexVar][pk_index] = pk
+
+	g = open("intermediate", "w")
+
+	f = open("batOutputResults.dat", "w")
+	outputString = ""
+
+	trials = {}
+	trialsInd = {}
+
+	indInter = open("ind_intermediate", "w")
+
+	for programIteration in range(0, numProgramIterations):
+		trials[programIteration] = {}
+		trialsInd[programIteration] = {}
+
+		for numSigs in range(0, N):
+			dict = {}
+			msgListInd = []
+			sigListInd = []
+
+			for loadSig in range(0, (numSigs + 1)):
+				dict[loadSig] = CDH_dict[loadSig]
+				msgListInd.append(mList[loadSig])
+				sigListInd.append(sigList[loadSig])
+
+			startTime = time.clock()
+			runCDH_batch(dict, groupObj)
+			endTime = time.clock()
+
+			result = (endTime - startTime) * 1000
+
+			#batch
+			trials[programIteration][numSigs] = float(result) / float(numSigs + 1)
+
+			mystring = str(programIteration) + " " + str(numSigs) + " " + str(result) + " " + str(trials[programIteration][numSigs]) + "\n"
+			print(mystring)
+			g.write(mystring)
+
+
+
+
+
+			startTime = time.clock()
+			individualVerification(groupObj, cdh, dict, msgListInd, sigListInd, (numSigs + 1))
+			endTime = time.clock()
+
+			result = (endTime - startTime) * 1000
+
+			#ind
+			trialsInd[programIteration][numSigs] = float(result) / float(numSigs + 1)
+
+			mystring = str(programIteration) + " " + str(numSigs) + " " + str(result) + " " + str(trialsInd[programIteration][numSigs]) + "\n"
+			print(mystring)
+			indInter.write(mystring)
+
+
+
+
+
+	indDat = open("indOutputResults.dat", "w")
+
+	outputStringBATCH = ""
+	outputStringIND = ""
+
+	for sigNum in range(0, N):
+
+		sumBatch = 0.0
+		sumInd = 0.0
+
+		for iteration in range(0, numProgramIterations):
+
+			sumBatch = sumBatch + trials[iteration][sigNum]
+			sumInd = sumInd + trialsInd[iteration][sigNum]
+
+		valueToWriteBatch = float(sumBatch) / float(numProgramIterations)
+		valueToWriteInd = float(sumInd) / float(numProgramIterations)
+
+		outputStringBATCH += str(sigNum+1) + " " + str(valueToWriteBatch) + "\n"
+		outputStringIND += str(sigNum+1) + " " + str(valueToWriteInd) + "\n"
+
+	
+	f.write(outputStringBATCH)
+	indDat.write(outputStringIND)
+
+	f.close()
+	g.close()
+	indDat.close()
+	indInter.close()

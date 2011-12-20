@@ -1,8 +1,8 @@
 import sys, ast
 
 class AST_Visitor(ast.NodeVisitor):
-	def visit_Expr(self, node):
-		print((node.value._fields))
+	def visit_FunctionDef(self, node):
+		print(node.args.args[1].arg)
 
 f = open(sys.argv[1], 'r').readlines()
 c = ""

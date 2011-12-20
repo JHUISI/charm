@@ -5,6 +5,7 @@
 
 from batchparser import *
 from batchproof import *
+from batchorder import BatchOrder
 
 try:
     #import benchmarks
@@ -137,7 +138,8 @@ if __name__ == "__main__":
     if len(sys.argv) == 1:
         print("%s [ batch-input.bv ] -b -c -p" % sys.argv[0])
         print("-b : estimate threshold for a given signature scheme with 1 to N signatures.")
-        print("-c : generate the output for the code generator (temporary)")
+        print("-c : generate the output for the code generator (temporary).")
+        print("-d : check for further precomputations in final batch equation.")
         print("-p : generate the proof for the signature scheme.")
         exit(-1)
     # main for batch input parser    
@@ -161,8 +163,10 @@ if __name__ == "__main__":
     batch_precompute[ "delta" ] = "for{z := 1, N} do prng_z"
     
     algorithm = ast_struct [ TRANSFORM ]
-    if not algorithm: algorithm = ['2', '3'] # standard transform that applies to most signature schemes we've tested
-    
+    ORDER     = False
+    #if not algorithm: algorithm = ['2', '3'] # standard transform that applies to most signature schemes we've tested
+    if not algorithm: algorithm = ['2', '3']; ORDER = True 
+
     verify, N = None, None
     setting = {}
     metadata = {}
@@ -180,23 +184,36 @@ if __name__ == "__main__":
     # process settings
     sig_vars, pub_vars, msg_vars = ast_struct[ SIGNATURE ], ast_struct[ PUBLIC ], ast_struct[ MESSAGE ]
     batch_count = {} # F = more than one, T = only one exists
-    if setting.get(MESSAGE) == SAME:
+    MSG_set = setting.get(MESSAGE)
+    PUB_set = setting.get(PUBLIC)
+    SIG_set = setting.get(SIGNATURE)
+    if MSG_set == SAME:
         batch_count[ MESSAGE ] = SAME 
-    else: # different messages per signer?
-        batch_count[ MESSAGE ] = DIFF
+    elif MSG_set in metadata.keys():
+        batch_count[ MESSAGE ] = MSG_set
+    else:
+        print("variable not defined but referenced: ", MSG_set)
     
     # check public key setting (can either be many keys or just one single key)
-    if setting.get(PUBLIC) == SAME:
-        batch_count[ PUBLIC ] = SAME
-    else: # different public keys
-        batch_count[ PUBLIC ] = DIFF
+    if PUB_set == SAME:
+        batch_count[ PUBLIC ] = SAME 
+    elif PUB_set in metadata.keys():
+        batch_count[ PUBLIC ] = PUB_set
+    else:
+        print("variable not defined but referenced: ", PUB_set)
     
+    if SIG_set in metadata.keys():
+        batch_count[ SIGNATURE ] = SIG_set
+    else:
+        print("variable not defined but referenced: ", SIG_set)    
+    
+    if VERBOSE: print("setting: ", batch_count)
+        
     vars = types
     vars['N'] = N
     vars.update(metadata)
     print("variables =>", vars)
     print("metadata =>", metadata)
-    print("batch algorithm =>", algorithm)
 
     if PROOFGEN_FLAG:
         lcg_data = {}
@@ -217,6 +234,14 @@ if __name__ == "__main__":
     print("\nStage B: Small Exp Test =>", verify2, "\n")
     if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Apply the small exponents test, using exponents $\delta_1, \dots \delta_\\numsigs \in_R \Zq$', 
                                                'eq':lcg.print_statement(verify2.right), 'preq':small_exp_label }; lcg_steps += 1
+
+
+    # figure out order automatically (if not specified in bv file)
+    if ORDER:
+        test = BatchOrder(const, types, vars, BinaryNode.copy(verify2.right)).strategy()
+        #print("strategy combo: ", test)
+        #exit(0)
+    print("batch algorithm =>", algorithm)
 
     techniques = {'2':Technique2, '3':Technique3, '4':Technique4, 'S':SimplifyDotProducts, 'P':PairInstanceFinder }
 
@@ -242,7 +267,7 @@ if __name__ == "__main__":
             lcg_data[ lcg_steps ] = { 'msg':Tech.rule, 'eq': lcg.print_statement(verify2.right) }
             lcg_steps += 1
 
-    exit(0)
+#    exit(0)
     
     if PROOFGEN_FLAG:
         lcg_data[ lcg_steps-1 ]['preq'] = final_batch_eq
