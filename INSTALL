@@ -36,9 +36,9 @@ WARNING: Python 2.7 is not supported by apt on Ubuntu. Please see the python 3.x
 
 1. Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
 	1. Git
-		sudo apt-get installGit
-    2 Python2.x and python2.x-dev where x >= 2.7.
-        You probably need to build these from source.
+		sudo apt-get install git
+        2. Python2.x and python2.x-dev where x >= 2.7.
+                You probably need to build these from source.
 	3. m4
 		sudo apt-get install m4
 	4. libssl-dev
@@ -46,7 +46,7 @@ WARNING: Python 2.7 is not supported by apt on Ubuntu. Please see the python 3.x
 
 2. Now we need to obtain a copy of Charm:
 	git clone git://github.com/JHUISI/charm.git
-    git branch 2.7-master 
+        git branch 2.7-master 
 3. Next, we will install Charm. Navigate to the Charm directory.
 	1. We must first run the configuration script:
 		sudo ./configure.sh
@@ -70,11 +70,10 @@ WARNING: Python 2.7 is not supported by apt on Ubuntu. Please see the python 3.x
 
 2. Now we need to obtain a copy of Charm:
 	git clone git://github.com/JHUISI/charm.git
-    git branch 2.7-master 
+        git branch 2.7-master 
 3. Next, we will install Charm. Navigate to the Charm directory.
 	1. We must first run the configuration script:
 		sudo ./configure.sh
-		[If you installed Python 3 and would like to use that, you will need to add –-python=/path/to/python3]
 	2. Now we will build and install Charm:
 		sudo make build
 		sudo make install
@@ -129,7 +128,7 @@ WARNING: Python 2.7 is not supported by apt on Ubuntu. Please see the python 3.x
 
 3. Now we need to obtain a copy of Charm:
 	git clone git://github.com/JHUISI/charm.git
-    git branch 2.7-master 
+        git branch 2.7-master 
 4. Next, we will install Charm. Navigate to the Charm directory.
 	1. We must first run the configuration script:
 		su -c "./configure.sh"
@@ -144,7 +143,7 @@ WARNING: Python 2.7 is not supported by apt on Ubuntu. Please see the python 3.x
 [Mint x86_64]
 1. Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
         1. Git
-                sudo apt-get install subversion
+                sudo apt-get install git
         2. m4
                 sudo apt-get install m4
         3. Header files/static library
@@ -155,7 +154,7 @@ WARNING: Python 2.7 is not supported by apt on Ubuntu. Please see the python 3.x
 
 2. Now we need to obtain a copy of Charm:
 	git clone git://github.com/JHUISI/charm.git
-    git branch 2.7-master 
+        git branch 2.7-master 
 3. Next, we will install Charm. Navigate to the Charm directory.
         1. We must first run the configuration script:
                 sudo bash ./configure.sh                * Bash to avoid unexpected operator error.
@@ -203,6 +202,14 @@ Let's first build our dependencies with the following scripts:
 	make
 	make install
 
+        # ** NOTE ** openssl-1.0.0e ./test compilation problems.
+        # You will run into a compilation error that looks similar to:
+        #    mdtest.c:1:10 error: expected ...
+        #
+        # To mitigate, do the following:
+        #    grep "./test/dummytest.c" *
+        #    edit each file from "dummytest.c" to "#include "dummytest.c"
+
 	#PBC
 	./configure --prefix=/mingw --disable-static --enable-shared
 	make
@@ -210,6 +217,13 @@ Let's first build our dependencies with the following scripts:
 	
 	#Building Charm
 	./configure --prefix=/mingw --python=/c/Python32/python.exe 
+
+        # ** NOTE ** The latest mingw installer comes coupled with gcc-4.6.x
+        # which no longer supports the flag -mno-cygwin.  This, unfortunately,
+        # is called during python setup.py build as it is a part of a class
+        # in distutils for python.  A fix is coming for python to evaluate
+        # the gcc compiler version, and remove the flag -mno-cygwin if it
+        # 4.6+, but that has yet to be implemented.  
 	
 [MinGW64]
 
@@ -231,6 +245,8 @@ Let's first build our dependencies with the following scripts:
 	to build openssl with the following: 
 	
 		./config --openssldir=/c/charm-crypto --shared
+    
+       * Be sure to follow the MINGW32 openssl note.
 
 BUILDING IN OS X 
 ------------------------
@@ -253,3 +269,7 @@ The steps for building in os x this way are:
 
 For Lion, run ./configure.sh --enable-darwin in step 1 and follow the steps above for OS X.
 
+# *** NOTE *** A direct install of xcode 4.2 on a clean Lion machine will
+# no longer include the gcc-4.2 compiler. This will create some hardache
+# for pbc as llvm-gcc-4.2 doesn't support nested functions, and thus will
+# fail during build.  

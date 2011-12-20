@@ -134,9 +134,9 @@ wget="$(which wget)"
 #fall back to python if for some reason python3 does not exist 
 # there is still a version check later so it sitll has to be
 # python 3 
-#if !  [ -n "$python_path"  ]; then
-#   python_path="$(which python)"
-#fi 
+if !  [ -n "$python_path"  ]; then
+   python_path="$(which python)"
+fi 
 # set -x
 
 # parse CC options first
@@ -877,7 +877,7 @@ fi
 # For python installers on OS X.
 test_path=`echo $python_path | awk 'BEGIN {FS="."}{print $1}'`
 if [ "$test_path" = "/Library/Frameworks/Python" ] ; then
-    echo "PYTHONBUILDEXT=-L/usr/local/lib -I/usr/local/include $PYTHONBUILDEXT" >> $config_mk
+    echo PYTHONBUILDEXT="-L/usr/local/lib -I/usr/local/include $PYTHONBUILDEXT"
 fi
 
 if [ "$PYTHONBUILDEXT" != "" ] ; then

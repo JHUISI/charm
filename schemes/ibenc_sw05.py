@@ -148,16 +148,15 @@ class IBE_SW05_LUC(IBEnc):
         return (pk, mk)
 
     def eval_T(self, pk, n, x):
-        N = [group.init(ZR, (y + 1)) for y in range(n + 1)]        
-        N_int = [(y + 1) for y in range(n + 1)]
+        N = [group.init(ZR,(x + 1)) for x in range(n + 1)]        
+        N_int = [(x + 1) for x in range(n + 1)]
         
         coeffs = util.recoverCoefficients(N)
-        
         prod_result = 1
         for i in N_int:
             j = group.init(ZR, i)
             prod_result *= (pk['t'][i-1] ** coeffs[j])
-
+        
         #n = group.init(ZR, n)
         T = (pk['g2'] ** (x * n)) * prod_result
         return T
