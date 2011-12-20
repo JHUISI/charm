@@ -5,7 +5,7 @@ class BinOpValue:
 	def __init__(self):
 		self.lineNo = None
 		self.left = None
-		self.op = None
+		self.opType = None
 		self.right = None
 
 	def getType(self):
@@ -17,8 +17,8 @@ class BinOpValue:
 	def getLeft(self):
 		return self.left
 
-	def getOp(self):
-		return self.op
+	def getOpType(self):
+		return self.opType
 
 	def getRight(self):
 		return self.right
@@ -35,11 +35,11 @@ class BinOpValue:
 
 		self.left = left
 
-	def setOp(self, op):
-		if ( (op == None) or (type(op).__name__ not in con.opTypesAST) ):
-			sys.exit("BinOpValue->setOp:  problem with op parameter passed in.")
+	def setOpType(self, opType):
+		if (opType not in con.opTypesAST):
+			sys.exit("BinOpValue->setOpType:  op type passed in is not one of the supported types.")
 
-		self.op = op
+		self.opType = opType
 
 	def setRight(self, right):
 		if (right == None):

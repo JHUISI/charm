@@ -328,6 +328,39 @@ class ASTParser:
 		retNodeVisitor.visit(funcNode)
 		return retNodeVisitor.getReturnNodeList()
 
+	def getLeftNodeOfBinOp(self, node):
+		if ( (node == None) or (type(node).__name__ != con.binOpTypeAST) ):
+			sys.exit("ASTParser->getLeftNodeOfBinOp:  problem with node passed in to function.")
+
+		try:
+			retNode = node.left
+		except:
+			sys.exit("ASTParser->getLeftNodeOfBinOp:  could not extract left node of the node passed in to the function.")
+
+		return retNode
+
+	def getRightNodeOfBinOp(self, node):
+		if ( (node == None) or (type(node).__name__ != con.binOpTypeAST) ):
+			sys.exit("ASTParser->getRightNodeOfBinOp:  problem with node passed in to function.")
+
+		try:
+			retNode = node.right
+		except:
+			sys.exit("ASTParser->getRightNodeOfBinOp:  could not extract right node of the node passed in to the function.")
+
+		return retNode
+
+	def getOpTypeOfBinOp(self, node):
+		if ( (node == None) or (type(node).__name__ != con.binOpTypeAST) ):
+			sys.exit("ASTParser->getOpTypeOfBinOp:  problem with the node passed in to the function.")
+
+		try:
+			retType = type(node.op).__name__
+		except:
+			sys.exit("ASTParser->getOpTypeOfBinOp:  could not extract the type of the op node of the node passed in to the function.")
+
+		return retType
+
 	def getDictKeyNodes(self, node):
 		if ( (node == None) or (type(node).__name__ != con.dictTypeAST) ):
 			sys.exit("ASTParser->getDictKeyNodes:  problem with node passed in to function.")
@@ -1004,7 +1037,7 @@ class ASTParser:
 			return con.dictTypeAST
 
 		if (nameType == con.binOpTypeAST):
-			return con.binOnTypeAST
+			return con.binOpTypeAST
 
 		return None
 

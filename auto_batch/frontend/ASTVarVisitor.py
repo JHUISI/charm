@@ -11,6 +11,7 @@ from RandomValue import RandomValue
 from LambdaValue import LambdaValue
 from DotProdValue import DotProdValue
 from DictValue import DictValue
+from BinOpValue import BinOpValue
 
 class ASTVarVisitor(ast.NodeVisitor):
 	def __init__(self, myASTParser):
@@ -138,8 +139,6 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		return hashGroupType
 
-	#START HERE.  BREAK UP THE FUNCTION BELOW INTO GET NODES, THEN PROCESS EACH NODE.  THEN FINISH DICTVALUE BUILDING BELOW
-
 	def getArgNodeList(self, node):
 		if (node == None):
 			sys.exit("ASTVarVisitor->getArgNodeList:  node passed in is of None type.")
@@ -147,6 +146,16 @@ class ASTVarVisitor(ast.NodeVisitor):
 		argNodeList = self.myASTParser.getArgNodeList(node)
 		if ( (argNodeList == None) or (type(argNodeList).__name__ != con.listTypePython) ):
 			sys.exit("ASTVarVisitor->getArgNodeList:  problem with value returned from ASTParser->getArgNodeList.")
+
+		retArgNodeList = self.processEachArgNode(argNodeList)
+		if ( (retArgNodeList == None) or (type(retArgNodeList).__name__ != con.listTypePython) ):
+			sys.exit("ASTVarVisitor->getArgNodeList:  problem with value returned from processEachArgNode.")
+
+		return retArgNodeList
+
+	def processEachArgNode(self, argNodeList):
+		if ( (argNodeList == None) or (type(argNodeList).__name__ != con.listTypePython) ):
+			sys.exit("ASTVarVisitor->processEachArgNode:  problem with the arguments node list passed in to the function.")
 
 		retArgNodeList = []
 
@@ -320,17 +329,36 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if ( (node == None) or (type(node).__name__ != con.dictTypeAST) ):
 			sys.exit("ASTVarVisitor->buildDictValue:  problem with node passed in to function.")
 
-		dictKeys = self.myASTParser.getDictKeys(node)
-		if ( (dictKeys == None) or (type(dictKeys).__name__ != con.listTypePython) ):
-			sys.exit("ASTVarVisitor->buildDictValue:  problem with value returned from myASTParser->getDictKeys.")
+		dictKeyNodes = self.myASTParser.getDictKeyNodes(node)
+		if ( (dictKeyNodes != None) and (type(dictKeyNodes).__name__ != con.listTypePython) ):
+			sys.exit("ASTVarVisitor->buildDictValue:  problem with value returned from myASTParser->getDictKeyNodes.")
 
-		dictValues = self.myASTParser.getDictValues(node)
-		if ( (dictValues == None) or (type(dictValues).__name__ != con.listTypePython) ):
-			sys.exit("ASTVarVisitor->buildDictValue:  problem with value returned from myASTParser->getDictValues.")
+		dictValueNodes = self.myASTParser.getDictValueNodes(node)
+		if ( (dictValueNodes != None) and (type(dictValueNodes).__name__ != con.listTypePython) ):
+			sys.exit("ASTVarVisitor->buildDictValue:  problem with value returned from myASTParser->getDictValueNodes.")
+
+		if ( len(dictKeyNodes) != len(dictValueNodes) ):
+			sys.exit("ASTVarVisitor->buildDictValue:  extracted unequal numbers of keys and values.")
+
+		#dictKeys = self.myASTParser.getDictKeys(node)
+		#if ( (dictKeys == None) or (type(dictKeys).__name__ != con.listTypePython) ):
+			#sys.exit("ASTVarVisitor->buildDictValue:  problem with value returned from myASTParser->getDictKeys.")
+
+		#dictValues = self.myASTParser.getDictValues(node)
+		#if ( (dictValues == None) or (type(dictValues).__name__ != con.listTypePython) ):
+			#sys.exit("ASTVarVisitor->buildDictValue:  problem with value returned from myASTParser->getDictValues.")
+
+		processedKeys = self.processEachArgNode(dictKeyNodes)
+		if ( (processedKeys != None) and (type(processedKeys).__name__ != con.listTypePython) ) or (len(dictKeyNodes) != len(processedKeys) ):
+			sys.exit("ASTVarVisitor->buildDictValue:  problem with value returned from processEachArgNode (keys).")
+
+		processedValues = self.processEachArgNode(dictValueNodes)
+		if ( (processedValues != None) and (type(processedValues).__name__ != con.listTypePython) ) or (len(dictValueNodes) != len(processedValues) ):
+			sys.exit("ASTVarVisitor->buildDictValue:  problem with value returned from processEachArgNode (values).")
 
 		returnDictValue = DictValue()
-		returnDictValue.setKeys(dictKeys)
-		returnDictValue.setValues(dictValues)
+		returnDictValue.setKeys(processedKeys)
+		returnDictValue.setValues(processedValues)
 
 		return returnDictValue
 
@@ -338,7 +366,32 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if ( (node == None) or (type(node).__name__ != con.binOpTypeAST) ):
 			sys.exit("ASTVarVisitor->buildBinOpValue:  problem with node passed in to function.")
 
-		return None
+		leftNode = self.myASTParser.getLeftNodeOfBinOp(node)
+		if (node == None):
+			sys.exit("ASTVarVisitor->buildBinOpValue:  could not extract left node of the node passed in.")
+
+		rightNode = self.myASTParser.getRightNodeOfBinOp(node)
+		if (node == None):
+			sys.exit("ASTVarVisitor->buildBinOpValue:  could not extract right node of the node passed in.")
+
+		opType = self.myASTParser.getOpTypeOfBinOp(node)
+		if (opType not in con.opTypesAST):
+			sys.exit("ASTVarVisitor->buildBinOpValue:  op type extracted from node passed in is not one of the supported types.")
+
+		processedLeftNode = self.processNode(leftNode)
+		if (processedLeftNode == None):
+			sys.exit("ASTVarVisitor->buildBinOpValue:  value returned from processNode (on left node) is of None type.")
+
+		processedRightNode = self.processNode(rightNode)
+		if (processedRightNode == None):
+			sys.exit("ASTVarVisitor->buildBinOpValue:  value returned from processNode (on right node) is of None type.")
+
+		returnBinOpValue = BinOpValue()
+		returnBinOpValue.setLeft(processedLeftNode)
+		returnBinOpValue.setRight(processedRightNode)
+		returnBinOpValue.setOpType(opType)
+
+		return returnBinOpValue
 
 	def processNode(self, node):
 		if (node == None):
