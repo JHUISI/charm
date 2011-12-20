@@ -9,9 +9,9 @@ class Value(metaclass=ABCMeta):
 	def getLineNo(self):
 		return
 
-	#@abstractmethod
-	#def getStringVarName(self):
-		#return
+	@abstractmethod
+	def getStringVarName(self):
+		return
 
 	@abstractmethod
 	def setLineNo(self, lineNo):

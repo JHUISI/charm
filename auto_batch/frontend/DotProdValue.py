@@ -31,6 +31,55 @@ class DotProdValue:
 	def getLineNo(self):
 		return self.lineNo
 
+	def getStringVarName(self):
+		if ( (self.initialValue == None) or (self.skipValue == None) or (self.numProds == None) or (self.funcName == None) or (self.argList == None) ):
+			return None
+
+		stringVarName = ""
+		stringVarName += con.dotProdType
+		stringVarName += "("
+
+		initialValueStringVarName = self.initialValue.getStringVarName()
+		if ( (initialValueStringVarName == None) or (type(initialValueStringVarName).__name__ != con.strTypePython) or (len(initialValueStringVarName) == 0) ):
+			return None
+
+		stringVarName += initialValueStringVarName
+		stringVarName += ", "
+
+		skipValueStringVarName = self.skipValue.getStringVarName()
+		if ( (skipValueStringVarName == None) or (type(skipValueStringVarName).__name__ != con.strTypePython) or (len(skipValueStringVarName) == 0) ):
+			return None
+
+		stringVarName += skipValueStringVarName
+		stringVarName += ", "
+
+		numProdsStringVarName = self.numProds.getStringVarName()
+		if ( (numProdsStringVarName == None) or (type(numProdsStringVarName).__name__ != con.strTypePython) or (len(numProdsStringVarName) == 0) ):
+			return None
+
+		stringVarName += numProdsStringVarName
+		stringVarName += ", "
+
+		funcNameStringVarName = self.funcName.getStringVarName()
+		if ( (funcNameStringVarName == None) or (type(funcNameStringVarName).__name__ != con.strTypePython) or (len(funcNameStringVarName) == 0) ):
+			return None
+
+		stringVarName += funcNameStringVarName
+		stringVarName += ", "
+
+		for arg in self.argList:
+			argStringVarName = arg.getStringVarName()
+			if ( (argStringVarName == None) or (type(argStringVarName).__name__ != con.strTypePython) or (len(argStringVarName) == 0) ):
+				return None
+
+			stringVarName += argStringVarName
+			stringVarName += ", "
+
+		stringVarName = stringVarName[0:(len(stringVarName) - 2)]
+		stringVarName += ")"
+
+		return stringVarName
+
 	def setInitialValue(self, initialValue):
 		if (initialValue == None):
 			sys.exit("DotProdValue->setInitialValue:  initial value passed in is of None type.")

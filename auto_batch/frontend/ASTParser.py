@@ -458,6 +458,8 @@ class ASTParser:
 			return con.hashType
 		if (callType == con.randomType):
 			return con.randomType
+		if (callType == con.initType):
+			return con.initType
 
 		return None
 
@@ -551,8 +553,8 @@ class ASTParser:
 			sys.exit("ASTParser->getLambdaExpression:  lambda arguments are of length zero.")
 
 		for arg in lambdaArgs:
-			if (type(arg) is not str):
-				sys.exit("ASTParser->getLambdaExpression:  one of the lambda arguments passed in is not of type " + con.strTypePython)
+			if ( (arg == None) or (type(arg).__name__ != con.stringName) ):
+				sys.exit("ASTParser->getLambdaExpression:  problem with one of the lambda arguments passed in.")
 
 		try:
 			lambdaBody = node.body
@@ -569,7 +571,11 @@ class ASTParser:
 		if (type(expression) is not str):
 			sys.exit("ASTParser->getLambdaExpression:  expression returned from lambdaExpressRecursion is not of type " + con.strTypePython)
 
-		return expression
+		returnLambdaExpression = self.buildStringValue(node, expression)
+		if ( (returnLambdaExpression == None) or (type(returnLambdaExpression).__name__ != con.stringValue) ):
+			sys.exit("ASTParser->getLambdaExpression:  problem with value returned from self.buildStringValue.")
+
+		return returnLambdaExpression
 
 	def getLambdaArgNodeList(self, node):
 		if ( (node == None) or (type(node).__name__ != con.lambdaType) ):
@@ -605,7 +611,11 @@ class ASTParser:
 			if (type(arg) is not str):
 				sys.exit("ASTParser->getLambdaArgList:  one of the arguments of the node passed in is not of " + con.strTypePython + " type.")
 
-			returnArgList.append(arg)
+			argStringName = self.buildStringName(node, arg)
+			if ( (argStringName == None) or (type(argStringName).__name__ != con.stringName) ):
+				sys.exit("ASTParser->getLambdaArgList:  problem with value returned from self.buildStringName.")
+
+			returnArgList.append(argStringName)
 
 		if (len(returnArgList) == 0):
 			sys.exit("ASTParser->getLambdaArgList:  could not obtain any of the arguments of the node passed in.")
@@ -728,14 +738,34 @@ class ASTParser:
 		return valueName + "[" + sliceValueName + "]"
 
 	def buildStringName(self, node, name):
-		if ( (node == None) or (name == None) or (type(name).__name__ != con.strTypePython) ):
-			sys.exit("ASTParser->buildStringName:  problem with input parameter passed in.")
+		if ( (node == None) or (name == None) or (type(name).__name__ != con.strTypePython) or (len(name) == 0) ):
+			sys.exit("ASTParser->buildStringName:  problem with input parameters passed in.")
 
 		returnStringName = StringName()
 		returnStringName.setName(name)
-		returnStringName.setLineNo(node.lineno)
+
+		lineNo = self.getLineNumberOfNode(node)
+		if ( (lineNo == None) or (type(lineNo).__name__ != con.intTypePython) or (lineNo < 1) ):
+			sys.exit("ASTParser->buildStringName:  could not extract the line number of the node passed in.")
+
+		returnStringName.setLineNo(lineNo)
 
 		return returnStringName
+
+	def buildStringValue(self, node, name):
+		if ( (node == None) or (name == None) or (type(name).__name__ != con.strTypePython) or (len(name) == 0) ):
+			sys.exit("ASTParser->buildStringValue:  problem with input parameters passed in.")
+
+		returnStringValue = StringValue()
+		returnStringValue.setValue(name)
+
+		lineNo = self.getLineNumberOfNode(node)
+		if ( (lineNo == None) or (type(lineNo).__name__ != con.intTypePython) or (lineNo < 1) ):
+			sys.exit("ASTParser->buildStringValue:  could not extract the line number of the node passed in.")
+
+		returnStringValue.setLineNo(lineNo)
+
+		return returnStringValue
 
 	def getSubscriptValueAsStringName(self, node):
 		if (node == None):
@@ -1027,8 +1057,8 @@ class ASTParser:
 		if (nameType == con.callTypeAST):
 			return con.callTypeAST
 
-		if (nameType == con.lambdaType):
-			return con.lambdaType
+		if (nameType == con.lambdaTypeAST):
+			return con.lambdaTypeAST
 
 		if (nameType == con.subscriptTypeAST):
 			return con.subscriptTypeAST

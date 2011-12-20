@@ -16,6 +16,9 @@ class StringName:
 		return self.lineNo
 
 	def getStringVarName(self):
+		if (self.name == None):
+			return None
+
 		return str(self.name)
 
 	def setName(self, name):

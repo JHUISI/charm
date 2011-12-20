@@ -5,8 +5,8 @@ class AST_Test(ast.NodeVisitor):
 	def __init__(self):
 		self.my = ASTParser()
 
-	def visit_BinOp(self, node):
-		print(type(node.op).__name__)
+	def visit_Call(self, node):
+		print(node.args)
 
 def verify():
 	x = group.hash("M", str(x), G1)

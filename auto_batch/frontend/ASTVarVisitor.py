@@ -12,6 +12,7 @@ from LambdaValue import LambdaValue
 from DotProdValue import DotProdValue
 from DictValue import DictValue
 from BinOpValue import BinOpValue
+from InitValue import InitValue
 
 class ASTVarVisitor(ast.NodeVisitor):
 	def __init__(self, myASTParser):
@@ -147,6 +148,9 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if ( (argNodeList == None) or (type(argNodeList).__name__ != con.listTypePython) ):
 			sys.exit("ASTVarVisitor->getArgNodeList:  problem with value returned from ASTParser->getArgNodeList.")
 
+		if (len(argNodeList) == 0):
+			return None
+
 		retArgNodeList = self.processEachArgNode(argNodeList)
 		if ( (retArgNodeList == None) or (type(retArgNodeList).__name__ != con.listTypePython) ):
 			sys.exit("ASTVarVisitor->getArgNodeList:  problem with value returned from processEachArgNode.")
@@ -193,22 +197,61 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if (node == None):
 			sys.exit("ASTVarVisitor->buildRandomValue:  node passed in is of None type.")
 
-		randomArgList = self.myASTParser.getCallArgList(node)
+		randomArgList = self.getArgNodeList(node)
+
+		#randomArgList = self.myASTParser.getCallArgList(node)
+
+		seed = None
+
 		if (randomArgList == None):
-			groupType = con.ZR
+			groupType = self.myASTParser.buildStringName(node, con.ZR)
+			if ( (groupType == None) or (type(groupType).__name__ != con.stringName) ):
+				sys.exit("ASTVarVisitor->buildRandomValue:  problem with value returned from buildStringName for a null arguments list.")
+
 		else:
-			if ( (len(randomArgList) != 1) or (type(randomArgList[0]).__name__ != con.stringName) ):
-				sys.exit("ASTVarVisitor->buildRandomValue:  problem with the values returned from myASTParser->getCallArgList.")
+			if ( (len(randomArgList) > 2) or (type(randomArgList[0]).__name__ != con.stringName) ):
+				sys.exit("ASTVarVisitor->buildRandomValue:  problem with the values returned from getArgNodeList.")
 
-			if (randomArgList[0].getName() not in con.groupTypes):
-				sys.exit("ASTVarVisitor->buildRandomValue:  the argument returned from getCallArgList is not a group type that is supported.")
+			if (randomArgList[0].getStringVarName() not in con.groupTypes):
+				sys.exit("ASTVarVisitor->buildRandomValue:  the first argument returned from getArgNodeList is not a group type that is supported.")
 
-			groupType = randomArgList[0].getName()
+			groupType = copy.deepcopy(randomArgList[0])
+
+			if (len(randomArgList) == 2):
+				seed = copy.deepcopy(randomArgList[1])
 
 		randomValueToAdd = RandomValue()
 		randomValueToAdd.setGroupType(groupType)
+		if (seed != None):
+			randomValueToAdd.setSeed(seed)
 
 		return randomValueToAdd
+
+	def buildInitValue(self, node):
+		if (node == None):
+			sys.exit("ASTVarVisitor->buildInitValue:  node passed in is of None type.")
+
+		initArgList = self.getArgNodeList(node)
+
+		value = None
+
+		if ( (len(initArgList) == 0) or (len(initArgList) > 2) or (type(initArgList[0]).__name__ != con.stringName) ):
+			sys.exit("ASTVarVisitor->buildInitValue:  problem with the value returned from getArgNodeList..")
+
+		if (initArgList[0].getStringVarName() not in con.groupTypes):
+			sys.exit("ASTVarVisitor->buildInitValue:  first argument returned from getArgNodeList is not a group type that is currently supported.")
+
+		groupType = copy.deepcopy(initArgList[0])
+
+		if (len(initArgList) == 2):
+			value = copy.deepcopy(initArgList[1])
+
+		initValueToAdd = InitValue()
+		initValueToAdd.setGroupType(groupType)
+		if (value != None):
+			initValueToAdd.setValue(value)
+
+		return initValueToAdd
 
 	def buildDotProdValue(self, node):
 		if (node == None):
@@ -223,6 +266,8 @@ class ASTVarVisitor(ast.NodeVisitor):
 			#sys.exit("ASTVarVisitor->buildDotProdValue:  return value from getCallArgList does not meet the proper criteria.")
 
 		dotProdValueToAdd = DotProdValue()
+		dotProdValueToAdd.setInitialValue(dotProdArgList[0])
+		dotProdValueToAdd.setSkipValue(dotProdArgList[1])
 		dotProdValueToAdd.setNumProds(dotProdArgList[2])
 		dotProdValueToAdd.setFuncName(dotProdArgList[3])
 
@@ -264,6 +309,13 @@ class ASTVarVisitor(ast.NodeVisitor):
 				sys.exit("ASTVarVisitor->buildCallValue:  return value of buildRandomValue is of None type.")
 
 			return randomValueToAdd
+
+		if (callType == con.initType):
+			initValueToAdd = self.buildInitValue(node)
+			if (initValueToAdd == None):
+				sys.exit("ASTVarVisitor->buildCallValue:  return value of buildInitValue is of None type.")
+
+			return initValueToAdd
 
 		if (callType == con.dotProdType):
 			dotProdValueToAdd = self.buildDotProdValue(node)
@@ -307,18 +359,15 @@ class ASTVarVisitor(ast.NodeVisitor):
 			sys.exit("ASTVarVisitor->buildLambdaValue:  list returned from getLambdaArgList is of length zero.")
 
 		for arg in lambdaArgList:
-			if (type(arg) is not str):
-				sys.exit("ASTVarVisitor->buildLambdaValue:  one of the arguments returned from getLambdaArgList is not of type " + con.strTypePython)
+			if ( (arg == None) or (type(arg).__name__ != con.stringName) ):
+				sys.exit("ASTVarVisitor->buildLambdaValue:  problem with one of the arguments returned from getLambdaArgList.")
 
 		lambdaExpression = self.myASTParser.getLambdaExpression(node, lambdaArgList)
 		if (lambdaExpression == None):
 			sys.exit("ASTVarVisitor->buildLambdaValue:  expression returned from getLambdaExpression is of None type.")
 
-		if (len(lambdaExpression) == 0):
-			sys.exit("ASTVarVisitor->buildLambdaValue:  expression returned from getLambdaExpression if of length zero.")
-
-		if (type(lambdaExpression) is not str):
-			sys.exit("ASTVarVisitor->buildLambdaValue:  expression returned from getLambdaExpression is not of type " + con.strTypePython)
+		if (type(lambdaExpression).__name__ != con.stringValue):
+			sys.exit("ASTVarVisitor->buildLambdaValue:  expression returned from getLambdaExpression is not of type " + con.stringValue)
 
 		returnLambdaValue = LambdaValue()
 		returnLambdaValue.setArgList(lambdaArgList)
@@ -439,7 +488,7 @@ class ASTVarVisitor(ast.NodeVisitor):
 			if (callValueToAdd != None):
 				return callValueToAdd
 
-		if (nodeType == con.lambdaType):
+		if (nodeType == con.lambdaTypeAST):
 			lambdaValueToAdd = self.buildLambdaValue(node)
 			if (lambdaValueToAdd == None):
 				sys.exit("ASTVarVisitor->processNode:  return value of buildLambdaValue is of None type.")

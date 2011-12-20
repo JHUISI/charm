@@ -23,6 +23,42 @@ class BinOpValue:
 	def getRight(self):
 		return self.right
 
+	def getOpString(self):
+		if (self.opType == addTypeAST):
+			return "+"
+
+		if (self.opType == divTypeAST):
+			return "/"
+
+		if (self.opType == expTypeAST):
+			return "**"
+
+		if (self.opType == multTypeAST):
+			return "*"
+
+		if (self.opType == subTypeAST):
+			return "-"
+
+		sys.exit("BinOpValue->getOpString:  self.opType is not one of the supported types.")
+
+	def getStringVarName(self):
+		if ( (self.left == None) or (self.opType == None) or (self.right == None) ):
+			return None
+
+		leftStringVarName = self.left.getStringVarName()
+		if ( (leftStringVarName == None) or (type(leftStringVarName).__name__ != con.strTypePython) or (len(leftStringVarName) == 0) ):
+			return None
+
+		rightStringVarName = self.right.getStringVarName()
+		if ( (rightStringVarName == None) or (type(rightStringVarName).__name__ != con.strTypePython) or (len(rightStringVarName) == 0) ):
+			return None
+
+		opString = self.getOpString()
+		if ( (opString == None) or (type(opString).__name__ != con.strTypePython) or (len(opString) == 0) ):
+			sys.exit("BinOpValue->getStringVarName:  problem with the value returned from getOpString.")
+
+		return leftStringVarName + " " + opString + " " + rightStringVarName
+
 	def setLineNo(self, lineNo):
 		if ( (lineNo == None) or (type(lineNo).__name__ != con.intTypePython) or (lineNo < 1) ):
 			sys.exit("BinOpValue->setLineNo:  problem with line number passed in.")

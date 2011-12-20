@@ -20,7 +20,18 @@ class SubscriptName:
 		return self.lineNo
 
 	def getStringVarName(self):
-		return str(self.value.getStringVarName()) + "[" + str(self.slice.getStringVarName()) + "]"
+		if ( (self.value == None) or (self.slice == None) ):
+			return None
+
+		valueStringVarName = self.value.getStringVarName()
+		if ( (valueStringVarName == None) or (type(valueStringVarName).__name__ != con.strTypePython) or (len(valueStringVarName) == 0) ):
+			return None
+
+		sliceStringVarName = self.slice.getStringVarName()
+		if ( (sliceStringVarName == None) or (type(sliceStringVarName).__name__ != con.strTypePython) or (len(sliceStringVarName) == 0) ):
+			return None
+
+		return valueStringVarName + "[" + sliceStringVarName + "]"
 
 	def setValue(self, value):
 		if (value == None):

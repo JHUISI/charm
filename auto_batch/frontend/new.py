@@ -1,1 +1,1 @@
-x = y + 4
+x = group.random()
