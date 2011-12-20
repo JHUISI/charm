@@ -106,6 +106,13 @@ class ASTFuncArgMapsVisitor(ast.NodeVisitor):
 		myASTParser = ASTParser()
 		callerArgList = myASTParser.getCallArgList(node)
 
+		if ( (callerArgList == None) and (len(destArgNames) == 0) ):
+			funcArgMapObject = FunctionArgMap()
+			funcArgMapObject.setDestFuncName(destFuncName)
+			funcArgMapObject.setLineNo(node.lineno)
+			self.functionArgMappings.append(copy.deepcopy(funcArgMapObject))
+			return
+
 		if (len(callerArgList) != len(destArgNames) ):
 			sys.exit("ASTFuncArgMapsVisitor->visit_Call:  length of caller and destination arguments lists are not equal.")
 
