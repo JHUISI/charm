@@ -51,6 +51,7 @@ class PairInstanceFinder:
         self.instance = {}
         self.index = 0
         self.rule = "Merge pairings with common first or second element."
+        self.wouldApply = False
         
     def visit(self, node, data):
         pass
@@ -104,12 +105,13 @@ class PairInstanceFinder:
             self.index += 1
         return
 
-    def checkForMultiple(self):
+    def checkForMultiple(self, check=False):
         for i in self.instance.keys():
             data = self.instance[ i ]
             if data['instance'] > 1:
-                return data
-        return None
+                if not check: return data
+                else: return True
+        return False
     
     def makeSubstitution(self, equation):
         # first get a node in which 
@@ -118,7 +120,10 @@ class PairInstanceFinder:
             #print("Pair =>", pairDict)
             batchparser.ASTVisitor( SubstitutePairs( pairDict ) ).preorder( equation )
             #print("Done\n")
-            
+    
+    def testForApplication(self):
+        self.wouldApply = self.checkForMultiple(True)
+        return self.wouldApply
         
 
 # substitute nodes that can be precomputed with a stub
@@ -396,3 +401,69 @@ class SubstituteSigDotProds:
         #print("node =>", node)
         assert self.vars_def.get(_type) != None, "Key error in vars db => '%s'" % _type
         return self.vars_def[_type]
+
+# Focuses on simplifying dot products of the form
+# prod{} on (x * y)
+class DotProdInstanceFinder:
+    def __init__(self):
+        self.rule = "Simplify dot products: "
+        self.wouldApply = False
+        self.instance = {}
+        self.index    = 0
+
+    # not sure if there is any advantage to recording these!
+    def record(self, _list):
+        if len(_list) > 1:
+            self.instance[ self.index ] = _list
+            self.index += 1
+        
+    def getMulTokens(self, subtree, parent_type, target_type, _list):
+        if subtree == None: return None
+        elif parent_type == ops.EXP and Type(subtree) == ops.MUL:
+            return
+        elif parent_type == ops.MUL:
+            if Type(subtree) in target_type: 
+                found = False
+                for i in _list:
+                    if isNodeInSubtree(i, subtree): found = True
+                if not found: _list.append(subtree)
+
+        if subtree.left: self.getMulTokens(subtree.left, subtree.type, target_type, _list)
+        if subtree.right: self.getMulTokens(subtree.right, subtree.type, target_type, _list)
+        return
+    
+    def visit(self, node, data):
+        pass
+
+    # visit all the ON nodes and test whether we can distribute the product to children nodes
+    # e.g., prod{} on (x * y) => prod{} on x * prod{} on y    
+    # left = prod{}
+    # right = someNode (interested in MUL nodes only)
+    def visit_on(self, node, data):
+        if Type(data['parent']) == ops.PAIR:
+            return
+        #print("test: right node of prod =>", node.right, ": type =>", node.right.type)
+        #print("parent type =>", Type(data['parent']))
+#        _type = node.right.type
+        if Type(node.right) == ops.MUL:            
+            # must distribute prod to both children of mul
+            r = []
+            mul_node = node.right
+            self.getMulTokens(mul_node, ops.NONE, [ops.EXP, ops.HASH, ops.PAIR, ops.ATTR], r)
+            #for i in r:
+            #    print("node =>", i)
+            
+            if len(r) == 0:
+                pass
+            elif len(r) > 1:
+            # in case we're dealing with prod{} on attr1 * attr2 
+            # no need to simply further, so we can simply return
+                if mul_node.left.type == ops.ATTR and mul_node.right.type == ops.ATTR:
+                    return
+                
+                self.wouldApply = True
+                self.record(r)
+            else:
+                return
+    def testForApplication(self):
+        return self.wouldApply

@@ -29,13 +29,14 @@ class BatchOrder:
         self.meta  = metadata
         self.verify = equation
         self.debug  = False
+        self.techMap = { 2:Technique2, 3:Technique3, 4:Technique4 }
+
 
     def testSequence(self, combo):
         eq = BinaryNode.copy(self.verify)
-        technique = { 2:Technique2, 3:Technique3, 4:Technique4 }
         order = []
         for k in combo:
-            tech = technique[k](self.const, self.vars, self.meta)
+            tech = self.techMap[k](self.const, self.vars, self.meta)
             # traverse verify with tech operations
             ASTVisitor(tech).preorder(eq)
 #            print("Result: ", self.verify, "\nApplied: ", tech.applied)
@@ -44,7 +45,10 @@ class BatchOrder:
                 order.append(k)
         return (order, eq)
     
-    def strategy(self):
+    def strategy(self, option=None):
+        return self.BasicStrategy()
+    
+    def BasicStrategy(self):
         techniques = [2, 3, 4]
         count = fact(len(techniques))
         tools = {'S':SimplifyDotProducts, 'P':PairInstanceFinder }
@@ -78,3 +82,7 @@ class BatchOrder:
         if self.debug: print("Final list: ", final_list)
         print("Technique order: ", final_list[index], ": avg batch time: ", batch_time[index])
         return final_list[index]
+
+    def BFStrategy(self):
+        techniques = [2, 3, 4, 5.0, 5.1]
+        pass

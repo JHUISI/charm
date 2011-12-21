@@ -614,7 +614,9 @@ class SimplifyDotProducts:
             #for i in r:
             #    print("node =>", i)
             
-            if len(r) <= 2:
+            if len(r) == 0:
+                pass
+            elif len(r) <= 2:
             # in case we're dealing with prod{} on attr1 * attr2 
             # no need to simply further, so we can simply return
                 if mul_node.left.type == ops.ATTR and mul_node.right.type == ops.ATTR:
