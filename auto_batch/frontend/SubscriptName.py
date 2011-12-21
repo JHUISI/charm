@@ -14,7 +14,7 @@ class SubscriptName:
 		return self.slice
 
 	def getType(self):
-		return con.subscriptTypeAST
+		return con.subscriptName
 
 	def getLineNo(self):
 		return self.lineNo
@@ -32,6 +32,15 @@ class SubscriptName:
 			return None
 
 		return valueStringVarName + "[" + sliceStringVarName + "]"
+
+	def equals(self, otherSubscriptNameObject):
+		if ( (otherSubscriptNameObject == None) or (type(otherSubscriptNameObject).__name__ != con.subscriptName) ):
+			sys.exit("SubscriptName->equals:  problem with input parameter passed in.")
+
+		if ( self.getStringVarName() == otherSubscriptNameObject.getStringVarName() ):
+			return True
+
+		return False
 
 	def setValue(self, value):
 		if (value == None):

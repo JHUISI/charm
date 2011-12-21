@@ -1,6 +1,7 @@
 import con, copy, sys
 from ASTParser import *
 from ASTVarVisitor import ASTVarVisitor
+from StringName import StringName
 
 def removeSubstringFromEnd(fullString, removeSubstring, leftOrRight):
 	if (len(fullString) == 0):
@@ -864,6 +865,16 @@ def main():
 		sys.exit("AutoBatch_Parser->main:  getVarAssignments returned None when trying to get the variable assignments.")
 
 	writeBVFile(varAssignments, outputFileName)
+
+
+	DELETESTRING = StringName()
+	DELETESTRING.setName("g")
+	DELETESTRING.setLineNo(30)
+
+	DELETEME = ASTVarVisitor(myASTParser)
+	DELETEME.getVariableGroupType(DELETESTRING, "keygen", functionArgMappings, returnNodes, varAssignments)
+
+
 
 '''
 
