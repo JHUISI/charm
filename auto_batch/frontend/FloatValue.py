@@ -15,6 +15,9 @@ class FloatValue:
 	def getLineNo(self):
 		return self.lineNo
 
+	def getStringVarName(self):
+		return str(self.value)
+
 	def setValue(self, value):
 		if (type(value) is not float):
 			sys.exit("Value passed to FloatValue class is not of type " + con.floatTypePython)

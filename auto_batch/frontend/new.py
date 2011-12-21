@@ -1,1 +1,1 @@
-M = {'a':str(x)}
+x = group.random()

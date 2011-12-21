@@ -10,10 +10,25 @@ class StringName:
 		return self.name
 
 	def getType(self):
-		return str
+		return con.stringName
 
 	def getLineNo(self):
 		return self.lineNo
+
+	def getStringVarName(self):
+		if (self.name == None):
+			return None
+
+		return str(self.name)
+
+	def equals(self, otherStringNameObject):
+		if ( (otherStringNameObject == None) or (type(otherStringNameObject).__name__ != con.stringName) ):
+			sys.exit("StringName->equals:  problem with input parameter passed in.")
+
+		if ( self.getStringVarName() == otherStringNameObject.getStringVarName() ):
+			return True
+
+		return False
 
 	def setName(self, name):
 		if (type(name) is not str):

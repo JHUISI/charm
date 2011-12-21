@@ -1,1 +1,1 @@
-SubscriptName.py
+getstringvarname on dotprod

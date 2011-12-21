@@ -17,8 +17,6 @@ from charm.engine.util import *
 
 debug = False
 
-N = 200
-
 class IBSig():
     def __init__(self, groupObj):
         global group
@@ -48,6 +46,8 @@ class IBSig():
         return False 
 
 def main():
+    N = 200
+
     groupObj = PairingGroup('../param/d224.param')
     
     m = { 'a':"hello world!!!" , 'b':"test message" }

@@ -19,6 +19,41 @@ class DictValue:
 	def getLineNo(self):
 		return self.lineNo
 
+	def getStringVarName(self):
+		if ( (self.keys == None) or (self.values == None) ):
+			return None
+
+		keysStringNameList = []
+		valuesStringNameList = []
+
+		for key in self.keys:
+			keyStringName = key.getStringVarName()
+			if ( (keyStringName == None) or (type(keyStringName).__name__ != con.strTypePython) or (len(keyStringName) == 0) ):
+				return None
+
+			keysStringNameList.append(keyStringName)
+
+		for value in self.values:
+			valueStringName = value.getStringVarName()
+			if ( (valueStringName == None) or (type(valueStringName).__name__ != con.strTypePython) or (len(valueStringName) == 0) ):
+				return None
+
+			valuesStringNameList.append(valueStringName)
+
+		if ( len(keysStringNameList) != len(valuesStringNameList) ):
+			sys.exit("DictValue->getStringVarName:  lists of string names for keys and values are of unequal size.")
+
+		dictStringVarName = "{"
+		lenDict = len(keysStringNameList)
+
+		for index in range(0, lenDict):
+			dictStringVarName += keysStringNameList[index] + ":" + valuesStringNameList[index] + ", "
+
+		dictStringVarName = dictStringVarName[0:(len(dictStringVarName) - 2)]
+		dictStringVarName += "}"
+
+		return dictStringVarName
+
 	def setKeys(self, keys):
 		if ( (keys == None) or (type(keys).__name__ != con.listTypePython) ):
 			sys.exit("DictValue->setKeys:  problem with input passed in to the function.")

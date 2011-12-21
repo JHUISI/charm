@@ -1,6 +1,7 @@
 import con, copy, sys
 from ASTParser import *
 from ASTVarVisitor import ASTVarVisitor
+from StringName import StringName
 
 def removeSubstringFromEnd(fullString, removeSubstring, leftOrRight):
 	if (len(fullString) == 0):
@@ -507,13 +508,70 @@ def getVariableTypes(variableTypes, assignmentsDict):
 
 	return variableTypes
 
-def getNumSignatures(varAssignments):
-	pass
+def getStringNameIntegerValue(varAssignments, stringNameOfVariable, nameOfFunction):
+	if ( (varAssignments == None) or (type(varAssignments).__name__ != con.dictTypePython) or (len(varAssignments) == 0) ):
+		sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  problem with the variable assignments dictionary passed in.")
 
+	if ( (stringNameOfVariable == None) or (type(stringNameOfVariable).__name__ != con.strTypePython) or (len(stringNameOfVariable) == 0) ):
+		sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  problem with the variable name passed in.")
 
+	if ( (nameOfFunction == None) or (type(nameOfFunction).__name__ != con.strTypePython) or (len(nameOfFunction) == 0) ):
+		sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  problem with the function name passed in.")
 
-def writeBVFile(varAssignments):
-	numSignatures = getNumSignatures(varAssignments)
+	if (nameOfFunction not in varAssignments):
+		sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  could not find a function named " + nameOfFunction + " in the varAssignments dictionary passed in.")
+
+	functionVariables = varAssignments[nameOfFunction]
+	if ( (functionVariables == None) or (type(functionVariables).__name__ != con.listTypePython) or (len(functionVariables) == 0) ):
+		sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  problem with the list of variables obtained from varAssignments for the " + nameOfFunction + " function.")
+
+	for var in functionVariables:
+		if (type(var).__name__ != con.variable):
+			sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  one of the entries in varAssignments is not of type " + con.variable)
+
+		varNameObj = var.getName()
+		if (type(varNameObj).__name__ != con.stringName):
+			continue
+
+		varName = varNameObj.getName()
+		if (varName != stringNameOfVariable):
+			continue
+
+		varValueObj = var.getValue()
+		if (type(varValueObj).__name__ != con.integerValue):
+			continue
+
+		varValue = varValueObj.getValue()
+		if ( (varValue == None) or (type(varValue).__name__ != con.intTypePython) ):
+			continue
+
+		return varValue
+
+	sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  could not find a variable named " + stringNameOfVariable + " in the " + nameOfFunction + " function.")
+
+def writeBVFile(varAssignments, outputFileName):
+	try:
+		outputFile = open(outputFileName, 'w')
+	except:
+		sys.exit("AutoBatch_Parser->writeBVFile:  could not obtain a file named " + outputFileName + " for writing.")
+
+	outputString = ""
+
+	numSignatures = getStringNameIntegerValue(varAssignments, con.numSignatures, con.mainFuncName)
+	if ( (numSignatures == None) or (type(numSignatures).__name__ != con.intTypePython) or (numSignatures < 1) ):
+		sys.exit("AutoBatch_Parser->writeBVFile:  problem with the value returned from getNumSignatures.")
+
+	outputString += "N = "
+	outputString += str(numSignatures)
+	outputString += "\n\n"
+
+	outputString += "BEGIN :: types\n"
+
+	try:
+		outputFile.write(outputString)
+		outputFile.close()
+	except:
+		sys.exit("AutoBatch_Parser->writeBVFile:  error when attempting to write to the " + outputFileName + " file and then close it.")
 
 '''
 def writeBVFile(outputFileName, variableTypes, precomputeTypes, cleanVerifyEqLn):
@@ -712,6 +770,37 @@ def getVarAssignments(rootNode, functionNames, myASTParser):
 
 	return varAssignments
 
+def getAllVariableNamesFromVerifyEq(verifyEqNode, myASTParser):
+	if ( (verifyEqNode == None) or (myASTParser == None) ):
+		sys.exit("AutoBatch_Parser->getAllVariableNamesFromVerifyEq:  problem with the variables passed in to the function.")
+
+	varsVerifyEq = myASTParser.getAllVariableNames(verifyEqNode)
+	if ( (varsVerifyEq == None) or (type(varsVerifyEq).__name__ != con.listTypePython) or (len(varsVerifyEq) == 0) ):
+		sys.exit("AutoBatch_Parser->getAllVariableNamesFromVerifyEq:  problem with value returned from ASTParser->getAllVariableNames.")
+
+	varsVerifyEq = myASTParser.removeVarsFromListWithStringName(varsVerifyEq, con.pair)
+	if ( (varsVerifyEq == None) or (type(varsVerifyEq).__name__ != con.listTypePython) or (len(varsVerifyEq) == 0) ):
+		sys.exit("AutoBatch_Parser->getAllVariableNamesFromVerifyEq:  problem with value returned from ASTParser->removeVarsFromListWithName.")
+
+	return varsVerifyEq
+
+def getReturnNodes(functionNames, myASTParser):
+	if ( (functionNames == None) or (type(functionNames).__name__ != con.dictTypePython) or (len(functionNames) == 0) ):
+		sys.exit("AutoBatch_Parser->getReturnNodes:  problem with the function names dictionary passed in.")
+
+	if ( (myASTParser == None) or (type(myASTParser).__name__ != con.ASTParser) ):
+		sys.exit("AutoBatch_Parser->getReturnNodes:  problem with the AST parser passed in.")
+
+	returnNodes = {}
+
+	for funcName in functionNames:
+		returnNodes[funcName] = myASTParser.getReturnNodeList(functionNames[funcName])
+
+	if (len(returnNodes) == 0):
+		sys.exit("AutoBatch_Parser->getReturnNodes:  could not obtain any return nodes for the function names/nodes passed in.")
+
+	return returnNodes
+
 def main():
 	if ( (len(sys.argv) != 3) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
 		sys.exit("Usage:  python " + sys.argv[0] + " [name of input file that runs the cryptosystem] [name of .bls output file]")
@@ -748,6 +837,10 @@ def main():
 	if (functionArgMappings == None):
 		sys.exit("AutoBatch_Parser->main:  mappings of variables passed between functions from getFunctionArgMappings is of None type.")
 
+	returnNodes = getReturnNodes(functionNames, myASTParser)
+	if ( (returnNodes == None) or (type(returnNodes).__name__ != con.dictTypePython) or (len(returnNodes) == 0) ):
+		sys.exit("AutoBatch_Parser->main:  problem with value returned from getReturnNodes.")
+
 	verifyFuncNodeList = myASTParser.getFunctionNode(rootNode, con.verifyFuncName)
 	if (verifyFuncNodeList == None):
 		sys.exit("AutoBatch_Parser->main:  could not locate a function with name " + con.verifyFuncName)
@@ -763,11 +856,25 @@ def main():
 	origVerifyEq = myASTParser.getSourceLineOfNode(verifyEqNode)
 	cleanVerifyEqLn = cleanVerifyEq(origVerifyEq)
 
+	varsVerifyEq = getAllVariableNamesFromVerifyEq(verifyEqNode, myASTParser)
+	if ( (varsVerifyEq == None) or (type(varsVerifyEq).__name__ != con.listTypePython) or (len(varsVerifyEq) == 0) ):
+		sys.exit("AutoBatch_Parser->main:  problem with the value returned from getAllVariableNamesFromVerifyEq on the verify equation node.")
+
 	varAssignments = getVarAssignments(rootNode, functionNames, myASTParser)
 	if (varAssignments == None):
 		sys.exit("AutoBatch_Parser->main:  getVarAssignments returned None when trying to get the variable assignments.")
 
-	writeBVFile(varAssignments)
+	writeBVFile(varAssignments, outputFileName)
+
+
+	DELETESTRING = StringName()
+	DELETESTRING.setName("g")
+	DELETESTRING.setLineNo(30)
+
+	DELETEME = ASTVarVisitor(myASTParser)
+	DELETEME.getVariableGroupType(DELETESTRING, "keygen", functionArgMappings, returnNodes, varAssignments)
+
+
 
 '''
 

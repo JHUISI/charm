@@ -19,14 +19,38 @@ class LambdaValue:
 	def getExpression(self):
 		return self.expression
 
-	def setLineNo(self, lineNo):
-		if (type(lineNo) is not int):
-			sys.exit("LambdaValue->setLineNo:  line number passed in is not of type " + con.intTypePython)
+	def getStringVarName(self):
+		if ( (self.argList == None) or (self.expression == None) ):
+			return None
 
-		if (lineNo < 1):
-			sys.exit("LambdaValue->setLineNo:  line number passed in is less than one.")
+		stringVarName = ""
+		stringVarName += con.lambdaTypeCharm
+		stringVarName += " "
 
-		self.lineNo = lineNo
+		for arg in self.argList:
+			if ( (arg == None) or (type(arg).__name__ != con.stringName) ):
+				sys.exit("LambdaValue->getStringVarName:  problem with one of the arguments in self.argList.")
+
+			argStringVarName = arg.getStringVarName()
+			if ( (argStringVarName == None) or (type(argStringVarName).__name__ != con.strTypePython) or (len(argStringVarName) == 0) ):
+				return None
+
+			stringVarName += argStringVarName
+			stringVarName += ", "
+
+		stringVarName = stringVarName[0:(len(stringVarName) - 2)]
+		stringVarName += ": "
+
+		if (type(self.expression).__name__ != con.stringValue):
+			sys.exit("LambdaValue->getStringVarName:  self.expression is not of type " + con.stringValue)
+
+		expressionStringVarName = self.expression.getStringVarName()
+		if ( (expressionStringVarName == None) or (type(expressionStringVarName).__name__ != con.strTypePython) or (len(expressionStringVarName) == 0) ):
+			return None
+
+		stringVarName += expressionStringVarName
+
+		return stringVarName
 
 	def setArgList(self, argList):
 		if (argList == None):
@@ -36,18 +60,24 @@ class LambdaValue:
 			sys.exit("LambdaValue->setArgList:  list passed in is of zero length.")
 
 		for arg in argList:
-			if (type(arg) is not str):
-				sys.exit("LambdaValue->setArgList:  one of the arguments passed in the argument list is not of string type.")
+			if ( (arg == None) or (type(arg).__name__ != con.stringName) ):
+				sys.exit("LambdaValue->setArgList:  problem with one of the arguments passed in the argument list.")
 
-		self.argList = argList
+		self.argList = copy.deepcopy(argList)
 
 	def setExpression(self, expression):
 		if (expression == None):
 			sys.exit("LambdaValue->setExpression:  expression passed in is of None type.")
 
-		if (len(expression) == 0):
-			sys.exit("LambdaValue->setExpression:  expression is of length zero.")
+		if (type(expression).__name__ != con.stringValue):
+			sys.exit("LambdaValue->setExpression:  expression passed in is not of type " + con.stringValue)
 
-		self.expression = expression
+		self.expression = copy.deepcopy(expression)
+
+	def setLineNo(self, lineNo):
+		if ( (lineNo == None) or (type(lineNo).__name__ != con.intTypePython) or (lineNo < 1) ):
+			sys.exit("LambdaValue->setLineNo:  problem with the line number passed in.")
+
+		self.lineNo = lineNo
 
 Value.register(LambdaValue)

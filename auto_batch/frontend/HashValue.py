@@ -31,6 +31,33 @@ class HashValue:
 	def getLineNo(self):
 		return self.lineNo
 
+	def getStringVarName(self):
+		if ( (self.argList == None) or (self.groupType == None) ):
+			return None
+
+		stringVarName = ""
+		stringVarName += "H("
+
+		for arg in self.argList:
+			argStringVarName = arg.getStringVarName()
+			if ( (argStringVarName == None) or (type(argStringVarName).__name__ != con.strTypePython) or (len(argStringVarName) == 0) ):
+				return None
+
+			stringVarName += argStringVarName
+			stringVarName += ", "
+
+		groupTypeStringVarName = self.groupType.getStringVarName()
+		if ( (groupTypeStringVarName == None) or (type(groupTypeStringVarName).__name__ != con.strTypePython) or (len(groupTypeStringVarName) == 0) ):
+			return None
+
+		if (groupTypeStringVarName not in con.groupTypes):
+			sys.exit("HashValue->getStringVarName:  group type string var name extracted from self.groupTypes is not one of the supported group types.")
+
+		stringVarName += groupTypeStringVarName
+		stringVarName += ")"
+
+		return stringVarName
+
 	def setArgList(self, argList):
 		if (type(argList) is not list):
 			sys.exit("HashValue->setArgList:  value passed in is not of type list.")

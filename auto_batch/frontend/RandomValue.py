@@ -3,15 +3,15 @@ from Value import Value
 
 class RandomValue:
 	def __init__(self):
-		self.value = None
+		self.seed = None
 		self.groupType = None
 		self.lineNo = None
 
-	def getValue(self):
-		return self.value
-
 	def getType(self):
 		return con.randomType
+
+	def getSeed(self):
+		return self.seed
 
 	def getGroupType(self):
 		return self.groupType
@@ -19,14 +19,48 @@ class RandomValue:
 	def getLineNo(self):
 		return self.lineNo
 
-	def setValue(self, value):
-		if (value == None):
-			sys.exit("RandomValue->setValue:  value passed in is of None type.")
+	def getStringVarName(self):
+		if (self.groupType == None):
+			return None
 
-		self.value = value
+		groupTypeStringVarName = self.groupType.getStringVarName()
+		if ( (groupTypeStringVarName == None) or (type(groupTypeStringVarName).__name__ != con.strTypePython) or (len(groupTypeStringVarName) == 0) ):
+			return None
+
+		if (groupTypeStringVarName not in con.groupTypes):
+			sys.exit("RandomValue->getStringVarName:  group type extracted from self.groupType is not one of the supported types.")
+
+		stringVarName = ""
+		stringVarName += con.group
+		stringVarName += "."
+		stringVarName += con.randomType
+		stringVarName += "("
+		stringVarName += groupTypeStringVarName
+
+		if (self.seed != None):
+			seedStringVarName = self.seed.getStringVarName()
+			if ( (seedStringVarName == None) or (type(seedStringVarname).__name__ != con.strTypePython) or (len(seedStringVarName) == 0) ):
+				return None
+
+			stringVarName += ", "
+			stringVarName += seedStringVarName
+
+		stringVarName += ")"
+
+		return stringVarName
+
+	def setSeed(self, seed):
+		if (seed == None):
+			sys.exit("RandomValue->setSeed:  value passed in is of None type.")
+
+		self.seed = seed
 
 	def setGroupType(self, groupType):
-		if (groupType not in con.groupTypes):
+		groupTypeStringVarName = groupType.getStringVarName()
+		if ( (groupTypeStringVarName == None) or (type(groupTypeStringVarName).__name__ != con.strTypePython) or (len(groupTypeStringVarName) == 0) ):
+			sys.exit("RandomValue->setGroupType:  could not properly extract group type string variable name from group type parameter passed in.")
+
+		if (groupTypeStringVarName not in con.groupTypes):
 			sys.exit("RandomValue->setGroupType:  value passed in is not one of the supported group types.")
 
 		self.groupType = groupType

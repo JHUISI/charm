@@ -15,6 +15,9 @@ class IntegerValue:
 	def getLineNo(self):
 		return self.lineNo
 
+	def getStringVarName(self):
+		return str(self.value)
+
 	def setValue(self, value):
 		if (type(value) is not int):
 			sys.exit("Value passed to IntegerValue class is not of type " + con.intTypePython)

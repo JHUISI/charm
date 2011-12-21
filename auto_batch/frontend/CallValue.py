@@ -23,6 +23,43 @@ class CallValue:
 	def getLineNo(self):
 		return self.lineNo
 
+	def getStringVarName(self):
+		if (self.funcName == None):
+			return None
+
+		funcStringVarName = self.funcName.getStringVarName()
+		if ( (funcStringVarName == None) or (type(funcStringVarName).__name__ != con.strTypePython) or (len(funcStringVarName) == 0) ):
+			return None
+
+		stringVarName = ""
+		stringVarName += funcStringVarName
+
+		if (self.attrName != None):
+			attrStringVarName = self.attrName.getStringVarName()
+			if ( (attrStringVarName == None) or (type(attrStringVarName).__name__ != con.strTypePython) or (len(attrStringVarName) == 0) ):
+				return None
+
+			stringVarName += "." + attrStringVarName
+
+		stringVarName += "("
+
+		if (self.argList != None):
+			argListStringVarName = ""
+			for arg in self.argList:
+				argStringVarName = arg.getStringVarName()
+				if ( (argStringVarName == None) or (type(argStringVarName).__name__ != con.strTypePython) or (len(argStringVarName) == 0) ):
+					return None
+
+				argListStringVarName += argStringVarName + ", "
+
+			argListStringVarName = argListStringVarName[0:(len(argListStringVarName) - 2)]
+
+			stringVarName += argListStringVarName
+
+		stringVarName += ")"
+
+		return stringVarName
+
 	def setFuncName(self, funcName):
 		if ( (funcName == None) or (type(funcName).__name__ != con.strTypePython) or (len(funcName) == 0) ):
 			sys.exit("CallValue->setFuncName:  problem with the function name passed in.")
@@ -36,7 +73,7 @@ class CallValue:
 		self.attrName = attrName
 
 	def setArgList(self, argList):
-		if ( (argList == None) or (type(argList).__name__ != con.listTypePython) ):
+		if ( (argList != None) and (type(argList).__name__ != con.listTypePython) ):
 			sys.exit("CallValue->setArgList:  problem with the argument list passed in.")
 
 		self.argList = argList

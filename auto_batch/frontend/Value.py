@@ -10,5 +10,9 @@ class Value(metaclass=ABCMeta):
 		return
 
 	@abstractmethod
+	def getStringVarName(self):
+		return
+
+	@abstractmethod
 	def setLineNo(self, lineNo):
 		return
