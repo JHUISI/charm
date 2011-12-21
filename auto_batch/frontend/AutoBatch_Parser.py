@@ -872,7 +872,7 @@ def main():
 	DELETESTRING.setLineNo(30)
 
 	DELETEME = ASTVarVisitor(myASTParser)
-	DELETEME.getVariableGroupType(DELETESTRING, "keygen", functionArgMappings, returnNodes, varAssignments)
+	DELETEME.getVariableGroupType(DELETESTRING, "keygen", functionArgMappings, functionArgNames, returnNodes, varAssignments)
 
 
 

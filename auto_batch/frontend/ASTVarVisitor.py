@@ -579,36 +579,36 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		return self.varAssignments
 
-	def recursiveGroupTypeTraversal(self, varObj, funcName, functionArgMappings, returnNodes, groupTypeList):
-		if ( (varObj == None) or (type(varObj).__name__ not in variableTypes) ):
-			sys.exit("ASTVarVisitor->recursiveGroupTypeTraversal:  problem with varObj input parameter passed in.")
-
-		if ( (funcName == None) or (type(funcName).__name__ != con.strTypePython) or (funcName not in functionArgMappings) ):
-			sys.exit("ASTVarVisitor->recursiveGroupTypeTraversal:  problem with function name parameter passed in.")
+	def getGroupTypeOfOneVar(self, varObj, groupTypeList):
+		if ( (varObj == None) or (type(varObj).__name__ != con.variable) ):
+			sys.exit("ASTVarVisitor->getGroupTypeOfOneVar:  problem with variable object input parameter passed in.")
 
 		if ( (groupTypeList == None) or (type(groupTypeList).__name__ != con.listTypePython) or (len(groupTypeList) > 1) ):
-			sys.exit("ASTVarVisitor->recursiveGroupTypeTraversal:  problem with the group type list parameter passed in.")
+			sys.exit("ASTVarVisitor->getGroupTypeOfOneVar:  problem with the group type list parameter passed in.")
 
 		try:
-			retGroupType = varObj.getGroupType()
+			varValue = varObj.getValue()
 		except:
-			retGroupType = None
+			sys.exit("ASTVarVisitor->getGroupTypeOfOneVar:  could not extract the Value object from the Variable object passed in.")
 
-		if (retGroupType != None):
+		try:
+			retGroupTypeObj = varValue.getGroupType()
+		except:
+			retGroupTypeObj = None
+
+		if (retGroupTypeObj != None):
+			if (type(retGroupTypeObj).__name__ != con.stringName):
+				sys.exit("ASTVarVisitor->getGroupTypeOfOneVar:  group type object extracted is not of type " + con.stringName)
+
+			retGroupType = retGroupTypeObj.getStringVarName()
 			if (retGroupType not in con.groupTypes):
-				sys.exit("ASTVarVisitor->recursiveGroupTypeTraversal:  group type extracted is not one of the supported types.")
+				sys.exit("ASTVarVisitor->getGroupTypeOfOneVar:  group type extracted is not one of the supported types.")
 
 			if (len(groupTypeList) == 0):
 				groupTypeList.append(retGroupType)
 			else:
 				if (retGroupType != groupTypeList[0]):
-					sys.exit("ASTVarVisitor->recursiveGroupTypeTraversal:  group type extracted is different from a previously extracted group type.")
-
-		varType = type(varObj).__name__
-
-		if (varType == con.binOpValue):
-			nextVarObj = self.myASTParser.getLeftNodeOfBinOp(varObj)
-			self.recursiveGroupTypeTraversal(nextVarObj, groupTypeList)
+					sys.exit("ASTVarVisitor->getGroupTypeOfOneVar:  group type extracted is different from a previously extracted group type.")
 
 	def getVarObjFromSameFunction(self, varName, funcName, varAssignments):
 		if ( (varName == None) or (type(varName).__name__ not in con.variableNameTypes) ):
@@ -636,30 +636,72 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		return None
 
-	def getVariableGroupType(self, varName, funcName, functionArgMappings, returnNodes, varAssignments):
+	def getNextVarToCheck(self, varObj):
+		if ( (varObj == None) or (type(varObj).__name__ != con.variable) ):
+			sys.exit("ASTVarVisitor->getNextVarToCheck:  problem with the variable object parameter passed in.")
+
+		try:
+			varValue = varObj.getValue()
+		except:
+			sys.exit("ASTVarVisitor->getNextVarToCheck:  could not extract the Value object from the Variable object passed in.")
+
+		try:
+			valueType = type(varValue).__name__
+		except:
+			sys.exit("ASTVarVisitor->getNextVarToCheck:  could not extract the type of the Value object extracted from the Variable object passed in.")
+
+		if (valueType == con.binOpValue):
+			return copy.deepcopy(self.myASTParser.getLeftNodeOfBinOp(varValue))
+
+		return None
+
+	def getVariableGroupType(self, varName, funcName, functionArgMappings, functionArgNames, returnNodes, varAssignments):
 		if ( (varName == None) or (type(varName).__name__ not in con.variableNameTypes) ):
 			sys.exit("ASTVarVisitor->getVariableGroupType:  problem with variable name parameter passed in.")
 
 		if ( (functionArgMappings == None) or (type(functionArgMappings).__name__ != con.dictTypePython) or (len(functionArgMappings) == 0) ):
 			sys.exit("ASTVarVisitor->getVariableGroupType:  problem with the function argument mappings dictionary passed in.")
 
+		if ( (functionArgNames == None) or (type(functionArgNames).__name__ != con.dictTypePython) or (len(functionArgNames) == 0) ):
+			sys.exit("ASTVarVisitor->getVariableGroupType:  problem with the function argument names dictionary passed in.")
+
 		if ( (varAssignments == None) or (type(varAssignments).__name__ != con.dictTypePython) or (len(varAssignments) == 0) ):
 			sys.exit("ASTVarVisitor->getVariableGroupType:  problem with the variable assignments dictionary passed in.")
 
-		if ( (funcName == None) or (funcName not in varAssignments) or (funcName not in functionArgMappings) ):
+		if ( (funcName == None) or (funcName not in varAssignments) or (funcName not in functionArgMappings) or (funcName not in functionArgNames) ):
 			sys.exit("ASTVarVisitor->getVariableGroupType:  problem with the function name passed in.")
 
 		if ( (returnNodes == None) or (type(returnNodes).__name__ != con.dictTypePython) or (len(returnNodes) == 0) ):
 			sys.exit("ASTVarVisitor->getVariableGroupType:  problem with the return nodes dictionary passed in.")
 
-		variableObject = self.getVarObjFromSameFunction(varName, funcName, varAssignments)
-		if ( (variableObject != None) and (type(variableObject).__name__ != con.variable) ):
-			sys.exit("ASTVarVisitor->getVariableGroupType:  problem with the variable object returned from getVarObjFromSameFunction.")
+		groupTypeList = []
 
-		'''
-		groupTypeList = self.recursiveGroupTypeTraversal(varObj, funcName, functionArgMappings, returnNodes, [])
+		while (True):
+			varInSameFunc = self.getVarObjFromSameFunction(varName, funcName, varAssignments)
+			if ( (varInSameFunc != None) and (type(varInSameFunc).__name__ != con.variable) ):
+				sys.exit("ASTVarVisitor->getVariableGroupType:  problem with the variable object returned from getVarObjFromSameFunction.")
+
+			if (varInSameFunc != None):
+				self.getGroupTypeOfOneVar(varInSameFunc, groupTypeList)
+				nextVarToCheck = self.getNextVarToCheck(varInSameFunc)
+				if (nextVarToCheck != None):
+					varInSameFunc = nextVarToCheck
+					continue
+				break
+
+			primaryVarName = self.myASTParser.getPrimaryNameOfVariable(varInSameFunc)
+			funcArgNameObjs = functionArgNames[funcName]
+			funcArgNames = self.myASTParser.getStringListOfStructItems(funcArgNameObjs)
+
+			if (primaryVarName not in funcArgNames):
+				break
+
+
+					
+
+
 		if ( (groupTypeList == None) or (type(groupTypeList).__name__ != con.listTypePython) or (len(groupTypeList) > 1) ):
-			sys.exit("ASTVarVisitor->getVariableGroupType:  problem with value returned from recursiveGroupTypeTraversal.")
+			sys.exit("ASTVarVisitor->getVariableGroupType:  problem with the group type list collected so far.")
 
 		if (len(groupTypeList) == 0):
 			return None
@@ -667,7 +709,6 @@ class ASTVarVisitor(ast.NodeVisitor):
 		retGroupType = groupTypeList[0]
 
 		if (retGroupType not in con.groupTypes):
-			sys.exit("ASTVarVisitor->getVariableGroupType:  group type returned from recursiveGroupTypeTraversal is not one of the supported types.")
+			sys.exit("ASTVarVisitor->getVariableGroupType:  group type extracted is not one of the supported types.")
 
 		return retGroupType
-		'''

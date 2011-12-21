@@ -20,7 +20,7 @@ class FunctionArgMap:
 		return self.lineNo
 
 	def setDestFuncName(self, destFuncName):
-		if ( (destFuncName == None) or (type(destFuncName).__name__ != con.strTypePython) or (len(destFuncName) == 0) ):
+		if ( (destFuncName == None) or (type(destFuncName).__name__ != con.stringName) ):
 			sys.exit("FunctionArgMap->setDestFuncName:  problem with function named passed in.")
 
 		self.destFuncName = destFuncName

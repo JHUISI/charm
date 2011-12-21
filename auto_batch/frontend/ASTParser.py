@@ -7,9 +7,54 @@ from FunctionArgMap import FunctionArgMap
 from CallValue import CallValue
 from SubscriptName import SubscriptName
 
+def getPrimaryNameOfVariable(variableObject):
+	if ( (variableObject == None) or (type(variableObject).__name__ != con.variable) ):
+		sys.exit("ASTParser->getPrimaryNameOfVariable:  problem with variable object passed in.")
+
+	try:
+		nameObject = variableObject.getName()
+	except:
+		sys.exit("ASTParser->getPrimaryNameOfVariable:  could not extract Name object from Variable object passed in.")
+
+	nameType = type(nameObject).__name__
+	if (nameType not in con.variableNameTypes):
+		sys.exit("ASTParser->getPrimaryNameOfVariable:  type of Name object is not one of the supported object types for names.")
+
+	if (nameType == con.stringName):
+		return nameType.getStringVarOfName()
+	elif (nameType == con.subscriptName):
+		return nameType.getValue().getStringVarOfName()
+	else:
+		sys.exit("ASTParser->getPrimaryNameOfVariable:  this function does not include logic for all of the supported Name types.")
+
+def getStringListOfStructItems(struct):
+	if ( (struct == None) or (len(struct) == 0) ):
+		sys.exit("ASTParser->getStringListOfStructItems:  problem with structure passed in.")
+
+	stringList = []
+
+	for key in struct:
+		if (key == None):
+			sys.exit("ASTParser->getStringListOfStructItems:  one of the keys of the structure passed in is of None type.")
+
+		try:
+			stringRepOfKey = key.getStringVarName()
+		except:
+			sys.exit("ASTParser->getStringListOfStructItems:  problem when running the getStringVarName() method on one of the keys of the structure passed in.")
+
+		if ( (stringRepOfKey == None) or (type(stringRepOfKey).__name__ != con.strTypePython) or (len(stringRepOfKey) == 0) ):
+			sys.exit("ASTParser->getStringListOfStructItems:  problem with value returned from getStringVarName() on one of the keys.")
+
+		stringList.append(stringRepOfKey)
+
+	if (len(stringList) == 0):
+		sys.exit("ASTParser->getStringListOfStructItems:  could not extract the string representations of any of the keys of the structure passed in.")
+
+	return stringList
+
 def getValueOfLastLine(dict):
-	if (len(dict) == 0):
-		return None
+	if ( (dict == None) or (len(dict) == 0) ):
+		sys.exit("ASTParser->getValueOfLastLine:  problem with dictionary passed in.")
 
 	keys = list(dict.keys())
 	keys.sort()
@@ -33,6 +78,8 @@ class ASTVariableNamesVisitor(ast.NodeVisitor):
 	def __init__(self):
 		self.variableNames = []
 		self.myASTParser = ASTParser()
+		if ( (self.myASTParser == None) or (type(self.myASTParser).__name__ != con.ASTParser) ):
+			sys.exit("ASTVariableNamesVisitor->__init__:  problem with value returned from ASTParser().")
 
 	def visit_Subscript(self, node):
 		subscriptObject = self.myASTParser.buildSubscriptObjectFromNode(node)
@@ -59,6 +106,10 @@ class ASTFuncArgMapsVisitor(ast.NodeVisitor):
 		if ( (functionArgNames == None) or (type(functionArgNames).__name__ != con.dictTypePython) or (len(functionArgNames) == 0) ):
 			sys.exit("ASTFuncArgMapsVisitor->__init__:  problem with the function argument names passed in.")
 
+		self.myASTParser = ASTParser()
+		if ( (self.myASTParser == None) or (type(self.myASTParser).__name__ != con.ASTParser) ):
+			sys.exit("ASTFuncArgMapsVisitor->__init__:  problem with the value returned from ASTParser().")
+
 		self.functionArgNames = functionArgNames
 		self.functionArgMappings = []
 
@@ -72,7 +123,11 @@ class ASTFuncArgMapsVisitor(ast.NodeVisitor):
 			destFuncName = None
 
 		if (destFuncName != None):
-			return destFuncName
+			destFuncNameObject = self.myASTParser.buildStringName(node, destFuncName)
+			if ( (destFuncNameObject == None) or (type(destFuncNameObject).__name__ != con.stringName) ):
+				sys.exit("ASTFuncArgMapsVisitor->getDestFuncName:  problem with value returned from ASTParser->buildStringName for destination function name.")
+
+			return destFuncNameObject
 
 		try:
 			funcValueName = node.func.value.id
@@ -87,24 +142,24 @@ class ASTFuncArgMapsVisitor(ast.NodeVisitor):
 		except:
 			sys.exit("ASTFuncArgMapsVisitor->getDestFuncName:  could not obtain the function's attribute name from the node passed in.")
 
-		return funcAttrName
+		funcAttrNameObject = self.myASTParser.buildStringName(node, funcAttrName)
+		if ( (funcAttrNameObject == None) or (type(funcAttrNameObject).__name__ != con.stringName) ):
+			sys.exit("ASTFuncArgMapsVisitor->getDestFuncName:  problem with value returned from ASTParser->buildStringName for function attribute name.")
+
+		return funcAttrNameObject
 
 	def visit_Call(self, node):
 		destFuncName = self.getDestFuncName(node)
-		if (destFuncName == None):
-			return
+		if ( (destFuncName == None) or (type(destFuncName).__name__ != con.stringName) ):
+			sys.exit("ASTFuncArgMapsVisitor->visit_Call:  problem with value returned from self.getDestFuncName.")
 
-		if (type(destFuncName).__name__ != con.strTypePython):
-			sys.exit("ASTFuncArgMapsVisitor->visit_Call:  function name returned from getDestFuncName function is not of type " + con.strTypePython)
-
-		if (destFuncName not in self.functionArgNames):
+		if (destFuncName.getStringVarName() not in self.functionArgNames):
 			return
 			#sys.exit("ASTFuncArgMapsVisitor->visit_Call:  " + destFuncName + " is not in the function argument names object passed in.")
 
-		destArgNames = self.functionArgNames[destFuncName]
+		destArgNames = self.functionArgNames[destFuncName.getStringVarName()]
 
-		myASTParser = ASTParser()
-		callerArgList = myASTParser.getCallArgList(node)
+		callerArgList = self.myASTParser.getCallArgList(node)
 
 		if ( (callerArgList == None) and (len(destArgNames) == 0) ):
 			funcArgMapObject = FunctionArgMap()
@@ -132,6 +187,10 @@ class ASTFuncArgMapsVisitor(ast.NodeVisitor):
 
 class ASTFunctionArgNames(ast.NodeVisitor):
 	def __init__(self):
+		self.myASTParser = ASTParser()
+		if ( (self.myASTParser == None) or (type(self.myASTParser).__name__ != con.ASTParser) ):
+			sys.exit("ASTParser->ASTFunctionArgNames->__init__:  problem with value returned from ASTParser constructor.")
+
 		self.functionArgNames = {}
 
 	def visit_FunctionDef(self, node):
@@ -158,7 +217,8 @@ class ASTFunctionArgNames(ast.NodeVisitor):
 				sys.exit("ASTParser->ASTFunctionArgNames->visit_FunctionDef:  could not extract one of the argument names of function " + nodeName)
 
 			if (argToAdd != con.self):
-				argNamesList.append(argToAdd)
+				argToAddStringName = self.myASTParser.buildStringName(node, argToAdd)
+				argNamesList.append(argToAddStringName)
 
 		self.functionArgNames[nodeName] = argNamesList
 
@@ -250,6 +310,12 @@ class ASTParser:
 			sys.exit("ASTParser->getASTNodeFromFile:  error when running \"ast.parse\" on the source-code lines of the file name passed in.")
 
 		return returnNode
+
+	def getPrimaryNameOfVariable(self, variableObject):
+		return getPrimaryNameOfVariable(variableObject)
+
+	def getStringListOfStructItems(self, struct):
+		return getStringListOfStructItems(struct)
 
 	def getLineNumberOfNode(self, node):
 		if (node == None):
