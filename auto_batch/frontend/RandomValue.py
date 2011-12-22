@@ -56,6 +56,9 @@ class RandomValue:
 		self.seed = seed
 
 	def setGroupType(self, groupType):
+		if ( (groupType == None) or (type(groupType).__name__ != con.stringName) ):
+			sys.exit("RandomValue->setGroupType:  problem with group type parameter passed in.")
+
 		groupTypeStringVarName = groupType.getStringVarName()
 		if ( (groupTypeStringVarName == None) or (type(groupTypeStringVarName).__name__ != con.strTypePython) or (len(groupTypeStringVarName) == 0) ):
 			sys.exit("RandomValue->setGroupType:  could not properly extract group type string variable name from group type parameter passed in.")

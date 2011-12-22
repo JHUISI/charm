@@ -872,8 +872,8 @@ def main():
 	DELETESTRING.setLineNo(30)
 
 	DELETEME = ASTVarVisitor(myASTParser)
-	DELETEME.getVariableGroupType(DELETESTRING, "verify", functionArgMappings, functionArgNames, returnNodes, varAssignments)
-
+	deletethistoo = DELETEME.getVariableGroupType(DELETESTRING, "verify", functionArgMappings, functionArgNames, returnNodes, varAssignments)
+	print(deletethistoo)
 
 
 '''

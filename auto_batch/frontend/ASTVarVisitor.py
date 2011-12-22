@@ -128,7 +128,7 @@ class ASTVarVisitor(ast.NodeVisitor):
 			if (type(hashArg).__name__ != con.stringName):
 				continue
 
-			possibleGroupType = hashArg.getName()
+			possibleGroupType = hashArg.getStringVarName()
 			if (possibleGroupType in con.groupTypes):
 				if (hashGroupType != None):
 					sys.exit("ASTVarVisitor->getHashGroupType:  found more than one argument that represents group type.")
@@ -187,9 +187,11 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		#hashArgList.remove(hashGroupType)
 
+		hashGroupTypeStringNameObj = self.myASTParser.buildStringName(node, hashGroupType)
+
 		hashValueToAdd = HashValue()
 		hashValueToAdd.setArgList(hashArgList)
-		hashValueToAdd.setGroupType(hashGroupType)
+		hashValueToAdd.setGroupType(hashGroupTypeStringNameObj)
 
 		return hashValueToAdd
 
@@ -656,6 +658,11 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		if (valueType == con.binOpValue):
 			return copy.deepcopy(self.myASTParser.getLeftNodeOfBinOp(varValue))
+		elif (valueType == con.callValue):
+			if (varValue.getAttrName() != None):
+				return varValue.getAttrName().getStringVarName()
+			else:
+				return varValue.getFuncName().getStringVarName()
 
 		return None
 
@@ -666,18 +673,20 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if ( (funcName == None) or (type(funcName).__name__ != con.strTypePython) or (funcName not in functionArgMappings) ):
 			sys.exit("ASTVarVisitor->getFuncArgMapOfCallingFunc:  problem with the function name passed in.")
 
+		callingFuncName = None
 		funcArgMapOfCallingFunction = None
 
 		for funcNameEntry in functionArgMappings:
 			funcCallList = functionArgMappings[funcNameEntry]
 			for funcCallEntry in funcCallList:
 				if (funcCallEntry.getDestFuncName().getStringVarName() == funcName):
-					if (funcArgMapOfCallingFunction != None):
+					if ( (funcArgMapOfCallingFunction != None) or (callingFuncName != None) ):
 						sys.exit("ASTVarVisitor->getFuncArgMapOfCallingFunc:  function call passed in (" + funcName + ") is called more than once in the program.")
 
+					callingFuncName = funcNameEntry
 					funcArgMapOfCallingFunction = funcCallEntry
 
-		return funcArgMapOfCallingFunction
+		return (callingFuncName, funcArgMapOfCallingFunction)
 
 	def getVariableGroupType(self, varName, funcName, functionArgMappings, functionArgNames, returnNodes, varAssignments):
 		if ( (varName == None) or (type(varName).__name__ not in con.variableNameTypes) ):
@@ -718,24 +727,48 @@ class ASTVarVisitor(ast.NodeVisitor):
 			if (varInSameFunc != None):
 				self.getGroupTypeOfOneVar(varInSameFunc, groupTypeList)
 				nextVarToCheck = self.getNextVarToCheck(varInSameFunc)
-				if (nextVarToCheck != None):
+				if (type(nextVarToCheck).__name__ == con.variable):
 					varName = nextVarToCheck.getName()
 					maxLineNo = varInSameFunc.getName().getLineNo()
 					continue
-				break
+				elif (type(nextVarToCheck).__name__ == con.strTypePython):
+					#this is where we go into a function that was called in which the return value is what we are
+					#are looking for (e.g., sig = bls.sign(....) ).  There are 2 possibilities here.  One is that the
+					#return value of that function is a variable (e.g., return sig).  In this case, change varName to
+					#sig and change the function name to the name of that function (e.g., "sign"), then rerun the while
+					#loop with that new variable name and function name.  The other possibility is that the return
+					#value is a calculation (e.g., return group.hash(M, G1) * x).  In this case, turn the value of that
+					#calculation into a node (get it from the list of returnNodes that was passed into this function),
+					#then try to find the group type of that node in the same way you've done the others.
+				else:
+					break
 
 			primaryVarName = self.myASTParser.getPrimaryNameOfNameObject(varName)
 			funcArgNameObjs = functionArgNames[funcName]
 			funcArgNames = self.myASTParser.getStringListOfStructItems(funcArgNameObjs)
 
-			if (primaryVarName not in funcArgNames):
+			argOrder = None
+			argCounter = 0
+
+			for funcArgNameEntry in funcArgNames:
+				if (primaryVarName == funcArgNameEntry):
+					argOrder = argCounter
+				argCounter += 1
+
+			if (argOrder == None):
 				break
 
-			funcArgMapOfCallingFunc = self.getFuncArgMapOfCallingFunc(functionArgMappings, funcName)
-			if ( (funcArgMapOfCallingFunc == None) or (type(funcArgMapOfCallingFunc).__name__ != con.functionArgMap) ):
-				sys.exit("ASTVarVisitor->getVariableGroupType:  problem with value returned from funcArgMapOfCallingFunc.")
+			(callingFuncName, funcArgMapOfCallingFunc) = self.getFuncArgMapOfCallingFunc(functionArgMappings, funcName)
+			if ( (funcArgMapOfCallingFunc == None) or (callingFuncName == None) or (type(funcArgMapOfCallingFunc).__name__ != con.functionArgMap) or (type(callingFuncName).__name__ != con.strTypePython) or (len(callingFuncName) == 0) ):
+				sys.exit("ASTVarVisitor->getVariableGroupType:  problem with values returned from funcArgMapOfCallingFunc.")
 
-			break
+			callingFuncMatchingArgObj = funcArgMapOfCallingFunc.getCallerArgList()[argOrder]
+			if (type(callingFuncMatchingArgObj).__name__ not in con.variableNameTypes):
+				break
+
+			varName = callingFuncMatchingArgObj
+			funcName = callingFuncName
+			maxLineNo = funcArgMapOfCallingFunc.getLineNo()
 
 		if ( (groupTypeList == None) or (type(groupTypeList).__name__ != con.listTypePython) or (len(groupTypeList) > 1) ):
 			sys.exit("ASTVarVisitor->getVariableGroupType:  problem with the group type list collected so far.")

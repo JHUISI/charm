@@ -57,8 +57,8 @@ class InitValue:
 		self.value = value
 
 	def setGroupType(self, groupType):
-		if (groupType not in con.groupTypes):
-			sys.exit("InitValue->setGroupType:  value passed in is not one of the supported group types.")
+		if ( (groupType == None) or (type(groupType).__name__ != con.stringName) or (groupType.getStringVarName() not in con.groupTypes) ):
+			sys.exit("InitValue->setGroupType:  problem with group type parameter passed in.")
 
 		self.groupType = groupType
 

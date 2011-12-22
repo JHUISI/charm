@@ -884,7 +884,10 @@ class ASTParser:
 
 		if (funcName != None):
 			returnCallObject = CallValue()
-			returnCallObject.setFuncName(funcName)
+
+			funcNameStringNameObj = self.buildStringName(node, funcName)
+
+			returnCallObject.setFuncName(funcNameStringNameObj)
 			returnCallObject.setArgList(argList)
 			returnCallObject.setLineNo(node.lineno)
 			return returnCallObject
@@ -900,8 +903,12 @@ class ASTParser:
 			sys.exit("ASTParser->buildCallObjectFromNode:  could not extract attribute name of call from the node passed in.")
 
 		returnCallObject = CallValue()
-		returnCallObject.setFuncName(funcValueName)
-		returnCallObject.setAttrName(funcAttrName)
+
+		funcValueNameStringNameObj = self.buildStringName(node, funcValueName)
+		funcAttrNameStringNameObj = self.buildStringName(node, funcAttrName)
+
+		returnCallObject.setFuncName(funcValueNameStringNameObj)
+		returnCallObject.setAttrName(funcAttrNameStringNameObj)
 		returnCallObject.setArgList(argList)
 		returnCallObject.setLineNo(node.lineno)
 		return returnCallObject
