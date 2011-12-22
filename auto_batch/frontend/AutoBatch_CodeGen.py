@@ -1,106 +1,6 @@
-#TODO:  get ensurespacesbetweentokens in here, run every
-#line of verify through it
-#then go through and replace each variable name with the
-#right variable in the verify dict
+import copy, os, sys
 
 '''
-Requirements:
-
-- The definition line for the verify function in the 
-Charm code for the scheme must be on one line.  For example,
-
-def verify(pk, sig, M):
-
-This must all be on one line.
-'''
-
-import ast, os, sys, copy
-
-areDeltasNeeded = False
-pythonCodeNode = None
-precomputeOuterDotProds = []
-pythonStringRep = 'str'
-pythonListRep = 'list'
-tempVerifySigsOutput = ""
-finalEqLineVars = []
-numSignersIndex = 'y'
-numSignaturesIndex = 'z' 
-dotProdTypes = {}
-precomputeVarReplacements = {}
-varsThatAreLists = {}
-cleanBatchEqVars = {}
-sumPrefix = 'sum'
-sumOrDotSymbol = '_'
-newSliceSymbol = '#'
-valueRep = 'Value'
-typeRep = 'Type'
-numSignaturesEndValInCode = 'N'
-numSignersEndValInCode = 'l'
-numSignaturesEndVal = 'N'
-numSignersEndVal = 'l'
-pythonDictRep = 'dict'
-dictRepInAST = 'Dict'
-multipleSubscriptIndicatorChar = '$'
-finalEqLineString = 'Final version => '
-dotProdPrefix = 'dot'
-computeLineVarsNoSubscripts = 'Variable_List_No_Subscripts'
-computeLineVars = 'Variable_List'
-computeLineIndex = 'Index_Variable'
-computeLineExp = 'Expression'
-computeLineStartValue = 'Start_Value'
-computeLineEndValue = 'End_Value'
-computeLineRange = 'Range'
-nameOfVerifyFunc = 'verify'
-stringRepInAST = 's'
-numRepInAST = 'n'
-keysRepInAST = 'keys'
-argsRepInAST = 'args'
-argRepInAST = 'arg'
-selfRepInAST = 'self'
-idRepInAST = 'id'
-lambdaRepInAST = 'Lambda'
-callRepInAST = 'Call'
-funcRepInAST = 'func'
-sigNumKey = 'Signature_Number'
-bodyKey = 'Body'
-individualTemplate = '/Users/matt/Documents/charm/auto_batch/frontend/Waters/IndividualVerifyTemplate.py'
-batchTemplate = '/Users/matt/Documents/charm/auto_batch/frontend/Waters/BatchVerifyTemplate.py'
-equalityOperator = 'Eq()'
-printPrefix = 'print('
-commentPrefix = '#'
-dictBeginChar = '['
-lParan = '('
-space = ' '
-numSpacesPerTab = 4
-#pairFuncNames = ['pairing', 'PairingGroup', 'hashlib']
-pairFuncNames = ['hashlib']
-selfDump = 'self.dump('
-selfDumpLen = len(selfDump)
-batchVerifierPythonFile = '/Users/matt/Documents/charm/auto_batch/batchverify.py'
-#batchVerifierOutputFile = '/Users/matt/Documents/charm/auto_batch/frontend/batchVerifierOutput'
-finalBatchEqTag = 'Final batch eq'
-numBitsOfSecurity = 80
-deltasGroupType = 'ZR'
-batchEqRemoveVars = ['e', '(', 'j', '1', 'prod', '{', '}', 'N', ':=', '^', ',', 'on', ')', '==', '*', 'i', 'l', 'of', 'sum', numSignersIndex, numSignaturesIndex]
-dotProdSymbol = '_'
-deltaString = 'delta'
-deltasString = 'deltas'
-deltaDotProdString = 'delta_j'
-idRepInAST = 'id'
-eltsRepInAST = 'elts'
-numRepInAST = 'n'
-sliceRepInAST = 'slice'
-unknownType = 'Unknown'
-reservedWords = ['prod', 'group', 'G1', 'G2', 'GT', 'dotprod', 'range', 'lam_func', 'ZR', 'self', 'for', 'in', 'while', 'if', 'pass', 'sum', 'e']
-reservedSymbols = ['(', ')', '{', '}', ':=', '=', '-', '*', '^', '/', ',', '==', ':', '[', ']' ]
-numSpacesPerTab = 4
-commentChar = '#'
-indentedBlockStartLineNo = 'startLineNo'
-indentedBlockEndLineNo = 'endLineNo'
-indentedBlockVars = 'Variable_Names'
-computeLineString = 'Compute:  '
-dotProdAssignSymbol = ' := '
-
 class ImportFromVisitor(ast.NodeVisitor):
 	def __init__(self):
 		self.lineNos = []
@@ -188,27 +88,6 @@ class GetKeysOfDictAssign(ast.NodeVisitor):
 class GetLastLineOfFunction(ast.NodeVisitor):
 	def __init__(self):
 		self.lastLine = 0
-
-	'''
-	def checkNextNode(self, node):
-		print(node.lineno)
-		if (node.lineno > self.lastLine):
-			self.lastLine = node.lineno
-	'''
-
-	'''
-	def visit_Module(self, node):
-		self.checkNextNode(node)
-
-	def visit_Interactive(self, node):
-		self.checkNextNode(node)
-
-	def visit_Expression(self, node):
-		self.checkNextNode(node)
-
-	#def visit_Assign(self, node):
-		#self.checkNextNode(node)
-	'''
 
 	def generic_visit(self, node):
 		#print(node._fields)
@@ -707,14 +586,6 @@ def addDeltasAndArgSigIndexMap(batchOutputString, declaredLists):
 			deltaList = deltaListSplit[0] + deltaListSplit[1]
 			batchOutputString += "\tfor sigIndex in range(0, numSigs):\n"
 			batchOutputString += "\t\t" + deltaList + "[sigIndex] = prng_bits(group, " + str(numBitsOfSecurity) + ")\n\n"
-
-	'''
-	batchOutputString += "\t\tfor arg in verifyFuncArgs:\n"
-	batchOutputString += "\t\t\tif (sigNumKey in verifyArgsDict[sigIndex][arg]):\n"
-	batchOutputString += "\t\t\t\targSigIndexMap[arg] = int(verifyArgsDict[sigIndex][arg][sigNumKey])\n"
-	batchOutputString += "\t\t\telse:\n"
-	batchOutputString += "\t\t\t\targSigIndexMap[arg] = sigIndex\n\n"
-	'''
 		
 	return batchOutputString
 
@@ -732,11 +603,6 @@ def getBatchEqVars(finalBatchEq):
 	for removeVar in batchEqRemoveVars:
 		while (batchEqVars.count(removeVar) > 0):
 			batchEqVars.remove(removeVar)
-
-	'''
-	for varIndex in range(0, len(batchEqVars)):
-		batchEqVars[varIndex] = batchEqVars[varIndex].rstrip(dotProdSuffix)
-	'''
 	
 	for dupVar in batchEqVars:
 		while (batchEqVars.count(dupVar) > 1):
@@ -769,12 +635,6 @@ def distillBatchEqVars(batchEqVars, batchEqNotSumOrDotVars):
 		#else:
 			#batchEqNotSumOrDotVars.append(batchEqVars[varIndex])
 	#return batchEqDotProdVars
-
-'''
-def removeDupsFromList(list):
-	for listIndex in range(0, len(list)):
-		while ()
-'''
 
 def getIndentedBlockIndex(listOfIndentedBlocks, lineNo):
 	for counter in range(0, len(listOfIndentedBlocks)):
@@ -1321,15 +1181,6 @@ def writeDotProdIndicesString(indexVarsOfDotProdsInOrder):
 
 
 	return "[" + numSignaturesIndex + "]"
-	
-	'''
-	if (len(indexVarsOfDotProdsInOrder) == 1) and (indexVarsOfDotProdsInOrder[0] == numSignaturesIndex):
-		return "[" + numSignaturesIndex + "]"
-
-	indexString = ""
-	for indexVar in indexVarsOfDotProdsInOrder:
-		indexString += "[" + indexVar + "]"
-	'''
 		
 	return indexString
 		
@@ -1717,24 +1568,12 @@ def getDotProdListIndex(dotProdList, range):
 	return -1
 					
 
-def dotProdLoopRecursive(computeLineInfo, outerDotProd, dotProdList):
-	'''
-	if (outerDotProd not in dotProdDict):
-		dotProdDict[outerDotProd] = {}
-	'''
-	
+def dotProdLoopRecursive(computeLineInfo, outerDotProd, dotProdList):	
 	range = computeLineInfo[outerDotProd][computeLineRange]
 	
 	#if (range not in dotProdList):
 
 	#rangeKeyExists = False
-
-	'''	
-	for child in dotProdList:
-		if child == range:
-			rangeKeyExists = True
-			break
-	'''
 
 	dotProdListIndex = getDotProdListIndex(dotProdList, range)
 		
@@ -1819,10 +1658,6 @@ def addEqualityTestFromFinalBatchEq(verifySigsOutput, finalBatchEq, outerDotProd
 	verifySigsOutput += "\t\tverifySigsRecursive(group, deltaz, verifyFuncArgs, argSigIndexMap, verifyArgsDict, " + outerDotProdString + "midIndex, endIndex)\n"
 
 	#print(finalBatchEq)
-	'''
-	print(batchEqVars)
-	print(batchEqDotProdVars)
-	'''
 	return verifySigsOutput
 
 def convertNewSliceSymbolToUnderscore(varName):
@@ -2101,14 +1936,6 @@ def getSplitDotProdLoopOrder(dotProdLoopOrder, computeLineInfo):
 	#precompute
 
 	return precomputeDotProdOrder
-	
-	'''
-	for dotProd in dotProdLoopOrder:
-		for key in dotProd:
-			keyName = key
-			print(keyName)
-			break
-	'''
 		
 	#print(dotProdLoopOrder)
 	#return precomputeDotProdOrder#, DC_dotProdOrder
@@ -2283,9 +2110,12 @@ def isTopLayerLoopOverNumSignatures(dotProdLoopOrder):
 			return False
 		
 	return True
+'''
 
+def main():
+	print("hello")
 
-if __name__ == '__main__':
+'''
 	if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
 		sys.exit("\nUsage:  python Code_Generator.py \n [individual verification output filename] \n [batch verification output filename] \n [filename of the output from the batchverify.py script] \n [filename of Python code for signature scheme] \n [filename of pickled Python dictionary with verify function arguments] \n [filename of .bv file that will be input for the batch verifier] \n")
 
@@ -2551,3 +2381,7 @@ if __name__ == '__main__':
 
 	#os.system("python " + individualVerArg)
 	#os.system("python " + batchVerArg)
+'''
+
+if __name__ == '__main__':
+	main()

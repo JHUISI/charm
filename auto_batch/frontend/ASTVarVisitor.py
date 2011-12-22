@@ -740,6 +740,7 @@ class ASTVarVisitor(ast.NodeVisitor):
 					#value is a calculation (e.g., return group.hash(M, G1) * x).  In this case, turn the value of that
 					#calculation into a node (get it from the list of returnNodes that was passed into this function),
 					#then try to find the group type of that node in the same way you've done the others.
+					break
 				else:
 					break
 
