@@ -7,25 +7,18 @@ from FunctionArgMap import FunctionArgMap
 from CallValue import CallValue
 from SubscriptName import SubscriptName
 
-def getPrimaryNameOfVariable(variableObject):
-	if ( (variableObject == None) or (type(variableObject).__name__ != con.variable) ):
-		sys.exit("ASTParser->getPrimaryNameOfVariable:  problem with variable object passed in.")
-
-	try:
-		nameObject = variableObject.getName()
-	except:
-		sys.exit("ASTParser->getPrimaryNameOfVariable:  could not extract Name object from Variable object passed in.")
+def getPrimaryNameOfNameObject(nameObject):
+	if ( (nameObject == None) or (type(nameObject).__name__ not in con.variableNameTypes) ):
+		sys.exit("ASTParser->getPrimaryNameOfNameObject:  problem with name object passed in to function.")
 
 	nameType = type(nameObject).__name__
-	if (nameType not in con.variableNameTypes):
-		sys.exit("ASTParser->getPrimaryNameOfVariable:  type of Name object is not one of the supported object types for names.")
 
 	if (nameType == con.stringName):
-		return nameType.getStringVarOfName()
+		return nameObject.getStringVarName()
 	elif (nameType == con.subscriptName):
-		return nameType.getValue().getStringVarOfName()
+		return nameObject.getValue().getStringVarName()
 	else:
-		sys.exit("ASTParser->getPrimaryNameOfVariable:  this function does not include logic for all of the supported Name types.")
+		sys.exit("ASTParser->getPrimaryNameOfNameObject:  this function does not include logic for all of the supported Name types.")
 
 def getStringListOfStructItems(struct):
 	if ( (struct == None) or (len(struct) == 0) ):
@@ -311,8 +304,8 @@ class ASTParser:
 
 		return returnNode
 
-	def getPrimaryNameOfVariable(self, variableObject):
-		return getPrimaryNameOfVariable(variableObject)
+	def getPrimaryNameOfNameObject(self, nameObject):
+		return getPrimaryNameOfNameObject(nameObject)
 
 	def getStringListOfStructItems(self, struct):
 		return getStringListOfStructItems(struct)

@@ -868,11 +868,11 @@ def main():
 
 
 	DELETESTRING = StringName()
-	DELETESTRING.setName("g")
+	DELETESTRING.setName("sig")
 	DELETESTRING.setLineNo(30)
 
 	DELETEME = ASTVarVisitor(myASTParser)
-	DELETEME.getVariableGroupType(DELETESTRING, "keygen", functionArgMappings, functionArgNames, returnNodes, varAssignments)
+	DELETEME.getVariableGroupType(DELETESTRING, "verify", functionArgMappings, functionArgNames, returnNodes, varAssignments)
 
 
 

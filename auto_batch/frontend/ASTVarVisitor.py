@@ -610,7 +610,7 @@ class ASTVarVisitor(ast.NodeVisitor):
 				if (retGroupType != groupTypeList[0]):
 					sys.exit("ASTVarVisitor->getGroupTypeOfOneVar:  group type extracted is different from a previously extracted group type.")
 
-	def getVarObjFromSameFunction(self, varName, funcName, varAssignments):
+	def getVarObjFromSameFunction(self, varName, funcName, varAssignments, maxLineNo=sys.maxsize):
 		if ( (varName == None) or (type(varName).__name__ not in con.variableNameTypes) ):
 			sys.exit("ASTVarVisitor->getVarObjFromSameFunction:  problem with the variable name parameter passed in.")
 
@@ -619,6 +619,9 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		if ( (funcName == None) or (type(funcName).__name__ != con.strTypePython) or (funcName not in varAssignments) ):
 			sys.exit("ASTVarVisitor->getVarObjFromSameFunction:  problem with the function name parameter passed in.")
+
+		if ( (maxLineNo == None) or (type(maxLineNo).__name__ != con.intTypePython) or (maxLineNo < 1) ):
+			sys.exit("ASTVarVisitor->getVarObjFromSameFunction:  problem with the maximum line number parameter passed in.")
 
 		varsForFuncName = varAssignments[funcName]
 		if ( (varsForFuncName == None) or (type(varsForFuncName).__name__ != con.listTypePython) ):
@@ -631,7 +634,8 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		for index in range( (lenVarsForFunc - 1), -1, -1):
 			currentVarObj = varsForFuncName[index]
-			if (varName.getStringVarName() == currentVarObj.getName().getStringVarName() ):
+			currentLineNo = currentVarObj.getName().getLineNo()
+			if (varName.getStringVarName() == currentVarObj.getName().getStringVarName() ) and (currentLineNo <= maxLineNo):
 				return currentVarObj
 
 		return None
@@ -655,6 +659,26 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		return None
 
+	def getFuncArgMapOfCallingFunc(self, functionArgMappings, funcName):
+		if ( (functionArgMappings == None) or (type(functionArgMappings).__name__ != con.dictTypePython) or (len(functionArgMappings) == 0) ):
+			sys.exit("ASTVarVisitor->getFuncArgMapOfCallingFunc:  problem with the function argument mappings dictionary passed in.")
+
+		if ( (funcName == None) or (type(funcName).__name__ != con.strTypePython) or (funcName not in functionArgMappings) ):
+			sys.exit("ASTVarVisitor->getFuncArgMapOfCallingFunc:  problem with the function name passed in.")
+
+		funcArgMapOfCallingFunction = None
+
+		for funcNameEntry in functionArgMappings:
+			funcCallList = functionArgMappings[funcNameEntry]
+			for funcCallEntry in funcCallList:
+				if (funcCallEntry.getDestFuncName().getStringVarName() == funcName):
+					if (funcArgMapOfCallingFunction != None):
+						sys.exit("ASTVarVisitor->getFuncArgMapOfCallingFunc:  function call passed in (" + funcName + ") is called more than once in the program.")
+
+					funcArgMapOfCallingFunction = funcCallEntry
+
+		return funcArgMapOfCallingFunction
+
 	def getVariableGroupType(self, varName, funcName, functionArgMappings, functionArgNames, returnNodes, varAssignments):
 		if ( (varName == None) or (type(varName).__name__ not in con.variableNameTypes) ):
 			sys.exit("ASTVarVisitor->getVariableGroupType:  problem with variable name parameter passed in.")
@@ -675,9 +699,19 @@ class ASTVarVisitor(ast.NodeVisitor):
 			sys.exit("ASTVarVisitor->getVariableGroupType:  problem with the return nodes dictionary passed in.")
 
 		groupTypeList = []
+		maxLineNo = sys.maxsize
 
 		while (True):
-			varInSameFunc = self.getVarObjFromSameFunction(varName, funcName, varAssignments)
+			if ( (varName == None) or (type(varName).__name__ not in con.variableNameTypes) ):
+				sys.exit("ASTVarVisitor->getVariableGroupType:  problem with varName parameter in while loop.")
+
+			if ( (funcName == None) or (funcName not in varAssignments) or (funcName not in functionArgMappings) or (funcName not in functionArgNames) ):
+				sys.exit("ASTVarVisitor->getVariableGroupType:  problem with function name parameter in while loop.")
+
+			if ( (maxLineNo == None) or (type(maxLineNo).__name__ != con.intTypePython) or (maxLineNo < 1) ):
+				sys.exit("ASTVarVisitor->getVariableGroupType:  problem with the maximum line number in while loop.")
+
+			varInSameFunc = self.getVarObjFromSameFunction(varName, funcName, varAssignments, maxLineNo)
 			if ( (varInSameFunc != None) and (type(varInSameFunc).__name__ != con.variable) ):
 				sys.exit("ASTVarVisitor->getVariableGroupType:  problem with the variable object returned from getVarObjFromSameFunction.")
 
@@ -685,20 +719,23 @@ class ASTVarVisitor(ast.NodeVisitor):
 				self.getGroupTypeOfOneVar(varInSameFunc, groupTypeList)
 				nextVarToCheck = self.getNextVarToCheck(varInSameFunc)
 				if (nextVarToCheck != None):
-					varInSameFunc = nextVarToCheck
+					varName = nextVarToCheck.getName()
+					maxLineNo = varInSameFunc.getName().getLineNo()
 					continue
 				break
 
-			primaryVarName = self.myASTParser.getPrimaryNameOfVariable(varInSameFunc)
+			primaryVarName = self.myASTParser.getPrimaryNameOfNameObject(varName)
 			funcArgNameObjs = functionArgNames[funcName]
 			funcArgNames = self.myASTParser.getStringListOfStructItems(funcArgNameObjs)
 
 			if (primaryVarName not in funcArgNames):
 				break
 
+			funcArgMapOfCallingFunc = self.getFuncArgMapOfCallingFunc(functionArgMappings, funcName)
+			if ( (funcArgMapOfCallingFunc == None) or (type(funcArgMapOfCallingFunc).__name__ != con.functionArgMap) ):
+				sys.exit("ASTVarVisitor->getVariableGroupType:  problem with value returned from funcArgMapOfCallingFunc.")
 
-					
-
+			break
 
 		if ( (groupTypeList == None) or (type(groupTypeList).__name__ != con.listTypePython) or (len(groupTypeList) > 1) ):
 			sys.exit("ASTVarVisitor->getVariableGroupType:  problem with the group type list collected so far.")
