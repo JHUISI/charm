@@ -1,2 +1,1 @@
-from toolbox.bitstring import Bytes
-import hashlib
+mpk['g1'] ** -s

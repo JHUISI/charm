@@ -321,34 +321,7 @@ def removeLastCharNewline(buf):
 
 	return buf
 
-def getNumIndentedSpaces(line):
-	lenOfLine = len(line)
-	for index in range(0, lenOfLine):
-		if (line[index] != space):
-			break
 
-	#print(line)
-
-	#if (index == 0):
-		#sys.exit("Error:  one of the lines in the verify() function is not preceded by a space.")
-
-	return index
-
-def getLinesFromSourceCode(lines, startLine, endLine, indentationList):
-	retLines = []
-	lineCounter = 1
-
-	for line in lines:
-		if (lineCounter > endLine):
-			return retLines
-		if (lineCounter >= startLine):
-			numIndentedSpaces = getNumIndentedSpaces(line)
-			tempLine = line.lstrip().rstrip()
-			if ( (not tempLine.startswith(printPrefix)) and (not tempLine.startswith(commentPrefix)) ):
-				#print(tempLine)
-				retLines.append(tempLine)
-				indentationList.append(numIndentedSpaces)
-		lineCounter += 1
 
 def ensureSpacesBtwnTokens(lineOfCode):
 	if (lineOfCode == '\n'):
@@ -2126,9 +2099,9 @@ def addImportLines():
 		sys.exit("AutoBatch_CodeGen->addImportLines:  problem with value returned from getImportLines.")
 
 	for index in range(0, len(importLines)):
-		batchVerFile.write(importLines[index])
-		individualVerFile.write(importLines[index])
-		verifySigsFile.write(importLines[index])
+		batchVerFile.write(importLines[index].lstrip().rstrip() + "\n")
+		individualVerFile.write(importLines[index].lstrip().rstrip() + "\n")
+		verifySigsFile.write(importLines[index].lstrip().rstrip() + "\n")
 
 def addTemplateLines():
 	global batchVerFile, individualVerFile
@@ -2154,6 +2127,35 @@ def addTemplateLines():
 	indOutputString += "\t" + con.numSignatures + " = len(verifyArgsDict)\n\n"
 	indOutputString += "\tincorrectIndices = []\n"
 
+	individualVerFile.write(indOutputString)
+
+def addPrerequisites():
+	global batchVerFile, individualVerFile
+
+	prereqLineNos = getLineNosOfValueType(varAssignments, con.lambdaValue)
+	if (prereqLineNos == None):
+		return
+
+	if ( (type(prereqLineNos).__name__ != con.listTypePython) or (len(prereqLineNos) == 0) ):
+		sys.exit("AutoBatch_CodeGen->addPrerequisites:  problem with value returned from getLineNosOfValueType.")
+
+	prereqLines = getLinesFromSourceCode(pythonCodeLines, prereqLineNos)
+	if ( (prereqLines == None) or (type(prereqLines).__name__ != con.listTypePython) or (len(prereqLines) == 0) ):
+		sys.exit("AutoBatch_CodeGen->addPrerequisites:  problem with value returned from getLinesFromSourceCode.")
+
+	batchOutputString = ""
+	indOutputString = ""
+
+	for line in prereqLines:
+		if ( (line == None) or (type(line).__name__ != con.strTypePython) or (len(line) == 0) ):
+			sys.exit("AutoBatch_CodeGen->addPrerequisites:  problem with one of the lines returned from getLinesFromSourceCode.")
+
+		batchOutputString += "\t" + line.lstrip().rstrip()
+		batchOutputString += "\n"
+		indOutputString += "\t" + line.lstrip().rstrip()
+		indOutputString += "\n"
+
+	batchVerFile.write(batchOutputString)
 	individualVerFile.write(indOutputString)
 
 def main():
@@ -2206,6 +2208,8 @@ def main():
 	varAssignments = getVarAssignments(pythonCodeNode, functionNames, myASTParser)
 	if (varAssignments == None):
 		sys.exit("AutoBatch_CodeGen->main:  getVarAssignments returned None when trying to get the variable assignments.")
+
+	addPrerequisites()
 
 	try:
 		batchVerFile.close()

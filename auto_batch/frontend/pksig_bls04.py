@@ -21,6 +21,7 @@ class IBSig():
     def __init__(self, groupObj):
         global group
         group = groupObj
+        lam_func = lambda i,a,b: a[i] ** b[i]
         
     def dump(self, obj):
         ser_a = serializeDict(obj, group)

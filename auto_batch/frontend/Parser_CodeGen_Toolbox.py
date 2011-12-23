@@ -2,6 +2,66 @@ import con, sys
 from ASTParser import *
 from ASTVarVisitor import *
 
+def getNumIndentedSpaces(line):
+	if ( (line == None) or (type(line).__name__ != con.strTypePython) or (len(line) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getNumIndentedSpaces:  problem with line parameter passed in.")
+
+	lenOfLine = len(line)
+	for index in range(0, lenOfLine):
+		if (line[index] != con.space):
+			break
+
+	return index
+
+def getLinesFromSourceCodeWithinRange(lines, startLine, endLine, indentationList):
+	if ( (lines == None) or (type(lines).__name__ != con.listTypePython) or (len(lines) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getLinesFromSourceCodeWithinRange:  problem with lines parameter passed in.")
+
+	if ( (startLine == None) or (type(startLine).__name__ != con.intTypePython) or (startLine < 1) ):
+		sys.exit("Parser_CodeGen_Toolbox->getLinesFromSourceCodeWithinRange:  problem with the start line parameter passed in.")
+
+	if ( (endLine == None) or (type(endLine).__name__ != con.intTypePython) or (endLine < 1) ):
+		sys.exit("Parser_CodeGen_Toolbox->getLinesFromSourceCodeWithinRange:  problem with the end line parameter passed in.")
+
+	if ( (indentationList == None) or (type(indentationList).__name__ != con.listTypePython) ):
+		sys.exit("Parser_CodeGen_Toolbox->getLinesFromSourceCodeWithinRange:  problem with the indentation list passed in.")
+
+	retLines = []
+	lineCounter = 1
+
+	for line in lines:
+		if (lineCounter > endLine):
+			if (len(retLines) == 0):
+				return None
+			return retLines
+		if (lineCounter >= startLine):
+			numIndentedSpaces = getNumIndentedSpaces(line)
+			tempLine = line.lstrip().rstrip()
+			retLines.append(tempLine)
+			indentationList.append(numIndentedSpaces)
+		lineCounter += 1
+
+def getLineNosOfValueType(varAssignments, valueType):
+	if ( (varAssignments == None) or (type(varAssignments).__name__ != con.dictTypePython) or (len(varAssignments) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getLineNosOfValueType:  problem with the variable assignments dictionary passed in.")
+
+	if ( (valueType == None) or (type(valueType).__name__ != con.strTypePython) or (len(valueType) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getLineNosOfValueType:  problem with the value type passed in.")
+
+	lineNos = []
+
+	for funcName in varAssignments:
+		funcAssignments = varAssignments[funcName]
+		for assignment in funcAssignments:
+			value = assignment.getValue()
+			if (type(value).__name__ == valueType):
+				lineNos.append(value.getLineNo())
+
+	if (len(lineNos) == 0):
+		return None
+
+	return lineNos
+
 def getFunctionArgMappings(functionNames, functionArgNames, myASTParser):
 	if ( (functionNames == None) or (type(functionNames).__name__ != con.dictTypePython) or (len(functionNames) == 0) ):
 		sys.exit("AutoBatch_Parser->getFunctionArgMappings:  problem with the function names passed in.")
