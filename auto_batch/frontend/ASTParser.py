@@ -54,6 +54,22 @@ def getValueOfLastLine(dict):
 	lenKeys = len(keys)
 	return dict[keys[lenKeys-1]]
 
+class ASTImportNodeLineNoVisitor(ast.NodeVisitor):
+	def __init__(self):
+		self.lineNos = []
+
+	def visit_ImportFrom(self, node):
+		self.lineNos.append(node.lineno)
+
+	def visit_Import(self, node):
+		self.lineNos.append(node.lineno)
+
+	def getLineNos(self):
+		if (len(self.lineNos) == 0):
+			return None
+
+		return self.lineNos
+
 class ASTReturnNodeVisitor(ast.NodeVisitor):
 	def __init__(self):
 		self.returnNodeList = []
@@ -303,6 +319,14 @@ class ASTParser:
 			sys.exit("ASTParser->getASTNodeFromFile:  error when running \"ast.parse\" on the source-code lines of the file name passed in.")
 
 		return returnNode
+
+	def getImportLineNos(self, rootNode):
+		if (rootNode == None):
+			sys.exit("ASTParser->getImportLineNos:  node passed in is of None type.")
+
+		importLineNoObj = ASTImportNodeLineNoVisitor()
+		importLineNoObj.visit(rootNode)
+		return importLineNoObj.getLineNos()
 
 	def getPrimaryNameOfNameObject(self, nameObject):
 		return getPrimaryNameOfNameObject(nameObject)

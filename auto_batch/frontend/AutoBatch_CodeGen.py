@@ -1,4 +1,12 @@
 import copy, os, sys
+from ASTParser import *
+from Parser_CodeGen_Toolbox import *
+
+batchVerFile = None
+individualVerFile = None
+pythonCodeLines = None
+pythonCodeNode = None
+verifySigsFile = None
 
 '''
 class ImportFromVisitor(ast.NodeVisitor):
@@ -279,12 +287,6 @@ def getVerifyEqNode(verifyFuncNode):
 	astEqVisitor = ASTEqCompareVisitor()
 	astEqVisitor.visit(verifyFuncNode)
 	return astEqVisitor.getLastEqOpFromVerify()
-
-def getRootASTNode(lines):
-	code = ""
-	for line in lines:
-		code += line
-	return ast.parse(code)
 
 def getVerifyFuncNode(astNode):
 	astVerifyVisitor = ASTVerifyFuncVisitor()
@@ -2112,38 +2114,63 @@ def isTopLayerLoopOverNumSignatures(dotProdLoopOrder):
 	return True
 '''
 
+def addImportLines():
+	importLines = getImportLines(pythonCodeNode, pythonCodeLines)
+	if (importLines == None):
+		return
+
+	if ( (type(importLines).__name__ != con.listTypePython) or (len(importLines) == 0) ):
+		sys.exit("AutoBatch_CodeGen->addImportLines:  problem with value returned from getImportLines.")
+
+	for index in range(0, len(importLines)):
+		batchVerFile.write(importLines[index])
+		individualVerFile.write(importLines[index])
+		verifySigsFile.write(importLines[index])
+
 def main():
-	print("hello")
-
-'''
 	if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
-		sys.exit("\nUsage:  python Code_Generator.py \n [individual verification output filename] \n [batch verification output filename] \n [filename of the output from the batchverify.py script] \n [filename of Python code for signature scheme] \n [filename of pickled Python dictionary with verify function arguments] \n [filename of .bv file that will be input for the batch verifier] \n")
+		sys.exit("\nUsage:  python " + sys.argv[0] + "\n \
+			[input path and filename of Python code for signature scheme] \n \
+			[input path and filename of output file from batcher] \n \
+			[input path and filename of pickled Python dictionary with verify function arguments] \n \
+			[output path and filename of individual verification Python module] \n \
+			[output path and filename of batch verification Python module] \n \
+			[output path and filename of divide-and-conquer Python module] \n")
 
-	individualVerArg = sys.argv[1]
-	batchVerArg = sys.argv[2]
-	batchVerifierOutputFile = sys.argv[3]
-	pythonCodeArg = sys.argv[4]
-	verifyParamFilesArg = sys.argv[5]
-	verifySigsFile = sys.argv[6]
+	try:
+		pythonCodeArg = sys.argv[1]
+		batchVerifierOutputFile = sys.argv[2]
+		verifyParamFilesArg = sys.argv[3]
+		individualVerArg = sys.argv[4]
+		batchVerArg = sys.argv[5]
+		verifySigsArg = sys.argv[6]
+	except:
+		sys.exit("AutoBatch_CodeGen->main:  problem obtaining command-line arguments using sys.argv.")
 
-	#os.system("cp " + individualTemplate + " " + individualVerArg)
-	#os.system("cp " + batchTemplate + " " + batchVerArg)
+	try:
 
-	individualVerFile = open(individualVerArg, 'w')
-	batchVerFile = open(batchVerArg, 'w')
+		pythonCodeLines = open(pythonCodeArg, 'r').readlines()
+		individualVerFile = open(individualVerArg, 'w')
+		batchVerFile = open(batchVerArg, 'w')
+		verifySigsFile = open(verifySigsArg, 'w')
+	except:
+		sys.exit("AutoBatch_CodeGen->main:  problem opening input/output files passed in as command-line arguments.")
 
-	pythonCodeLines = open(pythonCodeArg, 'r').readlines()
+	myASTParser = ASTParser()
+	pythonCodeNode = myASTParser.getASTNodeFromFile(pythonCodeArg)
+	if (pythonCodeNode == None):
+		sys.exit("AutoBatch_CodeGen->main:  root node obtained from ASTParser->getASTNodeFromFile is of None type.")
 
-	pythonCodeNode = getRootASTNode(pythonCodeLines)
-	
-	
-	importFromLines = getImportFromLines(pythonCodeNode, pythonCodeLines)
-	for importFromLine in importFromLines:			
-		#individualOutputString += "\t" + str(importFromLine) + "\n"
-		individualVerFile.write(importFromLine)
-		individualVerFile.write("\n")
-		batchVerFile.write(importFromLine)
-		batchVerFile.write("\n")
+	addImportLines()
+
+	try:
+		batchVerFile.close()
+		individualVerFile.close()
+		verifySigsFile.close()
+	except:
+		sys.exit("AutoBatch_CodeGen->main:  problem attempting to run close() on the output files of this program.")
+'''
+
 
 	individualTemplateLines = open(individualTemplate, 'r').readlines()
 	batchTemplateLines = open(batchTemplate, 'r').readlines()

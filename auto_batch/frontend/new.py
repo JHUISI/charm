@@ -1,1 +1,2 @@
-x = group.random()
+from toolbox.bitstring import Bytes
+import hashlib
