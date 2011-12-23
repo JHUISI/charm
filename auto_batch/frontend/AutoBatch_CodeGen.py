@@ -2115,6 +2115,8 @@ def isTopLayerLoopOverNumSignatures(dotProdLoopOrder):
 '''
 
 def addImportLines():
+	global batchVerFile, individualVerFile, verifySigsFile
+
 	importLines = getImportLines(pythonCodeNode, pythonCodeLines)
 	if (importLines == None):
 		return
@@ -2126,6 +2128,32 @@ def addImportLines():
 		batchVerFile.write(importLines[index])
 		individualVerFile.write(importLines[index])
 		verifySigsFile.write(importLines[index])
+
+def addTemplateLines():
+	global batchVerFile, individualVerFile
+
+	batchOutputString = ""
+	batchOutputString += "from toolbox.pairinggroup import *\n"
+	batchOutputString += "from verifySigs import verifySigsRecursive\n\n"
+	batchOutputString += "bodyKey = \'Body\'\n\n"
+	batchOutputString += "def prng_bits(group, bits=80):\n"
+	batchOutputString += "\treturn group.init(ZR, randomBits(bits))\n\n"
+	batchOutputString += "def run_Batch(verifyArgsDict, group, verifyFuncArgs):\n"
+	batchOutputString += "\t#Group membership checks\n\n"
+	batchOutputString += "\t" + con.numSignatures + " = len(verifyArgsDict)\n\n"
+	batchOutputString += "\tfor sigIndex in range(0, " + con.numSignatures + "):\n"
+	batchOutputString += "\t\tdeltaz[sigIndex] = prng_bits(group, 80)\n\n"
+	batchOutputString += "\tincorrectIndices = []\n"
+
+	batchVerFile.write(batchOutputString)
+
+	indOutputString = ""
+	indOutputString += "\nbodyKey = \'Body\'\n\n"
+	indOutputString += "def run_Ind(verifyArgsDict, group, verifyFuncArgs):\n"
+	indOutputString += "\t" + con.numSignatures + " = len(verifyArgsDict)\n\n"
+	indOutputString += "\tincorrectIndices = []\n"
+
+	individualVerFile.write(indOutputString)
 
 def main():
 	if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
@@ -2147,6 +2175,8 @@ def main():
 	except:
 		sys.exit("AutoBatch_CodeGen->main:  problem obtaining command-line arguments using sys.argv.")
 
+	global pythonCodeLines, individualVerFile, batchVerFile, verifySigsFile, pythonCodeNode
+
 	try:
 
 		pythonCodeLines = open(pythonCodeArg, 'r').readlines()
@@ -2162,6 +2192,7 @@ def main():
 		sys.exit("AutoBatch_CodeGen->main:  root node obtained from ASTParser->getASTNodeFromFile is of None type.")
 
 	addImportLines()
+	addTemplateLines()
 
 	try:
 		batchVerFile.close()
@@ -2172,14 +2203,6 @@ def main():
 '''
 
 
-	individualTemplateLines = open(individualTemplate, 'r').readlines()
-	batchTemplateLines = open(batchTemplate, 'r').readlines()
-
-	for line in individualTemplateLines:
-		individualVerFile.write(line)
-		
-	for line in batchTemplateLines:
-		batchVerFile.write(line)
 	
 	verifyFuncNode = getVerifyFuncNode(pythonCodeNode)
 	verifyFuncArgs = getVerifyFuncArgs(verifyFuncNode)
