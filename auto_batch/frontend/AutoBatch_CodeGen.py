@@ -6,6 +6,7 @@ batchVerFile = None
 individualVerFile = None
 pythonCodeLines = None
 pythonCodeNode = None
+varAssignments = None
 verifySigsFile = None
 
 '''
@@ -2175,7 +2176,7 @@ def main():
 	except:
 		sys.exit("AutoBatch_CodeGen->main:  problem obtaining command-line arguments using sys.argv.")
 
-	global pythonCodeLines, individualVerFile, batchVerFile, verifySigsFile, pythonCodeNode
+	global pythonCodeLines, individualVerFile, batchVerFile, verifySigsFile, pythonCodeNode, varAssignments
 
 	try:
 
@@ -2194,6 +2195,18 @@ def main():
 	addImportLines()
 	addTemplateLines()
 
+	functionNames = myASTParser.getFunctionNames(pythonCodeNode)
+	if (functionNames == None):
+		sys.exit("AutoBatch_CodeGen->main:  function names obtained from ASTParser->getFunctionNames is of None type.")
+
+	for funcName in con.funcNamesNotToTest:
+		if (funcName in functionNames):
+			del functionNames[funcName]
+
+	varAssignments = getVarAssignments(pythonCodeNode, functionNames, myASTParser)
+	if (varAssignments == None):
+		sys.exit("AutoBatch_CodeGen->main:  getVarAssignments returned None when trying to get the variable assignments.")
+
 	try:
 		batchVerFile.close()
 		individualVerFile.close()
@@ -2202,29 +2215,12 @@ def main():
 		sys.exit("AutoBatch_CodeGen->main:  problem attempting to run close() on the output files of this program.")
 '''
 
-
-	
 	verifyFuncNode = getVerifyFuncNode(pythonCodeNode)
 	verifyFuncArgs = getVerifyFuncArgs(verifyFuncNode)
-	#print(verifyFuncArgs)
-
 	verifyEqNode = getVerifyEqNode(verifyFuncNode)
-	if (verifyEqNode == 0):
-		sys.exit("Could not locate the verify equation within the \"verify\" function")
-
-	#buildMapOfControlFlow(pythonCodeLines, verifyFuncNode.lineno, (verifyEqNode.lineno - 1))
-
 	lastLineVisitor = GetLastLineOfFunction()
 	lastLineVisitor.visit(verifyFuncNode)
 	lastLineOfVerifyFunc = lastLineVisitor.getLastLine()
-	#print(lastLineOfVerifyFunc)
-
-	individualOutputString = ""
-	batchOutputString = ""
-
-	individualOutputString += "\n"
-	batchOutputString += "\n"
-
 	indentationList = []
 
 	verifyFuncLine = getLinesFromSourceCode(pythonCodeLines, verifyFuncNode.lineno, verifyFuncNode.lineno, indentationList)	
