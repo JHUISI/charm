@@ -1,5 +1,6 @@
 from batchlang import *
 from batchparser import *
+from batchoptimizer import *
 import random
 
 try:
@@ -20,6 +21,9 @@ def fact(n):
     else:
         return n * fact(n - 1)
 
+def score(eq):
+    pass
+
 # Class for pre-processing SDL to determine the order in which the optimization techniques
 # are applied to the batch equation.
 class BatchOrder:
@@ -30,6 +34,7 @@ class BatchOrder:
         self.verify = equation
         self.debug  = False
         self.techMap = { 2:Technique2, 3:Technique3, 4:Technique4 }
+        self.techMap2 = { 2:Technique2, 3:Technique3, 4:Technique4, 5:DotProdInstanceFinder, 6:PairInstanceFinder }
 
 
     def testSequence(self, combo):
@@ -48,6 +53,7 @@ class BatchOrder:
     def strategy(self, option=None):
         return self.BasicStrategy()
     
+    # Try all permutations of techniques (does not repeat applying technique)
     def BasicStrategy(self):
         techniques = [2, 3, 4]
         count = fact(len(techniques))
@@ -83,6 +89,16 @@ class BatchOrder:
         print("Technique order: ", final_list[index], ": avg batch time: ", batch_time[index])
         return final_list[index]
 
-    def BFStrategy(self):
-        techniques = [2, 3, 4, 5.0, 5.1]
+    # recognized patterns of techniques that lead to the optimized batch algorithm 
+    # this could load from a db with each pattern that is discovered in the past?
+    def RPStrategy(self):
+        # db = loadDB() # list of orderings 
         pass
+    
+    def BFStrategy(self):
+        techniques = [2, 3, 4, 5, 6]
+        # starting point: choose a tech
+        # 
+        pass
+    
+    
