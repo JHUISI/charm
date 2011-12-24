@@ -54,6 +54,24 @@ def getValueOfLastLine(dict):
 	lenKeys = len(keys)
 	return dict[keys[lenKeys-1]]
 
+class GetLastLineOfFunction(ast.NodeVisitor):
+	def __init__(self):
+		self.lastLine = 0
+
+	def generic_visit(self, node):
+		try:
+			if (node.lineno > self.lastLine):
+				self.lastLine = node.lineno
+		except:
+			pass
+		ast.NodeVisitor.generic_visit(self, node)
+
+	def getLastLine(self):
+		if (self.lastLine == 0):
+			return None
+
+		return self.lastLine
+
 class ASTImportNodeLineNoVisitor(ast.NodeVisitor):
 	def __init__(self):
 		self.lineNos = []
@@ -582,12 +600,21 @@ class ASTParser:
 		if ( (argName == None) or (len(argName) == 0) or (type(argName) is not str) or (lambdaArgs == None) or (len(lambdaArgs) == 0) or (type(lambdaArgs) is not list) ):
 			sys.exit("ASTParser->getLambdaArgOrder:  problem with inputs to function.")
 
-		try:
-			argOrder = lambdaArgs.index(argName)
-		except:
-			sys.exit("ASTParser->getLambdaArgOrder:  the argument name passed in is not in the argument list passed in.")
+		lenLambdaArgs = len(lambdaArgs)
 
-		return argOrder
+		for index in range(0, lenLambdaArgs):
+			lambdaArgInLoop = lambdaArgs[index]
+			if ( (lambdaArgInLoop == None) or (type(lambdaArgInLoop).__name__ != con.stringName) ):
+				sys.exit("ASTParser->getLambdaArgOrder:  problem with one of the Lambda arguments.")
+
+			lambdaArgNameAsStr = lambdaArgInLoop.getStringVarName()
+			if ( (lambdaArgNameAsStr == None) or (type(lambdaArgNameAsStr).__name__ != con.strTypePython) or (len(lambdaArgNameAsStr) == 0) ):
+				sys.exit("ASTParser->getLambdaArgOrder:  problem with value returned from getStringVarName() on one of the Lambda arguments.")
+
+			if (argName == lambdaArgNameAsStr):
+				return index
+
+		sys.exit("ASTParser->getLambdaArgOrder:  could not find a match for " + argName + " in the Lambda argument names.")
 
 	def lambdaExpressionRecursion(self, node, lambdaArgs):
 		if ( (node == None) or (lambdaArgs == None) or (len(lambdaArgs) == 0) ):

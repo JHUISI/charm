@@ -2,6 +2,195 @@ import con, sys
 from ASTParser import *
 from ASTVarVisitor import *
 
+def writeFunctionFromCodeToString(sourceCodeLines, startLineNo, endLineNo, extraTabsPerLine, removeSelf=False):
+	if ( (sourceCodeLines == None) or (type(sourceCodeLines).__name__ != con.listTypePython) or (len(sourceCodeLines) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->writeFunctionFromCodeToString:  problem with source code lines parameter passed in.")
+
+	if ( (startLineNo == None) or (type(startLineNo).__name__ != con.intTypePython) or (startLineNo < 1) ):
+		sys.exit("Parser_CodeGen_Toolbox->writeFunctionFromCodeToString:  problem with start line number parameter passed in.")
+
+	if ( (endLineNo == None) or (type(endLineNo).__name__ != con.intTypePython) or (endLineNo < startLineNo) ):
+		sys.exit("Parser_CodeGen_Toolbox->writeFunctionFromCodeToString:  problem with end line number parameter passed in.")
+
+	if ( (extraTabsPerLine == None) or (type(extraTabsPerLine).__name__ != con.intTypePython) or (extraTabsPerLine < 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->writeFunctionFromCodeToString:  problem with extra tabs per line parameter passed in.")
+
+	indentationList = []
+	extractedLines = getLinesFromSourceCodeWithinRange(sourceCodeLines, startLineNo, endLineNo, indentationList)
+	if ( (extractedLines == None) or (type(extractedLines).__name__ != con.listTypePython) or (len(extractedLines) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->writeFunctionFromCodeToString:  problem with value returned from getLinesFromSourceCodeWithinRange.")
+
+	outputString = ""
+
+	numSpacesFirstLine = indentationList[0]
+	if ( (numSpacesFirstLine == None) or (type(numSpacesFirstLine).__name__ != con.intTypePython) or (numSpacesFirstLine < 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->writeFunctionFromCodeToString:  problem with value returned from getNumIndentedSpaces on first line.")
+
+	numTabsFirstLine = determineNumTabsFromSpaces(numSpacesFirstLine)
+	if ( (numTabsFirstLine == None) or (type(numTabsFirstLine).__name__ != con.intTypePython) or (numTabsFirstLine < 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->writeFunctionFromCodeToString:  problem with value returned from determineNumTabsFromSpaces on first line.")
+
+	outputString += getStringOfTabs(extraTabsPerLine)
+	firstLine = extractedLines[0].lstrip().rstrip()
+	if (removeSelf == True):
+		firstLine = firstLine.replace(con.selfFuncArgString, "")
+
+	outputString += firstLine
+	outputString += "\n"
+
+	lenExtractedLines = len(extractedLines)
+
+	for index in range(1, lenExtractedLines):
+		numSpaces = indentationList[index]
+		numTabs = determineNumTabsFromSpaces(numSpaces)
+		numTabsForThisLine = numTabs - numTabsFirstLine
+		line = extractedLines[index].lstrip().rstrip()
+		outputString += getStringOfTabs(extraTabsPerLine + numTabsForThisLine)
+		outputString += line
+		outputString += "\n"
+
+	outputString += "\n"
+	return outputString
+
+def getStringOfTabs(numTabs):
+	if ( (numTabs == None) or (type(numTabs).__name__ != con.intTypePython) or (numTabs < 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getStringOfTabs:  problem with the number of tabs passed in.")
+
+	outputString = ""
+
+	for tab in range(0, numTabs):
+		outputString += "\t"
+
+	return outputString
+
+def determineNumTabsFromSpaces(numSpaces):
+	if ( (numSpaces == None) or (type(numSpaces).__name__ != con.intTypePython) or (numSpaces < 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->determineNumTabsFromSpaces:  problem with number of spaces parameter passed in.")
+
+	if ( (numSpaces % con.numSpacesPerTab) != 0):
+		sys.exit("Parser_CodeGen_Toolbox->determineNumTabsFromSpaces:  number of spaces passed in is not a multiple of the number of spaces per tab (" + con.numSpacesPerTab + ")")
+
+	return (int(numSpaces / con.numSpacesPerTab))
+
+def getFirstLastLineNosOfFuncList(funcList, rootNode):
+	if ( (funcList == None) or (type(funcList).__name__ != con.listTypePython) or (len(funcList) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getFirstLastLineNosOfFuncList:  problem with function list parameter passed in.")
+
+	if (rootNode == None):
+		sys.exit("Parser_CodeGen_Toolbox->getFirstLastLineNosOfFuncList:  root node passed in is of None type.")
+
+	firstLastLinePairs = []
+
+	for funcName in funcList:
+		if ( (funcName == None) or (type(funcName).__name__ != con.strTypePython) or (len(funcName) == 0) ):
+			sys.exit("Parser_CodeGen_Toolbox->getFirstLastLineNosOfFuncList:  problem with one of the function names in the function list parameter passed in.")
+
+		currentFirstLastLinePair = getFuncFirstLastLineNos(funcName, rootNode)
+
+		firstLastLinePairs.append(currentFirstLastLinePair)
+
+	if (len(firstLastLinePairs) == 0):
+		sys.exit("Parser_CodeGen_Toolbox->getFirstLastLineNosOfFuncList:  could not extract any first/last line number pairs.")
+
+	return firstLastLinePairs
+
+def getFuncFirstLastLineNos(funcName, rootNode):
+	if ( (funcName == None) or (type(funcName).__name__ != con.strTypePython) or (len(funcName) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getFuncFirstLastLineNos:  problem with function name parameter passed in.")
+
+	if (rootNode == None):
+		sys.exit("Parser_CodeGen_Toolbox->getFuncFirstLastLineNos:  root node passed in is of None type.")
+
+	myASTParser = ASTParser()
+	if (myASTParser == None):
+		sys.exit("Parser_CodeGen_Toolbox->getFuncFirstLastLineNos:  could not obtain ASTParser object.")
+
+	funcNodeList = myASTParser.getFunctionNode(rootNode, funcName)
+	if (funcNodeList == None):
+		sys.exit("Parser_CodeGen_Toolbox->getFuncFirstLastLineNos:  could not locate a function with name " + funcName)
+	if (len(funcNodeList) > 1):
+		sys.exit("Parser_CodeGen_Toolbox->getFuncFirstLastLineNos:  located more than one function with the name " + funcName)
+
+	funcNode = funcNodeList[0]
+
+	firstLine = myASTParser.getLineNumberOfNode(funcNode)
+	if ( (firstLine == None) or (type(firstLine).__name__ != con.intTypePython) or (firstLine < 1) ):
+		sys.exit("Parser_CodeGen_Toolbox->getFuncFirstLastLineNos:  problem with first line number returned from ASTParser->getLineNumberOfNode.")
+
+	lastLineVisitor = GetLastLineOfFunction()
+	lastLineVisitor.visit(funcNode)
+	lastLine = lastLineVisitor.getLastLine()
+
+	if ( (lastLine == None) or (type(lastLine).__name__ != con.intTypePython) or (lastLine < firstLine) ):
+		sys.exit("Parser_CodeGen_Toolbox->getFuncFirstLastLineNos:  problem with last line returned from GetLastLineOfFunction->getLastLine.")
+
+	return (firstLine, lastLine)
+
+def buildCallListOfFunc(functionArgMappings, funcName, callList, funcsVisitedSoFar):
+	if ( (functionArgMappings == None) or (type(functionArgMappings).__name__ != con.dictTypePython) or (len(functionArgMappings) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->buildCallListOfFunc:  problem with function argument mappings parameter passed in.")
+
+	if ( (funcName == None) or (type(funcName).__name__ != con.strTypePython) or (funcName not in functionArgMappings) ):
+		sys.exit("Parser_CodeGen_Toolbox->buildCallListOfFunc:  problem with the function name parameter passed in.")
+
+	if ( (callList == None) or (type(callList).__name__ != con.listTypePython) ):
+		sys.exit("Parser_CodeGen_Toolbox->buildCallListOfFunc:  problem with the call list parameter passed in.")
+
+	if ( (funcsVisitedSoFar == None) or (type(funcsVisitedSoFar).__name__ != con.listTypePython) ):
+		sys.exit("Parser_CodeGen_Toolbox->buildCallListOfFunc:  problem with the list of functions visited so far.")
+
+	if (funcName in funcsVisitedSoFar):
+		return
+
+	funcsCalledWithinFunc = functionArgMappings[funcName]
+	if ( (funcsCalledWithinFunc == None) or (type(funcsCalledWithinFunc).__name__ != con.listTypePython) ):
+		sys.exit("Parser_CodeGen_Toolbox->buildCallListOfFunc:  problem with function list extracted from function argument mappings for function " + funcName)
+
+	funcsVisitedSoFar.append(funcName)
+
+	if (len(funcsCalledWithinFunc) == 0):
+		return
+
+	for funcCalledWithin in funcsCalledWithinFunc:
+		if ( (funcCalledWithin == None) or (type(funcCalledWithin).__name__ != con.functionArgMap) ):
+			sys.exit("Parser_CodeGen_Toolbox->buildCallListOfFunc:  problem with function argument map extracted from list of function " + funcName)
+
+		funcCalledWithinName = funcCalledWithin.getDestFuncName().getStringVarName()
+		if ( (funcCalledWithinName == None) or (type(funcCalledWithinName).__name__ != con.strTypePython) or (len(funcCalledWithinName) == 0) ):
+			sys.exit("Parser_CodeGen_Toolbox->buildCallListOfFunc:  problem with the name of one of the functions called from within " + funcName)
+
+		if funcCalledWithinName not in callList:
+			callList.append(funcCalledWithinName)
+
+		buildCallListOfFunc(functionArgMappings, funcCalledWithinName, callList, funcsVisitedSoFar)
+
+def isLineOnlyWhiteSpace(line):
+	if ( (line == None) or (type(line).__name__ != con.strTypePython) ):
+		sys.exit("Parser_CodeGen_Toolbox->isLineOnlyWhiteSpace:  problem with line parameter passed in.")
+
+	if (len(line) == 0):
+		return True
+
+	line = line.lstrip().rstrip()
+	if (line == ""):
+		return True
+	return False
+
+def isPreviousCharAlpha(line, currIndex):
+	if ( (line == None) or (type(line).__name__ != con.strTypePython) or (len(line) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->isPreviousCharAlpha:  problem with line parameter passed in.")
+
+	if ( (currIndex == None) or (type(currIndex).__name__ != con.intTypePython) or (currIndex < 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->isPreviousCharAlpha:  problem with current index parameter passed in.")
+
+	if (currIndex == 0):
+		return False
+	
+	if (line[currIndex - 1].isalpha() == True):
+		return True
+	
+	return False
+
 def getNumIndentedSpaces(line):
 	if ( (line == None) or (type(line).__name__ != con.strTypePython) or (len(line) == 0) ):
 		sys.exit("Parser_CodeGen_Toolbox->getNumIndentedSpaces:  problem with line parameter passed in.")
@@ -20,7 +209,7 @@ def getLinesFromSourceCodeWithinRange(lines, startLine, endLine, indentationList
 	if ( (startLine == None) or (type(startLine).__name__ != con.intTypePython) or (startLine < 1) ):
 		sys.exit("Parser_CodeGen_Toolbox->getLinesFromSourceCodeWithinRange:  problem with the start line parameter passed in.")
 
-	if ( (endLine == None) or (type(endLine).__name__ != con.intTypePython) or (endLine < 1) ):
+	if ( (endLine == None) or (type(endLine).__name__ != con.intTypePython) or (endLine < startLine) ):
 		sys.exit("Parser_CodeGen_Toolbox->getLinesFromSourceCodeWithinRange:  problem with the end line parameter passed in.")
 
 	if ( (indentationList == None) or (type(indentationList).__name__ != con.listTypePython) ):
@@ -64,37 +253,37 @@ def getLineNosOfValueType(varAssignments, valueType):
 
 def getFunctionArgMappings(functionNames, functionArgNames, myASTParser):
 	if ( (functionNames == None) or (type(functionNames).__name__ != con.dictTypePython) or (len(functionNames) == 0) ):
-		sys.exit("AutoBatch_Parser->getFunctionArgMappings:  problem with the function names passed in.")
+		sys.exit("Parser_CodeGen_Toolbox->getFunctionArgMappings:  problem with the function names passed in.")
 
 	if ( (functionArgNames == None) or (type(functionArgNames).__name__ != con.dictTypePython) or (len(functionArgNames) == 0) ):
-		sys.exit("AutoBatch_Parser->getFunctionArgMappings:  problem with the function argument names passed in.")
+		sys.exit("Parser_CodeGen_Toolbox->getFunctionArgMappings:  problem with the function argument names passed in.")
 
 	if (myASTParser == None):
-		sys.exit("AutoBatch_Parser->getFunctionArgMappings:  myASTParser passed in is of None type.")
+		sys.exit("Parser_CodeGen_Toolbox->getFunctionArgMappings:  myASTParser passed in is of None type.")
 
 	functionArgMappings = {}
 
 	for funcName in functionNames:
 		funcArgMapList = myASTParser.getFunctionArgMappings(functionNames[funcName], functionArgNames)
 		if ( (funcArgMapList == None) or (type(funcArgMapList).__name__ != con.listTypePython) ):
-			sys.exit("AutoBatch_Parser->getFunctionArgMappings:  problems with value returned from myASTParser->getFunctionArgMappings.")
+			sys.exit("Parser_CodeGen_Toolbox->getFunctionArgMappings:  problems with value returned from myASTParser->getFunctionArgMappings.")
 
 		functionArgMappings[funcName] = funcArgMapList
 
 	if (len(functionArgMappings) == 0):
-		sys.exit("AutoBatch_Parser->getFunctionArgMappings:  could not obtain any function argument mappings at all.")
+		sys.exit("Parser_CodeGen_Toolbox->getFunctionArgMappings:  could not obtain any function argument mappings at all.")
 
 	return functionArgMappings
 
 def getVarAssignments(rootNode, functionNames, myASTParser):
 	if (rootNode == None):
-		sys.exit("AutoBatch_Parser->getVarAssignments:  root node passed in is of None type.")
+		sys.exit("Parser_CodeGen_Toolbox->getVarAssignments:  root node passed in is of None type.")
 
 	if ( (functionNames == None) or (type(functionNames).__name__ != con.dictTypePython) or (len(functionNames) == 0) ):
-		sys.exit("AutoBatch_Parser->getVarAssignments:  problem with the function names passed in.")
+		sys.exit("Parser_CodeGen_Toolbox->getVarAssignments:  problem with the function names passed in.")
 
 	if (myASTParser == None):
-		sys.exit("AutoBatch_Parser->getVarAssignments:  myASTParser passed in is of None type.")
+		sys.exit("Parser_CodeGen_Toolbox->getVarAssignments:  myASTParser passed in is of None type.")
 
 	varAssignments = {}
 
@@ -105,30 +294,30 @@ def getVarAssignments(rootNode, functionNames, myASTParser):
 		del myVarVisitor
 
 	if (len(varAssignments) == 0):
-		sys.exit("AutoBatch_Parser->getVarAssigments:  could not find any variable assignments.")
+		sys.exit("Parser_CodeGen_Toolbox->getVarAssigments:  could not find any variable assignments.")
 
 	return varAssignments
 
 def getAllVariableNamesFromVerifyEq(verifyEqNode, myASTParser):
 	if ( (verifyEqNode == None) or (myASTParser == None) ):
-		sys.exit("AutoBatch_Parser->getAllVariableNamesFromVerifyEq:  problem with the variables passed in to the function.")
+		sys.exit("Parser_CodeGen_Toolbox->getAllVariableNamesFromVerifyEq:  problem with the variables passed in to the function.")
 
 	varsVerifyEq = myASTParser.getAllVariableNames(verifyEqNode)
 	if ( (varsVerifyEq == None) or (type(varsVerifyEq).__name__ != con.listTypePython) or (len(varsVerifyEq) == 0) ):
-		sys.exit("AutoBatch_Parser->getAllVariableNamesFromVerifyEq:  problem with value returned from ASTParser->getAllVariableNames.")
+		sys.exit("Parser_CodeGen_Toolbox->getAllVariableNamesFromVerifyEq:  problem with value returned from ASTParser->getAllVariableNames.")
 
 	varsVerifyEq = myASTParser.removeVarsFromListWithStringName(varsVerifyEq, con.pair)
 	if ( (varsVerifyEq == None) or (type(varsVerifyEq).__name__ != con.listTypePython) or (len(varsVerifyEq) == 0) ):
-		sys.exit("AutoBatch_Parser->getAllVariableNamesFromVerifyEq:  problem with value returned from ASTParser->removeVarsFromListWithName.")
+		sys.exit("Parser_CodeGen_Toolbox->getAllVariableNamesFromVerifyEq:  problem with value returned from ASTParser->removeVarsFromListWithName.")
 
 	return varsVerifyEq
 
 def getReturnNodes(functionNames, myASTParser):
 	if ( (functionNames == None) or (type(functionNames).__name__ != con.dictTypePython) or (len(functionNames) == 0) ):
-		sys.exit("AutoBatch_Parser->getReturnNodes:  problem with the function names dictionary passed in.")
+		sys.exit("Parser_CodeGen_Toolbox->getReturnNodes:  problem with the function names dictionary passed in.")
 
 	if ( (myASTParser == None) or (type(myASTParser).__name__ != con.ASTParser) ):
-		sys.exit("AutoBatch_Parser->getReturnNodes:  problem with the AST parser passed in.")
+		sys.exit("Parser_CodeGen_Toolbox->getReturnNodes:  problem with the AST parser passed in.")
 
 	returnNodes = {}
 
@@ -136,30 +325,30 @@ def getReturnNodes(functionNames, myASTParser):
 		returnNodes[funcName] = myASTParser.getReturnNodeList(functionNames[funcName])
 
 	if (len(returnNodes) == 0):
-		sys.exit("AutoBatch_Parser->getReturnNodes:  could not obtain any return nodes for the function names/nodes passed in.")
+		sys.exit("Parser_CodeGen_Toolbox->getReturnNodes:  could not obtain any return nodes for the function names/nodes passed in.")
 
 	return returnNodes
 
 def getStringNameIntegerValue(varAssignments, stringNameOfVariable, nameOfFunction):
 	if ( (varAssignments == None) or (type(varAssignments).__name__ != con.dictTypePython) or (len(varAssignments) == 0) ):
-		sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  problem with the variable assignments dictionary passed in.")
+		sys.exit("Parser_CodeGen_Toolbox->getStringNameIntegerValue:  problem with the variable assignments dictionary passed in.")
 
 	if ( (stringNameOfVariable == None) or (type(stringNameOfVariable).__name__ != con.strTypePython) or (len(stringNameOfVariable) == 0) ):
-		sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  problem with the variable name passed in.")
+		sys.exit("Parser_CodeGen_Toolbox->getStringNameIntegerValue:  problem with the variable name passed in.")
 
 	if ( (nameOfFunction == None) or (type(nameOfFunction).__name__ != con.strTypePython) or (len(nameOfFunction) == 0) ):
-		sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  problem with the function name passed in.")
+		sys.exit("Parser_CodeGen_Toolbox->getStringNameIntegerValue:  problem with the function name passed in.")
 
 	if (nameOfFunction not in varAssignments):
-		sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  could not find a function named " + nameOfFunction + " in the varAssignments dictionary passed in.")
+		sys.exit("Parser_CodeGen_Toolbox->getStringNameIntegerValue:  could not find a function named " + nameOfFunction + " in the varAssignments dictionary passed in.")
 
 	functionVariables = varAssignments[nameOfFunction]
 	if ( (functionVariables == None) or (type(functionVariables).__name__ != con.listTypePython) or (len(functionVariables) == 0) ):
-		sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  problem with the list of variables obtained from varAssignments for the " + nameOfFunction + " function.")
+		sys.exit("Parser_CodeGen_Toolbox->getStringNameIntegerValue:  problem with the list of variables obtained from varAssignments for the " + nameOfFunction + " function.")
 
 	for var in functionVariables:
 		if (type(var).__name__ != con.variable):
-			sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  one of the entries in varAssignments is not of type " + con.variable)
+			sys.exit("Parser_CodeGen_Toolbox->getStringNameIntegerValue:  one of the entries in varAssignments is not of type " + con.variable)
 
 		varNameObj = var.getName()
 		if (type(varNameObj).__name__ != con.stringName):
@@ -179,11 +368,13 @@ def getStringNameIntegerValue(varAssignments, stringNameOfVariable, nameOfFuncti
 
 		return varValue
 
-	sys.exit("AutoBatch_Parser->getStringNameIntegerValue:  could not find a variable named " + stringNameOfVariable + " in the " + nameOfFunction + " function.")
+	return None
+
+	#sys.exit("Parser_CodeGen_Toolbox->getStringNameIntegerValue:  could not find a variable named " + stringNameOfVariable + " in the " + nameOfFunction + " function.")
 
 def cleanVerifyEq(origVerifyEq):
 	if (len(origVerifyEq) == 0):
-		sys.exit("AutoBatch_Parser->cleanVerifyEq:  original verification equation passed in is of length zero.")
+		sys.exit("Parser_CodeGen_Toolbox->cleanVerifyEq:  original verification equation passed in is of length zero.")
 
 	cleanVerifyEq = origVerifyEq.lstrip().rstrip().rstrip(':').replace('pair', 'e').replace('**', '^').replace(' = ', ' := ')
 	cleanVerifyEq = removeSubstringFromEnd(cleanVerifyEq, 'if ', con.left)
@@ -193,19 +384,19 @@ def cleanVerifyEq(origVerifyEq):
 
 def removeSubstringFromEnd(fullString, removeSubstring, leftOrRight):
 	if (len(fullString) == 0):
-		sys.exit("AutoBatch_Parser->removeSubstringFromEnd:  full string passed in is of length zero.")
+		sys.exit("Parser_CodeGen_Toolbox->removeSubstringFromEnd:  full string passed in is of length zero.")
 
 	if (len(removeSubstring) == 0):
-		sys.exit("AutoBatch_Parser->removeSubstringFromEnd:  remove substring passed in is of length zero.")
+		sys.exit("Parser_CodeGen_Toolbox->removeSubstringFromEnd:  remove substring passed in is of length zero.")
 
 	if ( (leftOrRight != con.left) and (leftOrRight != con.right) ):
-		sys.exit("AutoBatch_Parser->removeSubstringFromEnd:  leftOrRight parameter passed in was neither con.left nor con.right.")
+		sys.exit("Parser_CodeGen_Toolbox->removeSubstringFromEnd:  leftOrRight parameter passed in was neither con.left nor con.right.")
 
 	lenFullString = len(fullString)
 	lenRemoveSubstring = len(removeSubstring)
 
 	if (lenRemoveSubstring >= lenFullString):
-		sys.exit("AutoBatch_Parser->removeSubstringFromEnd:  length of remove substring is greater than or equal to the length of the full string.")
+		sys.exit("Parser_CodeGen_Toolbox->removeSubstringFromEnd:  length of remove substring is greater than or equal to the length of the full string.")
 
 	if (leftOrRight == con.left):
 		if (fullString.startswith(removeSubstring) == False):

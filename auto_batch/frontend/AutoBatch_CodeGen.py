@@ -3,10 +3,16 @@ from ASTParser import *
 from Parser_CodeGen_Toolbox import *
 
 batchVerFile = None
+callListOfVerifyFuncs = None
+functionArgMappings = None
 individualVerFile = None
+linePairsOfVerifyFuncs = None
 pythonCodeLines = None
 pythonCodeNode = None
 varAssignments = None
+verifyEqNode = None
+verifyFuncNode = None
+verifyLines = None
 verifySigsFile = None
 
 '''
@@ -94,21 +100,6 @@ class GetKeysOfDictAssign(ast.NodeVisitor):
 	def getKeys(self):
 		return self.keys
 
-class GetLastLineOfFunction(ast.NodeVisitor):
-	def __init__(self):
-		self.lastLine = 0
-
-	def generic_visit(self, node):
-		#print(node._fields)
-		try:
-			if (node.lineno > self.lastLine):
-				self.lastLine = node.lineno
-		except:
-			pass
-		ast.NodeVisitor.generic_visit(self, node)
-
-	def getLastLine(self):
-		return self.lastLine
 
 class BuildAssignMap(ast.NodeVisitor):
 	def __init__(self):
@@ -257,14 +248,6 @@ class ASTEqCompareVisitor(ast.NodeVisitor):
 		lineNumsList.reverse()
 		return self.eqCompareNodes[lineNumsList[0]]
 
-def isPreviousCharAlpha(line, currIndex):
-	if (currIndex == 0):
-		return False
-	
-	if (line[currIndex - 1].isalpha() == True):
-		return True
-	
-	return False
 
 
 def isNextCharAlpha(line, currIndex):
@@ -278,11 +261,6 @@ def isNextCharAlpha(line, currIndex):
 	return False
 
 
-def isLineOnlyWhiteSpace(line):
-	line = line.lstrip().rstrip()
-	if (line == ""):
-		return True
-	return False
 
 def getVerifyEqNode(verifyFuncNode):
 	astEqVisitor = ASTEqCompareVisitor()
@@ -320,17 +298,18 @@ def removeLastCharNewline(buf):
 		buf = buf[0:lastChar]
 
 	return buf
-
-
+'''
 
 def ensureSpacesBtwnTokens(lineOfCode):
+	if ( (lineOfCode == None) or (type(lineOfCode).__name__ != con.strTypePython) or (len(lineOfCode) == 0) ):
+		sys.exit("AutoBatch_CodeGen->ensureSpacesBtwnTokens:  problem with line of code parameter passed in.")
+
 	if (lineOfCode == '\n'):
 		return lineOfCode
 
 	lenOfLine = len(lineOfCode)
 	if (lineOfCode[lenOfLine - 1] == '\n'):
 		lineOfCode = lineOfCode[0:(lenOfLine-1)]
-
 	
 	L_index = 1
 	R_index = 1
@@ -348,21 +327,11 @@ def ensureSpacesBtwnTokens(lineOfCode):
 		elif (lineOfCode[R_index] in ['^', '+', '(', ')', '{', '}', '-', ',', '[', ']']):
 			currChars = lineOfCode[R_index]
 			L_index = R_index
-			checkForSpace = True
-			
-			
+			checkForSpace = True			
 		elif ( (lineOfCode[R_index] == 'e') and (isPreviousCharAlpha(lineOfCode, R_index) == False) ):
 			currChars = lineOfCode[R_index]
 			L_index = R_index
 			checkForSpace = True
-			
-			
-				
-		#elif ( (lineOfCode[R_index] == '[') and (isPreviousCharAlpha(lineOfCode, R_index) == False) ):
-			#currChars = lineOfCode[R_index]
-			#L_index = R_index
-			#checkForSpace = True
-
 		elif (lineOfCode[R_index] in ['>', '<', ':', '!', '=']):
 			if (lineOfCode[R_index+1] == '='):
 				L_index = R_index
@@ -458,7 +427,6 @@ def ensureSpacesBtwnTokens(lineOfCode):
 
 		lenOfLine = len(lineOfCode)
 
-		#CHEAP HACK!!!!  THIS MUST BE FIXED
 		if (R_index == (lenOfLine - 1)):
 			if (lineOfCode[R_index] == ']'):
 				lineOfCode = lineOfCode[0:R_index] + ' ]'
@@ -469,10 +437,7 @@ def ensureSpacesBtwnTokens(lineOfCode):
 			elif (lineOfCode[R_index] == ':'):
 				lineOfCode = lineOfCode[0:R_index] + ' :'
 				break
-			
-			
-			
-		
+
 		if (R_index >= (lenOfLine - 1)):
 			break
 
@@ -486,6 +451,7 @@ def ensureSpacesBtwnTokens(lineOfCode):
 
 	return lineOfCode
 
+'''
 def removeLeftParanSpaces(line):
 	nextLParanIndex = line.find(lParan)
 
@@ -499,11 +465,6 @@ def removeLeftParanSpaces(line):
 
 	return line
 
-def determineNumTabs(numSpaces):
-	if ( (numSpaces % numSpacesPerTab) != 0):
-		sys.exit("Error:  Python cryptosystem did not use proper number of spaces per tab.")
-
-	return (int(numSpaces / numSpacesPerTab))
 
 def getImportFromLines(rootNode, codeLines):
 	importVisitor = ImportFromVisitor()
@@ -2091,7 +2052,7 @@ def isTopLayerLoopOverNumSignatures(dotProdLoopOrder):
 def addImportLines():
 	global batchVerFile, individualVerFile, verifySigsFile
 
-	importLines = getImportLines(pythonCodeNode, pythonCodeLines)
+	importLines = getImportLines(pythonCodeNode, copy.deepcopy(pythonCodeLines))
 	if (importLines == None):
 		return
 
@@ -2103,7 +2064,7 @@ def addImportLines():
 		individualVerFile.write(importLines[index].lstrip().rstrip() + "\n")
 		verifySigsFile.write(importLines[index].lstrip().rstrip() + "\n")
 
-def addTemplateLines():
+def addCommonHeaderLines():
 	global batchVerFile, individualVerFile
 
 	batchOutputString = ""
@@ -2112,9 +2073,28 @@ def addTemplateLines():
 	batchOutputString += "bodyKey = \'Body\'\n\n"
 	batchOutputString += "def prng_bits(group, bits=80):\n"
 	batchOutputString += "\treturn group.init(ZR, randomBits(bits))\n\n"
+
+	batchVerFile.write(batchOutputString)
+
+	indOutputString = ""
+	indOutputString += "\nbodyKey = \'Body\'\n"
+	indOutputString += "sigNumKey = \'Signature_Number\'\n\n"
+
+	individualVerFile.write(indOutputString)
+
+def addTemplateLines():
+	global batchVerFile, individualVerFile
+
+	numSigners = getStringNameIntegerValue(varAssignments, con.numSigners, con.mainFuncName)
+
+	batchOutputString = ""
 	batchOutputString += "def run_Batch(verifyArgsDict, group, verifyFuncArgs):\n"
 	batchOutputString += "\t#Group membership checks\n\n"
-	batchOutputString += "\t" + con.numSignatures + " = len(verifyArgsDict)\n\n"
+	batchOutputString += "\t" + con.numSignatures + " = len(verifyArgsDict)\n"
+
+	if (numSigners != None):
+		batchOutputString += "\t" + con.numSigners + " = " + str(numSigners) + "\n"
+
 	batchOutputString += "\tfor sigIndex in range(0, " + con.numSignatures + "):\n"
 	batchOutputString += "\t\tdeltaz[sigIndex] = prng_bits(group, 80)\n\n"
 	batchOutputString += "\tincorrectIndices = []\n"
@@ -2122,10 +2102,14 @@ def addTemplateLines():
 	batchVerFile.write(batchOutputString)
 
 	indOutputString = ""
-	indOutputString += "\nbodyKey = \'Body\'\n\n"
 	indOutputString += "def run_Ind(verifyArgsDict, group, verifyFuncArgs):\n"
-	indOutputString += "\t" + con.numSignatures + " = len(verifyArgsDict)\n\n"
+	indOutputString += "\t" + con.numSignatures + " = len(verifyArgsDict)\n"
+
+	if (numSigners != None):
+		indOutputString += "\t" + con.numSigners + " = " + str(numSigners) + "\n"
+
 	indOutputString += "\tincorrectIndices = []\n"
+	indOutputString += "\targSigIndexMap = {}\n"
 
 	individualVerFile.write(indOutputString)
 
@@ -2139,7 +2123,7 @@ def addPrerequisites():
 	if ( (type(prereqLineNos).__name__ != con.listTypePython) or (len(prereqLineNos) == 0) ):
 		sys.exit("AutoBatch_CodeGen->addPrerequisites:  problem with value returned from getLineNosOfValueType.")
 
-	prereqLines = getLinesFromSourceCode(pythonCodeLines, prereqLineNos)
+	prereqLines = getLinesFromSourceCode(copy.deepcopy(pythonCodeLines), prereqLineNos)
 	if ( (prereqLines == None) or (type(prereqLines).__name__ != con.listTypePython) or (len(prereqLines) == 0) ):
 		sys.exit("AutoBatch_CodeGen->addPrerequisites:  problem with value returned from getLinesFromSourceCode.")
 
@@ -2158,111 +2142,30 @@ def addPrerequisites():
 	batchVerFile.write(batchOutputString)
 	individualVerFile.write(indOutputString)
 
-def main():
-	if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
-		sys.exit("\nUsage:  python " + sys.argv[0] + "\n \
-			[input path and filename of Python code for signature scheme] \n \
-			[input path and filename of output file from batcher] \n \
-			[input path and filename of pickled Python dictionary with verify function arguments] \n \
-			[output path and filename of individual verification Python module] \n \
-			[output path and filename of batch verification Python module] \n \
-			[output path and filename of divide-and-conquer Python module] \n")
+def addSigLoopToInd():
+	global individualVerFile
 
-	try:
-		pythonCodeArg = sys.argv[1]
-		batchVerifierOutputFile = sys.argv[2]
-		verifyParamFilesArg = sys.argv[3]
-		individualVerArg = sys.argv[4]
-		batchVerArg = sys.argv[5]
-		verifySigsArg = sys.argv[6]
-	except:
-		sys.exit("AutoBatch_CodeGen->main:  problem obtaining command-line arguments using sys.argv.")
+	individualOutputString = ""
 
-	global pythonCodeLines, individualVerFile, batchVerFile, verifySigsFile, pythonCodeNode, varAssignments
-
-	try:
-
-		pythonCodeLines = open(pythonCodeArg, 'r').readlines()
-		individualVerFile = open(individualVerArg, 'w')
-		batchVerFile = open(batchVerArg, 'w')
-		verifySigsFile = open(verifySigsArg, 'w')
-	except:
-		sys.exit("AutoBatch_CodeGen->main:  problem opening input/output files passed in as command-line arguments.")
-
-	myASTParser = ASTParser()
-	pythonCodeNode = myASTParser.getASTNodeFromFile(pythonCodeArg)
-	if (pythonCodeNode == None):
-		sys.exit("AutoBatch_CodeGen->main:  root node obtained from ASTParser->getASTNodeFromFile is of None type.")
-
-	addImportLines()
-	addTemplateLines()
-
-	functionNames = myASTParser.getFunctionNames(pythonCodeNode)
-	if (functionNames == None):
-		sys.exit("AutoBatch_CodeGen->main:  function names obtained from ASTParser->getFunctionNames is of None type.")
-
-	for funcName in con.funcNamesNotToTest:
-		if (funcName in functionNames):
-			del functionNames[funcName]
-
-	varAssignments = getVarAssignments(pythonCodeNode, functionNames, myASTParser)
-	if (varAssignments == None):
-		sys.exit("AutoBatch_CodeGen->main:  getVarAssignments returned None when trying to get the variable assignments.")
-
-	addPrerequisites()
-
-	try:
-		batchVerFile.close()
-		individualVerFile.close()
-		verifySigsFile.close()
-	except:
-		sys.exit("AutoBatch_CodeGen->main:  problem attempting to run close() on the output files of this program.")
-'''
-
-	verifyFuncNode = getVerifyFuncNode(pythonCodeNode)
-	verifyFuncArgs = getVerifyFuncArgs(verifyFuncNode)
-	verifyEqNode = getVerifyEqNode(verifyFuncNode)
-	lastLineVisitor = GetLastLineOfFunction()
-	lastLineVisitor.visit(verifyFuncNode)
-	lastLineOfVerifyFunc = lastLineVisitor.getLastLine()
-	indentationList = []
-
-	verifyFuncLine = getLinesFromSourceCode(pythonCodeLines, verifyFuncNode.lineno, verifyFuncNode.lineno, indentationList)	
-	numTabsOnVerifyFuncLine = determineNumTabs(indentationList[0])
-
-	prereqVisitor = PrereqAssignVisitor()
-	prereqVisitor.visit(pythonCodeNode)
-	prereqAssignLineNos = prereqVisitor.getPrereqAssignLineNos()
-
-	indentationList = []
-
-	if (len(prereqAssignLineNos) > 0):
-		for prereqLineNo in prereqAssignLineNos:
-			prereqLine = getLinesFromSourceCode(pythonCodeLines, prereqLineNo, prereqLineNo, indentationList)
-			individualOutputString += "\t" + str(prereqLine[0]) + "\n"
-			batchOutputString += "\t" + str(prereqLine[0]) + "\n"
-
-	batchOutputString = addNumSigsSignersDefs(batchOutputString, pythonCodeLines)
-
-	indentationList = []
-
-	verifyLines = getLinesFromSourceCode(pythonCodeLines, (verifyFuncNode.lineno + 1), verifyEqNode.lineno, indentationList)
-
-	lineNumber = -1
-
-	individualOutputString += "\n\tfor sigIndex in range(0, numSigs):\n"
+	individualOutputString += "\n\tfor sigIndex in range(0, " + con.numSignatures + "):\n"
 	individualOutputString += "\t\tfor arg in verifyFuncArgs:\n"
 	individualOutputString += "\t\t\tif (sigNumKey in verifyArgsDict[sigIndex][arg]):\n"
 	individualOutputString += "\t\t\t\targSigIndexMap[arg] = int(verifyArgsDict[sigIndex][arg][sigNumKey])\n"
 	individualOutputString += "\t\t\telse:\n"
 	individualOutputString += "\t\t\t\targSigIndexMap[arg] = sigIndex\n"
 
+	individualVerFile.write(individualOutputString)
+
+def writeBodyOfInd():
+	global individualVerFile
+
+	lineNumber = -1
+
 	for line in verifyLines:
 		lineNumber += 1
 		if (isLineOnlyWhiteSpace(line) == True):
 			continue
 		line = ensureSpacesBtwnTokens(line)
-		#print(line)
 		for arg in verifyFuncArgs:
 			argWithSpaces = ' ' + arg + ' '
 			numArgMatches = line.count(argWithSpaces)
@@ -2296,6 +2199,156 @@ def main():
 	individualOutputString += "\t\t\tpass\n"
 	individualOutputString += "\t\telse:\n"
 	individualOutputString += "\t\t\tprint(\"Verification of signature \" + str(sigIndex) + \" failed.\\n\")\n"
+
+	individualVerFile.write(individualOutputString)
+
+def addFunctionsThatVerifyCalls():
+	global batchVerFile, individualVerFile
+
+	batchOutputString = ""
+	individualOutputString = ""
+
+	for linePair in linePairsOfVerifyFuncs:
+		functionString = writeFunctionFromCodeToString(copy.deepcopy(pythonCodeLines), linePair[0], linePair[1], 0, True)
+		if ( (functionString == None) or (type(functionString).__name__ != con.strTypePython) or (len(functionString) == 0) ):
+			sys.exit("AutoBatch_CodeGen->addFunctionsThatVerifyCalls:  problem with function string returned from writeFunctionFromCodeToString.")
+
+		batchOutputString += functionString
+		individualOutputString += functionString
+
+	batchVerFile.write(batchOutputString)
+	individualVerFile.write(individualOutputString)
+
+def main():
+	if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
+		sys.exit("\nUsage:  python " + sys.argv[0] + "\n \
+			[input path and filename of Python code for signature scheme] \n \
+			[input path and filename of output file from batcher] \n \
+			[input path and filename of pickled Python dictionary with verify function arguments] \n \
+			[output path and filename of individual verification Python module] \n \
+			[output path and filename of batch verification Python module] \n \
+			[output path and filename of divide-and-conquer Python module] \n")
+
+	try:
+		pythonCodeArg = sys.argv[1]
+		batchVerifierOutputFile = sys.argv[2]
+		verifyParamFilesArg = sys.argv[3]
+		individualVerArg = sys.argv[4]
+		batchVerArg = sys.argv[5]
+		verifySigsArg = sys.argv[6]
+	except:
+		sys.exit("AutoBatch_CodeGen->main:  problem obtaining command-line arguments using sys.argv.")
+
+	global pythonCodeLines, individualVerFile, batchVerFile, verifySigsFile, pythonCodeNode, varAssignments, verifyFuncNode, verifyLines 
+	global verifyEqNode, functionArgMappings, callListOfVerifyFuncs, linePairsOfVerifyFuncs
+
+	try:
+
+		pythonCodeLines = open(pythonCodeArg, 'r').readlines()
+		individualVerFile = open(individualVerArg, 'w')
+		batchVerFile = open(batchVerArg, 'w')
+		verifySigsFile = open(verifySigsArg, 'w')
+	except:
+		sys.exit("AutoBatch_CodeGen->main:  problem opening input/output files passed in as command-line arguments.")
+
+	myASTParser = ASTParser()
+	pythonCodeNode = myASTParser.getASTNodeFromFile(pythonCodeArg)
+	if (pythonCodeNode == None):
+		sys.exit("AutoBatch_CodeGen->main:  root node obtained from ASTParser->getASTNodeFromFile is of None type.")
+
+	functionNames = myASTParser.getFunctionNames(pythonCodeNode)
+	if (functionNames == None):
+		sys.exit("AutoBatch_CodeGen->main:  function names obtained from ASTParser->getFunctionNames is of None type.")
+
+	functionArgNames = myASTParser.getFunctionArgNames(pythonCodeNode)
+	if (functionArgNames == None):
+		sys.exit("AutoBatch_CodeGen->main:  function argument names obtained from ASTParser->getFunctionArgNames is of None type.")
+
+	for funcName in con.funcNamesNotToTest:
+		if (funcName in functionNames):
+			del functionNames[funcName]
+		if (funcName in functionArgNames):
+			del functionArgNames[funcName]
+
+	functionArgMappings = getFunctionArgMappings(functionNames, functionArgNames, myASTParser)
+	if (functionArgMappings == None):
+		sys.exit("AutoBatch_CodeGen->main:  mappings of variables passed between functions from getFunctionArgMappings is of None type.")
+
+	varAssignments = getVarAssignments(pythonCodeNode, functionNames, myASTParser)
+	if (varAssignments == None):
+		sys.exit("AutoBatch_CodeGen->main:  getVarAssignments returned None when trying to get the variable assignments.")
+
+	verifyFuncNodeList = myASTParser.getFunctionNode(pythonCodeNode, con.verifyFuncName)
+	if (verifyFuncNodeList == None):
+		sys.exit("AutoBatch_CodeGen->main:  could not locate a function with name " + con.verifyFuncName)
+	if (len(verifyFuncNodeList) > 1):
+		sys.exit("AutoBatch_CodeGen->main:  located more than one function with the name " + con.verifyFuncName)
+
+	verifyFuncNode = verifyFuncNodeList[0]
+
+	verifyEqNode = myASTParser.getLastEquation(verifyFuncNode)
+	if (verifyEqNode == None):
+		sys.exit("AutoBatch_CodeGen->main:  could not locate the verify equation within the " + con.verifyFuncName + " function.")
+
+	verifyStartLine = myASTParser.getLineNumberOfNode(verifyFuncNode)
+	if ( (verifyStartLine == None) or (type(verifyStartLine).__name__ != con.intTypePython) or (verifyStartLine < 1) ):
+		sys.exit("AutoBatch_CodeGen->main:  problem with value returned for starting line of " + con.verifyFuncName + " function.")
+
+	verifyStartLine += 1
+
+	verifyEndLine = myASTParser.getLineNumberOfNode(verifyEqNode)
+	if ( (verifyEndLine == None) or (type(verifyEndLine).__name__ != con.intTypePython) or (verifyEndLine < verifyStartLine) ):
+		sys.exit("AutoBatch_CodeGen->main:  problem with value returned for ending line of " + con.verifyFuncName + " function.")
+
+	indentationList = []
+	verifyLines = getLinesFromSourceCodeWithinRange(copy.deepcopy(pythonCodeLines), verifyStartLine, verifyEndLine, indentationList)
+
+	callListOfVerifyFuncs = []
+	funcsVisitedSoFar = []
+	linePairsOfVerifyFuncs = None
+	buildCallListOfFunc(functionArgMappings, con.verifyFuncName, callListOfVerifyFuncs, funcsVisitedSoFar)
+	if (len(callListOfVerifyFuncs) > 0):
+		linePairsOfVerifyFuncs = getFirstLastLineNosOfFuncList(callListOfVerifyFuncs, pythonCodeNode)
+		if ( (linePairsOfVerifyFuncs == None) or (type(linePairsOfVerifyFuncs).__name__ != con.listTypePython) or (len(linePairsOfVerifyFuncs) == 0) ):
+			sys.exit("AutoBatch_CodeGen->main:  problem with value returned from getFirstLastLineNosOfFuncList.")
+
+	addImportLines()
+	addCommonHeaderLines()
+
+	if (linePairsOfVerifyFuncs != None):
+		addFunctionsThatVerifyCalls()
+
+	addTemplateLines()
+	addPrerequisites()
+	addSigLoopToInd()
+	#writeBodyOfInd()
+
+	try:
+		batchVerFile.close()
+		individualVerFile.close()
+		verifySigsFile.close()
+	except:
+		sys.exit("AutoBatch_CodeGen->main:  problem attempting to run close() on the output files of this program.")
+'''
+
+	verifyFuncNode = getVerifyFuncNode(pythonCodeNode)
+	verifyFuncArgs = getVerifyFuncArgs(verifyFuncNode)
+	verifyEqNode = getVerifyEqNode(verifyFuncNode)
+	lastLineVisitor = GetLastLineOfFunction()
+	lastLineVisitor.visit(verifyFuncNode)
+	lastLineOfVerifyFunc = lastLineVisitor.getLastLine()
+	indentationList = []
+
+	verifyFuncLine = getLinesFromSourceCode(pythonCodeLines, verifyFuncNode.lineno, verifyFuncNode.lineno, indentationList)	
+	numTabsOnVerifyFuncLine = determineNumTabs(indentationList[0])
+
+
+
+
+
+
+	indentationList = []
+
 
 	#os.system("python " + batchVerifierPythonFile + " " + batchVerifierInputFile + " > " + batchVerifierOutputFile)
 	batchVerifierOutput = open(batchVerifierOutputFile, 'r').readlines()

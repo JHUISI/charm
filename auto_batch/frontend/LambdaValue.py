@@ -1,4 +1,4 @@
-import con, sys
+import con, copy, sys
 from Value import Value
 
 class LambdaValue:

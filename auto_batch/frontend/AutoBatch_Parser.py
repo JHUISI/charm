@@ -488,7 +488,7 @@ def writeBVFile(varAssignments, outputFileName):
 	if ( (numSignatures == None) or (type(numSignatures).__name__ != con.intTypePython) or (numSignatures < 1) ):
 		sys.exit("AutoBatch_Parser->writeBVFile:  problem with the value returned from getNumSignatures.")
 
-	outputString += "N = "
+	outputString += con.numSignatures + " = "
 	outputString += str(numSignatures)
 	outputString += "\n\n"
 
