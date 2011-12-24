@@ -3,10 +3,18 @@ from ASTParser import *
 from Parser_CodeGen_Toolbox import *
 
 batchVerFile = None
+batchVerifierOutput = None
 callListOfVerifyFuncs = None
+finalBatchEq = None
+finalBatchEqWithLoops = None
 functionArgMappings = None
+indentationListVerifyLines = None
 individualVerFile = None
 linePairsOfVerifyFuncs = None
+listVars = {}
+loopVarGroupTypes = {}
+numTabsOnVerifyLine = None
+precomputeVars = {}
 pythonCodeLines = None
 pythonCodeNode = None
 varAssignments = None
@@ -301,156 +309,6 @@ def removeLastCharNewline(buf):
 	return buf
 '''
 
-def ensureSpacesBtwnTokens(lineOfCode):
-	if ( (lineOfCode == None) or (type(lineOfCode).__name__ != con.strTypePython) or (len(lineOfCode) == 0) ):
-		sys.exit("AutoBatch_CodeGen->ensureSpacesBtwnTokens:  problem with line of code parameter passed in.")
-
-	if (lineOfCode == '\n'):
-		return lineOfCode
-
-	lenOfLine = len(lineOfCode)
-	if (lineOfCode[lenOfLine - 1] == '\n'):
-		lineOfCode = lineOfCode[0:(lenOfLine-1)]
-	
-	L_index = 1
-	R_index = 1
-	withinApostrophes = False
-
-	while (True):
-		checkForSpace = False
-		if ( (lineOfCode[R_index] == '\'') or (lineOfCode[R_index] == '\"') ):
-			if (withinApostrophes == True):
-				withinApostrophes = False
-			else:
-				withinApostrophes = True
-		if (withinApostrophes == True):
-			pass
-		elif (lineOfCode[R_index] in ['^', '+', '(', ')', '{', '}', '-', ',', '[', ']']):
-			currChars = lineOfCode[R_index]
-			L_index = R_index
-			checkForSpace = True			
-		elif ( (lineOfCode[R_index] == 'e') and (isPreviousCharAlpha(lineOfCode, R_index) == False) ):
-			currChars = lineOfCode[R_index]
-			L_index = R_index
-			checkForSpace = True
-		elif (lineOfCode[R_index] in ['>', '<', ':', '!', '=']):
-			if (lineOfCode[R_index+1] == '='):
-				L_index = R_index
-				R_index += 1
-				currChars = lineOfCode[L_index:(R_index+1)]
-				checkForSpace = True
-			else:
-				currChars = lineOfCode[R_index]
-				L_index = R_index
-				checkForSpace = True
-		elif (lineOfCode[R_index] == '&'):
-			if (lineOfCode[R_index+1] == '&'):
-				L_index = R_index
-				R_index += 1
-				currChars = lineOfCode[L_index:(R_index+1)]
-				checkForSpace = True
-			else:
-				currChars = lineOfCode[R_index]
-				L_index = R_index
-				checkForSpace = True
-		elif (lineOfCode[R_index] == '/'):
-			if (lineOfCode[R_index+1] == '/'):
-				L_index = R_index
-				R_index += 1
-				currChars = lineOfCode[L_index:(R_index+1)]
-				checkForSpace = True
-			else:
-				currChars = lineOfCode[R_index]
-				L_index = R_index
-				checkForSpace = True
-		elif (lineOfCode[R_index] == '|'):
-			if (lineOfCode[R_index+1] == '|'):
-				L_index = R_index
-				R_index += 1
-				currChars = lineOfCode[L_index:(R_index+1)]
-				checkForSpace = True
-			else:
-				currChars = lineOfCode[R_index]
-				L_index = R_index
-				checkForSpace = True
-		elif (lineOfCode[R_index] == '*'):
-			if (lineOfCode[R_index+1] == '*'):
-				L_index = R_index
-				R_index += 1
-				currChars = lineOfCode[L_index:(R_index+1)]
-				checkForSpace = True
-			else:
-				currChars = lineOfCode[R_index]
-				L_index = R_index
-				checkForSpace = True
-		elif (lineOfCode[R_index] == 'H'):
-			if (lineOfCode[R_index+1] == '('):
-				L_index = R_index
-				R_index += 1
-				currChars = lineOfCode[L_index:(R_index+1)]
-				checkForSpace = True
-			else:
-				checkForSpace = False
-		elif (lineOfCode[R_index] == 'e'):
-			if ( (lineOfCode[R_index+1] == '(') and (isPreviousCharAlpha(lineOfCode, R_index) == False) ):
-				L_index = R_index
-				R_index += 1
-				currChars = lineOfCode[L_index:(R_index+1)]
-				checkForSpace = True
-			else:
-				checkForSpace = False
-		if (checkForSpace == True):
-			if ( (lineOfCode[L_index-1] != ' ') and (lineOfCode[R_index+1] != ' ') ):
-				lenOfLine = len(lineOfCode)
-				if ( (R_index + 1) == (lenOfLine - 1) ):
-					lineOfCode = lineOfCode[0:L_index] + ' ' + currChars + ' ' + lineOfCode[R_index+1]
-				else:
-					lineOfCode = lineOfCode[0:L_index] + ' ' + currChars + ' ' + lineOfCode[(R_index+1):lenOfLine]
-				R_index += 3
-			elif ( (lineOfCode[L_index-1] != ' ') and (lineOfCode[R_index+1] == ' ') ):
-				lenOfLine = len(lineOfCode)
-				if (L_index == (lenOfLine - 1) ):
-					lineOfCode = lineOfCode[0:L_index] + ' ' + lineOfCode[L_index]
-				else:
-					lineOfCode = lineOfCode[0:L_index] + ' ' + lineOfCode[L_index:lenOfLine]
-				R_index += 2
-			elif ( (lineOfCode[L_index-1] == ' ') and (lineOfCode[R_index+1] != ' ') ):
-				lenOfLine = len(lineOfCode)
-				if ( (R_index + 1) == (lenOfLine - 1) ):
-					lineOfCode = lineOfCode[0:(R_index+1)] + ' ' + lineOfCode[R_index+1]
-				else:
-					lineOfCode = lineOfCode[0:(R_index+1)] + ' ' + lineOfCode[(R_index+1):lenOfLine]
-				R_index += 2
-			elif ( (lineOfCode[L_index-1] == ' ') and (lineOfCode[R_index+1] == ' ') ):
-				R_index += 2
-		else:
-			R_index += 1
-
-		lenOfLine = len(lineOfCode)
-
-		if (R_index == (lenOfLine - 1)):
-			if (lineOfCode[R_index] == ']'):
-				lineOfCode = lineOfCode[0:R_index] + ' ]'
-				break
-			elif (lineOfCode[R_index] == ')'):
-				lineOfCode = lineOfCode[0:R_index] + ' )'
-				break			
-			elif (lineOfCode[R_index] == ':'):
-				lineOfCode = lineOfCode[0:R_index] + ' :'
-				break
-
-		if (R_index >= (lenOfLine - 1)):
-			break
-
-	lenOfLine = len(lineOfCode)
-	if ( (lineOfCode[0] == '(' ) and (lineOfCode[1] != ' ') ):
-		lineOfCode = '( ' + lineOfCode[1:lenOfLine]
-	if ( (lineOfCode[lenOfLine-1] == ')' ) and (lineOfCode[lenOfLine-2] != ' ') ):
-		lineOfCode = lineOfCode[0:(lenOfLine-1)] + ' )'
-
-	lineOfCode = ' ' + lineOfCode + ' '
-
-	return lineOfCode
 
 '''
 
@@ -481,26 +339,16 @@ def removeSelfDump(line):
 	line = line[0:selfDumpIndex] + line[(selfDumpIndex + selfDumpLen + 1):lenOfLine]
 	line = line.rstrip(')')
 	return line
+'''
 
-def cleanFinalBatchEq(finalBatchEq):
+def cleanFinalBatchEq():
+	global finalBatchEq
 	
-	finalBatchEq = finalBatchEq.replace(finalBatchEqTag, '', 1)
-	finalBatchEq = finalBatchEq.replace(':', '', 1)
-	finalBatchEq = finalBatchEq.lstrip()
-	
-	#finalBatchEq = finalBatchEq.lstrip(finalBatchEqTag).lstrip(':').lstrip()
-	
-	
-	finalBatchEq = ensureSpacesBtwnTokens(finalBatchEq)
-	
-	#finalBatchEq = finalBatchEq.rstrip()
-	
-	#print(finalBatchEq)
-	
-	return finalBatchEq
-	
-	#print(finalBatchEq)
+	finalBatchEq = finalBatchEq.replace(con.finalBatchEqString, '', 1)
+	finalBatchEq = finalBatchEq.lstrip()	
+	finalBatchEq = ensureSpacesBtwnTokens_CodeGen(finalBatchEq)
 
+'''
 def addDeltasAndArgSigIndexMap(batchOutputString, declaredLists):
 	#batchOutputString += "\n\t" + deltaString + " = {}\n\n"
 	
@@ -1761,50 +1609,67 @@ def getVariableTypes(verifyNode):
 	variableTypes = basicTypesVar.getVariableTypesDict()
 	
 	return variableTypes
+'''
 
-def getVarsThatAreLists(line):
-	line = line.replace("List := ", '', 1)
-	line = line.rstrip()
-	#line = line.lstrip("List : = ").rstrip()
-	lineSplit = line.split(' in ')
-	
+def processListLine(line):
+	global listVars
+
+	if ( (line == None) or (type(line).__name__ != con.strTypePython) or (len(line) == 0) or (line.startswith(con.listString) == False) ):
+		sys.exit("AutoBatch_CodeGen->processListLine:  problem with line parameter passed to the function.")
+
+	line = line.replace(con.listString, '', 1)
+	line = line.lstrip().rstrip()
+	lineSplit = line.split(con.listInString)
 	varName = lineSplit[0].lstrip().rstrip()
-	endVal = lineSplit[1].lstrip().rstrip()
+	if (varName in listVars):
+		sys.exit("AutoBatch_CodeGen->processListLine:  variable currently being processed (" + varName + ") is already included in the listVars data structure (duplicate.")
 
-	if (endVal == 'N'):
-		varsThatAreLists[varName] = numSignaturesIndex
-	elif (endVal == 'l'):
-		varsThatAreLists[varName] = numSignersIndex
+	loopType = lineSplit[1].lstrip().rstrip()
+	if (loopType not in con.loopTypes):
+		sys.exit("AutoBatch_CodeGen->processListLine:  one of the loop types extracted is not one of the supported loop types.")
 
-def getPrecomputeVarReplacements(batchVerifierOutput):
-	for line in batchVerifierOutput:
-		if (line.startswith("Precompute: ")):			
-			line = line[len("Precompute: "):len(line)]
-			line = line.lstrip().rstrip()
-			if (line.startswith("delta := ")):
-				continue
-			#line = line.lstrip("Precompute: ").rstrip()
-			
-			if ( (line.startswith("pre")) == False  ):
-				continue
-			
-			lineSplit = line.split(" := ")
-			key = lineSplit[0].lstrip().rstrip()
-			val = lineSplit[1].lstrip().rstrip()
-			precomputeVarReplacements[key] = val
-			
-			#print(lineSplit[0])
-			#print(lineSplit[1])
-			#print(line)
+	listVars[varName] = loopType
 
-def getDotProdTypes(batchVerifierOutput):
-	for line in batchVerifierOutput:
-		if ( (line.startswith("dot")) or (line.startswith("sum"))):
-			line = line.split(" := ")
-			dotProdName = line[0].lstrip().rstrip()
-			dotProdType = line[1].lstrip().rstrip().rstrip("\n")
-			dotProdTypes[dotProdName] = dotProdType
+def processPrecomputeLine(line):
+	global precomputeVars
 
+	if ( (line == None) or (type(line).__name__ != con.strTypePython) or (line.startswith(con.precomputeString) == False) ):
+		sys.exit("AutoBatch_CodeGen->processPrecomputeLine:  problem with line parameter passed in.")
+
+	lenPrecomputeString = len(con.precomputeString)
+	line = line[lenPrecomputeString:len(line)]
+	line = line.lstrip().rstrip()
+	if (line.startswith(con.precomputeVarString) == False):
+		return
+
+	lineSplit = line.split(con.batchVerifierOutputAssignment)
+	key = lineSplit[0].lstrip().rstrip()
+	val = lineSplit[1].lstrip().rstrip()
+
+	if (key in precomputeVars):
+		sys.exit("AutoBatch_CodeGen->processPrecomputeLine:  found duplicate variable name for a precompute variable (" + key + ").")
+
+	precomputeVars[key] = val
+
+def processLoopLine(line):
+	global loopVarGroupTypes
+
+	if ( (line == None) or (type(line).__name__ != con.strTypePython) or ( (line.startswith(con.dotPrefix) == False) and (line.startswith(con.sumPrefix) == False) ) ):
+		sys.exit("AutoBatch_CodeGen->processLoopLine:  problem with line parameter passed in.")
+
+	lineSplit = line.split(con.batchVerifierOutputAssignment)
+	varName = lineSplit[0].lstrip().rstrip()
+	groupType = lineSplit[1].lstrip().rstrip()
+
+	if (varName in loopVarGroupTypes):
+		sys.exit("AutoBatch_CodeGen->processLoopLine:  found duplicate in loop variable names.")
+
+	if (groupType not in con.groupTypes):
+		sys.exit("AutoBatch_CodeGen->processLoopLine:  group type ovar loop variable " + varName + " is not one of the supported types.")
+
+	loopVarGroupTypes[varName] = groupType
+
+'''
 def getStandAloneVars(batchEqNotSumOrDotVars):
 	standAloneVars = []
 
@@ -2059,6 +1924,7 @@ def addCommonHeaderLines():
 	batchOutputString = ""
 	batchOutputString += "from toolbox.pairinggroup import *\n"
 	batchOutputString += "from verifySigs import verifySigsRecursive\n\n"
+	batchOutputString += "group = None\n"
 	batchOutputString += "bodyKey = \'Body\'\n\n"
 	batchOutputString += "def prng_bits(group, bits=80):\n"
 	batchOutputString += "\treturn group.init(ZR, randomBits(bits))\n\n"
@@ -2066,8 +1932,8 @@ def addCommonHeaderLines():
 	batchVerFile.write(batchOutputString)
 
 	indOutputString = ""
-	indOutputString += "\nbodyKey = \'Body\'\n"
-	indOutputString += "sigNumKey = \'Signature_Number\'\n\n"
+	indOutputString += "\ngroup = None\n"
+	indOutputString += "bodyKey = \'Body\'\n\n"
 
 	individualVerFile.write(indOutputString)
 
@@ -2077,7 +1943,9 @@ def addTemplateLines():
 	numSigners = getStringNameIntegerValue(varAssignments, con.numSigners, con.mainFuncName)
 
 	batchOutputString = ""
-	batchOutputString += "def run_Batch(verifyArgsDict, group, verifyFuncArgs):\n"
+	batchOutputString += "def run_Batch(verifyArgsDict, groupObjParam, verifyFuncArgs):\n"
+	batchOutputString += "\tglobal group\n"
+	batchOutputString += "\tgroup = groupObjParam\n\n"
 	batchOutputString += "\t#Group membership checks\n\n"
 	batchOutputString += "\t" + con.numSignatures + " = len(verifyArgsDict)\n"
 
@@ -2091,14 +1959,16 @@ def addTemplateLines():
 	batchVerFile.write(batchOutputString)
 
 	indOutputString = ""
-	indOutputString += "def run_Ind(verifyArgsDict, group, verifyFuncArgs):\n"
+	indOutputString += "def run_Ind(verifyArgsDict, groupObjParam, verifyFuncArgs):\n"
+	indOutputString += "\tglobal group\n"
+	indOutputString += "\tgroup = groupObjParam\n\n"
+	indOutputString += "\t#Group membership checks\n\n"
 	indOutputString += "\t" + con.numSignatures + " = len(verifyArgsDict)\n"
 
 	if (numSigners != None):
 		indOutputString += "\t" + con.numSigners + " = " + str(numSigners) + "\n"
 
 	indOutputString += "\tincorrectIndices = []\n"
-	indOutputString += "\targSigIndexMap = {}\n"
 
 	individualVerFile.write(indOutputString)
 
@@ -2135,59 +2005,46 @@ def addSigLoopToInd():
 	global individualVerFile
 
 	individualOutputString = ""
-
 	individualOutputString += "\n\tfor sigIndex in range(0, " + con.numSignatures + "):\n"
-	individualOutputString += "\t\tfor arg in verifyFuncArgs:\n"
-	individualOutputString += "\t\t\tif (sigNumKey in verifyArgsDict[sigIndex][arg]):\n"
-	individualOutputString += "\t\t\t\targSigIndexMap[arg] = int(verifyArgsDict[sigIndex][arg][sigNumKey])\n"
-	individualOutputString += "\t\t\telse:\n"
-	individualOutputString += "\t\t\t\targSigIndexMap[arg] = sigIndex\n"
-
 	individualVerFile.write(individualOutputString)
 
 def writeBodyOfInd():
 	global individualVerFile
 
 	lineNumber = -1
+	individualOutputString = ""
 
 	for line in verifyLines:
 		lineNumber += 1
 		if (isLineOnlyWhiteSpace(line) == True):
 			continue
-		line = ensureSpacesBtwnTokens(line)
+		line = ensureSpacesBtwnTokens_CodeGen(line)
 		for arg in verifyFuncArgs:
 			argWithSpaces = ' ' + arg + ' '
 			numArgMatches = line.count(argWithSpaces)
 			for countIndex in range(0, numArgMatches):
-				#print(argWithSpaces)
 				indexOfCharAfterArg = line.index(argWithSpaces) + len(argWithSpaces)
 				if (indexOfCharAfterArg < len(line)):
 					charAfterArg = line[indexOfCharAfterArg]
 				else:
 					charAfterArg = ''
-				replacementString = " verifyArgsDict[argSigIndexMap[\'" + arg + "\']][\'" + arg + "\'][bodyKey]"
-				if (charAfterArg == dictBeginChar):
+				replacementString = " verifyArgsDict[sigIndex][\'" + arg + "\'][bodyKey]"
+				if (charAfterArg == con.dictBeginChar):
 					line = line.replace(argWithSpaces + '[', replacementString + '[', 1)
 				else:
 					line = line.replace(argWithSpaces, replacementString + ' ', 1)
-				#print(line)
-				#print("\n\n")
-		#print(line)
 		line = line.lstrip().rstrip()
-		#print(line)
 		line = removeLeftParanSpaces(line)
-		#print(line)
-		#print("\n\n")
-		line = removeSelfDump(line)
-		numTabs = determineNumTabs(indentationList[lineNumber]) - numTabsOnVerifyFuncLine
+		line = line.replace(con.selfFuncCallString, con.space)
+		numTabs = determineNumTabsFromSpaces(indentationListVerifyLines[lineNumber]) - numTabsOnVerifyLine
 		numTabs += 1
-		for tabNumber in range(0, numTabs):
-			individualOutputString += "\t"
+		individualOutputString += getStringOfTabs(numTabs)
 		individualOutputString += line + "\n"
 
 	individualOutputString += "\t\t\tpass\n"
 	individualOutputString += "\t\telse:\n"
-	individualOutputString += "\t\t\tprint(\"Verification of signature \" + str(sigIndex) + \" failed.\\n\")\n"
+	individualOutputString += "\t\t\tincorrectIndices.append(sigIndex)\n\n"
+	individualOutputString += "\treturn incorrectIndices\n"
 
 	individualVerFile.write(individualOutputString)
 
@@ -2229,11 +2086,13 @@ def main():
 		sys.exit("AutoBatch_CodeGen->main:  problem obtaining command-line arguments using sys.argv.")
 
 	global pythonCodeLines, individualVerFile, batchVerFile, verifySigsFile, pythonCodeNode, varAssignments, verifyFuncNode, verifyLines 
-	global verifyEqNode, functionArgMappings, callListOfVerifyFuncs, linePairsOfVerifyFuncs, verifyFuncArgs
+	global verifyEqNode, functionArgMappings, callListOfVerifyFuncs, linePairsOfVerifyFuncs, verifyFuncArgs, indentationListVerifyLines
+	global numTabsOnVerifyLine, batchVerifierOutput, finalBatchEq, finalBatchEqWithLoops, listVars
 
 	try:
 
 		pythonCodeLines = open(pythonCodeArg, 'r').readlines()
+		batchVerifierOutput = open(batchVerifierOutputFile, 'r').readlines()
 		individualVerFile = open(individualVerArg, 'w')
 		batchVerFile = open(batchVerArg, 'w')
 		verifySigsFile = open(verifySigsArg, 'w')
@@ -2283,14 +2142,31 @@ def main():
 	if ( (verifyStartLine == None) or (type(verifyStartLine).__name__ != con.intTypePython) or (verifyStartLine < 1) ):
 		sys.exit("AutoBatch_CodeGen->main:  problem with value returned for starting line of " + con.verifyFuncName + " function.")
 
+	numSpacesOnVerifyFuncList = []
+	getLinesFromSourceCodeWithinRange(copy.deepcopy(pythonCodeLines), verifyStartLine, verifyStartLine, numSpacesOnVerifyFuncList)
+	if ( (numSpacesOnVerifyFuncList == None) or (type(numSpacesOnVerifyFuncList).__name__ != con.listTypePython) or (len(numSpacesOnVerifyFuncList) != 1) ):
+		sys.exit("AutoBatch_CodeGen->main:  problem with value returned from getLinesFromSourceCodeWithinRange to determine the number of spaces on the line of the " + con.verifyfuncName + " function.")
+
+	numSpacesOnVerifyFunc = numSpacesOnVerifyFuncList[0]
+	if ( (numSpacesOnVerifyFunc == None) or (type(numSpacesOnVerifyFunc).__name__ != con.intTypePython) or (numSpacesOnVerifyFunc < 0) ):
+		sys.exit("AutoBatch_CodeGen->main:  problem with number of spaces extracted on the line of the " + con.verifyFuncName + " function.")
+
+	numTabsOnVerifyLine = determineNumTabsFromSpaces(numSpacesOnVerifyFunc)
+	if ( (numTabsOnVerifyLine == None) or (type(numTabsOnVerifyLine).__name__ != con.intTypePython) or (numTabsOnVerifyLine < 0) ):
+		sys.exit("AutoBatch_CodeGen->main:  problem with number of tabs extracted on the line of the " + con.verifyFuncName + " function.")
+
 	verifyStartLine += 1
 
 	verifyEndLine = myASTParser.getLineNumberOfNode(verifyEqNode)
 	if ( (verifyEndLine == None) or (type(verifyEndLine).__name__ != con.intTypePython) or (verifyEndLine < verifyStartLine) ):
 		sys.exit("AutoBatch_CodeGen->main:  problem with value returned for ending line of " + con.verifyFuncName + " function.")
 
-	indentationList = []
-	verifyLines = getLinesFromSourceCodeWithinRange(copy.deepcopy(pythonCodeLines), verifyStartLine, verifyEndLine, indentationList)
+	indentationListVerifyLines = []
+	verifyLines = getLinesFromSourceCodeWithinRange(copy.deepcopy(pythonCodeLines), verifyStartLine, verifyEndLine, indentationListVerifyLines)
+
+	verifyFuncArgs = getFunctionArgsAsStrings(functionArgNames, con.verifyFuncName)
+	if ( (verifyFuncArgs == None) or (type(verifyFuncArgs).__name__ != con.listTypePython) or (len(verifyFuncArgs) == 0) ):
+		sys.exit("AutoBatch_CodeGen->main:  problem with value returned from getFunctionArgsAsStrings to get arguments of " + con.verifyFuncName + " function.")
 
 	callListOfVerifyFuncs = []
 	funcsVisitedSoFar = []
@@ -2310,7 +2186,28 @@ def main():
 	addTemplateLines()
 	addPrerequisites()
 	addSigLoopToInd()
-	#writeBodyOfInd()
+	writeBodyOfInd()
+
+	for line in batchVerifierOutput:
+		if (line.startswith(con.finalBatchEqString) == True):
+			if (finalBatchEq != None):
+				sys.exit("AutoBatch_CodeGen->main:  more than one line starting with final batch equation string (" + con.finalBatchEqString + ") was found in the output from the batch verifier.")
+			finalBatchEq = line
+		if (line.startswith(con.finalBatchEqWithLoopsString) == True):
+			if (finalBatchEqWithLoops != None):
+				sys.exit("AutoBatch_CodeGen->main:  more than one line starting with final batch equation with loops string (" + con.finalBatchEqWithLoopsString + ") was found in the output from the batch verifier.")
+			finalBatchEqWithLoops = line
+		if (line.startswith(con.listString) == True):
+			processListLine(line)
+		if (line.startswith(con.precomputeString) == True):
+			processPrecomputeLine(line)
+		if ( (line.startswith(con.dotPrefix) == True) or (line.startswith(con.sumPrefix) == True) ):
+			processLoopLine(line)
+
+	if ( (finalBatchEq == None) or (finalBatchEqWithLoops == None) ):
+		sys.exit("AutoBatch_CodeGen->main:  problem locating the various forms of the final batch equation from the output of the batch verifier.")
+
+	cleanFinalBatchEq()
 
 	try:
 		batchVerFile.close()
@@ -2318,50 +2215,12 @@ def main():
 		verifySigsFile.close()
 	except:
 		sys.exit("AutoBatch_CodeGen->main:  problem attempting to run close() on the output files of this program.")
-'''
 
-	verifyFuncNode = getVerifyFuncNode(pythonCodeNode)
-	verifyFuncArgs = getVerifyFuncArgs(verifyFuncNode)
-	verifyEqNode = getVerifyEqNode(verifyFuncNode)
-	lastLineVisitor = GetLastLineOfFunction()
-	lastLineVisitor.visit(verifyFuncNode)
-	lastLineOfVerifyFunc = lastLineVisitor.getLastLine()
-	indentationList = []
-
-	verifyFuncLine = getLinesFromSourceCode(pythonCodeLines, verifyFuncNode.lineno, verifyFuncNode.lineno, indentationList)	
-	numTabsOnVerifyFuncLine = determineNumTabs(indentationList[0])
-
-
-
-
-
-
-	indentationList = []
-
-
-	#os.system("python " + batchVerifierPythonFile + " " + batchVerifierInputFile + " > " + batchVerifierOutputFile)
-	batchVerifierOutput = open(batchVerifierOutputFile, 'r').readlines()
-	for line in batchVerifierOutput:
-		if (line.startswith(finalBatchEqTag) == True):
-			finalBatchEq = line
-		elif (line.startswith('List := ') == True):
-			getVarsThatAreLists(line)
-			
-			
-			
-	for line in pythonCodeLines:		
-		if (line.startswith(numSignersEndVal + ' = ')):
-			actual_numSignersEndVal_value = (line[4])
-
-	getPrecomputeVarReplacements(batchVerifierOutput)
-	getDotProdTypes(batchVerifierOutput)
-	finalBatchEq = cleanFinalBatchEq(finalBatchEq)
-	
+'''	
 	batchEqVars = getBatchEqVars(finalBatchEq)
 	batchEqDotProdVars = [] #not used
 	batchEqSumVars = [] #not used
 	batchEqNotSumOrDotVars = []
-	
 	distillBatchEqVars(batchEqVars, batchEqNotSumOrDotVars)
 	assignMapVar = BuildAssignMap()
 	assignMapVar.visit(verifyFuncNode)
@@ -2373,46 +2232,22 @@ def main():
 	dotProdLoopOrder = getDotProdLoopOrder(computeLineInfo, outerDotProds, dotProdLoopOrder)	
 	precomputeDotProdLoopOrder = getSplitDotProdLoopOrder(dotProdLoopOrder, computeLineInfo)
 	DC_outerDotProds = getDC_outerDotProds_JUSTOUTER(dotProdLoopOrder, True)
-	
 	mydctest = getDC_outerDotProds_JUSTOUTER(dotProdLoopOrder, False)
-		
 	declaredLists = []
 	batchOutputString = addListDeclarations(batchOutputString, computeLineInfo, verifyFuncArgs, declaredLists)
 	batchOutputString = addDeltasAndArgSigIndexMap(batchOutputString, declaredLists)
 	variableTypes = getVariableTypes(verifyFuncNode)
 	verifySigsOutput = ""
-	
-	
 	getPrecomputeOuterDotProds(precomputeDotProdLoopOrder)	
-	
-	
-	
-	
 	batchOutputString = addDotProdLoops(batchOutputString, True, computeLineInfo, precomputeDotProdLoopOrder, assignMap, pythonCodeLines, listOfIndentedBlocks, numTabsOnVerifyFuncLine, verifyFuncArgs, declaredLists, outerDotProds)
 	batchOutputString = addLinesForNonDotProdVars(batchOutputString, assignMap, pythonCodeLines, listOfIndentedBlocks, computeLineInfo, 1, verifyFuncArgs)	
-	varNameFuncArgs = []
-	
-	
-	
-	#precomputeOuterDotProds = getPrecomputeOuterDotProds(precomputeDotProdLoopOrder)
-	
-	
-	
-	
-		
-	#getPrecomputeOuterDotProds(precomputeDotProdLoopOrder)	
-	
-	
-	
-	
+	varNameFuncArgs = []	
 	batchOutputString = addCallToVerifySigs(batchOutputString, precomputeOuterDotProds, varNameFuncArgs, verifyFuncArgs, pythonCodeNode)
 	verifySigsFile = open(verifySigsFile, 'w')
 	verifySigsOutput = ""
 	for importFromLine in importFromLines:			
 		verifySigsOutput += importFromLine + "\n"
-		
 	verifySigsOutput += "import hashlib\n"
-		
 	verifySigsOutput += "import sys, copy\n"
 	verifySigsOutput += "from charm.engine.util import *\n"
 	verifySigsOutput += "from toolbox.pairinggroup import *\n\n"
@@ -2423,29 +2258,13 @@ def main():
 	for varNameFuncArg in varNameFuncArgs:
 		verifySigsOutput += varNameFuncArg + ", "
 	verifySigsOutput += "startIndex, endIndex):\n\n"
-	
 	verifySigsOutput += "\t" + numSignersEndVal + " = " + actual_numSignersEndVal_value + "\n\n"
 	verifySigsOutput += "\tsigNumKey = \'Signature_Number\'\n\n"
-
-	verifySigsOutput += "\thashObj = hashlib.new('sha1')\n\n"
-	
-	
-	#assignMapFor_l = BuildAssignMap()
-	#assignMapFor_l.visit(pythonCodeNode)
-	#assignMapFor_l_map = assignMapFor_l.getAssignMap()
-	
-	
-	
-	
-	
-	#print(assignMapFor_l_map[numSignersEndVal])
-	
-	
+	verifySigsOutput += "\thashObj = hashlib.new('sha1')\n\n"	
 	if (len(prereqAssignLineNos) > 0):
 		for prereqLineNo in prereqAssignLineNos:
 			prereqLine = getLinesFromSourceCode(pythonCodeLines, prereqLineNo, prereqLineNo, indentationList)
 			verifySigsOutput += "\t" + str(prereqLine[0]) + "\n"
-			#batchOutputString += "\t" + str(prereqLine[0]) + "\n"
 	verifySigsOutput = resetArgSigIndexDictTo1s(verifySigsOutput)
 	outerDotProdsDict = {}
 	outerDotProdsDict['key'] = outerDotProds
@@ -2463,16 +2282,6 @@ def main():
 	simplifiedFinalBatchEq = getSimplifiedFinalBatchEq(batchVerifierOutput, pythonCodeNode, verifyFuncArgs, varNameFuncArgs)	
 	verifySigsOutput = addEqualityTestFromFinalBatchEq(verifySigsOutput, simplifiedFinalBatchEq, outerDotProds, varNameFuncArgs, precomputeOuterDotProds)
 
-	individualVerFile.write(individualOutputString)
-	batchVerFile.write(batchOutputString)
-	individualVerFile.close()
-	batchVerFile.close()
-
-	verifySigsFile.write(verifySigsOutput)
-	verifySigsFile.close()
-
-	#os.system("python " + individualVerArg)
-	#os.system("python " + batchVerArg)
 '''
 
 if __name__ == '__main__':

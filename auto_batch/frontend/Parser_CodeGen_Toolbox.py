@@ -2,8 +2,270 @@ import con, sys
 from ASTParser import *
 from ASTVarVisitor import *
 
+def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
+	if ( (lineOfCode == None) or (type(lineOfCode).__name__ != con.strTypePython) or (len(lineOfCode) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->ensureSpacesBtwnTokens_CodeGen:  problem with line of code parameter passed in.")
+
+	if (lineOfCode == '\n'):
+		return lineOfCode
+
+	lenOfLine = len(lineOfCode)
+	if (lineOfCode[lenOfLine - 1] == '\n'):
+		lineOfCode = lineOfCode[0:(lenOfLine-1)]
+	
+	L_index = 1
+	R_index = 1
+	withinApostrophes = False
+
+	while (True):
+		checkForSpace = False
+		if ( (lineOfCode[R_index] == '\'') or (lineOfCode[R_index] == '\"') ):
+			if (withinApostrophes == True):
+				withinApostrophes = False
+			else:
+				withinApostrophes = True
+		if (withinApostrophes == True):
+			pass
+		elif (lineOfCode[R_index] in ['^', '+', '(', ')', '{', '}', '-', ',', '[', ']']):
+			currChars = lineOfCode[R_index]
+			L_index = R_index
+			checkForSpace = True			
+		elif ( (lineOfCode[R_index] == 'e') and (isPreviousCharAlpha(lineOfCode, R_index) == False) ):
+			currChars = lineOfCode[R_index]
+			L_index = R_index
+			checkForSpace = True
+		elif (lineOfCode[R_index] in ['>', '<', ':', '!', '=']):
+			if (lineOfCode[R_index+1] == '='):
+				L_index = R_index
+				R_index += 1
+				currChars = lineOfCode[L_index:(R_index+1)]
+				checkForSpace = True
+			else:
+				currChars = lineOfCode[R_index]
+				L_index = R_index
+				checkForSpace = True
+		elif (lineOfCode[R_index] == '&'):
+			if (lineOfCode[R_index+1] == '&'):
+				L_index = R_index
+				R_index += 1
+				currChars = lineOfCode[L_index:(R_index+1)]
+				checkForSpace = True
+			else:
+				currChars = lineOfCode[R_index]
+				L_index = R_index
+				checkForSpace = True
+		elif (lineOfCode[R_index] == '/'):
+			if (lineOfCode[R_index+1] == '/'):
+				L_index = R_index
+				R_index += 1
+				currChars = lineOfCode[L_index:(R_index+1)]
+				checkForSpace = True
+			else:
+				currChars = lineOfCode[R_index]
+				L_index = R_index
+				checkForSpace = True
+		elif (lineOfCode[R_index] == '|'):
+			if (lineOfCode[R_index+1] == '|'):
+				L_index = R_index
+				R_index += 1
+				currChars = lineOfCode[L_index:(R_index+1)]
+				checkForSpace = True
+			else:
+				currChars = lineOfCode[R_index]
+				L_index = R_index
+				checkForSpace = True
+		elif (lineOfCode[R_index] == '*'):
+			if (lineOfCode[R_index+1] == '*'):
+				L_index = R_index
+				R_index += 1
+				currChars = lineOfCode[L_index:(R_index+1)]
+				checkForSpace = True
+			else:
+				currChars = lineOfCode[R_index]
+				L_index = R_index
+				checkForSpace = True
+		elif (lineOfCode[R_index] == 'H'):
+			if (lineOfCode[R_index+1] == '('):
+				L_index = R_index
+				R_index += 1
+				currChars = lineOfCode[L_index:(R_index+1)]
+				checkForSpace = True
+			else:
+				checkForSpace = False
+		elif (lineOfCode[R_index] == 'e'):
+			if ( (lineOfCode[R_index+1] == '(') and (isPreviousCharAlpha(lineOfCode, R_index) == False) ):
+				L_index = R_index
+				R_index += 1
+				currChars = lineOfCode[L_index:(R_index+1)]
+				checkForSpace = True
+			else:
+				checkForSpace = False
+		if (checkForSpace == True):
+			if ( (lineOfCode[L_index-1] != ' ') and (lineOfCode[R_index+1] != ' ') ):
+				lenOfLine = len(lineOfCode)
+				if ( (R_index + 1) == (lenOfLine - 1) ):
+					lineOfCode = lineOfCode[0:L_index] + ' ' + currChars + ' ' + lineOfCode[R_index+1]
+				else:
+					lineOfCode = lineOfCode[0:L_index] + ' ' + currChars + ' ' + lineOfCode[(R_index+1):lenOfLine]
+				R_index += 3
+			elif ( (lineOfCode[L_index-1] != ' ') and (lineOfCode[R_index+1] == ' ') ):
+				lenOfLine = len(lineOfCode)
+				if (L_index == (lenOfLine - 1) ):
+					lineOfCode = lineOfCode[0:L_index] + ' ' + lineOfCode[L_index]
+				else:
+					lineOfCode = lineOfCode[0:L_index] + ' ' + lineOfCode[L_index:lenOfLine]
+				R_index += 2
+			elif ( (lineOfCode[L_index-1] == ' ') and (lineOfCode[R_index+1] != ' ') ):
+				lenOfLine = len(lineOfCode)
+				if ( (R_index + 1) == (lenOfLine - 1) ):
+					lineOfCode = lineOfCode[0:(R_index+1)] + ' ' + lineOfCode[R_index+1]
+				else:
+					lineOfCode = lineOfCode[0:(R_index+1)] + ' ' + lineOfCode[(R_index+1):lenOfLine]
+				R_index += 2
+			elif ( (lineOfCode[L_index-1] == ' ') and (lineOfCode[R_index+1] == ' ') ):
+				R_index += 2
+		else:
+			R_index += 1
+
+		lenOfLine = len(lineOfCode)
+
+		if (R_index == (lenOfLine - 1)):
+			if (lineOfCode[R_index] == ']'):
+				lineOfCode = lineOfCode[0:R_index] + ' ]'
+				break
+			elif (lineOfCode[R_index] == ')'):
+				lineOfCode = lineOfCode[0:R_index] + ' )'
+				break			
+			elif (lineOfCode[R_index] == ':'):
+				lineOfCode = lineOfCode[0:R_index] + ' :'
+				break
+
+		if (R_index >= (lenOfLine - 1)):
+			break
+
+	lenOfLine = len(lineOfCode)
+	if ( (lineOfCode[0] == '(' ) and (lineOfCode[1] != ' ') ):
+		lineOfCode = '( ' + lineOfCode[1:lenOfLine]
+	if ( (lineOfCode[lenOfLine-1] == ')' ) and (lineOfCode[lenOfLine-2] != ' ') ):
+		lineOfCode = lineOfCode[0:(lenOfLine-1)] + ' )'
+
+	lineOfCode = ' ' + lineOfCode + ' '
+
+	return lineOfCode
+
+def ensureSpacesBtwnTokens_Parser(lineOfCode):
+	if ( (lineOfCode == None) or (type(lineOfCode).__name__ != con.strTypePython) or (len(lineOfCode) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->ensureSpacesBtwnTokens_Parser:  problem with line of code parameter passed in.")
+
+	L_index = 1
+	R_index = 1
+	while (True):
+		checkForSpace = False
+		if (lineOfCode[R_index] in ['^', '+', '(', ')', '{', '}', '-', ',']):
+			currChars = lineOfCode[R_index]
+			L_index = R_index
+			checkForSpace = True
+		elif (lineOfCode[R_index] in ['>', '<', ':', '!', '=']):
+			if (lineOfCode[R_index+1] == '='):
+				L_index = R_index
+				R_index += 1
+				currChars = lineOfCode[L_index:(R_index+1)]
+				checkForSpace = True
+			else:
+				currChars = lineOfCode[R_index]
+				L_index = R_index
+				checkForSpace = True
+		elif (lineOfCode[R_index] == '&'):
+			if (lineOfCode[R_index+1] == '&'):
+				L_index = R_index
+				R_index += 1
+				currChars = lineOfCode[L_index:(R_index+1)]
+				checkForSpace = True
+			else:
+				currChars = lineOfCode[R_index]
+				L_index = R_index
+				checkForSpace = True
+		elif (lineOfCode[R_index] == '/'):
+			if (lineOfCode[R_index+1] == '/'):
+				L_index = R_index
+				R_index += 1
+				currChars = lineOfCode[L_index:(R_index+1)]
+				checkForSpace = True
+			else:
+				currChars = lineOfCode[R_index]
+				L_index = R_index
+				checkForSpace = True
+		elif (lineOfCode[R_index] == '|'):
+			if (lineOfCode[R_index+1] == '|'):
+				L_index = R_index
+				R_index += 1
+				currChars = lineOfCode[L_index:(R_index+1)]
+				checkForSpace = True
+			else:
+				currChars = lineOfCode[R_index]
+				L_index = R_index
+				checkForSpace = True
+		elif (lineOfCode[R_index] == '*'):
+			if (lineOfCode[R_index+1] == '*'):
+				L_index = R_index
+				R_index += 1
+				currChars = lineOfCode[L_index:(R_index+1)]
+				checkForSpace = True
+			else:
+				currChars = lineOfCode[R_index]
+				L_index = R_index
+				checkForSpace = True
+		elif (lineOfCode[R_index] == 'H'):
+			if (lineOfCode[R_index+1] == '('):
+				L_index = R_index
+				R_index += 1
+				currChars = lineOfCode[L_index:(R_index+1)]
+				checkForSpace = True
+			else:
+				checkForSpace = False
+		elif (lineOfCode[R_index] == 'e'):
+			if (lineOfCode[R_index+1] == '('):
+				L_index = R_index
+				R_index += 1
+				currChars = lineOfCode[L_index:(R_index+1)]
+				checkForSpace = True
+			else:
+				checkForSpace = False
+		if (checkForSpace == True):
+			if ( (lineOfCode[L_index-1] != ' ') and (lineOfCode[R_index+1] != ' ') ):
+				lenOfLine = len(lineOfCode)
+				if ( (R_index + 1) == (lenOfLine - 1) ):
+					lineOfCode = lineOfCode[0:L_index] + ' ' + currChars + ' ' + lineOfCode[R_index+1]
+				else:
+					lineOfCode = lineOfCode[0:L_index] + ' ' + currChars + ' ' + lineOfCode[(R_index+1):lenOfLine]
+				R_index += 3
+			elif ( (lineOfCode[L_index-1] != ' ') and (lineOfCode[R_index+1] == ' ') ):
+				lenOfLine = len(lineOfCode)
+				if (L_index == (lenOfLine - 1) ):
+					lineOfCode = lineOfCode[0:L_index] + ' ' + lineOfCode[L_index]
+				else:
+					lineOfCode = lineOfCode[0:L_index] + ' ' + lineOfCode[L_index:lenOfLine]
+				R_index += 2
+			elif ( (lineOfCode[L_index-1] == ' ') and (lineOfCode[R_index+1] != ' ') ):
+				lenOfLine = len(lineOfCode)
+				if ( (R_index + 1) == (lenOfLine - 1) ):
+					lineOfCode = lineOfCode[0:(R_index+1)] + ' ' + lineOfCode[R_index+1]
+				else:
+					lineOfCode = lineOfCode[0:(R_index+1)] + ' ' + lineOfCode[(R_index+1):lenOfLine]
+				R_index += 2
+			elif ( (lineOfCode[L_index-1] == ' ') and (lineOfCode[R_index+1] == ' ') ):
+				R_index += 2
+		else:
+			R_index += 1
+
+		lenOfLine = len(lineOfCode)
+		if (R_index >= (lenOfLine - 1)):
+			break
+
+	return lineOfCode
+
 def getFunctionArgsAsStrings(functionArgNames, funcName):
-	if ( (functionArgNames == None) or (type(funcionArgNames).__name__ != con.dictTypePython) or (len(functionArgNames) == 0) ):
+	if ( (functionArgNames == None) or (type(functionArgNames).__name__ != con.dictTypePython) or (len(functionArgNames) == 0) ):
 		sys.exit("Parser_CodeGen_Toolbox->getFunctionArgsAsStrings:  problem with function argument names dictionary parameter passed in.")
 
 	if ( (funcName == None) or (type(funcName).__name__ != con.strTypePython) or (funcName not in functionArgNames) ):
@@ -43,9 +305,9 @@ def removeLeftParanSpaces(line):
 		if ( (nextLParanIndex > 0) and (line[nextLParanIndex - 1] == con.space) ):
 			lenOfLine = len(line)
 			line = line[0:(nextLParanIndex - 1)] + line[nextLParanIndex:lenOfLine]
-			nextLParanIndex = line.find(lParan, nextLParanIndex)
+			nextLParanIndex = line.find(con.lParan, nextLParanIndex)
 		else:
-			nextLParanIndex = line.find(lParan, (nextLParanIndex + 1))
+			nextLParanIndex = line.find(con.lParan, (nextLParanIndex + 1))
 
 	return line
 
@@ -79,9 +341,12 @@ def writeFunctionFromCodeToString(sourceCodeLines, startLineNo, endLineNo, extra
 
 	outputString += getStringOfTabs(extraTabsPerLine)
 	firstLine = extractedLines[0].lstrip().rstrip()
+	firstLine = ensureSpacesBtwnTokens_CodeGen(firstLine)
 	if (removeSelf == True):
-		firstLine = firstLine.replace(con.selfFuncArgString, "")
+		firstLine = firstLine.replace(con.selfFuncArgString, con.space)
 
+	firstLine = firstLine.lstrip()
+	firstLine = removeLeftParanSpaces(firstLine)
 	outputString += firstLine
 	outputString += "\n"
 
