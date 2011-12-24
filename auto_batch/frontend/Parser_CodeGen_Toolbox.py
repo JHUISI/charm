@@ -2,6 +2,37 @@ import con, sys
 from ASTParser import *
 from ASTVarVisitor import *
 
+def getFunctionArgsAsStrings(functionArgNames, funcName):
+	if ( (functionArgNames == None) or (type(funcionArgNames).__name__ != con.dictTypePython) or (len(functionArgNames) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getFunctionArgsAsStrings:  problem with function argument names dictionary parameter passed in.")
+
+	if ( (funcName == None) or (type(funcName).__name__ != con.strTypePython) or (funcName not in functionArgNames) ):
+		sys.exit("Parser_CodeGen_Toolbox->getFunctionArgsAsStrings:  problem with function name parameter passed in.")
+
+	argsAsStringNames = functionArgNames[funcName]
+	if ( (argsAsStringNames == None) or (type(argsAsStringNames).__name__ != con.listTypePython) ):
+		sys.exit("Parser_CodeGen_Toolbox->getFunctionArgsAsStrings:  problem with list of argument names represented as StringName objects.")
+
+	if (len(argsAsStringNames) == 0):
+		return None
+
+	argsAsStringsList = []
+
+	for argStringName in argsAsStringNames:
+		if ( (argStringName == None) or (type(argStringName).__name__ != con.stringName) ):
+			sys.exit("Parser_CodeGen_Toolbox->getFunctionArgsAsStrings:  problem with one of the stringName objects in the argument list.")
+
+		argAsString = argStringName.getStringVarName()
+		if ( (argAsString == None) or (type(argAsString).__name__ != con.strTypePython) or (len(argAsString) == 0) ):
+			sys.exit("Parser_CodeGen_Toolbox->getFunctionArgsAsStrings:  problem with the return value of getStringVarName on one of the argument stringName objects.")
+
+		argsAsStringsList.append(argAsString)
+
+	if (len(argsAsStringsList) == 0):
+		sys.exit("Parser_CodeGen_Toolbox->getFunctionArgsAsStrings:  could not extract any of the argument names as strings.")
+
+	return argsAsStringsList
+
 def removeLeftParanSpaces(line):
 	if ( (line == None) or (type(line).__name__ != con.strTypePython) or (len(line) == 0) ):
 		sys.exit("Parser_CodeGen_Toolbox->removeLeftParanSpaces:  problem with line parameter passed in.")
