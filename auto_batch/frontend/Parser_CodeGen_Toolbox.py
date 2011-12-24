@@ -2,6 +2,22 @@ import con, sys
 from ASTParser import *
 from ASTVarVisitor import *
 
+def removeLeftParanSpaces(line):
+	if ( (line == None) or (type(line).__name__ != con.strTypePython) or (len(line) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->removeLeftParanSpaces:  problem with line parameter passed in.")
+
+	nextLParanIndex = line.find(con.lParan)
+
+	while (nextLParanIndex != -1):
+		if ( (nextLParanIndex > 0) and (line[nextLParanIndex - 1] == con.space) ):
+			lenOfLine = len(line)
+			line = line[0:(nextLParanIndex - 1)] + line[nextLParanIndex:lenOfLine]
+			nextLParanIndex = line.find(lParan, nextLParanIndex)
+		else:
+			nextLParanIndex = line.find(lParan, (nextLParanIndex + 1))
+
+	return line
+
 def writeFunctionFromCodeToString(sourceCodeLines, startLineNo, endLineNo, extraTabsPerLine, removeSelf=False):
 	if ( (sourceCodeLines == None) or (type(sourceCodeLines).__name__ != con.listTypePython) or (len(sourceCodeLines) == 0) ):
 		sys.exit("Parser_CodeGen_Toolbox->writeFunctionFromCodeToString:  problem with source code lines parameter passed in.")

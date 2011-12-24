@@ -33,6 +33,7 @@ lambdaTypeCharm = 'lambda'
 lambdaValue = 'LambdaValue'
 left = 'left'
 listTypePython = 'list'
+lParan = '('
 mainFuncName = 'main'
 mathOp = ('left', 'op', 'right')
 multTypeAST = 'Mult'

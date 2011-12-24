@@ -16,20 +16,16 @@ from toolbox.pairinggroup import *
 from charm.engine.util import *
 
 debug = False
-
 class IBSig():
     def __init__(self, groupObj):
         global group
         group = groupObj
-        lam_func = lambda i,a,b: a[i] ** b[i]
-        lam_func2 = lambda i,a,b: a[i] ** b[i]
         
     def dump(self, obj):
         ser_a = serializeDict(obj, group)
         return str(pickleObject(ser_a))
             
     def keygen(self, secparam=None):
-        self.__init__(test)
         g, x = group.random(G2), group.random()
         g_x = g ** x
         pk = { 'g^x':g_x, 'g':g, 'identity':str(g_x), 'secparam':secparam }
@@ -43,16 +39,12 @@ class IBSig():
         
     def verify(self, pk, sig, message):
         M = self.dump(message)
-        self.keygen(0)
         h = group.hash(M, G1)
         if pair(sig, pk['g']) == pair(h, pk['g^x']):
             return True  
         return False 
 
 def main():
-    N = 200
-    z = 15
-
     groupObj = PairingGroup('../param/d224.param')
     
     m = { 'a':"hello world!!!" , 'b':"test message" }

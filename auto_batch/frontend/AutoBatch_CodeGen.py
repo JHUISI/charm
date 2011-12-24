@@ -11,6 +11,7 @@ pythonCodeLines = None
 pythonCodeNode = None
 varAssignments = None
 verifyEqNode = None
+verifyFuncArgs = None
 verifyFuncNode = None
 verifyLines = None
 verifySigsFile = None
@@ -452,18 +453,6 @@ def ensureSpacesBtwnTokens(lineOfCode):
 	return lineOfCode
 
 '''
-def removeLeftParanSpaces(line):
-	nextLParanIndex = line.find(lParan)
-
-	while (nextLParanIndex != -1):
-		if ( (nextLParanIndex > 0) and (line[nextLParanIndex - 1] == space) ):
-			lenOfLine = len(line)
-			line = line[0:(nextLParanIndex - 1)] + line[nextLParanIndex:lenOfLine]
-			nextLParanIndex = line.find(lParan, nextLParanIndex)
-		else:
-			nextLParanIndex = line.find(lParan, (nextLParanIndex + 1))
-
-	return line
 
 
 def getImportFromLines(rootNode, codeLines):
@@ -2240,7 +2229,7 @@ def main():
 		sys.exit("AutoBatch_CodeGen->main:  problem obtaining command-line arguments using sys.argv.")
 
 	global pythonCodeLines, individualVerFile, batchVerFile, verifySigsFile, pythonCodeNode, varAssignments, verifyFuncNode, verifyLines 
-	global verifyEqNode, functionArgMappings, callListOfVerifyFuncs, linePairsOfVerifyFuncs
+	global verifyEqNode, functionArgMappings, callListOfVerifyFuncs, linePairsOfVerifyFuncs, verifyFuncArgs
 
 	try:
 
