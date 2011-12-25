@@ -1,6 +1,70 @@
-import con, sys
+import con, copy, sys
 from ASTParser import *
 from ASTVarVisitor import *
+from LineInfo import LineInfo
+from StringName import StringName
+
+def getVarNamesAsStringNamesFromLine(line):
+	if ( (line == None) or (type(line).__name__ != con.strTypePython) or (len(line) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getVarNamesAsStringNamesFromLine:  problem with line passed in.")
+
+	line = line.lstrip().rstrip()
+
+	if ( (line.startswith(con.commentChar) == True) or (len(line) == 0) ):
+		return None
+
+	line = ensureSpacesBtwnTokens_CodeGen(line)
+
+	varList = []
+
+	for token in line.split():
+		if ( (token in con.reservedWords) or (token in con.reservedSymbols) or (token.isdigit() == True) ):
+			continue
+
+		nextStringNameObj = StringName()
+		nextStringNameObj.setName(token)
+		varList.append(copy.deepcopy(nextStringNameObj))
+		del nextStringNameObj
+
+	if (len(varList) == 0):
+		return None
+
+	return varList
+
+def getLineInfoFromSourceCodeLines(sourceCodeLines, numSpacesPerTab):
+	if ( (sourceCodeLines == None) or (type(sourceCodeLines).__name__ != con.listTypePython) or (len(sourceCodeLines) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getLineInfoFromSourceCodeLines:  problem with source code lines passed in.")
+
+	if ( (numSpacesPerTab == None) or (type(numSpacesPerTab).__name__ != con.intTypePython) or (numSpacesPerTab < 1) ):
+		sys.exit("Parser_CodeGen_Toolbox->getLineInfoFromSourceCodeLines:  problem with the number of spaces per tab passed in.")
+
+	lineNumber = 0
+	lineInfoList = []
+	
+	for line in sourceCodeLines:
+		if (isLineOnlyWhiteSpace(line) == True):
+			continue
+
+		lineNumber += 1
+		nextLineInfoObj = LineInfo()
+		nextLineInfoObj.setLineNo(lineNumber)
+		numSpaces = getNumIndentedSpaces(line)
+		if ( (numSpaces == None) or (type(numSpaces).__name__ != con.intTypePython) or (numSpaces < 0) ):
+			sys.exit("Parser_CodeGen_Toolbox->getLineInfoFromSourceCodeLines:  problem with number of spaces extracted from one of the lines passed in.")
+		nextLineInfoObj.setNumIndentSpaces(numSpaces, numSpacesPerTab)
+		varNames = getVarNamesAsStringNamesFromLine(line)
+		if (varNames != None):
+			if ( (type(varNames).__name__ != con.listTypePython) or (len(varNames) == 0) ):
+				sys.exit("Parser_CodeGen_Toolbox->getLineInfoFromSourceCodeLines:  problem with list returned from getVarNamesAsStringNamesFromLine.")
+			nextLineInfoObj.setVarNames(varNames)
+
+		lineInfoList.append(copy.deepcopy(nextLineInfoObj))
+		del nextLineInfoObj
+
+	if (len(lineInfoList) == 0):
+		sys.exit("Parser_CodeGen_Toolbox->getLineInfoFromSourceCodeLines:  could not extract line information for any of the lines passed in.")
+
+	return lineInfoList
 
 def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
 	if ( (lineOfCode == None) or (type(lineOfCode).__name__ != con.strTypePython) or (len(lineOfCode) == 0) ):
@@ -311,7 +375,7 @@ def removeLeftParanSpaces(line):
 
 	return line
 
-def writeFunctionFromCodeToString(sourceCodeLines, startLineNo, endLineNo, extraTabsPerLine, removeSelf=False):
+def writeFunctionFromCodeToString(sourceCodeLines, startLineNo, endLineNo, extraTabsPerLine, numSpacesPerTab, removeSelf=False):
 	if ( (sourceCodeLines == None) or (type(sourceCodeLines).__name__ != con.listTypePython) or (len(sourceCodeLines) == 0) ):
 		sys.exit("Parser_CodeGen_Toolbox->writeFunctionFromCodeToString:  problem with source code lines parameter passed in.")
 
@@ -335,7 +399,7 @@ def writeFunctionFromCodeToString(sourceCodeLines, startLineNo, endLineNo, extra
 	if ( (numSpacesFirstLine == None) or (type(numSpacesFirstLine).__name__ != con.intTypePython) or (numSpacesFirstLine < 0) ):
 		sys.exit("Parser_CodeGen_Toolbox->writeFunctionFromCodeToString:  problem with value returned from getNumIndentedSpaces on first line.")
 
-	numTabsFirstLine = determineNumTabsFromSpaces(numSpacesFirstLine)
+	numTabsFirstLine = determineNumTabsFromSpaces(numSpacesFirstLine, numSpacesPerTab)
 	if ( (numTabsFirstLine == None) or (type(numTabsFirstLine).__name__ != con.intTypePython) or (numTabsFirstLine < 0) ):
 		sys.exit("Parser_CodeGen_Toolbox->writeFunctionFromCodeToString:  problem with value returned from determineNumTabsFromSpaces on first line.")
 
@@ -354,7 +418,7 @@ def writeFunctionFromCodeToString(sourceCodeLines, startLineNo, endLineNo, extra
 
 	for index in range(1, lenExtractedLines):
 		numSpaces = indentationList[index]
-		numTabs = determineNumTabsFromSpaces(numSpaces)
+		numTabs = determineNumTabsFromSpaces(numSpaces, numSpacesPerTab)
 		numTabsForThisLine = numTabs - numTabsFirstLine
 		line = extractedLines[index].lstrip().rstrip()
 		outputString += getStringOfTabs(extraTabsPerLine + numTabsForThisLine)
@@ -375,14 +439,17 @@ def getStringOfTabs(numTabs):
 
 	return outputString
 
-def determineNumTabsFromSpaces(numSpaces):
+def determineNumTabsFromSpaces(numSpaces, numSpacesPerTab):
 	if ( (numSpaces == None) or (type(numSpaces).__name__ != con.intTypePython) or (numSpaces < 0) ):
 		sys.exit("Parser_CodeGen_Toolbox->determineNumTabsFromSpaces:  problem with number of spaces parameter passed in.")
 
-	if ( (numSpaces % con.numSpacesPerTab) != 0):
-		sys.exit("Parser_CodeGen_Toolbox->determineNumTabsFromSpaces:  number of spaces passed in is not a multiple of the number of spaces per tab (" + con.numSpacesPerTab + ")")
+	if ( (numSpacesPerTab == None) or (type(numSpacesPerTab).__name__ != con.intTypePython) or (numSpacesPerTab < 1) ):
+		sys.exit("Parser_CodeGen_Toolbox->determineNumTabsFromSpaces:  problem with number of spaces per tab passed in.")
 
-	return (int(numSpaces / con.numSpacesPerTab))
+	if ( (numSpaces % numSpacesPerTab) != 0):
+		sys.exit("Parser_CodeGen_Toolbox->determineNumTabsFromSpaces:  number of spaces passed in (" + numSpaces + ") is not a multiple of the number of spaces per tab (" + numSpacesPerTab + ")")
+
+	return (int(numSpaces / numSpacesPerTab))
 
 def getFirstLastLineNosOfFuncList(funcList, rootNode):
 	if ( (funcList == None) or (type(funcList).__name__ != con.listTypePython) or (len(funcList) == 0) ):

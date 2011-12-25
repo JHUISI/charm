@@ -11,7 +11,7 @@ Boneh-Lynn-Shacham Identity Based Signature
 
 :Authors:    J. Ayo Akinyele
 :Date:       1/2011
- '''
+'''
 from toolbox.pairinggroup import *
 from charm.engine.util import *
 

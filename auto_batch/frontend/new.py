@@ -1,1 +1,2 @@
-mpk['g1'] ** -s
+x = "a"
+print(x)

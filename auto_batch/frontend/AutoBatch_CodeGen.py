@@ -2,6 +2,9 @@ import copy, os, sys
 from ASTParser import *
 from Parser_CodeGen_Toolbox import *
 
+batchEqLoopVars = []
+batchEqNotLoopVars = []
+batchEqVars = None
 batchVerFile = None
 batchVerifierOutput = None
 callListOfVerifyFuncs = None
@@ -10,9 +13,11 @@ finalBatchEqWithLoops = None
 functionArgMappings = None
 indentationListVerifyLines = None
 individualVerFile = None
+lineInfo = None
 linePairsOfVerifyFuncs = None
 listVars = {}
 loopVarGroupTypes = {}
+numSpacesPerTab = None
 numTabsOnVerifyLine = None
 precomputeVars = {}
 pythonCodeLines = None
@@ -371,27 +376,41 @@ def addIfElse(batchOutputString, finalBatchEq):
 	batchOutputString += "\telse:\n"
 	batchOutputString += "\t\tprint(\"Batch signature verification failed.\\n\")"
 	return batchOutputString
+'''
 
-def getBatchEqVars(finalBatchEq):
+def getBatchEqVars():
+	global batchEqVars
+
 	batchEqVars = finalBatchEq.split()
-	for removeVar in batchEqRemoveVars:
-		while (batchEqVars.count(removeVar) > 0):
-			batchEqVars.remove(removeVar)
-	
+
+	for removeString in con.batchEqRemoveStrings:
+		while (batchEqVars.count(removeString) > 0):
+			batchEqVars.remove(removeString)
+
 	for dupVar in batchEqVars:
 		while (batchEqVars.count(dupVar) > 1):
 			batchEqVars.remove(dupVar)
 
-	#print(batchEqVars)
-			
-	if (batchEqVars.count(deltaString) == 1):
-		batchEqVars.remove(deltaString)
-	
-	if (batchEqVars.count(deltaDotProdString) == 1):
-		batchEqVars.remove(deltaDotProdString)
+	deltaVarsToRemove = []
 
-	return batchEqVars
+	for deltaVar in batchEqVars:
+		if ( (deltaVar == con.delta) or (deltaVar.startswith(con.delta + con.loopIndicator) == True) ):
+			deltaVarsToRemove.append(deltaVar)
 
+	for varToRemove in deltaVarsToRemove:
+		batchEqVars.remove(varToRemove)
+
+def distillBatchEqVars():
+	global batchEqLoopVars, batchEqNotLoopVars
+
+	for varName in batchEqVars:
+		isThisALoopVar = varName.find(con.loopIndicator)
+		if (isThisALoopVar == -1):
+			batchEqNotLoopVars.append(varName)
+		else:
+			batchEqLoopVars.append(varName)
+
+'''
 def distillBatchEqVars(batchEqVars, batchEqNotSumOrDotVars):
 	#batchEqDotProdVars = []
 	
@@ -1924,15 +1943,15 @@ def addCommonHeaderLines():
 	batchOutputString = ""
 	batchOutputString += "from toolbox.pairinggroup import *\n"
 	batchOutputString += "from verifySigs import verifySigsRecursive\n\n"
-	batchOutputString += "group = None\n"
+	batchOutputString += con.group + " = None\n"
 	batchOutputString += "bodyKey = \'Body\'\n\n"
-	batchOutputString += "def prng_bits(group, bits=80):\n"
-	batchOutputString += "\treturn group.init(ZR, randomBits(bits))\n\n"
+	batchOutputString += "def prng_bits(" + con.group + ", bits=80):\n"
+	batchOutputString += "\treturn " + con.group + ".init(ZR, randomBits(bits))\n\n"
 
 	batchVerFile.write(batchOutputString)
 
 	indOutputString = ""
-	indOutputString += "\ngroup = None\n"
+	indOutputString += "\n" + con.group + " = None\n"
 	indOutputString += "bodyKey = \'Body\'\n\n"
 
 	individualVerFile.write(indOutputString)
@@ -1943,9 +1962,9 @@ def addTemplateLines():
 	numSigners = getStringNameIntegerValue(varAssignments, con.numSigners, con.mainFuncName)
 
 	batchOutputString = ""
-	batchOutputString += "def run_Batch(verifyArgsDict, groupObjParam, verifyFuncArgs):\n"
-	batchOutputString += "\tglobal group\n"
-	batchOutputString += "\tgroup = groupObjParam\n\n"
+	batchOutputString += "def run_Batch(verifyArgsDict, " + con.group + "ObjParam, verifyFuncArgs):\n"
+	batchOutputString += "\tglobal " + con.group + "\n"
+	batchOutputString += "\t" + con.group + " = " + con.group + "ObjParam\n\n"
 	batchOutputString += "\t#Group membership checks\n\n"
 	batchOutputString += "\t" + con.numSignatures + " = len(verifyArgsDict)\n"
 
@@ -1953,15 +1972,15 @@ def addTemplateLines():
 		batchOutputString += "\t" + con.numSigners + " = " + str(numSigners) + "\n"
 
 	batchOutputString += "\tfor sigIndex in range(0, " + con.numSignatures + "):\n"
-	batchOutputString += "\t\tdeltaz[sigIndex] = prng_bits(group, 80)\n\n"
+	batchOutputString += "\t\tdeltaz[sigIndex] = prng_bits(" + con.group + ", 80)\n\n"
 	batchOutputString += "\tincorrectIndices = []\n"
 
 	batchVerFile.write(batchOutputString)
 
 	indOutputString = ""
-	indOutputString += "def run_Ind(verifyArgsDict, groupObjParam, verifyFuncArgs):\n"
-	indOutputString += "\tglobal group\n"
-	indOutputString += "\tgroup = groupObjParam\n\n"
+	indOutputString += "def run_Ind(verifyArgsDict, " + con.group + "ObjParam, verifyFuncArgs):\n"
+	indOutputString += "\tglobal " + con.group + "\n"
+	indOutputString += "\t" + con.group + " = " + con.group + "ObjParam\n\n"
 	indOutputString += "\t#Group membership checks\n\n"
 	indOutputString += "\t" + con.numSignatures + " = len(verifyArgsDict)\n"
 
@@ -2014,6 +2033,8 @@ def writeBodyOfInd():
 	lineNumber = -1
 	individualOutputString = ""
 
+	argsToCheckForGroupMembership = []
+
 	for line in verifyLines:
 		lineNumber += 1
 		if (isLineOnlyWhiteSpace(line) == True):
@@ -2036,7 +2057,7 @@ def writeBodyOfInd():
 		line = line.lstrip().rstrip()
 		line = removeLeftParanSpaces(line)
 		line = line.replace(con.selfFuncCallString, con.space)
-		numTabs = determineNumTabsFromSpaces(indentationListVerifyLines[lineNumber]) - numTabsOnVerifyLine
+		numTabs = determineNumTabsFromSpaces(indentationListVerifyLines[lineNumber], numSpacesPerTab) - numTabsOnVerifyLine
 		numTabs += 1
 		individualOutputString += getStringOfTabs(numTabs)
 		individualOutputString += line + "\n"
@@ -2055,7 +2076,7 @@ def addFunctionsThatVerifyCalls():
 	individualOutputString = ""
 
 	for linePair in linePairsOfVerifyFuncs:
-		functionString = writeFunctionFromCodeToString(copy.deepcopy(pythonCodeLines), linePair[0], linePair[1], 0, True)
+		functionString = writeFunctionFromCodeToString(copy.deepcopy(pythonCodeLines), linePair[0], linePair[1], 0, numSpacesPerTab, True)
 		if ( (functionString == None) or (type(functionString).__name__ != con.strTypePython) or (len(functionString) == 0) ):
 			sys.exit("AutoBatch_CodeGen->addFunctionsThatVerifyCalls:  problem with function string returned from writeFunctionFromCodeToString.")
 
@@ -2087,7 +2108,7 @@ def main():
 
 	global pythonCodeLines, individualVerFile, batchVerFile, verifySigsFile, pythonCodeNode, varAssignments, verifyFuncNode, verifyLines 
 	global verifyEqNode, functionArgMappings, callListOfVerifyFuncs, linePairsOfVerifyFuncs, verifyFuncArgs, indentationListVerifyLines
-	global numTabsOnVerifyLine, batchVerifierOutput, finalBatchEq, finalBatchEqWithLoops, listVars
+	global numTabsOnVerifyLine, batchVerifierOutput, finalBatchEq, finalBatchEqWithLoops, listVars, numSpacesPerTab, lineInfo
 
 	try:
 
@@ -2143,15 +2164,19 @@ def main():
 		sys.exit("AutoBatch_CodeGen->main:  problem with value returned for starting line of " + con.verifyFuncName + " function.")
 
 	numSpacesOnVerifyFuncList = []
-	getLinesFromSourceCodeWithinRange(copy.deepcopy(pythonCodeLines), verifyStartLine, verifyStartLine, numSpacesOnVerifyFuncList)
-	if ( (numSpacesOnVerifyFuncList == None) or (type(numSpacesOnVerifyFuncList).__name__ != con.listTypePython) or (len(numSpacesOnVerifyFuncList) != 1) ):
+	getLinesFromSourceCodeWithinRange(copy.deepcopy(pythonCodeLines), verifyStartLine, (verifyStartLine + 1), numSpacesOnVerifyFuncList)
+	if ( (numSpacesOnVerifyFuncList == None) or (type(numSpacesOnVerifyFuncList).__name__ != con.listTypePython) or (len(numSpacesOnVerifyFuncList) != 2) ):
 		sys.exit("AutoBatch_CodeGen->main:  problem with value returned from getLinesFromSourceCodeWithinRange to determine the number of spaces on the line of the " + con.verifyfuncName + " function.")
 
 	numSpacesOnVerifyFunc = numSpacesOnVerifyFuncList[0]
 	if ( (numSpacesOnVerifyFunc == None) or (type(numSpacesOnVerifyFunc).__name__ != con.intTypePython) or (numSpacesOnVerifyFunc < 0) ):
 		sys.exit("AutoBatch_CodeGen->main:  problem with number of spaces extracted on the line of the " + con.verifyFuncName + " function.")
 
-	numTabsOnVerifyLine = determineNumTabsFromSpaces(numSpacesOnVerifyFunc)
+	numSpacesPerTab = numSpacesOnVerifyFuncList[1] - numSpacesOnVerifyFunc
+	if ( (numSpacesPerTab == None) or (type(numSpacesPerTab).__name__ != con.intTypePython) or (numSpacesPerTab < 1) ):
+		sys.exit("AutoBatch_codeGen->main:  problem with number obtained for the number of spaces per tab.")
+
+	numTabsOnVerifyLine = determineNumTabsFromSpaces(numSpacesOnVerifyFunc, numSpacesPerTab)
 	if ( (numTabsOnVerifyLine == None) or (type(numTabsOnVerifyLine).__name__ != con.intTypePython) or (numTabsOnVerifyLine < 0) ):
 		sys.exit("AutoBatch_CodeGen->main:  problem with number of tabs extracted on the line of the " + con.verifyFuncName + " function.")
 
@@ -2208,6 +2233,11 @@ def main():
 		sys.exit("AutoBatch_CodeGen->main:  problem locating the various forms of the final batch equation from the output of the batch verifier.")
 
 	cleanFinalBatchEq()
+	getBatchEqVars()
+	distillBatchEqVars()
+	lineInfo = getLineInfoFromSourceCodeLines(copy.deepcopy(pythonCodeLines), numSpacesPerTab)
+	if ( (lineInfo == None) or (type(lineInfo).__name__ != con.listTypePython) or (len(lineInfo) == 0) ):
+		sys.exit("AutoBatch_CodeGen->main:  could not extract any line information from the source code Python lines of the cryptoscheme.")
 
 	try:
 		batchVerFile.close()
@@ -2216,15 +2246,7 @@ def main():
 	except:
 		sys.exit("AutoBatch_CodeGen->main:  problem attempting to run close() on the output files of this program.")
 
-'''	
-	batchEqVars = getBatchEqVars(finalBatchEq)
-	batchEqDotProdVars = [] #not used
-	batchEqSumVars = [] #not used
-	batchEqNotSumOrDotVars = []
-	distillBatchEqVars(batchEqVars, batchEqNotSumOrDotVars)
-	assignMapVar = BuildAssignMap()
-	assignMapVar.visit(verifyFuncNode)
-	assignMap = assignMapVar.getAssignMap()
+'''
 	listOfIndentedBlocks = buildMapOfControlFlow(pythonCodeLines, verifyFuncNode.lineno, (verifyEqNode.lineno - 1))
 	computeLineInfo = getComputeLineInfo(batchVerifierOutput)	
 	outerDotProds = getOuterDotProds(batchVerifierOutput)
