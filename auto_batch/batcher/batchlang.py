@@ -248,11 +248,15 @@ class BinaryNode:
 		new_node.right = self.copy(this.right)		
 		return new_node	
 
+	# sets destination ref to src ref (type, attr value, and attr index)
 	@classmethod
 	def setNodeAs(self, dest, src):
 		dest.type = src.type
 		dest.attr = src.attr
-		dest.attr_index = src.attr_index
+		if src.attr_index:
+			dest.attr_index = list(src.attr_index)
+		else:
+			dest.attr_index = None
 		return
 
 	# only applies function on leaf nodes

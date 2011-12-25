@@ -695,19 +695,126 @@ class SmallExponent:
         _node = p.parse("a ^ b_i")
         return _node
 
-class Technique2:
+class AbstractTechnique:
     def __init__(self, constants, variables, meta):
-        self.consts  = constants
-        self.vars    = variables
+        self.consts = constants
+        self.vars   = variables
+        self.meta   = meta
+
+    def visit(self, node, data):
+        return
+# check whether left or right node is constant
+    def isConstInSubtreeT(self, node):  
+        if node == None: return None
+        if Type(node) == ops.ATTR:
+            return self.isConstant(node)
+        elif Type(node) == ops.HASH:
+            return self.isConstant(node.left)
+        result = self.isConstInSubtreeT(node.left)
+        if not result: return result
+        result = self.isConstInSubtreeT(node.right)
+        return result
+
+    def isConstant(self, node):        
+        for n in self.consts:
+            if n == node.getAttribute(): return True
+        return False
+
+    def getNodes(self, tree, parent_type, _list):
+        if tree == None: return None
+        elif parent_type == ops.MUL:
+            if tree.type == ops.ATTR: _list.append(tree)
+            elif tree.type == ops.EXP: _list.append(tree)
+            elif tree.type == ops.HASH: _list.append(tree)
+        
+        if tree.left: self.getNodes(tree.left, tree.type, _list)
+        if tree.right: self.getNodes(tree.right, tree.type, _list)
+        return
+
+    def getMulTokens(self, subtree, parent_type, target_type, _list):
+        if subtree == None: return None
+        elif parent_type == ops.MUL:
+            if subtree.type in target_type: _list.append(subtree)
+        if subtree.left: self.getMulTokens(subtree.left, subtree.type, target_type, _list)
+        if subtree.right: self.getMulTokens(subtree.right, subtree.type, target_type, _list)
+        return
+
+    def findExpWithIndex(self, node, index):
+        node_type = Type(node)
+        #print("node_type = ", node_type)
+        if node == None: return None
+        elif node_type == ops.EXP:
+            #print("node.right type =>", Type(node.right))
+            if Type(node.right) == ops.MUL:
+                return self.findExpWithIndex(node.right, index)                
+            elif index in node.right.attr_index:
+                #print("node =>", node)            
+                return node.right
+        elif node_type == ops.MUL:
+            if index in node.left.attr_index and index in node.right.attr_index: 
+                return node
+            elif index in node.left.attr_index: return node.left
+            elif index in node.right.attr_index: return node.right            
+        else:
+            result = self.findExpWithIndex(node.left, index)
+            if result: return node
+            result = self.findExpWithIndex(node.right, index)
+            return result
+
+    def createPair(self, left, right):
+        pair = BinaryNode(ops.PAIR)
+        pair.left = left
+        pair.right = right
+        return pair
+    
+    def createExp(self, left, right):
+        if left.type == ops.EXP: # left => a^b , then => a^(b * c)
+            mul = BinaryNode(ops.MUL)
+            mul.left = left.right
+            mul.right = right
+            exp = BinaryNode(ops.EXP)
+            exp.left = left.left
+            exp.right = mul
+        elif left.type in [ops.ATTR, ops.PAIR, ops.HASH]: # left: attr ^ right
+            exp = BinaryNode(ops.EXP)
+            exp.left = left
+            exp.right = right
+        else:
+            exp = BinaryNode(ops.EXP)
+            exp.left = left
+            exp.right = right
+        return exp
+    # node - target subtree, parent - self-explanatory
+    # target - node we would liek to delete, branch - side of tree that is traversed.
+    def deleteFromTree(self, node, parent, target, branch=None):
+        if node == None: return None
+        elif str(node) == str(target):
+            if branch == 'left': 
+                BinaryNode.setNodeAs(parent, parent.right)
+                parent.left = parent.right = None 
+                return                
+            elif branch == 'right': 
+                BinaryNode.setNodeAs(parent, parent.left)
+                parent.left = parent.right = None
+                return 
+        else:
+            self.deleteFromTree(node.left, node, target, 'left')
+            self.deleteFromTree(node.right, node, target, 'right')
+
+
+    
+
+class Technique2(AbstractTechnique):
+    def __init__(self, constants, variables, meta):
+        AbstractTechnique.__init__(self, constants, variables, meta)
+#        self.consts  = constants
+#        self.vars    = variables
         self.rule    = "Move the exponent(s) into the pairing (technique 2)"
         self.applied = False 
         #self.rule   = "Rule 2: "
         # TODO: pre-processing to determine context of how to apply technique 2
         # TODO: in cases of chp.bv, where you have multiple exponents outside a pairing, move them all into the e().
     
-    def visit(self, node, data):
-        pass
-
     # find: 'e(g, h)^d_i' transform into ==> 'e(g^d_i, h)' iff g or h is constant
     # move exponent towards the non-constant attribute
     def visit_exp(self, node, data):
@@ -800,30 +907,34 @@ class Technique2:
         else:
             pass
 
-    def createExp(self, left, right):
-        if left.type == ops.EXP: # left => a^b , then => a^(b * c)
-            mul = BinaryNode(ops.MUL)
-            mul.left = left.right
-            mul.right = right
-            exp = BinaryNode(ops.EXP)
-            exp.left = left.left
-            exp.right = mul
-        elif left.type in [ops.ATTR, ops.PAIR]: # left: attr ^ right
-            exp = BinaryNode(ops.EXP)
-            exp.left = left
-            exp.right = right
-        return exp
+#    def createExp(self, left, right):
+#        if left.type == ops.EXP: # left => a^b , then => a^(b * c)
+#            mul = BinaryNode(ops.MUL)
+#            mul.left = left.right
+#            mul.right = right
+#            exp = BinaryNode(ops.EXP)
+#            exp.left = left.left
+#            exp.right = mul
+#        elif left.type in [ops.ATTR, ops.PAIR, ops.HASH]: # left: attr ^ right
+#            exp = BinaryNode(ops.EXP)
+#            exp.left = left
+#            exp.right = right
+#        else:
+#            exp = BinaryNode(ops.EXP)
+#            exp.left = left
+#            exp.right = right
+#        return exp
 
-    def getNodes(self, tree, parent_type, _list):
-        if tree == None: return None
-        elif parent_type == ops.MUL:
-            if tree.type == ops.ATTR: _list.append(tree)
-            elif tree.type == ops.EXP: _list.append(tree)
-            elif tree.type == ops.HASH: _list.append(tree)
-        
-        if tree.left: self.getNodes(tree.left, tree.type, _list)
-        if tree.right: self.getNodes(tree.right, tree.type, _list)
-        return
+#    def getNodes(self, tree, parent_type, _list):
+#        if tree == None: return None
+#        elif parent_type == ops.MUL:
+#            if tree.type == ops.ATTR: _list.append(tree)
+#            elif tree.type == ops.EXP: _list.append(tree)
+#            elif tree.type == ops.HASH: _list.append(tree)
+#        
+#        if tree.left: self.getNodes(tree.left, tree.type, _list)
+#        if tree.right: self.getNodes(tree.right, tree.type, _list)
+#        return
     
     def setNodeAs(self, orig_node, attr_str, target_node, target_attr_str='left'):
         if attr_str == 'right':  tmp_node = orig_node.right; orig_node.right = target_node
@@ -834,32 +945,30 @@ class Technique2:
         else: return None
         return True
         
-    def isConstInSubtreeT(self, node): # check whether left or right node is constant  
-        if node == None: return None
-        if Type(node) == ops.ATTR:
-            return self.isConstant(node)
-        elif Type(node) == ops.HASH:
-            return self.isConstant(node.left)
-        result = self.isConstInSubtreeT(node.left)
-        if not result: return result
-        result = self.isConstInSubtreeT(node.right)
-        return result
+#    def isConstInSubtreeT(self, node): # check whether left or right node is constant  
+#        if node == None: return None
+#        if Type(node) == ops.ATTR:
+#            return self.isConstant(node)
+#        elif Type(node) == ops.HASH:
+#            return self.isConstant(node.left)
+#        result = self.isConstInSubtreeT(node.left)
+#        if not result: return result
+#        result = self.isConstInSubtreeT(node.right)
+#        return result
+#
+#    def isConstant(self, node):        
+#        for n in self.consts:
+#            if n == node.getAttribute(): return True
+#        return False
 
-    def isConstant(self, node):        
-        for n in self.consts:
-            if n == node.getAttribute(): return True
-        return False
-
-class Technique3:
+class Technique3(AbstractTechnique):
     def __init__(self, constants, variables, meta):
-        self.consts  = constants
-        self.vars    = variables
+        AbstractTechnique.__init__(self, constants, variables, meta)
+#        self.consts  = constants
+#        self.vars    = variables
         #self.rule   = "Rule 3: "
         self.rule    = "Combine pairings with common 1st or 2nd element. Reduce N pairings to 1 (technique 3)"
         self.applied = False
-    
-    def visit(self, node, data):
-        pass
 
     # once a     
     def visit_pair(self, node, data):
@@ -973,101 +1082,96 @@ class Technique3:
                 addAsChildNodeToParent(data, exp)
                 self.applied = True
 
-    def isConstInSubtreeT(self, node): # check whether left or right node is constant  
-        if node == None: return None
-        if node.type == ops.ATTR:
-            #print("node =>", node, node.type, self.isConstant(node))
-            return self.isConstant(node)
-        result = self.isConstInSubtreeT(node.left)
-        if not result: return result
-        result = self.isConstInSubtreeT(node.right)
-        return result
+#    def isConstInSubtreeT(self, node): # check whether left or right node is constant  
+#        if node == None: return None
+#        if node.type == ops.ATTR:
+#            #print("node =>", node, node.type, self.isConstant(node))
+#            return self.isConstant(node)
+#        result = self.isConstInSubtreeT(node.left)
+#        if not result: return result
+#        result = self.isConstInSubtreeT(node.right)
+#        return result
+#
+#    def isConstant(self, node): 
+#        for n in self.consts:
+#            if n == node.getAttribute(): return True
+#        return False
+    
+#    def getMulTokens(self, subtree, parent_type, target_type, _list):
+#        if subtree == None: return None
+#        elif parent_type == ops.MUL:
+#            if subtree.type in target_type: _list.append(subtree)
+#        if subtree.left: self.getMulTokens(subtree.left, subtree.type, target_type, _list)
+#        if subtree.right: self.getMulTokens(subtree.right, subtree.type, target_type, _list)
+#        return
+    
+#    def getNodes(self, tree, parent_type, _list):
+#        if tree == None: return None
+#        elif parent_type == ops.MUL:
+#            if tree.type == ops.ATTR: _list.append(tree)
+#            elif tree.type == ops.EXP: _list.append(tree)
+#            elif tree.type == ops.HASH: _list.append(tree)
+#        
+#        if tree.left: self.getNodes(tree.left, tree.type, _list)
+#        if tree.right: self.getNodes(tree.right, tree.type, _list)
+#        return
+    
+#    def createPair(self, left, right):
+#        pair = BinaryNode(ops.PAIR)
+#        pair.left = left
+#        pair.right = right
+#        return pair
+#    
+#    def createExp(self, left, right):
+#        exp = BinaryNode(ops.EXP)
+#        exp.left = left
+#        exp.right = right
+#        return exp
 
-    def isConstant(self, node): 
-        for n in self.consts:
-            if n == node.getAttribute(): return True
-        return False
-    
-    def getMulTokens(self, subtree, parent_type, target_type, _list):
-        if subtree == None: return None
-        elif parent_type == ops.MUL:
-            if subtree.type in target_type: _list.append(subtree)
-        if subtree.left: self.getMulTokens(subtree.left, subtree.type, target_type, _list)
-        if subtree.right: self.getMulTokens(subtree.right, subtree.type, target_type, _list)
-        return
-    
-    def getNodes(self, tree, parent_type, _list):
-        if tree == None: return None
-        elif parent_type == ops.MUL:
-            if tree.type == ops.ATTR: _list.append(tree)
-            elif tree.type == ops.EXP: _list.append(tree)
-            elif tree.type == ops.HASH: _list.append(tree)
-        
-        if tree.left: self.getNodes(tree.left, tree.type, _list)
-        if tree.right: self.getNodes(tree.right, tree.type, _list)
-        return
-    
-    def createPair(self, left, right):
-        pair = BinaryNode(ops.PAIR)
-        pair.left = left
-        pair.right = right
-        return pair
-    
-    def createExp(self, left, right):
-        exp = BinaryNode(ops.EXP)
-        exp.left = left
-        exp.right = right
-        return exp
-
-    def deleteFromTree(self, node, parent, target, branch=None):
-        if node == None: return None
-        elif str(node) == str(target):
-            if branch == 'left': 
-                BinaryNode.setNodeAs(parent, parent.right)
-                parent.left = parent.right = None 
-                return                
-            elif branch == 'right': 
-                BinaryNode.setNodeAs(parent, parent.left)
-                parent.left = parent.right = None
-                return 
-        else:
-            self.deleteFromTree(node.left, node, target, 'left')
-            self.deleteFromTree(node.right, node, target, 'right')
+#    def deleteFromTree(self, node, parent, target, branch=None):
+#        if node == None: return None
+#        elif str(node) == str(target):
+#            if branch == 'left': 
+#                BinaryNode.setNodeAs(parent, parent.right)
+#                parent.left = parent.right = None 
+#                return                
+#            elif branch == 'right': 
+#                BinaryNode.setNodeAs(parent, parent.left)
+#                parent.left = parent.right = None
+#                return 
+#        else:
+#            self.deleteFromTree(node.left, node, target, 'left')
+#            self.deleteFromTree(node.right, node, target, 'right')
             
-    def findExpWithIndex(self, node, index):
-        node_type = Type(node)
-        #print("node_type = ", node_type)
-        if node == None: return None
-        elif node_type == ops.EXP:
-            #print("node.right type =>", Type(node.right))
-            if Type(node.right) == ops.MUL:
-                return self.findExpWithIndex(node.right, index)                
-            elif index in node.right.attr_index:
-                #print("node =>", node)            
-                return node.right
-        elif node_type == ops.MUL:
-            if index in node.left.attr_index and index in node.right.attr_index: 
-                return node
-            elif index in node.left.attr_index: return node.left
-            elif index in node.right.attr_index: return node.right            
-        else:
-            result = self.findExpWithIndex(node.left, index)
-            if result: return node
-            result = self.findExpWithIndex(node.right, index)
-            return result
+#    def findExpWithIndex(self, node, index):
+#        node_type = Type(node)
+#        #print("node_type = ", node_type)
+#        if node == None: return None
+#        elif node_type == ops.EXP:
+#            #print("node.right type =>", Type(node.right))
+#            if Type(node.right) == ops.MUL:
+#                return self.findExpWithIndex(node.right, index)                
+#            elif index in node.right.attr_index:
+#                #print("node =>", node)            
+#                return node.right
+#        elif node_type == ops.MUL:
+#            if index in node.left.attr_index and index in node.right.attr_index: 
+#                return node
+#            elif index in node.left.attr_index: return node.left
+#            elif index in node.right.attr_index: return node.right            
+#        else:
+#            result = self.findExpWithIndex(node.left, index)
+#            if result: return node
+#            result = self.findExpWithIndex(node.right, index)
+#            return result
         
-class Technique4:
+class Technique4(AbstractTechnique):
     def __init__(self, constants, variables, meta):
-        self.consts = constants
-        self.vars   = variables
-        self.meta = meta
+        AbstractTechnique.__init__(self, constants, variables, meta)
         self.rule = "Applied waters hash technique (technique 4)"
         self.applied = False
         #print("Metadata =>", meta)
-    
-    def visit(self, node, data):
-        pass
-    
+        
     def visit_on(self, node, data):
         prod = node.left
         my_val = str(prod.right)
@@ -1135,21 +1239,22 @@ class Technique4:
             elif not self.allNodesWithIndex(index, node.left):
                 print("adjustProdNodes: need to handle the other case.")
         # first check the right side for product
-        
-    def createExp(self, left, right):
-        if left.type == ops.EXP: # left => a^b , then => a^(b * c)
-            mul = BinaryNode(ops.MUL)
-            mul.left = left.right
-            mul.right = right
-            exp = BinaryNode(ops.EXP)
-            exp.left = left.left
-            exp.right = mul
-        elif left.type in [ops.ATTR, ops.PAIR, ops.HASH]: # left: attr ^ right
-            exp = BinaryNode(ops.EXP)
-            exp.left = left
-            exp.right = right
-        else: return None
-        return exp
+#        
+#    def createExp(self, left, right):
+#        if left.type == ops.EXP: # left => a^b , then => a^(b * c)
+#            mul = BinaryNode(ops.MUL)
+#            mul.left = left.right
+#            mul.right = right
+#            exp = BinaryNode(ops.EXP)
+#            exp.left = left.left
+#            exp.right = mul
+#        elif left.type in [ops.ATTR, ops.PAIR, ops.HASH]: # left: attr ^ right
+#            exp = BinaryNode(ops.EXP)
+#            exp.left = left
+#            exp.right = right
+#        else: 
+#            return None
+#        return exp
     
     def allNodesWithIndex(self, index, subtree):
         if subtree == None: return True
@@ -1170,44 +1275,44 @@ class Technique4:
             result = self.searchProd(node.right, node)
             return result
         
-    def findExpWithIndex(self, node, index):
-        node_type = Type(node)
-        #print("node_type = ", node_type)
-        if node == None: return None
-        elif node_type == ops.EXP:
-            #print("node.right type =>", Type(node.right))
-            if Type(node.right) == ops.MUL:
-                return self.findExpWithIndex(node.right, index)                
-            elif index in node.right.attr_index:
-                #print("node =>", node)            
-                return node.right
-        elif node_type == ops.MUL:
-            if index in node.left.attr_index and index in node.right.attr_index: 
-                return node
-            elif index in node.left.attr_index: return node.left
-            elif index in node.right.attr_index: return node.right            
-        else:
-            result = self.findExpWithIndex(node.left, index)
-            if result: return node
-            result = self.findExpWithIndex(node.right, index)
-            return result
+#    def findExpWithIndex(self, node, index):
+#        node_type = Type(node)
+#        #print("node_type = ", node_type)
+#        if node == None: return None
+#        elif node_type == ops.EXP:
+#            #print("node.right type =>", Type(node.right))
+#            if Type(node.right) == ops.MUL:
+#                return self.findExpWithIndex(node.right, index)                
+#            elif index in node.right.attr_index:
+#                #print("node =>", node)            
+#                return node.right
+#        elif node_type == ops.MUL:
+#            if index in node.left.attr_index and index in node.right.attr_index: 
+#                return node
+#            elif index in node.left.attr_index: return node.left
+#            elif index in node.right.attr_index: return node.right            
+#        else:
+#            result = self.findExpWithIndex(node.left, index)
+#            if result: return node
+#            result = self.findExpWithIndex(node.right, index)
+#            return result
         
-    # node - target subtree, parent - self-explanatory
-    # target - node we would liek to delete, branch - side of tree that is traversed.
-    def deleteFromTree(self, node, parent, target, branch=None):
-        if node == None: return None
-        elif str(node) == str(target):
-            if branch == 'left': 
-                BinaryNode.setNodeAs(parent, parent.right)
-                parent.left = parent.right = None 
-                return                
-            elif branch == 'right': 
-                BinaryNode.setNodeAs(parent, parent.left)
-                parent.left = parent.right = None
-                return 
-        else:
-            self.deleteFromTree(node.left, node, target, 'left')
-            self.deleteFromTree(node.right, node, target, 'right')
+#    # node - target subtree, parent - self-explanatory
+#    # target - node we would liek to delete, branch - side of tree that is traversed.
+#    def deleteFromTree(self, node, parent, target, branch=None):
+#        if node == None: return None
+#        elif str(node) == str(target):
+#            if branch == 'left': 
+#                BinaryNode.setNodeAs(parent, parent.right)
+#                parent.left = parent.right = None 
+#                return                
+#            elif branch == 'right': 
+#                BinaryNode.setNodeAs(parent, parent.left)
+#                parent.left = parent.right = None
+#                return 
+#        else:
+#            self.deleteFromTree(node.left, node, target, 'left')
+#            self.deleteFromTree(node.right, node, target, 'right')
 
 
 def print_results(data):

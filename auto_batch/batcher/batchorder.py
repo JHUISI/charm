@@ -34,8 +34,9 @@ class BatchOrder:
         self.verify = equation
         self.debug  = False
         self.techMap = { 2:Technique2, 3:Technique3, 4:Technique4 }
-        self.techMap2 = { 2:Technique2, 3:Technique3, 4:Technique4, 5:DotProdInstanceFinder, 6:PairInstanceFinder }
-
+        # a quick way to test that a particular technique will transform the equation (pre-check)
+        #self.detectMap2 = { 2:Technique2Check, 3:Technique3Check, 4:Technique4Check, 5:DotProdInstanceFinder, 6:PairInstanceFinder }
+        self.detectMap2 = self.techMap
 
     def testSequence(self, combo):
         eq = BinaryNode.copy(self.verify)
@@ -96,9 +97,9 @@ class BatchOrder:
         pass
     
     def BFStrategy(self):
-        techniques = [2, 3, 4, 5, 6]
+        techniques = list(self.detectMap2.keys())
         # starting point: choose a tech
-        # 
+        
         pass
     
     

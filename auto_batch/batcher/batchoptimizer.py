@@ -111,11 +111,12 @@ class PairInstanceFinder:
             if data['instance'] > 1:
                 if not check: return data
                 else: return True
-        return False
+        return None
     
     def makeSubstitution(self, equation):
         # first get a node in which 
         pairDict = self.checkForMultiple()
+
         if pairDict != None:
             #print("Pair =>", pairDict)
             batchparser.ASTVisitor( SubstitutePairs( pairDict ) ).preorder( equation )
