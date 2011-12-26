@@ -1,5 +1,5 @@
-from batchlang import *
 from batchparser import *
+from batchtechniques import Technique2,Technique3,Technique4
 from batchoptimizer import *
 import random
 

@@ -3,7 +3,7 @@
 # and message. Finally, an optional transform section to describe the specific order in which
 # to apply the techniques 2, 3a, 3b and 4.
 
-from batchparser import *
+from batchtechniques import *
 from batchproof import *
 from batchorder import BatchOrder
 

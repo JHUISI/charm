@@ -1,9 +1,11 @@
 # variables
+name := chp
 N := 100
+S := 100
 
 BEGIN :: types
 M := str
-mpk#0 := G2
+g2 := G2
 pk := G2
 sig := G1
 b := ZR
@@ -16,7 +18,25 @@ b := H(M | t3, ZR)
 END :: precompute
 
 BEGIN :: constant
-a, mpk#0, h
+a, g2, h
 END :: constant
 
-verify := { e(sig, mpk#0) == e(a, pk) * e(h, pk)^b }
+BEGIN :: public
+pk
+END :: public
+
+BEGIN :: signature
+sig
+END :: signature
+
+BEGIN :: message
+h
+END :: message
+
+# different messages/sigs under a single signer
+message := one
+public := N
+signature := N
+
+
+verify := { e(sig, g2) == e(a, pk) * e(h, pk)^b }
