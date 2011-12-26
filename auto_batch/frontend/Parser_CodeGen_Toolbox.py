@@ -16,10 +16,16 @@ def getVarNamesAsStringNamesFromLine(line):
 	line = ensureSpacesBtwnTokens_CodeGen(line)
 
 	varList = []
+	namesAsStrings = []
 
 	for token in line.split():
 		if ( (token in con.reservedWords) or (token in con.reservedSymbols) or (token.isdigit() == True) ):
 			continue
+
+		if (token in namesAsStrings):
+			continue
+
+		namesAsStrings.append(token)
 
 		nextStringNameObj = StringName()
 		nextStringNameObj.setName(token)
