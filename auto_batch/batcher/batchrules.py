@@ -13,13 +13,8 @@ tech2 = Enum('NoneApplied', 'ExpIntoPairing', 'DistributeExpToPairings')
 class Technique2Check(AbstractTechnique):
     def __init__(self, constants, variables, meta):
         AbstractTechnique.__init__(self, constants, variables, meta)
-#        self.const = const
-#        self.vars  = vars
         self.score = tech.NoneApplied
         self.transformStack = [] # grows
-
-    def visit(self, node, data):
-        pass
 
     # find: 'e(g, h)^d_i' transform into ==> 'e(g^d_i, h)' iff g or h is constant
     # move exponent towards the non-constant attribute
@@ -106,59 +101,12 @@ class Technique2Check(AbstractTechnique):
         else:
             pass
 
-    def createExp(self, left, right):
-        if left.type == ops.EXP: # left => a^b , then => a^(b * c)
-            mul = BinaryNode(ops.MUL)
-            mul.left = left.right
-            mul.right = right
-            exp = BinaryNode(ops.EXP)
-            exp.left = left.left
-            exp.right = mul
-        elif left.type in [ops.ATTR, ops.PAIR]: # left: attr ^ right
-            exp = BinaryNode(ops.EXP)
-            exp.left = left
-            exp.right = right
-        return exp
 
-    def getNodes(self, tree, parent_type, _list):
-        if tree == None: return None
-        elif parent_type == ops.MUL:
-            if tree.type == ops.ATTR: _list.append(tree)
-            elif tree.type == ops.EXP: _list.append(tree)
-            elif tree.type == ops.HASH: _list.append(tree)
-        
-        if tree.left: self.getNodes(tree.left, tree.type, _list)
-        if tree.right: self.getNodes(tree.right, tree.type, _list)
-        return
-        
-    def isConstInSubtreeT(self, node): # check whether left or right node is constant  
-        if node == None: return None
-        if Type(node) == ops.ATTR:
-            return self.isConstant(node)
-        elif Type(node) == ops.HASH:
-            return self.isConstant(node.left)
-        result = self.isConstInSubtreeT(node.left)
-        if not result: return result
-        result = self.isConstInSubtreeT(node.right)
-        return result
-
-    def isConstant(self, node):        
-        for n in self.consts:
-            if n == node.getAttribute(): return True
-        return False
-
-
-
-class Technique3Check:
+class Technique3Check(AbstractTechnique):
     def __init__(self, constants, variables, meta):
-        self.consts  = constants
-        self.vars    = variables
-        #self.rule   = "Rule 3: "
+        AbstractTechnique.__init__(self, constants, variables, meta)
         self.rule    = "Combine pairings with common 1st or 2nd element. Reduce N pairings to 1 (technique 3)"
         self.applied = False
-    
-    def visit(self, node, data):
-        pass
 
     # once a     
     def visit_pair(self, node, data):
@@ -271,88 +219,5 @@ class Technique3Check:
                 #print("output =>", exp)
                 addAsChildNodeToParent(data, exp)
                 self.applied = True
-
-    def isConstInSubtreeT(self, node): # check whether left or right node is constant  
-        if node == None: return None
-        if node.type == ops.ATTR:
-            #print("node =>", node, node.type, self.isConstant(node))
-            return self.isConstant(node)
-        result = self.isConstInSubtreeT(node.left)
-        if not result: return result
-        result = self.isConstInSubtreeT(node.right)
-        return result
-
-    def isConstant(self, node): 
-        for n in self.consts:
-            if n == node.getAttribute(): return True
-        return False
-    
-    def getMulTokens(self, subtree, parent_type, target_type, _list):
-        if subtree == None: return None
-        elif parent_type == ops.MUL:
-            if subtree.type in target_type: _list.append(subtree)
-        if subtree.left: self.getMulTokens(subtree.left, subtree.type, target_type, _list)
-        if subtree.right: self.getMulTokens(subtree.right, subtree.type, target_type, _list)
-        return
-    
-    def getNodes(self, tree, parent_type, _list):
-        if tree == None: return None
-        elif parent_type == ops.MUL:
-            if tree.type == ops.ATTR: _list.append(tree)
-            elif tree.type == ops.EXP: _list.append(tree)
-            elif tree.type == ops.HASH: _list.append(tree)
-        
-        if tree.left: self.getNodes(tree.left, tree.type, _list)
-        if tree.right: self.getNodes(tree.right, tree.type, _list)
-        return
-    
-    def createPair(self, left, right):
-        pair = BinaryNode(ops.PAIR)
-        pair.left = left
-        pair.right = right
-        return pair
-    
-    def createExp(self, left, right):
-        exp = BinaryNode(ops.EXP)
-        exp.left = left
-        exp.right = right
-        return exp
-
-    def deleteFromTree(self, node, parent, target, branch=None):
-        if node == None: return None
-        elif str(node) == str(target):
-            if branch == 'left': 
-                BinaryNode.setNodeAs(parent, parent.right)
-                parent.left = parent.right = None 
-                return                
-            elif branch == 'right': 
-                BinaryNode.setNodeAs(parent, parent.left)
-                parent.left = parent.right = None
-                return 
-        else:
-            self.deleteFromTree(node.left, node, target, 'left')
-            self.deleteFromTree(node.right, node, target, 'right')
-            
-    def findExpWithIndex(self, node, index):
-        node_type = Type(node)
-        #print("node_type = ", node_type)
-        if node == None: return None
-        elif node_type == ops.EXP:
-            #print("node.right type =>", Type(node.right))
-            if Type(node.right) == ops.MUL:
-                return self.findExpWithIndex(node.right, index)                
-            elif index in node.right.attr_index:
-                #print("node =>", node)            
-                return node.right
-        elif node_type == ops.MUL:
-            if index in node.left.attr_index and index in node.right.attr_index: 
-                return node
-            elif index in node.left.attr_index: return node.left
-            elif index in node.right.attr_index: return node.right            
-        else:
-            result = self.findExpWithIndex(node.left, index)
-            if result: return node
-            result = self.findExpWithIndex(node.right, index)
-            return result
 
         
