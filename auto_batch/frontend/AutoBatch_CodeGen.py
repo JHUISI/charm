@@ -14,6 +14,7 @@ functionArgMappings = None
 indentationListVerifyLines = None
 individualVerFile = None
 lineInfo = None
+loopInfo = None
 linePairsOfVerifyFuncs = None
 listVars = {}
 loopVarGroupTypes = {}
@@ -680,7 +681,22 @@ def checkForPrecomputeValues(exp):
 				#tempStringExp = tempStringExp.replace(multipleSubscriptIndicatorChar, '')
 
 	return exp
-		
+'''
+
+def processComputeLine(line):
+	global loopInfo
+
+	if ( (line == None) or (type(line).__name__ != con.strTypePython) or (len(line) == 0) or (line.startswith(con.computeString) == False) ):
+		sys.exit("AutoBatch_CodeGen->processComputeLine:  problem with line passed in (" + line + ").")
+
+	loopInfo = []
+
+	line = line.lstrip().rstrip()
+	line = line.replace(con.computeString, '', 1)
+	ddd
+
+
+'''		
 def getComputeLineInfo(batchVerifierOutput):
 	computeLineInfo = {}
 	
@@ -2228,6 +2244,8 @@ def main():
 			processPrecomputeLine(line)
 		if ( (line.startswith(con.dotPrefix) == True) or (line.startswith(con.sumPrefix) == True) ):
 			processLoopLine(line)
+		if (line.startswith(con.computeString) == True):
+			processComputeLine(line)
 
 	if ( (finalBatchEq == None) or (finalBatchEqWithLoops == None) ):
 		sys.exit("AutoBatch_CodeGen->main:  problem locating the various forms of the final batch equation from the output of the batch verifier.")
@@ -2247,7 +2265,7 @@ def main():
 		sys.exit("AutoBatch_CodeGen->main:  problem attempting to run close() on the output files of this program.")
 
 '''
-	listOfIndentedBlocks = buildMapOfControlFlow(pythonCodeLines, verifyFuncNode.lineno, (verifyEqNode.lineno - 1))
+
 	computeLineInfo = getComputeLineInfo(batchVerifierOutput)	
 	outerDotProds = getOuterDotProds(batchVerifierOutput)
 	dotProdLoopOrder = []	
