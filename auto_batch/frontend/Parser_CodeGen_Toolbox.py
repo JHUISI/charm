@@ -218,6 +218,8 @@ def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
 				else:
 					lineOfCode = lineOfCode[0:(R_index+1)] + con.space + lineOfCode[(R_index+1):lenOfLine]
 				R_index += 2
+			else:
+				R_index += 1
 		elif ( (checkForSpace == True) and (R_index == (len(lineOfCode)-1) ) ):
 			if (lineOfCode[L_index-1] != con.space):
 				lenOfLine = len(lineOfCode)
@@ -225,7 +227,7 @@ def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
 					lineOfCode = lineOfCode[0:L_index] + con.space + lineOfCode[L_index]
 				else:
 					lineOfCode = lineOfCode[0:L_index] + con.space + lineOfCode[L_index:lenOfLine]
-				R_index += 2
+			break
 		elif (checkForSpace == True):
 			if ( (lineOfCode[L_index-1] != ' ') and (lineOfCode[R_index+1] != ' ') ):
 				lenOfLine = len(lineOfCode)
