@@ -17,6 +17,7 @@ indentationListVerifyLines = None
 individualVerFile = None
 lineInfo = None
 loopInfo = []
+loopNamesOfFinalBatchEq = []
 linePairsOfVerifyFuncs = None
 listVars = {}
 loopVarGroupTypes = {}
@@ -384,34 +385,42 @@ def addIfElse(batchOutputString, finalBatchEq):
 def getBatchEqVars():
 	global batchEqVars
 
-	batchEqVars = finalBatchEq.split()
+	batchEqVarsTemp = finalBatchEq.split()
 
 	for removeString in con.batchEqRemoveStrings:
-		while (batchEqVars.count(removeString) > 0):
-			batchEqVars.remove(removeString)
+		while (batchEqVarsTemp.count(removeString) > 0):
+			batchEqVarsTemp.remove(removeString)
 
-	for dupVar in batchEqVars:
-		while (batchEqVars.count(dupVar) > 1):
-			batchEqVars.remove(dupVar)
+	for dupVar in batchEqVarsTemp:
+		while (batchEqVarsTemp.count(dupVar) > 1):
+			batchEqVarsTemp.remove(dupVar)
 
 	deltaVarsToRemove = []
 
-	for deltaVar in batchEqVars:
+	for deltaVar in batchEqVarsTemp:
 		if ( (deltaVar == con.delta) or (deltaVar.startswith(con.delta + con.loopIndicator) == True) ):
 			deltaVarsToRemove.append(deltaVar)
 
 	for varToRemove in deltaVarsToRemove:
-		batchEqVars.remove(varToRemove)
+		batchEqVarsTemp.remove(varToRemove)
+
+	batchEqVars = []
+
+	for batchEqVarName in batchEqVarsTemp:
+		batchEqVarStringName = StringName()
+		batchEqVarStringName.setName(batchEqVarName)
+		batchEqVars.append(copy.deepcopy(batchEqVarStringName))
+		del batchEqVarStringName
 
 def distillBatchEqVars():
 	global batchEqLoopVars, batchEqNotLoopVars
 
 	for varName in batchEqVars:
-		isThisALoopVar = varName.find(con.loopIndicator)
+		isThisALoopVar = varName.getStringVarName().find(con.loopIndicator)
 		if (isThisALoopVar == -1):
-			batchEqNotLoopVars.append(varName)
+			batchEqNotLoopVars.append(copy.deepcopy(varName))
 		else:
-			batchEqLoopVars.append(varName)
+			batchEqLoopVars.append(copy.deepcopy(varName))
 
 '''
 def distillBatchEqVars(batchEqVars, batchEqNotSumOrDotVars):
@@ -2170,6 +2179,24 @@ def addFunctionsThatVerifyCalls():
 	batchVerFile.write(batchOutputString)
 	individualVerFile.write(individualOutputString)
 
+def getLoopNamesOfFinalBatchEq():
+	global loopNamesOfFinalBatchEq
+
+	loopNamesOfFinalBatchEq = []
+
+	batchEqWithLoopsCopy = finalBatchEqWithLoops.replace(con.finalBatchEqWithLoopsString, '', 1)
+
+	tempList = getVarNamesAsStringNamesFromLine(batchEqWithLoopsCopy)
+
+	for possibleLoopName in tempList:
+		nameAsString = possibleLoopName.getStringVarName()
+		if ( (nameAsString.startswith(con.dotPrefix) == False) and (nameAsString.startswith(con.sumPrefix) == False) ):
+			continue
+		if (len(nameAsString) <= 5):
+			loopNamesOfFinalBatchEq.append(copy.deepcopy(possibleLoopName))
+
+	del tempList
+
 def main():
 	if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
 		sys.exit("\nUsage:  python " + sys.argv[0] + "\n \
@@ -2325,6 +2352,8 @@ def main():
 	if ( (lineInfo == None) or (type(lineInfo).__name__ != con.listTypePython) or (len(lineInfo) == 0) ):
 		sys.exit("AutoBatch_CodeGen->main:  could not extract any line information from the source code Python lines of the cryptoscheme.")
 
+	getLoopNamesOfFinalBatchEq()
+
 	try:
 		batchVerFile.close()
 		individualVerFile.close()
@@ -2333,10 +2362,6 @@ def main():
 		sys.exit("AutoBatch_CodeGen->main:  problem attempting to run close() on the output files of this program.")
 
 '''
-
-	computeLineInfo = getComputeLineInfo(batchVerifierOutput)	
-	outerDotProds = getOuterDotProds(batchVerifierOutput)
-	dotProdLoopOrder = []	
 	dotProdLoopOrder = getDotProdLoopOrder(computeLineInfo, outerDotProds, dotProdLoopOrder)	
 	precomputeDotProdLoopOrder = getSplitDotProdLoopOrder(dotProdLoopOrder, computeLineInfo)
 	DC_outerDotProds = getDC_outerDotProds_JUSTOUTER(dotProdLoopOrder, True)
