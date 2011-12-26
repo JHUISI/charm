@@ -76,7 +76,7 @@ def determineIfWithinQuotes(lineOfCode, R_index, withinQuotes, lastQuoteChar):
 	if ( (withinQuotes != None) and (type(withinQuotes).__name__ != con.booleanType) ):
 		sys.exit("Parser_CodeGen_Toolbox->determineIfWithinQuotes:  problem with parameter passed in that indicates whether we're within quotes or not.")
 
-	if ( (lastQuoteChar != None) and (type(lastQuoteChar).__name__ not in con.quoteCharTypes) ):
+	if ( (lastQuoteChar != None) and (lastQuoteChar not in con.quoteCharTypes) ):
 		sys.exit("Parser_CodeGen_Toolbox->determineIfWithinQuotes:  problem with last quote character passed in.")
 
 	if (R_index == 0):
