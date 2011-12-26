@@ -4,6 +4,32 @@ from ASTVarVisitor import *
 from LineInfo import LineInfo
 from StringName import StringName
 
+def removeSubscriptsReturnStringNames(list):
+	if ( (list == None) or (type(list).__name__ != con.listTypePython) or (len(list) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->removeSubscriptsReturnStringNames:  problem with list input parameter passed in.")
+
+	returnList = []
+
+	for varName in list:
+		if ( (varName == None) or (type(varName).__name__ != con.strTypePython) or (len(varName) == 0) or (varName.count(con.loopIndicator) > 1) ):
+			sys.exit("Parser_CodeGen_Toolbox->removeSubscriptsReturnStringNames:  problem with one of the variable names in the list input parameter passed in.")
+
+		loopIndicatorIndex = varName.find(con.loopIndicator)
+		if (loopIndicatorIndex == -1):
+			finalString = varName
+		else:
+			finalString = varName[0:loopIndicatorIndex]
+
+		finalStringName = StringName()
+		finalStringName.setName(finalString)
+		returnList.append(copy.deepcopy(finalStringName))
+		del finalStringName
+
+	if (len(returnList) == 0):
+		sys.exit("Parser_CodeGen_Toolbox->removeSubscriptsReturnStringNames:  could not build any StringName objects for the names in the list passed in.")
+
+	return returnList
+
 def getVarNamesAsStringsFromLine(line):
 	if ( (line == None) or (type(line).__name__ != con.strTypePython) or (len(line) == 0) ):
 		sys.exit("Parser_CodeGen_Toolbox->getVarNamesAsStringsFromLine:  problem with line passed in.")

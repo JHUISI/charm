@@ -16,7 +16,7 @@ functionArgMappings = None
 indentationListVerifyLines = None
 individualVerFile = None
 lineInfo = None
-loopInfo = None
+loopInfo = []
 linePairsOfVerifyFuncs = None
 listVars = {}
 loopVarGroupTypes = {}
@@ -691,8 +691,6 @@ def processComputeLine(line):
 	if ( (line == None) or (type(line).__name__ != con.strTypePython) or (len(line) == 0) or (line.startswith(con.computeString) == False) ):
 		sys.exit("AutoBatch_CodeGen->processComputeLine:  problem with line passed in (" + line + ").")
 
-	loopInfo = []
-
 	line = line.lstrip().rstrip()
 	line = line.replace(con.computeString, '', 1)
 	splitOnAssignment = line.split(con.batchVerifierOutputAssignment, 1)
@@ -748,13 +746,22 @@ def processComputeLine(line):
 
 	expression = initialExpression.lstrip().rstrip()
 
+	varListWithSubscripts = getVarNamesAsStringNamesFromLine(expression)
+
+	varListAsStrings = getVarNamesAsStringsFromLine(expression)
+	varListNoSubscripts = removeSubscriptsReturnStringNames(varListAsStrings)
+
 	nextLoopInfoObj = LoopInfo()
 	nextLoopInfoObj.setLoopName(loopName)
 	nextLoopInfoObj.setLoopOverValue(loopOverValue)
 	nextLoopInfoObj.setIndexVariable(indexVarStringName)
 	nextLoopInfoObj.setStartValue(int(startVal))
 	nextLoopInfoObj.setLoopOverValue(loopOverValue)
-	nextLoopInfoObj.set
+	nextLoopInfoObj.setExpression(expression)
+	nextLoopInfoObj.setVarListWithSubscripts(varListWithSubscripts)
+	nextLoopInfoObj.setVarListNoSubscripts(varListNoSubscripts)
+
+	loopInfo.append(copy.deepcopy(nextLoopInfoObj))
 
 
 '''		
