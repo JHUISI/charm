@@ -31,9 +31,14 @@ class LoopInfo:
 	def getExpression(self):
 		return self.expression
 
-	def setLoopName(self, loopName):
+	def setLoopName(self, loopNameStringName):
+		if ( (loopNameStringName == None) or (type(loopNameStringName).__name__ != con.stringName) ):
+			sys.exit("LoopInfo->setLoopName:  problem with loop name parameter passed in.")
+
+		loopName = loopNameStringName.getStringVarName()
+
 		if ( (loopName == None) or (type(loopName).__name__ != con.strTypePython) or (len(loopName) == 0) ):
-			sys.exit("LoopInfo->setLoopName:  problem with loop name passed in.")
+			sys.exit("LoopInfo->setLoopName:  problem with the string obtained from getStringVarName on the loop name StringName object passed in.")
 
 		foundLoopPrefix = False
 
@@ -45,7 +50,7 @@ class LoopInfo:
 		if (foundLoopPrefix == False):
 			sys.exit("LoopInfo->setLoopName:  loop name passed in (" + loopName + ") is not one of the supported loop types (" + con.loopPrefixes + ").")
  
-		self.loopName = loopName
+		self.loopName = loopNameStringName
 
 	def setIndexVariable(self, indexVariable):
 		if ( (indexVariable == None) or (type(indexVariable).__name__ != con.stringName) ):

@@ -18,6 +18,8 @@ individualVerFile = None
 lineInfo = None
 loopInfo = []
 loopNamesOfFinalBatchEq = []
+loopsNotOnlyOverNumSignatures = []
+loopsOnlyOverNumSignatures = []
 linePairsOfVerifyFuncs = None
 listVars = {}
 loopVarGroupTypes = {}
@@ -760,8 +762,11 @@ def processComputeLine(line):
 	varListAsStrings = getVarNamesAsStringsFromLine(expression)
 	varListNoSubscripts = removeSubscriptsReturnStringNames(varListAsStrings)
 
+	loopNameStringName = StringName()
+	loopNameStringName.setName(loopName)
+
 	nextLoopInfoObj = LoopInfo()
-	nextLoopInfoObj.setLoopName(loopName)
+	nextLoopInfoObj.setLoopName(loopNameStringName)
 	nextLoopInfoObj.setLoopOverValue(loopOverValue)
 	nextLoopInfoObj.setIndexVariable(indexVarStringName)
 	nextLoopInfoObj.setStartValue(int(startVal))
@@ -2197,6 +2202,45 @@ def getLoopNamesOfFinalBatchEq():
 
 	del tempList
 
+def isVarOnlyOverNumSignatures(var):
+	if ( (var == None) or (type(var).__name__ != con.stringName) ):
+		sys.exit("AutoBatch_CodeGen->isVarOnlyOverNumSignatures:  problem with variable passed in.")
+
+	varName = var.getStringVarName()
+	if ( (varName == None) or (type(varName).__name__ != con.strTypePython) or (len(varName) == 0) ):
+		sys.exit("AutoBatch_CodeGen->isVarOnlyOverNumSignatures:  problem with one of the variable names returned from getStringVarName.")
+
+	if (varName.find(con.loopIndicator) == -1):
+		return True
+
+	if (varName.count(con.loopIndicator) > 1):
+		sys.exit("AutoBatch_CodeGen->isVarOnlyOverNumSignatures:  variable name contains more than one loop indicator symbol (" + con.loopIndicator + ").")
+
+	loopIndicatorIndex = varName.find(con.loopIndicator)
+
+	subscriptIndicesString = varName[(loopIndicatorIndex + 1):len(varName)]
+	if (subscriptIndicesString == con.numSignaturesIndex):
+		return True
+
+	return False
+
+def distillLoopsWRTNumSignatures():
+	global loopsNotOnlyOverNumSignatures, loopsOnlyOverNumSignatures
+
+	for loop in loopInfo:
+		varList = loop.getVarListWithSubscripts()
+		addThisLoopToOnly = True
+		for var in varList:
+			onlyOverNumSignatures = isVarOnlyOverNumSignatures(var)
+			if (onlyOverNumSignatures == False):
+				addThisLoopToOnly = False
+				break
+
+		if (addThisLoopToOnly == True):
+			loopsOnlyOverNumSignatures.append(copy.deepcopy(loop))
+		else:
+			loopsNotOnlyOverNumSignatures.append(copy.deepcopy(loop))
+
 def main():
 	if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
 		sys.exit("\nUsage:  python " + sys.argv[0] + "\n \
@@ -2353,6 +2397,7 @@ def main():
 		sys.exit("AutoBatch_CodeGen->main:  could not extract any line information from the source code Python lines of the cryptoscheme.")
 
 	getLoopNamesOfFinalBatchEq()
+	distillLoopsWRTNumSignatures()
 
 	try:
 		batchVerFile.close()
