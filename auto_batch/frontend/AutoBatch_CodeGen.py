@@ -1,6 +1,8 @@
 import copy, os, sys
 from ASTParser import *
 from Parser_CodeGen_Toolbox import *
+from LoopInfo import LoopInfo
+from StringName import StringName
 
 batchEqLoopVars = []
 batchEqNotLoopVars = []
@@ -693,7 +695,66 @@ def processComputeLine(line):
 
 	line = line.lstrip().rstrip()
 	line = line.replace(con.computeString, '', 1)
-	ddd
+	splitOnAssignment = line.split(con.batchVerifierOutputAssignment, 1)
+	loopName = splitOnAssignment[0]
+	fullExpression = splitOnAssignment[1].rstrip(con.newLineChar)
+	if ( (fullExpression.count(con.dotDirector) == 1) and (fullExpression.count(con.sumDirector) == 0) ):
+		splitExpression = fullExpression.split(con.dotDirector, 1)
+	elif ( (fullExpression.count(con.dotDirector) == 0) and (fullExpression.count(con.sumDirector) == 1) ):
+		splitExpression = fullExpression.split(con.sumDirector, 1)
+	else:
+		sys.exit("AutoBatch_CodeGen->processComputeLine:  compute line did not have only one " + con.dotDirector + " OR only one " + con.sumDirector + ".")
+
+	loopDeclaration = splitExpression[0]
+	initialExpression = splitExpression[1]
+
+	if ( (loopDeclaration.count(',') != 1) or (loopDeclaration.count('}') != 1) ):
+		sys.exit("AutoBatch_CodeGen->processComputeLine:  loop declaration is improperly formatted.")
+
+	commaLocation = loopDeclaration.find(',')
+	rightCurlyBraceLocation = loopDeclaration.find('}')
+
+	loopOverValue = loopDeclaration[(commaLocation + 1):rightCurlyBraceLocation].lstrip().rstrip()
+
+	if (loopDeclaration.count(con.batchVerifierOutputAssignment) != 1):
+		sys.exit("AutoBatch_CodeGen->processComputeLine:  loop declaration is improperly formatted (not only one " + con.batchVerifierOutputAssignment + " symbol).")
+
+	splitLoopDecl = loopDeclaration.split(con.batchVerifierOutputAssignment, 1)
+	indexVarExp = splitLoopDecl[0]
+	startValExp = splitLoopDecl[1]
+
+	if (indexVarExp.count('{') != 1):
+		sys.exit("AutoBatch_CodeGen->processComputeLine:  index variable expression is improperly formatted (not only one \'{\' symbol.")
+
+	leftCurlyBraceLocation = indexVarExp.find('{')
+	indexVar = indexVarExp[(leftCurlyBraceLocation + 1):len(indexVarExp)]
+	indexVar = indexVar.lstrip().rstrip()
+
+	indexVarStringName = StringName()
+	indexVarStringName.setName(indexVar)
+
+	if (startValExp.count(',') != 1):
+		sys.exit("AutoBatch_CodeGen->processComputeLine:  start value expression is improperly formatted (not only one \',\' symbol.")
+
+	commaLocation = startValExp.find(',')
+
+	startVal = startValExp[0:commaLocation]
+	startVal = startVal.lstrip().rstrip()
+
+	initialExpression = initialExpression.lstrip().rstrip()
+	lenInitExp = len(initialExpression)
+	if (initialExpression[lenInitExp-1] == ')'):
+		initialExpression = initialExpression[0:(lenInitExp-1)]
+
+	expression = initialExpression.lstrip().rstrip()
+
+	nextLoopInfoObj = LoopInfo()
+	nextLoopInfoObj.setLoopName(loopName)
+	nextLoopInfoObj.setLoopOverValue(loopOverValue)
+	nextLoopInfoObj.setIndexVariable(indexVarStringName)
+	nextLoopInfoObj.setStartValue(int(startVal))
+	nextLoopInfoObj.setLoopOverValue(loopOverValue)
+	nextLoopInfoObj.set
 
 
 '''		

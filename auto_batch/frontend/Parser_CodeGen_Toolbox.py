@@ -4,6 +4,33 @@ from ASTVarVisitor import *
 from LineInfo import LineInfo
 from StringName import StringName
 
+def getVarNamesAsStringsFromLine(line):
+	if ( (line == None) or (type(line).__name__ != con.strTypePython) or (len(line) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getVarNamesAsStringsFromLine:  problem with line passed in.")
+
+	line = line.lstrip().rstrip()
+
+	if ( (line.startswith(con.commentChar) == True) or (len(line) == 0) ):
+		return None
+
+	line = ensureSpacesBtwnTokens_CodeGen(line)
+
+	varList = []
+
+	for token in line.split():
+		if ( (token in con.reservedWords) or (token in con.reservedSymbols) or (token.isdigit() == True) ):
+			continue
+
+		if (token in varList):
+			continue
+
+		varList.append(token)
+
+	if (len(varList) == 0):
+		return None
+
+	return varList
+
 def getVarNamesAsStringNamesFromLine(line):
 	if ( (line == None) or (type(line).__name__ != con.strTypePython) or (len(line) == 0) ):
 		sys.exit("Parser_CodeGen_Toolbox->getVarNamesAsStringNamesFromLine:  problem with line passed in.")

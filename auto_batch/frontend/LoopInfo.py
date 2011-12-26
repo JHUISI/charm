@@ -3,6 +3,8 @@ import con, sys
 class LoopInfo:
 	def __init__(self):
 		self.loopName = None
+		self.indexVariable = None
+		self.startValue = None
 		self.loopOverValue = None
 		self.varListNoSubscripts = None
 		self.varListWithSubscripts = None
@@ -10,6 +12,12 @@ class LoopInfo:
 
 	def getLoopName(self):
 		return self.loopName
+
+	def getIndexVariable(self):
+		return self.indexVariable
+
+	def getStartValue(self):
+		return self.startValue
 
 	def getLoopOverValue(self):
 		return self.loopOverValue
@@ -38,6 +46,18 @@ class LoopInfo:
 			sys.exit("LoopInfo->setLoopName:  loop name passed in (" + loopName + ") is not one of the supported loop types (" + con.loopPrefixes + ").")
  
 		self.loopName = loopName
+
+	def setIndexVariable(self, indexVariable):
+		if ( (indexVariable == None) or (type(indexVariable).__name__ != con.stringName) ):
+			sys.exit("LoopInfo->setIndexVariable:  problem with indexVariable passed in.")
+
+		self.indexVariable = indexVariable
+
+	def setStartValue(self, startValue):
+		if ( (startValue == None) or (type(startValue).__name__ != con.intTypePython) or (startValue < 0) ):
+			sys.exit("LoopInfo->setStartValue:  problem with start value passed in.")
+
+		self.startValue = startValue
 
 	def setLoopOverValue(self, loopOverValue):
 		if ( (loopOverValue == None) or (type(loopOverValue).__name__ != con.strTypePython) or (len(loopOverValue) == 0) ):
