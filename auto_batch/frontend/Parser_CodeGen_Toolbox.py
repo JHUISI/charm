@@ -42,10 +42,11 @@ def getLineInfoFromSourceCodeLines(sourceCodeLines, numSpacesPerTab):
 	lineInfoList = []
 	
 	for line in sourceCodeLines:
+		lineNumber += 1
+
 		if (isLineOnlyWhiteSpace(line) == True):
 			continue
 
-		lineNumber += 1
 		nextLineInfoObj = LineInfo()
 		nextLineInfoObj.setLineNo(lineNumber)
 		numSpaces = getNumIndentedSpaces(line)
