@@ -66,29 +66,74 @@ def getLineInfoFromSourceCodeLines(sourceCodeLines, numSpacesPerTab):
 
 	return lineInfoList
 
+def determineIfWithinQuotes(lineOfCode, R_index, withinQuotes, lastQuoteChar):
+	if ( (lineOfCode == None) or (type(lineOfCode).__name__ != con.strTypePython) or (len(lineOfCode) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->determineIfWithinQuotes:  problem with line of code parameter passed in.")
+
+	if ( (R_index == None) or (type(R_index).__name__ != con.intTypePython) or (R_index < 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->determineIfWithinQuotes:  problem with right index number passed in.")
+
+	if ( (withinQuotes != None) and (type(withinQuotes).__name__ != con.booleanType) ):
+		sys.exit("Parser_CodeGen_Toolbox->determineIfWithinQuotes:  problem with parameter passed in that indicates whether we're within quotes or not.")
+
+	if ( (lastQuoteChar != None) and (type(lastQuoteChar).__name__ not in con.quoteCharTypes) ):
+		sys.exit("Parser_CodeGen_Toolbox->determineIfWithinQuotes:  problem with last quote character passed in.")
+
+	if (R_index == 0):
+		if (lineOfCode[R_index] == con.singleQuote):
+			return (True, con.singleQuote)
+		if (lineOfCode[R_index] == con.doubleQuote):
+			return (True, con.doubleQuote)
+		return (False, None)
+
+	if (lineOfCode[R_index - 1] == con.backSlash):
+		return (withinQuotes, lastQuoteChar)
+
+	if (lineOfCode[R_index] not in con.quoteCharTypes):
+		return (withinQuotes, lastQuoteChar)
+
+	currentQuoteChar = lineOfCode[R_index]
+
+	if (withinQuotes == True):
+		if (lastQuoteChar == con.singleQuote):
+			if (currentQuoteChar == con.singleQuote):
+				return (False, None)
+			elif (currentQuoteChar == con.doubleQuote):
+				return (withinQuotes, lastQuoteChar)
+		elif (lastQuoteChar == con.doubleQuote):
+			if (currentQuoteChar == con.singleQuote):
+				return (withinQuotes, lastQuoteChar)
+			elif (currentQuoteChar == con.doubleQuote):
+				return (False, None)
+	elif (withinQuotes == False):
+		if (currentQuoteChar == con.singleQuote):
+			return (True, con.singleQuote)
+		elif (currentQuoteChar == con.doubleQuote):
+			return (True, con.doubleQuote)
+
+	sys.exit("Parser_CodeGen_Toolbox->determineIfWithinQuotes:  reached end of function without finding case for the input parameters passed in.")
+
 def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
 	if ( (lineOfCode == None) or (type(lineOfCode).__name__ != con.strTypePython) or (len(lineOfCode) == 0) ):
 		sys.exit("Parser_CodeGen_Toolbox->ensureSpacesBtwnTokens_CodeGen:  problem with line of code parameter passed in.")
 
-	if (lineOfCode == '\n'):
+	if (len(lineOfCode) < 3):
 		return lineOfCode
 
 	lenOfLine = len(lineOfCode)
-	if (lineOfCode[lenOfLine - 1] == '\n'):
+	if (lineOfCode[lenOfLine - 1] == con.newLineChar):
 		lineOfCode = lineOfCode[0:(lenOfLine-1)]
 	
-	L_index = 1
-	R_index = 1
-	withinApostrophes = False
+	L_index = 0
+	R_index = 0
+	withinQuotes = False
+	lastQuoteChar = None
 
 	while (True):
 		checkForSpace = False
-		if ( (lineOfCode[R_index] == '\'') or (lineOfCode[R_index] == '\"') ):
-			if (withinApostrophes == True):
-				withinApostrophes = False
-			else:
-				withinApostrophes = True
-		if (withinApostrophes == True):
+		(withinQuotes, lastQuoteChar) = determineIfWithinQuotes(lineOfCode, R_index, withinQuotes, lastQuoteChar)
+		lenOfLine = len(lineOfCode)
+		if (withinQuotes == True):
 			pass
 		elif (lineOfCode[R_index] in ['^', '+', '(', ')', '{', '}', '-', ',', '[', ']']):
 			currChars = lineOfCode[R_index]
@@ -99,7 +144,7 @@ def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
 			L_index = R_index
 			checkForSpace = True
 		elif (lineOfCode[R_index] in ['>', '<', ':', '!', '=']):
-			if (lineOfCode[R_index+1] == '='):
+			if ( (R_index+1) <= (lenOfLine - 1) ) and (lineOfCode[R_index+1] == '='):
 				L_index = R_index
 				R_index += 1
 				currChars = lineOfCode[L_index:(R_index+1)]
@@ -109,7 +154,7 @@ def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
 				L_index = R_index
 				checkForSpace = True
 		elif (lineOfCode[R_index] == '&'):
-			if (lineOfCode[R_index+1] == '&'):
+			if ( (R_index+1) <= (lenOfLine-1) ) and (lineOfCode[R_index+1] == '&'):
 				L_index = R_index
 				R_index += 1
 				currChars = lineOfCode[L_index:(R_index+1)]
@@ -119,7 +164,7 @@ def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
 				L_index = R_index
 				checkForSpace = True
 		elif (lineOfCode[R_index] == '/'):
-			if (lineOfCode[R_index+1] == '/'):
+			if ( (R_index+1) <= (lenOfLine - 1) ) and (lineOfCode[R_index+1] == '/'):
 				L_index = R_index
 				R_index += 1
 				currChars = lineOfCode[L_index:(R_index+1)]
@@ -129,7 +174,7 @@ def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
 				L_index = R_index
 				checkForSpace = True
 		elif (lineOfCode[R_index] == '|'):
-			if (lineOfCode[R_index+1] == '|'):
+			if ( (R_index+1) <= (lenOfLine - 1) ) and (lineOfCode[R_index+1] == '|'):
 				L_index = R_index
 				R_index += 1
 				currChars = lineOfCode[L_index:(R_index+1)]
@@ -139,7 +184,7 @@ def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
 				L_index = R_index
 				checkForSpace = True
 		elif (lineOfCode[R_index] == '*'):
-			if (lineOfCode[R_index+1] == '*'):
+			if ( (R_index+1) <= (lenOfLine - 1) ) and (lineOfCode[R_index+1] == '*'):
 				L_index = R_index
 				R_index += 1
 				currChars = lineOfCode[L_index:(R_index+1)]
@@ -149,7 +194,7 @@ def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
 				L_index = R_index
 				checkForSpace = True
 		elif (lineOfCode[R_index] == 'H'):
-			if (lineOfCode[R_index+1] == '('):
+			if ( (R_index+1) <= (lenOfLine - 1) ) and (lineOfCode[R_index+1] == '('):
 				L_index = R_index
 				R_index += 1
 				currChars = lineOfCode[L_index:(R_index+1)]
@@ -157,14 +202,31 @@ def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
 			else:
 				checkForSpace = False
 		elif (lineOfCode[R_index] == 'e'):
-			if ( (lineOfCode[R_index+1] == '(') and (isPreviousCharAlpha(lineOfCode, R_index) == False) ):
+			if ( (R_index+1) <= (lenOfLine - 1) ) and ( (lineOfCode[R_index+1] == '(') and (isPreviousCharAlpha(lineOfCode, R_index) == False) ):
 				L_index = R_index
 				R_index += 1
 				currChars = lineOfCode[L_index:(R_index+1)]
 				checkForSpace = True
 			else:
 				checkForSpace = False
-		if (checkForSpace == True):
+
+		if ( (checkForSpace == True) and (L_index == 0) ):
+			if (lineOfCode[R_index+1] != con.space):
+				lenOfLine = len(lineOfCode)
+				if ( (R_index + 1) == (lenOfLine - 1) ):
+					lineOfCode = lineOfCode[0:(R_index+1)] + con.space + lineOfCode[R_index+1]
+				else:
+					lineOfCode = lineOfCode[0:(R_index+1)] + con.space + lineOfCode[(R_index+1):lenOfLine]
+				R_index += 2
+		elif ( (checkForSpace == True) and (R_index == (len(lineOfCode)-1) ) ):
+			if (lineOfCode[L_index-1] != con.space):
+				lenOfLine = len(lineOfCode)
+				if (L_index == (lenOfLine - 1) ):
+					lineOfCode = lineOfCode[0:L_index] + con.space + lineOfCode[L_index]
+				else:
+					lineOfCode = lineOfCode[0:L_index] + con.space + lineOfCode[L_index:lenOfLine]
+				R_index += 2
+		elif (checkForSpace == True):
 			if ( (lineOfCode[L_index-1] != ' ') and (lineOfCode[R_index+1] != ' ') ):
 				lenOfLine = len(lineOfCode)
 				if ( (R_index + 1) == (lenOfLine - 1) ):
@@ -192,26 +254,8 @@ def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
 			R_index += 1
 
 		lenOfLine = len(lineOfCode)
-
-		if (R_index == (lenOfLine - 1)):
-			if (lineOfCode[R_index] == ']'):
-				lineOfCode = lineOfCode[0:R_index] + ' ]'
-				break
-			elif (lineOfCode[R_index] == ')'):
-				lineOfCode = lineOfCode[0:R_index] + ' )'
-				break			
-			elif (lineOfCode[R_index] == ':'):
-				lineOfCode = lineOfCode[0:R_index] + ' :'
-				break
-
-		if (R_index >= (lenOfLine - 1)):
+		if (R_index >= lenOfLine):
 			break
-
-	lenOfLine = len(lineOfCode)
-	if ( (lineOfCode[0] == '(' ) and (lineOfCode[1] != ' ') ):
-		lineOfCode = '( ' + lineOfCode[1:lenOfLine]
-	if ( (lineOfCode[lenOfLine-1] == ')' ) and (lineOfCode[lenOfLine-2] != ' ') ):
-		lineOfCode = lineOfCode[0:(lenOfLine-1)] + ' )'
 
 	lineOfCode = ' ' + lineOfCode + ' '
 
