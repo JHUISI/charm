@@ -27,6 +27,7 @@ import string
 types = Enum('G1', 'G2', 'GT', 'ZR', 'str')
 declarator = Enum('constants', 'verify')
 ops = Enum('BEGIN', 'TYPE', 'ADD', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT','END', 'NONE')
+side = Enum('left', 'right')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
 
@@ -144,6 +145,7 @@ class BinaryNode:
 			self.attr_index = None
 		self.left = left
 		self.right = right
+#		self.myside = None
 
 	def __str__(self):
 		if(self.type == ops.ATTR):
@@ -215,6 +217,9 @@ class BinaryNode:
 		else:
 			return None
 	
+#	def getMySide(self):
+#		return self.myside
+	
 	def getLeft(self):
 		return self.left if self.left != None else None
 	
@@ -224,7 +229,9 @@ class BinaryNode:
 	def addSubNode(self, left, right):
 		# set subNodes appropriately
 		self.left = self.createSubNode(left) if left != None else None
+		#self.left.myside = side.left
 		self.right = self.createSubNode(right) if left != None else None
+		#self.right.myside = side.right
 		if debug == levels.all:
 			print("addSubNode: ");
 			print("left type =>", type(self.left), ' =>', self.left)

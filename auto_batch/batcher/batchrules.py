@@ -7,9 +7,6 @@ from batchlang import *
 # which is based on the number of operations we are able to save that is reducing pairings
 # and exponentiations in particular groups. 
 
-# rule types with ordering of 
-tech2 = Enum('NoneApplied', 'ExpIntoPairing', 'DistributeExpToPairings')
-
 class Technique2Check(AbstractTechnique):
     def __init__(self, constants, variables, meta):
         AbstractTechnique.__init__(self, constants, variables, meta)
@@ -25,14 +22,13 @@ class Technique2Check(AbstractTechnique):
                                   # make cur node the left child of pair node
             # G1 : pair.left, G2 : pair.right
             if not self.isConstInSubtreeT(pair_node.left):
-                self.score = tech2.ExpIntoPairing
 #                addAsChildNodeToParent(data, pair_node) # move pair node one level up
 #                node.left = pair_node.left
 #                pair_node.left = node
                 #self.rule += "Left := Move '" + str(node.right) + "' exponent into the pairing. "
-            
+                pass
             elif not self.isConstInSubtreeT(pair_node.right):       
-                self.score = tech2.ExpIntoPairing
+                pass
 #                
 #                addAsChildNodeToParent(data, pair_node) # move pair node one level up                
 #                node.left = pair_node.right
@@ -60,18 +56,18 @@ class Technique2Check(AbstractTechnique):
                         _subnodes = []
                         getListNodes(pair_node.right, ops.NONE, _subnodes)
                         if len(_subnodes) > 2: # candidate for expanding
-                            self.score = tech2.DistributeExpToPairings
+                            pass
                             #self.rule += "distributed exponent into the pairing: right side. "
                         else:
                             #self.setNodeAs(pair_node, 'right', node, 'left')
                             #self.rule += "moved exponent into the pairing: less than 2 mul nodes. "
-                            self.score = tech2.ExpIntoPairing
+                            pass
 
                     elif Type(pair_node.right) == ops.ATTR:
                         # set pair node left child to node left since we've determined
                         # that the left side of pair node is not a constant
                         #self.setNodeAs(pair_node, 'left', node, 'left')
-                        self.score = tech2.ExpIntoPairing
+                        pass
 
                     else:
                         print("T2: what case are we missing: ", Type(pair_node.right))
@@ -101,12 +97,13 @@ class Technique2Check(AbstractTechnique):
         else:
             pass
 
+tech3 = Enum('NoneApplied', 'CombinePairing', 'SplitPairing')
 
 class Technique3Check(AbstractTechnique):
     def __init__(self, constants, variables, meta):
         AbstractTechnique.__init__(self, constants, variables, meta)
         self.rule    = "Combine pairings with common 1st or 2nd element. Reduce N pairings to 1 (technique 3)"
-        self.applied = False
+        self.score   = tech3.NoneApplied
 
     # once a     
     def visit_pair(self, node, data):
@@ -120,19 +117,19 @@ class Technique3Check(AbstractTechnique):
             #print("left ON node =>", index)
             exp_node = self.findExpWithIndex(right, index)
             if exp_node:
-                base_node = left.right
-                left.right = self.createExp(base_node, exp_node)
-                self.deleteFromTree(right, node, exp_node, 'right') # cleanup right side tree?
-                self.applied = True
+#                base_node = left.right
+#                left.right = self.createExp(base_node, exp_node)
+#                self.deleteFromTree(right, node, exp_node, side.right) # cleanup right side tree?
+#                self.score = tech3.CombinePairing
         elif Type(right) == ops.ON:
             index = str(right.left.left.left)
             #print("right ON node =>", index)
             exp_node = self.findExpWithIndex(left, index)
             if exp_node:
-                base_node = right.right
-                right.right = self.createExp(base_node, exp_node)
-                self.deleteFromTree(left, node, exp_node, 'left')
-                self.applied = True
+#                base_node = right.right
+#                right.right = self.createExp(base_node, exp_node)
+#                self.deleteFromTree(left, node, exp_node, side.left)
+                self.score = tech3.CombinePairing
         elif Type(left) == ops.MUL:
             pass
         elif Type(right) == ops.MUL:
@@ -147,10 +144,10 @@ class Technique3Check(AbstractTechnique):
                 mul.right = self.createPair(left, child_node2)
                 #print("new node =+>", mul)
                 addAsChildNodeToParent(data, mul)
-                self.applied = True
+                self.score = tech3.SplitPairing
 #                self.rule += "split one pairing into two pairings. "
             else:
-                print("T3: missing case?")
+                print("T3: missing case: right.left: ", Type(child_node1), "right.right: ", Type(child_node2))
         else:
             return None
 
@@ -173,19 +170,19 @@ class Technique3Check(AbstractTechnique):
                 # special case: reverse split a \single\ pairing into two or more pairings to allow for application of 
                 # other techniques. pair(a, b * c * d?) => p(a, b) * p(a, c) * p(a, d)
                 # pair with a child node with more than two mult's?
-                left = pair_node.left
-                muls = [ BinaryNode(ops.MUL) for i in range(len(r)-1) ]
-                for i in range(len(muls)):
-                    muls[i].left = self.createPair(left, r[i])
-                    if i < len(muls)-1:
-                        muls[i].right = muls[i+1]
-                    else:
-                        muls[i].right = self.createPair(left, r[i+1])
+#                left = pair_node.left
+#                muls = [ BinaryNode(ops.MUL) for i in range(len(r)-1) ]
+#                for i in range(len(muls)):
+#                    muls[i].left = self.createPair(left, r[i])
+#                    if i < len(muls)-1:
+#                        muls[i].right = muls[i+1]
+#                    else:
+#                        muls[i].right = self.createPair(left, r[i+1])
                 #print("root =>", muls[0])
-                node.right = muls[0]
-                self.applied = True
+#                node.right = muls[0]
+#                addAsChildNodeToParent(data, muls[0])
+                self.score = tech3.SplitPairing
                 #self.rule += "split one pairing into two or three."
-                #addAsChildNodeToParent(data, muls[0])
             else:        
                 addAsChildNodeToParent(data, pair_node) # move pair one level up  
 # TODO: REVISIT THIS SECTION
@@ -195,13 +192,13 @@ class Technique3Check(AbstractTechnique):
                     pair_node.left = node # pair points to 'on' node
                     #self.rule += "common 1st (left) node appears, so can reduce n pairings to 1. "
                     self.visit_pair(pair_node, data)                    
-                    self.applied = True
+                    self.score = tech3.CombinePairing
                 elif not self.isConstInSubtreeT(pair_node.right):
                     node.right = pair_node.right
                     pair_node.right = node
                     #self.rule += "common 2nd (right) node appears, so can reduce n pairings to 1. "
                     self.visit_pair(pair_node, data)
-                    self.applied = True
+                    self.score = tech3.CombinePairing
                 else:
                     pass
             return

@@ -1,5 +1,5 @@
 from batchparser import *
-from batchtechniques import Technique2,Technique3,Technique4
+from batchtechniques import Technique2,Technique3,Technique4,DistributeDotProducts
 from batchoptimizer import *
 import random
 
@@ -35,8 +35,8 @@ class BatchOrder:
         self.debug  = False
         self.techMap = { 2:Technique2, 3:Technique3, 4:Technique4 }
         # a quick way to test that a particular technique will transform the equation (pre-check)
-        #self.detectMap2 = { 2:Technique2Check, 3:Technique3Check, 4:Technique4Check, 5:DotProdInstanceFinder, 6:PairInstanceFinder }
-        self.detectMap2 = self.techMap
+        self.techMap2 = { 5:DotProdInstanceFinder, 6:PairInstanceFinder }
+        #self.detectMap2 = self.techMap
 
     def testSequence(self, combo):
         eq = BinaryNode.copy(self.verify)
@@ -96,10 +96,15 @@ class BatchOrder:
         # db = loadDB() # list of orderings 
         pass
     
-    def BFStrategy(self):
+    def BFStrategy(self, start=None):
         techniques = list(self.detectMap2.keys())
-        # starting point: choose a tech
+        # starting point: start
+        if start:
+            pass
+            # 1. apply technique to equation
+            # 2. suggest next technique or tool (2 - 6): current state, previous technique applied, and equation
+            # 3. measure efficiency of current batch equation
+            # 4. if measurement does not converge meaning savings before or after application of tech is thesame
+            # 5. 
         
-        pass
-    
     

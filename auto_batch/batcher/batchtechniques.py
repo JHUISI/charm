@@ -95,25 +95,27 @@ class AbstractTechnique:
     def deleteFromTree(self, node, parent, target, branch=None):
         if node == None: return None
         elif str(node) == str(target):
-            if branch == 'left': 
+            if branch == side.left: 
                 BinaryNode.setNodeAs(parent, parent.right)
                 parent.left = parent.right = None 
                 return                
-            elif branch == 'right': 
+            elif branch == side.right: 
                 BinaryNode.setNodeAs(parent, parent.left)
                 parent.left = parent.right = None
-                return 
+                return
         else:
-            self.deleteFromTree(node.left, node, target, 'left')
-            self.deleteFromTree(node.right, node, target, 'right')
+            self.deleteFromTree(node.left, node, target, side.left)
+            self.deleteFromTree(node.right, node, target, side.right)
 
+tech2 = Enum('NoneApplied', 'ExpIntoPairing', 'DistributeExpToPairing')
 
 class Technique2(AbstractTechnique):
     def __init__(self, constants, variables, meta):
         AbstractTechnique.__init__(self, constants, variables, meta)
         self.rule    = "Move the exponent(s) into the pairing (technique 2)"
         self.applied = False 
-
+        self.score   = tech2.NoneApplied
+        
         # TODO: in cases of chp.bv, where you have multiple exponents outside a pairing, move them all into the e().
     
     # find: 'e(g, h)^d_i' transform into ==> 'e(g^d_i, h)' iff g or h is constant
@@ -129,6 +131,7 @@ class Technique2(AbstractTechnique):
                 node.left = pair_node.left
                 pair_node.left = node
                 self.applied = True
+                self.score   = tech2.ExpIntoPairing
                 #self.rule += "Left := Move '" + str(node.right) + "' exponent into the pairing. "
             
             elif not self.isConstInSubtreeT(pair_node.right):       
@@ -136,6 +139,7 @@ class Technique2(AbstractTechnique):
                 node.left = pair_node.right
                 pair_node.right = node 
                 self.applied = True                
+                self.score   = tech2.ExpIntoPairing                
                 #self.rule += "Right := Move '" + str(node.right) + "' exponent into the pairing. "
             else:
                 print("T2: Need to consider other cases here: ", pair_node)
@@ -169,10 +173,12 @@ class Technique2(AbstractTechnique):
                             #print("root =>", muls[0])
                             pair_node.right = muls[0]
                             self.applied = True
+                            self.score   = tech2.DistributeExpToPairing
                             #self.rule += "distributed exponent into the pairing: right side. "
                         else:
                             self.setNodeAs(pair_node, 'right', node, 'left')
-                            self.applied = True                            
+                            self.applied = True       
+                            self.score   = tech2.ExpIntoPairing                   
                             #self.rule += "moved exponent into the pairing: less than 2 mul nodes. "
 
                     elif Type(pair_node.right) == ops.ATTR:
@@ -180,6 +186,7 @@ class Technique2(AbstractTechnique):
                         # that the left side of pair node is not a constant
                         self.setNodeAs(pair_node, 'left', node, 'left')
                         self.applied = True
+                        self.score   = tech2.ExpIntoPairing
                     else:
                         print("T2: missing case?")
 
@@ -191,18 +198,21 @@ class Technique2(AbstractTechnique):
                     elif Type(pair_node.left) == ops.ATTR:
                         self.setNodeAs(pair_node, 'left', node, 'left')
                         self.applied = True
-
+                        self.score   = tech2.ExpIntoPairing
             else:
             #    blindly make the exp node the right child of whatever node
                 self.setNodeAs(prod_node, 'right', node, 'left')
                 self.applied = True
-        elif(Type(node.left) == ops.MUL):
+                self.score   = tech2.ExpIntoPairing
+                
+        elif(Type(node.left) == ops.MUL):            
             #print("Consider: node.left.type =>", node.left.type)
             mul_node = node.left
             mul_node.left = self.createExp(mul_node.left, BinaryNode.copy(node.right))
             mul_node.right = self.createExp(mul_node.right, BinaryNode.copy(node.right))
             addAsChildNodeToParent(data, mul_node)            
             self.applied = True
+            self.score   = tech2.DistributeExpToPairing
             #self.rule += " distributed the exp node when applied to a MUL node. "
             # Note: if the operands of the mul are ATTR or PAIR doesn't matter. If the operands are PAIR nodes, PAIR ^ node.right
             # This is OK b/c of preorder visitation, we will apply transformations to the children once we return.
@@ -220,12 +230,14 @@ class Technique2(AbstractTechnique):
         else: return None
         return True
         
+tech3 = Enum('NoneApplied', 'ProductToSum','CombinePairing', 'SplitPairing')
 
 class Technique3(AbstractTechnique):
     def __init__(self, constants, variables, meta):
         AbstractTechnique.__init__(self, constants, variables, meta)
         self.rule    = "Combine pairings with common 1st or 2nd element. Reduce N pairings to 1 (technique 3)"
         self.applied = False
+        self.score   = tech3.NoneApplied
 
     # once a     
     def visit_pair(self, node, data):
@@ -241,8 +253,8 @@ class Technique3(AbstractTechnique):
             if exp_node:
                 base_node = left.right
                 left.right = self.createExp(base_node, exp_node)
-                self.deleteFromTree(right, node, exp_node, 'right') # cleanup right side tree?
-                self.applied = True
+                self.deleteFromTree(right, node, exp_node, side.right) # cleanup right side tree?
+#                self.applied = True
         elif Type(right) == ops.ON:
             index = str(right.left.left.left)
             #print("right ON node =>", index)
@@ -250,8 +262,8 @@ class Technique3(AbstractTechnique):
             if exp_node:
                 base_node = right.right
                 right.right = self.createExp(base_node, exp_node)
-                self.deleteFromTree(left, node, exp_node, 'left')
-                self.applied = True
+                self.deleteFromTree(left, node, exp_node, side.left)
+#                self.applied = True
         elif Type(left) == ops.MUL:
             pass
         elif Type(right) == ops.MUL:
@@ -267,6 +279,7 @@ class Technique3(AbstractTechnique):
                 #print("new node =+>", mul)
                 addAsChildNodeToParent(data, mul)
                 self.applied = True
+                self.score   = tech3.SplitPairing
 #                self.rule += "split one pairing into two pairings. "
             else:
                 print("T3: missing case?")
@@ -287,7 +300,7 @@ class Technique3(AbstractTechnique):
             self.getMulTokens(pair_node.left, ops.NONE, [ops.EXP, ops.HASH], l)
             self.getMulTokens(pair_node.right, ops.NONE, [ops.EXP, ops.HASH], r)
             if len(l) > 2: 
-                print("T3: Need to code this case!")
+                print("T3: Need to handle the left case in visit_on.")
             elif len(r) > 2:
                 # special case: reverse split a \single\ pairing into two or more pairings to allow for application of 
                 # other techniques. pair(a, b * c * d?) => p(a, b) * p(a, c) * p(a, d)
@@ -303,6 +316,7 @@ class Technique3(AbstractTechnique):
                 #print("root =>", muls[0])
                 node.right = muls[0]
                 self.applied = True
+                self.score   = tech3.SplitPairing
                 #self.rule += "split one pairing into two or three."
                 #addAsChildNodeToParent(data, muls[0])
             else:        
@@ -315,12 +329,14 @@ class Technique3(AbstractTechnique):
                     #self.rule += "common 1st (left) node appears, so can reduce n pairings to 1. "
                     self.visit_pair(pair_node, data)                    
                     self.applied = True
+                    self.score   = tech3.CombinePairing                    
                 elif not self.isConstInSubtreeT(pair_node.right):
                     node.right = pair_node.right
                     pair_node.right = node
                     #self.rule += "common 2nd (right) node appears, so can reduce n pairings to 1. "
                     self.visit_pair(pair_node, data)
                     self.applied = True
+                    self.score   = tech3.CombinePairing
                 else:
                     pass
             return
@@ -338,13 +354,16 @@ class Technique3(AbstractTechnique):
                 #print("output =>", exp)
                 addAsChildNodeToParent(data, exp)
                 self.applied = True
+                self.score   = tech3.ProductToSum
 
+tech4 = Enum('NoneApplied', 'ConstantPairing')
         
 class Technique4(AbstractTechnique):
     def __init__(self, constants, variables, meta):
         AbstractTechnique.__init__(self, constants, variables, meta)
         self.rule = "Applied waters hash technique (technique 4)"
         self.applied = False
+        self.score   = tech4.NoneApplied
         #print("Metadata =>", meta)
         
     def visit_on(self, node, data):
@@ -370,6 +389,7 @@ class Technique4(AbstractTechnique):
                 if Type(node2_parent) == ops.PAIR:
                     self.adjustProdNodes( node2_parent )
                     self.applied = True
+                    self.score   = tech4.ConstantPairings
                 else:
                     print("Not applying any transformation for: ", Type(node2_parent))
 
@@ -389,7 +409,7 @@ class Technique4(AbstractTechnique):
                     new_prod.right = self.createExp(prod.right, result)
                     # add new_prod into current node left
                     node.left = new_prod
-                    self.deleteFromTree(node.right, node, result, 'right')
+                    self.deleteFromTree(node.right, node, result, side.right)
                     #print("updated node =>", node)
                 
         elif Type(node.right) == ops.ON:
@@ -408,9 +428,8 @@ class Technique4(AbstractTechnique):
                     new_prod.right = self.createExp(node.left, result)
                     # add new_prod into current node left                
                     node.left = new_prod    
-                    self.deleteFromTree(node.right, node, result, 'right')
+                    self.deleteFromTree(node.right, node, result, side.right)
                     #print("updated node =>", node)
-                 
             elif not self.allNodesWithIndex(index, node.left):
                 print("adjustProdNodes: need to handle the other case.")
         # first check the right side for product
@@ -435,4 +454,90 @@ class Technique4(AbstractTechnique):
             return result
         
 
+# Focuses on simplifying dot products of the form
+# prod{} on (x * y)
+class DistributeDotProducts(AbstractTechnique):
+    def __init__(self, constants, variables, meta):
+        AbstractTechnique.__init__(self, constants, variables, meta)
+        self.rule = "Distribute dot products: "
+        self.applied = False
+
+    def getMulTokens2(self, subtree, parent_type, target_type, _list):
+        if subtree == None: return None
+        elif parent_type == ops.EXP and Type(subtree) == ops.MUL:
+            return               
+        elif parent_type == ops.MUL:
+            if Type(subtree) in target_type: 
+                found = False
+                for i in _list:
+                    if isNodeInSubtree(i, subtree): found = True
+                if not found: _list.append(subtree)
+
+        if subtree.left: self.getMulTokens2(subtree.left, subtree.type, target_type, _list)
+        if subtree.right: self.getMulTokens2(subtree.right, subtree.type, target_type, _list)
+        return
+    
+    def visit(self, node, data):
+        pass
+
+    # visit all the ON nodes and test whether we can distribute the product to children nodes
+    # e.g., prod{} on (x * y) => prod{} on x * prod{} on y    
+    def visit_on(self, node, data):
+        if Type(data['parent']) == ops.PAIR:
+            #self.rule += "False "
+            return
+        #print("test: right node of prod =>", node.right, ": type =>", node.right.type)
+        #print("parent type =>", Type(data['parent']))
+#        _type = node.right.type
+        if Type(node.right) == ops.MUL:            
+            # must distribute prod to both children of mul
+            r = []
+            mul_node = node.right
+            self.getMulTokens2(mul_node, ops.NONE, [ops.EXP, ops.HASH, ops.PAIR, ops.ATTR], r)
+            #for i in r:
+            #    print("node =>", i)
+            
+            if len(r) == 0:
+                pass
+            elif len(r) <= 2:
+            # in case we're dealing with prod{} on attr1 * attr2 
+            # no need to simply further, so we can simply return
+                if mul_node.left.type == ops.ATTR and mul_node.right.type == ops.ATTR:
+                    return
+
+                node.right = None
+                prod_node2 = BinaryNode.copy(node)
+            
+            # add prod nodes to children of mul_node
+                prod_node2.right = mul_node.right
+                mul_node.right = prod_node2
+            
+                node.right = mul_node.left
+                mul_node.left = node
+                #self.rule += "True "
+                # move mul_node one level up to replace the "on" node.
+                addAsChildNodeToParent(data, mul_node)
+                self.applied = True
+            elif len(r) > 2:
+                #print("original node =>", node)
+                muls = [BinaryNode(ops.MUL) for i in range(len(r)-1)]
+                prod = [BinaryNode.copy(node) for i in r]
+                # distribute the products to all nodes in r
+                for i in range(len(r)):
+                    prod[i].right = r[i]
+#                    print("n =>", prod[i])
+                # combine prod nodes into mul nodes                     
+                for i in range(len(muls)):
+                    muls[i].left = prod[i]
+                    if i < len(muls)-1:
+                        muls[i].right = muls[i+1]
+                    else:
+                        muls[i].right = prod[i+1]
+#                print("final node =>", muls[0])
+                addAsChildNodeToParent(data, muls[0])    
+                self.applied = True            
+                #self.rule += "True "
+            else:
+                #self.rule += "False "
+                return                
 
