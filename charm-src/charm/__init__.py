@@ -12,7 +12,7 @@ elif install_system == 'Windows':
 	path_to_charm = distutils.sysconfig.get_python_lib()
 elif install_system == 'Linux':
    dist = platform.linux_distribution()[0]
-   if dist == 'Ubuntu' or 'LinuxMint':
+   if dist == 'Ubuntu' or dist == 'LinuxMint':
       path_to_charm = distutils.sysconfig.get_python_lib(1, 1, '/usr/local') + "/dist-packages"
       path_to_charm2 = distutils.sysconfig.get_python_lib(1, 1, '/usr/local') + "/site-packages"
    elif dist == 'Fedora':
