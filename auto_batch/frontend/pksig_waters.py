@@ -2,7 +2,6 @@
 Waters - Identity-based signatures
 
 | From: "B. Waters - Efficient identity-based encryption without random oracles"
-| Published in: EUROCRYPT 2005
 | Available from: Vol 3494 of LNCS, pages 320-329
 | Notes: 
 

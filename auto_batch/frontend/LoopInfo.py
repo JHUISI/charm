@@ -1,4 +1,5 @@
 import con, sys
+from Parser_CodeGen_Toolbox import *
 
 class LoopInfo:
 	def __init__(self):
@@ -9,6 +10,7 @@ class LoopInfo:
 		self.varListNoSubscripts = None
 		self.varListWithSubscripts = None
 		self.expression = None
+		self.groupType = None
 
 	def getLoopName(self):
 		return self.loopName
@@ -31,6 +33,9 @@ class LoopInfo:
 	def getExpression(self):
 		return self.expression
 
+	def getGroupType(self):
+		return self.groupType
+
 	def setLoopName(self, loopNameStringName):
 		if ( (loopNameStringName == None) or (type(loopNameStringName).__name__ != con.stringName) ):
 			sys.exit("LoopInfo->setLoopName:  problem with loop name parameter passed in.")
@@ -40,14 +45,9 @@ class LoopInfo:
 		if ( (loopName == None) or (type(loopName).__name__ != con.strTypePython) or (len(loopName) == 0) ):
 			sys.exit("LoopInfo->setLoopName:  problem with the string obtained from getStringVarName on the loop name StringName object passed in.")
 
-		foundLoopPrefix = False
+		isValidLoopName = isStringALoopName(loopName)
 
-		for prefix in con.loopPrefixes:
-			if (loopName.startswith(prefix) == True):
-				foundLoopPrefix = True
-				break
-
-		if (foundLoopPrefix == False):
+		if (isValidLoopName == False):
 			sys.exit("LoopInfo->setLoopName:  loop name passed in (" + loopName + ") is not one of the supported loop types (" + con.loopPrefixes + ").")
  
 		self.loopName = loopNameStringName
@@ -102,3 +102,9 @@ class LoopInfo:
 			sys.exit("LoopInfo->setExpression:  problem with expression passed in.")
 
 		self.expression = expression
+
+	def setGroupType(self, groupType):
+		if ( (groupType == None) or (type(groupType).__name__ != con.stringName) or (groupType.getStringVarName() not in con.groupTypes) ):
+			sys.exit("LoopInfo->setGroupType:  problem with group type parameter passed in.")
+
+		self.groupType = groupType

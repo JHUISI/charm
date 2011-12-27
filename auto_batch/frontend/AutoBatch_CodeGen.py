@@ -3,6 +3,7 @@ from ASTParser import *
 from Parser_CodeGen_Toolbox import *
 from LoopInfo import LoopInfo
 from StringName import StringName
+from PrecomputeVariable import PrecomputeVariable
 
 batchEqLoopVars = []
 batchEqNotLoopVars = []
@@ -25,7 +26,7 @@ listVars = {}
 loopVarGroupTypes = {}
 numSpacesPerTab = None
 numTabsOnVerifyLine = None
-precomputeVars = {}
+precomputeVars = []
 pythonCodeLines = None
 pythonCodeNode = None
 varAssignments = None
@@ -1756,17 +1757,25 @@ def processPrecomputeLine(line):
 	lenPrecomputeString = len(con.precomputeString)
 	line = line[lenPrecomputeString:len(line)]
 	line = line.lstrip().rstrip()
-	if (line.startswith(con.precomputeVarString) == False):
+	if (line.startswith(con.deltaPrecomputeVarString) == True):
 		return
 
 	lineSplit = line.split(con.batchVerifierOutputAssignment)
-	key = lineSplit[0].lstrip().rstrip()
-	val = lineSplit[1].lstrip().rstrip()
+	varName = lineSplit[0].lstrip().rstrip()
+	expression = lineSplit[1].lstrip().rstrip()
 
-	if (key in precomputeVars):
-		sys.exit("AutoBatch_CodeGen->processPrecomputeLine:  found duplicate variable name for a precompute variable (" + key + ").")
+	for precomputeVariable in precomputeVars:
+		currentVariableName = precomputeVariable.getVarName().getStringVarName()
+		if (varName == currentVariableName):
+			sys.exit("AutoBatch_CodeGen->processPrecomputeLine:  found duplicate variable name for a precompute variable (" + varName + ").")
 
-	precomputeVars[key] = val
+	varNameStringName = StringName()
+	varNameStringName.setName(varName)
+
+	nextPrecomputeVarObj = PrecomputeVariable()
+	nextPrecomputeVarObj.setVarName(varNameStringName)
+	nextPrecomputeVarObj.setExpression(expression)
+	precomputeVars.append(copy.deepcopy(nextPrecomputeVarObj))
 
 def processLoopLine(line):
 	global loopVarGroupTypes
@@ -2035,6 +2044,9 @@ def addImportLines():
 		individualVerFile.write(importLines[index].lstrip().rstrip() + "\n")
 		verifySigsFile.write(importLines[index].lstrip().rstrip() + "\n")
 
+	batchVerFile.write("import sys\n")
+	individualVerFile.write("import sys\n")
+
 def addCommonHeaderLines():
 	global batchVerFile, individualVerFile
 
@@ -2069,8 +2081,9 @@ def addTemplateLines():
 	if (numSigners != None):
 		batchOutputString += "\t" + con.numSigners + " = " + str(numSigners) + "\n"
 
+	batchOutputString += "\tdeltas = {}\n"
 	batchOutputString += "\tfor sigIndex in range(0, " + con.numSignatures + "):\n"
-	batchOutputString += "\t\tdeltaz[sigIndex] = prng_bits(" + con.group + ", 80)\n\n"
+	batchOutputString += "\t\tdeltas[sigIndex] = prng_bits(" + con.group + ", 80)\n\n"
 	batchOutputString += "\tincorrectIndices = []\n"
 
 	batchVerFile.write(batchOutputString)
@@ -2079,7 +2092,6 @@ def addTemplateLines():
 	indOutputString += "def run_Ind(verifyArgsDict, " + con.group + "ObjParam, verifyFuncArgs):\n"
 	indOutputString += "\tglobal " + con.group + "\n"
 	indOutputString += "\t" + con.group + " = " + con.group + "ObjParam\n\n"
-	indOutputString += "\t#Group membership checks\n\n"
 	indOutputString += "\t" + con.numSignatures + " = len(verifyArgsDict)\n"
 
 	if (numSigners != None):
@@ -2123,6 +2135,16 @@ def addSigLoopToInd():
 
 	individualOutputString = ""
 	individualOutputString += "\n\tfor sigIndex in range(0, " + con.numSignatures + "):\n"
+	individualVerFile.write(individualOutputString)
+
+def addGroupMembershipChecksToInd():
+	global individualVerFile
+
+	individualOutputString = ""
+	individualOutputString += "\t\tfor arg in verifyFuncArgs:\n"
+	individualOutputString += "\t\t\tif (group.ismember(verifyArgsDict[sigIndex][arg][bodyKey]) == False):\n"
+	individualOutputString += "\t\t\t\tsys.exit(\"ALERT:  Group membership check failed!!!!\\n\")\n\n"
+
 	individualVerFile.write(individualOutputString)
 
 def writeBodyOfInd():
@@ -2195,10 +2217,10 @@ def getLoopNamesOfFinalBatchEq():
 
 	for possibleLoopName in tempList:
 		nameAsString = possibleLoopName.getStringVarName()
-		if ( (nameAsString.startswith(con.dotPrefix) == False) and (nameAsString.startswith(con.sumPrefix) == False) ):
+		isValidLoopName = isStringALoopName(nameAsString)
+		if (isValidLoopName == False):
 			continue
-		if (len(nameAsString) <= 5):
-			loopNamesOfFinalBatchEq.append(copy.deepcopy(possibleLoopName))
+		loopNamesOfFinalBatchEq.append(copy.deepcopy(possibleLoopName))
 
 	del tempList
 
@@ -2366,6 +2388,7 @@ def main():
 	addTemplateLines()
 	addPrerequisites()
 	addSigLoopToInd()
+	addGroupMembershipChecksToInd()
 	writeBodyOfInd()
 
 	for line in batchVerifierOutput:

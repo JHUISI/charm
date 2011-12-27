@@ -4,6 +4,24 @@ from ASTVarVisitor import *
 from LineInfo import LineInfo
 from StringName import StringName
 
+def isStringALoopName(strName):
+	if ( (strName == None) or (type(strName).__name__ != con.strTypePython) or (len(strName) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->isStringALoopName:  problem with string name parameter passed in.")
+
+	lenStr = len(strName)
+
+	if (lenStr > con.maxLengthForLoopNames):
+		return False
+
+	foundPrefix = False
+
+	for prefix in con.loopPrefixes:
+		if (strName.startswith(prefix) == True):
+			foundPrefix = True
+			break
+
+	return foundPrefix
+
 def removeSubscriptsReturnStringNames(list):
 	if ( (list == None) or (type(list).__name__ != con.listTypePython) or (len(list) == 0) ):
 		sys.exit("Parser_CodeGen_Toolbox->removeSubscriptsReturnStringNames:  problem with list input parameter passed in.")
