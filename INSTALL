@@ -84,9 +84,11 @@ The steps for building in linux this way are:
 1. Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
 	1. m4
 		su -c "yum install m4"
-	2. Header files/static library
+    2. Python 3
+        su -c "yum install python3"
+	3. Header files/static library
 		su -c "yum install python3-devel"
-	3. openssl-devel
+	4. openssl-devel
 		su -c "yum install openssl-devel"
 
 2. Red Hat/Fedora has decided not to support ECC in OpenSSL due to patent concerns, so we now need to remove their restriction, manually import the required files, and build new shared libraries.
