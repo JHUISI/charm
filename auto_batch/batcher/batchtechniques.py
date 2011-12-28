@@ -1,6 +1,8 @@
 
 from batchparser import *
 
+Tech_db = Enum('NoneApplied', 'ExpIntoPairing', 'DistributeExpToPairing', 'ProductToSum', 'CombinePairing', 'SplitPairing', 'ConstantPairing')
+
 class AbstractTechnique:
     def __init__(self, constants, variables, meta):
         self.consts = constants
@@ -107,7 +109,7 @@ class AbstractTechnique:
             self.deleteFromTree(node.left, node, target, side.left)
             self.deleteFromTree(node.right, node, target, side.right)
 
-tech2 = Enum('NoneApplied', 'ExpIntoPairing', 'DistributeExpToPairing')
+tech2 = Tech_db # Enum('NoneApplied', 'ExpIntoPairing', 'DistributeExpToPairing')
 
 class Technique2(AbstractTechnique):
     def __init__(self, constants, variables, meta):
@@ -188,13 +190,13 @@ class Technique2(AbstractTechnique):
                         self.applied = True
                         self.score   = tech2.ExpIntoPairing
                     else:
-                        print("T2: missing case?")
+                        print("T2: what are the other cases: ", Type(pair_node.right))
 
                 # check whether right side is constant
                 elif not self.isConstInSubtreeT(pair_node.right):
                     # check the type of pair_node : 
                     if Type(pair_node.left) == ops.MUL:
-                        pass
+                        print("T2: missing case - pair_node.left and MUL node.")
                     elif Type(pair_node.left) == ops.ATTR:
                         self.setNodeAs(pair_node, 'left', node, 'left')
                         self.applied = True
@@ -230,7 +232,7 @@ class Technique2(AbstractTechnique):
         else: return None
         return True
         
-tech3 = Enum('NoneApplied', 'ProductToSum','CombinePairing', 'SplitPairing')
+tech3 = Tech_db # Enum('NoneApplied', 'ProductToSum','CombinePairing', 'SplitPairing')
 
 class Technique3(AbstractTechnique):
     def __init__(self, constants, variables, meta):
@@ -356,7 +358,7 @@ class Technique3(AbstractTechnique):
                 self.applied = True
                 self.score   = tech3.ProductToSum
 
-tech4 = Enum('NoneApplied', 'ConstantPairing')
+tech4 = Tech_db # Enum('NoneApplied', 'ConstantPairing')
         
 class Technique4(AbstractTechnique):
     def __init__(self, constants, variables, meta):
