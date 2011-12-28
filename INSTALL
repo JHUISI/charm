@@ -84,12 +84,14 @@ The steps for building in linux this way are:
 1. Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
 	1. m4
 		su -c "yum install m4"
-	3. Python 3
-		su -c "yum install python3"
-	4. Header files/static library
+    2. Python 3
+        su -c "yum install python3"
+	3. Header files/static library
 		su -c "yum install python3-devel"
+	4. openssl-devel
+		su -c "yum install openssl-devel"
 
-2. Red Hat/Fedora has decided not to support ECC in OpenSSL due to patent concerns, so we now need to remove their restriction and manually import the required files.
+2. Red Hat/Fedora has decided not to support ECC in OpenSSL due to patent concerns, so we now need to remove their restriction, manually import the required files, and build new shared libraries.
 	1. Remove the ECC restriction
 		1. Navigate to /usr/include/openssl
 			cd /usr/include/openssl
@@ -108,13 +110,13 @@ The steps for building in linux this way are:
 				#endif
 			Delete (later on the file)
 				# if defined(OPENSSL_NO_EC) && !defined(NO_EC)
-				#  define NO_EC
+				# define NO_EC
 				# endif
 				# if defined(OPENSSL_NO_ECDH) && !defined(NO_ECDH)
-				#  define NO_ECDH
+				# define NO_ECDH
 				# endif
 				# if defined(OPENSSL_NO_ECDSA) && !defined(NO_ECDSA)
-				#  define NO_ECDSA
+				# define NO_ECDSA
 				# endif
 		4. Save the file and close it
 	2. Add the ECC files
@@ -124,18 +126,67 @@ The steps for building in linux this way are:
 			cd /path/to/openssl-[version]/include/openssl
 		4. Add the new files to the current OpenSSL installation
 			su -c "yes n | cp * /usr/include/openssl"
+	3. Build the new shared libraries
+		1. Navigate to your downloaded version of OpenSSL
+			cd /path/to/openssl-[version]/
+		2. Configure OpenSSL to make the shared libraries
+			./config shared
+		3. Make the new OpenSSL library
+			make
+	4. Move the new shared libraries with their links
+		su -c "cp --no-dereference libcrypto.so /usr/local/lib/libcrypto.so.10"
+		su -c "cp libcrypto.so.1.0.0 /usr/local/lib"
+		su -c "cp --no-dereference libssl.so /usr/local/lib/libssl.so.10"
+		su -c "cp libssl.so.1.0.0 /usr/local/lib"
+		su -c "cp libcrypto.a /usr/local/lib"
+		su -c "cp libssl.a /usr/local/lib"
+	5. And now we need to set the library search path to look for the libraries we just added first.
+		cd /etc/ld.so.conf.d/
+		su -c "vi charm.conf"
+		put "/usr/local/lib" (without quotes) into the file, save, and close
+		su -c ldconfig
+	6. Set the library search path to look for the new libraries first (either type this into your terminal or put it in your .bashrc file and source it)
+		export LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
 
 3. Now we need to obtain a copy of Charm:
-	git clone git://github.com/JHUISI/charm.git
+	git clone -b master https://github.com/JHUISI/charm.git
 
 4. Next, we will install Charm. Navigate to the Charm directory.
 	1. We must first run the configuration script:
-		su -c "./configure.sh"
+		su -c ./configure.sh
+
+		If the output of the configure script says that libgmp is already installed (and this is your first time installing Charm), chances are you have an outdated version of GMP.  We need to check which version of libgmp you have installed.
+			su -c updatedb
+			locate libgmp
+		If you don't see libgmp.so.10 OR libgmp.so.10.0.2 in the resulting list, then you will need to build the GMP libraries from source.
+			1. Download the latest version of the GMP source from ftp://ftp.gnu.org/gnu/gmp/gmp-5.0.2.tar.gz
+			2. Untar it
+			3. Navigate to /path/to/gmpsource (ie inside the untarred file)
+				cd /path/to/gmpsource
+			4. Build and install the libraries
+				./configure
+				make
+				su -c "cp gmp.h /usr/local/include"
+				su -c "make install"
+            5. You now have two options (remove or keep the old libraries):
+				1. Remove the old libraries
+					cd /usr/lib
+					su -c "rm libgmp.*"
+				2. Keep the old libraries, rename the new one
+					1. Determine the version of the old library
+						su -c updatedb
+						locate libgmp
+					2. Look for /usr/lib/libgmp.so.X in the resulting list where X is a number (NOT /usr/lib/libgmp.X.Y.Z)
+					3. Rename the new link
+						cd /usr/local/lib
+						su -c "mv libgmp.so.10 libgmp.so.X"
+			6. Rebuild the searchpath for libraries
+				su -c ldconfig
 	2. Now we will build and install Charm:
 		su -c "make build"
 		su -c "make install"
 	3. And finally we must rebuild the searchpath for libraries
-		su -c "ldconfig"
+		su -c ldconfig
 
 [Fedora x86_64]
 
