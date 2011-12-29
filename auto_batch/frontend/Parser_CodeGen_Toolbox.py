@@ -3,6 +3,193 @@ from ASTParser import *
 from ASTVarVisitor import *
 from LineInfo import LineInfo
 from StringName import StringName
+from StringValue import StringValue
+
+def searchForLoopNameInLoopList(loopNameToSearchFor, loopList):
+	if (loopList == None):
+		return False
+
+	if ( (loopNameToSearchFor == None) or (type(loopNameToSearchFor).__name__ != con.strTypePython) or (isStringALoopName(loopNameToSearchFor) == False) ):
+		sys.exit("Parser_CodeGen_Toolbox->searchForLoopNameInLoopList:  problem with loop name to search for parameter passed in.")
+
+	if ( (type(loopList).__name__ != con.listTypePython) or (len(loopList) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->searchForLoopNameInLoopList:  problem with loop list parameter passed in.")
+
+	foundIt = False
+
+	for loopStringName in loopList:
+		if ( (loopStringName == None) or (type(loopStringName).__name__ != con.stringName) ):
+			sys.exit("Parser_CodeGen_Toolbox->searchForLoopNameInLoopList:  problem with one of the loop string name objects extracted from the loop list parameter passed in.")
+
+		loopAsString = loopStringName.getStringVarName()
+		if ( (loopAsString == None) or (type(loopAsString).__name__ != con.strTypePython) or (isStringALoopName(loopAsString) == False) ):
+			sys.exit("Parser_CodeGen_Toolbox->searchForLoopNameInLoopList:  problem with return value for getStringVarName called on one of the loops in the loop list passed in.")
+
+		if (loopNameToSearchFor == loopAsString):
+			if (foundIt == True):
+				sys.exit("Parser_CodeGen_Toolbox->searchForLoopNameInLoopList:  found duplicate loop names in the loop list passed in that match the loop name to search for parameter passed in.")
+
+			foundIt = True
+
+	return foundIt
+
+def getLoopNamesAsStringsFromLoopList(loopList):
+	if (areAllLoopNamesValid(loopList) == False):
+		sys.exit("Parser_CodeGen_Toolbox->getLoopNamesAsStringsFromLoopList:  loop list passed in failed the check of areAllLoopNamesValid.")
+
+	retList = []
+
+	for loop in loopList:
+		retList.append(loop.getLoopName().getStringVarName())
+
+	return retList
+
+def checkLoopOrder(loopOrder):
+	if ( (loopOrder == None) or (type(loopOrder).__name__ != con.listTypePython) or (len(loopOrder) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->checkLoopOrder:  problem with loop order parameter passed in.")
+
+	for indexStringName in loopOrder:
+		if ( (indexStringName == None) or (type(indexStringName).__name__ != con.stringName) ):
+			sys.exit("Parser_CodeGen_Toolbox->checkLoopOrder:  problem with one of the indices in the loop order parameter passed in.")
+
+		index = indexStringName.getStringVarName()
+
+		if ( (index == None) or (type(index).__name__ != con.strTypePython) or (index not in con.loopIndexTypes) ):
+			sys.exit("Parser_CodeGen_Toolbox->checkLoopOrder:  problem with string version of one of the indices in the loop order passed in.")
+
+	return True
+
+def getLoopOrderAsString(loopOrder):
+	if (loopOrder == None):
+		return None
+
+	if ( (type(loopOrder).__name__ != con.listTypePython) or (len(loopOrder) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getLoopOrderAsString:  problem with loopOrder parameter passed in.")
+
+	loopOrderAsString = ""
+
+	for loop in loopOrder:
+		if ( (loop == None) or (type(loop).__name__ != con.stringName) ):
+			sys.exit("Parser_CodeGen_Toolbox->getLoopOrderAsString:  problem with one of the loop " + con.stringName + " objects extracted from the loop order list.")
+
+		loopIndexString = loop.getStringVarName()
+		if ( (loopIndexString == None) or (type(loopIndexString).__name__ != con.strTypePython) or (loopIndexString not in con.loopIndexTypes) ):
+			sys.exit("Parser_CodeGen_Toolbox->getLoopOrderAsString:  problem with the string representations of one of the loop indices in the loop order.")
+
+		loopOrderAsString += loopIndexString
+
+	if (len(loopOrderAsString) == 0):
+		sys.exit("Parser_CodeGen_Toolbox->getLoopOrderAsString:  could not extract the string representations of any of the loop indices in the loop order.")
+
+	return loopOrderAsString
+
+def getLoopInfoObjFromLoopName(loopList, loopName):
+	if ( (loopList == None) or (type(loopList).__name__ != con.listTypePython) or (len(loopList) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getLoopInfoObjFromLoopName:  problem with loop list passed in.")
+
+	if ( (loopName == None) or (type(loopName).__name__ != con.strTypePython) or (len(loopName) == 0) or (isStringALoopName(loopName) == False) ):
+		sys.exit("Parser_CodeGen_Toolbox->getLoopInfoObjFromLoopName:  problem with loop name passed in.")
+
+	retLoop = None
+
+	for loop in loopList:
+		if (loop.getLoopName().getStringVarName() == loopName):
+			if (retLoop != None):
+				sys.exit("Parser_CodeGen_Toolbox->getLoopInfoObjFromLoopName:  found more than one loop info object with the same loop name (" + loopName + ").")
+			retLoop = copy.deepcopy(loop)
+
+	return retLoop
+
+def returnOperationAsStringValue(opString):
+	if ( (opString == None) or (type(opString).__name__ != con.strTypePython) or (len(opString) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->returnOperationAsStringValue:  problem with operation string passed in.")
+
+	retOpString = None
+
+	for opType in con.operationTypes:
+		if (opString.startswith(opType) == True):
+			if (retOpString != None):
+				sys.exit("Parser_CodeGen_Toolbox->returnOperationAsStringValue:  found multiple operation types that fit the operation string passed in (" + opString + ").")
+			retOpString = opType
+
+	if (retOpString == None):
+		return None
+
+	retOpString_StringValue = StringValue()
+	retOpString_StringValue.setValue(retOpString)
+	return retOpString_StringValue
+
+def getChildrenLoopsOfLoop(loop):
+	if ( (loop == None) or (type(loop).__name__ != con.loopInfo) ):
+		sys.exit("Parser_CodeGen_Toolbox->getChildrenLoopsOfLoop:  problem with loop passed in.")
+
+	returnList = []
+
+	childrenList = loop.getVarListWithSubscripts()
+	for child in childrenList:
+		childName = child.getStringVarName()
+		if ( (childName == None) or (type(childName).__name__ != con.strTypePython) or (len(childName) == 0) ):
+			sys.exit("Parser_CodeGen_Toolbox->getChildrenLoopsOfLoop:  problem with the string version of one of the child variable names.")
+
+		if (isStringALoopName(childName) == True):
+			returnList.append(childName)
+
+	if (len(returnList) == 0):
+		return None
+
+	return returnList
+
+def buildAbbreviatedLoopDict(loopList):
+	if (areAllLoopNamesValid(loopList) == False):
+		sys.exit("Parser_CodeGen_Toolbox->buildAbbreviatedLoopDict:  one of the loop names in the loop list passed in is invalid.")
+
+	abbrLoopDict = {}
+
+	for loop in loopList:
+		loopName = loop.getLoopName().getStringVarName()
+		startVal = loop.getStartValue().getValue()
+		if ( (startVal == None) or (type(startVal).__name__ != con.intTypePython) or (startVal < 0) ):
+			sys.exit("Parser_CodeGen_Toolbox->buildAbbreviatedLoopDict:  problem with start value extracted for one of the loops in the loop list passed in.")
+		loopOverValue = loop.getLoopOverValue().getStringVarName()
+		if ( (loopOverValue == None) or (type(loopOverValue).__name__ != con.strTypePython) or (loopOverValue not in con.loopTypes) ):
+			sys.exit("Parser_CodeGen_Toolbox->buildAbbreviatedLoopDict:  problem with loop over value in one of the loops in the loop list passed in.")
+		loopOperation = loop.getOperation().getStringVarName()
+		if ( (loopOperation == None) or (type(loopOperation).__name__ != con.strTypePython) or (loopOperation not in con.operationTypes) ):
+			sys.exit("Parser_CodeGen_Toolbox->buildAbbreviatedLoopDict:  problem with loop operation in one of the loops in the loop list passed in.")
+
+		rangeStruct = []
+		rangeStruct.append(startVal)
+		rangeStruct.append(loopOverValue)
+		rangeStruct.append(loopOperation)
+
+		abbrLoopDict[loopName] = copy.deepcopy(rangeStruct)
+		del rangeStruct
+
+	if (len(abbrLoopDict) == 0):
+		sys.exit("Parser_CodeGen_Toolbox->buildAbbreviatedLoopDict:  could not extract abbreviated loop form of any of the loops passed in.")
+
+	return abbrLoopDict
+
+def areAllLoopNamesValid(loopList):
+	if ( (loopList == None) or (type(loopList).__name__ != con.listTypePython) or (len(loopList) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->areAllLoopNamesValid:  problem with loop list passed in.")
+
+	for loop in loopList:
+		if (type(loop).__name__ == con.loopInfo):
+			loopName = loop.getLoopName().getStringVarName()
+		elif (type(loop).__name__ == con.stringName):
+			loopName = loop.getStringVarName()
+		else:
+			sys.exit("Parser_CodeGen_Toolbox->areAllLoopNamesValid:  type of the loops in the loop list passed in are not one of the supported types (" + con.loopInfo + ", " + con.stringName + ").")
+
+		if ( (loopName == None) or (type(loopName).__name__ != con.strTypePython) or (len(loopName) == 0) ):
+			sys.exit("Parser_CodeGen_Toolbox->areAllLoopNamesValid:  problem with one of the loop names in the list passed in.")
+
+		isValidLoopName = isStringALoopName(loopName)
+		if (isValidLoopName == False):
+			return False
+
+	return True
 
 def isStringALoopName(strName):
 	if ( (strName == None) or (type(strName).__name__ != con.strTypePython) or (len(strName) == 0) ):
@@ -10,7 +197,7 @@ def isStringALoopName(strName):
 
 	lenStr = len(strName)
 
-	if (lenStr > con.maxLengthForLoopNames):
+	if (lenStr > con.maxStrLengthForLoopNames):
 		return False
 
 	foundPrefix = False

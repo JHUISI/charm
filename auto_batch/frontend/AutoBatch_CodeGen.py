@@ -4,6 +4,9 @@ from Parser_CodeGen_Toolbox import *
 from LoopInfo import LoopInfo
 from StringName import StringName
 from PrecomputeVariable import PrecomputeVariable
+from IntegerValue import IntegerValue
+from Loop_Block_Toolbox import *
+from OperationValue import OperationValue
 
 batchEqLoopVars = []
 batchEqNotLoopVars = []
@@ -17,10 +20,12 @@ functionArgMappings = None
 indentationListVerifyLines = None
 individualVerFile = None
 lineInfo = None
+loopBlocksForCachedCalculations = []
+loopBlocksForNonCachedCalculations = []
 loopInfo = []
 loopNamesOfFinalBatchEq = []
-loopsNotOnlyOverNumSignatures = []
-loopsOnlyOverNumSignatures = []
+loopsOuterNumSignatures = []
+loopsOuterNotNumSignatures = []
 linePairsOfVerifyFuncs = None
 listVars = {}
 loopVarGroupTypes = {}
@@ -761,20 +766,35 @@ def processComputeLine(line):
 	varListWithSubscripts = getVarNamesAsStringNamesFromLine(expression)
 
 	varListAsStrings = getVarNamesAsStringsFromLine(expression)
+	loopOrder = getLoopOrder(varListAsStrings)
 	varListNoSubscripts = removeSubscriptsReturnStringNames(varListAsStrings)
+
+	operationStringValue = returnOperationAsStringValue(loopName)
+	if ( (operationStringValue == None) or (type(operationStringValue).__name__ != con.stringValue) ):
+		sys.exit("AutoBatch_CodeGen->processComputeLine:  could not extract the operation value of one of the loops parsed from the batcher output.")
+
+	myOperationValue = OperationValue()
+	myOperationValue.setOperation(operationStringValue)
 
 	loopNameStringName = StringName()
 	loopNameStringName.setName(loopName)
 
+	startValIntegerValue = IntegerValue()
+	startValIntegerValue.setValue(int(startVal))
+
+	loopOverValueStringName = StringName()
+	loopOverValueStringName.setName(loopOverValue)
+
 	nextLoopInfoObj = LoopInfo()
 	nextLoopInfoObj.setLoopName(loopNameStringName)
-	nextLoopInfoObj.setLoopOverValue(loopOverValue)
 	nextLoopInfoObj.setIndexVariable(indexVarStringName)
-	nextLoopInfoObj.setStartValue(int(startVal))
-	nextLoopInfoObj.setLoopOverValue(loopOverValue)
+	nextLoopInfoObj.setStartValue(startValIntegerValue)
+	nextLoopInfoObj.setLoopOverValue(loopOverValueStringName)
+	nextLoopInfoObj.setOperation(myOperationValue)
 	nextLoopInfoObj.setExpression(expression)
 	nextLoopInfoObj.setVarListWithSubscripts(varListWithSubscripts)
 	nextLoopInfoObj.setVarListNoSubscripts(varListNoSubscripts)
+	nextLoopInfoObj.setLoopOrder(loopOrder)
 
 	loopInfo.append(copy.deepcopy(nextLoopInfoObj))
 
@@ -1780,12 +1800,16 @@ def processPrecomputeLine(line):
 def processLoopLine(line):
 	global loopVarGroupTypes
 
-	if ( (line == None) or (type(line).__name__ != con.strTypePython) or ( (line.startswith(con.dotPrefix) == False) and (line.startswith(con.sumPrefix) == False) ) ):
+	if ( (line == None) or (type(line).__name__ != con.strTypePython) ):
 		sys.exit("AutoBatch_CodeGen->processLoopLine:  problem with line parameter passed in.")
 
 	lineSplit = line.split(con.batchVerifierOutputAssignment)
 	varName = lineSplit[0].lstrip().rstrip()
 	groupType = lineSplit[1].lstrip().rstrip()
+
+	isVarNameALoopName = isStringALoopName(varName)
+	if (isVarNameALoopName == False):
+		sys.exit("AutoBatch_CodeGen->processLoopLine:  loop line passed in does not contain the name of a valid loop name.")
 
 	if (varName in loopVarGroupTypes):
 		sys.exit("AutoBatch_CodeGen->processLoopLine:  found duplicate in loop variable names.")
@@ -2224,44 +2248,74 @@ def getLoopNamesOfFinalBatchEq():
 
 	del tempList
 
-def isVarOnlyOverNumSignatures(var):
-	if ( (var == None) or (type(var).__name__ != con.stringName) ):
-		sys.exit("AutoBatch_CodeGen->isVarOnlyOverNumSignatures:  problem with variable passed in.")
+def getLoopOrder(varListAsStrings):
+	if ( (varListAsStrings == None) or (type(varListAsStrings).__name__ != con.listTypePython) or (len(varListAsStrings) == 0) ):
+		sys.exit("AutoBatch_CodeGen->getLoopOrder:  problem with variable list parameter passed in.")
 
-	varName = var.getStringVarName()
-	if ( (varName == None) or (type(varName).__name__ != con.strTypePython) or (len(varName) == 0) ):
-		sys.exit("AutoBatch_CodeGen->isVarOnlyOverNumSignatures:  problem with one of the variable names returned from getStringVarName.")
+	loopOrder = []
+	maxListSize = 0
+	maxList = []
 
-	if (varName.find(con.loopIndicator) == -1):
-		return True
+	for varName in varListAsStrings:
+		if ( (varName == None) or (type(varName).__name__ != con.strTypePython) or (len(varName) == 0) ):
+			sys.exit("AutoBach_CodeGen->getLoopOrder:  problem with one of the variable names within the list parameter passed in.")
 
-	if (varName.count(con.loopIndicator) > 1):
-		sys.exit("AutoBatch_CodeGen->isVarOnlyOverNumSignatures:  variable name contains more than one loop indicator symbol (" + con.loopIndicator + ").")
+		if (varName.find(con.loopIndicator) == -1):
+			continue
 
-	loopIndicatorIndex = varName.find(con.loopIndicator)
+		if (varName.count(con.loopIndicator) > 1):
+			sys.exit("AutoBatch_CodeGen->getLoopOrder:  variable name contains more than one loop indicator symbol (" + con.loopIndicator + ").")
 
-	subscriptIndicesString = varName[(loopIndicatorIndex + 1):len(varName)]
-	if (subscriptIndicesString == con.numSignaturesIndex):
-		return True
+		currentList = []
 
-	return False
+		loopIndicatorIndex = varName.find(con.loopIndicator)
+		subscriptIndicesStringSpaces = varName[(loopIndicatorIndex + 1):len(varName)]
+		subscriptIndicesString = subscriptIndicesStringSpaces.lstrip().rstrip()
+		splitString = subscriptIndicesString.split(con.loopIndicesSeparator)
+
+		for indString in splitString:
+			currentList.append(indString)
+
+		currentSize = len(currentList)
+
+		if (currentSize < maxListSize):
+			continue
+
+		if (currentSize == maxListSize):
+			if (currentList != maxList):
+				sys.exit("AutoBatch_CodeGen->getLoopOrder:  multiple lists of same size contain different loop orders.")
+			else:
+				continue
+
+		maxList = copy.deepcopy(currentList)
+		maxListSize = len(maxList)
+
+	for loopNameEntry in maxList:
+		loopNameEntryAsStringName = StringName()
+		loopNameEntryAsStringName.setName(loopNameEntry)
+		loopOrder.append(copy.deepcopy(loopNameEntryAsStringName))
+		del loopNameEntryAsStringName
+
+	return loopOrder
 
 def distillLoopsWRTNumSignatures():
-	global loopsNotOnlyOverNumSignatures, loopsOnlyOverNumSignatures
+	global loopsOuterNumSignatures, loopsOuterNotNumSignatures
 
 	for loop in loopInfo:
-		varList = loop.getVarListWithSubscripts()
-		addThisLoopToOnly = True
-		for var in varList:
-			onlyOverNumSignatures = isVarOnlyOverNumSignatures(var)
-			if (onlyOverNumSignatures == False):
-				addThisLoopToOnly = False
-				break
+		loopNameToAdd = StringName()
+		loopNameToAdd.setName(loop.getLoopName().getStringVarName())
 
-		if (addThisLoopToOnly == True):
-			loopsOnlyOverNumSignatures.append(copy.deepcopy(loop))
+		loopOrder = loop.getLoopOrder()
+		outerIndexStringName = loopOrder[0]
+		outerIndex = outerIndexStringName.getStringVarName()
+		if (outerIndex not in con.loopIndexTypes):
+			sys.exit("AutoBatch_CodeGen->distillLoopsWRTNumSignatures:  outer loop index extracted from one of the loops in loopInfo is not one of the supported loop index types.")
+		if (outerIndex == con.numSignaturesIndex):
+			loopsOuterNumSignatures.append(copy.deepcopy(loop))
 		else:
-			loopsNotOnlyOverNumSignatures.append(copy.deepcopy(loop))
+			loopsOuterNotNumSignatures.append(copy.deepcopy(loop))
+
+		del loopNameToAdd
 
 def main():
 	if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
@@ -2286,6 +2340,7 @@ def main():
 	global pythonCodeLines, individualVerFile, batchVerFile, verifySigsFile, pythonCodeNode, varAssignments, verifyFuncNode, verifyLines 
 	global verifyEqNode, functionArgMappings, callListOfVerifyFuncs, linePairsOfVerifyFuncs, verifyFuncArgs, indentationListVerifyLines
 	global numTabsOnVerifyLine, batchVerifierOutput, finalBatchEq, finalBatchEqWithLoops, listVars, numSpacesPerTab, lineInfo
+	global loopBlocksForCachedCalculations, loopBlocksForNonCachedCalculations
 
 	try:
 
@@ -2404,10 +2459,11 @@ def main():
 			processListLine(line)
 		if (line.startswith(con.precomputeString) == True):
 			processPrecomputeLine(line)
-		if ( (line.startswith(con.dotPrefix) == True) or (line.startswith(con.sumPrefix) == True) ):
-			processLoopLine(line)
 		if (line.startswith(con.computeString) == True):
 			processComputeLine(line)
+		linePrefix = line[0:con.maxStrLengthForLoopNames]
+		if (isStringALoopName(linePrefix) == True):
+			processLoopLine(line)
 
 	if ( (finalBatchEq == None) or (finalBatchEqWithLoops == None) ):
 		sys.exit("AutoBatch_CodeGen->main:  problem locating the various forms of the final batch equation from the output of the batch verifier.")
@@ -2421,6 +2477,13 @@ def main():
 
 	getLoopNamesOfFinalBatchEq()
 	distillLoopsWRTNumSignatures()
+	loopBlocksForCachedCalculations = buildLoopBlockList(loopsOuterNumSignatures)
+	if ( (loopBlocksForCachedCalculations == None) or (type(loopBlocksForCachedCalculations).__name__ != con.listTypePython) or (len(loopBlocksForCachedCalculations) == 0) ):
+		sys.exit("AutoBatch_CodeGen->main:  problem obtaining loop blocks used for cached calculations.")
+
+	loopBlocksForNonCachedCalculations = buildLoopBlockList(loopsOuterNotNumSignatures, loopsOuterNumSignatures)
+	if ( (loopBlocksForNonCachedCalculations == None) or (type(loopBlocksForNonCachedCalculations).__name__ != con.listTypePython) or (len(loopBlocksForNonCachedCalculations) == 0) ):
+		sys.exit("AutoBatch_CodeGen->main:  problem obtaining loop blocks used for non-cached calculations.")
 
 	try:
 		batchVerFile.close()

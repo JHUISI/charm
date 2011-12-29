@@ -7,8 +7,10 @@ class LoopInfo:
 		self.indexVariable = None
 		self.startValue = None
 		self.loopOverValue = None
+		self.operation = None
 		self.varListNoSubscripts = None
 		self.varListWithSubscripts = None
+		self.loopOrder = None
 		self.expression = None
 		self.groupType = None
 
@@ -24,11 +26,20 @@ class LoopInfo:
 	def getLoopOverValue(self):
 		return self.loopOverValue
 
+	def getOperation(self):
+		return self.operation
+
 	def getVarListNoSubscripts(self):
 		return self.varListNoSubscripts
 
 	def getVarListWithSubscripts(self):
 		return self.varListWithSubscripts
+
+	def getLoopOrder(self):
+		return self.loopOrder
+
+	def getLoopOrderAsString(self):
+		return getLoopOrderAsString(self.loopOrder)
 
 	def getExpression(self):
 		return self.expression
@@ -59,19 +70,37 @@ class LoopInfo:
 		self.indexVariable = indexVariable
 
 	def setStartValue(self, startValue):
-		if ( (startValue == None) or (type(startValue).__name__ != con.intTypePython) or (startValue < 0) ):
+		if ( (startValue == None) or (type(startValue).__name__ != con.integerValue) ):
 			sys.exit("LoopInfo->setStartValue:  problem with start value passed in.")
+
+		startValueInt = startValue.getValue()
+		if (startValueInt < 0):
+			sys.exit("LoopInfo->setStartValue:  integer version of start value passed in is less than zero.")
 
 		self.startValue = startValue
 
 	def setLoopOverValue(self, loopOverValue):
-		if ( (loopOverValue == None) or (type(loopOverValue).__name__ != con.strTypePython) or (len(loopOverValue) == 0) ):
-			sys.exit("LoopInfo->setLoopOverValue:  problem with loop over value passed in (" + loopOverValue + ").")
+		if ( (loopOverValue == None) or (type(loopOverValue).__name__ != con.stringName) ):
+			sys.exit("LoopInfo->setLoopOverValue:  problem with loop over value passed in.")
 
-		if (loopOverValue not in con.loopTypes):
-			sys.exit("LoopInfo->setLoopOverValue:  loop over value passed in (" + loopOverValue + ") is not one of the supported loop types (" + con.loopTypes + ").")
+		loopOverValueString = loopOverValue.getStringVarName()
+		if ( (loopOverValueString == None) or (type(loopOverValueString).__name__ != con.strTypePython) ):
+			sys.exit("LoopInfo->setLoopOverValue:  problem with string version of loop over value passed in.")
+
+		if (loopOverValueString not in con.loopTypes):
+			sys.exit("LoopInfo->setLoopOverValue:  loop over value passed in (" + loopOverValueString + ") is not one of the supported loop types (" + con.loopTypes + ").")
 
 		self.loopOverValue = loopOverValue
+
+	def setOperation(self, operation):
+		if ( (operation == None) or (type(operation).__name__ != con.operationValue) ):
+			sys.exit("LoopInfo->setOperation:  problem with operation parameter passed in.")
+
+		operationAsString = operation.getStringVarName()
+		if ( (operationAsString == None) or (type(operationAsString).__name__ != con.strTypePython) or (operationAsString not in con.operationTypes) ):
+			sys.exit("LoopInfo->setOperation:  problem with string representation of operation parameter passed in.")
+
+		self.operation = operation
 
 	def setVarListNoSubscripts(self, list):
 		if ( (list == None) or (type(list).__name__ != con.listTypePython) or (len(list) == 0) ):
@@ -96,6 +125,12 @@ class LoopInfo:
 				sys.exit("LoopInfo->setVarListWithSubscripts:  one of the variable names in the list passed in is not of type " + con.stringName)
 
 		self.varListWithSubscripts = list
+
+	def setLoopOrder(self, loopOrder):
+		if (checkLoopOrder(loopOrder) == False):
+			sys.exit("LoopInfo->setExpression:  loop order passed in failed the call to checkLoopOrder.")
+
+		self.loopOrder = loopOrder
 
 	def setExpression(self, expression):
 		if ( (expression == None) or (type(expression).__name__ != con.strTypePython) or (len(expression) == 0) ):
