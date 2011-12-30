@@ -95,6 +95,8 @@ class WatersSig:
         return False
 
 def main():
+   N = 200
+   l = 5
    z = 5
    groupObj = pairing('../param/a.param')
 

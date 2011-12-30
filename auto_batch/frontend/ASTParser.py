@@ -1297,6 +1297,7 @@ class ASTParser:
 		if (node == None):
 			sys.exit("ASTParser->isNodeATuple:  node passed in is of None type.")
 
+		'''
 		try:
 			nodeFields = node._fields
 		except:
@@ -1306,6 +1307,14 @@ class ASTParser:
 			sys.exit("ASTParser->isNodeATuple:  the fields list of the node passed in has a length of zero.")
 
 		if (nodeFields[0] == con.tupleAST):
+			return True
+
+		return False
+		'''
+
+		nodeType = self.getNodeType(node)
+
+		if (nodeType == con.tupleTypeAST):
 			return True
 
 		return False
@@ -1415,6 +1424,9 @@ class ASTParser:
 
 		if (nameType == con.unaryOpTypeAST):
 			return con.unaryOpTypeAST
+
+		if (nameType == con.tupleTypeAST):
+			return con.tupleTypeAST
 
 		return None
 

@@ -11,13 +11,16 @@ class AST_Visitor(ast.NodeVisitor):
 	def visit_Subscript(self, node):
 		print(node.slice._fields)
 
+	def visit_Assign(self, node):
+		print(type(node.value).__name__)
+
 f = open(sys.argv[1], 'r').readlines()
 c = ""
 for l in f:
 	c += l
 
 t = ast.parse(c)
-print(ast.dump(t))
+#print(ast.dump(t))
 
 u = AST_Visitor()
-#u.visit(t)
+u.visit(t)
