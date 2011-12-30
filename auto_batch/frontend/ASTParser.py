@@ -1100,6 +1100,20 @@ class ASTParser:
 
 		sys.exit("ASTParser->buildObjectFromNode:  type of node is not currently supported.")
 
+	def getSubscriptValueNode(self, node):
+		if ( (node == None) or (type(node).__name__ != con.subscriptTypeAST) ):
+			sys.exit("ASTParser->getSubscriptValueNode:  problem with node passed in to function.")
+
+		try:
+			retNode = node.value
+		except:
+			sys.exit("ASTParser->getSubscriptValueNode:  could not extract value node from subscript node passed in to function.")
+
+		if ( (type(retNode).__name__ != con.nameOnlyTypeAST) and (type(retNode).__name__ != con.callTypeAST) ):
+			sys.exit("ASTParser->getSubscriptValueNode:  value node extracted is neither of type " + con.nameOnlyTypeAST + " nor of type " + con.callTypeAST + ".")
+
+		return retNode
+
 	def getSubscriptSliceNode(self, node):
 		if ( (node == None) or (type(node).__name__ != con.subscriptTypeAST) ):
 			sys.exit("ASTParser->getSubscriptSliceNode:  problem with node passed in to function.")

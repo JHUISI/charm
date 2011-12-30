@@ -46,8 +46,8 @@ class SubscriptName:
 		if (value == None):
 			sys.exit("SubscriptName->setValue:  value passed in is of None type.")
 
-		if (type(value).__name__ != con.stringName):
-			sys.exit("SubscriptName->setValue:  value passed in is not of type " + con.stringName)
+		if ( (type(value).__name__ != con.stringName) and (type(value).__name__ != con.callValue) ):
+			sys.exit("SubscriptName->setValue:  value passed in is not of type " + con.stringName + " or type " + con.callValue + ".")
 
 		self.value = value
 

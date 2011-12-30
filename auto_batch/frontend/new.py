@@ -1,1 +1,2 @@
-dotprod(group.init(G1), -1, mpk['z'], lam_func, mpk['u'], k)
+bstr = bin(val)[2:]
+bstr = x[2]

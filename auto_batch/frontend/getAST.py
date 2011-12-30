@@ -5,8 +5,11 @@ class AST_Visitor(ast.NodeVisitor):
 		#print(ast.dump(node))
 		#ast.NodeVisitor.generic_visit(self, node)
 
-	def visit_UnaryOp(self, node):
-		print(type(node.op).__name__)
+	#def visit_UnaryOp(self, node):
+		#print(type(node.op).__name__)
+
+	def visit_Subscript(self, node):
+		print(type(node.value).__name__)
 
 f = open(sys.argv[1], 'r').readlines()
 c = ""
@@ -14,7 +17,7 @@ for l in f:
 	c += l
 
 t = ast.parse(c)
-#print(ast.dump(t))
+print(ast.dump(t))
 
 u = AST_Visitor()
 u.visit(t)
