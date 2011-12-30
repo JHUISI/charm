@@ -35,8 +35,9 @@ m
 END :: message
 
 # 3, 2, S, 4, P, 3
+# 3, 2, S, 4, P, 3
 BEGIN :: transform
-3, 2, S, 4, P, 3
+2, 3
 END :: transform
 
 # different messages/sigs under different signers

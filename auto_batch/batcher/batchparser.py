@@ -134,7 +134,7 @@ class BatchParser:
    
 
 # valid keywords
-signer_mode  = Enum('single', 'multi')
+signer_mode  = Enum('single', 'multi', 'ring')
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
 TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
 MESSAGE, SIGNATURE, PUBLIC, LATEX = 'message','signature', 'public', 'latex'
@@ -437,6 +437,21 @@ class CombineVerifyEq:
             #if n.getAttribute() == node.getAttribute(): return True
         return False
 
+class CheckExistingDotProduct:
+    def __init__(self, index):
+        self.target = index
+        # whether we found an existing product in tree going up to index        
+        self.applied = False
+    
+    def visit(self, node, data):
+        pass
+
+    def visit_prod(self, node, data):
+        #print("Target :", self.target," == ", node.right)
+        if self.target == str(node.right):
+            self.applied = True
+        return
+
 class CVForMultiSigner:
     def __init__(self, var_types, sig_vars, pub_vars, msg_vars, setting):
         self.vars = var_types
@@ -463,27 +478,32 @@ class CVForMultiSigner:
         self.sigKey = 'z'; self.sigEnd = setting[SIGNATURE]
         self.pubEnd = None
 #        if setting[PUBLIC] == SAME and setting[SIGNATURE] == setting[MESSAGE]:
-        if setting[SIGNATURE] == setting[MESSAGE] and setting[PUBLIC] == SAME:
-            self.signer = signer_mode.single
-            self.pubKey = self.sigKey
-            print("Mode: ", self.signer, "signer")
-        elif setting[PUBLIC] == setting[SIGNATURE]:
+        if setting[ PUBLIC ] and setting[ MESSAGE ]:
+            if setting[SIGNATURE] == setting[MESSAGE] and setting[PUBLIC] == SAME:
+                self.signer = signer_mode.single
+                self.pubKey = self.sigKey
+                print("Mode: ", self.signer, "signer")
+            elif setting[PUBLIC] == setting[SIGNATURE]:
             # technically multi-signer, but since there is a 
             # one-to-one mapping with sigs and public keys
             # we should just call it single signer. Equation turns out 
             # to be the same
-            self.signer = signer_mode.single            
-            self.pubKey = self.sigKey
-            self.pubEnd = self.sigEnd
-            print("Mode: multi signer") 
-        elif setting[PUBLIC] != setting[SIGNATURE]:
+                self.signer = signer_mode.single            
+                self.pubKey = self.sigKey
+                self.pubEnd = self.sigEnd
+                print("Mode: multi signer") 
+            elif setting[PUBLIC] != setting[SIGNATURE]:
             # most likely multi-signer mode
-            self.signer = signer_mode.multi
-            self.pubKey = 'i' # reserved for different amount of signers than signatures
-            self.pubEnd = setting[PUBLIC]
-            print("Mode: ", self.signer, "signer")
+                self.signer = signer_mode.multi
+                self.pubKey = 'i' # reserved for different amount of signers than signatures
+                self.pubEnd = setting[PUBLIC]
+                print("Mode: ", self.signer, "signer")
+            else:
+                print("error?")
         else:
-            print("error?")
+            # if None for either or both (most likely a different setting)
+            if setting[SIGNATURE]:
+                self.signer = signer_mode.ring
            
     def visit(self, node, data):
         pass

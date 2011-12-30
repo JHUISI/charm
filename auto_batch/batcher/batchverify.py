@@ -191,7 +191,12 @@ if __name__ == "__main__":
     if MSG_set == SAME:
         batch_count[ MESSAGE ] = SAME 
     elif MSG_set in metadata.keys():
-        batch_count[ MESSAGE ] = MSG_set
+        checkDotProd = CheckExistingDotProduct(MSG_set)
+        ASTVisitor(checkDotProd).preorder(verify.right)
+        if not checkDotProd.applied:
+            batch_count[ MESSAGE ] = MSG_set
+        else:
+            batch_count[ MESSAGE ] = None
     else:
         print("variable not defined but referenced: ", MSG_set)
     
@@ -199,7 +204,13 @@ if __name__ == "__main__":
     if PUB_set == SAME:
         batch_count[ PUBLIC ] = SAME 
     elif PUB_set in metadata.keys():
-        batch_count[ PUBLIC ] = PUB_set
+        checkDotProd = CheckExistingDotProduct(PUB_set)
+        ASTVisitor(checkDotProd).preorder(verify.right)
+        if not checkDotProd.applied:
+            batch_count[ PUBLIC ] = PUB_set
+        else:
+            batch_count[ PUBLIC ] = None
+        
     else:
         print("variable not defined but referenced: ", PUB_set)
     
@@ -209,7 +220,8 @@ if __name__ == "__main__":
         print("variable not defined but referenced: ", SIG_set)    
     
     if VERBOSE: print("setting: ", batch_count)
-        
+    
+#    exit(0)
     vars = types
     vars['N'] = N
     vars.update(metadata)

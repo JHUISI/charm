@@ -69,6 +69,22 @@ class AbstractTechnique:
             result = self.findExpWithIndex(node.right, index)
             return result
 
+    def isAttrIndexInNode(self, node, index):
+        node_type = Type(node)
+        #print("node_type = ", node_type)
+        if node == None: return None
+        elif node_type == ops.ATTR:
+            #print("node.right type =>", Type(node.right))
+            if node.attr_index and index in node.attr_index:
+                return True
+            return False
+        else:
+            result = self.isAttrIndexInNode(node.left, index)
+            if result: return result
+            result = self.isAttrIndexInNode(node.right, index)
+            return result
+
+
     def createPair(self, left, right):
         pair = BinaryNode(ops.PAIR)
         pair.left = left
@@ -269,11 +285,11 @@ class Technique3(AbstractTechnique):
         elif Type(left) == ops.MUL:
             pass
         elif Type(right) == ops.MUL:
+#            print("T3: Node =", right, " type:", Type(right))
             child_node1 = right.left
             child_node2 = right.right
-#            print("child type 1 =>", Type(child_node1))
             if Type(child_node1) == ops.ON:
-                pass
+                print("child type 1 =>", Type(child_node1))
             elif Type(child_node2) == ops.ON:
                 mul = BinaryNode(ops.MUL)
                 mul.left = self.createPair(left, child_node1)                
@@ -282,9 +298,9 @@ class Technique3(AbstractTechnique):
                 addAsChildNodeToParent(data, mul)
                 self.applied = True
                 self.score   = tech3.SplitPairing
-#                self.rule += "split one pairing into two pairings. "
+#                self.rule += "split one pairing into two pairings. "            
             else:
-                print("T3: missing case?")
+                print("T3: missing case: ", Type(child_node1), " and ", Type(child_node2))
         else:
             return None
 
@@ -295,9 +311,13 @@ class Technique3(AbstractTechnique):
         if index != 'N' or Type(data['parent']) == ops.PAIR:
             return # should check for other things before returning in the multi-signer case
         
-        if Type(node.right) == ops.PAIR:
+        if Type(node.right) == ops.PAIR:            
             pair_node = node.right
             
+            # verify we can actually move dot prod into pairing otherwise, bail:
+            #print("index: ", node.left.left.left)
+            if not self.verifyCombinePair(node.left.left.left, pair_node):
+                return
             l = []; r = [];
             self.getMulTokens(pair_node.left, ops.NONE, [ops.EXP, ops.HASH], l)
             self.getMulTokens(pair_node.right, ops.NONE, [ops.EXP, ops.HASH], r)
@@ -345,7 +365,7 @@ class Technique3(AbstractTechnique):
         elif Type(node.right) == ops.EXP:
             exp = node.right
             isattr = exp.left
-            if Type(isattr) == ops.ATTR and isattr.attr_index == None:
+            if Type(isattr) == ops.ATTR and isattr.attr_index == None and self.isConstant(isattr):
                 bp = BatchParser()
                 prod = node.left
                 sumOf = bp.parse("sum{x,y} of z")
@@ -357,7 +377,17 @@ class Technique3(AbstractTechnique):
                 addAsChildNodeToParent(data, exp)
                 self.applied = True
                 self.score   = tech3.ProductToSum
-
+    
+    # Quick check that the dot product can be reliably moved inside the pairing
+    def verifyCombinePair(self, index, pair):
+        target = str(index)
+        left = self.isAttrIndexInNode(pair.left, target)
+        right = self.isAttrIndexInNode(pair.right, target)
+        if left and right: 
+        # if both true (meaning index appears on left and right side), then do NOT apply transformation
+            return False
+        return True 
+        
 tech4 = Tech_db # Enum('NoneApplied', 'ConstantPairing')
         
 class Technique4(AbstractTechnique):

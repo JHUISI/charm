@@ -51,7 +51,7 @@ class PairInstanceFinder:
         self.instance = {}
         self.index = 0
         self.rule = "Merge pairings with common first or second element."
-        self.wouldApply = False
+        self.applied = False
         
     def visit(self, node, data):
         pass
@@ -123,8 +123,8 @@ class PairInstanceFinder:
             #print("Done\n")
     
     def testForApplication(self):
-        self.wouldApply = self.checkForMultiple(True)
-        return self.wouldApply
+        self.applied = self.checkForMultiple(True)
+        return self.applied
         
 
 # substitute nodes that can be precomputed with a stub
@@ -408,7 +408,7 @@ class SubstituteSigDotProds:
 class DotProdInstanceFinder:
     def __init__(self):
         self.rule = "Simplify dot products: "
-        self.wouldApply = False
+        self.applied = False
         self.instance = {}
         self.index    = 0
 
@@ -462,9 +462,9 @@ class DotProdInstanceFinder:
                 if mul_node.left.type == ops.ATTR and mul_node.right.type == ops.ATTR:
                     return
                 
-                self.wouldApply = True
+                self.applied = True
                 self.record(r)
             else:
                 return
     def testForApplication(self):
-        return self.wouldApply
+        return self.applied

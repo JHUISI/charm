@@ -4,9 +4,9 @@ l := 2
 BEGIN :: types
 M := ZR
 t := ZR
-Atpk := G2
-Btpk := G2
-Ctpk := G2
+At := G2
+Bt := G2
+Ct := G2
 D := GT
 S := G1
 END :: types
@@ -16,11 +16,31 @@ D := e(g1, g2)
 END :: precompute
 
 BEGIN :: constant
-Atpk, Btpk, Ctpk, D
+At, Bt, Ct
 END :: constant
 
-verify :=  { prod{y:=1, l} on e(S_y, Atpk_y * (Btpk_y^M_y) * (Ctpk_y^t_y)) } == D
+BEGIN :: public
+At, Bt, Ct
+END :: public
 
+BEGIN :: signature
+S, t
+END :: signature
+
+BEGIN :: message
+M
+END :: message
+
+# different messages/sigs under different signers (ring)
+message := N
+public := l
+signature := N
+
+
+verify :=  { prod{y:=1, l} on e(S_y, At_y * (Bt_y^M_y) * (Ct_y^t_y)) } == D
+
+# 2, 3, 4, S, 3
+# 2, 4, 3, S, 3 (works!!)
 BEGIN :: transform
-2, 3, 4, S, 3
+2, 4, 3, S, 3
 END :: transform

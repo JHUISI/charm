@@ -117,18 +117,18 @@ class BatchOrder:
         if tech_obj.applied:
             if tech_applied == 2:
                 if tech_obj.score in [Tech_db.ExpIntoPairing, Tech_db.DistributeExpToPairing]:
-                    suggest = [5, 3] # move on to tech3 or distribute dot products if possible
+                    suggest = [3, 5] # move on to tech3 or distribute dot products if possible
             elif tech_applied == 3:
                 if tech_obj.score == Tech_db.CombinePairing:
                     suggest = [5]
                 elif tech_obj.score == Tech_db.SplitPairing:
-                    suggest = [2, 4]
+                    suggest = [4, 2]
             elif tech_applied == 4:
                 if tech_obj.score == Tech_db.ConstantPairing:
-                    suggest = [5, 3, 6]
+                    suggest = [6, 3, 5]
             elif tech_applied == 5: # distribute products
                 if tech_obj.testForApplication:
-                    suggest = [3, 4]
+                    suggest = [4, 3]
             elif tech_applied == 6: # combine pairings
                 if tech_obj.testForApplication:
                     suggest = [3, 5]
@@ -136,25 +136,42 @@ class BatchOrder:
                 return
         else:
             # try something else, if didn't apply
-            suggest = [2, 3, 4, 5, 6]
+            suggest = [6, 5, 4, 3, 2]
             suggest.remove(tech_applied)
             for i in excl_tech_list:
                 suggest.remove(i)
         return suggest
     
+    # TODO: finish algorithm and figure out when it is BEST to distribute dot products 
     def BFStrategy(self, start_tech=None):
         techniques = list(self.detectMap2.keys())
+        path = []
         # starting point: start
         if start_tech:
             # 1. apply the start technique to equation
             cur_tech  = start_tech
             excl_list = []
+
             (tech, verify_eq) = self.testTechnique(cur_tech, self.verify)
-                        
+            
+            # measure efficiency of verify_eq
+            rop_batch = RecordOperations(self.vars)
+            rop_batch.visit(verify_eq, {})
+            (msmt, avg) = calculate_times(rop_batch.ops, curves[c_key], N)
+                              
             # check score and get next option
             next_tech = self.possibleTechniques(cur_tech, tech, excl_list)
+            # self.tryPaths(next_tech, verify_eq, path)
             
-            
+
+    def tryPaths(self, techs, verify_eq, path_list):            
+        try_tech = techs.pop()
+        (tech, verify_eq2) = self.testTechnique(try_tech, verify_eq)
+        if tech.applied:
+            path_list.append( try_tech )
+        else:
+            self.tryPaths(techs, verify_eq, path_list)
+        return
             # 2. suggest next technique or tool (2 - 6): current state, previous technique applied, and equation
             # 3. measure efficiency of current batch equation
             # 4. if measurement does not converge meaning savings before or after application of tech is thesame
