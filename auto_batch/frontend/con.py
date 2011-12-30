@@ -99,6 +99,8 @@ sumOperation = 'sum'
 sumPrefix = 'sum'
 sumString = 'sum'
 tupleAST = 'elts'
+unaryOpTypeAST = 'UnaryOp'
+unaryOpValue = 'UnaryOpValue'
 variable = 'Variable'
 verifyFuncName = 'verify'
 batchEqRemoveStrings = [pairingLetter, lParan, numSignersIndex, numSignaturesIndex, '1', productString, '{', '}', numSigners, numSignatures, ':=', '^', ',', dotDirector, ')', '==', '*', sumDirector, sumString]

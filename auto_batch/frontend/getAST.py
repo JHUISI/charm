@@ -5,8 +5,8 @@ class AST_Visitor(ast.NodeVisitor):
 		#print(ast.dump(node))
 		#ast.NodeVisitor.generic_visit(self, node)
 
-	def visit_Name(self, node):
-		print(ast.dump(node))
+	def visit_Call(self, node):
+		print(node.args[1]._fields)
 
 f = open(sys.argv[1], 'r').readlines()
 c = ""
