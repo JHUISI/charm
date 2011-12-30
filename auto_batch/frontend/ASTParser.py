@@ -485,6 +485,17 @@ class ASTParser:
 		retNodeVisitor.visit(funcNode)
 		return retNodeVisitor.getReturnNodeList()
 
+	def getOperandNodeOfUnaryOp(self, node):
+		if ( (node == None) or (type(node).__name__ != con.unaryOpTypeAST) ):
+			sys.exit("ASTParser->getOperandNodeOfUnaryOp:  problem with node passed in to function.")
+
+		try:
+			retNode = node.operand
+		except:
+			sys.exit("ASTParser->getOperandNodeOfUnaryOp:  could not extract operand node of the node passed in to the function.")
+
+		return retNode
+
 	def getLeftNodeOfBinOp(self, node):
 		if ( (node == None) or (type(node).__name__ != con.binOpTypeAST) ):
 			sys.exit("ASTParser->getLeftNodeOfBinOp:  problem with node passed in to function.")
@@ -511,10 +522,32 @@ class ASTParser:
 		if ( (node == None) or (type(node).__name__ != con.binOpTypeAST) ):
 			sys.exit("ASTParser->getOpTypeOfBinOp:  problem with the node passed in to the function.")
 
+		retType = self.getOpTypeOfOp(node)
+
+		if ( (retType == None) or (type(retType).__name__ != con.strTypePython) or (retType not in con.opTypesAST) ):
+			sys.exit("ASTParser->getOpTypeOfBinOp:  problem with value returned from getOpTypeOfOp.")
+
+		return retType
+
+	def getOpTypeOfUnaryOp(self, node):
+		if ( (node == None) or (type(node).__name__ != con.unaryOpTypeAST) ):
+			sys.exit("ASTParser->getOpTypeOfUnaryOp:  problem with node passed in to function.")
+
+		retType = self.getOpTypeOfOp(node)
+
+		if ( (retType == None) or (type(retType).__name__ != con.strTypePython) or (retType not in con.unaryOpTypesAST) ):
+			sys.exit("ASTParser->getOpTypeOfUnaryOp:  problem with value returned from getOpTypeOfOp.")
+
+		return retType
+
+	def getOpTypeOfOp(self, node):
+		if (node == None):
+			sys.exit("ASTParser->getOpTypeOfOp:  node passed in is of None type.")
+
 		try:
 			retType = type(node.op).__name__
 		except:
-			sys.exit("ASTParser->getOpTypeOfBinOp:  could not extract the type of the op node of the node passed in to the function.")
+			sys.exit("ASTParser->getOpTypeOfOp:  could not extract the type of the op node of the node passed in to the function.")
 
 		return retType
 
@@ -1241,6 +1274,9 @@ class ASTParser:
 
 		if (nameType == con.binOpTypeAST):
 			return con.binOpTypeAST
+
+		if (nameType == con.unaryOpTypeAST):
+			return con.unaryOpTypeAST
 
 		return None
 

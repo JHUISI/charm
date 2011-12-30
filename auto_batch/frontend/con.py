@@ -101,6 +101,7 @@ sumString = 'sum'
 tupleAST = 'elts'
 unaryOpTypeAST = 'UnaryOp'
 unaryOpValue = 'UnaryOpValue'
+uSubTypeAST = 'USub'
 variable = 'Variable'
 verifyFuncName = 'verify'
 batchEqRemoveStrings = [pairingLetter, lParan, numSignersIndex, numSignaturesIndex, '1', productString, '{', '}', numSigners, numSignatures, ':=', '^', ',', dotDirector, ')', '==', '*', sumDirector, sumString]
@@ -112,4 +113,5 @@ operationTypes = [dotOperation, sumOperation]
 quoteCharTypes = [singleQuote, doubleQuote]
 reservedWords = ['print', pair, 'class', 'pickleObject', 'elif', 'True', 'False', '__init__', 'global', 'str', 'int', 'float', 'return', 'def', dotPrefix, productString, group, G1, G2, GT, dotProdType, range, 'lam_func', ZR, self, 'for', 'in', 'while', 'if', 'pass', sumString, 'e']
 reservedSymbols = [lParan, ')', '{', '}', ':=', '=', '-', '*', '^', '/', ',', '==', ':', '[', ']' ]
+unaryOpTypesAST = [uSubTypeAST]
 variableNameTypes = [stringName, subscriptName]

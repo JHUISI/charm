@@ -24,19 +24,19 @@ class BinOpValue:
 		return self.right
 
 	def getOpString(self):
-		if (self.opType == addTypeAST):
+		if (self.opType == con.addTypeAST):
 			return "+"
 
-		if (self.opType == divTypeAST):
+		if (self.opType == con.divTypeAST):
 			return "/"
 
-		if (self.opType == expTypeAST):
+		if (self.opType == con.expTypeAST):
 			return "**"
 
-		if (self.opType == multTypeAST):
+		if (self.opType == con.multTypeAST):
 			return "*"
 
-		if (self.opType == subTypeAST):
+		if (self.opType == con.subTypeAST):
 			return "-"
 
 		sys.exit("BinOpValue->getOpString:  self.opType is not one of the supported types.")

@@ -13,6 +13,7 @@ from DotProdValue import DotProdValue
 from DictValue import DictValue
 from BinOpValue import BinOpValue
 from InitValue import InitValue
+from UnaryOpValue import UnaryOpValue
 
 class ASTVarVisitor(ast.NodeVisitor):
 	def __init__(self, myASTParser):
@@ -413,16 +414,38 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		return returnDictValue
 
+	def buildUnaryOpValue(self, node):
+		if ( (node == None) or (type(node).__name__ != con.unaryOpTypeAST) ):
+			sys.exit("ASTVarVisitor->buildUnaryOpValue:  problem with node passed in to function.")
+
+		operandNode = self.myASTParser.getOperandNodeOfUnaryOp(node)
+		if (operandNode == None):
+			sys.exit("ASTVarVisitor->buildUnaryOpValue:  could not extract operand node of the node passed in.")
+
+		opType = self.myASTParser.getOpTypeOfUnaryOp(node)
+		if (opType not in con.unaryOpTypesAST):
+			sys.exit("ASTVarVisitor->buildUnaryOpValue:  op type extracted from node passed in is not one of the supported types.")
+
+		processedOperand = self.processNode(operandNode)
+		if (processedOperand == None):
+			sys.exit("ASTVarVisitor->buildUnaryOpValue:  value returned from processNode (on operand) is of None type.")
+
+		returnUnaryOpValue = UnaryOpValue()
+		returnUnaryOpValue.setOperand(processedOperand)
+		returnUnaryOpValue.setOpType(opType)
+
+		return returnUnaryOpValue
+
 	def buildBinOpValue(self, node):
 		if ( (node == None) or (type(node).__name__ != con.binOpTypeAST) ):
 			sys.exit("ASTVarVisitor->buildBinOpValue:  problem with node passed in to function.")
 
 		leftNode = self.myASTParser.getLeftNodeOfBinOp(node)
-		if (node == None):
+		if (leftNode == None):
 			sys.exit("ASTVarVisitor->buildBinOpValue:  could not extract left node of the node passed in.")
 
 		rightNode = self.myASTParser.getRightNodeOfBinOp(node)
-		if (node == None):
+		if (rightNode == None):
 			sys.exit("ASTVarVisitor->buildBinOpValue:  could not extract right node of the node passed in.")
 
 		opType = self.myASTParser.getOpTypeOfBinOp(node)
@@ -510,6 +533,13 @@ class ASTVarVisitor(ast.NodeVisitor):
 				sys.exit("ASTVarVisitor->processNode:  return value of buildBinOpValue is of None type.")
 
 			return binOpValueToAdd
+
+		if (nodeType == con.unaryOpTypeAST):
+			unaryOpValueToAdd = self.buildUnaryOpValue(node)
+			if (unaryOpValueToAdd == None):
+				sys.exit("ASTVarVisitor->processNode:  return value of unaryOpValueToAdd is of None type.")
+
+			return unaryOpValueToAdd
 
 		return None
 

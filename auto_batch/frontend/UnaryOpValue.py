@@ -8,78 +8,53 @@ class UnaryOpValue:
 		self.opType = None
 
 	def getType(self):
-		return con.binOpTypeAST
+		return con.unaryOpTypeAST
 
 	def getLineNo(self):
 		return self.lineNo
 
-	def getLeft(self):
-		return self.left
+	def getOperand(self):
+		return self.operand
 
 	def getOpType(self):
 		return self.opType
 
-	def getRight(self):
-		return self.right
-
 	def getOpString(self):
-		if (self.opType == addTypeAST):
-			return "+"
-
-		if (self.opType == divTypeAST):
-			return "/"
-
-		if (self.opType == expTypeAST):
-			return "**"
-
-		if (self.opType == multTypeAST):
-			return "*"
-
-		if (self.opType == subTypeAST):
+		if (self.opType == uSubTypeAST):
 			return "-"
 
-		sys.exit("BinOpValue->getOpString:  self.opType is not one of the supported types.")
+		sys.exit("UnaryOpValue->getOpString:  self.opType is not one of the supported types.")
 
 	def getStringVarName(self):
-		if ( (self.left == None) or (self.opType == None) or (self.right == None) ):
+		if ( (self.operand == None) or (self.opType == None) ):
 			return None
 
-		leftStringVarName = self.left.getStringVarName()
-		if ( (leftStringVarName == None) or (type(leftStringVarName).__name__ != con.strTypePython) or (len(leftStringVarName) == 0) ):
-			return None
-
-		rightStringVarName = self.right.getStringVarName()
-		if ( (rightStringVarName == None) or (type(rightStringVarName).__name__ != con.strTypePython) or (len(rightStringVarName) == 0) ):
+		operandStringVarName = self.operand.getStringVarName()
+		if ( (operandStringVarName == None) or (type(operandStringVarName).__name__ != con.strTypePython) or (len(operandStringVarName) == 0) ):
 			return None
 
 		opString = self.getOpString()
 		if ( (opString == None) or (type(opString).__name__ != con.strTypePython) or (len(opString) == 0) ):
-			sys.exit("BinOpValue->getStringVarName:  problem with the value returned from getOpString.")
+			sys.exit("UnaryOpValue->getStringVarName:  problem with the value returned from getOpString.")
 
-		return leftStringVarName + " " + opString + " " + rightStringVarName
+		return opString + operandStringVarName
 
 	def setLineNo(self, lineNo):
 		if ( (lineNo == None) or (type(lineNo).__name__ != con.intTypePython) or (lineNo < 1) ):
-			sys.exit("BinOpValue->setLineNo:  problem with line number passed in.")
+			sys.exit("UnaryOpValue->setLineNo:  problem with line number passed in.")
 
 		self.lineNo = lineNo
 
-	def setLeft(self, left):
-		if (left == None):
-			sys.exit("BinOpValue->setLeft:  left parameter passed in is of None type.")
+	def setOperand(self, operand):
+		if (operand == None):
+			sys.exit("UnaryOpValue->setOperand:  operand parameter passed in is of None type.")
 
-		self.left = left
+		self.operand = operand
 
 	def setOpType(self, opType):
-		if (opType not in con.opTypesAST):
-			sys.exit("BinOpValue->setOpType:  op type passed in is not one of the supported types.")
+		if (opType not in con.unaryOpTypesAST):
+			sys.exit("UnaryOpValue->setOpType:  op type passed in is not one of the supported types.")
 
 		self.opType = opType
 
-	def setRight(self, right):
-		if (right == None):
-			sys.exit("BinOpValue->setRight:  right parameter passed in is of None type.")
-
-		self.right = right
-
-Value.register(BinOpValue)
+Value.register(UnaryOpValue)
