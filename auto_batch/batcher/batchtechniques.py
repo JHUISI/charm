@@ -75,7 +75,9 @@ class AbstractTechnique:
         if node == None: return None
         elif node_type == ops.ATTR:
             #print("node.right type =>", Type(node.right))
-            if node.attr_index and index in node.attr_index:
+            if str(node.attr) == "delta":
+                pass
+            elif node.attr_index and index in node.attr_index:
                 return True
             return False
         else:
@@ -314,10 +316,6 @@ class Technique3(AbstractTechnique):
         if Type(node.right) == ops.PAIR:            
             pair_node = node.right
             
-            # verify we can actually move dot prod into pairing otherwise, bail:
-            #print("index: ", node.left.left.left)
-            if not self.verifyCombinePair(node.left.left.left, pair_node):
-                return
             l = []; r = [];
             self.getMulTokens(pair_node.left, ops.NONE, [ops.EXP, ops.HASH], l)
             self.getMulTokens(pair_node.right, ops.NONE, [ops.EXP, ops.HASH], r)
@@ -341,9 +339,18 @@ class Technique3(AbstractTechnique):
                 self.score   = tech3.SplitPairing
                 #self.rule += "split one pairing into two or three."
                 #addAsChildNodeToParent(data, muls[0])
-            else:        
+            else:                        
+                # verify we can actually move dot prod into pairing otherwise, bail:
+                # NOTE: this only applies to when trying to moving dot products inside pairing
+                if not self.verifyCombinePair(node.left.left.left, pair_node):
+                    test = []
+                    self.getMulTokens(pair_node.right, ops.NONE, [ops.ON, ops.EXP, ops.HASH], test)
+                    #print("test len :", len(test))
+                    if len(test) >= 1:
+                        return
+                
                 addAsChildNodeToParent(data, pair_node) # move pair one level up  
-# TODO: REVISIT THIS SECTION
+
                 #print("pair_node left +> ", pair_node.left, self.isConstInSubtreeT(pair_node.left))                              
                 if not self.isConstInSubtreeT(pair_node.left): # if F, then can apply prod node to left child of pair node              
                     node.right = pair_node.left
@@ -383,6 +390,9 @@ class Technique3(AbstractTechnique):
         target = str(index)
         left = self.isAttrIndexInNode(pair.left, target)
         right = self.isAttrIndexInNode(pair.right, target)
+        #print("Pair: ", pair)
+        #print("left: ", left)
+        #print("right: ", right)
         if left and right: 
         # if both true (meaning index appears on left and right side), then do NOT apply transformation
             return False
@@ -421,7 +431,7 @@ class Technique4(AbstractTechnique):
                 if Type(node2_parent) == ops.PAIR:
                     self.adjustProdNodes( node2_parent )
                     self.applied = True
-                    self.score   = tech4.ConstantPairings
+                    self.score   = tech4.ConstantPairing
                 else:
                     print("Not applying any transformation for: ", Type(node2_parent))
 

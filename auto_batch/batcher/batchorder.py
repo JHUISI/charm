@@ -143,22 +143,15 @@ class BatchOrder:
         return suggest
     
     # TODO: finish algorithm and figure out when it is BEST to distribute dot products 
-    def BFStrategy(self, start_tech=None):
+    # Recursively determine all the paths that might apply until we converge (e.g., no more techniques apply)
+    def BFStrategy(self):
         techniques = list(self.detectMap2.keys())
         path = []
         # starting point: start
         if start_tech:
             # 1. apply the start technique to equation
-            cur_tech  = start_tech
-            excl_list = []
-
             (tech, verify_eq) = self.testTechnique(cur_tech, self.verify)
-            
-            # measure efficiency of verify_eq
-            rop_batch = RecordOperations(self.vars)
-            rop_batch.visit(verify_eq, {})
-            (msmt, avg) = calculate_times(rop_batch.ops, curves[c_key], N)
-                              
+                                          
             # check score and get next option
             next_tech = self.possibleTechniques(cur_tech, tech, excl_list)
             # self.tryPaths(next_tech, verify_eq, path)
