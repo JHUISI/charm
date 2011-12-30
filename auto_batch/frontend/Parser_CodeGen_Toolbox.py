@@ -941,12 +941,15 @@ def getLineNosOfValueType(varAssignments, valueType):
 
 	return lineNos
 
-def getFunctionArgMappings(functionNames, functionArgNames, myASTParser):
+def getFunctionArgMappings(functionNames, functionArgNames, lenFunctionArgDefaults, myASTParser):
 	if ( (functionNames == None) or (type(functionNames).__name__ != con.dictTypePython) or (len(functionNames) == 0) ):
 		sys.exit("Parser_CodeGen_Toolbox->getFunctionArgMappings:  problem with the function names passed in.")
 
 	if ( (functionArgNames == None) or (type(functionArgNames).__name__ != con.dictTypePython) or (len(functionArgNames) == 0) ):
 		sys.exit("Parser_CodeGen_Toolbox->getFunctionArgMappings:  problem with the function argument names passed in.")
+
+	if ( (lenFunctionArgDefaults == None) or (type(lenFunctionArgDefaults).__name__ != con.dictTypePython) or (len(lenFunctionArgDefaults) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getFunctionArgMappings:  problem with the length of function argument defaults parameter passed in.")
 
 	if (myASTParser == None):
 		sys.exit("Parser_CodeGen_Toolbox->getFunctionArgMappings:  myASTParser passed in is of None type.")
@@ -954,7 +957,7 @@ def getFunctionArgMappings(functionNames, functionArgNames, myASTParser):
 	functionArgMappings = {}
 
 	for funcName in functionNames:
-		funcArgMapList = myASTParser.getFunctionArgMappings(functionNames[funcName], functionArgNames)
+		funcArgMapList = myASTParser.getFunctionArgMappings(functionNames[funcName], functionArgNames, lenFunctionArgDefaults)
 		if ( (funcArgMapList == None) or (type(funcArgMapList).__name__ != con.listTypePython) ):
 			sys.exit("Parser_CodeGen_Toolbox->getFunctionArgMappings:  problems with value returned from myASTParser->getFunctionArgMappings.")
 

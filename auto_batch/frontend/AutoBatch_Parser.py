@@ -566,17 +566,19 @@ def main():
 	if (functionNames == None):
 		sys.exit("AutoBatch_Parser->main:  function names obtained from ASTParser->getFunctionNames is of None type.")
 
-	functionArgNames = myASTParser.getFunctionArgNames(rootNode)
-	if (functionArgNames == None):
-		sys.exit("AutoBatch_Parser->main:  function argument names obtained from ASTParser->getFunctionArgNames is of None type.")
+	(functionArgNames, lenFunctionArgDefaults) = myASTParser.getFunctionArgNamesAndDefaultLen(rootNode)
+	if ( (functionArgNames == None) or (lenFunctionArgDefaults == None) ):
+		sys.exit("AutoBatch_Parser->main:  problem with either functionArgNames or lenFunctionArgDefaults returned from getFunctionArgNamesAndDefaultLen.")
 
 	for funcName in con.funcNamesNotToTest:
 		if (funcName in functionNames):
 			del functionNames[funcName]
 		if (funcName in functionArgNames):
 			del functionArgNames[funcName]
+		if (funcName in lenFunctionArgDefaults):
+			del lenFunctionArgDefaults[funcName]
 
-	functionArgMappings = getFunctionArgMappings(functionNames, functionArgNames, myASTParser)
+	functionArgMappings = getFunctionArgMappings(functionNames, functionArgNames, lenFunctionArgDefaults, myASTParser)
 	if (functionArgMappings == None):
 		sys.exit("AutoBatch_Parser->main:  mappings of variables passed between functions from getFunctionArgMappings is of None type.")
 

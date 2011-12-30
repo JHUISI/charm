@@ -129,15 +129,19 @@ class ASTVariableNamesVisitor(ast.NodeVisitor):
 		return self.variableNames
 
 class ASTFuncArgMapsVisitor(ast.NodeVisitor):
-	def __init__(self, functionArgNames):
+	def __init__(self, functionArgNames, lenFunctionArgDefaults):
 		if ( (functionArgNames == None) or (type(functionArgNames).__name__ != con.dictTypePython) or (len(functionArgNames) == 0) ):
 			sys.exit("ASTFuncArgMapsVisitor->__init__:  problem with the function argument names passed in.")
+
+		if ( (lenFunctionArgDefaults == None) or (type(lenFunctionArgDefaults).__name__ != con.dictTypePython) or (len(lenFunctionArgDefaults) == 0) ):
+			sys.exit("ASTFuncArgMapsVisitor->__init__:  problem with the length of function argument defaults dictionary.")
 
 		self.myASTParser = ASTParser()
 		if ( (self.myASTParser == None) or (type(self.myASTParser).__name__ != con.ASTParser) ):
 			sys.exit("ASTFuncArgMapsVisitor->__init__:  problem with the value returned from ASTParser().")
 
 		self.functionArgNames = functionArgNames
+		self.lenFunctionArgDefaults = lenFunctionArgDefaults
 		self.functionArgMappings = []
 
 	def getDestFuncName(self, node):
@@ -175,6 +179,32 @@ class ASTFuncArgMapsVisitor(ast.NodeVisitor):
 
 		return funcAttrNameObject
 
+	def throwErrorOnUnequalCallLists(self, lenCallerArgs, lenDestArgs, destFuncName):
+		if ( (lenCallerArgs == None) or (type(lenCallerArgs).__name__ != con.intTypePython) or (lenCallerArgs < 0) ):
+			sys.exit("ASTFuncArgMapsVisitor->throwErrorOnUnequalCallLists:  problem with length of caller arguments passed in.")
+
+		if ( (lenDestArgs == None) or (type(lenDestArgs).__name__ != con.intTypePython) or (lenDestArgs < 0) ):
+			sys.exit("ASTFuncArgMapsVisitor->throwErrorOnUnequalCallLists:  problem with length of destination arguments passed in.")
+
+		if ( (destFuncName == None) or (type(destFuncName).__name__ != con.strTypePython) or (len(destFuncName) == 0) ):
+			sys.exit("ASTFuncArgMapsVisitor->throwErrorOnUnequalCallLists:  problem with destination function name passed in.")
+
+		if ( (destFuncName not in self.functionArgNames) or (destFuncName not in self.lenFunctionArgDefaults) ):
+			sys.exit("ASTFuncArgMapsVisitor->throwErrorOnUnequalCallLists:  destination function name passed in is not in the function argument names dictionary OR length of function default arguments dictionary.")
+
+		diffInNumArgs = lenDestArgs - lenCallerArgs
+		if (diffInNumArgs < 0):
+			sys.exit("ASTFuncArgMapsVisitor->throwErrorOnUnequalCallLists:  number of caller arguments exceeds number of destination arguments.")
+
+		numDefaultArgsInDest = self.lenFunctionArgDefaults[destFuncName]
+		if (numDefaultArgsInDest < 0):
+			sys.exit("ASTFuncArgMapsVisitor->throwErrorOnUnequalCallLists:  number of default arguments for destination function name passed in is less than zero.")
+
+		if (diffInNumArgs > numDefaultArgsInDest):
+			return True
+
+		return False
+
 	def visit_Call(self, node):
 		destFuncName = self.getDestFuncName(node)
 		if ( (destFuncName == None) or (type(destFuncName).__name__ != con.stringName) ):
@@ -196,7 +226,9 @@ class ASTFuncArgMapsVisitor(ast.NodeVisitor):
 			return
 
 		if (len(callerArgList) != len(destArgNames) ):
-			sys.exit("ASTFuncArgMapsVisitor->visit_Call:  length of caller and destination arguments lists are not equal.")
+			throwError = self.throwErrorOnUnequalCallLists(len(callerArgList), len(destArgNames), destFuncName.getStringVarName())
+			if (throwError == True):
+				sys.exit("ASTFuncArgMapsVisitor->visit_Call:  length of caller and destination arguments lists are not equal.")
 
 		funcArgMapObject = FunctionArgMap()
 		funcArgMapObject.setDestFuncName(destFuncName)
@@ -219,6 +251,7 @@ class ASTFunctionArgNames(ast.NodeVisitor):
 			sys.exit("ASTParser->ASTFunctionArgNames->__init__:  problem with value returned from ASTParser constructor.")
 
 		self.functionArgNames = {}
+		self.lenFunctionArgDefaults = {}
 
 	def visit_FunctionDef(self, node):
 		try:
@@ -249,11 +282,24 @@ class ASTFunctionArgNames(ast.NodeVisitor):
 
 		self.functionArgNames[nodeName] = argNamesList
 
+		try:
+			lenDefaultArgs = len(node.args.defaults)
+		except:
+			sys.exit("ASTParser->ASTFunctionArgNames->visit_FunctionDef:  could not obtain the length of the default argument array.")
+
+		self.lenFunctionArgDefaults[nodeName] = lenDefaultArgs
+
 	def getFunctionArgNames(self):
 		if (len(self.functionArgNames) == 0):
 			return None
 
 		return self.functionArgNames
+
+	def getLenFunctionArgDefaults(self):
+		if (len(self.lenFunctionArgDefaults) == 0):
+			return None
+
+		return self.lenFunctionArgDefaults
 
 class ASTFunctionNamesVisitor(ast.NodeVisitor):
 	def __init__(self):
@@ -377,22 +423,25 @@ class ASTParser:
 		myFuncNamesVisitor.visit(node)
 		return myFuncNamesVisitor.getFunctionNames()
 
-	def getFunctionArgNames(self, node):
+	def getFunctionArgNamesAndDefaultLen(self, node):
 		if (node == None):
-			sys.exit("ASTParser->getFunctionArgNames:  node passed in is of None type.")
+			sys.exit("ASTParser->getFunctionArgNamesAndDefaultLen:  node passed in is of None type.")
 
 		myFuncArgNamesVisitor = ASTFunctionArgNames()
 		myFuncArgNamesVisitor.visit(node)
-		return myFuncArgNamesVisitor.getFunctionArgNames()
+		return (myFuncArgNamesVisitor.getFunctionArgNames(), myFuncArgNamesVisitor.getLenFunctionArgDefaults())
 
-	def getFunctionArgMappings(self, funcNode, functionArgNames):
+	def getFunctionArgMappings(self, funcNode, functionArgNames, lenFunctionArgDefaults):
 		if (funcNode == None):
 			sys.exit("ASTParser->getFunctionArgMappings:  function node passed in is of None type.")
 
 		if ( (functionArgNames == None) or (type(functionArgNames).__name__ != con.dictTypePython) or (len(functionArgNames) == 0) ):
 			sys.exit("ASTParser->getFunctionArgMappings:  problem with the function argument names passed in.")
 
-		myFuncArgMapsVisitor = ASTFuncArgMapsVisitor(functionArgNames)
+		if ( (lenFunctionArgDefaults == None) or (type(lenFunctionArgDefaults).__name__ != con.dictTypePython) or (len(lenFunctionArgDefaults) == 0) ):
+			sys.exit("ASTParser->getFunctionArgMappings:  problem with length of function default arguments parameter passed in.")
+
+		myFuncArgMapsVisitor = ASTFuncArgMapsVisitor(functionArgNames, lenFunctionArgDefaults)
 		myFuncArgMapsVisitor.visit(funcNode)
 		return myFuncArgMapsVisitor.getFunctionArgMappings()
 
