@@ -2343,7 +2343,6 @@ def main():
 	global loopBlocksForCachedCalculations, loopBlocksForNonCachedCalculations
 
 	try:
-
 		pythonCodeLines = open(pythonCodeArg, 'r').readlines()
 		batchVerifierOutput = open(batchVerifierOutputFile, 'r').readlines()
 		individualVerFile = open(individualVerArg, 'w')

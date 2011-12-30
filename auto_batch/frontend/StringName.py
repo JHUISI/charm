@@ -5,6 +5,7 @@ class StringName:
 	def __init__(self):
 		self.name = None
 		self.lineNo = None
+		self.defaultValue = None
 
 	def getName(self):
 		return self.name
@@ -14,6 +15,9 @@ class StringName:
 
 	def getLineNo(self):
 		return self.lineNo
+
+	def getDefaultValue(self):
+		return self.defaultValue
 
 	def getStringVarName(self):
 		if (self.name == None):
@@ -47,5 +51,11 @@ class StringName:
 			sys.exit("StringName->setLineNo:  line number passed in is less than one.")
 
 		self.lineNo = lineNo
+
+	def setDefaultValue(self, defaultValue):
+		if (defaultValue == None):
+			sys.exit("StringName->setDefaultValue:  default value passed in is of None type.")
+
+		self.defaultValue = defaultValue
 
 Name.register(StringName)
