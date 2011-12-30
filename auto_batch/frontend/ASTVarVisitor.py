@@ -22,7 +22,14 @@ class ASTVarVisitor(ast.NodeVisitor):
 			sys.exit("ASTVarVisitor->init:  myASTParser passed in is of None type.")
 
 		self.varAssignments = []
+		self.varNames = []
 		self.myASTParser = myASTParser
+
+	def clearVarAssignments(self):
+		self.varAssignments = []
+
+	def clearVarNames(self):
+		self.varNames = []
 
 	def buildStringName(self, node):
 		if (node == None):
@@ -602,6 +609,20 @@ class ASTVarVisitor(ast.NodeVisitor):
 			variableToAdd.getValue().setLineNo(rightLineNo)
 			self.varAssignments.append(variableToAdd)
 
+	def visit_Name(self, node):
+		nameToAdd = self.processNode(node)
+		if (nameToAdd != None):
+			lineNumber = self.myASTParser.getLineNumberOfNode(node)
+			nameToAdd.setLineNo(lineNumber)
+			self.varNames.append(nameToAdd)
+
+	def visit_Subscript(self, node):
+		nameToAdd = self.processNode(node)
+		if (nameToAdd != None):
+			lineNumber = self.myASTParser.getLineNumberOfNode(node)
+			nameToAdd.setLineNo(lineNumber)
+			self.varNames.append(nameToAdd)
+
 	def visit_Assign(self, node):
 		leftSideNode = self.myASTParser.getAssignLeftSideNode(node)
 		if (leftSideNode == None):
@@ -650,6 +671,12 @@ class ASTVarVisitor(ast.NodeVisitor):
 			return None
 
 		return self.varAssignments
+
+	def getVarNameDict(self):
+		if (len(self.varNames) == 0):
+			return None
+
+		return self.varNames
 
 	def getGroupTypeOfOneVar(self, varObj, groupTypeList):
 		if ( (varObj == None) or (type(varObj).__name__ != con.variable) ):

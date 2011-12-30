@@ -995,9 +995,9 @@ def getAllVariableNamesFromVerifyEq(verifyEqNode, myASTParser):
 	if ( (verifyEqNode == None) or (myASTParser == None) ):
 		sys.exit("Parser_CodeGen_Toolbox->getAllVariableNamesFromVerifyEq:  problem with the variables passed in to the function.")
 
-	varsVerifyEq = myASTParser.getAllVariableNames(verifyEqNode)
-	if ( (varsVerifyEq == None) or (type(varsVerifyEq).__name__ != con.listTypePython) or (len(varsVerifyEq) == 0) ):
-		sys.exit("Parser_CodeGen_Toolbox->getAllVariableNamesFromVerifyEq:  problem with value returned from ASTParser->getAllVariableNames.")
+	myVarVisitor = ASTVarVisitor(myASTParser)
+	myVarVisitor.visit(verifyEqNode)
+	varsVerifyEq = copy.deepcopy(myVarVisitor.getVarNameDict())
 
 	varsVerifyEq = myASTParser.removeVarsFromListWithStringName(varsVerifyEq, con.pair)
 	if ( (varsVerifyEq == None) or (type(varsVerifyEq).__name__ != con.listTypePython) or (len(varsVerifyEq) == 0) ):

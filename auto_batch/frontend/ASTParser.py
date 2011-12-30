@@ -1100,6 +1100,97 @@ class ASTParser:
 
 		sys.exit("ASTParser->buildObjectFromNode:  type of node is not currently supported.")
 
+	def getSubscriptSliceTypeAsStringName(self, node):
+		if ( (node == None) or (type(node).__name__ != con.subscriptTypeAST) ):
+			sys.exit("ASTParser->getSubscriptSliceTypeAsStringName:  problem with node passed in.")
+
+		retStringName = StringName()
+
+		typeIsValue = True
+
+		try:
+			dummyVariable = node.slice.value
+		except:
+			typeIsValue = False
+
+		if (typeIsValue == True):
+			retStringName.setName(con.sliceType_Value)
+			return retStringName
+
+		typeIsLowerUpperStep = True
+
+		try:
+			dummyVariable = node.slice.lower
+		except:
+			typeIsLowerUperStep = False
+
+		try:
+			dummyVariable = node.slice.upper
+		except:
+			typeIsLowerUpperStep = False
+
+		try:
+			dummyVariable = node.slice.step
+		except:
+			typeIsLowerUpperStep = False
+
+		if (typeIsLowerUpperStep == True):
+			retStringName.setName(con.sliceType_LowerUpperStep)
+			return retStringName
+
+		sys.exit("ASTParser->getSubscriptSliceTypeAsStringName:  slice component of node passed in is not one of the supported types.")
+
+	'''
+	def buildSliceValueObjForSubscript(self, node):
+		if ( (node == None) or (type(node).__name__ != con.subscriptTypeAST) ):
+			sys.exit("ASTParser->buildSliceValueObjForSubscript:  problem with node passed in.")
+
+		sliceTypeStringName = self.getSubscriptSliceTypeAsStringName(node)
+		if ( (sliceTypeStringName == None) or (type(sliceTypeStringName).__name__ != con.stringName) ):
+			sys.exit("ASTVarVisitor->buildSliceValueObjForSubscript:  problem with value returned from getSubscriptSliceTypeAsStringName.")
+
+		sliceType = sliceTypeStringName.getStringVarName()
+
+		if ( (sliceType == None) or (type(sliceType).__name__ != con.strTypePython) or (sliceType not in con.sliceTypes) ):
+			sys.exit("ASTVarVisitor->buildSliceValueObjForSubscript:  problem with string representation of value returned from getSubscriptSliceType.")
+
+		sliceValueObj = SliceValue()
+
+		if (sliceType == con.sliceType_Value):
+			sliceNode_Value = self.getSubscriptSliceNode_Value(node)
+			processedSliceNode_Value = self.processNode(sliceNode_Value)
+			sliceValueObj.setSliceType(sliceTypeStringName)
+			sliceValueObj.setValue(processedSliceNode_Value)
+		elif (sliceType == con.sliceType_LowerUpperStep):
+			foundAtLeastOne = False
+
+			sliceNode_Lower = self.myASTParser.getSubscriptSliceNode_Lower(node)
+			if (sliceNode_Lower != None):
+				foundAtLeastOne = True
+				processedSliceNode_Lower = self.processNode(sliceNode_Lower)
+				sliceValueObj.setLower(processedSliceNode_Lower)
+
+			sliceNode_Upper = self.myASTParser.getSubscriptSliceNode_Upper(node)
+			if (sliceNode_Upper != None):
+				foundAtLeastOne = True
+				processedSliceNode_Upper = self.processNode(sliceNode_Upper)
+				sliceValueObj.setUpper(processedSliceNode_Upper)
+
+			sliceNode_Step = self.myASTParser.getSubscriptSliceNode_Step(node)
+			if (sliceNode_Step != None):
+				foundAtLeastOne = True
+				processedSliceNode_Step = self.processNode(sliceNode_Step)
+				sliceValueObj.setStep(processedSliceNode_Step)
+
+			if (foundAtLeastOne == False):
+				sys.exit("ASTVarVisitor->buildSubscriptName:  slice type was returned as lower/upper/step, but none of those three nodes was a non-None type.")
+
+			sliceValueObj.setSliceType(sliceTypeStringName)
+
+		else:
+			sys.exit("ASTVarVisitor->buildSubscriptName:  value obtained for slice type is not one of the supported types.")
+	'''
+
 	def getSubscriptValueNode(self, node):
 		if ( (node == None) or (type(node).__name__ != con.subscriptTypeAST) ):
 			sys.exit("ASTParser->getSubscriptValueNode:  problem with node passed in to function.")
