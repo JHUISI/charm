@@ -9,7 +9,7 @@ class AST_Visitor(ast.NodeVisitor):
 		#print(type(node.op).__name__)
 
 	def visit_Subscript(self, node):
-		print(type(node.value).__name__)
+		print(node.slice._fields)
 
 f = open(sys.argv[1], 'r').readlines()
 c = ""
@@ -20,4 +20,4 @@ t = ast.parse(c)
 print(ast.dump(t))
 
 u = AST_Visitor()
-u.visit(t)
+#u.visit(t)

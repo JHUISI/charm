@@ -14,6 +14,7 @@ from DictValue import DictValue
 from BinOpValue import BinOpValue
 from InitValue import InitValue
 from UnaryOpValue import UnaryOpValue
+from SliceValue import SliceValue
 
 class ASTVarVisitor(ast.NodeVisitor):
 	def __init__(self, myASTParser):
@@ -65,10 +66,6 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if (node == None):
 			sys.exit("ASTVarVisitor->buildSubscriptName:  node passed in is of None type.")
 
-		#valueAsStringName = self.myASTParser.getSubscriptValueAsStringName(node)
-		#if ( (valueAsStringName == None) or (type(valueAsStringName).__name__ != con.stringName) ):
-			#sys.exit("ASTVarVisitor->buildSubscriptName:  problem with value returned from myASTParser->getSubscriptValueAsStringName.")
-
 		valueNode = self.myASTParser.getSubscriptValueNode(node)
 		if (valueNode == None):
 			sys.exit("ASTVarVisitor->buildSubscriptName:  value returned from getSubscriptValueNode is of None type.")
@@ -76,19 +73,54 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if ( (type(valueNode).__name__ != con.nameOnlyTypeAST) and (type(valueNode).__name__ != con.callTypeAST) ):
 			sys.exit("ASTVarVisitor->buildSubscriptName:  value returned from getSubscriptValueNode is neither of type " + con.nameOnlyTypeAST + " nor of type " + con.callTypeAST + ".")
 
-		sliceNode = self.myASTParser.getSubscriptSliceNode(node)
-		if (sliceNode == None):
-			sys.exit("ASTVarVisitor->buildSubscriptName:  problem with value returned from myASTParser->getSubscriptSliceNode.")
+		sliceTypeStringName = self.myASTParser.getSubscriptSliceTypeAsStringName(node)
+		if ( (sliceTypeStringName == None) or (type(sliceTypeStringName).__name__ != con.stringName) ):
+			sys.exit("ASTVarVisitor->buildSubscriptName:  problem with value returned from getSubscriptSliceTypeAsStringName.")
 
-		#slice = self.myASTParser.getSubscriptSlice(node)
-		#if (slice == None):
-			#sys.exit("ASTVarVisitor->buildSubscriptName:  value returned from myASTParser->getSubscriptSlice is of None type.")
+		sliceType = sliceTypeStringName.getStringVarName()
+
+		if ( (sliceType == None) or (type(sliceType).__name__ != con.strTypePython) or (sliceType not in con.sliceTypes) ):
+			sys.exit("ASTVarVisitor->buildSubscriptName:  problem with string representation of value returned from getSubscriptSliceType.")
+
+		sliceValueObj = SliceValue()
+
+		if (sliceType == con.sliceType_Value):
+			sliceNode_Value = self.myASTParser.getSubscriptSliceNode_Value(node)
+			processedSliceNode_Value = self.processNode(sliceNode_Value)
+			sliceValueObj.setSliceType(sliceTypeStringName)
+			sliceValueObj.setValue(processedSliceNode_Value)
+		elif (sliceType == con.sliceType_LowerUpperStep):
+			foundAtLeastOne = False
+
+			sliceNode_Lower = self.myASTParser.getSubscriptSliceNode_Lower(node)
+			if (sliceNode_Lower != None):
+				foundAtLeastOne = True
+				processedSliceNode_Lower = self.processNode(sliceNode_Lower)
+				sliceValueObj.setLower(processedSliceNode_Lower)
+
+			sliceNode_Upper = self.myASTParser.getSubscriptSliceNode_Upper(node)
+			if (sliceNode_Upper != None):
+				foundAtLeastOne = True
+				processedSliceNode_Upper = self.processNode(sliceNode_Upper)
+				sliceValueObj.setUpper(processedSliceNode_Upper)
+
+			sliceNode_Step = self.myASTParser.getSubscriptSliceNode_Step(node)
+			if (sliceNode_Step != None):
+				foundAtLeastOne = True
+				processedSliceNode_Step = self.processNode(sliceNode_Step)
+				sliceValueObj.setStep(processedSliceNode_Step)
+
+			if (foundAtLeastOne == False):
+				sys.exit("ASTVarVisitor->buildSubscriptName:  slice type was returned as lower/upper/step, but none of those three nodes was a non-None type.")
+
+			sliceValueObj.setSliceType(sliceTypeStringName)
+
+		else:
+			sys.exit("ASTVarVisitor->buildSubscriptName:  value obtained for slice type is not one of the supported types.")
 
 		subscriptNameToAdd = SubscriptName()
-		#subscriptNameToAdd.setValue(valueAsStringName)
-		#subscriptNameToAdd.setSlice(slice)
 		subscriptNameToAdd.setValue(self.processNode(valueNode))
-		subscriptNameToAdd.setSlice(self.processNode(sliceNode))
+		subscriptNameToAdd.setSlice(sliceValueObj)
 
 		return subscriptNameToAdd
 

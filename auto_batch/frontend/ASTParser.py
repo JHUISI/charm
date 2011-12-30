@@ -1114,14 +1114,47 @@ class ASTParser:
 
 		return retNode
 
-	def getSubscriptSliceNode(self, node):
+	def getSubscriptSliceNode_Value(self, node):
 		if ( (node == None) or (type(node).__name__ != con.subscriptTypeAST) ):
-			sys.exit("ASTParser->getSubscriptSliceNode:  problem with node passed in to function.")
+			sys.exit("ASTParser->getSubscriptSliceNode_Value:  problem with node passed in to function.")
 
 		try:
 			retNode = node.slice.value
 		except:
-			sys.exit("ASTParser->getSubscriptSliceNode:  could not extract slice node from the subscript node passed in.")
+			sys.exit("ASTParser->getSubscriptSliceNode_Value:  could not extract slice value node from the subscript node passed in.")
+
+		return retNode
+
+	def getSubscriptSliceNode_Lower(self, node):
+		if ( (node == None) or (type(node).__name__ != con.subscriptTypeAST) ):
+			sys.exit("ASTParser->getSubscriptSliceNode_Lower:  problem with node passed in to function.")
+
+		try:
+			retNode = node.slice.lower
+		except:
+			sys.exit("ASTParser->getSubscriptSliceNode_Lower:  could not extract slice lower node from the subscript node passed in.")
+
+		return retNode
+
+	def getSubscriptSliceNode_Upper(self, node):
+		if ( (node == None) or (type(node).__name__ != con.subscriptTypeAST) ):
+			sys.exit("ASTParser->getSubscriptSliceNode_Upper:  problem with node passed in to function.")
+
+		try:
+			retNode = node.slice.upper
+		except:
+			sys.exit("ASTParser->getSubscriptSliceNode_Upper:  could not extract slice upper node from the subscript node passed in.")
+
+		return retNode
+
+	def getSubscriptSliceNode_Step(self, node):
+		if ( (node == None) or (type(node).__name__ != con.subscriptTypeAST) ):
+			sys.exit("ASTParser->getSubscriptSliceNode_Step:  problem with node passed in to function.")
+
+		try:
+			retNode = node.slice.step
+		except:
+			sys.exit("ASTParser->getSubscriptSliceNode_Step:  could not extract slice step node from the subscript node passed in.")
 
 		return retNode
 

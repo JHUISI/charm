@@ -1,2 +1,1 @@
-bstr = bin(val)[2:]
-bstr = x[2]
+bstr = bin(val)[2:4:5]

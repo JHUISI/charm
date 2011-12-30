@@ -52,13 +52,8 @@ class SubscriptName:
 		self.value = value
 
 	def setSlice(self, slice):
-		if (slice == None):
-			sys.exit("SubscriptName->setSlice:  slice passed in is of None type.")
-
-		#sliceType = type(slice).__name__
-
-		#if ( (sliceType != con.stringName) and (sliceType != con.stringValue) and (sliceType != con.integerValue) and (sliceType != con.floatValue) ):
-			#sys.exit("SubscriptName->setSlice:  slice passed in is not one of the supported types (" + con.stringName + ", " + con.stringValue + ", " + con.integerValue + ", or " + con.floatValue + ").")
+		if ( (slice == None) or (type(slice).__name__ != con.sliceValue) ):
+			sys.exit("SubscriptName->setSlice:  problem with slice parameter passed in.")
 
 		self.slice = slice
 
