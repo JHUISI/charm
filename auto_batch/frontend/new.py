@@ -1,5 +1,1 @@
-def funcName(x):
-	print(x)
-
-y = "funcName"
-y("hello")
+global test, test2

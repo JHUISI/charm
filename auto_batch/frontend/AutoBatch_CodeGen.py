@@ -17,6 +17,7 @@ callListOfVerifyFuncs = None
 finalBatchEq = None
 finalBatchEqWithLoops = None
 functionArgMappings = None
+globalVars = []
 indentationListVerifyLines = None
 individualVerFile = None
 lineInfo = None
@@ -2343,7 +2344,7 @@ def main():
 	global verifyEqNode, functionArgMappings, callListOfVerifyFuncs, linePairsOfVerifyFuncs, verifyFuncArgs, indentationListVerifyLines
 	global numTabsOnVerifyLine, batchVerifierOutput, finalBatchEq, finalBatchEqWithLoops, listVars, numSpacesPerTab, lineInfo
 	global loopBlocksForCachedCalculations, loopBlocksForNonCachedCalculations, lineNosPerVar
-	global lineNoOfFirstFunction
+	global lineNoOfFirstFunction, globalVars
 
 	try:
 		pythonCodeLines = open(pythonCodeArg, 'r').readlines()
@@ -2358,6 +2359,10 @@ def main():
 	pythonCodeNode = myASTParser.getASTNodeFromFile(pythonCodeArg)
 	if (pythonCodeNode == None):
 		sys.exit("AutoBatch_CodeGen->main:  root node obtained from ASTParser->getASTNodeFromFile is of None type.")
+
+	globalVars = getGlobalDeclVars(pythonCodeNode)
+	if ( (globalVars != None) and (type(globalVars).__name__ != con.listTypePython) ):
+		sys.exit("AutoBatch_CodeGen->main:  problem with value returned from getGlobalDeclVars.")
 
 	functionNames = myASTParser.getFunctionNames(pythonCodeNode)
 	if (functionNames == None):

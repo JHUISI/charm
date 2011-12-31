@@ -339,6 +339,29 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		return dotProdValueToAdd
 
+	def buildCallObjectFromNode(self, node):
+		if ( (node == None) or (type(node).__name__ != con.callTypeAST) ):
+			sys.exit("ASTVarVisitor->buildCallObjectFromNode:  problem with node passed in.")
+
+		argList = self.getArgNodeList(node)
+
+		(funcValueNameObject, funcAttrNameObject) = self.myASTParser.getFuncNameFromCallNode(node)
+		if ( (funcValueNameObject == None) or (type(funcValueNameObject).__name__ != con.stringName) ):
+			sys.exit("ASTVarVisitor->buildCallObjectFromNode:  problem with value returned from ASTParser->getFuncNameFromCallNode on function value name object.")
+
+		if (funcAttrNameObject != None):
+			if (type(funcAttrNameObject).__name__ != con.stringName):
+				sys.exit("ASTVarVisitor->buildCallObjectFromNode:  problem with value returned from ASTParser->getFuncNameFromCallNode for function attribute name object.")
+
+		returnCallObject = CallValue()
+		returnCallObject.setFuncName(funcValueNameObject)
+
+		if (funcAttrNameObject != None):
+			returnCallObject.setAttrName(funcAttrNameObject)
+
+		returnCallObject.setArgList(argList)
+		return returnCallObject
+
 	def buildCallValue(self, node):
 		if (node == None):
 			sys.exit("ASTVarVisitor->buildCallValue:  node passed in is of None type.")
@@ -377,7 +400,7 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		#return None
 
-		callValueToAdd = self.myASTParser.buildCallObjectFromNode(node)
+		callValueToAdd = self.buildCallObjectFromNode(node)
 		if ( (callValueToAdd == None) or (type(callValueToAdd).__name__ != con.callValue) ):
 			sys.exit("ASTVarVisitor->buildCallValue:  problem with return value of buildCallObjectFromNode.")
 

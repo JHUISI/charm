@@ -55,6 +55,33 @@ def getValueOfLastLine(dict):
 	lenKeys = len(keys)
 	return dict[keys[lenKeys-1]]
 
+class ASTGetGlobalDeclVars(ast.NodeVisitor):
+	def __init__(self):
+		self.globalDeclVars = []
+		self.myASTParser = ASTParser()
+		if ( (self.myASTParser == None) or (type(self.myASTParser).__name__ != con.ASTParser) ):
+			sys.exit("ASTParser->ASTGetGlobalDeclVars->__init__:  could not obtain an ASTParser object.")
+
+	def visit_Global(self, node):
+		try:
+			namesList = node.names
+		except:
+			sys.exit("ASTParser->ASTGetGlobalDeclVars->visit_Global:  could not obtain global names list.")
+
+		for name in namesList:
+			stringNameToAdd = StringName()
+			stringNameToAdd.setName(name)
+			lineNumber = self.myASTParser.getLineNumberOfNode(node)
+			stringNameToAdd.setLineNo(lineNumber)
+			self.globalDeclVars.append(copy.deepcopy(stringNameToAdd))
+			del stringNameToAdd
+
+	def getGlobalDecVars(self):
+		if (len(self.globalDeclVars) == 0):
+			return None
+
+		return self.globalDeclVars
+
 class ASTGetVariableNames(ast.NodeVisitor):
 	def __init__(self):
 		self.varNamesAsStringNameList = []
@@ -435,6 +462,42 @@ class ASTParser:
 
 	def getStringListOfStructItems(self, struct):
 		return getStringListOfStructItems(struct)
+
+	def getFuncNameFromCallNode(self, node):
+		if ( (node == None) or (type(node).__name__ != con.callTypeAST) ):
+			sys.exit("ASTParser->getFuncNameFromCallNode:  problem with node passed in to function.")
+
+		try:
+			funcName = node.func.id
+		except:
+			funcName = None
+
+		if (funcName != None):
+			funcNameObject = self.buildStringName(node, funcName)
+			if ( (funcNameObject == None) or (type(funcNameObject).__name__ != con.stringName) ):
+				sys.exit("ASTParser->getFuncNameFromCallNode:  problem with value returned from ASTParser->buildStringName for function name.")
+
+			return (funcNameObject, None)
+
+		try:
+			funcValueName = node.func.value.id
+		except:
+			sys.exit("ASTParser->getFuncNameFromCallNode:  could not obtain any information about the call represented by the node passed in.")
+
+		try:
+			funcAttrName = node.func.attr
+		except:
+			sys.exit("ASTParser->getFuncNameFromCallNode:  could not obtain the function's attribute name from the node passed in.")
+
+		funcValueNameObject = self.buildStringName(node, funcValueName)
+		if ( (funcValueNameObject == None) or (type(funcValueNameObject).__name__ != con.stringName) ):
+			sys.exit("ASTParser->getFuncNameFromCallNode:  problem with value returned from buildStringName for function value name.")
+
+		funcAttrNameObject = self.buildStringName(node, funcAttrName)
+		if ( (funcAttrNameObject == None) or (type(funcAttrNameObject).__name__ != con.stringName) ):
+			sys.exit("ASTParser->getFuncNameFromCallNode:  problem with value returned from buildStringName for function attribute name.")
+
+		return (funcValueNameObject, funcAttrNameObject)
 
 	def getLineNumberOfNode(self, node):
 		if (node == None):
@@ -1044,6 +1107,7 @@ class ASTParser:
 		returnSubscriptObject.setLineNo(node.lineno)
 		return returnSubscriptObject
 
+	'''
 	def buildCallObjectFromNode(self, node):
 		if ( (node == None) or (type(node).__name__ != con.callTypeAST) ):
 			sys.exit("ASTParser->buildCallObjectFromNode:  problem with node passed in.")
@@ -1085,6 +1149,7 @@ class ASTParser:
 		returnCallObject.setArgList(argList)
 		returnCallObject.setLineNo(node.lineno)
 		return returnCallObject
+	'''
 
 	def buildObjectFromNode(self, node):
 		if (node == None):

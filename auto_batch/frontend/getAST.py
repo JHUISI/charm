@@ -14,8 +14,12 @@ class AST_Visitor(ast.NodeVisitor):
 	#def visit_Assign(self, node):
 		#print(node.value._fields)
 
-	def visit_Name(self, node):
-		print(node.id)
+	#def visit_Name(self, node):
+		#print(node.id)
+
+	def visit_Global(self, node):
+		for x in node.names:
+			print(x)
 
 f = open(sys.argv[1], 'r').readlines()
 c = ""

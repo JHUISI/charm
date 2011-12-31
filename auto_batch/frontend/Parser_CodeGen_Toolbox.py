@@ -10,6 +10,14 @@ def getLineNosPerVar(varAssignments):
 	if ( (varAssignments == None) or (type(varAssignments).
 '''
 
+def getGlobalDeclVars(node):
+	if (node == None):
+		sys.exit("Parser_CodeGen_Toolbox->getGlobalDeclVars:  node passed in is of None type.")
+
+	myASTGlobalVisitor = ASTGetGlobalDeclVars()
+	myASTGlobalVisitor.visit(node)
+	return myASTGlobalVisitor.getGlobalDecVars()
+
 class ASTFuncArgMapsVisitor(ast.NodeVisitor):
 	def __init__(self, functionArgNames, lenFunctionArgDefaults):
 		if ( (functionArgNames == None) or (type(functionArgNames).__name__ != con.dictTypePython) or (len(functionArgNames) == 0) ):
@@ -34,6 +42,18 @@ class ASTFuncArgMapsVisitor(ast.NodeVisitor):
 		if ( (node == None) or (type(node).__name__ != con.callTypeAST) ):
 			sys.exit("ASTFuncArgMapsVisitor->getDestFuncName:  problem with node passed in to function.")
 
+		(funcValueNameObject, funcAttrNameObject) = self.myASTParser.getFuncNameFromCallNode(node)
+		if (funcAttrNameObject == None):
+			destFuncName = funcValueNameObject
+		else:
+			destFuncName = funcAttrNameObject
+
+		if ( (destFuncName == None) or (type(destFuncName).__name__ != con.stringName) ):
+			sys.exit("ASTFuncArgMapsVisitor->getDestFuncName:  problem with value returned from ASTParser->getFuncNameFromCallNode.")
+
+		return destFuncName
+
+		'''
 		try:
 			destFuncName = node.func.id
 		except:
@@ -61,6 +81,7 @@ class ASTFuncArgMapsVisitor(ast.NodeVisitor):
 			sys.exit("ASTFuncArgMapsVisitor->getDestFuncName:  problem with value returned from ASTParser->buildStringName for function attribute name.")
 
 		return funcAttrNameObject
+		'''
 
 	def throwErrorOnUnequalCallLists(self, lenCallerArgs, lenDestArgs, destFuncName):
 		if ( (lenCallerArgs == None) or (type(lenCallerArgs).__name__ != con.intTypePython) or (lenCallerArgs < 0) ):
