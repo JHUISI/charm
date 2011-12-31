@@ -8,11 +8,14 @@ class AST_Visitor(ast.NodeVisitor):
 	#def visit_UnaryOp(self, node):
 		#print(type(node.op).__name__)
 
-	def visit_Subscript(self, node):
-		print(node.slice._fields)
+	#def visit_Subscript(self, node):
+		#print(node.slice._fields)
 
-	def visit_Assign(self, node):
-		print(type(node.value).__name__)
+	#def visit_Assign(self, node):
+		#print(node.value._fields)
+
+	def visit_Name(self, node):
+		print(node.id)
 
 f = open(sys.argv[1], 'r').readlines()
 c = ""

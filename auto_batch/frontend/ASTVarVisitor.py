@@ -15,6 +15,7 @@ from BinOpValue import BinOpValue
 from InitValue import InitValue
 from UnaryOpValue import UnaryOpValue
 from SliceValue import SliceValue
+from VariableNamesValue import VariableNamesValue
 
 class ASTVarVisitor(ast.NodeVisitor):
 	def __init__(self, myASTParser):
@@ -600,6 +601,10 @@ class ASTVarVisitor(ast.NodeVisitor):
 		variableToAdd = Variable()
 		variableToAdd.setName(self.processNode(leftSideNode))
 		variableToAdd.setValue(self.processNode(rightSideNode))
+
+		if ( (variableToAdd.getName() != None) and (variableToAdd.getValue() == None) ):
+			varNamesValue = self.myASTParser.buildVarNamesValueFromNode(rightSideNode)
+			variableToAdd.setValue(varNamesValue)
 
 		if ( (variableToAdd.getName() != None) and (variableToAdd.getValue() != None) ):
 			leftLineNo = self.myASTParser.getLineNumberOfNode(leftSideNode)

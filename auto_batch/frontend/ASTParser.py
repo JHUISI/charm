@@ -6,6 +6,7 @@ from FloatValue import FloatValue
 from FunctionArgMap import FunctionArgMap
 from CallValue import CallValue
 from SubscriptName import SubscriptName
+from VariableNamesValue import VariableNamesValue
 
 def getPrimaryNameOfNameObject(nameObject):
 	if ( (nameObject == None) or (type(nameObject).__name__ not in con.variableNameTypes) ):
@@ -53,6 +54,33 @@ def getValueOfLastLine(dict):
 	keys.sort()
 	lenKeys = len(keys)
 	return dict[keys[lenKeys-1]]
+
+class ASTGetVariableNames(ast.NodeVisitor):
+	def __init__(self):
+		self.varNamesAsStringNameList = []
+		self.varNamesValue = None
+		self.myASTParser = ASTParser()
+
+	def visit_Name(self, node):
+		try:
+			nodeName = node.id
+		except:
+			sys.exit("ASTParser->ASTGetVariableNames->visit_Name:  could not obtain the name of the node.")
+
+		varNameAsStringName = StringName()
+		varNameAsStringName.setName(nodeName)
+		varNameAsStringName.setLineNo(self.myASTParser.getLineNumberOfNode(node))
+
+		self.varNamesAsStringNameList.append(varNameAsStringName)
+
+	def getVarNamesValue(self):
+		if (len(self.varNamesAsStringNameList) == 0):
+			return None
+
+		retValue = VariableNamesValue()
+		retValue.setVarNamesList(self.varNamesAsStringNameList)
+
+		return retValue
 
 class GetLastLineOfFunction(ast.NodeVisitor):
 	def __init__(self):
@@ -1479,3 +1507,13 @@ class ASTParser:
 			sys.exit("ASTParser->getFloatValueFromNode:  could not obtain the \"n\" field of the node passed in.")
 
 		return floatValue
+
+	def buildVarNamesValueFromNode(self, node):
+		if (node == None):
+			sys.exit("ASTParser->buildVarNamesValueFromNode:  node passed in is of None type.")
+
+		getVarNamesObj = ASTGetVariableNames()
+		getVarNamesObj.visit(node)
+		varNamesValue = getVarNamesObj.getVarNamesValue()
+
+		return varNamesValue

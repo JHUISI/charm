@@ -107,6 +107,7 @@ unaryOpTypeAST = 'UnaryOp'
 unaryOpValue = 'UnaryOpValue'
 uSubTypeAST = 'USub'
 variable = 'Variable'
+variableNamesValue = 'VariableNamesValue'
 verifyFuncName = 'verify'
 batchEqRemoveStrings = [pairingLetter, lParan, numSignersIndex, numSignaturesIndex, '1', productString, '{', '}', numSigners, numSignatures, ':=', '^', ',', dotDirector, ')', '==', '*', sumDirector, sumString]
 opTypesAST = [addTypeAST, divTypeAST, expTypeAST, multTypeAST, subTypeAST]
