@@ -1,5 +1,6 @@
 addTypeAST = 'Add'
 ASTParser = 'ASTParser'
+ASTVarVisitor = 'ASTVarVisitor'
 backSlash = '\\'
 batchVerifierOutputAssignment = ' := '
 binOpTypeAST = 'BinOp'

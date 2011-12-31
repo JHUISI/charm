@@ -5,6 +5,167 @@ from LineInfo import LineInfo
 from StringName import StringName
 from StringValue import StringValue
 
+'''
+def getLineNosPerVar(varAssignments):
+	if ( (varAssignments == None) or (type(varAssignments).
+'''
+
+class ASTFuncArgMapsVisitor(ast.NodeVisitor):
+	def __init__(self, functionArgNames, lenFunctionArgDefaults):
+		if ( (functionArgNames == None) or (type(functionArgNames).__name__ != con.dictTypePython) or (len(functionArgNames) == 0) ):
+			sys.exit("ASTFuncArgMapsVisitor->__init__:  problem with the function argument names passed in.")
+
+		if ( (lenFunctionArgDefaults == None) or (type(lenFunctionArgDefaults).__name__ != con.dictTypePython) or (len(lenFunctionArgDefaults) == 0) ):
+			sys.exit("ASTFuncArgMapsVisitor->__init__:  problem with the length of function argument defaults dictionary.")
+
+		self.myASTParser = ASTParser()
+		if ( (self.myASTParser == None) or (type(self.myASTParser).__name__ != con.ASTParser) ):
+			sys.exit("ASTFuncArgMapsVisitor->__init__:  problem with the value returned from ASTParser().")
+
+		self.myASTVarVisitor = ASTVarVisitor(self.myASTParser)
+		if ( (self.myASTVarVisitor == None) or (type(self.myASTVarVisitor).__name__ != con.ASTVarVisitor) ):
+			sys.exit("ASTFuncArgMapsVisitor->__init__:  problem with value returned from ASTVarVisitor().")
+
+		self.functionArgNames = functionArgNames
+		self.lenFunctionArgDefaults = lenFunctionArgDefaults
+		self.functionArgMappings = []
+
+	def getDestFuncName(self, node):
+		if ( (node == None) or (type(node).__name__ != con.callTypeAST) ):
+			sys.exit("ASTFuncArgMapsVisitor->getDestFuncName:  problem with node passed in to function.")
+
+		try:
+			destFuncName = node.func.id
+		except:
+			destFuncName = None
+
+		if (destFuncName != None):
+			destFuncNameObject = self.myASTParser.buildStringName(node, destFuncName)
+			if ( (destFuncNameObject == None) or (type(destFuncNameObject).__name__ != con.stringName) ):
+				sys.exit("ASTFuncArgMapsVisitor->getDestFuncName:  problem with value returned from ASTParser->buildStringName for destination function name.")
+
+			return destFuncNameObject
+
+		try:
+			funcValueName = node.func.value.id
+		except:
+			sys.exit("ASTFuncArgMapsVisitor->getDestFuncName:  could not obtain any information about the call represented by the node passed in.")
+
+		try:
+			funcAttrName = node.func.attr
+		except:
+			sys.exit("ASTFuncArgMapsVisitor->getDestFuncName:  could not obtain the function's attribute name from the node passed in.")
+
+		funcAttrNameObject = self.myASTParser.buildStringName(node, funcAttrName)
+		if ( (funcAttrNameObject == None) or (type(funcAttrNameObject).__name__ != con.stringName) ):
+			sys.exit("ASTFuncArgMapsVisitor->getDestFuncName:  problem with value returned from ASTParser->buildStringName for function attribute name.")
+
+		return funcAttrNameObject
+
+	def throwErrorOnUnequalCallLists(self, lenCallerArgs, lenDestArgs, destFuncName):
+		if ( (lenCallerArgs == None) or (type(lenCallerArgs).__name__ != con.intTypePython) or (lenCallerArgs < 0) ):
+			sys.exit("ASTFuncArgMapsVisitor->throwErrorOnUnequalCallLists:  problem with length of caller arguments passed in.")
+
+		if ( (lenDestArgs == None) or (type(lenDestArgs).__name__ != con.intTypePython) or (lenDestArgs < 0) ):
+			sys.exit("ASTFuncArgMapsVisitor->throwErrorOnUnequalCallLists:  problem with length of destination arguments passed in.")
+
+		if ( (destFuncName == None) or (type(destFuncName).__name__ != con.strTypePython) or (len(destFuncName) == 0) ):
+			sys.exit("ASTFuncArgMapsVisitor->throwErrorOnUnequalCallLists:  problem with destination function name passed in.")
+
+		if ( (destFuncName not in self.functionArgNames) or (destFuncName not in self.lenFunctionArgDefaults) ):
+			sys.exit("ASTFuncArgMapsVisitor->throwErrorOnUnequalCallLists:  destination function name passed in is not in the function argument names dictionary OR length of function default arguments dictionary.")
+
+		diffInNumArgs = lenDestArgs - lenCallerArgs
+		if (diffInNumArgs < 0):
+			sys.exit("ASTFuncArgMapsVisitor->throwErrorOnUnequalCallLists:  number of caller arguments exceeds number of destination arguments.")
+
+		numDefaultArgsInDest = self.lenFunctionArgDefaults[destFuncName]
+		if (numDefaultArgsInDest < 0):
+			sys.exit("ASTFuncArgMapsVisitor->throwErrorOnUnequalCallLists:  number of default arguments for destination function name passed in is less than zero.")
+
+		if (diffInNumArgs > numDefaultArgsInDest):
+			return True
+
+		return False
+
+	def visit_Call(self, node):
+		destFuncName = self.getDestFuncName(node)
+		if ( (destFuncName == None) or (type(destFuncName).__name__ != con.stringName) ):
+			sys.exit("ASTFuncArgMapsVisitor->visit_Call:  problem with value returned from self.getDestFuncName.")
+
+		if (destFuncName.getStringVarName() not in self.functionArgNames):
+			return
+
+		destArgNames = self.functionArgNames[destFuncName.getStringVarName()]
+
+		callerArgList = self.myASTVarVisitor.getArgNodeList(node)
+
+		if ( (callerArgList == None) and (len(destArgNames) == 0) ):
+			funcArgMapObject = FunctionArgMap()
+			funcArgMapObject.setDestFuncName(destFuncName)
+			funcArgMapObject.setLineNo(node.lineno)
+			self.functionArgMappings.append(copy.deepcopy(funcArgMapObject))
+			return
+
+		if (len(callerArgList) != len(destArgNames) ):
+			throwError = self.throwErrorOnUnequalCallLists(len(callerArgList), len(destArgNames), destFuncName.getStringVarName())
+			if (throwError == True):
+				sys.exit("ASTFuncArgMapsVisitor->visit_Call:  length of caller and destination arguments lists are not equal.")
+
+		funcArgMapObject = FunctionArgMap()
+		funcArgMapObject.setDestFuncName(destFuncName)
+
+		if (len(callerArgList) != 0):
+			funcArgMapObject.setCallerArgList(callerArgList)
+			funcArgMapObject.setDestArgList(destArgNames)
+
+		funcArgMapObject.setLineNo(node.lineno)
+
+		self.functionArgMappings.append(copy.deepcopy(funcArgMapObject))
+
+	def getFunctionArgMappings(self):
+		return self.functionArgMappings
+
+def getFunctionArgMappings_OneFunction(funcNode, functionArgNames, lenFunctionArgDefaults):
+	if (funcNode == None):
+		sys.exit("Parser_CodeGen_Toolbox->getFunctionArgMappings_OneFunction:  function node passed in is of None type.")
+
+	if ( (functionArgNames == None) or (type(functionArgNames).__name__ != con.dictTypePython) or (len(functionArgNames) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getFunctionArgMappings_OneFunction:  problem with the function argument names passed in.")
+
+	if ( (lenFunctionArgDefaults == None) or (type(lenFunctionArgDefaults).__name__ != con.dictTypePython) or (len(lenFunctionArgDefaults) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getFunctionArgMappings_OneFunction:  problem with length of function default arguments parameter passed in.")
+
+	myFuncArgMapsVisitor = ASTFuncArgMapsVisitor(functionArgNames, lenFunctionArgDefaults)
+	myFuncArgMapsVisitor.visit(funcNode)
+	return myFuncArgMapsVisitor.getFunctionArgMappings()
+
+def getLineNoOfFirstFunction(functionNames, myASTParser):
+	if ( (functionNames == None) or (type(functionNames).__name__ != con.dictTypePython) or (len(functionNames) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getLineNoOfFirstFunction:  problem with function names parameter passed in.")
+
+	if (myASTParser == None):
+		sys.exit("Parser_CodeGen_Toolbox->getLineNoOfFirstFunction:  problem with ASTParser parameter passed in.")
+
+	firstLineNo = sys.maxsize
+
+	for funcNameAsString in functionNames:
+		funcNode = functionNames[funcNameAsString]
+		if (funcNode == None):
+			sys.exit("Parser_CodeGen_Toolbox->getLineNoOfFirstFunction:  one of the function nodes extracted from the function names parameter passed in is of None type.")
+
+		currentLineNo = myASTParser.getLineNumberOfNode(funcNode)
+		if ( (currentLineNo == None) or (type(currentLineNo).__name__ != con.intTypePython) or (currentLineNo < 1) ):
+			sys.exit("Parser_CodeGen_Toolbox->getLineNoOfFirstFunction:  problem with one of the line numbers obtained of the function nodes.")
+
+		if (currentLineNo < firstLineNo):
+			firstLineNo = currentLineNo
+
+	if (firstLineNo == sys.maxsize):
+		sys.exit("Parser_CodeGen_Toolbox->getLineNoOfFirstFunction:  could not obtain the first line number from the function names parameter passed in.")
+
+	return firstLineNo
+
 def searchForLoopNameInLoopList(loopNameToSearchFor, loopList):
 	if (loopList == None):
 		return False
@@ -957,9 +1118,9 @@ def getFunctionArgMappings(functionNames, functionArgNames, lenFunctionArgDefaul
 	functionArgMappings = {}
 
 	for funcName in functionNames:
-		funcArgMapList = myASTParser.getFunctionArgMappings(functionNames[funcName], functionArgNames, lenFunctionArgDefaults)
+		funcArgMapList = getFunctionArgMappings_OneFunction(functionNames[funcName], functionArgNames, lenFunctionArgDefaults)
 		if ( (funcArgMapList == None) or (type(funcArgMapList).__name__ != con.listTypePython) ):
-			sys.exit("Parser_CodeGen_Toolbox->getFunctionArgMappings:  problems with value returned from myASTParser->getFunctionArgMappings.")
+			sys.exit("Parser_CodeGen_Toolbox->getFunctionArgMappings:  problems with value returned from getFunctionArgMappings_OneFunction.")
 
 		functionArgMappings[funcName] = funcArgMapList
 

@@ -20,6 +20,8 @@ functionArgMappings = None
 indentationListVerifyLines = None
 individualVerFile = None
 lineInfo = None
+lineNoOfFirstFunction = None
+lineNosPerVar = None
 loopBlocksForCachedCalculations = []
 loopBlocksForNonCachedCalculations = []
 loopInfo = []
@@ -2340,7 +2342,8 @@ def main():
 	global pythonCodeLines, individualVerFile, batchVerFile, verifySigsFile, pythonCodeNode, varAssignments, verifyFuncNode, verifyLines 
 	global verifyEqNode, functionArgMappings, callListOfVerifyFuncs, linePairsOfVerifyFuncs, verifyFuncArgs, indentationListVerifyLines
 	global numTabsOnVerifyLine, batchVerifierOutput, finalBatchEq, finalBatchEqWithLoops, listVars, numSpacesPerTab, lineInfo
-	global loopBlocksForCachedCalculations, loopBlocksForNonCachedCalculations
+	global loopBlocksForCachedCalculations, loopBlocksForNonCachedCalculations, lineNosPerVar
+	global lineNoOfFirstFunction
 
 	try:
 		pythonCodeLines = open(pythonCodeArg, 'r').readlines()
@@ -2359,6 +2362,10 @@ def main():
 	functionNames = myASTParser.getFunctionNames(pythonCodeNode)
 	if (functionNames == None):
 		sys.exit("AutoBatch_CodeGen->main:  function names obtained from ASTParser->getFunctionNames is of None type.")
+
+	lineNoOfFirstFunction = getLineNoOfFirstFunction(functionNames, myASTParser)
+	if ( (lineNoOfFirstFunction == None) or (type(lineNoOfFirstFunction).__name__ != con.intTypePython) or (lineNoOfFirstFunction < 1) ):
+		sys.exit("AutoBatch_CodeGen->main:  problem with value obtained from getLineNoOfFirstFunction.")
 
 	(functionArgNames, lenFunctionArgDefaults) = myASTParser.getFunctionArgNamesAndDefaultLen(pythonCodeNode)
 	if ( (functionArgNames == None) or (lenFunctionArgDefaults == None) ):
@@ -2485,6 +2492,10 @@ def main():
 	loopBlocksForNonCachedCalculations = buildLoopBlockList(loopsOuterNotNumSignatures, loopsOuterNumSignatures)
 	if ( (loopBlocksForNonCachedCalculations == None) or (type(loopBlocksForNonCachedCalculations).__name__ != con.listTypePython) or (len(loopBlocksForNonCachedCalculations) == 0) ):
 		sys.exit("AutoBatch_CodeGen->main:  problem obtaining loop blocks used for non-cached calculations.")
+
+	lineNosPerVar = getLineNosPerVar(varAssignments)
+	if ( (lineNosPerVar == None) or (type(lineNosPerVar).__name__ != con.dictTypePython) or (len(lineNosPerVar) == 0) ):
+		sys.exit("AutoBatch_CodeGen->main:  problem with value returned from getLineNosPerVar.")
 
 	try:
 		batchVerFile.close()

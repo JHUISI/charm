@@ -164,6 +164,7 @@ class ASTVariableNamesVisitor(ast.NodeVisitor):
 
 		return self.variableNames
 
+'''
 class ASTFuncArgMapsVisitor(ast.NodeVisitor):
 	def __init__(self, functionArgNames, lenFunctionArgDefaults):
 		if ( (functionArgNames == None) or (type(functionArgNames).__name__ != con.dictTypePython) or (len(functionArgNames) == 0) ):
@@ -279,6 +280,7 @@ class ASTFuncArgMapsVisitor(ast.NodeVisitor):
 
 	def getFunctionArgMappings(self):
 		return self.functionArgMappings
+'''
 
 class ASTFunctionArgNames(ast.NodeVisitor):
 	def __init__(self):
@@ -467,6 +469,7 @@ class ASTParser:
 		myFuncArgNamesVisitor.visit(node)
 		return (myFuncArgNamesVisitor.getFunctionArgNames(), myFuncArgNamesVisitor.getLenFunctionArgDefaults())
 
+	'''
 	def getFunctionArgMappings(self, funcNode, functionArgNames, lenFunctionArgDefaults):
 		if (funcNode == None):
 			sys.exit("ASTParser->getFunctionArgMappings:  function node passed in is of None type.")
@@ -480,6 +483,7 @@ class ASTParser:
 		myFuncArgMapsVisitor = ASTFuncArgMapsVisitor(functionArgNames, lenFunctionArgDefaults)
 		myFuncArgMapsVisitor.visit(funcNode)
 		return myFuncArgMapsVisitor.getFunctionArgMappings()
+	'''
 
 	def removeVarsFromListWithStringName(self, varList, varName):
 		if ( (varList == None) or (type(varList).__name__ != con.listTypePython) or (len(varList) == 0) ):

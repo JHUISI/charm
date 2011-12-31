@@ -20,6 +20,7 @@ import hashlib
 debug = False
 
 class WatersSig:
+
     def __init__(self, groupObj):
         global group,lam_func,hashObj
         group = groupObj
