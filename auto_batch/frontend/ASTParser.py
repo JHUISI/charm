@@ -58,6 +58,7 @@ def getValueOfLastLine(dict):
 class ASTGetVariableNames(ast.NodeVisitor):
 	def __init__(self):
 		self.varNamesAsStringNameList = []
+		self.varNamesAsStrings = []
 		self.varNamesValue = None
 		self.myASTParser = ASTParser()
 
@@ -67,11 +68,18 @@ class ASTGetVariableNames(ast.NodeVisitor):
 		except:
 			sys.exit("ASTParser->ASTGetVariableNames->visit_Name:  could not obtain the name of the node.")
 
+		if (nodeName in con.reservedWords):
+			return
+
+		if (nodeName in self.varNamesAsStrings):
+			return
+
 		varNameAsStringName = StringName()
 		varNameAsStringName.setName(nodeName)
 		varNameAsStringName.setLineNo(self.myASTParser.getLineNumberOfNode(node))
 
 		self.varNamesAsStringNameList.append(varNameAsStringName)
+		self.varNamesAsStrings.append(nodeName)
 
 	def getVarNamesValue(self):
 		if (len(self.varNamesAsStringNameList) == 0):
