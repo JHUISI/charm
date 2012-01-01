@@ -258,6 +258,7 @@ class Technique3(AbstractTechnique):
         self.rule    = "Combine pairings with common 1st or 2nd element. Reduce N pairings to 1 (technique 3)"
         self.applied = False
         self.score   = tech3.NoneApplied
+        self.debug   = False
 
     # once a     
     def visit_pair(self, node, data):
@@ -291,7 +292,7 @@ class Technique3(AbstractTechnique):
             child_node1 = right.left
             child_node2 = right.right
             if Type(child_node1) == ops.ON:
-                print("child type 1 =>", Type(child_node1))
+                if self.debug: print("child type 1 =>", Type(child_node1))
             elif Type(child_node2) == ops.ON:
                 mul = BinaryNode(ops.MUL)
                 mul.left = self.createPair(left, child_node1)                
@@ -302,7 +303,8 @@ class Technique3(AbstractTechnique):
                 self.score   = tech3.SplitPairing
 #                self.rule += "split one pairing into two pairings. "            
             else:
-                print("T3: missing case: ", Type(child_node1), " and ", Type(child_node2))
+                if self.debug: 
+                    print("TODO: T3 - missing case: ", Type(child_node1), " and ", Type(child_node2))
         else:
             return None
 
@@ -320,7 +322,7 @@ class Technique3(AbstractTechnique):
             self.getMulTokens(pair_node.left, ops.NONE, [ops.EXP, ops.HASH], l)
             self.getMulTokens(pair_node.right, ops.NONE, [ops.EXP, ops.HASH], r)
             if len(l) > 2: 
-                print("T3: Need to handle the left case in visit_on.")
+                print("TODO: T3 - Need to handle the left case in visit_on.")
             elif len(r) > 2:
                 # special case: reverse split a \single\ pairing into two or more pairings to allow for application of 
                 # other techniques. pair(a, b * c * d?) => p(a, b) * p(a, c) * p(a, d)
@@ -342,13 +344,16 @@ class Technique3(AbstractTechnique):
             else:                        
                 # verify we can actually move dot prod into pairing otherwise, bail:
                 # NOTE: this only applies to when trying to moving dot products inside pairing
-                if not self.verifyCombinePair(node.left.left.left, pair_node):
-                    test = []
-                    self.getMulTokens(pair_node.right, ops.NONE, [ops.ON, ops.EXP, ops.HASH], test)
-                    #print("test len :", len(test))
-                    if len(test) >= 1:
-                        return
-                
+                target = str(node.left.left.left)
+                if not self.verifyCombinePair(target, pair_node):
+                    # check if we pass the basic variable with index exists on both side of pairing check,
+                    # then, check whether the variables found can be rearranged to the side we move the
+                    # dot product to. If it can't be rearranged given other dependencies, then bail and do not
+                    # apply the combine pairing technique.
+                    if self.canRearrange(target, pair_node) == False:
+                        if self.debug: print("Cannot rearrange, therefore, BAIL!")
+                        return # bail, no dice!
+                                    
                 addAsChildNodeToParent(data, pair_node) # move pair one level up  
 
                 #print("pair_node left +> ", pair_node.left, self.isConstInSubtreeT(pair_node.left))                              
@@ -367,7 +372,7 @@ class Technique3(AbstractTechnique):
                     self.applied = True
                     self.score   = tech3.CombinePairing
                 else:
-                    pass
+                    pass # do nothing if previous criteria isn't met.
             return
         elif Type(node.right) == ops.EXP:
             exp = node.right
@@ -390,14 +395,62 @@ class Technique3(AbstractTechnique):
         target = str(index)
         left = self.isAttrIndexInNode(pair.left, target)
         right = self.isAttrIndexInNode(pair.right, target)
-        #print("Pair: ", pair)
-        #print("left: ", left)
-        #print("right: ", right)
+        if self.debug: print("Pair: ", pair)
         if left and right: 
         # if both true (meaning index appears on left and right side), then do NOT apply transformation
             return False
         return True 
         
+    def canRearrange(self, index, node, another_dp_index_found=None):
+        another_index = another_dp_index_found
+        node_type = Type(node)
+        #print("node_type = ", node_type)
+        if node == None: return None
+        elif node_type == ops.ATTR:
+            #print("visiting: ", node.attr, node.attr_index)
+            #print("Another_index 1: ", another_index)
+            #print("index in list?: ", index in node.attr_index)
+            if str(node.attr) == "delta": 
+                # we know for sure there's only one index, therefore, delta can be rearranged
+                return True
+            elif node.attr_index and index in node.attr_index:
+                if self.debug: print("Another_index: ", another_index)
+                if len(node.attr_index) == 1:
+                # if there is an index match AND that is the only index in the list. 
+                # this effectively gives us the same condition as delta_z.
+                # otherwise, false b/c we most likley cannot rearrange the variable in question due to
+                # a dependency (from the other index) that belongs to another dot product loop.
+                    if self.debug: print("attr_index len is 1!")
+                    return True
+                elif len(node.attr_index) > 1 and another_index == None:
+                # TODO: must check whether that loop is within the pairing or outside? 
+                    if self.debug: print("FOUND another index w/o a dot prod in pairing left or right.")
+                    return True
+#                elif len(node.attr_index) > 1 and another_index:
+#                    print("found another index: ", another_index, " with its dot prod inside the pairing as well. can't move")
+#                    return False
+                else:
+                    return False
+            else:
+                return True
+        elif node_type == ops.ON:
+                prod = node.left            
+                if str(prod.left.left) != index: 
+                    another_index = str(prod.left.left)
+                    #print("another_index : ", prod.left.left)
+                #print("visiting next: ", node.right)
+                result = self.canRearrange(index, node.right, another_index)
+                return result
+        else:
+            #print("Visiting: ", Type(node), node, another_index)
+            result1 = self.canRearrange(index, node.left, another_index)
+            result2 = self.canRearrange(index, node.right, another_index)
+            #print("Result1: ", result1)
+            #print("Result2: ", result2)
+            if result1 == result2: return result1
+            elif result1 or result2: return False
+            return # most likely won't hit this condition
+
 tech4 = Tech_db # Enum('NoneApplied', 'ConstantPairing')
         
 class Technique4(AbstractTechnique):
@@ -406,6 +459,7 @@ class Technique4(AbstractTechnique):
         self.rule = "Applied waters hash technique (technique 4)"
         self.applied = False
         self.score   = tech4.NoneApplied
+        self.debug   = False
         #print("Metadata =>", meta)
         
     def visit_on(self, node, data):
@@ -429,11 +483,15 @@ class Technique4(AbstractTechnique):
 #                print("node2 =>", node2)
 #                print("parent =>", node2_parent, ":", Type(node2_parent))
                 if Type(node2_parent) == ops.PAIR:
+                    if self.debug: print("applied a transformation for technique 4")
                     self.adjustProdNodes( node2_parent )
                     self.applied = True
                     self.score   = tech4.ConstantPairing
                 else:
-                    print("Not applying any transformation for: ", Type(node2_parent))
+                    self.applied = True                    
+                    self.score   = tech4.ConstantPairing
+                    if self.debug: 
+                        print("No other transformation necessary since not a PAIR node instead:", Type(node2_parent))
 
     def adjustProdNodes(self, node): 
         if Type(node.left) == ops.ON:
@@ -473,7 +531,7 @@ class Technique4(AbstractTechnique):
                     self.deleteFromTree(node.right, node, result, side.right)
                     #print("updated node =>", node)
             elif not self.allNodesWithIndex(index, node.left):
-                print("adjustProdNodes: need to handle the other case.")
+                print("TODO: adjustProdNodes: need to handle the other case.")
         # first check the right side for product
     
     def allNodesWithIndex(self, index, subtree):

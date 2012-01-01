@@ -35,10 +35,12 @@ m
 END :: message
 
 # 3, 2, S, 4, P, 3
-# 3, 2, S, 4, P, 3
-BEGIN :: transform
-2, 3, S, 4, P, 3
-END :: transform
+#2, 3, 5, 4, 6, 3
+#2, 3, 5, 3, 4, 6
+#2, 3, 5, 4, 6, 3
+#BEGIN :: transform
+#2, 3, 5, 3, 4, 6
+#END :: transform
 
 # different messages/sigs under different signers
 message := N

@@ -407,6 +407,95 @@ class SubstituteSigDotProds:
 # prod{} on (x * y)
 class DotProdInstanceFinder:
     def __init__(self):
+        self.rule = "Distribute dot products: "
+        self.applied = False
+
+
+    def getMulTokens(self, subtree, parent_type, target_type, _list):
+        if subtree == None: return None
+        elif parent_type == ops.EXP and Type(subtree) == ops.MUL:
+            return               
+        elif parent_type == ops.MUL:
+            if Type(subtree) in target_type: 
+                found = False
+                for i in _list:
+                    if isNodeInSubtree(i, subtree): found = True
+                if not found: _list.append(subtree)
+
+        if subtree.left: self.getMulTokens(subtree.left, subtree.type, target_type, _list)
+        if subtree.right: self.getMulTokens(subtree.right, subtree.type, target_type, _list)
+        return
+    
+    def visit(self, node, data):
+        pass
+
+    # visit all the ON nodes and test whether we can distribute the product to children nodes
+    # e.g., prod{} on (x * y) => prod{} on x * prod{} on y    
+    def visit_on(self, node, data):
+        if Type(data['parent']) == ops.PAIR:
+            #self.rule += "False "
+            return
+        #print("test: right node of prod =>", node.right, ": type =>", node.right.type)
+        #print("parent type =>", Type(data['parent']))
+#        _type = node.right.type
+        if Type(node.right) == ops.MUL:            
+            # must distribute prod to both children of mul
+            r = []
+            mul_node = node.right
+            self.getMulTokens(mul_node, ops.NONE, [ops.EXP, ops.HASH, ops.PAIR, ops.ATTR], r)
+            #for i in r:
+            #    print("node =>", i)
+            
+            if len(r) == 0:
+                pass
+            elif len(r) <= 2:
+            # in case we're dealing with prod{} on attr1 * attr2 
+            # no need to simply further, so we can simply return
+                if mul_node.left.type == ops.ATTR and mul_node.right.type == ops.ATTR:
+                    return
+
+                node.right = None
+                prod_node2 = BinaryNode.copy(node)
+            
+            # add prod nodes to children of mul_node
+                prod_node2.right = mul_node.right
+                mul_node.right = prod_node2
+            
+                node.right = mul_node.left
+                mul_node.left = node
+                #self.rule += "True "
+                # move mul_node one level up to replace the "on" node.
+                batchparser.addAsChildNodeToParent(data, mul_node)
+                self.applied = True
+            elif len(r) > 2:
+                #print("original node =>", node)
+                muls = [BinaryNode(ops.MUL) for i in range(len(r)-1)]
+                prod = [BinaryNode.copy(node) for i in r]
+                # distribute the products to all nodes in r
+                for i in range(len(r)):
+                    prod[i].right = r[i]
+#                    print("n =>", prod[i])
+                # combine prod nodes into mul nodes                     
+                for i in range(len(muls)):
+                    muls[i].left = prod[i]
+                    if i < len(muls)-1:
+                        muls[i].right = muls[i+1]
+                    else:
+                        muls[i].right = prod[i+1]
+#                print("final node =>", muls[0])
+                batchparser.addAsChildNodeToParent(data, muls[0])       
+                self.applied = True
+                #self.rule += "True "
+            else:
+                #self.rule += "False "
+                return                
+    def testForApplication(self):
+        return self.applied
+
+# Focuses on simplifying dot products of the form
+# prod{} on (x * y)
+class DotProdInstanceFinder2:
+    def __init__(self):
         self.rule = "Simplify dot products: "
         self.applied = False
         self.instance = {}

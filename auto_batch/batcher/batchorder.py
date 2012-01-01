@@ -36,7 +36,6 @@ class BatchOrder:
         self.techMap = { 2:Technique2, 3:Technique3, 4:Technique4 }
         # a quick way to test that a particular technique will transform the equation (pre-check)
         self.techMap2 = { 5:DotProdInstanceFinder, 6:PairInstanceFinder }
-        self.techTool = { 5:SimplifyDotProducts, 6:PairInstanceFinder }
 
     def testSequence(self, combo):
         eq = BinaryNode.copy(self.verify)
@@ -64,11 +63,32 @@ class BatchOrder:
         
         # traverse equation with the specified technique
         ASTVisitor(tech).preorder(eq2)
+
+        # to apply tools if indeed technique applied
+        if tech_option in self.techMap2.keys():
+            # this makes sure that the technique actually applied
+            tech.testForApplication()
+            # this applies just to technique 6 (pair instance finder - which combines pairings)
+            if getattr(tech, "makeSubstitution", None):
+                tech.makeSubstitution(eq2)
+
         # return the results
         return (tech, eq2)
     
     def strategy(self, option=None):
-        return self.BasicStrategy()
+        #return self.BasicStrategy()
+        path = []; all_paths = []; self.batch_time = {}
+        self.BFStrategy(self.verify, path, all_paths)
+        min_index = 0
+        min_time = self.batch_time[min_index]
+        for i in self.batch_time.keys():
+            #print("unique paths:", i, ", time:", self.batch_time[i], "path: ", all_paths[i])
+            if self.batch_time[i] <= min_time:
+                min_index = i; 
+                min_time = self.batch_time[i]
+        
+        if self.debug: print("returning batch algorithm: ", all_paths[min_index])        
+        return all_paths[min_index]
     
     # Try all permutations of techniques (does not repeat applying technique)
     def BasicStrategy(self):
@@ -112,62 +132,77 @@ class BatchOrder:
         pass
     
     # take the current 
-    def possibleTechniques(self, tech_applied, tech_obj, excl_tech_list):
+    def possibleTechniques(self, tech_applied, tech_obj):
         suggest = None
         if tech_obj.applied:
             if tech_applied == 2:
                 if tech_obj.score in [Tech_db.ExpIntoPairing, Tech_db.DistributeExpToPairing]:
-                    suggest = [3, 5] # move on to tech3 or distribute dot products if possible
+                    suggest = [4, 5, 3] # move on to tech3 or distribute dot products if possible
             elif tech_applied == 3:
-                if tech_obj.score == Tech_db.CombinePairing:
-                    suggest = [5]
-                elif tech_obj.score == Tech_db.SplitPairing:
-                    suggest = [4, 2]
+                if tech_obj.score in [Tech_db.CombinePairing, Tech_db.ProductToSum, Tech_db.SplitPairing]:
+                    suggest = [4, 5, 2]
             elif tech_applied == 4:
                 if tech_obj.score == Tech_db.ConstantPairing:
-                    suggest = [6, 3, 5]
+                    suggest = [6, 5, 3]
             elif tech_applied == 5: # distribute products
                 if tech_obj.testForApplication:
                     suggest = [4, 3]
             elif tech_applied == 6: # combine pairings
                 if tech_obj.testForApplication:
-                    suggest = [3, 5]
+                    suggest = [5, 4, 3]
             else:
                 return
         else:
             # try something else, if didn't apply
             suggest = [6, 5, 4, 3, 2]
             suggest.remove(tech_applied)
-            for i in excl_tech_list:
-                suggest.remove(i)
+#            for i in excl_tech_list: # stuff I've already tried
+#                suggest.remove(i)
         return suggest
     
     # TODO: finish algorithm and figure out when it is BEST to distribute dot products 
     # Recursively determine all the paths that might apply until we converge (e.g., no more techniques apply)
-    def BFStrategy(self):
-        techniques = list(self.detectMap2.keys())
-        path = []
-        # starting point: start
-        if start_tech:
-            # 1. apply the start technique to equation
-            (tech, verify_eq) = self.testTechnique(cur_tech, self.verify)
-                                          
-            # check score and get next option
-            next_tech = self.possibleTechniques(cur_tech, tech, excl_list)
-            # self.tryPaths(next_tech, verify_eq, path)
-            
+    def BFStrategy(self, equation, path, all_paths, cur_tech=None):
+#        techniques = list(self.detectMap2.keys())
+        if not cur_tech: cur_tech = 2
 
-    def tryPaths(self, techs, verify_eq, path_list):            
-        try_tech = techs.pop()
-        (tech, verify_eq2) = self.testTechnique(try_tech, verify_eq)
-        if tech.applied:
-            path_list.append( try_tech )
-        else:
-            self.tryPaths(techs, verify_eq, path_list)
-        return
-            # 2. suggest next technique or tool (2 - 6): current state, previous technique applied, and equation
-            # 3. measure efficiency of current batch equation
-            # 4. if measurement does not converge meaning savings before or after application of tech is thesame
-            # 5. 
+        # 1. apply the start technique to equation
+        #print("Starting path: ", path)
+        if self.debug: print("Testing technique: ", cur_tech)
+        (tech, verify_eq) = self.testTechnique(cur_tech, equation)
         
+        if tech.applied:
+            if self.debug: print("Technique ", cur_tech, " successfully applied.")
+            path.append(cur_tech)
+            # check score and get next option
+            #excl_list = []
+            # 2. get next techniques to try
+            next_tech_list = self.possibleTechniques(cur_tech, tech)
+            if self.debug: print("Try these techs next: ", next_tech_list, "\n")
+            # 3. recursively test other schemes and paths
+            if next_tech_list:
+                while len(next_tech_list) > 0:
+                    try_tech = next_tech_list.pop()
+                    result = self.BFStrategy(verify_eq, list(path), all_paths, try_tech)
+
+            #if self.debug: print("Final Path: ", path, "\n")
+            return True
+            
+        else:
+            # technique didn't apply to the verify equation
+            if self.debug: print("Technique ", cur_tech, "did NOT apply.")
+            #print("Final path: ", path)
+            if not path in all_paths:
+                all_paths.append(path)
+                cnt = all_paths.index(path)
+                N = int(self.vars['N'])
+                rop_batch = RecordOperations(self.vars)
+                rop_batch.visit(equation, {})
+                (msmt, avg) = calculate_times(rop_batch.ops, curves[c_key], N)
+                self.batch_time[ cnt ] = avg
+                if self.debug:
+                    print("Saving path: ", path)
+                    print("Measure batch time: ", avg)
+
+            return False
     

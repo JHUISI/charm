@@ -212,7 +212,9 @@ def parseFile(filename):
     inStruct = (False, None)
     queue = []
     for line in code:
-        if line.find(BLOCK_SEP) != -1: # parse differently
+        if len(line.strip()) == 0 or line[0] == COMMENT:
+            continue
+        elif line.find(BLOCK_SEP) != -1: # parse differently
             token = clean(line.split(BLOCK_SEP))
             if token[0] == START_TOKEN and (token[1] in [TYPE, CONST, PRECOMP, TRANSFORM, MESSAGE, SIGNATURE, PUBLIC, LATEX]):
                 inStruct = (True, token[1])

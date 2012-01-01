@@ -31,10 +31,6 @@ BEGIN :: message
   h
 END :: message
 
-BEGIN :: transform
-2, 3, P
-END :: transform
-
 # different messages/sigs under a single signer
 message := N
 public := one

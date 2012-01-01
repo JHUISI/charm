@@ -41,6 +41,6 @@ verify :=  { prod{y:=1, l} on e(S_y, At_y * (Bt_y^M_y) * (Ct_y^t_y)) } == D
 
 # 2, 3, 4, S, 3
 # 2, 4, 3, S, 3 (works!!)
-BEGIN :: transform
-2, 4, 3, S, 3
-END :: transform
+#BEGIN :: transform
+#2, 4, 3, 5, 3
+#END :: transform

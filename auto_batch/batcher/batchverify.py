@@ -255,13 +255,13 @@ if __name__ == "__main__":
         algorithm = [str(x) for x in result]
         print("found batch algorithm =>", algorithm)
 
-    techniques = {'2':Technique2, '3':Technique3, '4':Technique4, 'S':SimplifyDotProducts, 'P':PairInstanceFinder }
+    techniques = {'2':Technique2, '3':Technique3, '4':Technique4, '5':SimplifyDotProducts, '6':PairInstanceFinder }
 
     for option in algorithm:
-        if option == 'S':
+        if option == '5':
             option_str = "Simplifying =>"
             Tech = techniques[option]()
-        elif option == 'P':
+        elif option == '6':
             option_str = "Combine Pairings:"
             Tech = techniques[option]()            
         elif option in techniques.keys():
@@ -271,10 +271,10 @@ if __name__ == "__main__":
             print("Unrecognized technique selection.")
             continue
         ASTVisitor(Tech).preorder(verify2.right)
-        print(Tech.rule, "\n")
-        print(option_str, ":",verify2, "\n")
-        if option == 'P':
+        if option == '6':
             Tech.makeSubstitution(verify2.right)
+        print(Tech.rule, "\n")
+        print(option_str, ":",verify2.right, "\n")
         if PROOFGEN_FLAG:
             lcg_data[ lcg_steps ] = { 'msg':Tech.rule, 'eq': lcg.print_statement(verify2.right) }
             lcg_steps += 1

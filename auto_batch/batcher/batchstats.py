@@ -142,7 +142,6 @@ class RecordOperations:
 #                print("Dot prod count =>", _prod, "in", right_type)
                 if right_type: self.ops[ 'mul' ][ right_type ] += _prod
                 self.visit(node.right, data.copy(), node)
-#                 return (left + ", lambda " + pls.vars()  + right + ", " + pls.args() + ")")
             elif(node.type == ops.HASH):
                 if node.right.attr in [types.ZR, types.G1, types.G2]:
                     _type_id = str(node.right.attr)
