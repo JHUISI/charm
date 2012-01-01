@@ -255,7 +255,7 @@ if __name__ == "__main__":
         algorithm = [str(x) for x in result]
         print("found batch algorithm =>", algorithm)
 
-    techniques = {'2':Technique2, '3':Technique3, '4':Technique4, '5':SimplifyDotProducts, '6':PairInstanceFinder }
+    techniques = {'2':Technique2, '3':Technique3, '4':Technique4, '5':DotProdInstanceFinder, '6':PairInstanceFinder }
 
     for option in algorithm:
         if option == '5':

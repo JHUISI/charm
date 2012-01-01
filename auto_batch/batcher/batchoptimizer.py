@@ -410,7 +410,6 @@ class DotProdInstanceFinder:
         self.rule = "Distribute dot products: "
         self.applied = False
 
-
     def getMulTokens(self, subtree, parent_type, target_type, _list):
         if subtree == None: return None
         elif parent_type == ops.EXP and Type(subtree) == ops.MUL:
@@ -429,10 +428,14 @@ class DotProdInstanceFinder:
     def visit(self, node, data):
         pass
 
+    def visit_pair(self, node, data):
+        return { 'visited_pair': True }
+
     # visit all the ON nodes and test whether we can distribute the product to children nodes
     # e.g., prod{} on (x * y) => prod{} on x * prod{} on y    
     def visit_on(self, node, data):
-        if Type(data['parent']) == ops.PAIR:
+#        print("DP finder: ", data.get('visited_pair'))
+        if Type(data['parent']) == ops.PAIR or data.get('visited_pair'):
             #self.rule += "False "
             return
         #print("test: right node of prod =>", node.right, ": type =>", node.right.type)

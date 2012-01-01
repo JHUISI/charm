@@ -1,24 +1,50 @@
 # chch batch inputs
 # variables
+name := chch
 N := 100
 
 BEGIN ::types
 M := str
-mpk#1 := G2
+P := G2
 pk := G1
 S1 := G1
 S2 := G1
-mpk#0 := G2
+g2 := G2
+a := ZR
 END :: types
 
 #sig := (S1, S2)
 BEGIN :: precompute
-a := H(M | S1, ZR)
+a_z := H(M_z | S1_z, ZR)
 END :: precompute
 
 BEGIN :: constant 
-mpk#0, pk, mpk#1
+P, g2
 END :: constant
 
-# verify equation
-verify := { e(S2, mpk#1) == e(S1 * pk^a, mpk#0) }
+BEGIN :: public
+pk
+END :: public
+
+BEGIN :: signature
+S1, S2
+END :: signature
+
+BEGIN :: message
+a
+END :: message
+
+# different messages/sigs under different signers
+message := N
+public := N
+signature := N
+
+verify := { e(S2, g2) == e(S1 * pk^a, P) }
+
+BEGIN :: latex
+S1 := S_1
+S2 := S_2
+g2 := g_2
+P := P_{pub}
+END :: latex
+

@@ -1,22 +1,43 @@
+
+name := cyh
 N := 100
-l := 30
+l := 10
 
 BEGIN :: types
 r := ZR
-mpk#1 := G2
+g := G2
 S := G1
 u := G1
 pk := G1
 sk := G1
+h := ZR
 END :: types
 
 BEGIN :: precompute
-h := H(M | L | u, ZR)
-S := sk^(h + r)
+h_z := H(M | L | u_z, ZR)
 END :: precompute
+#S := sk^(h + r)
 
 BEGIN :: constant
-mpk#0, mpk#1
+P, g
 END :: constant
 
-verify := { e((prod{y:=1, l} on (u_y * (pk_y^h_y))) , mpk#0) == e(S, mpk#1) }
+BEGIN :: public
+pk
+END :: public
+
+BEGIN :: signature
+S, u
+END :: signature
+
+BEGIN :: message
+h
+END :: message
+
+# different messages/sigs under different signers
+message := N
+# number of signers already in verify equation
+public := one
+signature := N
+
+verify := { e((prod{y:=1, l} on (u_y * (pk_y^h_y))) , P) == e(S, g) }

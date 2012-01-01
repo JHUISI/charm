@@ -1,4 +1,5 @@
 
+from batchlang import *
 from batchparser import *
 
 Tech_db = Enum('NoneApplied', 'ExpIntoPairing', 'DistributeExpToPairing', 'ProductToSum', 'CombinePairing', 'SplitPairing', 'ConstantPairing')
@@ -463,6 +464,10 @@ class Technique4(AbstractTechnique):
         #print("Metadata =>", meta)
         
     def visit_on(self, node, data):
+        # if see our parent is a PAIR node. if so, BAIL no point applying waters hash
+        if Type(data['parent']) == ops.PAIR:            
+            return
+        
         prod = node.left
         my_val = str(prod.right)
         # check right subnode for another prod node
@@ -492,6 +497,9 @@ class Technique4(AbstractTechnique):
                     self.score   = tech4.ConstantPairing
                     if self.debug: 
                         print("No other transformation necessary since not a PAIR node instead:", Type(node2_parent))
+        else:
+            pass
+            #print("No transformation applied.")
 
     def adjustProdNodes(self, node): 
         if Type(node.left) == ops.ON:

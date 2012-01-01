@@ -321,12 +321,12 @@ class dispatch(object):
                     if meth == self.default:
                         meth = getattr(visitor, self.default)
                     visitor.cache[func_name] = meth # cache for next call
-                    meth(*args)
+                    return meth(*args)
                 else:
                     # call cached function
                     self.hit += 1
                     # print("hitting cache: ", self.hit) 
-                    visitor.cache[func_name](*args)
+                    return visitor.cache[func_name](*args)
             except Exception as e:
                 print(e)
 
@@ -348,15 +348,27 @@ class ASTVisitor(object):
         """Generic visit function or sub nodes"""
         return
         
-    def preorder(self, root_node, parent_node=None, sib_node=None):
+    def preorder(self, root_node, parent_node=None, sib_node=None, pass_info=None):
         if root_node == None: return None
         # if parent_node == None: parent_node = root_node
         info = { 'parent': parent_node, 'sibling': sib_node }
-        self.visit(self.visitor, root_node, info) 
-        self.preorder(root_node.left, root_node, root_node.right)
-        self.preorder(root_node.right, root_node, root_node.left)
+        if pass_info and type(pass_info) == dict: 
+            #print("special info passed: ", pass_info)
+            info.update(pass_info) 
+
+        result = self.visit(self.visitor, root_node, info) 
+
+        # allow other information to be passed between visitation of nodes
+        if result == None: result = pass_info # if no knew information is added from the last visitation then
+        elif type(result) == dict and type(pass_info) == dict: result.update(pass_info) # they passed something else back, so we add to pass_info
+        elif type(result) == dict and pass_info == None: pass # no need to update result dict
+        else: assert False, "can ONLY return dictionaries from visit methods." # should raise an exception here
+        
+        self.preorder(root_node.left, root_node, root_node.right, result)
+        self.preorder(root_node.right, root_node, root_node.left, result)
     
-    def postorder(self, root_node, parent_node=None, sib_node=None):
+    # TODO: need to think about how to pass information when we perform the bottom up tree traversal.
+    def postorder(self, root_node, parent_node=None, sib_node=None, pass_info=None):
         if root_node == None: return None
         # if parent_node == None: parent_node = root_node
         info = { 'parent': parent_node, 'sibling': sib_node }
@@ -364,7 +376,8 @@ class ASTVisitor(object):
         self.postorder(root_node.right, root_node, root_node.left)
         self.visit(self.visitor, root_node, info)
     
-    def inorder(self, root_node, parent_node=None, sib_node=None):
+    # TODO: think about how to pass info when traversing in order. 
+    def inorder(self, root_node, parent_node=None, sib_node=None, pass_info=None):
         if root_node == None: return None
         # if parent_node == None: parent_node = root_node        
         info = { 'parent': parent_node, 'sibling': sib_node }

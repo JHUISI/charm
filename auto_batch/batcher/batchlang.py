@@ -63,9 +63,9 @@ def isNodeInSubtree(node, target):
 def searchNodeType(node, target_type):
 	if node == None: return None
 	elif node.type == target_type: return node		
-	result = searchNode(node.left)
+	result = searchNodeType(node.left, target_type)
 	if result: return result
-	result = searchNode(node.right)		
+	result = searchNodeType(node.right, target_type)		
 	return result
 
 # simplifies checking the type of a given node

@@ -1,4 +1,4 @@
-
+name := hess
 N := 100
 
 BEGIN :: types
@@ -10,15 +10,36 @@ pk := G1
 a := ZR
 END :: types
 
-#S1 := e(h, g2)^s
-#S2 := (sk^a) * (h^s)
-
 BEGIN :: precompute
 a := H(M_z | S1_z, ZR)
 END :: precompute
 
 BEGIN :: constant
-mpk#0, mpk#1
+P, g2
 END :: constant
 
-verify := { e(S2, mpk#1) == ( e(pk, mpk#0)^a ) * S1 }
+BEGIN :: public
+pk
+END :: public
+
+BEGIN :: signature
+S1, S2, S3
+END :: signature
+
+BEGIN :: message
+a
+END :: message
+
+# different messages/sigs under different signers
+message := N
+public := N
+signature := N
+
+verify := { e(S2, g2) == ( e(pk, P)^a ) * S1 }
+
+BEGIN :: latex
+S1 := S_1
+S2 := S_2
+g2 := g_2
+P := P_{pub}
+END :: latex
