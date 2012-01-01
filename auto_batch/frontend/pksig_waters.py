@@ -96,26 +96,26 @@ class WatersSig:
         return False
 
 def main():
-   N = 200
-   l = 5
-   z = 5
-   groupObj = pairing('../param/a.param')
+    N = 200
+    l = 5
+    z = 5
+    groupObj = pairing('../param/a.param')
 
-   waters = WatersSig(groupObj)
-   (mpk, msk) = waters.setup(z)
+    waters = WatersSig(groupObj)
+    (mpk, msk) = waters.setup(z)
 
-   ID = 'janedoe@email.com'
-   sk = waters.keygen(mpk, msk, ID)  
-   if debug:
-    print("Keygen...")
-    print("sk =>", sk)
+    ID = 'janedoe@email.com'
+    sk = waters.keygen(mpk, msk, ID)  
+    if debug:
+        print("Keygen...")
+        print("sk =>", sk)
  
-   M = 'please sign this new message!'
-   sig = waters.sign(mpk, sk, M)
-   if debug: print("Signature...")
+    M = 'please sign this new message!'
+    sig = waters.sign(mpk, sk, M)
+    if debug: print("Signature...")
 
-   assert waters.verify(mpk, ID, M, sig), "invalid signature!"
-   if debug: print("Verification successful!")
+    assert waters.verify(mpk, ID, M, sig), "invalid signature!"
+    if debug: print("Verification successful!")
 
 if __name__ == "__main__":
     debug = True

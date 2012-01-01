@@ -4,11 +4,59 @@ from ASTVarVisitor import *
 from LineInfo import LineInfo
 from StringName import StringName
 from StringValue import StringValue
+from LineNumbers import LineNumbers
 
-'''
 def getLineNosPerVar(varAssignments):
-	if ( (varAssignments == None) or (type(varAssignments).
-'''
+	if ( (varAssignments == None) or (type(varAssignments).__name__ != con.dictTypePython) or (len(varAssignments) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getLineNosPerVar:  problem with variable assignments dictionary passed in.")
+
+	retDict = {}
+
+	for funcName in varAssignments:
+		varsForFunction = varAssignments[funcName]
+		lineNosForOneFunc = {}
+		lineNosObjectsForFunc = []
+		for varListEntry in varsForFunction:
+			varNameAsString = varListEntry.getName().getStringVarName()
+			currentLineNo = varListEntry.getName().getLineNo()
+			if (varNameAsString in lineNosForOneFunc):
+				currentList = lineNosForOneFunc[varNameAsString]
+				if (currentLineNo not in currentList):
+					lineNosForOneFunc[varNameAsString].append(currentLineNo)
+				else:
+					sys.exit("Parser_CodeGen_Toolbox->getLineNosPerVar:  found duplicate variable name <-> line number entry in the variable assignments dictionary passed in.")
+			else:
+				lineNosForOneFunc[varNameAsString] = []
+				lineNosForOneFunc[varNameAsString].append(currentLineNo)
+		for varNameAsString in lineNosForOneFunc:
+			nameEntry = getEquivalentNameObject(varsForFunction, varNameAsString)
+			lineNoListEntry = lineNosForOneFunc[varNameAsString]
+			lineNoListEntry.sort()
+			currentLineNumbersObject = LineNumbers()
+			currentLineNumbersObject.setVarName(nameEntry)
+			currentLineNumbersObject.setLineNosList(lineNoListEntry)
+			lineNosObjectsForFunc.append(copy.deepcopy(currentLineNumbersObject))
+			del currentLineNumbersObject
+		retDict[funcName] = lineNosObjectsForFunc
+
+	if (len(retDict) == 0):
+		sys.exit("Parser_CodeGen_Toolbox->getLineNosPerVar:  could not extract any line-number objects for any of the variables or functions passed in within the variable assignments dictionary.")
+
+	return retDict
+
+def getEquivalentNameObject(variableList, varNameAsString):
+	if ( (variableList == None) or (type(variableList).__name__ != con.listTypePython) or (len(variableList) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getEquivalentNameObject:  problem with variable list parameter passed in.")
+
+	if ( (varNameAsString == None) or (type(varNameAsString).__name__ != con.strTypePython) or (len(varNameAsString) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getEquivalentNameObject:  problem with variable name as string parameter passed in.")
+
+	for varListEntry in variableList:
+		currentVarNameAsString = varListEntry.getName().getStringVarName()
+		if (currentVarNameAsString == varNameAsString):
+			return varListEntry.getName()
+
+	sys.exit("Parser_CodeGen_Toolbox->getEquivalentNameObject:  could not locate an equivalent string name object for the variable name passed in within the variable list passed in.")
 
 def getGlobalDeclVars(node):
 	if (node == None):
