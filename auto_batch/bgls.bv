@@ -1,3 +1,4 @@
+name := bgls
 N := 100
 l := 5
 
@@ -9,12 +10,16 @@ pk := G2
 g2 := G2
 END :: types
 
+BEGIN :: public
+pk
+END :: public
+
 BEGIN :: signature
 sig
 END :: signature
 
 BEGIN :: constant
-g2, pk
+g2
 END :: constant
 
 # dot product of BLS signatures [i=1, L]
@@ -23,8 +28,13 @@ sig := { prod{y := 1, l} on bsig_y }
 abc := b-a
 END :: precompute
 
-BEGIN :: transform
-2, 3, 4
-END :: transform
+#BEGIN :: transform
+#2, 3, 4
+#END :: transform
+
+# different messages/sigs under a single signer
+message := N
+public := l
+signature := N
 
 verify := { e(sig, g2) == (prod{y := 1, l} on e(H(M_y, G1), pk_y)) }
