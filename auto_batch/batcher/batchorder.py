@@ -1,5 +1,5 @@
 from batchparser import *
-from batchtechniques import Tech_db,Technique2,Technique3,Technique4,DistributeDotProducts
+from batchtechniques import Tech_db,Technique2,Technique3,Technique4
 from batchoptimizer import *
 import random
 
