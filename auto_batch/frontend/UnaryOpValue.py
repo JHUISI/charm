@@ -20,7 +20,7 @@ class UnaryOpValue:
 		return self.opType
 
 	def getOpString(self):
-		if (self.opType == uSubTypeAST):
+		if (self.opType == con.uSubTypeAST):
 			return "-"
 
 		sys.exit("UnaryOpValue->getOpString:  self.opType is not one of the supported types.")

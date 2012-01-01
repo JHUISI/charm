@@ -5,6 +5,165 @@ from LineInfo import LineInfo
 from StringName import StringName
 from StringValue import StringValue
 from LineNumbers import LineNumbers
+from VariableDependencies import VariableDependencies
+
+def getVarDependenciesAsStringsForOneVar(variableObj):
+	if ( (variableObj == None) or (type(variableObj).__name__ != con.variable) ):
+		sys.exit("Parser_CodeGen_Toolbox->getVarDependenciesAsStringsForOneVar:  problem with variable object passed in.")
+
+	valueObj = variableObj.getValue()
+	if (valueObj == None):
+		sys.exit("Parser_CodeGen_Toolbox->getVarDependenciesAsStringsForOneVar:  value object extracted from variable object passed in is of None type.")
+
+	valueAsString = valueObj.getStringVarName()
+	if ( (valueAsString == None) or (type(valueAsString).__name__ != con.strTypePython) or (len(valueAsString) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getVarDependenciesAsStringsForOneVar:  problem with string representation of value object extracted from variable object passed in.")
+
+	varsAsStringsList = getVarNamesAsStringsFromLine(valueAsString)
+	if (varsAsStringsList == None):
+		return None
+
+	if ( (type(varsAsStringsList).__name__ != con.listTypePython) or (len(varsAsStringsList) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getVarDependenciesAsStringsForOneVar:  problem with return value from getVarNamesAsStringsFromLine.")
+
+	lenVarList = len(varsAsStringsList)
+
+	for varIndex in range(0, lenVarList):
+		varAsString = varsAsStringsList[varIndex]
+		periodIndex = varAsString.count('.')
+		if (periodIndex == 0):
+			continue
+		if (periodIndex > 1):
+			sys.exit("Parser_CodeGen_Toolbox->getVarDependenciesAsStringsForOneVar:  variable name has more than one period in it.")
+		periodLocation = varAsString.find('.')
+		varsAsStringsList[varIndex] = varAsString[0:periodLocation]
+
+	while (varsAsStringsList.count(con.self) > 0):
+		varsAsStringsList.remove(con.self)
+
+	if (len(varsAsStringsList) == 0):
+		return None
+
+	return varsAsStringsList
+
+def getVar_VarDependencies(varAssignments, globalVars=None):
+	if ( (varAssignments == None) or (type(varAssignments).__name__ != con.dictTypePython) or (len(varAssignments) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getVar_VarDependencies:  problem with variable assignments dictionary passed in.")
+
+	if ( (globalVars != None) and (type(globalVars).__name__ != con.listTypePython) ):
+		sys.exit("Parser_CodeGen_Toolbox->getVar_VarDependencies:  problem with global variables list passed in.")
+
+	if (globalVars == None):
+		globalVarsExist = False
+	else:
+		globalVarsExist = True
+
+	if (globalVarsExist == True):
+		if (len(globalVars) == 0):
+			sys.exit("Parser_CodeGen_Toolbox->getVar_VarDependencies:  globalVars was set to non-None, but is of length zero.")
+
+	globalVarsAsStrings = None
+
+	if (globalVarsExist == True):
+		globalVarsAsStrings = []
+		for globalVarStringName in globalVars:
+			if ( (globalVarStringName == None) or (type(globalVarStringName).__name__ != con.stringName) ):
+				sys.exit("Parser_CodeGen_Toolbox->getVar_VarDependencies:  problem with one of the StringName objects in the global variables list passed in.")
+
+			currentGlobalVarAsString = globalVarStringName.getStringVarName()
+			if ( (currentGlobalVarAsString == None) or (type(currentGlobalVarAsString).__name__ != con.strTypePython) or (len(currentGlobalVarAsString) == 0) ):
+				sys.exit("Parser_CodeGen_Toolbox->getVar_VarDependencies:  problem with string representation of one of the global variable StringName objects within the global variables list passed in.")
+
+			if (currentGlobalVarAsString not in globalVarsAsStrings):
+				globalVarsAsStrings.append(currentGlobalVarAsString)
+
+	retDict = {}
+
+	for funcName in varAssignments:
+		varsForOneFunc = varAssignments[funcName]
+		if ( (varsForOneFunc == None) or (type(varsForOneFunc).__name__ != con.listTypePython) or (len(varsForOneFunc) == 0) ):
+			sys.exit("Parser_CodeGen_Toolbox->getVar_VarDependencies:  problem with one of the variable lists in the variable assignments dictionary passed in.")
+
+		dependenciesForOneFunc = {}
+
+		for varEntry in varsForOneFunc:
+			currentVarNameAsString = varEntry.getName().getStringVarName()
+			if ( (currentVarNameAsString == None) or (type(currentVarNameAsString).__name__ != con.strTypePython) or (len(currentVarNameAsString) == 0) ):
+				sys.exit("Parser_CodeGen_Toolbox->getVar_VarDependencies:  problem with variable name as string within loop over variable assignments dictionary for current function.")
+
+			varDependenciesAsStringsForOneVar = getVarDependenciesAsStringsForOneVar(varEntry)
+			if (varDependenciesAsStringsForOneVar == None):
+				continue
+
+			if (currentVarNameAsString not in dependenciesForOneFunc):
+				dependenciesForOneFunc[currentVarNameAsString] = varDependenciesAsStringsForOneVar
+			else:
+				addVarsToListNoDups(dependenciesForOneFunc[currentVarNameAsString], varDependenciesAsStringsForOneVar)
+
+		if (len(dependenciesForOneFunc) == 0):
+			sys.exit("Parser_CodeGen_Toolbox->getVar_VarDependencies:  could not build dependency list for any of the variables in one of the functions passed in.")
+
+		variableDependenciesObj = buildVariableDependenciesObject(dependenciesForOneFunc)
+		if ( (variableDependenciesObj == None) or (type(variableDependenciesObj).__name__ != con.listTypePython) or (len(variableDependenciesObj) == 0) ):
+			sys.exit("Parser_CodeGen_Toolbox->getVar_VarDependencies:  problem with value returned from buildVariableDependenciesObject.")
+
+		retDict[funcName] = copy.deepcopy(variableDependenciesObj)
+		del variableDependenciesObj
+
+	if (len(retDict) == 0):
+		sys.exit("Parser_CodeGen_Toolbox->getVar_VarDependencies:  could not extract any variable dependency objects for any of the variables in the variable assignment dictionary passed in.")
+
+	return retDict
+
+def buildVariableDependenciesObject(dependenciesDict):
+	if ( (dependenciesDict == None) or (type(dependenciesDict).__name__ != con.dictTypePython) or (len(dependenciesDict) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->buildVariableDependenciesObject:  problem with dependencies dictionary parameter passed in.")
+
+	retList = []
+
+	for varName in dependenciesDict:
+		varDepObj = VariableDependencies()
+		varDependencies = dependenciesDict[varName]
+
+		varNameAsStringName = StringName()
+		varNameAsStringName.setName(varName)
+		varDepObj.setName(copy.deepcopy(varNameAsStringName))
+		del varNameAsStringName
+
+		depList = []
+
+		for dep in varDependencies:
+			depAsStringName = StringName()
+			depAsStringName.setName(dep)
+			depList.append(copy.deepcopy(depAsStringName))
+			del depAsStringName
+
+		varDepObj.setDependenciesList(copy.deepcopy(depList))
+		del depList
+
+		retList.append(copy.deepcopy(varDepObj))
+		del varDepObj
+
+	if (len(retList) == 0):
+		sys.exit("Parser_CodeGen_Toolbox->buildVariableDependenciesObject:  could not build any VariableDependencies objects for any of the variables passed in.")
+
+	return retList
+
+def addVarsToListNoDups(listToAddTo, varList):
+	if ( (listToAddTo == None) or (type(listToAddTo).__name__ != con.listTypePython) or (len(listToAddTo) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->addVarsToListNoDups:  problem with list to add to parameter passed in.")
+
+	if ( (varList == None) or (type(varList).__name__ != con.listTypePython) or (len(varList) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->addVarsToListNoDups:  problem with variable list parameter passed in.")
+
+	for varEntry in varList:
+		if (varEntry == None):
+			sys.exit("Parser_CodeGen_Toolbox->addVarsToListNoDups:  one of the variables in the variable list parameter passed in is of None type.")
+
+		if (varEntry not in listToAddTo):
+			listToAddTo.append(varEntry)
+
+	return listToAddTo
 
 def getLineNosPerVar(varAssignments):
 	if ( (varAssignments == None) or (type(varAssignments).__name__ != con.dictTypePython) or (len(varAssignments) == 0) ):

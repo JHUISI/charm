@@ -16,7 +16,24 @@ class VariableNamesValue:
 		return self.lineNo
 
 	def getStringVarName(self):
-		return None
+		if (self.varNamesList == None):
+			return None
+
+		retString = ""
+
+		for varName in self.varNamesList:
+			if ( (varName == None) or (type(varName).__name__ != con.stringName) ):
+				sys.exit("VariableNamesValue->getStringVarName:  problem with one of the StringName values in self.varNamesList.")
+
+			varNameAsString = varName.getStringVarName()
+			if ( (varNameAsString == None) or (type(varNameAsString).__name__ != con.strTypePython) or (len(varNameAsString) == 0) ):
+				sys.exit("VariableNamesValue->getStringVarName:  problem with string representation of one of the variable names in self.varNamesList.")
+
+			retString += varNameAsString + ", "
+
+		lenRetString = len(retString)
+		retString = retString[0:(lenRetString - 2)]
+		return retString
 
 	def setVarNamesList(self, varNamesList):
 		if ( (varNamesList == None) or (type(varNamesList).__name__ != con.listTypePython) or (len(varNamesList) == 0) ):

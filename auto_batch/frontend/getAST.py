@@ -18,8 +18,9 @@ class AST_Visitor(ast.NodeVisitor):
 		#print(node.id)
 
 	def visit_Global(self, node):
-		for x in node.names:
-			print(x)
+		#for x in node.names:
+			#print(x)
+		print(node.names)
 
 f = open(sys.argv[1], 'r').readlines()
 c = ""

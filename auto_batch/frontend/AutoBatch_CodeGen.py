@@ -37,6 +37,7 @@ numTabsOnVerifyLine = None
 precomputeVars = []
 pythonCodeLines = None
 pythonCodeNode = None
+var_varDependencies = None
 varAssignments = None
 verifyEqNode = None
 verifyFuncArgs = None
@@ -2344,7 +2345,7 @@ def main():
 	global verifyEqNode, functionArgMappings, callListOfVerifyFuncs, linePairsOfVerifyFuncs, verifyFuncArgs, indentationListVerifyLines
 	global numTabsOnVerifyLine, batchVerifierOutput, finalBatchEq, finalBatchEqWithLoops, listVars, numSpacesPerTab, lineInfo
 	global loopBlocksForCachedCalculations, loopBlocksForNonCachedCalculations, lineNosPerVar
-	global lineNoOfFirstFunction, globalVars
+	global lineNoOfFirstFunction, globalVars, var_varDependencies
 
 	try:
 		pythonCodeLines = open(pythonCodeArg, 'r').readlines()
@@ -2501,6 +2502,10 @@ def main():
 	lineNosPerVar = getLineNosPerVar(varAssignments)
 	if ( (lineNosPerVar == None) or (type(lineNosPerVar).__name__ != con.dictTypePython) or (len(lineNosPerVar) == 0) ):
 		sys.exit("AutoBatch_CodeGen->main:  problem with value returned from getLineNosPerVar.")
+
+	var_varDependencies = getVar_VarDependencies(varAssignments, globalVars)
+	if ( (var_varDependencies == None) or (type(var_varDependencies).__name__ != con.dictTypePython) or (len(var_varDependencies) == 0) ):
+		sys.exit("AutoBatch_CodeGen->main:  problem with value returned from getVar_VarDependencies.")
 
 	try:
 		batchVerFile.close()
