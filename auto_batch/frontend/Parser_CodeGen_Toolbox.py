@@ -914,7 +914,9 @@ def writeFunctionFromCodeToString(sourceCodeLines, startLineNo, endLineNo, extra
 		numTabs = determineNumTabsFromSpaces(numSpaces, numSpacesPerTab)
 		numTabsForThisLine = numTabs - numTabsFirstLine
 		line = extractedLines[index].lstrip().rstrip()
-		outputString += getStringOfTabs(extraTabsPerLine + numTabsForThisLine)
+		if ( (extraTabsPerLine + numTabsForThisLine) > 0):
+			outputString += getStringOfTabs(extraTabsPerLine + numTabsForThisLine)
+
 		outputString += line
 		outputString += "\n"
 
