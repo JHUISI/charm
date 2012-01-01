@@ -18,6 +18,10 @@ BEGIN :: signature
 sig
 END :: signature
 
+BEGIN :: message
+M
+END :: message
+
 BEGIN :: constant
 g2
 END :: constant

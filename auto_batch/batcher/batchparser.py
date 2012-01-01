@@ -553,6 +553,7 @@ class CVForMultiSigner:
                 node.setAttrIndex('i')
                 
         if self.isMsg(node) and self.setting[MESSAGE] == self.setting[SIGNATURE]:
+            #print("visiting: ", node, self.setting[ MESSAGE ])
             node.setAttrIndex('z')
     
     def newProdNode(self, key=None, end=None):
