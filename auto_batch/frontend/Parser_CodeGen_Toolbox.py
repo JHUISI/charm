@@ -7,6 +7,74 @@ from StringValue import StringValue
 from LineNumbers import LineNumbers
 from VariableDependencies import VariableDependencies
 
+def getVariablesOfLoopsAsStrings(loopInfo, loopNamesAsStrings):
+	if ( (loopInfo == None) or (type(loopInfo).__name__ != con.listTypePython) or (len(loopInfo) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getVariablesOfLoopsAsStrings:  problem with loop info parameter passed in.")
+
+	if ( (loopNamesAsStrings == None) or (type(loopNamesAsStrings).__name__ != con.listTypePython) or (len(loopNamesAsStrings) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getVariablesOfLoopsAsStrings:  problem with loop names as strings parameter passed in.")
+
+	retList = []
+
+	for loopName in loopNamesAsStrings:
+		if ( (loopName == None) or (type(loopName).__name__ != con.strTypePython) or (isStringALoopName(loopName) == False) ):
+			sys.exit("Parser_CodeGen_Toolbox->getVariablesOfLoopsAsStrings:  problem with one of the loop names in the loop names as strings parameter passed in.")
+
+	for loopInfoObj in loopInfo:
+		if ( (loopInfoObj == None) or (type(loopInfoObj).__name__ != con.loopInfo) ):
+			sys.exit("Parser_CodeGen_Toolbox->getVariablesOfLoopsAsStrings:  problem with one of the loop info objects in the loop info parameter passed in.")
+
+		currentLoopName = loopInfoObj.getLoopName().getStringVarName()
+		if ( (currentLoopName == None) or (type(currentLoopName).__name__ != con.strTypePython) or (isStringALoopName(currentLoopName) == False) ):
+			sys.exit("Parser_CodeGen_Toolbox->getVariablesOfLoopsAsStrings:  problem with string representation of loop name of current loop info object.")
+
+		if (currentLoopName not in loopNamesAsStrings):
+			continue
+
+		currentVarList = loopInfoObj.getVarListNoSubscripts()
+		if ( (currentVarList == None) or (type(currentVarList).__name__ != con.listTypePython) or (len(currentVarList) == 0) ):
+			sys.exit("Parser_CodeGen_Toolbox->getVariablesOfLoopsAsStrings:  problem with the variable list (no subscripts) of the current loop info object in the loop info parameter passed in.")
+
+		for currentLoopVar in currentVarList:
+			if ( (currentLoopVar == None) or (type(currentLoopVar).__name__ != con.stringName) ):
+				sys.exit("Parser_CodeGen_Toolbox->getVariablesOfLoopsAsStrings:  problem with one of the variable StringName objects in the variable list (no subscripts) in the current loop info object.")
+
+			currentLoopVarAsString = currentLoopVar.getStringVarName()
+			if ( (currentLoopVarAsString == None) or (type(currentLoopVarAsString).__name__ != con.strTypePython) or (len(currentLoopVarAsString) == 0) or (currentLoopVarAsString.find(con.loopIndicator) != -1) ):
+				sys.exit("Parser_CodeGen_Toolbox->getVariablesOfLoopsAsStrings:  problem with string representation of one of the variables in the variable list (no subscripts) of the current loop object.")
+
+			if (currentLoopVarAsString not in retList):
+				retList.append(currentLoopVarAsString)
+
+	if (len(retList) == 0):
+		sys.exit("Parser_CodeGen_Toolbox->getVariablesOfLoopsAsStrings:  could not extract any variable names from the parameters passed in.")
+
+	return retList
+
+def getStringNameListAsStringsNoDups(stringNameList):
+	if ( (stringNameList == None) or (type(stringNameList).__name__ != con.listTypePython) or (len(stringNameList) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getStringNameListAsStringsNoDups:  problem with string name list parameter passed in.")
+
+	retList = []
+
+	for stringNameObj in stringNameList:
+		if ( (stringNameObj == None) or (type(stringNameObj).__name__ != con.stringName) ):
+			sys.exit("Parser_CodeGen_Toolbox->getStringNameListAsStringsNoDups:  problem with one of the string name objects in the list parameter passed in.")
+
+		entryAsString = stringNameObj.getStringVarName()
+		if ( (entryAsString == None) or (type(entryAsString).__name__ != con.strTypePython) or (len(entryAsString) == 0) ):
+			sys.exit("Parser_CodeGen_Toolbox->getStringNameListAsStringsNoDups:  problem with string representation of one of the string name objects in the list parameter passed in.")
+
+		if entryAsString in retList:
+			sys.exit("Parser_CodeGen_Toolbox->getStringNameListAsStringsNoDups:  duplicate string found in the list parameter passed in.")
+
+		retList.append(entryAsString)
+
+	if (len(retList) == 0):
+		sys.exit("Parser_CodeGen_Toolbox->getStringNameListAsStringsNoDups:  could not extract any of the strings from the list parameter passed in.")
+
+	return retList
+
 def getVarDependenciesAsStringsForOneVar(variableObj):
 	if ( (variableObj == None) or (type(variableObj).__name__ != con.variable) ):
 		sys.exit("Parser_CodeGen_Toolbox->getVarDependenciesAsStringsForOneVar:  problem with variable object passed in.")
@@ -1059,19 +1127,44 @@ def getFunctionArgsAsStrings(functionArgNames, funcName):
 
 	return argsAsStringsList
 
-def removeLeftParanSpaces(line):
+def removeSpaceBeforeChar(line, char):
 	if ( (line == None) or (type(line).__name__ != con.strTypePython) or (len(line) == 0) ):
-		sys.exit("Parser_CodeGen_Toolbox->removeLeftParanSpaces:  problem with line parameter passed in.")
+		sys.exit("Parser_CodeGen_Toolbox->removeSpaceBeforeChar:  problem with line parameter passed in.")
 
-	nextLParanIndex = line.find(con.lParan)
+	if ( (char == None) or (type(char).__name__ != con.strTypePython) or (len(char) != 1) ):
+		sys.exit("Parser_CodeGen_Toolbox->removeSpaceBeforeChar:  problem with character parameter passed in.")
 
-	while (nextLParanIndex != -1):
-		if ( (nextLParanIndex > 0) and (line[nextLParanIndex - 1] == con.space) ):
+	nextIndex = line.find(char)
+
+	while (nextIndex != -1):
+		if ( (nextIndex > 0) and (line[nextIndex - 1] == con.space) ):
 			lenOfLine = len(line)
-			line = line[0:(nextLParanIndex - 1)] + line[nextLParanIndex:lenOfLine]
-			nextLParanIndex = line.find(con.lParan, nextLParanIndex)
+			line = line[0:(nextIndex - 1)] + line[nextIndex:lenOfLine]
+			nextIndex = line.find(char, nextIndex)
 		else:
-			nextLParanIndex = line.find(con.lParan, (nextLParanIndex + 1))
+			nextIndex = line.find(char, (nextIndex + 1))
+
+	return line
+
+def removeSpaceAfterChar(line, char):
+	if ( (line == None) or (type(line).__name__ != con.strTypePython) or (len(line) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->removeSpaceAfterChar:  problem with line parameter passed in.")
+
+	if ( (char == None) or (type(char).__name__ != con.strTypePython) or (len(char) != 1) ):
+		sys.exit("Parser_CodeGen_Toolbox->removeSpaceAfterChar:  problem with character parameter passed in.")
+
+	nextIndex = line.find(char)
+
+	while (nextIndex != -1):
+		lenLine = len(line)
+		if (nextIndex == (lenLine - 2) ):
+			break
+
+		if (line[nextIndex + 1] == con.space):
+			line = line[0:(nextIndex + 1)] + line[(nextIndex + 2):lenLine]
+			nextIndex = line.find(char, (nextIndex + 1))
+		else:
+			nextIndex = line.find(char, (nextIndex + 2))
 
 	return line
 
@@ -1110,7 +1203,8 @@ def writeFunctionFromCodeToString(sourceCodeLines, startLineNo, endLineNo, extra
 		firstLine = firstLine.replace(con.selfFuncArgString, con.space)
 
 	firstLine = firstLine.lstrip()
-	firstLine = removeLeftParanSpaces(firstLine)
+	firstLine = removeSpaceBeforeChar(firstLine, con.lParan)
+	firstLine = removeSpaceAfterChar(firstLine, '-')
 	outputString += firstLine
 	outputString += "\n"
 

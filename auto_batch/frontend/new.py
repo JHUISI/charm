@@ -1,5 +1,4 @@
-def func_name(x):
-	return "dictName"
+def __init__(x):
+	print(x)
 
-x = {func_name(4):5}
-print(x["dictName"])
+__init__("hello")

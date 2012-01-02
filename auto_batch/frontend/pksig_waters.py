@@ -17,7 +17,7 @@ from toolbox.conversion import Conversion
 from toolbox.bitstring import Bytes
 import hashlib
 
-debug = False
+#debug = False
 
 class WatersSig:
 
@@ -96,6 +96,8 @@ class WatersSig:
         return False
 
 def main():
+    global debug
+    debug = False
     N = 200
     l = 5
     z = 5

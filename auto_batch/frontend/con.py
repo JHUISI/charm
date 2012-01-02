@@ -41,6 +41,7 @@ hashType = 'hash'
 hashTypesCharm = ['hash', 'H', 'H2']
 hashValue = 'HashValue'
 indexTypeAST = 'Index'
+initFuncName = '__init__'
 initType = 'init'
 initValue = 'InitValue'
 integerValue = 'IntegerValue'
