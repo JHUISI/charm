@@ -131,7 +131,7 @@ class GetLastLineOfFunction(ast.NodeVisitor):
 
 	def getLastLine(self):
 		if (self.lastLine == 0):
-			return None
+			sys.exit("ASTParser->GetLastLineOfFunction->getLastLine:  could not extract the last line of the function node passed in.")
 
 		return self.lastLine
 
@@ -1375,6 +1375,35 @@ class ASTParser:
 			sys.exit("ASTParser->setBaseNode:  node passed in is of None type.")
 
 		self.baseNode = node
+
+	def getForLoopIterNode(self, node):
+		if ( (node == None) or (type(node).__name__ != con.forLoopTypeAST) ):
+			sys.exit("ASTParser->getForLoopIterNode:  problem with node passed in to function.")
+
+		try:
+			forLoopIterNode = node.iter
+		except:
+			sys.exit("ASTParser->getForLoopIterNode:  could not extract iter node from for loop node passed in.")
+
+		return forLoopIterNode
+
+	def getTargetNameOfForLoopAsStringName(self, node):
+		if ( (node == None) or (type(node).__name__ != con.forLoopTypeAST) ):
+			sys.exit("ASTParser->getTargetNameOfForLoopAsStringName:  problem with node passed in.")
+
+		try:
+			forLoopTargetName = node.target.id
+		except:
+			sys.exit("ASTParser->getTargetNameOfForLoopAsStringName:  could not extract the target name of the for loop node passed in.")
+
+		targetNameAsStringName = StringName()
+		targetNameAsStringName.setName(forLoopTargetName)
+		lineNo = self.getLineNumberOfNode(node)
+		if ( (lineNo == None) or (type(lineNo).__name__ != con.intTypePython) or (lineNo < 1) ):
+			sys.exit("ASTParser->getTargetNameOfForLoopAsStringName:  problem with value returned from self.getLineNumberOfNode.")
+
+		targetNameAsStringName.setLineNo(lineNo)
+		return targetNameAsStringName
 
 	def getAssignLeftSideNode(self, node):
 		if (node == None):

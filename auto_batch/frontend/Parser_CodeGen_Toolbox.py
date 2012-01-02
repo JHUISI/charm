@@ -7,6 +7,128 @@ from StringValue import StringValue
 from LineNumbers import LineNumbers
 from VariableDependencies import VariableDependencies
 
+def getImpactingLineNosRecursive(varName, funcName, lineNosPerVar, var_varDependencies, retLineNos, varNamesAlreadyVisited):
+	if ( (varName == None) or (type(varName).__name__ != con.strTypePython) or (len(varName) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  problem with variable name parameter passed in.")
+
+	if ( (lineNosPerVar == None) or (type(lineNosPerVar).__name__ != con.dictTypePython) or (len(lineNosPerVar) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  problem with lineNosPerVar parameter passed in.")
+
+	if ( (var_varDependencies == None) or (type(var_varDependencies).__name__ != con.dictTypePython) or (len(var_varDependencies) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  problem with var_varDependencies parameter passed in.")
+
+	if ( (retLineNos == None) or (type(retLineNos).__name__ != con.listTypePython) ):
+		sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  problem with retLineNos parameter passed in.")
+
+	if ( (varNamesAlreadyVisited == None) or (type(varNamesAlreadyVisited).__name__ != con.listTypePython) ):
+		sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  problem with varNamesAlreadyVisited parameter passed in.")
+
+	if ( (funcName == None) or (type(funcName).__name__ != con.strTypePython) or (funcName not in lineNosPerVar) or (funcName not in var_varDependencies) ):
+		sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  problem with function name parameter passed in.")
+
+	lineNosForFunction = lineNosPerVar[funcName]
+	if ( (lineNosForFunction == None) or (type(lineNosForFunction).__name__ != con.listTypePython) or (len(lineNosForFunction) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  problem with line numbers extracted for the function name passed in.")
+
+	foundVariablePassedIn = False
+
+	for lineNoObj in lineNosForFunction:
+		if ( (lineNoObj == None) or (type(lineNoObj).__name__ != con.lineNumbers) ):
+			sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  problem with LineNumbers object extracted from lineNosPerVar[funcName].")
+
+		currentVarName = lineNoObj.getVarName().getStringVarName()
+		if ( (currentVarName == None) or (type(currentVarName).__name__ != con.strTypePython) or (len(currentVarName) == 0) ):
+			sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  problem with variable name represented as string, extracted from current LineNumbers object in lineNosPerVar[funcName].")
+
+		if (currentVarName != varName):
+			continue
+
+		if (foundVariablePassedIn == True):
+			sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  found duplicate variable names in lineNosPerVar parameter passed in for function name passed in.")
+
+		foundVariablePassedIn = True
+
+		lineNosForCurrentVar = lineNoObj.getLineNosList()
+		if ( (lineNosForCurrentVar == None) or (type(lineNosForCurrentVar).__name__ != con.listTypePython) or (len(lineNosForCurrentVar) == 0) ):
+			sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  problem with line numbers list extracted from current LineNumbers object.")
+
+		for currentLineNo in lineNosForCurrentVar:
+			if ( (currentLineNo == None) or (type(currentLineNo).__name__ != con.intTypePython) or (currentLineNo < 1) ):
+				sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  problem with integer representation of one of the line numbers in the line number list of one of the LineNumbers objects.")
+
+			if (currentLineNo not in retLineNos):
+				retLineNos.append(currentLineNo)
+
+	varDepsForFunc = var_varDependencies[funcName]
+	if ( (varDepsForFunc == None) or (type(varDepsForFunc).__name__ != con.listTypePython) or (len(varDepsForFunc) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  problem with variable dependencies list extracted from var_varDependencies for function name passed in.")
+
+	foundVariableNamePassedIn = False
+
+	for currentVarDep in varDepsForFunc:
+		if ( (currentVarDep == None) or (type(currentVarDep).__name__ != con.variableDependencies) ):
+			sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  problem with variable dependencies object extracted from var_varDependencies for function name passed in.")
+
+		currentVarName = currentVarDep.getName().getStringVarName()
+		if ( (currentVarName == None) or (type(currentVarName).__name__ != con.strTypePython) or (len(currentVarName) == 0) ):
+			sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  problem with variable name as string in one of the VariableDependencies object in var_varDependencies[funcName].")
+
+		if (currentVarName != varName):
+			continue
+
+		if (foundVariableNamePassedIn == True):
+			sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  found duplicate variable names in var_varDependencies[funcName].")
+
+		foundVariableNamePassedIn = True
+
+		currentDepList = currentVarDep.getDependenciesList()
+		if ( (currentDepList == None) or (type(currentDepList).__name__ != con.listTypePython) or (len(currentDepList) == 0) ):
+			sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  problem with dependencies list extracted from current VariablesDependencies object in var_varDependencies[funcName].")
+
+		for currentDepEntry in currentDepList:
+			if ( (currentDepEntry == None) or (type(currentDepEntry).__name__ != con.stringName) ):
+				sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  problem with StringName object in the dependency list of current VariableDependencies object.")
+
+			currentDepEntryNameAsString = currentDepEntry.getStringVarName()
+			if ( (currentDepEntryNameAsString == None) or (type(currentDepEntryNameAsString).__name__ != con.strTypePython) or (len(currentDepEntryNameAsString) == 0) ):
+				sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  problem with string representation of current entry in dependencies list of current VariableDependencies object.")
+
+			if (currentDepEntryNameAsString in varNamesAlreadyVisited):
+				continue
+
+			varNamesAlreadyVisited.append(currentDepEntryNameAsString)
+
+			getImpactingLineNosRecursive(currentDepEntryNameAsString, funcName, lineNosPerVar, var_varDependencies, retLineNos, varNamesAlreadyVisited)
+
+def getAllLineNosThatImpactVarList(varList, funcName, lineNosPerVar, var_varDependencies):
+	if ( (varList == None) or (type(varList).__name__ != con.listTypePython) or (len(varList) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getAllLineNosThatImpactVarList:  problem with variable list passed in.")
+
+	if ( (lineNosPerVar == None) or (type(lineNosPerVar).__name__ != con.dictTypePython) or (len(lineNosPerVar) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getAllLineNosThatImpactVarList:  problem with lineNosPerVar dictionary passed in.")
+
+	if ( (var_varDependencies == None) or (type(var_varDependencies).__name__ != con.dictTypePython) or (len(var_varDependencies) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getAllLineNosThatImpactVarList:  problem with var_varDependencies parameter passed in.")
+
+	if ( (funcName == None) or (type(funcName).__name__ != con.strTypePython) or (funcName not in lineNosPerVar) or (funcName not in var_varDependencies) ):
+		sys.exit("Parser_CodeGen_Toolbox->getAllLineNosThatImpactVarList:  problem with function name parameter passed in.")
+
+	retLineNos = []
+	varNamesAlreadyVisited = []
+
+	for varName in varList:
+		if ( (varName == None) or (type(varName).__name__ != con.strTypePython) or (len(varName) == 0) ):
+			sys.exit("Parser_CodeGen_Toolbox->getAllLineNosThatImpactVarList:  problem with variable name in the variable list parameter passed in.")
+
+		getImpactingLineNosRecursive(varName, funcName, lineNosPerVar, var_varDependencies, retLineNos, varNamesAlreadyVisited)
+
+	if (len(retLineNos) == 0):
+		return None
+
+	retLineNos.sort()
+
+	return retLineNos
+
 def getVariablesOfLoopsAsStrings(loopInfo, loopNamesAsStrings):
 	if ( (loopInfo == None) or (type(loopInfo).__name__ != con.listTypePython) or (len(loopInfo) == 0) ):
 		sys.exit("Parser_CodeGen_Toolbox->getVariablesOfLoopsAsStrings:  problem with loop info parameter passed in.")

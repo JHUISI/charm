@@ -88,6 +88,9 @@ class WatersSig:
         k = self.strToId(mpk, ID)
         m = self.strToId(mpk, M)
         (S1, S2, S3) = sig['S1'], sig['S2'], sig['S3']
+        x = m
+        for i in range(0, x):
+            S1 = 4 * i
         A, g2 = mpk['A'], mpk['g2']
         comp1 = dotprod(group.init(G2), -1, mpk['z'], lam_func, mpk['ub'], k)
         comp2 = dotprod(group.init(G2), -1, mpk['z'], lam_func, mpk['ub'], m)

@@ -637,6 +637,31 @@ class ASTVarVisitor(ast.NodeVisitor):
 			variableToAdd.getValue().setLineNo(rightLineNo)
 			self.varAssignments.append(variableToAdd)
 
+	def visit_For(self, node):
+		targetNameAsStringName = self.myASTParser.getTargetNameOfForLoopAsStringName(node)
+		if ( (targetNameAsStringName == None) or (type(targetNameAsStringName).__name__ != con.stringName) ):
+			sys.exit("ASTVarVisitor->visit_For:  problem with value returned from ASTParser->getTargetNameOfForLoopAsStringName.")
+
+		forLoopIterNode = self.myASTParser.getForLoopIterNode(node)
+		if (forLoopIterNode == None):
+			sys.exit("ASTVarVisitor->visit_For:  value returned from ASTParser->getForLoopIterNode is of None type.")
+
+		processedIterNode = self.processNode(forLoopIterNode)
+		if (processedIterNode == None):
+			sys.exit("ASTVarVisitor->visit_For:  problem with value returned from processNode on the for loop iter node.")
+
+		variableToAdd = Variable()
+		variableToAdd.setName(targetNameAsStringName)
+		variableToAdd.setValue(processedIterNode)
+
+		leftLineNo = self.myASTParser.getLineNumberOfNode(node)
+		rightLineNo = self.myASTParser.getLineNumberOfNode(forLoopIterNode)
+
+		variableToAdd.getName().setLineNo(leftLineNo)
+		variableToAdd.getValue().setLineNo(rightLineNo)
+
+		self.varAssignments.append(variableToAdd)
+
 	def visit_Name(self, node):
 		nameToAdd = self.processNode(node)
 		if (nameToAdd != None):

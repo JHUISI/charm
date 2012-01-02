@@ -2447,7 +2447,9 @@ def writeOneBlockToFile(block, numBaseTabs):
 	blockLoopsWithVarsToCalc = block.getLoopsWithVarsToCalculate()
 	blockLoopsWithVarsAsStrings = getStringNameListAsStringsNoDups(blockLoopsWithVarsToCalc)
 	variablesToCalculateAsStrings = getVariablesOfLoopsAsStrings(loopInfo, blockLoopsWithVarsAsStrings)
-	lineNosToWriteToFile = getAllLineNosThatImpactVarList(variablesToCalculateAsStrings, 
+	lineNosToWriteToFile = getAllLineNosThatImpactVarList(variablesToCalculateAsStrings, con.verifyFuncName, lineNosPerVar, var_varDependencies)
+	if (lineNosToWriteToFile != None):
+		print(lineNosToWriteToFile)
 
 def writeBodyOfCachedCalcsForBatch():
 	if ( (loopBlocksForCachedCalculations == None) or (type(loopBlocksForCachedCalculations).__name__ != con.listTypePython) or (len(loopBlocksForCachedCalculations) == 0) ):
