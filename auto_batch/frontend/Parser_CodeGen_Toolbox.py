@@ -1518,9 +1518,37 @@ def getLinesFromSourceCodeWithinRange(lines, startLine, endLine, indentationList
 	for line in lines:
 		if (lineCounter > endLine):
 			if (len(retLines) == 0):
-				return None
+				sys.exit("Parser_CodeGen_Toolbox->getLinesFromSourceCodeWithinRange:  could not extract any lines from the source code lines passed in.")
 			return retLines
 		if (lineCounter >= startLine):
+			numIndentedSpaces = getNumIndentedSpaces(line)
+			tempLine = line.lstrip().rstrip()
+			retLines.append(tempLine)
+			indentationList.append(numIndentedSpaces)
+		lineCounter += 1
+
+def getSourceCodeLinesFromLineList(sourceCodeLines, lineList, indentationList):
+	if ( (sourceCodeLines == None) or (type(sourceCodeLines).__name__ != con.listTypePython) or (len(sourceCodeLines) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getSourceCodeLinesFromLineList:  problem with source code lines passed in.")
+
+	if ( (lineList == None) or (type(lineList).__name__ != con.listTypePython) or (len(lineList) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getSourceCodeLinesFromLineList:  problem with line list parameter passed in.")
+
+	if ( (indentationList == None) or (type(indentationList).__name__ != con.listTypePython) ):
+		sys.exit("Parser_CodeGen_Toolbox->getSourceCodeLinesFromLineList:  problem with indentation list parameter passed in.")
+
+	retLines = []
+	lineCounter = 1
+
+	lineList.sort()
+	lastLine = lineList[len(lineList) - 1]
+
+	for line in sourceCodeLines:
+		if (lineCounter > lastLine):
+			if (len(retLines) == 0):
+				sys.exit("Parser_CodeGen_Toolbox->getSourceCodeLinesFromLineList:  could not extract any lines from the source code lines passed in.")
+			return retLines
+		if (lineCounter in lineList):
 			numIndentedSpaces = getNumIndentedSpaces(line)
 			tempLine = line.lstrip().rstrip()
 			retLines.append(tempLine)

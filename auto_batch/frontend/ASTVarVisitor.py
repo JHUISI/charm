@@ -662,6 +662,8 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		self.varAssignments.append(variableToAdd)
 
+		ast.NodeVisitor.generic_visit(self, node)
+
 	def visit_Name(self, node):
 		nameToAdd = self.processNode(node)
 		if (nameToAdd != None):

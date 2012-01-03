@@ -1,2 +1,2 @@
-for i in range(0, 10):
-	x = 1
+for i in range(0, 1):
+	x = 4 * 5

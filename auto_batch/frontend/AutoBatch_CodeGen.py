@@ -2260,15 +2260,20 @@ def addGroupMembershipChecksToInd():
 
 	individualVerFile.write(individualOutputString)
 
-def writeBodyOfInd():
-	global individualVerFile
+def writeLinesToOutputString(lines, indentationListParam, baseNumTabs):
+	if ( (lines == None) or (type(lines).__name__ != con.listTypePython) or (len(lines) == 0) ):
+		sys.exit("AutoBatch_CodeGen->writeLinesToOutputString:  problem with lines parameter passed in.")
 
+	if ( (indentationListParam == None) or (type(indentationListParam).__name__ != con.listTypePython) or (len(indentationListParam) != len(lines) ) ):
+		sys.exit("AutoBatch_CodeGen->writeLinesToOutputString:  problem with indentation list parameter passed in.")
+
+	if ( (baseNumTabs == None) or (type(baseNumTabs).__name__ != con.intTypePython) or (baseNumTabs < 0) ):
+		sys.exit("AutoBatch_CodeGen->writeLinesToOutputString:  problem with base number of tabs parameter passed in.")
+
+	outputString = ""
 	lineNumber = -1
-	individualOutputString = ""
 
-	argsToCheckForGroupMembership = []
-
-	for line in verifyLines:
+	for line in lines:
 		lineNumber += 1
 		if (isLineOnlyWhiteSpace(line) == True):
 			continue
@@ -2291,10 +2296,22 @@ def writeBodyOfInd():
 		line = removeSpaceBeforeChar(line, con.lParan)
 		line = removeSpaceAfterChar(line, '-')
 		line = line.replace(con.selfFuncCallString, con.space)
-		numTabs = determineNumTabsFromSpaces(indentationListVerifyLines[lineNumber], numSpacesPerTab) - numTabsOnVerifyLine
+		numTabs = determineNumTabsFromSpaces(indentationListParam[lineNumber], numSpacesPerTab) - baseNumTabs
 		numTabs += 1
-		individualOutputString += getStringOfTabs(numTabs)
-		individualOutputString += line + "\n"
+		outputString += getStringOfTabs(numTabs)
+		outputString += line + "\n"
+
+	if (len(outputString) == 0):
+		sys.exit("AutoBatch_CodeGen->writeLinesToOutputString:  could not form any lines for the output string.")
+
+	return outputString
+
+def writeBodyOfInd():
+	global individualVerFile
+
+	individualOutputString = writeLinesToOutputString(verifyLines, indentationListVerifyLines, numTabsOnVerifyLine)
+	if ( (individualOutputString == None) or (type(individualOutputString).__name__ != con.strTypePython) or (len(individualOutputString) == 0) ):
+		sys.exit("AutoBatch_CodeGen->writeBodyOfInd:  problem with value returned from writeLinesToOutputString.")
 
 	individualOutputString += "\t\t\tpass\n"
 	individualOutputString += "\t\telse:\n"
@@ -2449,7 +2466,10 @@ def writeOneBlockToFile(block, numBaseTabs):
 	variablesToCalculateAsStrings = getVariablesOfLoopsAsStrings(loopInfo, blockLoopsWithVarsAsStrings)
 	lineNosToWriteToFile = getAllLineNosThatImpactVarList(variablesToCalculateAsStrings, con.verifyFuncName, lineNosPerVar, var_varDependencies)
 	if (lineNosToWriteToFile != None):
-		print(lineNosToWriteToFile)
+		indentationListParam = []
+		sourceLinesToWriteToFile = getSourceCodeLinesFromLineList(copy.deepcopy(pythonCodeLines), lineNosToWriteToFile, indentationListParam)
+		batchOutputString = writeLinesToOutputString(sourceLinesToWriteToFile, indentationListParam, numTabsOnVerifyLine)
+		batchVerFile.write(batchOutputString)
 
 def writeBodyOfCachedCalcsForBatch():
 	if ( (loopBlocksForCachedCalculations == None) or (type(loopBlocksForCachedCalculations).__name__ != con.listTypePython) or (len(loopBlocksForCachedCalculations) == 0) ):
@@ -2457,6 +2477,35 @@ def writeBodyOfCachedCalcsForBatch():
 
 	for block in loopBlocksForCachedCalculations:
 		writeOneBlockToFile(block, 1)
+
+def writeDictDefsOfCachedCalcsForBatch():
+	global batchVerFile
+
+	if ( (loopBlocksForCachedCalculations == None) or (type(loopBlocksForCachedCalculations).__name__ != con.listTypePython) or (len(loopBlocksForCachedCalculations) == 0) ):
+		sys.exit("AutoBatch_CodeGen->writeDictDefsOfCachedCalcsForBatch:  problem with loopBlocksForCachedCalculations global variable.")
+
+	loopList = []
+
+	for block in loopBlocksForCachedCalculations:
+		if (block.getLoopsWithVarsToCalculate() != None):
+			for loop in block.getLoopsWithVarsToCalculate():
+				loopName = loop.getStringVarName()
+				if (loopName not in loopList):
+					loopList.append(loopName)
+
+		if (block.getLoopsToCalculate() != None):
+			for loop in block.getLoopsToCalculate():
+				loopName = loop.getStringVarName()
+				if (loopName not in loopList):
+					loopList.append(loopName)
+
+	batchOutputString = ""
+
+	for loopName in loopList:
+		batchOutputString += "\t" + loopName + " = {}\n"
+
+	batchOutputString += "\n"
+	batchVerFile.write(batchOutputString)
 
 def main():
 	if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
@@ -2662,6 +2711,7 @@ def main():
 	if ( (var_varDependencies == None) or (type(var_varDependencies).__name__ != con.dictTypePython) or (len(var_varDependencies) == 0) ):
 		sys.exit("AutoBatch_CodeGen->main:  problem with value returned from getVar_VarDependencies.")
 
+	writeDictDefsOfCachedCalcsForBatch()
 	writeBodyOfCachedCalcsForBatch()
 
 	try:
