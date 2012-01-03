@@ -78,8 +78,8 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if (valueNode == None):
 			sys.exit("ASTVarVisitor->buildSubscriptName:  value returned from getSubscriptValueNode is of None type.")
 
-		if ( (type(valueNode).__name__ != con.nameOnlyTypeAST) and (type(valueNode).__name__ != con.callTypeAST) ):
-			sys.exit("ASTVarVisitor->buildSubscriptName:  value returned from getSubscriptValueNode is neither of type " + con.nameOnlyTypeAST + " nor of type " + con.callTypeAST + ".")
+		#if ( (type(valueNode).__name__ != con.nameOnlyTypeAST) and (type(valueNode).__name__ != con.callTypeAST) ):
+			#sys.exit("ASTVarVisitor->buildSubscriptName:  value returned from getSubscriptValueNode is neither of type " + con.nameOnlyTypeAST + " nor of type " + con.callTypeAST + ".")
 
 		sliceTypeStringName = self.myASTParser.getSubscriptSliceTypeAsStringName(node)
 		if ( (sliceTypeStringName == None) or (type(sliceTypeStringName).__name__ != con.stringName) ):

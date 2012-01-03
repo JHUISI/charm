@@ -7,6 +7,42 @@ from StringValue import StringValue
 from LineNumbers import LineNumbers
 from VariableDependencies import VariableDependencies
 
+def getExpressionFromLoopInfoList(loopInfo, loopName):
+	if ( (loopInfo == None) or (type(loopInfo).__name__ != con.listTypePython) or (len(loopInfo) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->getExpressionFromLoopInfoList:  problem with loop info list parameter passed in.")
+
+	if ( (loopName == None) or (type(loopName).__name__ != con.strTypePython) or (isStringALoopName(loopName) == False) ):
+		sys.exit("Parser_CodeGen_Toolbox->getExpressionFromLoopInfoList:  problem with loop name parameter passed in.")
+
+	foundIt = False
+	expressionAsString = None
+
+	for loopInfoObj in loopInfo:
+		if ( (loopInfoObj == None) or (type(loopInfoObj).__name__ != con.loopInfo) ):
+			sys.exit("Parser_CodeGen_Toolbox->getExpressionFromLoopInfoList:  problem with one of the loop info objects in the loop info list parameter passed in.")
+
+		currentLoopName = loopInfoObj.getLoopName().getStringVarName()
+		if ( (currentLoopName == None) or (type(currentLoopName).__name__ != con.strTypePython) or (isStringALoopName(currentLoopName) == False) ):
+			sys.exit("Parser_CodeGen_Toolbox->getExpressionFromLoopInfoList:  problem with loop name as string for one of the loop info objects in the loop info list passed in.")
+
+		if (currentLoopName != loopName):
+			continue
+
+		if (foundIt == True):
+			sys.exit("Parser_CodeGen_Toolbox->getExpressionFromLoopInfoList:  found duplicate entries in loop info parameter passed in with the same loop name.")
+
+		foundIt = True
+
+		expressionAsString = loopInfoObj.getExpression().getStringVarName()
+
+		if ( (expressionAsString == None) or (type(expressionAsString).__name__ != con.strTypePython) or (len(expressionAsString) == 0) ):
+			sys.exit("Parser_CodeGen_Toolbox->getExpressionFromLoopInfoList:  problem with string representation of expression of matching loop info object from loop info list passed in.")
+
+	if (expressionAsString == None):
+		sys.exit("Parser_CodeGen_Toolbox->getExpressionFromLoopInfoList:  could not extract expression of loop name parameter passed in from loop info list passed in.")
+
+	return expressionAsString
+
 def getImpactingLineNosRecursive(varName, funcName, lineNosPerVar, var_varDependencies, retLineNos, varNamesAlreadyVisited):
 	if ( (varName == None) or (type(varName).__name__ != con.strTypePython) or (len(varName) == 0) ):
 		sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  problem with variable name parameter passed in.")

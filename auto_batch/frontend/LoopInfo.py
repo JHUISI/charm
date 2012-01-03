@@ -133,8 +133,13 @@ class LoopInfo:
 		self.loopOrder = loopOrder
 
 	def setExpression(self, expression):
-		if ( (expression == None) or (type(expression).__name__ != con.strTypePython) or (len(expression) == 0) ):
-			sys.exit("LoopInfo->setExpression:  problem with expression passed in.")
+		if ( (expression == None) or (type(expression).__name__ != con.stringValue) ):
+			sys.exit("LoopInfo->setExpression:  problem with expression parameter passed in.")
+
+		expressionAsString = expression.getStringVarName()
+
+		if ( (expressionAsString == None) or (type(expressionAsString).__name__ != con.strTypePython) or (len(expressionAsString) == 0) ):
+			sys.exit("LoopInfo->setExpression:  problem with string representation of expression parameter passed in.")
 
 		self.expression = expression
 

@@ -133,8 +133,8 @@ def areLoopingParamsOfBlockAndLoopEqual(block, loop):
 	if (block.getLoopOverValue().getStringVarName() != loop.getLoopOverValue().getStringVarName() ):
 		return False
 
-	if (block.getOperation().getStringVarName() != loop.getOperation().getStringVarName() ):
-		return False
+	#if (block.getOperation().getStringVarName() != loop.getOperation().getStringVarName() ):
+		#return False
 
 	return True
 
@@ -312,7 +312,8 @@ def isSingleBlockInCurrentList(loop, blocksMadeSoFar):
 		if ( (currLoopOrderAsString == None) or (type(currLoopOrderAsString).__name__ != con.strTypePython) or (len(currLoopOrderAsString) == 0) ):
 			sys.exit("Loop_Block_Toolbox->isSingleBlockInCurrentList:  problem with loop order as string obtained from current block in blocks made so far parameter passed in.")
 
-		if ( (currStartVal == loopStartValue) and (currLoopOverVal == loopOverValue) and (currOperation == loopOperation) and (currLoopOrderAsString == loopOrderAsString) ):
+		#if ( (currStartVal == loopStartValue) and (currLoopOverVal == loopOverValue) and (currOperation == loopOperation) and (currLoopOrderAsString == loopOrderAsString) ):
+		if ( (currStartVal == loopStartValue) and (currLoopOverVal == loopOverValue) and (currLoopOrderAsString == loopOrderAsString) ):
 			retBlocks.append(indBlock)
 
 	if (len(retBlocks) == 0):

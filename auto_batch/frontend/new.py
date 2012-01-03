@@ -1,2 +1,6 @@
-for i in range(0, 1):
-	x = 4 * 5
+x = [4, 5]
+
+for i in x:
+	i = i + 1
+
+print(x)
