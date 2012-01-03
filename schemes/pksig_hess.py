@@ -12,7 +12,7 @@ Hess - Identity-based Signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from charm.pairing import *
+from toolbox.pairinggroup import PairingGroup,G1,G2,ZR,pair
 from toolbox.PKSig import PKSig
 #import gc
 #gc.disable()
@@ -27,8 +27,8 @@ class CHCH(PKSig):
         
     def setup(self):
         global H1,H2
-        H1 = lambda x: group.H(x, G1)
-        H2 = lambda x,y: group.H((x,y), ZR)
+        H1 = lambda x: group.hash(x, G1)
+        H2 = lambda x,y: group.hash((x,y), ZR)
         g2, alpha = group.random(G2), group.random(ZR)
         msk = alpha
         P = g2 ** alpha 
@@ -61,7 +61,7 @@ class CHCH(PKSig):
 
 def main():
    
-   groupObj = pairing('../param/a.param')
+   groupObj = PairingGroup('../param/a.param')
    chch = CHCH(groupObj)
    (mpk, msk) = chch.setup()
 

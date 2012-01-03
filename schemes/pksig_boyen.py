@@ -13,7 +13,8 @@ Xavier Boyen - Anonymous Ring Signatures
 :Date:       11/2011
 
 """
-from charm.pairing import *
+#from charm.pairing import *
+from toolbox.pairinggroup import *
 from toolbox.PKSig import PKSig
 #from toolbox.iterate import dotprod
 
@@ -27,7 +28,7 @@ class Boyen(PKSig):
     
     def setup(self):
         global H
-        H = lambda a: group.H(('1', str(a)), ZR)
+        H = lambda a: group.hash(('1', str(a)), ZR)
         g1, g2 = group.random(G1), group.random(G2)
         a = [group.random(ZR) for i in range(3)]
         A = []; At = [];
@@ -104,7 +105,7 @@ class Boyen(PKSig):
         return False
 
 def main():
-   groupObj = pairing('../param/d224.param')
+   groupObj = PairingGroup('../param/d224.param')
    boyen = Boyen(groupObj)
    mpk = boyen.setup()
    if debug: print("Pub parameters")
