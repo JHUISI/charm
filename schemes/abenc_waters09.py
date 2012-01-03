@@ -22,7 +22,7 @@ class CPabe09(ABEnc):
     def __init__(self, groupObj):
         ABEnc.__init__(self)
         global util, group
-        util = SecretUtil(groupObj.Pairing, groupObj._verbose)        
+        util = SecretUtil(groupObj, groupObj._verbose)        
         group = groupObj
                         
     def setup(self):

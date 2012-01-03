@@ -24,7 +24,7 @@ class KPabe(ABEnc):
         ABEnc.__init__(self)
         global group, util
         group = groupObj
-        util = SecretUtil(group.Pairing, verbose)        
+        util = SecretUtil(group, verbose)        
         self.parser = PolicyParser()
 
     def setup(self):

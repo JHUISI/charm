@@ -1,5 +1,5 @@
 # Implementing the proof of concept secret sharing 
-from charm.pairing import *
+from toolbox.pairinggroup import PairingGroup,ZR
 
 class SecretShare:
     def __init__(self, element, verbose_status=False):
@@ -71,7 +71,7 @@ if __name__ == "__main__":
 # Testing Secret sharing python API
   k = 3
   n = 4
-  p = pairing('../param/a.param')
+  p = PairingGroup('../param/a.param')
 
   s = SecretShare(p, True)
   sec = p.random(ZR)

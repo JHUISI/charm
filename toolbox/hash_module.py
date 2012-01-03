@@ -1,5 +1,5 @@
 import charm.cryptobase
-from charm.pairing import *
+from toolbox.pairinggroup import *
 from charm.integer import *
 import hashlib, base64
 
@@ -16,11 +16,11 @@ class Hash():
             #print "digest => %s" % h.hexdigest()
             # get raw bytes of digest and hash to Zr
             val = h.digest()
-            return integer(int(self.e.H(val, ZR)))
+            return integer(int(self.e.hash(val, ZR)))
             # do something related to that
         if type(value) == integer:
             str_value = int2Bytes(value)
-            return integer(int(self.e.H(str_value, ZR)))
+            return integer(int(self.e.hash(str_value, ZR)))
         return None
     
     # takes two arbitrary strings and hashes to an element of Zr
@@ -39,6 +39,6 @@ class Hash():
                     strs += str(base64.encodebytes(self.e.serialize(i)))
 
             if len(strs) > 0:
-                return self.e.H(strs, ZR)
+                return self.e.hash(strs, ZR)
             return None
         
