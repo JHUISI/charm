@@ -412,7 +412,7 @@ int hash2_element_to_bytes(element_t *element, uint8_t* last_buf, int hash_size,
 
 	element_to_bytes((unsigned char *) temp_buf, *element);
 	// create output buffer
-	uint8_t* temp2_buf = (uint8_t *) malloc(last_buflen + buf_len + 4);
+	uint8_t* temp2_buf = (uint8_t *) malloc(last_buflen + buf_len + 1);
 	memset(temp2_buf, 0, (last_buflen + buf_len));
 //	// copy first input buffer (last_buf) into target buffer
 //	strncat((char *) temp2_buf, (char *) last_buf, last_buflen);
@@ -615,18 +615,12 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 	int type;
 	PyObject *long_obj = NULL;
 	
-//	if(self->pairing == NULL) {
-//		PyErr_SetString(ElementError, "pairing object is not set.");
-//		return NULL;
-//	}
-	
 	if(!PyArg_ParseTuple(args, "Oi|O", &group, &type, &long_obj)) {
 		PyErr_SetString(ElementError, "invalid arguments.\n");
 		return NULL;
 	}
 	
 	debug("init an element.\n");
-
 	if(type >= ZR && type <= GT) {
 		retObject = createNewElement(type, group->pairing);
 	}
@@ -1044,6 +1038,7 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		}
 		else {
 			// we have a problem
+			return NULL;
 		}
 	}
 	else {
