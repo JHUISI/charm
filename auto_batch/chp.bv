@@ -26,7 +26,7 @@ pk
 END :: public
 
 BEGIN :: signature
-sig
+sig, b
 END :: signature
 
 BEGIN :: message
