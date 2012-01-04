@@ -7,6 +7,41 @@ from StringValue import StringValue
 from LineNumbers import LineNumbers
 from VariableDependencies import VariableDependencies
 
+def expandEntryWithSubscriptPlaceholder(varAssignments, entryName, argumentNumber):
+	foundIt = False
+	retSubscriptSliceString = None
+
+	for funcName in varAssignments:
+		varsForFunc = varAssignments[funcName]
+		for varEntry in varsForFunc:
+			if (type(varEntry).__name__ != con.dictValue):
+				continue
+
+			varNameAsString = varEntry.getName().getStringVarName()
+			if (varNameAsString != entryName):
+				continue
+
+			if (foundIt == True):
+				sys.exit("expandEntryWithSubscriptPlaceholder. . . . ")
+
+			foundIt = True
+
+			dictValues = varEntry.getValues()
+
+			valueCounter = -1
+
+			for dictValueEntry in dictValues:
+				valueCounter += 1
+				if (valueCounter != argumentNumber):
+					continue
+
+				retSubscriptSliceString = dictValueEntry.getStringVarName()
+
+	if (retSubscriptSliceString == None):
+		sys.exit("expandEntryWithSubscriptPlaceholder . . . ")
+
+	return entryName + "[" + retSubscriptSliceString + "]"
+
 def getGroupTypeOfLoop(loopInfo, loopName):
 	foundIt = False
 	retGroupType = None

@@ -2582,8 +2582,11 @@ def processTokenWithSubscriptIndicator(token):
 	if (tokenSplit[1].count(con.loopIndicator) > 1):
 		sys.exit("AutoBatch_CodeGen->processTokenWithSubscriptIndicator . . . ")
 
+	loopIndices = None
+
 	if (tokenSplit[1].count(con.loopIndicator) == 1):
 		keyNoAsString = tokenSplit[1].split(con.loopIndicator)[0]
+		loopIndices = tokenSplit[1].split(con.loopIndicator)[1]
 	else:
 		keyNoAsString = tokenSplit[1]
 
@@ -2592,7 +2595,12 @@ def processTokenWithSubscriptIndicator(token):
 	except:
 		sys.exit("AutoBatch_CodeGen->processTokenWithSubscriptIndicator . . . ")
 
-	dddd
+	expandedName = expandEntryWithSubscriptPlaceholder(varAssignments, structName, keyNo)
+
+	if (loopIndices != None):
+		expandedName += con.loopIndicator + loopIndices
+
+	return expandedName
 
 def processTokenWithLoopIndicator(token):
 	tokenSplit = token.split(con.loopIndicator)
