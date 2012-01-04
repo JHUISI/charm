@@ -321,10 +321,10 @@ if __name__ == "__main__":
         ASTVisitor(subProds).preorder(verify2.right)
         # print("Dot prod =>", subProds.dotprod)
         # need to check for presence of other variables
-        key = None
-        for i in metadata.keys():
-            if i != 'N': key = i
-        subProds1 = SubstituteSigDotProds(vars, 'y', key)
+#        key = None
+#        for i in metadata.keys():
+#            if i != 'N': key = i
+        subProds1 = SubstituteSigDotProds(vars, 'y', 'l')
         subProds1.setState(subProds.cnt)
         ASTVisitor(subProds1).preorder(verify2.right)
     
@@ -338,7 +338,9 @@ if __name__ == "__main__":
         for i in batch_precompute.keys():
             print("Precompute:", i, ":=", batch_precompute[i])
         for i in subProds.dotprod['list']:
-            print(i,":=", subProds.dotprod['types'][i])    
+            print(i,":=", subProds.dotprod['types'][i])
+        for i in subProds1.dotprod['list']:
+            print(i,":=", subProds1.dotprod['types'][i])
 
     if PROOFGEN_FLAG:
         print("Generated the proof for the given signature scheme.")
