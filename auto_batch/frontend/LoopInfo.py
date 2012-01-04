@@ -47,6 +47,17 @@ class LoopInfo:
 	def getGroupType(self):
 		return self.groupType
 
+	def getInitValue(self):
+		operationString = self.operation.getStringVarName()
+
+		if (operationString == con.dotOperation):
+			return 1
+
+		if (operationString == con.sumOperation):
+			return 0
+
+		sys.exit("LoopInfo->getInitValue:  current value of operation parameter is not currently supported.")
+
 	def setLoopName(self, loopNameStringName):
 		if ( (loopNameStringName == None) or (type(loopNameStringName).__name__ != con.stringName) ):
 			sys.exit("LoopInfo->setLoopName:  problem with loop name parameter passed in.")

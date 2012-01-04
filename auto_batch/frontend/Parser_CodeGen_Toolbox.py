@@ -7,6 +7,50 @@ from StringValue import StringValue
 from LineNumbers import LineNumbers
 from VariableDependencies import VariableDependencies
 
+def getGroupTypeOfLoop(loopInfo, loopName):
+	foundIt = False
+	retGroupType = None
+
+	for loopInfoObj in loopInfo:
+		currentLoopName = loopInfoObj.getLoopName().getStringVarName()
+
+		if (currentLoopName != loopName):
+			continue
+
+		if (foundIt == True):
+			sys.exit("Parser_CodeGen_Toolbox->getGroupTypeOfLoop:  found duplicate entries in the loop info parameter passed in with the same loop name.")
+
+		foundIt = True
+
+		retGroupType = loopInfoObj.getGroupType().getStringVarName()
+
+	if (retGroupType == None):
+		sys.exit("Parser_CodeGen_Toolbox->getGroupTypeOfLoop:  could not extract the group type of the loop passed in.")
+
+	return retGroupType
+
+def getInitValueOfLoop(loopInfo, loopName):
+	foundIt = False
+	retInitValue = None
+
+	for loopInfoObj in loopInfo:
+		currentLoopName = loopInfoObj.getLoopName().getStringVarName()
+
+		if (currentLoopName != loopName):
+			continue
+
+		if (foundIt == True):
+			sys.exit("Parser_CodeGen_Toolbox->getInitTypeOfLoop:  found duplicate entries in the loop info list passed in with the same loop name.")
+
+		foundIt = True
+
+		retInitValue = loopInfoObj.getInitValue()
+
+	if (retInitValue == None):
+		sys.exit("Parser_CodeGen_Toolbox->getInitTypeOfLoop:  could not extract init value from loop name and loop info object list passed in.")
+
+	return retInitValue
+
 def getExpressionFromLoopInfoList(loopInfo, loopName):
 	if ( (loopInfo == None) or (type(loopInfo).__name__ != con.listTypePython) or (len(loopInfo) == 0) ):
 		sys.exit("Parser_CodeGen_Toolbox->getExpressionFromLoopInfoList:  problem with loop info list parameter passed in.")
