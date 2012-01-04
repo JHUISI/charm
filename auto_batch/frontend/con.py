@@ -101,6 +101,7 @@ strTypeAST = ['Name', 'Str']
 strTypePython = 'str'
 subTypeAST = 'Sub'
 subscriptFields = ('value', 'slice', 'ctx')
+subscriptIndicator = '#'
 subscriptTypeAST = 'Subscript'
 subscriptName = 'SubscriptName'
 sumDirector = 'of'

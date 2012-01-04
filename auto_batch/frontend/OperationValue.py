@@ -15,6 +15,17 @@ class OperationValue:
 	def getOperation(self):
 		return self.operation
 
+	def getOperationSymbol(self):
+		operationSymbolString = self.operation.getStringVarName()
+
+		if (operationSymbolString == con.dotOperation):
+			return "*"
+
+		if (operationSymbolString == con.sumOperation):
+			return "+"
+
+		sys.exit("OperationValue->getOperationSymbol:  current value of self.operation is not one of the currently supported types.")
+
 	def getStringVarName(self):
 		if (self.operation == None):
 			return None

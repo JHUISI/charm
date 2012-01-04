@@ -2448,7 +2448,7 @@ def writeLinesToFile(lineNosToWriteToFile, numBaseTabs, outputFile):
 	batchOutputString = writeLinesToOutputString(sourceLinesToWriteToFile, indentationListParam, numTabsOnVerifyLine, numBaseTabs)
 	outputFile.write(batchOutputString)
 
-def writeOneBlockToFile(block, numBaseTabs, outputFile):
+def writeOneBlockToFile(block, numBaseTabs, outputFile, forCachedCalcs):
 	if ( (block == None) or (type(block).__name__ != con.loopBlock) ):
 		sys.exit("AutoBatch_CodeGen->writeOneBlockToFile:  problem with block parameter passed in.")
 
@@ -2468,7 +2468,34 @@ def writeOneBlockToFile(block, numBaseTabs, outputFile):
 	if ( (blockLoopOverValue == None) or (type(blockLoopOverValue).__name__ != con.strTypePython) or (blockLoopOverValue not in con.loopTypes) ):
 		sys.exit("AutoBatch_CodeGen->writeOneBlockToFile:  problem with the loop over value of the block parameter passed in.")
 
+	loopsToCalculate = []
+
+	blockLoopsWithVarsToCalc = block.getLoopsWithVarsToCalculate()
+	if (blockLoopsWithVarsToCalc != None):
+		blockLoopsWithVarsAsStrings = getStringNameListAsStringsNoDups(blockLoopsWithVarsToCalc)
+
+		for blockLoopVarString in blockLoopsWithVarsAsStrings:
+			loopsToCalculate.append(blockLoopVarString)
+
+	blockLoopsToCalc = block.getLoopsToCalculate()
+	if (blockLoopsToCalc != None):
+		blockLoopsAsStrings = getStringNameListAsStringsNoDups(blockLoopsToCalc)
+		for blockLoopString in blockLoopsAsStrings:
+			loopsToCalculate.append(blockLoopString)
+
+	blockOperationString = block.getOperation().getOperationSymbol()
+
 	outputString = ""
+
+	if (forCachedCalcs == False):
+		for loopToCalc in loopsToCalculate:
+			loopNameForInit = loopToCalc
+			loopGroupTypeForInit = loopVarGroupTypes[loopToCalc]
+			loopInitValueForInit = str(getInitValueOfLoop(loopInfo, loopToCalc))
+
+			outputString += getStringOfTabs(numBaseTabs)
+			outputString += loopNameForInit + "_loopVal = group.init(" + loopGroupTypeForInit + ", " + loopInitValueForInit + ")\n"
+
 	outputString += getStringOfTabs(numBaseTabs)
 	outputString += "for " + blockIndexVariable + " in range(" + str(blockStartValue) + ", " + blockLoopOverValue + "):\n"
 	outputFile.write(outputString)
@@ -2480,32 +2507,20 @@ def writeOneBlockToFile(block, numBaseTabs, outputFile):
 			if ( (childBlock == None) or (type(childBlock).__name__ != con.loopBlock) ):
 				sys.exit("AutoBatch_CodeGen->writeOneBlockToFile:  problem with one of the child blocks from the block parameter passed in.")
 
-			writeOneBlockToFile(childBlock, (numBaseTabs + 1), outputFile)
+			writeOneBlockToFile(childBlock, (numBaseTabs + 1), outputFile, forCachedCalcs)
 
-	loopsToCalculate = []
-
-	blockLoopsWithVarsToCalc = block.getLoopsWithVarsToCalculate()
 	if (blockLoopsWithVarsToCalc != None):
-		blockLoopsWithVarsAsStrings = getStringNameListAsStringsNoDups(blockLoopsWithVarsToCalc)
-
-		for blockLoopVarString in blockLoopsWithVarsAsStrings:
-			loopsToCalculate.append(blockLoopVarString)
-
 		variablesToCalculateAsStrings = getVariablesOfLoopsAsStrings(loopInfo, blockLoopsWithVarsAsStrings)
 		lineNosToWriteToFile = getAllLineNosThatImpactVarList(variablesToCalculateAsStrings, con.verifyFuncName, lineNosPerVar, var_varDependencies)
 		if (lineNosToWriteToFile != None):
 			writeLinesToFile(lineNosToWriteToFile, numBaseTabs, outputFile)
 
-	blockLoopsToCalc = block.getLoopsToCalculate()
-	if (blockLoopsToCalc != None):
-		blockLoopsAsStrings = getStringNameListAsStringsNoDups(blockLoopsToCalc)
-		for blockLoopString in blockLoopsAsStrings:
-			loopsToCalculate.append(blockLoopString)
+	outputFile.write("\n")
 
 	for loopToCalculate in loopsToCalculate:
-		writeOneLoopCalculation(loopToCalculate, (numBaseTabs + 1), True, outputFile)
+		writeOneLoopCalculation(loopToCalculate, blockOperationString, (numBaseTabs + 1), forCachedCalcs, outputFile)
 
-def writeOneLoopCalculation(loopName, numBaseTabs, forCachedCalcs, outputFile):
+def writeOneLoopCalculation(loopName, blockOperationString, numBaseTabs, forCachedCalcs, outputFile):
 	if ( (loopName == None) or (type(loopName).__name__ != con.strTypePython) or (isStringALoopName(loopName) == False) ):
 		sys.exit("AutoBatch_CodeGen->writeOneLoopCalcualtion:  problem with loop name parameter passed in.")
 
@@ -2517,11 +2532,11 @@ def writeOneLoopCalculation(loopName, numBaseTabs, forCachedCalcs, outputFile):
 
 	global cachedCalcsToPassToDC
 
-	if loopName not in cachedCalcsToPassToDC:
+	if ( (loopName not in cachedCalcsToPassToDC) and (forCachedCalcs == True) ):
 		cachedCalcsToPassToDC.append(loopName)
 
 	expression = getExpressionFromLoopInfoList(loopInfo, loopName)
-	expressionCalcString = getExpressionCalcString(expression, loopName, numBaseTabs, forCachedCalcs)
+	expressionCalcString = getExpressionCalcString(expression, loopName, blockOperationString, numBaseTabs, forCachedCalcs)
 
 	outputString = ""
 	outputString += getStringOfTabs(numBaseTabs)
@@ -2530,27 +2545,75 @@ def writeOneLoopCalculation(loopName, numBaseTabs, forCachedCalcs, outputFile):
 
 	outputFile.write(outputString)
 
-def getExpressionCalcString(expression, loopName, numBaseTabs, forCachedCalcs):
+def getExpressionCalcString(expression, loopName, blockOperationString, numBaseTabs, forCachedCalcs):
 	outputString = ""
 	outputString += loopName
 
 	if (forCachedCalcs == True):
 		outputString += "[" + con.numSignaturesIndex + "] = "
+	else:
+		outputString += "_loopVal = " + loopName + "_loopVal " + blockOperationString + " "
 
 	expression = ensureSpacesBtwnTokens_CodeGen(expression)
 	expression = expression.replace(' ^ ', ' ** ')
+	expression = expression.replace(' e ', ' pair ')
 
 	expressionSplit = expression.split()
-	for token in expressionSplit:
+	for tokenCopy in expressionSplit:
+		token = copy.deepcopy(tokenCopy)
+
 		if (token.count(con.loopIndicator) > 1):
 			sys.exit("AutoBatch_CodeGen->getExpressionCalcString:  one of the tokens in the expression string contains more than one loop indicator symbol.  This is not currently supported.")
+
+		if (token.count(con.subscriptIndicator) > 1):
+			sys.exit("AutoBatch_CodeGen->getExpressionCalcString:  one of the tokens in the expression contains more than one subscript indicator symbol.  This is not currently supported.")
+
+		newToken = None
 
 		if (token.count(con.loopIndicator) == 1):
 			newToken = processTokenWithLoopIndicator(token)
 			expression = expression.replace(token, newToken, 1)
 
+		if (newToken != None):
+			token = newToken
+
+		if (token.count(con.subscriptIndicator) == 1):
+			newToken = processTokenWithSubscriptIndicator(token)
+			expression = expression.replace(token, newToken, 1)
+
+	expression = removeSpaceBeforeChar(expression, con.lParan)
+	expression = removeSpaceAfterChar(expression, '-')
+
 	outputString += expression
 	return outputString
+
+def processTokenWithSubscriptIndicator(token):
+	tokenSplit = token.split(con.subscriptIndicator)
+	structName = tokenSplit[0]
+	if (tokenSplit[1].count(con.loopIndicator) > 1):
+		sys.exit("AutoBatch_CodeGen->processTokenWithSubscriptIndicator . . . ")
+
+	loopIndices = None
+
+	dictBeginCharIndex = tokenSplit[1].find(con.dictBeginChar)
+
+	if (dictBeginCharIndex != -1):
+		keyNoAsString = tokenSplit[1][0:dictBeginCharIndex]
+		loopIndices = tokenSplit[1][dictBeginCharIndex:len(tokenSplit[1])]
+	else:
+		keyNoAsString = tokenSplit[1]
+
+	try:
+		keyNo = int(keyNoAsString)
+	except:
+		sys.exit("AutoBatch_CodeGen->processTokenWithSubscriptIndicator . . . ")
+
+	expandedName = expandEntryWithSubscriptPlaceholder(varAssignments, structName, keyNo)
+
+	if (loopIndices != None):
+		expandedName += loopIndices
+
+	return expandedName
 
 def processTokenWithLoopIndicator(token):
 	tokenSplit = token.split(con.loopIndicator)
@@ -2587,7 +2650,7 @@ def writeBodyOfNonCachedCalcsForDC():
 	global verifySigsFile
 
 	for block in loopBlocksForNonCachedCalculations:
-		writeOneBlockToFile(block, 1, verifySigsFile)
+		writeOneBlockToFile(block, 1, verifySigsFile, False)
 
 def writeBodyOfCachedCalcsForBatch():
 	global batchVerFile
@@ -2596,7 +2659,7 @@ def writeBodyOfCachedCalcsForBatch():
 		sys.exit("AutoBatch_CodeGen->writeBodyOfCachedCalcsForBatch:  problem with loopBlocksForCachedCalculations global parameter.")
 
 	for block in loopBlocksForCachedCalculations:
-		writeOneBlockToFile(block, 1, batchVerFile)
+		writeOneBlockToFile(block, 1, batchVerFile, True)
 
 	batchVerFile.write("\n")
 
@@ -2681,6 +2744,8 @@ def writeOpeningLinesToDCVerifySigsRecursiveFunc():
 	verifyOutputString += "\t" + con.group + " = groupObj\n\n"
 
 	verifyOutputString += verifyPrereqs
+
+	verifyOutputString += "\n"
 
 	verifySigsFile.write(verifyOutputString)
 
