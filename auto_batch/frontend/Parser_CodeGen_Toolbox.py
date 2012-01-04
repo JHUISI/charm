@@ -14,10 +14,13 @@ def expandEntryWithSubscriptPlaceholder(varAssignments, entryName, argumentNumbe
 	for funcName in varAssignments:
 		varsForFunc = varAssignments[funcName]
 		for varEntry in varsForFunc:
-			if (type(varEntry).__name__ != con.dictValue):
+			varEntryName = varEntry.getName()
+			varEntryValue = varEntry.getValue()
+
+			if (type(varEntryValue).__name__ != con.dictValue):
 				continue
 
-			varNameAsString = varEntry.getName().getStringVarName()
+			varNameAsString = varEntryName.getStringVarName()
 			if (varNameAsString != entryName):
 				continue
 
@@ -26,7 +29,7 @@ def expandEntryWithSubscriptPlaceholder(varAssignments, entryName, argumentNumbe
 
 			foundIt = True
 
-			dictValues = varEntry.getValues()
+			dictValues = varEntryValue.getValues()
 
 			valueCounter = -1
 

@@ -2556,22 +2556,33 @@ def getExpressionCalcString(expression, loopName, blockOperationString, numBaseT
 
 	expression = ensureSpacesBtwnTokens_CodeGen(expression)
 	expression = expression.replace(' ^ ', ' ** ')
+	expression = expression.replace(' e ', ' pair ')
 
 	expressionSplit = expression.split()
-	for token in expressionSplit:
+	for tokenCopy in expressionSplit:
+		token = copy.deepcopy(tokenCopy)
+
 		if (token.count(con.loopIndicator) > 1):
 			sys.exit("AutoBatch_CodeGen->getExpressionCalcString:  one of the tokens in the expression string contains more than one loop indicator symbol.  This is not currently supported.")
 
 		if (token.count(con.subscriptIndicator) > 1):
 			sys.exit("AutoBatch_CodeGen->getExpressionCalcString:  one of the tokens in the expression contains more than one subscript indicator symbol.  This is not currently supported.")
 
-		if (token.count(con.subscriptIndicator) == 1):
-			newToken = processTokenWithSubscriptIndicator(token)
-			expression = expression.replace(token, newToken, 1)
+		newToken = None
 
 		if (token.count(con.loopIndicator) == 1):
 			newToken = processTokenWithLoopIndicator(token)
 			expression = expression.replace(token, newToken, 1)
+
+		if (newToken != None):
+			token = newToken
+
+		if (token.count(con.subscriptIndicator) == 1):
+			newToken = processTokenWithSubscriptIndicator(token)
+			expression = expression.replace(token, newToken, 1)
+
+	expression = removeSpaceBeforeChar(expression, con.lParan)
+	expression = removeSpaceAfterChar(expression, '-')
 
 	outputString += expression
 	return outputString
@@ -2584,9 +2595,11 @@ def processTokenWithSubscriptIndicator(token):
 
 	loopIndices = None
 
-	if (tokenSplit[1].count(con.loopIndicator) == 1):
-		keyNoAsString = tokenSplit[1].split(con.loopIndicator)[0]
-		loopIndices = tokenSplit[1].split(con.loopIndicator)[1]
+	dictBeginCharIndex = tokenSplit[1].find(con.dictBeginChar)
+
+	if (dictBeginCharIndex != -1):
+		keyNoAsString = tokenSplit[1][0:dictBeginCharIndex]
+		loopIndices = tokenSplit[1][dictBeginCharIndex:len(tokenSplit[1])]
 	else:
 		keyNoAsString = tokenSplit[1]
 
@@ -2598,7 +2611,7 @@ def processTokenWithSubscriptIndicator(token):
 	expandedName = expandEntryWithSubscriptPlaceholder(varAssignments, structName, keyNo)
 
 	if (loopIndices != None):
-		expandedName += con.loopIndicator + loopIndices
+		expandedName += loopIndices
 
 	return expandedName
 
