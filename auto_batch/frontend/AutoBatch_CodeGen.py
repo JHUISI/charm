@@ -53,7 +53,7 @@ verifyNumSignersLine = None
 verifySigsFile = None
 verifySigsFileName = None
 verifySigsInitCall = None
-verifySigsPrereqs = None
+verifyPrereqs = None
 
 '''
 class ImportFromVisitor(ast.NodeVisitor):
@@ -2635,7 +2635,8 @@ def getExpressionCalcString(expression, loopName, blockOperationString, numBaseT
 	expression = ensureSpacesBtwnTokens_CodeGen(expression)
 	for verifyArg in verifyFuncArgs:
 		verifyArgWithSpaces = con.space + verifyArg + con.space
-		replacementExpression = " verifyArgsDict[0]['" + verifyArg + "'][bodyKey] "
+		replacementExpression = " verifyArgsDict[" + con.numSignaturesIndex + "]['" + verifyArg + "'][bodyKey] "
+
 		expression = expression.replace(verifyArgWithSpaces, replacementExpression)
 
 	expression = removeSpaceBeforeChar(expression, con.lParan)
@@ -2726,17 +2727,21 @@ def writeBodyOfCachedCalcsForBatch():
 
 	for currPrecomputeVar in precomputeVars:
 		currPrecomputeVarName = currPrecomputeVar.getVarName().getStringVarName()
+		if (doesVarHaveNumSignaturesIndex(currPrecomputeVarName) == True):
+			continue
+
 		nonLoopCachedVars.append(currPrecomputeVarName)
 		if currPrecomputeVarName not in cachedCalcsToPassToDC:
 			cachedCalcsToPassToDC.append(currPrecomputeVarName)
 
-	lineNosToWriteToFile = getAllLineNosThatImpactVarList(nonLoopCachedVars, con.verifyFuncName, lineNosPerVar, var_varDependencies)
-	if ( (lineNosToWriteToFile == None) or (type(lineNosToWriteToFile).__name__ != con.listTypePython) or (len(lineNosToWriteToFile) == 0) ):
-		sys.exit("AutoBatch_CodeGen->writeBodyOfCachedCalcsForBatch:  problem with value returned from getAllLineNosThatImpactVarList for non-loop cached variables.")
+	if (len(nonLoopCachedVars) != 0):
+		lineNosToWriteToFile = getAllLineNosThatImpactVarList(nonLoopCachedVars, con.verifyFuncName, lineNosPerVar, var_varDependencies)
+		if ( (lineNosToWriteToFile == None) or (type(lineNosToWriteToFile).__name__ != con.listTypePython) or (len(lineNosToWriteToFile) == 0) ):
+			sys.exit("AutoBatch_CodeGen->writeBodyOfCachedCalcsForBatch:  problem with value returned from getAllLineNosThatImpactVarList for non-loop cached variables.")
 
-	writeLinesToFile(lineNosToWriteToFile, 0, batchVerFile)
+		writeLinesToFile(lineNosToWriteToFile, 0, batchVerFile)
 
-	batchVerFile.write("\n")
+		batchVerFile.write("\n")
 
 	if (con.deltaDictName not in cachedCalcsToPassToDC):
 		cachedCalcsToPassToDC.append(con.deltaDictName)
@@ -2798,12 +2803,16 @@ def writeOpeningLinesToDCVerifySigsRecursiveFunc():
 			verifyOutputString += cachedCalcName
 
 	verifyOutputString += "):\n"
+
+	verifyOutputString += "\t" + con.numSignaturesIndex + " = 0\n\n"
+
 	verifyOutputString += "\t" + con.group + " = groupObj\n\n"
 
 	if (verifyNumSignersLine != None):
 		verifyOutputString += verifyNumSignersLine + "\n"
 
-	verifyOutputString += verifyPrereqs
+	if (verifyPrereqs != None):
+		verifyOutputString += verifyPrereqs
 
 	verifyOutputString += "\n"
 
@@ -3077,9 +3086,12 @@ def main():
 	if ( (loopBlocksForCachedCalculations == None) or (type(loopBlocksForCachedCalculations).__name__ != con.listTypePython) or (len(loopBlocksForCachedCalculations) == 0) ):
 		sys.exit("AutoBatch_CodeGen->main:  problem obtaining loop blocks used for cached calculations.")
 
-	loopBlocksForNonCachedCalculations = buildLoopBlockList(loopsOuterNotNumSignatures, loopsOuterNumSignatures)
-	if ( (loopBlocksForNonCachedCalculations == None) or (type(loopBlocksForNonCachedCalculations).__name__ != con.listTypePython) or (len(loopBlocksForNonCachedCalculations) == 0) ):
-		sys.exit("AutoBatch_CodeGen->main:  problem obtaining loop blocks used for non-cached calculations.")
+	if (len(loopsOuterNotNumSignatures) != 0):
+		loopBlocksForNonCachedCalculations = buildLoopBlockList(loopsOuterNotNumSignatures, loopsOuterNumSignatures)
+		if ( (loopBlocksForNonCachedCalculations == None) or (type(loopBlocksForNonCachedCalculations).__name__ != con.listTypePython) or (len(loopBlocksForNonCachedCalculations) == 0) ):
+			sys.exit("AutoBatch_CodeGen->main:  problem obtaining loop blocks used for non-cached calculations.")
+	else:
+		loopBlocksForNonCachedCalculations = None
 
 	lineNosPerVar = getLineNosPerVar(varAssignments)
 	if ( (lineNosPerVar == None) or (type(lineNosPerVar).__name__ != con.dictTypePython) or (len(lineNosPerVar) == 0) ):
@@ -3094,10 +3106,10 @@ def main():
 	writeCallToDCAndRetToBatch()
 
 	writeOpeningLinesToDCVerifySigsRecursiveFunc()
-	writeBodyOfNonCachedCalcsForDC()
+	if (loopBlocksForNonCachedCalculations != None):
+		writeBodyOfNonCachedCalcsForDC()
 
 	writeCachedCalcAssignmentsForDC()
-
 	writeVerifyEqAndRecursionForDC()
 
 	try:

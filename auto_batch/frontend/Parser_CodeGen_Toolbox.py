@@ -7,6 +7,34 @@ from StringValue import StringValue
 from LineNumbers import LineNumbers
 from VariableDependencies import VariableDependencies
 
+def getListOfLoopIndicesOfVar(varName):
+	if (varName.count(con.loopIndicator) != 1):
+		sys.exit("getlistofloopindices . . .")
+
+	varNameSplit = varName.split(con.loopIndicator)
+	indicesListString = varNameSplit[1]
+
+	retIndicesList = []
+
+	indicesListStringSplit = indicesListString.split(con.loopIndicesSeparator)
+
+	for index in indicesListStringSplit:
+		retIndicesList.append(index)
+
+	return retIndicesList
+
+def doesVarHaveNumSignaturesIndex(varName):
+	if (varName.find(con.loopIndicator) == -1):
+		return False
+
+	listOfLoopIndices = getListOfLoopIndicesOfVar(varName)
+
+	for loopIndex in listOfLoopIndices:
+		if (loopIndex == con.numSignaturesIndex):
+			return True
+
+	return False
+
 def expandEntryWithSubscriptPlaceholder(varAssignments, entryName, argumentNumber):
 	foundIt = False
 	retSubscriptSliceString = None
