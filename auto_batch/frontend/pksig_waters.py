@@ -2,6 +2,7 @@
 Waters - Identity-based signatures
 
 | From: "B. Waters - Efficient identity-based encryption without random oracles"
+| Published in: EUROCRYPT 2005
 | Available from: Vol 3494 of LNCS, pages 320-329
 | Notes: 
 
@@ -16,13 +17,17 @@ from toolbox.iterate import dotprod
 from toolbox.conversion import Conversion
 from toolbox.bitstring import Bytes
 import hashlib
+import sys, random, string
+from toolbox.PKSig import PKSig
+from toolbox.pairinggroup import *
+from charm.engine.util import *
 
 #debug = False
 
 class WatersSig:
-
     def __init__(self, groupObj):
-        global group,lam_func,hashObj
+        global group,lam_func,hashObj,debug
+        debug = False
         group = groupObj
         lam_func = lambda i,a,b: a[i] ** b[i]
         hashObj = hashlib.new('sha1')
@@ -88,9 +93,6 @@ class WatersSig:
         k = self.strToId(mpk, ID)
         m = self.strToId(mpk, M)
         (S1, S2, S3) = sig['S1'], sig['S2'], sig['S3']
-        x = m
-        for i in range(0, 10):
-            S1 = 4 * 10
         A, g2 = mpk['A'], mpk['g2']
         comp1 = dotprod(group.init(G2), -1, mpk['z'], lam_func, mpk['ub'], k)
         comp2 = dotprod(group.init(G2), -1, mpk['z'], lam_func, mpk['ub'], m)
@@ -99,12 +101,12 @@ class WatersSig:
         return False
 
 def main():
-    global debug
-    debug = False
-    N = 200
+    #if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
+        #sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
+
     l = 5
     z = 5
-    groupObj = pairing('../param/a.param')
+    groupObj = pairing('/Users/matt/Documents/charm/param/a.param')
 
     waters = WatersSig(groupObj)
     (mpk, msk) = waters.setup(z)
@@ -121,6 +123,126 @@ def main():
 
     assert waters.verify(mpk, ID, M, sig), "invalid signature!"
     if debug: print("Verification successful!")
+
+    '''
+    numValidMessages = int(sys.argv[1])
+    numInvalidMessages = int(sys.argv[2])
+    messageSize = int(sys.argv[3])
+    prefixName = sys.argv[4]
+    validOutputDictName = sys.argv[5]
+    invalidOutputDictName = sys.argv[6]
+
+    f_mpk = open('mpk.charmPickle', 'wb')
+    pick_mpk = pickleObject(serializeDict(mpk, groupObj))
+    f_mpk.write(pick_mpk)
+    f_mpk.close()
+
+    f_pk = open('ID.pythonPickle', 'wb')
+    pickle.dump(ID, f_pk)
+    f_pk.close()
+
+    validOutputDict = {}
+    validOutputDict[0] = {}
+    validOutputDict[0]['mpk'] = 'mpk.charmPickle'
+    validOutputDict[0]['ID'] = 'ID.pythonPickle'
+
+    invalidOutputDict = {}
+    invalidOutputDict[0] = {}
+    invalidOutputDict[0]['mpk'] = 'mpk.charmPickle'
+    invalidOutputDict[0]['ID'] = 'ID.pythonPickle'
+
+    for index in range(0, numValidMessages):
+        if (index != 0):
+            validOutputDict[index] = {}
+            validOutputDict[index]['mpk'] = 'mpk.charmPickle'
+            validOutputDict[index]['ID'] = 'ID.pythonPickle'
+
+        message = ""
+        for randomChar in range(0, messageSize):
+            message += random.choice(string.printable)
+
+        sig = waters.sign(mpk, sk, message)
+        assert waters.verify(mpk, ID, message, sig)
+
+        f_message = open(prefixName + str(index) + '_ValidMessage.pythonPickle', 'wb')
+        validOutputDict[index]['M'] = prefixName + str(index) + '_ValidMessage.pythonPickle'
+
+        f_sig = open(prefixName + str(index) + '_ValidSignature.charmPickle', 'wb')
+        validOutputDict[index]['sig'] = prefixName + str(index) + '_ValidSignature.charmPickle'
+
+        pickle.dump(message, f_message)
+        f_message.close()
+
+        pick_sig = pickleObject(serializeDict(sig, groupObj))
+
+        f_sig.write(pick_sig)
+        f_sig.close()
+
+        del message
+        del sig
+        del f_message
+        del f_sig
+        del pick_sig
+
+    dict_pickle = pickleObject(serializeDict(validOutputDict, groupObj))
+    f = open(validOutputDictName, 'wb')
+    f.write(dict_pickle)
+    f.close()
+    del dict_pickle
+    del f
+
+    for index in range(0, numInvalidMessages):
+        if (index != 0):
+            invalidOutputDict[index] = {}
+            invalidOutputDict[index]['mpk'] = 'mpk.charmPickle'
+            invalidOutputDict[index]['ID'] = 'ID.pythonPickle'
+
+        message = ""
+        for randomChar in range(0, messageSize):
+            message += random.choice(string.printable)
+
+        sig = waters.sign(mpk, sk, message)
+        assert waters.verify(mpk, ID, message, sig)
+
+        f_message = open(prefixName + str(index) + '_InvalidMessage.pythonPickle', 'wb')
+        invalidOutputDict[index]['M'] = prefixName + str(index) + '_InvalidMessage.pythonPickle'
+        randomIndex = random.randint(0, (messageSize - 1))
+        oldValue = message[randomIndex]
+        newValue = random.choice(string.printable)
+        while (newValue == oldValue):
+            newValue = random.choice(string.printable)
+
+        if (messageSize == 1):
+            message = newValue
+        elif (randomIndex != (messageSize -1) ):
+            message = message[0:randomIndex] + newValue + message[(randomIndex + 1):messageSize]
+        else:
+            message = message[0:randomIndex] + newValue
+
+        f_sig = open(prefixName + str(index) + '_InvalidSignature.charmPickle', 'wb')
+        invalidOutputDict[index]['sig'] = prefixName + str(index) + '_InvalidSignature.charmPickle'
+
+        pickle.dump(message, f_message)
+        f_message.close()
+
+        pick_sig = pickleObject(serializeDict(sig, groupObj))
+
+        f_sig.write(pick_sig)
+        f_sig.close()
+
+        del message
+        del sig
+        del f_message
+        del f_sig
+        del pick_sig
+
+    dict_pickle = pickleObject(serializeDict(invalidOutputDict, groupObj))
+    f = open(invalidOutputDictName, 'wb')
+    f.write(dict_pickle)
+    f.close()
+    del dict_pickle
+    del f
+    '''
 
 if __name__ == "__main__":
     debug = True
