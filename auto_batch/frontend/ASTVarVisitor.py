@@ -185,7 +185,9 @@ class ASTVarVisitor(ast.NodeVisitor):
 				hashGroupType = possibleGroupType
 
 		if (hashGroupType == None):
-			sys.exit("ASTVarVisitor->getHashGroupType:  could not locate a group type from the arguments list.")
+			print("ASTVarVisitor->getHashGroupType:  couldn't get hash group type.  Setting it to G1 for now.  THIS MUST BE CHANGED!!!!")
+			hashGroupType = "G1"
+			#sys.exit("ASTVarVisitor->getHashGroupType:  could not locate a group type from the arguments list.")
 
 		return hashGroupType
 
