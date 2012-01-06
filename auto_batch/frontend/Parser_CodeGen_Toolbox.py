@@ -7,6 +7,39 @@ from StringValue import StringValue
 from LineNumbers import LineNumbers
 from VariableDependencies import VariableDependencies
 
+def getLineNosOfNodeType(codeNode, nodeType):
+	myASTNodeTypeVisitor = GetLineNosOfNodeType(nodeType)
+	myASTNodeTypeVisitor.visit(codeNode)
+	return myASTNodeTypeVisitor.getLineNos()
+
+def getListOfLoopIndicesOfVar(varName):
+	if (varName.count(con.loopIndicator) != 1):
+		sys.exit("getlistofloopindices . . .")
+
+	varNameSplit = varName.split(con.loopIndicator)
+	indicesListString = varNameSplit[1]
+
+	retIndicesList = []
+
+	indicesListStringSplit = indicesListString.split(con.loopIndicesSeparator)
+
+	for index in indicesListStringSplit:
+		retIndicesList.append(index)
+
+	return retIndicesList
+
+def doesVarHaveNumSignaturesIndex(varName):
+	if (varName.find(con.loopIndicator) == -1):
+		return False
+
+	listOfLoopIndices = getListOfLoopIndicesOfVar(varName)
+
+	for loopIndex in listOfLoopIndices:
+		if (loopIndex == con.numSignaturesIndex):
+			return True
+
+	return False
+
 def expandEntryWithSubscriptPlaceholder(varAssignments, entryName, argumentNumber):
 	foundIt = False
 	retSubscriptSliceString = None
@@ -29,21 +62,42 @@ def expandEntryWithSubscriptPlaceholder(varAssignments, entryName, argumentNumbe
 
 			foundIt = True
 
-			dictValues = varEntryValue.getValues()
+			dictKeys = varEntryValue.getKeys()
 
-			valueCounter = -1
+			keyCounter = -1
 
-			for dictValueEntry in dictValues:
-				valueCounter += 1
-				if (valueCounter != argumentNumber):
+			for dictKeyEntry in dictKeys:
+				keyCounter += 1
+				if (keyCounter != argumentNumber):
 					continue
 
-				retSubscriptSliceString = dictValueEntry.getStringVarName()
+				retSubscriptSliceString = dictKeyEntry.getStringVarName()
 
 	if (retSubscriptSliceString == None):
 		sys.exit("expandEntryWithSubscriptPlaceholder . . . ")
 
 	return entryName + "[" + retSubscriptSliceString + "]"
+
+def getOperationStringOfLoop(loopInfo, loopName):
+	foundIt = False
+	retOpString = None
+
+	for loopInfoObj in loopInfo:
+		currentLoopName = loopInfoObj.getLoopName().getStringVarName()
+		if (currentLoopName != loopName):
+			continue
+
+		if (foundIt == True):
+			sys.exit("getoperationstringofloop . . .")
+
+		foundIt = True
+
+		retOpString = loopInfoObj.getOperationSymbol()
+
+	if (retOpString == None):
+		sys.exit("getoperationsstringofloop . . . ")
+
+	return retOpString
 
 def getGroupTypeOfLoop(loopInfo, loopName):
 	foundIt = False
@@ -338,6 +392,9 @@ def getVarDependenciesAsStringsForOneVar(variableObj):
 
 	for varIndex in range(0, lenVarList):
 		varAsString = varsAsStringsList[varIndex]
+		if ( (varAsString[0] == '\'') and (varAsString[len(varAsString)-1] == '\'') ):
+			continue
+
 		periodIndex = varAsString.count('.')
 		if (periodIndex == 0):
 			continue
@@ -1151,6 +1208,11 @@ def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
 				R_index += 1
 				currChars = lineOfCode[L_index:(R_index+1)]
 				checkForSpace = True
+			elif ( (R_index+1) <= (lenOfLine - 1) ) and (lineOfCode[R_index+1] == '='):
+				L_index = R_index
+				R_index += 1
+				currChars = lineOfCode[L_index:(R_index+1)]
+				checkForSpace = True
 			else:
 				currChars = lineOfCode[R_index]
 				L_index = R_index
@@ -1455,6 +1517,19 @@ def writeFunctionFromCodeToString(sourceCodeLines, startLineNo, endLineNo, extra
 		numTabs = determineNumTabsFromSpaces(numSpaces, numSpacesPerTab)
 		numTabsForThisLine = numTabs - numTabsFirstLine
 		line = extractedLines[index].lstrip().rstrip()
+
+		if (isLineOnlyWhiteSpace(line) == True):
+			outputString += "\n"
+			continue
+
+		line = ensureSpacesBtwnTokens_CodeGen(line)
+		if (removeSelf == True):
+			line = line.replace(con.selfFuncCallString, con.space)
+
+		line = line.lstrip()
+		line = removeSpaceBeforeChar(line, con.lParan)
+		line = removeSpaceAfterChar(line, '-')
+
 		if ( (extraTabsPerLine + numTabsForThisLine) > 0):
 			outputString += getStringOfTabs(extraTabsPerLine + numTabsForThisLine)
 

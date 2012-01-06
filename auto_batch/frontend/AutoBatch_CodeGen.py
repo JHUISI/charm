@@ -47,8 +47,13 @@ verifyEqNode = None
 verifyFuncArgs = None
 verifyFuncNode = None
 verifyLines = None
+
+verifyNumSignersLine = None
+
 verifySigsFile = None
-verifySigsPrereqs = None
+verifySigsFileName = None
+verifySigsInitCall = None
+verifyPrereqs = None
 
 '''
 class ImportFromVisitor(ast.NodeVisitor):
@@ -2084,14 +2089,14 @@ def addImportLines():
 	individualVerFile.write("import sys\n")
 	verifySigsFile.write("import sys\n\n")
 
-def getGlobalVarsHeaderString():
+def getGlobalVarsAsStringList():
 	if (globalVars == None):
 		return None
 
-	globalsString = ""
-
 	if ( (type(globalVars).__name__ != con.listTypePython) or (len(globalVars) == 0) ):
 		sys.exit("AutoBatch_CodeGen->getGlobalVarsHeaderString:  problem with globalVars global variable.")
+
+	retList = []
 
 	for var in globalVars:
 		if ( (var == None) or (type(var).__name__ != con.stringName) ):
@@ -2104,11 +2109,33 @@ def getGlobalVarsHeaderString():
 		if (varAsString == con.group):
 			continue
 
-		globalsString += varAsString + ", "
+		retList.append(varAsString)
 
-	lenString = len(globalsString)
+	return retList
 
-	return globalsString[0:(lenString - 2)]
+def getGlobalVarsHeaderString():
+	globalVarsAsStringList = getGlobalVarsAsStringList()
+
+	retString = ""
+
+	for var in globalVarsAsStringList:
+		retString += var + " = None\n"
+
+	lenRetString = len(retString)
+
+	return retString[0:(lenRetString - 8)]
+
+def getGlobalVarsAssignString():
+	globalVarsAsStringList = getGlobalVarsAsStringList()
+
+	retString = ""
+
+	for var in globalVarsAsStringList:
+		retString += var + ", "
+
+	lenRetString = len(retString)
+
+	return retString[0:(lenRetString - 2)]
 
 def addCommonHeaderLines():
 	global batchVerFile, individualVerFile, verifySigsFile
@@ -2118,7 +2145,7 @@ def addCommonHeaderLines():
 	verifyOutputString = ""
 
 	batchOutputString += "from toolbox.pairinggroup import *\n"
-	batchOutputString += "from verifySigs import verifySigsRecursive\n\n"
+	batchOutputString += "from " + verifySigsFileName + " import verifySigsRecursive\n\n"
 	batchOutputString += con.group + " = None\n"
 
 	indOutputString += "\n" + con.group + " = None\n"
@@ -2134,6 +2161,9 @@ def addCommonHeaderLines():
 		verifyOutputString += globalVarsString + " = None\n"
 
 	batchOutputString += "bodyKey = \'Body\'\n\n"
+
+	verifyOutputString += "bodyKey = \'Body\'\n\n"
+
 	batchOutputString += "def prng_bits(bits=80):\n"
 	batchOutputString += "\treturn " + con.group + ".init(ZR, randomBits(bits))\n\n"
 
@@ -2147,6 +2177,7 @@ def addCommonHeaderLines():
 
 def addTemplateLines():
 	global batchVerFile, individualVerFile
+	global verifyNumSignersLine
 
 	numSigners = getStringNameIntegerValue(varAssignments, con.numSigners, con.mainFuncName)
 
@@ -2159,7 +2190,7 @@ def addTemplateLines():
 	indOutputString += "def run_Ind(verifyArgsDict, " + con.group + "ObjParam, verifyFuncArgs):\n"
 	indOutputString += "\tglobal " + con.group + "\n"
 
-	globalsString = getGlobalVarsHeaderString()
+	globalsString = getGlobalVarsAssignString()
 	if (globalsString != None):
 		if ( (type(globalsString).__name__ != con.strTypePython) or (len(globalsString) == 0) ):
 			sys.exit("AutoBatch_CodeGen->addTemplateLines:  problem with return value from getGlobalVarsHeaderString.")
@@ -2171,10 +2202,11 @@ def addTemplateLines():
 
 	if (numSigners != None):
 		batchOutputString += "\t" + con.numSigners + " = " + str(numSigners) + "\n"
+		verifyNumSignersLine = "\t" + con.numSigners + " = " + str(numSigners) + "\n"
 
 	batchOutputString += "\t" + con.deltaDictName + " = {}\n"
-	batchOutputString += "\tfor sigIndex in range(0, " + con.numSignatures + "):\n"
-	batchOutputString += "\t\t" + con.deltaDictName + "[sigIndex] = prng_bits(80)\n\n"
+	batchOutputString += "\tfor " + con.numSignaturesIndex + " in range(0, " + con.numSignatures + "):\n"
+	batchOutputString += "\t\t" + con.deltaDictName + "[" + con.numSignaturesIndex + "] = prng_bits(80)\n\n"
 	batchOutputString += "\tincorrectIndices = []\n"
 
 	indOutputString += "\t" + con.group + " = " + con.group + "ObjParam\n\n"
@@ -2191,9 +2223,17 @@ def addTemplateLines():
 def addPrerequisites():
 	global batchVerFile, individualVerFile
 
+	'''
 	prereqLineNos = getLineNosOfValueType(varAssignments, con.lambdaValue)
 	if (prereqLineNos == None):
 		return
+	'''
+
+	prereqLineNos = getLineNosOfNodeType(pythonCodeNode, con.lambdaTypeAST)
+	if (len(prereqLineNos) == 0):
+		return
+
+	#print(prereqLineNos)
 
 	if ( (type(prereqLineNos).__name__ != con.listTypePython) or (len(prereqLineNos) == 0) ):
 		sys.exit("AutoBatch_CodeGen->addPrerequisites:  problem with value returned from getLineNosOfValueType.")
@@ -2242,7 +2282,7 @@ def addCallToInit():
 	if (con.initFuncName not in functionNames):
 		sys.exit("AutoBatch_CodeGen->addCallToInit:  init function is not included in the function names dictionary.")
 
-	global batchVerFile, individualVerFile
+	global batchVerFile, individualVerFile, verifySigsInitCall
 
 	batchOutputString = ""
 	indOutputString = ""
@@ -2252,6 +2292,8 @@ def addCallToInit():
 	batchOutputString += "\t__init__(" + initArgString + ")\n\n"
 	indOutputString += "\t__init__(" + initArgString + ")\n"
 
+	verifySigsInitCall = batchOutputString
+
 	batchVerFile.write(batchOutputString)
 	individualVerFile.write(indOutputString)
 
@@ -2259,7 +2301,7 @@ def addSigLoop():
 	global batchVerFile, individualVerFile
 
 	outputString = ""
-	outputString += "\n\tfor sigIndex in range(0, " + con.numSignatures + "):\n"
+	outputString += "\n\tfor " + con.numSignaturesIndex + " in range(0, " + con.numSignatures + "):\n"
 
 	batchVerFile.write(outputString)
 	individualVerFile.write(outputString)
@@ -2268,9 +2310,11 @@ def addGroupMembershipChecks():
 	global batchVerFile, individualVerFile
 
 	outputString = ""
-	outputString += "\t\tfor arg in verifyFuncArgs:\n"
-	outputString += "\t\t\tif (group.ismember(verifyArgsDict[sigIndex][arg][bodyKey]) == False):\n"
-	outputString += "\t\t\t\tsys.exit(\"ALERT:  Group membership check failed!!!!\\n\")\n\n"
+	outputString += "\t\t#for arg in verifyFuncArgs:\n"
+	outputString += "\t\t\t#if (group.ismember(verifyArgsDict[" + con.numSignaturesIndex + "][arg][bodyKey]) == False):\n"
+	outputString += "\t\t\t\t#sys.exit(\"ALERT:  Group membership check failed!!!!\\n\")\n\n"
+
+	outputString += "\t\tpass\n\n"
 
 	batchVerFile.write(outputString)
 	individualVerFile.write(outputString)
@@ -2305,7 +2349,7 @@ def writeLinesToOutputString(lines, indentationListParam, baseNumTabs, numExtraT
 					charAfterArg = line[indexOfCharAfterArg]
 				else:
 					charAfterArg = ''
-				replacementString = " verifyArgsDict[sigIndex][\'" + arg + "\'][bodyKey]"
+				replacementString = " verifyArgsDict[" + con.numSignaturesIndex + "][\'" + arg + "\'][bodyKey]"
 				if (charAfterArg == con.dictBeginChar):
 					line = line.replace(argWithSpaces + '[', replacementString + '[', 1)
 				else:
@@ -2333,7 +2377,7 @@ def writeBodyOfInd():
 
 	individualOutputString += "\t\t\tpass\n"
 	individualOutputString += "\t\telse:\n"
-	individualOutputString += "\t\t\tincorrectIndices.append(sigIndex)\n\n"
+	individualOutputString += "\t\t\tincorrectIndices.append(" + con.numSignaturesIndex + ")\n\n"
 	individualOutputString += "\treturn incorrectIndices\n"
 
 	individualVerFile.write(individualOutputString)
@@ -2497,7 +2541,11 @@ def writeOneBlockToFile(block, numBaseTabs, outputFile, forCachedCalcs):
 			outputString += loopNameForInit + "_loopVal = group.init(" + loopGroupTypeForInit + ", " + loopInitValueForInit + ")\n"
 
 	outputString += getStringOfTabs(numBaseTabs)
-	outputString += "for " + blockIndexVariable + " in range(" + str(blockStartValue) + ", " + blockLoopOverValue + "):\n"
+	if ( (forCachedCalcs == False) and (blockLoopOverValue == con.numSignatures) ):
+		outputString += "for " + blockIndexVariable + " in range(startSigNum, endSigNum):\n"
+	else:
+		outputString += "for " + blockIndexVariable + " in range(" + str(blockStartValue) + ", " + blockLoopOverValue + "):\n"
+
 	outputFile.write(outputString)
 	outputString = ""
 
@@ -2536,7 +2584,7 @@ def writeOneLoopCalculation(loopName, blockOperationString, numBaseTabs, forCach
 		cachedCalcsToPassToDC.append(loopName)
 
 	expression = getExpressionFromLoopInfoList(loopInfo, loopName)
-	expressionCalcString = getExpressionCalcString(expression, loopName, blockOperationString, numBaseTabs, forCachedCalcs)
+	expressionCalcString = getExpressionCalcString(expression, loopName, blockOperationString, numBaseTabs, forCachedCalcs, True)
 
 	outputString = ""
 	outputString += getStringOfTabs(numBaseTabs)
@@ -2545,15 +2593,17 @@ def writeOneLoopCalculation(loopName, blockOperationString, numBaseTabs, forCach
 
 	outputFile.write(outputString)
 
-def getExpressionCalcString(expression, loopName, blockOperationString, numBaseTabs, forCachedCalcs):
+def getExpressionCalcString(expression, loopName, blockOperationString, numBaseTabs, forCachedCalcs, forAssignment):
 	outputString = ""
-	outputString += loopName
 
-	if (forCachedCalcs == True):
-		outputString += "[" + con.numSignaturesIndex + "] = "
-	else:
-		outputString += "_loopVal = " + loopName + "_loopVal " + blockOperationString + " "
+	if (forAssignment == True):
+		outputString += loopName
+		if (forCachedCalcs == True):
+			outputString += "[" + con.numSignaturesIndex + "] = "
+		else:
+			outputString += "_loopVal = " + loopName + "_loopVal " + blockOperationString + " "
 
+	expression = expression.lstrip('\'').rstrip('\'')
 	expression = ensureSpacesBtwnTokens_CodeGen(expression)
 	expression = expression.replace(' ^ ', ' ** ')
 	expression = expression.replace(' e ', ' pair ')
@@ -2571,6 +2621,9 @@ def getExpressionCalcString(expression, loopName, blockOperationString, numBaseT
 		newToken = None
 
 		if (token.count(con.loopIndicator) == 1):
+			if (forAssignment == False):
+				sys.exit("getexpressioncalcstring . . . ")
+
 			newToken = processTokenWithLoopIndicator(token)
 			expression = expression.replace(token, newToken, 1)
 
@@ -2580,6 +2633,19 @@ def getExpressionCalcString(expression, loopName, blockOperationString, numBaseT
 		if (token.count(con.subscriptIndicator) == 1):
 			newToken = processTokenWithSubscriptIndicator(token)
 			expression = expression.replace(token, newToken, 1)
+
+		if (isStringALoopName(token) == True):
+			if (forCachedCalcs == True):
+				sys.exit("getExpressionCalcString-> . . . ")
+			newToken = token + "_loopVal"
+			expression = expression.replace(token, newToken, 1)
+
+	expression = ensureSpacesBtwnTokens_CodeGen(expression)
+	for verifyArg in verifyFuncArgs:
+		verifyArgWithSpaces = con.space + verifyArg + con.space
+		replacementExpression = " verifyArgsDict[" + con.numSignaturesIndex + "]['" + verifyArg + "'][bodyKey] "
+
+		expression = expression.replace(verifyArgWithSpaces, replacementExpression)
 
 	expression = removeSpaceBeforeChar(expression, con.lParan)
 	expression = removeSpaceAfterChar(expression, '-')
@@ -2669,17 +2735,21 @@ def writeBodyOfCachedCalcsForBatch():
 
 	for currPrecomputeVar in precomputeVars:
 		currPrecomputeVarName = currPrecomputeVar.getVarName().getStringVarName()
+		if (doesVarHaveNumSignaturesIndex(currPrecomputeVarName) == True):
+			continue
+
 		nonLoopCachedVars.append(currPrecomputeVarName)
 		if currPrecomputeVarName not in cachedCalcsToPassToDC:
 			cachedCalcsToPassToDC.append(currPrecomputeVarName)
 
-	lineNosToWriteToFile = getAllLineNosThatImpactVarList(nonLoopCachedVars, con.verifyFuncName, lineNosPerVar, var_varDependencies)
-	if ( (lineNosToWriteToFile == None) or (type(lineNosToWriteToFile).__name__ != con.listTypePython) or (len(lineNosToWriteToFile) == 0) ):
-		sys.exit("AutoBatch_CodeGen->writeBodyOfCachedCalcsForBatch:  problem with value returned from getAllLineNosThatImpactVarList for non-loop cached variables.")
+	if (len(nonLoopCachedVars) != 0):
+		lineNosToWriteToFile = getAllLineNosThatImpactVarList(nonLoopCachedVars, con.verifyFuncName, lineNosPerVar, var_varDependencies)
+		if ( (lineNosToWriteToFile == None) or (type(lineNosToWriteToFile).__name__ != con.listTypePython) or (len(lineNosToWriteToFile) == 0) ):
+			sys.exit("AutoBatch_CodeGen->writeBodyOfCachedCalcsForBatch:  problem with value returned from getAllLineNosThatImpactVarList for non-loop cached variables.")
 
-	writeLinesToFile(lineNosToWriteToFile, 0, batchVerFile)
+		writeLinesToFile(lineNosToWriteToFile, 0, batchVerFile)
 
-	batchVerFile.write("\n")
+		batchVerFile.write("\n")
 
 	if (con.deltaDictName not in cachedCalcsToPassToDC):
 		cachedCalcsToPassToDC.append(con.deltaDictName)
@@ -2733,7 +2803,7 @@ def writeOpeningLinesToDCVerifySigsRecursiveFunc():
 	global verifySigsFile
 
 	verifyOutputString = ""
-	verifyOutputString += "def verifySigsRecursive(verifyArgsDict, groupObj, incorrectIndices, startSigNum, EndSigNum"
+	verifyOutputString += "def verifySigsRecursive(verifyArgsDict, groupObj, incorrectIndices, startSigNum, endSigNum"
 
 	if (len(cachedCalcsToPassToDC) != 0):
 		for cachedCalcName in cachedCalcsToPassToDC:
@@ -2741,13 +2811,87 @@ def writeOpeningLinesToDCVerifySigsRecursiveFunc():
 			verifyOutputString += cachedCalcName
 
 	verifyOutputString += "):\n"
+
+	verifyOutputString += "\t" + con.numSignaturesIndex + " = 0\n\n"
+
 	verifyOutputString += "\t" + con.group + " = groupObj\n\n"
 
-	verifyOutputString += verifyPrereqs
+	if (verifyNumSignersLine != None):
+		verifyOutputString += verifyNumSignersLine + "\n"
+
+	if (verifyPrereqs != None):
+		verifyOutputString += verifyPrereqs
 
 	verifyOutputString += "\n"
 
+	verifyOutputString += verifySigsInitCall
+
 	verifySigsFile.write(verifyOutputString)
+
+def writeCachedCalcAssignmentsForDC():
+	global verifySigsFile
+
+	outputString = ""
+	outputString += "\n"
+
+	for cachedCalcName in cachedCalcsToPassToDC:
+		if (isStringALoopName(cachedCalcName) == False):
+			continue
+
+		loopGroupTypeForInit = loopVarGroupTypes[cachedCalcName]
+		loopInitValueForInit = str(getInitValueOfLoop(loopInfo, cachedCalcName))
+
+		outputString += "\t" + cachedCalcName + "_loopVal = group.init(" + loopGroupTypeForInit + ", " + loopInitValueForInit + ")\n"
+
+	outputString += "\n"
+
+	outputString += "\tfor index in range(startSigNum, endSigNum):\n"
+
+	for cachedCalcName in cachedCalcsToPassToDC:
+		if (isStringALoopName(cachedCalcName) == False):
+			continue
+
+		operationString = getOperationStringOfLoop(loopInfo, cachedCalcName)
+		outputString += "\t\t" + cachedCalcName + "_loopVal = " + cachedCalcName + "_loopVal " + operationString + " " + cachedCalcName + "[index]\n"
+
+	verifySigsFile.write(outputString)
+
+def writeVerifyEqAndRecursionForDC():
+	global verifySigsFile
+
+	outputString = ""
+	outputString += "\n"
+	finalBatchEq = finalBatchEqWithLoops.replace(con.finalBatchEqWithLoopsString, '', 1)
+
+	finalBatchExp = getExpressionCalcString(finalBatchEq, None, None, None, False, False)
+
+	outputString += "\tif (" + finalBatchExp + "):\n"
+	outputString += "\t\treturn\n"
+	outputString += "\telse:\n"
+	outputString += "\t\tmidWay = int( (endSigNum - startSigNum) / 2)\n"
+	outputString += "\t\tif (midWay == 0):\n"
+	outputString += "\t\t\tincorrectIndices.append(startSigNum)\n"
+	outputString += "\t\t\treturn\n"
+	outputString += "\t\tmidSigNum = startSigNum + midWay\n"
+	outputString += "\t\tverifySigsRecursive(verifyArgsDict, group, incorrectIndices, startSigNum, midSigNum"
+
+	if (len(cachedCalcsToPassToDC) != 0):
+		for cachedCalcName in cachedCalcsToPassToDC:
+			outputString += ", "
+			outputString += cachedCalcName
+
+	outputString += ")\n"
+
+	outputString += "\t\tverifySigsRecursive(verifyArgsDict, group, incorrectIndices, midSigNum, endSigNum"
+
+	if (len(cachedCalcsToPassToDC) != 0):
+		for cachedCalcName in cachedCalcsToPassToDC:
+			outputString += ", "
+			outputString += cachedCalcName
+
+	outputString += ")\n"
+
+	verifySigsFile.write(outputString)
 
 def main():
 	if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
@@ -2774,6 +2918,7 @@ def main():
 	global numTabsOnVerifyLine, batchVerifierOutput, finalBatchEq, finalBatchEqWithLoops, listVars, numSpacesPerTab, lineInfo
 	global loopBlocksForCachedCalculations, loopBlocksForNonCachedCalculations, lineNosPerVar
 	global lineNoOfFirstFunction, globalVars, var_varDependencies, functionArgNames, functionNames
+	global verifySigsFileName
 
 	try:
 		pythonCodeLines = open(pythonCodeArg, 'r').readlines()
@@ -2783,6 +2928,11 @@ def main():
 		verifySigsFile = open(verifySigsArg, 'w')
 	except:
 		sys.exit("AutoBatch_CodeGen->main:  problem opening input/output files passed in as command-line arguments.")
+
+	if (verifySigsArg.endswith(".py") == False):
+		sys.exit("no py ending")
+
+	verifySigsFileName = verifySigsArg[0:(len(verifySigsArg) - 3)]
 
 	myASTParser = ASTParser()
 	pythonCodeNode = myASTParser.getASTNodeFromFile(pythonCodeArg)
@@ -2944,9 +3094,12 @@ def main():
 	if ( (loopBlocksForCachedCalculations == None) or (type(loopBlocksForCachedCalculations).__name__ != con.listTypePython) or (len(loopBlocksForCachedCalculations) == 0) ):
 		sys.exit("AutoBatch_CodeGen->main:  problem obtaining loop blocks used for cached calculations.")
 
-	loopBlocksForNonCachedCalculations = buildLoopBlockList(loopsOuterNotNumSignatures, loopsOuterNumSignatures)
-	if ( (loopBlocksForNonCachedCalculations == None) or (type(loopBlocksForNonCachedCalculations).__name__ != con.listTypePython) or (len(loopBlocksForNonCachedCalculations) == 0) ):
-		sys.exit("AutoBatch_CodeGen->main:  problem obtaining loop blocks used for non-cached calculations.")
+	if (len(loopsOuterNotNumSignatures) != 0):
+		loopBlocksForNonCachedCalculations = buildLoopBlockList(loopsOuterNotNumSignatures, loopsOuterNumSignatures)
+		if ( (loopBlocksForNonCachedCalculations == None) or (type(loopBlocksForNonCachedCalculations).__name__ != con.listTypePython) or (len(loopBlocksForNonCachedCalculations) == 0) ):
+			sys.exit("AutoBatch_CodeGen->main:  problem obtaining loop blocks used for non-cached calculations.")
+	else:
+		loopBlocksForNonCachedCalculations = None
 
 	lineNosPerVar = getLineNosPerVar(varAssignments)
 	if ( (lineNosPerVar == None) or (type(lineNosPerVar).__name__ != con.dictTypePython) or (len(lineNosPerVar) == 0) ):
@@ -2961,7 +3114,11 @@ def main():
 	writeCallToDCAndRetToBatch()
 
 	writeOpeningLinesToDCVerifySigsRecursiveFunc()
-	writeBodyOfNonCachedCalcsForDC()
+	if (loopBlocksForNonCachedCalculations != None):
+		writeBodyOfNonCachedCalcsForDC()
+
+	writeCachedCalcAssignmentsForDC()
+	writeVerifyEqAndRecursionForDC()
 
 	try:
 		batchVerFile.close()

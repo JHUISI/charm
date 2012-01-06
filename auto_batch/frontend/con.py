@@ -48,6 +48,9 @@ initType = 'init'
 initValue = 'InitValue'
 integerValue = 'IntegerValue'
 intTypePython = 'int'
+
+invertTypeAST = 'Invert'
+
 lambdaArgBegin = 'LAMBDA_ARG_BEGIN'
 lambdaArgEnd = 'LAMBDA_ARG_END'
 lambdaTypeAST = 'Lambda'
@@ -57,7 +60,13 @@ left = 'left'
 lineNumbers = 'LineNumbers'
 listInString = ' in '
 listString = 'List := '
+
+listTypeAST = 'List'
+
 listTypePython = 'list'
+
+listValue = 'ListValue'
+
 loopBlock = 'LoopBlock'
 loopIndicator = '_'
 loopIndicesSeparator = '%'
@@ -109,6 +118,9 @@ sumOperation = 'sum'
 sumPrefix = 'sum'
 sumString = 'sum'
 tupleTypeAST = 'Tuple'
+
+tupleValue = 'TupleValue'
+
 unaryOpTypeAST = 'UnaryOp'
 unaryOpValue = 'UnaryOpValue'
 uSubTypeAST = 'USub'
@@ -125,5 +137,5 @@ operationTypes = [dotOperation, sumOperation]
 quoteCharTypes = [singleQuote, doubleQuote]
 reservedWords = ['print', pair, 'class', 'pickleObject', 'elif', 'True', 'False', '__init__', 'global', 'str', 'int', 'float', 'return', 'def', dotPrefix, productString, group, G1, G2, GT, dotProdType, range, 'lam_func', ZR, self, 'for', 'in', 'while', 'if', 'pass', sumString, 'e']
 reservedSymbols = ['..', lParan, ')', '{', '}', ':=', '=', '-', '*', '^', '/', ',', '==', ':', '[', ']', '**']
-unaryOpTypesAST = [uSubTypeAST]
+unaryOpTypesAST = [invertTypeAST, uSubTypeAST]
 variableNameTypes = [stringName, subscriptName]

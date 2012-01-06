@@ -17,6 +17,7 @@ class OperationValue:
 
 	def getOperationSymbol(self):
 		operationSymbolString = self.operation.getStringVarName()
+		operationSymbolString = operationSymbolString.lstrip('\'').rstrip('\'')
 
 		if (operationSymbolString == con.dotOperation):
 			return "*"
@@ -34,6 +35,7 @@ class OperationValue:
 			sys.exit("OperationValue->getStringVarName:  self.operation is not of type " + con.stringValue)
 
 		operationAsString = self.operation.getStringVarName()
+		operationAsString = operationAsString.lstrip('\'').rstrip('\'')
 		if ( (operationAsString == None) or (type(operationAsString).__name__ != con.strTypePython) or (len(operationAsString) == 0) ):
 			sys.exit("OperationValue->getStringVarName:  problem with value returned from getStringVarName() call on self.operation.")
 
@@ -56,6 +58,7 @@ class OperationValue:
 			sys.exit("OperationValue->setOperation:  problem with operation passed in.")
 
 		operationAsString = operation.getStringVarName()
+		operationAsString = operationAsString.lstrip('\'').rstrip('\'')
 		if ( (operationAsString == None) or (type(operationAsString).__name__ != con.strTypePython) or (operationAsString not in con.operationTypes) ):
 			sys.exit("OperationValue->setOperation:  problem with string representation of operation passed in.")
 

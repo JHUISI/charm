@@ -5,6 +5,7 @@ class StringValue:
 	def __init__(self):
 		self.value = None
 		self.lineNo = None
+		self.inQuotes = False
 
 	def getValue(self):
 		return self.value
@@ -16,7 +17,14 @@ class StringValue:
 		return self.lineNo
 
 	def getStringVarName(self):
-		return str(self.value)
+		'''
+		if (self.inQuotes == True):
+			return "'" + str(self.value) + "'"
+		else:
+			return str(self.value)
+		'''
+
+		return "'" + str(self.value) + "'"
 
 	def setValue(self, value):
 		if (type(value) is not str):
@@ -35,5 +43,8 @@ class StringValue:
 			sys.exit("StringValue->setLineNo:  line number passed in is less than one.")
 
 		self.lineNo = lineNo
+
+	def setInQuotes(self, inQuotes):
+		self.inQuotes = inQuotes
 
 Value.register(StringValue)

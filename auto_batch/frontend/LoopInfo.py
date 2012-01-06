@@ -47,6 +47,17 @@ class LoopInfo:
 	def getGroupType(self):
 		return self.groupType
 
+	def getOperationSymbol(self):
+		operationString = self.operation.getStringVarName()
+
+		if (operationString == con.dotOperation):
+			return "*"
+
+		if (operationString == con.sumOperation):
+			return "+"
+
+		sys.exit("getoperationsymbol . . .")
+
 	def getInitValue(self):
 		operationString = self.operation.getStringVarName()
 
