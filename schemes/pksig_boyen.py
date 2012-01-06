@@ -87,15 +87,15 @@ class Boyen(PKSig):
     
     def verify(self, mpk, pk, M, sig):
         if debug: print("Verifying...")
-        At_pk, Bt_pk, Ct_pk = self.getPKdict(mpk, pk, ['At', 'Bt', 'Ct'])
-        l = len(At_pk.keys())
+        At, Bt, Ct = self.getPKdict(mpk, pk, ['At', 'Bt', 'Ct'])
+        l = len(At.keys())
         if debug: print("Length =>", l)
         D = pair(mpk['g1'], mpk['g2'])
         S, t = sig['S'], sig['t']
         m = H(M)
-        prod_result = group.init(GT, 1)
+        prod_result = 1
         for i in range(l):
-            prod_result *= pair(S[i], At_pk[i] * (Bt_pk[i] ** m) * (Ct_pk[i] ** t[i]))
+            prod_result *= pair(S[i], At[i] * (Bt[i] ** m) * (Ct[i] ** t[i]))
         if debug: print("final result =>", prod_result)
         if debug: print("D =>", D )
         if prod_result == D:
