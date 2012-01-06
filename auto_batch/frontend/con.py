@@ -60,7 +60,13 @@ left = 'left'
 lineNumbers = 'LineNumbers'
 listInString = ' in '
 listString = 'List := '
+
+listTypeAST = 'List'
+
 listTypePython = 'list'
+
+listValue = 'ListValue'
+
 loopBlock = 'LoopBlock'
 loopIndicator = '_'
 loopIndicesSeparator = '%'

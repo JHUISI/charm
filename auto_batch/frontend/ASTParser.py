@@ -1578,6 +1578,9 @@ class ASTParser:
 		if (nameType == con.tupleTypeAST):
 			return con.tupleTypeAST
 
+		if (nameType == con.listTypeAST):
+			return con.listTypeAST
+
 		return None
 
 	def getStringNameFromNode(self, node):

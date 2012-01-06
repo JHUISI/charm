@@ -1208,6 +1208,11 @@ def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
 				R_index += 1
 				currChars = lineOfCode[L_index:(R_index+1)]
 				checkForSpace = True
+			elif ( (R_index+1) <= (lenOfLine - 1) ) and (lineOfCode[R_index+1] == '='):
+				L_index = R_index
+				R_index += 1
+				currChars = lineOfCode[L_index:(R_index+1)]
+				checkForSpace = True
 			else:
 				currChars = lineOfCode[R_index]
 				L_index = R_index

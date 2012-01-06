@@ -17,6 +17,7 @@ from UnaryOpValue import UnaryOpValue
 from SliceValue import SliceValue
 from VariableNamesValue import VariableNamesValue
 from TupleValue import TupleValue
+from ListValue import ListValue
 
 class ASTVarVisitor(ast.NodeVisitor):
 	def __init__(self, myASTParser):
@@ -233,6 +234,19 @@ class ASTVarVisitor(ast.NodeVisitor):
 		retTupleValue.setTupleList(processedArgList)
 
 		return retTupleValue
+
+	def buildListValue(self, node):
+		processedArgList = []
+
+		for arg in node.elts:
+			processedArg = self.processNode(arg)
+			processedArgList.append(copy.deepcopy(processedArg))
+			del processedArg
+
+		retListValue = ListValue()
+		retListValue.setArgList(processedArgList)
+
+		return retListValue
 
 	def buildHashValue(self, node):
 		if (node == None):
@@ -632,6 +646,11 @@ class ASTVarVisitor(ast.NodeVisitor):
 			tupleValueToAdd = self.buildTupleValue(node)
 
 			return tupleValueToAdd
+
+		if (nodeType == con.listTypeAST):
+			listValueToAdd = self.buildListValue(node)
+
+			return listValueToAdd
 
 		return None
 
