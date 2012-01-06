@@ -16,7 +16,7 @@ for l in f:
 	c += l
 
 t = ast.parse(c)
-#print(ast.dump(t))
+print(ast.dump(t))
 
 u = AST_Visitor()
-u.visit(t)
+#u.visit(t)

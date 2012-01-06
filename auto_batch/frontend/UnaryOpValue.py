@@ -23,6 +23,9 @@ class UnaryOpValue:
 		if (self.opType == con.uSubTypeAST):
 			return "-"
 
+		if (self.opType == con.invertTypeAST):
+			return "~"
+
 		sys.exit("UnaryOpValue->getOpString:  self.opType is not one of the supported types.")
 
 	def getStringVarName(self):

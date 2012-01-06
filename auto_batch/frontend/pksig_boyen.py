@@ -35,8 +35,7 @@ class Boyen(PKSig):
             A.append(g1 ** a[i])
             At.append(g2 ** a[i])
         # public verification key "in the sky" for all users
-        return {'g1':g1, 'g2':g2, 'A':A[0],    'B':A[1],   'C':A[2], 
-                                  'At':At[0], 'Bt':At[1], 'Ct':At[2]}
+        return {'g1':g1, 'g2':g2, 'A':A[0],    'B':A[1],   'C':A[2], 'At':At[0], 'Bt':At[1], 'Ct':At[2]}
     
     def keygen(self, mpk):
         a, b, c = group.random(ZR), group.random(ZR), group.random(ZR)
@@ -69,7 +68,7 @@ class Boyen(PKSig):
         S = {}
         for i in range(l-1):
             S[ i ] = mpk['g1'] ** s[i]
-#            print("S[", i, "] :=", S[i])         
+            #print("S[", i, "] :=", S[i])         
         # index=0
         (A, B, C) = A_pk[ 0 ], B_pk[ 0 ], C_pk[ 0 ]
         prod = (A * (B ** m) * (C ** t[0])) ** -s[0]
@@ -100,7 +99,7 @@ class Boyen(PKSig):
         if debug: print("final result =>", prod_result)
         if debug: print("D =>", D )
         if prod_result == D:
-           return True
+            return True
         return False
 
 def main():
@@ -111,6 +110,7 @@ def main():
     if debug: print(mpk, "\n\n")
    
     num_signers = 3
+    l = 3
     L_keys = [ boyen.keygen(mpk) for i in range(num_signers)]     
     L_pk = {}; L_sk = {}
     for i in range(len(L_keys)):
