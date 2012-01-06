@@ -109,6 +109,9 @@ sumOperation = 'sum'
 sumPrefix = 'sum'
 sumString = 'sum'
 tupleTypeAST = 'Tuple'
+
+tupleValue = 'TupleValue'
+
 unaryOpTypeAST = 'UnaryOp'
 unaryOpValue = 'UnaryOpValue'
 uSubTypeAST = 'USub'
