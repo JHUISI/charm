@@ -55,6 +55,22 @@ def getValueOfLastLine(dict):
 	lenKeys = len(keys)
 	return dict[keys[lenKeys-1]]
 
+class GetLineNosOfNodeType(ast.NodeVisitor):
+	def __init__(self, nodeType):
+		self.lineNos = []
+		self.nodeType = nodeType
+
+	def generic_visit(self, node):
+		if (type(node).__name__ == self.nodeType):
+			currentLineNo = node.lineno
+			if (currentLineNo not in self.lineNos):
+				self.lineNos.append(currentLineNo)
+
+		ast.NodeVisitor.generic_visit(self, node)
+
+	def getLineNos(self):
+		return self.lineNos
+
 class ASTGetGlobalDeclVars(ast.NodeVisitor):
 	def __init__(self):
 		self.globalDeclVars = []

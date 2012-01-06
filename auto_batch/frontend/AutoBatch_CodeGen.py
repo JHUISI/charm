@@ -2223,9 +2223,17 @@ def addTemplateLines():
 def addPrerequisites():
 	global batchVerFile, individualVerFile
 
+	'''
 	prereqLineNos = getLineNosOfValueType(varAssignments, con.lambdaValue)
 	if (prereqLineNos == None):
 		return
+	'''
+
+	prereqLineNos = getLineNosOfNodeType(pythonCodeNode, con.lambdaTypeAST)
+	if (len(prereqLineNos) == 0):
+		return
+
+	#print(prereqLineNos)
 
 	if ( (type(prereqLineNos).__name__ != con.listTypePython) or (len(prereqLineNos) == 0) ):
 		sys.exit("AutoBatch_CodeGen->addPrerequisites:  problem with value returned from getLineNosOfValueType.")

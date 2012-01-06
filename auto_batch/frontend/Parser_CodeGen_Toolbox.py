@@ -7,6 +7,11 @@ from StringValue import StringValue
 from LineNumbers import LineNumbers
 from VariableDependencies import VariableDependencies
 
+def getLineNosOfNodeType(codeNode, nodeType):
+	myASTNodeTypeVisitor = GetLineNosOfNodeType(nodeType)
+	myASTNodeTypeVisitor.visit(codeNode)
+	return myASTNodeTypeVisitor.getLineNos()
+
 def getListOfLoopIndicesOfVar(varName):
 	if (varName.count(con.loopIndicator) != 1):
 		sys.exit("getlistofloopindices . . .")
