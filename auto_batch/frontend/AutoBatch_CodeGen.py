@@ -2478,6 +2478,9 @@ def getLoopOrder(varListAsStrings):
 def distillLoopsWRTNumSignatures():
 	global loopsOuterNumSignatures, loopsOuterNotNumSignatures
 
+	loopsAddedToOuterNumSigs = []
+	loopsToAddToOuterNumSigs = []
+
 	for loop in loopInfo:
 		loopNameToAdd = StringName()
 		loopNameToAdd.setName(loop.getLoopName().getStringVarName())
@@ -2487,12 +2490,31 @@ def distillLoopsWRTNumSignatures():
 		outerIndex = outerIndexStringName.getStringVarName()
 		if (outerIndex not in con.loopIndexTypes):
 			sys.exit("AutoBatch_CodeGen->distillLoopsWRTNumSignatures:  outer loop index extracted from one of the loops in loopInfo is not one of the supported loop index types.")
-		if (outerIndex == con.numSignaturesIndex):
+		if (outerIndex != con.numSignaturesIndex):
+			continue
+		loopsOuterNumSignatures.append(copy.deepcopy(loop))
+
+		loopsAddedToOuterNumSigs.append(loop.getLoopName().getStringVarName())
+
+		childListAsStrings = getStringNameListAsStringsNoDups(loop.getVarListNoSubscripts())
+
+		for childLoopName in childListAsStrings:
+			if (isStringALoopName(childLoopName) == True):
+				if childLoopName not in loopsToAddToOuterNumSigs:
+					loopsToAddToOuterNumSigs.append(childLoopName)
+
+		del loopNameToAdd
+
+	for loop in loopInfo:
+		currentLoopNameAsString = loop.getLoopName().getStringVarName()
+		if (currentLoopNameAsString in loopsAddedToOuterNumSigs):
+			continue
+
+		if (currentLoopNameAsString in loopsToAddToOuterNumSigs):
 			loopsOuterNumSignatures.append(copy.deepcopy(loop))
 		else:
 			loopsOuterNotNumSignatures.append(copy.deepcopy(loop))
 
-		del loopNameToAdd
 
 def writeLinesToFile(lineNosToWriteToFile, numBaseTabs, outputFile):
 	indentationListParam = []
