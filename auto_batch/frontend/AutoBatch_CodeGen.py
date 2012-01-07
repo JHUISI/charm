@@ -2323,7 +2323,9 @@ def addGroupMembershipChecks():
 	#batchVerFile.write(outputString)
 	individualVerFile.write(outputString)
 
-	outputString += "\t" + con.numSignaturesIndex + " = 0\n\n"
+	outputString += "\t" + con.numSignaturesIndex + " = 0\n"
+	outputString += "\tstartSigNum = 0\n"
+	outputString += "\tendSigNum = " + con.numSignatures + "\n\n"
 
 	batchVerFile.write(outputString)
 
@@ -2668,8 +2670,8 @@ def getExpressionCalcString(expression, loopName, blockOperationString, numBaseT
 			expression = expression.replace(token, newToken, 1)
 
 		if (isStringALoopName(token) == True):
-			if (forCachedCalcs == True):
-				sys.exit("getExpressionCalcString-> . . . ")
+			#if (forCachedCalcs == True):
+				#sys.exit("getExpressionCalcString-> . . . here")
 			newToken = token + "_loopVal"
 			expression = expression.replace(token, newToken, 1)
 

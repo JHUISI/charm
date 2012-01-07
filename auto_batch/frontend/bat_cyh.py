@@ -52,4 +52,28 @@ def run_Batch(verifyArgsDict, groupObjParam, verifyFuncArgs):
 		pass
 
 	z = 0
+	startSigNum = 0
+	endSigNum = N
 
+	dotC = {}
+	dotB = {}
+
+	for z in range(0, N):
+		u , S = verifyArgsDict[z]['sig'][bodyKey][ 'u' ] , verifyArgsDict[z]['sig'][bodyKey][ 'S' ]
+
+		dotC[z] =   S ** delta [ z ]  
+	for z in range(0, N):
+		for y in range(0, l):
+			u , S = verifyArgsDict[z]['sig'][bodyKey][ 'u' ] , verifyArgsDict[z]['sig'][bodyKey][ 'S' ]
+			num_signers = len( verifyArgsDict[z]['L'][bodyKey] )
+			h = [ group.init( ZR , 1 ) for i in range( num_signers ) ]
+			for i in range( num_signers ) :
+			pk = [ H1( i ) for i in verifyArgsDict[z]['L'][bodyKey] ] # get all signers pub keys
+
+			dotA[z] =  ( u [ l ] * pk [ l ] ** h [ l ] )  
+
+		dotB[z] =   dotA_loopVal ** delta [ z ]  
+
+	verifySigsRecursive(verifyArgsDict, group, incorrectIndices, 0, N, delta, dotC, dotA, dotB)
+
+	return incorrectIndices

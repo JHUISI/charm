@@ -749,8 +749,9 @@ class ASTVarVisitor(ast.NodeVisitor):
 				sys.exit("ASTVarVisitor->visit_Assign:  could not obtain the tuple list of the right side of the assignment equation.")
 
 		if (isLeftSideATuple == False):
-			for tupleNode in rightSideList:
-				self.processAssignment(leftSideNode, tupleNode)
+			#for tupleNode in rightSideList:
+				#self.processAssignment(leftSideNode, tupleNode)
+			self.processAssignment(leftSideNode, rightSideNode)
 			return
 
 		if (isRightSideATuple == False):
