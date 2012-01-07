@@ -36,6 +36,9 @@ loopsOuterNotNumSignatures = []
 linePairsOfVerifyFuncs = None
 listVars = {}
 loopVarGroupTypes = {}
+
+nonLoopCachedVars = []
+
 numSpacesPerTab = None
 numTabsOnVerifyLine = None
 precomputeVars = []
@@ -2207,6 +2210,7 @@ def addTemplateLines():
 	batchOutputString += "\t" + con.deltaDictName + " = {}\n"
 	batchOutputString += "\tfor " + con.numSignaturesIndex + " in range(0, " + con.numSignatures + "):\n"
 	batchOutputString += "\t\t" + con.deltaDictName + "[" + con.numSignaturesIndex + "] = prng_bits(80)\n\n"
+	#batchOutputString += "\t" + con.numSignaturesIndex + " = 0\n\n"
 	batchOutputString += "\tincorrectIndices = []\n"
 
 	indOutputString += "\t" + con.group + " = " + con.group + "ObjParam\n\n"
@@ -2316,8 +2320,12 @@ def addGroupMembershipChecks():
 
 	outputString += "\t\tpass\n\n"
 
-	batchVerFile.write(outputString)
+	#batchVerFile.write(outputString)
 	individualVerFile.write(outputString)
+
+	outputString += "\t" + con.numSignaturesIndex + " = 0\n\n"
+
+	batchVerFile.write(outputString)
 
 def writeLinesToOutputString(lines, indentationListParam, baseNumTabs, numExtraTabs):
 	if ( (lines == None) or (type(lines).__name__ != con.listTypePython) or (len(lines) == 0) ):
@@ -2559,6 +2567,9 @@ def writeOneBlockToFile(block, numBaseTabs, outputFile, forCachedCalcs):
 
 	if (blockLoopsWithVarsToCalc != None):
 		variablesToCalculateAsStrings = getVariablesOfLoopsAsStrings(loopInfo, blockLoopsWithVarsAsStrings)
+
+		removeListEntriesFromAnotherList(nonLoopCachedVars, variablesToCalculateAsStrings)
+
 		lineNosToWriteToFile = getAllLineNosThatImpactVarList(variablesToCalculateAsStrings, con.verifyFuncName, lineNosPerVar, var_varDependencies)
 		if (lineNosToWriteToFile != None):
 			writeLinesToFile(lineNosToWriteToFile, numBaseTabs, outputFile)
@@ -2719,15 +2730,10 @@ def writeBodyOfNonCachedCalcsForDC():
 		writeOneBlockToFile(block, 1, verifySigsFile, False)
 
 def writeBodyOfCachedCalcsForBatch():
-	global batchVerFile
+	global batchVerFile, nonLoopCachedVars
 
 	if ( (loopBlocksForCachedCalculations == None) or (type(loopBlocksForCachedCalculations).__name__ != con.listTypePython) or (len(loopBlocksForCachedCalculations) == 0) ):
 		sys.exit("AutoBatch_CodeGen->writeBodyOfCachedCalcsForBatch:  problem with loopBlocksForCachedCalculations global parameter.")
-
-	for block in loopBlocksForCachedCalculations:
-		writeOneBlockToFile(block, 1, batchVerFile, True)
-
-	batchVerFile.write("\n")
 
 	nonLoopCachedVars = []
 
@@ -2748,11 +2754,15 @@ def writeBodyOfCachedCalcsForBatch():
 			sys.exit("AutoBatch_CodeGen->writeBodyOfCachedCalcsForBatch:  problem with value returned from getAllLineNosThatImpactVarList for non-loop cached variables.")
 
 		writeLinesToFile(lineNosToWriteToFile, 0, batchVerFile)
-
 		batchVerFile.write("\n")
 
 	if (con.deltaDictName not in cachedCalcsToPassToDC):
 		cachedCalcsToPassToDC.append(con.deltaDictName)
+
+	for block in loopBlocksForCachedCalculations:
+		writeOneBlockToFile(block, 1, batchVerFile, True)
+
+	batchVerFile.write("\n")
 
 def writeDictDefsOfCachedCalcsForBatch():
 	global batchVerFile

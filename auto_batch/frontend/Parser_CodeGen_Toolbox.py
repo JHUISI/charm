@@ -7,6 +7,11 @@ from StringValue import StringValue
 from LineNumbers import LineNumbers
 from VariableDependencies import VariableDependencies
 
+def removeListEntriesFromAnotherList(listEntries, listToRemoveFrom):
+	for entry in listEntries:
+		while (listToRemoveFrom.count(entry) > 0):
+			listToRemoveFrom.remove(entry)
+
 def getLineNosOfNodeType(codeNode, nodeType):
 	myASTNodeTypeVisitor = GetLineNosOfNodeType(nodeType)
 	myASTNodeTypeVisitor.visit(codeNode)

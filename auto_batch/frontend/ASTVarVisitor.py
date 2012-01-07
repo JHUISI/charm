@@ -924,6 +924,8 @@ class ASTVarVisitor(ast.NodeVisitor):
 					maxLineNo = varInSameFunc.getName().getLineNo()
 					continue
 				elif (type(nextVarToCheck).__name__ == con.strTypePython):
+					print(nextVarToCheck)
+
 					#this is where we go into a function that was called in which the return value is what we are
 					#are looking for (e.g., sig = bls.sign(....) ).  There are 2 possibilities here.  One is that the
 					#return value of that function is a variable (e.g., return sig).  In this case, change varName to
