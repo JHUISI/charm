@@ -55,7 +55,10 @@ def buildLoopBlockList(loopList, loopListCachedLoops=None):
 			if (type(childBlockDict).__name__ != con.dictTypePython):
 				sys.exit("Loop_Block_Toolbox->buildLoopBlockList:  value returned from getChildBlockDict is not of type " + con.dictTypePython)
 
-			buildChildBlocksForCachedLoops(childBlockDict, loopListCachedLoops, blocksMadeSoFar)
+
+
+			if (loopListCachedLoops != None):
+				buildChildBlocksForCachedLoops(childBlockDict, loopListCachedLoops, blocksMadeSoFar)
 
 			childBlockList = []
 
