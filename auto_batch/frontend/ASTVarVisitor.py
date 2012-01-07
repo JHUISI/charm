@@ -64,8 +64,8 @@ class ASTVarVisitor(ast.NodeVisitor):
 		if (type(stringValue) is not str):
 			sys.exit("ASTVarVisitor->buildStringValue:  string value returned from myASTParser->getStringValueFromNode is not of type str.")
 
-		if (len(stringValue) == 0):
-			sys.exit("ASTVarVisitor->buildStringValue:  string value returned from myASTParser->getStringValueFromNode is of length zero.")
+		#if (len(stringValue) == 0):
+			#sys.exit("ASTVarVisitor->buildStringValue:  string value returned from myASTParser->getStringValueFromNode is of length zero.")
 
 		stringValueToAdd = StringValue()
 		stringValueToAdd.setValue(stringValue)

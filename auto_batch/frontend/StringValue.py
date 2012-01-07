@@ -30,8 +30,8 @@ class StringValue:
 		if (type(value) is not str):
 			sys.exit("Value passed to StringValue class is not of type " + con.strTypePython)
 
-		if (len(value) == 0):
-			sys.exit("Value passed to StringValue class is of length zero.")
+		#if (len(value) == 0):
+			#sys.exit("Value passed to StringValue class is of length zero.")
 
 		self.value = value
 

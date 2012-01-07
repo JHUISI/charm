@@ -1606,8 +1606,8 @@ class ASTParser:
 		except:
 			sys.exit("ASTParser->getStringValueFromNode:  could not obtain the \"s\" field of the node passed in.")
 
-		if (len(stringValue) == 0):
-			sys.exit("ASTParser->getStringValueFromNode:  string obtained from node is of length zero.")
+		#if (len(stringValue) == 0):
+			#sys.exit("ASTParser->getStringValueFromNode:  string obtained from node is of length zero.")
 
 		return stringValue
 

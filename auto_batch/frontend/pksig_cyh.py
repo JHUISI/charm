@@ -56,10 +56,10 @@ class CYH(PKSig):
         h = [group.init(ZR, 1) for i in range(num_signers)]
         for i in range(num_signers):
             if IDs != L[i]:
-               u[i] = group.random(G1)
-               h[i] = H2(M, Lt, u[i])
+                u[i] = group.random(G1)
+                h[i] = H2(M, Lt, u[i])
             else:
-               s = i
+                s = i
         
         r = group.random(ZR)
         pk = [ H1(i) for i in L] # get all signers pub keys
