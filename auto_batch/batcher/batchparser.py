@@ -137,7 +137,7 @@ class BatchParser:
 signer_mode  = Enum('single', 'multi', 'ring')
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
 TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
-MESSAGE, SIGNATURE, PUBLIC, LATEX = 'message','signature', 'public', 'latex'
+MESSAGE, SIGNATURE, PUBLIC, LATEX, SETTING = 'message','signature', 'public', 'latex', 'setting'
 # qualifier (means only one instance of that particular keyword exists)
 SAME, DIFF = 'one', 'many'
 LINE_DELIM, COMMENT = ';', '#'
@@ -507,10 +507,14 @@ class CVForMultiSigner:
                 self.pubKey = self.sigKey
                 self.pubEnd = self.sigEnd
                 print("Mode: multi signer") 
+            elif setting[PUBLIC] != setting[SIGNATURE] and setting[PUBLIC] == SAME:
+                self.signer = signer_mode.single
+                self.pubKey = self.pubEnd = None
+                print("Mode: ", self.signer, "signer")
             elif setting[PUBLIC] != setting[SIGNATURE]:
             # most likely multi-signer mode
                 self.signer = signer_mode.multi
-                self.pubKey = 'i' # reserved for different amount of signers than signatures
+                self.pubKey = 'y' # reserved for different amount of signers than signatures
                 self.pubEnd = setting[PUBLIC]
                 print("Mode: ", self.signer, "signer")
             else:
@@ -519,6 +523,7 @@ class CVForMultiSigner:
             # if None for either or both (most likely a different setting)
             if setting[SIGNATURE]:
                 self.signer = signer_mode.ring
+                print("Mode: ", self.signer, "signer")
            
     def visit(self, node, data):
         pass
@@ -563,7 +568,7 @@ class CVForMultiSigner:
             elif self.signer == signer_mode.single:
                 node.setAttrIndex('z')
             elif self.signer == signer_mode.multi:
-                node.setAttrIndex('i')
+                node.setAttrIndex('y')
                 
         if self.isMsg(node) and self.setting[MESSAGE] == self.setting[SIGNATURE]:
             #print("visiting: ", node, self.setting[ MESSAGE ])
@@ -572,9 +577,9 @@ class CVForMultiSigner:
     def newProdNode(self, key=None, end=None):
         p = BatchParser()
         if key and end:
-            new_node = p.parse("prod{"+key+":=1,"+end+"} on x")        
+            new_node = p.parse("prod{"+key+":=0,"+end+"} on x")        
         else:
-            new_node = p.parse("prod{z:=1, N} on x")
+            new_node = p.parse("prod{z:=0, N} on x")
         return new_node
 
     def isPub(self, node):

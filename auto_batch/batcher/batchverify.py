@@ -159,7 +159,7 @@ if __name__ == "__main__":
     except:
         print("An error occured while processing batch inputs.")
         exit(-1)
-    const, types = ast_struct[ CONST ], ast_struct[ TYPE ]
+    constants, types = ast_struct[ CONST ], ast_struct[ TYPE ]
     latex_subs = ast_struct[ LATEX ]
     (indiv_precompute, batch_precompute) = ast_struct[ PRECOMP ]
     batch_precompute[ "delta" ] = "for{z := 1, N} do prng_z"
@@ -221,17 +221,17 @@ if __name__ == "__main__":
     
     if VERBOSE: print("setting: ", batch_count)
     
-#    exit(0)
     vars = types
     vars['N'] = N
     vars.update(metadata)
     print("variables =>", vars)
     print("metadata =>", metadata)
 
+    # build data inputs for technique classes    
+    sdl_data = { CONST : constants, PUBLIC: pub_vars, MESSAGE : msg_vars, SETTING : batch_count }    
     if PROOFGEN_FLAG:
-        lcg_data = {}
-        lcg_steps = 0
-        lcg = LatexCodeGenerator(const, vars, latex_subs)
+        lcg_data = {}; lcg_steps = 0
+        lcg = LatexCodeGenerator(constants, vars, latex_subs)
 
 
     print("\nVERIFY EQUATION =>", verify)
@@ -243,7 +243,7 @@ if __name__ == "__main__":
     ASTVisitor(SimplifyDotProducts()).preorder(verify2.right)
 
     print("\nStage A: Combined Equation =>", verify2)
-    ASTVisitor(SmallExponent(const, vars)).preorder(verify2.right)
+    ASTVisitor(SmallExponent(constants, vars)).preorder(verify2.right)
     print("\nStage B: Small Exp Test =>", verify2, "\n")
     if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Apply the small exponents test, using exponents $\delta_1, \dots \delta_\\numsigs \in_R \Zq$', 
                                                'eq':lcg.print_statement(verify2.right), 'preq':small_exp_label }; lcg_steps += 1
@@ -251,7 +251,7 @@ if __name__ == "__main__":
 
     # figure out order automatically (if not specified in bv file)
     if FIND_ORDER:
-        result = BatchOrder(const, types, vars, BinaryNode.copy(verify2.right)).strategy()
+        result = BatchOrder(sdl_data, types, vars, BinaryNode.copy(verify2.right)).strategy()
         algorithm = [str(x) for x in result]
         print("found batch algorithm =>", algorithm)
 
@@ -266,7 +266,7 @@ if __name__ == "__main__":
             Tech = techniques[option]()            
         elif option in techniques.keys():
             option_str = "Applying technique " + option
-            Tech = techniques[option](const, vars, metadata)
+            Tech = techniques[option](sdl_data, vars, metadata)
         else:
             print("Unrecognized technique selection.")
             continue
@@ -279,7 +279,6 @@ if __name__ == "__main__":
             lcg_data[ lcg_steps ] = { 'msg':Tech.rule, 'eq': lcg.print_statement(verify2.right) }
             lcg_steps += 1
 
-#    exit(0)
     
     if PROOFGEN_FLAG:
         lcg_data[ lcg_steps-1 ]['preq'] = final_batch_eq

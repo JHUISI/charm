@@ -4,9 +4,16 @@ from batchparser import *
 
 Tech_db = Enum('NoneApplied', 'ExpIntoPairing', 'DistributeExpToPairing', 'ProductToSum', 'CombinePairing', 'SplitPairing', 'ConstantPairing')
 
+#TODO: code up reverse 2 : pull values from pairing outside, 
+#TODO: code up precompute pair : precomputing pairings where both sides are constant.
+
 class AbstractTechnique:
-    def __init__(self, constants, variables, meta):
-        self.consts = constants
+    def __init__(self, sdl_data, variables, meta):
+        self.consts = sdl_data['constant']
+        self.public = sdl_data['public']
+        self.message = sdl_data['message']
+        self.setting = sdl_data['setting']
+        
         self.vars   = variables
         self.meta   = meta
 
@@ -25,8 +32,14 @@ class AbstractTechnique:
         return result
 
     def isConstant(self, node):        
-        for n in self.consts:
-            if n == node.getAttribute(): return True
+#        for n in self.data['constants']:
+#            if n == node.getAttribute(): return True
+        if node.getAttribute() in self.consts:
+            return True
+        elif node.getAttribute() in self.public and self.setting['public'] == SAME:
+            return True            
+        elif node.getAttribute() in self.message and self.setting['message'] == SAME:
+            return True
         return False
 
     def getNodes(self, tree, parent_type, _list):
@@ -131,8 +144,8 @@ class AbstractTechnique:
 tech2 = Tech_db # Enum('NoneApplied', 'ExpIntoPairing', 'DistributeExpToPairing')
 
 class Technique2(AbstractTechnique):
-    def __init__(self, constants, variables, meta):
-        AbstractTechnique.__init__(self, constants, variables, meta)
+    def __init__(self, sdl_data, variables, meta):
+        AbstractTechnique.__init__(self, sdl_data, variables, meta)
         self.rule    = "Move the exponent(s) into the pairing (technique 2)"
         self.applied = False 
         self.score   = tech2.NoneApplied
@@ -153,7 +166,7 @@ class Technique2(AbstractTechnique):
                 pair_node.left = node
                 self.applied = True
                 self.score   = tech2.ExpIntoPairing
-                #self.rule += "Left := Move '" + str(node.right) + "' exponent into the pairing. "
+                #print("T2: Left := Move '" + str(node.right) + "' exponent into the pairing.")
             
             elif not self.isConstInSubtreeT(pair_node.right):       
                 addAsChildNodeToParent(data, pair_node) # move pair node one level up                
@@ -161,7 +174,7 @@ class Technique2(AbstractTechnique):
                 pair_node.right = node 
                 self.applied = True                
                 self.score   = tech2.ExpIntoPairing                
-                #self.rule += "Right := Move '" + str(node.right) + "' exponent into the pairing. "
+                #print("T2: Right := Move '" + str(node.right) + "' exponent into the pairing.")
             else:
                 print("T2: Need to consider other cases here: ", pair_node)
                 return
@@ -203,6 +216,7 @@ class Technique2(AbstractTechnique):
                             #self.rule += "moved exponent into the pairing: less than 2 mul nodes. "
 
                     elif Type(pair_node.right) == ops.ATTR:
+                        print("DEBUG: T2 - exercise pair_node : right = ATTR")
                         # set pair node left child to node left since we've determined
                         # that the left side of pair node is not a constant
                         self.setNodeAs(pair_node, 'left', node, 'left')
@@ -217,6 +231,8 @@ class Technique2(AbstractTechnique):
                     if Type(pair_node.left) == ops.MUL:
                         print("T2: missing case - pair_node.left and MUL node.")
                     elif Type(pair_node.left) == ops.ATTR:
+                        print("DEBUG: T2 - exercise pair_node : left = ATTR")
+                        # set pair node right child to 
                         self.setNodeAs(pair_node, 'left', node, 'left')
                         self.applied = True
                         self.score   = tech2.ExpIntoPairing
@@ -254,8 +270,8 @@ class Technique2(AbstractTechnique):
 tech3 = Tech_db # Enum('NoneApplied', 'ProductToSum','CombinePairing', 'SplitPairing')
 
 class Technique3(AbstractTechnique):
-    def __init__(self, constants, variables, meta):
-        AbstractTechnique.__init__(self, constants, variables, meta)
+    def __init__(self, sdl_data, variables, meta):
+        AbstractTechnique.__init__(self, sdl_data, variables, meta)
         self.rule    = "Combine pairings with common 1st or 2nd element. Reduce N pairings to 1 (technique 3)"
         self.applied = False
         self.score   = tech3.NoneApplied
@@ -455,8 +471,8 @@ class Technique3(AbstractTechnique):
 tech4 = Tech_db # Enum('NoneApplied', 'ConstantPairing')
         
 class Technique4(AbstractTechnique):
-    def __init__(self, constants, variables, meta):
-        AbstractTechnique.__init__(self, constants, variables, meta)
+    def __init__(self, sdl_data, variables, meta):
+        AbstractTechnique.__init__(self, sdl_data, variables, meta)
         self.rule = "Applied waters hash technique (technique 4)"
         self.applied = False
         self.score   = tech4.NoneApplied

@@ -2,7 +2,7 @@ N := 100
 l := 2
 
 BEGIN :: types
-M := ZR
+m := ZR
 t := ZR
 At := G2
 Bt := G2
@@ -28,7 +28,7 @@ S, t
 END :: signature
 
 BEGIN :: message
-M
+m
 END :: message
 
 # different messages/sigs under different signers (ring)
@@ -37,7 +37,7 @@ public := l
 signature := N
 
 
-verify :=  { prod{y:=1, l} on e(S_y, At_y * (Bt_y^M_y) * (Ct_y^t_y)) } == D
+verify :=  { prod{y:=1, l} on e(S_y, At_y * (Bt_y^m_y) * (Ct_y^t_y)) } == D
 
 # 2, 3, 4, S, 3
 # 2, 4, 3, S, 3 (works!!)
