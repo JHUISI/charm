@@ -56,7 +56,7 @@ class AbstractTechnique:
     def getMulTokens(self, subtree, parent_type, target_type, _list):
         if subtree == None: return None
         elif parent_type == ops.MUL:
-            if subtree.type in target_type: _list.append(subtree)
+            if subtree.type in target_type: _list.append(subtree); return
         if subtree.left: self.getMulTokens(subtree.left, subtree.type, target_type, _list)
         if subtree.right: self.getMulTokens(subtree.right, subtree.type, target_type, _list)
         return
@@ -107,6 +107,27 @@ class AbstractTechnique:
         pair.right = right
         return pair
     
+    def createSplitPairings(self, left, right, list_nodes):        
+        nodes = list_nodes;
+        muls = [ BinaryNode(ops.MUL) for i in range(len(nodes)-1) ]
+        if left.type == ops.MUL:
+            for i in range(len(muls)):
+                muls[i].left = self.createPair(nodes[i], right)
+                if i < len(muls)-1:
+                    muls[i].right = muls[i+1]
+                else:
+                    muls[i].right = self.createPair(nodes[i+1], right)
+            return muls[0]
+        elif right.type == ops.MUL:
+            for i in range(len(muls)):
+                muls[i].left = self.createPair(left, nodes[i])
+                if i < len(muls)-1:
+                    muls[i].right = muls[i+1]
+                else:
+                    muls[i].right = self.createPair(left, nodes[i+1])
+            return muls[0]            
+        return None
+    
     def createExp(self, left, right):
         if left.type == ops.EXP: # left => a^b , then => a^(b * c)
             mul = BinaryNode(ops.MUL)
@@ -119,6 +140,20 @@ class AbstractTechnique:
             exp = BinaryNode(ops.EXP)
             exp.left = left
             exp.right = right
+        elif left.type == ops.MUL:
+            nodes = []
+            getListNodes(left, ops.NONE, nodes)
+            if len(nodes) > 2: # only distribute exponent when there are 
+                muls = [ BinaryNode(ops.MUL) for i in range(len(nodes)-1) ]
+                for i in range(len(muls)):
+                    muls[i].left = self.createExp(nodes[i], BinaryNode.copy(right))
+                    if i < len(muls)-1: muls[i].right = muls[i+1]
+                    else: muls[i].right = self.createExp(nodes[i+1], BinaryNode.copy(right))
+                exp = muls[0] # MUL nodes absorb the exponent
+            else:
+                exp = BinaryNode(ops.EXP)
+                exp.left = left
+                exp.right = right
         else:
             exp = BinaryNode(ops.EXP)
             exp.left = left
@@ -149,6 +184,7 @@ class Technique2(AbstractTechnique):
         self.rule    = "Move the exponent(s) into the pairing (technique 2)"
         self.applied = False 
         self.score   = tech2.NoneApplied
+        self.debug   = False
         
         # TODO: in cases of chp.bv, where you have multiple exponents outside a pairing, move them all into the e().
     
@@ -191,35 +227,36 @@ class Technique2(AbstractTechnique):
             if pair_node:
                 # move exp inside the pair node
                 # check whether left side is constant
+                if self.debug:
+                    print("Check left: ", self.isConstInSubtreeT(pair_node.left))
+                    print("Check right: ", self.isConstInSubtreeT(pair_node.right))
                 if not self.isConstInSubtreeT(pair_node.left):
+                    if self.debug: print("exponent moving towards right: ", pair_node.right)
                     #print(" pair right type =>", pair_node.right.type)
                     if Type(pair_node.right) == ops.MUL:
+#                        print("T2: dot prod with pair: ", pair_node)
+#                        print("MUL on right: ", pair_node.right)
                         _subnodes = []
                         getListNodes(pair_node.right, ops.NONE, _subnodes)
-                        if len(_subnodes) > 2: # candidate for expanding
-                            muls = [ BinaryNode(ops.MUL) for i in range(len(_subnodes)-1) ]
-                            for i in range(len(muls)):
-                                muls[i].left = self.createExp(_subnodes[i], BinaryNode.copy(node.right))
-                                if i < len(muls)-1:
-                                    muls[i].right = muls[i+1]
-                                else:
-                                    muls[i].right = self.createExp(_subnodes[i+1], BinaryNode.copy(node.right))
-                            #print("root =>", muls[0])
-                            pair_node.right = muls[0]
+                        if len(_subnodes) > 2:
+                            # basically call createExp to distribute the exponent to each
+                            # MUL node in pair_node.right
+                            new_mul_node = self.createExp(pair_node.right, node.right)
+                            pair_node.right = new_mul_node
                             self.applied = True
                             self.score   = tech2.DistributeExpToPairing
                             #self.rule += "distributed exponent into the pairing: right side. "
                         else:
-                            self.setNodeAs(pair_node, 'right', node, 'left')
+                            self.setNodeAs(pair_node, side.right, node, side.left)
                             self.applied = True       
                             self.score   = tech2.ExpIntoPairing                   
                             #self.rule += "moved exponent into the pairing: less than 2 mul nodes. "
 
                     elif Type(pair_node.right) == ops.ATTR:
-                        print("DEBUG: T2 - exercise pair_node : right = ATTR")
+                        if self.debug: print("T2 - exercise pair_node : right = ATTR : ", pair_node.right)
                         # set pair node left child to node left since we've determined
                         # that the left side of pair node is not a constant
-                        self.setNodeAs(pair_node, 'left', node, 'left')
+                        self.setNodeAs(pair_node, side.right, node, side.left)
                         self.applied = True
                         self.score   = tech2.ExpIntoPairing
                     else:
@@ -230,15 +267,29 @@ class Technique2(AbstractTechnique):
                     # check the type of pair_node : 
                     if Type(pair_node.left) == ops.MUL:
                         print("T2: missing case - pair_node.left and MUL node.")
+                        _subnodes = []
+                        getListNodes(pair_node.left, ops.NONE, _subnodes)
+                        if len(_subnodes) > 2:
+                            new_mul_node = self.createExp(pair_node.left, node.right)
+                            pair_node.left = new_mul_node
+                            self.applied = True
+                            self.score   = tech2.DistributeExpToPairing                            
+                        else:
+                            # pair_node -> left side is set to node (then which side)
+                            self.setNodeAs(pair_node, side.left, node, side.left)
+                            self.applied = True
+                            self.score   = tech2.ExpIntoPairing                            
                     elif Type(pair_node.left) == ops.ATTR:
-                        print("DEBUG: T2 - exercise pair_node : left = ATTR")
+                        print("T2 - exercise pair_node : left = ATTR : ", pair_node.left)
                         # set pair node right child to 
-                        self.setNodeAs(pair_node, 'left', node, 'left')
+                        self.setNodeAs(pair_node, side.left, node, side.left)
                         self.applied = True
                         self.score   = tech2.ExpIntoPairing
+                    else:
+                        pass
             else:
             #    blindly make the exp node the right child of whatever node
-                self.setNodeAs(prod_node, 'right', node, 'left')
+                self.setNodeAs(prod_node, side.right, node, side.left)
                 self.applied = True
                 self.score   = tech2.ExpIntoPairing
                 
@@ -258,12 +309,15 @@ class Technique2(AbstractTechnique):
             #print("Other cases not ATTR?: ", Type(node.left))
             return
     
-    def setNodeAs(self, orig_node, attr_str, target_node, target_attr_str='left'):
-        if attr_str == 'right':  tmp_node = orig_node.right; orig_node.right = target_node
-        elif attr_str == 'left': tmp_node = orig_node.left; orig_node.left = target_node
+    # A quick way to reassign node pointers
+    # 1. sets orig_node (left or right side) to target_node
+    # 2. sets target_node (left or right side) to orig_node's specified side
+    def setNodeAs(self, orig_node, attr_str, target_node, target_attr_str=side.left):
+        if attr_str == side.right:  tmp_node = orig_node.right; orig_node.right = target_node
+        elif attr_str == side.left: tmp_node = orig_node.left; orig_node.left = target_node
         else: return None
-        if target_attr_str == 'left': target_node.left = tmp_node
-        elif target_attr_str == 'right': target_node.right = tmp_node
+        if target_attr_str == side.left: target_node.left = tmp_node
+        elif target_attr_str == side.right: target_node.right = tmp_node
         else: return None
         return True
         
@@ -293,6 +347,7 @@ class Technique3(AbstractTechnique):
                 left.right = self.createExp(base_node, exp_node)
                 self.deleteFromTree(right, node, exp_node, side.right) # cleanup right side tree?
 #                self.applied = True
+                #print("T3: cleaned up right side of dot product?")
         elif Type(right) == ops.ON:
             index = str(right.left.left.left)
             #print("right ON node =>", index)
@@ -303,9 +358,10 @@ class Technique3(AbstractTechnique):
                 self.deleteFromTree(left, node, exp_node, side.left)
 #                self.applied = True
         elif Type(left) == ops.MUL:
+            if self.debug: print("T3: visit pair - left = MUL, what to do?")
             pass
         elif Type(right) == ops.MUL:
-#            print("T3: Node =", right, " type:", Type(right))
+            if self.debug: print("T3: visit pair - Node =", right, " type:", Type(right))
             child_node1 = right.left
             child_node2 = right.right
             if Type(child_node1) == ops.ON:
@@ -332,28 +388,30 @@ class Technique3(AbstractTechnique):
         if index != 'N' or Type(data['parent']) == ops.PAIR:
             return # should check for other things before returning in the multi-signer case
         
-        if Type(node.right) == ops.PAIR:            
+        if Type(node.right) == ops.PAIR:  
             pair_node = node.right
             
             l = []; r = [];
-            self.getMulTokens(pair_node.left, ops.NONE, [ops.EXP, ops.HASH], l)
-            self.getMulTokens(pair_node.right, ops.NONE, [ops.EXP, ops.HASH], r)
-            if len(l) > 2: 
-                print("TODO: T3 - Need to handle the left case in visit_on.")
-            elif len(r) > 2:
+            self.getMulTokens(pair_node.left, ops.NONE, [ops.EXP, ops.HASH, ops.ATTR], l)
+            self.getMulTokens(pair_node.right, ops.NONE, [ops.EXP, ops.HASH, ops.ATTR], r)
+            if self.debug:
+                print("left list: ")
+                for i in l: print(i)
+                print("right list: ")
+                for i in r: print(i)
+            
+            if len(l) > 2 and len(r) < 2: 
+                right = pair_node.right # right side of pairing is the constant
+                node.right = self.createSplitPairings(pair_node.left, right, l)
+                self.applied = True
+                self.score   = tech3.SplitPairing
+                 
+            elif len(r) > 2 and len(l) < 2:
                 # special case: reverse split a \single\ pairing into two or more pairings to allow for application of 
                 # other techniques. pair(a, b * c * d?) => p(a, b) * p(a, c) * p(a, d)
                 # pair with a child node with more than two mult's?
-                left = pair_node.left
-                muls = [ BinaryNode(ops.MUL) for i in range(len(r)-1) ]
-                for i in range(len(muls)):
-                    muls[i].left = self.createPair(left, r[i])
-                    if i < len(muls)-1:
-                        muls[i].right = muls[i+1]
-                    else:
-                        muls[i].right = self.createPair(left, r[i+1])
-                #print("root =>", muls[0])
-                node.right = muls[0]
+                left = pair_node.left # left side of pairing is the constant
+                node.right = self.createSplitPairings(left, pair_node.right, r)
                 self.applied = True
                 self.score   = tech3.SplitPairing
                 #self.rule += "split one pairing into two or three."
