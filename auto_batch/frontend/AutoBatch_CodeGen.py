@@ -2178,11 +2178,19 @@ def addCommonHeaderLines():
 	individualVerFile.write(indOutputString)
 	verifySigsFile.write(verifyOutputString)
 
+def writeNumSignersLine(outputFile):
+	lineNosToWriteToFile = getAllLineNosThatImpactVarList([con.numSigners], con.verifyFuncName, lineNosPerVar, var_varDependencies)
+	if (lineNosToWriteToFile != None):
+		writeLinesToFile(lineNosToWriteToFile, 0, outputFile)
+		return
+
+	numSignersNum = getStringNameIntegerValue(varAssignments, con.numSigners, con.mainFuncName)
+
+	if (numSignersNum != None):
+		outputFile.write("\t" + con.numSigners + " = " + str(numSignersNum) + "\n")
+
 def addTemplateLines():
 	global batchVerFile, individualVerFile
-	global verifyNumSignersLine
-
-	numSigners = getStringNameIntegerValue(varAssignments, con.numSigners, con.mainFuncName)
 
 	batchOutputString = ""
 	indOutputString = ""
@@ -2202,10 +2210,11 @@ def addTemplateLines():
 
 	batchOutputString += "\t" + con.group + " = " + con.group + "ObjParam\n\n"
 	batchOutputString += "\t" + con.numSignatures + " = len(verifyArgsDict)\n"
+	batchOutputString += "\t" + con.numSignaturesIndex + " = 0\n"
 
-	if (numSigners != None):
-		batchOutputString += "\t" + con.numSigners + " = " + str(numSigners) + "\n"
-		verifyNumSignersLine = "\t" + con.numSigners + " = " + str(numSigners) + "\n"
+	batchVerFile.write(batchOutputString)
+	batchOutputString = ""
+	writeNumSignersLine(batchVerFile)
 
 	batchOutputString += "\t" + con.deltaDictName + " = {}\n"
 	batchOutputString += "\tfor " + con.numSignaturesIndex + " in range(0, " + con.numSignatures + "):\n"
@@ -2215,9 +2224,11 @@ def addTemplateLines():
 
 	indOutputString += "\t" + con.group + " = " + con.group + "ObjParam\n\n"
 	indOutputString += "\t" + con.numSignatures + " = len(verifyArgsDict)\n"
+	indOutputString += "\t" + con.numSignaturesIndex + " = 0\n"
 
-	if (numSigners != None):
-		indOutputString += "\t" + con.numSigners + " = " + str(numSigners) + "\n"
+	individualVerFile.write(indOutputString)
+	indOutputString = ""
+	writeNumSignersLine(individualVerFile)
 
 	indOutputString += "\tincorrectIndices = []\n"
 
@@ -2345,6 +2356,8 @@ def writeLinesToOutputString(lines, indentationListParam, baseNumTabs, numExtraT
 	outputString = ""
 	lineNumber = -1
 
+	numTabsOnPreviousLine = 9999
+
 	for line in lines:
 		lineNumber += 1
 		if (isLineOnlyWhiteSpace(line) == True):
@@ -2366,12 +2379,26 @@ def writeLinesToOutputString(lines, indentationListParam, baseNumTabs, numExtraT
 					line = line.replace(argWithSpaces, replacementString + ' ', 1)
 		line = line.lstrip().rstrip()
 		line = removeSpaceBeforeChar(line, con.lParan)
+
+		line = removeSpaceBeforeChar(line, '=')
+
 		line = removeSpaceAfterChar(line, '-')
 		line = line.replace(con.selfFuncCallString, con.space)
 		numTabs = determineNumTabsFromSpaces(indentationListParam[lineNumber], numSpacesPerTab) - baseNumTabs
 		numTabs += numExtraTabs
+
+		#if (numTabs == (numTabsOnPreviousLine + 1) ):
+			#outputString += getStringOfTabs(numTabs)
+			#outputString += "pass\n"
+
+		numTabsOnPreviousLine = numTabs
+
 		outputString += getStringOfTabs(numTabs)
 		outputString += line + "\n"
+
+		outputString = addPassToPythonLoops(line, outputString, (numTabs+1))
+
+
 
 	if (len(outputString) == 0):
 		sys.exit("AutoBatch_CodeGen->writeLinesToOutputString:  could not form any lines for the output string.")
@@ -2587,7 +2614,7 @@ def writeOneBlockToFile(block, numBaseTabs, outputFile, forCachedCalcs):
 			if ( (childBlock == None) or (type(childBlock).__name__ != con.loopBlock) ):
 				sys.exit("AutoBatch_CodeGen->writeOneBlockToFile:  problem with one of the child blocks from the block parameter passed in.")
 
-			writeOneBlockToFile(childBlock, (numBaseTabs + 1), outputFile, forCachedCalcs)
+			writeOneBlockToFile(childBlock, (numBaseTabs + 1), outputFile, False)
 
 	if (blockLoopsWithVarsToCalc != None):
 		variablesToCalculateAsStrings = getVariablesOfLoopsAsStrings(loopInfo, blockLoopsWithVarsAsStrings)
@@ -2683,6 +2710,9 @@ def getExpressionCalcString(expression, loopName, blockOperationString, numBaseT
 		expression = expression.replace(verifyArgWithSpaces, replacementExpression)
 
 	expression = removeSpaceBeforeChar(expression, con.lParan)
+
+	expression = removeSpaceBeforeChar(expression, '=')
+
 	expression = removeSpaceAfterChar(expression, '-')
 
 	outputString += expression
@@ -2849,9 +2879,9 @@ def writeOpeningLinesToDCVerifySigsRecursiveFunc():
 	verifyOutputString += "\t" + con.numSignaturesIndex + " = 0\n\n"
 
 	verifyOutputString += "\t" + con.group + " = groupObj\n\n"
-
-	if (verifyNumSignersLine != None):
-		verifyOutputString += verifyNumSignersLine + "\n"
+	verifySigsFile.write(verifyOutputString)
+	verifyOutputString = ""
+	writeNumSignersLine(verifySigsFile)
 
 	if (verifyPrereqs != None):
 		verifyOutputString += verifyPrereqs
@@ -3074,6 +3104,18 @@ def main():
 		if ( (linePairsOfVerifyFuncs == None) or (type(linePairsOfVerifyFuncs).__name__ != con.listTypePython) or (len(linePairsOfVerifyFuncs) == 0) ):
 			sys.exit("AutoBatch_CodeGen->main:  problem with value returned from getFirstLastLineNosOfFuncList.")
 
+
+	lineNosPerVar = getLineNosPerVar(varAssignments)
+	if ( (lineNosPerVar == None) or (type(lineNosPerVar).__name__ != con.dictTypePython) or (len(lineNosPerVar) == 0) ):
+		sys.exit("AutoBatch_CodeGen->main:  problem with value returned from getLineNosPerVar.")
+
+
+	var_varDependencies = getVar_VarDependencies(varAssignments, globalVars)
+	if ( (var_varDependencies == None) or (type(var_varDependencies).__name__ != con.dictTypePython) or (len(var_varDependencies) == 0) ):
+		sys.exit("AutoBatch_CodeGen->main:  problem with value returned from getVar_VarDependencies.")
+
+
+
 	addImportLines()
 	addCommonHeaderLines()
 
@@ -3135,13 +3177,6 @@ def main():
 	else:
 		loopBlocksForNonCachedCalculations = None
 
-	lineNosPerVar = getLineNosPerVar(varAssignments)
-	if ( (lineNosPerVar == None) or (type(lineNosPerVar).__name__ != con.dictTypePython) or (len(lineNosPerVar) == 0) ):
-		sys.exit("AutoBatch_CodeGen->main:  problem with value returned from getLineNosPerVar.")
-
-	var_varDependencies = getVar_VarDependencies(varAssignments, globalVars)
-	if ( (var_varDependencies == None) or (type(var_varDependencies).__name__ != con.dictTypePython) or (len(var_varDependencies) == 0) ):
-		sys.exit("AutoBatch_CodeGen->main:  problem with value returned from getVar_VarDependencies.")
 
 	writeDictDefsOfCachedCalcsForBatch()
 	writeBodyOfCachedCalcsForBatch()

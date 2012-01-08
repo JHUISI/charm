@@ -89,6 +89,9 @@ pairingLetter = 'e'
 precomputeString = 'Precompute: '
 precomputeVarString = 'pre'
 productString = 'prod'
+
+pythonLoopPrefixes = ['for ', 'while ']
+
 randomType = 'random'
 randomValue = 'RandomValue'
 range = 'range'

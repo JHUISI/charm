@@ -7,6 +7,15 @@ from StringValue import StringValue
 from LineNumbers import LineNumbers
 from VariableDependencies import VariableDependencies
 
+def addPassToPythonLoops(line, outputString, numTabs):
+	for loopPrefix in con.pythonLoopPrefixes:
+		if (line.startswith(loopPrefix) == True):
+			outputString += getStringOfTabs(numTabs)
+			outputString += "pass\n"
+			break
+
+	return outputString
+
 def removeListEntriesFromAnotherList(listEntries, listToRemoveFrom):
 	for entry in listEntries:
 		while (listToRemoveFrom.count(entry) > 0):
@@ -1511,11 +1520,16 @@ def writeFunctionFromCodeToString(sourceCodeLines, startLineNo, endLineNo, extra
 
 	firstLine = firstLine.lstrip()
 	firstLine = removeSpaceBeforeChar(firstLine, con.lParan)
+
+	firstLine = removeSpaceBeforeChar(firstLine, '=')
+
 	firstLine = removeSpaceAfterChar(firstLine, '-')
 	outputString += firstLine
 	outputString += "\n"
 
 	lenExtractedLines = len(extractedLines)
+
+	numTabsOnPreviousLine = 9999
 
 	for index in range(1, lenExtractedLines):
 		numSpaces = indentationList[index]
@@ -1533,13 +1547,28 @@ def writeFunctionFromCodeToString(sourceCodeLines, startLineNo, endLineNo, extra
 
 		line = line.lstrip()
 		line = removeSpaceBeforeChar(line, con.lParan)
+
+		line = removeSpaceBeforeChar(line, '=')
+
 		line = removeSpaceAfterChar(line, '-')
 
-		if ( (extraTabsPerLine + numTabsForThisLine) > 0):
-			outputString += getStringOfTabs(extraTabsPerLine + numTabsForThisLine)
+		totalTabsForThisLine = extraTabsPerLine + numTabsForThisLine
+
+		#if (totalTabsForThisLine == (numTabsOnPreviousLine + 1) ):
+			#outputString += getStringOfTabs(totalTabsForThisLine)
+			#outputString += "pass\n"
+
+		numTabsOnPreviousLine = totalTabsForThisLine
+
+		if (totalTabsForThisLine > 0):
+			outputString += getStringOfTabs(totalTabsForThisLine)
 
 		outputString += line
 		outputString += "\n"
+
+		outputString = addPassToPythonLoops(line, outputString, (totalTabsForThisLine + 1))
+
+
 
 	outputString += "\n"
 	return outputString
