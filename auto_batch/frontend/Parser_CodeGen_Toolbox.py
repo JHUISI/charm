@@ -226,11 +226,18 @@ def getImpactingLineNosRecursive(varName, funcName, lineNosPerVar, var_varDepend
 		if ( (currentVarName == None) or (type(currentVarName).__name__ != con.strTypePython) or (len(currentVarName) == 0) ):
 			sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  problem with variable name represented as string, extracted from current LineNumbers object in lineNosPerVar[funcName].")
 
+		indexLBraceCurrentVar = currentVarName.find('[')
+		indexLBraceVar = varName.find('[')
+
+		if ( (indexLBraceVar == -1) and (indexLBraceCurrentVar != -1) ):
+			currentVarName = currentVarName[0:indexLBraceCurrentVar]
+			#print(currentVarName)
+
 		if (currentVarName != varName):
 			continue
 
-		if (foundVariablePassedIn == True):
-			sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  found duplicate variable names in lineNosPerVar parameter passed in for function name passed in.")
+		#if (foundVariablePassedIn == True):
+			#sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  found duplicate variable names in lineNosPerVar parameter passed in for function name passed in.")
 
 		foundVariablePassedIn = True
 
@@ -259,11 +266,18 @@ def getImpactingLineNosRecursive(varName, funcName, lineNosPerVar, var_varDepend
 		if ( (currentVarName == None) or (type(currentVarName).__name__ != con.strTypePython) or (len(currentVarName) == 0) ):
 			sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  problem with variable name as string in one of the VariableDependencies object in var_varDependencies[funcName].")
 
+		indexLBraceCurrentVar = currentVarName.find('[')
+		indexLBraceVar = varName.find('[')
+
+		if ( (indexLBraceVar == -1) and (indexLBraceCurrentVar != -1) ):
+			currentVarName = currentVarName[0:indexLBraceCurrentVar]
+
+
 		if (currentVarName != varName):
 			continue
 
-		if (foundVariableNamePassedIn == True):
-			sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  found duplicate variable names in var_varDependencies[funcName].")
+		#if (foundVariableNamePassedIn == True):
+			#sys.exit("Parser_CodeGen_Toolbox->getImpactingLineNosRecursive:  found duplicate variable names in var_varDependencies[funcName].")
 
 		foundVariableNamePassedIn = True
 
