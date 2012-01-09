@@ -44,6 +44,9 @@ numTabsOnVerifyLine = None
 precomputeVars = []
 pythonCodeLines = None
 pythonCodeNode = None
+
+sortVars = []
+
 var_varDependencies = None
 varAssignments = None
 verifyEqNode = None
@@ -1817,6 +1820,12 @@ def processPrecomputeLine(line):
 	nextPrecomputeVarObj.setExpression(expression)
 	precomputeVars.append(copy.deepcopy(nextPrecomputeVarObj))
 
+def processSortLine(line):
+	global sortVars
+
+	line = line.replace(con.sortString, '', 1)
+	print(line)
+
 def processLoopLine(line):
 	global loopVarGroupTypes
 
@@ -2195,7 +2204,7 @@ def addTemplateLines():
 	batchOutputString = ""
 	indOutputString = ""
 
-	batchOutputString += "def run_Batch(verifyArgsDict, " + con.group + "ObjParam, verifyFuncArgs):\n"
+	batchOutputString += "def run_Batch_Sorted(verifyArgsDict, " + con.group + "ObjParam, verifyFuncArgs):\n"
 	batchOutputString += "\tglobal " + con.group + "\n"
 
 	indOutputString += "def run_Ind(verifyArgsDict, " + con.group + "ObjParam, verifyFuncArgs):\n"
@@ -2957,6 +2966,18 @@ def writeVerifyEqAndRecursionForDC():
 
 	verifySigsFile.write(outputString)
 
+def writeCallToSortFunction():
+	global batchVerFile
+
+	outputString = ""
+	outputString += "\n"
+	outputString += "def run_Batch(verifyArgsDict, groupObjParam, verifyFuncArgs, toSort):\n"
+	outputString += "\tif (toSort == False):\n"
+	outputString += "\t\tincorrectIndices = run_Batch_Sorted(verifyArgsDict, groupObjParam, verifyFuncArgs)\n"
+	outputString += "\t\treturn incorrectIndices\n\n"
+
+	batchVerFile.write(outputString)
+
 def main():
 	if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
 		sys.exit("\nUsage:  python " + sys.argv[0] + "\n \
@@ -3147,6 +3168,10 @@ def main():
 			processPrecomputeLine(line)
 		if (line.startswith(con.computeString) == True):
 			processComputeLine(line)
+
+		if (line.startswith(con.sortString) == True):
+			processSortLine(line)
+
 		linePrefix = line[0:con.maxStrLengthForLoopNames]
 		if (isStringALoopName(linePrefix) == True):
 			processLoopLine(line)
@@ -3181,6 +3206,8 @@ def main():
 	writeDictDefsOfCachedCalcsForBatch()
 	writeBodyOfCachedCalcsForBatch()
 	writeCallToDCAndRetToBatch()
+
+	writeCallToSortFunction()
 
 	writeOpeningLinesToDCVerifySigsRecursiveFunc()
 	if (loopBlocksForNonCachedCalculations != None):

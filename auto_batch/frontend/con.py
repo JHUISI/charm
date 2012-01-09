@@ -105,6 +105,9 @@ sliceValue = 'SliceValue'
 sliceType_LowerUpperStep = 'SliceType_LowerUpperStep'
 sliceType_Value = 'SliceType_Value'
 sliceTypes = [sliceType_LowerUpperStep, sliceType_Value]
+
+sortString = 'Sort := '
+
 space = ' '
 stringName = 'StringName'
 stringValue = 'StringValue'
