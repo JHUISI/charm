@@ -32,9 +32,9 @@ sig := { prod{y := 1, l} on bsig_y }
 abc := b-a
 END :: precompute
 
-BEGIN :: transform
-2, 4, 3
-END :: transform
+#BEGIN :: transform
+#2, 4, 3
+#END :: transform
 
 # different messages/sigs under a single signer
 message := N
@@ -42,5 +42,4 @@ public := l
 signature := N
 
 verify := { e(sig, g2) == (prod{y := 1, l} on e(H(M_y, G1), pk_y)) }
-#verify := { e(sig, g2) == (prod{y := 1, l} on e(pk_y, H(M_y, G1))) }
 

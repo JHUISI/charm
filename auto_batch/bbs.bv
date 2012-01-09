@@ -1,0 +1,51 @@
+# bls batch inputs
+# variables
+name := bbs
+N := 100
+
+BEGIN :: types
+  M := str
+  g1 := G1; g2 := G2
+  R3 := GT
+END :: types
+
+BEGIN :: precompute
+  R1_z := u^s-alpha * T1^c
+  R2_z := v^s-beta * T2^c
+  R4_z := T1^s-x
+  R5_z := T2^s-x * v^s-gamma2
+END :: precompute
+
+BEGIN :: constant
+  g1, g2, h, u, v, w
+END :: constant
+
+BEGIN :: public 
+  h, u, v, w
+END :: public
+
+BEGIN :: signature
+  T1, T2, T3, R3, c, s-alpha, s-beta, s-x, s-gamma1, s-gamma2
+END :: signature
+
+BEGIN :: message
+  M
+END :: message
+
+# different messages/sigs under a single signer
+message := one
+public := one
+signature := N
+
+# same message. different signatures/signers
+#message := one
+#public := S
+#signature := N
+
+verify := { e(T3, g2)^s-x * e(h, w)^(s-alpha * s-beta) * e(h, g2)^(s-gamma1 * s-gamma2) * (e(T3, w) * e(g1, g2)^1)^c == R3 }
+
+# notes: need to test negation for '1' and 's-alpha' etc. variables
+
+BEGIN :: transform
+2
+END :: transform
