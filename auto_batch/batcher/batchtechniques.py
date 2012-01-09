@@ -19,9 +19,13 @@ class AbstractTechnique:
 
     def visit(self, node, data):
         return
-# check whether left or right node is constant
+    # check whether left or right node is constant
     def isConstInSubtreeT(self, node):  
         if node == None: return None
+        if Type(node) == ops.EXP: 
+            # when presented with A^B_z or A^B type nodes 
+            # (checking the base value should be sufficient)
+            return self.isConstInSubtreeT(node.left)
         if Type(node) == ops.ATTR:
             return self.isConstant(node)
         elif Type(node) == ops.HASH:
@@ -35,6 +39,7 @@ class AbstractTechnique:
 #        for n in self.data['constants']:
 #            if n == node.getAttribute(): return True
         if node.getAttribute() in self.consts:
+            if self.debug: print("node is constant: ", node.getAttribute())
             return True
         elif node.getAttribute() in self.public and self.setting['public'] == SAME:
             return True            
@@ -112,19 +117,19 @@ class AbstractTechnique:
         muls = [ BinaryNode(ops.MUL) for i in range(len(nodes)-1) ]
         if left.type == ops.MUL:
             for i in range(len(muls)):
-                muls[i].left = self.createPair(nodes[i], right)
+                muls[i].left = self.createPair(nodes[i], BinaryNode.copy(right))
                 if i < len(muls)-1:
                     muls[i].right = muls[i+1]
                 else:
-                    muls[i].right = self.createPair(nodes[i+1], right)
+                    muls[i].right = self.createPair(nodes[i+1], BinaryNode.copy(right))
             return muls[0]
         elif right.type == ops.MUL:
             for i in range(len(muls)):
-                muls[i].left = self.createPair(left, nodes[i])
+                muls[i].left = self.createPair(BinaryNode.copy(left), nodes[i])
                 if i < len(muls)-1:
                     muls[i].right = muls[i+1]
                 else:
-                    muls[i].right = self.createPair(left, nodes[i+1])
+                    muls[i].right = self.createPair(BinaryNode.copy(left), nodes[i+1])
             return muls[0]            
         return None
     
@@ -252,7 +257,7 @@ class Technique2(AbstractTechnique):
                             self.score   = tech2.ExpIntoPairing                   
                             #self.rule += "moved exponent into the pairing: less than 2 mul nodes. "
 
-                    elif Type(pair_node.right) == ops.ATTR:
+                    elif Type(pair_node.right) in [ops.HASH, ops.ATTR]:
                         if self.debug: print("T2 - exercise pair_node : right = ATTR : ", pair_node.right)
                         # set pair node left child to node left since we've determined
                         # that the left side of pair node is not a constant
@@ -279,7 +284,7 @@ class Technique2(AbstractTechnique):
                             self.setNodeAs(pair_node, side.left, node, side.left)
                             self.applied = True
                             self.score   = tech2.ExpIntoPairing                            
-                    elif Type(pair_node.left) == ops.ATTR:
+                    elif Type(pair_node.left) in [ops.HASH, ops.ATTR]:
                         print("T2 - exercise pair_node : left = ATTR : ", pair_node.left)
                         # set pair node right child to 
                         self.setNodeAs(pair_node, side.left, node, side.left)
@@ -333,7 +338,7 @@ class Technique3(AbstractTechnique):
 
     # once a     
     def visit_pair(self, node, data):
-        #print("State: ", node)
+        #print("Current state: ", node)
         left = node.left
         right = node.right
         if Type(left) == ops.ON:
@@ -342,23 +347,30 @@ class Technique3(AbstractTechnique):
             index = str(left.left.left.left)
             #print("left ON node =>", index)
             exp_node = self.findExpWithIndex(right, index)
+#            print("T3: before =>", node)
+#            print("left := ON => moving EXP node: ", exp_node)
             if exp_node:
                 base_node = left.right
                 left.right = self.createExp(base_node, exp_node)
                 self.deleteFromTree(right, node, exp_node, side.right) # cleanup right side tree?
 #                self.applied = True
-                #print("T3: cleaned up right side of dot product?")
+#                print("T3: result =>", node)
         elif Type(right) == ops.ON:
             index = str(right.left.left.left)
             #print("right ON node =>", index)
             exp_node = self.findExpWithIndex(left, index)
+#            print("T3: before =>", node)
+#            print("right := ON => moving EXP node: ", exp_node)
             if exp_node:
                 base_node = right.right
                 right.right = self.createExp(base_node, exp_node)
                 self.deleteFromTree(left, node, exp_node, side.left)
 #                self.applied = True
+#                print("T3: result right =>", node)
+            else: pass
+#                print("T3: result w/o transform =>", node)
         elif Type(left) == ops.MUL:
-            if self.debug: print("T3: visit pair - left = MUL, what to do?")
+            print("T3: visit pair - left = MUL, what to do?")
             pass
         elif Type(right) == ops.MUL:
             if self.debug: print("T3: visit pair - Node =", right, " type:", Type(right))
@@ -379,7 +391,7 @@ class Technique3(AbstractTechnique):
                 if self.debug: 
                     print("TODO: T3 - missing case: ", Type(child_node1), " and ", Type(child_node2))
         else:
-            return None
+            return
 
     # transform prod{} on pair(x,y) => pair( prod{} on x, y) OR pair(x, prod{} on y)
     # n pairings to 1 and considers the split reverse case
@@ -388,6 +400,7 @@ class Technique3(AbstractTechnique):
         if index != 'N' or Type(data['parent']) == ops.PAIR:
             return # should check for other things before returning in the multi-signer case
         
+        #print("T3: visit_on : current_state :=", node)
         if Type(node.right) == ops.PAIR:  
             pair_node = node.right
             
@@ -429,23 +442,54 @@ class Technique3(AbstractTechnique):
                         if self.debug: print("Cannot rearrange, therefore, BAIL!")
                         return # bail, no dice!
                                     
-                addAsChildNodeToParent(data, pair_node) # move pair one level up  
-
-                #print("pair_node left +> ", pair_node.left, self.isConstInSubtreeT(pair_node.left))                              
-                if not self.isConstInSubtreeT(pair_node.left): # if F, then can apply prod node to left child of pair node              
+                #addAsChildNodeToParent(data, pair_node) # move pair one level up  
+                left_check = not self.isConstInSubtreeT(pair_node.left)
+                right_check = not self.isConstInSubtreeT(pair_node.right)
+#                print("left check:", left_check, ", right check:", right_check)
+                if left_check == right_check and left_check: 
+                    # thus far, we've determined that both side are candidates for dot product.
+                    # so we need another indicator to determine which side.
+#                    print("T3: this case not fully explored. There maybe other corner cases!!!")
+#                    print("index of interest: ", target)
+                    loop_left_check = self.isLoopOverTarget(pair_node.left, target)
+                    loop_right_check = self.isLoopOverTarget(pair_node.right, target)
+                    if loop_left_check: # move dot prod to left side
+#                        print("move dot prod to left: ", pair_node.left)
+                        addAsChildNodeToParent(data, pair_node) # move pair one level up  
+                        node.right      = pair_node.left # set dot prod right to pair_node left
+                        pair_node.left  = node # pair node moves up and set pair left to dot prod
+                        self.visit_pair(pair_node, data) # organize exponents that maybe in the wrong side
+                        self.applied    = True
+                        self.score      = tech3.CombinePairing
+                    elif loop_right_check:
+#                        print("move dot prod to right: ", pair_node.right)                        
+                        addAsChildNodeToParent(data, pair_node) # move pair one level up                          
+                        node.right      = pair_node.right
+                        pair_node.right = node
+                        self.visit_pair(pair_node, data)
+                        self.applied    = True
+                        self.score      = tech3.CombinePairing
+                    
+                elif left_check: # if F, then can apply prod node to left child of pair node  
+                    addAsChildNodeToParent(data, pair_node) # move pair one level up                                  
+#                    print("T3: before _pair left: combinepair: ", node)                                      
                     node.right = pair_node.left
                     pair_node.left = node # pair points to 'on' node
                     #self.rule += "common 1st (left) node appears, so can reduce n pairings to 1. "
                     self.visit_pair(pair_node, data)                    
                     self.applied = True
-                    self.score   = tech3.CombinePairing                    
-                elif not self.isConstInSubtreeT(pair_node.right):
+                    self.score   = tech3.CombinePairing  
+#                    print("T3: after _pair left: combinepair: ", node, "\n")                  
+                elif right_check:
+                    addAsChildNodeToParent(data, pair_node) # move pair one level up                                                      
+#                    print("T3: before _pair right: combinepair: ", node)                                      
                     node.right = pair_node.right
                     pair_node.right = node
                     #self.rule += "common 2nd (right) node appears, so can reduce n pairings to 1. "
                     self.visit_pair(pair_node, data)
                     self.applied = True
                     self.score   = tech3.CombinePairing
+#                    print("T3: after _pair right: combinepair: ", node,"\n")                                                          
                 else:
                     pass # do nothing if previous criteria isn't met.
             return
@@ -525,6 +569,18 @@ class Technique3(AbstractTechnique):
             if result1 == result2: return result1
             elif result1 or result2: return False
             return # most likely won't hit this condition
+
+    def isLoopOverTarget(self, tree, target):
+        if tree == None: return None
+        elif Type(tree) in [ops.EXP, ops.HASH]:
+            if target in tree.left.attr_index: return True
+        elif Type(tree) == ops.ATTR:
+            if target in tree.attr_index: return True
+        else:
+            result = self.isLoopOverTarget(tree.left, target)
+            if result: return result 
+            return self.isLoopOverTarget(tree.right, target)
+        return False
 
 tech4 = Tech_db # Enum('NoneApplied', 'ConstantPairing')
         
