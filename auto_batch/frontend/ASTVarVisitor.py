@@ -375,19 +375,40 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		argList = self.getArgNodeList(node)
 
-		(funcValueNameObject, funcAttrNameObject) = self.myASTParser.getFuncNameFromCallNode(node)
-		if ( (funcValueNameObject == None) or (type(funcValueNameObject).__name__ != con.stringName) ):
-			sys.exit("ASTVarVisitor->buildCallObjectFromNode:  problem with value returned from ASTParser->getFuncNameFromCallNode on function value name object.")
+		#(funcValueNameObject, funcAttrNameObject) = self.myASTParser.getFuncNameFromCallNode(node)
+		#if ( (funcValueNameObject == None) or (type(funcValueNameObject).__name__ != con.stringName) ):
+			#sys.exit("ASTVarVisitor->buildCallObjectFromNode:  problem with value returned from ASTParser->getFuncNameFromCallNode on function value name object.")
 
-		if (funcAttrNameObject != None):
-			if (type(funcAttrNameObject).__name__ != con.stringName):
-				sys.exit("ASTVarVisitor->buildCallObjectFromNode:  problem with value returned from ASTParser->getFuncNameFromCallNode for function attribute name object.")
+		#if (funcAttrNameObject != None):
+			#if (type(funcAttrNameObject).__name__ != con.stringName):
+				#sys.exit("ASTVarVisitor->buildCallObjectFromNode:  problem with value returned from ASTParser->getFuncNameFromCallNode for function attribute name object.")
 
 		returnCallObject = CallValue()
-		returnCallObject.setFuncName(funcValueNameObject)
 
-		if (funcAttrNameObject != None):
-			returnCallObject.setAttrName(funcAttrNameObject)
+		callNodeFields = node.func._fields
+		if ( ('id' in callNodeFields) and ('value' not in callNodeFields) and ('attr' not in callNodeFields) ):
+			processedFuncName = self.processNode(node.func)
+			returnCallObject.setFuncName(processedFuncName)
+		elif ( ('id' not in callNodeFields) and ('value' in callNodeFields) and ('attr' in callNodeFields) ):
+			processedFuncName = self.processNode(node.func.value)
+
+			#print(node.func.attr)
+			#print(node.lineno)
+
+			processedAttrName = StringName()
+			processedAttrName.setName(node.func.attr)
+			processedAttrName.setLineNo(node.lineno)
+
+			returnCallObject.setFuncName(processedFuncName)
+			returnCallObject.setAttrName(processedAttrName)
+		else:
+			sys.exit("astvarvisit->buildcall:  structure not understood.")
+
+		#if (funcValueNameObject != None):
+			#returnCallObject.setFuncName(funcValueNameObject)
+
+		#if (funcAttrNameObject != None):
+			#returnCallObject.setAttrName(funcAttrNameObject)
 
 		returnCallObject.setArgList(argList)
 		return returnCallObject

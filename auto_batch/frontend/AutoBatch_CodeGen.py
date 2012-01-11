@@ -2976,7 +2976,46 @@ def writeCallToSortFunction():
 	outputString += "\t\tincorrectIndices = run_Batch_Sorted(verifyArgsDict, groupObjParam, verifyFuncArgs)\n"
 	outputString += "\t\treturn incorrectIndices\n\n"
 
+	outputString += "\t" + con.numSignatures + " = len(verifyArgsDict)\n"
+	outputString += "\tsortValues = {}\n"
+	outputString += "\tsigNosMap = {}\n"
+	outputString += "\tsortedSigEntries = {}\n"
+	outputString += "\tfor " + con.numSignaturesIndex + " in range(0, " + con.numSignatures + "):\n"
+	#outputString += "\t\tcurrentSortVal = 
+
+	'''
+		currentSortVal = verifyArgsDict[z]['pk'][bodyKey]['g^x']
+		matchingIndex = None
+		sortKey = -1
+		for sortKey in sortValues:
+			if (sortValues[sortKey] == currentSortVal):
+				matchingIndex = sortKey
+				break
+		if (matchingIndex != None):
+			sigNosMap[matchingIndex].append(z)
+			lenCurrentSigsBatch = len(sortedSigEntries[matchingIndex])
+			sortedSigEntries[matchingIndex][lenCurrentSigsBatch] = verifyArgsDict[z]
+		else:
+			newIndex = sortKey + 1
+			sortValues[newIndex] = currentSortVal
+			sigNosMap[newIndex] = []
+			sigNosMap[newIndex].append(z)
+			sortedSigEntries[newIndex] = {}
+			sortedSigEntries[newIndex][0] = verifyArgsDict[z]
+
+	incorrectIndices = []
+
+	for sortValKey in sortedSigEntries:
+		incorrectsFromSortedBatch = run_Batch_Sorted(sortedSigEntries[sortValKey], groupObjParam, verifyFuncArgs)
+		actualIndices = sigNosMap[sortValKey]
+		for incorrect in incorrectsFromSortedBatch:
+			incorrectIndices.append(actualIndices[incorrect])
+
+	return incorrectIndices
+	'''
+
 	batchVerFile.write(outputString)
+
 
 def main():
 	if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):

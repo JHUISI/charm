@@ -25,11 +25,11 @@ class CallValue:
 
 	def getStringVarName(self):
 		if (self.funcName == None):
-			return None
-
-		funcStringVarName = self.funcName.getStringVarName()
-		if ( (funcStringVarName == None) or (type(funcStringVarName).__name__ != con.strTypePython) or (len(funcStringVarName) == 0) ):
-			return None
+			funcStringVarName = ""
+		else:
+			funcStringVarName = self.funcName.getStringVarName()
+			if ( (funcStringVarName == None) or (type(funcStringVarName).__name__ != con.strTypePython) or (len(funcStringVarName) == 0) ):
+				return None
 
 		stringVarName = ""
 		stringVarName += funcStringVarName
@@ -46,13 +46,17 @@ class CallValue:
 		if (self.argList != None):
 			argListStringVarName = ""
 			for arg in self.argList:
+				if (arg == None):
+					continue
+
 				argStringVarName = arg.getStringVarName()
 				if ( (argStringVarName == None) or (type(argStringVarName).__name__ != con.strTypePython) or (len(argStringVarName) == 0) ):
 					return None
 
 				argListStringVarName += argStringVarName + ", "
 
-			argListStringVarName = argListStringVarName[0:(len(argListStringVarName) - 2)]
+			if (len(argListStringVarName) >= 3):
+				argListStringVarName = argListStringVarName[0:(len(argListStringVarName) - 2)]
 
 			stringVarName += argListStringVarName
 
@@ -61,7 +65,7 @@ class CallValue:
 		return stringVarName
 
 	def setFuncName(self, funcName):
-		if ( (funcName == None) or (type(funcName).__name__ != con.stringName) ):
+		if ( (funcName == None) or ( (type(funcName).__name__ != con.stringName) and (type(funcName).__name__ != con.subscriptName) ) ):
 			sys.exit("CallValue->setFuncName:  problem with the function name passed in.")
 
 		self.funcName = funcName

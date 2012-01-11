@@ -60,6 +60,9 @@ def expandEntryWithSubscriptPlaceholder(varAssignments, entryName, argumentNumbe
 
 	for funcName in varAssignments:
 		varsForFunc = varAssignments[funcName]
+		if (varsForFunc == None):
+			continue
+
 		for varEntry in varsForFunc:
 			varEntryName = varEntry.getName()
 			varEntryValue = varEntry.getValue()
@@ -474,8 +477,13 @@ def getVar_VarDependencies(varAssignments, globalVars=None):
 
 	for funcName in varAssignments:
 		varsForOneFunc = varAssignments[funcName]
-		if ( (varsForOneFunc == None) or (type(varsForOneFunc).__name__ != con.listTypePython) or (len(varsForOneFunc) == 0) ):
-			sys.exit("Parser_CodeGen_Toolbox->getVar_VarDependencies:  problem with one of the variable lists in the variable assignments dictionary passed in.")
+		if (varsForOneFunc == None):
+			retDict[funcName] = None
+			continue
+
+
+		#if ( (varsForOneFunc == None) or (type(varsForOneFunc).__name__ != con.listTypePython) or (len(varsForOneFunc) == 0) ):
+			#sys.exit("Parser_CodeGen_Toolbox->getVar_VarDependencies:  problem with one of the variable lists in the variable assignments dictionary passed in.")
 
 		dependenciesForOneFunc = {}
 
@@ -526,6 +534,9 @@ def buildVariableDependenciesObject(dependenciesDict):
 		depList = []
 
 		for dep in varDependencies:
+			if ( (len(dep) == 0) or (dep in con.reservedSymbols) ):
+				continue
+
 			depAsStringName = StringName()
 			depAsStringName.setName(dep)
 			depList.append(copy.deepcopy(depAsStringName))
@@ -566,6 +577,10 @@ def getLineNosPerVar(varAssignments):
 
 	for funcName in varAssignments:
 		varsForFunction = varAssignments[funcName]
+		if (varsForFunction == None):
+			retDict[funcName] = None
+			continue
+
 		lineNosForOneFunc = {}
 		lineNosObjectsForFunc = []
 		for varListEntry in varsForFunction:

@@ -498,16 +498,20 @@ class ASTParser:
 		try:
 			funcValueName = node.func.value.id
 		except:
-			sys.exit("ASTParser->getFuncNameFromCallNode:  could not obtain any information about the call represented by the node passed in.")
+			print("ASTParser->getFuncNameFromCallNode:  could not obtain any information about the call represented by the node passed in.  THIS SHOULD BE FIXED.")
+			funcValueName = None
 
 		try:
 			funcAttrName = node.func.attr
 		except:
 			sys.exit("ASTParser->getFuncNameFromCallNode:  could not obtain the function's attribute name from the node passed in.")
 
-		funcValueNameObject = self.buildStringName(node, funcValueName)
-		if ( (funcValueNameObject == None) or (type(funcValueNameObject).__name__ != con.stringName) ):
-			sys.exit("ASTParser->getFuncNameFromCallNode:  problem with value returned from buildStringName for function value name.")
+		funcValueNameObject = None
+
+		if (funcValueName != None):
+			funcValueNameObject = self.buildStringName(node, funcValueName)
+			if ( (funcValueNameObject == None) or (type(funcValueNameObject).__name__ != con.stringName) ):
+				sys.exit("ASTParser->getFuncNameFromCallNode:  problem with value returned from buildStringName for function value name.")
 
 		funcAttrNameObject = self.buildStringName(node, funcAttrName)
 		if ( (funcAttrNameObject == None) or (type(funcAttrNameObject).__name__ != con.stringName) ):
