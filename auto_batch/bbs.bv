@@ -45,11 +45,6 @@ message := N
 public := one
 signature := N
 
-# same message. different signatures/signers
-#message := one
-#public := S
-#signature := N
-
 # original verify := { ((e(T3, g2)^-s#x) * ((e(h, w)^(-s#alpha * -s#beta)) * ((e(h, g2)^(-s#gamma1 * -s#gamma2)) * ((e(T3, w) * e(g1, g2)^-1)^-c)))) == R3 }
 verify := { ((e(T3, g2)^-s#x) * ((e(h, w)^(-s#alpha * -s#beta)) * ((e(h, g2)^(-s#gamma1 * -s#gamma2)) * ((e(T3, w)^-c) * (e(g1, g2)^c)))))) == R3 }
 
