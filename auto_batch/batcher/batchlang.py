@@ -122,6 +122,7 @@ def createTree(op, node1, node2):
 
 class BinaryNode:
 	def __init__(self, value, left=None, right=None):		
+		self.negated = False	
 		if(isinstance(value, str)):
 			if value in ['G1', 'G2', 'GT', 'ZR', 'str']:
 				self.type = ops.TYPE
@@ -130,7 +131,13 @@ class BinaryNode:
 			else:
 				self.type = ops.ATTR
 				arr = value.split('_')
-				self.attr = arr[0]
+				attr = arr[0]
+				# test for negation in attribute
+				if attr[0] != '-': self.attr = attr
+				else:
+					self.attr = attr[1:]
+					self.negated = True
+				# handle indices 
 				if len(arr) > 1: # True means a_b form
 					self.attr_index = [arr[1]]
 				else: # False means a and no '_' present
@@ -145,11 +152,15 @@ class BinaryNode:
 			self.attr_index = None
 		self.left = left
 		self.right = right
-#		self.myside = None
 
 	def __str__(self):
-		if(self.type == ops.ATTR):
-			msg = self.attr
+		if self == None: return None
+		elif(self.type == ops.ATTR):
+			# check for negation
+			if self.negated:
+				msg = "-" + self.attr
+			else:
+				msg = self.attr
 			if self.attr_index != None and type(self.attr_index) == list:
 				token = ""
 				for t in self.attr_index:
@@ -198,6 +209,8 @@ class BinaryNode:
 				 return ( left + ' of ' + right)
 			elif(self.type == ops.CONCAT):
 				 return (left + ' | ' + right)
+			elif(self.type == ops.NONE):
+				 return 'NONE'
 				# return ( left + ' on ' + right )				
 		return None
 	
@@ -247,6 +260,7 @@ class BinaryNode:
 	def copy(self, this):
 		if this == None: return None
 		new_node = BinaryNode(this.type)
+		new_node.negated = this.negated
 		new_node.attr = this.attr
 		new_node.attr_index = this.attr_index
 		
@@ -260,12 +274,22 @@ class BinaryNode:
 	def setNodeAs(self, dest, src):
 		dest.type = src.type
 		dest.attr = src.attr
+		dest.negated = src.negated
 		if src.attr_index:
 			dest.attr_index = list(src.attr_index)
 		else:
 			dest.attr_index = None
 		return
 
+	@classmethod
+	def clearNode(self, dest):
+		dest.type = ops.NONE
+		dest.attr = None
+		dest.negated = False
+		dest.attr_index = None
+#		del dest.left, dest.right
+		dest.left = None
+		dest.right = None
 	# only applies function on leaf nodes
 	def traverse(self, function):
 		# visit node then traverse left and right

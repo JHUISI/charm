@@ -5,15 +5,23 @@ N := 100
 
 BEGIN :: types
   M := str
-  g1 := G1; g2 := G2
+  g1 := G1; T3 := G1; h := G1
+  g2 := G2
+  w := G2 
   R3 := GT
+  s#x := ZR
+  s#alpha := ZR
+  s#beta := ZR
+  s#gamma1 := ZR
+  s#gamma2 := ZR
+  c := ZR
 END :: types
 
 BEGIN :: precompute
-  R1_z := u^s-alpha * T1^c
-  R2_z := v^s-beta * T2^c
-  R4_z := T1^s-x
-  R5_z := T2^s-x * v^s-gamma2
+  R1_z := u^s#alpha * T1^-c
+  R2_z := v^s#beta * T2^-c
+  R4_z := T1^s#x
+  R5_z := T2^s#x * v^s#gamma2
 END :: precompute
 
 BEGIN :: constant
@@ -25,7 +33,7 @@ BEGIN :: public
 END :: public
 
 BEGIN :: signature
-  T1, T2, T3, R3, c, s-alpha, s-beta, s-x, s-gamma1, s-gamma2
+  T1, T2, T3, R3, c, s#alpha, s#beta, s#x, s#gamma1, s#gamma2
 END :: signature
 
 BEGIN :: message
@@ -33,7 +41,7 @@ BEGIN :: message
 END :: message
 
 # different messages/sigs under a single signer
-message := one
+message := N
 public := one
 signature := N
 
@@ -42,10 +50,9 @@ signature := N
 #public := S
 #signature := N
 
-verify := { e(T3, g2)^s-x * e(h, w)^(s-alpha * s-beta) * e(h, g2)^(s-gamma1 * s-gamma2) * (e(T3, w) * e(g1, g2)^1)^c == R3 }
+# original verify := { ((e(T3, g2)^-s#x) * ((e(h, w)^(-s#alpha * -s#beta)) * ((e(h, g2)^(-s#gamma1 * -s#gamma2)) * ((e(T3, w) * e(g1, g2)^-1)^-c)))) == R3 }
+verify := { ((e(T3, g2)^-s#x) * ((e(h, w)^(-s#alpha * -s#beta)) * ((e(h, g2)^(-s#gamma1 * -s#gamma2)) * ((e(T3, w)^-c) * (e(g1, g2)^c)))))) == R3 }
 
-# notes: need to test negation for '1' and 's-alpha' etc. variables
-
-BEGIN :: transform
-2
-END :: transform
+#BEGIN :: transform
+#2, 6, 6, 5, 3
+#END :: transform

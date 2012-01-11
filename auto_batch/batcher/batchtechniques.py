@@ -147,7 +147,11 @@ class AbstractTechnique:
             exp.right = right
         elif left.type == ops.MUL:
             nodes = []
-            getListNodes(left, ops.NONE, nodes)
+            self.getMulTokens(left, ops.NONE, [ops.EXP, ops.HASH, ops.ATTR], nodes)
+            #getListNodes(left, ops.NONE, nodes)
+#            print("createExp sub nodes:")
+#            for i in nodes:
+#                print("subnodes: ", i)
             if len(nodes) > 2: # only distribute exponent when there are 
                 muls = [ BinaryNode(ops.MUL) for i in range(len(nodes)-1) ]
                 for i in range(len(muls)):
@@ -201,7 +205,18 @@ class Technique2(AbstractTechnique):
             pair_node = node.left
                                   # make cur node the left child of pair node
             # G1 : pair.left, G2 : pair.right
-            if not self.isConstInSubtreeT(pair_node.left):
+            left_check = not self.isConstInSubtreeT(pair_node.left)
+            right_check = not self.isConstInSubtreeT(pair_node.right)
+            if self.debug: print("T2: visit_exp => left check:", left_check, ", right check:", right_check)
+            if left_check == right_check and left_check == False:
+                #print("T2: handle this case :=>", pair_node)
+                # move to first by default since both are constant!
+                addAsChildNodeToParent(data, pair_node) # move pair node one level up
+                node.left = pair_node.left
+                pair_node.left = node
+                self.applied = True
+                self.score   = tech2.ExpIntoPairing                
+            elif left_check:
                 addAsChildNodeToParent(data, pair_node) # move pair node one level up
                 node.left = pair_node.left
                 pair_node.left = node
@@ -209,7 +224,7 @@ class Technique2(AbstractTechnique):
                 self.score   = tech2.ExpIntoPairing
                 #print("T2: Left := Move '" + str(node.right) + "' exponent into the pairing.")
             
-            elif not self.isConstInSubtreeT(pair_node.right):       
+            elif right_check:       
                 addAsChildNodeToParent(data, pair_node) # move pair node one level up                
                 node.left = pair_node.right
                 pair_node.right = node 
@@ -250,6 +265,7 @@ class Technique2(AbstractTechnique):
                             pair_node.right = new_mul_node
                             self.applied = True
                             self.score   = tech2.DistributeExpToPairing
+#                            print("new pair node: ", pair_node, "\n")                            
                             #self.rule += "distributed exponent into the pairing: right side. "
                         else:
                             self.setNodeAs(pair_node, side.right, node, side.left)
@@ -265,13 +281,14 @@ class Technique2(AbstractTechnique):
                         self.applied = True
                         self.score   = tech2.ExpIntoPairing
                     else:
-                        print("T2: what are the other cases: ", Type(pair_node.right))
+#                        print("T2: what are the other cases: ", Type(pair_node.right))
+                        pass
 
                 # check whether right side is constant
                 elif not self.isConstInSubtreeT(pair_node.right):
                     # check the type of pair_node : 
                     if Type(pair_node.left) == ops.MUL:
-                        print("T2: missing case - pair_node.left and MUL node.")
+#                        print("T2: missing case - pair_node.left and MUL node.")
                         _subnodes = []
                         getListNodes(pair_node.left, ops.NONE, _subnodes)
                         if len(_subnodes) > 2:
@@ -285,7 +302,7 @@ class Technique2(AbstractTechnique):
                             self.applied = True
                             self.score   = tech2.ExpIntoPairing                            
                     elif Type(pair_node.left) in [ops.HASH, ops.ATTR]:
-                        print("T2 - exercise pair_node : left = ATTR : ", pair_node.left)
+#                        print("T2 - exercise pair_node : left = ATTR : ", pair_node.left)
                         # set pair node right child to 
                         self.setNodeAs(pair_node, side.left, node, side.left)
                         self.applied = True
@@ -298,9 +315,13 @@ class Technique2(AbstractTechnique):
                 self.applied = True
                 self.score   = tech2.ExpIntoPairing
                 
-        elif(Type(node.left) == ops.MUL):            
+        elif(Type(node.left) == ops.MUL):    
+            # distributing exponent over a MUL node (which may have more MUL nodes)        
             #print("Consider: node.left.type =>", node.left.type)
             mul_node = node.left
+            #print("distribute exp correctly =>")
+            #print("left: ", mul_node.left)
+            #print("right: ", mul_node.right)
             mul_node.left = self.createExp(mul_node.left, BinaryNode.copy(node.right))
             mul_node.right = self.createExp(mul_node.right, BinaryNode.copy(node.right))
             addAsChildNodeToParent(data, mul_node)            
@@ -331,7 +352,7 @@ tech3 = Tech_db # Enum('NoneApplied', 'ProductToSum','CombinePairing', 'SplitPai
 class Technique3(AbstractTechnique):
     def __init__(self, sdl_data, variables, meta):
         AbstractTechnique.__init__(self, sdl_data, variables, meta)
-        self.rule    = "Combine pairings with common 1st or 2nd element. Reduce N pairings to 1 (technique 3)"
+        self.rule    = "Move dot products inside pairings to reduce N pairings to 1 (technique 3)"
         self.applied = False
         self.score   = tech3.NoneApplied
         self.debug   = False
@@ -370,7 +391,11 @@ class Technique3(AbstractTechnique):
             else: pass
 #                print("T3: result w/o transform =>", node)
         elif Type(left) == ops.MUL:
-            print("T3: visit pair - left = MUL, what to do?")
+            if self.debug:
+                print("T3: visit pair - Do nothing.")
+                print("OK because we want to move as many operations as possible into the smallest group G1.")
+                print("left: ", left)
+                print("right: ", right, "\n")
             pass
         elif Type(right) == ops.MUL:
             if self.debug: print("T3: visit pair - Node =", right, " type:", Type(right))
@@ -408,18 +433,20 @@ class Technique3(AbstractTechnique):
             self.getMulTokens(pair_node.left, ops.NONE, [ops.EXP, ops.HASH, ops.ATTR], l)
             self.getMulTokens(pair_node.right, ops.NONE, [ops.EXP, ops.HASH, ops.ATTR], r)
             if self.debug:
-                print("left list: ")
+                print("T3: visit_on left list: ")
                 for i in l: print(i)
                 print("right list: ")
                 for i in r: print(i)
             
-            if len(l) > 2 and len(r) < 2: 
-                right = pair_node.right # right side of pairing is the constant
-                node.right = self.createSplitPairings(pair_node.left, right, l)
-                self.applied = True
-                self.score   = tech3.SplitPairing
-                 
-            elif len(r) > 2 and len(l) < 2:
+            #if len(l) > 2 and len(r) < 2: 
+                #right = pair_node.right # right side of pairing is the constant
+                #node.right = self.createSplitPairings(pair_node.left, right, l)
+                #self.applied = True
+                #self.score   = tech3.SplitPairing
+            # Note the same check does not apply to the left side b/c we want to move as many operations
+            # into the smallest group G1. Therefore, if there are indeed more than two MUL nodes on the left side
+            # of pairing, then that's actually a great thing and will give us the most savings.
+            if len(r) > 2 and len(l) < 2:
                 # special case: reverse split a \single\ pairing into two or more pairings to allow for application of 
                 # other techniques. pair(a, b * c * d?) => p(a, b) * p(a, c) * p(a, d)
                 # pair with a child node with more than two mult's?
@@ -508,6 +535,9 @@ class Technique3(AbstractTechnique):
                 addAsChildNodeToParent(data, exp)
                 self.applied = True
                 self.score   = tech3.ProductToSum
+        else:
+            #print("T3: missing type check :=>", Type(node.right))
+            pass
     
     # Quick check that the dot product can be reliably moved inside the pairing
     def verifyCombinePair(self, index, pair):

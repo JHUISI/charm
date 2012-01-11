@@ -50,7 +50,7 @@ class PairInstanceFinder:
         # keys must match
         self.instance = {}
         self.index = 0
-        self.rule = "Merge pairings with common first or second element."
+        self.rule = "Merge pairings with common first or second element (technique 6)"
         self.applied = False
         
     def visit(self, node, data):
@@ -80,23 +80,27 @@ class PairInstanceFinder:
         found = False
         for i in self.instance.keys():
             data = self.instance[ i ]
-            #print("data : ", data)
+#            print("found another: ", data['key'], data['lnode'], data['rnode'], data['instance'])
             if data['key'] == 'lnode':
                 if str(lnode) == str(data['lnode']): # found a match
                     data['instance'] += 1 # increment the finding of an instance
-                    data['rnode1'] = rnode 
-                    # save some state to delete this node on second pass                    
-                    if parent: data['rnodePair'] = parent
-                    else: data['rnodePair'] = node                    
+                    if data.get('rnode1'): data['rnode1'].append(rnode)
+                    else: data['rnode1'] = [rnode] 
+                    # save some state to delete this node on second pass  
+                    if not data.get('rnode1_parent'): data['rnode1_parent'] = [] # create new list                  
+                    if parent: data['rnode1_parent'].append(parent)
+                    else: data['rnode1_parent'].append(node)                    
                     found = True
                     break
             elif data['key'] == 'rnode':
                 if str(rnode) == str(data['rnode']):
                     data['instance'] += 1
-                    data['lnode1'] = lnode
+                    if data.get('lnode1'): data['lnode1'].append(lnode)
+                    else: data['lnode1'] = [lnode]
                     # save some state to delete this node on second pass
-                    if parent: data['lnodePair'] = parent
-                    else: data['lnodePair'] = node                    
+                    if not data.get('lnode1_parent'): data['lnode1_parent'] = [] # create new list                  
+                    if parent: data['lnode1_parent'].append(parent)
+                    else: data['lnode1_parent'].append(node)                    
                     found = True
                     break
         # if not found
@@ -118,8 +122,17 @@ class PairInstanceFinder:
         pairDict = self.checkForMultiple()
 
         if pairDict != None:
-            #print("Pair =>", pairDict)
-            batchparser.ASTVisitor( SubstitutePairs( pairDict ) ).preorder( equation )
+#            print("Pair =>", pairDict)
+#            for i in pairDict.keys():
+#                if type(pairDict[i]) == list:
+#                    for j in pairDict[i]:
+#                        print("\tnodes:", j)
+#                else:
+#                    print(i, ":=>", pairDict[i])
+            SP2 = SubstitutePairs2( pairDict )
+            batchparser.ASTVisitor( SP2 ).preorder( equation )
+            if SP2.pruneCheck:
+                batchparser.ASTVisitor( PruneTree() ).preorder( equation )
             #print("Done\n")
     
     def testForApplication(self):
@@ -235,6 +248,131 @@ class SubstituteExps:
                 pass
             else:
                 print("Substitute: missing some cases: ", Type(right))
+
+# objective: combine or merge pairings that have a common first or second element. Takes a dictionary
+# of multiple nodes that have a particular structure:
+# pairDict =>
+#    key : the side that has the constant?
+#    lnode : the first left node that was found
+#    rnode : the first right node that was found during traversal
+#    
+class SubstitutePairs2:
+    def __init__(self, pairDict):
+        self.pairDict = pairDict
+        self.key = pairDict['key']
+        self.left = pairDict['lnode']
+        self.right = pairDict['rnode']
+        self.index = 0        
+        if self.key == 'rnode': # if right, then extras will be on the left
+            self.extra = pairDict['lnode1']
+            self.extra_parent = pairDict['lnode1_parent']
+        elif self.key == 'lnode':
+            self.extra = pairDict['rnode1']
+            self.extra_parent = pairDict['rnode1_parent']
+        
+        self.deleteOtherPair = self.pruneCheck = self.debug = False
+        
+    def visit(self, node, data):
+        if self.deleteOtherPair:
+#            print("visit: node.left: ", node.left)    
+#            print("visit: node.right: ", node.right)        
+            if node.left in self.extra_parent:
+                batchparser.addAsChildNodeToParent(data, node.right) 
+                BinaryNode.clearNode(node.left)
+                self.pruneCheck = True 
+            elif node.right in self.extra_parent:
+                batchparser.addAsChildNodeToParent(data, node.left)
+                BinaryNode.clearNode(node.right)
+                self.pruneCheck = True 
+            else:
+                pass
+        
+    def visit_pair(self, node, data):
+        if self.key == 'rnode':
+            # find the attribute node on the right
+            if self.debug: print(node.right, " =?= ", self.right)
+            if str(node.right) == str(self.right) and Type(node.right) == ops.ATTR:
+                #print("Found a right match: ", node)
+                if node.left == self.left and Type(self.left) == ops.ON:                    
+                    if self.debug: print("combine other nodes with ON node: ", self.left)
+                    target = self.left
+                    for nodes in self.extra:
+                        target = self.combine(target, nodes) # may need to make this smarter to do a proper merge
+                        self.left.right = target
+                    #print("ans => ", self.left)
+                    node.left = BinaryNode.copy(self.left)
+                    #print("node =>", node)
+                    self.deleteOtherPair = True
+
+                elif node.left == self.left: # found the target node
+                    #print("Need another case: ", node.left, self.left)
+                    self.extra.insert(0, BinaryNode.copy(self.left))
+                    muls = [ BinaryNode(ops.MUL) for i in range(len(self.extra)-1) ]
+                    for i in range(len(muls)):
+                        muls[i].left = BinaryNode.copy(self.extra[i])
+                        if i < len(muls)-1: muls[i].right = muls[i+1]
+                        else: muls[i].right = BinaryNode.copy(self.extra[i+1])
+                    node.left = muls[0] # self.right doesn't change
+                    #print("new pairing node: ", muls[0], self.right) # MUL nodes absorb the exponent
+                    self.deleteOtherPair = True                    
+
+                elif node.left in self.extra: # foudn the other nodes we want to delete
+                    del node.left, node.right
+                    node.left = None
+                    node.right = None
+                    BinaryNode.clearNode(node)
+                    self.pruneCheck = True
+                    
+                    
+            elif str(node.right) == str(self.right):
+                print("Found a match: ", self.left)
+                for i in self.extra:
+                    print("node: ", i)
+                # find the second pair node
+#                n = BinaryNode(ops.MUL)
+#                n.left = self.left
+#                n.right = self.extra
+                
+                
+        elif self.key == 'lnode':
+            if str(node.left) == str(self.left):
+                print("Found a left match: ", node)
+                
+    def combine(self, subtree1, subtree2, parentOfTarget=None):
+        if subtree2 == None: return None
+        elif subtree2.left == None: pass
+        elif Type(subtree1.left) == Type(subtree2.left):
+            result = self.combine(subtree1.right, subtree2.right, subtree1)
+            if result:                 
+                n = BinaryNode(ops.MUL)
+                n.left = subtree1.right
+                n.right = subtree2.right
+                return n
+            return None    
+        # check if node is a LEAF. if so report that node is different 
+        if Type(subtree2) == ops.ATTR:
+            return True
+
+    def mergeWithMul(self, subtree1, subtree2):
+        checkSubtrees = False
+        self.mergeWithMul(subtree1.left, subtree2.left)
+        #if subtree2 == None: return None
+#        if Type(subtree1) == Type(subtree2):
+#            pass
+        self.mergeWithMul(subtree1.right, subtree2.right)
+
+class PruneTree:
+    def __init__(self):
+        pass
+    
+    def visit(self, node, data):
+        if Type(node.left) != ops.NONE and Type(node.right) == ops.NONE:
+            #print("prune this 1: ", node)
+            batchparser.addAsChildNodeToParent(data, node.left)            
+        elif Type(node.left) == ops.NONE and Type(node.right) != ops.NONE:
+            #print("prune this 2: ", node)
+            batchparser.addAsChildNodeToParent(data, node.right)            
+
 
 class SubstitutePairs:
     def __init__(self, pairDict):
@@ -407,7 +545,7 @@ class SubstituteSigDotProds:
 # prod{} on (x * y)
 class DotProdInstanceFinder:
     def __init__(self):
-        self.rule = "Distribute dot products: "
+        self.rule = "Distribute dot products (technique 5): "
         self.applied = False
 
     def getMulTokens(self, subtree, parent_type, target_type, _list):

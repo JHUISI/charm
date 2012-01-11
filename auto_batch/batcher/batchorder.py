@@ -27,8 +27,8 @@ def score(eq):
 # Class for pre-processing SDL to determine the order in which the optimization techniques
 # are applied to the batch equation.
 class BatchOrder:
-    def __init__(self, const, vars, metadata, equation):
-        self.const = const
+    def __init__(self, sdl, vars, metadata, equation):
+        self.sdl_data = sdl
         self.vars  = vars
         self.meta  = metadata
         self.verify = equation
@@ -55,7 +55,7 @@ class BatchOrder:
         
         tech = None
         if tech_option in self.techMap.keys():
-            tech = self.techMap[tech_option](self.const, self.vars, self.meta)
+            tech = self.techMap[tech_option](self.sdl_data, self.vars, self.meta)
         elif tech_option in self.techMap2.keys():
             tech = self.techMap2[tech_option]()
         else:
@@ -77,6 +77,8 @@ class BatchOrder:
     
     def strategy(self, option=None):
         #return self.BasicStrategy()
+        # first determine whether we can combine some pairings
+        # if so, no point distributing products first           
         path = []; all_paths = []; self.batch_time = {}
         self.BFStrategy(self.verify, path, all_paths)
         min_index = 0
@@ -137,7 +139,7 @@ class BatchOrder:
         if tech_obj.applied:
             if tech_applied == 2:
                 if tech_obj.score in [Tech_db.ExpIntoPairing, Tech_db.DistributeExpToPairing]:
-                    suggest = [4, 5, 3] # move on to tech3 or distribute dot products if possible
+                    suggest = [4, 5, 6, 3] # move on to tech3 or distribute dot products if possible
             elif tech_applied == 3:
                 if tech_obj.score in [Tech_db.CombinePairing, Tech_db.ProductToSum, Tech_db.SplitPairing]:
                     suggest = [4, 5, 2]
@@ -149,7 +151,7 @@ class BatchOrder:
                     suggest = [4, 3]
             elif tech_applied == 6: # combine pairings
                 if tech_obj.testForApplication:
-                    suggest = [5, 4, 3]
+                    suggest = [5, 4, 3, 6]
             else:
                 return
         else:

@@ -234,13 +234,21 @@ if __name__ == "__main__":
         lcg = LatexCodeGenerator(constants, vars, latex_subs)
 
 
+    techniques = {'2':Technique2, '3':Technique3, '4':Technique4, '5':DotProdInstanceFinder, '6':PairInstanceFinder }
     print("\nVERIFY EQUATION =>", verify)
     if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Equation', 'eq': lcg.print_statement(verify.right) }; lcg_steps += 1
     verify2 = BinaryNode.copy(verify)
 #    ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
     ASTVisitor(CVForMultiSigner(vars, sig_vars, pub_vars, msg_vars, batch_count)).preorder(verify2.right)
     if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Combined Equation', 'eq':lcg.print_statement(verify2.right) }; lcg_steps += 1
-    ASTVisitor(SimplifyDotProducts()).preorder(verify2.right)
+    # check whether this step is necessary!    
+    verify_test = BinaryNode.copy(verify2.right)
+    pif = PairInstanceFinder()
+    ASTVisitor(pif).preorder(verify_test)
+    if pif.testForApplication(): # if we can combine some pairings, then no need to distribute just yet
+        pass
+    else:
+        ASTVisitor(SimplifyDotProducts()).preorder(verify2.right)
 
     print("\nStage A: Combined Equation =>", verify2)
     ASTVisitor(SmallExponent(constants, vars)).preorder(verify2.right)
@@ -255,7 +263,6 @@ if __name__ == "__main__":
         algorithm = [str(x) for x in result]
         print("found batch algorithm =>", algorithm)
 
-    techniques = {'2':Technique2, '3':Technique3, '4':Technique4, '5':DotProdInstanceFinder, '6':PairInstanceFinder }
 
     for option in algorithm:
         if option == '5':

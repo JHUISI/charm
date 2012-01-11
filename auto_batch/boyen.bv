@@ -1,3 +1,4 @@
+name := boyen
 N := 100
 l := 2
 
