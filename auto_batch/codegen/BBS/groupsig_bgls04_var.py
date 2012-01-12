@@ -71,14 +71,14 @@ class ShortSig(PKSig):
     def verify(self, gpk, M, sigma):        
         """alternative verification check for BGLS04 which allows it to be batched"""
         c, T1, T2, T3 = sigma['c'], sigma['T1'], sigma['T2'], sigma['T3']
-        s_alpha, s_beta = sigma['s_alpha'], sigma['s_beta']
-        s_x, s_gamma1, s_gamma2 = sigma['s_x'], sigma['s_gamma1'], sigma['s_gamma2']
+        salpha, sbeta = sigma['s_alpha'], sigma['s_beta']
+        sx, sgamma1, sgamma2 = sigma['s_x'], sigma['s_gamma1'], sigma['s_gamma2']
         R3 = sigma['R3']
         
-        R1 = (gpk['u'] ** s_alpha) * (T1 ** -c)
-        R2 = (gpk['v'] ** s_beta) * (T2 ** -c)
-        R4 = (T1 ** s_x) * (gpk['u'] ** -s_gamma1)
-        R5 = (T2 ** s_x) * (gpk['v'] ** -s_gamma2)
+        R1 = (gpk['u'] ** salpha) * (T1 ** -c)
+        R2 = (gpk['v'] ** sbeta) * (T2 ** -c)
+        R4 = (T1 ** sx) * (gpk['u'] ** -sgamma1)
+        R5 = (T2 ** sx) * (gpk['v'] ** -sgamma2)
         if c == group.hash((M, T1, T2, T3, R1, R2, R3, R4, R5), ZR):
             if debug: print("c => '%s'" % c)
             if debug: print("Valid Group Signature for message: '%s'" % M)
@@ -87,7 +87,7 @@ class ShortSig(PKSig):
             if debug: print("Not a valid signature for message!!!")
             return False
         
-        if ((pair(T3, gpk['g2']) ** s_x) * (pair(gpk['h'],gpk['w']) ** (-s_alpha - s_beta)) * (pair(gpk['h'], gpk['g2']) ** (-s_gamma1 - s_gamma2)) * (pair(T3, gpk['w']) ** c) * (pair(gpk['g1'], gpk['g2']) ** -c) ) == R3: 
+        if ((pair(T3, gpk['g2']) ** sx) * (pair(gpk['h'],gpk['w']) ** (-salpha - sbeta)) * (pair(gpk['h'], gpk['g2']) ** (-sgamma1 - sgamma2)) * (pair(T3, gpk['w']) ** c) * (pair(gpk['g1'], gpk['g2']) ** -c) ) == R3: 
             return True
         else:
             return False

@@ -4,7 +4,7 @@ import sys, random, string
 from toolbox.pairinggroup import *
 import sys
 from toolbox.pairinggroup import *
-from /Users/matt/Documents/charm/auto_batch/frontend/BBS/ver_bbs import verifySigsRecursive
+from ver_bbs import verifySigsRecursive
 
 group = None
 debug = None
@@ -14,7 +14,6 @@ def prng_bits(bits=80):
 	return group.init(ZR, randomBits(bits))
 
 def __init__( groupObj ) : 
-	PKSig.__init__( self ) 
 	global group , debug 
 	group= groupObj 
 	debug= False 
@@ -51,6 +50,8 @@ def run_Batch_Sorted(verifyArgsDict, groupObjParam, verifyFuncArgs):
 
 	for z in range(0, N):
 		c , T1 , T2 , T3= verifyArgsDict[z]['sigma'][bodyKey][ 'c' ] , verifyArgsDict[z]['sigma'][bodyKey][ 'T1' ] , verifyArgsDict[z]['sigma'][bodyKey][ 'T2' ] , verifyArgsDict[z]['sigma'][bodyKey][ 'T3' ]
+		salpha , sbeta= verifyArgsDict[z]['sigma'][bodyKey][ 's_alpha' ] , verifyArgsDict[z]['sigma'][bodyKey][ 's_beta' ]
+		sx , sgamma1 , sgamma2= verifyArgsDict[z]['sigma'][bodyKey][ 's_x' ] , verifyArgsDict[z]['sigma'][bodyKey][ 's_gamma1' ] , verifyArgsDict[z]['sigma'][bodyKey][ 's_gamma2' ]
 		R3= verifyArgsDict[z]['sigma'][bodyKey][ 'R3' ]
 
 		dotA[z] =  ( T3 **( -sx * delta [ z ] ) *( verifyArgsDict[z]['gpk'][bodyKey] [ 'h' ] **(( -sgamma1 * -sgamma2 ) * delta [ z ] ) * verifyArgsDict[z]['gpk'][bodyKey] [ 'g1' ] **( c * delta [ z ] ) ) )  
@@ -66,8 +67,10 @@ def run_Batch(verifyArgsDict, groupObjParam, verifyFuncArgs, toSort):
 		incorrectIndices = run_Batch_Sorted(verifyArgsDict, groupObjParam, verifyFuncArgs)
 		return incorrectIndices
 
+'''
 	N = len(verifyArgsDict)
 	sortValues = {}
 	sigNosMap = {}
 	sortedSigEntries = {}
 	for z in range(0, N):
+'''

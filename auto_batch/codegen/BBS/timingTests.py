@@ -126,7 +126,7 @@ if __name__ == '__main__':
 
 	verifyFuncArgs = list(verifyArgsDictRandomized[0].keys())
 
-	incorrectSigIndices = run_Batch(verifyArgsDictRandomized, groupParamArg, verifyFuncArgs)
+	incorrectSigIndices = run_Batch(verifyArgsDictRandomized, groupParamArg, verifyFuncArgs, False)
 	incorrectSigIndices.sort()
 
 	print(incorrectSigIndices)

@@ -10,7 +10,6 @@ bodyKey = 'Body'
 
 
 def __init__( groupObj ) : 
-	PKSig.__init__( self ) 
 	global group , debug 
 	group= groupObj 
 	debug= False 

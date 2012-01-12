@@ -1572,7 +1572,7 @@ def writeFunctionFromCodeToString(sourceCodeLines, startLineNo, endLineNo, extra
 
 		line = ensureSpacesBtwnTokens_CodeGen(line)
 
-		if (line in con.linesNotToWrite):
+		if (line.lstrip().rstrip() in con.linesNotToWrite):
 			continue
 
 		if (removeSelf == True):
