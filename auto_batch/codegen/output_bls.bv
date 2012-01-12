@@ -1,0 +1,15 @@
+# bls batch inputs
+# variables
+N := 200
+numSigners := Unknown
+
+BEGIN :: types
+h := G1
+message := str
+END :: types
+
+BEGIN :: precompute
+END :: precompute
+
+# verify equation
+verify := { e( verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey] , verifyArgsDict[argSigIndexMap['pk']]['pk'][bodyKey][ 'g' ] ) == e( H(message, G1) , verifyArgsDict[argSigIndexMap['pk']]['pk'][bodyKey][ 'g ^ x' ] )   }

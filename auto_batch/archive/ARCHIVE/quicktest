@@ -1,0 +1,7 @@
+func()
+
+if __name__ == '__main__':
+	func()
+
+def func():
+	print("hello\n")
