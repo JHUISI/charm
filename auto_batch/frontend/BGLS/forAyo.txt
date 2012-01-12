@@ -1,0 +1,43 @@
+['bgls.bv', '-c']
+types  => {'M': 'str', 'h': 'G1', 'sig': 'G1', 'g': 'G2', 'pk': 'G2'}
+public  => ['pk']
+signature  => ['sig']
+message  => ['M']
+constant  => ['g']
+variables => {'name': 'bgls', 'g': 'G2', 'h': 'G1', 'M': 'str', 'l': '5', 'N': '20', 'sig': 'G1', 'pk': 'G2'}
+metadata => {'l': '5', 'name': 'bgls', 'N': '20'}
+
+VERIFY EQUATION => verify := e(sig,g) == (prod{y := 1,l} on e(h_y,pk_y))
+Mode:  ring signer
+
+Stage A: Combined Equation => verify := (prod{z := 0,N} on e(sig_z,g)) == (prod{z := 0,N} on (prod{y := 1,l} on e(h_y,pk_y)))
+
+Stage B: Small Exp Test => verify := (prod{z := 0,N} on e(sig_z,g)^delta_z) == (prod{z := 0,N} on (prod{y := 1,l} on e(h_y,pk_y))^delta_z) 
+
+found batch algorithm => ['2', '4', '3']
+Move the exponent(s) into the pairing (technique 2) 
+
+Applying technique 2 : (prod{z := 0,N} on e(sig_z^delta_z,g)) == (prod{z := 0,N} on (prod{y := 1,l} on e(h_y,pk_y^delta_z))) 
+
+Applied waters hash technique (technique 4) 
+
+Applying technique 4 : (prod{z := 0,N} on e(sig_z^delta_z,g)) == (prod{y := 1,l} on (prod{z := 0,N} on e(h_y,pk_y^delta_z))) 
+
+Move dot products inside pairings to reduce N pairings to 1 (technique 3) 
+
+Applying technique 3 : e((prod{z := 0,N} on sig_z^delta_z),g) == (prod{y := 1,l} on (prod{z := 0,N} on e(h_y,pk_y^delta_z))) 
+
+Final batch eq: e((prod{z := 0,N} on sig_z^delta_z),g) == (prod{y := 1,l} on (prod{z := 0,N} on e(h_y,pk_y^delta_z)))
+Key error in vars db => 'dotC'
+<====	PREP FOR CODE GEN	====>
+
+Final version => e(dotA,g) == (prod{y := 1,l} on dotC) 
+
+Compute:  dotA := (prod{z := 0,N} on sig_z^delta_z)
+Compute:  dotB := (prod{z := 0,N} on e(h_y,pk_y^delta_z))
+Compute:  dotC := (prod{z := 0,N} on e(h_y,pk_y^delta_z))
+Precompute: h_y := H(M_y,G1)
+Precompute: delta := for{z := 1, N} do prng_z
+dotA := G1
+dotB := GT
+dotC := GT
