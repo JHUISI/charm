@@ -1,0 +1,50 @@
+# cdh batch inputs
+# variables
+name := hw
+N := 100
+
+BEGIN :: types
+sig1 := G1; sig2 := G1
+M := ZR
+D := GT; V := GT; U := GT
+w := G2; Z := G2; h := G2
+A := G2; r := ZR; n := ZR
+i := ZR; g := G2
+END :: types
+
+BEGIN :: constant
+g, w, Z, h
+END :: constant
+
+BEGIN :: precompute
+n := lg_i
+U := e(u, g^a)
+V := e(v, g^a)
+D := e(d, g^a)
+END :: precompute
+
+BEGIN :: public
+U, V, D
+END :: public
+
+BEGIN :: signature
+sig1, sig2, r, i
+END :: signature
+
+BEGIN :: message
+M
+END :: message
+
+# same signer configuration
+message := N
+public := one
+signature := N
+
+verify := ( e(sig1, g) == (U^M) * (V^r) * D * e(sig2^n, w) * e(sig2^i,Z) * e(sig2, h) )
+
+BEGIN :: latex
+sig1 := \sigma_1
+sig2 := \sigma_2
+Z := z
+n := \lg(i)
+END :: latex

@@ -46,10 +46,10 @@ def checkForSigs(node):
         result = checkForSigs(node.right)
         return result
 
-def benchIndivVerification(N, equation, const, vars, precompute, _verbose):
+def benchIndivVerification(N, equation, sdl_dict, vars, precompute, _verbose):
     rop_ind = RecordOperations(vars)
     # add attrIndex to non constants
-    ASTVisitor(ASTAddIndex(const, vars)).preorder(equation)
+    ASTVisitor(ASTIndexForIndiv(sdl_dict, vars, None)).preorder(equation)
     print("Final indiv eq:", equation, "\n")
     if _verbose:
         print("<====\tINDIVIDUAL\t====>")
@@ -70,7 +70,7 @@ def benchIndivVerification(N, equation, const, vars, precompute, _verbose):
     return calculate_times(rop_ind.ops, curve['mnt160'], N)
     
 
-def benchBatchVerification(N, equation, const, vars, precompute, _verbose):
+def benchBatchVerification(N, equation, sdl_dict, vars, precompute, _verbose):
     rop_batch = RecordOperations(vars)
     rop_batch.visit(equation, {})
     if _verbose:
@@ -302,7 +302,7 @@ if __name__ == "__main__":
     # START BENCHMARK : THRESHOLD ESTIMATOR
     if THRESHOLD_FLAG:
         print("<== Running threshold estimator ==>")
-        (indiv_msmt, indiv_avg_msmt) = benchIndivVerification(N, verify.right, const, vars, indiv_precompute, VERBOSE)
+        (indiv_msmt, indiv_avg_msmt) = benchIndivVerification(N, verify.right, sdl_data, vars, indiv_precompute, VERBOSE)
         print("Result N =",N, ":", indiv_avg_msmt)
 
         outfile = file.split('.')[0]
@@ -312,7 +312,7 @@ if __name__ == "__main__":
         threshold = -1
         for i in range(1, N+1):
             vars['N'] = i
-            (batch_msmt, batch_avg_msmt) = benchBatchVerification(i, verify2.right, const, vars, batch_precompute, VERBOSE)
+            (batch_msmt, batch_avg_msmt) = benchBatchVerification(i, verify2.right, sdl_data, vars, batch_precompute, VERBOSE)
             output_indiv.write(str(i) + " " + str(indiv_avg_msmt) + "\n")
             output_batch.write(str(i) + " " + str(batch_avg_msmt) + "\n")
             if batch_avg_msmt <= indiv_avg_msmt and threshold == -1: threshold = i 

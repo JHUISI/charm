@@ -16,6 +16,7 @@ class AbstractTechnique:
         
         self.vars   = variables
         self.meta   = meta
+        self.debug  = None
 
     def visit(self, node, data):
         return
@@ -212,22 +213,23 @@ class Technique2(AbstractTechnique):
                 #print("T2: handle this case :=>", pair_node)
                 # move to first by default since both are constant!
                 addAsChildNodeToParent(data, pair_node) # move pair node one level up
-                node.left = pair_node.left
-                pair_node.left = node
+                pair_node.left = self.createExp(pair_node.left, node.right)
                 self.applied = True
                 self.score   = tech2.ExpIntoPairing                
             elif left_check:
-                addAsChildNodeToParent(data, pair_node) # move pair node one level up
-                node.left = pair_node.left
-                pair_node.left = node
+                addAsChildNodeToParent(data, pair_node) # move pair node one level up                                
+                pair_node.left = self.createExp(pair_node.left, node.right)
+#               node.left = pair_node.left
+#               pair_node.left = node                
                 self.applied = True
                 self.score   = tech2.ExpIntoPairing
                 #print("T2: Left := Move '" + str(node.right) + "' exponent into the pairing.")
             
             elif right_check:       
                 addAsChildNodeToParent(data, pair_node) # move pair node one level up                
-                node.left = pair_node.right
-                pair_node.right = node 
+                pair_node.right = self.createExp(pair_node.right, node.right)
+#                node.left = pair_node.right
+#                pair_node.right = node 
                 self.applied = True                
                 self.score   = tech2.ExpIntoPairing                
                 #print("T2: Right := Move '" + str(node.right) + "' exponent into the pairing.")
@@ -310,7 +312,7 @@ class Technique2(AbstractTechnique):
                     else:
                         pass
             else:
-            #    blindly make the exp node the right child of whatever node
+                #    blindly make the exp node the right child of whatever node
                 self.setNodeAs(prod_node, side.right, node, side.left)
                 self.applied = True
                 self.score   = tech2.ExpIntoPairing
@@ -721,3 +723,14 @@ class Technique4(AbstractTechnique):
             result = self.searchProd(node.right, node)
             return result
         
+
+class ASTIndexForIndiv(AbstractTechnique):
+    def __init__(self, sdl_data, variables, meta):
+        AbstractTechnique.__init__(self, sdl_data, variables, meta)        
+        
+    def visit_attr(self, node, data):
+        if data['parent'].type in [ops.PROD, ops.EQ]:
+            return
+        if not self.isConstant(node):
+            node.setAttrIndex('z') # add index to each attr that isn't constant
+    
