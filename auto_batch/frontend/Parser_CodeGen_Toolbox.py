@@ -1201,7 +1201,7 @@ def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
 			currChars = lineOfCode[R_index]
 			L_index = R_index
 			checkForSpace = True			
-		elif ( (lineOfCode[R_index] == 'e') and (isPreviousCharAlpha(lineOfCode, R_index) == False) ):
+		elif ( (lineOfCode[R_index] == 'e') and (isPreviousCharAlpha(lineOfCode, R_index) == False) and (isNextCharAlpha(lineOfCode, R_index) == False) ):
 			currChars = lineOfCode[R_index]
 			L_index = R_index
 			checkForSpace = True
@@ -1571,6 +1571,10 @@ def writeFunctionFromCodeToString(sourceCodeLines, startLineNo, endLineNo, extra
 			continue
 
 		line = ensureSpacesBtwnTokens_CodeGen(line)
+
+		if (line in con.linesNotToWrite):
+			continue
+
 		if (removeSelf == True):
 			line = line.replace(con.selfFuncCallString, con.space)
 
@@ -1740,6 +1744,23 @@ def isPreviousCharAlpha(line, currIndex):
 		return False
 	
 	if (line[currIndex - 1].isalpha() == True):
+		return True
+	
+	return False
+
+def isNextCharAlpha(line, currIndex):
+	if ( (line == None) or (type(line).__name__ != con.strTypePython) or (len(line) == 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->isNextCharAlpha:  problem with line parameter passed in.")
+
+	if ( (currIndex == None) or (type(currIndex).__name__ != con.intTypePython) or (currIndex < 0) ):
+		sys.exit("Parser_CodeGen_Toolbox->isNextCharAlpha:  problem with current index parameter passed in.")
+
+	lenLine = len(line)
+
+	if (currIndex == (lenLine - 1) ):
+		return False
+
+	if (line[currIndex + 1].isalpha() == True):
 		return True
 	
 	return False

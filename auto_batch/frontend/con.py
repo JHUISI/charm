@@ -58,6 +58,9 @@ lambdaTypeCharm = 'lambda'
 lambdaValue = 'LambdaValue'
 left = 'left'
 lineNumbers = 'LineNumbers'
+
+linesNotToWrite = ['PKSig.__init__( self )']
+
 listInString = ' in '
 listString = 'List := '
 
