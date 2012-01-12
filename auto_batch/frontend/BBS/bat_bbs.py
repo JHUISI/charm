@@ -4,7 +4,7 @@ import sys, random, string
 from toolbox.pairinggroup import *
 import sys
 from toolbox.pairinggroup import *
-from ver_bbs import verifySigsRecursive
+from /Users/matt/Documents/charm/auto_batch/frontend/BBS/ver_bbs import verifySigsRecursive
 
 group = None
 debug = None
@@ -14,12 +14,12 @@ def prng_bits(bits=80):
 	return group.init(ZR, randomBits(bits))
 
 def __init__( groupObj ) : 
-	#PKSig.__init__( self ) 
+	PKSig.__init__( self ) 
 	global group , debug 
 	group= groupObj 
 	debug= False 
 
-def run_Batch(verifyArgsDict, groupObjParam, verifyFuncArgs):
+def run_Batch_Sorted(verifyArgsDict, groupObjParam, verifyFuncArgs):
 	global group
 	global debug
 	group = groupObjParam
@@ -61,7 +61,6 @@ def run_Batch(verifyArgsDict, groupObjParam, verifyFuncArgs):
 
 	return incorrectIndices
 
-'''
 def run_Batch(verifyArgsDict, groupObjParam, verifyFuncArgs, toSort):
 	if (toSort == False):
 		incorrectIndices = run_Batch_Sorted(verifyArgsDict, groupObjParam, verifyFuncArgs)
@@ -72,4 +71,3 @@ def run_Batch(verifyArgsDict, groupObjParam, verifyFuncArgs, toSort):
 	sigNosMap = {}
 	sortedSigEntries = {}
 	for z in range(0, N):
-'''
