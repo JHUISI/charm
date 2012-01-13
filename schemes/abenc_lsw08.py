@@ -3,7 +3,7 @@ Allison Lewko, Amit Sahai and Brent Waters (Pairing-based)
  
 | From: "Revocation Systems with Very Small Private Keys", Large Universe Construction
 | Published in: IEEE S&P 2010
-| Available from: http://eprint.iacr.org/2009/309.pdf
+| Available from: http://eprint.iacr.org/2008/309.pdf
 | Notes: 
 
 * type:           key-policy attribute-based encryption (public key)
@@ -12,7 +12,7 @@ Allison Lewko, Amit Sahai and Brent Waters (Pairing-based)
 :Authors:    J Ayo Akinyele
 :Date:            12/2010
 '''
-from __future__ import print_function
+
 from toolbox.pairinggroup import *
 from toolbox.secretutil import *
 from toolbox.policytree import *
@@ -24,12 +24,12 @@ class KPabe(ABEnc):
         ABEnc.__init__(self)
         global group, util
         group = groupObj
-        util = SecretUtil(group.Pairing, verbose)        
+        util = SecretUtil(group, verbose)        
         self.parser = PolicyParser()
 
     def setup(self):
         # pick random exponents
-        alpha1, alpha2, b = group.random(), group.random(), group.random()
+        alpha1, alpha2, b = group.random(ZR), group.random(ZR), group.random(ZR)
         
         alpha = alpha1 * alpha2
         g_G1, g_G2 = group.random(G1), group.random(G2) # PK 1,2        
@@ -54,16 +54,16 @@ class KPabe(ABEnc):
         
         D = {}
         for x in attr_list:
-            d = []; r = group.random()
+            d = []; r = group.random(ZR)
             if not self.negatedAttr(x): # meaning positive
                 d.append((pk['g_G1'] ** (mk['alpha2'] * shares[x])) * (group.hash(unicode(x), G1) ** r))   # compute D1 for attribute x
                 d.append((pk['g_G2'] ** r))  # compute D2 for attribute x
             #else:
-            #    d.append((pk['g2_G1'] ** shares[x]) * (pk['g_G1_b2'] ** r)) # compute D3
-            #    d.append((pk['g_G1^b'] ** (r * H(x, 'Zr'))) * (mk['h_G1'] ** r)) # compute D4 (not quite right)
-            #    d.append(pk['g_G2'] ** -r)
+                #d.append((pk['g2_G1'] ** shares[x]) * (pk['g_G1_b2'] ** r)) # compute D3
+                #d.append((pk['g_G1_b'] ** (r * group.hash(x))) * (pk['h_G1'] ** r)) # compute D4
+                #d.append(pk['g_G1'] ** -r) # compute D5
             D[x] = d
-        if debug: print("Policy: %s" % policy)
+        if debug: print("Access Policy for key: %s" % policy)
         if debug: print("Attribute list: %s" % attr_list)
         D['policy'] = unicode(policy_str)
         return D
@@ -79,31 +79,34 @@ class KPabe(ABEnc):
         # s will hold secret
         t = group.init(ZR, 0)
         s = group.random(); sx = [s]
-        for i in range(1, len(attr_list)):
-            sx.append(group.random())
+        for i in range(len(attr_list)):
+            sx.append(group.random(ZR))
             sx[0] -= sx[i]
-        
-        # compute E3
-        E3 = [group.hash(unicode(x), G1) ** s for x in attr_list]
-        # compute E4
-        E4 = [pk['g_G1_b'] ** sx[i] for i in range(len(attr_list))]
-        E5 = [(pk['g_G1_b2'] ** (sx[i] * group.hash(attr_list[i]))) * (pk['h_G1_b'] ** sx[i]) for i in range(len(attr_list))]  
+            
+        E3 = {}
+        #E4, E5 = {}, {}
+        for i in range(len(attr_list)):
+            attr = attr_list[i]
+            E3[attr] = group.hash(unicode(attr), G1) ** s
+            #E4[attr] = pk['g_G1_b'] ** sx[i]
+            #E5[attr] = (pk['g_G1_b2'] ** (sx[i] * group.hash(attr))) * (pk['h_G1_b'] ** sx[i])
+
         attr_list = [unicode(a) for a in attr_list]
-        return {'E1':(pk['e(gg)_alpha'] ** s) * M, 'E2':pk['g_G2'] ** s, 'E3':E3, 'E4':E4, 'E5':E5, 'attributes':attr_list }
+        
+        return {'E1':(pk['e(gg)_alpha'] ** s) * M, 'E2':pk['g_G2'] ** s, 'E3':E3, 'attributes':attr_list }
     
     def decrypt(self, E, D):
-        attrs = E['attributes']
         policy = util.createPolicy(D['policy'])
+        attrs = util.prune(policy, E['attributes'])        
         coeff = {}; util.getCoefficients(policy, coeff)
         
         Z = {}; prodT = group.init(GT, 1)
         for i in range(len(attrs)):
             x = attrs[i]
-            #print("Coeff[%s] = %s" % (x, coeff[x]))
             if not self.negatedAttr(x):
-                 z = pair(D[x][0], E['E2']) / pair(E['E3'][i], D[x][1])
-            Z[x] = z; prodT *= Z[x] ** coeff[x]
-            #print('Z val for %s: %s\n' % (x, Z[x]))
+                 z = pair(D[x][0], E['E2']) / pair(E['E3'][x], D[x][1])
+                 Z[x] = z
+                 prodT *= Z[x] ** coeff[x]                 
        
         return E['E1'] / prodT 
 
@@ -113,13 +116,15 @@ def main():
     
     (pk, mk) = kpabe.setup()
     
-    policy = '((ONE or TWO) and THREE)'
-    attributes = [ 'ONE', 'THREE' ]
-    msg = groupObj.random(GT)   
+    policy = '(ONE or THREE) and (FOUR or TWO)'
+    attributes = [ 'ONE', 'TWO', 'THREE', 'FOUR' ]
+    msg = groupObj.random(GT) 
  
     mykey = kpabe.keygen(pk, mk, policy)
     
+    print("Encrypt under these attributes: ", attributes)
     ciphertext = kpabe.encrypt(pk, msg, attributes)
+    print(ciphertext)
     
     rec_msg = kpabe.decrypt(ciphertext, mykey)
    
