@@ -39,6 +39,8 @@ END :: message
 message := N
 public := one
 signature := N
+# sort based on the state variable, s
+sort := sig#3
 
 verify := ( e(sig1, g) == (U^M) * (V^r) * D * e(sig2^n, w) * e(sig2^i,Z) * e(sig2, h) )
 
