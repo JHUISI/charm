@@ -10,8 +10,11 @@ class AST_Visitor(ast.NodeVisitor):
 	#def visit_Tuple(self, node):
 		#print(node.elts) 
 
-	def visit_Call(self, node):
-		print((node.func.attr))
+	#def visit_Call(self, node):
+		#print((node.func.attr))
+
+	def visit_If(self, node):
+		print(node.orelse[0].orelse[0].orelse)
 
 f = open(sys.argv[1], 'r').readlines()
 c = ""
@@ -19,7 +22,7 @@ for l in f:
 	c += l
 
 t = ast.parse(c)
-print(ast.dump(t))
+#print(ast.dump(t))
 
 u = AST_Visitor()
-#u.visit(t)
+u.visit(t)

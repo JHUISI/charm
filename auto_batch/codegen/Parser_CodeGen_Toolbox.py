@@ -7,6 +7,46 @@ from StringValue import StringValue
 from LineNumbers import LineNumbers
 from VariableDependencies import VariableDependencies
 
+def combineListsNoDups(listToAddTo, listToTakeFrom):
+
+	for entry in listToTakeFrom:
+		if (entry not in listToAddTo):
+			listToAddTo.append(entry)
+
+def createListFromRange(startNo, endNo):
+	retList = []
+
+	while (startNo <= endNo):
+		retList.append(startNo)
+		startNo += 1
+
+	if (len(retList) == 0):
+		return None
+
+	return retList
+
+def getVarNamesFromLineInfoObj(lineNoList, lineInfo):
+	varNamesAsStrings = []
+
+	for lineNo in lineNoList:
+		if (lineNo not in lineInfo):
+			continue
+
+		varsAsStringNameObjs = lineInfo[lineNo].getVarNames()
+
+		if (varsAsStringNameObjs == None):
+			continue
+
+		for varAsStringName in varsAsStringNameObjs:
+			varAsString = varAsStringName.getStringVarName()
+			if (varAsString not in varNamesAsStrings):
+				varNamesAsStrings.append(varAsString)
+
+	if (len(varNamesAsStrings) == 0):
+		return None
+
+	return varNamesAsStrings
+
 def addPassToPythonLoops(line, outputString, numTabs):
 	for loopPrefix in con.pythonLoopPrefixes:
 		if (line.startswith(loopPrefix) == True):
@@ -1100,7 +1140,7 @@ def getLineInfoFromSourceCodeLines(sourceCodeLines, numSpacesPerTab):
 		sys.exit("Parser_CodeGen_Toolbox->getLineInfoFromSourceCodeLines:  problem with the number of spaces per tab passed in.")
 
 	lineNumber = 0
-	lineInfoList = []
+	lineInfoList = {}
 	
 	for line in sourceCodeLines:
 		lineNumber += 1
@@ -1120,7 +1160,7 @@ def getLineInfoFromSourceCodeLines(sourceCodeLines, numSpacesPerTab):
 				sys.exit("Parser_CodeGen_Toolbox->getLineInfoFromSourceCodeLines:  problem with list returned from getVarNamesAsStringNamesFromLine.")
 			nextLineInfoObj.setVarNames(varNames)
 
-		lineInfoList.append(copy.deepcopy(nextLineInfoObj))
+		lineInfoList[lineNumber] = copy.deepcopy(nextLineInfoObj)
 		del nextLineInfoObj
 
 	if (len(lineInfoList) == 0):
@@ -1574,6 +1614,9 @@ def writeFunctionFromCodeToString(sourceCodeLines, startLineNo, endLineNo, extra
 
 		if (line.lstrip().rstrip() in con.linesNotToWrite):
 			continue
+
+		if (line.lstrip().rstrip() == 'return False'):
+			line = "incorrectIndices.append(" + con.numSignaturesIndex + ")"
 
 		if (removeSelf == True):
 			line = line.replace(con.selfFuncCallString, con.space)

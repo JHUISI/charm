@@ -16,6 +16,9 @@ batchVerFile = None
 batchVerifierOutput = None
 cachedCalcsToPassToDC = []
 callListOfVerifyFuncs = None
+
+checkBlocks = None
+
 finalBatchEq = None
 finalBatchEqWithLoops = None
 functionArgMappings = None
@@ -2340,9 +2343,21 @@ def addGroupMembershipChecks():
 
 	outputString += "\t\tpass\n\n"
 
-	#batchVerFile.write(outputString)
+	batchVerFile.write(outputString)
 	individualVerFile.write(outputString)
 
+	for checkBlock in checkBlocks:
+		startLineCheckBlock = checkBlock[0]
+		endLineCheckBlock = checkBlock[1]
+		lineNoList = createListFromRange(startLineCheckBlock, endLineCheckBlock)
+		varNamesInCheckBlock = getVarNamesFromLineInfoObj(lineNoList, lineInfo)
+		lineNosNeededForCheckBlock = getAllLineNosThatImpactVarList(varNamesInCheckBlock, con.verifyFuncName, lineNosPerVar, var_varDependencies)
+		combineListsNoDups(lineNoList, lineNosNeededForCheckBlock)
+		lineNoList.sort()
+		writeLinesToFile(lineNoList, 1, batchVerFile)
+		batchVerFile.write("\n")
+
+	outputString = ""
 	outputString += "\t" + con.numSignaturesIndex + " = 0\n"
 	outputString += "\tstartSigNum = 0\n"
 	outputString += "\tendSigNum = " + con.numSignatures + "\n\n"
@@ -2372,6 +2387,10 @@ def writeLinesToOutputString(lines, indentationListParam, baseNumTabs, numExtraT
 		if (isLineOnlyWhiteSpace(line) == True):
 			continue
 		line = ensureSpacesBtwnTokens_CodeGen(line)
+
+		if (line.lstrip().rstrip() == 'return False'):
+			line = "incorrectIndices.append(" + con.numSignaturesIndex + ")"
+
 		for arg in verifyFuncArgs:
 			argWithSpaces = ' ' + arg + ' '
 			numArgMatches = line.count(argWithSpaces)
@@ -2423,7 +2442,9 @@ def writeBodyOfInd():
 
 	individualOutputString += "\t\t\tpass\n"
 	individualOutputString += "\t\telse:\n"
-	individualOutputString += "\t\t\tincorrectIndices.append(" + con.numSignaturesIndex + ")\n\n"
+	individualOutputString += "\t\t\tif " + con.numSignaturesIndex + " not in incorrectIndices:\n"
+	individualOutputString += "\t\t\t\tincorrectIndices.append(" + con.numSignaturesIndex + ")\n\n"
+
 	individualOutputString += "\treturn incorrectIndices\n"
 
 	individualVerFile.write(individualOutputString)
@@ -2943,7 +2964,10 @@ def writeVerifyEqAndRecursionForDC():
 	outputString += "\telse:\n"
 	outputString += "\t\tmidWay = int( (endSigNum - startSigNum) / 2)\n"
 	outputString += "\t\tif (midWay == 0):\n"
-	outputString += "\t\t\tincorrectIndices.append(startSigNum)\n"
+	outputString += "\t\t\tif startSigNum not in incorrectIndices:\n"
+
+
+	outputString += "\t\t\t\tincorrectIndices.append(startSigNum)\n"
 	outputString += "\t\t\treturn\n"
 	outputString += "\t\tmidSigNum = startSigNum + midWay\n"
 	outputString += "\t\tverifySigsRecursive(verifyArgsDict, group, incorrectIndices, startSigNum, midSigNum"
@@ -3042,7 +3066,7 @@ def main():
 	global numTabsOnVerifyLine, batchVerifierOutput, finalBatchEq, finalBatchEqWithLoops, listVars, numSpacesPerTab, lineInfo
 	global loopBlocksForCachedCalculations, loopBlocksForNonCachedCalculations, lineNosPerVar
 	global lineNoOfFirstFunction, globalVars, var_varDependencies, functionArgNames, functionNames
-	global verifySigsFileName
+	global verifySigsFileName, checkBlocks
 
 	try:
 		pythonCodeLines = open(pythonCodeArg, 'r').readlines()
@@ -3188,6 +3212,12 @@ def main():
 	if (con.initFuncName in functionNames):
 		addCallToInit()
 
+	lineInfo = getLineInfoFromSourceCodeLines(copy.deepcopy(pythonCodeLines), numSpacesPerTab)
+	if ( (lineInfo == None) or (type(lineInfo).__name__ != con.dictTypePython) or (len(lineInfo) == 0) ):
+		sys.exit("AutoBatch_CodeGen->main:  could not extract any line information from the source code Python lines of the cryptoscheme.")
+
+	checkBlocks = myASTParser.getStartEndLineCheckBlocks(copy.deepcopy(pythonCodeLines), lineInfo, verifyStartLine, (verifyEndLine - 1), numTabsOnVerifyLine)
+
 	addSigLoop()
 	addGroupMembershipChecks()
 	writeBodyOfInd()
@@ -3224,9 +3254,6 @@ def main():
 	cleanFinalBatchEq()
 	getBatchEqVars()
 	distillBatchEqVars()
-	lineInfo = getLineInfoFromSourceCodeLines(copy.deepcopy(pythonCodeLines), numSpacesPerTab)
-	if ( (lineInfo == None) or (type(lineInfo).__name__ != con.listTypePython) or (len(lineInfo) == 0) ):
-		sys.exit("AutoBatch_CodeGen->main:  could not extract any line information from the source code Python lines of the cryptoscheme.")
 
 	getLoopNamesOfFinalBatchEq()
 	distillLoopsWRTNumSignatures()

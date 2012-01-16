@@ -479,6 +479,53 @@ class ASTParser:
 	def getStringListOfStructItems(self, struct):
 		return getStringListOfStructItems(struct)
 
+	def getStartOrEndLineOfBlock(self, codeLines, lineInfo, lineNumber, numTabsOnVerifyLine, getStartLine, minLine, maxLine):
+
+		while (True):
+			if (getStartLine == True):
+				lineNumber -= 1
+			else:
+				lineNumber += 1
+
+			if ( (lineNumber <= minLine) or (lineNumber >= maxLine) ):
+				return lineNumber
+
+			if (lineNumber not in lineInfo):
+				continue
+
+			numTabsOnThisLine = lineInfo[lineNumber].getNumIndentTabs()
+			if ( (numTabsOnThisLine) != (numTabsOnVerifyLine + 1) ):
+				continue
+
+			lineOfCode = codeLines[lineNumber - 1].lstrip().rstrip()
+			if ( (lineOfCode.startswith('elif ') == True) or (lineOfCode.startswith('else:') == True) ):
+				continue
+
+			return lineNumber
+
+	def getStartEndLineCheckBlocks(self, codeLines, lineInfo, startLine, endLine, numTabsOnVerifyLine):
+		lineNoInList = startLine - 2
+		endLineNoInList = endLine - 1
+
+		withinIfBranch = False
+
+		retList = []
+
+		while (lineNoInList <= (endLineNoInList - 1)):
+			lineNoInList += 1
+
+			lineOfCode = codeLines[lineNoInList].lstrip().rstrip()
+			if (lineOfCode == 'return False'):
+				startLineOfCheckBlock = self.getStartOrEndLineOfBlock(codeLines, lineInfo, lineNoInList + 1, numTabsOnVerifyLine, True, startLine, endLine)
+				endLineOfCheckBlock = self.getStartOrEndLineOfBlock(codeLines, lineInfo, lineNoInList + 1, numTabsOnVerifyLine, False, startLine, endLine)
+				endLineOfCheckBlock -= 1
+				retList.append((startLineOfCheckBlock, endLineOfCheckBlock))
+
+		if (len(retList) == 0):
+			return None
+
+		return retList
+
 	def getFuncNameFromCallNode(self, node):
 		if ( (node == None) or (type(node).__name__ != con.callTypeAST) ):
 			sys.exit("ASTParser->getFuncNameFromCallNode:  problem with node passed in to function.")
