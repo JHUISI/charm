@@ -1,8 +1,8 @@
 from toolbox.pairinggroup import *
 from charm.engine.util import *
 import sys, copy, random
-from bat_watersTEST import run_Batch
-from ind_watersTEST import run_Ind
+from batNEW import run_Batch
+from indNEW import run_Ind
 
 sigNumKey = 'Signature_Number'
 bodyKey = 'Body'
@@ -126,7 +126,7 @@ if __name__ == '__main__':
 
 	verifyFuncArgs = list(verifyArgsDictRandomized[0].keys())
 
-	incorrectSigIndices = run_Batch(verifyArgsDictRandomized, groupParamArg, verifyFuncArgs)
+	incorrectSigIndices = run_Batch(verifyArgsDictRandomized, groupParamArg, verifyFuncArgs, True)
 	incorrectSigIndices.sort()
 
 	print(incorrectSigIndices)

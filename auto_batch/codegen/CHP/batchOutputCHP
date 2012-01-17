@@ -38,3 +38,4 @@ Precompute: b_z := H(M | t3,ZR)
 dotA := G1
 dotB := G2
 dotC := G2
+Sort := mpk#0

@@ -16,6 +16,9 @@ batchVerFile = None
 batchVerifierOutput = None
 cachedCalcsToPassToDC = []
 callListOfVerifyFuncs = None
+
+checkBlocks = None
+
 finalBatchEq = None
 finalBatchEqWithLoops = None
 functionArgMappings = None
@@ -1824,7 +1827,15 @@ def processSortLine(line):
 	global sortVars
 
 	line = line.replace(con.sortString, '', 1)
-	print(line)
+	line = line.lstrip().rstrip()
+	if (line.count(con.subscriptIndicator) != 1):
+		sys.exit("processSortLine in codegen py file.")
+
+	withExpandedSubscript = processTokenWithSubscriptIndicator(line)
+	finalVersion = writeLinesToOutputString([withExpandedSubscript], None, 0, 0)
+
+	sortVars.append(finalVersion.lstrip().rstrip())
+
 
 def processLoopLine(line):
 	global loopVarGroupTypes
@@ -2340,9 +2351,22 @@ def addGroupMembershipChecks():
 
 	outputString += "\t\tpass\n\n"
 
-	#batchVerFile.write(outputString)
+	batchVerFile.write(outputString)
 	individualVerFile.write(outputString)
 
+	if (checkBlocks != None):
+		for checkBlock in checkBlocks:
+			startLineCheckBlock = checkBlock[0]
+			endLineCheckBlock = checkBlock[1]
+			lineNoList = createListFromRange(startLineCheckBlock, endLineCheckBlock)
+			varNamesInCheckBlock = getVarNamesFromLineInfoObj(lineNoList, lineInfo)
+			lineNosNeededForCheckBlock = getAllLineNosThatImpactVarList(varNamesInCheckBlock, con.verifyFuncName, lineNosPerVar, var_varDependencies)
+			combineListsNoDups(lineNoList, lineNosNeededForCheckBlock)
+			lineNoList.sort()
+			writeLinesToFile(lineNoList, 1, batchVerFile)
+			batchVerFile.write("\n")
+
+	outputString = ""
 	outputString += "\t" + con.numSignaturesIndex + " = 0\n"
 	outputString += "\tstartSigNum = 0\n"
 	outputString += "\tendSigNum = " + con.numSignatures + "\n\n"
@@ -2353,8 +2377,8 @@ def writeLinesToOutputString(lines, indentationListParam, baseNumTabs, numExtraT
 	if ( (lines == None) or (type(lines).__name__ != con.listTypePython) or (len(lines) == 0) ):
 		sys.exit("AutoBatch_CodeGen->writeLinesToOutputString:  problem with lines parameter passed in.")
 
-	if ( (indentationListParam == None) or (type(indentationListParam).__name__ != con.listTypePython) or (len(indentationListParam) != len(lines) ) ):
-		sys.exit("AutoBatch_CodeGen->writeLinesToOutputString:  problem with indentation list parameter passed in.")
+	#if ( (indentationListParam == None) or (type(indentationListParam).__name__ != con.listTypePython) or (len(indentationListParam) != len(lines) ) ):
+		#sys.exit("AutoBatch_CodeGen->writeLinesToOutputString:  problem with indentation list parameter passed in.")
 
 	if ( (baseNumTabs == None) or (type(baseNumTabs).__name__ != con.intTypePython) or (baseNumTabs < 0) ):
 		sys.exit("AutoBatch_CodeGen->writeLinesToOutputString:  problem with base number of tabs parameter passed in.")
@@ -2372,6 +2396,10 @@ def writeLinesToOutputString(lines, indentationListParam, baseNumTabs, numExtraT
 		if (isLineOnlyWhiteSpace(line) == True):
 			continue
 		line = ensureSpacesBtwnTokens_CodeGen(line)
+
+		if (line.lstrip().rstrip() == 'return False'):
+			line = "incorrectIndices.append(" + con.numSignaturesIndex + ")"
+
 		for arg in verifyFuncArgs:
 			argWithSpaces = ' ' + arg + ' '
 			numArgMatches = line.count(argWithSpaces)
@@ -2393,7 +2421,11 @@ def writeLinesToOutputString(lines, indentationListParam, baseNumTabs, numExtraT
 
 		line = removeSpaceAfterChar(line, '-')
 		line = line.replace(con.selfFuncCallString, con.space)
-		numTabs = determineNumTabsFromSpaces(indentationListParam[lineNumber], numSpacesPerTab) - baseNumTabs
+		if (indentationListParam != None):
+			numTabs = determineNumTabsFromSpaces(indentationListParam[lineNumber], numSpacesPerTab) - baseNumTabs
+		else:
+			numTabs = 0
+
 		numTabs += numExtraTabs
 
 		#if (numTabs == (numTabsOnPreviousLine + 1) ):
@@ -2423,7 +2455,9 @@ def writeBodyOfInd():
 
 	individualOutputString += "\t\t\tpass\n"
 	individualOutputString += "\t\telse:\n"
-	individualOutputString += "\t\t\tincorrectIndices.append(" + con.numSignaturesIndex + ")\n\n"
+	individualOutputString += "\t\t\tif " + con.numSignaturesIndex + " not in incorrectIndices:\n"
+	individualOutputString += "\t\t\t\tincorrectIndices.append(" + con.numSignaturesIndex + ")\n\n"
+
 	individualOutputString += "\treturn incorrectIndices\n"
 
 	individualVerFile.write(individualOutputString)
@@ -2943,7 +2977,10 @@ def writeVerifyEqAndRecursionForDC():
 	outputString += "\telse:\n"
 	outputString += "\t\tmidWay = int( (endSigNum - startSigNum) / 2)\n"
 	outputString += "\t\tif (midWay == 0):\n"
-	outputString += "\t\t\tincorrectIndices.append(startSigNum)\n"
+	outputString += "\t\t\tif startSigNum not in incorrectIndices:\n"
+
+
+	outputString += "\t\t\t\tincorrectIndices.append(startSigNum)\n"
 	outputString += "\t\t\treturn\n"
 	outputString += "\t\tmidSigNum = startSigNum + midWay\n"
 	outputString += "\t\tverifySigsRecursive(verifyArgsDict, group, incorrectIndices, startSigNum, midSigNum"
@@ -2969,6 +3006,9 @@ def writeVerifyEqAndRecursionForDC():
 def writeCallToSortFunction():
 	global batchVerFile
 
+	if (len(sortVars) != 1):
+		sys.exit("writecalltosortfunc in codegen py file.")
+
 	outputString = ""
 	outputString += "\n"
 	outputString += "def run_Batch(verifyArgsDict, groupObjParam, verifyFuncArgs, toSort):\n"
@@ -2981,38 +3021,34 @@ def writeCallToSortFunction():
 	outputString += "\tsigNosMap = {}\n"
 	outputString += "\tsortedSigEntries = {}\n"
 	outputString += "\tfor " + con.numSignaturesIndex + " in range(0, " + con.numSignatures + "):\n"
-	#outputString += "\t\tcurrentSortVal = 
-
-	'''
-		currentSortVal = verifyArgsDict[z]['pk'][bodyKey]['g^x']
-		matchingIndex = None
-		sortKey = -1
-		for sortKey in sortValues:
-			if (sortValues[sortKey] == currentSortVal):
-				matchingIndex = sortKey
-				break
-		if (matchingIndex != None):
-			sigNosMap[matchingIndex].append(z)
-			lenCurrentSigsBatch = len(sortedSigEntries[matchingIndex])
-			sortedSigEntries[matchingIndex][lenCurrentSigsBatch] = verifyArgsDict[z]
-		else:
-			newIndex = sortKey + 1
-			sortValues[newIndex] = currentSortVal
-			sigNosMap[newIndex] = []
-			sigNosMap[newIndex].append(z)
-			sortedSigEntries[newIndex] = {}
-			sortedSigEntries[newIndex][0] = verifyArgsDict[z]
-
-	incorrectIndices = []
-
-	for sortValKey in sortedSigEntries:
-		incorrectsFromSortedBatch = run_Batch_Sorted(sortedSigEntries[sortValKey], groupObjParam, verifyFuncArgs)
-		actualIndices = sigNosMap[sortValKey]
-		for incorrect in incorrectsFromSortedBatch:
-			incorrectIndices.append(actualIndices[incorrect])
-
-	return incorrectIndices
-	'''
+	outputString += "\t\tcurrentSortVal = " + sortVars[0] + "\n"
+	outputString += "\t\tmatchingIndex = None\n"
+	outputString += "\t\tsortKey = -1\n"
+	outputString += "\t\tfor sortKey in sortValues:\n"
+	outputString += "\t\t\tif (sortValues[sortKey] == currentSortVal):\n"
+	outputString += "\t\t\t\tmatchingIndex = sortKey\n"
+	outputString += "\t\t\t\tbreak\n"
+	outputString += "\t\tif (matchingIndex != None):\n"
+	outputString += "\t\t\tsigNosMap[matchingIndex].append(" + con.numSignaturesIndex + ")\n"
+	outputString += "\t\t\tlenCurrentSigsBatch = len(sortedSigEntries[matchingIndex])\n"
+	outputString += "\t\t\tsortedSigEntries[matchingIndex][lenCurrentSigsBatch] = verifyArgsDict[" + con.numSignaturesIndex + "]\n"
+	outputString += "\t\telse:\n"
+	outputString += "\t\t\tnewIndex = sortKey + 1\n"
+	outputString += "\t\t\tsortValues[newIndex] = currentSortVal\n"
+	outputString += "\t\t\tsigNosMap[newIndex] = []\n"
+	outputString += "\t\t\tsigNosMap[newIndex].append(" + con.numSignaturesIndex + ")\n"
+	outputString += "\t\t\tsortedSigEntries[newIndex] = {}\n"
+	outputString += "\t\t\tsortedSigEntries[newIndex][0] = verifyArgsDict[" + con.numSignaturesIndex + "]\n"
+	outputString += "\n"
+	outputString += "\tincorrectIndices = []\n"
+	outputString += "\n"
+	outputString += "\tfor sortValKey in sortedSigEntries:\n"
+	outputString += "\t\tincorrectsFromSortedBatch = run_Batch_Sorted(sortedSigEntries[sortValKey], groupObjParam, verifyFuncArgs)\n"
+	outputString += "\t\tactualIndices = sigNosMap[sortValKey]\n"
+	outputString += "\t\tfor incorrect in incorrectsFromSortedBatch:\n"
+	outputString += "\t\t\tincorrectIndices.append(actualIndices[incorrect])\n"
+	outputString += "\n"
+	outputString += "\treturn incorrectIndices\n"
 
 	batchVerFile.write(outputString)
 
@@ -3042,7 +3078,7 @@ def main():
 	global numTabsOnVerifyLine, batchVerifierOutput, finalBatchEq, finalBatchEqWithLoops, listVars, numSpacesPerTab, lineInfo
 	global loopBlocksForCachedCalculations, loopBlocksForNonCachedCalculations, lineNosPerVar
 	global lineNoOfFirstFunction, globalVars, var_varDependencies, functionArgNames, functionNames
-	global verifySigsFileName
+	global verifySigsFileName, checkBlocks
 
 	try:
 		pythonCodeLines = open(pythonCodeArg, 'r').readlines()
@@ -3188,6 +3224,12 @@ def main():
 	if (con.initFuncName in functionNames):
 		addCallToInit()
 
+	lineInfo = getLineInfoFromSourceCodeLines(copy.deepcopy(pythonCodeLines), numSpacesPerTab)
+	if ( (lineInfo == None) or (type(lineInfo).__name__ != con.dictTypePython) or (len(lineInfo) == 0) ):
+		sys.exit("AutoBatch_CodeGen->main:  could not extract any line information from the source code Python lines of the cryptoscheme.")
+
+	checkBlocks = myASTParser.getStartEndLineCheckBlocks(copy.deepcopy(pythonCodeLines), lineInfo, verifyStartLine, (verifyEndLine - 1), numTabsOnVerifyLine)
+
 	addSigLoop()
 	addGroupMembershipChecks()
 	writeBodyOfInd()
@@ -3224,9 +3266,6 @@ def main():
 	cleanFinalBatchEq()
 	getBatchEqVars()
 	distillBatchEqVars()
-	lineInfo = getLineInfoFromSourceCodeLines(copy.deepcopy(pythonCodeLines), numSpacesPerTab)
-	if ( (lineInfo == None) or (type(lineInfo).__name__ != con.listTypePython) or (len(lineInfo) == 0) ):
-		sys.exit("AutoBatch_CodeGen->main:  could not extract any line information from the source code Python lines of the cryptoscheme.")
 
 	getLoopNamesOfFinalBatchEq()
 	distillLoopsWRTNumSignatures()

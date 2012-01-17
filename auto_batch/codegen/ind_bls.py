@@ -1,96 +1,44 @@
-from toolbox.pairinggroup import *
 from charm.engine.util import *
+import sys, random, string
+from toolbox.pairinggroup import *
 import sys
 
-# Constants used to load message/signature data from disk
+group = None
+debug = None
+bodyKey = 'Body'
 
-#sigNumKey = 'Signature_Number'
-#bodyKey = 'Body'
-#charmPickleSuffix = '.charmPickle'
-#pythonPickleSuffix = '.pythonPickle'
-#repeatSuffix = '.repeat'
+def __init__( groupObj ) : 
+	global group , debug 
+	group= groupObj 
+	debug= False 
 
-N = 200
-l = 1
+def dump( obj ) : 
+	ser_a= serializeDict( obj , group ) 
+	return str( pickleObject( ser_a ) ) 
 
-global group
-group = PairingGroup(80)
+def run_Ind(verifyArgsDict, groupObjParam, verifyFuncArgs):
+	global group
+	global debug
+	group = groupObjParam
 
-def keygen(self, secparam=None):
-	g = group.random(G2)
-	x = group.random(ZR)
-	g_x = g ** x
-	pk = { 'g^x':g_x, 'g':g, 'identity':str(g_x), 'secparam':secparam }
-	sk = { 'x':x }
-	return (pk, sk)
+	N = len(verifyArgsDict)
+	z = 0
+	incorrectIndices = []
+	__init__(group)
 
-def sign(x, message):
-	sig = group.hash(message, G1) ** x
-	return sig
+	for z in range(0, N):
+		#for arg in verifyFuncArgs:
+			#if (group.ismember(verifyArgsDict[z][arg][bodyKey]) == False):
+				#sys.exit("ALERT:  Group membership check failed!!!!\n")
 
-def verify():
-	"""
-	verifyParamFilesArg = sys.argv[1]
-	verifyParamFiles = open(verifyParamFilesArg, 'rb').read()
-	groupParamArg = PairingGroup(int(sys.argv[2]))
-	verifyParamFilesDict = deserializeDict( unpickleObject( verifyParamFiles ) , groupParamArg )
-	verifyArgsDict = {}
-	numSigs = len(verifyParamFilesDict)
-	lenRepeatSuffix = len(repeatSuffix)
-	verifyFuncArgs = list(verifyParamFilesDict[1].keys())
+		pass
 
-	for sigIndex in range(0, numSigs):
-		verifyArgsDict[sigIndex] = {}
-		for arg in verifyFuncArgs:
-			verifyArgsDict[sigIndex][arg] = {}
-			verifyParamFile = str(verifyParamFilesDict[sigIndex][arg])
-			if (verifyParamFile.endswith(charmPickleSuffix)):
-				verifyParamPickle = open(verifyParamFile, 'rb').read()
-				verifyArgsDict[sigIndex][arg][bodyKey] = deserializeDict( unpickleObject( verifyParamPickle ) , groupParamArg )
-			elif (verifyParamFile.endswith(pythonPickleSuffix)):
-				verifyParamPickle = open(verifyParamFile, 'rb')
-				verifyArgsDict[sigIndex][arg][bodyKey] = pickle.load(verifyParamPickle)
-			elif (verifyParamFile.endswith(repeatSuffix)):
-				verifyArgsDict[sigIndex][arg][sigNumKey] = verifyParamFile[0:(len(verifyParamFile) - lenRepeatSuffix)]
-			else:
-				tempFile = open(verifyParamFile, 'rb')
-				tempBuf = tempFile.read()
-				verifyArgsDict[sigIndex][arg][bodyKey] = tempBuf
-
-
-	# Holds pointers to the data in the case of repeat information
-	argSigIndexMap = {}
-	"""
-	group = groupParamArg
-	N = numSigs
-
-	for sigIndex in range(0, numSigs):
-
-		# Load references so we can get to the data if there are pointers
-		for arg in verifyFuncArgs:
-			if (sigNumKey in verifyArgsDict[sigIndex][arg]):
-				argSigIndexMap[arg] = int(verifyArgsDict[sigIndex][arg][sigNumKey])
-			else:
-				argSigIndexMap[arg] = sigIndex
-
-
-		# Group membership checks
-		if (type( verifyArgsDict[argSigIndexMap['message']]['message'][bodyKey] ) != str):
-			sys.exit("Group membership check failed")
-
-		if (group.ismember( verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey] ) == False):
-			sys.exit("Group membership check failed")
-
-		if (group.ismember( verifyArgsDict[argSigIndexMap['pk']]['pk'][bodyKey]['g^x'] ) == False):
-			sys.exit("Group membership check failed")
-
-		if (group.ismember( verifyArgsDict[argSigIndexMap['pk']]['pk'][bodyKey]['g'] ) == False):
-			sys.exit("Group membership check failed")
-
-
-		# Scheme-specific code to test the signature
-		h = group.hash( message , G1 )
-		if pair( verifyArgsDict[argSigIndexMap['sig']]['sig'][bodyKey] , verifyArgsDict[argSigIndexMap['pk']]['pk'][bodyKey][ 'g' ] ) == pair( h , verifyArgsDict[argSigIndexMap['pk']]['pk'][bodyKey][ 'g^x' ] )  :
+		M= dump( verifyArgsDict[z]['message'][bodyKey] )
+		h= group.hash( M , G1 )
+		if pair( verifyArgsDict[z]['sig'][bodyKey] , verifyArgsDict[z]['pk'][bodyKey][ 'g' ] )== pair( h , verifyArgsDict[z]['pk'][bodyKey][ 'g^x' ] ) :
 			pass
 		else:
-			print("Verification of signature " + str(sigIndex) + " failed.\n")
+			if z not in incorrectIndices:
+				incorrectIndices.append(z)
+
+	return incorrectIndices

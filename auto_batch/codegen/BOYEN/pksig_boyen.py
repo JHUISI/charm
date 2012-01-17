@@ -35,7 +35,8 @@ class Boyen(PKSig):
             A.append(g1 ** a[i])
             At.append(g2 ** a[i])
         # public verification key "in the sky" for all users
-        return {'g1':g1, 'g2':g2, 'A':A[0],    'B':A[1],   'C':A[2], 'At':At[0], 'Bt':At[1], 'Ct':At[2]}
+        mpk = {'g1':g1, 'g2':g2, 'A':A[0],    'B':A[1],   'C':A[2], 'At':At[0], 'Bt':At[1], 'Ct':At[2]}
+        return mpk
     
     def keygen(self, mpk):
         a, b, c = group.random(ZR), group.random(ZR), group.random(ZR)

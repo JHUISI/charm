@@ -36,3 +36,4 @@ Precompute: h_z := H(M_z,G1)
 Precompute: delta := for{z := 0, N} do prng_z
 dotA := G1
 dotB := G1
+Sort := pk#0

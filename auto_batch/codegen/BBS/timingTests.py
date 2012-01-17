@@ -1,8 +1,8 @@
 from toolbox.pairinggroup import *
 from charm.engine.util import *
 import sys, copy, random
-from bat_bbs import run_Batch
-from ind_bbs import run_Ind
+from batNEW import run_Batch
+from indNEW import run_Ind
 
 sigNumKey = 'Signature_Number'
 bodyKey = 'Body'
