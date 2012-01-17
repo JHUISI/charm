@@ -46,7 +46,7 @@ message := N
 public := one
 signature := N
 
-verify := { ((e(T3, g2)^-sx) * ((e(h, w)^(-salpha + -sbeta)) * ((e(h, g2)^(-sgamma1 + -sgamma2)) * ((e(T3, w)^-c) * (e(g1, g2)^c)))))) == R3 }
+verify := { ((e(T3, g2)^-sx) * ((e(h, w)^(-salpha + -sbeta)) * ((e(h, g2)^(-sgamma1 + -sgamma2)) * ((e(T3, w)^c) * (e(g1, g2)^-c)))))) == R3 }
 
 #BEGIN :: transform
 #2, 6, 6, 5, 3
