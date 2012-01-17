@@ -1,0 +1,41 @@
+name := test5
+N := 100
+
+BEGIN :: types
+S1 := G1; S2 := G1; S3 := G1
+pk := G1
+b := ZR
+g := G2
+END :: types
+
+BEGIN :: precompute
+s_z := H(M_z, G2)
+END :: precompute
+
+BEGIN :: constant
+g
+END :: constant
+
+BEGIN :: public
+pk
+END :: public
+
+BEGIN :: signature
+S1, S2, S3, b
+END :: signature
+
+BEGIN :: message
+M
+END :: message
+
+# different messages/sigs under different signers
+message := N
+public := one
+signature := N
+
+BEGIN :: transform
+2, 3, 7, 8, 3, 2
+END :: transform
+
+verify := (e(S1, g^b) * (e(S2, H(M, G2)) * e(S3, H(M, G2)^b))) == (e(pk, g^b)) 
+
