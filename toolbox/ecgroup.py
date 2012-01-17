@@ -18,7 +18,7 @@ class ECGroup():
         return 'ECGroup'     
 
     def init(self, type=ZR):
-        return init(sef.group, type)
+        return init(self.group, type)
     
     def random(self, type=ZR):
         if type == ZR or type == G:
