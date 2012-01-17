@@ -20,15 +20,14 @@ from toolbox.PKSig import PKSig
 
 debug = False
 
-class CHCH(PKSig):
+class Hess(PKSig):
     def __init__(self, groupObj):
-        global group
+        global group,H1,H2
         group = groupObj
-        
-    def setup(self):
-        global H1,H2
         H1 = lambda x: group.hash(x, G1)
         H2 = lambda x,y: group.hash((x,y), ZR)
+        
+    def setup(self):
         g2, alpha = group.random(G2), group.random(ZR)
         msk = alpha
         P = g2 ** alpha 
@@ -62,7 +61,7 @@ class CHCH(PKSig):
 def main():
    
    groupObj = PairingGroup('../param/a.param')
-   chch = CHCH(groupObj)
+   chch = Hess(groupObj)
    (mpk, msk) = chch.setup()
 
    _id = "janedoe@email.com"
