@@ -35,12 +35,12 @@ class IBSig():
         return (pk, sk)
         
     def sign(self, x, message):
-        M = self.dump(message)
+        M = message
         if debug: print("Message => '%s'" % M)
         return group.hash(M, G1) ** x
         
     def verify(self, pk, sig, message):
-        M = self.dump(message)
+        M = message
         h = group.hash(M, G1)
         if pair(sig, pk['g']) == pair(h, pk['g^x']):
             return True  
