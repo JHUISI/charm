@@ -1,0 +1,52 @@
+# hess + chch
+name := case2 
+N := 100
+
+BEGIN :: types
+S1h := GT
+S2h := G1
+S1c := G1; S2c := G1
+pk := G1
+a := ZR
+END :: types
+
+BEGIN :: precompute
+a := H(M_z | S1_z, ZR)
+END :: precompute
+
+BEGIN :: constant
+P, g2
+END :: constant
+
+BEGIN :: public
+pk
+END :: public
+
+BEGIN :: signature
+S1, S2
+END :: signature
+
+BEGIN :: message
+a
+END :: message
+
+# different messages/sigs under different signers
+message := N
+public := N
+signature := N
+
+# ultimate goal :=>
+# hess
+# verify1 := { e(S2h, g2) == ( e(pk, P)^a ) * S1c }
+# chch
+# verify2 := { e(S2c, g2) == ( e(S1c * pk^a, P) )
+# verify := verify1 and verify2
+
+verify := { (((e(pk, P)^a ) * S1h) * (e(S2h, g2)^-1)) == (e(S1c * pk^a, P) * e(S2c, g2)^-1) }
+
+BEGIN :: latex
+S1 := S_1
+S2 := S_2
+g2 := g_2
+P := P_{pub}
+END :: latex
