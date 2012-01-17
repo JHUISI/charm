@@ -234,7 +234,7 @@ if __name__ == "__main__":
         lcg = LatexCodeGenerator(constants, vars, latex_subs)
 
 
-    techniques = {'2':Technique2, '3':Technique3, '4':Technique4, '5':DotProdInstanceFinder, '6':PairInstanceFinder }
+    techniques = {'2':Technique2, '3':Technique3, '4':Technique4, '5':DotProdInstanceFinder, '6':PairInstanceFinder, '7':Technique7, '8':Technique8 }
     print("\nVERIFY EQUATION =>", verify)
     if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Equation', 'eq': lcg.print_statement(verify.right) }; lcg_steps += 1
     verify2 = BinaryNode.copy(verify)
@@ -263,7 +263,7 @@ if __name__ == "__main__":
         algorithm = [str(x) for x in result]
         print("found batch algorithm =>", algorithm)
 
-
+    # execute the batch algorithm sequence 
     for option in algorithm:
         if option == '5':
             option_str = "Simplifying =>"
@@ -280,6 +280,8 @@ if __name__ == "__main__":
         ASTVisitor(Tech).preorder(verify2.right)
         if option == '6':
             Tech.makeSubstitution(verify2.right)
+        if hasattr(Tech, 'precompute'):
+            batch_precompute.update(Tech.precompute)
         print(Tech.rule, "\n")
         print(option_str, ":",verify2.right, "\n")
         if PROOFGEN_FLAG:

@@ -2,7 +2,7 @@
 from batchlang import *
 from batchparser import *
 
-Tech_db = Enum('NoneApplied', 'ExpIntoPairing', 'DistributeExpToPairing', 'ProductToSum', 'CombinePairing', 'SplitPairing', 'ConstantPairing')
+Tech_db = Enum('NoneApplied', 'ExpIntoPairing', 'DistributeExpToPairing', 'ProductToSum', 'CombinePairing', 'SplitPairing', 'ConstantPairing', 'MoveExpOutPairing')
 
 #TODO: code up reverse 2 : pull values from pairing outside, 
 #TODO: code up precompute pair : precomputing pairings where both sides are constant.
@@ -722,8 +722,65 @@ class Technique4(AbstractTechnique):
             if result: return result            
             result = self.searchProd(node.right, node)
             return result
+    
+    
+class Technique7(AbstractTechnique):
+    """ looks for e( a^c_z, b^d_z ) where a and b are constants and c and d are variable"""
+    def __init__(self, sdl_data, variables, meta):
+        AbstractTechnique.__init__(self, sdl_data, variables, meta)        
+        self.applied = False
+        self.score   = Tech_db.NoneApplied
+        self.rule    = "Reverse technique 2. Move exponents outside pairing"
         
+    def visit_pair(self, node, data):
+        left = node.left
+        right = node.right
+        # note that there are several cases that will need to account for
+        if Type(left) == ops.EXP and Type(right) == ops.EXP:         
+            if self.isConstant(left.left) and self.isConstant(right.left):
+                if not self.isConstant(left.right) and not self.isConstant(right.right):
+                    #print("Candidate for technique 7:  ", left.right, right.right)
+                    new_mul = BinaryNode(ops.MUL, BinaryNode.copy(left.right), BinaryNode.copy(right.right))
+                    new_pair = self.createPair(BinaryNode.copy(left.left), BinaryNode.copy(right.left))
+                    new_exp = self.createExp(new_pair, new_mul)
+                    addAsChildNodeToParent(data, new_exp)
+                    del node # clean up
+                    self.applied = True
+                    self.score   = Tech_db.MoveExpOutPairing
+                    
+    
+class Technique8(AbstractTechnique):
+    def __init__(self, sdl_data, variables, meta):
+        AbstractTechnique.__init__(self, sdl_data, variables, meta)        
+        self.applied = False
+        self.score   = Tech_db.NoneApplied
+        self.rule    = "Precompute pairings with constant first and second elements."
+        self.prefix  = "preP"
+        self.ctr     = 0 # in case there are more than one. go from 0 to N intances
+        self.precompute = {}
+    
+    def visit_pair(self, node, data):
+        left = node.left
+        right = node.right
+        if Type(left) == ops.ATTR and Type(right) == ops.ATTR:
+            if self.isConstant(left) and self.isConstant(right):
+                #print("Candidate for technique 8:")
+                precomp_key = self.record(node)
+                addAsChildNodeToParent(data, precomp_key)
+                del node
+                self.applied = True
+                self.score   = Tech_db.ConstantPairing
 
+    def record(self, node):
+        key      = self.prefix + str(self.ctr)
+        keyNode  = BinaryNode(key)
+        self.precompute[ keyNode ] = BinaryNode.copy(node)
+        # take note in the other dictionaries: vars and consts
+        self.vars[ key ] = 'GT' 
+        self.consts.append( key )
+        self.ctr += 1
+        return keyNode
+    
 class ASTIndexForIndiv(AbstractTechnique):
     def __init__(self, sdl_data, variables, meta):
         AbstractTechnique.__init__(self, sdl_data, variables, meta)        
