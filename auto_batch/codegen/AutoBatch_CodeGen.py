@@ -2177,11 +2177,11 @@ def addCommonHeaderLines():
 
 	globalVarsString = getGlobalVarsHeaderString()
 	if (globalVarsString != None):
-		if ( (type(globalVarsString).__name__ != con.strTypePython) or (len(globalVarsString) == 0) ):
-			sys.exit("AutoBatch_CodeGen->addCommonHeaderLines:  problem with value returned from getGlobalVarsHeaderString.")
-		batchOutputString += globalVarsString + " = None\n"
-		indOutputString += globalVarsString + " = None\n"
-		verifyOutputString += globalVarsString + " = None\n"
+		if ( (type(globalVarsString).__name__ == con.strTypePython) and (len(globalVarsString) > 0) ):
+			#sys.exit("AutoBatch_CodeGen->addCommonHeaderLines:  problem with value returned from getGlobalVarsHeaderString.")
+			batchOutputString += globalVarsString + " = None\n"
+			indOutputString += globalVarsString + " = None\n"
+			verifyOutputString += globalVarsString + " = None\n"
 
 	batchOutputString += "bodyKey = \'Body\'\n\n"
 
@@ -2223,10 +2223,10 @@ def addTemplateLines():
 
 	globalsString = getGlobalVarsAssignString()
 	if (globalsString != None):
-		if ( (type(globalsString).__name__ != con.strTypePython) or (len(globalsString) == 0) ):
-			sys.exit("AutoBatch_CodeGen->addTemplateLines:  problem with return value from getGlobalVarsHeaderString.")
-		batchOutputString += "\tglobal " + globalsString + "\n"
-		indOutputString += "\tglobal " + globalsString + "\n"
+		if ( (type(globalsString).__name__ == con.strTypePython) and (len(globalsString) > 0) ):
+			#sys.exit("AutoBatch_CodeGen->addTemplateLines:  problem with return value from getGlobalVarsHeaderString.")
+			batchOutputString += "\tglobal " + globalsString + "\n"
+			indOutputString += "\tglobal " + globalsString + "\n"
 
 	batchOutputString += "\t" + con.group + " = " + con.group + "ObjParam\n\n"
 	batchOutputString += "\t" + con.numSignatures + " = len(verifyArgsDict)\n"

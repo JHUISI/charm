@@ -786,7 +786,9 @@ class ASTFuncArgMapsVisitor(ast.NodeVisitor):
 		if (len(callerArgList) != len(destArgNames) ):
 			throwError = self.throwErrorOnUnequalCallLists(len(callerArgList), len(destArgNames), destFuncName.getStringVarName())
 			if (throwError == True):
-				sys.exit("ASTFuncArgMapsVisitor->visit_Call:  length of caller and destination arguments lists are not equal.")
+				#sys.exit("ASTFuncArgMapsVisitor->visit_Call:  length of caller and destination arguments lists are not equal.")
+				print("ASTFuncArgMapsVisitor->visit_Call:  length of caller and destination arguments lists are not equal.  This needs to be fixed.")
+				return
 
 		funcArgMapObject = FunctionArgMap()
 		funcArgMapObject.setDestFuncName(destFuncName)

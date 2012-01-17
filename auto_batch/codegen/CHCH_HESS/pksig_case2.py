@@ -19,44 +19,43 @@ from schemes.pksig_chch import CHCH
 
 debug = False
 
-class ComboScheme(PKSig):
-    def __init__(self, hessScheme, chchScheme):
-        self.hess = hessScheme
-        self.chch = chchScheme
+def __init__(groupObj):
+    global group
+    group = groupObj
             
-    def verify(self, mpk, pk, M, sig):
-        sig1, sig2 = sig['sig_hess'], sig['sig_chch']        
-        if self.hess.verify(mpk, pk, M, sig1) and self.chch.verify(mpk, pk, M, sig2):
-            return True
-        return False
+def verify(mpk, pk, M, sig, hess, chch):
+    sig1, sig2 = sig['sig_hess'], sig['sig_chch']        
+    isHessTrue = hess.verify(mpk, pk, M, sig1)
+    isCHCHTrue = chch.verify(mpk, pk, M, sig2)
+    if ( (isHessTrue and isCHCHTrue) == True):
+        return True
+    return False
         
-def main():
+def main():   
+    groupObj = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
+    hess = Hess(groupObj)
+    chch = CHCH(groupObj)
    
-   groupObj = PairingGroup('../param/d224.param')
-   hess = Hess(groupObj)
-   chch = CHCH(groupObj)
-   combo = ComboScheme(hess, chch)
-   
-   (mpk, msk) = chch.setup()
+    (mpk, msk) = chch.setup()
 
-   _id = "janedoe@email.com"
-   (pk, sk) = chch.keygen(msk, _id)
-   if debug:  
-    print("Keygen...")
-    print("pk =>", pk)
-    print("sk =>", sk)
+    _id = "janedoe@email.com"
+    (pk, sk) = chch.keygen(msk, _id)
+    if debug:  
+        print("Keygen...")
+        print("pk =>", pk)
+        print("sk =>", sk)
  
-   M = "this is a message! twice!" 
-   sig1 = hess.sign(mpk, sk, M)
-   sig2 = chch.sign(pk, sk, M)
-   sig = { 'sig_hess':sig1, 'sig_chch':sig2 }
-   if debug:
-       print("Signature...")
-       print("sig1 =>", sig1)
-       print("sig2 =>", sig2)
+    M = "this is a message! twice!" 
+    sig1 = hess.sign(mpk, sk, M)
+    sig2 = chch.sign(pk, sk, M)
+    sig = { 'sig_hess':sig1, 'sig_chch':sig2 }
+    if debug:
+        print("Signature...")
+        print("sig1 =>", sig1)
+        print("sig2 =>", sig2)
    
-   assert combo.verify(mpk, pk, M, sig), "invalid signature!"
-   if debug: print("Verification successful!")
+    assert verify(mpk, pk, M, sig, hess, chch), "invalid signature!"
+    if debug: print("Verification successful!")
 
 if __name__ == "__main__":
     debug = True

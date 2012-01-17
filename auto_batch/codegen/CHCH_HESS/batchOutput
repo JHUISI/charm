@@ -1,0 +1,51 @@
+['/Users/matt/Documents/charm/auto_batch/codegen/CHCH_HESS/case2.bv', '-c']
+types  => {'a': 'ZR', 'S2c': 'G1', 'S2h': 'G1', 'S1h': 'GT', 'S1c': 'G1', 'pk': 'G1'}
+constant  => ['P', 'g2']
+public  => ['pk']
+signature  => ['S1', 'S2']
+message  => ['a']
+latex => {'S2': 'S_2', 'S1': 'S_1', 'g2': 'g_2', 'P': 'P_{pub}'}
+variables => {'a': 'ZR', 'S2c': 'G1', 'name': 'case2', 'S2h': 'G1', 'N': '100', 'S1h': 'GT', 'S1c': 'G1', 'pk': 'G1'}
+metadata => {'name': 'case2', 'N': '100'}
+
+VERIFY EQUATION => verify := ((e(pk,P)^a * S1h) * e(S2h,g2)^-1) == (e((S1c * pk^a),P) * e(S2c,g2)^-1)
+Mode: multi signer
+
+Stage A: Combined Equation => verify := (prod{z := 0,N} on ((e(pk_z,P)^a_z * S1h) * e(S2h,g2)^-1)) == (prod{z := 0,N} on (e((S1c * pk_z^a_z),P) * e(S2c,g2)^-1))
+
+Stage B: Small Exp Test => verify := (prod{z := 0,N} on ((e(pk_z,P)^a_z * S1h) * e(S2h,g2)^-1)^delta_z) == (prod{z := 0,N} on (e((S1c * pk_z^a_z),P) * e(S2c,g2)^-1)^delta_z) 
+
+found batch algorithm => ['2', '6', '6', '5', '3']
+Move the exponent(s) into the pairing (technique 2) 
+
+Applying technique 2 : (prod{z := 0,N} on ((e(pk_z^(a_z * delta_z),P) * S1h^delta_z) * e(S2h^-delta_z,g2))) == (prod{z := 0,N} on (e((S1c^delta_z * pk_z^(a_z * delta_z)),P) * e(S2c^-delta_z,g2))) 
+
+Merge pairings with common first or second element (technique 6) 
+
+Combine Pairings: : (prod{z := 0,N} on ((e((pk_z^(a_z * delta_z) * (S1c^delta_z * pk_z^(a_z * delta_z))),P) * S1h^delta_z) * e(S2h^-delta_z,g2))) == (prod{z := 0,N} on e(S2c^-delta_z,g2)) 
+
+Merge pairings with common first or second element (technique 6) 
+
+Combine Pairings: : (prod{z := 0,N} on ((e((pk_z^(a_z * delta_z) * (S1c^delta_z * pk_z^(a_z * delta_z))),P) * S1h^delta_z) * e((S2h^-delta_z * S2c^-delta_z),g2))) == prod{z := 0,N} 
+
+Distribute dot products (technique 5):  
+
+Simplifying => : ((prod{z := 0,N} on e((pk_z^(a_z * delta_z) * (S1c^delta_z * pk_z^(a_z * delta_z))),P)) * ((prod{z := 0,N} on S1h^delta_z) * (prod{z := 0,N} on e((S2h^-delta_z * S2c^-delta_z),g2)))) == 1 
+
+Move dot products inside pairings to reduce N pairings to 1 (technique 3) 
+
+Applying technique 3 : (e((prod{z := 0,N} on (pk_z^(a_z * delta_z) * (S1c^delta_z * pk_z^(a_z * delta_z)))),P) * ((prod{z := 0,N} on S1h^delta_z) * e((prod{z := 0,N} on (S2h^-delta_z * S2c^-delta_z)),g2))) == 1 
+
+Final batch eq: (e((prod{z := 0,N} on (pk_z^(a_z * delta_z) * (S1c^delta_z * pk_z^(a_z * delta_z)))),P) * ((prod{z := 0,N} on S1h^delta_z) * e((prod{z := 0,N} on (S2h^-delta_z * S2c^-delta_z)),g2))) == 1
+<====	PREP FOR CODE GEN	====>
+
+Final version => (e(dotA,mpk#0) * (dotB * e(dotC,mpk#1))) == 1 
+
+Compute:  dotA := (prod{z := 0,N} on (pk_z^(a_z * delta_z) * (S1c^delta_z * pk_z^(a_z * delta_z))))
+Compute:  dotB := (prod{z := 0,N} on S1h^delta_z)
+Compute:  dotC := (prod{z := 0,N} on (S2h^-delta_z * S2c^-delta_z))
+Precompute: a := H(M_z | S1_z,ZR)
+Precompute: delta := for{z := 1, N} do prng_z
+dotA := G1
+dotB := GT
+dotC := G1
