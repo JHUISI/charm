@@ -1827,7 +1827,15 @@ def processSortLine(line):
 	global sortVars
 
 	line = line.replace(con.sortString, '', 1)
-	print(line)
+	line = line.lstrip().rstrip()
+	if (line.count(con.subscriptIndicator) != 1):
+		sys.exit("processSortLine in codegen py file.")
+
+	withExpandedSubscript = processTokenWithSubscriptIndicator(line)
+	finalVersion = writeLinesToOutputString([withExpandedSubscript], None, 0, 0)
+
+	sortVars.append(finalVersion.lstrip().rstrip())
+
 
 def processLoopLine(line):
 	global loopVarGroupTypes
@@ -2346,16 +2354,17 @@ def addGroupMembershipChecks():
 	batchVerFile.write(outputString)
 	individualVerFile.write(outputString)
 
-	for checkBlock in checkBlocks:
-		startLineCheckBlock = checkBlock[0]
-		endLineCheckBlock = checkBlock[1]
-		lineNoList = createListFromRange(startLineCheckBlock, endLineCheckBlock)
-		varNamesInCheckBlock = getVarNamesFromLineInfoObj(lineNoList, lineInfo)
-		lineNosNeededForCheckBlock = getAllLineNosThatImpactVarList(varNamesInCheckBlock, con.verifyFuncName, lineNosPerVar, var_varDependencies)
-		combineListsNoDups(lineNoList, lineNosNeededForCheckBlock)
-		lineNoList.sort()
-		writeLinesToFile(lineNoList, 1, batchVerFile)
-		batchVerFile.write("\n")
+	if (checkBlocks != None):
+		for checkBlock in checkBlocks:
+			startLineCheckBlock = checkBlock[0]
+			endLineCheckBlock = checkBlock[1]
+			lineNoList = createListFromRange(startLineCheckBlock, endLineCheckBlock)
+			varNamesInCheckBlock = getVarNamesFromLineInfoObj(lineNoList, lineInfo)
+			lineNosNeededForCheckBlock = getAllLineNosThatImpactVarList(varNamesInCheckBlock, con.verifyFuncName, lineNosPerVar, var_varDependencies)
+			combineListsNoDups(lineNoList, lineNosNeededForCheckBlock)
+			lineNoList.sort()
+			writeLinesToFile(lineNoList, 1, batchVerFile)
+			batchVerFile.write("\n")
 
 	outputString = ""
 	outputString += "\t" + con.numSignaturesIndex + " = 0\n"
@@ -2368,8 +2377,8 @@ def writeLinesToOutputString(lines, indentationListParam, baseNumTabs, numExtraT
 	if ( (lines == None) or (type(lines).__name__ != con.listTypePython) or (len(lines) == 0) ):
 		sys.exit("AutoBatch_CodeGen->writeLinesToOutputString:  problem with lines parameter passed in.")
 
-	if ( (indentationListParam == None) or (type(indentationListParam).__name__ != con.listTypePython) or (len(indentationListParam) != len(lines) ) ):
-		sys.exit("AutoBatch_CodeGen->writeLinesToOutputString:  problem with indentation list parameter passed in.")
+	#if ( (indentationListParam == None) or (type(indentationListParam).__name__ != con.listTypePython) or (len(indentationListParam) != len(lines) ) ):
+		#sys.exit("AutoBatch_CodeGen->writeLinesToOutputString:  problem with indentation list parameter passed in.")
 
 	if ( (baseNumTabs == None) or (type(baseNumTabs).__name__ != con.intTypePython) or (baseNumTabs < 0) ):
 		sys.exit("AutoBatch_CodeGen->writeLinesToOutputString:  problem with base number of tabs parameter passed in.")
@@ -2412,7 +2421,11 @@ def writeLinesToOutputString(lines, indentationListParam, baseNumTabs, numExtraT
 
 		line = removeSpaceAfterChar(line, '-')
 		line = line.replace(con.selfFuncCallString, con.space)
-		numTabs = determineNumTabsFromSpaces(indentationListParam[lineNumber], numSpacesPerTab) - baseNumTabs
+		if (indentationListParam != None):
+			numTabs = determineNumTabsFromSpaces(indentationListParam[lineNumber], numSpacesPerTab) - baseNumTabs
+		else:
+			numTabs = 0
+
 		numTabs += numExtraTabs
 
 		#if (numTabs == (numTabsOnPreviousLine + 1) ):
@@ -2993,6 +3006,9 @@ def writeVerifyEqAndRecursionForDC():
 def writeCallToSortFunction():
 	global batchVerFile
 
+	if (len(sortVars) != 1):
+		sys.exit("writecalltosortfunc in codegen py file.")
+
 	outputString = ""
 	outputString += "\n"
 	outputString += "def run_Batch(verifyArgsDict, groupObjParam, verifyFuncArgs, toSort):\n"
@@ -3005,38 +3021,34 @@ def writeCallToSortFunction():
 	outputString += "\tsigNosMap = {}\n"
 	outputString += "\tsortedSigEntries = {}\n"
 	outputString += "\tfor " + con.numSignaturesIndex + " in range(0, " + con.numSignatures + "):\n"
-	#outputString += "\t\tcurrentSortVal = 
-
-	'''
-		currentSortVal = verifyArgsDict[z]['pk'][bodyKey]['g^x']
-		matchingIndex = None
-		sortKey = -1
-		for sortKey in sortValues:
-			if (sortValues[sortKey] == currentSortVal):
-				matchingIndex = sortKey
-				break
-		if (matchingIndex != None):
-			sigNosMap[matchingIndex].append(z)
-			lenCurrentSigsBatch = len(sortedSigEntries[matchingIndex])
-			sortedSigEntries[matchingIndex][lenCurrentSigsBatch] = verifyArgsDict[z]
-		else:
-			newIndex = sortKey + 1
-			sortValues[newIndex] = currentSortVal
-			sigNosMap[newIndex] = []
-			sigNosMap[newIndex].append(z)
-			sortedSigEntries[newIndex] = {}
-			sortedSigEntries[newIndex][0] = verifyArgsDict[z]
-
-	incorrectIndices = []
-
-	for sortValKey in sortedSigEntries:
-		incorrectsFromSortedBatch = run_Batch_Sorted(sortedSigEntries[sortValKey], groupObjParam, verifyFuncArgs)
-		actualIndices = sigNosMap[sortValKey]
-		for incorrect in incorrectsFromSortedBatch:
-			incorrectIndices.append(actualIndices[incorrect])
-
-	return incorrectIndices
-	'''
+	outputString += "\t\tcurrentSortVal = " + sortVars[0] + "\n"
+	outputString += "\t\tmatchingIndex = None\n"
+	outputString += "\t\tsortKey = -1\n"
+	outputString += "\t\tfor sortKey in sortValues:\n"
+	outputString += "\t\t\tif (sortValues[sortKey] == currentSortVal):\n"
+	outputString += "\t\t\t\tmatchingIndex = sortKey\n"
+	outputString += "\t\t\t\tbreak\n"
+	outputString += "\t\tif (matchingIndex != None):\n"
+	outputString += "\t\t\tsigNosMap[matchingIndex].append(" + con.numSignaturesIndex + ")\n"
+	outputString += "\t\t\tlenCurrentSigsBatch = len(sortedSigEntries[matchingIndex])\n"
+	outputString += "\t\t\tsortedSigEntries[matchingIndex][lenCurrentSigsBatch] = verifyArgsDict[" + con.numSignaturesIndex + "]\n"
+	outputString += "\t\telse:\n"
+	outputString += "\t\t\tnewIndex = sortKey + 1\n"
+	outputString += "\t\t\tsortValues[newIndex] = currentSortVal\n"
+	outputString += "\t\t\tsigNosMap[newIndex] = []\n"
+	outputString += "\t\t\tsigNosMap[newIndex].append(" + con.numSignaturesIndex + ")\n"
+	outputString += "\t\t\tsortedSigEntries[newIndex] = {}\n"
+	outputString += "\t\t\tsortedSigEntries[newIndex][0] = verifyArgsDict[" + con.numSignaturesIndex + "]\n"
+	outputString += "\n"
+	outputString += "\tincorrectIndices = []\n"
+	outputString += "\n"
+	outputString += "\tfor sortValKey in sortedSigEntries:\n"
+	outputString += "\t\tincorrectsFromSortedBatch = run_Batch_Sorted(sortedSigEntries[sortValKey], groupObjParam, verifyFuncArgs)\n"
+	outputString += "\t\tactualIndices = sigNosMap[sortValKey]\n"
+	outputString += "\t\tfor incorrect in incorrectsFromSortedBatch:\n"
+	outputString += "\t\t\tincorrectIndices.append(actualIndices[incorrect])\n"
+	outputString += "\n"
+	outputString += "\treturn incorrectIndices\n"
 
 	batchVerFile.write(outputString)
 

@@ -71,3 +71,31 @@ def run_Batch(verifyArgsDict, groupObjParam, verifyFuncArgs, toSort):
 	sigNosMap = {}
 	sortedSigEntries = {}
 	for z in range(0, N):
+		currentSortVal = verifyArgsDict[z]['pk'][bodyKey][ 'g^x' ]
+		matchingIndex = None
+		sortKey = -1
+		for sortKey in sortValues:
+			if (sortValues[sortKey] == currentSortVal):
+				matchingIndex = sortKey
+				break
+		if (matchingIndex != None):
+			sigNosMap[matchingIndex].append(z)
+			lenCurrentSigsBatch = len(sortedSigEntries[matchingIndex])
+			sortedSigEntries[matchingIndex][lenCurrentSigsBatch] = verifyArgsDict[z]
+		else:
+			newIndex = sortKey + 1
+			sortValues[newIndex] = currentSortVal
+			sigNosMap[newIndex] = []
+			sigNosMap[newIndex].append(z)
+			sortedSigEntries[newIndex] = {}
+			sortedSigEntries[newIndex][0] = verifyArgsDict[z]
+
+	incorrectIndices = []
+
+	for sortValKey in sortedSigEntries:
+		incorrectsFromSortedBatch = run_Batch_Sorted(sortedSigEntries[sortValKey], groupObjParam, verifyFuncArgs)
+		actualIndices = sigNosMap[sortValKey]
+		for incorrect in incorrectsFromSortedBatch:
+			incorrectIndices.append(actualIndices[incorrect])
+
+	return incorrectIndices
