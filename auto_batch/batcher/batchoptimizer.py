@@ -335,9 +335,32 @@ class SubstitutePairs2:
                 
                 
         elif self.key == 'lnode':
-            if str(node.left) == str(self.left):
-                print("Found a left match: ", node)
+            if str(node.left) == str(self.left) and Type(node.left) == ops.ATTR:
+                #print("handle this case: ", node)
+                if node.right == self.right and Type(self.right) == ops.ON:                    
+                    pass
+                elif node.right == self.right:
+                    self.extra.insert(0, BinaryNode.copy(self.right))
+                    muls = [ BinaryNode(ops.MUL) for i in range(len(self.extra)-1) ]
+                    for i in range(len(muls)):
+                        muls[i].left = BinaryNode.copy(self.extra[i])
+                        if i < len(muls)-1: muls[i].right = muls[i+1]
+                        else: muls[i].right = BinaryNode.copy(self.extra[i+1])
+                    node.right = muls[0] # self.right doesn't change
+                    #print("new pairing node: ", muls[0], self.right) # MUL nodes absorb the exponent
+                    self.deleteOtherPair = True                    
+#                    print("New node: ", node)
+                elif node.right in self.extra:
+                    #print("delete node: ", node)
+                    del node.left, node.right
+                    node.left = None
+                    node.right = None
+                    BinaryNode.clearNode(node)
+                    self.pruneCheck = True
                 
+            elif str(node.left) == str(self.left):
+                print("Found a match: ", self.left)
+                    
     def combine(self, subtree1, subtree2, parentOfTarget=None):
         if subtree2 == None: return None
         elif subtree2.left == None: pass
