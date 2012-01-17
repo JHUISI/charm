@@ -1,0 +1,6 @@
+name := cl04
+N := 100
+
+BEGIN :: types
+...
+END :: types

@@ -43,7 +43,7 @@ class BatchParser:
     def getBNF(self):
         # supported operators => (OR, AND, <, prod{
         #OperatorOR = Literal("OR") | Literal("or").setParseAction(upcaseTokens)
-        #OperatorAND = Literal("AND") | Literal("and").setParseAction(upcaseTokens)
+        ANDOp = Literal("AND") | Literal("and").setParseAction(upcaseTokens)
         lpar = Literal("(").suppress() | Literal("{").suppress()
         rpar = Literal(")").suppress() | Literal("}").suppress()
         rcurly = Literal("}").suppress()
@@ -66,7 +66,7 @@ class BatchParser:
         SumOf = Literal("of")
         
         # captures order of parsing token operators
-        Token = Equality | ExpOp | MulOp | DivOp | AddOp | ForDo | ProdOf | SumOf | Concat | Assignment
+        Token = ANDOp | Equality | ExpOp | MulOp | DivOp | AddOp | ForDo | ProdOf | SumOf | Concat | Assignment
         Operator = Token 
         #Operator = OperatorAND | OperatorOR | Token
 
