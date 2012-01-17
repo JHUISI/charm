@@ -562,13 +562,24 @@ class DotProdInstanceFinder:
         if subtree.left: self.getMulTokens(subtree.left, subtree.type, target_type, _list)
         if subtree.right: self.getMulTokens(subtree.right, subtree.type, target_type, _list)
         return
-    
+        
     def visit(self, node, data):
         pass
 
     def visit_pair(self, node, data):
         return { 'visited_pair': True }
-
+    
+    # Bandaid: cleaning up when about to distribute a dot products where PROD node has no ON node
+    # in other words, dangling PROD node in verify equation
+    def visit_prod(self, node, data):
+        if Type(data['parent']) != ops.ON:
+            #print("Found a candidate for cleaning!!!")
+            new_node = BinaryNode(ops.ATTR)
+            new_node.setAttribute("1")
+            BinaryNode.clearNode(node)
+            BinaryNode.setNodeAs(node, new_node)
+            
+            
     # visit all the ON nodes and test whether we can distribute the product to children nodes
     # e.g., prod{} on (x * y) => prod{} on x * prod{} on y    
     def visit_on(self, node, data):

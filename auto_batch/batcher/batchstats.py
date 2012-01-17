@@ -185,5 +185,6 @@ class RecordOperations:
         #print("printing type =>", _type)
         #print("node =>", node)
         if _type == 'delta': return 'ZR'
+        if _type == '1': return 'ZR' # probably computing an inverse here 
         assert self.vars_def.get(_type) != None, "Key error in vars db => '%s'" % _type
         return self.vars_def[_type]

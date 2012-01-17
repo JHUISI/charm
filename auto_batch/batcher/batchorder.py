@@ -1,5 +1,5 @@
 from batchparser import *
-from batchtechniques import Tech_db,Technique2,Technique3,Technique4
+from batchtechniques import Tech_db,Technique2,Technique3,Technique4,Technique7,Technique8
 from batchoptimizer import *
 import random
 
@@ -33,7 +33,7 @@ class BatchOrder:
         self.meta  = metadata
         self.verify = equation
         self.debug  = False
-        self.techMap = { 2:Technique2, 3:Technique3, 4:Technique4 }
+        self.techMap = { 2:Technique2, 3:Technique3, 4:Technique4, 7:Technique7, 8:Technique8 }
         # a quick way to test that a particular technique will transform the equation (pre-check)
         self.techMap2 = { 5:DotProdInstanceFinder, 6:PairInstanceFinder }
 
@@ -41,7 +41,7 @@ class BatchOrder:
         eq = BinaryNode.copy(self.verify)
         order = []
         for k in combo:
-            tech = self.techMap[k](self.const, self.vars, self.meta)
+            tech = self.techMap[k](self.sdl_data, self.vars, self.meta)
             # traverse verify with tech operations
             ASTVisitor(tech).preorder(eq)
 #            print("Result: ", self.verify, "\nApplied: ", tech.applied)
@@ -142,7 +142,7 @@ class BatchOrder:
                     suggest = [4, 5, 6, 3] # move on to tech3 or distribute dot products if possible
             elif tech_applied == 3:
                 if tech_obj.score in [Tech_db.CombinePairing, Tech_db.ProductToSum, Tech_db.SplitPairing]:
-                    suggest = [4, 5, 2]
+                    suggest = [4, 7, 5, 2]
             elif tech_applied == 4:
                 if tech_obj.score == Tech_db.ConstantPairing:
                     suggest = [6, 5, 3]
@@ -152,6 +152,12 @@ class BatchOrder:
             elif tech_applied == 6: # combine pairings
                 if tech_obj.testForApplication:
                     suggest = [5, 4, 3, 6]
+            elif tech_applied == 7:
+                if tech_obj.score == Tech_db.MoveExpOutPairing:
+                    suggest = [8]
+            elif tech_applied == 8:
+                if tech_obj.score == Tech_db.ConstantPairing:
+                    suggest = [7, 3, 2]
             else:
                 return
         else:

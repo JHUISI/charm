@@ -136,12 +136,24 @@ class AbstractTechnique:
     
     def createExp(self, left, right):
         if left.type == ops.EXP: # left => a^b , then => a^(b * c)
-            mul = BinaryNode(ops.MUL)
-            mul.left = left.right
-            mul.right = right
+#            exp = BinaryNode(ops.EXP)
+            if Type(left.right) == ops.ATTR:
+                value = left.right.getAttribute()
+                if value.isdigit() and int(value) <= 1:                    
+#                    exp.left = left.left
+                    left.right.setAttribute(str(right))
+                    mul = left.right
+                else:
+                    mul = BinaryNode(ops.MUL)
+                    mul.left = left.right
+                    mul.right = right                    
+            else:
+                mul = BinaryNode(ops.MUL)
+                mul.left = left.right
+                mul.right = right
             exp = BinaryNode(ops.EXP)
             exp.left = left.left
-            exp.right = mul
+            exp.right = mul                
         elif left.type in [ops.ATTR, ops.PAIR, ops.HASH]: # left: attr ^ right
             exp = BinaryNode(ops.EXP)
             exp.left = left

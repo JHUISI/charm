@@ -230,6 +230,12 @@ class BinaryNode:
 		else:
 			return None
 	
+	def setAttribute(self, value):
+		if (self.type == ops.ATTR):
+			self.attr = str(value)
+			return True
+		return False
+	
 #	def getMySide(self):
 #		return self.myside
 	
