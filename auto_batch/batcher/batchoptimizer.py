@@ -3,8 +3,10 @@
 # the same variables is found, then it is a candidate for further optimization. This is separate
 # from the techniques in batch parser, however.
 from batchlang import *
+import batchtechniques 
 import batchparser
 import string
+
 
 class ExpInstanceFinder:
     def __init__(self):
@@ -270,7 +272,8 @@ class SubstitutePairs2:
             self.extra = pairDict['rnode1']
             self.extra_parent = pairDict['rnode1_parent']
         
-        self.deleteOtherPair = self.pruneCheck = self.debug = False
+        self.deleteOtherPair = self.pruneCheck = False
+        self.debug = False
         
     def visit(self, node, data):
         if self.deleteOtherPair:
@@ -297,9 +300,11 @@ class SubstitutePairs2:
                     if self.debug: print("combine other nodes with ON node: ", self.left)
                     target = self.left
                     for nodes in self.extra:
+                        if self.debug: print("other nodes: ", nodes)
                         target = self.combine(target, nodes) # may need to make this smarter to do a proper merge
+                   #     print("target :=", target)
                         self.left.right = target
-                    #print("ans => ", self.left)
+                    #print("result => ", self.left)
                     node.left = BinaryNode.copy(self.left)
                     #print("node =>", node)
                     self.deleteOtherPair = True
@@ -325,20 +330,23 @@ class SubstitutePairs2:
                     
                     
             elif str(node.right) == str(self.right):
-                print("Found a match: ", self.left)
+                print("Found a match, general right case: ", self.left, self.right)
                 for i in self.extra:
-                    print("node: ", i)
-                # find the second pair node
-#                n = BinaryNode(ops.MUL)
-#                n.left = self.left
-#                n.right = self.extra
-                
+                    print("node: ", i)                
                 
         elif self.key == 'lnode':
             if str(node.left) == str(self.left) and Type(node.left) == ops.ATTR:
                 #print("handle this case: ", node)
                 if node.right == self.right and Type(self.right) == ops.ON:                    
-                    pass
+                    if self.debug: print("combine other nodes with ON node: ", self.right)
+                    target = self.right
+                    for nodes in self.extra:
+                        target = self.combine(target, nodes) # may need to make this smarter to do a proper merge
+                        self.right.right = target
+                    #print("ans => ", self.left)
+                    node.left = BinaryNode.copy(self.left)
+                    #print("node =>", node)
+                    self.deleteOtherPair = True
                 elif node.right == self.right:
                     self.extra.insert(0, BinaryNode.copy(self.right))
                     muls = [ BinaryNode(ops.MUL) for i in range(len(self.extra)-1) ]
@@ -359,22 +367,39 @@ class SubstitutePairs2:
                     self.pruneCheck = True
                 
             elif str(node.left) == str(self.left):
-                print("Found a match: ", self.left)
+                print("Found a match, general left case: ", self.left, self.right)
+                for i in self.extra:
+                    print("node: ", i)                
+        else:
+            print("invalid or unrecognized key: ", self.key)
                     
     def combine(self, subtree1, subtree2, parentOfTarget=None):
-        if subtree2 == None: return None
-        elif subtree2.left == None: pass
-        elif Type(subtree1.left) == Type(subtree2.left):
-            result = self.combine(subtree1.right, subtree2.right, subtree1)
-            if result:                 
-                n = BinaryNode(ops.MUL)
-                n.left = subtree1.right
-                n.right = subtree2.right
-                return n
-            return None    
-        # check if node is a LEAF. if so report that node is different 
-        if Type(subtree2) == ops.ATTR:
-            return True
+        if Type(subtree1) == Type(subtree2) and Type(subtree1) == ops.ON:
+            #print("Found ON node: ", subtree1)
+            return self.combine(subtree1.right, subtree2.right)
+        elif Type(subtree1) == Type(subtree2) and Type(subtree1) == ops.MUL:
+            #print("Found MUL node: ", subtree1, subtree2)
+            return batchtechniques.AbstractTechnique.createMul(subtree1, subtree2)
+        elif Type(subtree1) == Type(subtree2) and Type(subtree1) == ops.EXP:
+            #print("Found EXP node: ", subtree1, subtree2)
+            return batchtechniques.AbstractTechnique.createMul(subtree1, subtree2)
+        else:
+            #print("Found node: ", Type(subtree1), Type(subtree2))
+            return BinaryNode(ops.MUL, BinaryNode.copy(subtree1), BinaryNode.copy(subtree2))
+#        if subtree2 == None: return None
+#        elif subtree2.left == None: pass
+#        elif Type(subtree1.left) == Type(subtree2.left):
+#            print("left == right :", Type(subtree1.left))
+#            result = self.combine(subtree1.right, subtree2.right, subtree1)
+#            if result:                 
+#                n = BinaryNode(ops.MUL)
+#                n.left = subtree1.right
+#                n.right = subtree2.right
+#                return n
+#            return None    
+#        # check if node is a LEAF. if so report that node is different 
+#        if Type(subtree2) == ops.ATTR:
+#            return True
 
     def mergeWithMul(self, subtree1, subtree2):
         checkSubtrees = False

@@ -42,7 +42,8 @@ signature := N
 # verify2 := { e(S2c, g2) == ( e(S1c * pk^a, P) )
 # verify := verify1 and verify2
 
-verify := { (((e(pk, P)^a ) * S1h) * (e(S2h, g2)^-1)) == (e(S1c * pk^a, P) * e(S2c, g2)^-1) }
+#verify := { (((e(pk, P)^a ) * S1h) * (e(S2h, g2)^-1)) == (e(S1c * pk^a, P) * e(S2c, g2)^-1) }
+verify := { (((e(pk, P)^a ) * S1h) * ((e(S2h, g2)^-1) * ((e(S1c * pk^a, P)^-1) * e(S2c, g2)))) == 1 }
 
 BEGIN :: latex
 S1 := S_1

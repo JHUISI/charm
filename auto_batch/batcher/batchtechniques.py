@@ -134,6 +134,23 @@ class AbstractTechnique:
             return muls[0]            
         return None
     
+    @classmethod
+    def createMul(self, left, right):
+        if left.type == right.type and left.type == ops.EXP:
+            # test whether exponents are the same
+            l = str(left.right)
+            r = str(right.right)
+#            print(l, r)
+            if l == r: # in other words, the same exponent
+                mul = AbstractTechnique.createMul(left.left, right.left)
+                exp = BinaryNode(ops.EXP, mul, BinaryNode.copy(left.right))
+                return exp
+            else:
+                return BinaryNode(ops.MUL, left, right) # for now
+        else:
+            return BinaryNode(ops.MUL, BinaryNode.copy(left), BinaryNode.copy(right))
+    
+    # TODO: turn EXP and Pair into classmethods
     def createExp(self, left, right):
         if left.type == ops.EXP: # left => a^b , then => a^(b * c)
 #            exp = BinaryNode(ops.EXP)
@@ -231,6 +248,7 @@ class Technique2(AbstractTechnique):
             elif left_check:
                 addAsChildNodeToParent(data, pair_node) # move pair node one level up                                
                 pair_node.left = self.createExp(pair_node.left, node.right)
+                #print("pair_node :", pair_node.left)
 #               node.left = pair_node.left
 #               pair_node.left = node                
                 self.applied = True
@@ -332,15 +350,20 @@ class Technique2(AbstractTechnique):
         elif(Type(node.left) == ops.MUL):    
             # distributing exponent over a MUL node (which may have more MUL nodes)        
             #print("Consider: node.left.type =>", node.left.type)
+                
+                
             mul_node = node.left
             #print("distribute exp correctly =>")
             #print("left: ", mul_node.left)
             #print("right: ", mul_node.right)
-            mul_node.left = self.createExp(mul_node.left, BinaryNode.copy(node.right))
-            mul_node.right = self.createExp(mul_node.right, BinaryNode.copy(node.right))
-            addAsChildNodeToParent(data, mul_node)            
-            self.applied = True
-            self.score   = tech2.DistributeExpToPairing
+            if Type(data['parent']) != ops.PAIR: 
+                mul_node.left = self.createExp(mul_node.left, BinaryNode.copy(node.right))
+                mul_node.right = self.createExp(mul_node.right, BinaryNode.copy(node.right))
+                addAsChildNodeToParent(data, mul_node)            
+                self.applied = True
+                self.score   = tech2.DistributeExpToPairing
+            #else:
+            #    print("something went wrong!")
             #self.rule += " distributed the exp node when applied to a MUL node. "
             # Note: if the operands of the mul are ATTR or PAIR doesn't matter. If the operands are PAIR nodes, PAIR ^ node.right
             # This is OK b/c of preorder visitation, we will apply transformations to the children once we return.
@@ -725,10 +748,14 @@ class Technique4(AbstractTechnique):
         result = self.allNodesWithIndex(index, subtree.right)
         return result
     
-    def searchProd(self, node, parent):
+    def searchProd(self, node, parent, meta=None):
         if node == None: return None
         elif node.type == ops.ON:
             return (node, parent)
+#        elif node.type == ops.EXP:
+#            exp = node.right
+#            if Type(exp) == ops.MUL: pass
+#            elif Type(exp) == ops.ATTR and 'z' in exp.attr_index: 
         else:
             result = self.searchProd(node.left, node)
             if result: return result            
@@ -800,6 +827,6 @@ class ASTIndexForIndiv(AbstractTechnique):
     def visit_attr(self, node, data):
         if data['parent'].type in [ops.PROD, ops.EQ]:
             return
-        if not self.isConstant(node):
+        if not self.isConstant(node) and str(node) != '1':
             node.setAttrIndex('z') # add index to each attr that isn't constant
     

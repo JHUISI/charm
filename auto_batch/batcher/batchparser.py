@@ -531,12 +531,12 @@ class CVForMultiSigner:
     def visit_eq_tst(self, node, data):
         # distribute prod to left and right side
         if self.signer >= signer_mode.single:
-            if Type(node.left) != ops.EQ:
+            if Type(node.left) != ops.EQ and str(node.left) != '1':
                 prodL = self.newProdNode(self.sigKey, self.sigEnd) # check if sig vars appear in left side?
                 prodL.right = node.left
                 node.left = prodL
         
-            if Type(node.right) != ops.EQ:
+            if Type(node.right) != ops.EQ and str(node.right) != '1':
                 prodR = self.newProdNode(self.sigKey, self.sigEnd)
                 prodR.right = node.right
                 node.right = prodR
