@@ -3007,7 +3007,8 @@ def writeCallToSortFunction():
 	global batchVerFile
 
 	if (len(sortVars) != 1):
-		sys.exit("writecalltosortfunc in codegen py file.")
+		return
+		#sys.exit("writecalltosortfunc in codegen py file.")
 
 	outputString = ""
 	outputString += "\n"

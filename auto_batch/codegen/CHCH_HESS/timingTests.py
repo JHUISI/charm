@@ -1,7 +1,7 @@
 from toolbox.pairinggroup import *
 from charm.engine.util import *
 import sys, copy, random
-from bat import run_Batch
+from bat import run_Batch_Sorted
 from ind import run_Ind
 
 sigNumKey = 'Signature_Number'
@@ -47,7 +47,11 @@ def loadDictDataFromFile(verifyParamFilesDict, groupParamArg):
 			verifyParamFile = str(verifyParamFilesDict[sigIndex][arg])
 			if (verifyParamFile.endswith(charmPickleSuffix)):
 				verifyParamPickle = open(verifyParamFile, 'rb').read()
+				if (arg == 'pk'):
+					print("unpickled:  ", verifyParamPickle)
 				verifyArgsDict[sigIndex][arg][bodyKey] = deserialize( unpickleObject( verifyParamPickle ) , groupParamArg )
+				if (arg == 'pk'):
+					print(verifyArgsDict[sigIndex]['pk'][bodyKey])
 			elif (verifyParamFile.endswith(pythonPickleSuffix)):
 				verifyParamPickle = open(verifyParamFile, 'rb')
 				verifyArgsDict[sigIndex][arg][bodyKey] = pickle.load(verifyParamPickle)
@@ -126,7 +130,7 @@ if __name__ == '__main__':
 
 	verifyFuncArgs = list(verifyArgsDictRandomized[0].keys())
 
-	incorrectSigIndices = run_Batch(verifyArgsDictRandomized, groupParamArg, verifyFuncArgs, True)
+	incorrectSigIndices = run_Batch_Sorted(verifyArgsDictRandomized, groupParamArg, verifyFuncArgs)
 	incorrectSigIndices.sort()
 
 	print(incorrectSigIndices)
