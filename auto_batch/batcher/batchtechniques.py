@@ -668,8 +668,8 @@ class Technique4(AbstractTechnique):
         prod = node.left
         my_val = str(prod.right)
         # check right subnode for another prod node
-        node_tuple = self.searchProd(node.right, node)
-        if node_tuple: node2 = node_tuple[0]; node2_parent = node_tuple[1]
+        node_tuple = self.searchProd(node.right, node, None)
+        if node_tuple: node2 = node_tuple[0]; node2_parent = node_tuple[1]; node2_grand = node_tuple[2]
         else: node2 = None; node2_parent = None
 
         if node2 != None:
@@ -682,8 +682,9 @@ class Technique4(AbstractTechnique):
                 node2.left = prod
                 #self.rule += " waters hash technique. "
                 # check if we need to redistribute or simplify?
-#                print("node2 =>", node2)
-#                print("parent =>", node2_parent, ":", Type(node2_parent))
+                #print("node2 =>", node2)
+                #print("parent =>", node2_parent, ":", Type(node2_parent))
+                #print("grandpa =>", node2_grand, ":", Type(node2_grand))
                 if Type(node2_parent) == ops.PAIR:
                     if self.debug: print("applied a transformation for technique 4")
                     self.adjustProdNodes( node2_parent )
@@ -692,6 +693,7 @@ class Technique4(AbstractTechnique):
                 else:
                     self.applied = True                    
                     self.score   = tech4.ConstantPairing
+                    self.adjustProdNodes( node2_grand )
                     if self.debug: 
                         print("No other transformation necessary since not a PAIR node instead:", Type(node2_parent))
         else:
@@ -703,8 +705,8 @@ class Technique4(AbstractTechnique):
             prod = node.left
             index = str(prod.left.left.left)              
             # check the following
-            #print("prod =>", prod.right)
-            #print("other =>", node.right)
+            print("prod =>", prod.right)
+            print("other =>", node.right)
             if not self.allNodesWithIndex(index, prod.right):
                 print("TODO: need to handle this case 1.")
             elif not self.allNodesWithIndex(index, node.right):
@@ -737,6 +739,8 @@ class Technique4(AbstractTechnique):
                     #print("updated node =>", node)
             elif not self.allNodesWithIndex(index, node.left):
                 print("TODO: adjustProdNodes: need to handle the other case.")
+        #elif Type(node) == ops.EXP:
+        #    print("Found somehting? ", node)
         # first check the right side for product
     
     def allNodesWithIndex(self, index, subtree):
@@ -748,18 +752,18 @@ class Technique4(AbstractTechnique):
         result = self.allNodesWithIndex(index, subtree.right)
         return result
     
-    def searchProd(self, node, parent, meta=None):
+    def searchProd(self, node, parent, grandpa=None):
         if node == None: return None
         elif node.type == ops.ON:
-            return (node, parent)
+            return (node, parent, grandpa)
 #        elif node.type == ops.EXP:
 #            exp = node.right
 #            if Type(exp) == ops.MUL: pass
 #            elif Type(exp) == ops.ATTR and 'z' in exp.attr_index: 
         else:
-            result = self.searchProd(node.left, node)
+            result = self.searchProd(node.left, node, parent)
             if result: return result            
-            result = self.searchProd(node.right, node)
+            result = self.searchProd(node.right, node, parent)
             return result
     
     

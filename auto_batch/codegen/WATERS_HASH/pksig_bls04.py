@@ -1,38 +1,80 @@
 from toolbox.pairinggroup import *
+from toolbox.iterate import dotprod
 from charm.engine.util import *
+from toolbox.conversion import Conversion
+from toolbox.bitstring import Bytes
 import sys, random, string
+import hashlib
 
 debug = False
 class IBSig():
     def __init__(self, groupObj):
-        global group, debug
+        global group, debug, hashObj
         group = groupObj
         debug = False
+        hashObj = hashlib.new('sha1')
         
     def dump(self, obj):
         ser_a = serializeDict(obj, group)
         return str(pickleObject(ser_a))
+
+    def sha1(self, message):
+        h = hashObj.copy()
+        h.update(bytes(message, 'utf-8'))
+        return Bytes(h.digest()) 
             
+    def strToId(self, pk, strID):
+        '''Hash the identity string and break it up in to l bit pieces'''
+        hash = self.sha1(strID)
+        val = Conversion.OS2IP(hash) #Convert to integer format
+        bstr = bin(val)[2:]   #cut out the 0b header
+
+        v=[]
+        for i in range(pk['z']):  #z must be greater than or equal to 1
+            binsubstr = bstr[pk['l']*i : pk['l']*(i+1)]
+            intval = int(binsubstr, 2)
+            intelement = group.init(ZR, intval)
+            v.append(intelement)
+        return v
+
+    def setup(self, z=5, l=32):
+        global lam_func
+        lam_func = lambda i,a,b: a[i] ** b[i]
+        g1 = group.random(G1)
+        y = [group.random(ZR) for i in range(z)]
+        u = [g1 ** y[i] for i in range(z)]
+        mpk = { 'u0': g1, 'u':u, 'z':z, 'l':l }
+        return mpk
+
     def keygen(self, secparam=None):
+        g1 = group.random(G1)
         g, x = group.random(G2), group.random()
         g_x = g ** x
         pk = { 'g^x':g_x, 'g':g, 'identity':str(g_x), 'secparam':secparam }
         sk = { 'x':x }
         return (pk, sk)
         
-    def sign(self, x, message):
-        M = message
+    def sign(self, mpk, x, message):
+        M = self.strToId(mpk, message)
+        #print("M :=", M)
+        #M = message
+        #sig1 = group.hash(M, G1) ** x
         if debug: print("Message => '%s'" % M)
-        sig1 = group.hash(M, G1) ** x
+        sig1 = (mpk['u0'] * dotprod(1, -1, mpk['z'], lam_func, mpk['u'], M)) ** x
+        #print("sig1 :=", sig1)
         sig2 = group.random()
         sig = {}
         sig['sig1'] = sig1
         sig['sig2'] = sig2
         return sig
         
-    def verify(self, pk, sigDict, message):
-        M = message
-        h = group.hash(M, G1)
+    def verify(self, mpk, pk, sigDict, message):
+        #M = message
+        #h = group.hash(M, G1)
+        M = self.strToId(mpk, message)
+        #print("M :=", M)
+        h = mpk['u0'] * dotprod(1, -1, mpk['z'], lam_func, mpk['u'], M)
+        #print("h :=", h)
         sig = sigDict['sig1']
         t = sigDict['sig2']
 
@@ -44,20 +86,24 @@ def main():
     #if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
         #sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
 
-    groupObj = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
+    #groupObj = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
+    groupObj = PairingGroup('d224.param')
     
     #m = { 'a':"hello world!!!" , 'b':"test message" }
+    z = 5
     m = "rest"
     bls = IBSig(groupObj)
+
+    mpk = bls.setup(z)
     
     (pk, sk) = bls.keygen(0)
     
-    sig = bls.sign(sk['x'], m)
+    sig = bls.sign(mpk, sk['x'], m)
     
     if debug: print("Message: '%s'" % m)
     if debug: print("Signature: '%s'" % sig)     
-    assert bls.verify(pk, sig, m), "Failure!!!"
-    result = bls.verify(pk, sig, m)
+    assert bls.verify(mpk, pk, sig, m), "Failure!!!"
+    result = bls.verify(mpk, pk, sig, m)
     print(result)
     if debug: print('SUCCESS!!!')
 
