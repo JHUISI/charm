@@ -46,13 +46,13 @@ class Hess(PKSig):
         S1 = pair(h,pk['g2']) ** s 
         a = H2(M, S1)
         S2 = (sk ** a) * (h ** s)
-        #return {'S1':S1, 'S2':S2}
-        return (S1, S2)
+        return {'S1':S1, 'S2':S2}
+#        return (S1, S2)
 
     
     def verify(self, mpk, pk, M, sig):
         if debug: print("verify...")
-        (S1, S2) = sig
+        (S1, S2) = sig['S1'], sig['S2']
         a = H2(M, S1)
         if pair(S2, mpk['g2']) == (pair(pk, mpk['P']) ** a) * S1: 
             return True
