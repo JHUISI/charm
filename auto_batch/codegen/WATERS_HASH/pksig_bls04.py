@@ -83,11 +83,11 @@ class IBSig():
         return False 
 
 def main():
-    #if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
-        #sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
+    if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
+        sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
 
-    #groupObj = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
-    groupObj = PairingGroup('d224.param')
+    groupObj = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
+    #groupObj = PairingGroup('d224.param')
     
     #m = { 'a':"hello world!!!" , 'b':"test message" }
     z = 5
@@ -104,10 +104,10 @@ def main():
     if debug: print("Signature: '%s'" % sig)     
     assert bls.verify(mpk, pk, sig, m), "Failure!!!"
     result = bls.verify(mpk, pk, sig, m)
-    print(result)
+    #print(result)
     if debug: print('SUCCESS!!!')
 
-    '''
+
     numValidMessages = int(sys.argv[1])
     numInvalidMessages = int(sys.argv[2])
     messageSize = int(sys.argv[3])
@@ -116,29 +116,39 @@ def main():
     invalidOutputDictName = sys.argv[6]
 
     f_mpk = open('mpk.charmPickle', 'wb')
-    pick_mpk = pickleObject(serializeDict(pk, groupObj))
+    pick_mpk = pickleObject(serialize(mpk, groupObj))
     f_mpk.write(pick_mpk)
     f_mpk.close()
 
+
+    f_pk = open('pk.charmPickle', 'wb')
+    pick_pk = pickleObject(serialize(pk, groupObj))
+    f_pk.write(pick_pk)
+    f_pk.close()
+
+
     validOutputDict = {}
     validOutputDict[0] = {}
-    validOutputDict[0]['pk'] = 'mpk.charmPickle'
+    validOutputDict[0]['mpk'] = 'mpk.charmPickle'
+    validOutputDict[0]['pk'] = 'pk.charmPickle'
 
     invalidOutputDict = {}
     invalidOutputDict[0] = {}
-    invalidOutputDict[0]['pk'] = 'mpk.charmPickle'
+    invalidOutputDict[0]['mpk'] = 'mpk.charmPickle'
+    invalidOutputDict[0]['pk'] = 'pk.charmPickle'
 
     for index in range(0, numValidMessages):
         if (index != 0):
             validOutputDict[index] = {}
-            validOutputDict[index]['pk'] = 'mpk.charmPickle'
+            validOutputDict[index]['mpk'] = 'mpk.charmPickle'
+            validOutputDict[index]['pk'] = 'pk.charmPickle'
 
         message = ""
         for randomChar in range(0, messageSize):
             message += random.choice(string.printable)
 
-        sig = bls.sign(sk['x'], message)
-        assert bls.verify(pk, sig, message)
+        sig = bls.sign(mpk, sk['x'], message)
+        assert bls.verify(mpk, pk, sig, message)
 
         f_message = open(prefixName + str(index) + '_ValidMessage.pythonPickle', 'wb')
         validOutputDict[index]['message'] = prefixName + str(index) + '_ValidMessage.pythonPickle'
@@ -149,7 +159,7 @@ def main():
         pickle.dump(message, f_message)
         f_message.close()
 
-        pick_sig = pickleObject(serializeDict(sig, groupObj))
+        pick_sig = pickleObject(serialize(sig, groupObj))
 
         f_sig.write(pick_sig)
         f_sig.close()
@@ -160,7 +170,7 @@ def main():
         del f_sig
         del pick_sig
 
-    dict_pickle = pickleObject(serializeDict(validOutputDict, groupObj))
+    dict_pickle = pickleObject(serialize(validOutputDict, groupObj))
     f = open(validOutputDictName, 'wb')
     f.write(dict_pickle)
     f.close()
@@ -170,14 +180,15 @@ def main():
     for index in range(0, numInvalidMessages):
         if (index != 0):
             invalidOutputDict[index] = {}
-            invalidOutputDict[index]['pk'] = 'mpk.charmPickle'
+            invalidOutputDict[index]['mpk'] = 'mpk.charmPickle'
+            invalidOutputDict[index]['pk'] = 'pk.charmPickle'
 
         message = ""
         for randomChar in range(0, messageSize):
             message += random.choice(string.printable)
 
-        sig = bls.sign(sk['x'], message)
-        assert bls.verify(pk, sig, message)
+        sig = bls.sign(mpk, sk['x'], message)
+        assert bls.verify(mpk, pk, sig, message)
 
         f_message = open(prefixName + str(index) + '_InvalidMessage.pythonPickle', 'wb')
         invalidOutputDict[index]['message'] = prefixName + str(index) + '_InvalidMessage.pythonPickle'
@@ -200,7 +211,7 @@ def main():
         pickle.dump(message, f_message)
         f_message.close()
 
-        pick_sig = pickleObject(serializeDict(sig, groupObj))
+        pick_sig = pickleObject(serialize(sig, groupObj))
 
         f_sig.write(pick_sig)
         f_sig.close()
@@ -211,13 +222,12 @@ def main():
         del f_sig
         del pick_sig
 
-    dict_pickle = pickleObject(serializeDict(invalidOutputDict, groupObj))
+    dict_pickle = pickleObject(serialize(invalidOutputDict, groupObj))
     f = open(invalidOutputDictName, 'wb')
     f.write(dict_pickle)
     f.close()
     del dict_pickle
     del f
-    '''
 
 if __name__ == "__main__":
     debug = False
