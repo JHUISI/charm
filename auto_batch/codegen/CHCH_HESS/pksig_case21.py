@@ -20,8 +20,10 @@ from schemes.pksig_chch import CHCH
 debug = False
 
 class ComboScheme(PKSig):
-    def __init__(self, group):
-        global H2
+    def __init__(self, groupObj):
+        global H2, group, debug
+        group = groupObj
+        debug = False
         H2 = lambda x,y: group.hash((x,y), ZR)
             
     def verify(self, mpk, pk, M, sig):
@@ -36,32 +38,32 @@ class ComboScheme(PKSig):
         
 def main():
    
-   groupObj = PairingGroup('../param/d224.param')
-   hess = Hess(groupObj)
-   chch = CHCH(groupObj)
-   combo = ComboScheme(groupObj)
+    groupObj = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
+    hess = Hess(groupObj)
+    chch = CHCH(groupObj)
+    combo = ComboScheme(groupObj)
    
-   (mpk, msk) = chch.setup()
+    (mpk, msk) = chch.setup()
 
-   _id = "janedoe@email.com"
-   (pk, sk) = chch.keygen(msk, _id)
-   if debug:  
-    print("Keygen...")
-    print("pk =>", pk)
-    print("sk =>", sk)
+    _id = "janedoe@email.com"
+    (pk, sk) = chch.keygen(msk, _id)
+    if debug:  
+        print("Keygen...")
+        print("pk =>", pk)
+        print("sk =>", sk)
  
-   M = "this is a message! twice!" 
-   sig1 = hess.sign(mpk, sk, M)
-   sig2 = chch.sign(pk, sk, M)
-   sig = { 'sig_hess':sig1, 'sig_chch':sig2 }
-   if debug:
-       print("Signature...")
-       print("sig1 =>", sig1)
-       print("sig2 =>", sig2)
+    M = "this is a message! twice!" 
+    sig1 = hess.sign(mpk, sk, M)
+    sig2 = chch.sign(pk, sk, M)
+    sig = { 'sig_hess':sig1, 'sig_chch':sig2 }
+    if debug:
+        print("Signature...")
+        print("sig1 =>", sig1)
+        print("sig2 =>", sig2)
    
-   assert combo.verify(mpk, pk, M, sig), "invalid signature!"
-   if debug: print("Verification successful!")
+    assert combo.verify(mpk, pk, M, sig), "invalid signature!"
+    if debug: print("Verification successful!")
 
 if __name__ == "__main__":
-    debug = True
+    debug = False
     main()
