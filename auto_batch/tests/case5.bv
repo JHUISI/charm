@@ -33,9 +33,5 @@ message := N
 public := one
 signature := N
 
-#BEGIN :: transform
-#2, 3, 7, 8, 3
-#END :: transform
-
 verify := (e(S1, g^b) * (e(S2, H(M, G2)) * e(S3, H(M, G2)^b))) == (e(pk, g^b)) 
 
