@@ -7,11 +7,12 @@ S1h := GT
 S2h := G1
 S1c := G1; S2c := G1
 pk := G1
-a := ZR
+ah := ZR; ac := ZR
 END :: types
 
 BEGIN :: precompute
-a := H(M_z | S1_z, ZR)
+ah := H(M_z | S1h_z, ZR)
+ac := H(M_z | S1c_z, ZR)
 END :: precompute
 
 BEGIN :: constant
@@ -42,7 +43,7 @@ signature := N
 # verify2 := { e(S2c, g2) == ( e(S1c * pk^a, P) )
 # verify := verify1 and verify2
 
-verify := { (((e(pk, P)^a ) * S1h) * ((e(S2h, g2)^-1) * ((e(S1c * pk^a, P)^-1) * e(S2c, g2)))) == 1 }
+verify := { (((e(pk, P)^ah ) * S1h) * ((e(S2h, g2)^-1) * ((e(S1c * pk^ac, P)^-1) * e(S2c, g2)))) == 1 }
 
 BEGIN :: latex
 S1 := S_1
