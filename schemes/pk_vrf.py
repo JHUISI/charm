@@ -46,9 +46,9 @@ class VRF10:
     
     def prove(self, sk, x):
         pi = [i for i in range(sk['n'])]
-        for i in range(1, sk['n']+1):
-            result = dotprod(1, -1, i, lam_func, sk['u'], x) 
-            pi[i-1] = sk['g1'] ** (sk['u_t'] * result)
+        for i in range(sk['n']):
+            result = dotprod(1, -1, i+1, lam_func, sk['u'], x) 
+            pi[i] = sk['g1'] ** (sk['u_t'] * result)
         
         result0 = dotprod(1, -1, sk['n'], lam_func, sk['u'], x)
         pi_0 = sk['g1'] ** (sk['u_t'] * sk['u'][0] * result0)
