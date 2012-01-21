@@ -14,8 +14,8 @@
  '''
 from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
 from toolbox.PKSig import PKSig
-debug = False
 
+debug = False
 class CL04(PKSig):
     def __init__(self, groupObj):
         global group
@@ -51,18 +51,20 @@ def main():
     mpk = cl.setup()
     
     (pk, sk) = cl.keygen(mpk)
-    print("Keygen...")
-    print("pk :=", pk)
-    print("sk :=", sk)
+    if debug:
+        print("Keygen...")
+        print("pk :=", pk)
+        print("sk :=", sk)
     
     M = "Please sign this stupid message!"
     sig = cl.sign(pk, sk, M)
-    print("Signature: ", sig)
+    if debug: print("Signature: ", sig)
     
     result = cl.verify(pk, M, sig)
     assert result, "INVALID signature!"
-    print("Successful Verification!!!")
+    if debug: print("Successful Verification!!!")
     
 if __name__ == "__main__":
+    debug = True
     main()
     

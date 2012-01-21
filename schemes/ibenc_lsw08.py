@@ -15,8 +15,9 @@ Allison Lewko, Amit Sahai and Brent Waters (Pairing-based)
 from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from toolbox.IBEnc import *
 
+debug = False
 class IBE_Revoc(IBEnc):
-    def __init__(self, groupObj, verbose=False):
+    def __init__(self, groupObj):
         IBEnc.__init__(self)
         global group, util
         group = groupObj
@@ -84,7 +85,7 @@ class IBE_Revoc(IBEnc):
         _ID = sk['ID']
         # hash IDs
         S_id = [group.hash(i.upper()) for i in S]
-        print("hashed IDs: ", S_id)
+        if debug: print("hashed IDs: ", S_id)
         if _ID in S_id: print("Your ID:", _ID, "is in revoked list!"); return
         A1 = pair(C[1], D[1]) * pair(C[2], D[2]) * pair(C[3], D[3]) * pair(C[4], D[4]) * pair(C[5], D[5])
         A2 = pair(C[6], D[6]) * pair(C[7], D[7])
@@ -115,7 +116,7 @@ def main():
     
     m = ibe.decrypt(S, ct, sk)
     assert M == m, "Decryption FAILED!"
-    #if debug: print("Successful Decryption!!!")
+    if debug: print("Successful Decryption!!!")
 
 if __name__ == "__main__":
     debug = True

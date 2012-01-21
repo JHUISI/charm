@@ -13,7 +13,7 @@ Cramer-Shoup Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption 
 * assumption:	DDH
 
 :Authors:	Matthew Green
-:Date:			1/2011
+:Date:		1/2011
 '''
 from toolbox.integergroup import *
 from toolbox.PKEnc import *

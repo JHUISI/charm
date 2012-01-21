@@ -16,6 +16,7 @@ Susan Hohenberger and Brent Waters (Pairing-based)
 from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from toolbox.iterate import dotprod 
 
+debug = False
 class VRF10:
     """Definition in paper: behave as Pseudo Random Functions (PRFs) with an additional property that party
     holding the seed will publish a commitment to the function and is able to non-interactively convince
@@ -60,25 +61,25 @@ class VRF10:
         # check first index 
         check1 = pair(pi[0], pk['g2'])
         if x[0] == 0 and check1 == pair(pk['g1'], pk['U_t']):
-            print("Verify: check 0 successful!\t\tcase:", x[0])
+            if debug: print("Verify: check 0 successful!\t\tcase:", x[0])
         elif x[0] == 1 and pair(pk['U1'][0], pk['U_t']):
-            print("Verify: check 0 successful!\t\tcase:", x[0])            
+            if debug: print("Verify: check 0 successful!\t\tcase:", x[0])            
         else: 
-            print("Verify: check 0 FAILURE!\t\tcase:", x[0])            
+            if debug: print("Verify: check 0 FAILURE!\t\tcase:", x[0])            
             return False
         
         for i in range(1, len(x)):
             check2 = pair(pi[i], pk['g2'])
             if x[i] == 0 and check2 == pair(pi[i-1], pk['g2']):
-                print("Verify: check", i ,"successful!\t\tcase:", x[i])
+                if debug: print("Verify: check", i ,"successful!\t\tcase:", x[i])
             elif check2 == pair(pi[i-1], pk['U2'][i]):
-                print("Verify: check", i ,"successful!\t\tcase:", x[i])
+                if debug: print("Verify: check", i ,"successful!\t\tcase:", x[i])
             else:
-                print("Verify: check", i ,"FAILURE!\t\tcase:", x[i])
+                if debug: print("Verify: check", i ,"FAILURE!\t\tcase:", x[i])
                 return False
         
         if pair(pi_0, pk['g2']) == pair(pi[n-1], pk['U2'][0]) and pair(pi_0, pk['h']) == y:
-            print("Verify: all and final check successful!!!")
+            if debug: print("Verify: all and final check successful!!!")
             return True
         else:
             return False

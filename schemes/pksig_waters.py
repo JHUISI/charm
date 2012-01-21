@@ -12,7 +12,7 @@ Waters - Identity-based signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from charm.pairing import *
+from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
 from toolbox.iterate import dotprod
 from toolbox.conversion import Conversion
 from toolbox.bitstring import Bytes
@@ -97,7 +97,7 @@ class WatersSig:
 
 def main():
    z = 5
-   groupObj = pairing('../param/a.param')
+   groupObj = PairingGroup('../param/a.param')
 
    waters = WatersSig(groupObj)
    (mpk, msk) = waters.setup(z)
