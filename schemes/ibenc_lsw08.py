@@ -115,7 +115,7 @@ def main():
     
     m = ibe.decrypt(S, ct, sk)
     assert M == m, "Decryption FAILED!"
-    print("Successful Decryption!!!")
+    if debug: print("Successful Decryption!!!")
 
 if __name__ == "__main__":
     debug = True

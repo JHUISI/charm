@@ -35,7 +35,6 @@ class HybridABEncMA(ABEncMultiAuth):
     def decrypt(self, gp, sk, ct):
         c1, c2 = ct['c1'], ct['c2']
         key = abencma.decrypt(gp, sk, c1)
-        print("symm key :=>", key)
         cipher = AuthenticatedCryptoAbstraction(sha1(key))
         return cipher.decrypt(c2)
         
