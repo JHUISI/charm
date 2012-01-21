@@ -22,11 +22,8 @@ class ChamHash_Adm05(ChamHash):
         ChamHash.__init__(self)
         global group; 
         group = IntegerGroupQ(0)
-        if not p == 0 and not q == 0:
-            # if p and q parameters have already been selected
-            group.p, group.q, group.r = p, q, 2
-        else: 
-            group.p = group.q = 0
+        # if p and q parameters have already been selected
+        group.p, group.q, group.r = p, q, 2
         self.group = group        
     
     def paramgen(self, secparam=1024):
