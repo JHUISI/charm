@@ -44,11 +44,13 @@ class PairingGroup():
             return init(self.Pairing, type, value)
         return init(self.Pairing, type)
             
-    def random(self, type=ZR, seed=None):
+    def random(self, type=ZR, count=1, seed=None):
         if type == GT: return self.__randomGT()
         elif type == ZR or type == G1 or type == G2:
-            if seed != None:
+            if seed != None and count == 1:
                 return random(self.Pairing, type, seed)
+            elif count > 1:
+                return tuple([random(self.Pairing, type) for i in range(count)])                
             return random(self.Pairing, type)
         else:
             return integer(randomBits(self.secparam))
