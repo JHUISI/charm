@@ -1,11 +1,11 @@
 # TODO: update transitions dictionary to allow for a list as keys such that we can allow a state to transition to multiple states!
 # TODO: provide a transition checker that prevents a feedback loop, inconsistent state.
-# TODO: automatically store the state of the input keys? basically, input.keys() then loop through and store
 # in user db that way user can eliminate store step on the receive side.
 
 from charm.engine.util import *
 MAX_SIZE = 2048
 
+debug = False
 class Protocol:
     def __init__(self, error_states): # any init information?
         global error
@@ -16,6 +16,7 @@ class Protocol:
         self.partyTypes = {}
         self.party = {}
         self._serialize = False
+        self.db = {} # initialize the database
         
     def setup(self, *args):
         # handles the hookup between parties involved
@@ -40,7 +41,6 @@ class Protocol:
                print("Adding party instance w/ id: ", p_ctr)
                return True
         return None
-
 
     def addPartyType(self, type, state_map, trans_map, init_state=False):
         ExistingTypeFound = False
@@ -97,8 +97,16 @@ class Protocol:
         # find the corresponding call back based on current party id
         self.nextCall = None        
         if state_num == None: return None   
-        if self._cur_trans.get(self.cur_state) != state_num: 
+        nextPossibleState = self._cur_trans.get(self.cur_state)
+        if type(nextPossibleState) == list and not state_num in nextPossibleState:
            print("Invalid State Transition! Error!")
+           print("\tCurrent state: ", self.cur_state)
+           print("\tNext state: ", state_num)
+           print("Allowed states: ", nextPossibleState)        
+        elif type(nextPossibleState) != list and nextPossibleState != state_num: 
+           print("Invalid State Transition! Error!")
+           print("\tCurrent state: ", self.cur_state)
+           print("\tNext state not allowed: ", state_num)
            # do not make the transition
            return None
             
@@ -155,6 +163,7 @@ class Protocol:
                 self.db = state
         
     def get(self, keys, _type=tuple):
+        if not type(keys) == list: return
         if _type == tuple:
             ret = []
         else: ret = {}
@@ -201,12 +210,12 @@ class Protocol:
         self._user_serialize = serial
         self._user_deserialize = deserial
         return None
-    
+        
     # records the final state of a protocol execution
     def setErrorCode(self, value):
         self.result = value
         
-    # who we are talking to and the socket we should
+    # executes state machine from the 'party_type' perspective 
     def execute(self, party_type, close_sock=True):
         print("Party Descriptions:")
         print(self.listParyTypes(), "\n")
@@ -220,23 +229,34 @@ class Protocol:
 #        Timeout = False
         (start, func) = self.getInitState(party_type)
         self._cur_trans = self.partyTypes[party_type]['transitions'] 
-        print("Starting Point => ", func.__name__)        
+        #print("Possible transitions: ", self._cur_trans)
+        print("Starting Point => ", func.__name__)
         if start == True:
             # call the first state for party1, then send msg
             output = func.__call__()
+            if type(output) == dict: self.db.update(output)
             self.send_msg(output)
         else:
             # first receive message, call state function
             # then send call response
             input = self.recv_msg()
+            if type(input) == dict:
+#                print("input db :=>", input)
+                self.db.update(input)
             output = func.__call__(input)
+            if isinstance(output, dict):
+#                print("output db :=>", output)
+                self.db.update(output)
             self.send_msg(output)
         # take output and send back to other party via socket
 
         while self.nextCall != None: 
              input = self.recv_msg()
+             if isinstance(input, dict): self.db.update(input)
              output = self.nextCall.__call__(input)
-             if output != None: self.send_msg(output)
+             if output != None: 
+                 if isinstance(output, dict): self.db.update(output)
+                 self.send_msg(output)
         if close_sock:
            self.clean()
         return output
@@ -248,6 +268,8 @@ class Protocol:
         pass
     
     def clean(self):
+        if debug: print("Cleaning database...")
         self._socket.close()
+        self.db.clear()
         print("PROTOCOL COMPLETE!")
         return None
