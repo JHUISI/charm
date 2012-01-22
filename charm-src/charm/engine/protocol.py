@@ -1,11 +1,13 @@
-# TODO: update transitions dictionary to allow for a list as keys such that we can allow a state to transition to multiple states!
 # TODO: provide a transition checker that prevents a feedback loop, inconsistent state.
 # in user db that way user can eliminate store step on the receive side.
 
 from charm.engine.util import *
+from toolbox.enum import Enum
 MAX_SIZE = 2048
 
 debug = False
+# standardize responses between client and server
+# code = Enum('Success', 'Fail', 'Repeat', 'StartSubprotocol', 'EndSubprotocol')
 class Protocol:
     def __init__(self, error_states): # any init information?
         global error

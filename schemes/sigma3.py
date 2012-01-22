@@ -42,9 +42,11 @@ class SigmaProtocol3(Sigma):
     
     def prover_state3(self, input):
         print("PROVER 3: ")
-        (r, h) = Protocol.get(self, ['r', 'h'])
-        c = input['c']
+        (r, h, c) = Protocol.get(self, ['r', 'h', 'c'])
+#        c = input['c']
         print("input c =>", c)
+        print("r :=", r.type)
+        print("h :=", h.type)
         z = r * (h ** -c)
         Protocol.setState(self, 5)
         # need store and get functions for db        
@@ -72,8 +74,8 @@ class SigmaProtocol3(Sigma):
 
     def verifier_state4(self, input):
         print("VERIFIER 4: ")
-        z = input['z']
-        (a1, a2, g, H, c, V, W) = Protocol.get(self, ['a1','a2','g','H','c','V','W'])
+#        z = input['z']
+        (a1, a2, g, H, c, V, W, z) = Protocol.get(self, ['a1','a2','g','H','c','V','W','z'])
         print("get a1 =>", a1)
         _a1 = pair(g,z) * (H ** c)
         _a2 = pair(V,z) * (W ** c)

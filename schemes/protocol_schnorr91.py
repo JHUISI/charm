@@ -1,4 +1,4 @@
-from charm.engine.protocol import Protocol
+from charm.engine.protocol import *
 from toolbox.ecgroup import ECGroup,G
 from socket import socket,AF_INET,SOCK_STREAM
 from toolbox.eccurve import prime192v1
@@ -16,7 +16,7 @@ class SchnorrZK(Protocol):
         prover_states = { 1:self.prover_state1, 3:self.prover_state3, 5:self.prover_state5 }
 
         verifier_trans = { 2:4, 4:[2,6] }
-        prover_trans = { 1:3, 3:[1,5] }
+        prover_trans = { 1:3, 3:5, 5:1 }
         # describe the parties involved and the valid transitions
         Protocol.addPartyType(self, VERIFIER, verifier_states, verifier_trans)
         Protocol.addPartyType(self, PROVER, prover_states, prover_trans, True)
@@ -31,23 +31,22 @@ class SchnorrZK(Protocol):
         r, g = self.group.random(), self.group.random(G)
         t = g ** r 
         print('prover: ',"hello to verifier.")
-#        Protocol.store(self, ('r',r), ('x',x), ('t',t), ('g',g))
         Protocol.store(self, ('r',r), ('x',x))
         Protocol.setState(self, 3)
         return {'t':t, 'g':g, 'y':g ** x } # output goes to the next state.
      
     def prover_state3( self, input):
-        print("state3 input => ", input)
+        print("state3 => ", input)
         (r, x, c) = Protocol.get(self, ['r', 'x', 'c'])
-        #c = input['c']
         s = r + c * x
         Protocol.setState(self, 5)
         return {'s':s}
 
     def prover_state5( self, input ):
-        print("state5 input => ", input)
-        output = "prover: End state."
-        Protocol.setState(self, None)
+        print("state5 => ", input)
+        result = input.split(':')[1]
+        if result == 'ACCEPTED': Protocol.setState(self, None)
+        else: Protocol.setState(self, 1); return 'REPEAT'
         return None
 
     # VERIFIER states
@@ -56,7 +55,6 @@ class SchnorrZK(Protocol):
         # compute challenge c and send to prover
         c = self.group.random()
         print("state2 generate c :=", c)
-#        Protocol.store(self, ('c',c),('t',input['t']),('g',input['g']),('y',input['y']))
         Protocol.store(self, ('c',c))
         Protocol.setState(self, 4)        
         return {'c':c}
@@ -64,14 +62,13 @@ class SchnorrZK(Protocol):
     def verifier_state4( self, input ):
         (t,g,y,c,s) = Protocol.get(self, ['t','g','y','c','s'])
         print("state4: s :=", s)
-#        s = input['s']
         
         if (g ** s == t * (y ** c)):
            print("SUCCESSFUL VERIFICATION!!!")
-           output = "verifier: ACCEPTED!"
+           output = "verifier : ACCEPTED!"
         else:
             print("FAILED TO VERIFY!!!")            
-            output = "verifier: FAILED!"
+            output = "verifier : FAILED!"
         Protocol.setState(self, 6)
         return output
     

@@ -3,20 +3,20 @@ from charm.engine.protocol import Protocol
 from charm.engine.util import *
 from toolbox.enum import Enum
 
-partyType = Enum('Prover', 'Verifier')
+#party = Enum('Prover', 'Verifier')
 
 class Sigma(Protocol):
     def __init__(self, groupObj, common_input=None):        
         Protocol.__init__(self, None)  # think of something for handling errors      
         self.verifier_states = { 2:self.verifier_state2, 4:self.verifier_state4, 6:self.verifier_state6 }
         self.prover_states = { 1:self.prover_state1, 3:self.prover_state3, 5:self.prover_state5 }
-#        self.PROVER, self.VERIFIER = 1, 2  # PROVER = 1, VERIFIER = 2
+        self.PROVER, self.VERIFIER = 1, 2  # PROVER = 1, VERIFIER = 2
 
         self.verifier_trans = { 2:4, 4:6 }
         self.prover_trans = { 1:3, 3:5 }
         # describe the parties involved and the valid transitions
-        Protocol.addPartyType(self, partyType.Verifier, self.verifier_states, self.verifier_trans)
-        Protocol.addPartyType(self, partyType.Prover, self.prover_states, self.prover_trans, True)
+        Protocol.addPartyType(self, self.VERIFIER, self.verifier_states, self.verifier_trans)
+        Protocol.addPartyType(self, self.PROVER, self.prover_states, self.prover_trans, True)
 
         self.group = groupObj
         # proof parameter generation
