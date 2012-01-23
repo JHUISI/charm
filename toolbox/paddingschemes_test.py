@@ -3,7 +3,7 @@
 :Authors: Gary Belvin
 '''
 import unittest
-import paddingschemes
+from  toolbox.paddingschemes import OAEPEncryptionPadding, MGF1, hashFunc, PSSPadding, PKCS7Padding
 from binascii import a2b_hex
 
 debug = False
@@ -54,12 +54,12 @@ class Test(unittest.TestCase):
             print("seedMask=>", seedMask)   #Correct
             print("maskedseed=>", maskedSeed)
 
-        c = paddingschemes.OAEPEncryptionPadding()
+        c = OAEPEncryptionPadding()
         E = c.encode(m, 128,"",seed)
         self.assertEqual(EM, E)
     
     def testOAEPRoundTripEquiv(self):
-        oaep = paddingschemes.OAEPEncryptionPadding()
+        oaep = OAEPEncryptionPadding()
         m = b'This is a test message'
         ct = oaep.encode(m, 64)
         pt = oaep.decode(ct)
@@ -69,16 +69,16 @@ class Test(unittest.TestCase):
     @unittest.skip("Unnecessary length test")
     def testMFGLength(self):
         seed = ""
-        hashFn = paddingschemes.OAEPEncryptionPadding().hashFn
-        hLen =  paddingschemes.OAEPEncryptionPadding().hashFnOutputBytes
+        hashFn = OAEPEncryptionPadding().hashFn
+        hLen =  OAEPEncryptionPadding().hashFnOutputBytes
         
         for mbytes in range(100):
-            a = paddingschemes.MGF1(seed, mbytes, hashFn, hLen)
+            a = MGF1(seed, mbytes, hashFn, hLen)
             self.assertEqual(len(a), mbytes, 'MFG output wrong size')
 
     def testMFGvector(self):
-        hashFn = paddingschemes.OAEPEncryptionPadding().hashFn
-        hLen =  paddingschemes.OAEPEncryptionPadding().hashFnOutputBytes
+        hashFn = OAEPEncryptionPadding().hashFn
+        hLen =  OAEPEncryptionPadding().hashFnOutputBytes
         seed  = a2b_hex(bytes("aa fd 12 f6 59 ca e6 34 89 b4 79 e5 07 6d de c2 f0 6c b5 8f".replace(' ' ,''),'utf-8'))
         #dbmask = dbMask = MGF (seed , 107):
         dbmask= a2b_hex(bytes("06 e1 de b2 36 9a a5 a5 c7 07 d8 2c 8e 4e 93 24 8a c7 83 de e0 b2 c0 46\
@@ -86,11 +86,11 @@ class Test(unittest.TestCase):
                          77 28 b4 a1 b7 c1 36 2b aa d2 9a b4 8d 28 69 d5 02 41 21 43 58 11 59 1b\
                          e3 92 f9 82 fb 3e 87 d0 95 ae b4 04 48 db 97 2f 3a c1 4e af f4 9c 8c 3b\
                          7c fc 95 1a 51 ec d1 dd e6 12 64".replace(" ",""),'utf-8'))
-        a = paddingschemes.MGF1(seed, 107, hashFn, hLen)
+        a = MGF1(seed, 107, hashFn, hLen)
         self.assertEqual(dbmask, a)
         
     def testSHA1Vector(self):
-        hashFn = paddingschemes.hashFunc('sha1')
+        hashFn = hashFunc('sha1')
         V0 = (b"", a2b_hex(bytes("da39a3ee5e6b4b0d3255bfef95601890afd80709",'utf-8')))
         V1 = (bytes("The quick brown fox jumps over the lazy dog", 'utf-8'), a2b_hex(bytes("2fd4e1c67a2d28fced849ee1bb76e7391b93eb12",'utf-8'))) #ASCII encoding
         V2 = (b'The quick brown fox jumps over the lazy dog', a2b_hex(bytes("2fd4e1c67a2d28fced849ee1bb76e7391b93eb12",'utf-8'))) #binary data
@@ -104,7 +104,7 @@ class Test(unittest.TestCase):
     
     
     def testPSSRountTripEquiv(self):
-        pss = paddingschemes.PSSPadding()
+        pss = PSSPadding()
         m = b'This is a test message'
         em = pss.encode(m)
         self.assertTrue(pss.verify(m, em))
@@ -203,7 +203,7 @@ class Test(unittest.TestCase):
             print("EM    =>", EM)
             print("EMLen =>", len(EM))
         
-        pss = paddingschemes.PSSPadding()
+        pss = PSSPadding()
         realEM = pss.encode(m,len(EM)*8,salt)
         self.assertEqual(EM, realEM)
 
@@ -212,6 +212,26 @@ class Test(unittest.TestCase):
     def suite(self):
         suite = unittest.TestLoader().loadTestsFromTestCase(Test)
         return suite
+
+class TestPkcs7Padding(unittest.TestCase):
+    def setUp(self):
+        self.padder = PKCS7Padding()
+    def encodecode(self,text):
+        _bytes = bytes(text,'utf-8')
+        padded = self.padder.encode(_bytes)
+        assert _bytes == self.padder.decode(padded), 'o: =>%s\nm: =>%s' % (_bytes,padded)
+        assert len(padded) % 16 == 0 , 'invalid padding length: %s' % (len(padded))
+        assert len(padded) > 0, 'invalid padding length: %s' % (len(padded))
+        assert len(padded) > len(_bytes), 'message must allways have padding'
+        
+    def testBasic(self):
+        self.encodecode("asd")
+    def testEmpty(self):
+        self.encodecode("")
+    def testFull(self):
+        self.encodecode("sixteen byte msg")
+    def testLarge(self):
+        self.encodecode("sixteen byte msg +3")
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
