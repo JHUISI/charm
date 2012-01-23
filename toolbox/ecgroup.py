@@ -2,14 +2,14 @@ from charm.ecc import *
 
 class ECGroup():
     def __init__(self, builtin_cv):
-        self.elem = ecc(nid=builtin_cv)
+        self.group = ecc(nid=builtin_cv)
         self._verbose = True
 
     def order(self):
-        return self.elem.order()
+        return order(self.group)
 
     def bitsize(self):
-        return self.elem.bitsize()
+        return bitsize(self.group)
     
     def paramgen(self, secparam):
         return None
@@ -18,24 +18,24 @@ class ECGroup():
         return 'ECGroup'     
 
     def init(self, type=ZR):
-        return self.elem.init(type)
+        return init(self.group, type)
     
     def random(self, type=ZR):
         if type == ZR or type == G:
-            return self.elem.random(type)
+            return random(self.group, type)
         return None
     
     def encode(self, message):
-        return self.elem.encode(message)
+        return encode(self.group, message)
     
     def decode(self, msg_bytes):
-        return self.elem.decode(msg_bytes)
+        return decode(self.group, msg_bytes)
     
     def serialize(self, object):
-        return self.elem.serialize(object)
+        return serialize(object)
     
     def deserialize(self, bytes_object):
-        return self.elem.deserialize(bytes_object)
+        return deserialize(self.group, bytes_object)
     
     # needs work to iterate over tuple
     def hash(self, args, _type=ZR):
@@ -43,27 +43,27 @@ class ECGroup():
             s = bytes()
             for i in args:
                 if type(i) == ecc:
-                    s += self.elem.serialize(i)
+                    s += serialize(i)
                 elif type(i) == str:
                     s += str(i)
                 # consider other types    
             #print("s => %s" % s)
-            return self.elem.hash(str(s), _type)
+            return hash(self.group, str(s), _type)
         elif type(args) == ecc:
-            msg = str(self.elem.serialize(args))
-            return self.elem.hash(msg, _type)
+            msg = str(serialize(args))
+            return hash(self.group, msg, _type)
         elif type(args) == str:
-            return self.elem.hash(args, _type)
+            return hash(self.group, args, _type)
         return None
     
     def zr(self, point):
         if type(point) == ecc:
-            return self.elem.getXY(point, False)
+            return getXY(self.group, point, False)
         return None
 
     def coordinates(self, point):
         if type(point) == ecc:
-            return self.elem.getXY(point, True)
+            return getXY(self.group, point, True)
         
     def debug(self, data, prefix=None):
         if type(data) == dict and self._verbose:
