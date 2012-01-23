@@ -100,6 +100,16 @@ typedef struct {
 	   element_set1(obj);	\
     else {  element_set_si(obj, (signed int) value); }
 
+#define VERIFY_GROUP(g) \
+	if(PyElement_Check(g) && g->safe_pairing_clear == FALSE) {	\
+		PyErr_SetString(ElementError, "invalid group object specified.");  \
+		return NULL;  } 	\
+	if(g->pairing == NULL) {	\
+		PyErr_SetString(ElementError, "pairing object is NULL.");	\
+		return NULL;  }		\
+
+
+
 PyObject *Element_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int Element_init(Element *self, PyObject *args, PyObject *kwds);
 PyObject *Element_print(Element* self);

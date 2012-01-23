@@ -22,7 +22,7 @@ class IBE_BonehFranklin(IBEnc):
         IBEnc.__init__(self)
         global group,h,ZN
         group = groupObj
-        h = Hash('sha1', group.Pairing)
+        h = Hash('sha1', group)
         ZN = -1
         
     def setup(self):

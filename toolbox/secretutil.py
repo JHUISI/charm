@@ -8,11 +8,11 @@ from toolbox.policytree import *
 
 class SecretUtil:
     def __init__(self, pairing, verbose=False):
-        self.elem = pairing        
+        self.group = pairing        
         self.parser = PolicyParser()
 
     def P(self, coeff, x):
-        share = self.elem.init(ZR, 0)
+        share = 0
         # evaluate polynomial
         for i in range(0, len(coeff)):
             share += (coeff[i] * (x ** i))
@@ -20,7 +20,7 @@ class SecretUtil:
 
     def genShares(self, secret, k, n):
         if(k <= n):
-            rand = self.elem.random
+            rand = self.group.random
             a = [rand(ZR) for i in range(0, k)]
             a[0] = secret
             Pfunc = self.P
@@ -29,19 +29,19 @@ class SecretUtil:
     
     # shares is a dictionary
     def recoverCoefficients(self, list):
-        eTop = self.elem.init(ZR)
-        eBot = self.elem.init(ZR)
+        eTop = self.group.init(ZR)
+        eBot = self.group.init(ZR)
         coeff = {}
         #list = shares.keys()
         for i in list:
-            result = self.elem.init(ZR, long(1))
+            result = 1
             for j in list:
                 if(i != j):
                     # lagrange basis poly
                     eTop.set(0 - j) # numerator
                     eBot.set(i - j) # denominator
-                    result = result * (eTop/eBot)
-                #print("coeff '%d' => '%s'" % (i, result))
+                    result *= eTop / eBot
+#                print("coeff '%d' => '%s'" % (i, result))
             coeff[i] = result
         return coeff
         
@@ -49,7 +49,7 @@ class SecretUtil:
         list = shares.keys()
         if self.verbose: print(list)
         coeff = self.recoverCoefficients(list)
-        secret = self.elem.init(ZR, 0)
+        secret = self.group.init(ZR, 0)
         for i in list:
             secret += (coeff[i] * shares[i])
 

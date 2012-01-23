@@ -100,8 +100,11 @@ typedef struct {
 	PyErr_SetString(PyECErrorObject, "group object not allocated."); \
 	return NULL;    }
 
-#define Group_Init(obj) if(!obj->group_init || obj->group == NULL) { \
-	PyErr_SetString(PyECErrorObject, "group object not initialized.");   \
+#define Group_Init(obj) \
+	if(!PyEC_Check(obj))  {  \
+		PyErr_SetString(PyECErrorObject, "not an ecc object."); return NULL; } \
+	if(!obj->group_init || obj->group == NULL) { \
+		PyErr_SetString(PyECErrorObject, "group object not initialized.");   \
 	return NULL;	}
 
 #define Point_Init(obj) if(!obj->point_init) {  	\

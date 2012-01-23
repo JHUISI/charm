@@ -122,9 +122,9 @@ def main():
  
     mykey = kpabe.keygen(pk, mk, policy)
     
-    print("Encrypt under these attributes: ", attributes)
+    if debug: print("Encrypt under these attributes: ", attributes)
     ciphertext = kpabe.encrypt(pk, msg, attributes)
-    print(ciphertext)
+    if debug: print(ciphertext)
     
     rec_msg = kpabe.decrypt(ciphertext, mykey)
    
