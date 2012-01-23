@@ -87,9 +87,10 @@ class Sig_RSA_Stateless_HW09(PKSig):
         self.Prf = Prf()
         self.ChameleonHash = CH()
         
-    def keygen(self, keyLength=1024):
+    def keygen(self, keyLength=1024, p=0, q=0):
         # Generate a Blum-Williams integer N of 'key_length' bits with factorization p,q
-        (p, q) = self.BWInt.generatePrimes(int(keyLength/2))
+        if p == 0 and q == 0:
+            (p, q) = self.BWInt.generatePrimes(int(keyLength/2))
         # Generate random u,h \in QR_N and a random c \in {0,1}^|N|
         N = p * q
         u = randomQR(N)
@@ -187,8 +188,10 @@ class Sig_RSA_Stateless_HW09(PKSig):
         
 def main():
     pksig = Sig_RSA_Stateless_HW09() 
-
-    (pk, sk) = pksig.keygen(1024)
+    # fixed params for unit tests
+    p = integer(13075790812874903063868976368194105132206964291400106069285054021531242344673657224376055832139406140158530256050580761865568307154219348003780027259560207)
+    q = integer(12220150399144091059083151334113293594120344494042436487743750419696868216757186059428173175925369884682105191510729093971051869295857706815002710593321543)
+    (pk, sk) = pksig.keygen(1024, p, q)
     if debug:
         print("Public parameters...")
         print("pk =>", pk)

@@ -320,7 +320,6 @@ PyObject *ECE_init(ECElement *self, PyObject *args) {
 }
 
 PyObject *ECE_random(ECElement *self, PyObject *args) {
-	printf("\nIn ECE_random\n");
 
 	GroupType type = NONE_G;
 	ECElement *gobj = NULL;
@@ -329,7 +328,6 @@ PyObject *ECE_random(ECElement *self, PyObject *args) {
 		Group_Init(gobj);
 
 		if(type == G) {
-			printf("\nG\n");
 			// generate a random element from ec group G.
 			// call 'EC_POINT_set_compressed_coordinates_GFp' w/ group, P, x, 1, ctx
 			// call 'EC_POINT_set_affine_coordinates_GFp' w/ group, P, x/y, ctx
@@ -369,7 +367,6 @@ PyObject *ECE_random(ECElement *self, PyObject *args) {
 			return (PyObject *) objG;
 		}
 		else if(type == ZR) {
-			printf("\nZR\n");
 			ECElement *objZR = createNewPoint(ZR, gobj->group, gobj->ctx);
 			BIGNUM *order = BN_new();
 			EC_GROUP_get_order(self->group, order, gobj->ctx);
