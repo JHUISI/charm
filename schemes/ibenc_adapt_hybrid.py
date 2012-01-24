@@ -1,4 +1,4 @@
-from toolbox.AuthenticatedCryptoAbstraction import AuthenticatedCryptoAbstraction
+from toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from toolbox.pairinggroup import *
 from charm.pairing import hash as sha1
 from schemes.ibenc_adapt_identityhash import *
