@@ -2,6 +2,7 @@ from charm.cryptobase import MODE_CBC,AES,selectPRP
 from charm.pairing import hash as sha1
 from hashlib import sha1 as sha1hashlib
 from toolbox.conversion import *
+from toolbox.paddingschemes import  PKCS7Padding
 from toolbox.securerandom import OpenSSLRand
 from math import ceil
 import json
@@ -35,7 +36,7 @@ class MessageAuthenticator(object):
         return {
                 "alg": self._algorithm,
                 "msg": msg, 
-                "digest": hmac.new(self._key,bytes(self._algorithm+msg,'utf-8'),digestmod=sha1hashlib).hexdigest()
+                "digest": hmac.new(self._key,bytes(self._algorithm + msg,"utf-8"),digestmod=sha1hashlib).hexdigest()
                }
 
     def verify(self,msgAndDigest):
@@ -70,6 +71,7 @@ class SymmetricCryptoAbstraction(object):
         self._block_size = 16 
         self._mode = mode
         self._key = key[0:self.key_len]
+        self._padding = PKCS7Padding();
  
     def _initCipher(self,IV = None):
         if IV == None :
@@ -82,6 +84,9 @@ class SymmetricCryptoAbstraction(object):
         data['CipherText'] = func(data['CipherText'])
         return data
 
+    #This code should be factored out into  another class
+    #Because json is only defined over strings, we need to base64 encode the encrypted data
+    # and convery the base 64 byte array into a utf8 string
     def _encode(self,data):
         return self.__encode_decode(data,lambda x:b64encode(x).decode('utf-8'))
 
@@ -89,7 +94,11 @@ class SymmetricCryptoAbstraction(object):
         return self.__encode_decode(data,lambda x:b64decode(bytes(x,'utf-8')))
 
     def encrypt(self, message):
+        #This should be removed when all crypto functions deal with bytes"
+        if type(message) != bytes :
+            message = bytes(message,"utf-8")
         ct = self._encrypt(message)
+        #JSON strings cannot have binary data in them, so we must base64 encode  cipher
         cte = json.dumps(self._encode(ct))
         return cte
 
@@ -100,32 +109,19 @@ class SymmetricCryptoAbstraction(object):
         ct= {'ALG':self._alg,
             'MODE':self._mode,
             'IV':self._IV,
-            'CipherText':cipher.encrypt(self.__pad(message))
+            'CipherText':cipher.encrypt(self._padding.encode(message))
             }
         return ct
 
     def decrypt(self,cipherText):
         f = json.loads(cipherText)
-        return self._decrypt(self._decode(f))
+        return self._decrypt(self._decode(f)).decode("utf-8")
 
     def _decrypt(self,cipherText):
         cipher = self._initCipher(cipherText['IV'])
-        
         msg = cipher.decrypt(cipherText['CipherText'])
-        return self.__unpad(msg)
+        return self._padding.decode(msg)
         
-    def __pad(self, message):
-        # calculate the ceiling of
-        msg_len = ceil(len(message) / float(self.key_len)) * self.key_len
-        extra = msg_len - len(message)
-        # append 'extra' bytes to message
-        for i in range(0, extra):
-            message += '\x00'
-        return message
-
-    def __unpad(self,message):
-        return Conversion.bytes2str(message).strip('\x00') 
-
 class AuthenticatedCryptoAbstraction(SymmetricCryptoAbstraction): 
     def encrypt(self,msg):
         mac = MessageAuthenticator(sha1hashlib(b'Poor Mans Key Extractor'+self._key).digest()) # warning only valid in the random oracle 
