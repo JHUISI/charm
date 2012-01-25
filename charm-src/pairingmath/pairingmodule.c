@@ -1174,18 +1174,7 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 	STOP_CLOCK(dBench);
 	return str;
 }
-/*
-static PyObject *dealloc_benchmark(Element *self, PyObject *args) {
-	Benchmark *bObject = NULL;
-	if(PyArg_ParseTuple(args, "O", &bObject)) {
-		if(bObject != NULL) {
-			printf("Removing contents of bObject.\n");
-			bObject->ob_type->tp_free((PyObject*)bObject);
-		}
-	}
-	return Py_BuildValue("i", TRUE);
-}
-*/
+
 // note that this is a class instance function and thus, self will refer to the class object 'element'
 // the args will contain the references to the objects passed in by the caller.
 // The hash function should be able to handle elements of various types and accept
