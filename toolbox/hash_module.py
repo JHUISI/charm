@@ -1,26 +1,31 @@
 import charm.cryptobase
-from toolbox.pairinggroup import *
-from charm.integer import *
+from charm.pairing import pairing,ZR
+#from toolbox.pairinggroup import pairing,ZR
+from charm.integer import integer,int2Bytes
 import hashlib, base64
 
 class Hash():
     def __init__(self, htype='sha1', pairingElement=None, integerElement=None):        
         if htype == 'sha1':
             self.hash_type = htype 
-            self.e = pairingElement
+            # instance of PairingGroup
+            self.group = pairingElement
         
     def hashToZn(self, value):
         if type(value) == pairing:
             h = hashlib.new(self.hash_type)
-            h.update(self.e.serialize(value))
+            h.update(self.group.serialize(value))
             #print "digest => %s" % h.hexdigest()
             # get raw bytes of digest and hash to Zr
             val = h.digest()
-            return integer(int(self.e.hash(val, ZR)))
+            return integer(int(self.group.hash(val, ZR)))
             # do something related to that
         if type(value) == integer:
             str_value = int2Bytes(value)
-            return integer(int(self.e.hash(str_value, ZR)))
+#            print("str_value =>", str_value)
+#            val = self.group.hash(str_value, ZR)
+#            print("hash =>", val)
+            return integer(int(self.group.hash(str_value, ZR)))
         return None
     
     # takes two arbitrary strings and hashes to an element of Zr
@@ -36,9 +41,9 @@ class Hash():
                 elif type(i) == integer:
                     strs += str(base64.encodebytes(int2Bytes(i)))
                 elif type(i) == pairing:
-                    strs += str(base64.encodebytes(self.e.serialize(i)))
+                    strs += str(base64.encodebytes(self.group.serialize(i)))
 
             if len(strs) > 0:
-                return self.e.hash(strs, ZR)
+                return self.group.hash(strs, ZR)
             return None
         

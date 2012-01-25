@@ -1190,7 +1190,6 @@ static PyObject *dealloc_benchmark(Element *self, PyObject *args) {
 // the args will contain the references to the objects passed in by the caller.
 // The hash function should be able to handle elements of various types and accept
 // a field to hash too. For example, a string can be hashed to Zr or G1, an element in G1 can be
-// hashed to GT?
 static PyObject *Element_hash(Element *self, PyObject *args) {
 	Element *newObject = NULL, *object = NULL, *group = NULL;
 	PyObject *objList = NULL, *tmpObject = NULL;
@@ -1200,7 +1199,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 	int result, i;
 	GroupType type = ZR;
 	
-	char *tmp = NULL;
+	char *tmp = NULL, *str;
 	// make sure args have the right type -- check that args contain a "string" and "string"
 	if(!PyArg_ParseTuple(args, "OO|i", &group, &objList, &type)) {
 		tmp = "invalid object types";
@@ -1209,12 +1208,9 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 
 	VERIFY_GROUP(group);
 	// first case: is a string and type may or may not be set
-	if(PyUnicode_Check(objList)) {
-#if PY_MAJOR_VERSION >= 3
-		char *str = PyBytes_AS_STRING(PyUnicode_AsUTF8String(objList));
-#else
-		char *str = PyString_AsString(objList);
-#endif
+	if(PyBytes_CharmCheck(objList)) {
+		str = NULL;
+		PyBytes_ToString(str, objList);
 		if(type == ZR) {
 			debug("Hashing string '%s' to Zr...\n", str);
 			// create an element of Zr
@@ -1265,12 +1261,9 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 				result = hash_element_to_bytes(&object->e, HASH_LEN, hash_buf, 0);
 				STOP_CLOCK(dBench);
 			}
-			else if(PyUnicode_Check(tmpObject)) {
-#if PY_MAJOR_VERSION >= 3
-				char *str = PyBytes_AS_STRING(PyUnicode_AsUTF8String(tmpObject));
-#else
-				char *str = PyString_AsString(tmpObject);
-#endif
+			else if(PyBytes_CharmCheck(tmpObject)) {
+				str = NULL;
+				PyBytes_ToString(str, tmpObject);
 				START_CLOCK(dBench);
 				result = hash_to_bytes((uint8_t *) str, strlen((char *) str), HASH_LEN, hash_buf, HASH_FUNCTION_STR_TO_Zr_CRH);
 				STOP_CLOCK(dBench);
@@ -1294,12 +1287,9 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 					printf_buffer_as_hex(out_buf, HASH_LEN);
 					memcpy(hash_buf, out_buf, HASH_LEN);
 				}
-				else if(PyUnicode_Check(tmpObject)) {
-#if PY_MAJOR_VERSION >= 3
-				char *str = PyBytes_AS_STRING(PyUnicode_AsUTF8String(tmpObject));
-#else
-				char *str = PyString_AsString(tmpObject);
-#endif
+				else if(PyBytes_CharmCheck(tmpObject)) {
+					str = NULL;
+					PyBytes_ToString(str, tmpObject);
 					START_CLOCK(dBench);
 					// this assumes that the string is the first object (NOT GOOD, change)
 //					result = hash_to_bytes((uint8_t *) str, strlen((char *) str), HASH_LEN, (unsigned char *) hash_buf, HASH_FUNCTION_STR_TO_Zr_CRH);
@@ -1331,7 +1321,6 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 		}
 
 		// TODO: add type == ZR?
-
 		// Hash an element of Zr to an element of G1.
 		if(type == G1) {
 			START_CLOCK(dBench);
@@ -1348,7 +1337,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 			STOP_CLOCK(dBench);
 		}
 		else {
-			tmp = "can only hash an element of Zr to G1. Random Oracle.";
+			tmp = "can only hash an element of Zr to G1. Random Oracle model.";
 			goto cleanup;
 		}
 	}
