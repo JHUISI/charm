@@ -4,7 +4,7 @@ Allison Lewko, Amit Sahai and Brent Waters (Pairing-based)
 | From: "Revocation Systems with Very Small Private Keys"
 | Published in: IEEE S&P 2010
 | Available from: http://eprint.iacr.org/2008/309.pdf
-| Notes: IBE Construction with revocable keys.
+| Notes: fully secure IBE Construction with revocable keys.
 
 * type:           identity-based encryption (public key)
 * setting:        Pairing
@@ -16,7 +16,7 @@ from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from toolbox.IBEnc import *
 
 debug = False
-class IBE_Revoc(IBEnc):
+class IBE_Revoke(IBEnc):
     def __init__(self, groupObj):
         IBEnc.__init__(self)
         global group, util
@@ -100,7 +100,7 @@ def main():
     grp = PairingGroup('../param/a.param')
     n = 5 # total # of users
     
-    ibe = IBE_Revoc(grp)
+    ibe = IBE_Revoke(grp)
     
     ID = "user2@email.com"
     S = ["user1@email.com", "user3@email.com", "user4@email.com"]
