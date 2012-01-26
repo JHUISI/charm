@@ -19,16 +19,11 @@ class Hash():
             #print "digest => %s" % h.hexdigest()
             # get raw bytes of digest and hash to Zr
             val = h.digest()
-            return integer(int(self.group.hash(val, ZR)))
-            #return integer(int(unicode(self.e.H(val, ZR))))
+            return integer(int(unicode(self.group.hash(val, ZR))))
             # do something related to that
         if type(value) == integer:
             str_value = int2Bytes(value)
-#            print("str_value =>", str_value)
-#            return integer(int(unicode(self.e.H(str_value, ZR))))
-#            val = self.group.hash(str_value, ZR)
-#            print("hash =>", val)
-            return integer(int(self.group.hash(str_value, ZR)))
+            return integer(int(unicode(self.group.hash(str_value, ZR))))
         return None
     
     # takes two arbitrary strings and hashes to an element of Zr
