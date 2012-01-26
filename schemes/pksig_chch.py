@@ -12,20 +12,19 @@ Jae Choon Cha and Jung Hee Cheon - Identity-based Signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from charm.pairing import *
+from toolbox.pairinggroup import *
 from toolbox.PKSig import PKSig
 
 debug = False
 
 class CHCH(PKSig):
     def __init__(self, groupObj):
-        global group
+        global group,H1,H2
         group = groupObj
+        H1 = lambda x: group.hash(x, G1)
+        H2 = lambda x,y: group.hash((x,y), ZR)
         
     def setup(self):
-        global H1,H2
-        H1 = lambda x: group.H(x, G1)
-        H2 = lambda x,y: group.H((x,y), ZR)
         g2, alpha = group.random(G2), group.random(ZR)
         msk = alpha
         P = g2 ** alpha 
@@ -55,7 +54,7 @@ class CHCH(PKSig):
         return False
 
 def main():
-   groupObj = pairing('../param/a.param')
+   groupObj = PairingGroup('../param/a.param')
    chch = CHCH(groupObj)
    (mpk, msk) = chch.setup()
 

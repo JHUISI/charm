@@ -23,16 +23,16 @@ class PairingGroup():
         return False
 
     def ismember(self, obj):
-        if type(obj) in [tuple, list]:
+        if type(obj) in [set, tuple, list]:
            for i in obj:
-               if self.Pairing.ismember(i) == False: return False 
+               if ismember(self.Pairing, i) == False: return False 
            return True
         elif type(obj) == dict:
            for i in obj.keys():
-               if self.Pairing.ismember(obj[i]) == False: return False
+               if ismember(self.Pairing, obj[i]) == False: return False
            return True
         else:
-           return self.Pairing.ismember(obj)
+           return ismember(self.Pairing, obj)
 
     def groupType(self): 
         return 'PairingGroup'     
@@ -42,22 +42,25 @@ class PairingGroup():
 
     def init(self, type, value=None):
         if value != None:
-            return self.Pairing.init(type, long(value))
-        return self.Pairing.init(type)
+            return init(self.Pairing, type, value)
+#            return self.Pairing.init(type, long(value))
+        return init(self.Pairing, type)
             
-    def random(self, type=ZR, seed=None):
+    def random(self, type=ZR, count=1, seed=None):
         if type == GT: return self.__randomGT()
         elif type == ZR or type == G1 or type == G2:
-            if seed != None:
-                return self.Pairing.random(type, seed)
-            return self.Pairing.random(type)
+            if seed != None and count == 1:
+                return random(self.Pairing, type, seed)
+            elif count > 1:
+                return tuple([random(self.Pairing, type) for i in range(count)])                
+            return random(self.Pairing, type)
         else:
             return integer(randomBits(self.secparam))
         
     def __randomGT(self):
         if not hasattr(self, 'gt'):
-            self.gt = pair(self.Pairing.random(G1), self.Pairing.random(G2))
-        z = self.Pairing.random(ZR)
+            self.gt = pair(self.random(G1), self.random(G2))
+        z = self.random(ZR)
         return self.gt ** z
     
     def encode(self, message):
@@ -66,14 +69,14 @@ class PairingGroup():
     def decode(self, element):
         raise NotImplementedException 
     
-    def hash(self, args, type1=ZR):
-        return self.Pairing.H(args, type1)
+    def hash(self, args, type=ZR):
+        return H(self.Pairing, args, type)
     
     def serialize(self, obj):
-        return self.Pairing.serialize(obj)
+        return serialize(obj)
     
     def deserialize(self, obj):
-        return self.Pairing.deserialize(obj)
+        return deserialize(self.Pairing, obj)
     
     def debug(self, data, prefix=None):
         if type(data) == dict and self._verbose:

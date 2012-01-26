@@ -1,6 +1,9 @@
 
-from charm.engine.protocol import *
+from charm.engine.protocol import Protocol
 from charm.engine.util import *
+from toolbox.enum import Enum
+
+#party = Enum('Prover', 'Verifier')
 
 class Sigma(Protocol):
     def __init__(self, groupObj, common_input=None):        

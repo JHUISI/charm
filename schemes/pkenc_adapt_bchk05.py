@@ -66,8 +66,8 @@ class BCHKIBEnc(IBEnc):
 
         C2 = self.str_XOR(m2, kprimeStr)
         C2 = C2.encode('utf-8')
-
-        C1prime = pickleObject(serialize(C1, group))
+        
+        C1prime = pickleObject(serializeObject(C1, group))
         
         tag = hmac.new(k, C1prime+C2, hashlib.sha1).digest()
         
@@ -86,7 +86,7 @@ class BCHKIBEnc(IBEnc):
         x = m2.split(':')[1]
         k = encap.R(pk['pub'], c['ID'], x)
 
-        C1prime = pickleObject(serialize(c['C1'], group))
+        C1prime = pickleObject(serializeObject(c['C1'], group))
         
         if(c['tag'] == hmac.new(k, C1prime+c['C2'], hashlib.sha1).digest()):
             return m2.split(':')[0]

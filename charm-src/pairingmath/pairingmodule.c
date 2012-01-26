@@ -412,7 +412,7 @@ int hash2_element_to_bytes(element_t *element, uint8_t* last_buf, int hash_size,
 
 	element_to_bytes((unsigned char *) temp_buf, *element);
 	// create output buffer
-	uint8_t* temp2_buf = (uint8_t *) malloc(last_buflen + buf_len + 4);
+	uint8_t* temp2_buf = (uint8_t *) malloc(last_buflen + buf_len + 1);
 	memset(temp2_buf, 0, (last_buflen + buf_len));
 //	// copy first input buffer (last_buf) into target buffer
 //	strncat((char *) temp2_buf, (char *) last_buf, last_buflen);
@@ -611,24 +611,18 @@ PyObject *Element_call(Element *elem, PyObject *args, PyObject *kwds)
  
 static PyObject *Element_elem(Element* self, PyObject* args)
 {
-	Element *retObject;
+	Element *retObject, *group = NULL;
 	int type;
 	PyObject *long_obj = NULL;
 	
-	if(self->pairing == NULL) {
-		PyErr_SetString(ElementError, "pairing object is not set.");
-		return NULL;
-	}
-	
-	if(!PyArg_ParseTuple(args, "i|O", &type, &long_obj)) {
+	if(!PyArg_ParseTuple(args, "Oi|O", &group, &type, &long_obj)) {
 		PyErr_SetString(ElementError, "invalid arguments.\n");
 		return NULL;
 	}
 	
 	debug("init an element.\n");
-
 	if(type >= ZR && type <= GT) {
-		retObject = createNewElement(type, self->pairing);
+		retObject = createNewElement(type, group->pairing);
 	}
 	else {
 		PyErr_SetString(ElementError, "unrecognized group type.");
@@ -675,32 +669,28 @@ PyObject *Element_print(Element* self)
 
 static PyObject *Element_random(Element* self, PyObject* args)
 {
-	Element *retObject;
+	Element *retObject,*group = NULL;
 	int arg1;
 	int e_type = -1, seed = -1;
 
-	if(self->pairing == NULL) {
-		printf("pairing is NULL.\n");
-		return NULL;
-	}
-	
 	/* create a new object */
-	if(!PyArg_ParseTuple(args, "i|i", &arg1, &seed))
+	if(!PyArg_ParseTuple(args, "Oi|i", &group, &arg1, &seed))
 		return NULL;
 
 	START_CLOCK(dBench);
+	VERIFY_GROUP(group);
 	retObject = PyObject_New(Element, &ElementType);
 	debug("init random element in '%d'\n", arg1);
 	if(arg1 == ZR) {
-		element_init_Zr(retObject->e, self->pairing->pair_obj);
-		e_type = ZR; 
+		element_init_Zr(retObject->e, group->pairing->pair_obj);
+		e_type = ZR;
 	}
 	else if(arg1 == G1) {
-		element_init_G1(retObject->e, self->pairing->pair_obj);
+		element_init_G1(retObject->e, group->pairing->pair_obj);
 		e_type = G1;
 	}
 	else if(arg1 == G2) {
-		element_init_G2(retObject->e, self->pairing->pair_obj);
+		element_init_G2(retObject->e, group->pairing->pair_obj);
 		e_type = G2;
 	}
 	else if(arg1 == GT) {
@@ -711,7 +701,7 @@ static PyObject *Element_random(Element* self, PyObject* args)
 		PyErr_SetString(ElementError, "unrecognized group type.");
 		return NULL;
 	}
-	
+
 	if(seed > -1) {
 		pbc_random_set_deterministic((uint32_t) seed);
 	}
@@ -719,12 +709,13 @@ static PyObject *Element_random(Element* self, PyObject* args)
 	element_random(retObject->e);
 	STOP_CLOCK(dBench);
 	retObject->elem_initialized = TRUE;
-	retObject->pairing = self->pairing;
+	retObject->pairing = group->pairing;
 	retObject->safe_pairing_clear = FALSE;
 	retObject->param_buf = NULL;
 	retObject->element_type = e_type;
-	return (PyObject *) retObject;	
+	return (PyObject *) retObject;
 }
+
 static PyObject *Element_add(Element *self, Element *other)
 {
 	Element *newObject;
@@ -1047,6 +1038,7 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		}
 		else {
 			// we have a problem
+			return NULL;
 		}
 	}
 	else {
@@ -1182,25 +1174,13 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 	STOP_CLOCK(dBench);
 	return str;
 }
-/*
-static PyObject *dealloc_benchmark(Element *self, PyObject *args) {
-	Benchmark *bObject = NULL;
-	if(PyArg_ParseTuple(args, "O", &bObject)) {
-		if(bObject != NULL) {
-			printf("Removing contents of bObject.\n");
-			bObject->ob_type->tp_free((PyObject*)bObject);
-		}
-	}
-	return Py_BuildValue("i", TRUE);
-}
-*/
+
 // note that this is a class instance function and thus, self will refer to the class object 'element'
 // the args will contain the references to the objects passed in by the caller.
 // The hash function should be able to handle elements of various types and accept
 // a field to hash too. For example, a string can be hashed to Zr or G1, an element in G1 can be
-// hashed to GT?
 static PyObject *Element_hash(Element *self, PyObject *args) {
-	Element *newObject = NULL, *object = NULL;
+	Element *newObject = NULL, *object = NULL, *group = NULL;
 	PyObject *objList = NULL, *tmpObject = NULL;
 	// hashing element to Zr
 	uint8_t hash_buf[HASH_LEN+1];
@@ -1208,26 +1188,24 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 	int result, i;
 	GroupType type = ZR;
 	
-	char *tmp = NULL;
+	char *tmp = NULL, *str;
 	// make sure args have the right type -- check that args contain a "string" and "string"
-	if(!PyArg_ParseTuple(args, "O|i", &objList, &type)) {
+	if(!PyArg_ParseTuple(args, "OO|i", &group, &objList, &type)) {
 		tmp = "invalid object types";
 		goto cleanup;
 	}
 
+	VERIFY_GROUP(group);
 	// first case: is a string and type may or may not be set
-	if(PyUnicode_Check(objList)) {
-#if PY_MAJOR_VERSION >= 3
-		char *str = PyBytes_AS_STRING(PyUnicode_AsUTF8String(objList));
-#else
-		char *str = PyString_AsString(objList);
-#endif
+	if(PyBytes_CharmCheck(objList)) {
+		str = NULL;
+		PyBytes_ToString(str, objList);
 		if(type == ZR) {
 			debug("Hashing string '%s' to Zr...\n", str);
 			// create an element of Zr
 			// hash bytes using SHA1
 			START_CLOCK(dBench);
-			newObject = createNewElement(ZR, self->pairing);
+			newObject = createNewElement(ZR, group->pairing);
 			result = hash_to_bytes((uint8_t *) str, strlen((char *) str), HASH_LEN, hash_buf, type);
 			// extract element in hash
 			if(!result) { 
@@ -1242,7 +1220,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 			debug("Hashing string '%s'\n", str);
 			debug("Target GroupType => '%d'", type);
 			START_CLOCK(dBench);
-			newObject = createNewElement(type, self->pairing);
+			newObject = createNewElement(type, group->pairing);
 			// hash bytes using SHA1
 			result = hash_to_bytes((uint8_t *) str, strlen((char *) str), HASH_LEN, hash_buf, type);
 			if(!result) { 
@@ -1272,12 +1250,9 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 				result = hash_element_to_bytes(&object->e, HASH_LEN, hash_buf, 0);
 				STOP_CLOCK(dBench);
 			}
-			else if(PyUnicode_Check(tmpObject)) {
-#if PY_MAJOR_VERSION >= 3
-				char *str = PyBytes_AS_STRING(PyUnicode_AsUTF8String(tmpObject));
-#else
-				char *str = PyString_AsString(tmpObject);
-#endif
+			else if(PyBytes_CharmCheck(tmpObject)) {
+				str = NULL;
+				PyBytes_ToString(str, tmpObject);
 				START_CLOCK(dBench);
 				result = hash_to_bytes((uint8_t *) str, strlen((char *) str), HASH_LEN, hash_buf, HASH_FUNCTION_STR_TO_Zr_CRH);
 				STOP_CLOCK(dBench);
@@ -1301,12 +1276,9 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 					printf_buffer_as_hex(out_buf, HASH_LEN);
 					memcpy(hash_buf, out_buf, HASH_LEN);
 				}
-				else if(PyUnicode_Check(tmpObject)) {
-#if PY_MAJOR_VERSION >= 3
-				char *str = PyBytes_AS_STRING(PyUnicode_AsUTF8String(tmpObject));
-#else
-				char *str = PyString_AsString(tmpObject);
-#endif
+				else if(PyBytes_CharmCheck(tmpObject)) {
+					str = NULL;
+					PyBytes_ToString(str, tmpObject);
 					START_CLOCK(dBench);
 					// this assumes that the string is the first object (NOT GOOD, change)
 //					result = hash_to_bytes((uint8_t *) str, strlen((char *) str), HASH_LEN, (unsigned char *) hash_buf, HASH_FUNCTION_STR_TO_Zr_CRH);
@@ -1317,8 +1289,8 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 				Py_DECREF(tmpObject);
 			}
 			START_CLOCK(dBench);
-			if(type == ZR) { newObject = createNewElement(ZR, self->pairing); }
-			else if(type == G1) { newObject = createNewElement(G1, self->pairing); }
+			if(type == ZR) { newObject = createNewElement(ZR, group->pairing); }
+			else if(type == G1) { newObject = createNewElement(G1, group->pairing); }
 			else {
 				tmp = "invalid object type";
 				goto cleanup;
@@ -1338,11 +1310,10 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 		}
 
 		// TODO: add type == ZR?
-
 		// Hash an element of Zr to an element of G1.
 		if(type == G1) {
 			START_CLOCK(dBench);
-			newObject = createNewElement(G1, self->pairing);
+			newObject = createNewElement(G1, group->pairing);
 			debug_e("Hashing element '%B' to G1...\n", object->e);
 			// hash the element to the G1 field (uses sha1 as well)
 			// START_CLOCK
@@ -1355,7 +1326,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 			STOP_CLOCK(dBench);
 		}
 		else {
-			tmp = "can only hash an element of Zr to G1. Random Oracle.";
+			tmp = "can only hash an element of Zr to G1. Random Oracle model.";
 			goto cleanup;
 		}
 	}
@@ -1485,10 +1456,10 @@ BINARY(instance_sub, 's', Element_sub)
 
 static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 
-	if(o1->pairing == NULL) {
-		PyErr_SetString(ElementError, "pairing params not initialized.");
-		return NULL;
-	}
+//	if(o1->pairing == NULL) {
+//		PyErr_SetString(ElementError, "pairing params not initialized.");
+//		return NULL;
+//	}
 	Element *self = NULL;
 	if(!PyArg_ParseTuple(args, "O", &self)) {
 		PyErr_SetString(ElementError, "invalid argument.");
@@ -1550,16 +1521,12 @@ static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 }
 
 static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
-	Element *origObject = NULL;
+	Element *origObject = NULL, *group = NULL;
 	PyObject *object;
 
-	if(self->pairing == NULL) {
-		PyErr_SetString(ElementError, "pairing params not initialized.");
-		return NULL;
-	}
-
-	if(PyArg_ParseTuple(args, "O", &object)) {
+	if(PyArg_ParseTuple(args, "OO", &group, &object)) {
 		START_CLOCK(dBench);
+		VERIFY_GROUP(group);
 		if(PyBytes_Check(object)) {
 			uint8_t *serial_buf = (uint8_t *) PyBytes_AsString(object);
 			int type = atoi((const char *) &(serial_buf[0]));
@@ -1571,7 +1538,7 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 			if((type == ZR || type == GT) && deserialized_len > 0) {
 //				debug("result => ");
 //				printf_buffer_as_hex(binary_buf, deserialized_len);
-				origObject = createNewElement(type, self->pairing);
+				origObject = createNewElement(type, group->pairing);
 				element_from_bytes(origObject->e, binary_buf);
 				free(binary_buf);
 				STOP_CLOCK(dBench);
@@ -1579,7 +1546,7 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 			}
 			else if((type == G1 || type == G2) && deserialized_len > 0) {
 				// now convert element back to an element type (assume of type ZR for now)
-				origObject = createNewElement(type, self->pairing);
+				origObject = createNewElement(type, group->pairing);
 				element_from_bytes_compressed(origObject->e, binary_buf);
 				free(binary_buf);
 				STOP_CLOCK(dBench);
@@ -1645,12 +1612,12 @@ int check_membership(Element *elementObj) {
 
 static PyObject *Group_Check(Element *self, PyObject *args) {
 
-	IS_PAIRING_OBJ_NULL(self);
-
+//	IS_PAIRING_OBJ_NULL(self);
 	PyObject *object = NULL;
 	if(PyArg_ParseTuple(args, "O", &object)) {
 		if(PyElement_Check(object)) {
 			Element *elem = (Element *) object;
+			IS_PAIRING_OBJ_NULL(elem);
 
 			if(check_membership(elem) == TRUE) {
 				Py_INCREF(Py_True);
@@ -1668,10 +1635,20 @@ static PyObject *Group_Check(Element *self, PyObject *args) {
 }
 
 static PyObject *Get_Order(Element *self, PyObject *args) {
+	PyObject *obj = NULL;
+	if(!PyArg_ParseTuple(args, "O", &obj)) {
+		PyErr_SetString(ElementError, "invalid group object.");
+		return NULL;
+	}
 
-	IS_PAIRING_OBJ_NULL(self);
-	PyObject *object = (PyObject *) mpzToLongObj(self->pairing->pair_obj->r);
-	return object; /* returns a PyInt */
+	if(PyElement_Check(obj)) {
+		Element *group = (Element *) obj;
+		IS_PAIRING_OBJ_NULL(group);
+		PyObject *object = (PyObject *) mpzToLongObj(group->pairing->pair_obj->r);
+		return object; /* returns a PyInt */
+	}
+
+	return NULL; /* most likely invalid */
 }
 
 #if PY_MAJOR_VERSION >= 3
@@ -1958,21 +1935,20 @@ PyMemberDef Element_members[] = {
 };
 
 PyMethodDef Element_methods[] = {
-	// benchmark methods
-	{"init", (PyCFunction)Element_elem, METH_VARARGS, "Create an element in a specific group: G1, G2, GT or Zr"},
-	{"random", (PyCFunction)Element_random, METH_VARARGS, "Return a random element in a specific group: G1, G2, Zr"},
 	{"set", (PyCFunction)Element_set, METH_VARARGS, "Set an element to a fixed value."},
-	{"H", (PyCFunction)Element_hash, METH_VARARGS, "Hash an element type to a specific field: Zr, G1, or G2"},
-	{"serialize", (PyCFunction)Serialize_cmp, METH_VARARGS, "Serialize an element type into bytes."},
-	{"deserialize", (PyCFunction)Deserialize_cmp, METH_VARARGS, "De-serialize an bytes object into an element object"},
-	{"ismember", (PyCFunction) Group_Check, METH_VARARGS, "Group membership test for element objects."},
-	{"order", (PyCFunction) Get_Order, METH_NOARGS, "Get the group order for a particular field."},
     {NULL}  /* Sentinel */
 };
 
 PyMethodDef pairing_methods[] = {
+	{"init", (PyCFunction)Element_elem, METH_VARARGS, "Create an element in a specific group: G1, G2, GT or Zr"},
 	{"pair", (PyCFunction)Apply_pairing, METH_VARARGS, "Apply pairing between an element of G1 and G2 and returns an element mapped to GT"},
 	{"hash", (PyCFunction)sha1_hash, METH_VARARGS, "Compute a sha1 hash of an element type"},
+	{"H", (PyCFunction)Element_hash, METH_VARARGS, "Hash an element type to a specific field: Zr, G1, or G2"},
+	{"random", (PyCFunction)Element_random, METH_VARARGS, "Return a random element in a specific group: G1, G2, Zr"},
+	{"serialize", (PyCFunction)Serialize_cmp, METH_VARARGS, "Serialize an element type into bytes."},
+	{"deserialize", (PyCFunction)Deserialize_cmp, METH_VARARGS, "De-serialize an bytes object into an element object"},
+	{"ismember", (PyCFunction) Group_Check, METH_VARARGS, "Group membership test for element objects."},
+	{"order", (PyCFunction) Get_Order, METH_VARARGS, "Get the group order for a particular field."},
 	{"InitBenchmark", (PyCFunction)_init_benchmark, METH_NOARGS, "Initialize a benchmark object"},
 	{"StartBenchmark", (PyCFunction)_start_benchmark, METH_VARARGS, "Start a new benchmark with some options"},
 	{"EndBenchmark", (PyCFunction)_end_benchmark, METH_VARARGS, "End a given benchmark"},

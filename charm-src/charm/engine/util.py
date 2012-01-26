@@ -80,7 +80,7 @@ def serializeList(object, group):
         if type(object) == str: return bytes(object, 'utf8')
         else: return group.serialize(object)
 
-def serialize(objects, group):
+def serializeObject(objects, group):
     if type(objects) == dict: return serializeDict(objects, group)
     # handles lists, tuples, sets, and even individual elements
     else: return serializeList(objects, group)
@@ -163,7 +163,7 @@ def deserializeList(object, group):
         # just one bytes object
         return object
 
-def deserialize(objects, group):
+def deserializeObject(objects, group):
     if type(objects) == dict: return deserializeDict(objects, group)
     else: return deserializeList(objects, group)
     

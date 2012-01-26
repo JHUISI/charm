@@ -12,8 +12,8 @@ Boneh-Franklin Identity Based Encryption
 :Authors:    J. Ayo Akinyele
 :Date:       2/2011
 '''
-from toolbox.pairinggroup import *
-from toolbox.hash_module import *
+from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
+from toolbox.hash_module import Hash,int2Bytes,integer
 from toolbox.IBEnc import IBEnc
 
 debug = False
@@ -22,7 +22,7 @@ class IBE_BonehFranklin(IBEnc):
         IBEnc.__init__(self)
         global group,h,ZN
         group = groupObj
-        h = Hash('sha1', group.Pairing)
+        h = Hash('sha1', group)
         ZN = -1
         
     def setup(self):

@@ -29,7 +29,7 @@ class CPabe_BSW07(ABEnc):
     def __init__(self, groupObj):
         ABEnc.__init__(self)
         global util, group
-        util = SecretUtil(groupObj.Pairing, verbose=False)
+        util = SecretUtil(groupObj, verbose=False)
         group = groupObj
 
     @output(pk_t, mk_t)    

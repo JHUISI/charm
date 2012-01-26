@@ -403,3 +403,22 @@ class SAEPEncryptionPadding:
             print("r    => ", r)
 
         return (M, t)
+
+class PKCS7Padding(object):
+    def __init__(self,block_size = 16):
+        self.block_size = block_size
+        
+    def encode(self,_bytes,block_size = 16):
+        pad = self._padlength(_bytes)
+        return _bytes.ljust(pad+len(_bytes),bytes([pad]))
+
+    def decode(self,_bytes):
+        return _bytes[:-(_bytes[-1])]
+
+
+    def _padlength(self,_bytes):
+        ln=len(_bytes)
+        pad_bytes_needed = self.block_size -(ln % self.block_size)
+        if pad_bytes_needed == 0:
+            pad_bytes_needed = self.block_size
+        return pad_bytes_needed

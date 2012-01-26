@@ -1,4 +1,4 @@
-from toolbox.AuthenticatedCryptoAbstraction import AuthenticatedCryptoAbstraction
+from toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from charm.cryptobase import *
 from charm.pairing import hash as sha1
 from math import ceil
@@ -52,7 +52,7 @@ def main():
     #Two authorities may not issue keys for the same attribute. 
     #Otherwise, the decryption algorithm will not know which private key to use   
     jhu_attributes = ['jhu_professor', 'jhu_staff', 'jhu_student']
-    jhmi_attributes = ['jhmi_doctor', 'jhm_inurse', 'jhmi_staff', 'jhmi_researcher']
+    jhmi_attributes = ['jhmi_doctor', 'jhmi_nurse', 'jhmi_staff', 'jhmi_researcher']
     (jhuSK, jhuPK) = hyb_abema.authsetup(gp, jhu_attributes)
     (jhmiSK, jhmiPK) = hyb_abema.authsetup(gp, jhmi_attributes)
     allAuthPK = {}; allAuthPK.update(jhuPK); allAuthPK.update(jhmiPK)
