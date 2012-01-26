@@ -87,7 +87,7 @@ class KPabe(ABEnc):
         #E4, E5 = {}, {}
         for i in range(len(attr_list)):
             attr = attr_list[i]
-            E3[attr] = group.hash(attr, G1) ** s
+            E3[attr] = group.hash(unicode(attr), G1) ** s
             #E4[attr] = pk['g_G1_b'] ** sx[i]
             #E5[attr] = (pk['g_G1_b2'] ** (sx[i] * group.hash(attr))) * (pk['h_G1_b'] ** sx[i])
 

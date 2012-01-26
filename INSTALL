@@ -28,8 +28,8 @@ BUILDING IN LINUX
 Note that the entire compilation process is supported by the Charm configure/make scripts.
 The steps for building in linux this way are:
 	1. In a terminal, run configure.sh
-    2. sudo Make build.
-    3. sudo Make install.	
+    2. sudo Make build
+    3. sudo Make install
 	
 [Ubuntu 10.04 LTS]
 WARNING: Python 2.7 is not supported by apt on Ubuntu. Please see the python 3.x release.

@@ -38,8 +38,9 @@ class EC_CS98(PKEnc):
     def keygen(self, secparam=0):
         group.paramgen(secparam)
         g1, g2 = group.random(G), group.random(G)
-        
+        print("G.random")
         x1, x2, y1, y2, z = group.random(), group.random(), group.random(), group.random(), group.random()		
+        print("Done w random")
         c = ((g1 ** x1) * (g2 ** x2))
         d = ((g1 ** y1) * (g2 ** y2)) 
         h = (g1 ** z)

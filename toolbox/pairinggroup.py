@@ -56,6 +56,7 @@ class PairingGroup():
             return random(self.Pairing, type)
         else:
             return integer(randomBits(self.secparam))
+
         
     def __randomGT(self):
         if not hasattr(self, 'gt'):
