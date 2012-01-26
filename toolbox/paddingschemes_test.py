@@ -216,7 +216,7 @@ class TestPkcs7Padding(unittest.TestCase):
     def setUp(self):
         self.padder = PKCS7Padding()
     def encodecode(self,text):
-        _bytes = bytes(text,'utf-8')
+        _bytes = text
         padded = self.padder.encode(_bytes)
         assert _bytes == self.padder.decode(padded), 'o: =>%s\nm: =>%s' % (_bytes,padded)
         assert len(padded) % 16 == 0 , 'invalid padding length: %s' % (len(padded))
