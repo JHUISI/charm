@@ -36,7 +36,7 @@ class MessageAuthenticator(object):
         return {
                 "alg": self._algorithm,
                 "msg": msg, 
-                "digest": hmac.new(self._key,bytes(self._algorithm + msg,"utf-8"),digestmod=sha1hashlib).hexdigest()
+                "digest": hmac.new(self._key,(self._algorithm + msg),digestmod=sha1hashlib).hexdigest()
                }
 
     def verify(self,msgAndDigest):
@@ -45,8 +45,8 @@ class MessageAuthenticator(object):
         """
         if msgAndDigest['alg'] != self._algorithm:
             raise ValueError()
-        expected = bytes(self.mac(msgAndDigest['msg'])['digest'],'utf-8')
-        recieved = bytes(msgAndDigest['digest'],'utf-8')
+        expected = (self.mac(msgAndDigest['msg'])['digest'])
+        recieved = (msgAndDigest['digest'])
         return sha1hashlib(expected).digest() == sha1hashlib(recieved).digest() # we compare the hash instead of the direct value to avoid a timing attack
 
 class SymmetricCryptoAbstraction(object):
@@ -91,12 +91,12 @@ class SymmetricCryptoAbstraction(object):
         return self.__encode_decode(data,lambda x:b64encode(x).decode('utf-8'))
 
     def _decode(self,data):
-        return self.__encode_decode(data,lambda x:b64decode(bytes(x,'utf-8')))
+        return self.__encode_decode(data,lambda x:b64decode((x)))
 
     def encrypt(self, message):
         #This should be removed when all crypto functions deal with bytes"
         if type(message) != bytes :
-            message = bytes(message,"utf-8")
+            message = (message)
         ct = self._encrypt(message)
         #JSON strings cannot have binary data in them, so we must base64 encode  cipher
         cte = json.dumps(self._encode(ct))

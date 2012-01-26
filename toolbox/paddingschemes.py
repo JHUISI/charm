@@ -6,6 +6,7 @@ import hashlib
 import math
 import struct
 import sys
+from array import *
 
 debug = False
 
@@ -410,10 +411,10 @@ class PKCS7Padding(object):
         
     def encode(self,_bytes,block_size = 16):
         pad = self._padlength(_bytes)
-        return _bytes.ljust(pad+len(_bytes),bytes([pad]))
+        return _bytes.ljust(pad+len(_bytes), chr(pad & 0xFF))
 
     def decode(self,_bytes):
-        return _bytes[:-(_bytes[-1])]
+        return _bytes[:-ord(_bytes[-1])]
 
 
     def _padlength(self,_bytes):
