@@ -34,7 +34,14 @@ def verifySigsRecursive(verifyArgsDict, groupObj, incorrectIndices, startSigNum,
 
 			dotB_loopVal = dotB_loopVal *   h ** delta [ z ]  
 
-		dotC_loopVal = dotC_loopVal *   pair( dotB_loopVal , verifyArgsDict[z]['pk'][bodyKey] [ 'g^x' ] [ y ] )  
+		#print("start")
+		#print(dotB_loopVal,verifyArgsDict[z]['pk'][bodyKey][y]['g^x'])
+		#print("end")
+
+		#print(dotB_loopVal.type)
+		print(verifyArgsDict[z]['pk'][bodyKey][y]['g^x'])
+
+		dotC_loopVal=dotC_loopVal*pair(dotB_loopVal,verifyArgsDict[z]['pk'][bodyKey][y]['g^x'])  
 
 	dotA_loopVal = group.init(G1, 1)
 
