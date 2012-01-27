@@ -353,7 +353,7 @@ if __name__ == "__main__":
     if PROOFGEN_FLAG:
         print("Generated the proof for the given signature scheme.")
         latex_file = metadata['name'].upper()
-        writeConfig(lcg, latex_file, lcg_data, const, vars, sigs)
+        writeConfig(lcg, latex_file, lcg_data, constants, vars, sig_vars)
 #        lcg = LatexCodeGenerator(const, vars)
 #        equation = lcg.print_statement(verify2.right)
 #        print("Latex Equation: ", equation)
