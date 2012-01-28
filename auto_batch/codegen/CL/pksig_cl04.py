@@ -59,18 +59,12 @@ def main():
     mpk = cl.setup()
     
     (pk, sk) = cl.keygen(mpk)
-    #print("Keygen...")
-    #print("pk :=", pk)
-    #print("sk :=", sk)
     
     M = "Please sign this stupid message!"
     sig = cl.sign(pk, sk, M)
-    #print("Signature: ", sig)
     
     result = cl.verify(pk, M, sig)
     assert result, "INVALID signature!"
-    #print("Successful Verification!!!")
-
 
     numValidMessages = int(sys.argv[1])
     numInvalidMessages = int(sys.argv[2])
@@ -80,7 +74,7 @@ def main():
     invalidOutputDictName = sys.argv[6]
 
     f_mpk = open('mpk.charmPickle', 'wb')
-    pick_mpk = pickleObject(serialize(pk, grp))
+    pick_mpk = objectToBytes(pk, grp)
     f_mpk.write(pick_mpk)
     f_mpk.close()
 
@@ -113,7 +107,7 @@ def main():
         pickle.dump(message, f_message)
         f_message.close()
 
-        pick_sig = pickleObject(serialize(sig, grp))
+        pick_sig = objectToBytes(sig, grp)
 
         f_sig.write(pick_sig)
         f_sig.close()
@@ -124,7 +118,7 @@ def main():
         del f_sig
         del pick_sig
 
-    dict_pickle = pickleObject(serialize(validOutputDict, grp))
+    dict_pickle = objectToBytes(validOutputDict, grp)
     f = open(validOutputDictName, 'wb')
     f.write(dict_pickle)
     f.close()
@@ -164,7 +158,7 @@ def main():
         pickle.dump(message, f_message)
         f_message.close()
 
-        pick_sig = pickleObject(serialize(sig, grp))
+        pick_sig = objectToBytes(sig, grp)
 
         f_sig.write(pick_sig)
         f_sig.close()
@@ -175,7 +169,7 @@ def main():
         del f_sig
         del pick_sig
 
-    dict_pickle = pickleObject(serialize(invalidOutputDict, grp))
+    dict_pickle = objectToBytes(invalidOutputDict, grp)
     f = open(invalidOutputDictName, 'wb')
     f.write(dict_pickle)
     f.close()
