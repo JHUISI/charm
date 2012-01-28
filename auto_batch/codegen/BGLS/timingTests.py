@@ -47,7 +47,7 @@ def loadDictDataFromFile(verifyParamFilesDict, groupParamArg):
 			verifyParamFile = str(verifyParamFilesDict[sigIndex][arg])
 			if (verifyParamFile.endswith(charmPickleSuffix)):
 				verifyParamPickle = open(verifyParamFile, 'rb').read()
-				verifyArgsDict[sigIndex][arg][bodyKey] = deserializeDict( unpickleObject( verifyParamPickle ) , groupParamArg )
+				verifyArgsDict[sigIndex][arg][bodyKey] = bytesToObject(verifyParamPickle, groupParamArg)
 			elif (verifyParamFile.endswith(pythonPickleSuffix)):
 				verifyParamPickle = open(verifyParamFile, 'rb')
 				verifyArgsDict[sigIndex][arg][bodyKey] = pickle.load(verifyParamPickle)
@@ -90,8 +90,8 @@ if __name__ == '__main__':
 	invalidDictArg = open(sys.argv[2], 'rb').read()
 	groupParamArg = PairingGroup(sys.argv[3])
 
-	validDictFile = deserializeDict( unpickleObject(validDictArg), groupParamArg )
-	invalidDictFile = deserializeDict( unpickleObject(invalidDictArg), groupParamArg )
+	validDictFile = bytesToObject(validDictArg, groupParamArg)
+	invalidDictFile = bytesToObject(invalidDictArg, groupParamArg)
 
 	validDict = loadDictDataFromFile(validDictFile, groupParamArg)
 	invalidDict = loadDictDataFromFile(invalidDictFile, groupParamArg)

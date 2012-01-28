@@ -13,8 +13,6 @@ Boneh-Gentry-Lynn-Shacham Aggregate Signature
 '''
 from charm.engine.util import *
 from toolbox.pairinggroup import *
-#from charm.engine.util import *
-#import string, random, sys
 import sys, random, string
 
 debug = False
@@ -56,7 +54,7 @@ class BGLS():
             h = group.hash(M[index], G1)
             rightSideProduct = rightSideProduct * pair(h, pk[index]['g^x'])
 
-        if pair(sig, g2) == rightSideProduct:
+        if pair(sig, pk[0]['g2']) == rightSideProduct:
             return True
         return False
 
@@ -79,7 +77,6 @@ def main():
     invalidOutputDictName = sys.argv[6]
 
     validOutputDict = {}
-    '''
 
     for i in range(0, numValidMessages):
         pk = []
@@ -104,9 +101,8 @@ def main():
         sig = bgls.aggregate(sigList)
         assert bgls.verify(pk, sig, message)
 
-    '''
         f_pk = open(prefixName + str(i) + '_ValidPK.charmPickle', 'wb')
-        pick_pk = pickleObject(serialize(pk, groupObj))
+        pick_pk = objectToBytes(pk, groupObj)
         f_pk.write(pick_pk)
         f_pk.close()
 
@@ -115,7 +111,7 @@ def main():
         validOutputDict[i]['pk'] = prefixName + str(i) + '_ValidPK.charmPickle'
 
         f_sig = open(prefixName + str(i) + '_ValidSignature.charmPickle', 'wb')
-        pick_sig = pickleObject(serialize(sig, groupObj))
+        pick_sig = objectToBytes(sig, groupObj)
         f_sig.write(pick_sig)
         f_sig.close()
 
@@ -127,7 +123,7 @@ def main():
 
         validOutputDict[i]['M'] = prefixName + str(i) + '_ValidMessage.pythonPickle'
 
-    dict_pickle = pickleObject(serialize(validOutputDict, groupObj))
+    dict_pickle = objectToBytes(validOutputDict, groupObj)
     f = open(validOutputDictName, 'wb')
     f.write(dict_pickle)
     f.close()
@@ -158,7 +154,7 @@ def main():
         assert bgls.verify(pk, sig, message)
 
         f_pk = open(prefixName + str(i) + '_InvalidPK.charmPickle', 'wb')
-        pick_pk = pickleObject(serialize(pk, groupObj))
+        pick_pk = objectToBytes(pk, groupObj)
         f_pk.write(pick_pk)
         f_pk.close()
 
@@ -167,7 +163,7 @@ def main():
         invalidOutputDict[i]['pk'] = prefixName + str(i) + '_invalidPK.charmPickle'
 
         f_sig = open(prefixName + str(i) + '_invalidSignature.charmPickle', 'wb')
-        pick_sig = pickleObject(serialize(sig, groupObj))
+        pick_sig = objectToBytes(sig, groupObj)
         f_sig.write(pick_sig)
         f_sig.close()
 
@@ -193,7 +189,7 @@ def main():
 
         invalidOutputDict[i]['M'] = prefixName + str(i) + '_invalidMessage.pythonPickle'
 
-    dict_pickle = pickleObject(serialize(invalidOutputDict, groupObj))
+    dict_pickle = objectToBytes(invalidOutputDict, groupObj)
     f = open(invalidOutputDictName, 'wb')
     f.write(dict_pickle)
     f.close()

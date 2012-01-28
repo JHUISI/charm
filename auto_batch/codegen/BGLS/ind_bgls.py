@@ -37,9 +37,10 @@ def run_Ind(verifyArgsDict, groupObjParam, verifyFuncArgs):
 			pass
 			h= group.hash( verifyArgsDict[z]['M'][bodyKey][ index ] , G1 )
 			rightSideProduct= rightSideProduct * pair( h , verifyArgsDict[z]['pk'][bodyKey][ index ] [ 'g^x' ] )
-		if pair( verifyArgsDict[z]['sig'][bodyKey] , g2 )== rightSideProduct :
+		if pair( verifyArgsDict[z]['sig'][bodyKey] , verifyArgsDict[z]['pk'][bodyKey][ 0 ] [ 'g2' ] )== rightSideProduct :
 			pass
 		else:
-			incorrectIndices.append(z)
+			if z not in incorrectIndices:
+				incorrectIndices.append(z)
 
 	return incorrectIndices
