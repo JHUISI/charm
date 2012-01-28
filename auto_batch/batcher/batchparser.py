@@ -43,7 +43,8 @@ class BatchParser:
     def getBNF(self):
         # supported operators => (OR, AND, <, prod{
         #OperatorOR = Literal("OR") | Literal("or").setParseAction(upcaseTokens)
-        ANDOp = Literal("AND") | Literal("and").setParseAction(upcaseTokens)
+#        ANDOp = Literal("AND") | Literal("and").setParseAction(upcaseTokens)
+        AndOp = Literal("and")
         lpar = Literal("(").suppress() | Literal("{").suppress()
         rpar = Literal(")").suppress() | Literal("}").suppress()
         rcurly = Literal("}").suppress()
@@ -54,19 +55,20 @@ class BatchParser:
         ExpOp = Literal("^")
         AddOp = Literal("+")
         Equality = Literal("==") # | Word("<>", max=1)
-        BinOp = ExpOp | MulOp | AddOp | Concat | Equality
         Assignment =  Literal(":=")
         Pairing = Literal('e(') # Pairing token
-        Hash = Literal('H(')
+        Hash = Literal('H(') # TODO: provide a way to specify arbitrary func. calls
         Prod = Literal("prod{") # dot product token
         For = Literal("for{")
         Sum = Literal("sum{")
         ProdOf = Literal("on")
         ForDo = Literal("do") # for{x,y} do y
         SumOf = Literal("of")
-        
+
+        # captures the binary operators allowed (and, ^, *, /, +, |, ==)        
+        BinOp = AndOp | ExpOp | MulOp | DivOp | AddOp | Concat | Equality
         # captures order of parsing token operators
-        Token = ANDOp | Equality | ExpOp | MulOp | DivOp | AddOp | ForDo | ProdOf | SumOf | Concat | Assignment
+        Token =  Equality | AndOp | ExpOp | MulOp | DivOp | AddOp | ForDo | ProdOf | SumOf | Concat | Assignment
         Operator = Token 
         #Operator = OperatorAND | OperatorOR | Token
 
@@ -104,7 +106,7 @@ class BatchParser:
         op = stack.pop()
         if debug >= levels.some:
             print("op: %s" % op)
-        if op in ["+", "*", "^", ":=", "==", "e(", "for{", "do","prod{", "on", "sum{", "of", "|"]:
+        if op in ["+", "*", "^", ":=", "==", "e(", "for{", "do","prod{", "on", "sum{", "of", "|", "and"]:
             op2 = self.evalStack(stack)
             op1 = self.evalStack(stack)
             return createTree(op, op1, op2)

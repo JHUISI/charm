@@ -26,7 +26,7 @@ import string
 
 types = Enum('G1', 'G2', 'GT', 'ZR', 'str')
 declarator = Enum('constants', 'verify')
-ops = Enum('BEGIN', 'TYPE', 'ADD', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT','END', 'NONE')
+ops = Enum('BEGIN', 'TYPE', 'AND', 'ADD', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT','END', 'NONE')
 side = Enum('left', 'right')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
@@ -37,10 +37,14 @@ debug = levels.none
 
 def getListNodes(subtree, parent_type, _list):
 	if subtree == None: return None
+	# trying to capture most probable arrangements (may need to expand for other cases)
 	elif parent_type == ops.MUL:
 		if subtree.type == ops.ATTR: _list.append(subtree)
 		elif subtree.type == ops.EXP: _list.append(subtree)
 		elif subtree.type == ops.HASH: _list.append(subtree)
+		elif subtree.type == ops.PAIR: _list.append(subtree)
+	elif parent_type == ops.EQ_TST:
+		if subtree.type == ops.PAIR: _list.append(subtree)
 		
 	if subtree.left: getListNodes(subtree.left, subtree.type, _list)
 	if subtree.right: getListNodes(subtree.right, subtree.type, _list)
@@ -113,6 +117,8 @@ def createTree(op, node1, node2):
     	node = BinaryNode(ops.OF)
     elif(op == "|"):
         node = BinaryNode(ops.CONCAT)
+    elif(op == "and"):
+    	node = BinaryNode(ops.AND)
     # elif e( ... )
     else:    
         return None
@@ -209,6 +215,8 @@ class BinaryNode:
 				 return ( left + ' of ' + right)
 			elif(self.type == ops.CONCAT):
 				 return (left + ' | ' + right)
+			elif(self.type == ops.AND):
+				 return ("{" + left + "} and {" + right + "}") 
 			elif(self.type == ops.NONE):
 				 return 'NONE'
 				# return ( left + ' on ' + right )				

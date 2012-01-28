@@ -6,6 +6,8 @@
 from batchtechniques import *
 from batchproof import *
 from batchorder import BatchOrder
+from batchparser import BatchParser
+from batchcomboeq import TestForMultipleEq,CombineMultipleEq
 
 try:
     #import benchmarks
@@ -17,6 +19,25 @@ except:
     exit(0)
 
 debug = False
+
+def handleVerifyEq(equation):
+#    print("Input: ", Type(equation), equation)
+    combined_equation = BinaryNode.copy(equation.right)
+    print("Original eq:", combined_equation)
+    tme = TestForMultipleEq()
+    ASTVisitor(tme).preorder(combined_equation)
+    if tme.multiple:
+        cme = CombineMultipleEq()
+        ASTVisitor(cme).preorder(combined_equation)
+        if len(cme.finalAND) == 1: 
+            combined_equation = cme.finalAND.pop()
+            print("Combined eq: ", combined_equation)
+        else:
+            # may need to combine them further? or batch separaely
+            print("Note: multiple equations left. Either batch each equation separately OR combine further.")
+            for i in cme.finalAND:
+                print("eq: ", i)
+    return combined_equation
 
 def countInstances(equation):
     Instfind = ExpInstanceFinder()
@@ -147,8 +168,8 @@ if __name__ == "__main__":
     try:
         file = sys.argv[1]
         print(sys.argv[1:])
-        ast_struct = parseFile(file)
         THRESHOLD_FLAG = CODEGEN_FLAG = PROOFGEN_FLAG = PRECOMP_CHECK = VERBOSE = CHOOSE_STRATEGY = False # initialization
+        TEST_STATEMENT = False
         for i in sys.argv:
             if i == "-b": THRESHOLD_FLAG = True
             elif i == "-c": CODEGEN_FLAG = True
@@ -156,9 +177,25 @@ if __name__ == "__main__":
             elif i == "-p": PROOFGEN_FLAG = True
             elif i == "-d": PRECOMP_CHECK = True
             elif i == "-s": CHOOSE_STRATEGY = True
+            elif i == "-t": TEST_STATEMENT = True
+        if not TEST_STATEMENT: ast_struct = parseFile(file)
     except:
         print("An error occured while processing batch inputs.")
         exit(-1)
+    if TEST_STATEMENT:
+        debug = levels.all
+        statement = sys.argv[2]
+        #print("Original statement: ", statement)
+        parser = BatchParser()
+        final = parser.parse(statement)
+        print("Final statement(%s): '%s'" % (type(final), final))
+#        tme = TestForMultipleEq()
+#        ASTVisitor(tme).preorder(final.right)
+#        print("Multiple? ", tme.multiple)
+#        for i in tme.finalAND:
+#            print("node: ", i)
+        exit(0)
+
     constants, types = ast_struct[ CONST ], ast_struct[ TYPE ]
     latex_subs = ast_struct[ LATEX ]
     (indiv_precompute, batch_precompute) = ast_struct[ PRECOMP ]
@@ -173,7 +210,8 @@ if __name__ == "__main__":
     metadata = {}
     for n in ast_struct[ OTHER ]:
         if str(n.left) == 'verify':
-            verify = n
+#            verify = n
+            verify = handleVerifyEq(n)
         elif str(n.left) == 'N':
             N = int(str(n.right))
             metadata['N'] = str(n.right)
@@ -192,7 +230,7 @@ if __name__ == "__main__":
         batch_count[ MESSAGE ] = SAME 
     elif MSG_set in metadata.keys():
         checkDotProd = CheckExistingDotProduct(MSG_set)
-        ASTVisitor(checkDotProd).preorder(verify.right)
+        ASTVisitor(checkDotProd).preorder(verify)
         if not checkDotProd.applied:
             batch_count[ MESSAGE ] = MSG_set
         else:
@@ -205,7 +243,7 @@ if __name__ == "__main__":
         batch_count[ PUBLIC ] = SAME 
     elif PUB_set in metadata.keys():
         checkDotProd = CheckExistingDotProduct(PUB_set)
-        ASTVisitor(checkDotProd).preorder(verify.right)
+        ASTVisitor(checkDotProd).preorder(verify)
         if not checkDotProd.applied:
             batch_count[ PUBLIC ] = PUB_set
         else:
@@ -236,30 +274,30 @@ if __name__ == "__main__":
 
     techniques = {'2':Technique2, '3':Technique3, '4':Technique4, '5':DotProdInstanceFinder, '6':PairInstanceFinder, '7':Technique7, '8':Technique8 }
     print("\nVERIFY EQUATION =>", verify)
-    if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Equation', 'eq': lcg.print_statement(verify.right) }; lcg_steps += 1
+    if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Equation', 'eq': lcg.print_statement(verify) }; lcg_steps += 1
     verify2 = BinaryNode.copy(verify)
 #    ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
-    ASTVisitor(CVForMultiSigner(vars, sig_vars, pub_vars, msg_vars, batch_count)).preorder(verify2.right)
-    if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Combined Equation', 'eq':lcg.print_statement(verify2.right) }; lcg_steps += 1
+    ASTVisitor(CVForMultiSigner(vars, sig_vars, pub_vars, msg_vars, batch_count)).preorder(verify2)
+    if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Combined Equation', 'eq':lcg.print_statement(verify2) }; lcg_steps += 1
     # check whether this step is necessary!    
-    verify_test = BinaryNode.copy(verify2.right)
+    verify_test = BinaryNode.copy(verify2)
     pif = PairInstanceFinder()
     ASTVisitor(pif).preorder(verify_test)
     if pif.testForApplication(): # if we can combine some pairings, then no need to distribute just yet
         pass
     else:
-        ASTVisitor(SimplifyDotProducts()).preorder(verify2.right)
+        ASTVisitor(SimplifyDotProducts()).preorder(verify2)
 
     print("\nStage A: Combined Equation =>", verify2)
-    ASTVisitor(SmallExponent(constants, vars)).preorder(verify2.right)
+    ASTVisitor(SmallExponent(constants, vars)).preorder(verify2)
     print("\nStage B: Small Exp Test =>", verify2, "\n")
     if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Apply the small exponents test, using exponents $\delta_1, \dots \delta_\\numsigs \in_R \Zq$', 
-                                               'eq':lcg.print_statement(verify2.right), 'preq':small_exp_label }; lcg_steps += 1
+                                               'eq':lcg.print_statement(verify2), 'preq':small_exp_label }; lcg_steps += 1
 
 
     # figure out order automatically (if not specified in bv file)
     if FIND_ORDER:
-        result = BatchOrder(sdl_data, types, vars, BinaryNode.copy(verify2.right)).strategy()
+        result = BatchOrder(sdl_data, types, vars, BinaryNode.copy(verify2)).strategy()
         algorithm = [str(x) for x in result]
         print("found batch algorithm =>", algorithm)
 
@@ -277,15 +315,15 @@ if __name__ == "__main__":
         else:
             print("Unrecognized technique selection.")
             continue
-        ASTVisitor(Tech).preorder(verify2.right)
+        ASTVisitor(Tech).preorder(verify2)
         if option == '6':
-            Tech.makeSubstitution(verify2.right)
+            Tech.makeSubstitution(verify2)
         if hasattr(Tech, 'precompute'):
             batch_precompute.update(Tech.precompute)
         print(Tech.rule, "\n")
-        print(option_str, ":",verify2.right, "\n")
+        print(option_str, ":",verify2, "\n")
         if PROOFGEN_FLAG:
-            lcg_data[ lcg_steps ] = { 'msg':Tech.rule, 'eq': lcg.print_statement(verify2.right) }
+            lcg_data[ lcg_steps ] = { 'msg':Tech.rule, 'eq': lcg.print_statement(verify2) }
             lcg_steps += 1
 
     
@@ -296,15 +334,15 @@ if __name__ == "__main__":
     if PRECOMP_CHECK:
         countDict = countInstances(verify2) 
         if not isOptimized(countDict):
-            ASTVisitor(SubstituteExps(countDict, batch_precompute, vars)).preorder(verify2.right)
-            print("Final batch eq:", verify2.right)
+            ASTVisitor(SubstituteExps(countDict, batch_precompute, vars)).preorder(verify2)
+            print("Final batch eq:", verify2)
         else:
-            print("Final batch eq:", verify2.right)
+            print("Final batch eq:", verify2)
 
     # START BENCHMARK : THRESHOLD ESTIMATOR
     if THRESHOLD_FLAG:
         print("<== Running threshold estimator ==>")
-        (indiv_msmt, indiv_avg_msmt) = benchIndivVerification(N, verify.right, sdl_data, vars, indiv_precompute, VERBOSE)
+        (indiv_msmt, indiv_avg_msmt) = benchIndivVerification(N, verify, sdl_data, vars, indiv_precompute, VERBOSE)
         print("Result N =",N, ":", indiv_avg_msmt)
 
         outfile = file.split('.')[0]
@@ -314,7 +352,7 @@ if __name__ == "__main__":
         threshold = -1
         for i in range(1, N+1):
             vars['N'] = i
-            (batch_msmt, batch_avg_msmt) = benchBatchVerification(i, verify2.right, sdl_data, vars, batch_precompute, VERBOSE)
+            (batch_msmt, batch_avg_msmt) = benchBatchVerification(i, verify2, sdl_data, vars, batch_precompute, VERBOSE)
             output_indiv.write(str(i) + " " + str(indiv_avg_msmt) + "\n")
             output_batch.write(str(i) + " " + str(batch_avg_msmt) + "\n")
             if batch_avg_msmt <= indiv_avg_msmt and threshold == -1: threshold = i 
@@ -324,9 +362,9 @@ if __name__ == "__main__":
     # STOP BENCHMARK : THRESHOLD ESTIMATOR 
     # TODO: check avg for when batch is more efficient than 
     if CODEGEN_FLAG:
-        print("Final batch eq:", verify2.right)
+        print("Final batch eq:", verify2)
         subProds = SubstituteSigDotProds(vars, 'z', 'N')
-        ASTVisitor(subProds).preorder(verify2.right)
+        ASTVisitor(subProds).preorder(verify2)
         # print("Dot prod =>", subProds.dotprod)
         # need to check for presence of other variables
 #        key = None
@@ -334,10 +372,10 @@ if __name__ == "__main__":
 #            if i != 'N': key = i
         subProds1 = SubstituteSigDotProds(vars, 'y', 'l')
         subProds1.setState(subProds.cnt)
-        ASTVisitor(subProds1).preorder(verify2.right)
+        ASTVisitor(subProds1).preorder(verify2)
     
         print("<====\tPREP FOR CODE GEN\t====>")
-        print("\nFinal version =>", verify2.right, "\n")
+        print("\nFinal version =>", verify2, "\n")
         for i in subProds.dotprod['list']:
             print("Compute: ", i,":=", subProds.dotprod['dict'][i])    
 #    print("Dot prod =>", subProds1.dotprod)
@@ -355,7 +393,7 @@ if __name__ == "__main__":
         latex_file = metadata['name'].upper()
         writeConfig(lcg, latex_file, lcg_data, constants, vars, sig_vars)
 #        lcg = LatexCodeGenerator(const, vars)
-#        equation = lcg.print_statement(verify2.right)
+#        equation = lcg.print_statement(verify2)
 #        print("Latex Equation: ", equation)
         
         

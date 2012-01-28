@@ -32,4 +32,6 @@ message := N
 public := one
 signature := N
 
-verify := { (e(Y, a) * (e(g, b)^-1)) == (e(X, a) * ((e(X, b)^m) * (e(g, c)^-1))) }
+#verify := { (e(Y, a) * (e(g, b)^-1)) == (e(X, a) * ((e(X, b)^m) * (e(g, c)^-1))) }
+verify := { e(Y, a) == e(g, b) } and { (e(X, a) * (e(X, b)^m)) == e(g, c) }
+
