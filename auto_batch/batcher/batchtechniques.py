@@ -59,6 +59,7 @@ class AbstractTechnique:
         if tree.right: self.getNodes(tree.right, tree.type, _list)
         return
 
+    @classmethod
     def getMulTokens(self, subtree, parent_type, target_type, _list):
         if subtree == None: return None
         elif parent_type == ops.MUL:
@@ -150,13 +151,34 @@ class AbstractTechnique:
         else:
             return BinaryNode(ops.MUL, BinaryNode.copy(left), BinaryNode.copy(right))
     
+    @classmethod    
+    def createInvExp(self, left):
+        inv_node = BinaryNode("-1")
+        new = BinaryNode.copy(left)
+        if Type(new) == ops.EXP:
+            if Type(new.right) == ops.ATTR:
+                new.right.negated = not new.right.negated
+            else: # MUL, ADD, DIV, SUB, etc
+                print("warning: not tested yet in createInvExp():", Type(new), 
+                      self.createMul(new, inv_node))
+                return new
+        elif Type(new) == ops.ON:
+            new.right = self.createInvExp(new.right)
+        else:
+#            print("handle case 2.")
+            return self.createExp(new, inv_node)
+        return new
+        
+        
+    
     # TODO: turn EXP and Pair into classmethods
+    @classmethod
     def createExp(self, left, right):
         if left.type == ops.EXP: # left => a^b , then => a^(b * c)
 #            exp = BinaryNode(ops.EXP)
             if Type(left.right) == ops.ATTR:
                 value = left.right.getAttribute()
-                if value.isdigit() and int(value) <= 1:                    
+                if value.isdigit() and int(value) <= 1:  
 #                    exp.left = left.left
                     left.right.setAttribute(str(right))
                     mul = left.right
@@ -290,6 +312,9 @@ class Technique2(AbstractTechnique):
 #                        print("MUL on right: ", pair_node.right)
                         _subnodes = []
                         getListNodes(pair_node.right, ops.NONE, _subnodes)
+                        print("len: ", len(_subnodes))
+                        for i in _subnodes:
+                            print("found: ", i)
                         if len(_subnodes) > 2:
                             # basically call createExp to distribute the exponent to each
                             # MUL node in pair_node.right
@@ -831,6 +856,6 @@ class ASTIndexForIndiv(AbstractTechnique):
     def visit_attr(self, node, data):
         if data['parent'].type in [ops.PROD, ops.EQ]:
             return
-        if not self.isConstant(node) and str(node) != '1':
+        if not self.isConstant(node) and not str(node) in ['1', '-1']:
             node.setAttrIndex('z') # add index to each attr that isn't constant
     
