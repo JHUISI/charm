@@ -11,8 +11,8 @@ ah := ZR; ac := ZR
 END :: types
 
 BEGIN :: precompute
-ah := H(M_z | S1h_z, ZR)
-ac := H(M_z | S1c_z, ZR)
+ah_z := H(M_z | S1h_z, ZR)
+ac_z := H(M_z | S1c_z, ZR)
 END :: precompute
 
 BEGIN :: constant
