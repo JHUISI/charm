@@ -55,16 +55,3 @@ def run_Batch(verifyArgsDict, groupObjParam, verifyFuncArgs):
 	verifySigsRecursive(verifyArgsDict, group, incorrectIndices, 0, N, delta, dotA)
 
 	return incorrectIndices
-
-'''
-def run_Batch(verifyArgsDict, groupObjParam, verifyFuncArgs, toSort):
-	if (toSort == False):
-		incorrectIndices = run_Batch_Sorted(verifyArgsDict, groupObjParam, verifyFuncArgs)
-		return incorrectIndices
-
-	N = len(verifyArgsDict)
-	sortValues = {}
-	sigNosMap = {}
-	sortedSigEntries = {}
-	for z in range(0, N):
-'''
