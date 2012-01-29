@@ -1,6 +1,8 @@
 doc/build/*
 *.pyc 
 *.swp
+**.pyc
+**__pycache__
 schemes/*.pyc
 toolbox/*.pyc
 .project
