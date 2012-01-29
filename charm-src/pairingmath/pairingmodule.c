@@ -1430,7 +1430,7 @@ static PyObject *Element_long(PyObject *o1) {
 			return obj;
 		}
 	}
-	PyErr_SetString(ElementError, "cannot cast this type.");
+	PyErr_SetString(ElementError, "cannot cast pairing object to an integer.");
 	return NULL;
 }
 
