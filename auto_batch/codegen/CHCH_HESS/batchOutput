@@ -4,37 +4,39 @@ constant  => ['P', 'g2']
 public  => ['pk']
 signature  => ['S1', 'S2']
 message  => ['a']
-latex => {'S2': 'S_2', 'S1': 'S_1', 'g2': 'g_2', 'P': 'P_{pub}'}
+latex => {'S2c': 'S_2', 'ac': 'a', 'g2': 'g_2', 'ah': 'a', 'S2h': 'S_2', 'P': 'P_{pub}', 'S1h': 'S_1', 'S1c': 'S_1'}
+Original eq: {e(S2h,g2) == (e(pk,P)^ah * S1h)} and {e(S2c,g2) == e((S1c * pk^ac),P)}
+Combined eq:  ((e(pk,P)^ah * S1h) * e(S2h,g2)^-1) == (e((S1c * pk^ac),P) * e(S2c,g2)^-1)
 variables => {'S2c': 'G1', 'ac': 'ZR', 'name': 'case2', 'ah': 'ZR', 'S2h': 'G1', 'N': '100', 'S1h': 'GT', 'S1c': 'G1', 'pk': 'G1'}
 metadata => {'name': 'case2', 'N': '100'}
 
-VERIFY EQUATION => verify := ((e(pk,P)^ah * S1h) * (e(S2h,g2)^-1 * (e((S1c * pk^ac),P)^-1 * e(S2c,g2)))) == 1
+VERIFY EQUATION => ((e(pk,P)^ah * S1h) * e(S2h,g2)^-1) == (e((S1c * pk^ac),P) * e(S2c,g2)^-1)
 Mode: multi signer
 
-Stage A: Combined Equation => verify := (prod{z := 0,N} on ((e(pk_z,P)^ah * S1h) * (e(S2h,g2)^-1 * (e((S1c * pk_z^ac),P)^-1 * e(S2c,g2))))) == 1
+Stage A: Combined Equation => (prod{z := 0,N} on ((e(pk_z,P)^ah * S1h) * e(S2h,g2)^-1)) == (prod{z := 0,N} on (e((S1c * pk_z^ac),P) * e(S2c,g2)^-1))
 
-Stage B: Small Exp Test => verify := (prod{z := 0,N} on ((e(pk_z,P)^ah * S1h) * (e(S2h,g2)^-1 * (e((S1c * pk_z^ac),P)^-1 * e(S2c,g2))))^delta_z) == 1 
+Stage B: Small Exp Test => (prod{z := 0,N} on ((e(pk_z,P)^ah * S1h) * e(S2h,g2)^-1)^delta_z) == (prod{z := 0,N} on (e((S1c * pk_z^ac),P) * e(S2c,g2)^-1)^delta_z) 
 
-found batch algorithm => ['2', '5', '3', '2', '6', '6']
+found batch algorithm => ['2', '6', '5', '3', '2', '6']
 Move the exponent(s) into the pairing (technique 2) 
 
-Applying technique 2 : (prod{z := 0,N} on ((e(pk_z^(ah * delta_z),P) * S1h^delta_z) * (e(S2h^-delta_z,g2) * (e((S1c * pk_z^ac)^-delta_z,P) * e(S2c^delta_z,g2))))) == 1 
-
-Distribute dot products (technique 5):  
-
-Simplifying => : ((prod{z := 0,N} on e(pk_z^(ah * delta_z),P)) * ((prod{z := 0,N} on S1h^delta_z) * ((prod{z := 0,N} on e(S2h^-delta_z,g2)) * ((prod{z := 0,N} on e((S1c * pk_z^ac)^-delta_z,P)) * (prod{z := 0,N} on e(S2c^delta_z,g2)))))) == 1 
-
-Move dot products inside pairings to reduce N pairings to 1 (technique 3) 
-
-Applying technique 3 : (e((prod{z := 0,N} on pk_z^(ah * delta_z)),P) * ((prod{z := 0,N} on S1h^delta_z) * (e((prod{z := 0,N} on S2h^-delta_z),g2) * (e((prod{z := 0,N} on (S1c * pk_z^ac)^-delta_z),P) * e((prod{z := 0,N} on S2c^delta_z),g2))))) == 1 
-
-Move the exponent(s) into the pairing (technique 2) 
-
-Applying technique 2 : (e((prod{z := 0,N} on pk_z^(ah * delta_z)),P) * ((prod{z := 0,N} on S1h^delta_z) * (e((prod{z := 0,N} on S2h^-delta_z),g2) * (e((prod{z := 0,N} on (S1c^-delta_z * pk_z^(ac * -delta_z))),P) * e((prod{z := 0,N} on S2c^delta_z),g2))))) == 1 
+Applying technique 2 : (prod{z := 0,N} on ((e(pk_z^(ah * delta_z),P) * S1h^delta_z) * e(S2h^-delta_z,g2))) == (prod{z := 0,N} on (e((S1c * pk_z^ac)^delta_z,P) * e(S2c^-delta_z,g2))) 
 
 Merge pairings with common first or second element (technique 6) 
 
-Combine Pairings: : (e((prod{z := 0,N} on (pk_z^(ah * delta_z) * (S1c^-delta_z * pk_z^(ac * -delta_z)))),P) * ((prod{z := 0,N} on S1h^delta_z) * (e((prod{z := 0,N} on S2h^-delta_z),g2) * e((prod{z := 0,N} on S2c^delta_z),g2)))) == 1 
+Combine Pairings: : (prod{z := 0,N} on ((e((pk_z^(ah * delta_z) * (S1c * pk_z^ac)^-delta_z),P) * S1h^delta_z) * e(S2h^-delta_z,g2))) == (prod{z := 0,N} on e(S2c^-delta_z,g2)) 
+
+Distribute dot products (technique 5):  
+
+Simplifying => : ((prod{z := 0,N} on e((pk_z^(ah * delta_z) * (S1c * pk_z^ac)^-delta_z),P)) * ((prod{z := 0,N} on S1h^delta_z) * (prod{z := 0,N} on e(S2h^-delta_z,g2)))) == (prod{z := 0,N} on e(S2c^-delta_z,g2)) 
+
+Move dot products inside pairings to reduce N pairings to 1 (technique 3) 
+
+Applying technique 3 : (e((prod{z := 0,N} on (pk_z^(ah * delta_z) * (S1c * pk_z^ac)^-delta_z)),P) * ((prod{z := 0,N} on S1h^delta_z) * e((prod{z := 0,N} on S2h^-delta_z),g2))) == e((prod{z := 0,N} on S2c^-delta_z),g2) 
+
+Move the exponent(s) into the pairing (technique 2) 
+
+Applying technique 2 : (e((prod{z := 0,N} on (pk_z^(ah * delta_z) * (S1c^-delta_z * pk_z^(ac * -delta_z)))),P) * ((prod{z := 0,N} on S1h^delta_z) * e((prod{z := 0,N} on S2h^-delta_z),g2))) == e((prod{z := 0,N} on S2c^-delta_z),g2) 
 
 Merge pairings with common first or second element (technique 6) 
 
@@ -48,9 +50,9 @@ Final version => (e(dotA,mpk['P']) * (dotB * e(dotC,mpk['g2']))) == 1
 Compute:  dotA := (prod{z := 0,N} on (pk_z^(ah * delta_z) * (S1c^-delta_z * pk_z^(ac * -delta_z))))
 Compute:  dotB := (prod{z := 0,N} on S1h^delta_z)
 Compute:  dotC := (prod{z := 0,N} on (S2h^-delta_z * S2c^delta_z))
+Precompute: delta := for{z := 1, N} do prng_z
 Precompute: ah_z := H(M_z | S1h_z,ZR)
 Precompute: ac_z := H(M_z | S1c_z,ZR)
-Precompute: delta := for{z := 1, N} do prng_z
 dotA := G1
 dotB := GT
 dotC := G1

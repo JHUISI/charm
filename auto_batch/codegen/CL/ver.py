@@ -32,7 +32,7 @@ def verifySigsRecursive(verifyArgsDict, groupObj, incorrectIndices, startSigNum,
 		dotB_loopVal = dotB_loopVal * dotB[index]
 		dotC_loopVal = dotC_loopVal * dotC[index]
 
-	if ( ( pair( verifyArgsDict[z]['pk'][bodyKey] [ 'Y' ] , dotA_loopVal ) * pair( verifyArgsDict[z]['pk'][bodyKey] [ 'g' ] , dotB_loopVal ) )== pair( verifyArgsDict[z]['pk'][bodyKey] [ 'X' ] , dotC_loopVal )   ):
+	if ( ( pair( verifyArgsDict[z]['pk'][bodyKey] [ 'g' ] , dotA_loopVal ) * pair( verifyArgsDict[z]['pk'][bodyKey] [ 'Y' ] , dotB_loopVal ) )== pair( verifyArgsDict[z]['pk'][bodyKey] [ 'X' ] , dotC_loopVal )   ):
 		return
 	else:
 		midWay = int( (endSigNum - startSigNum) / 2)

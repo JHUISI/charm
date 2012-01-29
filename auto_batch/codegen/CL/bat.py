@@ -52,8 +52,8 @@ def run_Batch(verifyArgsDict, groupObjParam, verifyFuncArgs):
 		( a , b , c )= verifyArgsDict[z]['sig'][bodyKey][ 'a' ] , verifyArgsDict[z]['sig'][bodyKey][ 'a_y' ] , verifyArgsDict[z]['sig'][bodyKey][ 'a_xy' ]
 		m= group.hash( verifyArgsDict[z]['M'][bodyKey] , ZR )
 
-		dotA[z] =   a ** delta [ z ]  
-		dotB[z] =  ( b ** -delta [ z ] * c ** -delta [ z ] )  
+		dotA[z] =  ( b ** delta [ z ] * c ** delta [ z ] )  
+		dotB[z] =   a ** -delta [ z ]  
 		dotC[z] =  ( a ** delta [ z ] * b **( m * delta [ z ] ) )  
 
 	verifySigsRecursive(verifyArgsDict, group, incorrectIndices, 0, N, delta, dotA, dotB, dotC)

@@ -51,24 +51,13 @@ def main():
 
     _id = "janedoe@email.com"
     (pk, sk) = chch.keygen(msk, _id)
-    print("pk = ", pk)
-    if debug:  
-        print("Keygen...")
-        print("pk =>", pk)
-        print("sk =>", sk)
  
     M = "this is a message! twice!" 
     sig1 = hess.sign(mpk, sk, M)
     sig2 = chch.sign(pk, sk, M)
     sig = { 'sig_hess':sig1, 'sig_chch':sig2 }
-    if debug:
-        print("Signature...")
-        print("sig1 =>", sig1)
-        print("sig2 =>", sig2)
    
     result = combo.verify(mpk, pk, M, sig)
-    #print(result)
-    if debug: print("Verification successful!")
 
     '''
     numValidMessages = int(sys.argv[1])
@@ -79,17 +68,14 @@ def main():
     invalidOutputDictName = sys.argv[6]
 
     f_mpk = open('mpk.charmPickle', 'wb')
-    pick_mpk = pickleObject(serialize(mpk, groupObj))
+    pick_mpk = objectToBytes(mpk, groupObj)
     f_mpk.write(pick_mpk)
     f_mpk.close()
 
-
     f_pk = open('pk.charmPickle', 'wb')
-    pick_pk = pickleObject(serialize(pk, groupObj))
-    print("pick pk = ", pick_pk)
+    pick_pk = objectToBytes(pk, groupObj)
     f_pk.write(pick_pk)
     f_pk.close()
-
 
     validOutputDict = {}
     validOutputDict[0] = {}
@@ -125,7 +111,7 @@ def main():
         pickle.dump(message, f_message)
         f_message.close()
 
-        pick_sig = pickleObject(serialize(sig, groupObj))
+        pick_sig = objectToBytes(sig, groupObj)
 
         f_sig.write(pick_sig)
         f_sig.close()
@@ -136,7 +122,7 @@ def main():
         del f_sig
         del pick_sig
 
-    dict_pickle = pickleObject(serialize(validOutputDict, groupObj))
+    dict_pickle = objectToBytes(validOutputDict, groupObj)
     f = open(validOutputDictName, 'wb')
     f.write(dict_pickle)
     f.close()
@@ -179,7 +165,7 @@ def main():
         pickle.dump(message, f_message)
         f_message.close()
 
-        pick_sig = pickleObject(serialize(sig, groupObj))
+        pick_sig = objectToBytes(sig, groupObj)
 
         f_sig.write(pick_sig)
         f_sig.close()
@@ -190,14 +176,12 @@ def main():
         del f_sig
         del pick_sig
 
-    dict_pickle = pickleObject(serialize(invalidOutputDict, groupObj))
+    dict_pickle = objectToBytes(invalidOutputDict, groupObj)
     f = open(invalidOutputDictName, 'wb')
     f.write(dict_pickle)
     f.close()
     del dict_pickle
     del f
-
-    print("finished")
     '''
 
 if __name__ == "__main__":
