@@ -162,6 +162,7 @@ def writeConfig(lcg, latex_file, lcg_data, const, vars, sigs):
  
  
 def runBatcher(file, verify, ast_struct):
+    global global_count
     constants, types = ast_struct[ CONST ], ast_struct[ TYPE ]
     latex_subs = ast_struct[ LATEX ]
     if ast_struct.get(PRECOMP):
