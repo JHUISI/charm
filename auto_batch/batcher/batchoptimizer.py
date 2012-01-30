@@ -465,10 +465,10 @@ class PruneTree:
             batchparser.addAsChildNodeToParent(data, node.right)            
 
 class SubstituteSigDotProds:
-    def __init__(self, vars, index='z', sig='N' ):
+    def __init__(self, vars, index='z', sig='N', cnt=0 ):
         self.prefix = 'dot' # self.prefix + self.alpha[cnt]; cnt += 1
         self.alpha = string.ascii_uppercase
-        self.cnt = 0        
+        self.cnt = cnt        
         self.sig = sig 
         self.index = index 
         self.vars_def = vars

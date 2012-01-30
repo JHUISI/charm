@@ -21,7 +21,7 @@ except:
 debug = False
 THRESHOLD_FLAG = CODEGEN_FLAG = PROOFGEN_FLAG = PRECOMP_CHECK = VERBOSE = CHOOSE_STRATEGY = False
 TEST_STATEMENT = False
-
+global_count   = 0
 
 
 def handleVerifyEq(equation):
@@ -329,15 +329,18 @@ def runBatcher(file, verify, ast_struct):
     # TODO: check avg for when batch is more efficient than 
     if CODEGEN_FLAG:
         print("Final batch eq:", verify2)
-        subProds = SubstituteSigDotProds(vars, 'z', 'N')
+        subProds = SubstituteSigDotProds(vars, 'z', 'N', global_count)
         ASTVisitor(subProds).preorder(verify2)
+        # update variable counter
+        global_count = subProds.cnt
         # print("Dot prod =>", subProds.dotprod)
         # need to check for presence of other variables
 #        key = None
 #        for i in metadata.keys():
 #            if i != 'N': key = i
-        subProds1 = SubstituteSigDotProds(vars, 'y', 'l')
-        subProds1.setState(subProds.cnt)
+        subProds1 = SubstituteSigDotProds(vars, 'y', 'l', global_count)
+        global_count = subProds1.cnt
+#        subProds1.setState(subProds.cnt)
         ASTVisitor(subProds1).preorder(verify2)
     
         print("<====\tPREP FOR CODE GEN\t====>")
