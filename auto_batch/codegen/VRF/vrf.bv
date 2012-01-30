@@ -4,9 +4,9 @@ n := 8
 
 BEGIN :: types
  pi#0 := G1; pi#1 := G1; pi#n := G1; pi#t := G1; pi#t-1 := G1 
- U1 := G1; g1 := G1; x#i := ZR
- g2 := G2; Ut := G2; U0 := G2
- y := GT; h := G2; U#t := G2
+ U1#0 := G1; g1 := G1; x#1 := ZR; x#t := ZR
+ g2 := G2; Ut := G2; U2#0 := G2
+ y := GT; h := G2; U2#t := G2
 END :: types
 
 BEGIN :: constant
@@ -14,11 +14,11 @@ BEGIN :: constant
 END :: constant
 
 BEGIN :: message
- x#i
+ x#1, x#t
 END :: message
 
 BEGIN :: public
- U0, U1, Ut, U#t
+ U1#0, U2#0, U2#t, Ut
 END :: public
 
 BEGIN :: signature
@@ -30,6 +30,6 @@ message := N
 public := one
 signature := N
 
-verify1 := { e(pi#1, g2) == e((g1^(1 + -x#i)) * (U1^x#i), Ut) } and {{ e(pi#0, g2) == e(pi#n, U0) } and { e(pi#0, h) == y }}
-verify2 := { for{t:=1, n} do { e(pi#t, g2) == (e((pi#t-1^(1 + -x#i)), g2) * e(pi#t-1^x#i, U#t)) } }
+verify1 := { e(pi#1, g2) == e((g1^(1 + -x#1)) * (U1#0^x#1), Ut) } and {{ e(pi#0, g2) == e(pi#n, U2#0) } and { e(pi#0, h) == y }}
+verify2 := { for{t:=1, n} do { e(pi#t, g2) == (e((pi#t-1^(1 + -x#t)), g2) * e(pi#t-1^x#t, U2#t)) } }
 

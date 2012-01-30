@@ -454,10 +454,11 @@ def getStringNameListAsStringsNoDups(stringNameList):
 		if ( (entryAsString == None) or (type(entryAsString).__name__ != con.strTypePython) or (len(entryAsString) == 0) ):
 			sys.exit("Parser_CodeGen_Toolbox->getStringNameListAsStringsNoDups:  problem with string representation of one of the string name objects in the list parameter passed in.")
 
-		if entryAsString in retList:
-			sys.exit("Parser_CodeGen_Toolbox->getStringNameListAsStringsNoDups:  duplicate string found in the list parameter passed in.")
+		if entryAsString not in retList:
+			#sys.exit("Parser_CodeGen_Toolbox->getStringNameListAsStringsNoDups:  duplicate string found in the list parameter passed in.")
+			retList.append(entryAsString)
 
-		retList.append(entryAsString)
+
 
 	if (len(retList) == 0):
 		sys.exit("Parser_CodeGen_Toolbox->getStringNameListAsStringsNoDups:  could not extract any of the strings from the list parameter passed in.")

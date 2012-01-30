@@ -9,8 +9,8 @@ from Loop_Block_Toolbox import *
 from OperationValue import OperationValue
 from LoopBlock import LoopBlock
 
-batchEqLoopVars = []
-batchEqNotLoopVars = []
+batchEqLoopVars = {}
+batchEqNotLoopVars = {}
 batchEqVars = {}
 batchVerFile = None
 batchVerifierOutput = None
@@ -465,12 +465,26 @@ def getBatchEqVars_Ind(finalBatchEq_Ind, codeGenSegNo):
 def distillBatchEqVars():
 	global batchEqLoopVars, batchEqNotLoopVars
 
-	for varName in batchEqVars:
+	batchEqLoopVars = {}
+	batchEqNotLoopVars = {}
+
+	numPasses = len(batchEqVars)
+
+	for index in range(0, numPasses):
+		distillBatchEqVars_Ind(batchEqVars[index], index)
+
+def distillBatchEqVars_Ind(batchEqVars_Ind, codeGenSegNo):
+	global batchEqLoopVars, batchEqNotLoopVars
+
+	batchEqLoopVars[codeGenSegNo] = []
+	batchEqNotLoopVars[codeGenSegNo] = []
+
+	for varName in batchEqVars_Ind:
 		isThisALoopVar = varName.getStringVarName().find(con.loopIndicator)
 		if (isThisALoopVar == -1):
-			batchEqNotLoopVars.append(copy.deepcopy(varName))
+			batchEqNotLoopVars[codeGenSegNo].append(copy.deepcopy(varName))
 		else:
-			batchEqLoopVars.append(copy.deepcopy(varName))
+			batchEqLoopVars[codeGenSegNo].append(copy.deepcopy(varName))
 
 '''
 def distillBatchEqVars(batchEqVars, batchEqNotSumOrDotVars):
@@ -2513,9 +2527,19 @@ def addFunctionsThatVerifyCalls():
 def getLoopNamesOfFinalBatchEq():
 	global loopNamesOfFinalBatchEq
 
-	loopNamesOfFinalBatchEq = []
+	loopNamesOfFinalBatchEq = {}
 
-	batchEqWithLoopsCopy = finalBatchEqWithLoops.replace(con.finalBatchEqWithLoopsString, '', 1)
+	numPasses = len(finalBatchEqWithLoops)
+
+	for index in range(0, numPasses):
+		getLoopNamesOfFinalBatchEq_Ind(finalBatchEqWithLoops[index], index)
+
+def getLoopNamesOfFinalBatchEq_Ind(finalBatchEqWithLoops_Ind, codeGenSegNo):
+	global loopNamesOfFinalBatchEq
+
+	loopNamesOfFinalBatchEq[codeGenSegNo] = []
+
+	batchEqWithLoopsCopy = finalBatchEqWithLoops_Ind.replace(con.finalBatchEqWithLoopsString, '', 1)
 
 	tempList = getVarNamesAsStringNamesFromLine(batchEqWithLoopsCopy)
 
@@ -2524,7 +2548,7 @@ def getLoopNamesOfFinalBatchEq():
 		isValidLoopName = isStringALoopName(nameAsString)
 		if (isValidLoopName == False):
 			continue
-		loopNamesOfFinalBatchEq.append(copy.deepcopy(possibleLoopName))
+		loopNamesOfFinalBatchEq[codeGenSegNo].append(copy.deepcopy(possibleLoopName))
 
 	del tempList
 

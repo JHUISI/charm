@@ -1,11 +1,11 @@
-Final batch eq: (e((prod{z := 0,N} on (g1^((1 + -x#i_z) * delta_z) * U1^(x#i_z * delta_z))),pk#2) * e((prod{z := 1,N} on pi#1_z^-delta_z),pk#4)) == 1
+Final batch eq: (e((prod{z := 0,N} on (pk#3^((1 + -x#1_z) * delta_z) * pk#0#0^(x#1_z * delta_z))),pk#2) * e((prod{z := 0,N} on pi#1_z^-delta_z),pk#4)) == 1
 <====	PREP FOR CODE GEN	====>
 
 Final version => (e(dotA,pk#2) * e(dotB,pk#4)) == 1 
 
-Compute:  dotA := (prod{z := 0,N} on (pk#3^((1 + -x#i_z) * delta_z) * U1^(x#i_z * delta_z)))
+Compute:  dotA := (prod{z := 0,N} on (pk#3^((1 + -x#1_z) * delta_z) * pk#0#0^(x#1_z * delta_z)))
 Compute:  dotB := (prod{z := 0,N} on pi#1_z^-delta_z)
-Precompute: delta := for{z := 0,N} do prng_z
+Precompute: delta := for{z := 0, N} do prng_z
 dotA := G1
 dotB := G1
 
@@ -13,15 +13,17 @@ dotB := G1
 
 
 
-Final batch eq: (e((prod{z := 0,N} on pi#n_z^delta_z),U0) * e((prod{z := 1,N} on pi#0_z^-delta_z),(pk#4 * pk#5^-1))) == (prod{z := 1,N} on y_z^delta_z)
+
+
+Final batch eq: (e((prod{z := 0,N} on pi#n_z^delta_z),pk#1#0) * e((prod{z := 0,N} on pi#0_z^-delta_z),(pk#4 * pk#5^-1))) == (prod{z := 0,N} on y_z^delta_z)
 <====	PREP FOR CODE GEN	====>
 
-Final version => (e(dotC,pk#0) * e(dotD,(pk#4 * pk#5^-1))) == dotE 
+Final version => (e(dotC,pk#1#0) * e(dotD,(pk#4 * pk#5^-1))) == dotE 
 
 Compute:  dotC := (prod{z := 0,N} on pi#n_z^delta_z)
 Compute:  dotD := (prod{z := 0,N} on pi#0_z^-delta_z)
 Compute:  dotE := (prod{z := 0,N} on y_z^delta_z)
-Precompute: delta := for{z := 0,N} do prng_z
+Precompute: delta := for{z := 0, N} do prng_z
 dotC := G1
 dotD := G1
 dotE := GT
@@ -30,13 +32,15 @@ dotE := GT
 
 
 
-Final batch eq: for{t := 0,n} do e((prod{z := 1,N} on (pi#t_z^delta_z * pi#t-1_z^((1 + -x#i_z) * -delta_z))),pk#4) == e((prod{z := 1,N} on pi#t-1_z^(x#i_z * delta_z)),pk#2#t)
+
+
+Final batch eq: for{t := 0,n} do e((prod{z := 0,N} on (pi#t_z^delta_z * pi#t-1_z^((1 + -x#t_z) * -delta_z))),pk#4) == e((prod{z := 0,N} on pi#t-1_z^(x#t_z * delta_z)),pk#1#t)
 <====	PREP FOR CODE GEN	====>
 
-Final version => for{t := 0,n} do e(dotF,pk#4) == e(dotG,pk#2#t) 
+Final version => for{t := 0,n} do e(dotF,pk#4) == e(dotG,pk#1#t) 
 
-Compute:  dotF := (prod{z := 0,N} on (pi#t_z^delta_z * pi#t-1_z^((1 + -x#i_z) * -delta_z)))
-Compute:  dotG := (prod{z := 0,N} on pi#t-1_z^(x#i_z * delta_z))
-Precompute: delta := for{z := 0,N} do prng_z
+Compute:  dotF := (prod{z := 0,N} on (pi#t_z^delta_z * pi#t-1_z^((1 + -x#t_z) * -delta_z)))
+Compute:  dotG := (prod{z := 0,N} on pi#t-1_z^(x#t_z * delta_z))
+Precompute: delta := for{z := 0, N} do prng_z
 dotF := G1
 dotG := G1
