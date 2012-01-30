@@ -39,11 +39,11 @@ message := N
 public := N
 signature := N
 
-BEGIN :: transform
-2, 5, 3, 4, 6, 3
-END :: transform
+#BEGIN :: transform
+#2, 3, 5, 4, 6, 3
+#END :: transform
 
-verify := { (e(S1, g2) * e(S2, u1b * (prod{y:=0, l} on ub_y^k_y)) * e(S3, u2b * (prod{y:=0,l} on ub_y^m_y))) == A }
+verify := { (e(S1, g2) * e(S2, u1b * (prod{y:=1, l} on ub_y^k_y)) * e(S3, u2b * (prod{y:=1,l} on ub_y^m_y))) == A }
 
 BEGIN :: latex
 S1 := S_1

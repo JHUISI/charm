@@ -406,7 +406,10 @@ class SubstitutePairs2:
                     self.pruneCheck = True                
             elif str(node.left) == str(self.left):
 #                print("Found a match, general left case: ", self.left, self.right)
-                print("warning: this code has not been fully tested yet.", self.left, self.right)
+#                if Type(data['parent']) != ops.ON:
+                    # potentially prevent infinite loop of reverse split tech 3 and combine pairing of tech 6
+#                    return
+                print("warning: this code has not been fully tested yet.", self.left, node.left, self.right)
                 target = self.right
                 for i in self.extra:
                     target = self.combine(target, BinaryNode.copy(self.checkForInverse(i)))

@@ -405,4 +405,3 @@ if __name__ == "__main__":
     for v in verify_eq:    
         print("\nRunning batcher....\n")
         runBatcher(file, v, ast_struct)
-        exit(0)

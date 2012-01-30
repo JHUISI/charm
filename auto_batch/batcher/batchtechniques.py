@@ -79,10 +79,12 @@ class AbstractTechnique:
         #print("node_type = ", node_type)
         if node == None: return None
         elif node_type == ops.EXP:
-            #print("node.right type =>", Type(node.right))
+            # look for a^b_z or a^(b_z * s) where if z appears in right then return
+            # the EXP right node as a acceptable candidate
+            # debug: print("node.right type =>", Type(node.right))
             if Type(node.right) == ops.MUL:
                 return self.findExpWithIndex(node.right, index)                
-            elif node.right.isAttrIndexEmpty() and index in node.right.attr_index:
+            elif not node.right.isAttrIndexEmpty() and index in node.right.attr_index:
                 #print("node =>", node)            
                 return node.right
         elif node_type == ops.MUL:
@@ -741,7 +743,7 @@ class Technique4(AbstractTechnique):
                 else:
                     self.applied = True                    
                     self.score   = tech4.ConstantPairing
-                    self.adjustProdNodes( node2_grand )
+#                    self.adjustProdNodes( node2_grand )
                     if self.debug: 
                         print("No other transformation necessary since not a PAIR node instead:", Type(node2_parent))
         else:
