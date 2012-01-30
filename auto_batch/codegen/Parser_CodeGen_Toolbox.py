@@ -7,6 +7,30 @@ from StringValue import StringValue
 from LineNumbers import LineNumbers
 from VariableDependencies import VariableDependencies
 
+def getSectionRanges(lines, sectionHeader):
+	lineNo = 0
+	startLineNo = -1
+	endLineNo = -1
+	ranges = []
+
+	for line in lines:
+		lineNo += 1
+		line = line.lstrip().rstrip()
+		if (line.startswith(sectionHeader) == True):
+			if (startLineNo != -1):
+				endLineNo = lineNo - 1
+				ranges.append((startLineNo, endLineNo))
+
+			startLineNo = lineNo
+
+	if (startLineNo > endLineNo):
+		ranges.append((startLineNo, lineNo))
+
+	if (len(ranges) == 0):
+		return None
+
+	return ranges
+
 def combineListsNoDups(listToAddTo, listToTakeFrom):
 
 	for entry in listToTakeFrom:

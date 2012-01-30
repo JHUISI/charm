@@ -11,7 +11,7 @@ from LoopBlock import LoopBlock
 
 batchEqLoopVars = []
 batchEqNotLoopVars = []
-batchEqVars = None
+batchEqVars = {}
 batchVerFile = None
 batchVerifierOutput = None
 cachedCalcsToPassToDC = []
@@ -19,8 +19,10 @@ callListOfVerifyFuncs = None
 
 checkBlocks = None
 
-finalBatchEq = None
-finalBatchEqWithLoops = None
+codeGenRanges = None
+
+finalBatchEq = []
+finalBatchEqWithLoops = []
 functionArgMappings = None
 functionArgNames = None
 functionNames = None
@@ -383,10 +385,15 @@ def removeSelfDump(line):
 
 def cleanFinalBatchEq():
 	global finalBatchEq
-	
-	finalBatchEq = finalBatchEq.replace(con.finalBatchEqString, '', 1)
-	finalBatchEq = finalBatchEq.lstrip()	
-	finalBatchEq = ensureSpacesBtwnTokens_CodeGen(finalBatchEq)
+
+	numEqs = len(codeGenRanges)
+
+	for index in range(0, numEqs):
+		tempEq = finalBatchEq[index]
+		tempEq = tempEq.replace(con.finalBatchEqString, '', 1)
+		tempEq = tempEq.lstrip()
+		tempEq = ensureSpacesBtwnTokens_CodeGen(tempEq)
+		finalBatchEq[index] = tempEq
 
 '''
 def addDeltasAndArgSigIndexMap(batchOutputString, declaredLists):
@@ -416,7 +423,19 @@ def addIfElse(batchOutputString, finalBatchEq):
 def getBatchEqVars():
 	global batchEqVars
 
-	batchEqVarsTemp = finalBatchEq.split()
+	numPasses = len(finalBatchEq)
+
+	batchEqVars = {}
+
+	for passNo in range(0, numPasses):
+		getBatchEqVars_Ind(finalBatchEq[passNo], passNo)
+
+def getBatchEqVars_Ind(finalBatchEq_Ind, codeGenSegNo):
+	global batchEqVars
+
+	batchEqVars[codeGenSegNo] = []
+
+	batchEqVarsTemp = finalBatchEq_Ind.split()
 
 	for removeString in con.batchEqRemoveStrings:
 		while (batchEqVarsTemp.count(removeString) > 0):
@@ -435,12 +454,12 @@ def getBatchEqVars():
 	for varToRemove in deltaVarsToRemove:
 		batchEqVarsTemp.remove(varToRemove)
 
-	batchEqVars = []
+	#batchEqVars = []
 
 	for batchEqVarName in batchEqVarsTemp:
 		batchEqVarStringName = StringName()
 		batchEqVarStringName.setName(batchEqVarName)
-		batchEqVars.append(copy.deepcopy(batchEqVarStringName))
+		batchEqVars[codeGenSegNo].append(copy.deepcopy(batchEqVarStringName))
 		del batchEqVarStringName
 
 def distillBatchEqVars():
@@ -725,7 +744,7 @@ def checkForPrecomputeValues(exp):
 	return exp
 '''
 
-def processComputeLine(line):
+def processComputeLine(line, passNo):
 	global loopInfo
 
 	if ( (line == None) or (type(line).__name__ != con.strTypePython) or (len(line) == 0) or (line.startswith(con.computeString) == False) ):
@@ -821,6 +840,7 @@ def processComputeLine(line):
 	nextLoopInfoObj.setVarListWithSubscripts(varListWithSubscripts)
 	nextLoopInfoObj.setVarListNoSubscripts(varListNoSubscripts)
 	nextLoopInfoObj.setLoopOrder(loopOrder)
+	nextLoopInfoObj.setCodeGenSegmentNo(passNo)
 
 	loopInfo.append(copy.deepcopy(nextLoopInfoObj))
 
@@ -1785,16 +1805,20 @@ def processListLine(line):
 	line = line.lstrip().rstrip()
 	lineSplit = line.split(con.listInString)
 	varName = lineSplit[0].lstrip().rstrip()
-	if (varName in listVars):
-		sys.exit("AutoBatch_CodeGen->processListLine:  variable currently being processed (" + varName + ") is already included in the listVars data structure (duplicate).")
+	#if (varName in listVars):
+		#sys.exit("AutoBatch_CodeGen->processListLine:  variable currently being processed (" + varName + ") is already included in the listVars data structure (duplicate).")
 
 	loopTypes = lineSplit[1].lstrip().rstrip()
+
 	#if (loopType not in con.loopTypes):
 		#sys.exit("AutoBatch_CodeGen->processListLine:  one of the loop types extracted is not one of the supported loop types.")
 
+	if ( (varName in listVars) and (listVars[varName] != loopTypes) ):
+		sys.exit("CodeGen->processlistline:  duplicate varname, but mismatching loop type.")
+
 	listVars[varName] = loopTypes
 
-def processPrecomputeLine(line):
+def processPrecomputeLine(line, passNo):
 	global precomputeVars
 
 	if ( (line == None) or (type(line).__name__ != con.strTypePython) or (line.startswith(con.precomputeString) == False) ):
@@ -1821,6 +1845,9 @@ def processPrecomputeLine(line):
 	nextPrecomputeVarObj = PrecomputeVariable()
 	nextPrecomputeVarObj.setVarName(varNameStringName)
 	nextPrecomputeVarObj.setExpression(expression)
+
+	nextPrecomputeVarObj.setCodeGenSegmentNo(passNo)
+
 	precomputeVars.append(copy.deepcopy(nextPrecomputeVarObj))
 
 def processSortLine(line):
@@ -1833,11 +1860,15 @@ def processSortLine(line):
 
 	withExpandedSubscript = processTokenWithSubscriptIndicator(line)
 	finalVersion = writeLinesToOutputString([withExpandedSubscript], None, 0, 0)
+	finalVersion = finalVersion.lstrip().rstrip()
 
-	sortVars.append(finalVersion.lstrip().rstrip())
+	if (finalVersion in sortVars):
+		sys.exit("CodeGen->processSortLine:  found duplicate sort vars entry.")
+
+	sortVars.append(finalVersion)
 
 
-def processLoopLine(line):
+def processLoopLine(line, passNo):
 	global loopVarGroupTypes
 
 	if ( (line == None) or (type(line).__name__ != con.strTypePython) ):
@@ -3053,6 +3084,44 @@ def writeCallToSortFunction():
 
 	batchVerFile.write(outputString)
 
+def processBatcherOutput():
+	#global finalBatchEq, finalBatchEqWithLoops
+
+	numPasses = len(codeGenRanges)
+	for passNo in range(0, numPasses):
+		startLineNo = codeGenRanges[passNo][0]
+		endLineNo = codeGenRanges[passNo][1]
+		processOneLineBatcherOutput(startLineNo, endLineNo, passNo)
+
+def processOneLineBatcherOutput(startLineNo, endLineNo, passNo):
+	global finalBatchEq, finalBatchEqWithLoops
+
+	for lineNo in range(startLineNo, (endLineNo + 1)):
+		line = batchVerifierOutput[lineNo - 1]
+		#print(line)
+
+		if (line.startswith(con.finalBatchEqString) == True):
+			finalBatchEq.append(line)
+
+		if (line.startswith(con.finalBatchEqWithLoopsString) == True):
+			finalBatchEqWithLoops.append(line)
+
+		if (line.startswith(con.listString) == True):
+			processListLine(line)
+
+		if (line.startswith(con.precomputeString) == True):
+			processPrecomputeLine(line, passNo)
+
+		if (line.startswith(con.computeString) == True):
+			processComputeLine(line, passNo)
+
+		if (line.startswith(con.sortString) == True):
+			processSortLine(line)
+
+		linePrefix = line[0:con.maxStrLengthForLoopNames]
+		if (isStringALoopName(linePrefix) == True):
+			processLoopLine(line, passNo)
+
 
 def main():
 	if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
@@ -3079,7 +3148,7 @@ def main():
 	global numTabsOnVerifyLine, batchVerifierOutput, finalBatchEq, finalBatchEqWithLoops, listVars, numSpacesPerTab, lineInfo
 	global loopBlocksForCachedCalculations, loopBlocksForNonCachedCalculations, lineNosPerVar
 	global lineNoOfFirstFunction, globalVars, var_varDependencies, functionArgNames, functionNames
-	global verifySigsFileName, checkBlocks
+	global verifySigsFileName, checkBlocks, codeGenRanges
 
 	try:
 		pythonCodeLines = open(pythonCodeArg, 'r').readlines()
@@ -3235,30 +3304,14 @@ def main():
 	addGroupMembershipChecks()
 	writeBodyOfInd()
 
-	for line in batchVerifierOutput:
-		if (line.startswith(con.finalBatchEqString) == True):
-			if (finalBatchEq != None):
-				sys.exit("AutoBatch_CodeGen->main:  more than one line starting with final batch equation string (" + con.finalBatchEqString + ") was found in the output from the batch verifier.")
-			finalBatchEq = line
-		if (line.startswith(con.finalBatchEqWithLoopsString) == True):
-			if (finalBatchEqWithLoops != None):
-				sys.exit("AutoBatch_CodeGen->main:  more than one line starting with final batch equation with loops string (" + con.finalBatchEqWithLoopsString + ") was found in the output from the batch verifier.")
-			finalBatchEqWithLoops = line
-		if (line.startswith(con.listString) == True):
-			processListLine(line)
-		if (line.startswith(con.precomputeString) == True):
-			processPrecomputeLine(line)
-		if (line.startswith(con.computeString) == True):
-			processComputeLine(line)
+	codeGenRanges = getSectionRanges(copy.deepcopy(batchVerifierOutput), con.finalBatchEqString)
+	#print(codeGenRanges)
 
-		if (line.startswith(con.sortString) == True):
-			processSortLine(line)
+	processBatcherOutput()
 
-		linePrefix = line[0:con.maxStrLengthForLoopNames]
-		if (isStringALoopName(linePrefix) == True):
-			processLoopLine(line)
 
-	if ( (finalBatchEq == None) or (finalBatchEqWithLoops == None) ):
+
+	if ( (len(finalBatchEq) == 0) or (len(finalBatchEqWithLoops) == 0) ):
 		sys.exit("AutoBatch_CodeGen->main:  problem locating the various forms of the final batch equation from the output of the batch verifier.")
 
 	if (con.deltaDictName not in listVars):
