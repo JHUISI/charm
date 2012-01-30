@@ -555,7 +555,7 @@ class Technique3(AbstractTechnique):
                 #addAsChildNodeToParent(data, pair_node) # move pair one level up  
                 left_check = not self.isConstInSubtreeT(pair_node.left)
                 right_check = not self.isConstInSubtreeT(pair_node.right)
-                if self.debug: print("left check:", left_check, ", right check:", right_check)
+                if self.debug: print("left check:", left_check, ", right check:", right_check, ": ", pair_node)
                 if left_check == right_check and left_check: 
                     # thus far, we've determined that both side are candidates for dot product.
                     # so we need another indicator to determine which side.
@@ -563,6 +563,7 @@ class Technique3(AbstractTechnique):
 #                    print("index of interest: ", target)
                     loop_left_check = self.isLoopOverTarget(pair_node.left, target)
                     loop_right_check = self.isLoopOverTarget(pair_node.right, target)
+                    if self.debug: print("loop on left: ", loop_left_check, ", loop on right: ", loop_right_check)
                     if loop_left_check: # move dot prod to left side
                         #print("move dot prod to left: ", pair_node.left)
                         addAsChildNodeToParent(data, pair_node) # move pair one level up  
@@ -690,9 +691,9 @@ class Technique3(AbstractTechnique):
     def isLoopOverTarget(self, tree, target):
         if tree == None: return None
         elif Type(tree) in [ops.EXP, ops.HASH]:
-            if target in tree.left.attr_index: return True
+            if not tree.left.isAttrIndexEmpty() and target in tree.left.attr_index: return True
         elif Type(tree) == ops.ATTR:
-            if target in tree.attr_index: return True
+            if not tree.isAttrIndexEmpty() and target in tree.attr_index: return True
         else:
             result = self.isLoopOverTarget(tree.left, target)
             if result: return result 
