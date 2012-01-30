@@ -390,7 +390,6 @@ if __name__ == "__main__":
     if TEST_STATEMENT:
         debug = levels.all
         statement = sys.argv[2]
-        #print("Original statement: ", statement)
         parser = BatchParser()
         final = parser.parse(statement)
         print("Final statement(%s): '%s'" % (type(final), final))

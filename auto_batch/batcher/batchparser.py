@@ -721,10 +721,15 @@ class SmallExponent:
         
         if node.right.type == ops.EXP:
             exp = node.right
-            mul = BinaryNode(ops.MUL)
-            mul.right = BinaryNode("delta_z")
-            mul.left = exp.right
-            exp.right = mul
+            if exp.right.getAttribute() in ["1", "-1"]:
+                neg_status = exp.right.negated
+                exp.right = BinaryNode("delta_z")
+                exp.right.negated = neg_status
+            else:
+                mul = BinaryNode(ops.MUL)
+                mul.right = BinaryNode("delta_z")
+                mul.left = exp.right
+                exp.right = mul
         else:
             new_node = self.newExpNode()
             new_node.left = node.right

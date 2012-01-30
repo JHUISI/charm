@@ -9,7 +9,7 @@ BEGIN :: types
 END :: types
 
 BEGIN :: constant
- g1, g2
+ g1, g2, h
 END :: constant
 
 BEGIN :: message

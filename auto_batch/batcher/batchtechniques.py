@@ -421,7 +421,7 @@ class Technique3(AbstractTechnique):
 
     # once a     
     def visit_pair(self, node, data):
-        #print("Current state: ", node)
+#        if self.debug: print("Current state: ", node)
         left = node.left
         right = node.right
         if Type(left) == ops.ON:
@@ -534,7 +534,7 @@ class Technique3(AbstractTechnique):
                 #addAsChildNodeToParent(data, pair_node) # move pair one level up  
                 left_check = not self.isConstInSubtreeT(pair_node.left)
                 right_check = not self.isConstInSubtreeT(pair_node.right)
-#                print("left check:", left_check, ", right check:", right_check)
+                if self.debug: print("left check:", left_check, ", right check:", right_check)
                 if left_check == right_check and left_check: 
                     # thus far, we've determined that both side are candidates for dot product.
                     # so we need another indicator to determine which side.
@@ -543,7 +543,7 @@ class Technique3(AbstractTechnique):
                     loop_left_check = self.isLoopOverTarget(pair_node.left, target)
                     loop_right_check = self.isLoopOverTarget(pair_node.right, target)
                     if loop_left_check: # move dot prod to left side
-#                        print("move dot prod to left: ", pair_node.left)
+                        print("move dot prod to left: ", pair_node.left)
                         addAsChildNodeToParent(data, pair_node) # move pair one level up  
                         node.right      = pair_node.left # set dot prod right to pair_node left
                         pair_node.left  = node # pair node moves up and set pair left to dot prod
@@ -551,7 +551,7 @@ class Technique3(AbstractTechnique):
                         self.applied    = True
                         self.score      = tech3.CombinePairing
                     elif loop_right_check:
-#                        print("move dot prod to right: ", pair_node.right)                        
+                        print("move dot prod to right: ", pair_node.right)                        
                         addAsChildNodeToParent(data, pair_node) # move pair one level up                          
                         node.right      = pair_node.right
                         pair_node.right = node
@@ -580,7 +580,7 @@ class Technique3(AbstractTechnique):
                     self.score   = tech3.CombinePairing
 #                    print("T3: after _pair right: combinepair: ", node,"\n")                                                          
                 else:
-                    pass # do nothing if previous criteria isn't met.
+                    if self.debug: print("did nothing here.") # do nothing if previous criteria isn't met.
             return
         elif Type(node.right) == ops.EXP:
             exp = node.right
@@ -606,7 +606,7 @@ class Technique3(AbstractTechnique):
         target = str(index)
         left = self.isAttrIndexInNode(pair.left, target)
         right = self.isAttrIndexInNode(pair.right, target)
-        if self.debug: print("Pair: ", pair)
+        if self.debug: print("Pair: ", pair, left, right)
         if left and right: 
         # if both true (meaning index appears on left and right side), then do NOT apply transformation
             return False
@@ -615,7 +615,6 @@ class Technique3(AbstractTechnique):
     def canRearrange(self, index, node, another_dp_index_found=None):
         another_index = another_dp_index_found
         node_type = Type(node)
-        #print("node_type = ", node_type)
         if node == None: return None
         elif node_type == ops.ATTR:
             #print("visiting: ", node.attr, node.attr_index)
@@ -653,7 +652,7 @@ class Technique3(AbstractTechnique):
                 result = self.canRearrange(index, node.right, another_index)
                 return result
         else:
-            #print("Visiting: ", Type(node), node, another_index)
+            #print("Visiting else: ", Type(node), node, another_index)
             result1 = self.canRearrange(index, node.left, another_index)
             result2 = self.canRearrange(index, node.right, another_index)
             #print("Result1: ", result1)
