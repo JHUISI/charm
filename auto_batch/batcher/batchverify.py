@@ -19,6 +19,10 @@ except:
     exit(0)
 
 debug = False
+THRESHOLD_FLAG = CODEGEN_FLAG = PROOFGEN_FLAG = PRECOMP_CHECK = VERBOSE = CHOOSE_STRATEGY = False
+TEST_STATEMENT = False
+
+
 
 def handleVerifyEq(equation):
 #    print("Input: ", Type(equation), equation)
@@ -31,12 +35,13 @@ def handleVerifyEq(equation):
         ASTVisitor(cme).preorder(combined_equation)
         if len(cme.finalAND) == 1: 
             combined_equation = cme.finalAND.pop()
-            print("Combined eq: ", combined_equation)
+            print("Final combined eq: ", combined_equation)
         else:
             # may need to combine them further? or batch separaely
             print("Note: multiple equations left. Either batch each equation separately OR combine further.")
-            for i in cme.finalAND:
-                print("eq: ", i)
+#            for i in cme.finalAND:
+#                print("eq: ", i)
+            return cme.finalAND
     return combined_equation
 
 def countInstances(equation):
@@ -154,64 +159,27 @@ def writeConfig(lcg, latex_file, lcg_data, const, vars, sigs):
     f.write(outputStr)
     f.close()
     return
-    
-if __name__ == "__main__":
-    if len(sys.argv) == 1:
-        print("%s [ batch-input.bv ] -b -c -p" % sys.argv[0])
-        print("-b : estimate threshold for a given signature scheme with 1 to N signatures.")
-        print("-c : generate the output for the code generator (temporary).")
-        print("-d : check for further precomputations in final batch equation.")
-        print("-p : generate the proof for the signature scheme.")
-        print("-s : select strategy for the ordering of techniques. Options: basic, score, what else?")
-        exit(-1)
-    # main for batch input parser    
-    try:
-        file = sys.argv[1]
-        print(sys.argv[1:])
-        THRESHOLD_FLAG = CODEGEN_FLAG = PROOFGEN_FLAG = PRECOMP_CHECK = VERBOSE = CHOOSE_STRATEGY = False # initialization
-        TEST_STATEMENT = False
-        for i in sys.argv:
-            if i == "-b": THRESHOLD_FLAG = True
-            elif i == "-c": CODEGEN_FLAG = True
-            elif i == "-v": VERBOSE = True
-            elif i == "-p": PROOFGEN_FLAG = True
-            elif i == "-d": PRECOMP_CHECK = True
-            elif i == "-s": CHOOSE_STRATEGY = True
-            elif i == "-t": TEST_STATEMENT = True
-        if not TEST_STATEMENT: ast_struct = parseFile(file)
-    except:
-        print("An error occured while processing batch inputs.")
-        exit(-1)
-    if TEST_STATEMENT:
-        debug = levels.all
-        statement = sys.argv[2]
-        #print("Original statement: ", statement)
-        parser = BatchParser()
-        final = parser.parse(statement)
-        print("Final statement(%s): '%s'" % (type(final), final))
-#        tme = TestForMultipleEq()
-#        ASTVisitor(tme).preorder(final.right)
-#        print("Multiple? ", tme.multiple)
-#        for i in tme.finalAND:
-#            print("node: ", i)
-        exit(0)
-
+ 
+ 
+def runBatcher(file, verify, ast_struct):
     constants, types = ast_struct[ CONST ], ast_struct[ TYPE ]
     latex_subs = ast_struct[ LATEX ]
-    (indiv_precompute, batch_precompute) = ast_struct[ PRECOMP ]
+    if ast_struct.get(PRECOMP):
+        (indiv_precompute, batch_precompute) = ast_struct[ PRECOMP ]
+    else:
+        batch_precompute = {}
     batch_precompute[ "delta" ] = "for{z := 1, N} do prng_z"
     
     algorithm = ast_struct [ TRANSFORM ]
     FIND_ORDER     = False
-    if not algorithm: FIND_ORDER = True #algorithm = ['2', '3'];  
+    if not algorithm: FIND_ORDER = True 
 
-    verify, N = None, None
+    N = None
     setting = {}
     metadata = {}
     for n in ast_struct[ OTHER ]:
-        if str(n.left) == 'verify':
-#            verify = n
-            verify = handleVerifyEq(n)
+        if 'verify' in str(n.left):
+            pass
         elif str(n.left) == 'N':
             N = int(str(n.right))
             metadata['N'] = str(n.right)
@@ -220,7 +188,6 @@ if __name__ == "__main__":
         else:
             metadata[ str(n.left) ] = str(n.right)
     
-    # process settings
     sig_vars, pub_vars, msg_vars = ast_struct[ SIGNATURE ], ast_struct[ PUBLIC ], ast_struct[ MESSAGE ]
     batch_count = {} # F = more than one, T = only one exists
     MSG_set = setting.get(MESSAGE)
@@ -293,7 +260,6 @@ if __name__ == "__main__":
     print("\nStage B: Small Exp Test =>", verify2, "\n")
     if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Apply the small exponents test, using exponents $\delta_1, \dots \delta_\\numsigs \in_R \Zq$', 
                                                'eq':lcg.print_statement(verify2), 'preq':small_exp_label }; lcg_steps += 1
-
 
     # figure out order automatically (if not specified in bv file)
     if FIND_ORDER:
@@ -396,4 +362,48 @@ if __name__ == "__main__":
 #        equation = lcg.print_statement(verify2)
 #        print("Latex Equation: ", equation)
         
-        
+if __name__ == "__main__":
+    if len(sys.argv) == 1:
+        print("%s [ batch-input.bv ] -b -c -p" % sys.argv[0])
+        print("-b : estimate threshold for a given signature scheme with 1 to N signatures.")
+        print("-c : generate the output for the code generator (temporary).")
+        print("-d : check for further precomputations in final batch equation.")
+        print("-p : generate the proof for the signature scheme.")
+        print("-s : select strategy for the ordering of techniques. Options: basic, score, what else?")
+        exit(-1)
+    # main for batch input parser    
+    try:
+        file = sys.argv[1]
+        print(sys.argv[1:])
+        for i in sys.argv:
+            if i == "-b": THRESHOLD_FLAG = True
+            elif i == "-c": CODEGEN_FLAG = True
+            elif i == "-v": VERBOSE = True
+            elif i == "-p": PROOFGEN_FLAG = True
+            elif i == "-d": PRECOMP_CHECK = True
+            elif i == "-s": CHOOSE_STRATEGY = True
+            elif i == "-t": TEST_STATEMENT = True
+        if not TEST_STATEMENT: ast_struct = parseFile(file)
+    except:
+        print("An error occured while processing batch inputs.")
+        exit(-1)
+    if TEST_STATEMENT:
+        debug = levels.all
+        statement = sys.argv[2]
+        #print("Original statement: ", statement)
+        parser = BatchParser()
+        final = parser.parse(statement)
+        print("Final statement(%s): '%s'" % (type(final), final))
+        exit(0)
+
+    verify_eq, N = [], None
+    for n in ast_struct[ OTHER ]:
+        if 'verify' in str(n.left):
+            result = handleVerifyEq(n)
+            if type(result) != list: verify_eq.append(result)
+            else: verify_eq.extend(result)
+    # process settings
+    for v in verify_eq:    
+        print("\nRunning batcher....\n")
+        runBatcher(file, v, ast_struct)
+

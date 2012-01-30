@@ -45,6 +45,7 @@ def getListNodes(subtree, parent_type, _list):
 		elif subtree.type == ops.PAIR: _list.append(subtree)
 	elif parent_type == ops.EQ_TST:
 		if subtree.type == ops.PAIR: _list.append(subtree)
+		elif subtree.type == ops.ATTR: _list.append(subtree)
 		
 	if subtree.left: getListNodes(subtree.left, subtree.type, _list)
 	if subtree.right: getListNodes(subtree.right, subtree.type, _list)

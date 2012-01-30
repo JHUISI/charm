@@ -58,5 +58,6 @@ class CombineMultipleEq(AbstractTechnique):
             return new_node
         else:
             print("CE: missing case!")
+            print("node: ", lsize, rsize, node)
             return
         
