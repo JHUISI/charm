@@ -26,7 +26,13 @@ class AbstractTechnique:
         if Type(node) == ops.EXP: 
             # when presented with A^B_z or A^B type nodes 
             # (checking the base value should be sufficient)
-            return self.isConstInSubtreeT(node.left)
+#            return self.isConstInSubtreeT(node.left)
+            result1 = self.isConstInSubtreeT(node.left)
+            result2 = self.isConstInSubtreeT(node.right)
+#            print("constant: ", result1, result2)
+            if result1 == result2: return result1
+            elif result1 or result2: return False
+            return True
         if Type(node) == ops.ATTR:
             return self.isConstant(node)
         elif Type(node) == ops.HASH:
@@ -325,9 +331,9 @@ class Technique2(AbstractTechnique):
 #                        print("MUL on right: ", pair_node.right)
                         _subnodes = []
                         getListNodes(pair_node.right, ops.NONE, _subnodes)
-                        print("len: ", len(_subnodes))
-                        for i in _subnodes:
-                            print("found: ", i)
+                        #print("len: ", len(_subnodes))
+                        #for i in _subnodes:
+                        #    print("found: ", i)
                         if len(_subnodes) > 2:
                             # basically call createExp to distribute the exponent to each
                             # MUL node in pair_node.right
@@ -594,6 +600,11 @@ class Technique3(AbstractTechnique):
 #                    print("T3: after _pair right: combinepair: ", node,"\n")                                                          
                 else:
                     if self.debug: print("did nothing here.") # do nothing if previous criteria isn't met.
+#                    print("last chance: ", self.isConstInSubtreeT(pair_node.left))
+                    # warning: not a general solution here... (very specific cases: e.g. VRF)
+                    #print("Type: ", Type(pair_node.left), pair_node.left.right)
+                    #if Type(pair_node.left) == ops.EXP:
+                    #    print("isConstant: ", self.isConstInSubtreeT(pair_node.left))
             return
         elif Type(node.right) == ops.EXP:
             exp = node.right
