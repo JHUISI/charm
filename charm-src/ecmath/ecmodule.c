@@ -369,7 +369,7 @@ PyObject *ECE_random(ECElement *self, PyObject *args) {
 		else if(type == ZR) {
 			ECElement *objZR = createNewPoint(ZR, gobj->group, gobj->ctx);
 			BIGNUM *order = BN_new();
-			EC_GROUP_get_order(self->group, order, gobj->ctx);
+			EC_GROUP_get_order(gobj->group, order, gobj->ctx);
 			objZR->elemZ = BN_new();
 //			START_CLOCK(dBench);
 			BN_rand_range(objZR->elemZ, order);
