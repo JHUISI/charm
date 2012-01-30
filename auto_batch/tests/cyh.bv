@@ -40,4 +40,4 @@ message := N
 public := one
 signature := N
 
-verify := { e((prod{y:=1, l} on (u_y * (pk_y^h_y))) , P) == e(S, g) }
+verify := { e((prod{y:=0, l} on (u_y * (pk_y^h_y))) , P) == e(S, g) }
