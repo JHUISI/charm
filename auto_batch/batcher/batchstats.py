@@ -36,8 +36,8 @@ class RecordOperations:
         else:            
             if debug >= levels.some:
                print("Operation: ", node.type)
-               print("Left operand: ", left)
-               print("Right operand: ", right)            
+               print("Left operand: ", node.left)
+               print("Right operand: ", node.right)            
             if(node.type == ops.EXP):
                 base_type = self.deriveNodeType(node.left)
                 # check if node.right ==> 'delta' keyword, modify cost to half of full exp
@@ -114,6 +114,9 @@ class RecordOperations:
                     exp = node.right
                     if exp.right.getAttribute() == SmallExp: cost = 0.5
                 elif Type(node.right) == ops.HASH: op = 'hash'
+                elif Type(node.right) == ops.EQ_TST:
+                    # in case of for{} do x == e(y, z) : we want to traverse EQ_TST children
+                    return self.visit(node.right, Copy(data), node)
                 else:
                     return
                 right_type = self.deriveNodeType(node.right)

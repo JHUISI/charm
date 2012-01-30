@@ -558,7 +558,7 @@ class CVForMultiSigner:
 
                     
     def visit_attr(self, node, data):
-        if data['parent'].type in [ops.PROD, ops.EQ]:
+        if data['parent'].type in [ops.PROD, ops.EQ, ops.FOR, ops.SUM]:
             return
         if self.isSig(node):
             node.setAttrIndex('z') # add index to each attr that isn't constant

@@ -87,6 +87,7 @@ class PairInstanceFinder:
             self.record(key, node, whichSide, data['parent'])
         else:
             self.record(key, node, whichSide)
+            
         return
 
     def record(self, key, node, whichSide, parent=None):
@@ -121,6 +122,24 @@ class PairInstanceFinder:
                     else: data['lnode1_parent'].append(node)                    
                     found = True
                     break
+                elif str(lnode) == str(data['lnode']):
+                    # basically, find that non-constants match. for example,
+                    # case: e(x * y, g) and e(x * y, h) transforms to e(x * y, g * h)
+                    #print("found a new case.\ninput: ", lnode, rnode)
+                    #print("data node: ", data['lnode'], data['rnode'], data['key'])
+                    # switch sides
+                    data['key'] = 'lnode'
+                    data['instance'] += 1
+                    if data.get('rnode1'): data['rnode1'].append(rnode)
+                    else: data['rnode1'] = [rnode]
+                    data['side'][ str(rnode) ] = whichSide
+                    # save some state to delete this node on second pass
+                    if not data.get('rnode1_parent'): data['rnode1_parent'] = [] # create new list                  
+                    if parent: data['rnode1_parent'].append(parent)
+                    else: data['rnode1_parent'].append(node)                    
+                    found = True
+                    break
+
         # if not found
         if not found:
             self.instance[ self.index ] = { 'key':key, 'lnode':lnode, 'rnode':rnode, 'keyside':whichSide,'instance':1, 'side':{} }
@@ -291,7 +310,6 @@ class SubstitutePairs2:
             self.extra_parent = pairDict['rnode1_parent']
             
         self.deleteOtherPair = self.pruneCheck = False
-#        self.side = {'left':[]}        
         self.debug = False
         
     def visit(self, node, data):
@@ -385,12 +403,16 @@ class SubstitutePairs2:
                     node.left = None
                     node.right = None
                     BinaryNode.clearNode(node)
-                    self.pruneCheck = True
-                
+                    self.pruneCheck = True                
             elif str(node.left) == str(self.left):
-                print("Found a match, general left case: ", self.left, self.right)
+#                print("Found a match, general left case: ", self.left, self.right)
+                print("warning: this code has not been fully tested yet.", self.left, self.right)
+                target = self.right
                 for i in self.extra:
-                    print("node: ", i)                
+                    target = self.combine(target, BinaryNode.copy(self.checkForInverse(i)))
+#                    print("mul: ", target)
+                    node.right = target
+                    self.deleteOtherPair = True
         else:
             print("invalid or unrecognized key: ", self.key)
     

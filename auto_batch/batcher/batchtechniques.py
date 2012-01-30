@@ -76,14 +76,15 @@ class AbstractTechnique:
             #print("node.right type =>", Type(node.right))
             if Type(node.right) == ops.MUL:
                 return self.findExpWithIndex(node.right, index)                
-            elif index in node.right.attr_index:
+            elif node.right.isAttrIndexEmpty() and index in node.right.attr_index:
                 #print("node =>", node)            
                 return node.right
         elif node_type == ops.MUL:
-            if index in node.left.attr_index and index in node.right.attr_index: 
-                return node
-            elif index in node.left.attr_index: return node.left
-            elif index in node.right.attr_index: return node.right            
+            if not node.left.isAttrIndexEmpty() and not node.right.isAttrIndexEmpty():
+                if index in node.left.attr_index and index in node.right.attr_index: 
+                    return node
+            elif not node.left.isAttrIndexEmpty() and index in node.left.attr_index: return node.left
+            elif not node.left.isAttrIndexEmpty() and index in node.right.attr_index: return node.right            
         else:
             result = self.findExpWithIndex(node.left, index)
             if result: return node
@@ -158,7 +159,19 @@ class AbstractTechnique:
         if Type(new) == ops.EXP:
             if Type(new.right) == ops.ATTR:
                 new.right.negated = not new.right.negated
-            else: # MUL, ADD, DIV, SUB, etc
+            elif Type(new.right) == ops.MUL:
+                # case 1: a^(b * c) transforms to a^(-b * -c)
+                # case 2: a^((x + y) * b) transforms to a^((x + y) * -b) 
+                subnodes = []
+                getListNodes(new.right, ops.EXP, subnodes)
+                if len(subnodes) > 0:
+                    for i in subnodes: 
+                        if Type(i) == ops.ATTR: i.negated = not i.negated
+                else:
+                    return self.createMul(new, inv_node)
+#                print("Result: ", new)
+                return new
+            else: # ADD, DIV, SUB, etc
                 print("warning: not tested yet in createInvExp():", Type(new), 
                       self.createMul(new, inv_node))
                 return new
@@ -421,14 +434,14 @@ class Technique3(AbstractTechnique):
 
     # once a     
     def visit_pair(self, node, data):
-#        if self.debug: print("Current state: ", node)
+        if self.debug: print("Current state: ", node)
         left = node.left
         right = node.right
         if Type(left) == ops.ON:
             # assume well-formed prod node construct
             # prod {var := 1, N} on v : to get var => left.left.left.left
             index = str(left.left.left.left)
-            #print("left ON node =>", index)
+#            print("left ON node =>", right, index)
             exp_node = self.findExpWithIndex(right, index)
 #            print("T3: before =>", node)
 #            print("left := ON => moving EXP node: ", exp_node)
@@ -543,7 +556,7 @@ class Technique3(AbstractTechnique):
                     loop_left_check = self.isLoopOverTarget(pair_node.left, target)
                     loop_right_check = self.isLoopOverTarget(pair_node.right, target)
                     if loop_left_check: # move dot prod to left side
-                        print("move dot prod to left: ", pair_node.left)
+                        #print("move dot prod to left: ", pair_node.left)
                         addAsChildNodeToParent(data, pair_node) # move pair one level up  
                         node.right      = pair_node.left # set dot prod right to pair_node left
                         pair_node.left  = node # pair node moves up and set pair left to dot prod
@@ -551,7 +564,7 @@ class Technique3(AbstractTechnique):
                         self.applied    = True
                         self.score      = tech3.CombinePairing
                     elif loop_right_check:
-                        print("move dot prod to right: ", pair_node.right)                        
+                        #print("move dot prod to right: ", pair_node.right)                        
                         addAsChildNodeToParent(data, pair_node) # move pair one level up                          
                         node.right      = pair_node.right
                         pair_node.right = node
@@ -566,9 +579,9 @@ class Technique3(AbstractTechnique):
                     pair_node.left = node # pair points to 'on' node
                     #self.rule += "common 1st (left) node appears, so can reduce n pairings to 1. "
                     self.visit_pair(pair_node, data)                    
+#                    print("T3: after _pair left: combinepair: ", pair_node, "\n") 
                     self.applied = True
                     self.score   = tech3.CombinePairing  
-#                    print("T3: after _pair left: combinepair: ", node, "\n")                  
                 elif right_check:
                     addAsChildNodeToParent(data, pair_node) # move pair one level up                                                      
 #                    print("T3: before _pair right: combinepair: ", node)                                      
@@ -853,7 +866,7 @@ class ASTIndexForIndiv(AbstractTechnique):
         AbstractTechnique.__init__(self, sdl_data, variables, meta)        
         
     def visit_attr(self, node, data):
-        if data['parent'].type in [ops.PROD, ops.EQ]:
+        if data['parent'].type in [ops.PROD, ops.EQ, ops.FOR, ops.SUM]:
             return
         if not self.isConstant(node) and not str(node) in ['1', '-1']:
             node.setAttrIndex('z') # add index to each attr that isn't constant

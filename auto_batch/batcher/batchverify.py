@@ -83,7 +83,7 @@ def benchIndivVerification(N, equation, sdl_dict, vars, precompute, _verbose):
         print("Equation =>", equation)
     data = {'key':['N'], 'N': N }
 
-    rop_ind.visit(verify.right, data)
+    rop_ind.visit(equation, data)
     if _verbose: print("<===\tOperations count\t===>")
     for i in precompute.keys():
             # if a str, then was precompute introduced programmatically and should skip for individual verification case. 
@@ -167,7 +167,7 @@ def runBatcher(file, verify, ast_struct):
     if ast_struct.get(PRECOMP):
         (indiv_precompute, batch_precompute) = ast_struct[ PRECOMP ]
     else:
-        batch_precompute = {}
+        (indiv_precompute, batch_precompute) = {}, {}
     batch_precompute[ "delta" ] = "for{z := 1, N} do prng_z"
     
     algorithm = ast_struct [ TRANSFORM ]
