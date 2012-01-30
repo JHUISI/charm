@@ -25,7 +25,6 @@ class ECDSA(PKSig):
         
     def keygen(self, bits):
         group.paramgen(bits)
-        print("group.random")
         x, g = group.random(), group.random(G)
         y = (g ** x)
         return ({'g':g, 'y':y}, x)
@@ -58,7 +57,6 @@ def main():
     ecdsa = ECDSA(groupObj)
     
     (pk, sk) = ecdsa.keygen(0)
-    print("Done with keygen")
     m = "hello world! this is a test message."
 
     sig = ecdsa.sign(pk, sk, m)
