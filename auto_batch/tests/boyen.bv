@@ -37,7 +37,7 @@ message := N
 public := l
 signature := N
 
-verify :=  { prod{y:=1, l} on e(S_y, At_y * (Bt_y^m_y) * (Ct_y^t_y)) } == D
+verify :=  { prod{y:=0, l} on e(S_y, At_y * (Bt_y^m_y) * (Ct_y^t_y)) } == D
 
 # rearrange => verify :=  { prod{y:=0, l} on e(At_y * (Bt_y^m_y) * (Ct_y^t_y), S_y) } == D
 # correct transform => 2, 4, 3, 5, 3 

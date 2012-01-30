@@ -444,7 +444,7 @@ class CombineVerifyEq:
     
     def newProdNode(self):
         p = BatchParser()
-        new_node = p.parse("prod{z:=1, N} on x")
+        new_node = p.parse("prod{z:=0, N} on x")
         return new_node
 
     def isConstant(self, node):
@@ -579,9 +579,9 @@ class CVForMultiSigner:
     def newProdNode(self, key=None, end=None):
         p = BatchParser()
         if key and end:
-            new_node = p.parse("prod{"+key+":=1,"+end+"} on x")        
+            new_node = p.parse("prod{"+key+":=0,"+end+"} on x")        
         else:
-            new_node = p.parse("prod{z:=1, N} on x")
+            new_node = p.parse("prod{z:=0, N} on x")
         return new_node
 
     def isPub(self, node):
