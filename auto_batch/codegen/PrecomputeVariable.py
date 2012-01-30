@@ -4,12 +4,16 @@ class PrecomputeVariable:
 	def __init__(self):
 		self.varName = None
 		self.expression = None
+		self.codeGenSegmentNo = None
 
 	def getVarName(self):
 		return self.varName
 
 	def getExpression(self):
 		return self.expression
+
+	def getCodeGenSegmentNo(self):
+		return self.codeGenSegmentNo
 
 	def setVarName(self, varName):
 		if ( (varName == None) or (type(varName).__name__ != con.stringName) ):
@@ -26,3 +30,6 @@ class PrecomputeVariable:
 			sys.exit("PrecomputeVariable->setExpression:  problem with expression parameter passed in.")
 
 		self.expression = expression
+
+	def setCodeGenSegmentNo(self, codeGenSegmentNo):
+		self.codeGenSegmentNo = codeGenSegmentNo

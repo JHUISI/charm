@@ -8,6 +8,9 @@ binOpValue = 'BinOpValue'
 booleanType = 'bool'
 callValue = 'CallValue'
 callTypeAST = 'Call'
+
+codeGenHeader = "<====	PREP FOR CODE GEN	====>"
+
 commentChar = '#'
 computeString = 'Compute:  '
 delta = 'delta'

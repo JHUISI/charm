@@ -13,6 +13,7 @@ class LoopInfo:
 		self.loopOrder = None
 		self.expression = None
 		self.groupType = None
+		self.codeGenSegmentNo = None
 
 	def getLoopName(self):
 		return self.loopName
@@ -68,6 +69,9 @@ class LoopInfo:
 			return 0
 
 		sys.exit("LoopInfo->getInitValue:  current value of operation parameter is not currently supported.")
+
+	def getCodeGenSegmentNo(self):
+		return self.codeGenSegmentNo
 
 	def setLoopName(self, loopNameStringName):
 		if ( (loopNameStringName == None) or (type(loopNameStringName).__name__ != con.stringName) ):
@@ -170,3 +174,6 @@ class LoopInfo:
 			sys.exit("LoopInfo->setGroupType:  problem with group type parameter passed in.")
 
 		self.groupType = groupType
+
+	def setCodeGenSegmentNo(self, codeGenSegmentNo):
+		self.codeGenSegmentNo = codeGenSegmentNo
