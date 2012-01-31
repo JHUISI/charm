@@ -1456,10 +1456,6 @@ BINARY(instance_sub, 's', Element_sub)
 
 static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 
-//	if(o1->pairing == NULL) {
-//		PyErr_SetString(ElementError, "pairing params not initialized.");
-//		return NULL;
-//	}
 	Element *self = NULL;
 	if(!PyArg_ParseTuple(args, "O", &self)) {
 		PyErr_SetString(ElementError, "invalid argument.");
