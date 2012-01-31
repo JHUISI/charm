@@ -14,6 +14,7 @@ class LoopInfo:
 		self.expression = None
 		self.groupType = None
 		self.codeGenSegmentNo = None
+		self.hasMultipleEqChecks = None
 
 	def getLoopName(self):
 		return self.loopName
@@ -72,6 +73,9 @@ class LoopInfo:
 
 	def getCodeGenSegmentNo(self):
 		return self.codeGenSegmentNo
+
+	def getHasMultipleEqChecks(self):
+		return self.hasMultipleEqChecks
 
 	def setLoopName(self, loopNameStringName):
 		if ( (loopNameStringName == None) or (type(loopNameStringName).__name__ != con.stringName) ):
@@ -177,3 +181,6 @@ class LoopInfo:
 
 	def setCodeGenSegmentNo(self, codeGenSegmentNo):
 		self.codeGenSegmentNo = codeGenSegmentNo
+
+	def setHasMultipleEqChecks(self, hasMultipleEqChecks):
+		self.hasMultipleEqChecks = hasMultipleEqChecks

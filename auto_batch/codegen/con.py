@@ -27,6 +27,10 @@ dotPrefix = 'dot'
 dotProdType = 'dotprod'
 dotProdValue = 'DotProdValue'
 doubleQuote = "\""
+
+eqChecksIndex = 't'
+numEqChecks = 'n'
+
 equals = 'Eq()'
 expTypeAST = 'Pow'
 finalBatchEqString = 'Final batch eq: '
@@ -148,6 +152,8 @@ loopIndexTypes = [numSignaturesIndex, numSignersIndex]
 operationTypes = [dotOperation, sumOperation]
 quoteCharTypes = [singleQuote, doubleQuote]
 reservedWords = ['len', 'random', 'print', pair, 'class', 'pickleObject', 'elif', 'True', 'False', '__init__', 'global', 'str', 'int', 'float', 'return', 'def', dotPrefix, productString, group, G1, G2, GT, dotProdType, range, 'lam_func', ZR, self, 'for', 'in', 'while', 'if', 'pass', sumString, 'e']
-reservedSymbols = ['..', lParan, ')', '{', '}', ':=', '=', '-', '*', '^', '/', ',', '==', ':', '[', ']', '**']
+reservedSymbols = ['..', lParan, ')', '{', '}', ':=', '=', '-', '*', '^', '/', ',', '==', ':', '[', ']', '**', '+']
 unaryOpTypesAST = [invertTypeAST, uSubTypeAST]
 variableNameTypes = [stringName, subscriptName]
+
+eqChecksSuffix = subscriptIndicator + eqChecksIndex

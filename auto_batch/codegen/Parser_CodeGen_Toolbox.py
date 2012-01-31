@@ -169,9 +169,10 @@ def expandEntryWithSubscriptPlaceholder(varAssignments, entryName, argumentNumbe
 				sys.exit("expandEntryWith(parser)-> not dict or list (in if-else branch)")
 
 	if (retSubscriptSliceString == None):
-		print(entryName)
-		print(argumentNumber)
-		sys.exit("expandEntryWithSubscriptPlaceholder . . . ")
+		#print(entryName)
+		#print(argumentNumber)
+		#sys.exit("expandEntryWithSubscriptPlaceholder . . . ")
+		retSubscriptSliceString = str(argumentNumber)
 
 	return entryName + "[" + retSubscriptSliceString + "]"
 
@@ -239,6 +240,17 @@ def getInitValueOfLoop(loopInfo, loopName):
 		sys.exit("Parser_CodeGen_Toolbox->getInitTypeOfLoop:  could not extract init value from loop name and loop info object list passed in.")
 
 	return retInitValue
+
+def doesThisLoopHaveMultipleEqChecks(loopInfo, loopName):
+	for loopInfoObj in loopInfo:
+		currentLoopName = loopInfoObj.getLoopName().getStringVarName()
+
+		if (currentLoopName != loopName):
+			continue
+
+		return loopInfoObj.getHasMultipleEqChecks()
+
+	sys.exit("Parser->doesThisLoopHaveMultipleEqChecks")
 
 def getExpressionFromLoopInfoList(loopInfo, loopName):
 	if ( (loopInfo == None) or (type(loopInfo).__name__ != con.listTypePython) or (len(loopInfo) == 0) ):

@@ -824,6 +824,14 @@ def processComputeLine(line, passNo):
 	varListWithSubscripts = getVarNamesAsStringNamesFromLine(expression)
 
 	varListAsStrings = getVarNamesAsStringsFromLine(expression)
+
+	hasMultipleEqChecks = False
+
+	for varNameAsStringInLoop in varListAsStrings:
+		if (varNameAsStringInLoop.find(con.eqChecksSuffix) != -1):
+			hasMultipleEqChecks = True
+			break
+
 	loopOrder = getLoopOrder(varListAsStrings)
 	varListNoSubscripts = removeSubscriptsReturnStringNames(varListAsStrings)
 
@@ -857,6 +865,7 @@ def processComputeLine(line, passNo):
 	nextLoopInfoObj.setVarListNoSubscripts(varListNoSubscripts)
 	nextLoopInfoObj.setLoopOrder(loopOrder)
 	nextLoopInfoObj.setCodeGenSegmentNo(passNo)
+	nextLoopInfoObj.setHasMultipleEqChecks(hasMultipleEqChecks)
 
 	loopInfo.append(copy.deepcopy(nextLoopInfoObj))
 
@@ -2731,8 +2740,20 @@ def writeOneBlockToFile(block, numBaseTabs, outputFile, forCachedCalcs):
 
 	outputFile.write("\n")
 
+	multipleEqChecksAlready = False
+	eqChecksThisLoop = False
+
 	for loopToCalculate in loopsToCalculate:
-		writeOneLoopCalculation(loopToCalculate, blockOperationString, (numBaseTabs + 1), forCachedCalcs, outputFile)
+		eqChecksThisLoop = doesThisLoopHaveMultipleEqChecks(loopInfo, loopToCalculate)
+		#print(eqChecksThisLoop)
+
+		if (eqChecksThisLoop == False):
+			writeOneLoopCalculation(loopToCalculate, blockOperationString, (numBaseTabs + 1), forCachedCalcs, outputFile)
+		elif (multipleEqChecksAlready == False):
+			multipleEqChecksAlready = True
+			outputString = ""
+			outputString += getStringOfTabs(numBaseTabs + 1)
+			outputString += "for " + con.eqChecksIndex + " in range(
 
 def writeOneLoopCalculation(loopName, blockOperationString, numBaseTabs, forCachedCalcs, outputFile):
 	if ( (loopName == None) or (type(loopName).__name__ != con.strTypePython) or (isStringALoopName(loopName) == False) ):
@@ -2781,9 +2802,9 @@ def getExpressionCalcString(expression, loopName, blockOperationString, numBaseT
 		if (token.count(con.loopIndicator) > 1):
 			sys.exit("AutoBatch_CodeGen->getExpressionCalcString:  one of the tokens in the expression string contains more than one loop indicator symbol.  This is not currently supported.")
 
-		if (token.count(con.subscriptIndicator) > 1):
-			print(token)
-			sys.exit("AutoBatch_CodeGen->getExpressionCalcString:  one of the tokens in the expression contains more than one subscript indicator symbol.  This is not currently supported.")
+		#if (token.count(con.subscriptIndicator) > 1):
+			#print(token)
+			#sys.exit("AutoBatch_CodeGen->getExpressionCalcString:  one of the tokens in the expression contains more than one subscript indicator symbol.  This is not currently supported.")
 
 		newToken = None
 
@@ -2797,7 +2818,7 @@ def getExpressionCalcString(expression, loopName, blockOperationString, numBaseT
 		if (newToken != None):
 			token = newToken
 
-		if (token.count(con.subscriptIndicator) == 1):
+		if (token.count(con.subscriptIndicator) >= 1):
 			newToken = processTokenWithSubscriptIndicator(token)
 			expression = expression.replace(token, newToken, 1)
 
@@ -2825,8 +2846,12 @@ def getExpressionCalcString(expression, loopName, blockOperationString, numBaseT
 
 def processTokenWithSubscriptIndicator(token):
 	tokenSplit = token.split(con.subscriptIndicator)
+
+	#print(tokenSplit)
+
 	structName = tokenSplit[0]
 	if (tokenSplit[1].count(con.loopIndicator) > 1):
+		print(token)
 		sys.exit("AutoBatch_CodeGen->processTokenWithSubscriptIndicator . . . ")
 
 	loopIndices = None
@@ -2839,15 +2864,36 @@ def processTokenWithSubscriptIndicator(token):
 	else:
 		keyNoAsString = tokenSplit[1]
 
+	firstIndexIsNum = True
+
 	try:
 		keyNo = int(keyNoAsString)
 	except:
-		sys.exit("AutoBatch_CodeGen->processTokenWithSubscriptIndicator . . . ")
+		#print(token)
+		#sys.exit("AutoBatch_CodeGen->processTokenWithSubscriptIndicator . . . ")
+		firstIndexIsNum = False
 
-	expandedName = expandEntryWithSubscriptPlaceholder(varAssignments, structName, keyNo)
+	if (firstIndexIsNum == True):
+		expandedName = expandEntryWithSubscriptPlaceholder(varAssignments, structName, keyNo)
+	else:
+		expandedName = structName + "[" + str(keyNoAsString) + "]"
+		#print(expandedName)
 
 	if (loopIndices != None):
 		expandedName += loopIndices
+
+	if (len(tokenSplit) == 2):
+		return expandedName
+
+	#print(tokenSplit)
+
+	#numListIndices = len(tokenSplit) - 2
+	#print(numListIndices)
+
+	for listIndexNo in range(2, len(tokenSplit)):
+		expandedName += "[" + str(tokenSplit[listIndexNo]) + "]"
+
+	#print(expandedName)
 
 	return expandedName
 
@@ -3135,7 +3181,8 @@ def processOneLineBatcherOutput(startLineNo, endLineNo, passNo):
 			finalBatchEq.append(line)
 
 		if (line.startswith(con.finalBatchEqWithLoopsString) == True):
-			finalBatchEqWithLoops.append(line)
+			#finalBatchEqWithLoops.append(line)
+			processFinalBatchEqWithLoops(line, passNo)
 
 		if (line.startswith(con.listString) == True):
 			processListLine(line)
@@ -3152,6 +3199,14 @@ def processOneLineBatcherOutput(startLineNo, endLineNo, passNo):
 		linePrefix = line[0:con.maxStrLengthForLoopNames]
 		if (isStringALoopName(linePrefix) == True):
 			processLoopLine(line, passNo)
+
+def processFinalBatchEqWithLoops(line, codeGenSegNo):
+	global finalBatchEqWithLoops
+
+	finalEqStruct = FinalEqWithLoops()
+
+	if (line.startswith('for') == False):
+		finalEqStruct.
 
 
 def main():

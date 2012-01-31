@@ -34,10 +34,10 @@ dotE := GT
 
 
 
-Final batch eq: for{t := 0,n} do e((prod{z := 0,N} on (pi#t_z^delta_z * pi#t-1_z^((1 + -x#t_z) * -delta_z))),pk#4) == e((prod{z := 0,N} on pi#t-1_z^(x#t_z * delta_z)),pk#1#t)
+Final batch eq: for{t := 1,n} do e((prod{z := 0,N} on (pi#t_z^delta_z * pi#t-1_z^((1 + -x#t_z) * -delta_z))),pk#4) == e((prod{z := 0,N} on pi#t-1_z^(x#t_z * delta_z)),pk#1#t)
 <====	PREP FOR CODE GEN	====>
 
-Final version => for{t := 0,n} do e(dotF,pk#4) == e(dotG,pk#1#t) 
+Final version => for{t := 1,n} do e(dotF,pk#4) == e(dotG,pk#1#t) 
 
 Compute:  dotF := (prod{z := 0,N} on (pi#t_z^delta_z * pi#t-1_z^((1 + -x#t_z) * -delta_z)))
 Compute:  dotG := (prod{z := 0,N} on pi#t-1_z^(x#t_z * delta_z))
