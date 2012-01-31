@@ -155,6 +155,8 @@ def expandEntryWithSubscriptPlaceholder(varAssignments, entryName, argumentNumbe
 				retSubscriptSliceString = dictKeyEntry.getStringVarName()
 
 	if (retSubscriptSliceString == None):
+		print(entryName)
+		print(argumentNumber)
 		sys.exit("expandEntryWithSubscriptPlaceholder . . . ")
 
 	return entryName + "[" + retSubscriptSliceString + "]"

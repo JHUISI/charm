@@ -36,8 +36,10 @@ loopBlocksForCachedCalculations = []
 loopBlocksForNonCachedCalculations = []
 loopInfo = []
 loopNamesOfFinalBatchEq = []
+
 loopsOuterNumSignatures = []
 loopsOuterNotNumSignatures = []
+
 linePairsOfVerifyFuncs = None
 listVars = {}
 loopVarGroupTypes = {}
@@ -2399,7 +2401,7 @@ def addGroupMembershipChecks():
 	batchVerFile.write(outputString)
 	individualVerFile.write(outputString)
 
-	if (checkBlocks != None):
+	if ( (checkBlocks != None) and (len(codeGenRanges) == 1) ):
 		for checkBlock in checkBlocks:
 			startLineCheckBlock = checkBlock[0]
 			endLineCheckBlock = checkBlock[1]
@@ -2605,6 +2607,9 @@ def getLoopOrder(varListAsStrings):
 def distillLoopsWRTNumSignatures():
 	global loopsOuterNumSignatures, loopsOuterNotNumSignatures
 
+	loopsOuterNumSignatures = []
+	loopsOuterNotNumSignatures = []
+
 	loopsAddedToOuterNumSigs = []
 	loopsToAddToOuterNumSigs = []
 
@@ -2619,6 +2624,7 @@ def distillLoopsWRTNumSignatures():
 			sys.exit("AutoBatch_CodeGen->distillLoopsWRTNumSignatures:  outer loop index extracted from one of the loops in loopInfo is not one of the supported loop index types.")
 		if (outerIndex != con.numSignaturesIndex):
 			continue
+
 		loopsOuterNumSignatures.append(copy.deepcopy(loop))
 
 		loopsAddedToOuterNumSigs.append(loop.getLoopName().getStringVarName())
@@ -3324,12 +3330,17 @@ def main():
 
 	checkBlocks = myASTParser.getStartEndLineCheckBlocks(copy.deepcopy(pythonCodeLines), lineInfo, verifyStartLine, (verifyEndLine - 1), numTabsOnVerifyLine)
 
+
+	codeGenRanges = getSectionRanges(copy.deepcopy(batchVerifierOutput), con.finalBatchEqString)
+
+
+
 	addSigLoop()
 	addGroupMembershipChecks()
 	writeBodyOfInd()
 
-	codeGenRanges = getSectionRanges(copy.deepcopy(batchVerifierOutput), con.finalBatchEqString)
-	#print(codeGenRanges)
+
+
 
 	processBatcherOutput()
 
