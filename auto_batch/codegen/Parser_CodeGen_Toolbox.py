@@ -131,28 +131,42 @@ def expandEntryWithSubscriptPlaceholder(varAssignments, entryName, argumentNumbe
 			varEntryName = varEntry.getName()
 			varEntryValue = varEntry.getValue()
 
-			if (type(varEntryValue).__name__ != con.dictValue):
+			structType = type(varEntryValue).__name__
+
+			if ( (structType != con.dictValue) and (structType != con.listValue) ):
 				continue
+
+			#if (type(varEntryValue).__name__ != con.dictValue):
+				#continue
 
 			varNameAsString = varEntryName.getStringVarName()
 			if (varNameAsString != entryName):
 				continue
 
 			if (foundIt == True):
+				print(entryName)
+				print(argumentNumber)
 				sys.exit("expandEntryWithSubscriptPlaceholder. . . . ")
 
 			foundIt = True
 
-			dictKeys = varEntryValue.getKeys()
+			structType = type(varEntryValue).__name__
+			if ( (structType != con.dictValue) and (structType != con.listValue) ):
+				sys.exit("expandEntryWith (parser) -> not dict or list")
 
-			keyCounter = -1
+			if (structType == con.dictValue):
+				dictKeys = varEntryValue.getKeys()
+				keyCounter = -1
+				for dictKeyEntry in dictKeys:
+					keyCounter += 1
+					if (keyCounter != argumentNumber):
+						continue
 
-			for dictKeyEntry in dictKeys:
-				keyCounter += 1
-				if (keyCounter != argumentNumber):
-					continue
-
-				retSubscriptSliceString = dictKeyEntry.getStringVarName()
+					retSubscriptSliceString = dictKeyEntry.getStringVarName()
+			elif (structType == con.listValue):
+				retSubscriptSliceString = str(argumentNumber)
+			else:
+				sys.exit("expandEntryWith(parser)-> not dict or list (in if-else branch)")
 
 	if (retSubscriptSliceString == None):
 		print(entryName)

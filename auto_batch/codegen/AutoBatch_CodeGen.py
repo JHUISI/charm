@@ -2782,6 +2782,7 @@ def getExpressionCalcString(expression, loopName, blockOperationString, numBaseT
 			sys.exit("AutoBatch_CodeGen->getExpressionCalcString:  one of the tokens in the expression string contains more than one loop indicator symbol.  This is not currently supported.")
 
 		if (token.count(con.subscriptIndicator) > 1):
+			print(token)
 			sys.exit("AutoBatch_CodeGen->getExpressionCalcString:  one of the tokens in the expression contains more than one subscript indicator symbol.  This is not currently supported.")
 
 		newToken = None
