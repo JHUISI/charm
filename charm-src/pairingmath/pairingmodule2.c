@@ -79,11 +79,6 @@ static PyObject *f(PyObject *v, PyObject *w) { \
 	return NULL;				\
 }
 
-#define BINARY_NONE(f, m, n) \
-static PyObject *f(PyObject *v, PyObject *w) { \
- Py_INCREF(Py_NotImplemented);	\
- return Py_NotImplemented;  }
-
 PyObject *mpzToLongObj (mpz_t m)
 {
 	/* borrowed from gmpy */
@@ -1276,15 +1271,16 @@ cleanup:
 
 static PyObject *Element_long(PyObject *o1) {
 	if(PyElement_Check(o1)) {
-//		Element *value = (Element *) o1;
-//		if(value->element_type == ZR) {
-//			mpz_t val;
-//			mpz_init(val);
-//			element_to_mpz(val, value->e);
-//			PyObject *obj = mpzToLongObj(val);
-//			mpz_clear(val);
-//			return obj;
-//		}
+		Element *value = (Element *) o1;
+		/* can only handle elements in ZR */
+		if(value->element_type == ZR_t) {
+			mpz_t val;
+			mpz_init(val);
+			element_to_mpz(value->e, val);
+			PyObject *obj = mpzToLongObj(val);
+			mpz_clear(val);
+			return obj;
+		}
 	}
 	PyErr_SetString(ElementError, "cannot cast pairing object to an integer.");
 	return NULL;
@@ -1294,14 +1290,15 @@ static long Element_index(Element *o1) {
 	long result = -1;
 
 	if(PyElement_Check(o1)) {
-//	if(o1->element_type == ZR) {
-//		mpz_t o;
-//		mpz_init(o);
-//		element_to_mpz(o, o1->e);
-//		PyObject *temp = mpzToLongObj(o);
-//		result = PyObject_Hash(temp);
-//		mpz_clear(o);
-//		PyObject_Del(temp);
+		if(o1->element_type == ZR_t) {
+			mpz_t o;
+			mpz_init(o);
+			element_to_mpz(o1->e, o);
+			PyObject *temp = mpzToLongObj(o);
+			result = PyObject_Hash(temp);
+			mpz_clear(o);
+			PyObject_Del(temp);
+		}
 	}
 	return result;
 }
