@@ -2854,7 +2854,10 @@ def getExpressionCalcString(expression, loopName, blockOperationString, numBaseT
 		if (isStringALoopName(token) == True):
 			#if (forCachedCalcs == True):
 				#sys.exit("getExpressionCalcString-> . . . here")
-			newToken = token + "_loopVal"
+			if (indexVariable_EqChecks == None):
+				newToken = token + "_loopVal"
+			else:
+				newToken = token + "_loopVal[" + indexVariable_EqChecks + "]"
 			expression = expression.replace(token, newToken, 1)
 
 	expression = ensureSpacesBtwnTokens_CodeGen(expression)
@@ -3082,11 +3085,48 @@ def writeCachedCalcAssignmentsForDC():
 		if (isStringALoopName(cachedCalcName) == False):
 			continue
 
+		if (doesThisLoopHaveMultipleEqChecks(loopInfo, cachedCalcName) == True):
+			continue
+
 		loopGroupTypeForInit = loopVarGroupTypes[cachedCalcName]
 		loopInitValueForInit = str(getInitValueOfLoop(loopInfo, cachedCalcName))
 
 		outputString += "\t" + cachedCalcName + "_loopVal = group.init(" + loopGroupTypeForInit + ", " + loopInitValueForInit + ")\n"
 
+	outputString += "\n"
+
+	eqChecksDictDefs = ""
+	eqChecksLoop = ""
+	eqChecksBody = ""
+	eqChecksDictAssign = ""
+
+	for cachedCalcName in cachedCalcsToPassToDC:
+		if (isStringALoopName(cachedCalcName) == False):
+			continue
+
+		if (doesThisLoopHaveMultipleEqChecks(loopInfo, cachedCalcName) == False):
+			continue
+
+		eqChecksDictDefs += "\t" + cachedCalcName + "_loopVal = {}\n"
+
+		if (eqChecksLoop == ""):
+			(eqChecksLoop, indexVariable_EqChecks) = writeMultipleEqChecksForLoop(cachedCalcName, 1)
+
+		loopGroupTypeForInit = loopVarGroupTypes[cachedCalcName]
+		loopInitValueForInit = str(getInitValueOfLoop(loopInfo, cachedCalcName))
+
+		eqChecksBody += "\t\t" + cachedCalcName + "_loopVal[" + indexVariable_EqChecks + "] = group.init(" + loopGroupTypeForInit + ", " + loopInitValueForInit + ")\n"
+
+		operationString = getOperationStringOfLoop(loopInfo, cachedCalcName)
+
+		eqChecksDictAssign+="\t\t\t"+cachedCalcName+"_loopVal["+indexVariable_EqChecks+"] = "+cachedCalcName+"_loopVal["+indexVariable_EqChecks+"] "+operationString+" "+cachedCalcName+"[index]["+indexVariable_EqChecks+"]"
+		eqChecksDictAssign += "\n"
+
+	outputString += eqChecksDictDefs
+	outputString += "\n"
+	outputString += eqChecksLoop
+	#outputString += "\n"
+	outputString += eqChecksBody
 	outputString += "\n"
 
 	outputString += "\tfor index in range(startSigNum, endSigNum):\n"
@@ -3095,8 +3135,18 @@ def writeCachedCalcAssignmentsForDC():
 		if (isStringALoopName(cachedCalcName) == False):
 			continue
 
+		if (doesThisLoopHaveMultipleEqChecks(loopInfo, cachedCalcName) == True):
+			continue
+
 		operationString = getOperationStringOfLoop(loopInfo, cachedCalcName)
 		outputString += "\t\t" + cachedCalcName + "_loopVal = " + cachedCalcName + "_loopVal " + operationString + " " + cachedCalcName + "[index]\n"
+
+	outputString += "\n"
+	outputString += eqChecksLoop
+	#outputString += "\n"
+	outputString += "\t\tfor index in range(startSigNum, endSigNum):\n"
+
+	outputString += eqChecksDictAssign
 
 	verifySigsFile.write(outputString)
 
@@ -3106,35 +3156,85 @@ def writeVerifyEqAndRecursionForDC():
 	outputString = ""
 	outputString += "\n"
 
+	verifySigsFile.write(outputString)
+
 	for codeGenSegment in finalBatchEqWithLoops:
 		finalBatchEq = codeGenSegment.getEquation().replace(con.finalBatchEqWithLoopsString, '', 1)
-		finalBatchExp = getExpressionCalcString(finalBatchEq, None, None, None, False, False)
-		outputString += "\tif (" + finalBatchExp + "):\n"
-		outputString += "\t\tpass\n"
-		outputString += "\telse:\n"
-		outputString += "\t\tmidWay = int( (endSigNum - startSigNum) / 2)\n"
-		outputString += "\t\tif (midWay == 0):\n"
-		outputString += "\t\t\tif startSigNum not in incorrectIndices:\n"
-		outputString += "\t\t\t\tincorrectIndices.append(startSigNum)\n"
-		outputString += "\t\t\treturn\n"
-		outputString += "\t\tmidSigNum = startSigNum + midWay\n"
-		outputString += "\t\tverifySigsRecursive(verifyArgsDict, group, incorrectIndices, startSigNum, midSigNum"
+		multipleEqChecks = codeGenSegment.getHasMultipleEqChecks()
+		if (multipleEqChecks == False):
+			finalBatchExp = getExpressionCalcString(finalBatchEq, None, None, None, False, False)
+		else:
+			indexVariable = codeGenSegment.getIndexVariable()
+			finalBatchExp = getExpressionCalcString(finalBatchEq, None, None, None, False, False, indexVariable)
 
-		if (len(cachedCalcsToPassToDC) != 0):
-			for cachedCalcName in cachedCalcsToPassToDC:
-				outputString += ", "
-				outputString += cachedCalcName
+		writeVerifyEqRecursion_Ind(finalBatchExp, codeGenSegment, multipleEqChecks)
 
-		outputString += ")\n"
+def writeVerifyEqRecursion_Ind(finalBatchExp, codeGenSegment, multipleEqChecks):
+	global verifySigsFile
 
-		outputString += "\t\tverifySigsRecursive(verifyArgsDict, group, incorrectIndices, midSigNum, endSigNum"
+	numBaseTabs = None
 
-		if (len(cachedCalcsToPassToDC) != 0):
-			for cachedCalcName in cachedCalcsToPassToDC:
-				outputString += ", "
-				outputString += cachedCalcName
+	if (multipleEqChecks == True):
+		numBaseTabs = 2
+	else:
+		numBaseTabs = 1
 
-		outputString += ")\n\n"
+	outputString = ""
+
+	if (multipleEqChecks == True):
+		indexVariable = codeGenSegment.getIndexVariable()
+		startValue = codeGenSegment.getStartValue()
+		loopOverValue = codeGenSegment.getLoopOverValue()
+		outputString += "\tfor " + str(indexVariable) + " in range(" + str(startValue) + ", " + str(loopOverValue) + "):\n"
+
+
+
+	outputString += getStringOfTabs(numBaseTabs)
+	outputString += "if (" + finalBatchExp + "):\n"
+
+	outputString += getStringOfTabs(numBaseTabs)
+	outputString += "\tpass\n"
+
+	outputString += getStringOfTabs(numBaseTabs)
+	outputString += "else:\n"
+
+	outputString += getStringOfTabs(numBaseTabs)
+	outputString += "\tmidWay = int( (endSigNum - startSigNum) / 2)\n"
+
+	outputString += getStringOfTabs(numBaseTabs)
+	outputString += "\tif (midWay == 0):\n"
+
+	outputString += getStringOfTabs(numBaseTabs)
+	outputString += "\t\tif startSigNum not in incorrectIndices:\n"
+
+	outputString += getStringOfTabs(numBaseTabs)
+	outputString += "\t\t\tincorrectIndices.append(startSigNum)\n"
+
+	outputString += getStringOfTabs(numBaseTabs)
+	outputString += "\t\treturn\n"
+
+	outputString += getStringOfTabs(numBaseTabs)
+	outputString += "\tmidSigNum = startSigNum + midWay\n"
+
+	outputString += getStringOfTabs(numBaseTabs)
+	outputString += "\tverifySigsRecursive(verifyArgsDict, group, incorrectIndices, startSigNum, midSigNum"
+
+	if (len(cachedCalcsToPassToDC) != 0):
+		for cachedCalcName in cachedCalcsToPassToDC:
+			outputString += ", "
+			outputString += cachedCalcName
+
+	outputString += ")\n"
+
+	outputString += getStringOfTabs(numBaseTabs)
+	outputString += "\tverifySigsRecursive(verifyArgsDict, group, incorrectIndices, midSigNum, endSigNum"
+
+	if (len(cachedCalcsToPassToDC) != 0):
+		for cachedCalcName in cachedCalcsToPassToDC:
+			outputString += ", "
+			outputString += cachedCalcName
+
+	outputString += ")\n\n"
 
 	verifySigsFile.write(outputString)
 

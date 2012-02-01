@@ -13,8 +13,11 @@ Susan Hohenberger and Brent Waters (Pairing-based)
 :Authors:    J Ayo Akinyele
 :Date:       1/2012
 '''
-from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from toolbox.pairinggroup import *
 from toolbox.iterate import dotprod 
+from toolbox.PKSig import PKSig
+from charm.engine.util import *
+import sys, random, string
 
 debug = False
 class VRF10:
@@ -85,25 +88,122 @@ class VRF10:
             return False
         
 def main():
+    if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
+        sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
+
     grp = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
     
-    # bits
     x = [1, 0, 1, 0, 1, 0, 1, 0]
-    # block of bits
-    n = 8 
-    
+    n = 8
     vrf = VRF10(grp)
-    
-    # setup the VRF to accept input blocks of 8-bits 
     (pk, sk) = vrf.setup(n)
-    
-    # generate proof over block x (using sk)
     st = vrf.prove(sk, x)
-    
-    # verify bits using pk and proof
     assert vrf.verify(pk, x, st), "VRF failed verification"
-    
+
+    numValidMessages = int(sys.argv[1])
+    numInvalidMessages = int(sys.argv[2])
+    messageSize = int(sys.argv[3])
+    prefixName = sys.argv[4]
+    validOutputDictName = sys.argv[5]
+    invalidOutputDictName = sys.argv[6]
+
+    f_pk = open('pk.charmPickle', 'wb')
+    pick_pk = objectToBytes(pk, grp)
+    f_pk.write(pick_pk)
+    f_pk.close()
+
+    validOutputDict = {}
+    validOutputDict[0] = {}
+    validOutputDict[0]['pk'] = 'pk.charmPickle'
+
+    invalidOutputDict = {}
+    invalidOutputDict[0] = {}
+    invalidOutputDict[0]['pk'] = 'pk.charmPickle'
+
+    for index in range(0, numValidMessages):
+        if (index != 0):
+            validOutputDict[index] = {}
+            validOutputDict[index]['pk'] = 'pk.charmPickle'
+
+        x = []
+
+        for randomBitIndex in range(0, n):
+            randomBit = random.randint(0, 1)
+            x.append(randomBit)
+
+        st = vrf.prove(sk, x)
+        assert vrf.verify(pk, x, st), "VRF failed verification"
+
+        f_x = open(prefixName + str(index) + '_ValidMessage.pythonPickle', 'wb')
+        validOutputDict[index]['x'] = prefixName + str(index) + '_ValidMessage.pythonPickle'
+
+        f_st = open(prefixName + str(index) + '_ValidSignature.charmPickle', 'wb')
+        validOutputDict[index]['st'] = prefixName + str(index) + '_ValidSignature.charmPickle'
+
+        pickle.dump(x, f_x)     
+        f_x.close()
+
+        pick_st = objectToBytes(st, grp)
+
+        f_st.write(pick_st)
+        f_st.close()
+
+    dict_pickle = objectToBytes(validOutputDict, grp)
+    f = open(validOutputDictName, 'wb')
+    f.write(dict_pickle)
+    f.close()
+    del dict_pickle
+    del f
+
+    for index in range(0, numInvalidMessages):
+        if (index != 0):
+            invalidOutputDict[index] = {}
+            invalidOutputDict[index]['pk'] = 'pk.charmPickle'
+
+        x = []
+
+        for randomBitIndex in range(0, n):
+            randomBit = random.randint(0, 1)
+            x.append(randomBit)
+
+        st = vrf.prove(sk, x)
+        assert vrf.verify(pk, x, st), "VRF failed verification"
+
+        randomBitToChange = random.randint(0, 7)
+        print(x)
+        if (x[randomBitToChange] == 0):
+            x[randomBitToChange] = 1
+        else:
+            x[randomBitToChange] = 0
+        print(x)
+        print("\n\n")
+
+        shouldBeFalse = vrf.verify(pk, x, st)
+        if (shouldBeFalse == True):
+            sys.exit("bit flip failed")
+
+        f_x = open(prefixName + str(index) + '_InvalidMessage.pythonPickle', 'wb')
+        invalidOutputDict[index]['x'] = prefixName + str(index) + '_InvalidMessage.pythonPickle'
+
+        f_st = open(prefixName + str(index) + '_InvalidSignature.charmPickle', 'wb')
+        invalidOutputDict[index]['st'] = prefixName + str(index) + '_InvalidSignature.charmPickle'
+
+        pickle.dump(x, f_x)     
+        f_x.close()
+
+        pick_st = objectToBytes(st, grp)
+
+        f_st.write(pick_st)
+        f_st.close()
+
+    dict_pickle = objectToBytes(invalidOutputDict, grp)
+    f = open(invalidOutputDictName, 'wb')
+    f.write(dict_pickle)
+    f.close()
+    del dict_pickle
+    del f
+ 
 if __name__ == "__main__":
-    debug = True
+    debug = False
     main()
     
