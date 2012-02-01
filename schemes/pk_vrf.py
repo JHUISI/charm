@@ -72,7 +72,7 @@ class VRF10:
             check2 = pair(pi[i], pk['g2'])
             if x[i] == 0 and check2 == pair(pi[i-1], pk['g2']):
                 if debug: print("Verify: check", i ,"successful!\t\tcase:", x[i])
-            elif check2 == pair(pi[i-1], pk['U2'][i]):
+            elif x[i] == 1 and check2 == pair(pi[i-1], pk['U2'][i]):
                 if debug: print("Verify: check", i ,"successful!\t\tcase:", x[i])
             else:
                 if debug: print("Verify: check", i ,"FAILURE!\t\tcase:", x[i])
@@ -88,7 +88,8 @@ def main():
     grp = PairingGroup('../param/d224.param')
     
     # bits
-    x = [1, 0, 1, 0, 1, 0, 1, 0]
+    x1 = [1, 0, 1, 0, 1, 0, 1, 0]
+#    x2 = [1, 0, 1, 0, 1, 0, 0, 0]
     # block of bits
     n = 8 
     
@@ -98,10 +99,11 @@ def main():
     (pk, sk) = vrf.setup(n)
     
     # generate proof over block x (using sk)
-    st = vrf.prove(sk, x)
+    st = vrf.prove(sk, x1)
     
     # verify bits using pk and proof
-    assert vrf.verify(pk, x, st), "VRF failed verification"
+    assert vrf.verify(pk, x1, st), "VRF failed verification"
+    #assert vrf.verify(pk, x2, st), "VRF should FAIL verification!!!"
     
 if __name__ == "__main__":
     debug = True
