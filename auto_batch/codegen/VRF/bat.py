@@ -59,8 +59,11 @@ def run_Batch_Sorted(verifyArgsDict, groupObjParam, verifyFuncArgs):
 		dotC[z] =   pi [ n ] ** delta [ z ]  
 		dotD[z] =   pi [ 0 ] ** -delta [ z ]  
 		dotE[z] =   y ** delta [ z ]  
-		dotF[z] =  ( pi [ t ] ** delta [ z ] * pi [ t ] -1 **(( 1 + -verifyArgsDict[z]['x'][bodyKey] [ t ] ) * -delta [ z ] ) )  
-		dotG[z] =   pi [ t ] -1 **( verifyArgsDict[z]['x'][bodyKey] [ t ] * delta [ z ] )  
+		for t in range(1, n):
+			dotF[z] = {}
+			dotF[z][t] =  ( pi [ t ] ** delta [ z ] * pi [ t ] -1 **(( 1 + -verifyArgsDict[z]['x'][bodyKey] [ t ] ) * -delta [ z ] ) )  
+			dotG[z] = {}
+			dotG[z][t] =   pi [ t ] -1 **( verifyArgsDict[z]['x'][bodyKey] [ t ] * delta [ z ] )  
 
 	verifySigsRecursive(verifyArgsDict, group, incorrectIndices, 0, N, delta, dotA, dotB, dotC, dotD, dotE, dotF, dotG)
 

@@ -241,6 +241,17 @@ def getInitValueOfLoop(loopInfo, loopName):
 
 	return retInitValue
 
+def getCodeGenSegNo_Parser(loopInfo, loopName):
+	for loopInfoObj in loopInfo:
+		currentLoopName = loopInfoObj.getLoopName().getStringVarName()
+
+		if (currentLoopName != loopName):
+			continue
+
+		return loopInfoObj.getCodeGenSegmentNo()
+
+	sys.exit("Parser->getCodeGenSegNo")
+
 def doesThisLoopHaveMultipleEqChecks(loopInfo, loopName):
 	for loopInfoObj in loopInfo:
 		currentLoopName = loopInfoObj.getLoopName().getStringVarName()

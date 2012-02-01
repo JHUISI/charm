@@ -8,6 +8,7 @@ from IntegerValue import IntegerValue
 from Loop_Block_Toolbox import *
 from OperationValue import OperationValue
 from LoopBlock import LoopBlock
+from FinalEqWithLoops import FinalEqWithLoops
 
 batchEqLoopVars = {}
 batchEqNotLoopVars = {}
@@ -2550,7 +2551,7 @@ def getLoopNamesOfFinalBatchEq_Ind(finalBatchEqWithLoops_Ind, codeGenSegNo):
 
 	loopNamesOfFinalBatchEq[codeGenSegNo] = []
 
-	batchEqWithLoopsCopy = finalBatchEqWithLoops_Ind.replace(con.finalBatchEqWithLoopsString, '', 1)
+	batchEqWithLoopsCopy = finalBatchEqWithLoops_Ind.getEquation().replace(con.finalBatchEqWithLoopsString, '', 1)
 
 	tempList = getVarNamesAsStringNamesFromLine(batchEqWithLoopsCopy)
 
@@ -2751,11 +2752,34 @@ def writeOneBlockToFile(block, numBaseTabs, outputFile, forCachedCalcs):
 			writeOneLoopCalculation(loopToCalculate, blockOperationString, (numBaseTabs + 1), forCachedCalcs, outputFile)
 		elif (multipleEqChecksAlready == False):
 			multipleEqChecksAlready = True
-			outputString = ""
-			outputString += getStringOfTabs(numBaseTabs + 1)
-			outputString += "for " + con.eqChecksIndex + " in range(
+			(outputString, indexVariable_EqChecks) = writeMultipleEqChecksForLoop(loopToCalculate, (numBaseTabs + 1))
+			outputFile.write(outputString)
+			writeOneLoopCalculation(loopToCalculate, blockOperationString, (numBaseTabs + 2), forCachedCalcs, outputFile, indexVariable_EqChecks)
+		else:
+			(outputString, indexVariable_EqChecks) = writeMultipleEqChecksForLoop(loopToCalculate, (numBaseTabs + 1))
+			writeOneLoopCalculation(loopToCalculate, blockOperationString, (numBaseTabs + 2), forCachedCalcs, outputFile, indexVariable_EqChecks)
 
-def writeOneLoopCalculation(loopName, blockOperationString, numBaseTabs, forCachedCalcs, outputFile):
+
+def writeMultipleEqChecksForLoop(loopName, numTabs):
+	outputString = ""
+	outputString += getStringOfTabs(numTabs)
+
+	codeGenSegNo = getCodeGenSegNo_Parser(loopInfo, loopName)
+
+	finalBatchEqObj = finalBatchEqWithLoops[codeGenSegNo]
+
+	if (finalBatchEqObj.getCodeGenSegmentNo() != codeGenSegNo):
+		sys.exit("codegen->writemultipleeqchecks . . . mismatching codegensegno")
+
+	indexVariable = finalBatchEqObj.getIndexVariable()
+	startValue = finalBatchEqObj.getStartValue()
+	loopOverValue = finalBatchEqObj.getLoopOverValue()
+
+	outputString += "for " + str(indexVariable) + " in range(" + str(startValue) + ", " + str(loopOverValue) + "):\n"
+
+	return (outputString, indexVariable)
+
+def writeOneLoopCalculation(loopName, blockOperationString, numBaseTabs, forCachedCalcs, outputFile, indexVariable_EqChecks = None):
 	if ( (loopName == None) or (type(loopName).__name__ != con.strTypePython) or (isStringALoopName(loopName) == False) ):
 		sys.exit("AutoBatch_CodeGen->writeOneLoopCalcualtion:  problem with loop name parameter passed in.")
 
@@ -2771,7 +2795,7 @@ def writeOneLoopCalculation(loopName, blockOperationString, numBaseTabs, forCach
 		cachedCalcsToPassToDC.append(loopName)
 
 	expression = getExpressionFromLoopInfoList(loopInfo, loopName)
-	expressionCalcString = getExpressionCalcString(expression, loopName, blockOperationString, numBaseTabs, forCachedCalcs, True)
+	expressionCalcString = getExpressionCalcString(expression, loopName, blockOperationString, numBaseTabs, forCachedCalcs, True, indexVariable_EqChecks)
 
 	outputString = ""
 	outputString += getStringOfTabs(numBaseTabs)
@@ -2780,15 +2804,20 @@ def writeOneLoopCalculation(loopName, blockOperationString, numBaseTabs, forCach
 
 	outputFile.write(outputString)
 
-def getExpressionCalcString(expression, loopName, blockOperationString, numBaseTabs, forCachedCalcs, forAssignment):
+def getExpressionCalcString(expression, loopName, blockOperationString, numBaseTabs, forCachedCalcs, forAssignment, indexVariable_EqChecks = None):
 	outputString = ""
 
 	if (forAssignment == True):
-		outputString += loopName
+		#outputString += loopName
 		if (forCachedCalcs == True):
-			outputString += "[" + con.numSignaturesIndex + "] = "
+			if (indexVariable_EqChecks == None):
+				outputString += loopName + "[" + con.numSignaturesIndex + "] = "
+			else:
+				outputString += loopName + "[" + con.numSignaturesIndex + "] = {}\n"
+				outputString += getStringOfTabs(numBaseTabs)
+				outputString += loopName + "[" + con.numSignaturesIndex + "][" + indexVariable_EqChecks + "] = "
 		else:
-			outputString += "_loopVal = " + loopName + "_loopVal " + blockOperationString + " "
+			outputString += loopName + "_loopVal = " + loopName + "_loopVal " + blockOperationString + " "
 
 	expression = expression.lstrip('\'').rstrip('\'')
 	expression = ensureSpacesBtwnTokens_CodeGen(expression)
@@ -3076,38 +3105,36 @@ def writeVerifyEqAndRecursionForDC():
 
 	outputString = ""
 	outputString += "\n"
-	finalBatchEq = finalBatchEqWithLoops.replace(con.finalBatchEqWithLoopsString, '', 1)
 
-	finalBatchExp = getExpressionCalcString(finalBatchEq, None, None, None, False, False)
+	for codeGenSegment in finalBatchEqWithLoops:
+		finalBatchEq = codeGenSegment.getEquation().replace(con.finalBatchEqWithLoopsString, '', 1)
+		finalBatchExp = getExpressionCalcString(finalBatchEq, None, None, None, False, False)
+		outputString += "\tif (" + finalBatchExp + "):\n"
+		outputString += "\t\tpass\n"
+		outputString += "\telse:\n"
+		outputString += "\t\tmidWay = int( (endSigNum - startSigNum) / 2)\n"
+		outputString += "\t\tif (midWay == 0):\n"
+		outputString += "\t\t\tif startSigNum not in incorrectIndices:\n"
+		outputString += "\t\t\t\tincorrectIndices.append(startSigNum)\n"
+		outputString += "\t\t\treturn\n"
+		outputString += "\t\tmidSigNum = startSigNum + midWay\n"
+		outputString += "\t\tverifySigsRecursive(verifyArgsDict, group, incorrectIndices, startSigNum, midSigNum"
 
-	outputString += "\tif (" + finalBatchExp + "):\n"
-	outputString += "\t\treturn\n"
-	outputString += "\telse:\n"
-	outputString += "\t\tmidWay = int( (endSigNum - startSigNum) / 2)\n"
-	outputString += "\t\tif (midWay == 0):\n"
-	outputString += "\t\t\tif startSigNum not in incorrectIndices:\n"
+		if (len(cachedCalcsToPassToDC) != 0):
+			for cachedCalcName in cachedCalcsToPassToDC:
+				outputString += ", "
+				outputString += cachedCalcName
 
+		outputString += ")\n"
 
-	outputString += "\t\t\t\tincorrectIndices.append(startSigNum)\n"
-	outputString += "\t\t\treturn\n"
-	outputString += "\t\tmidSigNum = startSigNum + midWay\n"
-	outputString += "\t\tverifySigsRecursive(verifyArgsDict, group, incorrectIndices, startSigNum, midSigNum"
+		outputString += "\t\tverifySigsRecursive(verifyArgsDict, group, incorrectIndices, midSigNum, endSigNum"
 
-	if (len(cachedCalcsToPassToDC) != 0):
-		for cachedCalcName in cachedCalcsToPassToDC:
-			outputString += ", "
-			outputString += cachedCalcName
+		if (len(cachedCalcsToPassToDC) != 0):
+			for cachedCalcName in cachedCalcsToPassToDC:
+				outputString += ", "
+				outputString += cachedCalcName
 
-	outputString += ")\n"
-
-	outputString += "\t\tverifySigsRecursive(verifyArgsDict, group, incorrectIndices, midSigNum, endSigNum"
-
-	if (len(cachedCalcsToPassToDC) != 0):
-		for cachedCalcName in cachedCalcsToPassToDC:
-			outputString += ", "
-			outputString += cachedCalcName
-
-	outputString += ")\n"
+		outputString += ")\n\n"
 
 	verifySigsFile.write(outputString)
 
@@ -3182,7 +3209,7 @@ def processOneLineBatcherOutput(startLineNo, endLineNo, passNo):
 
 		if (line.startswith(con.finalBatchEqWithLoopsString) == True):
 			#finalBatchEqWithLoops.append(line)
-			processFinalBatchEqWithLoops(line, passNo)
+			processFinalBatchEqWithLoops(copy.deepcopy(line), passNo)
 
 		if (line.startswith(con.listString) == True):
 			processListLine(line)
@@ -3203,10 +3230,38 @@ def processOneLineBatcherOutput(startLineNo, endLineNo, passNo):
 def processFinalBatchEqWithLoops(line, codeGenSegNo):
 	global finalBatchEqWithLoops
 
+	line = line.lstrip().rstrip()
+	line = line.replace(con.finalBatchEqWithLoopsString, '', 1)
+
 	finalEqStruct = FinalEqWithLoops()
 
 	if (line.startswith('for') == False):
-		finalEqStruct.
+		finalEqStruct.setEquation(line)
+		finalEqStruct.setCodeGenSegmentNo(codeGenSegNo)
+		finalEqStruct.setHasMultipleEqChecks(False)
+		finalBatchEqWithLoops.append(copy.deepcopy(finalEqStruct))
+		del finalEqStruct
+		return
+
+	lineSplitOnDo = line.split(' do ')
+	finalEqStruct.setEquation(lineSplitOnDo[1])
+	finalEqStruct.setCodeGenSegmentNo(codeGenSegNo)
+	finalEqStruct.setHasMultipleEqChecks(True)
+
+	loopParameters = lineSplitOnDo[0].split('{')[1]
+	loopParamsSplit = loopParameters.split(con.batchVerifierOutputAssignment)
+	indexVariable = loopParamsSplit[0]
+	finalEqStruct.setIndexVariable(indexVariable.lstrip().rstrip())
+
+	startValue = loopParamsSplit[1].split(',')[0]
+	startValue = int(startValue.lstrip().rstrip())
+	finalEqStruct.setStartValue(startValue)
+
+	loopOverValue = loopParamsSplit[1].split(',')[1].split('}')[0]
+	finalEqStruct.setLoopOverValue(loopOverValue.lstrip().rstrip())
+
+	finalBatchEqWithLoops.append(copy.deepcopy(finalEqStruct))
+	del finalEqStruct
 
 
 def main():
