@@ -2826,6 +2826,8 @@ def getExpressionCalcString(expression, loopName, blockOperationString, numBaseT
 
 	expressionSplit = expression.split()
 	for tokenCopy in expressionSplit:
+		#print(tokenCopy)
+
 		token = copy.deepcopy(tokenCopy)
 
 		if (token.count(con.loopIndicator) > 1):
@@ -2908,7 +2910,11 @@ def processTokenWithSubscriptIndicator(token):
 	if (firstIndexIsNum == True):
 		expandedName = expandEntryWithSubscriptPlaceholder(varAssignments, structName, keyNo)
 	else:
-		expandedName = structName + "[" + str(keyNoAsString) + "]"
+		if (str(keyNoAsString) in con.loopTypes):
+			newIndexToAdd = "(" + str(keyNoAsString) + " - 1)"
+		else:
+			newIndexToAdd = str(keyNoAsString)
+		expandedName = structName + "[" + newIndexToAdd + "]"
 		#print(expandedName)
 
 	if (loopIndices != None):
@@ -2923,7 +2929,11 @@ def processTokenWithSubscriptIndicator(token):
 	#print(numListIndices)
 
 	for listIndexNo in range(2, len(tokenSplit)):
-		expandedName += "[" + str(tokenSplit[listIndexNo]) + "]"
+		if (str(tokenSplit[listIndexNo]) in con.loopTypes):
+			newIndexToAdd = "(" + str(tokenSplit[listIndexNo]) + " - 1)"
+		else:
+			newIndexToAdd = str(tokenSplit[listIndexNo])
+		expandedName += "[" + newIndexToAdd + "]"
 
 	#print(expandedName)
 

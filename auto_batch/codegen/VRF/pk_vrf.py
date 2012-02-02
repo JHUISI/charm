@@ -58,7 +58,7 @@ class VRF10:
         pi_0 = sk['g1'] ** (sk['u_t'] * sk['u'][0] * result0)
         y = self.F(sk, x)
         return { 'y':y, 'pi':pi, 'pi0':pi_0 }
-                
+
     def verify(self, pk, x, st):
         n, y, pi, pi_0 = pk['n'], st['y'], st['pi'], st['pi0']
         # check first index 
@@ -75,7 +75,7 @@ class VRF10:
             check2 = pair(pi[i], pk['g2'])
             if x[i] == 0 and check2 == pair(pi[i-1], pk['g2']):
                 if debug: print("Verify: check", i ,"successful!\t\tcase:", x[i])
-            elif check2 == pair(pi[i-1], pk['U2'][i]):
+            elif x[i] == 1 and check2 == pair(pi[i-1], pk['U2'][i]):
                 if debug: print("Verify: check", i ,"successful!\t\tcase:", x[i])
             else:
                 if debug: print("Verify: check", i ,"FAILURE!\t\tcase:", x[i])
@@ -88,8 +88,8 @@ class VRF10:
             return False
         
 def main():
-    if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
-        sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
+    #if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
+        #sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
 
     grp = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
     
@@ -100,6 +100,7 @@ def main():
     st = vrf.prove(sk, x)
     assert vrf.verify(pk, x, st), "VRF failed verification"
 
+    '''
     numValidMessages = int(sys.argv[1])
     numInvalidMessages = int(sys.argv[2])
     messageSize = int(sys.argv[3])
@@ -202,6 +203,7 @@ def main():
     f.close()
     del dict_pickle
     del f
+    '''
  
 if __name__ == "__main__":
     debug = False

@@ -1,5 +1,8 @@
-from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from toolbox.pairinggroup import *
 from toolbox.iterate import dotprod
+from toolbox.PKSig import PKSig
+from charm.engine.util import *
+import sys, random, string
 import sys
 
 group = None
@@ -44,7 +47,7 @@ def run_Ind(verifyArgsDict, groupObjParam, verifyFuncArgs):
 			check2= pair( pi [ i ] , verifyArgsDict[z]['pk'][bodyKey][ 'g2' ] )
 			if verifyArgsDict[z]['x'][bodyKey][ i ]== 0 and check2== pair( pi [ i -1 ] , verifyArgsDict[z]['pk'][bodyKey][ 'g2' ] ) :
 				if debug : print( "Verify: check" , i , "successful!\t\tcase:" , verifyArgsDict[z]['x'][bodyKey][ i ] )
-			elif check2== pair( pi [ i -1 ] , verifyArgsDict[z]['pk'][bodyKey][ 'U2' ] [ i ] ) :
+			elif verifyArgsDict[z]['x'][bodyKey][ i ]== 1 and check2== pair( pi [ i -1 ] , verifyArgsDict[z]['pk'][bodyKey][ 'U2' ] [ i ] ) :
 				if debug : print( "Verify: check" , i , "successful!\t\tcase:" , verifyArgsDict[z]['x'][bodyKey][ i ] )
 			else :
 				if debug : print( "Verify: check" , i , "FAILURE!\t\tcase:" , verifyArgsDict[z]['x'][bodyKey][ i ] )

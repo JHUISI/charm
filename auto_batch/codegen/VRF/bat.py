@@ -1,5 +1,8 @@
-from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from toolbox.pairinggroup import *
 from toolbox.iterate import dotprod
+from toolbox.PKSig import PKSig
+from charm.engine.util import *
+import sys, random, string
 import sys
 from toolbox.pairinggroup import *
 from ver import verifySigsRecursive
@@ -56,7 +59,7 @@ def run_Batch_Sorted(verifyArgsDict, groupObjParam, verifyFuncArgs):
 
 		dotA[z] =  ( verifyArgsDict[z]['pk'][bodyKey] [ 'g1' ] **(( 1 + -verifyArgsDict[z]['x'][bodyKey] [ 1 ] ) * delta [ z ] ) * verifyArgsDict[z]['pk'][bodyKey] [ 'U1' ] [ 0 ] **( verifyArgsDict[z]['x'][bodyKey] [ 1 ] * delta [ z ] ) )  
 		dotB[z] =   pi [ 1 ] ** -delta [ z ]  
-		dotC[z] =   pi [ n ] ** delta [ z ]  
+		dotC[z] =   pi [( n -1 ) ] ** delta [ z ]  
 		dotD[z] =   pi [ 0 ] ** -delta [ z ]  
 		dotE[z] =   y ** delta [ z ]  
 		for t in range(1, n):

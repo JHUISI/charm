@@ -164,7 +164,11 @@ def expandEntryWithSubscriptPlaceholder(varAssignments, entryName, argumentNumbe
 
 					retSubscriptSliceString = dictKeyEntry.getStringVarName()
 			elif (structType == con.listValue):
-				retSubscriptSliceString = str(argumentNumber)
+				if (str(argumentNumber) in con.loopTypes):
+					newIndexToAdd = "(" + str(argumentNumber) + " - 1)"
+				else:
+					newIndexToAdd = str(argumentNumber)
+				retSubscriptSliceString = newIndexToAdd
 			else:
 				sys.exit("expandEntryWith(parser)-> not dict or list (in if-else branch)")
 
@@ -172,7 +176,12 @@ def expandEntryWithSubscriptPlaceholder(varAssignments, entryName, argumentNumbe
 		#print(entryName)
 		#print(argumentNumber)
 		#sys.exit("expandEntryWithSubscriptPlaceholder . . . ")
-		retSubscriptSliceString = str(argumentNumber)
+		if (str(argumentNumber) in con.loopTypes):
+			newIndexToAdd = "(" + str(argumentNumber) + " - 1)"
+		else:
+			newIndexToAdd = str(argumentNumber)
+
+		retSubscriptSliceString = newIndexToAdd
 
 	return entryName + "[" + retSubscriptSliceString + "]"
 
