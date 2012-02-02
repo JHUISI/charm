@@ -7,6 +7,19 @@ from StringValue import StringValue
 from LineNumbers import LineNumbers
 from VariableDependencies import VariableDependencies
 
+def getListOfLoopsWithMultipleEqChecks(loopInfo):
+	retList = []
+
+	for loopInfoObj in loopInfo:
+		currentLoopName = loopInfoObj.getLoopName().getStringVarName()
+		if (doesThisLoopHaveMultipleEqChecks(loopInfo, currentLoopName) == True):
+			retList.append(currentLoopName)
+
+	if (len(retList) == 0):
+		return None
+
+	return retList
+
 def getSectionRanges(lines, sectionHeader):
 	lineNo = 0
 	startLineNo = -1
@@ -1243,6 +1256,33 @@ def getLineInfoFromSourceCodeLines(sourceCodeLines, numSpacesPerTab):
 
 	return lineInfoList
 
+def determineIfWithinPound(lineOfCode, R_index, withinPound):
+	currentCharIsPound = None
+	currentCharIsTerm = None
+
+	if (lineOfCode[R_index] == con.subscriptIndicator):
+		currentCharIsPound = True
+	else:
+		currentCharIsPound = False
+
+	if (lineOfCode[R_index] == con.subscriptTerminator):
+		currentCharIsTerm = True
+	else:
+		currentCharIsTerm = False
+
+	if (withinPound == True):
+		if (currentCharIsTerm == True):
+			return False
+		else:
+			return True
+	else:
+		if (currentCharIsPound == True):
+			return True
+		else:
+			return False
+
+	sys.exit("Parser->withinPound->logic error")
+
 def determineIfWithinQuotes(lineOfCode, R_index, withinQuotes, lastQuoteChar):
 	if ( (lineOfCode == None) or (type(lineOfCode).__name__ != con.strTypePython) or (len(lineOfCode) == 0) ):
 		sys.exit("Parser_CodeGen_Toolbox->determineIfWithinQuotes:  problem with line of code parameter passed in.")
@@ -1306,11 +1346,14 @@ def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
 	withinQuotes = False
 	lastQuoteChar = None
 
+	withinPound = False
+
 	while (True):
 		checkForSpace = False
 		(withinQuotes, lastQuoteChar) = determineIfWithinQuotes(lineOfCode, R_index, withinQuotes, lastQuoteChar)
+		withinPound = determineIfWithinPound(lineOfCode, R_index, withinPound)
 		lenOfLine = len(lineOfCode)
-		if (withinQuotes == True):
+		if ( (withinQuotes == True) or (withinPound == True) ):
 			pass
 		elif (lineOfCode[R_index] in ['^', '+', '(', ')', '{', '}', '-', ',', '[', ']']):
 			currChars = lineOfCode[R_index]
@@ -1668,6 +1711,9 @@ def writeFunctionFromCodeToString(sourceCodeLines, startLineNo, endLineNo, extra
 	firstLine = removeSpaceBeforeChar(firstLine, '=')
 
 	firstLine = removeSpaceAfterChar(firstLine, '-')
+
+	firstLine = firstLine.replace(con.subscriptTerminator, '')
+
 	outputString += firstLine
 	outputString += "\n"
 
@@ -1702,6 +1748,8 @@ def writeFunctionFromCodeToString(sourceCodeLines, startLineNo, endLineNo, extra
 		line = removeSpaceBeforeChar(line, '=')
 
 		line = removeSpaceAfterChar(line, '-')
+
+		line = line.replace(con.subscriptTerminator, '')
 
 		totalTabsForThisLine = extraTabsPerLine + numTabsForThisLine
 

@@ -7,12 +7,14 @@ import sys
 
 group = None
 lam_func = None
+debug = None
 bodyKey = 'Body'
 
 
 def __init__( groupObj ) : 
-	global group , lam_func 
+	global group , lam_func , debug 
 	group= groupObj 
+	debug= False 
 	lam_func= lambda i , a , b : a [ i ] ** b [ i ] 
 
 def verifySigsRecursive(verifyArgsDict, groupObj, incorrectIndices, startSigNum, endSigNum, delta, dotA, dotB, dotC, dotD, dotE, dotF, dotG):
@@ -20,6 +22,7 @@ def verifySigsRecursive(verifyArgsDict, groupObj, incorrectIndices, startSigNum,
 
 	group = groupObj
 
+	n , y , pi , pi_0= verifyArgsDict[z]['pk'][bodyKey][ 'n' ] , verifyArgsDict[z]['st'][bodyKey][ 'y' ] , verifyArgsDict[z]['st'][bodyKey][ 'pi' ] , verifyArgsDict[z]['st'][bodyKey][ 'pi0' ]
 	lam_func = lambda i,a,b: a[i] ** b[i]
 
 	__init__(group)
@@ -50,7 +53,8 @@ def verifySigsRecursive(verifyArgsDict, groupObj, incorrectIndices, startSigNum,
 			dotF_loopVal[t] = dotF_loopVal[t] * dotF[index][t]
 			dotG_loopVal[t] = dotG_loopVal[t] * dotG[index][t]
 
-	if ( ( pair( dotA_loopVal , verifyArgsDict[z]['pk'][bodyKey] [ 'U_t' ] ) * pair( dotB_loopVal , verifyArgsDict[z]['pk'][bodyKey] [ 'g2' ] ) )== 1  ):
+	if ( ( pair( dotA_loopVal , verifyArgsDict[z]['pk'][bodyKey] [ 'U_t' ] ) * pair( dotB_loopVal , verifyArgsDict[z]['pk'][bodyKey] [ 'g2' ] ) )== group.init( GT , 1 )  ):
+		#print("check 1 passed!")
 		pass
 	else:
 		midWay = int( (endSigNum - startSigNum) / 2)
@@ -61,8 +65,10 @@ def verifySigsRecursive(verifyArgsDict, groupObj, incorrectIndices, startSigNum,
 		midSigNum = startSigNum + midWay
 		verifySigsRecursive(verifyArgsDict, group, incorrectIndices, startSigNum, midSigNum, delta, dotA, dotB, dotC, dotD, dotE, dotF, dotG)
 		verifySigsRecursive(verifyArgsDict, group, incorrectIndices, midSigNum, endSigNum, delta, dotA, dotB, dotC, dotD, dotE, dotF, dotG)
+		return
 
-	if ( ( pair( dotC_loopVal , verifyArgsDict[z]['pk'][bodyKey] [ 'U2' ] [ 0 ] ) * pair( dotD_loopVal ,( verifyArgsDict[z]['pk'][bodyKey] [ 'g2' ] * verifyArgsDict[z]['pk'][bodyKey] [ 'h' ] ** -1 ) ) )== dotE_loopVal  ):
+	if ( ( pair( dotC_loopVal , verifyArgsDict[z]['pk'][bodyKey] [ 'U2' ] [ 0 ] ) * pair( dotD_loopVal ,( verifyArgsDict[z]['pk'][bodyKey] [ 'g2' ] * ~verifyArgsDict[z]['pk'][bodyKey] [ 'h' ] ) ) )== dotE_loopVal  ):
+		#print("check 2 passed! yeah, son!")
 		pass
 	else:
 		midWay = int( (endSigNum - startSigNum) / 2)
@@ -73,9 +79,11 @@ def verifySigsRecursive(verifyArgsDict, groupObj, incorrectIndices, startSigNum,
 		midSigNum = startSigNum + midWay
 		verifySigsRecursive(verifyArgsDict, group, incorrectIndices, startSigNum, midSigNum, delta, dotA, dotB, dotC, dotD, dotE, dotF, dotG)
 		verifySigsRecursive(verifyArgsDict, group, incorrectIndices, midSigNum, endSigNum, delta, dotA, dotB, dotC, dotD, dotE, dotF, dotG)
+		return
 
 	for t in range(1, n):
 		if (  pair( dotF_loopVal [ t ] , verifyArgsDict[z]['pk'][bodyKey] [ 'g2' ] )== pair( dotG_loopVal [ t ] , verifyArgsDict[z]['pk'][bodyKey] [ 'U2' ] [ t ] )  ):
+			#print("check 3 passed! done")
 			pass
 		else:
 			midWay = int( (endSigNum - startSigNum) / 2)
@@ -86,4 +94,5 @@ def verifySigsRecursive(verifyArgsDict, groupObj, incorrectIndices, startSigNum,
 			midSigNum = startSigNum + midWay
 			verifySigsRecursive(verifyArgsDict, group, incorrectIndices, startSigNum, midSigNum, delta, dotA, dotB, dotC, dotD, dotE, dotF, dotG)
 			verifySigsRecursive(verifyArgsDict, group, incorrectIndices, midSigNum, endSigNum, delta, dotA, dotB, dotC, dotD, dotE, dotF, dotG)
+			return
 

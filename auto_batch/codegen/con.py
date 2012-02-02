@@ -127,6 +127,9 @@ strTypePython = 'str'
 subTypeAST = 'Sub'
 subscriptFields = ('value', 'slice', 'ctx')
 subscriptIndicator = '#'
+
+subscriptTerminator = '?'
+
 subscriptTypeAST = 'Subscript'
 subscriptName = 'SubscriptName'
 sumDirector = 'of'

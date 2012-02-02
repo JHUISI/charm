@@ -2266,6 +2266,17 @@ def writeNumSignersLine(outputFile):
 	if (numSignersNum != None):
 		outputFile.write("\t" + con.numSigners + " = " + str(numSignersNum) + "\n")
 
+def writeNumEqChecksLine(outputFile):
+	lineNosToWriteToFile = getAllLineNosThatImpactVarList([con.numEqChecks], con.verifyFuncName, lineNosPerVar, var_varDependencies)
+	if (lineNosToWriteToFile != None):
+		writeLinesToFile(lineNosToWriteToFile, 0, outputFile)
+		return
+
+	numEqChecksNum = getStringNameIntegerValue(varAssignments, con.numEqChecks, con.mainFuncName)
+
+	if (numEqChecksNum != None):
+		outputFile.write("\t" + con.numEqChecks + " = " + str(numEqChecksNum) + "\n")
+
 def addTemplateLines():
 	global batchVerFile, individualVerFile
 
@@ -2292,6 +2303,7 @@ def addTemplateLines():
 	batchVerFile.write(batchOutputString)
 	batchOutputString = ""
 	writeNumSignersLine(batchVerFile)
+	writeNumEqChecksLine(batchVerFile)
 
 	batchOutputString += "\t" + con.deltaDictName + " = {}\n"
 	batchOutputString += "\tfor " + con.numSignaturesIndex + " in range(0, " + con.numSignatures + "):\n"
@@ -2306,6 +2318,7 @@ def addTemplateLines():
 	individualVerFile.write(indOutputString)
 	indOutputString = ""
 	writeNumSignersLine(individualVerFile)
+	writeNumEqChecksLine(individualVerFile)
 
 	indOutputString += "\tincorrectIndices = []\n"
 
@@ -2477,6 +2490,9 @@ def writeLinesToOutputString(lines, indentationListParam, baseNumTabs, numExtraT
 		line = removeSpaceBeforeChar(line, '=')
 
 		line = removeSpaceAfterChar(line, '-')
+
+		line = line.replace(con.subscriptTerminator, '')
+
 		line = line.replace(con.selfFuncCallString, con.space)
 		if (indentationListParam != None):
 			numTabs = determineNumTabsFromSpaces(indentationListParam[lineNumber], numSpacesPerTab) - baseNumTabs
@@ -2743,6 +2759,7 @@ def writeOneBlockToFile(block, numBaseTabs, outputFile, forCachedCalcs):
 
 	multipleEqChecksAlready = False
 	eqChecksThisLoop = False
+	loopsWithMultipleEqChecks = getListOfLoopsWithMultipleEqChecks(loopInfo)
 
 	for loopToCalculate in loopsToCalculate:
 		eqChecksThisLoop = doesThisLoopHaveMultipleEqChecks(loopInfo, loopToCalculate)
@@ -2752,6 +2769,8 @@ def writeOneBlockToFile(block, numBaseTabs, outputFile, forCachedCalcs):
 			writeOneLoopCalculation(loopToCalculate, blockOperationString, (numBaseTabs + 1), forCachedCalcs, outputFile)
 		elif (multipleEqChecksAlready == False):
 			multipleEqChecksAlready = True
+			outputString = writeEqChecksDictDefs(loopsWithMultipleEqChecks, (numBaseTabs + 1))
+			outputFile.write(outputString)
 			(outputString, indexVariable_EqChecks) = writeMultipleEqChecksForLoop(loopToCalculate, (numBaseTabs + 1))
 			outputFile.write(outputString)
 			writeOneLoopCalculation(loopToCalculate, blockOperationString, (numBaseTabs + 2), forCachedCalcs, outputFile, indexVariable_EqChecks)
@@ -2759,6 +2778,18 @@ def writeOneBlockToFile(block, numBaseTabs, outputFile, forCachedCalcs):
 			(outputString, indexVariable_EqChecks) = writeMultipleEqChecksForLoop(loopToCalculate, (numBaseTabs + 1))
 			writeOneLoopCalculation(loopToCalculate, blockOperationString, (numBaseTabs + 2), forCachedCalcs, outputFile, indexVariable_EqChecks)
 
+def writeEqChecksDictDefs(loopsWithMultipleEqChecks, numBaseTabs):
+	if (loopsWithMultipleEqChecks == None):
+		sys.exit("codegen->writeeqchecksdictdefs->loops struct passed in is None.")
+
+	outputString = ""
+
+	for loopName in loopsWithMultipleEqChecks:
+		#print(loopName)
+		outputString += getStringOfTabs(numBaseTabs)
+		outputString += loopName + "[" + con.numSignaturesIndex + "] = {}\n"
+
+	return outputString
 
 def writeMultipleEqChecksForLoop(loopName, numTabs):
 	outputString = ""
@@ -2813,8 +2844,8 @@ def getExpressionCalcString(expression, loopName, blockOperationString, numBaseT
 			if (indexVariable_EqChecks == None):
 				outputString += loopName + "[" + con.numSignaturesIndex + "] = "
 			else:
-				outputString += loopName + "[" + con.numSignaturesIndex + "] = {}\n"
-				outputString += getStringOfTabs(numBaseTabs)
+				#outputString += loopName + "[" + con.numSignaturesIndex + "] = {}\n"
+				#outputString += getStringOfTabs(numBaseTabs)
 				outputString += loopName + "[" + con.numSignaturesIndex + "][" + indexVariable_EqChecks + "] = "
 		else:
 			outputString += loopName + "_loopVal = " + loopName + "_loopVal " + blockOperationString + " "
@@ -2875,11 +2906,19 @@ def getExpressionCalcString(expression, loopName, blockOperationString, numBaseT
 
 	expression = removeSpaceAfterChar(expression, '-')
 
+	expression = expression.replace(con.subscriptTerminator, '')
+
 	outputString += expression
 	return outputString
 
 def processTokenWithSubscriptIndicator(token):
 	tokenSplit = token.split(con.subscriptIndicator)
+
+	for tokenIndex in range(0, len(tokenSplit)):
+		if (tokenSplit[tokenIndex].count(con.subscriptTerminator) > 1):
+			sys.exit("codegen->processtoken->too many subscript terminators")
+
+		tokenSplit[tokenIndex] = tokenSplit[tokenIndex].replace(con.subscriptTerminator, '')
 
 	#print(tokenSplit)
 
@@ -3075,6 +3114,7 @@ def writeOpeningLinesToDCVerifySigsRecursiveFunc():
 	verifySigsFile.write(verifyOutputString)
 	verifyOutputString = ""
 	writeNumSignersLine(verifySigsFile)
+	writeNumEqChecksLine(verifySigsFile)
 
 	if (verifyPrereqs != None):
 		verifyOutputString += verifyPrereqs
@@ -3244,7 +3284,9 @@ def writeVerifyEqRecursion_Ind(finalBatchExp, codeGenSegment, multipleEqChecks):
 			outputString += ", "
 			outputString += cachedCalcName
 
-	outputString += ")\n\n"
+	outputString += ")\n"
+	outputString += getStringOfTabs(numBaseTabs + 1)
+	outputString += "return\n\n"
 
 	verifySigsFile.write(outputString)
 

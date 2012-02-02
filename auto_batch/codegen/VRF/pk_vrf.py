@@ -26,8 +26,9 @@ class VRF10:
     a verifier that a given evaluation is correct (matches pub commitment) without sacrificing pseudo-
     randomness property on other inputs."""
     def __init__(self, groupObj):
-        global group, lam_func
+        global group, lam_func, debug
         group = groupObj
+        debug = False
         lam_func = lambda i,a,b: a[i] ** b[i]
         
     def setup(self, n):
@@ -65,7 +66,7 @@ class VRF10:
         check1 = pair(pi[0], pk['g2'])
         if x[0] == 0 and check1 == pair(pk['g1'], pk['U_t']):
             if debug: print("Verify: check 0 successful!\t\tcase:", x[0])
-        elif x[0] == 1 and pair(pk['U1'][0], pk['U_t']):
+        elif x[0] == 1 and check1 == pair(pk['U1'][0], pk['U_t']):
             if debug: print("Verify: check 0 successful!\t\tcase:", x[0])            
         else: 
             if debug: print("Verify: check 0 FAILURE!\t\tcase:", x[0])            
@@ -81,7 +82,8 @@ class VRF10:
                 if debug: print("Verify: check", i ,"FAILURE!\t\tcase:", x[i])
                 return False
         
-        if pair(pi_0, pk['g2']) == pair(pi[n-1], pk['U2'][0]) and pair(pi_0, pk['h']) == y:
+#        if pair(pi_0, pk['g2']) == pair(pi[n-1], pk['U2'][0]) and pair(pi_0, pk['h']) == y:
+        if pair(pi_0, pk['g2'] * pk['h']) == pair(pi[n-1], pk['U2'][0]) * y:
             if debug: print("Verify: all and final check successful!!!")
             return True
         else:
@@ -99,6 +101,7 @@ def main():
     (pk, sk) = vrf.setup(n)
     st = vrf.prove(sk, x)
     assert vrf.verify(pk, x, st), "VRF failed verification"
+    print("Success!!!")
 
     '''
     numValidMessages = int(sys.argv[1])

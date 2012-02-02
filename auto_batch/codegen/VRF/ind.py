@@ -7,20 +7,23 @@ import sys
 
 group = None
 lam_func = None
+debug = None
 bodyKey = 'Body'
 
 def __init__( groupObj ) : 
-	global group , lam_func 
+	global group , lam_func , debug 
 	group= groupObj 
+	debug= False 
 	lam_func= lambda i , a , b : a [ i ] ** b [ i ] 
 
 def run_Ind(verifyArgsDict, groupObjParam, verifyFuncArgs):
 	global group
-	global lam_func
+	global lam_func, debug
 	group = groupObjParam
 
 	N = len(verifyArgsDict)
 	z = 0
+	n , y , pi , pi_0= verifyArgsDict[z]['pk'][bodyKey][ 'n' ] , verifyArgsDict[z]['st'][bodyKey][ 'y' ] , verifyArgsDict[z]['st'][bodyKey][ 'pi' ] , verifyArgsDict[z]['st'][bodyKey][ 'pi0' ]
 	incorrectIndices = []
 	lam_func = lambda i,a,b: a[i] ** b[i]
 	__init__(group)

@@ -102,6 +102,7 @@ if __name__ == '__main__':
 
 	loadDataFromDictInMemory(validDict, 0, 10, sigsDict, 0)
 	loadDataFromDictInMemory(invalidDict, 0, 10, sigsDict, 10, realIncorrectSigIndices)
+	#loadDataFromDictInMemory(validDict, 0, 10, sigsDict, 10, realIncorrectSigIndices)
 			
 	preRandomizedIndices = []
 	for randomIndex in range(0, 20):
