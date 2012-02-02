@@ -67,7 +67,7 @@ class IBE_CKRS(IBEnc):
         return v
     
     def extract(self, mpk, msk, ID):
-        r1, r2 = group.random(ZR, 2)
+        r1, r2 = group.random(ZR, 2) # should be params of extract
         hID = self.strToId(mpk, ID)
         hashID2 = mpk['h_l'][0] * dotprod2(range(1,mpk['n']), lam_func, mpk['h_l'], hID)        
         d = {}
@@ -77,7 +77,7 @@ class IBE_CKRS(IBEnc):
         d[2] = (mpk['h'] ** (-msk['alpha'] * msk['t1'])) * (hashID2 ** (-r1 * msk['t1']))
         d[3] = hashID2 ** (-r2 * msk['t4'])
         d[4] = hashID2 ** (-r2 * msk['t3'])
-        return { 'd':d, 'ID':ID }
+        return { 'd':d }
     
     def encrypt(self, mpk, ID, msg):
         s, s1, s2 = group.random(ZR, 3)
