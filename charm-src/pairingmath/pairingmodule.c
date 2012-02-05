@@ -79,12 +79,6 @@ static PyObject *f(PyObject *v, PyObject *w) { \
 	return NULL;				\
 }
 
-#define BINARY_NONE(f, m, n) \
-static PyObject *f(PyObject *v, PyObject *w) { \
- Py_INCREF(Py_NotImplemented);	\
- return Py_NotImplemented;  }
-
-
 PyObject *mpzToLongObj (mpz_t m)
 {
 	/* borrowed from gmpy */
@@ -175,11 +169,6 @@ int Check_Types(GroupType l_type, GroupType r_type, char op)
 		case 'p':
 			// rule for exponentiation for types
 			if(l_type != G1 && l_type != G2 && l_type != GT && l_type != ZR) { return FALSE; }
-			// && r_type != ZR)
-			// else { 
-			//	PyErr_SetString(ElementError, "Only fields => [G1,G2,GT,Zr] ** Zr");
-			//	return FALSE; 
-			//}			
 			break;
 		default:
 			break;
@@ -256,10 +245,6 @@ void	Element_dealloc(Element* self)
 		free(self->param_buf);
 	}
 	
-//	if(self->safe_pairing_clear && self->pairing) {
-//		debug("Clear pairing => 0x%p\n", self->pairing);
-//		pairing_clear(self->pairing);
-//	}
 	if(self->safe_pairing_clear) {
 		PyObject_Del(self->pairing);
 	}
@@ -1456,10 +1441,6 @@ BINARY(instance_sub, 's', Element_sub)
 
 static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 
-//	if(o1->pairing == NULL) {
-//		PyErr_SetString(ElementError, "pairing params not initialized.");
-//		return NULL;
-//	}
 	Element *self = NULL;
 	if(!PyArg_ParseTuple(args, "O", &self)) {
 		PyErr_SetString(ElementError, "invalid argument.");

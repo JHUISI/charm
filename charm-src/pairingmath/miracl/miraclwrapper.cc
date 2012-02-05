@@ -165,10 +165,12 @@ int _element_length_to_str(Group_t type, const element_t *e)
 	if(type == ZR_t) {
 		Big *y = (Big *) e;
 		ss << *y;
+// 		cout << "ZR origin => " << *y << endl;
 	}
 	else if(type == G1_t) {
 		G1 *point = (G1 *) e;
 		ss << point->g;
+//		cout << "G1 origin => " << point->g << endl;
 	}
 	else if(type == G2_t) {
 		G2 *point = (G2 *) e;

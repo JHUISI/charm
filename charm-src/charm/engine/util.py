@@ -1,6 +1,6 @@
 from __future__ import print_function
-import struct
 import io, pickle
+import json, zlib
 from base64 import *
 import types
 
@@ -194,18 +194,45 @@ def unpickleObject(byte_object):
         return pickle.loads(decoded)
     return None
 
+# json does not support 'bytes' objects, so these from/to_json 
+# functions handle protecting the 
+def to_json(object):
+    if isinstance(object, bytes):
+        return {'__class__': 'bytes', '__value__': list(object) }
+    return TypeError(repr(python_ob) + " is not JSON serializable")
+
+def from_json(json_object):
+    if '__class__' in json_object:
+        if json_object['__class__'] == 'bytes':
+            return bytes(json_object['__value__'])
+    return json_object
 
 # Two new API calls to simplify serializing to a blob of bytes
 # objectToBytes() and bytesToObject()
-# Note: in the future, pickle will be replaced by a more reliable 
-# json object serializer instead of pickle
 def objectToBytes(object, group):
     object_ser = serializeObject(object, group)
-    return pickleObject(object_ser)
-
+    #result = pickleObject(object_ser)
+    result = bytes(json.dumps(object_ser, default=to_json), 'utf-8')
+    return b64encode(zlib.compress(result))
+    
 def bytesToObject(byteobject, group):
-    unwrap_object = unpickleObject(byteobject)
+    #unwrap_object = unpickleObject(byteobject)
+    decoded = bytes.decode(zlib.decompress(b64decode(byteobject)))
+    unwrap_object = json.loads(decoded, object_hook=from_json)
     return deserializeObject(unwrap_object, group)
+    
+"""
+    Using serialization tools with our cryptographic schemes 
+    requires that the group object is initialized 
+    
+    data = { 'test1':b"hello", 'test2':b"world", }
+    
+    dataBytes = objectToBytes(data, group)
+    
+    dataRec   = bytesToObject(dataBytes, group)
+
+    assert data == dataRec, 'Error during deserialization.'    
+"""
 
 if __name__ == "__main__":
     data = { 'a':b"hello", 'b':b"world" }

@@ -3,7 +3,7 @@ from charm.cryptobase import MODE_CBC,AES,selectPRP
 from toolbox.ABEnc import ABEnc
 from schemes.abenc_lsw08 import KPabe
 from toolbox.pairinggroup import PairingGroup,GT
-from toolbox.AuthenticatedCryptoAbstraction import AuthenticatedCryptoAbstraction
+from toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from charm.pairing import hash as sha1
 from toolbox.conversion import *
 from math import ceil
