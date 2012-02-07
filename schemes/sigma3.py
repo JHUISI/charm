@@ -1,9 +1,5 @@
-from toolbox.sigmaprotocol import *
-from toolbox.pairinggroup import *
-#from socket import *
-import sys
-
-HOST, PORT = "", 8082
+from toolbox.sigmaprotocol import Sigma
+from toolbox.pairinggroup import ZR,G2,pair
 
 # Proof of Membership {(h): H = e(g,h) /and/ W = e(h,V)}
 class SigmaProtocol3(Sigma):
@@ -26,73 +22,56 @@ class SigmaProtocol3(Sigma):
         
     def prover_state1(self):
         print("PROVER 1: ")
-        (g, V) = Protocol.get(self, ['g', 'V'])
-        r = self.group.random(G1)
-#        a = (pair(V, g2) ** -r1) * (pair(g, g2) ** r2)
-        a1 = pair(g, r); a2 = pair(V, r)
+        (g, V) = Sigma.get(self, ['g', 'V'])
+        r = self.group.random(G2)
+        a1 = pair(g, r)
+        a2 = pair(V, r)
         print("send r =>", r)
         print("send a1 =>", a1)
         print("send a2 =>", a2)
+        pk = Sigma.get(self, ['g','V','H'], dict)
 
-        Protocol.store(self, ('r',r), ('a1',a1), ('a2',a2) )
-        Protocol.setState(self, 3)
-
-        pk = Protocol.get(self, ['g','V','H'], dict)
+        Sigma.store(self, ('r',r) )
+        Sigma.setState(self, 3)
         return { 'a1':a1, 'a2':a2, 'pk':pk }
     
     def prover_state3(self, input):
         print("PROVER 3: ")
-        (r, h, c) = Protocol.get(self, ['r', 'h', 'c'])
-#        c = input['c']
+        (r, h, c) = Sigma.get(self, ['r', 'h', 'c'])
         print("input c =>", c)
-        print("r :=", r.type)
-        print("h :=", h.type)
         z = r * (h ** -c)
-        Protocol.setState(self, 5)
+        Sigma.setState(self, 5)
         # need store and get functions for db        
         return {'z':z }
     
     def prover_state5(self, input):
         print("PROVER 5: result =>", input)
-        Protocol.setState(self, None)
-        Protocol.setErrorCode(self, input)
+        Sigma.setState(self, None)
+        Sigma.setErrorCode(self, input)
         return None
     
     def verifier_state2(self, input):
         print("VERIFIER 2: ")
-        print("input pk =>", input['pk'])
-        print("input a1 =>", input['a1'])
-        print("input a2 =>", input['a2'])
-        pk = input['pk']
-    
         c = self.group.random(ZR)
         print("send c =>", c)
-        Protocol.store(self, ('c',c),('g',pk['g']),('V',pk['V']),('H',pk['H']), 
-            ('a1', input['a1']), ('a2', input['a2']) ) 
-        Protocol.setState(self, 4)
+        Sigma.setState(self, 4)
         return {'c':c }
 
     def verifier_state4(self, input):
         print("VERIFIER 4: ")
-#        z = input['z']
-        (a1, a2, g, H, c, V, W, z) = Protocol.get(self, ['a1','a2','g','H','c','V','W','z'])
-        print("get a1 =>", a1)
-        _a1 = pair(g,z) * (H ** c)
-        _a2 = pair(V,z) * (W ** c)
-        print("test a1 =>", _a1)
-        print("get a2 =>", a2)
-        print("test a2 =>", _a2)
-        if a1 == _a1 and a2 == _a2:
+        (a1, a2, c, W, z, pk) = Sigma.get(self, ['a1','a2','c','W','z','pk'])
+        g, V, H = pk['g'], pk['V'], pk['H']
+        if a1 == pair(g,z) * (H ** c) and a2 == pair(V,z) * (W ** c):
             print("SUCCESS!!!!!!!"); result = 'OK'
         else:
             print("Failed!!!"); result = 'FAIL'
-        Protocol.setState(self, 6)
-        Protocol.setErrorCode(self, result)
+        Sigma.setState(self, 6)
+        Sigma.setErrorCode(self, result)
         return result
     
     def verifier_state6(self, input):
         print("VERIFIER 6: done.")
-        Protocol.setState(self, None)
+        Sigma.setState(self, None)
         return None
 
 #if __name__ == "__main__":
