@@ -488,20 +488,20 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 //	pbc_param_t p;
 	Pairing *pairing;
 	static char *buf;
-	char *buf2 = NULL;
+	char *param_buf2 = NULL;
 	PyObject *n = NULL, *short_val = NULL;
 	int qbits = 0, rbits = 0;
 	size_t b_len = 0;
 	int seed = -1;
 	
-    static char *kwlist[] = {"params", "n", "qbits", "rbits", "short", "param_string", "seed", NULL};
+    static char *kwlist[] = {"params", "n", "qbits", "rbits", "short", "string", "seed", NULL};
 	
     if (! PyArg_ParseTupleAndKeywords(args, kwds, "|sOiiOs#i", kwlist,
-                                      &self->params, &n, &qbits, &rbits, &short_val, &buf2, &b_len, &seed)) {
+                                      &self->params, &n, &qbits, &rbits, &short_val, &param_buf2, &b_len, &seed)) {
     	PyErr_SetString(ElementError, "invalid arguments");
         return -1; 
 	}
-	if (self->params && !n && !qbits && !rbits && !short_val && !buf2) {
+	if (self->params && !n && !qbits && !rbits && !short_val && !param_buf2) {
 		// check if file exists
 		int f = open(self->params, O_RDONLY);
 		if(f < 0) {
@@ -517,11 +517,11 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 			self->param_buf = buf;
 		}
 	}
-	else if(buf2 && !n && !qbits && !rbits && !short_val) {
+	else if(param_buf2 && !n && !qbits && !rbits && !short_val) {
 		// parameters is provided in string
+		debug("Paramter String => '%s'\n", param_buf2);
 		pairing = PyObject_New(Pairing, &PairingType);
-		debug("Paramter String => '%s'\n", buf2);
-		pbc_param_init_set_buf(pairing->p, buf2, b_len);
+		pbc_param_init_set_buf(pairing->p, param_buf2, b_len);
 		pairing_init_pbc_param(pairing->pair_obj, pairing->p);
 	}
 	else if (n && !(qbits || rbits)) {
