@@ -310,68 +310,13 @@ int Integer_init(Integer *self, PyObject *args, PyObject *kwds) {
 	return 0;
 }
 
-//// TODO: add ability to set the seed
-//static PyObject *Integer_randinit(Integer *self, PyObject *arg) {
-//	Integer *newObject = PyObject_New(Integer, &IntegerType);
-//
-//	mpz_init(newObject->e);
-//	mpz_init(newObject->m);
-//	// for the purposes of
-//	gmp_randinit_mt(newObject->state);
-//	if (arg == NULL) {
-//		BIGNUM *s = BN_new(), *range = BN_new();
-//		BN_set_word(range, SEED_RANGE);
-//		BN_pseudo_rand_range(s, range);
-//
-//		mpz_t m;
-//		mpz_init(m);
-//		bnToMPZ(s, m);
-//		printf("created m =>\n");
-//		print_mpz(m, 10);
-//		BIGNUM *s2 = BN_new();
-//		mpzToBN(m, s2);
-//		print_bn_dec(s2);
-//		BN_free(s2);
-//
-//		mpz_clear(m);
-//		printf("done for good!\n");
-//
-//
-//		PyObject *result = bnToLongObj(s);
-//
-//		BN_ULONG seed = BN_get_word(s);
-//		BN_free(s);
-//		BN_free(range);
-//		gmp_randseed_ui(newObject->state, seed);
-//
-////		return result;
-//	} else if (_PyLong_Check(arg)) {
-//		unsigned long seed2 = PyLong_AsUnsignedLongMask(arg);
-//		gmp_randseed_ui(newObject->state, seed2);
-//	}
-//	newObject->state_init = TRUE;
-//	newObject->initialized = FALSE;
-//
-//	return (PyObject *) newObject;
-//}
-//
-//static PyObject *Integer_call(Integer *intObject, PyObject *args, PyObject *kwds) {
-//	PyObject *obj = NULL;
-///*
-//	if(PyArg_ParseTuple(args, "O", &obj)) {
-//
-//	}
-//*/
-//	return NULL;
-//}
-
 static PyObject *Integer_equals(PyObject *o1, PyObject *o2, int opid) {
 	Integer *lhs = NULL, *rhs = NULL;
 	int foundLHS = FALSE, foundRHS = FALSE, result = -1;
 	unsigned long int lhs_value = 0, rhs_value = 0;
 
-	if (opid != Py_EQ) {
-		PyErr_SetString(IntegerError, "only comparison supported is '=='");
+	if(opid != Py_EQ && opid != Py_NE) {
+		ErrorMsg("only comparison supported is '==' or '!='");
 		return NULL;
 	}
 
@@ -417,13 +362,18 @@ static PyObject *Integer_equals(PyObject *o1, PyObject *o2, int opid) {
 		}
 	}
 
-	if (result == 0) {
-		Py_INCREF(Py_True);
-		return Py_True;
+	if(opid == Py_EQ) {
+		if(result == 0) {
+			Py_INCREF(Py_True); return Py_True;
+		}
+		Py_INCREF(Py_False); return Py_False;
 	}
-
-	Py_INCREF(Py_False);
-	return Py_False;
+	else { /* Py_NE */
+		if(result != 0) {
+			Py_INCREF(Py_True); return Py_True;
+		}
+		Py_INCREF(Py_False); return Py_False;
+	}
 }
 
 PyObject *Integer_print(Integer *self) {

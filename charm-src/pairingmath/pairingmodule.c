@@ -1334,8 +1334,8 @@ static PyObject *Element_equals(PyObject *lhs, PyObject *rhs, int opid) {
 	signed long int z;
 	int found_int = FALSE, result = -1; // , value;
 
-	if(opid != Py_EQ) {
-		PyErr_SetString(ElementError, "only comparison supported is '=='");
+	if(opid != Py_EQ && opid != Py_NE) {
+		PyErr_SetString(ElementError, "only comparison supported is '==' or '!='");
 		goto cleanup;
 	}
 
@@ -1392,14 +1392,19 @@ static PyObject *Element_equals(PyObject *lhs, PyObject *rhs, int opid) {
 	STOP_CLOCK(dBench);
 
 cleanup:
-//	value = (result == 0) ? TRUE : FALSE;
-	if(result == 0) {
-		Py_INCREF(Py_True);
-		return Py_True;
-	}
 
-	Py_INCREF(Py_False);
-	return Py_False; // Py_BuildValue("i", value);
+	if(opid == Py_EQ) {
+		if(result == 0) {
+			Py_INCREF(Py_True); return Py_True;
+		}
+		Py_INCREF(Py_False); return Py_False;
+	}
+	else { /* Py_NE */
+		if(result != 0) {
+			Py_INCREF(Py_True); return Py_True;
+		}
+		Py_INCREF(Py_False); return Py_False;
+	}
 }
 
 static PyObject *Element_long(PyObject *o1) {
