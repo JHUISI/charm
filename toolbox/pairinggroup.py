@@ -1,11 +1,22 @@
 from charm.pairing import *
+from toolbox.pairingcurves import a,d224
 from charm.integer import randomBits,bitsize,integer
 import os.path
 
 class PairingGroup():
     def __init__(self, param_file, secparam=512, verbose=False):
         #assert os.path.isfile(param_file), "Param file '%s' does not exist!" % param_file 
-        self.Pairing = pairing(param_file)            
+        #checks if this is a file path
+        
+        #legacy handler to handle calls that still pass in a file path
+        if param_file.endswith("a.param"):
+            pair = a
+        elif param_file.endswith("d224.param"):
+            pair = d224
+        else:
+            pair = param_file
+        
+        self.Pairing = pairing(string = a)            
         self.secparam = secparam # number of bits
 #        self.rand = init()
         self._verbose = verbose
