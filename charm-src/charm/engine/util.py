@@ -18,7 +18,9 @@ def serializeDict(object, group):
                 else:
                     bytes_object[i] = object[i] # don't convert to bytes, if string
             elif type(object[i]) == unicode:
-                bytes_object[i] = object[i]
+                temp = 'uni'+object[i]
+                bytes_object[i] = temp
+                #bytes_object[i] = object[i]
             elif type(object[i]) == dict:
                 bytes_object[i] = serializeDict(object[i], group) #; print("dict found in ser => '%s'" % i); 
             elif type(object[i]) == list:
@@ -47,7 +49,9 @@ def serializeList(object, group):
                 else:
                     bytes_object_.append(i)
             elif type(i) == unicode:
-                bytes_object_.append(i)
+                temp = 'uni'+i
+                bytes_object_.append(temp) 
+                #bytes_object_.append(i)
             elif type(i) == dict:
                 bytes_object_.append(serializeDict(i, group)) #; print("dict found in ser => '%s'" % i); 
             elif type(i) == list:
@@ -66,7 +70,9 @@ def serializeList(object, group):
                 else:
                     bytes_object_.append(i)
             elif type(i) == unicode:
-                bytes_object_.append(i)
+                temp = 'uni'+i
+                bytes_object_.append(temp)
+                #bytes_object_.append(i)
             elif type(i) == dict:
                 bytes_object_.append(serializeDict(i, group)) #; print("dict found in ser => '%s'" % i); 
             elif type(i) == list:
@@ -111,7 +117,14 @@ def deserializeDict(object, group):
             elif _type == int:
                 bytes_object[i] = object[i]
             elif _type == unicode:
-               bytes_object[i] = unicode(object[i])
+               if(object[i][:3] == 'str'):
+                   bytes_object[i] = bytes(object[i][3:])
+               else:
+                   if(object[i][:3] == 'uni'):
+                       bytes_object[i] = unicode(object[i][3:])
+                   else:
+                       bytes_object[i] = group.deserialize(bytes(object[i]))
+               #bytes_object[i] = unicode(object[i])
         return bytes_object
     elif type(object) == bytes:
         return group.deserialize(object)
@@ -141,7 +154,14 @@ def deserializeList(object, group):
             elif _typeL == int:
                 _bytes_object.append(i)
             elif _typeL == unicode:
-               _bytes_object.append(unicode(i))
+               if(i[:3] == 'str'):
+                   _bytes_object.append(bytes(i[3:]))
+               else:
+                   if(i[:3] == 'uni'):
+                       _bytes_object.append(unicode(i[3:]))
+                   else:
+                       _bytes_object.append(group.deserialize(bytes(i)))
+               #_bytes_object.append(unicode(i))
         return _bytes_object
     elif type(object) == tuple:
         for i in object:
@@ -160,7 +180,14 @@ def deserializeList(object, group):
             elif _typeL == int:
                 _bytes_object.append(i)
             elif _typeL == unicode:
-               _bytes_object.append(unicode(i))
+               if(i[:3] == 'str'):
+                   _bytes_object.append(bytes(i[3:]))
+               else:
+                   if(i[:3] == 'uni'):
+                       _bytes_object.append(unicode(i[3:]))
+                   else:
+                       _bytes_object.append(group.deserialize(bytes(i)))
+               #_bytes_object.append(unicode(i))
         return tuple(_bytes_object)        
     else:
         # just one bytes object
@@ -212,7 +239,7 @@ def from_json(json_object):
 def objectToBytes(object, group):
     object_ser = serializeObject(object, group)
     #result = pickleObject(object_ser)
-    result = bytes(json.dumps(object_ser, default=to_json), 'utf-8')
+    result = json.dumps(object_ser, default=to_json)
     return b64encode(zlib.compress(result))
     
 def bytesToObject(byteobject, group):
