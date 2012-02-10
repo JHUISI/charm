@@ -88,7 +88,8 @@ if __name__ == '__main__':
 
 	validDictArg = open(sys.argv[1], 'rb').read()
 	invalidDictArg = open(sys.argv[2], 'rb').read()
-	groupParamArg = PairingGroup(sys.argv[3])
+	#groupParamArg = PairingGroup(sys.argv[3])
+	groupParamArg = PairingGroup(MNT160)
 
 	validDictFile = deserializeDict( unpickleObject(validDictArg), groupParamArg )
 	invalidDictFile = deserializeDict( unpickleObject(invalidDictArg), groupParamArg )

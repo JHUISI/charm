@@ -47,10 +47,11 @@ class IBSig():
         return False 
 
 def main():
-    #if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
-        #sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
+    if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
+        sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
 
-    groupObj = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
+    #groupObj = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
+    groupObj = PairingGroup(MNT160)
     
     #m = { 'a':"hello world!!!" , 'b':"test message" }
     m = "rest"
@@ -66,7 +67,6 @@ def main():
     if debug: print('SUCCESS!!!')
 
 
-    '''
     numValidMessages = int(sys.argv[1])
     numInvalidMessages = int(sys.argv[2])
     messageSize = int(sys.argv[3])
@@ -176,7 +176,6 @@ def main():
     f.close()
     del dict_pickle
     del f
-    '''
     
 if __name__ == "__main__":
     debug = True
