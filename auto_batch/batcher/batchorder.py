@@ -84,7 +84,7 @@ class BatchOrder:
         min_index = 0
         min_time = self.batch_time[min_index]
         for i in self.batch_time.keys():
-            if self.debug: print("unique path:", i, ", time:", self.batch_time[i], ", path: ", all_paths[i])
+            print("unique path:", i, ", time:", self.batch_time[i], ", path: ", all_paths[i])
             if self.batch_time[i] <= min_time:
                 min_index = i; 
                 min_time = self.batch_time[i]
