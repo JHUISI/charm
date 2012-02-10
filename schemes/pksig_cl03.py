@@ -19,16 +19,20 @@ class Sig_CL03(PKSig):
         le = lm + 2
         l = lin
         
-    def keygen(self, secparam=512):
-        pprime = randomPrime(secparam)
-        while(not isPrime(2*pprime + 1)):
+    def keygen(self, secparam=512, p=0, q=0):
+        if(p == 0):
             pprime = randomPrime(secparam)
-        p = 2 * pprime + 1
+            while(not isPrime(2*pprime + 1)):
+                pprime = randomPrime(secparam)
+            p = 2 * pprime + 1
+            print(p)
 
-        qprime = randomPrime(secparam)
-        while(not isPrime(2*qprime + 1)):
+        if(q == 0):
             qprime = randomPrime(secparam)
-        q = 2 * qprime + 1
+            while(not isPrime(2*qprime + 1)):
+                qprime = randomPrime(secparam)
+            q = 2 * qprime + 1
+            print(q)
 
         N = p * q
 
@@ -88,7 +92,10 @@ class Sig_CL03(PKSig):
 def main():
     pksig = Sig_CL03() 
 
-    (pk, sk) = pksig.keygen(512)
+    p = integer(21281327767482252741932894893985715222965623124768085901716557791820905647984944443933101657552322341359898014680608292582311911954091137905079983298534519)
+    q = integer(25806791860198780216123533220157510131833627659100364815258741328806284055493647951841418122944864389129382151632630375439181728665686745203837140362092027)
+
+    (pk, sk) = pksig.keygen(512, p, q)
     if debug:
         print("Public parameters...")
         print("pk =>", pk)
