@@ -9,14 +9,17 @@ class PairingGroup():
         #checks if this is a file path
         
         #legacy handler to handle calls that still pass in a file path
-        if param_file.endswith("a.param"):
-            pair = a
-        elif param_file.endswith("d224.param"):
-            pair = d224
-        else:
-            pair = param_file
-        
-        self.Pairing = pairing(string = a)            
+        if type(param_file) == str:
+          if param_file.endswith("a.param"):
+              pair = a
+          elif param_file.endswith("d224.param"):
+              pair = d224
+          else:
+              pair = param_file
+          self.Pairing = pairing(string = pair)            
+        elif type(param_file) == int:
+          self.Pairing = pairing(param_file)
+ 
         self.secparam = secparam # number of bits
 #        self.rand = init()
         self._verbose = verbose
