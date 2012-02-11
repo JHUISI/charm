@@ -11,6 +11,8 @@ callTypeAST = 'Call'
 
 codeGenHeader = "<====	PREP FOR CODE GEN	====>"
 
+codeString = 'Code '
+
 commentChar = '#'
 computeString = 'Compute:  '
 delta = 'delta'

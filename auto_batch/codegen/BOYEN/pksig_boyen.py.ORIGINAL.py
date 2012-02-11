@@ -109,7 +109,7 @@ def main():
         sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
 
 
-    groupObj = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
+    groupObj = PairingGroup(MNT160)
     boyen = Boyen(groupObj)
     mpk = boyen.setup()
     if debug: print("Pub parameters")
@@ -145,12 +145,12 @@ def main():
     invalidOutputDictName = sys.argv[6]
 
     f_mpk = open('mpk.charmPickle', 'wb')
-    pick_mpk = pickleObject(serializeDict(mpk, groupObj))
+    pick_mpk = objectToBytes(mpk, groupObj)
     f_mpk.write(pick_mpk)
     f_mpk.close()
 
     f_pk = open('pk.charmPickle', 'wb')
-    pick_pk = pickleObject(serializeDict(L_pk, groupObj))
+    pick_pk = objectToBytes(L_pk, groupObj)
     f_pk.write(pick_pk)
     f_pk.close()
 
@@ -186,7 +186,7 @@ def main():
         pickle.dump(message, f_message)
         f_message.close()
 
-        pick_sig = pickleObject(serializeDict(sig, groupObj))
+        pick_sig = objectToBytes(sig, groupObj)
 
         f_sig.write(pick_sig)
         f_sig.close()
@@ -197,7 +197,7 @@ def main():
         del f_sig
         del pick_sig
 
-    dict_pickle = pickleObject(serializeDict(validOutputDict, groupObj))
+    dict_pickle = objectToBytes(validOutputDict, groupObj)
     f = open(validOutputDictName, 'wb')
     f.write(dict_pickle)
     f.close()
@@ -205,7 +205,7 @@ def main():
     del f
 
     for index in range(0, numInvalidMessages):
-        print("here")
+        #print("here")
         if (index != 0):
             invalidOutputDict[index] = {}
             invalidOutputDict[index]['mpk'] = 'mpk.charmPickle'
@@ -239,7 +239,7 @@ def main():
         pickle.dump(message, f_message)
         f_message.close()
 
-        pick_sig = pickleObject(serializeDict(sig, groupObj))
+        pick_sig = objectToBytes(sig, groupObj)
 
         f_sig.write(pick_sig)
         f_sig.close()
@@ -250,7 +250,7 @@ def main():
         del f_sig
         del pick_sig
 
-    dict_pickle = pickleObject(serializeDict(invalidOutputDict, groupObj))
+    dict_pickle = objectToBytes(invalidOutputDict, groupObj)
     f = open(invalidOutputDictName, 'wb')
     f.write(dict_pickle)
     f.close()
