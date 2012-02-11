@@ -81,13 +81,20 @@ class BatchOrder:
         # if so, no point distributing products first           
         path = []; all_paths = []; self.batch_time = {}
         self.BFStrategy(self.verify, path, all_paths)
+        remove_list = []
+        for i in all_paths:
+            for j in all_paths:
+                if i != j and set(i).issubset(j):
+#                    print("delete duplicate: ", i)
+                    remove_list.append(i)
         min_index = 0
         min_time = self.batch_time[min_index]
         for i in self.batch_time.keys():
-            print("unique path:", i, ", time:", self.batch_time[i], ", path: ", all_paths[i])
-            if self.batch_time[i] <= min_time:
-                min_index = i; 
-                min_time = self.batch_time[i]
+            if not all_paths[i] in remove_list:
+                print("unique path:", i, ", time:", self.batch_time[i], ", path: ", all_paths[i])
+                if self.batch_time[i] <= min_time:
+                    min_index = i; 
+                    min_time = self.batch_time[i]
         
         if self.debug: print("returning batch algorithm: ", all_paths[min_index])        
         return all_paths[min_index]
@@ -148,7 +155,7 @@ class BatchOrder:
                     suggest = [6, 5, 3]
             elif tech_applied == 5: # distribute products
                 if tech_obj.testForApplication:
-                    suggest = [4, 3]
+                    suggest = [2, 4, 3]
             elif tech_applied == 6: # combine pairings
                 if tech_obj.testForApplication:
                     suggest = [5, 4, 3, 6]
@@ -167,6 +174,13 @@ class BatchOrder:
 #            for i in excl_tech_list: # stuff I've already tried
 #                suggest.remove(i)
         return suggest
+    
+    def isSubSet(self, check_path, all_paths):
+        set_path = set(check_path)
+        for path in all_paths:
+            if set_path.issubset(set(path)):
+                return True
+        return False
     
     # TODO: finish algorithm and figure out when it is BEST to distribute dot products 
     # Recursively determine all the paths that might apply until we converge (e.g., no more techniques apply)
@@ -201,16 +215,17 @@ class BatchOrder:
             if self.debug: print("Technique ", cur_tech, "did NOT apply.")
             #print("Final path: ", path)
             if not path in all_paths:
-                all_paths.append(path)
-                cnt = all_paths.index(path)
-                N = int(self.vars['N'])
-                rop_batch = RecordOperations(self.vars)
-                rop_batch.visit(equation, {})
-                (msmt, avg) = calculate_times(rop_batch.ops, curves[c_key], N)
-                self.batch_time[ cnt ] = avg
-                if self.debug:
-                    print("Saving path: ", path)
-                    print("Measure batch time: ", avg)
+                if not self.isSubSet(path, all_paths):
+                    all_paths.append(path)
+                    cnt = all_paths.index(path)
+                    N = int(self.vars['N'])
+                    rop_batch = RecordOperations(self.vars)
+                    rop_batch.visit(equation, {})
+                    (msmt, avg) = calculate_times(rop_batch.ops, curves[c_key], N)
+                    self.batch_time[ cnt ] = avg
+                    if self.debug:
+                        print("Saving path: ", path)
+                        print("Measure batch time: ", avg)
 
             return False
     
