@@ -7,14 +7,9 @@ class PairingGroup():
     def __init__(self, param_file, secparam=512, verbose=False):        
         #legacy handler to handle calls that still pass in a file path
         if type(param_file) == str:
-          if param_file.endswith("a.param"):
-              pair = params['SS512']
-          elif param_file.endswith("d224.param"):
-              pair = params['MNT224']
-          else:
-              pair = params.get(param_file)
+          pair = params.get(param_file)
           assert pair != None, "'%s' not recognized! See 'pairingcurves.py' in toolbox." % param_file
-          self.Pairing = pairing(string=pair)            
+          self.Pairing = pairing(string=pair)
         elif type(param_file) == int:
             # support for MIRACL initialization : default arg := MNT160
           self.Pairing = pairing(param_file)

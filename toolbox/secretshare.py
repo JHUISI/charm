@@ -71,7 +71,7 @@ if __name__ == "__main__":
 # Testing Secret sharing python API
   k = 3
   n = 4
-  p = PairingGroup('../param/a.param')
+  p = PairingGroup('SS512')
 
   s = SecretShare(p, True)
   sec = p.random(ZR)

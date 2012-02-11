@@ -18,14 +18,14 @@ class TesSymmetricCryptoAbstraction(unittest.TestCase):
         clever enough to write papers about -- Whitfield Diffie.")
 
     def MsgtestAESCBC(self,msg):
-        groupObj = PairingGroup('../param/a.param')
+        groupObj = PairingGroup('SS512')
         a =  SymmetricCryptoAbstraction(sha1(groupObj.random(GT)))
         ct = a.encrypt(msg)
         dmsg = a.decrypt(ct);
         assert msg == dmsg , 'o: =>%s\nm: =>%s' % (msg, dmsg)
    
     def MsgTestAESCBCSeperate(self,msg):
-        groupObj = PairingGroup('../param/a.param')
+        groupObj = PairingGroup('SS512')
         ran = groupObj.random(GT)
         a =  SymmetricCryptoAbstraction(sha1(ran))
         ct = a.encrypt(msg)        
@@ -49,14 +49,14 @@ class TesAuthenticatedCryptoAbstraction(unittest.TestCase):
 
 
     def MsgtestAESCBC(self,msg):
-        groupObj = PairingGroup('../param/a.param')
+        groupObj = PairingGroup('SS512')
         a =  AuthenticatedCryptoAbstraction(sha1(groupObj.random(GT)))
         ct = a.encrypt(msg)
         dmsg = a.decrypt(ct);
         assert msg == dmsg , 'o: =>%s\nm: =>%s' % (msg, dmsg)
    
     def MsgTestAESCBCSeperate(self,msg):
-        groupObj = PairingGroup('../param/a.param')
+        groupObj = PairingGroup('SS512')
         ran = groupObj.random(GT)
         a =  AuthenticatedCryptoAbstraction(sha1(ran))
         ct = a.encrypt(msg)        
@@ -66,20 +66,20 @@ class TesAuthenticatedCryptoAbstraction(unittest.TestCase):
 
 class TestMessageAuthenticator(unittest.TestCase):
     def testSelfVerify(self):
-        key = sha1(PairingGroup('../param/a.param').random(GT))
+        key = sha1(PairingGroup('SS512').random(GT))
         m = MessageAuthenticator(key)
         a = m.mac('hello world')
         assert m.verify(a), "expected message to verify";
 
     def testSeperateVerify(self):
-        key = sha1(PairingGroup('../param/a.param').random(GT))
+        key = sha1(PairingGroup('SS512').random(GT))
         m = MessageAuthenticator(key)
         a = m.mac('hello world')
         m1 = MessageAuthenticator(key)
         assert m1.verify(a), "expected message to verify";
  
     def testTamperData(self):
-        key = sha1(PairingGroup('../param/a.param').random(GT))
+        key = sha1(PairingGroup('SS512').random(GT))
         m = MessageAuthenticator(key)
         a = m.mac('hello world')
         m1 = MessageAuthenticator(key)
@@ -87,7 +87,7 @@ class TestMessageAuthenticator(unittest.TestCase):
         assert not m1.verify(a), "expected message to verify";
 
     def testTamperMac(self):
-        key = sha1(PairingGroup('../param/a.param').random(GT))
+        key = sha1(PairingGroup('SS512').random(GT))
         m = MessageAuthenticator(key)
         a = m.mac('hello world')
         m1 = MessageAuthenticator(key)
@@ -95,7 +95,7 @@ class TestMessageAuthenticator(unittest.TestCase):
         assert not m1.verify(a), "expected message to verify";
 
     def testTamperAlg(self):
-        key = sha1(PairingGroup('../param/a.param').random(GT))
+        key = sha1(PairingGroup('SS512').random(GT))
         m = MessageAuthenticator(key)
         a = m.mac('hello world')
         m1 = MessageAuthenticator(key)

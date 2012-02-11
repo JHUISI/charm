@@ -44,12 +44,12 @@ def autoDiscoverSchemes():
 
 class Test(unittest.TestCase):    
     def testIBE_bb03(self):
-        group = PairingGroup('../param/d224.param', 1024)
+        group = PairingGroup('MNT224', 1024)
         M = group.random(GT)
         self.myCorrectnessTest(IBE_BB04, group, M)
     
     def testIBE_Franklin(self):
-        group = PairingGroup('../param/d224.param', 1024)
+        group = PairingGroup('MNT224', 1024)
         M = "hello world!!"
         self.myCorrectnessTest(IBE_BonehFranklin, group, M)
     
@@ -58,7 +58,7 @@ class Test(unittest.TestCase):
         ibe_names = all_unittests.find_modules()
         ibe_classes = all_unittests.collectSubClasses(IBEnc, ibe_names)
         
-        group = PairingGroup('../param/d224.param', 1024)
+        group = PairingGroup('MNT224', 1024)
         for c in ibe_classes:
             print("Testing ", c)
             M = "test message"
