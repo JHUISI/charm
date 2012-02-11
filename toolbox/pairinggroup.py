@@ -5,10 +5,7 @@ from charm.integer import randomBits,bitsize,integer
 import os.path
 
 class PairingGroup():
-    def __init__(self, param_file, secparam=512, verbose=False):
-        #assert os.path.isfile(param_file), "Param file '%s' does not exist!" % param_file 
-        #checks if this is a file path
-        
+    def __init__(self, param_file, secparam=512, verbose=False):        
         #legacy handler to handle calls that still pass in a file path
         if type(param_file) == str:
           if param_file.endswith("a.param"):
@@ -17,12 +14,11 @@ class PairingGroup():
               pair = d224
           else:
               pair = param_file
-          self.Pairing = pairing(string = pair)            
+          self.Pairing = pairing(string=pair)            
         elif type(param_file) == int:
           self.Pairing = pairing(param_file)
  
         self.secparam = secparam # number of bits
-#        self.rand = init()
         self._verbose = verbose
 
     # will be used to define curve parameters and such
