@@ -102,7 +102,7 @@ def main():
     if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
         sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
 
-    groupObj = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
+    groupObj = PairingGroup(MNT160)
     n = 3    # how manu users in the group
     user = 1 # which user's key to sign a message with
     
@@ -179,6 +179,8 @@ def main():
         del f_message
         del f_sig
         del pick_sig
+
+    #print(validOutputDict)
 
     dict_pickle = objectToBytes(validOutputDict, groupObj)
     f = open(validOutputDictName, 'wb')

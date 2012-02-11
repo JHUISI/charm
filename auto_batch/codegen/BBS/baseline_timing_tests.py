@@ -24,6 +24,9 @@ NUM_CYCLES = 100
 def loadDictDataFromFile(verifyParamFilesDict, groupParamArg):
 	verifyArgsDict = {}
 	totalNumSigs = len(verifyParamFilesDict)
+
+	print(verifyParamFilesDict['0'])
+
 	verifyFuncArgs = list(verifyParamFilesDict[0].keys())
 
 	for sigIndex in range(0, totalNumSigs):
@@ -81,7 +84,7 @@ if __name__ == '__main__':
 		sys.exit("Usage:  python " + sys.argv[0] + "\n\t[dictionary with valid messages/signatures]\n\t[group param int]\n\t[name of output file for batch results]\n\t[name of output file for ind. results]")
 
 	validDictArg = open(sys.argv[1], 'rb').read()
-	groupParamArg = PairingGroup(sys.argv[2])
+	groupParamArg = PairingGroup(MNT160)
 	batchResultsFile = sys.argv[3]
 	indResultsFile = sys.argv[4]
 
