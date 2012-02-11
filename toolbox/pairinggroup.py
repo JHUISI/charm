@@ -1,5 +1,5 @@
 from charm.pairing import *
-from toolbox.pairingcurves import a,d224
+from toolbox.pairingcurves import params
 from charm.integer import randomBits,bitsize,integer
 import os.path
 
@@ -8,13 +8,15 @@ class PairingGroup():
         #legacy handler to handle calls that still pass in a file path
         if type(param_file) == str:
           if param_file.endswith("a.param"):
-              pair = a
+              pair = params['SS512']
           elif param_file.endswith("d224.param"):
-              pair = d224
+              pair = params['MNT224']
           else:
-              pair = param_file
+              pair = params.get(param_file)
+          assert pair != None, "'%s' not recognized! See 'pairingcurves.py' in toolbox." % param_file
           self.Pairing = pairing(string=pair)            
         elif type(param_file) == int:
+            # support for MIRACL initialization : default arg := MNT160
           self.Pairing = pairing(param_file)
  
         self.secparam = secparam # number of bits
