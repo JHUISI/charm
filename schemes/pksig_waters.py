@@ -97,7 +97,7 @@ class WatersSig:
 
 def main():
    z = 5
-   groupObj = PairingGroup('../param/a.param')
+   groupObj = PairingGroup('SS512')
 
    waters = WatersSig(groupObj)
    (mpk, msk) = waters.setup(z)

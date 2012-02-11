@@ -89,7 +89,7 @@ class Sig_RSA_Stateless_HW09(PKSig):
         
     def keygen(self, keyLength=1024, p=0, q=0):
         # Generate a Blum-Williams integer N of 'key_length' bits with factorization p,q
-        if p == 0 and q == 0:
+        if p == 0 or q == 0:
             (p, q) = self.BWInt.generatePrimes(int(keyLength/2))
         # Generate random u,h \in QR_N and a random c \in {0,1}^|N|
         N = p * q

@@ -85,7 +85,7 @@ class CYH(PKSig):
 def main():
    L = [ "alice", "bob", "carlos", "dexter", "eddie"] 
    ID = "bob"
-   groupObj = PairingGroup('../param/a.param')
+   groupObj = PairingGroup('SS512')
    cyh = CYH(groupObj)
    (mpk, msk) = cyh.setup()
 

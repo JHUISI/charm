@@ -97,7 +97,7 @@ class IBE_Revoke(IBEnc):
 
 def main():
     # scheme designed for symmetric billinear groups
-    grp = PairingGroup('../param/a.param')
+    grp = PairingGroup('SS512')
     n = 5 # total # of users
     
     ibe = IBE_Revoke(grp)

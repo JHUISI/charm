@@ -52,7 +52,7 @@ class CHP(PKSig):
 
 def main():
    
-   groupObj = PairingGroup('../param/a.param')
+   groupObj = PairingGroup('SS512')
    chp = CHP(groupObj)
    mpk = chp.setup()
 

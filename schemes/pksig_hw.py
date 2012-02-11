@@ -72,7 +72,7 @@ class HW(PKSig):
         
 def main():
     #AES_SECURITY = 80
-    groupObj = PairingGroup('../param/a.param')
+    groupObj = PairingGroup('SS512')
     hw = HW(groupObj)
     
     (pk, sk) = hw.setup()

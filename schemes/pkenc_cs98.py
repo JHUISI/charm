@@ -26,7 +26,7 @@ class CS98(PKEnc):
         group.p, group.q, group.r = p, q, 2
            
     def keygen(self, secparam):
-        if group.p == 0 and group.q == 0:
+        if group.p == 0 or group.q == 0:
             group.paramgen(secparam)
         p = group.p
         g1, g2 = group.randomGen(), group.randomGen()

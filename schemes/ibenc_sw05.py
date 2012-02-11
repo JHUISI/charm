@@ -222,7 +222,7 @@ class IBE_SW05_LUC(IBEnc):
         
 def main():
     # initialize the element object so that object references have global scope
-    groupObj = PairingGroup('../param/a.param')
+    groupObj = PairingGroup('SS512')
     n = 6; d = 4
     ibe = IBE_SW05_LUC(groupObj)
     (pk, mk) = ibe.setup(n, d)

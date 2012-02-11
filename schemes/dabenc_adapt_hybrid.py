@@ -39,7 +39,7 @@ class HybridABEncMA(ABEncMultiAuth):
         return cipher.decrypt(c2)
         
 def main():
-    groupObj = PairingGroup('../param/a.param')
+    groupObj = PairingGroup('SS512')
     dabe = Dabe(groupObj)
         
     hyb_abema = HybridABEncMA(dabe, groupObj)

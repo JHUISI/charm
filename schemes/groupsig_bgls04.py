@@ -95,7 +95,7 @@ class ShortSig(PKSig):
         return A_prime
         
 def main():
-    groupObj = PairingGroup('../param/d224.param')
+    groupObj = PairingGroup('MNT224')
     n = 3    # how manu users in the group
     user = 1 # which user's key to sign a message with
     

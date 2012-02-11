@@ -24,7 +24,7 @@ class DSA():
         group.p, group.q, group.r = p, q, 2
         
     def keygen(self, bits):
-        if group.p == 0 and group.q == 0:
+        if group.p == 0 or group.q == 0:
             group.paramgen(bits)
         global p,q
         p,q = group.p, group.q 

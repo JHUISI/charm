@@ -100,7 +100,7 @@ class IBE_BonehFranklin(IBEnc):
      
 
 def main():
-    groupObj = PairingGroup('../param/d224.param', 1024)    
+    groupObj = PairingGroup('MNT224', 1024)    
     ibe = IBE_BonehFranklin(groupObj)
     
     (pk, sk) = ibe.setup()

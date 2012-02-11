@@ -54,7 +54,7 @@ class CHCH(PKSig):
         return False
 
 def main():
-   groupObj = PairingGroup('../param/a.param')
+   groupObj = PairingGroup('SS512')
    chch = CHCH(groupObj)
    (mpk, msk) = chch.setup()
 

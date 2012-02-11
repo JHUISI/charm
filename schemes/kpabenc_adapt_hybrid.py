@@ -52,7 +52,7 @@ class HybridABEnc(ABEnc):
         return cipher.decrypt(c2)
     
 def main():
-    groupObj = PairingGroup('../param/a.param')
+    groupObj = PairingGroup('SS512')
     kpabe = KPabe(groupObj)
     hyb_abe = HybridABEnc(kpabe, groupObj)
     access_key = '((ONE or TWO) and THREE)'

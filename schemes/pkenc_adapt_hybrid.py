@@ -4,6 +4,7 @@ import random, string
 # Works for ElGamal and CS98 schemes
 #from ec_cs98_enc import *
 from toolbox.symcrypto import AuthenticatedCryptoAbstraction
+from toolbox.eccurve import prime192v1
 from schemes.pkenc_elgamal85 import *
 from toolbox.PKEnc import PKEnc
 from charm.cryptobase import *
@@ -51,8 +52,8 @@ class HybridEnc(PKEnc):
         return msg
     
 def main():
-    #    pkenc = EC_CS98(409)
-    pkenc = ElGamal(ecc, 409)
+    #    pkenc = EC_CS98(prime192v1)
+    pkenc = ElGamal(ecc, prime192v1)
     hyenc = HybridEnc(pkenc)
    
     (pk, sk) = hyenc.keygen()

@@ -94,7 +94,7 @@ class BCHKIBEnc(IBEnc):
             return b'FALSE'
    
 def main():
-    groupObj = PairingGroup('../param/a.param')
+    groupObj = PairingGroup('SS512')
     ibe = IBE_BB04(groupObj)
     encap = EncapBCHK()
     

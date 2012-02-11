@@ -76,7 +76,7 @@ class IBE_BB04(IBEnc):
 
 def main():
     # initialize the element object so that object references have global scope
-    groupObj = PairingGroup('../param/d224.param')
+    groupObj = PairingGroup('MNT224')
     ibe = IBE_BB04(groupObj)
     (params, mk) = ibe.setup()
 
