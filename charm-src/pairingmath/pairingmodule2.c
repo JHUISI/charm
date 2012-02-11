@@ -1397,8 +1397,8 @@ static PyObject *Group_Check(Element *self, PyObject *args) {
 	PyObject *object = NULL;
 	if(PyArg_ParseTuple(args, "OO", &group, &object)) {
 		if(PyElement_Check(group) && PyElement_Check(object)) {
-			Element *elem = (Element *) object;
 			IS_PAIRING_OBJ_NULL(group); /* verify group object is still active */
+			Element *elem = (Element *) object;
 
 			if(check_membership(elem) == TRUE) {
 				Py_INCREF(Py_True);
