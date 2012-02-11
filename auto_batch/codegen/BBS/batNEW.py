@@ -3,7 +3,6 @@ from charm.engine.util import *
 import sys, random, string
 from toolbox.pairinggroup import *
 import sys
-from toolbox.pairinggroup import *
 from verNEW import verifySigsRecursive
 
 group = None
@@ -35,7 +34,6 @@ def run_Batch_Sorted(verifyArgsDict, groupObjParam, verifyFuncArgs):
 
 	for z in range(0, N):
 		for arg in verifyFuncArgs:
-			print((verifyArgsDict[z][arg][bodyKey]))
 			if (group.ismember(verifyArgsDict[z][arg][bodyKey]) == False):
 				sys.exit("ALERT:  Group membership check failed!!!!\n")
 
