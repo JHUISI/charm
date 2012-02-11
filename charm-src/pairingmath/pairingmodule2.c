@@ -65,13 +65,16 @@ static PyObject *f(PyObject *v) { \
 #define BINARY(f, m, n) \
 static PyObject *f(PyObject *v, PyObject *w) { \
 	Element *obj1 = NULL, *obj2 = NULL;				\
+	int obj1_long = FALSE, obj2_long = FALSE; 	\
 	debug("Performing the '%s' operation.\n", __func__); \
 	if(PyElement_Check(v)) {	\
 		obj1 = (Element *) v; } \
+	else if(PyNumber_Check(v)) { obj1 = convertToZR(v, w); obj1_long = TRUE; }  \
 	else { PyErr_SetString(ElementError, ERROR_TYPE(left, int,bytes,str)); \
 		return NULL; }			\
 	if(PyElement_Check(w)) {	\
 		obj2 = (Element *) w; } \
+	else if(PyNumber_Check(w)) { obj2 = convertToZR(w, v); obj2_long = TRUE; }  \
  	else { PyErr_SetString(ElementError, ERROR_TYPE(right, int,bytes,str)); \
 		return NULL; }		\
 	if(Check_Types(obj1->element_type, obj2->element_type, m))	\
@@ -211,6 +214,21 @@ static Element *createNewElement(Group_t element_type, Pairing *pairing) {
 	retObject->pairing = pairing;
 	retObject->safe_pairing_clear = FALSE;
 	return retObject;	
+}
+
+Element *convertToZR(PyObject *longObj, PyObject *elemObj) {
+	Element *self = (Element *) elemObj;
+	Element *new = createNewElement(ZR_t, self->pairing);
+
+	mpz_t x;
+	mpz_init(x);
+#if PY_MAJOR_VERSION < 3
+	longObj = PyNumber_Long(longObj);
+#endif
+	longObjToMPZ(x, (PyLongObject *) longObj);
+	element_set_mpz(new, x);
+	mpz_clear(x);
+	return new;
 }
 
 void 	Pairing_dealloc(Pairing *self)
@@ -829,19 +847,41 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 {
 	Element *newObject = NULL, *lhs_o1 = NULL, *rhs_o2 = NULL;
 	int longFoundLHS = FALSE, longFoundRHS = FALSE;
+	mpz_t n;
 
 	Check_Types2(o1, o2, lhs_o1, rhs_o2, longFoundLHS, longFoundRHS);
 
-	if(longFoundLHS || longFoundRHS) {
-		// o1 is a long type
+	if(longFoundLHS) {
+		// o1 is a long type and o2 is a element type
+		// o1 should be element and o2 should be mpz
+//		if(rhs_o2->element_type == ZR) {
+//			START_CLOCK(dBench);
+//			mpz_init(n);
+//			element_to_mpz(n, rhs_o2);
+//
+//			lhs_o1 = convertToZR(o1, o2);
+//			newObject = createNewElement(rhs_o2->element_type, rhs_o2->pairing);
+//			element_pow_zr(newObject, lhs_o1, n);
+//			mpz_clear(n);
+//			PyObject_Del(lhs_o1);
+//			STOP_CLOCK(dBench);
+//		}
 	}
 	else if(longFoundRHS) {
 		// o2 is a long type
+		START_CLOCK(dBench);
+		newObject = createNewElement(NONE_G, lhs_o1->pairing);
+		rhs_o2 = createNewElement(ZR_t, lhs_o1->pairing);
+		mpz_init(n);
+		longObjToMPZ(n, (PyLongObject *) o2);
+		element_set_mpz(rhs_o2, n);
+		element_pow_zr(newObject, lhs_o1, rhs_o2);
+		PyObject_Del(rhs_o2);
+		mpz_clear(n);
+		STOP_CLOCK(dBench);
 	}
 	else if(Check_Elements(o1, o2)) {
 		debug("Starting '%s'\n", __func__);
-//		debug_e("LHS: e => '%B'\n", lhs_o1->e);
-//		debug_e("RHS: e => '%B'\n", rhs_o2->e);
 		if( exp_rule(lhs_o1->element_type, rhs_o2->element_type) == FALSE) {
 			PyErr_SetString(ElementError, "invalid exp operation");
 			return NULL;
@@ -854,9 +894,6 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 			// newObject->e = element_pow_zr(lhs_o1, rhs_o2);
 			// newObject->element_type = lhs_o1->element_type;
 			STOP_CLOCK(dBench);
-		}
-		else {
-			// we have a problem
 		}
 	}
 	else {
@@ -1276,7 +1313,7 @@ static PyObject *Element_long(PyObject *o1) {
 		if(value->element_type == ZR_t) {
 			mpz_t val;
 			mpz_init(val);
-			element_to_mpz(value->e, val);
+			element_to_mpz(value, val);
 			PyObject *obj = mpzToLongObj(val);
 			mpz_clear(val);
 			return obj;
@@ -1293,7 +1330,7 @@ static long Element_index(Element *o1) {
 		if(o1->element_type == ZR_t) {
 			mpz_t o;
 			mpz_init(o);
-			element_to_mpz(o1->e, o);
+			element_to_mpz(o1, o);
 			PyObject *temp = mpzToLongObj(o);
 			result = PyObject_Hash(temp);
 			mpz_clear(o);
@@ -1429,7 +1466,7 @@ static PyObject *Get_Order(Element *self, PyObject *args) {
 		IS_PAIRING_OBJ_NULL(group);
 		mpz_t d;
 		mpz_init(d);
-		element_to_mpz(group->pairing->order, d);
+		object_to_mpz(group->pairing->order, d);
 		PyObject *object = (PyObject *) mpzToLongObj(d);
 		mpz_clear(d);
 		return object; /* returns a PyInt */

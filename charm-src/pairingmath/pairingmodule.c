@@ -218,6 +218,7 @@ Element *convertToZR(PyObject *longObj, PyObject *elemObj) {
 #endif
 	longObjToMPZ(x, (PyLongObject *) longObj);
 	element_set_mpz(new->e, x);
+	mpz_clear(x);
 	return new;
 }
 

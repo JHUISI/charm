@@ -374,11 +374,33 @@ void _element_div(Group_t type, element_t *c, const element_t *a, const element_
 
 }
 
+// ZR ^ int
+element_t *_element_pow_zr_int(Group_t type, const pairing_t *pairing, const element_t *a, const int b)
+{
+	if(type == ZR_t) {
+		PFC *pfc = (PFC *) pairing;
+		Big *x = (Big *) a;
+		Big *o = new Big(pfc->order());
+		Big *z = new Big(pow(*x, b, *o));
+		return (element_t *) z;
+	}
+
+	/* only for ZR_t types */
+	return NULL;
+}
+
 element_t *_element_pow_zr(Group_t type, const pairing_t *pairing, const element_t *a, const element_t *b)
 {
 	Big *y = (Big *) b; // note: must be ZR
 
-	if(type == G1_t) {
+	if(type == ZR_t) {
+		PFC *pfc = (PFC *) pairing;
+		Big *o = new Big(pfc->order());
+		Big *x = (Big *) a;
+		Big *z = new Big(pow(*x, *y, *o));
+		return (element_t *) z;
+	}
+	else if(type == G1_t) {
 		G1 *x  = (G1 *)  a;
 		G1 *z = new G1();
 		// (x->point)^y
