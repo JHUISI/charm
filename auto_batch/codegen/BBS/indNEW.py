@@ -24,9 +24,10 @@ def run_Ind(verifyArgsDict, groupObjParam, verifyFuncArgs):
 	__init__(group)
 
 	for z in range(0, N):
-		#for arg in verifyFuncArgs:
-			#if (group.ismember(verifyArgsDict[z][arg][bodyKey]) == False):
-				#sys.exit("ALERT:  Group membership check failed!!!!\n")
+		for arg in verifyFuncArgs:
+			print(group.ismember(verifyArgsDict[z][arg][bodyKey]))
+			if (group.ismember(verifyArgsDict[z][arg][bodyKey]) == False):
+				sys.exit("ALERT:  Group membership check failed!!!!\n")
 
 		pass
 

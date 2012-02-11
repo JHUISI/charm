@@ -25,7 +25,7 @@ def loadDictDataFromFile(verifyParamFilesDict, groupParamArg):
 	verifyArgsDict = {}
 	totalNumSigs = len(verifyParamFilesDict)
 
-	print(verifyParamFilesDict['0'])
+	#print(verifyParamFilesDict['0'])
 
 	verifyFuncArgs = list(verifyParamFilesDict[0].keys())
 
