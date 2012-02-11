@@ -18,13 +18,11 @@ def serializeDict(object, group):
                 else:
                     bytes_object[i] = object[i] # don't convert to bytes, if string
             elif type(object[i]) == unicode:
-                temp = 'uni'+object[i]
-                bytes_object[i] = temp
-                #bytes_object[i] = object[i]
+                bytes_object[i] = object[i]
             elif type(object[i]) == dict:
-                bytes_object[i] = serializeDict(object[i], group) #; print("dict found in ser => '%s'" % i); 
+                bytes_object[i] = serializeDict(object[i], group) #; print("dict found in ser => '%s'" % i);
             elif type(object[i]) == list:
-                bytes_object[i] = serializeList(object[i], group)               
+                bytes_object[i] = serializeList(object[i], group)
             else: # typically group object
                #print("DEBUG = k: %s, v: %s" % (i, object[i]))
                 bytes_object[i] = group.serialize(object[i])
@@ -49,11 +47,9 @@ def serializeList(object, group):
                 else:
                     bytes_object_.append(i)
             elif type(i) == unicode:
-                temp = 'uni'+i
-                bytes_object_.append(temp) 
-                #bytes_object_.append(i)
+                bytes_object_.append(i)
             elif type(i) == dict:
-                bytes_object_.append(serializeDict(i, group)) #; print("dict found in ser => '%s'" % i); 
+                bytes_object_.append(serializeDict(i, group)) #; print("dict found in ser => '%s'" % i);
             elif type(i) == list:
                 bytes_object_.append(serializeList(i, group))
             else: # typically group object
@@ -70,11 +66,9 @@ def serializeList(object, group):
                 else:
                     bytes_object_.append(i)
             elif type(i) == unicode:
-                temp = 'uni'+i
-                bytes_object_.append(temp)
-                #bytes_object_.append(i)
+                bytes_object_.append(i)
             elif type(i) == dict:
-                bytes_object_.append(serializeDict(i, group)) #; print("dict found in ser => '%s'" % i); 
+                bytes_object_.append(serializeDict(i, group)) #; print("dict found in ser => '%s'" % i);
             elif type(i) == list:
                 bytes_object_.append(serializeList(i, group))
             else: # typically group object
@@ -100,7 +94,7 @@ def deserializeDict(object, group):
     if not hasattr(group, 'deserialize'):
        return None
 
-    if type(object) == dict:    
+    if type(object) == dict:
         for i in object.keys():
             _type = type(object[i])
             if _type == bytes:
@@ -117,14 +111,7 @@ def deserializeDict(object, group):
             elif _type == int:
                 bytes_object[i] = object[i]
             elif _type == unicode:
-               if(object[i][:3] == 'str'):
-                   bytes_object[i] = bytes(object[i][3:])
-               else:
-                   if(object[i][:3] == 'uni'):
-                       bytes_object[i] = unicode(object[i][3:])
-                   else:
-                       bytes_object[i] = group.deserialize(bytes(object[i]))
-               #bytes_object[i] = unicode(object[i])
+               bytes_object[i] = unicode(object[i])
         return bytes_object
     elif type(object) == bytes:
         return group.deserialize(object)
@@ -154,14 +141,7 @@ def deserializeList(object, group):
             elif _typeL == int:
                 _bytes_object.append(i)
             elif _typeL == unicode:
-               if(i[:3] == 'str'):
-                   _bytes_object.append(bytes(i[3:]))
-               else:
-                   if(i[:3] == 'uni'):
-                       _bytes_object.append(unicode(i[3:]))
-                   else:
-                       _bytes_object.append(group.deserialize(bytes(i)))
-               #_bytes_object.append(unicode(i))
+               _bytes_object.append(unicode(i))
         return _bytes_object
     elif type(object) == tuple:
         for i in object:
@@ -180,15 +160,8 @@ def deserializeList(object, group):
             elif _typeL == int:
                 _bytes_object.append(i)
             elif _typeL == unicode:
-               if(i[:3] == 'str'):
-                   _bytes_object.append(bytes(i[3:]))
-               else:
-                   if(i[:3] == 'uni'):
-                       _bytes_object.append(unicode(i[3:]))
-                   else:
-                       _bytes_object.append(group.deserialize(bytes(i)))
-               #_bytes_object.append(unicode(i))
-        return tuple(_bytes_object)        
+               _bytes_object.append(unicode(i))
+        return tuple(_bytes_object)
     else:
         # just one bytes object
         return group.deserialize(object)
