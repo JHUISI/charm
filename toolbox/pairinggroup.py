@@ -40,7 +40,9 @@ class PairingGroup():
                   if ismember(self.Pairing, obj[i]) == False: return False
            return True
         else:
-           return ismember(self.Pairing, obj)
+           if type(obj) == pairing:
+               return ismember(self.Pairing, obj)
+           return None # ignore non-pairing types
 
     def groupType(self): 
         return 'PairingGroup'     
