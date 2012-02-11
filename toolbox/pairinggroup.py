@@ -31,11 +31,13 @@ class PairingGroup():
     def ismember(self, obj):
         if type(obj) in [set, tuple, list]:
            for i in obj:
-               if ismember(self.Pairing, i) == False: return False 
+               if type(i) == pairing:
+                  if ismember(self.Pairing, i) == False: return False 
            return True
         elif type(obj) == dict:
            for i in obj.keys():
-               if ismember(self.Pairing, obj[i]) == False: return False
+               if type(i) == pairing:
+                  if ismember(self.Pairing, obj[i]) == False: return False
            return True
         else:
            return ismember(self.Pairing, obj)
