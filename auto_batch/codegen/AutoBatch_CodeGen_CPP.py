@@ -735,6 +735,19 @@ def processHashesForCPP(line):
 
 	return line
 
+def processIfsForCPP(line):
+	line = line.lstrip().rstrip()
+
+	if (line.startswith('if ') == False):
+		return line
+
+	if (line.endswith(':') == True):
+		line = line.rstrip(':')
+
+	line = line[0:3] + '(' + line[3:len(line)] + '):'
+
+	return line
+
 def writeBodyOfInd():
 	global individualVerFile
 
@@ -751,6 +764,8 @@ def writeBodyOfInd():
 
 		for arg in verifyFuncArgs:
 			line = line.replace(arg, arg+"[z]")
+
+		line = processIfsForCPP(line)
 
 		line = processHashesForCPP(line)
 

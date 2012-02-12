@@ -30,12 +30,13 @@ int main()
 	irand((long)seed);
 
 	G1 h;
+	string M;
 
 	for (int z = 0; z < N; z++)
 	{
 		M = message[z];
 		HASH(h, M);
-		if pair ( sig[z] , pk[z] [ "g" ] ) == pair ( h , pk[z] [ "g^x" ] ) 
+		if (pair ( sig[z] , pk[z] [ "g" ] ) == pair ( h , pk[z] [ "g^x" ] ) )
 		{
 			cout << "Signature verified!" << endl;
 		}

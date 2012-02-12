@@ -30,6 +30,7 @@ int main()
 	irand((long)seed);
 
 	G1 h;
+	string M;
 
 	map<int, string> message;
 	map<int, G1> sig;
@@ -37,30 +38,31 @@ int main()
 	message[1] = "hello hello worlds!!! fail!";
 
 	const char * g_key = "g";
+	const char * gx_key = "g^x";
 
 	map<int, map<string, G2> > pk;
 	group.random(pk[0][g_key]);
-	group.random(pk[1]["g"]);
+	group.random(pk[1][g_key]);
 
 	map<int, Big> sk;
 	group.random(sk[0]);
 	group.random(sk[1]);
 
-	pk[0]["g^x"].g = sk[0] * pk[0]["g"].g;
-	pk[1]["g^x"].g = sk[1] * pk[1]["g"].g;
+	pk[0][gx_key].g = sk[0] * pk[0][g_key].g;
+	pk[1][gx_key].g = sk[1] * pk[1][g_key].g;
 
 	G1 tmp;
 	HASH(tmp, message[0]);
-	sig[0].g = sk * tmp.g;
+	sig[0].g = sk[0] * tmp.g;
 
 	HASH(tmp, message[1]);
-	sig[1].g = sk * tmp.g;
+	sig[1].g = sk[1] * tmp.g;
 
 	for (int z = 0; z < N; z++)
 	{
 		M = message[z];
 		HASH(h, M);
-		if pair ( sig[z] , pk[z] [ "g" ] ) == pair ( h , pk[z] [ "g^x" ] ) 
+		if ( pair ( sig[z] , pk[z] [ "g" ] ) == pair ( h , pk[z] [ "g^x" ] ) ) 
 		{
 			cout << "Signature verified!" << endl;
 		}

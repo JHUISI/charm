@@ -10,4 +10,5 @@ Precompute: delta := for{z := 0, N} do prng_z
 dotA := G1
 dotB := G1
 Type: h := G1
+Type: M := string
 Sort := pk#0

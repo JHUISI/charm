@@ -93,7 +93,7 @@ def main():
     #if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
         #sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
 
-    grp = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
+    grp = PairingGroup(MNT160)
     
     x = [1, 0, 1, 0, 1, 0, 1, 0]
     n = 8
@@ -101,7 +101,7 @@ def main():
     (pk, sk) = vrf.setup(n)
     st = vrf.prove(sk, x)
     assert vrf.verify(pk, x, st), "VRF failed verification"
-    print("Success!!!")
+    #print("Success!!!")
 
     '''
     numValidMessages = int(sys.argv[1])
@@ -174,13 +174,13 @@ def main():
         assert vrf.verify(pk, x, st), "VRF failed verification"
 
         randomBitToChange = random.randint(0, 7)
-        print(x)
+        #print(x)
         if (x[randomBitToChange] == 0):
             x[randomBitToChange] = 1
         else:
             x[randomBitToChange] = 0
-        print(x)
-        print("\n\n")
+        #print(x)
+        #print("\n\n")
 
         shouldBeFalse = vrf.verify(pk, x, st)
         if (shouldBeFalse == True):

@@ -181,7 +181,7 @@ def main():
         assert vrf.verify(pk, x, st), "VRF failed verification"
 
         randomBitToChange = random.randint(0, 7)
-        print(x)
+        #print(x)
         if (x[randomBitToChange] == 0):
             x[randomBitToChange] = 1
         else:

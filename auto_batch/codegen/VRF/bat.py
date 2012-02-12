@@ -39,9 +39,9 @@ def run_Batch(verifyArgsDict, groupObjParam, verifyFuncArgs):
 
 
 	for z in range(0, N):
-		#for arg in verifyFuncArgs:
-			#if (group.ismember(verifyArgsDict[z][arg][bodyKey]) == False):
-				#sys.exit("ALERT:  Group membership check failed!!!!\n")
+		for arg in verifyFuncArgs:
+			if (group.ismember(verifyArgsDict[z][arg][bodyKey]) == False):
+				sys.exit("ALERT:  Group membership check failed!!!!\n")
 
 		pass
 
@@ -61,9 +61,9 @@ def run_Batch(verifyArgsDict, groupObjParam, verifyFuncArgs):
 		n , y , pi , pi_0= verifyArgsDict[z]['pk'][bodyKey][ 'n' ] , verifyArgsDict[z]['st'][bodyKey][ 'y' ] , verifyArgsDict[z]['st'][bodyKey][ 'pi' ] , verifyArgsDict[z]['st'][bodyKey][ 'pi0' ]
 
 		dotA[z] =  ( verifyArgsDict[z]['pk'][bodyKey] [ 'g1' ] **(( 1 + -verifyArgsDict[z]['x'][bodyKey] [ 0 ] ) * delta [ z ] ) * verifyArgsDict[z]['pk'][bodyKey] [ 'U1' ] [ 0 ] **( verifyArgsDict[z]['x'][bodyKey] [ 0 ] * delta [ z ] ) )  
-		dotB[z] =   pi[ 0 ] ** -delta [ z ] # pi [ 1 ] ** -delta [ z ]  
+		dotB[z] =   pi[ 0 ] ** -delta [ z ]  
 		dotC[z] =   pi [( n -1 ) ] ** delta [ z ]  
-		dotD[z] =   pi_0 ** -delta [ z ] # pi [  ] ** -delta [ z ]  
+		dotD[z] =   pi_0 ** -delta [ z ]  
 		dotE[z] =   y ** delta [ z ]  
 		dotF[z] = {}
 		dotG[z] = {}

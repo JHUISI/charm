@@ -1,8 +1,8 @@
 from toolbox.pairinggroup import *
 from charm.engine.util import *
 import sys, copy, random
-from bat import run_Batch
-from ind import run_Ind
+from batALT import run_Batch
+from indALT import run_Ind
 
 sigNumKey = 'Signature_Number'
 bodyKey = 'Body'
@@ -88,7 +88,7 @@ if __name__ == '__main__':
 
 	validDictArg = open(sys.argv[1], 'rb').read()
 	invalidDictArg = open(sys.argv[2], 'rb').read()
-	groupParamArg = PairingGroup(sys.argv[3])
+	groupParamArg = PairingGroup(MNT160)
 
 	validDictFile = bytesToObject(validDictArg, groupParamArg)
 	invalidDictFile = bytesToObject(invalidDictArg, groupParamArg)
@@ -102,7 +102,6 @@ if __name__ == '__main__':
 
 	loadDataFromDictInMemory(validDict, 0, 10, sigsDict, 0)
 	loadDataFromDictInMemory(invalidDict, 0, 10, sigsDict, 10, realIncorrectSigIndices)
-	#loadDataFromDictInMemory(validDict, 0, 10, sigsDict, 10, realIncorrectSigIndices)
 			
 	preRandomizedIndices = []
 	for randomIndex in range(0, 20):

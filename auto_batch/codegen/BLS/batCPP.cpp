@@ -41,6 +41,7 @@ int main()
 	G1 dotB[N];
 
 	G1 h;
+	string M;
 
 	for z in range(0, N):
 		M= verifyArgsDict[z]['message'][bodyKey]
