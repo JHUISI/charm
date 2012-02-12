@@ -122,8 +122,13 @@ typedef struct {
 	_element_inv(b->element_type, b->e, a->e, b->pairing->order)
 
 #define element_pow_zr(c, a, b) \
+	if (a->element_type != ZR_t)  {  \
 	c->e = _element_pow_zr(a->element_type, a->pairing->pair_obj, a->e, b->e); \
-	c->element_type = a->element_type;
+	c->element_type = a->element_type; }
+
+#define element_pow_int(c, a, b) \
+	c->e = _element_pow_zr_zr(ZR_t, a->pairing->pair_obj, a->e, b, a->pairing->order);	\
+	c->element_type = ZR_t;
 
 #define pairing_apply(c, a, b) \
 	if(a->pairing->curve == MNT) { \

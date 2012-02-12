@@ -374,48 +374,38 @@ void _element_div(Group_t type, element_t *c, const element_t *a, const element_
 
 }
 
-// ZR ^ int
-element_t *_element_pow_zr_int(Group_t type, const pairing_t *pairing, const element_t *a, const int b)
+element_t *_element_pow_zr_zr(Group_t type, const pairing_t *pairing, const element_t *a, const int b, const element_t *o)
 {
+	Big *o1 = (Big *) o;
 	if(type == ZR_t) {
-		PFC *pfc = (PFC *) pairing;
 		Big *x = (Big *) a;
-		Big *o = new Big(pfc->order());
-		Big *z = new Big(pow(*x, b, *o));
-		return (element_t *) z;
+		return (element_t *) new Big(pow(*x, b, *o1));
 	}
-
-	/* only for ZR_t types */
 	return NULL;
 }
 
 element_t *_element_pow_zr(Group_t type, const pairing_t *pairing, const element_t *a, const element_t *b)
 {
 	Big *y = (Big *) b; // note: must be ZR
+	PFC *pfc = (PFC *) pairing;
 
-	if(type == ZR_t) {
-		PFC *pfc = (PFC *) pairing;
-		Big *o = new Big(pfc->order());
-		Big *x = (Big *) a;
-		Big *z = new Big(pow(*x, *y, *o));
-		return (element_t *) z;
-	}
-	else if(type == G1_t) {
+	if(type == G1_t) {
 		G1 *x  = (G1 *)  a;
 		G1 *z = new G1();
 		// (x->point)^y
-		z->g = *y * x->g;
+//		z->g = *y * x->g;
+		*z = pfc->mult(*x, *y);
 		return (element_t *) z;
 	}
 	else if(type == G2_t) {
 		G2 *x  = (G2 *)  a;
 		G2 *z = new G2();
 		// (x->point)^y
-		z->g = *y * x->g;
+		*z = pfc->mult(*x, *y);
 		return (element_t *) z;
 	}
 	else if(type == GT_t) {
-		PFC *pfc = (PFC *) pairing;
+//		PFC *pfc = (PFC *) pairing;
 		GT *x  = (GT *)  a;
 		GT *z = new GT();
 		// point ^ int

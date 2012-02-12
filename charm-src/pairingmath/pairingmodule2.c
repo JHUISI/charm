@@ -869,16 +869,31 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 	}
 	else if(longFoundRHS) {
 		// o2 is a long type
-		START_CLOCK(dBench);
-		newObject = createNewElement(NONE_G, lhs_o1->pairing);
-		rhs_o2 = createNewElement(ZR_t, lhs_o1->pairing);
-		mpz_init(n);
-		longObjToMPZ(n, (PyLongObject *) o2);
-		element_set_mpz(rhs_o2, n);
-		element_pow_zr(newObject, lhs_o1, rhs_o2);
-		PyObject_Del(rhs_o2);
-		mpz_clear(n);
-		STOP_CLOCK(dBench);
+		if(lhs_o1->element_type != ZR_t) {
+			START_CLOCK(dBench);
+			newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
+			rhs_o2 = createNewElement(ZR_t, lhs_o1->pairing);
+			mpz_init(n);
+			longObjToMPZ(n, (PyLongObject *) o2);
+			element_set_mpz(rhs_o2, n);
+			element_pow_zr(newObject, lhs_o1, rhs_o2);
+			PyObject_Del(rhs_o2);
+			mpz_clear(n);
+			STOP_CLOCK(dBench);
+		}
+		else {
+			int integer = (int) PyLong_AsLong(o2);
+			if(integer != -1) {
+				START_CLOCK(dBench);
+				newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
+				element_pow_int(newObject, lhs_o1, integer);
+				STOP_CLOCK(dBench);
+			}
+			else {
+				PyErr_SetString(ElementError, "integer too big!");
+				return NULL;
+			}
+		}
 	}
 	else if(Check_Elements(o1, o2)) {
 		debug("Starting '%s'\n", __func__);
@@ -888,12 +903,15 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		}
 
 		if(rhs_o2->element_type == ZR_t) {
-			START_CLOCK(dBench);
-			newObject = createNewElement(NONE_G, lhs_o1->pairing);
-			element_pow_zr(newObject, lhs_o1, rhs_o2);
-			// newObject->e = element_pow_zr(lhs_o1, rhs_o2);
-			// newObject->element_type = lhs_o1->element_type;
-			STOP_CLOCK(dBench);
+			if(lhs_o1->element_type == ZR_t) {
+				/* TODO: don't forget to implement this!!! */
+			}
+			else {
+				START_CLOCK(dBench);
+				newObject = createNewElement(NONE_G, lhs_o1->pairing);
+				element_pow_zr(newObject, lhs_o1, rhs_o2);
+				STOP_CLOCK(dBench);
+			}
 		}
 	}
 	else {
