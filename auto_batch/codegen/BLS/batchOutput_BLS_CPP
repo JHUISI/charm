@@ -11,6 +11,3 @@ dotA := G1
 dotB := G1
 Type: h := G1
 Sort := pk#0
-Code := M = message_z;
-Code := h = group.hash(M, G1);
-Code := if pair(sig, pk['g']) == pair(h, pk['g^x'])

@@ -715,8 +715,30 @@ def writeLinesToOutputString(lines, indentationListParam, baseNumTabs, numExtraT
 
 	return outputString
 
+def processHashesForCPP(line):
+	splitValue = None
+
+	if (line.count("group.hash (") == 1):
+		splitValue = "group.hash ("
+
+	if (splitValue == None):
+		return line
+
+	splitLine = line.split(splitValue)
+
+	#['h = ', 'M, G1)']
+
+	varName = splitLine[0].split('=')[0].lstrip().rstrip()
+	argName = splitLine[1].split(',')[0].lstrip().rstrip()
+
+	line = "HASH(" + varName + ", " + argName + ")"
+
+	return line
+
 def writeBodyOfInd():
 	global individualVerFile
+
+	#print(verifyLines)
 
 	#individualOutputString = writeLinesToOutputString(verifyLines, indentationListVerifyLines, numTabsOnVerifyLine, 1)
 	#if ( (individualOutputString == None) or (type(individualOutputString).__name__ != con.strTypePython) or (len(individualOutputString) == 0) ):
@@ -724,6 +746,36 @@ def writeBodyOfInd():
 
 	individualOutputString = ""
 
+	for line in verifyLines:
+		line = ensureSpacesBtwnTokens_CodeGen(line)
+
+		for arg in verifyFuncArgs:
+			line = line.replace(arg, arg+"[z]")
+
+		line = processHashesForCPP(line)
+
+		line = line.lstrip().rstrip()
+
+		if (line.endswith(':') == True):
+			line = line.rstrip(':')
+		else:
+			line += ";"
+
+		line = line.replace('\'', '"')
+
+		individualOutputString += "\t\t" + line + "\n"
+
+	individualOutputString += "\t\t{\n"
+	individualOutputString += "\t\t\tcout << \"Signature verified!\" << endl;\n"
+	individualOutputString += "\t\t}\n"
+	individualOutputString += "\t\telse\n"
+	individualOutputString += "\t\t{\n"
+	individualOutputString += "\t\t\tcout << \"Signature failed!\" << endl;\n"
+	individualOutputString += "\t\t}\n"
+	individualOutputString += "\t}\n"
+	individualOutputString += "}\n"
+
+	'''
 	for line in codeLinesFromBatcher:
 		line = line.replace("_z", "[z]")
 		individualOutputString += "\t\t" + line + "\n"
@@ -734,6 +786,7 @@ def writeBodyOfInd():
 	individualOutputString += "\t\t\t\tincorrectIndices.append(" + con.numSignaturesIndex + ")\n\n"
 
 	individualOutputString += "\treturn incorrectIndices\n"
+	'''
 
 	individualVerFile.write(individualOutputString)
 
