@@ -703,8 +703,18 @@ element_t *_element_pairing_type3(const pairing_t *pairing, const element_t *in1
 	PFC *pfc = (PFC *) pairing;
 	G1 *g1 = (G1 *) in1;
 	G2 *g2 = (G2 *) in2;
-
-	GT *gt = new GT(pfc->pairing(*g2, *g1)); // assumes type-3 pairings for now
+	G1 g_id = pfc->mult(*g1, Big(0)); // get identity elements
+	G2 g2_id = pfc->mult(*g2, Big(0));
+	GT *gt = new GT();
+	// check whetehr g1 and g2 != identity element
+	if(*g1 == g_id || *g2 == g2_id) {
+		*gt = pfc->power(*gt, Big(0)); // gt ^ 0 = identity element?
+//		cout << "One of the above is the identity element!" << endl;
+	}
+	else {
+		pfc->precomp_for_pairing(*g2);
+		gt = new GT(pfc->pairing(*g2, *g1)); // assumes type-3 pairings for now
+	}
 //	GT *gt_res = new GT(gt);
 //	cout << "Result of pairing => " << gt->g << endl;
 //	cout << "Result of pairing2 => " << gt_res->g << endl;
