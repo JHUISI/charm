@@ -15,6 +15,9 @@ codeString = 'Code '
 
 commentChar = '#'
 computeString = 'Compute:  '
+
+cppTemplate = 'cppTemplate.cpp'
+
 delta = 'delta'
 deltaDictName = 'delta'
 deltaPrecomputeVarString = 'delta := '
@@ -141,6 +144,8 @@ sumString = 'sum'
 tupleTypeAST = 'Tuple'
 
 tupleValue = 'TupleValue'
+
+typeString = 'Type: '
 
 unaryOpTypeAST = 'UnaryOp'
 unaryOpValue = 'UnaryOpValue'

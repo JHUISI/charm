@@ -49,6 +49,9 @@ precomputeVars = []
 pythonCodeLines = None
 pythonCodeNode = None
 sortVars = []
+
+typeVars = {}
+
 var_varDependencies = None
 varAssignments = None
 verifyEqNode = None
@@ -475,44 +478,53 @@ def addTemplateLines():
 	batchOutputString = ""
 	indOutputString = ""
 
-	batchOutputString += "def run_Batch_Sorted(verifyArgsDict, " + con.group + "ObjParam, verifyFuncArgs):\n"
-	batchOutputString += "\tglobal " + con.group + "\n"
+	#batchOutputString += "def run_Batch_Sorted(verifyArgsDict, " + con.group + "ObjParam, verifyFuncArgs):\n"
+	#batchOutputString += "\tglobal " + con.group + "\n"
 
-	indOutputString += "def run_Ind(verifyArgsDict, " + con.group + "ObjParam, verifyFuncArgs):\n"
-	indOutputString += "\tglobal " + con.group + "\n"
+	#indOutputString += "def run_Ind(verifyArgsDict, " + con.group + "ObjParam, verifyFuncArgs):\n"
+	#indOutputString += "\tglobal " + con.group + "\n"
 
 	globalsString = getGlobalVarsAssignString()
-	if (globalsString != None):
-		if ( (type(globalsString).__name__ == con.strTypePython) and (len(globalsString) > 0) ):
+	#if (globalsString != None):
+		#if ( (type(globalsString).__name__ == con.strTypePython) and (len(globalsString) > 0) ):
 			#sys.exit("AutoBatch_CodeGen->addTemplateLines:  problem with return value from getGlobalVarsHeaderString.")
-			batchOutputString += "\tglobal " + globalsString + "\n"
-			indOutputString += "\tglobal " + globalsString + "\n"
+			#batchOutputString += "\tglobal " + globalsString + "\n"
+			#indOutputString += "\tglobal " + globalsString + "\n"
 
-	batchOutputString += "\t" + con.group + " = " + con.group + "ObjParam\n\n"
-	batchOutputString += "\t" + con.numSignatures + " = len(verifyArgsDict)\n"
-	batchOutputString += "\t" + con.numSignaturesIndex + " = 0\n"
+	#batchOutputString += "\t" + con.group + " = " + con.group + "ObjParam\n\n"
+	#batchOutputString += "\t" + con.numSignatures + " = len(verifyArgsDict)\n"
+	#batchOutputString += "\t" + con.numSignaturesIndex + " = 0\n"
 
-	batchVerFile.write(batchOutputString)
+	#batchVerFile.write(batchOutputString)
 	batchOutputString = ""
-	writeNumSignersLine(batchVerFile)
-	writeNumEqChecksLine(batchVerFile)
+	#writeNumSignersLine(batchVerFile)
+	#writeNumEqChecksLine(batchVerFile)
 
-	batchOutputString += "\t" + con.deltaDictName + " = {}\n"
-	batchOutputString += "\tfor " + con.numSignaturesIndex + " in range(0, " + con.numSignatures + "):\n"
-	batchOutputString += "\t\t" + con.deltaDictName + "[" + con.numSignaturesIndex + "] = prng_bits(80)\n\n"
+	batchOutputString += "\n\tBig " + con.delta + "[" + con.numSignatures + "];\n"
+	batchOutputString += "\tbig t;\n\n"
+
+	batchOutputString += "\tfor (int " + con.numSignaturesIndex + " = 0; " + con.numSignaturesIndex + " < " + con.numSignatures + "; " + con.numSignaturesIndex + "++)\n"
+
+	batchOutputString += "\t{\n"
+	batchOutputString += "\t\tSmallExp(t, " + con.delta + "[" + con.numSignaturesIndex + "]);\n"
+	batchOutputString += "\t}\n\n"
+
+	#batchOutputString += "\t" + con.deltaDictName + " = {}\n"
+	#batchOutputString += "\tfor " + con.numSignaturesIndex + " in range(0, " + con.numSignatures + "):\n"
+	#batchOutputString += "\t\t" + con.deltaDictName + "[" + con.numSignaturesIndex + "] = prng_bits(80)\n\n"
 	#batchOutputString += "\t" + con.numSignaturesIndex + " = 0\n\n"
-	batchOutputString += "\tincorrectIndices = []\n"
+	#batchOutputString += "\tincorrectIndices = []\n"
 
-	indOutputString += "\t" + con.group + " = " + con.group + "ObjParam\n\n"
-	indOutputString += "\t" + con.numSignatures + " = len(verifyArgsDict)\n"
-	indOutputString += "\t" + con.numSignaturesIndex + " = 0\n"
+	#indOutputString += "\t" + con.group + " = " + con.group + "ObjParam\n\n"
+	#indOutputString += "\t" + con.numSignatures + " = len(verifyArgsDict)\n"
+	#indOutputString += "\t" + con.numSignaturesIndex + " = 0\n"
 
 	individualVerFile.write(indOutputString)
 	indOutputString = ""
-	writeNumSignersLine(individualVerFile)
-	writeNumEqChecksLine(individualVerFile)
+	#writeNumSignersLine(individualVerFile)
+	#writeNumEqChecksLine(individualVerFile)
 
-	indOutputString += "\tincorrectIndices = []\n"
+	#indOutputString += "\tincorrectIndices = []\n"
 
 	batchVerFile.write(batchOutputString)
 	individualVerFile.write(indOutputString)
@@ -590,9 +602,18 @@ def addSigLoop():
 	global batchVerFile, individualVerFile
 
 	outputString = ""
-	outputString += "\n\tfor " + con.numSignaturesIndex + " in range(0, " + con.numSignatures + "):\n"
 
-	batchVerFile.write(outputString)
+	outputString += "\n"
+
+	for currentVarName in typeVars:
+		outputString += "\t" + typeVars[currentVarName] + " " + currentVarName + ";\n"
+
+	#outputString += "\n\tfor " + con.numSignaturesIndex + " in range(0, " + con.numSignatures + "):\n"
+
+	outputString += "\n\tfor (int " + con.numSignaturesIndex + " = 0; " + con.numSignaturesIndex + " < " + con.numSignatures + "; " + con.numSignaturesIndex + "++)\n"
+	outputString += "\t{\n"
+
+	#batchVerFile.write(outputString)
 	individualVerFile.write(outputString)
 
 def addGroupMembershipChecks():
@@ -697,9 +718,15 @@ def writeLinesToOutputString(lines, indentationListParam, baseNumTabs, numExtraT
 def writeBodyOfInd():
 	global individualVerFile
 
-	individualOutputString = writeLinesToOutputString(verifyLines, indentationListVerifyLines, numTabsOnVerifyLine, 1)
-	if ( (individualOutputString == None) or (type(individualOutputString).__name__ != con.strTypePython) or (len(individualOutputString) == 0) ):
-		sys.exit("AutoBatch_CodeGen->writeBodyOfInd:  problem with value returned from writeLinesToOutputString.")
+	#individualOutputString = writeLinesToOutputString(verifyLines, indentationListVerifyLines, numTabsOnVerifyLine, 1)
+	#if ( (individualOutputString == None) or (type(individualOutputString).__name__ != con.strTypePython) or (len(individualOutputString) == 0) ):
+		#sys.exit("AutoBatch_CodeGen->writeBodyOfInd:  problem with value returned from writeLinesToOutputString.")
+
+	individualOutputString = ""
+
+	for line in codeLinesFromBatcher:
+		line = line.replace("_z", "[z]")
+		individualOutputString += "\t\t" + line + "\n"
 
 	individualOutputString += "\t\t\tpass\n"
 	individualOutputString += "\t\telse:\n"
@@ -1240,7 +1267,13 @@ def writeDictDefsOfCachedCalcsForBatch():
 	batchOutputString = ""
 
 	for loopName in loopList:
-		batchOutputString += "\t" + loopName + " = {}\n"
+		currentLoopType = loopVarGroupTypes[loopName]
+		batchOutputString += "\t" + currentLoopType + " " + loopName + "[" + con.numSignatures + "];\n"
+
+	batchOutputString += "\n"
+
+	for currentTypeVar in typeVars:
+		batchOutputString += "\t" + typeVars[currentTypeVar] + " " + currentTypeVar + ";\n"
 
 	batchOutputString += "\n"
 	batchVerFile.write(batchOutputString)
@@ -1287,7 +1320,7 @@ def writeOpeningLinesToDCVerifySigsRecursiveFunc():
 
 	verifyOutputString += "\n"
 
-	verifyOutputString += verifySigsInitCall
+	#verifyOutputString += verifySigsInitCall
 
 	verifySigsFile.write(verifyOutputString)
 
@@ -1457,6 +1490,8 @@ def writeVerifyEqRecursion_Ind(finalBatchExp, codeGenSegment, multipleEqChecks):
 def writeCallToSortFunction():
 	global batchVerFile
 
+	return
+
 	if (len(sortVars) != 1):
 		return
 		#sys.exit("writecalltosortfunc in codegen py file.")
@@ -1542,9 +1577,24 @@ def processOneLineBatcherOutput(startLineNo, endLineNo, passNo):
 		if (line.startswith(con.codeString) == True):
 			processCodeLine(line)
 
+		if (line.startswith(con.typeString) == True):
+			processTypeLine(line)
+
 		linePrefix = line[0:con.maxStrLengthForLoopNames]
 		if (isStringALoopName(linePrefix) == True):
 			processLoopLine(line, passNo)
+
+def processTypeLine(line):
+	global typeVars
+
+	line = line.replace(con.typeString, '', 1)
+
+	lineSplit = line.split(con.batchVerifierOutputAssignment)
+
+	currentVarName = lineSplit[0].lstrip().rstrip()
+	currentVarType = lineSplit[1].lstrip().rstrip()
+
+	typeVars[currentVarName] = currentVarType
 
 def processCodeLine(line):
 	global codeLinesFromBatcher
@@ -1616,19 +1666,22 @@ def main():
 	global lineNoOfFirstFunction, globalVars, var_varDependencies, functionArgNames, functionNames
 	global verifySigsFileName, checkBlocks, codeGenRanges
 
+	os.system("cp " + con.cppTemplate + " " + individualVerArg)
+	os.system("cp " + con.cppTemplate + " " + batchVerArg)
+
 	try:
 		pythonCodeLines = open(pythonCodeArg, 'r').readlines()
 		batchVerifierOutput = open(batchVerifierOutputFile, 'r').readlines()
-		individualVerFile = open(individualVerArg, 'w')
-		batchVerFile = open(batchVerArg, 'w')
+		individualVerFile = open(individualVerArg, 'a')
+		batchVerFile = open(batchVerArg, 'a')
 		verifySigsFile = open(verifySigsArg, 'w')
 	except:
 		sys.exit("AutoBatch_CodeGen->main:  problem opening input/output files passed in as command-line arguments.")
 
-	if (verifySigsArg.endswith(".py") == False):
-		sys.exit("no py ending")
+	#if (verifySigsArg.endswith(".py") == False):
+		#sys.exit("no py ending")
 
-	verifySigsFileName = verifySigsArg[0:(len(verifySigsArg) - 3)]
+	verifySigsFileName = verifySigsArg[0:(len(verifySigsArg) - 4)]
 
 	myASTParser = ASTParser()
 	pythonCodeNode = myASTParser.getASTNodeFromFile(pythonCodeArg)
@@ -1745,17 +1798,17 @@ def main():
 	if ( (var_varDependencies == None) or (type(var_varDependencies).__name__ != con.dictTypePython) or (len(var_varDependencies) == 0) ):
 		sys.exit("AutoBatch_CodeGen->main:  problem with value returned from getVar_VarDependencies.")
 
-	addImportLines()
-	addCommonHeaderLines()
+	#addImportLines()
+	#addCommonHeaderLines()
 
-	if (linePairsOfVerifyFuncs != None):
-		addFunctionsThatVerifyCalls()
+	#if (linePairsOfVerifyFuncs != None):
+		#addFunctionsThatVerifyCalls()
 
 	addTemplateLines()
-	addPrerequisites()
+	#addPrerequisites()
 
-	if (con.initFuncName in functionNames):
-		addCallToInit()
+	#if (con.initFuncName in functionNames):
+		#addCallToInit()
 
 	lineInfo = getLineInfoFromSourceCodeLines(copy.deepcopy(pythonCodeLines), numSpacesPerTab)
 	if ( (lineInfo == None) or (type(lineInfo).__name__ != con.dictTypePython) or (len(lineInfo) == 0) ):
@@ -1764,10 +1817,12 @@ def main():
 	checkBlocks = myASTParser.getStartEndLineCheckBlocks(copy.deepcopy(pythonCodeLines), lineInfo, verifyStartLine, (verifyEndLine - 1), numTabsOnVerifyLine)
 
 	codeGenRanges = getSectionRanges(copy.deepcopy(batchVerifierOutput), con.finalBatchEqString)
-	addSigLoop()
-	addGroupMembershipChecks()
-	writeBodyOfInd()
+
 	processBatcherOutput()
+
+	addSigLoop()
+	#addGroupMembershipChecks()
+	writeBodyOfInd()
 
 	if ( (len(finalBatchEq) == 0) or (len(finalBatchEqWithLoops) == 0) ):
 		sys.exit("AutoBatch_CodeGen->main:  problem locating the various forms of the final batch equation from the output of the batch verifier.")
