@@ -4,11 +4,12 @@ v0.4 beta release
 - Removed pairing curve params in favor of a unified 'toolbox/pairingcurve.py' with curve identifiers (e.g., SS512, MNT224, etc)
 - Deleted the 'params' dir (See previous bullet)
 - Added high-level serialization API to simplify managing ciphertexts and keys in applications
+- Added PKCS #7 padding to toolbox
 - Added public key encryption schemes: 2 new IBE schemes (ibenc_ckrs09, ibenc_lsw08)
 - Added signature schemes: CL04 (anony. creds)
 - Added verifiable random function (VRF) scheme
 - Updates to KPABE scheme with new adapter
-- Improved protocol engine: automatically data transmitted between parties and more flexibility in state transition map  
+- Improved protocol engine: automatically store data transmitted between parties and more flexibility in state transition map  
 - Updated CNS07 scheme 
 - Name updates to authenticated crypto abstraction
 - Updated documentation for generating group parameters and using our serialization interface
