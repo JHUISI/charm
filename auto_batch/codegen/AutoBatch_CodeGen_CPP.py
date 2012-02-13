@@ -771,7 +771,8 @@ def writeBodyOfInd():
 	individualOutputString += "\t\t{\n"
 	individualOutputString += "\t\t\tcout << \"Signature failed!\" << endl;\n"
 	individualOutputString += "\t\t}\n"
-	individualOutputString += "\t}\n"
+	individualOutputString += "\t}\n\n"
+	individualOutputString += "\treturn 0;\n"
 	individualOutputString += "}\n"
 
 	individualVerFile.write(individualOutputString)
@@ -1409,7 +1410,9 @@ def writeCallToDCAndRetToBatch():
 			outputString += ", "
 			outputString += cachedCalcName
 
-	outputString += ");\n}\n"
+	outputString += ");\n\n"
+
+	outputString += "\treturn 0;\n}\n"
 
 	#outputString += "\treturn incorrectIndices\n"
 
@@ -1581,6 +1584,7 @@ def writeVerifyEqAndRecursionForDC():
 
 		writeVerifyEqRecursion_Ind(finalBatchExp, codeGenSegment, multipleEqChecks)
 
+	verifySigsFile.write("\treturn;\n")
 	verifySigsFile.write("}")
 
 def writeVerifyEqRecursion_Ind(finalBatchExp, codeGenSegment, multipleEqChecks):
@@ -1602,10 +1606,12 @@ def writeVerifyEqRecursion_Ind(finalBatchExp, codeGenSegment, multipleEqChecks):
 		outputString += "\tfor " + str(indexVariable) + " in range(" + str(startValue) + ", " + str(loopOverValue) + "):\n"
 
 	outputString += getStringOfTabs(numBaseTabs)
-	outputString += "if (" + finalBatchExp + ")\n"
+	outputString += "if (" + finalBatchExp + "){\n"
 
 	outputString += getStringOfTabs(numBaseTabs)
 	outputString += "\tcout << \"Signature batch is valid\" << endl;\n"
+	outputString += getStringOfTabs(numBaseTabs)
+	outputString += "\treturn;}\n"
 
 	outputString += getStringOfTabs(numBaseTabs)
 	outputString += "else{\n"
@@ -1669,6 +1675,8 @@ def writeVerifyEqRecursion_Ind(finalBatchExp, codeGenSegment, multipleEqChecks):
 	outputString = outputString[0:len(outputString) - 2]
 
 	outputString += ");\n"
+	outputString += getStringOfTabs(numBaseTabs+1)
+	outputString += "return;\n"
 
 
 

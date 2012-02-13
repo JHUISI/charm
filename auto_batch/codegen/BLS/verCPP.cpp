@@ -28,8 +28,9 @@ void verifySigsRecursive(map<int, map<string, G2> > pk, map<int, G1> sig, map<in
 	}
 
 
-	if (  	pair( dotA_loopVal , pk [ z ]  [ "g^x" ] )== pair( dotB_loopVal , pk [ z ]  [ "g" ] )   )
+	if (  	pair( dotA_loopVal , pk [ z ]  [ "g^x" ] )== pair( dotB_loopVal , pk [ z ]  [ "g" ] )   ){
 		cout << "Signature batch is valid" << endl;
+		return;}
 	else{
 		int midWay = int( (endSigNum - startSigNum) / 2);
 		if (midWay == 0){
@@ -38,6 +39,8 @@ void verifySigsRecursive(map<int, map<string, G2> > pk, map<int, G1> sig, map<in
 		int midSigNum = startSigNum + midWay;
 		verifySigsRecursive(pk, sig, message, group, startSigNum, midSigNum, delta, dotA, dotB);
 		verifySigsRecursive(pk, sig, message, group, midSigNum, endSigNum, delta, dotA, dotB);
+		return;
 	}
 
+	return;
 }

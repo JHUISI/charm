@@ -42,4 +42,6 @@ int main()
 			cout << "Signature failed!" << endl;
 		}
 	}
+
+	return 0;
 }

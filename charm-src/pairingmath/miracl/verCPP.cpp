@@ -35,7 +35,10 @@ void verifySigsRecursive(map<int, map<string, G2> > pk, map<int, G1> sig, map<in
 	//cout << "here" << endl;
 
 	if (  	pair( dotA_loopVal , pk [ z ]  [ "g^x" ] )== pair( dotB_loopVal , pk [ z ]  [ "g" ] )   )
+	{
 		cout << "Valid:  " << startSigNum << " to " << endSigNum << endl;
+		return;
+	}
 	else{
 		cout << "Invalid:  " << startSigNum << " to " << endSigNum << endl;
 		int midWay = int( (endSigNum - startSigNum) / 2);
@@ -43,8 +46,20 @@ void verifySigsRecursive(map<int, map<string, G2> > pk, map<int, G1> sig, map<in
 			cout << " Invalid signature found:  number " << startSigNum << endl;
 			return;}
 		int midSigNum = startSigNum + midWay;
+
+		cout << "wrong stuff:  startsignum:  " << startSigNum << endl;
+		cout << "wrong stuff:  midsignum:  " << midSigNum << endl;
+		cout << "wrong stuff:  endsignnum:  " << endSigNum << endl;
+
 		verifySigsRecursive(pk, sig, message, group, startSigNum, midSigNum, delta, dotA, dotB);
+		cout << "here should print out" << endl;
+		cout << midSigNum << endl;
+		cout << endSigNum << endl;
 		verifySigsRecursive(pk, sig, message, group, midSigNum, endSigNum, delta, dotA, dotB);
+		cout << "I'd be surprised" << endl;
+		return;
 	}
+
+	return;
 
 }
