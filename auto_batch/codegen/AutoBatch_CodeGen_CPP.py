@@ -10,6 +10,8 @@ from OperationValue import OperationValue
 from LoopBlock import LoopBlock
 from FinalEqWithLoops import FinalEqWithLoops
 
+headerFile = None
+
 batchEqLoopVars = {}
 batchEqNotLoopVars = {}
 batchEqVars = {}
@@ -759,7 +761,23 @@ def writeBodyOfInd():
 
 	individualOutputString = ""
 
-	for line in verifyLines:
+	individualOutputString = writeLinesForCPP(verifyLines, individualOutputString, 2)
+
+	individualOutputString += "\t\t{\n"
+	individualOutputString += "\t\t\tcout << \"Signature verified!\" << endl;\n"
+	individualOutputString += "\t\t}\n"
+	individualOutputString += "\t\telse\n"
+	individualOutputString += "\t\t{\n"
+	individualOutputString += "\t\t\tcout << \"Signature failed!\" << endl;\n"
+	individualOutputString += "\t\t}\n"
+	individualOutputString += "\t}\n"
+	individualOutputString += "}\n"
+
+	individualVerFile.write(individualOutputString)
+
+def writeLinesForCPP(CPPLines, outputString, numTabsForCPP):
+
+	for line in CPPLines:
 		line = ensureSpacesBtwnTokens_CodeGen(line)
 
 		for arg in verifyFuncArgs:
@@ -778,32 +796,10 @@ def writeBodyOfInd():
 
 		line = line.replace('\'', '"')
 
-		individualOutputString += "\t\t" + line + "\n"
+		outputString += getStringOfTabs(numTabsForCPP)
+		outputString += line + "\n"
 
-	individualOutputString += "\t\t{\n"
-	individualOutputString += "\t\t\tcout << \"Signature verified!\" << endl;\n"
-	individualOutputString += "\t\t}\n"
-	individualOutputString += "\t\telse\n"
-	individualOutputString += "\t\t{\n"
-	individualOutputString += "\t\t\tcout << \"Signature failed!\" << endl;\n"
-	individualOutputString += "\t\t}\n"
-	individualOutputString += "\t}\n"
-	individualOutputString += "}\n"
-
-	'''
-	for line in codeLinesFromBatcher:
-		line = line.replace("_z", "[z]")
-		individualOutputString += "\t\t" + line + "\n"
-
-	individualOutputString += "\t\t\tpass\n"
-	individualOutputString += "\t\telse:\n"
-	individualOutputString += "\t\t\tif " + con.numSignaturesIndex + " not in incorrectIndices:\n"
-	individualOutputString += "\t\t\t\tincorrectIndices.append(" + con.numSignaturesIndex + ")\n\n"
-
-	individualOutputString += "\treturn incorrectIndices\n"
-	'''
-
-	individualVerFile.write(individualOutputString)
+	return outputString
 
 def addFunctionsThatVerifyCalls():
 	global batchVerFile, individualVerFile, verifySigsFile
@@ -949,7 +945,11 @@ def writeLinesToFile(lineNosToWriteToFile, numBaseTabs, outputFile):
 	indentationListParam = []
 	sourceLinesToWriteToFile = getSourceCodeLinesFromLineList(copy.deepcopy(pythonCodeLines), lineNosToWriteToFile, indentationListParam)
 	batchOutputString = writeLinesToOutputString(sourceLinesToWriteToFile, indentationListParam, numTabsOnVerifyLine, numBaseTabs)
-	outputFile.write(batchOutputString)
+	newOutputString = ""
+	newOutputString = writeLinesForCPP(sourceLinesToWriteToFile, newOutputString, numBaseTabs + 1)
+	outputFile.write(newOutputString)
+
+	#outputFile.write(batchOutputString)
 
 def writeOneBlockToFile(block, numBaseTabs, outputFile, forCachedCalcs):
 	if ( (block == None) or (type(block).__name__ != con.loopBlock) ):
@@ -1001,9 +1001,13 @@ def writeOneBlockToFile(block, numBaseTabs, outputFile, forCachedCalcs):
 
 	outputString += getStringOfTabs(numBaseTabs)
 	if ( (forCachedCalcs == False) and (blockLoopOverValue == con.numSignatures) ):
-		outputString += "for " + blockIndexVariable + " in range(startSigNum, endSigNum):\n"
+		#outputString += "for " + blockIndexVariable + " in range(startSigNum, endSigNum):\n"
+		outputString += "for (" + blockIndexVariable + " = startSigNum; " + blockIndexVariable + " < endSigNum; " + blockIndexVariable + "++){\n"
+
 	else:
-		outputString += "for " + blockIndexVariable + " in range(" + str(blockStartValue) + ", " + blockLoopOverValue + "):\n"
+		#outputString += "for " + blockIndexVariable + " in range(" + str(blockStartValue) + ", " + blockLoopOverValue + "):\n"
+		outputString += "for (" + blockIndexVariable + " = " + str(blockStartValue) + "; " + blockIndexVariable + " < " + str(blockLoopOverValue) + "; " + blockIndexVariable + "++){\n"
+
 
 	outputFile.write(outputString)
 	outputString = ""
@@ -1046,6 +1050,12 @@ def writeOneBlockToFile(block, numBaseTabs, outputFile, forCachedCalcs):
 		else:
 			(outputString, indexVariable_EqChecks) = writeMultipleEqChecksForLoop(loopToCalculate, (numBaseTabs + 1))
 			writeOneLoopCalculation(loopToCalculate, blockOperationString, (numBaseTabs + 2), forCachedCalcs, outputFile, indexVariable_EqChecks)
+
+	outputString = ""
+	outputString += getStringOfTabs(numBaseTabs)
+	outputString += "}\n"
+
+	outputFile.write(outputString)
 
 def writeEqChecksDictDefs(loopsWithMultipleEqChecks, numBaseTabs):
 	if (loopsWithMultipleEqChecks == None):
@@ -1107,22 +1117,42 @@ def writeOneLoopCalculation(loopName, blockOperationString, numBaseTabs, forCach
 def getExpressionCalcString(expression, loopName, blockOperationString, numBaseTabs, forCachedCalcs, forAssignment, indexVariable_EqChecks = None):
 	outputString = ""
 
+	assignObj = ""
+
 	if (forAssignment == True):
 		#outputString += loopName
 		if (forCachedCalcs == True):
 			if (indexVariable_EqChecks == None):
-				outputString += loopName + "[" + con.numSignaturesIndex + "] = "
+				assignObj += loopName + "[" + con.numSignaturesIndex + "]"
 			else:
 				#outputString += loopName + "[" + con.numSignaturesIndex + "] = {}\n"
 				#outputString += getStringOfTabs(numBaseTabs)
-				outputString += loopName + "[" + con.numSignaturesIndex + "][" + indexVariable_EqChecks + "] = "
+				assignObj += loopName + "[" + con.numSignaturesIndex + "][" + indexVariable_EqChecks + "]"
 		else:
-			outputString += loopName + "_loopVal = " + loopName + "_loopVal " + blockOperationString + " "
+			assignObj += loopName + "_loopVal = " + loopName + "_loopVal " + blockOperationString + " "
 
 	expression = expression.lstrip('\'').rstrip('\'')
 	expression = ensureSpacesBtwnTokens_CodeGen(expression)
 	expression = expression.replace(' ^ ', ' ** ')
 	expression = expression.replace(' e ', ' pair ')
+
+	expressionSplit = expression.split()
+	for tokenCopy in expressionSplit:
+		token = copy.deepcopy(tokenCopy)
+
+		if (token.endswith("_" + con.numSignaturesIndex) == True):
+			firstToken = token[0:(len(token)-2)]
+			if (firstToken in verifyFuncArgs) or (firstToken == 'delta'):
+				expression = expression.replace(token, firstToken + "[z]", 1)
+			else:
+				expression = expression.replace(token, firstToken, 1)
+
+	if (expression.count(' ** ') == 1):
+		expressionSplit = expression.split(' ** ')
+		leftSide = expressionSplit[0].lstrip().rstrip()
+		rightSide = expressionSplit[1].lstrip().rstrip()
+		outputString += "group.exp(" + assignObj + ", " + leftSide + ", " + rightSide + ");"
+		return outputString
 
 	expressionSplit = expression.split()
 	for tokenCopy in expressionSplit:
@@ -1300,6 +1330,8 @@ def writeBodyOfCachedCalcsForBatch():
 		if ( (lineNosToWriteToFile == None) or (type(lineNosToWriteToFile).__name__ != con.listTypePython) or (len(lineNosToWriteToFile) == 0) ):
 			sys.exit("AutoBatch_CodeGen->writeBodyOfCachedCalcsForBatch:  problem with value returned from getAllLineNosThatImpactVarList for non-loop cached variables.")
 
+		print("here")
+
 		writeLinesToFile(lineNosToWriteToFile, 0, batchVerFile)
 		batchVerFile.write("\n")
 
@@ -1350,7 +1382,15 @@ def writeCallToDCAndRetToBatch():
 	global batchVerFile
 
 	outputString = ""
-	outputString += "\tverifySigsRecursive(verifyArgsDict, " + con.group + ", incorrectIndices, 0, " + con.numSignatures
+
+	outputString += "\tmap<int, int> incorrectIndices;\n\n"
+
+	outputString += "\tverifySigsRecursive("
+
+	for argToAdd in verifyFuncArgs:
+		outputString += argToAdd + ", "
+
+	outputString += con.group + ", incorrectIndices, 0, " + con.numSignatures
 	if (len(cachedCalcsToPassToDC) != 0):
 		for cachedCalcName in cachedCalcsToPassToDC:
 			outputString += ", "
@@ -1707,6 +1747,17 @@ def processFinalBatchEqWithLoops(line, codeGenSegNo):
 	finalBatchEqWithLoops.append(copy.deepcopy(finalEqStruct))
 	del finalEqStruct
 
+def writeVerHeader(fileName):
+	global headerFile
+
+	headerFile = open(fileName + '.h', 'w')
+
+	outputString = ""
+	outputString += "#ifndef VERCPP\n"
+	outputString += "#
+
+	headerFile.close()
+
 def main():
 	if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
 		sys.exit("\nUsage:  python " + sys.argv[0] + "\n \
@@ -1750,6 +1801,7 @@ def main():
 		#sys.exit("no py ending")
 
 	verifySigsFileName = verifySigsArg[0:(len(verifySigsArg) - 4)]
+	#print(verifySigsFileName)
 
 	myASTParser = ASTParser()
 	pythonCodeNode = myASTParser.getASTNodeFromFile(pythonCodeArg)
@@ -1920,6 +1972,8 @@ def main():
 	writeCallToDCAndRetToBatch()
 
 	writeCallToSortFunction()
+
+	writeVerHeader(verifySigsFileName)
 
 	writeOpeningLinesToDCVerifySigsRecursiveFunc()
 	if (loopBlocksForNonCachedCalculations != None):

@@ -6,7 +6,7 @@
 #define AES_SECURITY 80
 #include "pairing_3.h"
 
-int N = 1;
+int N = 2;
 #define HASH(x, str) group.hash_and_map(x, (char *) string(str).c_str())
 #define Group PFC
 #define SmallExp(x, a)	\
@@ -43,13 +43,16 @@ int main()
 	G1 h;
 	string M;
 
-	for z in range(0, N):
-		M= verifyArgsDict[z]['message'][bodyKey]
-		h= group.hash( M , G1 )
+	for (z = 0; z < N; z++){
+		M = message[z];
+		HASH(h, M);
 
-		dotA[z] =   h ** delta [ z ]  
-		dotB[z] =   verifyArgsDict[z]['sig'][bodyKey] ** delta [ z ]  
+		group.exp(dotA[z], h, delta[z]);
+		group.exp(dotB[z], sig[z], delta[z]);
+	}
 
-	verifySigsRecursive(verifyArgsDict, group, incorrectIndices, 0, N, delta, dotA, dotB)
+	map<int, int> incorrectIndices;
+
+	verifySigsRecursive(pk, sig, message, group, incorrectIndices, 0, N, delta, dotA, dotB)
 
 	return incorrectIndices

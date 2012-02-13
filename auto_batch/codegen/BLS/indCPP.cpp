@@ -6,7 +6,7 @@
 #define AES_SECURITY 80
 #include "pairing_3.h"
 
-int N = 1;
+int N = 2;
 #define HASH(x, str) group.hash_and_map(x, (char *) string(str).c_str())
 #define Group PFC
 #define SmallExp(x, a)	\
