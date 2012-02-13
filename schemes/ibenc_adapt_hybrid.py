@@ -35,7 +35,7 @@ class HybridIBEnc(IBEnc):
         return cipher.decrypt(c2)
     
 def main():
-    groupObj = PairingGroup('../param/a.param')
+    groupObj = PairingGroup('SS512')
     ibe = IBE_BB04(groupObj)
     
     hashID = HashIDAdapter(ibe, groupObj)

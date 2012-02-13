@@ -98,7 +98,7 @@ class IBE_CKRS(IBEnc):
         return msg
     
 if __name__ == "__main__":
-    groupObj = PairingGroup('../param/a.param')
+    groupObj = PairingGroup('SS512')
     ibe = IBE_CKRS(groupObj)
     (mpk, msk) = ibe.setup()
 

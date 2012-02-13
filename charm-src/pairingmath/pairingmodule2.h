@@ -112,7 +112,8 @@ typedef struct {
 	if(a->element_type == ZR_t) { _element_set_si(a->element_type, a->e, b); }
 
 #define element_set_mpz(a, b)	_element_set_mpz(a->element_type, a->e, b);
-#define element_to_mpz(a, b)	_element_to_mpz(ZR_t, a, b);
+#define element_to_mpz(a, b)	_element_to_mpz(ZR_t, a->e, b);
+#define object_to_mpz(a, b)	_element_to_mpz(ZR_t, a, b);
 
 #define element_neg(a, b) \
 	a->e = _element_neg(a->element_type, b->e, b->pairing->order);
@@ -121,8 +122,13 @@ typedef struct {
 	_element_inv(b->element_type, b->e, a->e, b->pairing->order)
 
 #define element_pow_zr(c, a, b) \
+	if (a->element_type != ZR_t)  {  \
 	c->e = _element_pow_zr(a->element_type, a->pairing->pair_obj, a->e, b->e); \
-	c->element_type = a->element_type;
+	c->element_type = a->element_type; }
+
+#define element_pow_int(c, a, b) \
+	c->e = _element_pow_zr_zr(ZR_t, a->pairing->pair_obj, a->e, b, a->pairing->order);	\
+	c->element_type = ZR_t;
 
 #define pairing_apply(c, a, b) \
 	if(a->pairing->curve == MNT) { \
@@ -183,6 +189,7 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds);
 PyObject *Element_print(Element* self);
 PyObject *Element_call(Element *elem, PyObject *args, PyObject *kwds);
 void	Element_dealloc(Element* self);
+Element *convertToZR(PyObject *LongObj, PyObject *elemObj);
 
 PyObject *Apply_pairing(Element *self, PyObject *args);
 PyObject *sha1_hash(Element *self, PyObject *args);

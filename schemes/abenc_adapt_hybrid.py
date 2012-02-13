@@ -67,7 +67,7 @@ class HybridABEnc(ABEnc):
         return message
 
 def main():
-    groupObj = PairingGroup('../param/a.param')
+    groupObj = PairingGroup('SS512')
     cpabe = CPabe_BSW07(groupObj)
     hyb_abe = HybridABEnc(cpabe, groupObj)
     access_policy = '((four or three) and (two or one))'

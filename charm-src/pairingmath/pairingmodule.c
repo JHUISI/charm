@@ -218,6 +218,7 @@ Element *convertToZR(PyObject *longObj, PyObject *elemObj) {
 #endif
 	longObjToMPZ(x, (PyLongObject *) longObj);
 	element_set_mpz(new->e, x);
+	mpz_clear(x);
 	return new;
 }
 
@@ -1598,12 +1599,12 @@ int check_membership(Element *elementObj) {
 
 static PyObject *Group_Check(Element *self, PyObject *args) {
 
-//	IS_PAIRING_OBJ_NULL(self);
+	Element *group = NULL;
 	PyObject *object = NULL;
-	if(PyArg_ParseTuple(args, "O", &object)) {
+	if(PyArg_ParseTuple(args, "OO", &group, &object)) {
 		if(PyElement_Check(object)) {
+			IS_PAIRING_OBJ_NULL(group); /* verify group object is still active */
 			Element *elem = (Element *) object;
-			IS_PAIRING_OBJ_NULL(elem);
 
 			if(check_membership(elem) == TRUE) {
 				Py_INCREF(Py_True);

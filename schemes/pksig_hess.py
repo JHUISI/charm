@@ -60,7 +60,7 @@ class Hess(PKSig):
 
 def main():
    
-   groupObj = PairingGroup('../param/a.param')
+   groupObj = PairingGroup('SS512')
    chch = Hess(groupObj)
    (mpk, msk) = chch.setup()
 

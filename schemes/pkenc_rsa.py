@@ -134,7 +134,6 @@ def main():
     
     (pk, sk) = rsa.keygen(1024)
     
-    #m = integer(34567890981234556498) % pk['N']
     m = b'This is a test'
     c = rsa.encrypt(pk, m)
     if debug: print("ct =>", c)

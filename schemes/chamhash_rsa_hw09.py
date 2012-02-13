@@ -27,7 +27,7 @@ class ChamHash_HW09(ChamHash):
     
     def paramgen(self, secparam, p = 0, q = 0):
         # If we're given p, q, compute N = p*q.  Otherwise select random p, q
-        if not (p == 0 and q == 0):
+        if not (p == 0 or q == 0):
             N = p * q
             if debug: print("p :=", p)
             if debug: print("q :=", q)

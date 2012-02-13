@@ -111,7 +111,7 @@ class KPabe(ABEnc):
         return E['E1'] / prodT 
 
 def main():
-    groupObj = PairingGroup('../param/d224.param')
+    groupObj = PairingGroup('MNT224')
     kpabe = KPabe(groupObj)
     
     (pk, mk) = kpabe.setup()

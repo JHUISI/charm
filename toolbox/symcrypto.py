@@ -14,7 +14,7 @@ class MessageAuthenticator(object):
         
     >>> from toolbox.pairinggroup import PairingGroup,GT
     >>> from charm.pairing import hash as extractor
-    >>> groupObj = PairingGroup('../param/a.param')
+    >>> groupObj = PairingGroup('SS512')
     >>> key = groupObj.random(GT)
     >>> m = MessageAuthenticator(extractor(key))
     >>> AuthenticatedMessage = m.mac('Hello World')
@@ -57,7 +57,7 @@ class SymmetricCryptoAbstraction(object):
 
     usage:
     >>> from toolbox.pairinggroup import PairingGroup,GT
-    >>> groupObj = PairingGroup('../param/a.param')
+    >>> groupObj = PairingGroup('SS512')
     >>> from charm.pairing import hash as sha1
     >>> a = SymmetricCryptoAbstraction(sha1(groupObj.random(GT)))
     >>> ct = a.encrypt("Friendly Fire Isn't")

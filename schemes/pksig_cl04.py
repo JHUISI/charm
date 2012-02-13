@@ -45,7 +45,7 @@ class CL04(PKSig):
         return False
     
 def main():
-    grp = PairingGroup('../param/d224.param')
+    grp = PairingGroup('MNT224')
     cl = CL04(grp)
     
     mpk = cl.setup()

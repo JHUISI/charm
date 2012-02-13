@@ -86,7 +86,7 @@ class VRF10:
             return False
         
 def main():
-    grp = PairingGroup('../param/d224.param')
+    grp = PairingGroup('MNT224')
     
     # bits
     x1 = [0, 1, 1, 0, 1, 0, 1, 0]

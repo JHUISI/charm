@@ -1,6 +1,6 @@
 from __future__ import print_function
 from charm.pairing import *
-from toolbox.pairingcurves import a,d224
+from toolbox.pairingcurves import params
 from charm.integer import randomBits,bitsize,integer
 import os.path
 
@@ -8,14 +8,11 @@ class PairingGroup():
     def __init__(self, param_file, secparam=512, verbose=False):        
         #legacy handler to handle calls that still pass in a file path
         if type(param_file) == str:
-          if param_file.endswith("a.param"):
-              pair = a
-          elif param_file.endswith("d224.param"):
-              pair = d224
-          else:
-              pair = param_file
-          self.Pairing = pairing(string=pair)            
+          pair = params.get(param_file)
+          assert pair != None, "'%s' not recognized! See 'pairingcurves.py' in toolbox." % param_file
+          self.Pairing = pairing(string=pair)
         elif type(param_file) == int:
+            # support for MIRACL initialization : default arg := MNT160
           self.Pairing = pairing(param_file)
  
         self.secparam = secparam # number of bits
@@ -35,14 +32,18 @@ class PairingGroup():
     def ismember(self, obj):
         if type(obj) in [set, tuple, list]:
            for i in obj:
-               if ismember(self.Pairing, i) == False: return False 
+               if type(i) == pairing:
+                  if ismember(self.Pairing, i) == False: return False 
            return True
         elif type(obj) == dict:
            for i in obj.keys():
-               if ismember(self.Pairing, obj[i]) == False: return False
+               if type(i) == pairing:
+                  if ismember(self.Pairing, obj[i]) == False: return False
            return True
         else:
-           return ismember(self.Pairing, obj)
+           if type(obj) == pairing:
+               return ismember(self.Pairing, obj)
+           return None # ignore non-pairing types
 
     def groupType(self): 
         return 'PairingGroup'     
