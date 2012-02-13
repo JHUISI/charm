@@ -149,23 +149,34 @@ class LatexCodeGenerator:
             return None
         elif(node.type == ops.ATTR):
             msg = node.attr
-            if str(msg) == 'delta':
+            if 'delta' in str(msg):
                 msg = '\delta'
             elif str(msg) =='N':
                 msg = '\\numsigs'
             else:
                 msg = self.getLatexVersion(str(msg))
-                if msg.find('_') != -1: msg = "{" + msg + "}" # prevent subscript
+#                if msg.find('_') != -1: msg = "{" + msg + "}" # prevent subscript
                 
             if node.attr_index != None:
                 keys = ""
-                for i in node.attr_index:
-                    keys += i + ","
-                keys = keys[:len(keys)-1]
-                if len(node.attr_index) > 1:
-                    msg += '_{' + keys + '}'
+                if msg.find('_') != -1:
+                    s = msg.split('_')
+                    #print("s : ", s)
+                    for i in node.attr_index:
+                        keys += i + ","
+                    keys = keys[:len(keys)-1]
+                    msg = s[0] + '_{' + keys + "," + s[1] + '}'
+                    #print("msg :=", msgs)
                 else:
-                    msg += '_' + keys
+                    msg = "{" + msg + "}"
+                    for i in node.attr_index:
+                        keys += i + ","
+                    keys = keys[:len(keys)-1]
+                    if len(node.attr_index) > 1:
+                        msg += '_{' + keys + '}'
+                    else:
+                        msg += '_' + keys
+            if node.negated: msg = '-' + msg
             return msg
         elif(node.type == ops.TYPE):
             return str(node.attr)
@@ -184,11 +195,13 @@ class LatexCodeGenerator:
                     return ( l + "^{" + r + ' \cdot ' + right + "}")
                 elif Type(node.left) == ops.ATTR:
                     return (left + '^{' + right + "}")
-                return ("(" + left + ')^{' + right + "}")
+                return ("{" + left + '}^{' + right + "}")
             elif(node.type == ops.MUL):
                 return ( left + ' \cdot ' + right)
+            elif(node.type == ops.ADD):
+                return ("("+ left + '' + right + ")")
             elif(node.type == ops.EQ):
-                return (left + ' = ' + right)
+                return (left + ' = ' + str(int(right) + 1)) 
             elif(node.type == ops.EQ_TST):
                 return (left + ' \stackrel{?}{=} ' + right)
             elif(node.type == ops.PAIR):
@@ -205,6 +218,10 @@ class LatexCodeGenerator:
                 return ("{" + left + " " + right + "}")
             elif(node.type == ops.CONCAT):
                  return (left + ' | ' + right)
+            elif(node.type == ops.FOR):
+                return ('\\text{for }' + left + '\\text{ to }  ' + right)
+            elif(node.type == ops.DO):
+                 return ( left + ' \\text{ it holds: }  ' + right)
         return None    
 
 

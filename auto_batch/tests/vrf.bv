@@ -33,3 +33,18 @@ signature := N
 verify1 := { e(pi#1, g2) == e((g1^(1 + -x#1)) * (U1#0^x#1), Ut) } and {{ e(pi#0, g2) == e(pi#n, U2#0) } and { e(pi#0, h) == y }}
 verify2 := { for{t:=1, n} do { e(pi#t, g2) == (e((pi#t-1^(1 + -x#t)), g2) * e(pi#t-1^x#t, U2#t)) } }
 
+BEGIN :: latex
+pi#0 := \pi_0
+pi#1 := \pi_1
+pi#n := \pi_i
+pi#t := \pi_t
+pi#t-1 := \pi_{t-1}
+g1 := g_1
+g2 := g_2
+x#1 := x_1
+x#t := x_t
+Ut := \hat{U}
+U1#0 := U_1
+U2#0 := U_0
+U2#t := U_t
+END :: latex

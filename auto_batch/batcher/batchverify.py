@@ -161,7 +161,7 @@ def writeConfig(lcg, latex_file, lcg_data, const, vars, sigs):
     return
  
  
-def runBatcher(file, verify, ast_struct):
+def runBatcher(file, verify, ast_struct, eq_number=0):
     global global_count
     constants, types = ast_struct[ CONST ], ast_struct[ TYPE ]
     latex_subs = ast_struct[ LATEX ]
@@ -360,7 +360,7 @@ def runBatcher(file, verify, ast_struct):
 
     if PROOFGEN_FLAG:
         print("Generated the proof for the given signature scheme.")
-        latex_file = metadata['name'].upper()
+        latex_file = metadata['name'].upper() + str(eq_number)
         writeConfig(lcg, latex_file, lcg_data, constants, vars, sig_vars)
 #        lcg = LatexCodeGenerator(const, vars)
 #        equation = lcg.print_statement(verify2)
@@ -406,6 +406,6 @@ if __name__ == "__main__":
             if type(result) != list: verify_eq.append(result)
             else: verify_eq.extend(result)
     # process settings
-    for v in verify_eq:    
+    for i in range(len(verify_eq)):    
         print("\nRunning batcher....\n")
-        runBatcher(file, v, ast_struct)
+        runBatcher(file + str(i), verify_eq[i], ast_struct, i)
