@@ -73,4 +73,6 @@ int main()
 	}
 
 	verifySigsRecursive(pk, sig, message, group, 0, N, delta, dotA, dotB);
+
+	return 0;
 }
