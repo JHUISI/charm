@@ -60,7 +60,7 @@ class Commitment_GS08(Commitment):
         return True
 
 def main():
-    groupObj = PairingGroup('../param/a.param')
+    groupObj = PairingGroup('SS512')
     cm = Commitment_GS08(groupObj)
    
     pk = cm.setup()

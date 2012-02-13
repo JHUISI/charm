@@ -9,10 +9,14 @@ class BinNode:
     self.OR = 1
     self.AND = 2
     self.ATTR = 0
+    self.negated = False
     #OF = '' # anything above 1 and 2
     if(isinstance(value, str)):
+      if value[0] == '!': 
+          value = value[1:] # remove but set flag
+          self.negated = True
       self.type = self.ATTR
-      self.attribute = value.upper()
+      self.attribute = value.upper()      
             
     elif(isinstance(value, int)):
       self.type = self.OR if value == self.OR else self.AND
@@ -23,7 +27,9 @@ class BinNode:
 
   def __str__(self):
     if(self.type == self.ATTR):
-      return self.attribute
+      if self.negated: prefix = '!'
+      else: return self.attribute
+      return prefix + self.attribute
     else:			
       left = str(self.left)
       right = str(self.right)
@@ -36,7 +42,10 @@ class BinNode:
   
   def getAttribute(self):
     if (self.type == self.ATTR):
-        return self.attribute
+        if self.negated: prefix = '!'
+        else: return self.attribute
+        return prefix + self.attribute 
+    return
 
   def getLeft(self):
     return self.left

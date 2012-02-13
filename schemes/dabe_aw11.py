@@ -25,7 +25,7 @@ class Dabe(ABEncMultiAuth):
     def __init__(self, groupObj):
         ABEncMultiAuth.__init__(self)
         global util, group
-        util = SecretUtil(groupObj.Pairing, verbose=False)  #Create Secret Sharing Scheme
+        util = SecretUtil(groupObj, verbose=False)  #Create Secret Sharing Scheme
         group = groupObj    #:Prime order group        
 	#Another comment
    
@@ -140,7 +140,7 @@ class Dabe(ABEncMultiAuth):
         return ct['C0'] / egg_s
 
 def main():
-    groupObj = PairingGroup('../param/a.param', verbose=True)
+    groupObj = PairingGroup('SS512', verbose=True)
 
     dabe = Dabe(groupObj)
     GP = dabe.setup()

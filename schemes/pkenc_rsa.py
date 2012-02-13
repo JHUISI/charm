@@ -26,7 +26,7 @@ class RSA():
     def paramgen(self, secparam):
         while True:
             p, q = randomPrime(secparam), randomPrime(secparam)
-            if isPrime(p) and isPrime(q):
+            if isPrime(p) and isPrime(q) and p != q:
                 N = p * q
                 phi_N = (p - 1) * (q - 1)
                 break
@@ -134,7 +134,6 @@ def main():
     
     (pk, sk) = rsa.keygen(1024)
     
-    #m = integer(34567890981234556498) % pk['N']
     m = b'This is a test'
     c = rsa.encrypt(pk, m)
     if debug: print("ct =>", c)

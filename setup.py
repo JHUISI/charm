@@ -34,7 +34,7 @@ if opt.get('PAIR_MOD') == 'yes':
         # build MIRACL based pairing module - note that this is for experimental use only
         pairing_module = Extension('pairing', include_dirs = [path+'utils/', path+'pairingmath/miracl/'], 
                            sources = [path+'pairingmath/pairingmodule2.c', path+'utils/sha1.c', path+'pairingmath/miracl/miraclwrapper.cc'],
-                           libraries=['gmp','stdc++'], extra_objects=[path+'pairingmath/miracl/miracl.a'], extra_compile_args=['-c -m64 -O2'])
+                           libraries=['gmp','stdc++'], extra_objects=[path+'pairingmath/miracl/miracl.a'], extra_compile_args=None)
     _ext_modules.append(pairing_module)
    
 if opt.get('INT_MOD') == 'yes':

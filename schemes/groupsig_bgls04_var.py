@@ -49,8 +49,8 @@ class ShortSig(PKSig):
         T2 = gpk['v'] ** beta
         T3 = A * (gpk['h'] ** (alpha + beta))
         
-        delta1 = x * alpha
-        delta2 = x * beta
+        gamma1 = x * alpha
+        gamma2 = x * beta
         r = [group.random() for i in range(5)]
          
         R1 = gpk['u'] ** r[0]
@@ -61,32 +61,33 @@ class ShortSig(PKSig):
         
         c = group.hash((M, T1, T2, T3, R1, R2, R3, R4, R5), ZR)
         s1, s2 = r[0] + c * alpha, r[1] + c * beta
-        s3, s4 = r[2] + c * x, r[3] + c * delta1
-        s5 = r[4] + c * delta2
-        return {'T1':T1, 'T2':T2, 'T3':T3, 'c':c, 's_alpha':s1, 's_beta':s2, 's_x':s3, 's_delta1':s4, 's_delta2':s5}
+        s3, s4 = r[2] + c * x, r[3] + c * gamma1
+        s5 = r[4] + c * gamma2
+        return { 'T1':T1, 'T2':T2, 'T3':T3, 'R3':R3,'c':c, 's_alpha':s1, 's_beta':s2, 's_x':s3, 's_gamma1':s4, 's_gamma2':s5 }
     
-    def verify(self, gpk, M, sigma):
-        validSignature = False
-        
-        c, t1, t2, t3 = sigma['c'], sigma['T1'], sigma['T2'], sigma['T3']
+    def verify(self, gpk, M, sigma):        
+        """alternative verification check for BGLS04 which allows it to be batched"""
+        c, T1, T2, T3 = sigma['c'], sigma['T1'], sigma['T2'], sigma['T3']
         s_alpha, s_beta = sigma['s_alpha'], sigma['s_beta']
-        s_x, s_delta1, s_delta2 = sigma['s_x'], sigma['s_delta1'], sigma['s_delta2']
+        s_x, s_gamma1, s_gamma2 = sigma['s_x'], sigma['s_gamma1'], sigma['s_gamma2']
+        R3 = sigma['R3']
         
-        R1_ = (gpk['u'] ** s_alpha) * (t1 ** -c)
-        R2_ = (gpk['v'] ** s_beta) * (t2 ** -c)
-        R3_ = (pair(t3, gpk['g2']) ** s_x) * (pair(gpk['h'],gpk['w']) ** (-s_alpha - s_beta)) * (pair(gpk['h'], gpk['g2']) ** (-s_delta1 - s_delta2)) * ((pair(t3, gpk['w']) / pair(gpk['g1'], gpk['g2'])) ** c)
-        R4_ = (t1 ** s_x) * (gpk['u'] ** -s_delta1)
-        R5_ = (t2 ** s_x) * (gpk['v'] ** -s_delta2)
-        
-        c_prime = group.hash((M, t1, t2, t3, R1_, R2_, R3_, R4_, R5_), ZR)
-        
-        if c == c_prime:
+        R1 = (gpk['u'] ** s_alpha) * (T1 ** -c)
+        R2 = (gpk['v'] ** s_beta) * (T2 ** -c)
+        R4 = (T1 ** s_x) * (gpk['u'] ** -s_gamma1)
+        R5 = (T2 ** s_x) * (gpk['v'] ** -s_gamma2)
+        if c == group.hash((M, T1, T2, T3, R1, R2, R3, R4, R5), ZR):
             if debug: print("c => '%s'" % c)
             if debug: print("Valid Group Signature for message: '%s'" % M)
-            validSignature = True
+            pass
         else:
             if debug: print("Not a valid signature for message!!!")
-        return validSignature
+            return False
+        
+        if ((pair(T3, gpk['g2']) ** s_x) * (pair(gpk['h'],gpk['w']) ** (-s_alpha - s_beta)) * (pair(gpk['h'], gpk['g2']) ** (-s_gamma1 - s_gamma2)) * (pair(T3, gpk['w']) ** c) * (pair(gpk['g1'], gpk['g2']) ** -c) ) == R3: 
+            return True
+        else:
+            return False
     
     def open(self, gpk, gmsk, M, sigma):
         t1, t2, t3, xi1, xi2 = sigma['T1'], sigma['T2'], sigma['T3'], gmsk['xi1'], gmsk['xi2']
@@ -119,7 +120,7 @@ def main():
     #            print('A = %s' % index)
     #        i += 1
     assert result, "Signature Failed"
-    if debug: print('Complete!')
+    if debug: print('Successful Verification!')
 
 if __name__ == "__main__":
     debug = True

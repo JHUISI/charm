@@ -22,7 +22,7 @@ class CPabe09(ABEnc):
     def __init__(self, groupObj):
         ABEnc.__init__(self)
         global util, group
-        util = SecretUtil(groupObj.Pairing, groupObj._verbose)        
+        util = SecretUtil(groupObj, groupObj._verbose)        
         group = groupObj
                         
     def setup(self):
@@ -88,7 +88,7 @@ class CPabe09(ABEnc):
 
 def main():
     #Get the eliptic curve with the bilinear mapping feature needed.
-    groupObj = PairingGroup('../param/a.param', verbose=True)
+    groupObj = PairingGroup('SS512', verbose=True)
 
     cpabe = CPabe09(groupObj)
     (msk, pk) = cpabe.setup()

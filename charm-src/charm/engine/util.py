@@ -1,5 +1,5 @@
-import struct
 import io, pickle
+import json, zlib
 from base64 import *
 
 def serializeDict(object, group):
@@ -32,7 +32,7 @@ def serializeList(object, group):
     if not hasattr(group, 'serialize'):
         return None
     
-    if isinstance(object, list):
+    if type(object) == list:
         for i in object:
             # check the type of the object[i]
             if type(i) in [str, int]:
@@ -48,7 +48,7 @@ def serializeList(object, group):
                #print("DEBUG = k: %s, v: %s" % (i, object[i]))
                 bytes_object_.append(group.serialize(i))
         return bytes_object_
-    elif isinstance(object, tuple):
+    elif type(object) == tuple:
         for i in object:
             # check the type of the object[i]
             if type(i) in [str, int]:
@@ -66,13 +66,18 @@ def serializeList(object, group):
         return tuple(bytes_object_)
     else:
         # just one bytes object and it's a string
-        if type(object) == str: return bytes(object, 'utf8')
+        if type(object) == str: 
+           return b'str:' + bytes(object, 'utf8')
+        elif type(object) == bytes:
+           return b'byte:' + object 
         else: return group.serialize(object)
 
-def serialize(objects, group):
-    if type(objects) == dict: return serializeDict(objects, group)
+def serializeObject(objects, group):
+    if type(objects) == dict: 
+       return serializeDict(objects, group)
     # handles lists, tuples, sets, and even individual elements
-    else: return serializeList(objects, group)
+    else: 
+       return serializeList(objects, group)
 
 
 def deserializeDict(object, group):
@@ -108,7 +113,7 @@ def deserializeList(object, group):
     if not hasattr(group, 'deserialize'):
        return None
 
-    if isinstance(object, list):
+    if type(object) == list:
         for i in object:
             _typeL = type(i)
             if _typeL == bytes:
@@ -125,7 +130,7 @@ def deserializeList(object, group):
             elif _typeL == int:
                 _bytes_object.append(i)
         return _bytes_object
-    elif isinstance(object, tuple):
+    elif type(object) == tuple:
         for i in object:
             _typeL = type(i)
             if _typeL == bytes:
@@ -143,13 +148,18 @@ def deserializeList(object, group):
                 _bytes_object.append(i)
         return tuple(_bytes_object)        
     else:
+        delim = b':'
+        if type(object) == str and object.split(delim)[0] == b'str':
+            return bytes.decode(object.split(delim)[1])
+        elif type(object) == bytes and object.split(delim)[0] == b'byte':
+            return object.split(delim)[1] # keep as a byte object
         # just one bytes object
-        return object
+        return group.deserialize(object)
+        # return object
 
-def deserialize(objects, group):
+def deserializeObject(objects, group):
     if type(objects) == dict: return deserializeDict(objects, group)
     else: return deserializeList(objects, group)
-    
     
 def pickleObject(object):
     valid_types = [bytes, dict, list, str, int]    
@@ -163,10 +173,7 @@ def pickleObject(object):
                return None
     pickle.dump(object, file, pickle.HIGHEST_PROTOCOL)
     result = file.getvalue()
-#    print("before enc =>", len(result))
     encoded = b64encode(result)
-#    print("Result enc =>", encoded)
-#    print("len =>", len(encoded))
     file.close()
     return encoded
 
@@ -178,19 +185,29 @@ def unpickleObject(object):
     else:
        return None
     decoded = b64decode(byte_object)
-#    print("Result dec =>", decoded)
-#    print("len =>", len(decoded))
     if type(decoded) == bytes and len(decoded) > 0:
         return pickle.loads(decoded)
     return None
 
-if __name__ == "__main__":
-    data = { 'a':b"hello", 'b':b"world" }
-  
-    #packer = getPackerObject(data)    
-    #print("packed => ", packer.pack())
-    result = pickleObject(data)
-
-    data2 = unpickleObject(result)
+# Two new API calls to simplify serializing to a blob of bytes
+# objectToBytes() and bytesToObject()
+def objectToBytes(object, group):
+    object_ser = serializeObject(object, group)
+    return pickleObject(object_ser)
     
-    print("data2 => ", data2)
+def bytesToObject(byteobject, group):
+    unwrap_object = unpickleObject(byteobject)
+    return deserializeObject(unwrap_object, group)
+    
+"""
+    Using serialization tools with our cryptographic schemes 
+    requires that the group object is initialized 
+    
+    data = { 'test1':b"hello", 'test2':b"world", }
+    
+    dataBytes = objectToBytes(data, group)
+    
+    dataRec   = bytesToObject(dataBytes, group)
+
+    assert data == dataRec, 'Error during deserialization.'
+"""

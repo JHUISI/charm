@@ -12,7 +12,7 @@ Camenisch-Hohenberger-Pedersen - Identity-based Signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from charm.pairing import *
+from toolbox.pairinggroup import PairingGroup,G1,G2,GT,ZR,pair
 from toolbox.PKSig import PKSig
 
 debug = False
@@ -24,8 +24,8 @@ class CHP(PKSig):
         
     def setup(self):
         global H,H3
-        H = lambda prefix,x: group.H((str(prefix), str(x)), G1)
-        H3 = lambda a,b: group.H(('3', str(a), str(b)), ZR)
+        H = lambda prefix,x: group.hash((str(prefix), str(x)), G1)
+        H3 = lambda a,b: group.hash(('3', str(a), str(b)), ZR)
         g = group.random(G2) 
         return { 'g' : g }
     
@@ -52,7 +52,7 @@ class CHP(PKSig):
 
 def main():
    
-   groupObj = pairing('../param/a.param')
+   groupObj = PairingGroup('SS512')
    chp = CHP(groupObj)
    mpk = chp.setup()
 

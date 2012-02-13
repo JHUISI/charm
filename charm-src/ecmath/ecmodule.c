@@ -297,20 +297,19 @@ PyObject *ECElement_print(ECElement *self) {
 
 PyObject *ECE_init(ECElement *self, PyObject *args) {
 	GroupType type = NONE_G;
-	ECElement *obj;
+	ECElement *obj, *gobj = NULL;
 
-	Group_Init(self);
-
-	if(PyArg_ParseTuple(args, "i", &type)) {
+	if(PyArg_ParseTuple(args, "Oi", &gobj, &type)) {
+		Group_Init(gobj);
 
 		if(type == G) {
 			debug("init element in group G.\n");
-			obj = createNewPoint(G, self->group, self->ctx);
+			obj = createNewPoint(G, gobj->group, gobj->ctx);
 			return (PyObject *) obj;
 		}
 		else if(type == ZR) {
 			debug("init element of ZR.\n");
-			obj = createNewPoint(ZR, self->group, self->ctx);
+			obj = createNewPoint(ZR, gobj->group, gobj->ctx);
 			return (PyObject *) obj;
 		}
 		else {
@@ -323,24 +322,26 @@ PyObject *ECE_init(ECElement *self, PyObject *args) {
 PyObject *ECE_random(ECElement *self, PyObject *args) {
 
 	GroupType type = NONE_G;
-	Group_Init(self);
+	ECElement *gobj = NULL;
 
-	if(PyArg_ParseTuple(args, "i", &type)) {
+	if(PyArg_ParseTuple(args, "Oi", &gobj, &type)) {
+		Group_Init(gobj);
+
 		if(type == G) {
 			// generate a random element from ec group G.
 			// call 'EC_POINT_set_compressed_coordinates_GFp' w/ group, P, x, 1, ctx
 			// call 'EC_POINT_set_affine_coordinates_GFp' w/ group, P, x/y, ctx
 			// test group membership 'EC_POINT_is_on_curve'
-			ECElement *objG = createNewPoint(G, self->group, self->ctx);
+			ECElement *objG = createNewPoint(G, gobj->group, gobj->ctx);
 			BIGNUM *x = BN_new(), *y = BN_new(), *order = BN_new();
-			EC_GROUP_get_order(self->group, order, self->ctx);
+			EC_GROUP_get_order(gobj->group, order, gobj->ctx);
 			int FindAnotherPoint = TRUE;
 //			START_CLOCK(dBench);
 			do {
 				// generate random point
 				BN_rand_range(x, order);
-				EC_POINT_set_compressed_coordinates_GFp(self->group, objG->P, x, 1, objG->ctx);
-				EC_POINT_get_affine_coordinates_GFp(self->group, objG->P, x, y, objG->ctx);
+				EC_POINT_set_compressed_coordinates_GFp(gobj->group, objG->P, x, 1, objG->ctx);
+				EC_POINT_get_affine_coordinates_GFp(gobj->group, objG->P, x, y, objG->ctx);
 				// make sure point is on curve and not zero
 
 				if(BN_is_zero(x) || BN_is_zero(y)) {
@@ -348,7 +349,7 @@ PyObject *ECE_random(ECElement *self, PyObject *args) {
 					continue;
 				}
 
-				if(EC_POINT_is_on_curve(self->group, objG->P, objG->ctx)) {
+				if(EC_POINT_is_on_curve(gobj->group, objG->P, objG->ctx)) {
 					FindAnotherPoint = FALSE;
 				}
 //				char *xstr = BN_bn2dec(x);
@@ -366,9 +367,9 @@ PyObject *ECE_random(ECElement *self, PyObject *args) {
 			return (PyObject *) objG;
 		}
 		else if(type == ZR) {
-			ECElement *objZR = createNewPoint(ZR, self->group, self->ctx);
+			ECElement *objZR = createNewPoint(ZR, gobj->group, gobj->ctx);
 			BIGNUM *order = BN_new();
-			EC_GROUP_get_order(self->group, order, self->ctx);
+			EC_GROUP_get_order(gobj->group, order, gobj->ctx);
 			objZR->elemZ = BN_new();
 //			START_CLOCK(dBench);
 			BN_rand_range(objZR->elemZ, order);
@@ -1005,26 +1006,27 @@ static PyObject *ECE_long(PyObject *o1) {
 }
 
 static PyObject *ECE_convertToZR(ECElement *self, PyObject *args) {
-	Group_NULL(self);
-	Group_Init(self);
-	ECElement *obj = NULL;
+	ECElement *obj = NULL, *gobj = NULL;
 	PyObject *retXY = NULL;
 
+	/* gobj - initialized ec group object */
 	/* obj - ecc point object on an elliptic curve */
 	/* retXY => whether to return just x (Py_True) or x and y (Py_False) */
-	if(PyArg_ParseTuple(args, "OO", &obj, &retXY)) {
+	if(PyArg_ParseTuple(args, "OOO", &gobj, &obj, &retXY)) {
+		Group_Init(gobj);
+
 		if(PyEC_Check(obj)) {
 			// convert to
 			Point_Init(obj);
 			if(obj->type == G) {
 				BIGNUM *x = BN_new(), *y = BN_new();
-				EC_POINT_get_affine_coordinates_GFp(self->group, obj->P, x, y, self->ctx);
+				EC_POINT_get_affine_coordinates_GFp(gobj->group, obj->P, x, y, gobj->ctx);
 				if(PyBool_Check(retXY)) {
 					// see if retXY is Py_True or Py_False
 					if(retXY == Py_True) {
 						debug("Py_True detected.\n");
-						ECElement *X = createNewPoint(ZR, self->group, self->ctx);
-						ECElement *Y = createNewPoint(ZR, self->group, self->ctx);
+						ECElement *X = createNewPoint(ZR, gobj->group, gobj->ctx);
+						ECElement *Y = createNewPoint(ZR, gobj->group, gobj->ctx);
 						BN_copy(X->elemZ, x);
 						BN_copy(Y->elemZ, y);
 						BN_free(x); BN_free(y);
@@ -1032,7 +1034,7 @@ static PyObject *ECE_convertToZR(ECElement *self, PyObject *args) {
 					}
 					else {
 						BN_free(y);
-						ECElement *newObj = createNewPoint(ZR, self->group, self->ctx);
+						ECElement *newObj = createNewPoint(ZR, gobj->group, gobj->ctx);
 						BN_copy(newObj->elemZ, x);
 						BN_free(x);
 						return (PyObject *) newObj;
@@ -1061,24 +1063,34 @@ static PyObject *ECE_convertToZR(ECElement *self, PyObject *args) {
 //	}
 //}
 
-static PyObject *ECE_getOrder(ECElement *self) {
-	Group_Init(self);
-	ECElement *order = createNewPoint(ZR, self->group, self->ctx);
-	EC_GROUP_get_order(self->group, order->elemZ, NULL);
-	// return the order of the group
-	return (PyObject *) order;
+static PyObject *ECE_getOrder(ECElement *self, PyObject *arg) {
+	if(PyEC_Check(arg)) {
+		ECElement *gobj = (ECElement *) arg;
+		Group_Init(gobj);
+
+		ECElement *order = createNewPoint(ZR, self->group, self->ctx);
+		EC_GROUP_get_order(self->group, order->elemZ, NULL);
+		// return the order of the group
+		return (PyObject *) order;
+	}
+	ErrorMsg("invalid argument.");
 }
 
-static PyObject *ECE_bitsize(ECElement *self) {
-	Group_Init(self);
-	BIGNUM *elemZ = BN_new();
-	EC_GROUP_get_order(self->group, elemZ, NULL);
-	size_t max_len = BN_num_bytes(elemZ) - RESERVED_ENCODING_BYTES;
-	debug("order len in bytes => '%zd'\n", max_len);
+static PyObject *ECE_bitsize(ECElement *self, PyObject *arg) {
+	if(PyEC_Check(arg)) {
+		ECElement *gobj = (ECElement *) arg;
+		Group_Init(gobj);
 
-	BN_free(elemZ);
-	// maximum bitsize for messages encoded for the selected group
-	return Py_BuildValue("i", max_len);
+		BIGNUM *elemZ = BN_new();
+		EC_GROUP_get_order(gobj->group, elemZ, NULL);
+		size_t max_len = BN_num_bytes(elemZ) - RESERVED_ENCODING_BYTES;
+		debug("order len in bytes => '%zd'\n", max_len);
+
+		BN_free(elemZ);
+		// maximum bitsize for messages encoded for the selected group
+		return Py_BuildValue("i", max_len);
+	}
+	ErrorMsg("invalid argument.");
 }
 
 
@@ -1155,14 +1167,18 @@ static PyObject *ECE_equals(PyObject *o1, PyObject *o2, int opid) {
 	return Py_False;
 }
 
-static PyObject *ECE_getGen(ECElement *self) {
+static PyObject *ECE_getGen(ECElement *self, PyObject *arg) {
+	if(PyEC_Check(arg)) {
+		ECElement *gobj = (ECElement *) arg;
+		Group_Init(gobj);
 
-	Group_Init(self);
-	ECElement *genObj = createNewPoint(G, self->group, self->ctx);
-	const EC_POINT *gen = EC_GROUP_get0_generator(self->group);
-	EC_POINT_copy(genObj->P, gen);
+		ECElement *genObj = createNewPoint(G, gobj->group, gobj->ctx);
+		const EC_POINT *gen = EC_GROUP_get0_generator(gobj->group);
+		EC_POINT_copy(genObj->P, gen);
 
-	return (PyObject *) genObj;
+		return (PyObject *) genObj;
+	}
+	ErrorMsg("invalid argument.");
 }
 
 /*
@@ -1218,11 +1234,11 @@ static PyObject *ECE_hash(ECElement *self, PyObject *args) {
 	char *msg = NULL;
 	int msg_len;
 	GroupType type;
-	ECElement *hashObj = NULL;
-	Group_Init(self);
+	ECElement *hashObj = NULL, *gobj = NULL;
 
 	// TODO: consider hashing string then generating an element from it's output
-	if(PyArg_ParseTuple(args, "s#i", &msg, &msg_len, &type)) {
+	if(PyArg_ParseTuple(args, "Os#i", &gobj, &msg, &msg_len, &type)) {
+		Group_Init(gobj);
 		// hash the message, then generate an element from the hash_buf
 		uint8_t hash_buf[HASH_LEN+1];
 		if(type == G) {
@@ -1232,8 +1248,8 @@ static PyObject *ECE_hash(ECElement *self, PyObject *args) {
 			debug("Hash output => ");
 			printf_buffer_as_hex(hash_buf, HASH_LEN);
 
-			hashObj = createNewPoint(G, self->group, self->ctx);
-			hashObj->P = element_from_hash(self->group, (uint8_t *) hash_buf, HASH_LEN);
+			hashObj = createNewPoint(G, gobj->group, gobj->ctx);
+			hashObj->P = element_from_hash(gobj->group, (uint8_t *) hash_buf, HASH_LEN);
 			STOP_CLOCK(dBench);
 			return (PyObject *) hashObj;
 		}
@@ -1244,7 +1260,7 @@ static PyObject *ECE_hash(ECElement *self, PyObject *args) {
 			debug("Hash output => ");
 			printf_buffer_as_hex(hash_buf, HASH_LEN);
 
-			hashObj = createNewPoint(ZR, self->group, self->ctx);
+			hashObj = createNewPoint(ZR, gobj->group, gobj->ctx);
 			BN_bin2bn((const uint8_t *) hash_buf, HASH_LEN, hashObj->elemZ);
 			STOP_CLOCK(dBench);
 
@@ -1268,9 +1284,10 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
 	uint8_t *old_msg;
 	int msg_len, bits = -1, ctr = 1, ERROR_SET = FALSE; // always have a ctr start from 1
 	BIGNUM *x = NULL, *y = NULL;
-	Group_Init(self);
+	ECElement *gobj = NULL;
 
-	if(PyArg_ParseTuple(args, "O|i", &old_m, &bits)) {
+	if(PyArg_ParseTuple(args, "OO|i", &gobj, &old_m, &bits)) {
+		Group_Init(gobj);
 
 		if(PyBytes_Check(old_m)) {
 			old_msg = (uint8_t *) PyBytes_AS_STRING(old_m);
@@ -1286,7 +1303,7 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
 		}
 		// make sure msg will fit into group (get order num bits / 8)
 		BIGNUM *order = BN_new();
-		EC_GROUP_get_order(self->group, order, NULL);
+		EC_GROUP_get_order(gobj->group, order, NULL);
 		int max_len = (BN_num_bits(order) / BYTE);
 		debug("max msg len => '%d'\n", max_len);
 
@@ -1328,7 +1345,7 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
 					debug("input hex msg => ");
 					// check if msg len is big enough to fit into length
 					printf_buffer_as_hex((uint8_t *) input, len);
-					encObj = createNewPoint(G, self->group, self->ctx);
+					encObj = createNewPoint(G, gobj->group, gobj->ctx);
 					x = BN_bin2bn((const uint8_t *) input, len, NULL);
 					y = BN_new();
 					char *xstr = BN_bn2dec(x);
@@ -1384,15 +1401,16 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
  * Decode a group element to a message (PyUnicode_String)
  */
 static PyObject *ECE_decode(ECElement *self, PyObject *args) {
-	ECElement *obj = NULL;
-	Group_Init(self);
+	ECElement *obj = NULL, *gobj = NULL;
 
-	if(PyArg_ParseTuple(args, "O", &obj)) {
+	if(PyArg_ParseTuple(args, "OO", &gobj, &obj)) {
+		Group_Init(gobj);
+
 		if(PyEC_Check(obj)) {
 			BIGNUM *x = BN_new(), *y = BN_new();
 			START_CLOCK(dBench);
 			// TODO: verify that element is on the curve before getting coordinates
-			EC_POINT_get_affine_coordinates_GFp(self->group, obj->P, x, y, self->ctx);
+			EC_POINT_get_affine_coordinates_GFp(gobj->group, obj->P, x, y, gobj->ctx);
 
 			int x_len = BN_num_bytes(x);
 			uint8_t *xstr = (uint8_t*) malloc(x_len + 1);
@@ -1431,11 +1449,10 @@ static PyObject *ECE_decode(ECElement *self, PyObject *args) {
 }
 
 static PyObject *Serialize(ECElement *self, PyObject *args) {
-	Group_NULL(self);
 
 	ECElement *obj = NULL;
 	if(!PyArg_ParseTuple(args, "O", &obj)) {
-		printf("ERROR: invalid argument.\n");
+		ErrorMsg("invalid argument.");
 		return NULL;
 	}
 
@@ -1446,7 +1463,7 @@ static PyObject *Serialize(ECElement *self, PyObject *args) {
 			uint8_t p_buf[MAX_BUF+1];
 			memset(p_buf, 0, MAX_BUF);
 			START_CLOCK(dBench);
-			size_t len = EC_POINT_point2oct(obj->group, obj->P, POINT_CONVERSION_COMPRESSED,  p_buf, MAX_BUF, self->ctx);
+			size_t len = EC_POINT_point2oct(obj->group, obj->P, POINT_CONVERSION_COMPRESSED,  p_buf, MAX_BUF, obj->ctx);
 			if(len == 0) {
 				ErrorMsg("could not serialize point.");
 			}
@@ -1490,9 +1507,10 @@ static PyObject *Serialize(ECElement *self, PyObject *args) {
 static PyObject *Deserialize(ECElement *self, PyObject *args)
 {
 	PyObject *obj = NULL;
-	Group_Init(self);
+	ECElement *gobj = NULL;
 
-	if(PyArg_ParseTuple(args, "O", &obj)) {
+	if(PyArg_ParseTuple(args, "OO", &gobj, &obj)) {
+		Group_Init(gobj);
 		if(PyBytes_Check(obj)) {
 			// char *buf = PyBytes_AsString(obj);
 			unsigned char *serial_buf = (unsigned char *) PyBytes_AsString(obj);
@@ -1506,9 +1524,9 @@ static PyObject *Deserialize(ECElement *self, PyObject *args)
 			debug("Deserialize this => ");
 			printf_buffer_as_hex(buf, len);
 			if(type == G) {
-				ECElement *newObj = createNewPoint(type, self->group, self->ctx);
+				ECElement *newObj = createNewPoint(type, gobj->group, gobj->ctx);
 				START_CLOCK(dBench);
-				EC_POINT_oct2point(self->group, newObj->P, (const uint8_t *) buf, len, self->ctx);
+				EC_POINT_oct2point(gobj->group, newObj->P, (const uint8_t *) buf, len, gobj->ctx);
 
 				if(EC_POINT_is_on_curve(newObj->group, newObj->P, newObj->ctx)) {
 					STOP_CLOCK(dBench);
@@ -1516,7 +1534,7 @@ static PyObject *Deserialize(ECElement *self, PyObject *args)
 				}
 			}
 			else if(type == ZR) {
-				ECElement *newObj = createNewPoint(type, self->group, self->ctx);
+				ECElement *newObj = createNewPoint(type, gobj->group, gobj->ctx);
 				START_CLOCK(dBench);
 				BN_bin2bn((const uint8_t *) buf, len, newObj->elemZ);
 				STOP_CLOCK(dBench);
@@ -1548,18 +1566,18 @@ PyMemberDef ECElement_members[] = {
 };
 
 PyMethodDef ECElement_methods[] = {
-		{"init", (PyCFunction)ECE_init, METH_VARARGS, "Create an element in a specific group G or ZR."},
-		{"random", (PyCFunction)ECE_random, METH_VARARGS, "Return a random element in a specific group G or ZR."},
-		{"order", (PyCFunction)ECE_getOrder, METH_NOARGS, "Return the order of a group."},
-		{"getGenerator", (PyCFunction)ECE_getGen, METH_NOARGS, "Get the generator of the group."},
+//		{"init", (PyCFunction)ECE_init, METH_VARARGS, "Create an element in a specific group G or ZR."},
+//		{"random", (PyCFunction)ECE_random, METH_VARARGS, "Return a random element in a specific group G or ZR."},
+//		{"order", (PyCFunction)ECE_getOrder, METH_NOARGS, "Return the order of a group."},
+//		{"getGenerator", (PyCFunction)ECE_getGen, METH_NOARGS, "Get the generator of the group."},
 		{"isInf", (PyCFunction)ECE_is_infinity, METH_NOARGS, "Checks whether a point is at infinity."},
-		{"bitsize", (PyCFunction)ECE_bitsize, METH_NOARGS, "Returns number of bytes to represent a message."},
-		{"serialize", (PyCFunction)Serialize, METH_VARARGS, "Serialize an element to a string"},
-		{"deserialize", (PyCFunction)Deserialize, METH_VARARGS, "Deserialize an element to G or ZR"},
-		{"hash", (PyCFunction)ECE_hash, METH_VARARGS, "Perform a hash of a string to a group element of G."},
-		{"encode", (PyCFunction)ECE_encode, METH_VARARGS, "Encode string as a group element of G"},
-		{"decode", (PyCFunction)ECE_decode, METH_VARARGS, "Decode group element to a string."},
-		{"getXY", (PyCFunction)ECE_convertToZR, METH_VARARGS, "Returns the x and/or y coordinates of point on an elliptic curve."},
+//		{"bitsize", (PyCFunction)ECE_bitsize, METH_NOARGS, "Returns number of bytes to represent a message."},
+//		{"serialize", (PyCFunction)Serialize, METH_VARARGS, "Serialize an element to a string"},
+//		{"deserialize", (PyCFunction)Deserialize, METH_VARARGS, "Deserialize an element to G or ZR"},
+//		{"hash", (PyCFunction)ECE_hash, METH_VARARGS, "Perform a hash of a string to a group element of G."},
+//		{"encode", (PyCFunction)ECE_encode, METH_VARARGS, "Encode string as a group element of G"},
+//		{"decode", (PyCFunction)ECE_decode, METH_VARARGS, "Decode group element to a string."},
+//		{"getXY", (PyCFunction)ECE_convertToZR, METH_VARARGS, "Returns the x and/or y coordinates of point on an elliptic curve."},
 		{NULL}
 };
 
@@ -1742,6 +1760,17 @@ static struct module_state _state;
 #endif
 
 static PyMethodDef ecc_methods[] = {
+		{"init", (PyCFunction)ECE_init, METH_VARARGS, "Create an element in a specific group G or ZR."},
+		{"random", (PyCFunction)ECE_random, METH_VARARGS, "Return a random element in a specific group G or ZR."},
+		{"order", (PyCFunction)ECE_getOrder, METH_O, "Return the order of a group."},
+		{"getGenerator", (PyCFunction)ECE_getGen, METH_O, "Get the generator of the group."},
+		{"bitsize", (PyCFunction)ECE_bitsize, METH_O, "Returns number of bytes to represent a message."},
+		{"serialize", (PyCFunction)Serialize, METH_VARARGS, "Serialize an element to a string"},
+		{"deserialize", (PyCFunction)Deserialize, METH_VARARGS, "Deserialize an element to G or ZR"},
+		{"hash", (PyCFunction)ECE_hash, METH_VARARGS, "Perform a hash of a string to a group element of G."},
+		{"encode", (PyCFunction)ECE_encode, METH_VARARGS, "Encode string as a group element of G"},
+		{"decode", (PyCFunction)ECE_decode, METH_VARARGS, "Decode group element to a string."},
+		{"getXY", (PyCFunction)ECE_convertToZR, METH_VARARGS, "Returns the x and/or y coordinates of point on an elliptic curve."},
 		{"InitBenchmark", (PyCFunction)_init_benchmark, METH_NOARGS, "Initialize a benchmark object"},
 		{"StartBenchmark", (PyCFunction)_start_benchmark, METH_VARARGS, "Start a new benchmark with some options"},
 		{"EndBenchmark", (PyCFunction)_end_benchmark, METH_VARARGS, "End a given benchmark"},

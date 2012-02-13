@@ -12,8 +12,8 @@ Hohenberger-Waters - Realizing hash-and-sign signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from charm.pairing import *
-from toolbox.PKSig import *
+from toolbox.pairinggroup import PairingGroup,G1,G2,GT,ZR,pair
+from toolbox.PKSig import PKSig
 from math import *
 
 debug=False
@@ -48,7 +48,7 @@ class HW(PKSig):
         s += 1
         S = group.init(ZR, s)
         if debug: print("S =>", S)
-        M = group.H(msg, ZR)
+        M = group.hash(msg, ZR)
         r, t = group.random(ZR), group.random(ZR)
         sigma1a = ((pk['u'] ** M) * (pk['v'] ** r) * pk['d']) ** sk['a']
         sigma1b = ((pk['w1'] ** self.ceilog(s)) * (pk['z1'] ** S) * pk['h1']) ** t
@@ -58,7 +58,7 @@ class HW(PKSig):
         return { 1:sigma1, 2:sigma2, 'r':r, 'i':s }
         
     def verify(self, pk, msg, sig):
-        M = group.H(msg, ZR)
+        M = group.hash(msg, ZR)
         sigma1, sigma2 = sig[1], sig[2]
         r, s = sig['r'], sig['i']
         S = group.init(ZR, s)        
@@ -72,7 +72,7 @@ class HW(PKSig):
         
 def main():
     #AES_SECURITY = 80
-    groupObj = pairing('../param/a.param')
+    groupObj = PairingGroup('SS512')
     hw = HW(groupObj)
     
     (pk, sk) = hw.setup()
