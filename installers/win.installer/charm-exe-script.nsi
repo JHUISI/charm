@@ -23,7 +23,7 @@
 ; --------------------------------
 
 !define PRODUCT_NAME "charm-crypto"
-!define PRODUCT_VERSION "0.3"
+!define PRODUCT_VERSION "0.4b"
 !define PRODUCT_PUBLISHER "Johns Hopkins University, HMS Lab"
 !define PRODUCT_WEB_SITE "http://charm-crypto.com/Main.html"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -48,7 +48,7 @@ SetCompressor lzma
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
 
 ; Welcome page
-!insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_WELCOME "../../CHANGELOG"
 ; License page
 !insertmacro MUI_PAGE_LICENSE "gpl_v3.txt"
 ; Components page
@@ -135,8 +135,6 @@ Section /o "" python32_detected
   ;
   SetOutPath "$INSTDIR\charm-usr-3.2\tests"
   File /r "C:\MinGW\msys\1.0\home\dev\charm-crypto-3.2\tests\"
-  SetOutPath "$INSTDIR\charm-usr-3.2\param"
-  File /r "C:\MinGW\msys\1.0\home\dev\charm-crypto-3.2\param\"
   SetOutPath "$INSTDIR\charm-usr-3.2\schemes"
   File /r "C:\MinGW\msys\1.0\home\dev\charm-crypto-3.2\schemes\"  
   SetOutPath "$INSTDIR\charm-usr-3.2\adapters"
@@ -165,8 +163,6 @@ Section /o "" python27_detected
   ;
   SetOutPath "$INSTDIR\charm-usr-2.7\tests"
   File /r "C:\MinGW\msys\1.0\home\dev\charm-crypto-2.7\tests\"
-  SetOutPath "$INSTDIR\charm-usr-2.7\param"
-  File /r "C:\MinGW\msys\1.0\home\dev\charm-crypto-2.7\param\"  
   SetOutPath "$INSTDIR\charm-usr-2.7\schemes"
   File /r "C:\MinGW\msys\1.0\home\dev\charm-crypto-2.7\schemes\"
   SetOutPath "$INSTDIR\charm-usr-2.7\adapters"

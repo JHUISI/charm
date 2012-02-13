@@ -7,13 +7,12 @@
 #
 #   1) ./build/Charm Crypto.mpkg -> ./charmDMG/Charm Crypto.mpkg
 #   2) ../../schemes/            -> ./charmDMG/charm-usr/schemes
-#   3) ../../params/             -> ./charmDMG/charm-usr/params
-#   4) ../../tests/              -> ./charmDMG/charm-usr/tests
+#   3) ../../tests/              -> ./charmDMG/charm-usr/tests
 #
 
 
 # Declare some useful variables.
-VOLName="Charm Crypto 0.3a"
+VOLName="Charm Crypto 0.4b"
 TMPName="charm-temp.dmg"
 SRC="./charmDMG/"
 DMGName="Charm Crypto"
@@ -26,15 +25,31 @@ test -d "./build/" || {
     exit 1;
 }
 
-mkdir -p charmDMG/charm-usr charmDMG/.background
+# Maybe there is a better way to do this, for now just ask.
+echo "Please type the path of the top level directory of Charm, python 2.x build, surrounding input in quotes:"
+read CHARM27
+echo "Please type the path of the top level directory of Charm, python 3.x build, surrounding input in quotes:"
+read CHARM32
+
+
+mkdir -p charmDMG/charm-usr2.7 charmDMG/charm-usr3.2 charmDMG/.background charmDMG/charm-usr2.7/adapters charmDMG/charm-usr3.2/adapters
 
 cp -R "./build/Charm Crypto.mpkg" ./charmDMG/"Charm Crypto.mpkg"
-cp -R ../../schemes/ ./charmDMG/charm-usr/schemes
-mv ./charmDMG/charm-usr/schemes/*adapt* ./charmDMG/charm-usr/adapters
-cp -R ../../param/ ./charmDMG/charm-usr/param
-cp -R ../../tests/ ./charmDMG/charm-usr/tests
-cp README-OSX.rtf ./charmDMG/
-cp charm-dmg-background.png ./charmDMG/.background/charm-dmg-background.png
+
+
+cp -R ${CHARM27}/schemes/ ./charmDMG/charm-usr2.7/schemes
+cp -R ${CHARM32}/schemes/ ./charmDMG/charm-usr3.2/schemes
+mv ./charmDMG/charm-usr2.7/schemes/*adapt* ./charmDMG/charm-usr2.7/adapters
+mv ./charmDMG/charm-usr3.2/schemes/*adapt* ./charmDMG/charm-usr3.2/adapters
+
+cp -R ${CHARM27}/tests/ ./charmDMG/charm-usr2.7/tests
+cp -R ${CHARM32}/tests/ ./charmDMG/charm-usr3.2/tests
+
+cp ./packages-src/README-OSX.rtf ./charmDMG/
+cp ./packages-src/charm-dmg-background.png ./charmDMG/.background/charm-dmg-background.png
+
+echo "Make nice folder icons. Press enter when you're done." 
+read haltomodifyfolder
 
 # Create the image.
 echo "Creating the Charm Crypto disk image."
