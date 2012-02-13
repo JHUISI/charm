@@ -1,4 +1,4 @@
-from toolbox.AuthenticatedCryptoAbstraction import AuthenticatedCryptoAbstraction
+from toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from toolbox.pairinggroup import *
 from charm.pairing import hash as sha1
 from schemes.ibenc_adapt_identityhash import *
@@ -35,7 +35,7 @@ class HybridIBEnc(IBEnc):
         return cipher.decrypt(c2)
     
 def main():
-    groupObj = PairingGroup('../param/a.param')
+    groupObj = PairingGroup('SS512')
     ibe = IBE_BB04(groupObj)
     
     hashID = HashIDAdapter(ibe, groupObj)

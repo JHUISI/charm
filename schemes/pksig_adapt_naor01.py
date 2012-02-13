@@ -61,7 +61,7 @@ class Sig_Generic_ibetosig_Naor01(PKSig):
         else:
             return False
 def main():
-    groupObj = PairingGroup('../param/d224.param')
+    groupObj = PairingGroup('MNT224')
     
     ibe = IBE_BB04(groupObj)
     

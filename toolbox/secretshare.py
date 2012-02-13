@@ -1,5 +1,6 @@
 # Implementing the proof of concept secret sharing 
-from charm.pairing import *
+from __future__ import print_function
+from toolbox.pairinggroup import PairingGroup,ZR
 
 class SecretShare:
     def __init__(self, element, verbose_status=False):
@@ -7,10 +8,10 @@ class SecretShare:
         self.verbose = verbose_status
         
     def P(self, coeff, x):
-        share = 0
+        share = self.elem.init(ZR, 0)
         # evaluate polynomial
         for i in range(0, len(coeff)):
-            i2 = self.elem.init(ZR, i)
+            i2 = self.elem.init(ZR, long(i))
             share += (coeff[i] * (x ** i2))
         return share
 
@@ -47,7 +48,7 @@ class SecretShare:
     def recoverCoefficients(self, list):
         coeff = {}
         for i in list:
-            result = 1
+            result = self.elem.init(ZR, long(1))
             for j in list:
                 if not (i == j):
                     # lagrange basis poly
@@ -61,7 +62,7 @@ class SecretShare:
         if self.verbose: print(list)
         coeff = self.recoverCoefficients(list)
         if self.verbose: print("coefficients: ", coeff)
-        secret = 0
+        secret = self.elem.init(ZR, 0)
         for i in list:
             secret += (coeff[i] * shares[i])
 
@@ -72,7 +73,7 @@ if __name__ == "__main__":
 # Testing Secret sharing python API
   k = 3
   n = 4
-  p = pairing('../param/a.param')
+  p = PairingGroup('SS512')
 
   s = SecretShare(p, True)
   sec = p.random(ZR)

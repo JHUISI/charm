@@ -15,3 +15,8 @@ def dotprod(init, skip, n, func, *args):
     #print("product =>", prod)
     return prod
 
+def dotprod2(iterator, func, *args):
+    prod = 1
+    for j in iterator:
+        prod *= func(j, *args)
+    return prod

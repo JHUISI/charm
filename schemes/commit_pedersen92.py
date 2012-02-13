@@ -1,5 +1,6 @@
 from toolbox.Commit import *
 from toolbox.ecgroup import *
+from toolbox.eccurve import prime192v1
 
 debug = False
 class CM_Ped92(Commitment):

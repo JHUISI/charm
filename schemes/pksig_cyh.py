@@ -12,7 +12,7 @@ Chow-Yiu-Hui - Identity-based ring signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from charm.pairing import *
+from toolbox.pairinggroup import PairingGroup,G1,G2,GT,ZR,pair
 from toolbox.PKSig import PKSig
 from toolbox.iterate import dotprod
 
@@ -31,8 +31,8 @@ class CYH(PKSig):
 
     def setup(self):
         global H1,H2,lam_func
-        H1 = lambda x: group.H(('1', str(x)), G1)
-        H2 = lambda a, b, c: group.H(('2', a, b, c), ZR)
+        H1 = lambda x: group.hash(('1', str(x)), G1)
+        H2 = lambda a, b, c: group.hash(('2', a, b, c), ZR)
         lam_func = lambda i,a,b,c: a[i] * (b[i] ** c[i]) # => u * (pk ** h) for all signers
         g, alpha = group.random(G2), group.random(ZR)
         P = g ** alpha
@@ -85,7 +85,7 @@ class CYH(PKSig):
 def main():
    L = [ "alice", "bob", "carlos", "dexter", "eddie"] 
    ID = "bob"
-   groupObj = pairing('../param/a.param')
+   groupObj = PairingGroup('SS512')
    cyh = CYH(groupObj)
    (mpk, msk) = cyh.setup()
 

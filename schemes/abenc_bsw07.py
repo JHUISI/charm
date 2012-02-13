@@ -29,7 +29,7 @@ class CPabe_BSW07(ABEnc):
     def __init__(self, groupObj):
         ABEnc.__init__(self)
         global util, group
-        util = SecretUtil(groupObj.Pairing, verbose=False)
+        util = SecretUtil(groupObj, verbose=False)
         group = groupObj
 
     @output(pk_t, mk_t)    
@@ -89,7 +89,7 @@ class CPabe_BSW07(ABEnc):
         return ct['C_tilde'] / (pair(ct['C'], sk['D']) / A)
 
 def main():
-    groupObj = PairingGroup('../param/a.param')
+    groupObj = PairingGroup('SS512')
     
     cpabe = CPabe_BSW07(groupObj)
     attrs = ['ONE', 'TWO', 'THREE']

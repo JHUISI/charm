@@ -12,7 +12,7 @@ Hess - Identity-based Signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from charm.pairing import *
+from toolbox.pairinggroup import PairingGroup,G1,G2,ZR,pair
 from toolbox.PKSig import PKSig
 #import gc
 #gc.disable()
@@ -20,15 +20,14 @@ from toolbox.PKSig import PKSig
 
 debug = False
 
-class CHCH(PKSig):
+class Hess(PKSig):
     def __init__(self, groupObj):
-        global group
+        global group,H1,H2
         group = groupObj
+        H1 = lambda x: group.hash(x, G1)
+        H2 = lambda x,y: group.hash((x,y), ZR)
         
     def setup(self):
-        global H1,H2
-        H1 = lambda x: group.H(x, G1)
-        H2 = lambda x,y: group.H((x,y), ZR)
         g2, alpha = group.random(G2), group.random(ZR)
         msk = alpha
         P = g2 ** alpha 
@@ -47,13 +46,13 @@ class CHCH(PKSig):
         S1 = pair(h,pk['g2']) ** s 
         a = H2(M, S1)
         S2 = (sk ** a) * (h ** s)
-        #return {'S1':S1, 'S2':S2}
-        return (S1, S2)
+        return {'S1':S1, 'S2':S2}
+#        return (S1, S2)
 
     
     def verify(self, mpk, pk, M, sig):
         if debug: print("verify...")
-        (S1, S2) = sig
+        (S1, S2) = sig['S1'], sig['S2']
         a = H2(M, S1)
         if pair(S2, mpk['g2']) == (pair(pk, mpk['P']) ** a) * S1: 
             return True
@@ -61,8 +60,8 @@ class CHCH(PKSig):
 
 def main():
    
-   groupObj = pairing('../param/a.param')
-   chch = CHCH(groupObj)
+   groupObj = PairingGroup('SS512')
+   chch = Hess(groupObj)
    (mpk, msk) = chch.setup()
 
    _id = "janedoe@email.com"

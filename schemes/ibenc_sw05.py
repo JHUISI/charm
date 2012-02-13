@@ -148,17 +148,16 @@ class IBE_SW05_LUC(IBEnc):
         return (pk, mk)
 
     def eval_T(self, pk, n, x):
-        N = [group.init(ZR, (y + 1)) for y in range(n + 1)]        
-        N_int = [(y + 1) for y in range(n + 1)]
+        N = [group.init(ZR,long(x + 1)) for x in range(n + 1)]        
+        N_int = [(x + 1) for x in range(n + 1)]
         
         coeffs = util.recoverCoefficients(N)
-        
         prod_result = 1
         for i in N_int:
-            j = group.init(ZR, i)
+            j = group.init(ZR, long(i))
             prod_result *= (pk['t'][i-1] ** coeffs[j])
-
-        #n = group.init(ZR, n)
+        
+        n = group.init(ZR, long(n))
         T = (pk['g2'] ** (x * n)) * prod_result
         return T
 
@@ -225,7 +224,7 @@ class IBE_SW05_LUC(IBEnc):
         
 def main():
     # initialize the element object so that object references have global scope
-    groupObj = PairingGroup('../param/a.param')
+    groupObj = PairingGroup('SS512')
     n = 6; d = 4
     ibe = IBE_SW05_LUC(groupObj)
     (pk, mk) = ibe.setup(n, d)
