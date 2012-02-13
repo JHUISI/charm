@@ -1,14 +1,8 @@
-#include <iostream>
-#include <ctime>
-#include <map>
-#include <sstream>
-#define MR_PAIRING_MNT
-#define AES_SECURITY 80
-#include "pairing_3.h"
+#include "verCPP.h"
 
 int N = 2;
+
 #define HASH(x, str) group.hash_and_map(x, (char *) string(str).c_str())
-#define Group PFC
 #define SmallExp(x, a)	\
 	x = mirvar(0); \
 	bigbits(AES_SECURITY, x); \
@@ -41,18 +35,18 @@ int main()
 	G1 dotB[N];
 
 	G1 h;
+	map<int, string> message;
+	map<int, G1> sig;
 	string M;
+	map<int, map<string, G2> > pk;
 
-	for (z = 0; z < N; z++){
+	for (int z = 0; z < N; z++){
 		M = message[z];
 		HASH(h, M);
 
-		group.exp(dotA[z], h, delta[z]);
-		group.exp(dotB[z], sig[z], delta[z]);
+		group_exp(dotA[z], h, delta[z]);
+		group_exp(dotB[z], sig[z], delta[z]);
 	}
 
-	map<int, int> incorrectIndices;
-
-	verifySigsRecursive(pk, sig, message, group, incorrectIndices, 0, N, delta, dotA, dotB)
-
-	return incorrectIndices
+	verifySigsRecursive(pk, sig, message, group, 0, N, delta, dotA, dotB);
+}

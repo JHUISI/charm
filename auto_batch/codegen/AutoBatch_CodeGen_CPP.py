@@ -608,6 +608,7 @@ def addSigLoop():
 	outputString += "\n"
 
 	for currentVarName in typeVars:
+		#if currentVarName not in verifyFuncArgs:
 		outputString += "\t" + typeVars[currentVarName] + " " + currentVarName + ";\n"
 
 	#outputString += "\n\tfor " + con.numSignaturesIndex + " in range(0, " + con.numSignatures + "):\n"
@@ -779,6 +780,8 @@ def writeLinesForCPP(CPPLines, outputString, numTabsForCPP):
 
 	for line in CPPLines:
 		line = ensureSpacesBtwnTokens_CodeGen(line)
+
+		line = line.replace(' e ', ' pair ')
 
 		for arg in verifyFuncArgs:
 			line = line.replace(arg, arg+"[z]")
@@ -1002,11 +1005,11 @@ def writeOneBlockToFile(block, numBaseTabs, outputFile, forCachedCalcs):
 	outputString += getStringOfTabs(numBaseTabs)
 	if ( (forCachedCalcs == False) and (blockLoopOverValue == con.numSignatures) ):
 		#outputString += "for " + blockIndexVariable + " in range(startSigNum, endSigNum):\n"
-		outputString += "for (" + blockIndexVariable + " = startSigNum; " + blockIndexVariable + " < endSigNum; " + blockIndexVariable + "++){\n"
+		outputString += "for (int " + blockIndexVariable + " = startSigNum; " + blockIndexVariable + " < endSigNum; " + blockIndexVariable + "++){\n"
 
 	else:
 		#outputString += "for " + blockIndexVariable + " in range(" + str(blockStartValue) + ", " + blockLoopOverValue + "):\n"
-		outputString += "for (" + blockIndexVariable + " = " + str(blockStartValue) + "; " + blockIndexVariable + " < " + str(blockLoopOverValue) + "; " + blockIndexVariable + "++){\n"
+		outputString += "for (int " + blockIndexVariable + " = " + str(blockStartValue) + "; " + blockIndexVariable + " < " + str(blockLoopOverValue) + "; " + blockIndexVariable + "++){\n"
 
 
 	outputFile.write(outputString)
@@ -1119,6 +1122,8 @@ def getExpressionCalcString(expression, loopName, blockOperationString, numBaseT
 
 	assignObj = ""
 
+	#print(expression)
+
 	if (forAssignment == True):
 		#outputString += loopName
 		if (forCachedCalcs == True):
@@ -1136,6 +1141,8 @@ def getExpressionCalcString(expression, loopName, blockOperationString, numBaseT
 	expression = expression.replace(' ^ ', ' ** ')
 	expression = expression.replace(' e ', ' pair ')
 
+	#print(expression)
+
 	expressionSplit = expression.split()
 	for tokenCopy in expressionSplit:
 		token = copy.deepcopy(tokenCopy)
@@ -1151,8 +1158,10 @@ def getExpressionCalcString(expression, loopName, blockOperationString, numBaseT
 		expressionSplit = expression.split(' ** ')
 		leftSide = expressionSplit[0].lstrip().rstrip()
 		rightSide = expressionSplit[1].lstrip().rstrip()
-		outputString += "group.exp(" + assignObj + ", " + leftSide + ", " + rightSide + ");"
+		outputString += "group_exp(" + assignObj + ", " + leftSide + ", " + rightSide + ");"
 		return outputString
+
+	#print(expression)
 
 	expressionSplit = expression.split()
 	for tokenCopy in expressionSplit:
@@ -1187,11 +1196,14 @@ def getExpressionCalcString(expression, loopName, blockOperationString, numBaseT
 			expression = expression.replace(token, newToken, 1)
 
 	expression = ensureSpacesBtwnTokens_CodeGen(expression)
+
+	'''
 	for verifyArg in verifyFuncArgs:
 		verifyArgWithSpaces = con.space + verifyArg + con.space
 		replacementExpression = " verifyArgsDict[" + con.numSignaturesIndex + "]['" + verifyArg + "'][bodyKey] "
 
 		expression = expression.replace(verifyArgWithSpaces, replacementExpression)
+	'''
 
 	expression = removeSpaceBeforeChar(expression, con.lParan)
 
@@ -1373,6 +1385,7 @@ def writeDictDefsOfCachedCalcsForBatch():
 	batchOutputString += "\n"
 
 	for currentTypeVar in typeVars:
+		#if currentTypeVar not in verifyFuncArgs:
 		batchOutputString += "\t" + typeVars[currentTypeVar] + " " + currentTypeVar + ";\n"
 
 	batchOutputString += "\n"
@@ -1383,22 +1396,22 @@ def writeCallToDCAndRetToBatch():
 
 	outputString = ""
 
-	outputString += "\tmap<int, int> incorrectIndices;\n\n"
+	#outputString += "\tmap<int, int> incorrectIndices;\n\n"
 
 	outputString += "\tverifySigsRecursive("
 
 	for argToAdd in verifyFuncArgs:
 		outputString += argToAdd + ", "
 
-	outputString += con.group + ", incorrectIndices, 0, " + con.numSignatures
+	outputString += con.group + ", 0, " + con.numSignatures
 	if (len(cachedCalcsToPassToDC) != 0):
 		for cachedCalcName in cachedCalcsToPassToDC:
 			outputString += ", "
 			outputString += cachedCalcName
 
-	outputString += ")\n\n"
+	outputString += ");\n}\n"
 
-	outputString += "\treturn incorrectIndices\n"
+	#outputString += "\treturn incorrectIndices\n"
 
 	batchVerFile.write(outputString)
 
@@ -1406,8 +1419,35 @@ def writeOpeningLinesToDCVerifySigsRecursiveFunc():
 	global verifySigsFile
 
 	verifyOutputString = ""
-	verifyOutputString += "def verifySigsRecursive(verifyArgsDict, groupObj, incorrectIndices, startSigNum, endSigNum"
 
+	#verifyOutputString += "#include \"" + verifySigsFileName + ".h\"\n\n"
+
+	verifyOutputString += "\nvoid verifySigsRecursive("
+
+	for argToAdd in verifyFuncArgs:
+		#print(typeVars[argToAdd])
+		if typeVars[argToAdd] in ['G1', 'G2', 'GT', 'ZR']:
+			verifyOutputString += typeVars[argToAdd] + " " + argToAdd + "[], "
+		else:
+			verifyOutputString += typeVars[argToAdd] + " " + argToAdd + ", "
+
+
+	verifyOutputString += "Group group, int startSigNum, int endSigNum, Big delta[], "
+
+	if (len(cachedCalcsToPassToDC) != 0):
+		for cacheToAdd in cachedCalcsToPassToDC:
+			if cacheToAdd in loopVarGroupTypes:
+				verifyOutputString += loopVarGroupTypes[cacheToAdd] + " " + cacheToAdd + "[], "
+
+	verifyOutputString = verifyOutputString[0:len(verifyOutputString) - 2]
+
+	verifyOutputString += ")\n{\n"
+
+	verifyOutputString += "\tint z = 0;\n\n"
+
+	#verifyOutputString += "def verifySigsRecursive(verifyArgsDict, groupObj, incorrectIndices, startSigNum, endSigNum"
+
+	'''
 	if (len(cachedCalcsToPassToDC) != 0):
 		for cachedCalcName in cachedCalcsToPassToDC:
 			verifyOutputString += ", "
@@ -1429,6 +1469,7 @@ def writeOpeningLinesToDCVerifySigsRecursiveFunc():
 	verifyOutputString += "\n"
 
 	#verifyOutputString += verifySigsInitCall
+	'''
 
 	verifySigsFile.write(verifyOutputString)
 
@@ -1448,7 +1489,8 @@ def writeCachedCalcAssignmentsForDC():
 		loopGroupTypeForInit = loopVarGroupTypes[cachedCalcName]
 		loopInitValueForInit = str(getInitValueOfLoop(loopInfo, cachedCalcName))
 
-		outputString += "\t" + cachedCalcName + "_loopVal = group.init(" + loopGroupTypeForInit + ", " + loopInitValueForInit + ")\n"
+		#outputString += "\t" + cachedCalcName + "_loopVal = group.init(" + loopGroupTypeForInit + ", " + loopInitValueForInit + ")\n"
+		outputString += "\t" + loopGroupTypeForInit + " " + cachedCalcName + "_loopVal;\n"
 
 	outputString += "\n"
 
@@ -1486,7 +1528,8 @@ def writeCachedCalcAssignmentsForDC():
 	outputString += eqChecksBody
 	outputString += "\n"
 
-	outputString += "\tfor index in range(startSigNum, endSigNum):\n"
+	#outputString += "\tfor index in range(startSigNum, endSigNum):\n"
+	outputString += "\tfor (int index = startSigNum; index < endSigNum; index++){\n"
 
 	for cachedCalcName in cachedCalcsToPassToDC:
 		if (isStringALoopName(cachedCalcName) == False):
@@ -1496,12 +1539,17 @@ def writeCachedCalcAssignmentsForDC():
 			continue
 
 		operationString = getOperationStringOfLoop(loopInfo, cachedCalcName)
-		outputString += "\t\t" + cachedCalcName + "_loopVal = " + cachedCalcName + "_loopVal " + operationString + " " + cachedCalcName + "[index]\n"
+		#outputString += "\t\t" + cachedCalcName + "_loopVal = " + cachedCalcName + "_loopVal " + operationString + " " + cachedCalcName + "[index]\n"
+
+		if (operationString == '*'):
+			outputString += "\t\tgroup_mul(" + cachedCalcName + "_loopVal, " + cachedCalcName + "[index]);\n"
+
+	outputString += "\t}\n"
 
 	outputString += "\n"
 	outputString += eqChecksLoop
 	#outputString += "\n"
-	outputString += "\t\tfor index in range(startSigNum, endSigNum):\n"
+	#outputString += "\t\tfor index in range(startSigNum, endSigNum):\n"
 
 	outputString += eqChecksDictAssign
 
@@ -1515,16 +1563,25 @@ def writeVerifyEqAndRecursionForDC():
 
 	verifySigsFile.write(outputString)
 
+	outputString = ""
+
 	for codeGenSegment in finalBatchEqWithLoops:
 		finalBatchEq = codeGenSegment.getEquation().replace(con.finalBatchEqWithLoopsString, '', 1)
 		multipleEqChecks = codeGenSegment.getHasMultipleEqChecks()
 		if (multipleEqChecks == False):
 			finalBatchExp = getExpressionCalcString(finalBatchEq, None, None, None, False, False)
+			finalBatchEq += ":"
+			finalBatchExp = writeLinesForCPP([finalBatchEq], outputString, 1)
+			#print("after writelines for cpp:  ", finalBatchExp)
+			finalBatchExp = getExpressionCalcString(finalBatchExp, None, None, None, False, False)
+			#print("after getexpressioncalc:  ", finalBatchExp)
 		else:
 			indexVariable = codeGenSegment.getIndexVariable()
 			finalBatchExp = getExpressionCalcString(finalBatchEq, None, None, None, False, False, indexVariable)
 
 		writeVerifyEqRecursion_Ind(finalBatchExp, codeGenSegment, multipleEqChecks)
+
+	verifySigsFile.write("}")
 
 def writeVerifyEqRecursion_Ind(finalBatchExp, codeGenSegment, multipleEqChecks):
 	global verifySigsFile
@@ -1545,33 +1602,77 @@ def writeVerifyEqRecursion_Ind(finalBatchExp, codeGenSegment, multipleEqChecks):
 		outputString += "\tfor " + str(indexVariable) + " in range(" + str(startValue) + ", " + str(loopOverValue) + "):\n"
 
 	outputString += getStringOfTabs(numBaseTabs)
-	outputString += "if (" + finalBatchExp + "):\n"
+	outputString += "if (" + finalBatchExp + ")\n"
 
 	outputString += getStringOfTabs(numBaseTabs)
-	outputString += "\tpass\n"
+	outputString += "\tcout << \"Signature batch is valid\" << endl;\n"
 
 	outputString += getStringOfTabs(numBaseTabs)
-	outputString += "else:\n"
+	outputString += "else{\n"
 
 	outputString += getStringOfTabs(numBaseTabs)
-	outputString += "\tmidWay = int( (endSigNum - startSigNum) / 2)\n"
+	outputString += "\tint midWay = int( (endSigNum - startSigNum) / 2);\n"
 
 	outputString += getStringOfTabs(numBaseTabs)
-	outputString += "\tif (midWay == 0):\n"
+	outputString += "\tif (midWay == 0){\n"
 
 	outputString += getStringOfTabs(numBaseTabs)
-	outputString += "\t\tif startSigNum not in incorrectIndices:\n"
+	outputString += "\t\tcout << \" Invalid signature found:  number \" << startSigNum << endl;\n"
+
+	#outputString += getStringOfTabs(numBaseTabs)
+	#outputString += "\t\t\tincorrectIndices.append(startSigNum)\n"
 
 	outputString += getStringOfTabs(numBaseTabs)
-	outputString += "\t\t\tincorrectIndices.append(startSigNum)\n"
+	outputString += "\t\treturn;}\n"
 
 	outputString += getStringOfTabs(numBaseTabs)
-	outputString += "\t\treturn\n"
+	outputString += "\tint midSigNum = startSigNum + midWay;\n"
 
-	outputString += getStringOfTabs(numBaseTabs)
-	outputString += "\tmidSigNum = startSigNum + midWay\n"
 
-	outputString += getStringOfTabs(numBaseTabs)
+
+
+	outputString += getStringOfTabs(numBaseTabs+1)
+
+
+	outputString += "verifySigsRecursive("
+
+	for argToAdd in verifyFuncArgs:
+		outputString += argToAdd + ", "
+
+	outputString += "group, startSigNum, midSigNum, delta, "
+
+	if (len(cachedCalcsToPassToDC) != 0):
+		for cacheToAdd in cachedCalcsToPassToDC:
+			if cacheToAdd in loopVarGroupTypes:
+				outputString += cacheToAdd + ", "
+
+	outputString = outputString[0:len(outputString) - 2]
+
+	outputString += ");\n"
+
+
+	outputString += getStringOfTabs(numBaseTabs+1)
+
+
+	outputString += "verifySigsRecursive("
+
+	for argToAdd in verifyFuncArgs:
+		outputString += argToAdd + ", "
+
+	outputString += "group, midSigNum, endSigNum, delta, "
+
+	if (len(cachedCalcsToPassToDC) != 0):
+		for cacheToAdd in cachedCalcsToPassToDC:
+			if cacheToAdd in loopVarGroupTypes:
+				outputString += cacheToAdd + ", "
+
+	outputString = outputString[0:len(outputString) - 2]
+
+	outputString += ");\n"
+
+
+
+	'''
 	outputString += "\tverifySigsRecursive(verifyArgsDict, group, incorrectIndices, startSigNum, midSigNum"
 
 	if (len(cachedCalcsToPassToDC) != 0):
@@ -1590,8 +1691,10 @@ def writeVerifyEqRecursion_Ind(finalBatchExp, codeGenSegment, multipleEqChecks):
 			outputString += cachedCalcName
 
 	outputString += ")\n"
-	outputString += getStringOfTabs(numBaseTabs + 1)
-	outputString += "return\n\n"
+	'''
+
+	outputString += getStringOfTabs(numBaseTabs)
+	outputString += "}\n\n"
 
 	verifySigsFile.write(outputString)
 
@@ -1750,11 +1853,35 @@ def processFinalBatchEqWithLoops(line, codeGenSegNo):
 def writeVerHeader(fileName):
 	global headerFile
 
-	headerFile = open(fileName + '.h', 'w')
+	os.system("cp cppTemplate_Ver.h " + fileName + ".h")
+
+	headerFile = open(fileName + '.h', 'a')
 
 	outputString = ""
-	outputString += "#ifndef VERCPP\n"
-	outputString += "#
+	#outputString += "#include <map>\n"
+	#outputString += "#include <sstream>\n\n"
+
+	outputString += "#ifndef VERCPP_H\n"
+	outputString += "#define VERCPP_H\n\n"
+	outputString += "extern void verifySigsRecursive("
+
+	for argToAdd in verifyFuncArgs:
+		outputString += typeVars[argToAdd] + " " + argToAdd + ", "
+
+	outputString += "Group group, int startSigNum, int endSigNum, Big delta[], "
+
+	if (len(cachedCalcsToPassToDC) != 0):
+		for cacheToAdd in cachedCalcsToPassToDC:
+			if cacheToAdd in loopVarGroupTypes:
+				outputString += loopVarGroupTypes[cacheToAdd] + " " + cacheToAdd + "[], "
+
+	outputString = outputString[0:len(outputString) - 2]
+
+	outputString += ");\n\n"
+
+	outputString += "#endif"
+
+	headerFile.write(outputString)
 
 	headerFile.close()
 
@@ -1785,15 +1912,16 @@ def main():
 	global lineNoOfFirstFunction, globalVars, var_varDependencies, functionArgNames, functionNames
 	global verifySigsFileName, checkBlocks, codeGenRanges
 
-	os.system("cp " + con.cppTemplate + " " + individualVerArg)
-	os.system("cp " + con.cppTemplate + " " + batchVerArg)
+	os.system("cp cppTemplate_IndBat.cpp " + individualVerArg)
+	os.system("cp cppTemplate_IndBat.cpp " + batchVerArg)
+	os.system("cp cppTemplate_Ver.cpp " + verifySigsArg)
 
 	try:
 		pythonCodeLines = open(pythonCodeArg, 'r').readlines()
 		batchVerifierOutput = open(batchVerifierOutputFile, 'r').readlines()
 		individualVerFile = open(individualVerArg, 'a')
 		batchVerFile = open(batchVerArg, 'a')
-		verifySigsFile = open(verifySigsArg, 'w')
+		verifySigsFile = open(verifySigsArg, 'a')
 	except:
 		sys.exit("AutoBatch_CodeGen->main:  problem opening input/output files passed in as command-line arguments.")
 

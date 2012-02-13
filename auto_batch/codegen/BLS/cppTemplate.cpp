@@ -5,6 +5,7 @@
 #define MR_PAIRING_MNT
 #define AES_SECURITY 80
 #include "pairing_3.h"
+#include "verCPP.h"
 
 int N = 2;
 #define HASH(x, str) group.hash_and_map(x, (char *) string(str).c_str())

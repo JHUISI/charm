@@ -1,14 +1,8 @@
-#include <iostream>
-#include <ctime>
-#include <map>
-#include <sstream>
-#define MR_PAIRING_MNT
-#define AES_SECURITY 80
-#include "pairing_3.h"
+#include "verCPP.h"
 
 int N = 2;
+
 #define HASH(x, str) group.hash_and_map(x, (char *) string(str).c_str())
-#define Group PFC
 #define SmallExp(x, a)	\
 	x = mirvar(0); \
 	bigbits(AES_SECURITY, x); \
@@ -30,7 +24,10 @@ int main()
 	irand((long)seed);
 
 	G1 h;
+	map<int, string> message;
+	map<int, G1> sig;
 	string M;
+	map<int, map<string, G2> > pk;
 
 	for (int z = 0; z < N; z++)
 	{
