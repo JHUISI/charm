@@ -11,14 +11,14 @@
 ; the version of Python found, it will check those in for site-package installation.
 ; Charm dependencies will be installed unknowingly to the user, and for the
 ; easier installation path the INSTDIR is unmodifiable (C:\charm-crypto).  Dependencies
-; added all the bloat to this installer as it includes openssl, gmp, pbc.  You
-; will have to install pyparsing on your own.
+; added all the bloat to this installer as it includes openssl, gmp, pbc.  
 ;
 ; Future Improvements:
 ; Support a branch on the interpreter installs such that libmiracl is supported.
+; Currently doesn't remove pyparsing.
 ;
 ; Author: Michael Rushanan (micharu1@cs.jhu.edu)
-; Date: 09/2011
+; Date: 02/2012
 ;
 ; --------------------------------
 
@@ -42,7 +42,6 @@ SetCompressor lzma
 !include "LogicLib.nsh"
 !include "x64.nsh"
 !include "nsDialogs.nsh"
-!include "nsDialogs_createTextMultiline.nsh"
 
 ; MUI Settings
 !define MUI_ABORTWARNING
@@ -78,8 +77,7 @@ Page custom changeLogPage
 
 
 ; Globals ------
-Var changeLogLabel
-var changeLogText
+Var changeLog
 Var Python32Dir
 Var Python27Dir
 !define Python32Exe "$Python32Dir\python.exe"
@@ -101,17 +99,21 @@ ShowUnInstDetails show
 ; Changelog Page
 Function changeLogPage
 
-	!insertmacro MUI_HEADER_TEXT "Charm-Crypto v0.4b" "CHANGELOG" 
+    !insertmacro MUI_HEADER_TEXT "Change Log" "Please review the below for recent changes to this version of charm-crypto."
 	
 	nsDialogs::Create 1018
 
-	;${NSD_CreateLabel} 0 0 100% 12u "v0.4b CHANGELOG"
+	;${NSD_CreateLabel} 0 0 100% 12u "2/14/2012"
+	;Pop $changeLog
 	
-	Pop $changeLogLabel
+	nsDialogs::CreateControl EDIT \
+	"${__NSD_Text_STYLE}|${WS_VSCROLL}|${WS_HSCROLL}|${ES_MULTILINE}|${ES_WANTRETURN}" \
+	"${__NSD_Text_EXSTYLE}" \
+	0 0 100% 100% \
+	"- Several bug fixes to base modules: pairing (PBC & Miracl), ecc, and integer $\r$\n- Major changes to base module API. Recommend using the group abstraction wrappers: PairingGroup, ECGroup, and IntegerGroup $\r$\n- Removed pairing curve params in favor of a unified 'toolbox/pairingcurve.py' with curve identifiers (e.g., SS512, MNT224, etc)$\r$\n- Deleted the 'params' dir (See previous)$\r$\n- Added high-level serialization API to simplify managing ciphertexts and keys in applications$\r$\n- Added PKCS #7 padding to toolbox$\r$\n- Added public key encryption schemes: 2 new IBE schemes (ibenc_ckrs09, ibenc_lsw08)$\r$\n- Added signature schemes: CL04 (anony. creds)$\r$\n- Added verifiable random function (VRF) scheme$\r$\n- Updates to KPABE scheme with new adapter$\r$\n- Improved protocol engine: automatically store data transmitted between parties and inc flexibility in state transition map  $\r$\n- Updated CNS07 scheme $\r$\n- Name updates to authenticated crypto abstraction$\r$\n- Updated doc for generating group params and using our serialization interface$\r$\n"
+		
 
-	${NSD_CreateTextMultiLine} 0 13u 100% -13u "- Several bug fixes to base modules: pairing (PBC & Miracl), ecc, and integer $\r$\n- Major changes to base module API. Recommend using the group abstraction wrappers: PairingGroup, ECGroup, and IntegerGroup $\r$\n- Removed pairing curve params in favor of a unified 'toolbox/pairingcurve.py' with curve identifiers (e.g., SS512, MNT224, etc)$\r$\n- Deleted the 'params' dir (See previous bullet)$\r$\n- Added high-level serialization API to simplify managing ciphertexts and keys in applications$\r$\n- Added PKCS #7 padding to toolbox$\r$\n- Added public key encryption schemes: 2 new IBE schemes (ibenc_ckrs09, ibenc_lsw08)$\r$\n- Added signature schemes: CL04 (anony. creds)$\r$\n- Added verifiable random function (VRF) scheme$\r$\n- Updates to KPABE scheme with new adapter$\r$\n- Improved protocol engine: automatically store data transmitted between parties and more flexibility in state transition map  $\r$\n- Updated CNS07 scheme $\r$\n- Name updates to authenticated crypto abstraction$\r$\n- Updated documentation for generating group parameters and using our serialization interface"
-	
-	Pop $changeLogText
+	Pop $changeLog
 	
 	nsDialogs::Show
 
@@ -175,8 +177,12 @@ Section /o "" python32_detected
   SetOverwrite ifnewer
   ; CHANGEME on every new release.
   File "C:\Python32\Lib\site-packages\Charm_Crypto-0.4-py3.2.egg-info"
+  ; Now bundling pyparsing, current version 1.5.6
+  File "C:\Python32\Lib\site-packages\pyparsing-1.5.6-py3.2.egg-info"  
+  File "C:\Python32\Lib\site-packages\pyparsing.pyc"  
+  File "C:\Python32\Lib\site-packages\pyparsing.py"
   
-  CreateShortCut "$SMPROGRAMS\charm-crypto\charm-usr.lnk" "$INSTDIR\charm-usr-3.2"
+  CreateShortCut "$SMPROGRAMS\charm-crypto\charm-usr-3.2.lnk" "$INSTDIR\charm-usr-3.2"
 SectionEnd
 
 Section /o "" python27_detected
@@ -203,8 +209,12 @@ Section /o "" python27_detected
   SetOverwrite ifnewer
   ; CHANGEME on every new release.
   File "C:\Python27\Lib\site-packages\Charm_Crypto-0.4-py2.7.egg-info"  
+  ; Now bundling pyparsing, current version 1.5.6
+  File "C:\Python27\Lib\site-packages\pyparsing-1.5.6-py2.7.egg-info"  
+  File "C:\Python27\Lib\site-packages\pyparsing.pyc"  
+  File "C:\Python27\Lib\site-packages\pyparsing.py"  
   
-  CreateShortCut "$SMPROGRAMS\charm-crypto\charm-usr.lnk" "$INSTDIR\charm-usr-2.7"  
+  CreateShortCut "$SMPROGRAMS\charm-crypto\charm-usr-2.7.lnk" "$INSTDIR\charm-usr-2.7"  
 SectionEnd
 
 Section -AdditionalIcons
