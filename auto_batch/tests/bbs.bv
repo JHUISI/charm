@@ -48,6 +48,18 @@ signature := N
 
 verify := { ((e(T3, g2)^sx) * ((e(h, w)^(-salpha + -sbeta)) * ((e(h, g2)^(-sgamma1 + -sgamma2)) * ((e(T3, w)^c) * (e(g1, g2)^-c)))))) == R3 }
 
+BEGIN :: latex
+T3 := T_3
+g1 := g_1
+g2 := g_2
+R3 := R_3
+sx := s_x
+salpha := s_\alpha
+sbeta := s_\beta
+sgamma1 := s_\gamma1
+sgamma2 := s_\gamma2
+END :: latex
+
 #BEGIN :: transform
 #2, 6, 6, 5, 3
 #END :: transform

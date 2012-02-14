@@ -11,8 +11,8 @@ from batchcomboeq import TestForMultipleEq,CombineMultipleEq
 
 try:
     #import benchmarks
-    import miraclbench
-    curve = miraclbench.benchmarks
+    import miraclbench2
+    curve = miraclbench2.benchmarks
     curve_key = 'mnt160'
 except:
     print("Could not find the 'benchmarks' file that has measurement results! Generate and re-run.")

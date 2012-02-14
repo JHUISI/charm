@@ -20,8 +20,8 @@ def parseNumConditional(s, loc, toks):
     print("print: %s" % toks)
     return BinaryNode(toks[0])
 
-def markPublic(s, loc, toks):
-    print("public: %s" % toks)
+def debugParser(s, loc, toks):
+    print("tokens: %s" % toks)
     return toks
 
 def markSecret(s, loc, toks):
@@ -31,6 +31,10 @@ def markSecret(s, loc, toks):
 def pushFirst( s, loc, toks ):
     if debug >= levels.some:
        print("Pushing first =>", toks[0])
+    objStack.append( toks[0] )
+
+def pushSecond(s, loc, toks ):
+    print("input: ", toks)
     objStack.append( toks[0] )
 
 # Implements language parser for our signature descriptive language (SDL) and returns
@@ -54,21 +58,24 @@ class BatchParser:
         Concat = Literal("|")
         ExpOp = Literal("^")
         AddOp = Literal("+")
+        SubOp = Literal("-")        
         Equality = Literal("==") # | Word("<>", max=1)
         Assignment =  Literal(":=")
-        Pairing = Literal('e(') # Pairing token
-        Hash = Literal('H(') # TODO: provide a way to specify arbitrary func. calls
+        Pairing = Literal("e(") # Pairing token
+        Hash = Literal("H(") # TODO: provide a way to specify arbitrary func. calls
+        Random = Literal("random(")
         Prod = Literal("prod{") # dot product token
         For = Literal("for{")
         Sum = Literal("sum{")
         ProdOf = Literal("on")
         ForDo = Literal("do") # for{x,y} do y
         SumOf = Literal("of")
+        List  = Literal("list{") # represents a list
 
         # captures the binary operators allowed (and, ^, *, /, +, |, ==)        
-        BinOp = AndOp | ExpOp | MulOp | DivOp | AddOp | Concat | Equality
+        BinOp = AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | Concat | Equality
         # captures order of parsing token operators
-        Token =  Equality | AndOp | ExpOp | MulOp | DivOp | AddOp | ForDo | ProdOf | SumOf | Concat | Assignment
+        Token =  Equality | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | ForDo | ProdOf | SumOf | Concat | Assignment
         Operator = Token 
         #Operator = OperatorAND | OperatorOR | Token
 
@@ -82,6 +89,8 @@ class BatchParser:
                (Prod + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
                (For + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
                (Sum + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
+               (Random + leafNode + rpar).setParseAction( pushFirst ) | \
+               (List + delimitedList(leafNode)).setParseAction( pushFirst ) | \
                lpar + expr + rpar | (leafNode).setParseAction( pushFirst )
 
         # Represents the order of operations (^, *, |, ==)
@@ -98,7 +107,7 @@ class BatchParser:
         # so on and so forth (follows post fix notation).
         expr << term + ZeroOrMore((Operator + term).setParseAction( pushFirst ))
         # final bnf object
-        finalPol = expr#.setParseAction( debug )
+        finalPol = expr#.setParseAction( debugParser )
         return finalPol
     
     # method for evaluating stack assumes operators have two operands and pops them accordingly
@@ -106,7 +115,7 @@ class BatchParser:
         op = stack.pop()
         if debug >= levels.some:
             print("op: %s" % op)
-        if op in ["+", "*", "^", ":=", "==", "e(", "for{", "do","prod{", "on", "sum{", "of", "|", "and"]:
+        if op in ["+","-","*", "^", ":=", "==", "e(", "for{", "do","prod{", "on", "sum{", "of", "|", "and"]:
             op2 = self.evalStack(stack)
             op1 = self.evalStack(stack)
             return createTree(op, op1, op2)
@@ -114,6 +123,17 @@ class BatchParser:
             op2 = self.evalStack(stack)
             op1 = self.evalStack(stack)
             return createTree(op, op1, op2)
+        elif op in ["list{"]:
+            ops = []
+            while(len(stack) > 0):
+                ops.append(self.evalStack(stack))
+            newList = createTree(op, None, None)
+            ops.reverse()
+            newList.listNodes = list(ops)
+            return newList
+        elif op in ["random("]:
+            op1 = self.evalStack(stack)
+            return createTree(op, op1, None)
         else:
             # Node value
             return op

@@ -26,10 +26,17 @@ import string
 
 types = Enum('G1', 'G2', 'GT', 'ZR', 'str')
 declarator = Enum('constants', 'verify')
-ops = Enum('BEGIN', 'TYPE', 'AND', 'ADD', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT','END', 'NONE')
+ops = Enum('BEGIN', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'END', 'NONE')
 side = Enum('left', 'right')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
+
+# Note: when updating the grammar, there are four places that you have to update:
+# - getBNF: symbol must be represented in the grammar (w/o) breaking the other rules.
+# - batchparser: evalStack routine must be able to identify the new symbol in input file.
+# - ops: definition above must include symbolic representation of new construct somewhere between BEGIN and END
+# - createTree: need to add a clause for the new symbol.
+# - BinaryNode: need to add a clause to the __str__ routine.
 
 # utilities over binary node structures
 # list: 
@@ -96,6 +103,8 @@ def createTree(op, node1, node2):
         node = BinaryNode(ops.MUL)
     elif(op == "+"):
         node = BinaryNode(ops.ADD)
+    elif(op == "-"):
+        node = BinaryNode(ops.SUB)
     elif(op == ":="):
         node = BinaryNode(ops.EQ)
     elif(op == "=="):
@@ -121,6 +130,10 @@ def createTree(op, node1, node2):
         node = BinaryNode(ops.CONCAT)
     elif(op == "and"):
     	node = BinaryNode(ops.AND)
+    elif(op == "list{"):
+    	node = BinaryNode(ops.LIST)
+    elif(op == "random("):
+    	node = BinaryNode(ops.RANDOM)
     # elif e( ... )
     else:    
         return None
@@ -195,6 +208,8 @@ class BinaryNode:
 				return ('(' + left + ' / ' + right + ')')
 			elif(self.type == ops.ADD):
 				return ('(' + left + ' + ' + right + ')')
+			elif(self.type == ops.SUB):
+				return ('(' + left + ' - ' + right + ')')
 			elif(self.type == ops.EQ):
 				return (left + ' := ' + right)
 			elif(self.type == ops.EQ_TST):
@@ -211,6 +226,8 @@ class BinaryNode:
 				 return ('(' + left + ' on ' + right + ')')
 			elif(self.type == ops.FOR):
 				return ('for{' + left + ',' + right + '}')
+			elif(self.type == ops.RANDOM):
+				return ('random(' + left + ')')
 			elif(self.type == ops.DO):
 				 return ( left + ' do ' + right)
 			elif(self.type == ops.OF):
@@ -219,6 +236,12 @@ class BinaryNode:
 				 return (left + ' | ' + right)
 			elif(self.type == ops.AND):
 				 return ("{" + left + "} and {" + right + "}") 
+			elif(self.type == ops.LIST):
+				 listVal = ""
+				 for i in self.listNodes:
+				 		listVal += str(i) + ', '
+				 listVal = listVal[:len(listVal)-2]
+				 return 'list{' + listVal + '}'
 			elif(self.type == ops.NONE):
 				 return 'NONE'
 				# return ( left + ' on ' + right )				
