@@ -1050,7 +1050,7 @@
 				<key>OVERWRITE_PERMISSIONS</key>
 				<false/>
 				<key>VERSION</key>
-				<string>.21a</string>
+				<string>.4b</string>
 			</dict>
 			<key>UUID</key>
 			<string>0E0E1076-412E-4E09-8CA8-1BCF8565C1E0</string>
@@ -1700,7 +1700,7 @@
 																											<key>GID</key>
 																											<integer>0</integer>
 																											<key>PATH</key>
-																											<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/Charm_Crypto-0.3-py3.2.egg-info</string>
+																											<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/Charm_Crypto-0.4-py3.2.egg-info</string>
 																											<key>PATH_TYPE</key>
 																											<integer>0</integer>
 																											<key>PERMISSIONS</key>
@@ -2362,6 +2362,38 @@
 																													<key>GID</key>
 																													<integer>0</integer>
 																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/groupsig_bgls04_var.py</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/groupsig_bgls04_var.pyc</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
 																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/ibenc_adapt_hybrid.py</string>
 																													<key>PATH_TYPE</key>
 																													<integer>0</integer>
@@ -2490,6 +2522,70 @@
 																													<key>GID</key>
 																													<integer>0</integer>
 																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/ibenc_ckrs09.py</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/ibenc_ckrs09.pyc</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/ibenc_lsw08.py</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/ibenc_lsw08.pyc</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
 																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/ibenc_sw05.py</string>
 																													<key>PATH_TYPE</key>
 																													<integer>0</integer>
@@ -2539,6 +2635,70 @@
 																													<integer>0</integer>
 																													<key>PATH</key>
 																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/ibenc_waters05.pyc</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/kpabenc_adapt_hybrid.py</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/kpabenc_adapt_hybrid.pyc</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/pk_vrf.py</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/pk_vrf.pyc</string>
 																													<key>PATH_TYPE</key>
 																													<integer>0</integer>
 																													<key>PERMISSIONS</key>
@@ -3019,6 +3179,38 @@
 																													<integer>0</integer>
 																													<key>PATH</key>
 																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/pksig_cl03.pyc</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/pksig_cl04.py</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/pksig_cl04.pyc</string>
 																													<key>PATH_TYPE</key>
 																													<integer>0</integer>
 																													<key>PERMISSIONS</key>
@@ -4237,6 +4429,38 @@
 																													<key>GID</key>
 																													<integer>0</integer>
 																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/toolbox/pairingcurves.py</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/toolbox/pairingcurves.pyc</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
 																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/toolbox/pairinggroup.py</string>
 																													<key>PATH_TYPE</key>
 																													<integer>0</integer>
@@ -4574,6 +4798,70 @@
 																													<integer>0</integer>
 																													<key>PATH</key>
 																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/toolbox/specialprimes.pyc</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/toolbox/symcrypto.py</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/toolbox/symcrypto.pyc</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/toolbox/symcrypto_test.py</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/toolbox/symcrypto_test.pyc</string>
 																													<key>PATH_TYPE</key>
 																													<integer>0</integer>
 																													<key>PERMISSIONS</key>
@@ -4981,7 +5269,7 @@
 				<key>OVERWRITE_PERMISSIONS</key>
 				<false/>
 				<key>VERSION</key>
-				<string>.3a</string>
+				<string>.4b</string>
 			</dict>
 			<key>TYPE</key>
 			<integer>0</integer>
@@ -5633,7 +5921,7 @@
 																											<key>GID</key>
 																											<integer>0</integer>
 																											<key>PATH</key>
-																											<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/Charm_Crypto-0.3-py2.7.egg-info</string>
+																											<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/Charm_Crypto-0.4-py2.7.egg-info</string>
 																											<key>PATH_TYPE</key>
 																											<integer>0</integer>
 																											<key>PERMISSIONS</key>
@@ -6295,6 +6583,38 @@
 																													<key>GID</key>
 																													<integer>0</integer>
 																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/groupsig_bgls04_var.py</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/groupsig_bgls04_var.pyc</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
 																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/ibenc_adapt_hybrid.py</string>
 																													<key>PATH_TYPE</key>
 																													<integer>0</integer>
@@ -6423,6 +6743,70 @@
 																													<key>GID</key>
 																													<integer>0</integer>
 																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/ibenc_ckrs09.py</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/ibenc_ckrs09.pyc</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/ibenc_lsw08.py</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/ibenc_lsw08.pyc</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
 																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/ibenc_sw05.py</string>
 																													<key>PATH_TYPE</key>
 																													<integer>0</integer>
@@ -6472,6 +6856,70 @@
 																													<integer>0</integer>
 																													<key>PATH</key>
 																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/ibenc_waters05.pyc</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/kpabenc_adapt_hybrid.py</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/kpabenc_adapt_hybrid.pyc</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/pk_vrf.py</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/pk_vrf.pyc</string>
 																													<key>PATH_TYPE</key>
 																													<integer>0</integer>
 																													<key>PERMISSIONS</key>
@@ -6952,6 +7400,38 @@
 																													<integer>0</integer>
 																													<key>PATH</key>
 																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/pksig_cl03.pyc</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/pksig_cl04.py</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/pksig_cl04.pyc</string>
 																													<key>PATH_TYPE</key>
 																													<integer>0</integer>
 																													<key>PERMISSIONS</key>
@@ -8170,6 +8650,38 @@
 																													<key>GID</key>
 																													<integer>0</integer>
 																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/toolbox/pairingcurves.py</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/toolbox/pairingcurves.pyc</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
 																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/toolbox/pairinggroup.py</string>
 																													<key>PATH_TYPE</key>
 																													<integer>0</integer>
@@ -8507,6 +9019,70 @@
 																													<integer>0</integer>
 																													<key>PATH</key>
 																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/toolbox/specialprimes.pyc</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/toolbox/symcrypto.py</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/toolbox/symcrypto.pyc</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/toolbox/symcrypto_test.py</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/toolbox/symcrypto_test.pyc</string>
 																													<key>PATH_TYPE</key>
 																													<integer>0</integer>
 																													<key>PERMISSIONS</key>
@@ -8916,7 +9492,7 @@
 				<key>REFERENCE_PATH</key>
 				<string></string>
 				<key>VERSION</key>
-				<string>.3a</string>
+				<string>.4b</string>
 			</dict>
 			<key>TYPE</key>
 			<integer>0</integer>
@@ -9337,7 +9913,7 @@
 																							<key>GID</key>
 																							<integer>0</integer>
 																							<key>PATH</key>
-																							<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/Charm_Crypto-0.3-py2.7.egg-info</string>
+																							<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/Charm_Crypto-0.4-py2.7.egg-info</string>
 																							<key>PATH_TYPE</key>
 																							<integer>0</integer>
 																							<key>PERMISSIONS</key>
@@ -9999,6 +10575,38 @@
 																									<key>GID</key>
 																									<integer>0</integer>
 																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/groupsig_bgls04_var.py</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/groupsig_bgls04_var.pyc</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
 																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/ibenc_adapt_hybrid.py</string>
 																									<key>PATH_TYPE</key>
 																									<integer>0</integer>
@@ -10127,6 +10735,70 @@
 																									<key>GID</key>
 																									<integer>0</integer>
 																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/ibenc_ckrs09.py</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/ibenc_ckrs09.pyc</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/ibenc_lsw08.py</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/ibenc_lsw08.pyc</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
 																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/ibenc_sw05.py</string>
 																									<key>PATH_TYPE</key>
 																									<integer>0</integer>
@@ -10176,6 +10848,70 @@
 																									<integer>0</integer>
 																									<key>PATH</key>
 																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/ibenc_waters05.pyc</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/kpabenc_adapt_hybrid.py</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/kpabenc_adapt_hybrid.pyc</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/pk_vrf.py</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/pk_vrf.pyc</string>
 																									<key>PATH_TYPE</key>
 																									<integer>0</integer>
 																									<key>PERMISSIONS</key>
@@ -10656,6 +11392,38 @@
 																									<integer>0</integer>
 																									<key>PATH</key>
 																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/pksig_cl03.pyc</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/pksig_cl04.py</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/pksig_cl04.pyc</string>
 																									<key>PATH_TYPE</key>
 																									<integer>0</integer>
 																									<key>PERMISSIONS</key>
@@ -11874,6 +12642,38 @@
 																									<key>GID</key>
 																									<integer>0</integer>
 																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/toolbox/pairingcurves.py</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/toolbox/pairingcurves.pyc</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
 																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/toolbox/pairinggroup.py</string>
 																									<key>PATH_TYPE</key>
 																									<integer>0</integer>
@@ -12211,6 +13011,70 @@
 																									<integer>0</integer>
 																									<key>PATH</key>
 																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/toolbox/specialprimes.pyc</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/toolbox/symcrypto.py</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/toolbox/symcrypto.pyc</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/toolbox/symcrypto_test.py</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/toolbox/symcrypto_test.pyc</string>
 																									<key>PATH_TYPE</key>
 																									<integer>0</integer>
 																									<key>PERMISSIONS</key>
@@ -12774,7 +13638,7 @@
 				<key>OVERWRITE_PERMISSIONS</key>
 				<false/>
 				<key>VERSION</key>
-				<string>.3a</string>
+				<string>.4b</string>
 			</dict>
 			<key>TYPE</key>
 			<integer>0</integer>
@@ -13195,7 +14059,7 @@
 																							<key>GID</key>
 																							<integer>0</integer>
 																							<key>PATH</key>
-																							<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/Charm_Crypto-0.3-py3.2.egg-info</string>
+																							<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/Charm_Crypto-0.4-py3.2.egg-info</string>
 																							<key>PATH_TYPE</key>
 																							<integer>0</integer>
 																							<key>PERMISSIONS</key>
@@ -13857,6 +14721,38 @@
 																									<key>GID</key>
 																									<integer>0</integer>
 																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/groupsig_bgls04_var.py</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/groupsig_bgls04_var.pyc</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
 																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/ibenc_adapt_hybrid.py</string>
 																									<key>PATH_TYPE</key>
 																									<integer>0</integer>
@@ -13985,6 +14881,70 @@
 																									<key>GID</key>
 																									<integer>0</integer>
 																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/ibenc_ckrs09.py</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/ibenc_ckrs09.pyc</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/ibenc_lsw08.py</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/ibenc_lsw08.pyc</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
 																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/ibenc_sw05.py</string>
 																									<key>PATH_TYPE</key>
 																									<integer>0</integer>
@@ -14034,6 +14994,70 @@
 																									<integer>0</integer>
 																									<key>PATH</key>
 																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/ibenc_waters05.pyc</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/kpabenc_adapt_hybrid.py</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/kpabenc_adapt_hybrid.pyc</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/pk_vrf.py</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/pk_vrf.pyc</string>
 																									<key>PATH_TYPE</key>
 																									<integer>0</integer>
 																									<key>PERMISSIONS</key>
@@ -14514,6 +15538,38 @@
 																									<integer>0</integer>
 																									<key>PATH</key>
 																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/pksig_cl03.pyc</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/pksig_cl04.py</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/pksig_cl04.pyc</string>
 																									<key>PATH_TYPE</key>
 																									<integer>0</integer>
 																									<key>PERMISSIONS</key>
@@ -15732,6 +16788,38 @@
 																									<key>GID</key>
 																									<integer>0</integer>
 																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/toolbox/pairingcurves.py</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/toolbox/pairingcurves.pyc</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
 																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/toolbox/pairinggroup.py</string>
 																									<key>PATH_TYPE</key>
 																									<integer>0</integer>
@@ -16069,6 +17157,70 @@
 																									<integer>0</integer>
 																									<key>PATH</key>
 																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/toolbox/specialprimes.pyc</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/toolbox/symcrypto.py</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/toolbox/symcrypto.pyc</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/toolbox/symcrypto_test.py</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/toolbox/symcrypto_test.pyc</string>
 																									<key>PATH_TYPE</key>
 																									<integer>0</integer>
 																									<key>PERMISSIONS</key>
@@ -16623,7 +17775,7 @@
 				<key>OVERWRITE_PERMISSIONS</key>
 				<false/>
 				<key>VERSION</key>
-				<string>.3a</string>
+				<string>.4b</string>
 			</dict>
 			<key>TYPE</key>
 			<integer>0</integer>
@@ -17160,7 +18312,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>/Library/Python/2.7/site-packages/Charm_Crypto-0.3-py2.7.egg-info</string>
+															<string>/Library/Python/2.7/site-packages/Charm_Crypto-0.4-py2.7.egg-info</string>
 															<key>PATH_TYPE</key>
 															<integer>0</integer>
 															<key>PERMISSIONS</key>
@@ -17822,6 +18974,38 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
+																	<string>/Library/Python/2.7/site-packages/schemes/groupsig_bgls04_var.py</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>420</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>0</integer>
+																	<key>PATH</key>
+																	<string>/Library/Python/2.7/site-packages/schemes/groupsig_bgls04_var.pyc</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>420</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>0</integer>
+																	<key>PATH</key>
 																	<string>/Library/Python/2.7/site-packages/schemes/ibenc_adapt_hybrid.py</string>
 																	<key>PATH_TYPE</key>
 																	<integer>0</integer>
@@ -17950,6 +19134,70 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
+																	<string>/Library/Python/2.7/site-packages/schemes/ibenc_ckrs09.py</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>420</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>0</integer>
+																	<key>PATH</key>
+																	<string>/Library/Python/2.7/site-packages/schemes/ibenc_ckrs09.pyc</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>420</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>0</integer>
+																	<key>PATH</key>
+																	<string>/Library/Python/2.7/site-packages/schemes/ibenc_lsw08.py</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>420</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>0</integer>
+																	<key>PATH</key>
+																	<string>/Library/Python/2.7/site-packages/schemes/ibenc_lsw08.pyc</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>420</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>0</integer>
+																	<key>PATH</key>
 																	<string>/Library/Python/2.7/site-packages/schemes/ibenc_sw05.py</string>
 																	<key>PATH_TYPE</key>
 																	<integer>0</integer>
@@ -17999,6 +19247,70 @@
 																	<integer>0</integer>
 																	<key>PATH</key>
 																	<string>/Library/Python/2.7/site-packages/schemes/ibenc_waters05.pyc</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>420</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>0</integer>
+																	<key>PATH</key>
+																	<string>/Library/Python/2.7/site-packages/schemes/kpabenc_adapt_hybrid.py</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>420</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>0</integer>
+																	<key>PATH</key>
+																	<string>/Library/Python/2.7/site-packages/schemes/kpabenc_adapt_hybrid.pyc</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>420</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>0</integer>
+																	<key>PATH</key>
+																	<string>/Library/Python/2.7/site-packages/schemes/pk_vrf.py</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>420</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>0</integer>
+																	<key>PATH</key>
+																	<string>/Library/Python/2.7/site-packages/schemes/pk_vrf.pyc</string>
 																	<key>PATH_TYPE</key>
 																	<integer>0</integer>
 																	<key>PERMISSIONS</key>
@@ -18479,6 +19791,38 @@
 																	<integer>0</integer>
 																	<key>PATH</key>
 																	<string>/Library/Python/2.7/site-packages/schemes/pksig_cl03.pyc</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>420</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>0</integer>
+																	<key>PATH</key>
+																	<string>/Library/Python/2.7/site-packages/schemes/pksig_cl04.py</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>420</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>0</integer>
+																	<key>PATH</key>
+																	<string>/Library/Python/2.7/site-packages/schemes/pksig_cl04.pyc</string>
 																	<key>PATH_TYPE</key>
 																	<integer>0</integer>
 																	<key>PERMISSIONS</key>
@@ -19697,6 +21041,38 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
+																	<string>/Library/Python/2.7/site-packages/toolbox/pairingcurves.py</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>420</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>0</integer>
+																	<key>PATH</key>
+																	<string>/Library/Python/2.7/site-packages/toolbox/pairingcurves.pyc</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>420</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>0</integer>
+																	<key>PATH</key>
 																	<string>/Library/Python/2.7/site-packages/toolbox/pairinggroup.py</string>
 																	<key>PATH_TYPE</key>
 																	<integer>0</integer>
@@ -20034,6 +21410,70 @@
 																	<integer>0</integer>
 																	<key>PATH</key>
 																	<string>/Library/Python/2.7/site-packages/toolbox/specialprimes.pyc</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>420</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>0</integer>
+																	<key>PATH</key>
+																	<string>/Library/Python/2.7/site-packages/toolbox/symcrypto.py</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>420</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>0</integer>
+																	<key>PATH</key>
+																	<string>/Library/Python/2.7/site-packages/toolbox/symcrypto.pyc</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>420</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>0</integer>
+																	<key>PATH</key>
+																	<string>/Library/Python/2.7/site-packages/toolbox/symcrypto_test.py</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>420</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>0</integer>
+																	<key>PATH</key>
+																	<string>/Library/Python/2.7/site-packages/toolbox/symcrypto_test.pyc</string>
 																	<key>PATH_TYPE</key>
 																	<integer>0</integer>
 																	<key>PERMISSIONS</key>
@@ -20414,7 +21854,7 @@
 				<key>OVERWRITE_PERMISSIONS</key>
 				<false/>
 				<key>VERSION</key>
-				<string>.3a</string>
+				<string>.4b</string>
 			</dict>
 			<key>TYPE</key>
 			<integer>0</integer>
@@ -20436,18 +21876,18 @@
 			ZW50LVN0eWxlLVR5cGUiIGNvbnRlbnQ9InRleHQvY3NzIj4KPHRp
 			dGxlPjwvdGl0bGU+CjxtZXRhIG5hbWU9IkdlbmVyYXRvciIgY29u
 			dGVudD0iQ29jb2EgSFRNTCBXcml0ZXIiPgo8bWV0YSBuYW1lPSJD
-			b2NvYVZlcnNpb24iIGNvbnRlbnQ9IjExMzgiPgo8c3R5bGUgdHlw
-			ZT0idGV4dC9jc3MiPgpwLnAxIHttYXJnaW46IDAuMHB4IDAuMHB4
-			IDAuMHB4IDAuMHB4OyBmb250OiAxMi4wcHggSGVsdmV0aWNhfQo8
-			L3N0eWxlPgo8L2hlYWQ+Cjxib2R5Pgo8cCBjbGFzcz0icDEiPkNo
-			YXJtIGlzIGEgZnJhbWV3b3JrIGZvciByYXBpZGx5IHByb3RvdHlw
-			aW5nIGFkdmFuY2VkIGNyeXB0b3N5c3RlbXMuwqAgQmFzZWQgb24g
-			dGhlIFB5dGhvbiBsYW5ndWFnZSwgaXQgd2FzIGRlc2lnbmVkIGZy
-			b20gdGhlIGdyb3VuZCB1cCB0byBtaW5pbWl6ZSBkZXZlbG9wbWVu
-			dCB0aW1lIGFuZCBjb2RlIGNvbXBsZXhpdHkgd2hpbGUgcHJvbW90
-			aW5nIHRoZSByZXVzZSBvZiBjb21wb25lbnRzLjxzcGFuIGNsYXNz
-			PSJBcHBsZS1jb252ZXJ0ZWQtc3BhY2UiPsKgPC9zcGFuPjwvcD4K
-			PC9ib2R5Pgo8L2h0bWw+Cg==
+			b2NvYVZlcnNpb24iIGNvbnRlbnQ9IjExMzguMjMiPgo8c3R5bGUg
+			dHlwZT0idGV4dC9jc3MiPgpwLnAxIHttYXJnaW46IDAuMHB4IDAu
+			MHB4IDAuMHB4IDAuMHB4OyBmb250OiAxMi4wcHggSGVsdmV0aWNh
+			fQo8L3N0eWxlPgo8L2hlYWQ+Cjxib2R5Pgo8cCBjbGFzcz0icDEi
+			PkNoYXJtIGlzIGEgZnJhbWV3b3JrIGZvciByYXBpZGx5IHByb3Rv
+			dHlwaW5nIGFkdmFuY2VkIGNyeXB0b3N5c3RlbXMuwqAgQmFzZWQg
+			b24gdGhlIFB5dGhvbiBsYW5ndWFnZSwgaXQgd2FzIGRlc2lnbmVk
+			IGZyb20gdGhlIGdyb3VuZCB1cCB0byBtaW5pbWl6ZSBkZXZlbG9w
+			bWVudCB0aW1lIGFuZCBjb2RlIGNvbXBsZXhpdHkgd2hpbGUgcHJv
+			bW90aW5nIHRoZSByZXVzZSBvZiBjb21wb25lbnRzLjxzcGFuIGNs
+			YXNzPSJBcHBsZS1jb252ZXJ0ZWQtc3BhY2UiPsKgPC9zcGFuPjwv
+			cD4KPC9ib2R5Pgo8L2h0bWw+Cg==
 			</data>
 		</dict>
 		<key>PROJECT_PRESENTATION</key>

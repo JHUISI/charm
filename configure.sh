@@ -877,7 +877,7 @@ fi
 # For python installers on OS X.
 test_path=`echo $python_path | awk 'BEGIN {FS="."}{print $1}'`
 if [ "$test_path" = "/Library/Frameworks/Python" ] ; then
-    echo PYTHONBUILDEXT="-L/usr/local/lib -I/usr/local/include $PYTHONBUILDEXT"
+    PYTHONBUILDEXT="-L/usr/local/lib -I/usr/local/include $PYTHONBUILDEXT"
 fi
 
 if [ "$PYTHONBUILDEXT" != "" ] ; then

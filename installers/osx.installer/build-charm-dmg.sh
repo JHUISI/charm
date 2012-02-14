@@ -80,7 +80,8 @@ set background picture of theViewOptions to file ".background:'charm-dmg-backgro
 make new alias file at container window to POSIX file "'${APPDIR}'" with properties {name:"Applications"}
 set position of item "'Charm  Crypto.mpkg'" of container window to {100, 100}
 set position of item "Applications" of container window to {685, 120}
-set position of item "'charm-usr'" of container window to {50,25}
+set position of item "'charm-usr2.7'" of container window to {50,25}
+set position of item "'charm-usr3.2'" of container window to {50,25}
 set position of item "'README-OSX.rtf'" of container window to {385,120}
 update without registering applications
 delay 5

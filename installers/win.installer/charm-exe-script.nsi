@@ -41,6 +41,8 @@ SetCompressor lzma
 ; For conditionals and 64-bit check.
 !include "LogicLib.nsh"
 !include "x64.nsh"
+!include "nsDialogs.nsh"
+!include "nsDialogs_createTextMultiline.nsh"
 
 ; MUI Settings
 !define MUI_ABORTWARNING
@@ -48,7 +50,9 @@ SetCompressor lzma
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
 
 ; Welcome page
-!insertmacro MUI_PAGE_WELCOME "../../CHANGELOG"
+!insertmacro MUI_PAGE_WELCOME
+; Custom Changelog page
+Page custom changeLogPage
 ; License page
 !insertmacro MUI_PAGE_LICENSE "gpl_v3.txt"
 ; Components page
@@ -74,6 +78,8 @@ SetCompressor lzma
 
 
 ; Globals ------
+Var changeLogLabel
+var changeLogText
 Var Python32Dir
 Var Python27Dir
 !define Python32Exe "$Python32Dir\python.exe"
@@ -89,6 +95,28 @@ OutFile "charm-crypto.exe"
 InstallDir "C:\charm-crypto"
 ShowInstDetails show
 ShowUnInstDetails show
+
+
+
+; Changelog Page
+Function changeLogPage
+
+	!insertmacro MUI_HEADER_TEXT "Charm-Crypto v0.4b" "CHANGELOG" 
+	
+	nsDialogs::Create 1018
+
+	;${NSD_CreateLabel} 0 0 100% 12u "v0.4b CHANGELOG"
+	
+	Pop $changeLogLabel
+
+	${NSD_CreateTextMultiLine} 0 13u 100% -13u "- Several bug fixes to base modules: pairing (PBC & Miracl), ecc, and integer $\r$\n- Major changes to base module API. Recommend using the group abstraction wrappers: PairingGroup, ECGroup, and IntegerGroup $\r$\n- Removed pairing curve params in favor of a unified 'toolbox/pairingcurve.py' with curve identifiers (e.g., SS512, MNT224, etc)$\r$\n- Deleted the 'params' dir (See previous bullet)$\r$\n- Added high-level serialization API to simplify managing ciphertexts and keys in applications$\r$\n- Added PKCS #7 padding to toolbox$\r$\n- Added public key encryption schemes: 2 new IBE schemes (ibenc_ckrs09, ibenc_lsw08)$\r$\n- Added signature schemes: CL04 (anony. creds)$\r$\n- Added verifiable random function (VRF) scheme$\r$\n- Updates to KPABE scheme with new adapter$\r$\n- Improved protocol engine: automatically store data transmitted between parties and more flexibility in state transition map  $\r$\n- Updated CNS07 scheme $\r$\n- Name updates to authenticated crypto abstraction$\r$\n- Updated documentation for generating group parameters and using our serialization interface"
+	
+	Pop $changeLogText
+	
+	nsDialogs::Show
+
+FunctionEnd
+
 
 
 ; This section, dependencies, must be installed.  So no user option control!
@@ -146,7 +174,7 @@ Section /o "" python32_detected
   SetOutPath "$Python32Dir"
   SetOverwrite ifnewer
   ; CHANGEME on every new release.
-  File "C:\Python32\Lib\site-packages\Charm_Crypto-0.3-py3.2.egg-info"
+  File "C:\Python32\Lib\site-packages\Charm_Crypto-0.4-py3.2.egg-info"
   
   CreateShortCut "$SMPROGRAMS\charm-crypto\charm-usr.lnk" "$INSTDIR\charm-usr-3.2"
 SectionEnd
@@ -174,7 +202,7 @@ Section /o "" python27_detected
   SetOutPath "$Python27Dir"
   SetOverwrite ifnewer
   ; CHANGEME on every new release.
-  File "C:\Python27\Lib\site-packages\Charm_Crypto-0.3-py2.7.egg-info"  
+  File "C:\Python27\Lib\site-packages\Charm_Crypto-0.4-py2.7.egg-info"  
   
   CreateShortCut "$SMPROGRAMS\charm-crypto\charm-usr.lnk" "$INSTDIR\charm-usr-2.7"  
 SectionEnd
@@ -325,7 +353,7 @@ Section Uninstall
 	  RMDir /r "$8$9\compiler\"
 	  ;RMDir /r "$8$9\schemes\"
 	  RMDir /r "$8$9\toolbox\"
-      Delete "$8$9\Charm_Crypto-0.2-py3.2.egg-info"
+      Delete "$8$9\Charm_Crypto-0.4-py3.2.egg-info"
       ;Delete "$SMPROGRAMS\charm-crypto\schemes-py32.lnk" 	  
 	  ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\3.2\InstallPath" ""
 	  StrCmp $8 "" done hasPython27
@@ -334,7 +362,7 @@ Section Uninstall
 	  RMDir /r "$8$9\compiler\"
 	  ;RMDir /r "$8$9\schemes\"
 	  RMDir /r "$8$9\toolbox\"  
-      Delete "$8$9\Charm_Crypto-0.2-py2.7.egg-info"
+      Delete "$8$9\Charm_Crypto-0.4-py2.7.egg-info"
 	  ;Delete "$SMPROGRAMS\charm-crypto\schemes-py27.lnk"
   done:
       ;Don't do anything when done.
