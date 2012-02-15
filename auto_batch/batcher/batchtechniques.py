@@ -203,7 +203,10 @@ class AbstractTechnique:
 #                    exp.left = left.left
                     if right.negated: left.right.negated = False; right.negated = False 
                     left.right.setAttribute(str(right))
-                    left.right.attr_index = right.attr_index                    
+# JAA commented out to avoid extra index, for example, 'delta_z_z' for VRF 
+#                    print("original: ", left.right.attr_index)
+#                    left.right.attr_index = right.attr_index                    
+#                    print("post: ", left.right.attr_index)
                     mul = left.right
                 else:
                     mul = BinaryNode(ops.MUL)
@@ -255,7 +258,7 @@ class AbstractTechnique:
 #                    print("mul : ", str(right), left.right) 
                     if right.negated: left.right.negated = False; right.negated = False 
                     left.right.setAttribute(str(right)) 
-                    left.right.attr_index = right.attr_index
+#                    left.right.attr_index = right.attr_index
                     mul = left.right
                 else:
                     mul = BinaryNode(ops.MUL)

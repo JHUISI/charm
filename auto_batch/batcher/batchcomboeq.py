@@ -20,7 +20,7 @@ class CombineMultipleEq(AbstractTechnique):
         self.inverse = BinaryNode("-1")
         self.finalAND   = [ ]
         self.deltaCount = { }
-        self.debug      = True
+        self.debug      = False
         
     def visit_and(self, node, data):
         left = right = BinaryNode("1")
