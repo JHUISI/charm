@@ -12,9 +12,9 @@ Camenisch-Hohenberger-Pedersen - Identity-based Signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from toolbox.pairinggroup import PairingGroup,G1,G2,GT,ZR,pair
-from toolbox.PKSig import PKSig
+
 from toolbox.pairinggroup import *
+from toolbox.PKSig import PKSig
 from charm.engine.util import *
 import sys, random, string
 
@@ -31,7 +31,6 @@ class CHP(PKSig):
         H = lambda prefix,x: group.hash((str(prefix), str(x)), G1)
         H3 = lambda a,b: group.hash(('3', str(a), str(b)), ZR)
         g = group.random(G2) 
-        #return { 'g' : g }
         mpk = { 'g' : g }
         return mpk
     
@@ -57,10 +56,10 @@ class CHP(PKSig):
         return False
 
 def main():
-    #if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
-        #sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
+    if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
+        sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
    
-    groupObj = PairingGroup('/Users/matt/Documents/charm/param/a.param')
+    groupObj = PairingGroup(MNT160)
     chp = CHP(groupObj)
     mpk = chp.setup()
 
@@ -79,7 +78,7 @@ def main():
     assert chp.verify(mpk, pk, M, sig), "invalid signature!"
     if debug: print("Verification successful!")
 
-    '''
+
     numValidMessages = int(sys.argv[1])
     numInvalidMessages = int(sys.argv[2])
     messageSize = int(sys.argv[3])
@@ -88,12 +87,12 @@ def main():
     invalidOutputDictName = sys.argv[6]
 
     f_mpk = open('mpk.charmPickle', 'wb')
-    pick_mpk = pickleObject(serialize(mpk, groupObj))
+    pick_mpk = objectToBytes(mpk, groupObj)
     f_mpk.write(pick_mpk)
     f_mpk.close()
 
     f_pk = open('pk.charmPickle', 'wb')
-    pick_pk = pickleObject(serialize(pk, groupObj))
+    pick_pk = objectToBytes(pk, groupObj)
     f_pk.write(pick_pk)
     f_pk.close()
 
@@ -119,10 +118,8 @@ def main():
 
         M = { 't1':'time_1', 't2':'time_2', 't3':'time_3', 'str':message}
 
-
         sig = chp.sign(pk, sk, M)
         assert chp.verify(mpk, pk, M, sig), "invalid signature!"
-  
        
         f_message = open(prefixName + str(index) + '_ValidMessage.pythonPickle', 'wb')
         validOutputDict[index]['M'] = prefixName + str(index) + '_ValidMessage.pythonPickle'
@@ -132,7 +129,8 @@ def main():
         
         pickle.dump(M, f_message)
         f_message.close()
-        pick_sig = pickleObject(serialize(sig, groupObj))
+
+        pick_sig = objectToBytes(sig, groupObj)
 
         f_sig.write(pick_sig)
         f_sig.close()
@@ -144,13 +142,12 @@ def main():
         del f_sig
         del pick_sig
 
-    dict_pickle = pickleObject(serialize(validOutputDict, groupObj))
+    dict_pickle = objectToBytes(validOutputDict, groupObj)
     f = open(validOutputDictName, 'wb')
     f.write(dict_pickle)
     f.close()
     del dict_pickle
     del f
-
 
     for index in range(0, numInvalidMessages):
         if (index != 0):
@@ -166,7 +163,6 @@ def main():
 
         sig = chp.sign(pk, sk, M)
         assert chp.verify(mpk, pk, M, sig), "invalid signature!"
-
 
         f_message = open(prefixName + str(index) + '_InvalidMessage.pythonPickle', 'wb')
         invalidOutputDict[index]['M'] = prefixName + str(index) + '_InvalidMessage.pythonPickle'
@@ -188,11 +184,10 @@ def main():
 
         M = { 't1':'time_1', 't2':'time_2', 't3':'time_3', 'str':message}
 
-
         pickle.dump(M, f_message)
         f_message.close()
 
-        pick_sig = pickleObject(serialize(sig, groupObj))
+        pick_sig = objectToBytes(sig, groupObj)
 
         f_sig.write(pick_sig)
         f_sig.close()
@@ -204,13 +199,12 @@ def main():
         del f_sig
         del pick_sig
     
-    dict_pickle = pickleObject(serialize(invalidOutputDict, groupObj))
+    dict_pickle = objectToBytes(invalidOutputDict, groupObj)
     f = open(invalidOutputDictName, 'wb')
     f.write(dict_pickle)
     f.close()
     del dict_pickle
     del f
-    '''
 
 if __name__ == "__main__":
     debug = False

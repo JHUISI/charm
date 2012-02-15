@@ -12,10 +12,9 @@ Chow-Yiu-Hui - Identity-based ring signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from toolbox.pairinggroup import PairingGroup,G1,G2,GT,ZR,pair
+from toolbox.pairinggroup import *
 from toolbox.PKSig import PKSig
 from toolbox.iterate import dotprod
-from toolbox.pairinggroup import *
 from charm.engine.util import *
 import sys, random, string
 
@@ -87,13 +86,13 @@ class CYH(PKSig):
         return False
 
 def main():
-    #if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
-        #sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
+    if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
+        sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
 
     L = [ "alice", "bob", "carlos", "dexter", "eddie"] 
 
     ID = "bob"
-    groupObj = PairingGroup('/Users/matt/Documents/charm/param/a.param')
+    groupObj = PairingGroup(MNT160)
     cyh = CYH(groupObj)
     (mpk, msk) = cyh.setup()
 
@@ -113,7 +112,7 @@ def main():
     if debug: print("Verification successful!")
 
 
-    '''
+
     numValidMessages = int(sys.argv[1])
     numInvalidMessages = int(sys.argv[2])
     messageSize = int(sys.argv[3])
@@ -122,12 +121,12 @@ def main():
     invalidOutputDictName = sys.argv[6]
 
     f_mpk = open('mpk.charmPickle', 'wb')
-    pick_mpk = pickleObject(serialize(mpk, groupObj))
+    pick_mpk = objectToBytes(mpk, groupObj)
     f_mpk.write(pick_mpk)
     f_mpk.close()
 
     f_pk = open('pk.charmPickle', 'wb')
-    pick_pk = pickleObject(serialize(L, groupObj))
+    pick_pk = objectToBytes(L, groupObj)
     f_pk.write(pick_pk)
     f_pk.close()
 
@@ -154,7 +153,6 @@ def main():
         sig = cyh.sign(sk, L, message)
         assert cyh.verify(mpk, L, message, sig), "invalid signature!"
 
-       
         f_message = open(prefixName + str(index) + '_ValidMessage.pythonPickle', 'wb')
         validOutputDict[index]['M'] = prefixName + str(index) + '_ValidMessage.pythonPickle'
 
@@ -163,7 +161,7 @@ def main():
         
         pickle.dump(message, f_message)
         f_message.close()
-        pick_sig = pickleObject(serialize(sig, groupObj))
+        pick_sig = objectToBytes(sig, groupObj)
 
         f_sig.write(pick_sig)
         f_sig.close()
@@ -174,7 +172,7 @@ def main():
         del f_sig
         del pick_sig
 
-    dict_pickle = pickleObject(serialize(validOutputDict, groupObj))
+    dict_pickle = objectToBytes(validOutputDict, groupObj)
     f = open(validOutputDictName, 'wb')
     f.write(dict_pickle)
     f.close()
@@ -194,10 +192,6 @@ def main():
 
         sig = cyh.sign(sk, L, message)
         assert cyh.verify(mpk, L, message, sig), "invalid signature!"
-
-
-
-
 
         f_message = open(prefixName + str(index) + '_InvalidMessage.pythonPickle', 'wb')
         invalidOutputDict[index]['M'] = prefixName + str(index) + '_InvalidMessage.pythonPickle'
@@ -220,7 +214,7 @@ def main():
         pickle.dump(message, f_message)
         f_message.close()
 
-        pick_sig = pickleObject(serialize(sig, groupObj))
+        pick_sig = objectToBytes(sig, groupObj)
 
         f_sig.write(pick_sig)
         f_sig.close()
@@ -231,13 +225,12 @@ def main():
         del f_sig
         del pick_sig
     
-    dict_pickle = pickleObject(serialize(invalidOutputDict, groupObj))
+    dict_pickle = objectToBytes(invalidOutputDict, groupObj)
     f = open(invalidOutputDictName, 'wb')
     f.write(dict_pickle)
     f.close()
     del dict_pickle
     del f
-    '''
 
 
 if __name__ == "__main__":

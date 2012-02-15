@@ -1,18 +1,13 @@
-#MUST CHANGE BACK TO PRINTABLE!!!!!!!!!!
-
 from toolbox.pairinggroup import *
 from charm.engine.util import *
 import sys, random, string
-
-messageKEY = 1337
 
 debug = False
 
 class IBSig():
     def __init__(self):
         global group
-        #group = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
-        group = PairingGroup(80)
+        group = PairingGroup(MNT160)
   
     def keygen(self, secparam=None):
         g = group.random(G2)
@@ -23,11 +18,7 @@ class IBSig():
         return (pk, sk)
         
     def sign(self, x, message):
-        #print("secret key:  ", x)
-        #print("message:  ", message)
-        #print("message hash:  ", group.hash(message, G1))
         sig = group.hash(message, G1) ** x
-        #print("sig:  ", sig)
         return sig
         
     def verify(self, pk, sig, message):
@@ -36,23 +27,6 @@ class IBSig():
         if pair(sig, pk['g']) == pair(h, pk['g^x']):
             return True  
         return False 
-
-
-def deserialize_test(pick_sig, sig, valid, num, message):
-	depick_sig = deserializeDict(unpickleObject(pick_sig), group)
-	if not (sig == depick_sig):
-		if (valid == True):
-			print("valid")
-		else:
-			print("invalid")
-		print("num:  ", num)
-		print("original sig:  ", sig)
-		print("depick sig:  ", depick_sig)
-		print("pick sig:  ", pick_sig)
-		print("\n")
-
-
-
 
 if __name__ == "__main__":
 	if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
@@ -68,10 +42,8 @@ if __name__ == "__main__":
 	bls = IBSig()
 	(pk, sk) = bls.keygen(0)
 
-	#print(pk)
-
 	f_pk = open('pkBLS.charmPickle', 'wb')
-	pick_pk = pickleObject(serializeDict(pk, group))
+	pick_pk = objectToBytes(pk, group)
 	f_pk.write(pick_pk)
 	f_pk.close()
 
@@ -91,13 +63,12 @@ if __name__ == "__main__":
 		message = ""
 		for randomChar in range(0, messageSize):
 			message += random.choice(string.printable)
-		#print(message)
+
 		sig = bls.sign(sk['x'], message)
-		#print(sig)
 		assert bls.verify(pk, sig, message)
 
 		f_message = open(prefixName + str(index) + '_ValidMessage.pythonPickle', 'wb')
-		validOutputDict[index][messageKEY] = prefixName + str(index) + '_ValidMessage.pythonPickle'
+		validOutputDict[index]['message'] = prefixName + str(index) + '_ValidMessage.pythonPickle'
 
 		f_sig = open(prefixName + str(index) + '_ValidSignature.charmPickle', 'wb')
 		validOutputDict[index]['sig'] = prefixName + str(index) + '_ValidSignature.charmPickle'
@@ -105,15 +76,7 @@ if __name__ == "__main__":
 		pickle.dump(message, f_message)
 		f_message.close()
 
-		pick_sig = pickleObject(serializeDict(sig, group))
-		deserialize_test(pick_sig, sig, True, index, message)
-
-
-
-
-		#print("pick_sig:  ", pick_sig)
-
-
+		pick_sig = objectToBytes(sig, group)
 		f_sig.write(pick_sig)
 		f_sig.close()
 
@@ -131,19 +94,17 @@ if __name__ == "__main__":
 		message = ""
 		for randomChar in range(0, messageSize):
 			message += random.choice(string.printable)
+
 		sig = bls.sign(sk['x'], message)
-		#print(sig)
 		assert bls.verify(pk, sig, message)
 
 		f_message = open(prefixName + str(index) + '_InvalidMessage.pythonPickle', 'wb')
-		invalidOutputDict[index][messageKEY] = prefixName + str(index) + '_InvalidMessage.pythonPickle'
+		invalidOutputDict[index]['message'] = prefixName + str(index) + '_InvalidMessage.pythonPickle'
 		randomIndex = random.randint(0, (messageSize - 1))
 		oldValue = message[randomIndex]
 
 		newValue = random.choice(string.printable)
 		while (newValue == oldValue):
-
-
 			newValue = random.choice(string.printable)
 
 
@@ -154,17 +115,13 @@ if __name__ == "__main__":
 		else:
 			message = message[0:randomIndex] + newValue
 
-		#print(message)
-
 		f_sig = open(prefixName + str(index) + '_InvalidSignature.charmPickle', 'wb')
 		invalidOutputDict[index]['sig'] = prefixName + str(index) + '_InvalidSignature.charmPickle'
 
 		pickle.dump(message, f_message)
 		f_message.close()
 
-		pick_sig = pickleObject(serializeDict(sig, group))
-
-		deserialize_test(pick_sig, sig, False, index, message)
+		pick_sig = objectToBytes(sig, group)
 
 		f_sig.write(pick_sig)
 		f_sig.close()
@@ -175,14 +132,14 @@ if __name__ == "__main__":
 		del f_sig
 		del pick_sig
 
-	dict_pickle = pickleObject(serializeDict(validOutputDict, group))
+	dict_pickle = objectToBytes(validOutputDict, group)
 	f = open(validOutputDictName, 'wb')
 	f.write(dict_pickle)
 	f.close()
 	del dict_pickle
 	del f
 
-	dict_pickle = pickleObject(serializeDict(invalidOutputDict, group))
+	dict_pickle = objectToBytes(invalidOutputDict, group)
 	f = open(invalidOutputDictName, 'wb')
 	f.write(dict_pickle)
 	f.close()
