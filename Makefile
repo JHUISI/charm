@@ -29,6 +29,7 @@ all:
 	@echo "make install - Install on local system."
 	@echo "make clean - Get rid of scratch and byte files."
 	@echo "make test  - Run Unit Tests."
+	@echo "make xmltest  - Run Unit Tests and produce xml results in folder test-results."
 	@echo "make doc   - Compile documentation"
 
 .PHONY: setup
@@ -122,6 +123,10 @@ test:
 	$(PYTHON) tests/all_tests.py
 	find . -name '*.pyc' -delete
 
+.PHONY: xmltest 
+xmltest:
+	$(PYTHON) tests/all_tests_with_xml_test_result.py
+	find . -name '*.pyc' -delete
 .PHONY: doc
 doc:
 	if test "${BUILD_DOCS}" = "yes" ; then \
