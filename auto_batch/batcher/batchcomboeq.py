@@ -19,7 +19,8 @@ class CombineMultipleEq(AbstractTechnique):
             AbstractTechnique.__init__(self, sdl_data, variables, meta)
         self.inverse = BinaryNode("-1")
         self.finalAND   = [ ]
-        self.debug      = False
+        self.deltaCount = { }
+        self.debug      = True
         
     def visit_and(self, node, data):
         left = right = BinaryNode("1")
