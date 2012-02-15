@@ -1,8 +1,8 @@
 from toolbox.pairinggroup import *
 from charm.engine.util import *
-import sys, copy, random
-from bat_BLS import run_Batch
-from ind_BLS import run_Ind
+import sys, copy, random, time
+from batNEW import run_Batch
+from indNEW import run_Ind
 
 sigNumKey = 'Signature_Number'
 bodyKey = 'Body'
@@ -13,20 +13,8 @@ lenRepeatSuffix = len(repeatSuffix)
 
 trials = 1
 time_in_ms = 1000
-MS_PER_CYCLE = 1000
-TIMER = 0
+NUM_PROGRAM_ITERATIONS = 10
 NUM_CYCLES = 100
-
-def shuffle(oldList):
-	lenList = len(oldList)
-	newList = []
-
-	for i in range(0, lenList):
-		randNum = random.choice(oldList)
-		newList.append(randNum)
-		oldList.remove(randNum)
-
-	return newList
 
 def loadDictDataFromFile(verifyParamFilesDict, groupParamArg):
 	verifyArgsDict = {}
@@ -41,6 +29,7 @@ def loadDictDataFromFile(verifyParamFilesDict, groupParamArg):
 			if (verifyParamFile.endswith(charmPickleSuffix)):
 				verifyParamPickle = open(verifyParamFile, 'rb').read()
 				verifyArgsDict[sigIndex][arg][bodyKey] = bytesToObject(verifyParamPickle, groupParamArg)
+
 			elif (verifyParamFile.endswith(pythonPickleSuffix)):
 				verifyParamPickle = open(verifyParamFile, 'rb')
 				verifyArgsDict[sigIndex][arg][bodyKey] = pickle.load(verifyParamPickle)
@@ -67,78 +56,81 @@ def loadDataFromDictInMemory(verifyParamFilesDict, startIndex, numSigsToProcess,
 
 	return (counterFromZero - 1)
 
-def getIndexReplacement(randomizedIndices, numSigs, indexToFind):
-	for sigIndex in range(0, numSigs):
-		possibleIndex = randomizedIndices[sigIndex]
-		if ( int(possibleIndex) == int(indexToFind) ):
-			return sigIndex
+def getResults(resultsDict):
+	resultsString = ""
 
-	return -1
+	for cycle in range(0, NUM_CYCLES):
+		value = 0.0
+
+		for programIteration in range(0, NUM_PROGRAM_ITERATIONS):
+			value += resultsDict[programIteration][cycle]
+
+		value = float(value) / float(NUM_PROGRAM_ITERATIONS)
+
+		resultsString += str(cycle+1) + " " + str(value) + "\n"
+
+	return resultsString
 
 if __name__ == '__main__':
 	if ( (len(sys.argv) != 5) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
-		sys.exit("Usage:  python " + sys.argv[0] + "\n\t[dictionary with valid messages/signatures]\n\t[path and filename of group param file]\n\t[name of output file for individual]\n\t[name of output file for batch]\n")
+		sys.exit("Usage:  python " + sys.argv[0] + "\n\t[dictionary with valid messages/signatures]\n\t[group param int]\n\t[name of output file for batch results]\n\t[name of output file for ind. results]")
 
 	validDictArg = open(sys.argv[1], 'rb').read()
-	groupParamArg = PairingGroup(int(sys.argv[2]))
-	indOutputFileName = sys.argv[3]
-	batOutputFileName = sys.argv[4]
+	groupParamArg = PairingGroup(MNT160)
+	batchResultsFile = sys.argv[3]
+	indResultsFile = sys.argv[4]
 
 	validDictFile = bytesToObject(validDictArg, groupParamArg)
 	validDict = loadDictDataFromFile(validDictFile, groupParamArg)
 
-	indOutputString = ""
-	batOutputString = ""
+	batchResultsTimes = {}
+	indResultsTimes = {}
 
-	for numValidSigs in range(1, (NUM_CYCLES + 1)):
-		sigsDict = {}
-		loadDataFromDictInMemory(validDict, 0, numValidSigs, sigsDict, 0)
+	for initIndex in range(0, NUM_PROGRAM_ITERATIONS):
+		batchResultsTimes[initIndex] = {}
+		indResultsTimes[initIndex] = {}
 
-		verifyArgsDictRandomized = sigsDict
+	for programIteration in range(0, NUM_PROGRAM_ITERATIONS):
 
-		verifyFuncArgs = list(verifyArgsDictRandomized[0].keys())
+		print("program iteration ", programIteration)
 
-		bID1 = InitBenchmark()
+		for cycle in range(0, NUM_CYCLES):
 
-		StartBenchmark(bID1, [RealTime])
-		incorrectSigIndices = run_Ind(verifyArgsDictRandomized, groupParamArg, verifyFuncArgs)
-		EndBenchmark(bID1)
+			sigsDict = {}
+			loadDataFromDictInMemory(validDict, 0, (cycle+1), sigsDict, 0)
+			verifyFuncArgs = list(sigsDict[0].keys())
 
-		if (incorrectSigIndices != []):
-			sys.exit("Individual failed.")
+			startTime = time.clock()
+			incorrectSigIndices = run_Batch(sigsDict, groupParamArg, verifyFuncArgs, False)
+			endTime = time.clock()
 
-		result = (GetBenchmark(bID1, RealTime) / trials) * time_in_ms
+			result = (endTime - startTime) * time_in_ms
 
+			if (incorrectSigIndices != []):
+				sys.exit("Batch verification returned invalid signatures.")
 
+			batchResultsTimes[programIteration][cycle] = ( float(result) / float(cycle+1) )
 
-here
-		#outputString += str(cycle+1) + "\t\t\t" + str(TIMER) + "\t\t\t" + str(SIGS_PER_CYCLE) + "\t\t" + str(numValidSigs) + "\t\t\t" + str(numInvalidSigs) + "\n\n"
-		outputString += str(TIMER) + " " + str(SIGS_PER_CYCLE) + "\n"
-		testString += str(TIMER) + " " + str(numInvalidSigs) + "\n"
-		print("outputString")
-		print(str(TIMER) + " " + str(SIGS_PER_CYCLE) + "\n")
-		print("test")
-		print(str(TIMER) + " " + str(numInvalidSigs) + "\n")
+			startTime = time.clock()
+			incorrectSigIndices = run_Ind(sigsDict, groupParamArg, verifyFuncArgs)
+			endTime = time.clock()
 
-		if ( (randomizedIncorrectSigIndices.sort()) != (incorrectSigIndices.sort()) ):
-			sys.exit("Error:  batch code returned wrong results for which signatures are invalid.")
+			result = (endTime - startTime) * time_in_ms
 
-		SIGS_PER_CYCLE = int( ( float(MS_PER_CYCLE) / float(result) ) * SIGS_PER_CYCLE )
-		if (SIGS_PER_CYCLE == 0):
-			SIGS_PER_CYCLE = 1
+			if (incorrectSigIndices != []):
+				sys.exit("Ind. verification returned invalid signatures.")
 
-		del sigsDict
-		del randomizedIndices
-		del verifyArgsDictRandomized
-		del incorrectSigIndices
-		del realIncorrectSigIndices
-		del randomizedIncorrectSigIndices
+			indResultsTimes[programIteration][cycle] = ( float(result) / float(cycle+1) )
 
-	outputFile = open(outputFileName, 'w')
-	outputFile.write(outputString)
+	batchResultsString = getResults(batchResultsTimes)
+	indResultsString = getResults(indResultsTimes)
+
+	outputFile = open(batchResultsFile, 'w')
+	outputFile.write(batchResultsString)
 	outputFile.close()
 	del outputFile
 
-	testOutputFileName.write(testString)
-
-	testOutputFileName.close()
+	outputFile = open(indResultsFile, 'w')
+	outputFile.write(indResultsString)
+	outputFile.close()
+	del outputFile
