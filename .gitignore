@@ -12,6 +12,7 @@ doc/build/*
 **.cproject
 **.tar.*
 **__pycache__
+**test-reports/
 schemes/*.pyc
 toolbox/*.pyc
 .project

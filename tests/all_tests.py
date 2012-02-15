@@ -8,7 +8,7 @@ import unittest, os, sys
 from all_unittests import getAllTestsSuite
 from all_schemes import testSchemes, modules, skip
 
-if __name__ == '__main__':
+def get_suites():
     if os.access("schemes/", os.R_OK):
         os.chdir('schemes/')
     elif os.access("../schemes/", os.R_OK):
@@ -22,6 +22,8 @@ if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTests(testSchemes(modules, skip))
     suite.addTests(getAllTestsSuite(paths))
-    
-    unittest.TextTestRunner(verbosity=2).run(suite)
+    return suite 
+if __name__ == '__main__':
+       
+    unittest.TextTestRunner(verbosity=2).run(get_suites())
     
