@@ -13,6 +13,7 @@ class TestForMultipleEq:
     def visit(self, node, data):
         pass
 
+# So called technique 0
 class CombineMultipleEq(AbstractTechnique):
     def __init__(self, sdl_data=None, variables=None, meta=None):
         if sdl_data:
