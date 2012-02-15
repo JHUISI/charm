@@ -3,10 +3,11 @@
 name := hw
 N := 100
 
+#D := GT; V := GT; U := GT
 BEGIN :: types
 sig1 := G1; sig2 := G1
 M := ZR
-D := GT; V := GT; U := GT
+d := G1; v := G1; u := G1
 w := G2; Z := G2; h := G2
 A := G2; r := ZR; n := ZR
 i := ZR; g := G2
@@ -16,15 +17,15 @@ BEGIN :: constant
 g, w, Z, h
 END :: constant
 
+#U := e(u, g^a)
+#V := e(v, g^a)
+#D := e(d, g^a)
 BEGIN :: precompute
 n := lg_i
-U := e(u, g^a)
-V := e(v, g^a)
-D := e(d, g^a)
 END :: precompute
 
 BEGIN :: public
-U, V, D
+u, v, d
 END :: public
 
 BEGIN :: signature
@@ -37,12 +38,16 @@ END :: message
 
 # same signer configuration
 message := N
-public := one
+public := N
 signature := N
 # sort based on the state variable, s
 sort := sig#3
 
-verify := ( e(sig1, g) == (U^M) * (V^r) * D * e(sig2^n, w) * e(sig2^i,Z) * e(sig2, h) )
+verify := ( e(sig1, g) == (e(u, A)^M) * (e(v,A)^r) * (e(d, A)) * e(sig2^n, w) * e(sig2^i,Z) * e(sig2, h) )
+
+#BEGIN :: transform
+#2, 3, 7
+#END :: transform
 
 BEGIN :: latex
 sig1 := \sigma_1
