@@ -7,7 +7,7 @@ from batchtechniques import *
 from batchproof import *
 from batchorder import BatchOrder
 from batchparser import BatchParser
-from batchcomboeq import TestForMultipleEq,CombineMultipleEq
+from batchcomboeq import TestForMultipleEq,CombineMultipleEq,SmallExpTestMul
 
 try:
     #import benchmarks
@@ -22,25 +22,44 @@ debug = False
 THRESHOLD_FLAG = CODEGEN_FLAG = PROOFGEN_FLAG = PRECOMP_CHECK = VERBOSE = CHOOSE_STRATEGY = False
 TEST_STATEMENT = False
 global_count   = 0
+flags = { 'multiple':None }
 
-
-def handleVerifyEq(equation):
+def handleVerifyEq(equation, index):
 #    print("Input: ", Type(equation), equation)
     combined_equation = BinaryNode.copy(equation.right)
     print("Original eq:", combined_equation)
     tme = TestForMultipleEq()
     ASTVisitor(tme).preorder(combined_equation)
+    flags['multiple' + str(index)] = False
     if tme.multiple:
         cme = CombineMultipleEq()
         ASTVisitor(cme).preorder(combined_equation)
         if len(cme.finalAND) == 1: 
             combined_equation = cme.finalAND.pop()
             print("Final combined eq: ", combined_equation)
+            se_test = SmallExpTestMul()
+            combined_equation2 = BinaryNode.copy(combined_equation)
+            ASTVisitor(se_test).preorder(combined_equation2)            
+            flags['multiple' + str(index)] = True
+            flags[ str(index) ] = combined_equation2
         else:
             # may need to combine them further? or batch separaely
             print("Note: multiple equations left. Either batch each equation separately OR combine further.")
-#            for i in cme.finalAND:
-#                print("eq: ", i)
+            if len(cme.finalAND) == 2:
+                combined_equation2 = BinaryNode(ops.AND, cme.finalAND[0], cme.finalAND[1])
+                cme2 = CombineMultipleEq()
+                ASTVisitor(cme2).preorder(combined_equation2)
+                combined = cme2.finalAND.pop()
+                print("Combined: ", combined)
+                se_test = SmallExpTestMul()
+                combined2 = BinaryNode.copy(combined)
+                ASTVisitor(se_test).preorder(combined2)
+                print("combined: ", combined2)               
+#                exit(0)
+                flags['multiple' + str(index)] = True
+                flags[ str(index) ] = combined2
+                return combined
+
             return cme.finalAND
     return combined_equation
 
@@ -162,7 +181,7 @@ def writeConfig(lcg, latex_file, lcg_data, const, vars, sigs):
  
  
 def runBatcher(file, verify, ast_struct, eq_number=0):
-    global global_count
+    global global_count, flags
     constants, types = ast_struct[ CONST ], ast_struct[ TYPE ]
     latex_subs = ast_struct[ LATEX ]
     if ast_struct.get(PRECOMP):
@@ -242,7 +261,10 @@ def runBatcher(file, verify, ast_struct, eq_number=0):
 
     techniques = {'2':Technique2, '3':Technique3, '4':Technique4, '5':DotProdInstanceFinder, '6':PairInstanceFinder, '7':Technique7, '8':Technique8 }
     print("\nVERIFY EQUATION =>", verify)
-    if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Equation', 'eq': lcg.print_statement(verify) }; lcg_steps += 1
+    if PROOFGEN_FLAG: 
+        lcg_data[ lcg_steps ] = { 'msg':'Equation', 'eq': lcg.print_statement(verify) }
+        if flags['multiple' + str(eq_number)]: lcg_data[ lcg_steps ]['eq'] = lcg.print_statement(flags[ str(eq_number) ]) # shortcut!
+        lcg_steps += 1
     verify2 = BinaryNode.copy(verify)
 #    ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
     ASTVisitor(CVForMultiSigner(vars, sig_vars, pub_vars, msg_vars, batch_count)).preorder(verify2)
@@ -399,12 +421,13 @@ if __name__ == "__main__":
         print("Final statement(%s): '%s'" % (type(final), final))
         exit(0)
 
-    verify_eq, N = [], None
+    verify_eq, N = [], None; cnt = 0
     for n in ast_struct[ OTHER ]:
         if 'verify' in str(n.left):
-            result = handleVerifyEq(n)
+            result = handleVerifyEq(n, cnt); cnt += 1
             if type(result) != list: verify_eq.append(result)
             else: verify_eq.extend(result)
+
     # process settings
     for i in range(len(verify_eq)):    
         print("\nRunning batcher....\n")

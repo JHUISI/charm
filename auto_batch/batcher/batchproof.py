@@ -156,11 +156,11 @@ class LatexCodeGenerator:
             else:
                 msg = self.getLatexVersion(str(msg))
 #                if msg.find('_') != -1: msg = "{" + msg + "}" # prevent subscript
-                
+#            print("msg : ", msg)
             if node.attr_index != None:
                 keys = ""
                 if msg.find('_') != -1:
-                    s = msg.split('_')
+                    s = msg.split('_', 1)
                     #print("s : ", s)
                     for i in node.attr_index:
                         keys += i + ","
@@ -168,7 +168,6 @@ class LatexCodeGenerator:
                     msg = s[0] + '_{' + keys + "," + s[1] + '}'
                     #print("msg :=", msgs)
                 else:
-                    msg = "{" + msg + "}"
                     for i in node.attr_index:
                         keys += i + ","
                     keys = keys[:len(keys)-1]
@@ -176,14 +175,17 @@ class LatexCodeGenerator:
                         msg += '_{' + keys + '}'
                     else:
                         msg += '_' + keys
+                    msg = "{" + msg + "}"
+#                    print("result: ", msg)
             if node.negated: msg = '-' + msg
+#            print("msg2 : ", msg)
             return msg
         elif(node.type == ops.TYPE):
             return str(node.attr)
         else:
             left = self.print_statement(node.left)
             right = self.print_statement(node.right)
-            
+
             if debug >= levels.some:
                print("Operation: ", node.type)
                print("Left operand: ", left)
@@ -193,9 +195,10 @@ class LatexCodeGenerator:
                     l = self.print_statement(node.left.left)
                     r = self.print_statement(node.left.right)
                     return ( l + "^{" + r + ' \cdot ' + right + "}")
-                elif Type(node.left) == ops.ATTR:
-                    return (left + '^{' + right + "}")
-                return ("{" + left + '}^{' + right + "}")
+                elif Type(node.left) in [ops.ATTR, ops.PAIR]:
+                    if str(right) == "1": return left 
+                    return ( left + '^{' + right + "}")
+                return ("(" + left + ')^{' + right + "}")
             elif(node.type == ops.MUL):
                 return ( left + ' \cdot ' + right)
             elif(node.type == ops.ADD):

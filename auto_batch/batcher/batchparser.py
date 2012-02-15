@@ -159,6 +159,7 @@ class BatchParser:
 signer_mode  = Enum('single', 'multi', 'ring')
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
 TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
+ARBITRARY_FUNC = 'func:'
 MESSAGE, SIGNATURE, PUBLIC, LATEX, SETTING = 'message','signature', 'public', 'latex', 'setting'
 # qualifier (means only one instance of that particular keyword exists)
 SAME, DIFF = 'one', 'many'
@@ -185,7 +186,7 @@ def handle(lines, target):
     if type(lines) != list:
         return parser.parse(lines)
 
-    if target in [CONST, TRANSFORM, PUBLIC, SIGNATURE, MESSAGE]:
+    if (target in [CONST, TRANSFORM, PUBLIC, SIGNATURE, MESSAGE]) or (ARBITRARY_FUNC in target):
         # parse differently 'a, b, etc.\n'
         _ast = []
         for line in lines:
@@ -228,7 +229,7 @@ def parseFile(filename):
     ast = {TYPE: None, CONST: None, PRECOMP: None, TRANSFORM: None, 
            MESSAGE: None, SIGNATURE: None, PUBLIC: None, LATEX: None, 
            OTHER: [] }
-    
+    AcceptedEnclosures = [TYPE, CONST, PRECOMP, TRANSFORM, MESSAGE, SIGNATURE, PUBLIC, LATEX]
     # parser = BatchParser()
     code = fd.readlines(); i = 1
     inStruct = (False, None)
@@ -238,7 +239,7 @@ def parseFile(filename):
             continue
         elif line.find(BLOCK_SEP) != -1: # parse differently
             token = clean(line.split(BLOCK_SEP))
-            if token[0] == START_TOKEN and (token[1] in [TYPE, CONST, PRECOMP, TRANSFORM, MESSAGE, SIGNATURE, PUBLIC, LATEX]):
+            if token[0] == START_TOKEN and (token[1] in AcceptedEnclosures or ARBITRARY_FUNC in token[1]):
                 inStruct = (True, token[1])
                 if debugs == levels.all: print("Got a section!!!")
                 continue

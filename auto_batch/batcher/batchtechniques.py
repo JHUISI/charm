@@ -201,7 +201,9 @@ class AbstractTechnique:
                 value = left.right.getAttribute()
                 if value.isdigit() and int(value) <= 1:  
 #                    exp.left = left.left
+                    if right.negated: left.right.negated = False; right.negated = False 
                     left.right.setAttribute(str(right))
+                    left.right.attr_index = right.attr_index                    
                     mul = left.right
                 else:
                     mul = BinaryNode(ops.MUL)
@@ -241,6 +243,61 @@ class AbstractTechnique:
             exp.left = left
             exp.right = right
         return exp
+
+    @classmethod
+    def createExp2(self, left, right, _listIFMul=None):
+        if left.type == ops.EXP: # left => a^b , then => a^(b * c)
+#            exp = BinaryNode(ops.EXP)
+            if Type(left.right) == ops.ATTR:
+                value = left.right.getAttribute()
+                if value.isdigit() and int(value) <= 1:  
+#                    exp.left = left.left                   
+#                    print("mul : ", str(right), left.right) 
+                    if right.negated: left.right.negated = False; right.negated = False 
+                    left.right.setAttribute(str(right)) 
+                    left.right.attr_index = right.attr_index
+                    mul = left.right
+                else:
+                    mul = BinaryNode(ops.MUL)
+                    mul.left = left.right
+                    mul.right = right                    
+            else:
+                mul = BinaryNode(ops.MUL)
+                mul.left = left.right
+                mul.right = right
+            exp = BinaryNode(ops.EXP)
+            exp.left = left.left
+            exp.right = mul                
+        elif left.type in [ops.ATTR, ops.PAIR, ops.HASH]: # left: attr ^ right
+            exp = BinaryNode(ops.EXP)
+            exp.left = left
+            exp.right = right
+        elif left.type == ops.MUL:
+            nodes = []
+            if not _listIFMul: _listIFMul = [ops.EXP, ops.HASH, ops.ATTR]
+            self.getMulTokens(left, ops.MUL, _listIFMul, nodes)
+#            getListNodes(left, ops.EQ_TST, nodes)
+#            print("createExp sub nodes:")
+#            for i in nodes:
+#                print("subnodes: ", i)
+            if len(nodes) >= 2: # only distribute exponent when there are 
+                muls = [ BinaryNode(ops.MUL) for i in range(len(nodes)-1) ]
+                for i in range(len(muls)):
+                    muls[i].left = self.createExp2(nodes[i], BinaryNode.copy(right), _listIFMul)
+                    if i < len(muls)-1: muls[i].right = muls[i+1]
+                    else: muls[i].right = self.createExp2(nodes[i+1], BinaryNode.copy(right), _listIFMul)
+                exp = muls[0] # MUL nodes absorb the exponent
+            else:
+                exp = BinaryNode(ops.EXP)
+                exp.left = left
+                exp.right = right
+        else:
+            exp = BinaryNode(ops.EXP)
+            exp.left = left
+            exp.right = right
+        return exp
+
+    
     # node - target subtree, parent - self-explanatory
     # target - node we would liek to delete, branch - side of tree that is traversed.
     def deleteFromTree(self, node, parent, target, branch=None):
@@ -625,7 +682,7 @@ class Technique3(AbstractTechnique):
                 self.applied = True
                 self.score   = tech3.ProductToSum
         else:
-            #print("T3: missing type check :=>", Type(node.right))
+            if self.debug: print("T3: missing type check :=>", Type(node.right))
             pass
     
     # Quick check that the dot product can be reliably moved inside the pairing

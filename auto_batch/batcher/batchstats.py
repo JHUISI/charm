@@ -176,6 +176,7 @@ class RecordOperations:
             _type = str(node.right.attr)
             return _type
         elif node.type == ops.EXP:
+#            print("node: ", node.left, node.left.type)
             return self.deriveNodeType(node.left)
         elif node.type == ops.PAIR:
             return 'GT'
