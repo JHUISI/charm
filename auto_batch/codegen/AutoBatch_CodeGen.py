@@ -2415,9 +2415,9 @@ def addGroupMembershipChecks():
 	global batchVerFile, individualVerFile
 
 	outputString = ""
-	outputString += "\t\t#for arg in verifyFuncArgs:\n"
-	outputString += "\t\t\t#if (group.ismember(verifyArgsDict[" + con.numSignaturesIndex + "][arg][bodyKey]) == False):\n"
-	outputString += "\t\t\t\t#sys.exit(\"ALERT:  Group membership check failed!!!!\\n\")\n\n"
+	outputString += "\t\tfor arg in verifyFuncArgs:\n"
+	outputString += "\t\t\tif (group.ismember(verifyArgsDict[" + con.numSignaturesIndex + "][arg][bodyKey]) == False):\n"
+	outputString += "\t\t\t\tsys.exit(\"ALERT:  Group membership check failed!!!!\\n\")\n\n"
 
 	outputString += "\t\tpass\n\n"
 
