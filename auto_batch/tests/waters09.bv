@@ -43,8 +43,26 @@ signature := N
 
 verify := {(e(gb^s, sig1) * (e(gba1^s1, sig2) * (e(ga1^s1, sig3) * (e(gba2^s2, sig4) * e(ga2^s2, sig5))))) == (e((tau1^s1) * (tau2^s2), sig6) * (e(((tau1b^s1) * ((tau2b^s2) * w^-t)), sig7) * ( ( ( e( (((u^M) * (w^tagc)) * h)^t, sig7) * (e(g1^t, sigK)^-1) )^theta) * (A^s2)))) }
 
-# next is 3 and doesn't work with automatic search algorithm...
-# 2, 5, 3
-#BEGIN :: transform
-#2, 5, 3
-#END :: transform
+BEGIN :: latex
+sig1 := \sigma_1
+sig2 := \sigma_2
+sig3 := \sigma_3
+sig4 := \sigma_4
+sig5 := \sigma_5
+sig6 := \sigma_6
+sig7 := \sigma_7
+sigK := \sigma_K
+theta := \theta
+s2 := s_2
+s1 := s_1
+tagc := tag_c
+tau1 := \tau_1
+tau2 := \tau_2
+tau1b := {\tau_1}^b
+tau2b := {\tau_2}^b
+gb := {g_1}^b
+gba1 := {g_1}^{b \cdot a_1}
+gba2 := {g_1}^{b \cdot a_2}
+ga2 := {g_1}^{a_2}
+ga1 := {g_1}^{a_1}
+END :: latex
