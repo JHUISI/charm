@@ -1,0 +1,50 @@
+# bls batch inputs
+# variables
+name := waters09
+N := 100
+
+BEGIN :: types
+ gb := G1; gba1 := G1; ga1 := G1; ga2 := G1; gba2 := G1; tau1 := G1; tau2 := G1; tau1b := G1; tau2b := G1; w := G1; u := G1; h := G1; g1 := G1
+ sig1 := G2; sig2 := G2; sig3 := G2; sig4 := G2; sig5 := G2; sig6 := G2; sig7 := G2; sigK := G2; g2 := G2
+ theta := ZR; s := ZR; s1 := ZR; s2 := ZR; t := ZR; M := ZR; tagc := ZR
+ A := GT
+END :: types
+
+#A := (e(g1, g2)^(alpha * (a1 * b))
+BEGIN :: precompute
+s1 := random(ZR)
+s2 := random(ZR)
+t := random(ZR)
+tagc := random(ZR)
+s := s1 + s2
+theta_z := ((tagc - tagk)^-1)
+END :: precompute
+
+BEGIN :: constant
+ g1, g2
+END :: constant
+
+BEGIN :: public 
+ gb, gba1, ga1, gba2, tau1, tau2, tau1b, tau2b, w, u, h, A
+END :: public
+
+BEGIN :: signature
+ theta, sig1, sig2, sig3, sig4, sig5, sig6, sig7, sigK, s, s1, s2, t, tagc
+END :: signature
+
+BEGIN :: message
+ M
+END :: message
+
+# different messages/sigs under a single signer
+message := N
+public := one
+signature := N
+
+verify := {(e(gb^s, sig1) * (e(gba1^s1, sig2) * (e(ga1^s1, sig3) * (e(gba2^s2, sig4) * e(ga2^s2, sig5))))) == (e((tau1^s1) * (tau2^s2), sig6) * (e(((tau1b^s1) * ((tau2b^s2) * w^-t)), sig7) * ( ( ( e( (((u^M) * (w^tagc)) * h)^t, sig7) * (e(g1^t, sigK)^-1) )^theta) * (A^s2)))) }
+
+# next is 3 and doesn't work with automatic search algorithm...
+# 2, 5, 3
+#BEGIN :: transform
+#2, 5, 3
+#END :: transform
