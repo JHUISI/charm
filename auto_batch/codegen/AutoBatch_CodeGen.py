@@ -2490,6 +2490,7 @@ def writeLinesToOutputString(lines, indentationListParam, baseNumTabs, numExtraT
 		line = removeSpaceBeforeChar(line, '=')
 
 		line = removeSpaceAfterChar(line, '-')
+		line = removeSpaceAfterChar(line, '~')
 
 		line = line.replace(con.subscriptTerminator, '')
 
@@ -2905,6 +2906,7 @@ def getExpressionCalcString(expression, loopName, blockOperationString, numBaseT
 	expression = removeSpaceBeforeChar(expression, '=')
 
 	expression = removeSpaceAfterChar(expression, '-')
+	expression = removeSpaceAfterChar(expression, '~')
 
 	expression = expression.replace(con.subscriptTerminator, '')
 
