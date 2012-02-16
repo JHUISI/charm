@@ -32,6 +32,10 @@ class CombineMultipleEq(AbstractTechnique):
         if Type(node.right) == ops.EQ_TST:
             right = self.visit_equality(node.right)
         combined_eq = BinaryNode(ops.EQ_TST, left, right)
+        # test whether technique 6 applies, if so, combine?
+        tech6      = PairInstanceFinder()
+        ASTVisitor(tech6).preorder(combined_eq)
+        if tech6.testForApplication(): tech6.makeSubstitution(combined_eq); print("Result: ", combined_eq)# ; exit(-1)
         if self.debug: print("Combined eq: ", combined_eq)
         self.finalAND.append(combined_eq)
         return

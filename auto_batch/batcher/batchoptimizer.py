@@ -65,7 +65,8 @@ class PairInstanceFinder:
         getListNodes(node.left, Type(node), lnodes)
         for i in lnodes:
             if Type(i) == ops.PAIR: self.side['left'].append(str(i))
-    
+            elif i.left != None and Type(i.left) == ops.PAIR: self.side['left'].append(str(i.left))
+
     def visit_pair(self, node, data):
         lhs = node.left
         rhs = node.right
@@ -318,8 +319,15 @@ class SubstitutePairs2:
 #            print("visit: node.right: ", node.right)        
 #            print("visit: node.left: ", node.left)    
             if node.left in self.extra_parent:
-                batchparser.addAsChildNodeToParent(data, node.right)
-                BinaryNode.clearNode(node.left)
+                if Type(node) != ops.EXP:
+                    batchparser.addAsChildNodeToParent(data, node.right)
+                    BinaryNode.clearNode(node.left)
+                else:
+                    # has an exp node therefore treat accordingly
+                    #print("warning: found another EXP node: ", node.left, node.right)
+                    batchparser.addAsChildNodeToParent(data, node.right)
+                    BinaryNode.clearNode(node.left)
+                    BinaryNode.clearNode(node.right)
                 self.pruneCheck = True 
             elif node.right in self.extra_parent:
                 batchparser.addAsChildNodeToParent(data, node.left)
@@ -332,9 +340,9 @@ class SubstitutePairs2:
         #print("complete list: ", self.extra_side)
         if self.key == 'rnode':
             # find the attribute node on the right
-            if self.debug: print(node.right, " =?= ", self.right)
+            if self.debug: print(node.right, " =?= ", self.right, "left type:", Type(self.left), node.left, self.left)
             if str(node.right) == str(self.right) and Type(node.right) == ops.ATTR:
-                #print("Found a right match: ", node)
+                #print("Found a right match: ", node, self.left, self.right)
                 if node.left == self.left and Type(self.left) == ops.ON:                    
                     if self.debug: print("combine other nodes with ON node: ", self.left)
                     target = self.left
@@ -346,7 +354,7 @@ class SubstitutePairs2:
                     node.left = BinaryNode.copy(self.left)
                     #print("node =>", node)
                     self.deleteOtherPair = True
-
+                
                 elif node.left == self.left: # found the target node
                     #print("Need another case: ", node.left, self.left)
                     self.extra.insert(0, BinaryNode.copy(self.left))
@@ -365,17 +373,17 @@ class SubstitutePairs2:
                     node.right = None
                     BinaryNode.clearNode(node)
                     self.pruneCheck = True
-                    
+                
                     
             elif str(node.right) == str(self.right):
-                print("Found a match, general right case: ", self.left, self.right)
+                #print("Found a match, general right case: ", self.left, self.right)
                 for i in self.extra:
                     print("node: ", i)                
                 
         elif self.key == 'lnode':
             if str(node.left) == str(self.left) and Type(node.left) == ops.ATTR:
                 #print("handle this case: ", node)
-                if node.right == self.right and Type(self.right) == ops.ON:            
+                if node.right == self.right and Type(self.right) == ops.ON:
                     if self.debug: print("combine other nodes with ON node: ", self.right)
                     target = self.right
                     for nodes in self.extra:
@@ -386,9 +394,10 @@ class SubstitutePairs2:
                     #print("node =>", node)
                     self.deleteOtherPair = True
                 elif node.right == self.right:
+#                    print("Type of parent: ", Type(data['parent'])) # in case of e(a,b)^c and we're about to merge the pairing...we need to move c into pairing first                    
                     self.extra.insert(0, BinaryNode.copy(self.right))
                     muls = [ BinaryNode(ops.MUL) for i in range(len(self.extra)-1) ]
-                    for i in range(len(muls)):
+                    for i in range(len(muls)):                        
                         muls[i].left = BinaryNode.copy(self.checkForInverse(self.extra[i]))
                         if i < len(muls)-1: muls[i].right = muls[i+1]
                         else: 
@@ -405,7 +414,7 @@ class SubstitutePairs2:
                     BinaryNode.clearNode(node)
                     self.pruneCheck = True                
             elif str(node.left) == str(self.left):
-#                print("Found a match, general left case: ", self.left, self.right)
+                #print("Found a match, general left case: ", self.left, self.right)
 #                if Type(data['parent']) != ops.ON:
                     # potentially prevent infinite loop of reverse split tech 3 and combine pairing of tech 6
 #                    return

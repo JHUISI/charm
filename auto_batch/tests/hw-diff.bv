@@ -28,7 +28,7 @@ U, V, D
 END :: public
 
 BEGIN :: signature
-sig1, sig2, r, i
+sig1, sig2, r, i, n
 END :: signature
 
 BEGIN :: message
@@ -42,11 +42,11 @@ signature := N
 # sort based on the state variable, s
 sort := sig#3
 
-verify := ( e(sig1, g) == ((U^M) * (V^r) * D * e(sig2^n, ((w^n) * ((z^i) * h)))) )
+verify := ( e(sig1, g) == ((U^M) * (V^r) * D * e(sig2, ((w^n) * ((z^i) * h)))) )
 
 BEGIN :: latex
 sig1 := \sigma_1
 sig2 := \sigma_2
 Z := z
-n := \lg(i)
+n := \lceil\lg(i)\rceil
 END :: latex
