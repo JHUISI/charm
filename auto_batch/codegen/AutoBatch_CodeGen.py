@@ -3111,6 +3111,10 @@ def writeOpeningLinesToDCVerifySigsRecursiveFunc():
 	verifyOutputString += "\t" + con.numSignaturesIndex + " = 0\n\n"
 
 	verifyOutputString += "\t" + con.group + " = groupObj\n\n"
+
+	verifyOutputString += verifySigsInitCall
+	verifyOutputString += "\n"
+
 	verifySigsFile.write(verifyOutputString)
 	verifyOutputString = ""
 	writeNumSignersLine(verifySigsFile)
@@ -3121,7 +3125,7 @@ def writeOpeningLinesToDCVerifySigsRecursiveFunc():
 
 	verifyOutputString += "\n"
 
-	verifyOutputString += verifySigsInitCall
+	#verifyOutputString += verifySigsInitCall
 
 	verifySigsFile.write(verifyOutputString)
 
@@ -3194,9 +3198,10 @@ def writeCachedCalcAssignmentsForDC():
 	outputString += "\n"
 	outputString += eqChecksLoop
 	#outputString += "\n"
-	outputString += "\t\tfor index in range(startSigNum, endSigNum):\n"
 
-	outputString += eqChecksDictAssign
+	if (len(eqChecksDictAssign.lstrip().rstrip()) > 0):
+		outputString += "\t\tfor index in range(startSigNum, endSigNum):\n"
+		outputString += eqChecksDictAssign
 
 	verifySigsFile.write(outputString)
 

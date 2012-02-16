@@ -2,9 +2,9 @@
 gnuplot <<EOF
 
 set terminal postscript eps enhanced "Helvetica" 24;
-set size 3,2;
+set size 3,1.33333;
 set output "DoS_Attack.eps";
-set yrange [1 : 825]; set y2range [0:0.53]; set xrange[0 : 75100];
+set yrange [1 : 825]; set y2range [0:0.55]; set xrange[0 : 75100];
 set y2tics border;
 set title "AutoBatch Performance During DoS Attack" font "Helvetica,28";
 set xlabel "Cumulative Time (ms)" font "Helvetica,28";
