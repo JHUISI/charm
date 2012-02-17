@@ -1355,7 +1355,7 @@ def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
 		lenOfLine = len(lineOfCode)
 		if ( (withinQuotes == True) or (withinPound == True) ):
 			pass
-		elif (lineOfCode[R_index] in ['^', '+', '(', ')', '{', '}', '-', ',', '[', ']']):
+		elif (lineOfCode[R_index] in ['^', '+', '(', ')', '{', '}', '-', ',', '[', ']', '~']):
 			currChars = lineOfCode[R_index]
 			L_index = R_index
 			checkForSpace = True			
@@ -1711,6 +1711,7 @@ def writeFunctionFromCodeToString(sourceCodeLines, startLineNo, endLineNo, extra
 	firstLine = removeSpaceBeforeChar(firstLine, '=')
 
 	firstLine = removeSpaceAfterChar(firstLine, '-')
+	firstLine = removeSpaceAfterChar(firstLine, '~')
 
 	firstLine = firstLine.replace(con.subscriptTerminator, '')
 
@@ -1748,6 +1749,7 @@ def writeFunctionFromCodeToString(sourceCodeLines, startLineNo, endLineNo, extra
 		line = removeSpaceBeforeChar(line, '=')
 
 		line = removeSpaceAfterChar(line, '-')
+		line = removeSpaceAfterChar(line, '~')
 
 		line = line.replace(con.subscriptTerminator, '')
 
