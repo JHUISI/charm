@@ -627,9 +627,23 @@ class Technique3(AbstractTechnique):
         self.rule    = "Move dot products inside pairings to reduce N pairings to 1 (technique 3)"
         self.applied = False
         self.score   = tech3.NoneApplied
-        self.debug   = False
+        self.debug   = True
 
-    # once a     
+
+    def checkSubtreeForSameBase(self, node, parent, data):
+        if node.left: 
+            result = self.checkSubtreeForSameBase(node.left, node, data)
+            if not result: return False
+        if node.right: 
+            result = self.checkSubtreeForSameBase(node.right, node, data)
+            if not result: return False
+        if Type(node) == ops.ATTR and Type(parent) == ops.EXP and node == parent.left: 
+            if len(data) == 0: data.append(str(node)); return True
+            else:
+                if str(node) in data: return True
+                else: return False
+        return True
+        
     def visit_pair(self, node, data):
         if self.debug: print("Current state: ", node)
         left = node.left
@@ -696,6 +710,19 @@ class Technique3(AbstractTechnique):
                 self.applied = True
                 self.score   = tech3.SplitPairing
 #                self.rule += "split one pairing into two pairings. "            
+            elif Type(right) == ops.MUL:
+                print("JAA: how to handle this case: ", child_node1, " AND ", child_node2)
+                r = []
+                self.getMulTokens(right, ops.NONE, [ops.EXP, ops.HASH, ops.ATTR], r)
+                for i in r:
+                    print("i: ", i)
+                exit(0)
+#                mul = BinaryNode(ops.MUL)
+#                mul.left = self.createPair(left, child_node1)
+#                if Type(child_node2) != ops.MUL:
+#                    mul.right = self.createPair(left, child_node2)
+#                else:
+#                    mul.right = self.createPair(left, child_node2.left)
             else:
                 if self.debug: 
                     print("TODO: T3 - missing case: ", Type(child_node1), " and ", Type(child_node2))
@@ -879,6 +906,15 @@ class Technique3(AbstractTechnique):
                 #print("visiting next: ", node.right)
                 result = self.canRearrange(index, node.right, another_index)
                 return result
+        elif node_type == ops.MUL:
+            # call external function to traverse the subtrees
+            #print("JAA: Checking whether we can rearrange when visiting MUL nodes...")
+            _list = []
+            result = self.checkSubtreeForSameBase(node , None, _list)
+            #for i in _list:
+            #    print("result: ", i)
+            if result: return True
+            else: return False
         else:
             #print("Visiting else: ", Type(node), node, another_index)
             result1 = self.canRearrange(index, node.left, another_index)
