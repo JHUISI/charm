@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>ibenc_adapt_identityhash &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>ibenc_adapt_identityhash &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -49,14 +49,12 @@
           <div class="body">
             
   <h1>Source code for ibenc_adapt_identityhash</h1><div class="highlight"><pre>
-<span class="kn">from</span> <span class="nn">schemes.ibenc_bb03</span> <span class="kn">import</span> <span class="n">IBE_BB04</span>
-<span class="kn">from</span> <span class="nn">toolbox.IBEnc</span> <span class="kn">import</span> <span class="n">IBEnc</span>
 <span class="kn">from</span> <span class="nn">toolbox.pairinggroup</span> <span class="kn">import</span> <span class="o">*</span>
 
 <span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
-<div class="viewcode-block" id="HashIDAdapter"><a class="viewcode-back" href="../schemes/ibenc_adapt_identityhash.html#ibenc_adapt_identityhash.HashIDAdapter">[docs]</a><span class="k">class</span> <span class="nc">HashIDAdapter</span><span class="p">(</span><span class="n">IBEnc</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">HashIDAdapter</span><span class="p">(</span><span class="n">IBEnc</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
-        <span class="n">IBEnc</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+<div class="viewcode-block" id="HashIDAdapter"><a class="viewcode-back" href="../schemes/ibenc_adapt_identityhash.html#ibenc_adapt_identityhash.HashIDAdapter">[docs]</a>        <span class="n">IBEnc</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">group</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ibe_good</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="c"># validate that we have the appropriate object</span>
@@ -73,29 +71,29 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ibe_good</span><span class="p">:</span>
             <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;ibe object does not satisfy requirements.&quot;</span>
 
-<div class="viewcode-block" id="HashIDAdapter.setup"><a class="viewcode-back" href="../schemes/ibenc_adapt_identityhash.html#ibenc_adapt_identityhash.HashIDAdapter.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ibe_good</span><span class="p">:</span> <span class="k">return</span> <span class="n">IBEnc</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ibenc</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
-</div>
-<div class="viewcode-block" id="HashIDAdapter.extract"><a class="viewcode-back" href="../schemes/ibenc_adapt_identityhash.html#ibenc_adapt_identityhash.HashIDAdapter.extract">[docs]</a>    <span class="k">def</span> <span class="nf">extract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="n">ID</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ibe_good</span><span class="p">:</span> <span class="k">return</span> <span class="n">IBEnc</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="n">ID</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="HashIDAdapter.setup"><a class="viewcode-back" href="../schemes/ibenc_adapt_identityhash.html#ibenc_adapt_identityhash.HashIDAdapter.setup">[docs]</a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ibenc</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">extract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="n">ID</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ibe_good</span><span class="p">:</span> <span class="k">return</span> <span class="n">IBEnc</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="n">ID</span><span class="p">)</span></div>
+<div class="viewcode-block" id="HashIDAdapter.extract"><a class="viewcode-back" href="../schemes/ibenc_adapt_identityhash.html#ibenc_adapt_identityhash.HashIDAdapter.extract">[docs]</a>        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
             <span class="n">ID2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ibenc</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">mk</span><span class="p">,</span> <span class="n">ID2</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;invalid type on ID.&quot;</span>
-    </div>
-<div class="viewcode-block" id="HashIDAdapter.encrypt"><a class="viewcode-back" href="../schemes/ibenc_adapt_identityhash.html#ibenc_adapt_identityhash.HashIDAdapter.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ibe_good</span><span class="p">:</span> <span class="k">return</span> <span class="n">IBEnc</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ibenc</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-</div>
-<div class="viewcode-block" id="HashIDAdapter.decrypt"><a class="viewcode-back" href="../schemes/ibenc_adapt_identityhash.html#ibenc_adapt_identityhash.HashIDAdapter.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ct</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ibe_good</span><span class="p">:</span> <span class="k">return</span> <span class="n">IBEnc</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ct</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ibenc</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ct</span><span class="p">)</span>
-</div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/ibenc_adapt_identityhash.html#ibenc_adapt_identityhash.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;../param/a.param&#39;</span><span class="p">)</span>
     
+    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ibe_good</span><span class="p">:</span> <span class="k">return</span> <span class="n">IBEnc</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span></div>
+<div class="viewcode-block" id="HashIDAdapter.encrypt"><a class="viewcode-back" href="../schemes/ibenc_adapt_identityhash.html#ibenc_adapt_identityhash.HashIDAdapter.encrypt">[docs]</a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ibenc</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ct</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ibe_good</span><span class="p">:</span> <span class="k">return</span> <span class="n">IBEnc</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ct</span><span class="p">)</span></div>
+<div class="viewcode-block" id="HashIDAdapter.decrypt"><a class="viewcode-back" href="../schemes/ibenc_adapt_identityhash.html#ibenc_adapt_identityhash.HashIDAdapter.decrypt">[docs]</a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ibenc</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ct</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span></div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/ibenc_adapt_identityhash.html#ibenc_adapt_identityhash.main">[docs]</a>    
     <span class="n">ibe</span> <span class="o">=</span> <span class="n">IBE_BB04</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
     
     <span class="n">hashID</span> <span class="o">=</span> <span class="n">HashIDAdapter</span><span class="p">(</span><span class="n">ibe</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
@@ -115,9 +113,9 @@
     <span class="k">assert</span> <span class="n">m</span> <span class="o">==</span> <span class="n">orig_m</span>
     <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Decryption!!!&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Result =&gt;&quot;</span><span class="p">,</span> <span class="n">orig_m</span><span class="p">)</span>
-    </div>
+    
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span></div>
     <span class="n">main</span><span class="p">()</span>
     
         
@@ -131,7 +129,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -154,14 +152,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

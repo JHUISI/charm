@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>sigmaprotocol &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>sigmaprotocol &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -49,12 +49,14 @@
           <div class="body">
             
   <h1>Source code for sigmaprotocol</h1><div class="highlight"><pre>
-<span class="kn">from</span> <span class="nn">charm.engine.protocol</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">charm.engine.util</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">toolbox.enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+
+<span class="c">#party = Enum(&#39;Prover&#39;, &#39;Verifier&#39;)</span>
 
 <span class="k">class</span> <span class="nc">Sigma</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<div class="viewcode-block" id="Sigma"><a class="viewcode-back" href="../toolbox/sigmaprotocol.html#sigmaprotocol.Sigma">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">,</span> <span class="n">common_input</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>        
-        <span class="n">Protocol</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>  <span class="c"># think of something for handling errors      </span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">,</span> <span class="n">common_input</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>        
+<div class="viewcode-block" id="Sigma"><a class="viewcode-back" href="../toolbox/sigmaprotocol.html#sigmaprotocol.Sigma">[docs]</a>        <span class="n">Protocol</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>  <span class="c"># think of something for handling errors      </span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verifier_states</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">2</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">verifier_state2</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">verifier_state4</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">verifier_state6</span> <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prover_states</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">prover_state1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">prover_state3</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">prover_state5</span> <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">PROVER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">VERIFIER</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>  <span class="c"># PROVER = 1, VERIFIER = 2</span>
@@ -75,23 +77,23 @@
     
     <span class="c"># must be implemented by sub class... </span>
     <span class="k">def</span> <span class="nf">prover_state1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<div class="viewcode-block" id="Sigma.prover_state1"><a class="viewcode-back" href="../toolbox/sigmaprotocol.html#sigmaprotocol.Sigma.prover_state1">[docs]</a>        <span class="k">pass</span>
-    
-    <span class="k">def</span> <span class="nf">prover_state3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span></div>
-<div class="viewcode-block" id="Sigma.prover_state3"><a class="viewcode-back" href="../toolbox/sigmaprotocol.html#sigmaprotocol.Sigma.prover_state3">[docs]</a>        <span class="k">pass</span>
-    
-    <span class="k">def</span> <span class="nf">prover_state5</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span></div>
-<div class="viewcode-block" id="Sigma.prover_state5"><a class="viewcode-back" href="../toolbox/sigmaprotocol.html#sigmaprotocol.Sigma.prover_state5">[docs]</a>        <span class="k">pass</span>
-    
-    <span class="k">def</span> <span class="nf">verifier_state2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span></div>
-<div class="viewcode-block" id="Sigma.verifier_state2"><a class="viewcode-back" href="../toolbox/sigmaprotocol.html#sigmaprotocol.Sigma.verifier_state2">[docs]</a>        <span class="k">pass</span>
-
-    <span class="k">def</span> <span class="nf">verifier_state4</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span></div>
-<div class="viewcode-block" id="Sigma.verifier_state4"><a class="viewcode-back" href="../toolbox/sigmaprotocol.html#sigmaprotocol.Sigma.verifier_state4">[docs]</a>        <span class="k">pass</span>
-    
-    <span class="k">def</span> <span class="nf">verifier_state6</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span></div>
-<div class="viewcode-block" id="Sigma.verifier_state6"><a class="viewcode-back" href="../toolbox/sigmaprotocol.html#sigmaprotocol.Sigma.verifier_state6">[docs]</a>        <span class="k">pass</span>
-</pre></div></div></div>
+        <span class="k">pass</span>
+<div class="viewcode-block" id="Sigma.prover_state1"><a class="viewcode-back" href="../toolbox/sigmaprotocol.html#sigmaprotocol.Sigma.prover_state1">[docs]</a>    
+    <span class="k">def</span> <span class="nf">prover_state3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+<div class="viewcode-block" id="Sigma.prover_state3"><a class="viewcode-back" href="../toolbox/sigmaprotocol.html#sigmaprotocol.Sigma.prover_state3">[docs]</a>    
+    <span class="k">def</span> <span class="nf">prover_state5</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+<div class="viewcode-block" id="Sigma.prover_state5"><a class="viewcode-back" href="../toolbox/sigmaprotocol.html#sigmaprotocol.Sigma.prover_state5">[docs]</a>    
+    <span class="k">def</span> <span class="nf">verifier_state2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+<div class="viewcode-block" id="Sigma.verifier_state2"><a class="viewcode-back" href="../toolbox/sigmaprotocol.html#sigmaprotocol.Sigma.verifier_state2">[docs]</a>
+    <span class="k">def</span> <span class="nf">verifier_state4</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+<div class="viewcode-block" id="Sigma.verifier_state4"><a class="viewcode-back" href="../toolbox/sigmaprotocol.html#sigmaprotocol.Sigma.verifier_state4">[docs]</a>    
+    <span class="k">def</span> <span class="nf">verifier_state6</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+<div class="viewcode-block" id="Sigma.verifier_state6"><a class="viewcode-back" href="../toolbox/sigmaprotocol.html#sigmaprotocol.Sigma.verifier_state6">[docs]</a></pre></div></div></div>
 
           </div>
         </div>
@@ -101,7 +103,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -124,14 +126,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

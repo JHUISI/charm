@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>chamhash_adm05 &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>chamhash_adm05 &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,72 +48,75 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for chamhash_adm05</h1><div class="highlight"><pre>
-<span class="sd">&#39;&#39;&#39; Ateneise-Medeiros (Schnorr group-based)</span>
-<span class="sd"> </span>
-<span class="sd"> | From: &quot;Ateneise-Breno de Medeiros On the Key Exposure Problem in Chameleon Hashes&quot;, Section 4.</span>
-<span class="sd"> | Published in: SCN 2004</span>
-<span class="sd"> | Available from:</span>
-<span class="sd"> | Notes: </span>
+  <h1>Source code for chamhash_adm05</h1><pre>
+ | From: "Ateneise-Breno de Medeiros On the Key Exposure Problem in Chameleon Hashes", Section 4.
+ | Published in: SCN 2004
+ | Available from:
+ | Notes: 
 
-<span class="sd"> * type:         hash function (chameleon)</span>
-<span class="sd"> * setting:      Schnorr groups</span>
-<span class="sd"> * assumption:   DL-Hard</span>
+ * type:         hash function (chameleon)
+ * setting:      Schnorr groups
+ * assumption:   DL-Hard
 
-<span class="sd">:Authors: J Ayo Akinyele</span>
-<span class="sd">:Date:    4/2011</span>
-<span class="sd">&#39;&#39;&#39;</span>
+:Authors: J Ayo Akinyele
+:Date:    4/2011
+'''
 
-<span class="kn">from</span> <span class="nn">toolbox.Hash</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">toolbox.integergroup</span> <span class="kn">import</span> <span class="o">*</span>
+from toolbox.Hash import *
+from toolbox.integergroup import *
 
-<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
-<div class="viewcode-block" id="ChamHash_Adm05"><a class="viewcode-back" href="../schemes/chamhash_adm05.html#chamhash_adm05.ChamHash_Adm05">[docs]</a><span class="k">class</span> <span class="nc">ChamHash_Adm05</span><span class="p">(</span><span class="n">ChamHash</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">ChamHash</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">global</span> <span class="n">group</span><span class="p">;</span> 
-        <span class="n">group</span> <span class="o">=</span> <span class="n">IntegerGroupQ</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">group</span>        
+debug = False
+class ChamHash_Adm05(ChamHash):
+    def __init__(self, p=0, q=0):
+<div class="viewcode-block" id="ChamHash_Adm05"><a class="viewcode-back" href="../schemes/chamhash_adm05.html#chamhash_adm05.ChamHash_Adm05">[docs]</a>        ChamHash.__init__(self)
+        global group; 
+        group = IntegerGroupQ(0)
+        # if p and q parameters have already been selected
+        group.p, group.q, group.r = p, q, 2
+        self.group = group        
     
-<div class="viewcode-block" id="ChamHash_Adm05.paramgen"><a class="viewcode-back" href="../schemes/chamhash_adm05.html#chamhash_adm05.ChamHash_Adm05.paramgen">[docs]</a>    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="o">=</span><span class="mi">1024</span><span class="p">):</span>
-        <span class="n">group</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="n">secparam</span><span class="p">)</span>
-        <span class="n">g</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">randomGen</span><span class="p">(),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="c"># g, [1,q-1]</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">x</span>
+    def paramgen(self, secparam=1024):
+        if group.p == 0 or group.q == 0:
+<div class="viewcode-block" id="ChamHash_Adm05.paramgen"><a class="viewcode-back" href="../schemes/chamhash_adm05.html#chamhash_adm05.ChamHash_Adm05.paramgen">[docs]</a>            group.paramgen(secparam)
+        g, x = group.randomGen(), group.random() # g, [1,q-1]
+        y = g ** x
         
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Public params&quot;</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;g =&gt;&quot;</span><span class="p">,</span> <span class="n">g</span><span class="p">);</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;y =&gt;&quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        if debug:
+            print("Public params")
+            print("g =&gt;", g); print("y =&gt;", y)
         
-        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s">&#39;y&#39;</span><span class="p">:</span><span class="n">y</span> <span class="p">}</span>
-        <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;x&#39;</span><span class="p">:</span><span class="n">x</span> <span class="p">}</span>        
-        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
-    </div>
-<div class="viewcode-block" id="ChamHash_Adm05.hash"><a class="viewcode-back" href="../schemes/chamhash_adm05.html#chamhash_adm05.ChamHash_Adm05.hash">[docs]</a>    <span class="k">def</span> <span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="n">p</span><span class="p">,</span><span class="n">q</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">q</span>
-        <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">r</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>        
-        <span class="n">e</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
-        
-        <span class="n">C</span> <span class="o">=</span> <span class="n">r</span> <span class="o">-</span> <span class="p">(((</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">e</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">))</span> <span class="o">%</span> <span class="n">p</span><span class="p">)</span> <span class="o">%</span> <span class="n">q</span>
-        <span class="k">return</span> <span class="n">C</span>
-</div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/chamhash_adm05.html#chamhash_adm05.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>    
-    <span class="n">chamHash</span> <span class="o">=</span> <span class="n">ChamHash_Adm05</span><span class="p">()</span>
+        pk = { 'g':g, 'y':y }
+        sk = { 'x':x }        
+        return (pk, sk)
     
-    <span class="c">#TODO: how long is paramgen supposed to take?</span>
-    <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">chamHash</span><span class="o">.</span><span class="n">paramgen</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;pk =&gt; &quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;sk =&gt; &quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>    
+    def hash(self, pk, m, r = 0):
+        p,q = group.p, group.q</div>
+<div class="viewcode-block" id="ChamHash_Adm05.hash"><a class="viewcode-back" href="../schemes/chamhash_adm05.html#chamhash_adm05.ChamHash_Adm05.hash">[docs]</a>        if r == 0: r = group.random()
+        s = group.random()        
+        e = group.hash(m, r)
+        
+        C = r - (((pk['y'] ** e) * (pk['g'] ** s)) % p) % q
+        return C
 
-    <span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;hello world this is the message&quot;</span>
-    <span class="n">c</span> <span class="o">=</span> <span class="n">chamHash</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+def main():    
+    # fixed params for unit tests</div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/chamhash_adm05.html#chamhash_adm05.main">[docs]</a>    p = integer(141660875619984104245410764464185421040193281776686085728248762539241852738181649330509191671665849071206347515263344232662465937366909502530516774705282764748558934610432918614104329009095808618770549804432868118610669336907161081169097403439689930233383598055540343198389409225338204714777812724565461351567)
+    q = integer(70830437809992052122705382232092710520096640888343042864124381269620926369090824665254595835832924535603173757631672116331232968683454751265258387352641382374279467305216459307052164504547904309385274902216434059305334668453580540584548701719844965116691799027770171599194704612669102357388906362282730675783)
+    chamHash = ChamHash_Adm05(p, q)
+    #TODO: how long is paramgen supposed to take?
+    (pk, sk) = chamHash.paramgen()
+    if debug: print("pk =&gt; ", pk)
+    if debug: print("sk =&gt; ", sk)    
+
+    msg = "hello world this is the message"
+    c = chamHash.hash(pk, msg)
     
-    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
-</div>
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
-    <span class="n">main</span><span class="p">()</span>
-</pre></div>
+    if debug: print("sig =&gt;", c)
+
+if __name__ == "__main__":
+    debug = True</div>
+    main()
+</pre>
 
           </div>
         </div>
@@ -123,7 +126,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -146,14 +149,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

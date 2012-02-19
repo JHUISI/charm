@@ -1,0 +1,228 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>symcrypto &mdash; Charm-Crypto 0.4b documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.4b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for symcrypto</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">sha1</span> <span class="k">as</span> <span class="n">sha1hashlib</span>
+<span class="kn">from</span> <span class="nn">toolbox.conversion</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">toolbox.paddingschemes</span> <span class="kn">import</span>  <span class="n">PKCS7Padding</span>
+<span class="kn">from</span> <span class="nn">toolbox.securerandom</span> <span class="kn">import</span> <span class="n">OpenSSLRand</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">hmac</span>
+<span class="kn">from</span> <span class="nn">base64</span> <span class="kn">import</span> <span class="n">b64encode</span><span class="p">,</span><span class="n">b64decode</span>
+
+<span class="k">class</span> <span class="nc">MessageAuthenticator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Abstraction for constructing and verifying authenticated messages </span>
+<div class="viewcode-block" id="MessageAuthenticator"><a class="viewcode-back" href="../toolbox/symcrypto.html#symcrypto.MessageAuthenticator">[docs]</a><span class="sd">        </span>
+<span class="sd">    &gt;&gt;&gt; from toolbox.pairinggroup import PairingGroup,GT</span>
+<span class="sd">    &gt;&gt;&gt; from charm.pairing import hash as extractor</span>
+<span class="sd">    &gt;&gt;&gt; groupObj = PairingGroup(&#39;SS512&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; key = groupObj.random(GT)</span>
+<span class="sd">    &gt;&gt;&gt; m = MessageAuthenticator(extractor(key))</span>
+<span class="sd">    &gt;&gt;&gt; AuthenticatedMessage = m.mac(&#39;Hello World&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; m.verify(AuthenticatedMessage)</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">,</span> <span class="n">alg</span> <span class="o">=</span> <span class="s">&quot;HMAC_SHA1&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a message authenticator and verifier under the specified key</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">alg</span> <span class="o">!=</span> <span class="s">&quot;HMAC_SHA1&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Currently only HMAC_SHA1 is supportated as an algorithm&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_algorithm</span> <span class="o">=</span> <span class="n">alg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_key</span> <span class="o">=</span> <span class="n">key</span>    
+    <span class="k">def</span> <span class="nf">mac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">msg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MessageAuthenticator.mac"><a class="viewcode-back" href="../toolbox/symcrypto.html#symcrypto.MessageAuthenticator.mac">[docs]</a><span class="sd">        authenticates a message </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+                <span class="s">&quot;alg&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_algorithm</span><span class="p">,</span>
+                <span class="s">&quot;msg&quot;</span><span class="p">:</span> <span class="n">msg</span><span class="p">,</span> 
+                <span class="s">&quot;digest&quot;</span><span class="p">:</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">,</span><span class="nb">bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_algorithm</span> <span class="o">+</span> <span class="n">msg</span><span class="p">,</span><span class="s">&quot;utf-8&quot;</span><span class="p">),</span><span class="n">digestmod</span><span class="o">=</span><span class="n">sha1hashlib</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+               <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">msgAndDigest</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span></div>
+<div class="viewcode-block" id="MessageAuthenticator.verify"><a class="viewcode-back" href="../toolbox/symcrypto.html#symcrypto.MessageAuthenticator.verify">[docs]</a><span class="sd">        verifies the result returned by mac</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">msgAndDigest</span><span class="p">[</span><span class="s">&#39;alg&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_algorithm</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+        <span class="n">expected</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mac</span><span class="p">(</span><span class="n">msgAndDigest</span><span class="p">[</span><span class="s">&#39;msg&#39;</span><span class="p">])[</span><span class="s">&#39;digest&#39;</span><span class="p">],</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="n">recieved</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">msgAndDigest</span><span class="p">[</span><span class="s">&#39;digest&#39;</span><span class="p">],</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sha1hashlib</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span> <span class="o">==</span> <span class="n">sha1hashlib</span><span class="p">(</span><span class="n">recieved</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span> <span class="c"># we compare the hash instead of the direct value to avoid a timing attack</span>
+
+<span class="k">class</span> <span class="nc">SymmetricCryptoAbstraction</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span></div></div>
+<div class="viewcode-block" id="SymmetricCryptoAbstraction"><a class="viewcode-back" href="../toolbox/symcrypto.html#symcrypto.SymmetricCryptoAbstraction">[docs]</a><span class="sd">    Abstraction for symmetric encryption and decryption of data.</span>
+<span class="sd">    Ideally provide an INDCCA2 secure symmetric container for arbitrary data.</span>
+<span class="sd">    Currently only supports primitives that JSON can encode and decode.</span>
+
+<span class="sd">    usage:</span>
+<span class="sd">    &gt;&gt;&gt; from toolbox.pairinggroup import PairingGroup,GT</span>
+<span class="sd">    &gt;&gt;&gt; groupObj = PairingGroup(&#39;SS512&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; from charm.pairing import hash as sha1</span>
+<span class="sd">    &gt;&gt;&gt; a = SymmetricCryptoAbstraction(sha1(groupObj.random(GT)))</span>
+<span class="sd">    &gt;&gt;&gt; ct = a.encrypt(&quot;Friendly Fire Isn&#39;t&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; a.decrypt(ct)</span>
+<span class="sd">    &quot;Friendly Fire Isn&#39;t&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">,</span> <span class="n">alg</span> <span class="o">=</span> <span class="n">AES</span><span class="p">,</span> <span class="n">mode</span> <span class="o">=</span> <span class="n">MODE_CBC</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_alg</span> <span class="o">=</span> <span class="n">alg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_len</span> <span class="o">=</span> <span class="mi">16</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_block_size</span> <span class="o">=</span> <span class="mi">16</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">=</span> <span class="n">mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_key</span> <span class="o">=</span> <span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">key_len</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_padding</span> <span class="o">=</span> <span class="n">PKCS7Padding</span><span class="p">();</span>
+ 
+    <span class="k">def</span> <span class="nf">_initCipher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">IV</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">IV</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">:</span>
+            <span class="n">IV</span> <span class="o">=</span>  <span class="n">OpenSSLRand</span><span class="p">()</span><span class="o">.</span><span class="n">getRandomBytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_block_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_IV</span> <span class="o">=</span> <span class="n">IV</span>
+        <span class="k">return</span> <span class="n">selectPRP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_alg</span><span class="p">,(</span><span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_IV</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__encode_decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="n">func</span><span class="p">):</span>
+        <span class="n">data</span><span class="p">[</span><span class="s">&#39;IV&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;IV&#39;</span><span class="p">])</span>
+        <span class="n">data</span><span class="p">[</span><span class="s">&#39;CipherText&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;CipherText&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">data</span>
+
+    <span class="c">#This code should be factored out into  another class</span>
+    <span class="c">#Because json is only defined over strings, we need to base64 encode the encrypted data</span>
+    <span class="c"># and convery the base 64 byte array into a utf8 string</span>
+    <span class="k">def</span> <span class="nf">_encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__encode_decode</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">b64encode</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__encode_decode</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">b64decode</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="s">&#39;utf-8&#39;</span><span class="p">)))</span>
+
+    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="c">#This should be removed when all crypto functions deal with bytes&quot;</span>
+<div class="viewcode-block" id="SymmetricCryptoAbstraction.encrypt"><a class="viewcode-back" href="../toolbox/symcrypto.html#symcrypto.SymmetricCryptoAbstraction.encrypt">[docs]</a>        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">bytes</span> <span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">message</span><span class="p">,</span><span class="s">&quot;utf-8&quot;</span><span class="p">)</span>
+        <span class="n">ct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encrypt</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="c">#JSON strings cannot have binary data in them, so we must base64 encode  cipher</span>
+        <span class="n">cte</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encode</span><span class="p">(</span><span class="n">ct</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">cte</span>
+
+    <span class="k">def</span> <span class="nf">_encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">message</span><span class="p">):</span>
+        <span class="c">#Because the IV cannot be set after instantiation, decrypt and encrypt </span></div>
+        <span class="c"># must operate on their own instances of the cipher </span>
+        <span class="n">cipher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initCipher</span><span class="p">()</span> 
+        <span class="n">ct</span><span class="o">=</span> <span class="p">{</span><span class="s">&#39;ALG&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_alg</span><span class="p">,</span>
+            <span class="s">&#39;MODE&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="p">,</span>
+            <span class="s">&#39;IV&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_IV</span><span class="p">,</span>
+            <span class="s">&#39;CipherText&#39;</span><span class="p">:</span><span class="n">cipher</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_padding</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">message</span><span class="p">))</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="n">ct</span>
+
+    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">cipherText</span><span class="p">):</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">cipherText</span><span class="p">)</span>
+<div class="viewcode-block" id="SymmetricCryptoAbstraction.decrypt"><a class="viewcode-back" href="../toolbox/symcrypto.html#symcrypto.SymmetricCryptoAbstraction.decrypt">[docs]</a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_decrypt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_decode</span><span class="p">(</span><span class="n">f</span><span class="p">))</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&quot;utf-8&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">cipherText</span><span class="p">):</span>
+        <span class="n">cipher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initCipher</span><span class="p">(</span><span class="n">cipherText</span><span class="p">[</span><span class="s">&#39;IV&#39;</span><span class="p">])</span></div>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">cipherText</span><span class="p">[</span><span class="s">&#39;CipherText&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_padding</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        
+<span class="k">class</span> <span class="nc">AuthenticatedCryptoAbstraction</span><span class="p">(</span><span class="n">SymmetricCryptoAbstraction</span><span class="p">):</span> 
+    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">msg</span><span class="p">):</span></div>
+<div class="viewcode-block" id="AuthenticatedCryptoAbstraction"><a class="viewcode-back" href="../toolbox/symcrypto.html#symcrypto.AuthenticatedCryptoAbstraction">[docs]</a>        <span class="n">mac</span> <span class="o">=</span> <span class="n">MessageAuthenticator</span><span class="p">(</span><span class="n">sha1hashlib</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;Poor Mans Key Extractor&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span> <span class="c"># warning only valid in the random oracle </span>
+<div class="viewcode-block" id="AuthenticatedCryptoAbstraction.encrypt"><a class="viewcode-back" href="../toolbox/symcrypto.html#symcrypto.AuthenticatedCryptoAbstraction.encrypt">[docs]</a>        <span class="n">enc</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">AuthenticatedCryptoAbstraction</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mac</span><span class="o">.</span><span class="n">mac</span><span class="p">(</span><span class="n">enc</span><span class="p">);</span>
+    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">cipherText</span><span class="p">):</span> 
+        <span class="n">mac</span> <span class="o">=</span> <span class="n">MessageAuthenticator</span><span class="p">(</span><span class="n">sha1hashlib</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;Poor Mans Key Extractor&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span> <span class="c"># warning only valid in the random oracle </span></div>
+<div class="viewcode-block" id="AuthenticatedCryptoAbstraction.decrypt"><a class="viewcode-back" href="../toolbox/symcrypto.html#symcrypto.AuthenticatedCryptoAbstraction.decrypt">[docs]</a>        <span class="k">if</span> <span class="ow">not</span>  <span class="n">mac</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">cipherText</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Invalid mac. Your data was tampered with or your key is wrong&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AuthenticatedCryptoAbstraction</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">cipherText</span><span class="p">[</span><span class="s">&#39;msg&#39;</span><span class="p">])</span>
+</pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

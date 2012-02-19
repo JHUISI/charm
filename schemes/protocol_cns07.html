@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>protocol_cns07 &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>protocol_cns07 &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,10 +25,10 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
     <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
     <link rel="next" title="protocol_schnorr91" href="protocol_schnorr91.html" />
-    <link rel="prev" title="pksig_waters05" href="pksig_waters05.html" /> 
+    <link rel="prev" title="pksig_waters09" href="pksig_waters09.html" /> 
   </head>
   <body>
     <div class="related">
@@ -44,9 +44,9 @@
           <a href="protocol_schnorr91.html" title="protocol_schnorr91"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="pksig_waters05.html" title="pksig_waters05"
+          <a href="pksig_waters09.html" title="pksig_waters09"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -58,15 +58,35 @@
             
   <div class="section" id="module-protocol_cns07">
 <span id="protocol-cns07"></span><h1>protocol_cns07<a class="headerlink" href="#module-protocol_cns07" title="Permalink to this headline">¶</a></h1>
+<p>Camenisch-Neven-shelat - Oblivious Transfer</p>
+<div class="line-block">
+<div class="line">From: &#8220;J. Camenisch, G. Neven, a. shelat - Simulatable Adaptive Oblivious Transfer&#8221;</div>
+<div class="line">Published in: EUROCRYPT 2007</div>
+<div class="line">Available from: <a class="reference external" href="http://eprint.iacr.org/2008/014">http://eprint.iacr.org/2008/014</a></div>
+<div class="line">Notes: </div>
+</div>
+<ul class="simple">
+<li>type:           signature (ID-based)</li>
+<li>setting:        bilinear groups (asymmetric)</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body"><ol class="first upperalpha simple" start="10">
+<li>Ayo Akinyele</li>
+</ol>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body"><p class="first last">2/2012</p>
+</td>
+</tr>
+</tbody>
+</table>
 <dl class="class">
 <dt id="protocol_cns07.ObliviousTransfer">
 <em class="property">class </em><tt class="descclassname">protocol_cns07.</tt><tt class="descname">ObliviousTransfer</tt><big>(</big><em>messages=None</em>, <em>groupObj=None</em>, <em>common_input=None</em><big>)</big><a class="reference internal" href="../_modules/protocol_cns07.html#ObliviousTransfer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">charm.engine.protocol.Protocol</span></tt></p>
-<dl class="method">
-<dt id="protocol_cns07.ObliviousTransfer.encrypt">
-<tt class="descname">encrypt</tt><big>(</big><em>key</em>, <em>data</em><big>)</big><a class="reference internal" href="../_modules/protocol_cns07.html#ObliviousTransfer.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.encrypt" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="method">
 <dt id="protocol_cns07.ObliviousTransfer.get_common">
 <tt class="descname">get_common</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/protocol_cns07.html#ObliviousTransfer.get_common"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.get_common" title="Permalink to this definition">¶</a></dt>
@@ -128,8 +148,8 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="pksig_waters05.html"
-                        title="previous chapter">pksig_waters05</a></p>
+  <p class="topless"><a href="pksig_waters09.html"
+                        title="previous chapter">pksig_waters09</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="protocol_schnorr91.html"
                         title="next chapter">protocol_schnorr91</a></p>
@@ -141,7 +161,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -168,16 +188,16 @@
           <a href="protocol_schnorr91.html" title="protocol_schnorr91"
              >next</a> |</li>
         <li class="right" >
-          <a href="pksig_waters05.html" title="pksig_waters05"
+          <a href="pksig_waters09.html" title="pksig_waters09"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

@@ -1,0 +1,7 @@
+
+groupsig_bgls04_var
+=========================================
+.. automodule:: groupsig_bgls04_var
+    :show-inheritance:
+    :members:
+    :undoc-members:

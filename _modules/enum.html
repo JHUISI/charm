@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>enum &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>enum &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -49,10 +49,8 @@
           <div class="body">
             
   <h1>Source code for enum</h1><div class="highlight"><pre>
-<span class="c"># code adapted from active state code recipes for enumeration</span>
-<div class="viewcode-block" id="Enum"><a class="viewcode-back" href="../toolbox/enum.html#enum.Enum">[docs]</a><span class="k">def</span> <span class="nf">Enum</span><span class="p">(</span><span class="o">*</span><span class="n">names</span><span class="p">):</span>
       <span class="k">class</span> <span class="nc">EnumClass</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-         <span class="n">__slots__</span> <span class="o">=</span> <span class="n">names</span>
+<div class="viewcode-block" id="Enum"><a class="viewcode-back" href="../toolbox/enum.html#enum.Enum">[docs]</a>         <span class="n">__slots__</span> <span class="o">=</span> <span class="n">names</span>
          <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="n">constants</span><span class="p">)</span>
          <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">constants</span><span class="p">)</span>
          <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>  
@@ -107,8 +105,8 @@
           <span class="n">lookup</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)]</span> <span class="o">=</span> <span class="n">i</span>
       <span class="n">constants</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">constants</span><span class="p">)</span>
       <span class="n">EnumType</span> <span class="o">=</span> <span class="n">EnumClass</span><span class="p">()</span>
-      <span class="k">return</span> <span class="n">EnumType</span></div>
-</pre></div>
+      <span class="k">return</span> <span class="n">EnumType</span>
+</pre></div></div>
 
           </div>
         </div>
@@ -118,7 +116,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -141,14 +139,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

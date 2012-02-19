@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>How To Get Started &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>How To Get Started &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="index.html" />
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="index.html" />
     <link rel="next" title="Demonstration Schemes" href="schemes.html" />
     <link rel="prev" title="Platform Install Manual" href="install_source.html" /> 
   </head>
@@ -45,7 +45,7 @@
         <li class="right" >
           <a href="install_source.html" title="Platform Install Manual"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li> 
+        <li><a href="index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -164,9 +164,54 @@
 <span class="n">message</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ciphertext</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">To support serialization of key material and ciphertexts, we have provided a <tt class="docutils literal"><span class="pre">serialize</span></tt> and <tt class="docutils literal"><span class="pre">deserialize</span></tt> routine available in the <tt class="docutils literal"><span class="pre">charm.engine.util</span></tt> package.</p>
+</div>
+<div class="section" id="group-abstractions">
+<h2>Group Abstractions<a class="headerlink" href="#group-abstractions" title="Permalink to this headline">¶</a></h2>
+<p>We now describe how to take advantage of Charm&#8217;s group abstraction. Modern cryptographic algorithms are typically implemented on top of mathematical groups based on certain hardness assumptions (e.g., Diffie-Hellman). We provide the same building blocks to facilitate development in this way of thinking:</p>
+<p>At the moment, there are three cryptographic settings covered by Charm: <tt class="docutils literal"><span class="pre">integergroups</span></tt>, <tt class="docutils literal"><span class="pre">ecgroups</span></tt>, and <tt class="docutils literal"><span class="pre">pairinggroups</span></tt>.
+To initialize a group in the EC, refer to the toolbox.eccurve for all the full set of identifiers for supported NIST approved curves (e.g., <tt class="docutils literal"><span class="pre">prime192v1</span></tt>). For EC with billinear maps (or pairings), we provide a set of identifiers for both symmetric and asymmetric curves. For example, the <tt class="docutils literal"><span class="pre">'SS512'</span></tt> represents a symmetric curve with a 512-bit base field and <tt class="docutils literal"><span class="pre">'MNT159'</span></tt> represents an asymmetric curve with 159-bit base field.
+Finally, for integer groups, typically defining large primes <tt class="docutils literal"><span class="pre">p</span></tt> and <tt class="docutils literal"><span class="pre">q</span></tt> is enough to generate an RSA group. For schnorr groups, these group parameters may take some time to generate because they require safe primes (e.g., <tt class="docutils literal"><span class="pre">p</span> <span class="pre">=</span> <span class="pre">2q</span> <span class="pre">+</span> <span class="pre">1</span></tt>). Here are detailed examples below for integer and pairing groups (see above for EC group initialization):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">toolbox.integergroup</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">group1</span> <span class="o">=</span> <span class="n">IntegerGroup</span><span class="p">()</span>
+<span class="n">group1</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+
+<span class="n">g</span> <span class="o">=</span> <span class="n">group1</span><span class="o">.</span><span class="n">randomGen</span><span class="p">()</span>
+
+<span class="kn">from</span> <span class="nn">toolbox.pairinggroup</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">group2</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+
+<span class="n">g</span> <span class="o">=</span> <span class="n">group2</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-serialization-api">
+<h2>Using serialization API<a class="headerlink" href="#using-serialization-api" title="Permalink to this headline">¶</a></h2>
+<p>To support serialization of key material and ciphertexts, we provide two high-level API calls to serialize charm objects in arbitrary python structures (e.g., lists, tuples, or dictionaries, etc): <tt class="docutils literal"><span class="pre">objectToBytes()</span></tt> and <tt class="docutils literal"><span class="pre">bytesToObject()</span></tt> from the <tt class="docutils literal"><span class="pre">charm.engine.util</span></tt> provide the necessary functionality for converting keys and ciphertexts to base 64 encoded strings. Both calls require the object to be serialized/deserialized and a class that defines the serialize and deserialize methods such as the group object.
+We show later how to customize our serialization routines for your purposes:</p>
+<p>Here is an example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.engine.util</span> <span class="kn">import</span> <span class="n">objectToBytes</span><span class="p">,</span><span class="n">bytesToObject</span>
+
+<span class="n">pk_bytes</span> <span class="o">=</span> <span class="n">objectToBytes</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
+
+<span class="n">orig_pk</span> <span class="o">=</span> <span class="n">bytesToObject</span><span class="p">(</span><span class="n">pk_bytes</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you&#8217;d like to define your custom serialization routine in conjunction with our API, the following example works for schemes based on the integergroup which in some cases do not utilize a group object:</p>
+<div class="highlight-python"><pre>from charm.integer import integer,serialize,deserialize
+
+class mySerializeAPI:
+        def __init__(self)
+                ...
+
+        def serialize(self, charm_object):
+            assert type(charm_object) == integer, "required type is integer, not: ", type(charm_object)
+            return serialize(charm_object)
+
+        def deserialize(self, object):
+            assert type(object) == bytes, "required type is bytes, not: ", type(object)
+            return deserialize(object)</pre>
 </div>
 <p>Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at <a class="reference external" href="mailto:support&#37;&#52;&#48;charm-crypto&#46;com">support<span>&#64;</span>charm-crypto<span>&#46;</span>com</a>. Thank you!</p>
 </div>
@@ -184,6 +229,8 @@
 <li><a class="reference internal" href="#installation-and-dependencies">Installation and dependencies</a></li>
 <li><a class="reference internal" href="#implement-a-scheme">Implement a Scheme</a></li>
 <li><a class="reference internal" href="#using-a-scheme">Using a Scheme</a></li>
+<li><a class="reference internal" href="#group-abstractions">Group Abstractions</a></li>
+<li><a class="reference internal" href="#using-serialization-api">Using serialization API</a></li>
 </ul>
 </li>
 </ul>
@@ -202,7 +249,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -231,13 +278,13 @@
         <li class="right" >
           <a href="install_source.html" title="Platform Install Manual"
              >previous</a> |</li>
-        <li><a href="index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li> 
+        <li><a href="index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

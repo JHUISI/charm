@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pksig_chch &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>pksig_chch &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,89 +48,86 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for pksig_chch</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot; </span>
-<span class="sd">Jae Choon Cha and Jung Hee Cheon - Identity-based Signatures</span>
+  <h1>Source code for pksig_chch</h1><pre>
 
-<span class="sd">| From: &quot;J. Cha and J. Choen - An identity-based signature from gap Diffie-Hellman groups.&quot;</span>
-<span class="sd">| Published in: PKC 2003</span>
-<span class="sd">| Available from: Vol. 2567. LNCS, pages 18-30</span>
-<span class="sd">| Notes: </span>
+| From: "J. Cha and J. Choen - An identity-based signature from gap Diffie-Hellman groups."
+| Published in: PKC 2003
+| Available from: Vol. 2567. LNCS, pages 18-30
+| Notes: 
 
-<span class="sd">* type:           signature (ID-based)</span>
-<span class="sd">* setting:        bilinear groups (asymmetric)</span>
+* type:           signature (ID-based)
+* setting:        bilinear groups (asymmetric)
 
-<span class="sd">:Authors:    J. Ayo Akinyele</span>
-<span class="sd">:Date:       11/2011</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">charm.pairing</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">toolbox.PKSig</span> <span class="kn">import</span> <span class="n">PKSig</span>
+:Authors:    J. Ayo Akinyele
+:Date:       11/2011
+"""
+from toolbox.pairinggroup import *
+from toolbox.PKSig import PKSig
 
-<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+debug = False
 
-<div class="viewcode-block" id="CHCH"><a class="viewcode-back" href="../schemes/pksig_chch.html#pksig_chch.CHCH">[docs]</a><span class="k">class</span> <span class="nc">CHCH</span><span class="p">(</span><span class="n">PKSig</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
-        <span class="k">global</span> <span class="n">group</span>
-        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+class CHCH(PKSig):
+    def __init__(self, groupObj):
+<div class="viewcode-block" id="CHCH"><a class="viewcode-back" href="../schemes/pksig_chch.html#pksig_chch.CHCH">[docs]</a>        global group,H1,H2
+        group = groupObj
+        H1 = lambda x: group.hash(x, G1)
+        H2 = lambda x,y: group.hash((x,y), ZR)
         
-<div class="viewcode-block" id="CHCH.setup"><a class="viewcode-back" href="../schemes/pksig_chch.html#pksig_chch.CHCH.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">global</span> <span class="n">H1</span><span class="p">,</span><span class="n">H2</span>
-        <span class="n">H1</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">H</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">G1</span><span class="p">)</span>
-        <span class="n">H2</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">H</span><span class="p">((</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">),</span> <span class="n">ZR</span><span class="p">)</span>
-        <span class="n">g2</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
-        <span class="n">msk</span> <span class="o">=</span> <span class="n">alpha</span>
-        <span class="n">P</span> <span class="o">=</span> <span class="n">g2</span> <span class="o">**</span> <span class="n">alpha</span> 
-        <span class="n">mpk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;P&#39;</span><span class="p">:</span><span class="n">P</span><span class="p">,</span> <span class="s">&#39;g2&#39;</span><span class="p">:</span><span class="n">g2</span><span class="p">}</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span>
-</div>
-<div class="viewcode-block" id="CHCH.keygen"><a class="viewcode-back" href="../schemes/pksig_chch.html#pksig_chch.CHCH.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msk</span><span class="p">,</span> <span class="n">ID</span><span class="p">):</span>
-        <span class="n">alpha</span> <span class="o">=</span> <span class="n">msk</span>
-        <span class="n">sk</span> <span class="o">=</span> <span class="n">H1</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span> <span class="o">**</span> <span class="n">alpha</span>
-        <span class="n">pk</span> <span class="o">=</span> <span class="n">H1</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
-    </div>
-<div class="viewcode-block" id="CHCH.sign"><a class="viewcode-back" href="../schemes/pksig_chch.html#pksig_chch.CHCH.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;sign...&quot;</span><span class="p">)</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
-        <span class="n">S1</span> <span class="o">=</span> <span class="n">pk</span> <span class="o">**</span> <span class="n">s</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="n">H2</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">S1</span><span class="p">)</span>
-        <span class="n">S2</span> <span class="o">=</span> <span class="n">sk</span> <span class="o">**</span> <span class="p">(</span><span class="n">s</span> <span class="o">+</span> <span class="n">a</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;S1&#39;</span><span class="p">:</span><span class="n">S1</span><span class="p">,</span> <span class="s">&#39;S2&#39;</span><span class="p">:</span><span class="n">S2</span><span class="p">}</span>
-    </div>
-<div class="viewcode-block" id="CHCH.verify"><a class="viewcode-back" href="../schemes/pksig_chch.html#pksig_chch.CHCH.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;verify...&quot;</span><span class="p">)</span>
-        <span class="p">(</span><span class="n">S1</span><span class="p">,</span> <span class="n">S2</span><span class="p">)</span> <span class="o">=</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;S1&#39;</span><span class="p">],</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;S2&#39;</span><span class="p">]</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="n">H2</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">S1</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">pair</span><span class="p">(</span><span class="n">S2</span><span class="p">,</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="n">pair</span><span class="p">(</span><span class="n">S1</span> <span class="o">*</span> <span class="p">(</span><span class="n">pk</span> <span class="o">**</span> <span class="n">a</span><span class="p">),</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;P&#39;</span><span class="p">]):</span> 
-            <span class="k">return</span> <span class="bp">True</span>
-        <span class="k">return</span> <span class="bp">False</span>
-</div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pksig_chch.html#pksig_chch.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-   <span class="n">groupObj</span> <span class="o">=</span> <span class="n">pairing</span><span class="p">(</span><span class="s">&#39;../param/a.param&#39;</span><span class="p">)</span>
-   <span class="n">chch</span> <span class="o">=</span> <span class="n">CHCH</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
-   <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span> <span class="o">=</span> <span class="n">chch</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+    def setup(self):
+        g2, alpha = group.random(G2), group.random(ZR)
+<div class="viewcode-block" id="CHCH.setup"><a class="viewcode-back" href="../schemes/pksig_chch.html#pksig_chch.CHCH.setup">[docs]</a>        msk = alpha
+        P = g2 ** alpha 
+        mpk = {'P':P, 'g2':g2}
+        return (mpk, msk)
 
-   <span class="n">_id</span> <span class="o">=</span> <span class="s">&quot;janedoe@email.com&quot;</span>
-   <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">chch</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">msk</span><span class="p">,</span> <span class="n">_id</span><span class="p">)</span>  
-   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Keygen...&quot;</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">&quot;pk =&gt;&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">&quot;sk =&gt;&quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+    def keygen(self, msk, ID):
+        alpha = msk</div>
+<div class="viewcode-block" id="CHCH.keygen"><a class="viewcode-back" href="../schemes/pksig_chch.html#pksig_chch.CHCH.keygen">[docs]</a>        sk = H1(ID) ** alpha
+        pk = H1(ID)
+        return (pk, sk)
+    
+    def sign(self, pk, sk, M):
+        if debug: print("sign...")</div>
+<div class="viewcode-block" id="CHCH.sign"><a class="viewcode-back" href="../schemes/pksig_chch.html#pksig_chch.CHCH.sign">[docs]</a>        s = group.random(ZR)
+        S1 = pk ** s
+        a = H2(M, S1)
+        S2 = sk ** (s + a)
+        return {'S1':S1, 'S2':S2}
+    
+    def verify(self, mpk, pk, M, sig):
+        if debug: print("verify...")</div>
+<div class="viewcode-block" id="CHCH.verify"><a class="viewcode-back" href="../schemes/pksig_chch.html#pksig_chch.CHCH.verify">[docs]</a>        (S1, S2) = sig['S1'], sig['S2']
+        a = H2(M, S1)
+        if pair(S2, mpk['g2']) == pair(S1 * (pk ** a), mpk['P']): 
+            return True
+        return False
+
+def main():
+   groupObj = PairingGroup('SS512')</div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pksig_chch.html#pksig_chch.main">[docs]</a>   chch = CHCH(groupObj)
+   (mpk, msk) = chch.setup()
+
+   _id = "janedoe@email.com"
+   (pk, sk) = chch.keygen(msk, _id)  
+   if debug:
+    print("Keygen...")
+    print("pk =&gt;", pk)
+    print("sk =&gt;", sk)
  
-   <span class="n">M</span> <span class="o">=</span> <span class="s">&quot;this is a message!&quot;</span> 
-   <span class="n">sig</span> <span class="o">=</span> <span class="n">chch</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
-   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature...&quot;</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+   M = "this is a message!" 
+   sig = chch.sign(pk, sk, M)
+   if debug:
+    print("Signature...")
+    print("sig =&gt;", sig)
 
-   <span class="k">assert</span> <span class="n">chch</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s">&quot;invalid signature!&quot;</span>
-   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verification successful!&quot;</span><span class="p">)</span>
-</div>
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
-    <span class="n">main</span><span class="p">()</span>
+   assert chch.verify(mpk, pk, M, sig), "invalid signature!"
+   if debug: print("Verification successful!")
+
+if __name__ == "__main__":
+    debug = True</div>
+    main()
    
-</pre></div>
+</pre>
 
           </div>
         </div>
@@ -140,7 +137,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -163,14 +160,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

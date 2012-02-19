@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pkenc_cs98 &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>pkenc_cs98 &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -49,8 +49,6 @@
           <div class="body">
             
   <h1>Source code for pkenc_cs98</h1><div class="highlight"><pre>
-<span class="c">#!/usr/bin/python</span>
-
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">Cramer-Shoup Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption in groups of prime order)</span>
 <span class="sd"> </span>
@@ -64,19 +62,21 @@
 <span class="sd">* assumption:	DDH</span>
 
 <span class="sd">:Authors:	Matthew Green</span>
-<span class="sd">:Date:			1/2011</span>
+<span class="sd">:Date:		1/2011</span>
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="kn">from</span> <span class="nn">toolbox.integergroup</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">toolbox.PKEnc</span> <span class="kn">import</span> <span class="o">*</span>
 
 <span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
-<div class="viewcode-block" id="CS98"><a class="viewcode-back" href="../schemes/pkenc_cs98.html#pkenc_cs98.CS98">[docs]</a><span class="k">class</span> <span class="nc">CS98</span><span class="p">(</span><span class="n">PKEnc</span><span class="p">):</span>	
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">global</span> <span class="n">group</span>
+<span class="k">class</span> <span class="nc">CS98</span><span class="p">(</span><span class="n">PKEnc</span><span class="p">):</span>	
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="CS98"><a class="viewcode-back" href="../schemes/pkenc_cs98.html#pkenc_cs98.CS98">[docs]</a>        <span class="k">global</span> <span class="n">group</span>
         <span class="n">group</span> <span class="o">=</span> <span class="n">IntegerGroup</span><span class="p">()</span>
+        <span class="n">group</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">q</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="mi">2</span>
            
-<div class="viewcode-block" id="CS98.keygen"><a class="viewcode-back" href="../schemes/pkenc_cs98.html#pkenc_cs98.CS98.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="p">):</span>
-        <span class="n">group</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="n">secparam</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">group</span><span class="o">.</span><span class="n">p</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">group</span><span class="o">.</span><span class="n">q</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<div class="viewcode-block" id="CS98.keygen"><a class="viewcode-back" href="../schemes/pkenc_cs98.html#pkenc_cs98.CS98.keygen">[docs]</a>            <span class="n">group</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="n">secparam</span><span class="p">)</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">p</span>
         <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">randomGen</span><span class="p">(),</span> <span class="n">group</span><span class="o">.</span><span class="n">randomGen</span><span class="p">()</span>
         
@@ -89,10 +89,10 @@
         <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;g1&#39;</span> <span class="p">:</span> <span class="n">g1</span><span class="p">,</span> <span class="s">&#39;g2&#39;</span> <span class="p">:</span> <span class="n">g2</span><span class="p">,</span> <span class="s">&#39;c&#39;</span> <span class="p">:</span> <span class="n">c</span><span class="p">,</span> <span class="s">&#39;d&#39;</span> <span class="p">:</span> <span class="n">d</span><span class="p">,</span> <span class="s">&#39;h&#39;</span> <span class="p">:</span> <span class="n">h</span> <span class="p">}</span>
         <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;x1&#39;</span> <span class="p">:</span> <span class="n">x1</span><span class="p">,</span> <span class="s">&#39;x2&#39;</span> <span class="p">:</span> <span class="n">x2</span><span class="p">,</span> <span class="s">&#39;y1&#39;</span> <span class="p">:</span> <span class="n">y1</span><span class="p">,</span> <span class="s">&#39;y2&#39;</span> <span class="p">:</span> <span class="n">y2</span><span class="p">,</span> <span class="s">&#39;z&#39;</span> <span class="p">:</span> <span class="n">z</span> <span class="p">}</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
-</div>
-<div class="viewcode-block" id="CS98.encrypt"><a class="viewcode-back" href="../schemes/pkenc_cs98.html#pkenc_cs98.CS98.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>	
-        <span class="n">r</span>     <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
-        <span class="n">u1</span>    <span class="o">=</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>	
+        <span class="n">r</span>     <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span></div>
+<div class="viewcode-block" id="CS98.encrypt"><a class="viewcode-back" href="../schemes/pkenc_cs98.html#pkenc_cs98.CS98.encrypt">[docs]</a>        <span class="n">u1</span>    <span class="o">=</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span>
         <span class="n">u2</span>    <span class="o">=</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span>
         <span class="n">e</span>     <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">M</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span>
         <span class="n">alpha</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">u1</span><span class="p">,</span> <span class="n">u2</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
@@ -101,10 +101,10 @@
 	<span class="c"># Assemble the ciphertext</span>
         <span class="n">c</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;u1&#39;</span> <span class="p">:</span> <span class="n">u1</span><span class="p">,</span> <span class="s">&#39;u2&#39;</span> <span class="p">:</span> <span class="n">u2</span><span class="p">,</span> <span class="s">&#39;e&#39;</span> <span class="p">:</span> <span class="n">e</span><span class="p">,</span> <span class="s">&#39;v&#39;</span> <span class="p">:</span> <span class="n">v</span> <span class="p">}</span>
         <span class="k">return</span> <span class="n">c</span>
-    </div>
-<div class="viewcode-block" id="CS98.decrypt"><a class="viewcode-back" href="../schemes/pkenc_cs98.html#pkenc_cs98.CS98.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>	
-        <span class="n">alpha</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;u1&#39;</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;u2&#39;</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;e&#39;</span><span class="p">])</span>        
-        <span class="n">v_prime</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;u1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;x1&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;y1&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)))</span> <span class="o">*</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;u2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;x2&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;y2&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)))</span>
+    
+    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>	
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;u1&#39;</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;u2&#39;</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;e&#39;</span><span class="p">])</span>        </div>
+<div class="viewcode-block" id="CS98.decrypt"><a class="viewcode-back" href="../schemes/pkenc_cs98.html#pkenc_cs98.CS98.decrypt">[docs]</a>        <span class="n">v_prime</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;u1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;x1&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;y1&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)))</span> <span class="o">*</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;u2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;x2&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;y2&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;v&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">v_prime</span><span class="p">):</span>
            <span class="k">return</span> <span class="s">&#39;ERROR&#39;</span> 
 
@@ -112,9 +112,11 @@
         <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;c[&#39;v&#39;] =&gt; </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;v&#39;</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;v&#39; =&gt; </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">v_prime</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">group</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;e&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;u1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;z&#39;</span><span class="p">]))</span>
-</div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pkenc_cs98.html#pkenc_cs98.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">pkenc</span> <span class="o">=</span> <span class="n">CS98</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">156053402631691285300957066846581395905893621007563090607988086498527791650834395958624527746916581251903190331297268907675919283232442999706619659475326192111220545726433895802392432934926242553363253333261282122117343404703514696108330984423475697798156574052962658373571332699002716083130212467463571362679</span><span class="p">)</span></div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pkenc_cs98.html#pkenc_cs98.main">[docs]</a>    <span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">78026701315845642650478533423290697952946810503781545303994043249263895825417197979312263873458290625951595165648634453837959641616221499853309829737663096055610272863216947901196216467463121276681626666630641061058671702351757348054165492211737848899078287026481329186785666349501358041565106233731785681339</span><span class="p">)</span>
+    <span class="n">pkenc</span> <span class="o">=</span> <span class="n">CS98</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
     
     <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
     <span class="n">M</span> <span class="o">=</span> <span class="n">b</span><span class="s">&quot;hello world. test message&quot;</span>
@@ -124,9 +126,9 @@
     
     <span class="k">assert</span> <span class="n">M</span> <span class="o">==</span> <span class="n">message</span><span class="p">,</span> <span class="s">&quot;UNSUCCESSFUL!!!! :-( why?&quot;</span>
     <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;SUCCESSFULLY RECOVERED =&gt; </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">message</span><span class="p">)</span>
-       </div>
+       
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span></div>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 
@@ -138,7 +140,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -161,14 +163,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

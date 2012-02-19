@@ -1,0 +1,175 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>groupsig_bgls04_var &mdash; Charm-Crypto 0.4b documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.4b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
+    <link rel="next" title="ibenc_adapt_hybrid" href="ibenc_adapt_hybrid.html" />
+    <link rel="prev" title="groupsig_bgls04" href="groupsig_bgls04.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ibenc_adapt_hybrid.html" title="ibenc_adapt_hybrid"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="groupsig_bgls04.html" title="groupsig_bgls04"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-groupsig_bgls04_var">
+<span id="groupsig-bgls04-var"></span><h1>groupsig_bgls04_var<a class="headerlink" href="#module-groupsig_bgls04_var" title="Permalink to this headline">¶</a></h1>
+<p>Dan Boneh, Xavier Boyen, and Hovav Shacham</p>
+<div class="line-block">
+<div class="line">From: &#8220;Short Group Signatures</div>
+<div class="line">Published in: CRYPTO 2004</div>
+<div class="line">Available from: n/a</div>
+<div class="line">Notes: An extended abstract of this paper appeared in Advances in Cryptology (2004)</div>
+</div>
+<ul class="simple">
+<li>type:           digital signature scheme</li>
+<li>setting:        Pairing</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">J Ayo Akinyele</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">12/2010</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="groupsig_bgls04_var.ShortSig">
+<em class="property">class </em><tt class="descclassname">groupsig_bgls04_var.</tt><tt class="descname">ShortSig</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../_modules/groupsig_bgls04_var.html#ShortSig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#groupsig_bgls04_var.ShortSig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.PKSig.PKSig</span></tt></p>
+<dl class="method">
+<dt id="groupsig_bgls04_var.ShortSig.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>n</em><big>)</big><a class="reference internal" href="../_modules/groupsig_bgls04_var.html#ShortSig.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#groupsig_bgls04_var.ShortSig.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="groupsig_bgls04_var.ShortSig.open">
+<tt class="descname">open</tt><big>(</big><em>gpk</em>, <em>gmsk</em>, <em>M</em>, <em>sigma</em><big>)</big><a class="reference internal" href="../_modules/groupsig_bgls04_var.html#ShortSig.open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#groupsig_bgls04_var.ShortSig.open" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="groupsig_bgls04_var.ShortSig.sign">
+<tt class="descname">sign</tt><big>(</big><em>gpk</em>, <em>gsk</em>, <em>M</em><big>)</big><a class="reference internal" href="../_modules/groupsig_bgls04_var.html#ShortSig.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#groupsig_bgls04_var.ShortSig.sign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="groupsig_bgls04_var.ShortSig.verify">
+<tt class="descname">verify</tt><big>(</big><em>gpk</em>, <em>M</em>, <em>sigma</em><big>)</big><a class="reference internal" href="../_modules/groupsig_bgls04_var.html#ShortSig.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#groupsig_bgls04_var.ShortSig.verify" title="Permalink to this definition">¶</a></dt>
+<dd><p>alternative verification check for BGLS04 which allows it to be batched</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="groupsig_bgls04_var.main">
+<tt class="descclassname">groupsig_bgls04_var.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/groupsig_bgls04_var.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#groupsig_bgls04_var.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="groupsig_bgls04.html"
+                        title="previous chapter">groupsig_bgls04</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ibenc_adapt_hybrid.html"
+                        title="next chapter">ibenc_adapt_hybrid</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/schemes/groupsig_bgls04_var.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ibenc_adapt_hybrid.html" title="ibenc_adapt_hybrid"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="groupsig_bgls04.html" title="groupsig_bgls04"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>paddingschemes &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>paddingschemes &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,9 +25,9 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
     <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
-    <link rel="next" title="pairinggroup" href="pairinggroup.html" />
+    <link rel="next" title="pairingcurves" href="pairingcurves.html" />
     <link rel="prev" title="node" href="node.html" /> 
   </head>
   <body>
@@ -41,12 +41,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="pairinggroup.html" title="pairinggroup"
+          <a href="pairingcurves.html" title="pairingcurves"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="node.html" title="node"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -110,6 +110,22 @@ Implemented according to PKCS#1 v2.1 Section 7 <a class="reference external" hre
 </tbody>
 </table>
 </dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="paddingschemes.PKCS7Padding">
+<em class="property">class </em><tt class="descclassname">paddingschemes.</tt><tt class="descname">PKCS7Padding</tt><big>(</big><em>block_size=16</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#PKCS7Padding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.PKCS7Padding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dl class="method">
+<dt id="paddingschemes.PKCS7Padding.decode">
+<tt class="descname">decode</tt><big>(</big><em>_bytes</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#PKCS7Padding.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.PKCS7Padding.decode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="paddingschemes.PKCS7Padding.encode">
+<tt class="descname">encode</tt><big>(</big><em>_bytes</em>, <em>block_size=16</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#PKCS7Padding.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.PKCS7Padding.encode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -201,8 +217,8 @@ emLen will be set to the minimum allowed length if not explicitly set</p>
   <p class="topless"><a href="node.html"
                         title="previous chapter">node</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="pairinggroup.html"
-                        title="next chapter">pairinggroup</a></p>
+  <p class="topless"><a href="pairingcurves.html"
+                        title="next chapter">pairingcurves</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/toolbox/paddingschemes.txt"
@@ -211,7 +227,7 @@ emLen will be set to the minimum allowed length if not explicitly set</p>
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -235,19 +251,19 @@ emLen will be set to the minimum allowed length if not explicitly set</p>
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="pairinggroup.html" title="pairinggroup"
+          <a href="pairingcurves.html" title="pairingcurves"
              >next</a> |</li>
         <li class="right" >
           <a href="node.html" title="node"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

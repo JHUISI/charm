@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>commit_gs08 &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>commit_gs08 &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,88 +48,86 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for commit_gs08</h1><div class="highlight"><pre>
-<span class="sd">&#39;&#39;&#39; </span>
-<span class="sd">Groth-Sahai Commitment Scheme</span>
-<span class="sd"> </span>
-<span class="sd">| From: &quot;J. Groth, A. Sahai.  Efficient Non-interactive Proof Systems for Bilinear Groups&quot;.</span>
-<span class="sd">| Published in: Eurocrypt 2008</span>
-<span class="sd">| Available from: http://www.cs.ucl.ac.uk/staff/J.Groth/WImoduleFull.pdf</span>
-<span class="sd">| Notes: This implements only the SXDH and DLIN instantiations, in prime-order groups.</span>
+  <h1>Source code for commit_gs08</h1><pre>
+ 
+| From: "J. Groth, A. Sahai.  Efficient Non-interactive Proof Systems for Bilinear Groups".
+| Published in: Eurocrypt 2008
+| Available from: http://www.cs.ucl.ac.uk/staff/J.Groth/WImoduleFull.pdf
+| Notes: This implements only the SXDH and DLIN instantiations, in prime-order groups.
 
-<span class="sd">* type:			commitment</span>
-<span class="sd">* setting:		bilinear groups</span>
+* type:			commitment
+* setting:		bilinear groups
 
-<span class="sd">:Authors:	Matthew Green</span>
-<span class="sd">:Date:		6/2011</span>
-<span class="sd">&#39;&#39;&#39;</span>
+:Authors:	Matthew Green
+:Date:		6/2011
+'''
 
-<span class="kn">from</span> <span class="nn">toolbox.pairinggroup</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">toolbox.Commit</span> <span class="kn">import</span> <span class="o">*</span>
+from toolbox.pairinggroup import *
+from toolbox.Commit import *
 
-<span class="n">debug</span><span class="o">=</span><span class="bp">False</span>
-<div class="viewcode-block" id="Commitment_GS08"><a class="viewcode-back" href="../schemes/commit_gs08.html#commit_gs08.Commitment_GS08">[docs]</a><span class="k">class</span> <span class="nc">Commitment_GS08</span><span class="p">(</span><span class="n">Commitment</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">,</span> <span class="n">setting</span><span class="o">=</span><span class="s">&#39;SXDH&#39;</span><span class="p">):</span>
-        <span class="n">Commitment</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="c">#Commitment.setProperty(self, secdef=&#39;CM_PHCB&#39;, assumption=[&#39;SXDH&#39;,&#39;DLIN&#39;], message_space=[G1, &#39;KEM&#39;], secmodel=&#39;SM&#39;)</span>
-        <span class="k">global</span> <span class="n">group</span>
-        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+debug=False
+class Commitment_GS08(Commitment):
+    def __init__(self, groupObj, setting='SXDH'):
+<div class="viewcode-block" id="Commitment_GS08"><a class="viewcode-back" href="../schemes/commit_gs08.html#commit_gs08.Commitment_GS08">[docs]</a>        Commitment.__init__(self)
+        #Commitment.setProperty(self, secdef='CM_PHCB', assumption=['SXDH','DLIN'], message_space=[G1, 'KEM'], secmodel='SM')
+        global group
+        group = groupObj
     
-    <span class="c"># Generates commitment parameters for either G1 or G2 (specified by groupChoice).</span>
-    <span class="c"># By default this generates the binding commitment parameters.  Set commitType to &#39;hiding&#39;</span>
-    <span class="c"># in order to generate hiding parameters.</span>
-<div class="viewcode-block" id="Commitment_GS08.setup"><a class="viewcode-back" href="../schemes/commit_gs08.html#commit_gs08.Commitment_GS08.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">groupChoice</span><span class="o">=</span><span class="n">G1</span><span class="p">,</span> <span class="n">commitType</span><span class="o">=</span><span class="s">&#39;binding&#39;</span><span class="p">):</span>
-        <span class="n">g1</span><span class="p">,</span> <span class="n">h1</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">groupChoice</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">groupChoice</span><span class="p">)</span>
-        <span class="n">s</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">commitType</span> <span class="o">==</span> <span class="s">&#39;binding&#39;</span><span class="p">):</span>
-            <span class="n">g2</span><span class="p">,</span> <span class="n">h2</span> <span class="o">=</span> <span class="n">g1</span> <span class="o">**</span> <span class="n">s</span><span class="p">,</span> <span class="n">h1</span> <span class="o">**</span> <span class="n">s</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">g2</span><span class="p">,</span> <span class="n">h2</span> <span class="o">=</span> <span class="n">g1</span> <span class="o">**</span> <span class="n">s</span><span class="p">,</span> <span class="n">h1</span> <span class="o">**</span> <span class="n">t</span>
+    # Generates commitment parameters for either G1 or G2 (specified by groupChoice).
+    # By default this generates the binding commitment parameters.  Set commitType to 'hiding'
+    # in order to generate hiding parameters.
+    def setup(self, secparam=None, groupChoice=G1, commitType='binding'):
+        g1, h1 = group.random(groupChoice), group.random(groupChoice)
+<div class="viewcode-block" id="Commitment_GS08.setup"><a class="viewcode-back" href="../schemes/commit_gs08.html#commit_gs08.Commitment_GS08.setup">[docs]</a>        s, t = group.random(ZR), group.random(ZR)
+        if (commitType == 'binding'):
+            g2, h2 = g1 ** s, h1 ** s
+        else:
+            g2, h2 = g1 ** s, h1 ** t
         
-        <span class="k">return</span> <span class="p">(</span><span class="n">g1</span><span class="p">,</span> <span class="n">g2</span><span class="p">,</span> <span class="n">h1</span><span class="p">,</span> <span class="n">h2</span><span class="p">)</span>
-    <span class="c"># msg =&gt; ZR    </span></div>
-<div class="viewcode-block" id="Commitment_GS08.commit"><a class="viewcode-back" href="../schemes/commit_gs08.html#commit_gs08.Commitment_GS08.commit">[docs]</a>    <span class="k">def</span> <span class="nf">commit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="c"># TODO: check that the message is in the same group as the params</span>
-        <span class="p">(</span><span class="n">g1</span><span class="p">,</span> <span class="n">g2</span><span class="p">,</span> <span class="n">h1</span><span class="p">,</span> <span class="n">h2</span><span class="p">)</span> <span class="o">=</span> <span class="n">params</span>
-        <span class="n">r1</span><span class="p">,</span> <span class="n">r2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        return (g1, g2, h1, h2)
+    # msg =&gt; ZR    
+    def commit(self, params, msg):
+        # TODO: check that the message is in the same group as the params</div>
+<div class="viewcode-block" id="Commitment_GS08.commit"><a class="viewcode-back" href="../schemes/commit_gs08.html#commit_gs08.Commitment_GS08.commit">[docs]</a>        (g1, g2, h1, h2) = params
+        r1, r2 = group.random(ZR), group.random(ZR)
         
-        <span class="n">c1</span> <span class="o">=</span> <span class="p">(</span><span class="n">g1</span> <span class="o">**</span> <span class="n">r1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">h1</span> <span class="o">**</span> <span class="n">r2</span><span class="p">)</span>
-        <span class="n">c2</span> <span class="o">=</span> <span class="n">msg</span> <span class="o">*</span> <span class="p">(</span><span class="n">g2</span> <span class="o">**</span> <span class="n">r1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">h2</span> <span class="o">**</span> <span class="n">r2</span><span class="p">)</span>
+        c1 = (g1 ** r1) * (h1 ** r2)
+        c2 = msg * (g2 ** r1) * (h2 ** r2)
         
-        <span class="k">return</span> <span class="p">({</span> <span class="s">&#39;c1&#39;</span><span class="p">:</span><span class="n">c1</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">:</span><span class="n">c2</span> <span class="p">},</span> <span class="p">{</span> <span class="s">&#39;r1&#39;</span><span class="p">:</span><span class="n">r1</span><span class="p">,</span> <span class="s">&#39;r2&#39;</span><span class="p">:</span><span class="n">r2</span> <span class="p">})</span>
-        </div>
-<div class="viewcode-block" id="Commitment_GS08.decommit"><a class="viewcode-back" href="../schemes/commit_gs08.html#commit_gs08.Commitment_GS08.decommit">[docs]</a>    <span class="k">def</span> <span class="nf">decommit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="c"># TODO: check that the message is in the same group as the params</span>
-        <span class="p">(</span><span class="n">g1</span><span class="p">,</span> <span class="n">g2</span><span class="p">,</span> <span class="n">h1</span><span class="p">,</span> <span class="n">h2</span><span class="p">)</span> <span class="o">=</span> <span class="n">params</span>
+        return ({ 'c1':c1, 'c2':c2 }, { 'r1':r1, 'r2':r2 })
         
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;c1&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">((</span><span class="n">g1</span> <span class="o">**</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;r1&#39;</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">h1</span> <span class="o">**</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;r2&#39;</span><span class="p">])))):</span>
-            <span class="k">return</span> <span class="bp">False</span>
+    def decommit(self, params, c, d, msg):
+        # TODO: check that the message is in the same group as the params</div>
+<div class="viewcode-block" id="Commitment_GS08.decommit"><a class="viewcode-back" href="../schemes/commit_gs08.html#commit_gs08.Commitment_GS08.decommit">[docs]</a>        (g1, g2, h1, h2) = params
         
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="p">((</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;c2&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">msg</span><span class="p">)</span> <span class="o">==</span> <span class="p">((</span><span class="n">g2</span> <span class="o">**</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;r1&#39;</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">h2</span> <span class="o">**</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;r2&#39;</span><span class="p">])))):</span>
-            <span class="k">return</span> <span class="bp">False</span>
+        if (not (c['c1'] == ((g1 ** d['r1']) * (h1 ** d['r2'])))):
+            return False
         
-        <span class="k">return</span> <span class="bp">True</span>
-</div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/commit_gs08.html#commit_gs08.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;../param/a.param&#39;</span><span class="p">)</span>
-    <span class="n">cm</span> <span class="o">=</span> <span class="n">Commitment_GS08</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+        if (not ((c['c2'] / msg) == ((g2 ** d['r1']) * (h2 ** d['r2'])))):
+            return False
+        
+        return True
+
+def main():
+    groupObj = PairingGroup('SS512')</div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/commit_gs08.html#commit_gs08.main">[docs]</a>    cm = Commitment_GS08(groupObj)
    
-    <span class="n">pk</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> 
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Public parameters...&quot;</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;pk =&gt;&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+    pk = cm.setup()
+    if debug: 
+        print("Public parameters...")
+        print("pk =&gt;", pk)
     
-    <span class="n">m</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Committing to =&gt;&quot;</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
-    <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">commit</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+    m = groupObj.random(G1)
+    if debug: print("Committing to =&gt;", m)
+    (c, d) = cm.commit(pk, m)
     
-    <span class="k">assert</span> <span class="n">cm</span><span class="o">.</span><span class="n">decommit</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="s">&quot;FAILED to decommit&quot;</span>
-    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful and Verified decommitment!!!&quot;</span><span class="p">)</span>
-</div>
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
-    <span class="n">main</span><span class="p">()</span>       
-</pre></div>
+    assert cm.decommit(pk, c, d, m), "FAILED to decommit"
+    if debug: print("Successful and Verified decommitment!!!")
+
+if __name__ == "__main__":
+    debug = True</div>
+    main()       
+</pre>
 
           </div>
         </div>
@@ -139,7 +137,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -162,14 +160,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

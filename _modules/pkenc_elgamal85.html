@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pkenc_elgamal85 &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>pkenc_elgamal85 &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,120 +48,118 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for pkenc_elgamal85</h1><div class="highlight"><pre>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">El Gamal Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption in groups of prime order)</span>
+  <h1>Source code for pkenc_elgamal85</h1><pre>
 
-<span class="sd">| Available from: http://en.wikipedia.org/wiki/ElGamal_encryption</span>
-<span class="sd">| Notes: </span>
+| Available from: http://en.wikipedia.org/wiki/ElGamal_encryption
+| Notes: 
 
-<span class="sd">* type:          encryption (public key)</span>
-<span class="sd">* setting:       DDH-hard prime order group</span>
-<span class="sd">* assumption:    DDH</span>
+* type:          encryption (public key)
+* setting:       DDH-hard prime order group
+* assumption:    DDH
 
-<span class="sd">:Authors: J Ayo Akinyele</span>
-<span class="sd">:Date:           3/2011</span>
-<span class="sd">&#39;&#39;&#39;</span>
+:Authors: J Ayo Akinyele
+:Date:           3/2011
+'''
 
-<span class="kn">from</span> <span class="nn">toolbox.integergroup</span> <span class="kn">import</span> <span class="n">IntegerGroupQ</span>
-<span class="kn">from</span> <span class="nn">toolbox.ecgroup</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">toolbox.PKEnc</span> <span class="kn">import</span> <span class="n">PKEnc</span>
-<span class="kn">from</span> <span class="nn">toolbox.eccurve</span> <span class="kn">import</span> <span class="n">prime192v2</span>
+from toolbox.integergroup import IntegerGroupQ
+from toolbox.ecgroup import *
+from toolbox.PKEnc import PKEnc
+from toolbox.eccurve import prime192v2
 
-<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
-<div class="viewcode-block" id="ElGamalCipher"><a class="viewcode-back" href="../schemes/pkenc_elgamal85.html#pkenc_elgamal85.ElGamalCipher">[docs]</a><span class="k">class</span> <span class="nc">ElGamalCipher</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ct</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">dict</span><span class="p">:</span> <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;Not a dictionary!&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">([</span><span class="s">&#39;c1&#39;</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">]):</span> <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;&#39;c1&#39;,&#39;c2&#39; keys not present.&quot;</span>
-        <span class="nb">dict</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ct</span><span class="p">)</span>
+debug = False
+class ElGamalCipher(dict):
+    def __init__(self, ct):
+<div class="viewcode-block" id="ElGamalCipher"><a class="viewcode-back" href="../schemes/pkenc_elgamal85.html#pkenc_elgamal85.ElGamalCipher">[docs]</a>        if type(ct) != dict: assert False, "Not a dictionary!"
+        if not set(ct).issubset(['c1', 'c2']): assert False, "'c1','c2' keys not present."
+        dict.__init__(self, ct)
 
-    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
-           <span class="n">lhs_c1</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;c1&#39;</span><span class="p">)</span>
-           <span class="n">lhs_c2</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">)</span>
-           <span class="k">return</span> <span class="n">ElGamalCipher</span><span class="p">({</span><span class="s">&#39;c1&#39;</span><span class="p">:</span><span class="n">lhs_c1</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">:</span><span class="n">lhs_c2</span> <span class="o">+</span> <span class="n">other</span><span class="p">})</span>
-        <span class="k">else</span><span class="p">:</span>
-           <span class="k">pass</span> 
+    def __add__(self, other):
+        if type(other) == int:
+           lhs_c1 = dict.__getitem__(self, 'c1')
+           lhs_c2 = dict.__getitem__(self, 'c2')
+           return ElGamalCipher({'c1':lhs_c1, 'c2':lhs_c2 + other})
+        else:
+           pass 
 
-    <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
-           <span class="n">lhs_c1</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;c1&#39;</span><span class="p">)</span>
-           <span class="n">lhs_c2</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">)</span>
-           <span class="k">return</span> <span class="n">ElGamalCipher</span><span class="p">({</span><span class="s">&#39;c1&#39;</span><span class="p">:</span><span class="n">lhs_c1</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">:</span><span class="n">lhs_c2</span> <span class="o">*</span> <span class="n">other</span><span class="p">})</span>
-        <span class="k">else</span><span class="p">:</span>
-           <span class="n">lhs_c1</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;c1&#39;</span><span class="p">)</span> 
-           <span class="n">rhs_c1</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s">&#39;c1&#39;</span><span class="p">)</span>
+    def __mul__(self, other):
+        if type(other) == int:
+           lhs_c1 = dict.__getitem__(self, 'c1')
+           lhs_c2 = dict.__getitem__(self, 'c2')
+           return ElGamalCipher({'c1':lhs_c1, 'c2':lhs_c2 * other})
+        else:
+           lhs_c1 = dict.__getitem__(self, 'c1') 
+           rhs_c1 = dict.__getitem__(other, 'c1')
 
-           <span class="n">lhs_c2</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">)</span> 
-           <span class="n">rhs_c2</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">)</span>
-           <span class="k">return</span> <span class="n">ElGamalCipher</span><span class="p">({</span><span class="s">&#39;c1&#39;</span><span class="p">:</span><span class="n">lhs_c1</span> <span class="o">*</span> <span class="n">rhs_c1</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">:</span><span class="n">lhs_c2</span> <span class="o">*</span> <span class="n">rhs_c2</span><span class="p">})</span>
-        <span class="k">return</span> <span class="bp">None</span>
-</div>
-<div class="viewcode-block" id="ElGamal"><a class="viewcode-back" href="../schemes/pkenc_elgamal85.html#pkenc_elgamal85.ElGamal">[docs]</a><span class="k">class</span> <span class="nc">ElGamal</span><span class="p">(</span><span class="n">PKEnc</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">builtin_cv</span><span class="o">=</span><span class="mi">410</span><span class="p">):</span>
-        <span class="n">PKEnc</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">global</span> <span class="n">_type</span>
-        <span class="n">_type</span> <span class="o">=</span> <span class="n">group_type</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="n">_type</span><span class="p">,</span> <span class="n">builtin_cv</span><span class="p">)</span>
+           lhs_c2 = dict.__getitem__(self, 'c2') 
+           rhs_c2 = dict.__getitem__(other, 'c2')
+           return ElGamalCipher({'c1':lhs_c1 * rhs_c1, 'c2':lhs_c2 * rhs_c2})
+        return None
 
-<div class="viewcode-block" id="ElGamal.paramgen"><a class="viewcode-back" href="../schemes/pkenc_elgamal85.html#pkenc_elgamal85.ElGamal.paramgen">[docs]</a>    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_type</span><span class="p">,</span> <span class="n">_cv</span><span class="p">):</span>
-        <span class="k">global</span> <span class="n">group</span>
-        <span class="k">if</span> <span class="n">_type</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
-            <span class="n">group</span> <span class="o">=</span> <span class="n">IntegerGroupQ</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">_type</span> <span class="o">==</span> <span class="n">ecc</span><span class="p">:</span>
-            <span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">_cv</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;Invalid Type Exception!&quot;</span>
-</div>
-<div class="viewcode-block" id="ElGamal.keygen"><a class="viewcode-back" href="../schemes/pkenc_elgamal85.html#pkenc_elgamal85.ElGamal.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="o">=</span><span class="mi">1024</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">_type</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
-            <span class="n">group</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="n">secparam</span><span class="p">)</span>
-            <span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">randomGen</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">_type</span> <span class="o">==</span> <span class="n">ecc</span><span class="p">:</span>
-            <span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
-        <span class="c"># x is private, g is public param</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">();</span> <span class="n">h</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">x</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;Public parameters...&#39;</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;h =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">h</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;g =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">g</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;Secret key...&#39;</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;x =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">)</span>
-        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s">&#39;h&#39;</span><span class="p">:</span><span class="n">h</span> <span class="p">}</span>
-        <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;x&#39;</span><span class="p">:</span><span class="n">x</span><span class="p">}</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
-    </div>
-<div class="viewcode-block" id="ElGamal.encrypt"><a class="viewcode-back" href="../schemes/pkenc_elgamal85.html#pkenc_elgamal85.ElGamal.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>    
-        <span class="n">y</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
-        <span class="n">c1</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">y</span> 
-        <span class="n">s</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">y</span>
-        <span class="c"># check M and make sure it&#39;s right size</span>
-        <span class="n">c2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">M</span><span class="p">)</span> <span class="o">*</span> <span class="n">s</span>
-        <span class="k">return</span> <span class="n">ElGamalCipher</span><span class="p">({</span><span class="s">&#39;c1&#39;</span><span class="p">:</span><span class="n">c1</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">:</span><span class="n">c2</span><span class="p">})</span>
-    </div>
-<div class="viewcode-block" id="ElGamal.decrypt"><a class="viewcode-back" href="../schemes/pkenc_elgamal85.html#pkenc_elgamal85.ElGamal.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;c1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">]</span>
-        <span class="n">m</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;c2&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="o">~</span><span class="n">s</span>
-        <span class="n">M</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&#39;m =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">m</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&#39;dec M =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">M</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">M</span>
-</div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pkenc_elgamal85.html#pkenc_elgamal85.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">el</span> <span class="o">=</span> <span class="n">ElGamal</span><span class="p">(</span><span class="n">ecc</span><span class="p">,</span> <span class="n">prime192v2</span><span class="p">)</span>    
-    <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
-    <span class="n">msg</span> <span class="o">=</span> <span class="n">b</span><span class="s">&quot;hello world!&quot;</span>
-    <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-    <span class="n">cipher1</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+class ElGamal(PKEnc):
+    def __init__(self, group_type=int, builtin_cv=410):</div>
+<div class="viewcode-block" id="ElGamal"><a class="viewcode-back" href="../schemes/pkenc_elgamal85.html#pkenc_elgamal85.ElGamal">[docs]</a>        PKEnc.__init__(self)
+        global _type
+        _type = group_type
+        self.paramgen(_type, builtin_cv)
+
+    def paramgen(self, _type, _cv):
+        global group
+<div class="viewcode-block" id="ElGamal.paramgen"><a class="viewcode-back" href="../schemes/pkenc_elgamal85.html#pkenc_elgamal85.ElGamal.paramgen">[docs]</a>        if _type == int:
+            group = IntegerGroupQ()
+        elif _type == ecc:
+            group = ECGroup(_cv)
+        else:
+            assert False, "Invalid Type Exception!"
+
+    def keygen(self, secparam=1024):
+        if _type == int:</div>
+<div class="viewcode-block" id="ElGamal.keygen"><a class="viewcode-back" href="../schemes/pkenc_elgamal85.html#pkenc_elgamal85.ElGamal.keygen">[docs]</a>            group.paramgen(secparam)
+            g = group.randomGen()
+        elif _type == ecc:
+            g = group.random(G)
+        # x is private, g is public param
+        x = group.random(); h = g ** x
+        if debug:
+            print('Public parameters...')
+            print('h =&gt; %s' % h)
+            print('g =&gt; %s' % g)
+            print('Secret key...')
+            print('x =&gt; %s' % x)
+        pk = {'g':g, 'h':h }
+        sk = {'x':x}
+        return (pk, sk)
     
-    <span class="n">m</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">cipher1</span><span class="p">)</span>    
-    <span class="k">assert</span> <span class="n">m</span> <span class="o">==</span> <span class="n">msg</span><span class="p">,</span> <span class="s">&quot;Failed Decryption!!!&quot;</span>
-    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;SUCCESSFULLY DECRYPTED!!!&quot;</span><span class="p">)</span>
-        </div>
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
-    <span class="n">main</span><span class="p">()</span>
-</pre></div>
+    def encrypt(self, pk, M):    
+        y = group.random()</div>
+<div class="viewcode-block" id="ElGamal.encrypt"><a class="viewcode-back" href="../schemes/pkenc_elgamal85.html#pkenc_elgamal85.ElGamal.encrypt">[docs]</a>        c1 = pk['g'] ** y 
+        s = pk['h'] ** y
+        # check M and make sure it's right size
+        c2 = group.encode(M) * s
+        return ElGamalCipher({'c1':c1, 'c2':c2})
+    
+    def decrypt(self, pk, sk, c):
+        s = c['c1'] ** sk['x']</div>
+<div class="viewcode-block" id="ElGamal.decrypt"><a class="viewcode-back" href="../schemes/pkenc_elgamal85.html#pkenc_elgamal85.ElGamal.decrypt">[docs]</a>        m = c['c2'] * ~s
+        M = group.decode(m)
+        if debug: print('m =&gt; %s' % m)
+        if debug: print('dec M =&gt; %s' % M)
+        return M
+
+def main():
+    el = ElGamal(ecc, prime192v2)    </div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pkenc_elgamal85.html#pkenc_elgamal85.main">[docs]</a>    (pk, sk) = el.keygen()
+    msg = b"hello world!"
+    size = len(msg)
+    cipher1 = el.encrypt(pk, msg)
+    
+    m = el.decrypt(pk, sk, cipher1)    
+    assert m == msg, "Failed Decryption!!!"
+    if debug: print("SUCCESSFULLY DECRYPTED!!!")
+        
+if __name__ == "__main__":
+    debug = True</div>
+    main()
+</pre>
 
           </div>
         </div>
@@ -171,7 +169,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -194,14 +192,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

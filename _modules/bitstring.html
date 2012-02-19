@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>bitstring &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>bitstring &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,51 +48,49 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for bitstring</h1><div class="highlight"><pre>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">``bistring.Bytes`` is a replacement for Python&#39;s ``byte``.</span>
-<span class="sd">&#39;&#39;&#39;</span>
+  <h1>Source code for bitstring</h1><pre>
+'''
 
-<span class="kn">import</span> <span class="nn">string</span>
-<span class="kn">import</span> <span class="nn">sys</span>
+import string
+import sys
 
-<span class="n">py3</span> <span class="o">=</span> <span class="bp">False</span>
-<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">hexversion</span> <span class="o">&gt;=</span> <span class="nb">int</span><span class="p">(</span><span class="mh">0x03000000</span><span class="p">):</span>
-    <span class="n">py3</span> <span class="o">=</span> <span class="bp">True</span>
+py3 = False
+if sys.hexversion &gt;= int(0x03000000):
+    py3 = True
 
 
-<div class="viewcode-block" id="Bytes"><a class="viewcode-back" href="../toolbox/bitstring.html#bitstring.Bytes">[docs]</a><span class="k">class</span> <span class="nc">Bytes</span><span class="p">(</span><span class="nb">bytes</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">enc</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">enc</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
-           <span class="k">if</span> <span class="n">py3</span><span class="p">:</span> <span class="nb">bytes</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">enc</span><span class="p">)</span>
-           <span class="k">else</span><span class="p">:</span> <span class="nb">bytes</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-           <span class="nb">bytes</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+class Bytes(bytes):
+    def __init__(self, value, enc=None):
+<div class="viewcode-block" id="Bytes"><a class="viewcode-back" href="../toolbox/bitstring.html#bitstring.Bytes">[docs]</a>        if enc != None:
+           if py3: bytes.__init__(value, enc)
+           else: bytes.__init__(value)
+        else:
+           bytes.__init__(value)
 
-    <span class="k">def</span> <span class="nf">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Overload the ``^`` operator to provide xor &#39;&#39;&#39;</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="s">&quot;xor: operands differ in length.&quot;</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
-            <span class="k">if</span> <span class="n">py3</span><span class="p">:</span> <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">^</span> <span class="n">other</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-            <span class="k">else</span><span class="p">:</span> <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">^</span> <span class="nb">ord</span><span class="p">(</span><span class="n">other</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span>
-            <span class="c">#print(&quot;res[%s] = %s&quot; % (i, res[i]))</span>
-        <span class="k">return</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>            
+    def __xor__(self, other):
+        '''Overload the ``^`` operator to provide xor '''
+        assert len(self) == len(other), "xor: operands differ in length."
+        res = bytearray()
+        for i in range(0,len(self)):
+            if py3: res.append(self[i] ^ other[i])
+            else: res.append(chr(ord(self[i]) ^ ord(other[i])))
+            #print("res[%s] = %s" % (i, res[i]))
+        return Bytes(res)            
 
-    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">Bytes</span><span class="p">(</span><span class="nb">bytes</span><span class="o">.</span><span class="n">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">))</span>
+    def __add__(self, other):
+        return Bytes(bytes.__add__(self, other))
     
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Bytes.fill"><a class="viewcode-back" href="../toolbox/bitstring.html#bitstring.Bytes.fill">[docs]</a>    <span class="k">def</span> <span class="nf">fill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Provides an easy way to create a byte array of a specified length and content&#39;&#39;&#39;</span>
-        <span class="n">bits</span> <span class="o">=</span> <span class="n">b</span><span class="s">&#39;&#39;</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">length</span><span class="p">)):</span>
-            <span class="n">bits</span> <span class="o">+=</span> <span class="n">prefix</span>
-        <span class="k">return</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">bits</span><span class="p">)</span>
+    @classmethod
+    def fill(self, prefix, length):
+        '''Provides an easy way to create a byte array of a specified length and content'''
+<div class="viewcode-block" id="Bytes.fill"><a class="viewcode-back" href="../toolbox/bitstring.html#bitstring.Bytes.fill">[docs]</a>        bits = b''
+        for i in range(0, int(length)):
+            bits += prefix
+        return Bytes(bits)
         
 
-<span class="c"># TODO: add left and right bit shifting</span></div></div>
-</pre></div>
+# TODO: add left and right bit shifting
+</pre></div></div>
 
           </div>
         </div>
@@ -102,7 +100,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -125,14 +123,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

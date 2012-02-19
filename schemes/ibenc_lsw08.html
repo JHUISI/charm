@@ -1,0 +1,174 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ibenc_lsw08 &mdash; Charm-Crypto 0.4b documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.4b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
+    <link rel="next" title="ibenc_sw05" href="ibenc_sw05.html" />
+    <link rel="prev" title="ibenc_ckrs09" href="ibenc_ckrs09.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ibenc_sw05.html" title="ibenc_sw05"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ibenc_ckrs09.html" title="ibenc_ckrs09"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-ibenc_lsw08">
+<span id="ibenc-lsw08"></span><h1>ibenc_lsw08<a class="headerlink" href="#module-ibenc_lsw08" title="Permalink to this headline">¶</a></h1>
+<p>Allison Lewko, Amit Sahai and Brent Waters (Pairing-based)</p>
+<div class="line-block">
+<div class="line">From: &#8220;Revocation Systems with Very Small Private Keys&#8221;</div>
+<div class="line">Published in: IEEE S&amp;P 2010</div>
+<div class="line">Available from: <a class="reference external" href="http://eprint.iacr.org/2008/309.pdf">http://eprint.iacr.org/2008/309.pdf</a></div>
+<div class="line">Notes: fully secure IBE Construction with revocable keys.</div>
+</div>
+<ul class="simple">
+<li>type:           identity-based encryption (public key)</li>
+<li>setting:        Pairing</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">J Ayo Akinyele</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">1/2012</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="ibenc_lsw08.IBE_Revoke">
+<em class="property">class </em><tt class="descclassname">ibenc_lsw08.</tt><tt class="descname">IBE_Revoke</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../_modules/ibenc_lsw08.html#IBE_Revoke"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_lsw08.IBE_Revoke" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">toolbox.IBEnc.IBEnc</span></tt></p>
+<dl class="method">
+<dt id="ibenc_lsw08.IBE_Revoke.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>S</em>, <em>ct</em>, <em>sk</em><big>)</big><a class="reference internal" href="../_modules/ibenc_lsw08.html#IBE_Revoke.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_lsw08.IBE_Revoke.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_lsw08.IBE_Revoke.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>mpk</em>, <em>M</em>, <em>S</em><big>)</big><a class="reference internal" href="../_modules/ibenc_lsw08.html#IBE_Revoke.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_lsw08.IBE_Revoke.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_lsw08.IBE_Revoke.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>mpk</em>, <em>msk</em>, <em>ID</em><big>)</big><a class="reference internal" href="../_modules/ibenc_lsw08.html#IBE_Revoke.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_lsw08.IBE_Revoke.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ibenc_lsw08.IBE_Revoke.setup">
+<tt class="descname">setup</tt><big>(</big><em>n</em><big>)</big><a class="reference internal" href="../_modules/ibenc_lsw08.html#IBE_Revoke.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_lsw08.IBE_Revoke.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="ibenc_lsw08.main">
+<tt class="descclassname">ibenc_lsw08.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ibenc_lsw08.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ibenc_lsw08.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ibenc_ckrs09.html"
+                        title="previous chapter">ibenc_ckrs09</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ibenc_sw05.html"
+                        title="next chapter">ibenc_sw05</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/schemes/ibenc_lsw08.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ibenc_sw05.html" title="ibenc_sw05"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ibenc_ckrs09.html" title="ibenc_ckrs09"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+          <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

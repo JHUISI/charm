@@ -1,0 +1,162 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pksig_cl04 &mdash; Charm-Crypto 0.4b documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.4b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pksig_cl04</h1><pre>
+ 
+| From: "J. Camenisch, A. Lysyanskaya. Signature Schemes and Anonymous Credentials from Bilinear Maps"
+| Published in: 2004
+| Available from: http://www.cs.brown.edu/~anna/papers/cl04.pdf
+| Notes: Scheme A on page 5 section 3.1.
+
+* type:           signature (identity-based)
+* setting:        bilinear groups (asymmetric)
+
+:Authors:    J. Ayo Akinyele
+:Date:       1/2012
+ '''
+from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
+from toolbox.PKSig import PKSig
+
+debug = False
+class CL04(PKSig):
+    def __init__(self, groupObj):
+<div class="viewcode-block" id="CL04"><a class="viewcode-back" href="../schemes/pksig_cl04.html#pksig_cl04.CL04">[docs]</a>        global group
+        group = groupObj
+        
+    def setup(self):
+        g = group.random(G1)
+<div class="viewcode-block" id="CL04.setup"><a class="viewcode-back" href="../schemes/pksig_cl04.html#pksig_cl04.CL04.setup">[docs]</a>        return { 'g': g }
+        
+    def keygen(self, mpk):
+        x, y = group.random(ZR), group.random(ZR)</div>
+<div class="viewcode-block" id="CL04.keygen"><a class="viewcode-back" href="../schemes/pksig_cl04.html#pksig_cl04.CL04.keygen">[docs]</a>        sk = { 'x':x, 'y':y }
+        pk = { 'X':mpk['g'] ** x, 'Y': mpk['g'] ** y, 'g':mpk['g'] }        
+        return (pk, sk)
+    
+    def sign(self, pk, sk, M):
+        a = group.random(G2)</div>
+<div class="viewcode-block" id="CL04.sign"><a class="viewcode-back" href="../schemes/pksig_cl04.html#pksig_cl04.CL04.sign">[docs]</a>        m = group.hash(M, ZR)
+        sig = {'a':a, 'a_y':a ** sk['y'], 'a_xy':a ** (sk['x'] + (m * sk['x'] * sk['y'])) }
+        return sig
+    
+    def verify(self, pk, M, sig):
+        (a, b, c) = sig['a'], sig['a_y'], sig['a_xy']</div>
+<div class="viewcode-block" id="CL04.verify"><a class="viewcode-back" href="../schemes/pksig_cl04.html#pksig_cl04.CL04.verify">[docs]</a>        m = group.hash(M, ZR)
+        if pair(pk['Y'], a) == pair(pk['g'], b) and (pair(pk['X'], a) * (pair(pk['X'], b) ** m)) == pair(pk['g'], c):
+            return True
+        return False
+    
+def main():
+    grp = PairingGroup('MNT224')</div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pksig_cl04.html#pksig_cl04.main">[docs]</a>    cl = CL04(grp)
+    
+    mpk = cl.setup()
+    
+    (pk, sk) = cl.keygen(mpk)
+    if debug:
+        print("Keygen...")
+        print("pk :=", pk)
+        print("sk :=", sk)
+    
+    M = "Please sign this stupid message!"
+    sig = cl.sign(pk, sk, M)
+    if debug: print("Signature: ", sig)
+    
+    result = cl.verify(pk, M, sig)
+    assert result, "INVALID signature!"
+    if debug: print("Successful Verification!!!")
+    
+if __name__ == "__main__":
+    debug = True</div>
+    main()
+    </pre>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

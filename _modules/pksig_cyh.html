@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pksig_cyh &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>pksig_cyh &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,118 +48,116 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for pksig_cyh</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot; </span>
-<span class="sd">Chow-Yiu-Hui - Identity-based ring signatures</span>
+  <h1>Source code for pksig_cyh</h1><pre>
 
-<span class="sd">| From: &quot;S. Chow, S. Yiu and L. Hui - Efficient identity based ring signature.&quot;</span>
-<span class="sd">| Published in: ACNS 2005</span>
-<span class="sd">| Available from: Vol 3531 of LNCS, pages 499-512</span>
-<span class="sd">| Notes: </span>
+| From: "S. Chow, S. Yiu and L. Hui - Efficient identity based ring signature."
+| Published in: ACNS 2005
+| Available from: Vol 3531 of LNCS, pages 499-512
+| Notes: 
 
-<span class="sd">* type:           signature (ring-based)</span>
-<span class="sd">* setting:        bilinear groups (asymmetric)</span>
+* type:           signature (ring-based)
+* setting:        bilinear groups (asymmetric)
 
-<span class="sd">:Authors:    J. Ayo Akinyele</span>
-<span class="sd">:Date:       11/2011</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">charm.pairing</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">toolbox.PKSig</span> <span class="kn">import</span> <span class="n">PKSig</span>
-<span class="kn">from</span> <span class="nn">toolbox.iterate</span> <span class="kn">import</span> <span class="n">dotprod</span>
+:Authors:    J. Ayo Akinyele
+:Date:       11/2011
+"""
+from toolbox.pairinggroup import PairingGroup,G1,G2,GT,ZR,pair
+from toolbox.PKSig import PKSig
+from toolbox.iterate import dotprod
 
-<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+debug = False
 
-<div class="viewcode-block" id="CYH"><a class="viewcode-back" href="../schemes/pksig_cyh.html#pksig_cyh.CYH">[docs]</a><span class="k">class</span> <span class="nc">CYH</span><span class="p">(</span><span class="n">PKSig</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
-        <span class="k">global</span> <span class="n">group</span>
-        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+class CYH(PKSig):
+    def __init__(self, groupObj):
+<div class="viewcode-block" id="CYH"><a class="viewcode-back" href="../schemes/pksig_cyh.html#pksig_cyh.CYH">[docs]</a>        global group
+        group = groupObj
     
-<div class="viewcode-block" id="CYH.concat"><a class="viewcode-back" href="../schemes/pksig_cyh.html#pksig_cyh.CYH.concat">[docs]</a>    <span class="k">def</span> <span class="nf">concat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L_id</span><span class="p">):</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">L_id</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">+=</span> <span class="s">&quot;:&quot;</span><span class="o">+</span><span class="n">i</span> 
-        <span class="k">return</span> <span class="n">result</span>
-</div>
-<div class="viewcode-block" id="CYH.setup"><a class="viewcode-back" href="../schemes/pksig_cyh.html#pksig_cyh.CYH.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">global</span> <span class="n">H1</span><span class="p">,</span><span class="n">H2</span><span class="p">,</span><span class="n">lam_func</span>
-        <span class="n">H1</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">H</span><span class="p">((</span><span class="s">&#39;1&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> <span class="n">G1</span><span class="p">)</span>
-        <span class="n">H2</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">H</span><span class="p">((</span><span class="s">&#39;2&#39;</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span> <span class="n">ZR</span><span class="p">)</span>
-        <span class="n">lam_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">:</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">**</span> <span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="c"># =&gt; u * (pk ** h) for all signers</span>
-        <span class="n">g</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
-        <span class="n">P</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">alpha</span>
-        <span class="n">msk</span> <span class="o">=</span> <span class="n">alpha</span>
-        <span class="n">mpk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;Pub&#39;</span><span class="p">:</span><span class="n">P</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span> <span class="p">}</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span> 
-    </div>
-<div class="viewcode-block" id="CYH.keygen"><a class="viewcode-back" href="../schemes/pksig_cyh.html#pksig_cyh.CYH.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msk</span><span class="p">,</span> <span class="n">ID</span><span class="p">):</span>
-        <span class="n">sk</span> <span class="o">=</span> <span class="n">H1</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span> <span class="o">**</span> <span class="n">msk</span>
-        <span class="n">pk</span> <span class="o">=</span> <span class="n">H1</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
-    </div>
-<div class="viewcode-block" id="CYH.sign"><a class="viewcode-back" href="../schemes/pksig_cyh.html#pksig_cyh.CYH.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
-        <span class="p">(</span><span class="n">IDs</span><span class="p">,</span> <span class="n">IDpk</span><span class="p">,</span> <span class="n">IDsk</span><span class="p">)</span> <span class="o">=</span> <span class="n">sk</span>
-        <span class="k">assert</span> <span class="n">IDs</span> <span class="ow">in</span> <span class="n">L</span><span class="p">,</span> <span class="s">&quot;signer should be an element in L&quot;</span>
-        <span class="n">Lt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> 
-        <span class="n">num_signers</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+    def concat(self, L_id):
+        result = ""
+<div class="viewcode-block" id="CYH.concat"><a class="viewcode-back" href="../schemes/pksig_cyh.html#pksig_cyh.CYH.concat">[docs]</a>        for i in L_id:
+            result += ":"+i 
+        return result
+
+    def setup(self):
+        global H1,H2,lam_func</div>
+<div class="viewcode-block" id="CYH.setup"><a class="viewcode-back" href="../schemes/pksig_cyh.html#pksig_cyh.CYH.setup">[docs]</a>        H1 = lambda x: group.hash(('1', str(x)), G1)
+        H2 = lambda a, b, c: group.hash(('2', a, b, c), ZR)
+        lam_func = lambda i,a,b,c: a[i] * (b[i] ** c[i]) # =&gt; u * (pk ** h) for all signers
+        g, alpha = group.random(G2), group.random(ZR)
+        P = g ** alpha
+        msk = alpha
+        mpk = {'Pub':P, 'g':g }
+        return (mpk, msk) 
+    
+    def keygen(self, msk, ID):
+        sk = H1(ID) ** msk</div>
+<div class="viewcode-block" id="CYH.keygen"><a class="viewcode-back" href="../schemes/pksig_cyh.html#pksig_cyh.CYH.keygen">[docs]</a>        pk = H1(ID)
+        return (ID, pk, sk)
+    
+    def sign(self, sk, L, M):
+        (IDs, IDpk, IDsk) = sk</div>
+<div class="viewcode-block" id="CYH.sign"><a class="viewcode-back" href="../schemes/pksig_cyh.html#pksig_cyh.CYH.sign">[docs]</a>        assert IDs in L, "signer should be an element in L"
+        Lt = self.concat(L) 
+        num_signers = len(L)
  
-        <span class="n">u</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_signers</span><span class="p">)]</span>
-        <span class="n">h</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_signers</span><span class="p">)]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_signers</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">IDs</span> <span class="o">!=</span> <span class="n">L</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
-               <span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
-               <span class="n">h</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">H2</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">Lt</span><span class="p">,</span> <span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-            <span class="k">else</span><span class="p">:</span>
-               <span class="n">s</span> <span class="o">=</span> <span class="n">i</span>
+        u = [group.init(G1) for i in range(num_signers)]
+        h = [group.init(ZR, 1) for i in range(num_signers)]
+        for i in range(num_signers):
+            if IDs != L[i]:
+               u[i] = group.random(G1)
+               h[i] = H2(M, Lt, u[i])
+            else:
+               s = i
         
-        <span class="n">r</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
-        <span class="n">pk</span> <span class="o">=</span> <span class="p">[</span> <span class="n">H1</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">L</span><span class="p">]</span> <span class="c"># get all signers pub keys</span>
-        <span class="n">u</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">IDpk</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span> <span class="o">*</span> <span class="o">~</span><span class="n">dotprod</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">G1</span><span class="p">),</span> <span class="n">s</span><span class="p">,</span> <span class="n">num_signers</span><span class="p">,</span> <span class="n">lam_func</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
-        <span class="n">h</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">H2</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">Lt</span><span class="p">,</span> <span class="n">u</span><span class="p">[</span><span class="n">s</span><span class="p">])</span>
-        <span class="n">S</span> <span class="o">=</span> <span class="n">IDsk</span> <span class="o">**</span> <span class="p">(</span><span class="n">h</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span>
-        <span class="n">sig</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;u&#39;</span><span class="p">:</span><span class="n">u</span><span class="p">,</span> <span class="s">&#39;S&#39;</span><span class="p">:</span><span class="n">S</span> <span class="p">}</span>
-        <span class="k">return</span> <span class="n">sig</span>
-    </div>
-<div class="viewcode-block" id="CYH.verify"><a class="viewcode-back" href="../schemes/pksig_cyh.html#pksig_cyh.CYH.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpk</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
-        <span class="n">u</span><span class="p">,</span> <span class="n">S</span> <span class="o">=</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;u&#39;</span><span class="p">],</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;S&#39;</span><span class="p">]</span>
-        <span class="n">Lt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> 
-        <span class="n">num_signers</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
-        <span class="n">h</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_signers</span><span class="p">)]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_signers</span><span class="p">):</span>
-            <span class="n">h</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">H2</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">Lt</span><span class="p">,</span> <span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        r = group.random(ZR)
+        pk = [ H1(i) for i in L] # get all signers pub keys
+        u[s] = (IDpk ** r) * ~dotprod(group.init(G1), s, num_signers, lam_func, u, pk, h)
+        h[s] = H2(M, Lt, u[s])
+        S = IDsk ** (h[s] + r)
+        sig = { 'u':u, 'S':S }
+        return sig
+    
+    def verify(self, mpk, L, M, sig):
+        u, S = sig['u'], sig['S']</div>
+<div class="viewcode-block" id="CYH.verify"><a class="viewcode-back" href="../schemes/pksig_cyh.html#pksig_cyh.CYH.verify">[docs]</a>        Lt = self.concat(L) 
+        num_signers = len(L)
+        h = [group.init(ZR, 1) for i in range(num_signers)]
+        for i in range(num_signers):
+            h[i] = H2(M, Lt, u[i])
 
-        <span class="n">pk</span> <span class="o">=</span> <span class="p">[</span> <span class="n">H1</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">L</span><span class="p">]</span> <span class="c"># get all signers pub keys</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">dotprod</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">G1</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_signers</span><span class="p">,</span> <span class="n">lam_func</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> 
-        <span class="k">if</span> <span class="n">pair</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;Pub&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="n">pair</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]):</span>
-            <span class="k">return</span> <span class="bp">True</span>
-        <span class="k">return</span> <span class="bp">False</span>
-</div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pksig_cyh.html#pksig_cyh.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-   <span class="n">L</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&quot;alice&quot;</span><span class="p">,</span> <span class="s">&quot;bob&quot;</span><span class="p">,</span> <span class="s">&quot;carlos&quot;</span><span class="p">,</span> <span class="s">&quot;dexter&quot;</span><span class="p">,</span> <span class="s">&quot;eddie&quot;</span><span class="p">]</span> 
-   <span class="n">ID</span> <span class="o">=</span> <span class="s">&quot;bob&quot;</span>
-   <span class="n">groupObj</span> <span class="o">=</span> <span class="n">pairing</span><span class="p">(</span><span class="s">&#39;../param/a.param&#39;</span><span class="p">)</span>
-   <span class="n">cyh</span> <span class="o">=</span> <span class="n">CYH</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
-   <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span> <span class="o">=</span> <span class="n">cyh</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+        pk = [ H1(i) for i in L] # get all signers pub keys
+        result = dotprod(group.init(G1), -1, num_signers, lam_func, u, pk, h) 
+        if pair(result, mpk['Pub']) == pair(S, mpk['g']):
+            return True
+        return False
 
-   <span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="n">Pk</span><span class="p">,</span> <span class="n">Sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">cyh</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">msk</span><span class="p">,</span> <span class="n">ID</span><span class="p">)</span>  
-   <span class="n">sk</span> <span class="o">=</span> <span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="n">Pk</span><span class="p">,</span> <span class="n">Sk</span><span class="p">)</span>
-   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Keygen...&quot;</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">&quot;sk =&gt;&quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+def main():
+   L = [ "alice", "bob", "carlos", "dexter", "eddie"] </div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pksig_cyh.html#pksig_cyh.main">[docs]</a>   ID = "bob"
+   groupObj = PairingGroup('SS512')
+   cyh = CYH(groupObj)
+   (mpk, msk) = cyh.setup()
+
+   (ID, Pk, Sk) = cyh.keygen(msk, ID)  
+   sk = (ID, Pk, Sk)
+   if debug:
+    print("Keygen...")
+    print("sk =&gt;", sk)
   
-   <span class="n">M</span> <span class="o">=</span> <span class="s">&#39;please sign this new message!&#39;</span>
-   <span class="n">sig</span> <span class="o">=</span> <span class="n">cyh</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
-   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature...&quot;</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+   M = 'please sign this new message!'
+   sig = cyh.sign(sk, L, M)
+   if debug:
+    print("Signature...")
+    print("sig =&gt;", sig)
 
-   <span class="k">assert</span> <span class="n">cyh</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s">&quot;invalid signature!&quot;</span>
-   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verification successful!&quot;</span><span class="p">)</span>
-</div>
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
-    <span class="n">main</span><span class="p">()</span>
+   assert cyh.verify(mpk, L, M, sig), "invalid signature!"
+   if debug: print("Verification successful!")
+
+if __name__ == "__main__":
+    debug = True</div>
+    main()
    
-</pre></div>
+</pre>
 
           </div>
         </div>
@@ -169,7 +167,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -192,14 +190,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

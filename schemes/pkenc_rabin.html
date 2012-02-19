@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pkenc_rabin &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>pkenc_rabin &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
     <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
     <link rel="next" title="pkenc_rsa" href="pkenc_rsa.html" />
     <link rel="prev" title="pkenc_paillier99" href="pkenc_paillier99.html" /> 
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="pkenc_paillier99.html" title="pkenc_paillier99"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -79,7 +79,7 @@
 </table>
 <dl class="class">
 <dt id="pkenc_rabin.Rabin">
-<em class="property">class </em><tt class="descclassname">pkenc_rabin.</tt><tt class="descname">Rabin</tt><big>(</big><em>modulus=&lt;toolbox.specialprimes.BlumWilliamsInteger object at 0x1084913d0&gt;</em><big>)</big><a class="reference internal" href="../_modules/pkenc_rabin.html#Rabin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rabin.Rabin" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">pkenc_rabin.</tt><tt class="descname">Rabin</tt><big>(</big><em>modulus=&lt;toolbox.specialprimes.BlumWilliamsInteger object at 0x10a029b50&gt;</em><big>)</big><a class="reference internal" href="../_modules/pkenc_rabin.html#Rabin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rabin.Rabin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
 <p>Rabin Module</p>
 <dl class="method">
@@ -101,7 +101,7 @@
 
 <dl class="class">
 <dt id="pkenc_rabin.Rabin_Enc">
-<em class="property">class </em><tt class="descclassname">pkenc_rabin.</tt><tt class="descname">Rabin_Enc</tt><big>(</big><em>padding=&lt;toolbox.paddingschemes.SAEPEncryptionPadding object at 0x108491ad0&gt;</em>, <em>redundancy=&lt;toolbox.redundancyschemes.InMessageRedundancy object at 0x1084910d0&gt;</em>, <em>params=None</em><big>)</big><a class="reference internal" href="../_modules/pkenc_rabin.html#Rabin_Enc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rabin.Rabin_Enc" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">pkenc_rabin.</tt><tt class="descname">Rabin_Enc</tt><big>(</big><em>padding=&lt;toolbox.paddingschemes.SAEPEncryptionPadding object at 0x10a092f50&gt;</em>, <em>redundancy=&lt;toolbox.redundancyschemes.InMessageRedundancy object at 0x10a092810&gt;</em>, <em>params=None</em><big>)</big><a class="reference internal" href="../_modules/pkenc_rabin.html#Rabin_Enc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rabin.Rabin_Enc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pkenc_rabin.Rabin" title="pkenc_rabin.Rabin"><tt class="xref py py-class docutils literal"><span class="pre">pkenc_rabin.Rabin</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">toolbox.PKEnc.PKEnc</span></tt></p>
 <dl class="method">
 <dt id="pkenc_rabin.Rabin_Enc.decrypt">
@@ -117,7 +117,7 @@
 
 <dl class="class">
 <dt id="pkenc_rabin.Rabin_Sig">
-<em class="property">class </em><tt class="descclassname">pkenc_rabin.</tt><tt class="descname">Rabin_Sig</tt><big>(</big><em>padding=&lt;toolbox.paddingschemes.OAEPEncryptionPadding object at 0x108491d10&gt;</em><big>)</big><a class="reference internal" href="../_modules/pkenc_rabin.html#Rabin_Sig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rabin.Rabin_Sig" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">pkenc_rabin.</tt><tt class="descname">Rabin_Sig</tt><big>(</big><em>padding=&lt;toolbox.paddingschemes.OAEPEncryptionPadding object at 0x10a092450&gt;</em><big>)</big><a class="reference internal" href="../_modules/pkenc_rabin.html#Rabin_Sig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rabin.Rabin_Sig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pkenc_rabin.Rabin" title="pkenc_rabin.Rabin"><tt class="xref py py-class docutils literal"><span class="pre">pkenc_rabin.Rabin</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">toolbox.PKSig.PKSig</span></tt></p>
 <p>RSASSA-PSS</p>
 <dl class="method">
@@ -164,7 +164,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -193,14 +193,14 @@
         <li class="right" >
           <a href="pkenc_paillier99.html" title="pkenc_paillier99"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

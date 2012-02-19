@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>conversion &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>conversion &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,108 +48,106 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for conversion</h1><div class="highlight"><pre>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">:Date: Jul 5, 2011</span>
-<span class="sd">:Authors: Gary Belvin</span>
+  <h1>Source code for conversion</h1><pre>
+:Authors: Gary Belvin
 
-<span class="sd">This class facilitates conversion between domain spaces</span>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="kn">from</span> <span class="nn">charm.integer</span> <span class="kn">import</span> <span class="n">integer</span>
-<span class="kn">from</span> <span class="nn">toolbox.bitstring</span> <span class="kn">import</span> <span class="n">Bytes</span><span class="p">,</span><span class="n">py3</span>
-<span class="kn">import</span> <span class="nn">math</span>
+This class facilitates conversion between domain spaces
+'''
+from charm.integer import integer
+from toolbox.bitstring import Bytes,py3
+import math
 
-<div class="viewcode-block" id="Conversion"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion">[docs]</a><span class="k">class</span> <span class="nc">Conversion</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    The goal is to convert arbitrarily between any of the following types</span>
-<span class="sd">    </span>
-<span class="sd">    Input types:</span>
-<span class="sd">    </span>
-<span class="sd">    * bytes</span>
-<span class="sd">    * Bytes</span>
-<span class="sd">    * int</span>
-<span class="sd">    * Integer Element</span>
-<span class="sd">    * Modular Integer Element</span>
-<span class="sd">    </span>
-<span class="sd">    Output types:</span>
-<span class="sd">    </span>
-<span class="sd">    * int</span>
-<span class="sd">    * Group element</span>
-<span class="sd">    * Integer element</span>
-<span class="sd">    * Integer element mod N</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+class Conversion(object):
+    '''
+<div class="viewcode-block" id="Conversion"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion">[docs]</a>    The goal is to convert arbitrarily between any of the following types
+    
+    Input types:
+    
+    * bytes
+    * Bytes
+    * int
+    * Integer Element
+    * Modular Integer Element
+    
+    Output types:
+    
+    * int
+    * Group element
+    * Integer element
+    * Integer element mod N
+    '''
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Conversion.bytes2element"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.bytes2element">[docs]</a>    <span class="k">def</span> <span class="nf">bytes2element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytestr</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Converts a byte string to a group element&#39;&#39;&#39;</span>
-        <span class="k">pass</span></div>
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Conversion.bytes2integer"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.bytes2integer">[docs]</a>    <span class="k">def</span> <span class="nf">bytes2integer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytestr</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Converts a bytes string to an integer object&#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="n">integer</span><span class="p">(</span><span class="n">bytestr</span><span class="p">)</span></div>
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Conversion.str2bytes"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.str2bytes">[docs]</a>    <span class="k">def</span> <span class="nf">str2bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strobj</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">strobj</span><span class="p">,</span> <span class="s">&#39;utf-8&#39;</span><span class="p">)</span></div>
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Conversion.bytes2str"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.bytes2str">[docs]</a>    <span class="k">def</span> <span class="nf">bytes2str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">byteobj</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">Bytes</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">byteobj</span><span class="p">,</span> <span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
-    </div>
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Conversion.int2bin"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.int2bin">[docs]</a>    <span class="k">def</span> <span class="nf">int2bin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intobj</span><span class="p">):</span>
-        <span class="n">_str</span> <span class="o">=</span> <span class="nb">bin</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">intobj</span><span class="p">))</span>
-        <span class="n">_array</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">_str</span><span class="p">)):</span>
-            <span class="n">_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">_str</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span> 
-        <span class="k">return</span> <span class="n">_array</span>
-        </div>
-    <span class="nd">@classmethod</span>    
-<div class="viewcode-block" id="Conversion.OS2IP"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.OS2IP">[docs]</a>    <span class="k">def</span> <span class="nf">OS2IP</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytestr</span><span class="p">,</span> <span class="n">element</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        :Return: A python ``int`` if element is False. An ``integer.Element`` if element is True</span>
-<span class="sd">        </span>
-<span class="sd">        Converts a byte string to an integer</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="mi">0</span> 
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bytestr</span><span class="p">)):</span>
-            <span class="n">byt</span> <span class="o">=</span> <span class="n">bytestr</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">bytestr</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">i</span><span class="p">]</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">py3</span><span class="p">:</span> <span class="n">byt</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">byt</span><span class="p">)</span>
-            <span class="n">val</span> <span class="o">+=</span> <span class="n">byt</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="mi">8</span> <span class="o">*</span><span class="n">i</span><span class="p">)</span>
-
-        <span class="c">#These lines convert val into a binary string of 1&#39;s and 0&#39;s </span>
-        <span class="c">#bstr = bin(val)[2:]   #cut out the 0b header</span>
-        <span class="c">#val = int(bstr, 2)</span>
-        <span class="c">#return val</span>
-        <span class="k">if</span> <span class="n">element</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">integer</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">val</span></div>
-    <span class="nd">@classmethod</span>    
-<div class="viewcode-block" id="Conversion.IP2OS"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.IP2OS">[docs]</a>    <span class="k">def</span> <span class="nf">IP2OS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number</span><span class="p">,</span> <span class="n">xLen</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        :Parameters:</span>
-<span class="sd">          - ``number``: is a normal integer, not modular</span>
-<span class="sd">          - ``xLen``: is the intended length of the resulting octet string</span>
-<span class="sd">        </span>
-<span class="sd">        Converts an integer into a byte string&#39;&#39;&#39;</span>
+    @classmethod
+    def bytes2element(self, bytestr):
+        '''Converts a byte string to a group element'''
+<div class="viewcode-block" id="Conversion.bytes2element"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.bytes2element">[docs]</a>        pass
+    @classmethod
+    def bytes2integer(self, bytestr):</div>
+        '''Converts a bytes string to an integer object'''
+<div class="viewcode-block" id="Conversion.bytes2integer"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.bytes2integer">[docs]</a>        return integer(bytestr)
+    @classmethod
+    def str2bytes(self, strobj):</div>
+        return Bytes(strobj, 'utf-8')
+<div class="viewcode-block" id="Conversion.str2bytes"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.str2bytes">[docs]</a>    @classmethod
+    def bytes2str(self, byteobj):</div>
+        return Bytes.decode(byteobj, 'utf-8')
+<div class="viewcode-block" id="Conversion.bytes2str"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.bytes2str">[docs]</a>    
+    @classmethod
+    def int2bin(self, intobj):</div>
+        _str = bin(int(intobj))
+<div class="viewcode-block" id="Conversion.int2bin"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.int2bin">[docs]</a>        _array = []
+        for i in range(2, len(_str)):
+            _array.append(int(_str[i])) 
+        return _array
         
-        <span class="n">ba</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">number</span><span class="p">)</span> <span class="o">==</span> <span class="n">integer</span><span class="p">:</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">number</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">number</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="n">py3</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">number</span><span class="p">)</span> <span class="o">==</span> <span class="nb">long</span><span class="p">:</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">number</span>  
+    @classmethod    
+    def OS2IP(self, bytestr, element = False):</div>
+        '''
+<div class="viewcode-block" id="Conversion.OS2IP"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.OS2IP">[docs]</a>        :Return: A python ``int`` if element is False. An ``integer.Element`` if element is True
+        
+        Converts a byte string to an integer
+        '''
+        val = 0 
+        for i in range(len(bytestr)):
+            byt = bytestr[len(bytestr)-1-i]
+            if not py3: byt = ord(byt)
+            val += byt &lt;&lt; (8 *i)
 
-        <span class="k">if</span> <span class="n">xLen</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">xLen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mf">8.0</span><span class="p">))</span>
+        #These lines convert val into a binary string of 1's and 0's 
+        #bstr = bin(val)[2:]   #cut out the 0b header
+        #val = int(bstr, 2)
+        #return val
+        if element:
+            return integer(val)
+        else:
+            return val
+    @classmethod    
+    def IP2OS(self, number, xLen=None):</div>
+        '''
+<div class="viewcode-block" id="Conversion.IP2OS"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.IP2OS">[docs]</a>        :Parameters:
+          - ``number``: is a normal integer, not modular
+          - ``xLen``: is the intended length of the resulting octet string
+        
+        Converts an integer into a byte string'''
+        
+        ba = bytearray()
+        x = 0
+        if type(number) == integer:
+            x = int(number)
+        elif type(number) == int:
+            x = number
+        elif not py3 and type(number) == long:
+            x = number  
+
+        if xLen == None:
+            xLen = int(math.ceil(math.log(x, 2) / 8.0))
             
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">xLen</span><span class="p">):</span>
-            <span class="n">ba</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span> <span class="o">%</span> <span class="mi">256</span><span class="p">)</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span>
-        <span class="n">ba</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">ba</span><span class="p">)</span></div></div>
-</pre></div>
+        for i in range(xLen):
+            ba.append(x % 256)
+            x = x &gt;&gt; 8
+        ba.reverse()
+        return Bytes(ba)
+</pre></div></div>
 
           </div>
         </div>
@@ -159,7 +157,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -182,14 +180,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

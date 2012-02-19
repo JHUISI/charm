@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>PKSig &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>PKSig &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,30 +48,28 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for PKSig</h1><div class="highlight"><pre>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">Base class for public-key signatures</span>
-<span class="sd"> </span>
-<span class="sd">Notes: This class implements an interface for a standard public-key signature scheme.</span>
-<span class="sd">A public key signature consists of three algorithms: (keygen, sign, verify).</span>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="kn">from</span> <span class="nn">toolbox.schemebase</span> <span class="kn">import</span> <span class="o">*</span>
+  <h1>Source code for PKSig</h1><pre>
+ 
+Notes: This class implements an interface for a standard public-key signature scheme.
+A public key signature consists of three algorithms: (keygen, sign, verify).
+'''
+from toolbox.schemebase import *
 
-<div class="viewcode-block" id="PKSig"><a class="viewcode-back" href="../toolbox/PKSig.html#PKSig.PKSig">[docs]</a><span class="k">class</span> <span class="nc">PKSig</span><span class="p">(</span><span class="n">SchemeBase</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">&#39;PKSig&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">baseSecDefs</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;EU_CMA&#39;</span><span class="p">,</span> <span class="s">&#39;wEU_CMA&#39;</span><span class="p">,</span> <span class="s">&#39;sEU_CMA&#39;</span><span class="p">)</span>
+class PKSig(SchemeBase):
+    def __init__(self):
+<div class="viewcode-block" id="PKSig"><a class="viewcode-back" href="../toolbox/PKSig.html#PKSig.PKSig">[docs]</a>        SchemeBase.__init__(self)
+        SchemeBase.setProperty(self, scheme='PKSig')
+        self.baseSecDefs = Enum('EU_CMA', 'wEU_CMA', 'sEU_CMA')
         
-<div class="viewcode-block" id="PKSig.keygen"><a class="viewcode-back" href="../toolbox/PKSig.html#PKSig.PKSig.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">securityparam</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>		
-</div>
-<div class="viewcode-block" id="PKSig.sign"><a class="viewcode-back" href="../toolbox/PKSig.html#PKSig.PKSig.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-    </div>
-<div class="viewcode-block" id="PKSig.verify"><a class="viewcode-back" href="../toolbox/PKSig.html#PKSig.PKSig.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
-</pre></div>
+    def keygen(self, securityparam):
+        raise NotImplementedError		
+<div class="viewcode-block" id="PKSig.keygen"><a class="viewcode-back" href="../toolbox/PKSig.html#PKSig.PKSig.keygen">[docs]</a>
+    def sign(self, pk, sk, message):
+        raise NotImplementedError</div>
+<div class="viewcode-block" id="PKSig.sign"><a class="viewcode-back" href="../toolbox/PKSig.html#PKSig.PKSig.sign">[docs]</a>    
+    def verify(self, pk, message, sig):
+        raise NotImplementedError</div>
+<div class="viewcode-block" id="PKSig.verify"><a class="viewcode-back" href="../toolbox/PKSig.html#PKSig.PKSig.verify">[docs]</a></pre></div></div>
 
           </div>
         </div>
@@ -81,7 +79,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -104,14 +102,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

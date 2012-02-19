@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>chamhash_rsa_hw09 &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>chamhash_rsa_hw09 &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,80 +48,83 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for chamhash_rsa_hw09</h1><div class="highlight"><pre>
-<span class="sd">&#39;&#39;&#39; </span>
-<span class="sd">Hohenberger-Waters Chameleon Hash (RSA-based)</span>
-<span class="sd">based on the scheme of Ateneise and de Medeiros</span>
-<span class="sd"> </span>
-<span class="sd"> | From: &quot;S. Hohenberger, B. Waters. Realizing Hash-and-Sign Signatures under Standard Assumptions&quot;, Appendix A.</span>
-<span class="sd"> | Published in: Eurocrypt 2009</span>
-<span class="sd"> | Available from: http://eprint.iacr.org/2009/028.pdf</span>
-<span class="sd"> | Notes: </span>
+  <h1>Source code for chamhash_rsa_hw09</h1><pre>
+based on the scheme of Ateneise and de Medeiros
+ 
+ | From: "S. Hohenberger, B. Waters. Realizing Hash-and-Sign Signatures under Standard Assumptions", Appendix A.
+ | Published in: Eurocrypt 2009
+ | Available from: http://eprint.iacr.org/2009/028.pdf
+ | Notes: 
 
-<span class="sd"> * type:       hash function (chameleon)</span>
-<span class="sd"> * setting:      RSA</span>
-<span class="sd"> * assumption:   RSA</span>
+ * type:       hash function (chameleon)
+ * setting:      RSA
+ * assumption:   RSA
 
-<span class="sd">:Author:    J. Ayo Akinyele</span>
-<span class="sd">:Date:      1/2011</span>
-<span class="sd">&#39;&#39;&#39;</span>
+:Author:    J. Ayo Akinyele
+:Date:      1/2011
+'''
 
-<span class="kn">from</span> <span class="nn">toolbox.Hash</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">toolbox.integergroup</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">toolbox.conversion</span> <span class="kn">import</span> <span class="o">*</span>
+from toolbox.Hash import *
+from toolbox.integergroup import *
+from toolbox.conversion import *
 
-<span class="n">debug</span><span class="o">=</span><span class="bp">False</span>
-<div class="viewcode-block" id="ChamHash_HW09"><a class="viewcode-back" href="../schemes/chamhash_rsa_hw09.html#chamhash_rsa_hw09.ChamHash_HW09">[docs]</a><span class="k">class</span> <span class="nc">ChamHash_HW09</span><span class="p">(</span><span class="n">ChamHash</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">global</span> <span class="n">group</span>
-        <span class="n">group</span> <span class="o">=</span> <span class="n">IntegerGroupQ</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+debug=False
+class ChamHash_HW09(ChamHash):
+    def __init__(self):
+<div class="viewcode-block" id="ChamHash_HW09"><a class="viewcode-back" href="../schemes/chamhash_rsa_hw09.html#chamhash_rsa_hw09.ChamHash_HW09">[docs]</a>        global group
+        group = IntegerGroupQ(0)
     
-<div class="viewcode-block" id="ChamHash_HW09.paramgen"><a class="viewcode-back" href="../schemes/chamhash_rsa_hw09.html#chamhash_rsa_hw09.ChamHash_HW09.paramgen">[docs]</a>    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="c"># If we&#39;re given p, q, compute N = p*q.  Otherwise select random p, q</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">p</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="n">N</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">group</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="n">secparam</span><span class="p">)</span>
-            <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">q</span>
-            <span class="n">N</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span>
+    def paramgen(self, secparam, p = 0, q = 0):
+        # If we're given p, q, compute N = p*q.  Otherwise select random p, q
+<div class="viewcode-block" id="ChamHash_HW09.paramgen"><a class="viewcode-back" href="../schemes/chamhash_rsa_hw09.html#chamhash_rsa_hw09.ChamHash_HW09.paramgen">[docs]</a>        if not (p == 0 or q == 0):
+            N = p * q
+            if debug: print("p :=", p)
+            if debug: print("q :=", q)
+        else:
+            group.paramgen(secparam)
+            p, q = group.p, group.q
+            N = p * q
         
-        <span class="n">phi_N</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">J</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
-        <span class="n">e</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">phi_N</span><span class="p">)</span>
-        <span class="k">while</span> <span class="p">(</span><span class="ow">not</span> <span class="n">gcd</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">phi_N</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="n">e</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">phi_N</span><span class="p">)</span>
-        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;secparam&#39;</span><span class="p">:</span> <span class="n">secparam</span><span class="p">,</span> <span class="s">&#39;N&#39;</span><span class="p">:</span> <span class="n">N</span><span class="p">,</span> <span class="s">&#39;J&#39;</span><span class="p">:</span> <span class="n">J</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">:</span> <span class="n">e</span> <span class="p">}</span>
-        <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;p&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span> <span class="s">&#39;q&#39;</span><span class="p">:</span> <span class="n">q</span> <span class="p">}</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
-          </div>
-<div class="viewcode-block" id="ChamHash_HW09.hash"><a class="viewcode-back" href="../schemes/chamhash_rsa_hw09.html#chamhash_rsa_hw09.ChamHash_HW09.hash">[docs]</a>    <span class="k">def</span> <span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="n">N</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;J&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;e&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-           <span class="n">r</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
-        <span class="n">M</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">bytes2integer</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-        <span class="n">h</span> <span class="o">=</span> <span class="p">((</span><span class="n">J</span> <span class="o">**</span> <span class="n">M</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">r</span> <span class="o">**</span> <span class="n">e</span><span class="p">))</span> <span class="o">%</span> <span class="n">N</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
-</div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/chamhash_rsa_hw09.html#chamhash_rsa_hw09.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>    
-    <span class="n">chamHash</span> <span class="o">=</span> <span class="n">ChamHash_HW09</span><span class="p">()</span>
-    
-    <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">chamHash</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
-    
-    <span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;Hello world this is the message!&quot;</span>
-    <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="o">=</span> <span class="n">chamHash</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Hash...&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">r</span><span class="p">))</span>
+        phi_N = (p-1)*(q-1)
+        J = group.random(N)
+        e = group.random(phi_N)
+        while (not gcd(e, phi_N) == 1):
+            e = group.random(phi_N)
+        pk = { 'secparam': secparam, 'N': N, 'J': J, 'e': e }
+        sk = { 'p': p, 'q': q }
+        return (pk, sk)
+          
+    def hash(self, pk, message, r = 0):
+        N, J, e = pk['N'], pk['J'], pk['e']</div>
+<div class="viewcode-block" id="ChamHash_HW09.hash"><a class="viewcode-back" href="../schemes/chamhash_rsa_hw09.html#chamhash_rsa_hw09.ChamHash_HW09.hash">[docs]</a>        if r == 0:
+           r = group.random(N)
+        M = Conversion.bytes2integer(message)
+        h = ((J ** M) * (r ** e)) % N
+        return (h, r)
 
-    <span class="p">(</span><span class="n">h1</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="o">=</span> <span class="n">chamHash</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;sig 2 =&gt;&quot;</span><span class="p">,</span> <span class="n">h1</span><span class="p">)</span>
+def main():    
+    # test p and q primes for unit tests only</div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/chamhash_rsa_hw09.html#chamhash_rsa_hw09.main">[docs]</a>    p = integer(164960892556379843852747960442703555069442262500242170785496141408191025653791149960117681934982863436763270287998062485836533436731979391762052869620652382502450810563192532079839617163226459506619269739544815249458016088505187490329968102214003929285843634017082702266003694786919671197914296386150563930299)
+    q = integer(82480446278189921926373980221351777534721131250121085392748070704095512826895574980058840967491431718381635143999031242918266718365989695881026434810326191251225405281596266039919808581613229753309634869772407624729008044252593745164984051107001964642921817008541351133001847393459835598957148193075281965149) 
 
-    <span class="k">assert</span> <span class="n">h</span> <span class="o">==</span> <span class="n">h1</span><span class="p">,</span> <span class="s">&quot;Signature failed!!!&quot;</span>
-    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature generated correctly!!!&quot;</span><span class="p">)</span>
-</div>
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
-    <span class="n">main</span><span class="p">()</span>
-</pre></div>
+    chamHash = ChamHash_HW09()
+    (pk, sk) = chamHash.paramgen(1024, p, q)
+    
+    msg = "Hello world this is the message!"
+    (h, r) = chamHash.hash(pk, msg)
+    if debug: print("Hash...")
+    if debug: print("sig =&gt;", (h, r))
+
+    (h1, r) = chamHash.hash(pk, msg, r)
+    if debug: print("sig 2 =&gt;", h1)
+
+    assert h == h1, "Signature failed!!!"
+    if debug: print("Signature generated correctly!!!")
+
+if __name__ == "__main__":
+    debug = True</div>
+    main()
+</pre>
 
           </div>
         </div>
@@ -131,7 +134,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -154,14 +157,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

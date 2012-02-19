@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>MessageAuthenticator &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>MessageAuthenticator &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,10 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
-    <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
-    <link rel="next" title="node" href="node.html" />
-    <link rel="prev" title="iterate" href="iterate.html" /> 
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -40,14 +37,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="node.html" title="node"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="iterate.html" title="iterate"
-             accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -56,37 +46,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="module-MessageAuthenticator">
-<span id="messageauthenticator"></span><h1>MessageAuthenticator<a class="headerlink" href="#module-MessageAuthenticator" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="MessageAuthenticator.MessageAuthenticator">
-<em class="property">class </em><tt class="descclassname">MessageAuthenticator.</tt><tt class="descname">MessageAuthenticator</tt><big>(</big><em>key</em>, <em>alg='HMAC_SHA1'</em><big>)</big><a class="reference internal" href="../_modules/MessageAuthenticator.html#MessageAuthenticator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#MessageAuthenticator.MessageAuthenticator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
-<p>Abstraction for constructing and verifying authenticated messages</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">GT</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.pairing</span> <span class="kn">import</span> <span class="nb">hash</span> <span class="k">as</span> <span class="n">extractor</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;../param/a.param&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">MessageAuthenticator</span><span class="p">(</span><span class="n">extractor</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">AuthenticatedMessage</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">mac</span><span class="p">(</span><span class="s">&#39;Hello World&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">AuthenticatedMessage</span><span class="p">)</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-<dl class="method">
-<dt id="MessageAuthenticator.MessageAuthenticator.mac">
-<tt class="descname">mac</tt><big>(</big><em>msg</em><big>)</big><a class="reference internal" href="../_modules/MessageAuthenticator.html#MessageAuthenticator.mac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#MessageAuthenticator.MessageAuthenticator.mac" title="Permalink to this definition">¶</a></dt>
-<dd><p>authenticates a message</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="MessageAuthenticator.MessageAuthenticator.verify">
-<tt class="descname">verify</tt><big>(</big><em>msgAndDigest</em><big>)</big><a class="reference internal" href="../_modules/MessageAuthenticator.html#MessageAuthenticator.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#MessageAuthenticator.MessageAuthenticator.verify" title="Permalink to this definition">¶</a></dt>
-<dd><p>verifies the result returned by mac</p>
-</dd></dl>
-
-</dd></dl>
-
+  <div class="section" id="messageauthenticator">
+<h1>MessageAuthenticator<a class="headerlink" href="#messageauthenticator" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -95,12 +56,6 @@
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="iterate.html"
-                        title="previous chapter">iterate</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="node.html"
-                        title="next chapter">node</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/toolbox/MessageAuthenticator.txt"
@@ -109,7 +64,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -132,20 +87,13 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="node.html" title="node"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="iterate.html" title="iterate"
-             >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

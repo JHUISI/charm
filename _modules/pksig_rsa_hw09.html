@@ -1,0 +1,311 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pksig_rsa_hw09 &mdash; Charm-Crypto 0.4b documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.4b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pksig_rsa_hw09</h1><pre>
+ 
+ | From: "S. Hohenberger, B. Waters. Realizing Hash-and-Sign Signatures under Standard Assumptions", Section 3.
+ | Published in: Eurocrypt 2009
+ | Available from: http://eprint.iacr.org/2009/028.pdf
+ | Notes: 
+
+ * type:       signature (public key)
+ * setting:      RSA
+ * assumption:   RSA
+
+:Author:    J Ayo Akinyele/Christina Garman
+:Date:      12/2011
+:Status:    Needs Improvement.
+"""
+
+from charm.integer import *
+from toolbox.PKSig import PKSig
+from chamhash_rsa_hw09 import ChamHash_HW09
+from toolbox.conversion import Conversion
+from toolbox.bitstring import Bytes
+from toolbox.specialprimes import BlumWilliamsInteger
+import hmac, hashlib, math
+
+debug = False
+
+def SHA1(bytes1):
+  s1 = hashlib.new('sha1')
+<div class="viewcode-block" id="SHA1"><a class="viewcode-back" href="../schemes/pksig_rsa_hw09.html#pksig_rsa_hw09.SHA1">[docs]</a>  s1.update(bytes1)
+  return s1.digest()
+
+
+def randomQR(n):
+    return random(n) ** 2</div>
+<div class="viewcode-block" id="randomQR"><a class="viewcode-back" href="../schemes/pksig_rsa_hw09.html#pksig_rsa_hw09.randomQR">[docs]</a>    
+class LogFunction:
+  def __init__(self, base=10):</div>
+<div class="viewcode-block" id="LogFunction"><a class="viewcode-back" href="../schemes/pksig_rsa_hw09.html#pksig_rsa_hw09.LogFunction">[docs]</a>    self.base = base
+  
+  def __getitem__(self, base):
+    return LogFunction(base)
+  
+  def __call__(self, val):
+    return math.log(val, self.base)
+log = LogFunction()
+</div>
+class Prf:
+  def __init__(self):
+<div class="viewcode-block" id="Prf"><a class="viewcode-back" href="../schemes/pksig_rsa_hw09.html#pksig_rsa_hw09.Prf">[docs]</a>      pass
+  
+  @classmethod
+  def keygen(self, bits):
+    return integer(randomBits(bits))
+<div class="viewcode-block" id="Prf.keygen"><a class="viewcode-back" href="../schemes/pksig_rsa_hw09.html#pksig_rsa_hw09.Prf.keygen">[docs]</a>
+  @classmethod  
+  def eval(self, k, input1): </div>
+    if type(k) == integer:
+<div class="viewcode-block" id="Prf.eval"><a class="viewcode-back" href="../schemes/pksig_rsa_hw09.html#pksig_rsa_hw09.Prf.eval">[docs]</a>        h = hmac.new(serialize(k), b'', hashlib.sha1)
+    else:
+        h = hmac.new(serialize(integer(k)), b'', hashlib.sha1)
+    
+    h.update(input1)
+    return Conversion.bytes2integer(h.hexdigest())
+
+class BlumIntegerSquareRoot:
+  def __init__(self, p, q):</div></div>
+<div class="viewcode-block" id="BlumIntegerSquareRoot"><a class="viewcode-back" href="../schemes/pksig_rsa_hw09.html#pksig_rsa_hw09.BlumIntegerSquareRoot">[docs]</a>    self.raisedToThePower = 1
+    self.p = p
+    self.q = q
+    
+  def pow(self, modularInt):
+    p, q = self.p, self.q
+<div class="viewcode-block" id="BlumIntegerSquareRoot.pow"><a class="viewcode-back" href="../schemes/pksig_rsa_hw09.html#pksig_rsa_hw09.BlumIntegerSquareRoot.pow">[docs]</a>    result = integer(modularInt) % (p * q)
+    for repeat in range(self.raisedToThePower):
+        result = result ** (((p-1)*(q-1)+4)/8)
+    return result
+
+  def __pow__(self, power):
+    exp = BlumIntegerSquareRoot(self.p, self.q)</div>
+    exp.raisedToThePower = power
+    return exp.pow(power)
+
+class Sig_RSA_Stateless_HW09(PKSig):
+    def __init__(self, CH = ChamHash_HW09):</div>
+<div class="viewcode-block" id="Sig_RSA_Stateless_HW09"><a class="viewcode-back" href="../schemes/pksig_rsa_hw09.html#pksig_rsa_hw09.Sig_RSA_Stateless_HW09">[docs]</a>        self.BWInt = BlumWilliamsInteger()
+        self.Prf = Prf()
+        self.ChameleonHash = CH()
+        
+    def keygen(self, keyLength=1024, p=0, q=0):
+        # Generate a Blum-Williams integer N of 'key_length' bits with factorization p,q
+<div class="viewcode-block" id="Sig_RSA_Stateless_HW09.keygen"><a class="viewcode-back" href="../schemes/pksig_rsa_hw09.html#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.keygen">[docs]</a>        if p == 0 or q == 0:
+            (p, q) = self.BWInt.generatePrimes(int(keyLength/2))
+        # Generate random u,h \in QR_N and a random c \in {0,1}^|N|
+        N = p * q
+        u = randomQR(N)
+        h = randomQR(N)
+        c = randomBits(keyLength)#PRNG_generate_bits(key_length)
+
+        K = self.Prf.keygen(keyLength)
+        self.state = 0
+    
+        # Generate the Chameleon hash parameters.  We do not need the secret params.
+        (L, secret) = self.ChameleonHash.paramgen(keyLength, p, q);
+    
+        # Assemble the public and secret keys
+        pk = { 'length': keyLength, 'N': N, 'u': u, 'h': h, 'c': c, 'K': K, 'L': L }
+        sk = { 'p': p, 'q': q }
+        return (pk, sk);
+    
+    def sign(self, pk, sk, message, s=0):
+        if debug: print("Sign...")</div>
+<div class="viewcode-block" id="Sig_RSA_Stateless_HW09.sign"><a class="viewcode-back" href="../schemes/pksig_rsa_hw09.html#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.sign">[docs]</a>        L, K, c, keyLength, u, h, N = pk['L'], pk['K'], pk['c'], pk['length'], pk['u'], pk['h'], pk['N']
+        p, q = sk['p'], sk['q']
+        # Use internal state counter if none was provided
+        if (s == 0):
+          s = self.state
+          self.state += 1
+          s += 1
+
+        # Hash the message using the chameleon hash under params L to obtain (x, r)
+        (x, r) = self.ChameleonHash.hash(L, message);
+        # Compute e = H_k(s) and check whether it's prime. If not, increment s and repeat.
+        phi_N = (p-1)*(q-1)
+        e = self.HW_hash(K, c, s, keyLength)
+        e1 = e % phi_N
+        e2 = e % N
+        
+        while (not (isPrime(e2))) or (not gcd(e1, phi_N) == 1):
+            s += 1
+            e = self.HW_hash(K, c, s, keyLength)
+            e1 = e % phi_N
+            e2 = e % N
+        e = e1
+
+        # Compute B = SQRT(u^x * h)^ceil(log_2(s)) mod N
+        # Note that SQRT requires the factorization p, q
+        temp = ((u ** x) * h) % N
+        power = ((((p-1)*(q-1))+4)/8) ** (math.ceil(log[2](s)))
+        B = temp ** power
+        sigma1 = (B ** (e ** -1)) % N
+
+        # Update internal state counter and return sig = (sigma1, r, s)
+        self.state = s
+        return { 'sigma1':sigma1, 'r': r, 's': s, 'e':e }
+
+
+    def verify(self, pk, message, sig):
+        if debug: print("\nVERIFY\n\n")</div>
+<div class="viewcode-block" id="Sig_RSA_Stateless_HW09.verify"><a class="viewcode-back" href="../schemes/pksig_rsa_hw09.html#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.verify">[docs]</a>        sigma1, r, s, e = sig['sigma1'], sig['r'], sig['s'], sig['e']
+        K, L, c, keyLength, u, h, N = pk['K'], pk['L'], pk['c'], pk['length'], pk['u'], pk['h'], pk['N']
+    
+        # Make sure that 0 &lt; s &lt; 2^{keylength/2}, else reject the signature
+        if not (0 &lt; s and s &lt; (2 ** (keyLength/2))):
+            return False
+
+        # Compute e = H_k(s) and reject the signature if it's not prime
+        ei = self.HW_hash(K, c, s, keyLength) % N
+        if not isPrime(ei):
+            if debug: print("ei not prime")
+            return False
+        
+        # Compute Y = sigma1^{2*ceil(log2(s))}
+        s1 = integer(2 ** (math.ceil(log[2](s))))
+        Y = (sigma1 ** s1) % N
+        
+        # Hash the mesage using the chameleon hash with fixed randomness r
+        (x, r2) = self.ChameleonHash.hash(L, message, r)
+
+        lhs = (Y ** ei) % N
+        rhs = ((u ** x) * h) % N
+        if debug:
+            print("lhs =&gt;", lhs)
+            print("rhs =&gt;", rhs)
+        # Verify that Y^e = (u^x h) mod N.  If so, accept the signature
+        if lhs == rhs:
+            return True
+        # Default: reject the signature
+        return False
+    
+    def HW_hash(self, key, c, input, keyLen):
+        C = integer(c)</div>
+<div class="viewcode-block" id="Sig_RSA_Stateless_HW09.HW_hash"><a class="viewcode-back" href="../schemes/pksig_rsa_hw09.html#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.HW_hash">[docs]</a>        input_size = bitsize(c)
+        input_b = Conversion.IP2OS(input, input_size)
+        # Return c XOR PRF(k, input), where the output of PRF is keyLength bits
+        result = C ^ self.Prf.eval(key, input_b)
+        return result
+        
+def main():
+    pksig = Sig_RSA_Stateless_HW09() </div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pksig_rsa_hw09.html#pksig_rsa_hw09.main">[docs]</a>    # fixed params for unit tests
+    p = integer(13075790812874903063868976368194105132206964291400106069285054021531242344673657224376055832139406140158530256050580761865568307154219348003780027259560207)
+    q = integer(12220150399144091059083151334113293594120344494042436487743750419696868216757186059428173175925369884682105191510729093971051869295857706815002710593321543)
+    (pk, sk) = pksig.keygen(1024, p, q)
+    if debug:
+        print("Public parameters...")
+        print("pk =&gt;", pk)
+        print("sk =&gt;", sk)
+    
+    m = SHA1(b'this is the message I want to hash.')
+    m2 = SHA1(b'please sign this message too!')
+    #m = b'This is a message to hash'
+    sig = pksig.sign(pk, sk, m)
+    if debug:
+        print("Signature...")
+        print("sig =&gt;", sig)
+    sig2 = pksig.sign(pk, sk, m2)
+    if debug:
+        print("Signature 2...")
+        print("sig2 =&gt;", sig2)
+    
+    assert pksig.verify(pk, m, sig), "FAILED VERIFICATION!!!"
+    assert pksig.verify(pk, m2, sig2), "FAILED VERIFICATION!!!"
+    if debug: print("Successful Verification!!!")
+
+if __name__ == "__main__":
+    debug = True</div>
+    main()   
+</pre>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Johns Hopkins University ISI.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

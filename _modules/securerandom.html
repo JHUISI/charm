@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>securerandom &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>securerandom &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,81 +48,79 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for securerandom</h1><div class="highlight"><pre>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">Base class for cryptographic secure random number generation</span>
-<span class="sd">:authors: Gary Belvin</span>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="kn">from</span> <span class="nn">toolbox.bitstring</span> <span class="kn">import</span> <span class="n">Bytes</span>
-<span class="kn">from</span> <span class="nn">toolbox.conversion</span> <span class="kn">import</span> <span class="n">Conversion</span>
-<span class="kn">from</span> <span class="nn">charm.integer</span> <span class="kn">import</span> <span class="n">randomBits</span>
-<span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">random</span>
+  <h1>Source code for securerandom</h1><pre>
+:authors: Gary Belvin
+'''
+from toolbox.bitstring import Bytes
+from toolbox.conversion import Conversion
+from charm.integer import randomBits
+import datetime
+import math
+import random
 
-<div class="viewcode-block" id="SecureRandom"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.SecureRandom">[docs]</a><span class="k">class</span> <span class="nc">SecureRandom</span><span class="p">():</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span>
-<div class="viewcode-block" id="SecureRandom.getRandomBytes"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.SecureRandom.getRandomBytes">[docs]</a>    <span class="k">def</span> <span class="nf">getRandomBytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Returns a random bit string of length bytes&#39;&#39;&#39;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
-<div class="viewcode-block" id="SecureRandom.addSeed"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.SecureRandom.addSeed">[docs]</a>    <span class="k">def</span> <span class="nf">addSeed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Add randomness to the generator.  </span>
-<span class="sd">        Always increases entropy</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-</div></div>
-<div class="viewcode-block" id="SecureRandomFactory"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.SecureRandomFactory">[docs]</a><span class="k">class</span> <span class="nc">SecureRandomFactory</span><span class="p">():</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    This class provides a central place to swap out the randomness engine</span>
-<span class="sd">    used by the charm framework.</span>
-<span class="sd">    Classes should call ``rand = SecureRandomFactory.getInstance()`` </span>
-<span class="sd">    to acquire a randomnesss generator</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="SecureRandomFactory.getInstance"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.SecureRandomFactory.getInstance">[docs]</a>    <span class="k">def</span> <span class="nf">getInstance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">OpenSSLRand</span><span class="p">()</span>
-    
-</div></div>
-<div class="viewcode-block" id="OpenSSLRand"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.OpenSSLRand">[docs]</a><span class="k">class</span> <span class="nc">OpenSSLRand</span><span class="p">(</span><span class="n">SecureRandom</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Uses the OpenSSL PRNG for random bits&#39;&#39;&#39;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">SecureRandom</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="c">#seed with a little bit of random data. This is not the only source</span>
-        <span class="c">#of randomness. Internally, OpenSSL samples additional physical randomness.</span>
-    
-<div class="viewcode-block" id="OpenSSLRand.getRandomBytes"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.OpenSSLRand.getRandomBytes">[docs]</a>    <span class="k">def</span> <span class="nf">getRandomBytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
-        <span class="n">bits</span> <span class="o">=</span> <span class="n">length</span> <span class="o">*</span> <span class="mi">8</span><span class="p">;</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="n">randomBits</span><span class="p">(</span><span class="n">bits</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>    
-    </div>
-<div class="viewcode-block" id="OpenSSLRand.getRandomBits"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.OpenSSLRand.getRandomBits">[docs]</a>    <span class="k">def</span> <span class="nf">getRandomBits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
-        <span class="n">i</span> <span class="o">=</span> <span class="n">randomBits</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
-        <span class="nb">len</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">length</span> <span class="o">/</span> <span class="mi">8</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">len</span><span class="p">)</span>
+class SecureRandom():
+    def __init__(self):
+<div class="viewcode-block" id="SecureRandom"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.SecureRandom">[docs]</a>        pass
+    def getRandomBytes(self, length):
+        '''Returns a random bit string of length bytes'''
+<div class="viewcode-block" id="SecureRandom.getRandomBytes"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.SecureRandom.getRandomBytes">[docs]</a>        raise NotImplementedError
+    def addSeed(self, seed):
+        '''</div>
+<div class="viewcode-block" id="SecureRandom.addSeed"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.SecureRandom.addSeed">[docs]</a>        Add randomness to the generator.  
+        Always increases entropy
+        '''
+        raise NotImplementedError
 
-</div></div>
-<div class="viewcode-block" id="WeakRandom"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.WeakRandom">[docs]</a><span class="k">class</span> <span class="nc">WeakRandom</span><span class="p">(</span><span class="n">SecureRandom</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">SecureRandom</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-<div class="viewcode-block" id="WeakRandom.getRandomBytes"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.WeakRandom.getRandomBytes">[docs]</a>    <span class="k">def</span> <span class="nf">getRandomBytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">myrandom</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span></div>
-<div class="viewcode-block" id="WeakRandom.addSeed"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.WeakRandom.addSeed">[docs]</a>    <span class="k">def</span> <span class="nf">addSeed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="WeakRandom.myrandom"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.WeakRandom.myrandom">[docs]</a>    <span class="k">def</span> <span class="nf">myrandom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">printable</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        This method does **NOT** provide cryptographically secure random numbers.</span>
-<span class="sd">        This should **NOT** be used for production code</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">printable</span><span class="p">):</span>
-            <span class="c">#Nice printable characters for testing purposes</span>
-            <span class="k">return</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mh">0x20</span><span class="p">,</span> <span class="mh">0x7E</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">length</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">length</span><span class="p">))</span>
-    </div></div>
-</pre></div>
+class SecureRandomFactory():
+    '''</div></div>
+<div class="viewcode-block" id="SecureRandomFactory"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.SecureRandomFactory">[docs]</a>    This class provides a central place to swap out the randomness engine
+    used by the charm framework.
+    Classes should call ``rand = SecureRandomFactory.getInstance()`` 
+    to acquire a randomnesss generator
+    '''
+    @classmethod
+    def getInstance(self):
+        return OpenSSLRand()
+<div class="viewcode-block" id="SecureRandomFactory.getInstance"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.SecureRandomFactory.getInstance">[docs]</a>    
+
+class OpenSSLRand(SecureRandom):
+    '''Uses the OpenSSL PRNG for random bits'''</div></div>
+<div class="viewcode-block" id="OpenSSLRand"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.OpenSSLRand">[docs]</a>    def __init__(self):
+        SecureRandom.__init__(self)
+        #seed with a little bit of random data. This is not the only source
+        #of randomness. Internally, OpenSSL samples additional physical randomness.
+    
+    def getRandomBytes(self, length):
+        bits = length * 8;
+<div class="viewcode-block" id="OpenSSLRand.getRandomBytes"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.OpenSSLRand.getRandomBytes">[docs]</a>        val = randomBits(bits)
+        return Conversion.IP2OS(val, length)    
+    
+    def getRandomBits(self, length):
+        i = randomBits(length)</div>
+<div class="viewcode-block" id="OpenSSLRand.getRandomBits"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.OpenSSLRand.getRandomBits">[docs]</a>        len = math.ceil(length / 8)
+        return Conversion.IP2OS(i, len)
+
+
+class WeakRandom(SecureRandom):
+    def __init__(self):</div></div>
+<div class="viewcode-block" id="WeakRandom"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.WeakRandom">[docs]</a>        SecureRandom.__init__(self)
+    def getRandomBytes(self, length):
+        return self.myrandom(length, False)
+<div class="viewcode-block" id="WeakRandom.getRandomBytes"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.WeakRandom.getRandomBytes">[docs]</a>    def addSeed(self, seed):
+        raise NotImplementedError()</div>
+<div class="viewcode-block" id="WeakRandom.addSeed"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.WeakRandom.addSeed">[docs]</a>    @classmethod
+    def myrandom(self, length, printable=False):</div>
+        '''
+<div class="viewcode-block" id="WeakRandom.myrandom"><a class="viewcode-back" href="../toolbox/securerandom.html#securerandom.WeakRandom.myrandom">[docs]</a>        This method does **NOT** provide cryptographically secure random numbers.
+        This should **NOT** be used for production code
+        '''
+        if(printable):
+            #Nice printable characters for testing purposes
+            return Bytes(random.randrange(0x20, 0x7E) for i in range(length))
+        else:
+            return Bytes(random.randrange(0, 256) for i in range(length))
+    
+</pre></div></div>
 
           </div>
         </div>
@@ -132,7 +130,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -155,14 +153,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

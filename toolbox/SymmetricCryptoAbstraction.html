@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>SymmetricCryptoAbstraction &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>SymmetricCryptoAbstraction &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,10 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
-    <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
-    <link rel="next" title="zknode" href="zknode.html" />
-    <link rel="prev" title="specialprimes" href="specialprimes.html" /> 
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -40,14 +37,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="zknode.html" title="zknode"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="specialprimes.html" title="specialprimes"
-             accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -56,35 +46,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="module-SymmetricCryptoAbstraction">
-<span id="symmetriccryptoabstraction"></span><h1>SymmetricCryptoAbstraction<a class="headerlink" href="#module-SymmetricCryptoAbstraction" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="SymmetricCryptoAbstraction.SymmetricCryptoAbstraction">
-<em class="property">class </em><tt class="descclassname">SymmetricCryptoAbstraction.</tt><tt class="descname">SymmetricCryptoAbstraction</tt><big>(</big><em>key</em>, <em>alg=0</em>, <em>mode=2</em><big>)</big><a class="reference internal" href="../_modules/SymmetricCryptoAbstraction.html#SymmetricCryptoAbstraction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SymmetricCryptoAbstraction.SymmetricCryptoAbstraction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
-<p>Abstraction for symmetric encryption and decryption of data.
-Ideally provide an INDCCA2 secure symmetric container for arbitrary data.
-Currently only supports primitives that JSON can encode and decode.</p>
-<p>usage:
-&gt;&gt;&gt; from toolbox.pairinggroup import PairingGroup,GT
-&gt;&gt;&gt; groupObj = PairingGroup(&#8216;../param/a.param&#8217;)
-&gt;&gt;&gt; from charm.pairing import hash as sha1
-&gt;&gt;&gt; a = SymmetricCryptoAbstraction(sha1(groupObj.random(GT)))
-&gt;&gt;&gt; ct = a.encrypt(&#8220;Friendly Fire Isn&#8217;t&#8221;)
-&gt;&gt;&gt; a.decrypt(ct)
-&#8220;Friendly Fire Isn&#8217;t&#8221;</p>
-<dl class="method">
-<dt id="SymmetricCryptoAbstraction.SymmetricCryptoAbstraction.decrypt">
-<tt class="descname">decrypt</tt><big>(</big><em>cipherText</em><big>)</big><a class="reference internal" href="../_modules/SymmetricCryptoAbstraction.html#SymmetricCryptoAbstraction.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SymmetricCryptoAbstraction.SymmetricCryptoAbstraction.decrypt" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="SymmetricCryptoAbstraction.SymmetricCryptoAbstraction.encrypt">
-<tt class="descname">encrypt</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="../_modules/SymmetricCryptoAbstraction.html#SymmetricCryptoAbstraction.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SymmetricCryptoAbstraction.SymmetricCryptoAbstraction.encrypt" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+  <div class="section" id="symmetriccryptoabstraction">
+<h1>SymmetricCryptoAbstraction<a class="headerlink" href="#symmetriccryptoabstraction" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -93,12 +56,6 @@ Currently only supports primitives that JSON can encode and decode.</p>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="specialprimes.html"
-                        title="previous chapter">specialprimes</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="zknode.html"
-                        title="next chapter">zknode</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/toolbox/SymmetricCryptoAbstraction.txt"
@@ -107,7 +64,7 @@ Currently only supports primitives that JSON can encode and decode.</p>
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -130,20 +87,13 @@ Currently only supports primitives that JSON can encode and decode.</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="zknode.html" title="zknode"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="specialprimes.html" title="specialprimes"
-             >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

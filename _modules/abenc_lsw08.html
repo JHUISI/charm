@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>abenc_lsw08 &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>abenc_lsw08 &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,139 +48,141 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for abenc_lsw08</h1><div class="highlight"><pre>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">Allison Lewko, Amit Sahai and Brent Waters (Pairing-based)</span>
-<span class="sd"> </span>
-<span class="sd">| From: &quot;Revocation Systems with Very Small Private Keys&quot;, Large Universe Construction</span>
-<span class="sd">| Published in: IEEE S&amp;P 2010</span>
-<span class="sd">| Available from: http://eprint.iacr.org/2009/309.pdf</span>
-<span class="sd">| Notes: </span>
-
-<span class="sd">* type:           key-policy attribute-based encryption (public key)</span>
-<span class="sd">* setting:        Pairing</span>
-
-<span class="sd">:Authors:    J Ayo Akinyele</span>
-<span class="sd">:Date:            12/2010</span>
-<span class="sd">&#39;&#39;&#39;</span>
-
-<span class="kn">from</span> <span class="nn">toolbox.pairinggroup</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">toolbox.secretutil</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">toolbox.policytree</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">toolbox.ABEnc</span> <span class="kn">import</span> <span class="o">*</span>
-
-<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
-<div class="viewcode-block" id="KPabe"><a class="viewcode-back" href="../schemes/abenc_lsw08.html#abenc_lsw08.KPabe">[docs]</a><span class="k">class</span> <span class="nc">KPabe</span><span class="p">(</span><span class="n">ABEnc</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
-        <span class="n">ABEnc</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">global</span> <span class="n">group</span><span class="p">,</span> <span class="n">util</span>
-        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
-        <span class="n">util</span> <span class="o">=</span> <span class="n">SecretUtil</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">Pairing</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>        
-        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">=</span> <span class="n">PolicyParser</span><span class="p">()</span>
-
-<div class="viewcode-block" id="KPabe.setup"><a class="viewcode-back" href="../schemes/abenc_lsw08.html#abenc_lsw08.KPabe.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c"># pick random exponents</span>
-        <span class="n">alpha1</span><span class="p">,</span> <span class="n">alpha2</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
-        
-        <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha1</span> <span class="o">*</span> <span class="n">alpha2</span>
-        <span class="n">g_G1</span><span class="p">,</span> <span class="n">g_G2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span> <span class="c"># PK 1,2        </span>
-        <span class="n">h_G1</span><span class="p">,</span> <span class="n">h_G2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span> <span class="c"># PK 3</span>
-        <span class="n">g1b</span> <span class="o">=</span> <span class="n">g_G1</span> <span class="o">**</span> <span class="n">b</span>        
-        <span class="n">e_gg_alpha</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">g_G1</span><span class="p">,</span><span class="n">g_G2</span><span class="p">)</span> <span class="o">**</span> <span class="n">alpha</span>
-        
-        <span class="c">#public parameters # &#39;g_G2^b&#39;:(g_G2 ** b), &#39;g_G2^b2&#39;:g_G2 ** (b * b),</span>
-        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;g_G1&#39;</span><span class="p">:</span><span class="n">g_G1</span><span class="p">,</span> <span class="s">&#39;g_G2&#39;</span><span class="p">:</span><span class="n">g_G2</span><span class="p">,</span> <span class="s">&#39;g_G1_b&#39;</span><span class="p">:</span><span class="n">g1b</span><span class="p">,</span>
-              <span class="s">&#39;g_G1_b2&#39;</span><span class="p">:</span><span class="n">g1b</span> <span class="o">**</span> <span class="n">b</span><span class="p">,</span> <span class="s">&#39;h_G1_b&#39;</span><span class="p">:</span><span class="n">h_G1</span> <span class="o">**</span> <span class="n">b</span><span class="p">,</span> <span class="s">&#39;e(gg)_alpha&#39;</span><span class="p">:</span><span class="n">e_gg_alpha</span> <span class="p">}</span>
-        <span class="c">#secret parameters</span>
-        <span class="n">mk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;alpha1&#39;</span><span class="p">:</span><span class="n">alpha1</span><span class="p">,</span> <span class="s">&#39;alpha2&#39;</span><span class="p">:</span><span class="n">alpha2</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">:</span><span class="n">b</span><span class="p">,</span> <span class="s">&#39;h_G1&#39;</span><span class="p">:</span><span class="n">h_G1</span><span class="p">,</span> <span class="s">&#39;h_G2&#39;</span><span class="p">:</span><span class="n">h_G2</span> <span class="p">}</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">)</span>
-    </div>
-<div class="viewcode-block" id="KPabe.keygen"><a class="viewcode-back" href="../schemes/abenc_lsw08.html#abenc_lsw08.KPabe.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="n">policy_str</span><span class="p">):</span>
-        <span class="c">#policy = self.parser.parse(policy_str)</span>
-        <span class="n">policy</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">createPolicy</span><span class="p">(</span><span class="n">policy_str</span><span class="p">)</span>
-        <span class="n">attr_list</span> <span class="o">=</span> <span class="p">[];</span> <span class="n">util</span><span class="o">.</span><span class="n">getAttributeList</span><span class="p">(</span><span class="n">policy</span><span class="p">,</span> <span class="n">attr_list</span><span class="p">)</span>
-        
-        <span class="n">s</span> <span class="o">=</span> <span class="n">mk</span><span class="p">[</span><span class="s">&#39;alpha1&#39;</span><span class="p">];</span> <span class="n">secret</span> <span class="o">=</span> <span class="n">s</span>
-        <span class="n">shares</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">calculateShares</span><span class="p">(</span><span class="n">secret</span><span class="p">,</span> <span class="n">policy</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
-        
-        <span class="n">D</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">attr_list</span><span class="p">:</span>
-            <span class="n">d</span> <span class="o">=</span> <span class="p">[];</span> <span class="n">r</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">negatedAttr</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="c"># meaning positive</span>
-                <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g_G1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">mk</span><span class="p">[</span><span class="s">&#39;alpha2&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">shares</span><span class="p">[</span><span class="n">x</span><span class="p">]))</span> <span class="o">*</span> <span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">G1</span><span class="p">)</span> <span class="o">**</span> <span class="n">r</span><span class="p">))</span>   <span class="c"># compute D1 for attribute x</span>
-                <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g_G2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">))</span>  <span class="c"># compute D2 for attribute x</span>
-            <span class="c">#else:</span>
-            <span class="c">#    d.append((pk[&#39;g2_G1&#39;] ** shares[x]) * (pk[&#39;g_G1_b2&#39;] ** r)) # compute D3</span>
-            <span class="c">#    d.append((pk[&#39;g_G1^b&#39;] ** (r * H(x, &#39;Zr&#39;))) * (mk[&#39;h_G1&#39;] ** r)) # compute D4 (not quite right)</span>
-            <span class="c">#    d.append(pk[&#39;g_G2&#39;] ** -r)</span>
-            <span class="n">D</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Policy: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">policy</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Attribute list: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">attr_list</span><span class="p">)</span>
-        <span class="n">D</span><span class="p">[</span><span class="s">&#39;policy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">policy_str</span>
-        <span class="k">return</span> <span class="n">D</span>
-    </div>
-<div class="viewcode-block" id="KPabe.negatedAttr"><a class="viewcode-back" href="../schemes/abenc_lsw08.html#abenc_lsw08.KPabe.negatedAttr">[docs]</a>    <span class="k">def</span> <span class="nf">negatedAttr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">attribute</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;!&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Checking... =&gt; </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">attribute</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-            <span class="k">return</span> <span class="bp">True</span>
-        <span class="k">return</span> <span class="bp">False</span>    
-    </div>
-<div class="viewcode-block" id="KPabe.encrypt"><a class="viewcode-back" href="../schemes/abenc_lsw08.html#abenc_lsw08.KPabe.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">attr_list</span><span class="p">):</span>   
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&#39;Encryption Algorithm...&#39;</span><span class="p">)</span>    
-        <span class="c"># s will hold secret</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">();</span> <span class="n">sx</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">attr_list</span><span class="p">)):</span>
-            <span class="n">sx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">())</span>
-            <span class="n">sx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-=</span> <span class="n">sx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        
-        <span class="c"># compute E3</span>
-        <span class="n">E3</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">G1</span><span class="p">)</span> <span class="o">**</span> <span class="n">s</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">attr_list</span><span class="p">]</span>
-        <span class="c"># compute E4</span>
-        <span class="n">E4</span> <span class="o">=</span> <span class="p">[</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g_G1_b&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">attr_list</span><span class="p">))]</span>
-        <span class="n">E5</span> <span class="o">=</span> <span class="p">[(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g_G1_b2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">sx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">attr_list</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span> <span class="o">*</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;h_G1_b&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sx</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">attr_list</span><span class="p">))]</span>                
-        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;E1&#39;</span><span class="p">:(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;e(gg)_alpha&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">)</span> <span class="o">*</span> <span class="n">M</span><span class="p">,</span> <span class="s">&#39;E2&#39;</span><span class="p">:</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g_G2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">,</span> <span class="s">&#39;E3&#39;</span><span class="p">:</span><span class="n">E3</span><span class="p">,</span> <span class="s">&#39;E4&#39;</span><span class="p">:</span><span class="n">E4</span><span class="p">,</span> <span class="s">&#39;E5&#39;</span><span class="p">:</span><span class="n">E5</span><span class="p">,</span> <span class="s">&#39;attributes&#39;</span><span class="p">:</span><span class="n">attr_list</span> <span class="p">}</span>
-    </div>
-<div class="viewcode-block" id="KPabe.decrypt"><a class="viewcode-back" href="../schemes/abenc_lsw08.html#abenc_lsw08.KPabe.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">D</span><span class="p">):</span>
-        <span class="n">attrs</span> <span class="o">=</span> <span class="n">E</span><span class="p">[</span><span class="s">&#39;attributes&#39;</span><span class="p">]</span>
-        <span class="n">policy</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">createPolicy</span><span class="p">(</span><span class="n">D</span><span class="p">[</span><span class="s">&#39;policy&#39;</span><span class="p">])</span>
-        <span class="n">coeff</span> <span class="o">=</span> <span class="p">{};</span> <span class="n">util</span><span class="o">.</span><span class="n">getCoefficients</span><span class="p">(</span><span class="n">policy</span><span class="p">,</span> <span class="n">coeff</span><span class="p">)</span>
-        
-        <span class="n">Z</span> <span class="o">=</span> <span class="p">{};</span> <span class="n">prodT</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">GT</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">attrs</span><span class="p">)):</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="c">#print(&quot;Coeff[%s] = %s&quot; % (x, coeff[x]))</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">negatedAttr</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-                 <span class="n">z</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">D</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">E</span><span class="p">[</span><span class="s">&#39;E2&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">pair</span><span class="p">(</span><span class="n">E</span><span class="p">[</span><span class="s">&#39;E3&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">D</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
-            <span class="n">Z</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span><span class="p">;</span> <span class="n">prodT</span> <span class="o">*=</span> <span class="n">Z</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">**</span> <span class="n">coeff</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
-            <span class="c">#print(&#39;Z val for %s: %s\n&#39; % (x, Z[x]))</span>
-       
-        <span class="k">return</span> <span class="n">E</span><span class="p">[</span><span class="s">&#39;E1&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">prodT</span> 
-</div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/abenc_lsw08.html#abenc_lsw08.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;../param/d224.param&#39;</span><span class="p">)</span>
-    <span class="n">kpabe</span> <span class="o">=</span> <span class="n">KPabe</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
-    
-    <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">)</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
-    
-    <span class="n">policy</span> <span class="o">=</span> <span class="s">&#39;((ONE or TWO) and THREE)&#39;</span>
-    <span class="n">attributes</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&#39;ONE&#39;</span><span class="p">,</span> <span class="s">&#39;THREE&#39;</span> <span class="p">]</span>
-    <span class="n">msg</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>   
+  <h1>Source code for abenc_lsw08</h1><pre>
  
-    <span class="n">mykey</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="n">policy</span><span class="p">)</span>
+| From: "Revocation Systems with Very Small Private Keys", Large Universe Construction
+| Published in: IEEE S&amp;P 2010
+| Available from: http://eprint.iacr.org/2008/309.pdf
+| Notes: 
+
+* type:           key-policy attribute-based encryption (public key)
+* setting:        Pairing
+
+:Authors:    J Ayo Akinyele
+:Date:            12/2010
+'''
+
+from toolbox.pairinggroup import *
+from toolbox.secretutil import *
+from toolbox.policytree import *
+from toolbox.ABEnc import *
+
+debug = False
+class KPabe(ABEnc):
+    def __init__(self, groupObj, verbose=False):
+<div class="viewcode-block" id="KPabe"><a class="viewcode-back" href="../schemes/abenc_lsw08.html#abenc_lsw08.KPabe">[docs]</a>        ABEnc.__init__(self)
+        global group, util
+        group = groupObj
+        util = SecretUtil(group, verbose)        
+        self.parser = PolicyParser()
+
+    def setup(self):
+        # pick random exponents
+<div class="viewcode-block" id="KPabe.setup"><a class="viewcode-back" href="../schemes/abenc_lsw08.html#abenc_lsw08.KPabe.setup">[docs]</a>        alpha1, alpha2, b = group.random(ZR), group.random(ZR), group.random(ZR)
+        
+        alpha = alpha1 * alpha2
+        g_G1, g_G2 = group.random(G1), group.random(G2) # PK 1,2        
+        h_G1, h_G2 = group.random(G1), group.random(G2) # PK 3
+        g1b = g_G1 ** b        
+        e_gg_alpha = pair(g_G1,g_G2) ** alpha
+        
+        #public parameters # 'g_G2^b':(g_G2 ** b), 'g_G2^b2':g_G2 ** (b * b),
+        pk = { 'g_G1':g_G1, 'g_G2':g_G2, 'g_G1_b':g1b,
+              'g_G1_b2':g1b ** b, 'h_G1_b':h_G1 ** b, 'e(gg)_alpha':e_gg_alpha }
+        #secret parameters
+        mk = { 'alpha1':alpha1, 'alpha2':alpha2, 'b':b, 'h_G1':h_G1, 'h_G2':h_G2 }
+        return (pk, mk)
     
-    <span class="n">ciphertext</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+    def keygen(self, pk, mk, policy_str):
+        #policy = self.parser.parse(policy_str)</div>
+<div class="viewcode-block" id="KPabe.keygen"><a class="viewcode-back" href="../schemes/abenc_lsw08.html#abenc_lsw08.KPabe.keygen">[docs]</a>        policy = util.createPolicy(policy_str)
+        attr_list = []; util.getAttributeList(policy, attr_list)
+        
+        s = mk['alpha1']; secret = s
+        shares = util.calculateShares(secret, policy, dict)
+        
+        D = {}
+        for x in attr_list:
+            d = []; r = group.random(ZR)
+            if not self.negatedAttr(x): # meaning positive
+                d.append((pk['g_G1'] ** (mk['alpha2'] * shares[x])) * (group.hash(x, G1) ** r))   # compute D1 for attribute x
+                d.append((pk['g_G2'] ** r))  # compute D2 for attribute x
+            #else:
+                #d.append((pk['g2_G1'] ** shares[x]) * (pk['g_G1_b2'] ** r)) # compute D3
+                #d.append((pk['g_G1_b'] ** (r * group.hash(x))) * (pk['h_G1'] ** r)) # compute D4
+                #d.append(pk['g_G1'] ** -r) # compute D5
+            D[x] = d
+        if debug: print("Access Policy for key: %s" % policy)
+        if debug: print("Attribute list: %s" % attr_list)
+        D['policy'] = policy_str
+        return D
     
-    <span class="n">rec_msg</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">,</span> <span class="n">mykey</span><span class="p">)</span>
+    def negatedAttr(self, attribute):
+        if attribute[0] == '!':</div>
+<div class="viewcode-block" id="KPabe.negatedAttr"><a class="viewcode-back" href="../schemes/abenc_lsw08.html#abenc_lsw08.KPabe.negatedAttr">[docs]</a>            if debug: print("Checking... =&gt; %s" % attribute[0])
+            return True
+        return False    
+    
+    def encrypt(self, pk, M, attr_list):   
+        if debug: print('Encryption Algorithm...')    </div>
+<div class="viewcode-block" id="KPabe.encrypt"><a class="viewcode-back" href="../schemes/abenc_lsw08.html#abenc_lsw08.KPabe.encrypt">[docs]</a>        # s will hold secret
+        t = group.init(ZR, 0)
+        s = group.random(); sx = [s]
+        for i in range(len(attr_list)):
+            sx.append(group.random(ZR))
+            sx[0] -= sx[i]
+            
+        E3 = {}
+        #E4, E5 = {}, {}
+        for i in range(len(attr_list)):
+            attr = attr_list[i]
+            E3[attr] = group.hash(attr, G1) ** s
+            #E4[attr] = pk['g_G1_b'] ** sx[i]
+            #E5[attr] = (pk['g_G1_b2'] ** (sx[i] * group.hash(attr))) * (pk['h_G1_b'] ** sx[i])
+        
+        return {'E1':(pk['e(gg)_alpha'] ** s) * M, 'E2':pk['g_G2'] ** s, 'E3':E3, 'attributes':attr_list }
+    
+    def decrypt(self, E, D):
+        policy = util.createPolicy(D['policy'])</div>
+<div class="viewcode-block" id="KPabe.decrypt"><a class="viewcode-back" href="../schemes/abenc_lsw08.html#abenc_lsw08.KPabe.decrypt">[docs]</a>        attrs = util.prune(policy, E['attributes'])        
+        coeff = {}; util.getCoefficients(policy, coeff)
+        
+        Z = {}; prodT = group.init(GT, 1)
+        for i in range(len(attrs)):
+            x = attrs[i]
+            if not self.negatedAttr(x):
+                 z = pair(D[x][0], E['E2']) / pair(E['E3'][x], D[x][1])
+                 Z[x] = z
+                 prodT *= Z[x] ** coeff[x]                 
+       
+        return E['E1'] / prodT 
+
+def main():
+    groupObj = PairingGroup('MNT224')</div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/abenc_lsw08.html#abenc_lsw08.main">[docs]</a>    kpabe = KPabe(groupObj)
+    
+    (pk, mk) = kpabe.setup()
+    
+    policy = '(ONE or THREE) and (FOUR or TWO)'
+    attributes = [ 'ONE', 'TWO', 'THREE', 'FOUR' ]
+    msg = groupObj.random(GT) 
+ 
+    mykey = kpabe.keygen(pk, mk, policy)
+    
+    if debug: print("Encrypt under these attributes: ", attributes)
+    ciphertext = kpabe.encrypt(pk, msg, attributes)
+    if debug: print(ciphertext)
+    
+    rec_msg = kpabe.decrypt(ciphertext, mykey)
    
-    <span class="k">assert</span> <span class="n">msg</span> <span class="o">==</span> <span class="n">rec_msg</span> 
-    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Decryption!&quot;</span><span class="p">)</span>    
-    </div>
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
-    <span class="n">main</span><span class="p">()</span>
+    assert msg == rec_msg 
+    if debug: print("Successful Decryption!")    
     
-</pre></div>
+if __name__ == "__main__":
+    debug = True</div>
+    main()
+    
+</pre>
 
           </div>
         </div>
@@ -190,7 +192,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -213,14 +215,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>

@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>zknode &mdash; Charm-Crypto 0.3a documentation</title>
+    <title>zknode &mdash; Charm-Crypto 0.4b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3a',
+        VERSION:     '0.4b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.3a documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -49,13 +49,11 @@
           <div class="body">
             
   <h1>Source code for zknode</h1><div class="highlight"><pre>
-<span class="c">#!/usr/bin/python</span>
-
 <span class="kn">import</span> <span class="nn">string</span>
 
-<div class="viewcode-block" id="BinNode"><a class="viewcode-back" href="../toolbox/zknode.html#zknode.BinNode">[docs]</a><span class="k">class</span> <span class="nc">BinNode</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">BinNode</span><span class="p">:</span>
 	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>		
-		<span class="c">#types of node</span>
+<div class="viewcode-block" id="BinNode"><a class="viewcode-back" href="../toolbox/zknode.html#zknode.BinNode">[docs]</a>		<span class="c">#types of node</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">OR</span> <span class="o">=</span> <span class="mi">1</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">AND</span> <span class="o">=</span> <span class="mi">2</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">EXP</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c"># &#39;^&#39; or exponent</span>
@@ -92,27 +90,27 @@
 				<span class="k">return</span> <span class="p">(</span><span class="n">left</span> <span class="o">+</span> <span class="s">&#39; = &#39;</span> <span class="o">+</span> <span class="n">right</span><span class="p">)</span>
 		<span class="k">return</span> <span class="bp">None</span>
 	
-<div class="viewcode-block" id="BinNode.getAttribute"><a class="viewcode-back" href="../toolbox/zknode.html#zknode.BinNode.getAttribute">[docs]</a>	<span class="k">def</span> <span class="nf">getAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">getAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">ATTR</span><span class="p">):</span>
-			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute</span>
+<div class="viewcode-block" id="BinNode.getAttribute"><a class="viewcode-back" href="../toolbox/zknode.html#zknode.BinNode.getAttribute">[docs]</a>			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute</span>
 		<span class="k">else</span><span class="p">:</span>
 			<span class="k">return</span> <span class="bp">None</span>
-	</div>
-<div class="viewcode-block" id="BinNode.getLeft"><a class="viewcode-back" href="../toolbox/zknode.html#zknode.BinNode.getLeft">[docs]</a>	<span class="k">def</span> <span class="nf">getLeft</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span>
-	</div>
-<div class="viewcode-block" id="BinNode.getRight"><a class="viewcode-back" href="../toolbox/zknode.html#zknode.BinNode.getRight">[docs]</a>	<span class="k">def</span> <span class="nf">getRight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span>
-</div>
-<div class="viewcode-block" id="BinNode.addSubNode"><a class="viewcode-back" href="../toolbox/zknode.html#zknode.BinNode.addSubNode">[docs]</a>	<span class="k">def</span> <span class="nf">addSubNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">):</span>
-		<span class="c"># set subNodes appropriately</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">left</span> <span class="k">if</span> <span class="n">left</span> <span class="o">!=</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">None</span>
+	
+	<span class="k">def</span> <span class="nf">getLeft</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span></div>
+<div class="viewcode-block" id="BinNode.getLeft"><a class="viewcode-back" href="../toolbox/zknode.html#zknode.BinNode.getLeft">[docs]</a>	
+	<span class="k">def</span> <span class="nf">getRight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span></div>
+<div class="viewcode-block" id="BinNode.getRight"><a class="viewcode-back" href="../toolbox/zknode.html#zknode.BinNode.getRight">[docs]</a>
+	<span class="k">def</span> <span class="nf">addSubNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">):</span>
+		<span class="c"># set subNodes appropriately</span></div>
+<div class="viewcode-block" id="BinNode.addSubNode"><a class="viewcode-back" href="../toolbox/zknode.html#zknode.BinNode.addSubNode">[docs]</a>		<span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">left</span> <span class="k">if</span> <span class="n">left</span> <span class="o">!=</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">None</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span> <span class="k">if</span> <span class="n">left</span> <span class="o">!=</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">None</span>
 
-	<span class="c"># only applies function on leaf nodes</span></div>
-<div class="viewcode-block" id="BinNode.traverse"><a class="viewcode-back" href="../toolbox/zknode.html#zknode.BinNode.traverse">[docs]</a>	<span class="k">def</span> <span class="nf">traverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">):</span>
-		<span class="c"># visit node then traverse left and right</span>
-		<span class="n">function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+	<span class="c"># only applies function on leaf nodes</span>
+	<span class="k">def</span> <span class="nf">traverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">):</span>
+		<span class="c"># visit node then traverse left and right</span></div>
+<div class="viewcode-block" id="BinNode.traverse"><a class="viewcode-back" href="../toolbox/zknode.html#zknode.BinNode.traverse">[docs]</a>		<span class="n">function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 		<span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">==</span> <span class="bp">None</span><span class="p">):</span>
 			<span class="k">return</span> <span class="bp">None</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">traverse</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
@@ -130,7 +128,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -153,14 +151,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.3a documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Dec 06, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Feb 19, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
     </div>
   </body>
 </html>
