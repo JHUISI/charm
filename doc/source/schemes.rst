@@ -17,12 +17,17 @@ Demonstration Schemes
    schemes/dabenc_adapt_hybrid
    schemes/encap_bchk05
    schemes/groupsig_bgls04
+   schemes/groupsig_bgls04_var
    schemes/ibenc_adapt_hybrid
    schemes/ibenc_adapt_identityhash
    schemes/ibenc_bb03
    schemes/ibenc_bf01
+   schemes/ibenc_ckrs09
+   schemes/ibenc_lsw08
    schemes/ibenc_sw05
    schemes/ibenc_waters05
+   schemes/kpabenc_adapt_hybrid
+   schemes/pk_vrf
    schemes/pkenc_adapt_bchk05
    schemes/pkenc_adapt_chk04
    schemes/pkenc_adapt_hybrid
@@ -38,14 +43,17 @@ Demonstration Schemes
    schemes/pksig_chch
    schemes/pksig_chp
    schemes/pksig_cl03
+   schemes/pksig_cl04
    schemes/pksig_cyh
    schemes/pksig_dsa
    schemes/pksig_ecdsa
    schemes/pksig_hess
    schemes/pksig_hw
+   schemes/pksig_rsa_hw09
    schemes/pksig_schnorr91
    schemes/pksig_waters
    schemes/pksig_waters05
+   schemes/pksig_waters09
    schemes/protocol_cns07
    schemes/protocol_schnorr91
    schemes/sigma1

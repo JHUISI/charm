@@ -220,7 +220,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'charm-crypto', 'Charm-Crypto Documentation',
-     ['Joseph Ayo Akinyele, Gary Belvin, Matt Green'], 1)
+     ['J Ayo Akinyele, Gary Belvin, Matt Green'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -233,7 +233,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'Charm-Crypto', 'Charm-Crypto Documentation', 'Joseph Ayo Akinyele, Gary Belvin, Matt Green',
+  ('index', 'Charm-Crypto', 'Charm-Crypto Documentation', 'J Ayo Akinyele, Gary Belvin, Matt Green',
    'Charm-Crypto', 'One line description of project.', 'Miscellaneous'),
 ]
 

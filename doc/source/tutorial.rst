@@ -138,10 +138,11 @@ Group Abstractions
 We now describe how to take advantage of Charm's group abstraction. Modern cryptographic algorithms are typically implemented on top of mathematical groups based on certain hardness assumptions (e.g., Diffie-Hellman). We provide the same building blocks to facilitate development in this way of thinking: 
 
 At the moment, there are three cryptographic settings covered by Charm: ``integergroups``, ``ecgroups``, and ``pairinggroups``. 
-To initialize a group in the EC, refer to the toolbox.eccurve for all the full set of identifiers for supported NIST approved curves (e.g., prime192v1). For EC with billinear maps (or pairings), we provide a set of identifiers for both symmetric and asymmetric curves. For example, the 'SS512' represents a symmetric curve with a 512-bit base field and 'MNT159' represents an asymmetric curve with 159-bit base field.
-Finally, for integer groups, typically defining large primes p and q is enough to generate an RSA group. For schnorr groups, these group parameters may take some time to generate because they require safe primes (e.g., p = 2q + 1). Here are detailed examples below for integer and pairing groups (see above for EC group initialization):
+To initialize a group in the EC, refer to the ``toolbox.eccurve`` for all the full set of identifiers for supported NIST approved curves (e.g., ``prime192v1``). For EC with billinear maps (or pairings), we provide a set of identifiers for both symmetric and asymmetric curves. For example, the ``'SS512'`` represents a symmetric curve with a 512-bit base field and ``'MNT159'`` represents an asymmetric curve with 159-bit base field.
+Finally, for integer groups, typically defining large primes ``p`` and ``q`` is enough to generate an RSA group. For schnorr groups, these group parameters may take some time to generate because they require safe primes (e.g., ``p = 2q + 1``). Here are detailed examples below for integer and pairing groups (see above for EC group initialization):
 
 ::
+
 	from toolbox.integergroup import *
 	
 	group1 = IntegerGroup()	
@@ -156,23 +157,25 @@ Finally, for integer groups, typically defining large primes p and q is enough t
 	g = group2.random(G1)
 
 
-Using our serialization API
+Using serialization API
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-To support serialization of key material and ciphertexts, we provide two high-level API calls to serialize charm objects in arbitrary python structures (e.g., lists, tuples, or dictionaries): ``objectToBytes()`` and ``bytesToObject()`` from the ``charm.engine.util`` provide the necessary functionality for converting keys and ciphertexts to base 64 encoded strings. Both calls require the object to be serialized/deserialized and a class that defines the serialize and deserialize methods such as the group object. 
-We show later how to customize our serialization routines for your purposes: 
+To support serialization of key material and ciphertexts, we provide two high-level API calls to serialize charm objects embedded in arbitrary python structures (e.g., lists, tuples, or dictionaries, etc) which are ``objectToBytes()`` and ``bytesToObject()`` from the ``charm.engine.util`` package. These functions provide the necessary functionality for converting keys and ciphertexts to base 64 encoded strings. Both calls require the object to be serialized/deserialized and a class that defines the serialize and deserialize methods such as the group object. 
+We also show below how to customize our serialization routines: 
 
-Here is an example:
+Here is an example of how to use the API with any of the supported group objects (``integergroup``, ``pairinggroup`` or ``ecgroup``):
 
 ::
+
 	from charm.engine.util import objectToBytes,bytesToObject
 	
 	pk_bytes = objectToBytes(pk, group)	
 
-	pk = bytesToObject(pk_bytes, group)
+	orig_pk = bytesToObject(pk_bytes, group)
 
-If you'd like to define your custom serialization routine in conjunction with our API, the following example works for schemes based on the integergroup which in some cases do not utilize a group object:
+If you would like to define your own custom serialization routine in conjunction with our API, the following example works for schemes based on the ``integergroup`` which in some cases do not utilize a group object:
 
 ::
+
 	from charm.integer import integer,serialize,deserialize
 	
 	class mySerializeAPI:
@@ -180,11 +183,23 @@ If you'd like to define your custom serialization routine in conjunction with ou
 			...
 		
 		def serialize(self, charm_object):
-			assert type(charm_object) == integer, "invalid type: ", type(charm_object)
-			return serialize(charm_object)
-			
-		def deserialize(self, bytes_object):
-			assert type(bytes_object) == bytes, "fail"
-			return deserialize(bytes_object)
+		    assert type(charm_object) == integer, "required type is integer, not: ", type(charm_object)
+		    return serialize(charm_object)
+		
+		def deserialize(self, object):
+		    assert type(object) == bytes, "required type is bytes, not: ", type(object)
+		    return deserialize(object)
+
+
+::
+
+	from charm.engine.util import objectToBytes,bytesToObject
+	
+	serObject = mySerializeAPI()
+	
+	pk_bytes = objectToBytes(pk, serObject)	
+
+	orig_pk = bytesToObject(pk_bytes, serObject) 
+
 			
 Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at support@charm-crypto.com. Thank you!
