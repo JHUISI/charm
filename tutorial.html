@@ -189,8 +189,8 @@ Finally, for integer groups, typically defining large primes <tt class="docutils
 <div class="section" id="using-serialization-api">
 <h2>Using serialization API<a class="headerlink" href="#using-serialization-api" title="Permalink to this headline">¶</a></h2>
 <p>To support serialization of key material and ciphertexts, we provide two high-level API calls to serialize charm objects embedded in arbitrary python structures (e.g., lists, tuples, or dictionaries, etc) which are <tt class="docutils literal"><span class="pre">objectToBytes()</span></tt> and <tt class="docutils literal"><span class="pre">bytesToObject()</span></tt> from the <tt class="docutils literal"><span class="pre">charm.engine.util</span></tt> package. These functions provide the necessary functionality for converting keys and ciphertexts to base 64 encoded strings. Both calls require the object to be serialized/deserialized and a class that defines the serialize and deserialize methods such as the group object.
-We show later how to customize our serialization routines for your purposes:</p>
-<p>Here is an example:</p>
+We also show below how to customize our serialization routines:</p>
+<p>Here is an example of how to use the API with any of the supported group objects (<tt class="docutils literal"><span class="pre">integergroup</span></tt>, <tt class="docutils literal"><span class="pre">pairinggroup</span></tt> or <tt class="docutils literal"><span class="pre">ecgroup</span></tt>):</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.engine.util</span> <span class="kn">import</span> <span class="n">objectToBytes</span><span class="p">,</span><span class="n">bytesToObject</span>
 
 <span class="n">pk_bytes</span> <span class="o">=</span> <span class="n">objectToBytes</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
@@ -198,7 +198,7 @@ We show later how to customize our serialization routines for your purposes:</p>
 <span class="n">orig_pk</span> <span class="o">=</span> <span class="n">bytesToObject</span><span class="p">(</span><span class="n">pk_bytes</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>If you would like to define your custom serialization routine in conjunction with our API, the following example works for schemes based on the <tt class="docutils literal"><span class="pre">integergroup</span></tt> which in some cases do not utilize a group object:</p>
+<p>If you would like to define your own custom serialization routine in conjunction with our API, the following example works for schemes based on the <tt class="docutils literal"><span class="pre">integergroup</span></tt> which in some cases do not utilize a group object:</p>
 <div class="highlight-python"><pre>from charm.integer import integer,serialize,deserialize
 
 class mySerializeAPI:
@@ -212,6 +212,15 @@ class mySerializeAPI:
         def deserialize(self, object):
             assert type(object) == bytes, "required type is bytes, not: ", type(object)
             return deserialize(object)</pre>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.engine.util</span> <span class="kn">import</span> <span class="n">objectToBytes</span><span class="p">,</span><span class="n">bytesToObject</span>
+
+<span class="n">serObject</span> <span class="o">=</span> <span class="n">mySerializeAPI</span><span class="p">()</span>
+
+<span class="n">pk_bytes</span> <span class="o">=</span> <span class="n">objectToBytes</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">serObject</span><span class="p">)</span>
+
+<span class="n">orig_pk</span> <span class="o">=</span> <span class="n">bytesToObject</span><span class="p">(</span><span class="n">pk_bytes</span><span class="p">,</span> <span class="n">serObject</span><span class="p">)</span>
+</pre></div>
 </div>
 <p>Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at <a class="reference external" href="mailto:support&#37;&#52;&#48;charm-crypto&#46;com">support<span>&#64;</span>charm-crypto<span>&#46;</span>com</a>. Thank you!</p>
 </div>
