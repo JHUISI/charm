@@ -3,10 +3,7 @@ from charm.integer import *
 class IntegerGroup:
     def __init__(self, start=0):
         pass
-#        if start != 0:   
-#            fixed = start 
-#            self.randObj = init(fixed)
-#        self.randObj = init()
+
     def setparam(self, p, q): 
         if p == (2 * q) + 1 and isPrime(p) and isPrime(q):
             self.p = integer(p)
@@ -52,15 +49,20 @@ class IntegerGroup:
             return random(self.p)        
         else:
             return random(max)
-
-#    def randomPrime(self, bits):
-#        return randomPrime(bits)
     
     def encode(self, M):
         return encode(M, self.p, self.q)
      
     def decode(self, element):
         return decode(element, self.p, self.q)
+
+    def serialize(self, object):
+        assert type(object) == integer, "cannot serialize non-integer types"
+        return serialize(object)
+    
+    def deserialize(self, bytes_object):
+        assert type(bytes_object) == bytes, "cannot deserialize object"
+        return deserialize(bytes_object)
     
     def hash(self, *args):
         if isinstance(args, tuple):
@@ -71,10 +73,6 @@ class IntegerGroup:
 class IntegerGroupQ:
     def __init__(self, start=0):
         pass
-#        if start != 0:   
-#            fixed = start 
-#            self.randObj = init(fixed)
-#        self.randObj = init()
         
     def paramgen(self, bits, r=2):
         # determine which group
@@ -86,6 +84,9 @@ class IntegerGroupQ:
         self.r = r
         return None    
     
+    def randomG(self):
+        return self.randomGen()
+        
     def randomGen(self):
         while True:
             h = random(self.p)
@@ -126,4 +127,61 @@ class IntegerGroupQ:
         for i in args:
             List.append(i)
         return hash(tuple(List), self.p, self.q, True)
+
+    def serialize(self, object):
+        assert type(object) == integer, "cannot serialize non-integer types"
+        return serialize(object)
     
+    def deserialize(self, bytes_object):
+        assert type(bytes_object) == bytes, "cannot deserialize object"
+        return deserialize(bytes_object)
+
+    
+class RSAGroup:
+    def __init__(self):
+        self.p = self.q = self.n = 0
+    
+    def paramgen(self, secparam):
+        while True:
+           p, q = randomPrime(secparam), randomPrime(secparam)
+           if isPrime(p) and isPrime(q) and gcd(p * q, (p - 1) * (q - 1)) == 1:
+              break
+        self.p = p
+        self.q = q
+        return (p, q, p * q)    
+
+    def setparam(self, p, q): 
+        if isPrime(p) and isPrime(q) and p != q:
+            self.p = integer(p)
+            self.q = integer(q)
+            self.n = self.p * self.q
+            return True
+        else:
+            print("p and q are not primes!")
+        return False
+
+    def serialize(self, object):
+        assert type(object) == integer, "cannot serialize non-integer types"
+        return serialize(object)
+    
+    def deserialize(self, bytes_object):
+        assert type(bytes_object) == bytes, "cannot deserialize object"
+        return deserialize(bytes_object)
+
+    def random(self, max=0):
+        if max == 0:
+            return random(self.n)        
+        else:
+            return random(max)
+
+    def groupType(self): 
+        return 'RSAGroup mod p'     
+          
+    def groupOrder(self):
+        return bitsize(self.n)    
+        
+    def encode(self, value):
+        pass
+
+    def decode(self, value):
+        pass

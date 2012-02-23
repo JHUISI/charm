@@ -64,7 +64,8 @@ class CPabe09(ABEnc):
         for i in range(len(p_list)):
             r = group.random()
             if shares[i][0] == p_list[i]:
-               C[ p_list[i] ] = ((pk['g1^a'] ** shares[i][1]) * (group.hash(p_list[i], G1) ** -r))
+               attr = shares[i][0].getAttribute() 
+               C[ p_list[i] ] = ((pk['g1^a'] ** shares[i][1]) * (group.hash(attr, G1) ** -r))
                D[ p_list[i] ] = (pk['g2'] ** r)
         
         if debug: print("SessionKey: %s" % C_tilde)
@@ -78,15 +79,18 @@ class CPabe09(ABEnc):
         
         # create list for attributes in order...
         k_x, w_i = {}, {}
-        for j in pruned:
-            k_x[ j ] = sk['K_x'][j]
+        for i in pruned:
+            j = i.getAttributeAndIndex()
+            k = i.getAttribute()
+            k_x[ j ] = sk['K_x'][k]
             w_i[ j ] = coeffs[j]
             #print('Attribute %s: coeff=%s, k_x=%s' % (j, w_i[j], k_x[j]))
             
         C, D = ct['C'], ct['D']
         denominator = group.init(GT, 1)
         for i in pruned:
-            denominator *= ( pair(C[i] ** w_i[i], sk['L']) * pair(k_x[i] ** w_i[i], D[i]) )   
+            j = i.getAttributeAndIndex()
+            denominator *= ( pair(C[j] ** w_i[j], sk['L']) * pair(k_x[j] ** w_i[j], D[j]) )   
         return ct['C_tilde'] / (numerator / denominator)
 
 def main():

@@ -74,7 +74,7 @@ class SecretUtil:
                 self.getCoefficients(tree.getLeft(), coeff_list, coeff * this_coeff[1])
                 self.getCoefficients(tree.getRight(), coeff_list, coeff * this_coeff[1])
             elif(node == tree.ATTR):
-                attr = tree.getAttribute()
+                attr = tree.getAttributeAndIndex()
                 coeff_list[ attr ] = coeff
             else:
                 return None
@@ -87,7 +87,9 @@ class SecretUtil:
         else: # assume dict
             share = {}
             for i in range(0, len(attr_list)):
-                share[ attr_list[i][0] ] = attr_list[i][1]
+                key = attr_list[i][0].getAttributeAndIndex()
+                if not key in share.keys():
+                    share[ key ] = attr_list[i][1]
             return share
     
     def compute_shares(self, secret, subtree, List):
@@ -98,7 +100,8 @@ class SecretUtil:
         type = subtree.getNodeType()
         if(type == subtree.ATTR):
             # visiting a leaf node
-            t = (subtree.getAttribute(), secret)
+#            t = (subtree.getAttribute(), secret)
+            t = (subtree, secret)
             List.append(t)
             return None
         elif(type == subtree.OR):
@@ -112,12 +115,24 @@ class SecretUtil:
         # recursively generate shares for children nodes
         self.compute_shares(shares[1], subtree.getLeft(), List)
         self.compute_shares(shares[2], subtree.getRight(), List)
+    
+    def strip_index(self, node_str):
+        if node_str.find('_') != -1: return node_str.split('_')[0]
+        return node_str
         
+    
     def createPolicy(self, policy_string):
         if(type(policy_string) == str):
             policy_string = unicode(policy_string)
-        return self.parser.parse(policy_string)
-    
+        policy_obj = self.parser.parse(policy_string)
+        _dictCount, _dictLabel = {}, {}
+        self.parser.findDuplicates(policy_obj, _dictCount)
+        for i in _dictCount.keys(): 
+            if _dictCount[ i ] > 1: _dictLabel[ i ] = 0
+        self.parser.labelDuplicates(policy_obj, _dictLabel)
+#        print("result: ", policy_obj)
+        return policy_obj
+        
     def prune(self, policy, attributes):
         return self.parser.prune(policy, attributes)
     
@@ -127,7 +142,7 @@ class SecretUtil:
 
         # V, L, R
         if(Node.getNodeType() == Node.ATTR):
-            List.append(Node.getAttribute())
+            List.append(Node.getAttributeAndIndex()) # .getAttribute()
         else:
             self.getAttributeList(Node.getLeft(), List)
             self.getAttributeList(Node.getRight(), List)
