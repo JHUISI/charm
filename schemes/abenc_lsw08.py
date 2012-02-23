@@ -45,18 +45,18 @@ class KPabe(ABEnc):
         return (pk, mk)
     
     def keygen(self, pk, mk, policy_str):
-        #policy = self.parser.parse(policy_str)
         policy = util.createPolicy(policy_str)
         attr_list = []; util.getAttributeList(policy, attr_list)
         
         s = mk['alpha1']; secret = s
         shares = util.calculateShares(secret, policy, dict)
         
-        D = {}
+        D = { 'policy': policy_str }
         for x in attr_list:
+            y = util.strip_index(x)
             d = []; r = group.random(ZR)
             if not self.negatedAttr(x): # meaning positive
-                d.append((pk['g_G1'] ** (mk['alpha2'] * shares[x])) * (group.hash(x, G1) ** r))   # compute D1 for attribute x
+                d.append((pk['g_G1'] ** (mk['alpha2'] * shares[x])) * (group.hash(y, G1) ** r))   # compute D1 for attribute x
                 d.append((pk['g_G2'] ** r))  # compute D2 for attribute x
             #else:
                 #d.append((pk['g2_G1'] ** shares[x]) * (pk['g_G1_b2'] ** r)) # compute D3
@@ -65,12 +65,13 @@ class KPabe(ABEnc):
             D[x] = d
         if debug: print("Access Policy for key: %s" % policy)
         if debug: print("Attribute list: %s" % attr_list)
-        D['policy'] = policy_str
         return D
     
     def negatedAttr(self, attribute):
-        if attribute[0] == '!':
-            if debug: print("Checking... => %s" % attribute[0])
+        if type(attribute) != str: attr = attribute.getAttribute()
+        else: attr = attribute
+        if attr[0] == '!':
+            if debug: print("Checking... => %s" % attr[0])
             return True
         return False    
     
@@ -100,11 +101,11 @@ class KPabe(ABEnc):
         
         Z = {}; prodT = group.init(GT, 1)
         for i in range(len(attrs)):
-            x = attrs[i]
-            if not self.negatedAttr(x):
-                 z = pair(D[x][0], E['E2']) / pair(E['E3'][x], D[x][1])
-                 Z[x] = z
-                 prodT *= Z[x] ** coeff[x]                 
+            x = attrs[i].getAttribute()
+            y = attrs[i].getAttributeAndIndex()
+            if not self.negatedAttr(y):
+                 Z[y] = pair(D[y][0], E['E2']) / pair(E['E3'][x], D[y][1])
+                 prodT *= Z[y] ** coeff[y] 
        
         return E['E1'] / prodT 
 
@@ -114,7 +115,7 @@ def main():
     
     (pk, mk) = kpabe.setup()
     
-    policy = '(ONE or THREE) and (FOUR or TWO)'
+    policy = '(ONE or THREE) and (THREE or TWO)'
     attributes = [ 'ONE', 'TWO', 'THREE', 'FOUR' ]
     msg = groupObj.random(GT) 
  

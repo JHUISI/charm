@@ -10,14 +10,19 @@ class BinNode:
     self.AND = 2
     self.ATTR = 0
     self.negated = False
+    self.index   = None
     #OF = '' # anything above 1 and 2
     if(isinstance(value, str)):
       if value[0] == '!': 
           value = value[1:] # remove but set flag
           self.negated = True
+      if value.find('_') != -1:
+          val = value.split('_')
+          self.index = int(val[1]) # index
+          value = val[0]
       self.type = self.ATTR
       self.attribute = value.upper()      
-            
+      
     elif(isinstance(value, int)):
       self.type = self.OR if value == self.OR else self.AND
       self.attribute = ''
@@ -27,10 +32,12 @@ class BinNode:
 
   def __str__(self):
     if(self.type == self.ATTR):
-      if self.negated: prefix = '!'
-      else: return self.attribute
-      return prefix + self.attribute
-    else:			
+        if self.negated: prefix = '!'
+        else: prefix = ''
+        if self.index != None: postfix = '_' + str(self.index)
+        else: postfix = ''
+        return prefix + self.attribute + postfix
+    else:
       left = str(self.left)
       right = str(self.right)
       
@@ -43,9 +50,35 @@ class BinNode:
   def getAttribute(self):
     if (self.type == self.ATTR):
         if self.negated: prefix = '!'
-        else: return self.attribute
-        return prefix + self.attribute 
+        else: prefix = ''        
+        return prefix + self.attribute
     return
+
+  def getAttributeAndIndex(self):
+    if (self.type == self.ATTR):
+        if self.negated: prefix = '!'
+        else: prefix = ''
+        if self.index != None: postfix = '_' + str(self.index)
+        else: postfix = ''
+        
+        return prefix + self.attribute + postfix
+    return
+
+  def __iter__(self):
+      return self
+
+  def __eq__(self, other):
+      #print("checking...:", self, str(other))
+      if other == None:
+          return False
+      if type(self) == type(other):
+#          print(" compare => ", self.getAttribute(),"?",other.getAttribute())
+          return self.getAttribute() == other.getAttribute()
+      elif type(other) == str:
+          return other in self.getAttributeAndIndex()
+      elif type(self) == str:
+          return self in other.getAttributeAndIndex()
+      return self == other # compare references?
 
   def getLeft(self):
     return self.left

@@ -84,6 +84,22 @@ class PolicyParser:
         self.finalPol.parseString(string)
         return self.evalStack(objStack)
 
+    def findDuplicates(self, tree, _dict):
+        if tree.left: self.findDuplicates(tree.left, _dict)
+        if tree.right: self.findDuplicates(tree.right, _dict)
+        if tree.getNodeType() == tree.ATTR:
+            key = tree.getAttribute()
+            if _dict.get(key) == None: _dict[ key ] = 1
+            else: _dict[ key ] += 1
+
+    def labelDuplicates(self, tree, _dictLabel):
+        if tree.left: self.labelDuplicates(tree.left, _dictLabel)
+        if tree.right: self.labelDuplicates(tree.right, _dictLabel)
+        if tree.getNodeType() == tree.ATTR:
+            key = tree.getAttribute()
+            if _dictLabel.get(key) != None: 
+                tree.index = _dictLabel[ key ]
+                _dictLabel[ key ] += 1
     # determine whether subset will satisfy
     # the tree
     def prune(self, tree, list):
@@ -92,13 +108,19 @@ class PolicyParser:
         self.verifyExistence(tree, list, new_list)
         return new_list
 
+    def inListAlready(self, node, n_list):
+        for n in n_list:
+            print("compare: ", node, "==", n, ":=>", str(node) == str(n))
+            if str(node) == str(n): return True
+        return False
         
     def verifyExistence(self, tree, list, n_list):        
         if(tree == None):
             return 0
         # if AND-gate, both nodes must be in list if attr's
         if(tree.getNodeType() == tree.ATTR):
-            leaf = tree.getAttribute()
+            leaf = tree#.getAttribute()
+            # check if leaf is in the list
             if(list.count(leaf) == 1):
                 n_list.append(leaf)
             return list.count(leaf)
