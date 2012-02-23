@@ -72,13 +72,13 @@ class BinNode:
       if other == None:
           return False
       if type(self) == type(other):
-#          print(" compare => ", self.getAttribute(),"?",other.getAttribute())
           return self.getAttribute() == other.getAttribute()
-      elif type(other) == str:
+      elif type(other) in [str, bytes]:
           return other in self.getAttributeAndIndex()
-      elif type(self) == str:
+      elif type(self) in [str, bytes]:
           return self in other.getAttributeAndIndex()
-      return self == other # compare references?
+      else:
+          raise ValueError('BinNode - invalid comparison.')
 
   def getLeft(self):
     return self.left

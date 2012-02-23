@@ -99,7 +99,6 @@ class Dabe(ABEncMultiAuth):
         C1, C2, C3 = {}, {}, {}
         
         #Parse the policy string into a tree
-
         policy = util.createPolicy(policy_str)
         sshares = util.calculateShares(s, policy, list) #Shares of the secret 
         wshares = util.calculateShares(w, policy, list) #Shares of 0
@@ -117,7 +116,7 @@ class Dabe(ABEncMultiAuth):
             
         #plist = []
         #util.getAttributeList(policy, plist)
-        return { 'C0':C0, 'C1':C1, 'C2':C2, 'C3':C3, 'policy':policy}  #'attributes':plist 
+        return { 'C0':C0, 'C1':C1, 'C2':C2, 'C3':C3, 'policy':policy_str }  #'attributes':plist 
 
     def decrypt(self, gp, sk, ct):
         '''Decrypt a ciphertext
@@ -126,8 +125,9 @@ class Dabe(ABEncMultiAuth):
     
         usr_attribs = list(sk.keys())
         usr_attribs.remove('gid')
-        pruned = util.prune(ct['policy'], usr_attribs)
-        coeffs = {}; util.getCoefficients(ct['policy'], coeffs)
+        policy = util.createPolicy(ct['policy'])
+        pruned = util.prune(policy, usr_attribs)
+        coeffs = {}; util.getCoefficients(policy, coeffs)
     
         h_gid = gp['H'](sk['gid'])  #find H(GID)
         egg_s = group.init(GT, 1)
