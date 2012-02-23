@@ -95,10 +95,10 @@ def main():
     
     m = "plese sign this message!!!!"
     sigma = ibe.sign(mpk, msk, m)
-    print("Signature :=", sigma)
+    if debug: print("Signature :=", sigma)
         
     assert ibe.verify(mpk, sigma, m), "Invalid Verification!!!!"
-    print("Successful Individual Verification!")
+    if debug: print("Successful Individual Verification!")
         
 if __name__ == "__main__":
     debug = True
