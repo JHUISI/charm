@@ -105,14 +105,15 @@ class Dabe(ABEncMultiAuth):
         wshares = util.calculateShares(w, policy, list) #Shares of 0
         
     
-        wshares = dict([(x[0], x[1]) for x in wshares])
-        sshares = dict([(x[0], x[1]) for x in sshares])
+        wshares = dict([(x[0].getAttributeAndIndex(), x[1]) for x in wshares])
+        sshares = dict([(x[0].getAttributeAndIndex(), x[1]) for x in sshares])
         for attr, s_share in sshares.items():
+            k_attr = util.strip_index(attr)
             w_share = wshares[attr]
             r_x = group.random()
-            C1[attr] = (pair(gp['g'],gp['g']) ** s_share) * (pk[attr]['e(gg)^alpha_i'] ** r_x)
+            C1[attr] = (pair(gp['g'],gp['g']) ** s_share) * (pk[k_attr]['e(gg)^alpha_i'] ** r_x)
             C2[attr] = gp['g'] ** r_x
-            C3[attr] = (pk[attr]['g^y_i'] ** r_x) * (gp['g'] ** w_share)
+            C3[attr] = (pk[k_attr]['g^y_i'] ** r_x) * (gp['g'] ** w_share)
             
         #plist = []
         #util.getAttributeList(policy, plist)
@@ -130,9 +131,11 @@ class Dabe(ABEncMultiAuth):
     
         h_gid = gp['H'](sk['gid'])  #find H(GID)
         egg_s = group.init(GT, 1)
-        for x in pruned:
+        for i in pruned:
+            x = i.getAttributeAndIndex()
+            y = i.getAttribute()
             num = ct['C1'][x] * pair(h_gid, ct['C3'][x])
-            dem = pair(sk[x]['k'], ct['C2'][x])
+            dem = pair(sk[y]['k'], ct['C2'][x])
             egg_s *= ( (num / dem) ** coeffs[x] )
    
         if(debug): print("e(gg)^s: %s" % egg_s)
