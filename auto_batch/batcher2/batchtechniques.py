@@ -197,8 +197,14 @@ class AbstractTechnique:
             if result: return result
             result = self.isAttrIndexInNode(node.right, index)
             return result
-
-
+    
+    @classmethod
+    def createPair2(self, left, right):
+        pair = BinaryNode(ops.PAIR)
+        pair.left = BinaryNode.copy(left)
+        pair.right = BinaryNode.copy(right)
+        return pair
+        
     def createPair(self, left, right):
         pair = BinaryNode(ops.PAIR)
         pair.left = left
@@ -627,7 +633,7 @@ class Technique3(AbstractTechnique):
         self.rule    = "Move dot products inside pairings to reduce N pairings to 1 (technique 3)"
         self.applied = False
         self.score   = tech3.NoneApplied
-        self.debug   = True
+        self.debug   = False
 
 
     def checkSubtreeForSameBase(self, node, parent, data):
@@ -659,8 +665,9 @@ class Technique3(AbstractTechnique):
 #                print("found: ", i)
 #            print("T3: before =>", node)
 #            print("left := ON => moving EXP node: ", exp_node, "\n\n")
+            if len(_listNodes_uniq) == 0: return # nothing to do here
             exp_node = self.createMulFromList(_listNodes_uniq)
-            if exp_node or len(exp_node) >= 1:
+            if exp_node != None:
                 base_node = left.right
                 left.right = self.createExp(base_node, exp_node)
                 self.deleteNodesFromTree(right, node, _listNodes, side.right) # cleanup right side tree?
@@ -674,12 +681,12 @@ class Technique3(AbstractTechnique):
             self.findManyExpWithIndex2(left, index, _listNodes, _listNodes_uniq)
 #            for i in _listNodes_uniq:
 #                print("found: ", i)
-#            print("should work: ", len(_listNodes))
+            if len(_listNodes_uniq) == 0: return # nothing to do here            
             exp_node = self.createMulFromList(_listNodes_uniq)
 #            print("\t NEW RESULT: ", exp_node)
 #            print("T3: before =>", node)
 #            print("right := ON => moving EXP node: ", exp_node, "\n\n")
-            if exp_node or len(exp_node) >= 1:
+            if exp_node != None:
                 base_node = right.right
                 right.right = self.createExp(base_node, exp_node)
                 self.deleteNodesFromTree(left, node, _listNodes, side.left)
@@ -709,20 +716,16 @@ class Technique3(AbstractTechnique):
                 addAsChildNodeToParent(data, mul)
                 self.applied = True
                 self.score   = tech3.SplitPairing
-#                self.rule += "split one pairing into two pairings. "            
+#                self.rule += "split one pairing into two pairings. "
             elif Type(right) == ops.MUL:
                 print("JAA: how to handle this case: ", child_node1, " AND ", child_node2)
                 r = []
                 self.getMulTokens(right, ops.NONE, [ops.EXP, ops.HASH, ops.ATTR], r)
-                for i in r:
-                    print("i: ", i)
-                exit(0)
-#                mul = BinaryNode(ops.MUL)
-#                mul.left = self.createPair(left, child_node1)
-#                if Type(child_node2) != ops.MUL:
-#                    mul.right = self.createPair(left, child_node2)
-#                else:
-#                    mul.right = self.createPair(left, child_node2.left)
+                n = [ self.createPair2(left, i) for i in r ]
+                addAsChildNodeToParent(data, self.createMulFromList(n))
+                self.applied = True
+                self.score   = tech3.SplitPairing
+
             else:
                 if self.debug: 
                     print("TODO: T3 - missing case: ", Type(child_node1), " and ", Type(child_node2))

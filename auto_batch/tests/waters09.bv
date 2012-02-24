@@ -5,7 +5,7 @@ N := 100
 
 BEGIN :: types
  gb := G1; gba1 := G1; ga1 := G1; ga2 := G1; gba2 := G1; tau1 := G1; tau2 := G1; tau1b := G1; tau2b := G1; w := G1; u := G1; h := G1; g1 := G1
- sig1 := G2; sig2 := G2; sig3 := G2; sig4 := G2; sig5 := G2; sig6 := G2; sig7 := G2; sigK := G2; g2 := G2
+ sig1 := G2; sig2 := G2; sig3 := G2; sig4 := G2; sig5 := G2; sig6 := G1; sig7 := G1; sigK := G2; g2 := G2
  theta := ZR; s := ZR; s1 := ZR; s2 := ZR; t := ZR; M := ZR; tagc := ZR
  A := GT
 END :: types
@@ -41,7 +41,7 @@ message := N
 public := one
 signature := N
 
-verify := {(e(gb^s, sig1) * (e(gba1^s1, sig2) * (e(ga1^s1, sig3) * (e(gba2^s2, sig4) * e(ga2^s2, sig5))))) == (e((tau1^s1) * (tau2^s2), sig6) * (e(((tau1b^s1) * ((tau2b^s2) * w^-t)), sig7) * ( ( ( e( (((u^M) * (w^tagc)) * h)^t, sig7) * (e(g1^t, sigK)^-1) )^theta) * (A^s2)))) }
+verify := { (e(gb^s, sig1) * (e(gba1^s1, sig2) * (e(ga1^s1, sig3) * (e(gba2^s2, sig4) * e(ga2^s2, sig5))))) == (e(sig6, (tau1^s1) * (tau2^s2)) * (e(sig7, ((tau1b^s1) * ((tau2b^s2) * w^-t))) * ( ( ( e(sig7, ((u^(M * t)) * (w^(tagc * t))) * h^t) * (e(g1^t, sigK)^-1) )^theta) * (A^s2)))) }
 
 BEGIN :: latex
 sig1 := \sigma_1
@@ -66,3 +66,7 @@ gba2 := {g_1}^{b \cdot a_2}
 ga2 := {g_1}^{a_2}
 ga1 := {g_1}^{a_1}
 END :: latex
+
+BEGIN :: transform
+2, 3, 5, 3, 6
+END :: transform
