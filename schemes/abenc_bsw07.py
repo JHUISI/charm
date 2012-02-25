@@ -65,13 +65,14 @@ class CPabe_BSW07(ABEnc):
         a_list = []; util.getAttributeList(policy, a_list)
         s = group.random()
         shares = util.calculateShares(s, policy, dict)      
-        
+
         C = pk['h'] ** s
         C_y, C_y_pr = {}, {}
-        for i in a_list:
+        for i in shares.keys():
+            j = util.strip_index(i)
             C_y[i] = pk['g'] ** shares[i]
-            C_y_pr[i] = group.hash(i, G2) ** shares[i] 
-        
+            C_y_pr[i] = group.hash(j, G2) ** shares[i] 
+
         return { 'C_tilde':(pk['e_gg_alpha'] ** s) * M,
                  'C':C, 'Cy':C_y, 'Cyp':C_y_pr, 'policy':unicode(policy_str), 'attributes':a_list }
     
@@ -84,7 +85,8 @@ class CPabe_BSW07(ABEnc):
 
         A = group.init(GT, 1) 
         for i in pruned_list:
-            A *= ( pair(ct['Cy'][i], sk['Dj'][i]) / pair(sk['Djp'][i], ct['Cyp'][i]) ) ** z[i]
+            j = i.getAttributeAndIndex(); k = i.getAttribute()
+            A *= ( pair(ct['Cy'][j], sk['Dj'][k]) / pair(sk['Djp'][k], ct['Cyp'][j]) ) ** z[j]
         
         return ct['C_tilde'] / (pair(ct['C'], sk['D']) / A)
 
@@ -93,7 +95,7 @@ def main():
     
     cpabe = CPabe_BSW07(groupObj)
     attrs = ['ONE', 'TWO', 'THREE']
-    access_policy = '((four or three) and (two or one))'
+    access_policy = '((four or three) and (three or one))'
     if debug: 
         print("Attributes =>", attrs); print("Policy =>", access_policy)
     
