@@ -300,6 +300,24 @@ Let's first build our dependencies with the following scripts:
     
        * Be sure to follow the MINGW32 openssl note.
 
+       ** Alternatively, if you don't want to build pbc/gmp via configure.sh and the --build-win-exe argument
+          than build as follows:
+          #GMP
+          ./configure --prefix=/c/charm-crypto --disable-static --enable-shared
+          make
+          make install
+
+          #PBC
+          ./configure --prefix=/c/charm-crypto --disable-static --enable-shared LDFLAGS="-L/c/charm-crypto/lib" CPPFLAGS="-I/c/charm-crypto/include"
+          make
+          make install
+
+          #OPENSSL
+          ./config --openssldir=/c/charm-crypto --shared # This gets us around installing perl.
+          make
+          make install
+
+
 BUILDING IN OS X 
 ------------------------
 

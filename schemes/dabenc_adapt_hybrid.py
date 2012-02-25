@@ -2,7 +2,7 @@ from toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from charm.cryptobase import *
 from charm.pairing import hash as sha1
 from math import ceil
-from schemes.dabe_aw11 import Dabe
+from schemes.dabe_aw11 import *
 from toolbox.ABEncMultiAuth import ABEncMultiAuth
 from toolbox.pairinggroup import *
 
@@ -51,8 +51,8 @@ def main():
     #Attribute names must be globally unique.  HybridABEncMA
     #Two authorities may not issue keys for the same attribute. 
     #Otherwise, the decryption algorithm will not know which private key to use   
-    jhu_attributes = ['jhu_professor', 'jhu_staff', 'jhu_student']
-    jhmi_attributes = ['jhmi_doctor', 'jhmi_nurse', 'jhmi_staff', 'jhmi_researcher']
+    jhu_attributes = ['jhu.professor', 'jhu.staff', 'jhu.student']
+    jhmi_attributes = ['jhmi.doctor', 'jhmi.nurse', 'jhmi.staff', 'jhmi.researcher']
     (jhuSK, jhuPK) = hyb_abema.authsetup(gp, jhu_attributes)
     (jhmiSK, jhmiPK) = hyb_abema.authsetup(gp, jhmi_attributes)
     allAuthPK = {}; allAuthPK.update(jhuPK); allAuthPK.update(jhmiPK)
@@ -60,13 +60,13 @@ def main():
     #Setup a user with a few keys
     bobs_gid = "20110615 bob@gmail.com cryptokey"
     K = {}
-    hyb_abema.keygen(gp, jhuSK,'jhu_professor', bobs_gid, K)
-    hyb_abema.keygen(gp, jhmiSK,'jhmi_researcher', bobs_gid, K)
+    hyb_abema.keygen(gp, jhuSK,'jhu.professor', bobs_gid, K)
+    hyb_abema.keygen(gp, jhmiSK,'jhmi.researcher', bobs_gid, K)
     
     
     msg = 'Hello World, I am a sensitive record!'
     size = len(msg)
-    policy_str = "(jhmi_doctor or (jhmi_researcher and jhu_professor))"
+    policy_str = "(jhmi.doctor OR (jhmi.researcher AND jhu.professor))"
     ct = hyb_abema.encrypt(allAuthPK, gp, msg, policy_str)    
 
     if debug:

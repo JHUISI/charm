@@ -19,7 +19,7 @@ def parseNumConditional(s, loc, toks):
     print("print: %s" % toks)
     return BinNode(toks[0])
 
-def debug(s, loc, toks):
+def printStuff(s, loc, toks):
     print("print: %s" % toks)
     return toks
         
@@ -36,7 +36,6 @@ def createTree(op, node1, node2):
     node.addSubNode(node1, node2)
     return node
 
-
 class PolicyParser:
     def __init__(self, verbose=False):
         self.finalPol = self.getBNF()
@@ -44,8 +43,8 @@ class PolicyParser:
 
     def getBNF(self):
         # supported operators => (OR, AND, <
-        OperatorOR = Literal("OR") | Literal("or").setParseAction(upcaseTokens)
-        OperatorAND = Literal("AND") | Literal("and").setParseAction(upcaseTokens)
+        OperatorOR = Literal("OR").setParseAction(downcaseTokens) | Literal("or")
+        OperatorAND = Literal("AND").setParseAction(downcaseTokens) | Literal("and")
         Operator = OperatorAND | OperatorOR
         lpar = Literal("(").suppress()
         rpar = Literal(")").suppress()
@@ -53,7 +52,7 @@ class PolicyParser:
         BinOperator = Literal("<=") | Literal(">=") | Literal("==") | Word("<>", max=1)
 
         # describes an individual leaf node
-        leafNode =  (Optional("!") + Word(alphanums+'_./\?!@#$^&*%')).setParseAction( createNode )
+        leafNode =  (Optional("!") + Word(alphanums+'-_./\?!@#$^&*%')).setParseAction( createNode )
         # describes expressions such as (attr < value)
         leafConditional = (Word(alphanums) + BinOperator + Word(nums)).setParseAction( parseNumConditional )
 
@@ -70,10 +69,10 @@ class PolicyParser:
     
     def evalStack(self, stack):
         op = stack.pop()
-        if op in ["OR", "AND"]:
+        if op in ["or", "and"]:
             op2 = self.evalStack(stack)
             op1 = self.evalStack(stack)
-            return createTree(OpType[op.lower()], op1, op2)
+            return createTree(OpType[op], op1, op2)
         else:
             # Node value
             return op
@@ -84,6 +83,22 @@ class PolicyParser:
         self.finalPol.parseString(string)
         return self.evalStack(objStack)
 
+    def findDuplicates(self, tree, _dict):
+        if tree.left: self.findDuplicates(tree.left, _dict)
+        if tree.right: self.findDuplicates(tree.right, _dict)
+        if tree.getNodeType() == tree.ATTR:
+            key = tree.getAttribute()
+            if _dict.get(key) == None: _dict[ key ] = 1
+            else: _dict[ key ] += 1
+
+    def labelDuplicates(self, tree, _dictLabel):
+        if tree.left: self.labelDuplicates(tree.left, _dictLabel)
+        if tree.right: self.labelDuplicates(tree.right, _dictLabel)
+        if tree.getNodeType() == tree.ATTR:
+            key = tree.getAttribute()
+            if _dictLabel.get(key) != None: 
+                tree.index = _dictLabel[ key ]
+                _dictLabel[ key ] += 1
     # determine whether subset will satisfy
     # the tree
     def prune(self, tree, list):
@@ -91,14 +106,14 @@ class PolicyParser:
         new_list = []
         self.verifyExistence(tree, list, new_list)
         return new_list
-
         
     def verifyExistence(self, tree, list, n_list):        
         if(tree == None):
             return 0
         # if AND-gate, both nodes must be in list if attr's
         if(tree.getNodeType() == tree.ATTR):
-            leaf = tree.getAttribute()
+            leaf = tree#.getAttribute()
+            # check if leaf is in the list
             if(list.count(leaf) == 1):
                 n_list.append(leaf)
             return list.count(leaf)

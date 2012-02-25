@@ -12,8 +12,10 @@ Pascal Paillier (Public-Key)
 :Authors:    J Ayo Akinyele
 :Date:            4/2011
 '''
-from charm.integer import *
+#from charm.integer import *
+from toolbox.integergroup import RSAGroup,lcm,integer
 from toolbox.PKEnc import PKEnc
+from charm.engine.util import *
 
 debug = False
 """A ciphertext class with homomorphic properties"""
@@ -48,22 +50,16 @@ class Ciphertext(dict):
         return value # + ", pk =" + str(pk)
     
 class Pai99(PKEnc):
-    def __init__(self):
+    def __init__(self, groupObj):
         PKEnc.__init__(self)
+        global group
+        group = groupObj
     
-    def paramgen(self, secparam):
-        while True:
-           p, q = randomPrime(secparam), randomPrime(secparam)
-           if isPrime(p) and isPrime(q) and gcd(p * q, (p - 1) * (q - 1)) == 1:
-              break
-        return (p, q)    
-
     def L(self, u, n):
         return integer(int(u - 1)) / n
                 
     def keygen(self, secparam=1024):
-        (p, q) = self.paramgen(secparam)
-        n = p * q
+        (p, q, n) = group.paramgen(secparam)
         g = n + 1
         lam = lcm(p - 1, q - 1)
         n2 = n ** 2
@@ -73,7 +69,7 @@ class Pai99(PKEnc):
 
     def encrypt(self, pk, m):
         g, n, n2 = pk['g'], pk['n'], pk['n2']
-        r = random(pk['n'])
+        r = group.random(pk['n'])
         c = ((g % n2) ** m) * ((r % n2) ** n)
         return Ciphertext({'c':c}, pk, 'c')
     
@@ -90,8 +86,9 @@ class Pai99(PKEnc):
         pass
 
 def main():
-    pai = Pai99()
-    
+    group = RSAGroup()
+    pai = Pai99(group)
+        
     (pk, sk) = pai.keygen()
     
     m1 = pai.encode(pk['n'], 12345678987654321)

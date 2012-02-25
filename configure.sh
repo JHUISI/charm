@@ -288,7 +288,7 @@ for opt do
   case "$opt" in
   --help|-h) show_help=yes
   ;;
-  --version|-V) exec cat $source_path/VERSION
+  --version|-V) exec cat "$source_path/VERSION"
   ;;
   --prefix=*) prefix="$optarg"
   ;;
@@ -665,7 +665,7 @@ fi
 
 # Consult white-list to determine whether to enable werror
 # by default.  Only enable by default for git builds
-z_version=`cut -f3 -d. $source_path/VERSION`
+z_version=`cut -f3 -d. "$source_path/VERSION"`
 
 if test -z "$werror" ; then
     if test "$z_version" = "50" -a \
@@ -763,7 +763,7 @@ if test $profiler = "yes" ; then
   echo "CONFIG_PROFILER=y" >> $config_mk
 fi
 
-CHARM_version=`head $source_path/VERSION`
+CHARM_version=`head "$source_path/VERSION"`
 echo "VERSION=$CHARM_version" >>$config_mk
 echo "PKGVERSION=$pkgversion" >>$config_mk
 echo "SRC_PATH=$source_path" >> $config_mk
@@ -877,7 +877,7 @@ fi
 # For python installers on OS X.
 test_path=`echo $python_path | awk 'BEGIN {FS="."}{print $1}'`
 if [ "$test_path" = "/Library/Frameworks/Python" ] ; then
-    echo PYTHONBUILDEXT="-L/usr/local/lib -I/usr/local/include $PYTHONBUILDEXT"
+    PYTHONBUILDEXT="-L/usr/local/lib -I/usr/local/include $PYTHONBUILDEXT"
 fi
 
 if [ "$PYTHONBUILDEXT" != "" ] ; then
