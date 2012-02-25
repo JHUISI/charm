@@ -9,7 +9,7 @@ from toolbox.policytree import *
 class SecretUtil:
     def __init__(self, pairing, verbose=False):
         self.group = pairing        
-        self.parser = PolicyParser()
+#        self.parser = PolicyParser()
 
     def P(self, coeff, x):
 #        share = 0
@@ -122,19 +122,21 @@ class SecretUtil:
         
     
     def createPolicy(self, policy_string):
+        assert type(policy_string) in [str, unicode], "invalid type for policy_string"
         if(type(policy_string) == str):
             policy_string = unicode(policy_string)
-        policy_obj = self.parser.parse(policy_string)
+        parser = PolicyParser()        
+        policy_obj = parser.parse(policy_string)
         _dictCount, _dictLabel = {}, {}
-        self.parser.findDuplicates(policy_obj, _dictCount)
+        parser.findDuplicates(policy_obj, _dictCount)
         for i in _dictCount.keys(): 
             if _dictCount[ i ] > 1: _dictLabel[ i ] = 0
-        self.parser.labelDuplicates(policy_obj, _dictLabel)
-#        print("result: ", policy_obj)
+        parser.labelDuplicates(policy_obj, _dictLabel)
         return policy_obj
         
     def prune(self, policy, attributes):
-        return self.parser.prune(policy, attributes)
+        parser = PolicyParser()        
+        return parser.prune(policy, attributes)
     
     def getAttributeList(self, Node, List):
         if(Node == None):
