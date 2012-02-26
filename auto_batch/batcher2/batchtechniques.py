@@ -5,7 +5,6 @@ from batchparser import *
 Tech_db = Enum('NoneApplied', 'ExpIntoPairing', 'DistributeExpToPairing', 'ProductToSum', 'CombinePairing', 'SplitPairing', 'ConstantPairing', 'MoveExpOutPairing')
 
 #TODO: code up reverse 2 : pull values from pairing outside, 
-#TODO: code up precompute pair : precomputing pairings where both sides are constant.
 
 class AbstractTechnique:
     def __init__(self, sdl_data, variables, meta):
@@ -946,8 +945,6 @@ class Technique3(AbstractTechnique):
 
 tech4 = Tech_db # Enum('NoneApplied', 'ConstantPairing')
 
-#JAA: TODO fix this class in this situation prod(to N) on ( prod(to l) on e(a,b) * prod(to l) on e(b, c) )
-# need to switch with both dot products on the inside not just the first one
 class Technique4(AbstractTechnique):
     def __init__(self, sdl_data, variables, meta):
         AbstractTechnique.__init__(self, sdl_data, variables, meta)
@@ -985,50 +982,6 @@ class Technique4(AbstractTechnique):
                         self.adjustProdNodes(parent)
                     self.applied = True
                     self.score   = tech4.ConstantPairing
-#        for i in node_tuple:
-#            node2 = i[0]
-#            print("cur node: ", node)
-#            parent = i[1]
-#            if var_index > int(self.meta[str(node2.right)]):
-#                # switch prods
-#                prod2 = node2.left
-#                node.left = BinaryNode.copy( prod2 )
-#                node2.left = BinaryNode.copy( prod )
-#
-#        print("result node: ", node)
-#        exit(0)
-
-#        OLD WAY OF APPLYING TECH 4 WHERE ONLY ONE PROD NEEDS TO BE SWITCHED
-#        if node_tuple: node2 = node_tuple[0]; node2_parent = node_tuple[1];
-#        else: node2 = None
-#
-#        if node2 != None:
-#            # can apply technique 4 optimization
-#            prod2 = node2.left
-#            # N > x then we need to switch x with N
-#            if int(self.meta[str(prod.right)]) > int(self.meta[str(prod2.right)]):
-#                # switch nodes between prod nodes of x (constant) and N
-#                node.left = prod2
-#                node2.left = prod
-#                #self.rule += " waters hash technique. "
-#                # check if we need to redistribute or simplify?
-#                #print("node2 =>", node2)
-#                #print("parent =>", node2_parent, ":", Type(node2_parent))
-#                #print("grandpa =>", node2_grand, ":", Type(node2_grand))
-#                if Type(node2_parent) == ops.PAIR:
-#                    if self.debug: print("applied a transformation for technique 4")
-#                    self.adjustProdNodes( node2_parent )
-#                    self.applied = True
-#                    self.score   = tech4.ConstantPairing
-#                else:
-#                    self.applied = True                    
-#                    self.score   = tech4.ConstantPairing
-##                    self.adjustProdNodes( node2_grand )
-#                    if self.debug: 
-#                        print("No other transformation necessary since not a PAIR node instead:", Type(node2_parent))
-#        else:
-#            pass
-            #print("No transformation applied.")
 
     def adjustProdNodes(self, node): 
         if Type(node.left) == ops.ON:
