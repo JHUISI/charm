@@ -306,7 +306,8 @@ def runBatcher(file, verify, ast_struct, eq_number=0):
             continue
         ASTVisitor(Tech).preorder(verify2)
         if option == '6':
-            Tech.makeSubstitution(verify2)
+            testVerify2 = Tech.makeSubstitution(verify2)
+            if testVerify2 != None: verify2 = testVerify2
         if hasattr(Tech, 'precompute'):
             batch_precompute.update(Tech.precompute)
         print(Tech.rule, "\n")

@@ -41,3 +41,7 @@ verify :=  { prod{y:=0, l} on e(S_y, At_y * (Bt_y^m_y) * (Ct_y^t_y)) } == D
 
 # rearrange => verify :=  { prod{y:=0, l} on e(At_y * (Bt_y^m_y) * (Ct_y^t_y), S_y) } == D
 # correct transform => 2, 4, 3, 5, 3 
+#2, 3, 4, 5, 3
+#BEGIN :: transform
+#2, 3, 5, 4, 3
+#END :: transform

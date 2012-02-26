@@ -63,15 +63,14 @@ class BatchOrder:
         
         # traverse equation with the specified technique
         ASTVisitor(tech).preorder(eq2)
-
         # to apply tools if indeed technique applied
         if tech_option in self.techMap2.keys():
             # this makes sure that the technique actually applied
             tech.testForApplication()
             # this applies just to technique 6 (pair instance finder - which combines pairings)
             if getattr(tech, "makeSubstitution", None):
-                tech.makeSubstitution(eq2)
-
+                test = tech.makeSubstitution(eq2)
+                if test != None: eq2 = test
         # return the results
         return (tech, eq2)
     
@@ -90,7 +89,8 @@ class BatchOrder:
         min_index = 0
         min_time = self.batch_time[min_index]
         for i in self.batch_time.keys():
-            if not all_paths[i] in remove_list:
+#            if not all_paths[i] in remove_list:
+             if True:
                 print("unique path:", i, ", time:", self.batch_time[i], ", path: ", all_paths[i])
                 if self.batch_time[i] <= min_time:
                     min_index = i; 
@@ -140,8 +140,14 @@ class BatchOrder:
         # db = loadDB() # list of orderings 
         pass
     
+    def checkForTechniqueComboInPath(self, tech1, tech2, path):
+        for i in range(len(path)):
+            if tech1 == path[i]:
+                if i + 1 < len(path) and tech2 == path[i+1]: return True
+        return False
+    
     # take the current 
-    def possibleTechniques(self, tech_applied, tech_obj):
+    def possibleTechniques(self, tech_applied, tech_obj, history):
         suggest = None
         if tech_obj.applied:
             if tech_applied == 2:
@@ -150,6 +156,8 @@ class BatchOrder:
             elif tech_applied == 3:
                 if tech_obj.score in [Tech_db.CombinePairing, Tech_db.ProductToSum, Tech_db.SplitPairing]:
                     suggest = [4, 7, 5, 2]
+                    # if history already does not have 3 to 6, then it is ok to suggest
+                    if not self.checkForTechniqueComboInPath(3, 6, history): suggest.insert(0, 6)
             elif tech_applied == 4:
                 if tech_obj.score == Tech_db.ConstantPairing:
                     suggest = [6, 5, 3]
@@ -199,7 +207,7 @@ class BatchOrder:
             # check score and get next option
             #excl_list = []
             # 2. get next techniques to try
-            next_tech_list = self.possibleTechniques(cur_tech, tech)
+            next_tech_list = self.possibleTechniques(cur_tech, tech, path)
             if self.debug: print("Try these techs next: ", next_tech_list, "\n")
             # 3. recursively test other schemes and paths
             if next_tech_list:

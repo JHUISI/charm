@@ -68,6 +68,7 @@ class PairInstanceFinder:
             elif i.left != None and Type(i.left) == ops.PAIR: self.side['left'].append(str(i.left))
 
     def visit_pair(self, node, data):
+        #print("T6: parent type: ", Type(data['parent']))
         lhs = node.left
         rhs = node.right
         key = None
@@ -157,8 +158,10 @@ class PairInstanceFinder:
     
     def makeSubstitution(self, equation):
         # first get a node in which 
-        pairDict = self.checkForMultiple()
-
+#        tech6Applied = self.testForApplication()
+#        print("tech 6 apply? =>", tech6Applied)
+        pairDict = self.checkForMultiple()     
+        equation2 = BinaryNode.copy(equation)
         if pairDict != None:
 #            print("Pair =>", pairDict)
 #            for i in pairDict.keys():
@@ -171,6 +174,27 @@ class PairInstanceFinder:
             batchparser.ASTVisitor( SP2 ).preorder( equation )
             if SP2.pruneCheck: 
                 batchparser.ASTVisitor( PruneTree() ).preorder( equation )
+            if self.failedTechnique(equation): self.applied = False; return equation2
+            else: return None 
+                
+    def failedTechnique(self, equation):
+        check = SanityCheckT6()
+        batchparser.ASTVisitor( check ).preorder( equation )
+#        print("Test sanity check: ", check.foundError)
+        return check.foundError
+#                print("Test sanity check: ", check.foundError)
+#                print("result 1:", equation2)
+#                print("result 2:", equation)
+#                print("pairDict keys: ", pairDict.keys())
+#                # update the dictionary
+##                self.applied = check.foundError
+#                return equation2
+#            elif not check.foundError and not tech6Applied:
+#                return equation
+#            else:
+#                print("Reverting state back: ", equation)
+#                self.applied = False
+#                return equation
 #            print("Done\n")
     
     def testForApplication(self):
@@ -418,7 +442,7 @@ class SubstitutePairs2:
 #                if Type(data['parent']) != ops.ON:
                     # potentially prevent infinite loop of reverse split tech 3 and combine pairing of tech 6
 #                    return
-                print("warning: this code has not been fully tested yet.", self.left, node.left, self.right)
+                if self.debug: print("warning: this code has not been fully tested yet.", self.left, node.left, self.right)
                 target = self.right
                 for i in self.extra:
                     target = self.combine(target, BinaryNode.copy(self.checkForInverse(i)))
@@ -473,6 +497,27 @@ class PruneTree:
             #print("prune this 2: ", node)
             batchparser.addAsChildNodeToParent(data, node.right)            
 
+class SanityCheckT6:
+    def __init__(self):
+        self.foundError = False
+    
+    def visit(self, node, data):
+        pass
+    
+    def visit_prod(self, node, data):
+        if Type(data['parent']) != ops.ON:
+            self.foundError = True
+    
+    def visit_on(self, node, data):
+        if Type(node.left) != ops.PROD:
+            self.foundError = True
+    
+    def visit_pair(self, node, data):
+        if node.left == None or node.right == None:
+            self.foundError = True
+    
+        
+        
 class SubstituteSigDotProds:
     def __init__(self, vars, index='z', sig='N', cnt=0 ):
         self.prefix = 'dot' # self.prefix + self.alpha[cnt]; cnt += 1
@@ -613,8 +658,10 @@ class DotProdInstanceFinder:
     # e.g., prod{} on (x * y) => prod{} on x * prod{} on y    
     def visit_on(self, node, data):
 #        print("DP finder: ", data.get('visited_pair'))
-        if Type(data['parent']) == ops.PAIR or data.get('visited_pair'):
-            #self.rule += "False "
+        if Type(data['parent']) == ops.PAIR or data.get('visited_pair'): # bail if dot prod already a child of a pairing node
+            return
+        #print("T5: right node type =>", Type(node.right), node.right)
+        if Type(node.right) == ops.ON: # prod{} on (prod{} on x). thus, we should bail
             return
         #print("test: right node of prod =>", node.right, ": type =>", node.right.type)
         #print("parent type =>", Type(data['parent']))

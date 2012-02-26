@@ -67,6 +67,6 @@ ga2 := {g_1}^{a_2}
 ga1 := {g_1}^{a_1}
 END :: latex
 
-BEGIN :: transform
-2, 3, 5, 3, 6
-END :: transform
+#BEGIN :: transform
+#2, 3, 5, 3, 6
+#END :: transform
