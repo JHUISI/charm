@@ -4,7 +4,7 @@ name := waters09
 N := 100
 
 BEGIN :: types
- gb := G1; gba1 := G1; ga1 := G1; ga2 := G1; gba2 := G1; tau1 := G1; tau2 := G1; tau1b := G1; tau2b := G1; w := G1; u := G1; h := G1; g1 := G1
+ gb := G1; gba1 := G1; ga1 := G1; ga2 := G1; gba2 := G1; tau1 := G2; tau2 := G2; tau1b := G2; tau2b := G2; w := G2; u := G2; h := G2; g1 := G1
  sig1 := G2; sig2 := G2; sig3 := G2; sig4 := G2; sig5 := G2; sig6 := G1; sig7 := G1; sigK := G2; g2 := G2
  theta := ZR; s := ZR; s1 := ZR; s2 := ZR; t := ZR; M := ZR; tagc := ZR
  A := GT
