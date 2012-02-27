@@ -1,0 +1,214 @@
+'''
+Allison Lewko, Amit Sahai and Brent Waters (Pairing-based)
+ 
+| From: "Revocation Systems with Very Small Private Keys"
+| Published in: IEEE S&P 2010
+| Available from: http://eprint.iacr.org/2008/309.pdf
+| Notes: fully secure IBE Construction with revocable keys.
+
+* type:           identity-based encryption (public key)
+* setting:        Pairing
+
+:Authors:    J Ayo Akinyele
+:Date:       1/2012
+'''
+from toolbox.pairinggroup import *
+from toolbox.PKSig import PKSig
+from toolbox.iterate import dotprod
+from charm.engine.util import *
+import sys, random, string
+#from toolbox.IBEnc import *
+
+debug = False
+class IBE_Revoke(IBEnc):
+    def __init__(self, groupObj):
+        #IBEnc.__init__(self)
+        global group, util
+        group = groupObj
+
+    def keygen(self):
+        g1 = group.random(G1)
+        g2 = group.random(G2)
+        a1, a2, b, alpha = group.random(ZR, 4)
+        _w, _h, _v, _v1, _v2, _u = group.random(ZR, 6)
+        
+        v = g1 ** _v 
+        v1 = g1 ** _v1 
+        v2 = g1 ** _v2
+        
+        v_2 = g2 ** _v
+        v1_2 = g2 ** _v1
+        v2_2 = g2 ** _v2
+        w1, h1 = g1 ** _w, g1 ** _h
+        w2, h2 = g2 ** _w, g2 ** _h
+        u2 = g2 ** _u
+        u1 = g1 ** _u
+        
+        tau1 = v * (v1 ** a1)
+        tau2 = v * (v2 ** a2)
+        mpk = { 'g1':g1, 'g2':g2, 'g1^b':g1 ** b, 'g^a1':g1 ** a1, 'g^a2':g1 ** a2, 'g^ba1':g1 ** (b * a1), 'g^ba2':g1 ** (b * a2), 'tau1':tau1, 'tau2':tau2, 'tau1^b':tau1 ** b, 'tau2^b':tau2 ** b, 'u':u1, 'u2':u2,'w1':w1, 'h1':h1, 'w2':w2, 'h2':h2, 'egg_alpha': pair(g1, g2) ** (alpha * a1 * b) }
+        sk = {'g^alph_a1':g2 ** (alpha * a1), 'g2^b':g2 ** b,'v':v_2, 'v1':v1_2, 'v2':v2_2, 'alpha':alpha }
+        return (mpk, sk)
+    
+    def sign(self, mpk, msk, m):
+        r1, r2, z1, z2, tagk = group.random(ZR, 5)
+        r = r1 + r2
+        M = group.hash(m)
+
+        S = {}
+        S[1] = msk['g^alph_a1'] * (msk['v'] ** r)
+        S[2] = (mpk['g2'] ** -msk['alpha']) * (msk['v1'] ** r) * (mpk['g2'] ** z1)
+        S[3] = msk['g2^b'] ** -z1
+        S[4] = (msk['v2'] ** r) * (mpk['g2'] ** z2)
+        S[5] = msk['g2^b'] ** -z2
+        S[6] = msk['g2^b'] ** r2
+        S[7] = mpk['g2'] ** r1
+        SK = ((mpk['u2'] ** M) * (mpk['w2'] ** tagk) * mpk['h2']) ** r1
+        
+        sigma = { 'sig':S, 'K':SK, 'tagk':tagk }
+        return sigma
+
+    def verify(self, mpk, sigma, m):
+        s1, s2, t, tagc = group.random(ZR, 4)
+        s = s1 + s2
+        
+        sig1, sig2, sig3, sig4, sig5, sig6, sig7, sigK, tagk = sigma['sig'][1],sigma['sig'][2],sigma['sig'][3],sigma['sig'][4],sigma['sig'][5],sigma['sig'][6],sigma['sig'][7],sigma['K'],sigma['tagk']
+
+        M = group.hash(m)
+
+        E1 = ((mpk['u'] ** M) * (mpk['w1'] * tagc) * mpk['h1']) ** t
+        E2 = mpk['g1'] ** t
+        A = mpk['egg_alpha']
+        theta =  ~(tagc - tagk)
+        
+        lhs_pair = pair(mpk['g1^b'] ** s, sig1) * pair(mpk['g^ba1'] ** s1, sig2) * pair(mpk['g^a1'] ** s1, sig3) * pair(mpk['g^ba2'] ** s2, sig4) * pair(mpk['g^a2'] ** s2, sig5)        
+        rhs_pair = pair((mpk['tau1'] ** s1) * (mpk['tau2'] ** s2), sig6) * pair((mpk['tau1^b'] ** s1) * (mpk['tau2^b'] ** s2) * (mpk['w1'] ** -t), sig7) * (( pair(E1, sig7) / pair(E2, sigK) ) ** theta) * (A ** s2)
+        if lhs_pair == rhs_pair:
+            return True
+        return False
+        
+def main():
+    #if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
+        #sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
+
+    grp = PairingGroup(MNT160)
+    
+    ibe = IBE_Revoke(grp)
+    
+    (mpk, msk) = ibe.keygen()
+
+    '''
+    numValidMessages = int(sys.argv[1])
+    numInvalidMessages = int(sys.argv[2])
+    messageSize = int(sys.argv[3])
+    prefixName = sys.argv[4]
+    validOutputDictName = sys.argv[5]
+    invalidOutputDictName = sys.argv[6]
+
+    f_mpk = open('mpk.charmPickle', 'wb')
+    pick_mpk = objectToBytes(mpk, grp)
+    f_mpk.write(pick_mpk)
+    f_mpk.close()
+
+    validOutputDict = {}
+    validOutputDict[0] = {}
+    validOutputDict[0]['mpk'] = 'mpk.charmPickle'
+
+    invalidOutputDict = {}
+    invalidOutputDict[0] = {}
+    invalidOutputDict[0]['mpk'] = 'mpk.charmPickle'
+  
+    for index in range(0, numValidMessages):
+        if (index != 0):
+            validOutputDict[index] = {}
+            validOutputDict[index]['mpk'] = 'mpk.charmPickle'
+
+        message = ""
+        for randomChar in range(0, messageSize):
+            message += random.choice(string.printable)
+
+        sigma = ibe.sign(mpk, msk, message)        
+        assert ibe.verify(mpk, sigma, message), "Invalid Verification!!!!"
+
+        f_message = open(prefixName + str(index) + '_ValidMessage.pythonPickle', 'wb')
+        validOutputDict[index]['m'] = prefixName + str(index) + '_ValidMessage.pythonPickle'
+
+        f_sig = open(prefixName + str(index) + '_ValidSignature.charmPickle', 'wb')
+        validOutputDict[index]['sigma'] = prefixName + str(index) + '_ValidSignature.charmPickle'
+        
+        pickle.dump(message, f_message)
+        f_message.close()
+
+        pick_sig = objectToBytes(sigma, grp)
+
+        f_sig.write(pick_sig)
+        f_sig.close()
+
+        del message
+        del sigma
+        del f_message
+        del f_sig
+        del pick_sig
+
+    dict_pickle = objectToBytes(validOutputDict, grp)
+    f = open(validOutputDictName, 'wb')
+    f.write(dict_pickle)
+    f.close()
+    del dict_pickle
+    del f
+
+    for index in range(0, numInvalidMessages):
+        if (index != 0):
+            invalidOutputDict[index] = {}
+            invalidOutputDict[index]['mpk'] = 'mpk.charmPickle'
+
+        message = ""
+        for randomChar in range(0, messageSize):
+            message += random.choice(string.printable)
+
+        sigma = ibe.sign(mpk, msk, message)        
+        assert ibe.verify(mpk, sigma, message), "Invalid Verification!!!!"
+
+        f_message = open(prefixName + str(index) + '_InvalidMessage.pythonPickle', 'wb')
+        invalidOutputDict[index]['m'] = prefixName + str(index) + '_InvalidMessage.pythonPickle'
+        randomIndex = random.randint(0, (messageSize - 1))
+        oldValue = message[randomIndex]
+        newValue = random.choice(string.printable)
+        while (newValue == oldValue):
+            newValue = random.choice(string.printable)
+
+        if (messageSize == 1):
+            message = newValue
+        elif (randomIndex != (messageSize -1) ):
+            message = message[0:randomIndex] + newValue + message[(randomIndex + 1):messageSize]
+        else:
+            message = message[0:randomIndex] + newValue
+
+        f_sig = open(prefixName + str(index) + '_InvalidSignature.charmPickle', 'wb')
+        invalidOutputDict[index]['sigma'] = prefixName + str(index) + '_InvalidSignature.charmPickle'
+
+        pickle.dump(message, f_message)
+        f_message.close()
+
+        pick_sig = objectToBytes(sigma, grp)
+
+        f_sig.write(pick_sig)
+        f_sig.close()
+
+        del message
+        del sigma
+        del f_message
+        del f_sig
+        del pick_sig
+    
+    dict_pickle = objectToBytes(invalidOutputDict, grp)
+    f = open(invalidOutputDictName, 'wb')
+    f.write(dict_pickle)
+    f.close()
+    del dict_pickle
+    del f
+    '''
+
+if __name__ == "__main__":
+    debug = True
+    main()

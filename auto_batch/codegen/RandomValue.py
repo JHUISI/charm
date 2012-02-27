@@ -39,7 +39,7 @@ class RandomValue:
 
 		if (self.seed != None):
 			seedStringVarName = self.seed.getStringVarName()
-			if ( (seedStringVarName == None) or (type(seedStringVarname).__name__ != con.strTypePython) or (len(seedStringVarName) == 0) ):
+			if ( (seedStringVarName == None) or (type(seedStringVarName).__name__ != con.strTypePython) or (len(seedStringVarName) == 0) ):
 				return None
 
 			stringVarName += ", "
