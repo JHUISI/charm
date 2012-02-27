@@ -106,6 +106,7 @@ typedef struct {
 #define element_mul_zn(c, a, b) _element_mul_zn(a->element_type, a->pairing->pair_obj, c->e, a->e, b->e, a->pairing->order)
 #define element_div(c, a, b) _element_div(a->element_type, c->e, a->e, b->e) // TODO: fix for 1 / ZR
 #define element_set(a, b) _element_set(a->pairing->curve, a->element_type, a->e, b->e);
+#define element_set_raw(g, t, a, b) _element_set(g->pairing->curve, t, a, b);
 #define element_setG1(c, a, b) _element_setG1(c->element_type, c->e, a->e, b->e);
 
 #define element_set_si(a, b) \
@@ -134,7 +135,12 @@ typedef struct {
 	if(a->pairing->curve == MNT) { \
 		c->e = _element_pairing_type3(a->pairing->pair_obj, a->e, b->e); \
 		c->element_type = GT_t;   \
-	} else { /* do other stuff for SS-curves */ }
+	} else { /* TODO: do other stuff for SS-curves */ }
+
+#define element_prod_pairing(c, a, b, l) \
+	if(c->pairing->curve == MNT) { \
+		c->e = _element_prod_pairing_type3(c->pairing->pair_obj, a, b, l); \
+		c->element_type = GT_t;  }
 
 #define element_from_hash(a, d, l) \
 		a->e = _element_from_hash(a->element_type, a->pairing->pair_obj, d, l);

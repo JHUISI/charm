@@ -100,3 +100,5 @@ class PairingGroup():
            print(data)
         return None
     
+    def pair_prod(self, lhs, rhs):
+        return pair(lhs, rhs, self.Pairing)
