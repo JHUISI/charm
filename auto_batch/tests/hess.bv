@@ -8,6 +8,8 @@ S1 := GT
 S2 := G1
 pk := G1
 a := ZR
+g2 := G2
+P := G2
 END :: types
 
 BEGIN :: precompute

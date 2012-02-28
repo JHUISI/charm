@@ -8,13 +8,18 @@ Tech_db = Enum('NoneApplied', 'ExpIntoPairing', 'DistributeExpToPairing', 'Produ
 
 class AbstractTechnique:
     def __init__(self, sdl_data, variables, meta):
-        self.consts = sdl_data['constant']
-        self.public = sdl_data['public']
-        self.message = sdl_data['message']
-        self.setting = sdl_data['setting']
-        
+        if sdl_data != None:
+            self.consts = sdl_data['constant']
+            self.public = sdl_data['public']
+            self.message = sdl_data['message']
+            self.setting = sdl_data['setting']
+        else:
+            self.consts = self.public = self.message = self.setting = None
         self.vars   = variables
-        self.meta   = meta
+        if meta != None:
+            self.meta   = meta
+        else:
+            self.meta   = None
         self.debug  = None
 
     def visit(self, node, data):

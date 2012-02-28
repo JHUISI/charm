@@ -8,6 +8,7 @@ from batchproof import *
 from batchorder import BatchOrder
 from batchparser import BatchParser
 from batchcomboeq import TestForMultipleEq,CombineMultipleEq,SmallExpTestMul
+from batchsyntax import BasicTypeExist,PairingTypeCheck
 
 try:
     #import benchmarks
@@ -428,6 +429,17 @@ if __name__ == "__main__":
             result = handleVerifyEq(n, cnt); cnt += 1
             if type(result) != list: verify_eq.append(result)
             else: verify_eq.extend(result)
+
+    # verify 
+    variables = ast_struct[ TYPE ]
+    for eq in verify_eq:
+        bte = BasicTypeExist( variables )
+        ASTVisitor( bte ).preorder( eq )
+        bte.report( eq )
+        
+        cte = PairingTypeCheck( variables )
+        ASTVisitor( cte ).preorder( eq )
+        cte.report( eq )
 
     # process settings
     for i in range(len(verify_eq)):    

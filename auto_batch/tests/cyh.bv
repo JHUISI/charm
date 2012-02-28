@@ -11,6 +11,7 @@ u := G1
 pk := G1
 sk := G1
 h := ZR
+P := G2
 END :: types
 
 BEGIN :: precompute

@@ -9,6 +9,8 @@ g2 := G2
 pk := G2
 sig := G1
 b := ZR
+a := G1
+h := G1
 END :: types
 
 BEGIN :: precompute
