@@ -577,10 +577,10 @@ class SubstituteSigDotProds:
 
         if sig == self.sig:
             key = BinaryNode(self.getkey('sum'))
-            if node.right.getAttribute() == 'delta':
-                self.store(key, node, 'ZR')
-            else:
-                self.store(key, node)
+#            if node.right.getAttribute() == 'delta':
+#                self.store(key, node, 'ZR')
+#            else:
+            self.store(key, node, 'ZR') # most likely
             batchparser.addAsChildNodeToParent(data, key)
             
                 
