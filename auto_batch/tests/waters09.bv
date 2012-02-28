@@ -41,7 +41,7 @@ message := N
 public := one
 signature := N
 
-verify := { (e(gb^s, sig1) * (e(gba1^s1, sig2) * (e(ga1^s1, sig3) * (e(gba2^s2, sig4) * e(ga2^s2, sig5))))) == (e(sig6, (tau1^s1) * (tau2^s2)) * (e(sig7, ((tau1b^s1) * ((tau2b^s2) * w^-t))) * ( ( ( e(sig7, ((u^(M * t)) * (w^(tagc * t))) * h^t) * (e(g1^t, sigK)^-1) )^theta) * (A^s2)))) }
+verify := { (e(gb^s, sig1) * (e(gba1^s1, sig2) * (e(ga1^s1, sig3) * (e(gba2^s2, sig4) * e(ga2^s2, sig5))))) == (e(sig6, (tau1^s1) * (tau2^s2)) * (e(sig7, ((tau1b^s1) * ((tau2b^s2) * w^-t))) * ( ( ( e(sig7, ((u^(M * t)) * (w^(tagc * t))) * h^t) * (e(g1^-t, sigK)) )^theta) * (A^s2)))) }
 
 BEGIN :: latex
 sig1 := \sigma_1
