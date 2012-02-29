@@ -14,11 +14,15 @@ Brent Waters (Pairing-based)
 '''
 from toolbox.pairinggroup import *
 from toolbox.IBEnc import *
+from toolbox.PKSig import PKSig
+from toolbox.iterate import dotprod
+from charm.engine.util import *
+import sys, random, string
 
 debug = False
 class IBEWaters09(IBEnc):
     def __init__(self, groupObj):
-        IBEnc.__init__(self)
+        #IBEnc.__init__(self)
         global group, util
         group = groupObj
 
@@ -42,13 +46,9 @@ class IBEWaters09(IBEnc):
         
         tau1 = v_2 * (v1_2 ** a1)
         tau2 = v_2 * (v2_2 ** a2)
-        pk = { 'g1':g1, 'g2':g2, 'g1^b':g1 ** b, 'g^a1':g1 ** a1, 'g^a2':g1 ** a2, 
-              'g^ba1':g1 ** (b * a1), 'g^ba2':g1 ** (b * a2), 'tau1':tau1, 'tau2':tau2, 
-              'tau1^b':tau1 ** b, 'tau2^b':tau2 ** b, 'u':u1, 'u2':u2,'w1':w1, 'h1':h1, 'w2':w2, 'h2':h2,
-              'egg_alpha': pair(g1, g2) ** (alpha * a1 * b) }
-        sk = {'g^alph_a1':g2 ** (alpha * a1),
-              'g2^b':g2 ** b,'v':v_2, 'v1':v1_2, 'v2':v2_2, 'alpha':alpha }
-        return (pk, sk)
+        mpk = { 'g1':g1, 'g2':g2, 'g1^b':g1 ** b, 'g^a1':g1 ** a1, 'g^a2':g1 ** a2, 'g^ba1':g1 ** (b * a1), 'g^ba2':g1 ** (b * a2), 'tau1':tau1, 'tau2':tau2, 'tau1^b':tau1 ** b, 'tau2^b':tau2 ** b, 'u':u1, 'u2':u2,'w1':w1, 'h1':h1, 'w2':w2, 'h2':h2, 'egg_alpha': pair(g1, g2) ** (alpha * a1 * b) }
+        sk = {'g^alph_a1':g2 ** (alpha * a1), 'g2^b':g2 ** b,'v':v_2, 'v1':v1_2, 'v2':v2_2, 'alpha':alpha }
+        return (mpk, sk)
     
     def sign(self, mpk, msk, m):
         r1, r2, z1, z2, tagk = group.random(ZR, 5)
@@ -86,19 +86,134 @@ class IBEWaters09(IBEnc):
         return False
 
 def main():
+    #if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
+        #sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
+
     # scheme designed for symmetric billinear groups
-    grp = PairingGroup('MNT224')
+    grp = PairingGroup(MNT160)
     
     ibe = IBEWaters09(grp)
     
     (mpk, msk) = ibe.keygen()
     
-    m = "plese sign this message!!!!"
-    sigma = ibe.sign(mpk, msk, m)
-    if debug: print("Signature :=", sigma)
+    #m = "plese sign this message!!!!"
+    #sigma = ibe.sign(mpk, msk, m)
+    #if debug: print("Signature :=", sigma)
         
-    assert ibe.verify(mpk, sigma, m), "Invalid Verification!!!!"
-    if debug: print("Successful Individual Verification!")
+    #assert ibe.verify(mpk, sigma, m), "Invalid Verification!!!!"
+    #if debug: print("Successful Individual Verification!")
+
+    '''
+    numValidMessages = int(sys.argv[1])
+    numInvalidMessages = int(sys.argv[2])
+    messageSize = int(sys.argv[3])
+    prefixName = sys.argv[4]
+    validOutputDictName = sys.argv[5]
+    invalidOutputDictName = sys.argv[6]
+
+    f_mpk = open('mpk.charmPickle', 'wb')
+    pick_mpk = objectToBytes(mpk, grp)
+    f_mpk.write(pick_mpk)
+    f_mpk.close()
+
+    validOutputDict = {}
+    validOutputDict[0] = {}
+    validOutputDict[0]['mpk'] = 'mpk.charmPickle'
+
+    invalidOutputDict = {}
+    invalidOutputDict[0] = {}
+    invalidOutputDict[0]['mpk'] = 'mpk.charmPickle'
+  
+    for index in range(0, numValidMessages):
+        if (index != 0):
+            validOutputDict[index] = {}
+            validOutputDict[index]['mpk'] = 'mpk.charmPickle'
+
+        message = ""
+        for randomChar in range(0, messageSize):
+            message += random.choice(string.printable)
+
+        sigma = ibe.sign(mpk, msk, message)        
+        assert ibe.verify(mpk, sigma, message), "Invalid Verification!!!!"
+
+        f_message = open(prefixName + str(index) + '_ValidMessage.pythonPickle', 'wb')
+        validOutputDict[index]['m'] = prefixName + str(index) + '_ValidMessage.pythonPickle'
+
+        f_sig = open(prefixName + str(index) + '_ValidSignature.charmPickle', 'wb')
+        validOutputDict[index]['sigma'] = prefixName + str(index) + '_ValidSignature.charmPickle'
+        
+        pickle.dump(message, f_message)
+        f_message.close()
+
+        pick_sig = objectToBytes(sigma, grp)
+
+        f_sig.write(pick_sig)
+        f_sig.close()
+
+        del message
+        del sigma
+        del f_message
+        del f_sig
+        del pick_sig
+
+    dict_pickle = objectToBytes(validOutputDict, grp)
+    f = open(validOutputDictName, 'wb')
+    f.write(dict_pickle)
+    f.close()
+    del dict_pickle
+    del f
+
+    for index in range(0, numInvalidMessages):
+        if (index != 0):
+            invalidOutputDict[index] = {}
+            invalidOutputDict[index]['mpk'] = 'mpk.charmPickle'
+
+        message = ""
+        for randomChar in range(0, messageSize):
+            message += random.choice(string.printable)
+
+        sigma = ibe.sign(mpk, msk, message)        
+        assert ibe.verify(mpk, sigma, message), "Invalid Verification!!!!"
+
+        f_message = open(prefixName + str(index) + '_InvalidMessage.pythonPickle', 'wb')
+        invalidOutputDict[index]['m'] = prefixName + str(index) + '_InvalidMessage.pythonPickle'
+        randomIndex = random.randint(0, (messageSize - 1))
+        oldValue = message[randomIndex]
+        newValue = random.choice(string.printable)
+        while (newValue == oldValue):
+            newValue = random.choice(string.printable)
+
+        if (messageSize == 1):
+            message = newValue
+        elif (randomIndex != (messageSize -1) ):
+            message = message[0:randomIndex] + newValue + message[(randomIndex + 1):messageSize]
+        else:
+            message = message[0:randomIndex] + newValue
+
+        f_sig = open(prefixName + str(index) + '_InvalidSignature.charmPickle', 'wb')
+        invalidOutputDict[index]['sigma'] = prefixName + str(index) + '_InvalidSignature.charmPickle'
+
+        pickle.dump(message, f_message)
+        f_message.close()
+
+        pick_sig = objectToBytes(sigma, grp)
+
+        f_sig.write(pick_sig)
+        f_sig.close()
+
+        del message
+        del sigma
+        del f_message
+        del f_sig
+        del pick_sig
+    
+    dict_pickle = objectToBytes(invalidOutputDict, grp)
+    f = open(invalidOutputDictName, 'wb')
+    f.write(dict_pickle)
+    f.close()
+    del dict_pickle
+    del f
+    '''
         
 if __name__ == "__main__":
     debug = True
