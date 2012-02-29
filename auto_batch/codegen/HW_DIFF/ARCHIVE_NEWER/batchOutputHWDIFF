@@ -1,0 +1,18 @@
+Final batch eq: e((prod{z := 0,N} on sigma1_z^delta_z),pk#4?) == ((prod{z := 0,N} on U_z^(M_z * delta_z)) * ((prod{z := 0,N} on V_z^(r_z * delta_z)) * ((prod{z := 0,N} on D_z^delta_z) * e((prod{z := 0,N} on sigma2_z^(n * delta_z)),(pk#7?^n * (pk#9?^S * pk#11?))))))
+<====	PREP FOR CODE GEN	====>
+
+Final version => e(dotA,pk#4?) == (dotB * (dotC * (dotD * e(dotE,(pk#7?^n * (pk#9?^S * pk#11?)))))) 
+
+Compute:  dotA := (prod{z := 0,N} on sigma1_z^delta_z)
+Compute:  dotB := (prod{z := 0,N} on U_z^(M_z * delta_z))
+Compute:  dotC := (prod{z := 0,N} on V_z^(r_z * delta_z))
+Compute:  dotD := (prod{z := 0,N} on D_z^delta_z)
+Compute:  dotE := (prod{z := 0,N} on sigma2_z^(n * delta_z))
+Precompute: n := lg_i
+Precompute: S := junkjunk
+Precompute: delta := for{z := 1, N} do prng_z
+dotA := G1
+dotB := GT
+dotC := GT
+dotD := GT
+dotE := G1

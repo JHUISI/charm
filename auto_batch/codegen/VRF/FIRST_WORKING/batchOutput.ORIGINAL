@@ -1,0 +1,46 @@
+Final batch eq: (e((prod{z := 0,N} on (g1^((1 + -x#1_z) * delta_z) * U1#0^(x#1_z * delta_z))),Ut) * e((prod{z := 1,N} on pi#1_z^-delta_z),g2)) == 1
+<====	PREP FOR CODE GEN	====>
+
+Final version => (e(dotA,Ut) * e(dotB,g2)) == 1 
+
+Compute:  dotA := (prod{z := 0,N} on (g1^((1 + -x#1_z) * delta_z) * U1#0^(x#1_z * delta_z)))
+Compute:  dotB := (prod{z := 0,N} on pi#1_z^-delta_z)
+Precompute: delta := for{z := 0, N} do prng_z
+dotA := G1
+dotB := G1
+
+
+
+
+
+
+
+Final batch eq: (e((prod{z := 0,N} on pi#n_z^delta_z),U2#0) * e((prod{z := 1,N} on pi#0_z^-delta_z),(g2 * h^-1))) == (prod{z := 1,N} on y_z^delta_z)
+<====	PREP FOR CODE GEN	====>
+
+Final version => (e(dotC,U2#0) * e(dotD,(g2 * h^-1))) == dotE 
+
+Compute:  dotC := (prod{z := 0,N} on pi#n_z^delta_z)
+Compute:  dotD := (prod{z := 0,N} on pi#0_z^-delta_z)
+Compute:  dotE := (prod{z := 0,N} on y_z^delta_z)
+Precompute: delta := for{z := 0, N} do prng_z
+dotC := G1
+dotD := G1
+dotE := GT
+
+
+
+
+
+
+
+Final batch eq: for{t := 0,n} do e((prod{z := 0,N} on (pi#t_z^delta_z * pi#t-1_z^((1 + -x#t_z) * -delta_z))),g2) == e((prod{z := 1,N} on pi#t-1_z^(x#t_z * delta_z)),U2#t)
+<====	PREP FOR CODE GEN	====>
+
+Final version => for{t := 0,n} do e(dotF,g2) == e(dotG,U2#t) 
+
+Compute:  dotF := (prod{z := 0,N} on (pi#t_z^delta_z * pi#t-1_z^((1 + -x#t_z) * -delta_z)))
+Compute:  dotG := (prod{z := 0,N} on pi#t-1_z^(x#t_z * delta_z))
+Precompute: delta := for{z := 0, N} do prng_z
+dotF := G1
+dotG := G1

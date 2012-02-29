@@ -1,0 +1,51 @@
+['cl04.bv', '-c']
+types  => {'a': 'G2', 'c': 'G2', 'b': 'G2', 'g': 'G1', 'm': 'ZR', 'Y': 'G1', 'X': 'G1'}
+constant  => ['g']
+message  => ['m']
+public  => ['X', 'Y']
+signature  => ['a', 'b', 'c']
+Original eq: (e(Y,a) * e(g,b)^-1) == (e(X,a) * (e(X,b)^m * e(g,c)^-1))
+variables => {'a': 'G2', 'c': 'G2', 'b': 'G2', 'name': 'cl04', 'g': 'G1', 'm': 'ZR', 'N': '100', 'Y': 'G1', 'X': 'G1'}
+metadata => {'name': 'cl04', 'N': '100'}
+
+VERIFY EQUATION => (e(Y,a) * e(g,b)^-1) == (e(X,a) * (e(X,b)^m * e(g,c)^-1))
+Mode:  single signer
+
+Stage A: Combined Equation => (prod{z := 0,N} on (e(Y,a_z) * e(g,b_z)^-1)) == (prod{z := 0,N} on (e(X,a_z) * (e(X,b_z)^m_z * e(g,c_z)^-1)))
+
+Stage B: Small Exp Test => (prod{z := 0,N} on (e(Y,a_z) * e(g,b_z)^-1)^delta_z) == (prod{z := 0,N} on (e(X,a_z) * (e(X,b_z)^m_z * e(g,c_z)^-1))^delta_z) 
+
+found batch algorithm => ['2', '6', '6', '5', '3']
+Move the exponent(s) into the pairing (technique 2) 
+
+Applying technique 2 : (prod{z := 0,N} on (e(Y,a_z^delta_z) * e(g,b_z^-delta_z))) == (prod{z := 0,N} on (e(X,a_z^delta_z) * (e(X,b_z^(m_z * delta_z)) * e(g,c_z^-delta_z)))) 
+
+Merge pairings with common first or second element (technique 6) 
+
+Combine Pairings: : (prod{z := 0,N} on (e(Y,a_z^delta_z) * e(g,(b_z^-delta_z * c_z^-delta_z)))) == (prod{z := 0,N} on (e(X,a_z^delta_z) * e(X,b_z^(m_z * delta_z)))) 
+
+Merge pairings with common first or second element (technique 6) 
+
+Combine Pairings: : (prod{z := 0,N} on (e(Y,a_z^delta_z) * e(g,(b_z^-delta_z * c_z^-delta_z)))) == (prod{z := 0,N} on e(X,(a_z^delta_z * b_z^(m_z * delta_z)))) 
+
+Distribute dot products (technique 5):  
+
+Simplifying => : ((prod{z := 0,N} on e(Y,a_z^delta_z)) * (prod{z := 0,N} on e(g,(b_z^-delta_z * c_z^-delta_z)))) == (prod{z := 0,N} on e(X,(a_z^delta_z * b_z^(m_z * delta_z)))) 
+
+Move dot products inside pairings to reduce N pairings to 1 (technique 3) 
+
+Applying technique 3 : (e(Y,(prod{z := 0,N} on a_z^delta_z)) * e(g,(prod{z := 0,N} on (b_z^-delta_z * c_z^-delta_z)))) == e(X,(prod{z := 0,N} on (a_z^delta_z * b_z^(m_z * delta_z)))) 
+
+Final batch eq: (e(Y,(prod{z := 0,N} on a_z^delta_z)) * e(g,(prod{z := 0,N} on (b_z^-delta_z * c_z^-delta_z)))) == e(X,(prod{z := 0,N} on (a_z^delta_z * b_z^(m_z * delta_z))))
+<====	PREP FOR CODE GEN	====>
+
+Final version => (e(pk#1,dotA) * e(pk#2,dotB)) == e(pk#0,dotC) 
+
+Compute:  dotA := (prod{z := 0,N} on a_z^delta_z)
+Compute:  dotB := (prod{z := 0,N} on (b_z^-delta_z * c_z^-delta_z))
+Compute:  dotC := (prod{z := 0,N} on (a_z^delta_z * b_z^(m_z * delta_z)))
+Precompute: m_z := H(M_z,ZR)
+Precompute: delta := for{z := 1, N} do prng_z
+dotA := G2
+dotB := G2
+dotC := G2

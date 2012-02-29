@@ -1,0 +1,24 @@
+        rightSideProduct = group.init(GT, 1)
+
+        for index in range(0, len(M)):
+            h = group.hash(M[index], G1)
+            rightSideProduct = rightSideProduct * pair(h, pk[index]['g^x'])
+
+        if pair(sig, g2) == rightSideProduct:
+            return True
+        return False
+
+
+
+        for z in range(0, N):
+
+                rightSideProduct= group.init( GT , 1 )
+                for index in range( 0 , len( verifyArgsDict[z]['M'][bodyKey] ) ) :
+                        pass
+                        h= group.hash( verifyArgsDict[z]['M'][bodyKey][ index ] , G1 )
+                        rightSideProduct= rightSideProduct * pair( h , verifyArgsDict[z]['pk'][bodyKey][ inde$
+                if pair( verifyArgsDict[z]['sig'][bodyKey] , g2 )== rightSideProduct :
+                        pass
+                else:
+                        incorrectIndices.append(z)
+

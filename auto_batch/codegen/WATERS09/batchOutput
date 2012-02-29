@@ -1,0 +1,41 @@
+Final batch eq: (e(mpk#2?,(prod{z := 0,N} on sig1_z^(s_z * delta_z))) * (e(mpk#5?,(prod{z := 0,N} on sig2_z^(s1_z * delta_z))) * (e(mpk#3?,(prod{z := 0,N} on sig3_z^(s1_z * delta_z))) * (e(mpk#6?,(prod{z := 0,N} on sig4_z^(s2_z * delta_z))) * e(mpk#4?,(prod{z := 0,N} on sig5_z^(s2_z * delta_z))))))) == (e((prod{z := 0,N} on sig6_z^(delta_z * s1_z)),mpk#7?) * (e((prod{z := 0,N} on sig6_z^(delta_z * s2_z)),mpk#8?) * (e((prod{z := 0,N} on sig7_z^(delta_z * s1_z)),mpk#9?) * (e((prod{z := 0,N} on sig7_z^(delta_z * s2_z)),mpk#10?) * (e((prod{z := 0,N} on (sig7_z^(delta_z * -t_z) * sig7_z^((theta_z * delta_z) * (tagc_z * t_z)))),mpk#13?) * (e((prod{z := 0,N} on sig7_z^((theta_z * delta_z) * (M_z * t_z))),mpk#12?) * (e((prod{z := 0,N} on sig7_z^((theta_z * delta_z) * t_z)),mpk#16?) * (e(mpk#0?,(prod{z := 0,N} on sigK_z^(t_z * (-theta_z * -delta_z)))) * A^sum{z := 0,N} of (s2_z * delta_z)))))))))
+<====	PREP FOR CODE GEN	====>
+
+Final version => (e(mpk#2?,dotA) * (e(mpk#5?,dotB) * (e(mpk#3?,dotC) * (e(mpk#6?,dotD) * e(mpk#4?,dotE))))) == (e(dotF,mpk#7?) * (e(dotG,mpk#8?) * (e(dotH,mpk#9?) * (e(dotI,mpk#10?) * (e(dotJ,mpk#15?) * (e(dotK,mpk#12?) * (e(dotL,mpk#16?) * (e(mpk#0?,dotM) * A^sumN)))))))) 
+
+Compute:  dotA := (prod{z := 0,N} on sig1_z^(s_z * delta_z))
+Compute:  dotB := (prod{z := 0,N} on sig2_z^(s1_z * delta_z))
+Compute:  dotC := (prod{z := 0,N} on sig3_z^(s1_z * delta_z))
+Compute:  dotD := (prod{z := 0,N} on sig4_z^(s2_z * delta_z))
+Compute:  dotE := (prod{z := 0,N} on sig5_z^(s2_z * delta_z))
+Compute:  dotF := (prod{z := 0,N} on sig6_z^(delta_z * s1_z))
+Compute:  dotG := (prod{z := 0,N} on sig6_z^(delta_z * s2_z))
+Compute:  dotH := (prod{z := 0,N} on sig7_z^(delta_z * s1_z))
+Compute:  dotI := (prod{z := 0,N} on sig7_z^(delta_z * s2_z))
+Compute:  dotJ := (prod{z := 0,N} on (sig7_z^(delta_z * -t_z) * sig7_z^((theta_z * delta_z) * (tagc_z * t_z))))
+Compute:  dotK := (prod{z := 0,N} on sig7_z^((theta_z * delta_z) * (M_z * t_z)))
+Compute:  dotL := (prod{z := 0,N} on sig7_z^((theta_z * delta_z) * t_z))
+Compute:  dotM := (prod{z := 0,N} on sigK_z^(t_z * (-theta_z * -delta_z)))
+Compute:  sumN := (sum{z := 0,N} of (s2_z * delta_z))
+Precompute: s1_z := random(ZR)
+Precompute: s2_z := random(ZR)
+Precompute: theta_z := (tagc - tagk)^-1
+Precompute: s_z := (s1 + s2)
+Precompute: delta := for{z := 1, N} do prng_z
+Precompute: tagc_z := random(ZR)
+Precompute: t_z := random(ZR)
+Precompute:  A := blahblahblah
+dotA := G2
+dotB := G2
+dotC := G2
+dotD := G2
+dotE := G2
+dotF := G1
+dotG := G1
+dotH := G1
+dotI := G1
+dotJ := G1
+dotK := G1
+dotL := G1
+dotM := G2
+sumN := ZR
