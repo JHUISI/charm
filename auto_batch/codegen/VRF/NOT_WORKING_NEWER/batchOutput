@@ -1,0 +1,16 @@
+Final batch eq: (e((prod{z := 0,N} on (pk#3?^((1 + -x#0?_z) * delta_z) * pk#0#0?^(x#0?_z * delta_z))),pk#2?) * e((prod{z := 0,N} on pi#0?_z^-delta_z),pk#4?)) == (e((prod{z := 0,N} on pi#n-1?_z^delta_z),pk#1#0?) * (e((prod{z := 0,N} on pizero_z^-delta_z),(pk#4? * ~pk#5?)) * (prod{z := 0,N} on y_z^-delta_z)))
+<====	PREP FOR CODE GEN	====>
+
+Final version => (e(dotA,pk#2?) * e(dotB,pk#4?)) == (e(dotC,pk#1#0?) * (e(dotD,(pk#4? * ~pk#5?)) * dotE)) 
+
+Compute:  dotA := (prod{z := 0,N} on (pk#3?^((1 + -x#0?_z) * delta_z) * pk#0#0?^(x#0?_z * delta_z)))
+Compute:  dotB := (prod{z := 0,N} on pi#0?_z^-delta_z)
+Compute:  dotC := (prod{z := 0,N} on pi#n-1?_z^delta_z)
+Compute:  dotD := (prod{z := 0,N} on pizero_z^-delta_z)
+Compute:  dotE := (prod{z := 0,N} on y_z^-delta_z)
+Precompute: delta := for{z := 1, N} do prng_z
+dotA := G1
+dotB := G1
+dotC := G1
+dotD := G1
+dotE := GT

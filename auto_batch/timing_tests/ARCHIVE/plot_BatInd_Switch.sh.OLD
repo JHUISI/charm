@@ -1,0 +1,52 @@
+#!/bin/sh
+gnuplot <<EOF
+
+set terminal postscript eps enhanced "Helvetica" 24;
+set size 3,2;
+set output "DELETE_ME_PLOT.eps";
+set yrange [1 : 825]; set y2range [0:0.53]; set xrange[0 : 75100];
+set y2tics border;
+set title "AutoBatch Performance During DoS Attack" font "Helvetica,28";
+set xlabel "Cumulative Time (ms)" font "Helvetica,28";
+set ylabel "Signatures / sec" font "Helvetica,28";
+set y2label "Invalid Signatures as Fraction of Total" font "Helvetica,28";
+#set logscale y
+
+set style line 1 lt 1 lw 8 pt 3
+set style line 2 lt 4 lw 8 pt 3
+set style line 3 lt 2 lw 8 pt 3
+set style line 4 lt 3 lw 8 pt 3
+
+f(x) = m*x + b
+fit f(x) "DELETEME_INVALID_SIGS_LINEAR.dat" using 1:2 via m,b
+
+#plot f(x) axes x1y2
+
+#g(x) = n*x + c
+#fit g(x) "invalid_BatInd_Line2" using 1:2 via n, c
+
+#plot f(x), g(x) axes x1y2;
+
+#plot f(x)
+#plot g(x)
+
+plot "DELETE_ME_SIGS_PER_SEC_ABOVE" w lines ls 1 title "Batch + Individual Verifier", \\
+	"DELETE_ME_SIGS_PER_SEC_BELOW" w lines ls 3 title "Batch-Only Verifier", \\
+	f(x) w lines ls 2 title "Invalid Signatures as Fraction of Total" axes x1y2;
+
+#plot "DELETE_ME_SIGS_PER_SEC_ABOVE" w lines ls 1 title "Signatures / sec", \\
+#	"DELETE_ME_SIGS_PER_SEC_BELOW" w lines ls 3 title "Projected Performance of Batch", \\
+#	"invalid_Line_Eq_1.dat" w lines ls 2 title "Fraction of Invalid Signatures (Initial)" axes x1y2, \\
+#	"invalid_Line_Eq_2.dat" w lines ls 4 title "Fraction of Invalid Signatures (Steady Increase" axes x1y2;
+
+#plot "DELETE_ME_SIGS_PER_SEC_ABOVE" w lines ls 1 title "Signatures / sec", \\
+#	"DELETE_ME_SIGS_PER_SEC_BELOW" w lines ls 3 title "Projected Performance of Batch", \\
+#	f(x) w lines ls 2 title "Fraction of Invalid Signatures (Initial)" axes x1y2, \\
+#	g(x) w lines ls 2 title "Fraction of Invalid Signatures (Steady)" axes x1y2, \\
+#	"DELETE_ME_INVALID_SIGS" w lines ls 4 title "look at me" axes x1y2;
+
+#plot "DELETE_ME_SIGS_PER_SEC_ABOVE" w lines ls 1 title "Signatures / sec", \\
+#	"DELETE_ME_SIGS_PER_SEC_BELOW" w lines ls 3 title "Projected Performance of Batch", \\
+#	"DELETE_ME_INVALID_SIGS" w lines ls 2 title "Fraction of Invalid Signatures" axes x1y2;
+
+EOF

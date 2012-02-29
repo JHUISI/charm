@@ -1,0 +1,45 @@
+['frontend/CDH/cdh3.bv', '-c']
+types  => {'A': 'G2', 'r': 'ZR', 'D': 'GT', 'g': 'G2', 'i': 'ZR', 'h': 'G2', 'M': 'ZR', 'n': 'ZR', 'sig1': 'G1', 'sig2': 'G1', 'U': 'GT', 'w': 'G2', 'V': 'GT', 'Z': 'G2'}
+constant  => ['g', 'A', 'U', 'V', 'D', 'w', 'Z', 'h']
+public  => ['D := e(d', 'g^a)']
+signature  => ['sig1', 'sig2', 'r', 'i']
+latex => {'sig1': '\\sigma_1', 'Z': 'z', 'sig2': '\\sigma_2', 'n': '\\lg(i)'}
+variables => {'A': 'G2', 'r': 'ZR', 'D': 'GT', 'g': 'G2', 'i': 'ZR', 'h': 'G2', 'M': 'ZR', 'n': 'ZR', 'sig1': 'G1', 'N': '100', 'sig2': 'G1', 'U': 'GT', 'w': 'G2', 'V': 'GT', 'Z': 'G2', 'name': 'cdh'}
+metadata => {'name': 'cdh', 'N': '100'}
+batch algorithm => ['2', '3']
+
+VERIFY EQUATION => verify := e(sig1,g) == (U^M * (V^r * (D * (e(sig2^n,w) * (e(sig2^i,Z) * e(sig2,h))))))
+
+Stage A: Combined Equation => verify := (prod{z := 1,N} on e(sig1_z,g)) == ((prod{z := 1,N} on U^M_z) * ((prod{z := 1,N} on V^r_z) * ((prod{z := 1,N} on D) * ((prod{z := 1,N} on e(sig2_z^n_z,w)) * ((prod{z := 1,N} on e(sig2_z^i_z,Z)) * (prod{z := 1,N} on e(sig2_z,h)))))))
+
+Stage B: Small Exp Test => verify := (prod{z := 1,N} on e(sig1_z,g)^delta_z) == ((prod{z := 1,N} on U^(M_z * delta_z)) * ((prod{z := 1,N} on V^(r_z * delta_z)) * ((prod{z := 1,N} on D^delta_z) * ((prod{z := 1,N} on e(sig2_z^n_z,w)^delta_z) * ((prod{z := 1,N} on e(sig2_z^i_z,Z)^delta_z) * (prod{z := 1,N} on e(sig2_z,h)^delta_z)))))) 
+
+Move the exponent(s) into the pairing (technique 2) 
+
+Applying technique 2 : verify := (prod{z := 1,N} on e(sig1_z^delta_z,g)) == ((prod{z := 1,N} on U^(M_z * delta_z)) * ((prod{z := 1,N} on V^(r_z * delta_z)) * ((prod{z := 1,N} on D^delta_z) * ((prod{z := 1,N} on e(sig2_z^n_z^delta_z,w)) * ((prod{z := 1,N} on e(sig2_z^i_z^delta_z,Z)) * (prod{z := 1,N} on e(sig2_z^delta_z,h))))))) 
+
+Combine pairings with common 1st or 2nd element. Reduce N pairings to 1 (technique 3) 
+
+Applying technique 3 : verify := e((prod{z := 1,N} on sig1_z^delta_z),g) == (U^sum{z := 1,N} of (M_z * delta_z) * (V^sum{z := 1,N} of (r_z * delta_z) * (D^sum{z := 1,N} of delta_z * (e((prod{z := 1,N} on sig2_z^n_z^delta_z),w) * (e((prod{z := 1,N} on sig2_z^i_z^delta_z),Z) * e((prod{z := 1,N} on sig2_z^delta_z),h)))))) 
+
+Final batch eq: e((prod{z := 1,N} on sig1_z^delta_z),g) == (U^sum{z := 1,N} of (M_z * delta_z) * (V^sum{z := 1,N} of (r_z * delta_z) * (D^sum{z := 1,N} of delta_z * (e((prod{z := 1,N} on sig2_z^n_z^delta_z),w) * (e((prod{z := 1,N} on sig2_z^i_z^delta_z),Z) * e((prod{z := 1,N} on sig2_z^delta_z),h))))))
+<====	PREP FOR CODE GEN	====>
+
+Final version => e(dotA,g) == (U^sumB * (V^sumC * (D^sumD * (e(dotE,w) * (e(dotF,Z) * e(dotG,h)))))) 
+
+Compute:  dotA := (prod{z := 1,N} on sig1_z^delta_z)
+Compute:  sumB := sum{z := 1,N} of (M_z * delta_z)
+Compute:  sumC := sum{z := 1,N} of (r_z * delta_z)
+Compute:  sumD := sum{z := 1,N} of delta_z
+Compute:  dotE := (prod{z := 1,N} on sig2_z^n_z^delta_z)
+Compute:  dotF := (prod{z := 1,N} on sig2_z^i_z^delta_z)
+Compute:  dotG := (prod{z := 1,N} on sig2_z^delta_z)
+Precompute: n := lg_i
+Precompute: delta := for{z := 1, N} do prng_z
+dotA := G1
+sumB := None
+sumC := None
+sumD := ZR
+dotE := G1
+dotF := G1
+dotG := G1
