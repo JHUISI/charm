@@ -23,9 +23,9 @@ header = """\n
 
 basic_step = """\medskip \\noindent
 {\\bf Step %d:} %s:
-\\begin{equation}
+\\begin{multline}
 %s
-\end{equation}
+\end{multline}
 """ # (step #, message of what we are doing, resulting equation)
 
 small_exp_label = "\label{eqn:smallexponents}\n"

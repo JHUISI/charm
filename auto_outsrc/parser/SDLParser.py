@@ -30,6 +30,10 @@ def pushSecond(s, loc, toks ):
     print("input: ", toks)
     objStack.append( toks[0] )
 
+def checkCount(s, loc, toks):
+    cnt = len(toks)
+    objStack.append( str(cnt) )
+
 # Implements language parser for our signature descriptive language (SDL) and returns
 # a binary tree (AST) representation of valid SDL statements.
 class BatchParser:
@@ -80,7 +84,7 @@ class BatchParser:
                (For + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
                (Sum + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
                (Random + leafNode + rpar).setParseAction( pushFirst ) | \
-               (List + delimitedList(leafNode) + rcurly).setParseAction( pushFirst ) | \
+               (List + delimitedList(leafNode).setParseAction( checkCount ) + rcurly).setParseAction( pushFirst ) | \
                lpar + expr + rpar | (leafNode).setParseAction( pushFirst )
 
         # Represents the order of operations (^, *, |, ==)
@@ -115,7 +119,9 @@ class BatchParser:
             return createTree(op, op1, op2)
         elif op in ["list{"]:
             ops = []
-            while(len(stack) > 0):
+            cnt = self.evalStack(stack)
+#            print("count: ", cnt)
+            for i in range(int(cnt)):
                 ops.append(self.evalStack(stack))
             newList = createTree(op, None, None)
             ops.reverse()
