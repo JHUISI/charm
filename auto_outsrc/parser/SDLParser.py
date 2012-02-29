@@ -3,9 +3,7 @@
 # 
 
 from pyparsing import *
-from batchgen import *
-from batchstats import *
-from batchoptimizer import *
+from SDLang import *
 import string,sys
 
 objStack = []
@@ -21,10 +19,6 @@ def parseNumConditional(s, loc, toks):
 
 def debugParser(s, loc, toks):
     print("tokens: %s" % toks)
-    return toks
-
-def markSecret(s, loc, toks):
-    print("secret: %s" % toks)
     return toks
         
 def pushFirst( s, loc, toks ):
@@ -44,9 +38,6 @@ class BatchParser:
         self.verbose = verbose
 
     def getBNF(self):
-        # supported operators => (OR, AND, <, prod{
-        #OperatorOR = Literal("OR") | Literal("or").setParseAction(upcaseTokens)
-#        ANDOp = Literal("AND") | Literal("and").setParseAction(upcaseTokens)
         AndOp = Literal("and")
         lpar = Literal("(").suppress() | Literal("{").suppress()
         rpar = Literal(")").suppress() | Literal("}").suppress()
