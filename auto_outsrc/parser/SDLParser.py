@@ -80,7 +80,7 @@ class BatchParser:
                (For + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
                (Sum + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
                (Random + leafNode + rpar).setParseAction( pushFirst ) | \
-               (List + delimitedList(leafNode)).setParseAction( pushFirst ) | \
+               (List + delimitedList(leafNode) + rcurly).setParseAction( pushFirst ) | \
                lpar + expr + rpar | (leafNode).setParseAction( pushFirst )
 
         # Represents the order of operations (^, *, |, ==)
