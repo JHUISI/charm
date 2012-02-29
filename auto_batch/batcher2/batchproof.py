@@ -4,11 +4,13 @@ from batchparser import *
 import sys
 
 header = """\n
-
+\\catcode`\^ = 13 \def^#1{\sp{#1}{}}
+\\newcommand{\\newln}{\\\&\quad\quad{}}
 \\newcommand{\schemename}{{\sf %s}}
 \\newcommand{\pkvariables}{ %s }
 \\newcommand{\sigvariables}{ %s }
 \\newcommand{\indivverificationeqn}{ %s }
+
 \\newcommand{\\batchverificationeqn}{ %s  }
 
 \\newcommand{\gutsoftheproof}{

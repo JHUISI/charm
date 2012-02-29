@@ -63,8 +63,10 @@ tau2b := {\tau_2}^b
 gb := {g_1}^b
 gba1 := {g_1}^{b \cdot a_1}
 gba2 := {g_1}^{b \cdot a_2}
-ga2 := {g_1}^{a_2}
-ga1 := {g_1}^{a_1}
+ga2 := {g_1}^a_2
+ga1 := {g_1}^a_1
+g1 := g_1
+g2 := g_2
 END :: latex
 
 #BEGIN :: transform
