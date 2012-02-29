@@ -58,6 +58,7 @@ char *print_mpz(mpz_t x, int base);
 void _element_set_mpz(Group_t type, element_t *dst, mpz_t src);
 void _element_to_mpz(Group_t type, element_t *src, mpz_t dst);
 element_t *_element_pairing_type3(const pairing_t *pairing, const element_t *in1, const element_t *in2);
+element_t *_element_prod_pairing_type3(const pairing_t *pairing, const element_t **in1, const element_t **in2, int length);
 
 // I/O functions start
 int _element_length_in_bytes(Curve_t ctype, Group_t type, element_t *e);

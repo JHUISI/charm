@@ -1006,30 +1006,101 @@ static PyObject *Element_setxy(Element *self, PyObject *args)
     return Py_BuildValue("i", errcode);
 }
 
+/* Takes a list of two objects in G1 & G2 respectively and computes the multi-pairing */
+PyObject *multi_pairing_asymmetric(Element *groupObj, PyObject *listG1, PyObject *listG2) {
+
+//	int GroupSymmetric = FALSE;
+	// check for symmetric vs. asymmetric
+//	if(pairing_is_symmetric(groupObj->pairing->pair_obj)) {
+//		GroupSymmetric = TRUE;
+//	}
+
+	int length = PySequence_Length(listG1);
+
+	if(length != PySequence_Length(listG2)) {
+		PyErr_SetString(ElementError, "unequal number of pairing elements.");
+		return NULL;
+	}
+
+	if(length > 0) {
+
+		element_t *g1[length];
+		element_t *g2[length];
+		int i, l = 0, r = 0;
+
+		for(i = 0; i < length; i++) {
+			PyObject *tmpObject1 = PySequence_GetItem(listG1, i);
+			PyObject *tmpObject2 = PySequence_GetItem(listG2, i);
+
+			if(PyElement_Check(tmpObject1) && PyElement_Check(tmpObject2)) {
+				Element *tmp1 = (Element *) tmpObject1;
+				Element *tmp2 = (Element *) tmpObject2;
+				if(tmp1->element_type == G1_t) {
+					g1[l] = element_init_G1();
+					element_set_raw(groupObj, G1_t, g1[l], tmp1->e);
+					l++;
+				}
+				if(tmp2->element_type == G2_t) {
+ 					g2[r] = element_init_G2();
+					element_set_raw(groupObj, G2_t, g2[r], tmp2->e);
+					r++;
+				}
+			}
+			Py_DECREF(tmpObject1);
+			Py_DECREF(tmpObject2);
+		}
+
+		Element *newObject = NULL;
+		if(l == r) {
+			newObject = createNewElement(GT_t, groupObj->pairing);
+			element_prod_pairing(newObject, &g1, &g2, l); // pairing product calculation
+		}
+		else {
+			PyErr_SetString(ElementError, "invalid pairing element types in list.");
+		}
+
+		/* clean up */
+		for(i = 0; i < l; i++) { element_delete(G1_t, g1[i]); }
+		for(i = 0; i < r; i++) { element_delete(G2_t, g2[i]); }
+		return (PyObject *) newObject;
+	}
+
+	PyErr_SetString(ElementError, "list is empty.");
+	return NULL;
+}
+
 /* this is a type method that is visible on the global or class level. Therefore,
    the function prototype needs the self (element class) and the args (tuple of Element objects).
  */
 PyObject *Apply_pairing(Element *self, PyObject *args)
 {
 	// lhs => G1_t and rhs => G2
-	Element *newObject = NULL, *lhs, *rhs;
+	Element *newObject = NULL, *lhs, *rhs, *group = NULL;
+	PyObject *lhs2, *rhs2;
 	
 	debug("Applying pairing...\n");
-	if(!PyArg_ParseTuple(args, "OO", &lhs, &rhs)) {
+	if(!PyArg_ParseTuple(args, "OO|O", &lhs2, &rhs2, &group)) {
 		PyErr_SetString(ElementError, "missing element objects");
 		return NULL;
 	}
 
-	if(Check_Elements(lhs, rhs) && pair_rule(lhs->element_type, rhs->element_type) == TRUE) {
-		// apply pairing
-//		debug_e("LHS: '%B'\n", lhs->e);
-//		debug_e("RHS: '%B'\n", rhs->e);
-		START_CLOCK(dBench);
-		newObject = createNewElement(NONE_G, lhs->pairing);
-		pairing_apply(newObject, lhs, rhs);
-		STOP_CLOCK(dBench);
-		UPDATE_BENCHMARK(PAIRINGS, dBench);
-		return (PyObject *) newObject;
+	if(PySequence_Check(lhs2) && PySequence_Check(rhs2)) {
+		VERIFY_GROUP(group);
+		return multi_pairing_asymmetric(group, lhs2, rhs2);
+	}
+	else if(PyElement_Check(lhs2) && PyElement_Check(rhs2)) {
+
+		lhs = (Element *) lhs2;
+		rhs = (Element *) rhs2;
+
+		if(Check_Elements(lhs, rhs) && pair_rule(lhs->element_type, rhs->element_type) == TRUE) {
+			START_CLOCK(dBench);
+			newObject = createNewElement(NONE_G, lhs->pairing);
+			pairing_apply(newObject, lhs, rhs);
+			STOP_CLOCK(dBench);
+			UPDATE_BENCHMARK(PAIRINGS, dBench);
+			return (PyObject *) newObject;
+		}
 	}
 
 	PyErr_SetString(ElementError, "pairings only apply to elements of G1 x G2 --> GT");

@@ -721,6 +721,24 @@ element_t *_element_pairing_type3(const pairing_t *pairing, const element_t *in1
 	return (element_t *) gt;
 }
 
+/* Does NOT perform any error checking */
+element_t *_element_prod_pairing_type3(const pairing_t *pairing, const element_t **in1, const element_t **in2, int length)
+{
+	if(length <= 0) { return NULL; }
+
+	PFC *pfc = (PFC *) pairing;
+	G1 *g1_list[length];
+	G2 *g2_list[length];
+
+	for(int i = 0; i < length; i++) {
+		g1_list[i] = (G1 *) in1[i];
+		g2_list[i] = (G2 *) in2[i];
+	}
+
+	GT *gt = new GT(pfc->multi_pairing(length, g2_list, g1_list));
+	return (element_t *) gt;
+}
+
 string bigToBytes(Big x)
 {
 	char c[MAX_LEN+1];
