@@ -707,15 +707,15 @@ def calculate_times(opcount, curve, N, debugging=False):
         print("Per Signature =>", total_time / N, "\n")
     return (result, total_time / N)
 
-#if __name__ == "__main__":
-#    print(sys.argv[1:])
-#    if sys.argv[1] == '-t':
-#        debug = levels.all
-#        statement = sys.argv[2]
-#        parser = BatchParser()
-#        final = parser.parse(statement)
-#        print("Final statement:  '%s'" % final)
-#        exit(0)
+if __name__ == "__main__":
+    print(sys.argv[1:])
+    if sys.argv[1] == '-t':
+        debug = levels.all
+        statement = sys.argv[2]
+        parser = BatchParser()
+        final = parser.parse(statement)
+        print("Final statement:  '%s'" % final)
+        exit(0)
 #    elif sys.argv[1] == '-p':
 #        print_results(None)
 #        exit(0)
