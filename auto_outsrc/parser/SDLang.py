@@ -24,9 +24,10 @@ AST simple rules
 from toolbox.enum import *
 import string
 
+FUNC_SYMBOL = "def func :"
 types = Enum('G1', 'G2', 'GT', 'ZR', 'str')
-declarator = Enum('constants', 'verify')
-ops = Enum('BEGIN', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'END', 'NONE')
+declarator = Enum('func', 'verify')
+ops = Enum('BEGIN', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'FUNC', 'END', 'NONE')
 side = Enum('left', 'right')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
@@ -96,7 +97,7 @@ def createNode(node_type, left=None, right=None):
 
 # binds a string representation of the operation to 
 # the symbolic representation (Enums) above 
-def createTree(op, node1, node2):
+def createTree(op, node1, node2, op_value=None):
     if(op == "^"):
         node = BinaryNode(ops.EXP)
     elif(op == "*"):
@@ -134,6 +135,9 @@ def createTree(op, node1, node2):
     	node = BinaryNode(ops.LIST)
     elif(op == "random("):
     	node = BinaryNode(ops.RANDOM)
+    elif(FUNC_SYMBOL in op):
+    	node = BinaryNode(ops.FUNC)
+    	node.setAttribute(op_value)
     # elif e( ... )
     else:    
         return None
@@ -242,6 +246,12 @@ class BinaryNode:
 				 		listVal += str(i) + ', '
 				 listVal = listVal[:len(listVal)-2]
 				 return 'list{' + listVal + '}'
+			elif(self.type == ops.FUNC):
+				 listVal = ""
+				 for i in self.listNodes:
+				 		listVal += str(i) + ', '
+				 listVal = listVal[:len(listVal)-2]
+				 return self.attr + '(' + listVal + ')'
 			elif(self.type == ops.NONE):
 				 return 'NONE'
 				# return ( left + ' on ' + right )				
@@ -269,7 +279,7 @@ class BinaryNode:
 			return None
 	
 	def setAttribute(self, value):
-		if (self.type == ops.ATTR):
+		if self.type in [ops.ATTR, ops.FUNC]:
 			self.attr = str(value)
 			return True
 		return False

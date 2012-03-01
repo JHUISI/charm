@@ -34,6 +34,10 @@ def checkCount(s, loc, toks):
     cnt = len(toks)
     objStack.append( str(cnt) )
 
+def pushFunc(s, loc, toks):
+    print("found a function: ", toks[0])
+    objStack.append( FUNC_SYMBOL + toks[0] )
+
 # Implements language parser for our signature descriptive language (SDL) and returns
 # a binary tree (AST) representation of valid SDL statements.
 class BatchParser:
@@ -65,6 +69,7 @@ class BatchParser:
         ForDo = Literal("do") # for{x,y} do y
         SumOf = Literal("of")
         List  = Literal("list{") # represents a list
+        funcName = Word(alphanums + '_')
 
         # captures the binary operators allowed (and, ^, *, /, +, |, ==)        
         BinOp = AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | Concat | Equality
@@ -85,6 +90,7 @@ class BatchParser:
                (Sum + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
                (Random + leafNode + rpar).setParseAction( pushFirst ) | \
                (List + delimitedList(leafNode).setParseAction( checkCount ) + rcurly).setParseAction( pushFirst ) | \
+               (funcName + '(' + delimitedList(leafNode).setParseAction( checkCount ) + ')').setParseAction( pushFunc ) | \
                lpar + expr + rpar | (leafNode).setParseAction( pushFirst )
 
         # Represents the order of operations (^, *, |, ==)
@@ -130,6 +136,16 @@ class BatchParser:
         elif op in ["random("]:
             op1 = self.evalStack(stack)
             return createTree(op, op1, None)
+        elif FUNC_SYMBOL in op:
+            ops = []
+            cnt = self.evalStack(stack)
+            print("func name: ", op.split(FUNC_SYMBOL)[1])
+            for i in range(int(cnt)):
+                ops.append(self.evalStack(stack))
+            newList = createTree(op, None, None, op.split(FUNC_SYMBOL)[1])
+            ops.reverse()
+            newList.listNodes = list(ops)
+            return newList
         else:
             # Node value
             return op
