@@ -19,6 +19,7 @@ pk := list{g, g2, h, f, egg}
 return := list{mk, pk}
 END :: func:setup
 
+
 BEGIN :: func:keygen
 input := list{pk, mk, S} 
 output := sk
@@ -35,6 +36,7 @@ for{y := 1, Y} do { s_y := random(ZR); Dj_y := p0 * (H(S_y, G2)^s_y); Djp_y := g
 sk := list{S, D, Dj, Djp}
 return := sk
 END :: func:keygen
+
 
 BEGIN :: func:encrypt
 input := list{pk, M, policy_str}
@@ -56,6 +58,7 @@ for{y := 1, Y} do { Cr_y := g1 ^ sh_y; Cpr_y := (H(attrs_y, G2))^sh_y }
 ct := list{policy_str, Ctl, C, Cr, Cpr}
 return := ct
 END :: func:encrypt
+
 
 BEGIN :: func:decrypt
 input := list{pk, sk, ct}
