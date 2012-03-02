@@ -1,7 +1,39 @@
 name := bsw07
 
-BEGIN :: func:keygen
+BEGIN :: func:setup
+input := None
+output := list{mk, pk}
+g := random(G1)
+g2 := random(G2)
+alpha := random(ZR)
+beta := random(ZR)
 
+h := g^beta
+f := g^(1/beta)
+i := g^alpha
+egg := e(g, g2)^alpha
+
+mk := list{beta, i}
+pk := list{g, g2, h, f, egg}
+
+return := list{mk, pk}
+END :: func:setup
+
+BEGIN :: func:keygen
+input := list{pk, mk, S} 
+output := sk
+
+r := random(ZR)
+p0 := pk#1^r
+D := (mk#1 * p0)^(1/mk#0)
+Dj := list{}
+Djp := list{}
+
+Y := len(S)
+for{y := 1, Y} do { s_y := random(ZR); Dj_y := p0 * (H(S_y, G2)^s_y); Djp_y := g^s_y }
+
+sk := list{S, D, Dj, Djp}
+return := sk
 END :: func:keygen
 
 BEGIN :: func:encrypt
@@ -13,13 +45,13 @@ attrs := getAttributeList(policy)
 s := random(ZR)
 sh := calculateShares(s, policy)
 Y := len(sh)
-h := pk#0
-g := pk#1
+g1 := pk#0
+h := pk#2
 egg := pk#2
 
 Ctl := M * egg^s
 C    := h ^ s
-for{y := 1, Y} do { Cr_y := g ^ sh_y; Cpr_y := (H(attrs_y, G2))^sh_y } 
+for{y := 1, Y} do { Cr_y := g1 ^ sh_y; Cpr_y := (H(attrs_y, G2))^sh_y } 
 
 ct := list{policy_str, Ctl, C, Cr, Cpr}
 return := ct
