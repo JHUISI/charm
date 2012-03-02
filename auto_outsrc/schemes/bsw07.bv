@@ -1,0 +1,55 @@
+name := bsw07
+
+BEGIN :: func:keygen
+
+END :: func:keygen
+
+BEGIN :: func:encrypt
+input := list{pk, M, policy_str}
+output := ct
+
+policy := createPolicy(policy_str)
+attrs := getAttributeList(policy)
+s := random(ZR)
+sh := calculateShares(s, policy)
+Y := len(sh)
+h := pk#0
+g := pk#1
+egg := pk#2
+
+Ctl := M * egg^s
+C    := h ^ s
+for{y := 1, Y} do { Cr_y := g ^ sh_y; Cpr_y := (H(attrs_y, G2))^sh_y } 
+
+ct := list{policy_str, Ctl, C, Cr, Cpr}
+return := ct
+END :: func:encrypt
+
+BEGIN :: func:decrypt
+input := list{pk, sk, ct}
+output := M
+
+S := sk#0
+D := sk#1
+Dj := sk#2
+Djp := sk#3
+policy_str := ct#0
+Ctl := ct#1
+C :=  ct#2
+Cr := ct#3
+Cpr := ct#4
+
+policy := createPolicy(policy_str)
+attrs  := prune(policy, S)
+coeff := getCoefficients(policy)
+
+Y := len(attrs)
+A := 1
+for{y := 1, Y} do { A := A * ((e(Cr_y, Dj_y) / e(Djp_y, Cpr_y))^coeff_y) }
+
+result0 := e(C, D) / A
+M := Ctl / result0
+
+return := M
+END :: func:decrypt
+

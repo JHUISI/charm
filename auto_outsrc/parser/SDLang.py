@@ -119,6 +119,8 @@ def createTree(op, node1, node2, op_value=None):
         node = BinaryNode(ops.EXP)
     elif(op == "*"):
         node = BinaryNode(ops.MUL)
+    elif(op == "/"):
+    	node = BinaryNode(ops.DIV)
     elif(op == "+"):
         node = BinaryNode(ops.ADD)
     elif(op == "-"):

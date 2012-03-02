@@ -32,7 +32,7 @@ def pushFirst( s, loc, toks ):
     objStack.append( toks[0] )
 
 def pushSecond(s, loc, toks ):
-    print("input: ", toks)
+    if debug >= levels.some: print("Pushing second => ", toks)
     objStack.append( toks[0] )
 
 def checkCount(s, loc, toks):
@@ -40,12 +40,12 @@ def checkCount(s, loc, toks):
     objStack.append( str(cnt) )
 
 def pushFunc(s, loc, toks):
-    print("found a function: ", toks[0])
+    if debug >= levels.some: print("found a function: ", toks[0])
     objStack.append( FUNC_SYMBOL + toks[0] )
 
 # Implements language parser for our signature descriptive language (SDL) and returns
 # a binary tree (AST) representation of valid SDL statements.
-class BatchParser:
+class SDLParser:
     def __init__(self, verbose=False):
         self.finalPol = self.getBNF()
         self.verbose = verbose
@@ -127,7 +127,7 @@ class BatchParser:
         op = stack.pop()
         if debug >= levels.some:
             print("op: %s" % op)
-        if op in ["+","-","*", "^", ":=", "==", "e(", "for{", "do","prod{", "on", "sum{", "of", "|", "and", ";"]:
+        if op in ["+","-","*", "/","^", ":=", "==", "e(", "for{", "do","prod{", "on", "sum{", "of", "|", "and", ";"]:
             op2 = self.evalStack(stack)
             op1 = self.evalStack(stack)
             return createTree(op, op1, op2)
@@ -151,7 +151,7 @@ class BatchParser:
         elif FUNC_SYMBOL in op:
             ops = []
             cnt = self.evalStack(stack)
-            print("func name: ", op.split(FUNC_SYMBOL)[1])
+            if self.verbose: print("func name: ", op.split(FUNC_SYMBOL)[1])
             for i in range(int(cnt)):
                 ops.append(self.evalStack(stack))
             newList = createTree(op, None, None, op.split(FUNC_SYMBOL)[1])
@@ -306,6 +306,21 @@ def parseFile(filename):
                 
     fd.close()
     return ast
+
+# NEW SDL PARSER
+def parseFile2(filename):    
+    fd = open(filename, 'r')
+    code = fd.readlines(); i = 1
+    parser = SDLParser() 
+    ast_code = []
+    for line in code:
+        if len(line.strip()) > 0:
+            node = parser.parse(line, i)
+            print("sdl: ", i, node)
+            ast_code.append(node)
+            i += 1
+        
+    
 
 # Perform some type checking here?
 # rules: find constants, verify, variable definitions
@@ -749,10 +764,14 @@ if __name__ == "__main__":
     if sys.argv[1] == '-t':
         debug = levels.all
         statement = sys.argv[2]
-        parser = BatchParser()
+        parser = SDLParser()
         final = parser.parse(statement)
         print("Final statement:  '%s'" % final)
         exit(0)
+    else:
+        parseFile2(sys.argv[1])
+        # read contents of file
+        # 
 #    elif sys.argv[1] == '-p':
 #        print_results(None)
 #        exit(0)
