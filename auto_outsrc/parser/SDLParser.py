@@ -18,7 +18,7 @@ def parseNumConditional(s, loc, toks):
     return BinaryNode(toks[0])
 
 def debugParser(s, loc, toks):
-    print("tokens: %s" % toks)
+    print("debug info: %s" % toks)
     return toks
         
 def pushFirst( s, loc, toks ):
@@ -50,7 +50,8 @@ class BatchParser:
         lpar = Literal("(").suppress() | Literal("{").suppress()
         rpar = Literal(")").suppress() | Literal("}").suppress()
         rcurly = Literal("}").suppress()
-
+        
+        Comment = Literal("#") + restOfLine
         MulOp = Literal("*")
         DivOp = Literal("/")
         Concat = Literal("|")
@@ -69,12 +70,13 @@ class BatchParser:
         ForDo = Literal("do") # for{x,y} do y
         SumOf = Literal("of")
         List  = Literal("list{") # represents a list
+        MultiLine = Literal(";") + Optional(Literal("\\n").suppress())
         funcName = Word(alphanums + '_')
 
         # captures the binary operators allowed (and, ^, *, /, +, |, ==)        
         BinOp = AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | Concat | Equality
         # captures order of parsing token operators
-        Token =  Equality | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | ForDo | ProdOf | SumOf | Concat | Assignment
+        Token = MultiLine | Equality | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | ForDo | ProdOf | SumOf | Concat | Assignment 
         Operator = Token 
         #Operator = OperatorAND | OperatorOR | Token
 
@@ -108,6 +110,7 @@ class BatchParser:
         expr << term + ZeroOrMore((Operator + term).setParseAction( pushFirst ))
         # final bnf object
         finalPol = expr#.setParseAction( debugParser )
+        finalPol.ignore( Comment )
         return finalPol
     
     # method for evaluating stack assumes operators have two operands and pops them accordingly
@@ -115,7 +118,7 @@ class BatchParser:
         op = stack.pop()
         if debug >= levels.some:
             print("op: %s" % op)
-        if op in ["+","-","*", "^", ":=", "==", "e(", "for{", "do","prod{", "on", "sum{", "of", "|", "and"]:
+        if op in ["+","-","*", "^", ":=", "==", "e(", "for{", "do","prod{", "on", "sum{", "of", "|", "and", ";"]:
             op2 = self.evalStack(stack)
             op1 = self.evalStack(stack)
             return createTree(op, op1, op2)
@@ -154,18 +157,24 @@ class BatchParser:
     # the tokens from the string (not used for anything). 3) evaluate the stack which is in a post
     # fix format so that we can pop an OR, AND, ^ or = nodes then pull 2 subsequent variables off the stack. Then,
     # recursively evaluate those variables whether they are internal nodes or leaf nodes, etc.
-    def parse(self, line):
+    def parse(self, line, line_number=0):
         # use lineCtr to track line of code.
-        if len(line) == 0 or line[0] == '#': 
-#            print("comments or empty strings will be ignored.")
-            return None 
         global objStack
         del objStack[:]
-        tokens = self.finalPol.parseString(line)
-        if debug >= levels.some:
-           print("stack =>", objStack)
-        return self.evalStack(objStack)
-   
+        try:
+            tokens = self.finalPol.parseString(line)
+            if debug >= levels.some:
+                print("stack =>", objStack)
+            object = self.evalStack(objStack)
+            if len(objStack) > 0 or object == False:
+                raise TypeError("Invalid SDL Expression!")
+            return object
+        except:
+            print("Invalid SDL Expression found at line #%d: '%s'" % (line_number, line))
+            exit(-1)
+        if len(objStack) > 0:
+            raise TypeError("Invalid SDL Expression!")
+        return None
 
 # valid keywords
 signer_mode  = Enum('single', 'multi', 'ring')

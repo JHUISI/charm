@@ -27,7 +27,7 @@ import string
 FUNC_SYMBOL = "def func :"
 types = Enum('G1', 'G2', 'GT', 'ZR', 'str')
 declarator = Enum('func', 'verify')
-ops = Enum('BEGIN', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'FUNC', 'END', 'NONE')
+ops = Enum('BEGIN', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'FUNC', 'SEQ','END', 'NONE')
 side = Enum('left', 'right')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
@@ -95,6 +95,18 @@ def createNode(node_type, left=None, right=None):
 	node.right = right
 	return node
 
+def validateCreatedNode(node):
+	correct = True
+	if Type(node) == ops.OF:
+		if Type(node.left) != ops.SUM: correct = False
+	elif Type(node) == ops.DO:
+		if Type(node.left) != ops.FOR: correct = False
+	elif Type(node) == ops.ON:
+		if Type(node.left) != ops.PROD: correct = False
+	# extend for other nodes like PAIR/MUL
+	return correct
+
+
 # binds a string representation of the operation to 
 # the symbolic representation (Enums) above 
 def createTree(op, node1, node2, op_value=None):
@@ -138,10 +150,14 @@ def createTree(op, node1, node2, op_value=None):
     elif(FUNC_SYMBOL in op):
     	node = BinaryNode(ops.FUNC)
     	node.setAttribute(op_value)
+    elif(op == ";"):
+    	node = BinaryNode(ops.SEQ) # represents multi-line assignment statements
+    	# rule: throw up an error if 
     # elif e( ... )
     else:    
         return None
     node.addSubNode(node1, node2)
+    if not validateCreatedNode(node): del node; return False
     return node
 
 
@@ -233,7 +249,7 @@ class BinaryNode:
 			elif(self.type == ops.RANDOM):
 				return ('random(' + left + ')')
 			elif(self.type == ops.DO):
-				 return ( left + ' do ' + right)
+				 return ( left + ' do { ' + right + ' }')
 			elif(self.type == ops.OF):
 				 return ( left + ' of ' + right)
 			elif(self.type == ops.CONCAT):
@@ -252,6 +268,8 @@ class BinaryNode:
 				 		listVal += str(i) + ', '
 				 listVal = listVal[:len(listVal)-2]
 				 return self.attr + '(' + listVal + ')'
+			elif(self.type == ops.SEQ):
+				return (left + '; ' + right)
 			elif(self.type == ops.NONE):
 				 return 'NONE'
 				# return ( left + ' on ' + right )				
