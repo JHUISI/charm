@@ -7,6 +7,11 @@ from SDLang import *
 import string,sys
 
 objStack = []
+TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
+ARBITRARY_FUNC = 'func:'
+MESSAGE, SIGNATURE, PUBLIC, LATEX, SETTING = 'message','signature', 'public', 'latex', 'setting'
+# qualifier (means only one instance of that particular keyword exists)
+SAME, DIFF = 'one', 'many'
 
 def createNode(s, loc, toks):
     print('createNode => ', toks)
@@ -72,6 +77,9 @@ class BatchParser:
         List  = Literal("list{") # represents a list
         MultiLine = Literal(";") + Optional(Literal("\\n").suppress())
         funcName = Word(alphanums + '_')
+        blockName = Word(alphanums + '_:')
+        BeginAndEndBlock = CaselessLiteral(START_TOKEN) | CaselessLiteral(END_TOKEN)
+        BlockSep   = Literal(BLOCK_SEP)
 
         # captures the binary operators allowed (and, ^, *, /, +, |, ==)        
         BinOp = AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | Concat | Equality
@@ -85,7 +93,8 @@ class BatchParser:
         expr = Forward()
         term = Forward()
         factor = Forward()
-        atom = (Hash + expr + ',' + expr + rpar).setParseAction( pushFirst ) | \
+        atom = (BeginAndEndBlock + BlockSep + blockName.setParseAction( pushSecond ) ).setParseAction( pushFirst ) | \
+               (Hash + expr + ',' + expr + rpar).setParseAction( pushFirst ) | \
                (Pairing + expr + ',' + expr + rpar).setParseAction( pushFirst ) | \
                (Prod + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
                (For + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
@@ -149,6 +158,9 @@ class BatchParser:
             ops.reverse()
             newList.listNodes = list(ops)
             return newList
+        elif op in [START_TOKEN, END_TOKEN]: # start and end block lines
+            op1 = self.evalStack(stack)
+            return createTree(op, op1, None)
         else:
             # Node value
             return op
@@ -178,12 +190,6 @@ class BatchParser:
 
 # valid keywords
 signer_mode  = Enum('single', 'multi', 'ring')
-START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
-TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
-ARBITRARY_FUNC = 'func:'
-MESSAGE, SIGNATURE, PUBLIC, LATEX, SETTING = 'message','signature', 'public', 'latex', 'setting'
-# qualifier (means only one instance of that particular keyword exists)
-SAME, DIFF = 'one', 'many'
 LINE_DELIM, COMMENT = ';', '#'
 
 

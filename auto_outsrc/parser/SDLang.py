@@ -25,9 +25,10 @@ from toolbox.enum import *
 import string
 
 FUNC_SYMBOL = "def func :"
+START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
 types = Enum('G1', 'G2', 'GT', 'ZR', 'str')
 declarator = Enum('func', 'verify')
-ops = Enum('BEGIN', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'FUNC', 'SEQ','END', 'NONE')
+ops = Enum('BEGIN', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'FUNC', 'SEQ', 'END', 'NONE')
 side = Enum('left', 'right')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
@@ -110,7 +111,11 @@ def validateCreatedNode(node):
 # binds a string representation of the operation to 
 # the symbolic representation (Enums) above 
 def createTree(op, node1, node2, op_value=None):
-    if(op == "^"):
+    if(op == START_TOKEN):
+        node = BinaryNode(ops.BEGIN)
+    elif(op == END_TOKEN):
+    	node = BinaryNode(ops.END)
+    elif(op == "^"):
         node = BinaryNode(ops.EXP)
     elif(op == "*"):
         node = BinaryNode(ops.MUL)
@@ -183,7 +188,7 @@ class BinaryNode:
 					self.attr_index = [arr[1]]
 				else: # False means a and no '_' present
 					self.attr_index = None
-		elif value > ops.BEGIN and value < ops.END:
+		elif value >= ops.BEGIN and value <= ops.END:
 			self.type = value
 			self.attr = None
 			self.attr_index = None
@@ -220,7 +225,11 @@ class BinaryNode:
 			   print("Operation: ", self.type)
 			   print("Left operand: ", left, "type: ", self.left.type)
 			   print("Right operand: ", right, "type: ", self.right.type)
-			if(self.type == ops.EXP):
+			if(self.type == ops.BEGIN):
+				return (START_TOKEN + ' :: ' + left)
+			elif(self.type == ops.END):
+				return (END_TOKEN + ' :: ' + left)
+			elif(self.type == ops.EXP):
 				return (left + '^' + right)
 			elif(self.type == ops.MUL):
 				return ('(' + left + ' * ' + right + ')')
