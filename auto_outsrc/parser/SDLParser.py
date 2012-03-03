@@ -89,7 +89,7 @@ class SDLParser:
         # captures the binary operators allowed (and, ^, *, /, +, |, ==)        
         BinOp = MultiLine | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | Concat | Equality
         # captures order of parsing token operators
-        Token = MultiLine | Equality | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | ForDo | ProdOf | SumOf | Concat | Assignment 
+        Token = Equality | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | ForDo | ProdOf | SumOf | Concat | Assignment | MultiLine
         Operator = Token 
         #Operator = OperatorAND | OperatorOR | Token
 
@@ -338,7 +338,12 @@ def updateAssignInfo(node, i):
 def getVarDepList():
     global varDepList
 
-    print("hello")
+    for funcName in assignInfo:
+        varDepList[funcName] = {}
+        assignInfo_Func = assignInfo[funcName]
+        for varName in assignInfo_Func:
+            assignInfo_Var = assignInfo_Func[varName]
+            pass
 
 def getVarsThatProtectM():
     global varsThatProtectM
