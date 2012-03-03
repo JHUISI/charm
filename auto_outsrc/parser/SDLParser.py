@@ -10,6 +10,8 @@ import string,sys
 objStack = []
 currentFuncName = NONE_FUNC_NAME
 assignInfo = {}
+varDepList = {}
+varsThatProtectM = {}
 TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
 ARBITRARY_FUNC = 'func:'
 MESSAGE, SIGNATURE, PUBLIC, LATEX, SETTING = 'message','signature', 'public', 'latex', 'setting'
@@ -85,7 +87,7 @@ class SDLParser:
         BlockSep   = Literal(BLOCK_SEP)
 
         # captures the binary operators allowed (and, ^, *, /, +, |, ==)        
-        BinOp = AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | Concat | Equality
+        BinOp = MultiLine | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | Concat | Equality
         # captures order of parsing token operators
         Token = MultiLine | Equality | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | ForDo | ProdOf | SumOf | Concat | Assignment 
         Operator = Token 
@@ -332,6 +334,22 @@ def updateAssignInfo(node, i):
     varInfoObj.setAssignNode(node)
     varInfoObj.setLineNo(i)
     assignInfo_Func[varName] = varInfoObj
+
+def getVarDepList():
+    global varDepList
+
+    print("hello")
+
+def getVarsThatProtectM():
+    global varsThatProtectM
+
+    for funcName in assignInfo:
+        varsThatProtectM[funcName] = []
+        assignInfo_Func = assignInfo[funcName]
+        for varName in assignInfo_Func:
+            assignInfo_Var = assignInfo_Func[varName]
+            if (assignInfo_Var.getProtectsM() == True):
+                varsThatProtectM[funcName].append(varName)
 
 # NEW SDL PARSER
 def parseFile2(filename):
@@ -797,8 +815,13 @@ if __name__ == "__main__":
         exit(0)
     else:
         parseFile2(sys.argv[1])
-
-    pass
+        getVarDepList()
+        print("Variable dependency list:\n")
+        print(varDepList)
+        print("\n")
+        getVarsThatProtectM()
+        print("Variables that protect the message:\n")
+        print(varsThatProtectM)
 
         # read contents of file
         # 
