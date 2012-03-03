@@ -40,7 +40,7 @@ Dj := list{}
 Djp := list{}
 
 Y := len(S)
-for{y := 1, Y} do { s_y := random(ZR); Dj_y := p0 * (H(S_y, G2)^s_y); Djp_y := g^s_y }
+for{y := 1, Y} do { (s_y := random(ZR)); (Dj_y := p0 * (H(S_y, G2)^s_y)); (Djp_y := g^s_y) }
 
 sk := list{S, D, Dj, Djp}
 return := sk
