@@ -4,9 +4,12 @@
 
 from pyparsing import *
 from SDLang import *
+from VarInfo import *
 import string,sys
 
 objStack = []
+currentFuncName = NONE_FUNC_NAME
+assignInfo = {}
 TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
 ARBITRARY_FUNC = 'func:'
 MESSAGE, SIGNATURE, PUBLIC, LATEX, SETTING = 'message','signature', 'public', 'latex', 'setting'
@@ -160,6 +163,12 @@ class SDLParser:
             return newList
         elif op in [START_TOKEN, END_TOKEN]: # start and end block lines
             op1 = self.evalStack(stack)
+            if (op1.startswith(DECL_FUNC_HEADER) == True):
+                global currentFuncName
+                if (op == START_TOKEN):
+                    currentFuncName = op1[len(DECL_FUNC_HEADER):len(op1)]
+                elif (op == END_TOKEN):
+                    currentFuncName = NONE_FUNC_NAME
             return createTree(op, op1, None)
         else:
             # Node value
@@ -307,20 +316,38 @@ def parseFile(filename):
     fd.close()
     return ast
 
+def updateAssignInfo(node, i):
+    global assignInfo
+
+    if (currentFuncName not in assignInfo):
+        assignInfo[currentFuncName] = {}
+
+    assignInfo_Func = assignInfo[currentFuncName]
+
+    varName = getFullVarName(node.left)
+    if (varName in assignInfo_Func):
+        sys.exit("Found multiple assignments of same variable name within same function.")
+
+    varInfoObj = VarInfo()
+    varInfoObj.setAssignNode(node)
+    varInfoObj.setLineNo(i)
+    assignInfo_Func[varName] = varInfoObj
+
 # NEW SDL PARSER
-def parseFile2(filename):    
+def parseFile2(filename):
     fd = open(filename, 'r')
-    code = fd.readlines(); i = 1
+    code = fd.readlines(); i = 0
     parser = SDLParser() 
     ast_code = []
     for line in code:
+        i += 1
         if len(line.strip()) > 0:
             node = parser.parse(line, i)
-            print("sdl: ", i, node)
+            #print("sdl: ", i, node)
             ast_code.append(node)
-            i += 1
-        
-    
+            #i += 1
+            if (node.type == ops.EQ):
+                updateAssignInfo(node, i)
 
 # Perform some type checking here?
 # rules: find constants, verify, variable definitions
@@ -760,7 +787,7 @@ def calculate_times(opcount, curve, N, debugging=False):
     return (result, total_time / N)
 
 if __name__ == "__main__":
-    print(sys.argv[1:])
+    #print(sys.argv[1:])
     if sys.argv[1] == '-t':
         debug = levels.all
         statement = sys.argv[2]
@@ -770,6 +797,9 @@ if __name__ == "__main__":
         exit(0)
     else:
         parseFile2(sys.argv[1])
+
+    #print(assignInfo)
+
         # read contents of file
         # 
 #    elif sys.argv[1] == '-p':

@@ -22,8 +22,12 @@ AST simple rules
 '''
 
 from toolbox.enum import *
-import string
+import string, sys
 
+BINARY_NODE_CLASS_NAME = 'BinaryNode'
+NONE_FUNC_NAME = "NONE_FUNC_NAME"
+NONE_STRING = 'None'
+DECL_FUNC_HEADER = "func:"
 FUNC_SYMBOL = "def func :"
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
 types = Enum('G1', 'G2', 'GT', 'ZR', 'str')
@@ -43,6 +47,17 @@ debug = levels.none
 # utilities over binary node structures
 # list: 
 # - searchNode => find a particular type of node (ops.PAIR) in a given subtree (node)
+
+def getFullVarName(node):
+    if (node.type != ops.ATTR):
+        sys.exit("GetFullVarName in SDLang received node that is not of type " + str(ops.ATTR))
+
+    varName = node.attr
+    if (node.attr_index != None):
+        for index in node.attr_index:
+            varName += "_" + index
+
+    return varName
 
 def getListNodes(subtree, parent_type, _list):
 	if subtree == None: return None
