@@ -85,7 +85,7 @@ class SDLParser:
         BlockSep   = Literal(BLOCK_SEP)
 
         # captures the binary operators allowed (and, ^, *, /, +, |, ==)        
-        BinOp = AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | Concat | Equality
+        BinOp = MultiLine | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | Concat | Equality
         # captures order of parsing token operators
         Token = MultiLine | Equality | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | ForDo | ProdOf | SumOf | Concat | Assignment 
         Operator = Token 
