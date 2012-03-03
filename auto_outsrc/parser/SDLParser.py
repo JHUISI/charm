@@ -820,9 +820,9 @@ if __name__ == "__main__":
         exit(0)
     else:
         parseFile2(sys.argv[1])
-        getVarDepList()
-        print("Variable dependency list:\n")
-        print(varDepList)
+        #getVarDepList()
+        #print("Variable dependency list:\n")
+        #print(varDepList)
         print("\n")
         getVarsThatProtectM()
         print("Variables that protect the message:\n")
