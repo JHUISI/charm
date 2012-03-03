@@ -33,6 +33,17 @@ class VarInfo:
             if ( (varName not in self.varDeps) and (varName.isdigit() == False) and (varName != NONE_STRING) ):
                 self.varDeps.append(varName)
 
+        listNodes = None
+
+        try:
+            listNodes = node.listNodes
+        except:
+            pass
+
+        if (listNodes != None):
+            for listNode in listNodes:
+                self.varDeps.append(listNode)
+
         if (node.left != None):
             self.traverseAssignNodeRecursive(node.left)
         if (node.right != None):

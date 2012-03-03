@@ -48,9 +48,20 @@ debug = levels.none
 # list: 
 # - searchNode => find a particular type of node (ops.PAIR) in a given subtree (node)
 
+def getListNodeNames(node):
+    if (node.type != ops.LIST):
+        sys.exit("getListNodeNames in SDLang received node that is not of type " + str(ops.LIST))
+
+    retList = []
+
+    for listNodeName in node.listNodes:
+        retList.append(listNodeName)
+
+    return retList
+
 def getFullVarName(node):
     if (node.type != ops.ATTR):
-        sys.exit("GetFullVarName in SDLang received node that is not of type " + str(ops.ATTR))
+        sys.exit("getFullVarName in SDLang received node that is not of type " + str(ops.ATTR))
 
     varName = node.attr
     if (node.attr_index != None):

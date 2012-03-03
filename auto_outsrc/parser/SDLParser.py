@@ -798,7 +798,7 @@ if __name__ == "__main__":
     else:
         parseFile2(sys.argv[1])
 
-    #print(assignInfo)
+    pass
 
         # read contents of file
         # 
