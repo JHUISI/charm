@@ -28,6 +28,7 @@ BINARY_NODE_CLASS_NAME = 'BinaryNode'
 NONE_FUNC_NAME = "NONE_FUNC_NAME"
 NONE_STRING = 'None'
 TYPES_HEADER = "types"
+OTHER_TYPES = ['list', 'object']
 DECL_FUNC_HEADER = "func:"
 FUNC_SYMBOL = "def func :"
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
@@ -59,6 +60,12 @@ def getListNodeNames(node):
         retList.append(listNodeName)
 
     return retList
+
+def getVarType(node):
+    if (node.type != ops.TYPE):
+        sys.exit("getVarType in SDLange received node that is not of type " + str(ops.TYPE))
+
+    return node.attr
 
 def getFullVarName(node):
     if (node.type != ops.ATTR):

@@ -329,11 +329,7 @@ def getVarTypeInfo(node, varName):
     global varTypes
 
     if (currentFuncName == TYPES_HEADER):
-        currentTypeList = assignInfo[currentFuncName][varName].getVarDeps()
-        #if ( (len(currentTypeList) != 1) or (currentTypeList[0] not in types) ):
-            #pass
-            #sys.exit("One of the types listed in the \"Types\" section is not presented in a valid format.")
-        #varTypes[varName] = currentTypeList[0]
+        varTypes[varName] = assignInfo[currentFuncName][varName].getType()
 
 def updateAssignInfo(node, i):
     global assignInfo
@@ -864,6 +860,28 @@ def printVarDepORInfLists(listToPrint):
             print("\n")
         print("----------------------")
 
+def printFinalOutput():
+    print("\n")
+    print("Variable dependency list:\n")
+    printVarDepORInfLists(varDepList)
+    print("\n")
+    print("Variable influence list:\n")
+    printVarDepORInfLists(varInfList)
+    print("\n")
+
+    print("Variables that protect the message:\n")
+    #print(varsThatProtectM)
+    print("Ayo:  can you get this information from the two data structures I have shown above?")
+    print("If so, please access the message variable using the name M (defined in config.py) rather")
+    print("than hard-coding 'M' so we can keep it flexible for the user.")
+    print("If not, let me know so I can re-write the getVarsThatProtectM() method to make it what")
+    print("you need.\n")
+    print("-------------------------")
+    print("\n")
+    print("Variable types inferred so far (more to come soon):\n")
+    print(varTypes)
+    print("\n")
+
 if __name__ == "__main__":
     #print(sys.argv[1:])
     if sys.argv[1] == '-t':
@@ -876,24 +894,8 @@ if __name__ == "__main__":
     else:
         parseFile2(sys.argv[1])
         getVarDepInfLists()
-        print("\n")
-        print("Variable dependency list:\n")
-        printVarDepORInfLists(varDepList)
-        print("\n")
-        print("Variable influence list:\n")
-        printVarDepORInfLists(varInfList)
-        print("\n")
         getVarsThatProtectM()
-        print("Variables that protect the message:\n")
-        #print(varsThatProtectM)
-        print("Ayo:  can you get this information from the two data structures I have shown above?")
-        print("If so, please access the message variable using the name M (defined in config.py) rather")
-        print("than hard-coding 'M' so we can keep it flexible for the user.")
-        print("If not, let me know so I can re-write the getVarsThatProtectM() method to make it what")
-        print("you need.")
-        print("\n")
-
-        print(varTypes)
+        printFinalOutput()
 
         # read contents of file
         # 

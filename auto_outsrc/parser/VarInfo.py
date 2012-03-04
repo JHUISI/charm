@@ -9,6 +9,7 @@ class VarInfo:
         self.varDeps = None
         self.hasPairings = None
         self.protectsM = None
+        self.type = None
 
     def getAssignNode(self):
         return self.assignNode
@@ -25,6 +26,9 @@ class VarInfo:
     def getProtectsM(self):
         return self.protectsM
 
+    def getType(self):
+        return self.type
+
     def traverseAssignNodeRecursive(self, node):
         if (node.type == ops.PAIR):
             self.hasPairings = True
@@ -32,6 +36,13 @@ class VarInfo:
             varName = getFullVarName(node)
             if ( (varName not in self.varDeps) and (varName.isdigit() == False) and (varName != NONE_STRING) ):
                 self.varDeps.append(varName)
+        elif (node.type == ops.TYPE):
+            varType = getVarType(node)
+            if (varType not in types):
+                sys.exit("Variable type extracted by SDL parser in traverseAssignNodeRecursive is not one of the supported types.")
+            if (self.type != None):
+                sys.exit("Node passed to traverseAssignNodeRecursive in VarInfo has multiple subnodes on right side of assignment of type " + ops.TYPE)
+            self.type = varType
 
         listNodes = None
 
@@ -61,6 +72,11 @@ class VarInfo:
 
         if (M in self.varDeps):
             self.protectsM = True
+
+        if ( (len(self.varDeps) == 1) and (self.varDeps[0] in OTHER_TYPES) ):
+            if (self.type != None):
+                sys.exit("Node passed to traverseAssignNode in VarInfo has multiple node types in right subnode.")
+            self.type = self.varDeps[0]
 
     def setAssignNode(self, assignNode):
         if (type(assignNode).__name__ != BINARY_NODE_CLASS_NAME):
