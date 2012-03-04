@@ -27,6 +27,7 @@ import string, sys
 BINARY_NODE_CLASS_NAME = 'BinaryNode'
 NONE_FUNC_NAME = "NONE_FUNC_NAME"
 NONE_STRING = 'None'
+TYPES_HEADER = "types"
 DECL_FUNC_HEADER = "func:"
 FUNC_SYMBOL = "def func :"
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'

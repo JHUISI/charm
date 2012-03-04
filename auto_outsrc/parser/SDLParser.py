@@ -13,6 +13,7 @@ assignInfo = {}
 varDepList = {}
 varInfList = {}
 varsThatProtectM = {}
+varTypes = {}
 TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
 ARBITRARY_FUNC = 'func:'
 MESSAGE, SIGNATURE, PUBLIC, LATEX, SETTING = 'message','signature', 'public', 'latex', 'setting'
@@ -166,10 +167,15 @@ class SDLParser:
             return newList
         elif op in [START_TOKEN, END_TOKEN]: # start and end block lines
             op1 = self.evalStack(stack)
+            global currentFuncName
             if (op1.startswith(DECL_FUNC_HEADER) == True):
-                global currentFuncName
                 if (op == START_TOKEN):
                     currentFuncName = op1[len(DECL_FUNC_HEADER):len(op1)]
+                elif (op == END_TOKEN):
+                    currentFuncName = NONE_FUNC_NAME
+            elif (op1 == TYPES_HEADER):
+                if (op == START_TOKEN):
+                    currentFuncName = TYPES_HEADER
                 elif (op == END_TOKEN):
                     currentFuncName = NONE_FUNC_NAME
             return createTree(op, op1, None)
@@ -319,6 +325,16 @@ def parseFile(filename):
     fd.close()
     return ast
 
+def getVarTypeInfo(node, varName):
+    global varTypes
+
+    if (currentFuncName == TYPES_HEADER):
+        currentTypeList = assignInfo[currentFuncName][varName].getVarDeps()
+        #if ( (len(currentTypeList) != 1) or (currentTypeList[0] not in types) ):
+            #pass
+            #sys.exit("One of the types listed in the \"Types\" section is not presented in a valid format.")
+        #varTypes[varName] = currentTypeList[0]
+
 def updateAssignInfo(node, i):
     global assignInfo
 
@@ -335,6 +351,8 @@ def updateAssignInfo(node, i):
     varInfoObj.setAssignNode(node)
     varInfoObj.setLineNo(i)
     assignInfo_Func[varName] = varInfoObj
+
+    getVarTypeInfo(node, varName)
 
 def getVarDepList(funcName, varName, retVarDepList, varsVisitedSoFar):
     varsVisitedSoFar.append(varName)
@@ -867,8 +885,15 @@ if __name__ == "__main__":
         print("\n")
         getVarsThatProtectM()
         print("Variables that protect the message:\n")
-        print(varsThatProtectM)
+        #print(varsThatProtectM)
+        print("Ayo:  can you get this information from the two data structures I have shown above?")
+        print("If so, please access the message variable using the name M (defined in config.py) rather")
+        print("than hard-coding 'M' so we can keep it flexible for the user.")
+        print("If not, let me know so I can re-write the getVarsThatProtectM() method to make it what")
+        print("you need.")
         print("\n")
+
+        print(varTypes)
 
         # read contents of file
         # 
