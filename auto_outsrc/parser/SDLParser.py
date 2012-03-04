@@ -11,6 +11,7 @@ objStack = []
 currentFuncName = NONE_FUNC_NAME
 assignInfo = {}
 varDepList = {}
+varInfList = {}
 varsThatProtectM = {}
 TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
 ARBITRARY_FUNC = 'func:'
@@ -335,15 +336,41 @@ def updateAssignInfo(node, i):
     varInfoObj.setLineNo(i)
     assignInfo_Func[varName] = varInfoObj
 
-def getVarDepList():
-    global varDepList
+def getVarDepList(funcName, varName, retVarDepList, varsVisitedSoFar):
+    varsVisitedSoFar.append(varName)
+    assignInfo_Var = assignInfo[funcName][varName]
+    currentVarDepList = assignInfo_Var.getVarDeps()
+    for currentVarDep in currentVarDepList:
+        if (currentVarDep not in retVarDepList):
+            retVarDepList.append(currentVarDep)
+        if ( (currentVarDep in assignInfo[funcName]) and  (currentVarDep not in varsVisitedSoFar) ):
+            getVarDepList(funcName, currentVarDep, retVarDepList, varsVisitedSoFar)
+
+def getVarInfList():
+    global varInfList
+
+    for funcName in varDepList:
+        for varName in varDepList[funcName]:
+            currentVarDepList = varDepList[funcName][varName]
+            for currentVarDep in currentVarDepList:
+                if (varName not in varInfList[funcName][currentVarDep]):
+                    varInfList[funcName][currentVarDep].append(varName)
+
+def getVarDepInfLists():
+    global varDepList, varInfList
 
     for funcName in assignInfo:
         varDepList[funcName] = {}
+        varInfList[funcName] = {}
         assignInfo_Func = assignInfo[funcName]
         for varName in assignInfo_Func:
-            assignInfo_Var = assignInfo_Func[varName]
-            pass
+            retVarDepList = []
+            getVarDepList(funcName, varName, retVarDepList, [])
+            varDepList[funcName][varName] = retVarDepList
+            for retVarDep in retVarDepList:
+                varInfList[funcName][retVarDep] = []
+
+    getVarInfList()
 
 def getVarsThatProtectM():
     global varsThatProtectM
@@ -809,6 +836,16 @@ def calculate_times(opcount, curve, N, debugging=False):
         print("Per Signature =>", total_time / N, "\n")
     return (result, total_time / N)
 
+def printVarDepORInfLists(listToPrint):
+    for funcName in listToPrint:
+        print("FUNCTION NAME:  " + funcName)
+        print("\n")
+        for varName in listToPrint[funcName]:
+            print(varName)
+            print(listToPrint[funcName][varName])
+            print("\n")
+        print("----------------------")
+
 if __name__ == "__main__":
     #print(sys.argv[1:])
     if sys.argv[1] == '-t':
@@ -820,13 +857,18 @@ if __name__ == "__main__":
         exit(0)
     else:
         parseFile2(sys.argv[1])
-        #getVarDepList()
-        #print("Variable dependency list:\n")
-        #print(varDepList)
+        getVarDepInfLists()
+        print("\n")
+        print("Variable dependency list:\n")
+        printVarDepORInfLists(varDepList)
+        print("\n")
+        print("Variable influence list:\n")
+        printVarDepORInfLists(varInfList)
         print("\n")
         getVarsThatProtectM()
         print("Variables that protect the message:\n")
         print(varsThatProtectM)
+        print("\n")
 
         # read contents of file
         # 
