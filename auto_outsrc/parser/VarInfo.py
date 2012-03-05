@@ -10,6 +10,10 @@ class VarInfo:
         self.hasPairings = None
         self.protectsM = None
         self.type = types.NO_TYPE
+        self.initValue = None
+        self.beenSet = False
+        self.initCall = None
+        self.initCallHappenedAlready = False
 
     def getAssignNode(self):
         return self.assignNode
@@ -29,6 +33,12 @@ class VarInfo:
     def getType(self):
         return self.type
 
+    def getInitValue(self):
+        return self.initValue
+
+    def hasBeenSet(self):
+        return self.beenSet
+
     def traverseAssignNodeRecursive(self, node):
         if (node.type == ops.PAIR):
             self.hasPairings = True
@@ -36,6 +46,17 @@ class VarInfo:
             varName = getFullVarName(node)
             if ( (varName not in self.varDeps) and (varName.isdigit() == False) and (varName != NONE_STRING) ):
                 self.varDeps.append(varName)
+        elif (node.type == ops.FUNC):
+            userFuncName = getFullVarName(node)
+            if (userFuncName == INIT_FUNC_NAME):
+                if (self.initCallHappenedAlready == True):
+                    sys.exit("traverseAssignNodeRecursive found multiple calls to " + INIT_FUNC_NAME + " for the same variable in the same function.")
+                self.initCallHappenedAlready = True
+                listNodes = getListNodeNames(node)
+                if (len(listNodes) != 1):
+                    sys.exit("Init function call discovered by traverseAssignNodeRecursive has a number of arguments other than 1 (not supported).")
+                self.initValue = listNodes[0]
+                self.initCall = True
         elif (node.type == ops.TYPE):
             varType = getVarType(node)
             if (varType not in types):
@@ -48,16 +69,7 @@ class VarInfo:
                 sys.exit("Node passed to traverseAssignNodeRecursive in VarInfo has multiple subnodes on right side of assignment of type " + ops.TYPE)
             self.type = varType
 
-        listNodes = None
-
-        try:
-            listNodes = node.listNodes
-        except:
-            pass
-
-        if (listNodes != None):
-            for listNode in listNodes:
-                self.varDeps.append(listNode)
+        addListNodesToList(node, self.varDeps)
 
         if (node.left != None):
             self.traverseAssignNodeRecursive(node.left)
@@ -86,9 +98,11 @@ class VarInfo:
         if (type(assignNode).__name__ != BINARY_NODE_CLASS_NAME):
             sys.exit("Assignment node passed to VarInfo is invalid.")
 
+        self.initCall = False
         self.assignNode = assignNode
-
         self.traverseAssignNode()
+
+        self.beenSet = not(self.initCall)
 
     def setLineNo(self, lineNo):
         if ( (type(lineNo) is not int) or (lineNo < 1) ):

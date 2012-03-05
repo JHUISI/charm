@@ -343,12 +343,15 @@ def updateAssignInfo(node, i):
     varName = getFullVarName(node.left)
     #print("varName in updateAssignInfo :=", varName)
     if (varName in assignInfo_Func):
-        sys.exit("Found multiple assignments of same variable name within same function.")
-
-    varInfoObj = VarInfo()
-    varInfoObj.setAssignNode(node)
-    varInfoObj.setLineNo(i)
-    assignInfo_Func[varName] = varInfoObj
+        if (assignInfo_Func[varName].hasBeenSet() == True):
+            sys.exit("Found multiple assignments of same variable name within same function.")
+        assignInfo_Func[varName].setAssignNode(node)
+        assignInfo_Func[varName].setLineNo(i)
+    else:
+        varInfoObj = VarInfo()
+        varInfoObj.setAssignNode(node)
+        varInfoObj.setLineNo(i)
+        assignInfo_Func[varName] = varInfoObj
 
     getVarTypeInfo(node, varName)
 

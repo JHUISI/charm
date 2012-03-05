@@ -30,6 +30,7 @@ NONE_STRING = 'None'
 TYPES_HEADER = "types"
 OTHER_TYPES = ['list', 'object']
 DECL_FUNC_HEADER = "func:"
+INIT_FUNC_NAME = "init"
 FUNC_SYMBOL = "def func :"
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
 types = Enum('NO_TYPE','G1', 'G2', 'GT', 'ZR', 'str', 'list', 'object')
@@ -51,15 +52,30 @@ debug = levels.none
 # - searchNode => find a particular type of node (ops.PAIR) in a given subtree (node)
 
 def getListNodeNames(node):
-    if (node.type != ops.LIST):
-        sys.exit("getListNodeNames in SDLang received node that is not of type " + str(ops.LIST))
+    #if (node.type != ops.LIST):
+        #sys.exit("getListNodeNames in SDLang received node that is not of type " + str(ops.LIST))
 
+    listNodes = None
     retList = []
 
-    for listNodeName in node.listNodes:
+    try:
+        listNodes = node.listNodes
+    except:
+        return retList
+
+    for listNodeName in listNodes:
         retList.append(listNodeName)
 
     return retList
+
+def addListNodesToList(node, listToAddTo):
+    listNodes = getListNodeNames(node)
+    if (listNodes == []):
+        return
+
+    for listNode in listNodes:
+        if ( (listNode not in listToAddTo) and (listNode.isdigit() == False) and (listNode != NONE_STRING) ):
+            listToAddTo.append(listNode)
 
 def getVarType(node):
     if (node.type != ops.TYPE):
@@ -68,8 +84,8 @@ def getVarType(node):
     return node.attr
 
 def getFullVarName(node):
-    if (node.type != ops.ATTR):
-        sys.exit("getFullVarName in SDLang received node that is not of type " + str(ops.ATTR))
+    #if (node.type != ops.ATTR):
+        #sys.exit("getFullVarName in SDLang received node that is not of type " + str(ops.ATTR))
 
     varName = node.attr
     if (node.attr_index != None):
