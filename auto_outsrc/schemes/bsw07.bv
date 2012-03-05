@@ -89,7 +89,7 @@ attrs  := prune(policy, S)
 coeff := getCoefficients(policy)
 
 Y := len(attrs)
-A := 1
+A := init(1)
 for{y := 1, Y} do { A := A * ((e(Cr_y, Dj_y) / e(Djp_y, Cpr_y))^coeff_y) }
 
 result0 := e(C, D) / A
