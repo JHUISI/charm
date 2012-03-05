@@ -331,6 +331,7 @@ def getVarTypeInfo(node, varName):
 
     if (currentFuncName == TYPES_HEADER):
         varTypes[varName] = assignInfo[currentFuncName][varName].getType()
+        return
 
 def updateAssignInfo(node, i):
     global assignInfo
