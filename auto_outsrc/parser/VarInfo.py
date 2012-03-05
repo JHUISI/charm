@@ -9,7 +9,7 @@ class VarInfo:
         self.varDeps = None
         self.hasPairings = None
         self.protectsM = None
-        self.type = None
+        self.type = types.NO_TYPE
 
     def getAssignNode(self):
         return self.assignNode
@@ -40,7 +40,11 @@ class VarInfo:
             varType = getVarType(node)
             if (varType not in types):
                 sys.exit("Variable type extracted by SDL parser in traverseAssignNodeRecursive is not one of the supported types.")
-            if (self.type != None):
+            
+            if (self.type == types.ZR and varType != types.ZR):
+                # situation where we have two types G1^ZR. G1, G2, or GT should override ZR
+                pass
+            elif (self.type != types.NO_TYPE):
                 sys.exit("Node passed to traverseAssignNodeRecursive in VarInfo has multiple subnodes on right side of assignment of type " + ops.TYPE)
             self.type = varType
 

@@ -9,6 +9,7 @@ import string,sys
 
 objStack = []
 currentFuncName = NONE_FUNC_NAME
+ASSIGN_KEYWORDS = ['input', 'output']
 assignInfo = {}
 varDepList = {}
 varInfList = {}
@@ -340,6 +341,7 @@ def updateAssignInfo(node, i):
     assignInfo_Func = assignInfo[currentFuncName]
 
     varName = getFullVarName(node.left)
+    #print("varName in updateAssignInfo :=", varName)
     if (varName in assignInfo_Func):
         sys.exit("Found multiple assignments of same variable name within same function.")
 
@@ -349,6 +351,33 @@ def updateAssignInfo(node, i):
     assignInfo_Func[varName] = varInfoObj
 
     getVarTypeInfo(node, varName)
+
+def visitMultiLineNodes(node, i):
+    if node == None:
+        return
+    if node.type == ops.EQ:
+        #print("statement: ", node)
+        updateAssignInfo(BinaryNode.copy(node), i)
+        return
+    if node.left: visitMultiLineNodes(node.left, i)
+    if node.right: visitMultiLineNodes(node.right, i)
+
+def updateForLoopInfo(node, i):    
+    varName = 'loop' + str(i)
+    print("identified varName: ", varName)    
+    # recover assign statements within the for loop
+    if (currentFuncName not in assignInfo):
+        assignInfo[currentFuncName] = {}
+
+    assignInfo_Func = assignInfo[currentFuncName]
+    
+    visitMultiLineNodes(node.right, i)
+    # record for loop itself for future?
+    varInfoObj = VarInfo()
+    varInfoObj.setAssignNode(node)
+    varInfoObj.setLineNo(i)
+    assignInfo_Func[varName] = varInfoObj
+    
 
 def getVarDepList(funcName, varName, retVarDepList, varsVisitedSoFar):
     varsVisitedSoFar.append(varName)
@@ -394,7 +423,7 @@ def getVarsThatProtectM():
         assignInfo_Func = assignInfo[funcName]
         for varName in assignInfo_Func:
             assignInfo_Var = assignInfo_Func[varName]
-            if (assignInfo_Var.getProtectsM() == True):
+            if (assignInfo_Var.getProtectsM() == True and varName not in ASSIGN_KEYWORDS):
                 varsThatProtectM[funcName].append(varName)
 
 # NEW SDL PARSER
@@ -412,6 +441,8 @@ def parseFile2(filename):
             #i += 1
             if (node.type == ops.EQ):
                 updateAssignInfo(node, i)
+            elif (node.type == ops.DO): # handles for loop
+                updateForLoopInfo(node, i)
 
 # Perform some type checking here?
 # rules: find constants, verify, variable definitions

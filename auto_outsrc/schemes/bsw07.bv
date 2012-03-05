@@ -63,7 +63,7 @@ egg := pk#2
 Ctl := M * egg^s
 C    := h ^ s
 
-for{y := 1, Y} do { share_y := sh#attrs#y?; Cr_y := g1 ^ share_y; Cpr_y := (H(attrs_y, G2))^share_y } 
+for{y := 1, Y} do { (share_y := sh#attrs#y?); (Cr_y := g1 ^ share_y); (Cpr_y := (H(attrs_y, G2))^share_y) }
 
 ct := list{policy_str, Ctl, C, Cr, Cpr}
 return := ct

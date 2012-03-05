@@ -32,7 +32,7 @@ OTHER_TYPES = ['list', 'object']
 DECL_FUNC_HEADER = "func:"
 FUNC_SYMBOL = "def func :"
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
-types = Enum('G1', 'G2', 'GT', 'ZR', 'str')
+types = Enum('NO_TYPE','G1', 'G2', 'GT', 'ZR', 'str', 'list', 'object')
 declarator = Enum('func', 'verify')
 ops = Enum('BEGIN', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'FUNC', 'SEQ', 'END', 'NONE')
 side = Enum('left', 'right')
@@ -206,7 +206,8 @@ class BinaryNode:
 	def __init__(self, value, left=None, right=None):		
 		self.negated = False	
 		if(isinstance(value, str)):
-			if value in ['G1', 'G2', 'GT', 'ZR', 'str']:
+			if value in ['G1', 'G2', 'GT', 'ZR', 'str', 'list', 'object']:
+                # denotes group type of an attribute value
 				self.type = ops.TYPE
 				self.attr = types[value]
 				self.attr_index = None
