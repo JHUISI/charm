@@ -9,11 +9,28 @@ class BasicTypeExist(AbstractTechnique):
     def __init__(self, variables):
         AbstractTechnique.__init__(self, None, variables, None)
         self.missing_symbols = []
+        self.exclude_list = []
+    
+    def visit_for(self, node, data):
+        left_node = node.left
+        if Type(left_node) == ops.EQ:
+            self.exclude_list.append(str(left_node.left))
+        right_node = node.right 
+        if Type(right_node) == ops.ATTR:      
+            self.exclude_list.append(str(right_node))
+
+#    def visit_prod(self, node, data):
+#        left_node = node.left
+#        if Type(left_node) == ops.EQ:
+#            self.exclude_list.append(str(left_node.left))
+#        right_node = node.right 
+#        if Type(right_node) == ops.ATTR:      
+#            self.exclude_list.append(str(right_node))
     
     def visit_attr(self, node, data):
         variable = node.getAttribute()
         # ignore reserved keywords
-        if variable in ['0', '1', '-1', 'y', 'l', 'z', 'N']: pass
+        if variable in ['0', '1', '-1', 'y', 'l', 'z', 'N'] or variable in self.exclude_list: pass
         # consider storing variables in a list?
         elif not variable in self.vars.keys(): 
             print("Error: ", variable, "does not have a type!")

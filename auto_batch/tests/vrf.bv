@@ -31,10 +31,10 @@ public := one
 signature := N
 
 verify1 := { e(pi#1, g2) == e((g1^(1 + -x#0)) * (U1#0^x#0), Ut) } and {{ e(pi#0, g2) == e(pi#n, U2#0) } and { e(pi#0, h) == y }}
-verify2 := { for{t:=1, n} do { e(pi#t, g2) == (e((pi#t-1^(1 + -x#t)), g2) * e(pi#t-1^x#t, U2#t)) } }
+verify2 := { for{t:=1, n} do { e(pi#t, g2) == (e((pi#t-1^(1 - x#t)), g2) * e(pi#t-1^x#t, U2#t)) } }
 
 #BEGIN :: transform
-#2, 6, 5, 3, 2, 7
+#2, 6, 5, 3, 2
 #END :: transform
 
 BEGIN :: latex
