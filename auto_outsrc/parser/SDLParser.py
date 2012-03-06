@@ -326,18 +326,41 @@ def parseFile(filename):
     fd.close()
     return ast
 
+def updateVarTypes(varTypeSubStruct, varName, type):
+    if ( (varName in varTypeSubStruct) and (varTypeSubStruct[varName] != type) ):
+        sys.exit("Found mismatching type information in cryptoscheme.")
+
+    varTypeSubStruct[varName] = type
+
+def getVarTypeInfoRecursive(node, varName):
+    global varTypes
+
+    if (node.type == ops.RANDOM):
+        updateVarTypes(varTypes[currentFuncName], varName, node.left.attr)
+        return
+
+    if (node.left != None):
+        getVarTypeInfoRecursive(node.left, varName)
+    if (node.right != None):
+        getVarTypeInfoRecursive(node.right, varName)
+
 def getVarTypeInfo(node, varName):
     global varTypes
 
     if (currentFuncName == TYPES_HEADER):
-        varTypes[varName] = assignInfo[currentFuncName][varName].getType()
+        updateVarTypes(varTypes[currentFuncName], varName, assignInfo[currentFuncName][varName].getType())
         return
 
+    getVarTypeInfoRecursive(node.right, varName)
+
 def updateAssignInfo(node, i):
-    global assignInfo
+    global assignInfo, varTypes
 
     if (currentFuncName not in assignInfo):
         assignInfo[currentFuncName] = {}
+
+    if (currentFuncName not in varTypes):
+        varTypes[currentFuncName] = {}
 
     assignInfo_Func = assignInfo[currentFuncName]
 
@@ -897,6 +920,8 @@ def printVarDepORInfLists(listToPrint):
 
 def printFinalOutput():
     print("\n")
+
+    '''
     print("Variable dependency list:\n")
     printVarDepORInfLists(varDepList)
     print("\n")
@@ -913,6 +938,8 @@ def printFinalOutput():
     print("you need.\n")
     print("-------------------------")
     print("\n")
+    '''
+
     print("Variable types inferred so far (more to come soon):\n")
     print(varTypes)
     print("\n")
