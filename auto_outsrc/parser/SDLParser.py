@@ -5,16 +5,19 @@
 from pyparsing import *
 from SDLang import *
 from VarInfo import *
+from ForLoop import *
 import string,sys
 
 objStack = []
 currentFuncName = NONE_FUNC_NAME
 ASSIGN_KEYWORDS = ['input', 'output']
 assignInfo = {}
+forLoops = {}
 varDepList = {}
 varInfList = {}
 varsThatProtectM = {}
 varTypes = {}
+withinForLoop = False
 TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
 ARBITRARY_FUNC = 'func:'
 MESSAGE, SIGNATURE, PUBLIC, LATEX, SETTING = 'message','signature', 'public', 'latex', 'setting'
@@ -330,6 +333,9 @@ def updateVarTypes(varTypeSubStruct, varName, type):
     if ( (varName in varTypeSubStruct) and (varTypeSubStruct[varName] != type) ):
         sys.exit("Found mismatching type information in cryptoscheme.")
 
+    if (isValidType(type) == False):
+        sys.exit("Type inference engine found type that is not one of the currently supported types.")
+
     varTypeSubStruct[varName] = type
 
 def getVarTypeInfoRecursive(node, varName):
@@ -369,11 +375,11 @@ def updateAssignInfo(node, i):
     if (varName in assignInfo_Func):
         if (assignInfo_Func[varName].hasBeenSet() == True):
             sys.exit("Found multiple assignments of same variable name within same function.")
-        assignInfo_Func[varName].setAssignNode(node)
+        assignInfo_Func[varName].setAssignNode(node, currentFuncName)
         assignInfo_Func[varName].setLineNo(i)
     else:
         varInfoObj = VarInfo()
-        varInfoObj.setAssignNode(node)
+        varInfoObj.setAssignNode(node, currentFuncName)
         varInfoObj.setLineNo(i)
         assignInfo_Func[varName] = varInfoObj
 
@@ -401,7 +407,7 @@ def updateForLoopInfo(node, i):
     visitMultiLineNodes(node.right, i)
     # record for loop itself for future?
     varInfoObj = VarInfo()
-    varInfoObj.setAssignNode(node)
+    varInfoObj.setAssignNode(node, currentFuncName)
     varInfoObj.setLineNo(i)
     assignInfo_Func[varName] = varInfoObj
     

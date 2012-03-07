@@ -9,11 +9,12 @@ class VarInfo:
         self.varDeps = None
         self.hasPairings = None
         self.protectsM = None
-        self.type = types.NO_TYPE
         self.initValue = None
         self.beenSet = False
         self.initCall = None
         self.initCallHappenedAlready = False
+        self.type = types.NO_TYPE
+        self.funcName = None
 
     def getAssignNode(self):
         return self.assignNode
@@ -30,14 +31,17 @@ class VarInfo:
     def getProtectsM(self):
         return self.protectsM
 
-    def getType(self):
-        return self.type
-
     def getInitValue(self):
         return self.initValue
 
     def hasBeenSet(self):
         return self.beenSet
+
+    def getType(self):
+        return self.type
+
+    def getFuncName(self):
+        return self.funcName
 
     def traverseAssignNodeRecursive(self, node):
         if (node.type == ops.PAIR):
@@ -58,16 +62,11 @@ class VarInfo:
                 self.initValue = listNodes[0]
                 self.initCall = True
         elif (node.type == ops.TYPE):
-            varType = getVarType(node)
-            if (varType not in types):
-                sys.exit("Variable type extracted by SDL parser in traverseAssignNodeRecursive is not one of the supported types.")
-            
-            if (self.type == types.ZR and varType != types.ZR):
-                # situation where we have two types G1^ZR. G1, G2, or GT should override ZR
-                pass
-            elif (self.type != types.NO_TYPE):
-                sys.exit("Node passed to traverseAssignNodeRecursive in VarInfo has multiple subnodes on right side of assignment of type " + ops.TYPE)
-            self.type = varType
+            if (self.funcName == TYPES_HEADER):
+                varType = getVarType(node)
+                if (self.type != types.NO_TYPE):
+                    sys.exit("TraverseAssignNodeRecursive found multiple type assignments to same variable in " + str(self.funcName) + " function.")
+                self.type = varType
 
         addListNodesToList(node, self.varDeps)
 
@@ -89,17 +88,13 @@ class VarInfo:
         if (M in self.varDeps):
             self.protectsM = True
 
-        if ( (len(self.varDeps) == 1) and (self.varDeps[0] in OTHER_TYPES) ):
-            if (self.type != None):
-                sys.exit("Node passed to traverseAssignNode in VarInfo has multiple node types in right subnode.")
-            self.type = self.varDeps[0]
-
-    def setAssignNode(self, assignNode):
+    def setAssignNode(self, assignNode, funcName):
         if (type(assignNode).__name__ != BINARY_NODE_CLASS_NAME):
             sys.exit("Assignment node passed to VarInfo is invalid.")
 
         self.initCall = False
         self.assignNode = assignNode
+        self.funcName = funcName
         self.traverseAssignNode()
 
         self.beenSet = not(self.initCall)

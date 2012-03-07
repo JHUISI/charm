@@ -51,6 +51,13 @@ debug = levels.none
 # list: 
 # - searchNode => find a particular type of node (ops.PAIR) in a given subtree (node)
 
+def isValidType(possibleType):
+    for validType in types:
+        if (str(possibleType) == str(validType)):
+            return True
+
+    return False
+
 def getListNodeNames(node):
     #if (node.type != ops.LIST):
         #sys.exit("getListNodeNames in SDLang received node that is not of type " + str(ops.LIST))
