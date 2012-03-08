@@ -10,9 +10,11 @@ class PairingGroup():
           pair = params.get(param_file)
           assert pair != None, "'%s' not recognized! See 'pairingcurves.py' in toolbox." % param_file
           self.Pairing = pairing(string=pair)
+          self.param = param_file
         elif type(param_file) == int:
             # support for MIRACL initialization : default arg := MNT160
           self.Pairing = pairing(param_file)
+          self.param   = param_file
  
         self.secparam = secparam # number of bits
         self._verbose = verbose
@@ -44,8 +46,11 @@ class PairingGroup():
                return ismember(self.Pairing, obj)
            return None # ignore non-pairing types
 
+    def groupSetting(self):
+        return 'pairing'
+
     def groupType(self): 
-        return 'PairingGroup'     
+        return self.param
         
     def messageSize(self):
         return self.secparam / 8        

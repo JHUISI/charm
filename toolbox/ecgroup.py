@@ -3,6 +3,7 @@ from charm.ecc import *
 class ECGroup():
     def __init__(self, builtin_cv):
         self.group = ecc(nid=builtin_cv)
+        self.param = builtin_cv
         self._verbose = True
 
     def order(self):
@@ -14,8 +15,11 @@ class ECGroup():
     def paramgen(self, secparam):
         return None
 
+    def groupSetting(self):
+        return 'ecc'
+
     def groupType(self): 
-        return 'ECGroup'     
+        return self.param
 
     def init(self, type=ZR):
         return init(self.group, type)
