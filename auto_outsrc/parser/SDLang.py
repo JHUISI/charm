@@ -27,6 +27,7 @@ import string, sys
 BINARY_NODE_CLASS_NAME = 'BinaryNode'
 NONE_FUNC_NAME = "NONE_FUNC_NAME"
 NONE_STRING = 'None'
+FOR_LOOP_HEADER = "for"
 TYPES_HEADER = "types"
 OTHER_TYPES = ['list', 'object']
 DECL_FUNC_HEADER = "func:"

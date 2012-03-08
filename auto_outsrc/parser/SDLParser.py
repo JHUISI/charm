@@ -17,7 +17,7 @@ varDepList = {}
 varInfList = {}
 varsThatProtectM = {}
 varTypes = {}
-withinForLoop = False
+startLineNo_ForLoop = None
 TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
 ARBITRARY_FUNC = 'func:'
 MESSAGE, SIGNATURE, PUBLIC, LATEX, SETTING = 'message','signature', 'public', 'latex', 'setting'
@@ -134,44 +134,44 @@ class SDLParser:
         return finalPol
     
     # method for evaluating stack assumes operators have two operands and pops them accordingly
-    def evalStack(self, stack):
+    def evalStack(self, stack, line_number):
         op = stack.pop()
         if debug >= levels.some:
             print("op: %s" % op)
         if op in ["+","-","*", "/","^", ":=", "==", "e(", "for{", "do","prod{", "on", "sum{", "of", "|", "and", ";"]:
-            op2 = self.evalStack(stack)
-            op1 = self.evalStack(stack)
+            op2 = self.evalStack(stack, line_number)
+            op1 = self.evalStack(stack, line_number)
             return createTree(op, op1, op2)
         elif op in ["H("]:
-            op2 = self.evalStack(stack)
-            op1 = self.evalStack(stack)
+            op2 = self.evalStack(stack, line_number)
+            op1 = self.evalStack(stack, line_number)
             return createTree(op, op1, op2)
         elif op in ["list{"]:
             ops = []
-            cnt = self.evalStack(stack)
+            cnt = self.evalStack(stack, line_number)
 #            print("count: ", cnt)
             for i in range(int(cnt)):
-                ops.append(self.evalStack(stack))
+                ops.append(self.evalStack(stack, line_number))
             newList = createTree(op, None, None)
             ops.reverse()
             newList.listNodes = list(ops)
             return newList
         elif op in ["random("]:
-            op1 = self.evalStack(stack)
+            op1 = self.evalStack(stack, line_number)
             return createTree(op, op1, None)
         elif FUNC_SYMBOL in op:
             ops = []
-            cnt = self.evalStack(stack)
+            cnt = self.evalStack(stack, line_number)
             if self.verbose: print("func name: ", op.split(FUNC_SYMBOL)[1])
             for i in range(int(cnt)):
-                ops.append(self.evalStack(stack))
+                ops.append(self.evalStack(stack, line_number))
             newList = createTree(op, None, None, op.split(FUNC_SYMBOL)[1])
             ops.reverse()
             newList.listNodes = list(ops)
             return newList
         elif op in [START_TOKEN, END_TOKEN]: # start and end block lines
-            op1 = self.evalStack(stack)
-            global currentFuncName
+            op1 = self.evalStack(stack, line_number)
+            global currentFuncName, forLoops, startLineNo_ForLoop
             if (op1.startswith(DECL_FUNC_HEADER) == True):
                 if (op == START_TOKEN):
                     currentFuncName = op1[len(DECL_FUNC_HEADER):len(op1)]
@@ -182,6 +182,15 @@ class SDLParser:
                     currentFuncName = TYPES_HEADER
                 elif (op == END_TOKEN):
                     currentFuncName = NONE_FUNC_NAME
+            elif (op1 == FOR_LOOP_HEADER):
+                if (op == START_TOKEN):
+                    startLineNo_ForLoop = line_number
+                elif (op == END_TOKEN):
+                    startLineNo_ForLoop = None
+                    lenForLoops = len(forLoops[currentFuncName])
+                    if (forLoops[currentFuncName][lenForLoops - 1].getEndLineNo() != None):
+                        sys.exit("Ending line number of one of the for loops was set prematurely.")
+                    forLoops[currentFuncName][lenForLoops - 1].setEndLineNo(int(line_number))
             return createTree(op, op1, None)
         else:
             # Node value
@@ -199,7 +208,7 @@ class SDLParser:
             tokens = self.finalPol.parseString(line)
             if debug >= levels.some:
                 print("stack =>", objStack)
-            object = self.evalStack(objStack)
+            object = self.evalStack(objStack, line_number)
             if len(objStack) > 0 or object == False:
                 raise TypeError("Invalid SDL Expression!")
             return object
@@ -360,13 +369,16 @@ def getVarTypeInfo(node, varName):
     getVarTypeInfoRecursive(node.right, varName)
 
 def updateAssignInfo(node, i):
-    global assignInfo, varTypes
+    global assignInfo, forLoops, varTypes
 
     if (currentFuncName not in assignInfo):
         assignInfo[currentFuncName] = {}
 
     if (currentFuncName not in varTypes):
         varTypes[currentFuncName] = {}
+
+    if (currentFuncName not in forLoops):
+        forLoops[currentFuncName] = []
 
     assignInfo_Func = assignInfo[currentFuncName]
 
@@ -382,6 +394,11 @@ def updateAssignInfo(node, i):
         varInfoObj.setAssignNode(node, currentFuncName)
         varInfoObj.setLineNo(i)
         assignInfo_Func[varName] = varInfoObj
+
+    if (startLineNo_ForLoop != None):
+        lenForLoops = len(forLoops[currentFuncName])
+        forLoops[currentFuncName][lenForLoops - 1].appendToBinaryNodeList(node)
+        forLoops[currentFuncName][lenForLoops - 1].appendToVarInfoNodeList(assignInfo_Func[varName])
 
     getVarTypeInfo(node, varName)
 
@@ -459,6 +476,17 @@ def getVarsThatProtectM():
             if (assignInfo_Var.getProtectsM() == True and varName not in ASSIGN_KEYWORDS):
                 varsThatProtectM[funcName].append(varName)
 
+def updateForLoops(node, lineNo):
+    if (startLineNo_ForLoop == None):
+        sys.exit("updateForLoops function entered in SDLParser.py when startLineNo_ForLoop is set to None.")
+
+    global forLoops
+
+    retForLoopStruct = ForLoop()
+    retForLoopStruct.updateForLoopStruct(node, startLineNo_ForLoop, currentFuncName)
+
+    forLoops[currentFuncName].append(retForLoopStruct)
+
 # NEW SDL PARSER
 def parseFile2(filename):
     fd = open(filename, 'r')
@@ -476,6 +504,8 @@ def parseFile2(filename):
                 updateAssignInfo(node, i)
             elif (node.type == ops.DO): # handles for loop
                 updateForLoopInfo(node, i)
+            elif (node.type == ops.FOR):
+                updateForLoops(node, i)
 
 # Perform some type checking here?
 # rules: find constants, verify, variable definitions
@@ -924,6 +954,23 @@ def printVarDepORInfLists(listToPrint):
             print("\n")
         print("----------------------")
 
+def printForLoops():
+    for funcName in forLoops:
+        print("FUNCTION NAME:  " + funcName)
+        print("\n")
+        for forLoopObj in forLoops[funcName]:
+            print("Starting value:  " + str(forLoopObj.getStartVal()))
+            print("Ending value:  " + str(forLoopObj.getEndVal()))
+            print("Loop variable name:  " + str(forLoopObj.getLoopVar()))
+            print("Starting line number:  " + str(forLoopObj.getStartLineNo()))
+            print("Ending line number:  " + str(forLoopObj.getEndLineNo()))
+            print("Function name:  " + str(forLoopObj.getFuncName()))
+            print("Binary Nodes:")
+            for binaryNode in forLoopObj.getBinaryNodeList():
+                print("\t" + str(binaryNode))
+            print("Note:  we also have a list of the VarInfo objects associated with each line of the for loop.")
+            print("\n")
+
 def printFinalOutput():
     print("\n")
 
@@ -948,6 +995,12 @@ def printFinalOutput():
 
     print("Variable types inferred so far (more to come soon):\n")
     print(varTypes)
+    print("\n")
+    print("----------------------------")
+    print("\n")
+
+    print("For loops:\n")
+    printForLoops()
     print("\n")
 
 if __name__ == "__main__":
