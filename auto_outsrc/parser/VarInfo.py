@@ -15,6 +15,8 @@ class VarInfo:
         self.initCallHappenedAlready = False
         self.type = types.NO_TYPE
         self.funcName = None
+        self.isList = False
+        self.listNodesList = []
 
     def getAssignNode(self):
         return self.assignNode
@@ -42,6 +44,12 @@ class VarInfo:
 
     def getFuncName(self):
         return self.funcName
+
+    def getIsList(self):
+        return self.isList
+
+    def getListNodesList(self):
+        return self.listNodesList
 
     def traverseAssignNodeRecursive(self, node):
         if (node.type == ops.PAIR):
@@ -82,6 +90,11 @@ class VarInfo:
         self.varDeps = []
         self.hasPairings = False
         self.protectsM = False
+
+        if (self.assignNode.right.type == ops.LIST):
+            self.isList = True
+            self.type = ops.LIST
+            addListNodesToList(self.assignNode.right, self.listNodesList)
 
         self.traverseAssignNodeRecursive(self.assignNode.right)
 

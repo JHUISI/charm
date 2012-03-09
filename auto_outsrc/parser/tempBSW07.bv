@@ -1,4 +1,7 @@
 name := bsw07
+setting := asymmetric
+
+x := list{y, z, g}
 
 BEGIN :: for
 for{y := 1, Y} 
@@ -78,7 +81,7 @@ C    := h ^ s
 
 BEGIN :: for
 for{y := 1, Y}
-share_y := sh#attrs#y?
+share_y := sh#attrs#y
 Cr_y := g1 ^ share_y
 Cpr_y := (H(attrs_y, G2))^share_y
 END :: for

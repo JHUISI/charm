@@ -27,6 +27,11 @@ import string, sys
 BINARY_NODE_CLASS_NAME = 'BinaryNode'
 NONE_FUNC_NAME = "NONE_FUNC_NAME"
 NONE_STRING = 'None'
+SYMMETRIC_SETTING = "symmetric"
+ASYMMETRIC_SETTING = "asymmetric"
+ALGEBRAIC_SETTING = "setting"
+LIST_INDEX_SYMBOL = "#"
+LIST_INDEX_END_SYMBOL = "?"
 FOR_LOOP_HEADER = "for"
 TYPES_HEADER = "types"
 OTHER_TYPES = ['list', 'object']

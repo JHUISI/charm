@@ -17,6 +17,7 @@ varDepList = {}
 varInfList = {}
 varsThatProtectM = {}
 varTypes = {}
+algebraicSetting = None
 startLineNo_ForLoop = None
 TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
 ARBITRARY_FUNC = 'func:'
@@ -347,26 +348,111 @@ def updateVarTypes(varTypeSubStruct, varName, type):
 
     varTypeSubStruct[varName] = type
 
-def getVarTypeInfoRecursive(node, varName):
-    global varTypes
+def checkPairingInputTypes_Symmetric(leftType, rightType):
+    if ( (leftType != types.G1) and (leftType != types.G2) ):
+        sys.exit("Problem with the left side of one of the pairings in the symmetric setting.")
 
+    if ( (rightType != types.G1) and (rightType != types.G2) ):
+        sys.exit("Problem with the right side of one of the pairings in the symmetric setting.")
+
+def checkPairingInputTypes_Asymmetric(leftType, rightType):
+    if (leftType != types.G1):
+        sys.exit("One of the pairings in the asymmetric setting does not have a left side of type " + str(types.G1))
+
+    if (rightType != types.G2):
+        sys.exit("One of the pairings in the asymmetric setting does not have a right side of type " + str(types.G2))
+
+def checkPairingInputTypes(node):
+    if (node.type != ops.PAIR):
+        sys.exit("checkPairingInputTypes in SDLParser was passed a node that is not of type " + str(ops.PAIR))
+
+    leftType = getVarTypeInfoRecursive(node.left)
+    rightType = getVarTypeInfoRecursive(node.right)
+
+    if (algebraicSetting == SYMMETRIC_SETTING):
+        checkPairingInputTypes_Symmetric(leftType, rightType)
+    elif (algebraicSetting == ASYMMETRIC_SETTING):
+        checkPairingInputTypes_Asymmetric(leftType, rightType)
+    else:
+        sys.exit("Algebraic setting is set to unsupported value (found in checkPairingInputTypes in SDLParser).")
+
+def getVarNameEntryFromAssignInfo(varName):
+    retVal = None
+
+    for funcName in assignInfo:
+        for currentVarName in assignInfo[funcName]:
+            if (currentVarName == varName):
+                if (retVal != None):
+                    sys.exit("Found duplicate variable names stored in assignInfo.")
+                retVal = assignInfo[funcName][currentVarName]
+
+    if (retVal == None):
+        sys.exit("getVarNameEntryFromAssignInfo in SDLParser.py could not locate entry in assignInfo of the name passed in.")
+
+    return retVal
+
+def getNextListName(origListName, index):
+    listEntryInAssignInfo = getVarNameEntryFromAssignInfo(origListName)
+    if ( (listEntryInAssignInfo.isList() == False) or (len(listEntryInAssignInfo.getListNodesList()) == 0) ):
+        sys.exit("Problem with list obtained from assignInfo in getNextListName in SDLParser.")
+
+    listNodesList = listEntryInAssignInfo.getListNodesList()
+
+    index += 1
+
+    starthere
+
+def getVarNameFromListIndices(node):
+    if (node.type != ops.ATTR):
+        sys.exit("Node passed to getVarNameFromListIndex in SDLParser is not of type " + str(ops.ATTR))
+
+    if (node.attr.find(LIST_INDEX_SYMBOL) == -1):
+        sys.exit("Node passed to getVarNameFromListIndex is not a reference to an index in a list.")
+
+    nodeName = node.attr
+    nodeNameSplit = nodeName.split(LIST_INDEX_SYMBOL)
+    origListName = nodeNameSplit[0]
+    nodeNameSplit.remove(origListName)
+
+    for listIndex in nodeNameSplit:
+        if (listIndex.isdigit() == False):
+            return None
+        newListName = 
+
+
+
+
+    #listNameLastCharIndex = node.attr.find(LIST_INDEX_SYMBOL)
+    #listName = node.attr[0:listNameLastCharIndex]
+
+
+
+    #dddd
+
+def getVarTypeInfoRecursive(node):
     if (node.type == ops.RANDOM):
-        updateVarTypes(varTypes[currentFuncName], varName, node.left.attr)
-        return
+        return node.left.attr
+    if (node.type == ops.EXP):
+        return getVarTypeInfoRecursive(node.left)
+    if (node.type == ops.PAIR):
+        checkPairingInputTypes(node)
+        return types.GT
+    if (node.type == ops.ATTR):
+        if (node.attr in varTypes[currentFuncName]):
+            return varTypes[currentFuncName][node.attr]
+        if (node.attr.find(LIST_INDEX_SYMBOL) != -1):
+            varNameInList = getVarNameFromListIndices(node)
 
-    if (node.left != None):
-        getVarTypeInfoRecursive(node.left, varName)
-    if (node.right != None):
-        getVarTypeInfoRecursive(node.right, varName)
+    return types.NO_TYPE
 
 def getVarTypeInfo(node, varName):
-    global varTypes
-
     if (currentFuncName == TYPES_HEADER):
         updateVarTypes(varTypes[currentFuncName], varName, assignInfo[currentFuncName][varName].getType())
         return
 
-    getVarTypeInfoRecursive(node.right, varName)
+    retVarType = getVarTypeInfoRecursive(node.right)
+    if (retVarType != types.NO_TYPE):
+        updateVarTypes(varTypes[currentFuncName], varName, retVarType)
 
 def updateAssignInfo(node, i):
     global assignInfo, forLoops, varTypes
@@ -401,6 +487,19 @@ def updateAssignInfo(node, i):
         forLoops[currentFuncName][lenForLoops - 1].appendToVarInfoNodeList(assignInfo_Func[varName])
 
     getVarTypeInfo(node, varName)
+
+    global algebraicSetting
+
+    if ( (varName == ALGEBRAIC_SETTING) and (currentFuncName == NONE_FUNC_NAME) ):
+        if (algebraicSetting != None):
+            sys.exit("Algebraic setting has been set more than once.")
+        algSettingVarDepList = assignInfo_Func[varName].getVarDeps()
+        if (len(algSettingVarDepList) != 1):
+            sys.exit("Wrong number of arguments specified for algebraic setting.")
+        if ( (algSettingVarDepList[0] != SYMMETRIC_SETTING) and (algSettingVarDepList[0] != ASYMMETRIC_SETTING) ):
+            sys.exit("Incorrect value specified for algebraic setting.")
+
+        algebraicSetting = algSettingVarDepList[0]
 
 def visitMultiLineNodes(node, i):
     if node == None:
@@ -971,6 +1070,14 @@ def printForLoops():
             print("Note:  we also have a list of the VarInfo objects associated with each line of the for loop.")
             print("\n")
 
+def printVarTypes():
+    for funcName in varTypes:
+        print("FUNCTION NAME:  " + funcName)
+        print("\n")
+        for varName in varTypes[funcName]:
+            print(str(varName) + " -> " + str(varTypes[funcName][varName]))
+        print("\n")
+
 def printFinalOutput():
     print("\n")
 
@@ -994,14 +1101,16 @@ def printFinalOutput():
     '''
 
     print("Variable types inferred so far (more to come soon):\n")
-    print(varTypes)
+    printVarTypes()
     print("\n")
     print("----------------------------")
     print("\n")
 
+    '''
     print("For loops:\n")
     printForLoops()
     print("\n")
+    '''
 
 if __name__ == "__main__":
     #print(sys.argv[1:])
