@@ -1,4 +1,5 @@
 name := bsw07
+setting := asymmetric
 
 BEGIN :: types
 policy_str := str
@@ -41,7 +42,12 @@ Dj := list{}
 Djp := list{}
 
 Y := len(S)
-for{y := 1, Y} do { (s_y := random(ZR)); (Dj_y := p0 * (H(S_y, G2)^s_y)); (Djp_y := g^s_y) }
+BEGIN :: for
+for{y := 1, Y}
+s_y := random(ZR)
+Dj_y := p0 * (H(S_y, G2)^s_y)
+Djp_y := g^s_y
+END :: for
 
 sk := list{S, D, Dj, Djp}
 return := sk
@@ -64,7 +70,12 @@ egg := pk#2
 Ctl := M * egg^s
 C    := h ^ s
 
-for{y := 1, Y} do { (share_y := sh#attrs#y?); (Cr_y := g1 ^ share_y); (Cpr_y := (H(attrs_y, G2))^share_y) }
+BEGIN :: for
+for{y := 1, Y}
+share_y := sh#attrs#y
+Cr_y := g1 ^ share_y
+Cpr_y := (H(attrs_y, G2))^share_y
+END :: for
 
 ct := list{policy_str, Ctl, C, Cr, Cpr}
 return := ct
@@ -91,7 +102,10 @@ coeff := getCoefficients(policy)
 
 Y := len(attrs)
 A := init(1)
-for{y := 1, Y} do { A := A * ((e(Cr_y, Dj_y) / e(Djp_y, Cpr_y))^coeff_y) }
+BEGIN :: for
+for{y := 1, Y}
+A := A * ((e(Cr_y, Dj_y) / e(Djp_y, Cpr_y))^coeff_y)
+END :: for
 
 result0 := e(C, D) / A
 M := Ctl / result0
