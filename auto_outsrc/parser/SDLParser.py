@@ -377,30 +377,29 @@ def checkPairingInputTypes(node):
         sys.exit("Algebraic setting is set to unsupported value (found in checkPairingInputTypes in SDLParser).")
 
 def getVarNameEntryFromAssignInfo(varName):
-    retVal = None
+    retFuncName = None
+    retVarName = None
 
     for funcName in assignInfo:
         for currentVarName in assignInfo[funcName]:
             if (currentVarName == varName):
-                if (retVal != None):
+                if ( (retVarName != None) or (retFuncName != None) ):
                     sys.exit("Found duplicate variable names stored in assignInfo.")
-                retVal = assignInfo[funcName][currentVarName]
+                retFuncName = funcName
+                retVarName = assignInfo[funcName][currentVarName]
 
-    if (retVal == None):
+    if ( (retVarName == None) or (retFuncName == None) ):
         sys.exit("getVarNameEntryFromAssignInfo in SDLParser.py could not locate entry in assignInfo of the name passed in.")
 
-    return retVal
+    return (retFuncName, retVarName)
 
 def getNextListName(origListName, index):
-    listEntryInAssignInfo = getVarNameEntryFromAssignInfo(origListName)
-    if ( (listEntryInAssignInfo.isList() == False) or (len(listEntryInAssignInfo.getListNodesList()) == 0) ):
+    (listFuncNameInAssignInfo, listEntryInAssignInfo) = getVarNameEntryFromAssignInfo(origListName)
+    if ( (listEntryInAssignInfo.getIsList() == False) or (len(listEntryInAssignInfo.getListNodesList()) == 0) ):
         sys.exit("Problem with list obtained from assignInfo in getNextListName in SDLParser.")
 
     listNodesList = listEntryInAssignInfo.getListNodesList()
-
-    index += 1
-
-    starthere
+    return (listFuncNameInAssignInfo, listNodesList[int(index)])
 
 def getVarNameFromListIndices(node):
     if (node.type != ops.ATTR):
@@ -411,23 +410,15 @@ def getVarNameFromListIndices(node):
 
     nodeName = node.attr
     nodeNameSplit = nodeName.split(LIST_INDEX_SYMBOL)
-    origListName = nodeNameSplit[0]
-    nodeNameSplit.remove(origListName)
+    currentListName = nodeNameSplit[0]
+    nodeNameSplit.remove(currentListName)
 
     for listIndex in nodeNameSplit:
         if (listIndex.isdigit() == False):
-            return None
-        newListName = 
+            return (None, None)
+        (currentFuncName, currentListName) = getNextListName(currentListName, listIndex)
 
-
-
-
-    #listNameLastCharIndex = node.attr.find(LIST_INDEX_SYMBOL)
-    #listName = node.attr[0:listNameLastCharIndex]
-
-
-
-    #dddd
+    return (currentFuncName, currentListName)
 
 def getVarTypeInfoRecursive(node):
     if (node.type == ops.RANDOM):
@@ -441,7 +432,13 @@ def getVarTypeInfoRecursive(node):
         if (node.attr in varTypes[currentFuncName]):
             return varTypes[currentFuncName][node.attr]
         if (node.attr.find(LIST_INDEX_SYMBOL) != -1):
-            varNameInList = getVarNameFromListIndices(node)
+            (funcNameOfVar, varNameInList) = getVarNameFromListIndices(node)
+            if ( (funcNameOfVar == None) or (varNameInList == None) ):
+                return types.NO_TYPE
+            print(node)
+            print(varTypes[funcNameOfVar][varNameInList])
+            print("\n")
+            return varTypes[funcNameOfVar][varNameInList]
 
     return types.NO_TYPE
 
@@ -1101,7 +1098,7 @@ def printFinalOutput():
     '''
 
     print("Variable types inferred so far (more to come soon):\n")
-    printVarTypes()
+    #printVarTypes()
     print("\n")
     print("----------------------------")
     print("\n")
