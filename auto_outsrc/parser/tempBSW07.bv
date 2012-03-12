@@ -1,15 +1,6 @@
 name := bsw07
 setting := asymmetric
 
-x := list{y, z, g}
-
-BEGIN :: for
-for{y := 1, Y} 
-s_y := random(ZR))
-Dj_y := p0 * (H(S_y, G2)^s_y))
-Djp_y := g^s_y
-END :: for
-
 BEGIN :: types
 policy_str := str
 policy := object
@@ -39,7 +30,6 @@ pk := list{g, g2, h, f, egg}
 return := list{mk, pk}
 END :: func:setup
 
-
 BEGIN :: func:keygen
 input := list{pk, mk, S} 
 output := sk
@@ -51,18 +41,16 @@ Dj := list{}
 Djp := list{}
 
 Y := len(S)
-
 BEGIN :: for
-for{y := 1, Y} 
-s_y := random(ZR))
-Dj_y := p0 * (H(S_y, G2)^s_y))
+for{y := 1, Y}
+s_y := random(ZR)
+Dj_y := p0 * (H(S_y, G2)^s_y)
 Djp_y := g^s_y
 END :: for
 
 sk := list{S, D, Dj, Djp}
 return := sk
 END :: func:keygen
-
 
 BEGIN :: func:encrypt
 input := list{pk, M, policy_str}
@@ -90,7 +78,6 @@ END :: for
 ct := list{policy_str, Ctl, C, Cr, Cpr}
 return := ct
 END :: func:encrypt
-
 
 BEGIN :: func:decrypt
 input := list{pk, sk, ct}
@@ -122,4 +109,3 @@ M := Ctl / result0
 
 return := M
 END :: func:decrypt
-

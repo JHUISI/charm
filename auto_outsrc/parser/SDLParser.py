@@ -427,12 +427,27 @@ def getVarNameFromListIndices(node):
 
 def getVarTypeInfoRecursive(node):
     if (node.type == ops.RANDOM):
-        return node.left.attr
+        retRandomType = node.left.attr
+        if (str(retRandomType) not in [str(types.G1), str(types.G2), str(types.GT), str(types.ZR)]):
+            sys.exit("getVarTypeInfoRecursive in SDLParser.py found a random call in which the type is not one of the supported types (" + str(types.G1) + ", " + str(types.G2) + ", " + str(types.GT) + ", and " + str(types.ZR) + ").")
+        return retRandomType
     if (node.type == ops.EXP):
         return getVarTypeInfoRecursive(node.left)
+    if ( (node.type == ops.ADD) or (node.type == ops.SUB) or (node.type == ops.MUL) or (node.type == ops.DIV) ):
+        leftSideType = getVarTypeInfoRecursive(node.left)
+        rightSideType = getVarTypeInfoRecursive(node.right)
+        if (leftSideType != rightSideType):
+            print(node)
+            sys.exit("getVarTypeInfoRecursive in SDLParser.py found an operation of type ADD, SUB, MUL, or DIV in which the left and right sides were not of the same type.")
+        return leftSideType
     if (node.type == ops.PAIR):
         checkPairingInputTypes(node)
         return types.GT
+    if (node.type == ops.HASH):
+        retHashType = node.right.attr
+        if (str(retHashType) not in [str(types.ZR), str(types.G1), str(types.G2)]):
+            sys.exit("getVarTypeInfoRecursive in SDLParser.py found a hash operation that does not hash to a supported hash type (" + str(types.ZR) + ", " + str(types.G1) + ", and " + str(types.G2) + ").")
+        return retHashType
     if (node.type == ops.ATTR):
         if (node.attr in varTypes[currentFuncName]):
             return varTypes[currentFuncName][node.attr]
