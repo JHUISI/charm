@@ -65,7 +65,7 @@ sh := calculateShares(s, policy)
 Y := len(sh)
 g1 := pk#0
 h := pk#2
-egg := pk#2
+egg := pk#5
 
 Ctl := M * egg^s
 C    := h ^ s
