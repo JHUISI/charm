@@ -17,6 +17,7 @@ attrs := list
 sh := list
 coeff := list
 share := list
+S := list
 END :: types
 
 BEGIN :: func:setup

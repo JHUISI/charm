@@ -378,20 +378,25 @@ def checkPairingInputTypes(node):
 
 def getVarNameEntryFromAssignInfo(varName):
     retFuncName = None
-    retVarName = None
+    retVarInfoObj = None
 
     for funcName in assignInfo:
         for currentVarName in assignInfo[funcName]:
             if (currentVarName == varName):
-                if ( (retVarName != None) or (retFuncName != None) ):
-                    sys.exit("Found duplicate variable names stored in assignInfo.")
-                retFuncName = funcName
-                retVarName = assignInfo[funcName][currentVarName]
+                if ( (retVarInfoObj != None) or (retFuncName != None) ):
+                    if ( (funcName != TYPES_HEADER) and (retFuncName != TYPES_HEADER) ):
+                        sys.exit("getVarNameEntryFromAssignInfo in SDLParser.py found multiple assignments of the same variable is assignInfo in which neither of the functions is " + str(TYPES_HEADER))
+                    if (funcName == TYPES_HEADER):
+                        retFuncName = funcName
+                        retVarInfoObj = assignInfo[funcName][currentVarName]
+                else:
+                    retFuncName = funcName
+                    retVarInfoObj = assignInfo[funcName][currentVarName]
 
-    if ( (retVarName == None) or (retFuncName == None) ):
+    if ( (retVarInfoObj == None) or (retFuncName == None) ):
         sys.exit("getVarNameEntryFromAssignInfo in SDLParser.py could not locate entry in assignInfo of the name passed in.")
 
-    return (retFuncName, retVarName)
+    return (retFuncName, retVarInfoObj)
 
 def getNextListName(origListName, index):
     (listFuncNameInAssignInfo, listEntryInAssignInfo) = getVarNameEntryFromAssignInfo(origListName)
@@ -435,10 +440,16 @@ def getVarTypeInfoRecursive(node):
             (funcNameOfVar, varNameInList) = getVarNameFromListIndices(node)
             if ( (funcNameOfVar == None) or (varNameInList == None) ):
                 return types.NO_TYPE
+            try:
+                retVarType = varTypes[funcNameOfVar][varNameInList]
+            except:
+                (outsideFunctionName, retVarInfoObj) = getVarNameEntryFromAssignInfo(varNameInList)
+                retVarType = varTypes[outsideFunctionName][varNameInList]
+
             print(node)
-            print(varTypes[funcNameOfVar][varNameInList])
+            print(retVarType)
             print("\n")
-            return varTypes[funcNameOfVar][varNameInList]
+            return retVarType
 
     return types.NO_TYPE
 
