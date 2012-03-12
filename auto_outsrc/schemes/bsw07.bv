@@ -20,7 +20,7 @@ beta := random(ZR)
 
 h := g^beta
 f := g^(1/beta)
-i := g^alpha
+i := g2^alpha
 egg := e(g, g2)^alpha
 
 mk := list{beta, i}
