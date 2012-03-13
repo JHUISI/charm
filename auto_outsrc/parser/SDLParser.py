@@ -384,22 +384,33 @@ def getVarNameEntryFromAssignInfo(varName):
         for currentVarName in assignInfo[funcName]:
             if (currentVarName == varName):
                 if ( (retVarInfoObj != None) or (retFuncName != None) ):
-                    if ( (funcName != TYPES_HEADER) and (retFuncName != TYPES_HEADER) ):
-                        sys.exit("getVarNameEntryFromAssignInfo in SDLParser.py found multiple assignments of the same variable is assignInfo in which neither of the functions is " + str(TYPES_HEADER))
+                    #if ( (funcName != TYPES_HEADER) and (retFuncName != TYPES_HEADER) ):
+                        #sys.exit("getVarNameEntryFromAssignInfo in SDLParser.py found multiple assignments of the same variable is assignInfo in which neither of the functions is " + str(TYPES_HEADER))
                     if (funcName == TYPES_HEADER):
                         retFuncName = funcName
                         retVarInfoObj = assignInfo[funcName][currentVarName]
+                    elif (retFuncName == TYPES_HEADER):
+                        pass
+                    elif ( (retVarInfoObj.hasBeenSet() == False) and (assignInfo[funcName][currentVarName].hasBeenSet() == True) ):
+                        retFuncName = funcName
+                        retVarInfoObj = assignInfo[funcName][currentVarName]
+                    elif ( (retVarInfoObj.hasBeenSet() == True) and (assignInfo[funcName][currentVarName].hasBeenSet() == False) ):
+                        pass
+                    else:
+                        sys.exit("getVarNameEntryFromAssignInfo in SDLParser.py found multiple assignments of the same variable is assignInfo in which neither of the functions is " + str(TYPES_HEADER))
                 else:
                     retFuncName = funcName
                     retVarInfoObj = assignInfo[funcName][currentVarName]
 
-    if ( (retVarInfoObj == None) or (retFuncName == None) ):
-        sys.exit("getVarNameEntryFromAssignInfo in SDLParser.py could not locate entry in assignInfo of the name passed in.")
+    #if ( (retVarInfoObj == None) or (retFuncName == None) ):
+        #sys.exit("getVarNameEntryFromAssignInfo in SDLParser.py could not locate entry in assignInfo of the name passed in.")
 
     return (retFuncName, retVarInfoObj)
 
 def getNextListName(origListName, index):
     (listFuncNameInAssignInfo, listEntryInAssignInfo) = getVarNameEntryFromAssignInfo(origListName)
+    if ( (listFuncNameInAssignInfo == None) or (listEntryInAssignInfo == None) ):
+        sys.exit("Problem with return values from getVarNameEntryFromAssignInfo in getNextListName in SDLParser.py.")
     if ( (listEntryInAssignInfo.getIsList() == False) or (len(listEntryInAssignInfo.getListNodesList()) == 0) ):
         sys.exit("Problem with list obtained from assignInfo in getNextListName in SDLParser.")
 
@@ -464,6 +475,8 @@ def getVarTypeInfoRecursive(node):
                 retVarType = varTypes[funcNameOfVar][varNameInList]
             except:
                 (outsideFunctionName, retVarInfoObj) = getVarNameEntryFromAssignInfo(varNameInList)
+                if ( (outsideFunctionName == None) or (retVarInfoObj == None) or (varNameInList not in varTypes[outsideFunctionName]) ):
+                    sys.exit("Problem with return values from getVarNameEntryFromAssignInfo in getVarTypeInfoRecursive in SDLParser.py.") 
                 retVarType = varTypes[outsideFunctionName][varNameInList]
             print(node)
             print(retVarType)
@@ -471,7 +484,8 @@ def getVarTypeInfoRecursive(node):
             return retVarType
         else:
             (outsideFunctionName, retVarInfoObj) = getVarNameEntryFromAssignInfo(node.attr)
-            return varTypes[outsideFunctionName][node.attr]
+            if ( (outsideFunctionName != None) and (node.attr in varTypes[outsideFunctionName]) ):
+                return varTypes[outsideFunctionName][node.attr]
 
     return types.NO_TYPE
 

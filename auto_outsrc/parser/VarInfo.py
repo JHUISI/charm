@@ -39,6 +39,12 @@ class VarInfo:
     def hasBeenSet(self):
         return self.beenSet
 
+    def getInitCall(self):
+        return self.initCall
+
+    def getInitCallHappenedAlready(self):
+        return self.initCallHappenedAlready
+
     def getType(self):
         return self.type
 

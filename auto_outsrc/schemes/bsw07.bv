@@ -10,6 +10,10 @@ coeff := list
 share := list
 S := list
 M := GT
+Dj := list
+Djp := list
+Cr := list
+Cpr := list
 END :: types
 
 BEGIN :: func:setup
@@ -39,15 +43,15 @@ output := sk
 r := random(ZR)
 p0 := pk#1^r
 D := (mk#1 * p0)^(1/mk#0)
-Dj := list{}
-Djp := list{}
+Dj := init(list)
+Djp := init(list)
 
 Y := len(S)
 BEGIN :: for
 for{y := 1, Y}
 s_y := random(ZR)
-Dj_y := p0 * (H(S_y, G2)^s_y)
-Djp_y := g^s_y
+Dj#y := p0 * (H(S#y, G2)^s_y)
+Djp#y := g^s_y
 END :: for
 
 sk := list{S, D, Dj, Djp}
@@ -73,9 +77,9 @@ C    := h ^ s
 
 BEGIN :: for
 for{y := 1, Y}
-share_y := sh#attrs#y
-Cr_y := g1 ^ share_y
-Cpr_y := (H(attrs_y, G2))^share_y
+share#y := sh#attrs#y
+Cr#y := g1 ^ share#y
+Cpr#y := (H(attrs#y, G2))^share#y
 END :: for
 
 ct := list{policy_str, Ctl, C, Cr, Cpr}
@@ -105,7 +109,7 @@ Y := len(attrs)
 A := init(1)
 BEGIN :: for
 for{y := 1, Y}
-A := A * ((e(Cr_y, Dj_y) / e(Djp_y, Cpr_y))^coeff_y)
+A := A * ((e(Cr#y, Dj#y) / e(Djp#y, Cpr#y))^coeff#y)
 END :: for
 
 result0 := e(C, D) / A
