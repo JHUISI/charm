@@ -9,6 +9,7 @@ sh := list
 coeff := list
 share := list
 S := list
+M := GT
 END :: types
 
 BEGIN :: func:setup
@@ -65,7 +66,7 @@ sh := calculateShares(s, policy)
 Y := len(sh)
 g1 := pk#0
 h := pk#2
-egg := pk#5
+egg := pk#4
 
 Ctl := M * egg^s
 C    := h ^ s

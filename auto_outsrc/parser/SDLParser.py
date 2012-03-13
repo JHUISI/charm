@@ -404,7 +404,12 @@ def getNextListName(origListName, index):
         sys.exit("Problem with list obtained from assignInfo in getNextListName in SDLParser.")
 
     listNodesList = listEntryInAssignInfo.getListNodesList()
-    return (listFuncNameInAssignInfo, listNodesList[int(index)])
+    index = int(index)
+    lenListNodesList = len(listNodesList)
+    if (index >= lenListNodesList):
+        sys.exit("getNextListName in SDLParser.py found that the index submitted as input is greater than the length of the listNodesList returned from getVarNameEntryFromAssignInfo.")
+
+    return (listFuncNameInAssignInfo, listNodesList[index])
 
 def getVarNameFromListIndices(node):
     if (node.type != ops.ATTR):
@@ -460,11 +465,13 @@ def getVarTypeInfoRecursive(node):
             except:
                 (outsideFunctionName, retVarInfoObj) = getVarNameEntryFromAssignInfo(varNameInList)
                 retVarType = varTypes[outsideFunctionName][varNameInList]
-
             print(node)
             print(retVarType)
             print("\n")
             return retVarType
+        else:
+            (outsideFunctionName, retVarInfoObj) = getVarNameEntryFromAssignInfo(node.attr)
+            return varTypes[outsideFunctionName][node.attr]
 
     return types.NO_TYPE
 
