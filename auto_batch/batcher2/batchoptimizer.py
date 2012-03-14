@@ -471,10 +471,18 @@ class SubstitutePairs2:
             #print("Found MUL node: ", subtree1, subtree2)
             return batchtechniques.AbstractTechnique.createMul(subtree1, subtree2)
         elif Type(subtree1) == Type(subtree2) and Type(subtree1) == ops.EXP:
-            #print("Found EXP node: ", subtree1, subtree2)
+            if str(subtree1.left) == str(subtree2.left):
+                print("Found EXP node bases that match: ", subtree1, subtree2)
+                # this is for the situation where the bases are the same
+                # e.g., g^x * g^y => g^(x + y)
+                addNode = BinaryNode(ops.ADD)
+                addNode.left = subtree1.right
+                addNode.right = subtree2.right
+                return batchtechniques.AbstractTechnique.createExp(subtree1.left, addNode)
             return batchtechniques.AbstractTechnique.createMul(subtree1, subtree2)
         else:
             #print("Found node: ", Type(subtree1), Type(subtree2))
+            #print("Combining these two: ", subtree1, subtree2)
             return BinaryNode(ops.MUL, BinaryNode.copy(subtree1), BinaryNode.copy(subtree2))
 
 class PruneTree:

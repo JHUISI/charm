@@ -671,13 +671,13 @@ if __name__ == "__main__":
     equation = parser.parse(statement)
 
     print("Original: ", equation)
-#    tech2 = Technique2()
-#    ASTVisitor(tech2).preorder(equation)
-#    print("Tech 2: ", equation)
-#        
-#    tech1 = Technique1()
-#    ASTVisitor(tech1).preorder(equation)
-#    print("Tech 1: ", equation)
+    tech2 = Technique2()
+    ASTVisitor(tech2).preorder(equation)
+    print("Tech 2: ", equation)
+        
+    tech1 = Technique1()
+    ASTVisitor(tech1).preorder(equation)
+    print("Tech 1: ", equation)
     
     tech3 = Technique3()
     ASTVisitor(tech3).preorder(equation)
