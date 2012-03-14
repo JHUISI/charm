@@ -106,11 +106,7 @@ attrs  := prune(policy, S)
 coeff := getCoefficients(policy)
 
 Y := len(attrs)
-A := init(1)
-BEGIN :: for
-for{y := 1, Y}
-A := A * ((e(Cr#y, Dj#y) / e(Djp#y, Cpr#y))^coeff#y)
-END :: for
+A := { prod{y := 1, Y} on ((e(Cr#y, Dj#y) / e(Djp#y, Cpr#y))^coeff#y) }
 
 result0 := e(C, D) / A
 M := Ctl / result0
