@@ -384,12 +384,10 @@ def getVarNameEntryFromAssignInfo(varName):
         for currentVarName in assignInfo[funcName]:
             if (currentVarName == varName):
                 if ( (retVarInfoObj != None) or (retFuncName != None) ):
-                    #if ( (funcName != TYPES_HEADER) and (retFuncName != TYPES_HEADER) ):
-                        #sys.exit("getVarNameEntryFromAssignInfo in SDLParser.py found multiple assignments of the same variable is assignInfo in which neither of the functions is " + str(TYPES_HEADER))
-                    if (funcName == TYPES_HEADER):
+                    if (funcName != TYPES_HEADER):
                         retFuncName = funcName
                         retVarInfoObj = assignInfo[funcName][currentVarName]
-                    elif (retFuncName == TYPES_HEADER):
+                    elif (retFuncName != TYPES_HEADER):
                         pass
                     elif ( (retVarInfoObj.hasBeenSet() == False) and (assignInfo[funcName][currentVarName].hasBeenSet() == True) ):
                         retFuncName = funcName
@@ -436,7 +434,8 @@ def getVarNameFromListIndices(node):
 
     for listIndex in nodeNameSplit:
         if (listIndex.isdigit() == False):
-            return (None, None)
+            (tempFuncName, tempListName) = getVarNameEntryFromAssignInfo(currentListName)
+            return (tempFuncName, currentListName)
         (currentFuncName, currentListName) = getNextListName(currentListName, listIndex)
 
     return (currentFuncName, currentListName)
@@ -447,6 +446,8 @@ def getVarTypeInfoRecursive(node):
         if (str(retRandomType) not in [str(types.G1), str(types.G2), str(types.GT), str(types.ZR)]):
             sys.exit("getVarTypeInfoRecursive in SDLParser.py found a random call in which the type is not one of the supported types (" + str(types.G1) + ", " + str(types.G2) + ", " + str(types.GT) + ", and " + str(types.ZR) + ").")
         return retRandomType
+    if (node.type == ops.ON):
+        return getVarTypeInfoRecursive(node.right)
     if (node.type == ops.EXP):
         return getVarTypeInfoRecursive(node.left)
     if ( (node.type == ops.ADD) or (node.type == ops.SUB) or (node.type == ops.MUL) or (node.type == ops.DIV) ):
@@ -476,11 +477,8 @@ def getVarTypeInfoRecursive(node):
             except:
                 (outsideFunctionName, retVarInfoObj) = getVarNameEntryFromAssignInfo(varNameInList)
                 if ( (outsideFunctionName == None) or (retVarInfoObj == None) or (varNameInList not in varTypes[outsideFunctionName]) ):
-                    sys.exit("Problem with return values from getVarNameEntryFromAssignInfo in getVarTypeInfoRecursive in SDLParser.py.") 
-                retVarType = varTypes[outsideFunctionName][varNameInList]
-            print(node)
-            print(retVarType)
-            print("\n")
+                    return types.NO_TYPE
+                retVarType = varTypes[outsideFunctionName][varNameInList]            
             return retVarType
         else:
             (outsideFunctionName, retVarInfoObj) = getVarNameEntryFromAssignInfo(node.attr)
@@ -512,23 +510,26 @@ def updateAssignInfo(node, i):
 
     assignInfo_Func = assignInfo[currentFuncName]
 
+    currentForLoopObj = None
+    if (startLineNo_ForLoop != None):
+        lenForLoops = len(forLoops[currentFuncName])
+        currentForLoopObj = forLoops[currentFuncName][lenForLoops - 1]
+
     varName = getFullVarName(node.left)
-    #print("varName in updateAssignInfo :=", varName)
     if (varName in assignInfo_Func):
         if (assignInfo_Func[varName].hasBeenSet() == True):
             sys.exit("Found multiple assignments of same variable name within same function.")
-        assignInfo_Func[varName].setAssignNode(node, currentFuncName)
         assignInfo_Func[varName].setLineNo(i)
+        assignInfo_Func[varName].setAssignNode(node, currentFuncName, currentForLoopObj)
     else:
         varInfoObj = VarInfo()
-        varInfoObj.setAssignNode(node, currentFuncName)
         varInfoObj.setLineNo(i)
+        varInfoObj.setAssignNode(node, currentFuncName, currentForLoopObj)
         assignInfo_Func[varName] = varInfoObj
 
-    if (startLineNo_ForLoop != None):
-        lenForLoops = len(forLoops[currentFuncName])
-        forLoops[currentFuncName][lenForLoops - 1].appendToBinaryNodeList(node)
-        forLoops[currentFuncName][lenForLoops - 1].appendToVarInfoNodeList(assignInfo_Func[varName])
+    if (currentForLoopObj != None):
+        currentForLoopObj.appendToBinaryNodeList(node)
+        currentForLoopObj.appendToVarInfoNodeList(assignInfo_Func[varName])
 
     getVarTypeInfo(node, varName)
 
@@ -544,33 +545,6 @@ def updateAssignInfo(node, i):
             sys.exit("Incorrect value specified for algebraic setting.")
 
         algebraicSetting = algSettingVarDepList[0]
-
-def visitMultiLineNodes(node, i):
-    if node == None:
-        return
-    if node.type == ops.EQ:
-        #print("statement: ", node)
-        updateAssignInfo(BinaryNode.copy(node), i)
-        return
-    if node.left: visitMultiLineNodes(node.left, i)
-    if node.right: visitMultiLineNodes(node.right, i)
-
-def updateForLoopInfo(node, i):    
-    varName = 'loop' + str(i)
-    print("identified varName: ", varName)    
-    # recover assign statements within the for loop
-    if (currentFuncName not in assignInfo):
-        assignInfo[currentFuncName] = {}
-
-    assignInfo_Func = assignInfo[currentFuncName]
-    
-    visitMultiLineNodes(node.right, i)
-    # record for loop itself for future?
-    varInfoObj = VarInfo()
-    varInfoObj.setAssignNode(node, currentFuncName)
-    varInfoObj.setLineNo(i)
-    assignInfo_Func[varName] = varInfoObj
-    
 
 def getVarDepList(funcName, varName, retVarDepList, varsVisitedSoFar):
     varsVisitedSoFar.append(varName)
@@ -645,10 +619,23 @@ def parseFile2(filename):
             #i += 1
             if (node.type == ops.EQ):
                 updateAssignInfo(node, i)
-            elif (node.type == ops.DO): # handles for loop
-                updateForLoopInfo(node, i)
             elif (node.type == ops.FOR):
                 updateForLoops(node, i)
+
+def getFuncStmts(funcName):
+    if (funcName not in assignInfo):
+        sys.exit("Function name passed to getFuncStmts in SDLParser.py as input does not exist in assignInfo.")
+
+    retDict = {}
+
+    for currentVarName in assignInfo[funcName]:
+        currentVarInfoObj = assignInfo[funcName][currentVarName]
+        lineNoKey = currentVarInfoObj.getLineNo()
+        if (lineNoKey in retDict):
+            sys.exit("getFuncStmts in SDLParser.py found multiple VarInfo objects in assignInfo in same function that have the same line number.")
+        retDict[lineNoKey] = currentVarInfoObj
+
+    return retDict
 
 # Perform some type checking here?
 # rules: find constants, verify, variable definitions
@@ -1123,9 +1110,9 @@ def printVarTypes():
         print("\n")
 
 def printFinalOutput():
+    '''
     print("\n")
 
-    '''
     print("Variable dependency list:\n")
     printVarDepORInfLists(varDepList)
     print("\n")
@@ -1134,7 +1121,7 @@ def printFinalOutput():
     print("\n")
 
     print("Variables that protect the message:\n")
-    #print(varsThatProtectM)
+    print(varsThatProtectM)
     print("Ayo:  can you get this information from the two data structures I have shown above?")
     print("If so, please access the message variable using the name M (defined in config.py) rather")
     print("than hard-coding 'M' so we can keep it flexible for the user.")
@@ -1142,15 +1129,13 @@ def printFinalOutput():
     print("you need.\n")
     print("-------------------------")
     print("\n")
-    '''
 
     print("Variable types inferred so far (more to come soon):\n")
-    #printVarTypes()
+    printVarTypes()
     print("\n")
     print("----------------------------")
     print("\n")
 
-    '''
     print("For loops:\n")
     printForLoops()
     print("\n")
@@ -1170,29 +1155,4 @@ if __name__ == "__main__":
         getVarDepInfLists()
         getVarsThatProtectM()
         printFinalOutput()
-
-        # read contents of file
-        # 
-#    elif sys.argv[1] == '-p':
-#        print_results(None)
-#        exit(0)
-#    #elif sys.argv[1] == '-n':
-#    
-#    # main for batch input parser    
-#    file = sys.argv[1]
-#    ast_struct = parseFile(file)
-#    const, types = ast_struct[ CONST ], ast_struct[ TYPE ]
-#    precompute = ast_struct[ PRECOMP ]
-#    algorithm = ast_struct [ TRANSFORM ]
-#    verify, N = None, None
-#    metadata = {}
-#    for n in ast_struct[ OTHER ]:
-#        if str(n.left) == 'verify':
-#            verify = n
-#        elif str(n.left) == 'N':
-#            N = int(str(n.right))
-#            metadata['N'] = str(n.right)
-#        else:
-#            metadata[ str(n.left) ] = str(n.right)
-#
- 
+        retFuncStmts = getFuncStmts("decrypt")

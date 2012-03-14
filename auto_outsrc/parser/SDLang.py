@@ -87,14 +87,33 @@ def addListNodesToList(node, listToAddTo):
         return
 
     for listNode in listNodes:
-        if ( (listNode not in listToAddTo) and (listNode.isdigit() == False) and (listNode != NONE_STRING) ):
-            listToAddTo.append(listNode)
+        listNodeFinal = dropListIndexIfNonNum(listNode)
+        if ( (listNodeFinal not in listToAddTo) and (listNodeFinal.isdigit() == False) and (listNodeFinal != NONE_STRING) ):
+            listToAddTo.append(listNodeFinal)
 
 def getVarType(node):
     if (node.type != ops.TYPE):
         sys.exit("getVarType in SDLange received node that is not of type " + str(ops.TYPE))
 
     return node.attr
+
+def dropListIndexIfNonNum(varName):
+    if (varName.count(LIST_INDEX_SYMBOL) != 1):
+        return varName
+
+    listIndexPos = varName.find(LIST_INDEX_SYMBOL)
+    lenVarName = len(varName)
+    listIndex = varName[(listIndexPos+1):lenVarName]
+    listIndexIsInt = None
+    try:
+        listIndexIsInt = int(listIndex)
+    except:
+        pass
+
+    if (listIndexIsInt != None):
+        return varName
+
+    return varName[0:listIndexPos]
 
 def getFullVarName(node):
     #if (node.type != ops.ATTR):
@@ -105,7 +124,7 @@ def getFullVarName(node):
         for index in node.attr_index:
             varName += "_" + index
 
-    return varName
+    return dropListIndexIfNonNum(varName)
 
 def getListNodes(subtree, parent_type, _list):
 	if subtree == None: return None

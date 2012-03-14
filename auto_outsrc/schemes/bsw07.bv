@@ -69,8 +69,6 @@ s := random(ZR)
 sh := calculateShares(s, policy)
 Y := len(sh)
 g1 := pk#0
-h := pk#2
-egg := pk#4
 
 Ctl := M * egg^s
 C    := h ^ s
@@ -92,14 +90,7 @@ input := list{pk, sk, ct}
 output := M
 
 S := sk#0
-D := sk#1
-Dj := sk#2
-Djp := sk#3
 policy_str := ct#0
-Ctl := ct#1
-C :=  ct#2
-Cr := ct#3
-Cpr := ct#4
 
 policy := createPolicy(policy_str)
 attrs  := prune(policy, S)

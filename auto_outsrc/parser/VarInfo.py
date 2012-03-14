@@ -1,6 +1,7 @@
 import sys
 from SDLang import *
 from config import *
+from DotProd import *
 
 class VarInfo:
     def __init__(self):
@@ -17,6 +18,8 @@ class VarInfo:
         self.funcName = None
         self.isList = False
         self.listNodesList = []
+        self.dotProdObj = None
+        self.outsideForLoopObj = None
 
     def getAssignNode(self):
         return self.assignNode
@@ -56,6 +59,12 @@ class VarInfo:
 
     def getListNodesList(self):
         return self.listNodesList
+
+    def getDotProdObj(self):
+        return self.dotProdObj
+
+    def getOutsideForLoopObj(self):
+        return self.outsideForLoopObj
 
     def traverseAssignNodeRecursive(self, node):
         if (node.type == ops.PAIR):
@@ -101,19 +110,25 @@ class VarInfo:
             self.isList = True
             self.type = ops.LIST
             addListNodesToList(self.assignNode.right, self.listNodesList)
+        elif ( (self.assignNode.right.type == ops.ON) and (self.assignNode.right.left.type == ops.PROD) ):
+            dotProdObj = DotProd()
+            dotProdObj.setDotProdObj(self.assignNode.right, self.lineNo, self.funcName)
+            self.dotProdObj = dotProdObj
 
         self.traverseAssignNodeRecursive(self.assignNode.right)
 
         if (M in self.varDeps):
             self.protectsM = True
 
-    def setAssignNode(self, assignNode, funcName):
+    def setAssignNode(self, assignNode, funcName, outsideForLoopObj):
         if (type(assignNode).__name__ != BINARY_NODE_CLASS_NAME):
             sys.exit("Assignment node passed to VarInfo is invalid.")
 
         self.initCall = False
         self.assignNode = assignNode
         self.funcName = funcName
+        self.outsideForLoopObj = outsideForLoopObj
+
         self.traverseAssignNode()
 
         self.beenSet = not(self.initCall)
