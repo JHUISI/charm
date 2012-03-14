@@ -349,11 +349,14 @@ class BinaryNode:
 				 return 'NONE'
 				# return ( left + ' on ' + right )				
 		return None
-	
+	    
 	def isAttrIndexEmpty(self):
 		if self.attr_index != None:
 			if len(self.attr_index) > 0: return False
 		return True
+
+	def setType(self, value):
+        	self.type = value
 	
 	def setAttrIndex(self, value):
 		if(self.type in [ops.ATTR, ops.HASH]):
