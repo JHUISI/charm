@@ -20,6 +20,7 @@ class VarInfo:
         self.listNodesList = []
         self.dotProdObj = None
         self.outsideForLoopObj = None
+        self.hasRandomness = False
 
     def getAssignNode(self):
         return self.assignNode
@@ -69,6 +70,9 @@ class VarInfo:
     def getOutsideForLoopObj(self):
         return self.outsideForLoopObj
 
+    def getHasRandomness(self):
+        return self.hasRandomness
+
     def traverseAssignNodeRecursive(self, node):
         if (node.type == ops.PAIR):
             self.hasPairings = True
@@ -93,6 +97,8 @@ class VarInfo:
                 if (self.type != types.NO_TYPE):
                     sys.exit("TraverseAssignNodeRecursive found multiple type assignments to same variable in " + str(self.funcName) + " function.")
                 self.type = varType
+        elif (node.type == ops.RANDOM):
+            self.hasRandomness = True
 
         addListNodesToList(node, self.varDeps)
 
