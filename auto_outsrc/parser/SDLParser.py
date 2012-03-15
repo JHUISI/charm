@@ -629,6 +629,12 @@ def getFuncStmts(funcName):
     if (funcName not in varTypes):
         sys.exit("Function name passed to getFuncStmts in SDLParser.py as input does not exist in varTypes.")
 
+    if (funcName not in varDepList):
+        sys.exit("Function name passed to getFuncStmts in SDLParser.py as input does not exist in varDepList.")
+
+    if (funcName not in varInfList):
+        sys.exit("Function name passed to getFuncStmts in SDLParser.py as input does not exist in varInfList.")
+
     retDict = {}
 
     for currentVarName in assignInfo[funcName]:
@@ -638,7 +644,7 @@ def getFuncStmts(funcName):
             sys.exit("getFuncStmts in SDLParser.py found multiple VarInfo objects in assignInfo in same function that have the same line number.")
         retDict[lineNoKey] = currentVarInfoObj
 
-    return (retDict, varTypes[funcName])
+    return (retDict, varTypes[funcName], varDepList[funcName], varInfList[funcName])
 
 # Perform some type checking here?
 # rules: find constants, verify, variable definitions
@@ -1158,5 +1164,5 @@ if __name__ == "__main__":
         getVarDepInfLists()
         getVarsThatProtectM()
         printFinalOutput()
-        (retFuncStmts, retFuncTypes) = getFuncStmts("decrypt")
+        (retFuncStmts, retFuncTypes, retVarDepList, retVarInfList) = getFuncStmts("decrypt")
         pass
