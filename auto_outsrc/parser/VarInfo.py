@@ -34,6 +34,9 @@ class VarInfo:
         return self.hasPairings
 
     def getProtectsM(self):
+        # generally, we're not interested in keywords that may reference the message
+        if str(self.assignNode.left) in ['input', 'output', 'return']:
+            return False         
         return self.protectsM
 
     def getInitValue(self):
