@@ -23,7 +23,7 @@
 ; --------------------------------
 
 !define PRODUCT_NAME "charm-crypto"
-!define PRODUCT_VERSION "0.4b"
+!define PRODUCT_VERSION "0.41b"
 !define PRODUCT_PUBLISHER "Johns Hopkins University, HMS Lab"
 !define PRODUCT_WEB_SITE "http://charm-crypto.com/Main.html"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
