@@ -10,6 +10,10 @@ import sys
 
 def transform(sdl_scheme):
     parseFile2(sdl_scheme)
+    CTprime = Enum('T0', 'T1', 'T2') # T2 is for RCCA security
+    partDecCT = { CTprime.T0: None, CTprime.T1: None, CTprime.T2: None }
+    print("Building partially decrypted CT: ", partDecCT)
+    getVarDepInfLists()    
     getVarsThatProtectM()
     printFinalOutput()
     encrypt_block = assignInfo['encrypt']
@@ -20,12 +24,15 @@ def transform(sdl_scheme):
     print("Variables that protect the message:\n")
     print("Encrypt func: ", protectsM_enc)
     print("Decrypt func: ", protectsM_dec)
-    print("assignInfo =>", encrypt_block)    
-    (stmtsEnc, typesEnc) = getFuncStmts("encrypt")
-    (stmtsDec, typesDec) = getFuncStmts("decrypt")   
+    print("assignInfo =>", list(encrypt_block.keys()))
+    
+    
+    (stmtsEnc, typesEnc, depListEnc, infListEnc) = getFuncStmts("encrypt")
+    (stmtsDec, typesDec, depListDec, infListDec) = getFuncStmts("decrypt")
 
     print("<=== Encrypt ===>") 
     # first step is to identify message and how its protected   
+    t0_var = None
     linesEnc = list(stmtsEnc.keys())
     linesEnc.sort()
     for i in linesEnc:
@@ -33,7 +40,11 @@ def transform(sdl_scheme):
         if stmtsEnc[i].getProtectsM():
             n = stmtsEnc[i].getAssignNode()
             print("\t=> protects message!")
-            print("\t=> assign node: ", n.left)
+            print("\t=> assign node : T0 :=>", n.left)
+            t0_var = stmtsEnc[i]
+            print("\t=> object: ", t0_var.getAssignNode().left, t0_var.getVarDeps())
+        if stmtsEnc[i].getHasRandomness():
+            print("\t=> has randomness!")
     print("<=== END ===>")
     
     print("<=== Decrypt ===>")    
@@ -43,26 +54,23 @@ def transform(sdl_scheme):
         print(i, ": ", stmtsDec[i].getAssignNode())
         if stmtsDec[i].getHasPairings():
             print("\t=> has pairings True!")
-        elif stmtsDec[i].getProtectsM():
+        if stmtsDec[i].getProtectsM():
             print("\t=> protects message!")
+        print("\tdeps:=>", stmtsDec[i].getVarDeps())
     print("<=== END ===>")
+    
+    # need to add label to var info
+
+def programSlice(stmts, target_var):
+    lines = list(stmts.keys())
+    lines.sort()
+    for i in lines:
+        pass
+    
     
 if __name__ == "__main__":
     file = sys.argv[1]
     transform(file)
-#    parseFile2(sys.argv[1])
-#    getVarsThatProtectM()
-#    encrypt_block = assignInfo['encrypt']
-#    decrypt_block = assignInfo['decrypt']
-#    protectsM_enc = varsThatProtectM['encrypt']
-#    protectsM_dec = varsThatProtectM['decrypt']
-#    
-#    print("Variables that protect the message:\n")
-#    print("Encrypt func: ", protectsM_enc)
-#    print("Decrypt func: ", protectsM_dec)
-#    print("assignInfo =>", encrypt_block)
-    
-    
     print("\n")
     
     

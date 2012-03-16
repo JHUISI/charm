@@ -18,7 +18,6 @@ END :: types
 
 BEGIN :: func:setup
 input := None
-output := list{mk, pk}
 g := random(G1)
 g2 := random(G2)
 alpha := random(ZR)
@@ -32,13 +31,12 @@ egg := e(g, g2)^alpha
 mk := list{beta, i}
 pk := list{g, g2, h, f, egg}
 
-return := list{mk, pk}
+output := list{mk, pk}
 END :: func:setup
 
 
 BEGIN :: func:keygen
 input := list{pk, mk, S} 
-output := sk
 
 r := random(ZR)
 p0 := pk#1^r
@@ -55,13 +53,12 @@ Djp#y := g^s_y
 END :: for
 
 sk := list{S, D, Dj, Djp}
-return := sk
+output := sk
 END :: func:keygen
 
 
 BEGIN :: func:encrypt
 input := list{pk, M, policy_str}
-output := ct
 
 policy := createPolicy(policy_str)
 attrs := getAttributeList(policy)
@@ -81,13 +78,12 @@ Cpr#y := (H(attrs#y, G2))^share#y
 END :: for
 
 ct := list{policy_str, Ctl, C, Cr, Cpr}
-return := ct
+output := ct
 END :: func:encrypt
 
 
 BEGIN :: func:decrypt
 input := list{pk, sk, ct}
-output := M
 
 S := sk#0
 policy_str := ct#0
@@ -102,6 +98,6 @@ A := { prod{y := 1, Y} on ((e(Cr#y, Dj#y) / e(Djp#y, Cpr#y))^coeff#y) }
 result0 := e(C, D) / A
 M := Ctl / result0
 
-return := M
+output := M
 END :: func:decrypt
 

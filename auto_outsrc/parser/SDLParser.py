@@ -19,6 +19,7 @@ varsThatProtectM = {}
 varTypes = {}
 algebraicSetting = None
 startLineNo_ForLoop = None
+getVarDepInfListsCalled = getVarsThatProtectMCalled = False
 TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
 ARBITRARY_FUNC = 'func:'
 MESSAGE, SIGNATURE, PUBLIC, LATEX, SETTING = 'message','signature', 'public', 'latex', 'setting'
@@ -567,7 +568,7 @@ def getVarInfList():
                     varInfList[funcName][currentVarDep].append(varName)
 
 def getVarDepInfLists():
-    global varDepList, varInfList
+    global varDepList, varInfList, getVarDepInfListsCalled
 
     for funcName in assignInfo:
         varDepList[funcName] = {}
@@ -581,6 +582,7 @@ def getVarDepInfLists():
                 varInfList[funcName][retVarDep] = []
 
     getVarInfList()
+    getVarDepInfListsCalled = True
 
 def getVarsThatProtectM():
     global varsThatProtectM
@@ -592,6 +594,7 @@ def getVarsThatProtectM():
             assignInfo_Var = assignInfo_Func[varName]
             if (assignInfo_Var.getProtectsM() == True and varName not in ASSIGN_KEYWORDS):
                 varsThatProtectM[funcName].append(varName)
+    getVarsThatProtectMCalled = True
 
 def updateForLoops(node, lineNo):
     if (startLineNo_ForLoop == None):
@@ -623,17 +626,20 @@ def parseFile2(filename):
                 updateForLoops(node, i)
 
 def getFuncStmts(funcName):
+    if getVarDepInfListsCalled == False: 
+        sys.exit("ERROR: Need to call getVarDepInfLists()")
+    
     if (funcName not in assignInfo):
-        sys.exit("Function name passed to getFuncStmts in SDLParser.py as input does not exist in assignInfo.")
+        sys.exit("ERROR: Function name passed to getFuncStmts in SDLParser.py as input does not exist in assignInfo.")
 
     if (funcName not in varTypes):
-        sys.exit("Function name passed to getFuncStmts in SDLParser.py as input does not exist in varTypes.")
+        sys.exit("ERROR: Function name passed to getFuncStmts in SDLParser.py as input does not exist in varTypes.")
 
     if (funcName not in varDepList):
-        sys.exit("Function name passed to getFuncStmts in SDLParser.py as input does not exist in varDepList.")
+        sys.exit("ERROR: Function name passed to getFuncStmts in SDLParser.py as input does not exist in varDepList.")
 
     if (funcName not in varInfList):
-        sys.exit("Function name passed to getFuncStmts in SDLParser.py as input does not exist in varInfList.")
+        sys.exit("ERROR: Function name passed to getFuncStmts in SDLParser.py as input does not exist in varInfList.")
 
     retDict = {}
 

@@ -21,6 +21,7 @@ class VarInfo:
         self.dotProdObj = None
         self.outsideForLoopObj = None
         self.hasRandomness = False
+        self.label = None
 
     def getAssignNode(self):
         return self.assignNode
