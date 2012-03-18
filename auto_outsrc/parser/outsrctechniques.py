@@ -21,8 +21,8 @@ from SDLang import *
 #    return prod_result
 
 class AbstractTechnique:
-    def __init__(self):
-        self.debug  = None
+    def __init__(self, allStmtsInBlock):
+        self.allStmtsInBlock = allStmtsInBlock
 
     def visit(self, node, data):
         return
@@ -433,8 +433,8 @@ Tech_db = Enum('NoneApplied', 'ExpIntoPairing', 'DistributeExpToPairing', 'Split
 # Rule: 'e(g, h)^d_i' transform into ==> 'e(g^d_i, h)' iff g or h is constant == (attribute node)
 # move exponent towards the non-constant attribute
 class Technique1(AbstractTechnique):
-    def __init__(self):
-        AbstractTechnique.__init__(self)
+    def __init__(self, allStmtsInBlock):
+        AbstractTechnique.__init__(self, allStmtsInBlock)
         self.rule    = "Move the exponent(s) into the pairing (technique 2)"
         self.applied = False 
         self.score   = Tech_db.NoneApplied
@@ -606,8 +606,8 @@ class Technique1(AbstractTechnique):
 
 # Rule 2: transform x / y to x * y^-1 if y is ATTR or PAIR node
 class Technique2(AbstractTechnique):
-    def __init__(self):
-        AbstractTechnique.__init__(self)
+    def __init__(self, allStmtsInBlock):
+        AbstractTechnique.__init__(self, allStmtsInBlock)
         self.rule    = "Transform division operation into multiplication to inverse (technique 2)"
         self.applied = False 
         self.score   = Tech_db.NoneApplied
@@ -624,8 +624,8 @@ class Technique2(AbstractTechnique):
 # Rule 3: transform e(a, b*c*d) => e(a, b) * e(a, c) * e(a, d) OR
 # e(a*b*c, d) => e(a, d) * e(b, d) * e(c, d)
 class Technique3(AbstractTechnique):
-    def __init__(self):
-        AbstractTechnique.__init__(self)
+    def __init__(self, allStmtsInBlock):
+        AbstractTechnique.__init__(self, allStmtsInBlock)
         self.rule    = "Split pairings in all cases (technique 3)"
         self.applied = False 
         self.score   = Tech_db.NoneApplied
@@ -660,8 +660,9 @@ class Technique3(AbstractTechnique):
             self.score   = Tech_db.SplitPairing
             addAsChildNodeToParent(data, new_pair_nodes)
         else:
-            print("len l: ", len(l))
-            print("len r: ", len(r))
+            if self.debug:
+                print("len l: ", len(l))
+                print("len r: ", len(r))
             pass # do nothing
 
     

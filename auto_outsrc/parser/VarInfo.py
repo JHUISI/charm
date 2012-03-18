@@ -32,12 +32,17 @@ class VarInfo:
     def getVarDeps(self):
         return self.varDeps
 
+    def getAssignVar(self):
+        if self.assignNode:
+            return self.assignNode.left.getAttribute()
+        return None
+
     def getHasPairings(self):
         return self.hasPairings
 
     def getProtectsM(self):
         # generally, we're not interested in keywords that may reference the message
-        if str(self.assignNode.left) in ['input', 'output', 'return']:
+        if str(self.assignNode.left) in ['input', 'output']:
             return False         
         return self.protectsM
 
@@ -143,6 +148,11 @@ class VarInfo:
 
         self.beenSet = not(self.initCall)
 
+    def updateAssignNode(self, newNode):
+        # can only update if assignNode was already set
+        if self.assignNode == None: return None
+        self.assignNode = newNode
+        
     def setLineNo(self, lineNo):
         if ( (type(lineNo) is not int) or (lineNo < 1) ):
             sys.exit("Line number passed to VarInfo is invalid.")

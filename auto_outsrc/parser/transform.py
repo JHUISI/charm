@@ -1,6 +1,12 @@
 from SDLParser import *
+from outsrctechniques import AbstractTechnique,Technique1,Technique2,Technique3
+import config
 import sys
 
+CTprime = Enum('T0', 'T1', 'T2') # T2 is for RCCA security
+
+techMap = {1:Technique1, 2:Technique2, 3:Technique3}
+debug = False
 
 # 1. Get the assignment that protects the message in encrypt
 # 2. find this variable in the decrypt routine and retrieve a program slice that affects M (potentially the entire routine)
@@ -10,7 +16,6 @@ import sys
 
 def transform(sdl_scheme):
     parseFile2(sdl_scheme)
-    CTprime = Enum('T0', 'T1', 'T2') # T2 is for RCCA security
     partDecCT = { CTprime.T0: None, CTprime.T1: None, CTprime.T2: None }
     print("Building partially decrypted CT: ", partDecCT)
     getVarDepInfLists()    
@@ -42,31 +47,139 @@ def transform(sdl_scheme):
             print("\t=> protects message!")
             print("\t=> assign node : T0 :=>", n.left)
             t0_var = stmtsEnc[i]
-            print("\t=> object: ", t0_var.getAssignNode().left, t0_var.getVarDeps())
+            partDecCT[CTprime.T0] = stmtsEnc[i] # record T0
+            print("\t=> object: ", t0_var.getAssignVar(), t0_var.getVarDeps())
         if stmtsEnc[i].getHasRandomness():
             print("\t=> has randomness!")
     print("<=== END ===>")
     
-    print("<=== Decrypt ===>")    
-    linesDec = list(stmtsDec.keys())
-    linesDec.sort()
-    for i in linesDec:
-        print(i, ": ", stmtsDec[i].getAssignNode())
-        if stmtsDec[i].getHasPairings():
-            print("\t=> has pairings True!")
-        if stmtsDec[i].getProtectsM():
-            print("\t=> protects message!")
-        print("\tdeps:=>", stmtsDec[i].getVarDeps())
-    print("<=== END ===>")
-    
-    # need to add label to var info
+    traverseBackwards(stmtsDec, identifyT1, partDecCT)
+#    traverseLines(stmtsDec, identifyMessage, ans)
+    print("Results =>", partDecCT)
+    t1 = partDecCT[CTprime.T1].getAssignVar()
+    print("Dep list =>", t1, depListDec[t1])
 
-def programSlice(stmts, target_var):
+    # program slice for t1 (including the t1 assignment line)
+    t1_slice = {'depList':depListDec[t1], 'lines':[partDecCT[CTprime.T1].getLineNo() ], 'func':stmtsDec }
+    traverseBackwards(stmtsDec, programSliceT1, t1_slice)
+    t1_slice['lines'].sort()
+    transform = t1_slice['lines']
+    print("Slice: ", transform) 
+    print("<===\tTransform\t===>") 
+    traverseForwards(stmtsDec, printStmt, t1_slice)
+    print("<===\tEND\t===>") 
+
+    # rewrite pairing equations 
+    print("Rewrite pairing equations....")   
+    traverseBackwards(stmtsDec, applyRules, t1_slice)
+
+    print("<===\tNew Transform\t===>") 
+    traverseForwards(stmtsDec, printStmt, t1_slice)
+    print("<===\tEND\t===>") 
+
+            
+def applyRules(varInf, data):
+    if varInf.getHasPairings():
+        equation = varInf.getAssignNode()
+        print("Found pairing: ", equation)
+        code_block = data.get('func')
+        path = []
+        new_equation = Optimize(equation, path, code_block)
+        varInf.updateAssignNode(new_equation)
+            
+def printStmt(varInf, data):
+    if varInf.getLineNo() in data['lines']:
+        print(varInf.getLineNo(), ":", varInf.getAssignNode())
+
+def programSliceT1(varInf, data):
+    depList = data['depList']
+    if varInf.getAssignVar() in depList:
+        data['lines'].append(varInf.getLineNo())
+    elif varInf.getVarDeps() in depList:
+        data['lines'].append(varInf.getLineNo())
+
+def identifyT1(varInf, data):
+    targetFunc = 'decrypt'
+    s = varInf.getAssignNode()
+    if s.left.getAttribute() == 'output': 
+        data['msg'] = s.right.getAttribute()
+    elif data.get('msg') == s.left.getAttribute(): 
+        print("Found it: ", s, varInf.varDeps) # I want non-T0 var
+        t0_varname = data[CTprime.T0].getAssignNode().left.getAttribute()
+        t1_varname = list(varInf.varDeps)
+        t1_varname.remove(t0_varname)
+        print("T0 :=>", t0_varname, t1_varname, varInf.varDeps)
+        if len(t1_varname) == 1:
+            # M := T0 / T1 form
+            i = t1_varname[0]
+            print("T1: ", assignInfo[targetFunc][i])
+            data[CTprime.T1] = assignInfo[targetFunc][i]
+        else:
+            # TODO: need to create a new assignment for T1 and set to common operation of remaining
+            # variables 
+            pass
+
+def printHasPair(varInf, data):
+    if varInf.getHasPairings():
+        print("Found pairings: ", varInf.getAssignNode())
+
+def traverseForwards(stmts, funcToCall, dataObj=None):
+    assert type(stmts) == dict, "invalid stmt object!"
     lines = list(stmts.keys())
     lines.sort()
+    if not dataObj: dataObj = {}
     for i in lines:
-        pass
-    
+        funcToCall(stmts[i], dataObj)
+    return dataObj
+
+
+def traverseBackwards(stmts, funcToCall, dataObj=None):
+    assert type(stmts) == dict, "invalid stmt object!"
+    lines = list(stmts.keys())
+    lines.sort()
+    lines.reverse()
+    if not dataObj: dataObj = {}
+    for i in lines:
+        funcToCall(stmts[i], dataObj)
+    return dataObj
+
+# figures out which optimizations apply
+def Optimize(equation, path, code_block=None):
+    tech_list = [1, 2, 3]
+    # 1. apply the start technique to equation
+    new_eq = equation
+    while True:
+        cur_tech = tech_list.pop()
+        if debug: print("Testing technique: ", cur_tech)
+        (tech, new_eq) = testTechnique(cur_tech, new_eq, code_block)
+        
+        if tech.applied:
+            if debug: print("Technique ", cur_tech, " successfully applied.")
+            path.append(cur_tech)
+            tech_list = [1, 2, 3]
+            continue
+        else:
+            if len(tech_list) == 0: break
+    print("path: ", path)
+    print("optimized equation: ", new_eq)
+    return new_eq        
+        
+
+def testTechnique(tech_option, equation, code_block=None):
+    eq2 = BinaryNode.copy(equation)
+        
+    tech = None
+    if tech_option in techMap.keys():
+        tech = techMap[tech_option](code_block)
+    else:
+        return None
+        
+    # traverse equation with the specified technique
+    ASTVisitor(tech).preorder(eq2)
+
+    # return the results
+    return (tech, eq2)
+
     
 if __name__ == "__main__":
     file = sys.argv[1]
