@@ -77,7 +77,7 @@ for{y := 1, Y}
 r := random(ZR)
 k := attrs#y
 x := sh#y
-Cn#k := (g2a ^ x) * (H(k, G1)^-r)
+Cn#k := (g1a ^ x) * (H(k, G1)^-r)
 Dn#k := g2^r
 END :: for
 
