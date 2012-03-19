@@ -35,6 +35,8 @@ def blindKeygenOutputElement(keygenOutputElem, keygenInput):
         SDLLinesForKeygen += keygenOutputElem + blindingSuffix + " := " + keygenOutputElem + " ^ (1/" + keygenBlindingExponent + ")\n"
         return
 
+    SDLLinesForKeygen += keygenOutputElem + blindingSuffix + 
+
 def keygen(sdl_scheme):
     global SDLLinesForKeygen
 
