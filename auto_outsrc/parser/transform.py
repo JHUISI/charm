@@ -53,6 +53,8 @@ def transform(sdl_scheme):
     print("<=== END ===>")
     
     traverseBackwards(stmtsDec, identifyT1, partDecCT)
+    T0_sdlObj, T1_sdlObj = createLOC(partDecCT)
+    
 #    traverseLines(stmtsDec, identifyMessage, ans)
     print("Results =>", partDecCT)
     t1 = partDecCT[CTprime.T1].getAssignVar()
@@ -63,8 +65,8 @@ def transform(sdl_scheme):
     traverseBackwards(stmtsDec, programSliceT1, t1_slice)
     t1_slice['lines'].sort()
     transform = t1_slice['lines']
-    print("Slice: ", transform) 
-    print("<===\tTransform\t===>") 
+    print("Optimize these lines: ", transform) 
+    print("<===\tTransform Slice\t===>") 
     traverseForwards(stmtsDec, printStmt, t1_slice)
     print("<===\tEND\t===>") 
 
@@ -74,8 +76,11 @@ def transform(sdl_scheme):
 
     print("<===\tNew Transform\t===>") 
     traverseForwards(stmtsDec, printStmt, t1_slice)
+    print("\t", T0_sdlObj)
+    print("\t", T1_sdlObj)
+    print("\t output := list{T0, T1}")
     print("<===\tEND\t===>") 
-
+    
             
 def applyRules(varInf, data):
     if varInf.getHasPairings():
@@ -117,6 +122,22 @@ def identifyT1(varInf, data):
             # TODO: need to create a new assignment for T1 and set to common operation of remaining
             # variables 
             pass
+
+def createLOC(partialCT):
+    varName0 = partialCT[CTprime.T0].getAssignNode().left
+    
+    varName1 = partialCT[CTprime.T1].getAssignNode().left.getAttribute()
+    T0, T1 = "T0","T1"
+    targetFunc = 'decrypt'    
+    T0_node = BinaryNode(ops.EQ)
+    T0_node.left = BinaryNode(T0)
+    T0_node.right = varName0
+    
+    T1_node = BinaryNode(ops.EQ)
+    T1_node.left = BinaryNode(T1)
+    T1_node.right = assignInfo[targetFunc][varName1].getAssignNode().left
+
+    return T0_node, T1_node
 
 def printHasPair(varInf, data):
     if varInf.getHasPairings():
