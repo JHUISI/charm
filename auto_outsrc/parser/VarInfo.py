@@ -96,6 +96,8 @@ class VarInfo:
                 if (len(listNodes) != 1):
                     sys.exit("Init function call discovered by traverseAssignNodeRecursive has a number of arguments other than 1 (not supported).")
                 self.initValue = listNodes[0]
+                if (self.initValue == LIST_TYPE):
+                    self.isList = True
                 self.initCall = True
         elif (node.type == ops.TYPE):
             if (self.funcName == TYPES_HEADER):

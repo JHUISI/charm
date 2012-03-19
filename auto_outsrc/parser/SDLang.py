@@ -34,6 +34,7 @@ LIST_INDEX_SYMBOL = "#"
 LIST_INDEX_END_SYMBOL = "?"
 FOR_LOOP_HEADER = "for"
 TYPES_HEADER = "types"
+LIST_TYPE = "list"
 OTHER_TYPES = ['list', 'object']
 DECL_FUNC_HEADER = "func:"
 INIT_FUNC_NAME = "init"
