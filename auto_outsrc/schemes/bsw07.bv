@@ -84,9 +84,8 @@ END :: func:encrypt
 
 BEGIN :: func:decrypt
 input := list{pk, sk, ct}
-
-S := sk#0
-policy_str := ct#0
+ct := expand{policy_str, Ctl, C, Cr, Cpr}
+sk := expand{S, D, Dj, Djp}
 
 policy := createPolicy(policy_str)
 attrs  := prune(policy, S)
