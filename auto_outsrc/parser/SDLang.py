@@ -42,7 +42,7 @@ FUNC_SYMBOL = "def func :"
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
 types = Enum('NO_TYPE','G1', 'G2', 'GT', 'ZR', 'str', 'list', 'object')
 declarator = Enum('func', 'verify')
-ops = Enum('BEGIN', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'FUNC', 'SEQ', 'END', 'NONE')
+ops = Enum('BEGIN', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'EXPAND', 'FUNC', 'SEQ', 'END', 'NONE')
 side = Enum('left', 'right')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
@@ -235,6 +235,8 @@ def createTree(op, node1, node2, op_value=None):
     	node = BinaryNode(ops.AND)
     elif(op == "list{"):
     	node = BinaryNode(ops.LIST)
+    elif(op == "expand{"):
+    	node = BinaryNode(ops.EXPAND)
     elif(op == "random("):
     	node = BinaryNode(ops.RANDOM)
     elif(FUNC_SYMBOL in op):
@@ -357,6 +359,12 @@ class BinaryNode:
 				 		listVal += str(i) + ', '
 				 listVal = listVal[:len(listVal)-2]
 				 return 'list{' + listVal + '}'
+			elif(self.type == ops.EXPAND):
+				 listVal = ""
+				 for i in self.listNodes:
+				 		listVal += str(i) + ', '
+				 listVal = listVal[:len(listVal)-2]
+				 return 'expand{' + listVal + '}'
 			elif(self.type == ops.FUNC):
 				 listVal = ""
 				 for i in self.listNodes:

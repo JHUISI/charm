@@ -87,7 +87,7 @@ class SDLParser:
         ProdOf = Literal("on")
         ForDo = Literal("do") # for{x,y} do y
         SumOf = Literal("of")
-        List  = Literal("list{") # represents a list
+        List  = Literal("list{") | Literal("expand{") # represents a list
         MultiLine = Literal(";") + Optional(Literal("\\n").suppress())
         funcName = Word(alphanums + '_')
         blockName = Word(alphanums + '_:')
@@ -148,7 +148,7 @@ class SDLParser:
             op2 = self.evalStack(stack, line_number)
             op1 = self.evalStack(stack, line_number)
             return createTree(op, op1, op2)
-        elif op in ["list{"]:
+        elif op in ["list{", "expand{"]:
             ops = []
             cnt = self.evalStack(stack, line_number)
 #            print("count: ", cnt)
