@@ -39,6 +39,6 @@ class DotProd:
         self.lineNo = lineNo
         self.funcName = funcName
 
-        self.startVal = int(node.left.left.right.attr)
+        self.startVal = str(node.left.left.right.attr)
         self.endVal = str(node.left.right.attr)
         self.loopVar = str(node.left.left.left.attr)

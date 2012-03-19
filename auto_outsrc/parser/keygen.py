@@ -2,6 +2,7 @@ from SDLParser import *
 import config, sys
 
 #TODO:  move this to config.py
+blindingLoopVar = "y"
 blindingSuffix = "_Blinded"
 keygenBlindingExponent = "z"
 keygenFuncName = "keygen"
@@ -30,12 +31,18 @@ def blindKeygenOutputElement(keygenOutputElem, keygenInput):
             blindKeygenOutputElement(listMember, keygenInput)
         listMembersString = listMembersString[0:(len(listMembersString)-2)]
         SDLLinesForKeygen += keygenOutputElem + blindingSuffix + " := list{" + listMembersString + "}\n"
+        return
 
     if (keygenOutputVarInfo.getIsList() == False):
         SDLLinesForKeygen += keygenOutputElem + blindingSuffix + " := " + keygenOutputElem + " ^ (1/" + keygenBlindingExponent + ")\n"
         return
 
-    SDLLinesForKeygen += keygenOutputElem + blindingSuffix + 
+    SDLLinesForKeygen += "len_" + keygenOutputElem + blindingSuffix + " := len(" + keygenOutputElem + ")\n"
+    SDLLinesForKeygen += keygenOutputElem + blindingSuffix + " := init(list)\n"
+    SDLLinesForKeygen += "BEGIN :: for\n"
+    SDLLinesForKeygen += "for{" + blindingLoopVar + " := 1, len_" + keygenOutputElem + blindingSuffix + "}\n"
+    SDLLinesForKeygen += keygenOutputElem + blindingSuffix + LIST_INDEX_SYMBOL + blindingLoopVar + " := " + keygenOutputElem + LIST_INDEX_SYMBOL + blindingLoopVar + " ^ (1/" + keygenBlindingExponent + ")\n"
+    SDLLinesForKeygen += "END :: for\n"
 
 def keygen(sdl_scheme):
     global SDLLinesForKeygen
