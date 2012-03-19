@@ -29,8 +29,7 @@ def transform(sdl_scheme):
     print("Variables that protect the message:\n")
     print("Encrypt func: ", protectsM_enc)
     print("Decrypt func: ", protectsM_dec)
-    print("assignInfo =>", list(encrypt_block.keys()))
-    
+    print("assignInfo =>", list(decrypt_block.keys()), "\n")
     
     (stmtsEnc, typesEnc, depListEnc, infListEnc) = getFuncStmts("encrypt")
     (stmtsDec, typesDec, depListDec, infListDec) = getFuncStmts("decrypt")
@@ -60,7 +59,7 @@ def transform(sdl_scheme):
     print("Dep list =>", t1, depListDec[t1])
 
     # program slice for t1 (including the t1 assignment line)
-    t1_slice = {'depList':depListDec[t1], 'lines':[partDecCT[CTprime.T1].getLineNo() ], 'func':stmtsDec }
+    t1_slice = {'depList':depListDec[t1], 'lines':[partDecCT[CTprime.T1].getLineNo() ], 'block':decrypt_block }
     traverseBackwards(stmtsDec, programSliceT1, t1_slice)
     t1_slice['lines'].sort()
     transform = t1_slice['lines']
@@ -82,7 +81,7 @@ def applyRules(varInf, data):
     if varInf.getHasPairings():
         equation = varInf.getAssignNode()
         print("Found pairing: ", equation)
-        code_block = data.get('func')
+        code_block = data.get('block')
         path = []
         new_equation = Optimize(equation, path, code_block)
         varInf.updateAssignNode(new_equation)

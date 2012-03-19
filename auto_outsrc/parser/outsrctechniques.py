@@ -22,6 +22,7 @@ from SDLang import *
 
 class AbstractTechnique:
     def __init__(self, allStmtsInBlock):
+        assert type(allStmtsInBlock) == dict, "Invalid dict of code block"
         self.allStmtsInBlock = allStmtsInBlock
 
     def visit(self, node, data):
@@ -38,6 +39,13 @@ class AbstractTechnique:
         if tree.left: self.getNodes(tree.left, tree.type, _list)
         if tree.right: self.getNodes(tree.right, tree.type, _list)
         return
+
+    def getVarDef(self, name):
+        if name in self.allStmtsInBlock.keys():
+            # return the corresponding VarInfo object
+            assert type(self.allStmtsInBlock[name]) == VarInfo, "not a valid varInfo object."
+            return self.allStmtsInBlock[name]
+        return None 
 
     @classmethod
     def getMulTokens(self, subtree, parent_type, target_type, _list):
@@ -284,9 +292,14 @@ class AbstractTechnique:
                 value = left.right.getAttribute()
                 if value.isdigit() and int(value) <= 1:  
 #                    exp.left = left.left
-                    if right.negated: left.right.negated = False; right.negated = False 
+                    if right.negated: 
+#                        print("Before double negation: ", left, right)
+                        left.right.negated = False; 
+                        right.negated = False 
+#                        print("After double negation: ", left, right)
+                    else:                        
                     #left.right.setAttribute(str(right))
-                    self.negateThis(right)
+                        self.negateThis(right)
                     BinaryNode.setNodeAs(left.right, right)
                     #print("adjusted negation nodes: ", left.right)
 # JAA commented out to avoid extra index, for example, 'delta_z_z' for VRF 
@@ -342,10 +355,21 @@ class AbstractTechnique:
                 if value.isdigit() and int(value) <= 1:  
 #                    exp.left = left.left                   
 #                    print("mul : ", str(right), left.right) 
-                    if right.negated: left.right.negated = False; right.negated = False 
+                    if right.negated: 
+                        print("Set negation here 2!")
+                        left.right.negated = False; 
+                        right.negated = False 
+                    else:
+                        self.negateThis(right)
+                        
                     left.right.setAttribute(str(right)) 
 #                    left.right.attr_index = right.attr_index
                     mul = left.right
+                elif "1" in right.getAttribute():
+#                    print("WORD: ", right)
+                    mul = left.right
+                    if mul.negated and right.negated: mul.negated = True
+                    else: mul.negated = right.negated
                 else:
                     mul = BinaryNode(ops.MUL)
                     mul.left = left.right
@@ -484,90 +508,52 @@ class Technique1(AbstractTechnique):
             # (prod{} on x) ^ y => prod{} on x^y
             # check whether prod right
             prod_node = node.left
+            prod_node.right = self.createExp2(prod_node.right, BinaryNode.copy(node.right))
+            print("New prod node: ", prod_node)
             addAsChildNodeToParent(data, prod_node)
-            #print("prod_node right =>", prod_node.right.type)
-            # look into x: does x contain a PAIR node?
-            pair_node = searchNodeType(prod_node.right, ops.PAIR)
-            # if yes: 
-            if pair_node:
-                # move exp inside the pair node
-                # check whether left side is constant
-                if self.debug:
-                    print("Check left: ", self.isConstInSubtreeT(pair_node.left))
-                    print("Check right: ", self.isConstInSubtreeT(pair_node.right))
-                if not self.isConstInSubtreeT(pair_node.left):
-                    if self.debug: print("exponent moving towards right: ", pair_node.right)
-                    #print(" pair right type =>", pair_node.right.type)
-                    if Type(pair_node.right) == ops.MUL:
-#                        print("T2: dot prod with pair: ", pair_node)
-#                        print("MUL on right: ", pair_node.right)
-                        _subnodes = []
-                        getListNodes(pair_node.right, ops.NONE, _subnodes)
-                        if len(_subnodes) > 2:
+            print("exponent moving towards right: ", prod_node.right)
+            if Type(prod_node.right) == ops.MUL:
+                print("T2: dot prod with pair: ", prod_node)
+                print("MUL on right: ", prod_node.right)
+                _subnodes = []
+                getListNodes(prod_node.right, ops.NONE, _subnodes)
+                if len(_subnodes) > 2:
                             # basically call createExp to distribute the exponent to each
                             # MUL node in pair_node.right
-                            new_mul_node = self.createExp(pair_node.right, node.right)
-                            pair_node.right = new_mul_node
-                            self.applied = True
-                            self.score   = Tech_db.DistributeExpToPairing
+                    new_mul_node = self.createExp(prod_node.right, node.right)
+                    prod_node.right = new_mul_node
+                    self.applied = True
+                    self.score   = Tech_db.DistributeExpToPairing
 #                            print("new pair node: ", pair_node, "\n")                            
                             #self.rule += "distributed exponent into the pairing: right side. "
-                        else:
-                            self.setNodeAs(pair_node, side.right, node, side.left)
-                            self.applied = True       
-                            self.score   = Tech_db.ExpIntoPairing                   
+                else:
+                    self.setNodeAs(prod_node, side.right, node, side.left)
+                    self.applied = True       
+                    self.score   = Tech_db.ExpIntoPairing                   
                             #self.rule += "moved exponent into the pairing: less than 2 mul nodes. "
 
-                    elif Type(pair_node.right) in [ops.HASH, ops.ATTR]:
-                        if self.debug: print("T2 - exercise pair_node : right = ATTR : ", pair_node.right)
+            elif Type(prod_node.right) in [ops.HASH, ops.ATTR]:
+                print("T2 - exercise pair_node : right = ATTR : ", prod_node.right)
                         # set pair node left child to node left since we've determined
                         # that the left side of pair node is not a constant
-                        self.setNodeAs(pair_node, side.right, node, side.left)
-                        self.applied = True
-                        self.score   = Tech_db.ExpIntoPairing
-                    else:
-#                        print("T2: what are the other cases: ", Type(pair_node.right))
-                        pass
-
-                # check whether right side is constant
-                elif not self.isConstInSubtreeT(pair_node.right):
-                    # check the type of pair_node : 
-                    if Type(pair_node.left) == ops.MUL:
-#                        print("T2: missing case - pair_node.left and MUL node.")
-                        _subnodes = []
-                        getListNodes(pair_node.left, ops.NONE, _subnodes)
-#                        print("len: ", len(_subnodes))
-#                        for i in _subnodes:
-#                            print("found: ", i)
-                        if len(_subnodes) > 2:
-                            new_mul_node = self.createExp(pair_node.left, node.right)
-                            pair_node.left = new_mul_node
-                            self.applied = True
-                            self.score   = Tech_db.DistributeExpToPairing                            
-                        else:
-                            # pair_node -> left side is set to node (then which side)
-                            self.setNodeAs(pair_node, side.left, node, side.left)
-                            self.applied = True
-                            self.score   = Tech_db.ExpIntoPairing                            
-                    elif Type(pair_node.left) in [ops.HASH, ops.ATTR]:
-#                        print("T2 - exercise pair_node : left = ATTR : ", pair_node.left)
-                        # set pair node right child to 
-                        self.setNodeAs(pair_node, side.left, node, side.left)
-                        self.applied = True
-                        self.score   = Tech_db.ExpIntoPairing
-                    else:
-                        pass
-            else:
-                #    blindly make the exp node the right child of whatever node
                 self.setNodeAs(prod_node, side.right, node, side.left)
                 self.applied = True
                 self.score   = Tech_db.ExpIntoPairing
+            else:
+                pass
+# COMMENT OUT FOR NOW
+#            elif Type(prod_node.right) == ops.EXP:
+#                pass
+#            else:
+#                print("Else case: ", prod_node.right, Type(prod_node.right), "\n")
+#                #    blindly make the exp node the right child of whatever node
+#                self.setNodeAs(prod_node, side.right, node, side.left)
+#                self.applied = True
+#                self.score   = Tech_db.ExpIntoPairing
                 
         elif(Type(node.left) == ops.MUL):    
             # distributing exponent over a MUL node (which may have more MUL nodes)        
-            #print("Consider: node.left.type =>", node.left.type)
-                
-                
+            #print("Consider: node.left.type =>", node.left.type)                
             mul_node = node.left
             if self.debug: 
                 print("distribute exp correctly =>")
@@ -587,6 +573,16 @@ class Technique1(AbstractTechnique):
             # Note: if the operands of the mul are ATTR or PAIR doesn't matter. If the operands are PAIR nodes, PAIR ^ node.right
             # This is OK b/c of preorder visitation, we will apply transformations to the children once we return.
             # The EXP node of the mul children nodes will be visited, so we can apply technique 2 for that node.
+        elif(Type(node.left) == ops.ATTR):
+#            print("Need to add logic for this: ", node.left, node.right)
+            assign = self.getVarDef(str(node.left))
+            if assign: 
+                var_node = assign.getAssignNode() # EQ node
+                if Type(var_node) == ops.EQ: 
+                    new_node = self.createExp2(var_node.right, node.right)
+                    var_node.right = new_node
+                    addAsChildNodeToParent(data, node.left)
+                    print("Move exponent inside: ", var_node)
         else:
             #print("Other cases not ATTR?: ", Type(node.left))
             return
