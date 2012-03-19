@@ -614,8 +614,8 @@ def parseFile2(filename):
     parser = SDLParser() 
     ast_code = []
     for line in code:
-        i += 1
-        if len(line.strip()) > 0:
+        if len(line.strip()) > 0 and line[0] != '#':
+            i += 1
             node = parser.parse(line, i)
             #print("sdl: ", i, node)
             ast_code.append(node)

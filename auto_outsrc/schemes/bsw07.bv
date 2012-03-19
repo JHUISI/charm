@@ -82,6 +82,7 @@ output := ct
 END :: func:encrypt
 
 
+#dot prod should be "y := attrs#1"
 BEGIN :: func:decrypt
 input := list{pk, sk, ct}
 ct := expand{policy_str, Ctl, C, Cr, Cpr}
