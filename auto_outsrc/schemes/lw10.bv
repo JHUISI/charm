@@ -3,8 +3,8 @@ setting := symmetric
 
 BEGIN :: types
 msk := list
+pk := list{list{GT, G1}}
 sk := list
-pk := list
 ct := list
 policy_str := str
 policy := object
@@ -90,10 +90,9 @@ BEGIN :: for
 for{y := 1, Y}
 r := random(ZR)
 k := attrs#y
-# should be pk#k#0
-C1#k := (egg ^ s_sh#k) * (pk#0 ^ r)
+C1#k := (egg ^ s_sh#k) * (pk#k#0 ^ r)
 C2#k := g^r
-C3#k := (pk#0 ^ r) * (g ^ w_sh#k)
+C3#k := (pk#k#0 ^ r) * (g ^ w_sh#k)
 END :: for
 
 ct := list{policy_str, C0, C1, C2, C3}
