@@ -82,7 +82,6 @@ output := ct
 END :: func:encrypt
 
 
-#dot prod should be "y := attrs#1"
 BEGIN :: func:decrypt
 input := list{pk, sk, ct}
 ct := expand{policy_str, Ctl, C, Cr, Cpr}
@@ -93,7 +92,7 @@ attrs  := prune(policy, S)
 coeff := getCoefficients(policy)
 
 Y := len(attrs)
-A := { prod{y := 1, Y} on ((e(Cr#y, Dj#y) / e(Djp#y, Cpr#y))^coeff#y) }
+A := { prod{y := attrs#1, Y} on ((e(Cr#y, Dj#y) / e(Djp#y, Cpr#y))^coeff#y) }
 
 result0 := e(C, D) / A
 M := Ctl / result0

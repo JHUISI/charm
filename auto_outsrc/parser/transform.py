@@ -14,8 +14,8 @@ debug = False
 # 4. try our best to combine pairings where appropriate then apply rewriting rules to move as much info into pairing as possible
 # 5. iterate through each pairing line and move things in distribute so that they all look like this: e(a^b, c^d) * e(e^f,g^h) * ...
 
-def transform(sdl_scheme):
-    parseFile2(sdl_scheme)
+def transform(sdl_scheme, verbosity=False):
+    parseFile2(sdl_scheme, verbosity)
     partDecCT = { CTprime.T0: None, CTprime.T1: None, CTprime.T2: None }
     print("Building partially decrypted CT: ", partDecCT)
     getVarDepInfLists()    
@@ -202,8 +202,11 @@ def testTechnique(tech_option, equation, code_block=None):
 
     
 if __name__ == "__main__":
+    print(sys.argv)
     file = sys.argv[1]
-    transform(file)
+    sdlVerbose = False
+    if len(sys.argv) > 2 and sys.argv[2] == "-v":  sdlVerbose = True
+    transform(file, sdlVerbose)
     print("\n")
     
     

@@ -608,7 +608,7 @@ def updateForLoops(node, lineNo):
     forLoops[currentFuncName].append(retForLoopStruct)
 
 # NEW SDL PARSER
-def parseFile2(filename):
+def parseFile2(filename, verbosity):
     fd = open(filename, 'r')
     code = fd.readlines(); i = 0
     parser = SDLParser() 
@@ -617,7 +617,7 @@ def parseFile2(filename):
         if len(line.strip()) > 0 and line[0] != '#':
             i += 1
             node = parser.parse(line, i)
-            #print("sdl: ", i, node)
+            if verbosity: print("sdl: ", i, node)
             ast_code.append(node)
             #i += 1
             if (node.type == ops.EQ):
