@@ -4,6 +4,7 @@ setting := symmetric
 BEGIN :: types
 msk := list
 sk := list
+pk := list
 ct := list
 policy_str := str
 policy := object
@@ -69,8 +70,8 @@ END :: func:keygen
 
 
 BEGIN :: func:encrypt
-input := list{pk, gp, M, policy_str}
-gp := expand{g}
+input := list{pk, gpk, M, policy_str}
+gpk := expand{ g }
 
 policy := createPolicy(policy_str)
 attrs := getAttributeList(policy)
@@ -89,9 +90,10 @@ BEGIN :: for
 for{y := 1, Y}
 r := random(ZR)
 k := attrs#y
-C1#k := (egg ^ s_sh#k) * (pk#k#0 ^ r)
+# should be pk#k#0
+C1#k := (egg ^ s_sh#k) * (pk#0 ^ r)
 C2#k := g^r
-C3#k := (pk#k#0^r) * (g^w_sh#k)
+C3#k := (pk#0 ^ r) * (g ^ w_sh#k)
 END :: for
 
 ct := list{policy_str, C0, C1, C2, C3}
