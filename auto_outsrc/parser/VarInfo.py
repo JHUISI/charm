@@ -102,6 +102,8 @@ class VarInfo:
         elif (node.type == ops.TYPE):
             if (self.funcName == TYPES_HEADER):
                 varType = getVarType(node)
+                if (isValidType(varType) == False):
+                    sys.exit("TraverseAssignNodeRecursive in VarInfo.py extracted type that is not one of the supported types.")
                 if (self.type != types.NO_TYPE):
                     sys.exit("TraverseAssignNodeRecursive found multiple type assignments to same variable in " + str(self.funcName) + " function.")
                 self.type = varType

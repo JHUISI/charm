@@ -63,6 +63,9 @@ def isValidType(possibleType):
         if (str(possibleType) == str(validType)):
             return True
 
+    if (possibleType == ops.LIST):
+        return True
+
     return False
 
 def getListNodeNames(node):
