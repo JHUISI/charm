@@ -3,7 +3,8 @@ setting := symmetric
 
 BEGIN :: types
 msk := list
-pk := list{list{GT, G1}}
+pk1 := list{GT, G1}
+pk := list{pk1}
 sk := list
 ct := list
 policy_str := str
