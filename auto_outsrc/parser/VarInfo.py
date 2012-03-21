@@ -7,7 +7,7 @@ class VarInfo:
     def __init__(self):
         self.assignNode = None
         self.lineNo = None
-        self.varDeps = None
+        self.varDeps = []
         self.hasPairings = None
         self.protectsM = None
         self.initValue = None
@@ -22,6 +22,7 @@ class VarInfo:
         self.outsideForLoopObj = None
         self.hasRandomness = False
         self.label = None
+        self.isTypeEntryOnly = False
 
     def getAssignNode(self):
         return self.assignNode
@@ -41,6 +42,9 @@ class VarInfo:
         return self.hasPairings
 
     def getProtectsM(self):
+        if (self.assignNode == None):
+            return False
+
         # generally, we're not interested in keywords that may reference the message
         if str(self.assignNode.left) in ['input', 'output']:
             return False         
@@ -79,6 +83,9 @@ class VarInfo:
     def getHasRandomness(self):
         return self.hasRandomness
 
+    def getIsTypeEntryOnly(self):
+        return self.isTypeEntryOnly
+
     def traverseAssignNodeRecursive(self, node):
         if (node.type == ops.PAIR):
             self.hasPairings = True
@@ -99,14 +106,6 @@ class VarInfo:
                 if (self.initValue == LIST_TYPE):
                     self.isList = True
                 self.initCall = True
-        elif (node.type == ops.TYPE):
-            if (self.funcName == TYPES_HEADER):
-                varType = getVarType(node)
-                if (isValidType(varType) == False):
-                    sys.exit("TraverseAssignNodeRecursive in VarInfo.py extracted type that is not one of the supported types.")
-                if (self.type != types.NO_TYPE):
-                    sys.exit("TraverseAssignNodeRecursive found multiple type assignments to same variable in " + str(self.funcName) + " function.")
-                self.type = varType
         elif (node.type == ops.RANDOM):
             self.hasRandomness = True
 
@@ -121,7 +120,6 @@ class VarInfo:
         if (self.assignNode == None):
             sys.exit("Attempting to run traverseAssignNode in VarInfo when self.assignNode is still None.")
 
-        self.varDeps = []
         self.hasPairings = False
         self.protectsM = False
 
@@ -162,3 +160,12 @@ class VarInfo:
             sys.exit("Line number passed to VarInfo is invalid.")
 
         self.lineNo = lineNo
+
+    def setIsTypeEntryOnly(self, isTypeEntryOnly):
+        if (self.isTypeEntryOnly == True):
+            sys.exit("setIsTypeEntryOnly in VarInfo.py has been set more than once.")
+
+        if (isTypeEntryOnly != True):
+            sys.exit("setIsTypeEntryOnly in VarInfo.py received input that is not valid.")
+
+        self.isTypeEntryOnly = isTypeEntryOnly

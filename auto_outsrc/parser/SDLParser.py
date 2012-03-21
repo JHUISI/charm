@@ -5,6 +5,7 @@
 from pyparsing import *
 from SDLang import *
 from VarInfo import *
+from VarType import *
 from ForLoop import *
 import string,sys
 
@@ -340,14 +341,55 @@ def parseFile(filename):
     fd.close()
     return ast
 
-def updateVarTypes(varTypeSubStruct, varName, type):
-    if ( (varName in varTypeSubStruct) and (varTypeSubStruct[varName] != type) ):
-        sys.exit("Found mismatching type information in cryptoscheme.")
+def updateVarTypes(node, i, newType=types.NO_TYPE):
+    global varTypes, assignInfo
 
-    if (isValidType(type) == False):
-        sys.exit("Type inference engine found type that is not one of the currently supported types.")
+    if ( (newType == types.NO_TYPE) and (currentFuncName != TYPES_HEADER) ):
+        sys.exit("updateVarTypes in SDLParser.py received newType of types.NO_TYPE when currentFuncName was not TYPES_HEADER.")
 
-    varTypeSubStruct[varName] = type
+    if ( (newType != types.NO_TYPE) and (currentFuncName == TYPES_HEADER) ):
+        sys.exit("updateVarTypes in SDLParser.py received newType unequal to types.NO_TYPE when currentFuncName was TYPES_HEADER.")
+
+    varName = getFullVarName(node.left)
+    if (varName in varTypes[currentFuncName]):
+        sys.exit("updateVarTypes in SDLParser.py received as input a node whose full variable name is already in varTypes[currentFuncName].")
+
+    varTypeObj = VarType()
+    varTypeObj.setLineNo(i)
+
+    if (newType != types.NO_TYPE):
+        if (isValidType(newType) == False):
+            sys.exit("updateVarTypes in SDLParser.py received as input a new type that is not one of the supported types.")
+
+        varTypeObj.setType(newType)
+        varTypes[currentFuncName][varName] = varTypeObj
+        return
+
+    varInfoObj = VarInfo()
+    varInfoObj.setIsTypeEntryOnly(True)
+    if (varName in assignInfo[currentFuncName]):
+        sys.exit("In updateVarTypes in SDLParser.py, found duplicate entries for variable name in TYPES_HEADER function.")
+
+    assignInfo[currentFuncName][varName] = varInfoObj
+
+    typeNode = node.right
+
+    if (typeNode.type == ops.TYPE):
+        varTypeObj.setType(typeNode.attr)
+        varTypes[currentFuncName][varName] = varTypeObj
+        return
+
+    if (typeNode.type == ops.LIST):
+        varTypeObj.setType(ops.LIST)
+        addListNodesToList(typeNode, varTypeObj.getListNodesList())
+        listNodesList = varTypeObj.getListNodesList()
+        #for listNode in listNodesList:
+            #if (isValidType(listNode) == False):
+                #sys.exit("updateVarTypes in SDLParser.py extracted list whose members are not valid types.")
+        varTypes[currentFuncName][varName] = varTypeObj
+        return
+
+    sys.exit("updateVarTypes in SDLParser.py was passed a node that it is not currently capable of processing.")
 
 def checkPairingInputTypes_Symmetric(leftType, rightType):
     if ( (leftType != types.G1) and (leftType != types.G2) ):
@@ -455,7 +497,6 @@ def getVarTypeInfoRecursive(node):
         leftSideType = getVarTypeInfoRecursive(node.left)
         rightSideType = getVarTypeInfoRecursive(node.right)
         if (leftSideType != rightSideType):
-            print(node)
             sys.exit("getVarTypeInfoRecursive in SDLParser.py found an operation of type ADD, SUB, MUL, or DIV in which the left and right sides were not of the same type.")
         return leftSideType
     if (node.type == ops.PAIR):
@@ -468,46 +509,33 @@ def getVarTypeInfoRecursive(node):
         return retHashType
     if (node.type == ops.ATTR):
         if (node.attr in varTypes[currentFuncName]):
-            return varTypes[currentFuncName][node.attr]
+            return varTypes[currentFuncName][node.attr].getType()
         if (node.attr.find(LIST_INDEX_SYMBOL) != -1):
             (funcNameOfVar, varNameInList) = getVarNameFromListIndices(node)
             if ( (funcNameOfVar == None) or (varNameInList == None) ):
                 return types.NO_TYPE
             try:
-                retVarType = varTypes[funcNameOfVar][varNameInList]
+                retVarType = varTypes[funcNameOfVar][varNameInList].getType()
             except:
                 (outsideFunctionName, retVarInfoObj) = getVarNameEntryFromAssignInfo(varNameInList)
                 if ( (outsideFunctionName == None) or (retVarInfoObj == None) or (varNameInList not in varTypes[outsideFunctionName]) ):
                     return types.NO_TYPE
-                retVarType = varTypes[outsideFunctionName][varNameInList]            
+                retVarType = varTypes[outsideFunctionName][varNameInList].getType()            
             return retVarType
         else:
             (outsideFunctionName, retVarInfoObj) = getVarNameEntryFromAssignInfo(node.attr)
             if ( (outsideFunctionName != None) and (node.attr in varTypes[outsideFunctionName]) ):
-                return varTypes[outsideFunctionName][node.attr]
+                return varTypes[outsideFunctionName][node.attr].getType()
 
     return types.NO_TYPE
 
-def getVarTypeInfo(node, varName):
-    if (currentFuncName == TYPES_HEADER):
-        updateVarTypes(varTypes[currentFuncName], varName, assignInfo[currentFuncName][varName].getType())
-        return
-
+def getVarTypeInfo(node, i, varName):
     retVarType = getVarTypeInfoRecursive(node.right)
     if (retVarType != types.NO_TYPE):
-        updateVarTypes(varTypes[currentFuncName], varName, retVarType)
+        updateVarTypes(node, i, retVarType)
 
 def updateAssignInfo(node, i):
-    global assignInfo, forLoops, varTypes
-
-    if (currentFuncName not in assignInfo):
-        assignInfo[currentFuncName] = {}
-
-    if (currentFuncName not in varTypes):
-        varTypes[currentFuncName] = {}
-
-    if (currentFuncName not in forLoops):
-        forLoops[currentFuncName] = []
+    global assignInfo, forLoops
 
     assignInfo_Func = assignInfo[currentFuncName]
 
@@ -532,7 +560,7 @@ def updateAssignInfo(node, i):
         currentForLoopObj.appendToBinaryNodeList(node)
         currentForLoopObj.appendToVarInfoNodeList(assignInfo_Func[varName])
 
-    getVarTypeInfo(node, varName)
+    getVarTypeInfo(node, i, varName)
 
     global algebraicSetting
 
@@ -609,6 +637,8 @@ def updateForLoops(node, lineNo):
 
 # NEW SDL PARSER
 def parseFile2(filename, verbosity):
+    global varTypes, assignInfo, forLoops
+
     fd = open(filename, 'r')
     code = fd.readlines(); i = 0
     parser = SDLParser() 
@@ -621,7 +651,19 @@ def parseFile2(filename, verbosity):
             ast_code.append(node)
             #i += 1
             if (node.type == ops.EQ):
-                updateAssignInfo(node, i)
+                if (currentFuncName not in varTypes):
+                    varTypes[currentFuncName] = {}
+
+                if (currentFuncName not in assignInfo):
+                    assignInfo[currentFuncName] = {}
+
+                if (currentFuncName not in forLoops):
+                    forLoops[currentFuncName] = []
+
+                if (currentFuncName == TYPES_HEADER):
+                    updateVarTypes(node, i)
+                else:
+                    updateAssignInfo(node, i)
             elif (node.type == ops.FOR):
                 updateForLoops(node, i)
 
@@ -1121,7 +1163,7 @@ def printVarTypes():
         print("FUNCTION NAME:  " + funcName)
         print("\n")
         for varName in varTypes[funcName]:
-            print(str(varName) + " -> " + str(varTypes[funcName][varName]))
+            print(str(varName) + " -> " + str(varTypes[funcName][varName].getType()))
         print("\n")
 
 def printFinalOutput():

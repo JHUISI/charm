@@ -63,9 +63,6 @@ def isValidType(possibleType):
         if (str(possibleType) == str(validType)):
             return True
 
-    if (possibleType == ops.LIST):
-        return True
-
     return False
 
 def getListNodeNames(node):
@@ -95,11 +92,13 @@ def addListNodesToList(node, listToAddTo):
         if ( (listNodeFinal not in listToAddTo) and (listNodeFinal.isdigit() == False) and (listNodeFinal != NONE_STRING) ):
             listToAddTo.append(listNodeFinal)
 
+'''
 def getVarType(node):
     if (node.type != ops.TYPE):
         sys.exit("getVarType in SDLange received node that is not of type " + str(ops.TYPE))
 
     return node.attr
+'''
 
 def dropListIndexIfNonNum(varName):
     if (varName.count(LIST_INDEX_SYMBOL) != 1):
