@@ -41,8 +41,6 @@ input := list{pk, mk, S}
 r := random(ZR)
 p0 := pk#1^r
 D := (mk#1 * p0)^(1/mk#0)
-Dj := init(list)
-Djp := init(list)
 
 Y := len(S)
 BEGIN :: for

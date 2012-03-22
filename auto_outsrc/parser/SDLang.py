@@ -25,6 +25,7 @@ from toolbox.enum import *
 import string, sys
 
 BINARY_NODE_CLASS_NAME = 'BinaryNode'
+ENUM_VALUE_CLASS_NAME = 'EnumValue'
 NONE_FUNC_NAME = "NONE_FUNC_NAME"
 NONE_STRING = 'None'
 SYMMETRIC_SETTING = "symmetric"
@@ -62,6 +63,9 @@ def isValidType(possibleType):
     for validType in types:
         if (str(possibleType) == str(validType)):
             return True
+
+    if (possibleType == ops.LIST):
+        return True
 
     return False
 

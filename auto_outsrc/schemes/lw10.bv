@@ -34,8 +34,6 @@ END :: func:setup
 BEGIN :: func:authsetup
 input := list{gpk, authS}
 gpk := expand{g}
-msk := init(list)
-pk := init(list)
 
 Y := len(authS)
 BEGIN :: for
@@ -57,7 +55,6 @@ input := list{gpk, msk, gid, userS}
 gpk := expand{g}
 h := H(gid, G1)
 
-K := init(list)
 Y := len(userS)
 BEGIN :: for
 for{i := 1, Y}
@@ -83,9 +80,6 @@ w_sh := calculateShares(w, policy)
 Y := len(s_sh)
 egg := e(g,g)
 C0 := M * (egg^s)
-C1 := init(list)
-C2 := init(list)
-C3 := init(list)
 
 BEGIN :: for
 for{y := 1, Y}
@@ -93,7 +87,7 @@ r := random(ZR)
 k := attrs#y
 C1#k := (egg ^ s_sh#k) * (pk#k#0 ^ r)
 C2#k := g^r
-C3#k := (pk#k#0 ^ r) * (g ^ w_sh#k)
+C3#k := (pk#k#1 ^ r) * (g ^ w_sh#k)
 END :: for
 
 ct := list{policy_str, C0, C1, C2, C3}

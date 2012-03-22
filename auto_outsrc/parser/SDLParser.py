@@ -341,13 +341,23 @@ def parseFile(filename):
     fd.close()
     return ast
 
+def setVarTypeObjForList(varTypeObj, typeNode):
+    if (type(typeNode).__name__ != BINARY_NODE_CLASS_NAME):
+        sys.exit("setVarTypeObjForList in SDLParser.py received as input for typeNode a parameter that is not a Binary Node.")
+
+    if (typeNode.type != ops.LIST):
+        sys.exit("setVarTypeObjForList in SDLParser.py received as input for typeNode a Binary Node that is not of type ops.LIST.")
+
+    varTypeObj.setType(ops.LIST)
+    addListNodesToList(typeNode, varTypeObj.getListNodesList())
+
 def updateVarTypes(node, i, newType=types.NO_TYPE):
     global varTypes, assignInfo
 
-    if ( (newType == types.NO_TYPE) and (currentFuncName != TYPES_HEADER) ):
+    if ( (type(newType).__name__ == ENUM_VALUE_CLASS_NAME) and (newType == types.NO_TYPE) and (currentFuncName != TYPES_HEADER) ):
         sys.exit("updateVarTypes in SDLParser.py received newType of types.NO_TYPE when currentFuncName was not TYPES_HEADER.")
 
-    if ( (newType != types.NO_TYPE) and (currentFuncName == TYPES_HEADER) ):
+    if ( (type(newType).__name__ == ENUM_VALUE_CLASS_NAME) and (newType != types.NO_TYPE) and (currentFuncName == TYPES_HEADER) ):
         sys.exit("updateVarTypes in SDLParser.py received newType unequal to types.NO_TYPE when currentFuncName was TYPES_HEADER.")
 
     varName = getFullVarName(node.left)
@@ -356,6 +366,16 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
 
     varTypeObj = VarType()
     varTypeObj.setLineNo(i)
+
+    if (type(newType).__name__ == BINARY_NODE_CLASS_NAME):
+        if (newType.type != ops.LIST):
+            sys.exit("updateVarTypes in SDLParser.py received newType that is a Binary Node, but not of type ops.LIST.")
+        setVarTypeObjForList(varTypeObj, newType)
+        varTypes[currentFuncName][varName] = varTypeObj
+        return
+
+    if (type(newType).__name__ != ENUM_VALUE_CLASS_NAME):
+        sys.exit("updateVarTypes in SDLParser.py received newType that does not have type Binary Node or Enum Value.")
 
     if (newType != types.NO_TYPE):
         if (isValidType(newType) == False):
@@ -380,12 +400,7 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
         return
 
     if (typeNode.type == ops.LIST):
-        varTypeObj.setType(ops.LIST)
-        addListNodesToList(typeNode, varTypeObj.getListNodesList())
-        listNodesList = varTypeObj.getListNodesList()
-        #for listNode in listNodesList:
-            #if (isValidType(listNode) == False):
-                #sys.exit("updateVarTypes in SDLParser.py extracted list whose members are not valid types.")
+        setVarTypeObjForList(varTypeObj, typeNode)
         varTypes[currentFuncName][varName] = varTypeObj
         return
 
@@ -463,6 +478,13 @@ def getNextListName(origListName, index):
 
     return (listFuncNameInAssignInfo, listNodesList[index])
 
+def hasDefinedListMembers(listName):
+    (funcName, varInfoObj) = getVarNameEntryFromAssignInfo(listName)
+    if ( (varInfoObj.getIsList() == True) and (len(varInfoObj.getListNodesList()) > 0) ):
+        return True
+
+    return False
+
 def getVarNameFromListIndices(node):
     if (node.type != ops.ATTR):
         sys.exit("Node passed to getVarNameFromListIndex in SDLParser is not of type " + str(ops.ATTR))
@@ -474,12 +496,25 @@ def getVarNameFromListIndices(node):
     nodeNameSplit = nodeName.split(LIST_INDEX_SYMBOL)
     currentListName = nodeNameSplit[0]
     nodeNameSplit.remove(currentListName)
+    lenNodeNameSplit = len(nodeNameSplit)
+    counter_nodeNameSplit = 0
 
-    for listIndex in nodeNameSplit:
+    while (counter_nodeNameSplit < lenNodeNameSplit):
+        listIndex = nodeNameSplit[counter_nodeNameSplit]
         if (listIndex.isdigit() == False):
-            (tempFuncName, tempListName) = getVarNameEntryFromAssignInfo(currentListName)
-            return (tempFuncName, currentListName)
+            if (counter_nodeNameSplit == (lenNodeNameSplit - 1)):
+                (tempFuncName, tempListName) = getVarNameEntryFromAssignInfo(currentListName)
+                return (tempFuncName, currentListName)
+            definedListMembers = hasDefinedListMembers(currentListName)
+            if ( (definedListMembers == True) and (nodeNameSplit[counter_nodeNameSplit + 1].isdigit() == True) ):
+                (currentFuncName, currentListName) = getNextListName(currentListName, nodeNameSplit[counter_nodeNameSplit + 1])
+                counter_nodeNameSplit += 2
+                continue
+            else:
+                (tempFuncName, tempListName) = getVarNameEntryFromAssignInfo(currentListName)
+                return (tempFuncName, currentListName)
         (currentFuncName, currentListName) = getNextListName(currentListName, listIndex)
+        counter_nodeNameSplit += 1
 
     return (currentFuncName, currentListName)
 
@@ -491,6 +526,8 @@ def getVarTypeInfoRecursive(node):
         return retRandomType
     if (node.type == ops.ON):
         return getVarTypeInfoRecursive(node.right)
+    if (node.type == ops.LIST):
+        return node
     if (node.type == ops.EXP):
         return getVarTypeInfoRecursive(node.left)
     if ( (node.type == ops.ADD) or (node.type == ops.SUB) or (node.type == ops.MUL) or (node.type == ops.DIV) ):
@@ -531,8 +568,12 @@ def getVarTypeInfoRecursive(node):
 
 def getVarTypeInfo(node, i, varName):
     retVarType = getVarTypeInfoRecursive(node.right)
-    if (retVarType != types.NO_TYPE):
-        updateVarTypes(node, i, retVarType)
+    if (type(retVarType).__name__ == ENUM_VALUE_CLASS_NAME):
+        if (retVarType != types.NO_TYPE):
+            updateVarTypes(node, i, retVarType)
+    elif (type(retVarType).__name__ == BINARY_NODE_CLASS_NAME):
+        if (retVarType.type == ops.LIST):
+            updateVarTypes(node, i, retVarType)
 
 def updateAssignInfo(node, i):
     global assignInfo, forLoops
@@ -644,8 +685,9 @@ def parseFile2(filename, verbosity):
     parser = SDLParser() 
     ast_code = []
     for line in code:
+        i += 1
         if len(line.strip()) > 0 and line[0] != '#':
-            i += 1
+            #i += 1
             node = parser.parse(line, i)
             if verbosity: print("sdl: ", i, node)
             ast_code.append(node)

@@ -45,7 +45,6 @@ t := random(ZR)
 K := g2alph * (g2a^t)
 L := g2^t
 Y := len(S)
-Kl := init(list)
 
 BEGIN :: for
 for{y := 1, Y}
@@ -69,8 +68,6 @@ sh := calculateShares(s, policy)
 Y := len(sh)
 C := M * egg^s
 Cpr := g1 ^ s
-Cn := init(list)
-Dn := init(list)
 
 BEGIN :: for
 for{y := 1, Y}
