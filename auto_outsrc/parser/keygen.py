@@ -47,7 +47,7 @@ def blindKeygenOutputElement(keygenOutputElem, keygenInput):
 def keygen(sdl_scheme):
     global SDLLinesForKeygen
 
-    parseFile2(sdl_scheme)
+    parseFile2(sdl_scheme, False)
     getVarDepInfLists()    
     getVarsThatProtectM()
 
