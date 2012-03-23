@@ -688,6 +688,9 @@ def updateForLoops(node, lineNo):
 def getLinesOfCode():
     return linesOfCode
 
+def getAssignInfo():
+    return assignInfo
+
 def removeFromLinesOfCode(linesToRemove):
     global linesOfCode
 
