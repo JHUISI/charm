@@ -26,6 +26,7 @@ import string, sys
 
 BINARY_NODE_CLASS_NAME = 'BinaryNode'
 ENUM_VALUE_CLASS_NAME = 'EnumValue'
+VAR_INFO_CLASS_NAME = 'VarInfo'
 NONE_FUNC_NAME = "NONE_FUNC_NAME"
 NONE_STRING = 'None'
 SYMMETRIC_SETTING = "symmetric"

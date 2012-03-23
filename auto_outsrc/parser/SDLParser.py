@@ -685,6 +685,37 @@ def updateForLoops(node, lineNo):
 
     forLoops[currentFuncName].append(retForLoopStruct)
 
+def getLinesOfCodeFromLineNos(listOfLineNos):
+    if ( (type(listOfLineNos) is not list) or (len(listOfLineNos) == 0) ):
+        sys.exit("Problem with list of line numbers passed in to getLinesOfCodeFromLineNos in SDLParser.py.")
+
+    retListOfCodeLines = []
+
+    for lineNo in listOfLineNos:
+        if ( (type(lineNo) is not int) or (lineNo < 1) or (lineNo > len(linesOfCode)) ):
+            sys.exit("One of the line numbers passed in to getLinesOfCodeFromLineNos in SDLParser.py is invalid.")
+
+        retListOfCodeLines.append(linesOfCode[(lineNo - 1)])
+
+    if (len(retListOfCodeLines) == 0):
+        sys.exit("getLinesOfCodeFromLineNos in SDLParser.py was unable to retrieve any lines of code.")
+
+    return retListOfCodeLines
+
+def getLinesOfCodeFromVarInfoObjs(listOfVarInfoObjs):
+    if ( (type(listOfVarInfoObjs) is not list) or (len(listOfVarInfoObjs) == 0) ):
+        sys.exit("Problem with list of VarInfo objects passed in to getLinesOfCodeFromVarInfoObjs in SDLParser.py.")
+
+    lineNos = []
+
+    for varInfoObj in listOfVarInfoObjs:
+        if (type(varInfoObj).__name__ != VAR_INFO_CLASS_NAME):
+            sys.exit("One of the list entries in list passed to getLinesOfCodeFromBinNodes in SDLParser.py is not of VarInfo type.")
+
+        lineNos.append(varInfoObj.getLineNo())
+
+    return getLinesOfCodeFromLineNos(lineNos)
+
 def getLinesOfCode():
     return linesOfCode
 
