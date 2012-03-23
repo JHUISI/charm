@@ -18,9 +18,7 @@ def transform(sdl_scheme, verbosity=False):
     parseFile2(sdl_scheme, verbosity)
     partDecCT = { CTprime.T0: None, CTprime.T1: None, CTprime.T2: None }
     print("Building partially decrypted CT: ", partDecCT)
-    getVarDepInfLists()    
-    getVarsThatProtectM()
-    printFinalOutput()
+    print("Assign Info =>", assignInfo)
     encrypt_block = assignInfo['encrypt']
     decrypt_block = assignInfo['decrypt']
     protectsM_enc = varsThatProtectM['encrypt']

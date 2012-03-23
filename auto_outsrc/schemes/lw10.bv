@@ -112,3 +112,4 @@ M := C0 / A
 output := M
 END :: func:decrypt
 
+# change rule for moving exp into a variable : only if it's a negative exponent! nothing else!
