@@ -15,19 +15,13 @@ debug = False
 # 5. iterate through each pairing line and move things in distribute so that they all look like this: e(a^b, c^d) * e(e^f,g^h) * ...
 
 def transform(sdl_scheme, verbosity=False):
+    global AssignInfo
     parseFile2(sdl_scheme, verbosity)
     partDecCT = { CTprime.T0: None, CTprime.T1: None, CTprime.T2: None }
     print("Building partially decrypted CT: ", partDecCT)
-    print("Assign Info =>", assignInfo)
-    encrypt_block = assignInfo['encrypt']
-    decrypt_block = assignInfo['decrypt']
-    protectsM_enc = varsThatProtectM['encrypt']
-    protectsM_dec = varsThatProtectM['decrypt']
-    
-    print("Variables that protect the message:\n")
-    print("Encrypt func: ", protectsM_enc)
-    print("Decrypt func: ", protectsM_dec)
-    print("assignInfo =>", list(decrypt_block.keys()), "\n")
+    AssignInfo = getAssignInfo()
+    encrypt_block = AssignInfo['encrypt']
+    decrypt_block = AssignInfo['decrypt']
     
     (stmtsEnc, typesEnc, depListEnc, infListEnc) = getFuncStmts("encrypt")
     (stmtsDec, typesDec, depListDec, infListDec) = getFuncStmts("decrypt")
@@ -114,8 +108,8 @@ def identifyT1(varInf, data):
         if len(t1_varname) == 1:
             # M := T0 / T1 form
             i = t1_varname[0]
-            print("T1: ", assignInfo[targetFunc][i])
-            data[CTprime.T1] = assignInfo[targetFunc][i]
+            print("T1: ", AssignInfo[targetFunc][i])
+            data[CTprime.T1] = AssignInfo[targetFunc][i]
         else:
             # TODO: need to create a new assignment for T1 and set to common operation of remaining
             # variables 
@@ -133,7 +127,7 @@ def createLOC(partialCT):
     
     T1_node = BinaryNode(ops.EQ)
     T1_node.left = BinaryNode(T1)
-    T1_node.right = assignInfo[targetFunc][varName1].getAssignNode().left
+    T1_node.right = AssignInfo[targetFunc][varName1].getAssignNode().left
 
     return T0_node, T1_node
 
