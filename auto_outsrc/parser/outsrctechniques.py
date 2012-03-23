@@ -575,6 +575,7 @@ class Technique1(AbstractTechnique):
             # The EXP node of the mul children nodes will be visited, so we can apply technique 2 for that node.
         elif(Type(node.left) == ops.ATTR):
 #            print("Need to add logic for this: ", node.left, node.right)
+            if str(node.right) != "-1": return
             assign = self.getVarDef(str(node.left))
             if assign: 
                 var_node = assign.getAssignNode() # EQ node
