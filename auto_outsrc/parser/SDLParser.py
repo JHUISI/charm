@@ -20,6 +20,9 @@ varsThatProtectM = {}
 varTypes = {}
 algebraicSetting = None
 startLineNo_ForLoop = None
+startLineNos_Functions = {}
+endLineNos_Functions = {}
+linesOfCode = None
 getVarDepInfListsCalled = getVarsThatProtectMCalled = False
 TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
 ARBITRARY_FUNC = 'func:'
@@ -174,11 +177,17 @@ class SDLParser:
             return newList
         elif op in [START_TOKEN, END_TOKEN]: # start and end block lines
             op1 = self.evalStack(stack, line_number)
-            global currentFuncName, forLoops, startLineNo_ForLoop
+            global currentFuncName, forLoops, startLineNo_ForLoop, startLineNos_Functions, endLineNos_Functions
             if (op1.startswith(DECL_FUNC_HEADER) == True):
                 if (op == START_TOKEN):
                     currentFuncName = op1[len(DECL_FUNC_HEADER):len(op1)]
+                    if (currentFuncName in startLineNos_Functions):
+                        sys.exit("SDLParser.py found multiple START_TOKEN declarations for the same function name.")
+                    startLineNos_Functions[currentFuncName] = line_number
                 elif (op == END_TOKEN):
+                    if (currentFuncName in endLineNos_Functions):
+                        sys.exit("SDLParser.py found multiple END_TOKEN declarations for the same function.")
+                    endLineNos_Functions[currentFuncName] = line_number
                     currentFuncName = NONE_FUNC_NAME
             elif (op1 == TYPES_HEADER):
                 if (op == START_TOKEN):
@@ -676,22 +685,153 @@ def updateForLoops(node, lineNo):
 
     forLoops[currentFuncName].append(retForLoopStruct)
 
+def getLinesOfCode():
+    return linesOfCode
+
+def removeFromLinesOfCode(linesToRemove):
+    global linesOfCode
+
+    if (type(linesToRemove) is not list):
+        sys.exit("removeFromLinesOfCode in SDLParser.py was passed an argument for linesToRemove that is not a list.")
+
+    if (linesOfCode == None):
+        sys.exit("removeFromLinesOfCode in SDLParser.py called before linesOfCode is set.")
+
+    newLinesOfCode = []
+
+    for indexInLinesOfCode in range(0, len(linesOfCode)):
+        lineNo = indexInLinesOfCode + 1
+        if (lineNo not in linesToRemove):
+            newLinesOfCode.append(linesOfCode[indexInLinesOfCode])
+
+    linesOfCode = newLinesOfCode
+
+def removeRangeFromLinesOfCode(startLineNo, endLineNo):
+    global linesOfCode
+
+    if ( (type(startLineNo) is not int) or (startLineNo < 1) ):
+        sys.exit("removeRangeFromLinesOfCode in SDLParser.py received input for starting line number that is invalid.")
+
+    if ( (type(endLineNo) is not int) or (endLineNo < 1) ):
+        sys.exit("removeRangeFromLinesOfCode in SDLParser.py received input for ending line number that is invalid.")
+
+    if (startLineNo > endLineNo):
+        sys.exit("removeRangeFromLinesOfCode in SDLParser.py received a starting line number that is greater than the ending line number.")
+
+    if (linesOfCode == None):
+        sys.exit("removeRangeFromLinesOfCode in SDLParser.py called before linesOfCode is set.")
+
+    newLinesOfCode = []
+
+    for indexInLinesOfCode in range(0, len(linesOfCode)):
+        lineNo = indexInLinesOfCode + 1
+        if ( (lineNo < startLineNo) or (lineNo > endLineNo) ):
+            newLinesOfCode.append(linesOfCode[indexInLinesOfCode])
+
+    linesOfCode = newLinesOfCode
+
+def appendToLinesOfCode(linesToAdd, lineNumberToAddTo):
+    global linesOfCode
+
+    if (type(linesToAdd) is not list):
+        sys.exit("appendToLinesOfCode in SDLParser.py received input for linesToAdd that is not a list.")
+
+    if ( (type(lineNumberToAddTo) is not int) or (lineNumberToAddTo < 1) ):
+        sys.exit("appendToLinesOfCode in SDLParser.py received input for lineNumberToAddTo that is invalid.")
+
+    lenLinesOfCode = len(linesOfCode)
+
+    if (lineNumberToAddTo > (lenLinesOfCode + 1)):
+        sys.exit("appendToLinesOfCode in SDLParser.py received input for lineNumberToAddTo that is greater than the maximum size allowed.")
+
+    newLinesOfCode = []
+
+    if (lineNumberToAddTo > 1):
+        for indexInLinesOfCode in range(0, (lineNumberToAddTo - 1)):
+            newLinesOfCode.append(linesOfCode[indexInLinesOfCode])
+
+    for lineToAdd in linesToAdd:
+        newLinesOfCode.append(lineToAdd)
+
+    if (lineNumberToAddTo == (lenLinesOfCode + 1)):
+        linesOfCode = newLinesOfCode
+        return
+
+    for indexInLinesOfCode in range( (lineNumberToAddTo - 1), lenLinesOfCode):
+        newLinesOfCode.append(linesOfCode[indexInLinesOfCode])
+
+    linesOfCode = newLinesOfCode
+
+def getLineNoOfInputStatement(funcName):
+    if ( (type(funcName) is not str) or (len(funcName) == 0) ):
+        sys.exit("getLineNoOfInputStatement in SDLParser.py received as input for function name an invalid parameter.")
+
+    if (funcName not in assignInfo):
+        sys.exit("Function name passed in to getLineNoOfInputStatement in SDLParser.py is not in assignInfo.")
+
+    if (inputKeyword not in assignInfo[funcName]):
+        sys.exit("Function corresponding to function name passed in to getLineNoOfInputStatement in SDLParser.py does not have any assignment statements with the input keyword.")
+
+    return assignInfo[funcName][inputKeyword].getLineNo()
+
+def getLineNoOfOutputStatement(funcName):
+    if ( (type(funcName) is not str) or (len(funcName) == 0) ):
+        sys.exit("getLineNoOfOutputStatement in SDLParser.py received as input for function name an invalid parameter.")
+
+    if (funcName not in assignInfo):
+        sys.exit("Function name passed in to getLineNoOfOutputStatement in SDLParser.py is not in assignInfo.")
+
+    if (outputKeyword not in assignInfo[funcName]):
+        sys.exit("Function corresponding to function name passed in to getLineNoOfOutputStatement in SDLParser.py does not have any assignment statements with the output keyword.")
+
+    return assignInfo[funcName][outputKeyword].getLineNo()
+
+def getStartLineNoOfFunc(funcName):
+    if ( (type(funcName) is not str) or (len(funcName) == 0) or (funcName not in startLineNos_Functions) ):
+        sys.exit("Function name passed in to getStartLineNoOfFunc in SDLParser.py is invalid.")
+
+    return startLineNos_Functions[funcName]
+
+def getEndLineNoOfFunc(funcName):
+    if ( (type(funcName) is not str) or (len(funcName) == 0) or (funcName not in endLineNos_Functions) ):
+        sys.exit("Function name passed in to getEndLineNoOfFunc in SDLParser.py is invalid.")
+
+    return endLineNos_Functions[funcName]
+
 # NEW SDL PARSER
 def parseFile2(filename, verbosity):
-    global varTypes, assignInfo, forLoops
+    global linesOfCode
 
     fd = open(filename, 'r')
-    code = fd.readlines(); i = 0
-    parser = SDLParser() 
-    ast_code = []
+    linesOfCode = fd.readlines()
+    parseLinesOfCode(linesOfCode, verbosity)
+
+def parseLinesOfCode(code, verbosity):
+    global varTypes, assignInfo, forLoops, currentFuncName, varDepList, varInfList, varsThatProtectM
+    global algebraicSetting, startLineNo_ForLoop, startLineNos_Functions, endLineNos_Functions
+    global getVarDepInfListsCalled, getVarsThatProtectMCalled
+
+    varTypes = {}
+    assignInfo = {}
+    forLoops = {}
+    currentFuncName = NONE_FUNC_NAME
+    varDepList = {}
+    varInfList = {}
+    varsThatProtectM = {}
+    algebraicSetting = None
+    startLineNo_ForLoop = None
+    startLineNos_Functions = {}
+    endLineNos_Functions = {}
+    getVarDepInfListsCalled = False
+    getVarsThatProtectMCalled = False
+
+    parser = SDLParser()
+    lineNumberInCode = 0 
     for line in code:
-        i += 1
+        lineNumberInCode += 1
         if len(line.strip()) > 0 and line[0] != '#':
-            #i += 1
-            node = parser.parse(line, i)
-            if verbosity: print("sdl: ", i, node)
-            ast_code.append(node)
-            #i += 1
+            node = parser.parse(line, lineNumberInCode)
+            if verbosity: print("sdl: ", lineNumberInCode, node)
             if (node.type == ops.EQ):
                 if (currentFuncName not in varTypes):
                     varTypes[currentFuncName] = {}
@@ -703,11 +843,17 @@ def parseFile2(filename, verbosity):
                     forLoops[currentFuncName] = []
 
                 if (currentFuncName == TYPES_HEADER):
-                    updateVarTypes(node, i)
+                    updateVarTypes(node, lineNumberInCode)
                 else:
-                    updateAssignInfo(node, i)
+                    updateAssignInfo(node, lineNumberInCode)
             elif (node.type == ops.FOR):
-                updateForLoops(node, i)
+                updateForLoops(node, lineNumberInCode)
+
+    getVarDepInfLists()
+    getVarDepInfListsCalled = True
+
+    getVarsThatProtectM()
+    getVarsThatProtectMCalled = True
 
 def getFuncStmts(funcName):
     if getVarDepInfListsCalled == False: 
@@ -1255,4 +1401,3 @@ if __name__ == "__main__":
         getVarsThatProtectM()
         printFinalOutput()
         (retFuncStmts, retFuncTypes, retVarDepList, retVarInfList) = getFuncStmts("decrypt")
-        pass

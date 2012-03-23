@@ -97,4 +97,3 @@ M := Ctl / result0
 
 output := M
 END :: func:decrypt
-

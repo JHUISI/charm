@@ -1,13 +1,6 @@
 from SDLParser import *
-import config, sys
-
-#TODO:  move this to config.py
-blindingLoopVar = "y"
-blindingSuffix = "_Blinded"
-keygenBlindingExponent = "z"
-keygenFuncName = "keygen"
-inputKeyword = "input"
-outputKeyword = "output"
+from config import *
+import sys
 
 SDLLinesForKeygen = ""
 
