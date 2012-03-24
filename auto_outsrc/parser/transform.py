@@ -14,8 +14,6 @@ debug = False
 # 4. try our best to combine pairings where appropriate then apply rewriting rules to move as much info into pairing as possible
 # 5. iterate through each pairing line and move things in distribute so that they all look like this: e(a^b, c^d) * e(e^f,g^h) * ...
 
-
-
 # description: should return a list of VarObjects that make up the new
 # 
 def transform(sdl_scheme, verbosity=False):
@@ -25,13 +23,35 @@ def transform(sdl_scheme, verbosity=False):
     print("Building partially decrypted CT: ", partDecCT)
     AssignInfo = getAssignInfo()
 
-    encrypt_block = AssignInfo['encrypt']
+#    encrypt_block = AssignInfo['encrypt']
     decrypt_block = AssignInfo['decrypt']
+    # 1 get output line for keygen 
+    # 2 get the reference and list definition (e.g., vars of secret key)
+    # 3 see which ones appear in transform and mark them as needing to be blinded
+    keygen = "keygen"
+    (stmtsKg, typesKg, depListKg, infListKg) = getFuncStmts(keygen)
+    outputKgLine = getLineNoOfOutputStatement(keygen)
+    secret = str(stmtsKg[outputKgLine].getAssignNode().right)
+    print("output :=>", secret)
+    secretVars = AssignInfo[keygen][secret].getAssignNode().right
+    print("list :=>", secretVars.listNodes)
+    if Type(secretVars) == ops.LIST:
+        secretList = secretVars.listNodes
+    elif Type(secretVars) == ops.ATTR:
+        secretList = [secretVars]
+    else:
+        sys.exit("ERROR: invalid structure definition in", keygen)    
     
     (stmtsEnc, typesEnc, depListEnc, infListEnc) = getFuncStmts("encrypt")
     (stmtsDec, typesDec, depListDec, infListDec) = getFuncStmts("decrypt")
+    finalSecretList = []
+    for i in secretList:
+        for k,v in depListDec.items():
+            if  i in v: finalSecretList.append(i); break
+    
+    print("INFO: Variables in Keygen that need to be blinded: ", finalSecretList)
 
-    print("<=== Encrypt ===>") 
+    print("\n<=== Encrypt ===>") 
     # first step is to identify message and how its protected   
     t0_var = None
     linesEnc = list(stmtsEnc.keys())
@@ -98,18 +118,17 @@ def transform(sdl_scheme, verbosity=False):
     
     newObj = [T0_sdlObj, T1_sdlObj, output_sdlObj, transform_output_sdlObj]
     newFunc = 'transform'
-    AssignInfo[newFunc] = {}
+#    AssignInfo[newFunc] = {}
     for i in range(len(transformVarInfos)):
         ref = transformVarInfos[i]
         if stmtsDec.get(ref):
+            cur_list.append(str(stmtsDec[ref].getAssignNode()))
+            cur_line += 1
 #            varName = stmtsDec[ref].getAssignVar()
 #            newVF   = VarInfo.copy(stmtsDec[ref])
             #print("new lines :=>\t", cur_line, newVF.getAssignNode())
 #            newVF.setLineNo(cur_line)
 #            AssignInfo[newFunc][varName] = newVF
-            cur_list.append(str(stmtsDec[ref].getAssignNode()))
-            cur_line += 1
-
     
     for o in range(len(newObj)):
        c = cur_line + o
@@ -119,16 +138,15 @@ def transform(sdl_scheme, verbosity=False):
 #       varName = varInfo.getAssignVar()
 #       AssignInfo[newFunc][varName] = varInfo
 #       cur_list.append(str(varInfo.getAssignNode()))
-       #print("new lines :=>\t", c, varInfo.getAssignNode())
        
     cur_list.append(transformOutro)
     appendToLinesOfCode(cur_list, last_line)
     removeRangeFromLinesOfCode(startLineNo, endLineNo)
     
-    
     parseLinesOfCode(getLinesOfCode(), False)
-    (stmtsTrans, typesTrans, depListTransf, infListTransf) = getFuncStmts(newFunc)
-    print("result :=>", stmtsTrans)
+    # Confirm that transform was added correctly by retrieving its statements 
+    (stmtsTrans, typesTrans, depListTrans, infListTrans) = getFuncStmts(newFunc)
+
     newLines = list(stmtsTrans.keys())
     newLines.sort()
     print("<===\tNew Transform\t===>") 
@@ -136,8 +154,7 @@ def transform(sdl_scheme, verbosity=False):
         print(i, ":", stmtsTrans[i].getAssignNode())    
     print("<===\tEND\t===>") 
     
-    # get the
-
+    return finalSecretList
 
 def createVarInfo(i, node, currentFuncName):
     varInfoObj = VarInfo()
@@ -165,6 +182,9 @@ def programSliceT1(varInf, data):
         data['lines'].append(varInf.getLineNo())
     elif varInf.getVarDeps() in depList:
         data['lines'].append(varInf.getLineNo())
+
+#def depCheck(varInf, data):
+#    target
 
 def identifyT1(varInf, data):
     targetFunc = 'decrypt'
