@@ -18,7 +18,6 @@ debug = False
 # 
 def transform(sdl_scheme, verbosity=False):
     global AssignInfo
-    parseFile2(sdl_scheme, verbosity)
     partDecCT = { CTprime.T0: None, CTprime.T1: None, CTprime.T2: None }
     print("Building partially decrypted CT: ", partDecCT)
     AssignInfo = getAssignInfo()
@@ -297,10 +296,11 @@ def testTechnique(tech_option, equation, code_block=None):
     
 if __name__ == "__main__":
     print(sys.argv)
-    file = sys.argv[1]
+    sdl_file = sys.argv[1]
     sdlVerbose = False
     if len(sys.argv) > 2 and sys.argv[2] == "-v":  sdlVerbose = True
-    transform(file, sdlVerbose)
+    parseFile2(sdl_file, sdlVerbose)
+    keygenVarList = transform(sdlVerbose)
     print("\n")
     
     
