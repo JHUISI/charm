@@ -14,12 +14,17 @@ debug = False
 # 4. try our best to combine pairings where appropriate then apply rewriting rules to move as much info into pairing as possible
 # 5. iterate through each pairing line and move things in distribute so that they all look like this: e(a^b, c^d) * e(e^f,g^h) * ...
 
+
+
+# description: should return a list of VarObjects that make up the new
+# 
 def transform(sdl_scheme, verbosity=False):
     global AssignInfo
     parseFile2(sdl_scheme, verbosity)
     partDecCT = { CTprime.T0: None, CTprime.T1: None, CTprime.T2: None }
     print("Building partially decrypted CT: ", partDecCT)
     AssignInfo = getAssignInfo()
+
     encrypt_block = AssignInfo['encrypt']
     decrypt_block = AssignInfo['decrypt']
     
@@ -45,7 +50,7 @@ def transform(sdl_scheme, verbosity=False):
     print("<=== END ===>")
     
     traverseBackwards(stmtsDec, identifyT1, partDecCT)
-    T0_sdlObj, T1_sdlObj = createLOC(partDecCT)
+    T0_sdlObj, T1_sdlObj, output_sdlObj, transform_output_sdlObj = createLOC(partDecCT)
     
 #    traverseLines(stmtsDec, identifyMessage, ans)
     print("Results =>", partDecCT)
@@ -53,7 +58,8 @@ def transform(sdl_scheme, verbosity=False):
     print("Dep list =>", t1, depListDec[t1])
 
     # program slice for t1 (including the t1 assignment line)
-    t1_slice = {'depList':depListDec[t1], 'lines':[partDecCT[CTprime.T1].getLineNo() ], 'block':decrypt_block }
+    last_line = partDecCT[CTprime.T1].getLineNo()
+    t1_slice = {'depList':depListDec[t1], 'lines':[last_line], 'block':decrypt_block }
     traverseBackwards(stmtsDec, programSliceT1, t1_slice)
     t1_slice['lines'].sort()
     transform = t1_slice['lines']
@@ -65,14 +71,80 @@ def transform(sdl_scheme, verbosity=False):
     # rewrite pairing equations 
     print("Rewrite pairing equations....")   
     traverseBackwards(stmtsDec, applyRules, t1_slice)
+    
+    allLines = getLinesOfCode()
+    last_line = len(allLines) + 1
+    cur_line = last_line
+    
+    transformVarInfos = [ ]
+    transformVarInfos.extend(t1_slice['lines'])
+    print("Current transform LOCs: ", transformVarInfos)
 
-    print("<===\tNew Transform\t===>") 
+    # add statements to new transform block
     traverseForwards(stmtsDec, printStmt, t1_slice)
-    print("\t", T0_sdlObj)
-    print("\t", T1_sdlObj)
-    print("\t output := list{T0, T1}")
+
+
+    # get function prologue for decrypt
+    transformIntro = "BEGIN :: func:transform"
+    cur_list = [transformIntro]
+    startLineNo = getLineNoOfInputStatement("decrypt")
+    endLineNo   = getLineNoOfOutputStatement("decrypt")
+    intro = list(range(startLineNo, transformVarInfos[0]))
+    transformVarInfos = intro + transformVarInfos
+    print("New LOCs: ", intro) 
+    transformOutro = "END :: func:transform"
+    
+    print("Delete these lines: ", transformVarInfos)
+    
+    newObj = [T0_sdlObj, T1_sdlObj, output_sdlObj, transform_output_sdlObj]
+    newFunc = 'transform'
+    AssignInfo[newFunc] = {}
+    for i in range(len(transformVarInfos)):
+        ref = transformVarInfos[i]
+        if stmtsDec.get(ref):
+#            varName = stmtsDec[ref].getAssignVar()
+#            newVF   = VarInfo.copy(stmtsDec[ref])
+            #print("new lines :=>\t", cur_line, newVF.getAssignNode())
+#            newVF.setLineNo(cur_line)
+#            AssignInfo[newFunc][varName] = newVF
+            cur_list.append(str(stmtsDec[ref].getAssignNode()))
+            cur_line += 1
+
+    
+    for o in range(len(newObj)):
+       c = cur_line + o
+       transformVarInfos.append(c)
+       cur_list.append(str(newObj[o]))
+#       varInfo = createVarInfo(c, newObj[o], newFunc)
+#       varName = varInfo.getAssignVar()
+#       AssignInfo[newFunc][varName] = varInfo
+#       cur_list.append(str(varInfo.getAssignNode()))
+       #print("new lines :=>\t", c, varInfo.getAssignNode())
+       
+    cur_list.append(transformOutro)
+    appendToLinesOfCode(cur_list, last_line)
+    removeRangeFromLinesOfCode(startLineNo, endLineNo)
+    
+    
+    parseLinesOfCode(getLinesOfCode(), False)
+    (stmtsTrans, typesTrans, depListTransf, infListTransf) = getFuncStmts(newFunc)
+    print("result :=>", stmtsTrans)
+    newLines = list(stmtsTrans.keys())
+    newLines.sort()
+    print("<===\tNew Transform\t===>") 
+    for i in newLines:
+        print(i, ":", stmtsTrans[i].getAssignNode())    
     print("<===\tEND\t===>") 
     
+    # get the
+
+
+def createVarInfo(i, node, currentFuncName):
+    varInfoObj = VarInfo()
+    varInfoObj.setLineNo(i)
+    varInfoObj.setAssignNode(node, currentFuncName, None)
+    
+    return varInfoObj
             
 def applyRules(varInf, data):
     if varInf.getHasPairings():
@@ -121,6 +193,7 @@ def createLOC(partialCT):
     varName1 = partialCT[CTprime.T1].getAssignNode().left.getAttribute()
     T0, T1 = "T0","T1"
     targetFunc = 'decrypt'    
+    partialCiphertextName = 'ct_pr' # maybe search for a unique name
     T0_node = BinaryNode(ops.EQ)
     T0_node.left = BinaryNode(T0)
     T0_node.right = varName0
@@ -129,7 +202,16 @@ def createLOC(partialCT):
     T1_node.left = BinaryNode(T1)
     T1_node.right = AssignInfo[targetFunc][varName1].getAssignNode().left
 
-    return T0_node, T1_node
+    output_node = BinaryNode(ops.EQ)
+    output_node.left = BinaryNode(partialCiphertextName)
+    output_node.right = BinaryNode(ops.LIST)
+    output_node.right.listNodes = [T0, T1]
+    
+    transform_output = BinaryNode(ops.EQ)
+    transform_output.left = BinaryNode("output")
+    transform_output.right = BinaryNode(partialCiphertextName) 
+    
+    return T0_node, T1_node, output_node, transform_output
 
 def printHasPair(varInf, data):
     if varInf.getHasPairings():

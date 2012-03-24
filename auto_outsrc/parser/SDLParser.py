@@ -839,6 +839,7 @@ def parseFile2(filename, verbosity):
     fd = open(filename, 'r')
     linesOfCode = fd.readlines()
     parseLinesOfCode(linesOfCode, verbosity)
+    fd.close()
 
 def parseLinesOfCode(code, verbosity):
     global varTypes, assignInfo, forLoops, currentFuncName, varDepList, varInfList, varsThatProtectM

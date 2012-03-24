@@ -325,7 +325,7 @@ class BinaryNode:
 			elif(self.type == ops.END):
 				return (END_TOKEN + ' :: ' + left)
 			elif(self.type == ops.EXP):
-				return (left + '^' + right)
+				return ('(' + left + '^' + right + ')')
 			elif(self.type == ops.MUL):
 				return ('(' + left + ' * ' + right + ')')
 			elif(self.type == ops.DIV):
@@ -448,7 +448,8 @@ class BinaryNode:
 		new_node.negated = this.negated
 		new_node.attr = this.attr
 		new_node.attr_index = this.attr_index
-		
+		if this.type in [ops.LIST, ops.EXPAND]:
+			new_node.listNodes  = this.listNodes
 		# recursively call copy on left 
 		new_node.left = self.copy(this.left)
 		new_node.right = self.copy(this.right)		

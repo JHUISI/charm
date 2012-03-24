@@ -21,9 +21,30 @@ class VarInfo:
         self.dotProdObj = None
         self.outsideForLoopObj = None
         self.hasRandomness = False
-        self.label = None
         self.isTypeEntryOnly = False
-
+    
+    @classmethod
+    def copy(self, obj):
+        v = VarInfo()
+        v.assignNode  = obj.assignNode 
+        v.lineNo      = obj.lineNo
+        v.varDeps     = list(obj.varDeps)
+        v.hasPairings = obj.hasPairings
+        v.protectsM   = obj.protectsM
+        v.initValue   = obj.initValue
+        v.beenSet     = obj.beenSet
+        v.initCall    = obj.initCall
+        v.initCallHappenedAlready = obj.initCallHappenedAlready
+        v.type        = obj.type
+        v.funcName    = obj.funcName
+        v.isList      = obj.isList
+        v.listNodesList = list(obj.listNodesList)
+        v.dotProdObj  = obj.dotProdObj
+        v.outsideForLoopObj = obj.outsideForLoopObj
+        v.hasRandomness = obj.hasRandomness
+        v.isTypeEntryOnly = obj.isTypeEntryOnly
+        return v
+        
     def getAssignNode(self):
         return self.assignNode
 
