@@ -4,12 +4,16 @@ import sys
 
 SDLLinesForKeygen = ""
 
-def blindKeygenOutputElement(keygenOutputElem, keygenInput):
+#def blindKeygenOutputElement(keygenOutputElem, keygenInput):
+def blindKeygenOutputElement(keygenOutputElem, varsToBlindList):
     global SDLLinesForKeygen
 
-    if (keygenOutputElem in keygenInput):
+    #if (keygenOutputElem in keygenInput):
+    if (keygenOutputElem not in varsToBlindList):
         SDLLinesForKeygen += keygenOutputElem + blindingSuffix + " := " + keygenOutputElem + "\n"
         return
+
+    assignInfo = getAssignInfo()
 
     if (keygenOutputElem not in assignInfo[keygenFuncName]):
         sys.exit("keygen output element passed to blindKeygenOutputElement in keygen.py is not in assignInfo[keygenFuncName].")
@@ -37,12 +41,12 @@ def blindKeygenOutputElement(keygenOutputElem, keygenInput):
     SDLLinesForKeygen += keygenOutputElem + blindingSuffix + LIST_INDEX_SYMBOL + blindingLoopVar + " := " + keygenOutputElem + LIST_INDEX_SYMBOL + blindingLoopVar + " ^ (1/" + keygenBlindingExponent + ")\n"
     SDLLinesForKeygen += "END :: for\n"
 
-def keygen(sdl_scheme):
+def keygen(sdl_scheme, varsToBlindList):
     global SDLLinesForKeygen
 
     parseFile2(sdl_scheme, False)
-    getVarDepInfLists()    
-    getVarsThatProtectM()
+
+    assignInfo = getAssignInfo()
 
     if ( (keygenFuncName not in assignInfo) or (outputKeyword not in assignInfo[keygenFuncName]) ):
         sys.exit("assignInfo structure obtained in keygen function of keygen.py did not have the right keygen function name or output keywords.")
@@ -51,19 +55,28 @@ def keygen(sdl_scheme):
     if (len(keygenOutput) == 0):
         sys.exit("Variable dependencies obtained for output of keygen in keygen.py was of length zero.")
 
-    if (inputKeyword not in assignInfo[keygenFuncName]):
-        sys.exit("assignInfo structure obtained in keygen function of keygen.py did not have the right input keyword.")
+    #if (inputKeyword not in assignInfo[keygenFuncName]):
+        #sys.exit("assignInfo structure obtained in keygen function of keygen.py did not have the right input keyword.")
 
-    keygenInput = assignInfo[keygenFuncName][inputKeyword].getVarDeps()
-    if (len(keygenInput) == 0):
-        sys.exit("Variable dependencies obtained for input of keygen in keygen.py was of length zero.")
+    #keygenInput = assignInfo[keygenFuncName][inputKeyword].getVarDeps()
+    #if (len(keygenInput) == 0):
+        #sys.exit("Variable dependencies obtained for input of keygen in keygen.py was of length zero.")
 
     SDLLinesForKeygen += keygenBlindingExponent + " := random(ZR)\n"
 
     for keygenOutput_ind in keygenOutput:
-        blindKeygenOutputElement(keygenOutput_ind, keygenInput)
+        #blindKeygenOutputElement(keygenOutput_ind, keygenInput)
+        blindKeygenOutputElement(keygenOutput_ind, varsToBlindList)
 
 if __name__ == "__main__":
     file = sys.argv[1]
-    keygen(file)
+    varsToBlindList = sys.argv[2]
+
+    if ( (type(file) is not str) or (len(file) == 0) ):
+        sys.exit("First argument passed to keygen.py is invalid.")
+
+    if ( (type(varsToBlindList) is not list) or (len(varsToBlindList) == 0) ):
+        sys.exit("Second argument passed to keygen.py is invalid.")
+
+    keygen(file, varsToBlindList)
     print(SDLLinesForKeygen)
