@@ -12,6 +12,7 @@ import string,sys
 objStack = []
 currentFuncName = NONE_FUNC_NAME
 ASSIGN_KEYWORDS = ['input', 'output']
+astNodes = []
 assignInfo = {}
 forLoops = {}
 varDepList = {}
@@ -854,11 +855,15 @@ def parseFile2(filename, verbosity):
     parseLinesOfCode(linesOfCode, verbosity)
     fd.close()
 
+def getAstNodes():
+    return astNodes
+
 def parseLinesOfCode(code, verbosity):
     global varTypes, assignInfo, forLoops, currentFuncName, varDepList, varInfList, varsThatProtectM
     global algebraicSetting, startLineNo_ForLoop, startLineNos_Functions, endLineNos_Functions
-    global getVarDepInfListsCalled, getVarsThatProtectMCalled
+    global getVarDepInfListsCalled, getVarsThatProtectMCalled, astNodes
 
+    astNodes = []
     varTypes = {}
     assignInfo = {}
     forLoops = {}
@@ -879,6 +884,7 @@ def parseLinesOfCode(code, verbosity):
         lineNumberInCode += 1
         if len(line.strip()) > 0 and line[0] != '#':
             node = parser.parse(line, lineNumberInCode)
+            astNodes.append(node)
             if verbosity: print("sdl: ", lineNumberInCode, node)
             if (node.type == ops.EQ):
                 if (currentFuncName not in varTypes):

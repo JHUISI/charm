@@ -70,10 +70,20 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
     varNamesForListDecls.append(keygenOutputElem)
     return keygenOutputElem
 
-def keygen(varsToBlindList, varNamesForListDecls):
+def keygen(file):
     global SDLLinesForKeygen
 
+    if ( (type(file) is not str) or (len(file) == 0) ):
+        sys.exit("First argument passed to keygen.py is invalid.")
+
+    parseFile2(file, False)
+    varsToBlindList = transform(False)
+    varNamesForListDecls = []
+
     assignInfo = getAssignInfo()
+
+    if (keygenBlindingExponent in assignInfo[keygenFuncName]):
+        sys.exit("keygen.py:  the variable used for keygenBlindingExponent in config.py already exists in the keygen function of the scheme being analyzed.")
 
     if ( (keygenFuncName not in assignInfo) or (outputKeyword not in assignInfo[keygenFuncName]) ):
         sys.exit("assignInfo structure obtained in keygen function of keygen.py did not have the right keygen function name or output keywords.")
@@ -88,23 +98,6 @@ def keygen(varsToBlindList, varNamesForListDecls):
         secretKeyName = blindKeygenOutputElement(keygenOutput_ind, varsToBlindList, varNamesForListDecls)
 
     SDLLinesForKeygen.append("output := list{" + keygenBlindingExponent + ", " + secretKeyName + blindingSuffix + "}\n")
-
-if __name__ == "__main__":
-    file = sys.argv[1]
-
-    if ( (type(file) is not str) or (len(file) == 0) ):
-        sys.exit("First argument passed to keygen.py is invalid.")
-
-    parseFile2(file, False)
-    varsToBlindList = transform(False)
-    varNamesForListDecls = []
-
-    assignInfo = getAssignInfo()
-
-    if (keygenBlindingExponent in assignInfo[keygenFuncName]):
-        sys.exit("keygen.py:  the variable used for keygenBlindingExponent in config.py already exists in the keygen function of the scheme being analyzed.")
-
-    keygen(varsToBlindList, varNamesForListDecls)
 
     if (len(varsToBlindList) != 0):
         sys.exit("keygen.py completed without blinding all of the variables passed to it by transform.py.")
@@ -121,6 +114,7 @@ if __name__ == "__main__":
 
     parseLinesOfCode(getLinesOfCode(), False)
 
+if __name__ == "__main__":
+    keygen(sys.argv[1])
     print("\n\nUPDATED SCHEME WITH BOTH TRANSFORM AND KEYGEN:\n")
-
     printLinesOfCode()
