@@ -2,7 +2,7 @@ M = 'M'
 
 blindingLoopVar = "y"
 blindingSuffix = "_Blinded"
-keygenBlindingExponent = "z"
+keygenBlindingExponent = "zz"
 keygenFuncName = "keygen"
 inputKeyword = "input"
 outputKeyword = "output"

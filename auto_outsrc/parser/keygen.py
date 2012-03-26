@@ -1,50 +1,77 @@
 from SDLParser import *
 from config import *
+from transform import *
 import sys
 
-SDLLinesForKeygen = ""
+SDLLinesForKeygen = []
 
-#def blindKeygenOutputElement(keygenOutputElem, keygenInput):
-def blindKeygenOutputElement(keygenOutputElem, varsToBlindList):
+def getIsVarList(keygenOutputElem, keygenOutputVarInfo, assignInfo, varTypes):
+    if ( (keygenOutputVarInfo.getIsList() == True) or (len(keygenOutputVarInfo.getListNodesList()) > 0) ):
+        return True
+
+    try:
+        currentVarType = varTypes[TYPES_HEADER][keygenOutputElem].getType()
+    except:
+        return False
+
+    if ( (currentVarType == types.list) or (currentVarType == ops.LIST) ):
+        return True
+
+    return False
+
+def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListDecls):
     global SDLLinesForKeygen
 
-    #if (keygenOutputElem in keygenInput):
-    if (keygenOutputElem not in varsToBlindList):
-        SDLLinesForKeygen += keygenOutputElem + blindingSuffix + " := " + keygenOutputElem + "\n"
-        return
-
     assignInfo = getAssignInfo()
+    varTypes = getVarTypes()
+
+    varsModifiedInKeygen = list(assignInfo[keygenFuncName].keys())
+
+    if (keygenOutputElem not in varsModifiedInKeygen):
+        SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + " := " + keygenOutputElem + "\n")
+        varsToBlindList.remove(keygenOutputElem)
+        return keygenOutputElem
 
     if (keygenOutputElem not in assignInfo[keygenFuncName]):
         sys.exit("keygen output element passed to blindKeygenOutputElement in keygen.py is not in assignInfo[keygenFuncName].")
 
     keygenOutputVarInfo = assignInfo[keygenFuncName][keygenOutputElem]
 
+    isVarList = getIsVarList(keygenOutputElem, keygenOutputVarInfo, assignInfo, varTypes)
+
+    if (isVarList == False):
+        SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + " := " + keygenOutputElem + " ^ (1/" + keygenBlindingExponent + ")\n")
+        varsToBlindList.remove(keygenOutputElem)
+        return keygenOutputElem
+
     if ( (keygenOutputVarInfo.getIsList() == True) and (len(keygenOutputVarInfo.getListNodesList()) > 0) ):
         listMembers = keygenOutputVarInfo.getListNodesList()
         listMembersString = ""
         for listMember in listMembers:
             listMembersString += listMember + blindingSuffix + ", "
-            blindKeygenOutputElement(listMember, keygenInput)
+            blindKeygenOutputElement(listMember, varsToBlindList, varNamesForListDecls)
         listMembersString = listMembersString[0:(len(listMembersString)-2)]
-        SDLLinesForKeygen += keygenOutputElem + blindingSuffix + " := list{" + listMembersString + "}\n"
-        return
+        SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + " := list{" + listMembersString + "}\n")
+        #varsToBlindList.remove(keygenOutputElem)
+        if (keygenOutputElem in varNamesForListDecls):
+            sys.exit("blindKeygenOutputElement in keygen.py attempted to add duplicate keygenOutputElem to varNamesForListDecls -- 1 of 2.")
+        #varNamesForListDecls.append(keygenOutputElem)
+        return keygenOutputElem
 
-    if (keygenOutputVarInfo.getIsList() == False):
-        SDLLinesForKeygen += keygenOutputElem + blindingSuffix + " := " + keygenOutputElem + " ^ (1/" + keygenBlindingExponent + ")\n"
-        return
+    SDLLinesForKeygen.append("len_" + keygenOutputElem + blindingSuffix + " := len(" + keygenOutputElem + ")\n")
+    #SDLLinesForKeygen += keygenOutputElem + blindingSuffix + " := init(list)\n"
+    SDLLinesForKeygen.append("BEGIN :: for\n")
+    SDLLinesForKeygen.append("for{" + blindingLoopVar + " := 1, len_" + keygenOutputElem + blindingSuffix + "}\n")
+    SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + LIST_INDEX_SYMBOL + blindingLoopVar + " := " + keygenOutputElem + LIST_INDEX_SYMBOL + blindingLoopVar + " ^ (1/" + keygenBlindingExponent + ")\n")
+    SDLLinesForKeygen.append("END :: for\n")
+    varsToBlindList.remove(keygenOutputElem)
+    if (keygenOutputElem in varNamesForListDecls):
+        sys.exit("blindKeygenOutputElement in keygen.py attempted to add duplicate keygenOutputElem to varNamesForListDecls -- 2 of 2.")
+    varNamesForListDecls.append(keygenOutputElem)
+    return keygenOutputElem
 
-    SDLLinesForKeygen += "len_" + keygenOutputElem + blindingSuffix + " := len(" + keygenOutputElem + ")\n"
-    SDLLinesForKeygen += keygenOutputElem + blindingSuffix + " := init(list)\n"
-    SDLLinesForKeygen += "BEGIN :: for\n"
-    SDLLinesForKeygen += "for{" + blindingLoopVar + " := 1, len_" + keygenOutputElem + blindingSuffix + "}\n"
-    SDLLinesForKeygen += keygenOutputElem + blindingSuffix + LIST_INDEX_SYMBOL + blindingLoopVar + " := " + keygenOutputElem + LIST_INDEX_SYMBOL + blindingLoopVar + " ^ (1/" + keygenBlindingExponent + ")\n"
-    SDLLinesForKeygen += "END :: for\n"
-
-def keygen(sdl_scheme, varsToBlindList):
+def keygen(varsToBlindList, varNamesForListDecls):
     global SDLLinesForKeygen
-
-    parseFile2(sdl_scheme, False)
 
     assignInfo = getAssignInfo()
 
@@ -55,28 +82,41 @@ def keygen(sdl_scheme, varsToBlindList):
     if (len(keygenOutput) == 0):
         sys.exit("Variable dependencies obtained for output of keygen in keygen.py was of length zero.")
 
-    #if (inputKeyword not in assignInfo[keygenFuncName]):
-        #sys.exit("assignInfo structure obtained in keygen function of keygen.py did not have the right input keyword.")
-
-    #keygenInput = assignInfo[keygenFuncName][inputKeyword].getVarDeps()
-    #if (len(keygenInput) == 0):
-        #sys.exit("Variable dependencies obtained for input of keygen in keygen.py was of length zero.")
-
-    SDLLinesForKeygen += keygenBlindingExponent + " := random(ZR)\n"
+    SDLLinesForKeygen.append(keygenBlindingExponent + " := random(ZR)\n")
 
     for keygenOutput_ind in keygenOutput:
-        #blindKeygenOutputElement(keygenOutput_ind, keygenInput)
-        blindKeygenOutputElement(keygenOutput_ind, varsToBlindList)
+        secretKeyName = blindKeygenOutputElement(keygenOutput_ind, varsToBlindList, varNamesForListDecls)
+
+    SDLLinesForKeygen.append("output := list{" + keygenBlindingExponent + ", " + secretKeyName + blindingSuffix + "}\n")
 
 if __name__ == "__main__":
     file = sys.argv[1]
-    varsToBlindList = sys.argv[2]
 
     if ( (type(file) is not str) or (len(file) == 0) ):
         sys.exit("First argument passed to keygen.py is invalid.")
 
-    if ( (type(varsToBlindList) is not list) or (len(varsToBlindList) == 0) ):
-        sys.exit("Second argument passed to keygen.py is invalid.")
+    parseFile2(file, False)
+    varsToBlindList = transform(False)
+    varNamesForListDecls = []
 
-    keygen(file, varsToBlindList)
-    print(SDLLinesForKeygen)
+    assignInfo = getAssignInfo()
+
+    if (keygenBlindingExponent in assignInfo[keygenFuncName]):
+        sys.exit("keygen.py:  the variable used for keygenBlindingExponent in config.py already exists in the keygen function of the scheme being analyzed.")
+
+    keygen(varsToBlindList, varNamesForListDecls)
+
+    if (len(varsToBlindList) != 0):
+        sys.exit("keygen.py completed without blinding all of the variables passed to it by transform.py.")
+
+    lineNoKeygenOutput = getLineNoOfOutputStatement(keygenFuncName)
+    removeFromLinesOfCode([lineNoKeygenOutput])
+    appendToLinesOfCode(SDLLinesForKeygen, lineNoKeygenOutput)
+
+    for index_listVars in range(0, len(varNamesForListDecls)):
+        varNamesForListDecls[index_listVars] = varNamesForListDecls[index_listVars] + blindingSuffix + " := list\n"
+
+    lineNoEndTypesSection = getEndLineNoOfFunc(TYPES_HEADER)
+    appendToLinesOfCode(varNamesForListDecls, lineNoEndTypesSection)
+
+    parseLinesOfCode(getLinesOfCode(), False)

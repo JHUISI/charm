@@ -192,7 +192,13 @@ class SDLParser:
             elif (op1 == TYPES_HEADER):
                 if (op == START_TOKEN):
                     currentFuncName = TYPES_HEADER
+                    if (currentFuncName in startLineNos_Functions):
+                        sys.exit("SDLParser.py found multiple TYPES_HEADER start token declarations.")
+                    startLineNos_Functions[currentFuncName] = line_number
                 elif (op == END_TOKEN):
+                    if (currentFuncName in endLineNos_Functions):
+                        sys.exit("SDLParser.py found multiple TYPES_HEADER end token declarations.")
+                    endLineNos_Functions[currentFuncName] = line_number
                     currentFuncName = NONE_FUNC_NAME
             elif (op1 == FOR_LOOP_HEADER):
                 if (op == START_TOKEN):
@@ -685,6 +691,10 @@ def updateForLoops(node, lineNo):
 
     forLoops[currentFuncName].append(retForLoopStruct)
 
+def printLinesOfCode():
+    for line in linesOfCode:
+        print(line)
+
 def getLinesOfCodeFromLineNos(listOfLineNos):
     if ( (type(listOfLineNos) is not list) or (len(listOfLineNos) == 0) ):
         sys.exit("Problem with list of line numbers passed in to getLinesOfCodeFromLineNos in SDLParser.py.")
@@ -721,6 +731,9 @@ def getLinesOfCode():
 
 def getAssignInfo():
     return assignInfo
+
+def getVarTypes():
+    return varTypes
 
 def removeFromLinesOfCode(linesToRemove):
     global linesOfCode
