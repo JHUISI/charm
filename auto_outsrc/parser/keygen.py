@@ -120,3 +120,7 @@ if __name__ == "__main__":
     appendToLinesOfCode(varNamesForListDecls, lineNoEndTypesSection)
 
     parseLinesOfCode(getLinesOfCode(), False)
+
+    print("\n\nUPDATED SCHEME WITH BOTH TRANSFORM AND KEYGEN:\n")
+
+    printLinesOfCode()
