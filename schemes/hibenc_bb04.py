@@ -49,7 +49,7 @@ class HIBE_BB04:
     def strToZR(self, bits, length, strID):
         '''Hash the identity string and break it up in to l bit pieces'''
         hashObj = hashlib.new('sha1')         
-        hashObj.update(bytes(strID, 'utf-8'))
+        hashObj.update(strID)
         hash = Bytes(hashObj.digest())
 
         val = Conversion.OS2IP(hash) #Convert to integer format
