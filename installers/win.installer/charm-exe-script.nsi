@@ -23,7 +23,7 @@
 ; --------------------------------
 
 !define PRODUCT_NAME "charm-crypto"
-!define PRODUCT_VERSION "0.4b"
+!define PRODUCT_VERSION "0.41b"
 !define PRODUCT_PUBLISHER "Johns Hopkins University, HMS Lab"
 !define PRODUCT_WEB_SITE "http://charm-crypto.com/Main.html"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -176,7 +176,7 @@ Section /o "" python32_detected
   SetOutPath "$Python32Dir"
   SetOverwrite ifnewer
   ; CHANGEME on every new release.
-  File "C:\Python32\Lib\site-packages\Charm_Crypto-0.4-py3.2.egg-info"
+  File "C:\Python32\Lib\site-packages\Charm_Crypto-0.41-py3.2.egg-info"
   ; Now bundling pyparsing, current version 1.5.6
   File "C:\Python32\Lib\site-packages\pyparsing-1.5.6-py3.2.egg-info"  
   File "C:\Python32\Lib\site-packages\pyparsing.pyc"  
@@ -208,7 +208,7 @@ Section /o "" python27_detected
   SetOutPath "$Python27Dir"
   SetOverwrite ifnewer
   ; CHANGEME on every new release.
-  File "C:\Python27\Lib\site-packages\Charm_Crypto-0.4-py2.7.egg-info"  
+  File "C:\Python27\Lib\site-packages\Charm_Crypto-0.41-py2.7.egg-info"  
   ; Now bundling pyparsing, current version 1.5.6
   File "C:\Python27\Lib\site-packages\pyparsing-1.5.6-py2.7.egg-info"  
   File "C:\Python27\Lib\site-packages\pyparsing.pyc"  
@@ -363,7 +363,7 @@ Section Uninstall
 	  RMDir /r "$8$9\compiler\"
 	  ;RMDir /r "$8$9\schemes\"
 	  RMDir /r "$8$9\toolbox\"
-      Delete "$8$9\Charm_Crypto-0.4-py3.2.egg-info"
+      Delete "$8$9\Charm_Crypto-0.41-py3.2.egg-info"
       ;Delete "$SMPROGRAMS\charm-crypto\schemes-py32.lnk" 	  
 	  ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\3.2\InstallPath" ""
 	  StrCmp $8 "" done hasPython27
@@ -372,7 +372,7 @@ Section Uninstall
 	  RMDir /r "$8$9\compiler\"
 	  ;RMDir /r "$8$9\schemes\"
 	  RMDir /r "$8$9\toolbox\"  
-      Delete "$8$9\Charm_Crypto-0.4-py2.7.egg-info"
+      Delete "$8$9\Charm_Crypto-0.41-py2.7.egg-info"
 	  ;Delete "$SMPROGRAMS\charm-crypto\schemes-py27.lnk"
   done:
       ;Don't do anything when done.

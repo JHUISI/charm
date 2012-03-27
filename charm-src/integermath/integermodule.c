@@ -660,7 +660,7 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 				}
 				rop = (Integer *) obj;
 				return (PyObject *) rop;
-			} else if (exp > 0) {
+			} else if (exp >= 0) {
 				debug("exponent is positive\n");
 				mpz_t exp2;
 				mpz_init_set_si(exp2, exp);

@@ -1050,7 +1050,7 @@
 				<key>OVERWRITE_PERMISSIONS</key>
 				<false/>
 				<key>VERSION</key>
-				<string>.4b</string>
+				<string>.41</string>
 			</dict>
 			<key>UUID</key>
 			<string>0E0E1076-412E-4E09-8CA8-1BCF8565C1E0</string>
@@ -1700,7 +1700,7 @@
 																											<key>GID</key>
 																											<integer>0</integer>
 																											<key>PATH</key>
-																											<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/Charm_Crypto-0.4-py3.2.egg-info</string>
+																											<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/Charm_Crypto-0.41-py3.2.egg-info</string>
 																											<key>PATH_TYPE</key>
 																											<integer>0</integer>
 																											<key>PERMISSIONS</key>
@@ -1896,6 +1896,22 @@
 																											<integer>0</integer>
 																											<key>PATH</key>
 																											<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/pyparsing.pyc</string>
+																											<key>PATH_TYPE</key>
+																											<integer>0</integer>
+																											<key>PERMISSIONS</key>
+																											<integer>420</integer>
+																											<key>TYPE</key>
+																											<integer>3</integer>
+																											<key>UID</key>
+																											<integer>0</integer>
+																										</dict>
+																										<dict>
+																											<key>CHILDREN</key>
+																											<array/>
+																											<key>GID</key>
+																											<integer>0</integer>
+																											<key>PATH</key>
+																											<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/README</string>
 																											<key>PATH_TYPE</key>
 																											<integer>0</integer>
 																											<key>PERMISSIONS</key>
@@ -3499,6 +3515,38 @@
 																													<integer>0</integer>
 																													<key>PATH</key>
 																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/pksig_waters05.pyc</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/pksig_waters09.py</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/pksig_waters09.pyc</string>
 																													<key>PATH_TYPE</key>
 																													<integer>0</integer>
 																													<key>PERMISSIONS</key>
@@ -5269,7 +5317,7 @@
 				<key>OVERWRITE_PERMISSIONS</key>
 				<false/>
 				<key>VERSION</key>
-				<string>.4b</string>
+				<string>.41b</string>
 			</dict>
 			<key>TYPE</key>
 			<integer>0</integer>
@@ -5921,7 +5969,7 @@
 																											<key>GID</key>
 																											<integer>0</integer>
 																											<key>PATH</key>
-																											<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/Charm_Crypto-0.4-py2.7.egg-info</string>
+																											<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/Charm_Crypto-0.41-py2.7.egg-info</string>
 																											<key>PATH_TYPE</key>
 																											<integer>0</integer>
 																											<key>PERMISSIONS</key>
@@ -6117,6 +6165,22 @@
 																											<integer>0</integer>
 																											<key>PATH</key>
 																											<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/pyparsing.pyc</string>
+																											<key>PATH_TYPE</key>
+																											<integer>0</integer>
+																											<key>PERMISSIONS</key>
+																											<integer>420</integer>
+																											<key>TYPE</key>
+																											<integer>3</integer>
+																											<key>UID</key>
+																											<integer>0</integer>
+																										</dict>
+																										<dict>
+																											<key>CHILDREN</key>
+																											<array/>
+																											<key>GID</key>
+																											<integer>0</integer>
+																											<key>PATH</key>
+																											<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/README</string>
 																											<key>PATH_TYPE</key>
 																											<integer>0</integer>
 																											<key>PERMISSIONS</key>
@@ -7720,6 +7784,38 @@
 																													<integer>0</integer>
 																													<key>PATH</key>
 																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/pksig_waters05.pyc</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/pksig_waters09.py</string>
+																													<key>PATH_TYPE</key>
+																													<integer>0</integer>
+																													<key>PERMISSIONS</key>
+																													<integer>420</integer>
+																													<key>TYPE</key>
+																													<integer>3</integer>
+																													<key>UID</key>
+																													<integer>0</integer>
+																												</dict>
+																												<dict>
+																													<key>CHILDREN</key>
+																													<array/>
+																													<key>GID</key>
+																													<integer>0</integer>
+																													<key>PATH</key>
+																													<string>/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/pksig_waters09.pyc</string>
 																													<key>PATH_TYPE</key>
 																													<integer>0</integer>
 																													<key>PERMISSIONS</key>
@@ -9492,7 +9588,7 @@
 				<key>REFERENCE_PATH</key>
 				<string></string>
 				<key>VERSION</key>
-				<string>.4b</string>
+				<string>.41b</string>
 			</dict>
 			<key>TYPE</key>
 			<integer>0</integer>
@@ -9913,7 +10009,7 @@
 																							<key>GID</key>
 																							<integer>0</integer>
 																							<key>PATH</key>
-																							<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/Charm_Crypto-0.4-py2.7.egg-info</string>
+																							<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/Charm_Crypto-0.41-py2.7.egg-info</string>
 																							<key>PATH_TYPE</key>
 																							<integer>0</integer>
 																							<key>PERMISSIONS</key>
@@ -10113,6 +10209,22 @@
 																							<integer>0</integer>
 																							<key>PERMISSIONS</key>
 																							<integer>420</integer>
+																							<key>TYPE</key>
+																							<integer>3</integer>
+																							<key>UID</key>
+																							<integer>0</integer>
+																						</dict>
+																						<dict>
+																							<key>CHILDREN</key>
+																							<array/>
+																							<key>GID</key>
+																							<integer>0</integer>
+																							<key>PATH</key>
+																							<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/README</string>
+																							<key>PATH_TYPE</key>
+																							<integer>0</integer>
+																							<key>PERMISSIONS</key>
+																							<integer>436</integer>
 																							<key>TYPE</key>
 																							<integer>3</integer>
 																							<key>UID</key>
@@ -11712,6 +11824,38 @@
 																									<integer>0</integer>
 																									<key>PATH</key>
 																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/pksig_waters05.pyc</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/pksig_waters09.py</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/schemes/pksig_waters09.pyc</string>
 																									<key>PATH_TYPE</key>
 																									<integer>0</integer>
 																									<key>PERMISSIONS</key>
@@ -13638,7 +13782,7 @@
 				<key>OVERWRITE_PERMISSIONS</key>
 				<false/>
 				<key>VERSION</key>
-				<string>.4b</string>
+				<string>.41b</string>
 			</dict>
 			<key>TYPE</key>
 			<integer>0</integer>
@@ -14059,7 +14203,7 @@
 																							<key>GID</key>
 																							<integer>0</integer>
 																							<key>PATH</key>
-																							<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/Charm_Crypto-0.4-py3.2.egg-info</string>
+																							<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/Charm_Crypto-0.41-py3.2.egg-info</string>
 																							<key>PATH_TYPE</key>
 																							<integer>0</integer>
 																							<key>PERMISSIONS</key>
@@ -14259,6 +14403,22 @@
 																							<integer>0</integer>
 																							<key>PERMISSIONS</key>
 																							<integer>420</integer>
+																							<key>TYPE</key>
+																							<integer>3</integer>
+																							<key>UID</key>
+																							<integer>0</integer>
+																						</dict>
+																						<dict>
+																							<key>CHILDREN</key>
+																							<array/>
+																							<key>GID</key>
+																							<integer>0</integer>
+																							<key>PATH</key>
+																							<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/README</string>
+																							<key>PATH_TYPE</key>
+																							<integer>0</integer>
+																							<key>PERMISSIONS</key>
+																							<integer>436</integer>
 																							<key>TYPE</key>
 																							<integer>3</integer>
 																							<key>UID</key>
@@ -15858,6 +16018,38 @@
 																									<integer>0</integer>
 																									<key>PATH</key>
 																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/pksig_waters05.pyc</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/pksig_waters09.py</string>
+																									<key>PATH_TYPE</key>
+																									<integer>0</integer>
+																									<key>PERMISSIONS</key>
+																									<integer>420</integer>
+																									<key>TYPE</key>
+																									<integer>3</integer>
+																									<key>UID</key>
+																									<integer>0</integer>
+																								</dict>
+																								<dict>
+																									<key>CHILDREN</key>
+																									<array/>
+																									<key>GID</key>
+																									<integer>0</integer>
+																									<key>PATH</key>
+																									<string>/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/site-packages/schemes/pksig_waters09.pyc</string>
 																									<key>PATH_TYPE</key>
 																									<integer>0</integer>
 																									<key>PERMISSIONS</key>
@@ -17775,7 +17967,7 @@
 				<key>OVERWRITE_PERMISSIONS</key>
 				<false/>
 				<key>VERSION</key>
-				<string>.4b</string>
+				<string>.41b</string>
 			</dict>
 			<key>TYPE</key>
 			<integer>0</integer>
@@ -18312,7 +18504,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>/Library/Python/2.7/site-packages/Charm_Crypto-0.4-py2.7.egg-info</string>
+															<string>/Library/Python/2.7/site-packages/Charm_Crypto-0.41-py2.7.egg-info</string>
 															<key>PATH_TYPE</key>
 															<integer>0</integer>
 															<key>PERMISSIONS</key>
@@ -18508,6 +18700,22 @@
 															<integer>0</integer>
 															<key>PATH</key>
 															<string>/Library/Python/2.7/site-packages/pyparsing.pyc</string>
+															<key>PATH_TYPE</key>
+															<integer>0</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>/Library/Python/2.7/site-packages/README</string>
 															<key>PATH_TYPE</key>
 															<integer>0</integer>
 															<key>PERMISSIONS</key>
@@ -20111,6 +20319,38 @@
 																	<integer>0</integer>
 																	<key>PATH</key>
 																	<string>/Library/Python/2.7/site-packages/schemes/pksig_waters05.pyc</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>420</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>0</integer>
+																	<key>PATH</key>
+																	<string>/Library/Python/2.7/site-packages/schemes/pksig_waters09.py</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>420</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>0</integer>
+																	<key>PATH</key>
+																	<string>/Library/Python/2.7/site-packages/schemes/pksig_waters09.pyc</string>
 																	<key>PATH_TYPE</key>
 																	<integer>0</integer>
 																	<key>PERMISSIONS</key>
@@ -21854,7 +22094,7 @@
 				<key>OVERWRITE_PERMISSIONS</key>
 				<false/>
 				<key>VERSION</key>
-				<string>.4b</string>
+				<string>.41b</string>
 			</dict>
 			<key>TYPE</key>
 			<integer>0</integer>
