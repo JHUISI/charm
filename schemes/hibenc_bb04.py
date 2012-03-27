@@ -18,7 +18,7 @@ from toolbox.bitstring import Bytes
 from toolbox.iterate import dotprod2
 import hashlib
 
-
+debug = False
 class HIBE_BB04:
     def __init__(self, groupObj):
         global group
@@ -102,7 +102,7 @@ class HIBE_BB04:
         M = ct['A'] * (prod_result / pair(ct['B'], sk['d0']))
         return M
 
-if __name__ == "__main__":
+def main():
     groupObj = PairingGroup('SS512')
     hibe = HIBE_BB04(groupObj)
     (mpk, mk) = hibe.setup()
@@ -111,13 +111,16 @@ if __name__ == "__main__":
     ID = "bob@mail.com"
     (pk, sk) = hibe.extract(3, mpk, mk, ID)
     # dID => pk, sk
-    print("ID:%s , sk:%s" % (pk, sk))
+    if debug: print("ID:%s , sk:%s" % (pk, sk))
     
     M = groupObj.random(GT)
-    print("M :=", M)
+    if debug: print("M :=", M)
     ct = hibe.encrypt(mpk, pk, M)
     
     orig_M = hibe.decrypt(pk, sk, ct)
     assert orig_M == M, "invalid decryption!!!!"
-    print("Successful DECRYPTION!!!")
-    
+    if debug: print("Successful DECRYPTION!!!")
+ 
+if __name__ == "__main__":
+    debug = True
+    main()   
