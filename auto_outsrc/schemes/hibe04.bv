@@ -1,0 +1,86 @@
+name := hibe_bb04
+setting := symmetric
+
+BEGIN :: types
+mpk := list
+mk := list
+pk := list
+sk := list
+d := list
+id := str
+M := GT
+C := list
+ct := list
+
+END :: types
+
+BEGIN :: func:setup
+input := list{l, z}
+
+alpha := random(ZR) 
+beta := random(ZR)
+g := random(G1)
+gb := random(G2)
+g1 := g ^ alpha
+g1b := gb ^ alpha
+
+BEGIN :: for
+for{y := 1, l}
+delta#y := random(ZR)
+h#y := g ^ delta#y
+hb#y := gb ^ delta#y
+END :: for
+
+g0b := gb ^ (alpha * beta)
+v := e(g, g0b)
+    
+mpk := list{g, g1, h, gb, g1b, hb, v, l, z}
+mk := list{g0b}
+output := list{mpk, mk}
+END :: func:setup
+
+
+BEGIN :: func:keygen
+input := list{mpk, mk, id}
+
+Id := stringToID(z, j, id)
+BEGIN :: for
+for{y := 1, j}
+r#y := random(ZR)
+d#y := gb ^ r#y
+END :: for
+
+d0 := g0b * { prod{y := 1, j} on { (((g1b ^ Id#y) * hb#y) ^ r#y) }}
+pk := list{id, j}
+sk := list{d0, d}
+output := list{pk, sk}
+END :: func:keygen
+
+
+BEGIN :: func:encrypt
+input := list{mpk, pk, M}        
+mpk := expand{g, g1, h, gb, g1b, hb, v, l, z}
+pk := expand{id, j}
+s := random(ZR)
+A := M * (v ^ s)
+B :=  g ^ s
+
+BEGIN :: for
+for{y := 1, j}
+C#y := (((g1 ^ Id2#y) * h#y) ^ s)
+END :: for
+            
+ct := list{A, B, C, j}
+output := ct
+END :: func:encrypt
+
+
+BEGIN :: func:decrypt
+input := list{pk, sk, ct}
+sk := expand{d0, d}
+ct := expand{A, B, C, j}
+
+D := {prod{y := 1, j} on { e(C#y, d#y) }}
+M := A * (D / e(B, d0))
+output := M
+END :: func:decrypt
