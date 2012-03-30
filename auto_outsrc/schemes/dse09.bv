@@ -100,7 +100,7 @@ ct := list{C, E1, E2, tag_c}
 output := ct
 END :: func:encrypt
 
-BEGIN :: fun:decrypt
+BEGIN :: func:decrypt
 input := list{ct, sk}
 sk := expand{id, D, K, tag_k}
 ct := expand{C, E1, E2, tag_c}

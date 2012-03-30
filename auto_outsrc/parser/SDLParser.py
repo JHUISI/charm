@@ -564,6 +564,11 @@ def getVarTypeInfoRecursive(node):
         if (node.attr in varTypes[currentFuncName]):
             return varTypes[currentFuncName][node.attr].getType()
         if (node.attr.find(LIST_INDEX_SYMBOL) != -1):
+            (possibleFuncName, possibleVarInfoObj) = getVarNameEntryFromAssignInfo(node.attr)
+            if ( (possibleFuncName != None) and (possibleVarInfoObj != None) ):
+                if (node.attr in varTypes[possibleFuncName]):
+                    return varTypes[possibleFuncName][node.attr].getType()
+
             (funcNameOfVar, varNameInList) = getVarNameFromListIndices(node)
             if ( (funcNameOfVar == None) or (varNameInList == None) ):
                 return types.NO_TYPE
