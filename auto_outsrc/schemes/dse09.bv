@@ -109,7 +109,7 @@ tag := (1 / (tag_c - tag_k))
 A1 := (e(C#1, D#1) * (e(C#2, D#2) * (e(C#3, D#3) * (e(C#4, D#4) * e(C#5, D#5)))))
 A2 := (e(C#6, D#6) * e(C#7, D#7))
 A3 := A1 / A2
-A4 := (e(E1, D#7) / e(E2, K)) ** tag
+A4 := (e(E1, D#7) / e(E2, K)) ^ tag
 M := C#0 / (A3 / A4)
 output := M
 END :: func:decrypt
