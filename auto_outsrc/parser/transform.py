@@ -203,8 +203,8 @@ def identifyT1(varInf, data):
             data[CTprime.T1] = AssignInfo[targetFunc][i]
         else:
             # TODO: need to create a new assignment for T1 and set to common operation of remaining
-            # variables 
-            pass
+            # variables
+            sys.exit("TODO: need to handle this case first in identifyT1.")
 
 def createLOC(partialCT):
     varName0 = partialCT[CTprime.T0].getAssignNode().left
