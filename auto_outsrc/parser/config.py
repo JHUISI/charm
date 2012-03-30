@@ -1,7 +1,7 @@
 M = 'M'
 
 blindingLoopVar = "y"
-blindingSuffix = "_Blinded"
+blindingSuffix = "-Blinded"
 keygenBlindingExponent = "zz"
 keygenFuncName = "keygen"
 inputKeyword = "input"
@@ -16,3 +16,9 @@ decOutFunctionName = "decOut"
 
 pySuffix = ".py"
 cppSuffix = ".cpp"
+
+setupFunctionOrder = ["setup", "keygen", "encrypt"]
+argsToFirstSetupFunc = []
+
+groupObjName = "groupObj"
+groupArg = "MNT160"
