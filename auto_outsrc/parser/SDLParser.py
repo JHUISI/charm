@@ -1450,7 +1450,7 @@ if __name__ == "__main__":
         print("Final statement:  '%s'" % final)
         exit(0)
     else:
-        parseFile2(sys.argv[1], False)
+        parseFile2(sys.argv[1], True)
         getVarDepInfLists()
         getVarsThatProtectM()
         printFinalOutput()
