@@ -4,6 +4,9 @@ blindingLoopVar = "y"
 blindingSuffix = "-Blinded"
 keygenBlindingExponent = "zz"
 keygenFuncName = "keygen"
+keygenSecVar = "sk"
+
+# these should be keywords or part of semantics of SDL
 inputKeyword = "input"
 outputKeyword = "output"
 
@@ -12,7 +15,7 @@ transformFileName = "transformOutsourcing.py"
 decOutFileName = "decOutOutsourcing.cpp"
 
 transformFunctionName = "transform"
-decOutFunctionName = "decOut"
+decOutFunctionName = "decout"
 
 pySuffix = ".py"
 cppSuffix = ".cpp"

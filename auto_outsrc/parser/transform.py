@@ -1,5 +1,5 @@
 from SDLParser import *
-from outsrctechniques import AbstractTechnique,Technique1,Technique2,Technique3
+from outsrctechniques import AbstractTechnique,Technique1,Technique2,Technique3,FindT1
 import config
 import sys
 
@@ -30,10 +30,12 @@ def transform(sdl_scheme, verbosity=False):
     keygen = "keygen"
     (stmtsKg, typesKg, depListKg, infListKg) = getFuncStmts(keygen)
     outputKgLine = getLineNoOfOutputStatement(keygen)
-    secret = str(stmtsKg[outputKgLine].getAssignNode().right)
+    secret = config.keygenSecVar
+    # secret = str(stmtsKg[outputKgLine].getAssignNode().right)
     print("output :=>", secret)
     secretVars = AssignInfo[keygen][secret].getAssignNode().right
     print("list :=>", secretVars.listNodes)
+
     if Type(secretVars) == ops.LIST:
         secretList = secretVars.listNodes
     elif Type(secretVars) == ops.ATTR:
@@ -74,7 +76,12 @@ def transform(sdl_scheme, verbosity=False):
 #    traverseLines(stmtsDec, identifyMessage, ans)
     print("Results =>", partDecCT)
     t1 = partDecCT[CTprime.T1].getAssignVar()
-    print("Dep list =>", t1, depListDec[t1])
+    if t1 == "T1": # in other words, this is something we just added to dec, then 
+        print("Dep list =>", t1)
+        depListDec[t1] = partDecCT[CTprime.T1].getVarDeps()
+        print("new dep list for t1 :=>", depListDec[t1])
+    else:
+        print("Dep list for non T1 case =>", t1, depListDec[t1])
 
     # program slice for t1 (including the t1 assignment line)
     last_line = partDecCT[CTprime.T1].getLineNo()
@@ -130,9 +137,10 @@ def transform(sdl_scheme, verbosity=False):
 #            AssignInfo[newFunc][varName] = newVF
     
     for o in range(len(newObj)):
-       c = cur_line + o
-       transformVarInfos.append(c)
-       cur_list.append(str(newObj[o]))
+        if newObj[o] != None:
+            c = cur_line + o
+            transformVarInfos.append(c)
+            cur_list.append(str(newObj[o]))
 #       varInfo = createVarInfo(c, newObj[o], newFunc)
 #       varName = varInfo.getAssignVar()
 #       AssignInfo[newFunc][varName] = varInfo
@@ -204,12 +212,23 @@ def identifyT1(varInf, data):
         else:
             # TODO: need to create a new assignment for T1 and set to common operation of remaining
             # variables
-            sys.exit("TODO: need to handle this case first in identifyT1.")
+            copy_s = BinaryNode.copy(s.right)
+            # find and exlcude T0
+            findT1 = FindT1(t0_varname)
+            ASTVisitor( findT1 ).preorder( copy_s )
+            # create new stmt "T1 := operations" 
+            t1_node = BinaryNode(ops.EQ, BinaryNode("T1"), findT1.T1)
+            # merge changes back into original line with M
+            t1_vi = varInf
+            t1_vi.updateAssignNode(t1_node)
+            t1_vi.getVarDeps().remove(t0_varname)
+#            print("t1_vi =>>>", t1_vi.getVarDeps())
+            data[CTprime.T1] = t1_vi
+
 
 def createLOC(partialCT):
     varName0 = partialCT[CTprime.T0].getAssignNode().left
     
-    varName1 = partialCT[CTprime.T1].getAssignNode().left.getAttribute()
     T0, T1 = "T0","T1"
     targetFunc = 'decrypt'    
     partialCiphertextName = 'ct_pr' # maybe search for a unique name
@@ -217,10 +236,15 @@ def createLOC(partialCT):
     T0_node.left = BinaryNode(T0)
     T0_node.right = varName0
     
-    T1_node = BinaryNode(ops.EQ)
-    T1_node.left = BinaryNode(T1)
-    T1_node.right = AssignInfo[targetFunc][varName1].getAssignNode().left
-
+    T1_node = None    
+    varName1 = partialCT[CTprime.T1].getAssignNode().left.getAttribute()
+    print("varName1 :=>", varName1)
+    if varName1 != T1:
+        T1_node = BinaryNode(ops.EQ)
+        T1_node.left = BinaryNode(T1)
+        T1_node.right = AssignInfo[targetFunc][varName1].getAssignNode().left
+        print("T1 node :=", T1_node)
+        
     output_node = BinaryNode(ops.EQ)
     output_node.left = BinaryNode(partialCiphertextName)
     output_node.right = BinaryNode(ops.LIST)
