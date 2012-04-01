@@ -907,6 +907,8 @@ def parseLinesOfCode(code, verbosity):
                     updateAssignInfo(node, lineNumberInCode)
             elif (node.type == ops.FOR):
                 updateForLoops(node, lineNumberInCode)
+        else:
+            if verbosity: print("sdl: ", lineNumberInCode)
 
     getVarDepInfLists()
     getVarDepInfListsCalled = True

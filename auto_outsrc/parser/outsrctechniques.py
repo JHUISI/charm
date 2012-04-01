@@ -666,19 +666,33 @@ class FindT1:
     def __init__(self, T0_var):
         self.T0 = T0_var
         self.T1 = None
+        self.decout_op = None
         
     def visit(self, node, data):
         if Type(node.left) == ops.ATTR:
             var_name = node.left.getAttribute()
             if var_name == self.T0:
                 self.T1 = node.right
+                self.decout_op = Type(node)
 #                self.T1 = data['sibling']
                 print("T1 right :=", self.T1)
         elif Type(node.right) == ops.ATTR:
             var_name = node.right.getAttribute()
             if var_name == self.T0:
                 self.T1 = node.left
+                self.decout_op = Type(node)
                 print("T1 left :=", self.T1)
+
+class SubstituteVar:
+    def __init__(self, target, new_var):
+        self.target = target
+        self.new_var = new_var
+    def visit(self, node, data):
+        pass
+    
+    def visit_attr(self, node, data):
+        if str(node) == self.target:
+            node.setAttribute(self.new_var)
 
 if __name__ == "__main__":
     statement = sys.argv[1]

@@ -25,3 +25,6 @@ argsToFirstSetupFunc = []
 
 groupObjName = "groupObj"
 groupArg = "MNT160"
+
+rccaRandomVar = "R"
+rccaIntegrityVar = "r_int"

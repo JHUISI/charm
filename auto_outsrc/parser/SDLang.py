@@ -415,6 +415,11 @@ class BinaryNode:
 			return True
 		return False
 	
+	def addToList(self, value):
+ 		if self.type == ops.LIST:
+ 			if type(value) == str:
+ 				self.listNodes.append(value)
+    
 #	def getMySide(self):
 #		return self.myside
 	

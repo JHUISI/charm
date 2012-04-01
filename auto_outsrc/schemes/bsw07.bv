@@ -57,13 +57,13 @@ END :: func:keygen
 
 BEGIN :: func:encrypt
 input := list{pk, M, policy_str}
+pk := expand{g, g2, h, f, egg}
 
 policy := createPolicy(policy_str)
 attrs := getAttributeList(policy)
 s := random(ZR)
 sh := calculateShares(s, policy)
 Y := len(sh)
-g1 := pk#0
 
 Ctl := M * egg^s
 C    := h ^ s
@@ -71,7 +71,7 @@ C    := h ^ s
 BEGIN :: for
 for{y := 1, Y}
 share#y := sh#attrs#y
-Cr#y := g1 ^ share#y
+Cr#y := g ^ share#y
 Cpr#y := (H(attrs#y, G2))^share#y
 END :: for
 
