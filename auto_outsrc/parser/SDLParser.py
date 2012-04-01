@@ -759,6 +759,8 @@ def removeFromLinesOfCode(linesToRemove):
 
     linesOfCode = newLinesOfCode
 
+    parseLinesOfCode(linesOfCode, False)
+
 def removeRangeFromLinesOfCode(startLineNo, endLineNo):
     global linesOfCode
 
@@ -782,6 +784,8 @@ def removeRangeFromLinesOfCode(startLineNo, endLineNo):
             newLinesOfCode.append(linesOfCode[indexInLinesOfCode])
 
     linesOfCode = newLinesOfCode
+
+    parseLinesOfCode(linesOfCode, False)
 
 def appendToLinesOfCode(linesToAdd, lineNumberToAddTo):
     global linesOfCode
@@ -814,6 +818,19 @@ def appendToLinesOfCode(linesToAdd, lineNumberToAddTo):
         newLinesOfCode.append(linesOfCode[indexInLinesOfCode])
 
     linesOfCode = newLinesOfCode
+
+    parseLinesOfCode(linesOfCode, False)
+
+def substituteOneLineOfCode(line, lineNo):
+    if ( (type(line) is not str) or (len(line) == 0) ):
+        sys.exit("substituteOneLineOfCode in SDLParser.py:  problem with line parameter passed in.")
+
+    if ( (type(lineNo) is not int) or (lineNo < 1) ):
+        sys.exit("substituteOneLineOfCode in SDLParser.py:  problem with line number parameter passed in.")
+
+    removeFromLinesOfCode([lineNo])
+
+    appendToLinesOfCode([line], lineNo)
 
 def getLineNoOfInputStatement(funcName):
     if ( (type(funcName) is not str) or (len(funcName) == 0) ):
