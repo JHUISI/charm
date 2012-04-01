@@ -759,7 +759,7 @@ def removeFromLinesOfCode(linesToRemove):
 
     linesOfCode = newLinesOfCode
 
-    parseLinesOfCode(linesOfCode, False)
+#    parseLinesOfCode(linesOfCode, False)
 
 def removeRangeFromLinesOfCode(startLineNo, endLineNo):
     global linesOfCode
@@ -785,7 +785,7 @@ def removeRangeFromLinesOfCode(startLineNo, endLineNo):
 
     linesOfCode = newLinesOfCode
 
-    parseLinesOfCode(linesOfCode, False)
+#    parseLinesOfCode(linesOfCode, False)
 
 def appendToLinesOfCode(linesToAdd, lineNumberToAddTo):
     global linesOfCode
@@ -819,7 +819,7 @@ def appendToLinesOfCode(linesToAdd, lineNumberToAddTo):
 
     linesOfCode = newLinesOfCode
 
-    parseLinesOfCode(linesOfCode, False)
+#    parseLinesOfCode(linesOfCode, False)
 
 def substituteOneLineOfCode(line, lineNo):
     if ( (type(line) is not str) or (len(line) == 0) ):
