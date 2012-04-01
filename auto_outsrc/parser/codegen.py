@@ -147,13 +147,12 @@ def writeFunctionEnd(functionName):
 
 def isForLoopStart(binNode):
     if (binNode.type == ops.FOR):
-        pass
+        return True
+
+    return False
 
 def isForLoopEnd(binNode):
     return False
-
-def writeForLoopEnd():
-    return
 
 def isAssignStmt(binNode):
     if (binNode.type == ops.EQ):
@@ -165,28 +164,27 @@ def getAssignStmtAsString(node):
     if (type(node) is str):
         return node
     elif ( (node.type == ops.ATTR) or (node.type == ops.TYPE) ):
-        print(str(node.attr))
         return str(node.attr)
     elif (node.type == ops.ADD):
         leftString = getAssignStmtAsString(node.left)
         rightString = getAssignStmtAsString(node.right)
-        return leftString + " + " + rightString
+        return "(" + leftString + " + " + rightString + ")"
     elif (node.type == ops.SUB):
         leftString = getAssignStmtAsString(node.left)
         rightString = getAssignStmtAsString(node.right)
-        return leftString + " - " + rightString
+        return "(" + leftString + " - " + rightString + ")"
     elif (node.type == ops.MUL):
         leftString = getAssignStmtAsString(node.left)
         rightString = getAssignStmtAsString(node.right)
-        return leftString + " * " + rightString
+        return "(" + leftString + " * " + rightString + ")"
     elif (node.type == ops.DIV):
         leftString = getAssignStmtAsString(node.left)
         rightString = getAssignStmtAsString(node.right)
-        return leftString + " / " + rightString
+        return "(" + leftString + " / " + rightString + ")"
     elif (node.type == ops.EXP):
         leftString = getAssignStmtAsString(node.left)
         rightString = getAssignStmtAsString(node.right)
-        return leftString + " ** " + rightString
+        return "(" + leftString + " ** " + rightString + ")"
     elif (node.type == ops.LIST):
         listOutputString = "["
         for listNode in node.listNodes:
@@ -209,6 +207,13 @@ def getAssignStmtAsString(node):
         pairRightSide = getAssignStmtAsString(node.right)
         pairOutputString = "pair(" + pairLeftSide + ", " + pairRightSide + ")"
         return pairOutputString
+    elif (node.type == ops.FUNC):
+        funcOutputString = node.attr + "("
+        for listNodeInFunc in node.listNodes:
+            funcOutputString += listNodeInFunc + ", "
+        funcOutputString = funcOutputString[0:(len(funcOutputString) - len(", "))]
+        funcOutputString += ")"
+        return funcOutputString
 
     return "" #replace with sys.exit
 
@@ -232,6 +237,29 @@ def writeAssignStmt(binNode):
     else:
         writeAssignStmt_Python(setupFile, binNode)
 
+def writeForLoopDecl_Python(outputFile, binNode):
+    writeCurrentNumTabsIn(outputFile)
+
+    outputString = ""
+
+    outputString += "for "
+    outputString += getAssignStmtAsString(binNode.left.left)
+    outputString += " in range("
+    outputString += getAssignStmtAsString(binNode.left.right)
+    outputString += ", "
+    outputString += getAssignStmtAsString(binNode.right)
+    outputString += "):\n"
+
+    outputFile.write(outputString)
+
+def writeForLoopDecl(binNode):
+    if (currentFuncName == transformFunctionName):
+        writeForLoopDecl_Python(transformFile, binNode)
+    elif (currentFuncName == decOutFunctionName):
+        writeForLoopDecl_CPP(decOutFile, binNode)
+    else:
+        writeForLoopDecl_Python(setupFile, binNode)
+
 def writeSDLToFiles(astNodes):
     global currentFuncName, numTabsIn
 
@@ -250,7 +278,6 @@ def writeSDLToFiles(astNodes):
             writeForLoopDecl(astNode)
             numTabsIn += 1
         elif (isForLoopEnd(astNode) == True):
-            writeForLoopEnd()
             numTabsIn -= 1
         elif (isAssignStmt(astNode) == True):
             writeAssignStmt(astNode)
