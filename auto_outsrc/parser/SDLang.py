@@ -416,7 +416,7 @@ class BinaryNode:
 		return False
 	
 	def addToList(self, value):
- 		if self.type == ops.LIST:
+ 		if self.type  in [ops.LIST, ops.EXPAND]:
  			if type(value) == str:
  				self.listNodes.append(value)
     

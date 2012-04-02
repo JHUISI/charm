@@ -220,7 +220,7 @@ def identifyT2(varInf, data):
             t2_node = BinaryNode(ops.EQ, BinaryNode("T2"), findT1.T1)
             # merge changes back into original line with M
             t2_vi = varInf
-            t2_vi.updateAssignNode(t1_node)
+            t2_vi.updateAssignNode(t2_node)
             t2_vi.getVarDeps().remove(t0_varname)
 #            print("t1_vi =>>>", t1_vi.getVarDeps())
             data[CTprime.T2] = t2_vi
