@@ -112,9 +112,9 @@ def transform(sdl_scheme, verbosity=False):
 
     # get function prologue for decrypt
     transformIntro = "BEGIN :: func:%s" % config.transformFunctionName
-    cur_list = ["", transformIntro]
-    startLineNo = getLineNoOfInputStatement("decrypt")
-    endLineNo   = getLineNoOfOutputStatement("decrypt")
+    cur_list = [transformIntro]
+    startLineNo = getLineNoOfInputStatement("decrypt")-1
+    endLineNo   = getLineNoOfOutputStatement("decrypt")+1
     intro = list(range(startLineNo, transformVarInfos[0]))
     transformVarInfos = intro + transformVarInfos
     print("New LOCs: ", intro) 
