@@ -3,12 +3,15 @@ from config import *
 import sys
 
 assignInfo = None
+varNamesToFuncs_All = None
+varNamesToFuncs_Assign = None
 setupFile = None
 transformFile = None
 decOutFile = None
 currentFuncName = NONE_FUNC_NAME
 numTabsIn = 1
 returnValues = {}
+globalVarNames = []
 
 def writeCurrentNumTabsIn(outputFile):
     outputString = ""
@@ -21,15 +24,15 @@ def writeCurrentNumTabsIn(outputFile):
 def addImportLines():
     global setupFile, transformFile, decOutFile
 
-def addGlobalVars():
+def addGroupObjGlobalVar():
     global setupFile, transformFile
 
     if ( (type(groupObjName) is not str) or (len(groupObjName) == 0) ):
-        sys.exit("addGlobalVars in codegen.py:  groupObjName in config.py is invalid.")
+        sys.exit("addGroupObjGlobalVar in codegen.py:  groupObjName in config.py is invalid.")
 
     (possibleFuncName, possibleVarInfoObj) = getVarNameEntryFromAssignInfo(groupObjName)
     if ( (possibleFuncName != None) or (possibleVarInfoObj != None) ):
-        sys.exit("addGlobalVars in codegen.py:  groupObjName in config.py is also the name of a variable in the cryptoscheme (not allowed).")
+        sys.exit("addGroupObjGlobalVar in codegen.py:  groupObjName in config.py is also the name of a variable in the cryptoscheme (not allowed).")
 
     outputString = groupObjName + " = None\n\n"
 
@@ -95,6 +98,17 @@ def writeFunctionEnd_Python(outputFile, functionName):
 
     outputFile.write(outputString)
 
+def writeGlobalVarDecls(outputFile, functionName):
+    outputString = ""
+
+    for varName in globalVarNames:
+        if (varName in assignInfo[functionName]):
+            outputString += "\tglobal " + varName + "\n"
+
+    outputString += "\n"
+
+    outputFile.write(outputString)
+
 def writeFunctionDecl_Python(outputFile, functionName):
     outputString = ""
 
@@ -121,6 +135,8 @@ def writeFunctionDecl_Python(outputFile, functionName):
     outputString += "):\n"
 
     outputFile.write(outputString)
+
+    writeGlobalVarDecls(outputFile, functionName)
 
 def writeFunctionDecl_CPP(outputFile, functionName):
     pass
@@ -283,8 +299,53 @@ def writeForLoopDecl(binNode):
     else:
         writeForLoopDecl_Python(setupFile, binNode)
 
+def isTypesStart(binNode):
+    if ( (binNode.type == ops.BEGIN) and (binNode.left.attr == TYPES_HEADER) ):
+        return True
+
+    return False
+
+def isTypesEnd(binNode):
+    if ( (binNode.type == ops.END) and (binNode.left.attr == TYPES_HEADER) ):
+        return True
+
+    return False
+
+def addTypeDeclToGlobalVars(binNode):
+    global globalVarNames
+
+    if (binNode.right == None):
+        return
+
+    if (str(binNode.right.attr) != LIST_TYPE):
+        return
+
+    varName = str(binNode.left.attr)
+    if (varName.find(LIST_INDEX_SYMBOL) != -1):
+        sys.exit("addTypeDeclToGlobalVars in codegen.py:  variable name in types section has # sign in it.")
+
+    if (varName not in globalVarNames):
+        globalVarNames.append(varName)
+
+def writeGlobalVars_Python(outputFile):
+    outputString = ""
+
+    for varName in globalVarNames:
+        outputString += varName
+        outputString += " = []\n"
+
+    outputFile.write(outputString)
+
+def writeGlobalVars_CPP(outputFile):
+    return
+
+def writeGlobalVars():
+    writeGlobalVars_Python(setupFile)
+    writeGlobalVars_Python(transformFile)
+    writeGlobalVars_CPP(decOutFile)
+
 def writeSDLToFiles(astNodes):
-    global currentFuncName, numTabsIn
+    global currentFuncName, numTabsIn, setupFile, transformFile
 
     for astNode in astNodes:
         if (isFunctionStart(astNode) == True):
@@ -297,13 +358,16 @@ def writeSDLToFiles(astNodes):
             currentFuncName = TYPES_HEADER
         elif (isTypesEnd(astNode) == True):
             currentFuncName = NONE_FUNC_NAME
-
-starthere
+            writeGlobalVars()
+            setupFile.write("\n")
+            transformFile.write("\n")
 
         if (currentFuncName == NONE_FUNC_NAME):
             continue
 
-        if (isForLoopStart(astNode) == True):
+        if (currentFuncName == TYPES_HEADER):
+            addTypeDeclToGlobalVars(astNode)
+        elif (isForLoopStart(astNode) == True):
             writeForLoopDecl(astNode)
             numTabsIn += 1
         elif (isForLoopEnd(astNode) == True):
@@ -411,16 +475,29 @@ def writeMainFuncs():
     writeMainFuncOfTransform()
     writeMainFuncOfDecOut()
 
+def getGlobalVarNames():
+    global globalVarNames
+
+    for varName in varNamesToFuncs_All:
+        listForThisVar = varNamesToFuncs_All[varName]
+        if (len(listForThisVar) == 0):
+            sys.exit("getGlobalVarNames in codegen.py:  list extracted from varNamesToFuncs_All for current variable is empty.")
+        if (len(listForThisVar) == 1):
+            continue
+        if (varName not in globalVarNames):
+            globalVarNames.append(varName)
+
 def main(SDL_Scheme):
-    global setupFile, transformFile, decOutFile, assignInfo
+    global setupFile, transformFile, decOutFile, assignInfo, varNamesToFuncs_All, varNamesToFuncs_Assign
 
     if ( (type(SDL_Scheme) is not str) or (len(SDL_Scheme) == 0) ):
         sys.exit("codegen.py:  sys.argv[1] argument (file name for SDL scheme) passed in was invalid.")
 
     keygen(SDL_Scheme)
-    #printLinesOfCode()
     astNodes = getAstNodes()
     assignInfo = getAssignInfo()
+    varNamesToFuncs_All = getVarNamesToFuncs_All()
+    varNamesToFuncs_Assign = getVarNamesToFuncs_Assign()
 
     if ( (type(setupFileName) is not str) or (len(setupFileName) <= len(pySuffix) ) or (setupFileName.endswith(pySuffix) == False) ):
         sys.exit("codegen.py:  problem with setupFileName in config.py.")
@@ -435,8 +512,10 @@ def main(SDL_Scheme):
     transformFile = open(transformFileName, 'w')
     decOutFile = open(decOutFileName, 'w')
 
+    getGlobalVarNames()
+
     addImportLines()
-    addGlobalVars()
+    addGroupObjGlobalVar()
     writeSDLToFiles(astNodes)
     writeMainFuncs()
 

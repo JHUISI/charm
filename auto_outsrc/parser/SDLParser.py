@@ -14,6 +14,8 @@ currentFuncName = NONE_FUNC_NAME
 ASSIGN_KEYWORDS = ['input', 'output']
 astNodes = []
 assignInfo = {}
+varNamesToFuncs_All = {}
+varNamesToFuncs_Assign = {}
 forLoops = {}
 varDepList = {}
 varInfList = {}
@@ -596,8 +598,29 @@ def getVarTypeInfo(node, i, varName):
         if (retVarType.type == ops.LIST):
             updateVarTypes(node, i, retVarType)
 
+def updateVarNamesDicts(node, varNameList, dictToUpdate):
+    if (type(varNameList) is not list):
+        sys.exit("updateVarNamesDicts in SDLParser.py:  varNameList passed in is not of type list.")
+
+    if (type(dictToUpdate) is not dict):
+        sys.exit("updateVarNamesDicts in SDLParser.py:  dictToUpdate passed in is not of type dict.")
+
+    if (node.right.type == ops.EXPAND):
+        return
+
+    if (len(varNameList) == 0):
+        return
+
+    for varName in varNameList:
+        if (varName in dictToUpdate):
+            if (currentFuncName not in dictToUpdate[varName]):
+                dictToUpdate[varName].append(currentFuncName)
+        else:
+            dictToUpdate[varName] = []
+            dictToUpdate[varName].append(currentFuncName)
+
 def updateAssignInfo(node, i):
-    global assignInfo, forLoops
+    global assignInfo, forLoops, varNamesToFuncs_All, varNamesToFuncs_Assign
 
     assignInfo_Func = assignInfo[currentFuncName]
 
@@ -607,16 +630,27 @@ def updateAssignInfo(node, i):
         currentForLoopObj = forLoops[currentFuncName][lenForLoops - 1]
 
     varName = getFullVarName(node.left)
+    varNameWithoutIndices = getVarNameWithoutIndices(node.left)
+
+    updateVarNamesDicts(node, [varNameWithoutIndices], varNamesToFuncs_All)
+    updateVarNamesDicts(node, [varNameWithoutIndices], varNamesToFuncs_Assign)
+
+    resultingVarDeps = []
+
     if (varName in assignInfo_Func):
         if (assignInfo_Func[varName].hasBeenSet() == True):
             sys.exit("Found multiple assignments of same variable name within same function.")
         assignInfo_Func[varName].setLineNo(i)
-        assignInfo_Func[varName].setAssignNode(node, currentFuncName, currentForLoopObj)
+        resultingVarDeps = assignInfo_Func[varName].setAssignNode(node, currentFuncName, currentForLoopObj)
     else:
         varInfoObj = VarInfo()
         varInfoObj.setLineNo(i)
-        varInfoObj.setAssignNode(node, currentFuncName, currentForLoopObj)
+        resultingVarDeps = varInfoObj.setAssignNode(node, currentFuncName, currentForLoopObj)
         assignInfo_Func[varName] = varInfoObj
+
+    expandedVarDeps = expandVarNamesByIndexSymbols(resultingVarDeps)
+
+    updateVarNamesDicts(node, expandedVarDeps, varNamesToFuncs_All)
 
     if (currentForLoopObj != None):
         currentForLoopObj.appendToBinaryNodeList(node)
@@ -740,6 +774,12 @@ def getAssignInfo():
 
 def getVarTypes():
     return varTypes
+
+def getVarNamesToFuncs_All():
+    return varNamesToFuncs_All
+
+def getVarNamesToFuncs_Assign():
+    return varNamesToFuncs_Assign
 
 def removeFromLinesOfCode(linesToRemove):
     global linesOfCode
@@ -883,11 +923,14 @@ def getAstNodes():
 def parseLinesOfCode(code, verbosity):
     global varTypes, assignInfo, forLoops, currentFuncName, varDepList, varInfList, varsThatProtectM
     global algebraicSetting, startLineNo_ForLoop, startLineNos_Functions, endLineNos_Functions
-    global getVarDepInfListsCalled, getVarsThatProtectMCalled, astNodes
+    global getVarDepInfListsCalled, getVarsThatProtectMCalled, astNodes, varNamesToFuncs_All
+    global varNamesToFuncs_Assign
 
     astNodes = []
     varTypes = {}
     assignInfo = {}
+    varNamesToFuncs_All = {}
+    varNamesToFuncs_Assign = {}
     forLoops = {}
     currentFuncName = NONE_FUNC_NAME
     varDepList = {}

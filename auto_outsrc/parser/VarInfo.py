@@ -171,6 +171,8 @@ class VarInfo:
 
         self.beenSet = not(self.initCall)
 
+        return self.varDeps
+
     def updateAssignNode(self, newNode):
         # can only update if assignNode was already set
         if self.assignNode == None: return None

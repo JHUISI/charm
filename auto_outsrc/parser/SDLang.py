@@ -71,9 +71,6 @@ def isValidType(possibleType):
     return False
 
 def getListNodeNames(node):
-    #if (node.type != ops.LIST):
-        #sys.exit("getListNodeNames in SDLang received node that is not of type " + str(ops.LIST))
-
     listNodes = None
     retList = []
 
@@ -97,14 +94,6 @@ def addListNodesToList(node, listToAddTo):
         if ( (listNodeFinal not in listToAddTo) and (listNodeFinal.isdigit() == False) and (listNodeFinal != NONE_STRING) ):
             listToAddTo.append(listNodeFinal)
 
-'''
-def getVarType(node):
-    if (node.type != ops.TYPE):
-        sys.exit("getVarType in SDLange received node that is not of type " + str(ops.TYPE))
-
-    return node.attr
-'''
-
 def dropListIndexIfNonNum(varName):
     if (varName.count(LIST_INDEX_SYMBOL) != 1):
         return varName
@@ -123,10 +112,33 @@ def dropListIndexIfNonNum(varName):
 
     return varName[0:listIndexPos]
 
-def getFullVarName(node):
-    #if (node.type != ops.ATTR):
-        #sys.exit("getFullVarName in SDLang received node that is not of type " + str(ops.ATTR))
+def expandVarNamesByIndexSymbols(varNameList):
+    if (type(varNameList) is not list):
+        sys.exit("expandVarNamesByIndexSymbols in SDLang.py:  varNameList parameter passed in is not of type list.")
 
+    if (len(varNameList) == 0):
+        return varNameList
+
+    retList = []
+
+    for varName in varNameList:
+        varNameSplit = varName.split(LIST_INDEX_SYMBOL)
+        for varNameSplit_Ind in varNameSplit:
+            if (varNameSplit_Ind.isdigit() == True):
+                continue
+            if (varNameSplit_Ind not in retList):
+                retList.append(varNameSplit_Ind)
+
+    return retList
+
+def getVarNameWithoutIndices(node):
+    varName = node.attr
+    indexOfListSymbol = varName.find(LIST_INDEX_SYMBOL)
+    if (indexOfListSymbol == -1):
+        return varName
+    return varName[0:indexOfListSymbol]
+
+def getFullVarName(node):
     varName = node.attr
     if (node.attr_index != None):
         for index in node.attr_index:
@@ -416,7 +428,7 @@ class BinaryNode:
 		return False
 	
 	def addToList(self, value):
- 		if self.type == ops.LIST:
+ 		if self.type  in [ops.LIST, ops.EXPAND]:
  			if type(value) == str:
  				self.listNodes.append(value)
     
