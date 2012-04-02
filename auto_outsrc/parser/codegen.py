@@ -74,9 +74,7 @@ def writeFunctionEnd_Python(outputFile, functionName):
     try:
         outputVariables = assignInfo[functionName][outputKeyword].getVarDeps()
     except:
-        print("writeFunctionEnd_Python in codegen.py:  could not obtain function's output variables from getVarDeps() on VarInfo obj.")
-        print("This is most likely the decrypt function.  This should be fixed in transform.")
-        return
+        sys.exit("writeFunctionEnd_Python in codegen.py:  could not obtain function's output variables from getVarDeps() on VarInfo obj.")
 
     outputVariablesString = ""
 
@@ -117,9 +115,7 @@ def writeFunctionDecl_Python(outputFile, functionName):
     try:
         inputVariables = assignInfo[functionName][inputKeyword].getVarDeps()
     except:
-        print("writeFunctionDecl_Python in codegen.py:  could not obtain function's input variables from getVarDeps() on VarInfo obj.")
-        print("This is most likely the decrypt function.  This should be fixed in transform.")
-        return
+        sys.exit("writeFunctionDecl_Python in codegen.py:  could not obtain function's input variables from getVarDeps() on VarInfo obj.")
 
     inputVariablesString = ""
 
@@ -250,8 +246,11 @@ def getAssignStmtAsString(node):
         funcOutputString = funcOutputString[0:(len(funcOutputString) - len(", "))]
         funcOutputString += ")"
         return funcOutputString
+    elif (node.type == ops.ON):
+        dotProdOutputString = ""
+        return dotProdOutputString
 
-    return "" #replace with sys.exit
+    sys.exit("getAssignStmtAsString in codegen.py:  unsupported node type detected.")
 
 def writeAssignStmt_Python(outputFile, binNode):
     if (binNode.right.type == ops.EXPAND):
