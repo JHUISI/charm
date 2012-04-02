@@ -112,7 +112,7 @@ def transform(sdl_scheme, verbosity=False):
 
     # get function prologue for decrypt
     transformIntro = "BEGIN :: func:%s" % config.transformFunctionName
-    cur_list = [transformIntro]
+    cur_list = ["", transformIntro]
     startLineNo = getLineNoOfInputStatement("decrypt")
     endLineNo   = getLineNoOfOutputStatement("decrypt")
     intro = list(range(startLineNo, transformVarInfos[0]))
@@ -230,7 +230,7 @@ def createLOC(partialCT):
     
     T0, T1, T2 = "T0", "T1", "T2"
     targetFunc = 'decrypt'    
-    partialCiphertextName = 'ct_pr' # maybe search for a unique name
+    partialCiphertextName = config.partialCT
     T0_node = BinaryNode(ops.EQ)
     T0_node.left = BinaryNode(T0)
     T0_node.right = varName0

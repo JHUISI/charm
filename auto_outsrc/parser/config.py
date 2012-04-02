@@ -15,6 +15,7 @@ transformFileName = "transformOutsourcing.py"
 decOutFileName = "decOutOutsourcing.cpp"
 
 transformFunctionName = "transform"
+partialCT = "partCT"
 decOutFunctionName = "decout"
 
 pySuffix = ".py"
