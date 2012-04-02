@@ -238,6 +238,9 @@ def getAssignStmtAsString(node):
     return "" #replace with sys.exit
 
 def writeAssignStmt_Python(outputFile, binNode):
+    if (binNode.right.type == ops.EXPAND):
+        return
+
     writeCurrentNumTabsIn(outputFile)
 
     outputString = ""
@@ -290,6 +293,12 @@ def writeSDLToFiles(astNodes):
         elif (isFunctionEnd(astNode) == True):
             writeFunctionEnd(currentFuncName)
             currentFuncName = NONE_FUNC_NAME
+        elif (isTypesStart(astNode) == True):
+            currentFuncName = TYPES_HEADER
+        elif (isTypesEnd(astNode) == True):
+            currentFuncName = NONE_FUNC_NAME
+
+starthere
 
         if (currentFuncName == NONE_FUNC_NAME):
             continue
