@@ -70,60 +70,60 @@ def transform(sdl_scheme, verbosity=False):
             print("\t=> has randomness!")
     print("<=== END ===>")
     
-    traverseBackwards(stmtsDec, identifyT1, partDecCT)
-    T0_sdlObj, T1_sdlObj, output_sdlObj, transform_output_sdlObj = createLOC(partDecCT)
+    traverseBackwards(stmtsDec, identifyT2, partDecCT)
+    T0_sdlObj, T2_sdlObj, output_sdlObj, transform_output_sdlObj = createLOC(partDecCT)
     
 #    traverseLines(stmtsDec, identifyMessage, ans)
     print("Results =>", partDecCT)
-    t1 = partDecCT[CTprime.T1].getAssignVar()
-    if t1 == "T1": # in other words, this is something we just added to dec, then 
-        print("Dep list =>", t1)
-        depListDec[t1] = partDecCT[CTprime.T1].getVarDeps()
-        print("new dep list for t1 :=>", depListDec[t1])
+    t2 = partDecCT[CTprime.T2].getAssignVar()
+    if t2 == "T2": # in other words, this is something we just added to dec, then 
+        print("Dep list =>", t2)
+        depListDec[t2] = partDecCT[CTprime.T2].getVarDeps()
+        print("new dep list for t1 :=>", depListDec[t2])
     else:
-        print("Dep list for non T1 case =>", t1, depListDec[t1])
+        print("Dep list for non T1 case =>", t2, depListDec[t2])
 
     # program slice for t1 (including the t1 assignment line)
-    last_line = partDecCT[CTprime.T1].getLineNo()
-    t1_slice = {'depList':depListDec[t1], 'lines':[last_line], 'block':decrypt_block }
-    traverseBackwards(stmtsDec, programSliceT1, t1_slice)
-    t1_slice['lines'].sort()
-    transform = t1_slice['lines']
+    last_line = partDecCT[CTprime.T2].getLineNo()
+    t2_slice = {'depList':depListDec[t2], 'lines':[last_line], 'block':decrypt_block }
+    traverseBackwards(stmtsDec, programSliceT2, t2_slice)
+    t2_slice['lines'].sort()
+    transform = t2_slice['lines']
     print("Optimize these lines: ", transform) 
     print("<===\tTransform Slice\t===>") 
-    traverseForwards(stmtsDec, printStmt, t1_slice)
+    traverseForwards(stmtsDec, printStmt, t2_slice)
     print("<===\tEND\t===>") 
 
     # rewrite pairing equations 
     print("Rewrite pairing equations....")   
-    traverseBackwards(stmtsDec, applyRules, t1_slice)
+    traverseBackwards(stmtsDec, applyRules, t2_slice)
     
     allLines = getLinesOfCode()
     last_line = len(allLines) + 1
     cur_line = last_line
     
     transformVarInfos = [ ]
-    transformVarInfos.extend(t1_slice['lines'])
+    transformVarInfos.extend(t2_slice['lines'])
     print("Current transform LOCs: ", transformVarInfos)
 
     # add statements to new transform block
-    traverseForwards(stmtsDec, printStmt, t1_slice)
+    traverseForwards(stmtsDec, printStmt, t2_slice)
 
 
     # get function prologue for decrypt
-    transformIntro = "BEGIN :: func:transform"
+    transformIntro = "BEGIN :: func:%s" % config.transformFunctionName
     cur_list = [transformIntro]
     startLineNo = getLineNoOfInputStatement("decrypt")
     endLineNo   = getLineNoOfOutputStatement("decrypt")
     intro = list(range(startLineNo, transformVarInfos[0]))
     transformVarInfos = intro + transformVarInfos
     print("New LOCs: ", intro) 
-    transformOutro = "END :: func:transform"
+    transformOutro = "END :: func:%s" % config.transformFunctionName
     
     print("Delete these lines: ", transformVarInfos)
     
-    newObj = [T0_sdlObj, T1_sdlObj, output_sdlObj, transform_output_sdlObj]
-    newFunc = 'transform'
+    newObj = [T0_sdlObj, T2_sdlObj, output_sdlObj, transform_output_sdlObj]
+    newFunc = config.transformFunctionName # 'transform' string
 #    AssignInfo[newFunc] = {}
     for i in range(len(transformVarInfos)):
         ref = transformVarInfos[i]
@@ -183,7 +183,7 @@ def printStmt(varInf, data):
     if varInf.getLineNo() in data['lines']:
         print(varInf.getLineNo(), ":", varInf.getAssignNode())
 
-def programSliceT1(varInf, data):
+def programSliceT2(varInf, data):
     depList = data['depList']
     if varInf.getAssignVar() in depList:
         data['lines'].append(varInf.getLineNo())
@@ -193,7 +193,7 @@ def programSliceT1(varInf, data):
 #def depCheck(varInf, data):
 #    target
 
-def identifyT1(varInf, data):
+def identifyT2(varInf, data):
     targetFunc = 'decrypt'
     s = varInf.getAssignNode()
     if s.left.getAttribute() == 'output': 
@@ -201,14 +201,14 @@ def identifyT1(varInf, data):
     elif data.get('msg') == s.left.getAttribute(): 
         print("Found it: ", s, varInf.varDeps) # I want non-T0 var
         t0_varname = data[CTprime.T0].getAssignNode().left.getAttribute()
-        t1_varname = list(varInf.varDeps)
-        t1_varname.remove(t0_varname)
-        print("T0 :=>", t0_varname, t1_varname, varInf.varDeps)
-        if len(t1_varname) == 1:
+        t2_varname = list(varInf.varDeps)
+        t2_varname.remove(t0_varname)
+        print("T0 :=>", t0_varname, t2_varname, varInf.varDeps)
+        if len(t2_varname) == 1:
             # M := T0 / T1 form
-            i = t1_varname[0]
-            print("T1: ", AssignInfo[targetFunc][i])
-            data[CTprime.T1] = AssignInfo[targetFunc][i]
+            i = t2_varname[0]
+            print("T2: ", AssignInfo[targetFunc][i])
+            data[CTprime.T2] = AssignInfo[targetFunc][i]
         else:
             # TODO: need to create a new assignment for T1 and set to common operation of remaining
             # variables
@@ -217,44 +217,43 @@ def identifyT1(varInf, data):
             findT1 = FindT1(t0_varname)
             ASTVisitor( findT1 ).preorder( copy_s )
             # create new stmt "T1 := operations" 
-            t1_node = BinaryNode(ops.EQ, BinaryNode("T1"), findT1.T1)
+            t2_node = BinaryNode(ops.EQ, BinaryNode("T2"), findT1.T1)
             # merge changes back into original line with M
-            t1_vi = varInf
-            t1_vi.updateAssignNode(t1_node)
-            t1_vi.getVarDeps().remove(t0_varname)
+            t2_vi = varInf
+            t2_vi.updateAssignNode(t1_node)
+            t2_vi.getVarDeps().remove(t0_varname)
 #            print("t1_vi =>>>", t1_vi.getVarDeps())
-            data[CTprime.T1] = t1_vi
-
+            data[CTprime.T2] = t2_vi
 
 def createLOC(partialCT):
     varName0 = partialCT[CTprime.T0].getAssignNode().left
     
-    T0, T1 = "T0","T1"
+    T0, T1, T2 = "T0", "T1", "T2"
     targetFunc = 'decrypt'    
     partialCiphertextName = 'ct_pr' # maybe search for a unique name
     T0_node = BinaryNode(ops.EQ)
     T0_node.left = BinaryNode(T0)
     T0_node.right = varName0
     
-    T1_node = None    
-    varName1 = partialCT[CTprime.T1].getAssignNode().left.getAttribute()
+    T2_node = None    
+    varName1 = partialCT[CTprime.T2].getAssignNode().left.getAttribute()
     print("varName1 :=>", varName1)
-    if varName1 != T1:
-        T1_node = BinaryNode(ops.EQ)
-        T1_node.left = BinaryNode(T1)
-        T1_node.right = AssignInfo[targetFunc][varName1].getAssignNode().left
-        print("T1 node :=", T1_node)
+    if varName1 != T2:
+        T2_node = BinaryNode(ops.EQ)
+        T2_node.left = BinaryNode(T2)
+        T2_node.right = AssignInfo[targetFunc][varName1].getAssignNode().left
+        print("T2 node :=", T2_node)
         
     output_node = BinaryNode(ops.EQ)
     output_node.left = BinaryNode(partialCiphertextName)
     output_node.right = BinaryNode(ops.LIST)
-    output_node.right.listNodes = [T0, T1]
+    output_node.right.listNodes = [T0, T1, T2]
     
     transform_output = BinaryNode(ops.EQ)
     transform_output.left = BinaryNode("output")
     transform_output.right = BinaryNode(partialCiphertextName) 
     
-    return T0_node, T1_node, output_node, transform_output
+    return T0_node, T2_node, output_node, transform_output
 
 def printHasPair(varInf, data):
     if varInf.getHasPairings():
