@@ -79,7 +79,7 @@ s_sh := calculateShares(s, policy)
 w_sh := calculateShares(w, policy)
 Y := len(s_sh)
 egg := e(g,g)
-C0 := M * (egg^s)
+C0 := (M * (egg^s))
 
 BEGIN :: for
 for{y := 1, Y}
