@@ -152,6 +152,9 @@ def isForLoopStart(binNode):
     return False
 
 def isForLoopEnd(binNode):
+    if ( (binNode.type == ops.END) and (binNode.left.attr == FOR_LOOP_HEADER) ):
+        return True
+
     return False
 
 def isAssignStmt(binNode):
@@ -160,11 +163,28 @@ def isAssignStmt(binNode):
 
     return False
 
+def replacePoundsWithBrackets(nameWithPounds):
+    if ( (type(nameWithPounds) is not str) or (len(nameWithPounds) == 0) ):
+        sys.exit("replacePoundsWithBrackets in codegen.py:  problem with nameWithPounds parameter passed in.")
+
+    nameSplit = nameWithPounds.split(LIST_INDEX_SYMBOL)
+    if (len(nameSplit) == 1):
+        return nameWithPounds
+
+    nameToReturn = nameSplit[0]
+    lenNameSplit = len(nameSplit)
+
+    for counter in range(0, (lenNameSplit - 1)):
+        nameToReturn += "[" + nameSplit[counter + 1] + "]"
+
+    return nameToReturn
+
 def getAssignStmtAsString(node):
     if (type(node) is str):
         return node
     elif ( (node.type == ops.ATTR) or (node.type == ops.TYPE) ):
-        return str(node.attr)
+        strNameToReturn = replacePoundsWithBrackets(str(node.attr))
+        return strNameToReturn
     elif (node.type == ops.ADD):
         leftString = getAssignStmtAsString(node.left)
         rightString = getAssignStmtAsString(node.right)
@@ -218,10 +238,13 @@ def getAssignStmtAsString(node):
     return "" #replace with sys.exit
 
 def writeAssignStmt_Python(outputFile, binNode):
+    if (binNode.right.type == ops.EXPAND):
+        return
+
     writeCurrentNumTabsIn(outputFile)
 
     outputString = ""
-    outputString += binNode.left.attr
+    outputString += replacePoundsWithBrackets(str(binNode.left.attr))
     outputString += " = "
 
     outputString += getAssignStmtAsString(binNode.right)
@@ -270,6 +293,12 @@ def writeSDLToFiles(astNodes):
         elif (isFunctionEnd(astNode) == True):
             writeFunctionEnd(currentFuncName)
             currentFuncName = NONE_FUNC_NAME
+        elif (isTypesStart(astNode) == True):
+            currentFuncName = TYPES_HEADER
+        elif (isTypesEnd(astNode) == True):
+            currentFuncName = NONE_FUNC_NAME
+
+starthere
 
         if (currentFuncName == NONE_FUNC_NAME):
             continue
