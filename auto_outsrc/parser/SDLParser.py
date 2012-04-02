@@ -591,6 +591,7 @@ def getVarTypeInfoRecursive(node):
 
 def getVarTypeInfo(node, i, varName):
     retVarType = getVarTypeInfoRecursive(node.right)
+
     if (type(retVarType).__name__ == ENUM_VALUE_CLASS_NAME):
         if (retVarType != types.NO_TYPE):
             updateVarTypes(node, i, retVarType)
