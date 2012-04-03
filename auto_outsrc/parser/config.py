@@ -4,6 +4,9 @@ blindingLoopVar = "y"
 blindingSuffix = "-Blinded"
 keygenBlindingExponent = "zz"
 keygenFuncName = "keygen"
+# superset of variables we have used to represent public parameters in
+# our crypto schemes
+keygenPubVar = ["pk", "mpk", "gpk"]
 keygenSecVar = "sk"
 
 # these should be keywords or part of semantics of SDL
@@ -28,4 +31,3 @@ groupObjName = "groupObj"
 groupArg = "MNT160"
 
 rccaRandomVar = "R"
-rccaIntegrityVar = "r_int"

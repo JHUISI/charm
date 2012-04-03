@@ -213,6 +213,7 @@ def identifyT2(varInf, data):
             data[CTprime.T2] = AssignInfo[targetFunc][i]
             findT1 = FindT1(t0_varname)
             ASTVisitor( findT1 ).preorder( s.right )
+            # helps determine operation for dec out
             if findT1.decout_op == ops.DIV:
                 data['dec_op'] = '/'
             elif findT1.decout_op == ops.MUL:
@@ -228,6 +229,7 @@ def identifyT2(varInf, data):
             ASTVisitor( findT1 ).preorder( copy_s )
             # create new stmt "T1 := operations" 
             t2_node = BinaryNode(ops.EQ, BinaryNode("T2"), findT1.T1)
+            # helps determine operation for dec out            
             if findT1.decout_op == ops.DIV:
                 data['dec_op'] = '/'
             elif findT1.decout_op == ops.MUL:
