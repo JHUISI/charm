@@ -18,7 +18,7 @@ debug = False
 # 
 def transform(sdl_scheme, verbosity=False):
     global AssignInfo
-    partDecCT = { CTprime.T0: None, CTprime.T1: None, CTprime.T2: None }
+    partDecCT = { CTprime.T0: None, CTprime.T1: None, CTprime.T2: None, config.M:None, 'dec_op':None }
     print("Building partially decrypted CT: ", partDecCT)
     AssignInfo = getAssignInfo()
 
@@ -45,6 +45,8 @@ def transform(sdl_scheme, verbosity=False):
     
     (stmtsEnc, typesEnc, depListEnc, infListEnc) = getFuncStmts("encrypt")
     (stmtsDec, typesDec, depListDec, infListDec) = getFuncStmts("decrypt")
+    partDecCT[config.M] = typesDec[config.M].getType()
+
     finalSecretList = []
     for i in secretList:
         for k,v in depListDec.items():
@@ -161,7 +163,7 @@ def transform(sdl_scheme, verbosity=False):
         print(i, ":", stmtsTrans[i].getAssignNode())    
     print("<===\tEND\t===>") 
     
-    return finalSecretList
+    return finalSecretList, partDecCT
 
 def createVarInfo(i, node, currentFuncName):
     varInfoObj = VarInfo()
@@ -209,6 +211,14 @@ def identifyT2(varInf, data):
             i = t2_varname[0]
             print("T2: ", AssignInfo[targetFunc][i])
             data[CTprime.T2] = AssignInfo[targetFunc][i]
+            findT1 = FindT1(t0_varname)
+            ASTVisitor( findT1 ).preorder( s.right )
+            if findT1.decout_op == ops.DIV:
+                data['dec_op'] = '/'
+            elif findT1.decout_op == ops.MUL:
+                data['dec_op'] = '*'
+            else:
+                pass # seems incorrect
         else:
             # TODO: need to create a new assignment for T1 and set to common operation of remaining
             # variables
@@ -218,6 +228,12 @@ def identifyT2(varInf, data):
             ASTVisitor( findT1 ).preorder( copy_s )
             # create new stmt "T1 := operations" 
             t2_node = BinaryNode(ops.EQ, BinaryNode("T2"), findT1.T1)
+            if findT1.decout_op == ops.DIV:
+                data['dec_op'] = '/'
+            elif findT1.decout_op == ops.MUL:
+                data['dec_op'] = '*'
+            else:
+                pass # seems incorrect
             # merge changes back into original line with M
             t2_vi = varInf
             t2_vi.updateAssignNode(t2_node)
