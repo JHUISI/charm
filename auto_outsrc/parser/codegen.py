@@ -12,6 +12,8 @@ currentFuncName = NONE_FUNC_NAME
 numTabsIn = 1
 returnValues = {}
 globalVarNames = []
+lineNoBeingProcessed = 0
+numLambdaFunctions = 0
 
 def writeCurrentNumTabsIn(outputFile):
     outputString = ""
@@ -191,11 +193,15 @@ def replacePoundsWithBrackets(nameWithPounds):
 
     return nameToReturn
 
-def getAssignStmtAsString(node):
+def getAssignStmtAsString(node, replacementsDict = None):
     if (type(node) is str):
+        if ( (replacementsDict != None) and (node in replacementsDict) ):
+            return replacementsDict[node]
         return node
     elif ( (node.type == ops.ATTR) or (node.type == ops.TYPE) ):
         strNameToReturn = replacePoundsWithBrackets(str(node.attr))
+        if ( (replacementsDict != None) and (strNameToReturn in replacementsDict) ):
+            return replacementsDict[strNameToReturn]
         return strNameToReturn
     elif (node.type == ops.ADD):
         leftString = getAssignStmtAsString(node.left)
@@ -240,17 +246,63 @@ def getAssignStmtAsString(node):
         pairOutputString = "pair(" + pairLeftSide + ", " + pairRightSide + ")"
         return pairOutputString
     elif (node.type == ops.FUNC):
-        funcOutputString = node.attr + "("
+        if ( (replacementsDict != None) and (node.attr in replacementsDict) ):
+            funcOutputString = replacementsDict[node.attr] + "("
+        else:
+            funcOutputString = node.attr + "("
         for listNodeInFunc in node.listNodes:
-            funcOutputString += listNodeInFunc + ", "
+            if ( (replacementsDict != None) and (listNodeInFunc in replacementsDict) ):
+                funcOutputString += replacementsDict[listNodeInFunc] + ", "
+            else:
+                funcOutputString += listNodeInFunc + ", "
         funcOutputString = funcOutputString[0:(len(funcOutputString) - len(", "))]
         funcOutputString += ")"
         return funcOutputString
-    elif (node.type == ops.ON):
+    elif ( (node.type == ops.ON) and (node.left.type == ops.PROD) ):
         dotProdOutputString = ""
         return dotProdOutputString
 
     sys.exit("getAssignStmtAsString in codegen.py:  unsupported node type detected.")
+
+def writeLambdaFuncAssignStmt(outputFile, binNode):
+    global numLambdaFunctions
+
+    numLambdaFunctions += 1
+
+    if ( (binNode.right.type != ops.ON) or (binNode.right.left.type != ops.PROD) ):
+        sys.exit("writeLambdaFuncAssignStmt in codegen.py:  binary node passed in is not of the dot product type.")
+
+    varName = getFullVarName(binNode.left, True)
+
+    (funcName, varInfoObj) = getVarNameEntryFromAssignInfo(varName)
+    if ( (funcName == None) or (varInfoObj == None) or (varInfoObj.getDotProdObj() == None) ):
+        sys.exit("writeLambdaFuncAssignStmt in codegen.py:  problem with values returned from getVarNameEntryFromAssignInfo.")
+
+    dotProdObj = varInfoObj.getDotProdObj()
+    distinctVarsList = dotProdObj.getDistinctVarsInCalcList()
+    numDistinctVars = len(distinctVarsList)
+
+    lambdaOutputString = ""
+    lambdaOutputString += lamFuncName
+    lambdaOutputString += str(numLambdaFunctions)
+    lambdaOutputString += " = lambda "
+
+    lambdaReplacements = {}
+
+    for counter in range(0, numDistinctVars):
+        lambdaOutputString += lambdaLetters[counter] + ","
+        lambdaReplacements[distinctVarsList[counter]] = lambdaLetters[counter]
+
+    lambdaOutputString = lambdaOutputString[0:(len(lambdaOutputString) - 1)]
+    lambdaOutputString += ": "
+
+    lambdaExpression = getAssignStmtAsString(dotProdObj.getBinaryNode().right, lambdaReplacements)
+    print(lambdaExpression)
+
+    #lam_func = lambda i,a,b: a[i] ** b[i]
+
+    lambdaOutputString += "\n"
+    outputFile.write(lambdaOutputString)
 
 def writeAssignStmt_Python(outputFile, binNode):
     if (binNode.right.type == ops.EXPAND):
@@ -259,6 +311,11 @@ def writeAssignStmt_Python(outputFile, binNode):
     writeCurrentNumTabsIn(outputFile)
 
     outputString = ""
+
+    if ( (binNode.right.type == ops.ON) and (binNode.right.left.type == ops.PROD) ):
+        writeLambdaFuncAssignStmt(outputFile, binNode)
+        writeCurrentNumTabsIn(outputFile)
+
     outputString += replacePoundsWithBrackets(str(binNode.left.attr))
     outputString += " = "
 
@@ -331,7 +388,7 @@ def writeGlobalVars_Python(outputFile):
 
     for varName in globalVarNames:
         outputString += varName
-        outputString += " = []\n"
+        outputString += " = {}\n"
 
     outputFile.write(outputString)
 
@@ -344,9 +401,11 @@ def writeGlobalVars():
     writeGlobalVars_CPP(decOutFile)
 
 def writeSDLToFiles(astNodes):
-    global currentFuncName, numTabsIn, setupFile, transformFile
+    global currentFuncName, numTabsIn, setupFile, transformFile, lineNoBeingProcessed
 
     for astNode in astNodes:
+        lineNoBeingProcessed += 1
+
         if (isFunctionStart(astNode) == True):
             currentFuncName = getFuncNameFromBinNode(astNode)
             writeFunctionDecl(currentFuncName)

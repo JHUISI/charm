@@ -138,13 +138,19 @@ def getVarNameWithoutIndices(node):
         return varName
     return varName[0:indexOfListSymbol]
 
-def getFullVarName(node):
+def getFullVarName(node, dropListIndexIfNonNum_Arg):
+    if ( (dropListIndexIfNonNum_Arg != True) and (dropListIndexIfNonNum_Arg != False) ):
+        sys.exit("getFullVarName in SDLang.py:  dropListIndexIfNonNum_Arg parameter passed in is not set to True or False.")
+
     varName = node.attr
     if (node.attr_index != None):
         for index in node.attr_index:
             varName += "_" + index
 
-    return dropListIndexIfNonNum(varName)
+    if (dropListIndexIfNonNum_Arg == True):
+        return dropListIndexIfNonNum(varName)
+
+    return varName
 
 def getListNodes(subtree, parent_type, _list):
 	if subtree == None: return None

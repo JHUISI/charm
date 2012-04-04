@@ -77,7 +77,7 @@ def keygen(file):
         sys.exit("First argument passed to keygen.py is invalid.")
 
     parseFile2(file, False)
-    varsToBlindList = transform(False)
+    varsToBlindList = (transform(False))[0]
     varNamesForListDecls = []
 
     assignInfo = getAssignInfo()

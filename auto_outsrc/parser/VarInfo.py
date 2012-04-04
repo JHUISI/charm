@@ -111,11 +111,11 @@ class VarInfo:
         if (node.type == ops.PAIR):
             self.hasPairings = True
         elif (node.type == ops.ATTR):
-            varName = getFullVarName(node)
+            varName = getFullVarName(node, True)
             if ( (varName not in self.varDeps) and (varName.isdigit() == False) and (varName != NONE_STRING) ):
                 self.varDeps.append(varName)
         elif (node.type == ops.FUNC):
-            userFuncName = getFullVarName(node)
+            userFuncName = getFullVarName(node, True)
             if (userFuncName == INIT_FUNC_NAME):
                 if (self.initCallHappenedAlready == True):
                     sys.exit("traverseAssignNodeRecursive found multiple calls to " + INIT_FUNC_NAME + " for the same variable in the same function.")

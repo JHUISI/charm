@@ -378,7 +378,7 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
     if ( (type(newType).__name__ == ENUM_VALUE_CLASS_NAME) and (newType != types.NO_TYPE) and (currentFuncName == TYPES_HEADER) ):
         sys.exit("updateVarTypes in SDLParser.py received newType unequal to types.NO_TYPE when currentFuncName was TYPES_HEADER.")
 
-    varName = getFullVarName(node.left)
+    varName = getFullVarName(node.left, True)
     if (varName in varTypes[currentFuncName]):
         sys.exit("updateVarTypes in SDLParser.py received as input a node whose full variable name is already in varTypes[currentFuncName].")
 
@@ -629,7 +629,7 @@ def updateAssignInfo(node, i):
         lenForLoops = len(forLoops[currentFuncName])
         currentForLoopObj = forLoops[currentFuncName][lenForLoops - 1]
 
-    varName = getFullVarName(node.left)
+    varName = getFullVarName(node.left, True)
     varNameWithoutIndices = getVarNameWithoutIndices(node.left)
 
     updateVarNamesDicts(node, [varNameWithoutIndices], varNamesToFuncs_All)
@@ -968,6 +968,7 @@ def parseLinesOfCode(code, verbosity):
             elif (node.type == ops.FOR):
                 updateForLoops(node, lineNumberInCode)
         else:
+            astNodes.append(BinaryNode(ops.NONE))
             if verbosity: print("sdl: ", lineNumberInCode)
 
     getVarDepInfLists()
