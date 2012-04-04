@@ -19,7 +19,7 @@ def addVarToInputOfFunc(varName, targetVar, funcName):
         targetList = targetVarObj.getAssignNode().right
         if Type(targetList) == ops.EXPAND: 
             targetList.addToList(varName)
-            newLine = str(targetVarObj.getAssignNode())
+            newLine = str(targetVarObj.getAssignNode()) + "\n"
             replaceLineNo = targetVarObj.getLineNo()
             substituteOneLineOfCode(newLine, replaceLineNo)            
         else:
@@ -45,7 +45,7 @@ def addVarToOutputOfFunc(varName, funcName):
         if Type(node) == ops.LIST: node.addToList(varName)
         # result after adding variable to list node        
 #        print("result: ", ciphertext.getAssignNode())
-        newLine = str(ciphertext.getAssignNode())
+        newLine = str(ciphertext.getAssignNode()) + "\n"
     else:
         print("addVarToOutputOfFunc: expected output line in", funcName,"to be a ATTR variable node. Please fix.")
         sys.exit(-1)
@@ -115,12 +115,13 @@ def rcca(var_info):
                     # line for hashing 'r' into a session key 
                     rLine = varsForDec['session_key'] + " := SHA1(" + config.rccaRandomVar + ")\n"
                     t1Line = "T1 := SymEnc(" + varsForDec['session_key'] + " , " + message + ")\n"
+                    protectMsgLine = str(n) + "\n"
                     # figure out if there are any statements that need to be computed before protecting
                     # the message in str(n)
                     addCode = []
                     if len(lineDepRef.keys()) > 0:
                         addCode = list(lineDepRef.keys())
-                    addCode.extend([randomLine, sLine, rLine, str(n)])
+                    addCode.extend([randomLine, sLine, rLine, protectMsgLine])
                     appendToLinesOfCode(addCode, lineNo)                    
                     # fix final output for encrypt
                     outputLineNo = getLineNoOfOutputStatement(encFunc)
@@ -155,7 +156,7 @@ def rcca(var_info):
     parseLinesOfCode(getLinesOfCode(), True)
 
 def rcca_decout(vars):
-    decout_sdl = ["","BEGIN :: func:%s\n" % config.decOutFunctionName,
+    decout_sdl = ["\n","BEGIN :: func:%s\n" % config.decOutFunctionName,
 "input := list{%s, %s, %s}\n" % (config.partialCT, config.keygenBlindingExponent, vars['pk_value']),
 "%s := expand{T0, T1, T2}\n" % config.partialCT,
 "%s := T0 %s (T2^%s)\n" % (config.rccaRandomVar, vars['dec_op'], config.keygenBlindingExponent), # recover R
