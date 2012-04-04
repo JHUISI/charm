@@ -214,18 +214,14 @@ def applyReplacementsDict(replacementsDict, currentStrName):
 
     return retString
 
-starthere
-
 def getAssignStmtAsString(node, replacementsDict = None):
     if (type(node) is str):
-        node = replacePoundsWithBrackets(node)
-        if ( (replacementsDict != None) and (node in replacementsDict) ):
-            return replacementsDict[node]
-        return node
+        strNameToReturn = applyReplacementsDict(replacementsDict, node)
+        strNameToReturn = replacePoundsWithBrackets(strNameToReturn)
+        return strNameToReturn
     elif ( (node.type == ops.ATTR) or (node.type == ops.TYPE) ):
-        strNameToReturn = replacePoundsWithBrackets(str(node.attr))
-        if ( (replacementsDict != None) and (strNameToReturn in replacementsDict) ):
-            return replacementsDict[strNameToReturn]
+        strNameToReturn = applyReplacementsDict(replacementsDict, str(node.attr))
+        strNameToReturn = replacePoundsWithBrackets(strNameToReturn)
         return strNameToReturn
     elif (node.type == ops.ADD):
         leftString = getAssignStmtAsString(node.left)
@@ -270,17 +266,12 @@ def getAssignStmtAsString(node, replacementsDict = None):
         pairOutputString = "pair(" + pairLeftSide + ", " + pairRightSide + ")"
         return pairOutputString
     elif (node.type == ops.FUNC):
-        nodeName = replacePoundsWithBrackets(str(node.attr))
-        if ( (replacementsDict != None) and (nodeName in replacementsDict) ):
-            funcOutputString = replacementsDict[nodeName] + "("
-        else:
-            funcOutputString = nodeName + "("
+        nodeName = applyReplacementsDict(replacementsDict, str(node.attr))
+        nodeName = replacePoundsWithBrackets(nodeName)
+        funcOutputString = nodeName + "("
         for listNodeInFunc in node.listNodes:
-            listNodeName = replacePoundsWithBrackets(str(listNodeInFunc))
-            if ( (replacementsDict != None) and (listNodeName in replacementsDict) ):
-                funcOutputString += replacementsDict[listNodeName] + ", "
-            else:
-                funcOutputString += listNodeName + ", "
+            listNodeAsString = getAssignStmtAsString(listNodeInFunc)
+            funcOutputString += listNodeAsString + ", "
         funcOutputString = funcOutputString[0:(len(funcOutputString) - len(", "))]
         funcOutputString += ")"
         return funcOutputString
