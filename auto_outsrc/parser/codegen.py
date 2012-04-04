@@ -149,6 +149,9 @@ def writeFunctionDecl(functionName):
     else:
         writeFunctionDecl_Python(setupFile, functionName)
 
+def writeFunctionEnd_CPP(outputFile, functionName):
+    return
+
 def writeFunctionEnd(functionName):
     global setupFile, transformFile, decOutFile
 
@@ -192,6 +195,26 @@ def replacePoundsWithBrackets(nameWithPounds):
         nameToReturn += "[" + nameSplit[counter + 1] + "]"
 
     return nameToReturn
+
+def applyReplacementsDict(replacementsDict, currentStrName):
+    if (replacementsDict == None):
+        return currentStrName
+
+    retString = ""
+
+    currentStrName_Split = currentStrName.split(LIST_INDEX_SYMBOL)
+    for indStr in currentStrName_Split:
+        if (indStr in replacementsDict):
+            retString += replacementsDict[indStr]
+        else:
+            retString += indStr
+        retString += LIST_INDEX_SYMBOL
+
+    retString = retString[0:(len(retString) - len(LIST_INDEX_SYMBOL))]
+
+    return retString
+
+starthere
 
 def getAssignStmtAsString(node, replacementsDict = None):
     if (type(node) is str):
@@ -328,6 +351,9 @@ def writeAssignStmt_Python(outputFile, binNode):
     
     outputString += "\n"
     outputFile.write(outputString)
+
+def writeAssignStmt_CPP(outputFile, binNode):
+    return
 
 def writeAssignStmt(binNode):
     if (currentFuncName == transformFunctionName):

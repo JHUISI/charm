@@ -732,8 +732,11 @@ def updateForLoops(node, lineNo):
     forLoops[currentFuncName].append(retForLoopStruct)
 
 def printLinesOfCode():
+    lineNo = 0
+
     for line in linesOfCode:
-        print(line)
+        lineNo += 1
+        print(lineNo, ":", line, end=" ")
 
 def getLinesOfCodeFromLineNos(listOfLineNos):
     if ( (type(listOfLineNos) is not list) or (len(listOfLineNos) == 0) ):

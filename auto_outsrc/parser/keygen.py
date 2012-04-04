@@ -118,5 +118,4 @@ def keygen(file):
 
 if __name__ == "__main__":
     keygen(sys.argv[1])
-    print("\n\nUPDATED SCHEME WITH BOTH TRANSFORM AND KEYGEN:\n")
     printLinesOfCode()
