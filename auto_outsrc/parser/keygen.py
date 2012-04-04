@@ -1,6 +1,7 @@
 from SDLParser import *
 from config import *
 from transform import *
+from rcca import *
 import sys
 
 SDLLinesForKeygen = []
@@ -77,7 +78,8 @@ def keygen(file):
         sys.exit("First argument passed to keygen.py is invalid.")
 
     parseFile2(file, False)
-    varsToBlindList = (transform(False))[0]
+    (varsToBlindList, rccaData) = (transform(False))
+    rcca(rccaData)
     varNamesForListDecls = []
 
     assignInfo = getAssignInfo()

@@ -195,6 +195,7 @@ def replacePoundsWithBrackets(nameWithPounds):
 
 def getAssignStmtAsString(node, replacementsDict = None):
     if (type(node) is str):
+        node = replacePoundsWithBrackets(node)
         if ( (replacementsDict != None) and (node in replacementsDict) ):
             return replacementsDict[node]
         return node
@@ -246,15 +247,17 @@ def getAssignStmtAsString(node, replacementsDict = None):
         pairOutputString = "pair(" + pairLeftSide + ", " + pairRightSide + ")"
         return pairOutputString
     elif (node.type == ops.FUNC):
-        if ( (replacementsDict != None) and (node.attr in replacementsDict) ):
-            funcOutputString = replacementsDict[node.attr] + "("
+        nodeName = replacePoundsWithBrackets(str(node.attr))
+        if ( (replacementsDict != None) and (nodeName in replacementsDict) ):
+            funcOutputString = replacementsDict[nodeName] + "("
         else:
-            funcOutputString = node.attr + "("
+            funcOutputString = nodeName + "("
         for listNodeInFunc in node.listNodes:
-            if ( (replacementsDict != None) and (listNodeInFunc in replacementsDict) ):
-                funcOutputString += replacementsDict[listNodeInFunc] + ", "
+            listNodeName = replacePoundsWithBrackets(str(listNodeInFunc))
+            if ( (replacementsDict != None) and (listNodeName in replacementsDict) ):
+                funcOutputString += replacementsDict[listNodeName] + ", "
             else:
-                funcOutputString += listNodeInFunc + ", "
+                funcOutputString += listNodeName + ", "
         funcOutputString = funcOutputString[0:(len(funcOutputString) - len(", "))]
         funcOutputString += ")"
         return funcOutputString
@@ -279,7 +282,7 @@ def writeLambdaFuncAssignStmt(outputFile, binNode):
         sys.exit("writeLambdaFuncAssignStmt in codegen.py:  problem with values returned from getVarNameEntryFromAssignInfo.")
 
     dotProdObj = varInfoObj.getDotProdObj()
-    distinctVarsList = dotProdObj.getDistinctVarsInCalcList()
+    distinctVarsList = dotProdObj.getDistinctIndVarsInCalcList()
     numDistinctVars = len(distinctVarsList)
 
     lambdaOutputString = ""
@@ -292,6 +295,8 @@ def writeLambdaFuncAssignStmt(outputFile, binNode):
     for counter in range(0, numDistinctVars):
         lambdaOutputString += lambdaLetters[counter] + ","
         lambdaReplacements[distinctVarsList[counter]] = lambdaLetters[counter]
+
+    print(lambdaReplacements)
 
     lambdaOutputString = lambdaOutputString[0:(len(lambdaOutputString) - 1)]
     lambdaOutputString += ": "

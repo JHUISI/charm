@@ -11,6 +11,7 @@ class DotProd:
         self.funcName = None
         self.binaryNode = None
         self.distinctVarsInCalcList = None
+        self.distinctIndVarsInCalcList = None
 
     def getStartVal(self):
         return self.startVal
@@ -33,6 +34,9 @@ class DotProd:
     def getDistinctVarsInCalcList(self):
         return self.distinctVarsInCalcList
 
+    def getDistinctIndVarsInCalcList(self):
+        return self.distinctIndVarsInCalcList
+
     def findDistinctVarsInCalc(self, node):
         if (node.type == ops.ATTR):
             nodeName = getFullVarName(node, False)
@@ -43,8 +47,17 @@ class DotProd:
             if (len(nodeNameSplit) > 1):
                 for nodeNameCounter in range(1, len(nodeNameSplit)):
                     nodeNameSplit_Ind = nodeNameSplit[nodeNameCounter]
-                    if ( (nodeNameSplit_Ind not in self.distinctVarsInCalcList) and (nodeNameSplit_Ind.isdigit() == False) ):
+                    if (nodeNameSplit_Ind.isdigit() == True):
+                        continue
+                    if (nodeNameSplit_Ind not in self.distinctVarsInCalcList):
                         self.distinctVarsInCalcList.append(nodeNameSplit_Ind)
+                    if (nodeNameSplit_Ind not in self.distinctIndVarsInCalcList):
+                        self.distinctIndVarsInCalcList.append(nodeNameSplit_Ind)
+                if (nodeNameSplit[0] not in self.distinctIndVarsInCalcList):
+                    self.distinctIndVarsInCalcList.append(nodeNameSplit[0])
+            else:
+                if (nodeName not in self.distinctIndVarsInCalcList):
+                    self.distinctIndVarsInCalcList.append(nodeName)
 
         if (node.left != None):
             self.findDistinctVarsInCalc(node.left)
@@ -53,6 +66,7 @@ class DotProd:
 
     def setDistinctVarsInCalcList(self):
         self.distinctVarsInCalcList = []
+        self.distinctIndVarsInCalcList = []
 
         self.findDistinctVarsInCalc(self.binaryNode.right)
 
