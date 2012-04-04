@@ -101,20 +101,20 @@ def rcca(var_info):
                     del(lineDepRef[remLine])
 
                     lineNo = enc_block[j].getLineNo()
-                    randomLine = config.rccaRandomVar + " := random(%s)" % var_info[config.M]
+                    randomLine = config.rccaRandomVar + " := random(%s)\n" % var_info[config.M]
                     # build up data structure for generating dec_out SDL
                     varsForDec['s'] = j
                     varsForDec['session_key'] = j + '_sesskey'
                     varsForDec['s_type'] = str(typesEnc[j].getType())                    
                     # replaces encrypt randomness or 's' symbolically
-                    sLine   = j + " := H(list{" + config.rccaRandomVar + "," + message + "}," + varsForDec['s_type'] + ")" 
+                    sLine   = j + " := H(list{" + config.rccaRandomVar + "," + message + "}," + varsForDec['s_type'] + ")\n" 
                     remCode = [msgProtLineNo, lineNo] + list(lineDepRef.values()) 
                     removeFromLinesOfCode(remCode)
                     print("Randomness :=>", enc_block[j].getAssignNode())
                     ASTVisitor( SubstituteVar(message, config.rccaRandomVar) ).preorder( n ) 
                     # line for hashing 'r' into a session key 
-                    rLine = varsForDec['session_key'] + " := SHA1(" + config.rccaRandomVar + ")"
-                    t1Line = "T1 := SymEnc(" + varsForDec['session_key'] + " , " + message + ")"
+                    rLine = varsForDec['session_key'] + " := SHA1(" + config.rccaRandomVar + ")\n"
+                    t1Line = "T1 := SymEnc(" + varsForDec['session_key'] + " , " + message + ")\n"
                     # figure out if there are any statements that need to be computed before protecting
                     # the message in str(n)
                     addCode = []
@@ -155,17 +155,17 @@ def rcca(var_info):
     parseLinesOfCode(getLinesOfCode(), True)
 
 def rcca_decout(vars):
-    decout_sdl = ["","BEGIN :: func:%s" % config.decOutFunctionName,
-"input := list{%s, %s, %s}" % (config.partialCT, config.keygenBlindingExponent, vars['pk_value']),
-"%s := expand{T0, T1, T2}" % config.partialCT,
-"%s := T0 %s (T2^%s)" % (config.rccaRandomVar, vars['dec_op'], config.keygenBlindingExponent), # recover R
-"%s := SHA1( %s )" % (vars['session_key'], config.rccaRandomVar), # recover session key
-"%s := SymDec(%s, T1)" % (config.M, vars['session_key']), # use session key to recover M
-"%s := H(list{R, M}, %s)" % (vars['s'], vars['s_type']), # recover 'randomness' calculated for encrypt
-"verify := { (T0 == (%s * (%s ^ %s))) and (T2 == (%s * (%s ^ (%s / %s)))) }" 
+    decout_sdl = ["","BEGIN :: func:%s\n" % config.decOutFunctionName,
+"input := list{%s, %s, %s}\n" % (config.partialCT, config.keygenBlindingExponent, vars['pk_value']),
+"%s := expand{T0, T1, T2}\n" % config.partialCT,
+"%s := T0 %s (T2^%s)\n" % (config.rccaRandomVar, vars['dec_op'], config.keygenBlindingExponent), # recover R
+"%s := SHA1( %s )\n" % (vars['session_key'], config.rccaRandomVar), # recover session key
+"%s := SymDec(%s, T1)\n" % (config.M, vars['session_key']), # use session key to recover M
+"%s := H(list{R, M}, %s)\n" % (vars['s'], vars['s_type']), # recover 'randomness' calculated for encrypt
+"verify := { (T0 == (%s * (%s ^ %s))) and (T2 == (%s * (%s ^ (%s / %s)))) }\n" 
 % (config.rccaRandomVar, vars['pk_value'], vars['s'], config.rccaRandomVar, vars['pk_value'], vars['s'], config.keygenBlindingExponent), # verify T0 and T1 are well-formed
-"output := %s" % config.M,
-"END :: func:%s" % config.decOutFunctionName]
+"output := %s\n" % config.M,
+"END :: func:%s\n" % config.decOutFunctionName]
     return decout_sdl
 
 if __name__ == "__main__":

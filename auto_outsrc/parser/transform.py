@@ -113,14 +113,14 @@ def transform(sdl_scheme, verbosity=False):
 
 
     # get function prologue for decrypt
-    transformIntro = "BEGIN :: func:%s" % config.transformFunctionName
+    transformIntro = "BEGIN :: func:%s\n" % config.transformFunctionName
     cur_list = [transformIntro]
     startLineNo = getLineNoOfInputStatement("decrypt")-1
     endLineNo   = getLineNoOfOutputStatement("decrypt")+1
     intro = list(range(startLineNo, transformVarInfos[0]))
     transformVarInfos = intro + transformVarInfos
     print("New LOCs: ", intro) 
-    transformOutro = "END :: func:%s" % config.transformFunctionName
+    transformOutro = "END :: func:%s\n" % config.transformFunctionName
     
     print("Delete these lines: ", transformVarInfos)
     
@@ -130,7 +130,7 @@ def transform(sdl_scheme, verbosity=False):
     for i in range(len(transformVarInfos)):
         ref = transformVarInfos[i]
         if stmtsDec.get(ref):
-            cur_list.append(str(stmtsDec[ref].getAssignNode()))
+            cur_list.append(str(stmtsDec[ref].getAssignNode()) + "\n")
             cur_line += 1
 #            varName = stmtsDec[ref].getAssignVar()
 #            newVF   = VarInfo.copy(stmtsDec[ref])
@@ -142,7 +142,7 @@ def transform(sdl_scheme, verbosity=False):
         if newObj[o] != None:
             c = cur_line + o
             transformVarInfos.append(c)
-            cur_list.append(str(newObj[o]))
+            cur_list.append(str(newObj[o]) + "\n")
 #       varInfo = createVarInfo(c, newObj[o], newFunc)
 #       varName = varInfo.getAssignVar()
 #       AssignInfo[newFunc][varName] = varInfo
