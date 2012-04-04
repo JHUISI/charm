@@ -9,10 +9,6 @@ keygenFuncName = "keygen"
 keygenPubVar = ["pk", "mpk", "gpk"]
 keygenSecVar = "sk"
 
-# these should be keywords or part of semantics of SDL
-inputKeyword = "input"
-outputKeyword = "output"
-
 setupFileName = "setupOutsourcing.py"
 transformFileName = "transformOutsourcing.py"
 decOutFileName = "decOutOutsourcing.cpp"

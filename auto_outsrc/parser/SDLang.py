@@ -24,6 +24,9 @@ AST simple rules
 from toolbox.enum import *
 import string, sys
 
+inputKeyword = "input"
+outputKeyword = "output"
+
 BINARY_NODE_CLASS_NAME = 'BinaryNode'
 ENUM_VALUE_CLASS_NAME = 'EnumValue'
 VAR_INFO_CLASS_NAME = 'VarInfo'
