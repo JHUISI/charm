@@ -220,7 +220,10 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
         strNameToReturn = replacePoundsWithBrackets(strNameToReturn)
         return strNameToReturn
     elif ( (node.type == ops.ATTR) or (node.type == ops.TYPE) ):
-        strNameToReturn = applyReplacementsDict(replacementsDict, getFullVarName(node, False))
+        if (node.type == ops.ATTR):
+            strNameToReturn = applyReplacementsDict(replacementsDict, getFullVarName(node, False))
+        elif (node.type == ops.TYPE):
+            strNameToReturn = applyReplacementsDict(replacementsDict, str(node.attr))
         strNameToReturn = replacePoundsWithBrackets(strNameToReturn)
         return strNameToReturn
     elif (node.type == ops.ADD):
