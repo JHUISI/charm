@@ -214,84 +214,117 @@ def applyReplacementsDict(replacementsDict, currentStrName):
 
     return retString
 
-def getAssignStmtAsString(node, replacementsDict, dotProdObj=None):
+def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements, forOutput):
     if (type(node) is str):
         strNameToReturn = applyReplacementsDict(replacementsDict, node)
         strNameToReturn = replacePoundsWithBrackets(strNameToReturn)
         return strNameToReturn
     elif ( (node.type == ops.ATTR) or (node.type == ops.TYPE) ):
-        strNameToReturn = applyReplacementsDict(replacementsDict, str(node.attr))
+        strNameToReturn = applyReplacementsDict(replacementsDict, getFullVarName(node, False))
         strNameToReturn = replacePoundsWithBrackets(strNameToReturn)
         return strNameToReturn
     elif (node.type == ops.ADD):
-        leftString = getAssignStmtAsString(node.left, replacementsDict)
-        rightString = getAssignStmtAsString(node.right, replacementsDict)
+        leftString = getAssignStmtAsString(node.left, replacementsDict, None, None, False)
+        rightString = getAssignStmtAsString(node.right, replacementsDict, None, None, False)
         return "(" + leftString + " + " + rightString + ")"
     elif (node.type == ops.SUB):
-        leftString = getAssignStmtAsString(node.left, replacementsDict)
-        rightString = getAssignStmtAsString(node.right, replacementsDict)
+        leftString = getAssignStmtAsString(node.left, replacementsDict, None, None, False)
+        rightString = getAssignStmtAsString(node.right, replacementsDict, None, None, False)
         return "(" + leftString + " - " + rightString + ")"
     elif (node.type == ops.MUL):
-        leftString = getAssignStmtAsString(node.left, replacementsDict)
-        rightString = getAssignStmtAsString(node.right, replacementsDict)
+        leftString = getAssignStmtAsString(node.left, replacementsDict, None, None, False)
+        rightString = getAssignStmtAsString(node.right, replacementsDict, None, None, False)
         return "(" + leftString + " * " + rightString + ")"
     elif (node.type == ops.DIV):
-        leftString = getAssignStmtAsString(node.left, replacementsDict)
-        rightString = getAssignStmtAsString(node.right, replacementsDict)
+        leftString = getAssignStmtAsString(node.left, replacementsDict, None, None, False)
+        rightString = getAssignStmtAsString(node.right, replacementsDict, None, None, False)
         return "(" + leftString + " / " + rightString + ")"
     elif (node.type == ops.EXP):
-        leftString = getAssignStmtAsString(node.left, replacementsDict)
-        rightString = getAssignStmtAsString(node.right, replacementsDict)
+        leftString = getAssignStmtAsString(node.left, replacementsDict, None, None, False)
+        rightString = getAssignStmtAsString(node.right, replacementsDict, None, None, False)
         return "(" + leftString + " ** " + rightString + ")"
     elif (node.type == ops.LIST):
-        listOutputString = "["
+        if (forOutput == True):
+            listOutputString = "("
+        else:
+            listOutputString = "["
+
         for listNode in node.listNodes:
-            listNodeAsString = getAssignStmtAsString(listNode, replacementsDict)
+            listNodeAsString = getAssignStmtAsString(listNode, replacementsDict, None, None, False)
             listOutputString += listNodeAsString + ", "
         listOutputString = listOutputString[0:(len(listOutputString) - len(", "))]
-        listOutputString += "]"
+
+        if (forOutput == True):
+            listOutputString += ")"
+        else:
+            listOutputString += "]"
+
         return listOutputString
     elif (node.type == ops.RANDOM):
-        randomGroupType = getAssignStmtAsString(node.left, replacementsDict)
+        randomGroupType = getAssignStmtAsString(node.left, replacementsDict, None, None, False)
         randomOutputString = groupObjName + ".random(" + randomGroupType + ")"
         return randomOutputString
     elif (node.type == ops.HASH):
-        hashMessage = getAssignStmtAsString(node.left, replacementsDict)
-        hashGroupType = getAssignStmtAsString(node.right, replacementsDict)
+        hashMessage = getAssignStmtAsString(node.left, replacementsDict, None, None, False)
+        hashGroupType = getAssignStmtAsString(node.right, replacementsDict, None, None, False)
         hashOutputString = groupObjName + ".hash(" + hashMessage + ", " + hashGroupType + ")"
         return hashOutputString
     elif (node.type == ops.PAIR):
-        pairLeftSide = getAssignStmtAsString(node.left, replacementsDict)
-        pairRightSide = getAssignStmtAsString(node.right, replacementsDict)
+        pairLeftSide = getAssignStmtAsString(node.left, replacementsDict, None, None, False)
+        pairRightSide = getAssignStmtAsString(node.right, replacementsDict, None, None, False)
         pairOutputString = "pair(" + pairLeftSide + ", " + pairRightSide + ")"
         return pairOutputString
     elif (node.type == ops.FUNC):
-        nodeName = applyReplacementsDict(replacementsDict, str(node.attr))
+        nodeName = applyReplacementsDict(replacementsDict, getFullVarName(node, False))
         nodeName = replacePoundsWithBrackets(nodeName)
         funcOutputString = nodeName + "("
         for listNodeInFunc in node.listNodes:
-            listNodeAsString = getAssignStmtAsString(listNodeInFunc, replacementsDict)
+            listNodeAsString = getAssignStmtAsString(listNodeInFunc, replacementsDict, None, None, False)
             funcOutputString += listNodeAsString + ", "
         funcOutputString = funcOutputString[0:(len(funcOutputString) - len(", "))]
         funcOutputString += ")"
         return funcOutputString
     elif ( (node.type == ops.ON) and (node.left.type == ops.PROD) ):
-        if (dotProdObj == None):
-            sys.exit("getAssignStmtAsString in codegen.py:  dot prod node detected, but no dot product object passed in.")
+        if ( (dotProdObj == None) or (lambdaReplacements == None) ):
+            sys.exit("getAssignStmtAsString in codegen.py:  dot prod node detected, but there was a problem with either the dot product object or the lambda replacements dictionary passed in.")
         dotProdOutputString = "dotprod2("
-        dotProdOutputString += str(dotProdObj.getStartVal())
+        dotProdOutputString += replacePoundsWithBrackets(str(dotProdObj.getStartVal()))
+        dotProdOutputString += ", -1, "
+        dotProdOutputString += replacePoundsWithBrackets(str(dotProdObj.getEndVal()))
         dotProdOutputString += ", "
-        dotProdOutputString += 
-
-
-
-dotprod(1, -1, sk['n'], lam_func, sk['u'], x)
-init, skip, n, func, *args
-
-        dotProdOutputString = "here is where it is"
+        dotProdOutputString += lamFuncName
+        dotProdOutputString += str(numLambdaFunctions)
+        dotProdOutputString += ", "
+        dotProdOutputString += getLambdaReplacementsString(lambdaReplacements)
+        dotProdOutputString = dotProdOutputString[0:(len(dotProdOutputString) - len(", "))]
+        dotProdOutputString += ")"
         return dotProdOutputString
 
     sys.exit("getAssignStmtAsString in codegen.py:  unsupported node type detected.")
+
+def getLambdaReplacementsString(lambdaReplacements):
+    if (type(lambdaReplacements) is not dict):
+        sys.exit("getLambdaReplacementsString in codegen.py:  lambda replacements argument passed in is not of type dictionary.")
+
+    if (len(lambdaReplacements) == 0):
+        return ""
+
+    reverseDict = {}
+
+    for lambdaReplacementKey in lambdaReplacements:
+        lambdaReplacementValue = lambdaReplacements[lambdaReplacementKey]
+        reverseDict[lettersMapping[lambdaReplacementValue]] = lambdaReplacementKey
+
+    if (len(lambdaReplacements) != len(reverseDict) ):
+        sys.exit("getLambdaReplacementsString in codegen.py:  reverseDict is not the same length as lambdaReplacements.")
+
+    retString = ""
+
+    for counter in range(0, len(reverseDict)):
+        retString += reverseDict[counter]
+        retString += ", "
+
+    return retString
 
 def writeLambdaFuncAssignStmt(outputFile, binNode):
     global numLambdaFunctions
@@ -325,12 +358,12 @@ def writeLambdaFuncAssignStmt(outputFile, binNode):
     lambdaOutputString = lambdaOutputString[0:(len(lambdaOutputString) - 1)]
     lambdaOutputString += ": "
 
-    lambdaExpression = getAssignStmtAsString(dotProdObj.getBinaryNode().right, lambdaReplacements)
+    lambdaExpression = getAssignStmtAsString(dotProdObj.getBinaryNode().right, lambdaReplacements, None, None, False)
     lambdaOutputString += lambdaExpression
 
     lambdaOutputString += "\n"
     outputFile.write(lambdaOutputString)
-    return dotProdObj
+    return (dotProdObj, lambdaReplacements)
 
 def writeAssignStmt_Python(outputFile, binNode):
     if (binNode.right.type == ops.EXPAND):
@@ -339,15 +372,22 @@ def writeAssignStmt_Python(outputFile, binNode):
     writeCurrentNumTabsIn(outputFile)
 
     outputString = ""
+    dotProdObj = None
+    lambdaReplacements = None
 
     if ( (binNode.right.type == ops.ON) and (binNode.right.left.type == ops.PROD) ):
-        dotProdObj = writeLambdaFuncAssignStmt(outputFile, binNode)
+        (dotProdObj, lambdaReplacements) = writeLambdaFuncAssignStmt(outputFile, binNode)
         writeCurrentNumTabsIn(outputFile)
 
-    outputString += replacePoundsWithBrackets(str(binNode.left.attr))
+    variableName = replacePoundsWithBrackets(getFullVarName(binNode.left, False))
+
+    outputString += variableName
     outputString += " = "
 
-    outputString += getAssignStmtAsString(binNode.right, None, dotProdObj)
+    if (variableName == outputKeyword):
+        outputString += getAssignStmtAsString(binNode.right, None, dotProdObj, lambdaReplacements, True)
+    else:
+        outputString += getAssignStmtAsString(binNode.right, None, dotProdObj, lambdaReplacements, False)
     
     outputString += "\n"
     outputFile.write(outputString)
@@ -369,11 +409,11 @@ def writeForLoopDecl_Python(outputFile, binNode):
     outputString = ""
 
     outputString += "for "
-    outputString += getAssignStmtAsString(binNode.left.left, None)
+    outputString += getAssignStmtAsString(binNode.left.left, None, None, None, False)
     outputString += " in range("
-    outputString += getAssignStmtAsString(binNode.left.right, None)
+    outputString += getAssignStmtAsString(binNode.left.right, None, None, None, False)
     outputString += ", "
-    outputString += getAssignStmtAsString(binNode.right, None)
+    outputString += getAssignStmtAsString(binNode.right, None, None, None, False)
     outputString += "):\n"
 
     outputFile.write(outputString)
@@ -411,7 +451,7 @@ def addTypeDeclToGlobalVars(binNode):
     if (varName.find(LIST_INDEX_SYMBOL) != -1):
         sys.exit("addTypeDeclToGlobalVars in codegen.py:  variable name in types section has # sign in it.")
 
-    if (varName not in globalVarNames):
+    if ( (varName not in globalVarNames) and (varName != inputKeyword) and (varName != outputKeyword) ):
         globalVarNames.append(varName)
 
 def writeGlobalVars_Python(outputFile):
@@ -573,7 +613,7 @@ def getGlobalVarNames():
             sys.exit("getGlobalVarNames in codegen.py:  list extracted from varNamesToFuncs_All for current variable is empty.")
         if (len(listForThisVar) == 1):
             continue
-        if (varName not in globalVarNames):
+        if ( (varName not in globalVarNames) and (varName != inputKeyword) and (varName != outputKeyword) ):
             globalVarNames.append(varName)
 
 def main(SDL_Scheme):
