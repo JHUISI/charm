@@ -37,6 +37,7 @@ ASYMMETRIC_SETTING = "asymmetric"
 ALGEBRAIC_SETTING = "setting"
 LIST_INDEX_SYMBOL = "#"
 LIST_INDEX_END_SYMBOL = "?"
+IF_BRANCH_HEADER = "if"
 FOR_LOOP_HEADER = "for"
 TYPES_HEADER = "types"
 LIST_TYPE = "list"
@@ -47,7 +48,7 @@ FUNC_SYMBOL = "def func :"
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
 types = Enum('NO_TYPE','G1', 'G2', 'GT', 'ZR', 'str', 'list', 'object')
 declarator = Enum('func', 'verify')
-ops = Enum('BEGIN', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'EXPAND', 'FUNC', 'SEQ', 'END', 'NONE')
+ops = Enum('BEGIN', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'EXPAND', 'FUNC', 'SEQ', 'IF', 'END', 'NONE')
 side = Enum('left', 'right')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
@@ -257,6 +258,8 @@ def createTree(op, node1, node2, op_value=None):
     	node = BinaryNode(ops.SUM)
     elif(op == "of"):
     	node = BinaryNode(ops.OF)
+    elif(op == "if {"):
+        node = BinaryNode(ops.IF)
     elif(op == "|"):
         node = BinaryNode(ops.CONCAT)
     elif(op == "and"):
@@ -375,6 +378,8 @@ class BinaryNode:
 				return ('random(' + left + ')')
 			elif(self.type == ops.DO):
 				 return ( left + ' do { ' + right + ' }')
+			elif(self.type == ops.IF):
+				 return ( 'if {' + left + '}')
 			elif(self.type == ops.OF):
 				 return ( left + ' of ' + right)
 			elif(self.type == ops.CONCAT):
