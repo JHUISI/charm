@@ -163,9 +163,13 @@ def rcca_decout(vars):
 "%s := SHA1( %s )\n" % (vars['session_key'], config.rccaRandomVar), # recover session key
 "%s := SymDec(%s, T1)\n" % (config.M, vars['session_key']), # use session key to recover M
 "%s := H(list{R, M}, %s)\n" % (vars['s'], vars['s_type']), # recover 'randomness' calculated for encrypt
-"verify := { (T0 == (%s * (%s ^ %s))) and (T2 == (%s * (%s ^ (%s / %s)))) }\n" 
+"BEGIN :: if\n",
+"if { (T0 == (%s * (%s ^ %s))) and (T2 == (%s * (%s ^ (%s / %s)))) }\n" 
 % (config.rccaRandomVar, vars['pk_value'], vars['s'], config.rccaRandomVar, vars['pk_value'], vars['s'], config.keygenBlindingExponent), # verify T0 and T1 are well-formed
 "output := %s\n" % config.M,
+"else\n",
+"output := error\n",
+"END :: if\n"
 "END :: func:%s\n" % config.decOutFunctionName]
     return decout_sdl
 
