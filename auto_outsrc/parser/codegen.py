@@ -290,11 +290,11 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
     elif ( (node.type == ops.ON) and (node.left.type == ops.PROD) ):
         if ( (dotProdObj == None) or (lambdaReplacements == None) ):
             sys.exit("getAssignStmtAsString in codegen.py:  dot prod node detected, but there was a problem with either the dot product object or the lambda replacements dictionary passed in.")
-        dotProdOutputString = "dotprod2("
+        dotProdOutputString = "dotprod2(range("
         dotProdOutputString += replacePoundsWithBrackets(str(dotProdObj.getStartVal()))
-        dotProdOutputString += ", -1, "
+        dotProdOutputString += ","
         dotProdOutputString += replacePoundsWithBrackets(str(dotProdObj.getEndVal()))
-        dotProdOutputString += ", "
+        dotProdOutputString += "), "
         dotProdOutputString += lamFuncName
         dotProdOutputString += str(numLambdaFunctions)
         dotProdOutputString += ", "
@@ -302,6 +302,13 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
         dotProdOutputString = dotProdOutputString[0:(len(dotProdOutputString) - len(", "))]
         dotProdOutputString += ")"
         return dotProdOutputString
+    elif (node.type == ops.EXPAND):
+        expandOutputString = ""
+        for listNode in node.listNodes:
+            expandOutputString += replacePoundsWithBrackets(getFullVarName(listNode, False))
+            expandOutputString += ", "
+        dddd
+        return expandOutputString
 
     sys.exit("getAssignStmtAsString in codegen.py:  unsupported node type detected.")
 
@@ -369,8 +376,8 @@ def writeLambdaFuncAssignStmt(outputFile, binNode):
     return (dotProdObj, lambdaReplacements)
 
 def writeAssignStmt_Python(outputFile, binNode):
-    if (binNode.right.type == ops.EXPAND):
-        return
+    #if (binNode.right.type == ops.EXPAND):
+        #return
 
     writeCurrentNumTabsIn(outputFile)
 

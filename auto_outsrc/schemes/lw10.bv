@@ -37,7 +37,7 @@ gpk := expand{g}
 
 Y := len(authS)
 BEGIN :: for
-for{i := 1, Y}
+for{i := 0, Y}
 alpha := random(ZR)
 y := random(ZR)
 z := authS#i
@@ -57,7 +57,7 @@ h := H(gid, G1)
 
 Y := len(userS)
 BEGIN :: for
-for{i := 1, Y}
+for{i := 0, Y}
 z := userS#i
 K#z := (g ^ msk#z#0) * (h ^ msk#z#1)
 END :: for
@@ -82,7 +82,7 @@ egg := e(g,g)
 C0 := (M * (egg^s))
 
 BEGIN :: for
-for{y := 1, Y}
+for{y := 0, Y}
 r := random(ZR)
 k := attrs#y
 C1#k := (egg ^ s_sh#k) * (pk#k#0 ^ r)

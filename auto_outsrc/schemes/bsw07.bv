@@ -44,7 +44,7 @@ D := (mk#1 * p0)^(1/mk#0)
 
 Y := len(S)
 BEGIN :: for
-for{y := 1, Y}
+for{y := 0, Y}
 s_y := random(ZR)
 Dj#y := p0 * (H(S#y, G2)^s_y)
 Djp#y := g^s_y
@@ -69,7 +69,7 @@ Ctl := M * egg^s
 C    := h ^ s
 
 BEGIN :: for
-for{y := 1, Y}
+for{y := 0, Y}
 share#y := sh#attrs#y
 Cr#y := g ^ share#y
 Cpr#y := (H(attrs#y, G2))^share#y

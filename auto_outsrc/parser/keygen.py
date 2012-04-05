@@ -62,7 +62,7 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
     SDLLinesForKeygen.append("len-" + keygenOutputElem + blindingSuffix + " := len(" + keygenOutputElem + ")\n")
     #SDLLinesForKeygen += keygenOutputElem + blindingSuffix + " := init(list)\n"
     SDLLinesForKeygen.append("BEGIN :: for\n")
-    SDLLinesForKeygen.append("for{" + blindingLoopVar + " := 1, len-" + keygenOutputElem + blindingSuffix + "}\n")
+    SDLLinesForKeygen.append("for{" + blindingLoopVar + " := 0, len-" + keygenOutputElem + blindingSuffix + "}\n")
     SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + LIST_INDEX_SYMBOL + blindingLoopVar + " := " + keygenOutputElem + LIST_INDEX_SYMBOL + blindingLoopVar + " ^ (1/" + keygenBlindingExponent + ")\n")
     SDLLinesForKeygen.append("END :: for\n")
     varsToBlindList.remove(keygenOutputElem)
