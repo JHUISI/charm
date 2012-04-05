@@ -8,6 +8,7 @@ varNamesToFuncs_Assign = None
 setupFile = None
 transformFile = None
 decOutFile = None
+userFuncsFile = None
 currentFuncName = NONE_FUNC_NAME
 numTabsIn = 1
 returnValues = {}
@@ -25,6 +26,20 @@ def writeCurrentNumTabsIn(outputFile):
 
 def addImportLines():
     global setupFile, transformFile, decOutFile
+
+    pythonImportLines = ""
+    pythonImportLines += "from " + str(userFuncsFileName) + " import *\n"
+
+    pythonImportLines += "\n"
+
+    cppImportLines = ""
+
+    cppImportLines += "\n"
+
+    setupFile.write(pythonImportLines)
+    transformFile.write(pythonImportLines)
+    #decOutFile.write(cppImportLines)
+    decOutFile.write(pythonImportLines)
 
 def addGroupObjGlobalVar():
     global setupFile, transformFile
@@ -145,7 +160,8 @@ def writeFunctionDecl(functionName):
     if (currentFuncName == transformFunctionName):
         writeFunctionDecl_Python(transformFile, functionName)
     elif (currentFuncName == decOutFunctionName):
-        writeFunctionDecl_CPP(decOutFile, functionName)
+        #writeFunctionDecl_CPP(decOutFile, functionName)
+         writeFunctionDecl_Python(decOutFile, functionName)
     else:
         writeFunctionDecl_Python(setupFile, functionName)
 
@@ -158,7 +174,8 @@ def writeFunctionEnd(functionName):
     if (currentFuncName == transformFunctionName):
         writeFunctionEnd_Python(transformFile, functionName)
     elif (currentFuncName == decOutFunctionName):
-        writeFunctionEnd_CPP(decOutFile, functionName)
+        #writeFunctionEnd_CPP(decOutFile, functionName)
+        writeFunctionEnd_Python(decOutFile, functionName)
     else:
         writeFunctionEnd_Python(setupFile, functionName)
 
@@ -286,6 +303,11 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
             funcOutputString += listNodeAsString + ", "
         funcOutputString = funcOutputString[0:(len(funcOutputString) - len(", "))]
         funcOutputString += ")"
+        if (nodeName != lenFuncName):
+            global userFuncsFile
+            userFuncsOutputString = ""
+            userFuncsOutputString += "def " + funcOutputString + ":\n" + "\treturn\n\n"
+            userFuncsFile.write(userFuncsOutputString)
         return funcOutputString
     elif ( (node.type == ops.ON) and (node.left.type == ops.PROD) ):
         if ( (dotProdObj == None) or (lambdaReplacements == None) ):
@@ -305,9 +327,10 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
     elif (node.type == ops.EXPAND):
         expandOutputString = ""
         for listNode in node.listNodes:
-            expandOutputString += replacePoundsWithBrackets(getFullVarName(listNode, False))
+            expandOutputString += replacePoundsWithBrackets(str(listNode))
             expandOutputString += ", "
-        dddd
+        expandOutputString = expandOutputString[0:(len(expandOutputString) - len(", "))]
+        expandOutputString += " = "
         return expandOutputString
 
     sys.exit("getAssignStmtAsString in codegen.py:  unsupported node type detected.")
@@ -391,13 +414,17 @@ def writeAssignStmt_Python(outputFile, binNode):
 
     variableName = replacePoundsWithBrackets(getFullVarName(binNode.left, False))
 
-    outputString += variableName
-    outputString += " = "
+    if (binNode.right.type != ops.EXPAND):
+        outputString += variableName
+        outputString += " = "
 
     if (variableName == outputKeyword):
         outputString += getAssignStmtAsString(binNode.right, None, dotProdObj, lambdaReplacements, True)
     else:
         outputString += getAssignStmtAsString(binNode.right, None, dotProdObj, lambdaReplacements, False)
+
+    if (binNode.right.type == ops.EXPAND):
+        outputString += variableName
     
     outputString += "\n"
     outputFile.write(outputString)
@@ -409,7 +436,8 @@ def writeAssignStmt(binNode):
     if (currentFuncName == transformFunctionName):
         writeAssignStmt_Python(transformFile, binNode)
     elif (currentFuncName == decOutFunctionName):
-        writeAssignStmt_CPP(decOutFile, binNode)
+        #writeAssignStmt_CPP(decOutFile, binNode)
+        writeAssignStmt_Python(decOutFile, binNode)
     else:
         writeAssignStmt_Python(setupFile, binNode)
 
@@ -432,7 +460,8 @@ def writeForLoopDecl(binNode):
     if (currentFuncName == transformFunctionName):
         writeForLoopDecl_Python(transformFile, binNode)
     elif (currentFuncName == decOutFunctionName):
-        writeForLoopDecl_CPP(decOutFile, binNode)
+        #writeForLoopDecl_CPP(decOutFile, binNode)
+        writeForLoopDecl_Python(decOutFile, binNode)
     else:
         writeForLoopDecl_Python(setupFile, binNode)
 
@@ -479,7 +508,8 @@ def writeGlobalVars_CPP(outputFile):
 def writeGlobalVars():
     writeGlobalVars_Python(setupFile)
     writeGlobalVars_Python(transformFile)
-    writeGlobalVars_CPP(decOutFile)
+    #writeGlobalVars_CPP(decOutFile)
+    writeGlobalVars_Python(decOutFile)
 
 def writeSDLToFiles(astNodes):
     global currentFuncName, numTabsIn, setupFile, transformFile, lineNoBeingProcessed
@@ -514,20 +544,20 @@ def writeSDLToFiles(astNodes):
         elif (isAssignStmt(astNode) == True):
             writeAssignStmt(astNode)
 
-def getStringOfFirstSetupFuncArgs():
-    if (type(argsToFirstSetupFunc) is not list):
-        sys.exit("getStringOfFirstSetupFuncArgs in codegen.py:  argsToFirstSetupFunc is not of type list.")
+def getStringOfFirstFuncArgs(argsToFirstFunc):
+    if (type(argsToFirstFunc) is not list):
+        sys.exit("getStringOfFirstFuncArgs in codegen.py:  argsToFirstFunc is not of type list.")
 
-    if (len(argsToFirstSetupFunc) == 0):
+    if (len(argsToFirstFunc) == 0):
         return ""
 
     outputString = ""
 
-    for argName in argsToFirstSetupFunc:
+    for argName in argsToFirstFunc:
         try:
             argNameAsStr = str(argName)
         except:
-            sys.exit("getStringOfFirstSetupFuncArgs in codegen.py:  could not convert one of the argument names to a string.")
+            sys.exit("getStringOfFirstFuncArgs in codegen.py:  could not convert one of the argument names to a string.")
 
         outputString += str(argName) + ", "
 
@@ -567,6 +597,31 @@ def writeGroupObjToMain():
 
     return outputString
 
+def writeFuncsCalledFromMain(functionOrder, argsToFirstFunc):
+    outputString = ""
+
+    if ( (type(functionOrder) is not list) or (len(functionOrder) == 0) ):
+        sys.exit("writeFuncsCalledFromMain in codegen.py:  functionOrder parameter passed in is invalid.")
+
+    counter = 0
+    for funcName in functionOrder:
+        if ( (type(funcName) is not str) or (len(funcName) == 0) ):
+            sys.exit("writeFuncsCalledFromMain in codegen.py:  one of the entries in functionOrder is invalid.")
+        outputString += "\t"
+        if (funcName not in returnValues):
+            sys.exit("writeFuncsCalledFromMain in codegen.py:  current function name in functionOrder is not in return values.")
+        if (len(returnValues[funcName]) > 0):
+            outputString += returnValues[funcName] + " = "
+        outputString += funcName + "("
+        if (counter == 0):
+            outputString += getStringOfFirstFuncArgs(argsToFirstFunc)
+        else:
+            outputString += getStringOfInputArgsToFunc(funcName)
+        outputString += ")\n"
+        counter += 1
+
+    return outputString
+
 def writeMainFuncOfSetup():
     global setupFile
 
@@ -574,26 +629,7 @@ def writeMainFuncOfSetup():
     outputString += "if __name__ == \"__main__\":\n"
 
     outputString += writeGroupObjToMain()
-
-    if ( (type(setupFunctionOrder) is not list) or (len(setupFunctionOrder) == 0) ):
-        sys.exit("writeMainFuncOfSetup in codegen.py:  setupFunctionOrder from config.py is invalid.")
-
-    counter = 0
-    for setupFunc in setupFunctionOrder:
-        if ( (type(setupFunc) is not str) or (len(setupFunc) == 0) ):
-            sys.exit("writeMainFuncOfSetup in codegen.py:  one of the entries in setupFunctionOrder from config.py is invalid.")
-        outputString += "\t"
-        if (setupFunc not in returnValues):
-            sys.exit("writeMainFuncOfSetup in codegen.py:  current function name in setupFunctionOrder is not in return values.")
-        if (len(returnValues[setupFunc]) > 0):
-            outputString += returnValues[setupFunc] + " = "
-        outputString += setupFunc + "("
-        if (counter == 0):
-            outputString += getStringOfFirstSetupFuncArgs()
-        else:
-            outputString += getStringOfInputArgsToFunc(setupFunc)
-        outputString += ")\n"
-        counter += 1
+    outputString += writeFuncsCalledFromMain(setupFunctionOrder, argsToFirstSetupFunc)
 
     setupFile.write(outputString)
 
@@ -603,6 +639,7 @@ def writeMainFuncOfTransform():
     outputString = ""
     outputString += "if __name__ == \"__main__\":\n"
     outputString += writeGroupObjToMain()
+    outputString += writeFuncsCalledFromMain(transformFunctionOrder, argsToFirstTransformFunc)
 
     transformFile.write(outputString)
 
@@ -627,7 +664,8 @@ def getGlobalVarNames():
             globalVarNames.append(varName)
 
 def main(SDL_Scheme):
-    global setupFile, transformFile, decOutFile, assignInfo, varNamesToFuncs_All, varNamesToFuncs_Assign
+    global setupFile, transformFile, decOutFile, userFuncsFile, assignInfo, varNamesToFuncs_All
+    global varNamesToFuncs_Assign
 
     if ( (type(SDL_Scheme) is not str) or (len(SDL_Scheme) == 0) ):
         sys.exit("codegen.py:  sys.argv[1] argument (file name for SDL scheme) passed in was invalid.")
@@ -650,6 +688,7 @@ def main(SDL_Scheme):
     setupFile = open(setupFileName, 'w')
     transformFile = open(transformFileName, 'w')
     decOutFile = open(decOutFileName, 'w')
+    userFuncsFile = open(userFuncsFileName, 'w')
 
     getGlobalVarNames()
 
@@ -661,6 +700,7 @@ def main(SDL_Scheme):
     setupFile.close()
     transformFile.close()
     decOutFile.close()
+    userFuncsFile.close()
 
 if __name__ == "__main__":
     main(sys.argv[1])

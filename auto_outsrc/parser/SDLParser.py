@@ -94,6 +94,7 @@ class SDLParser:
         ProdOf = Literal("on")
         ForDo = Literal("do") # for{x,y} do y
         SumOf = Literal("of")
+        IfCond = Literal("if {")
         List  = Literal("list{") | Literal("expand{") # represents a list
         MultiLine = Literal(";") + Optional(Literal("\\n").suppress())
         funcName = Word(alphanums + '_')
@@ -104,7 +105,7 @@ class SDLParser:
         # captures the binary operators allowed (and, ^, *, /, +, |, ==)        
         BinOp = MultiLine | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | Concat | Equality
         # captures order of parsing token operators
-        Token = Equality | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | ForDo | ProdOf | SumOf | Concat | Assignment | MultiLine
+        Token = Equality | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | ForDo | ProdOf | SumOf | IfCond | Concat | Assignment | MultiLine
         Operator = Token 
         #Operator = OperatorAND | OperatorOR | Token
 
@@ -122,6 +123,7 @@ class SDLParser:
                (Random + leafNode + rpar).setParseAction( pushFirst ) | \
                (List + delimitedList(leafNode).setParseAction( checkCount ) + rcurly).setParseAction( pushFirst ) | \
                (funcName + '(' + delimitedList(leafNode).setParseAction( checkCount ) + ')').setParseAction( pushFunc ) | \
+               (IfCond + expr + rpar).setParseAction( pushFirst ) | \
                lpar + expr + rpar | (leafNode).setParseAction( pushFirst )
 
         # Represents the order of operations (^, *, |, ==)
@@ -166,6 +168,9 @@ class SDLParser:
             newList.listNodes = list(ops)
             return newList
         elif op in ["random("]:
+            op1 = self.evalStack(stack, line_number)
+            return createTree(op, op1, None)
+        elif op in ["if {"]:
             op1 = self.evalStack(stack, line_number)
             return createTree(op, op1, None)
         elif FUNC_SYMBOL in op:
