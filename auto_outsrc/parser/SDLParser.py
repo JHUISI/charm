@@ -55,9 +55,13 @@ def pushFirst( s, loc, toks ):
        print("Pushing first =>", toks[0])
     objStack.append( toks[0] )
 
-def pushSecond(s, loc, toks ):
-    if debug >= levels.some: print("Pushing second => ", toks)
-    objStack.append( toks[0] )
+def pushError(s, loc, toks ):
+    if debug >= levels.some: print("Pushing all => ", toks)
+    if len(toks) == 3:
+        objStack.append( toks[1] )
+        objStack.append( toks[0] )
+    else:
+        print("'error()' token not well-formed.")
 
 def checkCount(s, loc, toks):
     cnt = len(toks)
@@ -106,6 +110,7 @@ class SDLParser:
         blockName = Word(alphanums + '_:')
         BeginAndEndBlock = CaselessLiteral(START_TOKEN) | CaselessLiteral(END_TOKEN)
         BlockSep   = Literal(BLOCK_SEP)
+        ErrorName  = Literal("error(") 
 
         # captures the binary operators allowed (and, ^, *, /, +, |, ==)        
         BinOp = MultiLine | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | Concat | Equality
@@ -119,7 +124,8 @@ class SDLParser:
         expr = Forward()
         term = Forward()
         factor = Forward()
-        atom = (BeginAndEndBlock + BlockSep + blockName.setParseAction( pushSecond ) ).setParseAction( pushFirst ) | \
+        atom = (BeginAndEndBlock + BlockSep + blockName.setParseAction( pushFirst ) ).setParseAction( pushFirst ) | \
+               (ErrorName + sglQuotedString + ')').setParseAction( pushError ) | \
                (Hash + expr + ',' + expr + rpar).setParseAction( pushFirst ) | \
                (Pairing + expr + ',' + expr + rpar).setParseAction( pushFirst ) | \
                (Prod + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
@@ -184,6 +190,9 @@ class SDLParser:
             return createTree(op, op1, None)
         elif op in ["else"]:
             return createTree(op, None, None)
+        elif op in ["error("]:
+            op1 = self.evalStack(stack, line_number)
+            return createTree(op, None, None, op1)
         elif FUNC_SYMBOL in op:
             ops = []
             cnt = self.evalStack(stack, line_number)

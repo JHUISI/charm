@@ -168,7 +168,7 @@ def rcca_decout(vars):
 % (config.rccaRandomVar, vars['pk_value'], vars['s'], config.rccaRandomVar, vars['pk_value'], vars['s'], config.keygenBlindingExponent), # verify T0 and T1 are well-formed
 "output := %s\n" % config.M,
 "else\n",
-"output := error\n",
+"error('invalid ciphertext')\n",
 "END :: if\n"
 "END :: func:%s\n" % config.decOutFunctionName]
     return decout_sdl

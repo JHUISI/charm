@@ -49,7 +49,7 @@ FUNC_SYMBOL = "def func :"
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
 types = Enum('NO_TYPE','G1', 'G2', 'GT', 'ZR', 'str', 'list', 'object')
 declarator = Enum('func', 'verify')
-ops = Enum('BEGIN', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'EXPAND', 'FUNC', 'SEQ', 'IF', 'ELSEIF', 'ELSE', 'END', 'NONE')
+ops = Enum('BEGIN', 'ERROR', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'EXPAND', 'FUNC', 'SEQ', 'IF', 'ELSEIF', 'ELSE', 'END', 'NONE')
 side = Enum('left', 'right')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
@@ -275,6 +275,9 @@ def createTree(op, node1, node2, op_value=None):
     	node = BinaryNode(ops.EXPAND)
     elif(op == "random("):
     	node = BinaryNode(ops.RANDOM)
+    elif(op == "error("):
+        node = BinaryNode(ops.ERROR)
+        node.setAttribute(op_value)
     elif(FUNC_SYMBOL in op):
     	node = BinaryNode(ops.FUNC)
     	node.setAttribute(op_value)
@@ -381,6 +384,8 @@ class BinaryNode:
 				return ('for{' + left + ',' + right + '}')
 			elif(self.type == ops.RANDOM):
 				return ('random(' + left + ')')
+			elif(self.type == ops.ERROR):
+				return ('error(' + str(self.attr) + ')')
 			elif(self.type == ops.DO):
 				 return (left + ' do { ' + right + ' }')
 			elif(self.type == ops.IF):
@@ -445,7 +450,7 @@ class BinaryNode:
 			return None
 	
 	def setAttribute(self, value):
-		if self.type in [ops.ATTR, ops.FUNC]:
+		if self.type in [ops.ATTR, ops.FUNC, ops.ERROR]:
 			self.attr = str(value)
 			return True
 		return False
