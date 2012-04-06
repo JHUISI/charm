@@ -644,7 +644,14 @@ def writeMainFuncOfTransform():
     transformFile.write(outputString)
 
 def writeMainFuncOfDecOut():
-    return
+    global decOutFile
+
+    outputString = ""
+    outputString += "if __name__ == \"__main__\":\n"
+    outputString += writeGroupObjToMain()
+    outputString += writeFuncsCalledFromMain(decOutFunctionOrder, argsToFirstDecOutFunc)
+
+    decOutFile.write(outputString)
 
 def writeMainFuncs():
     writeMainFuncOfSetup()

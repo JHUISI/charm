@@ -3,12 +3,20 @@ from SDLang import *
 
 class IfElse:
     def __init__(self):
+        self.startLineNo = None
+        self.endLineNo = None
         self.conditionalAsNode = None
         self.conditionalAsString = None
         self.thenNodesAsBinNodes_List = None
         self.thenNodesAsVarInfoObjs_List = None
         self.elseNodesAsBinNodes_List = None
         self.elseNodesAsVarInfoObjs_List = None
+
+    def getStartLineNo(self):
+        return self.startLineNo
+
+    def getEndLineNo(self):
+        return self.endLineNo
 
     def getConditionalAsNode(self):
         return self.conditionalAsNode

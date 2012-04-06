@@ -7,6 +7,7 @@ from SDLang import *
 from VarInfo import *
 from VarType import *
 from ForLoop import *
+#from IfElse import *
 import string,sys
 
 objStack = []
@@ -17,12 +18,15 @@ assignInfo = {}
 varNamesToFuncs_All = {}
 varNamesToFuncs_Assign = {}
 forLoops = {}
+ifElseBranches = {}
 varDepList = {}
 varInfList = {}
 varsThatProtectM = {}
 varTypes = {}
 algebraicSetting = None
 startLineNo_ForLoop = None
+startLineNo_IfBranch = None
+startLineNo_ElseBranch = None
 startLineNos_Functions = {}
 endLineNos_Functions = {}
 linesOfCode = None
@@ -146,6 +150,9 @@ class SDLParser:
     
     # method for evaluating stack assumes operators have two operands and pops them accordingly
     def evalStack(self, stack, line_number):
+        global currentFuncName, forLoops, startLineNo_ForLoop, startLineNos_Functions
+        global endLineNos_Functions, ifElseBranches, startLineNo_IfBranch, startLineNo_ElseBranch
+
         op = stack.pop()
         if debug >= levels.some:
             print("op: %s" % op)
@@ -185,7 +192,6 @@ class SDLParser:
             return newList
         elif op in [START_TOKEN, END_TOKEN]: # start and end block lines
             op1 = self.evalStack(stack, line_number)
-            global currentFuncName, forLoops, startLineNo_ForLoop, startLineNos_Functions, endLineNos_Functions
             if (op1.startswith(DECL_FUNC_HEADER) == True):
                 if (op == START_TOKEN):
                     currentFuncName = op1[len(DECL_FUNC_HEADER):len(op1)]
@@ -217,6 +223,11 @@ class SDLParser:
                     if (forLoops[currentFuncName][lenForLoops - 1].getEndLineNo() != None):
                         sys.exit("Ending line number of one of the for loops was set prematurely.")
                     forLoops[currentFuncName][lenForLoops - 1].setEndLineNo(int(line_number))
+            elif (op1 == IF_BRANCH_HEADER):
+                if (op == START_TOKEN):
+                    startLineNo_IfBranch = line_number
+                elif (op == END_TOKEN):
+                    startLineNo_IfBranch = None  #STARTHERE
             return createTree(op, op1, None)
         else:
             # Node value

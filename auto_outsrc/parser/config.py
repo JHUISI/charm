@@ -26,8 +26,11 @@ cppSuffix = ".py"
 
 setupFunctionOrder = ["setup", "keygen", "encrypt"]
 transformFunctionOrder = ["transform"]
+decOutFunctionOrder = ["decout"]
+
 argsToFirstSetupFunc = []
 argsToFirstTransformFunc = ["sys.argv[1]", "sys.argv[2]", "sys.argv[3]"]
+argsToFirstDecOutFunc = ["sys.argv[1]", "sys.argv[2]", "sys.argv[3]"]
 
 groupObjName = "groupObj"
 groupArg = "MNT160"
