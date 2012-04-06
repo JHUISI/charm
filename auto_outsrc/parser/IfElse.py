@@ -37,3 +37,4 @@ class IfElse:
         return self.elseNodesAsVarInfoObjs_List
 
     def setIfElseStruct(node):
+        pass

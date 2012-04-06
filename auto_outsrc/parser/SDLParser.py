@@ -98,7 +98,8 @@ class SDLParser:
         ProdOf = Literal("on")
         ForDo = Literal("do") # for{x,y} do y
         SumOf = Literal("of")
-        IfCond = Literal("if {")
+        IfCond = Literal("if {") | Literal("else-if {")
+        ElseCond = Literal("else ") 
         List  = Literal("list{") | Literal("expand{") # represents a list
         MultiLine = Literal(";") + Optional(Literal("\\n").suppress())
         funcName = Word(alphanums + '_')
@@ -128,6 +129,7 @@ class SDLParser:
                (List + delimitedList(leafNode).setParseAction( checkCount ) + rcurly).setParseAction( pushFirst ) | \
                (funcName + '(' + delimitedList(leafNode).setParseAction( checkCount ) + ')').setParseAction( pushFunc ) | \
                (IfCond + expr + rpar).setParseAction( pushFirst ) | \
+               (ElseCond ).setParseAction( pushFirst ) | \
                lpar + expr + rpar | (leafNode).setParseAction( pushFirst )
 
         # Represents the order of operations (^, *, |, ==)
@@ -177,9 +179,11 @@ class SDLParser:
         elif op in ["random("]:
             op1 = self.evalStack(stack, line_number)
             return createTree(op, op1, None)
-        elif op in ["if {"]:
+        elif op in ["if {", "else-if {"]:
             op1 = self.evalStack(stack, line_number)
             return createTree(op, op1, None)
+        elif op in ["else "]:
+            return createTree(op, None, None)
         elif FUNC_SYMBOL in op:
             ops = []
             cnt = self.evalStack(stack, line_number)

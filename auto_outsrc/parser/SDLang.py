@@ -49,7 +49,7 @@ FUNC_SYMBOL = "def func :"
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
 types = Enum('NO_TYPE','G1', 'G2', 'GT', 'ZR', 'str', 'list', 'object')
 declarator = Enum('func', 'verify')
-ops = Enum('BEGIN', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'EXPAND', 'FUNC', 'SEQ', 'IF', 'END', 'NONE')
+ops = Enum('BEGIN', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'EXPAND', 'FUNC', 'SEQ', 'IF', 'ELSEIF', 'ELSE', 'END', 'NONE')
 side = Enum('left', 'right')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
@@ -261,6 +261,10 @@ def createTree(op, node1, node2, op_value=None):
     	node = BinaryNode(ops.OF)
     elif(op == "if {"):
         node = BinaryNode(ops.IF)
+    elif(op == "else-if {"):
+        node = BinaryNode(ops.ELSEIF)
+    elif(op == "else "):
+        node = BinaryNode(ops.ELSE)
     elif(op == "|"):
         node = BinaryNode(ops.CONCAT)
     elif(op == "and"):
@@ -378,9 +382,13 @@ class BinaryNode:
 			elif(self.type == ops.RANDOM):
 				return ('random(' + left + ')')
 			elif(self.type == ops.DO):
-				 return ( left + ' do { ' + right + ' }')
+				 return (left + ' do { ' + right + ' }')
 			elif(self.type == ops.IF):
-				 return ( 'if {' + left + '}')
+				 return ('if {' + left + '}')
+			elif(self.type == ops.ELSEIF):
+    			 return ('else-if {' + left + '}')
+			elif(self.type == ops.ELSE):
+    			 return 'else '
 			elif(self.type == ops.OF):
 				 return ( left + ' of ' + right)
 			elif(self.type == ops.CONCAT):
