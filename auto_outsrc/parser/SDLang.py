@@ -261,9 +261,9 @@ def createTree(op, node1, node2, op_value=None):
     	node = BinaryNode(ops.OF)
     elif(op == "if {"):
         node = BinaryNode(ops.IF)
-    elif(op == "else-if {"):
+    elif(op == "elseif {"):
         node = BinaryNode(ops.ELSEIF)
-    elif(op == "else "):
+    elif(op == "else"):
         node = BinaryNode(ops.ELSE)
     elif(op == "|"):
         node = BinaryNode(ops.CONCAT)
@@ -386,7 +386,7 @@ class BinaryNode:
 			elif(self.type == ops.IF):
 				 return ('if {' + left + '}')
 			elif(self.type == ops.ELSEIF):
-    			 return ('else-if {' + left + '}')
+    			 return ('elseif {' + left + '}')
 			elif(self.type == ops.ELSE):
     			 return 'else '
 			elif(self.type == ops.OF):

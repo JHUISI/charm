@@ -98,8 +98,8 @@ class SDLParser:
         ProdOf = Literal("on")
         ForDo = Literal("do") # for{x,y} do y
         SumOf = Literal("of")
-        IfCond = Literal("if {") | Literal("else-if {")
-        ElseCond = Literal("else ") 
+        IfCond = Literal("if {") | Literal("elseif {")
+        ElseCond = Literal("else") 
         List  = Literal("list{") | Literal("expand{") # represents a list
         MultiLine = Literal(";") + Optional(Literal("\\n").suppress())
         funcName = Word(alphanums + '_')
@@ -179,10 +179,10 @@ class SDLParser:
         elif op in ["random("]:
             op1 = self.evalStack(stack, line_number)
             return createTree(op, op1, None)
-        elif op in ["if {", "else-if {"]:
+        elif op in ["if {", "elseif {"]:
             op1 = self.evalStack(stack, line_number)
             return createTree(op, op1, None)
-        elif op in ["else "]:
+        elif op in ["else"]:
             return createTree(op, None, None)
         elif FUNC_SYMBOL in op:
             ops = []
