@@ -169,7 +169,7 @@ def rcca_decout(vars):
 "output := %s\n" % config.M,
 "else\n",
 "error('invalid ciphertext')\n",
-"END :: if\n"
+"END :: if\n",
 "END :: func:%s\n" % config.decOutFunctionName]
     return decout_sdl
 
