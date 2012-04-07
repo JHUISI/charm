@@ -20,6 +20,7 @@ class VarInfo:
         self.listNodesList = []
         self.dotProdObj = None
         self.outsideForLoopObj = None
+        self.outsideIfElseBranchObj = None
         self.hasRandomness = False
         self.isTypeEntryOnly = False
     
@@ -41,6 +42,7 @@ class VarInfo:
         v.listNodesList = list(obj.listNodesList)
         v.dotProdObj  = obj.dotProdObj
         v.outsideForLoopObj = obj.outsideForLoopObj
+        v.outsideIfElseBranchObj = obj.outsideIfElseBranchObj
         v.hasRandomness = obj.hasRandomness
         v.isTypeEntryOnly = obj.isTypeEntryOnly
         return v
@@ -101,6 +103,9 @@ class VarInfo:
     def getOutsideForLoopObj(self):
         return self.outsideForLoopObj
 
+    def getOutsideIfElseBranchObj(self):
+        return self.outsideIfElseBranchObj
+
     def getHasRandomness(self):
         return self.hasRandomness
 
@@ -158,7 +163,7 @@ class VarInfo:
         if (M in self.varDeps):
             self.protectsM = True
 
-    def setAssignNode(self, assignNode, funcName, outsideForLoopObj):
+    def setAssignNode(self, assignNode, funcName, outsideForLoopObj, outsideIfElseBranchObj):
         if (type(assignNode).__name__ != BINARY_NODE_CLASS_NAME):
             sys.exit("Assignment node passed to VarInfo is invalid.")
 
@@ -166,6 +171,7 @@ class VarInfo:
         self.assignNode = assignNode
         self.funcName = funcName
         self.outsideForLoopObj = outsideForLoopObj
+        self.outsideIfElseBranchObj = outsideIfElseBranchObj
 
         self.traverseAssignNode()
 

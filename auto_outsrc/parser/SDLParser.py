@@ -7,7 +7,7 @@ from SDLang import *
 from VarInfo import *
 from VarType import *
 from ForLoop import *
-#from IfElse import *
+from IfElseBranch import *
 import string,sys
 
 objStack = []
@@ -189,6 +189,9 @@ class SDLParser:
             op1 = self.evalStack(stack, line_number)
             return createTree(op, op1, None)
         elif op in ["else"]:
+            startLineNo_ElseBranch = line_number
+            lenIfElseBranches = len(ifElseBranches[currentFuncName])
+            ifElseBranches[currentFuncName][lenIfElseBranches - 1].appendToElseLineNos(int(line_number))
             return createTree(op, None, None)
         elif op in ["error("]:
             op1 = self.evalStack(stack, line_number)
@@ -240,7 +243,11 @@ class SDLParser:
                 if (op == START_TOKEN):
                     startLineNo_IfBranch = line_number
                 elif (op == END_TOKEN):
-                    startLineNo_IfBranch = None  #STARTHERE
+                    startLineNo_IfBranch = None
+                    lenIfElseBranches = len(ifElseBranches[currentFuncName])
+                    if (ifElseBranches[currentFuncName][lenIfElseBranches - 1].getEndLineNo() != None):
+                        sys.exit("Ending line number of one of the if-else branches was set prematurely.")
+                    ifElseBranches[currentFuncName][lenIfElseBranches - 1].setEndLineNo(int(line_number))
             return createTree(op, op1, None)
         else:
             # Node value
@@ -649,7 +656,7 @@ def updateVarNamesDicts(node, varNameList, dictToUpdate):
             dictToUpdate[varName].append(currentFuncName)
 
 def updateAssignInfo(node, i):
-    global assignInfo, forLoops, varNamesToFuncs_All, varNamesToFuncs_Assign
+    global assignInfo, forLoops, ifElseBranches, varNamesToFuncs_All, varNamesToFuncs_Assign
 
     assignInfo_Func = assignInfo[currentFuncName]
 
@@ -657,6 +664,11 @@ def updateAssignInfo(node, i):
     if (startLineNo_ForLoop != None):
         lenForLoops = len(forLoops[currentFuncName])
         currentForLoopObj = forLoops[currentFuncName][lenForLoops - 1]
+
+    currentIfElseBranch = None
+    if (startLineNo_IfBranch != None):
+        lenIfElseBranches = len(ifElseBranches[currentFuncName])
+        currentIfElseBranch = ifElseBranches[currentFuncName][lenIfElseBranches - 1]
 
     varName = getFullVarName(node.left, True)
     varNameWithoutIndices = getVarNameWithoutIndices(node.left)
@@ -670,11 +682,11 @@ def updateAssignInfo(node, i):
         if (assignInfo_Func[varName].hasBeenSet() == True):
             sys.exit("Found multiple assignments of same variable name within same function.")
         assignInfo_Func[varName].setLineNo(i)
-        resultingVarDeps = assignInfo_Func[varName].setAssignNode(node, currentFuncName, currentForLoopObj)
+        resultingVarDeps = assignInfo_Func[varName].setAssignNode(node, currentFuncName, currentForLoopObj, currentIfElseBranch)
     else:
         varInfoObj = VarInfo()
         varInfoObj.setLineNo(i)
-        resultingVarDeps = varInfoObj.setAssignNode(node, currentFuncName, currentForLoopObj)
+        resultingVarDeps = varInfoObj.setAssignNode(node, currentFuncName, currentForLoopObj, currentIfElseBranch)
         assignInfo_Func[varName] = varInfoObj
 
     expandedVarDeps = expandVarNamesByIndexSymbols(resultingVarDeps)
@@ -684,6 +696,10 @@ def updateAssignInfo(node, i):
     if (currentForLoopObj != None):
         currentForLoopObj.appendToBinaryNodeList(node)
         currentForLoopObj.appendToVarInfoNodeList(assignInfo_Func[varName])
+
+    if (currentIfElseBranch != None):
+        currentIfElseBranch.appendToBinaryNodeDict(node, i)
+        currentIfElseBranch.appendToVarInfoNodeList(assignInfo_Func[varName], i)
 
     getVarTypeInfo(node, i, varName)
 
@@ -760,6 +776,17 @@ def updateForLoops(node, lineNo):
 
     forLoops[currentFuncName].append(retForLoopStruct)
 
+def updateIfElseBranches(node, lineNo):
+    if (startLineNo_IfBranch == None):
+        sys.exit("updateIfElseBranches in SDLParser.py:  function entered when startLineNo_IfBranch is set to None.")
+
+    global ifElseBranches
+
+    retIfElseBranchStruct = IfElseBranch()
+    retIfElseBranchStruct.updateIfElseBranchStruct(node, startLineNo_IfBranch, currentFuncName)
+
+    ifElseBranches[currentFuncName].append(retIfElseBranchStruct)
+
 def printLinesOfCode():
     lineNo = 0
 
@@ -806,6 +833,9 @@ def getAssignInfo():
 
 def getVarTypes():
     return varTypes
+
+def getIfElseBranches():
+    return ifElseBranches
 
 def getVarNamesToFuncs_All():
     return varNamesToFuncs_All
@@ -956,7 +986,7 @@ def parseLinesOfCode(code, verbosity):
     global varTypes, assignInfo, forLoops, currentFuncName, varDepList, varInfList, varsThatProtectM
     global algebraicSetting, startLineNo_ForLoop, startLineNos_Functions, endLineNos_Functions
     global getVarDepInfListsCalled, getVarsThatProtectMCalled, astNodes, varNamesToFuncs_All
-    global varNamesToFuncs_Assign
+    global varNamesToFuncs_Assign, ifElseBranches, startLineNo_IfBranch, startLineNo_ElseBranch
 
     astNodes = []
     varTypes = {}
@@ -964,12 +994,15 @@ def parseLinesOfCode(code, verbosity):
     varNamesToFuncs_All = {}
     varNamesToFuncs_Assign = {}
     forLoops = {}
+    ifElseBranches = {}
     currentFuncName = NONE_FUNC_NAME
     varDepList = {}
     varInfList = {}
     varsThatProtectM = {}
     algebraicSetting = None
     startLineNo_ForLoop = None
+    startLineNo_IfBranch = None
+    startLineNo_ElseBranch = None
     startLineNos_Functions = {}
     endLineNos_Functions = {}
     getVarDepInfListsCalled = False
@@ -993,12 +1026,17 @@ def parseLinesOfCode(code, verbosity):
                 if (currentFuncName not in forLoops):
                     forLoops[currentFuncName] = []
 
+                if (currentFuncName not in ifElseBranches):
+                    ifElseBranches[currentFuncName] = []
+
                 if (currentFuncName == TYPES_HEADER):
                     updateVarTypes(node, lineNumberInCode)
                 else:
                     updateAssignInfo(node, lineNumberInCode)
             elif (node.type == ops.FOR):
                 updateForLoops(node, lineNumberInCode)
+            elif (node.type == ops.IF):
+                updateIfElseBranches(node, lineNumberInCode)
         else:
             astNodes.append(BinaryNode(ops.NONE))
             if verbosity: print("sdl: ", lineNumberInCode)

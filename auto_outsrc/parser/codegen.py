@@ -42,7 +42,7 @@ def addImportLines():
     decOutFile.write(pythonImportLines)
 
 def addGroupObjGlobalVar():
-    global setupFile, transformFile
+    global setupFile, transformFile, decOutFile
 
     if ( (type(groupObjName) is not str) or (len(groupObjName) == 0) ):
         sys.exit("addGroupObjGlobalVar in codegen.py:  groupObjName in config.py is invalid.")
@@ -54,7 +54,8 @@ def addGroupObjGlobalVar():
     outputString = groupObjName + " = None\n\n"
 
     setupFile.write(outputString)
-    transformFile.write(outputString) 
+    transformFile.write(outputString)
+    decOutFile.write(outputString)
 
 def isFunctionStart(binNode):
     if (binNode.type != ops.BEGIN):
@@ -530,6 +531,7 @@ def writeSDLToFiles(astNodes):
             writeGlobalVars()
             setupFile.write("\n")
             transformFile.write("\n")
+            decOutFile.write("\n")
 
         if (currentFuncName == NONE_FUNC_NAME):
             continue
@@ -711,3 +713,4 @@ def main(SDL_Scheme):
 
 if __name__ == "__main__":
     main(sys.argv[1])
+    parseLinesOfCode(getLinesOfCode(), True)
