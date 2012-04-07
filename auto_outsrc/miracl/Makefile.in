@@ -1,0 +1,24 @@
+CXX	:= g++
+CXXFLAGS := -g -m64 -O2
+
+# should be set by codegen
+SDL_SRC := cpp_example
+NAME    := my_test2
+CURVE   := kss
+
+OBJECTS	:= $(SDL_SRC).o 
+LIB     := miracl-$(CURVE).a
+ 
+# link SDL object file with miracl lib 
+.PHONY: $(NAME)
+$(NAME): $(OBJECTS) lib
+	$(CXX) $(OBJECTS) $(LIB) -o $(NAME)
+
+# compile target SDL sourcefile
+$(SDL_SRC).o: $(SDL_SRC).cpp
+	$(CXX) $(CXXFLAGS) -c $(SDL_SRC).cpp -o $(SDL_SRC).o
+
+# need target for building miracl-kss version lib
+.PHONY: lib
+lib:
+	sh build_miracl.sh $(CURVE)
