@@ -60,6 +60,9 @@ class ForLoop:
         if ( (type(endLineNo) is not int) or (endLineNo < 1) ):
             sys.exit("Problem with ending line number passed to setEndLineNo in ForLoop.")
 
+        if (self.startLineNo >= endLineNo):
+            sys.exit("setEndLineNo in ForLoop.py:  end line number passed in is less than or equal to start line number.")
+
         self.endLineNo = endLineNo
 
     def appendToBinaryNodeList(self, binaryNode):
