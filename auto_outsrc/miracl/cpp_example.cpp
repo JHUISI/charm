@@ -8,11 +8,10 @@
 #define AES_SECURITY 192
 #include "pairing_3.h"
 
-// mnt_pair.cpp, cp_pair.cpp, bn_pair.cpp, ssp_pair.cpp, ss2_pair.cpp, kss_pair.cpp
-
-
 int N = 1;
+// this needs to be thesame with respect to charm
 #define HASH(x, str) group.hash_and_map(x, (char *) string(str).c_str())
+
 #define Group PFC
 #define SmallExp(x, a)	\
 	x = mirvar(0); \
