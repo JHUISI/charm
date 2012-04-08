@@ -12,12 +12,11 @@ int main()
 
 	ZR c;
 	group.random(c);
-	cout << "ZR => " << c << endl;
-	cout << "Hello World! It worked!!!" << endl;
+	cout << "ZR : c := " << c << endl;
 
 	G1 g1;
 	group.random(g1);
-	cout << "G1 element => " << str(g1) << endl;
+	cout << "G1 :=> " << str(g1) << endl;
 
 	G2 g2;
 	group.random(g2);
@@ -26,7 +25,14 @@ int main()
 	G2 h2 = group.mul(g2, g2);
 	cout << "G2 added to itself " << str(h2) << endl;
 
+	h2 = group.div(h2, g2);
+	cout << "h2 =?= g2 => " << str(h2) << endl;
+
+	G2 c2 = group.exp(h2, c);
+	cout << "G2 c2 := h2 ^ c => " << str(c2) << endl;
+
 	cout << "Pairing test " << str( group.pair(g1, g2) ) << endl;
+
 
 	return 0;
 }
