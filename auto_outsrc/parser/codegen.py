@@ -1,6 +1,6 @@
 from keygen import *
 from config import *
-import sys
+import sys, os
 
 assignInfo = None
 varNamesToFuncs_All = None
@@ -15,6 +15,7 @@ returnValues = {}
 globalVarNames = []
 lineNoBeingProcessed = 0
 numLambdaFunctions = 0
+userFuncsList = []
 
 def writeCurrentNumTabsIn(outputFile):
     outputString = ""
@@ -25,10 +26,19 @@ def writeCurrentNumTabsIn(outputFile):
     outputFile.write(outputString)
 
 def addImportLines():
-    global setupFile, transformFile, decOutFile
+    global setupFile, transformFile, decOutFile, userFuncsFile
 
     pythonImportLines = ""
     pythonImportLines += "from " + str(userFuncsFileName) + " import *\n"
+
+    setupFile.write(pythonImportLines)
+    transformFile.write(pythonImportLines)
+    #decOutFile.write(cppImportLines)
+    decOutFile.write(pythonImportLines)
+
+    pythonImportLines = ""
+    for charmImportFunc in charmImportFuncs:
+        pythonImportLines += charmImportFunc + "\n"
 
     pythonImportLines += "\n"
 
@@ -40,6 +50,7 @@ def addImportLines():
     transformFile.write(pythonImportLines)
     #decOutFile.write(cppImportLines)
     decOutFile.write(pythonImportLines)
+    userFuncsFile.write(pythonImportLines)
 
 def addGroupObjGlobalVar():
     global setupFile, transformFile, decOutFile
@@ -233,6 +244,8 @@ def applyReplacementsDict(replacementsDict, currentStrName):
     return retString
 
 def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements, forOutput):
+    global userFuncsFile, userFuncsList
+
     if (type(node) is str):
         strNameToReturn = applyReplacementsDict(replacementsDict, node)
         strNameToReturn = replacePoundsWithBrackets(strNameToReturn)
@@ -304,8 +317,8 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
             funcOutputString += listNodeAsString + ", "
         funcOutputString = funcOutputString[0:(len(funcOutputString) - len(", "))]
         funcOutputString += ")"
-        if (nodeName != lenFuncName):
-            global userFuncsFile
+        if ( (nodeName not in pythonDefinedFuncs) and (nodeName not in userFuncsList) ):
+            userFuncsList.append(nodeName)
             userFuncsOutputString = ""
             userFuncsOutputString += "def " + funcOutputString + ":\n" + "\treturn\n\n"
             userFuncsFile.write(userFuncsOutputString)
@@ -568,6 +581,15 @@ def getStringOfFirstFuncArgs(argsToFirstFunc):
 
     return outputString
 
+def checkNumUserSuppliedArgs(userSuppliedArgs, funcName):
+    try:
+        inputVariables = assignInfo[funcName][inputKeyword].getVarDeps()
+    except:
+        sys.exit("checkNumUserSuppliedArgs in codegen.py:  could not obtain the input line for function currently being processed.")
+
+    if (len(userSuppliedArgs) != len(inputVariables)):
+        sys.exit("checkNumUserSuppliedArgs in codegen.py:  error in number of user-supplied args for function currently being processed.")
+
 def getStringOfInputArgsToFunc(funcName):
     inputVariables = []
 
@@ -616,6 +638,7 @@ def writeFuncsCalledFromMain(functionOrder, argsToFirstFunc):
             outputString += returnValues[funcName] + " = "
         outputString += funcName + "("
         if (counter == 0):
+            checkNumUserSuppliedArgs(argsToFirstFunc, funcName)
             outputString += getStringOfFirstFuncArgs(argsToFirstFunc)
         else:
             outputString += getStringOfInputArgsToFunc(funcName)
@@ -714,3 +737,4 @@ def main(SDL_Scheme):
 if __name__ == "__main__":
     main(sys.argv[1])
     parseLinesOfCode(getLinesOfCode(), True)
+    os.system("cp userFuncsPermanent.py userFuncs.py")
