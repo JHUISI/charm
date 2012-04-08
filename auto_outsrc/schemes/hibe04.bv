@@ -1,5 +1,5 @@
 name := hibe_bb04
-setting := symmetric
+setting := asymmetric
 
 BEGIN :: types
 mpk := list
