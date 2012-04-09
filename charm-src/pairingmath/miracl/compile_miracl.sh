@@ -83,9 +83,9 @@ ar r miracl.a mrflash.o mrfrnd.o mrdouble.o mrround.o mrbuild.o
 ar r miracl.a mrflsh1.o mrpi.o mrflsh2.o mrflsh3.o mrflsh4.o 
 ar r miracl.a mrbrick.o mrebrick.o mrec2m.o mrgf2m.o mrmuldv.o mrshs512.o
 #ar r miracl.a big.o zzn.o zzn2.o zzn3.o zzn6a.o ecn.o ecn3.o ec2.o flash.o crt.o mnt_pair.o 
-cp miracl.a miracl-mnt.a
+#cp miracl.a miracl-mnt.a
 cp miracl.a miracl-kss.a
-ar r miracl-mnt.a big.o zzn.o zzn2.o zzn3.o zzn6a.o ecn.o ecn3.o ec2.o flash.o crt.o mnt_pair.o 
+ar r miracl.a big.o zzn.o zzn2.o zzn3.o zzn6a.o ecn.o ecn3.o ec2.o flash.o crt.o mnt_pair.o 
 ar r miracl-kss.a big.o zzn.o zzn3.o zzn6.o zzn18.o ecn.o ecn3.o ec2.o flash.o crt.o kss_pair.o
 
 rm mr*.o
