@@ -12,7 +12,13 @@
 #endif
 
 #include <map>
+#include <iostream>
 #include <sstream>
+#include <string>
+//using namespace std;
+
+//#include <iostream>
+//using std::ostream;
 
 #define ZR Big
 #define str(point) point.g
@@ -26,13 +32,15 @@ struct Element
 	G2 *g2;
 #endif
 	GT *gt;
-	string *str;
+	string *strPtr;
 };
 
 class CharmList
 {
 public:
-	CharmList(int size); // static list
+	CharmList(void); // static list
+	~CharmList();
+	// consider adding remove
 	void append(string str);
 	void append(ZR&);
 	void append(G1&);
@@ -40,12 +48,15 @@ public:
 	void append(G2&);
 #endif
 	void append(GT&);
-	Element get(int index);
-	int len(); // return length of lists
+	int length(); // return length of lists
 	void print();
-	~CharmList();
+	string printAtIndex(int index);
+
+	// overload some operators here
+	Element& get(int index);
+	Element& operator[](const int index);
+    friend ostream& operator<<(ostream&, const CharmList&);
 private:
-	int length; // tracks size of list
 	int cur_index;
 	map<int, Element> list;
 };
@@ -58,6 +69,7 @@ class PairingGroup
 {
 public:
 	PairingGroup(int);
+	~PairingGroup();
 	// generate random
 	void random(ZR&);
 	void random(G1&);
@@ -106,7 +118,6 @@ public:
 	void deserialize(ZR&, char *);
 	void deserialize(G1&, char *);
 	void deserialize(GT&, char *);
-	~PairingGroup();
 
 private:
 	PFC *pfcObject; // defined by above #defines SYMMETRIC or ASYMMETRIC (for now)

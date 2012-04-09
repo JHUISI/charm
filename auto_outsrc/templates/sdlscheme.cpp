@@ -1,8 +1,7 @@
 #include <iostream>
 #include <ctime>
-#include <map>
-#include <sstream>
 #include "sdlconfig.h"
+#include <sstream>
 
 using namespace std;
 
@@ -33,7 +32,7 @@ int main()
 
 	cout << "Pairing test " << str( group.pair(g1, g2) ) << endl;
 
-	CharmList s(1);
+	CharmList s;
 
 	cout << "\n\nPrint list..." << endl;
 	s.append(string("hello world my name is this."));
@@ -41,8 +40,13 @@ int main()
 	s.append(g1);
 	s.append(g2);
 
-
 	s.print();
+
+	stringstream ss("msg: ");
+	ss << "initalization complete!!!";
+	cout << ss.str() << endl;
+
+//	cout << s << endl;
 
 	return 0;
 }

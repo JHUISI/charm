@@ -1,11 +1,9 @@
+#include <sstream>
+#include <string>
 #include "sdlconfig.h"
 
-CharmList::CharmList(int size)
+CharmList::CharmList(void)
 {
-//	if (size >= 0) {
-//		length = size;
-//	}
-//	else length = 0; // default to dynamic list
 	// increases as elements are appended
 	cur_index = 0;
 }
@@ -14,7 +12,7 @@ CharmList::~CharmList()
 {
 	for(int i = 0; i < cur_index; i++)
 		if(list[i].type == Str_t) {
-			delete list[i].str;
+			delete list[i].strPtr;
 		}
 		else if(list[i].type == ZR_t) {
 			delete list[i].zr;
@@ -33,7 +31,7 @@ void CharmList::append(string str)
 
 	// init elem here
 	elem.type = Str_t;
-	elem.str  = new string(str);
+	elem.strPtr  = new string(str);
 
 	list[cur_index] = elem;
 	cur_index++;
@@ -59,6 +57,7 @@ void CharmList::append(G1 & g1)
 	cur_index++;
 }
 
+#ifdef ASYMMETRIC
 void CharmList::append(G2 & g2)
 {
 	Element elem;
@@ -68,16 +67,48 @@ void CharmList::append(G2 & g2)
 	list[cur_index] = elem;
 	cur_index++;
 }
+#endif
 
-Element CharmList::get(int index)
+void CharmList::append(GT & gt)
 {
-	if(index >= 0 && index < cur_index) {
-		t = list[index].type;
+	Element elem;
+	elem.type = GT_t;
+	elem.gt   = new GT(gt);
 
+	list[cur_index] = elem;
+	cur_index++;
+}
+
+Element& CharmList::get(int index)
+{
+	int len = (int) list.size();
+	if(index >= 0 && index < len) {
 		return list[index];
 	}
 }
 
+Element& CharmList::operator[](const int index)
+{
+	int len = (int) list.size();
+	if(index >= 0 && index < len) {
+		return list[index];
+	}
+}
+
+int CharmList::length()
+{
+	return (int) list.size();
+}
+
+ostream& operator<<(ostream& s, const CharmList& cList)
+{
+	CharmList cList2 = cList;
+	for(int i = 0; i < cList2.length(); i++) {
+		s << i << ": " << cList2.printAtIndex(i) << endl;
+	}
+
+	return s;
+}
 
 void CharmList::print()
 {
@@ -85,7 +116,7 @@ void CharmList::print()
 		Type t = list[i].type;
 		cout << i << ": ";
 		if(t == Str_t) {
-			cout << *list[i].str << endl;
+			cout << *list[i].strPtr << endl;
 		}
 		else if(t == ZR_t) {
 			cout << *list[i].zr << endl;
@@ -98,11 +129,50 @@ void CharmList::print()
 			cout << list[i].g2->g << endl;
 		}
 #endif
+		else if(t == GT_t) {
+			cout << list[i].gt->g << endl;
+		}
 		else {
 			cout << "invalid type" << endl;
 		}
 	}
 }
+
+string CharmList::printAtIndex(int index)
+{
+	string ss2;
+	int i;
+
+//	string s = ss2.strPtr();
+	if(index >= 0 && index < (int) list.size()) {
+		i = index;
+		Type t = list[i].type;
+		if(t == Str_t) {
+			ss2.append(*list[i].strPtr);
+		}
+		else if(t == ZR_t) {
+			ss2.append("0");
+//			ss << *list[i].zr;
+//			return ss.strPtr();
+		}
+		else if(t == G1_t) {
+//			ss2 << list[i].g1->g;
+		}
+// #ifdef ASYMMETRIC
+		else if(t == G2_t) {
+//			ss2 << list[i].g2->g;
+		}
+//#endif
+		else if(t == GT_t) {
+//			ss2 << list[i].gt->g;
+		}
+		else {
+			ss2.append("invalid type");
+		}
+	}
+	return ss2;
+}
+
 
 // defines the PairingGroup class
 
@@ -175,8 +245,10 @@ GT PairingGroup::pair(G1 & g, G2 & h)
 	return gt;
 }
 
+// G2 PairingGroup::hashListToG2(CharmList & items)
 G2 PairingGroup::hashStringToG2(char *s)
 {
+//	for(int i = 0; i < items.length())
 	G2 g2;
 	pfcObject->hash_and_map(g2, s);
 	return g2;

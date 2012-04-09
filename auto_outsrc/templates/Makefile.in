@@ -7,7 +7,7 @@ NAME    := my_test
 # CURVE := ssp 
 CURVE   := mnt
 
-OBJECTS	:= $(SDL_SRC).o group.o 
+OBJECTS	:= group.o $(SDL_SRC).o 
 LIB     := miracl-$(CURVE).a
  
 # link SDL object file with miracl lib 
