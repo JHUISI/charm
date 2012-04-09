@@ -49,6 +49,10 @@ pythonDefinedFuncs = [lenFuncName]
 charmImportFuncs = []
 charmImportFuncs.append("from charm import *")
 charmImportFuncs.append("from toolbox import *")
+charmImportFuncs.append("from toolbox.pairinggroup import *")
+charmImportFuncs.append("from toolbox.secretutil import SecretUtil")
 charmImportFuncs.append("from schemes import *")
 charmImportFuncs.append("from math import *")
 charmImportFuncs.append("from charm.pairing import hash as SHA1")
+
+userGlobalsFuncName = "getUserGlobals"

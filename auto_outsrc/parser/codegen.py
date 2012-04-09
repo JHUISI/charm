@@ -28,8 +28,12 @@ def writeCurrentNumTabsIn(outputFile):
 def addImportLines():
     global setupFile, transformFile, decOutFile, userFuncsFile
 
+    userFuncsLibName = userFuncsFileName
+    if (userFuncsLibName.endswith(pySuffix) == True):
+        userFuncsLibName = userFuncsLibName[0:(len(userFuncsLibName) - len(pySuffix))]
+
     pythonImportLines = ""
-    pythonImportLines += "from " + str(userFuncsFileName) + " import *\n"
+    pythonImportLines += "from " + str(userFuncsLibName) + " import *\n"
 
     setupFile.write(pythonImportLines)
     transformFile.write(pythonImportLines)
@@ -53,7 +57,7 @@ def addImportLines():
     userFuncsFile.write(pythonImportLines)
 
 def addGroupObjGlobalVar():
-    global setupFile, transformFile, decOutFile
+    global setupFile, transformFile, decOutFile, userFuncsFile
 
     if ( (type(groupObjName) is not str) or (len(groupObjName) == 0) ):
         sys.exit("addGroupObjGlobalVar in codegen.py:  groupObjName in config.py is invalid.")
@@ -64,9 +68,13 @@ def addGroupObjGlobalVar():
 
     outputString = groupObjName + " = None\n\n"
 
-    setupFile.write(outputString)
-    transformFile.write(outputString)
-    decOutFile.write(outputString)
+    #setupFile.write(outputString)
+    #transformFile.write(outputString)
+    #decOutFile.write(outputString)
+
+    outputString = ""
+    outputString += groupObjName + "UserFuncs = None\n\n"
+    userFuncsFile.write(outputString)
 
 def isFunctionStart(binNode):
     if (binNode.type != ops.BEGIN):
@@ -93,7 +101,7 @@ def getFuncNameFromBinNode(binNode):
 
     return funcNameWhole[len(DECL_FUNC_HEADER):len(funcNameWhole)]
 
-def writeFunctionEnd_Python(outputFile, functionName):
+def writeFunctionEnd_Python(outputFile, functionName, retainGlobals):
     global returnValues
 
     outputString = ""
@@ -106,37 +114,46 @@ def writeFunctionEnd_Python(outputFile, functionName):
         sys.exit("writeFunctionEnd_Python in codegen.py:  could not obtain function's output variables from getVarDeps() on VarInfo obj.")
 
     outputVariablesString = ""
+    numOutputVariables = 0
 
     if (len(outputVariables) > 0):
         outputVariablesString += "("
         for outputVariable in outputVariables:
-            outputVariablesString += outputVariable + ", "
+            if ( (retainGlobals == True) or (outputVariable not in globalVarNames) ):
+                outputVariablesString += outputVariable + ", "
+                numOutputVariables += 1
         outputVariablesString = outputVariablesString[0:(len(outputVariablesString) - len(", "))]
         outputVariablesString += ")"
-
-    outputString += "\treturn output"
-    #outputString += outputVariablesString
-    outputString += "\n\n"
 
     if (functionName in returnValues):
         sys.exit("writeFunctionEnd_Python in codegen.py:  function name passed in is already in returnValues.")
 
-    returnValues[functionName] = outputVariablesString
+    if (numOutputVariables > 0):
+        returnValues[functionName] = outputVariablesString
+        outputString += "\treturn output\n"
+    else:
+        returnValues[functionName] = ""
 
+    outputString += "\n"
     outputFile.write(outputString)
 
 def writeGlobalVarDecls(outputFile, functionName):
     outputString = ""
 
     for varName in globalVarNames:
-        if (varName in assignInfo[functionName]):
+        if (varName not in varNamesToFuncs_Assign):
+            print(varName)
+            sys.exit("writeGlobalVarDecls in codegen.py:  current global variable name is not in varNamesToFuncs_Assign.")
+
+        funcsInWhichThisVarHasAssignment = varNamesToFuncs_Assign[varName]
+        if (functionName in funcsInWhichThisVarHasAssignment):
             outputString += "\tglobal " + varName + "\n"
 
     outputString += "\n"
 
     outputFile.write(outputString)
 
-def writeFunctionDecl_Python(outputFile, functionName):
+def writeFunctionDecl_Python(outputFile, functionName, toWriteGlobalVarDecls, retainGlobals):
     outputString = ""
 
     inputVariables = None
@@ -150,7 +167,8 @@ def writeFunctionDecl_Python(outputFile, functionName):
 
     if (len(inputVariables) > 0):
         for inputVariable in inputVariables:
-            inputVariablesString += inputVariable + ", "
+            if ( (retainGlobals == True) or (inputVariable not in globalVarNames) ):
+                inputVariablesString += inputVariable + ", "
         inputVariablesString = inputVariablesString[0:(len(inputVariablesString) - len(", "))]
 
     outputString += "def "
@@ -161,7 +179,8 @@ def writeFunctionDecl_Python(outputFile, functionName):
 
     outputFile.write(outputString)
 
-    writeGlobalVarDecls(outputFile, functionName)
+    if (toWriteGlobalVarDecls == True):
+        writeGlobalVarDecls(outputFile, functionName)
 
 def writeFunctionDecl_CPP(outputFile, functionName):
     pass
@@ -170,12 +189,12 @@ def writeFunctionDecl(functionName):
     global setupFile, transformFile, decOutFile
 
     if (currentFuncName == transformFunctionName):
-        writeFunctionDecl_Python(transformFile, functionName)
+        writeFunctionDecl_Python(transformFile, functionName, False, True)
     elif (currentFuncName == decOutFunctionName):
         #writeFunctionDecl_CPP(decOutFile, functionName)
-         writeFunctionDecl_Python(decOutFile, functionName)
+         writeFunctionDecl_Python(decOutFile, functionName, False, True)
     else:
-        writeFunctionDecl_Python(setupFile, functionName)
+        writeFunctionDecl_Python(setupFile, functionName, True, False)
 
 def writeFunctionEnd_CPP(outputFile, functionName):
     return
@@ -184,12 +203,12 @@ def writeFunctionEnd(functionName):
     global setupFile, transformFile, decOutFile
 
     if (currentFuncName == transformFunctionName):
-        writeFunctionEnd_Python(transformFile, functionName)
+        writeFunctionEnd_Python(transformFile, functionName, True)
     elif (currentFuncName == decOutFunctionName):
         #writeFunctionEnd_CPP(decOutFile, functionName)
-        writeFunctionEnd_Python(decOutFile, functionName)
+        writeFunctionEnd_Python(decOutFile, functionName, True)
     else:
-        writeFunctionEnd_Python(setupFile, functionName)
+        writeFunctionEnd_Python(setupFile, functionName, False)
 
 def isForLoopStart(binNode):
     if (binNode.type == ops.FOR):
@@ -320,7 +339,9 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
         if ( (nodeName not in pythonDefinedFuncs) and (nodeName not in userFuncsList) ):
             userFuncsList.append(nodeName)
             userFuncsOutputString = ""
-            userFuncsOutputString += "def " + funcOutputString + ":\n" + "\treturn\n\n"
+            userFuncsOutputString += "def " + funcOutputString + ":\n"
+            userFuncsOutputString += "\t" + userGlobalsFuncName + "()\n"
+            userFuncsOutputString += "\treturn\n\n"
             userFuncsFile.write(userFuncsOutputString)
         return funcOutputString
     elif ( (node.type == ops.ON) and (node.left.type == ops.PROD) ):
@@ -504,6 +525,9 @@ def addTypeDeclToGlobalVars(binNode):
     if (varName.find(LIST_INDEX_SYMBOL) != -1):
         sys.exit("addTypeDeclToGlobalVars in codegen.py:  variable name in types section has # sign in it.")
 
+    if (varName not in varNamesToFuncs_Assign):
+        return
+
     if ( (varName not in globalVarNames) and (varName != inputKeyword) and (varName != outputKeyword) ):
         globalVarNames.append(varName)
 
@@ -521,9 +545,9 @@ def writeGlobalVars_CPP(outputFile):
 
 def writeGlobalVars():
     writeGlobalVars_Python(setupFile)
-    writeGlobalVars_Python(transformFile)
+    #writeGlobalVars_Python(transformFile)
     #writeGlobalVars_CPP(decOutFile)
-    writeGlobalVars_Python(decOutFile)
+    #writeGlobalVars_Python(decOutFile)
 
 def writeSDLToFiles(astNodes):
     global currentFuncName, numTabsIn, setupFile, transformFile, lineNoBeingProcessed
@@ -543,14 +567,15 @@ def writeSDLToFiles(astNodes):
             currentFuncName = NONE_FUNC_NAME
             writeGlobalVars()
             setupFile.write("\n")
-            transformFile.write("\n")
-            decOutFile.write("\n")
+            #transformFile.write("\n")
+            #decOutFile.write("\n")
 
         if (currentFuncName == NONE_FUNC_NAME):
             continue
 
         if (currentFuncName == TYPES_HEADER):
             addTypeDeclToGlobalVars(astNode)
+            #pass
         elif (isForLoopStart(astNode) == True):
             writeForLoopDecl(astNode)
             numTabsIn += 1
@@ -590,7 +615,7 @@ def checkNumUserSuppliedArgs(userSuppliedArgs, funcName):
     if (len(userSuppliedArgs) != len(inputVariables)):
         sys.exit("checkNumUserSuppliedArgs in codegen.py:  error in number of user-supplied args for function currently being processed.")
 
-def getStringOfInputArgsToFunc(funcName):
+def getStringOfInputArgsToFunc(funcName, retainGlobals):
     inputVariables = []
 
     try:
@@ -604,10 +629,12 @@ def getStringOfInputArgsToFunc(funcName):
         return outputString
 
     for inputVar in inputVariables:
-        outputString += inputVar + ", "
+        if ( (retainGlobals == True) or (inputVar not in globalVarNames) ):
+            outputString += inputVar + ", "
 
     lenOutputString = len(outputString)
-    outputString = outputString[0:(lenOutputString - len(", "))]
+    if (lenOutputString > 0):
+        outputString = outputString[0:(lenOutputString - len(", "))]
 
     return outputString
 
@@ -641,7 +668,10 @@ def writeFuncsCalledFromMain(functionOrder, argsToFirstFunc):
             checkNumUserSuppliedArgs(argsToFirstFunc, funcName)
             outputString += getStringOfFirstFuncArgs(argsToFirstFunc)
         else:
-            outputString += getStringOfInputArgsToFunc(funcName)
+            if ( (funcName == transformFunctionName) or (funcName == decOutFunctionName) ):
+                outputString += getStringOfInputArgsToFunc(funcName, True)
+            else:
+                outputString += getStringOfInputArgsToFunc(funcName, False)                
         outputString += ")\n"
         counter += 1
 
@@ -654,6 +684,7 @@ def writeMainFuncOfSetup():
     outputString += "if __name__ == \"__main__\":\n"
 
     outputString += writeGroupObjToMain()
+    #outputString += "\tgetUserFuncsGlobals()\n\n"
     outputString += writeFuncsCalledFromMain(setupFunctionOrder, argsToFirstSetupFunc)
 
     setupFile.write(outputString)
@@ -690,10 +721,26 @@ def getGlobalVarNames():
         listForThisVar = varNamesToFuncs_All[varName]
         if (len(listForThisVar) == 0):
             sys.exit("getGlobalVarNames in codegen.py:  list extracted from varNamesToFuncs_All for current variable is empty.")
-        if (len(listForThisVar) == 1):
+        if (transformFunctionName in listForThisVar):
+            listForThisVar.remove(transformFunctionName)
+        if (decOutFunctionName in listForThisVar):
+            listForThisVar.remove(decOutFunctionName)
+        if (len(listForThisVar) <= 1):
             continue
         if ( (varName not in globalVarNames) and (varName != inputKeyword) and (varName != outputKeyword) ):
             globalVarNames.append(varName)
+
+def addGetGlobalsToUserFuncs():
+    global userFuncsFile
+
+    outputString = ""
+
+    outputString += "def " + userGlobalsFuncName + "():\n"
+    outputString += "\tglobal " + groupObjName + "UserFuncs\n\n"
+    outputString += "\tif (" + groupObjName + "UserFuncs == None):\n"
+    outputString += "\t\t" + groupObjName + "UserFuncs = PairingGroup(" + groupArg + ")\n"
+
+    userFuncsFile.write(outputString)
 
 def main(SDL_Scheme):
     global setupFile, transformFile, decOutFile, userFuncsFile, assignInfo, varNamesToFuncs_All
@@ -728,6 +775,7 @@ def main(SDL_Scheme):
     addGroupObjGlobalVar()
     writeSDLToFiles(astNodes)
     writeMainFuncs()
+    addGetGlobalsToUserFuncs()
 
     setupFile.close()
     transformFile.close()
