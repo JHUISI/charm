@@ -12,10 +12,11 @@
 #endif
 
 #include <map>
+#include <sstream>
 
 #define ZR Big
 #define str(point) point.g
-enum Type { ZR_t = 0, G1_t, G2_t, GT_t };
+enum Type { ZR_t = 0, G1_t, G2_t, GT_t, Str_t };
 struct Element
 {
 	Type type;
@@ -25,15 +26,14 @@ struct Element
 	G2 *g2;
 #endif
 	GT *gt;
-	char *str;
+	string *str;
 };
 
 class CharmList
 {
 public:
-	CharmList(void); 	 // dynamic list
 	CharmList(int size); // static list
-	void append(char *string);
+	void append(string str);
 	void append(ZR&);
 	void append(G1&);
 #ifdef ASYMMETRIC
@@ -46,6 +46,7 @@ public:
 	~CharmList();
 private:
 	int length; // tracks size of list
+	int cur_index;
 	map<int, Element> list;
 };
 

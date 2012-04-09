@@ -33,6 +33,16 @@ int main()
 
 	cout << "Pairing test " << str( group.pair(g1, g2) ) << endl;
 
+	CharmList s(1);
+
+	cout << "\n\nPrint list..." << endl;
+	s.append(string("hello world my name is this."));
+	s.append(c);
+	s.append(g1);
+	s.append(g2);
+
+
+	s.print();
 
 	return 0;
 }

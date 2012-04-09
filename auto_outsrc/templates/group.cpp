@@ -1,5 +1,111 @@
 #include "sdlconfig.h"
 
+CharmList::CharmList(int size)
+{
+//	if (size >= 0) {
+//		length = size;
+//	}
+//	else length = 0; // default to dynamic list
+	// increases as elements are appended
+	cur_index = 0;
+}
+
+CharmList::~CharmList()
+{
+	for(int i = 0; i < cur_index; i++)
+		if(list[i].type == Str_t) {
+			delete list[i].str;
+		}
+		else if(list[i].type == ZR_t) {
+			delete list[i].zr;
+		}
+		else if(list[i].type == G1_t) {
+			delete list[i].g1;
+		}
+		else if(list[i].type == G2_t) {
+			delete list[i].g2;
+		}
+}
+
+void CharmList::append(string str)
+{
+	Element elem;
+
+	// init elem here
+	elem.type = Str_t;
+	elem.str  = new string(str);
+
+	list[cur_index] = elem;
+	cur_index++;
+}
+
+void CharmList::append(ZR & zr)
+{
+	Element elem;
+	elem.type = ZR_t;
+	elem.zr   = new ZR(zr);
+
+	list[cur_index] = elem;
+	cur_index++;
+}
+
+void CharmList::append(G1 & g1)
+{
+	Element elem;
+	elem.type = G1_t;
+	elem.g1   = new G1(g1);
+
+	list[cur_index] = elem;
+	cur_index++;
+}
+
+void CharmList::append(G2 & g2)
+{
+	Element elem;
+	elem.type = G2_t;
+	elem.g2   = new G2(g2);
+
+	list[cur_index] = elem;
+	cur_index++;
+}
+
+Element CharmList::get(int index)
+{
+	if(index >= 0 && index < cur_index) {
+		t = list[index].type;
+
+		return list[index];
+	}
+}
+
+
+void CharmList::print()
+{
+	for(int i = 0; i < cur_index; i++) {
+		Type t = list[i].type;
+		cout << i << ": ";
+		if(t == Str_t) {
+			cout << *list[i].str << endl;
+		}
+		else if(t == ZR_t) {
+			cout << *list[i].zr << endl;
+		}
+		else if(t == G1_t) {
+			cout << list[i].g1->g << endl;
+		}
+#ifdef ASYMMETRIC
+		else if(t == G2_t) {
+			cout << list[i].g2->g << endl;
+		}
+#endif
+		else {
+			cout << "invalid type" << endl;
+		}
+	}
+}
+
+// defines the PairingGroup class
+
 PairingGroup::PairingGroup(int sec_level)
 {
 	cout << "Initializing underlying curve." << endl;
