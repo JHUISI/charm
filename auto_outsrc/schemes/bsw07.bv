@@ -70,7 +70,8 @@ C    := h ^ s
 
 BEGIN :: for
 for{y := 0, Y}
-share#y := sh#attrs#y
+y1 := attrs#y
+share#y := sh#y1
 Cr#y := g ^ share#y
 Cpr#y := (H(attrs#y, G2))^share#y
 END :: for
