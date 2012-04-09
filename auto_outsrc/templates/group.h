@@ -11,10 +11,44 @@
 #include "pairing_1.h"
 #endif
 
+#include <map>
 
 #define ZR Big
 #define str(point) point.g
-// enum Type { ZR_t = 0, G1_t, G2_t, GT_t };
+enum Type { ZR_t = 0, G1_t, G2_t, GT_t };
+struct Element
+{
+	Type type;
+	ZR *zr;
+	G1 *g1;
+#ifdef ASYMMETRIC
+	G2 *g2;
+#endif
+	GT *gt;
+	char *str;
+};
+
+class CharmList
+{
+public:
+	CharmList(void); 	 // dynamic list
+	CharmList(int size); // static list
+	void append(char *string);
+	void append(ZR&);
+	void append(G1&);
+#ifdef ASYMMETRIC
+	void append(G2&);
+#endif
+	void append(GT&);
+	Element get(int index);
+	int len(); // return length of lists
+	void print();
+	~CharmList();
+private:
+	int length; // tracks size of list
+	map<int, Element> list;
+};
+
 
 /* @description: wrapper around the MIRACL provided pairing-friendly class */
 /* PairingGroup conforms to Charm-C++ API.
@@ -76,3 +110,4 @@ public:
 private:
 	PFC *pfcObject; // defined by above #defines SYMMETRIC or ASYMMETRIC (for now)
 };
+
