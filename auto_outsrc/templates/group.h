@@ -89,13 +89,9 @@ public:
 #endif
 
 	Big order(); // returns the order of the group
-//
-//	ZR hashStringToZR(char *);
-//	G1 hashStringToG1(char *);
-//	G2 hashStringToG2(char *);
 
 //	// hash -- not done
-//	ZR hashListToZR(CharmList&);
+	ZR hashListToZR(CharmList&);
 //	G1 hashListToG1(CharmList&);
 //	G2 hashListToG2(CharmList&);
 

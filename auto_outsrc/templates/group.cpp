@@ -293,21 +293,41 @@ GT PairingGroup::exp(GT & g, ZR & r)
 	return l;
 }
 
-//ZR PairingGroup::hashStringToZR(char *s)
-//{
-//	return pfcObject->hash_to_group(s);
-//}
-//
-//G1 PairingGroup::hashStringToG1(char *s)
-//{
-//	G1 g1;
-//	pfcObject->hash_and_map(g1, s);
-//	return g1;
-//}
+ZR PairingGroup::hashListToZR(CharmList & list)
+{
+	int len = list.length();
+	pfcObject->start_hash();
+	for(int i = 0; i < len; i++) {
+		Element e = list[i];
+		if(e.type == Str_t) {
+			ZR tmp = pfcObject->hash_to_group( (char *) e.strPtr->c_str());
+			pfcObject->add_to_hash(tmp);
+		}
+		else if(e.type == ZR_t)
+			pfcObject->add_to_hash(*e.zr);
+		else if(e.type == G1_t)
+			pfcObject->add_to_hash(*e.g1);
+		else if(e.type == G2_t)
+			pfcObject->add_to_hash(*e.g2);
+		else if(e.type == GT_t)
+			pfcObject->add_to_hash(*e.gt);
+	}
 
-// TODO: multi-element hash. make sure identical to Charm-Python hash
-//ZR PairingGroup::hash(CharmList& c, Type t)
-//{
-//}
+	ZR result = pfcObject->finish_hash_to_group();
+	return result;
+}
+
+G1 PairingGroup::hashListToG1(CharmList & list)
+{
+	// follow above approach but hash and map to G1 instead
+	//	pfcObject->hash_and_map(g1, s);
+}
+
+#ifdef ASYMMETRIC
+G2 PairingGroup::hashListToG2(CharmList & list)
+{
+	// follow above approach but hash and map to G2 instead
+}
+#endif
 
 
