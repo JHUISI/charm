@@ -61,10 +61,13 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
 
     SDLLinesForKeygen.append("len" + keygenOutputElem + blindingSuffix + " := len(" + keygenOutputElem + ")\n")
     #SDLLinesForKeygen += keygenOutputElem + blindingSuffix + " := init(list)\n"
-    SDLLinesForKeygen.append("BEGIN :: for\n")
-    SDLLinesForKeygen.append("for{" + blindingLoopVar + " := 0, len" + keygenOutputElem + blindingSuffix + "}\n")
+    #SDLLinesForKeygen.append("BEGIN :: for\n")
+    SDLLinesForKeygen.append("BEGIN :: forall\n")
+    #SDLLinesForKeygen.append("for{" + blindingLoopVar + " := 0, len" + keygenOutputElem + blindingSuffix + "}\n")
+    SDLLinesForKeygen.append("forall{" + blindingLoopVar + " := " + keygenOutputElem + "}\n")
     SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + LIST_INDEX_SYMBOL + blindingLoopVar + " := " + keygenOutputElem + LIST_INDEX_SYMBOL + blindingLoopVar + " ^ (1/" + keygenBlindingExponent + ")\n")
-    SDLLinesForKeygen.append("END :: for\n")
+    #SDLLinesForKeygen.append("END :: for\n")
+    SDLLinesForKeygen.append("END :: forall\n")
     varsToBlindList.remove(keygenOutputElem)
     if (keygenOutputElem in varNamesForListDecls):
         sys.exit("blindKeygenOutputElement in keygen.py attempted to add duplicate keygenOutputElem to varNamesForListDecls -- 2 of 2.")

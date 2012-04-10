@@ -1,12 +1,7 @@
-from charm import *
-from toolbox import *
-from toolbox.pairinggroup import *
+from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair
 from toolbox.secretutil import SecretUtil
-from toolbox.ABEnc import *
 from toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from toolbox.iterate import dotprod2
-from schemes import *
-from math import *
 from charm.pairing import hash as SHA1
 
 groupObjUserFuncs = None
@@ -30,6 +25,10 @@ def SymEnc(s_sesskey, M):
 	getUserGlobals()
 	cipher = AuthenticatedCryptoAbstraction(s_sesskey)
 	return cipher.encrypt(M) 
+
+def GetString(attrsy):
+	getUserGlobals()
+	return attrsy.getAttribute()
 
 def prune(policy, S):
 	getUserGlobals()
