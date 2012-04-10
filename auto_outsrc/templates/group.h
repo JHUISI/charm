@@ -16,11 +16,6 @@
 
 #define ZR Big
 #define convert_str(point) point.g
-// #define ElementToZR(a)
-// #define ElementToStr(a)
-// #define ElementToG1(a)
-// #define ElementToG2(a)
-// #define ElementToGT(a)
 enum Type { ZR_t = 0, G1_t, G2_t, GT_t, Str_t, None_t };
 //struct Element
 //{
@@ -51,6 +46,9 @@ public:
 	Element(G1&);
 	Element(G2&);
 	Element(GT&);
+
+	static string serialize(PairingGroup&, Element&);
+//	Element deserialize(PairingGroup& pg);
 
     friend ostream& operator<<(ostream&, const Element&);
 private:

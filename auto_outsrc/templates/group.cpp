@@ -72,6 +72,12 @@ ostream& operator<<(ostream& s, const Element& e)
 	return s;
 }
 
+string Element::serialize(PairingGroup & group, Element e)
+{
+	// blah
+	if(type == str)
+}
+
 // CharmList implementation
 
 CharmList::CharmList(void)
