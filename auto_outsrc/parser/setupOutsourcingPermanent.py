@@ -120,7 +120,6 @@ def transform(ct):
 	coeff = getCoefficients(policy)
 	Y = len(attrs)
 	lam_func1 = lambda a,b,c,d,e,f: (pair((b[a] ** c[a]), d[a]) * pair((e[a] ** c[a]), f[a]))
-	print(attrs)
 	A = dotprod2(range(attrs[1],Y), lam_func1, y, Cr, coeff, Dj, Djp, Cpr)
 	result0 = (pair(C, D) * A)
 	T0 = Ctl
