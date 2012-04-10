@@ -27,6 +27,7 @@ Cr = {}
 Cpr = {}
 DjBlinded = {}
 DjpBlinded = {}
+skBlinded = {}
 
 def setup():
 	global pk
@@ -55,6 +56,7 @@ def keygen(S):
 	global Djp
 	global DjBlinded
 	global DjpBlinded
+	global skBlinded
 
 	input = [pk, mk, S]
 	r = groupObj.random(ZR)
@@ -109,10 +111,35 @@ def encrypt(M, policy_str):
 	output = ct
 	return output
 
+def transform(ct):
+	input = [pk, skBlinded, ct]
+	policy_str, Ctl, C, Cr, Cpr, T1 = ct
+	S, D, Dj, Djp = skBlinded
+	policy = createPolicy(policy_str)
+	attrs = prune(policy, S)
+	coeff = getCoefficients(policy)
+	Y = len(attrs)
+	lam_func1 = lambda a,b,c,d,e,f: (pair((b[a] ** c[a]), d[a]) * pair((e[a] ** c[a]), f[a]))
+	print(attrs)
+	A = dotprod2(range(attrs[1],Y), lam_func1, y, Cr, coeff, Dj, Djp, Cpr)
+	result0 = (pair(C, D) * A)
+	T0 = Ctl
+	T2 = result0
+	partCT = [T0, T1, T2]
+	output = partCT
+	return output
+
 if __name__ == "__main__":
 	global groupObj
 	groupObj = PairingGroup('SS512')
 
+	S = ['ONE', 'TWO', 'THREE']
+	#M = groupObj.random(GT)
+	M = "balls on fire"
+	policy_str = '((four or three) and (three or one))'
+
 	setup()
 	(zz, skBlinded) = keygen(S)
 	(ct) = encrypt(M, policy_str)
+
+	(partCT) = transform(ct)
