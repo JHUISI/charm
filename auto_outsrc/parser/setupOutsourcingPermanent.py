@@ -65,8 +65,9 @@ def keygen(S):
 	Y = len(S)
 	for y in range(0, Y):
 		s_y = groupObj.random(ZR)
-		Dj[y] = (p0 * (groupObj.hash(S[y], G2) ** s_y))
-		Djp[y] = (g ** s_y)
+		y0 = S[y]
+		Dj[y0] = (p0 * (groupObj.hash(y0, G2) ** s_y))
+		Djp[y0] = (g ** s_y)
 	sk = [S, D, Dj, Djp]
 	zz = groupObj.random(ZR)
 	SBlinded = S
@@ -111,6 +112,12 @@ def encrypt(M, policy_str):
 	output = ct
 	return output
 
+def transformLambdaFunc(y, attrs, Cr, coeff, Dj, Djp, Cpr):
+	lambdaIndex = attrs[y]
+	firstTerm = (Cr[lambdaIndex] ** (-coeff[lambdaIndex]))
+	secondTerm = (Djp[lambdaIndex] ** coeff[lambdaIndex])
+	return pair(firstTerm, Dj[lambdaIndex]) * pair(secondTerm, Cpr[lambdaIndex])
+
 def transform(ct):
 	input = [pk, skBlinded, ct]
 	policy_str, Ctl, C, Cr, Cpr, T1 = ct
@@ -120,7 +127,9 @@ def transform(ct):
 	coeff = getCoefficients(policy)
 	Y = len(attrs)
 	lam_func1 = lambda a,b,c,d,e,f: (pair((b[a] ** c[a]), d[a]) * pair((e[a] ** c[a]), f[a]))
-	A = dotprod2(range(attrs[1],Y), lam_func1, y, Cr, coeff, Dj, Djp, Cpr)
+	#A = dotprod2(range(attrs[1],Y), lam_func1, y, Cr, coeff, Dj, Djp, Cpr)
+
+	A = dotprod2(range(0,Y), transformLambdaFunc, y, attrs, Cr, coeff, Dj, Djp, Cpr)
 	result0 = (pair(C, D) * A)
 	T0 = Ctl
 	T2 = result0
@@ -133,7 +142,6 @@ if __name__ == "__main__":
 	groupObj = PairingGroup('SS512')
 
 	S = ['ONE', 'TWO', 'THREE']
-	#M = groupObj.random(GT)
 	M = "balls on fire"
 	policy_str = '((four or three) and (three or one))'
 

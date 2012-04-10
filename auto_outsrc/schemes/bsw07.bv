@@ -46,8 +46,9 @@ Y := len(S)
 BEGIN :: for
 for{y := 0, Y}
 s_y := random(ZR)
-Dj#y := p0 * (H(S#y, G2)^s_y)
-Djp#y := g^s_y
+y0 := S#y
+Dj#y0 := p0 * (H(y0, G2)^s_y)
+Djp#y0 := g^s_y
 END :: for
 
 sk := list{S, D, Dj, Djp}

@@ -63,8 +63,9 @@ def keygen(S):
 	Y = len(S)
 	for y in range(0, Y):
 		s_y = groupObj.random(ZR)
-		Dj[y] = (p0 * (groupObj.hash(S[y], G2) ** s_y))
-		Djp[y] = (g ** s_y)
+		y0 = S[y]
+		Dj[y0] = (p0 * (groupObj.hash(y0, G2) ** s_y))
+		Djp[y0] = (g ** s_y)
 	sk = [S, D, Dj, Djp]
 	zz = groupObj.random(ZR)
 	SBlinded = S
