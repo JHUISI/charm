@@ -1,13 +1,8 @@
-from userFuncs import *
-from charm import *
-from toolbox import *
-from toolbox.pairinggroup import *
+from userFuncs import createPolicy, getAttributeList, calculateSharesDict, SymEnc, GetString, prune, getCoefficients, SymDec
+from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair
 from toolbox.secretutil import SecretUtil
-from toolbox.ABEnc import *
 from toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from toolbox.iterate import dotprod2
-from schemes import *
-from math import *
 from charm.pairing import hash as SHA1
 
 pk = {}
@@ -73,10 +68,10 @@ def keygen(S):
 	SBlinded = S
 	DBlinded = (D ** (1 / zz))
 	lenDjBlinded = len(Dj)
-	for y in range(0, lenDjBlinded):
+	for y in Dj:
 		DjBlinded[y] = (Dj[y] ** (1 / zz))
 	lenDjpBlinded = len(Djp)
-	for y in range(0, lenDjpBlinded):
+	for y in Djp:
 		DjpBlinded[y] = (Djp[y] ** (1 / zz))
 	skBlinded = [SBlinded, DBlinded, DjBlinded, DjpBlinded]
 	output = (zz, skBlinded)
@@ -104,16 +99,16 @@ def encrypt(M, policy_str):
 	C = (h ** s)
 	for y in range(0, Y):
 		y1 = attrs[y]
-		share[y] = sh[y1]
-		Cr[y] = (g ** share[y])
-		Cpr[y] = (groupObj.hash(attrs[y], G2) ** share[y])
+		share[y1] = sh[y1]
+		Cr[y1] = (g ** share[y1])
+		Cpr[y1] = (groupObj.hash(y1, G2) ** share[y1])
 	T1 = SymEnc(s_sesskey, M)
 	ct = [policy_str, Ctl, C, Cr, Cpr, T1]
 	output = ct
 	return output
 
 def transformLambdaFunc(y, attrs, Cr, coeff, Dj, Djp, Cpr):
-	lambdaIndex = attrs[y]
+	lambdaIndex = GetString(attrs[y])
 	firstTerm = (Cr[lambdaIndex] ** (-coeff[lambdaIndex]))
 	secondTerm = (Djp[lambdaIndex] ** coeff[lambdaIndex])
 	return pair(firstTerm, Dj[lambdaIndex]) * pair(secondTerm, Cpr[lambdaIndex])
@@ -126,10 +121,7 @@ def transform(ct):
 	attrs = prune(policy, S)
 	coeff = getCoefficients(policy)
 	Y = len(attrs)
-	lam_func1 = lambda a,b,c,d,e,f: (pair((b[a] ** c[a]), d[a]) * pair((e[a] ** c[a]), f[a]))
-	#A = dotprod2(range(attrs[1],Y), lam_func1, y, Cr, coeff, Dj, Djp, Cpr)
-
-	A = dotprod2(range(0,Y), transformLambdaFunc, y, attrs, Cr, coeff, Dj, Djp, Cpr)
+	A = dotprod2(range(0,Y), transformLambdaFunc, attrs, Cr, coeff, Dj, Djp, Cpr)
 	result0 = (pair(C, D) * A)
 	T0 = Ctl
 	T2 = result0
@@ -137,16 +129,29 @@ def transform(ct):
 	output = partCT
 	return output
 
+def decout(partCT, zz):
+	T0, T1, T2 = partCT
+	R = (T0 / (T2 ** zz))
+	s_sesskey = SHA1(R)
+	M = SymDec(s_sesskey, T1)
+	s = groupObj.hash([R, M], ZR)
+	output = M
+	return output
+
 if __name__ == "__main__":
-	global groupObj
+	#global groupObj
 	groupObj = PairingGroup('SS512')
 
-	S = ['ONE', 'TWO', 'THREE']
+	#S = ['ONE', 'TWO', 'THREE']
 	M = "balls on fire"
-	policy_str = '((four or three) and (three or one))'
+	policy_str = '((four or three) and (two or one))'
 
 	setup()
-	(zz, skBlinded) = keygen(S)
+	(zz, skBlinded) = keygen(['ONE', 'TWO', 'THREE'])
 	(ct) = encrypt(M, policy_str)
 
-	(partCT) = transform(ct)
+	#(partCT) = transform(ct)
+
+	#(M) = decout(partCT, zz)
+
+	#print(M)

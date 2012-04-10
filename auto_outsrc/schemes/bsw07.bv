@@ -72,9 +72,9 @@ C    := h ^ s
 BEGIN :: for
 for{y := 0, Y}
 y1 := attrs#y
-share#y := sh#y1
-Cr#y := g ^ share#y
-Cpr#y := (H(attrs#y, G2))^share#y
+share#y1 := sh#y1
+Cr#y1 := g ^ share#y1
+Cpr#y1 := (H(y1, G2))^share#y1
 END :: for
 
 ct := list{policy_str, Ctl, C, Cr, Cpr}

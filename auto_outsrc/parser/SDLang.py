@@ -40,6 +40,7 @@ LIST_INDEX_END_SYMBOL = "?"
 IF_BRANCH_HEADER = "if"
 ELSE_BRANCH_HEADER = "else"
 FOR_LOOP_HEADER = "for"
+FORALL_LOOP_HEADER = "forall"
 TYPES_HEADER = "types"
 LIST_TYPE = "list"
 OTHER_TYPES = ['list', 'object']

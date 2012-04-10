@@ -71,10 +71,10 @@ def keygen(S):
 	SBlinded = S
 	DBlinded = (D ** (1 / zz))
 	lenDjBlinded = len(Dj)
-	for y in range(0, lenDjBlinded):
+	for y in Dj:
 		DjBlinded[y] = (Dj[y] ** (1 / zz))
 	lenDjpBlinded = len(Djp)
-	for y in range(0, lenDjpBlinded):
+	for y in Djp:
 		DjpBlinded[y] = (Djp[y] ** (1 / zz))
 	skBlinded = [SBlinded, DBlinded, DjBlinded, DjpBlinded]
 	output = (zz, skBlinded)
@@ -102,9 +102,9 @@ def encrypt(M, policy_str):
 	C = (h ** s)
 	for y in range(0, Y):
 		y1 = attrs[y]
-		share[y] = sh[y1]
-		Cr[y] = (g ** share[y])
-		Cpr[y] = (groupObj.hash(attrs[y], G2) ** share[y])
+		share[y1] = sh[y1]
+		Cr[y1] = (g ** share[y1])
+		Cpr[y1] = (groupObj.hash(y1, G2) ** share[y1])
 	T1 = SymEnc(s_sesskey, M)
 	ct = [policy_str, Ctl, C, Cr, Cpr, T1]
 	output = ct

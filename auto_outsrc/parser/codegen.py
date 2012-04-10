@@ -211,14 +211,15 @@ def writeFunctionEnd(functionName):
         writeFunctionEnd_Python(setupFile, functionName, False)
 
 def isForLoopStart(binNode):
-    if (binNode.type == ops.FOR):
+    if ( (binNode.type == ops.FOR) or (binNode.type == ops.FORALL) ):
         return True
 
     return False
 
 def isForLoopEnd(binNode):
-    if ( (binNode.type == ops.END) and (binNode.left.attr == FOR_LOOP_HEADER) ):
-        return True
+    if (binNode.type == ops.END):
+        if ( (binNode.left.attr == FOR_LOOP_HEADER) or (binNode.left.attr == FORALL_LOOP_HEADER) ):
+            return True
 
     return False
 
@@ -338,8 +339,11 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
         funcOutputString += ")"
         if ( (nodeName not in pythonDefinedFuncs) and (nodeName not in userFuncsList) ):
             userFuncsList.append(nodeName)
+            funcOutputForUser = funcOutputString
+            funcOutputForUser = funcOutputForUser.replace("[", "")
+            funcOutputForUser = funcOutputForUser.replace("]", "")
             userFuncsOutputString = ""
-            userFuncsOutputString += "def " + funcOutputString + ":\n"
+            userFuncsOutputString += "def " + funcOutputForUser + ":\n"
             userFuncsOutputString += "\t" + userGlobalsFuncName + "()\n"
             userFuncsOutputString += "\treturn\n\n"
             userFuncsFile.write(userFuncsOutputString)
@@ -481,13 +485,22 @@ def writeForLoopDecl_Python(outputFile, binNode):
 
     outputString = ""
 
-    outputString += "for "
-    outputString += getAssignStmtAsString(binNode.left.left, None, None, None, False)
-    outputString += " in range("
-    outputString += getAssignStmtAsString(binNode.left.right, None, None, None, False)
-    outputString += ", "
-    outputString += getAssignStmtAsString(binNode.right, None, None, None, False)
-    outputString += "):\n"
+    if (binNode.type == ops.FOR):
+        outputString += "for "
+        outputString += getAssignStmtAsString(binNode.left.left, None, None, None, False)
+        outputString += " in range("
+        outputString += getAssignStmtAsString(binNode.left.right, None, None, None, False)
+        outputString += ", "
+        outputString += getAssignStmtAsString(binNode.right, None, None, None, False)
+        outputString += "):\n"
+    elif (binNode.type == ops.FORALL):
+        outputString += "for "
+        outputString += getAssignStmtAsString(binNode.left.left, None, None, None, False)
+        outputString += " in "
+        outputString += getAssignStmtAsString(binNode.left.right, None, None, None, False)
+        outputString += ":\n"
+    else:
+        sys.exit("writeForLoopDecl_Python in codegen.py:  encountered node that is neither type ops.FOR nor ops.FORALL.")
 
     outputFile.write(outputString)
 
