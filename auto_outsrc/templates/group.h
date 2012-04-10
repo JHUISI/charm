@@ -1,5 +1,6 @@
 
 #define AES_SECURITY 80
+#define MAX_LEN 256
 
 #ifdef ASYMMETRIC
 #define MR_PAIRING_MNT	// AES-80 security
@@ -90,10 +91,10 @@ public:
 
 	Big order(); // returns the order of the group
 
-//	// hash -- not done
+	// hash -- not done
 	ZR hashListToZR(CharmList&);
-//	G1 hashListToG1(CharmList&);
-//	G2 hashListToG2(CharmList&);
+	G1 hashListToG1(CharmList&);
+	G2 hashListToG2(CharmList&);
 
 	GT pair(G1&, G1&);
 	G1 mul(G1&, G1&);

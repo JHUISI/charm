@@ -32,18 +32,24 @@ int main()
 	GT gt = group.pair(g1, g2);
 	cout << "Pairing test " << convert_str(gt) << endl;
 
-	string str1 = "hello world my name is...";
+	string str1 = "hello world my name is....";
 
 	CharmList s;
 	s.append(str1);
 	s.append(c);
-	s.append(g1);
 	s.append(g2);
+	s.append(g1);
 
 	cout << "\nPrint list so far...\n";
 	cout << s << endl;
+
 	ZR zr2 = group.hashListToZR(s);
+	G1 h1  = group.hashListToG1(s);
+	G2 h3  = group.hashListToG2(s);
 	cout << "ZR zr2 := " << zr2 << endl;
+	cout << "G1 h1  := " << convert_str(h1) << endl;
+	cout << "G2 h3  := " << convert_str(h3) << endl;
+
 
 	return 0;
 }

@@ -293,6 +293,39 @@ GT PairingGroup::exp(GT & g, ZR & r)
 	return l;
 }
 
+// serialize helper methods for going from Big to bytes and back
+string bigToBytes(Big x)
+{
+	char c[MAX_LEN+1];
+	memset(c, 0, MAX_LEN);
+	int size = to_binary(x, MAX_LEN, c, FALSE);
+	string bytes(c, size);
+//	printf("bigToBytes before => ");
+//	_printf_buffer_as_hex((uint8_t *) bytes.c_str(), size);
+	stringstream ss;
+	ss << size << ":" << bytes << "\0";
+//	printf("bigToBytes after => ");
+//	_printf_buffer_as_hex((uint8_t *) ss.str().c_str(), ss.str().size());
+	return ss.str();
+}
+
+Big *bytesToBig(string str, int *counter)
+{
+	int pos = str.find_first_of(':');
+	int len = atoi( str.substr(0, pos).c_str() );
+	const char *elem = str.substr(pos+1, pos + len).c_str();
+//		cout << "pos of elem => " << pos << endl;
+//		cout << "elem => " << elem << endl;
+//	printf("bytesToBig before => ");
+//	_printf_buffer_as_hex((uint8_t *) elem, len);
+	Big x = from_binary(len, (char *) elem);
+//	cout << "Big => " << x << endl;
+	Big *X  = new Big(x);
+	*counter  = pos + len + 1;
+	return X;
+}
+
+
 ZR PairingGroup::hashListToZR(CharmList & list)
 {
 	int len = list.length();
@@ -319,14 +352,57 @@ ZR PairingGroup::hashListToZR(CharmList & list)
 
 G1 PairingGroup::hashListToG1(CharmList & list)
 {
-	// follow above approach but hash and map to G1 instead
-	//	pfcObject->hash_and_map(g1, s);
+	int len = list.length();
+	pfcObject->start_hash();
+	for(int i = 0; i < len; i++) {
+		Element e = list[i];
+		if(e.type == Str_t) {
+			ZR tmp = pfcObject->hash_to_group( (char *) e.strPtr->c_str());
+			pfcObject->add_to_hash(tmp);
+		}
+		else if(e.type == ZR_t)
+			pfcObject->add_to_hash(*e.zr);
+		else if(e.type == G1_t)
+			pfcObject->add_to_hash(*e.g1);
+		else if(e.type == G2_t)
+			pfcObject->add_to_hash(*e.g2);
+		else if(e.type == GT_t)
+			pfcObject->add_to_hash(*e.gt);
+	}
+
+	ZR tmp1 = pfcObject->finish_hash_to_group();
+	G1 g1;
+	// convert result to bytes and hash to G1
+	pfcObject->hash_and_map(g1, (char *) bigToBytes(tmp1).c_str());
+	return g1;
 }
 
 #ifdef ASYMMETRIC
 G2 PairingGroup::hashListToG2(CharmList & list)
 {
-	// follow above approach but hash and map to G2 instead
+	int len = list.length();
+	pfcObject->start_hash();
+	for(int i = 0; i < len; i++) {
+		Element e = list[i];
+		if(e.type == Str_t) {
+			ZR tmp = pfcObject->hash_to_group( (char *) e.strPtr->c_str());
+			pfcObject->add_to_hash(tmp);
+		}
+		else if(e.type == ZR_t)
+			pfcObject->add_to_hash(*e.zr);
+		else if(e.type == G1_t)
+			pfcObject->add_to_hash(*e.g1);
+		else if(e.type == G2_t)
+			pfcObject->add_to_hash(*e.g2);
+		else if(e.type == GT_t)
+			pfcObject->add_to_hash(*e.gt);
+	}
+
+	ZR tmp1 = pfcObject->finish_hash_to_group();
+	G2 g2;
+	// convert result to bytes and hash to G2
+	pfcObject->hash_and_map(g2, (char *) bigToBytes(tmp1).c_str());
+	return g2;
 }
 #endif
 
