@@ -17,17 +17,10 @@
 #define ZR Big
 #define convert_str(point) point.g
 enum Type { ZR_t = 0, G1_t, G2_t, GT_t, Str_t, None_t };
-//struct Element
-//{
-//	Type type;
-//	ZR *zr;
-//	G1 *g1;
-//#ifdef ASYMMETRIC
-//	G2 *g2;
-//#endif
-//	GT *gt;
-//	string *strPtr;
-//};
+
+string _base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len);
+string _base64_decode(string const& encoded_string);
+static inline bool is_base64(unsigned char c);
 
 class Element
 {

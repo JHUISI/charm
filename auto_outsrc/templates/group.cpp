@@ -470,4 +470,170 @@ G2 PairingGroup::hashListToG2(CharmList & list)
 }
 #endif
 
+int element_to_bytes(unsigned char *data, Curve_t ctype, Group_t type, Element & e) {
+	char c[MAX_LEN+1];
+	memset(c, 0, MAX_LEN);
+	int enc_len;
+	string t;
+
+	if(type == ZR_t) {
+		Big *s = (Big *) e;
+		t.append(bigToBytes(*s));
+		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
+		enc_len = encoded.size();
+		memcpy(data, encoded.c_str(), enc_len);
+		data[enc_len] = '\0';
+//		printf("Result => ");
+//		_printf_buffer_as_hex((uint8_t *) data, enc_len);
+//		printf("\n");
+		return enc_len;
+	}
+	else if(type == G1_t) {
+		G1 *p = (G1 *) e;
+		Big x, y;
+		p->g.get(x, y);
+		string t;
+		t.append(bigToBytes(x));
+		t.append(bigToBytes(y));
+
+		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
+		enc_len = encoded.size();
+		memcpy(data, encoded.c_str(), enc_len);
+		data[enc_len] = '\0';
+		return enc_len;
+	}
+	else if(type == G2_t) {
+#ifdef ASYMMETRIC
+		G2 *P = (G2 *) e; // embeds an ECn3 element (for MNT curves)
+		ZZn3 x, y;
+			// ZZn a,b,c;
+		ZZn *a = new ZZn[6];
+		P->g.get(x, y); // get ZZn3's
+		x.get(a[0], a[1], a[2]); // get coordinates for each ZZn
+		y.get(a[3], a[4], a[5]);
+
+		string t;
+		for(int i = 0; i < 6; i++) {
+			t.append( bigToBytes(Big(a[i])) );
+		}
+			// base64 encode t and return
+		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
+		enc_len = encoded.size();
+		memcpy(data, encoded.c_str(), enc_len);
+		data[enc_len] = '\0';
+		return enc_len;
+#else
+		// if symmetric curve
+#endif
+	}
+	else if(type == GT_t) {
+#ifdef ASYMMETRIC
+		GT *P = (GT *) e; // embeds an ZZn6 element (for MNT curves) is equivalent to
+			// control this w/ a flag
+		ZZn2 x, y, z; // each zzn2 has a (x,y) coordinates of type Big
+		Big *a = new Big[6];
+		P->g.get(x, y, z); // get ZZn2's
+
+		x.get(a[0], a[1]); // get coordinates for each ZZn2
+		y.get(a[2], a[3]);
+		z.get(a[4], a[5]);
+	//	    cout << "Point => (" << x << ", " << y << ", " << z << ")" << endl;
+		string t;
+		for(int i = 0; i < 6; i++) {
+		    t.append( bigToBytes(a[i]) );
+		}
+//		    cout << "Pre-encoding => ";
+//		    _printf_buffer_as_hex((uint8_t *) t.c_str(), t.size());
+			// base64 encode t and return
+		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
+		enc_len = encoded.size();
+		memcpy(data, encoded.c_str(), enc_len);
+		data[enc_len] = '\0';
+		return enc_len;
+#else
+		// it must be symmetric
+#endif
+		}
+	}
+
+	return 0;
+}
+
+
+Element& *_element_from_bytes(Curve_t ctype, Type type, unsigned char *data)
+{
+	if(type == ZR_t) {
+		if(is_base64((unsigned char) data[0])) {
+			string b64_encoded((char *) data);
+			string s = _base64_decode(b64_encoded);
+			int cnt = 0;
+			Big *X = bytesToBig(s, &cnt);
+			return Element(X);
+		}
+	}
+	else if(type == G1_t) {
+		if(is_base64((unsigned char) data[0])) {
+		string b64_encoded((char *) data);
+		string s = _base64_decode(b64_encoded);
+
+		int cnt = 0;
+		Big x,y;
+		x = *bytesToBig(s, &cnt);
+		s = s.substr(cnt);
+		y = *bytesToBig(s, &cnt);
+//		cout << "point => (" << x << ", " << y << ")" << endl;
+		G1 *p = new G1();
+		p->g.set(x,y);
+		return (element_t *) p;
+		}
+	}
+	else if(type == G2_t) {
+		if(ctype == MNT && is_base64((unsigned char) data[0])) {
+			string b64_encoded((char *) data);
+			string s = _base64_decode(b64_encoded);
+	//		cout << "original => " << s << endl;
+			int cnt = 0;
+			ZZn *a = new ZZn[6];
+			for(int i = 0; i < 6; i++) {
+				a[i] = ZZn(*bytesToBig(s, &cnt) ); // retrieve all six coordinates
+				s = s.substr(cnt);
+			}
+			ZZn3 x (a[0], a[1], a[2]);
+			ZZn3 y (a[3], a[4], a[5]);
+
+			G2 *point = new G2();
+			point->g.set(x, y);
+			// cout << "Recovered pt => " << point->g << endl;
+			return (element_t *) point;
+		}
+	}
+	else if(type == GT_t) {
+		if(ctype == MNT && is_base64((unsigned char) data[0])) {
+			string b64_encoded((char *) data);
+			string s = _base64_decode(b64_encoded);
+	//		cout << "original => " << s << endl;
+			int cnt = 0;
+			Big *a = new Big[6];
+			for(int i = 0; i < 6; i++) {
+				// cout << "buffer => ";
+			    // printf_buffer_as_hex((uint8_t *) s.c_str(), s.size());
+				a[i] = *bytesToBig(s, &cnt); // retrieve all six coordinates
+				s = s.substr(cnt);
+				// cout << "i => " << a[i] << endl;
+			}
+			ZZn2 x, y, z;
+			x.set(a[0], a[1]);
+			y.set(a[2], a[3]);
+			z.set(a[4], a[5]);
+
+			GT *point = new GT();
+			point->g.set(x, y, z);
+			return (element_t *) point;
+		}
+	}
+
+	return NULL;
+}
+
+
 

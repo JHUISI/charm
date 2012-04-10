@@ -49,7 +49,7 @@ FUNC_SYMBOL = "def func :"
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
 types = Enum('NO_TYPE','G1', 'G2', 'GT', 'ZR', 'str', 'list', 'object')
 declarator = Enum('func', 'verify')
-ops = Enum('BEGIN', 'ERROR', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO','PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'EXPAND', 'FUNC', 'SEQ', 'IF', 'ELSEIF', 'ELSE', 'END', 'NONE')
+ops = Enum('BEGIN', 'ERROR', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO', 'FORALL', 'PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'EXPAND', 'FUNC', 'SEQ', 'IF', 'ELSEIF', 'ELSE', 'END', 'NONE')
 side = Enum('left', 'right')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
@@ -253,6 +253,8 @@ def createTree(op, node1, node2, op_value=None):
         node = BinaryNode(ops.ON)
     elif(op == "for{"):
     	node = BinaryNode(ops.FOR)
+    elif(op == "forall{"):
+        node = BinaryNode(ops.FORALL)        
     elif(op == "do"):
     	node = BinaryNode(ops.DO)
     elif(op == "sum{"):
@@ -382,6 +384,8 @@ class BinaryNode:
 				 return ('(' + left + ' on ' + right + ')')
 			elif(self.type == ops.FOR):
 				return ('for{' + left + ',' + right + '}')
+			elif(self.type == ops.FORALL):
+				return ('forall{' + left + '}')
 			elif(self.type == ops.RANDOM):
 				return ('random(' + left + ')')
 			elif(self.type == ops.ERROR):

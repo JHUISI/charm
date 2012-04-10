@@ -98,6 +98,7 @@ class SDLParser:
         Random = Literal("random(")
         Prod = Literal("prod{") # dot product token
         For = Literal("for{")
+        ForAll = Literal("forall{")
         Sum = Literal("sum{")
         ProdOf = Literal("on")
         ForDo = Literal("do") # for{x,y} do y
@@ -129,6 +130,7 @@ class SDLParser:
                (Hash + expr + ',' + expr + rpar).setParseAction( pushFirst ) | \
                (Pairing + expr + ',' + expr + rpar).setParseAction( pushFirst ) | \
                (Prod + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
+               (ForAll + expr + rcurly).setParseAction( pushFirst ) | \
                (For + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
                (Sum + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
                (Random + leafNode + rpar).setParseAction( pushFirst ) | \
@@ -182,7 +184,7 @@ class SDLParser:
             ops.reverse()
             newList.listNodes = list(ops)
             return newList
-        elif op in ["random("]:
+        elif op in ["random(", "forall{"]: # one argument
             op1 = self.evalStack(stack, line_number)
             return createTree(op, op1, None)
         elif op in ["if {", "elseif {"]:
