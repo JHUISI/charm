@@ -20,7 +20,7 @@ enum Type { ZR_t = 0, G1_t, G2_t, GT_t, Str_t, None_t };
 
 string _base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len);
 string _base64_decode(string const& encoded_string);
-static inline bool is_base64(unsigned char c);
+bool is_base64(unsigned char c);
 
 class Element
 {
@@ -40,14 +40,16 @@ public:
 	Element(G2&);
 	Element(GT&);
 
-	static string serialize(PairingGroup&, Element&);
-//	Element deserialize(PairingGroup& pg);
+	static string serialize(Element&);
+	static Element deserialize(string);
 
     friend ostream& operator<<(ostream&, const Element&);
 private:
 	// None
 };
 
+string element_to_bytes(Element & e);
+Element element_from_bytes(Type type, unsigned char *data);
 
 class CharmList
 {
@@ -99,8 +101,8 @@ public:
 	G2 mul(G2&, G2&);
 	G2 div(G2&, G2&);
 	G2 exp(G2&, ZR&);
-	char *serialize(G2&); // not done
-	void deserialize(G2&, char *); // not done
+//	char *serialize(G2&); // not done
+//	void deserialize(G2&, char *); // not done
 	GT pair(G1&, G2&);
 	void *hash(char *s, Type t);
 #endif
@@ -122,13 +124,13 @@ public:
 	GT exp(GT&, ZR&);
 
 	// not done
-	char *serialize(ZR&);
-	char *serialize(G1&);
-	char *serialize(GT&);
+//	char *serialize(ZR&);
+//	char *serialize(G1&);
+//	char *serialize(GT&);
 
-	void deserialize(ZR&, char *);
-	void deserialize(G1&, char *);
-	void deserialize(GT&, char *);
+//	void deserialize(ZR&, char *);
+//	void deserialize(G1&, char *);
+//	void deserialize(GT&, char *);
 
 private:
 	PFC *pfcObject; // defined by above #defines SYMMETRIC or ASYMMETRIC (for now)

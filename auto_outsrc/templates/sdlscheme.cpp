@@ -39,6 +39,7 @@ int main()
 	s.append(c);
 	s.append(g2);
 	s.append(g1);
+	s.append(gt);
 
 	cout << "\nPrint list so far...\n";
 	cout << s << endl;
@@ -58,6 +59,12 @@ int main()
 
 	cout << s[3] << endl;
 
+	cout << "Serialize/Deserialize tests..." << endl;
+
+	string serObj = Element::serialize(s[4]);
+	cout << serObj << endl;
+
+	cout << "Deserialized : " << Element::deserialize(serObj) << endl;
 
 	return 0;
 }
