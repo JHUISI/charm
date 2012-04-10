@@ -43,12 +43,20 @@ int main()
 	cout << "\nPrint list so far...\n";
 	cout << s << endl;
 
+	// how to hash elements
 	ZR zr2 = group.hashListToZR(s);
 	G1 h1  = group.hashListToG1(s);
 	G2 h3  = group.hashListToG2(s);
 	cout << "ZR zr2 := " << zr2 << endl;
 	cout << "G1 h1  := " << convert_str(h1) << endl;
 	cout << "G2 h3  := " << convert_str(h3) << endl;
+
+	string str2 = "hello world!!!";
+	s[0] = Element(str2);
+
+	cout << s << endl;
+
+	cout << s[3] << endl;
 
 
 	return 0;

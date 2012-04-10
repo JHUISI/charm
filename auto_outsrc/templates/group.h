@@ -21,18 +21,42 @@
 // #define ElementToG1(a)
 // #define ElementToG2(a)
 // #define ElementToGT(a)
-enum Type { ZR_t = 0, G1_t, G2_t, GT_t, Str_t };
-struct Element
+enum Type { ZR_t = 0, G1_t, G2_t, GT_t, Str_t, None_t };
+//struct Element
+//{
+//	Type type;
+//	ZR *zr;
+//	G1 *g1;
+//#ifdef ASYMMETRIC
+//	G2 *g2;
+//#endif
+//	GT *gt;
+//	string *strPtr;
+//};
+
+class Element
 {
+public:
+	// public values for now
 	Type type;
 	ZR *zr;
 	G1 *g1;
-#ifdef ASYMMETRIC
 	G2 *g2;
-#endif
 	GT *gt;
 	string *strPtr;
+	Element();
+	~Element();
+	Element(string);
+	Element(ZR&);
+	Element(G1&);
+	Element(G2&);
+	Element(GT&);
+
+    friend ostream& operator<<(ostream&, const Element&);
+private:
+	// None
 };
+
 
 class CharmList
 {
@@ -40,20 +64,21 @@ public:
 	CharmList(void); // static list
 	~CharmList();
 	// consider adding remove
-	void append(string str);
+	void append(string);
 	void append(ZR&);
 	void append(G1&);
 #ifdef ASYMMETRIC
 	void append(G2&);
 #endif
 	void append(GT&);
+	Element& newElement(string);
 	int length(); // return length of lists
 	void print();
 	string printAtIndex(int index);
 
-	// overload some operators here
-	Element& get(int index);
+	// retrieve a particular index
 	Element& operator[](const int index);
+	// Element& operator=()
     friend ostream& operator<<(ostream&, const CharmList&);
 private:
 	int cur_index;

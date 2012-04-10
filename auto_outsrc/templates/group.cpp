@@ -1,6 +1,79 @@
 #include "sdlconfig.h"
 #include <sstream>
 
+// Element implementation
+Element::Element()
+{
+	type = None_t;
+}
+Element::Element(string s)
+{
+	type = Str_t;
+	strPtr = new string(s);
+}
+
+Element::Element(ZR & z)
+{
+	type = ZR_t;
+	zr   = &z;
+}
+
+Element::Element(G1 & g)
+{
+	type = G1_t;
+	g1   = &g;
+}
+
+Element::Element(G2 & g)
+{
+	type = G2_t;
+	g2   = &g;
+}
+
+Element::Element(GT & g)
+{
+	type = GT_t;
+	gt   = &g;
+}
+
+Element::~Element()
+{
+	type = None_t;
+	strPtr = 0;
+	zr = 0;
+	g1 = 0;
+	g2 = 0;
+	gt = 0;
+}
+
+ostream& operator<<(ostream& s, const Element& e)
+{
+	Type t = e.type;
+	string elem_str = "E: ";
+	s << "T: ";
+	if(t == Str_t) {
+		s << "str_t, " << elem_str << *e.strPtr;
+	}
+	else if(t == ZR_t) {
+		s << "ZR_t, " << elem_str << *e.zr;
+	}
+	else if(t == G1_t) {
+		s << "G1_t, " << elem_str << e.g1->g;
+	}
+#ifdef ASYMMETRIC
+	else if(t == G2_t) {
+		s << "G2_t, " << elem_str << e.g2->g;
+	}
+#endif
+	else if(t == GT_t) {
+		s << "GT_t, " << elem_str << e.gt->g;
+	}
+
+	return s;
+}
+
+// CharmList implementation
+
 CharmList::CharmList(void)
 {
 	// increases as elements are appended
@@ -19,7 +92,7 @@ void CharmList::append(string strs)
 
 	// init elem here
 	elem.type = Str_t;
-	elem.strPtr  = &strs; // new string(str);
+	elem.strPtr  = &strs;
 
 	list[cur_index] = elem;
 	cur_index++;
@@ -27,20 +100,14 @@ void CharmList::append(string strs)
 
 void CharmList::append(ZR & zr)
 {
-	Element elem;
-	elem.type = ZR_t;
-	elem.zr   = &zr; // new ZR(zr);
-
+	Element elem(zr);
 	list[cur_index] = elem;
 	cur_index++;
 }
 
 void CharmList::append(G1 & g1)
 {
-	Element elem;
-	elem.type = G1_t;
-	elem.g1   = &g1; // new G1(g1);
-
+	Element elem(g1);
 	list[cur_index] = elem;
 	cur_index++;
 }
@@ -48,9 +115,7 @@ void CharmList::append(G1 & g1)
 #ifdef ASYMMETRIC
 void CharmList::append(G2 & g2)
 {
-	Element elem;
-	elem.type = G2_t;
-	elem.g2   =  &g2; // new G2(g2);
+	Element elem(g2);
 
 	list[cur_index] = elem;
 	cur_index++;
@@ -59,20 +124,10 @@ void CharmList::append(G2 & g2)
 
 void CharmList::append(GT & gt)
 {
-	Element elem;
-	elem.type = GT_t;
-	elem.gt   = new GT(gt);
+	Element elem(gt);
 
 	list[cur_index] = elem;
 	cur_index++;
-}
-
-Element& CharmList::get(int index)
-{
-	int len = (int) list.size();
-	if(index >= 0 && index < len) {
-		return list[index];
-	}
 }
 
 Element& CharmList::operator[](const int index)
@@ -80,6 +135,9 @@ Element& CharmList::operator[](const int index)
 	int len = (int) list.size();
 	if(index >= 0 && index < len) {
 		return list[index];
+	}
+	else {
+		throw new string("Invalid access.\n");
 	}
 }
 
@@ -98,33 +156,33 @@ ostream& operator<<(ostream& s, const CharmList& cList)
 	return s;
 }
 
-void CharmList::print()
-{
-	for(int i = 0; i < cur_index; i++) {
-		Type t = list[i].type;
-		cout << i << ": ";
-		if(t == Str_t) {
-			cout << *list[i].strPtr << endl;
-		}
-		else if(t == ZR_t) {
-			cout << *list[i].zr << endl;
-		}
-		else if(t == G1_t) {
-			cout << list[i].g1->g << endl;
-		}
-#ifdef ASYMMETRIC
-		else if(t == G2_t) {
-			cout << list[i].g2->g << endl;
-		}
-#endif
-		else if(t == GT_t) {
-			cout << list[i].gt->g << endl;
-		}
-		else {
-			cout << "invalid type" << endl;
-		}
-	}
-}
+//void CharmList::print()
+//{
+//	for(int i = 0; i < cur_index; i++) {
+//		Type t = list[i].type;
+//		cout << i << ": ";
+//		if(t == Str_t) {
+//			cout << *list[i].strPtr << endl;
+//		}
+//		else if(t == ZR_t) {
+//			cout << *list[i].zr << endl;
+//		}
+//		else if(t == G1_t) {
+//			cout << list[i].g1->g << endl;
+//		}
+//#ifdef ASYMMETRIC
+//		else if(t == G2_t) {
+//			cout << list[i].g2->g << endl;
+//		}
+//#endif
+//		else if(t == GT_t) {
+//			cout << list[i].gt->g << endl;
+//		}
+//		else {
+//			cout << "invalid type" << endl;
+//		}
+//	}
+//}
 
 string CharmList::printAtIndex(int index)
 {
