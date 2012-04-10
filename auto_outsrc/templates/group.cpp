@@ -171,7 +171,11 @@ ostream& operator<<(ostream& s, const Element& e)
 string Element::serialize(Element & e)
 {
 	stringstream eSerialized;
-	eSerialized << e.type << ":" << element_to_bytes(e);
+	eSerialized << e.type << ":";
+	if(e.type == Str_t)
+		eSerialized << *e.strPtr;
+	else
+		eSerialized << element_to_bytes(e);
 	return eSerialized.str();
 }
 
@@ -183,8 +187,10 @@ Element Element::deserialize(string s)
 
 	if(found != string::npos) {
 		int type = atoi(s.substr(0, found).c_str());
-		if(type >= ZR_t && type < None_t)
+		if(type >= ZR_t && type < Str_t)
 			return element_from_bytes((Type) type, (unsigned char *) s.substr(found+1, s.size()).c_str());
+		else if(type == Str_t)
+			return Element(s.substr(found+1, s.size()));
 	}
 
 	throw new string("Invalid bytes.\n");
@@ -273,34 +279,6 @@ ostream& operator<<(ostream& s, const CharmList& cList)
 
 	return s;
 }
-
-//void CharmList::print()
-//{
-//	for(int i = 0; i < cur_index; i++) {
-//		Type t = list[i].type;
-//		cout << i << ": ";
-//		if(t == Str_t) {
-//			cout << *list[i].strPtr << endl;
-//		}
-//		else if(t == ZR_t) {
-//			cout << *list[i].zr << endl;
-//		}
-//		else if(t == G1_t) {
-//			cout << list[i].g1->g << endl;
-//		}
-//#ifdef ASYMMETRIC
-//		else if(t == G2_t) {
-//			cout << list[i].g2->g << endl;
-//		}
-//#endif
-//		else if(t == GT_t) {
-//			cout << list[i].gt->g << endl;
-//		}
-//		else {
-//			cout << "invalid type" << endl;
-//		}
-//	}
-//}
 
 string CharmList::printAtIndex(int index)
 {
@@ -405,14 +383,6 @@ GT PairingGroup::pair(G1 & g, G2 & h)
 	return gt;
 }
 
-// G2 PairingGroup::hashListToG2(CharmList & items)
-//G2 PairingGroup::hashStringToG2(char *s)
-//{
-////	for(int i = 0; i < items.length())
-//	G2 g2;
-//	pfcObject->hash_and_map(g2, s);
-//	return g2;
-//}
 #endif
 
 ZR PairingGroup::order()

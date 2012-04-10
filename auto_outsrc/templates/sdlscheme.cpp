@@ -61,7 +61,7 @@ int main()
 
 	cout << "Serialize/Deserialize tests..." << endl;
 
-	string serObj = Element::serialize(s[4]);
+	string serObj = Element::serialize(s[2]);
 	cout << serObj << endl;
 
 	cout << "Deserialized : " << Element::deserialize(serObj) << endl;
