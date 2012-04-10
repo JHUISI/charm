@@ -139,10 +139,10 @@ def decout(partCT, zz):
 	return output
 
 if __name__ == "__main__":
-	#global groupObj
+	global groupObj
 	groupObj = PairingGroup('SS512')
 
-	#S = ['ONE', 'TWO', 'THREE']
+	S = ['ONE', 'TWO', 'THREE']
 	M = "balls on fire"
 	policy_str = '((four or three) and (two or one))'
 
@@ -150,8 +150,8 @@ if __name__ == "__main__":
 	(zz, skBlinded) = keygen(['ONE', 'TWO', 'THREE'])
 	(ct) = encrypt(M, policy_str)
 
-	#(partCT) = transform(ct)
+	(partCT) = transform(ct)
 
-	#(M) = decout(partCT, zz)
+	(M) = decout(partCT, zz)
 
-	#print(M)
+	print(M)
