@@ -1,6 +1,5 @@
-#include <sstream>
-#include <string>
 #include "sdlconfig.h"
+#include <sstream>
 
 CharmList::CharmList(void)
 {
@@ -10,28 +9,17 @@ CharmList::CharmList(void)
 
 CharmList::~CharmList()
 {
-	for(int i = 0; i < cur_index; i++)
-		if(list[i].type == Str_t) {
-			delete list[i].strPtr;
-		}
-		else if(list[i].type == ZR_t) {
-			delete list[i].zr;
-		}
-		else if(list[i].type == G1_t) {
-			delete list[i].g1;
-		}
-		else if(list[i].type == G2_t) {
-			delete list[i].g2;
-		}
+	for(int i = 0; i < (int) list.size(); i++)
+		list.erase(i);
 }
 
-void CharmList::append(string str)
+void CharmList::append(string strs)
 {
 	Element elem;
 
 	// init elem here
 	elem.type = Str_t;
-	elem.strPtr  = new string(str);
+	elem.strPtr  = &strs; // new string(str);
 
 	list[cur_index] = elem;
 	cur_index++;
@@ -41,7 +29,7 @@ void CharmList::append(ZR & zr)
 {
 	Element elem;
 	elem.type = ZR_t;
-	elem.zr   = new ZR(zr);
+	elem.zr   = &zr; // new ZR(zr);
 
 	list[cur_index] = elem;
 	cur_index++;
@@ -51,7 +39,7 @@ void CharmList::append(G1 & g1)
 {
 	Element elem;
 	elem.type = G1_t;
-	elem.g1   = new G1(g1);
+	elem.g1   = &g1; // new G1(g1);
 
 	list[cur_index] = elem;
 	cur_index++;
@@ -62,7 +50,7 @@ void CharmList::append(G2 & g2)
 {
 	Element elem;
 	elem.type = G2_t;
-	elem.g2   = new G2(g2);
+	elem.g2   =  &g2; // new G2(g2);
 
 	list[cur_index] = elem;
 	cur_index++;
@@ -140,37 +128,33 @@ void CharmList::print()
 
 string CharmList::printAtIndex(int index)
 {
-	string ss2;
+	stringstream ss;
 	int i;
 
-//	string s = ss2.strPtr();
 	if(index >= 0 && index < (int) list.size()) {
 		i = index;
 		Type t = list[i].type;
 		if(t == Str_t) {
-			ss2.append(*list[i].strPtr);
+			ss << *list[i].strPtr;
 		}
 		else if(t == ZR_t) {
-			ss2.append("0");
-//			ss << *list[i].zr;
-//			return ss.strPtr();
+			ss << *list[i].zr;
 		}
 		else if(t == G1_t) {
-//			ss2 << list[i].g1->g;
+			ss << list[i].g1->g;
 		}
-// #ifdef ASYMMETRIC
+#ifdef ASYMMETRIC
 		else if(t == G2_t) {
-//			ss2 << list[i].g2->g;
+			ss << list[i].g2->g;
 		}
-//#endif
+#endif
 		else if(t == GT_t) {
-//			ss2 << list[i].gt->g;
-		}
-		else {
-			ss2.append("invalid type");
+			ss << list[i].gt->g;
 		}
 	}
-	return ss2;
+
+	string s = ss.str();
+	return s;
 }
 
 
@@ -246,13 +230,13 @@ GT PairingGroup::pair(G1 & g, G2 & h)
 }
 
 // G2 PairingGroup::hashListToG2(CharmList & items)
-G2 PairingGroup::hashStringToG2(char *s)
-{
-//	for(int i = 0; i < items.length())
-	G2 g2;
-	pfcObject->hash_and_map(g2, s);
-	return g2;
-}
+//G2 PairingGroup::hashStringToG2(char *s)
+//{
+////	for(int i = 0; i < items.length())
+//	G2 g2;
+//	pfcObject->hash_and_map(g2, s);
+//	return g2;
+//}
 #endif
 
 ZR PairingGroup::order()
@@ -309,17 +293,17 @@ GT PairingGroup::exp(GT & g, ZR & r)
 	return l;
 }
 
-ZR PairingGroup::hashStringToZR(char *s)
-{
-	return pfcObject->hash_to_group(s);
-}
-
-G1 PairingGroup::hashStringToG1(char *s)
-{
-	G1 g1;
-	pfcObject->hash_and_map(g1, s);
-	return g1;
-}
+//ZR PairingGroup::hashStringToZR(char *s)
+//{
+//	return pfcObject->hash_to_group(s);
+//}
+//
+//G1 PairingGroup::hashStringToG1(char *s)
+//{
+//	G1 g1;
+//	pfcObject->hash_and_map(g1, s);
+//	return g1;
+//}
 
 // TODO: multi-element hash. make sure identical to Charm-Python hash
 //ZR PairingGroup::hash(CharmList& c, Type t)

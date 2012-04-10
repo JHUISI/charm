@@ -1,5 +1,6 @@
 CXX	:= g++
-CXXFLAGS := -g -m64 -O2
+#CXXFLAGS := -fno-strict-aliasing -fno-common -g -m64 -O2 -fwrapv -O3 -Wall
+CXXFLAGS := -g -m64 -O2 -O3 -Wall
 
 # should be set by codegen
 SDL_SRC := sdlscheme

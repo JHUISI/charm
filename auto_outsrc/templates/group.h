@@ -12,16 +12,14 @@
 #endif
 
 #include <map>
-#include <iostream>
-#include <sstream>
-#include <string>
-//using namespace std;
-
-//#include <iostream>
-//using std::ostream;
 
 #define ZR Big
-#define str(point) point.g
+#define convert_str(point) point.g
+// #define ElementToZR(a)
+// #define ElementToStr(a)
+// #define ElementToG1(a)
+// #define ElementToG2(a)
+// #define ElementToGT(a)
 enum Type { ZR_t = 0, G1_t, G2_t, GT_t, Str_t };
 struct Element
 {
@@ -91,15 +89,15 @@ public:
 #endif
 
 	Big order(); // returns the order of the group
+//
+//	ZR hashStringToZR(char *);
+//	G1 hashStringToG1(char *);
+//	G2 hashStringToG2(char *);
 
-	ZR hashStringToZR(char *);
-	G1 hashStringToG1(char *);
-	G2 hashStringToG2(char *);
-
-	// hash -- not done
-	ZR hashListToZR(CharmList&);
-	G1 hashListToG1(CharmList&);
-	G2 hashListToG2(CharmList&);
+//	// hash -- not done
+//	ZR hashListToZR(CharmList&);
+//	G1 hashListToG1(CharmList&);
+//	G2 hashListToG2(CharmList&);
 
 	GT pair(G1&, G1&);
 	G1 mul(G1&, G1&);
@@ -122,4 +120,3 @@ public:
 private:
 	PFC *pfcObject; // defined by above #defines SYMMETRIC or ASYMMETRIC (for now)
 };
-
