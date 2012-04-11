@@ -6,18 +6,6 @@ from charm.pairing import hash as SHA1
 
 groupObjUserFuncs = None
 
-def SHA1(R):
-	getUserGlobals()
-	return
-
-def SymEnc(s2_sesskey, M):
-	getUserGlobals()
-	return
-
-def SymDec(s2_sesskey, T1):
-	getUserGlobals()
-	return
-
 def getUserGlobals():
 	global groupObjUserFuncs
 

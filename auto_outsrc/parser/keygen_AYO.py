@@ -20,40 +20,6 @@ def getIsVarList(keygenOutputElem, keygenOutputVarInfo, assignInfo, varTypes):
 
     return False
 
-def removeListIndices(inputString):
-    inputStringSplit = inputString.split(LIST_INDEX_SYMBOL)
-    return inputStringSplit[0]
-
-def removeListIndicesAndDupsFromList(inputList):
-    retList = []
-
-    for inputListEntry in inputList:
-        entryWithoutIndices = removeListIndices(inputListEntry)
-        if (entryWithoutIndices not in retList):
-            retList.append(entryWithoutIndices)
-
-    return retList
-
-def writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls):
-    global SDLLinesForKeygen
-
-    SDLLinesForKeygen.append("BEGIN :: forall\n")
-    SDLLinesForKeygen.append("forall{" + blindingLoopVar + " := " + keygenOutputElem + "}\n")
-    SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + LIST_INDEX_SYMBOL + blindingLoopVar + " := " + keygenOutputElem + LIST_INDEX_SYMBOL + blindingLoopVar + " ^ (1/" + keygenBlindingExponent + ")\n")
-    SDLLinesForKeygen.append("END :: forall\n")
-    varsToBlindList.remove(keygenOutputElem)
-    if (keygenOutputElem in varNamesForListDecls):
-        sys.exit("writeForAllLoop in keygen.py attempted to add duplicate keygenOutputElem to varNamesForListDecls -- 2 of 2.")
-    varNamesForListDecls.append(keygenOutputElem)
-
-def varListContainsParentDict(varList, parentDict):
-    for varName in varList:
-        varNameWithoutIndices = removeListIndices(varName)
-        if (varNameWithoutIndices == parentDict):
-            return True
-
-    return False
-
 def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListDecls):
     global SDLLinesForKeygen
 
@@ -61,7 +27,6 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
     varTypes = getVarTypes()
 
     varsModifiedInKeygen = list(assignInfo[keygenFuncName].keys())
-    varsModifiedInKeygen = removeListIndicesAndDupsFromList(varsModifiedInKeygen)
 
     if (keygenOutputElem not in varsModifiedInKeygen):
         SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + " := " + keygenOutputElem + "\n")
@@ -69,10 +34,7 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
         return keygenOutputElem
 
     if (keygenOutputElem not in assignInfo[keygenFuncName]):
-        if (varListContainsParentDict(assignInfo[keygenFuncName].keys(), keygenOutputElem) == False):
-            sys.exit("keygen output element passed to blindKeygenOutputElement in keygen.py is not in assignInfo[keygenFuncName], and is not a parent dictionary of one of the variables in assignInfo[keygenFuncName].")
-        writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls)
-        return keygenOutputElem
+        sys.exit("keygen output element passed to blindKeygenOutputElement in keygen.py is not in assignInfo[keygenFuncName].")
 
     keygenOutputVarInfo = assignInfo[keygenFuncName][keygenOutputElem]
 
@@ -97,7 +59,19 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
         #varNamesForListDecls.append(keygenOutputElem)
         return keygenOutputElem
 
-    writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls)
+    SDLLinesForKeygen.append("len" + keygenOutputElem + blindingSuffix + " := len(" + keygenOutputElem + ")\n")
+    #SDLLinesForKeygen += keygenOutputElem + blindingSuffix + " := init(list)\n"
+    #SDLLinesForKeygen.append("BEGIN :: for\n")
+    SDLLinesForKeygen.append("BEGIN :: forall\n")
+    #SDLLinesForKeygen.append("for{" + blindingLoopVar + " := 0, len" + keygenOutputElem + blindingSuffix + "}\n")
+    SDLLinesForKeygen.append("forall{" + blindingLoopVar + " := " + keygenOutputElem + "}\n")
+    SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + LIST_INDEX_SYMBOL + blindingLoopVar + " := " + keygenOutputElem + LIST_INDEX_SYMBOL + blindingLoopVar + " ^ (1/" + keygenBlindingExponent + ")\n")
+    #SDLLinesForKeygen.append("END :: for\n")
+    SDLLinesForKeygen.append("END :: forall\n")
+    varsToBlindList.remove(keygenOutputElem)
+    if (keygenOutputElem in varNamesForListDecls):
+        sys.exit("blindKeygenOutputElement in keygen.py attempted to add duplicate keygenOutputElem to varNamesForListDecls -- 2 of 2.")
+    varNamesForListDecls.append(keygenOutputElem)
     return keygenOutputElem
 
 def keygen(file):
@@ -108,7 +82,7 @@ def keygen(file):
 
     parseFile2(file, False)
     (varsToBlindList, rccaData) = (transform(False))
-    rcca(rccaData)
+    #rcca(rccaData)
     varNamesForListDecls = []
 
     assignInfo = getAssignInfo()

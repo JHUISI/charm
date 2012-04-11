@@ -443,6 +443,7 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
 
     varInfoObj = VarInfo()
     varInfoObj.setIsTypeEntryOnly(True)
+    varInfoObj.setLineNo(i)
     if (varName in assignInfo[currentFuncName]):
         sys.exit("In updateVarTypes in SDLParser.py, found duplicate entries for variable name in TYPES_HEADER function.")
 
