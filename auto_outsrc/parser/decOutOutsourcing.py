@@ -19,4 +19,6 @@ if __name__ == "__main__":
 	global groupObj
 	groupObj = PairingGroup('SS512')
 
+	#comment
+
 	(M) = decout(sys.argv[1], sys.argv[2], sys.argv[3])
