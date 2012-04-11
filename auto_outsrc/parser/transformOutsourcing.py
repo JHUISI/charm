@@ -5,23 +5,20 @@ from toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from toolbox.iterate import dotprod2
 from charm.pairing import hash as SHA1
 
-def transform(ct, sk):
-	input = [ct, sk]
-	id, D, K, tag_k = sk
-	C, E1, E2, tag_c, T1 = ct
-	tag = (1 / (tag_c - tag_k))
-	A1 = (pair(C[1], D[1]) * (pair(C[2], D[2]) * (pair(C[3], D[3]) * (pair(C[4], D[4]) * pair(C[5], D[5])))))
-	A2 = (pair(C[6], D[6]) * pair(C[7], D[7]))
-	A3 = (A1 / A2)
-	A4 = (pair((E1 ** tag), D[7]) * pair((E2 ** -tag), K))
-	T2 = (A3 / A4)
-	T0 = C[0]
+def transform(pk, sk, ct):
+	input = [pk, sk, ct]
+	policy_str, Ctl, C, Cr, Cpr, T1 = ct
+	S, D, Dj, Djp = sk
+	policy = createPolicy(policy_str)
+	attrs = prune(policy, S)
+	coeff = getCoefficients(policy)
+	Y = len(attrs)
+	lam_func1 = lambda a,b,c,d,e,f: (pair((b[a] ** -c[a]), d[a]) * pair((e[a] ** c[a]), f[a]))
+	A = dotprod2(range(0, Y), lam_func2, attrs, Cr, coeff, Dj, Djp, Cpr)
+	result0 = (pair(C, D) * A)
+	T0 = Ctl
+	T2 = result0
 	partCT = [T0, T1, T2]
 	output = partCT
 	return output
 
-if __name__ == "__main__":
-	global groupObj
-	groupObj = PairingGroup('SS512')
-
-	(partCT) = transform(sys.argv[1], sys.argv[2])

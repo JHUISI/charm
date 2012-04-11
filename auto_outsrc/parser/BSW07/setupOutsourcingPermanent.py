@@ -1,5 +1,5 @@
-#from userFuncs import createPolicy, getAttributeList, calculateSharesDict, SymEnc, GetString, prune, getCoefficients, SymDec
-from userFuncs import *
+from userFuncs import createPolicy, getAttributeList, calculateSharesDict, SymEnc, GetString, prune, getCoefficients, SymDec
+#from userFuncs import *
 from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair
 from toolbox.secretutil import SecretUtil
 from toolbox.symcrypto import AuthenticatedCryptoAbstraction

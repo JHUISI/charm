@@ -64,7 +64,6 @@ def rcca(var_info):
     message = config.M # user-configured message
     
     myAssignInfo = getAssignInfo()
-    types      = myAssignInfo["types"]
     enc_block  = myAssignInfo[encFunc]
     varsForDec = {'s':None, 's_type':None, 'dec_op':var_info['dec_op'] }
 
@@ -147,7 +146,13 @@ def rcca(var_info):
                     
 
     print("<=== END ===>")    
-
+    # update the type info for 'M'
+    sdl_types      = myAssignInfo["types"]
+    M_varinfo = sdl_types[config.M]
+    new_M_type = config.M + ":= str" 
+    MLineNo = M_varinfo.getLineNo()
+    substituteOneLineOfCode(new_M_type, MLineNo)
+    
     parseLinesOfCode(getLinesOfCode(), False)
     newLinesOfSDL = rcca_decout(varsForDec)
     # append lines to the last line of SDL
