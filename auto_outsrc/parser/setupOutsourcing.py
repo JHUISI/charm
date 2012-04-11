@@ -6,14 +6,15 @@ from toolbox.iterate import dotprod2
 from charm.pairing import hash as SHA1
 
 tau1b = {}
+tau1 = {}
 ga2 = {}
 ga1 = {}
 gb = {}
 gba1 = {}
 gba2 = {}
 tau2 = {}
-tau1 = {}
 msk = {}
+idBlinded = {}
 mpk = {}
 v1 = {}
 v2 = {}
@@ -34,13 +35,13 @@ DBlinded = {}
 
 def setup():
 	global tau1b
+	global tau1
 	global ga2
 	global ga1
 	global gb
 	global gba1
 	global gba2
 	global tau2
-	global tau1
 	global msk
 	global mpk
 	global v1
@@ -89,6 +90,7 @@ def keygen(id):
 	global DBlinded
 
 	input = [mpk, msk, id]
+	zz = groupObj.random(ZR)
 	g, gb, ga1, ga2, gba1, gba2, tau1, tau2, tau1b, tau2b, w, u, h, egga = mpk
 	galpha, galpha_a1, v, v1, v2, alpha = msk
 	r1 = groupObj.random(ZR)
@@ -96,6 +98,7 @@ def keygen(id):
 	z1 = groupObj.random(ZR)
 	z2 = groupObj.random(ZR)
 	tag_k = groupObj.random(ZR)
+	tag_kBlinded = (tag_k ** (1 / zz))
 	r = (r1 + r2)
 	id_hash = groupObj.hash(id, ZR)
 	D[1] = (galpha_a1 * (v ** r))
@@ -105,14 +108,11 @@ def keygen(id):
 	D[5] = (gb ** -z2)
 	D[6] = (gb ** r2)
 	D[7] = (g ** r1)
-	K = ((((u ** id_hash) * (w ** tag_k)) * h) ** r1)
-	sk = [id, D, K, tag_k]
-	zz = groupObj.random(ZR)
-	idBlinded = id
 	for y in D:
 		DBlinded[y] = (D[y] ** (1 / zz))
+	K = ((((u ** id_hash) * (w ** tag_k)) * h) ** r1)
 	KBlinded = (K ** (1 / zz))
-	tag_kBlinded = (tag_k ** (1 / zz))
+	sk = [id, D, K, tag_k]
 	skBlinded = [idBlinded, DBlinded, KBlinded, tag_kBlinded]
 	output = (zz, skBlinded)
 	return output
