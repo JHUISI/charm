@@ -127,7 +127,7 @@ def rcca(var_info):
                     outputStmt = stmtsEnc[outputLineNo]
                     appendToLinesOfCode([t1Line], outputLineNo)
 
-                    parseLinesOfCode(getLinesOfCode(), True)
+                    parseLinesOfCode(getLinesOfCode(), False)
                     cipherInEnc = addVarToOutputOfFunc('T1', encFunc)
                     addVarToInputOfFunc('T1', cipherInEnc, transformFunc)
                     break # analysis is done
@@ -158,7 +158,7 @@ def rcca(var_info):
     # append lines to the last line of SDL
     lastLineNo = len(getLinesOfCode()) + 1
     appendToLinesOfCode(newLinesOfSDL, lastLineNo)
-    parseLinesOfCode(getLinesOfCode(), True)
+    parseLinesOfCode(getLinesOfCode(), False)
 
 def rcca_decout(vars):
     decout_sdl = ["\n","BEGIN :: func:%s\n" % config.decOutFunctionName,
