@@ -1,2 +1,0 @@
-from userFuncs.py import *
-
