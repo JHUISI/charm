@@ -142,7 +142,6 @@ def writeGlobalVarDecls(outputFile, functionName):
 
     for varName in globalVarNames:
         if (varName not in varNamesToFuncs_Assign):
-            print(varName)
             sys.exit("writeGlobalVarDecls in codegen.py:  current global variable name is not in varNamesToFuncs_Assign.")
 
         funcsInWhichThisVarHasAssignment = varNamesToFuncs_Assign[varName]
@@ -607,7 +606,7 @@ def addTypeDeclToGlobalVars(binNode):
     if (varName not in varNamesToFuncs_Assign):
         return
 
-    if ( (varName not in globalVarNames) and (varName != inputKeyword) and (varName != outputKeyword) ):
+    if ( (varName not in globalVarNames) and (varName in varNamesToFuncs_Assign) and (varName != inputKeyword) and (varName != outputKeyword) ):
         globalVarNames.append(varName)
 
 def writeGlobalVars_Python(outputFile):
@@ -806,7 +805,7 @@ def getGlobalVarNames():
             listForThisVar.remove(decOutFunctionName)
         if (len(listForThisVar) <= 1):
             continue
-        if ( (varName not in globalVarNames) and (varName != inputKeyword) and (varName != outputKeyword) ):
+        if ( (varName not in globalVarNames) and (varName in varNamesToFuncs_Assign) and (varName != inputKeyword) and (varName != outputKeyword) ):
             globalVarNames.append(varName)
 
 def addGetGlobalsToUserFuncs():

@@ -30,7 +30,7 @@ transformFunctionOrder = ["transform"]
 decOutFunctionOrder = ["decout"]
 
 argsToFirstSetupFunc = []
-argsToFirstTransformFunc = ["sys.argv[1]", "sys.argv[2]", "sys.argv[3]"]
+argsToFirstTransformFunc = ["sys.argv[1]", "sys.argv[2]"]
 argsToFirstDecOutFunc = ["sys.argv[1]", "sys.argv[2]", "sys.argv[3]"]
 
 groupObjName = "groupObj"
