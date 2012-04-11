@@ -139,6 +139,10 @@ def expandVarNamesByIndexSymbols(varNameList):
 
 def getVarNameWithoutIndices(node):
     varName = node.attr
+    if (node.attr_index != None):
+        for index in node.attr_index:
+            varName += "_" + index
+
     indexOfListSymbol = varName.find(LIST_INDEX_SYMBOL)
     if (indexOfListSymbol == -1):
         return varName

@@ -263,6 +263,64 @@ def applyReplacementsDict(replacementsDict, currentStrName):
 
     return retString
 
+def processDotProdAsNonInt(dotProdObj, lamFuncName, lambdaReplacements):
+    global userFuncsFile, numLambdaFunctions
+
+    numLambdaFunctions += 1
+
+    startVal = dotProdObj.getStartVal()
+    startValSplit = startVal.split(LIST_INDEX_SYMBOL)
+    startVal = startValSplit[0]
+
+    userFuncsOutputString = ""
+    userFuncsOutputString += "def " + getStringFunctionName + "(" + getStringFunctionName + argSuffix + "):\n\t"
+    userFuncsOutputString += userGlobalsFuncName + "()\n\t"
+    userFuncsOutputString += "return " + getStringFunctionName + argSuffix + ".getAttribute()\n\n"
+    userFuncsOutputString += "def "
+    userFuncsOutputString += lamFuncName
+    userFuncsOutputString += str(numLambdaFunctions)
+    userFuncsOutputString += "("
+    (lambdaReplacementOutputString, lambdaLoopVar) = getLambdaReplacementsString(lambdaReplacements, False)
+    userFuncsOutputString += lambdaLoopVar + ", " + startVal + ", "
+    userFuncsOutputString += lambdaReplacementOutputString
+    userFuncsOutputString = userFuncsOutputString[0:(len(userFuncsOutputString) - len(", "))]
+    userFuncsOutputString += "):\n\t"
+    userFuncsOutputString += userGlobalsFuncName + "()\n\t"
+    userFuncsOutputString += lambdaLoopVar + " = " + getStringFunctionName + "("
+    userFuncsOutputString += startVal + "[" + lambdaLoopVar + "])\n\t"
+    userFuncsOutputString += "return " + getAssignStmtAsString(dotProdObj.getBinaryNode().right, None, None, None, False)
+    userFuncsOutputString += "\n\n"
+
+    userFuncsFile.write(userFuncsOutputString)
+
+    dotProdOutputString = ""
+    dotProdOutputString += "dotprod2(range(0, "
+    dotProdOutputString += replacePoundsWithBrackets(str(dotProdObj.getEndVal()))
+    dotProdOutputString += "), "
+    dotProdOutputString += lamFuncName + str(numLambdaFunctions) + ", " + startVal + ", "
+    (lambdaReplacementOutputString, lambdaLoopVar) = getLambdaReplacementsString(lambdaReplacements, False)
+    dotProdOutputString += lambdaReplacementOutputString
+    dotProdOutputString = dotProdOutputString[0:(len(dotProdOutputString) - len(", "))]
+    dotProdOutputString += ")"
+
+    return dotProdOutputString
+
+def processDotProdAsInt(dotProdObj, lamFuncName, lambdaReplacements):
+    dotProdOutputString = "dotprod2(range("
+    dotProdOutputString += replacePoundsWithBrackets(str(dotProdObj.getStartVal()))
+    dotProdOutputString += ","
+    dotProdOutputString += replacePoundsWithBrackets(str(dotProdObj.getEndVal()))
+    dotProdOutputString += "), "
+    dotProdOutputString += lamFuncName
+    dotProdOutputString += str(numLambdaFunctions)
+    dotProdOutputString += ", "
+    (lambdaReplacementOutputString, lambdaLoopVar) = getLambdaReplacementsString(lambdaReplacements, True)
+    dotProdOutputString += lambdaReplacementOutputString
+    dotProdOutputString = dotProdOutputString[0:(len(dotProdOutputString) - len(", "))]
+    dotProdOutputString += ")"
+
+    return dotProdOutputString
+
 def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements, forOutput):
     global userFuncsFile, userFuncsList
 
@@ -276,6 +334,8 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
         elif (node.type == ops.TYPE):
             strNameToReturn = applyReplacementsDict(replacementsDict, str(node.attr))
         strNameToReturn = replacePoundsWithBrackets(strNameToReturn)
+        if (node.negated == True):
+            strNameToReturn = "-" + strNameToReturn
         return strNameToReturn
     elif (node.type == ops.ADD):
         leftString = getAssignStmtAsString(node.left, replacementsDict, None, None, False)
@@ -351,17 +411,16 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
     elif ( (node.type == ops.ON) and (node.left.type == ops.PROD) ):
         if ( (dotProdObj == None) or (lambdaReplacements == None) ):
             sys.exit("getAssignStmtAsString in codegen.py:  dot prod node detected, but there was a problem with either the dot product object or the lambda replacements dictionary passed in.")
-        dotProdOutputString = "dotprod2(range("
-        dotProdOutputString += replacePoundsWithBrackets(str(dotProdObj.getStartVal()))
-        dotProdOutputString += ","
-        dotProdOutputString += replacePoundsWithBrackets(str(dotProdObj.getEndVal()))
-        dotProdOutputString += "), "
-        dotProdOutputString += lamFuncName
-        dotProdOutputString += str(numLambdaFunctions)
-        dotProdOutputString += ", "
-        dotProdOutputString += getLambdaReplacementsString(lambdaReplacements)
-        dotProdOutputString = dotProdOutputString[0:(len(dotProdOutputString) - len(", "))]
-        dotProdOutputString += ")"
+        startValIsInt = None
+        try:
+            dummyIntVar = int(dotProdObj.getStartVal())
+            startValIsInt = True
+        except:
+            startValIsInt = False
+        if (startValIsInt == True):
+            dotProdOutputString = processDotProdAsInt(dotProdObj, lamFuncName, lambdaReplacements)
+        else:
+            dotProdOutputString = processDotProdAsNonInt(dotProdObj, lamFuncName, lambdaReplacements)
         return dotProdOutputString
     elif (node.type == ops.EXPAND):
         expandOutputString = ""
@@ -374,7 +433,7 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
 
     sys.exit("getAssignStmtAsString in codegen.py:  unsupported node type detected.")
 
-def getLambdaReplacementsString(lambdaReplacements):
+def getLambdaReplacementsString(lambdaReplacements, includeFirstLambdaVar):
     if (type(lambdaReplacements) is not dict):
         sys.exit("getLambdaReplacementsString in codegen.py:  lambda replacements argument passed in is not of type dictionary.")
 
@@ -393,10 +452,12 @@ def getLambdaReplacementsString(lambdaReplacements):
     retString = ""
 
     for counter in range(0, len(reverseDict)):
+        if ( (counter == 0) and (includeFirstLambdaVar == False) ):
+            continue
         retString += reverseDict[counter]
         retString += ", "
 
-    return retString
+    return (retString, reverseDict[0])
 
 def writeLambdaFuncAssignStmt(outputFile, binNode):
     global numLambdaFunctions
@@ -534,9 +595,14 @@ def addTypeDeclToGlobalVars(binNode):
     if (str(binNode.right.attr) != LIST_TYPE):
         return
 
-    varName = str(binNode.left.attr)
+    #varName = str(binNode.left.attr)
+
+    varName = getFullVarName(binNode.left, False)
+
     if (varName.find(LIST_INDEX_SYMBOL) != -1):
         sys.exit("addTypeDeclToGlobalVars in codegen.py:  variable name in types section has # sign in it.")
+
+    varName = getVarNameWithoutIndices(binNode.left)
 
     if (varName not in varNamesToFuncs_Assign):
         return
@@ -798,4 +864,4 @@ def main(SDL_Scheme):
 if __name__ == "__main__":
     main(sys.argv[1])
     parseLinesOfCode(getLinesOfCode(), True)
-    os.system("cp userFuncsPermanent.py userFuncs.py")
+    #os.system("cp userFuncsPermanent.py userFuncs.py")

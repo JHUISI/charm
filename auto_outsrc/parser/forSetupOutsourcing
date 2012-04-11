@@ -1,4 +1,0 @@
-	S = ['ONE', 'TWO', 'THREE']
-	#M = groupObj.random(GT)
-	M = "balls on fire"
-	policy_str = '((four or three) and (three or one))'

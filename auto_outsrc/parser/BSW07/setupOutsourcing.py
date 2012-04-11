@@ -1,4 +1,4 @@
-from userFuncs import createPolicy, getAttributeList, calculateSharesDict, SymEnc, GetString, prune, getCoefficients, SymDec
+from userFuncs import *
 from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair
 from toolbox.secretutil import SecretUtil
 from toolbox.symcrypto import AuthenticatedCryptoAbstraction
@@ -22,7 +22,6 @@ Cr = {}
 Cpr = {}
 DjBlinded = {}
 DjpBlinded = {}
-skBlinded = {}
 
 def setup():
 	global pk
@@ -51,7 +50,6 @@ def keygen(S):
 	global Djp
 	global DjBlinded
 	global DjpBlinded
-	global skBlinded
 
 	input = [pk, mk, S]
 	r = groupObj.random(ZR)
@@ -107,21 +105,16 @@ def encrypt(M, policy_str):
 	output = ct
 	return output
 
-def transformLambdaFunc(y, attrs, Cr, coeff, Dj, Djp, Cpr):
-	lambdaIndex = GetString(attrs[y])
-	firstTerm = (Cr[lambdaIndex] ** (-coeff[lambdaIndex]))
-	secondTerm = (Djp[lambdaIndex] ** coeff[lambdaIndex])
-	return pair(firstTerm, Dj[lambdaIndex]) * pair(secondTerm, Cpr[lambdaIndex])
-
-def transform(ct):
-	input = [pk, skBlinded, ct]
+def transform(sk, ct):
+	input = [sk, ct]
 	policy_str, Ctl, C, Cr, Cpr, T1 = ct
-	S, D, Dj, Djp = skBlinded
+	S, D, Dj, Djp = sk
 	policy = createPolicy(policy_str)
 	attrs = prune(policy, S)
 	coeff = getCoefficients(policy)
 	Y = len(attrs)
-	A = dotprod2(range(0,Y), transformLambdaFunc, attrs, Cr, coeff, Dj, Djp, Cpr)
+	lam_func1 = lambda a,b,c,d,e,f: (pair((b[a] ** -c[a]), d[a]) * pair((e[a] ** c[a]), f[a]))
+	A = dotprod2(range(0, Y), lam_func2, attrs, Cr, coeff, Dj, Djp, Cpr)
 	result0 = (pair(C, D) * A)
 	T0 = Ctl
 	T2 = result0
@@ -130,6 +123,7 @@ def transform(ct):
 	return output
 
 def decout(partCT, zz):
+	input = [partCT, zz]
 	T0, T1, T2 = partCT
 	R = (T0 / (T2 ** zz))
 	s_sesskey = SHA1(R)
@@ -143,14 +137,14 @@ if __name__ == "__main__":
 	groupObj = PairingGroup('SS512')
 
 	S = ['ONE', 'TWO', 'THREE']
-	M = "balls on fire"
+	M = "balls on fire (hot)"
 	policy_str = '((four or three) and (two or one))'
 
 	setup()
-	(zz, skBlinded) = keygen(['ONE', 'TWO', 'THREE'])
+	(zz, skBlinded) = keygen(S)
 	(ct) = encrypt(M, policy_str)
 
-	(partCT) = transform(ct)
+	(partCT) = transform(skBlinded, ct)
 
 	(M) = decout(partCT, zz)
 
