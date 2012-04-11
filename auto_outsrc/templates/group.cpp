@@ -102,10 +102,17 @@ Element::Element()
 {
 	type = None_t;
 }
+
+Element::Element(const char *s)
+{
+	type = Str_t;
+	strPtr = string(s);
+}
+
 Element::Element(string s)
 {
 	type = Str_t;
-	strPtr = new string(s);
+	strPtr = s;
 }
 
 Element::Element(ZR & z)
@@ -134,8 +141,9 @@ Element::Element(GT & g)
 
 Element::~Element()
 {
+//	if(type == Str_t) delete strPtr;
 	type = None_t;
-	strPtr = 0;
+//	strPtr = 0;
 	zr = 0;
 	g1 = 0;
 	g2 = 0;
@@ -148,7 +156,7 @@ ostream& operator<<(ostream& s, const Element& e)
 	string elem_str = "E: ";
 	s << "T: ";
 	if(t == Str_t) {
-		s << "str_t, " << elem_str << *e.strPtr;
+		s << "str_t, " << elem_str << e.strPtr;
 	}
 	else if(t == ZR_t) {
 		s << "ZR_t, " << elem_str << *e.zr;
@@ -173,14 +181,14 @@ string Element::serialize(Element & e)
 	stringstream eSerialized;
 	eSerialized << e.type << ":";
 	if(e.type == Str_t)
-		eSerialized << *e.strPtr;
+		eSerialized << e.strPtr;
 	else
 		eSerialized << element_to_bytes(e);
 	return eSerialized.str();
 }
 
 //TODO: add thorough error checking to deserialize functions
-Element Element::deserialize(string s)
+Element Element::deserialize(string & s)
 {
 	Element elem;
 	size_t found = s.find(':'); // delimeter
@@ -189,8 +197,10 @@ Element Element::deserialize(string s)
 		int type = atoi(s.substr(0, found).c_str());
 		if(type >= ZR_t && type < Str_t)
 			return element_from_bytes((Type) type, (unsigned char *) s.substr(found+1, s.size()).c_str());
-		else if(type == Str_t)
-			return Element(s.substr(found+1, s.size()));
+		else if(type == Str_t) {
+//			string s2 = ;
+			return Element(s.substr(found+1, s.size()).c_str());
+		}
 	}
 
 	throw new string("Invalid bytes.\n");
@@ -210,13 +220,20 @@ CharmList::~CharmList()
 		list.erase(i);
 }
 
+void CharmList::append(const char *s)
+{
+	Element elem(s);
+	list[cur_index] = elem;
+	cur_index++;
+}
+
 void CharmList::append(string strs)
 {
-	Element elem;
+	Element elem(strs);
 
 	// init elem here
-	elem.type = Str_t;
-	elem.strPtr  = &strs;
+//	elem.type = Str_t;
+//	elem.strPtr  = strs;
 
 	list[cur_index] = elem;
 	cur_index++;
@@ -289,7 +306,7 @@ string CharmList::printAtIndex(int index)
 		i = index;
 		Type t = list[i].type;
 		if(t == Str_t) {
-			ss << *list[i].strPtr;
+			ss << list[i].strPtr;
 		}
 		else if(t == ZR_t) {
 			ss << *list[i].zr;
@@ -311,6 +328,74 @@ string CharmList::printAtIndex(int index)
 	return s;
 }
 
+// end CharmList implementation
+
+// start CharmDict implementation
+
+CharmDict::CharmDict()
+{
+
+}
+
+CharmDict::~CharmDict()
+{
+	emap.clear();
+}
+
+int CharmDict::length()
+{
+	return (int) emap.size();
+}
+
+CharmList CharmDict::keys()
+{
+	CharmList s;
+	map<string, Element>::iterator iter;
+	for(iter = emap.begin(); iter != emap.end(); iter++) {
+		// s.push_back(iter->first);
+		const char *ptr = iter->first.c_str();
+		s.append( ptr );
+	}
+
+	return s;
+}
+
+string CharmDict::printAll()
+{
+	stringstream ss;
+	map<string, Element, cmp_str>::iterator iter;
+	for(iter = emap.begin(); iter != emap.end(); iter++) {
+		ss << "key = " << iter->first << ", value = " << iter->second << endl;
+	}
+
+	string s = ss.str();
+	return s;
+}
+
+void CharmDict::set(string key, Element& value)
+{
+	emap.insert(pair<string, Element>(key, value));
+}
+
+Element& CharmDict::operator[](const string key)
+{
+	map<string, Element, cmp_str>::iterator iter;
+	for(iter = emap.begin(); iter != emap.end(); iter++) {
+		if (key.c_str() == iter->first.c_str()) {
+			return iter->second;
+		} // strcmp(key.c_str(), iter->first.c_str())
+	}
+
+	// means it's a new index so set it
+	throw new string("Invalid access.\n");
+}
+
+ostream& operator<<(ostream& s, const CharmDict& e)
+{
+	CharmDict e2 = e;
+	s << e2.printAll();
+	return s;
+}
 
 // defines the PairingGroup class
 
@@ -479,7 +564,7 @@ ZR PairingGroup::hashListToZR(CharmList & list)
 	for(int i = 0; i < len; i++) {
 		Element e = list[i];
 		if(e.type == Str_t) {
-			ZR tmp = pfcObject->hash_to_group( (char *) e.strPtr->c_str());
+			ZR tmp = pfcObject->hash_to_group( (char *) e.strPtr.c_str());
 			pfcObject->add_to_hash(tmp);
 		}
 		else if(e.type == ZR_t)
@@ -503,7 +588,7 @@ G1 PairingGroup::hashListToG1(CharmList & list)
 	for(int i = 0; i < len; i++) {
 		Element e = list[i];
 		if(e.type == Str_t) {
-			ZR tmp = pfcObject->hash_to_group( (char *) e.strPtr->c_str());
+			ZR tmp = pfcObject->hash_to_group( (char *) e.strPtr.c_str());
 			pfcObject->add_to_hash(tmp);
 		}
 		else if(e.type == ZR_t)
@@ -531,7 +616,7 @@ G2 PairingGroup::hashListToG2(CharmList & list)
 	for(int i = 0; i < len; i++) {
 		Element e = list[i];
 		if(e.type == Str_t) {
-			ZR tmp = pfcObject->hash_to_group( (char *) e.strPtr->c_str());
+			ZR tmp = pfcObject->hash_to_group( (char *) e.strPtr.c_str());
 			pfcObject->add_to_hash(tmp);
 		}
 		else if(e.type == ZR_t)
@@ -578,17 +663,19 @@ string element_to_bytes(Element & e) {
 		G2 P = *e.g2; // embeds an ECn3 element (for MNT curves)
 		ZZn3 x, y;
 			// ZZn a,b,c;
-		ZZn *a = new ZZn[6];
+ 		ZZn *a = new ZZn[6];
 		P.g.get(x, y); // get ZZn3's
 		x.get(a[0], a[1], a[2]); // get coordinates for each ZZn
 		y.get(a[3], a[4], a[5]);
 
 		string t;
 		for(int i = 0; i < 6; i++) {
-			t.append( bigToBytes(Big(a[i])) );
+
+			t.append( bigToBytes( Big(a[i]) ) );
 		}
 			// base64 encode t and return
 		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
+ 		delete [] a;
 		return encoded;
 	}
 #endif
@@ -612,6 +699,7 @@ string element_to_bytes(Element & e) {
 //		    _printf_buffer_as_hex((uint8_t *) t.c_str(), t.size());
 			// base64 encode t and return
 		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
+		delete [] a;
 		return encoded;
 #else
 		// it must be symmetric
@@ -628,7 +716,9 @@ Element element_from_bytes(Type type, unsigned char *data)
 			string b64_encoded((char *) data);
 			string s = _base64_decode(b64_encoded);
 			int cnt = 0;
-			Element elem(*bytesToBig(s, &cnt));
+			Big *b = bytesToBig(s, &cnt);
+			Element elem(*b);
+			delete b;
 			return elem;
 		}
 	}
@@ -638,14 +728,18 @@ Element element_from_bytes(Type type, unsigned char *data)
 		string s = _base64_decode(b64_encoded);
 
 		int cnt = 0;
-		Big x,y;
-		x = *bytesToBig(s, &cnt);
+		Big *x, *y;
+		x = bytesToBig(s, &cnt);
 		s = s.substr(cnt);
-		y = *bytesToBig(s, &cnt);
+		y = bytesToBig(s, &cnt);
 //		cout << "point => (" << x << ", " << y << ")" << endl;
 		G1 *p = new G1();
-		p->g.set(x,y);
-		return Element(*p);
+		p->g.set(*x, *y);
+		delete x;
+		delete y;
+		Element elem(*p);
+		delete p;
+		return elem;
 		}
 	}
 #ifdef ASYMMETRIC
@@ -657,16 +751,21 @@ Element element_from_bytes(Type type, unsigned char *data)
 			int cnt = 0;
 			ZZn *a = new ZZn[6];
 			for(int i = 0; i < 6; i++) {
-				a[i] = ZZn(*bytesToBig(s, &cnt) ); // retrieve all six coordinates
+				Big *b = bytesToBig(s, &cnt);
+				a[i] = ZZn( *b ); // retrieve all six coordinates
 				s = s.substr(cnt);
+				delete b;
 			}
 			ZZn3 x (a[0], a[1], a[2]);
 			ZZn3 y (a[3], a[4], a[5]);
 
 			G2 *point = new G2();
 			point->g.set(x, y);
+			delete [] a;
 			// cout << "Recovered pt => " << point->g << endl;
-			return Element(*point);
+			Element elem(*point);
+			delete point;
+			return elem;
 		}
 	}
 #endif
@@ -679,11 +778,13 @@ Element element_from_bytes(Type type, unsigned char *data)
 #ifdef ASYMMETRIC
 			Big *a = new Big[6];
 			for(int i = 0; i < 6; i++) {
-				// cout << "buffer => ";
-			    // printf_buffer_as_hex((uint8_t *) s.c_str(), s.size());
-				a[i] = *bytesToBig(s, &cnt); // retrieve all six coordinates
+//				// cout << "buffer => ";
+//			    // printf_buffer_as_hex((uint8_t *) s.c_str(), s.size());
+				Big *b = bytesToBig(s, &cnt);
+				a[i] =  Big(*b); // retrieve all six coordinates
 				s = s.substr(cnt);
-				// cout << "i => " << a[i] << endl;
+				delete b;
+//				// cout << "i => " << a[i] << endl;
 			}
 			ZZn2 x, y, z;
 			x.set(a[0], a[1]);
@@ -692,7 +793,10 @@ Element element_from_bytes(Type type, unsigned char *data)
 
 			GT *point = new GT();
 			point->g.set(x, y, z);
-			return Element(*point);
+			Element elem (*point);
+			delete [] a;
+//			delete point;
+			return elem;
 #else
 		// must be symmetric
 #endif

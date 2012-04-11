@@ -37,8 +37,8 @@ int main()
 	CharmList s;
 	s.append(str1);
 	s.append(c);
-	s.append(g2);
 	s.append(g1);
+	s.append(g2);
 	s.append(gt);
 
 	cout << "\nPrint list so far...\n";
@@ -61,10 +61,25 @@ int main()
 
 	cout << "Serialize/Deserialize tests..." << endl;
 
-	string serObj = Element::serialize(s[2]);
+	string serObj = Element::serialize(s[3]);
 	cout << serObj << endl;
 
 	cout << "Deserialized : " << Element::deserialize(serObj) << endl;
+
+	cout << "CharmDict tests...." << endl << endl;
+	CharmDict d;
+
+	Element elem("hello this is another message");
+	d.set("100", elem);
+	d.set("102", s[1]);
+	d.set("103", s[2]);
+
+	cout << d << endl;
+
+	// vector<string>
+	CharmList s3 = d.keys();
+	for(int i = 0; i < s3.length(); i++)
+		cout << "Keys: " << s3[i] << endl;
 
 	return 0;
 }

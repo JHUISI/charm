@@ -13,6 +13,8 @@
 #endif
 
 #include <map>
+#include <vector>
+#include <string>
 
 #define ZR Big
 #define convert_str(point) point.g
@@ -31,9 +33,10 @@ public:
 	G1 *g1;
 	G2 *g2;
 	GT *gt;
-	string *strPtr;
+	string strPtr;
 	Element();
 	~Element();
+	Element(const char *);
 	Element(string);
 	Element(ZR&);
 	Element(G1&);
@@ -41,7 +44,7 @@ public:
 	Element(GT&);
 
 	static string serialize(Element&);
-	static Element deserialize(string);
+	static Element deserialize(string&);
 
     friend ostream& operator<<(ostream&, const Element&);
 private:
@@ -57,6 +60,7 @@ public:
 	CharmList(void); // static list
 	~CharmList();
 	// consider adding remove
+	void append(const char *);
 	void append(string);
 	void append(ZR&);
 	void append(G1&);
@@ -64,18 +68,41 @@ public:
 	void append(G2&);
 #endif
 	void append(GT&);
-	Element& newElement(string);
 	int length(); // return length of lists
-	void print();
 	string printAtIndex(int index);
 
 	// retrieve a particular index
 	Element& operator[](const int index);
-	// Element& operator=()
     friend ostream& operator<<(ostream&, const CharmList&);
 private:
 	int cur_index;
 	map<int, Element> list;
+};
+
+struct cmp_str
+{
+	bool operator()(const string a, const string b) {
+		return strcmp(a.c_str(), b.c_str()) < 0;
+	}
+};
+
+class CharmDict
+{
+public:
+	CharmDict(void); // static list
+	~CharmDict();
+	// consider adding remove
+	void set(string key, Element& value);
+	int length(); // return length of lists
+	CharmList keys(); // vector<string>
+	string printAll();
+
+	// retrieve a particular index
+	Element& operator[](const string key);
+    friend ostream& operator<<(ostream&, const CharmDict&);
+
+private:
+	map<string, Element, cmp_str> emap;
 };
 
 
@@ -101,8 +128,6 @@ public:
 	G2 mul(G2&, G2&);
 	G2 div(G2&, G2&);
 	G2 exp(G2&, ZR&);
-//	char *serialize(G2&); // not done
-//	void deserialize(G2&, char *); // not done
 	GT pair(G1&, G2&);
 	void *hash(char *s, Type t);
 #endif
@@ -122,15 +147,6 @@ public:
 
 	G1 exp(G1&, ZR&);
 	GT exp(GT&, ZR&);
-
-	// not done
-//	char *serialize(ZR&);
-//	char *serialize(G1&);
-//	char *serialize(GT&);
-
-//	void deserialize(ZR&, char *);
-//	void deserialize(G1&, char *);
-//	void deserialize(GT&, char *);
 
 private:
 	PFC *pfcObject; // defined by above #defines SYMMETRIC or ASYMMETRIC (for now)
