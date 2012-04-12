@@ -1019,6 +1019,10 @@ def parseLinesOfCode(code, verbosity):
             node = parser.parse(line, lineNumberInCode)
             astNodes.append(node)
             if verbosity: print("sdl: ", lineNumberInCode, node)
+
+            if (type(node) is str):
+                print(node)
+
             if (node.type == ops.EQ):
                 if (currentFuncName not in varTypes):
                     varTypes[currentFuncName] = {}
