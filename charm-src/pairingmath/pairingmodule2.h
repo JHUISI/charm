@@ -98,6 +98,11 @@ typedef struct {
 	element_printf(type, e); \
 	printf("\n");
 
+#define element_init_hash(a) _init_hash(a->pairing->pair_obj)
+#define element_add_str_hash(a, b, c) _element_add_str_hash(a->pairing->pair_obj, b, c)
+#define element_add_to_hash(a) _element_add_to_hash(a->element_type, a->pairing->pair_obj, a->e)
+#define element_finish_hash(a, t) a->e = finish_hash(t, a->pairing->pair_obj)
+
 #define element_is(a, b) element_is_value(a->element_type, a->e, b)
 #define element_add(c, a, b) _element_add(a->element_type, c->e, a->e, b->e)
 #define element_sub(c, a, b) _element_sub(a->element_type, c->e, a->e, b->e)
@@ -206,4 +211,5 @@ int add_rule(Group_t lhs, Group_t rhs);
 int sub_rule(Group_t lhs, Group_t rhs);
 int div_rule(Group_t lhs, Group_t rhs);
 int pair_rule(Group_t lhs, Group_t rhs);
+
 #endif

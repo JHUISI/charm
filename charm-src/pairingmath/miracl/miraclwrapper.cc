@@ -22,6 +22,37 @@ void _printf_buffer_as_hex(uint8_t * data, size_t len)
 //#endif
 }
 
+string bigToBytes(Big x)
+{
+	char c[MAX_LEN+1];
+	memset(c, 0, MAX_LEN);
+	int size = to_binary(x, MAX_LEN, c, FALSE);
+	string bytes(c, size);
+//	printf("bigToBytes before => ");
+//	_printf_buffer_as_hex((uint8_t *) bytes.c_str(), size);
+	stringstream ss;
+	ss << size << ":" << bytes << "\0";
+//	printf("bigToBytes after => ");
+//	_printf_buffer_as_hex((uint8_t *) ss.str().c_str(), ss.str().size());
+	return ss.str();
+}
+
+Big *bytesToBig(string str, int *counter)
+{
+	int pos = str.find_first_of(':');
+	int len = atoi( str.substr(0, pos).c_str() );
+	const char *elem = str.substr(pos+1, pos + len).c_str();
+//		cout << "pos of elem => " << pos << endl;
+//		cout << "elem => " << elem << endl;
+//	printf("bytesToBig before => ");
+//	_printf_buffer_as_hex((uint8_t *) elem, len);
+	Big x = from_binary(len, (char *) elem);
+//	cout << "Big => " << x << endl;
+	Big *X  = new Big(x);
+	*counter  = pos + len + 1;
+	return X;
+}
+
 pairing_t *pairing_init(int securitylevel) {
 
 	PFC *pfc = new PFC(securitylevel);
@@ -532,6 +563,68 @@ element_t *hash_then_map(Group_t type, const pairing_t *pairing, char *data, int
 
 }
 
+void _init_hash(const pairing_t *pairing)
+{
+	PFC *pfc = (PFC *) pairing;
+	pfc->start_hash();
+}
+
+void _element_add_str_hash(const pairing_t *pairing, void *data, int len)
+{
+	PFC *pfc = (PFC *) pairing;
+	string s((char *) data);
+	if(s.size() == (size_t) len) {
+		Big b = pfc->hash_to_group((char *) s.c_str());
+		pfc->add_to_hash(b);
+	}
+}
+
+void _element_add_to_hash(Group_t type, const pairing_t *pairing, const element_t *e)
+{
+	PFC *pfc = (PFC *) pairing;
+	if(type == ZR_t) {
+		Big *b = (Big *) e;
+		pfc->add_to_hash(*b);
+	}
+	else if(type == G1_t) {
+		G1 *g1 = (G1 *) e;
+		pfc->add_to_hash(*g1);
+	}
+	else if(type == G2_t) {
+		G2 *g2 = (G2 *) e;
+		pfc->add_to_hash(*g2);
+	}
+	else if(type == GT_t) {
+		GT *gt = (GT *) e;
+		pfc->add_to_hash(*gt);
+	}
+}
+
+element_t *finish_hash(Group_t type, const pairing_t *pairing)
+{
+	PFC *pfc = (PFC *) pairing;
+	Big *b = new Big(pfc->finish_hash_to_group());
+
+	if(type == ZR_t) {
+		return (element_t *) b;
+	}
+	else if(type == G1_t) {
+		G1 *g1 = new G1();
+		pfc->hash_and_map(*g1, (char *) bigToBytes(*b).c_str());
+		return (element_t *) g1;
+	}
+	else if(type == G2_t) {
+		G2 *g2 = new G2();
+		pfc->hash_and_map(*g2, (char *) bigToBytes(*b).c_str());
+		return (element_t *) g2;
+	}
+	else {
+		cout << "Hashing to an invalid type: " << type << endl;
+		delete b;
+		return NULL;
+	}
+}
+
 element_t *_element_from_hash(Group_t type, const pairing_t *pairing, void *data, int len)
 {
 	if(type == ZR_t) {
@@ -737,37 +830,6 @@ element_t *_element_prod_pairing_type3(const pairing_t *pairing, const element_t
 
 	GT *gt = new GT(pfc->multi_pairing(length, g2_list, g1_list));
 	return (element_t *) gt;
-}
-
-string bigToBytes(Big x)
-{
-	char c[MAX_LEN+1];
-	memset(c, 0, MAX_LEN);
-	int size = to_binary(x, MAX_LEN, c, FALSE);
-	string bytes(c, size);
-//	printf("bigToBytes before => ");
-//	_printf_buffer_as_hex((uint8_t *) bytes.c_str(), size);
-	stringstream ss;
-	ss << size << ":" << bytes << "\0";
-//	printf("bigToBytes after => ");
-//	_printf_buffer_as_hex((uint8_t *) ss.str().c_str(), ss.str().size());
-	return ss.str();
-}
-
-Big *bytesToBig(string str, int *counter)
-{
-	int pos = str.find_first_of(':');
-	int len = atoi( str.substr(0, pos).c_str() );
-	const char *elem = str.substr(pos+1, pos + len).c_str();
-//		cout << "pos of elem => " << pos << endl;
-//		cout << "elem => " << elem << endl;
-//	printf("bytesToBig before => ");
-//	_printf_buffer_as_hex((uint8_t *) elem, len);
-	Big x = from_binary(len, (char *) elem);
-//	cout << "Big => " << x << endl;
-	Big *X  = new Big(x);
-	*counter  = pos + len + 1;
-	return X;
 }
 
 int _element_length_in_bytes(Curve_t ctype, Group_t type, element_t *e) {
