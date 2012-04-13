@@ -2,28 +2,68 @@ from SDLParser import *
 from config import *
 from transform import *
 from rcca import *
+from outsrctechniques import SubstituteVar
 import sys
-
-#SDLLinesForKeygen = []
 
 assignInfo = None
 varTypes = None
+astNodes = None
 
-def writeLinesToFuncAfterVarLastAssign(funcName, lineList, varName):
-    global assignInfo, varTypes
+def processListOrExpandNodes(binNode, origVarName, newVarName):
+    binNodeRight = binNode.right
+    if (binNodeRight == None):
+        return
 
-    if (varName == None):
-        lineNo = 0
-    else:
-        lineNo = getLineNoOfLastAssign(funcName, varName) + 1
+    binNodeRightType = binNodeRight.type
+    if ( (binNodeRightType != ops.LIST) and (binNodeRightType != ops.EXPAND) ):
+        return
 
-    if (lineNo == 0):
-        lineNo = getLineNoOfInputStatement(funcName) + 1
+    nodeListNodes = binNodeRight.listNodes
+    if (len(nodeListNodes) == 0):
+        return
 
-    appendToLinesOfCode(lineList, lineNo)
+    retNodeList = []
+
+    for currentNode in nodeListNodes:
+        if (currentNode == origVarName):
+            retNodeList.append(newVarName)
+        else:
+            retNodeList.append(currentNode)
+
+    binNodeRight.listNodes = retNodeList
+
+def replaceVarInstancesInLineNoRange(startLineNo, endLineNo, origVarName, newVarName):
+    for lineNoIndex in range(startLineNo, (endLineNo + 1)):
+        indexIntoCodeStructs = lineNoIndex - 1
+        currentBinNode = astNodes[indexIntoCodeStructs]
+        ASTVisitor(SubstituteVar(origVarName,newVarName)).preorder(currentBinNode)
+        processListOrExpandNodes(currentBinNode, origVarName, newVarName)
+        binNodeAsString = str(currentBinNode)
+        if (binNodeAsString == 'NONE'):
+            binNodeAsString = "\n"
+        substituteOneLineOfCode(binNodeAsString, lineNoIndex)
+
+    updateCodeAndStructs()
+
+def updateCodeAndStructs():
+    global assignInfo, varTypes, astNodes
+
     parseLinesOfCode(getLinesOfCode(), False)
     assignInfo = getAssignInfo()
     varTypes = getVarTypes()
+    astNodes = getAstNodes()
+
+def writeLinesToFuncAfterVarLastAssign(funcName, lineList, varName):
+    if (varName == None):
+        lineNo = getLineNoOfInputStatement(funcName) + 1
+    else:
+        lineNo = getLineNoOfLastAssign(funcName, varName) + 1
+        if (lineNo == 1):
+            lineNo = getLineNoOfInputStatement(funcName) + 1
+
+    appendToLinesOfCode(lineList, lineNo)
+    updateCodeAndStructs()
+    return (lineNo + (len(lineList)))
 
 def getLineNoOfLastAssign(funcName, varNameToFind):
     if (funcName not in assignInfo):
@@ -75,8 +115,6 @@ def removeListIndicesAndDupsFromList(inputList):
     return retList
 
 def writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls):
-    #global SDLLinesForKeygen
-
     SDLLinesForKeygen = []
 
     SDLLinesForKeygen.append("BEGIN :: forall\n")
@@ -88,7 +126,8 @@ def writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls):
         sys.exit("writeForAllLoop in keygen.py attempted to add duplicate keygenOutputElem to varNamesForListDecls -- 2 of 2.")
     varNamesForListDecls.append(keygenOutputElem)
 
-    writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, keygenOutputElem)
+    lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, keygenOutputElem)
+    replaceVarInstancesInLineNoRange(lineNoAfterThisAddition, getEndLineNoOfFunc(keygenFuncName), keygenOutputElem, (keygenOutputElem + blindingSuffix))
 
 def varListContainsParentDict(varList, parentDict):
     for varName in varList:
@@ -99,8 +138,6 @@ def varListContainsParentDict(varList, parentDict):
     return False
 
 def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListDecls):
-    #global SDLLinesForKeygen
-
     SDLLinesForKeygen = []
 
     varsModifiedInKeygen = list(assignInfo[keygenFuncName].keys())
@@ -109,7 +146,8 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
     if (keygenOutputElem not in varsModifiedInKeygen):
         SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + " := " + keygenOutputElem + "\n")
         varsToBlindList.remove(keygenOutputElem)
-        writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, keygenOutputElem)
+        lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, keygenOutputElem)
+        replaceVarInstancesInLineNoRange(lineNoAfterThisAddition, getEndLineNoOfFunc(keygenFuncName), keygenOutputElem, (keygenOutputElem + blindingSuffix))
         return keygenOutputElem
 
     if (keygenOutputElem not in assignInfo[keygenFuncName]):
@@ -125,7 +163,8 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
     if (isVarList == False):
         SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + " := " + keygenOutputElem + " ^ (1/" + keygenBlindingExponent + ")\n")
         varsToBlindList.remove(keygenOutputElem)
-        writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, keygenOutputElem)
+        lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, keygenOutputElem)
+        replaceVarInstancesInLineNoRange(lineNoAfterThisAddition, getEndLineNoOfFunc(keygenFuncName), keygenOutputElem, (keygenOutputElem + blindingSuffix))
         return keygenOutputElem
 
     if ( (keygenOutputVarInfo.getIsList() == True) and (len(keygenOutputVarInfo.getListNodesList()) > 0) ):
@@ -138,17 +177,14 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
         SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + " := list{" + listMembersString + "}\n")
         if (keygenOutputElem in varNamesForListDecls):
             sys.exit("blindKeygenOutputElement in keygen.py attempted to add duplicate keygenOutputElem to varNamesForListDecls -- 1 of 2.")
-        writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, keygenOutputElem)
+        lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, keygenOutputElem)
+        replaceVarInstancesInLineNoRange(lineNoAfterThisAddition, getEndLineNoOfFunc(keygenFuncName), keygenOutputElem, (keygenOutputElem + blindingSuffix))
         return keygenOutputElem
 
     writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls)
     return keygenOutputElem
 
 def keygen(file):
-    #global SDLLinesForKeygen
-
-    global assignInfo, varTypes
-
     SDLLinesForKeygen = []
 
     if ( (type(file) is not str) or (len(file) == 0) ):
@@ -159,8 +195,7 @@ def keygen(file):
     rcca(rccaData)
     varNamesForListDecls = []
 
-    assignInfo = getAssignInfo()
-    varTypes = getVarTypes()
+    updateCodeAndStructs()
 
     if (keygenBlindingExponent in assignInfo[keygenFuncName]):
         sys.exit("keygen.py:  the variable used for keygenBlindingExponent in config.py already exists in the keygen function of the scheme being analyzed.")
@@ -173,7 +208,7 @@ def keygen(file):
         sys.exit("Variable dependencies obtained for output of keygen in keygen.py was of length zero.")
 
     SDLLinesForKeygen.append(keygenBlindingExponent + " := random(ZR)\n")
-    writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, None)
+    lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, None)
 
     for keygenOutput_ind in keygenOutput:
         secretKeyName = blindKeygenOutputElement(keygenOutput_ind, varsToBlindList, varNamesForListDecls)
@@ -187,19 +222,14 @@ def keygen(file):
     lineNoKeygenOutput = getLineNoOfOutputStatement(keygenFuncName)
     removeFromLinesOfCode([lineNoKeygenOutput])
     appendToLinesOfCode(SDLLinesForKeygen, lineNoKeygenOutput)
-    parseLinesOfCode(getLinesOfCode(), False)
-    assignInfo = getAssignInfo()
-    varTypes = getVarTypes()
+    updateCodeAndStructs()
 
     for index_listVars in range(0, len(varNamesForListDecls)):
         varNamesForListDecls[index_listVars] = varNamesForListDecls[index_listVars] + blindingSuffix + " := list\n"
 
     lineNoEndTypesSection = getEndLineNoOfFunc(TYPES_HEADER)
     appendToLinesOfCode(varNamesForListDecls, lineNoEndTypesSection)
-    parseLinesOfCode(getLinesOfCode(), False)
-    assignInfo = getAssignInfo()
-    varTypes = getVarTypes()
+    updateCodeAndStructs()
 
 if __name__ == "__main__":
     keygen(sys.argv[1])
-    #printLinesOfCode()
