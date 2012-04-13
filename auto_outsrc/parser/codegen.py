@@ -3,6 +3,7 @@ from config import *
 import sys, os
 
 assignInfo = None
+inputOutputVars = None
 varNamesToFuncs_All = None
 varNamesToFuncs_Assign = None
 setupFile = None
@@ -953,7 +954,7 @@ def addGetGlobalsToUserFuncs():
 
 def main(SDL_Scheme):
     global setupFile, transformFile, decOutFile, userFuncsFile, assignInfo, varNamesToFuncs_All
-    global varNamesToFuncs_Assign
+    global varNamesToFuncs_Assign, inputOutputVars
 
     if ( (type(SDL_Scheme) is not str) or (len(SDL_Scheme) == 0) ):
         sys.exit("codegen.py:  sys.argv[1] argument (file name for SDL scheme) passed in was invalid.")
@@ -961,6 +962,7 @@ def main(SDL_Scheme):
     keygen(SDL_Scheme)
     astNodes = getAstNodes()
     assignInfo = getAssignInfo()
+    inputOutputVars = getInputOutputVars()
     varNamesToFuncs_All = getVarNamesToFuncs_All()
     varNamesToFuncs_Assign = getVarNamesToFuncs_Assign()
 
@@ -996,3 +998,4 @@ if __name__ == "__main__":
     parseLinesOfCode(getLinesOfCode(), True)
     #os.system("cp userFuncsPermanent.py userFuncs.py")
     writeLinesOfCodeToFile(outputSDLFileName)
+    print("io vars:  ", getInputOutputVars())

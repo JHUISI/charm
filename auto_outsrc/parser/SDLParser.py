@@ -662,7 +662,17 @@ def updateVarNamesDicts(node, varNameList, dictToUpdate):
 def updateInputOutputVars(varsDepList):
     global inputOutputVars
 
-    if (type(
+    if (type(varsDepList) is not list):
+        sys.exit("updateInputOutputVars in SDLParser.py:  varsDepList parameter passed in is not of type list.")
+
+    if (len(varsDepList) == 0):
+        return
+
+    for varDep in varsDepList:
+        if (varDep.find(LIST_INDEX_SYMBOL) != -1):
+            sys.exit("updateInputOutputVars in SDLParser.py:  found variable dependency of either input or output statement that contains a list index symbol.")
+        if (varDep not in inputOutputVars):
+            inputOutputVars.append(varDep)
 
 def updateAssignInfo(node, i):
     global assignInfo, forLoops, ifElseBranches, varNamesToFuncs_All, varNamesToFuncs_Assign
@@ -702,7 +712,8 @@ def updateAssignInfo(node, i):
 
     updateVarNamesDicts(node, expandedVarDeps, varNamesToFuncs_All)
 
-    if ( (varName == inputKeyword) or (varName == outputKeyword) ):
+    varNameForIO = getFullVarName(node.left, False)
+    if ( (varNameForIO == inputKeyword) or (varNameForIO == outputKeyword) ):
         updateInputOutputVars(resultingVarDeps)
 
     if (currentForLoopObj != None):
@@ -1014,7 +1025,7 @@ def parseFile2(filename, verbosity):
 def getAstNodes():
     return astNodes
 
-def getInputOutputVars()
+def getInputOutputVars():
     return inputOutputVars
 
 def parseLinesOfCode(code, verbosity):
