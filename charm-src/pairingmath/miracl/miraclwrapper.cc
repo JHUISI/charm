@@ -22,6 +22,18 @@ void _printf_buffer_as_hex(uint8_t * data, size_t len)
 //#endif
 }
 
+string bigToRawBytes(Big x)
+{
+	char c[MAX_LEN+1];
+	memset(c, 0, MAX_LEN);
+	int size = to_binary(x, MAX_LEN, c, FALSE);
+	string bytes(c, size);
+	stringstream ss;
+	ss << bytes << "\0";
+	return ss.str();
+}
+
+
 string bigToBytes(Big x)
 {
 	char c[MAX_LEN+1];
@@ -785,6 +797,22 @@ void _element_to_mpz(Group_t type, element_t *src, mpz_t dst)
 		mpz_import(dst, size, 1, sizeof(b[0]), 0, 0, b);
 //		char *result = print_mpz(dst, 10);
 //		printf("Result in dec '%s'\n", result);
+	}
+}
+
+/*
+ * pointer to data should be to allocated memory of size len
+ */
+void _element_hash_key(const pairing_t *pairing, Group_t type, element_t *e, void *data, int len)
+{
+	if(type == GT_t) {
+		PFC *pfc = (PFC *) pairing;
+		GT *gt = (GT *) e;
+		Big tmp = pfc->hash_to_aes_key(*gt);
+
+		// convert tmp to a string, right?
+		string tmp_str = bigToRawBytes(tmp);
+		memcpy((char *) data, tmp_str.c_str(), (size_t) strlen(tmp_str.c_str()));
 	}
 }
 /* Note the following type definition from MIRACL pairing_3.h

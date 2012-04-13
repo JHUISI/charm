@@ -73,6 +73,8 @@ void _element_add_str_hash(const pairing_t *pairing, void *data, int len);
 void _element_add_to_hash(Group_t type, const pairing_t *pairing, const element_t *e);
 element_t *finish_hash(Group_t type, const pairing_t *pairing);
 
+void _element_hash_key(const pairing_t *pairing, Group_t type, element_t *e, void *data, int len);
+
 #ifdef __cplusplus
 }
 #endif

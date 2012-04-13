@@ -1142,6 +1142,40 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 	return str;
 }
 
+PyObject *sha1_hash2(Element *self, PyObject *args) {
+	Element *object;
+	PyObject *str;
+	char *hash_hex = NULL;
+	int label = 0;
+
+	debug("Hashing the element...\n");
+	if(!PyArg_ParseTuple(args, "O|i", &object, &label)) {
+		PyErr_SetString(ElementError, "missing element object");
+		return NULL;
+	}
+
+	if(!object->elem_initialized) {
+		PyErr_SetString(ElementError, "null element object");
+		return NULL;
+	}
+	START_CLOCK(dBench);
+	int hash_size = HASH_LEN;
+	uint8_t hash_buf[hash_size + 1];
+	memset(hash_buf, 0, hash_size);
+	if(object->element_type == GT_t) {
+		element_hash_to_key(object, hash_buf, hash_size);
+
+		hash_hex = convert_buffer_to_hex(hash_buf, hash_size);
+		printf_buffer_as_hex(hash_buf, hash_size);
+	}
+
+	str = PyBytes_FromStringAndSize((const char *) hash_hex, hash_size);
+	free(hash_hex);
+	STOP_CLOCK(dBench);
+	return str;
+}
+
+
 // note that this is a class instance function and thus, self will refer to the class object 'element'
 // the args will contain the references to the objects passed in by the caller.
 // The hash function should be able to handle elements of various types and accept
@@ -1979,7 +2013,7 @@ PyMethodDef pairing_methods[] = {
 	{"order", (PyCFunction) Get_Order, METH_VARARGS, "Get the group order for a particular field."},
 
 	{"pair", (PyCFunction)Apply_pairing, METH_VARARGS, "Apply pairing between an element of G1_t and G2 and returns an element mapped to GT"},
-	{"hash", (PyCFunction)sha1_hash, METH_VARARGS, "Compute a sha1 hash of an element type"},
+	{"hash", (PyCFunction)sha1_hash2, METH_VARARGS, "Compute a sha1 hash of an element type"},
 	{"InitBenchmark", (PyCFunction)_init_benchmark, METH_NOARGS, "Initialize a benchmark object"},
 	{"StartBenchmark", (PyCFunction)_start_benchmark, METH_VARARGS, "Start a new benchmark with some options"},
 	{"EndBenchmark", (PyCFunction)_end_benchmark, METH_VARARGS, "End a given benchmark"},
