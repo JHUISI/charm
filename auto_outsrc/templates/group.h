@@ -114,6 +114,7 @@ private:
 	map<string, Element, cmp_str> emap;
 };
 
+#define DeriveKey	group.aes_key
 
 /* @description: wrapper around the MIRACL provided pairing-friendly class */
 /* PairingGroup conforms to Charm-C++ API.
@@ -156,10 +157,9 @@ public:
 
 	G1 exp(G1&, ZR&);
 	GT exp(GT&, ZR&);
+	string aes_key(GT & g);
 
 private:
 	PFC *pfcObject; // defined by above #defines SYMMETRIC or ASYMMETRIC (for now)
-//	G1 *g1;
-//	G2 *g2;
 	GT *gt;
 };

@@ -97,6 +97,21 @@ string _base64_decode(string const& encoded_string) {
   return ret;
 }
 
+char *convert_buffer_to_hex(uint8_t * data, size_t len)
+{
+	size_t i;
+	char tmp1[3];
+	char *tmp = (char *) malloc(len * 3);
+	memset(tmp, 0, len*3 - 1);
+
+	for (i = 0; i < len; i++) {
+		snprintf(tmp1, 3, "%02x ", data[i]);
+		strcat(tmp, tmp1);
+	}
+
+	return tmp;
+}
+
 // Element implementation
 Element::Element()
 {
@@ -631,6 +646,25 @@ string bigToBytes(Big x)
 	return ss.str();
 }
 
+string bigToRawBytes(Big x)
+{
+	char c[MAX_LEN+1];
+	memset(c, 0, MAX_LEN);
+	int size = to_binary(x, MAX_LEN, c, FALSE);
+	string bytes(c, size);
+	stringstream ss;
+	ss << bytes << "\0";
+	return ss.str();
+}
+
+string PairingGroup::aes_key(GT & g)
+{
+	Big tmp = pfcObject->hash_to_aes_key(g);
+	string tmp_str = bigToRawBytes(tmp);
+	int output_len = strlen(tmp_str.c_str());
+	return string(convert_buffer_to_hex((uint8_t *) tmp_str.c_str(), output_len));
+}
+
 Big *bytesToBig(string str, int *counter)
 {
 	int pos = str.find_first_of(':');
@@ -910,6 +944,4 @@ void element_from_bytes(Element& elem, Type type, unsigned char *data)
 
 	throw new string("Invalid type specified.\n");
 }
-
-
 

@@ -13,6 +13,9 @@ int main()
 	group.random(gt2);
 	cout << "GT random 1 :=> " << convert_str(gt1) << endl;
 	cout << "GT random 2 :=> " << convert_str(gt2) << endl;
+	Element elem0(gt2);
+	cout << "Serialized 2 :=> " << Element::serialize(elem0) << endl;
+	cout << "Key from 2 :=> " << DeriveKey(gt2) << endl;
 
 	cout << endl << endl << endl;
 	string a_str = "hello world!";

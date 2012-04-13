@@ -112,7 +112,7 @@ def rcca(var_info):
                     print("Randomness :=>", enc_block[j].getAssignNode())
                     ASTVisitor( SubstituteVar(message, config.rccaRandomVar) ).preorder( n ) 
                     # line for hashing 'r' into a session key 
-                    rLine = varsForDec['session_key'] + " := SHA1(" + config.rccaRandomVar + ")\n"
+                    rLine = varsForDec['session_key'] + " := DeriveKey(" + config.rccaRandomVar + ")\n"
                     t1Line = "T1 := SymEnc(" + varsForDec['session_key'] + " , " + message + ")\n"
                     protectMsgLine = str(n) + "\n"
                     # figure out if there are any statements that need to be computed before protecting
@@ -165,7 +165,7 @@ def rcca_decout(vars):
 "input := list{%s, %s, %s}\n" % (config.partialCT, config.keygenBlindingExponent, vars['pk_value']),
 "%s := expand{T0, T1, T2}\n" % config.partialCT,
 "%s := T0 %s (T2^%s)\n" % (config.rccaRandomVar, vars['dec_op'], config.keygenBlindingExponent), # recover R
-"%s := SHA1( %s )\n" % (vars['session_key'], config.rccaRandomVar), # recover session key
+"%s := DeriveKey( %s )\n" % (vars['session_key'], config.rccaRandomVar), # recover session key
 "%s := SymDec(%s, T1)\n" % (config.M, vars['session_key']), # use session key to recover M
 "%s := H(list{R, M}, %s)\n" % (vars['s'], vars['s_type']), # recover 'randomness' calculated for encrypt
 "BEGIN :: if\n",
