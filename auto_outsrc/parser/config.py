@@ -16,6 +16,8 @@ decOutFileName = "decOutOutsourcing_DSE.py"
 userFuncsName = "userFuncs_DSE"
 userFuncsFileName = userFuncsName + ".py"
 outputSDLFileName = "outsourcedSDL_DSE.py"
+errorFuncName = "userErrorFunction"
+errorFuncArgString = "userErrorFunctionArgString"
 
 transformFunctionName = "transform"
 partialCT = "partCT"

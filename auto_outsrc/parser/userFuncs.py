@@ -14,5 +14,8 @@ def SymDec(s2_sesskey, T1):
 	cipher = AuthenticatedCryptoAbstraction(s2_sesskey)
 	return cipher.decrypt(T1)
 
+def userErrorFunction(arg):
+	return
+
 def getUserGlobals():
 	pass

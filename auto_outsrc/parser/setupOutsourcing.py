@@ -166,8 +166,14 @@ def decout(partCT, zz):
 	R = (T0 / (T2 ** zz))
 	s2_sesskey = SHA1(R)
 	M = SymDec(s2_sesskey, T1)
+	print("The message decrypts in decout to:  ", M)
 	s2 = groupObj.hash([R, M], ZR)
-	output = M
+	if ( ( (( (T0) == ((R * (egga ** s2))) )) and (( (T2) == ((R * (egga ** (s2 / zz)))) )) ) ):
+		output = M
+		print("RCCA check is successful")
+	else:
+		output = M
+		print("RCCA check has failed.")
 	return output
 
 if __name__ == "__main__":
@@ -175,7 +181,6 @@ if __name__ == "__main__":
 	groupObj = PairingGroup('SS512')
 
 	id = "user@blah.com"
-	M = groupObj.random(GT)
 	M = "balls on fire"
 
 	setup()
@@ -185,12 +190,7 @@ if __name__ == "__main__":
 	(partCT) = transform(skBlinded)
 	(newM) = decout(partCT, zz)
 
-	if (M == newM):
-		print("success")
-	else:
-		print("failure")
-
-
-
-	print(newM)
-	print(M)
+	print("\n\n")
+	print("From main():")
+	print("Original message:  ", M)
+	print("Decrypted message:  ", newM)
