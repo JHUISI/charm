@@ -860,3 +860,4 @@ if __name__ == "__main__":
     main(sys.argv[1])
     parseLinesOfCode(getLinesOfCode(), True)
     #os.system("cp userFuncsPermanent.py userFuncs.py")
+    writeLinesOfCodeToFile(outputSDLFileName)

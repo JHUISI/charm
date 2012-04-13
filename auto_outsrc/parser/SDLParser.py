@@ -790,6 +790,26 @@ def updateIfElseBranches(node, lineNo):
 
     ifElseBranches[currentFuncName].append(retIfElseBranchStruct)
 
+def writeLinesOfCodeToFile(outputFileName):
+    outputFile = open(outputFileName, 'w')
+    outputString = ""
+
+    lineNo = 0
+
+    for line in linesOfCode:
+        lineNo += 1
+        outputString += str(lineNo) + ":  " + line
+        lenLine = len(line)
+        if (lenLine == 0):
+            outputString += "\n"
+            continue
+        if (line[lenLine - 1] != "\n"):
+            outputString += "\n"
+
+    outputFile.write(outputString)
+
+    outputFile.close()
+
 def printLinesOfCode():
     lineNo = 0
 

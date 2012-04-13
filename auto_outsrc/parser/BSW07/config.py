@@ -9,12 +9,13 @@ keygenFuncName = "keygen"
 keygenPubVar = ["pk", "mpk", "gpk"]
 keygenSecVar = "sk"
 
-setupFileName = "setupOutsourcing.py"
-transformFileName = "transformOutsourcing.py"
-#decOutFileName = "decOutOutsourcing.cpp"
-decOutFileName = "decOutOutsourcing.py"
-userFuncsName = "userFuncs"
+setupFileName = "setupOutsourcing_BSW.py"
+transformFileName = "transformOutsourcing_BSW.py"
+#decOutFileName = "decOutOutsourcing_BSW.cpp"
+decOutFileName = "decOutOutsourcing_BSW.py"
+userFuncsName = "userFuncs_BSW"
 userFuncsFileName = userFuncsName + ".py"
+outputSDLFileName = "outsourcedSDL_BSW.bv"
 
 transformFunctionName = "transform"
 partialCT = "partCT"
