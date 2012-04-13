@@ -59,12 +59,11 @@ int main()
 
 	cout << s[3] << endl;
 
-	cout << "Serialize/Deserialize tests..." << endl;
-
-	string serObj = Element::serialize(s[1]);
-	cout << serObj << endl;
-
-	cout << "Deserialized : " << Element::deserialize(serObj) << endl;
+//	cout << "Serialize/Deserialize tests..." << endl;
+//	string serObj = Element::serialize(s[1]);
+//	cout << serObj << endl;
+//
+//	cout << "Deserialized : " << Element::deserialize(serObj) << endl;
 
 	cout << "CharmDict tests...." << endl << endl;
 	CharmDict d;
@@ -75,11 +74,14 @@ int main()
 	d.set("103", s[2]);
 
 	cout << d << endl;
+//
+//	// vector<string>
+//	CharmList s3 = d.keys();
+//	for(int i = 0; i < s3.length(); i++)
+//		cout << "Keys: " << s3[i] << endl;
 
-	// vector<string>
-	CharmList s3 = d.keys();
-	for(int i = 0; i < s3.length(); i++)
-		cout << "Keys: " << s3[i] << endl;
+	cout << "Test 1: " << d["100"] << endl;
+	cout << "Test 2: " << convert_str(d["103"].getG1()) << endl;
 
 	return 0;
 }

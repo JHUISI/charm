@@ -40,13 +40,19 @@ public:
 	Element(string);
 	Element(ZR&);
 	Element(G1&);
+#ifdef ASYMMETRIC
 	Element(G2&);
+ 	G2 getG2();
+	void createNew(G2);
+#endif
+
 	Element(GT&);
  	Element(const Element& e);
+ 	G1 getG1(); // getter methods
+ 	GT getGT();
 	string str();
 	void createNew(ZR&);
 	void createNew(G1);
-	void createNew(G2);
 	void createNew(GT);
 
 	static string serialize(Element&);
@@ -134,11 +140,11 @@ public:
 
 #ifdef ASYMMETRIC
 	void random(G2&);
-	bool ismember(G2&);
-	G2 mul(G2&, G2&);
-	G2 div(G2&, G2&);
-	G2 exp(G2&, ZR&);
-	GT pair(G1&, G2&);
+	bool ismember(G2);
+	G2 mul(G2, G2);
+	G2 div(G2, G2);
+	G2 exp(G2, ZR);
+	GT pair(G1, G2);
 	void *hash(char *s, Type t);
 #endif
 
@@ -149,14 +155,14 @@ public:
 	G1 hashListToG1(CharmList&);
 	G2 hashListToG2(CharmList&);
 
-	GT pair(G1&, G1&);
-	G1 mul(G1&, G1&);
-	GT mul(GT&, GT&);
-	G1 div(G1&, G1&);
-	GT div(GT&, GT&);
+	GT pair(G1, G1);
+	G1 mul(G1, G1);
+	GT mul(GT, GT);
+	G1 div(G1, G1);
+	GT div(GT, GT);
 
-	G1 exp(G1&, ZR&);
-	GT exp(GT&, ZR&);
+	G1 exp(G1, ZR);
+	GT exp(GT, ZR);
 	string aes_key(GT & g);
 
 private:

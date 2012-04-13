@@ -135,6 +135,7 @@ Element::Element(ZR & z)
 {
 	type = ZR_t;
 	zr   = &z;
+	isAllocated = false;
 }
 
 void Element::createNew(ZR &z)
@@ -148,6 +149,7 @@ Element::Element(G1 & g)
 {
 	type = G1_t;
 	g1   = &g;
+	isAllocated = false;
 }
 
 void Element::createNew(G1 g)
@@ -160,6 +162,7 @@ Element::Element(G2 & g)
 {
 	type = G2_t;
 	g2   = &g;
+	isAllocated = false;
 }
 
 void Element::createNew(G2 g)
@@ -173,6 +176,7 @@ Element::Element(GT & g)
 {
 	type = GT_t;
 	gt   = &g;
+	isAllocated = false;
 }
 
 void Element::createNew(GT g)
@@ -199,6 +203,25 @@ Element::Element(const Element& e)
 	isAllocated = false; // in case e.createNew() was called.
 }
 
+G1 Element::getG1()
+{
+	if(type == G1_t) return *g1;
+	throw new string("invalid type.");
+}
+
+#ifdef ASYMMETRIC
+G2 Element::getG2()
+{
+	if(type == G2_t) return *g2;
+	throw new string("invalid type.");
+}
+#endif
+
+GT Element::getGT()
+{
+	if(type == GT_t) return *gt;
+	throw new string("invalid type.");
+}
 
 string Element::str()
 {
@@ -221,13 +244,13 @@ Element::~Element()
 	if(type == ZR_t && isAllocated) {
 		delete zr;
 	}
-	else if(type == G1_t && isAllocated) {
+	if(type == G1_t && isAllocated) {
 		delete g1;
 	}
-	else if(type == G2_t && isAllocated) {
+	if(type == G2_t && isAllocated) {
 		delete g2;
 	}
-	else if(type == GT_t && isAllocated) {
+	if(type == GT_t && isAllocated) {
 		delete gt;
 	}
 }
@@ -546,37 +569,37 @@ void PairingGroup::random(G2 & g)
 	pfcObject->random(g);
 }
 
-bool PairingGroup::ismember(G2& g)
+bool PairingGroup::ismember(G2 g)
 {
 	return true; // add code to check
 }
 
-G2 PairingGroup::mul(G2 & g, G2& h)
+G2 PairingGroup::mul(G2 g, G2 h)
 {
 	G2 l(g + h);
 	return l;
 }
 
-G2 PairingGroup::div(G2 & g, G2& h)
+G2 PairingGroup::div(G2 g, G2 h)
 {
 	G2 l(g + -h);
 	return l;
 }
 
-G2 PairingGroup::exp(G2 & g, ZR & r)
+G2 PairingGroup::exp(G2 g, ZR r)
 {
 	// g ^ r == g * r OR scalar multiplication
 	G2 l = pfcObject->mult(g, r);
 	return l;
 }
 
-GT PairingGroup::pair(G1 & g, G2 & h)
+GT PairingGroup::pair(G1 g, G2 h)
 {
 	GT gt = pfcObject->pairing(h, g);
 	return gt;
 }
 #else
-GT PairingGroup::pair(G1 & g, G1 & h)
+GT PairingGroup::pair(G1 g, G1 h)
 {
 	GT gt = pfcObject->pairing(g, h);
 	return gt;
@@ -590,40 +613,40 @@ ZR PairingGroup::order()
 
 
 // mul for G1 & GT
-G1 PairingGroup::mul(G1 & g, G1 & h)
+G1 PairingGroup::mul(G1 g, G1 h)
 {
 	G1 l(g + h);
 	return l;
 }
 
-GT PairingGroup::mul(GT & g, GT & h)
+GT PairingGroup::mul(GT g, GT h)
 {
 	GT l(g * h);
 	return l;
 }
 
 // div for G1 & GT
-G1 PairingGroup::div(G1 & g, G1 & h)
+G1 PairingGroup::div(G1 g, G1 h)
 {
 	G1 l(g + -h);
 	return l;
 }
 
-GT PairingGroup::div(GT & g, GT & h)
+GT PairingGroup::div(GT g, GT h)
 {
 	GT l(g / h);
 	return l;
 }
 
 // exp for G1 & GT
-G1 PairingGroup::exp(G1 & g, ZR & r)
+G1 PairingGroup::exp(G1 g, ZR r)
 {
 	// g ^ r == g * r OR scalar multiplication
 	G1 l = pfcObject->mult(g, r);
 	return l;
 }
 
-GT PairingGroup::exp(GT & g, ZR & r)
+GT PairingGroup::exp(GT g, ZR r)
 {
 	// g ^ r == g * r OR scalar multiplication
 	GT l = pfcObject->power(g, r);
