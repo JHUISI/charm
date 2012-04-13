@@ -29,6 +29,7 @@ startLineNo_IfBranch = None
 startLineNo_ElseBranch = None
 startLineNos_Functions = {}
 endLineNos_Functions = {}
+inputOutputVars = []
 linesOfCode = None
 getVarDepInfListsCalled = getVarsThatProtectMCalled = False
 TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
@@ -658,6 +659,11 @@ def updateVarNamesDicts(node, varNameList, dictToUpdate):
             dictToUpdate[varName] = []
             dictToUpdate[varName].append(currentFuncName)
 
+def updateInputOutputVars(varsDepList):
+    global inputOutputVars
+
+    if (type(
+
 def updateAssignInfo(node, i):
     global assignInfo, forLoops, ifElseBranches, varNamesToFuncs_All, varNamesToFuncs_Assign
 
@@ -695,6 +701,9 @@ def updateAssignInfo(node, i):
     expandedVarDeps = expandVarNamesByIndexSymbols(resultingVarDeps)
 
     updateVarNamesDicts(node, expandedVarDeps, varNamesToFuncs_All)
+
+    if ( (varName == inputKeyword) or (varName == outputKeyword) ):
+        updateInputOutputVars(resultingVarDeps)
 
     if (currentForLoopObj != None):
         currentForLoopObj.appendToBinaryNodeList(node)
@@ -1005,11 +1014,15 @@ def parseFile2(filename, verbosity):
 def getAstNodes():
     return astNodes
 
+def getInputOutputVars()
+    return inputOutputVars
+
 def parseLinesOfCode(code, verbosity):
     global varTypes, assignInfo, forLoops, currentFuncName, varDepList, varInfList, varsThatProtectM
     global algebraicSetting, startLineNo_ForLoop, startLineNos_Functions, endLineNos_Functions
     global getVarDepInfListsCalled, getVarsThatProtectMCalled, astNodes, varNamesToFuncs_All
     global varNamesToFuncs_Assign, ifElseBranches, startLineNo_IfBranch, startLineNo_ElseBranch
+    global inputOutputVars
 
     astNodes = []
     varTypes = {}
@@ -1028,6 +1041,7 @@ def parseLinesOfCode(code, verbosity):
     startLineNo_ElseBranch = None
     startLineNos_Functions = {}
     endLineNos_Functions = {}
+    inputOutputVars = []
     getVarDepInfListsCalled = False
     getVarsThatProtectMCalled = False
 
