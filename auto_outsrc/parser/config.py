@@ -9,13 +9,13 @@ keygenFuncName = "keygen"
 keygenPubVar = ["pk", "mpk", "gpk"]
 keygenSecVar = "sk"
 
-setupFileName = "setupOutsourcing_DSE.py"
-transformFileName = "transformOutsourcing_DSE.py"
-#decOutFileName = "decOutOutsourcing_DSE.cpp"
-decOutFileName = "decOutOutsourcing_DSE.py"
-userFuncsName = "userFuncs_DSE"
+setupFileName = "setupOutsourcing_BSW.py"
+transformFileName = "transformOutsourcing_BSW.py"
+#decOutFileName = "decOutOutsourcing_BSW.cpp"
+decOutFileName = "decOutOutsourcing_BSW.py"
+userFuncsName = "userFuncs_BSW"
 userFuncsFileName = userFuncsName + ".py"
-outputSDLFileName = "outsourcedSDL_DSE.py"
+outputSDLFileName = "outsourcedSDL_BSW.py"
 errorFuncName = "userErrorFunction"
 errorFuncArgString = "userErrorFunctionArgString"
 
@@ -33,7 +33,7 @@ transformFunctionOrder = ["transform"]
 decOutFunctionOrder = ["decout"]
 
 argsToFirstSetupFunc = []
-argsToFirstTransformFunc = ["sys.argv[1]", "sys.argv[2]"]
+argsToFirstTransformFunc = ["sys.argv[1]", "sys.argv[2]", "sys.argv[3]"]
 argsToFirstDecOutFunc = ["sys.argv[1]", "sys.argv[2]", "sys.argv[3]"]
 
 groupObjName = "groupObj"

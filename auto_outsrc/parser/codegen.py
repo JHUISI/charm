@@ -731,6 +731,9 @@ def isUnnecessaryNodeForCodegen(astNode):
     if (astNode.type == ops.NONE):
         return True
 
+    if ( (astNode.type == ops.BEGIN) and (astNode.left.attr == FOR_LOOP_HEADER) ):
+        return True
+
     if ( (astNode.type == ops.BEGIN) and (astNode.left.attr == FORALL_LOOP_HEADER) ):
         return True
 
