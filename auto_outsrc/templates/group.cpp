@@ -101,6 +101,7 @@ string _base64_decode(string const& encoded_string) {
 Element::Element()
 {
 	type = None_t;
+	isAllocated = false;
 }
 
 Element::Element(const char *s)
@@ -121,10 +122,23 @@ Element::Element(ZR & z)
 	zr   = &z;
 }
 
+void Element::createNew(ZR &z)
+{
+	type = ZR_t;
+	zr   = new ZR(z);
+	isAllocated = true;
+}
+
 Element::Element(G1 & g)
 {
 	type = G1_t;
 	g1   = &g;
+}
+
+void Element::createNew(G1 g)
+{
+	type = G1_t;
+	g1   = new G1(g);
 }
 
 Element::Element(G2 & g)
@@ -133,45 +147,111 @@ Element::Element(G2 & g)
 	g2   = &g;
 }
 
+void Element::createNew(G2 g)
+{
+	type = G2_t;
+	g2   = new G2(g);
+	isAllocated = true;
+}
+
 Element::Element(GT & g)
 {
 	type = GT_t;
 	gt   = &g;
 }
 
+void Element::createNew(GT g)
+{
+	type = GT_t;
+	gt   = new GT(g);
+	isAllocated = true;
+}
+
+Element::Element(const Element& e)
+{
+	type = e.type;
+	if(type == Str_t)
+		strPtr = e.strPtr;
+	else if(type == ZR_t)
+		zr = e.zr;
+	else if(type == G1_t)
+		g1 = e.g1;
+	else if(type == G2_t)
+		g2 = e.g2;
+	else if(type == GT_t)
+		gt = e.gt;
+
+	isAllocated = false; // in case e.createNew() was called.
+}
+
+
+string Element::str()
+{
+	stringstream ss;
+	if(type == Str_t)
+		ss << strPtr;
+	else if(type == ZR_t)
+		ss << *zr;
+	else if(type == G1_t)
+		ss << g1->g;
+	else if(type == G2_t)
+		ss << g2->g;
+	else if(type == GT_t)
+		ss << gt->g;
+	return ss.str();
+}
+
 Element::~Element()
 {
-//	if(type == Str_t) delete strPtr;
-	type = None_t;
-//	strPtr = 0;
-	zr = 0;
-	g1 = 0;
-	g2 = 0;
-	gt = 0;
+	if(type == ZR_t && isAllocated) {
+		delete zr;
+	}
+	else if(type == G1_t && isAllocated) {
+		delete g1;
+	}
+	else if(type == G2_t && isAllocated) {
+		delete g2;
+	}
+	else if(type == GT_t && isAllocated) {
+		delete gt;
+	}
+}
+
+Element Element::operator=(const Element& e)
+{
+	type = e.type;
+	if(type == Str_t)
+		strPtr = e.strPtr;
+	else if(type == ZR_t)
+		zr = e.zr;
+	else if(type == G1_t)
+		g1 = e.g1;
+	else if(type == G2_t)
+		g2 = e.g2;
+	else if(type == GT_t)
+		gt = e.gt;
+
+	isAllocated = false; // in case e.createNew() was called.
+	return *this;
 }
 
 ostream& operator<<(ostream& s, const Element& e)
 {
-	Type t = e.type;
-	string elem_str = "E: ";
-	s << "T: ";
-	if(t == Str_t) {
-		s << "str_t, " << elem_str << e.strPtr;
-	}
-	else if(t == ZR_t) {
-		s << "ZR_t, " << elem_str << *e.zr;
-	}
-	else if(t == G1_t) {
-		s << "G1_t, " << elem_str << e.g1->g;
-	}
+	Element e2 = e;
+	Type t = e2.type;
+	if(t == Str_t)
+		s << "str: ";
+	else if(t == ZR_t)
+		s << "ZR: ";
+	else if(t == G1_t)
+		s << "G1: ";
 #ifdef ASYMMETRIC
-	else if(t == G2_t) {
-		s << "G2_t, " << elem_str << e.g2->g;
-	}
+	else if(t == G2_t)
+		s << "G2: ";
 #endif
-	else if(t == GT_t) {
-		s << "GT_t, " << elem_str << e.gt->g;
-	}
+	else if(t == GT_t)
+		s << "GT: ";
+	s << e2.str();
 
 	return s;
 }
@@ -188,25 +268,27 @@ string Element::serialize(Element & e)
 }
 
 //TODO: add thorough error checking to deserialize functions
-Element Element::deserialize(string & s)
+void Element::deserialize(Element & e, string & s)
 {
-	Element elem;
 	size_t found = s.find(':'); // delimeter
 
 	if(found != string::npos) {
 		int type = atoi(s.substr(0, found).c_str());
-		if(type >= ZR_t && type < Str_t)
-			return element_from_bytes((Type) type, (unsigned char *) s.substr(found+1, s.size()).c_str());
-		else if(type == Str_t) {
-//			string s2 = ;
-			return Element(s.substr(found+1, s.size()).c_str());
+		if(type >= ZR_t && type < Str_t) {
+			element_from_bytes(e, (Type) type, (unsigned char *) s.substr(found+1, s.size()).c_str());
 		}
+		else if(type == Str_t) {
+			e = Element(s.substr(found+1, s.size()).c_str());
+		}
+		return;
 	}
 
 	throw new string("Invalid bytes.\n");
 }
 
-// CharmList implementation
+// end Element implementation
+
+// start CharmList implementation
 
 CharmList::CharmList(void)
 {
@@ -230,11 +312,6 @@ void CharmList::append(const char *s)
 void CharmList::append(string strs)
 {
 	Element elem(strs);
-
-	// init elem here
-//	elem.type = Str_t;
-//	elem.strPtr  = strs;
-
 	list[cur_index] = elem;
 	cur_index++;
 }
@@ -257,7 +334,6 @@ void CharmList::append(G1 & g1)
 void CharmList::append(G2 & g2)
 {
 	Element elem(g2);
-
 	list[cur_index] = elem;
 	cur_index++;
 }
@@ -381,9 +457,9 @@ Element& CharmDict::operator[](const string key)
 {
 	map<string, Element, cmp_str>::iterator iter;
 	for(iter = emap.begin(); iter != emap.end(); iter++) {
-		if (key.c_str() == iter->first.c_str()) {
+		if (strcmp(key.c_str(), iter->first.c_str()) == 0) {
 			return iter->second;
-		} // strcmp(key.c_str(), iter->first.c_str())
+		}
 	}
 
 	// means it's a new index so set it
@@ -409,14 +485,28 @@ PairingGroup::PairingGroup(int sec_level)
 	time_t seed;
 	time(&seed);
     irand((long)seed);
+
+    G1 *g1 = new G1();
+    pfcObject->random(*g1);
+#ifdef ASYMMETRIC
+    G2 *g2 = new G2();
+    pfcObject->random(*g2);
+
+    gt = new GT(pfcObject->pairing(*g2, *g1));
+    delete g2;
+#else
+    gt = new GT(pfcObject->pairing(*g1, *g1));
+#endif
+    delete g1;
 }
 
 PairingGroup::~PairingGroup()
 {
 	delete pfcObject;
+	delete gt;
 }
 
-void PairingGroup::random(Big & b)
+void PairingGroup::random(ZR & b)
 {
 	pfcObject->random(b);
 }
@@ -428,8 +518,11 @@ void PairingGroup::random(G1 & g)
 
 void PairingGroup::random(GT & g)
 {
-	// retrieve g1 & g2
-	// choose rand ZR
+	// choose random ZR
+	ZR *zr = new ZR();
+	pfcObject->random(*zr);
+	g = pfcObject->power(*gt, *zr);
+	delete zr;
 }
 
 #ifdef ASYMMETRIC
@@ -467,7 +560,12 @@ GT PairingGroup::pair(G1 & g, G2 & h)
 	GT gt = pfcObject->pairing(h, g);
 	return gt;
 }
-
+#else
+GT PairingGroup::pair(G1 & g, G1 & h)
+{
+	GT gt = pfcObject->pairing(g, h);
+	return gt;
+}
 #endif
 
 ZR PairingGroup::order()
@@ -475,13 +573,6 @@ ZR PairingGroup::order()
 	return ZR(pfcObject->order());
 }
 
-#ifdef SYMMETRIC
-GT PairingGroup::pair(G1 & g, G1 & h)
-{
-	GT gt = pfcObject->pairing(g, h);
-	return gt;
-}
-#endif
 
 // mul for G1 & GT
 G1 PairingGroup::mul(G1 & g, G1 & h)
@@ -554,6 +645,17 @@ Big *bytesToBig(string str, int *counter)
 	Big *X  = new Big(x);
 	*counter  = pos + len + 1;
 	return X;
+}
+
+Big bytesToBigS(string str, int *counter)
+{
+	int pos = str.find_first_of(':');
+	int len = atoi( str.substr(0, pos).c_str() );
+	const char *elem = str.substr(pos+1, pos + len).c_str();
+
+	Big x = from_binary(len, (char *) elem);
+	*counter  = pos + len + 1;
+	return x;
 }
 
 
@@ -709,17 +811,18 @@ string element_to_bytes(Element & e) {
 	throw new string("element_to_bytes: invalid type specified");
 }
 
-Element element_from_bytes(Type type, unsigned char *data)
+void element_from_bytes(Element& elem, Type type, unsigned char *data)
 {
 	if(type == ZR_t) {
 		if(is_base64((unsigned char) data[0])) {
 			string b64_encoded((char *) data);
 			string s = _base64_decode(b64_encoded);
 			int cnt = 0;
-			Big *b = bytesToBig(s, &cnt);
-			Element elem(*b);
+			Big *b = new Big(bytesToBigS(s, &cnt));
+//			cout << "Element_from_bytes : " << *b << endl;
+			elem.createNew(*b);
 			delete b;
-			return elem;
+			return;
 		}
 	}
 	else if(type == G1_t) {
@@ -737,9 +840,9 @@ Element element_from_bytes(Type type, unsigned char *data)
 		p->g.set(*x, *y);
 		delete x;
 		delete y;
-		Element elem(*p);
+		elem.createNew(*p);
 		delete p;
-		return elem;
+		return;
 		}
 	}
 #ifdef ASYMMETRIC
@@ -763,9 +866,10 @@ Element element_from_bytes(Type type, unsigned char *data)
 			point->g.set(x, y);
 			delete [] a;
 			// cout << "Recovered pt => " << point->g << endl;
-			Element elem(*point);
+			// Element elem(*point);
+			elem.createNew(*point);
 			delete point;
-			return elem;
+			return;
 		}
 	}
 #endif
@@ -793,10 +897,11 @@ Element element_from_bytes(Type type, unsigned char *data)
 
 			GT *point = new GT();
 			point->g.set(x, y, z);
-			Element elem (*point);
+			elem.createNew(*point);
+//			Element elem (*point);
 			delete [] a;
 //			delete point;
-			return elem;
+			return;
 #else
 		// must be symmetric
 #endif

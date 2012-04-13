@@ -42,17 +42,26 @@ public:
 	Element(G1&);
 	Element(G2&);
 	Element(GT&);
+ 	Element(const Element& e);
+	string str();
+	void createNew(ZR&);
+	void createNew(G1);
+	void createNew(G2);
+	void createNew(GT);
 
 	static string serialize(Element&);
-	static Element deserialize(string&);
+	static void deserialize(Element&, string&);
 
+ 	Element operator=(const Element& e);
     friend ostream& operator<<(ostream&, const Element&);
 private:
-	// None
+    bool isAllocated; // if True, means Element class responsible
+    // for releasing the memory.
+    // False means Element field just holds a reference
 };
 
 string element_to_bytes(Element & e);
-Element element_from_bytes(Type type, unsigned char *data);
+void element_from_bytes(Element&, Type type, unsigned char *data);
 
 class CharmList
 {
@@ -150,4 +159,7 @@ public:
 
 private:
 	PFC *pfcObject; // defined by above #defines SYMMETRIC or ASYMMETRIC (for now)
+//	G1 *g1;
+//	G2 *g2;
+	GT *gt;
 };
