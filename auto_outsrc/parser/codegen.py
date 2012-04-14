@@ -707,7 +707,7 @@ def addTypeDeclToGlobalVars(binNode):
     if (varName not in varNamesToFuncs_Assign):
         return
 
-    if ( (varName not in globalVarNames) and (varName in varNamesToFuncs_Assign) and (varName != inputKeyword) and (varName != outputKeyword) ):
+    if ( (varName not in globalVarNames) and (varName in varNamesToFuncs_Assign) and (varName != inputKeyword) and (varName != outputKeyword) and (varName not in inputOutputVars) ):
         globalVarNames.append(varName)
 
 def writeGlobalVars_Python(outputFile):
@@ -937,7 +937,7 @@ def getGlobalVarNames():
             listForThisVar.remove(decOutFunctionName)
         if (len(listForThisVar) <= 1):
             continue
-        if ( (varName not in globalVarNames) and (varName in varNamesToFuncs_Assign) and (varName != inputKeyword) and (varName != outputKeyword) ):
+        if ( (varName not in globalVarNames) and (varName in varNamesToFuncs_Assign) and (varName != inputKeyword) and (varName != outputKeyword) and (varName not in inputOutputVars) ):
             globalVarNames.append(varName)
 
 def addGetGlobalsToUserFuncs():
