@@ -26,13 +26,19 @@ int main()
     for (i=0;i< 4*NB;i++) printf("%02x",block2[i]);
     printf("\n");
 
-    char *cipher = (char *) symenc.encrypt(key, block2, s_len).c_str();
-    printf("Encrypt= ");
-    for (i=0;i<4*NB;i++) printf("%02x", (unsigned char) cipher[i]);
+//    char *cipher = (char *) symenc.encrypt(key, block2, s_len).c_str();
+
+    string cipher_text = symenc.encrypt(key, block2, s_len);
+    char *cipher = (char *) cipher_text.c_str();
+    int c_len = (int) cipher_text.size();
+    cout << "Encrypt := " << cipher_text << endl;
+
+//    printf("Encrypt= ");
+//    for (i=0;i<4*NB;i++) printf("%02x", (unsigned char) cipher[i]);
     cout << endl << endl;
 
     printf("Decrypt= ");
-    char *msg = (char *) symenc.decrypt(key, cipher, s_len).c_str();
+    char *msg = (char *) symenc.decrypt(key, cipher, c_len).c_str();
     for (i=0;i<4*NB;i++) printf("%02x", (unsigned char) msg[i]);
     cout << "\n" << msg << endl;
     cout << endl;

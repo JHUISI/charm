@@ -1000,19 +1000,20 @@ string SymmetricEnc::encrypt(char *key, char *message, int len)
 //    for (i=0;i<aes_block_size;i++) printf("%02x",(unsigned char) message_buf[i]);
 //    aes_end(&a);
 
-    return string(message_buf, len);
+    string t = string(message_buf, len);
+	return _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
 }
 
 string SymmetricEnc::decrypt(char *key, char *ciphertext, int len)
 {
+
 	// assumes we're dealing with 16-block aligned buffers
 	int i;
+	for (i=0;i<16;i++) iv[i]=i; // TODO: provide method to randomize IV
 	if(aes_initialized) {
-	    for (i=0;i<16;i++) iv[i]=i;
 		aes_reset(&a, mode, iv);
 	}
 	else {
-	    for (i=0;i<16;i++) iv[i]=i;
 	    if (!aes_init(&a, mode, keysize, key, iv))
 		{
 	    	aes_initialized = true;
@@ -1020,14 +1021,28 @@ string SymmetricEnc::decrypt(char *key, char *ciphertext, int len)
 			return string("");
 		}
 	}
-	char ciphertext_buf[len + 1];
-	memset(ciphertext_buf, 0, len);
-	memcpy(ciphertext_buf, ciphertext, len);
 
-	aes_decrypt(&a, ciphertext_buf);
+	char *ciphertext2;
+	int len2;
+	if(is_base64((unsigned char) ciphertext[0])) {
+		string b64_encoded((char *) ciphertext, len);
+		string t = _base64_decode(b64_encoded);
+		ciphertext2 = (char *) t.c_str();
+		len2 = (int) t.size();
+	}
+	else {
+		ciphertext2 = ciphertext;
+		len2 = len;
+	}
+
+	char message_buf[len2 + 1];
+	memset(message_buf, 0, len2);
+	memcpy(message_buf, ciphertext2, len2);
+
+	aes_decrypt(&a, message_buf);
 //	for (i=0;i<aes_block_size;i++) printf("%02x",(unsigned char) ciphertext_buf[i]);
 
-	return string(ciphertext_buf, len);
+	return string(message_buf, len2);
 }
 
 string SymmetricEnc::pad(string s)
