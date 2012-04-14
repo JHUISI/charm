@@ -9,6 +9,12 @@ using namespace std;
 
 int main()
 {
+//	csprng RNG;
+//	string raw = "seeding RNG"; // read
+//	strong_init(&RNG, (int) raw.size(), (char *) raw.c_str(), 0L);
+//	cout << strong_rng(&RNG) << endl;
+//	strong_kill(&RNG);
+
     int i;
     char key[32];
     char iv[16];

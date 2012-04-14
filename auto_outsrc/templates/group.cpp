@@ -1,4 +1,5 @@
 #include "sdlconfig.h"
+#include "miracl.h"
 #include <sstream>
 
 /* helper methods to assist with serializing and base-64 encoding group elements */
@@ -981,9 +982,16 @@ SymmetricEnc::~SymmetricEnc()
 
 string SymmetricEnc::encrypt(char *key, char *message, int len)
 {
+	csprng RNG;
+	unsigned long ran;
+	time((time_t *) &ran);
+	string raw = "seeding RNGs"; // read from /dev/random
+	strong_init(&RNG, (int) raw.size(), (char *) raw.c_str(), ran);
+
 	int i;
 	// select random IV here
     for (i=0;i<16;i++) iv[i]=i;
+//	for (i=0;i<16;i++) iv[i]=strong_rng(&RNG);
     if (!aes_init(&a, mode, keysize, key, iv))
 	{
     	aes_initialized = false;
@@ -1000,6 +1008,7 @@ string SymmetricEnc::encrypt(char *key, char *message, int len)
 //    for (i=0;i<aes_block_size;i++) printf("%02x",(unsigned char) message_buf[i]);
 //    aes_end(&a);
 
+	strong_kill(&RNG);
     string t = string(message_buf, len);
 	return _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
 }
@@ -1008,12 +1017,12 @@ string SymmetricEnc::decrypt(char *key, char *ciphertext, int len)
 {
 
 	// assumes we're dealing with 16-block aligned buffers
-	int i;
-	for (i=0;i<16;i++) iv[i]=i; // TODO: provide method to randomize IV
 	if(aes_initialized) {
 		aes_reset(&a, mode, iv);
 	}
 	else {
+		int i;
+		for (i=0;i<16;i++) iv[i]=i; // TODO: retrieve IV from ciphertext
 	    if (!aes_init(&a, mode, keysize, key, iv))
 		{
 	    	aes_initialized = true;
