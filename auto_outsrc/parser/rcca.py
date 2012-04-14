@@ -162,7 +162,7 @@ def rcca(var_info):
 
 def rcca_decout(vars):
     decout_sdl = ["\n","BEGIN :: func:%s\n" % config.decOutFunctionName,
-"input := list{%s, %s, %s}\n" % (config.partialCT, config.keygenBlindingExponent + config.blindingSuffix, vars['pk_value']),
+"input := list{%s, %s, %s}\n" % (config.partialCT, config.keygenSecVar + config.blindingSuffix, vars['pk_value']),
 "%s := expand{T0, T1, T2}\n" % config.partialCT,
 "%s := T0 %s (T2^%s)\n" % (config.rccaRandomVar, vars['dec_op'], config.keygenBlindingExponent), # recover R
 "%s := DeriveKey( %s )\n" % (vars['session_key'], config.rccaRandomVar), # recover session key

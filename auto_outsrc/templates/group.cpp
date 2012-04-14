@@ -968,3 +968,76 @@ void element_from_bytes(Element& elem, Type type, unsigned char *data)
 	throw new string("Invalid type specified.\n");
 }
 
+SymmetricEnc::SymmetricEnc()
+{
+	keysize = aes_block_size; // 16 * 8 = 128-bit key
+	mode = MR_CBC;
+}
+
+SymmetricEnc::~SymmetricEnc()
+{
+	aes_end(&a);
+}
+
+string SymmetricEnc::encrypt(char *key, char *message, int len)
+{
+	int i;
+	// select random IV here
+    for (i=0;i<16;i++) iv[i]=i;
+    if (!aes_init(&a, mode, keysize, key, iv))
+	{
+    	aes_initialized = false;
+		printf("Failed to Initialize\n");
+		return string("");
+	}
+
+	// set flag that aes-initialized
+    aes_initialized = true;
+    char message_buf[len + 1];
+	memset(message_buf, 0, len);
+	memcpy(message_buf, message, len);
+    aes_encrypt(&a, message_buf);
+//    for (i=0;i<aes_block_size;i++) printf("%02x",(unsigned char) message_buf[i]);
+//    aes_end(&a);
+
+    return string(message_buf, len);
+}
+
+string SymmetricEnc::decrypt(char *key, char *ciphertext, int len)
+{
+	// assumes we're dealing with 16-block aligned buffers
+	int i;
+	if(aes_initialized) {
+	    for (i=0;i<16;i++) iv[i]=i;
+		aes_reset(&a, mode, iv);
+	}
+	else {
+	    for (i=0;i<16;i++) iv[i]=i;
+	    if (!aes_init(&a, mode, keysize, key, iv))
+		{
+	    	aes_initialized = true;
+			printf("Failed to Initialize\n");
+			return string("");
+		}
+	}
+	char ciphertext_buf[len + 1];
+	memset(ciphertext_buf, 0, len);
+	memcpy(ciphertext_buf, ciphertext, len);
+
+	aes_decrypt(&a, ciphertext_buf);
+//	for (i=0;i<aes_block_size;i++) printf("%02x",(unsigned char) ciphertext_buf[i]);
+
+	return string(ciphertext_buf, len);
+}
+
+string SymmetricEnc::pad(string s)
+{
+	// check length and append bytes up until 15-bytes
+	int i, padding_needed = aes_block_size - (((int) s.size()) % aes_block_size);
+
+	string s2 = s;
+	for(i = 0; i < padding_needed; i++)
+		s2 += " ";
+	return s2;
+}
+

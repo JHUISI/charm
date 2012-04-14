@@ -169,3 +169,23 @@ private:
 	PFC *pfcObject; // defined by above #defines SYMMETRIC or ASYMMETRIC (for now)
 	GT *gt;
 };
+
+#define aes_block_size 16
+
+class SymmetricEnc
+{
+public:
+	SymmetricEnc(); // take Mode,
+	~SymmetricEnc();
+	// wrapper around AES code
+	string encrypt(char *key, char *message, int len); // generate iv internally
+	string decrypt(char *key, char *ciphertext, int len);
+	static string pad(string s);
+
+private:
+	int keysize;
+	int mode;
+	char iv[aes_block_size];
+	bool aes_initialized;
+	aes a;
+};

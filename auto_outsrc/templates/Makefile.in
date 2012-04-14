@@ -3,7 +3,7 @@ CXX	:= g++
 CXXFLAGS := -g -m64 -O2 -O3 -Wall
 
 # should be set by codegen
-SDL_SRC := sdlscheme3
+SDL_SRC := sdlscheme4
 NAME    := my_test
 # CURVE := ssp 
 CURVE   := mnt
