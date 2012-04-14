@@ -49,7 +49,7 @@ class KPabe(ABEnc):
         attr_list = []; util.getAttributeList(policy, attr_list)
         
         s = mk['alpha1']; secret = s
-        shares = util.calculateShares(secret, policy, dict)
+        shares = util.calculateSharesDict(secret, policy)
         
         D = { 'policy': policy_str }
         for x in attr_list:

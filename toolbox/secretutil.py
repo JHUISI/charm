@@ -92,6 +92,12 @@ class SecretUtil:
                     share[ key ] = attr_list[i][1]
             return share
     
+    def calculateSharesList(self, secret, tree):
+        return self.calculateShares(secret, tree, list)
+    
+    def calculateSharesDict(self, secret, tree):
+        return self.calculateShares(secret, tree, dict)
+    
     def compute_shares(self, secret, subtree, List):
         k = 0
         if(subtree == None):

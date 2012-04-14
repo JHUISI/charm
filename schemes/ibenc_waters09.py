@@ -28,13 +28,13 @@ class DSE09(IBEnc):
         
         tau1 = v * (v1 ** a1)
         tau2 = v * (v2 ** a2)        
-        pk = { 'g':g, 'g^b':g ** b, 'g^a1':g ** a1, 'g^a2':g ** a2, 
+        mpk = { 'g':g, 'g^b':g ** b, 'g^a1':g ** a1, 'g^a2':g ** a2, 
               'g^ba1':g ** (b * a1), 'g^ba2':g ** (b * a2), 'tau1':tau1, 'tau2':tau2, 
               'tau1^b':tau1 ** b, 'tau2^b':tau2 ** b, 'w':w, 'u':u,'h':h,
               'egg_alpha': pair(g, g) ** (alpha * a1 * b) }
-        sk = { 'g^alph':g ** alpha, 'g^alph_a1':g ** (alpha * a1),
-              'g^b':g ** b,'v':v, 'v1':v1, 'v2':v2, 'alpha':alpha }
-        return (pk, sk)
+        msk = { 'g^alph':g ** alpha, 'g^alph_a1':g ** (alpha * a1),
+              'v':v, 'v1':v1, 'v2':v2, 'alpha':alpha }
+        return (mpk, msk)
     
     def keygen(self, mpk, msk, ID):
         r1, r2, z1, z2, tag_k = group.random(ZR, 5)

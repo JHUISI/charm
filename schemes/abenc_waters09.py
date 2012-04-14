@@ -58,7 +58,7 @@ class CPabe09(ABEnc):
         C_0 = pk['g1'] ** s
         C, D = {}, {}
         secret = s
-        shares = util.calculateShares(secret, policy, list)
+        shares = util.calculateSharesList(secret, policy)
 
         # ciphertext
         for i in range(len(p_list)):

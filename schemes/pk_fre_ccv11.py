@@ -30,42 +30,40 @@ class InputEnc:
         i_pk = { 'g':g, 'C':C, 'd':d }
         i_sk = { 'a':a }
         return (i_pk, i_sk)
-    
-#    def getVectorM(self, pk):
-#        return list(group.random(G1, pk['d']))
-    
-    def encrypt(self, i_pk, i, M : [G1]):
+        
+    def encrypt(self, i_pk, i, M : G1):
         if i > i_pk['d'] or i < 0: 
             print("i not in d. try again!")
-            return None
-        if len(M) > i_pk['d']:
-            print("M vector more than d elements.")
-            return None
-        
+            return None        
         r, r_pr = group.random(ZR, 2)
 
-        C   = i_pk['C'][i] ** r 
-        Cpr = i_pk['C'][i] ** r_pr
-        D = (i_pk['g'] ** r) * M[i]
+        C   = [ i_pk['C'][i] ** r for i in range(i_pk['d']) ] 
+        Cpr = [ i_pk['C'][i] ** r_pr for i in range(i_pk['d']) ]
+        D = (i_pk['g'] ** r) * M
         Dpr = i_pk['g'] ** r_pr
         E   = { 'C':C, 'D':D }
         Epr = { 'Cpr':Cpr, 'Dpr':Dpr }
         
         # is this correct?
-        pi = proof(C, D, Cpr, Dpr) # group.hash((C, D, Cpr, Dpr), ZR)
+        pi = None
+#        pi = proof(C, D, Cpr, Dpr) # group.hash((C, D, Cpr, Dpr), ZR)
         return (E, Epr, pi)
     
     def decrypt(self, i_sk, ct, M : [G1]):
         E, Epr, pi = ct
         C, D = E['C'], E['D']
         a = i_sk['a']
-        if pi != proof(C, D, Epr['Cpr'], Epr['Dpr']):
-            print("proof did not verify.")
-            return False
-        for i in range(a):
-            if D * ~(C ** (1 / a[i])) == M[i]:
-                return (i, M[i])
-        return False
+#        if pi != proof(C, D, Epr['Cpr'], Epr['Dpr']):
+#            print("proof did not verify.")
+#            return False
+        result = {}
+        for i in range(len(a)):
+            result[i] = D * ~(C ** (1 / a[i]))
+        
+        m = result[0]
+        for i in range(1, len(result)):
+            if m != result[i]: return False        
+        return m
     
 
 class OutputEnc:

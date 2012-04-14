@@ -100,8 +100,8 @@ class Dabe(ABEncMultiAuth):
         
         #Parse the policy string into a tree
         policy = util.createPolicy(policy_str)
-        sshares = util.calculateShares(s, policy, list) #Shares of the secret 
-        wshares = util.calculateShares(w, policy, list) #Shares of 0
+        sshares = util.calculateSharesList(s, policy) #Shares of the secret 
+        wshares = util.calculateSharesList(w, policy) #Shares of 0
         
     
         wshares = dict([(x[0].getAttributeAndIndex(), x[1]) for x in wshares])

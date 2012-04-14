@@ -64,7 +64,7 @@ class CPabe_BSW07(ABEnc):
         policy = util.createPolicy(policy_str)
         a_list = []; util.getAttributeList(policy, a_list)
         s = group.random()
-        shares = util.calculateShares(s, policy, dict)      
+        shares = util.calculateSharesDict(s, policy)      
 
         C = pk['h'] ** s
         C_y, C_y_pr = {}, {}

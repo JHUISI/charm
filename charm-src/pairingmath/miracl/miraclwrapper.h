@@ -7,7 +7,7 @@ typedef void element_t;
 extern "C" {
 #endif
 
-enum Curve {MNT, KSS, BLS, NONE_C}; // control what type of curve we are dealing with
+enum Curve {MNT, SS, BLS, NONE_C}; // control what type of curve we are dealing with
 enum Group {ZR_t = 0, G1_t, G2_t, GT_t, NONE_G}; // clashes with types in pairing_3.h
 typedef enum Group Group_t;
 typedef enum Curve Curve_t;
@@ -67,6 +67,13 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 // I/O functiond end
 
 void element_delete(Group_t type, element_t *e);
+
+void _init_hash(const pairing_t *pairing);
+void _element_add_str_hash(const pairing_t *pairing, void *data, int len);
+void _element_add_to_hash(Group_t type, const pairing_t *pairing, const element_t *e);
+element_t *finish_hash(Group_t type, const pairing_t *pairing);
+
+void _element_hash_key(const pairing_t *pairing, Group_t type, element_t *e, void *data, int len);
 
 #ifdef __cplusplus
 }
