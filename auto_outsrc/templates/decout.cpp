@@ -4,6 +4,16 @@
 #include <string>
 using namespace std;
 
+// ciphertext expected to be base64 encoded
+string SymDec(string k, string c_encoded)
+{
+	SymmetricEnc Symm;
+	char *key = (char *) k.c_str();
+	char *ciphertext = (char *) c_encoded.c_str();
+	int c_len = (int) c_encoded.size();
+	return Symm.decrypt(key, ciphertext, c_len);
+}
+
 string decout(PairingGroup & group, CharmDict & partCT, ZR & zz, GT & egg)
 {
 	GT R;
@@ -15,7 +25,7 @@ string decout(PairingGroup & group, CharmDict & partCT, ZR & zz, GT & egg)
 
 	R = group.div(T0, group.exp(T2, zz));
 	string s_sesskey = DeriveKey(R);
-	// string M = SymDec(s_sesskey, T1); // need to implement this as well ==> TRICKY!!!
+	string M = SymDec(s_sesskey, T1); // need to implement this as well ==> TRICKY!!!
 	string M = "original message here.";
 
 	sList.append(R);
