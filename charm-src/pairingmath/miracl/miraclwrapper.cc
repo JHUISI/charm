@@ -2,6 +2,7 @@
 #define MR_PAIRING_MNT
 #define AES_SECURITY 80
 #include "pairing_3.h"
+#include "miracl.h"
 #include <sstream>
 
 extern "C" {
@@ -1209,5 +1210,88 @@ string _base64_decode(string const& encoded_string) {
 
   return ret;
 }
+
+int aes_encrypt(char *key, char *message, int len, char **out)
+{
+	aes a;
+	int keysize = aes_block_size;
+	csprng RNG;
+	unsigned long ran;
+	time((time_t *) &ran);
+	string raw = "seeding RNGs"; // read from /dev/random
+	strong_init(&RNG, (int) raw.size(), (char *) raw.c_str(), ran);
+
+	int i;
+	char iv[aes_block_size];
+	// select random IV here
+    for (i=0;i<16;i++) iv[i]=i;
+//	for (i=0;i<16;i++) iv[i]=strong_rng(&RNG);
+    if (!aes_init(&a, MR_CBC, keysize, key, iv))
+	{
+		printf("Failed to Initialize\n");
+		return -1;
+	}
+
+    char message_buf[len + 1];
+	memset(message_buf, 0, len);
+	memcpy(message_buf, message, len);
+    aes_encrypt(&a, message_buf);
+//    for (i=0;i<aes_block_size;i++) printf("%02x",(unsigned char) message_buf[i]);
+//    aes_end(&a);
+
+	strong_kill(&RNG);
+    string t = string(message_buf, len);
+	aes_end(&a);
+	string s = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
+	int len2 = (int) s.size();
+	*out = (char *) malloc(len2 + 1);
+	memset(*out, 0, len2);
+	memcpy(*out, (char *) s.c_str(), len2);
+	return len2;
+}
+
+int aes_decrypt(char *key, char *ciphertext, int len, char **out)
+{
+	aes a;
+	int keysize = aes_block_size;
+	int i;
+	char iv[aes_block_size];
+	for (i=0;i<16;i++) iv[i]=i; // TODO: retrieve IV from ciphertext
+
+	// assumes we're dealing with 16-block aligned buffers
+	if (!aes_init(&a, MR_CBC, keysize, key, iv))
+	{
+		printf("Failed to Initialize\n");
+		return -1;
+	}
+
+	char *ciphertext2;
+	int len2;
+	if(is_base64((unsigned char) ciphertext[0])) {
+		string b64_encoded((char *) ciphertext, len);
+		string t = _base64_decode(b64_encoded);
+		ciphertext2 = (char *) t.c_str();
+		len2 = (int) t.size();
+	}
+	else {
+		ciphertext2 = ciphertext;
+		len2 = len;
+	}
+
+	char message_buf[len2 + 1];
+	memset(message_buf, 0, len2);
+	memcpy(message_buf, ciphertext2, len2);
+
+	aes_decrypt(&a, message_buf);
+//	for (i=0;i<aes_block_size;i++) printf("%02x",(unsigned char) ciphertext_buf[i]);
+	aes_end(&a);
+//	return string(message_buf, len2);
+	*out = (char *) malloc(len2 + 1);
+	memset(*out, 0, len2);
+	memcpy(*out, (char *) message_buf, len2);
+
+	return len2;
+}
+
 
 } // end of extern

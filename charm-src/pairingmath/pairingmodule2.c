@@ -1714,6 +1714,74 @@ static PyObject *Get_Order(Element *self, PyObject *args) {
 	return NULL;
 }
 
+/* TODO: move to cryptobase */
+PyObject *AES_Encrypt(Element *self, PyObject *args)
+{
+	PyObject *keyObj = NULL; // string or bytes object
+	char *messageStr;
+	int m_len = 0;
+
+	if(!PyArg_ParseTuple(args, "Os#", &keyObj, &messageStr, &m_len)) {
+		PyErr_SetString(ElementError, "invalid arguments.");
+		return NULL;
+	}
+
+	if((m_len % aes_block_size) != 0) {
+		PyErr_SetString(ElementError, "message not 16-byte block aligned. Add some padding.");
+		return NULL;
+	}
+
+	char *keyStr;
+	if(PyBytes_CharmCheck(keyObj)) {
+		PyBytes_ToString(keyStr, keyObj);
+		//printf("key => '%s'\n", keyStr);
+		//printf("message => '%s'\n", messageStr);
+		// perform AES encryption using miracl
+		char *cipher = NULL;
+
+		int c_len = aes_encrypt(keyStr, messageStr, m_len, &cipher);
+
+		PyObject *str = PyBytes_FromStringAndSize((const char *) cipher, c_len);
+		free(cipher);
+		return str;
+	}
+
+	PyErr_SetString(ElementError, "invalid objects.");
+	return NULL;
+}
+
+PyObject *AES_Decrypt(Element *self, PyObject *args)
+{
+	PyObject *keyObj = NULL; // string or bytes object
+	char *ciphertextStr;
+	int c_len = 0;
+
+	if(!PyArg_ParseTuple(args, "Os#", &keyObj, &ciphertextStr, &c_len)) {
+		PyErr_SetString(ElementError, "invalid arguments.");
+		return NULL;
+	}
+
+	char *keyStr;
+	if(PyBytes_CharmCheck(keyObj)) {
+		PyBytes_ToString(keyStr, keyObj);
+//		printf("key => '%s'\n", keyStr);
+//		printf("message => '%s'\n", ciphertextStr);
+		// perform AES encryption using miracl
+		char *message = NULL;
+
+		int m_len = aes_decrypt(keyStr, ciphertextStr, c_len, &message);
+
+		PyObject *str = PyBytes_FromStringAndSize((const char *) message, m_len);
+		free(message);
+		return str;
+	}
+
+	PyErr_SetString(ElementError, "invalid objects.");
+	return NULL;
+
+}
+
+
 
 #if PY_MAJOR_VERSION >= 3
 
@@ -2014,6 +2082,8 @@ PyMethodDef pairing_methods[] = {
 
 	{"pair", (PyCFunction)Apply_pairing, METH_VARARGS, "Apply pairing between an element of G1_t and G2 and returns an element mapped to GT"},
 	{"hash", (PyCFunction)sha1_hash2, METH_VARARGS, "Compute a sha1 hash of an element type"},
+	{"SymEnc", (PyCFunction) AES_Encrypt, METH_VARARGS, "AES encryption args: key (bytes or str), message (str)"},
+	{"SymDec", (PyCFunction) AES_Decrypt, METH_VARARGS, "AES decryption args: key (bytes or str), ciphertext (str)"},
 	{"InitBenchmark", (PyCFunction)_init_benchmark, METH_NOARGS, "Initialize a benchmark object"},
 	{"StartBenchmark", (PyCFunction)_start_benchmark, METH_VARARGS, "Start a new benchmark with some options"},
 	{"EndBenchmark", (PyCFunction)_end_benchmark, METH_VARARGS, "End a given benchmark"},

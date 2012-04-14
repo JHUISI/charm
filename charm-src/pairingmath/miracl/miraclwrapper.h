@@ -17,6 +17,7 @@ typedef enum Curve Curve_t;
 #define CF        	2 // Co-factor = 2 in MNT curves
 #define MAX_LEN		256
 #define LEN_BITS	4
+#define aes_block_size 16
 
 pairing_t *pairing_init(int securitylevel);
 void pairing_clear(pairing_t *pairing);
@@ -74,6 +75,9 @@ void _element_add_to_hash(Group_t type, const pairing_t *pairing, const element_
 element_t *finish_hash(Group_t type, const pairing_t *pairing);
 
 void _element_hash_key(const pairing_t *pairing, Group_t type, element_t *e, void *data, int len);
+
+int aes_encrypt(char *key, char *message, int len, char **out);
+int aes_decrypt(char *key, char *ciphertext, int len, char **out);
 
 #ifdef __cplusplus
 }

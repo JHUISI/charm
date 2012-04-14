@@ -128,7 +128,7 @@ libdir="\${prefix}/lib"
 sysconfdir="\${prefix}/etc"
 confsuffix="/charm"
 profiler="no"
-python_path="$(which python3)"
+python_path="$(which python)"
 wget="$(which wget)"
 
 #fall back to python if for some reason python3 does not exist 
