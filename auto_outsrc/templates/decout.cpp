@@ -26,7 +26,6 @@ string decout(PairingGroup & group, CharmDict & partCT, ZR & zz, GT & egg)
 	R = group.div(T0, group.exp(T2, zz));
 	string s_sesskey = DeriveKey(R);
 	string M = SymDec(s_sesskey, T1);
-	string M = "original message here.";
 
 	sList.append(R);
 	sList.append(M);
