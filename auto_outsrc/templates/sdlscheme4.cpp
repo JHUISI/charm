@@ -9,6 +9,17 @@ using namespace std;
 
 int main()
 {
+	PairingGroup group(AES_SECURITY);
+
+	string Rstr = "3:MjA6Z+Jw6hcPR40MRNKKrA4FV8ztPDwyMDpmf6K/0CrHw4UQst1iYq9QFB7woDIwOiunSkccLEXajoQFyGtZGcSjGNVkMjA6gzTplMwMwpbCsDdURVNxWj1UbWUyMDptgzr4zmIPwYDgcRrNg3lqlLLbqzIwOkAsvloI9I6glmnaQScHX0+tCsry";
+	string T1str = "w/gRnW9W7Toc7JvIJmqvyw==";
+	Element elem;
+	Element::deserialize(elem, Rstr);
+	GT R = elem.getGT();
+	string s_sesskey = DeriveKey(R);
+
+	cout << "Session key := " << s_sesskey << endl;
+
 //	csprng RNG;
 //	string raw = "seeding RNG"; // read
 //	strong_init(&RNG, (int) raw.size(), (char *) raw.c_str(), 0L);
@@ -16,15 +27,15 @@ int main()
 //	strong_kill(&RNG);
 
     int i;
-    char key[32];
+    char *key = (char *) s_sesskey.c_str();
     char iv[16];
-    for (i=0;i<32;i++) key[i]=0;
+//    for (i=0;i<32;i++) key[i]=0;
 //    key[0]=1;
     for (i=0;i<16;i++) iv[i]=i;
 
     SymmetricEnc symenc;
 #ifdef TEST_ALL
-	string s =  SymmetricEnc::pad(string("balls on fire12345"));
+	string s =  "hello world12345"; // SymmetricEnc::pad(string("hello world12345"));
 	int s_len = (int) s.size();
     cout << s_len << ": '" << s << "'" << endl;
     char *block2 = (char *) s.c_str();
@@ -36,6 +47,7 @@ int main()
 //    char *cipher = (char *) symenc.encrypt(key, block2, s_len).c_str();
 
     string cipher_text = symenc.encrypt(key, block2, s_len);
+    if (strcmp(T1str.c_str(), cipher_text.c_str()) == 0) { cout << "Houston, we have a match. Charm-Python and Charm-C++ in sync." << endl; }
     char *cipher = (char *) cipher_text.c_str();
     int c_len = (int) cipher_text.size();
     cout << "Encrypt := " << cipher_text << endl << endl;
