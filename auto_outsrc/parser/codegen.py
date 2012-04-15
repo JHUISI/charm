@@ -40,7 +40,7 @@ def addImportLines():
     setupFile.write(pythonImportLines)
     transformFile.write(pythonImportLines)
     #decOutFile.write(cppImportLines)
-    decOutFile.write(pythonImportLines)
+    #decOutFile.write(pythonImportLines)
 
     pythonImportLines = ""
     for charmImportFunc in charmImportFuncs:
@@ -49,13 +49,18 @@ def addImportLines():
     pythonImportLines += "\n"
 
     cppImportLines = ""
-
+    cppImportLines += "#include \"sdlconfig.h\"\n"
+    cppImportLines += "#include <iostream>\n"
+    cppImportLines += "#include <sstream>\n"
+    cppImportLines += "#include <string>\n"
+    cppImportLines += "using namespace std;\n"
+    cppImportLines += "#define DEBUG  true\n"
     cppImportLines += "\n"
 
     setupFile.write(pythonImportLines)
     transformFile.write(pythonImportLines)
-    #decOutFile.write(cppImportLines)
-    decOutFile.write(pythonImportLines)
+    decOutFile.write(cppImportLines)
+    #decOutFile.write(pythonImportLines)
     userFuncsFile.write(pythonImportLines)
 
 def addGroupObjGlobalVar():
@@ -103,17 +108,22 @@ def getFuncNameFromBinNode(binNode):
 
     return funcNameWhole[len(DECL_FUNC_HEADER):len(funcNameWhole)]
 
-def writeFunctionEnd_Python(outputFile, functionName, retainGlobals):
-    global returnValues
-
-    outputString = ""
-
+def getOutputVariablesList(funcName):
     outputVariables = None
 
     try:
-        outputVariables = assignInfo[functionName][outputKeyword].getVarDeps()
+        outputVariables = assignInfo[funcName][outputKeyword].getVarDeps()
     except:
-        sys.exit("writeFunctionEnd_Python in codegen.py:  could not obtain function's output variables from getVarDeps() on VarInfo obj.")
+        sys.exit("getOutputVariablesList in codegen.py:  could not obtain function's output variables from getVarDeps() on VarInfo obj.")
+
+    return outputVariables
+
+def writeFunctionEnd_Python(outputFile, functionName, retainGlobals):
+    global returnValues
+
+    outputVariables = getOutputVariablesList(functionName)
+
+    outputString = ""
 
     outputVariablesString = ""
     numOutputVariables = 0
@@ -154,15 +164,20 @@ def writeGlobalVarDecls(outputFile, functionName):
 
     outputFile.write(outputString)
 
-def writeFunctionDecl_Python(outputFile, functionName, toWriteGlobalVarDecls, retainGlobals):
-    outputString = ""
-
+def getInputVariablesList(functionName):
     inputVariables = None
 
     try:
         inputVariables = assignInfo[functionName][inputKeyword].getVarDeps()
     except:
-        sys.exit("writeFunctionDecl_Python in codegen.py:  could not obtain function's input variables from getVarDeps() on VarInfo obj.")
+        sys.exit("getInputVariablesList in codegen.py:  could not obtain function's input variables from getVarDeps() on VarInfo obj.")
+
+    return inputVariables
+
+def writeFunctionDecl_Python(outputFile, functionName, toWriteGlobalVarDecls, retainGlobals):
+    outputString = ""
+
+    inputVariables = getInputVariablesList(functionName)
 
     inputVariablesString = ""
 
@@ -183,8 +198,41 @@ def writeFunctionDecl_Python(outputFile, functionName, toWriteGlobalVarDecls, re
     if (toWriteGlobalVarDecls == True):
         writeGlobalVarDecls(outputFile, functionName)
 
+def makeTypeReplacementsForCPP(SDL_Type):
+    SDLTypeAsString = str(SDL_Type)
+
+    if (SDLTypeAsString == "str"):
+        return "string"
+    if (SDLTypeAsString == "LIST"):
+        return "CharmDict"
+
+    return SDLTypeAsString
+
 def writeFunctionDecl_CPP(outputFile, functionName):
-    pass
+    outputString = ""
+
+    inputVariables = getInputVariablesList(functionName)
+    outputVariables = getOutputVariablesList(functionName)
+
+    if (len(outputVariables) != 1):
+        sys.exit("writeFunctionDecl_CPP in codegen.py:  length of output variables for function name passed in is unequal to one (unsupported).")
+
+    funcOutputType = getVarTypeFromVarName(outputVariables[0])
+    if (funcOutputType == None):
+        sys.exit("writeFunctionDecl_CPP in codegen.py:  could not obtain the type of the return value of this function.")
+
+    outputString += makeTypeReplacementsForCPP(funcOutputType.getType()) + " " + functionName + "("
+
+    for inputVariable in inputVariables:
+        currentType = getVarTypeFromVarName(inputVariable)
+        if (currentType == None):
+            sys.exit("writeFunctionDecl_CPP in codegen.py:  could not obtain the type of one of the input variables to the function name passed in.")
+        outputString += makeTypeReplacementsForCPP(currentType.getType()) + " & " + inputVariable + ", "
+
+    outputString = outputString[0:(len(outputString) - len(", "))]
+    outputString += ")\n"
+
+    outputFile.write(outputString)
 
 def writeFunctionDecl(functionName):
     global setupFile, transformFile, decOutFile
@@ -192,8 +240,8 @@ def writeFunctionDecl(functionName):
     if (currentFuncName == transformFunctionName):
         writeFunctionDecl_Python(transformFile, functionName, False, True)
     elif (currentFuncName == decOutFunctionName):
-        #writeFunctionDecl_CPP(decOutFile, functionName)
-         writeFunctionDecl_Python(decOutFile, functionName, False, True)
+        writeFunctionDecl_CPP(decOutFile, functionName)
+        #writeFunctionDecl_Python(decOutFile, functionName, False, True)
     else:
         writeFunctionDecl_Python(setupFile, functionName, True, False)
 

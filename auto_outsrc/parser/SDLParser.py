@@ -398,6 +398,26 @@ def parseFile(filename):
     fd.close()
     return ast
 
+def getVarTypeFromVarName(varName):
+    if ( (type(varName) is not str) or (len(varName) == 0) ):
+        sys.exit("getVarTypeFromVarName in SDLParser.py:  received invalid varName parameter.")
+
+    retVarType = None
+
+    for funcName in varTypes:
+        for currentVarName in varTypes[funcName]:
+            if (currentVarName != varName):
+                continue
+
+            currentVarType = varTypes[funcName][currentVarName]
+            if (retVarType == None):
+                retVarType = currentVarType
+            else:
+                if (currentVarType != retVarType):
+                    sys.exit("getVarTypeFromVarName in SDLParser.py:  found mismatching variable type information for variable name passed in.")
+
+    return retVarType
+
 def setVarTypeObjForList(varTypeObj, typeNode):
     if (type(typeNode).__name__ != BINARY_NODE_CLASS_NAME):
         sys.exit("setVarTypeObjForList in SDLParser.py received as input for typeNode a parameter that is not a Binary Node.")
