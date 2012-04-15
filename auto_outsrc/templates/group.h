@@ -15,6 +15,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <fstream>
 
 #define ZR Big
 #define convert_str(point) point.g
@@ -48,6 +49,7 @@ public:
 
 	Element(GT&);
  	Element(const Element& e);
+ 	ZR getZR();
  	G1 getG1(); // getter methods
  	GT getGT();
 	string str();
@@ -189,3 +191,8 @@ private:
 	bool aes_initialized;
 	aes a;
 };
+
+// to support codegen
+void parsePartCT(const char *filename, CharmDict & d);
+void parseKeys(const char *filename, ZR & sk, GT & pk);
+string SymDec(string k, string c_encoded);

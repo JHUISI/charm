@@ -3,16 +3,7 @@
 #include <sstream>
 #include <string>
 using namespace std;
-
-// ciphertext expected to be base64 encoded
-string SymDec(string k, string c_encoded)
-{
-	SymmetricEnc Symm;
-	char *key = (char *) k.c_str();
-	char *ciphertext = (char *) c_encoded.c_str();
-	int c_len = (int) c_encoded.size();
-	return Symm.decrypt(key, ciphertext, c_len);
-}
+#define DEBUG  true
 
 string decout(PairingGroup & group, CharmDict & partCT, ZR & zz, GT & egg)
 {
@@ -26,6 +17,11 @@ string decout(PairingGroup & group, CharmDict & partCT, ZR & zz, GT & egg)
 	R = group.div(T0, group.exp(T2, zz));
 	string s_sesskey = DeriveKey(R);
 	string M = SymDec(s_sesskey, T1);
+	if(DEBUG) {
+		cout << "R := " << convert_str(R) << endl;
+		cout << "Session key := " << s_sesskey << endl;
+		cout << "M := " << M << endl;
+	}
 
 	sList.append(R);
 	sList.append(M);
@@ -41,17 +37,36 @@ string decout(PairingGroup & group, CharmDict & partCT, ZR & zz, GT & egg)
 	}
 }
 
-int main()
+int main(int argc, char* argv[])
 {
-	PairingGroup group(AES_SECURITY);
+	if(argc < 3) {
+		cout << "Usage: " << argv[0] << " [ partCT.txt ] [ keys.txt ]" << endl;
+		return -1;
+	}
+	cout << "argc = " << argc << endl;
+	for(int i = 0; i < argc; i++)
+		cout << "argv[" << i << "] = " << argv[i] << endl;
+
+   PairingGroup group(AES_SECURITY);
 
 	// get filename with ciphertext, secret key and public key ==> deserialize into object
 	// follow 'key' : 'value' format and parsing will be easier using standard string handling functions
+	CharmDict dict;
+	ZR sk;
+	GT pk;
 
+	Element T0,T1,T2;
+	dict.set("T0", T0);
+	dict.set("T1", T1);
+	dict.set("T2", T2);
 	// verify objects well-formed
+	parsePartCT(argv[1], dict);
+	parseKeys(argv[2], sk, pk);
+	cout << "sk => " << sk << endl;
+	cout << "pk => " << convert_str(pk) << endl;
 
 	// call decout(group, ciphertext, zz, pk) ==> M or error!
-
-    cout << "Hello World!!!" << endl;
+	string M = decout(group, dict, sk, pk);
+	cout << "Recovered message :=> " << M << endl;
 	return 0;
 }

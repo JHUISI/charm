@@ -204,6 +204,12 @@ Element::Element(const Element& e)
 	isAllocated = false; // in case e.createNew() was called.
 }
 
+ZR Element::getZR()
+{
+	if(type == ZR_t) return *zr;
+	throw new string("invalid type.");
+}
+
 G1 Element::getG1()
 {
 	if(type == G1_t) return *g1;
@@ -319,6 +325,10 @@ void Element::deserialize(Element & e, string & s)
 		else if(type == Str_t) {
 			e = Element(s.substr(found+1, s.size()).c_str());
 		}
+		return;
+	}
+	else {
+		e = Element(s); // default to a string
 		return;
 	}
 
@@ -973,6 +983,7 @@ SymmetricEnc::SymmetricEnc()
 {
 	keysize = aes_block_size; // 16 * 8 = 128-bit key
 	mode = MR_CBC;
+	aes_initialized = false;
 }
 
 SymmetricEnc::~SymmetricEnc()
@@ -1017,11 +1028,11 @@ string SymmetricEnc::decrypt(char *key, char *ciphertext, int len)
 {
 
 	// assumes we're dealing with 16-block aligned buffers
+	int i;
 	if(aes_initialized) {
 		aes_reset(&a, mode, iv);
 	}
 	else {
-		int i;
 		for (i=0;i<16;i++) iv[i]=i; // TODO: retrieve IV from ciphertext
 	    if (!aes_init(&a, mode, keysize, key, iv))
 		{
@@ -1044,6 +1055,7 @@ string SymmetricEnc::decrypt(char *key, char *ciphertext, int len)
 		len2 = len;
 	}
 
+//	for(i=0;i<len2;i++) printf("%02x",(unsigned char) ciphertext2[i]);
 	char message_buf[len2 + 1];
 	memset(message_buf, 0, len2);
 	memcpy(message_buf, ciphertext2, len2);
@@ -1065,3 +1077,59 @@ string SymmetricEnc::pad(string s)
 	return s2;
 }
 
+void parsePartCT(const char *filename, CharmDict & d)
+{
+	ifstream stream(filename);
+
+	string input;
+	while(!stream.eof()) {
+		stream >> input;
+		int input_len = (int) input.size();
+		int pos = input.find('=');
+		if(pos != -1) {
+			string key = input.substr(0, pos);
+			string value = input.substr(pos+1, input_len);
+			// deserialize value
+			Element::deserialize(d[key], value);
+		}
+		input.clear();
+	}
+	cout << d << endl;
+}
+
+void parseKeys(const char *filename, ZR & sk, GT & pk)
+{
+	Element skElem, pkElem;
+	ifstream stream(filename);
+
+	string input;
+	while(!stream.eof()) {
+		stream >> input;
+		int input_len = (int) input.size();
+		int pos = input.find('=');
+		if(pos != -1) {
+			char *key = (char *) input.substr(0, pos).c_str();
+			string value = input.substr(pos+1, input_len);
+
+			if(strcmp(key, "sk") == 0) {
+				Element::deserialize(skElem, value);
+				sk = skElem.getZR();
+			}
+			else if(strcmp(key, "pk") == 0) {
+				Element::deserialize(pkElem, value);
+				pk = pkElem.getGT();
+			}
+		}
+		input.clear();
+	}
+}
+
+// ciphertext expected to be base64 encoded
+string SymDec(string k, string c_encoded)
+{
+	SymmetricEnc Symm;
+	char *key = (char *) k.c_str();
+	char *ciphertext = (char *) c_encoded.c_str();
+	int c_len = (int) c_encoded.size();
+	return Symm.decrypt(key, ciphertext, c_len);
+}
