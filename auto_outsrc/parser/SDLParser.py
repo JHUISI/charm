@@ -402,15 +402,15 @@ def getVarTypeFromVarName(varName):
     if ( (type(varName) is not str) or (len(varName) == 0) ):
         sys.exit("getVarTypeFromVarName in SDLParser.py:  received invalid varName parameter.")
 
-    retVarType = None
+    retVarType = ops.NONE
 
     for funcName in varTypes:
         for currentVarName in varTypes[funcName]:
             if (currentVarName != varName):
                 continue
 
-            currentVarType = varTypes[funcName][currentVarName]
-            if (retVarType == None):
+            currentVarType = varTypes[funcName][currentVarName].getType()
+            if (retVarType == ops.NONE):
                 retVarType = currentVarType
             else:
                 if (currentVarType != retVarType):

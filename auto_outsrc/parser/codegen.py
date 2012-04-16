@@ -10,12 +10,14 @@ setupFile = None
 transformFile = None
 decOutFile = None
 userFuncsFile = None
+userFuncsCPPFile = None
 currentFuncName = NONE_FUNC_NAME
 numTabsIn = 1
 returnValues = {}
 globalVarNames = []
 lineNoBeingProcessed = 0
 numLambdaFunctions = 0
+userFuncsList_CPP = []
 userFuncsList = []
 currentLambdaFuncName = None
 
@@ -28,7 +30,7 @@ def writeCurrentNumTabsIn(outputFile):
     outputFile.write(outputString)
 
 def addImportLines():
-    global setupFile, transformFile, decOutFile, userFuncsFile
+    global setupFile, transformFile, decOutFile, userFuncsFile, userFuncsCPPFile
 
     userFuncsLibName = userFuncsFileName
     if (userFuncsLibName.endswith(pySuffix) == True):
@@ -62,9 +64,10 @@ def addImportLines():
     decOutFile.write(cppImportLines)
     #decOutFile.write(pythonImportLines)
     userFuncsFile.write(pythonImportLines)
+    userFuncsCPPFile.write(cppImportLines)
 
 def addGroupObjGlobalVar():
-    global setupFile, transformFile, decOutFile, userFuncsFile
+    global setupFile, transformFile, decOutFile, userFuncsFile, userFuncsCPPFile
 
     if ( (type(groupObjName) is not str) or (len(groupObjName) == 0) ):
         sys.exit("addGroupObjGlobalVar in codegen.py:  groupObjName in config.py is invalid.")
@@ -82,6 +85,10 @@ def addGroupObjGlobalVar():
     outputString = ""
     outputString += groupObjName + "UserFuncs = None\n\n"
     userFuncsFile.write(outputString)
+
+    outputString = ""
+    outputString += groupObjName + "UserFuncs = NULL\n\n"
+    userFuncsCPPFile.write(outputString)
 
 def isFunctionStart(binNode):
     if (binNode.type != ops.BEGIN):
@@ -218,19 +225,22 @@ def writeFunctionDecl_CPP(outputFile, functionName):
         sys.exit("writeFunctionDecl_CPP in codegen.py:  length of output variables for function name passed in is unequal to one (unsupported).")
 
     funcOutputType = getVarTypeFromVarName(outputVariables[0])
-    if (funcOutputType == None):
-        sys.exit("writeFunctionDecl_CPP in codegen.py:  could not obtain the type of the return value of this function.")
+    if (funcOutputType == ops.NONE):
+        #sys.exit("writeFunctionDecl_CPP in codegen.py:  could not obtain the type of the return value of this function.")
+        funcOutputType = defaultCPPVarType
 
-    outputString += makeTypeReplacementsForCPP(funcOutputType.getType()) + " " + functionName + "("
+    outputString += makeTypeReplacementsForCPP(funcOutputType) + " " + functionName + "("
+    outputString += PairingGroupClassName_CPP + " & " + groupObjName + ", "
 
     for inputVariable in inputVariables:
         currentType = getVarTypeFromVarName(inputVariable)
-        if (currentType == None):
-            sys.exit("writeFunctionDecl_CPP in codegen.py:  could not obtain the type of one of the input variables to the function name passed in.")
-        outputString += makeTypeReplacementsForCPP(currentType.getType()) + " & " + inputVariable + ", "
+        if (currentType == ops.NONE):
+            #sys.exit("writeFunctionDecl_CPP in codegen.py:  could not obtain the type of one of the input variables to the function name passed in.")
+            currentType = defaultCPPVarType
+        outputString += makeTypeReplacementsForCPP(currentType) + " & " + inputVariable + ", "
 
     outputString = outputString[0:(len(outputString) - len(", "))]
-    outputString += ")\n"
+    outputString += ")\n{\n"
 
     outputFile.write(outputString)
 
@@ -246,7 +256,18 @@ def writeFunctionDecl(functionName):
         writeFunctionDecl_Python(setupFile, functionName, True, False)
 
 def writeFunctionEnd_CPP(outputFile, functionName):
-    return
+    global returnValues
+
+    outputVariables = getOutputVariablesList(functionName)
+
+    if (len(outputVariables) > 1):
+        sys.exit("writeFunctionEnd_CPP in codegen.py:  number of output variables obtained from getOutputVariables List is greater than one (unsupported).")
+
+    if (len(outputVariables) == 0):
+        return
+
+    returnValues[functionName] = str(outputVariables[0])
+    outputFile.write("\treturn " + str(outputVariables[0]) + ";\n")
 
 def writeFunctionEnd(functionName):
     global setupFile, transformFile, decOutFile
@@ -254,8 +275,8 @@ def writeFunctionEnd(functionName):
     if (currentFuncName == transformFunctionName):
         writeFunctionEnd_Python(transformFile, functionName, True)
     elif (currentFuncName == decOutFunctionName):
-        #writeFunctionEnd_CPP(decOutFile, functionName)
-        writeFunctionEnd_Python(decOutFile, functionName, True)
+        writeFunctionEnd_CPP(decOutFile, functionName)
+        #writeFunctionEnd_Python(decOutFile, functionName, True)
     else:
         writeFunctionEnd_Python(setupFile, functionName, False)
 
@@ -413,22 +434,67 @@ def processDotProdAsInt(dotProdObj, currentLambdaFuncName, lambdaReplacements):
 
     return dotProdOutputString
 
+def processStrAssignStmt(node, replacementsDict):
+    strNameToReturn = applyReplacementsDict(replacementsDict, node)
+    strNameToReturn = replacePoundsWithBrackets(strNameToReturn)
+    return strNameToReturn
+
+def processAttrOrTypeAssignStmt(node, replacementsDict):
+    if (node.type == ops.ATTR):
+        strNameToReturn = applyReplacementsDict(replacementsDict, getFullVarName(node, False))
+    elif (node.type == ops.TYPE):
+        strNameToReturn = applyReplacementsDict(replacementsDict, str(node.attr))
+    strNameToReturn = replacePoundsWithBrackets(strNameToReturn)
+    if (node.negated == True):
+        strNameToReturn = "-" + strNameToReturn
+    return strNameToReturn
+
+def getAssignStmtAsString_CPP(node, replacementsDict):
+    global userFuncsCPPFile, userFuncsList_CPP
+
+    if (type(node) is str):
+        return processStrAssignStmt(node, replacementsDict)
+    elif ( (node.type == ops.ATTR) or (node.type == ops.TYPE) ):
+        return processAttrOrTypeAssignStmt(node, replacementsDict)
+    elif (node.type == ops.ADD):
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict)
+        return groupObjName + ".add(" + leftSide + ", " + rightSide + ")"
+    elif (node.type == ops.SUB):
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict)
+        return groupObjName + ".sub(" + leftSide + ", " + rightSide + ")"
+    elif (node.type == ops.MUL):
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict)
+        return groupObjName + ".mul(" + leftSide + ", " + rightSide + ")"
+    elif (node.type == ops.DIV):
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict)
+        return groupObjName + ".div(" + leftSide + ", " + rightSide + ")"
+    elif (node.type == ops.EXP):
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict)
+        return groupObjName + ".exp(" + leftSide + ", " + rightSide + ")"
+    elif (node.type == ops.AND):
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict)
+        return "( (" + leftSide + ") && (" + rightSide + ") )"
+    elif (node.type == ops.EQ_TST):
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict)
+        return "( (" + leftSide + ") == (" + rightSide + ") )"
+    #dddddd
+
+    return "" #replace with sys.exit
+
 def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements, forOutput):
     global userFuncsFile, userFuncsList
 
     if (type(node) is str):
-        strNameToReturn = applyReplacementsDict(replacementsDict, node)
-        strNameToReturn = replacePoundsWithBrackets(strNameToReturn)
-        return strNameToReturn
+        return processStrAssignStmt(node, replacementsDict)
     elif ( (node.type == ops.ATTR) or (node.type == ops.TYPE) ):
-        if (node.type == ops.ATTR):
-            strNameToReturn = applyReplacementsDict(replacementsDict, getFullVarName(node, False))
-        elif (node.type == ops.TYPE):
-            strNameToReturn = applyReplacementsDict(replacementsDict, str(node.attr))
-        strNameToReturn = replacePoundsWithBrackets(strNameToReturn)
-        if (node.negated == True):
-            strNameToReturn = "-" + strNameToReturn
-        return strNameToReturn
+        return processAttrOrTypeAssignStmt(node, replacementsDict)
     elif (node.type == ops.ADD):
         leftString = getAssignStmtAsString(node.left, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
         rightString = getAssignStmtAsString(node.right, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
@@ -577,6 +643,25 @@ def writeLambdaFuncAssignStmt(outputFile, binNode):
     outputFile.write(lambdaOutputString)
     return (dotProdObj, lambdaReplacements)
 
+def writeAssignStmt_CPP(outputFile, binNode):
+    writeCurrentNumTabsIn(outputFile)
+
+    outputString = ""
+
+    variableName = getFullVarName(binNode.left, False)
+    if (variableName.find(LIST_INDEX_SYMBOL) == -1):
+        variableTypeObj = getVarTypeFromVarName(variableName)
+        if (variableTypeObj == ops.NONE):
+            #sys.exit("writeAssignStmt_CPP in codegen.py:  could not obtain the type of the variable name passed to the function.")
+            variableTypeObj = defaultCPPVarType
+        outputString += makeTypeReplacementsForCPP(variableTypeObj) + " "
+
+    variableName = replacePoundsWithBrackets(variableName)
+    outputString += variableName + " = "
+    outputString += getAssignStmtAsString_CPP(binNode.right, None)
+    outputString += ";\n"
+    outputFile.write(outputString)
+
 def writeAssignStmt_Python(outputFile, binNode):
     writeCurrentNumTabsIn(outputFile)
 
@@ -605,20 +690,17 @@ def writeAssignStmt_Python(outputFile, binNode):
     outputString += "\n"
     outputFile.write(outputString)
 
-def writeAssignStmt_CPP(outputFile, binNode):
-    return
-
 def writeAssignStmt(binNode):
     if (currentFuncName == transformFunctionName):
         writeAssignStmt_Python(transformFile, binNode)
     elif (currentFuncName == decOutFunctionName):
-        #writeAssignStmt_CPP(decOutFile, binNode)
-        writeAssignStmt_Python(decOutFile, binNode)
+        writeAssignStmt_CPP(decOutFile, binNode)
+        #writeAssignStmt_Python(decOutFile, binNode)
     else:
         writeAssignStmt_Python(setupFile, binNode)
 
 def writeErrorFunc_Python(outputFile, binNode):
-    global userFuncsFile, userFuncsList
+    global userFuncsFile, userFuncsCPPFile, userFuncsList, userFuncsList_CPP
 
     writeCurrentNumTabsIn(outputFile)
     outputString = ""
@@ -638,6 +720,16 @@ def writeErrorFunc_Python(outputFile, binNode):
         userFuncsOutputString += "\t" + userGlobalsFuncName + "()\n"
         userFuncsOutputString += "\treturn\n\n"
         userFuncsFile.write(userFuncsOutputString)
+
+    if (errorFuncName not in userFuncsList_CPP):
+        userFuncsList_CPP.append(errorFuncName)
+        userFuncsOutputString = ""
+        userFuncsOutputString += "void " + errorFuncName + "(" + errorFuncArgString + ")\n"
+        userFuncsOutputString += "{\n"
+        userFuncsOutputString += "\t" + userGlobalsFuncName + "();\n"
+        userFuncsOutputString += "\treturn;\n"
+        userFuncsOutputString += "}\n\n"
+        userFuncsCPPFile.write(userFuncsOutputString)
 
 def writeElseStmt_Python(outputFile, binNode):
     writeCurrentNumTabsIn(outputFile)
@@ -989,7 +1081,7 @@ def getGlobalVarNames():
             globalVarNames.append(varName)
 
 def addGetGlobalsToUserFuncs():
-    global userFuncsFile
+    global userFuncsFile, userFuncsCPPFile
 
     outputString = ""
 
@@ -1000,9 +1092,20 @@ def addGetGlobalsToUserFuncs():
 
     userFuncsFile.write(outputString)
 
+    outputString = ""
+    outputString += "void " + userGlobalsFuncName + "()\n"
+    outputString += "{\n"
+    outputString += "\tif (" + groupObjName + "UserFuncs == NULL)\n"
+    outputString += "\t{\n"
+    outputString += "\t\t" + PairingGroupClassName_CPP + " " + groupObjName + "UserFuncs(" + SecurityParameter_CPP + ");\n"
+    outputString += "\t}\n"
+    outputString += "}\n"
+
+    userFuncsCPPFile.write(outputString)
+
 def main(SDL_Scheme):
     global setupFile, transformFile, decOutFile, userFuncsFile, assignInfo, varNamesToFuncs_All
-    global varNamesToFuncs_Assign, inputOutputVars
+    global varNamesToFuncs_Assign, inputOutputVars, userFuncsCPPFile
 
     if ( (type(SDL_Scheme) is not str) or (len(SDL_Scheme) == 0) ):
         sys.exit("codegen.py:  sys.argv[1] argument (file name for SDL scheme) passed in was invalid.")
@@ -1027,6 +1130,7 @@ def main(SDL_Scheme):
     transformFile = open(transformFileName, 'w')
     decOutFile = open(decOutFileName, 'w')
     userFuncsFile = open(userFuncsFileName, 'w')
+    userFuncsCPPFile = open(userFuncsCPPFileName, 'w')
 
     getGlobalVarNames()
 
@@ -1040,10 +1144,11 @@ def main(SDL_Scheme):
     transformFile.close()
     decOutFile.close()
     userFuncsFile.close()
+    userFuncsCPPFile.close()
 
 if __name__ == "__main__":
     main(sys.argv[1])
     parseLinesOfCode(getLinesOfCode(), True)
     #os.system("cp userFuncsPermanent.py userFuncs.py")
     writeLinesOfCodeToFile(outputSDLFileName)
-    print("io vars:  ", getInputOutputVars())
+    #print("io vars:  ", getInputOutputVars())

@@ -9,13 +9,19 @@ keygenFuncName = "keygen"
 keygenPubVar = ["pk", "mpk", "gpk"]
 keygenSecVar = "sk"
 
-setupFileName = "setupOutsourcing_BSW.py"
-transformFileName = "transformOutsourcing_BSW.py"
-decOutFileName = "decOutOutsourcing_BSW.cpp"
-#decOutFileName = "decOutOutsourcing_BSW.py"
+pySuffix = ".py"
+cppSuffix = ".cpp"
+#cppSuffix = ".py"
+cppHeaderSuffix = ".h"
+
+setupFileName = "setupOutsourcing_BSW" + pySuffix
+transformFileName = "transformOutsourcing_BSW" + pySuffix
+decOutFileName = "decOutOutsourcing_BSW" + cppSuffix
+#decOutFileName = "decOutOutsourcing_BSW" + pySuffix
 userFuncsName = "userFuncs_BSW"
-userFuncsFileName = userFuncsName + ".py"
-outputSDLFileName = "outsourcedSDL_BSW.py"
+userFuncsFileName = userFuncsName + pySuffix
+userFuncsCPPFileName = userFuncsName + cppHeaderSuffix
+outputSDLFileName = "outsourcedSDL_BSW" + pySuffix
 errorFuncName = "userErrorFunction"
 errorFuncArgString = "userErrorFunctionArgString"
 
@@ -23,10 +29,6 @@ transformFunctionName = "transform"
 partialCT = "partCT"
 decOutFunctionName = "decout"
 getStringFunctionName = "GetString"
-
-pySuffix = ".py"
-cppSuffix = ".cpp"
-#cppSuffix = ".py"
 
 setupFunctionOrder = ["setup", "keygen", "encrypt"]
 transformFunctionOrder = ["transform"]
@@ -36,6 +38,8 @@ argsToFirstSetupFunc = []
 argsToFirstTransformFunc = ["sys.argv[1]", "sys.argv[2]", "sys.argv[3]"]
 argsToFirstDecOutFunc = ["sys.argv[1]", "sys.argv[2]", "sys.argv[3]"]
 
+PairingGroupClassName_CPP = "PairingGroup"
+SecurityParameter_CPP = "AES_SECURITY"
 groupObjName = "groupObj"
 groupArg = "'SS512'"
 
@@ -61,3 +65,5 @@ userGlobalsFuncName = "getUserGlobals"
 
 argSuffix = "_Arg"
 nonIntDotProdIndex = "loopIndex"
+
+defaultCPPVarType = "string"
