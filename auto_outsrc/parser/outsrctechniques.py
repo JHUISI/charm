@@ -694,6 +694,15 @@ class SubstituteVar:
         if str(node) == self.target:
             node.setAttribute(self.new_var)
 
+    def visit_list(self, node, data):
+        found = False
+        if node.listNodes != None:
+            for i in node.listNodes:
+                if str(i) == self.target: found = True; break
+        if found:
+            ind = node.listNodes.index(self.target)
+            node.listNodes[ind] = self.new_var
+
 if __name__ == "__main__":
     statement = sys.argv[1]
     parser = SDLParser()

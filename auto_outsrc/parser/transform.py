@@ -1,5 +1,5 @@
 from SDLParser import *
-from outsrctechniques import AbstractTechnique,Technique1,Technique2,Technique3,FindT1
+from outsrctechniques import AbstractTechnique,Technique1,Technique2,Technique3,FindT1,SubstituteVar
 import config
 import sys
 
@@ -16,6 +16,7 @@ debug = False
 
 # description: should return a list of VarObjects that make up the new
 # 
+
 def transform(sdl_scheme, verbosity=False):
     global AssignInfo
     partDecCT = { CTprime.T0: None, CTprime.T1: None, CTprime.T2: None, config.M:None, 'dec_op':None }
@@ -130,6 +131,8 @@ def transform(sdl_scheme, verbosity=False):
     for i in range(len(transformVarInfos)):
         ref = transformVarInfos[i]
         if stmtsDec.get(ref):
+            # do substitution here
+            ASTVisitor( SubstituteVar(config.keygenSecVar, config.keygenSecVar + config.blindingSuffix) ).preorder( stmtsDec[ref].getAssignNode() )             
             cur_list.append(str(stmtsDec[ref].getAssignNode()) + "\n")
             cur_line += 1
 #            varName = stmtsDec[ref].getAssignVar()
@@ -180,6 +183,10 @@ def applyRules(varInf, data):
         path = []
         new_equation = Optimize(equation, path, code_block)
         varInf.updateAssignNode(new_equation)
+
+#def substitute(varInf, data):
+    
+    
             
 def printStmt(varInf, data):
     if varInf.getLineNo() in data['lines']:
