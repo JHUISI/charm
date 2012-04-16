@@ -65,5 +65,3 @@ userGlobalsFuncName = "getUserGlobals"
 
 argSuffix = "_Arg"
 nonIntDotProdIndex = "loopIndex"
-
-defaultCPPVarType = "string"
