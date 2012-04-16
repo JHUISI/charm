@@ -11,8 +11,8 @@ keygenSecVar = "sk"
 
 setupFileName = "setupOutsourcing_BSW.py"
 transformFileName = "transformOutsourcing_BSW.py"
-#decOutFileName = "decOutOutsourcing_BSW.cpp"
-decOutFileName = "decOutOutsourcing_BSW.py"
+decOutFileName = "decOutOutsourcing_BSW.cpp"
+#decOutFileName = "decOutOutsourcing_BSW.py"
 userFuncsName = "userFuncs_BSW"
 userFuncsFileName = userFuncsName + ".py"
 outputSDLFileName = "outsourcedSDL_BSW.py"
@@ -25,8 +25,8 @@ decOutFunctionName = "decout"
 getStringFunctionName = "GetString"
 
 pySuffix = ".py"
-#cppSuffix = ".cpp"
-cppSuffix = ".py"
+cppSuffix = ".cpp"
+#cppSuffix = ".py"
 
 setupFunctionOrder = ["setup", "keygen", "encrypt"]
 transformFunctionOrder = ["transform"]
