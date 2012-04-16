@@ -1,11 +1,12 @@
-from userFuncs import createPolicy, getAttributeList, calculateSharesDict, SymEnc, GetString, prune, getCoefficients, SymDec
-from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair
+from userFuncs import createPolicy, getAttributeList, calculateSharesDict, GetString, prune, getCoefficients, SymDec
+from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair, SymEnc
 from toolbox.secretutil import SecretUtil
 from toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from toolbox.iterate import dotprod2
 from charm.pairing import hash as SHA1
 from serializeAPI import *
 
+MNT160 = 80
 pk = {}
 Y = {}
 g = {}
@@ -111,7 +112,9 @@ def encrypt(M, policy_str):
 def transformLambdaFunc(y, attrs, Cr, coeff, Dj, Djp, Cpr):
 	lambdaIndex = GetString(attrs[y])
 	firstTerm = (Cr[lambdaIndex] ** (-coeff[lambdaIndex]))
+	print("firstTerm := ", firstTerm)
 	secondTerm = (Djp[lambdaIndex] ** coeff[lambdaIndex])
+	print("secondTerm := ", secondTerm)
 	return pair(firstTerm, Dj[lambdaIndex]) * pair(secondTerm, Cpr[lambdaIndex])
 
 def transform(ct):
@@ -123,10 +126,12 @@ def transform(ct):
 	coeff = getCoefficients(policy)
 	Y = len(attrs)
 	A = dotprod2(range(0,Y), transformLambdaFunc, attrs, Cr, coeff, Dj, Djp, Cpr)
+	print(" A := ", A)
 	result0 = (pair(C, D) * A)
 	T0 = Ctl
 	T2 = result0
-	partCT = [T0, T1, T2]
+	print("T2 :=>", result0)
+	partCT = {'T0':T0, 'T1':T1, 'T2':T2}
 	output = partCT
 	return output
 
@@ -141,10 +146,10 @@ def decout(partCT, zz):
 
 if __name__ == "__main__":
 	global groupObj
-	groupObj = PairingGroup('SS512')
+	groupObj = PairingGroup(MNT160)
 
 	S = ['ONE', 'TWO', 'THREE']
-	M = "balls on fire"
+	M = "balls on fire123"
 	policy_str = '((four or three) and (two or one))'
 
 	setup()
@@ -153,7 +158,9 @@ if __name__ == "__main__":
 
 	(partCT) = transform(ct)
 	
-	writeFile('partCT.txt', objectOut(groupObj, partCT))
+	writeToFile('partCT.txt', objectOut(groupObj, partCT))
+	keys = {'sk':zz, 'pk':egg}
+	writeToFile('keys.txt', objectOut(groupObj, keys))
 	#M = decout(partCT, zz)
 
 	#print(M)

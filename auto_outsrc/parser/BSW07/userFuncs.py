@@ -21,10 +21,10 @@ def calculateSharesDict(s, policy):
 	getUserGlobals()
 	return util.calculateSharesDict(s, policy)
 
-def SymEnc(s_sesskey, M):
-	getUserGlobals()
-	cipher = AuthenticatedCryptoAbstraction(s_sesskey)
-	return cipher.encrypt(M)
+#def SymEnc(s_sesskey, M):
+#	getUserGlobals()
+#	cipher = AuthenticatedCryptoAbstraction(s_sesskey)
+#	return cipher.encrypt(M)
 
 def prune(policy, S):
 	getUserGlobals()
@@ -54,7 +54,7 @@ def getUserGlobals():
 	global groupObjUserFuncs, util
 
 	if (groupObjUserFuncs == None):
-		groupObjUserFuncs = PairingGroup('SS512')
+		groupObjUserFuncs = PairingGroup(80)
 
 	if (util == None):
 		util = SecretUtil(groupObjUserFuncs, verbose=False)
