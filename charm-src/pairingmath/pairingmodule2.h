@@ -127,7 +127,7 @@ typedef struct {
 	a->e = _element_neg(a->element_type, b->e, b->pairing->order);
 
 #define element_invert(a, b) \
-	_element_inv(b->element_type, b->e, a->e, b->pairing->order)
+	_element_inv(b->element_type, b->pairing->pair_obj, b->e, a->e, b->pairing->order)
 
 #define element_pow_zr(c, a, b) \
 	if (a->element_type != ZR_t)  {  \

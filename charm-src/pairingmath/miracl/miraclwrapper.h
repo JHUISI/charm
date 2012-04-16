@@ -43,7 +43,8 @@ void _element_div(Group_t type, element_t *c, const element_t *a, const element_
 element_t *_element_pow_zr(Group_t type, const pairing_t *pairing, const element_t *a, const element_t *b);
 element_t *_element_pow_zr_zr(Group_t type, const pairing_t *pairing, const element_t *a, const int b, const element_t *o);
 element_t *_element_neg(Group_t type, const element_t *e, const element_t *o);
-void _element_inv(Group_t type, const element_t *a, element_t *b, element_t *o);
+//void _element_inv(Group_t type, const element_t *a, element_t *b, element_t *o);
+void _element_inv(Group_t type, const pairing_t *pairing, const element_t *a, element_t *b, element_t *o);
 
 element_t *hash_then_map(Group_t type, const pairing_t *pairing, char *data, int len);
 element_t *_element_from_hash(Group_t type, const pairing_t *pairing, void *data, int len);

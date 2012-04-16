@@ -497,8 +497,9 @@ element_t *_element_neg(Group_t type, const element_t *e, const element_t *o)
 //
 //}
 
-void _element_inv(Group_t type, const element_t *a, element_t *b, element_t *o)
+void _element_inv(Group_t type, const pairing_t *pairing, const element_t *a, element_t *b, element_t *o)
 {
+	PFC *pfc = (PFC *) pairing;
 	// TODO: not working as expeced ZR_t * ~ZR_t = seg fault?
 	if(type == ZR_t) {
 		Big *x = (Big *) a;
@@ -520,7 +521,9 @@ void _element_inv(Group_t type, const element_t *a, element_t *b, element_t *o)
 		h->g = -g->g;
 	}
 	else if(type == GT_t) {
-		// TODO: figure out the algorithm - operator doesn't exist
+		GT *g = (GT *) a;
+		GT *h = (GT *) b;
+		h->g     = pfc->power(*g, Big(-1)).g;
 	}
 }
 
