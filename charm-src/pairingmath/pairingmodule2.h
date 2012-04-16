@@ -110,7 +110,8 @@ typedef struct {
 #define element_mul(c, a, b) _element_mul(a->element_type, c->e, a->e, b->e, a->pairing->order)
 #define element_mul_si(c, a, b) _element_mul_si(a->element_type, a->pairing->pair_obj, c->e, a->e, b, a->pairing->order)
 #define element_mul_zn(c, a, b) _element_mul_zn(a->element_type, a->pairing->pair_obj, c->e, a->e, b->e, a->pairing->order)
-#define element_div(c, a, b) _element_div(a->element_type, c->e, a->e, b->e) // TODO: fix for 1 / ZR
+// TODO: fix for -1 / ZR and similar operations
+#define element_div(c, a, b) _element_div(a->element_type, c->e, a->e, b->e)
 #define element_set(a, b) _element_set(a->pairing->curve, a->element_type, a->e, b->e);
 #define element_set_raw(g, t, a, b) _element_set(g->pairing->curve, t, a, b);
 #define element_setG1(c, a, b) _element_setG1(c->element_type, c->e, a->e, b->e);
