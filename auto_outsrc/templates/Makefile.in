@@ -4,7 +4,7 @@ CXXFLAGS := -g -m64 -O2 -O3 -Wall
 
 # should be set by codegen
 SDL_SRC := decout
-NAME    := my_test
+NAME    := client_decout
 # CURVE := ssp 
 CURVE   := mnt
 

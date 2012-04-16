@@ -609,6 +609,7 @@ GT PairingGroup::pair(G1 g, G2 h)
 	GT gt = pfcObject->pairing(h, g);
 	return gt;
 }
+
 #else
 GT PairingGroup::pair(G1 g, G1 h)
 {
@@ -645,8 +646,8 @@ G1 PairingGroup::div(G1 g, G1 h)
 
 GT PairingGroup::div(GT g, GT h)
 {
-	GT l(g / h);
-	return l;
+        GT l = pfcObject->power(h, Big(-1));
+	return g * h;
 }
 
 // exp for G1 & GT

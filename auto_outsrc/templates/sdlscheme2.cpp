@@ -7,9 +7,10 @@ using namespace std;
 int main()
 {
 	PairingGroup group(AES_SECURITY);
-
 	GT gt1, gt2;
 	group.random(gt1);
+  	group.test(gt1);
+	
 	group.random(gt2);
 	cout << "GT random 1 :=> " << convert_str(gt1) << endl;
 	cout << "GT random 2 :=> " << convert_str(gt2) << endl;

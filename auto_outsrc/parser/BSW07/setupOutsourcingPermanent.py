@@ -1,5 +1,5 @@
-from userFuncs import createPolicy, getAttributeList, calculateSharesDict, GetString, prune, getCoefficients, SymDec
-from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair, SymEnc
+from userFuncs import createPolicy, getAttributeList, calculateSharesDict, GetString, prune, getCoefficients
+from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair, SymEnc, SymDec
 from toolbox.secretutil import SecretUtil
 from toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from toolbox.iterate import dotprod2
@@ -93,8 +93,10 @@ def encrypt(M, policy_str):
 	policy = createPolicy(policy_str)
 	attrs = getAttributeList(policy)
 	R = groupObj.random(GT)
+	print("R :=", R)
 	s = groupObj.hash([R, M], ZR)
 	s_sesskey = SHA1(R)
+	print("s_sesskey :=", s_sesskey)
 	Ctl = (R * (egg ** s))
 	sh = calculateSharesDict(s, policy)
 	Y = len(sh)
@@ -112,9 +114,7 @@ def encrypt(M, policy_str):
 def transformLambdaFunc(y, attrs, Cr, coeff, Dj, Djp, Cpr):
 	lambdaIndex = GetString(attrs[y])
 	firstTerm = (Cr[lambdaIndex] ** (-coeff[lambdaIndex]))
-	print("firstTerm := ", firstTerm)
 	secondTerm = (Djp[lambdaIndex] ** coeff[lambdaIndex])
-	print("secondTerm := ", secondTerm)
 	return pair(firstTerm, Dj[lambdaIndex]) * pair(secondTerm, Cpr[lambdaIndex])
 
 def transform(ct):
@@ -136,8 +136,9 @@ def transform(ct):
 	return output
 
 def decout(partCT, zz):
-	T0, T1, T2 = partCT
+	T0, T1, T2 = partCT['T0'], partCT['T1'], partCT['T2']
 	R = (T0 / (T2 ** zz))
+	print("Recov R :=", R)
 	s_sesskey = SHA1(R)
 	M = SymDec(s_sesskey, T1)
 	s = groupObj.hash([R, M], ZR)
@@ -161,6 +162,6 @@ if __name__ == "__main__":
 	writeToFile('partCT.txt', objectOut(groupObj, partCT))
 	keys = {'sk':zz, 'pk':egg}
 	writeToFile('keys.txt', objectOut(groupObj, keys))
-	#M = decout(partCT, zz)
+	M = decout(partCT, zz)
 
-	#print(M)
+	print("M := ", M)
