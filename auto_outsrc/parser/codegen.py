@@ -21,6 +21,19 @@ userFuncsList_CPP = []
 userFuncsList = []
 currentLambdaFuncName = None
 
+builtInTypes = {}
+builtInTypes["DeriveKey"] = "str"
+builtInTypes["SymDec"] = "str"
+builtInTypes["stringToID"] = "LIST"
+
+def writeCurrentNumTabsToString():
+    outputString = ""
+
+    for numTabs in range(0, numTabsIn):
+        outputString += "\t"
+
+    return outputString
+
 def writeCurrentNumTabsIn(outputFile):
     outputString = ""
 
@@ -215,6 +228,35 @@ def makeTypeReplacementsForCPP(SDL_Type):
 
     return SDLTypeAsString
 
+def getFinalVarType(varName, varNode=None, replacementsDict=None):
+    typeFromParser = getVarTypeFromVarName(varName)
+    typeFromBuiltInDict = None
+
+    if ( (varNode != None) and (varNode.type == ops.FUNC) ):
+        funcName = applyReplacementsDict(replacementsDict, getFullVarName(varNode, False))
+        funcName = replacePoundsWithBrackets(funcName)
+        if (funcName in builtInTypes):
+            typeFromBuiltInDict = builtInTypes[funcName]
+
+    print("varName:  ", varName)
+    print("typeFromParser:  ", typeFromParser)
+    print("typeFromBuiltInDict:  ", typeFromBuiltInDict)
+    print("\n\n")
+
+    if ( (typeFromParser != ops.NONE) and (typeFromBuiltInDict == None) ):
+        return typeFromParser
+
+    if ( (typeFromParser == ops.NONE) and (typeFromBuiltInDict != None) ):
+        return typeFromBuiltInDict
+
+    if ( (typeFromParser == ops.NONE) and (typeFromBuiltInDict == None) ):
+        sys.exit("getFinalVarType in codegen.py:  both typeFromParser and typeFromBuiltInDict are of type ops.NONE.")
+
+    if (str(typeFromParser) != typeFromBuiltInDict):
+        sys.exit("getFinalVarType in codegen.py:  typeFromParser is unequal to typeFromBuiltInDict.")
+
+    return typeFromParser
+
 def writeFunctionDecl_CPP(outputFile, functionName):
     outputString = ""
 
@@ -224,19 +266,13 @@ def writeFunctionDecl_CPP(outputFile, functionName):
     if (len(outputVariables) != 1):
         sys.exit("writeFunctionDecl_CPP in codegen.py:  length of output variables for function name passed in is unequal to one (unsupported).")
 
-    funcOutputType = getVarTypeFromVarName(outputVariables[0])
-    if (funcOutputType == ops.NONE):
-        #sys.exit("writeFunctionDecl_CPP in codegen.py:  could not obtain the type of the return value of this function.")
-        funcOutputType = defaultCPPVarType
+    funcOutputType = getFinalVarType(outputVariables[0])
 
     outputString += makeTypeReplacementsForCPP(funcOutputType) + " " + functionName + "("
     outputString += PairingGroupClassName_CPP + " & " + groupObjName + ", "
 
     for inputVariable in inputVariables:
-        currentType = getVarTypeFromVarName(inputVariable)
-        if (currentType == ops.NONE):
-            #sys.exit("writeFunctionDecl_CPP in codegen.py:  could not obtain the type of one of the input variables to the function name passed in.")
-            currentType = defaultCPPVarType
+        currentType = getFinalVarType(inputVariable)
         outputString += makeTypeReplacementsForCPP(currentType) + " & " + inputVariable + ", "
 
     outputString = outputString[0:(len(outputString) - len(", "))]
@@ -449,7 +485,7 @@ def processAttrOrTypeAssignStmt(node, replacementsDict):
         strNameToReturn = "-" + strNameToReturn
     return strNameToReturn
 
-def getAssignStmtAsString_CPP(node, replacementsDict):
+def getAssignStmtAsString_CPP(node, replacementsDict, variableName=None):
     global userFuncsCPPFile, userFuncsList_CPP
 
     if (type(node) is str):
@@ -457,36 +493,87 @@ def getAssignStmtAsString_CPP(node, replacementsDict):
     elif ( (node.type == ops.ATTR) or (node.type == ops.TYPE) ):
         return processAttrOrTypeAssignStmt(node, replacementsDict)
     elif (node.type == ops.ADD):
-        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict)
-        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict)
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
         return groupObjName + ".add(" + leftSide + ", " + rightSide + ")"
     elif (node.type == ops.SUB):
-        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict)
-        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict)
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
         return groupObjName + ".sub(" + leftSide + ", " + rightSide + ")"
     elif (node.type == ops.MUL):
-        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict)
-        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict)
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
         return groupObjName + ".mul(" + leftSide + ", " + rightSide + ")"
     elif (node.type == ops.DIV):
-        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict)
-        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict)
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
         return groupObjName + ".div(" + leftSide + ", " + rightSide + ")"
     elif (node.type == ops.EXP):
-        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict)
-        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict)
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
         return groupObjName + ".exp(" + leftSide + ", " + rightSide + ")"
     elif (node.type == ops.AND):
-        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict)
-        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict)
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
         return "( (" + leftSide + ") && (" + rightSide + ") )"
     elif (node.type == ops.EQ_TST):
-        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict)
-        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict)
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
         return "( (" + leftSide + ") == (" + rightSide + ") )"
-    #dddddd
+    elif (node.type == ops.LIST):
+        if (variableName == None):
+            sys.exit("getAssignStmtAsString_CPP in codegen.py:  encountered node of type ops.LIST, but variableName parameter passed in is of type None.")
+        listOutputString = ""
+        listOutputString += ";\n"
+        for listNode in node.listNodes:
+            listOutputString += writeCurrentNumTabsToString()
+            listOutputString += variableName + ".append("
+            listNodeAsString = getAssignStmtAsString_CPP(listNode, replacementsDict, variableName)
+            listOutputString += listNodeAsString + ");\n"
+        return listOutputString
+    elif (node.type == ops.RANDOM):
+        randomGroupType = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
+        randomOutputString = groupObjName + ".random(" + randomGroupType + ")"
+        return randomOutputString
+    elif (node.type == ops.HASH):
+        hashMessage = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
+        hashGroupType = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
+        hashOutputString = groupObjName + ".hashListTo" + (str(hashGroupType)).upper() + "(" + hashMessage + ")"
+        return hashOutputString
+    elif (node.type == ops.PAIR):
+        pairLeftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
+        pairRightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
+        pairOutputString = groupObjName + ".pair(" + pairLeftSide + ", " + pairRightSide + ")"
+        return pairOutputString
+    elif (node.type == ops.FUNC):
+        nodeName = applyReplacementsDict(replacementsDict, getFullVarName(node, False))
+        nodeName = replacePoundsWithBrackets(nodeName)
+        funcOutputString = nodeName + "("
+        for listNodeInFunc in node.listNodes:
+            listNodeAsString = getAssignStmtAsString_CPP(listNodeInFunc, replacementsDict, variableName)
+            funcOutputString += listNodeAsString + ", "
+        funcOutputString = funcOutputString[0:(len(funcOutputString) - len(", "))]
+        funcOutputString += ")"
+        if (nodeName not in userFuncsList_CPP):
+            userFuncsList_CPP.append(nodeName)
+            funcOutputForUser = funcOutputString
+            funcOutputForUser = funcOutputForUser.replace("[", "")
+            funcOutputForUser = funcOutputForUser.replace("]", "")
+            userFuncsOutputString = ""
+            userFuncsOutputString += "void " + funcOutputForUser + "\n{\n"
+            userFuncsOutputString += "\t" + userGlobalsFuncName + "();\n"
+            userFuncsOutputString += "\treturn;\n}\n\n"
+            userFuncsCPPFile.write(userFuncsOutputString)
+        return funcOutputString
+    elif (node.type == ops.EXPAND):
+        expandOutputString = ""
+        expandOutputString += ";\n"
+        for listNode in node.listNodes:
+            expandOutputString += writeCurrentNumTabsToString()
+            expandOutputString += variableName + ".append(" + replacePoundsWithBrackets(str(listNode)) + ");\n"
+        return expandOutputString
 
-    return "" #replace with sys.exit
+    sys.exit("getAssignStmtAsString_CPP in codegen.py:  unsupported node type detected.")
 
 def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements, forOutput):
     global userFuncsFile, userFuncsList
@@ -650,16 +737,17 @@ def writeAssignStmt_CPP(outputFile, binNode):
 
     variableName = getFullVarName(binNode.left, False)
     if (variableName.find(LIST_INDEX_SYMBOL) == -1):
-        variableTypeObj = getVarTypeFromVarName(variableName)
-        if (variableTypeObj == ops.NONE):
-            #sys.exit("writeAssignStmt_CPP in codegen.py:  could not obtain the type of the variable name passed to the function.")
-            variableTypeObj = defaultCPPVarType
-        outputString += makeTypeReplacementsForCPP(variableTypeObj) + " "
+        variableType = getFinalVarType(variableName, binNode.right, None)
+        outputString += makeTypeReplacementsForCPP(variableType) + " "
 
     variableName = replacePoundsWithBrackets(variableName)
-    outputString += variableName + " = "
-    outputString += getAssignStmtAsString_CPP(binNode.right, None)
-    outputString += ";\n"
+    outputString += variableName
+    if ( (binNode.right.type != ops.LIST) and (binNode.right.type != ops.EXPAND) ):
+        outputString += " = "
+
+    outputString += getAssignStmtAsString_CPP(binNode.right, None, variableName)
+    if ( (binNode.right.type != ops.LIST) and (binNode.right.type != ops.EXPAND) ):
+        outputString += ";\n"
     outputFile.write(outputString)
 
 def writeAssignStmt_Python(outputFile, binNode):
