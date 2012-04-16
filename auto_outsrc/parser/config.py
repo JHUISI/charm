@@ -65,3 +65,10 @@ userGlobalsFuncName = "getUserGlobals"
 
 argSuffix = "_Arg"
 nonIntDotProdIndex = "loopIndex"
+
+KeysListSuffix_CPP = "_Keys_List"
+ListLengthSuffix_CPP = "_List_Length"
+TempLoopVar_CPP = "_Temp_Loop_Var"
+
+charmListType = "CharmList"
+charmDictType = "CharmDict"

@@ -224,7 +224,7 @@ def makeTypeReplacementsForCPP(SDL_Type):
     if (SDLTypeAsString == "str"):
         return "string"
     if (SDLTypeAsString == "LIST"):
-        return "CharmDict"
+        return charmDictType
 
     return SDLTypeAsString
 
@@ -303,7 +303,7 @@ def writeFunctionEnd_CPP(outputFile, functionName):
         return
 
     returnValues[functionName] = str(outputVariables[0])
-    outputFile.write("\treturn " + str(outputVariables[0]) + ";\n")
+    outputFile.write("\treturn " + str(outputVariables[0]) + ";\n}\n\n")
 
 def writeFunctionEnd(functionName):
     global setupFile, transformFile, decOutFile
@@ -485,7 +485,7 @@ def processAttrOrTypeAssignStmt(node, replacementsDict):
         strNameToReturn = "-" + strNameToReturn
     return strNameToReturn
 
-def getAssignStmtAsString_CPP(node, replacementsDict, variableName=None):
+def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
     global userFuncsCPPFile, userFuncsList_CPP
 
     if (type(node) is str):
@@ -788,7 +788,7 @@ def writeAssignStmt(binNode):
         writeAssignStmt_Python(setupFile, binNode)
 
 def writeErrorFunc_Python(outputFile, binNode):
-    global userFuncsFile, userFuncsCPPFile, userFuncsList, userFuncsList_CPP
+    global userFuncsFile, userFuncsList
 
     writeCurrentNumTabsIn(outputFile)
     outputString = ""
@@ -809,6 +809,20 @@ def writeErrorFunc_Python(outputFile, binNode):
         userFuncsOutputString += "\treturn\n\n"
         userFuncsFile.write(userFuncsOutputString)
 
+def writeErrorFunc_CPP(outputFile, binNode):
+    global userFuncsCPPFile, userFuncsList_CPP
+
+    writeCurrentNumTabsIn(outputFile)
+    outputString = ""
+    outputString += errorFuncName + "("
+    outputString += getAssignStmtAsString_CPP(binNode.attr, None, None)
+    outputString += ");\n"
+    outputFile.write(outputString)
+
+    writeCurrentNumTabsIn(outputFile)
+    outputString = "return;\n"
+    outputFile.write(outputString)
+
     if (errorFuncName not in userFuncsList_CPP):
         userFuncsList_CPP.append(errorFuncName)
         userFuncsOutputString = ""
@@ -818,6 +832,23 @@ def writeErrorFunc_Python(outputFile, binNode):
         userFuncsOutputString += "\treturn;\n"
         userFuncsOutputString += "}\n\n"
         userFuncsCPPFile.write(userFuncsOutputString)
+
+def writeElseStmt_CPP(outputFile, binNode):
+    writeCurrentNumTabsIn(outputFile)
+    outputString = ""
+
+    if (binNode.left == None):
+        outputString += "else\n"
+        outputString += writeCurrentNumTabsToString()
+        outputString += "{\n"
+    else:
+        outputString += "else if ( \n"
+        outputString += getAssignStmtAsString_CPP(binNode.left, None, None)
+        outputString += " )\n"
+        outputString += writeCurrentNumTabsToString()
+        outputString += "{\n"
+
+    outputFile.write(outputString)
 
 def writeElseStmt_Python(outputFile, binNode):
     writeCurrentNumTabsIn(outputFile)
@@ -832,6 +863,18 @@ def writeElseStmt_Python(outputFile, binNode):
 
     outputFile.write(outputString)
 
+def writeIfStmt_CPP(outputFile, binNode):
+    writeCurrentNumTabsIn(outputFile)
+    outputString = ""
+
+    outputString += "if ( "
+    outputString += getAssignStmtAsString_CPP(binNode.left, None, None)
+    outputString += " )\n"
+    outputString += writeCurrentNumTabsToString()
+    outputString += "{\n"
+
+    outputFile.write(outputString)
+
 def writeIfStmt_Python(outputFile, binNode):
     writeCurrentNumTabsIn(outputFile)
     outputString = ""
@@ -839,6 +882,39 @@ def writeIfStmt_Python(outputFile, binNode):
     outputString += "if ( "
     outputString += getAssignStmtAsString(binNode.left, None, None, None, False)
     outputString += " ):\n"
+
+    outputFile.write(outputString)
+
+def writeForLoopDecl_CPP(outputFile, binNode):
+    writeCurrentNumTabsIn(outputFile)
+
+    outputString = ""
+
+    if (binNode.type == ops.FOR):
+        outputString += "for (int "
+        currentLoopIncVarName = getAssignStmtAsString_CPP(binNode.left.left, None, None)
+        outputString += currentLoopIncVarName + " = "
+        outputString += getAssignStmtAsString_CPP(binNode.left.right, None, None)
+        outputString += "; " + currentLoopIncVarName + " < "
+        outputString += getAssignStmtAsString_CPP(binNode.right, None, None)
+        outputString += "; " + currentLoopIncVarName + "++)\n"
+        outputString += writeCurrentNumTabsToString()
+        outputString += "{\n"
+    elif (binNode.type == ops.FORALL):
+        currentLoopVariableName = getAssignStmtAsString_CPP(binNode.left.right, None, None)
+        outputString += charmListType + " " + currentLoopVariableName + KeysListSuffix_CPP + " = " + currentLoopVariableName + ".keys();\n"
+        outputString += writeCurrentNumTabsToString()
+        outputString += "int " + currentLoopVariableName + ListLengthSuffix_CPP + " = " + currentLoopVariableName + ".length();\n"
+        outputString += writeCurrentNumTabsToString()
+        outputString += "for (int "
+        currentLoopIncVarName = getAssignStmtAsString_CPP(binNode.left.left, None, None)
+        outputString += currentLoopIncVarName + TempLoopVar_CPP + "; " + currentLoopIncVarName + TempLoopVar_CPP + " < " + currentLoopVariableName + ListLengthSuffix_CPP + "; " + currentLoopIncVarName + TempLoopVar_CPP + "++)\n"
+        outputString += writeCurrentNumTabsToString()
+        outputString += "{\n"
+        outputString += writeCurrentNumTabsToString() + "\t"
+        outputString += currentLoopIncVarName + " = " + currentLoopVariableName + KeysListSuffix_CPP + "[" + currentLoopIncVarName + TempLoopVar_CPP + "];\n"
+    else:
+        sys.exit("writeForLoopDecl_CPP in codegen.py:  encounted node that is neither type ops.FOR nor ops.FORALL (unsupported).")
 
     outputFile.write(outputString)
 
@@ -870,8 +946,8 @@ def writeErrorFunc(binNode):
     if (currentFuncName == transformFunctionName):
         writeErrorFunc_Python(transformFile, binNode)
     elif (currentFuncName == decOutFunctionName):
-        #writeErrorFunc_CPP(decOutFile, binNode)
-        writeErrorFunc_Python(decOutFile, binNode)
+        writeErrorFunc_CPP(decOutFile, binNode)
+        #writeErrorFunc_Python(decOutFile, binNode)
     else:
         writeErrorFunc_Python(setupFile, binNode)
 
@@ -879,8 +955,8 @@ def writeElseStmtDecl(binNode):
     if (currentFuncName == transformFunctionName):
         writeElseStmt_Python(transformFile, binNode)
     elif (currentFuncName == decOutFunctionName):
-        #writeElseStmt_CPP(decOutFile, binNode)
-        writeElseStmt_Python(decOutFile, binNode)
+        writeElseStmt_CPP(decOutFile, binNode)
+        #writeElseStmt_Python(decOutFile, binNode)
     else:
         writeElseStmt_Python(setupFile, binNode)
 
@@ -888,8 +964,8 @@ def writeIfStmtDecl(binNode):
     if (currentFuncName == transformFunctionName):
         writeIfStmt_Python(transformFile, binNode)
     elif (currentFuncName == decOutFunctionName):
-        #writeIfStmt_CPP(decOutFile, binNode)
-        writeIfStmt_Python(decOutFile, binNode)
+        writeIfStmt_CPP(decOutFile, binNode)
+        #writeIfStmt_Python(decOutFile, binNode)
     else:
         writeIfStmt_Python(setupFile, binNode)
 
@@ -897,8 +973,8 @@ def writeForLoopDecl(binNode):
     if (currentFuncName == transformFunctionName):
         writeForLoopDecl_Python(transformFile, binNode)
     elif (currentFuncName == decOutFunctionName):
-        #writeForLoopDecl_CPP(decOutFile, binNode)
-        writeForLoopDecl_Python(decOutFile, binNode)
+        writeForLoopDecl_CPP(decOutFile, binNode)
+        #writeForLoopDecl_Python(decOutFile, binNode)
     else:
         writeForLoopDecl_Python(setupFile, binNode)
 
