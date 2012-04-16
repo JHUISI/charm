@@ -167,7 +167,8 @@ def rcca_decout(vars):
 "%s := T0 %s (T2^%s)\n" % (config.rccaRandomVar, vars['dec_op'], config.keygenBlindingExponent), # recover R
 "%s := DeriveKey( %s )\n" % (vars['session_key'], config.rccaRandomVar), # recover session key
 "%s := SymDec(%s, T1)\n" % (config.M, vars['session_key']), # use session key to recover M
-"%s := H(list{R, M}, %s)\n" % (vars['s'], vars['s_type']), # recover 'randomness' calculated for encrypt
+"hashRandM := list{R, M}\n",
+"%s := H(hashRandM, %s)\n" % (vars['s'], vars['s_type']), # recover 'randomness' calculated for encrypt
 "BEGIN :: if\n",
 "if { (T0 == (%s * (%s ^ %s))) and (T2 == (%s ^ (%s / %s))) }\n" 
 % (config.rccaRandomVar, vars['pk_value'], vars['s'], vars['pk_value'], vars['s'], config.keygenBlindingExponent), # verify T0 and T1 are well-formed

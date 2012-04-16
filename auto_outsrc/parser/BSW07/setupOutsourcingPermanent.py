@@ -1,10 +1,10 @@
 from userFuncs import createPolicy, getAttributeList, calculateSharesDict, SymEnc, GetString, prune, getCoefficients, SymDec
-#from userFuncs import *
 from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair
 from toolbox.secretutil import SecretUtil
 from toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from toolbox.iterate import dotprod2
 from charm.pairing import hash as SHA1
+from serializeAPI import *
 
 pk = {}
 Y = {}
@@ -152,7 +152,8 @@ if __name__ == "__main__":
 	(ct) = encrypt(M, policy_str)
 
 	(partCT) = transform(ct)
+	
+	writeFile('partCT.txt', objectOut(groupObj, partCT))
+	#M = decout(partCT, zz)
 
-	(M) = decout(partCT, zz)
-
-	print(M)
+	#print(M)
