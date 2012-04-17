@@ -50,7 +50,7 @@ FUNC_SYMBOL = "def func :"
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
 types = Enum('NO_TYPE','G1', 'G2', 'GT', 'ZR', 'str', 'list', 'object')
 declarator = Enum('func', 'verify')
-ops = Enum('BEGIN', 'ERROR', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO', 'FORALL', 'PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'EXPAND', 'FUNC', 'SEQ', 'IF', 'ELSEIF', 'ELSE', 'END', 'NONE')
+ops = Enum('BEGIN', 'ERROR', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO', 'FORALL', 'PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'SYMMAP', 'EXPAND', 'FUNC', 'SEQ', 'IF', 'ELSEIF', 'ELSE', 'END', 'NONE')
 side = Enum('left', 'right')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
@@ -278,6 +278,8 @@ def createTree(op, node1, node2, op_value=None):
     	node = BinaryNode(ops.AND)
     elif(op == "list{"):
     	node = BinaryNode(ops.LIST)
+    elif(op == "symmap{"):
+        node = BinaryNode(ops.SYMMAP)
     elif(op == "expand{"):
     	node = BinaryNode(ops.EXPAND)
     elif(op == "random("):
@@ -412,19 +414,25 @@ class BinaryNode:
 			elif(self.type == ops.LIST):
 				 listVal = ""
 				 for i in self.listNodes:
-				 		listVal += str(i) + ', '
+				 	listVal += str(i) + ', '
 				 listVal = listVal[:len(listVal)-2]
 				 return 'list{' + listVal + '}'
+			elif(self.type == ops.SYMMAP):
+				 listVal = ""
+				 for i in self.listNodes:
+				 	listVal += str(i) + ', '
+				 listVal = listVal[:len(listVal)-2]
+				 return 'list{' + listVal + '}'    
 			elif(self.type == ops.EXPAND):
 				 listVal = ""
 				 for i in self.listNodes:
-				 		listVal += str(i) + ', '
+				 	listVal += str(i) + ', '
 				 listVal = listVal[:len(listVal)-2]
 				 return 'expand{' + listVal + '}'
 			elif(self.type == ops.FUNC):
 				 listVal = ""
 				 for i in self.listNodes:
-				 		listVal += str(i) + ', '
+				 	listVal += str(i) + ', '
 				 listVal = listVal[:len(listVal)-2]
 				 return self.attr + '(' + listVal + ')'
 			elif(self.type == ops.SEQ):
