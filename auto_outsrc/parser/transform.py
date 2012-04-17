@@ -271,7 +271,7 @@ def createLOC(partialCT):
         
     output_node = BinaryNode(ops.EQ)
     output_node.left = BinaryNode(partialCiphertextName)
-    output_node.right = BinaryNode(ops.LIST)
+    output_node.right = BinaryNode(ops.SYMMAP)
     output_node.right.listNodes = [T0, T1, T2]
     
     transform_output = BinaryNode(ops.EQ)
