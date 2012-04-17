@@ -2,11 +2,14 @@ name := ibeckrs09
 setting := symmetric
 
 BEGIN :: types
+n := ZR
+l := ZR
 M := GT
 mpk := list
 sk := list
 ct := list
-
+hl := list
+gl := list
 c := list
 d := list
 z := list
@@ -93,6 +96,7 @@ mpk := expand{omega, g, h, gl, hl, v1, v2, v3, v4, n, l}
 sk := expand{id, d}
 ct := expand{c, c_pr}
 
-M := c_pr * e(c#0, d#0) * e(c#1, d#1) * e(c#2, d#2) * e(c#3, d#3) * e(c#4, d#4)        
+result := e(c#0, d#0) * e(c#1, d#1) * e(c#2, d#2) * e(c#3, d#3) * e(c#4, d#4)        
+M := c_pr * result   
 output := M
 END :: func:decrypt
