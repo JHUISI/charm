@@ -969,6 +969,8 @@ def writeIfStmtDecl(binNode):
     else:
         writeIfStmt_Python(setupFile, binNode)
 
+def 
+
 def writeForLoopDecl(binNode):
     if (currentFuncName == transformFunctionName):
         writeForLoopDecl_Python(transformFile, binNode)
@@ -1079,6 +1081,7 @@ def writeSDLToFiles(astNodes):
             numTabsIn += 1
         elif (isForLoopEnd(astNode) == True):
             numTabsIn -= 1
+            writeForLoopEnd(astNode)
         elif (isAssignStmt(astNode) == True):
             writeAssignStmt(astNode)
         elif (isIfStmtStart(astNode) == True):
@@ -1090,12 +1093,12 @@ def writeSDLToFiles(astNodes):
             numTabsIn += 1
         elif (isIfStmtEnd(astNode) == True):
             numTabsIn -= 1
+            writeIfStmtEnd(astNode)
         elif (isErrorFunc(astNode) == True):
             writeErrorFunc(astNode)
         elif ( (processedAsFunctionStart == True) or (isUnnecessaryNodeForCodegen(astNode) == True) ):
             continue
         else:
-            print(astNode)
             sys.exit("writeSDLToFiles in codegen.py:  unrecognized type of statement in SDL.")
 
 def getStringOfFirstFuncArgs(argsToFirstFunc):
