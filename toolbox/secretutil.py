@@ -6,8 +6,8 @@ from charm.pairing import *
 from toolbox.policytree import *
 
 class SecretUtil:
-    def __init__(self, pairing, verbose=False):
-        self.group = pairing        
+    def __init__(self, groupObj, verbose=True):
+        self.group = groupObj        
 #        self.parser = PolicyParser()
 
     def P(self, coeff, x):
@@ -20,42 +20,46 @@ class SecretUtil:
     def genShares(self, secret, k, n):
         if(k <= n):
             rand = self.group.random
-            a = [rand(ZR) for i in range(0, k)]
-            a[0] = secret
-            Pfunc = self.P
+            a = [] # will hold polynomial coefficients
+            for i in range(0, k):
+                if (i == 0): a.append(secret) # a[0]
+                else: a.append(rand(ZR))
+            Pfunc = self.P 
             shares = [Pfunc(a, i) for i in range(0, n+1)]
         return shares
     
     # shares is a dictionary
     def recoverCoefficients(self, list):
-        eTop = self.group.init(ZR)
-        eBot = self.group.init(ZR)
+        """recovers the coefficients over a binary tree."""
         coeff = {}
-        #list = shares.keys()
-        for i in list:
+        list2 = [self.group.init(ZR, i) for i in list]
+        for i in list2:
             result = 1
-            for j in list:
-                if(i != j):
+            for j in list2:
+                if not (i == j):
                     # lagrange basis poly
-                    eTop.set(0 - j) # numerator
-                    eBot.set(i - j) # denominator
-                    result *= eTop / eBot
+                    result *= (0 - j) / (i - j)
 #                print("coeff '%d' => '%s'" % (i, result))
-            coeff[i] = result
+            coeff[int(i)] = result
         return coeff
         
     def recoverSecret(self, shares):
+        """take shares and attempt to recover secret by taking sum of coeff * share for all shares.
+        if user indeed has at least k of n shares, then secret will be recovered."""
         list = shares.keys()
         if self.verbose: print(list)
         coeff = self.recoverCoefficients(list)
-        secret = self.group.init(ZR, 0)
+        secret = 0
         for i in list:
             secret += (coeff[i] * shares[i])
 
         return secret
 
     
-    def getCoefficients(self, tree, coeff_list, coeff=1):   
+    def getCoefficients(self, tree, coeff_list, coeff=1):
+        """recover coefficient over a binary tree where possible node types are OR = (1 of 2)
+        and AND = (2 of 2) secret sharing. The leaf nodes are attributes and the coefficients are
+        recorded in a coeff-list dictionary.""" 
         if tree:
             node = tree.getNodeType()
             if(node == tree.AND):
@@ -74,6 +78,7 @@ class SecretUtil:
                 return None
             
     def calculateShares(self, secret, tree, _type=dict):
+        """performs secret sharing over a policy tree. could be adapted for LSSS matrices."""
         attr_list = []
         self.compute_shares(secret, tree, attr_list)
         if _type == list:
@@ -93,6 +98,8 @@ class SecretUtil:
         return self.calculateShares(secret, tree, dict)
     
     def compute_shares(self, secret, subtree, List):
+        """computes recursive secret sharing over the binary tree. Start by splitting 1-of-2 (OR) or 2-of-2 (AND nodes).
+         Continues recursively down the tree doing a round of secret sharing at each boolean node type."""
         k = 0
         if(subtree == None):
             return None
@@ -105,9 +112,9 @@ class SecretUtil:
             List.append(t)
             return None
         elif(type == subtree.OR):
-            k = 1
+            k = 1 # 1-of-2
         elif(type == subtree.AND):
-            k = 2
+            k = 2 # 2-of-2
         else:
             return None
         # generate shares for k and n        
@@ -133,10 +140,12 @@ class SecretUtil:
         return policy_obj
         
     def prune(self, policy, attributes):
+        """determine whether a given set of attributes satisfies the policy"""
         parser = PolicyParser()        
         return parser.prune(policy, attributes)
     
     def getAttributeList(self, Node, List):
+        """retrieve the attributes that occur in a policy tree in order (left to right)"""
         if(Node == None):
             return None
         # V, L, R
@@ -146,4 +155,8 @@ class SecretUtil:
             self.getAttributeList(Node.getLeft(), List)
             self.getAttributeList(Node.getRight(), List)
         return None
-        
+
+# TODO: add test cases here for SecretUtil
+if __name__ == "__main__":
+    pass
+
