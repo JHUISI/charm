@@ -1,0 +1,10 @@
+def substituteOneLineOfCode(line, lineNo):
+    if ( (type(line) is not str) or (len(line) == 0) ):
+        sys.exit("substituteOneLineOfCode in SDLParser.py:  problem with line parameter passed in.")
+
+    if ( (type(lineNo) is not int) or (lineNo < 1) ):
+        sys.exit("substituteOneLineOfCode in SDLParser.py:  problem with line number parameter passed in.")
+
+    removeFromLinesOfCode([lineNo])
+
+    appendToLinesOfCode([line], lineNo)
