@@ -27,7 +27,7 @@ string decout(PairingGroup & group, CharmDict & partCT, ZR & zz, GT & egg)
 	sList.append(M);
 	ZR s = group.hashListToZR(sList);
 
-	if( (T0 == group.mul(R, group.exp(egg, s))) && (T2 == group.exp(egg, s / zz)) ) {
+	if( (T0 == group.mul(R, group.exp(egg, s))) && (T2 == group.exp(egg, group.div(s, zz))) ) {
 		cout << "Successful Decryption!!!" << endl;
 		return M; // should be a string at this point
 	}

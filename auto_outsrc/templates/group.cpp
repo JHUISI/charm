@@ -623,6 +623,11 @@ ZR PairingGroup::order()
 	return ZR(pfcObject->order());
 }
 
+ZR PairingGroup::mul(ZR g, ZR h)
+{
+	ZR o = pfcObject->order();
+	return modmult(g, h, o);
+}
 
 // mul for G1 & GT
 G1 PairingGroup::mul(G1 g, G1 h)
@@ -637,6 +642,12 @@ GT PairingGroup::mul(GT g, GT h)
 	return l;
 }
 
+ZR PairingGroup::div(ZR g, ZR h)
+{
+	ZR o = pfcObject->order();
+	return moddiv(g, h, o);
+}
+
 // div for G1 & GT
 G1 PairingGroup::div(G1 g, G1 h)
 {
@@ -646,8 +657,14 @@ G1 PairingGroup::div(G1 g, G1 h)
 
 GT PairingGroup::div(GT g, GT h)
 {
-        GT l = pfcObject->power(h, Big(-1));
-	return g * h;
+	GT l(g / h);
+	return l;
+}
+
+ZR PairingGroup::exp(ZR x, ZR y)
+{
+	ZR z = pfcObject->order();
+	return pow(x, y, z);
 }
 
 // exp for G1 & GT

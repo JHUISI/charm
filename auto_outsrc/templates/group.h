@@ -158,11 +158,14 @@ public:
 	G2 hashListToG2(CharmList&);
 
 	GT pair(G1, G1);
+	ZR mul(ZR, ZR);
 	G1 mul(G1, G1);
 	GT mul(GT, GT);
+	ZR div(ZR, ZR);
 	G1 div(G1, G1);
 	GT div(GT, GT);
 
+	ZR exp(ZR, ZR);
 	G1 exp(G1, ZR);
 	GT exp(GT, ZR);
 	string aes_key(GT & g);
