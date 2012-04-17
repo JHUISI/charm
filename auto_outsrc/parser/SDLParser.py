@@ -38,6 +38,11 @@ MESSAGE, SIGNATURE, PUBLIC, LATEX, SETTING = 'message','signature', 'public', 'l
 # qualifier (means only one instance of that particular keyword exists)
 SAME, DIFF = 'one', 'many'
 
+builtInTypes = {}
+builtInTypes["DeriveKey"] = "str"
+builtInTypes["SymDec"] = "str"
+builtInTypes["stringToID"] = "LIST"
+
 def createNode(s, loc, toks):
     print('createNode => ', toks)
     return BinaryNode(toks[0])
@@ -398,11 +403,14 @@ def parseFile(filename):
     fd.close()
     return ast
 
-def getVarTypeFromVarName(varName):
+def getVarTypeFromVarName(varName, functionNameArg_TieBreaker):
     if ( (type(varName) is not str) or (len(varName) == 0) ):
         sys.exit("getVarTypeFromVarName in SDLParser.py:  received invalid varName parameter.")
 
     retVarType = ops.NONE
+    retFunctionName = None
+
+    outputKeywordDisagreement = False
 
     for funcName in varTypes:
         for currentVarName in varTypes[funcName]:
@@ -412,9 +420,28 @@ def getVarTypeFromVarName(varName):
             currentVarType = varTypes[funcName][currentVarName].getType()
             if (retVarType == ops.NONE):
                 retVarType = currentVarType
-            else:
-                if (currentVarType != retVarType):
-                    sys.exit("getVarTypeFromVarName in SDLParser.py:  found mismatching variable type information for variable name passed in.")
+                retFunctionName = funcName
+                continue
+            if (currentVarType == retVarType):
+                continue
+            if (varName != outputKeyword):
+                sys.exit("getVarTypeFromVarName in SDLParser.py:  found mismatching variable type information for variable name passed in.")
+            if (retFunctionName == functionNameArg_TieBreaker):
+                continue
+            if (funcName == functionNameArg_TieBreaker):
+                retVarType = currentVarType
+                retFunctionName = funcName
+                continue
+            #sys.exit("getVarTypeFromVarName in SDLParser.py:  found mismatching types for output keyword, but neither of the function names recorded for each instance matches the function name tiebreaker passed in.")
+            outputKeywordDisagreement = True
+            continue
+
+    if (outputKeywordDisagreement == True):
+        if (retFunctionName != functionNameArg_TieBreaker):
+            #sys.exit("getVarTypeFromVarName in SDLParser.py:  there was a disagreement on the type of the output keyword, and the function chosen was not the same as the tiebreaker passed in.")
+            pass
+            #ddddddddddd
+            #TODO:  PICK UP HERE
 
     return retVarType
 
@@ -606,6 +633,12 @@ def getVarTypeInfoRecursive(node):
         return getVarTypeInfoRecursive(node.right)
     if (node.type == ops.LIST):
         return node
+
+    #TODO:  THIS MUST BE FIXED!!!!  MODEL SYMMAP AFTER LIST
+    if (node.type == ops.SYMMAP):
+        return ops.SYMMAP
+    #TODO:  FIX THE ABOVE (SYMMAP).
+
     if (node.type == ops.EXP):
         return getVarTypeInfoRecursive(node.left)
     if ( (node.type == ops.ADD) or (node.type == ops.SUB) or (node.type == ops.MUL) or (node.type == ops.DIV) ):

@@ -21,11 +21,6 @@ userFuncsList_CPP = []
 userFuncsList = []
 currentLambdaFuncName = None
 
-builtInTypes = {}
-builtInTypes["DeriveKey"] = "str"
-builtInTypes["SymDec"] = "str"
-builtInTypes["stringToID"] = "LIST"
-
 def writeCurrentNumTabsToString():
     outputString = ""
 
@@ -228,8 +223,8 @@ def makeTypeReplacementsForCPP(SDL_Type):
 
     return SDLTypeAsString
 
-def getFinalVarType(varName, varNode=None, replacementsDict=None):
-    typeFromParser = getVarTypeFromVarName(varName)
+def getFinalVarType(varName, varNode, replacementsDict):
+    typeFromParser = getVarTypeFromVarName(varName, currentFuncName)
     typeFromBuiltInDict = None
 
     if ( (varNode != None) and (varNode.type == ops.FUNC) ):
@@ -238,10 +233,10 @@ def getFinalVarType(varName, varNode=None, replacementsDict=None):
         if (funcName in builtInTypes):
             typeFromBuiltInDict = builtInTypes[funcName]
 
-    print("varName:  ", varName)
-    print("typeFromParser:  ", typeFromParser)
-    print("typeFromBuiltInDict:  ", typeFromBuiltInDict)
-    print("\n\n")
+    #print("varName:  ", varName)
+    #print("typeFromParser:  ", typeFromParser)
+    #print("typeFromBuiltInDict:  ", typeFromBuiltInDict)
+    #print("\n\n")
 
     if ( (typeFromParser != ops.NONE) and (typeFromBuiltInDict == None) ):
         return typeFromParser
@@ -266,13 +261,13 @@ def writeFunctionDecl_CPP(outputFile, functionName):
     if (len(outputVariables) != 1):
         sys.exit("writeFunctionDecl_CPP in codegen.py:  length of output variables for function name passed in is unequal to one (unsupported).")
 
-    funcOutputType = getFinalVarType(outputVariables[0])
+    funcOutputType = getFinalVarType(outputVariables[0], None, None)
 
     outputString += makeTypeReplacementsForCPP(funcOutputType) + " " + functionName + "("
     outputString += PairingGroupClassName_CPP + " & " + groupObjName + ", "
 
     for inputVariable in inputVariables:
-        currentType = getFinalVarType(inputVariable)
+        currentType = getFinalVarType(inputVariable, None, None)
         outputString += makeTypeReplacementsForCPP(currentType) + " & " + inputVariable + ", "
 
     outputString = outputString[0:(len(outputString) - len(", "))]
@@ -531,6 +526,17 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
             listNodeAsString = getAssignStmtAsString_CPP(listNode, replacementsDict, variableName)
             listOutputString += listNodeAsString + ");\n"
         return listOutputString
+    elif (node.type == ops.SYMMAP):
+        if (variableName == None):
+            sys.exit("getAssignStmtAsString_CPP in codegen.py:  encountered node of type ops.SYMMAP, but variable name parameter passed in is of None type.")
+        symmapOutputString = ""
+        symmapOutputString += ";\n"
+        for symmapNode in node.listNodes:
+            symmapOutputString += writeCurrentNumTabsToString()
+            symmapOutputString += variableName + ".set(\""
+            symmapNodeAsString = getAssignStmtAsString_CPP(symmapNode, replacementsDict, variableName)
+            symmapOutputString += "\":" + variableName + ");\n"
+        return symmapOutputString
     elif (node.type == ops.RANDOM):
         randomGroupType = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
         randomOutputString = groupObjName + ".random(" + randomGroupType + ")"
@@ -633,7 +639,10 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
         symmapOutputString += "{"
         for symmapNode in node.listNodes:
             symmapNodeAsString = getAssignStmtAsString(symmapNode, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
-            symmapOutputString += "\" + symmapNode
+            symmapOutputString += "\"" + symmapNodeAsString + "\":" + symmapNodeAsString + ", "
+        symmapOutputString = symmapOutputString[0:(len(symmapOutputString) - len(", "))]
+        symmapOutputString += "}"
+        return symmapOutputString
     elif (node.type == ops.RANDOM):
         randomGroupType = getAssignStmtAsString(node.left, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
         randomOutputString = groupObjName + ".random(" + randomGroupType + ")"
@@ -745,11 +754,11 @@ def writeAssignStmt_CPP(outputFile, binNode):
 
     variableName = replacePoundsWithBrackets(variableName)
     outputString += variableName
-    if ( (binNode.right.type != ops.LIST) and (binNode.right.type != ops.EXPAND) ):
+    if ( (binNode.right.type != ops.LIST) and (binNode.right.type != ops.SYMMAP) and (binNode.right.type != ops.EXPAND) ):
         outputString += " = "
 
     outputString += getAssignStmtAsString_CPP(binNode.right, None, variableName)
-    if ( (binNode.right.type != ops.LIST) and (binNode.right.type != ops.EXPAND) ):
+    if ( (binNode.right.type != ops.LIST) and (binNode.right.type != ops.SYMMAP) and (binNode.right.type != ops.EXPAND) ):
         outputString += ";\n"
     outputFile.write(outputString)
 

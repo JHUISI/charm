@@ -71,7 +71,7 @@ def isValidType(possibleType):
         if (str(possibleType) == str(validType)):
             return True
 
-    if (possibleType == ops.LIST):
+    if ( (possibleType == ops.LIST) or (possibleType == ops.SYMMAP) ):
         return True
 
     return False
