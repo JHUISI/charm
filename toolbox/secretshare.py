@@ -1,5 +1,5 @@
 # Implementing the proof of concept secret sharing 
-from toolbox.pairinggroup import PairingGroup,ZR
+from toolbox.pairinggroup import PairingGroup,ZR,order
 
 class SecretShare:
     def __init__(self, element, verbose_status=False):
@@ -71,20 +71,20 @@ if __name__ == "__main__":
 # Testing Secret sharing python API
   k = 3
   n = 4
-  p = PairingGroup('SS512')
+  group = PairingGroup('SS512')
 
-  s = SecretShare(p, True)
-  sec = p.random(ZR)
+  s = SecretShare(group, True)
+  sec = group.random(ZR)
   shares = s.genShares(sec, k, n)
 
   K = shares[0]
   print('\nOriginal secret: %s' % K)
-  y = {1:shares[1], 2:shares[2], 3:shares[3]}
+  y = {group.init(ZR, 1):shares[1], group.init(ZR, 2):shares[2], group.init(ZR, 3):shares[3]}
 
   secret = s.recoverSecret(y)
 
   if(K == secret):
-    print('\nRecovered secret: %s' % secret)
+    print('\nSuccessfully recovered secret: %s' % secret)
   else:
     print('\nCould not recover the secret!')
 

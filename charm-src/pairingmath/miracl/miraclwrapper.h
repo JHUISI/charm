@@ -32,15 +32,16 @@ void element_printf(Group_t type, const element_t *e);
 int _element_length_to_str(Group_t type, const element_t *e);
 int _element_to_str(unsigned char **data_str, Group_t type, const element_t *e);
 
-void _element_add(Group_t type, element_t *c, const element_t *a, const element_t *b); // c = a + b
-void _element_sub(Group_t type, element_t *c, const element_t *a, const element_t *b); // c = a - b
+void _element_add(Group_t type, element_t *c, const element_t *a, const element_t *b, const element_t *o); // c = a + b
+void _element_sub(Group_t type, element_t *c, const element_t *a, const element_t *b, const element_t *o); // c = (a - b) % o
 void _element_mul(Group_t type, element_t *c, const element_t *a, const element_t *b, const element_t *o);
 void _element_mul_si(Group_t type, const pairing_t *pairing, element_t *c, const element_t *a, const signed long int b, const element_t *o);
 void _element_mul_zn(Group_t type, const pairing_t *pairing, element_t *c, const element_t *a, const element_t *b, const element_t *o);
-void _element_div(Group_t type, element_t *c, const element_t *a, const element_t *b); // c = a / b
+void _element_div(Group_t type, element_t *c, const element_t *a, const element_t *b, const element_t *o); // c = a / b
 
 // c = a (G1, G2 or GT) ^ b (ZR)
-element_t *_element_pow_zr(Group_t type, const pairing_t *pairing, const element_t *a, const element_t *b);
+element_t *_element_pow_zr(Group_t type, const pairing_t *pairing, element_t *a, element_t *b, element_t *o);
+//element_t *_element_pow_zr(Group_t type, const pairing_t *pairing, const element_t *a, const element_t *b, const element_t *o);
 element_t *_element_pow_zr_zr(Group_t type, const pairing_t *pairing, const element_t *a, const int b, const element_t *o);
 element_t *_element_neg(Group_t type, const element_t *e, const element_t *o);
 //void _element_inv(Group_t type, const element_t *a, element_t *b, element_t *o);

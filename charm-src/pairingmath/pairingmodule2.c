@@ -782,7 +782,7 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 	else if(PyElement_Check(rhs) && found_int) {
 		// rhs is the element type
 		START_CLOCK(dBench);
-		if(z > 1) {
+		if(z > 1 || z <= 0) {
 			newObject = createNewElement(other->element_type, other->pairing);
 			self = createNewElement(other->element_type, other->pairing);
 			element_set_si(self, z);
@@ -791,10 +791,6 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 		else if(z == 1) {
 			newObject = createNewElement(other->element_type, other->pairing);
 			element_invert(newObject, other);
-		}
-		else if(z < 0) {
-			printf("TODO: Handle Negative division.\n");
-			return NULL;
 		}
 		STOP_CLOCK(dBench);
 	}
@@ -913,15 +909,15 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		}
 
 		if(rhs_o2->element_type == ZR_t) {
-			if(lhs_o1->element_type == ZR_t) {
-				/* TODO: don't forget to implement this!!! */
-			}
-			else {
+//			if(lhs_o1->element_type == ZR_t) {
+//				/* TODO: don't forget to implement this!!! */
+//			}
+//			else {
 				START_CLOCK(dBench);
 				newObject = createNewElement(NONE_G, lhs_o1->pairing);
 				element_pow_zr(newObject, lhs_o1, rhs_o2);
 				STOP_CLOCK(dBench);
-			}
+//			}
 		}
 	}
 	else {

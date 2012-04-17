@@ -105,13 +105,13 @@ typedef struct {
 #define element_hash_to_key(a, b, c) _element_hash_key(a->pairing->pair_obj, a->element_type, a->e, b, c)
 
 #define element_is(a, b) element_is_value(a->element_type, a->e, b)
-#define element_add(c, a, b) _element_add(a->element_type, c->e, a->e, b->e)
-#define element_sub(c, a, b) _element_sub(a->element_type, c->e, a->e, b->e)
+#define element_add(c, a, b) _element_add(a->element_type, c->e, a->e, b->e, a->pairing->order)
+#define element_sub(c, a, b) _element_sub(a->element_type, c->e, a->e, b->e, a->pairing->order)
 #define element_mul(c, a, b) _element_mul(a->element_type, c->e, a->e, b->e, a->pairing->order)
 #define element_mul_si(c, a, b) _element_mul_si(a->element_type, a->pairing->pair_obj, c->e, a->e, b, a->pairing->order)
 #define element_mul_zn(c, a, b) _element_mul_zn(a->element_type, a->pairing->pair_obj, c->e, a->e, b->e, a->pairing->order)
 // TODO: fix for -1 / ZR and similar operations
-#define element_div(c, a, b) _element_div(a->element_type, c->e, a->e, b->e)
+#define element_div(c, a, b) _element_div(a->element_type, c->e, a->e, b->e, a->pairing->order)
 #define element_set(a, b) _element_set(a->pairing->curve, a->element_type, a->e, b->e);
 #define element_set_raw(g, t, a, b) _element_set(g->pairing->curve, t, a, b);
 #define element_setG1(c, a, b) _element_setG1(c->element_type, c->e, a->e, b->e);
@@ -130,8 +130,8 @@ typedef struct {
 	_element_inv(b->element_type, b->pairing->pair_obj, b->e, a->e, b->pairing->order)
 
 #define element_pow_zr(c, a, b) \
-	if (a->element_type != ZR_t)  {  \
-	c->e = _element_pow_zr(a->element_type, a->pairing->pair_obj, a->e, b->e); \
+	if (a->element_type != NONE_G)  {  \
+	c->e = _element_pow_zr(a->element_type, a->pairing->pair_obj, a->e, b->e, a->pairing->order); \
 	c->element_type = a->element_type; }
 
 #define element_pow_int(c, a, b) \

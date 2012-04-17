@@ -265,11 +265,14 @@ int _element_to_str(unsigned char **data_str, Group_t type, const element_t *e)
 	return TRUE;
 }
 
-void _element_add(Group_t type, element_t *c, const element_t *a, const element_t *b)
+void _element_add(Group_t type, element_t *c, const element_t *a, const element_t *b, const element_t *o)
 {
 	if(type == ZR_t) {
-		Big *x = (Big *) a;	Big *y = (Big *) b; Big *z = (Big *) c;
-		*z = *x + *y;
+		Big *x = (Big *) a;
+		Big *y = (Big *) b;
+		Big *z = (Big *) c;
+		Big *o1 = (Big *) o;
+		*z = ((*x + *y) % *o1);
 //		cout << "Result => " << *z << endl;
 	}
 	else if(type == G1_t) {
@@ -286,14 +289,14 @@ void _element_add(Group_t type, element_t *c, const element_t *a, const element_
 
 }
 
-void _element_sub(Group_t type, element_t *c, const element_t *a, const element_t *b)
+void _element_sub(Group_t type, element_t *c, const element_t *a, const element_t *b, const element_t *o)
 {
 	if(type == ZR_t) {
 		Big *x = (Big *) a;
 		Big *y = (Big *) b;
 		Big *z = (Big *) c;
-		*z = *x - *y;
-//		cout << "Result => " << *z << endl;
+		Big *o1 = (Big *) o;
+		*z = ((*x - *y) % *o1);
 	}
 	else if(type == G1_t) {
 		G1 *x = (G1 *) a;  G1 *y = (G1 *) b; G1 *z = (G1 *) c;
@@ -343,9 +346,8 @@ void _element_mul_si(Group_t type, const pairing_t *pairing, element_t *c, const
 		Big *z  = (Big *) c;
 		Big *x  = (Big *) a;
 		Big *o1 = (Big *) o;
-//		*z = *x * Big(b);
-		*z = modmult(*x, Big(b), *o1);
 
+		*z = modmult(*x, Big(b), *o1);
 	}
 	else if(type == G1_t) {
 		G1 *z = (G1 *) c;
@@ -372,7 +374,7 @@ void _element_mul_zn(Group_t type, const pairing_t *pairing, element_t *c, const
 		Big *z = (Big *) c;
 		Big *x = (Big *) a;
 		Big *o1 = (Big *) o;
-//		*z = *x * *b1;
+
 		*z = modmult(*x, *b1, *o1);
 	}
 	else if(type == G1_t) {
@@ -392,13 +394,15 @@ void _element_mul_zn(Group_t type, const pairing_t *pairing, element_t *c, const
 	}
 }
 
-void _element_div(Group_t type, element_t *c, const element_t *a, const element_t *b)
+void _element_div(Group_t type, element_t *c, const element_t *a, const element_t *b, const element_t *o)
 {
 	if(type == ZR_t) {
 		Big *x = (Big *) a;
 		Big *y = (Big *) b;
 		Big *z = (Big *) c;
-		if(!y->iszero()) *z = *x / *y;
+		Big *o1 = (Big *) o;
+
+		if(!y->iszero()) *z = moddiv(*x, *y, *o1);
 //		cout << "y => " << *y << endl;
 //		cout << "Result => " << *z << endl;
 	}
@@ -428,12 +432,18 @@ element_t *_element_pow_zr_zr(Group_t type, const pairing_t *pairing, const elem
 	return NULL;
 }
 
-element_t *_element_pow_zr(Group_t type, const pairing_t *pairing, const element_t *a, const element_t *b)
+element_t *_element_pow_zr(Group_t type, const pairing_t *pairing, element_t *a, element_t *b, element_t *o)
 {
 	Big *y = (Big *) b; // note: must be ZR
 	PFC *pfc = (PFC *) pairing;
 
-	if(type == G1_t) {
+	if(type == ZR_t) {
+		Big *x = (Big *) a;
+		Big *z = (Big *) o;
+		Big w = pow(*x, *y, *z);
+		return (element_t *) new Big(w);
+	}
+	else if(type == G1_t) {
 		G1 *x  = (G1 *)  a;
 		G1 *z = new G1();
 		// (x->point)^y
@@ -469,9 +479,6 @@ element_t *_element_neg(Group_t type, const element_t *e, const element_t *o)
 		// Big *o1 = (Big *) o;
 		y->negate();
 		// *y %= *o1;
-//		cout << "original => " << *x << endl;
-//		cout << "debug => " << *y << endl;
-//		cout << "test => " << *x + *y << endl;
 		return (element_t *) y;
 	}
 	else if(type == G1_t) {
@@ -500,7 +507,7 @@ element_t *_element_neg(Group_t type, const element_t *e, const element_t *o)
 void _element_inv(Group_t type, const pairing_t *pairing, const element_t *a, element_t *b, element_t *o)
 {
 	PFC *pfc = (PFC *) pairing;
-	// TODO: not working as expeced ZR_t * ~ZR_t = seg fault?
+	// TODO: not working as expected for ZR_t * ~ZR_t = seg fault?
 	if(type == ZR_t) {
 		Big *x = (Big *) a;
 		Big *order = (Big *) o;
