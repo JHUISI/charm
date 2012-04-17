@@ -1,3 +1,5 @@
+schemeName = "BSW"
+
 M = 'M'
 
 blindingLoopVar = "y"
@@ -14,14 +16,15 @@ cppSuffix = ".cpp"
 #cppSuffix = ".py"
 cppHeaderSuffix = ".h"
 
-setupFileName = "setupOutsourcing_BSW" + pySuffix
-transformFileName = "transformOutsourcing_BSW" + pySuffix
-decOutFileName = "decOutOutsourcing_BSW" + cppSuffix
-#decOutFileName = "decOutOutsourcing_BSW" + pySuffix
-userFuncsName = "userFuncs_BSW"
+setupFileName = "setupOutsourcing_" + schemeName + pySuffix
+transformFileName = "transformOutsourcing_" + schemeName + pySuffix
+decOutFileName = "decOutOutsourcing_" + schemeName + cppSuffix
+#decOutFileName = "decOutOutsourcing_" + schemeName + pySuffix
+userFuncsName = "userFuncs_" + schemeName
 userFuncsFileName = userFuncsName + pySuffix
 userFuncsCPPFileName = userFuncsName + cppHeaderSuffix
-outputSDLFileName = "outsourcedSDL_BSW" + pySuffix
+outputSDLFileName = "outsourcedSDL_" + schemeName + pySuffix
+
 errorFuncName = "userErrorFunction"
 errorFuncArgString = "userErrorFunctionArgString"
 
