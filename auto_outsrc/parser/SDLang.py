@@ -422,7 +422,7 @@ class BinaryNode:
 				 for i in self.listNodes:
 				 	listVal += str(i) + ', '
 				 listVal = listVal[:len(listVal)-2]
-				 return 'list{' + listVal + '}'    
+				 return 'symmap{' + listVal + '}'    
 			elif(self.type == ops.EXPAND):
 				 listVal = ""
 				 for i in self.listNodes:
