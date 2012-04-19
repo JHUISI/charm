@@ -5,7 +5,7 @@ M = 'M'
 blindingLoopVar = "y"
 blindingSuffix = "Blinded"
 keygenBlindingExponent = "zz"
-keygenFuncName = "keygen"
+keygenFuncName = "extract"
 # superset of variables we have used to represent public parameters in
 # our crypto schemes
 keygenPubVar = ["pk", "mpk", "gpk"]

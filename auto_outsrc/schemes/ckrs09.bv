@@ -65,7 +65,7 @@ d#4 := (hashID2r2 ^ t3)
         
 sk := list{id, d}
 output := sk
-END :: func:keygen
+END :: func:extract
 
 
 BEGIN :: func:encrypt
