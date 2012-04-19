@@ -8,6 +8,7 @@ class VarInfo:
         self.assignNode = None
         self.lineNo = None
         self.varDeps = []
+        self.varDepsNoExponents = []
         self.hasPairings = None
         self.protectsM = None
         self.initValue = None
@@ -31,6 +32,7 @@ class VarInfo:
         v.assignNode  = obj.assignNode 
         v.lineNo      = obj.lineNo
         v.varDeps     = list(obj.varDeps)
+        v.varDepsNoExponents = list(obj.varDepsNoExponents)
         v.hasPairings = obj.hasPairings
         v.protectsM   = obj.protectsM
         v.initValue   = obj.initValue
@@ -57,6 +59,9 @@ class VarInfo:
 
     def getVarDeps(self):
         return self.varDeps
+
+    def getVarDepsNoExponents(self):
+        return self.varDepsNoExponents
 
     def getAssignVar(self):
         if self.assignNode:
@@ -117,13 +122,15 @@ class VarInfo:
     def getListElementsType(self):
         return self.listElementsType
 
-    def traverseAssignNodeRecursive(self, node):
+    def traverseAssignNodeRecursive(self, node, isExponent):
         if (node.type == ops.PAIR):
             self.hasPairings = True
         elif (node.type == ops.ATTR):
             varName = getFullVarName(node, True)
             if ( (varName not in self.varDeps) and (varName.isdigit() == False) and (varName != NONE_STRING) ):
                 self.varDeps.append(varName)
+                if (isExponent == False):
+                    self.varDepsNoExponents.append(varName)
         elif (node.type == ops.FUNC):
             userFuncName = getFullVarName(node, True)
             if (userFuncName == INIT_FUNC_NAME):
@@ -142,11 +149,16 @@ class VarInfo:
 
         if (self.listElementsType == None):
             addListNodesToList(node, self.varDeps)
+            if (isExponent == False):
+                addListNodesToList(node, self.varDepsNoExponents)
 
         if (node.left != None):
-            self.traverseAssignNodeRecursive(node.left)
+            self.traverseAssignNodeRecursive(node.left, False)
         if (node.right != None):
-            self.traverseAssignNodeRecursive(node.right)
+            if (node.type == ops.EXP):
+                self.traverseAssignNodeRecursive(node.right, True)
+            else:
+                self.traverseAssignNodeRecursive(node.right, False)
 
     def isOnlyListElementsTypeDecl(self, listNode):
         if (listNode.type != ops.LIST):
@@ -182,7 +194,7 @@ class VarInfo:
             dotProdObj.setDotProdObj(self.assignNode.right, self.lineNo, self.funcName)
             self.dotProdObj = dotProdObj
 
-        self.traverseAssignNodeRecursive(self.assignNode.right)
+        self.traverseAssignNodeRecursive(self.assignNode.right, False)
 
         if (M in self.varDeps):
             self.protectsM = True

@@ -30,7 +30,7 @@ def transform(sdl_scheme, verbosity=False):
     # 3 see which ones appear in transform and mark them as needing to be blinded
     #keygen = "keygen"
     keygen = config.keygenFuncName
-    (stmtsKg, typesKg, depListKg, infListKg) = getFuncStmts(keygen)
+    (stmtsKg, typesKg, depListKg, depListKgNoExponents, infListKg, infListKgNoExponents) = getFuncStmts(keygen)
     outputKgLine = getLineNoOfOutputStatement(keygen)
     secret = config.keygenSecVar
     # secret = str(stmtsKg[outputKgLine].getAssignNode().right)
@@ -45,8 +45,8 @@ def transform(sdl_scheme, verbosity=False):
     else:
         sys.exit("ERROR: invalid structure definition in", keygen)    
     
-    (stmtsEnc, typesEnc, depListEnc, infListEnc) = getFuncStmts("encrypt")
-    (stmtsDec, typesDec, depListDec, infListDec) = getFuncStmts("decrypt")
+    (stmtsEnc, typesEnc, depListEnc, depListEncNoExponents, infListEnc, infListEncNoExponents) = getFuncStmts("encrypt")
+    (stmtsDec, typesDec, depListDec, depListDecNoExponents, infListDec, infListDecNoExponents) = getFuncStmts("decrypt")
     partDecCT[config.M] = typesDec[config.M].getType()
 
     finalSecretList = []
@@ -158,7 +158,7 @@ def transform(sdl_scheme, verbosity=False):
     
     parseLinesOfCode(getLinesOfCode(), False)
     # Confirm that transform was added correctly by retrieving its statements 
-    (stmtsTrans, typesTrans, depListTrans, infListTrans) = getFuncStmts(newFunc)
+    (stmtsTrans, typesTrans, depListTrans, depListTransNoExponents, infListTrans, infListTransNoExponents) = getFuncStmts(newFunc)
 
     newLines = list(stmtsTrans.keys())
     newLines.sort()

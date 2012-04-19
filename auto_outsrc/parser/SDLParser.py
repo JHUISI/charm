@@ -20,7 +20,9 @@ varNamesToFuncs_Assign = {}
 forLoops = {}
 ifElseBranches = {}
 varDepList = {}
+varDepListNoExponents = {}
 varInfList = {}
+varInfListNoExponents = {}
 varsThatProtectM = {}
 varTypes = {}
 algebraicSetting = None
@@ -736,6 +738,9 @@ def getVarTypeInfoForAttr(node):
     if (nodeAttrFullName.find(LIST_INDEX_SYMBOL) != -1):
         return getVarTypeInfoForAttr_List(node)
 
+    if (nodeAttrFullName == "1"):
+        return types.ZR
+
     return types.NO_TYPE
 
 def getVarTypeInfoRecursive(node):
@@ -893,41 +898,55 @@ def updateAssignInfo(node, i):
 
         algebraicSetting = algSettingVarDepList[0]
 
-def getVarDepList(funcName, varName, retVarDepList, varsVisitedSoFar):
+def getVarDepList(funcName, varName, retVarDepList, varsVisitedSoFar, includeExponents):
     varsVisitedSoFar.append(varName)
     assignInfo_Var = assignInfo[funcName][varName]
-    currentVarDepList = assignInfo_Var.getVarDeps()
+    if (includeExponents == True):
+        currentVarDepList = assignInfo_Var.getVarDeps()
+    else:
+        currentVarDepList = assignInfo_Var.getVarDepsNoExponents()
     for currentVarDep in currentVarDepList:
         if (currentVarDep not in retVarDepList):
             retVarDepList.append(currentVarDep)
         if ( (currentVarDep in assignInfo[funcName]) and  (currentVarDep not in varsVisitedSoFar) ):
-            getVarDepList(funcName, currentVarDep, retVarDepList, varsVisitedSoFar)
+            getVarDepList(funcName, currentVarDep, retVarDepList, varsVisitedSoFar, includeExponents)
 
-def getVarInfList():
-    global varInfList
+def getVarInfList(retList, includeExponents):
+    if (includeExponents == True):
+        listToUse = varDepList
+    else:
+        listToUse = varDepListNoExponents
 
-    for funcName in varDepList:
-        for varName in varDepList[funcName]:
-            currentVarDepList = varDepList[funcName][varName]
-            for currentVarDep in currentVarDepList:
-                if (varName not in varInfList[funcName][currentVarDep]):
-                    varInfList[funcName][currentVarDep].append(varName)
+    for funcName in listToUse:
+        for varName in listToUse[funcName]:
+            currentListToUse = listToUse[funcName][varName]
+            for currentVarDep in currentListToUse:
+                if (varName not in retList[funcName][currentVarDep]):
+                    retList[funcName][currentVarDep].append(varName)
 
 def getVarDepInfLists():
-    global varDepList, varInfList, getVarDepInfListsCalled
+    global varDepList, varDepListNoExponents, varInfList, varInfListNoExponents, getVarDepInfListsCalled
 
     for funcName in assignInfo:
         varDepList[funcName] = {}
         varInfList[funcName] = {}
+        varDepListNoExponents[funcName] = {}
+        varInfListNoExponents[funcName] = {}
         assignInfo_Func = assignInfo[funcName]
         for varName in assignInfo_Func:
             retVarDepList = []
-            getVarDepList(funcName, varName, retVarDepList, [])
+            retVarDepListNoExponents = []
+            getVarDepList(funcName, varName, retVarDepList, [], True)
+            getVarDepList(funcName, varName, retVarDepListNoExponents, [], False)
             varDepList[funcName][varName] = retVarDepList
+            varDepListNoExponents[funcName][varName] = retVarDepListNoExponents
             for retVarDep in retVarDepList:
                 varInfList[funcName][retVarDep] = []
+            for retVarDepNoExponents in retVarDepListNoExponents:
+                varInfListNoExponents[funcName][retVarDepNoExponents] = []
 
-    getVarInfList()
+    getVarInfList(varInfList, True)
+    getVarInfList(varInfListNoExponents, False)
     getVarDepInfListsCalled = True
 
 def getVarsThatProtectM():
@@ -1190,7 +1209,7 @@ def parseLinesOfCode(code, verbosity):
     global algebraicSetting, startLineNo_ForLoop, startLineNos_Functions, endLineNos_Functions
     global getVarDepInfListsCalled, getVarsThatProtectMCalled, astNodes, varNamesToFuncs_All
     global varNamesToFuncs_Assign, ifElseBranches, startLineNo_IfBranch, startLineNo_ElseBranch
-    global inputOutputVars
+    global inputOutputVars, varDepListNoExponents, varInfListNoExponents
 
     astNodes = []
     varTypes = {}
@@ -1201,7 +1220,9 @@ def parseLinesOfCode(code, verbosity):
     ifElseBranches = {}
     currentFuncName = NONE_FUNC_NAME
     varDepList = {}
+    varDepListNoExponents = {}
     varInfList = {}
+    varInfListNoExponents = {}
     varsThatProtectM = {}
     algebraicSetting = None
     startLineNo_ForLoop = None
@@ -1269,8 +1290,14 @@ def getFuncStmts(funcName):
     if (funcName not in varDepList):
         sys.exit("ERROR: Function name passed to getFuncStmts in SDLParser.py as input does not exist in varDepList.")
 
+    if (funcName not in varDepListNoExponents):
+        sys.exit("ERROR: Function name passed to getFuncStmts in SDLParser.py as input does not exist in varDepListNoExponents.")
+
     if (funcName not in varInfList):
         sys.exit("ERROR: Function name passed to getFuncStmts in SDLParser.py as input does not exist in varInfList.")
+
+    if (funcName not in varInfListNoExponents):
+        sys.exit("ERROR: Function name passed to getFuncStmts in SDLParser.py as input does not exist in varInfListNoExponents.")
 
     retDict = {}
 
@@ -1281,7 +1308,7 @@ def getFuncStmts(funcName):
             sys.exit("getFuncStmts in SDLParser.py found multiple VarInfo objects in assignInfo in same function that have the same line number.")
         retDict[lineNoKey] = currentVarInfoObj
 
-    return (retDict, varTypes[funcName], varDepList[funcName], varInfList[funcName])
+    return (retDict, varTypes[funcName], varDepList[funcName], varDepListNoExponents[funcName], varInfList[funcName], varInfListNoExponents[funcName])
 
 # Perform some type checking here?
 # rules: find constants, verify, variable definitions
@@ -1801,4 +1828,4 @@ if __name__ == "__main__":
         getVarDepInfLists()
         getVarsThatProtectM()
         printFinalOutput()
-        (retFuncStmts, retFuncTypes, retVarDepList, retVarInfList) = getFuncStmts("decrypt")
+        (retFuncStmts, retFuncTypes, retVarDepList, retVarDepListNoExponents, retVarInfList, retVarInfListNoExponents) = getFuncStmts("decrypt")

@@ -9,7 +9,7 @@ def addVarToInputOfFunc(varName, targetVar, funcName):
     AssignInfo = getAssignInfo()
     block = AssignInfo[funcName]
     lineNo = getLineNoOfInputStatement(funcName)
-    (stmts, types, depList, infList) = getFuncStmts(funcName)
+    (stmts, types, depList, depListNoExponents, infList, infListNoExponents) = getFuncStmts(funcName)
     
     inputLine = stmts[lineNo].getAssignNode().right
     
@@ -33,7 +33,7 @@ def addVarToOutputOfFunc(varName, funcName):
     AssignInfo = getAssignInfo()
     block = AssignInfo[funcName]
     lineNo = getLineNoOfOutputStatement(funcName)
-    (stmts, types, depList, infList) = getFuncStmts(funcName)
+    (stmts, types, depList, depListNoExponents, infList, infListNoExponents) = getFuncStmts(funcName)
     outputLine = stmts[lineNo].getAssignNode().right
     
     if Type(outputLine) == ops.ATTR:
@@ -60,7 +60,7 @@ def rcca(var_info):
     encFunc = "encrypt"
     setupFunc = "setup"
     transformFunc = config.transformFunctionName
-    (stmtsEnc, typesEnc, depListEnc, infListEnc) = getFuncStmts(encFunc)
+    (stmtsEnc, typesEnc, depListEnc, depListEncNoExponents, infListEnc, infListEncNoExponents) = getFuncStmts(encFunc)
     message = config.M # user-configured message
     
     myAssignInfo = getAssignInfo()
