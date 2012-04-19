@@ -210,7 +210,7 @@ def identifyT2(varInf, data):
         data['msg'] = s.right.getAttribute()
     elif data.get('msg') == s.left.getAttribute(): 
         print("Found it: ", s, varInf.varDeps) # I want non-T0 var
-        t0_varname = data[CTprime.T0].getAssignNode().left.getAttribute()
+        t0_varname = data[CTprime.T0].getAssignNode().left.getFullAttribute()
         t2_varname = list(varInf.varDeps)
         print("t0_varname := ", t0_varname)
         t2_varname.remove(t0_varname)
@@ -222,6 +222,7 @@ def identifyT2(varInf, data):
             data[CTprime.T2] = AssignInfo[targetFunc][i]
             findT1 = FindT1(t0_varname)
             ASTVisitor( findT1 ).preorder( s.right )
+            print("decout :=", findT1.decout_op)
             # helps determine operation for dec out
             if findT1.decout_op == ops.DIV:
                 data['dec_op'] = '/'

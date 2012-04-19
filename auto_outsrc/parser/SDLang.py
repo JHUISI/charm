@@ -462,10 +462,14 @@ class BinaryNode:
 	
 	def getAttribute(self):
 		if (self.type == ops.ATTR):
+			return str(self.attr)
+		return None
+
+	def getFullAttribute(self):
+		if (self.type == ops.ATTR):
 			return str(self)
-		else:
-			return None
-	
+		return None	
+
 	def setAttribute(self, value):
 		if self.type in [ops.ATTR, ops.FUNC, ops.ERROR]:
 			self.attr = str(value)

@@ -670,14 +670,15 @@ class FindT1:
         
     def visit(self, node, data):
         if Type(node.left) == ops.ATTR:
-            var_name = node.left.getAttribute()
+            var_name = node.left.getFullAttribute()
+            print("Visiting this node :=", node, self.T0)
             if var_name == self.T0:
                 self.T1 = node.right
                 self.decout_op = Type(node)
-#                self.T1 = data['sibling']
                 print("T1 right :=", self.T1)
+#                self.T1 = data['sibling']
         elif Type(node.right) == ops.ATTR:
-            var_name = node.right.getAttribute()
+            var_name = node.right.getFullAttribute()
             if var_name == self.T0:
                 self.T1 = node.left
                 self.decout_op = Type(node)
