@@ -28,7 +28,8 @@ def transform(sdl_scheme, verbosity=False):
     # 1 get output line for keygen 
     # 2 get the reference and list definition (e.g., vars of secret key)
     # 3 see which ones appear in transform and mark them as needing to be blinded
-    keygen = "keygen"
+    #keygen = "keygen"
+    keygen = config.keygenFuncName
     (stmtsKg, typesKg, depListKg, infListKg) = getFuncStmts(keygen)
     outputKgLine = getLineNoOfOutputStatement(keygen)
     secret = config.keygenSecVar
