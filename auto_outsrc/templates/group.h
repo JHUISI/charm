@@ -5,6 +5,7 @@
 #ifdef ASYMMETRIC
 #define MR_PAIRING_MNT	// AES-80 security
 #include "pairing_3.h"
+#define MNT160 AES_SECURITY
 #endif
 
 #ifdef SYMMETRIC
