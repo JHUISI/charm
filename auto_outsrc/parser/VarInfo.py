@@ -23,6 +23,7 @@ class VarInfo:
         self.outsideIfElseBranchObj = None
         self.hasRandomness = False
         self.isTypeEntryOnly = False
+        self.listElementsType = None
     
     @classmethod
     def copy(self, obj):
@@ -45,6 +46,7 @@ class VarInfo:
         v.outsideIfElseBranchObj = obj.outsideIfElseBranchObj
         v.hasRandomness = obj.hasRandomness
         v.isTypeEntryOnly = obj.isTypeEntryOnly
+        v.listElementsType = obj.listElementsType
         return v
         
     def getAssignNode(self):
@@ -112,6 +114,9 @@ class VarInfo:
     def getIsTypeEntryOnly(self):
         return self.isTypeEntryOnly
 
+    def getListElementsType(self):
+        return self.listElementsType
+
     def traverseAssignNodeRecursive(self, node):
         if (node.type == ops.PAIR):
             self.hasPairings = True
@@ -135,12 +140,27 @@ class VarInfo:
         elif (node.type == ops.RANDOM):
             self.hasRandomness = True
 
-        addListNodesToList(node, self.varDeps)
+        if (self.listElementsType == None):
+            addListNodesToList(node, self.varDeps)
 
         if (node.left != None):
             self.traverseAssignNodeRecursive(node.left)
         if (node.right != None):
             self.traverseAssignNodeRecursive(node.right)
+
+    def isOnlyListElementsTypeDecl(self, listNode):
+        if (listNode.type != ops.LIST):
+            sys.exit("isOnlyListElementsTypeDecl in VarInfo.py:  parameter passed in is not of type ops.LIST.")
+
+        listNodeChildren = getListNodeNames(listNode)
+
+        if (len(listNodeChildren) != 1):
+            return None
+
+        if (isValidType(listNodeChildren[0]) == True):
+            return listNodeChildren[0]
+
+        return None
 
     def traverseAssignNode(self):
         if (self.assignNode == None):
@@ -152,7 +172,11 @@ class VarInfo:
         if (self.assignNode.right.type == ops.LIST):
             self.isList = True
             self.type = ops.LIST
-            addListNodesToList(self.assignNode.right, self.listNodesList)
+            onlyListElementsTypeDecl = self.isOnlyListElementsTypeDecl(self.assignNode.right)
+            if (onlyListElementsTypeDecl != None):
+                self.listElementsType = onlyListElementsTypeDecl
+            else:
+                addListNodesToList(self.assignNode.right, self.listNodesList)
         elif ( (self.assignNode.right.type == ops.ON) and (self.assignNode.right.left.type == ops.PROD) ):
             dotProdObj = DotProd()
             dotProdObj.setDotProdObj(self.assignNode.right, self.lineNo, self.funcName)

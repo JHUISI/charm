@@ -28,8 +28,8 @@ omega := e(g, h)^(t1 * (t2 * alpha))
 BEGIN :: for
 for{y := 1, n}
 z#y := random(ZR) # n of these
-gl#y := z#y
-hl#y := z#y
+gl#y := g ^ z#y
+hl#y := h ^ z#y
 END :: for
 
 v1 := g ^ t1
@@ -56,7 +56,7 @@ hashID := hl#0 * (prod{y := 1, n} on { hl#y ^ hID#y })
 
 d#0 := h ^ ((r1 * (t1 * t2)) + (r2 * (t3 * t4)))
 halpha := (h ^ -alpha)
-hashIDr1 := hashID ^ -r1
+hashID2r1 := hashID ^ -r1
 d#1 := (halpha ^ t2) * (hashID2r1 ^ t2)
 d#2 := (halpha ^ t1) * (hashID2r1 ^ t1)
 hashID2r2 := hashID ^ -r2

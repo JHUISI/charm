@@ -39,9 +39,10 @@ MESSAGE, SIGNATURE, PUBLIC, LATEX, SETTING = 'message','signature', 'public', 'l
 SAME, DIFF = 'one', 'many'
 
 builtInTypes = {}
-builtInTypes["DeriveKey"] = "str"
-builtInTypes["SymDec"] = "str"
-builtInTypes["stringToID"] = "LIST"
+builtInTypes["DeriveKey"] = types.str
+builtInTypes["SymEnc"] = types.str
+builtInTypes["SymDec"] = types.str
+builtInTypes["stringToID"] = types.listZR
 
 def createNode(s, loc, toks):
     print('createNode => ', toks)
@@ -403,11 +404,30 @@ def parseFile(filename):
     fd.close()
     return ast
 
+def getEndLineNoOfForLoop(funcName, lineNo):
+    if (funcName not in forLoops):
+        sys.exit("getEndLineNoOfForLoop in SDLParser.py:  function name parameter passed in is not in forLoops.")
+
+    returnLineNo = 0
+
+    for currentForLoopObj in forLoops[funcName]:
+        startingLineNo = currentForLoopObj.getStartLineNo()
+        endingLineNo = currentForLoopObj.getEndLineNo()
+        if ( (startingLineNo > lineNo) or (endingLineNo < lineNo) ):
+            continue
+
+        if (returnLineNo != 0):
+            sys.exit("getEndLineNoOfForLoop in SDLParser.py:  found multiple for loops that contain the line number parameter passed in.")
+
+        returnLineNo = endingLineNo
+
+    return returnLineNo
+
 def getVarTypeFromVarName(varName, functionNameArg_TieBreaker):
     if ( (type(varName) is not str) or (len(varName) == 0) ):
         sys.exit("getVarTypeFromVarName in SDLParser.py:  received invalid varName parameter.")
 
-    retVarType = ops.NONE
+    retVarType = types.NO_TYPE
     retFunctionName = None
 
     outputKeywordDisagreement = False
@@ -418,7 +438,7 @@ def getVarTypeFromVarName(varName, functionNameArg_TieBreaker):
                 continue
 
             currentVarType = varTypes[funcName][currentVarName].getType()
-            if (retVarType == ops.NONE):
+            if (retVarType == types.NO_TYPE):
                 retVarType = currentVarType
                 retFunctionName = funcName
                 continue
@@ -438,22 +458,34 @@ def getVarTypeFromVarName(varName, functionNameArg_TieBreaker):
 
     if (outputKeywordDisagreement == True):
         if (retFunctionName != functionNameArg_TieBreaker):
-            #sys.exit("getVarTypeFromVarName in SDLParser.py:  there was a disagreement on the type of the output keyword, and the function chosen was not the same as the tiebreaker passed in.")
-            pass
-            #ddddddddddd
-            #TODO:  PICK UP HERE
+            sys.exit("getVarTypeFromVarName in SDLParser.py:  there was a disagreement on the type of the output keyword, and the function chosen was not the same as the tiebreaker passed in.")
 
     return retVarType
+
+def setVarTypeObjForTypedList(varTypeObj, listType):
+    if (listType == "G1"):
+        varTypeObj.setType(types.listG1)
+    elif (listType == "G2"):
+        varTypeObj.setType(types.listG2)
+    elif (listType == "GT"):
+        varTypeObj.setType(types.listGT)
+    elif (listType == "ZR"):
+        varTypeObj.setType(types.listZR)
+    else:
+        sys.exit("setVarTypeObjForTypedList in SDLParser.py:  listType passed in is not one of the supported types.")
 
 def setVarTypeObjForList(varTypeObj, typeNode):
     if (type(typeNode).__name__ != BINARY_NODE_CLASS_NAME):
         sys.exit("setVarTypeObjForList in SDLParser.py received as input for typeNode a parameter that is not a Binary Node.")
 
     if (typeNode.type != ops.LIST):
-        sys.exit("setVarTypeObjForList in SDLParser.py received as input for typeNode a Binary Node that is not of type ops.LIST.")
+        sys.exit("setVarTypeObjForList in SDLParser.py:  typeNode parameter passed in is not of type ops.LIST.")
 
-    varTypeObj.setType(ops.LIST)
-    addListNodesToList(typeNode, varTypeObj.getListNodesList())
+    if ( (len(typeNode.listNodes) == 1) and (isValidType(typeNode.listNodes[0]) == True) ):
+        setVarTypeObjForTypedList(varTypeObj, typeNode.listNodes[0])
+    else:
+        varTypeObj.setType(types.list)
+        addListNodesToList(typeNode, varTypeObj.getListNodesList())
 
 def updateVarTypes(node, i, newType=types.NO_TYPE):
     global varTypes, assignInfo
@@ -500,7 +532,7 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
     typeNode = node.right
 
     if (typeNode.type == ops.TYPE):
-        varTypeObj.setType(typeNode.attr)
+        varTypeObj.setType(getFullVarName(typeNode, False))
         varTypes[currentFuncName][varName] = varTypeObj
         return
 
@@ -573,7 +605,8 @@ def getNextListName(origListName, index):
     if ( (listFuncNameInAssignInfo == None) or (listEntryInAssignInfo == None) ):
         sys.exit("Problem with return values from getVarNameEntryFromAssignInfo in getNextListName in SDLParser.py.")
     if ( (listEntryInAssignInfo.getIsList() == False) or (len(listEntryInAssignInfo.getListNodesList()) == 0) ):
-        sys.exit("Problem with list obtained from assignInfo in getNextListName in SDLParser.")
+        #sys.exit("Problem with list obtained from assignInfo in getNextListName in SDLParser.")
+        return (None, None)
 
     listNodesList = listEntryInAssignInfo.getListNodesList()
     index = int(index)
@@ -594,10 +627,12 @@ def getVarNameFromListIndices(node):
     if (node.type != ops.ATTR):
         sys.exit("Node passed to getVarNameFromListIndex in SDLParser is not of type " + str(ops.ATTR))
 
-    if (node.attr.find(LIST_INDEX_SYMBOL) == -1):
+    nodeAttrFullName = getFullVarName(node, False)
+
+    if (nodeAttrFullName.find(LIST_INDEX_SYMBOL) == -1):
         sys.exit("Node passed to getVarNameFromListIndex is not a reference to an index in a list.")
 
-    nodeName = node.attr
+    nodeName = nodeAttrFullName
     nodeNameSplit = nodeName.split(LIST_INDEX_SYMBOL)
     currentListName = nodeNameSplit[0]
     nodeNameSplit.remove(currentListName)
@@ -613,15 +648,90 @@ def getVarNameFromListIndices(node):
             definedListMembers = hasDefinedListMembers(currentListName)
             if ( (definedListMembers == True) and (nodeNameSplit[counter_nodeNameSplit + 1].isdigit() == True) ):
                 (currentFuncName, currentListName) = getNextListName(currentListName, nodeNameSplit[counter_nodeNameSplit + 1])
+                if ( (currentFuncName == None) and (currentListName == None) ):
+                    break
                 counter_nodeNameSplit += 2
                 continue
             else:
                 (tempFuncName, tempListName) = getVarNameEntryFromAssignInfo(currentListName)
                 return (tempFuncName, currentListName)
         (currentFuncName, currentListName) = getNextListName(currentListName, listIndex)
+        if ( (currentFuncName == None) and (currentListName == None) ):
+            break
         counter_nodeNameSplit += 1
 
     return (currentFuncName, currentListName)
+
+def checkForListWithOneNumIndex(nodeName):
+    if (nodeName.count(LIST_INDEX_SYMBOL) != 1):
+        return types.NO_TYPE
+
+    nodeNameSplit = nodeName.split(LIST_INDEX_SYMBOL)
+    if (nodeNameSplit[1].isdigit() == False):
+        return types.NO_TYPE
+
+    listName = nodeNameSplit[0]
+
+    if (TYPES_HEADER not in varTypes):
+        return types.NO_TYPE
+
+    if (listName not in varTypes[TYPES_HEADER]):
+        return types.NO_TYPE
+
+    x = varTypes[TYPES_HEADER][listName].getType()
+    #print(varTypes[TYPES_HEADER][listName].getType())
+    if (varTypes[TYPES_HEADER][listName].getType() != types.list):
+        return types.NO_TYPE
+
+    retVarType = types.NO_TYPE
+
+    for currentFuncName in varTypes:
+        if (currentFuncName == TYPES_HEADER):
+            continue
+        for currentVarName in varTypes[currentFuncName]:
+            if (currentVarName != listName):
+                continue
+
+            currentVarType = varTypes[currentFuncName][currentVarName].getType()
+            if (retVarType == types.NO_TYPE):
+                retVarType = currentVarType
+                continue
+            if (retVarType == currentVarType):
+                continue
+
+            sys.exit("checkForListWithOneNumIndex in SDLParser.py:  found conflicting variable types in varTypes structure.")
+
+    return retVarType
+
+def getVarTypeInfoForAttr_List(node):
+    (funcNameOfVar, varNameInList) = getVarNameFromListIndices(node)
+    if ( (funcNameOfVar != None) and (varNameInList != None) ):
+        if ( (funcNameOfVar in varTypes) and (varNameInList in varTypes[funcNameOfVar]) ):
+            return varTypes[funcNameOfVar][varNameInList].getType()
+
+        (outsideFunctionName, retVarInfoObj) = getVarNameEntryFromAssignInfo(varNameInList)
+        if ( (outsideFunctionName != None) and (retVarInfoObj != None) and (outsideFunctionName in varTypes) and (varNameInList in varTypes[outsideFunctionName]) ):
+            return varTypes[outsideFunctionName][varNameInList].getType()
+
+    nodeAttrFullName = getFullVarName(node, False)
+
+    lastAttemptAtType = checkForListWithOneNumIndex(nodeAttrFullName)
+    return lastAttemptAtType
+
+def getVarTypeInfoForAttr(node):
+    nodeAttrFullName = getFullVarName(node, False)
+
+    if (nodeAttrFullName in varTypes[currentFuncName]):
+        return varTypes[currentFuncName][nodeAttrFullName].getType()
+
+    (possibleFuncName, possibleVarInfoObj) = getVarNameEntryFromAssignInfo(nodeAttrFullName)
+    if ( (possibleFuncName != None) and (possibleVarInfoObj != None) and (nodeAttrFullName in varTypes[possibleFuncName]) ):
+        return varTypes[possibleFuncName][nodeAttrFullName].getType()
+
+    if (nodeAttrFullName.find(LIST_INDEX_SYMBOL) != -1):
+        return getVarTypeInfoForAttr_List(node)
+
+    return types.NO_TYPE
 
 def getVarTypeInfoRecursive(node):
     if (node.type == ops.RANDOM):
@@ -636,7 +746,7 @@ def getVarTypeInfoRecursive(node):
 
     #TODO:  THIS MUST BE FIXED!!!!  MODEL SYMMAP AFTER LIST
     if (node.type == ops.SYMMAP):
-        return ops.SYMMAP
+        return types.symmap
     #TODO:  FIX THE ABOVE (SYMMAP).
 
     if (node.type == ops.EXP):
@@ -656,31 +766,17 @@ def getVarTypeInfoRecursive(node):
             sys.exit("getVarTypeInfoRecursive in SDLParser.py found a hash operation that does not hash to a supported hash type (" + str(types.ZR) + ", " + str(types.G1) + ", and " + str(types.G2) + ").")
         return retHashType
     if (node.type == ops.ATTR):
-        if (node.attr in varTypes[currentFuncName]):
-            return varTypes[currentFuncName][node.attr].getType()
-        if (node.attr.find(LIST_INDEX_SYMBOL) != -1):
-            (possibleFuncName, possibleVarInfoObj) = getVarNameEntryFromAssignInfo(node.attr)
-            if ( (possibleFuncName != None) and (possibleVarInfoObj != None) ):
-                if (node.attr in varTypes[possibleFuncName]):
-                    return varTypes[possibleFuncName][node.attr].getType()
+        return getVarTypeInfoForAttr(node)
+    if (node.type == ops.EXPAND):
+        return types.NO_TYPE
+    if (node.type == ops.FUNC):
+        currentFuncName = getFullVarName(node, False)
+        if (currentFuncName in builtInTypes):
+            return builtInTypes[currentFuncName]
+        return types.NO_TYPE
 
-            (funcNameOfVar, varNameInList) = getVarNameFromListIndices(node)
-            if ( (funcNameOfVar == None) or (varNameInList == None) ):
-                return types.NO_TYPE
-            try:
-                retVarType = varTypes[funcNameOfVar][varNameInList].getType()
-            except:
-                (outsideFunctionName, retVarInfoObj) = getVarNameEntryFromAssignInfo(varNameInList)
-                if ( (outsideFunctionName == None) or (retVarInfoObj == None) or (varNameInList not in varTypes[outsideFunctionName]) ):
-                    return types.NO_TYPE
-                retVarType = varTypes[outsideFunctionName][varNameInList].getType()            
-            return retVarType
-        else:
-            (outsideFunctionName, retVarInfoObj) = getVarNameEntryFromAssignInfo(node.attr)
-            if ( (outsideFunctionName != None) and (node.attr in varTypes[outsideFunctionName]) ):
-                return varTypes[outsideFunctionName][node.attr].getType()
-
-    return types.NO_TYPE
+    print(node)
+    sys.exit("getVarTypeInfoRecursive in SDLParser.py:  error in logic.")
 
 def getVarTypeInfo(node, i, varName):
     retVarType = getVarTypeInfoRecursive(node.right)
@@ -929,6 +1025,9 @@ def getAssignInfo():
 
 def getVarTypes():
     return varTypes
+
+def getForLoops():
+    return forLoops
 
 def getIfElseBranches():
     return ifElseBranches

@@ -218,37 +218,39 @@ def makeTypeReplacementsForCPP(SDL_Type):
 
     if (SDLTypeAsString == "str"):
         return "string"
-    if (SDLTypeAsString == "LIST"):
+    if (SDLTypeAsString == "list"):
+        return charmListType
+    if (SDLTypeAsString == "symmap"):
         return charmDictType
 
     return SDLTypeAsString
 
 def getFinalVarType(varName, varNode, replacementsDict):
     typeFromParser = getVarTypeFromVarName(varName, currentFuncName)
-    typeFromBuiltInDict = None
+    #typeFromBuiltInDict = None
 
-    if ( (varNode != None) and (varNode.type == ops.FUNC) ):
-        funcName = applyReplacementsDict(replacementsDict, getFullVarName(varNode, False))
-        funcName = replacePoundsWithBrackets(funcName)
-        if (funcName in builtInTypes):
-            typeFromBuiltInDict = builtInTypes[funcName]
+    #if ( (varNode != None) and (varNode.type == ops.FUNC) ):
+        #funcName = applyReplacementsDict(replacementsDict, getFullVarName(varNode, False))
+        #funcName = replacePoundsWithBrackets(funcName)
+        #if (funcName in builtInTypes):
+            #typeFromBuiltInDict = builtInTypes[funcName]
 
     #print("varName:  ", varName)
     #print("typeFromParser:  ", typeFromParser)
     #print("typeFromBuiltInDict:  ", typeFromBuiltInDict)
     #print("\n\n")
 
-    if ( (typeFromParser != ops.NONE) and (typeFromBuiltInDict == None) ):
-        return typeFromParser
+    #if ( (typeFromParser != ops.NONE) and (typeFromBuiltInDict == None) ):
+        #return typeFromParser
 
-    if ( (typeFromParser == ops.NONE) and (typeFromBuiltInDict != None) ):
-        return typeFromBuiltInDict
+    #if ( (typeFromParser == ops.NONE) and (typeFromBuiltInDict != None) ):
+        #return typeFromBuiltInDict
 
-    if ( (typeFromParser == ops.NONE) and (typeFromBuiltInDict == None) ):
-        sys.exit("getFinalVarType in codegen.py:  both typeFromParser and typeFromBuiltInDict are of type ops.NONE.")
+    #if ( (typeFromParser == ops.NONE) and (typeFromBuiltInDict == None) ):
+        #sys.exit("getFinalVarType in codegen.py:  both typeFromParser and typeFromBuiltInDict are of type ops.NONE.")
 
-    if (str(typeFromParser) != typeFromBuiltInDict):
-        sys.exit("getFinalVarType in codegen.py:  typeFromParser is unequal to typeFromBuiltInDict.")
+    #if (str(typeFromParser) != typeFromBuiltInDict):
+        #sys.exit("getFinalVarType in codegen.py:  typeFromParser is unequal to typeFromBuiltInDict.")
 
     return typeFromParser
 
@@ -483,6 +485,11 @@ def processAttrOrTypeAssignStmt(node, replacementsDict):
 def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
     global userFuncsCPPFile, userFuncsList_CPP
 
+    variableType = types.NO_TYPE
+
+    if (variableName != None):
+        variableType = getFinalVarType(variableName, node, None)
+
     if (type(node) is str):
         return processStrAssignStmt(node, replacementsDict)
     elif ( (node.type == ops.ATTR) or (node.type == ops.TYPE) ):
@@ -515,7 +522,7 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
         leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
         rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
         return "( (" + leftSide + ") == (" + rightSide + ") )"
-    elif (node.type == ops.LIST):
+    elif ( (node.type == ops.LIST) ): #or ( (node.type == ops.EXPAND) and (variableType == types.list) ) ):
         if (variableName == None):
             sys.exit("getAssignStmtAsString_CPP in codegen.py:  encountered node of type ops.LIST, but variableName parameter passed in is of type None.")
         listOutputString = ""
@@ -526,7 +533,7 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
             listNodeAsString = getAssignStmtAsString_CPP(listNode, replacementsDict, variableName)
             listOutputString += listNodeAsString + ");\n"
         return listOutputString
-    elif (node.type == ops.SYMMAP):
+    elif ( (node.type == ops.SYMMAP) ): #or ( (node.type == ops.EXPAND) and (variableType == types.symmap) ) ):
         if (variableName == None):
             sys.exit("getAssignStmtAsString_CPP in codegen.py:  encountered node of type ops.SYMMAP, but variable name parameter passed in is of None type.")
         symmapOutputString = ""
@@ -572,14 +579,41 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
             userFuncsCPPFile.write(userFuncsOutputString)
         return funcOutputString
     elif (node.type == ops.EXPAND):
-        expandOutputString = ""
-        expandOutputString += ";\n"
-        for listNode in node.listNodes:
-            expandOutputString += writeCurrentNumTabsToString()
-            expandOutputString += variableName + ".append(" + replacePoundsWithBrackets(str(listNode)) + ");\n"
-        return expandOutputString
+        if (variableName == None):
+            sys.exit("getAssignStmtAsString_CPP in codegen.py:  ops.EXPAND node encountered, but variableName is set to None.")
+        return getCPPAsstStringForExpand(node, variableName, replacementsDict)
 
     sys.exit("getAssignStmtAsString_CPP in codegen.py:  unsupported node type detected.")
+
+def getCPPAsstStringForExpand(node, variableName, replacementsDict):
+    outputString = ""
+    outputString += "\n"
+
+    for listNode in node.listNodes:
+        listNodeName = applyReplacementsDict(replacementsDict, listNode)
+        listNodeName = replacePoundsWithBrackets(listNodeName)
+        listNodeType = getFinalVarType(listNodeName, node, replacementsDict)
+        if (listNodeType == types.NO_TYPE):
+            sys.exit("getCPPAsstStringForExpand in codegen.py:  could not obtain one of the types for the variable names included in the expand node.")
+        outputString += writeCurrentNumTabsToString()
+        outputString += makeTypeReplacementsForCPP(listNodeType) + " " + listNodeName + " = "
+        outputString += variableName + "[\"" + listNodeName + "\"]."
+        if (listNodeType == types.G1):
+            outputString += "getG1()"
+        elif (listNodeType == types.G2):
+            outputString += "getG2()"
+        elif (listNodeType == types.GT):
+            outputString += "getGT()"
+        elif (listNodeType == types.ZR):
+            outputString += "getZR()"
+        elif (listNodeType == types.str):
+            outputString += "strPtr"
+        else:
+            sys.exit("getCPPAsstStringForExpand in codegen.py:  one of the types of the listNodes is not one of the supported types (G1, G2, GT, ZR, or string).")
+
+        outputString += ";\n"
+
+    return outputString
 
 def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements, forOutput):
     global userFuncsFile, userFuncsList
@@ -748,12 +782,15 @@ def writeAssignStmt_CPP(outputFile, binNode):
     outputString = ""
 
     variableName = getFullVarName(binNode.left, False)
-    if (variableName.find(LIST_INDEX_SYMBOL) == -1):
+    if ( (variableName.find(LIST_INDEX_SYMBOL) == -1) and (binNode.right.type != ops.EXPAND) ):
         variableType = getFinalVarType(variableName, binNode.right, None)
         outputString += makeTypeReplacementsForCPP(variableType) + " "
 
     variableName = replacePoundsWithBrackets(variableName)
-    outputString += variableName
+    
+    if (binNode.right.type != ops.EXPAND):
+        outputString += variableName
+
     if ( (binNode.right.type != ops.LIST) and (binNode.right.type != ops.SYMMAP) and (binNode.right.type != ops.EXPAND) ):
         outputString += " = "
 

@@ -8,6 +8,7 @@ import sys
 assignInfo = None
 varTypes = None
 astNodes = None
+forLoops = None
 
 def processListOrExpandNodes(binNode, origVarName, newVarName):
     binNodeRight = binNode.right
@@ -46,12 +47,13 @@ def replaceVarInstancesInLineNoRange(startLineNo, endLineNo, origVarName, newVar
     updateCodeAndStructs()
 
 def updateCodeAndStructs():
-    global assignInfo, varTypes, astNodes
+    global assignInfo, varTypes, astNodes, forLoops
 
     parseLinesOfCode(getLinesOfCode(), False)
     assignInfo = getAssignInfo()
     varTypes = getVarTypes()
     astNodes = getAstNodes()
+    forLoops = getForLoops()
 
 def writeLinesToFuncAfterVarLastAssign(funcName, lineList, varName):
     if (varName == None):
@@ -84,6 +86,10 @@ def getLineNoOfLastAssign(funcName, varNameToFind):
     #if (lastLineNo == 0):
         #sys.exit("getLineNoOfLastAssign in keygen.py:  could not find any line numbers matching the variable name and function name passed in.")
 
+    possibleNewLastLineNo = getEndLineNoOfForLoop(funcName, lastLineNo)
+    if (possibleNewLastLineNo != 0):
+        lastLineNo = possibleNewLastLineNo + 1
+
     return lastLineNo
 
 def getIsVarList(keygenOutputElem, keygenOutputVarInfo):
@@ -95,7 +101,10 @@ def getIsVarList(keygenOutputElem, keygenOutputVarInfo):
     except:
         return False
 
-    if ( (currentVarType == types.list) or (currentVarType == ops.LIST) ):
+    if (currentVarType == ops.LIST):
+        sys.exit("getIsVarList in keygen.py:  currentVarType is ops.LIST, not types.list.")
+
+    if (currentVarType == types.list):
         return True
 
     return False
