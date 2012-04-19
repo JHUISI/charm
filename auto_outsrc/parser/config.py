@@ -4,6 +4,7 @@ M = 'M'
 
 blindingLoopVar = "y"
 blindingSuffix = "Blinded"
+setupFuncName = "setup"
 keygenBlindingExponent = "zz"
 keygenFuncName = "keygen"
 # superset of variables we have used to represent public parameters in
@@ -42,9 +43,9 @@ argsToFirstTransformFunc = ["sys.argv[1]", "sys.argv[2]", "sys.argv[3]"]
 argsToFirstDecOutFunc = ["sys.argv[1]", "sys.argv[2]", "sys.argv[3]"]
 
 PairingGroupClassName_CPP = "PairingGroup"
-SecurityParameter_CPP = "AES_SECURITY"
+SecurityParameter_CPP = "MNT160"
 groupObjName = "groupObj"
-groupArg = "'SS512'"
+groupArg = "MNT160"
 
 utilObjName = "util"
 
@@ -58,11 +59,11 @@ lenFuncName = "len"
 pythonDefinedFuncs = [lenFuncName]
 
 charmImportFuncs = []
-charmImportFuncs.append("from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair")
+charmImportFuncs.append("from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair, SymEnc, SymDec")
 charmImportFuncs.append("from toolbox.secretutil import SecretUtil")
-charmImportFuncs.append("from toolbox.symcrypto import AuthenticatedCryptoAbstraction")
 charmImportFuncs.append("from toolbox.iterate import dotprod2")
-charmImportFuncs.append("from charm.pairing import hash as SHA1")
+charmImportFuncs.append("from charm.pairing import hash as DeriveKey")
+charmImportFuncs.append("from charm.engine.util import objectToBytes, bytesToObject")
 charmImportFuncs.append("from builtInFuncs import *")
 
 userGlobalsFuncName = "getUserGlobals"
@@ -76,3 +77,17 @@ TempLoopVar_CPP = "_Temp_Loop_Var"
 
 charmListType = "CharmList"
 charmDictType = "CharmDict"
+
+serializeFuncName = "writeToFile"
+serializeExt = ".txt"
+serializeObjectOutFuncName = "objectOut"
+serializeKeysName = "keys"
+serializePubKey = "egg"
+
+linesForSetupMain = []
+linesForSetupMain.append("S = ['ONE', 'TWO', 'THREE']")
+linesForSetupMain.append("M = \"balls on fire123\"")
+linesForSetupMain.append("policy_str = '((four or three) and (two or one))'")
+
+charmPickleExt = ".charmPickle"
+objectToBytesFuncName = "objectToBytes"

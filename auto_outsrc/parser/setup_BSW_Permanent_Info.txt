@@ -1,0 +1,4 @@
+	S = ['ONE', 'TWO', 'THREE']
+	M = "balls on fire123"
+	policy_str = '((four or three) and (two or one))'
+

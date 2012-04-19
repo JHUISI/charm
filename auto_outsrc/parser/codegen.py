@@ -45,7 +45,7 @@ def addImportLines():
         userFuncsLibName = userFuncsLibName[0:(len(userFuncsLibName) - len(pySuffix))]
 
     pythonImportLines = ""
-    pythonImportLines += "from " + str(userFuncsLibName) + " import *\n"
+    pythonImportLines += "from " + str(userFuncsLibName) + " import *\n\n"
 
     setupFile.write(pythonImportLines)
     transformFile.write(pythonImportLines)
@@ -67,11 +67,11 @@ def addImportLines():
     cppImportLines += "#define DEBUG  true\n"
     cppImportLines += "\n"
 
-    setupFile.write(pythonImportLines)
-    transformFile.write(pythonImportLines)
+    #setupFile.write(pythonImportLines)
+    #transformFile.write(pythonImportLines)
     decOutFile.write(cppImportLines)
     #decOutFile.write(pythonImportLines)
-    userFuncsFile.write(pythonImportLines)
+    userFuncsFile.write("from builtInFuncs import *\n\n")
     userFuncsCPPFile.write(cppImportLines)
 
 def addGroupObjGlobalVar():
@@ -1263,7 +1263,7 @@ def writeFuncsCalledFromMain(functionOrder, argsToFirstFunc):
         outputString += ")\n"
         counter += 1
 
-    return outputString
+    return (outputString, funcName)
 
 def writeMainFuncOfSetup():
     global setupFile
@@ -1272,8 +1272,27 @@ def writeMainFuncOfSetup():
     outputString += "if __name__ == \"__main__\":\n"
 
     outputString += writeGroupObjToMain()
+
+    for lineForSetupMain in linesForSetupMain:
+        outputString += "\t" + lineForSetupMain + "\n"
+
+    outputString += "\n"
+
     #outputString += "\tgetUserFuncsGlobals()\n\n"
-    outputString += writeFuncsCalledFromMain(setupFunctionOrder, argsToFirstSetupFunc)
+    (outputFromFuncsCalledFromMain, lastFuncNameWrittenToMain) = writeFuncsCalledFromMain(setupFunctionOrder, argsToFirstSetupFunc)
+    outputString += outputFromFuncsCalledFromMain + "\n"
+
+    for lastFuncOutputVar in getOutputVariablesList(lastFuncNameWrittenToMain):
+        #outputString += "\t" + serializeFuncName + "('" + lastFuncOutputVar + "_" + schemeName + "_" + serializeExt + "', " + serializeObjectOutFuncName + "(" + groupObjName + ", " + lastFuncOutputVar + "))\n"
+        #outputString += "\t" + serializeKeysName + " = {'" + keygenSecVar + "':" + keygenBlindingExponent + ", '" + keygenPubVar[0] + "':" + serializePubKey + "}\n"
+        #outputString += "\t" + serializeFuncName + "('" + serializeKeysName + "_" + schemeName + "_" + serializeExt + "', " + serializeObjectOutFuncName + "(" + groupObjName + ", " + serializeKeysName + "))\n\n"
+        currentVariableName = lastFuncOutputVar + "_" + schemeName
+        outputString += "\tf_" + currentVariableName + " = open('" + currentVariableName + charmPickleExt + "', 'wb')\n"
+        outputString += "\tpick_" + currentVariableName + " = " + objectToBytesFuncName + "(" + lastFuncOutputVar + ", " + groupObjName + ")\n"
+        outputString += "\tf_" + currentVariableName + ".write(pick_" + currentVariableName + ")\n"
+        outputString += "\tf_" + currentVariableName + ".close()\n"
+
+    outputString += "\n"
 
     setupFile.write(outputString)
 
@@ -1283,7 +1302,8 @@ def writeMainFuncOfTransform():
     outputString = ""
     outputString += "if __name__ == \"__main__\":\n"
     outputString += writeGroupObjToMain()
-    outputString += writeFuncsCalledFromMain(transformFunctionOrder, argsToFirstTransformFunc)
+    (outputFromFuncsCalledFromMain, lastFuncNameWrittenToMain) = writeFuncsCalledFromMain(transformFunctionOrder, argsToFirstTransformFunc)
+    outputString += outputFromFuncsCalledFromMain
 
     transformFile.write(outputString)
 
@@ -1293,7 +1313,8 @@ def writeMainFuncOfDecOut():
     outputString = ""
     outputString += "if __name__ == \"__main__\":\n"
     outputString += writeGroupObjToMain()
-    outputString += writeFuncsCalledFromMain(decOutFunctionOrder, argsToFirstDecOutFunc)
+    (outputFromFuncsCalledFromMain, lastFuncNameWrittenToMain) = writeFuncsCalledFromMain(decOutFunctionOrder, argsToFirstDecOutFunc)
+    outputString += outputFromFuncsCalledFromMain
 
     decOutFile.write(outputString)
 
