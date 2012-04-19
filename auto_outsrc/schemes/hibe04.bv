@@ -35,7 +35,7 @@ g0b := gb ^ (alpha * beta)
 v := e(g, g0b)
     
 mpk := list{g, g1, h, gb, g1b, hb, v, l, z}
-mk := list{g0b}
+mk := list{g0b, None}
 output := list{mpk, mk}
 END :: func:setup
 

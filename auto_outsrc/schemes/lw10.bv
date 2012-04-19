@@ -4,7 +4,7 @@ setting := symmetric
 BEGIN :: types
 msk := list
 pk1 := list{GT, G1}
-pk := list{pk1}
+pk := list{pk1, None}
 sk := list
 ct := list
 policy_str := str
@@ -26,7 +26,7 @@ END :: types
 BEGIN :: func:setup
 input := None
 g := random(G1)
-gpk := list{g}
+gpk := list{g, None}
 
 output := gpk
 END :: func:setup

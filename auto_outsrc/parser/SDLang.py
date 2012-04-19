@@ -462,7 +462,7 @@ class BinaryNode:
 	
 	def getAttribute(self):
 		if (self.type == ops.ATTR):
-			return self.attr
+			return str(self)
 		else:
 			return None
 	
