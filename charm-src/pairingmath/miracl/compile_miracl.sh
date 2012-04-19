@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # untar MIRACL source into this directory, then run this script 
-# unzip -j -aa -L miracl.zip
+unzip -j -aa -L miracl.zip
 
 rm -f *.exe
 rm -f miracl.a
