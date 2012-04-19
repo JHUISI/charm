@@ -567,7 +567,7 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
             funcOutputString += listNodeAsString + ", "
         funcOutputString = funcOutputString[0:(len(funcOutputString) - len(", "))]
         funcOutputString += ")"
-        if (nodeName not in userFuncsList_CPP):
+        if ( (nodeName not in userFuncsList_CPP) and (nodeName not in builtInFuncs) ):
             userFuncsList_CPP.append(nodeName)
             funcOutputForUser = funcOutputString
             funcOutputForUser = funcOutputForUser.replace("[", "")
@@ -700,7 +700,7 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
             funcOutputString += listNodeAsString + ", "
         funcOutputString = funcOutputString[0:(len(funcOutputString) - len(", "))]
         funcOutputString += ")"
-        if ( (nodeName not in pythonDefinedFuncs) and (nodeName not in userFuncsList) ):
+        if ( (nodeName not in pythonDefinedFuncs) and (nodeName not in userFuncsList) and (nodeName not in builtInFuncs) ):
             userFuncsList.append(nodeName)
             funcOutputForUser = funcOutputString
             funcOutputForUser = funcOutputForUser.replace("[", "")

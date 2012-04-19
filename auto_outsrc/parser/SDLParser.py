@@ -43,6 +43,11 @@ builtInTypes["DeriveKey"] = types.str
 builtInTypes["SymEnc"] = types.str
 builtInTypes["SymDec"] = types.str
 builtInTypes["stringToID"] = types.listZR
+builtInTypes["createPolicy"] = types.object
+builtInTypes["getAttributeList"] = types.list
+builtInTypes["calculateSharesDict"] = types.symmap
+builtInTypes["prune"] = types.list
+builtInTypes["getCoefficients"] = types.symmap
 
 def createNode(s, loc, toks):
     print('createNode => ', toks)

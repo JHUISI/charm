@@ -5,7 +5,7 @@ M = 'M'
 blindingLoopVar = "y"
 blindingSuffix = "Blinded"
 keygenBlindingExponent = "zz"
-keygenFuncName = "extract"
+keygenFuncName = "keygen"
 # superset of variables we have used to represent public parameters in
 # our crypto schemes
 keygenPubVar = ["pk", "mpk", "gpk"]
@@ -63,6 +63,7 @@ charmImportFuncs.append("from toolbox.secretutil import SecretUtil")
 charmImportFuncs.append("from toolbox.symcrypto import AuthenticatedCryptoAbstraction")
 charmImportFuncs.append("from toolbox.iterate import dotprod2")
 charmImportFuncs.append("from charm.pairing import hash as SHA1")
+charmImportFuncs.append("from builtInFuncs import *")
 
 userGlobalsFuncName = "getUserGlobals"
 
