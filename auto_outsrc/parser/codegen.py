@@ -69,8 +69,9 @@ def addImportLines():
 
     #setupFile.write(pythonImportLines)
     #transformFile.write(pythonImportLines)
-    decOutFile.write(cppImportLines)
+    #decOutFile.write(cppImportLines)
     #decOutFile.write(pythonImportLines)
+    decOutFile.write("#include \"" + userFuncsCPPFileName + "\"\n\n")
     userFuncsFile.write("from builtInFuncs import *\n\n")
     userFuncsCPPFile.write(cppImportLines)
 
@@ -225,34 +226,8 @@ def makeTypeReplacementsForCPP(SDL_Type):
 
     return SDLTypeAsString
 
-def getFinalVarType(varName, varNode, replacementsDict):
-    typeFromParser = getVarTypeFromVarName(varName, currentFuncName)
-    #typeFromBuiltInDict = None
-
-    #if ( (varNode != None) and (varNode.type == ops.FUNC) ):
-        #funcName = applyReplacementsDict(replacementsDict, getFullVarName(varNode, False))
-        #funcName = replacePoundsWithBrackets(funcName)
-        #if (funcName in builtInTypes):
-            #typeFromBuiltInDict = builtInTypes[funcName]
-
-    #print("varName:  ", varName)
-    #print("typeFromParser:  ", typeFromParser)
-    #print("typeFromBuiltInDict:  ", typeFromBuiltInDict)
-    #print("\n\n")
-
-    #if ( (typeFromParser != ops.NONE) and (typeFromBuiltInDict == None) ):
-        #return typeFromParser
-
-    #if ( (typeFromParser == ops.NONE) and (typeFromBuiltInDict != None) ):
-        #return typeFromBuiltInDict
-
-    #if ( (typeFromParser == ops.NONE) and (typeFromBuiltInDict == None) ):
-        #sys.exit("getFinalVarType in codegen.py:  both typeFromParser and typeFromBuiltInDict are of type ops.NONE.")
-
-    #if (str(typeFromParser) != typeFromBuiltInDict):
-        #sys.exit("getFinalVarType in codegen.py:  typeFromParser is unequal to typeFromBuiltInDict.")
-
-    return typeFromParser
+def getFinalVarType(varName, funcName):
+    return getVarTypeFromVarName(varName, funcName)
 
 def writeFunctionDecl_CPP(outputFile, functionName):
     outputString = ""
@@ -263,13 +238,13 @@ def writeFunctionDecl_CPP(outputFile, functionName):
     if (len(outputVariables) != 1):
         sys.exit("writeFunctionDecl_CPP in codegen.py:  length of output variables for function name passed in is unequal to one (unsupported).")
 
-    funcOutputType = getFinalVarType(outputVariables[0], None, None)
+    funcOutputType = getFinalVarType(outputVariables[0], currentFuncName)
 
     outputString += makeTypeReplacementsForCPP(funcOutputType) + " " + functionName + "("
     outputString += PairingGroupClassName_CPP + " & " + groupObjName + ", "
 
     for inputVariable in inputVariables:
-        currentType = getFinalVarType(inputVariable, None, None)
+        currentType = getFinalVarType(inputVariable, currentFuncName)
         outputString += makeTypeReplacementsForCPP(currentType) + " & " + inputVariable + ", "
 
     outputString = outputString[0:(len(outputString) - len(", "))]
@@ -300,7 +275,8 @@ def writeFunctionEnd_CPP(outputFile, functionName):
         return
 
     returnValues[functionName] = str(outputVariables[0])
-    outputFile.write("\treturn " + str(outputVariables[0]) + ";\n}\n\n")
+    #outputFile.write("\treturn " + str(outputVariables[0]) + ";\n}\n\n")
+    outputFile.write("\treturn " + outputKeyword + ";\n}\n\n")
 
 def writeFunctionEnd(functionName):
     global setupFile, transformFile, decOutFile
@@ -490,7 +466,7 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
     variableType = types.NO_TYPE
 
     if (variableName != None):
-        variableType = getFinalVarType(variableName, node, None)
+        variableType = getFinalVarType(variableName, currentFuncName)
 
     if (type(node) is str):
         return processStrAssignStmt(node, replacementsDict)
@@ -594,7 +570,7 @@ def getCPPAsstStringForExpand(node, variableName, replacementsDict):
     for listNode in node.listNodes:
         listNodeName = applyReplacementsDict(replacementsDict, listNode)
         listNodeName = replacePoundsWithBrackets(listNodeName)
-        listNodeType = getFinalVarType(listNodeName, node, replacementsDict)
+        listNodeType = getFinalVarType(listNodeName, currentFuncName)
         if (listNodeType == types.NO_TYPE):
             sys.exit("getCPPAsstStringForExpand in codegen.py:  could not obtain one of the types for the variable names included in the expand node.")
         outputString += writeCurrentNumTabsToString()
@@ -785,7 +761,7 @@ def writeAssignStmt_CPP(outputFile, binNode):
 
     variableName = getFullVarName(binNode.left, False)
     if ( (variableName.find(LIST_INDEX_SYMBOL) == -1) and (binNode.right.type != ops.EXPAND) ):
-        variableType = getFinalVarType(variableName, binNode.right, None)
+        variableType = getFinalVarType(variableName, currentFuncName)
         outputString += makeTypeReplacementsForCPP(variableType) + " "
 
     variableName = replacePoundsWithBrackets(variableName)
@@ -1334,6 +1310,43 @@ def writeMainFuncOfTransform():
     transformFile.write(outputString)
 
 def writeMainFuncOfDecOut():
+    global decOutFile
+
+    outputString = ""
+    outputString += CPP_Main_Line + "\n"
+    outputString += "{\n"
+    outputString += "\t" + PairingGroupClassName_CPP + " " + groupObjName + "(" + SecurityParameter_CPP + ");\n\n"
+
+    outputString += "\t" + charmDictType + " dict;\n"
+
+    secretKeyType = getFinalVarType(keygenBlindingExponent, keygenFuncName)
+
+    outputString += "\t" + str(secretKeyType) + " " + keygenBlindingExponent + ";\n"
+    outputString += "\t" + serializePubKeyType + " " + serializePubKey_DecOut + ";\n\n"
+    outputString += "\t" + "Element T0, T1, T2;\n"
+    outputString += "\t" + "dict.set(\"T0\", T0);\n"
+    outputString += "\t" + "dict.set(\"T1\", T1);\n"
+    outputString += "\t" + "dict.set(\"T2\", T2);\n\n"
+    outputString += "\t" + parseParCT_FuncName_DecOut + "('"
+
+    transformOutputVar = getOutputVariablesList(transformFunctionName)
+    if (len(transformOutputVar) != 1):
+        sys.exit("writeMainFuncOfDecOut in codegen.py:  getOutputVariablesList(transformFunctionName) returned list of length != 1.")
+ 
+    outputString += transformOutputVar[0] + "_" + schemeName + "_" + serializeExt + "', dict);\n"
+    outputString += "\t" + parseKeys_FuncName_DecOut + "('"
+    outputString += serializeKeysName + "_" + schemeName + "_" + serializeExt + "', "
+    outputString += keygenBlindingExponent + ", " + serializePubKey_DecOut + ");\n"
+    #outputString += 
+
+    #STILL LEFT TO DO DDDDDDD TODO HERE STARTHERE
+    #string M = decout(group, dict, sk, pk);
+    #return 0;
+    #}
+
+    decOutFile.write(outputString)
+
+def writeMainFuncOfDecOut_Python():
     global decOutFile
 
     outputString = ""

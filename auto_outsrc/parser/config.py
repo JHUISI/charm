@@ -6,6 +6,7 @@ blindingLoopVar = "y"
 blindingSuffix = "Blinded"
 setupFuncName = "setup"
 keygenBlindingExponent = "zz"
+keygenBlindingExponentType = "ZR"
 keygenFuncName = "keygen"
 # superset of variables we have used to represent public parameters in
 # our crypto schemes
@@ -83,6 +84,8 @@ serializeExt = ".txt"
 serializeObjectOutFuncName = "objectOut"
 serializeKeysName = "keys"
 serializePubKey = "pk[4]"
+serializePubKeyType = "GT"
+serializePubKey_DecOut = "pk"
 
 linesForSetupMain = []
 linesForSetupMain.append("S = ['ONE', 'TWO', 'THREE']")
@@ -97,3 +100,8 @@ objectToBytesFuncName = "objectToBytes"
 bytesToObjectFuncName = "bytesToObject"
 
 unpickleFileSuffix = "_File"
+
+CPP_Main_Line = "int main(int argc, char* argv[])"
+
+parseParCT_FuncName_DecOut = "parsePartCT"
+parseKeys_FuncName_DecOut = "parseKeys"
