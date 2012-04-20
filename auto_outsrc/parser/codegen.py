@@ -755,11 +755,14 @@ def writeLambdaFuncAssignStmt(outputFile, binNode):
     return (dotProdObj, lambdaReplacements)
 
 def writeAssignStmt_CPP(outputFile, binNode):
-    writeCurrentNumTabsIn(outputFile)
+    variableName = getFullVarName(binNode.left, False)
 
+    if (variableName == inputKeyword):
+        return
+
+    writeCurrentNumTabsIn(outputFile)
     outputString = ""
 
-    variableName = getFullVarName(binNode.left, False)
     if ( (variableName.find(LIST_INDEX_SYMBOL) == -1) and (binNode.right.type != ops.EXPAND) ):
         variableType = getFinalVarType(variableName, currentFuncName)
         outputString += makeTypeReplacementsForCPP(variableType) + " "
@@ -842,12 +845,18 @@ def writeErrorFunc_CPP(outputFile, binNode):
     writeCurrentNumTabsIn(outputFile)
     outputString = ""
     outputString += errorFuncName + "("
-    outputString += getAssignStmtAsString_CPP(binNode.attr, None, None)
+    userErrorFuncArg_WithApostrophes = getAssignStmtAsString_CPP(binNode.attr, None, None)
+    lenErrorArg_WithApostrophes = len(userErrorFuncArg_WithApostrophes)
+    if (userErrorFuncArg_WithApostrophes[0] == "'"):
+        userErrorFuncArg_WithApostrophes = "\"" + userErrorFuncArg_WithApostrophes[1:lenErrorArg_WithApostrophes]
+    if (userErrorFuncArg_WithApostrophes[lenErrorArg_WithApostrophes - 1] == "'"):
+        userErrorFuncArg_WithApostrophes = userErrorFuncArg_WithApostrophes[0:(lenErrorArg_WithApostrophes -1)] + "\""
+    outputString += userErrorFuncArg_WithApostrophes
     outputString += ");\n"
     outputFile.write(outputString)
 
     writeCurrentNumTabsIn(outputFile)
-    outputString = "return NULL;\n"
+    outputString = "return \"\";\n"
     outputFile.write(outputString)
 
     if (errorFuncName not in userFuncsList_CPP):
@@ -1321,28 +1330,36 @@ def writeMainFuncOfDecOut():
 
     secretKeyType = getFinalVarType(keygenBlindingExponent, keygenFuncName)
 
-    outputString += "\t" + str(secretKeyType) + " " + keygenBlindingExponent + ";\n"
+    outputString += "\t" + makeTypeReplacementsForCPP(secretKeyType) + " " + keygenBlindingExponent + ";\n"
     outputString += "\t" + serializePubKeyType + " " + serializePubKey_DecOut + ";\n\n"
     outputString += "\t" + "Element T0, T1, T2;\n"
     outputString += "\t" + "dict.set(\"T0\", T0);\n"
     outputString += "\t" + "dict.set(\"T1\", T1);\n"
     outputString += "\t" + "dict.set(\"T2\", T2);\n\n"
-    outputString += "\t" + parseParCT_FuncName_DecOut + "('"
+    outputString += "\t" + parseParCT_FuncName_DecOut + "(\""
 
     transformOutputVar = getOutputVariablesList(transformFunctionName)
     if (len(transformOutputVar) != 1):
         sys.exit("writeMainFuncOfDecOut in codegen.py:  getOutputVariablesList(transformFunctionName) returned list of length != 1.")
  
-    outputString += transformOutputVar[0] + "_" + schemeName + "_" + serializeExt + "', dict);\n"
-    outputString += "\t" + parseKeys_FuncName_DecOut + "('"
-    outputString += serializeKeysName + "_" + schemeName + "_" + serializeExt + "', "
-    outputString += keygenBlindingExponent + ", " + serializePubKey_DecOut + ");\n"
-    #outputString += 
+    outputString += transformOutputVar[0] + "_" + schemeName + "_" + serializeExt + "\", dict);\n"
+    outputString += "\t" + parseKeys_FuncName_DecOut + "(\""
+    outputString += serializeKeysName + "_" + schemeName + "_" + serializeExt + "\", "
+    outputString += keygenBlindingExponent + ", " + serializePubKey_DecOut + ");\n\n"
 
-    #STILL LEFT TO DO DDDDDDD TODO HERE STARTHERE
-    #string M = decout(group, dict, sk, pk);
-    #return 0;
-    #}
+    decOutOutputVars = getOutputVariablesList(decOutFunctionName)
+    if (len(decOutOutputVars) != 1):
+        sys.exit("writeMainFuncOfDecOut in codegen.py:  getOutputVariablesList(decOutFunctionName) returned a list that is not of length one.")
+
+    varTypeOfDecOut_Output = getFinalVarType(decOutOutputVars[0], decOutFunctionName)
+    if (varTypeOfDecOut_Output == types.NO_TYPE):
+        sys.exit("writeMainFuncOfDecOut in codegen.py:  could not obtain the type of decout's output variable.")
+
+    outputString += "\t" + makeTypeReplacementsForCPP(varTypeOfDecOut_Output) + " " + decOutOutputVars[0] + " = " + decOutFunctionName
+    outputString += "(" + groupObjName + ", dict, " + keygenBlindingExponent + ", " + serializePubKey_DecOut
+    outputString += ");\n\n"
+    outputString += "\treturn 0;\n"
+    outputString += "}\n"
 
     decOutFile.write(outputString)
 
@@ -1426,9 +1443,9 @@ def main(SDL_Scheme):
 
     setupFile = open(setupFileName, 'w')
     transformFile = open(transformFileName, 'w')
-    decOutFile = open(decOutFileName, 'w')
+    decOutFile = open(decOutFolderName + decOutFileName, 'w')
     userFuncsFile = open(userFuncsFileName, 'w')
-    userFuncsCPPFile = open(userFuncsCPPFileName, 'w')
+    userFuncsCPPFile = open(decOutFolderName + userFuncsCPPFileName, 'w')
 
     getGlobalVarNames()
 

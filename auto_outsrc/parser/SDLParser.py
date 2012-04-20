@@ -630,14 +630,20 @@ def hasDefinedListMembers(listName):
 
     return False
 
-def getVarNameFromListIndices(node):
+def getVarNameFromListIndices(node, failSilently=False):
     if (node.type != ops.ATTR):
-        sys.exit("Node passed to getVarNameFromListIndex in SDLParser is not of type " + str(ops.ATTR))
+        if (failSilently == True):
+            return (None, None)
+        else:
+            sys.exit("Node passed to getVarNameFromListIndex in SDLParser is not of type " + str(ops.ATTR))
 
     nodeAttrFullName = getFullVarName(node, False)
 
     if (nodeAttrFullName.find(LIST_INDEX_SYMBOL) == -1):
-        sys.exit("Node passed to getVarNameFromListIndex is not a reference to an index in a list.")
+        if (failSilently == True):
+            return (None, None)
+        else:
+            sys.exit("Node passed to getVarNameFromListIndex is not a reference to an index in a list.")
 
     nodeName = nodeAttrFullName
     nodeNameSplit = nodeName.split(LIST_INDEX_SYMBOL)

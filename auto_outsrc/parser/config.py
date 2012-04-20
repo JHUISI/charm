@@ -20,6 +20,7 @@ cppHeaderSuffix = ".h"
 
 setupFileName = "setupOutsourcing_" + schemeName + pySuffix
 transformFileName = "transformOutsourcing_" + schemeName + pySuffix
+decOutFolderName = "../cppCompilation/"
 decOutFileName = "decOutOutsourcing_" + schemeName + cppSuffix
 #decOutFileName = "decOutOutsourcing_" + schemeName + pySuffix
 userFuncsName = "userFuncs_" + schemeName
@@ -45,7 +46,7 @@ argsToFirstDecOutFunc = ["sys.argv[1]", "sys.argv[2]", "sys.argv[3]"]
 
 PairingGroupClassName_CPP = "PairingGroup"
 SecurityParameter_CPP = "MNT160"
-groupObjName = "groupObj"
+groupObjName = "group"
 groupArg = "MNT160"
 
 utilObjName = "util"
