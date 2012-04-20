@@ -89,5 +89,11 @@ linesForSetupMain.append("S = ['ONE', 'TWO', 'THREE']")
 linesForSetupMain.append("M = \"balls on fire123\"")
 linesForSetupMain.append("policy_str = '((four or three) and (two or one))'")
 
+structsToPickleInSetupMain = []
+structsToPickleInSetupMain.append("")
+
 charmPickleExt = ".charmPickle"
 objectToBytesFuncName = "objectToBytes"
+bytesToObjectFuncName = "bytesToObject"
+
+unpickleFileSuffix = "_File"

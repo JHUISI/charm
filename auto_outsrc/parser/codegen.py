@@ -417,6 +417,8 @@ def getLambdaReplacementsString(lambdaReplacements, includeFirstLambdaVar):
     return (retString, reverseDict[0])
 
 def processDotProdAsNonInt(dotProdObj, currentLambdaFuncName, lambdaReplacements):
+    global userFuncsFile
+
     startVal = dotProdObj.getStartVal()
     startValSplit = startVal.split(LIST_INDEX_SYMBOL)
     startVal = startValSplit[0]
@@ -773,7 +775,7 @@ def writeLambdaFuncAssignStmt(outputFile, binNode):
     lambdaOutputString += lambdaExpression
 
     lambdaOutputString += "\n"
-    outputFile.write(lambdaOutputString)
+    #outputFile.write(lambdaOutputString)
     return (dotProdObj, lambdaReplacements)
 
 def writeAssignStmt_CPP(outputFile, binNode):
@@ -808,7 +810,7 @@ def writeAssignStmt_Python(outputFile, binNode):
 
     if ( (binNode.right.type == ops.ON) and (binNode.right.left.type == ops.PROD) ):
         (dotProdObj, lambdaReplacements) = writeLambdaFuncAssignStmt(outputFile, binNode)
-        writeCurrentNumTabsIn(outputFile)
+        #writeCurrentNumTabsIn(outputFile)
 
     variableName = replacePoundsWithBrackets(getFullVarName(binNode.left, False))
 
@@ -1252,7 +1254,8 @@ def writeFuncsCalledFromMain(functionOrder, argsToFirstFunc):
         if (len(returnValues[funcName]) > 0):
             outputString += returnValues[funcName] + " = "
         outputString += funcName + "("
-        if (counter == 0):
+        #if (counter == 0):
+        if (counter == -1):
             checkNumUserSuppliedArgs(argsToFirstFunc, funcName)
             outputString += getStringOfFirstFuncArgs(argsToFirstFunc)
         else:
@@ -1282,17 +1285,25 @@ def writeMainFuncOfSetup():
     (outputFromFuncsCalledFromMain, lastFuncNameWrittenToMain) = writeFuncsCalledFromMain(setupFunctionOrder, argsToFirstSetupFunc)
     outputString += outputFromFuncsCalledFromMain + "\n"
 
-    for lastFuncOutputVar in getOutputVariablesList(lastFuncNameWrittenToMain):
-        #outputString += "\t" + serializeFuncName + "('" + lastFuncOutputVar + "_" + schemeName + "_" + serializeExt + "', " + serializeObjectOutFuncName + "(" + groupObjName + ", " + lastFuncOutputVar + "))\n"
-        #outputString += "\t" + serializeKeysName + " = {'" + keygenSecVar + "':" + keygenBlindingExponent + ", '" + keygenPubVar[0] + "':" + serializePubKey + "}\n"
-        #outputString += "\t" + serializeFuncName + "('" + serializeKeysName + "_" + schemeName + "_" + serializeExt + "', " + serializeObjectOutFuncName + "(" + groupObjName + ", " + serializeKeysName + "))\n\n"
+    varsToPickle = getOutputVariablesList(lastFuncNameWrittenToMain)
+
+    transformInputVariables = getInputVariablesList(transformFunctionName)
+
+    for transformInputVar in transformInputVariables:
+        if transformInputVar not in varsToPickle:
+            varsToPickle.append(transformInputVar)
+
+    for lastFuncOutputVar in varsToPickle:
         currentVariableName = lastFuncOutputVar + "_" + schemeName
         outputString += "\tf_" + currentVariableName + " = open('" + currentVariableName + charmPickleExt + "', 'wb')\n"
         outputString += "\tpick_" + currentVariableName + " = " + objectToBytesFuncName + "(" + lastFuncOutputVar + ", " + groupObjName + ")\n"
         outputString += "\tf_" + currentVariableName + ".write(pick_" + currentVariableName + ")\n"
-        outputString += "\tf_" + currentVariableName + ".close()\n"
+        outputString += "\tf_" + currentVariableName + ".close()\n\n"
 
-    outputString += "\n"
+    outputString += "\t" + serializeKeysName + " = {'" + keygenSecVar + "':" + keygenBlindingExponent + ", '" + keygenPubVar[0] + "':" + serializePubKey + "}\n"
+    outputString += "\t" + serializeFuncName + "('" + serializeKeysName + "_" + schemeName + "_" + serializeExt + "', " + serializeObjectOutFuncName + "(" + groupObjName + ", " + serializeKeysName + "))\n\n"
+
+    #outputString += "\n"
 
     setupFile.write(outputString)
 
@@ -1302,8 +1313,23 @@ def writeMainFuncOfTransform():
     outputString = ""
     outputString += "if __name__ == \"__main__\":\n"
     outputString += writeGroupObjToMain()
+
+    varsToUnpickle = getInputVariablesList(transformFunctionName)
+    for varToUnpickle in varsToUnpickle:
+        fileNameForThisVar = varToUnpickle + "_" + schemeName + charmPickleExt
+        outputString += "\t" + varToUnpickle + unpickleFileSuffix + " = open('" + fileNameForThisVar + "', 'rb').read()\n"
+        outputString += "\t" + varToUnpickle + " = " + bytesToObjectFuncName + "(" + varToUnpickle + unpickleFileSuffix + ", " + groupObjName + ")\n\n"
+        #outputString += "\t" + varToUnpickle + unpickleFileSuffix + ".close()\n\n"
+
+    #outputString += "\n"
+
     (outputFromFuncsCalledFromMain, lastFuncNameWrittenToMain) = writeFuncsCalledFromMain(transformFunctionOrder, argsToFirstTransformFunc)
     outputString += outputFromFuncsCalledFromMain
+    outputString += "\n"
+
+    varsToPickle = getOutputVariablesList(transformFunctionName)
+    for varToPickle in varsToPickle:
+        outputString += "\t" + serializeFuncName + "('" + varToPickle + "_" + schemeName + "_" + serializeExt + "', " + serializeObjectOutFuncName + "(" + groupObjName + ", " + varToPickle + "))\n"
 
     transformFile.write(outputString)
 
