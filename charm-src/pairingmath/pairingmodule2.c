@@ -2106,7 +2106,11 @@ static int pairings_traverse(PyObject *m, visitproc visit, void *arg) {
 static int pairings_clear(PyObject *m) {
 	Py_CLEAR(GETSTATE(m)->error);
 	Py_CLEAR(GETSTATE(m)->dBench);
+	return 0;
+}
 
+static int pairings_free(PyObject *m) {
+	miracl_clean();
 	return 0;
 }
 
@@ -2118,8 +2122,8 @@ static struct PyModuleDef moduledef = {
 		pairing_methods,
 		NULL,
 		pairings_traverse,
-		pairings_clear,
-		NULL
+		(inquiry) pairings_clear,
+		(freefunc) pairings_free
 };
 
 #define INITERROR return NULL

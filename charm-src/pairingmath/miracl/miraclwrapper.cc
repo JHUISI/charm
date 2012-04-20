@@ -72,7 +72,7 @@ pairing_t *pairing_init(int securitylevel) {
 	miracl *mip=get_mip();  // get handle on mip (Miracl Instance Pointer)
 	mip->IOBASE = 10;
 
-	// cout << "Initialized: " << endl;
+	//cout << "Initialized: " << pfc << endl;
     //cout << "Order = " << pfc->order() << endl;
     time_t seed;
 
@@ -1123,6 +1123,11 @@ void element_delete(Group_t type, element_t *e) {
 void pairing_clear(pairing_t *pairing) {
         PFC *pfc = (PFC *)pairing;
         delete pfc;
+}
+
+void miracl_clean() {
+	// cout << "mirexit() call to clean-up." << endl;
+	mirexit();
 }
 
 static const string base64_chars =

@@ -21,6 +21,8 @@ typedef enum Curve Curve_t;
 
 pairing_t *pairing_init(int securitylevel);
 void pairing_clear(pairing_t *pairing);
+// to clean up the mriacl system completely.NOTE: Make sure miracl PFC classes are patched.
+void miracl_clean();
 element_t *order(pairing_t *pairing);
 
 element_t *element_init_ZR(int value);
