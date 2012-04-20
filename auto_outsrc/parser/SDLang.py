@@ -465,6 +465,12 @@ class BinaryNode:
 			return str(self.attr)
 		return None
 
+	def getRefAttribute(self):
+		if (self.type == ops.ATTR):
+			attr = str(self)
+			return dropListIndexIfNonNum(attr)
+		return None
+
 	def getFullAttribute(self):
 		if (self.type == ops.ATTR):
 			return str(self)

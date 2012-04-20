@@ -23,7 +23,7 @@ t2 := random(ZR)
 t3 := random(ZR)
 t4 := random(ZR)
 g := random(G1) 
-h := random(G2)
+h := random(G1)
 omega := e(g, h)^(t1 * (t2 * alpha))
 BEGIN :: for
 for{y := 1, n}

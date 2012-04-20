@@ -183,11 +183,7 @@ def applyRules(varInf, data):
         code_block = data.get('block')
         path = []
         new_equation = Optimize(equation, path, code_block)
-        varInf.updateAssignNode(new_equation)
-
-#def substitute(varInf, data):
-    
-    
+        varInf.updateAssignNode(new_equation)    
             
 def printStmt(varInf, data):
     if varInf.getLineNo() in data['lines']:
@@ -199,9 +195,6 @@ def programSliceT2(varInf, data):
         data['lines'].append(varInf.getLineNo())
     elif varInf.getVarDeps() in depList:
         data['lines'].append(varInf.getLineNo())
-
-#def depCheck(varInf, data):
-#    target
 
 def identifyT2(varInf, data):
     targetFunc = 'decrypt'
@@ -326,7 +319,7 @@ def Optimize(equation, path, code_block=None):
             if len(tech_list) == 0: break
     print("path: ", path)
     print("optimized equation: ", new_eq)
-    return new_eq        
+    return new_eq
         
 
 def testTechnique(tech_option, equation, code_block=None):
