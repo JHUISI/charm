@@ -430,9 +430,12 @@ def getEndLineNoOfForLoop(funcName, lineNo):
 
     return returnLineNo
 
-def getVarTypeFromVarName(varName, functionNameArg_TieBreaker):
+def getVarTypeFromVarName(varName, functionNameArg_TieBreaker, failSilently=False):
     if ( (type(varName) is not str) or (len(varName) == 0) ):
-        sys.exit("getVarTypeFromVarName in SDLParser.py:  received invalid varName parameter.")
+        if (failSilently == True):
+            return types.NO_TYPE
+        else:
+            sys.exit("getVarTypeFromVarName in SDLParser.py:  received invalid varName parameter.")
 
     retVarType = types.NO_TYPE
     retFunctionName = None
@@ -452,7 +455,10 @@ def getVarTypeFromVarName(varName, functionNameArg_TieBreaker):
             if (currentVarType == retVarType):
                 continue
             if (varName != outputKeyword):
-                sys.exit("getVarTypeFromVarName in SDLParser.py:  found mismatching variable type information for variable name passed in.")
+                if (failSilently == True):
+                    return types.NO_TYPE
+                else:
+                    sys.exit("getVarTypeFromVarName in SDLParser.py:  found mismatching variable type information for variable name passed in.")
             if (retFunctionName == functionNameArg_TieBreaker):
                 continue
             if (funcName == functionNameArg_TieBreaker):
@@ -465,7 +471,10 @@ def getVarTypeFromVarName(varName, functionNameArg_TieBreaker):
 
     if (outputKeywordDisagreement == True):
         if (retFunctionName != functionNameArg_TieBreaker):
-            sys.exit("getVarTypeFromVarName in SDLParser.py:  there was a disagreement on the type of the output keyword, and the function chosen was not the same as the tiebreaker passed in.")
+            if (failSilently == True):
+                return types.NO_TYPE
+            else:
+                sys.exit("getVarTypeFromVarName in SDLParser.py:  there was a disagreement on the type of the output keyword, and the function chosen was not the same as the tiebreaker passed in.")
 
     return retVarType
 

@@ -20,6 +20,8 @@ numLambdaFunctions = 0
 userFuncsList_CPP = []
 userFuncsList = []
 currentLambdaFuncName = None
+CPP_varTypesLines = None
+CPP_funcBodyLines = None
 
 def writeCurrentNumTabsToString():
     outputString = ""
@@ -264,7 +266,7 @@ def writeFunctionDecl(functionName):
         writeFunctionDecl_Python(setupFile, functionName, True, False)
 
 def writeFunctionEnd_CPP(outputFile, functionName):
-    global returnValues
+    global returnValues, CPP_funcBodyLines
 
     outputVariables = getOutputVariablesList(functionName)
 
@@ -275,8 +277,12 @@ def writeFunctionEnd_CPP(outputFile, functionName):
         return
 
     returnValues[functionName] = str(outputVariables[0])
-    #outputFile.write("\treturn " + str(outputVariables[0]) + ";\n}\n\n")
-    outputFile.write("\treturn " + outputKeyword + ";\n}\n\n")
+    #outputFile.write("\treturn " + outputKeyword + ";\n}\n\n")
+    CPP_funcBodyLines += "\treturn " + outputKeyword + ";\n}\n\n"
+
+    outputFile.write(CPP_varTypesLines)
+    outputFile.write("\n")
+    outputFile.write(CPP_funcBodyLines)
 
 def writeFunctionEnd(functionName):
     global setupFile, transformFile, decOutFile
@@ -755,6 +761,8 @@ def writeLambdaFuncAssignStmt(outputFile, binNode):
     return (dotProdObj, lambdaReplacements)
 
 def writeAssignStmt_CPP(outputFile, binNode):
+    global CPP_varTypesLines, CPP_funcBodyLines
+
     variableName = getFullVarName(binNode.left, False)
 
     if (variableName == inputKeyword):
@@ -924,9 +932,12 @@ def writeIfStmt_Python(outputFile, binNode):
     outputFile.write(outputString)
 
 def writeForLoopDecl_CPP(outputFile, binNode):
-    writeCurrentNumTabsIn(outputFile)
+    global CPP_funcBodyLines
+
+    #writeCurrentNumTabsIn(outputFile)
 
     outputString = ""
+    outputString += writeCurrentNumTabsToString()
 
     if (binNode.type == ops.FOR):
         outputString += "for (int "
@@ -954,7 +965,8 @@ def writeForLoopDecl_CPP(outputFile, binNode):
     else:
         sys.exit("writeForLoopDecl_CPP in codegen.py:  encounted node that is neither type ops.FOR nor ops.FORALL (unsupported).")
 
-    outputFile.write(outputString)
+    #outputFile.write(outputString)
+    CPP_funcBodyLines += outputString
 
 def writeForLoopDecl_Python(outputFile, binNode):
     writeCurrentNumTabsIn(outputFile)
@@ -1008,11 +1020,15 @@ def writeIfStmtDecl(binNode):
         writeIfStmt_Python(setupFile, binNode)
 
 def writeForLoopEnd_CPP(outputFile, binNode):
+    global CPP_funcBodyLines
+
     outputString = ""
     outputString += writeCurrentNumTabsToString()
     outputString += "}\n"
 
-    outputFile.write(outputString)
+    #outputFile.write(outputString)
+
+    CPP_funcBodyLines += outputString
 
 def writeForLoopEnd(binNode):
     if (currentFuncName == decOutFunctionName):
@@ -1109,6 +1125,7 @@ def isUnnecessaryNodeForCodegen(astNode):
 
 def writeSDLToFiles(astNodes):
     global currentFuncName, numTabsIn, setupFile, transformFile, lineNoBeingProcessed
+    global CPP_varTypesLines, CPP_funcBodyLines
 
     for astNode in astNodes:
         lineNoBeingProcessed += 1
@@ -1117,6 +1134,8 @@ def writeSDLToFiles(astNodes):
         if (isFunctionStart(astNode) == True):
             currentFuncName = getFuncNameFromBinNode(astNode)
             writeFunctionDecl(currentFuncName)
+            CPP_varTypesLines = ""
+            CPP_funcBodyLines = ""
             processedAsFunctionStart = True
         elif (isFunctionEnd(astNode) == True):
             writeFunctionEnd(currentFuncName)
