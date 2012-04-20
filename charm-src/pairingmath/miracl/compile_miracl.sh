@@ -1,11 +1,13 @@
 #!/bin/sh
 
 # untar MIRACL source into this directory, then run this script 
-unzip -j -aa -L miracl.zip
-
-rm -f *.exe
-rm -f miracl.a
 set -x
+[ -e miracl.zip ] && unzip -j -aa -L miracl.zip
+
+# patch mnt_pair.cpp, ssp_pair.cpp, etc here
+patch -N < mnt_pair.patch
+
+rm -f miracl.a
 cp mirdef.hpp mirdef.h
 g++ -c -m64 -O2 mrcore.c
 g++ -c -m64 -O2 mrarth0.c
