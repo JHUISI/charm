@@ -106,7 +106,10 @@ def rcca(var_info):
                     varsForDec['session_key'] = j + '_sesskey'
                     varsForDec['s_type'] = str(typesEnc[j].getType())                    
                     # replaces encrypt randomness or 's' symbolically
-                    sLine   = j + " := H(list{" + config.rccaRandomVar + "," + message + "}," + varsForDec['s_type'] + ")\n" 
+                    sLine1   = "hash" + config.rccaRandomVar + "and" + message + " := " + "list{" + config.rccaRandomVar + "," + message + "}\n"
+                    sLine2   = j + " := H(hash" + config.rccaRandomVar + "and" + message + "," + varsForDec['s_type'] + ")\n" 
+                    varsForDec['hashList'] = str(sLine1)
+                    varsForDec['hashListStmt'] = str(sLine2)
                     remCode = [msgProtLineNo, lineNo] + list(lineDepRef.values()) 
                     removeFromLinesOfCode(remCode)
                     print("Randomness :=>", enc_block[j].getAssignNode())
@@ -120,7 +123,7 @@ def rcca(var_info):
                     addCode = []
                     if len(lineDepRef.keys()) > 0:
                         addCode = list(lineDepRef.keys())
-                    addCode.extend([randomLine, sLine, rLine, protectMsgLine])
+                    addCode.extend([randomLine, sLine1, sLine2, rLine, protectMsgLine])
                     appendToLinesOfCode(addCode, lineNo)                    
                     # fix final output for encrypt
                     outputLineNo = getLineNoOfOutputStatement(encFunc)
@@ -159,6 +162,16 @@ def rcca(var_info):
     lastLineNo = len(getLinesOfCode()) + 1
     appendToLinesOfCode(newLinesOfSDL, lastLineNo)
     parseLinesOfCode(getLinesOfCode(), False)
+    
+    #writeToFile("testFile.bv", getLinesOfCode())
+    
+def writeToFile(name, s):
+    fd = open(name, 'w')
+    for i in s:
+        fd.write(i)
+    fd.close()
+    return
+
 
 def rcca_decout(vars):
     decout_sdl = ["\n","BEGIN :: func:%s\n" % config.decOutFunctionName,
@@ -167,8 +180,8 @@ def rcca_decout(vars):
 "%s := T0 %s (T2^%s)\n" % (config.rccaRandomVar, vars['dec_op'], config.keygenBlindingExponent), # recover R
 "%s := DeriveKey( %s )\n" % (vars['session_key'], config.rccaRandomVar), # recover session key
 "%s := SymDec(%s, T1)\n" % (config.M, vars['session_key']), # use session key to recover M
-"hashRandM := list{R, M}\n",
-"%s := H(hashRandM, %s)\n" % (vars['s'], vars['s_type']), # recover 'randomness' calculated for encrypt
+"%s" % vars['hashList'],
+"%s" % (vars['hashListStmt']), # recover 'randomness' calculated for encrypt
 "BEGIN :: if\n",
 "if { (T0 == (%s * (%s ^ %s))) and (T2 == (%s ^ (%s / %s))) }\n" 
 % (config.rccaRandomVar, vars['pk_value'], vars['s'], vars['pk_value'], vars['s'], config.keygenBlindingExponent), # verify T0 and T1 are well-formed
