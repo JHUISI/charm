@@ -2,20 +2,28 @@
 
 string decout(PairingGroup & group, CharmDict & partCT, ZR & zz, GT & egg)
 {
-	
-	GT T0 = partCT["T0"].getGT();
-	string T1 = partCT["T1"].strPtr;
-	GT T2 = partCT["T2"].getGT();
-	GT R = group.div(T0, group.exp(T2, zz));
-	string s_sesskey = DeriveKey(R);
-	string M = SymDec(s_sesskey, T1);
+	GT T0;
+	string T1;
+	GT T2;
+	GT R;
+	string s_sesskey;
+	string M;
 	CharmList hashRandM;
+	ZR s;
+	string output;
+	
+	T0 = partCT["T0"].getGT();
+	T1 = partCT["T1"].strPtr;
+	T2 = partCT["T2"].getGT();
+	R = group.div(T0, group.exp(T2, zz));
+	s_sesskey = DeriveKey(R);
+	M = SymDec(s_sesskey, T1);
 	hashRandM.append(R);
 	hashRandM.append(M);
-	ZR s = group.hashListToZR(hashRandM);
+	s = group.hashListToZR(hashRandM);
 	if ( ( (( (T0) == (group.mul(R, group.exp(egg, s))) )) && (( (T2) == (group.exp(egg, group.div(s, zz))) )) ) )
 	{
-		string output = M;
+		output = M;
 	}
 	else
 	{
@@ -42,6 +50,8 @@ int main(int argc, char* argv[])
 	parseKeys("keys_BSW_.txt", zz, pk);
 
 	string M = decout(group, dict, zz, pk);
+
+	cout << M << endl;
 
 	return 0;
 }

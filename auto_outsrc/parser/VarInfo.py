@@ -25,6 +25,8 @@ class VarInfo:
         self.hasRandomness = False
         self.isTypeEntryOnly = False
         self.listElementsType = None
+        self.isUsedInHashCalc = False
+        self.hashArgsInAssignNode = []
     
     @classmethod
     def copy(self, obj):
@@ -49,6 +51,8 @@ class VarInfo:
         v.hasRandomness = obj.hasRandomness
         v.isTypeEntryOnly = obj.isTypeEntryOnly
         v.listElementsType = obj.listElementsType
+        v.isUsedInHashCalc = obj.isUsedInHashCalc
+        v.hashArgsInAssignNode = obj.hashArgsInAssignNode
         return v
         
     def getAssignNode(self):
@@ -82,6 +86,12 @@ class VarInfo:
 
     def getInitValue(self):
         return self.initValue
+
+    def isUsedInHashCalc(self):
+        return self.isUsedInHashCalc
+
+    def getHashArgsInAssignNode(self):
+        return self.hashArgsInAssignNode
 
     def hasBeenSet(self):
         return self.beenSet
@@ -125,6 +135,12 @@ class VarInfo:
     def traverseAssignNodeRecursive(self, node, isExponent):
         if (node.type == ops.PAIR):
             self.hasPairings = True
+        elif (node.type == ops.HASH):
+            if (node.left.type != ops.ATTR):
+                sys.exit("traverseAssignNodeRecursive in VarInfo.py:  left child node of ops.HASH node encountred is not of type ops.ATTR.")
+            hashInputName = getFullVarName(node.left, False)
+            if (hashInputName not in self.hashArgsInAssignNode):
+                self.hashArgsInAssignNode.append(hashInputName)
         elif (node.type == ops.ATTR):
             varName = getFullVarName(node, True)
             if ( (varName not in self.varDeps) and (varName.isdigit() == False) and (varName != NONE_STRING) ):
@@ -213,7 +229,7 @@ class VarInfo:
 
         self.beenSet = not(self.initCall)
 
-        return self.varDeps
+        return (self.varDeps, self.hashArgsInAssignNode)
 
     def updateAssignNode(self, newNode):
         # can only update if assignNode was already set
@@ -234,3 +250,9 @@ class VarInfo:
             sys.exit("setIsTypeEntryOnly in VarInfo.py received input that is not valid.")
 
         self.isTypeEntryOnly = isTypeEntryOnly
+
+    def setIsUsedInHashCalc(self, isUsedInHashCalc):
+        if ( (isUsedInHashCalc != True) and (isUsedInHashCalc != False) ):
+            sys.exit("setIsUsedInHashCalc in VarInfo.py:  isUsedInHashCalc parameter passed in is neither True nor False.")
+
+        self.isUsedInHashCalc = isUsedInHashCalc

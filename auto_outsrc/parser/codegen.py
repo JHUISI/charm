@@ -281,7 +281,7 @@ def writeFunctionEnd_CPP(outputFile, functionName):
     CPP_funcBodyLines += "\treturn " + outputKeyword + ";\n}\n\n"
 
     outputFile.write(CPP_varTypesLines)
-    outputFile.write("\n")
+    #outputFile.write("\n")
     outputFile.write(CPP_funcBodyLines)
 
 def writeFunctionEnd(functionName):
@@ -510,7 +510,7 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
         if (variableName == None):
             sys.exit("getAssignStmtAsString_CPP in codegen.py:  encountered node of type ops.LIST, but variableName parameter passed in is of type None.")
         listOutputString = ""
-        listOutputString += ";\n"
+        #listOutputString += ";\n"
         for listNode in node.listNodes:
             listOutputString += writeCurrentNumTabsToString()
             listOutputString += variableName + ".append("
@@ -570,6 +570,8 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
     sys.exit("getAssignStmtAsString_CPP in codegen.py:  unsupported node type detected.")
 
 def getCPPAsstStringForExpand(node, variableName, replacementsDict):
+    global CPP_varTypesLines
+
     outputString = ""
     outputString += "\n"
 
@@ -580,7 +582,10 @@ def getCPPAsstStringForExpand(node, variableName, replacementsDict):
         if (listNodeType == types.NO_TYPE):
             sys.exit("getCPPAsstStringForExpand in codegen.py:  could not obtain one of the types for the variable names included in the expand node.")
         outputString += writeCurrentNumTabsToString()
-        outputString += makeTypeReplacementsForCPP(listNodeType) + " " + listNodeName + " = "
+
+        CPP_varTypesLines += "\t" + makeTypeReplacementsForCPP(listNodeType) + " " + listNodeName + ";\n"
+        outputString += listNodeName + " = "
+
         outputString += variableName + "[\"" + listNodeName + "\"]."
         if (listNodeType == types.G1):
             outputString += "getG1()"
@@ -768,25 +773,37 @@ def writeAssignStmt_CPP(outputFile, binNode):
     if (variableName == inputKeyword):
         return
 
-    writeCurrentNumTabsIn(outputFile)
-    outputString = ""
+    outputString_Types = ""
+    outputString_Body = ""
+
+    if (binNode.right.type != ops.LIST):
+        outputString_Body += writeCurrentNumTabsToString()
+
+    #writeCurrentNumTabsIn(outputFile)
 
     if ( (variableName.find(LIST_INDEX_SYMBOL) == -1) and (binNode.right.type != ops.EXPAND) ):
         variableType = getFinalVarType(variableName, currentFuncName)
-        outputString += makeTypeReplacementsForCPP(variableType) + " "
+        #outputString += makeTypeReplacementsForCPP(variableType) + " "
+        outputString_Types += "\t" + makeTypeReplacementsForCPP(variableType) + " "
 
     variableName = replacePoundsWithBrackets(variableName)
-    
+
     if (binNode.right.type != ops.EXPAND):
-        outputString += variableName
+        outputString_Types += variableName + ";\n"
+
+    if ( (binNode.right.type != ops.EXPAND) and (binNode.right.type != ops.LIST) ):
+        outputString_Body += variableName
 
     if ( (binNode.right.type != ops.LIST) and (binNode.right.type != ops.SYMMAP) and (binNode.right.type != ops.EXPAND) ):
-        outputString += " = "
+        outputString_Body += " = "
 
-    outputString += getAssignStmtAsString_CPP(binNode.right, None, variableName)
+    outputString_Body += getAssignStmtAsString_CPP(binNode.right, None, variableName)
     if ( (binNode.right.type != ops.LIST) and (binNode.right.type != ops.SYMMAP) and (binNode.right.type != ops.EXPAND) ):
-        outputString += ";\n"
-    outputFile.write(outputString)
+        outputString_Body += ";\n"
+    #outputFile.write(outputString)
+
+    CPP_varTypesLines += outputString_Types
+    CPP_funcBodyLines += outputString_Body
 
 def writeAssignStmt_Python(outputFile, binNode):
     writeCurrentNumTabsIn(outputFile)
@@ -848,10 +865,11 @@ def writeErrorFunc_Python(outputFile, binNode):
         userFuncsFile.write(userFuncsOutputString)
 
 def writeErrorFunc_CPP(outputFile, binNode):
-    global userFuncsCPPFile, userFuncsList_CPP
+    global userFuncsCPPFile, userFuncsList_CPP, CPP_funcBodyLines
 
-    writeCurrentNumTabsIn(outputFile)
     outputString = ""
+    outputString += writeCurrentNumTabsToString()
+
     outputString += errorFuncName + "("
     userErrorFuncArg_WithApostrophes = getAssignStmtAsString_CPP(binNode.attr, None, None)
     lenErrorArg_WithApostrophes = len(userErrorFuncArg_WithApostrophes)
@@ -861,11 +879,11 @@ def writeErrorFunc_CPP(outputFile, binNode):
         userErrorFuncArg_WithApostrophes = userErrorFuncArg_WithApostrophes[0:(lenErrorArg_WithApostrophes -1)] + "\""
     outputString += userErrorFuncArg_WithApostrophes
     outputString += ");\n"
-    outputFile.write(outputString)
 
-    writeCurrentNumTabsIn(outputFile)
-    outputString = "return \"\";\n"
-    outputFile.write(outputString)
+    outputString += writeCurrentNumTabsToString()
+
+    outputString += "return \"\";\n"
+    CPP_funcBodyLines += outputString
 
     if (errorFuncName not in userFuncsList_CPP):
         userFuncsList_CPP.append(errorFuncName)
@@ -878,8 +896,11 @@ def writeErrorFunc_CPP(outputFile, binNode):
         userFuncsCPPFile.write(userFuncsOutputString)
 
 def writeElseStmt_CPP(outputFile, binNode):
-    writeCurrentNumTabsIn(outputFile)
+    global CPP_funcBodyLines
+
+    #writeCurrentNumTabsIn(outputFile)
     outputString = ""
+    outputString += writeCurrentNumTabsToString()
     outputString += "}\n"
     outputString += writeCurrentNumTabsToString()
 
@@ -894,7 +915,8 @@ def writeElseStmt_CPP(outputFile, binNode):
         outputString += writeCurrentNumTabsToString()
         outputString += "{\n"
 
-    outputFile.write(outputString)
+    #outputFile.write(outputString)
+    CPP_funcBodyLines += outputString
 
 def writeElseStmt_Python(outputFile, binNode):
     writeCurrentNumTabsIn(outputFile)
@@ -910,8 +932,11 @@ def writeElseStmt_Python(outputFile, binNode):
     outputFile.write(outputString)
 
 def writeIfStmt_CPP(outputFile, binNode):
-    writeCurrentNumTabsIn(outputFile)
+    global CPP_funcBodyLines
+
+    #writeCurrentNumTabsIn(outputFile)
     outputString = ""
+    outputString += writeCurrentNumTabsToString()
 
     outputString += "if ( "
     outputString += getAssignStmtAsString_CPP(binNode.left, None, None)
@@ -919,7 +944,9 @@ def writeIfStmt_CPP(outputFile, binNode):
     outputString += writeCurrentNumTabsToString()
     outputString += "{\n"
 
-    outputFile.write(outputString)
+    #outputFile.write(outputString)
+
+    CPP_funcBodyLines += outputString
 
 def writeIfStmt_Python(outputFile, binNode):
     writeCurrentNumTabsIn(outputFile)
@@ -1039,11 +1066,14 @@ def writeIfStmtEnd(binNode):
         writeIfStmtEnd_CPP(decOutFile, binNode)
 
 def writeIfStmtEnd_CPP(outputFile, binNode):
+    global CPP_funcBodyLines
+
     outputString = ""
     outputString += writeCurrentNumTabsToString()
     outputString += "}\n"
 
-    outputFile.write(outputString)
+    #outputFile.write(outputString)
+    CPP_funcBodyLines += outputString
 
 def writeForLoopDecl(binNode):
     if (currentFuncName == transformFunctionName):
@@ -1377,6 +1407,7 @@ def writeMainFuncOfDecOut():
     outputString += "\t" + makeTypeReplacementsForCPP(varTypeOfDecOut_Output) + " " + decOutOutputVars[0] + " = " + decOutFunctionName
     outputString += "(" + groupObjName + ", dict, " + keygenBlindingExponent + ", " + serializePubKey_DecOut
     outputString += ");\n\n"
+    outputString += "\tcout << " + decOutOutputVars[0] + " << endl;\n\n"
     outputString += "\treturn 0;\n"
     outputString += "}\n"
 
