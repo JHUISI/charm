@@ -25,6 +25,8 @@ class VarInfo:
         self.hasRandomness = False
         self.isTypeEntryOnly = False
         self.listElementsType = None
+        self.isUsedInHashCalc = False
+        self.hashArgsInAssignNode = []
     
     @classmethod
     def copy(self, obj):
@@ -49,6 +51,7 @@ class VarInfo:
         v.hasRandomness = obj.hasRandomness
         v.isTypeEntryOnly = obj.isTypeEntryOnly
         v.listElementsType = obj.listElementsType
+        v.isUsedInHashCalc = obj.isUsedInHashCalc
         return v
         
     def getAssignNode(self):
@@ -82,6 +85,9 @@ class VarInfo:
 
     def getInitValue(self):
         return self.initValue
+
+    def isUsedInHashCalc(self):
+        return self.isUsedInHashCalc
 
     def hasBeenSet(self):
         return self.beenSet
@@ -234,3 +240,9 @@ class VarInfo:
             sys.exit("setIsTypeEntryOnly in VarInfo.py received input that is not valid.")
 
         self.isTypeEntryOnly = isTypeEntryOnly
+
+    def setIsUsedInHashCalc(self, isUsedInHashCalc):
+        if ( (isUsedInHashCalc != True) and (isUsedInHashCalc != False) ):
+            sys.exit("setIsUsedInHashCalc in VarInfo.py:  isUsedInHashCalc parameter passed in is neither True nor False.")
+
+        self.isUsedInHashCalc = isUsedInHashCalc
