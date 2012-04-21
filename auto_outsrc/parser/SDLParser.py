@@ -848,6 +848,17 @@ def updateInputOutputVars(varsDepList):
         if (varDep not in inputOutputVars):
             inputOutputVars.append(varDep)
 
+def updateHashArgNames_Entries(resultingHashInputArgNames):
+    if (len(resultingHashInputArgNames) == 0):
+        return
+
+    for funcName in assignInfo:
+        for varName in assignInfo[funcName]:
+            if (varName not in resultingHashInputArgNames):
+                continue
+
+            assignInfo[funcName][varName].setIsUsedInHashCalc(True)
+
 def updateAssignInfo(node, i):
     global assignInfo, forLoops, ifElseBranches, varNamesToFuncs_All, varNamesToFuncs_Assign
 
@@ -870,17 +881,20 @@ def updateAssignInfo(node, i):
     updateVarNamesDicts(node, [varNameWithoutIndices], varNamesToFuncs_Assign)
 
     resultingVarDeps = []
+    resultingHashInputArgNames = []
 
     if (varName in assignInfo_Func):
         if (assignInfo_Func[varName].hasBeenSet() == True):
             sys.exit("Found multiple assignments of same variable name within same function.")
         assignInfo_Func[varName].setLineNo(i)
-        resultingVarDeps = assignInfo_Func[varName].setAssignNode(node, currentFuncName, currentForLoopObj, currentIfElseBranch)
+        (resultingVarDeps, resultingHashInputArgNames) = assignInfo_Func[varName].setAssignNode(node, currentFuncName, currentForLoopObj, currentIfElseBranch)
     else:
         varInfoObj = VarInfo()
         varInfoObj.setLineNo(i)
-        resultingVarDeps = varInfoObj.setAssignNode(node, currentFuncName, currentForLoopObj, currentIfElseBranch)
+        (resultingVarDeps, resultingHashInputArgNames) = varInfoObj.setAssignNode(node, currentFuncName, currentForLoopObj, currentIfElseBranch)
         assignInfo_Func[varName] = varInfoObj
+
+    updateHashArgNames_Entries(resultingHashInputArgNames)
 
     expandedVarDeps = expandVarNamesByIndexSymbols(resultingVarDeps)
 
