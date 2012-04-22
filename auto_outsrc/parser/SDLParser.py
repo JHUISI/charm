@@ -452,6 +452,12 @@ def getVarTypeFromVarName(varName, functionNameArg_TieBreaker, failSilently=Fals
                 retVarType = currentVarType
                 retFunctionName = funcName
                 continue
+            if (funcName == TYPES_HEADER):
+                continue
+            if (retFunctionName == TYPES_HEADER):
+                retVarType = currentVarType
+                retFunctionName = funcName
+                continue
             if (currentVarType == retVarType):
                 continue
             if (varName != outputKeyword):
@@ -477,15 +483,15 @@ def getVarTypeFromVarName(varName, functionNameArg_TieBreaker, failSilently=Fals
                 sys.exit("getVarTypeFromVarName in SDLParser.py:  there was a disagreement on the type of the output keyword, and the function chosen was not the same as the tiebreaker passed in.")
 
     if (forListMember == True):
-        if (retVarType == types.listG1):
+        if ( (retVarType == types.listG1) or (retVarType == types.G1) ):
             return types.G1
-        if (retVarType == types.listG2):
+        if ( (retVarType == types.listG2) or (retVarType == types.G2) ):
             return types.G2
-        if (retVarType == types.listGT):
+        if ( (retVarType == types.listGT) or (retVarType == types.GT) ):
             return types.GT
-        if (retVarType == types.listZR):
+        if ( (retVarType == types.listZR) or (retVarType == types.ZR) ):
             return types.ZR
-        if (retVarType == types.listStr):
+        if ( (retVarType == types.listStr) or (retVarType == types.str) ):
             return types.str
         return types.NO_TYPE
 

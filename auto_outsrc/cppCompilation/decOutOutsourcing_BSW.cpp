@@ -33,3 +33,25 @@ string decout(PairingGroup & group, CharmDict & partCT, ZR & zz, GT & omega)
 	return output;
 }
 
+int main(int argc, char* argv[])
+{
+	PairingGroup group(MNT160);
+
+	CharmDict dict;
+	ZR zz;
+	GT pk;
+
+	Element T0, T1, T2;
+	dict.set("T0", T0);
+	dict.set("T1", T1);
+	dict.set("T2", T2);
+
+	parsePartCT("partCT_BSW_.txt", dict);
+	parseKeys("keys_BSW_.txt", zz, pk);
+
+	string M = decout(group, dict, zz, pk);
+
+	cout << M << endl;
+
+	return 0;
+}

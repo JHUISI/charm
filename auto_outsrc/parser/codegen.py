@@ -1517,3 +1517,5 @@ if __name__ == "__main__":
     #os.system("cp userFuncsPermanent.py userFuncs.py")
     writeLinesOfCodeToFile(outputSDLFileName)
     #print("io vars:  ", getInputOutputVars())
+    lll = getFinalVarType("gl#0", "setup")
+    print(str(lll))

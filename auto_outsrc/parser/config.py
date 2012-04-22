@@ -8,6 +8,9 @@ setupFuncName = "setup"
 keygenBlindingExponent = "zz"
 keygenBlindingExponentType = "ZR"
 keygenFuncName = "extract"
+
+encryptFuncName = "encrypt"
+
 # superset of variables we have used to represent public parameters in
 # our crypto schemes
 keygenPubVar = ["pk", "mpk", "gpk"]
@@ -36,9 +39,9 @@ partialCT = "partCT"
 decOutFunctionName = "decout"
 getStringFunctionName = "GetString"
 
-setupFunctionOrder = ["setup", keygenFuncName, "encrypt"]
-transformFunctionOrder = ["transform"]
-decOutFunctionOrder = ["decout"]
+setupFunctionOrder = [setupFuncName, keygenFuncName, encryptFuncName]
+transformFunctionOrder = [transformFunctionName]
+decOutFunctionOrder = [decOutFunctionName]
 
 argsToFirstSetupFunc = []
 argsToFirstTransformFunc = ["sys.argv[1]", "sys.argv[2]", "sys.argv[3]"]

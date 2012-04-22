@@ -13,3 +13,10 @@ void userErrorFunction(userErrorFunctionArgString)
 	return;
 }
 
+void getUserGlobals()
+{
+	if (groupUserFuncs == NULL)
+	{
+		PairingGroup groupUserFuncs(MNT160);
+	}
+}
