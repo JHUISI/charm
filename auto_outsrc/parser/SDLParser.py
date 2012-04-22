@@ -430,7 +430,7 @@ def getEndLineNoOfForLoop(funcName, lineNo):
 
     return returnLineNo
 
-def getVarTypeFromVarName(varName, functionNameArg_TieBreaker, failSilently=False):
+def getVarTypeFromVarName(varName, functionNameArg_TieBreaker, failSilently=False, forListMember=False):
     if ( (type(varName) is not str) or (len(varName) == 0) ):
         if (failSilently == True):
             return types.NO_TYPE
@@ -476,7 +476,24 @@ def getVarTypeFromVarName(varName, functionNameArg_TieBreaker, failSilently=Fals
             else:
                 sys.exit("getVarTypeFromVarName in SDLParser.py:  there was a disagreement on the type of the output keyword, and the function chosen was not the same as the tiebreaker passed in.")
 
-    return retVarType
+    if (forListMember == True):
+        if (retVarType == types.listG1):
+            return types.G1
+        if (retVarType == types.listG2):
+            return types.G2
+        if (retVarType == types.listGT):
+            return types.GT
+        if (retVarType == types.listZR):
+            return types.ZR
+        if (retVarType == types.listStr):
+            return types.str
+        return types.NO_TYPE
+
+    if ( (retVarType != types.NO_TYPE) or (varName.count(LIST_INDEX_SYMBOL) != 1) ):
+        return retVarType
+
+    varNameSplit = varName.split(LIST_INDEX_SYMBOL)
+    return getVarTypeFromVarName(varNameSplit[0], functionNameArg_TieBreaker, False, True)
 
 def setVarTypeObjForTypedList(varTypeObj, listType):
     if (listType == "G1"):

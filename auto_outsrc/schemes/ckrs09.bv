@@ -52,7 +52,8 @@ msk := expand{alpha, t1, t2, t3, t4}
 r1 := random(ZR)
 r2 := random(ZR)
 hID := stringToID(mpk, id)
-hashID := hl#0 * (prod{y := 1, n} on { hl#y ^ hID#y })
+hashIDDotProd := (prod{y := 1, n} on { hl#y ^ hID#y })
+hashID := hl#0 * hashIDDotProd
 
 d#0 := h ^ ((r1 * (t1 * t2)) + (r2 * (t3 * t4)))
 halpha := (h ^ -alpha)
@@ -77,7 +78,8 @@ s1 := random(ZR)
 s2 := random(ZR)
 
 hID1 := stringToID(mpk, id) # list <-: stringToID(list, str)
-hashID1 := gl#0 * (prod{y := 1, n} on { gl#y ^ hID1#y })
+hashID1DotProd := (prod{y := 1, n} on { gl#y ^ hID1#y })
+hashID1 := gl#0 * hashID1DotProd
 
 c_pr := (omega ^ s) * M
 c#0 := hashID1 ^ s

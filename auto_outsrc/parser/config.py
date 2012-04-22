@@ -7,7 +7,7 @@ blindingSuffix = "Blinded"
 setupFuncName = "setup"
 keygenBlindingExponent = "zz"
 keygenBlindingExponentType = "ZR"
-keygenFuncName = "keygen"
+keygenFuncName = "extract"
 # superset of variables we have used to represent public parameters in
 # our crypto schemes
 keygenPubVar = ["pk", "mpk", "gpk"]
@@ -36,7 +36,7 @@ partialCT = "partCT"
 decOutFunctionName = "decout"
 getStringFunctionName = "GetString"
 
-setupFunctionOrder = ["setup", "keygen", "encrypt"]
+setupFunctionOrder = ["setup", keygenFuncName, "encrypt"]
 transformFunctionOrder = ["transform"]
 decOutFunctionOrder = ["decout"]
 
