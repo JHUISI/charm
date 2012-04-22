@@ -11,7 +11,7 @@
 # 4. Label ciphertext elements and identify all the variables that can be moved to G1 vs. G2: 
 #     - must verify that we don't compromise on the security
 from SDLParser import *
-
+from outsrctechniques import SubstituteVar, SubstitutePairings
 
 class GetPairingVariables:
     def __init__(self, list1, list2):
@@ -36,7 +36,7 @@ def retrieveGenList():
     print("setting is", setting)
     if setting != SYMMETRIC_SETTING:
         print("No need to convert to asymmetric setting.\n")
-        exit(0)
+        exit(0) # or continue
     
     setupFuncName = "setup"
     setup = setupFuncName
@@ -75,24 +75,28 @@ def retrieveGenList():
     info = {}
     info[ 'G1' ] = (pair_vars_G1, assignTraceback(generators, pair_vars_G1))
     info[ 'G2' ] = (pair_vars_G2, assignTraceback(generators, pair_vars_G2))
+    info['generators'] = generators 
 
     # TODO: 
     print("<===== Derive Rules =====>")
     rules = deriveRules(info, generators)
     print("<===== Derive Rules =====>\n")
-
     print("<===== Determine Assignment =====>")
-    determineTypeAssignments(rules)
+    info['genMapG1'], info['genMapG2'] = determineTypeAssignments(rules)
     print("<===== Determine Assignment =====>\n")
 
     print("<===== Determine Splits =====>")    
     replaceGenerators = deriveSetupGenerators(rules)
     print("<===== Determine Splits =====>\n")
     
+    info['rules'] = rules
+    info['setupGenerators'] = replaceGenerators 
     print("<===== Transform Setup =====>")
-#    transformSetup()    
+    transformSetup(stmtS, info)    
     print("<===== Transform Setup =====>\n")    
     
+#    print("info on G1 :=>", info['genMapG1'].keys())
+#    print("info on G2 :=>", info['genMapG2'].keys())    
 
 def assignTraceback(generators, listVars):
     varProp = []
@@ -121,6 +125,7 @@ def buildMap(generators, varList, var):
 #        print("var:", var, ", output: ", l)
         # prune 'l' here
         for i in l:
+#            print("name: ", i) # uncomment for ckrs09 error
             typeI = getVarTypeFromVarName(i, None, True)
 #            print("getVarTypeFromVarName:  ", i,":", typeI)
             if typeI == types.NO_TYPE:
@@ -128,6 +133,7 @@ def buildMap(generators, varList, var):
                 node.setAttribute(i)
                 (funcName , newVarName) = getVarNameFromListIndices(node, True)
                 if newVarName != None: 
+                    print("newVarName := ", newVarName)
                     resultVarName = getVarTypeFromVarName(newVarName, None, True)
 #                    print("second attempt: ", newVarName, ":", resultVarName)
                     varList.append(newVarName)
@@ -189,6 +195,7 @@ def determineTypeAssignments(rules):
         
     print("Left changes: ", listG1)
     print("Right changes: ", listG2)
+    return (listG1, listG2)
 
 def deriveSetupGenerators(rules):
     # there should be 
@@ -234,11 +241,156 @@ def deriveSetupGenerators(rules):
                 print("determineSplit invalid case!")
     
     print("New Setup: ", setupLines)
+    return setupLines
 
+def assignVarOccursInBoth(varName, info):
+    varKeysG1 = info['G1'][1].keys()
+    varValuesG1 = info['G1'][1]
+    varKeysG2 = info['G2'][1].keys()
+    varValuesG2 = info['G2'][1]
+    
+    inG1 = inG2 = False
+    for k in varKeysG1:
+        if varName in varValuesG1[k]: 
+            inG1 = True; break
+    for k in varKeysG2:
+        if varName in varValuesG2[k]:
+            inG2 = True; break
+    
+    if inG1 == True and inG2 == True: return True    
+    return False
 
-def transformSetup(data):
-    pass
+def assignVarOccursInG1(varName, info):
+    varKeysG1 = info['G1'][1].keys()
+    varValuesG1 = info['G1'][1]
+    for k in varKeysG1:
+        if varName in varValuesG1[k]: 
+            return True    
+    return False
 
+def assignVarOccursInG2(varName, info):
+    varKeysG2 = info['G2'][1].keys()
+    varValuesG2 = info['G2'][1]
+    for k in varKeysG2:
+        if varName in varValuesG2[k]: 
+            return True    
+    return False
+
+def assignVarIsGenerator(varName, info):
+    generatorList = info['generators']
+    return varName in generatorList
+
+def updateAllForBoth(node, assignVar, varDeps, info):
+    newLine1 = updateAllForG1(node, assignVar, varDeps, info)
+    newLine2 = updateAllForG2(node, assignVar, varDeps, info)
+    return [newLine1, newLine2]
+
+def updateAllForG1(node, assignVar, varDeps, info):
+    new_node2 = BinaryNode.copy(node)
+    # 1. assignVar
+    new_assignVar = assignVar + "_G1"
+    ASTVisitor( SubstituteVar(assignVar, new_assignVar) ).preorder( new_node2 )
+    info['genMapG1'][assignVar] = new_assignVar
+    for i in varDeps:
+        new_i = i + "_G1"
+        ASTVisitor( SubstituteVar(i, new_i) ).preorder( new_node2 )
+        info['genMapG1'][i] = new_i
+    print(" Changed: ", new_node2, end="")
+    return str(new_node2)
+
+def updateAllForG2(node, assignVar, varDeps, info):
+    new_node2 = BinaryNode.copy(node)
+    # 1. assignVar
+    new_assignVar = assignVar + "_G2"
+    ASTVisitor( SubstituteVar(assignVar, new_assignVar) ).preorder( new_node2 )
+    info['genMapG2'][assignVar] = new_assignVar
+    for i in varDeps:
+        new_i = i + "_G2"
+        ASTVisitor( SubstituteVar(i, new_i) ).preorder( new_node2 )
+        info['genMapG2'][i] = new_i
+    print(" Changed: ", new_node2, end="")
+    return str(new_node2)
+
+#updateAllForBoth(node, assignVar, varDeps, )
+
+def updateForLists(varInfo, info):
+    newList = []
+    inG1 = info['genMapG1'].keys()
+    inG1dict = info['genMapG1']
+    inG2 = info['genMapG2'].keys()
+    inG2dict = info['genMapG2']
+    
+    orig_list = varInfo.getListNodesList()
+    #print("list: ", orig_list)
+    for i in orig_list:
+        if i in inG1 and i in inG2:
+            newList.extend( [inG1dict[i], inG2dict[i]] )
+        elif i in inG1:
+            newList.append(inG1dict[i])
+        elif i in inG2:
+            newList.append(inG2dict[i])
+        else:
+            newList.append(i)
+    
+    new_node = BinaryNode.copy(varInfo.getAssignNode())
+    new_node.right.listNodes = newList
+#    print("newList: ", new_node)
+    return str(new_node)
+
+def updatForPairing(varInfo, info):    
+    node = BinaryNode.copy(varInfo.getAssignNode())
+    
+    for i in varInfo.getVarDepsNoExponents():
+        if i in info['generators']:
+            ASTVisitor( SubstitutePairings(i, info['genMapG1'].get(i), 'left')).preorder( node )
+            ASTVisitor( SubstitutePairings(i, info['genMapG2'].get(i), 'right')).preorder( node )    
+    print(" :=>", node)
+    return str(node)
+
+def transformSetup(setupStmts, info):
+    # loop through statements and identify two things:
+    # generator used in computation
+    # AssignVar assignment based on the following logic:
+    #   1. if AssignVar occurs in listG1 & listG2: then we need two assignments x_G1 := in blah_G1, x_G2 := in blah_G2
+    #   2. if AssignVar occurs just in listG1: then x_G1 := in blah G1
+    #   3. if AssignVar occurs just in listG2: then x_G2 := in blah G2 
+    setupLines = info['setupGenerators']
+    lines = setupStmts.keys()
+    for i in lines:
+        assign = setupStmts[i].getAssignNode()
+        print(i, ":", assign, end="")
+        if Type(assign) == ops.EQ:
+            assignVar = setupStmts[i].getAssignVar()
+            # store for later
+            if setupStmts[i].getHasRandomness():
+                if not assignVarIsGenerator(assignVar, info):
+                    print(" :-> not a generator, so add to setupList.", end="") # do not include in new setup 
+                    setupLines.append(str(assign))           
+                else:
+                    pass
+            elif assignVarOccursInBoth(assignVar, info):
+                print(" :-> split computation in G1 & G2:", setupStmts[i].getVarDepsNoExponents(), end="")
+                setupLines.extend(updateAllForBoth(assign, assignVar, setupStmts[i].getVarDepsNoExponents(), info))
+            elif assignVarOccursInG1(assignVar, info):
+                print(" :-> just in G1:", setupStmts[i].getVarDepsNoExponents(), end="")
+                setupLines.append(updateAllForG1(assign, assignVar, setupStmts[i].getVarDepsNoExponents(), info))
+            elif assignVarOccursInG2(assignVar, info):
+                print(" :-> just in G2:", setupStmts[i].getVarDepsNoExponents(), end="")
+                setupLines.append(updateAllForG2(assign, assignVar, setupStmts[i].getVarDepsNoExponents(), info))                
+            elif setupStmts[i].getHasPairings(): # in GT so don't need to touch assignVar
+                print(" :-> update pairing.", end="")
+                setupLines.append(updatForPairing(setupStmts[i], info))
+            elif setupStmts[i].getIsList():
+                print(" :-> updating list...", end="")
+                setupLines.append(updateForLists(setupStmts[i], info))
+                
+        print()
+        
+        print(".....NEW SETUP.....")
+        for i in setupLines:
+            print(i)
+
+        # update any lists with references to generators or assignVars
 
 if __name__ == "__main__":
     print(sys.argv)

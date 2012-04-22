@@ -68,8 +68,13 @@ class VarInfo:
         return self.varDepsNoExponents
 
     def getAssignVar(self):
-        if self.assignNode:
-            return self.assignNode.left.getAttribute()
+        if self.assignNode and Type(self.assignNode) == ops.EQ:
+            return self.assignNode.left.getFullAttribute()
+        return None
+    
+    def setAssignVar(self, newString):
+        if self.assignNode and Type(self.assignNode) == ops.EQ:
+            self.assignNode.left.setAttribute(newString)
         return None
 
     def getHasPairings(self):

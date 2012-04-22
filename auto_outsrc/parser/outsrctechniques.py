@@ -704,6 +704,24 @@ class SubstituteVar:
             ind = node.listNodes.index(self.target)
             node.listNodes[ind] = self.new_var
 
+class SubstitutePairings:
+    def __init__(self, this, this_new, side='left'):
+        self.this_target = this
+        self.this_new    = this_new
+        self.side        = side
+    def visit(self, node, data):
+        pass
+    
+    def visit_pair(self, node, data):
+        # TODO: may not be ATTR nodes: look for other cases
+        if self.side == 'left' and str(node.left) == self.this_target and Type(node.left) == ops.ATTR:
+            if self.this_new != None: node.left.setAttribute(self.this_new)
+        elif self.side == 'right' and str(node.right) == self.this_target and Type(node.right) == ops.ATTR:
+            if self.this_new != None: node.right.setAttribute(self.this_new)
+        else:
+            print("TODO: handle this case - ", Type(node.left), Type(node.right))
+
+
 if __name__ == "__main__":
     statement = sys.argv[1]
     parser = SDLParser()

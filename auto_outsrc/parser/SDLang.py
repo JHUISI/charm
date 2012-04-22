@@ -479,6 +479,7 @@ class BinaryNode:
 	def setAttribute(self, value):
 		if self.type in [ops.ATTR, ops.FUNC, ops.ERROR]:
 			self.attr = str(value)
+			self.attr_index = None
 			return True
 		return False
 	
