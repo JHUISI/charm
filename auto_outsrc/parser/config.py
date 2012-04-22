@@ -7,7 +7,7 @@ blindingSuffix = "Blinded"
 setupFuncName = "setup"
 keygenBlindingExponent = "zz"
 keygenBlindingExponentType = "ZR"
-keygenFuncName = "extract"
+keygenFuncName = "keygen"
 
 encryptFuncName = "encrypt"
 
@@ -26,13 +26,20 @@ transformFileName = "transformOutsourcing_" + schemeName + pySuffix
 decOutFolderName = "../cppCompilation/"
 decOutFileName = "decOutOutsourcing_" + schemeName + cppSuffix
 #decOutFileName = "decOutOutsourcing_" + schemeName + pySuffix
+
+decOutObjFileName = "client_decout_" + schemeName
+
 userFuncsName = "userFuncs_" + schemeName
 userFuncsFileName = userFuncsName + pySuffix
 userFuncsCPPFileName = userFuncsName + cppHeaderSuffix
 outputSDLFileName = "outsourcedSDL_" + schemeName + pySuffix
+makefileFolderName = "../cppCompilation/"
+makefileFileName = "Makefile"
+makefileTemplateFileName = "../cppCompilation/Makefile_Template"
 
 errorFuncName = "userErrorFunction"
 errorFuncArgString = "userErrorFunctionArgString"
+errorFuncArgString_CPPType = "string"
 
 transformFunctionName = "transform"
 partialCT = "partCT"

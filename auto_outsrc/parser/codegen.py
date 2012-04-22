@@ -99,7 +99,7 @@ def addGroupObjGlobalVar():
 
     outputString = ""
     outputString += groupObjName + "UserFuncs = NULL\n\n"
-    userFuncsCPPFile.write(outputString)
+    #userFuncsCPPFile.write(outputString)
 
 def isFunctionStart(binNode):
     if (binNode.type != ops.BEGIN):
@@ -888,9 +888,12 @@ def writeErrorFunc_CPP(outputFile, binNode):
     if (errorFuncName not in userFuncsList_CPP):
         userFuncsList_CPP.append(errorFuncName)
         userFuncsOutputString = ""
-        userFuncsOutputString += "void " + errorFuncName + "(" + errorFuncArgString + ")\n"
+        userFuncsOutputString += "void " + errorFuncName + "("
+        userFuncsOutputString += makeTypeReplacementsForCPP(errorFuncArgString_CPPType) + " "
+        userFuncsOutputString += errorFuncArgString + ")\n"
         userFuncsOutputString += "{\n"
-        userFuncsOutputString += "\t" + userGlobalsFuncName + "();\n"
+        #userFuncsOutputString += "\t" + userGlobalsFuncName + "();\n"
+        userFuncsOutputString += "\tcout << " + errorFuncArgString + " << endl;\n"
         userFuncsOutputString += "\treturn;\n"
         userFuncsOutputString += "}\n\n"
         userFuncsCPPFile.write(userFuncsOutputString)
@@ -1466,7 +1469,21 @@ def addGetGlobalsToUserFuncs():
     outputString += "\t}\n"
     outputString += "}\n"
 
-    userFuncsCPPFile.write(outputString)
+    #userFuncsCPPFile.write(outputString)
+
+def generateMakefile():
+    makefile_FileObject = open(makefileFolderName + makefileFileName, 'w')
+
+    outputString = ""
+    outputString += "SDL_SRC := decOutOutsourcing_" + schemeName + "\n"
+    outputString += "NAME    := " + decOutObjFileName + "\n\n"
+
+    makefileTemplateLines = open(makefileTemplateFileName, 'r').readlines()
+    for line in makefileTemplateLines:
+        outputString += line
+
+    makefile_FileObject.write(outputString)
+    makefile_FileObject.close()
 
 def main(SDL_Scheme):
     global setupFile, transformFile, decOutFile, userFuncsFile, assignInfo, varNamesToFuncs_All
@@ -1511,6 +1528,8 @@ def main(SDL_Scheme):
     userFuncsFile.close()
     userFuncsCPPFile.close()
 
+    generateMakefile()
+
 if __name__ == "__main__":
     main(sys.argv[1])
     parseLinesOfCode(getLinesOfCode(), True)
@@ -1518,4 +1537,4 @@ if __name__ == "__main__":
     writeLinesOfCodeToFile(outputSDLFileName)
     #print("io vars:  ", getInputOutputVars())
     lll = getFinalVarType("gl#0", "setup")
-    print(str(lll))
+    #print(str(lll))

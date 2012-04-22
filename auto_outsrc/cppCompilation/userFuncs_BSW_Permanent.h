@@ -10,3 +10,4 @@ void userErrorFunction(string userErrorFunctionArgString)
 	cout << userErrorFunctionArgString << endl;
 	return;
 }
+

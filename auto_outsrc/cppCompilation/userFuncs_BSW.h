@@ -5,18 +5,9 @@
 using namespace std;
 #define DEBUG  true
 
-groupUserFuncs = NULL
-
-void userErrorFunction(userErrorFunctionArgString)
+void userErrorFunction(string userErrorFunctionArgString)
 {
-	getUserGlobals();
+	cout << userErrorFunctionArgString << endl;
 	return;
 }
 
-void getUserGlobals()
-{
-	if (groupUserFuncs == NULL)
-	{
-		PairingGroup groupUserFuncs(MNT160);
-	}
-}
