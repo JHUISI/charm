@@ -50,7 +50,8 @@ r#y := random(ZR)
 d#y := gb ^ r#y
 END :: for
 
-d0 := g0b * { prod{y := 1, j} on { (((g1b ^ Id#y) * hb#y) ^ r#y) }}
+d0DotProdCalc := { prod{y := 1, j} on { (((g1b ^ Id#y) * hb#y) ^ r#y) }}
+d0 := g0b * d0DotProdCalc
 pk := list{id, j}
 sk := list{d0, d}
 output := list{pk, sk}

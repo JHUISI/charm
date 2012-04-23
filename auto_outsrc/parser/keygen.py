@@ -154,7 +154,8 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
 
     if (keygenOutputElem not in varsModifiedInKeygen):
         SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + " := " + keygenOutputElem + "\n")
-        varsToBlindList.remove(keygenOutputElem)
+        if (keygenOutputElem in varsToBlindList):
+            varsToBlindList.remove(keygenOutputElem)
         lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, keygenOutputElem)
         replaceVarInstancesInLineNoRange(lineNoAfterThisAddition, getEndLineNoOfFunc(keygenFuncName), keygenOutputElem, (keygenOutputElem + blindingSuffix))
         return keygenOutputElem
