@@ -1,9 +1,12 @@
-from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair, MNT160, SymEnc, SymDec
+#from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair, MNT160, SymEnc, SymDec
+from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair
+
 from toolbox.secretutil import SecretUtil
 from charm.pairing import pairing
 from toolbox.iterate import dotprod2
 from charm.pairing import hash as DeriveKey
 from charm.engine.util import objectToBytes, bytesToObject
+from toolbox.symcrypto import AuthenticatedCryptoAbstraction
 
 groupObjBuiltInFuncs = None
 utilBuiltInFuncs = None
@@ -37,10 +40,10 @@ def calculateSharesDict(s, policy):
 	getUserGlobals()
 	return utilBuiltInFuncs.calculateSharesDict(s, policy)
 
-#def SymEnc(s_sesskey, M):
-	#getUserGlobals()
-	#cipher = AuthenticatedCryptoAbstraction(s_sesskey)
-	#return cipher.encrypt(M)
+def SymEnc(s_sesskey, M):
+	getUserGlobals()
+	cipher = AuthenticatedCryptoAbstraction(s_sesskey)
+	return cipher.encrypt(M)
 
 def prune(policy, S):
 	getUserGlobals()
@@ -52,16 +55,16 @@ def getCoefficients(policy):
 	utilBuiltInFuncs.getCoefficients(policy, z)
 	return z
 
-#def SymDec(s_sesskey, T1):
-	#getUserGlobals()
-	#cipher = AuthenticatedCryptoAbstraction(s_sesskey)
-	#return cipher.decrypt(T1)
+def SymDec(s_sesskey, T1):
+	getUserGlobals()
+	cipher = AuthenticatedCryptoAbstraction(s_sesskey)
+	return cipher.decrypt(T1)
 
 def getUserGlobals():
 	global groupObjBuiltInFuncs, utilBuiltInFuncs
 
 	if (groupObjBuiltInFuncs == None):
-		groupObjBuiltInFuncs = PairingGroup(MNT160)
+		groupObjBuiltInFuncs = PairingGroup('SS512')
 
 	if (utilBuiltInFuncs == None):
 		utilBuiltInFuncs = SecretUtil(groupObjBuiltInFuncs, verbose=False)
