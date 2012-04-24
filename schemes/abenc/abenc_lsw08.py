@@ -46,7 +46,7 @@ class KPabe(ABEnc):
     
     def keygen(self, pk, mk, policy_str):
         policy = util.createPolicy(policy_str)
-        attr_list = []; util.getAttributeList(policy, attr_list)
+        attr_list = util.getAttributeList(policy)
         
         s = mk['alpha1']; secret = s
         shares = util.calculateSharesDict(secret, policy)
@@ -96,10 +96,12 @@ class KPabe(ABEnc):
     
     def decrypt(self, E, D):
         policy = util.createPolicy(D['policy'])
-        attrs = util.prune(policy, E['attributes'])        
-        coeff = {}; util.getCoefficients(policy, coeff)
+        attrs = util.prune(policy, E['attributes'])
+        if attrs == False:
+            return False              
+        coeff = util.getCoefficients(policy)
         
-        Z = {}; prodT = group.init(GT, 1)
+        Z = {}; prodT = 1
         for i in range(len(attrs)):
             x = attrs[i].getAttribute()
             y = attrs[i].getAttributeAndIndex()

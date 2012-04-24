@@ -5,7 +5,7 @@ import random, string
 #from ec_cs98_enc import *
 from toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from toolbox.eccurve import prime192v1
-from schemes.pkenc_elgamal85 import *
+from schemes.pkenc.pkenc_elgamal85 import *
 from toolbox.PKEnc import PKEnc
 from charm.cryptobase import *
 from math import ceil

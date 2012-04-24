@@ -2,7 +2,7 @@ from toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from charm.cryptobase import *
 from charm.pairing import hash as sha1
 from math import ceil
-from schemes.dabe_aw11 import *
+from schemes.dabenc.dabe_aw11 import *
 from toolbox.ABEncMultiAuth import ABEncMultiAuth
 from toolbox.pairinggroup import *
 
@@ -66,7 +66,7 @@ def main():
     
     msg = 'Hello World, I am a sensitive record!'
     size = len(msg)
-    policy_str = "(jhmi.doctor OR (jhmi.researcher AND jhu.professor))"
+    policy_str = "(jhmi.doctor or (jhmi.researcher and jhu.professor))"
     ct = hyb_abema.encrypt(allAuthPK, gp, msg, policy_str)    
 
     if debug:

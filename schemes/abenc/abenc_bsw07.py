@@ -34,7 +34,7 @@ class CPabe_BSW07(ABEnc):
     @output(pk_t, mk_t)    
     def setup(self):
         g, gp = group.random(G1), group.random(G2)
-        alpha, beta = group.random(), group.random()
+        alpha, beta = group.random(ZR), group.random(ZR)
 
         h = g ** beta; f = g ** ~beta
         e_gg_alpha = pair(g, gp ** alpha)
@@ -60,8 +60,8 @@ class CPabe_BSW07(ABEnc):
     @output(ct_t)
     def encrypt(self, pk, M, policy_str): 
         policy = util.createPolicy(policy_str)
-        a_list = []; util.getAttributeList(policy, a_list)
-        s = group.random()
+        a_list = util.getAttributeList(policy)
+        s = group.random(ZR)
         shares = util.calculateSharesDict(s, policy)      
 
         C = pk['h'] ** s
@@ -79,9 +79,10 @@ class CPabe_BSW07(ABEnc):
     def decrypt(self, pk, sk, ct):
         policy = util.createPolicy(ct['policy'])
         pruned_list = util.prune(policy, sk['S'])
-        z = {}; util.getCoefficients(policy, z)
-
-        A = group.init(GT, 1) 
+        if pruned_list == False:
+            return False
+        z = util.getCoefficients(policy)
+        A = 1 
         for i in pruned_list:
             j = i.getAttributeAndIndex(); k = i.getAttribute()
             A *= ( pair(ct['Cy'][j], sk['Dj'][k]) / pair(sk['Djp'][k], ct['Cyp'][j]) ) ** z[j]

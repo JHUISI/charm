@@ -114,20 +114,19 @@ class Dabe(ABEncMultiAuth):
             C2[attr] = gp['g'] ** r_x
             C3[attr] = (pk[k_attr]['g^y_i'] ** r_x) * (gp['g'] ** w_share)
             
-        #plist = []
-        #util.getAttributeList(policy, plist)
-        return { 'C0':C0, 'C1':C1, 'C2':C2, 'C3':C3, 'policy':policy_str }  #'attributes':plist 
+        return { 'C0':C0, 'C1':C1, 'C2':C2, 'C3':C3, 'policy':policy_str }
 
     def decrypt(self, gp, sk, ct):
         '''Decrypt a ciphertext
         SK is the user's private key dictionary {attr: { xxx , xxx }}
         ''' 
-    
         usr_attribs = list(sk.keys())
         usr_attribs.remove('gid')
         policy = util.createPolicy(ct['policy'])
         pruned = util.prune(policy, usr_attribs)
-        coeffs = {}; util.getCoefficients(policy, coeffs)
+        if pruned == False:
+            return False        
+        coeffs = util.getCoefficients(policy)
     
         h_gid = gp['H'](sk['gid'])  #find H(GID)
         egg_s = group.init(GT, 1)

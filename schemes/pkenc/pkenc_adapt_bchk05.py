@@ -14,7 +14,7 @@ from charm.pairing import hash as sha1
 import hmac, hashlib, math
 from toolbox.IBEnc import *
 from schemes.encap_bchk05 import *
-from schemes.ibenc_bb03 import *
+from schemes.ibenc.ibenc_bb03 import *
 
 debug = False
 class BCHKIBEnc(IBEnc):

@@ -1,7 +1,7 @@
 from toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from toolbox.pairinggroup import *
 from charm.pairing import hash as sha1
-from schemes.ibenc_adapt_identityhash import *
+from schemes.ibenc.ibenc_adapt_identityhash import *
 from toolbox.IBEnc import *
 from charm.cryptobase import *
 from math import ceil

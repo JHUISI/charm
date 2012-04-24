@@ -1,14 +1,14 @@
 import string
 from toolbox.enum import *
 
-OpType = Enum('or', 'and', 'attr')
+OpType = Enum('OR', 'AND', 'ATTR', 'THRESHOLD', 'CONDITIONAL', 'NONE')
 
 class BinNode:
   def __init__(self, value, left=None, right=None):		
     #types of node
-    self.OR = 1
-    self.AND = 2
-    self.ATTR = 0
+#    self.OR = 1
+#    self.AND = 2
+#    self.ATTR = 0
     self.negated = False
     self.index   = None
     #OF = '' # anything above 1 and 2
@@ -20,18 +20,29 @@ class BinNode:
           val = value.split('_')
           self.index = int(val[1]) # index
           value = val[0]
-      self.type = self.ATTR
+      self.type = OpType.ATTR
       self.attribute = value.upper()      
       
-    elif(isinstance(value, int)):
-      self.type = self.OR if value == self.OR else self.AND
+    elif(value >= OpType.OR and value < OpType.NONE):
+      self.type = value
+      if self.type == OpType.OR:
+          self.threshold = 1
+      elif self.type == OpType.AND:
+          self.threshold = 2
+#      elif self.type == OpType.THRESHOLD: 
+      self.attribute = ''
+    else:
+      self.type = None
       self.attribute = ''
     
     self.left = left
     self.right = right
-
+  
+  def __repr__(self):
+      return str(self)
+  
   def __str__(self):
-    if(self.type == self.ATTR):
+    if(self.type == OpType.ATTR):
         if self.negated: prefix = '!'
         else: prefix = ''
         if self.index != None: postfix = '_' + str(self.index)
@@ -41,21 +52,21 @@ class BinNode:
       left = str(self.left)
       right = str(self.right)
       
-      if(self.type == self.OR):
+      if(self.type == OpType.OR):
         return ('('+ left + ' or ' + right + ')')
-      else:
+      elif(self.type == OpType.AND):
       	return ('(' + left + ' and ' + right + ')')
     return None
   
   def getAttribute(self):
-    if (self.type == self.ATTR):
+    if (self.type == OpType.ATTR):
         if self.negated: prefix = '!'
         else: prefix = ''        
         return prefix + self.attribute
     return
 
   def getAttributeAndIndex(self):
-    if (self.type == self.ATTR):
+    if (self.type == OpType.ATTR):
         if self.negated: prefix = '!'
         else: prefix = ''
         if self.index != None: postfix = '_' + str(self.index)

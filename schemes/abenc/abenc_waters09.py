@@ -49,7 +49,7 @@ class CPabe09(ABEnc):
     def encrypt(self, pk, M, policy_str):
         # Extract the attributes as a list
         policy = util.createPolicy(policy_str)        
-        p_list = []; util.getAttributeList(policy, p_list)
+        p_list = util.getAttributeList(policy)
         s = group.random()
         C_tilde = (pk['e(gg)^alpha'] ** s) * M
         C_0 = pk['g1'] ** s
@@ -71,7 +71,9 @@ class CPabe09(ABEnc):
     def decrypt(self, pk, sk, ct):
         policy = util.createPolicy(ct['policy'])
         pruned = util.prune(policy, sk['attributes'])
-        coeffs = {}; util.getCoefficients(policy, coeffs)
+        if pruned == False:
+            return False
+        coeffs = util.getCoefficients(policy)
         numerator = pair(ct['C0'], sk['K'])
         
         # create list for attributes in order...

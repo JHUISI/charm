@@ -1,7 +1,7 @@
 
-from charm.cryptobase import MODE_CBC,AES,selectPRP
+from charm.cryptobase import MODE_CBC,AES
 from toolbox.ABEnc import ABEnc
-from schemes.abenc_lsw08 import KPabe
+from schemes.abenc.abenc_lsw08 import KPabe
 from toolbox.pairinggroup import PairingGroup,GT
 from toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from charm.pairing import hash as sha1
@@ -11,7 +11,7 @@ from math import ceil
 debug = False
 class HybridABEnc(ABEnc):
     """
-    >>> groupObj = PairingGroup('../param/a.param')
+    >>> groupObj = PairingGroup('SS512')
     >>> kpabe = KPabe(groupObj)
     >>> hyb_abe = HybridABEnc(kpabe, groupObj)
     >>> access_policy =  ['ONE', 'TWO', 'THREE']

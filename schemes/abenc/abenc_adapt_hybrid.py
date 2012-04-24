@@ -1,7 +1,7 @@
 
 from charm.cryptobase import MODE_CBC,AES,selectPRP
 from toolbox.ABEnc import ABEnc
-from schemes.abenc_bsw07 import CPabe_BSW07
+from schemes.abenc.abenc_bsw07 import CPabe_BSW07
 from toolbox.pairinggroup import PairingGroup,GT
 from toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from charm.pairing import hash as sha1

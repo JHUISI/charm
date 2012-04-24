@@ -55,32 +55,36 @@ class SecretUtil:
 
         return secret
 
+    def getCoefficients(self, tree):
+        coeffs = {}
+        self._getCoefficientsDict(tree, coeffs)
+        return coeffs
     
-    def getCoefficients(self, tree, coeff_list, coeff=1):
+    def _getCoefficientsDict(self, tree, coeff_list, coeff=1):
         """recover coefficient over a binary tree where possible node types are OR = (1 of 2)
         and AND = (2 of 2) secret sharing. The leaf nodes are attributes and the coefficients are
         recorded in a coeff-list dictionary.""" 
         if tree:
             node = tree.getNodeType()
-            if(node == tree.AND):
+            if(node == OpType.AND):
                 this_coeff = self.recoverCoefficients([1,2])
                 # left child => coeff[1], right child => coeff[2]
-                self.getCoefficients(tree.getLeft(), coeff_list, coeff * this_coeff[1])
-                self.getCoefficients(tree.getRight(), coeff_list, coeff * this_coeff[2])
-            elif(node == tree.OR):
+                self._getCoefficientsDict(tree.getLeft(), coeff_list, coeff * this_coeff[1])
+                self._getCoefficientsDict(tree.getRight(), coeff_list, coeff * this_coeff[2])
+            elif(node == OpType.OR):
                 this_coeff = self.recoverCoefficients([1])
-                self.getCoefficients(tree.getLeft(), coeff_list, coeff * this_coeff[1])
-                self.getCoefficients(tree.getRight(), coeff_list, coeff * this_coeff[1])
-            elif(node == tree.ATTR):
+                self._getCoefficientsDict(tree.getLeft(), coeff_list, coeff * this_coeff[1])
+                self._getCoefficientsDict(tree.getRight(), coeff_list, coeff * this_coeff[1])
+            elif(node == OpType.ATTR):
                 attr = tree.getAttributeAndIndex()
                 coeff_list[ attr ] = coeff
             else:
                 return None
             
-    def calculateShares(self, secret, tree, _type=dict):
+    def _calculateShares(self, secret, tree, _type=dict):
         """performs secret sharing over a policy tree. could be adapted for LSSS matrices."""
         attr_list = []
-        self.compute_shares(secret, tree, attr_list)
+        self._compute_shares(secret, tree, attr_list)
         if _type == list:
             return attr_list
         else: # assume dict
@@ -92,12 +96,14 @@ class SecretUtil:
             return share
     
     def calculateSharesList(self, secret, tree):
-        return self.calculateShares(secret, tree, list)
+        """calculate shares from given secret and returns a list of shares."""        
+        return self._calculateShares(secret, tree, list)
     
     def calculateSharesDict(self, secret, tree):
-        return self.calculateShares(secret, tree, dict)
+        """calculate shares from given secret and returns a dict as {attribute:shares} pairs"""        
+        return self._calculateShares(secret, tree, dict)
     
-    def compute_shares(self, secret, subtree, List):
+    def _compute_shares(self, secret, subtree, List):
         """computes recursive secret sharing over the binary tree. Start by splitting 1-of-2 (OR) or 2-of-2 (AND nodes).
          Continues recursively down the tree doing a round of secret sharing at each boolean node type."""
         k = 0
@@ -105,23 +111,23 @@ class SecretUtil:
             return None
         
         type = subtree.getNodeType()
-        if(type == subtree.ATTR):
+        if(type == OpType.ATTR):
             # visiting a leaf node
 #            t = (subtree.getAttribute(), secret)
             t = (subtree, secret)
             List.append(t)
             return None
-        elif(type == subtree.OR):
-            k = 1 # 1-of-2
-        elif(type == subtree.AND):
-            k = 2 # 2-of-2
+        elif(type == OpType.OR or type == OpType.AND):
+            k = subtree.threshold # 1-of-2 or 2-of-2
+#        elif(type == OpType.AND):
+#            k = 2 # 2-of-2
         else:
             return None
         # generate shares for k and n        
         shares = self.genShares(secret, k, n=2)
         # recursively generate shares for children nodes
-        self.compute_shares(shares[1], subtree.getLeft(), List)
-        self.compute_shares(shares[2], subtree.getRight(), List)
+        self._compute_shares(shares[1], subtree.getLeft(), List)
+        self._compute_shares(shares[2], subtree.getRight(), List)
     
     def strip_index(self, node_str):
         if node_str.find('_') != -1: return node_str.split('_')[0]
@@ -144,16 +150,21 @@ class SecretUtil:
         parser = PolicyParser()        
         return parser.prune(policy, attributes)
     
-    def getAttributeList(self, Node, List):
+    def getAttributeList(self, Node):
+        aList = []
+        self._getAttributeList(Node, aList)
+        return aList
+            
+    def _getAttributeList(self, Node, List):
         """retrieve the attributes that occur in a policy tree in order (left to right)"""
         if(Node == None):
             return None
         # V, L, R
-        if(Node.getNodeType() == Node.ATTR):
+        if(Node.getNodeType() == OpType.ATTR):
             List.append(Node.getAttributeAndIndex()) # .getAttribute()
         else:
-            self.getAttributeList(Node.getLeft(), List)
-            self.getAttributeList(Node.getRight(), List)
+            self._getAttributeList(Node.getLeft(), List)
+            self._getAttributeList(Node.getRight(), List)
         return None
 
 # TODO: add test cases here for SecretUtil

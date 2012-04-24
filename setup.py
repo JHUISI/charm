@@ -68,12 +68,13 @@ setup(name = 'Charm-Crypto',
 	version =  _charm_version,
 	description = 'Charm is a framework for rapid prototyping of cryptosystems',
 	ext_modules = _ext_modules,
-	author = "J Ayo Akinyele",
+	author = "J. Ayo Akinyele",
 	author_email = "ayo.akinyele@charm-crypto.com",
 	url = "http://charm-crypto.com/",
 	packages = ['charm', 'toolbox', 'compiler', 'schemes'],
 	package_dir = {'charm': 'charm-src/charm'},
-    package_data = {'charm':['__init__.py', 'engine/*.py'], 'toolbox':['*.py'], 'compiler':['*.py'], 'schemes':['*.py'], 'param':['*.param']},
+        package_data = {'charm':['__init__.py', 'engine/*.py'], 'toolbox':['*.py'], 'compiler':['*.py'], 
+                        'schemes':['*.py', 'abenc/*.py', 'dabenc/*.py', 'ibenc/*.py', 'hibenc/*.py', 'grpsig/*.py', 'commit/*.py', 'pkenc/*.py', 'pksig/*.py']},
         license = 'GPL'
      )
 
