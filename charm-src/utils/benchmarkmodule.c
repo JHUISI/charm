@@ -12,10 +12,10 @@ double CalcUsecs(struct timeval *start, struct timeval *stop) {
 		result -= (start->tv_usec - stop->tv_usec);
 	}
 
-	if(result < 0) {
+//	if(result < 0) {
 //		printf("start secs => '%ld' and usecs => '%d'\n", start->tv_sec, start->tv_usec);
 //		printf("stop secs => '%ld' and usecs => '%d'\n", stop->tv_sec, stop->tv_usec);
-	}
+//	}
 
 	return result / usec_per_second;
 }
@@ -46,8 +46,6 @@ PyObject *Benchmark_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 // benchmark init
 int Benchmark_init(Benchmark *self, PyObject *args, PyObject *kwds) {
 
-	// static char *kwlist[] = {NULL};
-	// static Operations operations;
 	// initializing object
 	if(self->bench_initialized == FALSE) {
 		// self->bench_initialized = TRUE; not true until we StartBenchmark( ... )
@@ -256,11 +254,9 @@ static PyObject *_startBenchmark(Benchmark *self, PyObject *args) {
 static PyObject *_endBenchmark(Benchmark *self, PyObject *args) {
 	if(self->bench_initialized == TRUE) {
 		PyEndBenchmark(self);
-//		return Py_BuildValue("i", TRUE);
 		Py_RETURN_TRUE;
 	}
 	PyErr_SetString(BenchmarkError, "benchmark object not initialized.");
-//	return Py_BuildValue("i", FALSE);
 	Py_RETURN_FALSE;
 }
 
@@ -296,31 +292,21 @@ PyObject *_benchmark_print(Benchmark *self) {
 	return PyUnicode_FromString("");
 }
 
-PyObject *_get_results(Benchmark *self) {
+PyObject *GetResults(Benchmark *self) {
 	if(self != NULL) {
-		PyObject *results;
-		PyObject *cpu = PyFloat_FromDouble(self->cpu_time_ms);
-		PyObject *native = PyFloat_FromDouble(self->native_time_ms);
-		PyObject *real = PyFloat_FromDouble(self->real_time_ms);
-#if PY_MAJOR_VERSION >= 3
-		results = PyUnicode_FromFormat("<--- Results --->\nCPU Time:  %Sms\nReal Time: %Ss\nNative Time: %Ss\nAdd:\t%i\nSub:\t%i\nMul:\t%i\nDiv:\t%i\nExp:\t%i\nPair:\t%i\n",
-								cpu, real, native, self->op_add, self->op_sub, self->op_mult, self->op_div, self->op_exp, self->op_pair);
-#else
-		char cpu_buf[100];
-		char real_buf[100];
-		char native_buf[100];
-		PyFloat_AsString(cpu_buf, (PyFloatObject *) cpu);
-		PyFloat_AsString(real_buf, (PyFloatObject *) real);
-		PyFloat_AsString(native_buf, (PyFloatObject *) native);
-		results = PyString_FromFormat("<--- Results --->\nCPU Time:  %sms\n"
-									  "Real Time: %ss\nNative Time: %ss\n"
-									  "Add:\t%i\nSub:\t%i\nMul:\t%i\nDiv:\t%i\nExp:\t%i\nPair:\t%i\n",
-								cpu_buf, real_buf, native_buf,
-								self->op_add, self->op_sub, self->op_mult, self->op_div,
-								self->op_exp, self->op_pair);
-#endif
-		PyClearBenchmark(self); // wipe data
-		return results;
+		PyObject *resultDict = PyDict_New();
+		PyDict_SetItem(resultDict, Py_BuildValue("i", CPU_TIME), PyFloat_FromDouble(self->cpu_time_ms));
+		PyDict_SetItem(resultDict, Py_BuildValue("i", REAL_TIME), PyFloat_FromDouble(self->real_time_ms));
+		PyDict_SetItem(resultDict, Py_BuildValue("i", NATIVE_TIME), PyFloat_FromDouble(self->native_time_ms));
+		PyDict_SetItem(resultDict, Py_BuildValue("i", ADDITION), Py_BuildValue("i", self->op_add));
+		PyDict_SetItem(resultDict, Py_BuildValue("i", SUBTRACTION), Py_BuildValue("i", self->op_sub));
+		PyDict_SetItem(resultDict, Py_BuildValue("i", MULTIPLICATION), Py_BuildValue("i", self->op_mult));
+		PyDict_SetItem(resultDict, Py_BuildValue("i", DIVISION), Py_BuildValue("i", self->op_div));
+		PyDict_SetItem(resultDict, Py_BuildValue("i", EXPONENTIATION), Py_BuildValue("i", self->op_exp));
+		PyDict_SetItem(resultDict, Py_BuildValue("i", PAIRINGS), Py_BuildValue("i", self->op_pair));
+
+		PyClearBenchmark(self); // wipe benchmark data
+		return resultDict;
 	}
 
 	return PyUnicode_FromString("Benchmark object has not been initialized properly.");
@@ -334,21 +320,14 @@ PyObject *Retrieve_result(Benchmark *self, MeasureType option) {
 			case REAL_TIME:	result = PyFloat_FromDouble(self->real_time_ms); break;
 			case NATIVE_TIME: result = PyFloat_FromDouble(self->native_time_ms); break;
 			case CPU_TIME: result = PyFloat_FromDouble(self->cpu_time_ms); break;
-#if PY_MAJOR_VERSION >= 3
-			case ADDITION: 	result = PyLong_FromLong(self->op_add); break;
-			case SUBTRACTION:  	result = PyLong_FromLong(self->op_sub); break;
-			case MULTIPLICATION: result = PyLong_FromLong(self->op_mult); break;
-			case DIVISION:		 result = PyLong_FromLong(self->op_div); break;
-			case EXPONENTIATION: result = PyLong_FromLong(self->op_exp); break;
-			case PAIRINGS: 		 result = PyLong_FromLong(self->op_pair); break;
-#else
-			case ADDITION: 	result = PyInt_FromSize_t((size_t) self->op_add); break;
-			case SUBTRACTION:  	result = PyInt_FromSize_t((size_t) self->op_sub); break;
-			case MULTIPLICATION: result = PyInt_FromSize_t((size_t) self->op_mult); break;
-			case DIVISION:		 result = PyInt_FromSize_t((size_t) self->op_div); break;
-			case EXPONENTIATION: result = PyInt_FromSize_t((size_t) self->op_exp); break;
-			case PAIRINGS: 		 result = PyInt_FromSize_t((size_t) self->op_pair); break;
-#endif
+
+			case ADDITION: 	result = PyToLongObj(self->op_add); break;
+			case SUBTRACTION:  	result = PyToLongObj(self->op_sub); break;
+			case MULTIPLICATION: result = PyToLongObj(self->op_mult); break;
+			case DIVISION:		 result = PyToLongObj(self->op_div); break;
+			case EXPONENTIATION: result = PyToLongObj(self->op_exp); break;
+			case PAIRINGS: 		 result = PyToLongObj(self->op_pair); break;
+
 			default: debug("not a valid option.\n");
 					 break;
 		}
@@ -361,7 +340,7 @@ PyMethodDef Benchmark_methods[] = {
 //	{"InitBenchmark", (PyCFunction)_initBenchmark, METH_NOARGS, "Initialize the benchmark object with an identifier"}
 	{"StartBenchmark", (PyCFunction)_startBenchmark, METH_VARARGS, "Start a new benchmark with some options"},
 	{"EndBenchmark", (PyCFunction)_endBenchmark, METH_VARARGS, "End a given benchmark"},
-	{"GetResults", (PyCFunction)_get_results, METH_NOARGS, "Print results of benchmark object."},
+	{"GetGeneralBenchmarks", (PyCFunction)GetResults, METH_NOARGS, "Retrieve general benchmark info as a dictionary."},
 	{"UpdateBenchmark", (PyCFunction)_updateBenchmark, METH_VARARGS, "Update a given option counter for a benchmark object"},
 	{NULL}
 };

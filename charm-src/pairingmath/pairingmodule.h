@@ -169,6 +169,7 @@ void print_mpz(mpz_t x, int base);
 	if(op_var_type == SUBTRACTION && op_group_type == group)      \
 		((Operations *) bench_obj->data_ptr)->sub_ ##group += 1;
 
+// exponentiation
 #define Op_EXP(op_var_type, op_group_type, group, bench_obj)  \
 	if(op_var_type == EXPONENTIATION && op_group_type == group)      \
 		((Operations *) bench_obj->data_ptr)->exp_ ##group += 1;

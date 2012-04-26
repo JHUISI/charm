@@ -49,8 +49,8 @@ def getAllTestsSuite(unittestpaths):
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     #A list of all the directories to search
-    unittestpaths1 = ['toolbox/', 'schemes/']
-    unittestpaths2 = ['../toolbox/', '../schemes/']
+    unittestpaths1 = ['toolbox/', 'schemes/', 'schemes/abenc/']
+    unittestpaths2 = ['../toolbox/', '../schemes/', '../schemes/abenc/']
     
     if os.access("schemes/", os.R_OK):
         unittestpaths = unittestpaths1

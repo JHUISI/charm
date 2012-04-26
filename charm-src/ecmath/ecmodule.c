@@ -1556,6 +1556,7 @@ InitBenchmark_CAPI(_init_benchmark, dBench, 2)
 StartBenchmark_CAPI(_start_benchmark, dBench);
 EndBenchmark_CAPI(_end_benchmark, dBench);
 GetBenchmark_CAPI(_get_benchmark, dBench);
+GetAllBenchmarks_CAPI(_get_all_results, dBench);
 
 PyMemberDef ECElement_members[] = {
 	{"type", T_INT, offsetof(ECElement, type), 0,
@@ -1775,6 +1776,7 @@ static PyMethodDef ecc_methods[] = {
 		{"StartBenchmark", (PyCFunction)_start_benchmark, METH_VARARGS, "Start a new benchmark with some options"},
 		{"EndBenchmark", (PyCFunction)_end_benchmark, METH_VARARGS, "End a given benchmark"},
 		{"GetBenchmark", (PyCFunction)_get_benchmark, METH_VARARGS, "Returns contents of a benchmark object"},
+		{ "GetGeneralBenchmarks", (PyCFunction) _get_all_results, METH_VARARGS, "Retrieve general benchmark info as a dictionary."},
 		{NULL, NULL}
 };
 

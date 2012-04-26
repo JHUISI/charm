@@ -732,7 +732,7 @@ static PyObject *Element_add(Element *self, Element *other)
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_add(newObject->e, self->e, other->e);
 	STOP_CLOCK(dBench);
-	UPDATE_BENCHMARK(ADDITION, dBench);
+	if(newObject != NULL) UPDATE_BENCH(ADDITION, newObject->element_type, dBench);
 	return (PyObject *) newObject;
 }
 
@@ -759,7 +759,7 @@ static PyObject *Element_sub(Element *self, Element *other)
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_sub(newObject->e, self->e, other->e);		
 	STOP_CLOCK(dBench);
-	UPDATE_BENCHMARK(SUBTRACTION, dBench);
+	if(newObject != NULL) UPDATE_BENCH(SUBTRACTION, newObject->element_type, dBench);
 	return (PyObject *) newObject;
 }
 
@@ -840,9 +840,7 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 		return NULL;
 	}
 
-	if(newObject != NULL)
-		UPDATE_BENCH(MULTIPLICATION, newObject->element_type, dBench);
-//	UPDATE_BENCHMARK(MULTIPLICATION, dBench);
+	if(newObject != NULL) UPDATE_BENCH(MULTIPLICATION, newObject->element_type, dBench);
 	return (PyObject *) newObject;
 }
 
@@ -915,7 +913,7 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 		return NULL;
 	}
 
-	UPDATE_BENCHMARK(DIVISION, dBench);
+	if(newObject != NULL) UPDATE_BENCH(DIVISION, newObject->element_type, dBench);
 	return (PyObject *) newObject;
 }
 /*
@@ -1042,8 +1040,7 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 	}
 	
 	// STOP_CLOCK
-	if(newObject != NULL)
-		UPDATE_BENCH(EXPONENTIATION, newObject->element_type, dBench);
+	if(newObject != NULL) UPDATE_BENCH(EXPONENTIATION, newObject->element_type, dBench);
 	return (PyObject *) newObject;
 }
 
@@ -1871,6 +1868,7 @@ InitBenchmark_CAPI(_init_benchmark, dBench, BenchmarkIdentifier);
 StartBenchmark_CAPI(_start_benchmark, dBench);
 EndBenchmark_CAPI(_end_benchmark, dBench);
 GetBenchmark_CAPI(_get_benchmark, dBench);
+GetAllBenchmarks_CAPI(_get_all_results, dBench);
 
 // new
 #if PY_MAJOR_VERSION >= 3
@@ -2081,9 +2079,9 @@ PyMethodDef pairing_methods[] = {
 	{"InitBenchmark", (PyCFunction)_init_benchmark, METH_NOARGS, "Initialize a benchmark object"},
 	{"StartBenchmark", (PyCFunction)_start_benchmark, METH_VARARGS, "Start a new benchmark with some options"},
 	{"EndBenchmark", (PyCFunction)_end_benchmark, METH_VARARGS, "End a given benchmark"},
-	{"GetBenchmark", (PyCFunction)_get_benchmark, METH_VARARGS, "Returns contents of a benchmark object"}, // --> phase this out
-//	{"GeneralBenchmarks", (PyCFunction) General_benchmark, METH_VARARGS, "Retrieve general benchmark as a dictionary."}, // from benchmark
-	{"GetGranularBenchmarks", (PyCFunction) Granular_benchmark, METH_VARARGS, "Retrieve all benchmarks as a dictionary."}, // from pairing
+	{"GetBenchmark", (PyCFunction)_get_benchmark, METH_VARARGS, "Returns contents of a benchmark object"},
+	{"GetGeneralBenchmarks", (PyCFunction) _get_all_results, METH_VARARGS, "Retrieve general benchmark info as a dictionary"},
+	{"GetGranularBenchmarks", (PyCFunction) Granular_benchmark, METH_VARARGS, "Retrieve granular benchmarks as a dictionary"},
     {NULL}  /* Sentinel */
 };
 

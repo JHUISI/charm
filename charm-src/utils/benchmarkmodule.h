@@ -24,10 +24,13 @@ extern "C" {
 #if PY_MAJOR_VERSION >= 3
 	#define _PyLong_Check(o1) PyLong_Check(o1)
 	#define ConvertToInt(o) PyLong_AsLong(o)
+	#define PyToLongObj(o) PyLong_FromLong(o)
 #else
 	#define _PyLong_Check(o) (PyInt_Check(o) || PyLong_Check(o))
 	#define ConvertToInt(o) PyInt_AsLong(o)
+	#define PyToLongObj(o) PyInt_FromSize_t(o)
 #endif
+
 
 // define new benchmark type for benchmark module
 PyTypeObject BenchmarkType;
@@ -74,6 +77,7 @@ PyObject *Benchmark_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 void Benchmark_dealloc(Benchmark *self);
 int Benchmark_init(Benchmark *self, PyObject *args, PyObject *kwds);
 PyObject *Benchmark_print(Benchmark *self);
+PyObject *GetResults(Benchmark *self);
 PyObject *Retrieve_result(Benchmark *self, MeasureType option);
 
 /* c api functions */
@@ -160,7 +164,7 @@ static PyObject *func_name(PyObject *self, PyObject *args) {		\
 	Py_RETURN_FALSE;			}
 
 #define GetBenchmark_CAPI(func_name, bench)		\
-static PyObject *_get_benchmark(PyObject *self, PyObject *args) {	\
+static PyObject *func_name(PyObject *self, PyObject *args) {	\
 	int id = -1;													\
 	MeasureType option = NONE;										\
 	if(PyArg_ParseTuple(args, "i|i", &id, &option)) {					\
@@ -169,6 +173,14 @@ static PyObject *_get_benchmark(PyObject *self, PyObject *args) {	\
 		Py_RETURN_FALSE;	}										\
 	Py_RETURN_FALSE;	}
 
+#define GetAllBenchmarks_CAPI(func_name, bench)		\
+static PyObject *func_name(PyObject *self, PyObject *args) {		\
+	int id = -1;													\
+	if(PyArg_ParseTuple(args, "i", &id)) {							\
+		if(id == bench->identifier)									\
+			return GetResults(bench);									\
+		debug("Invalid benchmark idenifier.\n");		}			\
+	Py_RETURN_FALSE;			}
 
 
 /* end - api helper functions */
