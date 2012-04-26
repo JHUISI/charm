@@ -100,7 +100,7 @@ static int PyStartBenchmark(Benchmark *data, PyObject *opList, int opListSize)
 			PyObject *item = PyList_GetItem(opList, i);
 			if(!_PyLong_Check(item)) continue;
 			MeasureType option = ConvertToInt(item);
-			if(option >= 0 && option < NONE) {
+			if(option > 0 && option < NONE) {
 				data->options_selected[cnt] = option;
 				cnt++;
 				debug("Option '%d' selected...\n", option);
@@ -114,6 +114,7 @@ static int PyStartBenchmark(Benchmark *data, PyObject *opList, int opListSize)
 					case DIVISION:	data->op_div = 0; break;
 					case EXPONENTIATION: data->op_exp = 0; break;
 					case PAIRINGS: data->op_pair = 0; break;
+					case GRANULAR: data->granular_option = TRUE; data->gran_init(); break; // data->gran_init();
 					default: debug("not a valid option.\n");
 							 break;
 				}
@@ -160,6 +161,7 @@ static int PyEndBenchmark(Benchmark *data)
 				case DIVISION:	debug("div operations:\t\t%d\n", data->op_div); break;
 				case EXPONENTIATION: debug("exp operations:\t\t%d\n", data->op_exp); break;
 				case PAIRINGS: debug("pairing operations:\t\t%d\n", data->op_pair); break;
+				case GRANULAR: debug("disabling granular measurement option.\n"); data->granular_option = FALSE; break;
 				default: debug("not a valid option.\n"); break;
 			}
 		}
@@ -205,7 +207,8 @@ static int PyClearBenchmark(Benchmark *data) {
 	data->op_add = data->op_sub = data->op_mult = 0;
 	data->op_div = data->op_exp = data->op_pair = 0;
 	data->native_time_ms = data->cpu_time_ms = data->real_time_ms = 0.0;
-	data->native_option = data->cpu_option = data->real_option = FALSE;
+	data->native_option = data->cpu_option = data->real_option = data->granular_option = FALSE;
+	if(data->granular_option == FALSE) data->gran_init();
 	debug("Initialized benchmark object.\n");
 	return TRUE;
 }
@@ -316,7 +319,7 @@ PyObject *_get_results(Benchmark *self) {
 								self->op_add, self->op_sub, self->op_mult, self->op_div,
 								self->op_exp, self->op_pair);
 #endif
-		PyClearBenchmark(self);
+		PyClearBenchmark(self); // wipe data
 		return results;
 	}
 
@@ -352,12 +355,6 @@ PyObject *Retrieve_result(Benchmark *self, MeasureType option) {
 	}
 	return result;
 }
-
-
-// for attributes and what not
-//static PyMemberDef Benchmark_members[] = {
-//		{NULL}
-//};
 
 // benchmark object methods (object instance scope)
 PyMethodDef Benchmark_methods[] = {

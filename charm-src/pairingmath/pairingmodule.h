@@ -17,6 +17,7 @@
 //#define DEBUG	1
 //#define TRUE	1
 //#define FALSE	0
+#define BenchmarkIdentifier 1
 #define MAX_LEN 2048
 #define HASH_LEN 20
 #define MAX_BENCH_OBJECTS	2
@@ -78,7 +79,7 @@ typedef struct {
     PyObject_HEAD
 	char *params;
 	char *param_buf;
-//	pairing_ptr pairing;
+
 	Pairing *pairing;
 	element_t e;
 	GroupType element_type;
@@ -86,6 +87,14 @@ typedef struct {
 	int safe_pairing_clear;
 } Element;
 
+typedef struct {
+	int exp_ZR, exp_G1, exp_G2, exp_GT;
+	int mul_ZR, mul_G1, mul_G2, mul_GT;
+	int div_ZR, div_G1, div_G2, div_GT;
+	// optional
+	int add_ZR, add_G1, add_G2, add_GT;
+	int sub_ZR, sub_G1, sub_G2, sub_GT;
+} Operations;
 
 #define IS_PAIRING_OBJ_NULL(obj) \
 	if(obj->pairing == NULL) {	\
@@ -93,9 +102,7 @@ typedef struct {
 		return NULL;	\
 	}
 
-
 #define Check_Elements(o1, o2)  PyElement_Check(o1) && PyElement_Check(o2)
-
 #define Check_Types2(o1, o2, lhs_o1, rhs_o2, longLHS_o1, longRHS_o2)  \
 	if(PyElement_Check(o1)) { \
 		lhs_o1 = (Element *) o1; \
@@ -126,8 +133,6 @@ typedef struct {
 		PyErr_SetString(ElementError, "pairing object is NULL.");	\
 		return NULL;  }		\
 
-
-
 PyObject *Element_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int Element_init(Element *self, PyObject *args, PyObject *kwds);
 PyObject *Element_print(Element* self);
@@ -145,4 +150,63 @@ int sub_rule(GroupType lhs, GroupType rhs);
 int div_rule(GroupType lhs, GroupType rhs);
 int pair_rule(GroupType lhs, GroupType rhs);
 void print_mpz(mpz_t x, int base);
+
+// for multiplicative notation
+#define Op_MUL(op_var_type, op_group_type, group, bench_obj)  \
+	if(op_var_type == MULTIPLICATION && op_group_type == group)      \
+		((Operations *) bench_obj->data_ptr)->mul_ ##group += 1;
+
+#define Op_DIV(op_var_type, op_group_type, group, bench_obj)  \
+	if(op_var_type == DIVISION && op_group_type == group)      \
+		((Operations *) bench_obj->data_ptr)->div_ ##group += 1;
+
+// for additive notation
+#define Op_ADD(op_var_type, op_group_type, group, bench_obj)  \
+	if(op_var_type == ADDITION && op_group_type == group)      \
+		((Operations *) bench_obj->data_ptr)->add_ ##group += 1;
+
+#define Op_SUB(op_var_type, op_group_type, group, bench_obj)  \
+	if(op_var_type == SUBTRACTION && op_group_type == group)      \
+		((Operations *) bench_obj->data_ptr)->sub_ ##group += 1;
+
+#define Op_EXP(op_var_type, op_group_type, group, bench_obj)  \
+	if(op_var_type == EXPONENTIATION && op_group_type == group)      \
+		((Operations *) bench_obj->data_ptr)->exp_ ##group += 1;
+
+#define Update_Op(name, op_type, elem_type, bench_obj)	\
+	Op_ ##name(op_type, elem_type, ZR, bench_obj)	\
+	Op_ ##name(op_type, elem_type, G1, bench_obj)	\
+	Op_ ##name(op_type, elem_type, G2, bench_obj)	\
+	Op_ ##name(op_type, elem_type, GT, bench_obj)	\
+
+#define UPDATE_BENCH(op_type, elem_type, bench_obj) \
+	if(bench_obj->granular_option && elem_type >= ZR && elem_type <= GT) {		\
+		Update_Op(MUL, op_type, elem_type, bench_obj) \
+		Update_Op(DIV, op_type, elem_type, bench_obj) \
+		Update_Op(ADD, op_type, elem_type, bench_obj) \
+		Update_Op(SUB, op_type, elem_type, bench_obj) \
+		Update_Op(EXP, op_type, elem_type, bench_obj) \
+	}		\
+	UPDATE_BENCHMARK(op_type, bench_obj);
+
+#define CLEAR_ALLDBENCH(bench_obj)  \
+	    CLEAR_DBENCH(bench_obj, ZR);	\
+	    CLEAR_DBENCH(bench_obj, G1);	\
+	    CLEAR_DBENCH(bench_obj, G2);	\
+	    CLEAR_DBENCH(bench_obj, GT);	\
+
+#define CLEAR_DBENCH(bench_obj, group)   \
+	((Operations *) bench_obj->data_ptr)->mul_ ##group = 0;	\
+	((Operations *) bench_obj->data_ptr)->exp_ ##group = 0;	\
+	((Operations *) bench_obj->data_ptr)->div_ ##group = 0;	\
+	((Operations *) bench_obj->data_ptr)->add_ ##group = 0;	\
+	((Operations *) bench_obj->data_ptr)->sub_ ##group = 0;	\
+
+#define GetField(count, type, group, bench_obj)  \
+	if(type == MULTIPLICATION) count = (((Operations *) bench_obj->data_ptr)->mul_ ##group ); \
+	else if(type == DIVISION) count = (((Operations *) bench_obj->data_ptr)->div_ ##group );	\
+	else if(type == ADDITION) count = (((Operations *) bench_obj->data_ptr)->add_ ##group ); \
+	else if(type == SUBTRACTION) count = (((Operations *) bench_obj->data_ptr)->sub_ ##group ); \
+	else if(type == EXPONENTIATION) count = (((Operations *) bench_obj->data_ptr)->exp_ ##group );
+
 #endif

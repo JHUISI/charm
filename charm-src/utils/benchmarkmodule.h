@@ -37,7 +37,7 @@ PyObject *BenchmarkError;
 #define PyBenchmark_Check(obj) PyObject_TypeCheck(obj, &BenchmarkType)
 /* header file for benchmark module */
 #define MAX_MEASURE 10
-enum Measure {CPU_TIME = 0, REAL_TIME, NATIVE_TIME, ADDITION, SUBTRACTION, MULTIPLICATION, DIVISION, EXPONENTIATION, PAIRINGS, NONE};
+enum Measure {CPU_TIME = 0, REAL_TIME, NATIVE_TIME, ADDITION, SUBTRACTION, MULTIPLICATION, DIVISION, EXPONENTIATION, PAIRINGS, GRANULAR, NONE};
 typedef enum Measure MeasureType;
 
 // for recording native time
@@ -54,7 +54,7 @@ if(object->native_option) { \
 typedef struct {
 	PyObject_HEAD
 	int identifier;
-//	time_t start_time, stop_time; // track real time
+
 	struct timeval start_time, stop_time, native_time; // track real time
 	clock_t start_clock, stop_clock; // track cpu time
 	// Operations *op_ptr; // track various operations
@@ -63,8 +63,10 @@ typedef struct {
 	double native_time_ms, cpu_time_ms, real_time_ms;
 	int num_options; // track num options for a particular benchmark
 	MeasureType options_selected[MAX_MEASURE]; // measurement options selected
-	int cpu_option, native_option, real_option;
+	int cpu_option, native_option, real_option, granular_option;
 	int bench_initialized;
+	void *data_ptr;
+	void (*gran_init)();
 } Benchmark;
 
 // PyMethodDef Benchmark_methods[];

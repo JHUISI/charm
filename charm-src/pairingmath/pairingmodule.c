@@ -635,6 +635,12 @@ PyObject *Element_print(Element* self)
 	memset(tmp, 0, MAX_LEN);
 	size_t max = MAX_LEN;
 	debug("Contents of element object\n");
+
+//	Operations *c = (Operations *) dBench->data_ptr;
+////	printf("Ptr: '%p'\n", dBench->data_ptr);
+//	printf("Mul Cnt in G1: '%d'\n", c->mul_G1);
+//	printf("Exp Cnt in G1: '%d'\n", c->exp_G1);
+
 	if(self->elem_initialized) {
 		element_snprintf(tmp, max, "%B", self->e);
 		strObj = PyUnicode_FromString((const char *) tmp);
@@ -834,7 +840,9 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 		return NULL;
 	}
 
-	UPDATE_BENCHMARK(MULTIPLICATION, dBench);
+	if(newObject != NULL)
+		UPDATE_BENCH(MULTIPLICATION, newObject->element_type, dBench);
+//	UPDATE_BENCHMARK(MULTIPLICATION, dBench);
 	return (PyObject *) newObject;
 }
 
@@ -1034,7 +1042,8 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 	}
 	
 	// STOP_CLOCK
-	UPDATE_BENCHMARK(EXPONENTIATION, dBench);
+	if(newObject != NULL)
+		UPDATE_BENCH(EXPONENTIATION, newObject->element_type, dBench);
 	return (PyObject *) newObject;
 }
 
@@ -1724,6 +1733,51 @@ static PyObject *Get_Order(Element *self, PyObject *args) {
 	return NULL; /* most likely invalid */
 }
 
+void Operations_clear()
+{
+	CLEAR_ALLDBENCH(dBench);
+}
+
+PyObject *PyCreateList(MeasureType type)
+{
+//	int groupTypes = 4;
+	int count;
+	PyObject *objList = PyList_New(0);
+	// Insert backwards from GT -> G2 -> G1 -> ZR
+	GetField(count, type, GT, dBench);
+	PyList_Insert(objList, 0, Py_BuildValue("i", count));
+	GetField(count, type, G2, dBench);
+	PyList_Insert(objList, 0, Py_BuildValue("i", count));
+	GetField(count, type, G1, dBench);
+	PyList_Insert(objList, 0, Py_BuildValue("i", count));
+	GetField(count, type, ZR, dBench);
+	PyList_Insert(objList, 0, Py_BuildValue("i", count));
+
+	return objList;
+}
+
+static PyObject *Granular_benchmark(PyObject *self, PyObject *args)
+{
+	PyObject *dict = NULL;
+	int id = -1;
+
+	if(!PyArg_ParseTuple(args, "i", &id)) {
+		PyErr_SetString(ElementError, "invalid benchmark identifier.");
+		return NULL;
+	}
+
+	if(id == BenchmarkIdentifier) {
+		dict = PyDict_New();
+		PyDict_SetItem(dict, Py_BuildValue("i", MULTIPLICATION), PyCreateList(MULTIPLICATION));
+		PyDict_SetItem(dict, Py_BuildValue("i", DIVISION), PyCreateList(DIVISION));
+		PyDict_SetItem(dict, Py_BuildValue("i", ADDITION), PyCreateList(ADDITION));
+		PyDict_SetItem(dict, Py_BuildValue("i", SUBTRACTION), PyCreateList(SUBTRACTION));
+		PyDict_SetItem(dict, Py_BuildValue("i", EXPONENTIATION), PyCreateList(EXPONENTIATION));
+	}
+
+	return dict;
+}
+
 #if PY_MAJOR_VERSION >= 3
 
 PyTypeObject PairingType = {
@@ -1811,10 +1865,12 @@ PyTypeObject PairingType = {
 };
 
 #endif
-InitBenchmark_CAPI(_init_benchmark, dBench, 1)
-StartBenchmark_CAPI(_start_benchmark, dBench)
-EndBenchmark_CAPI(_end_benchmark, dBench)
-GetBenchmark_CAPI(_get_benchmark, dBench)
+
+// Benchmark methods
+InitBenchmark_CAPI(_init_benchmark, dBench, BenchmarkIdentifier);
+StartBenchmark_CAPI(_start_benchmark, dBench);
+EndBenchmark_CAPI(_end_benchmark, dBench);
+GetBenchmark_CAPI(_get_benchmark, dBench);
 
 // new
 #if PY_MAJOR_VERSION >= 3
@@ -2025,7 +2081,9 @@ PyMethodDef pairing_methods[] = {
 	{"InitBenchmark", (PyCFunction)_init_benchmark, METH_NOARGS, "Initialize a benchmark object"},
 	{"StartBenchmark", (PyCFunction)_start_benchmark, METH_VARARGS, "Start a new benchmark with some options"},
 	{"EndBenchmark", (PyCFunction)_end_benchmark, METH_VARARGS, "End a given benchmark"},
-	{"GetBenchmark", (PyCFunction)_get_benchmark, METH_VARARGS, "Returns contents of a benchmark object"},
+	{"GetBenchmark", (PyCFunction)_get_benchmark, METH_VARARGS, "Returns contents of a benchmark object"}, // --> phase this out
+//	{"GeneralBenchmarks", (PyCFunction) General_benchmark, METH_VARARGS, "Retrieve general benchmark as a dictionary."}, // from benchmark
+	{"GetGranularBenchmarks", (PyCFunction) Granular_benchmark, METH_VARARGS, "Retrieve all benchmarks as a dictionary."}, // from pairing
     {NULL}  /* Sentinel */
 };
 
@@ -2042,16 +2100,23 @@ static int pairings_clear(PyObject *m) {
 	return 0;
 }
 
+static int pairings_free(PyObject *m) {
+	Operations *c = (Operations *) dBench->data_ptr;
+	free(c);
+	dBench->data_ptr = NULL;
+	return 0;
+}
+
 static struct PyModuleDef moduledef = {
-		PyModuleDef_HEAD_INIT,
-		"pairing",
-		NULL,
-		sizeof(struct module_state),
-		pairing_methods,
-		NULL,
-		pairings_traverse,
-		pairings_clear,
-		NULL
+	PyModuleDef_HEAD_INIT,
+	"pairing",
+	NULL,
+	sizeof(struct module_state),
+	pairing_methods,
+	NULL,
+	pairings_traverse,
+	(inquiry) pairings_clear,
+	(freefunc) pairings_free
 };
 
 #define INITERROR return NULL
@@ -2091,6 +2156,15 @@ void initpairing(void) 		{
     dBench = st->dBench;
     dBench->bench_initialized = FALSE;
 
+    Operations *cntr = (Operations *) malloc(sizeof(Operations));
+    dBench->data_ptr = (void *) cntr;
+    dBench->gran_init = &Operations_clear;
+//    CLEAR_ALLDBENCH(dBench);
+
+//  cntr->exp_ZR = 5;
+//	printf("Ptr: '%p'\n", dBench->data_ptr);
+//	printf("exp_ZR: '%d'\n", cntr->exp_ZR);
+
     Py_INCREF(&PairingType);
     PyModule_AddObject(m, "params", (PyObject *)&PairingType);
     Py_INCREF(&ElementType);
@@ -2110,6 +2184,7 @@ void initpairing(void) 		{
 	PyModule_AddIntConstant(m, "Div", DIVISION);
 	PyModule_AddIntConstant(m, "Exp", EXPONENTIATION);
 	PyModule_AddIntConstant(m, "Pair", PAIRINGS);
+	PyModule_AddIntConstant(m, "Granular", GRANULAR);
 #if PY_MAJOR_VERSION >= 3
 	return m;
 #endif
