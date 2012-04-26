@@ -4,20 +4,22 @@ from charm.integer import randomBits,bitsize,integer
 import os.path
 
 class PairingGroup():
-    def __init__(self, param_file, secparam=512, verbose=False):        
+    def __init__(self, param_id, param_file=False, secparam=512):        
         #legacy handler to handle calls that still pass in a file path
-        if type(param_file) == str:
-          pair = params.get(param_file)
-          assert pair != None, "'%s' not recognized! See 'pairingcurves.py' in toolbox." % param_file
-          self.Pairing = pairing(string=pair)
-          self.param = param_file
-        elif type(param_file) == int:
+        if param_file:
+          self.Pairing = pairing(file=param_id)
+        elif type(param_id) == str:
+          pairID = params.get(param_id)
+          assert pairID != None, "'%s' not recognized! See 'pairingcurves.py' in toolbox." % param_file
+          self.Pairing = pairing(string=pairID)
+          self.param = param_id
+        elif type(param_id) == int:
             # support for MIRACL initialization : default arg := MNT160
-          self.Pairing = pairing(param_file)
-          self.param   = param_file
+          self.Pairing = pairing(param_id)
+          self.param   = param_id
  
         self.secparam = secparam # number of bits
-        self._verbose = verbose
+        self._verbose = False
 
     # will be used to define curve parameters and such
     def paramgen(self, qbits, rbits):

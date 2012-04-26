@@ -495,7 +495,7 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 	size_t b_len = 0;
 	int seed = -1;
 	
-    static char *kwlist[] = {"params", "n", "qbits", "rbits", "short", "string", "seed", NULL};
+    static char *kwlist[] = {"file", "n", "qbits", "rbits", "short", "string", "seed", NULL};
 	
     if (! PyArg_ParseTupleAndKeywords(args, kwds, "|sOiiOs#i", kwlist,
                                       &self->params, &n, &qbits, &rbits, &short_val, &param_buf2, &b_len, &seed)) {
