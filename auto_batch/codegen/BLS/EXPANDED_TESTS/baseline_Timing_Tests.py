@@ -13,7 +13,7 @@ lenRepeatSuffix = len(repeatSuffix)
 
 trials = 1
 time_in_ms = 1000
-NUM_PROGRAM_ITERATIONS = 100
+NUM_PROGRAM_ITERATIONS = 10
 NUM_CYCLES = 100
 
 def loadDictDataFromFile(verifyParamFilesDict, groupParamArg):
@@ -90,16 +90,11 @@ if __name__ == '__main__':
 		batchResultsTimes[initIndex] = {}
 		indResultsTimes[initIndex] = {}
 
-	batchOutputFile = open(batchResultsFile, 'w')
-	indOutputFile = open(indResultsFile, 'w')
-
 	for programIteration in range(0, NUM_PROGRAM_ITERATIONS):
 
 		print("program iteration ", programIteration)
 
 		for cycle in range(0, NUM_CYCLES):
-
-			print("\tcycle number ", cycle)
 
 			sigsDict = {}
 			loadDataFromDictInMemory(validDict, 0, (cycle+1), sigsDict, 0)
@@ -112,12 +107,9 @@ if __name__ == '__main__':
 			result = (endTime - startTime) * time_in_ms
 
 			if (incorrectSigIndices != []):
-				print(incorrectSigIndices)
 				sys.exit("Batch verification returned invalid signatures.")
 
-			batchResultsTimes = ( float(result) / float(cycle+1) )
-			currentBatchOutputString = str(batchResultsTimes) + ","
-			batchOutputFile.write(currentBatchOutputString)
+			batchResultsTimes[programIteration][cycle] = ( float(result) / float(cycle+1) )
 
 			startTime = time.clock()
 			incorrectSigIndices = run_Ind(sigsDict, groupParamArg, verifyFuncArgs)
@@ -128,12 +120,17 @@ if __name__ == '__main__':
 			if (incorrectSigIndices != []):
 				sys.exit("Ind. verification returned invalid signatures.")
 
-			indResultsTimes = ( float(result) / float(cycle+1) )
-			currentIndOutputString = str(indResultsTimes) + ","
-			indOutputFile.write(currentIndOutputString)
+			indResultsTimes[programIteration][cycle] = ( float(result) / float(cycle+1) )
 
-		batchOutputFile.write("\n")
-		indOutputFile.write("\n")
+	batchResultsString = getResults(batchResultsTimes)
+	indResultsString = getResults(indResultsTimes)
 
-	batchOutputFile.close()
-	indOutputFile.close()
+	outputFile = open(batchResultsFile, 'w')
+	outputFile.write(batchResultsString)
+	outputFile.close()
+	del outputFile
+
+	outputFile = open(indResultsFile, 'w')
+	outputFile.write(indResultsString)
+	outputFile.close()
+	del outputFile
