@@ -465,6 +465,7 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
     if (! PyArg_ParseTupleAndKeywords(args, kwds, "|iss#", kwlist,
                                       &aes_sec, &params, &param_string, &b_len)) {
     	PyErr_SetString(ElementError, "invalid arguments");
+    	init_failed = TRUE;
         return -1; 
 	}
 
@@ -473,6 +474,7 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 		pairing->pair_obj = pairing_init(aes_sec);
 		pairing->order    = order(pairing->pair_obj);
 		pairing->curve	  = MNT; // only supported at this point
+		init_failed 	  = FALSE;
     }
 
 	self->pairing = pairing;
@@ -2110,7 +2112,8 @@ static int pairings_clear(PyObject *m) {
 }
 
 static int pairings_free(PyObject *m) {
-	miracl_clean();
+	if(init_failed == FALSE)
+		miracl_clean(); // mirsys was called
 	return 0;
 }
 
