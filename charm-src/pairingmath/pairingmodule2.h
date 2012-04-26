@@ -38,7 +38,7 @@
 #define debug_e(...)
 #endif
 
-int init_failed;
+int pairing_init_finished;
 PyTypeObject ElementType;
 PyTypeObject PairingType;
 static PyObject *ElementError;
