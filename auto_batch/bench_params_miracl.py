@@ -30,6 +30,7 @@ def mul_in_grp(group, grpChoice):
 
     EndBenchmark(bID1)
     result = (GetBenchmark(bID1, RealTime) / trials) * time_in_ms
+    ClearBenchmark(bID1)
     return result
 
 def exp_in_grp(group, grpChoice):
@@ -42,6 +43,7 @@ def exp_in_grp(group, grpChoice):
 
     EndBenchmark(bID2)
     result = (GetBenchmark(bID2, RealTime) / trials) * time_in_ms
+    ClearBenchmark(bID2)
     return result
 
 def hash_in_grp(group, grpChoice):
@@ -54,6 +56,7 @@ def hash_in_grp(group, grpChoice):
         res = _hash(m, _grp)
     EndBenchmark(bID3)
     result = (GetBenchmark(bID3, RealTime) / trials) * time_in_ms
+    ClearBenchmark(bID3)
     return result
 
 def prng_bits(group, bits=80):
@@ -63,6 +66,7 @@ def prng_bits(group, bits=80):
         a = group.init(ZR, randomBits(bits))
     EndBenchmark(bID4)
     result = (GetBenchmark(bID4, RealTime) / trials) * time_in_ms
+    ClearBenchmark(bID4)
     return result
 
 def bench(param):
@@ -77,6 +81,8 @@ def bench(param):
     EndBenchmark(bID)
 
     curve[param]['pair'] = (GetBenchmark(bID, RealTime) / trials) * time_in_ms
+    ClearBenchmark(bID)
+
     
     for i in ['G1', 'G2', 'GT']:
         curve[param]['mul'][i] = mul_in_grp(group, i)        
