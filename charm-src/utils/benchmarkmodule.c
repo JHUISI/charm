@@ -159,7 +159,7 @@ static int PyEndBenchmark(Benchmark *data)
 				case DIVISION:	debug("div operations:\t\t%d\n", data->op_div); break;
 				case EXPONENTIATION: debug("exp operations:\t\t%d\n", data->op_exp); break;
 				case PAIRINGS: debug("pairing operations:\t\t%d\n", data->op_pair); break;
-				case GRANULAR: debug("disabling granular measurement option.\n"); data->granular_option = FALSE; break;
+				case GRANULAR: debug("disabling granular measurement option.\n"); break;
 				default: debug("not a valid option.\n"); break;
 			}
 		}
@@ -205,8 +205,8 @@ static int PyClearBenchmark(Benchmark *data) {
 	data->op_add = data->op_sub = data->op_mult = 0;
 	data->op_div = data->op_exp = data->op_pair = 0;
 	data->native_time_ms = data->cpu_time_ms = data->real_time_ms = 0.0;
+	if(data->granular_option == TRUE) data->gran_init();
 	data->native_option = data->cpu_option = data->real_option = data->granular_option = FALSE;
-	if(data->granular_option == FALSE) data->gran_init();
 	debug("Initialized benchmark object.\n");
 	return TRUE;
 }
@@ -305,7 +305,7 @@ PyObject *GetResults(Benchmark *self) {
 		PyDict_SetItem(resultDict, Py_BuildValue("i", EXPONENTIATION), Py_BuildValue("i", self->op_exp));
 		PyDict_SetItem(resultDict, Py_BuildValue("i", PAIRINGS), Py_BuildValue("i", self->op_pair));
 
-		PyClearBenchmark(self); // wipe benchmark data
+//		PyClearBenchmark(self); // wipe benchmark data
 		return resultDict;
 	}
 

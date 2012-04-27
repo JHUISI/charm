@@ -1721,10 +1721,11 @@ PyTypeObject PairingType = {
 };
 
 #endif
-InitBenchmark_CAPI(_init_benchmark, dBench, 1)
-StartBenchmark_CAPI(_start_benchmark, dBench)
-EndBenchmark_CAPI(_end_benchmark, dBench)
-GetBenchmark_CAPI(_get_benchmark, dBench)
+InitBenchmark_CAPI(_init_benchmark, dBench, 1);
+StartBenchmark_CAPI(_start_benchmark, dBench);
+EndBenchmark_CAPI(_end_benchmark, dBench);
+GetBenchmark_CAPI(_get_benchmark, dBench);
+ClearBenchmarks_CAPI(_clear_benchmark, dBench);
 
 // new
 #if PY_MAJOR_VERSION >= 3
@@ -1939,6 +1940,7 @@ PyMethodDef pairing_methods[] = {
 	{"StartBenchmark", (PyCFunction)_start_benchmark, METH_VARARGS, "Start a new benchmark with some options"},
 	{"EndBenchmark", (PyCFunction)_end_benchmark, METH_VARARGS, "End a given benchmark"},
 	{"GetBenchmark", (PyCFunction)_get_benchmark, METH_VARARGS, "Returns contents of a benchmark object"},
+	{"ClearBenchmark", (PyCFunction)_clear_benchmark, METH_VARARGS, "Clears content of benchmark object"},
     {NULL}  /* Sentinel */
 };
 

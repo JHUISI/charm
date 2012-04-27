@@ -1869,6 +1869,7 @@ StartBenchmark_CAPI(_start_benchmark, dBench);
 EndBenchmark_CAPI(_end_benchmark, dBench);
 GetBenchmark_CAPI(_get_benchmark, dBench);
 GetAllBenchmarks_CAPI(_get_all_results, dBench);
+ClearBenchmarks_CAPI(_clear_benchmark, dBench);
 
 // new
 #if PY_MAJOR_VERSION >= 3
@@ -2082,6 +2083,7 @@ PyMethodDef pairing_methods[] = {
 	{"GetBenchmark", (PyCFunction)_get_benchmark, METH_VARARGS, "Returns contents of a benchmark object"},
 	{"GetGeneralBenchmarks", (PyCFunction) _get_all_results, METH_VARARGS, "Retrieve general benchmark info as a dictionary"},
 	{"GetGranularBenchmarks", (PyCFunction) Granular_benchmark, METH_VARARGS, "Retrieve granular benchmarks as a dictionary"},
+	{"ClearBenchmark", (PyCFunction)_clear_benchmark, METH_VARARGS, "Clears content of benchmark object"},
     {NULL}  /* Sentinel */
 };
 

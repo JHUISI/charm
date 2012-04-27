@@ -131,7 +131,6 @@ static void **PyBenchmark_API;
 #define InitBenchmark_CAPI(func_name, bench, id)   \
 static PyObject *func_name(PyObject *self, PyObject *args) {  \
 	if(bench->bench_initialized == FALSE) {   						\
-		PyClearBenchmark(bench);									\
 		bench->bench_initialized = TRUE;							\
 		bench->identifier = id;										\
 		debug("Initialized benchmark object.\n");					\
@@ -179,6 +178,16 @@ static PyObject *func_name(PyObject *self, PyObject *args) {		\
 	if(PyArg_ParseTuple(args, "i", &id)) {							\
 		if(id == bench->identifier)									\
 			return GetResults(bench);									\
+		debug("Invalid benchmark idenifier.\n");		}			\
+	Py_RETURN_FALSE;			}
+
+#define ClearBenchmarks_CAPI(func_name, bench)		\
+static PyObject *func_name(PyObject *self, PyObject *args) {		\
+	int id = -1;													\
+	if(PyArg_ParseTuple(args, "i", &id)) {							\
+		if(id == bench->identifier)	{								\
+			PyClearBenchmark(bench);									\
+			Py_RETURN_TRUE;    } 	\
 		debug("Invalid benchmark idenifier.\n");		}			\
 	Py_RETURN_FALSE;			}
 
