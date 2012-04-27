@@ -2010,6 +2010,7 @@ void initpairing(void) 		{
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);
     dBench = st->dBench;
     dBench->bench_initialized = FALSE;
+    InitClear(dBench);
 
     Py_INCREF(&PairingType);
     PyModule_AddObject(m, "params", (PyObject *)&PairingType);

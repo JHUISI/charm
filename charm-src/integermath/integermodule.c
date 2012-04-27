@@ -1708,6 +1708,7 @@ StartBenchmark_CAPI( _start_benchmark, dBench);
 EndBenchmark_CAPI( _end_benchmark, dBench);
 GetBenchmark_CAPI( _get_benchmark, dBench);
 GetAllBenchmarks_CAPI(_get_all_results, dBench);
+ClearBenchmarks_CAPI(_clear_benchmark, dBench);
 
 PyMethodDef Integer_methods[] = {
 	{ "set", (PyCFunction) Integer_set, METH_VARARGS, "initialize with another integer object." },
@@ -1916,6 +1917,7 @@ static PyMethodDef module_methods[] = {
 	{ "EndBenchmark", (PyCFunction) _end_benchmark, METH_VARARGS, "End a given benchmark" },
 	{ "GetBenchmark", (PyCFunction) _get_benchmark, METH_VARARGS, "Returns contents of a benchmark object" },
 	{ "GetGeneralBenchmarks", (PyCFunction) _get_all_results, METH_VARARGS, "Retrieve general benchmark info as a dictionary."},
+	{ "ClearBenchmark", (PyCFunction)_clear_benchmark, METH_VARARGS, "Clears content of benchmark object"},
 	{ "int2Bytes", (PyCFunction) toBytes, METH_O, "convert an integer object to a bytes object." },
 	{ NULL, NULL }
 };
@@ -1975,6 +1977,7 @@ void initinteger(void) {
 	st->dBench = PyObject_New(Benchmark, &BenchmarkType);
 	dBench = st->dBench;
 	dBench->bench_initialized = FALSE;
+	InitClear(dBench);
 	IntegerError = st->error;
 
 	Py_INCREF(&IntegerType);

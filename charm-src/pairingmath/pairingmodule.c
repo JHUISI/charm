@@ -2157,13 +2157,10 @@ void initpairing(void) 		{
     dBench->bench_initialized = FALSE;
 
     Operations *cntr = (Operations *) malloc(sizeof(Operations));
-    dBench->data_ptr = (void *) cntr;
-    dBench->gran_init = &Operations_clear;
-//    CLEAR_ALLDBENCH(dBench);
-
-//  cntr->exp_ZR = 5;
-//	printf("Ptr: '%p'\n", dBench->data_ptr);
-//	printf("exp_ZR: '%d'\n", cntr->exp_ZR);
+    dBench->data_ptr = (void *) cntr; // store data structure
+    dBench->gran_init = &Operations_clear; // pointer to clearing the structure memory
+    CLEAR_ALLDBENCH(dBench);
+    InitClear(dBench);
 
     Py_INCREF(&PairingType);
     PyModule_AddObject(m, "params", (PyObject *)&PairingType);

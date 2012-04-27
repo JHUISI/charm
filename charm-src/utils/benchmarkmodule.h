@@ -192,6 +192,13 @@ static PyObject *func_name(PyObject *self, PyObject *args) {		\
 	Py_RETURN_FALSE;			}
 
 
+#define InitClear(bench)  \
+	bench->bench_initialized = FALSE; \
+	bench->op_add = bench->op_sub = bench->op_mult = 0;	\
+	bench->op_div = bench->op_exp = bench->op_pair = 0; \
+	bench->native_time_ms = bench->cpu_time_ms = bench->real_time_ms = 0.0;
+
+
 /* end - api helper functions */
 
 static int import_benchmark(void)

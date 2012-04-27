@@ -1557,6 +1557,7 @@ StartBenchmark_CAPI(_start_benchmark, dBench);
 EndBenchmark_CAPI(_end_benchmark, dBench);
 GetBenchmark_CAPI(_get_benchmark, dBench);
 GetAllBenchmarks_CAPI(_get_all_results, dBench);
+ClearBenchmarks_CAPI(_clear_benchmark, dBench);
 
 PyMemberDef ECElement_members[] = {
 	{"type", T_INT, offsetof(ECElement, type), 0,
@@ -1567,18 +1568,7 @@ PyMemberDef ECElement_members[] = {
 };
 
 PyMethodDef ECElement_methods[] = {
-//		{"init", (PyCFunction)ECE_init, METH_VARARGS, "Create an element in a specific group G or ZR."},
-//		{"random", (PyCFunction)ECE_random, METH_VARARGS, "Return a random element in a specific group G or ZR."},
-//		{"order", (PyCFunction)ECE_getOrder, METH_NOARGS, "Return the order of a group."},
-//		{"getGenerator", (PyCFunction)ECE_getGen, METH_NOARGS, "Get the generator of the group."},
 		{"isInf", (PyCFunction)ECE_is_infinity, METH_NOARGS, "Checks whether a point is at infinity."},
-//		{"bitsize", (PyCFunction)ECE_bitsize, METH_NOARGS, "Returns number of bytes to represent a message."},
-//		{"serialize", (PyCFunction)Serialize, METH_VARARGS, "Serialize an element to a string"},
-//		{"deserialize", (PyCFunction)Deserialize, METH_VARARGS, "Deserialize an element to G or ZR"},
-//		{"hash", (PyCFunction)ECE_hash, METH_VARARGS, "Perform a hash of a string to a group element of G."},
-//		{"encode", (PyCFunction)ECE_encode, METH_VARARGS, "Encode string as a group element of G"},
-//		{"decode", (PyCFunction)ECE_decode, METH_VARARGS, "Decode group element to a string."},
-//		{"getXY", (PyCFunction)ECE_convertToZR, METH_VARARGS, "Returns the x and/or y coordinates of point on an elliptic curve."},
 		{NULL}
 };
 
@@ -1776,7 +1766,8 @@ static PyMethodDef ecc_methods[] = {
 		{"StartBenchmark", (PyCFunction)_start_benchmark, METH_VARARGS, "Start a new benchmark with some options"},
 		{"EndBenchmark", (PyCFunction)_end_benchmark, METH_VARARGS, "End a given benchmark"},
 		{"GetBenchmark", (PyCFunction)_get_benchmark, METH_VARARGS, "Returns contents of a benchmark object"},
-		{ "GetGeneralBenchmarks", (PyCFunction) _get_all_results, METH_VARARGS, "Retrieve general benchmark info as a dictionary."},
+		{"GetGeneralBenchmarks", (PyCFunction) _get_all_results, METH_VARARGS, "Retrieve general benchmark info as a dictionary."},
+		{"ClearBenchmark", (PyCFunction)_clear_benchmark, METH_VARARGS, "Clears content of benchmark object"},
 		{NULL, NULL}
 };
 
@@ -1838,13 +1829,13 @@ void initecc(void) 		{
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);
     dBench = st->dBench;
     dBench->bench_initialized = FALSE;
+    InitClear(dBench);
 
 	Py_INCREF(&ECType);
 	PyModule_AddObject(module, "ecc", (PyObject *)&ECType);
 	PyModule_AddIntConstant(module, "G", G);
 	PyModule_AddIntConstant(module, "ZR", ZR);
 	PyECErrorObject = st->error;
-//	PyObject *d = PyModule_GetDict(module);
 
 	PyModule_AddIntConstant(module, "CpuTime", CPU_TIME);
 	PyModule_AddIntConstant(module, "RealTime", REAL_TIME);
