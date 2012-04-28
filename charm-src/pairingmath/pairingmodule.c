@@ -2103,7 +2103,6 @@ static int pairings_clear(PyObject *m) {
 static int pairings_free(PyObject *m) {
 	Operations *c = (Operations *) dBench->data_ptr;
 	free(c);
-	dBench->data_ptr = NULL;
 	return 0;
 }
 

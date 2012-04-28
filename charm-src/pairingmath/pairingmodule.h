@@ -181,7 +181,7 @@ void print_mpz(mpz_t x, int base);
 	Op_ ##name(op_type, elem_type, GT, bench_obj)	\
 
 #define UPDATE_BENCH(op_type, elem_type, bench_obj) \
-	if(bench_obj->granular_option && elem_type >= ZR && elem_type <= GT) {		\
+	if(bench_obj->granular_option == TRUE && elem_type >= ZR && elem_type <= GT) {		\
 		Update_Op(MUL, op_type, elem_type, bench_obj) \
 		Update_Op(DIV, op_type, elem_type, bench_obj) \
 		Update_Op(ADD, op_type, elem_type, bench_obj) \

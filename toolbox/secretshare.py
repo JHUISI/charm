@@ -50,8 +50,6 @@ class SecretShare:
             for j in list:
                 if not (i == j):
                     # lagrange basis poly
-                    print("0 - j :=", 0 - j)
-                    print("i - j :=", i - j)
                     result *= (0 - j) / (i - j)
             if self.verbose: print("coeff '%d' => '%s'" % (i, result))
             coeff[i] = result

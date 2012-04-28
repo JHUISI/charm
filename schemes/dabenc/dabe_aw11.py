@@ -142,7 +142,7 @@ class Dabe(ABEncMultiAuth):
         return ct['C0'] / egg_s
 
 def main():
-    groupObj = PairingGroup('SS512', verbose=True)
+    groupObj = PairingGroup('SS512')
 
     dabe = Dabe(groupObj)
     GP = dabe.setup()

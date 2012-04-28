@@ -1,6 +1,6 @@
 from charm.pairing import *
 from toolbox.pairingcurves import params
-from charm.integer import randomBits,bitsize,integer
+#from charm.integer import randomBits,bitsize,integer
 import os.path
 
 class PairingGroup():
@@ -10,7 +10,7 @@ class PairingGroup():
           self.Pairing = pairing(file=param_id)
         elif type(param_id) == str:
           pairID = params.get(param_id)
-          assert pairID != None, "'%s' not recognized! See 'pairingcurves.py' in toolbox." % param_file
+          assert pairID != None, "'%s' not recognized! See 'pairingcurves.py' in toolbox." % param_id
           self.Pairing = pairing(string=pairID)
           self.param = param_id
         elif type(param_id) == int:
@@ -25,12 +25,12 @@ class PairingGroup():
     def paramgen(self, qbits, rbits):
         return None
 
-    def validSize(self, value):
-        size = bitsize(value)
-        if size <= self.messageSize():
-            return True
-        print("ERROR: max len => %s, input len => %s" % (self.messageSize(), size))
-        return False
+#    def validSize(self, value):
+#        size = bitsize(value)
+#        if size <= self.messageSize():
+#            return True
+#        print("ERROR: max len => %s, input len => %s" % (self.messageSize(), size))
+#        return False
 
     def ismember(self, obj):
         if type(obj) in [set, tuple, list]:
@@ -71,7 +71,7 @@ class PairingGroup():
                 return tuple([random(self.Pairing, type) for i in range(count)])                
             return random(self.Pairing, type)
         else:
-            return integer(randomBits(self.secparam))
+            return #integer(randomBits(self.secparam))
 
         
     def __randomGT(self):
