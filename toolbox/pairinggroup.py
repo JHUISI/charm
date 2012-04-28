@@ -1,6 +1,5 @@
 from charm.pairing import *
 from toolbox.pairingcurves import params
-#from charm.integer import randomBits,bitsize,integer
 import os.path
 
 class PairingGroup():
@@ -24,13 +23,6 @@ class PairingGroup():
     # will be used to define curve parameters and such
     def paramgen(self, qbits, rbits):
         return None
-
-#    def validSize(self, value):
-#        size = bitsize(value)
-#        if size <= self.messageSize():
-#            return True
-#        print("ERROR: max len => %s, input len => %s" % (self.messageSize(), size))
-#        return False
 
     def ismember(self, obj):
         if type(obj) in [set, tuple, list]:
@@ -70,8 +62,7 @@ class PairingGroup():
             elif count > 1:
                 return tuple([random(self.Pairing, type) for i in range(count)])                
             return random(self.Pairing, type)
-        else:
-            return #integer(randomBits(self.secparam))
+	return None
 
         
     def __randomGT(self):

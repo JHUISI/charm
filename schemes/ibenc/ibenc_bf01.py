@@ -11,8 +11,10 @@ Boneh-Franklin Identity Based Encryption
 
 :Authors:    J. Ayo Akinyele
 :Date:       2/2011
+:Status:     BROKEN
 '''
 from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
+from charm.integer import randomBits,integer,bitsize
 from toolbox.hash_module import Hash,int2Bytes,integer
 from toolbox.IBEnc import IBEnc
 
@@ -20,13 +22,12 @@ debug = False
 class IBE_BonehFranklin(IBEnc):
     def __init__(self, groupObj):
         IBEnc.__init__(self)
-        global group,h,ZN
+        global group,h
         group = groupObj
         h = Hash('sha1', group)
-        ZN = -1
         
     def setup(self):
-        s, P = group.random(), group.random(G2)
+        s, P = group.random(ZR), group.random(G2)
         P2 = s * P
         # choose H1, H2 hash functions
         pk = { 'P':P, 'P2':P2 }
@@ -51,11 +52,11 @@ class IBE_BonehFranklin(IBEnc):
         Q_id = group.hash(ID, G1) #standard
         g_id = pair(Q_id, pk['P2']) 
         #choose sig = {0,1}^n where n is # bits
-        sig = group.random(ZN)
+        sig = integer(randomBits(group.secparam))
         r = h.hashToZr(sig, M)
 
         enc_M = self.encodeToZn(M)
-        if group.validSize(enc_M):
+        if bitsize(enc_M) <= group.messageSize():
             C = { 'U':r * pk['P'], 'V':sig ^ h.hashToZn(g_id ** r) , 'W':enc_M ^ h.hashToZn(sig) }
         else:
             print("Message cannot be encoded.")
@@ -100,12 +101,12 @@ class IBE_BonehFranklin(IBEnc):
      
 
 def main():
-    groupObj = PairingGroup('MNT224', 1024)    
+    groupObj = PairingGroup('MNT224', secparam=1024)    
     ibe = IBE_BonehFranklin(groupObj)
     
     (pk, sk) = ibe.setup()
     
-    id = 'ayo@email.com'
+    id = 'user@email.com'
     key = ibe.extract(sk, id)
     
     m = "hello world!!!!!"
