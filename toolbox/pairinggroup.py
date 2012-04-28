@@ -62,7 +62,7 @@ class PairingGroup():
             elif count > 1:
                 return tuple([random(self.Pairing, type) for i in range(count)])                
             return random(self.Pairing, type)
-	return None
+        return None
 
         
     def __randomGT(self):
