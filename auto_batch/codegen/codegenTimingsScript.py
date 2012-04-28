@@ -4,6 +4,7 @@ from AutoBatch_CodeGen_FOR_TIMING_MSMTS import *
 schemeNames = ["Boyen", "ChCh_Hess", "VRF", "CL", "HW_Single", "HW_Different", "Waters09"]
 extension = ".dat"
 numIterations = 100
+time_in_ms = 1000
 
 def buildSchemesDetails():
 	schemesDetails = {}
@@ -39,11 +40,24 @@ def buildSchemesDetails():
 	schemesDetails["CL"][4] = "ARCHIVE/clBAT.py"
 	schemesDetails["CL"][5] = "ARCHIVE/clVER.py"
 
-	schemesDetails["HW_Different"][0] = "HW_DIFF/
+	schemesDetails["HW_Different"][0] = "HW_DIFF/pksig_hw.py"
+	schemesDetails["HW_Different"][1] = "HW_DIFF/batchOutput"
+	schemesDetails["HW_Different"][2] = "garbageValue"
+	schemesDetails["HW_Different"][3] = "ARCHIVE/hwdiffIND.py"
+	schemesDetails["HW_Different"][4] = "ARCHIVE/hwdiffBAT.py"
+	schemesDetails["HW_Different"][5] = "ARCHIVE/hwdiffVER.py"
+
+	schemesDetails["Waters09"][0] = "WATERS09/pksig_waters09_mod.py"
+	schemesDetails["Waters09"][1] = "WATERS09/batchOutput"
+	schemesDetails["Waters09"][2] = "garbageValue"
+	schemesDetails["Waters09"][3] = "ARCHIVE/waters09IND.py"
+	schemesDetails["Waters09"][4] = "ARCHIVE/waters09BAT.py"
+	schemesDetails["Waters09"][5] = "ARCHIVE/waters09VER.py"
 
 	return schemesDetails
 
 def processOneIteration(schemeName, schemesDetails):
+	startTime = time.clock()
 	dddddd
 
 def processIndScheme(prefixName, schemeName, schemesDetails):
@@ -61,7 +75,8 @@ def main(prefixName):
 	schemesDetails = buildSchemesDetails()
 
 	for schemeName in schemeNames:
-		processIndScheme(prefixName, schemeName, schemesDetails)
+		if (schemeName != "HW_Single"):
+			processIndScheme(prefixName, schemeName, schemesDetails)
 
 if __name__ == '__main__':
 	if ( (len(sys.argv) != 2) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
