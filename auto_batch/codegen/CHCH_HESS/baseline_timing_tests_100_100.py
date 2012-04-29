@@ -13,7 +13,7 @@ lenRepeatSuffix = len(repeatSuffix)
 
 trials = 1
 time_in_ms = 1000
-NUM_PROGRAM_ITERATIONS = 100
+NUM_PROGRAM_ITERATIONS = 30
 NUM_CYCLES = 100
 
 def loadDictDataFromFile(verifyParamFilesDict, groupParamArg):
@@ -95,11 +95,11 @@ if __name__ == '__main__':
 
 	for programIteration in range(0, NUM_PROGRAM_ITERATIONS):
 
-		print("program iteration ", programIteration)
+		#print("program iteration ", programIteration)
 
 		for cycle in range(0, NUM_CYCLES):
 
-			print("\tcycle number ", cycle)
+			#print("\tcycle number ", cycle)
 
 			sigsDict = {}
 			loadDataFromDictInMemory(validDict, 0, (cycle+1), sigsDict, 0)
