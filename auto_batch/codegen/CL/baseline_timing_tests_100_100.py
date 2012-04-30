@@ -13,7 +13,7 @@ lenRepeatSuffix = len(repeatSuffix)
 
 trials = 1
 time_in_ms = 1000
-NUM_PROGRAM_ITERATIONS = 100
+NUM_PROGRAM_ITERATIONS = 50
 NUM_CYCLES = 100
 
 def loadDictDataFromFile(verifyParamFilesDict, groupParamArg):
