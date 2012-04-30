@@ -9,7 +9,7 @@ from math import *
 
 messageSize = 100
 numSigs = 100
-numProgramIterations = 30
+numProgramIterations = 40
 
 M_index = 1
 sig_index = 2
