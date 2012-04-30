@@ -9,7 +9,7 @@ from math import *
 
 messageSize = 100
 numSigs = 100
-numProgramIterations = 100
+numProgramIterations = 30
 
 M_index = 1
 sig_index = 2
@@ -137,10 +137,10 @@ if __name__ == "__main__":
 
 	for programIteration in range(0, numProgramIterations):
 
-		print("program iteration " + str(programIteration))
+		#print("program iteration " + str(programIteration))
 
 		for numSigs in range(0, N):
-			print("cycle number:  " + str(numSigs))
+			#print("cycle number:  " + str(numSigs))
 
 			dict = {}
 			msgListInd = []
