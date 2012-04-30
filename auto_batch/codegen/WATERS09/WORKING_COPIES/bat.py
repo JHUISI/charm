@@ -79,10 +79,15 @@ def run_Batch(verifyArgsDict, groupObjParam, verifyFuncArgs):
 		dotG[z] =   sig6 **( delta [ z ] * s2 )  
 		dotH[z] =   sig7 **( delta [ z ] * s1 )  
 		dotI[z] =   sig7 **( delta [ z ] * s2 )  
-		dotJ[z] =  ( sig7 **(( delta [ z ] * -t ) +(( theta * delta [ z ] ) *( tagc * t ) ) ) )  
+		dotJ[z] =  ( sig7 **( delta [ z ] * -t ) * sig7 **(( theta * delta [ z ] ) *( tagc * t ) ) )  
 		dotK[z] =   sig7 **(( theta * delta [ z ] ) *( M * t ) )  
 		dotL[z] =   sig7 **(( theta * delta [ z ] ) * t )  
-		dotM[z] =   sigK **( -t *( theta * delta [ z ] ) )  
+		#dotM[z] =   sigK **( t *( -theta * -delta [ z ] ) )
+
+
+		dotM[z] =   sigK **( -t *( theta * delta [ z ] ) )
+
+  
 		sumN[z] =  ( s2 * delta [ z ] )  
 
 	verifySigsRecursive(verifyArgsDict, group, incorrectIndices, 0, N, A, delta, dotA, dotB, dotC, dotD, dotE, dotF, dotG, dotH, dotI, dotJ, dotK, dotL, dotM, sumN)
