@@ -8,6 +8,8 @@ S2h := G1
 S1c := G1; S2c := G1
 pk := G1
 ah := ZR; ac := ZR
+P := G2
+g2 := G2
 END :: types
 
 BEGIN :: precompute

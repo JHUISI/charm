@@ -204,7 +204,9 @@ class LatexCodeGenerator:
             elif(node.type == ops.MUL):
                 return ( left + ' \cdot ' + right)
             elif(node.type == ops.ADD):
-                return ("("+ left + '' + right + ")")
+                return ("("+ left + ' + ' + right + ")")
+            elif(node.type == ops.SUB):
+                return ("("+ left + ' - ' + right + ")")
             elif(node.type == ops.EQ):
                 return (left + ' = ' + str(int(right) + 1)) 
             elif(node.type == ops.EQ_TST):
