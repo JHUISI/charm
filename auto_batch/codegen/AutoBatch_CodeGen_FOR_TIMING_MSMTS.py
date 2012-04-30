@@ -3440,7 +3440,58 @@ def mainFunctionForTimings(sysArg1, sysArg2, sysArg3, sysArg4, sysArg5, sysArg6)
 	global numTabsOnVerifyLine, batchVerifierOutput, finalBatchEq, finalBatchEqWithLoops, listVars, numSpacesPerTab, lineInfo
 	global loopBlocksForCachedCalculations, loopBlocksForNonCachedCalculations, lineNosPerVar
 	global lineNoOfFirstFunction, globalVars, var_varDependencies, functionArgNames, functionNames
-	global verifySigsFileName, checkBlocks, codeGenRanges
+	global verifySigsFileName, checkBlocks, codeGenRanges, batchEqLoopVars, batchEqNotLoopVars
+	global batchEqVars, cachedCalcsToPassToDC, loopInfo, loopNamesOfFinalBatchEq, loopsOuterNumSignatures
+	global loopsOuterNotNumSignatures, loopVarGroupTypes, nonLoopCachedVars, precomputeVars, sortVars
+	global verifyNumSignersLine, verifySigsInitCall, verifyPrereqs
+
+	batchEqLoopVars = {}
+	batchEqNotLoopVars = {}
+	batchEqVars = {}
+	batchVerFile = None
+	batchVerifierOutput = None
+	cachedCalcsToPassToDC = []
+	callListOfVerifyFuncs = None
+	checkBlocks = None
+	codeGenRanges = None
+	finalBatchEq = []
+	finalBatchEqWithLoops = []
+	functionArgMappings = None
+	functionArgNames = None
+	functionNames = None
+	globalVars = []
+	indentationListVerifyLines = None
+	individualVerFile = None
+	lineInfo = None
+	lineNoOfFirstFunction = None
+	lineNosPerVar = None
+	loopBlocksForCachedCalculations = []
+	loopBlocksForNonCachedCalculations = []
+	loopInfo = []
+	loopNamesOfFinalBatchEq = []
+	loopsOuterNumSignatures = []
+	loopsOuterNotNumSignatures = []
+	linePairsOfVerifyFuncs = None
+	listVars = {}
+	loopVarGroupTypes = {}
+	nonLoopCachedVars = []
+	numSpacesPerTab = None
+	numTabsOnVerifyLine = None
+	precomputeVars = []
+	pythonCodeLines = None
+	pythonCodeNode = None
+	sortVars = []
+	var_varDependencies = None
+	varAssignments = None
+	verifyEqNode = None
+	verifyFuncArgs = None
+	verifyFuncNode = None
+	verifyLines = None
+	verifyNumSignersLine = None
+	verifySigsFile = None
+	verifySigsFileName = None
+	verifySigsInitCall = None
+	verifyPrereqs = None
 
 	try:
 		pythonCodeLines = open(pythonCodeArg, 'r').readlines()

@@ -4,6 +4,7 @@ from AutoBatch_CodeGen_FOR_TIMING_MSMTS import *
 schemeNames = ["Boyen", "ChCh_Hess", "VRF", "CL", "HW_Single", "HW_Different", "Waters09"]
 extension = ".dat"
 numIterations = 100
+numArgsToCodegen = 6
 time_in_ms = 1000
 
 def buildSchemesDetails():
@@ -56,16 +57,27 @@ def buildSchemesDetails():
 
 	return schemesDetails
 
-def processOneIteration(schemeName, schemesDetails):
+def processOneIteration(argsDict):
 	startTime = time.clock()
-	dddddd
+	mainFunctionForTimings(argsDict[0], argsDict[1], argsDict[2], argsDict[3], argsDict[4], argsDict[5])
+	endTime = time.clock()
+
+	result = (endTime - startTime) * time_in_ms
+
+	outputString = ""
+	outputString += str(result) + ","
+	return outputString
 
 def processIndScheme(prefixName, schemeName, schemesDetails):
 	outputFile = open(prefixName + "_" + schemeName + extension, 'w')
 	outputString = ""
 
-	for iteration in numIterations:
-		outputString += processOneIteration(schemeName, schemesDetails)
+	argsDict = {}
+	for index in range(0, numArgsToCodegen):
+		argsDict[index] = schemesDetails[schemeName][index]
+
+	for iteration in range(0, numIterations):
+		outputString += processOneIteration(argsDict)
 
 	outputFile.write(outputString)
 	outputFile.close()
