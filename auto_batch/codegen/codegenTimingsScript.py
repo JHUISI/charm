@@ -4,8 +4,8 @@ from AutoBatch_CodeGen_FOR_TIMING_MSMTS import *
 
 # NOTE: CHP, HESS, CHCH, WATERS05, CYH and BBS give this error: "SubscriptName->setValue: value passed in is of None type."
 schemeNames = ["BLS", "Boyen", "ChCh_Hess", "VRF", "CL", "HW_Single", "HW_Different", "Waters09", "CHP", "HESS", "CHCH", "WATERS", "CYH", "BBS"]
-extensionCG = "codegen.dat"
-extensionBT = "batcher.dat"
+extensionCG = "_codegen.dat"
+extensionBT = "_batcher.dat"
 numIterations = 100
 numArgsToCodegen = 6
 time_in_ms = 1000
