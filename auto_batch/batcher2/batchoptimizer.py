@@ -472,7 +472,7 @@ class SubstitutePairs2:
             return batchtechniques.AbstractTechnique.createMul(subtree1, subtree2)
         elif Type(subtree1) == Type(subtree2) and Type(subtree1) == ops.EXP:
             if str(subtree1.left) == str(subtree2.left):
-                print("Found EXP node bases that match: ", subtree1, subtree2)
+                # print("Found EXP node bases that match: ", subtree1, subtree2)
                 # this is for the situation where the bases are the same
                 # e.g., g^x * g^y => g^(x + y)
                 addNode = BinaryNode(ops.ADD)
