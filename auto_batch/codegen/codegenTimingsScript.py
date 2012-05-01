@@ -71,9 +71,9 @@ def buildSchemesDetails():
 	return schemesDetails
 
 def processOneIterationForCodegen(argsDict):
+	print("Call: ", argsDict)
 	startTime = time.clock()
 	# calling codegen
-	print("Call: ", argsDict)
 	mainFunctionForTimings(argsDict[0], argsDict[1], argsDict[2], argsDict[3], argsDict[4], argsDict[5])
 	endTime = time.clock()
 
@@ -84,6 +84,7 @@ def processOneIterationForCodegen(argsDict):
 	return outputString
 
 def processOneIterationForBatcher(argsDict):
+	print("Call: ", argsDict)
 	startTime = time.clock()
 	# calling batcher
 	Batcher(argsDict)
@@ -127,7 +128,7 @@ def main(prefixName):
 	for schemeName in schemeNames:
 		if (schemeName != "HW_Single"):
 			# run batcher first
-			#processIndSchemeBT(prefixName, schemeName, schemesDetails)
+			processIndSchemeBT(prefixName, schemeName, schemesDetails)
 			# then, run codegen 
 			processIndSchemeCG(prefixName, schemeName, schemesDetails)
 
