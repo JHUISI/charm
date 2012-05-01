@@ -25,7 +25,7 @@ def buildSchemesDetails():
 	schemesDetails["CHP"]["batcher"] = ["batchverify.py", "../tests/chp.bv", "-b", "-c", "-p"]
 
 	# Hess
-	schemesDetails["HESS"]["codegen"] = ["HESS/pksig_hess.py", "HESS/batchOutputHESS", "garbageValue", "tmp/hessIND.py", "tmp/hessBAT.py", "tmp/hessIND.py"] 
+	schemesDetails["HESS"]["codegen"] = ["HESS/pksig_hess.py", "HESS/batchOutputHess", "garbageValue", "tmp/hessIND.py", "tmp/hessBAT.py", "tmp/hessIND.py"] 
 	schemesDetails["HESS"]["batcher"] = ["batchverify.py", "../tests/hess.bv", "-b", "-c", "-p"]
 
 	# ChCh
