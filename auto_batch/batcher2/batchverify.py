@@ -3,6 +3,7 @@
 # and message. Finally, an optional transform section to describe the specific order in which
 # to apply the techniques 2, 3a, 3b and 4.
 
+import sys
 from batchtechniques import *
 from batchproof import *
 from batchorder import BatchOrder
@@ -24,6 +25,7 @@ THRESHOLD_FLAG = CODEGEN_FLAG = PROOFGEN_FLAG = PRECOMP_CHECK = VERBOSE = CHOOSE
 TEST_STATEMENT = False
 global_count   = 0
 flags = { 'multiple':None }
+filePrefix = None
 
 def handleVerifyEq(equation, index):
 #    print("Input: ", Type(equation), equation)
@@ -250,8 +252,8 @@ def runBatcher(file, verify, ast_struct, eq_number=0):
     vars = types
     vars['N'] = N
     vars.update(metadata)
-    print("variables =>", vars)
-    print("metadata =>", metadata)
+    #print("variables =>", vars)
+    #print("metadata =>", metadata)
 
     # build data inputs for technique classes    
     sdl_data = { CONST : constants, PUBLIC: pub_vars, MESSAGE : msg_vars, SETTING : batch_count }    
@@ -261,7 +263,7 @@ def runBatcher(file, verify, ast_struct, eq_number=0):
 
 
     techniques = {'2':Technique2, '3':Technique3, '4':Technique4, '5':DotProdInstanceFinder, '6':PairInstanceFinder, '7':Technique7, '8':Technique8 }
-    print("\nVERIFY EQUATION =>", verify)
+    #print("VERIFY EQUATION =>", verify)
     if PROOFGEN_FLAG: 
         lcg_data[ lcg_steps ] = { 'msg':'Equation', 'eq': lcg.print_statement(verify) }
         if flags['multiple' + str(eq_number)]: lcg_data[ lcg_steps ]['eq'] = lcg.print_statement(flags[ str(eq_number) ]) # shortcut!
@@ -279,9 +281,9 @@ def runBatcher(file, verify, ast_struct, eq_number=0):
     else:
         ASTVisitor(SimplifyDotProducts()).preorder(verify2)
 
-    print("\nStage A: Combined Equation =>", verify2)
+    if VERBOSE: print("\nStage A: Combined Equation =>", verify2)
     ASTVisitor(SmallExponent(constants, vars)).preorder(verify2)
-    print("\nStage B: Small Exp Test =>", verify2, "\n")
+    if VERBOSE: print("\nStage B: Small Exp Test =>", verify2, "\n")
     if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Apply the small exponents test, using exponents $\delta_1, \dots \delta_\\numsigs \in_R \Zq$', 
                                                'eq':lcg.print_statement(verify2), 'preq':small_exp_label }; lcg_steps += 1
 
@@ -289,7 +291,7 @@ def runBatcher(file, verify, ast_struct, eq_number=0):
     if FIND_ORDER:
         result = BatchOrder(sdl_data, types, vars, BinaryNode.copy(verify2)).strategy()
         algorithm = [str(x) for x in result]
-        print("found batch algorithm =>", algorithm)
+        print("<== Found Batch Algorithm ==>", algorithm)
 
     # execute the batch algorithm sequence 
     for option in algorithm:
@@ -311,8 +313,9 @@ def runBatcher(file, verify, ast_struct, eq_number=0):
             if testVerify2 != None: verify2 = testVerify2
         if hasattr(Tech, 'precompute'):
             batch_precompute.update(Tech.precompute)
-        print(Tech.rule, "\n")
-        print(option_str, ":",verify2, "\n")
+        if VERBOSE:
+           print(Tech.rule, "\n")
+           print(option_str, ":",verify2, "\n")
         if PROOFGEN_FLAG:
             lcg_data[ lcg_steps ] = { 'msg':Tech.rule, 'eq': lcg.print_statement(verify2) }
             lcg_steps += 1
@@ -336,8 +339,9 @@ def runBatcher(file, verify, ast_struct, eq_number=0):
         (indiv_msmt, indiv_avg_msmt) = benchIndivVerification(N, verify, sdl_data, vars, indiv_precompute, VERBOSE)
         print("Result N =",N, ":", indiv_avg_msmt)
 
-        outfile = file.split('.')[0]
+        outfile = file.split('.bv')[0]
         indiv, batch = outfile + "_indiv.dat", outfile + "_batch.dat"
+        if filePrefix: indiv = filePrefix + indiv; batch = filePrefix + batch # redirect output file
     
         output_indiv = open(indiv, 'w'); output_batch = open(batch, 'w')
         threshold = -1
@@ -367,20 +371,19 @@ def runBatcher(file, verify, ast_struct, eq_number=0):
         global_count = subProds1.cnt
 #        subProds1.setState(subProds.cnt)
         ASTVisitor(subProds1).preorder(verify2)
-    
-        print("<====\tPREP FOR CODE GEN\t====>")
-        print("\nFinal version =>", verify2, "\n")
-        for i in subProds.dotprod['list']:
-            print("Compute: ", i,":=", subProds.dotprod['dict'][i])    
-#    print("Dot prod =>", subProds1.dotprod)
-        for i in subProds1.dotprod['list']:
-            print("Compute: ", i,":=", subProds1.dotprod['dict'][i])
-        for i in batch_precompute.keys():
-            print("Precompute:", i, ":=", batch_precompute[i])
-        for i in subProds.dotprod['list']:
-            print(i,":=", subProds.dotprod['types'][i])
-        for i in subProds1.dotprod['list']:
-            print(i,":=", subProds1.dotprod['types'][i])
+        if VERBOSE:  
+          print("<====\tPREP FOR CODE GEN\t====>")
+          print("\nFinal version =>", verify2, "\n")
+          for i in subProds.dotprod['list']:
+              print("Compute: ", i,":=", subProds.dotprod['dict'][i])    
+          for i in subProds1.dotprod['list']:
+              print("Compute: ", i,":=", subProds1.dotprod['dict'][i])
+          for i in batch_precompute.keys():
+              print("Precompute:", i, ":=", batch_precompute[i])
+          for i in subProds.dotprod['list']:
+              print(i,":=", subProds.dotprod['types'][i])
+          for i in subProds1.dotprod['list']:
+              print(i,":=", subProds1.dotprod['types'][i])
 
     if PROOFGEN_FLAG:
         print("Generated the proof for the given signature scheme.")
@@ -390,20 +393,24 @@ def runBatcher(file, verify, ast_struct, eq_number=0):
 #        equation = lcg.print_statement(verify2)
 #        print("Latex Equation: ", equation)
         
-if __name__ == "__main__":
-    if len(sys.argv) == 1:
-        print("%s [ batch-input.bv ] -b -c -p" % sys.argv[0])
+def batcher_main(argv, prefix=None):
+    global TEST_STATEMENT, THRESHOLD_FLAG, CODEGEN_FLAG, PROOFGEN_FLAG, PRECOMP_CHECK, VERBOSE, CHOOSE_STRATEGY
+    global filePrefix
+    if len(argv) == 1:
+        print("%s [ file.bv ] -b -c -p" % argv[0])
         print("-b : estimate threshold for a given signature scheme with 1 to N signatures.")
         print("-c : generate the output for the code generator (temporary).")
         print("-d : check for further precomputations in final batch equation.")
         print("-p : generate the proof for the signature scheme.")
         print("-s : select strategy for the ordering of techniques. Options: basic, score, what else?")
         exit(-1)
+
     # main for batch input parser    
     try:
-        file = sys.argv[1]
-        print(sys.argv[1:])
-        for i in sys.argv:
+        print(argv)
+        file = str(argv[1])
+        if prefix: filePrefix = prefix
+        for i in argv:
             if i == "-b": THRESHOLD_FLAG = True
             elif i == "-c": CODEGEN_FLAG = True
             elif i == "-v": VERBOSE = True
@@ -412,12 +419,13 @@ if __name__ == "__main__":
             elif i == "-s": CHOOSE_STRATEGY = True
             elif i == "-t": TEST_STATEMENT = True
         if not TEST_STATEMENT: ast_struct = parseFile(file)
-    except:
-        print("An error occured while processing batch inputs.")
+    except Exception as exc:
+        print("An error occured while processing batch inputs: ", exc)
         exit(-1)
+
     if TEST_STATEMENT:
         debug = levels.all
-        statement = sys.argv[2]
+        statement = argv[2]
         parser = BatchParser()
         final = parser.parse(statement)
         print("Final statement(%s): '%s'" % (type(final), final))
@@ -445,3 +453,6 @@ if __name__ == "__main__":
     for i in range(len(verify_eq)):    
         print("\nRunning batcher....\n")
         runBatcher(file + str(i), verify_eq[i], ast_struct, i)
+
+if __name__ == "__main__":
+   batcher_main(sys.argv)

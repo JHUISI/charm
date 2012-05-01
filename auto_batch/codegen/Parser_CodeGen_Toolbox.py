@@ -1349,6 +1349,8 @@ def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
 	withinPound = False
 
 	while (True):
+		deleteThisVarWhenDone = lineOfCode[R_index]
+
 		checkForSpace = False
 		(withinQuotes, lastQuoteChar) = determineIfWithinQuotes(lineOfCode, R_index, withinQuotes, lastQuoteChar)
 		withinPound = determineIfWithinPound(lineOfCode, R_index, withinPound)
@@ -1483,6 +1485,15 @@ def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
 		lenOfLine = len(lineOfCode)
 		if (R_index >= lenOfLine):
 			break
+
+	#THIS MUST BE FIXED!!!  CHEAP HACK!!!
+
+	newLengthOfCodeLine = len(lineOfCode)
+	if (lineOfCode[newLengthOfCodeLine - 1] == ")") and (lineOfCode[newLengthOfCodeLine - 2] != " "):
+		lineOfCode = lineOfCode[0:(newLengthOfCodeLine - 1)] + " )"
+		#print(lineOfCode)
+
+	#FIX THE ABOVE!!! CHEAP HACK!!!
 
 	lineOfCode = ' ' + lineOfCode + ' '
 

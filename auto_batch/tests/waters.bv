@@ -5,12 +5,16 @@ l := 5
 
 BEGIN :: types
 alpha := ZR
+m := ZR
+k := ZR
 S1 := G1
 S2 := G1
 S3 := G1
+h := G1
 ub := G2
 u1b := G2
 u2b := G2
+g2 := G2
 A := GT
 END :: types
 

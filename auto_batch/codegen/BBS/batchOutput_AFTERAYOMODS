@@ -38,10 +38,10 @@ Applying technique 3 : (e((prod{z := 0,N} on (T3_z^(sx_z * delta_z) * (h^((-sgam
 Final batch eq: (e((prod{z := 0,N} on (T3_z^(sx_z * delta_z) * (h^((-sgamma1_z + -sgamma2_z) * delta_z) * g1^(-c_z * delta_z)))),g2) * e((prod{z := 0,N} on (h^((-salpha_z + -sbeta_z) * delta_z) * T3_z^(c_z * delta_z))),w)) == (prod{z := 0,N} on R3_z^delta_z)
 <====	PREP FOR CODE GEN	====>
 
-Final version => (e(dotA,gpk#1) * e(dotB,gpk#5)) == dotC 
+Final version => (e(dotA,gpk#1?) * e(dotB,gpk#5?)) == dotC 
 
-Compute:  dotA := (prod{z := 0,N} on (T3_z^(sx_z * delta_z) * (gpk#2^((-sgamma1_z + -sgamma2_z) * delta_z) * gpk#0^(-c_z * delta_z))))
-Compute:  dotB := (prod{z := 0,N} on (gpk#2^((-salpha_z + -sbeta_z) * delta_z) * T3_z^(c_z * delta_z)))
+Compute:  dotA := (prod{z := 0,N} on (T3_z^(sx_z * delta_z) * (gpk#2?^((-sgamma1_z + -sgamma2_z) * delta_z) * gpk#0?^(-c_z * delta_z))))
+Compute:  dotB := (prod{z := 0,N} on (gpk#2?^((-salpha_z + -sbeta_z) * delta_z) * T3_z^(c_z * delta_z)))
 Compute:  dotC := (prod{z := 0,N} on R3_z^delta_z)
 Precompute: R4_z := T1^sx
 Precompute: delta := for{z := 1, N} do prng_z
@@ -51,4 +51,4 @@ Precompute: R2_z := v^(sbeta * T2^-c)
 dotA := G1
 dotB := G1
 dotC := GT
-Sort := gpk#0
+Sort := gpk#0?

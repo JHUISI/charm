@@ -99,8 +99,8 @@ class ShortSig(PKSig):
         return A_prime
         
 def main():
-    if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
-        sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
+    #if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
+        #sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
 
     groupObj = PairingGroup(MNT160)
     n = 3    # how manu users in the group
@@ -128,6 +128,7 @@ def main():
     assert result, "Signature Failed"
     if debug: print('Successful Verification!')
 
+    '''
     numValidMessages = int(sys.argv[1])
     numInvalidMessages = int(sys.argv[2])
     messageSize = int(sys.argv[3])
@@ -239,6 +240,7 @@ def main():
     f.close()
     del dict_pickle
     del f
+    '''
 
 if __name__ == "__main__":
     debug = False

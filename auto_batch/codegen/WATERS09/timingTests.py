@@ -1,4 +1,4 @@
-from toolbox.pairinggroup import *
+from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair
 from charm.engine.util import *
 import sys, copy, random
 from bat import run_Batch
@@ -88,7 +88,7 @@ if __name__ == '__main__':
 
 	validDictArg = open(sys.argv[1], 'rb').read()
 	invalidDictArg = open(sys.argv[2], 'rb').read()
-	groupParamArg = PairingGroup(MNT160)
+	groupParamArg = PairingGroup(80)
 
 	validDictFile = bytesToObject(validDictArg, groupParamArg)
 	invalidDictFile = bytesToObject(invalidDictArg, groupParamArg)

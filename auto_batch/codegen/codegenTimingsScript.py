@@ -1,9 +1,13 @@
 import sys, time
+from AutoBatch_Batcher import *
 from AutoBatch_CodeGen_FOR_TIMING_MSMTS import *
 
-schemeNames = ["Boyen", "ChCh_Hess", "VRF", "CL", "HW_Single", "HW_Different", "Waters09"]
-extension = ".dat"
-numIterations = 100
+# NOTE: CHP, HESS, CHCH, WATERS05, CYH and BBS give this error: "SubscriptName->setValue: value passed in is of None type."
+schemeNames = ["BLS", "Boyen", "ChCh_Hess", "VRF", "CL", "HW_Single", "HW_Different", "Waters09", "CHP", "HESS", "CHCH", "WATERS", "CYH", "BBS"]
+extensionCG = "codegen.dat"
+extensionBT = "batcher.dat"
+numIterations = 1 #100
+numArgsToCodegen = 6
 time_in_ms = 1000
 
 def buildSchemesDetails():
@@ -12,60 +16,106 @@ def buildSchemesDetails():
 	for schemeName in schemeNames:
 		schemesDetails[schemeName] = {}
 
-	schemesDetails["Boyen"][0] = "BOYEN/pksig_boyen.py.ORIGINAL.py"
-	schemesDetails["Boyen"][1] = "BOYEN/batchOutputBoyen"
-	schemesDetails["Boyen"][2] = "garbageValue"
-	schemesDetails["Boyen"][3] = "ARCHIVE/boyenIND.py"
-	schemesDetails["Boyen"][4] = "ARCHIVE/boyenBAT.py"
-	schemesDetails["Boyen"][5] = "ARCHIVE/boyenVER.py"
+	# Bls
+	schemesDetails["BLS"]["codegen"] = ["BLS/pksig_bls04.py", "BLS/batchOutput_BLS", "garbageValue", "tmp/blsIND.py", "tmp/blsBAT.py", "tmp/blsIND.py"] 
+	schemesDetails["BLS"]["batcher"] = ["batchverify.py", "../tests/bls.bv", "-b", "-c", "-p"]
 
-	schemesDetails["ChCh_Hess"][0] = "CHCH_HESS/pksig_case21.py"
-	schemesDetails["ChCh_Hess"][1] = "CHCH_HESS/batchOutput"
-	schemesDetails["ChCh_Hess"][2] = "garbageValue"
-	schemesDetails["ChCh_Hess"][3] = "ARCHIVE/chchhessIND.py"
-	schemesDetails["ChCh_Hess"][4] = "ARCHIVE/chchhessBAT.py"
-	schemesDetails["ChCh_Hess"][5] = "ARCHIVE/chchhessVER.py"
+	# Chp
+	schemesDetails["CHP"]["codegen"] = ["CHP/pksig_chp.py", "CHP/batchOutputCHP", "garbageValue", "tmp/chpIND.py", "tmp/chpBAT.py", "tmp/chpIND.py"] 
+	schemesDetails["CHP"]["batcher"] = ["batchverify.py", "../tests/chp.bv", "-b", "-c", "-p"]
 
-	schemesDetails["VRF"][0] = "VRF/pk_vrf.py"
-	schemesDetails["VRF"][1] = "VRF/batchOutput"
-	schemesDetails["VRF"][2] = "garbageValue"
-	schemesDetails["VRF"][3] = "ARCHIVE/vrfIND.py"
-	schemesDetails["VRF"][4] = "ARCHIVE/vrfBAT.py"
-	schemesDetails["VRF"][5] = "ARCHIVE/vrfVER.py"
+	# Hess
+	schemesDetails["HESS"]["codegen"] = ["HESS/pksig_hess.py", "HESS/batchOutputHess", "garbageValue", "tmp/hessIND.py", "tmp/hessBAT.py", "tmp/hessIND.py"] 
+	schemesDetails["HESS"]["batcher"] = ["batchverify.py", "../tests/hess.bv", "-b", "-c", "-p"]
 
-	schemesDetails["CL"][0] = "CL/pksig_cl04.py"
-	schemesDetails["CL"][1] = "CL/batchOutput"
-	schemesDetails["CL"][2] = "garbageValue"
-	schemesDetails["CL"][3] = "ARCHIVE/clIND.py"
-	schemesDetails["CL"][4] = "ARCHIVE/clBAT.py"
-	schemesDetails["CL"][5] = "ARCHIVE/clVER.py"
+	# ChCh
+	schemesDetails["CHCH"]["codegen"] = ["CHCH/pksig_chch.py", "CHCH/batchOutputCHCH", "garbageValue", "tmp/chchIND.py", "tmp/chchBAT.py", "tmp/chchIND.py"] 
+	schemesDetails["CHCH"]["batcher"] = ["batchverify.py", "../tests/chch.bv", "-b", "-c", "-p"]
 
-	schemesDetails["HW_Different"][0] = "HW_DIFF/pksig_hw.py"
-	schemesDetails["HW_Different"][1] = "HW_DIFF/batchOutput"
-	schemesDetails["HW_Different"][2] = "garbageValue"
-	schemesDetails["HW_Different"][3] = "ARCHIVE/hwdiffIND.py"
-	schemesDetails["HW_Different"][4] = "ARCHIVE/hwdiffBAT.py"
-	schemesDetails["HW_Different"][5] = "ARCHIVE/hwdiffVER.py"
+	# Waters05
+	schemesDetails["WATERS"]["codegen"] = ["WATERS/pksig_waters.py", "WATERS/batchOutput", "garbageValue", "tmp/watersIND.py", "tmp/watersBAT.py", "tmp/watersIND.py"] 
+	schemesDetails["WATERS"]["batcher"] = ["batchverify.py", "../tests/waters.bv", "-b", "-c", "-p"]
 
-	schemesDetails["Waters09"][0] = "WATERS09/pksig_waters09_mod.py"
-	schemesDetails["Waters09"][1] = "WATERS09/batchOutput"
-	schemesDetails["Waters09"][2] = "garbageValue"
-	schemesDetails["Waters09"][3] = "ARCHIVE/waters09IND.py"
-	schemesDetails["Waters09"][4] = "ARCHIVE/waters09BAT.py"
-	schemesDetails["Waters09"][5] = "ARCHIVE/waters09VER.py"
+	# Cyh
+	schemesDetails["CYH"]["codegen"] = ["CYH/pksig_cyh.py", "CYH/batchOutputCYH", "garbageValue", "tmp/cyhIND.py", "tmp/cyhBAT.py", "tmp/cyhIND.py"] 
+	schemesDetails["CYH"]["batcher"] = ["batchverify.py", "../tests/cyh.bv", "-b", "-c", "-p"]
+
+	# Boyen
+	schemesDetails["Boyen"]["codegen"] = ["BOYEN/pksig_boyen.py.ORIGINAL.py", "BOYEN/batchOutputBoyen", "garbageValue", "tmp/boyenIND.py", "tmp/boyenBAT.py", "tmp/boyenIND.py"] 
+	schemesDetails["Boyen"]["batcher"] = ["batchverify.py", "../tests/boyen.bv", "-b", "-c", "-p"]
+
+        # BBS
+	schemesDetails["BBS"]["codegen"] = ["BBS/groupsig_bgls04_var.py", "BBS/batchOutput_AFTERAYOMODS", "garbageValue", "tmp/bbsIND.py", "tmp/bbsBAT.py", "tmp/bbsIND.py"] 
+	schemesDetails["BBS"]["batcher"] = ["batchverify.py", "../tests/bbs.bv", "-b", "-c", "-p"]
+	
+	# Chch + Hess
+	schemesDetails["ChCh_Hess"]["codegen"] = ["CHCH_HESS/pksig_case21.py", "CHCH_HESS/batchOutput", "garbageValue", "tmp/chchhessIND.py", "tmp/chchhessBAT.py", "tmp/chchhessVER.py"]
+	schemesDetails["ChCh_Hess"]["batcher"] = ["batchverify.py", "../tests/case2.bv", "-b", "-c", "-p"]
+
+	# VRF
+	schemesDetails["VRF"]["codegen"] = ["VRF/pk_vrf.py", "VRF/batchOutput", "garbageValue", "tmp/vrfIND.py", "tmp/vrfBAT.py", "tmp/vrfVER.py"]
+	schemesDetails["VRF"]["batcher"] = ["batchverify.py", "../tests/vrf.bv", "-b", "-c", "-p"]
+
+	# Cl
+	schemesDetails["CL"]["codegen"] = ["CL/pksig_cl04.py", "CL/batchOutput", "garbageValue", "tmp/clIND.py", "tmp/clBAT.py", "tmp/clVER.py"]
+	schemesDetails["CL"]["batcher"] = ["batchverify.py", "../tests/case1.bv", "-b", "-c", "-p"]
+
+	# HW - diff signers
+	schemesDetails["HW_Different"]["codegen"] = ["HW_DIFF/pksig_hw.py", "HW_DIFF/batchOutput", "gargabeValue", "tmp/hwdiffIND.py", "tmp/hwdiffBAT.py", "tmp/hwdiffVER.py"] 
+	schemesDetails["HW_Different"]["batcher"] = ["batchverify.py", "../tests/hw-diff.bv", "-b", "-c", "-p"]
+
+	# Waters09
+	schemesDetails["Waters09"]["codegen"] = ["WATERS09/pksig_waters09_mod.py", "WATERS09/batchOutput", "garbageValue", "tmp/waters09IND.py", "tmp/waters09BAT.py", "tmp/waters09VER.py"]
+	schemesDetails["Waters09"]["batcher"] = ["batchverify.py", "../tests/waters09.bv", "-b", "-c", "-p"]
 
 	return schemesDetails
 
-def processOneIteration(schemeName, schemesDetails):
+def processOneIterationForCodegen(argsDict):
 	startTime = time.clock()
-	dddddd
+	# calling codegen
+	print("Call: ", argsDict)
+	mainFunctionForTimings(argsDict[0], argsDict[1], argsDict[2], argsDict[3], argsDict[4], argsDict[5])
+	endTime = time.clock()
 
-def processIndScheme(prefixName, schemeName, schemesDetails):
-	outputFile = open(prefixName + "_" + schemeName + extension, 'w')
+	result = (endTime - startTime) * time_in_ms
+
+	outputString = ""
+	outputString += str(result) + ","
+	return outputString
+
+def processOneIterationForBatcher(argsDict):
+	startTime = time.clock()
+	# calling batcher
+	Batcher(argsDict)
+	endTime = time.clock()
+
+	result = (endTime - startTime) * time_in_ms
+
+	outputString = ""
+	outputString += str(result) + ","
+	return outputString
+
+def processIndSchemeCG(prefixName, schemeName, schemesDetails):
+	outputFile = open(prefixName + "_" + schemeName + extensionCG, 'w')
 	outputString = ""
 
-	for iteration in numIterations:
-		outputString += processOneIteration(schemeName, schemesDetails)
+	#for index in range(0, numArgsToCodegen):
+	#	argsDict[index] = schemesDetails[schemeName][index]
+	argsDictCG = schemesDetails[ schemeName ][ "codegen" ]
+	for iteration in range(0, numIterations):
+		outputString += processOneIterationForCodegen(argsDictCG)
+
+	outputFile.write(outputString)
+	outputFile.close()
+	del outputFile
+
+def processIndSchemeBT(prefixName, schemeName, schemesDetails):
+	outputFile = open(prefixName + "_" + schemeName + extensionBT, 'w')
+	outputString = ""
+
+	argsDictBT = schemesDetails[ schemeName ][ "batcher" ]
+	for iteration in range(0, numIterations):
+		outputString += processOneIterationForBatcher(argsDictBT)
 
 	outputFile.write(outputString)
 	outputFile.close()
@@ -76,7 +126,10 @@ def main(prefixName):
 
 	for schemeName in schemeNames:
 		if (schemeName != "HW_Single"):
-			processIndScheme(prefixName, schemeName, schemesDetails)
+			# run batcher first
+			#processIndSchemeBT(prefixName, schemeName, schemesDetails)
+			# then, run codegen 
+			processIndSchemeCG(prefixName, schemeName, schemesDetails)
 
 if __name__ == '__main__':
 	if ( (len(sys.argv) != 2) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
