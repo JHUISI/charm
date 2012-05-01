@@ -129,6 +129,9 @@ def main(prefixName):
 		if (schemeName != "HW_Single"):
 			# run batcher first
 			processIndSchemeBT(prefixName, schemeName, schemesDetails)
+
+	for schemeName in schemeNames:
+		if (schemeName != "HW_Single"):
 			# then, run codegen 
 			processIndSchemeCG(prefixName, schemeName, schemesDetails)
 
