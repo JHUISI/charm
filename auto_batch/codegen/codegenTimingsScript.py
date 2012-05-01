@@ -6,7 +6,7 @@ from AutoBatch_CodeGen_FOR_TIMING_MSMTS import *
 schemeNames = ["BLS", "Boyen", "ChCh_Hess", "VRF", "CL", "HW_Single", "HW_Different", "Waters09", "CHP", "HESS", "CHCH", "WATERS", "CYH", "BBS"]
 extensionCG = "codegen.dat"
 extensionBT = "batcher.dat"
-numIterations = 1 #100
+numIterations = 100
 numArgsToCodegen = 6
 time_in_ms = 1000
 
