@@ -160,19 +160,20 @@ class BatchOrder:
                     if not self.checkForTechniqueComboInPath(3, 6, history): suggest.insert(0, 6)
             elif tech_applied == 4:
                 if tech_obj.score == Tech_db.ConstantPairing:
-                    suggest = [6, 5, 3]
+                    suggest = [2, 6, 5, 3]
             elif tech_applied == 5: # distribute products
                 if tech_obj.testForApplication:
                     suggest = [2, 4, 3]
             elif tech_applied == 6: # combine pairings
                 if tech_obj.testForApplication:
-                    suggest = [5, 4, 3, 6]
-            elif tech_applied == 7:
-                if tech_obj.score == Tech_db.MoveExpOutPairing:
-                    suggest = [8]
-            elif tech_applied == 8:
-                if tech_obj.score == Tech_db.ConstantPairing:
-                    suggest = [7, 3, 2]
+                    suggest = [2, 5, 4, 3, 6]
+            #        suggest = [5, 4, 3, 6]
+            #elif tech_applied == 7:
+            #    if tech_obj.score == Tech_db.MoveExpOutPairing:
+            #        suggest = [8]
+            #elif tech_applied == 8:
+            #    if tech_obj.score == Tech_db.ConstantPairing:
+            #        suggest = [7, 3, 2]
             else:
                 return
         else:
