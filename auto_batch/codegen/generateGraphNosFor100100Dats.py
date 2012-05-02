@@ -1,6 +1,6 @@
 import sys, numpy
 
-numIterations = 100
+numIterations = 200
 numSignatures = 100
 
 runningTimesPrefix = "timing_autobatch/dontDelete_"
