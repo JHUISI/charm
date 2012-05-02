@@ -10,15 +10,17 @@ from batchorder import BatchOrder
 from batchparser import BatchParser
 from batchcomboeq import TestForMultipleEq,CombineMultipleEq,SmallExpTestMul
 from batchsyntax import BasicTypeExist,PairingTypeCheck
+from benchmark_interface import curve,param_id
 
-try:
+#try:
     #import benchmarks
-    import miraclbench2
-    curve = miraclbench2.benchmarks
-    curve_key = 'mnt160'
-except:
-    print("Could not find the 'benchmarks' file that has measurement results! Generate and re-run.")
-    exit(0)
+    #import miraclbench2
+    #import miraclbench2_relic
+    #curve = miraclbench2_relic.benchmarks
+    #curve_key = 'mnt160'
+#except:
+#    print("Could not find the 'benchmarks' file that has measurement results! Generate and re-run.")
+#    exit(0)
 
 debug = False
 THRESHOLD_FLAG = CODEGEN_FLAG = PROOFGEN_FLAG = PRECOMP_CHECK = VERBOSE = CHOOSE_STRATEGY = False
@@ -115,7 +117,7 @@ def benchIndivVerification(N, equation, sdl_dict, vars, precompute, _verbose):
             if _verbose: print("Precompute:", i, ":=", precompute[i])
     if _verbose:
         print_results(rop_ind.ops)
-    return calculate_times(rop_ind.ops, curve['mnt160'], N)
+    return calculate_times(rop_ind.ops, curve[param_id], N)
     
 
 def benchBatchVerification(N, equation, sdl_dict, vars, precompute, _verbose):
@@ -146,7 +148,7 @@ def benchBatchVerification(N, equation, sdl_dict, vars, precompute, _verbose):
                     if _verbose: print("TODO: need to account for this: ", i, ":=", precompute[i])
     if _verbose:
         print_results(rop_batch.ops)
-    return calculate_times(rop_batch.ops, curve['mnt160'], N)
+    return calculate_times(rop_batch.ops, curve[param_id], N)
 
 def proofHeader(lcg, title, const, sigs, indiv_eq, batch_eq):
     const_str = ""; sig_str = ""

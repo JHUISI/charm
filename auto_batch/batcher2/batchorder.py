@@ -1,17 +1,17 @@
 from batchparser import *
 from batchtechniques import Tech_db,Technique2,Technique3,Technique4,Technique7,Technique8
 from batchoptimizer import *
+from benchmark_interface import curve,param_id
 import random
 
-try:
+#try:
     #import benchmarks
-    import miraclbench
-    curves = miraclbench.benchmarks
-    c_key = 'mnt160'
-except:
-    print("Could not find the 'benchmarks' file that has measurement results! Generate and re-run.")
-    exit(0)
-
+#    import miraclbench2_relic
+#    curves = miraclbench2_relic.benchmarks
+#    c_key = 'mnt160'
+#except:
+#    print("Could not find the 'benchmarks' file that has measurement results! Generate and re-run.")
+#    exit(0)
 
 def fact(n):
     if n == 0:
@@ -125,7 +125,7 @@ class BatchOrder:
                     # measure
                     rop_batch = RecordOperations(self.vars)
                     rop_batch.visit(verify_eq, {})
-                    (msmt, avg) = calculate_times(rop_batch.ops, curves[c_key], N)
+                    (msmt, avg) = calculate_times(rop_batch.ops, curve[param_id], N)
                     batch_time.append(avg)
                 i += 1 # breaks permutation loop
 
@@ -230,7 +230,7 @@ class BatchOrder:
                     N = int(self.vars['N'])
                     rop_batch = RecordOperations(self.vars)
                     rop_batch.visit(equation, {})
-                    (msmt, avg) = calculate_times(rop_batch.ops, curves[c_key], N)
+                    (msmt, avg) = calculate_times(rop_batch.ops, curve[param_id], N)
                     self.batch_time[ cnt ] = avg
 #                    print("Final equation: ", equation, "\n\n")
                     if self.debug:
