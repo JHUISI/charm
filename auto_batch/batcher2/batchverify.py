@@ -173,15 +173,15 @@ def proofBody(step, data):
     return result
 
 def writeConfig(lcg, latex_file, lcg_data, const, vars, sigs):
-    f = open('verification_gen' + latex_file + '.tex', 'w')
-    title = latex_file.upper()
-    outputStr = proofHeader(lcg, title, const, sigs, lcg_data[0]['eq'], lcg_data[0]['batch'])
-    for i in lcg_data.keys():
-        if i != 0:
-            outputStr += proofBody(i, lcg_data[i])
-    outputStr += footer
-    f.write(outputStr)
-    f.close()
+#    f = open('verification_gen' + latex_file + '.tex', 'w')
+#    title = latex_file.upper()
+#    outputStr = proofHeader(lcg, title, const, sigs, lcg_data[0]['eq'], lcg_data[0]['batch'])
+#    for i in lcg_data.keys():
+#        if i != 0:
+#            outputStr += proofBody(i, lcg_data[i])
+#    outputStr += footer
+#    f.write(outputStr)
+#    f.close()
     return
  
  
@@ -472,7 +472,7 @@ def benchmark_batcher(argv, prefix=None):
         elif i == "-s": CHOOSE_STRATEGY = True
     ast_struct = parseFile(file)
     
-    start = time.time()
+#    start = time.time()
     verify_eq, N = [], None; cnt = 0
     for n in ast_struct[ OTHER ]:
         if 'verify' in str(n.left):
@@ -492,10 +492,10 @@ def benchmark_batcher(argv, prefix=None):
         cte.report( eq )
 
     # process settings
-    stop = time.time()
+#    stop = time.time()
     for i in range(len(verify_eq)):    
         runBatcher(file + str(i), verify_eq[i], ast_struct, i)
-    return (start, stop)
+#    return (start, stop)
 
 if __name__ == "__main__":
    batcher_main(sys.argv)
