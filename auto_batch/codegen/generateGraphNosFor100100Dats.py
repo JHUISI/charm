@@ -14,8 +14,7 @@ benchmarksOutputFileSuffix = "_Benchmarks_"
 benchmarkPrefix = "CCS2012_Benchmarks_"
 benchmarkSuffix = ".dat"
 benchmarkTypes = ["bat", "ind"]
-#benchmarkSchemes = ["BOYEN", "CHCH_HESS", "CL", "CDH/CDH", "HW_DIFF", "VRF", "WATERS09"]
-benchmarkSchemes = ["BOYEN", "CHCH_HESS", "CL", "CDH/CDH", "HW_DIFF"]
+benchmarkSchemes = ["BOYEN", "CHCH_HESS", "CL", "CDH/CDH", "HW_DIFF", "VRF", "WATERS09"]
 
 inputDelimiter = ","
 outputDelimiter = " : "
@@ -41,8 +40,12 @@ def getBenchmarksOutput(benchmarkInNames, prefixName):
 		for type in benchmarkInNames[scheme]:
 			processOneSchemeType_Benchmarks(benchmarkInNames, prefixName, scheme, type)
 
-def processInputLineSplit(inputLineSplit):
+def processInputLineSplit(inputLineSplit, scheme, type, lineNumberInFile):
 	if (len(inputLineSplit) != (numIterations + 1) ):
+		print("num iterations made through:  ", str(len(inputLineSplit)))
+		print(scheme)
+		print(type)
+		print("line No:  ", str(lineNumberInFile))
 		sys.exit("processInputLineSplit:  problem with length of input.")
 
 	lastValue = inputLineSplit.pop()
@@ -74,7 +77,7 @@ def processOneSchemeType_Benchmarks(benchmarkInNames, prefixName, scheme, type):
 		if (counter > numIterations):
 			break
 		inputLineSplit = line.split(inputDelimiter)
-		floatsList = processInputLineSplit(inputLineSplit)
+		floatsList = processInputLineSplit(inputLineSplit, scheme, type, counter)
 		msmtsCounter = 0
 		for msmt in floatsList:
 			msmtsCounter += 1
@@ -136,7 +139,7 @@ def getRunningTimesOutput(runningInNames, prefixName):
 
 def main(prefixName):
 	(runningInNames, benchmarkInNames) = buildIOFileNames()
-	getRunningTimesOutput(runningInNames, prefixName)
+	#getRunningTimesOutput(runningInNames, prefixName)
 	getBenchmarksOutput(benchmarkInNames, prefixName)
 
 if __name__ == '__main__':
