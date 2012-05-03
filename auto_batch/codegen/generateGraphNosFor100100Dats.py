@@ -1,6 +1,6 @@
 import sys, numpy
 
-numIterations = 200
+numIterations = 100
 numSignatures = 100
 
 runningTimesPrefix = "timing_autobatch/dontDelete_"
@@ -9,6 +9,7 @@ runningTimeSchemes = ["BBS", "BLS", "Boyen", "CHCH", "ChCh_Hess", "CHP", "CL", "
 runningTimeTypes = ["batcher", "codegen"]
 
 runningTimesOutputFileSuffix = "_Running_Times"
+benchmarksOutputFileSuffix = "_Benchmarks_"
 
 benchmarkPrefix = "CCS2012_Benchmarks_"
 benchmarkSuffix = ".dat"
@@ -34,6 +35,73 @@ def buildIOFileNames():
 			benchmarkInNames[scheme][type] = scheme + "/" + benchmarkPrefix + type + benchmarkSuffix
 
 	return (runningInNames, benchmarkInNames)
+
+def getBenchmarksOutput(benchmarkInNames, prefixName):
+	for scheme in benchmarkInNames:
+		for type in benchmarkInNames[scheme]:
+			processOneSchemeType_Benchmarks(benchmarkInNames, prefixName, scheme, type)
+
+def processInputLineSplit(inputLineSplit):
+	if (len(inputLineSplit) != (numIterations + 1) ):
+		sys.exit("processInputLineSplit:  problem with length of input.")
+
+	lastValue = inputLineSplit.pop()
+	if (lastValue != '\n'):
+		sys.exit("processInputLineSplit:  problem with last value.")
+
+	retList = []
+	for currentInput in inputLineSplit:
+		retList.append(float(currentInput))
+
+	if (len(retList) != numIterations):
+		sys.exit("processInputLineSplit:  len(retList) != numIterations.")
+
+	return retList
+
+def processOneSchemeType_Benchmarks(benchmarkInNames, prefixName, scheme, type):
+	inputFileName = benchmarkInNames[scheme][type]
+	inputFile = open(inputFileName, 'r').readlines()
+	if (len(inputFile) < numIterations):
+		sys.exit("getBenchmarksOutput:  # of lines read in for one of the files was less than numIterations.")
+
+	reverseNos = {}
+	for reverseNosIndex in range(1, 101):
+		reverseNos[reverseNosIndex] = []
+
+	counter = 0
+	for line in inputFile:
+		counter += 1
+		if (counter > numIterations):
+			break
+		inputLineSplit = line.split(inputDelimiter)
+		floatsList = processInputLineSplit(inputLineSplit)
+		msmtsCounter = 0
+		for msmt in floatsList:
+			msmtsCounter += 1
+			reverseNos[msmtsCounter].append(msmt)
+		if (msmtsCounter != numIterations):
+			sys.exit("getBenchmarksOutput:  msmtsCounter probs.")
+
+	if ( (counter != numIterations) and (counter != (numIterations + 1)) ):
+		sys.exit("getBenchmarksOutput:  bad counter number at end of loop.")
+
+	if (scheme != "CDH/CDH"):
+		outputFile = open(prefixName + "_" + scheme + "_" + type + "_" + benchmarksOutputFileSuffix + benchmarkSuffix, 'w')
+	else:
+		outputFile = open(prefixName + "_CDH_" + type + "_" + benchmarksOutputFileSuffix + benchmarkSuffix, 'w')
+
+	outputString = ""
+
+	for counter in range(1, (numIterations + 1)):
+		outputString += str(counter) + " "
+		if (len(reverseNos[counter]) != numIterations):
+			sys.exit("getBenchmarksOutput:  probs with reverseNos length.")
+
+		outputString += str(numpy.mean(reverseNos[counter], dtype=numpy.float64)) + " "
+		outputString += str(numpy.std(reverseNos[counter], dtype=numpy.float64)) + "\n"
+
+	outputFile.write(outputString)
+	outputFile.close()
 
 def getRunningTimesOutput(runningInNames, prefixName):
 	outputFile = open(prefixName + runningTimesOutputFileSuffix + runningTimesSuffix, 'w')
@@ -68,7 +136,8 @@ def getRunningTimesOutput(runningInNames, prefixName):
 
 def main(prefixName):
 	(runningInNames, benchmarkInNames) = buildIOFileNames()
-	runningTimesOutputDict = getRunningTimesOutput(runningInNames, prefixName)
+	getRunningTimesOutput(runningInNames, prefixName)
+	getBenchmarksOutput(benchmarkInNames, prefixName)
 
 if __name__ == '__main__':
 	if ( (len(sys.argv) != 2) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
