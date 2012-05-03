@@ -86,9 +86,9 @@ def processOneSchemeType_Benchmarks(benchmarkInNames, prefixName, scheme, type):
 		sys.exit("getBenchmarksOutput:  bad counter number at end of loop.")
 
 	if (scheme != "CDH/CDH"):
-		outputFile = open(prefixName + "_" + scheme + "_" + type + "_" + benchmarksOutputFileSuffix + benchmarkSuffix, 'w')
+		outputFile = open(prefixName + scheme + "_" + type + benchmarkSuffix, 'w')
 	else:
-		outputFile = open(prefixName + "_CDH_" + type + "_" + benchmarksOutputFileSuffix + benchmarkSuffix, 'w')
+		outputFile = open(prefixName + "CDH_" + type + benchmarkSuffix, 'w')
 
 	outputString = ""
 

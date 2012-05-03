@@ -3,16 +3,9 @@ import os
 N = 100
 x = 100
 xx = 1000
-
-#meta  = { 'bbs':None, 'bls':None, 'chp':None, 'chch':None, 'cyh':"ring=20", 'hess':None, 
-#          'boyen':"ring=3", 'waters05':None, 'waters09':None, 'cl':None, 'chchhess':None, 'vrf':None, 'hw':None }
-
-meta  = {'BOYEN':"ring=3", 'CL':None, 'HW_DIFF':None, 'CHCH_HESS':None, 'CDH':None }
-
-
-#files = { 'bbs':65, 'boyen':95, 'cl':50, 'vrf':170, 'bls':20, 'hw':25, 'chchhess':45, 'chch':22, 'chp':40, 'cyh':27, 'hess':23, 'waters05':45, 'waters09':120} #'chp':30, 'chch':50, 'cyh':40, 'hess':50, 'bgls':120, 'boyen':150, 'waters05':80 }
-files = { 'BOYEN':95, 'CL':50, 'HW_DIFF':25, 'CHCH_HESS':45, 'CDH':60}
-
+meta  = { 'bbs':None, 'bls':None, 'chp':None, 'chch':None, 'cyh':"ring=20", 'hess':None, 
+          'boyen':"ring=3", 'waters05':None, 'waters09':None, 'cl':None, 'chchhess':None, 'vrf':None, 'hw':None }
+files = { 'bbs':65, 'boyen':95, 'cl':50, 'vrf':170, 'bls':20, 'hw':25, 'chchhess':45, 'chch':22, 'chp':40, 'cyh':27, 'hess':23, 'waters05':45, 'waters09':120} #'chp':30, 'chch':50, 'cyh':40, 'hess':50, 'bgls':120, 'boyen':150, 'waters05':80 }
 # cyh => (ring size = 20)
 # boyen => (ring size = 2)
 
@@ -35,9 +28,7 @@ set title 'MNT160' font 'Helvetica,10';
 set xlabel 'Number of signatures';
 set ylabel 'ms per signature';
 plot '%s' w lines lw 6 title '%s (%s)', \\
- '%s' w lines lw 6 title '%s (%s)', \\
- '%s' w yerrorbars, \\
- '%s' w yerrorbars;
+ '%s' w lines lw 6 title '%s (%s)'; 
 """
 
 def build_graph( key, y_scale ):
@@ -48,7 +39,7 @@ def build_graph( key, y_scale ):
     batch_name = KEY + "_bat.dat"
     if meta[key]: batch_key = meta[key] 
     else: batch_key = "batched"    
-    return config % (key, y_scale, batch_name, KEY, batch_key, indiv_name, KEY, indiv_key, batch_name, indiv_name)
+    return config % (key, y_scale, batch_name, KEY, batch_key, indiv_name, KEY, indiv_key)
 
 def build_config(name):
     output = ""    
