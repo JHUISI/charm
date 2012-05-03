@@ -296,28 +296,30 @@ def runBatcher(file, verify, ast_struct, eq_number=0):
         print("<== Found Batch Algorithm ==>", algorithm)
 
     # execute the batch algorithm sequence 
-    for option in algorithm:
-        if option == '5':
-            option_str = "Simplifying =>"
-            Tech = techniques[option]()
-        elif option == '6':
-            option_str = "Combine Pairings:"
-            Tech = techniques[option]()            
-        elif option in techniques.keys():
-            option_str = "Applying technique " + option
-            Tech = techniques[option](sdl_data, vars, metadata)
-        else:
-            print("Unrecognized technique selection.")
-            continue
-        ASTVisitor(Tech).preorder(verify2)
-        if option == '6':
-            testVerify2 = Tech.makeSubstitution(verify2)
-            if testVerify2 != None: verify2 = testVerify2
-        if hasattr(Tech, 'precompute'):
-            batch_precompute.update(Tech.precompute)
-        if VERBOSE:
-           print(Tech.rule, "\n")
-           print(option_str, ":",verify2, "\n")
+#    for option in algorithm:
+#        if option == '5':
+#            option_str = "Simplifying =>"
+#            Tech = techniques[option]()
+#        elif option == '6':
+#            option_str = "Combine Pairings:"
+#            Tech = techniques[option]()            
+#        elif option in techniques.keys():
+#            option_str = "Applying technique " + option
+#            Tech = techniques[option](sdl_data, vars, metadata)
+#        else:
+#            print("Unrecognized technique selection.")
+#            continue
+#        ASTVisitor(Tech).preorder(verify2)
+#        if option == '6':
+#            testVerify2 = Tech.makeSubstitution(verify2)
+#            if testVerify2 != None: verify2 = testVerify2
+#        if hasattr(Tech, 'precompute'):
+#            batch_precompute.update(Tech.precompute)
+
+#        if VERBOSE:
+#           print(Tech.rule, "\n")
+#           print(option_str, ":",verify2, "\n")
+           
 #        if PROOFGEN_FLAG:
 #            lcg_data[ lcg_steps ] = { 'msg':Tech.rule, 'eq': lcg.print_statement(verify2) }
 #            lcg_steps += 1
