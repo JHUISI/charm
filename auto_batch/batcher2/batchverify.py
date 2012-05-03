@@ -460,6 +460,7 @@ def benchmark_batcher(argv, prefix=None):
     global THRESHOLD_FLAG, PROOFGEN_FLAG, PRECOMP_CHECK, VERBOSE, CHOOSE_STRATEGY
     global filePrefix
     ast_struct = None
+    THRESHOLD_FLAG = PROOFGEN_FLAG = PRECOMP_CHECK = VERBOSE = CHOOSE_STRATEGY = False
     
     # main for batch input parser    
     print(argv)
@@ -472,7 +473,6 @@ def benchmark_batcher(argv, prefix=None):
         elif i == "-s": CHOOSE_STRATEGY = True
     ast_struct = parseFile(file)
     
-#    start = time.time()
     verify_eq, N = [], None; cnt = 0
     for n in ast_struct[ OTHER ]:
         if 'verify' in str(n.left):
@@ -492,10 +492,9 @@ def benchmark_batcher(argv, prefix=None):
         cte.report( eq )
 
     # process settings
-#    stop = time.time()
     for i in range(len(verify_eq)):    
         runBatcher(file + str(i), verify_eq[i], ast_struct, i)
-#    return (start, stop)
+    return
 
 if __name__ == "__main__":
    batcher_main(sys.argv)
