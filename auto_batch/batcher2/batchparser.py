@@ -178,7 +178,7 @@ def handle(lines, target):
                 x = line.split(EQ)
                 lhs, rhs = x[0].strip(), x[1].strip()
                 code [ lhs ] = rhs
-        print("latex =>", code)
+        #print("latex =>", code)
         return code
     
     # parse as usual
@@ -192,7 +192,8 @@ def handle(lines, target):
         for line in lines:
             l = line.split(',')
             _ast = [i.strip() for i in l]
-        print(target, " =>", _ast)
+        # JAA: uncomment for debug
+        # print(target, " =>", _ast)
         return _ast
     elif target == TYPE:
         _ast = {}
@@ -204,7 +205,8 @@ def handle(lines, target):
                 left = str(ast_node.left)
                 right = str(ast_node.right)
                 _ast[ left ] = right
-        print(target, " =>", _ast)
+        # JAA: uncomment for debug
+        # print(target, " =>", _ast)
         return _ast
     elif target == PRECOMP:
         indiv_ast = {}
@@ -351,7 +353,7 @@ class dispatch(object):
                     # print("hitting cache: ", self.hit) 
                     return visitor.cache[func_name](*args)
             except Exception as e:
-                print(e)
+                print("Error: ", e)
 
         return wrapped_func(*args)
 
@@ -520,7 +522,8 @@ class CVForMultiSigner:
             if setting[SIGNATURE] == setting[MESSAGE] and setting[PUBLIC] == SAME:
                 self.signer = signer_mode.single
                 self.pubKey = self.sigKey
-                print("Mode: ", self.signer, "signer")
+                # JAA: uncomment for debug 
+                # print("Mode: ", self.signer, "signer")
             elif setting[PUBLIC] == setting[SIGNATURE]:
             # technically multi-signer, but since there is a 
             # one-to-one mapping with sigs and public keys
@@ -529,24 +532,28 @@ class CVForMultiSigner:
                 self.signer = signer_mode.single            
                 self.pubKey = self.sigKey
                 self.pubEnd = self.sigEnd
-                print("Mode: multi signer") 
+                # JAA: uncomment for debug 
+                # print("Mode: multi signer") 
             elif setting[PUBLIC] != setting[SIGNATURE] and setting[PUBLIC] == SAME:
                 self.signer = signer_mode.single
                 self.pubKey = self.pubEnd = None
-                print("Mode: ", self.signer, "signer")
+                # JAA: uncomment for debug 
+                # print("Mode: ", self.signer, "signer")
             elif setting[PUBLIC] != setting[SIGNATURE]:
             # most likely multi-signer mode
                 self.signer = signer_mode.multi
                 self.pubKey = 'y' # reserved for different amount of signers than signatures
                 self.pubEnd = setting[PUBLIC]
-                print("Mode: ", self.signer, "signer")
+                # JAA: uncomment for debug 
+                # print("Mode: ", self.signer, "signer")
             else:
                 print("error?")
         else:
             # if None for either or both (most likely a different setting)
             if setting[SIGNATURE]:
                 self.signer = signer_mode.ring
-                print("Mode: ", self.signer, "signer")
+                # JAA: uncomment for debug 
+                # print("Mode: ", self.signer, "signer")
            
     def visit(self, node, data):
         pass

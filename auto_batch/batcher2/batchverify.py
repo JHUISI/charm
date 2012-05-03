@@ -3,7 +3,7 @@
 # and message. Finally, an optional transform section to describe the specific order in which
 # to apply the techniques 2, 3a, 3b and 4.
 
-import sys
+import sys, time
 from batchtechniques import *
 from batchproof import *
 from batchorder import BatchOrder
@@ -32,7 +32,7 @@ filePrefix = None
 def handleVerifyEq(equation, index):
 #    print("Input: ", Type(equation), equation)
     combined_equation = BinaryNode.copy(equation.right)
-    print("Original eq:", combined_equation)
+    if VERBOSE: print("Original eq:", combined_equation)
     tme = TestForMultipleEq()
     ASTVisitor(tme).preorder(combined_equation)
     flags['multiple' + str(index)] = False
@@ -41,7 +41,7 @@ def handleVerifyEq(equation, index):
         ASTVisitor(cme).preorder(combined_equation)
         if len(cme.finalAND) == 1: 
             combined_equation = cme.finalAND.pop()
-            print("Final combined eq: ", combined_equation)
+            if VERBOSE: print("Final combined eq: ", combined_equation)
             se_test = SmallExpTestMul()
             combined_equation2 = BinaryNode.copy(combined_equation)
             ASTVisitor(se_test).preorder(combined_equation2)            
@@ -55,11 +55,11 @@ def handleVerifyEq(equation, index):
                 cme2 = CombineMultipleEq()
                 ASTVisitor(cme2).preorder(combined_equation2)
                 combined = cme2.finalAND.pop()
-                print("Combined: ", combined)
+                if VERBOSE: print("Combined: ", combined)
                 se_test = SmallExpTestMul()
                 combined2 = BinaryNode.copy(combined)
                 ASTVisitor(se_test).preorder(combined2)
-                print("combined: ", combined2)               
+                if VERBOSE: print("combined: ", combined2)               
 #                exit(0)
                 flags['multiple' + str(index)] = True
                 flags[ str(index) ] = combined2
@@ -71,7 +71,7 @@ def handleVerifyEq(equation, index):
 def countInstances(equation):
     Instfind = ExpInstanceFinder()
     ASTVisitor(Instfind).preorder(equation)
-    print("Instances found =>", Instfind.instance, "\n")
+    if VERBOSE: print("Instances found =>", Instfind.instance, "\n")
     return Instfind.instance
 
 def isOptimized(data):
@@ -100,7 +100,7 @@ def benchIndivVerification(N, equation, sdl_dict, vars, precompute, _verbose):
     rop_ind = RecordOperations(vars)
     # add attrIndex to non constants
     ASTVisitor(ASTIndexForIndiv(sdl_dict, vars, None)).preorder(equation)
-    print("Final indiv eq:", equation, "\n")
+    if VERBOSE: print("Final indiv eq:", equation, "\n")
     if _verbose:
         print("<====\tINDIVIDUAL\t====>")
         print("vars =>", vars)
@@ -453,8 +453,49 @@ def batcher_main(argv, prefix=None):
 
     # process settings
     for i in range(len(verify_eq)):    
-        print("\nRunning batcher....\n")
+        if VERBOSE: print("\nRunning batcher....\n")
         runBatcher(file + str(i), verify_eq[i], ast_struct, i)
+
+def benchmark_batcher(argv, prefix=None):
+    global THRESHOLD_FLAG, PROOFGEN_FLAG, PRECOMP_CHECK, VERBOSE, CHOOSE_STRATEGY
+    global filePrefix
+    ast_struct = None
+    
+    # main for batch input parser    
+    print(argv)
+    file = argv[1]
+    if prefix: filePrefix = prefix
+    for i in argv:
+        if i == "-b": THRESHOLD_FLAG = True
+        elif i == "-v": VERBOSE = True
+        elif i == "-p": PROOFGEN_FLAG = True
+        elif i == "-s": CHOOSE_STRATEGY = True
+    ast_struct = parseFile(file)
+    
+    start = time.time()
+    verify_eq, N = [], None; cnt = 0
+    for n in ast_struct[ OTHER ]:
+        if 'verify' in str(n.left):
+            result = handleVerifyEq(n, cnt); cnt += 1
+            if type(result) != list: verify_eq.append(result)
+            else: verify_eq.extend(result)
+
+    # verify 
+    variables = ast_struct[ TYPE ]
+    for eq in verify_eq:
+        bte = BasicTypeExist( variables )
+        ASTVisitor( bte ).preorder( eq )
+        bte.report( eq )
+        
+        cte = PairingTypeCheck( variables )
+        ASTVisitor( cte ).preorder( eq )
+        cte.report( eq )
+
+    # process settings
+    stop = time.time()
+    for i in range(len(verify_eq)):    
+        runBatcher(file + str(i), verify_eq[i], ast_struct, i)
+    return (start, stop)
 
 if __name__ == "__main__":
    batcher_main(sys.argv)

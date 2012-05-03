@@ -91,7 +91,7 @@ class BatchOrder:
         for i in self.batch_time.keys():
 #            if not all_paths[i] in remove_list:
              if True:
-                print("unique path:", i, ", time:", self.batch_time[i], ", path: ", all_paths[i])
+                if self.debug: print("unique path:", i, ", time:", self.batch_time[i], ", path: ", all_paths[i])
                 if self.batch_time[i] <= min_time:
                     min_index = i; 
                     min_time = self.batch_time[i]
@@ -130,8 +130,9 @@ class BatchOrder:
                 i += 1 # breaks permutation loop
 
         index = batch_time.index(min(batch_time))
-        if self.debug: print("Final list: ", final_list)
-        print("Technique order: ", final_list[index], ": avg batch time: ", batch_time[index])
+        if self.debug: 
+           print("Final list: ", final_list)
+           print("Technique order: ", final_list[index], ": avg batch time: ", batch_time[index])
         return final_list[index]
 
     # recognized patterns of techniques that lead to the optimized batch algorithm 

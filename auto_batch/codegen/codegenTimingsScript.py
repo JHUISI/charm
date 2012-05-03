@@ -4,6 +4,7 @@ from AutoBatch_CodeGen_FOR_TIMING_MSMTS import *
 
 # NOTE: CHP, HESS, CHCH, WATERS05, CYH and BBS give this error: "SubscriptName->setValue: value passed in is of None type."
 schemeNames = ["BLS", "Boyen", "ChCh_Hess", "VRF", "CL", "HW_Single", "HW_Different", "Waters09", "CHP", "HESS", "CHCH", "WATERS", "CYH", "BBS"]
+schemeUsedList = schemeNames
 extensionCG = "_codegen.dat"
 extensionBT = "_batcher.dat"
 numIterations = 100
@@ -66,7 +67,7 @@ def buildSchemesDetails():
 
 	# Waters09
 	schemesDetails["Waters09"]["codegen"] = ["WATERS09/pksig_waters09_mod.py", "WATERS09/batchOutput", "garbageValue", "tmp/waters09IND.py", "tmp/waters09BAT.py", "tmp/waters09VER.py"]
-	schemesDetails["Waters09"]["batcher"] = ["batchverify.py", "../tests/waters09.bv", "-b", "-c", "-p"]
+	schemesDetails["Waters09"]["batcher"] = ["batchverify.py", "../tests/waters09.bv", "-p"] # removed -b, -c
 
 	return schemesDetails
 
@@ -85,10 +86,11 @@ def processOneIterationForCodegen(argsDict):
 
 def processOneIterationForBatcher(argsDict):
 	print("Call: ", argsDict)
-	startTime = time.clock()
+	#startTime = time.clock()
 	# calling batcher
-	Batcher(argsDict)
-	endTime = time.clock()
+	(startTime, endTime) = Batcher(argsDict)
+	#endTime = time.clock()
+	#clearBatcherGlobals()
 
 	result = (endTime - startTime) * time_in_ms
 
@@ -125,12 +127,12 @@ def processIndSchemeBT(prefixName, schemeName, schemesDetails):
 def main(prefixName):
 	schemesDetails = buildSchemesDetails()
 
-	for schemeName in schemeNames:
+	for schemeName in schemeUsedList:
 		if (schemeName != "HW_Single"):
 			# run batcher first
 			processIndSchemeBT(prefixName, schemeName, schemesDetails)
 
-	for schemeName in schemeNames:
+	for schemeName in schemeUsedList:
 		if (schemeName != "HW_Single"):
 			# then, run codegen 
 			processIndSchemeCG(prefixName, schemeName, schemesDetails)
