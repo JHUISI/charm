@@ -273,7 +273,7 @@ def runBatcher(file, verify, ast_struct, eq_number=0):
     verify2 = BinaryNode.copy(verify)
 #    ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
     ASTVisitor(CVForMultiSigner(vars, sig_vars, pub_vars, msg_vars, batch_count)).preorder(verify2)
-#!    if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Combined Equation', 'eq':lcg.print_statement(verify2) }; lcg_steps += 1
+    if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Combined Equation', 'eq':lcg.print_statement(verify2) }; lcg_steps += 1
     # check whether this step is necessary!    
     verify_test = BinaryNode.copy(verify2)
     pif = PairInstanceFinder()
@@ -286,14 +286,14 @@ def runBatcher(file, verify, ast_struct, eq_number=0):
     if VERBOSE: print("\nStage A: Combined Equation =>", verify2)
     ASTVisitor(SmallExponent(constants, vars)).preorder(verify2)
     if VERBOSE: print("\nStage B: Small Exp Test =>", verify2, "\n")
-#    if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Apply the small exponents test, using exponents $\delta_1, \dots \delta_\\numsigs \in_R \Zq$', 
-#                                               'eq':lcg.print_statement(verify2), 'preq':small_exp_label }; lcg_steps += 1
+    if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Apply the small exponents test, using exponents $\delta_1, \dots \delta_\\numsigs \in_R \Zq$', 
+                                               'eq':lcg.print_statement(verify2), 'preq':small_exp_label }; lcg_steps += 1
 
     # figure out order automatically (if not specified in bv file)
-    if FIND_ORDER:
-        result = BatchOrder(sdl_data, types, vars, BinaryNode.copy(verify2)).strategy()
-        algorithm = [str(x) for x in result]
-        print("<== Found Batch Algorithm ==>", algorithm)
+#    if FIND_ORDER:
+#        result = BatchOrder(sdl_data, types, vars, BinaryNode.copy(verify2)).strategy()
+#        algorithm = [str(x) for x in result]
+#        print("<== Found Batch Algorithm ==>", algorithm)
 
     # execute the batch algorithm sequence 
 #    for option in algorithm:
