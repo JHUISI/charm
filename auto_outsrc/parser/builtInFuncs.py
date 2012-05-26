@@ -1,5 +1,4 @@
-#from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair, MNT160, SymEnc, SymDec
-from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair
+from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair, MNT160, SymEnc, SymDec
 
 from toolbox.secretutil import SecretUtil
 from charm.pairing import pairing
@@ -32,18 +31,11 @@ def createPolicy(policy_str):
 
 def getAttributeList(policy):
 	getUserGlobals()
-	a_list = []
-	utilBuiltInFuncs.getAttributeList(policy, a_list)
-	return a_list
+	return utilBuiltInFuncs.getAttributeList(policy)
 
 def calculateSharesDict(s, policy):
 	getUserGlobals()
 	return utilBuiltInFuncs.calculateSharesDict(s, policy)
-
-def SymEnc(s_sesskey, M):
-	getUserGlobals()
-	cipher = AuthenticatedCryptoAbstraction(s_sesskey)
-	return cipher.encrypt(M)
 
 def prune(policy, S):
 	getUserGlobals()
@@ -51,20 +43,13 @@ def prune(policy, S):
 
 def getCoefficients(policy):
 	getUserGlobals()
-	z = {}
-	utilBuiltInFuncs.getCoefficients(policy, z)
-	return z
-
-def SymDec(s_sesskey, T1):
-	getUserGlobals()
-	cipher = AuthenticatedCryptoAbstraction(s_sesskey)
-	return cipher.decrypt(T1)
+	return utilBuiltInFuncs.getCoefficients(policy)
 
 def getUserGlobals():
 	global groupObjBuiltInFuncs, utilBuiltInFuncs
 
 	if (groupObjBuiltInFuncs == None):
-		groupObjBuiltInFuncs = PairingGroup('SS512')
+		groupObjBuiltInFuncs = PairingGroup(MNT160)
 
 	if (utilBuiltInFuncs == None):
 		utilBuiltInFuncs = SecretUtil(groupObjBuiltInFuncs, verbose=False)
