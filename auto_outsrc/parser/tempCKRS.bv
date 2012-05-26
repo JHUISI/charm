@@ -1,0 +1,104 @@
+name := ibeckrs09 
+setting := asymmetric
+
+BEGIN :: types
+n := ZR
+l := ZR
+M := GT
+mpk := list
+sk := list
+ct := list
+hl := list
+gl := list
+c := list
+d := list
+z := list
+END :: types
+
+BEGIN :: func:setup
+input := list{n, l}
+alpha := random(ZR)
+t1 := random(ZR)
+t2 := random(ZR)
+t3 := random(ZR)
+t4 := random(ZR)
+g := random(G1) 
+#h := random(G1)
+h := random(G2)
+omega := e(g, h)^(t1 * (t2 * alpha))
+BEGIN :: for
+for{y := 1, n}
+z#y := random(ZR) # n of these
+gl#y := g ^ z#y
+hl#y := h ^ z#y
+END :: for
+
+v1 := g ^ t1
+v2 := g ^ t2
+v3 := g ^ t3
+v4 := g ^ t4
+
+mpk := list{omega, g, h, gl, hl, v1, v2, v3, v4, n, l}
+msk := list{alpha, t1, t2, t3, t4}
+
+output := list{mpk, msk}
+END :: func:setup
+
+
+BEGIN :: func:extract
+input := list{mpk, msk, id}
+mpk := expand{omega, g, h, gl, hl, v1, v2, v3, v4, n, l}
+msk := expand{alpha, t1, t2, t3, t4}
+
+r1 := random(ZR)
+r2 := random(ZR)
+hID := strToId(mpk, id)
+hashIDDotProd := (prod{y := 0, n} on { hl#y ^ hID#y })
+hashID := hl#0 * hashIDDotProd
+
+d#0 := h ^ ((r1 * (t1 * t2)) + (r2 * (t3 * t4)))
+halpha := (h ^ -alpha)
+hashID2r1 := hashID ^ -r1
+d#1 := (halpha ^ t2) * (hashID2r1 ^ t2)
+d#2 := (halpha ^ t1) * (hashID2r1 ^ t1)
+hashID2r2 := hashID ^ -r2
+d#3 := (hashID2r2 ^ t4)
+d#4 := (hashID2r2 ^ t3)
+        
+sk := list{id, d}
+output := sk
+END :: func:extract
+
+
+BEGIN :: func:encrypt
+input := list{mpk, M, id}
+mpk := expand{omega, g, h, gl, hl, v1, v2, v3, v4, n, l}
+
+s := random(ZR)
+s1 := random(ZR)
+s2 := random(ZR)
+
+hID1 := strToId(mpk, id) # list <-: strToId(list, str)
+hashID1DotProd := (prod{y := 0, n} on { gl#y ^ hID1#y })
+hashID1 := gl#0 * hashID1DotProd
+
+c_pr := (omega ^ s) * M
+c#0 := hashID1 ^ s
+c#1 := v1 ^ (s - s1)
+c#2 := v2 ^ s1
+c#3 := v3 ^ (s - s2)
+c#4 := v4 ^ s2
+
+ct := list{c, c_pr}
+output := ct
+END :: func:encrypt
+
+BEGIN :: func:decrypt
+input := list{sk, ct}
+sk := expand{id, d}
+ct := expand{c, c_pr}
+
+result := e(c#0, d#0) * e(c#1, d#1) * e(c#2, d#2) * e(c#3, d#3) * e(c#4, d#4)        
+M := c_pr * result   
+output := M
+END :: func:decrypt

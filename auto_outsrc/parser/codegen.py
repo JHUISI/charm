@@ -398,6 +398,29 @@ def getLambdaReplacementsString(lambdaReplacements, includeFirstLambdaVar):
 
     return (retString, reverseDict[0])
 
+def writeLamFuncToUserFuncsFile(lambdaReplacements, startVal, dotProdObj, forInt):
+    global userFuncsFile
+
+    userFuncsOutputString = ""
+    userFuncsOutputString += "def "
+    userFuncsOutputString += currentLambdaFuncName
+    userFuncsOutputString += "("
+    (lambdaReplacementOutputString, lambdaLoopVar) = getLambdaReplacementsString(lambdaReplacements, False)
+    userFuncsOutputString += lambdaLoopVar + ", " 
+    if (forInt == False):
+        userFuncsOutputString += startVal + ", "
+    userFuncsOutputString += lambdaReplacementOutputString
+    userFuncsOutputString = userFuncsOutputString[0:(len(userFuncsOutputString) - len(", "))]
+    userFuncsOutputString += "):\n\t"
+    userFuncsOutputString += userGlobalsFuncName + "()\n\t"
+    if (forInt == False):
+        userFuncsOutputString += lambdaLoopVar + " = " + getStringFunctionName + "("
+        userFuncsOutputString += startVal + "[" + lambdaLoopVar + "])\n\t"
+    userFuncsOutputString += "return " + getAssignStmtAsString(dotProdObj.getBinaryNode().right, None, None, None, False)
+    userFuncsOutputString += "\n\n"
+
+    userFuncsFile.write(userFuncsOutputString)
+
 def processDotProdAsNonInt(dotProdObj, currentLambdaFuncName, lambdaReplacements):
     global userFuncsFile
 
@@ -409,20 +432,9 @@ def processDotProdAsNonInt(dotProdObj, currentLambdaFuncName, lambdaReplacements
     userFuncsOutputString += "def " + getStringFunctionName + "(" + getStringFunctionName + argSuffix + "):\n\t"
     userFuncsOutputString += userGlobalsFuncName + "()\n\t"
     userFuncsOutputString += "return " + getStringFunctionName + argSuffix + ".getAttribute()\n\n"
-    userFuncsOutputString += "def "
-    userFuncsOutputString += currentLambdaFuncName
-    userFuncsOutputString += "("
-    (lambdaReplacementOutputString, lambdaLoopVar) = getLambdaReplacementsString(lambdaReplacements, False)
-    userFuncsOutputString += lambdaLoopVar + ", " + startVal + ", "
-    userFuncsOutputString += lambdaReplacementOutputString
-    userFuncsOutputString = userFuncsOutputString[0:(len(userFuncsOutputString) - len(", "))]
-    userFuncsOutputString += "):\n\t"
-    userFuncsOutputString += userGlobalsFuncName + "()\n\t"
-    userFuncsOutputString += lambdaLoopVar + " = " + getStringFunctionName + "("
-    userFuncsOutputString += startVal + "[" + lambdaLoopVar + "])\n\t"
-    userFuncsOutputString += "return " + getAssignStmtAsString(dotProdObj.getBinaryNode().right, None, None, None, False)
-    userFuncsOutputString += "\n\n"
     userFuncsFile.write(userFuncsOutputString)
+
+    writeLamFuncToUserFuncsFile(lambdaReplacements, startVal, dotProdObj, False)
 
     dotProdOutputString = ""
     dotProdOutputString += "dotprod2(range(0, "
@@ -437,6 +449,8 @@ def processDotProdAsNonInt(dotProdObj, currentLambdaFuncName, lambdaReplacements
     return dotProdOutputString
 
 def processDotProdAsInt(dotProdObj, currentLambdaFuncName, lambdaReplacements):
+    writeLamFuncToUserFuncsFile(lambdaReplacements, str(dotProdObj.getStartVal()), dotProdObj, True)
+
     dotProdOutputString = "dotprod2(range("
     dotProdOutputString += replacePoundsWithBrackets(str(dotProdObj.getStartVal()))
     dotProdOutputString += ","
