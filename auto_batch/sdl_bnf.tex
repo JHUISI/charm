@@ -1,0 +1,73 @@
+<name-statement> ::= <sdl-name>.
+
+<assign-statement> ::=  <variable-name> <assign-op> <expr-statement> 
+		      | <variable-name> <assign-op> <func-call-statement>  
+	   	      | <sig-size-statement>
+		      | <setting-statement>
+		      | <group-assign-statement>
+		      | <dict-statement>
+		      | <random-statement>
+		      | <hash-statement>
+		      | <pair-statement>
+
+<sig-size-statement> ::= <N-name> <assign-op> <integer>.
+<N-name> ::= "N"
+<setting-statement> ::= <setting-name> <assign-op> <setting-token>.
+<setting-name> ::= "setting"
+<setting-token> ::= "symmetric" 
+		      | "asymmetric".
+<group-assign-statement> ::= <variable-name> <assign-op> <type>.
+<func-call-statement> ::= <variable-name> "(" <arg-list> ")"
+<arg-list> ::= <arg-name> | <arg-name> "," <arg-list>
+<arg-name> ::= <variable-name>
+
+<random-statement> ::= <random-name> "(" <group-type> ")".
+<random-name> ::= "random"
+<hash-statement> ::= <hash-name> "(" <arg-list> "," <group-type> ")"
+<hash-name> ::= "H"
+<dict-statement> ::= "list{" <arg-list> "}" 
+		   | "expand{" <arg-list> "}".
+
+<dot-prod-statement> ::= "prod{" <assign-statement> "," <assign-statement> "}" "on" <expr-statement>
+<sum-of-statement> ::= "sum{" <assign-statement> "," <assign-statement> "}" "of" <expr-statement>
+<for-statement> ::= <proc-token> <block-sep> <for-token> 
+	          | "for{" <assign-statement> "," <assign-statement> "}" 
+		  | "forall{" <assign-statement> "," <assign-statement> "}"
+
+<expr-statement> ::= <expr-statement> <group-op> <expr-statement>
+		     | <exp1-statement>
+		     | <variable-name>.
+
+<pair-statement> ::= "e(" <expr-statement> "," <expr-statement> ")"
+		    | <pair-statement> <group-op> <pair-statement>
+		    | <pair-statement> <exp> <exp1-statement>
+
+<exp1-statement> ::= <exp1-statement> <exp> <exp2-statement>
+		  | <expr2-statement>
+
+<exp2-statement> ::= <expr-statement> <exp-ops> <expr-statement>
+		  | <expr-statement> <group-op> <expr-statement>
+		  | <unary-op> <exp2-statement>
+
+<exp> ::= "^"
+<exp-ops> ::= "+" | "-" | <group-op> 
+<group-op> ::= "*" | "/" 
+<bool-op> ::= "|" | "and" | "or" 
+<unary-op> ::= "-"
+
+<group-type> ::= None | ZR | G1 | G2 | GT 
+<type> ::= <group-type> | str | object | "list{" <group-type>, [ <group-type> ] "}" | 
+					 "expand{" <group-type>, [ <group-type> ] "}"
+
+<procedure> ::= <proc-token> <block-sep> <procedure-name>.
+<procedure-name> ::= <variable-name> | "func:" <procedure-name>.
+<proc-token> ::= "BEGIN" | "END"
+<block-sep> ::= "::"
+
+
+<variable-name> ::= <letters>{<letters>|<integer>|<symbols>}*. 
+<assign-op> ::= ":=" 
+<letters> := {"A-Z" | "a-z"}*
+<integer> ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+<symbols> ::= '_' | '#' | '?' | "$" 
+
