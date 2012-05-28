@@ -7,7 +7,7 @@ blindingSuffix = "Blinded"
 setupFuncName = "setup"
 keygenBlindingExponent = "zz"
 keygenBlindingExponentType = "ZR"
-keygenFuncName = "extract"
+keygenFuncName = "keygen"
 
 encryptFuncName = "encrypt"
 
@@ -99,9 +99,7 @@ serializePubKeyType = "GT"
 serializePubKey_DecOut = "pk"
 
 linesForSetupMain = []
-linesForSetupMain.append("n = 10")
-linesForSetupMain.append("l = 5")
-linesForSetupMain.append("id = \"john@example.com\"")
+linesForSetupMain.append("S = ['ONE', 'TWO', 'THREE']")
 linesForSetupMain.append("M = \"balls on fire345\"")
 linesForSetupMain.append("policy_str = '((four or three) and (two or one))'")
 
