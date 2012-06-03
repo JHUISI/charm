@@ -7,6 +7,8 @@ header = """\n
 \\catcode`\^ = 13 \def^#1{\sp{#1}{}}
 \\newcommand{\\newln}{\\\&\quad\quad{}}
 \\newcommand{\schemename}{{\sf %s}}
+\\newcommand{\schemeref}{%s_proof}
+\\newcommand{\schemecite}{\cite{REF}}
 \\newcommand{\pkvariables}{ %s }
 \\newcommand{\sigvariables}{ %s }
 \\newcommand{\indivverificationeqn}{ %s }

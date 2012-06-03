@@ -158,7 +158,7 @@ def proofHeader(lcg, title, const, sigs, indiv_eq, batch_eq):
     for i in sigs:
         sig_str += lcg.getLatexVersion(i) + ","
     sig_str = sig_str[:len(sig_str)-1]
-    result = header % (title, const_str, sig_str, indiv_eq, batch_eq)
+    result = header % (title, title, const_str, sig_str, indiv_eq, batch_eq)
     #print("header =>", result)
     return result
 
@@ -173,15 +173,15 @@ def proofBody(step, data):
     return result
 
 def writeConfig(lcg, latex_file, lcg_data, const, vars, sigs):
-#    f = open('verification_gen' + latex_file + '.tex', 'w')
-#    title = latex_file.upper()
-#    outputStr = proofHeader(lcg, title, const, sigs, lcg_data[0]['eq'], lcg_data[0]['batch'])
-#    for i in lcg_data.keys():
-#        if i != 0:
-#            outputStr += proofBody(i, lcg_data[i])
-#    outputStr += footer
-#    f.write(outputStr)
-#    f.close()
+    f = open('verification_gen' + latex_file + '.tex', 'w')
+    title = latex_file.upper()
+    outputStr = proofHeader(lcg, title, const, sigs, lcg_data[0]['eq'], lcg_data[0]['batch'])
+    for i in lcg_data.keys():
+        if i != 0:
+            outputStr += proofBody(i, lcg_data[i])
+    outputStr += footer
+    f.write(outputStr)
+    f.close()
     return
  
  
@@ -286,7 +286,7 @@ def runBatcher(file, verify, ast_struct, eq_number=0):
     if VERBOSE: print("\nStage A: Combined Equation =>", verify2)
     ASTVisitor(SmallExponent(constants, vars)).preorder(verify2)
     if VERBOSE: print("\nStage B: Small Exp Test =>", verify2, "\n")
-    if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Apply the small exponents test, using exponents $\delta_1, \dots \delta_\\numsigs \in_R \Zq$', 
+    if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Apply the small exponents test, using exponents $\delta_1, \dots \delta_\\numsigs \in \{1, 2^\lambda\}$', 
                                                'eq':lcg.print_statement(verify2), 'preq':small_exp_label }; lcg_steps += 1
 
     # figure out order automatically (if not specified in bv file)

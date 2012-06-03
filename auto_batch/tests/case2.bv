@@ -26,7 +26,7 @@ pk
 END :: public
 
 BEGIN :: signature
-S1, S2
+S1h, S2h, S1c, S2c
 END :: signature
 
 BEGIN :: message
@@ -43,12 +43,12 @@ signature := N
 verify := { e(S2h, g2) == ( e(pk, P)^ah ) * S1h } and { e(S2c, g2) == (e(S1c * pk^ac, P)) }
 
 BEGIN :: latex
-S1h := S_1
-S2h := S_2
-S1c := S_1
-S2c := S_2
+S1h := Sh_1
+S2h := Sh_2
+S1c := Sc_1
+S2c := Sc_2
 g2 := g_2
 P := P_{pub}
-ah := a
-ac := a
+ah := ah
+ac := ac
 END :: latex
