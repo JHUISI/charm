@@ -161,7 +161,6 @@ result=$?
 if test ${result} -ne 0 ; then
     echo "python installed, but not version 3.x. Trying python3 instead"
 	python_path="$(which python3)"
-
     #Confirm that python3 actually is python version 3.x
     $python_path $TMPC
     result=$?
