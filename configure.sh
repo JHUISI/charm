@@ -128,15 +128,51 @@ libdir="\${prefix}/lib"
 sysconfdir="\${prefix}/etc"
 confsuffix="/charm"
 profiler="no"
-python_path="$(which python)"
 wget="$(which wget)"
 
-#fall back to python if for some reason python3 does not exist 
-# there is still a version check later so it sitll has to be
-# python 3 
+# Python version handling logic. We prefer to use the version poited to by 
+# python if it is python 3. Baring that, we try python3  
+# Ths logic also handles the version check
+# which normally would be far further along in the file
+python_path="$(which python)"
+python3_found="no"
+
+#if python is not installed, try python3. 
 if !  [ -n "$python_path"  ]; then
-   python_path="$(which python)"
-fi 
+    echo "Python not installed, trying python3"
+    python_path="$(which python3)"
+fi
+
+# check if the python version is correct
+cat > $TMPC << EOF
+import sys
+
+if float(sys.version[:3]) >= 3.0:
+    exit(0)
+else:
+   exit(-1)
+EOF
+$python_path $TMPC
+result=$?
+if test ${result} -ne 0 ; then
+    echo "python installed, but not version 3.x. Trying python3 instead"
+	python_path="$(which python3)"
+else
+    echo "using \`which python\` as path to python3: $python_path"
+fi;
+echo "sd $python_path"
+#Confirm that what ever version python_path points to is in fact version 3.
+# This may be redundant but it is clean
+$python_path $TMPC
+result=$?
+if test ${result} = 0 ; then
+    python3_found="yes"
+else
+    echo "No python 3 version found. This version of Charm requires python version 3.x. Specify python3 location with --python=/path/to/python3"
+    echo "Otherwise, use the python 2.7+ version"
+fi
+
+ 
 # set -x
 
 # parse CC options first
@@ -563,22 +599,6 @@ fi
 #fi
 
 ##########################################
-# python3 probe
-cat > $TMPC << EOF
-import sys
-
-if float(sys.version[:3]) >= 3.0:
-   exit(0)
-else:
-   print("Need 3.x. Specify --python=/path/to/python3")
-   exit(-1)
-EOF
-python3_found="no"
-$python_path $TMPC
-result=$?
-if test ${result} = 0 ; then
-	python3_found="yes"
-fi
 
 cat > $TMPC << EOF
 try:
