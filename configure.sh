@@ -166,7 +166,7 @@ if test ${result} -ne 0 ; then
     result=$?
     if test ${result} = 0 ; then
         python3_found="yes"
-        echo "using \`which python\` as path to python3: $python_path"
+        echo "Python 3.x found: using \`which python3\` as path to python3: $python_path"
     else
         echo "No python 3 version found. This version of Charm requires python version 3.x. Specify python3 location with --python=/path/to/python3"
         echo "Otherwise, use the python 2.7+ version"
