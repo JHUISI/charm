@@ -17,7 +17,7 @@ Hohenberger-Waters Stateful Signatures (RSA-based)
 
 from charm.integer import *
 from toolbox.PKSig import PKSig
-from chamhash_rsa_hw09 import ChamHash_HW09
+from schemes.chamhash_rsa_hw09 import ChamHash_HW09
 from toolbox.conversion import Conversion
 from toolbox.bitstring import Bytes
 from toolbox.specialprimes import BlumWilliamsInteger

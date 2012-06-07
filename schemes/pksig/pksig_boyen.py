@@ -103,8 +103,8 @@ class Boyen(PKSig):
         return False
 
 def main():
-   #groupObj = PairingGroup('MNT224')
-   groupObj = PairingGroup(MNT160)
+   groupObj = PairingGroup('MNT224')
+   #groupObj = PairingGroup(MNT160)
    boyen = Boyen(groupObj)
    mpk = boyen.setup()
    if debug: print("Pub parameters")
