@@ -26,7 +26,7 @@ math_path = core_path + 'math/'
 crypto_path = core_path + 'crypto/'
 utils_path = core_path + 'utils/'
 
-core_prefix = 'core'
+core_prefix = 'charm.core'
 math_prefix = core_prefix + '.math'
 crypto_prefix = core_prefix + '.crypto'
 
@@ -50,7 +50,8 @@ if opt.get('PAIR_MOD') == 'yes':
                                         math_path + 'pairing/miracl/miraclwrapper.cc'],
                             libraries=['gmp','stdc++'],
                             extra_objects=[math_path+'pairing/miracl/miracl.a'], extra_compile_args=None)
-        _ext_modules.append(pairing_module)
+
+    _ext_modules.append(pairing_module)
    
 if opt.get('INT_MOD') == 'yes':
    integer_module = Extension(math_prefix + '.integer', 
@@ -92,13 +93,26 @@ if platform.system() in ['Linux', 'Windows']:
    if opt.get('ECC_MOD') == 'yes': ecc_module.sources.append(utils_path + 'benchmarkmodule.c')
 
 setup(name = 'Charm-Crypto',
-	ext_package = 'charm',
 	version =  _charm_version,
 	description = 'Charm is a framework for rapid prototyping of cryptosystems',
 	ext_modules = _ext_modules,
 	author = "J. Ayo Akinyele",
 	author_email = "ayo.akinyele@charm-crypto.com",
 	url = "http://charm-crypto.com/",
-	packages = ['charm'],
+	packages = ['charm',
+                    'charm.core',
+                        'charm.core.engine',
+                    'charm.schemes',
+                        'charm.schemes.abenc',
+                        'charm.schemes.commit',
+                        'charm.schemes.dabenc',
+                        'charm.schemes.grpsig',
+                        'charm.schemes.hibenc',
+                        'charm.schemes.ibenc',
+                        'charm.schemes.pkenc',
+                        'charm.schemes.pksig',
+                    'charm.toolbox',
+                    'charm.zkp_compiler',
+                ],
     license = 'GPL'
-     )
+)
