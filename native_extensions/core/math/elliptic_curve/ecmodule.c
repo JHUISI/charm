@@ -1612,7 +1612,7 @@ PyNumberMethods ecc_number = {
 
 PyTypeObject ECType = {
 	PyVarObject_HEAD_INIT(NULL, 0)
-	"ecc.Element",             /*tp_name*/
+	"elliptic_curve.Element",             /*tp_name*/
 	sizeof(ECElement),         /*tp_basicsize*/
 	0,                         /*tp_itemsize*/
 	(destructor)ECElement_dealloc, /*tp_dealloc*/
@@ -1697,7 +1697,7 @@ PyNumberMethods ecc_number = {
 PyTypeObject ECType = {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
-    "ecc.Element",             /*tp_name*/
+    "elliptic_curve.Element",             /*tp_name*/
     sizeof(ECElement),             /*tp_basicsize*/
     0,                         /*tp_itemsize*/
     (destructor)ECElement_dealloc, /*tp_dealloc*/
@@ -1786,7 +1786,7 @@ static int ecc_clear(PyObject *m) {
 
 static struct PyModuleDef moduledef = {
 		PyModuleDef_HEAD_INIT,
-		"ecc",
+		"elliptic_curve",
 		NULL,
 		sizeof(struct module_state),
 		ecc_methods,
@@ -1798,7 +1798,7 @@ static struct PyModuleDef moduledef = {
 
 #define INITERROR return NULL
 PyMODINIT_FUNC
-PyInit_ecc(void) 		{
+PyInit_elliptic_curve(void) 		{
 #else
 #define INITERROR return
 void initecc(void) 		{
@@ -1810,13 +1810,13 @@ void initecc(void) 		{
 #if PY_MAJOR_VERSION >= 3
 	module = PyModule_Create(&moduledef);
 #else
-	module = Py_InitModule("ecc", ecc_methods);
+	module = Py_InitModule("elliptic_curve", ecc_methods);
 #endif
 
 	if(module == NULL)
 		INITERROR;
 	struct module_state *st = GETSTATE(module);
-	st->error = PyErr_NewException("ecc.Error", NULL, NULL);
+	st->error = PyErr_NewException("elliptic_curve.Error", NULL, NULL);
 	if(st->error == NULL) {
 		Py_DECREF(module);
 		INITERROR;
@@ -1832,7 +1832,7 @@ void initecc(void) 		{
     InitClear(dBench);
 
 	Py_INCREF(&ECType);
-	PyModule_AddObject(module, "ecc", (PyObject *)&ECType);
+	PyModule_AddObject(module, "elliptic_curve", (PyObject *)&ECType);
 	PyModule_AddIntConstant(module, "G", G);
 	PyModule_AddIntConstant(module, "ZR", ZR);
 	PyECErrorObject = st->error;
