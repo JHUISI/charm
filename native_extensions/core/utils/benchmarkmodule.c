@@ -461,7 +461,7 @@ void initbenchmark(void) 		{
 	PyBenchmark_API[PyBenchmark_StopT]  = (void *)PyStopTBenchmark;
 	PyBenchmark_API[PyBenchmark_Clear]  = (void *)PyClearBenchmark;
 
-	api_object = (PyObject *) PyCapsule_New((void *) PyBenchmark_API, "benchmark._C_API", NULL);
+	api_object = (PyObject *) PyCapsule_New((void *) PyBenchmark_API,BENCHMARK_MOD_NAME, NULL);
 	if(api_object != NULL) PyModule_AddObject(module, "_C_API", api_object);
 
 	Py_INCREF(&BenchmarkType);

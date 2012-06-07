@@ -71,7 +71,7 @@ if opt.get('ECC_MOD') == 'yes':
 				libraries=['gmp', 'crypto'])
    _ext_modules.append(ecc_module)
 
-benchmark_module = Extension(core_prefix + '.benchmark', sources = [utils_path + 'benchmarkmodule.c'])
+benchmark_module = Extension('benchmark', sources = [utils_path + 'benchmarkmodule.c'])
 
 cryptobase = Extension(crypto_prefix+'.base', sources = [crypto_path + 'cryptobasemodule.c'])
 
@@ -102,6 +102,7 @@ setup(name = 'Charm-Crypto',
 	packages = ['charm',
                     'charm.core',
                         'charm.core.engine',
+                        'charm.core.math',
                     'charm.schemes',
                         'charm.schemes.abenc',
                         'charm.schemes.commit',

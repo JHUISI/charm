@@ -31,6 +31,7 @@ extern "C" {
 	#define PyToLongObj(o) PyInt_FromSize_t(o)
 #endif
 
+#define BENCHMARK_MOD_NAME "benchmark._C_API"
 
 // define new benchmark type for benchmark module
 PyTypeObject BenchmarkType;
@@ -203,7 +204,7 @@ static PyObject *func_name(PyObject *self, PyObject *args) { \
 
 static int import_benchmark(void)
 {
-	PyBenchmark_API = (void **) PyCapsule_Import("benchmark._C_API", 1);
+	PyBenchmark_API = (void **) PyCapsule_Import(BENCHMARK_MOD_NAME, 1);
 	return (PyBenchmark_API != NULL) ? 0 : -1;
 }
 
