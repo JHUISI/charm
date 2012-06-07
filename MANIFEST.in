@@ -1,7 +1,3 @@
 include VERSION README INSTALL configure.sh Makefile CHANGELOG
-recursive-include param/ *.param
-recursive-include tests/ *.py
-recursive-include charm-src/ *.h *.c *.cc *.py *.sh
-recursive-exclude schemes/ ake_ecmqv.py
 graft doc
 graft doc/source
