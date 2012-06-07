@@ -73,7 +73,7 @@ if opt.get('ECC_MOD') == 'yes':
 
 benchmark_module = Extension('benchmark', sources = [utils_path + 'benchmarkmodule.c'])
 
-cryptobase = Extension(crypto_prefix+'.base', sources = [crypto_path + 'cryptobasemodule.c'])
+cryptobase = Extension(crypto_prefix+'.cryptobase', sources = [crypto_path + 'cryptobasemodule.c'])
 
 aes = Extension(crypto_prefix + '.AES', sources = [crypto_path + 'AES.c'])
 
@@ -101,8 +101,9 @@ setup(name = 'Charm-Crypto',
 	url = "http://charm-crypto.com/",
 	packages = ['charm',
                     'charm.core',
+                        'charm.core.crypto', #contains only c modules, but needs __init__.py to load them
                         'charm.core.engine',
-                        'charm.core.math',
+                        'charm.core.math', #same as charm.core.crypto
                     'charm.schemes',
                         'charm.schemes.abenc',
                         'charm.schemes.commit',
