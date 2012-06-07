@@ -2,8 +2,8 @@
 Contains all the auxillary functions to do linear secret sharing (LSS) over an access structure. Mainly, we represent the 
 access structure as a binary tree. This could also support matrices for representing access structures.
 '''
-from charm.pairing import *
-from toolbox.policytree import *
+from charm.core.math.pairing import *
+from charm.toolbox.policytree import *
 
 class SecretUtil:
     def __init__(self, groupObj, verbose=True):

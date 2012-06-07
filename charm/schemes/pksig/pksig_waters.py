@@ -12,10 +12,10 @@ Waters - Identity-based signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
-from toolbox.iterate import dotprod
-from toolbox.conversion import Conversion
-from toolbox.bitstring import Bytes
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
+from charm.toolbox.iterate import dotprod
+from charm.toolbox.conversion import Conversion
+from charm.toolbox.bitstring import Bytes
 import hashlib
 
 debug = False

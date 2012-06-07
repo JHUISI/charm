@@ -1,6 +1,6 @@
-from schemes.ibenc.ibenc_bb03 import IBE_BB04
-from toolbox.IBEnc import IBEnc
-from toolbox.pairinggroup import *
+from charm.schemes.ibenc.ibenc_bb03 import IBE_BB04
+from charm.toolbox.IBEnc import IBEnc
+from charm.toolbox.pairinggroup import *
 
 debug = False
 class HashIDAdapter(IBEnc):

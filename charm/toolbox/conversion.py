@@ -4,8 +4,8 @@
 
 This class facilitates conversion between domain spaces
 '''
-from charm.integer import integer
-from toolbox.bitstring import Bytes,py3
+from charm.core.math.integer import integer
+from charm.toolbox.bitstring import Bytes,py3
 import math
 
 class Conversion(object):

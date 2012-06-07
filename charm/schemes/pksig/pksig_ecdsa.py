@@ -12,9 +12,9 @@ Digital Signature Algorithm (DSA)
 :Authors:    J. Ayo Akinyele
 :Date:       5/2011
 """
-from toolbox.ecgroup import *
-from toolbox.PKSig import PKSig
-from toolbox.eccurve import prime192v2
+from charm.toolbox.ecgroup import *
+from charm.toolbox.PKSig import PKSig
+from charm.toolbox.eccurve import prime192v2
 
 debug = False
 class ECDSA(PKSig):

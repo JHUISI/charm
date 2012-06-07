@@ -10,12 +10,12 @@
 :Date:			06/2011
 ''' 
 
-from charm.cryptobase import *
-from toolbox.PKSig import *
-from toolbox.bitstring import Bytes
-from toolbox.conversion import Conversion
-from toolbox.pairinggroup import *
-from charm.engine import util
+from charm.core.crypto.cryptobase import *
+from charm.toolbox.PKSig import *
+from charm.toolbox.bitstring import Bytes
+from charm.toolbox.conversion import Conversion
+from charm.toolbox.pairinggroup import *
+from charm.core.engine import util
 import hashlib, math
 
 debug = False

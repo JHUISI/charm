@@ -1,4 +1,4 @@
-from toolbox.schemebase import *
+from charm.toolbox.schemebase import *
 
 class Hash(SchemeBase):
     ''' Base class for Hash functions

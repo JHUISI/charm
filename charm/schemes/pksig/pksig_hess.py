@@ -12,8 +12,8 @@ Hess - Identity-based Signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from toolbox.pairinggroup import PairingGroup,G1,G2,ZR,pair
-from toolbox.PKSig import PKSig
+from charm.toolbox.pairinggroup import PairingGroup,G1,G2,ZR,pair
+from charm.toolbox.PKSig import PKSig
 #import gc
 #gc.disable()
 #gc.set_debug(gc.DEBUG_LEAK)

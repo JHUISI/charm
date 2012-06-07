@@ -10,11 +10,11 @@
 :Date:			06/2011
 ''' 
 
-from charm.cryptobase import *
-from toolbox.IBEnc import IBEnc
-from toolbox.bitstring import Bytes
-from toolbox.conversion import Conversion
-from toolbox.pairinggroup import *
+from charm.core.crypto.cryptobase import *
+from charm.toolbox.IBEnc import IBEnc
+from charm.toolbox.bitstring import Bytes
+from charm.toolbox.conversion import Conversion
+from charm.toolbox.pairinggroup import *
 import hashlib, math
 
 debug = False

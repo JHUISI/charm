@@ -1,4 +1,4 @@
-from charm.integer import *
+from charm.core.math.integer import *
 
 class IntegerGroup:
     def __init__(self, start=0):

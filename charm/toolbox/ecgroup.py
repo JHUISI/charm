@@ -1,4 +1,4 @@
-from charm.ecc import *
+from charm.core.math.elliptic_curve import *
 
 class ECGroup():
     def __init__(self, builtin_cv):

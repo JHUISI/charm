@@ -13,10 +13,10 @@ Allison Lewko, Amit Sahai and Brent Waters (Pairing-based)
 :Date:            12/2010
 '''
 
-from toolbox.pairinggroup import *
-from toolbox.secretutil import *
-from toolbox.policytree import *
-from toolbox.ABEnc import *
+from charm.toolbox.pairinggroup import *
+from charm.toolbox.secretutil import *
+from charm.toolbox.policytree import *
+from charm.toolbox.ABEnc import *
 
 debug = False
 class KPabe(ABEnc):

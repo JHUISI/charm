@@ -13,8 +13,8 @@
 :Date:    4/2011
 '''
 
-from toolbox.Hash import *
-from toolbox.integergroup import *
+from charm.toolbox.Hash import *
+from charm.toolbox.integergroup import *
 
 debug = False
 class ChamHash_Adm05(ChamHash):

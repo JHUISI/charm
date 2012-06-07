@@ -12,9 +12,9 @@ Chow-Yiu-Hui - Identity-based ring signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from toolbox.pairinggroup import PairingGroup,G1,G2,GT,ZR,pair
-from toolbox.PKSig import PKSig
-from toolbox.iterate import dotprod
+from charm.toolbox.pairinggroup import PairingGroup,G1,G2,GT,ZR,pair
+from charm.toolbox.PKSig import PKSig
+from charm.toolbox.iterate import dotprod
 
 debug = False
 

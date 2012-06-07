@@ -1,7 +1,7 @@
 '''A collection of encryption and signature padding schemes'''
-from toolbox.bitstring import Bytes,py3
-from toolbox.securerandom import SecureRandomFactory
-import charm.cryptobase
+from charm.toolbox.bitstring import Bytes,py3
+from charm.toolbox.securerandom import SecureRandomFactory
+import charm.core.crypto.cryptobase
 import hashlib
 import math
 import struct

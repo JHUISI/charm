@@ -1,5 +1,5 @@
-from charm.pairing import *
-from toolbox.pairingcurves import params
+from charm.core.math.pairing import *
+from charm.toolbox.pairingcurves import params
 import os.path
 
 class PairingGroup():

@@ -12,8 +12,8 @@ Brent Waters (Pairing-based)
 :Authors:    J Ayo Akinyele
 :Date:       2/2012
 '''
-from toolbox.pairinggroup import *
-from toolbox.IBEnc import *
+from charm.toolbox.pairinggroup import *
+from charm.toolbox.IBEnc import *
 
 debug = False
 class IBEWaters09(IBEnc):

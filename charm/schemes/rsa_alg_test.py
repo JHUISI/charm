@@ -3,9 +3,9 @@
 :authors: Gary Belvin
 '''
 from binascii import a2b_hex
-from pkenc.pkenc_rsa import RSA_Enc, RSA_Sig
-from toolbox.conversion import Conversion
-from toolbox.securerandom import WeakRandom
+from charm.schemes.pkenc.pkenc_rsa import RSA_Enc, RSA_Sig
+from charm.toolbox.conversion import Conversion
+from charm.toolbox.securerandom import WeakRandom
 import unittest
 from random import Random
 

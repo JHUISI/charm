@@ -12,10 +12,10 @@ El Gamal Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption in g
 :Date:           3/2011
 '''
 
-from toolbox.integergroup import IntegerGroupQ
-from toolbox.ecgroup import *
-from toolbox.PKEnc import PKEnc
-from toolbox.eccurve import prime192v2
+from charm.toolbox.integergroup import IntegerGroupQ
+from charm.toolbox.ecgroup import *
+from charm.toolbox.PKEnc import PKEnc
+from charm.toolbox.eccurve import prime192v2
 
 debug = False
 class ElGamalCipher(dict):

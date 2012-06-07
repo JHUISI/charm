@@ -4,7 +4,7 @@ Base class for identity-based encryption
  Notes: This class implements an interface for a standard identity-based encryption scheme.
         Identity-based encryption consists of three algorithms: (setup, extract, encrypt, and decrypt).
 '''
-from toolbox.schemebase import *
+from charm.toolbox.schemebase import *
 
 class IBEnc(SchemeBase):
     def __init__(self):

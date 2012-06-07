@@ -13,9 +13,9 @@ John Bethencourt, Brent Waters (Pairing-based)
 :Authors:    J Ayo Akinyele
 :Date:            04/2011
 '''
-from toolbox.pairinggroup import *
-from toolbox.secretutil import SecretUtil
-from toolbox.ABEnc import *
+from charm.toolbox.pairinggroup import *
+from charm.toolbox.secretutil import SecretUtil
+from charm.toolbox.ABEnc import *
 
 # type annotations
 pk_t = { 'g':G1, 'g2':G2, 'h':G1, 'f':G1, 'e_gg_alpha':GT }

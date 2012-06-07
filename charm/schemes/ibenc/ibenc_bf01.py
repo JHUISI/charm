@@ -13,10 +13,10 @@ Boneh-Franklin Identity Based Encryption
 :Date:       2/2011
 :Status:     BROKEN
 '''
-from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
-from charm.integer import randomBits,integer,bitsize
-from toolbox.hash_module import Hash,int2Bytes,integer
-from toolbox.IBEnc import IBEnc
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
+from charm.core.math.integer import randomBits,integer,bitsize
+from charm.toolbox.hash_module import Hash,int2Bytes,integer
+from charm.toolbox.IBEnc import IBEnc
 
 debug = False
 class IBE_BonehFranklin(IBEnc):

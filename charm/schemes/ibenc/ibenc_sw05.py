@@ -13,11 +13,11 @@ Sahai-Waters Fuzzy Identity-Based Encryption, Original Construction
 :Date:       10/2011
 '''
 
-from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-from charm.cryptobase import *
-from toolbox.IBEnc import IBEnc
-from charm.pairing import hash as sha1
-from toolbox.secretshare import *
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.core.crypto.cryptobase import *
+from charm.toolbox.IBEnc import IBEnc
+from charm.core.math.pairing import hash as sha1
+from charm.toolbox.secretshare import *
 import sys
 
 debug = False

@@ -3,11 +3,11 @@
 import random, string
 # Works for ElGamal and CS98 schemes
 #from ec_cs98_enc import *
-from toolbox.symcrypto import AuthenticatedCryptoAbstraction
-from toolbox.eccurve import prime192v1
-from schemes.pkenc.pkenc_elgamal85 import *
-from toolbox.PKEnc import PKEnc
-from charm.cryptobase import *
+from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
+from charm.toolbox.eccurve import prime192v1
+from charm.schemes.pkenc.pkenc_elgamal85 import *
+from charm.toolbox.PKEnc import PKEnc
+from charm.core.crypto.cryptobase import *
 from math import ceil
 from os import urandom
 import base64

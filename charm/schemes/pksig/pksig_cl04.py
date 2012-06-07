@@ -12,8 +12,8 @@
 :Authors:    J. Ayo Akinyele
 :Date:       1/2012
  '''
-from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
-from toolbox.PKSig import PKSig
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
+from charm.toolbox.PKSig import PKSig
 
 debug = False
 class CL04(PKSig):

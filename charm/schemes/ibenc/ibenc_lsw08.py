@@ -12,8 +12,8 @@ Allison Lewko, Amit Sahai and Brent Waters (Pairing-based)
 :Authors:    J Ayo Akinyele
 :Date:       1/2012
 '''
-from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-from toolbox.IBEnc import *
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.IBEnc import *
 
 debug = False
 class IBE_Revoke(IBEnc):

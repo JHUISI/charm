@@ -8,13 +8,13 @@ Boneh-Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform
 :Author: Christina Garman
 :Date: 12/2011
 '''
-from charm.engine.util import *
-from toolbox.pairinggroup import *
-from charm.pairing import hash as sha1
+from charm.core.engine.util import *
+from charm.toolbox.pairinggroup import *
+from charm.core.math.pairing import hash as sha1
 import hmac, hashlib, math
-from toolbox.IBEnc import *
-from schemes.encap_bchk05 import *
-from schemes.ibenc.ibenc_bb03 import *
+from charm.toolbox.IBEnc import *
+from charm.schemes.encap_bchk05 import *
+from charm.schemes.ibenc.ibenc_bb03 import *
 
 debug = False
 class BCHKIBEnc(IBEnc):

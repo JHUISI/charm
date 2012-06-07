@@ -21,10 +21,10 @@ Notes:	This transform was first described by Boneh and Franklin but credited to 
 :Date:		05/2011
 '''
 
-from schemes.ibenc_bb03 import IBE_BB04
-from toolbox.PKSig import *
-from toolbox.pairinggroup import *
-#from toolbox.ibe_bb03 import *
+from charm.schemes.ibenc_bb03 import IBE_BB04
+from charm.toolbox.PKSig import *
+from charm.toolbox.pairinggroup import *
+#from charm.toolbox.ibe_bb03 import *
 
 debug = False
 class Sig_Generic_ibetosig_Naor01(PKSig):

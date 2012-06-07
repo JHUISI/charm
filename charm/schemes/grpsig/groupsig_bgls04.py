@@ -12,8 +12,8 @@ Dan Boneh, Xavier Boyen, and Hovav Shacham
 :Authors:    J Ayo Akinyele
 :Date:           12/2010
 '''
-from toolbox.pairinggroup import *
-from toolbox.PKSig import PKSig
+from charm.toolbox.pairinggroup import *
+from charm.toolbox.PKSig import PKSig
 
 debug=False
 class ShortSig(PKSig):

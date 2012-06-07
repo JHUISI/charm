@@ -13,8 +13,8 @@ Groth-Sahai Commitment Scheme
 :Date:		6/2011
 '''
 
-from toolbox.pairinggroup import *
-from toolbox.Commit import *
+from charm.toolbox.pairinggroup import *
+from charm.toolbox.Commit import *
 
 debug=False
 class Commitment_GS08(Commitment):

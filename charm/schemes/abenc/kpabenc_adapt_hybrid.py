@@ -1,11 +1,11 @@
 
-from charm.cryptobase import MODE_CBC,AES
-from toolbox.ABEnc import ABEnc
-from schemes.abenc.abenc_lsw08 import KPabe
-from toolbox.pairinggroup import PairingGroup,GT
-from toolbox.symcrypto import AuthenticatedCryptoAbstraction
-from charm.pairing import hash as sha1
-from toolbox.conversion import *
+from charm.core.crypto.cryptobase import MODE_CBC,AES
+from charm.toolbox.ABEnc import ABEnc
+from charm.schemes.abenc.abenc_lsw08 import KPabe
+from charm.toolbox.pairinggroup import PairingGroup,GT
+from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
+from charm.core.math.pairing import hash as sha1
+from charm.toolbox.conversion import *
 from math import ceil
 
 debug = False

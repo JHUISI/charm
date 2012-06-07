@@ -15,8 +15,8 @@ Cramer-Shoup Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption 
 :Authors:	Matthew Green
 :Date:		1/2011
 '''
-from toolbox.integergroup import *
-from toolbox.PKEnc import *
+from charm.toolbox.integergroup import *
+from charm.toolbox.PKEnc import *
 
 debug = False
 class CS98(PKEnc):	

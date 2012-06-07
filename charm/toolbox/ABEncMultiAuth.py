@@ -5,7 +5,7 @@
 A public key attribute-based encryption scheme consists of four algorithms: 
 (setup, authsetup, keygen, encrypt, decrypt).
 '''
-from toolbox.schemebase import *
+from charm.toolbox.schemebase import *
 
 class ABEncMultiAuth(SchemeBase):
     def __init__(self):

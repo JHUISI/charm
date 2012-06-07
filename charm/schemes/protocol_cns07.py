@@ -12,13 +12,13 @@ Camenisch-Neven-shelat - Oblivious Transfer
 :Authors:    J. Ayo Akinyele
 :Date:       2/2012
 """
-from charm.engine.protocol import *
-from charm.engine.util import *
+from charm.core.engine.protocol import *
+from charm.core.engine.util import *
 from socket import *
-from toolbox.pairinggroup import *
-from schemes.sigma1 import *
-from schemes.sigma2 import *
-from schemes.sigma3 import *
+from charm.toolbox.pairinggroup import *
+from charm.schemes.sigma1 import *
+from charm.schemes.sigma2 import *
+from charm.schemes.sigma3 import *
 import sys
 
 SENDER,RECEIVER = 1,2

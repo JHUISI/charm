@@ -12,10 +12,10 @@ Boneh-Boyen Hierarchical Identity Based Encryption
 :Authors:    J Ayo Akinyele
 :Date:       3/2012
 '''
-from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-from toolbox.conversion import Conversion
-from toolbox.bitstring import Bytes
-from toolbox.iterate import dotprod2
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.conversion import Conversion
+from charm.toolbox.bitstring import Bytes
+from charm.toolbox.iterate import dotprod2
 import hashlib
 
 debug = False

@@ -2,9 +2,9 @@
 Base class for cryptographic secure random number generation
 :authors: Gary Belvin
 '''
-from toolbox.bitstring import Bytes
-from toolbox.conversion import Conversion
-from charm.integer import randomBits
+from charm.toolbox.bitstring import Bytes
+from charm.toolbox.conversion import Conversion
+from charm.core.math.integer import randomBits
 import datetime
 import math
 import random

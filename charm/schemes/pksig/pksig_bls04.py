@@ -1,5 +1,5 @@
 '''
-Boneh-Lynn-Shacham Identity Based Signature
+:Boneh-Lynn-Shacham Identity Based Signature
  
 | From: "D. Boneh, B. Lynn, H. Shacham Short Signatures from the Weil Pairing"
 | Published in: Journal of Cryptology 2004
@@ -12,8 +12,8 @@ Boneh-Lynn-Shacham Identity Based Signature
 :Authors:    J. Ayo Akinyele
 :Date:       1/2011
  '''
-from toolbox.pairinggroup import *
-from charm.engine.util import *
+from charm.toolbox.pairinggroup import *
+from charm.core.engine.util import *
 
 debug = False
 class IBSig():

@@ -10,14 +10,14 @@
 :Date:            09/2011
 '''
 
-from charm.integer import integer,isPrime,gcd,random,randomPrime
-from toolbox.PKEnc import PKEnc
-from toolbox.PKSig import PKSig
-from toolbox.paddingschemes import OAEPEncryptionPadding,PSSPadding,SAEPEncryptionPadding
-from toolbox.redundancyschemes import InMessageRedundancy
-from toolbox.conversion import Conversion
-from toolbox.bitstring import Bytes
-from toolbox.specialprimes import BlumWilliamsInteger
+from charm.core.math.integer import integer,isPrime,gcd,random,randomPrime
+from charm.toolbox.PKEnc import PKEnc
+from charm.toolbox.PKSig import PKSig
+from charm.toolbox.paddingschemes import OAEPEncryptionPadding,PSSPadding,SAEPEncryptionPadding
+from charm.toolbox.redundancyschemes import InMessageRedundancy
+from charm.toolbox.conversion import Conversion
+from charm.toolbox.bitstring import Bytes
+from charm.toolbox.specialprimes import BlumWilliamsInteger
 from math import ceil, floor
 
 debug = False

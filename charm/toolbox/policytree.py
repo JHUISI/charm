@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from pyparsing import *
-from toolbox.node import *
+from charm.toolbox.node import *
 import string
 
 objStack = []

@@ -6,7 +6,7 @@
  Allows one to commit to a value while keeping it hidden, with the ability
  to reveal the committed value later (wiki).
 '''
-from toolbox.schemebase import *
+from charm.toolbox.schemebase import *
 
 class Commitment(SchemeBase):
     def __init__(self):

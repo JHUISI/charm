@@ -15,12 +15,12 @@ Hohenberger-Waters Stateful Signatures (RSA-based)
 :Status:    Needs Improvement.
 """
 
-from charm.integer import *
-from toolbox.PKSig import PKSig
-from chamhash_rsa_hw09 import ChamHash_HW09
-from toolbox.conversion import Conversion
-from toolbox.bitstring import Bytes
-from toolbox.specialprimes import BlumWilliamsInteger
+from charm.core.math.integer import *
+from charm.toolbox.PKSig import PKSig
+from charm.schemes.chamhash_rsa_hw09 import ChamHash_HW09
+from charm.toolbox.conversion import Conversion
+from charm.toolbox.bitstring import Bytes
+from charm.toolbox.specialprimes import BlumWilliamsInteger
 import hmac, hashlib, math
 
 debug = False

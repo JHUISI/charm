@@ -10,11 +10,11 @@
 :Date:            07/2011
 '''
 
-from charm.integer import integer,isPrime,gcd,random,randomPrime
-from toolbox.PKEnc import PKEnc
-from toolbox.PKSig import PKSig
-from toolbox.paddingschemes import OAEPEncryptionPadding,PSSPadding
-from toolbox.conversion import Conversion
+from charm.core.math.integer import integer,isPrime,gcd,random,randomPrime
+from charm.toolbox.PKEnc import PKEnc
+from charm.toolbox.PKSig import PKSig
+from charm.toolbox.paddingschemes import OAEPEncryptionPadding,PSSPadding
+from charm.toolbox.conversion import Conversion
 from math import ceil
 
 debug = False

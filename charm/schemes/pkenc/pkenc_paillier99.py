@@ -13,9 +13,9 @@ Pascal Paillier (Public-Key)
 :Date:            4/2011
 '''
 #from charm.integer import *
-from toolbox.integergroup import RSAGroup,lcm,integer
-from toolbox.PKEnc import PKEnc
-from charm.engine.util import *
+from charm.toolbox.integergroup import RSAGroup,lcm,integer
+from charm.toolbox.PKEnc import PKEnc
+from charm.core.engine.util import *
 
 debug = False
 """A ciphertext class with homomorphic properties"""

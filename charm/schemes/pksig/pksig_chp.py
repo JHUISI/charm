@@ -12,8 +12,8 @@ Camenisch-Hohenberger-Pedersen - Identity-based Signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from toolbox.pairinggroup import PairingGroup,G1,G2,GT,ZR,pair
-from toolbox.PKSig import PKSig
+from charm.toolbox.pairinggroup import PairingGroup,G1,G2,GT,ZR,pair
+from charm.toolbox.PKSig import PKSig
 
 debug = False
 

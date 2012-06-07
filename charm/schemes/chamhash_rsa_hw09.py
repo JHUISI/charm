@@ -15,9 +15,9 @@ based on the scheme of Ateneise and de Medeiros
 :Date:      1/2011
 '''
 
-from toolbox.Hash import *
-from toolbox.integergroup import *
-from toolbox.conversion import *
+from charm.toolbox.Hash import *
+from charm.toolbox.integergroup import *
+from charm.toolbox.conversion import *
 
 debug=False
 class ChamHash_HW09(ChamHash):

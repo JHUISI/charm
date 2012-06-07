@@ -1,4 +1,4 @@
-from toolbox.enum import *
+from charm.toolbox.enum import *
 
 class SchemeBase:
     '''Base class for all crypto, which defines certain attributes'''

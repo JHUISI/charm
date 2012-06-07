@@ -3,7 +3,7 @@ Generates a Blum-Williams integer, which is the product of two distinct primes
 each congruent to 3 mod 4
 '''
 
-from charm.integer import integer,isPrime,randomPrime
+from charm.core.math.integer import integer,isPrime,randomPrime
 
 class BlumWilliamsInteger:
     def __init__(self):

@@ -1,5 +1,5 @@
-from toolbox.sigmaprotocol import Sigma
-from toolbox.pairinggroup import ZR,G2,pair
+from charm.toolbox.sigmaprotocol import Sigma
+from charm.toolbox.pairinggroup import ZR,G2,pair
 
 # Proof of Membership {(h): H = e(g,h) /and/ W = e(h,V)}
 class SigmaProtocol3(Sigma):

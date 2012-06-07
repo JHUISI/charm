@@ -12,9 +12,9 @@ Available from: http://eprint.iacr.org/2010/351.pdf
 :Date:           06/2011 
 '''
 
-from toolbox.pairinggroup import *
-from toolbox.secretutil import *
-from toolbox.ABEncMultiAuth import *
+from charm.toolbox.pairinggroup import *
+from charm.toolbox.secretutil import *
+from charm.toolbox.ABEncMultiAuth import *
 
 debug = False
 class Dabe(ABEncMultiAuth):

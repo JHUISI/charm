@@ -13,10 +13,10 @@ Boneh-Boyen Identity Based Encryption
 :Date:			11/2010
 '''
 
-from toolbox.pairinggroup import *
-from charm.cryptobase import *
-from toolbox.IBEnc import IBEnc
-from charm.pairing import hash as sha1
+from charm.toolbox.pairinggroup import *
+from charm.core.crypto.cryptobase import *
+from charm.toolbox.IBEnc import IBEnc
+from charm.core.math.pairing import hash as sha1
 
 debug = False
 class IBE_BB04(IBEnc):

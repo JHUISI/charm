@@ -14,11 +14,11 @@ Authorised Private Searches on Public Key Encrypted Data".
 :Authors:    J Ayo Akinyele/Mike Rushanan
 :Date:       02/2012
 '''
-from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-from toolbox.IBEnc import IBEnc
-from toolbox.conversion import Conversion
-from toolbox.bitstring import Bytes
-from toolbox.iterate import dotprod2
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.IBEnc import IBEnc
+from charm.toolbox.conversion import Conversion
+from charm.toolbox.bitstring import Bytes
+from charm.toolbox.iterate import dotprod2
 import hashlib
 
 

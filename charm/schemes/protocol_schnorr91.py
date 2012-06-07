@@ -1,8 +1,8 @@
 from charm.engine.protocol import *
-from toolbox.ecgroup import ECGroup,G
+from charm.toolbox.ecgroup import ECGroup,G
 from socket import socket,AF_INET,SOCK_STREAM
-from toolbox.eccurve import prime192v1
-from toolbox.enum import Enum
+from charm.toolbox.eccurve import prime192v1
+from charm.toolbox.enum import Enum
 import sys
 
 party = Enum('Verifier', 'Prover')

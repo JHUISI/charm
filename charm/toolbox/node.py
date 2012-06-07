@@ -1,5 +1,5 @@
 import string
-from toolbox.enum import *
+from charm.toolbox.enum import *
 
 OpType = Enum('OR', 'AND', 'ATTR', 'THRESHOLD', 'CONDITIONAL', 'NONE')
 
