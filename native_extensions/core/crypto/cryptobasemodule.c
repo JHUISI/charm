@@ -6,7 +6,7 @@ static PyObject *BaseError;
 #define PyBase_Check(obj) PyObject_TypeCheck(obj, &BaseType)
 #define TRUE	1
 #define FALSE	0
-#define PKG  "charm."
+#define PKG  "charm.core.crypto."
 enum MOP {NONE = 0, MODE_ECB, MODE_CBC, MODE_CFB, MODE_PGP, MODE_OFB, MODE_CTR};
 enum ALG {AES, DES, DES3};
 
