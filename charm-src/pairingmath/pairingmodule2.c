@@ -557,7 +557,7 @@ static PyObject *Element_random(Element* self, PyObject* args)
 {
 	Element *retObject, *group = NULL;
 	int arg1;
-	int e_type = -1, seed = -1;
+	int seed = -1;
 	
 	/* create a new object */
 	if(!PyArg_ParseTuple(args, "Oi|i", &group, &arg1, &seed))
@@ -568,18 +568,18 @@ static PyObject *Element_random(Element* self, PyObject* args)
 	debug("init random element in '%d'\n", arg1);
 	if(arg1 == ZR_t) {
 		retObject->e = element_init_ZR(0);
-		e_type = ZR_t;
+		retObject->element_type = ZR_t;
 	}
 	else if(arg1 == G1_t) {
 		retObject->e = element_init_G1();
-		e_type = G1_t;
+		retObject->element_type = G1_t;
 	}
 	else if(arg1 == G2_t) {
 		retObject->e = element_init_G2();
-		e_type = G2_t;
+		retObject->element_type = G2_t;
 	}
 	else if(arg1 == GT_t) {
-		PyErr_SetString(ElementError, "cannot generate random element in GT.");
+		PyErr_SetString(ElementError, "cannot generate random element in GT directly.");
 		return NULL;
 	}
 	else {
@@ -591,13 +591,12 @@ static PyObject *Element_random(Element* self, PyObject* args)
 //		pbc_random_set_deterministic((uint32_t) seed);
 	}
 	/* create new Element object */
-    element_random(e_type, group->pairing->pair_obj, retObject->e);
+    element_random(retObject->element_type, group->pairing->pair_obj, retObject->e);
 
 	STOP_CLOCK(dBench);
 	retObject->elem_initialized = TRUE;
 	retObject->pairing = group->pairing;
 	retObject->safe_pairing_clear = FALSE;
-	retObject->element_type = e_type;
 	return (PyObject *) retObject;	
 }
 static PyObject *Element_add(Element *self, Element *other)
@@ -734,7 +733,6 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 
 	UPDATE_BENCHMARK(MULTIPLICATION, dBench);
 	return (PyObject *) newObject;
-	return NULL;
 }
 
 static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
@@ -861,6 +859,7 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 	if(longFoundLHS) {
 		// o1 is a long type and o2 is a element type
 		// o1 should be element and o2 should be mpz
+		printf("operation undefined: <Python Int> ^ '%d'\n", rhs_o2->element_type);
 //		if(rhs_o2->element_type == ZR) {
 //			START_CLOCK(dBench);
 //			mpz_init(n);
@@ -876,8 +875,13 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 	}
 	else if(longFoundRHS) {
 		// o2 is a long type
-		if(lhs_o1->element_type != ZR_t) {
-			START_CLOCK(dBench);
+//		if(lhs_o1->element_type != ZR_t) {
+		START_CLOCK(dBench);
+		long rhs = PyLong_AsLong(o2);
+		if(PyErr_Occurred() || rhs > 0) {
+			// clear error and continue
+			//PyErr_Print(); // for debug purposes
+			PyErr_Clear();
 			newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
 			rhs_o2 = createNewElement(ZR_t, lhs_o1->pairing);
 			mpz_init(n);
@@ -888,46 +892,31 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 			mpz_clear(n);
 			STOP_CLOCK(dBench);
 		}
+		else if(rhs == -1) {
+			newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
+			element_invert(newObject, lhs_o1);
+			STOP_CLOCK(dBench);
+		}
 		else {
-			int integer = (int) PyLong_AsLong(o2);
-			if(integer != -1) {
-				START_CLOCK(dBench);
-				newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
-				element_pow_int(newObject, lhs_o1, integer);
-				STOP_CLOCK(dBench);
-			}
-			else {
-				PyErr_SetString(ElementError, "integer too big!");
-				return NULL;
-			}
+			EXIT_IF(TRUE, "unexpected error.");
 		}
 	}
 	else if(Check_Elements(o1, o2)) {
 		debug("Starting '%s'\n", __func__);
-		if( exp_rule(lhs_o1->element_type, rhs_o2->element_type) == FALSE) {
-			PyErr_SetString(ElementError, "invalid exp operation");
-			return NULL;
-		}
+		EXIT_IF(exp_rule(lhs_o1->element_type, rhs_o2->element_type) == FALSE, "invalid exp operation.");
 
 		if(rhs_o2->element_type == ZR_t) {
-//			if(lhs_o1->element_type == ZR_t) {
-//				/* TODO: don't forget to implement this!!! */
-//			}
-//			else {
-				START_CLOCK(dBench);
-				newObject = createNewElement(NONE_G, lhs_o1->pairing);
-				element_pow_zr(newObject, lhs_o1, rhs_o2);
-				STOP_CLOCK(dBench);
-//			}
+			START_CLOCK(dBench);
+			newObject = createNewElement(NONE_G, lhs_o1->pairing);
+			element_pow_zr(newObject, lhs_o1, rhs_o2);
+			STOP_CLOCK(dBench);
 		}
 	}
 	else {
-		if(!PyElement_Check(o1)) PyErr_SetString(ElementError, ERROR_TYPE(left, int, bytes, str));
-		if(!PyElement_Check(o2)) PyErr_SetString(ElementError, ERROR_TYPE(right, int, bytes, str));
-		return NULL;
+		EXIT_IF(!PyElement_Check(o1), ERROR_TYPE(left, int, bytes, str));
+		EXIT_IF(!PyElement_Check(o2), ERROR_TYPE(right, int, bytes, str));
 	}
 
-	// STOP_CLOCK
 	UPDATE_BENCHMARK(EXPONENTIATION, dBench);
 	return (PyObject *) newObject;
 }

@@ -210,4 +210,14 @@ void print_mpz(mpz_t x, int base);
 	else if(type == SUBTRACTION) count = (((Operations *) bench_obj->data_ptr)->sub_ ##group ); \
 	else if(type == EXPONENTIATION) count = (((Operations *) bench_obj->data_ptr)->exp_ ##group );
 
+#define EXIT_IF(check, msg) \
+	if(check) { 						\
+	PyErr_SetString(ElementError, msg); \
+	return NULL;	}
+
+#define EXITCODE_IF(check, msg, code) \
+	if(check) {						     \
+	PyErr_SetString(ElementError, msg);	 \
+	return Py_BuildValue("i", code);	}
+
 #endif

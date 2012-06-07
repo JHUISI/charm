@@ -448,6 +448,7 @@ element_t *_element_pow_zr(Group_t type, const pairing_t *pairing, element_t *a,
 		G1 *z = new G1();
 		// (x->point)^y
 //		z->g = *y * x->g;
+		// TODO: overflow error occurs if "y" is too big w/in miracl. Need to investigate
 		*z = pfc->mult(*x, *y);
 		return (element_t *) z;
 	}
@@ -785,6 +786,7 @@ void _element_set_mpz(Group_t type, element_t *dst, mpz_t src)
 		big y;
 		y = mirvar(0);
 
+		// TODO: not the best solution and susceptible to overflow - number too big error. look into converting piece by piece.
 		cinstr(y, x_string);
 		Big *b = new Big(y);
 //		cout << "Converted => " << *b << endl;

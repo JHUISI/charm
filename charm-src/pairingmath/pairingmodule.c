@@ -998,26 +998,41 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 			PyObject_Del(lhs_o1);
 			STOP_CLOCK(dBench);
 		}
+		else {
+			EXIT_IF(TRUE, "undefined exponentiation operation.");
+		}
 	}
 	else if(longFoundRHS) {
 		// o2 is a long type
 		START_CLOCK(dBench);
-		newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
-		mpz_init(n);
-		longObjToMPZ(n, (PyLongObject *) o2);
-		element_pow_mpz(newObject->e, lhs_o1->e, n);
-		mpz_clear(n);
+		long rhs = PyLong_AsLong(o2);
+		if(PyErr_Occurred() || rhs > 0) {
+			// clear error and continue
+			// PyErr_Print(); // for debug purposes
+			PyErr_Clear();
+			newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
+			mpz_init(n);
+			longObjToMPZ(n, (PyLongObject *) o2);
+			element_pow_mpz(newObject->e, lhs_o1->e, n);
+			mpz_clear(n);
+		}
+		else if(rhs == -1) {
+			// compute inverse
+			newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
+			element_invert(newObject->e, lhs_o1->e);
+		}
 		STOP_CLOCK(dBench);
 	}
 	else if(Check_Elements(o1, o2)) {
 		debug("Starting '%s'\n", __func__);
 		debug_e("LHS: e => '%B'\n", lhs_o1->e);
 		debug_e("RHS: e => '%B'\n", rhs_o2->e);
-		if( exp_rule(lhs_o1->element_type, rhs_o2->element_type) == FALSE) {
-			PyErr_SetString(ElementError, "invalid exp operation");
-			return NULL;
-		}
+//		if( exp_rule(lhs_o1->element_type, rhs_o2->element_type) == FALSE) {
+//			PyErr_SetString(ElementError, "invalid exp operation");
+//			return NULL;
+//		}
 
+		EXIT_IF(exp_rule(lhs_o1->element_type, rhs_o2->element_type) == FALSE, "invalid exp operation");
 		if(rhs_o2->element_type == ZR) {
 			// element_pow_zn(newObject->e, lhs_o1->e, rhs_o1->e);
 			START_CLOCK(dBench);
@@ -1030,13 +1045,12 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		}
 		else {
 			// we have a problem
-			return NULL;
+			EXIT_IF(TRUE, "undefined exponentiation operation");
 		}
 	}
 	else {
-		if(!PyElement_Check(o1)) PyErr_SetString(ElementError, ERROR_TYPE(left, int, bytes, str));
-		if(!PyElement_Check(o2)) PyErr_SetString(ElementError, ERROR_TYPE(right, int, bytes, str));
-		return NULL;
+		EXIT_IF(!PyElement_Check(o1), ERROR_TYPE(left, int, bytes, str));
+		EXIT_IF(!PyElement_Check(o2), ERROR_TYPE(right, int, bytes, str));
 	}
 	
 	// STOP_CLOCK
@@ -1055,11 +1069,12 @@ static PyObject *Element_set(Element *self, PyObject *args)
     // char *str = NULL;
     int errcode = TRUE;
 
-    if(self->elem_initialized == FALSE) {
-    	PyErr_SetString(ElementError, "must initialize element to a field (G1,G2,GT, or Zr)");
-    	errcode = FALSE;
-    	return Py_BuildValue("i", errcode);
-    }
+//    if(self->elem_initialized == FALSE) {
+//    	PyErr_SetString(ElementError, "must initialize element to a field (G1,G2,GT, or Zr)");
+//    	errcode = FALSE;
+//    	return Py_BuildValue("i", errcode);
+//    }
+    EXITCODE_IF(self->elem_initialized == FALSE, "must initialize element to a field (G1,G2,GT, or Zr)", FALSE);
 
     debug("Creating a new element\n");
     if(PyArg_ParseTuple(args, "l", &value)) {
@@ -1083,8 +1098,9 @@ static PyObject *Element_set(Element *self, PyObject *args)
             STOP_CLOCK(dBench);
     }
     else { //
-            PyErr_SetString(ElementError, "type not supported: signed int or Element object");
-            errcode = FALSE;
+//            PyErr_SetString(ElementError, "type not supported: signed int or Element object");
+//            errcode = FALSE;
+    	EXITCODE_IF(TRUE, "type not supported: signed int or Element object", FALSE);
     }
 
     return Py_BuildValue("i", errcode);
