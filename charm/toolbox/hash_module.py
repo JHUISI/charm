@@ -1,7 +1,7 @@
-import charm.cryptobase
-from charm.pairing import pairing,ZR
+import charm.core.crypto.cryptobase
+from charm.core.math.pairing import pairing,ZR
 #from toolbox.pairinggroup import pairing,ZR
-from charm.integer import integer,int2Bytes
+from charm.core.math.integer import integer,int2Bytes
 import hashlib, base64
 
 class Hash():
