@@ -1006,7 +1006,7 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		// o2 is a long type
 		START_CLOCK(dBench);
 		long rhs = PyLong_AsLong(o2);
-		if(PyErr_Occurred() || rhs > 0) {
+		if(PyErr_Occurred() || rhs >= 0) {
 			// clear error and continue
 			// PyErr_Print(); // for debug purposes
 			PyErr_Clear();
@@ -1020,6 +1020,9 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 			// compute inverse
 			newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
 			element_invert(newObject->e, lhs_o1->e);
+		}
+		else {
+			EXIT_IF(TRUE, "undefined exponentiation operation.");
 		}
 		STOP_CLOCK(dBench);
 	}

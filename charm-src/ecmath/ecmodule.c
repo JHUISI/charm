@@ -824,7 +824,7 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 		START_CLOCK(dBench);
 		long rhs = PyLong_AsLong(o2);
 		if(lhs->type == ZR) {
-			if(PyErr_Occurred() || rhs > 0) {
+			if(PyErr_Occurred() || rhs >= 0) {
 				// clear error and continue
 //					PyErr_Print(); // for debug purposes
 					PyErr_Clear();
@@ -848,7 +848,7 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 			}
 		}
 		else if(lhs->type == G) {
-			if(PyErr_Occurred() || rhs > 0) {
+			if(PyErr_Occurred() || rhs >= 0) {
 				// clear error and continue
 //					PyErr_Print(); // for debug purposes
 					PyErr_Clear();
