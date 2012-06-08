@@ -57,7 +57,7 @@ class ElGamal(PKEnc):
         global group
         if _type == int:
             group = IntegerGroupQ()
-        elif _type == ecc:
+        elif _type == elliptic_curve:
             group = ECGroup(_cv)
         else:
             assert False, "Invalid Type Exception!"
@@ -66,7 +66,7 @@ class ElGamal(PKEnc):
         if _type == int:
             group.paramgen(secparam)
             g = group.randomGen()
-        elif _type == ecc:
+        elif _type == elliptic_curve:
             g = group.random(G)
         # x is private, g is public param
         x = group.random(); h = g ** x
@@ -97,7 +97,7 @@ class ElGamal(PKEnc):
         return M
 
 def main():
-    el = ElGamal(ecc, prime192v2)    
+    el = ElGamal(elliptic_curve, prime192v2)    
     (pk, sk) = el.keygen()
     msg = b"hello world!"
     size = len(msg)

@@ -2,7 +2,7 @@ from charm.core.math.elliptic_curve import *
 
 class ECGroup():
     def __init__(self, builtin_cv):
-        self.group = ecc(nid=builtin_cv)
+        self.group = elliptic_curve(nid=builtin_cv)
         self.param = builtin_cv
         self._verbose = True
 
@@ -16,7 +16,7 @@ class ECGroup():
         return None
 
     def groupSetting(self):
-        return 'ecc'
+        return 'elliptic_curve'
 
     def groupType(self): 
         return self.param
@@ -46,14 +46,14 @@ class ECGroup():
         if isinstance(args, tuple):
             s = bytes()
             for i in args:
-                if type(i) == ecc:
+                if type(i) == elliptic_curve:
                     s += serialize(i)
                 elif type(i) == str:
                     s += str(i)
                 # consider other types    
             #print("s => %s" % s)
             return hash(self.group, str(s), _type)
-        elif type(args) == ecc:
+        elif type(args) == elliptic_curve:
             msg = str(serialize(args))
             return hash(self.group, msg, _type)
         elif type(args) == str:
@@ -61,12 +61,12 @@ class ECGroup():
         return None
     
     def zr(self, point):
-        if type(point) == ecc:
+        if type(point) == elliptic_curve:
             return getXY(self.group, point, False)
         return None
 
     def coordinates(self, point):
-        if type(point) == ecc:
+        if type(point) == elliptic_curve:
             return getXY(self.group, point, True)
         
     def debug(self, data, prefix=None):

@@ -109,9 +109,9 @@ if __name__ == "__main__":
     M = groupObj.random(GT)
     ct = ibe.encrypt(mpk, ID, M)
     m = ibe.decrypt(mpk, sk, ct)
-    print('m    =>', m)
+    if debug: print('m    =>', m)
 
     assert m == M, "FAILED Decryption!"
-    print("Successful Decryption!!! m => '%s'" % m)
+    if debug: print("Successful Decryption!!! m => '%s'" % m)
     
     

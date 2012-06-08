@@ -12,7 +12,7 @@ from charm.schemes.pkenc.pkenc_paillier99 import Pai99
 from charm.schemes.pkenc.pkenc_rabin import Rabin_Enc, Rabin_Sig
 from charm.schemes.pkenc.pkenc_rsa import RSA_Enc, RSA_Sig
 from charm.toolbox.pairinggroup import PairingGroup, GT, ZR
-from charm.toolbox.ecgroup import ECGroup, ecc
+from charm.toolbox.ecgroup import ECGroup, elliptic_curve
 from charm.toolbox.eccurve import prime192v1, prime192v2
 from charm.toolbox.integergroup import RSAGroup, integer
 import unittest
@@ -71,7 +71,7 @@ class CHK04Test(unittest.TestCase):
 class HybridEncTest(unittest.TestCase):
     def testHybridEnc(self):
         #    pkenc = EC_CS98(prime192v1)
-        pkenc = ElGamal(ecc, prime192v1)
+        pkenc = ElGamal(elliptic_curve, prime192v1)
         hyenc = HybridEnc(pkenc)
        
         (pk, sk) = hyenc.keygen()
@@ -113,7 +113,7 @@ class CS98Test(unittest.TestCase):
 
 class ElGamalTest(unittest.TestCase):
     def testElGamal(self):
-        el = ElGamal(ecc, prime192v2)    
+        el = ElGamal(elliptic_curve, prime192v2)    
         (pk, sk) = el.keygen()
         msg = b"hello world!"
         size = len(msg)

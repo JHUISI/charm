@@ -1,5 +1,5 @@
-from toolbox.secretshare import SecretShare
-from toolbox.pairinggroup import PairingGroup,ZR
+from charm.toolbox.secretshare import SecretShare
+from charm.toolbox.pairinggroup import PairingGroup,ZR
 import unittest
 
 debug=False
