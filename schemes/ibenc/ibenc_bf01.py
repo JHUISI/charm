@@ -11,7 +11,6 @@ Boneh-Franklin Identity Based Encryption
 
 :Authors:    J. Ayo Akinyele
 :Date:       2/2011
-:Status:     BROKEN
 '''
 from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.integer import randomBits,integer,bitsize

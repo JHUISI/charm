@@ -12,10 +12,9 @@
 
 from charm.cryptobase import *
 from toolbox.IBEnc import IBEnc
-from toolbox.bitstring import Bytes
-from toolbox.conversion import Conversion
 from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-import hashlib, math
+from toolbox.hash_module import Waters
+import math
 
 debug = False
 class IBE_N04(IBEnc):
@@ -25,27 +24,20 @@ class IBE_N04(IBEnc):
         IBEnc.setProperty(self, secdef='IND_ID_CPA', assumption='DBDH', secmodel='Standard')
         #, other={'id':ZR}
         #message_space=[GT, 'KEM']
-        global group, hashObj
+        global group
         group = groupObj
-        hashObj = hashlib.new('sha1') 
-        
-    def sha1(self, message):
-        h = hashObj.copy()
-        h.update(bytes(message))
-        return Bytes(h.digest()) 
-        
-        
+
     def setup(self, l=32):
         '''l is the security parameter
         with l = 32, and the hash function at 160 bits = n * l with n = 5'''
+        global waters
+        sha1_func, sha1_len = 'sha1', 20
         g = group.random(G1)      # generator for group G of prime order p
         
-        hLen = len(hashObj.digest()) * 8
+        hLen = sha1_len * 8
         n = int(math.floor(hLen / l))
-        
-        #nprime = n * int(g).bit_length()
-        #H = self.sha1 # Hash function H :{0,1}* -> {0,1}^{n'}      
-        
+        waters = Waters(group, n, l, sha1_func)
+                
         alpha = group.random()  #from Zp
         g1    = g ** alpha      # G1
         g2    = group.random(G2)    #G2
@@ -61,22 +53,7 @@ class IBE_N04(IBEnc):
             print(mk)
         
         return (pk, mk)
-    
-    def stringtoidentity(self, pk, strID):
-        '''Hash the identity string and break it up in to l bit pieces'''
-        hash = self.sha1(Bytes(strID, 'utf-8'))
-        val = Conversion.OS2IP(hash) #Convert to integer format
-        bstr = bin(val)[2:]   #cut out the 0b header
         
-        v=[]
-        for i in range(pk['n']):  #n must be greater than or equal to 1
-            binsubstr = bstr[pk['l']*i : pk['l']*(i+1)]
-            intval = int(binsubstr, 2)
-            intelement = group.init(ZR, intval) 
-            v.append(intelement)
-                     
-        return v
-    
     def extract(self, mk, v):
         '''v = (v1, .., vn) is an identity'''
         r = group.random()
@@ -130,7 +107,7 @@ def main():
 
     # represents public identity
     ID = "bob@mail.com"
-    kID = ibe.stringtoidentity(pk, ID)
+    kID = waters.hash(ID)
     #if debug: print("Bob's key  =>", kID)
     key = ibe.extract(mk, kID)
 

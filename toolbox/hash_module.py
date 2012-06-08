@@ -2,6 +2,8 @@ import charm.cryptobase
 from charm.pairing import pairing,ZR
 #from toolbox.pairinggroup import pairing,ZR
 from charm.integer import integer,int2Bytes
+from toolbox.conversion import Conversion
+from toolbox.bitstring import Bytes
 import hashlib, base64
 
 class Hash():
@@ -47,3 +49,44 @@ class Hash():
                 return self.group.hash(strs, ZR)
             return None
         
+
+"""
+Waters Hash technique: how to hash in standard model.
+Default - len=5 bits=32 ==> 160-bits total
+"""
+class Waters:
+    """
+    >>> from toolbox.pairinggroup import *
+    >>> from toolbox.hash_module import Waters
+    >>> group = PairingGroup("SS512")
+    >>> waters = Waters(group, length=5, bits=32)
+    >>> a = waters.hash("user@email.com")
+    """
+    def __init__(self, group, length=5, bits=32, hash_func='sha1'):
+        self._group = group
+        self._length = length
+        self._bitsize = bits
+        self.hash_function = hash_func
+        self._hashObj = hashlib.new(self.hash_function)
+        self.hashLen = len(self._hashObj.digest())
+
+    def sha1(self, message):
+        h = self._hashObj.copy()
+        h.update(bytes(message, 'utf-8'))
+        return Bytes(h.digest())    
+    
+    def hash(self, strID):
+        '''Hash the identity string and break it up in to l bit pieces'''
+        assert type(strID) == str, "invalid input type"
+        hash = self.sha1(strID)
+        
+        val = Conversion.OS2IP(hash) #Convert to integer format
+        bstr = bin(val)[2:]   #cut out the 0b header
+
+        v=[]
+        for i in range(self._length):  #z must be greater than or equal to 1
+            binsubstr = bstr[self._bitsize*i : self._bitsize*(i+1)]
+            intval = int(binsubstr, 2)
+            intelement = self._group.init(ZR, intval)
+            v.append(intelement)
+        return v

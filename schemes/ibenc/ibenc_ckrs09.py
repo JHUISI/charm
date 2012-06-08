@@ -16,23 +16,20 @@ Authorised Private Searches on Public Key Encrypted Data".
 '''
 from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from toolbox.IBEnc import IBEnc
-from toolbox.conversion import Conversion
-from toolbox.bitstring import Bytes
+from toolbox.hash_module import Waters
 from toolbox.iterate import dotprod2
-import hashlib
 
 debug = False
 class IBE_CKRS(IBEnc):
     def __init__(self, groupObj):
         global group,hashObj
         group = groupObj
-        hashObj = hashlib.new('sha1') 
-
     
     def setup(self, n=5, l=32):
         """n integers with each size l""" 
-        global lam_func
+        global lam_func, waters
         lam_func = lambda i,x,y: x[i] ** y[i] 
+        waters = Waters(group, n, l)
         alpha, t1, t2, t3, t4 = group.random(ZR, 5)
         z = list(group.random(ZR, n))
         g = group.random(G1)
@@ -46,29 +43,10 @@ class IBE_CKRS(IBEnc):
         mpk = { 'omega':omega, 'g':g, 'h':h, 'g_l':g_l, 'h_l':h_l, 
                'v1':v1, 'v2':v2, 'v3':v3, 'v4':v4, 'n':n, 'l':l }
         return (mpk, msk)
-
-    def sha1(self, message):
-        h = hashObj.copy()
-        h.update(bytes(message, 'utf-8'))
-        return Bytes(h.digest())
-
-    def strToId(self, pk, strID):
-        '''Hash the identity string and break it up in to l bit pieces'''
-        hash = self.sha1(strID)
-        val = Conversion.OS2IP(hash) #Convert to integer format
-        bstr = bin(val)[2:]   #cut out the 0b header
-
-        v=[]
-        for i in range(pk['n']):  #z must be greater than or equal to 1
-            binsubstr = bstr[pk['l']*i : pk['l']*(i+1)]
-            intval = int(binsubstr, 2)
-            intelement = group.init(ZR, intval)
-            v.append(intelement)
-        return v
     
     def extract(self, mpk, msk, ID):
         r1, r2 = group.random(ZR, 2) # should be params of extract
-        hID = self.strToId(mpk, ID)
+        hID = waters.hash(ID)
         hashID2 = mpk['h_l'][0] * dotprod2(range(1,mpk['n']), lam_func, mpk['h_l'], hID)        
         d = {}
         
@@ -81,7 +59,7 @@ class IBE_CKRS(IBEnc):
     
     def encrypt(self, mpk, ID, msg):
         s, s1, s2 = group.random(ZR, 3)
-        hID = self.strToId(mpk, ID)
+        hID = waters.hash(ID)
         hashID1 = mpk['g_l'][0] * dotprod2(range(1,mpk['n']), lam_func, mpk['g_l'], hID)
         c = {}
         c_pr = (mpk['omega'] ** s) * msg
