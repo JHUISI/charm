@@ -215,4 +215,15 @@ int sub_rule(Group_t lhs, Group_t rhs);
 int div_rule(Group_t lhs, Group_t rhs);
 int pair_rule(Group_t lhs, Group_t rhs);
 
+
+#define EXIT_IF(check, msg) \
+	if(check) { 						\
+	PyErr_SetString(ElementError, msg); \
+	return NULL;	}
+
+#define EXITCODE_IF(check, msg, code) \
+	if(check) {						     \
+	PyErr_SetString(ElementError, msg);	 \
+	return Py_BuildValue("i", code);	}
+
 #endif

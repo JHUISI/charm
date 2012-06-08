@@ -128,8 +128,6 @@ typedef struct {
 	PyObject_HEAD
 	mpz_t m;
 	mpz_t e;
-//	gmp_randstate_t state;
-//	int state_init;
 	int initialized;
 } Integer;
 
