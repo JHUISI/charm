@@ -99,20 +99,16 @@ setup(name = 'Charm-Crypto',
 	author = "J. Ayo Akinyele",
 	author_email = "ayo.akinyele@charm-crypto.com",
 	url = "http://charm-crypto.com/",
+
+    # we inentionally store charm in a directory not named charm so that 
+    #running the python interpeter from the project directory imports the
+    # installed version and not the one in the project with out the binnaries.
+    package_dir = {'charm': 'charm-framework'}, 
 	packages = ['charm',
                     'charm.core',
-                        'charm.core.crypto', #contains only c modules, but needs __init__.py to load them
+                        'charm.core.crypto',    # contains only c modules, but needs __init__.py to load them
                         'charm.core.engine',
-                        'charm.core.math', #same as charm.core.crypto
-                    'charm.schemes',
-                        'charm.schemes.abenc',
-                        'charm.schemes.commit',
-                        'charm.schemes.dabenc',
-                        'charm.schemes.grpsig',
-                        'charm.schemes.hibenc',
-                        'charm.schemes.ibenc',
-                        'charm.schemes.pkenc',
-                        'charm.schemes.pksig',
+                        'charm.core.math',      # same as charm.core.crypto
                     'charm.toolbox',
                     'charm.zkp_compiler',
                 ],
