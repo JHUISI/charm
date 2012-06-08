@@ -40,14 +40,14 @@ class ChamHash_Adm05(ChamHash):
         sk = { 'x':x }        
         return (pk, sk)
     
-    def hash(self, pk, m, r = 0):
+    def hash(self, pk, m, r = 0, s = 0):
         p,q = group.p, group.q
         if r == 0: r = group.random()
-        s = group.random()        
+        if s == 0: s = group.random()        
         e = group.hash(m, r)
         
         C = r - (((pk['y'] ** e) * (pk['g'] ** s)) % p) % q
-        return C
+        return (C, r, s)
 
 def main():    
     # fixed params for unit tests
@@ -60,7 +60,7 @@ def main():
     if debug: print("sk => ", sk)    
 
     msg = "hello world this is the message"
-    c = chamHash.hash(pk, msg)
+    (c, r, s) = chamHash.hash(pk, msg)
     
     if debug: print("sig =>", c)
 
