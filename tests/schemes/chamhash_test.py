@@ -17,11 +17,11 @@ class ChamHash_Adm05Test(unittest.TestCase):
         if debug: print("sk => ", sk)    
 
         msg = "Hello world this is the message!"
-        (h, r) = chamHash.hash(pk, msg)
+        (h, r, s) = chamHash.hash(pk, msg)
         if debug: print("Hash...")
         if debug: print("sig =>", (h, r))
 
-        (h1, r) = chamHash.hash(pk, msg, r)
+        (h1, r1, s1) = chamHash.hash(pk, msg, r, s)
         if debug: print("sig 2 =>", h1)
 
         assert h == h1, "Signature failed!!!"
@@ -39,9 +39,9 @@ class ChamHash_HW09Test(unittest.TestCase):
         msg = "Hello world this is the message!"
         (h, r) = chamHash.hash(pk, msg)
         if debug: print("Hash...")
-        if debug: print("sig =>", (h, r))
+        if debug: print("sig =>", h)
 
-        (h1, r) = chamHash.hash(pk, msg, r)
+        (h1, r1) = chamHash.hash(pk, msg, r)
         if debug: print("sig 2 =>", h1)
 
         assert h == h1, "Signature failed!!!"
