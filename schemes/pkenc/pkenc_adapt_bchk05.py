@@ -13,8 +13,8 @@ from charm.toolbox.pairinggroup import *
 from charm.core.math.pairing import hash as sha1
 import hmac, hashlib, math
 from charm.toolbox.IBEnc import *
-from charm.schemes.encap_bchk05 import *
-from charm.schemes.ibenc.ibenc_bb03 import *
+from schemes.encap_bchk05 import *
+from schemes.ibenc.ibenc_bb03 import *
 
 debug = False
 class BCHKIBEnc(IBEnc):

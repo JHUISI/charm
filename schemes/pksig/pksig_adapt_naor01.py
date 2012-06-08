@@ -21,7 +21,7 @@ Notes:	This transform was first described by Boneh and Franklin but credited to 
 :Date:		05/2011
 '''
 
-from charm.schemes.ibenc.ibenc_bb03 import IBE_BB04
+from schemes.ibenc.ibenc_bb03 import IBE_BB04
 from charm.toolbox.PKSig import *
 from charm.toolbox.pairinggroup import *
 #from charm.toolbox.ibe_bb03 import *
