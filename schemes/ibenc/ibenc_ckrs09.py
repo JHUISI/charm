@@ -21,7 +21,7 @@ from charm.toolbox.bitstring import Bytes
 from charm.toolbox.iterate import dotprod2
 import hashlib
 
-
+debug = False
 class IBE_CKRS(IBEnc):
     def __init__(self, groupObj):
         global group,hashObj
@@ -97,7 +97,7 @@ class IBE_CKRS(IBEnc):
         msg = ct['c_prime'] * pair(c[0], d[0]) * pair(c[1], d[1]) * pair(c[2], d[2]) * pair(c[3], d[3]) * pair(c[4], d[4])        
         return msg
     
-if __name__ == "__main__":
+def main():
     groupObj = PairingGroup('SS512')
     ibe = IBE_CKRS(groupObj)
     (mpk, msk) = ibe.setup()
@@ -115,3 +115,6 @@ if __name__ == "__main__":
     if debug: print("Successful Decryption!!! m => '%s'" % m)
     
     
+if __name__ == "__main__":
+    debug = True
+    main()

@@ -127,4 +127,10 @@ ECElement *invertECElement(ECElement *self);
 int hash_to_bytes(uint8_t *input_buf, int input_len, int hash_size, uint8_t *output_buf, uint32_t hash_num);
 EC_POINT *element_from_hash(EC_GROUP *group, uint8_t *input, int input_len);
 
+#define EXIT_IF(check, msg) \
+	if(check) { 						\
+	PyErr_SetString(PyECErrorObject, msg); \
+	return NULL;	}
+
+
 #endif

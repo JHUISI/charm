@@ -131,7 +131,7 @@ def main():
     # represents public identity
     ID = "bob@mail.com"
     kID = ibe.stringtoidentity(pk, ID)
-    if debug: print("Bob's key  =>", kID)
+    #if debug: print("Bob's key  =>", kID)
     key = ibe.extract(mk, kID)
 
     M = groupObj.random(GT)
@@ -140,8 +140,8 @@ def main():
     #print('m    =>', m)
 
     assert m == M, "FAILED Decryption!"
-    if debug: print("Successful Decryption!!! m => '%s'" % m)
-    del groupObj
+    #if debug: print("Successful Decryption!!! m => '%s'" % m)
+
 if __name__ == '__main__':
     debug = True
     main()

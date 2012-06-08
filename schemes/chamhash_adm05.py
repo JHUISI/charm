@@ -43,7 +43,7 @@ class ChamHash_Adm05(ChamHash):
     def hash(self, pk, m, r = 0, s = 0):
         p,q = group.p, group.q
         if r == 0: r = group.random()
-        if r == 0: s = group.random()        
+        if s == 0: s = group.random()        
         e = group.hash(m, r)
         
         C = r - (((pk['y'] ** e) * (pk['g'] ** s)) % p) % q
@@ -61,15 +61,9 @@ def main():
     if debug: print("sk => ", sk)    
 
     msg = "hello world this is the message"
-    (h, r, s) = chamHash.hash(pk, msg)
-    if debug: print("Hash...")
-    if debug: print("sig =>", h)
-
-    (h1, r1, s1) = chamHash.hash(pk, msg, r, s)
-    if debug: print("sig 2 =>", h1)
-
-    assert h == h1, "Signature failed!!!"
-    if debug: print("Signature generated correctly!!!")
+    (c, r, s) = chamHash.hash(pk, msg)
+    
+    if debug: print("sig =>", c)
 
 if __name__ == "__main__":
     debug = True

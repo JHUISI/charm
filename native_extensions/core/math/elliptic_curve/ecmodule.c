@@ -821,38 +821,52 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 	}
 	else if(foundRHS) {
 		// TODO: implement for elements of G ** Long or ZR ** Long
-		if(lhs->point_init && lhs->type == ZR) {
+		START_CLOCK(dBench);
+		long rhs = PyLong_AsLong(o2);
+		if(lhs->type == ZR) {
+			if(PyErr_Occurred() || rhs >= 0) {
+				// clear error and continue
+//					PyErr_Print(); // for debug purposes
+					PyErr_Clear();
+					BIGNUM *rhs_val = BN_new();
+					order = BN_new();
+					setBigNum((PyLongObject *) o2, &rhs_val);
 
-			if(_PyLong_Sign(o2) == -1)  {
+					ans = createNewPoint(ZR, lhs->group, lhs->ctx);
+					EC_GROUP_get_order(ans->group, order, ans->ctx);
+					BN_mod_exp(ans->elemZ, lhs->elemZ, rhs_val, order, ans->ctx);
+					BN_free(rhs_val);
+					BN_free(order);
+					STOP_CLOCK(dBench);
+			}
+			else if(rhs == -1) {
 				debug("finding modular inverse.\n");
 				ans = invertECElement(lhs);
 			}
 			else {
-				BIGNUM *rhs_val = BN_new();
-				order = BN_new();
-				setBigNum((PyLongObject *) o2, &rhs_val);
-
-				ans = createNewPoint(ZR, lhs->group, lhs->ctx);
-				EC_GROUP_get_order(ans->group, order, ans->ctx);
-				START_CLOCK(dBench);
-				BN_mod_exp(ans->elemZ, lhs->elemZ, rhs_val, order, ans->ctx);
-				STOP_CLOCK(dBench);
-				BN_free(rhs_val);
-				BN_free(order);
+				EXIT_IF(TRUE, "unsupported operation.");
 			}
-//			UPDATE_BENCHMARK(EXPONENTIATION, dBench)
-//			return (PyObject *) ans;
 		}
-		else if(lhs->point_init && lhs->type == G) {
-			BIGNUM *rhs_val = BN_new();
-			setBigNum((PyLongObject *) o2, &rhs_val);
-			// ans = createNewPoint(G, lhs->group, lhs->ctx);
-			// EC_POINT_copy(ans->P, lhs->P);
-			// EC_POINT_mul(ans->group, ans->P, rhs_val, NULL, NULL, ans->ctx);
-			ans = ec_point_mul(lhs->group, lhs->P, rhs_val, lhs->ctx);
+		else if(lhs->type == G) {
+			if(PyErr_Occurred() || rhs >= 0) {
+				// clear error and continue
+//					PyErr_Print(); // for debug purposes
+					PyErr_Clear();
+					BIGNUM *rhs_val = BN_new();
+					setBigNum((PyLongObject *) o2, &rhs_val);
+					ans = createNewPoint(G, lhs->group, lhs->ctx);
+					ans = ec_point_mul(lhs->group, lhs->P, rhs_val, lhs->ctx);
+			}
+			else if(rhs == -1) {
+				debug("finding modular inverse.\n");
+				ans = invertECElement(lhs);
+			}
+			else {
+				EXIT_IF(TRUE, "unsupported operation.");
+			}
 		}
 		else {
-			ErrorMsg("element type combination not supported.");
+			EXIT_IF(TRUE, "element type combination not supported.");
 		}
 
 		UPDATE_BENCHMARK(EXPONENTIATION, dBench);
@@ -863,12 +877,6 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 		Point_Init(lhs);
 		Point_Init(rhs);
 
-//		if(lhs->type == ZR && rhs->type == G) {
-			// ans = createNewPoint(G, lhs->group, lhs->ctx);
-			// EC_POINT_copy(ans->P, rhs->P);
-			// EC_POINT_mul(ans->group, ans->P, lhs->elemZ, NULL, NULL, ans->ctx);
-//			ans = ec_point_mul(lhs->group, rhs->P, lhs->elemZ, lhs->ctx);
-//		}
 		if(lhs->type == G && rhs->type == ZR) {
 			// ans = createNewPoint(G, lhs->group, lhs->ctx);
 			// EC_POINT_copy(ans->P, lhs->P);
