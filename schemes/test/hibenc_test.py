@@ -1,4 +1,4 @@
-from charm.schemes.hibenc.hibenc_bb04 import HIBE_BB04
+from schemes.hibenc.hibenc_bb04 import HIBE_BB04
 from charm.toolbox.pairinggroup import PairingGroup, GT
 import unittest
 

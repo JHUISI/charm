@@ -1,5 +1,5 @@
-from charm.schemes.grpsig.groupsig_bgls04 import ShortSig as BGLS04
-from charm.schemes.grpsig.groupsig_bgls04_var import ShortSig as BGLS04_Var
+from schemes.grpsig.groupsig_bgls04 import ShortSig as BGLS04
+from schemes.grpsig.groupsig_bgls04_var import ShortSig as BGLS04_Var
 from charm.toolbox.pairinggroup import PairingGroup
 import unittest
 

@@ -1,5 +1,5 @@
-from charm.schemes.commit.commit_gs08 import Commitment_GS08
-from charm.schemes.commit.commit_pedersen92 import CM_Ped92
+from schemes.commit.commit_gs08 import Commitment_GS08
+from schemes.commit.commit_pedersen92 import CM_Ped92
 from charm.toolbox.pairinggroup import PairingGroup, G1
 from charm.toolbox.ecgroup import ECGroup, ZR
 import unittest
