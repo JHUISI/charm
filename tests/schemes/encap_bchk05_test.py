@@ -1,4 +1,4 @@
-from schemes.encap_bchk05 import EncapBCHK
+from charm.schemes.encap_bchk05 import EncapBCHK
 import unittest
 
 debug = False

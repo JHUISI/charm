@@ -3,12 +3,12 @@ Created on Jun 23, 2011
 
 :authors: urbanus
 '''
-from toolbox.IBEnc import IBEnc
-from toolbox.pairinggroup import *
+from charm.toolbox.IBEnc import IBEnc
+from charm.toolbox.pairinggroup import *
 import imp, inspect, os, re
 import unittest
-from schemes.ibenc_bb03 import IBE_BB04
-from schemes.ibenc_bf01 import IBE_BonehFranklin
+from charm.schemes.ibenc.ibenc_bb03 import IBE_BB04
+from charm.schemes.ibenc.ibenc_bf01 import IBE_BonehFranklin
 import all_unittests
 
 #def suite():

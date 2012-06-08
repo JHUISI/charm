@@ -1,5 +1,5 @@
-from schemes.hibenc.hibenc_bb04 import HIBE_BB04
-from toolbox.pairinggroup import PairingGroup, GT
+from charm.schemes.hibenc.hibenc_bb04 import HIBE_BB04
+from charm.toolbox.pairinggroup import PairingGroup, GT
 import unittest
 
 debug = False

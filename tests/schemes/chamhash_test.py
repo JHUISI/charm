@@ -1,6 +1,6 @@
-from schemes.chamhash_adm05 import ChamHash_Adm05
-from schemes.chamhash_rsa_hw09 import ChamHash_HW09
-from toolbox.integergroup import *
+from charm.schemes.chamhash_adm05 import ChamHash_Adm05
+from charm.schemes.chamhash_rsa_hw09 import ChamHash_HW09
+from charm.toolbox.integergroup import *
 import unittest
 
 debug = False

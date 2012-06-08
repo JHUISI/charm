@@ -1,6 +1,6 @@
-from schemes.dabenc.dabe_aw11 import Dabe
-from schemes.dabenc.dabenc_adapt_hybrid import HybridABEncMA
-from toolbox.pairinggroup import PairingGroup, GT
+from charm.schemes.dabenc.dabe_aw11 import Dabe
+from charm.schemes.dabenc.dabenc_adapt_hybrid import HybridABEncMA
+from charm.toolbox.pairinggroup import PairingGroup, GT
 import unittest
 
 debug = False

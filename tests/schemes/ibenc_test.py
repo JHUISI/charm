@@ -1,13 +1,13 @@
-from schemes.ibenc.ibenc_adapt_hybrid import HybridIBEnc
-from schemes.ibenc.ibenc_adapt_identityhash import HashIDAdapter
-from schemes.ibenc.ibenc_bb03 import IBE_BB04
-from schemes.ibenc.ibenc_bf01 import IBE_BonehFranklin
-from schemes.ibenc.ibenc_ckrs09 import IBE_CKRS
-from schemes.ibenc.ibenc_lsw08 import IBE_Revoke
-from schemes.ibenc.ibenc_sw05 import IBE_SW05_LUC
-from schemes.ibenc.ibenc_waters05 import IBE_N04
-from schemes.ibenc.ibenc_waters09 import DSE09
-from toolbox.pairinggroup import PairingGroup, GT, ZR
+from charm.schemes.ibenc.ibenc_adapt_hybrid import HybridIBEnc
+from charm.schemes.ibenc.ibenc_adapt_identityhash import HashIDAdapter
+from charm.schemes.ibenc.ibenc_bb03 import IBE_BB04
+from charm.schemes.ibenc.ibenc_bf01 import IBE_BonehFranklin
+from charm.schemes.ibenc.ibenc_ckrs09 import IBE_CKRS
+from charm.schemes.ibenc.ibenc_lsw08 import IBE_Revoke
+from charm.schemes.ibenc.ibenc_sw05 import IBE_SW05_LUC
+from charm.schemes.ibenc.ibenc_waters05 import IBE_N04
+from charm.schemes.ibenc.ibenc_waters09 import DSE09
+from charm.toolbox.pairinggroup import PairingGroup, GT, ZR
 import unittest
 
 debug = False

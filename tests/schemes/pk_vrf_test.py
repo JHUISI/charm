@@ -1,5 +1,5 @@
-from toolbox.pairinggroup import PairingGroup
-from schemes.pk_vrf import VRF10
+from charm.toolbox.pairinggroup import PairingGroup
+from charm.schemes.pk_vrf import VRF10
 import unittest
 
 debug = False

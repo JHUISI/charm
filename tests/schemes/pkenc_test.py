@@ -1,20 +1,20 @@
-from schemes.encap_bchk05 import EncapBCHK
-from schemes.ibenc.ibenc_bb03 import IBE_BB04
-from schemes.pkenc.pkenc_adapt_bchk05 import BCHKIBEnc
-from schemes.pksig.pksig_bls04 import IBSig
-from schemes.ibenc.ibenc_adapt_identityhash import HashIDAdapter
-from schemes.pkenc.pkenc_adapt_chk04 import CHK04
-from schemes.pkenc.pkenc_adapt_hybrid import HybridEnc
-from schemes.pkenc.pkenc_cs98_ec import EC_CS98
-from schemes.pkenc.pkenc_cs98 import CS98
-from schemes.pkenc.pkenc_elgamal85 import ElGamal
-from schemes.pkenc.pkenc_paillier99 import Pai99
-from schemes.pkenc.pkenc_rabin import Rabin_Enc, Rabin_Sig
-from schemes.pkenc.pkenc_rsa import RSA_Enc, RSA_Sig
-from toolbox.pairinggroup import PairingGroup, GT, ZR
-from toolbox.ecgroup import ECGroup, ecc
-from toolbox.eccurve import prime192v1, prime192v2
-from toolbox.integergroup import RSAGroup, integer
+from charm.schemes.encap_bchk05 import EncapBCHK
+from charm.schemes.ibenc.ibenc_bb03 import IBE_BB04
+from charm.schemes.pkenc.pkenc_adapt_bchk05 import BCHKIBEnc
+from charm.schemes.pksig.pksig_bls04 import IBSig
+from charm.schemes.ibenc.ibenc_adapt_identityhash import HashIDAdapter
+from charm.schemes.pkenc.pkenc_adapt_chk04 import CHK04
+from charm.schemes.pkenc.pkenc_adapt_hybrid import HybridEnc
+from charm.schemes.pkenc.pkenc_cs98_ec import EC_CS98
+from charm.schemes.pkenc.pkenc_cs98 import CS98
+from charm.schemes.pkenc.pkenc_elgamal85 import ElGamal
+from charm.schemes.pkenc.pkenc_paillier99 import Pai99
+from charm.schemes.pkenc.pkenc_rabin import Rabin_Enc, Rabin_Sig
+from charm.schemes.pkenc.pkenc_rsa import RSA_Enc, RSA_Sig
+from charm.toolbox.pairinggroup import PairingGroup, GT, ZR
+from charm.toolbox.ecgroup import ECGroup, ecc
+from charm.toolbox.eccurve import prime192v1, prime192v2
+from charm.toolbox.integergroup import RSAGroup, integer
 import unittest
 
 debug = False
