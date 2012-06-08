@@ -34,7 +34,7 @@ class ECDSA(PKSig):
             k = group.random()
             r = group.zr(pk['g'] ** k)
             e = group.hash(M)
-            s = (~k) * (e + x * r)
+            s = (k ** -1) * (e + x * r)
             if (r == 0 or s == 0):
                 print ("unlikely error r = %s, s = %s" % (r,s))
                 continue
@@ -43,7 +43,7 @@ class ECDSA(PKSig):
         return { 'r':r, 's':s }
         
     def verify(self, pk, sig, M):
-        w = ~sig['s']
+        w = sig['s'] ** -1
         u1 = group.hash(M) * w
         u2 = sig['r'] * w
         v = (pk['g'] ** u1) * (pk['y'] ** u2)

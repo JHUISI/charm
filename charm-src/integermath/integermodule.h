@@ -23,7 +23,7 @@
 #define HASH_LEN 20
 #define MSG_LEN 128
 
-//#define DEBUG   1
+//#define DEBUG   0
 //#define TRUE	1
 //#define FALSE	0
 #if DEBUG
@@ -142,5 +142,10 @@ Integer *createNewInteger(mpz_t m);
 Integer *createNewIntegerNoMod(void);
 void print_mpz(mpz_t x, int base);
 void print_bn_dec(const BIGNUM *bn);
+
+#define EXIT_IF(check, msg) \
+	if(check) { 						\
+	PyErr_SetString(IntegerError, msg); \
+	return NULL;	}
 
 #endif

@@ -13,9 +13,9 @@ Boneh-Franklin Identity Based Encryption
 :Date:       2/2011
 :Status:     BROKEN
 '''
-from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
+from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.integer import randomBits,integer,bitsize
-from toolbox.hash_module import Hash,int2Bytes,integer
+from toolbox.hash_module import Hash,int2Bytes
 from toolbox.IBEnc import IBEnc
 
 debug = False
@@ -114,8 +114,6 @@ def main():
 
     msg = ibe.decrypt(pk, key, ciphertext)
     assert msg == m,  "failed decrypt: \n%s\n%s" % (msg, m)
-    if debug: print("Successful Decryption!!!")
-    
         
 if __name__ == "__main__":
     debug = True

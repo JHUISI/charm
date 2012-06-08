@@ -558,11 +558,10 @@ static PyObject *Integer_invert(PyObject *o1) {
 			if (errcode > 0) {
 				return (PyObject *) rop;
 			}
-			PyErr_SetString(IntegerError, "could not find a modular inverse");
-			return NULL;
+			EXIT_IF(TRUE, "could not find a modular inverse");
 		}
 	}
-	return NULL;
+	EXIT_IF(TRUE, "not an integer object type.");
 }
 
 static PyObject *Integer_long(PyObject *o1) {
@@ -649,41 +648,38 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 	// TODO: handle foundLHS (e.g. 2 ** <int.Elem>)
 	if (foundRHS) {
 		debug("foundRHS!\n");
-		if (_PyLong_Check(o2)) {
-			long long exp = PyLong_AsLongLong(o2);
-			debug("Value => %lld\n", exp);
-			if (exp == -1) {
-				debug("find modular inverse.\n");
-				PyObject *obj = Integer_invert((PyObject *) lhs);
-				if (obj == NULL) {
-					return NULL;
-				}
-				rop = (Integer *) obj;
-				return (PyObject *) rop;
-			} else if (exp >= 0) {
-				debug("exponent is positive\n");
-				mpz_t exp2;
-				mpz_init_set_si(exp2, exp);
-				rop = createNewInteger(lhs->m);
-				if (mpz_sgn(lhs->m) == 0)
-					mpz_pow_ui(rop->e, lhs->e, exp);
-				else
-					mpz_powm_sec(rop->e, lhs->e, exp2, rop->m);
-
-				mpz_clear(exp2);
-			} else {
-				PyErr_SetString(IntegerError,
-						"negative exponents not -1 are invalid.");
-				return NULL;
+		long rhs = PyLong_AsLong(o2);
+		if(PyErr_Occurred() || rhs >= 0) {
+			PyErr_Print(); // for debug purposes
+			PyErr_Clear();
+			debug("exponent is positive\n");
+			int sgn = mpz_sgn(lhs->m);
+			if(sgn > 0)  {
+				if(mpz_odd_p(lhs->m) > 0) {
+					mpz_t exp;
+					mpz_init(exp);
+					longObjToMPZ(exp, o2);
+					print_mpz(exp, 10);
+					rop = createNewInteger(lhs->m);
+					mpz_powm_sec(rop->e, lhs->e, exp, rop->m);
+					mpz_clear(exp);
+				 }
 			}
-		} else {
-			mpz_t exp;
-			mpz_init(exp);
-			longObjToMPZ(exp, o2);
-			rop = createNewInteger(lhs->m);
-			print_mpz(exp, 10);
-			mpz_powm_sec(rop->e, lhs->e, exp, rop->m);
-			mpz_clear(exp);
+			else if(sgn == 0) { // no modulus
+				unsigned long int exp = PyLong_AsUnsignedLong(o2);
+				EXIT_IF(PyErr_Occurred(), "integer too large to exponentiate without modulus.");
+				rop = createNewInteger(lhs->m);
+				mpz_pow_ui(rop->e, lhs->e, exp);
+			}
+			else {
+				EXIT_IF(TRUE, "cannot exponentiate integers without modulus.");
+			}
+		}
+		else if(rhs == -1) {
+			debug("find modular inverse.\n");
+			PyObject *obj = Integer_invert((PyObject *) lhs);
+			if(obj == NULL) return NULL;
+			rop = (Integer *) obj;
 		}
 	} else if (foundLHS) {
 		// find modular inverse
@@ -717,9 +713,7 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 				mpz_pow_ui(rop->e, lhs->e, exp);
 			} else { // last option...
 				// cannot represent reg ints as ulong's, so error out.
-				PyErr_SetString(IntegerError,
-						"could not exponentiate integers.");
-				return NULL;
+				EXIT_IF(TRUE, "could not exponentiate integers.");
 			}
 		}
 	}
@@ -1898,7 +1892,6 @@ static struct module_state _state;
 
 /* global module methods (include isPrime, randomPrime, etc. here). */
 static PyMethodDef module_methods[] = {
-//	{ "init", (PyCFunction) Integer_randinit, METH_O | METH_NOARGS, "initialize random number generator" },
 	{ "randomBits", (PyCFunction) genRandomBits, METH_VARARGS, "generate a random number of bits from 0 to 2^n-1." },
 	{ "random", (PyCFunction) genRandom, METH_VARARGS, "generate a random number in range of 0 to n-1 where n is large number." },
 	{ "randomPrime", (PyCFunction) genRandomPrime, METH_VARARGS, "generate a probabilistic random prime number that is n-bits." },
@@ -1919,6 +1912,7 @@ static PyMethodDef module_methods[] = {
 	{ "GetGeneralBenchmarks", (PyCFunction) _get_all_results, METH_VARARGS, "Retrieve general benchmark info as a dictionary."},
 	{ "ClearBenchmark", (PyCFunction)_clear_benchmark, METH_VARARGS, "Clears content of benchmark object"},
 	{ "int2Bytes", (PyCFunction) toBytes, METH_O, "convert an integer object to a bytes object." },
+//	{ "toInt", (PyCFunction) toInt, METH_O, "convert modular integer into an integer object."},
 	{ NULL, NULL }
 };
 

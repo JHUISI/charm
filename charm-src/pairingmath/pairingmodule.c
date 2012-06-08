@@ -2114,14 +2114,13 @@ static int pairings_traverse(PyObject *m, visitproc visit, void *arg) {
 
 static int pairings_clear(PyObject *m) {
 	Py_CLEAR(GETSTATE(m)->error);
+	Operations *c = (Operations *) dBench->data_ptr;
+	free(c);
 	Py_CLEAR(GETSTATE(m)->dBench);
-
 	return 0;
 }
 
 static int pairings_free(PyObject *m) {
-	Operations *c = (Operations *) dBench->data_ptr;
-	free(c);
 	return 0;
 }
 
@@ -2133,8 +2132,8 @@ static struct PyModuleDef moduledef = {
 	pairing_methods,
 	NULL,
 	pairings_traverse,
-	(inquiry) pairings_clear,
-	(freefunc) pairings_free
+	(inquiry) pairings_clear, // clear function to call during GC clearing of the module object
+	(freefunc) pairings_free //
 };
 
 #define INITERROR return NULL

@@ -14,7 +14,7 @@ from charm.cryptobase import *
 from toolbox.IBEnc import IBEnc
 from toolbox.bitstring import Bytes
 from toolbox.conversion import Conversion
-from toolbox.pairinggroup import *
+from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 import hashlib, math
 
 debug = False
@@ -131,7 +131,7 @@ def main():
     # represents public identity
     ID = "bob@mail.com"
     kID = ibe.stringtoidentity(pk, ID)
-    if debug: print("Bob's key  =>", kID)
+    #if debug: print("Bob's key  =>", kID)
     key = ibe.extract(mk, kID)
 
     M = groupObj.random(GT)
@@ -140,8 +140,8 @@ def main():
     #print('m    =>', m)
 
     assert m == M, "FAILED Decryption!"
-    if debug: print("Successful Decryption!!! m => '%s'" % m)
-    del groupObj
+    #if debug: print("Successful Decryption!!! m => '%s'" % m)
+
 if __name__ == '__main__':
     debug = True
     main()
