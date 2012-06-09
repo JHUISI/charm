@@ -7,6 +7,7 @@ from schemes.ibenc.ibenc_lsw08 import IBE_Revoke
 from schemes.ibenc.ibenc_sw05 import IBE_SW05_LUC
 from schemes.ibenc.ibenc_waters05 import IBE_N04
 from schemes.ibenc.ibenc_waters09 import DSE09
+from toolbox.hash_module import Waters
 from toolbox.pairinggroup import PairingGroup, GT, ZR
 import unittest
 
@@ -168,13 +169,14 @@ class IBE_N04Test(unittest.TestCase):
     def testIBE_N04(self):
         # initialize the element object so that object references have global scope
         groupObj = PairingGroup('SS512')
+        waters = Waters(groupObj)
         ibe = IBE_N04(groupObj)
         (pk, mk) = ibe.setup()
 
         # represents public identity
         ID = "bob@mail.com"
-        kID = ibe.stringtoidentity(pk, ID)
-        if debug: print("Bob's key  =>", kID)
+        kID = waters.hash(ID)
+        #if debug: print("Bob's key  =>", kID)
         key = ibe.extract(mk, kID)
 
         M = groupObj.random(GT)
