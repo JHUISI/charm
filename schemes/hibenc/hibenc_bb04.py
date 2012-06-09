@@ -13,17 +13,15 @@ Boneh-Boyen Hierarchical Identity Based Encryption
 :Date:       3/2012
 '''
 from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-from toolbox.conversion import Conversion
-from toolbox.bitstring import Bytes
+from toolbox.hash_module import Waters
 from toolbox.iterate import dotprod2
 import hashlib
 
 debug = False
 class HIBE_BB04:
     def __init__(self, groupObj):
-        global group
+        global group, hash_func
         group = groupObj
-        global hash_func
         hash_func = lambda k,w,x,y,z: ((w ** x[k]) * y[k]) ** z[k]
     
     def setup(self, l=5, z=32):
@@ -45,28 +43,11 @@ class HIBE_BB04:
         mpk = { 'g': g, 'g1':g1, 'h':h, 'gb':gb, 'g1b':g1b, 'hb':hb, 'v':v, 'l':l, 'z':z }
         mk = { 'g0b':g0b }
         return (mpk, mk)
-
-    def strToZR(self, bits, length, strID):
-        '''Hash the identity string and break it up in to l bit pieces'''
-        hashObj = hashlib.new('sha1')         
-        hashObj.update(bytes(strID, 'utf-8'))
-        hash = Bytes(hashObj.digest())
-
-        val = Conversion.OS2IP(hash) #Convert to integer format
-        bstr = bin(val)[2:]   #cut out the 0b header
-
-        v=[]
-        for i in range(length):  #z must be greater than or equal to 1
-            binsubstr = bstr[bits*i : bits*(i+1)]
-            intval = int(binsubstr, 2)
-            intelement = group.init(ZR, intval)
-            v.append(intelement)
-        return v
     
     def extract(self, level, mpk, mk, ID):
         j = level
         assert j >= 1 and j <= mpk['l'], "invalid level: 1 - %d" % mpk['l']
-        I = self.strToZR(mpk['z'], j, ID)
+        I = Waters(group, j, mpk['z']).hash(ID)
         r = [group.random(ZR) for i in range(j)]
         g_b = [mpk['gb'] ** r[i] for i in range(j)]
         hashID = mk['g0b'] * dotprod2(range(j), hash_func, mpk['g1b'], I, mpk['hb'], r)
@@ -76,7 +57,7 @@ class HIBE_BB04:
     def derive(self, mpk, pk):
         j = pk['j'] # pk[j-1] 
         assert pk['j'] + 1 <= mpk['l'], "invalid level: 1 - %d" % mpk['l']
-        I = self.strToZR(pk['z'], j, pk['ID'])
+        I = Waters(group, j, mpk['z']).hash(pk['ID'])
 
         r = [group.random(ZR) for i in range(j)]
         g_b = [pk['dn'][i] * (mpk['gb'] ** r[i]) for i in range(j)] # j-1
@@ -85,7 +66,7 @@ class HIBE_BB04:
         return { 'ID':ID, 'j':j }, { 'd0':hashID, 'dn':g_b}
         
     def encrypt(self, mpk, pk, M):
-        I = self.strToZR(mpk['z'], pk['j'], pk['ID'])
+        I = Waters(group, pk['j'], mpk['z']).hash(pk['ID'])
         s = group.random(ZR)
         A = M * (mpk['v'] ** s)
         B = mpk['g'] ** s
