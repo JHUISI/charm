@@ -16,6 +16,7 @@ from schemes.pksig.pksig_schnorr91 import SchnorrSig
 from schemes.pksig.pksig_waters05 import IBE_N04_Sig
 from schemes.pksig.pksig_waters09 import IBEWaters09
 from schemes.pksig.pksig_waters import WatersSig
+from toolbox.hash_module import Waters
 from toolbox.pairinggroup import PairingGroup, ZR
 from toolbox.ecgroup import ECGroup
 from toolbox.eccurve import prime192v2
@@ -316,19 +317,20 @@ class IBE_N04_SigTest(unittest.TestCase):
     def testIBE_N04_Sig(self):
         # initialize the element object so that object references have global scope
         groupObj = PairingGroup('SS512')
+        waters = Waters(groupObj)
         ibe = IBE_N04_Sig(groupObj)
         (pk, sk) = ibe.keygen()
 
         # represents public identity
         M = "bob@mail.com"
 
-        msg = ibe.stringtoidentity(pk, M)    
+        msg = waters.hash(M)
         sig = ibe.sign(pk, sk, msg)
-        if debug: 
+        if debug:
             print("original msg => '%s'" % M)
             print("msg => '%s'" % msg)
             print("sig => '%s'" % sig)
-        
+
         assert ibe.verify(pk, msg, sig), "Failed verification!"
         if debug: print("Successful Verification!!! msg => '%s'" % msg)
 
