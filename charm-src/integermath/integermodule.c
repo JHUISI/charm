@@ -468,9 +468,7 @@ static PyObject *Integer_add(PyObject *o1, PyObject *o2) {
 				rop = createNewInteger(lhs->m);
 				mpz_add(rop->e, lhs->e, rhs->e);
 			} else {
-				PyErr_SetString(IntegerError,
-						"cannot add integers with different modulus.");
-				return NULL;
+				EXIT_IF(TRUE, "cannot add integers with different modulus.");
 			}
 		}
 	}
@@ -502,9 +500,7 @@ static PyObject *Integer_sub(PyObject *o1, PyObject *o2) {
 				rop = createNewInteger(lhs->m);
 				mpz_sub(rop->e, lhs->e, rhs->e);
 			} else {
-				PyErr_SetString(IntegerError,
-						"cannot subtract integers with different modulus.");
-				return NULL;
+				EXIT_IF(TRUE,"cannot subtract integers with different modulus.");
 			}
 		}
 	}
@@ -536,9 +532,7 @@ static PyObject *Integer_mul(PyObject *o1, PyObject *o2) {
 				rop = createNewInteger(lhs->m);
 				mpz_mul(rop->e, lhs->e, rhs->e);
 			} else {
-				PyErr_SetString(IntegerError,
-						"cannot multiply integers with different modulus.");
-				return NULL;
+				EXIT_IF(TRUE, "cannot multiply integers with different modulus.");
 			}
 		}
 	}
@@ -572,9 +566,9 @@ static PyObject *Integer_long(PyObject *o1) {
 		return mpzToLongObj(value->e);
 	}
 
-	PyErr_SetString(IntegerError, "invalid object type.");
-	return NULL;
+	EXIT_IF(TRUE, "invalid object type.");
 }
+
 /** a / b mod N ...
  *  only defined when b is invertible modulo N, meaning a*b mod N = c*b mod N iff b has b^-1 s.t.
  *  b*b^-1 = 1 mod N. NOT IMPLEMENTED CORRECTLY! TODO: redo
@@ -629,10 +623,8 @@ static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 	}
 
 	if (mpz_sgn(rop->e) == 0) {
-		PyErr_SetString(IntegerError,
-				"division failed: could not find modular inverse.");
 		PyObject_Del(rop);
-		return NULL;
+		EXIT_IF(TRUE, "division failed: could not find modular inverse.");
 	}
 
 	UPDATE_BENCHMARK(DIVISION, dBench);
@@ -946,7 +938,8 @@ static PyObject *Integer_hash(PyObject *self, PyObject *args) {
 
 	}
 
-	cleanup: mpz_clear(v);
+cleanup:
+	mpz_clear(v);
 	mpz_clear(p);
 	mpz_clear(q);
 	mpz_clear(tmp);
@@ -1083,21 +1076,10 @@ static PyObject *genRandomBits(Integer *self, PyObject *args) {
 
 			}
 			return (PyObject *) v;
-
-//			mp_bitcnt_t n = bits;
-//
-//			mpz_t rop;
-//			mpz_init(rop);
-//			mpz_urandomb(rop, self->state, n);
-//
-//			PyObject *rop2 = mpzToLongObj(rop);
-//			mpz_clear(rop);
-//			return rop2;
 		}
 	}
 
-	PyErr_SetString(IntegerError, "number of bits must be > 0.");
-	return NULL;
+	EXIT_IF(TRUE, "number of bits must be > 0.");
 }
 
 static PyObject *genRandom(Integer *self, PyObject *args) {
@@ -1115,8 +1097,7 @@ static PyObject *genRandom(Integer *self, PyObject *args) {
 			mpz_init_set(N, obj1->e);
 		} else {
 			/* error */
-			PyErr_SetString(IntegerError, "invalid object type.");
-			return NULL;
+			EXIT_IF(TRUE, "invalid object type.");
 		}
 
 		BIGNUM *s = BN_new(), *bN = BN_new();
@@ -1129,12 +1110,10 @@ static PyObject *genRandom(Integer *self, PyObject *args) {
 		print_bn_dec(s);
 		BN_free(s);
 		BN_free(bN);
-//		while (mpz_cmp_ui(rop->e, 0) == 0)
-//			mpz_urandomm(rop->e, self->state, N);
 		mpz_clear(N);
 		return (PyObject *) rop;
 	}
-	return NULL;
+	EXIT_IF(TRUE, "invalid arguments.");
 }
 
 /* takes as input the number of bits and produces a prime number of that size. */
@@ -1164,8 +1143,7 @@ static PyObject *genRandomPrime(Integer *self, PyObject *args) {
 		}
 	}
 
-	PyErr_SetString(IntegerError, "invalid input.");
-	return NULL;
+	EXIT_IF(TRUE, "invalid input.");
 }
 
 static PyObject *encode_message(PyObject *self, PyObject *args) {
@@ -1178,7 +1156,6 @@ static PyObject *encode_message(PyObject *self, PyObject *args) {
 	mpz_t tmp, exp, rop;
 	Integer *rop2;
 
-//	if (PyArg_ParseTuple(args, "s#OO", &old_m, &m_size, &order, &order2)) {
 	if (PyArg_ParseTuple(args, "OOO", &old_msg, &order, &order2)) {
 		// make sure p = 2 * q + 1
 		if (PyInteger_Check(order) && PyInteger_Check(order2)) {
@@ -1194,17 +1171,13 @@ static PyObject *encode_message(PyObject *self, PyObject *args) {
 			mpz_add_ui(result, result, 1);
 
 			if (mpz_cmp(result, p) != 0) {
-				PyErr_SetString(IntegerError,
-						"can only encode messages into groups where p = 2*q+1.");
 				mpz_clear(p);
 				mpz_clear(q);
 				mpz_clear(result);
-				return NULL;
+				EXIT_IF(TRUE, "can only encode messages into groups where p = 2*q+1.");
 			}
 		} else {
-			PyErr_SetString(IntegerError,
-					"failed to specify large primes p and q.");
-			return NULL;
+			EXIT_IF(TRUE, "failed to specify large primes p and q.");
 		}
 		mpz_clear(q);
 		mpz_clear(result);
@@ -1219,14 +1192,12 @@ static PyObject *encode_message(PyObject *self, PyObject *args) {
 		
 			if(m_size > MSG_LEN-2) {
 				mpz_clear(p);
-				PyErr_SetString(IntegerError, "message too large. Cannot represent as an element of Zp.");
-				return NULL;
+				EXIT_IF(TRUE, "message too large. Cannot represent as an element of Zp.");
 			}
 		}
 		else {
 			mpz_clear(p);
-			PyErr_SetString(IntegerError, "message not a bytes object");
-			return NULL;
+			EXIT_IF(TRUE, "message not a bytes object");
 		}
 
 		//longest message can be is 128 characters (1024 bits) => check on this!!!
@@ -1282,8 +1253,7 @@ static PyObject *encode_message(PyObject *self, PyObject *args) {
 		return (PyObject *) rop2;
 	}
 
-	PyErr_SetString(IntegerError, "invalid input types.");
-	return NULL;
+	EXIT_IF(TRUE, "invalid input types.");
 }
 
 static PyObject *decode_message(PyObject *self, PyObject *args) {
@@ -1439,8 +1409,7 @@ static PyObject *testCongruency(Integer *self, PyObject *args) {
 
 	}
 
-	PyErr_SetString(IntegerError, "need long or int value to test congruency.");
-	return NULL;
+	EXIT_IF(TRUE, "need long or int value to test congruency.");
 }
 
 static PyObject *legendre(PyObject *self, PyObject *args) {
@@ -1476,7 +1445,7 @@ static PyObject *legendre(PyObject *self, PyObject *args) {
 		}
 	}
 
-	ErrorMsg("invalid input.");
+	EXIT_IF(TRUE, "invalid input.");
 }
 
 static PyObject *gcdCall(PyObject *self, PyObject *args) {
@@ -1514,7 +1483,7 @@ static PyObject *gcdCall(PyObject *self, PyObject *args) {
 		return (PyObject *) rop;
 	}
 
-	ErrorMsg("invalid input.");
+	EXIT_IF(TRUE, "invalid input.");
 }
 
 static PyObject *lcmCall(PyObject *self, PyObject *args) {
@@ -1530,7 +1499,7 @@ static PyObject *lcmCall(PyObject *self, PyObject *args) {
 			Integer *tmp = (Integer *) obj1;
 			mpz_set(op1, tmp->e);
 		} else {
-			ErrorMsg("invalid argument type: 1");
+			EXIT_IF(TRUE, "invalid argument type: 1");
 		}
 
 		if (_PyLong_Check(obj2)) {
@@ -1542,7 +1511,7 @@ static PyObject *lcmCall(PyObject *self, PyObject *args) {
 			mpz_set(op2, tmp->e);
 		} else {
 			mpz_clear(op1);
-			ErrorMsg("invalid argument type: 2");
+			EXIT_IF(TRUE, "invalid argument type: 2");
 		}
 
 		Integer *rop = createNewIntegerNoMod();
@@ -1552,7 +1521,7 @@ static PyObject *lcmCall(PyObject *self, PyObject *args) {
 		return (PyObject *) rop;
 	}
 
-	ErrorMsg("invalid input.");
+	EXIT_IF(TRUE, "invalid input.");
 }
 
 static PyObject *serialize(PyObject *self, PyObject *args) {
@@ -1595,7 +1564,7 @@ static PyObject *serialize(PyObject *self, PyObject *args) {
 	} else if (bytes1 != NULL) {
 		return bytes1;
 	} else {
-		ErrorMsg("invalid integer object.");
+		EXIT_IF(TRUE, "invalid integer object.");
 	}
 }
 
@@ -1614,7 +1583,7 @@ static PyObject *deserialize(PyObject *self, PyObject *args) {
 	PyObject *bytesObj = NULL;
 
 	if (!PyArg_ParseTuple(args, "O", &bytesObj)) {
-		ErrorMsg("invalid argument.");
+		EXIT_IF(TRUE, "invalid argument.");
 	}
 
 	unsigned char *serial_buf = (unsigned char *) PyBytes_AsString(bytesObj);
@@ -1674,7 +1643,7 @@ static PyObject *toBytes(PyObject *self, PyObject *args) {
 		return PyBytes_FromStringAndSize((const char *) Rop, (Py_ssize_t) count);
 	}
 
-	ErrorMsg("invalid type.");
+	EXIT_IF(TRUE, "invalid type.");
 }
 
 static PyObject *Integer_xor(PyObject *self, PyObject *other) {
@@ -1685,15 +1654,14 @@ static PyObject *Integer_xor(PyObject *self, PyObject *other) {
 	if (PyInteger_Check(other))
 		op2 = (Integer *) other;
 
-	if (op1 == NULL || op2 == NULL) {
-		ErrorMsg("both types are not of charm integer types.");
-	} else if (PyInteger_Init(op1, op2)) {
+	EXIT_IF(op1 == NULL || op2 == NULL, "both types are not of charm integer types.");
+	if (PyInteger_Init(op1, op2)) {
 		rop = createNewIntegerNoMod();
 		mpz_xor(rop->e, op1->e, op2->e);
 		return (PyObject *) rop;
 	}
 
-	ErrorMsg("objects not initialized properly.");
+	EXIT_IF(TRUE, "objects not initialized properly.");
 }
 
 /* END: helper function definition */

@@ -313,10 +313,10 @@ PyObject *ECE_init(ECElement *self, PyObject *args) {
 			return (PyObject *) obj;
 		}
 		else {
-			ErrorMsg("invalid type selected.");
+			EXIT_IF(TRUE, "invalid type selected.");
 		}
 	}
-	ErrorMsg("invalid argument.");
+	EXIT_IF(TRUE, "invalid argument.");
 }
 
 PyObject *ECE_random(ECElement *self, PyObject *args) {
@@ -336,7 +336,7 @@ PyObject *ECE_random(ECElement *self, PyObject *args) {
 			BIGNUM *x = BN_new(), *y = BN_new(), *order = BN_new();
 			EC_GROUP_get_order(gobj->group, order, gobj->ctx);
 			int FindAnotherPoint = TRUE;
-//			START_CLOCK(dBench);
+			START_CLOCK(dBench);
 			do {
 				// generate random point
 				BN_rand_range(x, order);
@@ -360,7 +360,7 @@ PyObject *ECE_random(ECElement *self, PyObject *args) {
 //				OPENSSL_free(ystr);
 			} while(FindAnotherPoint);
 
-//			STOP_CLOCK(dBench);
+			STOP_CLOCK(dBench);
 			BN_free(x);
 			BN_free(y);
 			BN_free(order);
@@ -371,30 +371,27 @@ PyObject *ECE_random(ECElement *self, PyObject *args) {
 			BIGNUM *order = BN_new();
 			EC_GROUP_get_order(gobj->group, order, gobj->ctx);
 			objZR->elemZ = BN_new();
-//			START_CLOCK(dBench);
+			START_CLOCK(dBench);
 			BN_rand_range(objZR->elemZ, order);
-//			STOP_CLOCK(dBench);
+			STOP_CLOCK(dBench);
 			BN_free(order);
 
 			return (PyObject *) objZR;
 		}
 		else {
 
-			ErrorMsg("invalid object type.");
+			EXIT_IF(TRUE, "invalid object type.");
 		}
 	}
 
 
-	ErrorMsg("invalid argument.");
+	EXIT_IF(TRUE, "invalid argument.");
 }
 
 static PyObject *ECE_is_infinity(ECElement *self, PyObject *args) {
 
 	Point_Init(self);
-	if(self->type != G) {
-		ErrorMsg("element not of type G.");
-		return NULL;
-	}
+	EXIT_IF(self->type != G, "element not of type G.");
 
 	START_CLOCK(dBench);
 	 if(EC_POINT_is_at_infinity(self->group, self->P)) {
@@ -469,11 +466,11 @@ static PyObject *ECE_add(PyObject *o1, PyObject *o2) {
 		}
 		else { // if(lhs->type == G && rhs->type == ZR) or vice versa operation undefined...
 
-			ErrorMsg("adding the a group element G to ZR is undefined.");
+			EXIT_IF(TRUE, "adding the a group element G to ZR is undefined.");
 		}
 	}
 
-	ErrorMsg("invalid arguments.");
+	EXIT_IF(TRUE, "invalid arguments.");
 }
 
 /*
@@ -546,13 +543,12 @@ static PyObject *ECE_sub(PyObject *o1, PyObject *o2) {
 		}
 		else {
 			// not defined for other combinations
-
-			ErrorMsg("invalid combination of operands.");
+			EXIT_IF(TRUE, "invalid combination of operands.");
 		}
 	}
 
 
-	ErrorMsg("invalid arguments.");
+	EXIT_IF(TRUE, "invalid arguments.");
 }
 
 // TODO: Not complete...need to figure out how to multiply two points
@@ -626,7 +622,7 @@ static PyObject *ECE_mul(PyObject *o1, PyObject *o2) {
 		}
 		else {
 
-			ErrorMsg("elements are not of the same type.");
+			EXIT_IF(TRUE, "elements are not of the same type.");
 		}
 
 		UPDATE_BENCHMARK(MULTIPLICATION, dBench);
@@ -773,12 +769,12 @@ static PyObject *ECE_rem(PyObject *o1, PyObject *o2) {
 		}
 		else {
 
-			ErrorMsg("invalid combination of element types");
+			EXIT_IF(TRUE, "invalid combination of element types");
 		}
 	}
 
 
-	ErrorMsg("invalid argument type.");
+	EXIT_IF(TRUE, "invalid argument type.");
 }
 
 ECElement *ec_point_mul(EC_GROUP *group, EC_POINT *point, BIGNUM *value, BN_CTX *ctx) {
@@ -817,7 +813,7 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 			UPDATE_BENCHMARK(EXPONENTIATION, dBench);
 			return (PyObject *) ans;
 		}
-		ErrorMsg("element type combination not supported.");
+		EXIT_IF(TRUE, "element type combination not supported.");
 	}
 	else if(foundRHS) {
 		// TODO: implement for elements of G ** Long or ZR ** Long
@@ -894,13 +890,13 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 		}
 		else {
 
-			ErrorMsg("cannot exponentiate two points.");
+			EXIT_IF(TRUE, "cannot exponentiate two points.");
 		}
 		UPDATE_BENCHMARK(EXPONENTIATION, dBench);
 		return (PyObject *) ans;
 	}
 
-	ErrorMsg("invalid arguments.");
+	EXIT_IF(TRUE, "invalid arguments.");
 }
 
 /* assume 'self' is a valid ECElement instance */
@@ -961,10 +957,10 @@ static PyObject *ECE_invert(PyObject *o1) {
 			return (PyObject *) obj2;
 		}
 
-		ErrorMsg("could not find inverse of element.");
+		EXIT_IF(TRUE, "could not find inverse of element.");
 	}
 
-	ErrorMsg("invalid argument type.");
+	EXIT_IF(TRUE, "invalid argument type.");
 }
 
 /* assume 'self' is a valid ECElement instance */
@@ -1006,7 +1002,7 @@ static PyObject *ECE_neg(PyObject *o1) {
 	}
 
 
-	ErrorMsg("invalid argument.");
+	EXIT_IF(TRUE, "invalid argument.");
 }
 
 static PyObject *ECE_long(PyObject *o1) {
@@ -1051,25 +1047,10 @@ static PyObject *ECE_convertToZR(ECElement *self, PyObject *args) {
 			}
 		}
 
-		ErrorMsg("invalid type.");
+		EXIT_IF(TRUE, "invalid type.");
 	}
-	ErrorMsg("invalid argument.");
+	EXIT_IF(TRUE, "invalid argument.");
 }
-//
-//static PyObject *ECE_convertToZR(ECElement *self, PyObject *args) {
-//	Group_NULL(self);
-//	Group_Init(self);
-//	ECElement *obj = NULL;
-//
-//	if(PyArg_ParseTuple(args, "O", &obj)) {
-//		if(PyEC_Check(obj)) {
-//			Point_Init(obj);
-//			if(obj->type == G) {
-//
-//			}
-//		}
-//	}
-//}
 
 static PyObject *ECE_getOrder(ECElement *self, PyObject *arg) {
 	if(PyEC_Check(arg)) {
@@ -1081,7 +1062,7 @@ static PyObject *ECE_getOrder(ECElement *self, PyObject *arg) {
 		// return the order of the group
 		return (PyObject *) order;
 	}
-	ErrorMsg("invalid argument.");
+	EXIT_IF(TRUE, "invalid argument.");
 }
 
 static PyObject *ECE_bitsize(ECElement *self, PyObject *arg) {
@@ -1098,14 +1079,12 @@ static PyObject *ECE_bitsize(ECElement *self, PyObject *arg) {
 		// maximum bitsize for messages encoded for the selected group
 		return Py_BuildValue("i", max_len);
 	}
-	ErrorMsg("invalid argument.");
+	EXIT_IF(TRUE, "invalid argument.");
 }
 
 
 static PyObject *ECE_equals(PyObject *o1, PyObject *o2, int opid) {
-	if(opid != Py_EQ && opid != Py_NE) {
-		ErrorMsg("'==' and '!=' only comparisons supported.");
-	}
+	EXIT_IF(opid != Py_EQ && opid != Py_NE, "'==' and '!=' only comparisons supported.");
 
 	int foundLongLHS = FALSE, foundLongRHS = FALSE, result = FALSE;
 	ECElement *lhs = NULL, *rhs = NULL;
@@ -1124,7 +1103,7 @@ static PyObject *ECE_equals(PyObject *o1, PyObject *o2, int opid) {
 			BN_free(lhs_val);
 		}
 		else {
-			ErrorMsg("comparison types not supported."); }
+			EXIT_IF(TRUE, "comparison types not supported."); }
 	}
 	else if(foundLongRHS) {
 		if(lhs->type == ZR) {
@@ -1140,7 +1119,7 @@ static PyObject *ECE_equals(PyObject *o1, PyObject *o2, int opid) {
 		}
 		else {
 
-			ErrorMsg("comparison types not supported."); }
+			EXIT_IF(TRUE, "comparison types not supported."); }
 	}
 	else {
 //		Point_Init(lhs)
@@ -1161,7 +1140,7 @@ static PyObject *ECE_equals(PyObject *o1, PyObject *o2, int opid) {
 		}
 		else {
 
-			ErrorMsg("cannot compare point to an integer.\n"); }
+			EXIT_IF(TRUE, "cannot compare point to an integer.\n"); }
 		STOP_CLOCK(dBench);
 	}
 
@@ -1186,7 +1165,7 @@ static PyObject *ECE_getGen(ECElement *self, PyObject *arg) {
 
 		return (PyObject *) genObj;
 	}
-	ErrorMsg("invalid argument.");
+	EXIT_IF(TRUE, "invalid argument.");
 }
 
 /*
@@ -1276,12 +1255,12 @@ static PyObject *ECE_hash(ECElement *self, PyObject *args) {
 		}
 		else {
 
-			ErrorMsg("invalid argument type");
+			EXIT_IF(TRUE, "invalid argument type");
 		}
 	}
 
 
-	ErrorMsg("invalid arguments");
+	EXIT_IF(TRUE, "invalid arguments");
 }
 
 /*
@@ -1307,7 +1286,7 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
 		}
 		else {
 			/* return error */
-			ErrorMsg("message not a bytes object");
+			EXIT_IF(TRUE, "message not a bytes object");
 		}
 		// make sure msg will fit into group (get order num bits / 8)
 		BIGNUM *order = BN_new();
@@ -1386,8 +1365,7 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
 				return (PyObject *) encObj;
 			}
 			else {
-//				printf("ERROR: maximum length for selected group is '%d'\n", max_len-1);
-				ErrorMsg("message too large for selected group. Call object 'bitsize()' function for maximum message size.");
+				EXIT_IF(TRUE, "message too large for selected group. Call object 'bitsize()' function for maximum message size.");
 
 			}
 		}
@@ -1396,10 +1374,7 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
 		// if point not on curve, increment ctr by 1
 	}
 
-	if(ERROR_SET) {
-		ErrorMsg("Ran out of counters. So, message couldn't encoded at current length. please consider making it smaller.");
-	}
-
+	EXIT_IF(ERROR_SET, "Ran out of counters. So, message couldn't encoded at current length. please consider making it smaller.");
 	Py_INCREF(Py_False);
 
 	return Py_False;
@@ -1453,7 +1428,7 @@ static PyObject *ECE_decode(ECElement *self, PyObject *args) {
 	}
 
 
-	ErrorMsg("invalid argument");
+	EXIT_IF(TRUE, "invalid argument");
 }
 
 static PyObject *Serialize(ECElement *self, PyObject *args) {
@@ -1472,9 +1447,7 @@ static PyObject *Serialize(ECElement *self, PyObject *args) {
 			memset(p_buf, 0, MAX_BUF);
 			START_CLOCK(dBench);
 			size_t len = EC_POINT_point2oct(obj->group, obj->P, POINT_CONVERSION_COMPRESSED,  p_buf, MAX_BUF, obj->ctx);
-			if(len == 0) {
-				ErrorMsg("could not serialize point.");
-			}
+			EXIT_IF(len == 0, "could not serialize point.");
 
 			STOP_CLOCK(dBench);
 			debug("Serialized point => ");
@@ -1520,11 +1493,9 @@ static PyObject *Deserialize(ECElement *self, PyObject *args)
 	if(PyArg_ParseTuple(args, "OO", &gobj, &obj)) {
 		Group_Init(gobj);
 		if(PyBytes_Check(obj)) {
-			// char *buf = PyBytes_AsString(obj);
 			unsigned char *serial_buf = (unsigned char *) PyBytes_AsString(obj);
 			GroupType type = atoi((const char *) &(serial_buf[0]));
 			uint8_t *base64_buf = (uint8_t *)(serial_buf + 2);
-//			size_t len = strlen((const char *) base64_buf);
 
 			size_t deserialized_len = 0;
 			uint8_t *buf = NewBase64Decode((const char *) base64_buf, strlen((char *) base64_buf), &deserialized_len);
@@ -1553,10 +1524,10 @@ static PyObject *Deserialize(ECElement *self, PyObject *args)
 			return Py_False;
 		}
 		else {
-			ErrorMsg("invalid object type");
+			EXIT_IF(TRUE, "invalid object type");
 		}
 	}
-	ErrorMsg("invalid argument");
+	EXIT_IF(TRUE, "invalid argument");
 }
 
 

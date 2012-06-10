@@ -584,12 +584,11 @@ PyObject *Element_call(Element *elem, PyObject *args, PyObject *kwds)
 	Element *newObject;
 	
 	if(!PyArg_ParseTuple(args, "O:ref", &object)) {
-		printf("Could not retrieve object.\n");
-		return NULL;
+		EXIT_IF(TRUE, "invalid argument.");
 	}
 	
 	newObject = (Element *) object;
-	element_printf("Elment->e => '%B'\n", newObject->e);
+	// element_printf("Elment->e => '%B'\n", newObject->e);
 	debug("Element->type => '%d'\n", newObject->element_type);
 	
 	return NULL;
@@ -602,8 +601,7 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 	PyObject *long_obj = NULL;
 	
 	if(!PyArg_ParseTuple(args, "Oi|O", &group, &type, &long_obj)) {
-		PyErr_SetString(ElementError, "invalid arguments.\n");
-		return NULL;
+		EXIT_IF(TRUE, "invalid arguments.");
 	}
 	
 	debug("init an element.\n");
@@ -611,8 +609,7 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 		retObject = createNewElement(type, group->pairing);
 	}
 	else {
-		PyErr_SetString(ElementError, "unrecognized group type.");
-		return NULL;
+		EXIT_IF(TRUE, "unrecognized group type.");
 	}
 
 	if(long_obj != NULL && PyLong_Check(long_obj)) {
@@ -635,11 +632,6 @@ PyObject *Element_print(Element* self)
 	memset(tmp, 0, MAX_LEN);
 	size_t max = MAX_LEN;
 	debug("Contents of element object\n");
-
-//	Operations *c = (Operations *) dBench->data_ptr;
-////	printf("Ptr: '%p'\n", dBench->data_ptr);
-//	printf("Mul Cnt in G1: '%d'\n", c->mul_G1);
-//	printf("Exp Cnt in G1: '%d'\n", c->exp_G1);
 
 	if(self->elem_initialized) {
 		element_snprintf(tmp, max, "%B", self->e);
@@ -686,12 +678,10 @@ static PyObject *Element_random(Element* self, PyObject* args)
 		e_type = G2;
 	}
 	else if(arg1 == GT) {
-		PyErr_SetString(ElementError, "cannot generate random element in GT.");
-		return NULL;
+		EXIT_IF(TRUE, "cannot generate random elements in GT.");
 	}
 	else {
-		PyErr_SetString(ElementError, "unrecognized group type.");
-		return NULL;
+		EXIT_IF(TRUE, "unrecognized group type.");
 	}
 
 	if(seed > -1) {
@@ -723,10 +713,7 @@ static PyObject *Element_add(Element *self, Element *other)
 	}
 #endif
 
-	if( add_rule(self->element_type, other->element_type) == FALSE) {
-		PyErr_SetString(ElementError, "invalid add operation");
-		return NULL;
-	}
+	EXIT_IF(add_rule(self->element_type, other->element_type) == FALSE, "invalid add operation.");
 	// start micro benchmark
 	START_CLOCK(dBench);
 	newObject = createNewElement(self->element_type, self->pairing);
@@ -750,11 +737,9 @@ static PyObject *Element_sub(Element *self, Element *other)
 		element_printf("Right: e => '%B'\n", other->e);				
 	}
 #endif
-	if( sub_rule(self->element_type, other->element_type) == FALSE) {
-		PyErr_SetString(ElementError, "invalid sub operation");
-		return NULL;
-	}
 	
+	EXIT_IF(sub_rule(self->element_type, other->element_type) == FALSE, "invalid sub operation.");
+
 	START_CLOCK(dBench);
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_sub(newObject->e, self->e, other->e);		
@@ -809,10 +794,7 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 	}
 	else if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
 		// both are element types
-		if( mul_rule(self->element_type, other->element_type) == FALSE) {
-			PyErr_SetString(ElementError, "invalid mul operation");
-			return NULL;
-		}
+		EXIT_IF(mul_rule(self->element_type, other->element_type) == FALSE, "invalid mul operation.");
 
 		if(self->element_type != ZR && other->element_type == ZR) {
 			START_CLOCK(dBench);
@@ -836,8 +818,7 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 		}
 	}
 	else {
-		PyErr_SetString(ElementError, "invalid types");
-		return NULL;
+		EXIT_IF(TRUE, "invalid types.");
 	}
 
 	if(newObject != NULL) UPDATE_BENCH(MULTIPLICATION, newObject->element_type, dBench);
@@ -898,10 +879,7 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 	}
 	else if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
 		// both are element types
-		if( div_rule(self->element_type, other->element_type) == FALSE) {
-			PyErr_SetString(ElementError, "invalid div operation");
-			return NULL;
-		}
+		EXIT_IF(div_rule(self->element_type, other->element_type) == FALSE, "invalid div operation.");
 
 		START_CLOCK(dBench);
 		newObject = createNewElement(self->element_type, self->pairing);
@@ -909,6 +887,7 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 		STOP_CLOCK(dBench);
 	}
 	else {
+		EXIT_IF(TRUE, "invalid types.");
 		PyErr_SetString(ElementError, "invalid types");
 		return NULL;
 	}
@@ -916,27 +895,6 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 	if(newObject != NULL) UPDATE_BENCH(DIVISION, newObject->element_type, dBench);
 	return (PyObject *) newObject;
 }
-/*
-static PyObject *Element_div(Element *self, Element *other)
-{
-	Element *newObject;
-	
-	debug("Starting '%s'\n", __func__);
-#ifdef DEBUG	
-	if(self->e) {
-		element_printf("Left: e => '%B'\n", self->e);		
-	}
-	
-	if(other->e) {
-		element_printf("Right: e => '%B'\n", other->e);				
-	}
-#endif
-	
-	newObject = createNewElement(self->element_type, self->pairing);
-	element_div(newObject->e, self->e, other->e);
-	return (PyObject *) newObject;
-}
-*/
  
 static PyObject *Element_invert(Element *self)
 {
@@ -1030,10 +988,6 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		debug("Starting '%s'\n", __func__);
 		debug_e("LHS: e => '%B'\n", lhs_o1->e);
 		debug_e("RHS: e => '%B'\n", rhs_o2->e);
-//		if( exp_rule(lhs_o1->element_type, rhs_o2->element_type) == FALSE) {
-//			PyErr_SetString(ElementError, "invalid exp operation");
-//			return NULL;
-//		}
 
 		EXIT_IF(exp_rule(lhs_o1->element_type, rhs_o2->element_type) == FALSE, "invalid exp operation");
 		if(rhs_o2->element_type == ZR) {
@@ -1101,8 +1055,6 @@ static PyObject *Element_set(Element *self, PyObject *args)
             STOP_CLOCK(dBench);
     }
     else { //
-//            PyErr_SetString(ElementError, "type not supported: signed int or Element object");
-//            errcode = FALSE;
     	EXITCODE_IF(TRUE, "type not supported: signed int or Element object", FALSE);
     }
 
@@ -1120,11 +1072,7 @@ PyObject *multi_pairing(Element *groupObj, PyObject *listG1, PyObject *listG2) {
 
 	int length = PySequence_Length(listG1);
 
-	if(length != PySequence_Length(listG2)) {
-		PyErr_SetString(ElementError, "unequal number of pairing elements.");
-		return NULL;
-	}
-
+	EXIT_IF(length != PySequence_Length(listG2), "unequal number of pairing elements.");
 	if(length > 0) {
 
 		element_t g1[length];
@@ -1170,8 +1118,7 @@ PyObject *multi_pairing(Element *groupObj, PyObject *listG1, PyObject *listG2) {
 			element_prod_pairing(newObject->e, g1, g2, l); // pairing product calculation
 		}
 		else {
-			PyErr_SetString(ElementError, "invalid pairing element types in list.");
-			return NULL;
+			EXIT_IF(TRUE, "invalid pairing element types in list.");
 		}
 
 		/* clean up */
@@ -1180,8 +1127,7 @@ PyObject *multi_pairing(Element *groupObj, PyObject *listG1, PyObject *listG2) {
 		return (PyObject *) newObject;
 	}
 
-	PyErr_SetString(ElementError, "list is empty.");
-	return NULL;
+	EXIT_IF(TRUE, "list is empty.");
 }
 
 /* this is a type method that is visible on the global or class level. Therefore,
@@ -1195,8 +1141,7 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 	
 	debug("Applying pairing...\n");	
 	if(!PyArg_ParseTuple(args, "OO|O", &lhs2, &rhs2, &group)) {
-		PyErr_SetString(ElementError, "missing element objects");
-		return NULL;
+		EXIT_IF(TRUE, "invalid arguments: G1, G2, groupObject.");
 	}
 	
 	if(PySequence_Check(lhs2) && PySequence_Check(rhs2)) {
@@ -1233,8 +1178,7 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 		}
 	}
 	
-	PyErr_SetString(ElementError, "pairings only apply to elements of G1 x G2 --> GT");
-	return NULL;
+	EXIT_IF(TRUE, "pairings only apply to elements of G1 x G2 --> GT");
 }
 
 PyObject *sha1_hash(Element *self, PyObject *args) {
@@ -1436,9 +1380,8 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 	return (PyObject *) newObject;
 
 cleanup:
-	PyErr_SetString(ElementError, tmp);
 	if(newObject != NULL) PyObject_Del(newObject);
-	return NULL;
+	EXIT_IF(TRUE, tmp);
 }
 
 static PyObject *Element_equals(PyObject *lhs, PyObject *rhs, int opid) {
@@ -1532,8 +1475,7 @@ static PyObject *Element_long(PyObject *o1) {
 			return obj;
 		}
 	}
-	PyErr_SetString(ElementError, "cannot cast pairing object to an integer.");
-	return NULL;
+	EXIT_IF(TRUE, "cannot cast pairing object to an integer.");
 }
 
 static long Element_index(Element *o1) {
@@ -1575,15 +1517,10 @@ static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 	START_CLOCK(dBench);
 
 	if(self->element_type == ZR || self->element_type == GT) {
-//		PyErr_SetString(ElementError, "cannot compress elements of Zr any further. Use 'serialize'.");
-//		return NULL;
 		elem_len = element_length_in_bytes(self->e);
 
 		data_buf = (uint8_t *) malloc(elem_len + 1);
-		if(data_buf == NULL) {
-			PyErr_SetString(ElementError, "out of memory.");
-			return NULL;
-		}
+		EXIT_IF(data_buf == NULL, "out of memory.");
 		// write to char buffer
 		bytes_written = element_to_bytes(data_buf, self->e);
 		debug("result => ");
@@ -1593,16 +1530,12 @@ static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 	// object initialized now retrieve element and serialize to a char buffer.
 		elem_len = element_length_in_bytes_compressed(self->e);
 		data_buf = (uint8_t *) malloc(elem_len + 1);
-		if(data_buf == NULL) {
-			PyErr_SetString(ElementError, "out of memory.");
-			return NULL;
-		}
+		EXIT_IF(data_buf == NULL, "out of memory.");
 		// write to char buffer
 		bytes_written = element_to_bytes_compressed(data_buf, self->e);
 	}
 	else {
-		PyErr_SetString(ElementError, "invalid type.\n");
-		return NULL;
+		EXIT_IF(TRUE, "invalid type.\n");
 	}
 
 	// convert to base64 and return as a string?
@@ -1651,12 +1584,10 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 				return (PyObject *) origObject;
 			}
 		}
-		PyErr_SetString(ElementError, "string object malformed.");
-		return NULL;
+		EXIT_IF(TRUE, "string object malformed.");
 	}
 
-	PyErr_SetString(ElementError, "nothing to deserialize in element.");
-	return NULL;
+	EXIT_IF(TRUE, "nothing to deserialize in element.");
 }
 
 void print_mpz(mpz_t x, int base) {
@@ -1735,8 +1666,7 @@ static PyObject *Group_Check(Element *self, PyObject *args) {
 static PyObject *Get_Order(Element *self, PyObject *args) {
 	PyObject *obj = NULL;
 	if(!PyArg_ParseTuple(args, "O", &obj)) {
-		PyErr_SetString(ElementError, "invalid group object.");
-		return NULL;
+		EXIT_IF(TRUE, "invalid group object.");
 	}
 
 	if(PyElement_Check(obj)) {
