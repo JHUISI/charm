@@ -119,10 +119,15 @@ install:
 	$(PYTHON) setup.py install
 	
 .PHONY: test
-test:
-	$(PYTHON) tests/all_tests.py
+test: test-schemes test-charm
+.PHONY: test-schemes
+test-schemes:
+	$(PYTHON) -m unittest discover -p "*_test.py"  schemes/test/
 	find . -name '*.pyc' -delete
-
+.PHONY: test-charm
+test-charm:
+	$(PYTHON) -m unittest discover -p "*_test.py"  charm-framework/test/toolbox/
+	find . -name '*.pyc' -delete
 .PHONY: xmltest 
 xmltest:
 	$(PYTHON) tests/all_tests_with_xml_test_result.py
