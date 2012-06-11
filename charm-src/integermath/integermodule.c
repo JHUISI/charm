@@ -1298,7 +1298,6 @@ static PyObject *decode_message(PyObject *self, PyObject *args) {
 			mpz_clear(p);
 			mpz_clear(q);
 
-//			return PyUnicode_FromFormat("%s", m);
 			return PyBytes_FromFormat("%s", m);
 		}
 	}
