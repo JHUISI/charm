@@ -110,7 +110,7 @@ if opt.get('ECC_MOD') == 'yes':
 				libraries=['gmp', 'crypto'])
    _ext_modules.append(ecc_module)
 
-benchmark_module = Extension('benchmark', sources = [utils_path + 'benchmarkmodule.c'])
+benchmark_module = Extension('charm.core.benchmark', sources = [utils_path + 'benchmarkmodule.c'])
 
 cryptobase = Extension(crypto_prefix+'.cryptobase', sources = [crypto_path + 'cryptobasemodule.c'])
 

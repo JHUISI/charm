@@ -5,7 +5,7 @@ import random, string
 #from ec_cs98_enc import *
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from charm.toolbox.eccurve import prime192v1
-from charm.schemes.pkenc.pkenc_elgamal85 import *
+from schemes.pkenc.pkenc_elgamal85 import *
 from charm.toolbox.PKEnc import PKEnc
 from charm.core.crypto.cryptobase import *
 from math import ceil
