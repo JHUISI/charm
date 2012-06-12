@@ -25,4 +25,4 @@ sys.path.append(path_to_charm + "/charm/")
 if path_to_charm2: sys.path.append(path_to_charm2 + "/charm/")
 # now python can easily find our modules
 # dependency for pairing, integer and ecc mods
-import charm.benchmark
+import charm.core.benchmark
