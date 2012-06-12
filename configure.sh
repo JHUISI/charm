@@ -129,54 +129,6 @@ sysconfdir="\${prefix}/etc"
 confsuffix="/charm"
 profiler="no"
 wget="$(which wget)"
-
-# Python version handling logic. We prefer to use the version poited to by 
-# python if it is python 3. Baring that, we try python3  
-# Ths logic also handles the version check
-# which normally would be far further along in the file
-python_path="$(which python)"
-python3_found="no"
-
-#if python is not installed, try python3. 
-if !  [ -n "$python_path"  ]; then
-    echo "Python not installed, trying python3"
-    python_path="$(which python3)"
-    if !  [ -n "$python_path"  ]; then
-        echo "Python3 not installed, please install python 3.x on your system as either python or python3"
-        exit -1
-    fi
-fi
-
-# check if the python version is correct
-cat > $TMPC << EOF
-import sys
-
-if float(sys.version[:3]) >= 3.0:
-    exit(0)
-else:
-   exit(-1)
-EOF
-$python_path $TMPC
-result=$?
-if test ${result} -ne 0 ; then
-    echo "python installed, but not version 3.x. Trying python3 instead"
-	python_path="$(which python3)"
-    #Confirm that python3 actually is python version 3.x
-    $python_path $TMPC
-    result=$?
-    if test ${result} = 0 ; then
-        python3_found="yes"
-        echo "Python 3.x found: using \`which python3\` as path to python3: $python_path"
-    else
-        echo "No python 3 version found. This version of Charm requires python version 3.x. Specify python3 location with --python=/path/to/python3"
-        echo "Otherwise, use the python 2.7+ version"
-        exit -1
-     fi
-else
-    python3_found="yes"
-    echo "using \`which python\` as path to python3: $python_path"
-fi;
-
  
 # set -x
 
@@ -496,6 +448,50 @@ echo ""
 echo "NOTE: The object files are built at the place where configure is launched"
 exit 1
 fi
+
+# Python version handling logic. We prefer the argument path given by --python 
+# the to use the version poited to by 
+# python if it is python 3. Baring that, we try python3  
+# Ths logic also handles the version check.
+python3_found="no"
+python_path = ${python_path-`which python`}
+#if python is not installed, try python3. 
+if !  [ -n "$python_path"  ]; then
+    python_path="$(which python3)"
+    if !  [ -n "$python_path"  ]; then
+        echo "Python version 3 not installed, please install python 3.x on your system as either python or python3"
+        echo "or specify the path to a python3 executable with --python=/path/to/python"
+        exit -1
+    fi
+fi
+
+# check if the python version is correct
+cat > $TMPC << EOF
+import sys
+
+if float(sys.version[:3]) >= 3.0:
+    exit(0)
+else:
+   exit(-1)
+EOF
+$python_path $TMPC
+result=$?
+if test ${result} -ne 0 ; then
+	python_path="$(which python3)"
+    #Confirm that python3 actually is python version 3.x
+    $python_path $TMPC
+    result=$?
+    if test ${result} = 0 ; then
+        python3_found="yes"
+        echo "Python 3.x found: using \`which python3\` as path to python3: $python_path"
+    else
+        echo "No python 3 version found. This version of Charm requires python version 3.x. Specify python3 location with --python=/path/to/python3"
+        echo "Otherwise, use the python 2.7+ version"
+        exit -1
+     fi
+else
+    python3_found="yes"
+fi;
 
 # check that the C compiler works.
 cat > $TMPC <<EOF
