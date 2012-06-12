@@ -90,7 +90,7 @@ class ElGamal(PKEnc):
     
     def decrypt(self, pk, sk, c):
         s = c['c1'] ** sk['x']
-        m = c['c2'] * ~s
+        m = c['c2'] * (s ** -1)
         M = group.decode(m)
         if debug: print('m => %s' % m)
         if debug: print('dec M => %s' % M)
