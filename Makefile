@@ -117,6 +117,10 @@ source:
 .PHONY: install
 install:
 	$(PYTHON) setup.py install
+
+.PHONY: uninstall
+uninstall:
+	$(PYTHON) setup.py uninstall
 	
 .PHONY: test
 test:
