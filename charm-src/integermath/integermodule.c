@@ -1645,6 +1645,23 @@ static PyObject *toBytes(PyObject *self, PyObject *args) {
 	EXIT_IF(TRUE, "invalid type.");
 }
 
+// class method for conversion for modular integer to an integer
+// integer.toInt(x mod Y) => x
+static PyObject *toInt(PyObject *self, PyObject *args) {
+	Integer *intObj = NULL;
+
+	if (PyInteger_Check(args)) {
+		intObj = (Integer *) args;
+		Integer *rop = createNewIntegerNoMod();
+		mpz_set(rop->e, intObj->e);
+
+		return (PyObject *) rop;
+	}
+
+	EXIT_IF(TRUE, "invalid type.");
+}
+
+
 static PyObject *Integer_xor(PyObject *self, PyObject *other) {
 	Integer *rop = NULL, *op1 = NULL, *op2 = NULL;
 
@@ -1879,7 +1896,7 @@ static PyMethodDef module_methods[] = {
 	{ "GetGeneralBenchmarks", (PyCFunction) _get_all_results, METH_VARARGS, "Retrieve general benchmark info as a dictionary."},
 	{ "ClearBenchmark", (PyCFunction)_clear_benchmark, METH_VARARGS, "Clears content of benchmark object"},
 	{ "int2Bytes", (PyCFunction) toBytes, METH_O, "convert an integer object to a bytes object." },
-//	{ "toInt", (PyCFunction) toInt, METH_O, "convert modular integer into an integer object."},
+	{ "toInt", (PyCFunction) toInt, METH_O, "convert modular integer into an integer object."},
 	{ NULL, NULL }
 };
 

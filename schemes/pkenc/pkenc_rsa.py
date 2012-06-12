@@ -10,7 +10,7 @@
 :Date:            07/2011
 '''
 
-from charm.integer import integer,isPrime,gcd,random,randomPrime
+from charm.integer import integer,isPrime,gcd,random,randomPrime,toInt
 from toolbox.PKEnc import PKEnc
 from toolbox.PKSig import PKSig
 from toolbox.paddingschemes import OAEPEncryptionPadding,PSSPadding
@@ -48,7 +48,7 @@ class RSA():
                 continue
             d = e ** -1
             break
-        pk = { 'N':N, 'e':e }
+        pk = { 'N':N, 'e':toInt(e) } # strip off \phi
         sk = { 'phi_N':phi_N, 'd':d , 'N':N}
 
         return (pk, sk)
