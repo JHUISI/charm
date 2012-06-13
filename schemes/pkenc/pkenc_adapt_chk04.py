@@ -21,6 +21,20 @@ from charm.toolbox.pairinggroup import * #PairingGroup,GT
 
 debug = False
 class CHK04(PKEnc):
+    """
+    >>> group = PairingGroup('SS512')
+    >>> ibe = IBE_BB04(group)
+    >>> hash_ibe = HashIDAdapter(ibe, group)
+    >>> ots = IBSig(group)
+    >>> pkenc = CHK04(hash_ibe, ots, group)
+    >>> secparam=0
+    >>> (public_key, secret_key) = pkenc.keygen(secparam)
+    >>> msg = group.random(GT)
+    >>> cipher_text = pkenc.encrypt(public_key, msg)
+    >>> orig_msg = pkenc.decrypt(public_key, secret_key, cipher_text)
+    >>> orig_msg == msg
+    True
+    """
     def __init__(self, ibe_scheme, ots_scheme, groupObj):
         global ibe, ots, group
         ibe = ibe_scheme
@@ -61,29 +75,3 @@ class CHK04(PKEnc):
         # Return the decryption of the ciphertext element "C" under key dk
         return ibe.decrypt(pk, dk, c['C'])
 
-def main():
-    groupObj = PairingGroup('SS512')
-    # instantiate an Identity-Based Encryption scheme
-    ibe = IBE_BB04(groupObj)
-    hash_ibe = HashIDAdapter(ibe, groupObj)
-   
-    # instantiate an one-time signature scheme such as BLS04
-    ots = IBSig(groupObj)
-    
-    pkenc = CHK04(hash_ibe, ots, groupObj)
-    
-    # not sure how to enforce secparam yet
-    (pk, sk) = pkenc.keygen(0)
-    
-    msg = groupObj.random(GT)
-    ciphertext = pkenc.encrypt(pk, msg)
-    
-    rec_msg = pkenc.decrypt(pk, sk, ciphertext)
-    assert rec_msg == msg, "FAILED Decryption!!!"
-    if debug: print("Successful Decryption!")       
-        
-if __name__ == "__main__":
-    debug = True
-    main()
-     
-    

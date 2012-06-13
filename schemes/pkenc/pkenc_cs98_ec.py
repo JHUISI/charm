@@ -28,6 +28,15 @@ str_t = str
 
 debug = False
 class EC_CS98(PKEnc):	
+    """
+    >>> pkenc = EC_CS98(prime192v1)
+    >>> (public_key, secret_key) = pkenc.keygen()
+    >>> msg = b"hello world!!!"
+    >>> cipher_text = pkenc.encrypt(public_key, msg)
+    >>> orig_msg = pkenc.decrypt(public_key, secret_key, cipher_text)
+    >>> orig_msg == msg
+    True
+    """
     def __init__(self, builtin_cv):
         PKEnc.__init__(self)
         global group
@@ -74,20 +83,3 @@ class EC_CS98(PKEnc):
         if debug: print("v' => %s" % v_prime)
         return group.decode(c['e'] / (c['u1'] ** sk['z']))
 
-def main():
-    pkenc = EC_CS98(prime192v1)
-    
-    (pk, sk) = pkenc.keygen()
-    M = b"hello world!!!"
-
-    ciphertext = pkenc.encrypt(pk, M)
-    
-    message = pkenc.decrypt(pk, sk, ciphertext)
-    
-    assert M == message, "Failed Decryption!!!"
-    if debug: print("SUCCESSFUL DECRYPTION!!! => %s" % message)
-   
-if __name__ == "__main__":
-    debug=True
-    main()
-   

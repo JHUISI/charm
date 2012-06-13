@@ -19,6 +19,16 @@ from charm.toolbox.eccurve import prime192v2
 
 debug = False
 class ElGamalCipher(dict):
+    """
+    >>> el = ElGamal(elliptic_curve, prime192v2)    
+    >>> (public_key, secret_key) = el.keygen()
+    >>> msg = b"hello world!"
+    >>> size = len(msg)
+    >>> cipher_text = el.encrypt(public_key, msg)
+    >>> orig_msg = el.decrypt(public_key, secret_key, cipher_text)    
+    >>> orig_msg == msg
+    True
+    """
     def __init__(self, ct):
         if type(ct) != dict: assert False, "Not a dictionary!"
         if not set(ct).issubset(['c1', 'c2']): assert False, "'c1','c2' keys not present."
@@ -96,17 +106,3 @@ class ElGamal(PKEnc):
         if debug: print('dec M => %s' % M)
         return M
 
-def main():
-    el = ElGamal(elliptic_curve, prime192v2)    
-    (pk, sk) = el.keygen()
-    msg = b"hello world!"
-    size = len(msg)
-    cipher1 = el.encrypt(pk, msg)
-    
-    m = el.decrypt(pk, sk, cipher1)    
-    assert m == msg, "Failed Decryption!!!"
-    if debug: print("SUCCESSFULLY DECRYPTED!!!")
-        
-if __name__ == "__main__":
-    debug = True
-    main()

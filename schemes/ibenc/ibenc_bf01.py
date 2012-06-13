@@ -20,6 +20,17 @@ from charm.toolbox.IBEnc import IBEnc
 
 debug = False
 class IBE_BonehFranklin(IBEnc):
+    """
+    >>> group = PairingGroup('MNT224', secparam=1024)    
+    >>> ibe = IBE_BonehFranklin(group)
+    >>> (public_key, secret_key) = ibe.setup()
+    >>> ID = 'user@email.com'
+    >>> key = ibe.extract(secret_key, ID)
+    >>> msg = "hello world!!!!!"
+    >>> cipher_text = ibe.encrypt(public_key, ID, msg)
+    >>> ibe.decrypt(public_key, key, cipher_text)
+    'hello world!!!!!'
+    """
     def __init__(self, groupObj):
         IBEnc.__init__(self)
         global group,h
@@ -100,21 +111,3 @@ class IBE_BonehFranklin(IBEnc):
         return None
      
 
-def main():
-    groupObj = PairingGroup('MNT224', secparam=1024)    
-    ibe = IBE_BonehFranklin(groupObj)
-    
-    (pk, sk) = ibe.setup()
-    
-    id = 'user@email.com'
-    key = ibe.extract(sk, id)
-    
-    m = "hello world!!!!!"
-    ciphertext = ibe.encrypt(pk, id, m)
-
-    msg = ibe.decrypt(pk, key, ciphertext)
-    assert msg == m,  "failed decrypt: \n%s\n%s" % (msg, m)
-        
-if __name__ == "__main__":
-    debug = True
-    main()

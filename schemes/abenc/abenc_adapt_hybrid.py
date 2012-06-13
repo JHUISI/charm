@@ -11,15 +11,15 @@ from math import ceil
 debug = False
 class HybridABEnc(ABEnc):
     """
-    >>> groupObj = PairingGroup('../param/a.param')
-    >>> cpabe = CPabe_BSW07(groupObj)
-    >>> hyb_abe = HybridABEnc(cpabe, groupObj)
+    >>> group = PairingGroup("SS512")
+    >>> cpabe = CPabe_BSW07(group)
+    >>> hyb_abe = HybridABEnc(cpabe, group)
     >>> access_policy = '((four or three) and (two or one))'
-    >>> message = "hello world this is an important message."
-    >>> (pk, mk) = hyb_abe.setup()
-    >>> sk = hyb_abe.keygen(pk, mk, ['ONE', 'TWO', 'THREE'])
-    >>> ct = hyb_abe.encrypt(pk, message, access_policy)
-    >>> hyb_abe.decrypt(pk, sk, ct)
+    >>> msg = "hello world this is an important message."
+    >>> (public_key, master_key) = hyb_abe.setup()
+    >>> secret_key = hyb_abe.keygen(public_key, master_key, ['ONE', 'TWO', 'THREE'])
+    >>> cipher_text = hyb_abe.encrypt(public_key, msg, access_policy)
+    >>> hyb_abe.decrypt(public_key, secret_key, cipher_text)
     'hello world this is an important message.'
     """
     def __init__(self, scheme, groupObj):

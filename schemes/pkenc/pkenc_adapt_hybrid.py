@@ -2,7 +2,7 @@
 
 import random, string
 # Works for ElGamal and CS98 schemes
-#from ec_cs98_enc import *
+from schemes.pkenc.pkenc_cs98_ec import *
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from charm.toolbox.eccurve import prime192v1
 from schemes.pkenc.pkenc_elgamal85 import *
@@ -14,6 +14,16 @@ import base64
 debug = False
 # Adapter class for Hybrid Encryption Schemes
 class HybridEnc(PKEnc):
+    """
+    >>> pkenc = EC_CS98(prime192v1)
+    >>> hyenc = HybridEnc(pkenc)
+    >>> (public_key, secret_key) = hyenc.keygen()
+    >>> msg = 'this is a new message'
+    >>> cipher_text = hyenc.encrypt(public_key, msg)
+    >>> orig_msg = hyenc.decrypt(public_key, secret_key, cipher_text)
+    >>> orig_msg == msg
+    True
+    """
     def __init__(self, pkenc, key_len=16, mode=AES): 
         PKEnc.__init__(self)
         # check that pkenc satisfies properties of a pkenc scheme
@@ -51,19 +61,3 @@ class HybridEnc(PKEnc):
         if debug: print("Rec msg =>", msg)
         return msg
     
-def main():
-    #    pkenc = EC_CS98(prime192v1)
-    pkenc = ElGamal(ecc, prime192v1)
-    hyenc = HybridEnc(pkenc)
-   
-    (pk, sk) = hyenc.keygen()
-   
-    m = 'this is a new message'
-    cipher = hyenc.encrypt(pk, m)
-    orig_m = hyenc.decrypt(pk, sk, cipher)
-    assert m == orig_m, "Failed Decryption"
-    if debug: print("Successful Decryption!!")
-
-if __name__ == "__main__":
-    debug = True
-    main()

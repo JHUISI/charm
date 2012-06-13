@@ -20,6 +20,22 @@ from charm.toolbox.ABEnc import *
 
 debug = False
 class KPabe(ABEnc):
+    """    
+    >>> from schemes.example_values import pairing_SS512_val as msg
+    >>> groupObj = PairingGroup('MNT224')
+    >>> kpabe = KPabe(groupObj)
+    >>> (public_key, master_key) = kpabe.setup()
+    >>> policy = '(ONE or THREE) and (THREE or TWO)'
+    >>> attributes = [ 'ONE', 'TWO', 'THREE', 'FOUR' ]
+    >>> mykey = kpabe.keygen(public_key, master_key, policy)
+    
+    For conveniece, we are using a pre-defined message
+    >>> ciphertext = kpabe.encrypt(private_key, msg, attributes)
+    
+    >>> kpabe.decrypt(ciphertext, mykey)
+    [8498626471746535541889196006969623245883442038940767658411896849230802260262151353691177896167637279292812138807029583456775233580306113979341887791855557, 6966939460945789223279096602928312619651295009575045207502056308294974480025386597816838423778648241850303711370830167285562786901756561121522858944449876] 
+    """
+
     def __init__(self, groupObj, verbose=False):
         ABEnc.__init__(self)
         global group, util
@@ -111,28 +127,5 @@ class KPabe(ABEnc):
        
         return E['E1'] / prodT 
 
-def main():
-    groupObj = PairingGroup('MNT224')
-    kpabe = KPabe(groupObj)
     
-    (pk, mk) = kpabe.setup()
-    
-    policy = '(ONE or THREE) and (THREE or TWO)'
-    attributes = [ 'ONE', 'TWO', 'THREE', 'FOUR' ]
-    msg = groupObj.random(GT) 
- 
-    mykey = kpabe.keygen(pk, mk, policy)
-    
-    if debug: print("Encrypt under these attributes: ", attributes)
-    ciphertext = kpabe.encrypt(pk, msg, attributes)
-    if debug: print(ciphertext)
-    
-    rec_msg = kpabe.decrypt(ciphertext, mykey)
-   
-    assert msg == rec_msg 
-    if debug: print("Successful Decryption!")    
-    
-if __name__ == "__main__":
-    debug = True
-    main()
     

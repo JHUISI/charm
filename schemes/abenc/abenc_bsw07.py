@@ -25,6 +25,21 @@ ct_t = { 'C_tilde':GT, 'C':G1, 'Cy':G1, 'Cyp':G2 }
 
 debug = False
 class CPabe_BSW07(ABEnc):
+    """
+    >>> from schemes.example_values import pairing_SS512_val as msg
+    >>> group = PairingGroup('SS512')
+    >>> cpabe = CPabe_BSW07(group)
+    >>> attributes = ['ONE', 'TWO', 'THREE']
+    >>> access_policy = '((four or three) and (three or one))'
+    >>> (public_key, master_key) = cpabe.setup()
+    >>> secret_key = cpabe.keygen(public_key, master_key, attributes)
+
+    We are using a predefined plaintext for convenience
+    >>> cipher_text = cpabe.encrypt(public_key, msg, access_policy)
+    >>> cpabe.decrypt(public_key, secret_key, cipher_text)
+    [8498626471746535541889196006969623245883442038940767658411896849230802260262151353691177896167637279292812138807029583456775233580306113979341887791855557, 6966939460945789223279096602928312619651295009575045207502056308294974480025386597816838423778648241850303711370830167285562786901756561121522858944449876]
+    """ 
+         
     def __init__(self, groupObj):
         ABEnc.__init__(self)
         global util, group
@@ -89,33 +104,4 @@ class CPabe_BSW07(ABEnc):
         
         return ct['C_tilde'] / (pair(ct['C'], sk['D']) / A)
 
-def main():
-    groupObj = PairingGroup('SS512')
-    
-    cpabe = CPabe_BSW07(groupObj)
-    attrs = ['ONE', 'TWO', 'THREE']
-    access_policy = '((four or three) and (three or one))'
-    if debug: 
-        print("Attributes =>", attrs); print("Policy =>", access_policy)
-    
-    (pk, mk) = cpabe.setup()
-    
-    sk = cpabe.keygen(pk, mk, attrs)
    
-    rand_msg = groupObj.random(GT) 
-    if debug: print("msg =>", rand_msg)
-    ct = cpabe.encrypt(pk, rand_msg, access_policy)
-    if debug: print("\n\nCiphertext...\n")
-    groupObj.debug(ct) 
-    
-    rec_msg = cpabe.decrypt(pk, sk, ct)
-    if debug: print("\n\nDecrypt...\n")
-    if debug: print("Rec msg =>", rec_msg)
-
-    assert rand_msg == rec_msg, "FAILED Decryption: message is incorrect"
-    if debug: print("Successful Decryption!!!")
-    
-if __name__ == "__main__":
-    debug = True
-    main()
-    

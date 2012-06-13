@@ -17,6 +17,21 @@ from charm.toolbox.IBEnc import *
 
 debug = False
 class IBE_Revoke(IBEnc):
+    """
+    >>> group = PairingGroup('SS512')
+    >>> num_users = 5 # total # of users
+    >>> ibe = IBE_Revoke(group)
+    >>> ID = "user2@email.com"
+    >>> S = ["user1@email.com", "user3@email.com", "user4@email.com"]
+    >>> (master_public_key, master_secret_key) = ibe.setup(num_users)
+    >>> secret_key = ibe.keygen(master_public_key, master_secret_key, ID)
+    >>> msg = group.random(GT)
+    >>> cipher_text = ibe.encrypt(master_public_key, msg, S)
+    >>> orig_msg = ibe.decrypt(S, cipher_text, secret_key)
+    >>> orig_msg == msg
+    True
+    """
+
     def __init__(self, groupObj):
         IBEnc.__init__(self)
         global group, util
@@ -95,29 +110,3 @@ class IBE_Revoke(IBEnc):
             A4 *= (pair(C['i1'][i], K) / pair(C['i2'][i], D[7])) ** (1 / (_ID - S_id[i]))
         return C[0] / (A3 / A4) 
 
-def main():
-    # scheme designed for symmetric billinear groups
-    grp = PairingGroup('SS512')
-    n = 5 # total # of users
-    
-    ibe = IBE_Revoke(grp)
-    
-    ID = "user2@email.com"
-    S = ["user1@email.com", "user3@email.com", "user4@email.com"]
-    (mpk, msk) = ibe.setup(n)
-    
-    sk = ibe.keygen(mpk, msk, ID)
-    if debug: print("Keygen...\nsk :=", sk)
-    
-    M = grp.random(GT)
-    
-    ct = ibe.encrypt(mpk, M, S)
-    if debug: print("Ciphertext...\nct :=", ct)
-    
-    m = ibe.decrypt(S, ct, sk)
-    assert M == m, "Decryption FAILED!"
-    if debug: print("Successful Decryption!!!")
-
-if __name__ == "__main__":
-    debug = True
-    main()

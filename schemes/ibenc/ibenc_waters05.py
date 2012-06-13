@@ -19,6 +19,20 @@ import hashlib, math
 
 debug = False
 class IBE_N04(IBEnc):
+    """
+    >>> group = PairingGroup('SS512')
+    >>> ibe = IBE_N04(group)
+    >>> (public_key, master_key) = ibe.setup()
+    >>> ID = "bob@mail.com"
+    >>> kID = ibe.stringtoidentity(public_key, ID)
+    >>> secret_key = ibe.extract(master_key, kID)
+    >>> msg = group.random(GT)
+    >>> cipher_text = ibe.encrypt(public_key, kID, msg)
+    >>> orig_msg = ibe.decrypt(public_key, secret_key, cipher_text)
+    >>> orig_msg == msg
+    True
+    """
+    
     """Implementation of David Naccahe Identity Based Encryption"""
     def __init__(self, groupObj):
         IBEnc.__init__(self)
@@ -122,26 +136,3 @@ class IBE_N04(IBEnc):
         return ct['c1'] *  num / dem
 
     
-def main():
-    # initialize the element object so that object references have global scope
-    groupObj = PairingGroup('SS512')
-    ibe = IBE_N04(groupObj)
-    (pk, mk) = ibe.setup()
-
-    # represents public identity
-    ID = "bob@mail.com"
-    kID = ibe.stringtoidentity(pk, ID)
-    #if debug: print("Bob's key  =>", kID)
-    key = ibe.extract(mk, kID)
-
-    M = groupObj.random(GT)
-    cipher = ibe.encrypt(pk, kID, M)
-    m = ibe.decrypt(pk, key, cipher)
-    #print('m    =>', m)
-
-    assert m == M, "FAILED Decryption!"
-    #if debug: print("Successful Decryption!!! m => '%s'" % m)
-
-if __name__ == '__main__':
-    debug = True
-    main()

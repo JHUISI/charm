@@ -17,6 +17,15 @@ from charm.toolbox.IBEnc import *
 
 debug = False
 class IBEWaters09(IBEnc):
+    """
+    >>> group = PairingGroup('MNT224')
+    >>> ibe = IBEWaters09(group)
+    >>> (master_public_key, master_secret_key) = ibe.keygen()
+    >>> msg = "plese sign this message!!!!"
+    >>> signature = ibe.sign(master_public_key, master_secret_key, msg)
+    >>> ibe.verify(master_public_key, signature, msg)
+    True
+    """
     def __init__(self, groupObj):
         IBEnc.__init__(self)
         global group, util
@@ -85,21 +94,3 @@ class IBEWaters09(IBEnc):
             return True
         return False
 
-def main():
-    # scheme designed for symmetric billinear groups
-    grp = PairingGroup('MNT224')
-    
-    ibe = IBEWaters09(grp)
-    
-    (mpk, msk) = ibe.keygen()
-    
-    m = "plese sign this message!!!!"
-    sigma = ibe.sign(mpk, msk, m)
-    if debug: print("Signature :=", sigma)
-        
-    assert ibe.verify(mpk, sigma, m), "Invalid Verification!!!!"
-    if debug: print("Successful Individual Verification!")
-        
-if __name__ == "__main__":
-    debug = True
-    main()

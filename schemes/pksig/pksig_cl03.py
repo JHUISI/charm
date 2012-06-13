@@ -12,6 +12,16 @@ def randomQR(n):
 
 debug=False
 class Sig_CL03(PKSig):
+    """
+    >>> pksig = Sig_CL03() 
+    >>> p = integer(21281327767482252741932894893985715222965623124768085901716557791820905647984944443933101657552322341359898014680608292582311911954091137905079983298534519)
+    >>> q = integer(25806791860198780216123533220157510131833627659100364815258741328806284055493647951841418122944864389129382151632630375439181728665686745203837140362092027)
+    >>> (public_key, secret_key) = pksig.keygen(1024, p, q)
+    >>> msg = integer(SHA1(b'This is the message I want to hash.'))
+    >>> signature = pksig.sign(public_key, secret_key, msg)
+    >>> pksig.verify(public_key, msg, signature)
+    True
+    """
     def __init__(self, lmin=160, lin=160, secparam=512):
         global ln, lm, le, l
         ln = 2 * secparam
@@ -89,27 +99,4 @@ class Sig_CL03(PKSig):
         return False
 
 
-def main():
-    pksig = Sig_CL03() 
 
-    p = integer(21281327767482252741932894893985715222965623124768085901716557791820905647984944443933101657552322341359898014680608292582311911954091137905079983298534519)
-    q = integer(25806791860198780216123533220157510131833627659100364815258741328806284055493647951841418122944864389129382151632630375439181728665686745203837140362092027)
-
-    (pk, sk) = pksig.keygen(1024, p, q)
-    if debug:
-        print("Public parameters...")
-        print("pk =>", pk)
-        print("sk =>", sk)
-    
-    m = integer(SHA1(b'This is the message I want to hash.'))
-    sig = pksig.sign(pk, sk, m)
-    if debug:
-        print("Signature...")
-        print("sig =>", sig)
-    
-    assert pksig.verify(pk, m, sig), "FAILED VERIFICATION!!!"
-    if debug: print("Successful Verification!!!")
-
-if __name__ == "__main__":
-    debug = True
-    main()
