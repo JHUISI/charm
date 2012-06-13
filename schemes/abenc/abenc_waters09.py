@@ -20,16 +20,17 @@ from charm.toolbox.ABEnc import *
 debug = False
 class CPabe09(ABEnc):
     """
-    >>> from schemes.example_values import pairing_SS512_val as msg
     >>> group = PairingGroup('SS512')
-    >>> cpabe = CPabe09(groupObj)
+    >>> cpabe = CPabe09(group)
+	>>> msg = group.random(GT)
     >>> (master_secret_key, public_key) = cpabe.setup()
     >>> policy = '((ONE or THREE) and (TWO or FOUR))'
     >>> attr_list = ['THREE', 'ONE', 'TWO']
     >>> secret_key = cpabe.keygen(public_key, master_secret_key, attr_list)
     >>> cipher_text = cpabe.encrypt(public_key, msg, policy)
-    >>> cpabe.decrypt(public_key, secret_key, cipher)
-    [8498626471746535541889196006969623245883442038940767658411896849230802260262151353691177896167637279292812138807029583456775233580306113979341887791855557, 6966939460945789223279096602928312619651295009575045207502056308294974480025386597816838423778648241850303711370830167285562786901756561121522858944449876]
+    >>> orig_msg = cpabe.decrypt(public_key, secret_key, cipher_text)
+    >>> orig_msg == msg
+    True
     """
     
     def __init__(self, groupObj):

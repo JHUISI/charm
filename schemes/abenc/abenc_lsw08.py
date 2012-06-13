@@ -20,20 +20,20 @@ from charm.toolbox.ABEnc import *
 
 debug = False
 class KPabe(ABEnc):
-    """    
-    >>> from schemes.example_values import pairing_SS512_val as msg
-    >>> groupObj = PairingGroup('MNT224')
-    >>> kpabe = KPabe(groupObj)
+    """
+    >>> group = PairingGroup('MNT224')
+    >>> kpabe = KPabe(group)
     >>> (public_key, master_key) = kpabe.setup()
     >>> policy = '(ONE or THREE) and (THREE or TWO)'
     >>> attributes = [ 'ONE', 'TWO', 'THREE', 'FOUR' ]
-    >>> mykey = kpabe.keygen(public_key, master_key, policy)
+    >>> secret_key = kpabe.keygen(public_key, master_key, policy)
     
-    For conveniece, we are using a pre-defined message
-    >>> ciphertext = kpabe.encrypt(private_key, msg, attributes)
+    >>> msg=group.random(GT)
+    >>> cipher_text = kpabe.encrypt(public_key, msg, attributes)
     
-    >>> kpabe.decrypt(ciphertext, mykey)
-    [8498626471746535541889196006969623245883442038940767658411896849230802260262151353691177896167637279292812138807029583456775233580306113979341887791855557, 6966939460945789223279096602928312619651295009575045207502056308294974480025386597816838423778648241850303711370830167285562786901756561121522858944449876] 
+    >>> orig_msg = kpabe.decrypt(cipher_text, secret_key)
+	>>> orig_msg == msg
+	True
     """
 
     def __init__(self, groupObj, verbose=False):

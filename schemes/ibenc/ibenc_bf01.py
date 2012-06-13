@@ -23,12 +23,12 @@ class IBE_BonehFranklin(IBEnc):
     """
     >>> group = PairingGroup('MNT224', secparam=1024)    
     >>> ibe = IBE_BonehFranklin(group)
-    >>> (public_key, secret_key) = ibe.setup()
+    >>> (public_key, master_secret_key) = ibe.setup()
     >>> ID = 'user@email.com'
-    >>> key = ibe.extract(secret_key, ID)
+    >>> private_key = ibe.extract(master_secret_key, ID)
     >>> msg = "hello world!!!!!"
     >>> cipher_text = ibe.encrypt(public_key, ID, msg)
-    >>> ibe.decrypt(public_key, key, cipher_text)
+    >>> ibe.decrypt(public_key, private_key, cipher_text)
     'hello world!!!!!'
     """
     def __init__(self, groupObj):

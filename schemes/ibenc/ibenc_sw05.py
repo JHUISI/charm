@@ -28,12 +28,12 @@ class IBE_SW05(IBEnc):
     >>> required_overlap = 4
     >>> ibe = IBE_SW05_LUC(group)
     >>> (public_key, master_key) = ibe.setup(max_attributes, required_overlap)
-    >>> w = ['insurance', 'id=2345', 'oncology', 'doctor', 'nurse', 'JHU'] #private identity
-    >>> wPrime = ['insurance', 'id=2345', 'doctor', 'oncology', 'JHU', 'billing', 'misc'] #public identity for encrypt
-    >>> (w_hashed, secret_key) = ibe.extract(master_key, w, public_key, required_overlap, max_attributes)
+    >>> private_identity = ['insurance', 'id=2345', 'oncology', 'doctor', 'nurse', 'JHU'] #private identity
+    >>> public_identity = ['insurance', 'id=2345', 'doctor', 'oncology', 'JHU', 'billing', 'misc'] #public identity for encrypt
+    >>> (pub_ID_hashed, secret_key) = ibe.extract(master_key, private_identity, public_key, required_overlap, max_attributes)
     >>> msg = group.random(GT)
-    >>> cipher_text = ibe.encrypt(public_key, wPrime, msg, max_attributes)
-    >>> orig_msg = ibe.decrypt(public_key, secret_key, cipher_text, w_hashed, required_overlap)
+    >>> cipher_text = ibe.encrypt(public_key, public_identity, msg, max_attributes)
+    >>> orig_msg = ibe.decrypt(public_key, secret_key, cipher_text, pub_ID_hashed, required_overlap)
     >>> msg == orig_msg
     True
     """

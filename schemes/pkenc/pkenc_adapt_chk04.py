@@ -27,8 +27,7 @@ class CHK04(PKEnc):
     >>> hash_ibe = HashIDAdapter(ibe, group)
     >>> ots = IBSig(group)
     >>> pkenc = CHK04(hash_ibe, ots, group)
-    >>> secparam=0
-    >>> (public_key, secret_key) = pkenc.keygen(secparam)
+    >>> (public_key, secret_key) = pkenc.keygen(0)
     >>> msg = group.random(GT)
     >>> cipher_text = pkenc.encrypt(public_key, msg)
     >>> orig_msg = pkenc.decrypt(public_key, secret_key, cipher_text)

@@ -21,6 +21,9 @@ debug = False
 """A ciphertext class with homomorphic properties"""
 class Ciphertext(dict):
     """
+    This tests the additively holomorphic properties of 
+    the Paillier encryption scheme.
+
     >>> group = RSAGroup()
     >>> pai = Pai99(group)
     >>> (public_key, secret_key) = pai.keygen()
@@ -29,9 +32,9 @@ class Ciphertext(dict):
     >>> msg_2=12345761234123409
     >>> msg_3 = msg_1 + msg_2
     
-    >>> msg_3 = pai.encode(public_key['n'], msg_3) 
     >>> msg_1 = pai.encode(public_key['n'], msg_1)
     >>> msg_2 = pai.encode(public_key['n'], msg_2)
+    >>> msg_3 = pai.encode(public_key['n'], msg_3) 
     
     >>> cipher_1 = pai.encrypt(public_key, msg_1)
     >>> cipher_2 = pai.encrypt(public_key, msg_2)

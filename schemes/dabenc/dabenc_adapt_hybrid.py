@@ -11,29 +11,39 @@ class HybridABEncMA(ABEncMultiAuth):
     """
     >>> group = PairingGroup('SS512')
     >>> dabe = Dabe(group)
+
+    Setup master authority.
     >>> hyb_abema = HybridABEncMA(dabe, group)
     >>> global_parameters = hyb_abema.setup()
     
+	Generate attributes for two different sub-authorities:
+    Johns Hopkins University, and Johns Hopkins Medical Institutions.
     >>> jhu_attributes = ['jhu.professor', 'jhu.staff', 'jhu.student']
     >>> jhmi_attributes = ['jhmi.doctor', 'jhmi.nurse', 'jhmi.staff', 'jhmi.researcher']
-    >>> (jhu_secret_key, jhu_public_key) = hyb_abema.authsetup(global_parameters, jhu_attributes)
-    >>> (jhmi_secret_key, jhmi_public_key) = hyb_abema.authsetup(global_parameters, jhmi_attributes)
-    >>> allAuth_private_key = {}; 
-    >>> allAuth_private_key.update(jhu_public_key); 
-    >>> allAuth_private_key.update(jhmi_public_key)
-    
-    >>> ID = "20110615 bob@gmail.com cryptokey"
-    >>> K = {}
-    >>> hyb_abema.keygen(global_parameters, jhu_secret_key,'jhu.professor', ID, K)
-    >>> hyb_abema.keygen(global_parameters, jhmi_secret_key,'jhmi.researcher', ID, K)
-    
-    
-    >>> msg = 'Hello World, I am a sensitive record!'
-    >>> size = len(msg)
-    >>> policy_str = "(jhmi.doctor or (jhmi.researcher and jhu.professor))"
-    >>> cipher_text = hyb_abema.encrypt(allAuth_private_key, global_parameters, msg, policy_str)    
 
-    >>> hyb_abema.decrypt(global_parameters, K, cipher_text)
+    Johns Hopkins sub-authorities master key.
+    >>> (jhu_secret_key, jhu_public_key) = hyb_abema.authsetup(global_parameters, jhu_attributes)
+
+    JHMI sub-authorities master key
+    >>> (jhmi_secret_key, jhmi_public_key) = hyb_abema.authsetup(global_parameters, jhmi_attributes)
+    
+    To encrypt messages we need all of the authorities' public keys.
+    >>> allAuth_public_key = {}; 
+    >>> allAuth_public_key.update(jhu_public_key); 
+    >>> allAuth_public_key.update(jhmi_public_key)
+    
+    An example user, Bob, who is both a professor at JHU and a researcher at JHMI.
+    >>> ID = "20110615 bob@gmail.com cryptokey"
+    >>> secrets_keys = {}
+    >>> hyb_abema.keygen(global_parameters, jhu_secret_key,'jhu.professor', ID, secrets_keys)
+    >>> hyb_abema.keygen(global_parameters, jhmi_secret_key,'jhmi.researcher', ID, secrets_keys)
+    
+    Encrypt a message to anyone who is both a profesor at JHU and a researcher at JHMI.
+    >>> msg = 'Hello World, I am a sensitive record!'
+    >>> policy_str = "(jhmi.doctor or (jhmi.researcher and jhu.professor))"
+    >>> cipher_text = hyb_abema.encrypt(allAuth_public_key, global_parameters, msg, policy_str)    
+
+    >>> hyb_abema.decrypt(global_parameters, secrets_keys, cipher_text)
     'Hello World, I am a sensitive record!'
     """
     def __init__(self, scheme, groupObj):

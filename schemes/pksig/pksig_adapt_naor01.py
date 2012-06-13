@@ -28,7 +28,6 @@ from charm.toolbox.pairinggroup import *
 
 debug = False
 class Sig_Generic_ibetosig_Naor01(PKSig):
-    #TODO msg must be in Zp
     """
     >>> group = PairingGroup('MNT224')
     >>> ibe = IBE_BB04(group)
@@ -39,6 +38,7 @@ class Sig_Generic_ibetosig_Naor01(PKSig):
     >>> ibsig.verify(master_public_key, msg, signature) 
     True
     """
+    #TODO msg must be in Zp
     def __init__(self, ibe_scheme, groupObj):
         global ibe, group
         ibe = ibe_scheme

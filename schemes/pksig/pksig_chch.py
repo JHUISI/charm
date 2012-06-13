@@ -22,8 +22,8 @@ class CHCH(PKSig):
     >>> group = PairingGroup('SS512')
     >>> chch = CHCH(group)
     >>> (master_public_key, master_secret_key) = chch.setup()
-    >>> _id = "janedoe@email.com"
-    >>> (public_key, secret_key) = chch.keygen(master_secret_key, _id)  
+    >>> ID = "janedoe@email.com"
+    >>> (public_key, secret_key) = chch.keygen(master_secret_key, ID)  
     >>> msg = "this is a message!" 
     >>> signature = chch.sign(public_key, secret_key, msg)
     >>> chch.verify(master_public_key, public_key, msg, signature)

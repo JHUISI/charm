@@ -19,11 +19,11 @@ debug = False
 class IBSig():
     """
     >>> group = PairingGroup('MNT224')
-    >>> msg = { 'a':"hello world!!!" , 'b':"test message" }
+    >>> messages = { 'a':"hello world!!!" , 'b':"test message" }
     >>> ib = IBSig(group)
     >>> (public_key, secret_key) = ib.keygen(0)
-    >>> signature = ib.sign(secret_key['x'], msg)
-    >>> ib.verify(public_key, signature, msg) 
+    >>> signature = ib.sign(secret_key['x'], messages)
+    >>> ib.verify(public_key, signature, messages) 
     True
     """
     def __init__(self, groupObj):

@@ -28,16 +28,16 @@ class Dabe(ABEncMultiAuth):
 
     #Setup an authority
     >>> auth_attrs= ['ONE', 'TWO', 'THREE', 'FOUR']
-    >>> (secret_key, public_key) = dabe.authsetup(public_parameters, auth_attrs)
+    >>> (master_secret_key, public_key) = dabe.authsetup(public_parameters, auth_attrs)
 
     #Setup a user and give him some keys
-    >>> ID, K = "bob", {}
+    >>> ID, secret_keys = "bob", {}
     >>> usr_attrs = ['THREE', 'ONE', 'TWO']
-    >>> for i in usr_attrs: dabe.keygen(public_parameters, secret_key, i, ID, K)
+    >>> for i in usr_attrs: dabe.keygen(public_parameters, master_secret_key, i, ID, secret_keys)
     >>> msg = group.random(GT)
     >>> policy = '((one or three) and (TWO or FOUR))'
     >>> cipher_text = dabe.encrypt(public_key, public_parameters, msg, policy)
-    >>> orig_msg = dabe.decrypt(public_parameters, K, cipher_text)
+    >>> orig_msg = dabe.decrypt(public_parameters, secret_keys, cipher_text)
     >>> orig_msg == msg
     True
     """
