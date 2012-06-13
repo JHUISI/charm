@@ -254,9 +254,6 @@ void Integer_dealloc(Integer* self) {
 	/* clear structure */
 	mpz_clear(self->m);
 	mpz_clear(self->e);
-//	if (self->state_init) {
-//		gmp_randclear(self->state);
-//	}
 	Py_TYPE(self)->tp_free((PyObject*) self);
 }
 
@@ -282,7 +279,19 @@ int Integer_init(Integer *self, PyObject *args, PyObject *kwds) {
 	}
 
 	// check if they are of type long
-	if(_PyLong_Check(num)) {
+	if(PyInteger_Check(num)) {
+		Integer *num1 = (Integer *) num;
+		mpz_set(self->e, num1->e);
+		if(mod != NULL)  {
+			if(PyInteger_Check(mod)) {
+				Integer *mod1 = (Integer *) mod;
+				mpz_set(self->m, mod1->e);
+			}
+			else if(_PyLong_Check(mod)) longObjToMPZ(self->m, mod);
+			else { EXIT_IF(TRUE, "invalid type for modulus"); }
+		}
+	}
+	else if(_PyLong_Check(num)) {
 		longObjToMPZ(self->e, num);
 	}
 	// raise error
