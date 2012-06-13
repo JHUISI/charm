@@ -605,7 +605,8 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 	}
 	
 	debug("init an element.\n");
-	if(type >= ZR && type <= GT) {
+//	if(type >= ZR && type <= GT) {
+	if(type == ZR) {
 		retObject = createNewElement(type, group->pairing);
 	}
 	else {
@@ -623,6 +624,7 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 	/* return Element object */
 	return (PyObject *) retObject;		
 }
+
 
 // TODO: use element_vnprintf to copy the result into element type
 PyObject *Element_print(Element* self)
@@ -2017,7 +2019,7 @@ PyMethodDef Element_methods[] = {
 };
 
 PyMethodDef pairing_methods[] = {
-	{"init", (PyCFunction)Element_elem, METH_VARARGS, "Create an element in a specific group: G1, G2, GT or Zr"},
+	{"init", (PyCFunction)Element_elem, METH_VARARGS, "Create an element in group ZR and optionally set value."},
 	{"pair", (PyCFunction)Apply_pairing, METH_VARARGS, "Apply pairing between an element of G1 and G2 and returns an element mapped to GT"},
 	{"hash", (PyCFunction)sha1_hash, METH_VARARGS, "Compute a sha1 hash of an element type"},
 	{"H", (PyCFunction)Element_hash, METH_VARARGS, "Hash an element type to a specific field: Zr, G1, or G2"},

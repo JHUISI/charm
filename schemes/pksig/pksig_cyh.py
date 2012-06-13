@@ -51,7 +51,7 @@ class CYH(PKSig):
         Lt = self.concat(L) 
         num_signers = len(L)
  
-        u = [group.init(G1) for i in range(num_signers)]
+        u = [1 for i in range(num_signers)]
         h = [group.init(ZR, 1) for i in range(num_signers)]
         for i in range(num_signers):
             if IDs != L[i]:
@@ -62,7 +62,7 @@ class CYH(PKSig):
         
         r = group.random(ZR)
         pk = [ H1(i) for i in L] # get all signers pub keys
-        u[s] = (IDpk ** r) * ~dotprod(group.init(G1), s, num_signers, lam_func, u, pk, h)
+        u[s] = (IDpk ** r) * (dotprod(1, s, num_signers, lam_func, u, pk, h) ** -1)
         h[s] = H2(M, Lt, u[s])
         S = IDsk ** (h[s] + r)
         sig = { 'u':u, 'S':S }
@@ -77,7 +77,7 @@ class CYH(PKSig):
             h[i] = H2(M, Lt, u[i])
 
         pk = [ H1(i) for i in L] # get all signers pub keys
-        result = dotprod(group.init(G1), -1, num_signers, lam_func, u, pk, h) 
+        result = dotprod(1, -1, num_signers, lam_func, u, pk, h) 
         if pair(result, mpk['Pub']) == pair(S, mpk['g']):
             return True
         return False

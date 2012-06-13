@@ -86,7 +86,7 @@ class CPabe09(ABEnc):
             #print('Attribute %s: coeff=%s, k_x=%s' % (j, w_i[j], k_x[j]))
             
         C, D = ct['C'], ct['D']
-        denominator = group.init(GT, 1)
+        denominator = 1
         for i in pruned:
             j = i.getAttributeAndIndex()
             denominator *= ( pair(C[j] ** w_i[j], sk['L']) * pair(k_x[j] ** w_i[j], D[j]) )   

@@ -47,7 +47,7 @@ class WatersSig:
         k = waters.hash(ID) # return list from k1,...,kz
         if debug: print("k =>", k)
         r = group.random(ZR)
-        k1 = msk * ((mpk['u1t'] * dotprod(group.init(G1), -1, mpk['z'], lam_func, mpk['u'], k)) ** r)  
+        k1 = msk * ((mpk['u1t'] * dotprod(1, -1, mpk['z'], lam_func, mpk['u'], k)) ** r)  
         k2 = mpk['g1'] ** -r
         return (k1, k2)
     
@@ -57,7 +57,7 @@ class WatersSig:
         if debug: print("m =>", m)
         (k1, k2) = sk
         s  = group.random(ZR)
-        S1 = k1 * ((mpk['u2t'] * dotprod(group.init(G1), -1, mpk['z'], lam_func, mpk['u'], m)) ** s)
+        S1 = k1 * ((mpk['u2t'] * dotprod(1, -1, mpk['z'], lam_func, mpk['u'], m)) ** s)
         S2 = k2
         S3 = mpk['g1'] ** -s
         return {'S1':S1, 'S2':S2, 'S3':S3}
@@ -68,8 +68,8 @@ class WatersSig:
         m = waters.hash(M)
         (S1, S2, S3) = sig['S1'], sig['S2'], sig['S3']
         A, g2 = mpk['A'], mpk['g2']
-        comp1 = dotprod(group.init(G2), -1, mpk['z'], lam_func, mpk['ub'], k)
-        comp2 = dotprod(group.init(G2), -1, mpk['z'], lam_func, mpk['ub'], m)
+        comp1 = dotprod(1, -1, mpk['z'], lam_func, mpk['ub'], k)
+        comp2 = dotprod(1, -1, mpk['z'], lam_func, mpk['ub'], m)
         if (pair(S1, g2) * pair(S2, mpk['u1b'] * comp1) * pair(S3, mpk['u2b'] * comp2)) == A: 
             return True
         return False

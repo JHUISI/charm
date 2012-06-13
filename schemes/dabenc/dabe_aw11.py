@@ -129,7 +129,7 @@ class Dabe(ABEncMultiAuth):
         coeffs = util.getCoefficients(policy)
     
         h_gid = gp['H'](sk['gid'])  #find H(GID)
-        egg_s = group.init(GT, 1)
+        egg_s = 1
         for i in pruned:
             x = i.getAttributeAndIndex()
             y = i.getAttribute()
