@@ -600,22 +600,6 @@ fi
 #fi
 
 ##########################################
-
-cat > $TMPC << EOF
-try:
-   from pyparsing import *
-   exit(0)
-except ImportError:
-   exit(-1)
-EOF
-
-pyparse_found="no"
-$python_path $TMPC
-result=$?
-if test ${result} = 0 ; then
-   pyparse_found="yes"
-fi
-##########################################
 # check if the compiler defines offsetof
 
 need_offsetof=yes
@@ -727,7 +711,6 @@ echo "-Werror enabled   $werror"
 echo "integer module    $integer_module"
 echo "ecc module        $ecc_module"
 echo "pairing module    $pairing_module"
-echo "pyparsing module  $pyparse_found"
 echo "libm found        $libm_found"
 echo "libgmp found      $libgmp_found"
 echo "libpbc found      $libpbc_found"
