@@ -31,7 +31,7 @@ extern "C" {
 	#define PyToLongObj(o) PyInt_FromSize_t(o)
 #endif
 
-#define BENCHMARK_MOD_NAME "benchmark._C_API"
+#define BENCHMARK_MOD_NAME "charm.core.benchmark._C_API"
 
 // define new benchmark type for benchmark module
 PyTypeObject BenchmarkType;

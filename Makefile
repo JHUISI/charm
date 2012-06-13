@@ -117,21 +117,29 @@ source:
 .PHONY: install
 install:
 	$(PYTHON) setup.py install
+
+.PHONY: uninstall
+uninstall:
+	$(PYTHON) setup.py uninstall
 	
 .PHONY: test
 test: test-schemes test-charm
+
 .PHONY: test-schemes
 test-schemes:
 	$(PYTHON) -m unittest discover -p "*_test.py"  schemes/test/
 	find . -name '*.pyc' -delete
+
 .PHONY: test-charm
 test-charm:
 	$(PYTHON) -m unittest discover -p "*_test.py"  charm-framework/test/toolbox/
 	find . -name '*.pyc' -delete
+
 .PHONY: xmltest 
 xmltest:
 	$(PYTHON) tests/all_tests_with_xml_test_result.py
 	find . -name '*.pyc' -delete
+
 .PHONY: doc
 doc:
 	if test "${BUILD_DOCS}" = "yes" ; then \
@@ -144,11 +152,11 @@ doc:
 
 .PHONY: builddeb
 builddeb:
-        # build the source package in the parent directory
-        # then rename it to project_version.orig.tar.gz
+	# build the source package in the parent directory
+	# then rename it to project_version.orig.tar.gz
 	$(PYTHON) setup.py sdist --dist-dir=../ --prune
 	#rename -f 's/$(PROJECT)-(.*)\.tar\.gz/$(PROJECT)_$$1\.orig\.tar\.gz/' ../*
-        # build the package
+	# build the package
 	#dpkg-buildpackage -i -I -rfakeroot
 
 .PHONY: clean
