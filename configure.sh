@@ -454,7 +454,7 @@ fi
 # python if it is python 3. Baring that, we try python3  
 # Ths logic also handles the version check.
 python3_found="no"
-python_path = ${python_path-`which python`}
+python_path=${python_path-`which python`}
 #if python is not installed, try python3. 
 if !  [ -n "$python_path"  ]; then
     python_path="$(which python3)"
