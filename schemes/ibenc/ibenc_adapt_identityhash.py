@@ -36,7 +36,11 @@ class HashIDAdapter(IBEnc):
     
     def encrypt(self, pk, ID, msg):
         if not self.ibe_good: return IBEnc.encrypt(self, pk, ID, msg)
-        return self.ibenc.encrypt(pk, ID, msg)
+        if type(ID) == str:
+            ID2 = self.group.hash(ID)
+            return self.ibenc.encrypt(pk, ID2, msg)
+        else:
+            assert False, "invalid type on ID."
 
     def decrypt(self, pk, sk, ct):
         if not self.ibe_good: return IBEnc.decrypt(self, pk, sk, ct)
@@ -57,7 +61,7 @@ def main():
     if debug: print(sk)
     
     m = group.random(GT)
-    ct = hashID.encrypt(pk, sk['id'], m)
+    ct = hashID.encrypt(pk, kID, m)
     
     orig_m = hashID.decrypt(pk, sk, ct)
     
