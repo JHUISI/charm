@@ -15,20 +15,9 @@ El Gamal Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption in g
 from charm.toolbox.integergroup import IntegerGroupQ
 from charm.toolbox.ecgroup import *
 from charm.toolbox.PKEnc import PKEnc
-from charm.toolbox.eccurve import prime192v2
 
 debug = False
 class ElGamalCipher(dict):
-    """
-    >>> el = ElGamal(elliptic_curve, prime192v2)    
-    >>> (public_key, secret_key) = el.keygen()
-    >>> msg = b"hello world!"
-    >>> size = len(msg)
-    >>> cipher_text = el.encrypt(public_key, msg)
-    >>> orig_msg = el.decrypt(public_key, secret_key, cipher_text)    
-    >>> orig_msg == msg
-    True
-    """
     def __init__(self, ct):
         if type(ct) != dict: assert False, "Not a dictionary!"
         if not set(ct).issubset(['c1', 'c2']): assert False, "'c1','c2' keys not present."
@@ -57,6 +46,17 @@ class ElGamalCipher(dict):
         return None
 
 class ElGamal(PKEnc):
+    """
+    >>> from charm.toolbox.eccurve import prime192v2
+    >>> el = ElGamal(elliptic_curve, prime192v2)    
+    >>> (public_key, secret_key) = el.keygen()
+    >>> msg = b"hello world!"
+    >>> size = len(msg)
+    >>> cipher_text = el.encrypt(public_key, msg)
+    >>> decrypted_msg = el.decrypt(public_key, secret_key, cipher_text)    
+    >>> decrypted_msg == msg
+    True
+    """
     def __init__(self, group_type=int, builtin_cv=410):
         PKEnc.__init__(self)
         global _type

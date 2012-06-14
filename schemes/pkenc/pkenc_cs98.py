@@ -27,7 +27,9 @@ class CS98(PKEnc):
     >>> (public_key, secret_key) = pkenc.keygen(1024)
     >>> msg = b"hello world. test message"
     >>> cipher_text = pkenc.encrypt(public_key, msg)
-    >>> orig_msg = pkenc.decrypt(public_key, secret_key, cipher_text)
+    >>> decrypted_msg = pkenc.decrypt(public_key, secret_key, cipher_text)
+    >>> decrypted_msg == msg
+    True
     """
     def __init__(self, p=0, q=0):
         global group

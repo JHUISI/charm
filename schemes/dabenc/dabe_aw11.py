@@ -21,14 +21,13 @@ class Dabe(ABEncMultiAuth):
     """
     Decentralized Attribute-Based Encryption by Lewko and Waters
 
-    >>> from schemes.example_values import pairing_SS512_val as msg
     >>> group = PairingGroup('SS512')
     >>> dabe = Dabe(group)
     >>> public_parameters = dabe.setup()
 
     #Setup an authority
     >>> auth_attrs= ['ONE', 'TWO', 'THREE', 'FOUR']
-    >>> (master_secret_key, public_key) = dabe.authsetup(public_parameters, auth_attrs)
+    >>> (master_secret_key, master_public_key) = dabe.authsetup(public_parameters, auth_attrs)
 
     #Setup a user and give him some keys
     >>> ID, secret_keys = "bob", {}
@@ -36,9 +35,9 @@ class Dabe(ABEncMultiAuth):
     >>> for i in usr_attrs: dabe.keygen(public_parameters, master_secret_key, i, ID, secret_keys)
     >>> msg = group.random(GT)
     >>> policy = '((one or three) and (TWO or FOUR))'
-    >>> cipher_text = dabe.encrypt(public_key, public_parameters, msg, policy)
-    >>> orig_msg = dabe.decrypt(public_parameters, secret_keys, cipher_text)
-    >>> orig_msg == msg
+    >>> cipher_text = dabe.encrypt(master_public_key, public_parameters, msg, policy)
+    >>> decrypted_msg = dabe.decrypt(public_parameters, secret_keys, cipher_text)
+    >>> decrypted_msg == msg
     True
     """
     def __init__(self, groupObj):

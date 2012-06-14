@@ -12,12 +12,13 @@ Brent Waters (Pairing-based)
 :Authors:    J Ayo Akinyele
 :Date:       03/2012
 '''
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.pairinggroup import ZR,G1,pair
 from charm.toolbox.IBEnc import *
 
 debug = False
 class DSE09(IBEnc):
     """
+    >>> from charm.toolbox.pairinggroup import PairingGroup, GT
     >>> group = PairingGroup('SS512')
     >>> ibe = DSE09(group)
     >>> ID = "user2@email.com"
@@ -25,8 +26,8 @@ class DSE09(IBEnc):
     >>> secret_key = ibe.keygen(master_public_key, master_secret_key, ID)
     >>> msg = group.random(GT)    
     >>> cipher_text = ibe.encrypt(master_public_key, msg, ID)
-    >>> orig_msg = ibe.decrypt(cipher_text, secret_key)
-    >>> orig_msg == msg
+    >>> decrypted_msg = ibe.decrypt(cipher_text, secret_key)
+    >>> decrypted_msg == msg
     True
     """
     def __init__(self, groupObj):

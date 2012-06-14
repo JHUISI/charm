@@ -1,6 +1,7 @@
 from charm.core.math.integer import randomBits
-import hmac, hashlib, math
-from charm.toolbox.conversion import Conversion
+#import hmac, hashlib, math
+import hashlib
+#from charm.toolbox.conversion import Conversion
 
 debug = False
 class EncapBCHK():

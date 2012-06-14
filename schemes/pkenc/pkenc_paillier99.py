@@ -13,7 +13,8 @@ Pascal Paillier (Public-Key)
 :Date:            4/2011
 '''
 #from charm.integer import *
-from charm.toolbox.integergroup import RSAGroup,lcm,integer
+from charm.toolbox.integergroup import lcm,integer
+#from charm.toolbox.integergroup import RSAGroup,lcm,integer
 from charm.toolbox.PKEnc import PKEnc
 from charm.core.engine.util import *
 
@@ -24,6 +25,7 @@ class Ciphertext(dict):
     This tests the additively holomorphic properties of 
     the Paillier encryption scheme.
 
+    >>> from charm.toolbox.integergroup import RSAGroup
     >>> group = RSAGroup()
     >>> pai = Pai99(group)
     >>> (public_key, secret_key) = pai.keygen()
@@ -40,8 +42,8 @@ class Ciphertext(dict):
     >>> cipher_2 = pai.encrypt(public_key, msg_2)
     >>> cipher_3 = cipher_1 + cipher_2
     
-    >>> orig_msg_3 = pai.decrypt(public_key, secret_key, cipher_3)
-    >>> orig_msg_3 == msg_3
+    >>> decrypted_msg_3 = pai.decrypt(public_key, secret_key, cipher_3)
+    >>> decrypted_msg_3 == msg_3
     True
     """
     def __init__(self, ct, pk, key):

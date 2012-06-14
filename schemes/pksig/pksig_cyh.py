@@ -12,7 +12,7 @@ Chow-Yiu-Hui - Identity-based ring signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from charm.toolbox.pairinggroup import PairingGroup,G1,G2,GT,ZR,pair
+from charm.toolbox.pairinggroup import G1,G2,ZR,pair
 from charm.toolbox.PKSig import PKSig
 from charm.toolbox.iterate import dotprod
 
@@ -20,6 +20,8 @@ debug = False
 
 class CYH(PKSig):
     """
+
+    >>> from charm.toolbox.pairinggroup import PairingGroup
     >>> users = [ "alice", "bob", "carlos", "dexter", "eddie"] 
     >>> signer = "bob"
     >>> group = PairingGroup('SS512')

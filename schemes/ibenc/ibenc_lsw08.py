@@ -12,12 +12,13 @@ Allison Lewko, Amit Sahai and Brent Waters (Pairing-based)
 :Authors:    J Ayo Akinyele
 :Date:       1/2012
 '''
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.pairinggroup import ZR,G1,pair
 from charm.toolbox.IBEnc import *
 
 debug = False
 class IBE_Revoke(IBEnc):
     """
+    >>> from charm.toolbox.pairinggroup import PairingGroup, GT, G2
     >>> group = PairingGroup('SS512')
     >>> num_users = 5 # total # of users
     >>> ibe = IBE_Revoke(group)
@@ -27,8 +28,8 @@ class IBE_Revoke(IBEnc):
     >>> secret_key = ibe.keygen(master_public_key, master_secret_key, ID)
     >>> msg = group.random(GT)
     >>> cipher_text = ibe.encrypt(master_public_key, msg, S)
-    >>> orig_msg = ibe.decrypt(S, cipher_text, secret_key)
-    >>> orig_msg == msg
+    >>> decrypted_msg = ibe.decrypt(S, cipher_text, secret_key)
+    >>> decrypted_msg == msg
     True
     """
 

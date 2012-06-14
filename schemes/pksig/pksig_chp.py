@@ -12,13 +12,14 @@ Camenisch-Hohenberger-Pedersen - Identity-based Signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from charm.toolbox.pairinggroup import PairingGroup,G1,G2,GT,ZR,pair
+from charm.toolbox.pairinggroup import G1,G2,ZR,pair
 from charm.toolbox.PKSig import PKSig
 
 debug = False
 
 class CHP(PKSig):
     """
+    >>> from charm.toolbox.pairinggroup import PairingGroup   
     >>> group = PairingGroup('SS512')
     >>> chp = CHP(group)
     >>> master_public_key = chp.setup()

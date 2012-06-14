@@ -14,7 +14,7 @@ Authorised Private Searches on Public Key Encrypted Data".
 :Authors:    J Ayo Akinyele/Mike Rushanan
 :Date:       02/2012
 '''
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.pairinggroup import ZR,G1,G2,pair
 from charm.toolbox.IBEnc import IBEnc
 from charm.toolbox.conversion import Conversion
 from charm.toolbox.bitstring import Bytes
@@ -24,6 +24,7 @@ import hashlib
 debug = False
 class IBE_CKRS(IBEnc):
     """
+    >>> from charm.toolbox.pairinggroup import PairingGroup, GT
     >>> group = PairingGroup('SS512')
     >>> ibe = IBE_CKRS(group)
     >>> (master_public_key, master_secret_key) = ibe.setup()
@@ -31,8 +32,8 @@ class IBE_CKRS(IBEnc):
     >>> secret_key = ibe.extract(master_public_key, master_secret_key, ID)
     >>> msg = group.random(GT)
     >>> cipher_text = ibe.encrypt(master_public_key, ID, msg)
-    >>> orig_msg = ibe.decrypt(master_public_key, secret_key, cipher_text)
-    >>> orig_msg == msg 
+    >>> decrypted_msg = ibe.decrypt(master_public_key, secret_key, cipher_text)
+    >>> decrypted_msg == msg 
     True
     """
     def __init__(self, groupObj):

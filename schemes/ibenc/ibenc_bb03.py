@@ -23,13 +23,13 @@ class IBE_BB04(IBEnc):
     """
     >>> group = PairingGroup('MNT224')
     >>> ibe = IBE_BB04(group)
-    >>> (public_key, master_key) = ibe.setup()
-    >>> public_key_ID = group.random(ZR)
-    >>> key = ibe.extract(master_key, public_key_ID)
+    >>> (master_public_key, master_key) = ibe.setup()
+    >>> master_public_key_ID = group.random(ZR)
+    >>> key = ibe.extract(master_key, master_public_key_ID)
     >>> msg = group.random(GT)
-    >>> cipher_text = ibe.encrypt(public_key, public_key_ID, msg)
-    >>> orig_msg = ibe.decrypt(public_key, key, cipher_text)
-    >>> orig_msg == msg
+    >>> cipher_text = ibe.encrypt(master_public_key, master_public_key_ID, msg)
+    >>> decrypted_msg = ibe.decrypt(master_public_key, key, cipher_text)
+    >>> decrypted_msg == msg
     True
     """
     def __init__(self, groupObj):

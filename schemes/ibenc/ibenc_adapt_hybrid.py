@@ -4,22 +4,23 @@ from charm.core.math.pairing import hash as sha1
 from schemes.ibenc.ibenc_adapt_identityhash import *
 from charm.toolbox.IBEnc import *
 from charm.core.crypto.cryptobase import *
-from math import ceil
+#from math import ceil
 
 debug = False
 class HybridIBEnc(IBEnc):
     """
+    >>> from schemes.ibenc.ibenc_bb03 import IBE_BB04
     >>> group = PairingGroup('SS512')
     >>> ibe = IBE_BB04(group)
     >>> hashID = HashIDAdapter(ibe, group)
     >>> hyb_ibe = HybridIBEnc(hashID, group)
-    >>> (public_key, master_key) = hyb_ibe.setup()
+    >>> (master_public_key, master_key) = hyb_ibe.setup()
     >>> ID = 'waldoayo@gmail.com'
     >>> secret_key = hyb_ibe.extract(master_key, ID)
     >>> msg = "Hello World My name is blah blah!!!! Word!"
-    >>> cipher_text = hyb_ibe.encrypt(public_key, ID, msg)
-    >>> orig_msg = hyb_ibe.decrypt(public_key, secret_key, cipher_text)
-    >>> orig_msg == msg
+    >>> cipher_text = hyb_ibe.encrypt(master_public_key, ID, msg)
+    >>> decrypted_msg = hyb_ibe.decrypt(master_public_key, secret_key, cipher_text)
+    >>> decrypted_msg == msg
     True
 
     """

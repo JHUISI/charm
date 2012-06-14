@@ -12,12 +12,13 @@
 :Authors:    J. Ayo Akinyele
 :Date:       1/2012
  '''
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
+from charm.toolbox.pairinggroup import ZR,G1,G2,pair
 from charm.toolbox.PKSig import PKSig
 
 debug = False
 class CL04(PKSig):
     """
+    >>> from charm.toolbox.pairinggroup import PairingGroup
     >>> group = PairingGroup('MNT224')
     >>> cl = CL04(group)
     >>> master_public_key = cl.setup()

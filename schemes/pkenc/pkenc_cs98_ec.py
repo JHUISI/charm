@@ -18,7 +18,6 @@ Cramer-Shoup Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption 
 '''
 from charm.toolbox.ecgroup import *
 from charm.toolbox.PKEnc import *
-from charm.toolbox.eccurve import prime192v1
 
 # type definitions
 pk_t = { 'g1' : G, 'g2' : G, 'c' : G, 'd' : G, 'h' : G }
@@ -29,12 +28,13 @@ str_t = str
 debug = False
 class EC_CS98(PKEnc):	
     """
+    >>> from charm.toolbox.eccurve import prime192v1
     >>> pkenc = EC_CS98(prime192v1)
     >>> (public_key, secret_key) = pkenc.keygen()
     >>> msg = b"hello world!!!"
     >>> cipher_text = pkenc.encrypt(public_key, msg)
-    >>> orig_msg = pkenc.decrypt(public_key, secret_key, cipher_text)
-    >>> orig_msg == msg
+    >>> decrypted_msg = pkenc.decrypt(public_key, secret_key, cipher_text)
+    >>> decrypted_msg == msg
     True
     """
     def __init__(self, builtin_cv):

@@ -23,13 +23,13 @@ class CPabe09(ABEnc):
     >>> group = PairingGroup('SS512')
     >>> cpabe = CPabe09(group)
 	>>> msg = group.random(GT)
-    >>> (master_secret_key, public_key) = cpabe.setup()
+    >>> (master_secret_key, master_public_key) = cpabe.setup()
     >>> policy = '((ONE or THREE) and (TWO or FOUR))'
     >>> attr_list = ['THREE', 'ONE', 'TWO']
-    >>> secret_key = cpabe.keygen(public_key, master_secret_key, attr_list)
-    >>> cipher_text = cpabe.encrypt(public_key, msg, policy)
-    >>> orig_msg = cpabe.decrypt(public_key, secret_key, cipher_text)
-    >>> orig_msg == msg
+    >>> secret_key = cpabe.keygen(master_public_key, master_secret_key, attr_list)
+    >>> cipher_text = cpabe.encrypt(master_public_key, msg, policy)
+    >>> decrypted_msg = cpabe.decrypt(master_public_key, secret_key, cipher_text)
+    >>> decrypted_msg == msg
     True
     """
     

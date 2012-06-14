@@ -13,15 +13,15 @@ Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform (generic composi
 :Authors:  J. Ayo Akinyele
 :Date:         1/2011
 '''
-from schemes.ibenc.ibenc_bb03 import IBE_BB04
-from schemes.pksig.pksig_bls04 import IBSig
-from schemes.ibenc.ibenc_adapt_identityhash import HashIDAdapter
 from charm.toolbox.PKEnc import PKEnc
 from charm.toolbox.pairinggroup import * #PairingGroup,GT
 
 debug = False
 class CHK04(PKEnc):
     """
+    >>> from schemes.ibenc.ibenc_adapt_identityhash import HashIDAdapter
+    >>> from schemes.ibenc.ibenc_bb03 import IBE_BB04
+    >>> from schemes.pksig.pksig_bls04 import IBSig
     >>> group = PairingGroup('SS512')
     >>> ibe = IBE_BB04(group)
     >>> hash_ibe = HashIDAdapter(ibe, group)
@@ -30,8 +30,8 @@ class CHK04(PKEnc):
     >>> (public_key, secret_key) = pkenc.keygen(0)
     >>> msg = group.random(GT)
     >>> cipher_text = pkenc.encrypt(public_key, msg)
-    >>> orig_msg = pkenc.decrypt(public_key, secret_key, cipher_text)
-    >>> orig_msg == msg
+    >>> decrypted_msg = pkenc.decrypt(public_key, secret_key, cipher_text)
+    >>> decrypted_msg == msg
     True
     """
     def __init__(self, ibe_scheme, ots_scheme, groupObj):

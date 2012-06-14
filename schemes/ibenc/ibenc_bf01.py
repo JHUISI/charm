@@ -13,7 +13,7 @@ Boneh-Franklin Identity Based Encryption
 :Date:       2/2011
 :Status:     BROKEN
 '''
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
+from charm.toolbox.pairinggroup import ZR,G1,G2,pair
 from charm.core.math.integer import randomBits,integer,bitsize
 from charm.toolbox.hash_module import Hash,int2Bytes,integer
 from charm.toolbox.IBEnc import IBEnc
@@ -21,14 +21,15 @@ from charm.toolbox.IBEnc import IBEnc
 debug = False
 class IBE_BonehFranklin(IBEnc):
     """
+    >>> from charm.toolbox.pairinggroup import PairingGroup
     >>> group = PairingGroup('MNT224', secparam=1024)    
     >>> ibe = IBE_BonehFranklin(group)
-    >>> (public_key, master_secret_key) = ibe.setup()
+    >>> (master_public_key, master_secret_key) = ibe.setup()
     >>> ID = 'user@email.com'
     >>> private_key = ibe.extract(master_secret_key, ID)
     >>> msg = "hello world!!!!!"
-    >>> cipher_text = ibe.encrypt(public_key, ID, msg)
-    >>> ibe.decrypt(public_key, private_key, cipher_text)
+    >>> cipher_text = ibe.encrypt(master_public_key, ID, msg)
+    >>> ibe.decrypt(master_public_key, private_key, cipher_text)
     'hello world!!!!!'
     """
     def __init__(self, groupObj):

@@ -1,16 +1,17 @@
 
-from charm.core.crypto.cryptobase import MODE_CBC,AES
+#from charm.core.crypto.cryptobase import MODE_CBC,AES
 from charm.toolbox.ABEnc import ABEnc
-from schemes.abenc.abenc_lsw08 import KPabe
-from charm.toolbox.pairinggroup import PairingGroup,GT
+from charm.toolbox.pairinggroup import GT
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from charm.core.math.pairing import hash as sha1
 from charm.toolbox.conversion import *
-from math import ceil
+#from math import ceil
 
 debug = False
 class HybridABEnc(ABEnc):
     """
+    >>> from charm.toolbox.pairinggroup import PairingGroup
+    >>> from schemes.abenc.abenc_lsw08 import KPabe
     >>> group = PairingGroup('SS512')
     >>> kpabe = KPabe(group)
     >>> hyb_abe = HybridABEnc(kpabe, group)
@@ -18,9 +19,9 @@ class HybridABEnc(ABEnc):
     >>> access_key = '((FOUR or THREE) and (TWO or ONE))'
     >>> 
     >>> msg = "hello world this is an important message."
-    >>> (public_key, master_key) = hyb_abe.setup()
-    >>> secret_key = hyb_abe.keygen(public_key, master_key, access_key)
-    >>> cipher_text = hyb_abe.encrypt(public_key, msg, access_policy)
+    >>> (master_public_key, master_key) = hyb_abe.setup()
+    >>> secret_key = hyb_abe.keygen(master_public_key, master_key, access_key)
+    >>> cipher_text = hyb_abe.encrypt(master_public_key, msg, access_policy)
     >>> hyb_abe.decrypt(cipher_text, secret_key)
     'hello world this is an important message.'
     """

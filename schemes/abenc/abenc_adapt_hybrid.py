@@ -1,5 +1,5 @@
 
-from charm.core.crypto.cryptobase import MODE_CBC,AES,selectPRP
+from charm.core.crypto.cryptobase import AES,selectPRP
 from charm.toolbox.ABEnc import ABEnc
 from schemes.abenc.abenc_bsw07 import CPabe_BSW07
 from charm.toolbox.pairinggroup import PairingGroup,GT
@@ -16,10 +16,10 @@ class HybridABEnc(ABEnc):
     >>> hyb_abe = HybridABEnc(cpabe, group)
     >>> access_policy = '((four or three) and (two or one))'
     >>> msg = "hello world this is an important message."
-    >>> (public_key, master_key) = hyb_abe.setup()
-    >>> secret_key = hyb_abe.keygen(public_key, master_key, ['ONE', 'TWO', 'THREE'])
-    >>> cipher_text = hyb_abe.encrypt(public_key, msg, access_policy)
-    >>> hyb_abe.decrypt(public_key, secret_key, cipher_text)
+    >>> (master_public_key, master_key) = hyb_abe.setup()
+    >>> secret_key = hyb_abe.keygen(master_public_key, master_key, ['ONE', 'TWO', 'THREE'])
+    >>> cipher_text = hyb_abe.encrypt(master_public_key, msg, access_policy)
+    >>> hyb_abe.decrypt(master_public_key, secret_key, cipher_text)
     'hello world this is an important message.'
     """
     def __init__(self, scheme, groupObj):

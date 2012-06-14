@@ -12,7 +12,7 @@ Boneh-Boyen Hierarchical Identity Based Encryption
 :Authors:    J Ayo Akinyele
 :Date:       3/2012
 '''
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.pairinggroup import ZR,G1,G2,pair
 from charm.toolbox.conversion import Conversion
 from charm.toolbox.bitstring import Bytes
 from charm.toolbox.iterate import dotprod2
@@ -21,6 +21,7 @@ import hashlib
 debug = False
 class HIBE_BB04:
     """
+    >>> from charm.toolbox.pairinggroup import PairingGroup, GT
     >>> group = PairingGroup('SS512')
     >>> hibe = HIBE_BB04(group)
     >>> (master_public_key, master_key) = hibe.setup()
@@ -28,8 +29,8 @@ class HIBE_BB04:
     >>> (public_key, secret_key) = hibe.extract(3, master_public_key, master_key, ID)
     >>> msg = group.random(GT)
     >>> cipher_text = hibe.encrypt(master_public_key, public_key, msg)
-    >>> orig_msg = hibe.decrypt(public_key, secret_key, cipher_text)
-    >>> orig_msg == msg 
+    >>> decrypted_msg = hibe.decrypt(public_key, secret_key, cipher_text)
+    >>> decrypted_msg == msg 
     True
 
     """

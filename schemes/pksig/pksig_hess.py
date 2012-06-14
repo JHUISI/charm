@@ -12,7 +12,7 @@ Hess - Identity-based Signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from charm.toolbox.pairinggroup import PairingGroup,G1,G2,ZR,pair
+from charm.toolbox.pairinggroup import G1,G2,ZR,pair
 from charm.toolbox.PKSig import PKSig
 #import gc
 #gc.disable()
@@ -22,6 +22,7 @@ debug = False
 
 class Hess(PKSig):
     """
+    >>> from charm.toolbox.pairinggroup import PairingGroup
     >>> group = PairingGroup('SS512')
     >>> hess = Hess(group)
     >>> (master_public_key, master_secret_key) = hess.setup()

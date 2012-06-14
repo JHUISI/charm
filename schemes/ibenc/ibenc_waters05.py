@@ -22,14 +22,14 @@ class IBE_N04(IBEnc):
     """
     >>> group = PairingGroup('SS512')
     >>> ibe = IBE_N04(group)
-    >>> (public_key, master_key) = ibe.setup()
+    >>> (master_public_key, master_key) = ibe.setup()
     >>> ID = "bob@mail.com"
-    >>> kID = ibe.stringtoidentity(public_key, ID)
+    >>> kID = ibe.stringtoidentity(master_public_key, ID)
     >>> secret_key = ibe.extract(master_key, kID)
     >>> msg = group.random(GT)
-    >>> cipher_text = ibe.encrypt(public_key, kID, msg)
-    >>> orig_msg = ibe.decrypt(public_key, secret_key, cipher_text)
-    >>> orig_msg == msg
+    >>> cipher_text = ibe.encrypt(master_public_key, kID, msg)
+    >>> decrypted_msg = ibe.decrypt(master_public_key, secret_key, cipher_text)
+    >>> decrypted_msg == msg
     True
     """
     

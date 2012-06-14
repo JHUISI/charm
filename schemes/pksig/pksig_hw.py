@@ -12,13 +12,14 @@ Hohenberger-Waters - Realizing hash-and-sign signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from charm.toolbox.pairinggroup import PairingGroup,G1,G2,GT,ZR,pair
+from charm.toolbox.pairinggroup import G1,G2,ZR,pair
 from charm.toolbox.PKSig import PKSig
-from math import *
+from math import ceil, log 
 
 debug=False
 class HW(PKSig):
     """
+    >>> from charm.toolbox.pairinggroup import PairingGroup, GT
     >>> group = PairingGroup('SS512')
     >>> hw = HW(group)
     >>> (public_key, secret_key) = hw.setup()

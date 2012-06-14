@@ -14,11 +14,11 @@ Digital Signature Algorithm (DSA)
 """
 from charm.toolbox.ecgroup import *
 from charm.toolbox.PKSig import PKSig
-from charm.toolbox.eccurve import prime192v2
 
 debug = False
 class ECDSA(PKSig):
     """
+    >>> from charm.toolbox.eccurve import prime192v2
     >>> group = ECGroup(prime192v2)
     >>> ecdsa = ECDSA(group)
     >>> (public_key, secret_key) = ecdsa.keygen(0)

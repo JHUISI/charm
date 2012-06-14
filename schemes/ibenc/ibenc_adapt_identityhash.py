@@ -1,20 +1,21 @@
-from schemes.ibenc.ibenc_bb03 import IBE_BB04
+#from schemes.ibenc.ibenc_bb03 import IBE_BB04
 from charm.toolbox.IBEnc import IBEnc
 from charm.toolbox.pairinggroup import *
 
 debug = False
 class HashIDAdapter(IBEnc):
     """
+    >>> from schemes.ibenc.ibenc_bb03 import IBE_BB04
     >>> group = PairingGroup('SS512')
     >>> ibe = IBE_BB04(group)
     >>> hashID = HashIDAdapter(ibe, group)
-    >>> (public_key, master_key) = hashID.setup()
+    >>> (master_public_key, master_key) = hashID.setup()
     >>> ID = 'waldoayo@email.com'
     >>> secret_key = hashID.extract(master_key, ID)
     >>> msg = group.random(GT)
-    >>> cipher_text = hashID.encrypt(public_key, ID, msg)
-    >>> orig_msg = hashID.decrypt(public_key, secret_key, cipher_text)
-    >>> msg == orig_msg
+    >>> cipher_text = hashID.encrypt(master_public_key, ID, msg)
+    >>> decrypted_msg = hashID.decrypt(master_public_key, secret_key, cipher_text)
+    >>> msg == decrypted_msg
     True
     """
     def __init__(self, scheme, group):

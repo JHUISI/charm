@@ -21,7 +21,6 @@ Notes:	This transform was first described by Boneh and Franklin but credited to 
 :Date:		05/2011
 '''
 
-from schemes.ibenc.ibenc_bb03 import IBE_BB04
 from charm.toolbox.PKSig import *
 from charm.toolbox.pairinggroup import *
 #from charm.toolbox.ibe_bb03 import *
@@ -29,6 +28,7 @@ from charm.toolbox.pairinggroup import *
 debug = False
 class Sig_Generic_ibetosig_Naor01(PKSig):
     """
+    >>> from schemes.ibenc.ibenc_bb03 import IBE_BB04
     >>> group = PairingGroup('MNT224')
     >>> ibe = IBE_BB04(group)
     >>> ibsig = Sig_Generic_ibetosig_Naor01(ibe, group)

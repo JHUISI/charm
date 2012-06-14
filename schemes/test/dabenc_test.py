@@ -76,9 +76,9 @@ class HybridABEncMATest(unittest.TestCase):
             print("c1 =>", ct['c1'])
             print("c2 =>", ct['c2'])
         
-        orig_msg = hyb_abema.decrypt(gp, K, ct)
-        if debug: print("Result =>", orig_msg)
-        assert orig_msg == msg, "Failed Decryption!!!"
+        decrypted_msg = hyb_abema.decrypt(gp, K, ct)
+        if debug: print("Result =>", decrypted_msg)
+        assert decrypted_msg == msg, "Failed Decryption!!!"
         if debug: print("Successful Decryption!!!")
         del groupObj
 

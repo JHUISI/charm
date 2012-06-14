@@ -8,17 +8,18 @@ Boneh-Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform
 :Author: Christina Garman
 :Date: 12/2011
 '''
-from charm.core.engine.util import *
-from charm.toolbox.pairinggroup import *
-from charm.core.math.pairing import hash as sha1
+from charm.core.engine.util import pickleObject, serializeObject 
+#from charm.toolbox.pairinggroup import *
+#from charm.core.math.pairing import hash as sha1
 import hmac, hashlib, math
-from charm.toolbox.IBEnc import *
-from schemes.encap_bchk05 import *
-from schemes.ibenc.ibenc_bb03 import *
+#from charm.toolbox.IBEnc import *
+from schemes.ibenc.ibenc_bb03 import IBEnc, ZR, GT, sha1
 
 debug = False
 class BCHKIBEnc(IBEnc):
     """
+    >>> from schemes.encap_bchk05 import EncapBCHK 
+    >>> from schemes.ibenc.ibenc_bb03 import PairingGroup, IBE_BB04
     >>> group = PairingGroup('SS512')
     >>> ibe = IBE_BB04(group)
     >>> encap = EncapBCHK()
@@ -26,8 +27,8 @@ class BCHKIBEnc(IBEnc):
     >>> (public_key, secret_key) = hyb_ibe.keygen()
     >>> msg = "Hello World!"
     >>> cipher_text = hyb_ibe.encrypt(public_key, msg)
-    >>> orig_msg = hyb_ibe.decrypt(public_key, secret_key, cipher_text)
-    >>> orig_msg == msg
+    >>> decrypted_msg = hyb_ibe.decrypt(public_key, secret_key, cipher_text)
+    >>> decrypted_msg == msg
     True
     """
     def str_XOR(self, m, k):

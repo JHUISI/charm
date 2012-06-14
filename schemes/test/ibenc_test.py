@@ -34,9 +34,9 @@ class HybridIBEncTest(unittest.TestCase):
             print("c1 =>", ct['c1'])
             print("c2 =>", ct['c2'])
         
-        orig_msg = hyb_ibe.decrypt(pk, sk, ct)
-        if debug: print("Result =>", orig_msg)
-        assert orig_msg == msg
+        decrypted_msg = hyb_ibe.decrypt(pk, sk, ct)
+        if debug: print("Result =>", decrypted_msg)
+        assert decrypted_msg == msg
         del groupObj
 
 class HashIDAdapterTest(unittest.TestCase):

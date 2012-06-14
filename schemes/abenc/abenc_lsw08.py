@@ -23,16 +23,16 @@ class KPabe(ABEnc):
     """
     >>> group = PairingGroup('MNT224')
     >>> kpabe = KPabe(group)
-    >>> (public_key, master_key) = kpabe.setup()
+    >>> (master_public_key, master_key) = kpabe.setup()
     >>> policy = '(ONE or THREE) and (THREE or TWO)'
     >>> attributes = [ 'ONE', 'TWO', 'THREE', 'FOUR' ]
-    >>> secret_key = kpabe.keygen(public_key, master_key, policy)
+    >>> secret_key = kpabe.keygen(master_public_key, master_key, policy)
     
     >>> msg=group.random(GT)
-    >>> cipher_text = kpabe.encrypt(public_key, msg, attributes)
+    >>> cipher_text = kpabe.encrypt(master_public_key, msg, attributes)
     
-    >>> orig_msg = kpabe.decrypt(cipher_text, secret_key)
-	>>> orig_msg == msg
+    >>> decrypted_msg = kpabe.decrypt(cipher_text, secret_key)
+	>>> decrypted_msg == msg
 	True
     """
 
