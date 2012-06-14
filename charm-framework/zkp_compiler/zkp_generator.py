@@ -3,10 +3,10 @@
 # statement to be proved/verified.  It outputs the  
 
 from pyparsing import *
-from zkparser import *
+from charm.zkp_compiler.zkparser import *
 from charm.core.engine.protocol import *
 from charm.core.engine.util import *
-from charm.pairing import *
+from charm.core.math.pairing import *
 
 int_default = True
 

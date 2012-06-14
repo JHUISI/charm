@@ -82,13 +82,15 @@ class BlumIntegerSquareRoot:
 
 class Sig_RSA_Stateless_HW09(PKSig):
     """
-    >>> pksig = Sig_RSA_Stateless_HW09() 
-    >>> p = integer(13075790812874903063868976368194105132206964291400106069285054021531242344673657224376055832139406140158530256050580761865568307154219348003780027259560207)
-    >>> q = integer(12220150399144091059083151334113293594120344494042436487743750419696868216757186059428173175925369884682105191510729093971051869295857706815002710593321543)
-    >>> (public_key, secret_key) = pksig.keygen(1024, p, q)
-    >>> msg = SHA1(b'this is the message I want to sign.')
-    >>> signature = pksig.sign(public_key, secret_key, msg)
-    >>> pksig.verify(public_key, msg, signature)
+	This code is time consuming, so for right now we skip it
+	when running doctests. Hence the +SKIP
+    >>> pksig = Sig_RSA_Stateless_HW09() +SKIP
+    >>> p = integer(13075790812874903063868976368194105132206964291400106069285054021531242344673657224376055832139406140158530256050580761865568307154219348003780027259560207) +SKIP
+    >>> q = integer(12220150399144091059083151334113293594120344494042436487743750419696868216757186059428173175925369884682105191510729093971051869295857706815002710593321543) +SKIP
+    >>> (public_key, secret_key) = pksig.keygen(1024, p, q) +SKIP
+    >>> msg = SHA1(b'this is the message I want to sign.') +SKIP
+    >>> signature = pksig.sign(public_key, secret_key, msg) +SKIP
+    >>> pksig.verify(public_key, msg, signature) +SKIP
     True
     """  
     def __init__(self, CH = ChamHash_HW09):

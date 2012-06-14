@@ -11,9 +11,15 @@ from base64 import b64encode,b64decode
 
 class MessageAuthenticator(object):
     """ Abstraction for constructing and verifying authenticated messages 
-        
-    >>> from toolbox.pairinggroup import PairingGroup,GT
-    >>> from charm.pairing import hash as extractor
+       
+        A large number of the schemes can only encrypt group elements 
+        and do not provide an efficien machanism for encoding byte in
+        those elements. As such we don't pick a symetric key and encrypt 
+        it asymetrically. Rather, we hash a random group element to get the
+        symatric key.
+
+    >>> from charm.toolbox.pairinggroup import PairingGroup,GT
+    >>> from charm.core.math.pairing import hash as extractor
     >>> groupObj = PairingGroup('SS512')
     >>> key = groupObj.random(GT)
     >>> m = MessageAuthenticator(extractor(key))
@@ -54,12 +60,18 @@ class SymmetricCryptoAbstraction(object):
     Abstraction for symmetric encryption and decryption of data.
     Ideally provide an INDCCA2 secure symmetric container for arbitrary data.
     Currently only supports primitives that JSON can encode and decode.
+  
+     A large number of the schemes can only encrypt group elements 
+    and do not provide an efficien machanism for encoding byte in
+    those elements. As such we don't pick a symetric key and encrypt 
+    it asymetrically. Rather, we hash a random group element to get the
+    symatric key.
 
     usage:
-    >>> from toolbox.pairinggroup import PairingGroup,GT
+    >>> from charm.toolbox.pairinggroup import PairingGroup,GT
     >>> groupObj = PairingGroup('SS512')
-    >>> from charm.pairing import hash as sha1
-    >>> a = SymmetricCryptoAbstraction(sha1(groupObj.random(GT)))
+    >>> from charm.core.math.pairing import hash as extractor
+    >>> a = SymmetricCryptoAbstraction(extractor(groupObj.random(GT)))
     >>> ct = a.encrypt("Friendly Fire Isn't")
     >>> a.decrypt(ct)
     "Friendly Fire Isn't"

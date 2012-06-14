@@ -21,7 +21,7 @@ from charm.toolbox.ecgroup import ECGroup
 from charm.toolbox.eccurve import prime192v2
 from charm.toolbox.integergroup import integer
 import unittest
-
+import pytest
 debug = False
 
 class PKSig_Naor01Test(unittest.TestCase):
@@ -267,6 +267,7 @@ class HWTest(unittest.TestCase):
         assert hw.verify(pk, m, sig), "invalid signature"
         if debug: print("Verification Successful!!")
 
+@pytest.mark.skpifif("1=1")
 class RSA_HW09Test(unittest.TestCase):
     def testRSA_HW09(self):
         pksig = Sig_RSA_Stateless_HW09() 

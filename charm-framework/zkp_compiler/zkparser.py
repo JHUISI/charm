@@ -1,5 +1,5 @@
 from pyparsing import *
-from toolbox.zknode import *
+from charm.toolbox.zknode import *
 import string,sys
 
 objStack = []
