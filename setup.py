@@ -1,4 +1,7 @@
-from distutils.core import setup, Extension, Command
+from distribute_setup import use_setuptools
+use_setuptools()
+from setuptools import setup
+from distutils.core import  Command, Extension
 from distutils.sysconfig import get_python_lib
 import os, platform, sys, shutil, re
 
@@ -151,9 +154,10 @@ setup(name = 'Charm-Crypto',
 	author = "J. Ayo Akinyele",
 	author_email = "ayo.akinyele@charm-crypto.com",
 	url = "http://charm-crypto.com/",
-
+    install_requires = ['setuptools',
+                        'pyparsing >= 1.5.5'],
     # we inentionally store charm in a directory not named charm so that 
-    #running the python interpeter from the project directory imports the
+    # running the python interpeter from the project directory imports the
     # installed version and not the one in the project with out the binnaries.
     package_dir = {'charm': 'charm-framework'}, 
 	packages = ['charm',

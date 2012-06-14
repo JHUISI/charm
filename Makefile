@@ -18,10 +18,6 @@ pbc_url=http://crypto.stanford.edu/pbc/files/${pbc_version}.tar.gz
 pbc_options=CC="${CC}" CPP="${CPP}" LDFLAGS="${LDFLAGS}" CPPFLAGS="${CPPFLAGS}" ${OSFLAGS}
 DESTDIR=${prefix}
 
-# python packages
-pyparse_version=pyparsing-1.5.5
-pyparse_url=http://cheeseshop.python.org/packages/source/p/pyparsing/${pyparse_version}.tar.gz
-
 all:
 	@echo "make deps - Build the charm dependencies."
 	@echo "make build - Build the charm framework and install dependencies."
@@ -38,25 +34,6 @@ setup:
 	set -x
 	${setup1}
 	set +x
-
-.PHONY: build-pyparse
-build-pyparse:
-	@echo "Build and install Pyparsing"
-	set -x
-	if test "${PYPARSING}" = "yes" ; then \
-	   echo "Pyparsing installed already."; \
-	elif [ ! -f ${pyparse_version}.tar.gz ]; then \
-	   ${wget} ${pyparse_url}; \
-	   tar -zxf ${pyparse_version}.tar.gz -C ${dest_build}; \
-	   cd ${dest_build}/${pyparse_version}; \
-	   ${PYTHON} setup.py install ${PYTHONFLAGS} ${PYTHONBUILDEXT}; \
-	else \
-	   tar -zxf ${pyparse_version}.tar.gz -C ${dest_build}; \
-	   cd ${dest_build}/${pyparse_version}; \
-	   ${PYTHON} setup.py install ${PYTHONFLAGS} ${PYTHONBUILDEXT}; \
-	fi
-	set +x
-	sed "s/PYPARSING=no/PYPARSING=yes/g" ${CONFIG} > ${CONFIG}.new; mv ${CONFIG}.new ${CONFIG} 
 
 .PHONY: build-gmp
 build-gmp:
@@ -105,7 +82,7 @@ deps: build-gmp build-pbc
 	@echo "Dependencies build complete."
 
 .PHONY: build
-build: setup build-gmp build-pbc build-pyparse
+build: setup build-gmp build-pbc
 	@echo "Building the Charm Framework"
 	${PYTHON} setup.py build ${PYTHONFLAGS} ${PYTHONBUILDEXT}
 	@echo "Complete"
