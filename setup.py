@@ -1,9 +1,20 @@
 from distribute_setup import use_setuptools
-use_setuptools()
+use_setuptools() #bootstrap installs Distribute if not installed
 from setuptools import setup
+from setuptools.command.test import test as TestCommand
 from distutils.core import  Command, Extension
 from distutils.sysconfig import get_python_lib
 import os, platform, sys, shutil, re
+
+class PyTest(TestCommand):
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+    def run_tests(self):
+        #import here, cause outside the eggs aren't loaded
+        import pytest
+        pytest.main(self.test_args)
 
 class UninstallCommand(Command):
     description = "remove old files"
@@ -156,6 +167,7 @@ setup(name = 'Charm-Crypto',
 	url = "http://charm-crypto.com/",
     install_requires = ['setuptools',
                         'pyparsing >= 1.5.5'],
+    tests_require=['pytest'],
     # we inentionally store charm in a directory not named charm so that 
     # running the python interpeter from the project directory imports the
     # installed version and not the one in the project with out the binnaries.
@@ -171,5 +183,5 @@ setup(name = 'Charm-Crypto',
                     'charm.zkp_compiler',
                 ],
     license = 'GPL',
-    cmdclass={'uninstall':UninstallCommand}
+    cmdclass={'uninstall':UninstallCommand,'test':PyTest}
 )
