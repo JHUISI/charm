@@ -9,10 +9,7 @@ Boneh-Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform
 :Date: 12/2011
 '''
 from charm.core.engine.util import pickleObject, serializeObject 
-#from charm.toolbox.pairinggroup import *
-#from charm.core.math.pairing import hash as sha1
 import hmac, hashlib, math
-#from charm.toolbox.IBEnc import *
 from schemes.ibenc.ibenc_bb03 import IBEnc, ZR, GT, sha1
 
 debug = False

@@ -33,8 +33,6 @@ class CPabe_BSW07(ABEnc):
     >>> access_policy = '((four or three) and (three or one))'
     >>> (master_public_key, master_key) = cpabe.setup()
     >>> secret_key = cpabe.keygen(master_public_key, master_key, attributes)
-
-    We are using a predefined plaintext for convenience
     >>> cipher_text = cpabe.encrypt(master_public_key, msg, access_policy)
     >>> decrypted_msg=cpabe.decrypt(master_public_key, secret_key, cipher_text)
     >>> msg == decrypted_msg

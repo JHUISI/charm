@@ -17,7 +17,6 @@ class HybridABEnc(ABEnc):
     >>> hyb_abe = HybridABEnc(kpabe, group)
     >>> access_policy =  ['ONE', 'TWO', 'THREE']
     >>> access_key = '((FOUR or THREE) and (TWO or ONE))'
-    >>> 
     >>> msg = "hello world this is an important message."
     >>> (master_public_key, master_key) = hyb_abe.setup()
     >>> secret_key = hyb_abe.keygen(master_public_key, master_key, access_key)

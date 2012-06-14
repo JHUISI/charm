@@ -1,6 +1,5 @@
 from charm.toolbox.Commit import *
 from charm.toolbox.ecgroup import *
-#from charm.toolbox.eccurve import prime192v1
 
 debug = False
 class CM_Ped92(Commitment):

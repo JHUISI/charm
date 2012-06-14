@@ -4,7 +4,6 @@ from charm.core.math.pairing import hash as sha1
 from schemes.ibenc.ibenc_adapt_identityhash import *
 from charm.toolbox.IBEnc import *
 from charm.core.crypto.cryptobase import *
-#from math import ceil
 
 debug = False
 class HybridIBEnc(IBEnc):

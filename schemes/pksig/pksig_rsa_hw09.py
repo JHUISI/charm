@@ -19,7 +19,6 @@ from charm.core.math.integer import *
 from charm.toolbox.PKSig import PKSig
 from schemes.chamhash_rsa_hw09 import ChamHash_HW09
 from charm.toolbox.conversion import Conversion
-#from charm.toolbox.bitstring import Bytes
 from charm.toolbox.specialprimes import BlumWilliamsInteger
 import hmac, hashlib, math
 

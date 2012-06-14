@@ -13,7 +13,6 @@ from schemes.pkenc.pkenc_rabin import Rabin_Enc, Rabin_Sig
 from schemes.pkenc.pkenc_rsa import RSA_Enc, RSA_Sig
 from charm.toolbox.pairinggroup import PairingGroup, GT 
 from charm.toolbox.ecgroup import elliptic_curve
-#from charm.toolbox.ecgroup import ECGroup, elliptic_curve
 from charm.toolbox.eccurve import prime192v1, prime192v2
 from charm.toolbox.integergroup import RSAGroup, integer
 import unittest

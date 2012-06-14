@@ -11,11 +11,9 @@
 '''
 
 from charm.core.math.integer import integer
-#from charm.core.math.integer import integer,isPrime,gcd,random,randomPrime
 from charm.toolbox.PKEnc import PKEnc
 from charm.toolbox.PKSig import PKSig
 from charm.toolbox.paddingschemes import OAEPEncryptionPadding,SAEPEncryptionPadding
-#from charm.toolbox.paddingschemes import OAEPEncryptionPadding,PSSPadding,SAEPEncryptionPadding
 from charm.toolbox.redundancyschemes import InMessageRedundancy
 from charm.toolbox.conversion import Conversion
 from charm.toolbox.bitstring import Bytes
@@ -24,16 +22,6 @@ from math import ceil
 
 debug = False
 class Rabin():
-    """
-    Rabin Module
-    >>> rabin = Rabin_Enc()
-    >>> (public_key, secret_key) = rabin.keygen(128, 1024)
-    >>> msg = b'This is a test'
-    >>> cipher_text = rabin.encrypt(public_key, msg)
-    >>> decrypted_msg = rabin.decrypt(public_key, secret_key, cipher_text)
-    >>> decrypted_msg == msg
-    True
-    """
     def __init__(self, modulus=BlumWilliamsInteger()):
         self.modulustype = modulus
 
@@ -64,6 +52,15 @@ class Rabin():
         return (integer(N), integer(p), integer(q), integer(yp), integer(yq))
     
 class Rabin_Enc(Rabin,PKEnc):
+    """
+    >>> rabin = Rabin_Enc()
+    >>> (public_key, secret_key) = rabin.keygen(128, 1024)
+    >>> msg = b'This is a test'
+    >>> cipher_text = rabin.encrypt(public_key, msg)
+    >>> decrypted_msg = rabin.decrypt(public_key, secret_key, cipher_text)
+    >>> decrypted_msg == msg
+    True
+    """
     def __init__(self, padding=SAEPEncryptionPadding(), redundancy=InMessageRedundancy(), params=None):
         Rabin.__init__(self)
         PKEnc.__init__(self)

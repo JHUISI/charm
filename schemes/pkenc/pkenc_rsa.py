@@ -19,17 +19,6 @@ from math import ceil
 
 debug = False
 class RSA():
-    """
-    RSA Module
-
-    >>> rsa = RSA_Enc()
-    >>> (public_key, secret_key) = rsa.keygen(1024)
-    >>> msg = b'This is a test'
-    >>> cipher_text = rsa.encrypt(public_key, msg)
-    >>> decrypted_msg = rsa.decrypt(public_key, secret_key, cipher_text)
-    >>> decrypted_msg == msg
-    True
-    """
     def __init__(self):
         pass
     # generate p,q and n
@@ -68,6 +57,15 @@ class RSA():
                 integer(p), integer(q))
     
 class RSA_Enc(RSA,PKEnc):
+    """
+    >>> rsa = RSA_Enc()
+    >>> (public_key, secret_key) = rsa.keygen(1024)
+    >>> msg = b'This is a test'
+    >>> cipher_text = rsa.encrypt(public_key, msg)
+    >>> decrypted_msg = rsa.decrypt(public_key, secret_key, cipher_text)
+    >>> decrypted_msg == msg
+    True
+    """
     def __init__(self, padding=OAEPEncryptionPadding(), params=None):
         RSA.__init__(self)
         PKEnc.__init__(self)

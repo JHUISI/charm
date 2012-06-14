@@ -15,7 +15,6 @@ from charm.toolbox.PKSig import *
 from charm.toolbox.bitstring import Bytes
 from charm.toolbox.conversion import Conversion
 from charm.toolbox.pairinggroup import *
-#from charm.core.engine import util
 import hashlib, math
 
 debug = False

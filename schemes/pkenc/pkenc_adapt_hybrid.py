@@ -1,15 +1,12 @@
 '''Takes an public-key encryption scheme and builds a hybrid encryption scheme.'''
 
-#import random, string
 # Works for ElGamal and CS98 schemes
 from schemes.pkenc.pkenc_cs98_ec import *
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from schemes.pkenc.pkenc_elgamal85 import *
 from charm.toolbox.PKEnc import PKEnc
 from charm.core.crypto.cryptobase import *
-#from math import ceil
 from os import urandom
-#import base64
 debug = False
 # Adapter class for Hybrid Encryption Schemes
 class HybridEnc(PKEnc):
