@@ -100,7 +100,8 @@ uninstall:
 	$(PYTHON) setup.py uninstall
 	
 .PHONY: test
-test: test-schemes test-charm
+test:
+	$(PYTHON) setup.py test
 
 .PHONY: test-schemes
 test-schemes:
