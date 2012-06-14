@@ -20,6 +20,22 @@ from charm.toolbox.ABEnc import *
 
 debug = False
 class KPabe(ABEnc):
+    """
+    >>> group = PairingGroup('MNT224')
+    >>> kpabe = KPabe(group)
+    >>> (master_public_key, master_key) = kpabe.setup()
+    >>> policy = '(ONE or THREE) and (THREE or TWO)'
+    >>> attributes = [ 'ONE', 'TWO', 'THREE', 'FOUR' ]
+    >>> secret_key = kpabe.keygen(master_public_key, master_key, policy)
+    
+    >>> msg=group.random(GT)
+    >>> cipher_text = kpabe.encrypt(master_public_key, msg, attributes)
+    
+    >>> decrypted_msg = kpabe.decrypt(cipher_text, secret_key)
+	>>> decrypted_msg == msg
+	True
+    """
+
     def __init__(self, groupObj, verbose=False):
         ABEnc.__init__(self)
         global group, util
@@ -111,28 +127,5 @@ class KPabe(ABEnc):
        
         return E['E1'] / prodT 
 
-def main():
-    groupObj = PairingGroup('MNT224')
-    kpabe = KPabe(groupObj)
     
-    (pk, mk) = kpabe.setup()
-    
-    policy = '(ONE or THREE) and (THREE or TWO)'
-    attributes = [ 'ONE', 'TWO', 'THREE', 'FOUR' ]
-    msg = groupObj.random(GT) 
- 
-    mykey = kpabe.keygen(pk, mk, policy)
-    
-    if debug: print("Encrypt under these attributes: ", attributes)
-    ciphertext = kpabe.encrypt(pk, msg, attributes)
-    if debug: print(ciphertext)
-    
-    rec_msg = kpabe.decrypt(ciphertext, mykey)
-   
-    assert msg == rec_msg 
-    if debug: print("Successful Decryption!")    
-    
-if __name__ == "__main__":
-    debug = True
-    main()
     

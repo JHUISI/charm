@@ -106,6 +106,7 @@ test: test-schemes test-charm
 test-schemes:
 	$(PYTHON) -m unittest discover -p "*_test.py"  schemes/test/
 	find . -name '*.pyc' -delete
+	./test.sh
 
 .PHONY: test-charm
 test-charm:

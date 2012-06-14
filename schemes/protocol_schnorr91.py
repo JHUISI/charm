@@ -1,4 +1,4 @@
-from charm.engine.protocol import *
+from charm.core.engine.protocol import *
 from charm.toolbox.ecgroup import ECGroup,G
 from socket import socket,AF_INET,SOCK_STREAM
 from charm.toolbox.eccurve import prime192v1

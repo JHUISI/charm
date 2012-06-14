@@ -12,12 +12,23 @@ Camenisch-Hohenberger-Pedersen - Identity-based Signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from charm.toolbox.pairinggroup import PairingGroup,G1,G2,GT,ZR,pair
+from charm.toolbox.pairinggroup import G1,G2,ZR,pair
 from charm.toolbox.PKSig import PKSig
 
 debug = False
 
 class CHP(PKSig):
+    """
+    >>> from charm.toolbox.pairinggroup import PairingGroup   
+    >>> group = PairingGroup('SS512')
+    >>> chp = CHP(group)
+    >>> master_public_key = chp.setup()
+    >>> (public_key, secret_key) = chp.keygen(master_public_key) 
+    >>> msg = { 't1':'time_1', 't2':'time_2', 't3':'time_3', 'str':'this is the message'}
+    >>> signature = chp.sign(public_key, secret_key, msg)
+    >>> chp.verify(master_public_key, public_key, msg, signature)
+    True
+    """
     def __init__(self, groupObj):
         global group, H
         group = groupObj
@@ -50,28 +61,3 @@ class CHP(PKSig):
             return True
         return False
 
-def main():
-   
-   groupObj = PairingGroup('SS512')
-   chp = CHP(groupObj)
-   mpk = chp.setup()
-
-   (pk, sk) = chp.keygen(mpk) 
-   if debug: 
-    print("Keygen...")
-    print("pk =>", pk)
-    print("sk =>", sk)
-  
-   M = { 't1':'time_1', 't2':'time_2', 't3':'time_3', 'str':'this is the message'}
-   sig = chp.sign(pk, sk, M)
-   if debug:
-    print("Signature...")
-    print("sig =>", sig)
-
-   assert chp.verify(mpk, pk, M, sig), "invalid signature!"
-   if debug: print("Verification successful!")
-
-if __name__ == "__main__":
-    debug = True
-    main()
-   

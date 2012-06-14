@@ -13,13 +13,38 @@ Pascal Paillier (Public-Key)
 :Date:            4/2011
 '''
 #from charm.integer import *
-from charm.toolbox.integergroup import RSAGroup,lcm,integer
+from charm.toolbox.integergroup import lcm,integer
 from charm.toolbox.PKEnc import PKEnc
 from charm.core.engine.util import *
 
 debug = False
 """A ciphertext class with homomorphic properties"""
 class Ciphertext(dict):
+    """
+    This tests the additively holomorphic properties of 
+    the Paillier encryption scheme.
+
+    >>> from charm.toolbox.integergroup import RSAGroup
+    >>> group = RSAGroup()
+    >>> pai = Pai99(group)
+    >>> (public_key, secret_key) = pai.keygen()
+
+    >>> msg_1=12345678987654321
+    >>> msg_2=12345761234123409
+    >>> msg_3 = msg_1 + msg_2
+    
+    >>> msg_1 = pai.encode(public_key['n'], msg_1)
+    >>> msg_2 = pai.encode(public_key['n'], msg_2)
+    >>> msg_3 = pai.encode(public_key['n'], msg_3) 
+    
+    >>> cipher_1 = pai.encrypt(public_key, msg_1)
+    >>> cipher_2 = pai.encrypt(public_key, msg_2)
+    >>> cipher_3 = cipher_1 + cipher_2
+    
+    >>> decrypted_msg_3 = pai.decrypt(public_key, secret_key, cipher_3)
+    >>> decrypted_msg_3 == msg_3
+    True
+    """
     def __init__(self, ct, pk, key):
         dict.__init__(self, ct)
         self.pk, self.key = pk, key
@@ -85,42 +110,3 @@ class Pai99(PKEnc):
     def decode(self, pk, element):
         pass
 
-def main():
-    group = RSAGroup()
-    pai = Pai99(group)
-        
-    (pk, sk) = pai.keygen()
-    
-    m1 = pai.encode(pk['n'], 12345678987654321)
-    m2 = pai.encode(pk['n'], 12345761234123409)
-    m3 = pai.encode(pk['n'], 24691440221777730) # target
-    c1 = pai.encrypt(pk, m1)
-    c2 = pai.encrypt(pk, m2)
-        
-    if debug: print("c1 =>", c1, "\n")
-    if debug: print("c2 =>", c2, "\n")
-    c3 = c1 + c2
-    if debug: print("Homomorphic Add Test...\nc1 + c2 =>", c3, "\n")
-            
-    orig_m = pai.decrypt(pk, sk, c3)
-    if debug: print("orig_m =>", orig_m)
-    
-    # m3 = m1 + m2
-    assert m3 == orig_m, "FAILED Decryption!!!" 
-    if debug: print("Successful Decryption!")
-    
-    if debug: print("Homomorphic Mul Test...\n")
-    c4 = c1 + 200
-    if debug: print("c4 = c1 + 200 =>", c4, "\n")        
-    orig_m = pai.decrypt(pk, sk, c4)
-    if debug: print("m4 =>", orig_m, "\n")
-    
-    c5 = c2 * 20201
-    if debug: print("c5 = c2 * 2021 =>", c5, "\n")
-    orig_m = pai.decrypt(pk, sk, c5)
-    if debug: print("m5 =>", orig_m, "\n")
-    
-if __name__ == "__main__":
-    debug = True
-    main()
-    

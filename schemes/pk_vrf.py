@@ -13,11 +13,22 @@ Susan Hohenberger and Brent Waters (Pairing-based)
 :Authors:    J Ayo Akinyele
 :Date:       1/2012
 '''
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.pairinggroup import ZR,G1,G2,pair
 from charm.toolbox.iterate import dotprod 
 
 debug = False
 class VRF10:
+    """
+    >>> from charm.toolbox.pairinggroup import PairingGroup
+    >>> group = PairingGroup('MNT224')
+    >>> vrf = VRF10(group)
+    >>> statement = [0, 1, 1, 0, 1, 0, 1, 0]
+    >>> n = len(statement) 
+    >>> (public_key, secret_key) = vrf.setup(n)
+    >>> witness = vrf.prove(secret_key, statement)
+    >>> vrf.verify(public_key, statement, witness)
+    True
+    """
     """Definition in paper: behave as Pseudo Random Functions (PRFs) with an additional property that party
     holding the seed will publish a commitment to the function and is able to non-interactively convince
     a verifier that a given evaluation is correct (matches pub commitment) without sacrificing pseudo-
@@ -84,28 +95,3 @@ class VRF10:
         else:
             return False
         
-def main():
-    grp = PairingGroup('MNT224')
-    
-    # bits
-    x1 = [0, 1, 1, 0, 1, 0, 1, 0]
-#    x2 = [1, 1, 1, 0, 1, 0, 1, 0]
-    # block of bits
-    n = 8 
-    
-    vrf = VRF10(grp)
-    
-    # setup the VRF to accept input blocks of 8-bits 
-    (pk, sk) = vrf.setup(n)
-    
-    # generate proof over block x (using sk)
-    st = vrf.prove(sk, x1)
-    
-    # verify bits using pk and proof
-    assert vrf.verify(pk, x1, st), "VRF failed verification"
-#    assert vrf.verify(pk, x2, st), "VRF should FAIL verification!!!"
-    
-if __name__ == "__main__":
-    debug = True
-    main()
-    

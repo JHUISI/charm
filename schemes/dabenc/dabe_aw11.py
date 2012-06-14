@@ -18,10 +18,28 @@ from charm.toolbox.ABEncMultiAuth import *
 
 debug = False
 class Dabe(ABEncMultiAuth):
-    '''
+    """
     Decentralized Attribute-Based Encryption by Lewko and Waters
-    '''
 
+    >>> group = PairingGroup('SS512')
+    >>> dabe = Dabe(group)
+    >>> public_parameters = dabe.setup()
+
+    #Setup an authority
+    >>> auth_attrs= ['ONE', 'TWO', 'THREE', 'FOUR']
+    >>> (master_secret_key, master_public_key) = dabe.authsetup(public_parameters, auth_attrs)
+
+    #Setup a user and give him some keys
+    >>> ID, secret_keys = "bob", {}
+    >>> usr_attrs = ['THREE', 'ONE', 'TWO']
+    >>> for i in usr_attrs: dabe.keygen(public_parameters, master_secret_key, i, ID, secret_keys)
+    >>> msg = group.random(GT)
+    >>> policy = '((one or three) and (TWO or FOUR))'
+    >>> cipher_text = dabe.encrypt(master_public_key, public_parameters, msg, policy)
+    >>> decrypted_msg = dabe.decrypt(public_parameters, secret_keys, cipher_text)
+    >>> decrypted_msg == msg
+    True
+    """
     def __init__(self, groupObj):
         ABEncMultiAuth.__init__(self)
         global util, group
@@ -141,40 +159,3 @@ class Dabe(ABEncMultiAuth):
 
         return ct['C0'] / egg_s
 
-def main():
-    groupObj = PairingGroup('SS512')
-
-    dabe = Dabe(groupObj)
-    GP = dabe.setup()
-
-    #Setup an authority
-    auth_attrs= ['ONE', 'TWO', 'THREE', 'FOUR']
-    (SK, PK) = dabe.authsetup(GP, auth_attrs)
-    if debug: print("Authority SK")
-    if debug: print(SK)
-
-    #Setup a user and give him some keys
-    gid, K = "bob", {}
-    usr_attrs = ['THREE', 'ONE', 'TWO']
-    for i in usr_attrs: dabe.keygen(GP, SK, i, gid, K)
-    if debug: print('User credential list: %s' % usr_attrs)    
-    if debug: print("\nSecret key:")
-    if debug: groupObj.debug(K)
-
-    #Encrypt a random element in GT
-    m = groupObj.random(GT)
-    policy = '((one or three) and (TWO or FOUR))'
-    if debug: print('Acces Policy: %s' % policy)
-    CT = dabe.encrypt(PK, GP, m, policy)
-    if debug: print("\nCiphertext...")
-    if debug: groupObj.debug(CT)    
-    
-    orig_m = dabe.decrypt(GP, K, CT)
-   
-    assert m == orig_m, 'FAILED Decryption!!!' 
-    if debug: print('Successful Decryption!')
-
-if __name__ == '__main__':
-    debug = True
-    main()
-             

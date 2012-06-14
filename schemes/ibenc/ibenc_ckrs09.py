@@ -14,7 +14,7 @@ Authorised Private Searches on Public Key Encrypted Data".
 :Authors:    J Ayo Akinyele/Mike Rushanan
 :Date:       02/2012
 '''
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.pairinggroup import ZR,G1,G2,pair
 from charm.toolbox.IBEnc import IBEnc
 from charm.toolbox.conversion import Conversion
 from charm.toolbox.bitstring import Bytes
@@ -23,6 +23,19 @@ import hashlib
 
 debug = False
 class IBE_CKRS(IBEnc):
+    """
+    >>> from charm.toolbox.pairinggroup import PairingGroup, GT
+    >>> group = PairingGroup('SS512')
+    >>> ibe = IBE_CKRS(group)
+    >>> (master_public_key, master_secret_key) = ibe.setup()
+    >>> ID = "bob@mail.com"
+    >>> secret_key = ibe.extract(master_public_key, master_secret_key, ID)
+    >>> msg = group.random(GT)
+    >>> cipher_text = ibe.encrypt(master_public_key, ID, msg)
+    >>> decrypted_msg = ibe.decrypt(master_public_key, secret_key, cipher_text)
+    >>> decrypted_msg == msg 
+    True
+    """
     def __init__(self, groupObj):
         global group,hashObj
         group = groupObj
@@ -97,24 +110,3 @@ class IBE_CKRS(IBEnc):
         msg = ct['c_prime'] * pair(c[0], d[0]) * pair(c[1], d[1]) * pair(c[2], d[2]) * pair(c[3], d[3]) * pair(c[4], d[4])        
         return msg
     
-def main():
-    groupObj = PairingGroup('SS512')
-    ibe = IBE_CKRS(groupObj)
-    (mpk, msk) = ibe.setup()
-
-    # represents public identity
-    ID = "bob@mail.com"
-    sk = ibe.extract(mpk, msk, ID)
-
-    M = groupObj.random(GT)
-    ct = ibe.encrypt(mpk, ID, M)
-    m = ibe.decrypt(mpk, sk, ct)
-    if debug: print('m    =>', m)
-
-    assert m == M, "FAILED Decryption!"
-    if debug: print("Successful Decryption!!! m => '%s'" % m)
-    
-    
-if __name__ == "__main__":
-    debug = True
-    main()

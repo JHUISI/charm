@@ -11,8 +11,8 @@ from schemes.pkenc.pkenc_elgamal85 import ElGamal
 from schemes.pkenc.pkenc_paillier99 import Pai99
 from schemes.pkenc.pkenc_rabin import Rabin_Enc, Rabin_Sig
 from schemes.pkenc.pkenc_rsa import RSA_Enc, RSA_Sig
-from charm.toolbox.pairinggroup import PairingGroup, GT, ZR
-from charm.toolbox.ecgroup import ECGroup, elliptic_curve
+from charm.toolbox.pairinggroup import PairingGroup, GT 
+from charm.toolbox.ecgroup import elliptic_curve
 from charm.toolbox.eccurve import prime192v1, prime192v2
 from charm.toolbox.integergroup import RSAGroup, integer
 import unittest
@@ -41,9 +41,9 @@ class BCHKIBEncTest(unittest.TestCase):
             print("C2 =>", ct['C2'])
             print("tag =>", ct['tag'])
 
-        orig_msg = hyb_ibe.decrypt(pk, sk, ct)
-        assert orig_msg == msg
-        if debug: print("Successful Decryption!!! =>", orig_msg)
+        decrypted_msg = hyb_ibe.decrypt(pk, sk, ct)
+        assert decrypted_msg == msg
+        if debug: print("Successful Decryption!!! =>", decrypted_msg)
         del groupObj
 
 class CHK04Test(unittest.TestCase):

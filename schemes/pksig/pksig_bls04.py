@@ -17,6 +17,15 @@ from charm.core.engine.util import *
 
 debug = False
 class IBSig():
+    """
+    >>> group = PairingGroup('MNT224')
+    >>> messages = { 'a':"hello world!!!" , 'b':"test message" }
+    >>> ib = IBSig(group)
+    >>> (public_key, secret_key) = ib.keygen(0)
+    >>> signature = ib.sign(secret_key['x'], messages)
+    >>> ib.verify(public_key, signature, messages) 
+    True
+    """
     def __init__(self, groupObj):
         global group
         group = groupObj
@@ -44,22 +53,3 @@ class IBSig():
             return True  
         return False 
 
-def main():
-    groupObj = PairingGroup('MNT224')
-    
-    m = { 'a':"hello world!!!" , 'b':"test message" }
-    bls = IBSig(groupObj)
-    
-    (pk, sk) = bls.keygen(0)
-    
-    sig = bls.sign(sk['x'], m)
-    
-    if debug: print("Message: '%s'" % m)
-    if debug: print("Signature: '%s'" % sig)     
-    assert bls.verify(pk, sig, m), "Failure!!!"
-    if debug: print('SUCCESS!!!')
-    
-if __name__ == "__main__":
-    debug = True
-    main()
-    

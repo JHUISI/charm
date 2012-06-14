@@ -18,6 +18,17 @@ from charm.toolbox.PKSig import PKSig
 debug = False
 
 class CHCH(PKSig):
+    """
+    >>> group = PairingGroup('SS512')
+    >>> chch = CHCH(group)
+    >>> (master_public_key, master_secret_key) = chch.setup()
+    >>> ID = "janedoe@email.com"
+    >>> (public_key, secret_key) = chch.keygen(master_secret_key, ID)  
+    >>> msg = "this is a message!" 
+    >>> signature = chch.sign(public_key, secret_key, msg)
+    >>> chch.verify(master_public_key, public_key, msg, signature)
+    True
+    """
     def __init__(self, groupObj):
         global group,H1,H2
         group = groupObj
@@ -53,28 +64,3 @@ class CHCH(PKSig):
             return True
         return False
 
-def main():
-   groupObj = PairingGroup('SS512')
-   chch = CHCH(groupObj)
-   (mpk, msk) = chch.setup()
-
-   _id = "janedoe@email.com"
-   (pk, sk) = chch.keygen(msk, _id)  
-   if debug:
-    print("Keygen...")
-    print("pk =>", pk)
-    print("sk =>", sk)
- 
-   M = "this is a message!" 
-   sig = chch.sign(pk, sk, M)
-   if debug:
-    print("Signature...")
-    print("sig =>", sig)
-
-   assert chch.verify(mpk, pk, M, sig), "invalid signature!"
-   if debug: print("Verification successful!")
-
-if __name__ == "__main__":
-    debug = True
-    main()
-   

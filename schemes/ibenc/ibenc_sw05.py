@@ -13,15 +13,31 @@ Sahai-Waters Fuzzy Identity-Based Encryption, Original Construction
 :Date:       10/2011
 '''
 
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.pairinggroup import ZR,G1,pair
 from charm.core.crypto.cryptobase import *
 from charm.toolbox.IBEnc import IBEnc
-from charm.core.math.pairing import hash as sha1
+#from charm.core.math.pairing import hash as sha1
 from charm.toolbox.secretshare import *
-import sys
+#import sys
 
 debug = False
 class IBE_SW05(IBEnc):    
+    """
+    >>> from charm.toolbox.pairinggroup import PairingGroup,GT
+    >>> group = PairingGroup('SS512')
+    >>> max_attributes = 6
+    >>> required_overlap = 4
+    >>> ibe = IBE_SW05_LUC(group)
+    >>> (master_public_key, master_key) = ibe.setup(max_attributes, required_overlap)
+    >>> private_identity = ['insurance', 'id=2345', 'oncology', 'doctor', 'nurse', 'JHU'] #private identity
+    >>> public_identity = ['insurance', 'id=2345', 'doctor', 'oncology', 'JHU', 'billing', 'misc'] #public identity for encrypt
+    >>> (pub_ID_hashed, secret_key) = ibe.extract(master_key, private_identity, master_public_key, required_overlap, max_attributes)
+    >>> msg = group.random(GT)
+    >>> cipher_text = ibe.encrypt(master_public_key, public_identity, msg, max_attributes)
+    >>> decrypted_msg = ibe.decrypt(master_public_key, secret_key, cipher_text, pub_ID_hashed, required_overlap)
+    >>> msg == decrypted_msg
+    True
+    """
     def __init__(self, groupObj):
         IBEnc.__init__(self)
         global group, H, util
@@ -216,33 +232,3 @@ class IBE_SW05_LUC(IBEnc):
             prod *= (pair(sk['d'][i], CT['E'][i]) / pair(sk['D'][i], CT['Eprimeprime'])) ** coeffs[i]
             
         return CT['Eprime'] * prod
-
-
- 
-        
-def main():
-    # initialize the element object so that object references have global scope
-    groupObj = PairingGroup('SS512')
-    n = 6; d = 4
-    ibe = IBE_SW05_LUC(groupObj)
-    (pk, mk) = ibe.setup(n, d)
-    if debug:
-        print("Parameter Setup...")
-        print("pk =>", pk)
-        print("mk =>", mk)
-
-    w = ['insurance', 'id=2345', 'oncology', 'doctor', 'nurse', 'JHU'] #private identity
-    wPrime = ['insurance', 'id=2345', 'doctor', 'oncology', 'JHU', 'billing', 'misc'] #public identity for encrypt
-
-    (w_hashed, sk) = ibe.extract(mk, w, pk, d, n)
-
-    M = groupObj.random(GT)
-    cipher = ibe.encrypt(pk, wPrime, M, n)
-    m = ibe.decrypt(pk, sk, cipher, w_hashed, d)
-
-    assert m == M, "FAILED Decryption: \nrecovered m = %s and original m = %s" % (m, M)
-    if debug: print("Successful Decryption!! M => '%s'" % m)
-                
-if __name__ == '__main__':
-    debug = True
-    main()

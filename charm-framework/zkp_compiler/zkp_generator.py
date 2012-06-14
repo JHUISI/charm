@@ -4,8 +4,8 @@
 
 from pyparsing import *
 from zkparser import *
-from charm.engine.protocol import *
-from charm.engine.util import *
+from charm.core.engine.protocol import *
+from charm.core.engine.util import *
 from charm.pairing import *
 
 int_default = True

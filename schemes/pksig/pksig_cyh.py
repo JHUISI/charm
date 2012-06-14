@@ -12,13 +12,28 @@ Chow-Yiu-Hui - Identity-based ring signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from charm.toolbox.pairinggroup import PairingGroup,G1,G2,GT,ZR,pair
+from charm.toolbox.pairinggroup import G1,G2,ZR,pair
 from charm.toolbox.PKSig import PKSig
 from charm.toolbox.iterate import dotprod
 
 debug = False
 
 class CYH(PKSig):
+    """
+
+    >>> from charm.toolbox.pairinggroup import PairingGroup
+    >>> users = [ "alice", "bob", "carlos", "dexter", "eddie"] 
+    >>> signer = "bob"
+    >>> group = PairingGroup('SS512')
+    >>> cyh = CYH(group)
+    >>> (master_public_key, master_secret_key) = cyh.setup()
+    >>> (signer, public_key, secret_key) = cyh.keygen(master_secret_key, signer)  
+    >>> secret_key = (signer, public_key, secret_key)
+    >>> msg = 'please sign this new message!'
+    >>> signature = cyh.sign(secret_key, users, msg)
+    >>> cyh.verify(master_public_key, users, msg, signature)
+    True
+    """
     def __init__(self, groupObj):
         global group
         group = groupObj
@@ -82,29 +97,4 @@ class CYH(PKSig):
             return True
         return False
 
-def main():
-   L = [ "alice", "bob", "carlos", "dexter", "eddie"] 
-   ID = "bob"
-   groupObj = PairingGroup('SS512')
-   cyh = CYH(groupObj)
-   (mpk, msk) = cyh.setup()
 
-   (ID, Pk, Sk) = cyh.keygen(msk, ID)  
-   sk = (ID, Pk, Sk)
-   if debug:
-    print("Keygen...")
-    print("sk =>", sk)
-  
-   M = 'please sign this new message!'
-   sig = cyh.sign(sk, L, M)
-   if debug:
-    print("Signature...")
-    print("sig =>", sig)
-
-   assert cyh.verify(mpk, L, M, sig), "invalid signature!"
-   if debug: print("Verification successful!")
-
-if __name__ == "__main__":
-    debug = True
-    main()
-   

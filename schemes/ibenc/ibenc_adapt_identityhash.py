@@ -1,9 +1,22 @@
-from schemes.ibenc.ibenc_bb03 import IBE_BB04
 from charm.toolbox.IBEnc import IBEnc
 from charm.toolbox.pairinggroup import *
 
 debug = False
 class HashIDAdapter(IBEnc):
+    """
+    >>> from schemes.ibenc.ibenc_bb03 import IBE_BB04
+    >>> group = PairingGroup('SS512')
+    >>> ibe = IBE_BB04(group)
+    >>> hashID = HashIDAdapter(ibe, group)
+    >>> (master_public_key, master_key) = hashID.setup()
+    >>> ID = 'waldoayo@email.com'
+    >>> secret_key = hashID.extract(master_key, ID)
+    >>> msg = group.random(GT)
+    >>> cipher_text = hashID.encrypt(master_public_key, ID, msg)
+    >>> decrypted_msg = hashID.decrypt(master_public_key, secret_key, cipher_text)
+    >>> msg == decrypted_msg
+    True
+    """
     def __init__(self, scheme, group):
         IBEnc.__init__(self)
         self.group = group
@@ -42,31 +55,3 @@ class HashIDAdapter(IBEnc):
         if not self.ibe_good: return IBEnc.decrypt(self, pk, sk, ct)
         return self.ibenc.decrypt(pk, sk, ct)
 
-def main():
-    group = PairingGroup('SS512')
-    
-    ibe = IBE_BB04(group)
-    
-    hashID = HashIDAdapter(ibe, group)
-    
-    (pk, mk) = hashID.setup()
-    
-    kID = 'waldoayo@email.com'
-    sk = hashID.extract(mk, kID)
-    if debug: print("Keygen for %s" % kID)
-    if debug: print(sk)
-    
-    m = group.random(GT)
-    ct = hashID.encrypt(pk, sk['id'], m)
-    
-    orig_m = hashID.decrypt(pk, sk, ct)
-    
-    assert m == orig_m
-    if debug: print("Successful Decryption!!!")
-    if debug: print("Result =>", orig_m)
-    
-if __name__ == "__main__":
-    debug = True
-    main()
-    
-        

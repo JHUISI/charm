@@ -10,19 +10,18 @@
 :Date:            09/2011
 '''
 
-from charm.core.math.integer import integer,isPrime,gcd,random,randomPrime
+from charm.core.math.integer import integer
 from charm.toolbox.PKEnc import PKEnc
 from charm.toolbox.PKSig import PKSig
-from charm.toolbox.paddingschemes import OAEPEncryptionPadding,PSSPadding,SAEPEncryptionPadding
+from charm.toolbox.paddingschemes import OAEPEncryptionPadding,SAEPEncryptionPadding
 from charm.toolbox.redundancyschemes import InMessageRedundancy
 from charm.toolbox.conversion import Conversion
 from charm.toolbox.bitstring import Bytes
 from charm.toolbox.specialprimes import BlumWilliamsInteger
-from math import ceil, floor
+from math import ceil 
 
 debug = False
 class Rabin():
-    '''Rabin Module'''
     def __init__(self, modulus=BlumWilliamsInteger()):
         self.modulustype = modulus
 
@@ -53,6 +52,15 @@ class Rabin():
         return (integer(N), integer(p), integer(q), integer(yp), integer(yq))
     
 class Rabin_Enc(Rabin,PKEnc):
+    """
+    >>> rabin = Rabin_Enc()
+    >>> (public_key, secret_key) = rabin.keygen(128, 1024)
+    >>> msg = b'This is a test'
+    >>> cipher_text = rabin.encrypt(public_key, msg)
+    >>> decrypted_msg = rabin.decrypt(public_key, secret_key, cipher_text)
+    >>> decrypted_msg == msg
+    True
+    """
     def __init__(self, padding=SAEPEncryptionPadding(), redundancy=InMessageRedundancy(), params=None):
         Rabin.__init__(self)
         PKEnc.__init__(self)
@@ -152,7 +160,17 @@ class Rabin_Enc(Rabin,PKEnc):
                    return message        
 
 class Rabin_Sig(Rabin, PKSig):
-    '''RSASSA-PSS'''
+    """
+    RSASSA-PSS
+
+    >>> msg = b'This is a test message.'
+    >>> rabin = Rabin_Sig()
+    >>> (public_key, secret_key) = rabin.keygen(1024)
+    >>> signature = rabin.sign(secret_key, msg)
+    >>> rabin.verify(public_key, msg, signature)
+    True
+    """
+
     def __init__(self, padding=OAEPEncryptionPadding()):
         Rabin.__init__(self)
         PKSig.__init__(self)
@@ -213,32 +231,4 @@ class Rabin_Sig(Rabin, PKSig):
 
         return (dec_mess == M)
     
-def main():
-    rabin = Rabin_Enc()
     
-    (pk, sk) = rabin.keygen(128, 1024)
-    
-    m = b'This is a test'
-    #m = 55
-    #m = b'A'
-    c = rabin.encrypt(pk, m)
-    if debug: print("ct =>", c)
-    
-    orig_m = rabin.decrypt(pk, sk, c)
-    if debug: print("recovered m =>", orig_m)
-
-    assert m == orig_m
-    if debug: print("Successful Decryption!!!")
-    
-def main2():
-    M = b'This is a test message.'
-    rabin = Rabin_Sig()
-    (pk, sk) = rabin.keygen(1024)
-    S = rabin.sign(sk, M)
-    assert rabin.verify(pk, M, S)
-    if debug: print("Successful Signature!")
-        
-if __name__ == "__main__":
-    debug = True
-    main()
-    main2()    

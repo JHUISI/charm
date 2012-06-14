@@ -12,7 +12,7 @@ Boneh-Boyen Hierarchical Identity Based Encryption
 :Authors:    J Ayo Akinyele
 :Date:       3/2012
 '''
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.pairinggroup import ZR,G1,G2,pair
 from charm.toolbox.conversion import Conversion
 from charm.toolbox.bitstring import Bytes
 from charm.toolbox.iterate import dotprod2
@@ -20,6 +20,20 @@ import hashlib
 
 debug = False
 class HIBE_BB04:
+    """
+    >>> from charm.toolbox.pairinggroup import PairingGroup, GT
+    >>> group = PairingGroup('SS512')
+    >>> hibe = HIBE_BB04(group)
+    >>> (master_public_key, master_key) = hibe.setup()
+    >>> ID = "bob@mail.com"
+    >>> (public_key, secret_key) = hibe.extract(3, master_public_key, master_key, ID)
+    >>> msg = group.random(GT)
+    >>> cipher_text = hibe.encrypt(master_public_key, public_key, msg)
+    >>> decrypted_msg = hibe.decrypt(public_key, secret_key, cipher_text)
+    >>> decrypted_msg == msg 
+    True
+
+    """
     def __init__(self, groupObj):
         global group
         group = groupObj
@@ -102,25 +116,3 @@ class HIBE_BB04:
         M = ct['A'] * (prod_result / pair(ct['B'], sk['d0']))
         return M
 
-def main():
-    groupObj = PairingGroup('SS512')
-    hibe = HIBE_BB04(groupObj)
-    (mpk, mk) = hibe.setup()
-
-    # represents public identity
-    ID = "bob@mail.com"
-    (pk, sk) = hibe.extract(3, mpk, mk, ID)
-    # dID => pk, sk
-    if debug: print("ID:%s , sk:%s" % (pk, sk))
-    
-    M = groupObj.random(GT)
-    if debug: print("M :=", M)
-    ct = hibe.encrypt(mpk, pk, M)
-    
-    orig_M = hibe.decrypt(pk, sk, ct)
-    assert orig_M == M, "invalid decryption!!!!"
-    if debug: print("Successful DECRYPTION!!!")
- 
-if __name__ == "__main__":
-    debug = True
-    main()   

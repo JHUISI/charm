@@ -21,13 +21,24 @@ Notes:	This transform was first described by Boneh and Franklin but credited to 
 :Date:		05/2011
 '''
 
-from schemes.ibenc.ibenc_bb03 import IBE_BB04
 from charm.toolbox.PKSig import *
 from charm.toolbox.pairinggroup import *
 #from charm.toolbox.ibe_bb03 import *
 
 debug = False
 class Sig_Generic_ibetosig_Naor01(PKSig):
+    """
+    >>> from schemes.ibenc.ibenc_bb03 import IBE_BB04
+    >>> group = PairingGroup('MNT224')
+    >>> ibe = IBE_BB04(group)
+    >>> ibsig = Sig_Generic_ibetosig_Naor01(ibe, group)
+    >>> (master_public_key, master_secret_key) = ibsig.keygen()
+    >>> msg = group.random(ZR)
+    >>> signature = ibsig.sign(master_secret_key, msg)
+    >>> ibsig.verify(master_public_key, msg, signature) 
+    True
+    """
+    #TODO msg must be in Zp
     def __init__(self, ibe_scheme, groupObj):
         global ibe, group
         ibe = ibe_scheme
@@ -60,29 +71,5 @@ class Sig_Generic_ibetosig_Naor01(PKSig):
             return True
         else:
             return False
-def main():
-    groupObj = PairingGroup('MNT224')
-    
-    ibe = IBE_BB04(groupObj)
-    
-    ibsig = Sig_Generic_ibetosig_Naor01(ibe, groupObj)
 
-    (mpk, msk) = ibsig.keygen()
-    
-    #M = "I want a signature on this message!"
-    M = groupObj.random(ZR)
 
-    #TODO: M must be in Zp
-    sigma = ibsig.sign(msk, M)
-    if debug: print("\nMessage =>", M)
-    if debug: print("Sigma =>", sigma)
-    
-    assert ibsig.verify(mpk, M, sigma), "Failed Verification!!!"
-    if debug: print("Successful Verification!!!")
-    del groupObj
-
-if __name__ == "__main__":
-    debug = True
-    main()
-    
-    
