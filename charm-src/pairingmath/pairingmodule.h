@@ -20,6 +20,7 @@
 #define BenchmarkIdentifier 1
 #define MAX_LEN 2048
 #define HASH_LEN 20
+#define ID_LEN   4
 #define MAX_BENCH_OBJECTS	2
 // define element_types
 enum Group {ZR, G1, G2, GT, NONE_G};
@@ -73,6 +74,7 @@ typedef struct {
 	pbc_param_t p;
 	pairing_t pair_obj;
 	int safe;
+	uint8_t hash_id[ID_LEN+1];
 } Pairing;
 
 typedef struct {
@@ -219,5 +221,11 @@ void print_mpz(mpz_t x, int base);
 	if(check) {						     \
 	PyErr_SetString(ElementError, msg);	 \
 	return Py_BuildValue("i", code);	}
+
+#define IS_SAME_GROUP(a, b) \
+	if(strncmp((const char *) a->pairing->hash_id, (const char *) b->pairing->hash_id, ID_LEN) != 0) {	\
+		PyErr_SetString(ElementError, "mixing group elements from different curves.");	\
+		return NULL;	\
+	}
 
 #endif

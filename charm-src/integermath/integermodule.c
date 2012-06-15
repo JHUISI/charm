@@ -288,7 +288,10 @@ int Integer_init(Integer *self, PyObject *args, PyObject *kwds) {
 				mpz_set(self->m, mod1->e);
 			}
 			else if(_PyLong_Check(mod)) longObjToMPZ(self->m, mod);
-			else { EXIT_IF(TRUE, "invalid type for modulus"); }
+			else {
+				PyErr_SetString(IntegerError, "invalid type for modulus");
+				return -1;
+			}
 		}
 	}
 	else if(_PyLong_Check(num)) {
