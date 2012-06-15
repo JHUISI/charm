@@ -10,7 +10,7 @@
 :Date:            07/2011
 '''
 
-from charm.core.math.integer import integer,isPrime,gcd,random,randomPrime
+from charm.core.math.integer import integer,isPrime,gcd,random,randomPrime,toInt
 from charm.toolbox.PKEnc import PKEnc
 from charm.toolbox.PKSig import PKSig
 from charm.toolbox.paddingschemes import OAEPEncryptionPadding,PSSPadding

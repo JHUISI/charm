@@ -16,6 +16,7 @@ from charm.toolbox.pairinggroup import ZR,G1,G2,pair
 from charm.toolbox.iterate import dotprod
 from charm.toolbox.conversion import Conversion
 from charm.toolbox.bitstring import Bytes
+from toolbox.hash_module import Waters
 import hashlib
 
 debug = False

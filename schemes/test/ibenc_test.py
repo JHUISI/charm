@@ -8,6 +8,7 @@ from schemes.ibenc.ibenc_sw05 import IBE_SW05_LUC
 from schemes.ibenc.ibenc_waters05 import IBE_N04
 from schemes.ibenc.ibenc_waters09 import DSE09
 from charm.toolbox.pairinggroup import PairingGroup, GT, ZR
+from charm.toolbox.hash_module import Waters
 import unittest
 
 debug = False
@@ -28,7 +29,7 @@ class HybridIBEncTest(unittest.TestCase):
 
         msg = "Hello World My name is blah blah!!!! Word!"
         
-        ct = hyb_ibe.encrypt(pk, sk['id'], msg)
+        ct = hyb_ibe.encrypt(pk, kID, msg)
         if debug:
             print("Ciphertext")
             print("c1 =>", ct['c1'])
@@ -55,7 +56,7 @@ class HashIDAdapterTest(unittest.TestCase):
         if debug: print(sk)
         
         m = group.random(GT)
-        ct = hashID.encrypt(pk, sk['id'], m)
+        ct = hashID.encrypt(pk, kID, m)
         
         orig_m = hashID.decrypt(pk, sk, ct)
         

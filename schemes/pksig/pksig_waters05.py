@@ -15,16 +15,18 @@ from charm.toolbox.PKSig import *
 from charm.toolbox.bitstring import Bytes
 from charm.toolbox.conversion import Conversion
 from charm.toolbox.pairinggroup import *
+from charm.toolbox.hash_module import Waters
 import hashlib, math
 
 debug = False
 class IBE_N04_Sig(PKSig):
     """
     >>> group = PairingGroup('SS512')
+    >>> waters = Waters(group)
     >>> ibe = IBE_N04_Sig(group)
     >>> (public_key, secret_key) = ibe.keygen()
     >>> ID = "bob@mail.com"
-    >>> msg = ibe.stringtoidentity(public_key, ID)    
+    >>> msg = waters.hash("This is a test.")    
     >>> signature = ibe.sign(public_key, secret_key, msg)
     >>> ibe.verify(public_key, msg, signature)
     True

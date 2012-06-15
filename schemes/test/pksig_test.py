@@ -20,6 +20,7 @@ from charm.toolbox.pairinggroup import PairingGroup, ZR
 from charm.toolbox.ecgroup import ECGroup
 from charm.toolbox.eccurve import prime192v2
 from charm.toolbox.integergroup import integer
+from charm.toolbox.hash_module import Waters
 import unittest
 import pytest
 debug = False

@@ -19,6 +19,7 @@ from charm.toolbox.IBEnc import IBEnc
 from charm.toolbox.conversion import Conversion
 from charm.toolbox.bitstring import Bytes
 from charm.toolbox.iterate import dotprod2
+from charm.toolbox.hash_module import Waters
 import hashlib
 
 debug = False

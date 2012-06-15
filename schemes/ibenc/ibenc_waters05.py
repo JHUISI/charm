@@ -15,16 +15,18 @@ from charm.toolbox.IBEnc import IBEnc
 from charm.toolbox.bitstring import Bytes
 from charm.toolbox.conversion import Conversion
 from charm.toolbox.pairinggroup import *
+from charm.toolbox.hash_module import Waters
 import hashlib, math
 
 debug = False
 class IBE_N04(IBEnc):
     """
     >>> group = PairingGroup('SS512')
+    >>> waters_hash = Waters(group)
     >>> ibe = IBE_N04(group)
     >>> (master_public_key, master_key) = ibe.setup()
     >>> ID = "bob@mail.com"
-    >>> kID = ibe.stringtoidentity(master_public_key, ID)
+    >>> kID = waters_hash.hash(ID)
     >>> secret_key = ibe.extract(master_key, kID)
     >>> msg = group.random(GT)
     >>> cipher_text = ibe.encrypt(master_public_key, kID, msg)
@@ -112,31 +114,3 @@ class IBE_N04(IBEnc):
             print("Dem:    =>", dem)
             
         return ct['c1'] *  num / dem
-
-    
-<<<<<<< HEAD
-def main():
-    # initialize the element object so that object references have global scope
-    groupObj = PairingGroup('SS512')
-    ibe = IBE_N04(groupObj)
-    (pk, mk) = ibe.setup()
-
-    # represents public identity
-    ID = "bob@mail.com"
-    kID = waters.hash(ID)
-    #if debug: print("Bob's key  =>", kID)
-    key = ibe.extract(mk, kID)
-
-    M = groupObj.random(GT)
-    cipher = ibe.encrypt(pk, kID, M)
-    m = ibe.decrypt(pk, key, cipher)
-    #print('m    =>', m)
-
-    assert m == M, "FAILED Decryption!"
-    #if debug: print("Successful Decryption!!! m => '%s'" % m)
-
-if __name__ == '__main__':
-    debug = True
-    main()
-=======
->>>>>>> change_package_structure

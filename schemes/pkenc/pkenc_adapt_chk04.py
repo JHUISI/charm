@@ -51,12 +51,10 @@ class CHK04(PKEnc):
         # Generate a random keypair for the OTS
         (svk, ssk) = ots.keygen(pk['secparam'])		
 
-        # get identity (element of ZR)
-        _id = group.hash(svk['identity'])
         # print("pub identity enc =>", _id)
 
         # Encrypt message with the IBE scheme under 'identity' vk
-        C = ibe.encrypt(pk['mpk'], _id, message)
+        C = ibe.encrypt(pk['mpk'],svk['identity'] , message)
         # Sign the resulting ciphertext with sk
         sigma = ots.sign(ssk['x'], C)
         return { 'vk' : svk, 'C' : C, 'sigma' : sigma }
