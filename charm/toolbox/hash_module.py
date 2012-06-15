@@ -55,8 +55,8 @@ Default - len=5 bits=32 ==> 160-bits total
 """
 class Waters:
     """
-    >>> from toolbox.pairinggroup import *
-    >>> from toolbox.hash_module import Waters
+    >>> from charm.toolbox.pairinggroup import *
+    >>> from charm.toolbox.hash_module import Waters
     >>> group = PairingGroup("SS512")
     >>> waters = Waters(group, length=5, bits=32)
     >>> a = waters.hash("user@email.com")

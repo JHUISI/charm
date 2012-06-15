@@ -74,7 +74,7 @@ if config != None:
    print("Config file:", config)
    opt = read_config(config)
 
-core_path = 'charm-framework/core/'
+core_path = 'charm/core/'
 math_path = core_path + 'math/'
 crypto_path = core_path + 'crypto/'
 utils_path = core_path + 'utilities/'
@@ -168,10 +168,6 @@ setup(name = 'Charm-Crypto',
     install_requires = ['setuptools',
                         'pyparsing >= 1.5.5'],
     tests_require=['pytest'],
-    # we inentionally store charm in a directory not named charm so that 
-    # running the python interpeter from the project directory imports the
-    # installed version and not the one in the project with out the binnaries.
-    package_dir = {'charm': 'charm-framework'}, 
 	packages = ['charm',
                     'charm.core',
                         'charm.core.crypto',
