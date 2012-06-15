@@ -494,6 +494,7 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 	int qbits = 0, rbits = 0;
 	size_t b_len = 0;
 	int seed = -1;
+	uint8_t hash_id[HASH_LEN+1];
 	
     static char *kwlist[] = {"file", "n", "qbits", "rbits", "short", "string", "seed", NULL};
 	
@@ -516,6 +517,9 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 		if(buf != NULL) {
 			debug("Initialized pairings type: '%s'\n", self->params);
 			self->param_buf = buf;
+			hash_to_bytes((uint8_t *) buf, strlen(buf), HASH_LEN, hash_id, HASH_FUNCTION_STRINGS);
+			strncpy((char *) pairing->hash_id, (char *) hash_id, ID_LEN);
+			printf_buffer_as_hex(pairing->hash_id, ID_LEN);
 		}
 	}
 	else if(param_buf2 && !n && !qbits && !rbits && !short_val) {
@@ -524,6 +528,11 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 		pairing = PyObject_New(Pairing, &PairingType);
 		pbc_param_init_set_buf(pairing->p, param_buf2, b_len);
 		pairing_init_pbc_param(pairing->pair_obj, pairing->p);
+		debug("hashing pairing parameters...\n");
+
+		hash_to_bytes((uint8_t *) param_buf2, b_len, HASH_LEN, hash_id, HASH_FUNCTION_STRINGS);
+		strncpy((char *) pairing->hash_id, (char *) hash_id, ID_LEN);
+		printf_buffer_as_hex(pairing->hash_id, ID_LEN);
 	}
 	else if (n && !(qbits || rbits)) {
 		// if n is provided, and qbits and rbits are not
@@ -553,6 +562,7 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 
 			pbc_param_init_a1_gen(pairing->p, n_val);
 			mpz_clear(n_val);
+			// TODO: add hash_id to these calls
 		}
 		pairing_init_pbc_param(pairing->pair_obj, pairing->p);
 	}
@@ -565,6 +575,7 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 		else
 			pbc_param_init_a_gen(pairing->p, rbits, qbits);
 		pairing_init_pbc_param(pairing->pair_obj, pairing->p);
+		// TODO: add hash_id to these calls
 	}
 	// figure out how to expose func to find type d and g curves
 	else {
@@ -714,7 +725,7 @@ static PyObject *Element_add(Element *self, Element *other)
 		element_printf("Right: e => '%B'\n", other->e);				
 	}
 #endif
-
+	IS_SAME_GROUP(self, other);
 	EXIT_IF(add_rule(self->element_type, other->element_type) == FALSE, "invalid add operation.");
 	// start micro benchmark
 	START_CLOCK(dBench);
@@ -739,7 +750,7 @@ static PyObject *Element_sub(Element *self, Element *other)
 		element_printf("Right: e => '%B'\n", other->e);				
 	}
 #endif
-	
+	IS_SAME_GROUP(self, other);
 	EXIT_IF(sub_rule(self->element_type, other->element_type) == FALSE, "invalid sub operation.");
 
 	START_CLOCK(dBench);
@@ -796,6 +807,7 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 	}
 	else if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
 		// both are element types
+		IS_SAME_GROUP(self, other);
 		EXIT_IF(mul_rule(self->element_type, other->element_type) == FALSE, "invalid mul operation.");
 
 		if(self->element_type != ZR && other->element_type == ZR) {
@@ -881,6 +893,7 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 	}
 	else if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
 		// both are element types
+		IS_SAME_GROUP(self, other);
 		EXIT_IF(div_rule(self->element_type, other->element_type) == FALSE, "invalid div operation.");
 
 		START_CLOCK(dBench);
@@ -991,6 +1004,7 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		debug_e("LHS: e => '%B'\n", lhs_o1->e);
 		debug_e("RHS: e => '%B'\n", rhs_o2->e);
 
+		IS_SAME_GROUP(lhs_o1, rhs_o2);
 		EXIT_IF(exp_rule(lhs_o1->element_type, rhs_o2->element_type) == FALSE, "invalid exp operation");
 		if(rhs_o2->element_type == ZR) {
 			// element_pow_zn(newObject->e, lhs_o1->e, rhs_o1->e);
@@ -1028,11 +1042,6 @@ static PyObject *Element_set(Element *self, PyObject *args)
     // char *str = NULL;
     int errcode = TRUE;
 
-//    if(self->elem_initialized == FALSE) {
-//    	PyErr_SetString(ElementError, "must initialize element to a field (G1,G2,GT, or Zr)");
-//    	errcode = FALSE;
-//    	return Py_BuildValue("i", errcode);
-//    }
     EXITCODE_IF(self->elem_initialized == FALSE, "must initialize element to a field (G1,G2,GT, or Zr)", FALSE);
 
     debug("Creating a new element\n");
@@ -1154,6 +1163,7 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 
 		lhs = (Element *) lhs2;
 		rhs = (Element *) rhs2;
+		IS_SAME_GROUP(lhs, rhs);
 		if(pairing_is_symmetric(lhs->pairing->pair_obj)) {
 
 			debug("Pairing is symmetric.\n");
@@ -1391,11 +1401,12 @@ static PyObject *Element_equals(PyObject *lhs, PyObject *rhs, int opid) {
 	signed long int z;
 	int found_int = FALSE, result = -1; // , value;
 
-	if(opid != Py_EQ && opid != Py_NE) {
-		PyErr_SetString(ElementError, "only comparison supported is '==' or '!='");
-		goto cleanup;
-	}
+//	if(opid != Py_EQ && opid != Py_NE) {
+//		PyErr_SetString(ElementError, "only comparison supported is '==' or '!='");
+//		goto cleanup;
+//	}
 
+	EXIT_IF(opid != Py_EQ && opid != Py_NE, "comparison supported: '==' or '!='");
 	// check type of lhs
 	if(PyElement_Check(lhs)) {
 		self = (Element *) lhs;
@@ -1439,6 +1450,7 @@ static PyObject *Element_equals(PyObject *lhs, PyObject *rhs, int opid) {
 	}
 	else if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
 		// lhs and rhs are both elements
+		IS_SAME_GROUP(self, other);
 		if(self->elem_initialized && other->elem_initialized) {
 			result = element_cmp(self->e, other->e);
 		}
