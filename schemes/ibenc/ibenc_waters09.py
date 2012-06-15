@@ -12,11 +12,24 @@ Brent Waters (Pairing-based)
 :Authors:    J Ayo Akinyele
 :Date:       03/2012
 '''
-from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-from toolbox.IBEnc import *
+from charm.toolbox.pairinggroup import ZR,G1,pair
+from charm.toolbox.IBEnc import *
 
 debug = False
 class DSE09(IBEnc):
+    """
+    >>> from charm.toolbox.pairinggroup import PairingGroup, GT
+    >>> group = PairingGroup('SS512')
+    >>> ibe = DSE09(group)
+    >>> ID = "user2@email.com"
+    >>> (master_public_key, master_secret_key) = ibe.setup()
+    >>> secret_key = ibe.keygen(master_public_key, master_secret_key, ID)
+    >>> msg = group.random(GT)    
+    >>> cipher_text = ibe.encrypt(master_public_key, msg, ID)
+    >>> decrypted_msg = ibe.decrypt(cipher_text, secret_key)
+    >>> decrypted_msg == msg
+    True
+    """
     def __init__(self, groupObj):
         IBEnc.__init__(self)
         global group, util
@@ -85,25 +98,3 @@ class DSE09(IBEnc):
         A4 = (pair(E1, D[7]) / pair(E2, K)) ** tag
         return C[0] / (A3 / A4) 
 
-def main():
-    grp = PairingGroup('SS512')
-    
-    ibe = DSE09(grp)
-    
-    ID = "user2@email.com"
-    (mpk, msk) = ibe.setup()
-    
-    sk = ibe.keygen(mpk, msk, ID)
-    if debug: print("Keygen...\nsk :=", sk)
-    
-    M = grp.random(GT)    
-    ct = ibe.encrypt(mpk, M, ID)
-    if debug: print("Ciphertext...\nct :=", ct)
-    
-    m = ibe.decrypt(ct, sk)
-    assert M == m, "Decryption FAILED!"
-    if debug: print("Successful Decryption!!!")
-
-if __name__ == "__main__":
-    debug = True
-    main()

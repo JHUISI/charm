@@ -10,15 +10,25 @@
 :Date:			06/2011
 ''' 
 
-from charm.cryptobase import *
-from toolbox.PKSig import PKSig
-from toolbox.pairinggroup import *
-from toolbox.hash_module import Waters
-from charm.engine import util
-import math
+from charm.core.crypto.cryptobase import *
+from charm.toolbox.PKSig import *
+from charm.toolbox.bitstring import Bytes
+from charm.toolbox.conversion import Conversion
+from charm.toolbox.pairinggroup import *
+import hashlib, math
 
 debug = False
 class IBE_N04_Sig(PKSig):
+    """
+    >>> group = PairingGroup('SS512')
+    >>> ibe = IBE_N04_Sig(group)
+    >>> (public_key, secret_key) = ibe.keygen()
+    >>> ID = "bob@mail.com"
+    >>> msg = ibe.stringtoidentity(public_key, ID)    
+    >>> signature = ibe.sign(public_key, secret_key, msg)
+    >>> ibe.verify(public_key, msg, signature)
+    True
+    """
     """Implementation of David Naccahe Identity Based Encryption"""
     def __init__(self, groupObj):
         PKSig.__init__(self)
@@ -79,25 +89,3 @@ class IBE_N04_Sig(PKSig):
         return pk['egg'] == num / dem
 
     
-def main():
-    # initialize the element object so that object references have global scope
-    groupObj = PairingGroup('SS512')
-    ibe = IBE_N04_Sig(groupObj)
-    (pk, sk) = ibe.keygen()
-
-    # represents public identity
-    M = "bob@mail.com"
-
-    msg = waters.hash(M)    
-    sig = ibe.sign(pk, sk, msg)
-    if debug: 
-        print("original msg => '%s'" % M)
-        print("msg => '%s'" % msg)
-        print("sig => '%s'" % sig)
-    
-    assert ibe.verify(pk, msg, sig), "Failed verification!"
-    if debug: print("Successful Verification!!! msg => '%s'" % msg)
-
-if __name__ == '__main__':
-    debug = True
-    main()

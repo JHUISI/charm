@@ -12,12 +12,21 @@ Digital Signature Algorithm (DSA)
 :Authors:    J. Ayo Akinyele
 :Date:       5/2011
 """
-from toolbox.ecgroup import *
-from toolbox.PKSig import PKSig
-from toolbox.eccurve import prime192v2
+from charm.toolbox.ecgroup import *
+from charm.toolbox.PKSig import PKSig
 
 debug = False
 class ECDSA(PKSig):
+    """
+    >>> from charm.toolbox.eccurve import prime192v2
+    >>> group = ECGroup(prime192v2)
+    >>> ecdsa = ECDSA(group)
+    >>> (public_key, secret_key) = ecdsa.keygen(0)
+    >>> msg = "hello world! this is a test message."
+    >>> signature = ecdsa.sign(public_key, secret_key, msg)
+    >>> ecdsa.verify(public_key, signature, msg)
+    True
+    """
     def __init__(self, groupObj):
         PKSig.__init__(self)
         global group
@@ -52,18 +61,4 @@ class ECDSA(PKSig):
             return True
         else:
             return False
-def main():
-    groupObj = ECGroup(prime192v2)
-    ecdsa = ECDSA(groupObj)
-    
-    (pk, sk) = ecdsa.keygen(0)
-    m = "hello world! this is a test message."
-
-    sig = ecdsa.sign(pk, sk, m)
-    assert ecdsa.verify(pk, sig, m), "Failed verification!"
-    if debug: print("Signature Verified!!!")
-    
-if __name__ == "__main__":
-    debug = True
-    main()
 

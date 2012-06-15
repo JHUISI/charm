@@ -10,16 +10,15 @@
 :Date:            07/2011
 '''
 
-from charm.integer import integer,isPrime,gcd,random,randomPrime,toInt
-from toolbox.PKEnc import PKEnc
-from toolbox.PKSig import PKSig
-from toolbox.paddingschemes import OAEPEncryptionPadding,PSSPadding
-from toolbox.conversion import Conversion
+from charm.core.math.integer import integer,isPrime,gcd,random,randomPrime
+from charm.toolbox.PKEnc import PKEnc
+from charm.toolbox.PKSig import PKSig
+from charm.toolbox.paddingschemes import OAEPEncryptionPadding,PSSPadding
+from charm.toolbox.conversion import Conversion
 from math import ceil
 
 debug = False
 class RSA():
-    '''RSA Module'''
     def __init__(self):
         pass
     # generate p,q and n
@@ -58,6 +57,15 @@ class RSA():
                 integer(p), integer(q))
     
 class RSA_Enc(RSA,PKEnc):
+    """
+    >>> rsa = RSA_Enc()
+    >>> (public_key, secret_key) = rsa.keygen(1024)
+    >>> msg = b'This is a test'
+    >>> cipher_text = rsa.encrypt(public_key, msg)
+    >>> decrypted_msg = rsa.decrypt(public_key, secret_key, cipher_text)
+    >>> decrypted_msg == msg
+    True
+    """
     def __init__(self, padding=OAEPEncryptionPadding(), params=None):
         RSA.__init__(self)
         PKEnc.__init__(self)
@@ -79,6 +87,14 @@ class RSA_Enc(RSA,PKEnc):
         return self.paddingscheme.decode(os)
     
 class RSA_Sig(RSA, PKSig):
+    """
+    >>> msg = b'This is a test message.'
+    >>> rsa = RSA_Sig()
+    >>> (public_key, secret_key) = rsa.keygen(1024)
+    >>> signature = rsa.sign(secret_key, msg)
+    >>> rsa.verify(public_key, msg, signature)
+    True
+    """
     '''RSASSA-PSS'''
     def __init__(self, padding=PSSPadding()):
         RSA.__init__(self)
@@ -129,30 +145,4 @@ class RSA_Sig(RSA, PKSig):
         return self.paddingscheme.verify(M, EM, modbits-1)
         
     
-def main():
-    rsa = RSA_Enc()
     
-    (pk, sk) = rsa.keygen(1024)
-    
-    m = b'This is a test'
-    c = rsa.encrypt(pk, m)
-    if debug: print("ct =>", c)
-    
-    orig_m = rsa.decrypt(pk, sk, c)
-    if debug: print("recovered m =>", orig_m)
-
-    assert m == orig_m
-    if debug: print("Successful Decryption!!!")
-    
-def main2():
-    M = b'This is a test message.'
-    rsa = RSA_Sig()
-    (pk, sk) = rsa.keygen(1024)
-    S = rsa.sign(sk, M)
-    assert rsa.verify(pk, M, S)
-    if debug: print("Successful Signature!")
-        
-if __name__ == "__main__":
-    debug = True
-    main()
-    main2()    

@@ -13,13 +13,30 @@ Xavier Boyen - Anonymous Ring Signatures
 :Date:       11/2011
 
 """
-from toolbox.pairinggroup import *
-from toolbox.PKSig import PKSig
+from charm.toolbox.pairinggroup import *
+from charm.toolbox.PKSig import PKSig
 
 debug = False
 
 # need RingSig
 class Boyen(PKSig):
+    """
+    >>> group = PairingGroup('MNT224')
+    >>> boyen = Boyen(group)
+    >>> master_public_key = boyen.setup()
+    >>> num_signers = 3
+    >>> keys = [ boyen.keygen(master_public_key) for i in range(num_signers)]     
+    >>> public_keys, secret_keys = {},{}
+    >>> for i in range(len(keys)):
+    ...     public_keys[ i+1 ] = keys[ i ][ 0 ]
+    ...     secret_keys[ i+1 ] = keys[ i ][ 1 ]
+    >>> signer = 3
+    >>> secret_key = secret_keys[signer] 
+    >>> msg = 'please sign this new message!'
+    >>> signature = boyen.sign(master_public_key, public_keys, secret_key, msg) 
+    >>> boyen.verify(master_public_key, public_keys, msg, signature) 
+    True
+    """
     def __init__(self, groupObj):
         global group
         group = groupObj
@@ -102,34 +119,3 @@ class Boyen(PKSig):
            return True
         return False
 
-def main():
-   groupObj = PairingGroup('MNT224')
-   #groupObj = PairingGroup(MNT160)
-   boyen = Boyen(groupObj)
-   mpk = boyen.setup()
-   if debug: print("Pub parameters")
-   if debug: print(mpk, "\n\n")
-   
-   num_signers = 3
-   L_keys = [ boyen.keygen(mpk) for i in range(num_signers)]     
-   L_pk = {}; L_sk = {}
-   for i in range(len(L_keys)):
-       L_pk[ i+1 ] = L_keys[ i ][ 0 ] # pk
-       L_sk[ i+1 ] = L_keys[ i ][ 1 ]
-
-   if debug: print("Keygen...")
-   if debug: print("sec keys =>", L_sk.keys(),"\n", L_sk) 
-
-   signer = 3
-   sk = L_sk[signer] 
-   M = 'please sign this new message!'
-   sig = boyen.sign(mpk, L_pk, sk, M)
-   if debug: print("\nSignature...")
-   if debug: print("sig =>", sig)
-
-   assert boyen.verify(mpk, L_pk, M, sig), "invalid signature!"
-   if debug: print("Verification successful!")
-
-if __name__ == "__main__":
-    debug = True
-    main()   

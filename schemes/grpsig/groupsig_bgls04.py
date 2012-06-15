@@ -12,11 +12,22 @@ Dan Boneh, Xavier Boyen, and Hovav Shacham
 :Authors:    J Ayo Akinyele
 :Date:           12/2010
 '''
-from toolbox.pairinggroup import *
-from toolbox.PKSig import PKSig
+from charm.toolbox.pairinggroup import *
+from charm.toolbox.PKSig import PKSig
 
 debug=False
 class ShortSig(PKSig):
+    """
+    >>> group = PairingGroup('MNT224')
+    >>> n = 3    # how manu users are in the group
+    >>> user = 1 # which user's key we will sign a message with
+    >>> shortSig = ShortSig(group)
+    >>> (global_public_key, global_master_secret_key, user_secret_keys) = shortSig.keygen(n)
+    >>> msg = 'Hello World this is a message!'
+    >>> signature = shortSig.sign(global_public_key, user_secret_keys[user], msg)
+    >>> shortSig.verify(global_public_key, msg, signature)
+    True
+    """
     def __init__(self, groupObj):
         PKSig.__init__(self)
         global group
@@ -94,33 +105,3 @@ class ShortSig(PKSig):
         A_prime = t3 / ((t1 ** xi1) * (t2 ** xi2))
         return A_prime
         
-def main():
-    groupObj = PairingGroup('MNT224')
-    n = 3    # how manu users in the group
-    user = 1 # which user's key to sign a message with
-    
-    sigTest = ShortSig(groupObj)
-    
-    (gpk, gmsk, gsk) = sigTest.keygen(n)
-
-    message = 'Hello World this is a message!'
-    if debug: print("\n\nSign the following M: '%s'" % (message))
-    
-    signature = sigTest.sign(gpk, gsk[user], message)
-    
-    result = sigTest.verify(gpk, message, signature)
-    #if result:
-    #    print("Verify signers identity...")
-    #    index = sigTest.open(gpk, gmsk, message, signature)
-    #    i = 0
-    #    while i < n:
-    #        if gsk[i][0] == index:
-    #            print('Found index of signer: %d' % i)
-    #            print('A = %s' % index)
-    #        i += 1
-    assert result, "Signature Failed"
-    if debug: print('Complete!')
-
-if __name__ == "__main__":
-    debug = True
-    main()

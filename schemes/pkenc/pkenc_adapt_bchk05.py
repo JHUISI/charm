@@ -8,16 +8,26 @@ Boneh-Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform
 :Author: Christina Garman
 :Date: 12/2011
 '''
-from charm.engine.util import *
-from toolbox.pairinggroup import *
-from charm.pairing import hash as sha1
+from charm.core.engine.util import pickleObject, serializeObject 
 import hmac, hashlib, math
-from toolbox.IBEnc import *
-from schemes.encap_bchk05 import *
-from schemes.ibenc.ibenc_bb03 import *
+from schemes.ibenc.ibenc_bb03 import IBEnc, ZR, GT, sha1
 
 debug = False
 class BCHKIBEnc(IBEnc):
+    """
+    >>> from schemes.encap_bchk05 import EncapBCHK 
+    >>> from schemes.ibenc.ibenc_bb03 import PairingGroup, IBE_BB04
+    >>> group = PairingGroup('SS512')
+    >>> ibe = IBE_BB04(group)
+    >>> encap = EncapBCHK()
+    >>> hyb_ibe = BCHKIBEnc(ibe, group, encap)
+    >>> (public_key, secret_key) = hyb_ibe.keygen()
+    >>> msg = "Hello World!"
+    >>> cipher_text = hyb_ibe.encrypt(public_key, msg)
+    >>> decrypted_msg = hyb_ibe.decrypt(public_key, secret_key, cipher_text)
+    >>> decrypted_msg == msg
+    True
+    """
     def str_XOR(self, m, k):
         output = ""
         for character in m:
@@ -93,32 +103,3 @@ class BCHKIBEnc(IBEnc):
         else:
             return b'FALSE'
    
-def main():
-    groupObj = PairingGroup('SS512')
-    ibe = IBE_BB04(groupObj)
-    encap = EncapBCHK()
-    
-    hyb_ibe = BCHKIBEnc(ibe, groupObj, encap)
-    
-    (pk, sk) = hyb_ibe.keygen()
-    if debug:
-        print("pk => ", pk)
-        print("sk => ", sk)
-
-    msg = "Hello World!"
-    
-    ct = hyb_ibe.encrypt(pk, msg)
-    if debug:
-        print("\nCiphertext")
-        print("C1 =>", ct['C1'])
-        print("C2 =>", ct['C2'])
-        print("tag =>", ct['tag'])
-
-    orig_msg = hyb_ibe.decrypt(pk, sk, ct)
-    assert orig_msg == msg
-    if debug: print("Successful Decryption!!! =>", orig_msg)
-    del groupObj
-
-if __name__ == "__main__":
-    debug = True
-    main()

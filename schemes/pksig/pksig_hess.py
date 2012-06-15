@@ -12,8 +12,8 @@ Hess - Identity-based Signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from toolbox.pairinggroup import PairingGroup,G1,G2,ZR,pair
-from toolbox.PKSig import PKSig
+from charm.toolbox.pairinggroup import G1,G2,ZR,pair
+from charm.toolbox.PKSig import PKSig
 #import gc
 #gc.disable()
 #gc.set_debug(gc.DEBUG_LEAK)
@@ -21,6 +21,18 @@ from toolbox.PKSig import PKSig
 debug = False
 
 class Hess(PKSig):
+    """
+    >>> from charm.toolbox.pairinggroup import PairingGroup
+    >>> group = PairingGroup('SS512')
+    >>> hess = Hess(group)
+    >>> (master_public_key, master_secret_key) = hess.setup()
+    >>> ID = "janedoe@email.com"
+    >>> (public_key, secret_key) = hess.keygen(master_secret_key, ID)
+    >>> msg = "this is a message!" 
+    >>> signature = hess.sign(master_public_key, secret_key, msg)
+    >>> hess.verify(master_public_key, public_key, msg, signature)
+    True
+    """
     def __init__(self, groupObj):
         global group,H1,H2
         group = groupObj
@@ -58,28 +70,4 @@ class Hess(PKSig):
             return True
         return False
 
-def main():
    
-   groupObj = PairingGroup('SS512')
-   chch = Hess(groupObj)
-   (mpk, msk) = chch.setup()
-
-   _id = "janedoe@email.com"
-   (pk, sk) = chch.keygen(msk, _id)
-   if debug:  
-    print("Keygen...")
-    print("pk =>", pk)
-    print("sk =>", sk)
- 
-   M = "this is a message!" 
-   sig = chch.sign(mpk, sk, M)
-   if debug:
-    print("Signature...")
-    print("sig =>", sig)
-
-   assert chch.verify(mpk, pk, M, sig), "invalid signature!"
-   if debug: print("Verification successful!")
-
-if __name__ == "__main__":
-    debug = True
-    main()

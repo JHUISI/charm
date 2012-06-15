@@ -12,12 +12,26 @@ Waters - Identity-based signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
-from toolbox.iterate import dotprod
-from toolbox.hash_module import Waters
+from charm.toolbox.pairinggroup import ZR,G1,G2,pair
+from charm.toolbox.iterate import dotprod
+from charm.toolbox.conversion import Conversion
+from charm.toolbox.bitstring import Bytes
+import hashlib
 
 debug = False
 class WatersSig:
+    """
+    >>> from charm.toolbox.pairinggroup import PairingGroup
+    >>> group = PairingGroup('SS512')
+    >>> waters = WatersSig(group)
+    >>> (master_public_key, master_secret_key) = waters.setup(5)
+    >>> ID = 'janedoe@email.com'
+    >>> secret_key = waters.keygen(master_public_key, master_secret_key, ID)  
+    >>> msg = 'please sign this new message!'
+    >>> signature = waters.sign(master_public_key, secret_key, msg)
+    >>> waters.verify(master_public_key, ID, msg, signature)
+    True
+    """
     def __init__(self, groupObj):
         global group,lam_func
         group = groupObj
@@ -74,26 +88,3 @@ class WatersSig:
             return True
         return False
 
-def main():
-   z = 5
-   groupObj = PairingGroup('SS512')
-
-   waters = WatersSig(groupObj)
-   (mpk, msk) = waters.setup(z)
-
-   ID = 'janedoe@email.com'
-   sk = waters.keygen(mpk, msk, ID)  
-   if debug:
-    print("Keygen...")
-    print("sk =>", sk)
- 
-   M = 'please sign this new message!'
-   sig = waters.sign(mpk, sk, M)
-   if debug: print("Signature...")
-
-   assert waters.verify(mpk, ID, M, sig), "invalid signature!"
-   if debug: print("Verification successful!")
-
-if __name__ == "__main__":
-    debug = True
-    main()

@@ -12,11 +12,22 @@
 :Authors:    J. Ayo Akinyele
 :Date:       1/2012
  '''
-from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
-from toolbox.PKSig import PKSig
+from charm.toolbox.pairinggroup import ZR,G1,G2,pair
+from charm.toolbox.PKSig import PKSig
 
 debug = False
 class CL04(PKSig):
+    """
+    >>> from charm.toolbox.pairinggroup import PairingGroup
+    >>> group = PairingGroup('MNT224')
+    >>> cl = CL04(group)
+    >>> master_public_key = cl.setup()
+    >>> (public_key, secret_key) = cl.keygen(master_public_key)
+    >>> msg = "Please sign this stupid message!"
+    >>> signature = cl.sign(public_key, secret_key, msg)
+    >>> cl.verify(public_key, msg, signature)
+    True
+    """
     def __init__(self, groupObj):
         global group
         group = groupObj
@@ -44,27 +55,4 @@ class CL04(PKSig):
             return True
         return False
     
-def main():
-    grp = PairingGroup('MNT224')
-    cl = CL04(grp)
-    
-    mpk = cl.setup()
-    
-    (pk, sk) = cl.keygen(mpk)
-    if debug:
-        print("Keygen...")
-        print("pk :=", pk)
-        print("sk :=", sk)
-    
-    M = "Please sign this stupid message!"
-    sig = cl.sign(pk, sk, M)
-    if debug: print("Signature: ", sig)
-    
-    result = cl.verify(pk, M, sig)
-    assert result, "INVALID signature!"
-    if debug: print("Successful Verification!!!")
-    
-if __name__ == "__main__":
-    debug = True
-    main()
     

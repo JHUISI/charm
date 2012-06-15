@@ -12,10 +12,9 @@ El Gamal Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption in g
 :Date:           3/2011
 '''
 
-from toolbox.integergroup import IntegerGroupQ
-from toolbox.ecgroup import *
-from toolbox.PKEnc import PKEnc
-from toolbox.eccurve import prime192v2
+from charm.toolbox.integergroup import IntegerGroupQ
+from charm.toolbox.ecgroup import *
+from charm.toolbox.PKEnc import PKEnc
 
 debug = False
 class ElGamalCipher(dict):
@@ -47,6 +46,17 @@ class ElGamalCipher(dict):
         return None
 
 class ElGamal(PKEnc):
+    """
+    >>> from charm.toolbox.eccurve import prime192v2
+    >>> el = ElGamal(elliptic_curve, prime192v2)    
+    >>> (public_key, secret_key) = el.keygen()
+    >>> msg = b"hello world!"
+    >>> size = len(msg)
+    >>> cipher_text = el.encrypt(public_key, msg)
+    >>> decrypted_msg = el.decrypt(public_key, secret_key, cipher_text)    
+    >>> decrypted_msg == msg
+    True
+    """
     def __init__(self, group_type=int, builtin_cv=410):
         PKEnc.__init__(self)
         global _type
@@ -57,7 +67,7 @@ class ElGamal(PKEnc):
         global group
         if _type == int:
             group = IntegerGroupQ()
-        elif _type == ecc:
+        elif _type == elliptic_curve:
             group = ECGroup(_cv)
         else:
             assert False, "Invalid Type Exception!"
@@ -66,7 +76,7 @@ class ElGamal(PKEnc):
         if _type == int:
             group.paramgen(secparam)
             g = group.randomGen()
-        elif _type == ecc:
+        elif _type == elliptic_curve:
             g = group.random(G)
         # x is private, g is public param
         x = group.random(); h = g ** x
@@ -96,17 +106,3 @@ class ElGamal(PKEnc):
         if debug: print('dec M => %s' % M)
         return M
 
-def main():
-    el = ElGamal(ecc, prime192v2)    
-    (pk, sk) = el.keygen()
-    msg = b"hello world!"
-    size = len(msg)
-    cipher1 = el.encrypt(pk, msg)
-    
-    m = el.decrypt(pk, sk, cipher1)    
-    assert m == msg, "Failed Decryption!!!"
-    if debug: print("SUCCESSFULLY DECRYPTED!!!")
-        
-if __name__ == "__main__":
-    debug = True
-    main()

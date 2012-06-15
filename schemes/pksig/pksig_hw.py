@@ -12,12 +12,22 @@ Hohenberger-Waters - Realizing hash-and-sign signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from toolbox.pairinggroup import PairingGroup,G1,G2,GT,ZR,pair
-from toolbox.PKSig import PKSig
-from math import *
+from charm.toolbox.pairinggroup import G1,G2,ZR,pair
+from charm.toolbox.PKSig import PKSig
+from math import ceil, log 
 
 debug=False
 class HW(PKSig):
+    """
+    >>> from charm.toolbox.pairinggroup import PairingGroup, GT
+    >>> group = PairingGroup('SS512')
+    >>> hw = HW(group)
+    >>> (public_key, secret_key) = hw.setup()
+    >>> msg = "please sign this message now please!"    
+    >>> signature = hw.sign(public_key, secret_key, public_key['s'], msg)
+    >>> hw.verify(public_key, msg, signature)
+    True
+    """
     def __init__(self, groupObj):
         global group
         group = groupObj
@@ -70,25 +80,3 @@ class HW(PKSig):
         else:
             return False
         
-def main():
-    #AES_SECURITY = 80
-    groupObj = PairingGroup('SS512')
-    hw = HW(groupObj)
-    
-    (pk, sk) = hw.setup()
-    if debug:
-        print("Public parameters")
-        print("pk =>", pk)
-
-    m = "please sign this message now please!"    
-    sig = hw.sign(pk, sk, pk['s'], m)
-    if debug:
-        print("Signature...")
-        print("sig =>", sig)
-
-    assert hw.verify(pk, m, sig), "invalid signature"
-    if debug: print("Verification Successful!!")
-
-if __name__ == "__main__":
-    debug = True
-    main()

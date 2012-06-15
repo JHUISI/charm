@@ -16,9 +16,8 @@ Cramer-Shoup Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption 
 
 
 '''
-from toolbox.ecgroup import *
-from toolbox.PKEnc import *
-from toolbox.eccurve import prime192v1
+from charm.toolbox.ecgroup import *
+from charm.toolbox.PKEnc import *
 
 # type definitions
 pk_t = { 'g1' : G, 'g2' : G, 'c' : G, 'd' : G, 'h' : G }
@@ -28,6 +27,16 @@ str_t = str
 
 debug = False
 class EC_CS98(PKEnc):	
+    """
+    >>> from charm.toolbox.eccurve import prime192v1
+    >>> pkenc = EC_CS98(prime192v1)
+    >>> (public_key, secret_key) = pkenc.keygen()
+    >>> msg = b"hello world!!!"
+    >>> cipher_text = pkenc.encrypt(public_key, msg)
+    >>> decrypted_msg = pkenc.decrypt(public_key, secret_key, cipher_text)
+    >>> decrypted_msg == msg
+    True
+    """
     def __init__(self, builtin_cv):
         PKEnc.__init__(self)
         global group
@@ -74,20 +83,3 @@ class EC_CS98(PKEnc):
         if debug: print("v' => %s" % v_prime)
         return group.decode(c['e'] / (c['u1'] ** sk['z']))
 
-def main():
-    pkenc = EC_CS98(prime192v1)
-    
-    (pk, sk) = pkenc.keygen()
-    M = b"hello world!!!"
-
-    ciphertext = pkenc.encrypt(pk, M)
-    
-    message = pkenc.decrypt(pk, sk, ciphertext)
-    
-    assert M == message, "Failed Decryption!!!"
-    if debug: print("SUCCESSFUL DECRYPTION!!! => %s" % message)
-   
-if __name__ == "__main__":
-    debug=True
-    main()
-   

@@ -10,14 +10,29 @@
 :Date:			06/2011
 ''' 
 
-from charm.cryptobase import *
-from toolbox.IBEnc import IBEnc
-from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-from toolbox.hash_module import Waters
-import math
+from charm.core.crypto.cryptobase import *
+from charm.toolbox.IBEnc import IBEnc
+from charm.toolbox.bitstring import Bytes
+from charm.toolbox.conversion import Conversion
+from charm.toolbox.pairinggroup import *
+import hashlib, math
 
 debug = False
 class IBE_N04(IBEnc):
+    """
+    >>> group = PairingGroup('SS512')
+    >>> ibe = IBE_N04(group)
+    >>> (master_public_key, master_key) = ibe.setup()
+    >>> ID = "bob@mail.com"
+    >>> kID = ibe.stringtoidentity(master_public_key, ID)
+    >>> secret_key = ibe.extract(master_key, kID)
+    >>> msg = group.random(GT)
+    >>> cipher_text = ibe.encrypt(master_public_key, kID, msg)
+    >>> decrypted_msg = ibe.decrypt(master_public_key, secret_key, cipher_text)
+    >>> decrypted_msg == msg
+    True
+    """
+    
     """Implementation of David Naccahe Identity Based Encryption"""
     def __init__(self, groupObj):
         IBEnc.__init__(self)
@@ -99,6 +114,7 @@ class IBE_N04(IBEnc):
         return ct['c1'] *  num / dem
 
     
+<<<<<<< HEAD
 def main():
     # initialize the element object so that object references have global scope
     groupObj = PairingGroup('SS512')
@@ -122,3 +138,5 @@ def main():
 if __name__ == '__main__':
     debug = True
     main()
+=======
+>>>>>>> change_package_structure

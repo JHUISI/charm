@@ -13,9 +13,9 @@ John Bethencourt, Brent Waters (Pairing-based)
 :Authors:    J Ayo Akinyele
 :Date:            04/2011
 '''
-from toolbox.pairinggroup import *
-from toolbox.secretutil import SecretUtil
-from toolbox.ABEnc import *
+from charm.toolbox.pairinggroup import *
+from charm.toolbox.secretutil import SecretUtil
+from charm.toolbox.ABEnc import *
 
 # type annotations
 pk_t = { 'g':G1, 'g2':G2, 'h':G1, 'f':G1, 'e_gg_alpha':GT }
@@ -25,6 +25,20 @@ ct_t = { 'C_tilde':GT, 'C':G1, 'Cy':G1, 'Cyp':G2 }
 
 debug = False
 class CPabe_BSW07(ABEnc):
+    """
+    >>> group = PairingGroup('SS512')
+    >>> cpabe = CPabe_BSW07(group)
+    >>> msg = group.random(GT)
+    >>> attributes = ['ONE', 'TWO', 'THREE']
+    >>> access_policy = '((four or three) and (three or one))'
+    >>> (master_public_key, master_key) = cpabe.setup()
+    >>> secret_key = cpabe.keygen(master_public_key, master_key, attributes)
+    >>> cipher_text = cpabe.encrypt(master_public_key, msg, access_policy)
+    >>> decrypted_msg=cpabe.decrypt(master_public_key, secret_key, cipher_text)
+    >>> msg == decrypted_msg
+    True
+    """ 
+         
     def __init__(self, groupObj):
         ABEnc.__init__(self)
         global util, group
@@ -89,33 +103,4 @@ class CPabe_BSW07(ABEnc):
         
         return ct['C_tilde'] / (pair(ct['C'], sk['D']) / A)
 
-def main():
-    groupObj = PairingGroup('SS512')
-    
-    cpabe = CPabe_BSW07(groupObj)
-    attrs = ['ONE', 'TWO', 'THREE']
-    access_policy = '((four or three) and (three or one))'
-    if debug: 
-        print("Attributes =>", attrs); print("Policy =>", access_policy)
-    
-    (pk, mk) = cpabe.setup()
-    
-    sk = cpabe.keygen(pk, mk, attrs)
    
-    rand_msg = groupObj.random(GT) 
-    if debug: print("msg =>", rand_msg)
-    ct = cpabe.encrypt(pk, rand_msg, access_policy)
-    if debug: print("\n\nCiphertext...\n")
-    groupObj.debug(ct) 
-    
-    rec_msg = cpabe.decrypt(pk, sk, ct)
-    if debug: print("\n\nDecrypt...\n")
-    if debug: print("Rec msg =>", rec_msg)
-
-    assert rand_msg == rec_msg, "FAILED Decryption: message is incorrect"
-    if debug: print("Successful Decryption!!!")
-    
-if __name__ == "__main__":
-    debug = True
-    main()
-    

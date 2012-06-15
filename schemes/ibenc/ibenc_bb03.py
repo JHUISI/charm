@@ -13,13 +13,25 @@ Boneh-Boyen Identity Based Encryption
 :Date:			11/2010
 '''
 
-from toolbox.pairinggroup import *
-from charm.cryptobase import *
-from toolbox.IBEnc import IBEnc
-from charm.pairing import hash as sha1
+from charm.toolbox.pairinggroup import *
+from charm.core.crypto.cryptobase import *
+from charm.toolbox.IBEnc import IBEnc
+from charm.core.math.pairing import hash as sha1
 
 debug = False
 class IBE_BB04(IBEnc):
+    """
+    >>> group = PairingGroup('MNT224')
+    >>> ibe = IBE_BB04(group)
+    >>> (master_public_key, master_key) = ibe.setup()
+    >>> master_public_key_ID = group.random(ZR)
+    >>> key = ibe.extract(master_key, master_public_key_ID)
+    >>> msg = group.random(GT)
+    >>> cipher_text = ibe.encrypt(master_public_key, master_public_key_ID, msg)
+    >>> decrypted_msg = ibe.decrypt(master_public_key, key, cipher_text)
+    >>> decrypted_msg == msg
+    True
+    """
     def __init__(self, groupObj):
         IBEnc.__init__(self)
         IBEnc.setProperty(self, secdef='IND_sID_CPA', assumption='DBDH', 
@@ -74,23 +86,3 @@ class IBE_BB04(IBEnc):
         v_s = pair(((B ** dID['r']) * C), dID['K'])
         return sha1(v_s)
 
-def main():
-    # initialize the element object so that object references have global scope
-    groupObj = PairingGroup('MNT224')
-    ibe = IBE_BB04(groupObj)
-    (params, mk) = ibe.setup()
-
-    # represents public identity
-    kID = groupObj.random(ZR)
-    key = ibe.extract(mk, kID)
-
-    M = groupObj.random(GT)
-    cipher = ibe.encrypt(params, kID, M)
-    m = ibe.decrypt(params, key, cipher)
-
-    assert m == M, "FAILED Decryption!"
-    if debug: print("Successful Decryption!! M => '%s'" % m)
-                
-if __name__ == '__main__':
-    debug = True
-    main()

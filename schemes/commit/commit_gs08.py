@@ -13,11 +13,20 @@ Groth-Sahai Commitment Scheme
 :Date:		6/2011
 '''
 
-from toolbox.pairinggroup import *
-from toolbox.Commit import *
+from charm.toolbox.pairinggroup import *
+from charm.toolbox.Commit import *
 
 debug=False
 class Commitment_GS08(Commitment):
+    """
+    >>> group = PairingGroup('SS512')
+    >>> alg = Commitment_GS08(group)
+    >>> public_key = alg.setup()
+    >>> msg = group.random(G1)
+    >>> (commit, decommit) = alg.commit(public_key, msg)
+    >>> alg.decommit(public_key, commit, decommit, msg)
+    True
+    """
     def __init__(self, groupObj, setting='SXDH'):
         Commitment.__init__(self)
         #Commitment.setProperty(self, secdef='CM_PHCB', assumption=['SXDH','DLIN'], message_space=[G1, 'KEM'], secmodel='SM')
@@ -59,22 +68,3 @@ class Commitment_GS08(Commitment):
         
         return True
 
-def main():
-    groupObj = PairingGroup('SS512')
-    cm = Commitment_GS08(groupObj)
-   
-    pk = cm.setup()
-    if debug: 
-        print("Public parameters...")
-        print("pk =>", pk)
-    
-    m = groupObj.random(G1)
-    if debug: print("Committing to =>", m)
-    (c, d) = cm.commit(pk, m)
-    
-    assert cm.decommit(pk, c, d, m), "FAILED to decommit"
-    if debug: print("Successful and Verified decommitment!!!")
-
-if __name__ == "__main__":
-    debug = True
-    main()       
