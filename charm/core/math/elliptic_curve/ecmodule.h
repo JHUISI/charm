@@ -39,12 +39,6 @@
 #define HASH_LEN	20
 #define RESERVED_ENCODING_BYTES			2
 
-#ifdef DEBUG
-#define debug(...)	printf("DEBUG: "__VA_ARGS__)
-#else
-#define debug(...)
-#endif
-
 PyTypeObject ECType;
 static PyObject *PyECErrorObject;
 static Benchmark *dBench;

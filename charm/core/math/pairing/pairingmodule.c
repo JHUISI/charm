@@ -365,18 +365,15 @@ int hash_element_to_bytes(element_t *element, int hash_size, uint8_t* output_buf
 	
 	buf_len = element_length_in_bytes(*element);
 	uint8_t *temp_buf = (uint8_t *)malloc(buf_len+1);
-	if (temp_buf == NULL) {
+	if (temp_buf == NULL)
 		return FALSE;
-	}
 	
 	element_to_bytes(temp_buf, *element);
-	if(prefix == 0) {
+	if(prefix == 0)
 		prefix = HASH_FUNCTION_ELEMENTS;
-	}
-	else if(prefix < 0) {
+	else if(prefix < 0)
 		// convert into a positive number
 		prefix *= -1;
-	}
 	result = hash_to_bytes(temp_buf, buf_len, hash_size, output_buf, prefix);
 	free(temp_buf);
 	
@@ -400,17 +397,13 @@ int hash2_element_to_bytes(element_t *element, uint8_t* last_buf, int hash_size,
 	// create output buffer
 	uint8_t* temp2_buf = (uint8_t *) malloc(last_buflen + buf_len + 1);
 	memset(temp2_buf, 0, (last_buflen + buf_len));
-//	// copy first input buffer (last_buf) into target buffer
-//	strncat((char *) temp2_buf, (char *) last_buf, last_buflen);
-//	// copy element buffer (temp_buf) into target buffer
-//	strncat((char *) temp2_buf, (char *) temp_buf, buf_len);
 	int i;
-	for(i = 0; i < last_buflen; i++) {
+	for(i = 0; i < last_buflen; i++)
 		temp2_buf[i] = last_buf[i];
-	}
 
 	int j = 0;
-	for(i = last_buflen; i < (last_buflen + buf_len); i++) {
+	for(i = last_buflen; i < (last_buflen + buf_len); i++)
+	{
 		temp2_buf[i] = temp_buf[j];
 		j++;
 	}
@@ -637,7 +630,6 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 }
 
 
-// TODO: use element_vnprintf to copy the result into element type
 PyObject *Element_print(Element* self)
 {
 	PyObject *strObj;

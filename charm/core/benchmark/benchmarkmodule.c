@@ -433,8 +433,8 @@ PyInit_benchmark(void) 		{
 void initbenchmark(void) 		{
 #endif
 	PyObject *module;
-	static void *PyBenchmark_API[PyBenchmark_API_pointers];
-	PyObject *api_object;
+//	static void *PyBenchmark_API[PyBenchmark_API_pointers];
+//	PyObject *api_object;
 
 	if(PyType_Ready(&BenchmarkType) < 0) INITERROR;
 

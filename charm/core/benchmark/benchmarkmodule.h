@@ -70,7 +70,7 @@ typedef struct {
 	int cpu_option, native_option, real_option, granular_option;
 	int bench_initialized;
 	void *data_ptr;
-	void (*gran_init)();
+	void (*gran_init)(void);
 } Benchmark;
 
 // PyMethodDef Benchmark_methods[];

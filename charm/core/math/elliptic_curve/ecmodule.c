@@ -1,6 +1,5 @@
 /*
- * Elliptic Curve Module - based on lib MIRACL
- * TODO: need parameter setting,
+ * Elliptic Curve Module - based on Openssl
  */
 #include "ecmodule.h"
 

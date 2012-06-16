@@ -13,7 +13,7 @@
 :Date:    4/2011
 '''
 
-from charm.toolbox.Hash import *
+from charm.toolbox.Hash import ChamHash,Hash
 from charm.toolbox.integergroup import *
 
 debug = False
