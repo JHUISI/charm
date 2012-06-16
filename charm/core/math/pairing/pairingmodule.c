@@ -2109,8 +2109,8 @@ void initpairing(void) 		{
 	}
 	ElementError = st->error;
 
-    if(import_benchmark() < 0)
-    	INITERROR;
+//    if(import_benchmark() < 0)
+//    	INITERROR;
     if(PyType_Ready(&BenchmarkType) < 0)
     	INITERROR;
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);
@@ -2127,20 +2127,23 @@ void initpairing(void) 		{
     PyModule_AddObject(m, "params", (PyObject *)&PairingType);
     Py_INCREF(&ElementType);
     PyModule_AddObject(m, "pairing", (PyObject *)&ElementType);
+    Py_INCREF(&BenchmarkType);
+    PyModule_AddObject(m, "benchmark", (PyObject *)&BenchmarkType);
 
 	PyModule_AddIntConstant(m, "ZR", ZR);
 	PyModule_AddIntConstant(m, "G1", G1);
 	PyModule_AddIntConstant(m, "G2", G2);
 	PyModule_AddIntConstant(m, "GT", GT);
 
-	PyModule_AddIntConstant(m, "CpuTime", CPU_TIME);
-	PyModule_AddIntConstant(m, "RealTime", REAL_TIME);
-	PyModule_AddIntConstant(m, "NativeTime", NATIVE_TIME);
-	PyModule_AddIntConstant(m, "Add", ADDITION);
-	PyModule_AddIntConstant(m, "Sub", SUBTRACTION);
-	PyModule_AddIntConstant(m, "Mul", MULTIPLICATION);
-	PyModule_AddIntConstant(m, "Div", DIVISION);
-	PyModule_AddIntConstant(m, "Exp", EXPONENTIATION);
+//	PyModule_AddIntConstant(m, "CpuTime", CPU_TIME);
+//	PyModule_AddIntConstant(m, "RealTime", REAL_TIME);
+//	PyModule_AddIntConstant(m, "NativeTime", NATIVE_TIME);
+//	PyModule_AddIntConstant(m, "Add", ADDITION);
+//	PyModule_AddIntConstant(m, "Sub", SUBTRACTION);
+//	PyModule_AddIntConstant(m, "Mul", MULTIPLICATION);
+//	PyModule_AddIntConstant(m, "Div", DIVISION);
+//	PyModule_AddIntConstant(m, "Exp", EXPONENTIATION);
+	ADD_BENCHMARK_OPTIONS(m);
 	PyModule_AddIntConstant(m, "Pair", PAIRINGS);
 	PyModule_AddIntConstant(m, "Granular", GRANULAR);
 #if PY_MAJOR_VERSION >= 3

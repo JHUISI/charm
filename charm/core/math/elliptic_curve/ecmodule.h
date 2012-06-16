@@ -132,5 +132,10 @@ EC_POINT *element_from_hash(EC_GROUP *group, uint8_t *input, int input_len);
 	PyErr_SetString(PyECErrorObject, msg); \
 	return NULL;	}
 
+#define IS_SAME_GROUP(a, b) \
+	if(a->nid != b->nid) {	\
+		PyErr_SetString(PyECErrorObject, "mixing group elements from different curves.");	\
+		return NULL;	\
+	}
 
 #endif

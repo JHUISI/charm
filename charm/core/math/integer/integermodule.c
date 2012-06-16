@@ -1960,8 +1960,8 @@ void initinteger(void) {
 		INITERROR;
 	}
 
-	if (import_benchmark() < 0)
-		INITERROR;
+//	if (import_benchmark() < 0)
+//		INITERROR;
 	if (PyType_Ready(&BenchmarkType) < 0)
 		INITERROR;
 	st->dBench = PyObject_New(Benchmark, &BenchmarkType);
@@ -1972,16 +1972,19 @@ void initinteger(void) {
 
 	Py_INCREF(&IntegerType);
 	PyModule_AddObject(m, "integer", (PyObject *) &IntegerType);
+    Py_INCREF(&BenchmarkType);
+    PyModule_AddObject(m, "benchmark", (PyObject *)&BenchmarkType);
 
 	// add integer error to module
-	PyModule_AddIntConstant(m, "CpuTime", CPU_TIME);
-	PyModule_AddIntConstant(m, "RealTime", REAL_TIME);
-	PyModule_AddIntConstant(m, "NativeTime", NATIVE_TIME);
-	PyModule_AddIntConstant(m, "Add", ADDITION);
-	PyModule_AddIntConstant(m, "Sub", SUBTRACTION);
-	PyModule_AddIntConstant(m, "Mul", MULTIPLICATION);
-	PyModule_AddIntConstant(m, "Div", DIVISION);
-	PyModule_AddIntConstant(m, "Exp", EXPONENTIATION);
+	ADD_BENCHMARK_OPTIONS(m);
+//	PyModule_AddIntConstant(m, "CpuTime", CPU_TIME);
+//	PyModule_AddIntConstant(m, "RealTime", REAL_TIME);
+//	PyModule_AddIntConstant(m, "NativeTime", NATIVE_TIME);
+//	PyModule_AddIntConstant(m, "Add", ADDITION);
+//	PyModule_AddIntConstant(m, "Sub", SUBTRACTION);
+//	PyModule_AddIntConstant(m, "Mul", MULTIPLICATION);
+//	PyModule_AddIntConstant(m, "Div", DIVISION);
+//	PyModule_AddIntConstant(m, "Exp", EXPONENTIATION);
 
 	// initialize PRNG
 	// replace with read from some source of randomness

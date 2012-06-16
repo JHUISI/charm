@@ -73,6 +73,10 @@ opt = {}
 if config != None:
    print("Config file:", config)
    opt = read_config(config)
+else:
+   config = "config.mk"
+   print("Config file:", config)
+   opt = read_config(config)
 
 core_path = 'charm/core/'
 math_path = core_path + 'math/'
@@ -131,7 +135,7 @@ if opt.get('ECC_MOD') == 'yes':
 				libraries=['gmp', 'crypto'])
    _ext_modules.append(ecc_module)
 
-benchmark_module = Extension(core_prefix + '.benchmark', sources = [benchmark_path + 'benchmarkmodule.c'])
+#benchmark_module = Extension(core_prefix + '.benchmark', sources = [benchmark_path + 'benchmarkmodule.c'])
 
 cryptobase = Extension(crypto_prefix+'.cryptobase', sources = [cryptobase_path + 'cryptobasemodule.c'])
 
@@ -150,7 +154,8 @@ des3  = Extension(crypto_prefix + '.DES3',
                                     crypto_path + 'DES/'], 
                     sources = [crypto_path + 'DES3/DES3.c'])
 
-_ext_modules.extend([benchmark_module, cryptobase, aes, des, des3])
+#_ext_modules.extend([benchmark_module, cryptobase, aes, des, des3])
+_ext_modules.extend([cryptobase, aes, des, des3])
 
 if platform.system() in ['Linux', 'Windows']:
    # add benchmark module to pairing, integer and ecc 
