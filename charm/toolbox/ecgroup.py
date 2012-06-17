@@ -1,4 +1,6 @@
-from charm.core.math.elliptic_curve import *
+#from charm.core.math.elliptic_curve import *
+from charm.core.math.elliptic_curve import elliptic_curve,ZR,G,init,random,order,getGenerator,bitsize,serialize,deserialize,hashEC,encode,decode,getXY
+#from charm.core.math.elliptic_curve import InitBenchmark,StartBenchmark,EndBenchmark,GetBenchmak,GetGeneralBenchmarks,ClearBenchmark
 
 class ECGroup():
     def __init__(self, builtin_cv):
@@ -21,12 +23,12 @@ class ECGroup():
     def groupType(self): 
         return self.param
 
-    def init(self, type=ZR):
-        return init(self.group, type)
+    def init(self, _type=ZR):
+        return init(self.group, _type)
     
-    def random(self, type=ZR):
-        if type == ZR or type == G:
-            return random(self.group, type)
+    def random(self, _type=ZR):
+        if _type == ZR or _type == G:
+            return random(self.group, _type)
         return None
     
     def encode(self, message):
@@ -52,12 +54,12 @@ class ECGroup():
                     s += str(i)
                 # consider other types    
             #print("s => %s" % s)
-            return hash(self.group, str(s), _type)
+            return hashEC(self.group, str(s), _type)
         elif type(args) == elliptic_curve:
             msg = str(serialize(args))
-            return hash(self.group, msg, _type)
+            return hashEC(self.group, msg, _type)
         elif type(args) == str:
-            return hash(self.group, args, _type)
+            return hashEC(self.group, args, _type)
         return None
     
     def zr(self, point):

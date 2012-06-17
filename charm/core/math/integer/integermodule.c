@@ -1894,7 +1894,7 @@ static PyMethodDef module_methods[] = {
 	{ "isPrime", (PyCFunction) testPrimality, METH_O, "probabilistic algorithm to whether a given integer is prime." },
 	{ "encode", (PyCFunction) encode_message, METH_VARARGS, "encode a message as a group element where p = 2*q + 1 only." },
 	{ "decode", (PyCFunction) decode_message, METH_VARARGS, "decode a message from a group element where p = 2*q + 1 to a message." },
-	{ "hash", (PyCFunction) Integer_hash, METH_VARARGS, "hash to group elements in which p = 2*q+1." },
+	{ "hashInt", (PyCFunction) Integer_hash, METH_VARARGS, "hash to group elements in which p = 2*q+1." },
 	{ "bitsize", (PyCFunction) bitsize, METH_VARARGS, "determine how many bits required to represent a given value." },
 	{ "legendre", (PyCFunction) legendre, METH_VARARGS, "given a and a positive prime p compute the legendre symbol." },
 	{ "gcd", (PyCFunction) gcdCall, METH_VARARGS, "compute the gcd of two integers a and b." },

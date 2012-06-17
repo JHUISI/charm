@@ -1743,7 +1743,7 @@ static PyMethodDef ec_methods[] = {
 		{"bitsize", (PyCFunction)ECE_bitsize, METH_O, "Returns number of bytes to represent a message."},
 		{"serialize", (PyCFunction)Serialize, METH_VARARGS, "Serialize an element to a string"},
 		{"deserialize", (PyCFunction)Deserialize, METH_VARARGS, "Deserialize an element to G or ZR"},
-		{"hash", (PyCFunction)ECE_hash, METH_VARARGS, "Perform a hash of a string to a group element of G."},
+		{"hashEC", (PyCFunction)ECE_hash, METH_VARARGS, "Perform a hash of a string to a group element of G."},
 		{"encode", (PyCFunction)ECE_encode, METH_VARARGS, "Encode string as a group element of G"},
 		{"decode", (PyCFunction)ECE_decode, METH_VARARGS, "Decode group element to a string."},
 		{"getXY", (PyCFunction)ECE_convertToZR, METH_VARARGS, "Returns the x and/or y coordinates of point on an elliptic curve."},

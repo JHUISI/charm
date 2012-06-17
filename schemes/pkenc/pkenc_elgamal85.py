@@ -13,7 +13,7 @@ El Gamal Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption in g
 '''
 
 from charm.toolbox.integergroup import IntegerGroupQ
-from charm.toolbox.ecgroup import *
+from charm.toolbox.ecgroup import elliptic_curve,ECGroup,ZR,G
 from charm.toolbox.PKEnc import PKEnc
 
 debug = False
@@ -47,6 +47,7 @@ class ElGamalCipher(dict):
 
 class ElGamal(PKEnc):
     """
+    >>> from charm.core.math.elliptic_curve import elliptic_curve
     >>> from charm.toolbox.eccurve import prime192v2
     >>> el = ElGamal(elliptic_curve, prime192v2)    
     >>> (public_key, secret_key) = el.keygen()

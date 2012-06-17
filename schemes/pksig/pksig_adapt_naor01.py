@@ -22,8 +22,7 @@ Notes:	This transform was first described by Boneh and Franklin but credited to 
 '''
 
 from charm.toolbox.PKSig import *
-from charm.toolbox.pairinggroup import *
-#from charm.toolbox.ibe_bb03 import *
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 
 debug = False
 class Sig_Generic_ibetosig_Naor01(PKSig):

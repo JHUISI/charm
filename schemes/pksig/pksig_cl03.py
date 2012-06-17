@@ -1,5 +1,5 @@
 from charm.toolbox.PKSig import PKSig
-from charm.core.math.integer import *
+from charm.core.math.integer import integer,isPrime,random,randomPrime,randomBits
 import hashlib
 
 def SHA1(bytes1):

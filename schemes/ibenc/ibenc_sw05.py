@@ -16,7 +16,7 @@ Sahai-Waters Fuzzy Identity-Based Encryption, Original Construction
 from charm.toolbox.pairinggroup import ZR,G1,pair
 from charm.core.crypto.cryptobase import *
 from charm.toolbox.IBEnc import IBEnc
-#from charm.core.math.pairing import hash as sha1
+#from charm.core.math.pairing import hashPair as sha1
 from charm.toolbox.secretshare import *
 #import sys
 

@@ -3,7 +3,7 @@
 from charm.toolbox.ABEnc import ABEnc
 from charm.toolbox.pairinggroup import GT
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
-from charm.core.math.pairing import hash as sha1
+from charm.core.math.pairing import hashPair as sha1
 from charm.toolbox.conversion import *
 #from math import ceil
 

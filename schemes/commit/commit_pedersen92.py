@@ -1,5 +1,5 @@
+from charm.toolbox.ecgroup import ECGroup,ZR,G
 from charm.toolbox.Commit import *
-from charm.toolbox.ecgroup import *
 
 debug = False
 class CM_Ped92(Commitment):

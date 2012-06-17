@@ -14,7 +14,7 @@ from charm.core.crypto.cryptobase import *
 from charm.toolbox.PKSig import *
 from charm.toolbox.bitstring import Bytes
 from charm.toolbox.conversion import Conversion
-from charm.toolbox.pairinggroup import *
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.hash_module import Waters
 import hashlib, math
 

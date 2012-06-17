@@ -14,7 +14,7 @@ Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform (generic composi
 :Date:         1/2011
 '''
 from charm.toolbox.PKEnc import PKEnc
-from charm.toolbox.pairinggroup import * #PairingGroup,GT
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 
 debug = False
 class CHK04(PKEnc):

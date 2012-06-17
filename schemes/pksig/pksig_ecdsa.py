@@ -12,7 +12,7 @@ Digital Signature Algorithm (DSA)
 :Authors:    J. Ayo Akinyele
 :Date:       5/2011
 """
-from charm.toolbox.ecgroup import *
+from charm.toolbox.ecgroup import ECGroup,ZR,G
 from charm.toolbox.PKSig import PKSig
 
 debug = False

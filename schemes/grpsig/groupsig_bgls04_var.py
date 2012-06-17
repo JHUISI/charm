@@ -12,7 +12,7 @@ Dan Boneh, Xavier Boyen, and Hovav Shacham
 :Authors:    J Ayo Akinyele
 :Date:           12/2010
 '''
-from charm.toolbox.pairinggroup import *
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.PKSig import PKSig
 
 debug=False

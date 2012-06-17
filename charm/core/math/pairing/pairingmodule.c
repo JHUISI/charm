@@ -2027,7 +2027,7 @@ PyMethodDef Element_methods[] = {
 PyMethodDef pairing_methods[] = {
 	{"init", (PyCFunction)Element_elem, METH_VARARGS, "Create an element in group ZR and optionally set value."},
 	{"pair", (PyCFunction)Apply_pairing, METH_VARARGS, "Apply pairing between an element of G1 and G2 and returns an element mapped to GT"},
-	{"hash", (PyCFunction)sha1_hash, METH_VARARGS, "Compute a sha1 hash of an element type"},
+	{"hashPair", (PyCFunction)sha1_hash, METH_VARARGS, "Compute a sha1 hash of an element type"},
 	{"H", (PyCFunction)Element_hash, METH_VARARGS, "Hash an element type to a specific field: Zr, G1, or G2"},
 	{"random", (PyCFunction)Element_random, METH_VARARGS, "Return a random element in a specific group: G1, G2, Zr"},
 	{"serialize", (PyCFunction)Serialize_cmp, METH_VARARGS, "Serialize an element type into bytes."},

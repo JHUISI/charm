@@ -16,7 +16,7 @@ Cramer-Shoup Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption 
 
 
 '''
-from charm.toolbox.ecgroup import *
+from charm.toolbox.ecgroup import ECGroup,ZR,G
 from charm.toolbox.PKEnc import *
 
 # type definitions

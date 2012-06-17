@@ -1,5 +1,5 @@
 from charm.toolbox.IBEnc import IBEnc
-from charm.toolbox.pairinggroup import *
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 
 debug = False
 class HashIDAdapter(IBEnc):

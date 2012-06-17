@@ -13,7 +13,7 @@ Xavier Boyen - Anonymous Ring Signatures
 :Date:       11/2011
 
 """
-from charm.toolbox.pairinggroup import *
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.PKSig import PKSig
 
 debug = False
