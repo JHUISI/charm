@@ -102,6 +102,9 @@ linesForSetupMain = []
 linesForSetupMain.append("S = ['ONE', 'TWO', 'THREE']")
 linesForSetupMain.append("M = \"balls on fire345\"")
 linesForSetupMain.append("policy_str = '((four or three) and (two or one))'")
+linesForSetupMain.append("n = 10")
+linesForSetupMain.append("l = 5")
+linesForSetupMain.append("id = 'example@email.com'")
 
 structsToPickleInSetupMain = []
 structsToPickleInSetupMain.append("")
