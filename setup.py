@@ -157,11 +157,11 @@ des3  = Extension(crypto_prefix + '.DES3',
 #_ext_modules.extend([benchmark_module, cryptobase, aes, des, des3])
 _ext_modules.extend([cryptobase, aes, des, des3])
 
-if platform.system() in ['Linux', 'Windows']:
+#if platform.system() in ['Linux', 'Windows']:
    # add benchmark module to pairing, integer and ecc 
-   if opt.get('PAIR_MOD') == 'yes': pairing_module.sources.append(benchmark_path + 'benchmarkmodule.c')
-   if opt.get('INT_MOD') == 'yes': integer_module.sources.append(benchmark_path  + 'benchmarkmodule.c')
-   if opt.get('ECC_MOD') == 'yes': ecc_module.sources.append(benchmark_path  + 'benchmarkmodule.c')
+   #if opt.get('PAIR_MOD') == 'yes': pairing_module.sources.append(benchmark_path + 'benchmarkmodule.c')
+   #if opt.get('INT_MOD') == 'yes': integer_module.sources.append(benchmark_path  + 'benchmarkmodule.c')
+   #if opt.get('ECC_MOD') == 'yes': ecc_module.sources.append(benchmark_path  + 'benchmarkmodule.c')
 
 setup(name = 'Charm-Crypto',
 	version =  _charm_version,
