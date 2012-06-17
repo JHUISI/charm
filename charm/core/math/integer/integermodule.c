@@ -976,9 +976,9 @@ static PyObject *Integer_remainder(PyObject *o1, PyObject *o2) {
 
 	Integer *lhs = NULL, *rhs = NULL, *rop = NULL;
 	int foundLHS = FALSE, foundRHS = FALSE;
-	unsigned long int lhs_value, rhs_value;
+	// unsigned long int lhs_value, rhs_value;
 
-	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value);
+	Check_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS); // , lhs_value, rhs_value);
 
 	if (foundLHS) {
 		rop = createNewInteger(rhs->m);

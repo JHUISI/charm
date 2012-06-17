@@ -265,8 +265,10 @@ ssize_t read_file(FILE *f, char** out)
 			/* allocate that amount of memory only */
 			if((*out = (char *) malloc(out_len+1)) != NULL) {
 				fseek(f, 0L, SEEK_SET);
-				fread(*out, sizeof(char), out_len, f);
-				return out_len;
+				if(fread(*out, sizeof(char), out_len, f) > 0)
+				    return out_len;
+				else
+				    return -1;
 			}
 		}
 	}
@@ -360,7 +362,6 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, int hash_size, uint8_t* out
 
 int hash_element_to_bytes(element_t *element, int hash_size, uint8_t* output_buf, int prefix)
 {
-	int result = TRUE;
 	unsigned int buf_len;
 	
 	buf_len = element_length_in_bytes(*element);
@@ -374,15 +375,14 @@ int hash_element_to_bytes(element_t *element, int hash_size, uint8_t* output_buf
 	else if(prefix < 0)
 		// convert into a positive number
 		prefix *= -1;
-	result = hash_to_bytes(temp_buf, buf_len, hash_size, output_buf, prefix);
+	int result = hash_to_bytes(temp_buf, buf_len, hash_size, output_buf, prefix);
 	free(temp_buf);
 	
-	return TRUE;
+	return result;
 }
 
 // take a previous hash and concatenate with serialized bytes of element and hashes into output buf
 int hash2_element_to_bytes(element_t *element, uint8_t* last_buf, int hash_size, uint8_t* output_buf) {
-	int result = TRUE;
 	// assume last buf contains a hash
 	unsigned int last_buflen = hash_size;
 	unsigned int buf_len = element_length_in_bytes(*element);
@@ -408,11 +408,11 @@ int hash2_element_to_bytes(element_t *element, uint8_t* last_buf, int hash_size,
 		j++;
 	}
 	// hash the temp2_buf to bytes
-	result = hash_to_bytes(temp2_buf, (last_buflen + buf_len), hash_size, output_buf, HASH_FUNCTION_ELEMENTS);
+	int result = hash_to_bytes(temp2_buf, (last_buflen + buf_len), hash_size, output_buf, HASH_FUNCTION_ELEMENTS);
 
 	free(temp2_buf);
 	free(temp_buf);
-	return TRUE;
+	return result;
 }
 
 int hash2_buffer_to_bytes(uint8_t *input_str, int input_len, uint8_t *last_hash, int hash_size, uint8_t *output_buf) {
@@ -440,7 +440,7 @@ int hash2_buffer_to_bytes(uint8_t *input_str, int input_len, uint8_t *last_hash,
 	result = hash_to_bytes(temp_buf, (input_len + hash_size), hash_size, output_buf, HASH_FUNCTION_STRINGS);
 
 	PyObject_Del(last);
-	return TRUE;
+	return result;
 }
 
 PyObject *Element_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
@@ -582,6 +582,7 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
     return 0;
 }
 
+/*
 PyObject *Element_call(Element *elem, PyObject *args, PyObject *kwds)
 {
 	PyObject *object;
@@ -597,6 +598,7 @@ PyObject *Element_call(Element *elem, PyObject *args, PyObject *kwds)
 	
 	return NULL;
 }
+*/
  
 static PyObject *Element_elem(Element* self, PyObject* args)
 {
@@ -1693,7 +1695,7 @@ void Operations_clear()
 PyObject *PyCreateList(MeasureType type)
 {
 //	int groupTypes = 4;
-	int count;
+	int count = -1;
 	PyObject *objList = PyList_New(0);
 	// Insert backwards from GT -> G2 -> G1 -> ZR
 	GetField(count, type, GT, dBench);
