@@ -12,9 +12,8 @@ El Gamal Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption in g
 :Date:           3/2011
 '''
 
-from charm.toolbox.integergroup import IntegerGroupQ
-from charm.toolbox.ecgroup import *
 from charm.toolbox.PKEnc import PKEnc
+from charm.toolbox.ecgroup import G
 
 debug = False
 class ElGamalCipher(dict):
@@ -48,35 +47,40 @@ class ElGamalCipher(dict):
 class ElGamal(PKEnc):
     """
     >>> from charm.toolbox.eccurve import prime192v2
-    >>> el = ElGamal(elliptic_curve, prime192v2)    
+    >>> from charm.toolbox.ecgroup import ECGroup
+    >>> groupObj = ECGroup(prime192v2)
+    >>> el = ElGamal(groupObj)    
     >>> (public_key, secret_key) = el.keygen()
     >>> msg = b"hello world!"
-    >>> size = len(msg)
+    >>> cipher_text = el.encrypt(public_key, msg)
+    >>> decrypted_msg = el.decrypt(public_key, secret_key, cipher_text)    
+    >>> decrypted_msg == msg
+    True
+    >>> from charm.toolbox.integergroup import IntegerGroupQ, integer
+    >>> p = integer(148829018183496626261556856344710600327516732500226144177322012998064772051982752493460332138204351040296264880017943408846937646702376203733370973197019636813306480144595809796154634625021213611577190781215296823124523899584781302512549499802030946698512327294159881907114777803654670044046376468983244647367)
+    >>> q = integer(74414509091748313130778428172355300163758366250113072088661006499032386025991376246730166069102175520148132440008971704423468823351188101866685486598509818406653240072297904898077317312510606805788595390607648411562261949792390651256274749901015473349256163647079940953557388901827335022023188234491622323683)
+    >>> groupObj = IntegerGroupQ()
+    >>> el = ElGamal(groupObj, p, q)    
+    >>> (public_key, secret_key) = el.keygen()
+    >>> msg = b"hello world!"
     >>> cipher_text = el.encrypt(public_key, msg)
     >>> decrypted_msg = el.decrypt(public_key, secret_key, cipher_text)    
     >>> decrypted_msg == msg
     True
     """
-    def __init__(self, group_type=int, builtin_cv=410):
+    def __init__(self, groupObj, p=0, q=0):
         PKEnc.__init__(self)
-        global _type
-        _type = group_type
-        self.paramgen(_type, builtin_cv)
-
-    def paramgen(self, _type, _cv):
         global group
-        if _type == int:
-            group = IntegerGroupQ()
-        elif _type == elliptic_curve:
-            group = ECGroup(_cv)
-        else:
-            assert False, "Invalid Type Exception!"
+        group = groupObj
+        if group.groupSetting() == 'integer':
+            group.p, group.q, group.r = p, q, 2
 
     def keygen(self, secparam=1024):
-        if _type == int:
-            group.paramgen(secparam)
+        if group.groupSetting() == 'integer':
+            if group.p == 0 or group.q == 0:
+                group.paramgen(secparam)
             g = group.randomGen()
-        elif _type == elliptic_curve:
+        elif group.groupSetting() == 'elliptic_curve':
             g = group.random(G)
         # x is private, g is public param
         x = group.random(); h = g ** x
@@ -90,7 +94,7 @@ class ElGamal(PKEnc):
         sk = {'x':x}
         return (pk, sk)
     
-    def encrypt(self, pk, M):    
+    def encrypt(self, pk, M):
         y = group.random()
         c1 = pk['g'] ** y 
         s = pk['h'] ** y
@@ -101,8 +105,10 @@ class ElGamal(PKEnc):
     def decrypt(self, pk, sk, c):
         s = c['c1'] ** sk['x']
         m = c['c2'] * (s ** -1)
-        M = group.decode(m)
+        if group.groupSetting() == 'integer':
+            M = group.decode(m % group.p)
+        elif group.groupSetting() == 'elliptic_curve':
+            M = group.decode(m)
         if debug: print('m => %s' % m)
         if debug: print('dec M => %s' % M)
         return M
-

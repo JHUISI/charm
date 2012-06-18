@@ -5,16 +5,15 @@ from schemes.pksig.pksig_bls04 import IBSig
 from schemes.ibenc.ibenc_adapt_identityhash import HashIDAdapter
 from schemes.pkenc.pkenc_adapt_chk04 import CHK04
 from schemes.pkenc.pkenc_adapt_hybrid import HybridEnc
-from schemes.pkenc.pkenc_cs98_ec import EC_CS98
 from schemes.pkenc.pkenc_cs98 import CS98
 from schemes.pkenc.pkenc_elgamal85 import ElGamal
 from schemes.pkenc.pkenc_paillier99 import Pai99
 from schemes.pkenc.pkenc_rabin import Rabin_Enc, Rabin_Sig
 from schemes.pkenc.pkenc_rsa import RSA_Enc, RSA_Sig
 from charm.toolbox.pairinggroup import PairingGroup, GT 
-from charm.toolbox.ecgroup import elliptic_curve
+from charm.toolbox.ecgroup import elliptic_curve, ECGroup
 from charm.toolbox.eccurve import prime192v1, prime192v2
-from charm.toolbox.integergroup import RSAGroup, integer
+from charm.toolbox.integergroup import RSAGroup, integer, IntegerGroupQ, IntegerGroup
 import unittest
 
 debug = False
@@ -71,7 +70,8 @@ class CHK04Test(unittest.TestCase):
 class HybridEncTest(unittest.TestCase):
     def testHybridEnc(self):
         #    pkenc = EC_CS98(prime192v1)
-        pkenc = ElGamal(elliptic_curve, prime192v1)
+        groupObj = ECGroup(prime192v1)
+        pkenc = ElGamal(groupObj)
         hyenc = HybridEnc(pkenc)
        
         (pk, sk) = hyenc.keygen()
@@ -84,7 +84,8 @@ class HybridEncTest(unittest.TestCase):
 
 class EC_CS98Test(unittest.TestCase):
     def testEC_CS98(self):
-        pkenc = EC_CS98(prime192v1)
+        groupObj = ECGroup(prime192v1)
+        pkenc = CS98(groupObj)
         
         (pk, sk) = pkenc.keygen()
         M = b"hello world!!!"
@@ -100,7 +101,8 @@ class CS98Test(unittest.TestCase):
     def testCS98(self):
         p = integer(156053402631691285300957066846581395905893621007563090607988086498527791650834395958624527746916581251903190331297268907675919283232442999706619659475326192111220545726433895802392432934926242553363253333261282122117343404703514696108330984423475697798156574052962658373571332699002716083130212467463571362679)
         q = integer(78026701315845642650478533423290697952946810503781545303994043249263895825417197979312263873458290625951595165648634453837959641616221499853309829737663096055610272863216947901196216467463121276681626666630641061058671702351757348054165492211737848899078287026481329186785666349501358041565106233731785681339)
-        pkenc = CS98(p, q)
+        groupObj = IntegerGroup()
+        pkenc = CS98(groupObj, p, q)
         
         (pk, sk) = pkenc.keygen(1024)
         M = b"hello world. test message"
@@ -113,13 +115,23 @@ class CS98Test(unittest.TestCase):
 
 class ElGamalTest(unittest.TestCase):
     def testElGamal(self):
-        el = ElGamal(elliptic_curve, prime192v2)    
+        groupObj = ECGroup(prime192v2)
+        el = ElGamal(groupObj)   
         (pk, sk) = el.keygen()
         msg = b"hello world!"
-        size = len(msg)
         cipher1 = el.encrypt(pk, msg)
-        
         m = el.decrypt(pk, sk, cipher1)    
+        assert m == msg, "Failed Decryption!!!"
+        if debug: print("SUCCESSFULLY DECRYPTED!!!")
+
+class ElGamalTest(unittest.TestCase):
+    def testElGamal(self):
+        groupObj = IntegerGroupQ()
+        el = ElGamal(groupObj) 
+        (pk, sk) = el.keygen()
+        msg = b"hello world!"
+        cipher1 = el.encrypt(pk, msg)
+        m = el.decrypt(pk, sk, cipher1)
         assert m == msg, "Failed Decryption!!!"
         if debug: print("SUCCESSFULLY DECRYPTED!!!")
 

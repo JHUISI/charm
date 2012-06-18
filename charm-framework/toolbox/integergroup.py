@@ -31,6 +31,9 @@ class IntegerGroup:
             if not g == 1:
                 break
         return g
+
+    def groupSetting(self):
+        return 'integer'
         
     def groupType(self): 
         return 'SchnorrGroup mod p'     
@@ -95,6 +98,9 @@ class IntegerGroupQ:
                 #print "g => %s" % g 
                 break
         return g
+
+    def groupSetting(self):
+        return 'integer'
         
     def groupType(self): 
         return 'SchnorrGroup mod q'     
@@ -173,6 +179,9 @@ class RSAGroup:
             return random(self.n)        
         else:
             return random(max)
+
+    def groupSetting(self):
+        return 'integer'
 
     def groupType(self): 
         return 'RSAGroup mod p'     

@@ -1,7 +1,7 @@
 '''Takes an public-key encryption scheme and builds a hybrid encryption scheme.'''
 
 # Works for ElGamal and CS98 schemes
-from schemes.pkenc.pkenc_cs98_ec import *
+from schemes.pkenc.pkenc_cs98 import *
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from schemes.pkenc.pkenc_elgamal85 import *
 from charm.toolbox.PKEnc import PKEnc
@@ -12,7 +12,9 @@ debug = False
 class HybridEnc(PKEnc):
     """
     >>> from charm.toolbox.eccurve import prime192v1
-    >>> pkenc = EC_CS98(prime192v1)
+    >>> from charm.toolbox.ecgroup import ECGroup
+    >>> groupObj = ECGroup(prime192v1)
+    >>> pkenc = CS98(groupObj)
     >>> hyenc = HybridEnc(pkenc)
     >>> (public_key, secret_key) = hyenc.keygen()
     >>> msg = 'this is a new message'
