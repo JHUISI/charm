@@ -12,8 +12,8 @@ Available from: http://eprint.iacr.org/2010/351.pdf
 :Date:           06/2011 
 '''
 
-from charm.toolbox.pairinggroup import *
-from charm.toolbox.secretutil import *
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.secretutil import SecretUtil
 from charm.toolbox.ABEncMultiAuth import *
 
 debug = False

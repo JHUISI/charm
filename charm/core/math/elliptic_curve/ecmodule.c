@@ -1,6 +1,5 @@
 /*
- * Elliptic Curve Module - based on lib MIRACL
- * TODO: need parameter setting,
+ * Elliptic Curve Module - based on Openssl
  */
 #include "ecmodule.h"
 
@@ -105,7 +104,7 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, int hash_size, uint8_t *out
 /*
  * Create a new point with an existing group object
  */
-ECElement *createNewPoint(GroupType type, EC_GROUP *group, BN_CTX *ctx) {
+ECElement *createNewPoint(GroupType type, ECElement *gobj) { // EC_GROUP *group, BN_CTX *ctx) {
 
 	ECElement *newObj = PyObject_New(ECElement, &ECType);
 	if(type == ZR) {
@@ -115,7 +114,7 @@ ECElement *createNewPoint(GroupType type, EC_GROUP *group, BN_CTX *ctx) {
 	}
 	else if(type == G) {
 		newObj->type = type;
-		newObj->P = EC_POINT_new(group);
+		newObj->P = EC_POINT_new(gobj->group);
 		newObj->elemZ = NULL;
 	}
 	else {
@@ -123,10 +122,10 @@ ECElement *createNewPoint(GroupType type, EC_GROUP *group, BN_CTX *ctx) {
 		return NULL;
 	}
 	newObj->point_init = TRUE;
-	newObj->nid = -1;
-	newObj->group = group;
+	newObj->nid = gobj->nid;
+	newObj->group = gobj->group;
 	newObj->group_init = FALSE;
-	newObj->ctx = ctx;
+	newObj->ctx = gobj->ctx;
 	return newObj;
 }
 
@@ -304,12 +303,12 @@ PyObject *ECE_init(ECElement *self, PyObject *args) {
 
 		if(type == G) {
 			debug("init element in group G.\n");
-			obj = createNewPoint(G, gobj->group, gobj->ctx);
+			obj = createNewPoint(G, gobj); // ->group, gobj->ctx);
 			return (PyObject *) obj;
 		}
 		else if(type == ZR) {
 			debug("init element of ZR.\n");
-			obj = createNewPoint(ZR, gobj->group, gobj->ctx);
+			obj = createNewPoint(ZR, gobj); // ->group, gobj->ctx);
 			return (PyObject *) obj;
 		}
 		else {
@@ -332,7 +331,7 @@ PyObject *ECE_random(ECElement *self, PyObject *args) {
 			// call 'EC_POINT_set_compressed_coordinates_GFp' w/ group, P, x, 1, ctx
 			// call 'EC_POINT_set_affine_coordinates_GFp' w/ group, P, x/y, ctx
 			// test group membership 'EC_POINT_is_on_curve'
-			ECElement *objG = createNewPoint(G, gobj->group, gobj->ctx);
+			ECElement *objG = createNewPoint(G, gobj); // ->group, gobj->ctx);
 			BIGNUM *x = BN_new(), *y = BN_new(), *order = BN_new();
 			EC_GROUP_get_order(gobj->group, order, gobj->ctx);
 			int FindAnotherPoint = TRUE;
@@ -367,7 +366,7 @@ PyObject *ECE_random(ECElement *self, PyObject *args) {
 			return (PyObject *) objG;
 		}
 		else if(type == ZR) {
-			ECElement *objZR = createNewPoint(ZR, gobj->group, gobj->ctx);
+			ECElement *objZR = createNewPoint(ZR, gobj); // ->group, gobj->ctx);
 			BIGNUM *order = BN_new();
 			EC_GROUP_get_order(gobj->group, order, gobj->ctx);
 			objZR->elemZ = BN_new();
@@ -419,7 +418,7 @@ static PyObject *ECE_add(PyObject *o1, PyObject *o2) {
 			BIGNUM *lhs_val = BN_new();
 			order = BN_new();
 			setBigNum((PyLongObject *) o1, &lhs_val);
-			ans = createNewPoint(ZR, rhs->group, rhs->ctx);
+			ans = createNewPoint(ZR, rhs); // ->group, rhs->ctx);
 			EC_GROUP_get_order(ans->group, order, ans->ctx);
 			START_CLOCK(dBench);
 			BN_mod_add(ans->elemZ, lhs_val, rhs->elemZ, order, ans->ctx);
@@ -437,7 +436,7 @@ static PyObject *ECE_add(PyObject *o1, PyObject *o2) {
 			BIGNUM *rhs_val = BN_new();
 			order = BN_new();
 			setBigNum((PyLongObject *) o2, &rhs_val);
-			ans = createNewPoint(ZR, lhs->group, lhs->ctx);
+			ans = createNewPoint(ZR, lhs); // ->group, lhs->ctx);
 			EC_GROUP_get_order(ans->group, order, ans->ctx);
 			START_CLOCK(dBench);
 			BN_mod_add(ans->elemZ, lhs->elemZ, rhs_val, order, ans->ctx);
@@ -453,9 +452,11 @@ static PyObject *ECE_add(PyObject *o1, PyObject *o2) {
 		Point_Init(lhs);
 		Point_Init(rhs);
 		if(ElementZR(lhs, rhs)) {
+
+			IS_SAME_GROUP(lhs, rhs);
 			// easy, just call BN_add
 			order = BN_new();
-			ans = createNewPoint(ZR, lhs->group, lhs->ctx);
+			ans = createNewPoint(ZR, lhs); // ->group, lhs->ctx);
 			EC_GROUP_get_order(ans->group, order, ans->ctx);
 			START_CLOCK(dBench);
 			BN_mod_add(ans->elemZ, lhs->elemZ, rhs->elemZ, order, ans->ctx);
@@ -493,7 +494,7 @@ static PyObject *ECE_sub(PyObject *o1, PyObject *o2) {
 			BIGNUM *lhs_val = BN_new();
 			order = BN_new();
 			setBigNum((PyLongObject *) o1, &lhs_val);
-			ans = createNewPoint(ZR, rhs->group, rhs->ctx);
+			ans = createNewPoint(ZR, rhs); // ->group, rhs->ctx);
 			EC_GROUP_get_order(ans->group, order, ans->ctx);
 			START_CLOCK(dBench);
 			BN_mod_sub(ans->elemZ, lhs_val, rhs->elemZ, order, ans->ctx);
@@ -513,7 +514,7 @@ static PyObject *ECE_sub(PyObject *o1, PyObject *o2) {
 			BIGNUM *rhs_val = BN_new();
 			order = BN_new();
 			setBigNum((PyLongObject *) o2, &rhs_val);
-			ans = createNewPoint(ZR, lhs->group, lhs->ctx);
+			ans = createNewPoint(ZR, lhs); // ->group, lhs->ctx);
 			EC_GROUP_get_order(ans->group, order, ans->ctx);
 			START_CLOCK(dBench);
 			BN_mod_sub(ans->elemZ, lhs->elemZ, rhs_val, order, ans->ctx);
@@ -531,8 +532,9 @@ static PyObject *ECE_sub(PyObject *o1, PyObject *o2) {
 		Point_Init(rhs);
 
 		if(ElementZR(lhs, rhs)) {
+			IS_SAME_GROUP(lhs, rhs);
 			order = BN_new();
-			ans = createNewPoint(ZR, lhs->group, lhs->ctx);
+			ans = createNewPoint(ZR, lhs); // ->group, lhs->ctx);
 			EC_GROUP_get_order(ans->group, order, ans->ctx);
 			START_CLOCK(dBench);
 			BN_mod_sub(ans->elemZ, lhs->elemZ, rhs->elemZ, order, ans->ctx);
@@ -568,7 +570,7 @@ static PyObject *ECE_mul(PyObject *o1, PyObject *o2) {
 			BIGNUM *lhs_val = BN_new();
 			order = BN_new();
 			setBigNum((PyLongObject *) o1, &lhs_val);
-			ans = createNewPoint(ZR, rhs->group, rhs->ctx);
+			ans = createNewPoint(ZR, rhs); // ->group, rhs->ctx);
 			EC_GROUP_get_order(ans->group, order, ans->ctx);
 			START_CLOCK(dBench);
 			BN_mod_mul(ans->elemZ, lhs_val, rhs->elemZ, order, ans->ctx);
@@ -588,7 +590,7 @@ static PyObject *ECE_mul(PyObject *o1, PyObject *o2) {
 			BIGNUM *rhs_val = BN_new();
 			order = BN_new();
 			setBigNum((PyLongObject *) o2, &rhs_val);
-			ans = createNewPoint(ZR, lhs->group, lhs->ctx);
+			ans = createNewPoint(ZR, lhs); // ->group, lhs->ctx);
 			EC_GROUP_get_order(ans->group, order, ans->ctx);
 			START_CLOCK(dBench);
 			BN_mod_mul(ans->elemZ, lhs->elemZ, rhs_val, order, ans->ctx);
@@ -604,16 +606,17 @@ static PyObject *ECE_mul(PyObject *o1, PyObject *o2) {
 		// check whether we have two Points
 		Point_Init(lhs);
 		Point_Init(rhs);
+		IS_SAME_GROUP(lhs, rhs);
 
 		if(ElementG(lhs, rhs)) {
-			ans = createNewPoint(G, lhs->group, lhs->ctx);
+			ans = createNewPoint(G, lhs); // ->group, lhs->ctx);
 			START_CLOCK(dBench);
 			EC_POINT_add(ans->group, ans->P, lhs->P, rhs->P, ans->ctx);
 			STOP_CLOCK(dBench);
 		}
 		else if(ElementZR(lhs, rhs)) {
 			order = BN_new();
-			ans = createNewPoint(ZR, lhs->group, lhs->ctx);
+			ans = createNewPoint(ZR, lhs); // ->group, lhs->ctx);
 			EC_GROUP_get_order(ans->group, order, ans->ctx);
 			START_CLOCK(dBench);
 			BN_mod_mul(ans->elemZ, lhs->elemZ, rhs->elemZ, order, ans->ctx);
@@ -650,7 +653,7 @@ static PyObject *ECE_div(PyObject *o1, PyObject *o2) {
 			BIGNUM *lhs_val = BN_new();
 			rm = BN_new();
 			setBigNum((PyLongObject *) o1, &lhs_val);
-			ans = createNewPoint(ZR, rhs->group, rhs->ctx);
+			ans = createNewPoint(ZR, rhs); // ->group, rhs->ctx);
 			START_CLOCK(dBench);
 			BN_div(ans->elemZ, rm, lhs_val, rhs->elemZ, ans->ctx);
 			STOP_CLOCK(dBench);
@@ -669,7 +672,7 @@ static PyObject *ECE_div(PyObject *o1, PyObject *o2) {
 			BIGNUM *rhs_val = BN_new();
 			rm = BN_new();
 			setBigNum((PyLongObject *) o2, &rhs_val);
-			ans = createNewPoint(ZR, lhs->group, lhs->ctx);
+			ans = createNewPoint(ZR, lhs); // ->group, lhs->ctx);
 			START_CLOCK(dBench);
 			BN_div(ans->elemZ, rm, lhs->elemZ, rhs_val, ans->ctx);
 			STOP_CLOCK(dBench);
@@ -684,11 +687,12 @@ static PyObject *ECE_div(PyObject *o1, PyObject *o2) {
 		// check whether we have two Points
 		Point_Init(lhs);
 		Point_Init(rhs);
+		IS_SAME_GROUP(lhs, rhs);
 
 		if(ElementG(lhs, rhs)) {
 			ECElement *rhs_neg = negatePoint(rhs);
 			if(rhs_neg != NULL) {
-				ans = createNewPoint(G, lhs->group, lhs->ctx);
+				ans = createNewPoint(G, lhs); // ->group, lhs->ctx);
 				START_CLOCK(dBench);
 				EC_POINT_add(ans->group, ans->P, lhs->P, rhs_neg->P, ans->ctx);
 				STOP_CLOCK(dBench);
@@ -699,7 +703,7 @@ static PyObject *ECE_div(PyObject *o1, PyObject *o2) {
 			}
 		}
 		else if(ElementZR(lhs, rhs)) {
-			ans = createNewPoint(ZR, lhs->group, lhs->ctx);
+			ans = createNewPoint(ZR, lhs); // ->group, lhs->ctx);
 			rm = BN_new();
 			START_CLOCK(dBench);
 			BN_div(ans->elemZ, rm, lhs->elemZ, rhs->elemZ, ans->ctx);
@@ -708,14 +712,14 @@ static PyObject *ECE_div(PyObject *o1, PyObject *o2) {
 		}
 		else {
 
-			ErrorMsg("elements not the same type.");
+			EXIT_IF(TRUE, "elements not the same type.");
 		}
 
 		UPDATE_BENCHMARK(DIVISION, dBench);
 		return (PyObject *) ans;
 	}
 
-	ErrorMsg("invalid argument.");
+	EXIT_IF(TRUE, "invalid argument.");
 }
 
 static PyObject *ECE_rem(PyObject *o1, PyObject *o2) {
@@ -732,7 +736,7 @@ static PyObject *ECE_rem(PyObject *o1, PyObject *o2) {
 		if(rhs->point_init && rhs->type == ZR) {
 			BIGNUM *lhs_val = BN_new();
 			setBigNum((PyLongObject *) o1, &lhs_val);
-			ans = createNewPoint(ZR, rhs->group, rhs->ctx);
+			ans = createNewPoint(ZR, rhs); // ->group, rhs->ctx);
 			START_CLOCK(dBench);
 			BN_mod(ans->elemZ, lhs_val, rhs->elemZ, ans->ctx);
 			STOP_CLOCK(dBench);
@@ -748,7 +752,7 @@ static PyObject *ECE_rem(PyObject *o1, PyObject *o2) {
 		if(lhs->point_init && lhs->type == ZR) {
 			BIGNUM *rhs_val = BN_new();
 			setBigNum((PyLongObject *) o2, &rhs_val);
-			ans = createNewPoint(ZR, lhs->group, lhs->ctx);
+			ans = createNewPoint(ZR, lhs); // ->group, lhs->ctx);
 			START_CLOCK(dBench);
 			BN_mod(ans->elemZ, lhs->elemZ, rhs_val, ans->ctx);
 			STOP_CLOCK(dBench);
@@ -761,7 +765,7 @@ static PyObject *ECE_rem(PyObject *o1, PyObject *o2) {
 		Point_Init(rhs);
 
 		if(ElementZR(lhs, rhs)) {
-			ans = createNewPoint(ZR, lhs->group, lhs->ctx);
+			ans = createNewPoint(ZR, lhs); // ->group, lhs->ctx);
 			// reall calls BN_div with the dv se to NULL.
 			BN_mod(ans->elemZ, lhs->elemZ, rhs->elemZ, ans->ctx);
 
@@ -777,17 +781,17 @@ static PyObject *ECE_rem(PyObject *o1, PyObject *o2) {
 	EXIT_IF(TRUE, "invalid argument type.");
 }
 
-ECElement *ec_point_mul(EC_GROUP *group, EC_POINT *point, BIGNUM *value, BN_CTX *ctx) {
-
-	ECElement *ans = createNewPoint(G, group, ctx);
-	START_CLOCK(dBench);
-//	EC_POINT_mul(group, ans->P, value, NULL, NULL, ctx);
-	EC_POINT_mul(group, ans->P, NULL, point, value, ctx);
-	STOP_CLOCK(dBench);
-//	BN_free(cofactor);
-//	BN_free(order);
-	return ans;
-}
+//ECElement *ec_point_mul(EC_GROUP *group, EC_POINT *point, BIGNUM *value, BN_CTX *ctx) {
+//
+////	ECElement *ans = createNewPoint(G, group, ctx);
+//	START_CLOCK(dBench);
+////	EC_POINT_mul(group, ans->P, value, NULL, NULL, ctx);
+//	EC_POINT_mul(group, ans->P, NULL, point, value, ctx);
+//	STOP_CLOCK(dBench);
+////	BN_free(cofactor);
+////	BN_free(order);
+//	return ans;
+//}
 
 static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 	ECElement *lhs = NULL, *rhs = NULL, *ans = NULL;
@@ -802,7 +806,7 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 			BIGNUM *lhs_val = BN_new();
 			order = BN_new();
 			setBigNum((PyLongObject *) o1, &lhs_val);
-			ans = createNewPoint(ZR, rhs->group, rhs->ctx);
+			ans = createNewPoint(ZR, rhs); // ->group, rhs->ctx);
 			EC_GROUP_get_order(ans->group, order, ans->ctx);
 			START_CLOCK(dBench);
 			BN_mod_exp(ans->elemZ, lhs_val, rhs->elemZ, order, ans->ctx);
@@ -828,7 +832,7 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 					order = BN_new();
 					setBigNum((PyLongObject *) o2, &rhs_val);
 
-					ans = createNewPoint(ZR, lhs->group, lhs->ctx);
+					ans = createNewPoint(ZR, lhs); // ->group, lhs->ctx);
 					EC_GROUP_get_order(ans->group, order, ans->ctx);
 					BN_mod_exp(ans->elemZ, lhs->elemZ, rhs_val, order, ans->ctx);
 					BN_free(rhs_val);
@@ -850,8 +854,10 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 					PyErr_Clear();
 					BIGNUM *rhs_val = BN_new();
 					setBigNum((PyLongObject *) o2, &rhs_val);
-					ans = createNewPoint(G, lhs->group, lhs->ctx);
-					ans = ec_point_mul(lhs->group, lhs->P, rhs_val, lhs->ctx);
+					ans = createNewPoint(G, lhs); // ->group, lhs->ctx);
+					EC_POINT_mul(ans->group, ans->P, NULL, lhs->P, rhs_val, ans->ctx);
+
+//					ans = ec_point_mul(lhs->group, lhs->P, rhs_val, lhs->ctx);
 			}
 			else if(rhs == -1) {
 				debug("finding modular inverse.\n");
@@ -872,15 +878,15 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 		// check whether we have two Points
 		Point_Init(lhs);
 		Point_Init(rhs);
+		IS_SAME_GROUP(lhs, rhs);
 
 		if(lhs->type == G && rhs->type == ZR) {
-			// ans = createNewPoint(G, lhs->group, lhs->ctx);
-			// EC_POINT_copy(ans->P, lhs->P);
-			// EC_POINT_mul(ans->group, ans->P, rhs->elemZ, NULL, NULL, ans->ctx);
-			ans = ec_point_mul(lhs->group, lhs->P, rhs->elemZ, lhs->ctx);
+//			ans = ec_point_mul(lhs->nid, lhs->group, lhs->P, rhs->elemZ, lhs->ctx);
+			ans = createNewPoint(G, lhs);
+			EC_POINT_mul(ans->group, ans->P, NULL, lhs->P, rhs->elemZ, ans->ctx);
 		}
 		else if(ElementZR(lhs, rhs)) {
-			ans = createNewPoint(ZR, lhs->group, lhs->ctx);
+			ans = createNewPoint(ZR, lhs); // ->group, lhs->ctx);
 			order = BN_new();
 			EC_GROUP_get_order(ans->group, order, ans->ctx);
 			START_CLOCK(dBench);
@@ -903,7 +909,7 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 ECElement *invertECElement(ECElement *self) {
 	ECElement *newObj = NULL;
 	if(self->type == G) {
-		newObj = createNewPoint(G, self->group, self->ctx);
+		newObj = createNewPoint(G, self); // ->group, self->ctx);
 		EC_POINT_copy(newObj->P, self->P);
 		START_CLOCK(dBench);
 		if(EC_POINT_invert(newObj->group, newObj->P, newObj->ctx)) {
@@ -924,7 +930,7 @@ ECElement *invertECElement(ECElement *self) {
 		BIGNUM *x = BN_mod_inverse(NULL, self->elemZ, p, self->ctx);
 		STOP_CLOCK(dBench);
 		if(x != NULL) {
-			newObj = createNewPoint(ZR, self->group, self->ctx);
+			newObj = createNewPoint(ZR, self); // ->group, self->ctx);
 			BN_copy(newObj->elemZ, x);
 			BN_free(x);
 			BN_free(p);
@@ -971,7 +977,7 @@ ECElement *negatePoint(ECElement *self) {
 	EC_POINT_get_affine_coordinates_GFp(self->group, self->P, x, y, self->ctx);
 	BN_set_negative(y, TRUE);
 
-	newObj = createNewPoint(G, self->group, self->ctx);
+	newObj = createNewPoint(G, self); // ->group, self->ctx);
 	EC_POINT_set_affine_coordinates_GFp(newObj->group, newObj->P, x, y, newObj->ctx);
 	if(EC_POINT_is_on_curve(newObj->group, newObj->P, newObj->ctx)) {
 		return newObj;
@@ -1029,8 +1035,8 @@ static PyObject *ECE_convertToZR(ECElement *self, PyObject *args) {
 					// see if retXY is Py_True or Py_False
 					if(retXY == Py_True) {
 						debug("Py_True detected.\n");
-						ECElement *X = createNewPoint(ZR, gobj->group, gobj->ctx);
-						ECElement *Y = createNewPoint(ZR, gobj->group, gobj->ctx);
+						ECElement *X = createNewPoint(ZR, gobj); // ->group, gobj->ctx);
+						ECElement *Y = createNewPoint(ZR, gobj); // ->group, gobj->ctx);
 						BN_copy(X->elemZ, x);
 						BN_copy(Y->elemZ, y);
 						BN_free(x); BN_free(y);
@@ -1038,7 +1044,7 @@ static PyObject *ECE_convertToZR(ECElement *self, PyObject *args) {
 					}
 					else {
 						BN_free(y);
-						ECElement *newObj = createNewPoint(ZR, gobj->group, gobj->ctx);
+						ECElement *newObj = createNewPoint(ZR, gobj); // ->group, gobj->ctx);
 						BN_copy(newObj->elemZ, x);
 						BN_free(x);
 						return (PyObject *) newObj;
@@ -1057,7 +1063,7 @@ static PyObject *ECE_getOrder(ECElement *self, PyObject *arg) {
 		ECElement *gobj = (ECElement *) arg;
 		Group_Init(gobj);
 
-		ECElement *order = createNewPoint(ZR, self->group, self->ctx);
+		ECElement *order = createNewPoint(ZR, gobj); // ->group, self->ctx);
 		EC_GROUP_get_order(self->group, order->elemZ, NULL);
 		// return the order of the group
 		return (PyObject *) order;
@@ -1159,7 +1165,7 @@ static PyObject *ECE_getGen(ECElement *self, PyObject *arg) {
 		ECElement *gobj = (ECElement *) arg;
 		Group_Init(gobj);
 
-		ECElement *genObj = createNewPoint(G, gobj->group, gobj->ctx);
+		ECElement *genObj = createNewPoint(G, gobj); // ->group, gobj->ctx);
 		const EC_POINT *gen = EC_GROUP_get0_generator(gobj->group);
 		EC_POINT_copy(genObj->P, gen);
 
@@ -1235,7 +1241,7 @@ static PyObject *ECE_hash(ECElement *self, PyObject *args) {
 			debug("Hash output => ");
 			printf_buffer_as_hex(hash_buf, HASH_LEN);
 
-			hashObj = createNewPoint(G, gobj->group, gobj->ctx);
+			hashObj = createNewPoint(G, gobj); // ->group, gobj->ctx);
 			hashObj->P = element_from_hash(gobj->group, (uint8_t *) hash_buf, HASH_LEN);
 			STOP_CLOCK(dBench);
 			return (PyObject *) hashObj;
@@ -1247,7 +1253,7 @@ static PyObject *ECE_hash(ECElement *self, PyObject *args) {
 			debug("Hash output => ");
 			printf_buffer_as_hex(hash_buf, HASH_LEN);
 
-			hashObj = createNewPoint(ZR, gobj->group, gobj->ctx);
+			hashObj = createNewPoint(ZR, gobj); // ->group, gobj->ctx);
 			BN_bin2bn((const uint8_t *) hash_buf, HASH_LEN, hashObj->elemZ);
 			STOP_CLOCK(dBench);
 
@@ -1332,7 +1338,7 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
 					debug("input hex msg => ");
 					// check if msg len is big enough to fit into length
 					printf_buffer_as_hex((uint8_t *) input, len);
-					encObj = createNewPoint(G, gobj->group, gobj->ctx);
+					encObj = createNewPoint(G, gobj); // ->group, gobj->ctx);
 					x = BN_bin2bn((const uint8_t *) input, len, NULL);
 					y = BN_new();
 					char *xstr = BN_bn2dec(x);
@@ -1503,7 +1509,7 @@ static PyObject *Deserialize(ECElement *self, PyObject *args)
 			debug("Deserialize this => ");
 			printf_buffer_as_hex(buf, len);
 			if(type == G) {
-				ECElement *newObj = createNewPoint(type, gobj->group, gobj->ctx);
+				ECElement *newObj = createNewPoint(type, gobj); // ->group, gobj->ctx);
 				START_CLOCK(dBench);
 				EC_POINT_oct2point(gobj->group, newObj->P, (const uint8_t *) buf, len, gobj->ctx);
 
@@ -1513,7 +1519,7 @@ static PyObject *Deserialize(ECElement *self, PyObject *args)
 				}
 			}
 			else if(type == ZR) {
-				ECElement *newObj = createNewPoint(type, gobj->group, gobj->ctx);
+				ECElement *newObj = createNewPoint(type, gobj); // ->group, gobj->ctx);
 				START_CLOCK(dBench);
 				BN_bin2bn((const uint8_t *) buf, len, newObj->elemZ);
 				STOP_CLOCK(dBench);
@@ -1531,7 +1537,7 @@ static PyObject *Deserialize(ECElement *self, PyObject *args)
 }
 
 
-InitBenchmark_CAPI(_init_benchmark, dBench, 2)
+InitBenchmark_CAPI(_init_benchmark, dBench, 2);
 StartBenchmark_CAPI(_start_benchmark, dBench);
 EndBenchmark_CAPI(_end_benchmark, dBench);
 GetBenchmark_CAPI(_get_benchmark, dBench);
@@ -1591,7 +1597,7 @@ PyNumberMethods ecc_number = {
 
 PyTypeObject ECType = {
 	PyVarObject_HEAD_INIT(NULL, 0)
-	"elliptic_curve.Element",             /*tp_name*/
+	"ecc.Element",             /*tp_name*/
 	sizeof(ECElement),         /*tp_basicsize*/
 	0,                         /*tp_itemsize*/
 	(destructor)ECElement_dealloc, /*tp_dealloc*/
@@ -1685,7 +1691,7 @@ PyTypeObject ECType = {
     0,                         /*tp_setattr*/
     0,                         /*tp_compare*/
     0,                         /*tp_repr*/
-    &ecc_number,       /*tp_as_number*/
+    &ec_number,       /*tp_as_number*/
     0,                         /*tp_as_sequence*/
     0,                         /*tp_as_mapping*/
     0,                         /*tp_hash */
@@ -1729,7 +1735,7 @@ struct module_state {
 static struct module_state _state;
 #endif
 
-static PyMethodDef ecc_methods[] = {
+static PyMethodDef ec_methods[] = {
 		{"init", (PyCFunction)ECE_init, METH_VARARGS, "Create an element in a specific group G or ZR."},
 		{"random", (PyCFunction)ECE_random, METH_VARARGS, "Return a random element in a specific group G or ZR."},
 		{"order", (PyCFunction)ECE_getOrder, METH_O, "Return the order of a group."},
@@ -1737,7 +1743,7 @@ static PyMethodDef ecc_methods[] = {
 		{"bitsize", (PyCFunction)ECE_bitsize, METH_O, "Returns number of bytes to represent a message."},
 		{"serialize", (PyCFunction)Serialize, METH_VARARGS, "Serialize an element to a string"},
 		{"deserialize", (PyCFunction)Deserialize, METH_VARARGS, "Deserialize an element to G or ZR"},
-		{"hash", (PyCFunction)ECE_hash, METH_VARARGS, "Perform a hash of a string to a group element of G."},
+		{"hashEC", (PyCFunction)ECE_hash, METH_VARARGS, "Perform a hash of a string to a group element of G."},
 		{"encode", (PyCFunction)ECE_encode, METH_VARARGS, "Encode string as a group element of G"},
 		{"decode", (PyCFunction)ECE_decode, METH_VARARGS, "Decode group element to a string."},
 		{"getXY", (PyCFunction)ECE_convertToZR, METH_VARARGS, "Returns the x and/or y coordinates of point on an elliptic curve."},
@@ -1752,12 +1758,12 @@ static PyMethodDef ecc_methods[] = {
 
 
 #if PY_MAJOR_VERSION >= 3
-static int ecc_traverse(PyObject *m, visitproc visit, void *arg) {
+static int ec_traverse(PyObject *m, visitproc visit, void *arg) {
 	Py_VISIT(GETSTATE(m)->error);
 	return 0;
 }
 
-static int ecc_clear(PyObject *m) {
+static int ec_clear(PyObject *m) {
 	Py_CLEAR(GETSTATE(m)->error);
 	Py_CLEAR(GETSTATE(m)->dBench);
 	return 0;
@@ -1768,10 +1774,10 @@ static struct PyModuleDef moduledef = {
 		"elliptic_curve",
 		NULL,
 		sizeof(struct module_state),
-		ecc_methods,
+		ec_methods,
 		NULL,
-		ecc_traverse,
-		ecc_clear,
+		ec_traverse,
+		ec_clear,
 		NULL
 };
 
@@ -1780,29 +1786,29 @@ PyMODINIT_FUNC
 PyInit_elliptic_curve(void) 		{
 #else
 #define INITERROR return
-void initecc(void) 		{
+void initelliptic_curve(void) 		{
 #endif
-	PyObject *module;
+	PyObject *m;
     if(PyType_Ready(&ECType) < 0)
     	INITERROR;
 
 #if PY_MAJOR_VERSION >= 3
-	module = PyModule_Create(&moduledef);
+	m = PyModule_Create(&moduledef);
 #else
-	module = Py_InitModule("elliptic_curve", ecc_methods);
+	m = Py_InitModule("elliptic_curve", ec_methods);
 #endif
 
-	if(module == NULL)
+	if(m == NULL)
 		INITERROR;
-	struct module_state *st = GETSTATE(module);
+	struct module_state *st = GETSTATE(m);
 	st->error = PyErr_NewException("elliptic_curve.Error", NULL, NULL);
 	if(st->error == NULL) {
-		Py_DECREF(module);
+		Py_DECREF(m);
 		INITERROR;
 	}
 
-    if(import_benchmark() < 0)
-    	INITERROR;
+//    if(import_benchmark() < 0)
+//    	INITERROR;
     if(PyType_Ready(&BenchmarkType) < 0)
     	INITERROR;
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);
@@ -1811,19 +1817,23 @@ void initecc(void) 		{
     InitClear(dBench);
 
 	Py_INCREF(&ECType);
-	PyModule_AddObject(module, "elliptic_curve", (PyObject *)&ECType);
-	PyModule_AddIntConstant(module, "G", G);
-	PyModule_AddIntConstant(module, "ZR", ZR);
+	PyModule_AddObject(m, "elliptic_curve", (PyObject *)&ECType);
+    Py_INCREF(&BenchmarkType);
+    PyModule_AddObject(m, "benchmark", (PyObject *)&BenchmarkType);
+
+	PyModule_AddIntConstant(m, "G", G);
+	PyModule_AddIntConstant(m, "ZR", ZR);
 	PyECErrorObject = st->error;
 
-	PyModule_AddIntConstant(module, "CpuTime", CPU_TIME);
-	PyModule_AddIntConstant(module, "RealTime", REAL_TIME);
-	PyModule_AddIntConstant(module, "NativeTime", NATIVE_TIME);
-	PyModule_AddIntConstant(module, "Add", ADDITION);
-	PyModule_AddIntConstant(module, "Sub", SUBTRACTION);
-	PyModule_AddIntConstant(module, "Mul", MULTIPLICATION);
-	PyModule_AddIntConstant(module, "Div", DIVISION);
-	PyModule_AddIntConstant(module, "Exp", EXPONENTIATION);
+	ADD_BENCHMARK_OPTIONS(m);
+//	PyModule_AddIntConstant(module, "CpuTime", CPU_TIME);
+//	PyModule_AddIntConstant(module, "RealTime", REAL_TIME);
+//	PyModule_AddIntConstant(module, "NativeTime", NATIVE_TIME);
+//	PyModule_AddIntConstant(module, "Add", ADDITION);
+//	PyModule_AddIntConstant(module, "Sub", SUBTRACTION);
+//	PyModule_AddIntConstant(module, "Mul", MULTIPLICATION);
+//	PyModule_AddIntConstant(module, "Div", DIVISION);
+//	PyModule_AddIntConstant(module, "Exp", EXPONENTIATION);
 
 	// initialize PRNG
 	// replace with read from some source of randomness
@@ -1837,6 +1847,6 @@ void initecc(void) 		{
 #endif
 
 #if PY_MAJOR_VERSION >= 3
-	return module;
+	return m;
 #endif
 }

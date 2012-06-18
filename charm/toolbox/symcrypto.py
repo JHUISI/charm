@@ -1,8 +1,8 @@
 from charm.core.crypto.cryptobase import MODE_CBC,AES,selectPRP
-from charm.core.math.pairing import hash as sha1
+from charm.core.math.pairing import hashPair as sha1
 from hashlib import sha1 as sha1hashlib
 from charm.toolbox.conversion import *
-from charm.toolbox.paddingschemes import  PKCS7Padding
+from charm.toolbox.paddingschemes import PKCS7Padding
 from charm.toolbox.securerandom import OpenSSLRand
 from math import ceil
 import json
@@ -19,7 +19,7 @@ class MessageAuthenticator(object):
         symatric key.
 
     >>> from charm.toolbox.pairinggroup import PairingGroup,GT
-    >>> from charm.core.math.pairing import hash as extractor
+    >>> from charm.core.math.pairing import hashPair as extractor
     >>> groupObj = PairingGroup('SS512')
     >>> key = groupObj.random(GT)
     >>> m = MessageAuthenticator(extractor(key))
@@ -70,7 +70,7 @@ class SymmetricCryptoAbstraction(object):
     usage:
     >>> from charm.toolbox.pairinggroup import PairingGroup,GT
     >>> groupObj = PairingGroup('SS512')
-    >>> from charm.core.math.pairing import hash as extractor
+    >>> from charm.core.math.pairing import hashPair as extractor
     >>> a = SymmetricCryptoAbstraction(extractor(groupObj.random(GT)))
     >>> ct = a.encrypt("Friendly Fire Isn't")
     >>> a.decrypt(ct)

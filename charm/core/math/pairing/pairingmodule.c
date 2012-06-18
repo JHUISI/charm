@@ -265,8 +265,10 @@ ssize_t read_file(FILE *f, char** out)
 			/* allocate that amount of memory only */
 			if((*out = (char *) malloc(out_len+1)) != NULL) {
 				fseek(f, 0L, SEEK_SET);
-				fread(*out, sizeof(char), out_len, f);
-				return out_len;
+				if(fread(*out, sizeof(char), out_len, f) > 0)
+				    return out_len;
+				else
+				    return -1;
 			}
 		}
 	}
@@ -360,32 +362,27 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, int hash_size, uint8_t* out
 
 int hash_element_to_bytes(element_t *element, int hash_size, uint8_t* output_buf, int prefix)
 {
-	int result = TRUE;
 	unsigned int buf_len;
 	
 	buf_len = element_length_in_bytes(*element);
 	uint8_t *temp_buf = (uint8_t *)malloc(buf_len+1);
-	if (temp_buf == NULL) {
+	if (temp_buf == NULL)
 		return FALSE;
-	}
 	
 	element_to_bytes(temp_buf, *element);
-	if(prefix == 0) {
+	if(prefix == 0)
 		prefix = HASH_FUNCTION_ELEMENTS;
-	}
-	else if(prefix < 0) {
+	else if(prefix < 0)
 		// convert into a positive number
 		prefix *= -1;
-	}
-	result = hash_to_bytes(temp_buf, buf_len, hash_size, output_buf, prefix);
+	int result = hash_to_bytes(temp_buf, buf_len, hash_size, output_buf, prefix);
 	free(temp_buf);
 	
-	return TRUE;
+	return result;
 }
 
 // take a previous hash and concatenate with serialized bytes of element and hashes into output buf
 int hash2_element_to_bytes(element_t *element, uint8_t* last_buf, int hash_size, uint8_t* output_buf) {
-	int result = TRUE;
 	// assume last buf contains a hash
 	unsigned int last_buflen = hash_size;
 	unsigned int buf_len = element_length_in_bytes(*element);
@@ -400,26 +397,22 @@ int hash2_element_to_bytes(element_t *element, uint8_t* last_buf, int hash_size,
 	// create output buffer
 	uint8_t* temp2_buf = (uint8_t *) malloc(last_buflen + buf_len + 1);
 	memset(temp2_buf, 0, (last_buflen + buf_len));
-//	// copy first input buffer (last_buf) into target buffer
-//	strncat((char *) temp2_buf, (char *) last_buf, last_buflen);
-//	// copy element buffer (temp_buf) into target buffer
-//	strncat((char *) temp2_buf, (char *) temp_buf, buf_len);
 	int i;
-	for(i = 0; i < last_buflen; i++) {
+	for(i = 0; i < last_buflen; i++)
 		temp2_buf[i] = last_buf[i];
-	}
 
 	int j = 0;
-	for(i = last_buflen; i < (last_buflen + buf_len); i++) {
+	for(i = last_buflen; i < (last_buflen + buf_len); i++)
+	{
 		temp2_buf[i] = temp_buf[j];
 		j++;
 	}
 	// hash the temp2_buf to bytes
-	result = hash_to_bytes(temp2_buf, (last_buflen + buf_len), hash_size, output_buf, HASH_FUNCTION_ELEMENTS);
+	int result = hash_to_bytes(temp2_buf, (last_buflen + buf_len), hash_size, output_buf, HASH_FUNCTION_ELEMENTS);
 
 	free(temp2_buf);
 	free(temp_buf);
-	return TRUE;
+	return result;
 }
 
 int hash2_buffer_to_bytes(uint8_t *input_str, int input_len, uint8_t *last_hash, int hash_size, uint8_t *output_buf) {
@@ -447,7 +440,7 @@ int hash2_buffer_to_bytes(uint8_t *input_str, int input_len, uint8_t *last_hash,
 	result = hash_to_bytes(temp_buf, (input_len + hash_size), hash_size, output_buf, HASH_FUNCTION_STRINGS);
 
 	PyObject_Del(last);
-	return TRUE;
+	return result;
 }
 
 PyObject *Element_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
@@ -589,6 +582,7 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
     return 0;
 }
 
+/*
 PyObject *Element_call(Element *elem, PyObject *args, PyObject *kwds)
 {
 	PyObject *object;
@@ -604,6 +598,7 @@ PyObject *Element_call(Element *elem, PyObject *args, PyObject *kwds)
 	
 	return NULL;
 }
+*/
  
 static PyObject *Element_elem(Element* self, PyObject* args)
 {
@@ -637,7 +632,6 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 }
 
 
-// TODO: use element_vnprintf to copy the result into element type
 PyObject *Element_print(Element* self)
 {
 	PyObject *strObj;
@@ -1701,7 +1695,7 @@ void Operations_clear()
 PyObject *PyCreateList(MeasureType type)
 {
 //	int groupTypes = 4;
-	int count;
+	int count = -1;
 	PyObject *objList = PyList_New(0);
 	// Insert backwards from GT -> G2 -> G1 -> ZR
 	GetField(count, type, GT, dBench);
@@ -2033,7 +2027,7 @@ PyMethodDef Element_methods[] = {
 PyMethodDef pairing_methods[] = {
 	{"init", (PyCFunction)Element_elem, METH_VARARGS, "Create an element in group ZR and optionally set value."},
 	{"pair", (PyCFunction)Apply_pairing, METH_VARARGS, "Apply pairing between an element of G1 and G2 and returns an element mapped to GT"},
-	{"hash", (PyCFunction)sha1_hash, METH_VARARGS, "Compute a sha1 hash of an element type"},
+	{"hashPair", (PyCFunction)sha1_hash, METH_VARARGS, "Compute a sha1 hash of an element type"},
 	{"H", (PyCFunction)Element_hash, METH_VARARGS, "Hash an element type to a specific field: Zr, G1, or G2"},
 	{"random", (PyCFunction)Element_random, METH_VARARGS, "Return a random element in a specific group: G1, G2, Zr"},
 	{"serialize", (PyCFunction)Serialize_cmp, METH_VARARGS, "Serialize an element type into bytes."},
@@ -2109,8 +2103,8 @@ void initpairing(void) 		{
 	}
 	ElementError = st->error;
 
-    if(import_benchmark() < 0)
-    	INITERROR;
+//    if(import_benchmark() < 0)
+//    	INITERROR;
     if(PyType_Ready(&BenchmarkType) < 0)
     	INITERROR;
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);
@@ -2127,20 +2121,23 @@ void initpairing(void) 		{
     PyModule_AddObject(m, "params", (PyObject *)&PairingType);
     Py_INCREF(&ElementType);
     PyModule_AddObject(m, "pairing", (PyObject *)&ElementType);
+    Py_INCREF(&BenchmarkType);
+    PyModule_AddObject(m, "benchmark", (PyObject *)&BenchmarkType);
 
 	PyModule_AddIntConstant(m, "ZR", ZR);
 	PyModule_AddIntConstant(m, "G1", G1);
 	PyModule_AddIntConstant(m, "G2", G2);
 	PyModule_AddIntConstant(m, "GT", GT);
 
-	PyModule_AddIntConstant(m, "CpuTime", CPU_TIME);
-	PyModule_AddIntConstant(m, "RealTime", REAL_TIME);
-	PyModule_AddIntConstant(m, "NativeTime", NATIVE_TIME);
-	PyModule_AddIntConstant(m, "Add", ADDITION);
-	PyModule_AddIntConstant(m, "Sub", SUBTRACTION);
-	PyModule_AddIntConstant(m, "Mul", MULTIPLICATION);
-	PyModule_AddIntConstant(m, "Div", DIVISION);
-	PyModule_AddIntConstant(m, "Exp", EXPONENTIATION);
+//	PyModule_AddIntConstant(m, "CpuTime", CPU_TIME);
+//	PyModule_AddIntConstant(m, "RealTime", REAL_TIME);
+//	PyModule_AddIntConstant(m, "NativeTime", NATIVE_TIME);
+//	PyModule_AddIntConstant(m, "Add", ADDITION);
+//	PyModule_AddIntConstant(m, "Sub", SUBTRACTION);
+//	PyModule_AddIntConstant(m, "Mul", MULTIPLICATION);
+//	PyModule_AddIntConstant(m, "Div", DIVISION);
+//	PyModule_AddIntConstant(m, "Exp", EXPONENTIATION);
+	ADD_BENCHMARK_OPTIONS(m);
 	PyModule_AddIntConstant(m, "Pair", PAIRINGS);
 	PyModule_AddIntConstant(m, "Granular", GRANULAR);
 #if PY_MAJOR_VERSION >= 3

@@ -15,7 +15,7 @@ Camenisch-Neven-shelat - Oblivious Transfer
 from charm.core.engine.protocol import *
 from charm.core.engine.util import *
 from socket import *
-from charm.toolbox.pairinggroup import *
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from schemes.sigma1 import *
 from schemes.sigma2 import *
 from schemes.sigma3 import *

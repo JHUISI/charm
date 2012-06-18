@@ -3,7 +3,7 @@ from schemes.abenc.abenc_bsw07 import CPabe_BSW07
 from schemes.abenc.abenc_lsw08 import KPabe
 from schemes.abenc.abenc_waters09 import CPabe09
 from schemes.abenc.kpabenc_adapt_hybrid import HybridABEnc as HybridKPABEnc
-from charm.toolbox.pairinggroup import PairingGroup, GT
+from charm.toolbox.pairinggroup import PairingGroup,GT
 import unittest
 
 debug = False

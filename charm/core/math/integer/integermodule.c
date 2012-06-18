@@ -976,9 +976,9 @@ static PyObject *Integer_remainder(PyObject *o1, PyObject *o2) {
 
 	Integer *lhs = NULL, *rhs = NULL, *rop = NULL;
 	int foundLHS = FALSE, foundRHS = FALSE;
-	unsigned long int lhs_value, rhs_value;
+	// unsigned long int lhs_value, rhs_value;
 
-	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value);
+	Check_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS); // , lhs_value, rhs_value);
 
 	if (foundLHS) {
 		rop = createNewInteger(rhs->m);
@@ -1894,7 +1894,7 @@ static PyMethodDef module_methods[] = {
 	{ "isPrime", (PyCFunction) testPrimality, METH_O, "probabilistic algorithm to whether a given integer is prime." },
 	{ "encode", (PyCFunction) encode_message, METH_VARARGS, "encode a message as a group element where p = 2*q + 1 only." },
 	{ "decode", (PyCFunction) decode_message, METH_VARARGS, "decode a message from a group element where p = 2*q + 1 to a message." },
-	{ "hash", (PyCFunction) Integer_hash, METH_VARARGS, "hash to group elements in which p = 2*q+1." },
+	{ "hashInt", (PyCFunction) Integer_hash, METH_VARARGS, "hash to group elements in which p = 2*q+1." },
 	{ "bitsize", (PyCFunction) bitsize, METH_VARARGS, "determine how many bits required to represent a given value." },
 	{ "legendre", (PyCFunction) legendre, METH_VARARGS, "given a and a positive prime p compute the legendre symbol." },
 	{ "gcd", (PyCFunction) gcdCall, METH_VARARGS, "compute the gcd of two integers a and b." },
@@ -1960,8 +1960,8 @@ void initinteger(void) {
 		INITERROR;
 	}
 
-	if (import_benchmark() < 0)
-		INITERROR;
+//	if (import_benchmark() < 0)
+//		INITERROR;
 	if (PyType_Ready(&BenchmarkType) < 0)
 		INITERROR;
 	st->dBench = PyObject_New(Benchmark, &BenchmarkType);
@@ -1972,16 +1972,19 @@ void initinteger(void) {
 
 	Py_INCREF(&IntegerType);
 	PyModule_AddObject(m, "integer", (PyObject *) &IntegerType);
+    Py_INCREF(&BenchmarkType);
+    PyModule_AddObject(m, "benchmark", (PyObject *)&BenchmarkType);
 
 	// add integer error to module
-	PyModule_AddIntConstant(m, "CpuTime", CPU_TIME);
-	PyModule_AddIntConstant(m, "RealTime", REAL_TIME);
-	PyModule_AddIntConstant(m, "NativeTime", NATIVE_TIME);
-	PyModule_AddIntConstant(m, "Add", ADDITION);
-	PyModule_AddIntConstant(m, "Sub", SUBTRACTION);
-	PyModule_AddIntConstant(m, "Mul", MULTIPLICATION);
-	PyModule_AddIntConstant(m, "Div", DIVISION);
-	PyModule_AddIntConstant(m, "Exp", EXPONENTIATION);
+	ADD_BENCHMARK_OPTIONS(m);
+//	PyModule_AddIntConstant(m, "CpuTime", CPU_TIME);
+//	PyModule_AddIntConstant(m, "RealTime", REAL_TIME);
+//	PyModule_AddIntConstant(m, "NativeTime", NATIVE_TIME);
+//	PyModule_AddIntConstant(m, "Add", ADDITION);
+//	PyModule_AddIntConstant(m, "Sub", SUBTRACTION);
+//	PyModule_AddIntConstant(m, "Mul", MULTIPLICATION);
+//	PyModule_AddIntConstant(m, "Div", DIVISION);
+//	PyModule_AddIntConstant(m, "Exp", EXPONENTIATION);
 
 	// initialize PRNG
 	// replace with read from some source of randomness

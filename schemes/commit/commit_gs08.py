@@ -13,7 +13,7 @@ Groth-Sahai Commitment Scheme
 :Date:		6/2011
 '''
 
-from charm.toolbox.pairinggroup import *
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.Commit import *
 
 debug=False

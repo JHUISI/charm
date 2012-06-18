@@ -23,25 +23,9 @@
 #define HASH_LEN 20
 #define MSG_LEN 128
 
-//#define DEBUG   0
-//#define TRUE	1
-//#define FALSE	0
-#if DEBUG
-#define debug(...)	printf("DEBUG: "__VA_ARGS__)
-#else
-#define debug(...)
-#endif
-
 #define ErrorMsg(msg) \
 	PyErr_SetString(IntegerError, msg); \
 	return NULL;
-
-//#if PY_MAJOR_VERSION >= 3
-//	#define _PyLong_Check(o1) PyLong_Check(o1)
-//#else
-//	#define _PyLong_Check(o1) PyLong_Check(o1) || PyInt_Check(o1)
-//#endif
-
 
 #if PY_MAJOR_VERSION >= 3
 

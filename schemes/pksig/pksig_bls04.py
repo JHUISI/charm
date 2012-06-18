@@ -12,7 +12,7 @@
 :Authors:    J. Ayo Akinyele
 :Date:       1/2011
  '''
-from charm.toolbox.pairinggroup import *
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.core.engine.util import *
 
 debug = False

@@ -1,6 +1,6 @@
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
-from charm.toolbox.pairinggroup import *
-from charm.core.math.pairing import hash as sha1
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.core.math.pairing import hashPair as sha1
 from schemes.ibenc.ibenc_adapt_identityhash import *
 from charm.toolbox.IBEnc import *
 from charm.core.crypto.cryptobase import *

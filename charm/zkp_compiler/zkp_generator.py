@@ -6,7 +6,7 @@ from pyparsing import *
 from charm.zkp_compiler.zkparser import *
 from charm.core.engine.protocol import *
 from charm.core.engine.util import *
-from charm.core.math.pairing import *
+#from charm.core.math.pairing import *
 
 int_default = True
 
@@ -129,7 +129,7 @@ def genIZKPreamble():
 \nfrom charm.engine.protocol import *
 from charm.engine.util import *
 from socket import *
-from charm.pairing import *
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 
 class %s(Protocol):
     def __init__(self, groupObj, common_input=None):

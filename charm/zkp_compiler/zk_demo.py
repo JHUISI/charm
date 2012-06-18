@@ -1,4 +1,4 @@
-from charm.toolbox.pairinggroup import * 
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.zkp_compiler.zkp_generator import *
 from socket import *
 import sys

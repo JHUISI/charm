@@ -39,12 +39,6 @@
 #define HASH_LEN	20
 #define RESERVED_ENCODING_BYTES			2
 
-#ifdef DEBUG
-#define debug(...)	printf("DEBUG: "__VA_ARGS__)
-#else
-#define debug(...)
-#endif
-
 PyTypeObject ECType;
 static PyObject *PyECErrorObject;
 static Benchmark *dBench;
@@ -132,5 +126,10 @@ EC_POINT *element_from_hash(EC_GROUP *group, uint8_t *input, int input_len);
 	PyErr_SetString(PyECErrorObject, msg); \
 	return NULL;	}
 
+#define IS_SAME_GROUP(a, b) \
+	if(a->nid != b->nid) {	\
+		PyErr_SetString(PyECErrorObject, "mixing group elements from different curves.");	\
+		return NULL;	\
+	}
 
 #endif

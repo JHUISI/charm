@@ -15,7 +15,7 @@ Hohenberger-Waters Stateful Signatures (RSA-based)
 :Status:    Needs Improvement.
 """
 
-from charm.core.math.integer import *
+from charm.core.math.integer import integer,random,randomBits,isPrime,gcd,bitsize,serialize
 from charm.toolbox.PKSig import PKSig
 from schemes.chamhash_rsa_hw09 import ChamHash_HW09
 from charm.toolbox.conversion import Conversion

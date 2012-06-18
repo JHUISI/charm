@@ -1,9 +1,9 @@
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from charm.core.crypto.cryptobase import *
-from charm.core.math.pairing import hash as sha1
+from charm.core.math.pairing import hashPair as sha1
 from schemes.dabenc.dabe_aw11 import *
 from charm.toolbox.ABEncMultiAuth import ABEncMultiAuth
-from charm.toolbox.pairinggroup import *
+#from charm.toolbox.pairinggroup import *
 
 debug = False
 class HybridABEncMA(ABEncMultiAuth):

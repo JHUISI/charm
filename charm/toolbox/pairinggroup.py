@@ -1,4 +1,4 @@
-from charm.core.math.pairing import *
+from charm.core.math.pairing import pairing,ZR,G1,G2,GT,init,pair,hashPair,H,random,serialize,deserialize,ismember,order
 from charm.toolbox.pairingcurves import params
 import os.path
 
@@ -54,14 +54,14 @@ class PairingGroup():
             return init(self.Pairing, type, value)
         return init(self.Pairing, type)
             
-    def random(self, type=ZR, count=1, seed=None):
-        if type == GT: return self.__randomGT()
-        elif type == ZR or type == G1 or type == G2:
+    def random(self, _type=ZR, count=1, seed=None):
+        if _type == GT: return self.__randomGT()
+        elif _type in [ZR, G1, G2]:
             if seed != None and count == 1:
-                return random(self.Pairing, type, seed)
+                return random(self.Pairing, _type, seed)
             elif count > 1:
-                return tuple([random(self.Pairing, type) for i in range(count)])                
-            return random(self.Pairing, type)
+                return tuple([random(self.Pairing, _type) for i in range(count)])                
+            return random(self.Pairing, _type)
         return None
 
         

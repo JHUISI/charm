@@ -1,4 +1,4 @@
-from charm.core.math.integer import *
+from charm.core.math.integer import integer,randomBits,random,randomPrime,isPrime,encode,decode,hashInt,bitsize,legendre,gcd,lcm,serialize,deserialize,int2Bytes,toInt
 
 class IntegerGroup:
     def __init__(self, start=0):
@@ -70,7 +70,7 @@ class IntegerGroup:
     def hash(self, *args):
         if isinstance(args, tuple):
             #print "Hashing => '%s'" % args
-            return hash(args, self.p, self.q, False)
+            return hashInt(args, self.p, self.q, False)
         return None
 
 class IntegerGroupQ:
@@ -128,11 +128,11 @@ class IntegerGroupQ:
     
     def hash(self, *args):
         if isinstance(args, tuple):
-            return hash(args, self.p, self.q, True)
+            return hashInt(args, self.p, self.q, True)
         List = []
         for i in args:
             List.append(i)
-        return hash(tuple(List), self.p, self.q, True)
+        return hashInt(tuple(List), self.p, self.q, True)
 
     def serialize(self, object):
         assert type(object) == integer, "cannot serialize non-integer types"

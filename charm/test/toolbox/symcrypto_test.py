@@ -1,7 +1,7 @@
 import unittest 
 from charm.toolbox.symcrypto  import SymmetricCryptoAbstraction,AuthenticatedCryptoAbstraction, MessageAuthenticator
 from charm.toolbox.pairinggroup import PairingGroup,GT
-from charm.core.math.pairing import hash as sha1
+from charm.core.math.pairing import hashPair as sha1
 class SymmetricCryptoAbstractionTest(unittest.TestCase):
     
     def testAESCBC(self):

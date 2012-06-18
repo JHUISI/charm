@@ -4,7 +4,7 @@ from charm.toolbox.ABEnc import ABEnc
 from schemes.abenc.abenc_bsw07 import CPabe_BSW07
 from charm.toolbox.pairinggroup import PairingGroup,GT
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
-from charm.core.math.pairing import hash as sha1
+from charm.core.math.pairing import hashPair as sha1
 from charm.toolbox.conversion import *
 from math import ceil
 

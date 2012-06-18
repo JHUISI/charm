@@ -107,11 +107,10 @@ test:
 test-schemes:
 	$(PYTHON) -m unittest discover -p "*_test.py"  schemes/test/
 	find . -name '*.pyc' -delete
-	./test.sh
 
 .PHONY: test-charm
 test-charm:
-	$(PYTHON) -m unittest discover -p "*_test.py"  charm-framework/test/toolbox/
+	$(PYTHON) -m unittest discover -p "*_test.py"  charm/test/toolbox/
 	find . -name '*.pyc' -delete
 
 .PHONY: xmltest 
