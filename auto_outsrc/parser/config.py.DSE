@@ -94,7 +94,7 @@ serializeFuncName = "writeToFile"
 serializeExt = ".txt"
 serializeObjectOutFuncName = "objectOut"
 serializeKeysName = "keys"
-serializePubKey = "pk[2]"
+serializePubKey = "mpk[24]"
 serializePubKeyType = "GT"
 serializePubKey_DecOut = "pk"
 
@@ -102,6 +102,7 @@ linesForSetupMain = []
 linesForSetupMain.append("S = ['ONE', 'TWO', 'THREE']")
 linesForSetupMain.append("M = \"balls on fire345\"")
 linesForSetupMain.append("policy_str = '((four or three) and (two or one))'")
+linesForSetupMain.append("id = 'example@email.com'")
 
 structsToPickleInSetupMain = []
 structsToPickleInSetupMain.append("")

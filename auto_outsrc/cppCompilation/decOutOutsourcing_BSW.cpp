@@ -1,27 +1,27 @@
 #include "userFuncs_BSW.h"
 
-string decout(PairingGroup & group, CharmDict & partCT, ZR & zz, GT & egga)
+string decout(PairingGroup & group, CharmDict & partCT, ZR & zz, GT & egg)
 {
 	GT T0;
 	string T1;
 	GT T2;
 	GT R;
-	string s2_sesskey;
+	string s_sesskey;
 	string M;
 	CharmList hashRandM;
-	ZR s2;
+	ZR s;
 	string output;
 	
 	T0 = partCT["T0"].getGT();
 	T1 = partCT["T1"].strPtr;
 	T2 = partCT["T2"].getGT();
 	R = group.div(T0, group.exp(T2, zz));
-	s2_sesskey = DeriveKey(R);
-	M = SymDec(s2_sesskey, T1);
+	s_sesskey = DeriveKey(R);
+	M = SymDec(s_sesskey, T1);
 	hashRandM.append(R);
 	hashRandM.append(M);
-	s2 = group.hashListToZR(hashRandM);
-	if ( ( (( (T0) == (group.mul(R, group.exp(egga, s2))) )) && (( (T2) == (group.exp(egga, group.div(s2, zz))) )) ) )
+	s = group.hashListToZR(hashRandM);
+	if ( ( (( (T0) == (group.mul(R, group.exp(egg, s))) )) && (( (T2) == (group.exp(egg, group.div(s, zz))) )) ) )
 	{
 		output = M;
 	}

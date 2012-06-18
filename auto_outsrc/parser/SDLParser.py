@@ -48,6 +48,7 @@ builtInTypes["strToId"] = types.listZR
 builtInTypes["createPolicy"] = types.object
 builtInTypes["getAttributeList"] = types.listStr
 builtInTypes["calculateSharesDict"] = types.symmap
+builtInTypes["calculateSharesList"] = types.list
 builtInTypes["prune"] = types.list
 builtInTypes["getCoefficients"] = types.symmap
 

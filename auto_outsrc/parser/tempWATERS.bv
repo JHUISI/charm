@@ -1,0 +1,103 @@
+name := waters09
+setting := asymmetric
+
+BEGIN :: types
+policy_str := str
+policy := object
+attrs := list
+sh := list
+coeff := list
+share := list
+S := list
+M := GT
+Cn := list
+Dn := list
+Kl := list
+
+END :: types
+
+BEGIN :: func:setup
+input := None
+g1 := random(G1)
+g2 := random(G2)
+alpha := random(ZR)
+a := random(ZR)
+egg := e(g1, g2)^alpha
+
+g1alph := g1^alpha
+g2alph := g2^alpha 
+g1a := g1^a
+g2a := g2^a
+
+msk := list{g1alph, g2alph}
+pk := list{g1, g2, egg, g1a, g2a}
+
+output := list{msk, pk}
+END :: func:setup
+
+
+BEGIN :: func:keygen
+input := list{pk, msk, S} 
+pk := expand{g1, g2, egg, g1a, g2a}
+msk := expand{g1alph, g2alph}
+
+t := random(ZR)
+K := g2alph * (g2a^t)
+L := g2^t
+Y := len(S)
+
+BEGIN :: for
+for{y := 0, Y}
+z := S#y
+Kl#z := H(z, G1)^t
+END :: for
+
+sk := list{S, K, L, Kl}
+output := sk
+END :: func:keygen
+
+
+BEGIN :: func:encrypt
+input := list{pk, M, policy_str}
+pk := expand{g1, g2, egg, g1a, g2a}
+
+policy := createPolicy(policy_str)
+attrs := getAttributeList(policy)
+s := random(ZR)
+sh := calculateSharesList(s, policy)
+Y := len(sh)
+C := M * egg^s
+Cpr := g1 ^ s
+
+BEGIN :: for
+for{y := 0, Y}
+r := random(ZR)
+k := attrs#y
+x := sh#y
+Cn#k := (g1a ^ x#1) * (H(k, G1)^-r)
+Dn#k := g2^r
+END :: for
+
+ct := list{policy_str, C, Cpr, Cn, Dn}
+output := ct
+END :: func:encrypt
+
+
+BEGIN :: func:decrypt
+input := list{pk, sk, ct}
+ct := expand{policy_str, C, Cpr, Cn, Dn}
+sk := expand{S, K, L, Kl}
+
+policy := createPolicy(policy_str)
+attrs  := prune(policy, S)
+coeff := getCoefficients(policy)
+
+Y := len(attrs)
+A := { prod{y := attrs#1, Y} on ((e(Cn#y, L) / e(Kl#y, Dn#y) ) ^coeff#y) }
+
+result0 := e(Cpr, K) / A
+M := C / result0
+
+output := M
+END :: func:decrypt
+

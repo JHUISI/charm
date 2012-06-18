@@ -45,6 +45,10 @@ def calculateSharesDict(s, policy):
 	getUserGlobals()
 	return utilBuiltInFuncs.calculateSharesDict(s, policy)
 
+def calculateSharesList(s, policy):
+	getUserGlobals()
+	return utilBuiltInFuncs.calculateSharesList(s, policy)
+
 def prune(policy, S):
 	getUserGlobals()
 	return utilBuiltInFuncs.prune(policy, S)
