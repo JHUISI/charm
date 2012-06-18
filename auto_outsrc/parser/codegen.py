@@ -372,7 +372,7 @@ def replacePoundsWithBrackets(nameWithPounds):
 
     return nameToReturn
 
-def getLambdaReplacementsString(lambdaReplacements, includeFirstLambdaVar):
+def getLambdaReplacementsString(lambdaReplacements, includeLoopVar, loopVarName):
     if (type(lambdaReplacements) is not dict):
         sys.exit("getLambdaReplacementsString in keygen.py:  lambda replacements argument passed in is not of type dictionary.")
 
@@ -391,21 +391,23 @@ def getLambdaReplacementsString(lambdaReplacements, includeFirstLambdaVar):
     retString = ""
 
     for counter in range(0, len(reverseDict)):
-        if ( (counter == 0) and (includeFirstLambdaVar == False) ):
+        #if ( (counter == 0) and (includeFirstLambdaVar == False) ):
+            #continue
+        if ( (includeLoopVar == False) and (reverseDict[counter] == loopVarName) ):
             continue
         retString += reverseDict[counter]
         retString += ", "
 
-    return (retString, reverseDict[0])
+    return retString
 
-def writeLamFuncToUserFuncsFile(lambdaReplacements, startVal, dotProdObj, forInt):
+def writeLamFuncToUserFuncsFile(lambdaReplacements, startVal, dotProdObj, forInt, lambdaLoopVar):
     global userFuncsFile
 
     userFuncsOutputString = ""
     userFuncsOutputString += "def "
     userFuncsOutputString += currentLambdaFuncName
     userFuncsOutputString += "("
-    (lambdaReplacementOutputString, lambdaLoopVar) = getLambdaReplacementsString(lambdaReplacements, False)
+    lambdaReplacementOutputString = getLambdaReplacementsString(lambdaReplacements, False, lambdaLoopVar)
     userFuncsOutputString += lambdaLoopVar + ", " 
     if (forInt == False):
         userFuncsOutputString += startVal + ", "
@@ -428,20 +430,22 @@ def processDotProdAsNonInt(dotProdObj, currentLambdaFuncName, lambdaReplacements
     startValSplit = startVal.split(LIST_INDEX_SYMBOL)
     startVal = startValSplit[0]
 
+    lambdaLoopVar = dotProdObj.getLoopVar()
+
     userFuncsOutputString = ""
     userFuncsOutputString += "def " + getStringFunctionName + "(" + getStringFunctionName + argSuffix + "):\n\t"
     userFuncsOutputString += userGlobalsFuncName + "()\n\t"
     userFuncsOutputString += "return " + getStringFunctionName + argSuffix + ".getAttribute()\n\n"
     userFuncsFile.write(userFuncsOutputString)
 
-    writeLamFuncToUserFuncsFile(lambdaReplacements, startVal, dotProdObj, False)
+    writeLamFuncToUserFuncsFile(lambdaReplacements, startVal, dotProdObj, False, lambdaLoopVar)
 
     dotProdOutputString = ""
     dotProdOutputString += "dotprod2(range(0, "
     dotProdOutputString += replacePoundsWithBrackets(str(dotProdObj.getEndVal()))
     dotProdOutputString += "), "
     dotProdOutputString += currentLambdaFuncName + ", " + startVal + ", "
-    (lambdaReplacementOutputString, lambdaLoopVar) = getLambdaReplacementsString(lambdaReplacements, False)
+    lambdaReplacementOutputString = getLambdaReplacementsString(lambdaReplacements, False, lambdaLoopVar)
     dotProdOutputString += lambdaReplacementOutputString
     dotProdOutputString = dotProdOutputString[0:(len(dotProdOutputString) - len(", "))]
     dotProdOutputString += ")"
@@ -449,7 +453,9 @@ def processDotProdAsNonInt(dotProdObj, currentLambdaFuncName, lambdaReplacements
     return dotProdOutputString
 
 def processDotProdAsInt(dotProdObj, currentLambdaFuncName, lambdaReplacements):
-    writeLamFuncToUserFuncsFile(lambdaReplacements, str(dotProdObj.getStartVal()), dotProdObj, True)
+    lambdaLoopVar = dotProdObj.getLoopVar()
+
+    writeLamFuncToUserFuncsFile(lambdaReplacements, str(dotProdObj.getStartVal()), dotProdObj, True, lambdaLoopVar)
 
     dotProdOutputString = "dotprod2(range("
     dotProdOutputString += replacePoundsWithBrackets(str(dotProdObj.getStartVal()))
@@ -458,7 +464,7 @@ def processDotProdAsInt(dotProdObj, currentLambdaFuncName, lambdaReplacements):
     dotProdOutputString += "), "
     dotProdOutputString += currentLambdaFuncName
     dotProdOutputString += ", "
-    (lambdaReplacementOutputString, lambdaLoopVar) = getLambdaReplacementsString(lambdaReplacements, True)
+    lambdaReplacementOutputString = getLambdaReplacementsString(lambdaReplacements, False, lambdaLoopVar)
     dotProdOutputString += lambdaReplacementOutputString
     dotProdOutputString = dotProdOutputString[0:(len(dotProdOutputString) - len(", "))]
     dotProdOutputString += ")"

@@ -1,0 +1,129 @@
+name := dsewaters09
+setting := asymmetric
+
+BEGIN :: types
+M := GT
+C := list
+D := list
+mpk := list
+msk := list
+sk := list
+ct := list
+
+END :: types
+
+BEGIN :: func:setup
+input := None
+g := random(G1)
+g2 := random(G2)
+w := random(G1)
+w2 := random(G2) 
+u := random(G1)
+u2 := random(G2)
+h := random(G1)
+h_2 := random(G2)
+v := random(G1)
+v_2 := random(G2)
+v1 := random(G1)
+v1_2 := random(G2)
+v2 := random(G1)
+v2_2 := random(G2)
+a1 := random(ZR)
+a2 := random(ZR) 
+b := random(ZR) 
+alpha := random(ZR)
+        
+gb := g ^ b
+gb_2 := g2 ^ b
+ga1 := g ^ a1
+ga2 := g ^ a2
+gba1 := gb ^ a1
+gba1_2 := gb_2 ^ a1
+gba2 := gb ^ a2
+gba2_2 := gb_2 ^ a2
+tau1 := v * (v1 ^ a1)
+tau1_2 := v_2 * (v1_2 ^ a1)
+tau2 := v * (v2 ^ a2)
+tau2_2 := v_2 * (v2_2 ^ a2)
+tau1b := tau1 ^ b
+tau1b_2 := tau1_2 ^ b
+tau2b := tau2 ^ b
+tau2b_2 := tau2_2 ^ b
+egga := e(g, g2)^(alpha * (a1 * b)) 
+galpha := g2 ^ alpha
+galpha_a1 := galpha ^ a1
+
+mpk := list{g, g2, gb, gb_2, ga1, ga2, gba1, gba1_2, gba2, gba2_2, tau1, tau1_2, tau2, tau2_2, tau1b, tau1b_2, tau2b, tau2b_2, w, w2, u, u2, h, h_2, egga}
+msk := list{galpha, galpha_a1, v, v_2, v1, v1_2, v2, v2_2, alpha}
+
+output := list{mpk, msk}
+END :: func:setup
+
+
+BEGIN :: func:keygen
+input := list{mpk, msk, id}
+mpk := expand{g, g2, gb, gb_2, ga1, ga2, gba1, gba1_2, gba2, gba2_2, tau1, tau1_2, tau2, tau2_2, tau1b, tau1b_2, tau2b, tau2b_2, w, w2, u, u2, h, h_2, egga}
+msk := expand{galpha, galpha_a1, v, v_2, v1, v1_2, v2, v2_2, alpha}
+
+r1 := random(ZR)
+r2 := random(ZR)
+z1 := random(ZR) 
+z2 := random(ZR)
+tag_k := random(ZR)
+
+r := r1 + r2
+id_hash := H(id, ZR)
+
+D#1 := galpha_a1 * (v_2 ^ r)
+D#2 := (g2 ^ -alpha) * (v1_2 ^ r) * (g2 ^ z1)
+D#3 := gb_2 ^ -z1
+D#4 := (v2_2 ^ r) * (g2 ^ z2)
+D#5 := gb_2 ^ -z2
+D#6 := gb_2 ^ r2
+D#7 := g2 ^ r1
+K := (((u2 ^ id_hash) * (w2 ^ tag_k)) * h_2) ^ r1
+        
+sk := list{id, D, K, tag_k}
+output := sk
+END :: func:keygen
+
+
+BEGIN :: func:encrypt
+input := list{mpk, M, id}
+mpk := expand{g, g2, gb, gb_2, ga1, ga2, gba1, gba1_2, gba2, gba2_2, tau1, tau1_2, tau2, tau2_2, tau1b, tau1b_2, tau2b, tau2b_2, w, w2, u, u2, h, h_2, egga}
+
+s1 := random(ZR) 
+s2:= random(ZR) 
+t := random(ZR)
+tag_c := random(ZR)
+s := s1 + s2
+id_hash2 := H(id, ZR)
+        
+C#0 := M * (egga ^ s2)
+C#1 := gb ^ s
+C#2 := gba1 ^ s1
+C#3 := ga1 ^ s1
+C#4 := gba2 ^ s2
+C#5 := ga2 ^ s2
+C#6 := (tau1 ^ s1) * (tau2 ^ s2)
+C#7 := (((tau1b ^ s1) * (tau2b ^ s2)) * (w ^ -t))
+E1 := (((u ^ id_hash2) * (w ^ tag_c)) * h) ^ t
+E2 := g ^ t
+
+ct := list{C, E1, E2, tag_c}
+output := ct
+END :: func:encrypt
+
+BEGIN :: func:decrypt
+input := list{ct, sk}
+sk := expand{id, D, K, tag_k}
+ct := expand{C, E1, E2, tag_c}
+
+tag := (1 / (tag_c - tag_k))
+A1 := (e(C#1, D#1) * (e(C#2, D#2) * (e(C#3, D#3) * (e(C#4, D#4) * e(C#5, D#5)))))
+A2 := (e(C#6, D#6) * e(C#7, D#7))
+A3 := A1 / A2
+A4 := (e(E1, D#7) / e(E2, K)) ^ tag
+M := C#0 / (A3 / A4)
+output := M
+END :: func:decrypt

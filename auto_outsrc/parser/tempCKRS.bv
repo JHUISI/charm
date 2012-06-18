@@ -27,7 +27,7 @@ g := random(G1)
 h := random(G2)
 omega := e(g, h)^(t1 * (t2 * alpha))
 BEGIN :: for
-for{y := 1, n}
+for{y := 0, n}
 z#y := random(ZR) # n of these
 gl#y := g ^ z#y
 hl#y := h ^ z#y
