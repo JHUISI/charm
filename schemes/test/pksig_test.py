@@ -268,34 +268,34 @@ class HWTest(unittest.TestCase):
         assert hw.verify(pk, m, sig), "invalid signature"
         if debug: print("Verification Successful!!")
 
-@pytest.mark.skpifif("1=1")
-class RSA_HW09Test(unittest.TestCase):
-    def testRSA_HW09(self):
-        pksig = Sig_RSA_Stateless_HW09() 
-        # fixed params for unit tests
-        p = integer(13075790812874903063868976368194105132206964291400106069285054021531242344673657224376055832139406140158530256050580761865568307154219348003780027259560207)
-        q = integer(12220150399144091059083151334113293594120344494042436487743750419696868216757186059428173175925369884682105191510729093971051869295857706815002710593321543)
-        (pk, sk) = pksig.keygen(1024, p, q)
-        if debug:
-            print("Public parameters...")
-            print("pk =>", pk)
-            print("sk =>", sk)
-        
-        m = SHA1(b'this is the message I want to hash.')
-        m2 = SHA1(b'please sign this message too!')
-        #m = b'This is a message to hash'
-        sig = pksig.sign(pk, sk, m)
-        if debug:
-            print("Signature...")
-            print("sig =>", sig)
-        sig2 = pksig.sign(pk, sk, m2)
-        if debug:
-            print("Signature 2...")
-            print("sig2 =>", sig2)
-        
-        assert pksig.verify(pk, m, sig), "FAILED VERIFICATION!!!"
-        assert pksig.verify(pk, m2, sig2), "FAILED VERIFICATION!!!"
-        if debug: print("Successful Verification!!!")
+#@pytest.mark.skpifif("1=1")
+#class RSA_HW09Test(unittest.TestCase):
+#    def testRSA_HW09(self):
+#        pksig = Sig_RSA_Stateless_HW09() 
+#        # fixed params for unit tests
+#        p = integer(13075790812874903063868976368194105132206964291400106069285054021531242344673657224376055832139406140158530256050580761865568307154219348003780027259560207)
+#        q = integer(12220150399144091059083151334113293594120344494042436487743750419696868216757186059428173175925369884682105191510729093971051869295857706815002710593321543)
+#        (pk, sk) = pksig.keygen(1024, p, q)
+#        if debug:
+#            print("Public parameters...")
+#            print("pk =>", pk)
+#            print("sk =>", sk)
+#        
+#        m = SHA1(b'this is the message I want to hash.')
+#        m2 = SHA1(b'please sign this message too!')
+#        #m = b'This is a message to hash'
+#        sig = pksig.sign(pk, sk, m)
+#        if debug:
+#            print("Signature...")
+#            print("sig =>", sig)
+#        sig2 = pksig.sign(pk, sk, m2)
+#        if debug:
+#            print("Signature 2...")
+#            print("sig2 =>", sig2)
+#        
+#        assert pksig.verify(pk, m, sig), "FAILED VERIFICATION!!!"
+#        assert pksig.verify(pk, m2, sig2), "FAILED VERIFICATION!!!"
+#        if debug: print("Successful Verification!!!")
 
 class SchnorrSigTest(unittest.TestCase):
     def testSchnorrSig(self):
