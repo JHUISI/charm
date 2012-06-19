@@ -1,3 +1,6 @@
 include VERSION README INSTALL configure.sh Makefile CHANGELOG
 graft doc
 graft doc/source
+recursive-include charm *.h *.c *.py
+include config.mk
+include distribute_setup.py
