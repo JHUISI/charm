@@ -1922,7 +1922,7 @@ PyMethodDef pairing_methods[] = {
 	{"order", (PyCFunction) Get_Order, METH_VARARGS, "Get the group order for a particular field."},
 
 	{"pair", (PyCFunction)Apply_pairing, METH_VARARGS, "Apply pairing between an element of G1_t and G2 and returns an element mapped to GT"},
-	{"hash", (PyCFunction)sha1_hash2, METH_VARARGS, "Compute a sha1 hash of an element type"},
+	{"hashPair", (PyCFunction)sha1_hash2, METH_VARARGS, "Compute a sha1 hash of an element type"},
 	{"SymEnc", (PyCFunction) AES_Encrypt, METH_VARARGS, "AES encryption args: key (bytes or str), message (str)"},
 	{"SymDec", (PyCFunction) AES_Decrypt, METH_VARARGS, "AES decryption args: key (bytes or str), ciphertext (str)"},
 	{"InitBenchmark", (PyCFunction)_init_benchmark, METH_NOARGS, "Initialize a benchmark object"},
@@ -1992,8 +1992,8 @@ void initpairing(void) 		{
 	}
 	ElementError = st->error;
 
-    if(import_benchmark() < 0)
-    	INITERROR;
+//    if(import_benchmark() < 0)
+//    	INITERROR;
     if(PyType_Ready(&BenchmarkType) < 0)
     	INITERROR;
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);
@@ -2011,19 +2011,22 @@ void initpairing(void) 		{
     PyModule_AddIntConstant(m, "G2", G2_t);
     PyModule_AddIntConstant(m, "GT", GT_t);
 
-    PyModule_AddIntConstant(m, "CpuTime", CPU_TIME);
-	PyModule_AddIntConstant(m, "RealTime", REAL_TIME);
-	PyModule_AddIntConstant(m, "NativeTime", NATIVE_TIME);
-	PyModule_AddIntConstant(m, "Add", ADDITION);
-	PyModule_AddIntConstant(m, "Sub", SUBTRACTION);
-	PyModule_AddIntConstant(m, "Mul", MULTIPLICATION);
-	PyModule_AddIntConstant(m, "Div", DIVISION);
-	PyModule_AddIntConstant(m, "Exp", EXPONENTIATION);
+//  PyModule_AddIntConstant(m, "CpuTime", CPU_TIME);
+//	PyModule_AddIntConstant(m, "RealTime", REAL_TIME);
+//	PyModule_AddIntConstant(m, "NativeTime", NATIVE_TIME);
+//	PyModule_AddIntConstant(m, "Add", ADDITION);
+//	PyModule_AddIntConstant(m, "Sub", SUBTRACTION);
+//	PyModule_AddIntConstant(m, "Mul", MULTIPLICATION);
+//	PyModule_AddIntConstant(m, "Div", DIVISION);
+//	PyModule_AddIntConstant(m, "Exp", EXPONENTIATION);
+//	PyModule_AddIntConstant(m, "Pair", PAIRINGS);
+
+	ADD_BENCHMARK_OPTIONS(m);
 	PyModule_AddIntConstant(m, "Pair", PAIRINGS);
 
 	pairing_init_finished = TRUE;
 	// builtin curves
-	PyModule_AddIntConstant(m, "MNT160", 80);
+	PyModule_AddIntConstant(m, "MNT160", MNT160);
 
 #if PY_MAJOR_VERSION >= 3
 	return m;

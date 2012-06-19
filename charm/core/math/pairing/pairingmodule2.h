@@ -22,8 +22,11 @@
 //#define DEBUG	1
 //#define TRUE	1
 //#define FALSE	0
+/* supported pairing curves */
+#define MNT160  	80
+/* buf sizes */
 #define BUF_MAX_LEN 512
-#define HASH_LEN 20
+#define HASH_LEN 	20
 #define MAX_BENCH_OBJECTS	2
 
 /* Index numbers for different hash functions.  These are all implemented as SHA1(index || message).	*/
