@@ -1558,7 +1558,7 @@ PyMethodDef ECElement_methods[] = {
 };
 
 #if PY_MAJOR_VERSION >= 3
-PyNumberMethods ecc_number = {
+PyNumberMethods ec_number = {
 		(binaryfunc) ECE_add,            /* nb_add */
 	    (binaryfunc) ECE_sub,            /* nb_subtract */
 	    (binaryfunc) ECE_mul,            /* nb_multiply */
@@ -1606,7 +1606,7 @@ PyTypeObject ECType = {
 	0,                         /*tp_setattr*/
 	0,			   				/*tp_reserved*/
 	(reprfunc)ECElement_print, /*tp_repr*/
-	&ecc_number,               /*tp_as_number*/
+	&ec_number,               /*tp_as_number*/
 	0,                         /*tp_as_sequence*/
 	0,                         /*tp_as_mapping*/
 	0,                         /*tp_hash */
@@ -1637,7 +1637,7 @@ PyTypeObject ECType = {
 };
 #else
 /* python 2.x series */
-PyNumberMethods ecc_number = {
+PyNumberMethods ec_number = {
     ECE_add,                       /* nb_add */
     ECE_sub,                       /* nb_subtract */
     ECE_mul,                        /* nb_multiply */
