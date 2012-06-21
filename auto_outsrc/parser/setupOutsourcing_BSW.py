@@ -1,94 +1,112 @@
 from userFuncs_BSW import *
 
-g1a = {}
-g2 = {}
-g1 = {}
-g2alph = {}
-Y = {}
-g2a = {}
-attrs = {}
-sh = {}
-coeff = {}
-Cn = {}
-Dn = {}
-Kl = {}
-KlBlinded = {}
+t3 = {}
+t1 = {}
+gl = {}
+v1 = {}
+v2 = {}
+v3 = {}
+v4 = {}
+hl = {}
+alpha = {}
+h = {}
+t4 = {}
+t2 = {}
+sk = {}
+c = {}
+d = {}
+z = {}
+dBlinded = {}
 
-def setup():
-	global g1a
-	global g2
-	global g1
-	global g2alph
-	global g2a
+def setup(n, l):
+	global t3
+	global t1
+	global gl
+	global v1
+	global v2
+	global v3
+	global v4
+	global hl
+	global alpha
+	global h
+	global t4
+	global t2
+	global z
 
-	input = None
-	g1 = group.random(G1)
-	g2 = group.random(G2)
+	input = [n, l]
 	alpha = group.random(ZR)
-	a = group.random(ZR)
-	egg = (pair(g1, g2) ** alpha)
-	g1alph = (g1 ** alpha)
-	g2alph = (g2 ** alpha)
-	g1a = (g1 ** a)
-	g2a = (g2 ** a)
-	msk = [g1alph, g2alph]
-	pk = [g1, g2, egg, g1a, g2a]
-	output = (msk, pk)
+	t1 = group.random(ZR)
+	t2 = group.random(ZR)
+	t3 = group.random(ZR)
+	t4 = group.random(ZR)
+	g = group.random(G1)
+	h = group.random(G2)
+	omega = (pair(g, h) ** (t1 * (t2 * alpha)))
+	for y in range(0, n):
+		z[y] = group.random(ZR)
+		gl[y] = (g ** z[y])
+		hl[y] = (h ** z[y])
+	v1 = (g ** t1)
+	v2 = (g ** t2)
+	v3 = (g ** t3)
+	v4 = (g ** t4)
+	mpk = [omega, g, h, gl, hl, v1, v2, v3, v4, n, l]
+	msk = [alpha, t1, t2, t3, t4]
+	output = (mpk, msk)
 	return output
 
-def keygen(pk, msk, S):
-	global Y
-	global Kl
-	global KlBlinded
+def extract(mpk, msk, id):
+	global sk
+	global d
+	global dBlinded
 
-	input = [pk, msk, S]
-	SBlinded = S
+	input = [mpk, msk, id]
+	idBlinded = id
 	zz = group.random(ZR)
-	g1, g2, egg, g1a, g2a = pk
-	g1alph, g2alph = msk
-	t = group.random(ZR)
-	K = (g2alph * (g2a ** t))
-	KBlinded = (K ** (1 / zz))
-	L = (g2 ** t)
-	LBlinded = (L ** (1 / zz))
-	Y = len(S)
-	for y in range(0, Y):
-		z = S[y]
-		Kl[z] = (group.hash(z, G1) ** t)
-	for y in Kl:
-		KlBlinded[y] = (Kl[y] ** (1 / zz))
-	sk = [SBlinded, KBlinded, LBlinded, KlBlinded]
-	skBlinded = [SBlinded, KBlinded, LBlinded, KlBlinded]
+	omega, g, h, gl, hl, v1, v2, v3, v4, n, l = mpk
+	alpha, t1, t2, t3, t4 = msk
+	r1 = group.random(ZR)
+	r2 = group.random(ZR)
+	hID = strToId(mpk, id)
+	hashIDDotProd = dotprod2(range(0,n), lam_func1, hl, hID)
+	hashID = (hl[0] * hashIDDotProd)
+	d[0] = (h ** ((r1 * (t1 * t2)) + (r2 * (t3 * t4))))
+	halpha = (h ** -alpha)
+	hashID2r1 = (hashID ** -r1)
+	d[1] = ((halpha ** t2) * (hashID2r1 ** t2))
+	d[2] = ((halpha ** t1) * (hashID2r1 ** t1))
+	hashID2r2 = (hashID ** -r2)
+	d[3] = (hashID2r2 ** t4)
+	d[4] = (hashID2r2 ** t3)
+	for y in d:
+		dBlinded[y] = (d[y] ** (1 / zz))
+	sk = [idBlinded, dBlinded]
+	skBlinded = [idBlinded, dBlinded]
 	output = (zz, skBlinded)
 	return output
 
-def encrypt(pk, M, policy_str):
-	global Y
-	global attrs
-	global sh
-	global Cn
-	global Dn
+def encrypt(mpk, M, id):
+	global c
 
-	input = [pk, M, policy_str]
-	g1, g2, egg, g1a, g2a = pk
-	policy = createPolicy(policy_str)
-	attrs = getAttributeList(policy)
+	input = [mpk, M, id]
+	omega, g, h, gl, hl, v1, v2, v3, v4, n, l = mpk
 	R = group.random(GT)
 	hashRandM = [R, M]
 	s = group.hash(hashRandM, ZR)
 	s_sesskey = DeriveKey(R)
-	C = (R * (egg ** s))
-	sh = calculateSharesList(s, policy)
-	Y = len(sh)
-	Cpr = (g1 ** s)
-	for y in range(0, Y):
-		r = group.random(ZR)
-		k = attrs[y]
-		x = sh[y]
-		Cn[k] = ((g1a ** x[1]) * (group.hash(k, G1) ** -r))
-		Dn[k] = (g2 ** r)
-		T1 = SymEnc(s_sesskey, M)
-	ct = [policy_str, C, Cpr, Cn, Dn, T1]
+	c_pr = ((omega ** s) * R)
+	s1 = group.random(ZR)
+	s2 = group.random(ZR)
+	hID1 = strToId(mpk, id)
+	hashID1DotProd = dotprod2(range(0,n), lam_func2, gl, hID1)
+	hashID1 = (gl[0] * hashID1DotProd)
+	c[0] = (hashID1 ** s)
+	c[1] = (v1 ** (s - s1))
+	c[2] = (v2 ** s1)
+	c[3] = (v3 ** (s - s2))
+	T1 = SymEnc(s_sesskey, M)
+	c[4] = (v4 ** s2)
+	ct = [c, c_pr, T1]
 	output = ct
 	return output
 
@@ -99,26 +117,24 @@ if __name__ == "__main__":
 	S = ['ONE', 'TWO', 'THREE']
 	M = "balls on fire345"
 	policy_str = '((four or three) and (two or one))'
+	n = 10
+	l = 5
+	id = 'example@email.com'
 
-	(msk, pk) = setup()
-	(zz, skBlinded) = keygen(pk, msk, S)
-	(ct) = encrypt(pk, M, policy_str)
+	(mpk, msk) = setup(n, l)
+	(zz, skBlinded) = extract(mpk, msk, id)
+	(ct) = encrypt(mpk, M, id)
 
 	f_ct_BSW = open('ct_BSW.charmPickle', 'wb')
 	pick_ct_BSW = objectToBytes(ct, group)
 	f_ct_BSW.write(pick_ct_BSW)
 	f_ct_BSW.close()
 
-	f_pk_BSW = open('pk_BSW.charmPickle', 'wb')
-	pick_pk_BSW = objectToBytes(pk, group)
-	f_pk_BSW.write(pick_pk_BSW)
-	f_pk_BSW.close()
-
 	f_skBlinded_BSW = open('skBlinded_BSW.charmPickle', 'wb')
 	pick_skBlinded_BSW = objectToBytes(skBlinded, group)
 	f_skBlinded_BSW.write(pick_skBlinded_BSW)
 	f_skBlinded_BSW.close()
 
-	keys = {'sk':zz, 'pk':pk[2]}
+	keys = {'sk':zz, 'pk':mpk[0]}
 	writeToFile('keys_BSW_.txt', objectOut(group, keys))
 

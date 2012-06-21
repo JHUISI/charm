@@ -2,14 +2,13 @@ from builtInFuncs import *
 
 groupUserFuncs = None
 
-def GetString(GetString_Arg):
+def lam_func1(y, hl, hID):
 	getUserGlobals()
-	return GetString_Arg.getAttribute()
+	return (hl[y] ** hID[y])
 
-def lam_func1(y, attrs, Cn, coeff, L, Kl, Dn):
+def lam_func2(y, gl, hID1):
 	getUserGlobals()
-	y = GetString(attrs[y])
-	return (pair((Cn[y] ** -coeff[y]), L) * pair((Kl[y] ** coeff[y]), Dn[y]))
+	return (gl[y] ** hID1[y])
 
 def getUserGlobals():
 	global groupUserFuncs
