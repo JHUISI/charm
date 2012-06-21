@@ -12,7 +12,7 @@ Available from: http://eprint.iacr.org/2011/337
 :Date:       03/2012 
 :Status:     NOT FINISHED/DOESN'T EXECUTE
 '''
-from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair as e
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair as e
 
 debug = False
 class InputEnc:

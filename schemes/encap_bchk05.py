@@ -1,9 +1,16 @@
-from charm.integer import randomBits
-import hmac, hashlib, math
-from toolbox.conversion import Conversion
+from charm.core.math.integer import randomBits
+import hashlib
 
 debug = False
 class EncapBCHK():
+    """
+    >>> encap = EncapBCHK()
+    >>> hout = encap.setup()
+    >>> (r, com, dec) = encap.S(hout)
+    >>> rout = encap.R(hout, com, dec)
+    >>> r == rout
+    True
+    """
     def __init__(self):
         global H
         H = hashlib.sha1()
@@ -33,20 +40,3 @@ class EncapBCHK():
         else:
             return b'FALSE'
     
-def main():
-    encap = EncapBCHK()
-
-    hout = encap.setup()
-
-    (r, com, dec) = encap.S(hout)
-
-    rout = encap.R(hout, com, dec)
-    
-    if debug: print("recovered m =>", rout)
-
-    assert r == rout, "Failed Decryption"
-    if debug: print("Successful Decryption!!!")
-    
-if __name__ == "__main__":
-    debug = True
-    main()   

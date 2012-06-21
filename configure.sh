@@ -130,13 +130,7 @@ confsuffix="/charm"
 profiler="no"
 python_path="$(which python)"
 wget="$(which wget)"
-
-#fall back to python if for some reason python3 does not exist 
-# there is still a version check later so it sitll has to be
-# python 3 
-if !  [ -n "$python_path"  ]; then
-   python_path="$(which python)"
-fi 
+ 
 # set -x
 
 # parse CC options first
@@ -563,37 +557,17 @@ fi
 #fi
 
 ##########################################
-# python3 probe
+# python probe
 cat > $TMPC << EOF
 import sys
 
-if sys.hexversion >= int(0x2070000):
+if sys.hexversion >= int(0x2070000) && sys.hexversion < int(0x3000000):
    exit(0)
 else:
    print("Need Python 2.7. Specify --python=/path/to/python")
    exit(-1)
 EOF
-python3_found="no"
-$python_path $TMPC
-result=$?
-if test ${result} = 0 ; then
-	python3_found="yes"
-fi
 
-cat > $TMPC << EOF
-try:
-   from pyparsing import *
-   exit(0)
-except ImportError:
-   exit(-1)
-EOF
-
-pyparse_found="no"
-$python_path $TMPC
-result=$?
-if test ${result} = 0 ; then
-   pyparse_found="yes"
-fi
 ##########################################
 # check if the compiler defines offsetof
 
@@ -706,7 +680,6 @@ echo "-Werror enabled   $werror"
 echo "integer module    $integer_module"
 echo "ecc module        $ecc_module"
 echo "pairing module    $pairing_module"
-echo "pyparsing module  $pyparse_found"
 echo "libm found        $libm_found"
 echo "libgmp found      $libgmp_found"
 echo "libpbc found      $libpbc_found"

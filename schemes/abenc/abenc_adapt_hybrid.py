@@ -1,7 +1,7 @@
 
 from charm.core.crypto.cryptobase import AES,selectPRP
 from charm.toolbox.ABEnc import ABEnc
-from schemes.abenc.abenc_bsw07 import CPabe_BSW07
+from abenc_bsw07 import CPabe_BSW07
 from charm.toolbox.pairinggroup import PairingGroup,GT
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from charm.core.math.pairing import hashPair as sha1

@@ -1,5 +1,5 @@
-from toolbox.sigmaprotocol import Sigma
-from toolbox.pairinggroup import ZR,G1,pair
+from charm.toolbox.sigmaprotocol import Sigma
+from charm.toolbox.pairinggroup import ZR,G1,pair
 
 class SigmaProtocol2(Sigma):
     def __init__(self, groupObj, common_input=None):
