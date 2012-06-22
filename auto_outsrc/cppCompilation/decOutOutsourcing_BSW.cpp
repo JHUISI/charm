@@ -15,27 +15,13 @@ string decout(PairingGroup & group, CharmDict & partCT, ZR & zz, GT & omega)
 	T0 = partCT["T0"].getGT();
 	T1 = partCT["T1"].strPtr;
 	T2 = partCT["T2"].getGT();
-	R = group.mul(T0, group.exp(T2, zz));
+	R = group.div(T0, group.exp(T2, zz));
 	s_sesskey = DeriveKey(R);
 	M = SymDec(s_sesskey, T1);
-
-	cout << "M is " << M << endl;
-
-
 	hashRandM.append(R);
 	hashRandM.append(M);
 	s = group.hashListToZR(hashRandM);
-
-
-
-	if ( (T2) == (group.exp(omega, group.div(-s, zz))))
-		cout << "it worked\n";
-	else
-		cout << "it didn't work\n";
-
-
-
-	if ( ( (( (T0) == (group.mul(R, group.exp(omega, s))) )) && (( (T2) == (group.exp(omega, group.div(-s, zz))) )) ) )
+	if ( ( (( (T0) == (group.mul(R, group.exp(omega, s))) )) && (( (T2) == (group.exp(omega, group.div(s, zz))) )) ) )
 	{
 		output = M;
 	}

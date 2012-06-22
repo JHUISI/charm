@@ -71,7 +71,7 @@ def extract(mpk, msk, id):
 	hashIDDotProd = dotprod2(range(0,n), lam_func1, hl, hID)
 	hashID = (hl[0] * hashIDDotProd)
 	d[0] = (h ** ((r1 * (t1 * t2)) + (r2 * (t3 * t4))))
-	halpha = (h ** -alpha)
+	halpha = (h ** alpha)
 	hashID2r1 = (hashID ** -r1)
 	d[1] = ((halpha ** t2) * (hashID2r1 ** t2))
 	d[2] = ((halpha ** t1) * (hashID2r1 ** t1))
@@ -115,7 +115,7 @@ if __name__ == "__main__":
 	group = PairingGroup(MNT160)
 
 	S = ['ONE', 'TWO', 'THREE']
-	M = "balls on fire345"
+	M = "balls on fireNOW"
 	policy_str = '((four or three) and (two or one))'
 	n = 10
 	l = 5
