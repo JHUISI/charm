@@ -71,6 +71,11 @@ def isValidType(possibleType):
         if (str(possibleType) == str(validType)):
             return True
 
+    #print(possibleType)
+
+    if (type(possibleType).__name__ != ENUM_VALUE_CLASS_NAME):
+        return False
+
     if ( (possibleType == ops.LIST) or (possibleType == ops.SYMMAP) ):
         return True
 

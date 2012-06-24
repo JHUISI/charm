@@ -5,9 +5,10 @@ M = 'M'
 blindingLoopVar = "y"
 blindingSuffix = "Blinded"
 setupFuncName = "setup"
+authsetupFuncName = "authsetup"
 keygenBlindingExponent = "zz"
 keygenBlindingExponentType = "ZR"
-keygenFuncName = "extract"
+keygenFuncName = "keygen"
 
 encryptFuncName = "encrypt"
 
@@ -46,7 +47,7 @@ partialCT = "partCT"
 decOutFunctionName = "decout"
 getStringFunctionName = "GetString"
 
-setupFunctionOrder = [setupFuncName, keygenFuncName, encryptFuncName]
+setupFunctionOrder = [setupFuncName, authsetupFuncName, keygenFuncName, encryptFuncName]
 transformFunctionOrder = [transformFunctionName]
 decOutFunctionOrder = [decOutFunctionName]
 
@@ -94,17 +95,17 @@ serializeFuncName = "writeToFile"
 serializeExt = ".txt"
 serializeObjectOutFuncName = "objectOut"
 serializeKeysName = "keys"
-serializePubKey = "mpk[0]"
+serializePubKey = "pk[4]"
 serializePubKeyType = "GT"
 serializePubKey_DecOut = "pk"
 
 linesForSetupMain = []
 linesForSetupMain.append("S = ['ONE', 'TWO', 'THREE']")
 linesForSetupMain.append("M = \"balls on fire345\"")
-linesForSetupMain.append("policy_str = '((four or three) and (two or one))'")
-linesForSetupMain.append("n = 10")
-linesForSetupMain.append("l = 5")
-linesForSetupMain.append("id = 'example@email.com'")
+linesForSetupMain.append("policy_str = '((one or three) and (TWO or FOUR))'")
+linesForSetupMain.append("authS = ['ONE', 'TWO', 'THREE', 'FOUR']")
+linesForSetupMain.append("gid = \"bob\"")
+linesForSetupMain.append("userS = ['THREE', 'ONE', 'TWO']")
 
 structsToPickleInSetupMain = []
 structsToPickleInSetupMain.append("")

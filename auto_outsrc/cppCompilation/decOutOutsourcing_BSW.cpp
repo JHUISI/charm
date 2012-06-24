@@ -1,6 +1,6 @@
 #include "userFuncs_BSW.h"
 
-string decout(PairingGroup & group, CharmDict & partCT, ZR & zz, GT & omega)
+string decout(PairingGroup & group, CharmDict & partCT, ZR & zz, GT & egg)
 {
 	GT T0;
 	string T1;
@@ -21,7 +21,7 @@ string decout(PairingGroup & group, CharmDict & partCT, ZR & zz, GT & omega)
 	hashRandM.append(R);
 	hashRandM.append(M);
 	s = group.hashListToZR(hashRandM);
-	if ( ( (( (T0) == (group.mul(R, group.exp(omega, s))) )) && (( (T2) == (group.exp(omega, group.div(s, zz))) )) ) )
+	if ( ( (( (T0) == (group.mul(R, group.exp(egg, s))) )) && (( (T2) == (group.exp(egg, group.div(s, zz))) )) ) )
 	{
 		output = M;
 	}

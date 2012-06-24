@@ -2,13 +2,18 @@ from builtInFuncs import *
 
 groupUserFuncs = None
 
-def lam_func1(y, hl, hID):
+def calculateShares(s, policy):
 	getUserGlobals()
-	return (hl[y] ** hID[y])
+	return
 
-def lam_func2(y, gl, hID1):
+def GetString(GetString_Arg):
 	getUserGlobals()
-	return (gl[y] ** hID1[y])
+	return GetString_Arg.getAttribute()
+
+def lam_func1(y, attrs, C1, coeff, h_gid, C3, K, C2):
+	getUserGlobals()
+	y = GetString(attrs[y])
+	return (((C1[y] ** coeff[y]) * pair((h_gid ** coeff[y]), C3[y])) * pair((K[y] ** -coeff[y]), C2[y]))
 
 def getUserGlobals():
 	global groupUserFuncs
