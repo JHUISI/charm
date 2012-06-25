@@ -27,6 +27,7 @@ class VarInfo:
         self.listElementsType = None
         self.isUsedInHashCalc = False
         self.hashArgsInAssignNode = []
+        self.hasListIndexSymInLeftAssign = False
     
     @classmethod
     def copy(self, obj):
@@ -53,6 +54,7 @@ class VarInfo:
         v.listElementsType = obj.listElementsType
         v.isUsedInHashCalc = obj.isUsedInHashCalc
         v.hashArgsInAssignNode = obj.hashArgsInAssignNode
+        v.hasListIndexSymInLeftAssign = obj.hasListIndexSymInLeftAssign
         return v
         
     def getAssignNode(self):
@@ -136,6 +138,9 @@ class VarInfo:
 
     def getListElementsType(self):
         return self.listElementsType
+
+    def getHasListIndexSymInLeftAssign(self):
+        return self.hasListIndexSymInLeftAssign
 
     def traverseAssignNodeRecursive(self, node, isExponent):
         if (node.type == ops.PAIR):
@@ -229,6 +234,9 @@ class VarInfo:
         self.funcName = funcName
         self.outsideForLoopObj = outsideForLoopObj
         self.outsideIfElseBranchObj = outsideIfElseBranchObj
+
+        if (getFullVarName(self.assignNode.left, False).find(LIST_INDEX_SYMBOL) != -1):
+            self.hasListIndexSymInLeftAssign = True
 
         self.traverseAssignNode()
 

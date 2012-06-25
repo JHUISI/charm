@@ -4,6 +4,7 @@ import sys, os
 
 assignInfo = None
 inputOutputVars = None
+functionNameOrder = None
 varNamesToFuncs_All = None
 varNamesToFuncs_Assign = None
 setupFile = None
@@ -192,6 +193,31 @@ def getInputVariablesList(functionName):
 
     return inputVariables
 
+def writeInitDictDefs(outputFile, functionName):
+    if (functionName not in assignInfo):
+        sys.exit("writeInitDictDefs in codegen.py:  function name parameter passed in is not in assignInfo.")
+
+    outputString = ""
+
+    for currentVarName in assignInfo[functionName]:
+        if (assignInfo[functionName][currentVarName].getHasListIndexSymInLeftAssign() == False):
+            continue
+
+        if (currentVarName not in inputOutputVars):
+            continue
+
+        if (currentVarName not in varNamesToFuncs_Assign):
+            sys.exit("writeInitDictDefs in codegen.py:  current variable name in loop is not in varNamesToFuncs_Assign.")
+
+        if (functionName != varNamesToFuncs_Assign[currentVarName][0]):
+            continue
+
+        outputString += "\t" + currentVarName + " = {}\n"
+
+    if (len(outputString) > 0):
+        outputString += "\n"
+        outputFile.write(outputString)
+
 def writeFunctionDecl_Python(outputFile, functionName, toWriteGlobalVarDecls, retainGlobals):
     outputString = ""
 
@@ -215,6 +241,8 @@ def writeFunctionDecl_Python(outputFile, functionName, toWriteGlobalVarDecls, re
 
     if (toWriteGlobalVarDecls == True):
         writeGlobalVarDecls(outputFile, functionName)
+
+    writeInitDictDefs(outputFile, functionName)
 
 def makeTypeReplacementsForCPP(SDL_Type):
     SDLTypeAsString = str(SDL_Type)
@@ -1507,7 +1535,7 @@ def generateMakefile():
 
 def main(SDL_Scheme):
     global setupFile, transformFile, decOutFile, userFuncsFile, assignInfo, varNamesToFuncs_All
-    global varNamesToFuncs_Assign, inputOutputVars, userFuncsCPPFile
+    global varNamesToFuncs_Assign, inputOutputVars, userFuncsCPPFile, functionNameOrder
 
     if ( (type(SDL_Scheme) is not str) or (len(SDL_Scheme) == 0) ):
         sys.exit("codegen.py:  sys.argv[1] argument (file name for SDL scheme) passed in was invalid.")
@@ -1516,6 +1544,7 @@ def main(SDL_Scheme):
     astNodes = getAstNodes()
     assignInfo = getAssignInfo()
     inputOutputVars = getInputOutputVars()
+    functionNameOrder = getFunctionNameOrder()
     varNamesToFuncs_All = getVarNamesToFuncs_All()
     varNamesToFuncs_Assign = getVarNamesToFuncs_Assign()
 
@@ -1558,3 +1587,4 @@ if __name__ == "__main__":
     #print("io vars:  ", getInputOutputVars())
     lll = getFinalVarType("gl#0", "setup")
     #print(str(lll))
+    #print("Function Name Order:  ", functionNameOrder)

@@ -31,6 +31,7 @@ startLineNo_IfBranch = None
 startLineNo_ElseBranch = None
 startLineNos_Functions = {}
 endLineNos_Functions = {}
+functionNameOrder = []
 inputOutputVars = []
 linesOfCode = None
 getVarDepInfListsCalled = getVarsThatProtectMCalled = False
@@ -177,6 +178,7 @@ class SDLParser:
     def evalStack(self, stack, line_number):
         global currentFuncName, forLoops, startLineNo_ForLoop, startLineNos_Functions
         global endLineNos_Functions, ifElseBranches, startLineNo_IfBranch, startLineNo_ElseBranch
+        global functionNameOrder
 
         op = stack.pop()
         if debug >= levels.some:
@@ -231,6 +233,7 @@ class SDLParser:
                     if (currentFuncName in startLineNos_Functions):
                         sys.exit("SDLParser.py found multiple START_TOKEN declarations for the same function name.")
                     startLineNos_Functions[currentFuncName] = line_number
+                    functionNameOrder.append(currentFuncName)
                 elif (op == END_TOKEN):
                     if (currentFuncName in endLineNos_Functions):
                         sys.exit("SDLParser.py found multiple END_TOKEN declarations for the same function.")
@@ -1257,12 +1260,15 @@ def getAstNodes():
 def getInputOutputVars():
     return inputOutputVars
 
+def getFunctionNameOrder():
+    return functionNameOrder
+
 def parseLinesOfCode(code, verbosity):
     global varTypes, assignInfo, forLoops, currentFuncName, varDepList, varInfList, varsThatProtectM
     global algebraicSetting, startLineNo_ForLoop, startLineNos_Functions, endLineNos_Functions
     global getVarDepInfListsCalled, getVarsThatProtectMCalled, astNodes, varNamesToFuncs_All
     global varNamesToFuncs_Assign, ifElseBranches, startLineNo_IfBranch, startLineNo_ElseBranch
-    global inputOutputVars, varDepListNoExponents, varInfListNoExponents
+    global inputOutputVars, varDepListNoExponents, varInfListNoExponents, functionNameOrder
 
     astNodes = []
     varTypes = {}
@@ -1283,6 +1289,7 @@ def parseLinesOfCode(code, verbosity):
     startLineNo_ElseBranch = None
     startLineNos_Functions = {}
     endLineNos_Functions = {}
+    functionNameOrder = []
     inputOutputVars = []
     getVarDepInfListsCalled = False
     getVarsThatProtectMCalled = False

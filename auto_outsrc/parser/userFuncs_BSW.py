@@ -2,10 +2,6 @@ from builtInFuncs import *
 
 groupUserFuncs = None
 
-def calculateShares(s, policy):
-	getUserGlobals()
-	return
-
 def GetString(GetString_Arg):
 	getUserGlobals()
 	return GetString_Arg.getAttribute()

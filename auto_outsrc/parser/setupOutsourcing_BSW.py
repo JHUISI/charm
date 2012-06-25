@@ -30,6 +30,9 @@ def authsetup(gpk, authS):
 	global Y
 	global z
 
+	msk = {}
+	pk = {}
+
 	input = [gpk, authS]
 	g, g_2 = gpk
 	Y = len(authS)
@@ -88,8 +91,8 @@ def encrypt(pk, gpk, M, policy_str):
 	s_sesskey = DeriveKey(R)
 	C0 = (R * (egg ** s))
 	w = 0
-	s_sh = calculateShares(s, policy)
-	w_sh = calculateShares(w, policy)
+	s_sh = calculateSharesDict(s, policy)
+	w_sh = calculateSharesDict(w, policy)
 	Y = len(s_sh)
 	for y in range(0, Y):
 		r = group.random(ZR)
@@ -133,6 +136,6 @@ if __name__ == "__main__":
 	f_skBlinded_BSW.write(pick_skBlinded_BSW)
 	f_skBlinded_BSW.close()
 
-	keys = {'sk':zz, 'pk':pk[4]}
+	keys = {'sk':zz, 'pk':pk[0]}
 	writeToFile('keys_BSW_.txt', objectOut(group, keys))
 

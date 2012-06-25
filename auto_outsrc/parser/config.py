@@ -95,7 +95,7 @@ serializeFuncName = "writeToFile"
 serializeExt = ".txt"
 serializeObjectOutFuncName = "objectOut"
 serializeKeysName = "keys"
-serializePubKey = "pk[4]"
+serializePubKey = "pk[0]"
 serializePubKeyType = "GT"
 serializePubKey_DecOut = "pk"
 
