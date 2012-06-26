@@ -7,7 +7,7 @@ from schemes.ibenc.ibenc_lsw08 import IBE_Revoke
 from schemes.ibenc.ibenc_sw05 import IBE_SW05_LUC
 from schemes.ibenc.ibenc_waters05 import IBE_N04
 from schemes.ibenc.ibenc_waters09 import DSE09
-from charm.toolbox.pairinggroup import PairingGroup, GT, ZR
+from charm.toolbox.pairinggroup import PairingGroup,ZR,GT
 from charm.toolbox.hash_module import Waters
 import unittest
 
@@ -27,7 +27,7 @@ class HybridIBEncTest(unittest.TestCase):
         kID = 'waldoayo@gmail.com'
         sk = hyb_ibe.extract(mk, kID)
 
-        msg = "Hello World My name is blah blah!!!! Word!"
+        msg = b"This is a test message."
         
         ct = hyb_ibe.encrypt(pk, kID, msg)
         if debug:

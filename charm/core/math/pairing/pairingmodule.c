@@ -2103,8 +2103,10 @@ void initpairing(void) 		{
 	}
 	ElementError = st->error;
 
-//    if(import_benchmark() < 0)
-//    	INITERROR;
+    if(import_benchmark() < 0) {
+    	Py_DECREF(m);
+    	INITERROR;
+    }
     if(PyType_Ready(&BenchmarkType) < 0)
     	INITERROR;
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);
@@ -2121,8 +2123,8 @@ void initpairing(void) 		{
     PyModule_AddObject(m, "params", (PyObject *)&PairingType);
     Py_INCREF(&ElementType);
     PyModule_AddObject(m, "pairing", (PyObject *)&ElementType);
-    Py_INCREF(&BenchmarkType);
-    PyModule_AddObject(m, "benchmark", (PyObject *)&BenchmarkType);
+//    Py_INCREF(&BenchmarkType);
+//    PyModule_AddObject(m, "benchmark", (PyObject *)&BenchmarkType);
 
 	PyModule_AddIntConstant(m, "ZR", ZR);
 	PyModule_AddIntConstant(m, "G1", G1);

@@ -17,7 +17,7 @@ class HybridEnc(PKEnc):
     >>> pkenc = CS98(groupObj)
     >>> hyenc = HybridEnc(pkenc)
     >>> (public_key, secret_key) = hyenc.keygen()
-    >>> msg = 'this is a new message'
+    >>> msg = b'this is a new message'
     >>> cipher_text = hyenc.encrypt(public_key, msg)
     >>> decrypted_msg = hyenc.decrypt(public_key, secret_key, cipher_text)
     >>> decrypted_msg == msg

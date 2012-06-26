@@ -22,7 +22,7 @@ class BCHKIBEnc(IBEnc):
     >>> encap = EncapBCHK()
     >>> hyb_ibe = BCHKIBEnc(ibe, group, encap)
     >>> (public_key, secret_key) = hyb_ibe.keygen()
-    >>> msg = "Hello World!"
+    >>> msg = b"Hello World!"
     >>> cipher_text = hyb_ibe.encrypt(public_key, msg)
     >>> decrypted_msg = hyb_ibe.decrypt(public_key, secret_key, cipher_text)
     >>> decrypted_msg == msg
@@ -64,10 +64,14 @@ class BCHKIBEnc(IBEnc):
 
     def encrypt(self, pk, m):
         (k, ID, x) = encap.S(pk['pub'])
+        if type(m) != bytes:
+           m = bytes(m, 'utf8')	
+        if type(x) != bytes:
+           x = bytes(x, 'utf8')	
 
         ID2 = group.hash(ID, ZR)
 
-        m2 = m + ':' + x
+        m2 = m + b':' + x
 
         kprime = group.random(GT)
         kprimeStr = self.elmtToString(kprime, len(m2))
@@ -75,7 +79,7 @@ class BCHKIBEnc(IBEnc):
         C1 = ibenc.encrypt(pk['PK'], ID2, kprime)
 
         C2 = self.str_XOR(m2, kprimeStr)
-        C2 = C2.encode('utf-8')
+        C2 = C2.encode('utf8')
         
         C1prime = pickleObject(serializeObject(C1, group))
         
@@ -99,7 +103,7 @@ class BCHKIBEnc(IBEnc):
         C1prime = pickleObject(serializeObject(c['C1'], group))
         
         if(c['tag'] == hmac.new(k, C1prime+c['C2'], hashlib.sha1).digest()):
-            return m2.split(':')[0]
+            return bytes(m2.split(':')[0], 'utf8')
         else:
             return b'FALSE'
    

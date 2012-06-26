@@ -1807,8 +1807,10 @@ void initelliptic_curve(void) 		{
 		INITERROR;
 	}
 
-//    if(import_benchmark() < 0)
-//    	INITERROR;
+    if(import_benchmark() < 0) {
+    	Py_DECREF(m);
+    	INITERROR;
+    }
     if(PyType_Ready(&BenchmarkType) < 0)
     	INITERROR;
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);

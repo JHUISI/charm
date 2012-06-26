@@ -1,8 +1,8 @@
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.core.math.pairing import hashPair as sha1
-from schemes.ibenc.ibenc_adapt_identityhash import *
-from charm.toolbox.IBEnc import *
+from schemes.ibenc.ibenc_adapt_identityhash import HashIDAdapter
+from charm.toolbox.IBEnc import IBEnc
 from charm.core.crypto.cryptobase import *
 
 debug = False
@@ -16,7 +16,7 @@ class HybridIBEnc(IBEnc):
     >>> (master_public_key, master_key) = hyb_ibe.setup()
     >>> ID = 'waldoayo@gmail.com'
     >>> secret_key = hyb_ibe.extract(master_key, ID)
-    >>> msg = "Hello World My name is blah blah!!!! Word!"
+    >>> msg = b"Hello World My name is blah blah!!!! Word!"
     >>> cipher_text = hyb_ibe.encrypt(master_public_key, ID, msg)
     >>> decrypted_msg = hyb_ibe.decrypt(master_public_key, secret_key, cipher_text)
     >>> decrypted_msg == msg
@@ -35,7 +35,7 @@ class HybridIBEnc(IBEnc):
         return ibenc.extract(mk, ID)
     
     def encrypt(self, pk, ID, M):
-        if type(M) != str: raise "message not right type!"        
+        if type(M) != bytes: raise "message not right type!"        
         key = group.random(GT)
         c1 = ibenc.encrypt(pk, ID, key)
         # instantiate a symmetric enc scheme from this key

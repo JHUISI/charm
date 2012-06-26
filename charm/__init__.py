@@ -2,4 +2,4 @@
 # fail to properly load shared modules that c extensions depend on.
 # In this case, the benchmark module is not handeled properly on osx
 # as such we import it preimptively to force its symbols to be loaded. 
-#import charm.core.benchmark 
+import charm.core.benchmark 

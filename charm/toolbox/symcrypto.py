@@ -1,9 +1,8 @@
-from charm.core.crypto.cryptobase import MODE_CBC,AES,selectPRP
 from charm.core.math.pairing import hashPair as sha1
-from hashlib import sha1 as sha1hashlib
-from charm.toolbox.conversion import *
 from charm.toolbox.paddingschemes import PKCS7Padding
 from charm.toolbox.securerandom import OpenSSLRand
+from charm.core.crypto.cryptobase import MODE_CBC,AES,selectPRP
+from hashlib import sha1 as sha1hashlib
 from math import ceil
 import json
 import hmac
@@ -72,9 +71,9 @@ class SymmetricCryptoAbstraction(object):
     >>> groupObj = PairingGroup('SS512')
     >>> from charm.core.math.pairing import hashPair as extractor
     >>> a = SymmetricCryptoAbstraction(extractor(groupObj.random(GT)))
-    >>> ct = a.encrypt("Friendly Fire Isn't")
+    >>> ct = a.encrypt(b"Friendly Fire Isn't")
     >>> a.decrypt(ct)
-    "Friendly Fire Isn't"
+    b"Friendly Fire Isn't"
     """
 
     def __init__(self,key, alg = AES, mode = MODE_CBC):
@@ -127,7 +126,7 @@ class SymmetricCryptoAbstraction(object):
 
     def decrypt(self,cipherText):
         f = json.loads(cipherText)
-        return self._decrypt(self._decode(f)).decode("utf-8")
+        return self._decrypt(self._decode(f)) #.decode("utf-8")
 
     def _decrypt(self,cipherText):
         cipher = self._initCipher(cipherText['IV'])
@@ -138,7 +137,8 @@ class AuthenticatedCryptoAbstraction(SymmetricCryptoAbstraction):
     def encrypt(self,msg):
         mac = MessageAuthenticator(sha1hashlib(b'Poor Mans Key Extractor'+self._key).digest()) # warning only valid in the random oracle 
         enc = super(AuthenticatedCryptoAbstraction,self).encrypt(msg)
-        return mac.mac(enc);
+        return mac.mac(enc)
+
     def decrypt(self,cipherText): 
         mac = MessageAuthenticator(sha1hashlib(b'Poor Mans Key Extractor'+self._key).digest()) # warning only valid in the random oracle 
         if not  mac.verify(cipherText):

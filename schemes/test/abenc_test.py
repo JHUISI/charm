@@ -14,7 +14,7 @@ class HybridABEncTest(unittest.TestCase):
         cpabe = CPabe_BSW07(groupObj)
         hyb_abe = HybridABEnc(cpabe, groupObj)
         access_policy = '((four or three) and (two or one))'
-        message = "hello world this is an important message."
+        message = b"hello world this is an important message."
         (pk, mk) = hyb_abe.setup()
         if debug: print("pk => ", pk)
         if debug: print("mk => ", mk)
@@ -108,7 +108,7 @@ class HybridKPABEncTest(unittest.TestCase):
         hyb_abe = HybridKPABEnc(kpabe, groupObj)
         access_key = '((ONE or TWO) and THREE)'
         access_policy = ['ONE', 'TWO', 'THREE']
-        message = "hello world this is an important message."
+        message = b"hello world this is an important message."
         (pk, mk) = hyb_abe.setup()
         if debug: print("pk => ", pk)
         if debug: print("mk => ", mk)

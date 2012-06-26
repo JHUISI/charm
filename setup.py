@@ -135,7 +135,7 @@ if opt.get('ECC_MOD') == 'yes':
 				libraries=['gmp', 'crypto'])
    _ext_modules.append(ecc_module)
 
-#benchmark_module = Extension(core_prefix + '.benchmark', sources = [benchmark_path + 'benchmarkmodule.c'])
+benchmark_module = Extension(core_prefix + '.benchmark', sources = [benchmark_path + 'benchmarkmodule.c'])
 
 cryptobase = Extension(crypto_prefix+'.cryptobase', sources = [cryptobase_path + 'cryptobasemodule.c'])
 
@@ -154,14 +154,14 @@ des3  = Extension(crypto_prefix + '.DES3',
                                     crypto_path + 'DES/'], 
                     sources = [crypto_path + 'DES3/DES3.c'])
 
-#_ext_modules.extend([benchmark_module, cryptobase, aes, des, des3])
-_ext_modules.extend([cryptobase, aes, des, des3])
+_ext_modules.extend([benchmark_module, cryptobase, aes, des, des3])
+#_ext_modules.extend([cryptobase, aes, des, des3])
 
-#if platform.system() in ['Linux', 'Windows']:
+if platform.system() in ['Linux', 'Windows']:
    # add benchmark module to pairing, integer and ecc 
-   #if opt.get('PAIR_MOD') == 'yes': pairing_module.sources.append(benchmark_path + 'benchmarkmodule.c')
-   #if opt.get('INT_MOD') == 'yes': integer_module.sources.append(benchmark_path  + 'benchmarkmodule.c')
-   #if opt.get('ECC_MOD') == 'yes': ecc_module.sources.append(benchmark_path  + 'benchmarkmodule.c')
+   if opt.get('PAIR_MOD') == 'yes': pairing_module.sources.append(benchmark_path + 'benchmarkmodule.c')
+   if opt.get('INT_MOD') == 'yes': integer_module.sources.append(benchmark_path  + 'benchmarkmodule.c')
+   if opt.get('ECC_MOD') == 'yes': ecc_module.sources.append(benchmark_path  + 'benchmarkmodule.c')
 
 setup(name = 'Charm-Crypto',
 	version =  _charm_version,
