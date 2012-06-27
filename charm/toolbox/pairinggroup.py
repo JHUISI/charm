@@ -1,5 +1,5 @@
 from charm.core.math.pairing import pairing,ZR,G1,G2,GT,init,pair,hashPair,H,random,serialize,deserialize,ismember,order
-from charm.toolbox.pairingcurves import params
+from charm.toolbox.pairingcurves import params as param_info
 import os.path
 
 class PairingGroup():
@@ -8,7 +8,7 @@ class PairingGroup():
         if param_file:
           self.Pairing = pairing(file=param_id)
         elif type(param_id) == str:
-          pairID = params.get(param_id)
+          pairID = param_info.get(param_id)
           assert pairID != None, "'%s' not recognized! See 'pairingcurves.py' in toolbox." % param_id
           self.Pairing = pairing(string=pairID)
           self.param = param_id

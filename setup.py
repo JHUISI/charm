@@ -89,7 +89,15 @@ core_prefix = 'charm.core'
 math_prefix = core_prefix + '.math'
 crypto_prefix = core_prefix + '.crypto'
 
-_macros = []
+#default is no unless benchmark module explicitly disabled
+if opt.get('DISABLE_BENCHMARK') == 'yes':
+   _macros = None
+   _undef_macro = ['BENCHMARK_ENABLED']
+else:
+   _macros = [('BENCHMARK_ENABLED', '1')]
+   _undef_macro = None
+    
+
 _charm_version = opt.get('VERSION')
 
 if opt.get('PAIR_MOD') == 'yes':
@@ -100,7 +108,7 @@ if opt.get('PAIR_MOD') == 'yes':
                             sources = [math_path+'pairing/pairingmodule.c', 
                                         utils_path+'sha1.c',
                                         utils_path+'base64.c'],
-                            libraries=['pbc', 'gmp'])
+                            libraries=['pbc', 'gmp'], define_macros=_macros, undef_macros=_undef_macro)
     else:
         # build MIRACL based pairing module - note that this is for experimental use only
         pairing_module = Extension(math_prefix + '.pairing',
@@ -122,7 +130,7 @@ if opt.get('INT_MOD') == 'yes':
                             sources = [math_path + 'integer/integermodule.c', 
                                         utils_path + 'sha1.c', 
                                         utils_path + 'base64.c'], 
-                            libraries=['gmp', 'crypto'])
+                            libraries=['gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro)
    _ext_modules.append(integer_module)
    
 if opt.get('ECC_MOD') == 'yes':
@@ -132,7 +140,7 @@ if opt.get('ECC_MOD') == 'yes':
 				sources = [math_path + 'elliptic_curve/ecmodule.c',
                             utils_path + 'sha1.c',
                             utils_path + 'base64.c'], 
-				libraries=['gmp', 'crypto'])
+				libraries=['gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro)
    _ext_modules.append(ecc_module)
 
 benchmark_module = Extension(core_prefix + '.benchmark', sources = [benchmark_path + 'benchmarkmodule.c'])

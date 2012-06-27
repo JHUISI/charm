@@ -5,7 +5,7 @@ from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
 #from schemes.pkenc.pkenc_elgamal85 import *
 from charm.toolbox.PKEnc import PKEnc
 from charm.core.crypto.cryptobase import AES
-from os import urandom
+from charm.toolbox.securerandom import OpenSSLRand
 debug = False
 # Adapter class for Hybrid Encryption Schemes
 class HybridEnc(PKEnc):
@@ -41,7 +41,7 @@ class HybridEnc(PKEnc):
     
     def encrypt(self, pk, M):
         # generate a short session key, K and encrypt using pkenc
-        key = urandom(self.key_len)
+        key = OpenSSLRand().getRandomBytes(self.key_len) # urandom(self.key_len)
         # encrypt session key using PKEnc
         c1 = self.pkenc.encrypt(pk, key)
         # use symmetric key encryption to enc actual message

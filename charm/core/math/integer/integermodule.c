@@ -1060,7 +1060,7 @@ static PyObject *genRandomBits(Integer *self, PyObject *args) {
 	if (PyArg_ParseTuple(args, "i", &bits)) {
 		if (bits > 0) {
 			// generate random number that is in 0 to 2^n-1 range.
-// TODO: fix code very very soon!
+			// TODO: fix code very very soon!
 			PyLongObject *v;
 			unsigned char buff[sizeof(long)];
 			long t;
@@ -1692,6 +1692,7 @@ static PyObject *Integer_xor(PyObject *self, PyObject *other) {
 	EXIT_IF(TRUE, "objects not initialized properly.");
 }
 
+#ifdef BENCHMARK_ENABLED
 /* END: helper function definition */
 InitBenchmark_CAPI(_init_benchmark, dBench, 3);
 StartBenchmark_CAPI( _start_benchmark, dBench);
@@ -1699,6 +1700,7 @@ EndBenchmark_CAPI( _end_benchmark, dBench);
 GetBenchmark_CAPI( _get_benchmark, dBench);
 GetAllBenchmarks_CAPI(_get_all_results, dBench);
 ClearBenchmarks_CAPI(_clear_benchmark, dBench);
+#endif
 
 PyMethodDef Integer_methods[] = {
 	{ "set", (PyCFunction) Integer_set, METH_VARARGS, "initialize with another integer object." },
@@ -1876,7 +1878,9 @@ PyTypeObject IntegerType = {
 
 struct module_state {
 	PyObject *error;
+#ifdef BENCHMARK_ENABLED
 	Benchmark *dBench;
+#endif
 };
 
 #if PY_MAJOR_VERSION >= 3
@@ -1901,12 +1905,14 @@ static PyMethodDef module_methods[] = {
 	{ "lcm", (PyCFunction) lcmCall, METH_VARARGS, "compute the lcd of two integers a and b." },
 	{ "serialize", (PyCFunction) serialize, METH_VARARGS, "Serialize an integer type into bytes." },
 	{ "deserialize", (PyCFunction) deserialize, METH_VARARGS, "De-serialize an bytes object into an integer object" },
+#ifdef BENCHMARK_ENABLED
 	{ "InitBenchmark", (PyCFunction) _init_benchmark, METH_NOARGS, "Initialize a benchmark object" },
 	{ "StartBenchmark", (PyCFunction) _start_benchmark, METH_VARARGS, "Start a new benchmark with some options" },
 	{ "EndBenchmark", (PyCFunction) _end_benchmark, METH_VARARGS, "End a given benchmark" },
 	{ "GetBenchmark", (PyCFunction) _get_benchmark, METH_VARARGS, "Returns contents of a benchmark object" },
 	{ "GetGeneralBenchmarks", (PyCFunction) _get_all_results, METH_VARARGS, "Retrieve general benchmark info as a dictionary."},
 	{ "ClearBenchmark", (PyCFunction)_clear_benchmark, METH_VARARGS, "Clears content of benchmark object"},
+#endif
 	{ "int2Bytes", (PyCFunction) toBytes, METH_O, "convert an integer object to a bytes object." },
 	{ "toInt", (PyCFunction) toInt, METH_O, "convert modular integer into an integer object."},
 	{ NULL, NULL }
@@ -1920,7 +1926,9 @@ static int int_traverse(PyObject *m, visitproc visit, void *arg) {
 
 static int int_clear(PyObject *m) {
 	Py_CLEAR(GETSTATE(m)->error);
+#ifdef BENCHMARK_ENABLED
 	Py_CLEAR(GETSTATE(m)->dBench);
+#endif
 	return 0;
 }
 
@@ -1959,7 +1967,8 @@ void initinteger(void) {
 		Py_DECREF(m);
 		INITERROR;
 	}
-
+	IntegerError = st->error;
+#ifdef BENCHMARK_ENABLED
 	if (import_benchmark() < 0) {
     	Py_DECREF(m);
     	INITERROR;
@@ -1970,24 +1979,16 @@ void initinteger(void) {
 	dBench = st->dBench;
 	dBench->bench_initialized = FALSE;
 	InitClear(dBench);
-	IntegerError = st->error;
-
+#endif
 	Py_INCREF(&IntegerType);
 	PyModule_AddObject(m, "integer", (PyObject *) &IntegerType);
     Py_INCREF(&BenchmarkType);
     PyModule_AddObject(m, "benchmark", (PyObject *)&BenchmarkType);
 
+#ifdef BENCHMARK_ENABLED
 	// add integer error to module
 	ADD_BENCHMARK_OPTIONS(m);
-//	PyModule_AddIntConstant(m, "CpuTime", CPU_TIME);
-//	PyModule_AddIntConstant(m, "RealTime", REAL_TIME);
-//	PyModule_AddIntConstant(m, "NativeTime", NATIVE_TIME);
-//	PyModule_AddIntConstant(m, "Add", ADDITION);
-//	PyModule_AddIntConstant(m, "Sub", SUBTRACTION);
-//	PyModule_AddIntConstant(m, "Mul", MULTIPLICATION);
-//	PyModule_AddIntConstant(m, "Div", DIVISION);
-//	PyModule_AddIntConstant(m, "Exp", EXPONENTIATION);
-
+#endif
 	// initialize PRNG
 	// replace with read from some source of randomness
 #ifndef MS_WINDOWS

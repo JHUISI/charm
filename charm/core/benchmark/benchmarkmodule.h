@@ -11,6 +11,10 @@ extern "C" {
 #include <structmember.h>
 #include <sys/time.h>
 
+// set default if not passed in by compiler
+//#ifndef BENCHMARK_ENABLED
+//#define BENCHMARK_ENABLED 1
+//#endif
 //#define DEBUG   1
 #define TRUE	1
 #define FALSE	0
@@ -45,6 +49,7 @@ enum Measure {CPU_TIME = 0, REAL_TIME, NATIVE_TIME, ADDITION, SUBTRACTION, MULTI
 typedef enum Measure MeasureType;
 
 // for recording native time
+#ifdef BENCHMARK_ENABLED
 #define START_CLOCK(object) \
 if(object->native_option) { \
 	PyStartTBenchmark(NATIVE_TIME, object); \
@@ -54,6 +59,12 @@ if(object->native_option) { \
 if(object->native_option) { \
 	PyStopTBenchmark(NATIVE_TIME, object); \
 }
+#else
+
+#define START_CLOCK(object) /* ... */
+#define STOP_CLOCK(object) /* ... */
+
+#endif
 
 typedef struct {
 	PyObject_HEAD
@@ -92,6 +103,7 @@ PyObject *Retrieve_result(Benchmark *self, MeasureType option);
 /* total number of C api pointers? */
 #define PyBenchmark_API_pointers 6
 
+#ifdef BENCHMARK_ENABLED
 #define START_NATIVE(bench)  \
     if(bench->bench_initialized && bench->native_option) { \
 	PyStartTBenchmark(NATIVE_TIME, bench); }
@@ -104,6 +116,13 @@ PyObject *Retrieve_result(Benchmark *self, MeasureType option);
 	if(bench->bench_initialized) {	   \
 	PyUpdateBenchmark(option, bench); }
 
+#else
+
+#define START_NATIVE(bench)  /* ... */
+#define STOP_NATIVE(bench) /* ... */
+#define UPDATE_BENCHMARK(option, bench) /* ... */
+
+#endif
 
 #ifdef BENCHMARK_MODULE
 /* This section is used when compiling benchmarkmodule.c */
