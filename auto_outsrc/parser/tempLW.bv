@@ -3,7 +3,7 @@ setting := asymmetric
 
 BEGIN :: types
 msk := list
-pk1 := list{GT, G1}
+pk1 := list{GT, G2}
 pk := list{pk1, None}
 sk := list
 ct := list
@@ -47,6 +47,8 @@ g2y := g_2^y
 msk#z := list{alpha, y}
 pk#z := list{eggalph, g2y}
 END :: for
+
+pk#123456 := e(g, g_2)
 
 output := list{msk, pk}
 END :: func:authsetup

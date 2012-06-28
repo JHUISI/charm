@@ -44,6 +44,7 @@ def authsetup(gpk, authS):
 		g2y = (g_2 ** y)
 		msk[z] = [alpha, y]
 		pk[z] = [eggalph, g2y]
+	pk[123456] = pair(g, g_2)
 	output = (msk, pk)
 	return output
 
@@ -136,6 +137,6 @@ if __name__ == "__main__":
 	f_skBlinded_BSW.write(pick_skBlinded_BSW)
 	f_skBlinded_BSW.close()
 
-	keys = {'sk':zz, 'pk':pk[0]}
+	keys = {'sk':zz, 'pk':pk[123456]}
 	writeToFile('keys_BSW_.txt', objectOut(group, keys))
 
