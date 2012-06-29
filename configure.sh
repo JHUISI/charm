@@ -112,6 +112,7 @@ ecc_module="yes"
 pairing_module="yes"
 pairing_miracl="no"
 pairing_pbc="yes"
+disable_benchmark="no"
 integer_ssl="no"
 integer_gmp="yes"
 python_version=""
@@ -332,6 +333,8 @@ for opt do
   ;;
   --disable-pairing) pairing_module="no"
   ;;
+  --disable-benchmark) disable_benchmark="yes"
+  ;;
   --enable-pairing-miracl) 
     echo "Enabling this option assumes you have unzipped the MIRACL library into charm-src/pairingmath/miracl/ and make sure the library is built in that directory."
   	pairing_pbc="no"
@@ -440,6 +443,7 @@ echo "  --enable-pairing-miracl  enable use of MIRACL lib for pairing module"
 echo "  --enable-pairing-pbc     enable use of PBC lib for pairing module (DEFAULT)"
 echo "  --enable-integer-openssl enable use of openssl for integer module"
 echo "  --enable-integer-gmp     enable use of GMP lib for integer module (DEFAULT)"
+echo "  --disable-benchmark      disable BENCHMARK base module (DEFAULT is no)"
 echo "  --disable-werror         disable compilation abort on warning"
 echo "  --enable-cocoa           enable COCOA (Mac OS X only)"
 echo "  --enable-docs            enable documentation build"
@@ -680,6 +684,7 @@ echo "-Werror enabled   $werror"
 echo "integer module    $integer_module"
 echo "ecc module        $ecc_module"
 echo "pairing module    $pairing_module"
+echo "disable benchmark $disable_benchmark"
 echo "libm found        $libm_found"
 echo "libgmp found      $libgmp_found"
 echo "libpbc found      $libpbc_found"
@@ -821,12 +826,18 @@ echo "ECC_MOD=$ecc_module" >> $config_mk
 echo "PAIR_MOD=$pairing_module" >> $config_mk
 
 if test "$pairing_pbc" = "yes" ; then
-	echo "USE_PBC=$pairing_pbc" >> $config_mk
-	echo "USE_GMP=$pairing_pbc" >> $config_mk
+    echo "USE_PBC=$pairing_pbc" >> $config_mk
+    echo "USE_GMP=$pairing_pbc" >> $config_mk
     echo "USE_MIRACL=no" >> $config_mk
 elif test "$pairing_miracl" = "yes" ; then
     echo "USE_MIRACL=$pairing_miracl" >> $config_mk
     echo "USE_PBC=no" >> $config_mk
+fi
+
+if test "$disable_benchmark" = "yes" ; then
+    echo "DISABLE_BENCHMARK=yes" >> $config_mk
+else
+    echo "DISABLE_BENCHMARK=no" >> $config_mk
 fi
 
 if test "$wget" = "" ; then

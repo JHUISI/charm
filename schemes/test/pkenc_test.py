@@ -31,7 +31,7 @@ class BCHKIBEncTest(unittest.TestCase):
             print("pk => ", pk)
             print("sk => ", sk)
 
-        msg = "Hello World!"
+        msg = b"Hello World!"
         
         ct = hyb_ibe.encrypt(pk, msg)
         if debug:
@@ -76,7 +76,7 @@ class HybridEncTest(unittest.TestCase):
        
         (pk, sk) = hyenc.keygen()
        
-        m = 'this is a new message'
+        m = b'this is a new message'
         cipher = hyenc.encrypt(pk, m)
         orig_m = hyenc.decrypt(pk, sk, cipher)
         assert m == orig_m, "Failed Decryption"

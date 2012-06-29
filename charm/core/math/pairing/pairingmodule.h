@@ -154,6 +154,7 @@ int div_rule(GroupType lhs, GroupType rhs);
 int pair_rule(GroupType lhs, GroupType rhs);
 void print_mpz(mpz_t x, int base);
 
+#ifdef BENCHMARK_ENABLED
 // for multiplicative notation
 #define Op_MUL(op_var_type, op_group_type, group, bench_obj)  \
 	if(op_var_type == MULTIPLICATION && op_group_type == group)      \
@@ -212,6 +213,14 @@ void print_mpz(mpz_t x, int base);
 	else if(type == ADDITION) count = (((Operations *) bench_obj->data_ptr)->add_ ##group ); \
 	else if(type == SUBTRACTION) count = (((Operations *) bench_obj->data_ptr)->sub_ ##group ); \
 	else if(type == EXPONENTIATION) count = (((Operations *) bench_obj->data_ptr)->exp_ ##group );
+
+#else
+
+#define UPDATE_BENCH(op_type, elem_type, bench_obj)  /* ... */
+// #define UPDATE_BENCHMARK(op_type, bench_obj)  /* ... */
+#define CLEAR_ALLDBENCH(bench_obj) /* ... */
+#define GetField(count, type, group, bench_obj)  /* ... */
+#endif
 
 #define EXIT_IF(check, msg) \
 	if(check) { 						\

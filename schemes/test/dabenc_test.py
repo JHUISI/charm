@@ -66,7 +66,7 @@ class HybridABEncMATest(unittest.TestCase):
         hyb_abema.keygen(gp, jhmiSK,'jhmi.researcher', bobs_gid, K)
         
         
-        msg = 'Hello World, I am a sensitive record!'
+        msg = b'Hello World, I am a sensitive record!'
         size = len(msg)
         policy_str = "(jhmi.doctor or (jhmi.researcher and jhu.professor))"
         ct = hyb_abema.encrypt(allAuthPK, gp, msg, policy_str)    

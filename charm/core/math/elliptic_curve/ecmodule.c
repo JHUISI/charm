@@ -1003,6 +1003,16 @@ static PyObject *ECE_neg(PyObject *o1) {
 		}
 		else if(obj1->type == ZR) {
 			// consider supporting this type.
+			obj2 = createNewPoint(ZR, obj1);
+			if(BN_copy(obj2->elemZ, obj1->elemZ) != NULL) {
+				int negate;
+				if(!BN_is_negative(obj2->elemZ)) negate = -1;
+				else negate = 0;
+				BN_set_negative(obj2->elemZ, negate);
+
+				return (PyObject *) obj2;
+			}
+			PyObject_Del(obj2);
 		}
 
 	}
@@ -1380,7 +1390,7 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
 		// if point not on curve, increment ctr by 1
 	}
 
-	EXIT_IF(ERROR_SET, "Ran out of counters. So, message couldn't encoded at current length. please consider making it smaller.");
+	EXIT_IF(ERROR_SET, "Ran out of counters. So, could not be encode message at given length. make it smaller.");
 	Py_INCREF(Py_False);
 
 	return Py_False;
@@ -1536,13 +1546,14 @@ static PyObject *Deserialize(ECElement *self, PyObject *args)
 	EXIT_IF(TRUE, "invalid argument");
 }
 
-
+#ifdef BENCHMARK_ENABLED
 InitBenchmark_CAPI(_init_benchmark, dBench, 2);
 StartBenchmark_CAPI(_start_benchmark, dBench);
 EndBenchmark_CAPI(_end_benchmark, dBench);
 GetBenchmark_CAPI(_get_benchmark, dBench);
 GetAllBenchmarks_CAPI(_get_all_results, dBench);
 ClearBenchmarks_CAPI(_clear_benchmark, dBench);
+#endif
 
 PyMemberDef ECElement_members[] = {
 	{"type", T_INT, offsetof(ECElement, type), 0,
@@ -1558,7 +1569,7 @@ PyMethodDef ECElement_methods[] = {
 };
 
 #if PY_MAJOR_VERSION >= 3
-PyNumberMethods ecc_number = {
+PyNumberMethods ec_number = {
 		(binaryfunc) ECE_add,            /* nb_add */
 	    (binaryfunc) ECE_sub,            /* nb_subtract */
 	    (binaryfunc) ECE_mul,            /* nb_multiply */
@@ -1597,7 +1608,7 @@ PyNumberMethods ecc_number = {
 
 PyTypeObject ECType = {
 	PyVarObject_HEAD_INIT(NULL, 0)
-	"ecc.Element",             /*tp_name*/
+	"elliptic_curve.Element",             /*tp_name*/
 	sizeof(ECElement),         /*tp_basicsize*/
 	0,                         /*tp_itemsize*/
 	(destructor)ECElement_dealloc, /*tp_dealloc*/
@@ -1606,7 +1617,7 @@ PyTypeObject ECType = {
 	0,                         /*tp_setattr*/
 	0,			   				/*tp_reserved*/
 	(reprfunc)ECElement_print, /*tp_repr*/
-	&ecc_number,               /*tp_as_number*/
+	&ec_number,               /*tp_as_number*/
 	0,                         /*tp_as_sequence*/
 	0,                         /*tp_as_mapping*/
 	0,                         /*tp_hash */
@@ -1637,7 +1648,7 @@ PyTypeObject ECType = {
 };
 #else
 /* python 2.x series */
-PyNumberMethods ecc_number = {
+PyNumberMethods ec_number = {
     ECE_add,                       /* nb_add */
     ECE_sub,                       /* nb_subtract */
     ECE_mul,                        /* nb_multiply */
@@ -1691,7 +1702,7 @@ PyTypeObject ECType = {
     0,                         /*tp_setattr*/
     0,                         /*tp_compare*/
     0,                         /*tp_repr*/
-    &ecc_number,       /*tp_as_number*/
+    &ec_number,       /*tp_as_number*/
     0,                         /*tp_as_sequence*/
     0,                         /*tp_as_mapping*/
     0,                         /*tp_hash */
@@ -1725,7 +1736,9 @@ PyTypeObject ECType = {
 
 struct module_state {
 	PyObject *error;
+#ifdef BENCHMARK_ENABLED
 	Benchmark *dBench;
+#endif
 };
 
 #if PY_MAJOR_VERSION >= 3
@@ -1747,12 +1760,14 @@ static PyMethodDef ec_methods[] = {
 		{"encode", (PyCFunction)ECE_encode, METH_VARARGS, "Encode string as a group element of G"},
 		{"decode", (PyCFunction)ECE_decode, METH_VARARGS, "Decode group element to a string."},
 		{"getXY", (PyCFunction)ECE_convertToZR, METH_VARARGS, "Returns the x and/or y coordinates of point on an elliptic curve."},
+#ifdef BENCHMARK_ENABLED
 		{"InitBenchmark", (PyCFunction)_init_benchmark, METH_NOARGS, "Initialize a benchmark object"},
 		{"StartBenchmark", (PyCFunction)_start_benchmark, METH_VARARGS, "Start a new benchmark with some options"},
 		{"EndBenchmark", (PyCFunction)_end_benchmark, METH_VARARGS, "End a given benchmark"},
 		{"GetBenchmark", (PyCFunction)_get_benchmark, METH_VARARGS, "Returns contents of a benchmark object"},
 		{"GetGeneralBenchmarks", (PyCFunction) _get_all_results, METH_VARARGS, "Retrieve general benchmark info as a dictionary."},
 		{"ClearBenchmark", (PyCFunction)_clear_benchmark, METH_VARARGS, "Clears content of benchmark object"},
+#endif
 		{NULL, NULL}
 };
 
@@ -1765,7 +1780,9 @@ static int ec_traverse(PyObject *m, visitproc visit, void *arg) {
 
 static int ec_clear(PyObject *m) {
 	Py_CLEAR(GETSTATE(m)->error);
+#ifdef BENCHMARK_ENABLED
 	Py_CLEAR(GETSTATE(m)->dBench);
+#endif
 	return 0;
 }
 
@@ -1807,14 +1824,18 @@ void initelliptic_curve(void) 		{
 		INITERROR;
 	}
 
-//    if(import_benchmark() < 0)
-//    	INITERROR;
+#ifdef BENCHMARK_ENABLED
+    if(import_benchmark() < 0) {
+    	Py_DECREF(m);
+    	INITERROR;
+    }
     if(PyType_Ready(&BenchmarkType) < 0)
     	INITERROR;
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);
     dBench = st->dBench;
     dBench->bench_initialized = FALSE;
     InitClear(dBench);
+#endif
 
 	Py_INCREF(&ECType);
 	PyModule_AddObject(m, "elliptic_curve", (PyObject *)&ECType);
@@ -1824,17 +1845,9 @@ void initelliptic_curve(void) 		{
 	PyModule_AddIntConstant(m, "G", G);
 	PyModule_AddIntConstant(m, "ZR", ZR);
 	PyECErrorObject = st->error;
-
+#ifdef BENCHMARK_ENABLED
 	ADD_BENCHMARK_OPTIONS(m);
-//	PyModule_AddIntConstant(module, "CpuTime", CPU_TIME);
-//	PyModule_AddIntConstant(module, "RealTime", REAL_TIME);
-//	PyModule_AddIntConstant(module, "NativeTime", NATIVE_TIME);
-//	PyModule_AddIntConstant(module, "Add", ADDITION);
-//	PyModule_AddIntConstant(module, "Sub", SUBTRACTION);
-//	PyModule_AddIntConstant(module, "Mul", MULTIPLICATION);
-//	PyModule_AddIntConstant(module, "Div", DIVISION);
-//	PyModule_AddIntConstant(module, "Exp", EXPONENTIATION);
-
+#endif
 	// initialize PRNG
 	// replace with read from some source of randomness
 #ifndef MS_WINDOWS

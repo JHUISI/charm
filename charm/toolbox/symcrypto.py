@@ -1,9 +1,8 @@
-from charm.core.crypto.cryptobase import MODE_CBC,AES,selectPRP
 from charm.core.math.pairing import hashPair as sha1
-from hashlib import sha1 as sha1hashlib
-from charm.toolbox.conversion import *
 from charm.toolbox.paddingschemes import PKCS7Padding
 from charm.toolbox.securerandom import OpenSSLRand
+from charm.core.crypto.cryptobase import MODE_CBC,AES,selectPRP
+from hashlib import sha1 as sha1hashlib
 from math import ceil
 import json
 import hmac
@@ -13,10 +12,10 @@ class MessageAuthenticator(object):
     """ Abstraction for constructing and verifying authenticated messages 
        
         A large number of the schemes can only encrypt group elements 
-        and do not provide an efficien machanism for encoding byte in
-        those elements. As such we don't pick a symetric key and encrypt 
-        it asymetrically. Rather, we hash a random group element to get the
-        symatric key.
+        and do not provide an efficient mechanism for encoding byte in
+        those elements. As such we don't pick a symmetric key and encrypt 
+        it asymmetrically. Rather, we hash a random group element to get the
+        symmetric key.
 
     >>> from charm.toolbox.pairinggroup import PairingGroup,GT
     >>> from charm.core.math.pairing import hashPair as extractor
@@ -32,7 +31,7 @@ class MessageAuthenticator(object):
         Creates a message authenticator and verifier under the specified key
         """
         if alg != "HMAC_SHA1":
-            raise ValueError("Currently only HMAC_SHA1 is supportated as an algorithm")
+            raise ValueError("Currently only HMAC_SHA1 is supported as an algorithm")
         self._algorithm = alg
         self._key = key    
     def mac(self,msg):
@@ -50,7 +49,7 @@ class MessageAuthenticator(object):
         verifies the result returned by mac
         """
         if msgAndDigest['alg'] != self._algorithm:
-            raise ValueError()
+            raise ValueError("Currently only HMAC_SHA1 is supported as an algorithm")
         expected = (self.mac(msgAndDigest['msg'])['digest'])
         recieved = (msgAndDigest['digest'])
         return sha1hashlib(expected).digest() == sha1hashlib(recieved).digest() # we compare the hash instead of the direct value to avoid a timing attack
@@ -62,19 +61,19 @@ class SymmetricCryptoAbstraction(object):
     Currently only supports primitives that JSON can encode and decode.
   
      A large number of the schemes can only encrypt group elements 
-    and do not provide an efficien machanism for encoding byte in
-    those elements. As such we don't pick a symetric key and encrypt 
-    it asymetrically. Rather, we hash a random group element to get the
-    symatric key.
+    and do not provide an efficient mechanism for encoding byte in
+    those elements. As such we don't pick a symmetric key and encrypt 
+    it asymmetrically. Rather, we hash a random group element to get the
+    symmetric key.
 
     usage:
     >>> from charm.toolbox.pairinggroup import PairingGroup,GT
     >>> groupObj = PairingGroup('SS512')
     >>> from charm.core.math.pairing import hashPair as extractor
     >>> a = SymmetricCryptoAbstraction(extractor(groupObj.random(GT)))
-    >>> ct = a.encrypt("Friendly Fire Isn't")
+    >>> ct = a.encrypt(b"Friendly Fire Isn't")
     >>> a.decrypt(ct)
-    "Friendly Fire Isn't"
+    b"Friendly Fire Isn't"
     """
 
     def __init__(self,key, alg = AES, mode = MODE_CBC):
@@ -98,7 +97,7 @@ class SymmetricCryptoAbstraction(object):
 
     #This code should be factored out into  another class
     #Because json is only defined over strings, we need to base64 encode the encrypted data
-    # and convery the base 64 byte array into a utf8 string
+    # and convert the base 64 byte array into a utf8 string
     def _encode(self,data):
         return self.__encode_decode(data,lambda x:b64encode(x).decode('utf-8'))
 
@@ -127,7 +126,7 @@ class SymmetricCryptoAbstraction(object):
 
     def decrypt(self,cipherText):
         f = json.loads(cipherText)
-        return self._decrypt(self._decode(f)).decode("utf-8")
+        return self._decrypt(self._decode(f)) #.decode("utf-8")
 
     def _decrypt(self,cipherText):
         cipher = self._initCipher(cipherText['IV'])
@@ -138,7 +137,8 @@ class AuthenticatedCryptoAbstraction(SymmetricCryptoAbstraction):
     def encrypt(self,msg):
         mac = MessageAuthenticator(sha1hashlib(b'Poor Mans Key Extractor'+self._key).digest()) # warning only valid in the random oracle 
         enc = super(AuthenticatedCryptoAbstraction,self).encrypt(msg)
-        return mac.mac(enc);
+        return mac.mac(enc)
+
     def decrypt(self,cipherText): 
         mac = MessageAuthenticator(sha1hashlib(b'Poor Mans Key Extractor'+self._key).digest()) # warning only valid in the random oracle 
         if not  mac.verify(cipherText):

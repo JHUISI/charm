@@ -9,6 +9,7 @@ class SecretShare:
         
     def P(self, coeff, x):
         share = self.elem.init(ZR, 0)
+#        share = 0
         # evaluate polynomial
         for i in range(0, len(coeff)):
             i2 = self.elem.init(ZR, long(i))
@@ -49,6 +50,7 @@ class SecretShare:
         coeff = {}
         for i in list:
             result = self.elem.init(ZR, long(1))
+#            result = 1
             for j in list:
                 if not (i == j):
                     # lagrange basis poly
@@ -63,6 +65,7 @@ class SecretShare:
         coeff = self.recoverCoefficients(list)
         if self.verbose: print("coefficients: ", coeff)
         secret = self.elem.init(ZR, 0)
+#        secret = 0
         for i in list:
             secret += (coeff[i] * shares[i])
 

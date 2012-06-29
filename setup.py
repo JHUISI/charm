@@ -71,12 +71,21 @@ print("Platform:", platform.system())
 config = os.environ.get('CONFIG_FILE')
 opt = {}
 if config != None:
-   print("Config file:", config)
-   opt = read_config(config)
+    print("Config file:", config)
+    opt = read_config(config)
 else:
-   config = "config.mk"
-   print("Config file:", config)
-   opt = read_config(config)
+    config = "config.mk"
+    print("Config file:", config)
+    try:
+        opt = read_config(config)
+    except IOError as e:
+        print("Warning, using default config vaules.")
+        print("You probably want to run ./configure.sh first.")
+        opt = {'PAIR_MOD':'yes',
+                'USE_PBC':'yes',
+                'INT_MOD':'yes',
+                'ECC_MOD':'yes'
+                }
 
 core_path = 'charm/core/'
 math_path = core_path + 'math/'
@@ -89,7 +98,15 @@ core_prefix = 'charm.core'
 math_prefix = core_prefix + '.math'
 crypto_prefix = core_prefix + '.crypto'
 
-_macros = []
+#default is no unless benchmark module explicitly disabled
+if opt.get('DISABLE_BENCHMARK') == 'yes':
+   _macros = None
+   _undef_macro = ['BENCHMARK_ENABLED']
+else:
+   _macros = [('BENCHMARK_ENABLED', '1')]
+   _undef_macro = None
+    
+
 _charm_version = opt.get('VERSION')
 
 if opt.get('PAIR_MOD') == 'yes':
@@ -100,7 +117,7 @@ if opt.get('PAIR_MOD') == 'yes':
                             sources = [math_path+'pairing/pairingmodule.c', 
                                         utils_path+'sha1.c',
                                         utils_path+'base64.c'],
-                            libraries=['pbc', 'gmp'])
+                            libraries=['pbc', 'gmp'], define_macros=_macros, undef_macros=_undef_macro)
     else:
         # build MIRACL based pairing module - note that this is for experimental use only
         pairing_module = Extension(math_prefix + '.pairing',
@@ -122,7 +139,7 @@ if opt.get('INT_MOD') == 'yes':
                             sources = [math_path + 'integer/integermodule.c', 
                                         utils_path + 'sha1.c', 
                                         utils_path + 'base64.c'], 
-                            libraries=['gmp', 'crypto'])
+                            libraries=['gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro)
    _ext_modules.append(integer_module)
    
 if opt.get('ECC_MOD') == 'yes':
@@ -132,10 +149,10 @@ if opt.get('ECC_MOD') == 'yes':
 				sources = [math_path + 'elliptic_curve/ecmodule.c',
                             utils_path + 'sha1.c',
                             utils_path + 'base64.c'], 
-				libraries=['gmp', 'crypto'])
+				libraries=['gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro)
    _ext_modules.append(ecc_module)
 
-#benchmark_module = Extension(core_prefix + '.benchmark', sources = [benchmark_path + 'benchmarkmodule.c'])
+benchmark_module = Extension(core_prefix + '.benchmark', sources = [benchmark_path + 'benchmarkmodule.c'])
 
 cryptobase = Extension(crypto_prefix+'.cryptobase', sources = [cryptobase_path + 'cryptobasemodule.c'])
 
@@ -154,14 +171,14 @@ des3  = Extension(crypto_prefix + '.DES3',
                                     crypto_path + 'DES/'], 
                     sources = [crypto_path + 'DES3/DES3.c'])
 
-#_ext_modules.extend([benchmark_module, cryptobase, aes, des, des3])
-_ext_modules.extend([cryptobase, aes, des, des3])
+_ext_modules.extend([benchmark_module, cryptobase, aes, des, des3])
+#_ext_modules.extend([cryptobase, aes, des, des3])
 
-#if platform.system() in ['Linux', 'Windows']:
+if platform.system() in ['Linux', 'Windows']:
    # add benchmark module to pairing, integer and ecc 
-   #if opt.get('PAIR_MOD') == 'yes': pairing_module.sources.append(benchmark_path + 'benchmarkmodule.c')
-   #if opt.get('INT_MOD') == 'yes': integer_module.sources.append(benchmark_path  + 'benchmarkmodule.c')
-   #if opt.get('ECC_MOD') == 'yes': ecc_module.sources.append(benchmark_path  + 'benchmarkmodule.c')
+   if opt.get('PAIR_MOD') == 'yes': pairing_module.sources.append(benchmark_path + 'benchmarkmodule.c')
+   if opt.get('INT_MOD') == 'yes': integer_module.sources.append(benchmark_path  + 'benchmarkmodule.c')
+   if opt.get('ECC_MOD') == 'yes': ecc_module.sources.append(benchmark_path  + 'benchmarkmodule.c')
 
 setup(name = 'Charm-Crypto',
 	version =  _charm_version,

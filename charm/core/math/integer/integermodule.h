@@ -94,6 +94,10 @@
 
 #endif
 
+#ifdef BENCHMARK_ENABLED
+static Benchmark *dBench;
+#endif
+
 /* Index numbers for different hash functions.  These are all implemented as SHA1(index || message).	*/
 #define HASH_FUNCTION_STR_TO_Zr_CRH		0
 #define HASH_FUNCTION_Zr_TO_G1_ROM		1
@@ -104,7 +108,6 @@
 // then make available to all random functions
 PyTypeObject IntegerType;
 static PyObject *IntegerError;
-static Benchmark *dBench;
 #define PyInteger_Check(obj) PyObject_TypeCheck(obj, &IntegerType)
 #define PyInteger_Init(obj1, obj2) obj1->initialized && obj2->initialized
 

@@ -39,9 +39,12 @@
 #define HASH_LEN	20
 #define RESERVED_ENCODING_BYTES			2
 
+#ifdef BENCHMARK_ENABLED
+static Benchmark *dBench;
+#endif
+
 PyTypeObject ECType;
 static PyObject *PyECErrorObject;
-static Benchmark *dBench;
 #define PyEC_Check(obj) PyObject_TypeCheck(obj, &ECType)
 enum Group {ZR = 0, G, NONE_G};
 typedef enum Group GroupType;

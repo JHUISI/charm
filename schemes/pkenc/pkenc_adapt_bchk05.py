@@ -22,7 +22,7 @@ class BCHKIBEnc(IBEnc):
     >>> encap = EncapBCHK()
     >>> hyb_ibe = BCHKIBEnc(ibe, group, encap)
     >>> (public_key, secret_key) = hyb_ibe.keygen()
-    >>> msg = "Hello World!"
+    >>> msg = b"Hello World!"
     >>> cipher_text = hyb_ibe.encrypt(public_key, msg)
     >>> decrypted_msg = hyb_ibe.decrypt(public_key, secret_key, cipher_text)
     >>> decrypted_msg == msg
@@ -67,7 +67,8 @@ class BCHKIBEnc(IBEnc):
 
         ID2 = group.hash(ID, ZR)
 
-        m2 = m + ':' + x
+        m2 = m + b':' + x
+#        m2 = m + ':' + x
 
         kprime = group.random(GT)
         kprimeStr = self.elmtToString(kprime, len(m2))
@@ -75,6 +76,7 @@ class BCHKIBEnc(IBEnc):
         C1 = ibenc.encrypt(pk['PK'], ID2, kprime)
 
         C2 = self.str_XOR(m2, kprimeStr)
+#        C2 = C2.encode('utf8')
         C2 = C2.encode('utf-8')
         
         C1prime = pickleObject(serializeObject(C1, group))

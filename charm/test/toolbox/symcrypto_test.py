@@ -1,19 +1,19 @@
 import unittest 
-from charm.toolbox.symcrypto  import SymmetricCryptoAbstraction,AuthenticatedCryptoAbstraction, MessageAuthenticator
+from charm.toolbox.symcrypto import SymmetricCryptoAbstraction,AuthenticatedCryptoAbstraction, MessageAuthenticator
 from charm.toolbox.pairinggroup import PairingGroup,GT
 from charm.core.math.pairing import hashPair as sha1
 class SymmetricCryptoAbstractionTest(unittest.TestCase):
     
     def testAESCBC(self):
-        self.MsgtestAESCBC("hello world")
+        self.MsgtestAESCBC(b"hello world")
 
     def testAESCBCLong(self):
-        self.MsgtestAESCBC("Lots of people working in cryptography have no deep \
+        self.MsgtestAESCBC(b"Lots of people working in cryptography have no deep \
        concern with real application issues. They are trying to discover things \
         clever enough to write papers about -- Whitfield Diffie.")
         
     def testAESCBC_Seperate(self):
-        self.MsgTestAESCBCSeperate("Lots of people working in cryptography have no deep \
+        self.MsgTestAESCBCSeperate(b"Lots of people working in cryptography have no deep \
         concern with real application issues. They are trying to discover things \
         clever enough to write papers about -- Whitfield Diffie.")
 
@@ -35,15 +35,15 @@ class SymmetricCryptoAbstractionTest(unittest.TestCase):
 
 class AuthenticatedCryptoAbstractionTest(unittest.TestCase):
     
-    def estAESCBC(self):
-       self.MsgtestAESCBC("hello world")
+    def testAESCBC(self):
+       self.MsgtestAESCBC(b"hello world")
 
     def testAESCBCLong(self):
-       self.MsgtestAESCBC("Lots of people working in cryptography have no deep \
+       self.MsgtestAESCBC(b"Lots of people working in cryptography have no deep \
        concern with real application issues. They are trying to discover things \
         clever enough to write papers about -- Whitfield Diffie.")
     def testAESCBC_Seperate(self):
-        self.MsgTestAESCBCSeperate("Lots of people working in cryptography have no deep \
+        self.MsgTestAESCBCSeperate(b"Lots of people working in cryptography have no deep \
         concern with real application issues. They are trying to discover things \
         clever enough to write papers about -- Whitfield Diffie.")
 

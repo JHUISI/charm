@@ -98,7 +98,7 @@ class CPabe_BSW07(ABEnc):
         if pruned_list == False:
             return False
         z = util.getCoefficients(policy)
-        A = group.init(GT, 1) 
+        A = 1 
         for i in pruned_list:
             j = i.getAttributeAndIndex(); k = i.getAttribute()
             A *= ( pair(ct['Cy'][j], sk['Dj'][k]) / pair(sk['Djp'][k], ct['Cyp'][j]) ) ** z[j]
