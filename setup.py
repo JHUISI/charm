@@ -71,12 +71,21 @@ print("Platform:", platform.system())
 config = os.environ.get('CONFIG_FILE')
 opt = {}
 if config != None:
-   print("Config file:", config)
-   opt = read_config(config)
+    print("Config file:", config)
+    opt = read_config(config)
 else:
-   config = "config.mk"
-   print("Config file:", config)
-   opt = read_config(config)
+    config = "config.mk"
+    print("Config file:", config)
+    try:
+        opt = read_config(config)
+    except IOError as e:
+        print("Warning, using default config vaules.")
+        print("You probably want to run ./configure.sh first.")
+        opt = {'PAIR_MOD':'yes',
+                'USE_PBC':'yes',
+                'INT_MOD':'yes',
+                'ECC_MOD':'yes'
+                }
 
 core_path = 'charm/core/'
 math_path = core_path + 'math/'
