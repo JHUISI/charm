@@ -10,17 +10,17 @@
 :Date:			06/2011
 ''' 
 
-from charm.core.crypto.cryptobase import *
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.IBEnc import IBEnc
 from charm.toolbox.bitstring import Bytes
-from charm.toolbox.conversion import Conversion
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.hash_module import Waters
 import hashlib, math
 
 debug = False
 class IBE_N04(IBEnc):
     """
+    >>> from charm.toolbox.pairinggroup import PairingGroup,GT
+    >>> from charm.toolbox.hash_module import Waters
     >>> group = PairingGroup('SS512')
     >>> waters_hash = Waters(group)
     >>> ibe = IBE_N04(group)
@@ -114,3 +114,23 @@ class IBE_N04(IBEnc):
             print("Dem:    =>", dem)
             
         return ct['c1'] *  num / dem
+
+def main():
+    group = PairingGroup('SS512')
+    waters_hash = Waters(group)
+    ibe = IBE_N04(group)
+    (master_public_key, master_key) = ibe.setup()
+
+    ID = "bob@mail.com"
+    kID = waters_hash.hash(ID)
+    secret_key = ibe.extract(master_key, kID)
+    msg = group.random(GT)
+    cipher_text = ibe.encrypt(master_public_key, kID, msg)
+    decrypted_msg = ibe.decrypt(master_public_key, secret_key, cipher_text)
+    assert msg == decrypted_msg, "invalid decryption"
+    if debug: print("Successful Decryption!")
+
+if __name__ == "__main__":
+    debug = True
+    main()
+

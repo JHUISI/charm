@@ -13,13 +13,12 @@ Susan Hohenberger and Brent Waters (Pairing-based)
 :Authors:    J Ayo Akinyele
 :Date:       1/2012
 '''
-from charm.toolbox.pairinggroup import ZR,G1,G2,pair
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.iterate import dotprod 
 
 debug = False
 class VRF10:
     """
-    >>> from charm.toolbox.pairinggroup import PairingGroup
     >>> group = PairingGroup('MNT224')
     >>> vrf = VRF10(group)
     >>> statement = [0, 1, 1, 0, 1, 0, 1, 0]

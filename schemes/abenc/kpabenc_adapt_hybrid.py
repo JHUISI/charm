@@ -1,14 +1,14 @@
 
-from charm.toolbox.ABEnc import ABEnc
-from charm.toolbox.pairinggroup import GT
+from charm.toolbox.pairinggroup import PairingGroup,GT
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from charm.core.math.pairing import hashPair as sha1
-from charm.toolbox.conversion import *
+from charm.toolbox.ABEnc import ABEnc
+#from charm.toolbox.conversion import Conversion
+#>>> from charm.toolbox.pairinggroup import PairingGroup
 
 debug = False
 class HybridABEnc(ABEnc):
     """
-    >>> from charm.toolbox.pairinggroup import PairingGroup
     >>> from schemes.abenc.abenc_lsw08 import KPabe
     >>> group = PairingGroup('SS512')
     >>> kpabe = KPabe(group)
@@ -50,3 +50,23 @@ class HybridABEnc(ABEnc):
         cipher = AuthenticatedCryptoAbstraction(sha1(key))
         return cipher.decrypt(c2)
     
+def main():
+    groupObj = PairingGroup('SS512')
+    kpabe = KPabe(groupObj)
+    hyb_abe = HybridABEnc(kpabe, groupObj)
+    access_key = '((ONE or TWO) and THREE)'
+    access_policy = ['ONE', 'TWO', 'THREE']
+    message = "hello world this is an important message."
+    (pk, mk) = hyb_abe.setup()
+    if debug: print("pk => ", pk)
+    if debug: print("mk => ", mk)
+    sk = hyb_abe.keygen(pk, mk, access_key)
+    if debug: print("sk => ", sk)
+    ct = hyb_abe.encrypt(pk, message, access_policy)
+    mdec = hyb_abe.decrypt(ct, sk)
+    assert mdec == message, "Failed Decryption!!!"
+    if debug: print("Successful Decryption!!!")
+
+if __name__ == "__main__":
+    debug = True
+    main()

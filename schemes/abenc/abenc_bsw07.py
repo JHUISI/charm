@@ -15,7 +15,7 @@ John Bethencourt, Brent Waters (Pairing-based)
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.secretutil import SecretUtil
-from charm.toolbox.ABEnc import *
+from charm.toolbox.ABEnc import ABEnc, Input, Output
 
 # type annotations
 pk_t = { 'g':G1, 'g2':G2, 'h':G1, 'f':G1, 'e_gg_alpha':GT }
@@ -26,6 +26,7 @@ ct_t = { 'C_tilde':GT, 'C':G1, 'Cy':G1, 'Cyp':G2 }
 debug = False
 class CPabe_BSW07(ABEnc):
     """
+    >>> from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
     >>> group = PairingGroup('SS512')
     >>> cpabe = CPabe_BSW07(group)
     >>> msg = group.random(GT)
@@ -34,7 +35,7 @@ class CPabe_BSW07(ABEnc):
     >>> (master_public_key, master_key) = cpabe.setup()
     >>> secret_key = cpabe.keygen(master_public_key, master_key, attributes)
     >>> cipher_text = cpabe.encrypt(master_public_key, msg, access_policy)
-    >>> decrypted_msg=cpabe.decrypt(master_public_key, secret_key, cipher_text)
+    >>> decrypted_msg = cpabe.decrypt(master_public_key, secret_key, cipher_text)
     >>> msg == decrypted_msg
     True
     """ 
@@ -45,7 +46,7 @@ class CPabe_BSW07(ABEnc):
         util = SecretUtil(groupObj, verbose=False)
         group = groupObj
 
-    @output(pk_t, mk_t)    
+    @Output(pk_t, mk_t)    
     def setup(self):
         g, gp = group.random(G1), group.random(G2)
         alpha, beta = group.random(ZR), group.random(ZR)
@@ -57,8 +58,8 @@ class CPabe_BSW07(ABEnc):
         mk = {'beta':beta, 'g2_alpha':gp ** alpha }
         return (pk, mk)
     
-    @input(pk_t, mk_t, [str])
-    @output(sk_t)
+    @Input(pk_t, mk_t, [str])
+    @Output(sk_t)
     def keygen(self, pk, mk, S):
         r = group.random() 
         g_r = (pk['g2'] ** r)    
@@ -70,8 +71,8 @@ class CPabe_BSW07(ABEnc):
             D_j_pr[j] = pk['g'] ** r_j
         return { 'D':D, 'Dj':D_j, 'Djp':D_j_pr, 'S':S }
     
-    @input(pk_t, GT, str)
-    @output(ct_t)
+    @Input(pk_t, GT, str)
+    @Output(ct_t)
     def encrypt(self, pk, M, policy_str): 
         policy = util.createPolicy(policy_str)
         a_list = util.getAttributeList(policy)
@@ -88,8 +89,8 @@ class CPabe_BSW07(ABEnc):
         return { 'C_tilde':(pk['e_gg_alpha'] ** s) * M,
                  'C':C, 'Cy':C_y, 'Cyp':C_y_pr, 'policy':policy_str, 'attributes':a_list }
     
-    @input(pk_t, sk_t, ct_t)
-    @output(GT)
+    @Input(pk_t, sk_t, ct_t)
+    @Output(GT)
     def decrypt(self, pk, sk, ct):
         policy = util.createPolicy(ct['policy'])
         pruned_list = util.prune(policy, sk['S'])

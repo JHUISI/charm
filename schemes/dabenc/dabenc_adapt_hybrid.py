@@ -75,3 +75,48 @@ class HybridABEncMA(ABEncMultiAuth):
         cipher = AuthenticatedCryptoAbstraction(sha1(key))
         return cipher.decrypt(c2)
         
+def main():
+    groupObj = PairingGroup('SS512')
+    dabe = Dabe(groupObj)
+
+    hyb_abema = HybridABEncMA(dabe, groupObj)
+
+    #Setup global parameters for all new authorities
+    gp = hyb_abema.setup()
+
+    #Instantiate a few authorities
+    #Attribute names must be globally unique.  HybridABEncMA
+    #Two authorities may not issue keys for the same attribute.
+    #Otherwise, the decryption algorithm will not know which private key to use
+    jhu_attributes = ['jhu.professor', 'jhu.staff', 'jhu.student']
+    jhmi_attributes = ['jhmi.doctor', 'jhmi.nurse', 'jhmi.staff', 'jhmi.researcher']
+    (jhuSK, jhuPK) = hyb_abema.authsetup(gp, jhu_attributes)
+    (jhmiSK, jhmiPK) = hyb_abema.authsetup(gp, jhmi_attributes)
+    allAuthPK = {}; allAuthPK.update(jhuPK); allAuthPK.update(jhmiPK)
+
+    #Setup a user with a few keys
+    bobs_gid = "20110615 bob@gmail.com cryptokey"
+    K = {}
+    hyb_abema.keygen(gp, jhuSK,'jhu.professor', bobs_gid, K)
+    hyb_abema.keygen(gp, jhmiSK,'jhmi.researcher', bobs_gid, K)
+
+
+    msg = 'Hello World, I am a sensitive record!'
+    size = len(msg)
+    policy_str = "(jhmi.doctor OR (jhmi.researcher AND jhu.professor))"
+    ct = hyb_abema.encrypt(allAuthPK, gp, msg, policy_str)
+
+    if debug:
+        print("Ciphertext")
+        print("c1 =>", ct['c1'])
+        print("c2 =>", ct['c2'])
+
+    orig_msg = hyb_abema.decrypt(gp, K, ct)
+    if debug: print("Result =>", orig_msg)
+    assert orig_msg == msg, "Failed Decryption!!!"
+    if debug: print("Successful Decryption!!!")
+
+if __name__ == "__main__":
+    debug = True
+    main()
+

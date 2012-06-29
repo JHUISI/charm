@@ -99,7 +99,7 @@ Decorator to handle checking an algorithms inputs and validating that types
 match. The only requirement other than structure def matching is that the type
 associated with the elements match target type (both python and charm types).
 """
-class input:
+class Input:
     def __init__(self, *_types):
         self._types = _types
         #print("INPUT TYPE: Defined types: ", self._types)
@@ -128,7 +128,7 @@ Decorator to handle checking an algorithms outputs and validating that types
 match. Similar to input, the only requirement other than structure def matching is that the type
 associated with the elements match target type (both python and charm types).
 """
-class output:
+class Output:
     def __init__(self, *_types):
         self._types = _types
         self._type_len = len(_types)
