@@ -14,7 +14,7 @@ We begin with a public-key encryption scheme due to Cramer-Shoup 1998 http://kno
 Typical implementations follow an object-oriented model such that an implementation of a cryptosystem can be easily reused or extended for other purposes. To this end, we provide several base classes with standard interfaces for a variety of cryptographic primitives such as ``PKEnc`` or public-key encryption, ``PKSig`` or public-key signatures, ``ABEnc`` or attribute-based encryption and many more. So, the following describes the python code that implements the Cramer-Shoup PKEnc scheme in Charm:
 ::
 
-	from toolbox.ecgroup import *
+	from charm.toolbox.ecgroup import ECGroup
 
 	class CS98(PKEnc):
 	     def __init__(self, curve):
@@ -27,7 +27,7 @@ Before we get started, it is important to understand that in our toolbox each cr
 Thus, at the beginning of the scheme, you must import the corresponding group setting in which the cryptographic scheme will be implemented
 ::
 	
-	from toolbox.ecgroup import *
+	from charm.toolbox.ecgroup import ECGroup
 
 Next, let's explain what goes on during class initialization. During ``__init__``, you define the basic security properties of the ``PKEnc`` scheme and in this case accept as input a NIST standard elliptic curve identifier. The group object can either be defined globally or defined as a class member. The idea is that any routine within this scheme will have access to the group object to perform any operation. In our example, we define group as a global variable. Alternatively, you could define group as ``self.group = ECGroup(curve)``.
 
@@ -120,10 +120,12 @@ To use any of our existing schemes in your application, each scheme includes a `
 
 ::
 
-	from schemes.pkenc_cs98_ec.py import *
-	from toolbox.eccurve import prime192v1
+	from schemes.pkenc.pkenc_cs98.py import CS98
+	from charm.toolbox.eccurve import prime192v1
+	from charm.toolbox.ecgroup import ECGroup
 	
-	pkenc = EC_CS98(prime192v1)
+	groupObj = ECGroup(prime192v1)
+	pkenc = CS98(groupObj)
 	
 	(pk, sk) = pkenc.keygen()
 
@@ -143,14 +145,14 @@ Finally, for integer groups, typically defining large primes ``p`` and ``q`` is 
 
 ::
 
-	from toolbox.integergroup import *
+	from charm.toolbox.integergroup import IntegerGroup
 	
 	group1 = IntegerGroup()	
 	group1.paramgen(1024)
 	
 	g = group1.randomGen()
 
-	from toolbox.pairinggroup import *
+	from charm.toolbox.pairinggroup import PairingGroup,G1
 	
 	group2 = PairingGroup('SS512')
 	
@@ -176,7 +178,7 @@ If you would like to define your own custom serialization routine in conjunction
 
 ::
 
-	from charm.integer import integer,serialize,deserialize
+	from charm.core.math.integer import integer,serialize,deserialize
 	
 	class mySerializeAPI:
 		def __init__(self)
