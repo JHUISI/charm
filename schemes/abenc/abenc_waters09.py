@@ -15,11 +15,12 @@ Brent Waters (Pairing-based)
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.secretutil import SecretUtil
-from charm.toolbox.ABEnc import *
+from charm.toolbox.ABEnc import ABEnc
 
 debug = False
 class CPabe09(ABEnc):
     """
+    >>> from charm.toolbox.pairinggroup import PairingGroup,GT
     >>> group = PairingGroup('SS512')
     >>> cpabe = CPabe09(group)
     >>> msg = group.random(GT)
@@ -36,7 +37,7 @@ class CPabe09(ABEnc):
     def __init__(self, groupObj):
         ABEnc.__init__(self)
         global util, group
-        util = SecretUtil(groupObj, groupObj._verbose)        
+        util = SecretUtil(groupObj, debug)        
         group = groupObj
                         
     def setup(self):
@@ -108,7 +109,7 @@ class CPabe09(ABEnc):
 
 def main():
     #Get the eliptic curve with the bilinear mapping feature needed.
-    groupObj = PairingGroup('SS512', verbose=True)
+    groupObj = PairingGroup('SS512')
 
     cpabe = CPabe09(groupObj)
     (msk, pk) = cpabe.setup()

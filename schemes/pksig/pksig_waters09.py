@@ -13,7 +13,7 @@ Brent Waters (Pairing-based)
 :Date:       2/2012
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-from charm.toolbox.IBEnc import *
+from charm.toolbox.IBEnc import IBEnc
 
 debug = False
 class IBEWaters09(IBEnc):
@@ -94,3 +94,21 @@ class IBEWaters09(IBEnc):
             return True
         return False
 
+def main():
+    # scheme designed for symmetric billinear groups
+    grp = PairingGroup('MNT224')
+
+    ibe = IBEWaters09(grp)
+
+    (mpk, msk) = ibe.keygen()
+
+    m = "plese sign this message!!!!"
+    sigma = ibe.sign(mpk, msk, m)
+    if debug: print("Signature :=", sigma)
+
+    assert ibe.verify(mpk, sigma, m), "Invalid Verification!!!!"
+    if debug: print("Successful Individual Verification!")
+
+if __name__ == "__main__":
+    debug = True
+    main()

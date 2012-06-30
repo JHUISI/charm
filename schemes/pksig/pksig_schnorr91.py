@@ -1,5 +1,5 @@
 from charm.toolbox.integergroup import IntegerGroupQ
-from charm.toolbox.PKSig import *
+from charm.toolbox.PKSig import PKSig
 
 debug = False
 class SchnorrSig(PKSig):

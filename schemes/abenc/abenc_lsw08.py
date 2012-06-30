@@ -105,7 +105,9 @@ class KPabe(ABEnc):
             #E4[attr] = pk['g_G1_b'] ** sx[i]
             #E5[attr] = (pk['g_G1_b2'] ** (sx[i] * group.hash(attr))) * (pk['h_G1_b'] ** sx[i])
         
-        return {'E1':(pk['e(gg)_alpha'] ** s) * M, 'E2':pk['g_G2'] ** s, 'E3':E3, 'attributes':attr_list }
+        E1 = (pk['e(gg)_alpha'] ** s) * M
+        E2 = pk['g_G2'] ** s
+        return {'E1':E1, 'E2':E2, 'E3':E3, 'attributes':attr_list }
     
     def decrypt(self, E, D):
         policy = util.createPolicy(D['policy'])

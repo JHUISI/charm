@@ -12,7 +12,7 @@
 :Authors:    J. Ayo Akinyele
 :Date:       1/2012
  '''
-from charm.toolbox.pairinggroup import ZR,G1,G2,pair
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
 from charm.toolbox.PKSig import PKSig
 
 debug = False
@@ -55,4 +55,26 @@ class CL04(PKSig):
             return True
         return False
     
+def main():
+    grp = PairingGroup('MNT224')
+    cl = CL04(grp)
     
+    mpk = cl.setup()
+    
+    (pk, sk) = cl.keygen(mpk)
+    if debug:
+        print("Keygen...")
+        print("pk :=", pk)
+        print("sk :=", sk)
+    
+    M = "Please sign this stupid message!"
+    sig = cl.sign(pk, sk, M)
+    if debug: print("Signature: ", sig)
+    
+    result = cl.verify(pk, M, sig)
+    assert result, "INVALID signature!"
+    if debug: print("Successful Verification!!!")
+    
+if __name__ == "__main__":
+    debug = True
+    main()

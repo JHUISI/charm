@@ -12,25 +12,22 @@ Waters - Identity-based signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from charm.toolbox.pairinggroup import ZR,G1,G2,pair
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
 from charm.toolbox.iterate import dotprod
-from charm.toolbox.conversion import Conversion
-from charm.toolbox.bitstring import Bytes
 from charm.toolbox.hash_module import Waters
-import hashlib
 
 debug = False
 class WatersSig:
     """
     >>> from charm.toolbox.pairinggroup import PairingGroup
     >>> group = PairingGroup('SS512')
-    >>> waters = WatersSig(group)
-    >>> (master_public_key, master_secret_key) = waters.setup(5)
+    >>> water = WatersSig(group)
+    >>> (master_public_key, master_secret_key) = water.setup(5)
     >>> ID = 'janedoe@email.com'
-    >>> secret_key = waters.keygen(master_public_key, master_secret_key, ID)  
+    >>> secret_key = water.keygen(master_public_key, master_secret_key, ID)  
     >>> msg = 'please sign this new message!'
-    >>> signature = waters.sign(master_public_key, secret_key, msg)
-    >>> waters.verify(master_public_key, ID, msg, signature)
+    >>> signature = water.sign(master_public_key, secret_key, msg)
+    >>> water.verify(master_public_key, ID, msg, signature)
     True
     """
     def __init__(self, groupObj):
@@ -85,7 +82,27 @@ class WatersSig:
         A, g2 = mpk['A'], mpk['g2']
         comp1 = dotprod(1, -1, mpk['z'], lam_func, mpk['ub'], k)
         comp2 = dotprod(1, -1, mpk['z'], lam_func, mpk['ub'], m)
-        if (pair(S1, g2) * pair(S2, mpk['u1b'] * comp1) * pair(S3, mpk['u2b'] * comp2)) == A: 
+        lhs = (pair(S1, g2) * pair(S2, mpk['u1b'] * comp1) * pair(S3, mpk['u2b'] * comp2)) 
+        #if ((pair(S1, g2) * pair(S2, mpk['u1b'] * comp1) * pair(S3, mpk['u2b'] * comp2)) == A): 
+        if lhs == A:
             return True
         return False
 
+def main():
+    groupObj = PairingGroup('SS512')
+    wat = WatersSig(groupObj)
+    (master_public_key, master_secret_key) = wat.setup(5)
+    ID = 'janedoe@email.com'
+    secret_key = wat.keygen(master_public_key, master_secret_key, ID)  
+    msg = 'please sign this new message!'
+
+    sig = wat.sign(master_public_key, secret_key, msg)
+
+    assert wat.verify(master_public_key, ID, msg, sig), "invalid signature"
+    if debug: print("Successful Verification!")
+
+if __name__ == "__main__":
+    debug = True
+    main()
+
+   
