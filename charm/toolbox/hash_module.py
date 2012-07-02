@@ -19,14 +19,14 @@ class Hash():
             #print "digest => %s" % h.hexdigest()
             # get raw bytes of digest and hash to Zr
             val = h.digest()
-            return integer(int(self.group.hash(val, ZR)))
+            return integer(int(unicode(self.group.hash(val, ZR))))
             # do something related to that
         if type(value) == integer:
             str_value = int2Bytes(value)
 #            print("str_value =>", str_value)
 #            val = self.group.hash(str_value, ZR)
 #            print("hash =>", val)
-            return integer(int(self.group.hash(str_value, ZR)))
+            return integer(int(unicode(self.group.hash(str_value, ZR))))
         return None
     
     # takes two arbitrary strings and hashes to an element of Zr
@@ -35,14 +35,14 @@ class Hash():
             #print("Hashing =>", args)
             strs = ""
             for i in args:
-                if type(i) == str:
-                    strs += str(base64.encodebytes(bytes(i, 'utf8')))
+                if type(i) == unicode:
+                    strs += unicode(base64.encodestring(i))
                 elif type(i) == bytes:
-                    strs += str(base64.encodebytes(i))
+                    strs += unicode(base64.encodestring(i))
                 elif type(i) == integer:
-                    strs += str(base64.encodebytes(int2Bytes(i)))
+                    strs += unicode(base64.encodestring(int2Bytes(i)))
                 elif type(i) == pairing:
-                    strs += str(base64.encodebytes(self.group.serialize(i)))
+                    strs += unicode(base64.encodestring(self.group.serialize(i)))
 
             if len(strs) > 0:
                 return self.group.hash(strs, ZR)
@@ -71,7 +71,7 @@ class Waters:
 
     def sha1(self, message):
         h = self._hashObj.copy()
-        h.update(bytes(message, 'utf-8'))
+        h.update(message)
         return Bytes(h.digest())    
     
     def hash(self, strID):

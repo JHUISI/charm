@@ -102,7 +102,5 @@ class CPabe_BSW07(ABEnc):
         for i in pruned_list:
             j = i.getAttributeAndIndex(); k = i.getAttribute()
             A *= ( pair(ct['Cy'][j], sk['Dj'][k]) / pair(sk['Djp'][k], ct['Cyp'][j]) ) ** z[j]
-        
-        return ct['C_tilde'] / (pair(ct['C'], sk['D']) / A)
 
-   
+        return ct['C_tilde'] / (pair(ct['C'], sk['D']) / A)   

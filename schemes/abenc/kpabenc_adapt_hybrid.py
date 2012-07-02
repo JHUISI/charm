@@ -15,12 +15,12 @@ class HybridABEnc(ABEnc):
     >>> hyb_abe = HybridABEnc(kpabe, group)
     >>> access_policy =  ['ONE', 'TWO', 'THREE']
     >>> access_key = '((FOUR or THREE) and (TWO or ONE))'
-    >>> msg = b"hello world this is an important message."
+    >>> msg = "hello world this is an important message."
     >>> (master_public_key, master_key) = hyb_abe.setup()
     >>> secret_key = hyb_abe.keygen(master_public_key, master_key, access_key)
     >>> cipher_text = hyb_abe.encrypt(master_public_key, msg, access_policy)
     >>> hyb_abe.decrypt(cipher_text, secret_key)
-    b'hello world this is an important message.'
+    'hello world this is an important message.'
     """
     
     def __init__(self, scheme, groupObj):

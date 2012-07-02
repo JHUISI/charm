@@ -107,7 +107,8 @@ class IBE_BonehFranklin(IBEnc):
     def decodeFromZn(self, element):
         if type(element) == integer:
             msg = int2Bytes(element)
-            return bytes.decode(msg, 'utf8') # convert back to string
+            return msg
+            #return bytes.decode(msg, 'utf8') # convert back to string
         return None
      
 

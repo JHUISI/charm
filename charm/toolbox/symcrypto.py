@@ -71,9 +71,9 @@ class SymmetricCryptoAbstraction(object):
     >>> groupObj = PairingGroup('SS512')
     >>> from charm.core.math.pairing import hashPair as extractor
     >>> a = SymmetricCryptoAbstraction(extractor(groupObj.random(GT)))
-    >>> ct = a.encrypt(b"Friendly Fire Isn't")
+    >>> ct = a.encrypt("Friendly Fire Isn't")
     >>> a.decrypt(ct)
-    b"Friendly Fire Isn't"
+    "Friendly Fire Isn't"
     """
 
     def __init__(self,key, alg = AES, mode = MODE_CBC):
