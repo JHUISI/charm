@@ -18,9 +18,6 @@ string decout(PairingGroup & group, CharmDict & partCT, ZR & zz, GT & egg)
 	R = group.div(T0, group.exp(T2, zz));
 	s_sesskey = DeriveKey(R);
 	M = SymDec(s_sesskey, T1);
-
-	cout << "M is " << M << endl;
-
 	hashRandM.append(R);
 	hashRandM.append(M);
 	s = group.hashListToZR(hashRandM);

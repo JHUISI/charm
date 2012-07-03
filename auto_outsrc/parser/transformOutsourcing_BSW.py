@@ -1,18 +1,17 @@
 from userFuncs_BSW import *
 
-def transform(gpk, skBlinded, ct):
-	input = [gpk, skBlinded, ct]
-	g, g_2 = gpk
-	policy_str, C0, C1, C2, C3, T1 = ct
-	gid, userS, K = skBlinded
+def transform(pk, skBlinded, ct):
+	input = [pk, skBlinded, ct]
+	policy_str, Ctl, C, Cr, Cpr, T1 = ct
+	S, D, Dj, Djp = skBlinded
 	policy = createPolicy(policy_str)
-	attrs = prune(policy, userS)
+	attrs = prune(policy, S)
 	coeff = getCoefficients(policy)
-	h_gid = group.hash(gid, G1)
 	Y = len(attrs)
-	A = dotprod2(range(0, Y), lam_func1, attrs, C1, coeff, h_gid, C3, K, C2)
-	T0 = C0
-	T2 = A
+	A = dotprod2(range(0, Y), lam_func1, attrs, Cr, coeff, Dj, Djp, Cpr)
+	result0 = (pair(C, D) * A)
+	T0 = Ctl
+	T2 = result0
 	partCT = {"T0":T0, "T1":T1, "T2":T2}
 	output = partCT
 	return output
@@ -21,8 +20,8 @@ if __name__ == "__main__":
 	global group
 	group = PairingGroup(MNT160)
 
-	gpk_File = open('gpk_BSW.charmPickle', 'rb').read()
-	gpk = bytesToObject(gpk_File, group)
+	pk_File = open('pk_BSW.charmPickle', 'rb').read()
+	pk = bytesToObject(pk_File, group)
 
 	skBlinded_File = open('skBlinded_BSW.charmPickle', 'rb').read()
 	skBlinded = bytesToObject(skBlinded_File, group)
@@ -30,6 +29,6 @@ if __name__ == "__main__":
 	ct_File = open('ct_BSW.charmPickle', 'rb').read()
 	ct = bytesToObject(ct_File, group)
 
-	(partCT) = transform(gpk, skBlinded, ct)
+	(partCT) = transform(pk, skBlinded, ct)
 
 	writeToFile('partCT_BSW_.txt', objectOut(group, partCT))
