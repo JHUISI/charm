@@ -12,16 +12,17 @@
 :Authors:    J. Ayo Akinyele
 :Date:       1/2011
  '''
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-from charm.core.engine.util import *
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
+from charm.core.engine.util import objectToBytes
 
 debug = False
 class IBSig():
     """
+    >>> from charm.toolbox.pairinggroup import PairingGroup
     >>> group = PairingGroup('MNT224')
     >>> messages = { 'a':"hello world!!!" , 'b':"test message" }
     >>> ib = IBSig(group)
-    >>> (public_key, secret_key) = ib.keygen(0)
+    >>> (public_key, secret_key) = ib.keygen()
     >>> signature = ib.sign(secret_key['x'], messages)
     >>> ib.verify(public_key, signature, messages) 
     True
@@ -31,8 +32,7 @@ class IBSig():
         group = groupObj
         
     def dump(self, obj):
-        ser_a = serializeDict(obj, group)
-        return str(pickleObject(ser_a))
+        return objectToBytes(obj, group)
             
     def keygen(self, secparam=None):
         g, x = group.random(G2), group.random()
@@ -53,3 +53,21 @@ class IBSig():
             return True  
         return False 
 
+def main():
+    groupObj = PairingGroup('MNT224')
+    
+    m = { 'a':"hello world!!!" , 'b':"test message" }
+    bls = IBSig(groupObj)
+    
+    (pk, sk) = bls.keygen()
+    
+    sig = bls.sign(sk['x'], m)
+    
+    if debug: print("Message: '%s'" % m)
+    if debug: print("Signature: '%s'" % sig)     
+    assert bls.verify(pk, sig, m), "Failure!!!"
+    if debug: print('SUCCESS!!!')
+    
+if __name__ == "__main__":
+    debug = True
+    main()

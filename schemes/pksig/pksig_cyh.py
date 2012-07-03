@@ -12,7 +12,7 @@ Chow-Yiu-Hui - Identity-based ring signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from charm.toolbox.pairinggroup import G1,G2,ZR,pair
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
 from charm.toolbox.PKSig import PKSig
 from charm.toolbox.iterate import dotprod
 
@@ -97,3 +97,29 @@ class CYH(PKSig):
             return True
         return False
 
+
+def main():
+   L = [ "alice", "bob", "carlos", "dexter", "eddie"] 
+   ID = "bob"
+   groupObj = PairingGroup('SS512')
+   cyh = CYH(groupObj)
+   (mpk, msk) = cyh.setup()
+
+   (ID, Pk, Sk) = cyh.keygen(msk, ID)  
+   sk = (ID, Pk, Sk)
+   if debug:
+    print("Keygen...")
+    print("sk =>", sk)
+  
+   M = 'please sign this new message!'
+   sig = cyh.sign(sk, L, M)
+   if debug:
+    print("Signature...")
+    print("sig =>", sig)
+
+   assert cyh.verify(mpk, L, M, sig), "invalid signature!"
+   if debug: print("Verification successful!")
+
+if __name__ == "__main__":
+    debug = True
+    main()

@@ -21,6 +21,7 @@ debug = False
 # need RingSig
 class Boyen(PKSig):
     """
+    >>> from charm.toolbox.pairinggroup import PairingGroup
     >>> group = PairingGroup('MNT224')
     >>> boyen = Boyen(group)
     >>> master_public_key = boyen.setup()
@@ -119,3 +120,33 @@ class Boyen(PKSig):
            return True
         return False
 
+def main():
+   groupObj = PairingGroup('MNT224')
+   boyen = Boyen(groupObj)
+   mpk = boyen.setup()
+   if debug: print("Pub parameters")
+   if debug: print(mpk, "\n\n")
+   
+   num_signers = 3
+   L_keys = [ boyen.keygen(mpk) for i in range(num_signers)]     
+   L_pk = {}; L_sk = {}
+   for i in range(len(L_keys)):
+       L_pk[ i+1 ] = L_keys[ i ][ 0 ] # pk
+       L_sk[ i+1 ] = L_keys[ i ][ 1 ]
+
+   if debug: print("Keygen...")
+   if debug: print("sec keys =>", L_sk.keys(),"\n", L_sk) 
+
+   signer = 3
+   sk = L_sk[signer] 
+   M = 'please sign this new message!'
+   sig = boyen.sign(mpk, L_pk, sk, M)
+   if debug: print("\nSignature...")
+   if debug: print("sig =>", sig)
+
+   assert boyen.verify(mpk, L_pk, M, sig), "invalid signature!"
+   if debug: print("Verification successful!")
+
+if __name__ == "__main__":
+    debug = True
+    main()

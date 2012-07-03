@@ -21,12 +21,13 @@ Notes:	This transform was first described by Boneh and Franklin but credited to 
 :Date:		05/2011
 '''
 
-from charm.toolbox.PKSig import *
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.PKSig import PKSig
 
 debug = False
 class Sig_Generic_ibetosig_Naor01(PKSig):
     """
+    >>> from charm.toolbox.pairinggroup import PairingGroup,ZR
     >>> from schemes.ibenc.ibenc_bb03 import IBE_BB04
     >>> group = PairingGroup('MNT224')
     >>> ibe = IBE_BB04(group)

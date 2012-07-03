@@ -10,17 +10,16 @@
 :Date:			06/2011
 ''' 
 
-from charm.core.crypto.cryptobase import *
-from charm.toolbox.PKSig import *
-from charm.toolbox.bitstring import Bytes
-from charm.toolbox.conversion import Conversion
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.PKSig import PKSig
+from charm.toolbox.enum import Enum
 from charm.toolbox.hash_module import Waters
-import hashlib, math
+import math
 
 debug = False
 class IBE_N04_Sig(PKSig):
     """
+    >>> from charm.toolbox.pairinggroup import PairingGroup
     >>> group = PairingGroup('SS512')
     >>> waters = Waters(group)
     >>> ibe = IBE_N04_Sig(group)
@@ -90,4 +89,26 @@ class IBE_N04_Sig(PKSig):
         dem = pair(sig['d2'], c3)
         return pk['egg'] == num / dem
 
+
+def main():
+    groupObj = PairingGroup('SS512')
+    ibe = IBE_N04_Sig(groupObj)
+    waters = Waters(group)
+    (pk, sk) = ibe.keygen()
+
+    # represents public identity
+    M = "bob@mail.com"
+    msg = waters.hash("This is a test.")    
+    sig = ibe.sign(pk, sk, msg)
+    if debug:
+        print("original msg => '%s'" % M)
+        print("msg => '%s'" % msg)
+        print("sig => '%s'" % sig)
+
+    assert ibe.verify(pk, msg, sig), "Failed verification!"
+    if debug: print("Successful Verification!!! msg => '%s'" % msg)
+
+if __name__ == '__main__':
+    debug = True
+    main()
     

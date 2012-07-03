@@ -12,7 +12,6 @@
 :Authors: J Ayo Akinyele
 :Date:    4/2011
 '''
-
 from charm.toolbox.Hash import ChamHash,Hash
 from charm.toolbox.integergroup import IntegerGroupQ
 
@@ -26,6 +25,8 @@ class ChamHash_Adm05(ChamHash):
     >>> (public_key, secret_key) = chamHash.paramgen()
     >>> msg = "hello world this is the message"
     >>> c = chamHash.hash(public_key, msg)
+    >>> c == chamHash.hash(public_key, msg, c[1], c[2])
+    True
     """
 
     def __init__(self, p=0, q=0):

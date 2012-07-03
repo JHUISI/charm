@@ -13,16 +13,12 @@ Sahai-Waters Fuzzy Identity-Based Encryption, Original Construction
 :Date:       10/2011
 '''
 
-from __future__ import print_function
-from charm.toolbox.pairinggroup import ZR,G1,pair
-from charm.core.crypto.cryptobase import *
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.IBEnc import IBEnc
-#from charm.core.math.pairing import hashPair as sha1
-from charm.toolbox.secretshare import *
-#import sys
+from charm.toolbox.secretshare import SecretShare
 
 debug = False
-class IBE_SW05(IBEnc):    
+class IBE_SW05(IBEnc): 
     """
     >>> from charm.toolbox.pairinggroup import PairingGroup,GT
     >>> group = PairingGroup('SS512')

@@ -1386,76 +1386,40 @@ cleanup:
 
 static PyObject *Element_equals(PyObject *lhs, PyObject *rhs, int opid) {
 	Element *self = NULL, *other = NULL;
-	signed long int z;
-	int found_int = FALSE, result = -1; // , value;
+	int result = -1; // , value;
 
 	EXIT_IF(opid != Py_EQ && opid != Py_NE, "comparison supported: '==' or '!='");
-	// check type of lhs
-	if(PyElement_Check(lhs)) {
+	// check type of lhs & rhs
+	if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
 		self = (Element *) lhs;
-	}
-	else if(PyNumber_Check(lhs)) {
-		if(PyArg_Parse(lhs, "l", &z)) {
-			debug("Integer lhs: '%li'\n", z);
-		}
-		found_int = (z == 0 || z == 1) ? TRUE : FALSE;
-	}
-	else {
-		PyErr_SetString(ElementError, "types supported: element or int (0 or 1)");
-		goto cleanup;
-	}
-
-	// check type of rhs
-	if(PyElement_Check(rhs)) {
 		other = (Element *) rhs;
-	}
-	else if(PyNumber_Check(rhs)) {
-		if(PyArg_Parse(lhs, "l", &z)) {
-			debug("Integer rhs: '%li'\n", z);
-		}
-		found_int = (z == 0 || z == 1) ? TRUE : FALSE;
-	}
-	else {
-		PyErr_SetString(ElementError, "types supported: element or int (0 or 1)");
-		goto cleanup;
 	}
 
 	debug("Starting '%s'\n", __func__);
 	START_CLOCK(dBench);
-	if(PyElement_Check(lhs) && found_int) {
-		// lhs is the element type
-		if(z == 0) result = element_is0(self->e);
-		else result = element_is1(self->e);
-	}
-	else if(PyElement_Check(rhs) && found_int) {
-		if(z == 0) result = element_is0(other->e);
-		else result = element_is1(self->e);
-	}
-	else if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
+	if(self != NULL && other != NULL) {
 		// lhs and rhs are both elements
 		IS_SAME_GROUP(self, other);
 		if(self->elem_initialized && other->elem_initialized) {
 			result = element_cmp(self->e, other->e);
 		}
 		else {
-			debug("One of the elements is not initialized.\n");
+			debug("one of the elements is not initialized.\n");
 		}
 	}
 	STOP_CLOCK(dBench);
 
-cleanup:
-
 	if(opid == Py_EQ) {
 		if(result == 0) {
-			Py_INCREF(Py_True); return Py_True;
+			Py_RETURN_TRUE;
 		}
-		Py_INCREF(Py_False); return Py_False;
+		Py_RETURN_FALSE;
 	}
 	else { /* Py_NE */
 		if(result != 0) {
-			Py_INCREF(Py_True); return Py_True;
+			Py_RETURN_TRUE;
 		}
-		Py_INCREF(Py_False); return Py_False;
+		Py_RETURN_FALSE;
 	}
 }
 

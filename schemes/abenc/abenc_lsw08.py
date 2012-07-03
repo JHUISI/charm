@@ -15,25 +15,23 @@ Allison Lewko, Amit Sahai and Brent Waters (Pairing-based)
 from __future__ import print_function
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.secretutil import SecretUtil
-from charm.toolbox.policytree import *
-from charm.toolbox.ABEnc import *
+from charm.toolbox.ABEnc import ABEnc
 
 debug = False
 class KPabe(ABEnc):
     """
+    >>> from charm.toolbox.pairinggroup import PairingGroup,GT
     >>> group = PairingGroup('MNT224')
     >>> kpabe = KPabe(group)
     >>> (master_public_key, master_key) = kpabe.setup()
     >>> policy = '(ONE or THREE) and (THREE or TWO)'
     >>> attributes = [ 'ONE', 'TWO', 'THREE', 'FOUR' ]
     >>> secret_key = kpabe.keygen(master_public_key, master_key, policy)
-    
     >>> msg=group.random(GT)
     >>> cipher_text = kpabe.encrypt(master_public_key, msg, attributes)
-    
     >>> decrypted_msg = kpabe.decrypt(cipher_text, secret_key)
-	>>> decrypted_msg == msg
-	True
+    >>> decrypted_msg == msg
+    True
     """
 
     def __init__(self, groupObj, verbose=False):
@@ -41,7 +39,6 @@ class KPabe(ABEnc):
         global group, util
         group = groupObj
         util = SecretUtil(group, verbose)        
-        self.parser = PolicyParser()
 
     def setup(self):
         # pick random exponents
@@ -85,10 +82,6 @@ class KPabe(ABEnc):
         return D
     
     def negatedAttr(self, attribute):
-        #if attribute[0] == '!':
-        #    if debug: print("Checking... => %s" % attribute[0])
-        #    return True
-        #return False  
         if type(attribute) not in [str, unicode]: attr = attribute.getAttribute()
         else: attr = attribute
         if attr[0] == '!':
@@ -115,7 +108,9 @@ class KPabe(ABEnc):
 
         attr_list = [unicode(a) for a in attr_list]
             
-        return {'E1':(pk['e(gg)_alpha'] ** s) * M, 'E2':pk['g_G2'] ** s, 'E3':E3, 'attributes':attr_list }
+        E1 = (pk['e(gg)_alpha'] ** s) * M
+        E2 = pk['g_G2'] ** s
+        return {'E1':E1, 'E2':E2, 'E3':E3, 'attributes':attr_list }
     
     def decrypt(self, E, D):
         policy = util.createPolicy(D['policy'])
@@ -134,5 +129,27 @@ class KPabe(ABEnc):
        
         return E['E1'] / prodT 
 
-    
-    
+def main():
+    groupObj = PairingGroup('MNT224')
+    kpabe = KPabe(groupObj)
+
+    (pk, mk) = kpabe.setup()
+
+    policy = '(ONE or THREE) and (THREE or TWO)'
+    attributes = [ 'ONE', 'TWO', 'THREE', 'FOUR' ]
+    msg = groupObj.random(GT)
+
+    mykey = kpabe.keygen(pk, mk, policy)
+
+    if debug: print("Encrypt under these attributes: ", attributes)
+    ciphertext = kpabe.encrypt(pk, msg, attributes)
+    if debug: print(ciphertext)
+
+    rec_msg = kpabe.decrypt(ciphertext, mykey)
+
+    assert msg == rec_msg
+    if debug: print("Successful Decryption!")
+
+if __name__ == "__main__":
+    debug = True
+    main()

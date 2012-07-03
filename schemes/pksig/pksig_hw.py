@@ -12,7 +12,7 @@ Hohenberger-Waters - Realizing hash-and-sign signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from charm.toolbox.pairinggroup import G1,G2,ZR,pair
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
 from charm.toolbox.PKSig import PKSig
 from math import ceil, log 
 
@@ -80,3 +80,24 @@ class HW(PKSig):
         else:
             return False
         
+def main():
+    groupObj = PairingGroup('SS512')
+    hw = HW(groupObj)
+    
+    (pk, sk) = hw.setup()
+    if debug:
+        print("Public parameters")
+        print("pk =>", pk)
+
+    m = "please sign this message now please!"    
+    sig = hw.sign(pk, sk, pk['s'], m)
+    if debug:
+        print("Signature...")
+        print("sig =>", sig)
+
+    assert hw.verify(pk, m, sig), "invalid signature"
+    if debug: print("Verification Successful!!")
+
+if __name__ == "__main__":
+    debug = True
+    main()

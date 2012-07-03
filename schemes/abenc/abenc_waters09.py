@@ -16,14 +16,15 @@ Brent Waters (Pairing-based)
 from __future__ import print_function
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.secretutil import SecretUtil
-from charm.toolbox.ABEnc import *
+from charm.toolbox.ABEnc import ABEnc
 
 debug = False
 class CPabe09(ABEnc):
     """
+    >>> from charm.toolbox.pairinggroup import PairingGroup,GT
     >>> group = PairingGroup('SS512')
     >>> cpabe = CPabe09(group)
-	>>> msg = group.random(GT)
+    >>> msg = group.random(GT)
     >>> (master_secret_key, master_public_key) = cpabe.setup()
     >>> policy = '((ONE or THREE) and (TWO or FOUR))'
     >>> attr_list = ['THREE', 'ONE', 'TWO']
@@ -37,7 +38,7 @@ class CPabe09(ABEnc):
     def __init__(self, groupObj):
         ABEnc.__init__(self)
         global util, group
-        util = SecretUtil(groupObj, groupObj._verbose)        
+        util = SecretUtil(groupObj, debug)        
         group = groupObj
                         
     def setup(self):
@@ -109,3 +110,32 @@ class CPabe09(ABEnc):
             denominator *= ( pair(C[j] ** w_i[j], sk['L']) * pair(k_x[j] ** w_i[j], D[j]) )   
         return ct['C_tilde'] / (numerator / denominator)
 
+def main():
+    #Get the eliptic curve with the bilinear mapping feature needed.
+    groupObj = PairingGroup('SS512')
+
+    cpabe = CPabe09(groupObj)
+    (msk, pk) = cpabe.setup()
+    pol = '((ONE or THREE) and (TWO or FOUR))'
+    attr_list = ['THREE', 'ONE', 'TWO']
+
+    if debug: print('Acces Policy: %s' % pol)
+    if debug: print('User credential list: %s' % attr_list)
+    m = groupObj.random(GT)
+
+    cpkey = cpabe.keygen(pk, msk, attr_list)
+    if debug: print("\nSecret key: %s" % attr_list)
+    if debug:groupObj.debug(cpkey)
+    cipher = cpabe.encrypt(pk, m, pol)
+
+    if debug: print("\nCiphertext...")
+    if debug:groupObj.debug(cipher)
+    orig_m = cpabe.decrypt(pk, cpkey, cipher)
+
+    assert m == orig_m, 'FAILED Decryption!!!'
+    if debug: print('Successful Decryption!')
+    del groupObj
+
+if __name__ == '__main__':
+    debug = True
+    main()
