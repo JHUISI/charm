@@ -96,4 +96,3 @@ class VRF10:
         else:
             return False
         
-

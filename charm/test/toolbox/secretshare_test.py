@@ -1,9 +1,8 @@
-from __future__ import print_function
 from charm.toolbox.secretshare import SecretShare
 from charm.toolbox.pairinggroup import PairingGroup,ZR
 import unittest
 
-debug=True
+debug=False
 
 class SecretShareTest(unittest.TestCase):
     def testSecretShare(self):
@@ -16,14 +15,11 @@ class SecretShareTest(unittest.TestCase):
           sec = group.random(ZR)
           shares = s.genShares(sec, k, n)
 
-          print(sec, shares[0], shares[1], shares[2], shares[3], shares[4])
-
           K = shares[0]
           if debug: print('\nOriginal secret: %s' % K)
-          y = {group.init(ZR, 1):shares[1], group.init(ZR, 2):shares[2], group.init(ZR, 3):shares[3]}
+          y = {group.init(ZR, long(1)):shares[1], group.init(ZR, long(2)):shares[2], group.init(ZR, long(3)):shares[3]}
 
           secret = s.recoverSecret(y)
-          print(secret)
 
           assert K == secret, "Could not recover the secret!"
           if debug: print("Successfully recovered secret: ", secret)

@@ -1,5 +1,4 @@
 # Implementing the proof of concept secret sharing 
-from __future__ import print_function
 from charm.toolbox.pairinggroup import PairingGroup,ZR,order
 
 class SecretShare:
@@ -11,15 +10,12 @@ class SecretShare:
         share = self.elem.init(ZR, 0)
 #        share = 0
 #        x = self.elem.init(ZR, x)
-        print(x, type(x))
-        if(type(x) == int):
-            x = self.elem.init(ZR, long(x))
-        print(x, type(x))
+#        if(type(x) == int):
+#            x = self.elem.init(ZR, long(x))
         # evaluate polynomial
         for i in range(0, len(coeff)):
             i2 = self.elem.init(ZR, long(i))
-            share += (coeff[i] * (x ** i2))
-            print(share, coeff[i], x, i2)
+            share += (coeff[i] * (x ** long(i)))
         return share
 
     def genShares(self, secret, k, n, q=None, x_points=None):
