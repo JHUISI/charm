@@ -40,6 +40,8 @@ ARBITRARY_FUNC = 'func:'
 MESSAGE, SIGNATURE, PUBLIC, LATEX, SETTING = 'message','signature', 'public', 'latex', 'setting'
 # qualifier (means only one instance of that particular keyword exists)
 SAME, DIFF = 'one', 'many'
+publicVarNames = []
+secretVarNames = []
 
 builtInTypes = {}
 builtInTypes["DeriveKey"] = types.str
@@ -860,6 +862,40 @@ def updateVarNamesDicts(node, varNameList, dictToUpdate):
             dictToUpdate[varName] = []
             dictToUpdate[varName].append(currentFuncName)
 
+def getInputOutputVarsDictOfFunc(funcName):
+    if ( (funcName == None) or (type(funcName) is not str) or (len(funcName) == 0) ):
+        sys.exit("getInputOutputVarsDictOfFunc in SDLParser.py:  problem with function name parameter passed in.")
+
+    if (funcName not in assignInfo):
+        sys.exit("getInputOutputVarsDictOfFunc in SDLParser.py:  function name parameter passed in is not in assignInfo.")
+
+    if (inputKeyword not in assignInfo[funcName]):
+        sys.exit("getInputOutputVarsDictOfFunc in SDLParser.py:  input keyword was not found in assignInfo[funcName].")
+
+    if (outputKeyword not in assignInfo[funcName]):
+        sys.exit("getInputOutputVarsDictOfFunc in SDLParser.py:  output keyword was not found in assignInfo[funcName].")
+
+    inputVarInfoObj = assignInfo[funcName][inputKeyword]
+    outputVarInfoObj = assignInfo[funcName][outputKeyword]
+
+    retDict = {inputKeyword:[], outputKeyword:[]}
+
+    if ( (inputVarInfoObj.getIsList() == True) and (len(inputVarInfoObj.getListNodesList()) > 0) ):
+        for inputVarName in inputVarInfoObj.getListNodesList():
+            if (inputVarName in retDict[inputKeyword]):
+                sys.exit("getInputOutputVarsDictOfFunc in SDLParser.py:  duplicate variable names found in input variable names.")
+
+            retDict[inputKeyword].append(inputVarName)
+
+    if ( (outputVarInfoObj.getIsList() == True) and (len(outputVarInfoObj.getListNodesList()) > 0) ):
+        for outputVarName in outputVarInfoObj.getListNodesList():
+            if (outputVarName in retDict[outputKeyword]):
+                sys.exit("getInputOutputVarsDictOfFunc in SDLParser.py:  duplicate variable names found in output variable list.")
+
+            retDict[outputKeyword].append(outputVarName)
+
+    return retDict
+
 def updateInputOutputVars(varsDepList):
     global inputOutputVars
 
@@ -1260,8 +1296,41 @@ def getAstNodes():
 def getInputOutputVars():
     return inputOutputVars
 
+def getPublicVarNames():
+    return publicVarNames
+
+def getSecretVarNames():
+    return secretVarNames
+
 def getFunctionNameOrder():
     return functionNameOrder
+
+def updatePublicVarNames():
+    global publicVarNames
+
+    for currentPubVarName in masterPubVars:
+        if (currentPubVarName not in publicVarNames):
+            publicVarNames.append(currentPubVarName)
+
+        (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(currentPubVarName)
+        if ( (retFuncName == None) or (retVarInfoObj == None) ):
+            sys.exit("updatePublicVarNames in SDLParser.py:  at least one None value returned from getVarNameEntryFromAssignInfo called on one of the master public variable names.")
+
+        if ( (retVarInfoObj.getIsList() == False) or (len(retVarInfoObj.getListNodesList()) == 0) ):
+            continue
+
+        for currentListNode in retVarInfoObj.getListNodesList():
+            if (currentListNode not in publicVarNames):
+                publicVarNames.append(currentListNode)
+
+    retDict = getInputOutputVarsDictOfFunc(encryptFuncName)
+    print(retDict)
+    retDict = getInputOutputVarsDictOfFunc(transformFunctionName)
+    print(retDict)
+    sys.exit("test")
+
+def updateSecretVarNames():
+    return
 
 def parseLinesOfCode(code, verbosity):
     global varTypes, assignInfo, forLoops, currentFuncName, varDepList, varInfList, varsThatProtectM
@@ -1269,6 +1338,7 @@ def parseLinesOfCode(code, verbosity):
     global getVarDepInfListsCalled, getVarsThatProtectMCalled, astNodes, varNamesToFuncs_All
     global varNamesToFuncs_Assign, ifElseBranches, startLineNo_IfBranch, startLineNo_ElseBranch
     global inputOutputVars, varDepListNoExponents, varInfListNoExponents, functionNameOrder
+    global publicVarNames, secretVarNames
 
     astNodes = []
     varTypes = {}
@@ -1293,6 +1363,8 @@ def parseLinesOfCode(code, verbosity):
     inputOutputVars = []
     getVarDepInfListsCalled = False
     getVarsThatProtectMCalled = False
+    publicVarNames = []
+    secretVarNames = []
 
     parser = SDLParser()
     lineNumberInCode = 0 
@@ -1336,6 +1408,12 @@ def parseLinesOfCode(code, verbosity):
 
     getVarsThatProtectM()
     getVarsThatProtectMCalled = True
+
+    updatePublicVarNames()
+    print(publicVarNames)
+    sys.exit("test")
+
+    updateSecretVarNames()
 
 def getFuncStmts(funcName):
     if getVarDepInfListsCalled == False: 

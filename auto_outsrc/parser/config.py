@@ -16,6 +16,9 @@ encryptFuncName = "encrypt"
 keygenPubVar = ["pk"]
 keygenSecVar = "sk"
 
+masterPubVars = ["pk"]
+masterSecVars = ["mk"]
+
 pySuffix = ".py"
 cppSuffix = ".cpp"
 #cppSuffix = ".py"
