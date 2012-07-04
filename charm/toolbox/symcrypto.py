@@ -60,13 +60,12 @@ class SymmetricCryptoAbstraction(object):
     Ideally provide an INDCCA2 secure symmetric container for arbitrary data.
     Currently only supports primitives that JSON can encode and decode.
   
-     A large number of the schemes can only encrypt group elements 
+    A large number of the schemes can only encrypt group elements 
     and do not provide an efficient mechanism for encoding byte in
     those elements. As such we don't pick a symmetric key and encrypt 
     it asymmetrically. Rather, we hash a random group element to get the
     symmetric key.
 
-    usage:
     >>> from charm.toolbox.pairinggroup import PairingGroup,GT
     >>> groupObj = PairingGroup('SS512')
     >>> from charm.core.math.pairing import hashPair as extractor

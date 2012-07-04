@@ -13,15 +13,17 @@ Contents:
    :maxdepth: 1
 
    install_source 
-   tutorial
-   schemes
-   toolbox
+   cryptographers
+   developers
+   mobile
 
 Developer Resources
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
+   schemes
+   toolbox
    todo
 
 Indices and tables

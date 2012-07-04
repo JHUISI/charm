@@ -6,18 +6,18 @@ Digital Signature Algorithm (DSA)
 | Available from: 
 | Notes: 
 
-* type:           signature (ring-based)
-* setting:        integer and elliptic curve groups
+* type:           signature
+* setting:        integer groups
 
 :Authors:    J. Ayo Akinyele
 :Date:       5/2011
 """
 
 from charm.toolbox.integergroup import IntegerGroupQ
-from charm.toolbox.PKSig import *
+from charm.toolbox.PKSig import PKSig
 
 debug = False
-class DSA():
+class DSA(PKSig):
     """
     >>> from charm.core.math.integer import integer
     >>> p = integer(156053402631691285300957066846581395905893621007563090607988086498527791650834395958624527746916581251903190331297268907675919283232442999706619659475326192111220545726433895802392432934926242553363253333261282122117343404703514696108330984423475697798156574052962658373571332699002716083130212467463571362679)
