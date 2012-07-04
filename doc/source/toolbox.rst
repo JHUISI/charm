@@ -30,6 +30,7 @@ Toolbox Classes
    toolbox/secretshare
    toolbox/secretutil
    toolbox/securerandom
+   toolbox/serialize
    toolbox/sigmaprotocol
    toolbox/specialprimes
    toolbox/symcrypto

@@ -1,9 +1,9 @@
 '''
 Lewko-Waters Decentralized Attribute-Based Encryption 
  
-Lewko, Allison, and Brent Waters, "Decentralizing Attribute-Based Encryption.", Appendix D
-Published in: Eurocrypt 2011
-Available from: http://eprint.iacr.org/2010/351.pdf
+| Lewko, Allison, and Brent Waters, "Decentralizing Attribute-Based Encryption.", Appendix D
+| Published in: Eurocrypt 2011
+| Available from: http://eprint.iacr.org/2010/351.pdf
 
 * type:           encryption (identity-based)
 * setting:        bilinear groups (asymmetric)
@@ -24,12 +24,10 @@ class Dabe(ABEncMultiAuth):
     >>> group = PairingGroup('SS512')
     >>> dabe = Dabe(group)
     >>> public_parameters = dabe.setup()
-
-    #Setup an authority
-    >>> auth_attrs= ['ONE', 'TWO', 'THREE', 'FOUR']
+    >>> auth_attrs= ['ONE', 'TWO', 'THREE', 'FOUR'] #setup an authority
     >>> (master_secret_key, master_public_key) = dabe.authsetup(public_parameters, auth_attrs)
 
-    #Setup a user and give him some keys
+        Setup a user and give him some keys
     >>> ID, secret_keys = "bob", {}
     >>> usr_attrs = ['THREE', 'ONE', 'TWO']
     >>> for i in usr_attrs: dabe.keygen(public_parameters, master_secret_key, i, ID, secret_keys)
