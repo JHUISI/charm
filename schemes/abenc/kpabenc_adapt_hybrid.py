@@ -3,6 +3,7 @@ from charm.toolbox.pairinggroup import PairingGroup,GT
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from charm.core.math.pairing import hashPair as sha1
 from charm.toolbox.ABEnc import ABEnc
+from schemes.abenc.abenc_lsw08 import KPabe
 
 debug = False
 class HybridABEnc(ABEnc):

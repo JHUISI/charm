@@ -6,8 +6,8 @@ Digital Signature Algorithm (DSA)
 | Available from: 
 | Notes: 
 
-* type:           signature (ring-based)
-* setting:        integer and elliptic curve groups
+* type:           signature
+* setting:        elliptic curve groups
 
 :Authors:    J. Ayo Akinyele
 :Date:       5/2011

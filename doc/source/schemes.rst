@@ -1,3 +1,5 @@
+.. _schemes:
+
 Demonstration Schemes
 -----------------------------------------
 
@@ -5,60 +7,47 @@ Demonstration Schemes
 .. toctree::
    :maxdepth: 1
 
-   schemes/abenc_adapt_hybrid
-   schemes/abenc_bsw07
-   schemes/abenc_lsw08
-   schemes/abenc_waters09
+   schemes/dabenc/dabe_aw11
+   schemes/dabenc/dabenc_adapt_hybrid
+   schemes/pkenc/pkenc_adapt_bchk05
+   schemes/pkenc/pkenc_adapt_chk04
+   schemes/pkenc/pkenc_adapt_hybrid
+   schemes/pkenc/pkenc_cs98
+   schemes/pkenc/pkenc_elgamal85
+   schemes/pkenc/pkenc_paillier99
+   schemes/pkenc/pkenc_rabin
+   schemes/pkenc/pkenc_rsa
+   schemes/abenc/abenc_adapt_hybrid
+   schemes/abenc/abenc_bsw07
+   schemes/abenc/abenc_lsw08
+   schemes/abenc/abenc_waters09
+   schemes/abenc/kpabenc_adapt_hybrid
    schemes/chamhash_adm05
    schemes/chamhash_rsa_hw09
-   schemes/commit_gs08
-   schemes/commit_pedersen92
-   schemes/dabe_aw11
-   schemes/dabenc_adapt_hybrid
    schemes/encap_bchk05
-   schemes/groupsig_bgls04
-   schemes/groupsig_bgls04_var
-   schemes/ibenc_adapt_hybrid
-   schemes/ibenc_adapt_identityhash
-   schemes/ibenc_bb03
-   schemes/ibenc_bf01
-   schemes/ibenc_ckrs09
-   schemes/ibenc_lsw08
-   schemes/ibenc_sw05
-   schemes/ibenc_waters05
-   schemes/kpabenc_adapt_hybrid
    schemes/pk_vrf
-   schemes/pkenc_adapt_bchk05
-   schemes/pkenc_adapt_chk04
-   schemes/pkenc_adapt_hybrid
-   schemes/pkenc_cs98
-   schemes/pkenc_cs98_ec
-   schemes/pkenc_elgamal85
-   schemes/pkenc_paillier99
-   schemes/pkenc_rabin
-   schemes/pkenc_rsa
-   schemes/pksig_adapt_naor01
-   schemes/pksig_bls04
-   schemes/pksig_boyen
-   schemes/pksig_chch
-   schemes/pksig_chp
-   schemes/pksig_cl03
-   schemes/pksig_cl04
-   schemes/pksig_cyh
-   schemes/pksig_dsa
-   schemes/pksig_ecdsa
-   schemes/pksig_hess
-   schemes/pksig_hw
-   schemes/pksig_rsa_hw09
-   schemes/pksig_schnorr91
-   schemes/pksig_waters
-   schemes/pksig_waters05
-   schemes/pksig_waters09
    schemes/protocol_cns07
    schemes/protocol_schnorr91
    schemes/sigma1
    schemes/sigma2
    schemes/sigma3
+   schemes/pksig/pksig_adapt_naor01
+   schemes/pksig/pksig_bls04
+   schemes/pksig/pksig_boyen
+   schemes/pksig/pksig_chch
+   schemes/pksig/pksig_chp
+   schemes/pksig/pksig_cl03
+   schemes/pksig/pksig_cl04
+   schemes/pksig/pksig_cyh
+   schemes/pksig/pksig_dsa
+   schemes/pksig/pksig_ecdsa
+   schemes/pksig/pksig_hess
+   schemes/pksig/pksig_hw
+   schemes/pksig/pksig_rsa_hw09
+   schemes/pksig/pksig_schnorr91
+   schemes/pksig/pksig_waters
+   schemes/pksig/pksig_waters05
+   schemes/pksig/pksig_waters09
 
 .. end_auto_scheme_list
 

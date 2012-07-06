@@ -86,7 +86,7 @@ def parseFromXML(xmlObjectString, group=None):
     
     if setting == 'pairing' and group == None:
         group = PairingGroup(param)
-    elif structure['setting'] == 'ecc' and group == None:
+    elif structure['setting'] == 'elliptic_curve' and group == None:
         group = ECGroup(param)
     elif structure['setting'] == 'integer':
         # TODO: this is a special case
