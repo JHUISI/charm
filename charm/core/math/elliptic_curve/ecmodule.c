@@ -692,14 +692,12 @@ static PyObject *ECE_div(PyObject *o1, PyObject *o2) {
 		if(ElementG(lhs, rhs)) {
 			ECElement *rhs_neg = negatePoint(rhs);
 			if(rhs_neg != NULL) {
-				ans = createNewPoint(G, lhs); // ->group, lhs->ctx);
+				ans = createNewPoint(G, lhs);
 				START_CLOCK(dBench);
 				EC_POINT_add(ans->group, ans->P, lhs->P, rhs_neg->P, ans->ctx);
 				STOP_CLOCK(dBench);
 
 				PyObject_Del(rhs_neg);
-
-				return (PyObject *) ans;
 			}
 		}
 		else if(ElementZR(lhs, rhs)) {

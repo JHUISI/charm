@@ -141,11 +141,70 @@ For more examples, see the ``schemes`` package that is included in each Charm re
 Reusable Tools 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Perhaps you are developing a new scheme that relies on existing building cryptographic blocks such as block ciphers, hash functions, secret sharing and etc, do not reinvent the wheel! Charm was designed with reusability in mind and to aid cryptographers in easily composing their schemes based on existing constructions. Charm has a growing toolbox of resuable components that might simplify your scheme development. If the component you are looking for does not exist in Charm, then once you implement it consider contributing it back to the project for others to leverage. The end goal is to come up with a comprehensive toolbox that all can reuse. See the :ref:`toolbox` section for a detailed list. 
+Perhaps you are developing a new scheme that relies on existing building blocks such as block ciphers, hash functions, secret sharing and etc, do not reinvent the wheel! Charm was designed with reusability in mind and to aid cryptographers in easily composing their schemes based on existing constructions. Charm has a growing toolbox of resuable components that might simplify your scheme development. If the component you are looking for does not exist in Charm, then once you implement it consider contributing it back to the project for others to leverage. The end goal is to come up with a comprehensive toolbox that all can reuse. See the :ref:`toolbox` section for a detailed list. 
 
 Testing & Benchmarking
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-TODO
+Once you have implemented your scheme, the next step is to test and benchmark. There are two possibile approaches: either define a test routine that executes the algorithms in your scheme via test vectors if they exist and/or embedding the test routine as a docstring in your scheme's class definition. See examples in the ``schemes`` package.
+
+Here is an example for how to use the Charm benchmark interface in the EC setting:
+
+::
+
+	from charm.toolbox.ecgroup import ECGroup,ZR,G
+	from charm.toolbox.eccurve import prime192v1
+	from charm.core.math.elliptic_curve import InitBenchmark,StartBenchmark,EndBenchmark,GetBenchmark,GetGeneralBenchmarks,ClearBenchmark,Mul,Div,Exp
+
+	trials = 10	
+	group = ECGroup(prime192v1)
+	g = group.random(G)
+	h = group.random(G)
+	i = group.random(G)
+
+	ID = InitBenchmark()
+	StartBenchmark(ID, [Mul, Div, Exp])
+	for a in range(trials):
+	    j = g * h	
+	    k = h ** group.random(ZR)
+    	    t = (j ** group.random(ZR)) / m
+	EndBenchmark(ID)
+	
+	msmtDict = GetGeneralBenchmarks(ID)
+	print("<=== General Benchmarks ===>")
+	print("Mul := ", msmtDict[Mul])
+	print("Div := ", msmtDict[Div])
+	print("Exp := ", msmtDict[Exp])
+	ClearBenchmark(ID)
+	
+Note that thesame benchmark function calls work for the other group settings as well. In particular, the pairing base module also supports the ability to perform benchmarks at a granular level (operation count per group). For this feature, import ``GetGranularBenchmarks`` in addition to ``GetGeneralBenchmarks`` in the ``pairing`` base module. Also, you are required to supply the ``Granular`` benchmark flag when calling ``StartBenchmark``. Here is an illustrative example:
+
+::
+	from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+	from charm.core.math.pairing import InitBenchmark,StartBenchmark,EndBenchmark,GetBenchmark,GetGeneralBenchmarks,GetGranularBenchmarks,ClearBenchmark,Mul,Div,Exp,Pair,Granular
+	
+	trials = 10	
+	group = PairingGroup("SS512")
+	g = group.random(G1)
+	h = group.random(G1)
+	i = group.random(G2)
+
+	ID = InitBenchmark()
+	StartBenchmark(ID, [Mul, Exp, Pair, Granular])
+	for a in range(trials):
+	    j = g * h	
+	    k = i ** group.random(ZR)
+    	    t = (j ** group.random(ZR)) / h
+	    n = pair(h, i)
+	EndBenchmark(ID)
+	
+	msmtDict = GetGeneralBenchmarks(ID)
+	granDict = GetGranularBenchmarks(ID)
+	print("<=== General Benchmarks ===>")
+	print("Results  := ", msmtDict)
+	print("<=== Granular Benchmarks ===>")
+	print("G1 mul   := ", granDict[Mul][G1])	
+	print("G2 exp   := ", granDict[Exp][G2])
+	ClearBenchmark(ID)
 
 Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at support@charm-crypto.com.
