@@ -148,7 +148,7 @@ Testing & Benchmarking
 
 Once you have implemented your scheme, the next step is to test and benchmark. There are two possibile approaches: either define a test routine that executes the algorithms in your scheme via test vectors if they exist and/or embedding the test routine as a docstring in your scheme's class definition. See examples in the ``schemes`` package.
 
-There are several benchmark flags you should be aware of the basic options: ``RealTime``,'`CpuTime``,``Add``,``Sub``,``Mul``,``Div``, and ``Exp``. Here is an example to demonstrate use of the Charm benchmark interface for the EC group setting:
+There are several benchmark flags you should be aware of such as: ``RealTime``, ``CpuTime``, ``Add``, ``Sub``, ``Mul``, ``Div``, and ``Exp``. Here is an example to demonstrate use of the Charm benchmark interface for the EC setting:
 
 ::
 
@@ -177,6 +177,7 @@ There are several benchmark flags you should be aware of the basic options: ``Re
 	print("Exp := ", msmtDict[Exp])
 	ClearBenchmark(ID)
 	
+
 Note that thesame benchmark function calls work for the other group settings as well. In particular, the pairing base module also supports the ability to perform benchmarks at a granular level (operation count per group). For this feature, import ``GetGranularBenchmarks`` in addition to ``GetGeneralBenchmarks`` in the ``pairing`` base module. Also, you are required to supply the ``Granular`` benchmark flag when calling ``StartBenchmark``. Here is an illustrative example:
 
 ::
@@ -207,5 +208,6 @@ Note that thesame benchmark function calls work for the other group settings as 
 	print("G1 mul   := ", granDict[Mul][G1])	
 	print("G2 exp   := ", granDict[Exp][G2])
 	ClearBenchmark(ID)
+
 
 Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at support@charm-crypto.com.
