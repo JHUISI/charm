@@ -148,7 +148,7 @@ Testing & Benchmarking
 
 Once you have implemented your scheme, the next step is to test and benchmark. There are two possibile approaches: either define a test routine that executes the algorithms in your scheme via test vectors if they exist and/or embedding the test routine as a docstring in your scheme's class definition. See examples in the ``schemes`` package.
 
-Here is an example for how to use the Charm benchmark interface in the EC setting:
+There are several benchmark flags you should be aware of the basic options: ``RealTime``,'`CpuTime``,``Add``,``Sub``,``Mul``,``Div``, and ``Exp``. Here is an example to demonstrate use of the Charm benchmark interface for the EC group setting:
 
 ::
 
@@ -167,9 +167,9 @@ Here is an example for how to use the Charm benchmark interface in the EC settin
 	for a in range(trials):
 	    j = g * h	
 	    k = h ** group.random(ZR)
-    	    t = (j ** group.random(ZR)) / m
+	    t = (j ** group.random(ZR)) / m
 	EndBenchmark(ID)
-	
+
 	msmtDict = GetGeneralBenchmarks(ID)
 	print("<=== General Benchmarks ===>")
 	print("Mul := ", msmtDict[Mul])
@@ -180,8 +180,9 @@ Here is an example for how to use the Charm benchmark interface in the EC settin
 Note that thesame benchmark function calls work for the other group settings as well. In particular, the pairing base module also supports the ability to perform benchmarks at a granular level (operation count per group). For this feature, import ``GetGranularBenchmarks`` in addition to ``GetGeneralBenchmarks`` in the ``pairing`` base module. Also, you are required to supply the ``Granular`` benchmark flag when calling ``StartBenchmark``. Here is an illustrative example:
 
 ::
+
 	from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-	from charm.core.math.pairing import InitBenchmark,StartBenchmark,EndBenchmark,GetBenchmark,GetGeneralBenchmarks,GetGranularBenchmarks,ClearBenchmark,Mul,Div,Exp,Pair,Granular
+	from charm.core.math.pairing import InitBenchmark,StartBenchmark,EndBenchmark,GetBenchmark,GetGeneralBenchmarks,GetGranularBenchmarks,ClearBenchmark,RealTime,Mul,Div,Exp,Pair,Granular
 	
 	trials = 10	
 	group = PairingGroup("SS512")
@@ -194,7 +195,7 @@ Note that thesame benchmark function calls work for the other group settings as 
 	for a in range(trials):
 	    j = g * h	
 	    k = i ** group.random(ZR)
-    	    t = (j ** group.random(ZR)) / h
+	    t = (j ** group.random(ZR)) / h
 	    n = pair(h, i)
 	EndBenchmark(ID)
 	
