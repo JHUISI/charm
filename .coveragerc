@@ -1,0 +1,3 @@
+[run]
+omit=schemes/test/*
+     charm/test/*
