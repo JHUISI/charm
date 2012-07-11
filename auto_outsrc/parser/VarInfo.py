@@ -28,6 +28,7 @@ class VarInfo:
         self.isUsedInHashCalc = False
         self.hashArgsInAssignNode = []
         self.hasListIndexSymInLeftAssign = False
+        self.isExpandNode = False
     
     @classmethod
     def copy(self, obj):
@@ -55,6 +56,7 @@ class VarInfo:
         v.isUsedInHashCalc = obj.isUsedInHashCalc
         v.hashArgsInAssignNode = obj.hashArgsInAssignNode
         v.hasListIndexSymInLeftAssign = obj.hasListIndexSymInLeftAssign
+        v.isExpandNode = obj.isExpandNode
         return v
         
     def getAssignNode(self):
@@ -142,6 +144,9 @@ class VarInfo:
     def getHasListIndexSymInLeftAssign(self):
         return self.hasListIndexSymInLeftAssign
 
+    def getIsExpandNode(self):
+        return self.isExpandNode
+
     def traverseAssignNodeRecursive(self, node, isExponent):
         if (node.type == ops.PAIR):
             self.hasPairings = True
@@ -219,6 +224,8 @@ class VarInfo:
             dotProdObj = DotProd()
             dotProdObj.setDotProdObj(self.assignNode.right, self.lineNo, self.funcName)
             self.dotProdObj = dotProdObj
+        elif (self.assignNode.right.type == ops.EXPAND):
+            self.isExpandNode = True
 
         self.traverseAssignNodeRecursive(self.assignNode.right, False)
 

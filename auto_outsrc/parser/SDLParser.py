@@ -619,19 +619,34 @@ def checkPairingInputTypes(node):
 def getVarNameEntryFromAssignInfo(varName):
     retFuncName = None
     retVarInfoObj = None
+    currentRetVarInfoObjIsExpandNode = False
 
     for funcName in assignInfo:
         for currentVarName in assignInfo[funcName]:
             if (currentVarName == varName):
                 if ( (retVarInfoObj != None) or (retFuncName != None) ):
                     if (funcName != TYPES_HEADER):
-                        retFuncName = funcName
-                        retVarInfoObj = assignInfo[funcName][currentVarName]
+                        if ( (assignInfo[funcName][currentVarName].getIsExpandNode() == True) and (currentRetVarInfoObjIsExpandNode == True) ):
+                            pass
+                        elif ( (assignInfo[funcName][currentVarName].getIsExpandNode() == True) and (currentRetVarInfoObjIsExpandNode == False) ):
+                            pass
+                        elif ( (assignInfo[funcName][currentVarName].getIsExpandNode() == False) and (currentRetVarInfoObjIsExpandNode == True) ):
+                            retFuncName = funcName
+                            retVarInfoObj = assignInfo[funcName][currentVarName]
+                            currentRetVarInfoObjIsExpandNode = False
+                        elif ( (assignInfo[funcName][currentVarName].getIsExpandNode() == False) and (currentRetVarInfoObjIsExpandNode == False) ):
+                            retFuncName = funcName
+                            retVarInfoObj = assignInfo[funcName][currentVarName]
+                            currentRetVarInfoObjIsExpandNode = False
                     elif (retFuncName != TYPES_HEADER):
                         pass
                     elif ( (retVarInfoObj.hasBeenSet() == False) and (assignInfo[funcName][currentVarName].hasBeenSet() == True) ):
                         retFuncName = funcName
                         retVarInfoObj = assignInfo[funcName][currentVarName]
+                        if (retVarInfoObj.getIsExpandNode() == True):
+                            currentRetVarInfoObjIsExpandNode = True
+                        else:
+                            currentRetVarInfoObjIsExpandNode = False
                     elif ( (retVarInfoObj.hasBeenSet() == True) and (assignInfo[funcName][currentVarName].hasBeenSet() == False) ):
                         pass
                     else:
@@ -639,6 +654,10 @@ def getVarNameEntryFromAssignInfo(varName):
                 else:
                     retFuncName = funcName
                     retVarInfoObj = assignInfo[funcName][currentVarName]
+                    if (retVarInfoObj.getIsExpandNode() == True):
+                        currentRetVarInfoObjIsExpandNode = True
+                    else:
+                        currentRetVarInfoObjIsExpandNode = False
 
     #if ( (retVarInfoObj == None) or (retFuncName == None) ):
         #sys.exit("getVarNameEntryFromAssignInfo in SDLParser.py could not locate entry in assignInfo of the name passed in.")
@@ -862,12 +881,47 @@ def updateVarNamesDicts(node, varNameList, dictToUpdate):
             dictToUpdate[varName] = []
             dictToUpdate[varName].append(currentFuncName)
 
+def getOutputVarsDictOfFuncRecursive(retList, funcName, outputVarInfoObj):
+    if (type(retList) is not list):
+        sys.exit("getOutputVarsDictOfFuncRecursive in SDLParser.py:  retList parameter passed in is not of type list.")
+
+    if ( (funcName == None) or (type(funcName) is not str) or (len(funcName) == 0) or (funcName not in assignInfo) ):
+        sys.exit("getOutputVarsDictOfFuncRecursive in SDLParser.py:  problem with funcName parameter passed in.")
+
+    if (outputVarInfoObj == None):
+        sys.exit("getOutputVarsDictOfFuncRecursive in SDLParser.py:  outputVarInfoObj parameter passed in is of None type.")
+
+    if (len(outputVarInfoObj.getListNodesList()) > 0):
+        for outputVarName in outputVarInfoObj.getListNodesList():
+            if (outputVarName in retList):
+                sys.exit("getOutputVarsDictOfFuncRecursive in SDLParser.py:  duplicate variable names found in retList parameter passed in to function.")
+
+            retList.append(outputVarName)
+    else:
+        if (outputVarInfoObj.getAssignNode().right.type != ops.ATTR):
+            sys.exit("getOutputVarsDictOfFuncRecursive in SDLParser.py:  current outputVarInfoObj is not one of the following types:  list, symmap, or attribute.")
+
+        newOutputVarName = str(outputVarInfoObj.getAssignNode().right)
+
+        if (newOutputVarName in retList):
+            sys.exit("getOutputVarsDictOfFuncRecursive in SDLParser.py:  new output variable name just generated is already in retList parameter passed in.")
+
+        retList.append(newOutputVarName) 
+
+        (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(newOutputVarName)
+        if ( (retFuncName == None) or (retFuncName != funcName) or (retVarInfoObj == None) ):
+            sys.exit("getOutputVarsDictOfFuncRecursive in SDLParser.py:  problem with values returned from getVarNameEntryFromAssignInfo.")
+
+        getOutputVarsDictOfFuncRecursive(retList, funcName, retVarInfoObj)
+
 def getInputOutputVarsDictOfFunc(funcName):
     if ( (funcName == None) or (type(funcName) is not str) or (len(funcName) == 0) ):
         sys.exit("getInputOutputVarsDictOfFunc in SDLParser.py:  problem with function name parameter passed in.")
 
     if (funcName not in assignInfo):
-        sys.exit("getInputOutputVarsDictOfFunc in SDLParser.py:  function name parameter passed in is not in assignInfo.")
+        return None
+        #print(funcName)
+        #sys.exit("getInputOutputVarsDictOfFunc in SDLParser.py:  function name parameter passed in is not in assignInfo.")
 
     if (inputKeyword not in assignInfo[funcName]):
         sys.exit("getInputOutputVarsDictOfFunc in SDLParser.py:  input keyword was not found in assignInfo[funcName].")
@@ -878,6 +932,9 @@ def getInputOutputVarsDictOfFunc(funcName):
     inputVarInfoObj = assignInfo[funcName][inputKeyword]
     outputVarInfoObj = assignInfo[funcName][outputKeyword]
 
+    if ( (inputVarInfoObj == None) or (outputVarInfoObj == None) ):
+        sys.exit("getInputOutputVarsDictOfFunc in SDLParser.py:  either inputVarInfoObj or outputVarInfoObj was found to be of None type.")
+
     retDict = {inputKeyword:[], outputKeyword:[]}
 
     if ( (inputVarInfoObj.getIsList() == True) and (len(inputVarInfoObj.getListNodesList()) > 0) ):
@@ -887,12 +944,7 @@ def getInputOutputVarsDictOfFunc(funcName):
 
             retDict[inputKeyword].append(inputVarName)
 
-    if ( (outputVarInfoObj.getIsList() == True) and (len(outputVarInfoObj.getListNodesList()) > 0) ):
-        for outputVarName in outputVarInfoObj.getListNodesList():
-            if (outputVarName in retDict[outputKeyword]):
-                sys.exit("getInputOutputVarsDictOfFunc in SDLParser.py:  duplicate variable names found in output variable list.")
-
-            retDict[outputKeyword].append(outputVarName)
+    getOutputVarsDictOfFuncRecursive(retDict[outputKeyword], funcName, outputVarInfoObj)
 
     return retDict
 
@@ -1305,6 +1357,21 @@ def getSecretVarNames():
 def getFunctionNameOrder():
     return functionNameOrder
 
+def addIOVarNamesToList(retList, IOVarNames):
+    if (type(retList) is not list):
+        sys.exit("addIOVarNamesToList in SDLParser.py:  retList parameter passed in is not of type list.")
+
+    if ( (type(IOVarNames) is not dict) or (inputKeyword not in IOVarNames) or (outputKeyword not in IOVarNames) or (type(IOVarNames[inputKeyword]) is not list) or (type(IOVarNames[outputKeyword]) is not list) ):
+        sys.exit("addIOVarNamesToList in SDLParser.py:  problem with IOVarNames parameter passed in.")
+
+    for currentInputVarName in IOVarNames[inputKeyword]:
+        if (currentInputVarName not in retList):
+            retList.append(currentInputVarName)
+
+    for currentOutputVarName in IOVarNames[outputKeyword]:
+        if (currentOutputVarName not in retList):
+            retList.append(currentOutputVarName)
+
 def updatePublicVarNames():
     global publicVarNames
 
@@ -1316,21 +1383,46 @@ def updatePublicVarNames():
         if ( (retFuncName == None) or (retVarInfoObj == None) ):
             sys.exit("updatePublicVarNames in SDLParser.py:  at least one None value returned from getVarNameEntryFromAssignInfo called on one of the master public variable names.")
 
-        if ( (retVarInfoObj.getIsList() == False) or (len(retVarInfoObj.getListNodesList()) == 0) ):
-            continue
+        getOutputVarsDictOfFuncRecursive(publicVarNames, retFuncName, retVarInfoObj)
 
-        for currentListNode in retVarInfoObj.getListNodesList():
-            if (currentListNode not in publicVarNames):
-                publicVarNames.append(currentListNode)
+    encryptFuncIOVarNames = getInputOutputVarsDictOfFunc(encryptFuncName)
+    if (encryptFuncIOVarNames == None):
+        sys.exit("updatePublicVarNames in SDLParser.py:  value returned from getInputOutputVarsDictOfFunc(encryptFuncName) is of None type.")
+    if (M in encryptFuncIOVarNames[inputKeyword]):
+        encryptFuncIOVarNames[inputKeyword].remove(M)
+    addIOVarNamesToList(publicVarNames, encryptFuncIOVarNames)
 
-    retDict = getInputOutputVarsDictOfFunc(encryptFuncName)
-    print(retDict)
-    retDict = getInputOutputVarsDictOfFunc(transformFunctionName)
-    print(retDict)
-    sys.exit("test")
+    transformFuncIOVarNames = getInputOutputVarsDictOfFunc(transformFunctionName)
+    if (transformFuncIOVarNames != None):
+        addIOVarNamesToList(publicVarNames, transformFuncIOVarNames)
 
 def updateSecretVarNames():
-    return
+    global secretVarNames
+
+    for currentSecVarName in masterSecVars:
+        if ( (currentSecVarName not in secretVarNames) and (currentSecVarName not in publicVarNames) ):
+            secretVarNames.append(currentSecVarName)
+
+        (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(currentSecVarName)
+        if ( (retFuncName == None) or (retVarInfoObj == None) ):
+            sys.exit("updateSecretVarNames in SDLParser.py:  problems with values returned from getVarNameEntryFromAssignInfo.")
+
+        #if ( (retVarInfoObj.getIsList() == False) and (currentSecVarName not in secretVarNames) and (currentSecVarName not in publicVarNames) ):
+            #secretVarNames.append(currentSecVarName)
+
+        getOutputVarsDictOfFuncRecursive(secretVarNames, retFuncName, retVarInfoObj)
+
+        varsToRemove = []
+
+        for currentSecVarName in secretVarNames:
+            if (currentSecVarName in publicVarNames):
+                if (currentSecVarName in varsToRemove):
+                    sys.exit("updateSecretVarNames in SDLParser.py:  duplicate variable name found in secretVarNames.")
+
+                varsToRemove.append(currentSecVarName)
+
+        for varToRemove in varsToRemove:
+            secretVarNames.remove(varToRemove)
 
 def parseLinesOfCode(code, verbosity):
     global varTypes, assignInfo, forLoops, currentFuncName, varDepList, varInfList, varsThatProtectM
@@ -1410,9 +1502,6 @@ def parseLinesOfCode(code, verbosity):
     getVarsThatProtectMCalled = True
 
     updatePublicVarNames()
-    print(publicVarNames)
-    sys.exit("test")
-
     updateSecretVarNames()
 
 def getFuncStmts(funcName):
