@@ -100,7 +100,7 @@ def getLineNoOfLastAssign(funcName, varNameToFind):
     return lastLineNo
 
 def getIsVarList(keygenOutputElem, keygenOutputVarInfo):
-    if ( (keygenOutputVarInfo.getIsList() == True) or (len(keygenOutputVarInfo.getListNodesList()) > 0) ):
+    if ( (keygenOutputVarInfo.getIsList() == True) or (keygenOutputVarInfo.getIsSymmap() == True) or (len(keygenOutputVarInfo.getListNodesList()) > 0) ):
         return True
 
     try:

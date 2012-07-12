@@ -616,6 +616,7 @@ def checkPairingInputTypes(node):
     else:
         sys.exit("Algebraic setting is set to unsupported value (found in checkPairingInputTypes in SDLParser).")
 
+'''
 def getVarNameEntryFromAssignInfo(varName):
     retFuncName = None
     retVarInfoObj = None
@@ -663,9 +664,11 @@ def getVarNameEntryFromAssignInfo(varName):
         #sys.exit("getVarNameEntryFromAssignInfo in SDLParser.py could not locate entry in assignInfo of the name passed in.")
 
     return (retFuncName, retVarInfoObj)
+'''
 
+'''
 def getNextListName(origListName, index):
-    (listFuncNameInAssignInfo, listEntryInAssignInfo) = getVarNameEntryFromAssignInfo(origListName)
+    (listFuncNameInAssignInfo, listEntryInAssignInfo) = getVarNameEntryFromAssignInfo(assignInfo, origListName)
     if ( (listFuncNameInAssignInfo == None) or (listEntryInAssignInfo == None) ):
         sys.exit("Problem with return values from getVarNameEntryFromAssignInfo in getNextListName in SDLParser.py.")
     if ( (listEntryInAssignInfo.getIsList() == False) or (len(listEntryInAssignInfo.getListNodesList()) == 0) ):
@@ -713,7 +716,7 @@ def getVarNameFromListIndices(node, failSilently=False):
         listIndex = nodeNameSplit[counter_nodeNameSplit]
         if (listIndex.isdigit() == False):
             if (counter_nodeNameSplit == (lenNodeNameSplit - 1)):
-                (tempFuncName, tempListName) = getVarNameEntryFromAssignInfo(currentListName)
+                (tempFuncName, tempListName) = getVarNameEntryFromAssignInfo(assignInfo, currentListName)
                 return (tempFuncName, currentListName)
             definedListMembers = hasDefinedListMembers(currentListName)
             if ( (definedListMembers == True) and (nodeNameSplit[counter_nodeNameSplit + 1].isdigit() == True) ):
@@ -731,6 +734,7 @@ def getVarNameFromListIndices(node, failSilently=False):
         counter_nodeNameSplit += 1
 
     return (currentFuncName, currentListName)
+'''
 
 def checkForListWithOneNumIndex(nodeName):
     if (nodeName.count(LIST_INDEX_SYMBOL) != 1):
@@ -774,12 +778,12 @@ def checkForListWithOneNumIndex(nodeName):
     return retVarType
 
 def getVarTypeInfoForAttr_List(node):
-    (funcNameOfVar, varNameInList) = getVarNameFromListIndices(node)
+    (funcNameOfVar, varNameInList) = getVarNameFromListIndices(assignInfo, node)
     if ( (funcNameOfVar != None) and (varNameInList != None) ):
         if ( (funcNameOfVar in varTypes) and (varNameInList in varTypes[funcNameOfVar]) ):
             return varTypes[funcNameOfVar][varNameInList].getType()
 
-        (outsideFunctionName, retVarInfoObj) = getVarNameEntryFromAssignInfo(varNameInList)
+        (outsideFunctionName, retVarInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, varNameInList)
         if ( (outsideFunctionName != None) and (retVarInfoObj != None) and (outsideFunctionName in varTypes) and (varNameInList in varTypes[outsideFunctionName]) ):
             return varTypes[outsideFunctionName][varNameInList].getType()
 
@@ -794,7 +798,7 @@ def getVarTypeInfoForAttr(node):
     if (nodeAttrFullName in varTypes[currentFuncName]):
         return varTypes[currentFuncName][nodeAttrFullName].getType()
 
-    (possibleFuncName, possibleVarInfoObj) = getVarNameEntryFromAssignInfo(nodeAttrFullName)
+    (possibleFuncName, possibleVarInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, nodeAttrFullName)
     if ( (possibleFuncName != None) and (possibleVarInfoObj != None) and (nodeAttrFullName in varTypes[possibleFuncName]) ):
         return varTypes[possibleFuncName][nodeAttrFullName].getType()
 
@@ -908,7 +912,7 @@ def getOutputVarsDictOfFuncRecursive(retList, funcName, outputVarInfoObj):
 
         retList.append(newOutputVarName) 
 
-        (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(newOutputVarName)
+        (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, newOutputVarName)
         if ( (retFuncName == None) or (retFuncName != funcName) or (retVarInfoObj == None) ):
             sys.exit("getOutputVarsDictOfFuncRecursive in SDLParser.py:  problem with values returned from getVarNameEntryFromAssignInfo.")
 
@@ -1002,11 +1006,11 @@ def updateAssignInfo(node, i):
         if (assignInfo_Func[varName].hasBeenSet() == True):
             sys.exit("Found multiple assignments of same variable name within same function.")
         assignInfo_Func[varName].setLineNo(i)
-        (resultingVarDeps, resultingHashInputArgNames) = assignInfo_Func[varName].setAssignNode(node, currentFuncName, currentForLoopObj, currentIfElseBranch)
+        (resultingVarDeps, resultingHashInputArgNames) = assignInfo_Func[varName].setAssignNode(assignInfo, node, currentFuncName, currentForLoopObj, currentIfElseBranch)
     else:
         varInfoObj = VarInfo()
         varInfoObj.setLineNo(i)
-        (resultingVarDeps, resultingHashInputArgNames) = varInfoObj.setAssignNode(node, currentFuncName, currentForLoopObj, currentIfElseBranch)
+        (resultingVarDeps, resultingHashInputArgNames) = varInfoObj.setAssignNode(assignInfo, node, currentFuncName, currentForLoopObj, currentIfElseBranch)
         assignInfo_Func[varName] = varInfoObj
 
     updateHashArgNames_Entries(resultingHashInputArgNames)
@@ -1382,7 +1386,7 @@ def updatePublicVarNames():
         if (currentPubVarName not in publicVarNames):
             publicVarNames.append(currentPubVarName)
 
-        (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(currentPubVarName)
+        (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, currentPubVarName)
         if ( (retFuncName == None) or (retVarInfoObj == None) ):
             sys.exit("updatePublicVarNames in SDLParser.py:  at least one None value returned from getVarNameEntryFromAssignInfo called on one of the master public variable names.")
 
@@ -1406,7 +1410,7 @@ def updateSecretVarNames():
         if ( (currentSecVarName not in secretVarNames) and (currentSecVarName not in publicVarNames) ):
             secretVarNames.append(currentSecVarName)
 
-        (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(currentSecVarName)
+        (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, currentSecVarName)
         if ( (retFuncName == None) or (retVarInfoObj == None) ):
             sys.exit("updateSecretVarNames in SDLParser.py:  problems with values returned from getVarNameEntryFromAssignInfo.")
 

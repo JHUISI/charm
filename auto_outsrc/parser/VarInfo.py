@@ -1,7 +1,10 @@
-import sys
+import sys, copy
 from SDLang import *
 from config import *
 from DotProd import *
+
+#TODO:  Replace "T1" with constant defined elsewhere that all T1 values pull from.
+namesOfFutureDeclVars = [keygenSecVar + blindingSuffix, "T1", keygenBlindingExponent]
 
 class VarInfo:
     def __init__(self):
@@ -30,6 +33,9 @@ class VarInfo:
         self.hashArgsInAssignNode = []
         self.hasListIndexSymInLeftAssign = False
         self.isExpandNode = False
+        self.isBaseElement = False
+        self.assignBaseElemsOnly = None
+        self.assignInfo = None
     
     @classmethod
     def copy(self, obj):
@@ -59,6 +65,9 @@ class VarInfo:
         v.hashArgsInAssignNode = obj.hashArgsInAssignNode
         v.hasListIndexSymInLeftAssign = obj.hasListIndexSymInLeftAssign
         v.isExpandNode = obj.isExpandNode
+        v.isBaseElement = obj.isBaseElement
+        v.assignBaseElemsOnly = obj.assignBaseElemsOnly
+        v.assignInfo = obj.assignInfo
         return v
         
     def getAssignNode(self):
@@ -152,6 +161,12 @@ class VarInfo:
     def getIsExpandNode(self):
         return self.isExpandNode
 
+    def getIsBaseElement(self):
+        return self.isBaseElement
+
+    def getAssignBaseElemsOnly(self):
+        return self.assignBaseElemsOnly
+
     def traverseAssignNodeRecursive(self, node, isExponent):
         if (node.type == ops.PAIR):
             self.hasPairings = True
@@ -210,6 +225,39 @@ class VarInfo:
 
         return None
 
+    def traverseAssignBaseElemsOnlyRecursive(self, node):
+        if (node.type == ops.ATTR):
+            numListIndexSymbols = (getFullVarName(node, False)).count(LIST_INDEX_SYMBOL)
+            if (numListIndexSymbols == 0):
+                (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(self.assignInfo, str(node))
+            else:
+                (retFuncName, retVarInfoObjString) = getVarNameFromListIndices(self.assignInfo, node)
+                (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(self.assignInfo, retVarInfoObjString)
+            if ( (retFuncName != None) and (retVarInfoObj != None) ):
+                node = copy.deepcopy(retVarInfoObj.getAssignBaseElemsOnly())
+                return
+        elif ( (node.type == ops.LIST) or (node.type == ops.SYMMAP) ):
+            newListNodesList = []
+            for oldListItem in node.listNodes:
+                (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(self.assignInfo, oldListItem)
+                if ( (retFuncName == None) or (retVarInfoObj == None) ):
+                    if (oldListItem in namesOfFutureDeclVars):
+                        newListNodesList.append(oldListItem)
+                    else:
+                        sys.exit("traverseAssignBaseElemsOnlyRecursive in VarInfo.py:  call to getVarNameEntryFromAssignInfo() for node.getListNodesList() failed.")
+                else:
+                    baseElemsReplacement = retVarInfoObj.getAssignBaseElemsOnly()
+                    if (baseElemsReplacement == None):
+                        newListNodesList.append(oldListItem)
+                    else:
+                        newListNodesList.append(str(baseElemsReplacement))
+            node.listNodes = newListNodesList
+
+        if (node.left != None):
+            self.traverseAssignBaseElemsOnlyRecursive(node.left)
+        if (node.right != None):
+            self.traverseAssignBaseElemsOnlyRecursive(node.right)
+
     def traverseAssignNode(self):
         if (self.assignNode == None):
             sys.exit("Attempting to run traverseAssignNode in VarInfo when self.assignNode is still None.")
@@ -235,17 +283,28 @@ class VarInfo:
             self.dotProdObj = dotProdObj
         elif (self.assignNode.right.type == ops.EXPAND):
             self.isExpandNode = True
+        elif (self.assignNode.right.type == ops.RANDOM):
+            self.isBaseElement = True
+            self.assignBaseElemsOnly = self.assignNode.left
+
+        if (self.assignBaseElemsOnly == None):
+            self.assignBaseElemsOnly = copy.deepcopy(self.assignNode.right)
+            self.traverseAssignBaseElemsOnlyRecursive(self.assignBaseElemsOnly)
 
         self.traverseAssignNodeRecursive(self.assignNode.right, False)
 
         if (M in self.varDeps):
             self.protectsM = True
 
-    def setAssignNode(self, assignNode, funcName, outsideForLoopObj, outsideIfElseBranchObj):
+    def setAssignNode(self, assignInfo, assignNode, funcName, outsideForLoopObj, outsideIfElseBranchObj):
         if (type(assignNode).__name__ != BINARY_NODE_CLASS_NAME):
             sys.exit("Assignment node passed to VarInfo is invalid.")
 
+        if ( (assignInfo == None) or (type(assignInfo) is not dict) ):
+            sys.exit("assignInfo structure passed into setAssignNode of VarInfo.py is invalid.")
+
         self.initCall = False
+        self.assignInfo = assignInfo
         self.assignNode = assignNode
         self.funcName = funcName
         self.outsideForLoopObj = outsideForLoopObj
@@ -285,3 +344,13 @@ class VarInfo:
             sys.exit("setIsUsedInHashCalc in VarInfo.py:  isUsedInHashCalc parameter passed in is neither True nor False.")
 
         self.isUsedInHashCalc = isUsedInHashCalc
+
+    def setListNodesList(self, newListNodesList):
+        if ( (newListNodesList == None) or (type(newListNodesList) is not list) or (len(newListNodesList) == 0) ):
+            sys.exit("setListNodesList in VarInfo.py:  problem with newListNodesList parameter passed in.")
+
+        for newListItem in newListNodesList:
+            if ( (newListItem == None) or (type(newListItem) is not str) or (len(newListItem) == 0) ):
+                sys.exit("setListNodesList in VarInfo.py:  problem with one of the list members of the newListNodesList parameter passed in.")
+
+        self.listNodesList = copy.deepcopy(newListNodesList)

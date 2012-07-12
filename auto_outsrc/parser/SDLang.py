@@ -66,6 +66,122 @@ debug = levels.none
 # list: 
 # - searchNode => find a particular type of node (ops.PAIR) in a given subtree (node)
 
+def getNextListName(assignInfo, origListName, index):
+    (listFuncNameInAssignInfo, listEntryInAssignInfo) = getVarNameEntryFromAssignInfo(assignInfo, origListName)
+    if ( (listFuncNameInAssignInfo == None) or (listEntryInAssignInfo == None) ):
+        sys.exit("Problem with return values from getVarNameEntryFromAssignInfo in getNextListName in SDLParser.py.")
+    if ( (listEntryInAssignInfo.getIsList() == False) or (len(listEntryInAssignInfo.getListNodesList()) == 0) ):
+        #sys.exit("Problem with list obtained from assignInfo in getNextListName in SDLParser.")
+        return (None, None)
+
+    listNodesList = listEntryInAssignInfo.getListNodesList()
+    index = int(index)
+    lenListNodesList = len(listNodesList)
+    if (index >= lenListNodesList):
+        sys.exit("getNextListName in SDLParser.py found that the index submitted as input is greater than the length of the listNodesList returned from getVarNameEntryFromAssignInfo.")
+
+    return (listFuncNameInAssignInfo, listNodesList[index])
+
+def hasDefinedListMembers(assignInfo, listName):
+    (funcName, varInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, listName)
+    if ( (varInfoObj.getIsList() == True) and (len(varInfoObj.getListNodesList()) > 0) ):
+        return True
+
+    return False
+
+def getVarNameFromListIndices(assignInfo, node, failSilently=False):
+    if (node.type != ops.ATTR):
+        if (failSilently == True):
+            return (None, None)
+        else:
+            sys.exit("Node passed to getVarNameFromListIndex in SDLParser is not of type " + str(ops.ATTR))
+
+    nodeAttrFullName = getFullVarName(node, False)
+
+    if (nodeAttrFullName.find(LIST_INDEX_SYMBOL) == -1):
+        if (failSilently == True):
+            return (None, None)
+        else:
+            sys.exit("Node passed to getVarNameFromListIndex is not a reference to an index in a list.")
+
+    nodeName = nodeAttrFullName
+    nodeNameSplit = nodeName.split(LIST_INDEX_SYMBOL)
+    currentListName = nodeNameSplit[0]
+    nodeNameSplit.remove(currentListName)
+    lenNodeNameSplit = len(nodeNameSplit)
+    counter_nodeNameSplit = 0
+
+    while (counter_nodeNameSplit < lenNodeNameSplit):
+        listIndex = nodeNameSplit[counter_nodeNameSplit]
+        if (listIndex.isdigit() == False):
+            if (counter_nodeNameSplit == (lenNodeNameSplit - 1)):
+                (tempFuncName, tempListName) = getVarNameEntryFromAssignInfo(assignInfo, currentListName)
+                return (tempFuncName, currentListName)
+            definedListMembers = hasDefinedListMembers(assignInfo, currentListName)
+            if ( (definedListMembers == True) and (nodeNameSplit[counter_nodeNameSplit + 1].isdigit() == True) ):
+                (currentFuncName, currentListName) = getNextListName(assignInfo, currentListName, nodeNameSplit[counter_nodeNameSplit + 1])
+                if ( (currentFuncName == None) and (currentListName == None) ):
+                    break
+                counter_nodeNameSplit += 2
+                continue
+            else:
+                (tempFuncName, tempListName) = getVarNameEntryFromAssignInfo(assignInfo, currentListName)
+                return (tempFuncName, currentListName)
+        (currentFuncName, currentListName) = getNextListName(assignInfo, currentListName, listIndex)
+        if ( (currentFuncName == None) and (currentListName == None) ):
+            break
+        counter_nodeNameSplit += 1
+
+    return (currentFuncName, currentListName)
+
+def getVarNameEntryFromAssignInfo(assignInfo, varName):
+    retFuncName = None
+    retVarInfoObj = None
+    currentRetVarInfoObjIsExpandNode = False
+
+    for funcName in assignInfo:
+        for currentVarName in assignInfo[funcName]:
+            if (currentVarName == varName):
+                if ( (retVarInfoObj != None) or (retFuncName != None) ):
+                    if (funcName != TYPES_HEADER):
+                        if ( (assignInfo[funcName][currentVarName].getIsExpandNode() == True) and (currentRetVarInfoObjIsExpandNode == True) ):
+                            pass
+                        elif ( (assignInfo[funcName][currentVarName].getIsExpandNode() == True) and (currentRetVarInfoObjIsExpandNode == False) ):
+                            pass
+                        elif ( (assignInfo[funcName][currentVarName].getIsExpandNode() == False) and (currentRetVarInfoObjIsExpandNode == True) ):
+                            retFuncName = funcName
+                            retVarInfoObj = assignInfo[funcName][currentVarName]
+                            currentRetVarInfoObjIsExpandNode = False
+                        elif ( (assignInfo[funcName][currentVarName].getIsExpandNode() == False) and (currentRetVarInfoObjIsExpandNode == False) ):
+                            retFuncName = funcName
+                            retVarInfoObj = assignInfo[funcName][currentVarName]
+                            currentRetVarInfoObjIsExpandNode = False
+                    elif (retFuncName != TYPES_HEADER):
+                        pass
+                    elif ( (retVarInfoObj.hasBeenSet() == False) and (assignInfo[funcName][currentVarName].hasBeenSet() == True) ):
+                        retFuncName = funcName
+                        retVarInfoObj = assignInfo[funcName][currentVarName]
+                        if (retVarInfoObj.getIsExpandNode() == True):
+                            currentRetVarInfoObjIsExpandNode = True
+                        else:
+                            currentRetVarInfoObjIsExpandNode = False
+                    elif ( (retVarInfoObj.hasBeenSet() == True) and (assignInfo[funcName][currentVarName].hasBeenSet() == False) ):
+                        pass
+                    else:
+                        sys.exit("getVarNameEntryFromAssignInfo in SDLParser.py found multiple assignments of the same variable is assignInfo in which neither of the functions is " + str(TYPES_HEADER))
+                else:
+                    retFuncName = funcName
+                    retVarInfoObj = assignInfo[funcName][currentVarName]
+                    if (retVarInfoObj.getIsExpandNode() == True):
+                        currentRetVarInfoObjIsExpandNode = True
+                    else:
+                        currentRetVarInfoObjIsExpandNode = False
+
+    #if ( (retVarInfoObj == None) or (retFuncName == None) ):
+        #sys.exit("getVarNameEntryFromAssignInfo in SDLParser.py could not locate entry in assignInfo of the name passed in.")
+
+    return (retFuncName, retVarInfoObj)
+
 def isValidType(possibleType):
     for validType in types:
         if (str(possibleType) == str(validType)):

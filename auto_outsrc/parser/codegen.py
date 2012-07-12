@@ -84,7 +84,7 @@ def addGroupObjGlobalVar():
     if ( (type(groupObjName) is not str) or (len(groupObjName) == 0) ):
         sys.exit("addGroupObjGlobalVar in codegen.py:  groupObjName in config.py is invalid.")
 
-    (possibleFuncName, possibleVarInfoObj) = getVarNameEntryFromAssignInfo(groupObjName)
+    (possibleFuncName, possibleVarInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, groupObjName)
     if ( (possibleFuncName != None) or (possibleVarInfoObj != None) ):
         sys.exit("addGroupObjGlobalVar in codegen.py:  groupObjName in config.py is also the name of a variable in the cryptoscheme (not allowed).")
 
@@ -783,7 +783,7 @@ def writeLambdaFuncAssignStmt(outputFile, binNode):
 
     varName = getFullVarName(binNode.left, True)
 
-    (funcName, varInfoObj) = getVarNameEntryFromAssignInfo(varName)
+    (funcName, varInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, varName)
     if ( (funcName == None) or (varInfoObj == None) or (varInfoObj.getDotProdObj() == None) ):
         sys.exit("writeLambdaFuncAssignStmt in codegen.py:  problem with values returned from getVarNameEntryFromAssignInfo.")
 
