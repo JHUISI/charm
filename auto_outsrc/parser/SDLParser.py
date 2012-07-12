@@ -891,7 +891,7 @@ def getOutputVarsDictOfFuncRecursive(retList, funcName, outputVarInfoObj):
     if (outputVarInfoObj == None):
         sys.exit("getOutputVarsDictOfFuncRecursive in SDLParser.py:  outputVarInfoObj parameter passed in is of None type.")
 
-    if (len(outputVarInfoObj.getListNodesList()) > 0):
+    if ( ( (outputVarInfoObj.getType() == ops.LIST) or (outputVarInfoObj.getType() == ops.SYMMAP) ) and (len(outputVarInfoObj.getListNodesList()) > 0) ):
         for outputVarName in outputVarInfoObj.getListNodesList():
             if (outputVarName in retList):
                 sys.exit("getOutputVarsDictOfFuncRecursive in SDLParser.py:  duplicate variable names found in retList parameter passed in to function.")
@@ -1205,6 +1205,9 @@ def getVarNamesToFuncs_All():
 
 def getVarNamesToFuncs_Assign():
     return varNamesToFuncs_Assign
+
+def externalGetVarDepList():
+    return varDepList
 
 def removeFromLinesOfCode(linesToRemove):
     global linesOfCode

@@ -9,6 +9,10 @@ assignInfo = None
 varTypes = None
 astNodes = None
 forLoops = None
+publicVarNames = None
+secretVarNames = None
+varDepList = None
+blindingFactorMap = {}
 
 def processListOrExpandNodes(binNode, origVarName, newVarName):
     binNodeRight = binNode.right
@@ -47,13 +51,16 @@ def replaceVarInstancesInLineNoRange(startLineNo, endLineNo, origVarName, newVar
     updateCodeAndStructs()
 
 def updateCodeAndStructs():
-    global assignInfo, varTypes, astNodes, forLoops
+    global assignInfo, varTypes, astNodes, forLoops, publicVarNames, secretVarNames, varDepList
 
     parseLinesOfCode(getLinesOfCode(), False)
     assignInfo = getAssignInfo()
     varTypes = getVarTypes()
     astNodes = getAstNodes()
     forLoops = getForLoops()
+    publicVarNames = getPublicVarNames()
+    secretVarNames = getSecretVarNames()
+    varDepList = externalGetVarDepList()
 
 def writeLinesToFuncAfterVarLastAssign(funcName, lineList, varName):
     if (varName == None):
@@ -146,13 +153,40 @@ def varListContainsParentDict(varList, parentDict):
 
     return False
 
+def getShouldThisElemBeUnblinded(keygenOutputElem, varsModifiedInKeygen):
+    if (keygenOutputElem in publicVarNames):
+        return True
+
+    if ( (keygenOutputElem not in secretVarNames) and (keygenOutputElem not in varsModifiedInKeygen) ):
+        return True
+
+    if (keygenFuncName not in varDepList):
+        sys.exit("getShouldThisElemBeUnblinded in keygen.py:  keygen function name is not in varDepList.")
+
+    if (keygenOutputElem not in varDepList[keygenFuncName]):
+        sys.exit("getShouldThisElemBeUnblinded in keygen.py:  keygenOutputElem parameter passed in is not in varDepList[keygenFuncName].")
+
+    varDepsOfThisElem = varDepList[keygenFuncName][keygenOutputElem]
+
+    for varDep in varDepsOfThisElem:
+        tempVarDep = varDep
+        listSymIndex = tempVarDep.find(LIST_INDEX_SYMBOL)
+        if (listSymIndex != -1):
+            tempVarDep = tempVarDep[0:listSymIndex]
+        if (tempVarDep in secretVarNames):
+            return False
+
+    return True
+
 def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListDecls):
     SDLLinesForKeygen = []
 
     varsModifiedInKeygen = list(assignInfo[keygenFuncName].keys())
     varsModifiedInKeygen = removeListIndicesAndDupsFromList(varsModifiedInKeygen)
 
-    if (keygenOutputElem not in varsModifiedInKeygen):
+    shouldThisElemBeUnblinded = getShouldThisElemBeUnblinded(keygenOutputElem, varsModifiedInKeygen)
+
+    if (shouldThisElemBeUnblinded == True):
         SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + " := " + keygenOutputElem + "\n")
         if (keygenOutputElem in varsToBlindList):
             varsToBlindList.remove(keygenOutputElem)

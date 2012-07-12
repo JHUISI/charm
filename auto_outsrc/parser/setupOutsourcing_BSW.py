@@ -11,8 +11,6 @@ Dj = {}
 Djp = {}
 Cr = {}
 Cpr = {}
-DjBlinded = {}
-DjpBlinded = {}
 
 def setup():
 	global g
@@ -36,8 +34,6 @@ def keygen(pk, mk, S):
 	global Y
 	global Dj
 	global Djp
-	global DjBlinded
-	global DjpBlinded
 
 	input = [pk, mk, S]
 	SBlinded = S
@@ -52,10 +48,8 @@ def keygen(pk, mk, S):
 		y0 = S[y]
 		Dj[y0] = (p0 * (group.hash(y0, G2) ** s_y))
 		Djp[y0] = (g ** s_y)
-	for y in Djp:
-		DjpBlinded[y] = (Djp[y] ** (1 / zz))
-	for y in Dj:
-		DjBlinded[y] = (Dj[y] ** (1 / zz))
+	DjpBlinded = Djp
+	DjBlinded = Dj
 	sk = [SBlinded, DBlinded, DjBlinded, DjpBlinded]
 	skBlinded = [SBlinded, DBlinded, DjBlinded, DjpBlinded]
 	output = (zz, skBlinded)

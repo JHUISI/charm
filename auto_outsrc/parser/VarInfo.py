@@ -18,6 +18,7 @@ class VarInfo:
         self.type = types.NO_TYPE
         self.funcName = None
         self.isList = False
+        self.isSymmap = False
         self.listNodesList = []
         self.dotProdObj = None
         self.outsideForLoopObj = None
@@ -46,6 +47,7 @@ class VarInfo:
         v.type        = obj.type
         v.funcName    = obj.funcName
         v.isList      = obj.isList
+        v.isSymmap    = obj.isSymmap
         v.listNodesList = list(obj.listNodesList)
         v.dotProdObj  = obj.dotProdObj
         v.outsideForLoopObj = obj.outsideForLoopObj
@@ -119,6 +121,9 @@ class VarInfo:
 
     def getIsList(self):
         return self.isList
+
+    def getIsSymmap(self):
+        return self.isSymmap
 
     def getListNodesList(self):
         return self.listNodesList
@@ -220,6 +225,10 @@ class VarInfo:
                 self.listElementsType = onlyListElementsTypeDecl
             else:
                 addListNodesToList(self.assignNode.right, self.listNodesList)
+        elif (self.assignNode.right.type == ops.SYMMAP):
+            self.isSymmap = True
+            self.type = ops.SYMMAP
+            addListNodesToList(self.assignNode.right, self.listNodesList)
         elif ( (self.assignNode.right.type == ops.ON) and (self.assignNode.right.left.type == ops.PROD) ):
             dotProdObj = DotProd()
             dotProdObj.setDotProdObj(self.assignNode.right, self.lineNo, self.funcName)
