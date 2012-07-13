@@ -225,21 +225,49 @@ class VarInfo:
 
         return None
 
+    def getVarNameEntryFromAssignInfo_Wrapper(self, node, varNameString):
+        numListIndexSymbols = varNameString.count(LIST_INDEX_SYMBOL)
+        if (numListIndexSymbols == 0):
+            (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(self.assignInfo, varNameString)
+        else:
+            (retFuncName, retVarInfoObjString) = getVarNameFromListIndices(self.assignInfo, node)
+            (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(self.assignInfo, retVarInfoObjString)
+        return (retFuncName, retVarInfoObj)
+
+    def addNonNumListIndicesString(self, retNode, origNodeNameString):
+        origNodeNameSplit = origNodeNameString.split(LIST_INDEX_SYMBOL)
+        if (len(origNodeNameSplit) == 1):
+            return
+
+        skipFirst = True
+        stillNumIndices = True
+
+        for listIndex in origNodeNameSplit:
+            if (skipFirst == True):
+                skipFirst = False
+                continue
+
+            if (listIndex.isdigit() == True):
+                if (stillNumIndices == True):
+                    continue
+            else:
+                if (stillNumIndices == True):
+                    stillNumIndices = False
+
     def traverseAssignBaseElemsOnlyRecursive(self, node):
         if (node.type == ops.ATTR):
-            numListIndexSymbols = (getFullVarName(node, False)).count(LIST_INDEX_SYMBOL)
-            if (numListIndexSymbols == 0):
-                (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(self.assignInfo, str(node))
-            else:
-                (retFuncName, retVarInfoObjString) = getVarNameFromListIndices(self.assignInfo, node)
-                (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(self.assignInfo, retVarInfoObjString)
+            (retFuncName, retVarInfoObj) = self.getVarNameEntryFromAssignInfo_Wrapper(node, getFullVarName(node, False))
             if ( (retFuncName != None) and (retVarInfoObj != None) ):
-                node = copy.deepcopy(retVarInfoObj.getAssignBaseElemsOnly())
-                return
-        elif ( (node.type == ops.LIST) or (node.type == ops.SYMMAP) ):
+                retNode = copy.deepcopy(retVarInfoObj.getAssignBaseElemsOnly())
+                if (retNode == None):
+                    return node
+                else:
+                    #self.addNonNumListIndicesString(retNode, getFullVarName(node, False))
+                    return retNode
+        elif ( (node.type == ops.LIST) or (node.type == ops.SYMMAP) or (node.type == ops.EXPAND) or (node.type == ops.FUNC) ):
             newListNodesList = []
             for oldListItem in node.listNodes:
-                (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(self.assignInfo, oldListItem)
+                (retFuncName, retVarInfoObj) = self.getVarNameEntryFromAssignInfo_Wrapper(node, oldListItem)
                 if ( (retFuncName == None) or (retVarInfoObj == None) ):
                     if (oldListItem in namesOfFutureDeclVars):
                         newListNodesList.append(oldListItem)
@@ -254,9 +282,13 @@ class VarInfo:
             node.listNodes = newListNodesList
 
         if (node.left != None):
-            self.traverseAssignBaseElemsOnlyRecursive(node.left)
+            retNodeLeft = self.traverseAssignBaseElemsOnlyRecursive(node.left)
+            node.left = retNodeLeft
         if (node.right != None):
-            self.traverseAssignBaseElemsOnlyRecursive(node.right)
+            retNodeRight = self.traverseAssignBaseElemsOnlyRecursive(node.right)
+            node.right = retNodeRight
+
+        return node
 
     def traverseAssignNode(self):
         if (self.assignNode == None):
@@ -288,8 +320,9 @@ class VarInfo:
             self.assignBaseElemsOnly = self.assignNode.left
 
         if (self.assignBaseElemsOnly == None):
-            self.assignBaseElemsOnly = copy.deepcopy(self.assignNode.right)
-            self.traverseAssignBaseElemsOnlyRecursive(self.assignBaseElemsOnly)
+            assignNodeRightDeepCopy = copy.deepcopy(self.assignNode.right)
+            newAssignBaseElemsOnlyNode = self.traverseAssignBaseElemsOnlyRecursive(assignNodeRightDeepCopy)
+            self.assignBaseElemsOnly = newAssignBaseElemsOnlyNode
 
         self.traverseAssignNodeRecursive(self.assignNode.right, False)
 
