@@ -267,7 +267,6 @@ Element *convertToZR(PyObject *longObj, PyObject *elemObj) {
 #endif
 	longObjToInt(x, (PyLongObject *) longObj);
 	element_set_int(new->e, x);
-//	element_set_mpz(new->e, x);
 	bn_free(x);
 	return new;
 }
@@ -333,7 +332,7 @@ int hash2_element_to_bytes(element_t *e, uint8_t* last_buf, int hash_size, uint8
 	memset(temp_buf, 0, SHA_LEN);
 	element_to_key(*e, temp_buf, SHA_LEN, HASH_FUNCTION_ELEMENTS);
 
-	uint8_t* temp2_buf[last_buflen + buf_len + 1];
+	uint8_t temp2_buf[last_buflen + buf_len + 1];
 	memset(temp2_buf, 0, (last_buflen + buf_len));
 	strncat((char *) temp2_buf, (char *) last_buf, last_buflen);
 	strncat((char *) temp2_buf, (char *) temp_buf, SHA_LEN);
@@ -420,8 +419,10 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
         return -1; 
 	}
 
-    if(pairing_init() == ELEMENT_OK) {
-    	printf("%s: successfully initialized pairing object..\n", __FUNCTION__);
+    if(pairing_init() != ELEMENT_OK) {
+//    	printf("%s: successfully initialized pairing object..\n", __FUNCTION__);
+    	PyErr_SetString(ElementError, "could not initialize pairing object.");
+    	return -1;
     }
 
 //	self->pairing = pairing;
@@ -429,24 +430,6 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 	self->safe_pairing_clear = TRUE;
     return 0;
 }
-
-/*
-PyObject *Element_call(Element *elem, PyObject *args, PyObject *kwds)
-{
-	PyObject *object;
-	Element *newObject;
-	
-	if(!PyArg_ParseTuple(args, "O:ref", &object)) {
-		EXIT_IF(TRUE, "invalid argument.");
-	}
-	
-	newObject = (Element *) object;
-	// element_printf("Elment->e => '%B'\n", newObject->e);
-	debug("Element->type => '%d'\n", newObject->element_type);
-	
-	return NULL;
-}
-*/
  
 static PyObject *Element_elem(Element* self, PyObject* args)
 {
@@ -1373,8 +1356,8 @@ static PyObject *Get_Order(Element *self, PyObject *args) {
 	EXIT_IF(!PyArg_ParseTuple(args, "O", &obj), "invalid group object");
 
 	if(PyElement_Check(obj)) {
-		Element *group = (Element *) obj;
-		IS_PAIRING_OBJ_NULL(group);
+//		Element *group = (Element *) obj;
+//		IS_PAIRING_OBJ_NULL(group);
 		integer_t x;
 		bn_inits(x);
 		get_order(x);
@@ -1843,6 +1826,13 @@ void initpairing(void) 		{
 	PyModule_AddIntConstant(m, "Pair", PAIRINGS);
 	PyModule_AddIntConstant(m, "Granular", GRANULAR);
 #endif
+
+	/* only supporting one for now */
+//    PyModule_AddIntConstant(m, "BN158", 0);
+    PyModule_AddIntConstant(m, "BN254", 1);
+//    PyModule_AddIntConstant(m, "BN256", 2);
+//    PyModule_AddIntConstant(m, "BN638", 3);
+//    PyModule_AddIntConstant(m, "KSS508",4);
 
 #if PY_MAJOR_VERSION >= 3
 	return m;
