@@ -118,6 +118,17 @@ if opt.get('PAIR_MOD') == 'yes':
                                         utils_path+'sha1.c',
                                         utils_path+'base64.c'],
                             libraries=['pbc', 'gmp'], define_macros=_macros, undef_macros=_undef_macro)
+    elif opt.get('USE_RELIC') == 'yes':
+        # check if RELIC lib has been built. if not, bail
+        pairing_module = Extension(math_prefix + '.pairing',
+                            include_dirs = [utils_path,
+                                            benchmark_path,
+                                            math_path + 'pairing/relic/include', math_path + 'pairing/relic-src/include'],
+                            sources = [math_path + 'pairing/relic/pairingmodule3.c',
+                                        math_path + 'pairing/relic/relic_interface.c',
+                                        utils_path + 'base64.c'],
+                            libraries=None,
+                            extra_objects=[math_path+'pairing/relic/lib/librelic_s.a'], extra_compile_args=None)
     else:
         # build MIRACL based pairing module - note that this is for experimental use only
         pairing_module = Extension(math_prefix + '.pairing',

@@ -1,8 +1,35 @@
-/* Disclaimer: this version of the pairing module uses the MIRACL library (www.shamus.ie).
- * At the moment, only useful for academic purposes and should be treated as such.
- * To build into Charm, you'll need to acquire the MIRACL source and compile with
- * build script located in the miracl dir.
+/*
+ * Charm-Crypto is a framework for rapidly prototyping cryptosystems.
+ *
+ * Charm-Crypto is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * Charm-Crypto is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Charm-Crypto. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Please contact the charm-crypto dev team at support@charm-crypto.com
+ * for any questions.
  */
+
+/*
+*   @file    pairingmodule2.c
+*
+*   @brief   charm interface over MIRACL's pairing-based operations
+*
+*   @author  ayo.akinyele@charm-crypto.com
+* 	@remark	 this version of the pairing module uses the MIRACL library (www.shamus.ie).
+*   At the moment, only useful for academic purposes and should be treated as such.
+*   To build into Charm, you'll need to acquire the MIRACL source and compile with the
+*   build script located in the miracl dir. See the online documentation at charm-crypto.com
+*   for how to install.
+*/
 
 #ifndef PAIRINGMODULE2_H
 #define PAIRINGMODULE2_H
@@ -19,9 +46,6 @@
 #include "sha1.h"
 #include "benchmarkmodule.h"
 
-//#define DEBUG	1
-//#define TRUE	1
-//#define FALSE	0
 /* supported pairing curves */
 #define MNT160  	80
 /* buf sizes */
@@ -65,8 +89,6 @@ static Benchmark *dBench;
 /* treat everything as string in 2.x */
 #define PyBytes_ToString(a, obj) a = PyString_AsString(obj);
 #endif
-
-// static Benchmark *dObjects[MAX_BENCH_OBJECTS], *activeObject = NULL;
 
 PyMethodDef Element_methods[];
 PyMethodDef pairing_methods[];

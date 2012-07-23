@@ -779,18 +779,6 @@ static PyObject *ECE_rem(PyObject *o1, PyObject *o2) {
 	EXIT_IF(TRUE, "invalid argument type.");
 }
 
-//ECElement *ec_point_mul(EC_GROUP *group, EC_POINT *point, BIGNUM *value, BN_CTX *ctx) {
-//
-////	ECElement *ans = createNewPoint(G, group, ctx);
-//	START_CLOCK(dBench);
-////	EC_POINT_mul(group, ans->P, value, NULL, NULL, ctx);
-//	EC_POINT_mul(group, ans->P, NULL, point, value, ctx);
-//	STOP_CLOCK(dBench);
-////	BN_free(cofactor);
-////	BN_free(order);
-//	return ans;
-//}
-
 static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 	ECElement *lhs = NULL, *rhs = NULL, *ans = NULL;
 	BIGNUM *order = NULL;

@@ -2021,7 +2021,7 @@ static int pairings_clear(PyObject *m) {
 }
 
 static int pairings_free(PyObject *m) {
-	return 0;
+	return pairings_clear(m);
 }
 
 static struct PyModuleDef moduledef = {
@@ -2059,19 +2059,18 @@ void initpairing(void) 		{
 		INITERROR;
 	struct module_state *st = GETSTATE(m);
 	st->error = PyErr_NewException("pairing.Error", NULL, NULL);
-	if(st->error == NULL) {
-		Py_DECREF(m);
+	if(st->error == NULL)
 		INITERROR;
-	}
 	ElementError = st->error;
 #ifdef BENCHMARK_ENABLED
     if(import_benchmark() < 0) {
-    	Py_DECREF(m);
     	INITERROR;
     }
     if(PyType_Ready(&BenchmarkType) < 0)
     	INITERROR;
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);
+    if(st->dBench == NULL)
+    	INITERROR;
     dBench = st->dBench;
     dBench->bench_initialized = FALSE;
 
