@@ -27,8 +27,8 @@
 *
 ************************************************************************/
 
-#ifndef PAIRINGMODULE_H
-#define PAIRINGMODULE_H
+#ifndef PAIRINGMODULE3_H
+#define PAIRINGMODULE3_H
 
 #include <Python.h>
 #include <structmember.h>

@@ -19,13 +19,13 @@
  */
 
 /*
-*   @file    pairingmodule3.c
-*
-*   @brief   charm interface over RELIC's pairing-based crypto module
-*
-*   @author  ayo.akinyele@charm-crypto.com
-*
-************************************************************************/
+ *   @file    pairingmodule3.c
+ *
+ *   @brief   charm interface over RELIC's pairing-based crypto module
+ *
+ *   @author  ayo.akinyele@charm-crypto.com
+ *
+ ************************************************************************/
 
 #include "pairingmodule3.h"
 

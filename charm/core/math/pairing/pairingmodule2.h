@@ -19,17 +19,18 @@
  */
 
 /*
-*   @file    pairingmodule2.c
-*
-*   @brief   charm interface over MIRACL's pairing-based operations
-*
-*   @author  ayo.akinyele@charm-crypto.com
-* 	@remark	 this version of the pairing module uses the MIRACL library (www.shamus.ie).
-*   At the moment, only useful for academic purposes and should be treated as such.
-*   To build into Charm, you'll need to acquire the MIRACL source and compile with the
-*   build script located in the miracl dir. See the online documentation at charm-crypto.com
-*   for how to install.
-*/
+ *   @file    pairingmodule2.h
+ *
+ *   @brief   charm interface over MIRACL's pairing-based operations
+ *
+ *   @author  ayo.akinyele@charm-crypto.com
+ * 	@remark	 this version of the pairing module uses the MIRACL library (www.shamus.ie).
+ *   At the moment, only useful for academic purposes and should be treated as such.
+ *   To build into Charm, you'll need to acquire the MIRACL source and compile with the
+ *   build script located in the miracl dir. See the online documentation at charm-crypto.com
+ *   for how to install.
+ *
+ ************************************************************************/
 
 #ifndef PAIRINGMODULE2_H
 #define PAIRINGMODULE2_H
