@@ -139,9 +139,9 @@ if opt.get('PAIR_MOD') == 'yes':
                             include_dirs = [utils_path,
                                             benchmark_path,
                                             math_path + 'pairing/miracl/'], 
-                            sources = [math_path + 'pairing/pairingmodule2.c',
+                            sources = [math_path + 'pairing/miracl/pairingmodule2.c',
                                         utils_path + 'sha1.c', 
-                                        math_path + 'pairing/miracl/miraclwrapper.cc'],
+                                        math_path + 'pairing/miracl/miracl_interface.cc'],
                             libraries=['gmp','stdc++'],
                             extra_objects=[math_path+'pairing/miracl/miracl.a'], extra_compile_args=None)
 

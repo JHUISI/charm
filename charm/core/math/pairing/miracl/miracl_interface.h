@@ -1,3 +1,32 @@
+/*
+ * Charm-Crypto is a framework for rapidly prototyping cryptosystems.
+ *
+ * Charm-Crypto is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * Charm-Crypto is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Charm-Crypto. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Please contact the charm-crypto dev team at support@charm-crypto.com
+ * for any questions.
+ */
+
+/*
+*   @file    miracl_interface.h
+*
+*   @brief   charm interface over MIRACL's pairing-based crypto C++ classes
+*
+*   @author  ayo.akinyele@charm-crypto.com
+*
+************************************************************************/
+
 #include <gmp.h>
 
 typedef void pairing_t;

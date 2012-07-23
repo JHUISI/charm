@@ -39,7 +39,7 @@
 #include <structmember.h>
 #include <longintrepr.h>
 #include <stdlib.h>
-#include "miraclwrapper.h"
+#include "miracl_interface.h"
 #include <gmp.h>
 #include <sys/types.h>
 #include <sys/stat.h>
