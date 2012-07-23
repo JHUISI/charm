@@ -131,7 +131,7 @@ if opt.get('PAIR_MOD') == 'yes':
                             sources = [math_path + 'pairing/relic/pairingmodule3.c',
                                         math_path + 'pairing/relic/relic_interface.c',
                                         utils_path + 'base64.c'],
-                            libraries=None,
+                            libraries=None, define_macros=_macros, undef_macros=_undef_macro,
                             extra_objects=[math_path+'pairing/relic/lib/librelic_s.a'], extra_compile_args=None)
     else:
         # build MIRACL based pairing module - note that this is for experimental use only

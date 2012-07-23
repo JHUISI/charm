@@ -187,10 +187,11 @@ static PyObject *func_name(PyObject *self, PyObject *args) { \
 	int id = -1;					\
 	MeasureType option = NONE;			\
 	if(PyArg_ParseTuple(args, "i|i", &id, &option)) { \
-		if(option != NONE) return Retrieve_result(dBench, option); \
-		else if(id == bench->identifier) return Benchmark_print(dBench); \
+		return Retrieve_result(dBench, option); \
 		Py_RETURN_FALSE;	}		\
 	Py_RETURN_FALSE;	}
+
+// 		else if(id == bench->identifier) return Benchmark_print(dBench);
 
 #define GetAllBenchmarks_CAPI(func_name, bench)	\
 static PyObject *func_name(PyObject *self, PyObject *args) { \

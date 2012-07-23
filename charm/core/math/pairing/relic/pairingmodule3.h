@@ -44,7 +44,7 @@
 //#define DEBUG	1
 //#define TRUE	1
 //#define FALSE	0
-#define BenchmarkIdentifier 1
+#define BenchmarkIdentifier 4
 #define MAX_LEN 2048
 #define HASH_LEN 20
 #define ID_LEN   4
