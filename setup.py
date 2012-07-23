@@ -215,6 +215,6 @@ setup(name = 'Charm-Crypto',
                     'charm.toolbox',
                     'charm.zkp_compiler',
                 ],
-    license = 'GPL',
+    license = 'LGPL',
     cmdclass={'uninstall':UninstallCommand,'test':PyTest}
 )
