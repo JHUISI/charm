@@ -2020,8 +2020,8 @@ void initpairing(void) 		{
 	}
 	ElementError = st->error;
 
-//    if(import_benchmark() < 0)
-//    	INITERROR;
+    if(import_benchmark() < 0)
+    	INITERROR;
     if(PyType_Ready(&BenchmarkType) < 0)
     	INITERROR;
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);

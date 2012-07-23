@@ -1828,7 +1828,7 @@ void initpairing(void) 		{
 #endif
 
 	/* only supporting one for now */
-//    PyModule_AddIntConstant(m, "BN158", 0);
+    PyModule_AddIntConstant(m, "BN158", 0);
     PyModule_AddIntConstant(m, "BN254", 1);
 //    PyModule_AddIntConstant(m, "BN256", 2);
 //    PyModule_AddIntConstant(m, "BN638", 3);
