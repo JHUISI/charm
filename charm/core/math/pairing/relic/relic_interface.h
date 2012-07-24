@@ -48,7 +48,6 @@ typedef enum _status_t { ELEMENT_OK = 0,
 	   ELEMENT_PAIRING_INIT_FAILED,
 	   ELEMENT_UNINITIALIZED,
 	   ELEMENT_DIV_ZERO
-//	   ELEMENT_INVALID_*?
 } status_t;
 
 enum Group {ZR, G1, G2, GT, NIL};

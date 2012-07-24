@@ -83,7 +83,9 @@ status_t element_init_G1(element_t e)
 {
 //	if(e->g1 != NULL) g1_free(e->g1);
 	g1_inits(e->g1);
+	bn_inits(e->order);
 	g1_set_infty(e->g1);
+	g1_get_ord(e->order);
 	e->isInitialized = TRUE;
 	e->type = G1;
     return ELEMENT_OK;
@@ -93,6 +95,8 @@ status_t element_init_G2(element_t e)
 {
 	g2_inits(e->g2);
 	g2_set_infty(e->g2);
+	bn_inits(e->order);
+	g2_get_ord(e->order);
 	e->isInitialized = TRUE;
 	e->type = G2;
     return ELEMENT_OK;
@@ -101,7 +105,9 @@ status_t element_init_G2(element_t e)
 status_t element_init_GT(element_t e)
 {
 	gt_inits(e->gt);
+	bn_inits(e->order);
 	gt_set_unity(e->gt);
+	g1_get_ord(e->order);
 	e->isInitialized = TRUE;
 	e->type = GT;
     return ELEMENT_OK;
@@ -158,9 +164,7 @@ status_t element_clear(element_t e)
     if(e->isInitialized == TRUE) {
     	if(e->type == ZR) {
     		bn_free(e->bn);
-    		bn_free(e->order);
     		bn_null(e->bn);
-    		bn_null(e->order);
 		}
     	else if(e->type == G1) {
     		g1_free(e->g1);
@@ -174,7 +178,11 @@ status_t element_clear(element_t e)
     		gt_free(e->gt);
     		gt_null(e->gt);
     	}
-
+    	else {
+    		return ELEMENT_INVALID_TYPES;
+    	}
+		bn_free(e->order);
+		bn_null(e->order);
     	e->isInitialized = FALSE;
     	e->type = NIL;
     }
@@ -213,29 +221,20 @@ status_t element_sub(element_t c, element_t a, element_t b)
 {
 	GroupType type;
 	EXIT_IF_NOT_SAME(type, a, b);
-	LEAVE_IF(a[0].isInitialized != TRUE || b[0].isInitialized != TRUE, "uninitialized arguments.");
+	LEAVE_IF(a->isInitialized != TRUE || b->isInitialized != TRUE, "uninitialized arguments.");
+	LEAVE_IF( c->type != type, "result initialized but invalid type.");
 
 	if(type == ZR) {
-		if(c[0].isInitialized != TRUE)
-			element_init_Zr(c, 0);
-		bn_sub(c[0].bn, a[0].bn, b[0].bn);
-		bn_mod(c[0].bn, c[0].bn, c[0].order);
+		bn_sub(c->bn, a->bn, b->bn);
+		bn_mod(c->bn, c->bn, c->order);
 	}
 	else if(type == G1) {
-		if(c[0].isInitialized != TRUE)
-			element_init_G1(c);
-		/* verify c is G1 */
-		LEAVE_IF( c[0].type != G1, "result initialized but invalid type.");
-		g1_sub(c[0].g1, a[0].g1, b[0].g1);
-		g1_norm(c[0].g1, c[0].g1);
+		g1_sub(c->g1, a->g1, b->g1);
+		g1_norm(c->g1, c->g1);
 	}
 	else if(type == G2) {
-		if(c[0].isInitialized != TRUE)
-			element_init_G2(c);
-		/* verify c is G2 */
-		LEAVE_IF( c[0].type != G2, "result initialized but invalid type.");
-		g2_sub(c[0].g2, a[0].g2, b[0].g2);
-		g2_norm(c[0].g2, c[0].g2);
+		g2_sub(c->g2, a->g2, b->g2);
+		g2_norm(c->g2, c->g2);
 	}
 	else {
 		return ELEMENT_INVALID_TYPES;
@@ -279,20 +278,17 @@ status_t element_mul_zr(element_t c, element_t a, element_t b)
 	GroupType type = a[0].type;
 	// TODO: c (type) = a (type) * b (ZR)
 	LEAVE_IF(a->isInitialized != TRUE, "invalid argument.");
+	LEAVE_IF(b->type != ZR || b->isInitialized != TRUE, "invalid type.");
+	LEAVE_IF(c->isInitialized != TRUE || c->type != type, "result not initialized or invalid type.");
 
 	if(type == G1) {
-		LEAVE_IF(b->type != ZR || b->isInitialized != TRUE, "invalid type.");
-		LEAVE_IF(c->isInitialized != TRUE || c->type != type, "result not initialized or invalid type.");
 		g1_mul(c->g1, a->g1, b->bn);
 	}
 	else if(type == G2) {
-		LEAVE_IF(b->type != ZR || b->isInitialized != TRUE, "invalid type.");
-		LEAVE_IF(c->isInitialized != TRUE || c->type != type, "result not initialized or invalid type.");
 		g2_mul(c->g2, a->g2, b->bn);
 	}
 	else if(type == GT) {
-		LEAVE_IF(c[0].isInitialized != TRUE || c[0].type != type, "result not initialized or invalid type.");
-		gt_exp(c[0].gt, a[0].gt, b[0].bn);
+		gt_exp(c->gt, a->gt, b->bn);
 	}
 	else {
 		return ELEMENT_INVALID_TYPES;
@@ -805,16 +801,16 @@ status_t element_from_bytes(element_t e, unsigned char *data, int data_len)
 	LEAVE_IF(e->isInitialized != TRUE, "uninitialized argument.");
 	GroupType type = e->type;
 	if(type == ZR) {
-		bn_read_bin(e->bn, data, data_len); // : DONE
+		bn_read_bin(e->bn, data, data_len);
 	}
 	else if(type == G1) {
-		return g1_read_bin(e->g1, data, data_len); // x & y : TODO
+		return g1_read_bin(e->g1, data, data_len); // x & y
 	}
 	else if(type == G2) {
-		return g2_read_bin(e->g2, data, data_len); // x1, y1  & x2, y2 : TODO
+		return g2_read_bin(e->g2, data, data_len); // x1, y1  & x2, y2
 	}
 	else if(type == GT) {
-		return gt_read_bin(e->gt, data, data_len); // x1-6 && y1-6 : TODO
+		return gt_read_bin(e->gt, data, data_len); // x1-6 && y1-6
 	}
 	else {
 		return ELEMENT_INVALID_TYPES;
@@ -828,16 +824,16 @@ status_t element_to_bytes(unsigned char *data, int data_len, element_t e)
 	LEAVE_IF(e->isInitialized != TRUE, "uninitialized argument.");
 	GroupType type = e->type;
 	if(type == ZR) {
-		bn_write_bin(data, data_len, e->bn); // : DONE
+		bn_write_bin(data, data_len, e->bn);
 	}
 	else if(type == G1) {
-		return g1_write_bin(e->g1, data, data_len); // x & y : TODO
+		return g1_write_bin(e->g1, data, data_len); // x & y
 	}
 	else if(type == G2) {
-		return g2_write_bin(e->g2, data, data_len); // x1, y1  & x2, y2 : TODO
+		return g2_write_bin(e->g2, data, data_len); // x1, y1  & x2, y2
 	}
 	else if(type == GT) {
-		return gt_write_bin(e->gt, data, data_len); // x1-6 && y1-6 : TODO
+		return gt_write_bin(e->gt, data, data_len); // x1-6 && y1-6
 	}
 	else {
 		return ELEMENT_INVALID_TYPES;
@@ -858,9 +854,10 @@ status_t element_to_key(element_t e, uint8_t *data, int data_len, uint8_t label)
 	if(d_len > 0 && digest_len <= data_len) {
 		element_to_bytes(d, d_len, e);
 		d[d_len-1] = label;
-//		printf("%s: bytes form....\n", __FUNCTION__);
-//		print_as_hex(d, d_len);
-
+#ifdef DEBUG
+		printf("%s: bytes form....\n", __FUNCTION__);
+		print_as_hex(d, d_len);
+#endif
 		// hash buf using md_map_sh256 and store data_len bytes in data
 		uint8_t digest[digest_len + 1];
 		memset(digest, 0, digest_len);
@@ -910,14 +907,10 @@ status_t pairing_apply(element_t et, element_t e1, element_t e2)
 int element_is_member(element_t e)
 {
 	LEAVE_IF(e->isInitialized != TRUE, "uninitialized argument.");
-	bn_t n;
 	int result;
 
-	bn_inits(n);
-	g1_get_ord(n);
-
 	if(e->type == ZR) {
-		if(bn_cmp(e->bn, n) <= CMP_EQ)
+		if(bn_cmp(e->bn, e->order) <= CMP_EQ)
 			result = TRUE;
 		else
 			result = FALSE;
@@ -926,7 +919,7 @@ int element_is_member(element_t e)
 		g1_t r;
 		g1_inits(r);
 
-		g1_mul(r, e->g1, n);
+		g1_mul(r, e->g1, e->order);
 		if(g1_is_infty(r) == 1)
 			result = TRUE;
 		else
@@ -935,9 +928,9 @@ int element_is_member(element_t e)
 	}
 	else if(e->type == G2) {
 		g2_t r;
-		g1_inits(r);
+		g2_inits(r);
 
-		g2_mul(r, e->g2, n);
+		g2_mul(r, e->g2, e->order);
 		if(g2_is_infty(r) == 1)
 			result = TRUE;
 		else
@@ -948,7 +941,7 @@ int element_is_member(element_t e)
 		gt_t r;
 		gt_inits(r);
 
-		gt_exp(r, e->gt, n);
+		gt_exp(r, e->gt, e->order);
 		if(gt_is_unity(r) == 1)
 			result = TRUE;
 		else
@@ -958,8 +951,6 @@ int element_is_member(element_t e)
 	else {
 		result = ELEMENT_INVALID_ARG;
 	}
-
-	bn_free(n);
 
 	return result;
 }
