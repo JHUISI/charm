@@ -159,6 +159,50 @@ status_t element_printf(const char *msg, element_t e)
     return ELEMENT_INVALID_RESULT;
 }
 
+//TODO:
+status_t element_to_str(char *data, int len, element_t e)
+{
+    if(e->isInitialized == TRUE) {
+    	int str_len = element_length(e) * 2;
+		if(str_len > len) return ELEMENT_INVALID_ARG;
+		memset(data, 0, len);
+    	uint8_t tmp1[str_len+1];
+		memset(tmp1, 0, str_len);
+
+    	if(e->type == ZR) {
+    		bn_write_str(data, str_len, e->bn, BASE);
+    	}
+    	else if(e->type == G1) {
+			g1_write_str(e->g1, tmp1, str_len);
+
+			int dist_y = FP_STR;
+			snprintf(data, len, "[%s, %s]", tmp1, &(tmp1[dist_y]));
+    	}
+    	else if(e->type == G2) {
+			g2_write_str(e->g2, tmp1, str_len);
+
+			int len2 = FP_STR;
+			int dist_x1 = len2, dist_y0 = len2 * 2, dist_y1 = len2 * 3;
+			snprintf(data, len, "[%s, %s, %s, %s]", tmp1, &(tmp1[dist_x1]), &(tmp1[dist_y0]), &(tmp1[dist_y1]));
+    	}
+    	else if(e->type == GT) {
+			gt_write_str(e->gt, tmp1, str_len);
+
+    		int len2 = FP_STR;
+    		int dist_x01 = len2, dist_x10 = len2 * 2, dist_x11 = len2 * 3,
+    			dist_x20 = len2 * 4, dist_x21 = len2 * 5, dist_y00 = len2 * 6,
+    			dist_y01 = len2 * 7, dist_y10 = len2 * 8, dist_y11 = len2 * 9,
+    			dist_y20 = len2 * 10, dist_y21 = len2 * 11;
+			 snprintf(data, len, "[%s, %s, %s, %s, %s, %s], [%s, %s, %s, %s, %s, %s]",
+    		 			  tmp1, &(tmp1[dist_x01]), &(tmp1[dist_x10]), &(tmp1[dist_x11]),
+    					  &(tmp1[dist_x20]), &(tmp1[dist_x21]),
+    					  &(tmp1[dist_y00]), &(tmp1[dist_y01]), &(tmp1[dist_y10]), &(tmp1[dist_y11]),
+    					  &(tmp1[dist_y20]), &(tmp1[dist_y21]));
+    	}
+    }
+    return ELEMENT_OK;
+}
+
 status_t element_clear(element_t e)
 {
     if(e->isInitialized == TRUE) {
@@ -191,8 +235,8 @@ status_t element_clear(element_t e)
 
 status_t element_add(element_t c, element_t a, element_t b)
 {
-	GroupType type;
-	EXIT_IF_NOT_SAME(type, a, b);
+	GroupType type = a->type;
+	EXIT_IF_NOT_SAME(a, b);
 	LEAVE_IF(a->isInitialized != TRUE || b->isInitialized != TRUE || c->isInitialized != TRUE, "uninitialized arguments.");
 
 	if(type == ZR) {
@@ -219,8 +263,8 @@ status_t element_add(element_t c, element_t a, element_t b)
 
 status_t element_sub(element_t c, element_t a, element_t b)
 {
-	GroupType type;
-	EXIT_IF_NOT_SAME(type, a, b);
+	GroupType type = a->type;
+	EXIT_IF_NOT_SAME(a, b);
 	LEAVE_IF(a->isInitialized != TRUE || b->isInitialized != TRUE, "uninitialized arguments.");
 	LEAVE_IF( c->type != type, "result initialized but invalid type.");
 
@@ -245,8 +289,8 @@ status_t element_sub(element_t c, element_t a, element_t b)
 
 status_t element_mul(element_t c, element_t a, element_t b)
 {
-	GroupType type;
-	EXIT_IF_NOT_SAME(type, a, b);
+	GroupType type = a->type;
+	EXIT_IF_NOT_SAME(a, b);
 	LEAVE_IF(a->isInitialized != TRUE || b->isInitialized != TRUE || c->isInitialized != TRUE, "uninitialized arguments.");
 	LEAVE_IF( c->type != type, "result initialized but invalid type.");
 
@@ -275,7 +319,7 @@ status_t element_mul(element_t c, element_t a, element_t b)
 // aka scalar multiplication?
 status_t element_mul_zr(element_t c, element_t a, element_t b)
 {
-	GroupType type = a[0].type;
+	GroupType type = a->type;
 	// TODO: c (type) = a (type) * b (ZR)
 	LEAVE_IF(a->isInitialized != TRUE, "invalid argument.");
 	LEAVE_IF(b->type != ZR || b->isInitialized != TRUE, "invalid type.");
@@ -326,8 +370,8 @@ status_t element_mul_int(element_t c, element_t a, integer_t b)
 
 status_t element_div(element_t c, element_t a, element_t b)
 {
-	GroupType type = a[0].type;
-	EXIT_IF_NOT_SAME(type, a, b);
+	GroupType type = a->type;
+	EXIT_IF_NOT_SAME(a, b);
 	LEAVE_IF(a->isInitialized != TRUE || b->isInitialized != TRUE || c->isInitialized != TRUE, "uninitialized arguments.");
 	LEAVE_IF( c->type != type, "result initialized but invalid type.");
 
@@ -362,7 +406,7 @@ status_t element_div(element_t c, element_t a, element_t b)
 status_t element_div_int(element_t c, element_t a, integer_t b)
 {
 	GroupType type = a->type;
-	EXIT_IF_NOT_SAME(type, c, a);
+	EXIT_IF_NOT_SAME(c, a);
 	LEAVE_IF( c->isInitialized != TRUE || a->isInitialized != TRUE, "uninitialized arguments.");
 	LEAVE_IF( c->type != type, "result initialized but invalid type.");
 
@@ -379,7 +423,7 @@ status_t element_div_int(element_t c, element_t a, integer_t b)
 status_t element_int_div(element_t c, integer_t a, element_t b)
 {
 	GroupType type = b->type;
-	EXIT_IF_NOT_SAME(type, c, b);
+	EXIT_IF_NOT_SAME(c, b);
 	LEAVE_IF( c->isInitialized != TRUE || b->isInitialized != TRUE, "uninitialized arguments.");
 	LEAVE_IF( c->type != type, "result initialized but invalid type.");
 
@@ -395,8 +439,8 @@ status_t element_int_div(element_t c, integer_t a, element_t b)
 
 status_t element_neg(element_t c, element_t a)
 {
-	GroupType type;
-	EXIT_IF_NOT_SAME(type, a, c);
+	GroupType type = a->type;
+	EXIT_IF_NOT_SAME(a, c);
 
 	if(type == ZR) {
 		bn_neg(c->bn, a->bn);
@@ -418,8 +462,8 @@ status_t element_neg(element_t c, element_t a)
 
 status_t element_invert(element_t c, element_t a)
 {
-	GroupType type;
-	EXIT_IF_NOT_SAME(type, a, c);
+	GroupType type = a->type;
+	EXIT_IF_NOT_SAME(a, c);
 
 	if(type == ZR) {
 		bn_t s;
@@ -446,10 +490,10 @@ status_t element_invert(element_t c, element_t a)
 
 status_t element_pow_zr(element_t c, element_t a, element_t b)
 {
-	GroupType type;
-	// TODO: c (type) = a (type) ^ b (ZR)
+	GroupType type = a->type;
+	// c (type) = a (type) ^ b (ZR)
 	LEAVE_IF( c->isInitialized != TRUE || a->isInitialized != TRUE, "uninitialized argument.");
-	EXIT_IF_NOT_SAME(type, c, a);
+	EXIT_IF_NOT_SAME(c, a);
 	LEAVE_IF(a->isInitialized != TRUE, "invalid argument.");
 	LEAVE_IF(b->isInitialized != TRUE || b->type != ZR, "invalid type.");
 
@@ -474,10 +518,10 @@ status_t element_pow_zr(element_t c, element_t a, element_t b)
 
 status_t element_pow_int(element_t c, element_t a, integer_t b)
 {
-	GroupType type;
+	GroupType type = a->type;
 	// TODO: c (type) = a (type) ^ b (ZR)
 	LEAVE_IF( c->isInitialized != TRUE || a->isInitialized != TRUE, "uninitialized argument.");
-	EXIT_IF_NOT_SAME(type, c, a);
+	EXIT_IF_NOT_SAME(c, a);
 	LEAVE_IF(b == NULL, "uninitialized integer.");
 
 	status_t result = ELEMENT_OK;
@@ -503,9 +547,9 @@ status_t element_pow_int(element_t c, element_t a, integer_t b)
 
 int element_cmp(element_t a, element_t b)
 {
-	GroupType type;
+	GroupType type = a->type;
 	LEAVE_IF(a->isInitialized != TRUE || b->isInitialized != TRUE, "uninitialized argument.");
-	EXIT_IF_NOT_SAME(type, a, b);
+	EXIT_IF_NOT_SAME(a, b);
 
 	switch(type) {
 		case ZR: return bn_cmp(a->bn, b->bn);
@@ -521,9 +565,9 @@ int element_cmp(element_t a, element_t b)
 // e = a
 status_t element_set(element_t e, element_t a)
 {
-	GroupType type;
+	GroupType type = a->type;
 	LEAVE_IF(e->isInitialized != TRUE || a->isInitialized != TRUE, "uninitialized argument.");
-	EXIT_IF_NOT_SAME(type, e, a);
+	EXIT_IF_NOT_SAME(e, a);
 	status_t result = ELEMENT_OK;
 
 	switch(type) {
@@ -656,6 +700,21 @@ status_t g1_write_bin(g1_t g, uint8_t *data, int data_len)
 	return ELEMENT_OK;
 }
 
+status_t g1_write_str(g1_t g, uint8_t *data, int data_len)
+{
+	if(g == NULL) return ELEMENT_UNINITIALIZED;
+	if(data_len < G1_LEN*2) return ELEMENT_INVALID_ARG_LEN;
+	char *d = (char *) data;
+
+	int len = FP_BYTES*2+1;
+
+	fp_write(d, len, g->x, BASE);
+	fp_write(&(d[len]), len, g->y, BASE);
+
+	return ELEMENT_OK;
+}
+
+
 status_t g2_read_bin(g2_t g, uint8_t *data, int data_len)
 {
 	if(g == NULL) return ELEMENT_UNINITIALIZED;
@@ -708,6 +767,26 @@ status_t g2_write_bin(g2_t g, uint8_t *data, int data_len)
 	memset(d, 0, G2_LEN);
 	return ELEMENT_OK;
 }
+
+status_t g2_write_str(g2_t g, uint8_t *data, int data_len)
+{
+	if(g == NULL) return ELEMENT_UNINITIALIZED;
+	int G2_STR = G2_LEN*4;
+	if(data_len < G2_STR) return ELEMENT_INVALID_ARG_LEN;
+	char *d = (char *) data;
+
+	int len = FP_BYTES*2 + 1;
+	fp_write(d, len, g->x[0], BASE);
+	d += len;
+	fp_write(d, len, g->x[1], BASE);
+	d += len;
+	fp_write(d, len, g->y[0], BASE);
+	d += len;
+	fp_write(d, len, g->y[1], BASE);
+
+	return ELEMENT_OK;
+}
+
 
 status_t gt_read_bin(gt_t g, uint8_t *data, int data_len)
 {
@@ -793,6 +872,42 @@ status_t gt_write_bin(gt_t g, uint8_t *data, int data_len)
 	}
 
 	memset(d, 0, GT_LEN);
+	return ELEMENT_OK;
+}
+
+status_t gt_write_str(gt_t g, uint8_t *data, int data_len)
+{
+	if(g == NULL) return ELEMENT_UNINITIALIZED;
+	if(data_len < GT_LEN*3) return ELEMENT_INVALID_ARG_LEN;
+
+	int len = FP_BYTES*2 + 1;
+	char *d1 = (char *) data;
+
+	// write the x-coordinate
+	fp_write(d1, len, g[0][0][0], BASE);
+	d1 += len;
+	fp_write(d1, len, g[0][0][1], BASE);
+	d1 += len;
+	fp_write(d1, len, g[0][1][0], BASE);
+	d1 += len;
+	fp_write(d1, len, g[0][1][1], BASE);
+	d1 += len;
+	fp_write(d1, len, g[0][2][0], BASE);
+	d1 += len;
+	fp_write(d1, len, g[0][2][1], BASE);
+	d1 += len;
+	fp_write(d1, len, g[1][0][0], BASE);
+	d1 += len;
+	fp_write(d1, len, g[1][0][1], BASE);
+	d1 += len;
+	fp_write(d1, len, g[1][1][0], BASE);
+	d1 += len;
+	fp_write(d1, len, g[1][1][1], BASE);
+	d1 += len;
+	fp_write(d1, len, g[1][2][0], BASE);
+	d1 += len;
+	fp_write(d1, len, g[1][2][1], BASE);
+
 	return ELEMENT_OK;
 }
 

@@ -406,26 +406,26 @@ int Pairing_init(Pairing *self, PyObject *args)
 
 int Element_init(Element *self, PyObject *args, PyObject *kwds)
 {
-	int bits = 0;
+	int bits = 0, string_len = 0;
 	int seed = -1;
+	char *string = NULL;
 //	Pairing *pairing;
 //	uint8_t hash_id[HASH_LEN+1];
 	
     static char *kwlist[] = {"bits", "string", "seed", NULL};
 	
-    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|ii", kwlist,
-                                      &bits, &seed)) {
+    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|is#i", kwlist,
+                                      &bits, &string, &string_len, &seed)) {
     	PyErr_SetString(ElementError, "invalid arguments");
         return -1; 
 	}
 
     if(pairing_init() != ELEMENT_OK) {
-//    	printf("%s: successfully initialized pairing object..\n", __FUNCTION__);
+//    	printf("%s: Using RELIC library...\n", __FUNCTION__);
     	PyErr_SetString(ElementError, "could not initialize pairing object.");
     	return -1;
     }
 
-//	self->pairing = pairing;
 	self->elem_initialized = FALSE;
 	self->safe_pairing_clear = TRUE;
     return 0;
@@ -464,27 +464,21 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 
 PyObject *Element_print(Element* self)
 {
-//	PyObject *strObj;
+	PyObject *strObj;
 	debug("Contents of element object\n");
 
 	if(self->elem_initialized) {
-//		char *tmp = (char *) malloc(MAX_LEN);
-//		memset(tmp, 0, MAX_LEN);
-//		size_t max = MAX_LEN;
 
-//		element_printf(tmp, max, "%B", self->e);
-		element_printf("element_t :=> \n", self->e);
-//		strObj = PyUnicode_FromString((const char *) tmp);
-//		free(tmp);
-		return PyUnicode_FromString("");
-	}
+//		element_printf("element_t :=> \n", self->e);
 
-	if(self->pairing && self->safe_pairing_clear) {
-		if(self->param_buf != NULL) return PyUnicode_FromString((char *) self->param_buf);
-		else {
-//			pbc_param_out_str(stdout, self->pairing->p);
+		char str[MAX_BUF + 1];
+		memset(str, 0, MAX_BUF);
+	 	element_to_str(str, MAX_BUF, self->e);;
+		strObj = PyUnicode_FromStringAndSize((const char *) str, MAX_BUF);
+		if(strObj != NULL)
+			return strObj;
+		else
 			return PyUnicode_FromString("");
-		}
 	}
 
 	return PyUnicode_FromString("");
@@ -1190,7 +1184,7 @@ cleanup:
 
 static PyObject *Element_equals(PyObject *lhs, PyObject *rhs, int opid) {
 	Element *self = NULL, *other = NULL;
-	int result = -1; // , value;
+	int result = -1;
 
 	EXIT_IF(opid != Py_EQ && opid != Py_NE, "comparison supported: '==' or '!='");
 	// check type of lhs & rhs

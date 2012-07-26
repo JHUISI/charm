@@ -34,9 +34,11 @@
 #include "relic.h"
 /* make sure error checking enabled in relic_conf.h, ALLOC should be dynamic */
 
+//#define DISABLE_CHECK  1
 #define TRUE	1
 #define FALSE	0
 #define BASE	16
+#define MAX_BUF	1024
 #define SHA_LEN  	32
 #define SHA_FUNC	md_map_sh256
 /* move to the appropriate place */
@@ -53,6 +55,7 @@ typedef enum _status_t { ELEMENT_OK = 0,
 enum Group {ZR, G1, G2, GT, NIL};
 typedef enum Group GroupType;
 
+#define FP_STR FP_BYTES * 2 + 1
 #define G1_LEN (FP_BYTES * 2) + 2
 #define G2_LEN (FP_BYTES * 4) + 4
 #define GT_LEN (FP_BYTES * 12) + 12
@@ -92,6 +95,7 @@ status_t element_init_GT(element_t e);
 status_t element_random(element_t e);
 /* print contents of ane element structure */
 status_t element_printf(const char *msg, element_t e);
+status_t element_to_str(char *data, int len, element_t e);
 /* free mem. associated with a */
 status_t element_clear(element_t e);
 
@@ -135,7 +139,6 @@ status_t hash_buffer_to_bytes(uint8_t *input, int input_len, uint8_t *output, in
 
 /* copy method: e = a */
 status_t element_set(element_t e, element_t a);
-/* */
 status_t element_set_int(element_t e, integer_t x);
 status_t element_to_int(integer_t x, element_t e);
 status_t element_set_si(element_t e, unsigned int x);
@@ -151,10 +154,15 @@ status_t element_from_bytes(element_t e, unsigned char *data, int data_len);
 void print_as_hex(uint8_t *data, size_t len);
 status_t g1_read_bin(g1_t g, uint8_t *data, int data_len);
 status_t g1_write_bin(g1_t g, uint8_t *data, int data_len);
+status_t g1_write_str(g1_t g, uint8_t *data, int data_len);
+
 status_t g2_read_bin(g2_t g, uint8_t *data, int data_len);
 status_t g2_write_bin(g2_t g, uint8_t *data, int data_len);
+status_t g2_write_str(g2_t g, uint8_t *data, int data_len);
+
 status_t gt_read_bin(gt_t g, uint8_t *data, int data_len);
 status_t gt_write_bin(gt_t g, uint8_t *data, int data_len);
+status_t gt_write_str(gt_t g, uint8_t *data, int data_len);
 
 #define bn_inits(b) \
 		bn_null(b);	\
@@ -172,13 +180,19 @@ status_t gt_write_bin(gt_t g, uint8_t *data, int data_len);
 		gt_null(g);	\
 		gt_new(g);
 
-#define EXIT_IF_NOT_SAME(t, a, b)		\
+#ifdef DISABLE_CHECK
+#define LEAVE_IF(a, m)	/* empty */
+#define EXIT_IF_NOT_SAME(a, b)  /* empty */
+#else
+#define EXIT_IF_NOT_SAME(a, b)		\
 	if(a->type != b->type)	{		\
-		return ELEMENT_INVALID_TYPES; }	\
-	t = a->type;
+		return ELEMENT_INVALID_TYPES; }
 
 #define LEAVE_IF(a, m)	\
 		if(a) {			\
 		  fprintf(stderr, "%s", m);	\
 		  return ELEMENT_INVALID_ARG;	}
+
+#endif
+
 #endif
