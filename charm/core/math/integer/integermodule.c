@@ -452,7 +452,6 @@ Integer *createNewInteger(mpz_t m) {
 	mpz_init(newObject->e);
 	mpz_init_set(newObject->m, m);
 	newObject->initialized = TRUE;
-//	newObject->state_init = FALSE;
 
 	return newObject;
 }
@@ -463,7 +462,6 @@ Integer *createNewIntegerNoMod(void) {
 	mpz_init(newObject->e);
 	mpz_init(newObject->m);
 	newObject->initialized = TRUE;
-//	newObject->state_init = FALSE;
 
 	return newObject;
 }
@@ -1003,7 +1001,7 @@ static PyObject *Integer_reduce(Integer *self, PyObject *arg) {
 
 static PyObject *Integer_remainder(PyObject *o1, PyObject *o2) {
 
-	Integer *lhs = NULL, *rhs = NULL, *rop = NULL;
+	Integer *lhs = NULL, *rhs = NULL, *rop;
 	int foundLHS = FALSE, foundRHS = FALSE;
 	// unsigned long int lhs_value, rhs_value;
 
