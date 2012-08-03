@@ -2051,7 +2051,8 @@ static int pairings_clear(PyObject *m) {
 }
 
 static int pairings_free(PyObject *m) {
-	return pairings_clear(m);
+	//return pairings_clear(m);
+	return 0;
 }
 
 static struct PyModuleDef moduledef = {
