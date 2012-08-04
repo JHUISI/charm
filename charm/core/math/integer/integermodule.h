@@ -104,6 +104,7 @@
 	else { ErrorMsg("invalid right operand type."); }
 
 
+// TODO: revisit o1 & o2 in 2nd if blocks
 #define Check_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS)  \
 	if(PyInteger_Check(o1)) { \
 		lhs = (Integer *) o1; } \

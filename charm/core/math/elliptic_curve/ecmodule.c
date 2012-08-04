@@ -131,7 +131,7 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, int hash_size, uint8_t *out
  * Create a new point with an existing group object
  */
 ECElement *createNewPoint(GroupType type, ECElement *gobj) { // EC_GROUP *group, BN_CTX *ctx) {
-
+	if(type != ZR && type != G) return NULL;
 	ECElement *newObj = PyObject_New(ECElement, &ECType);
 	if(type == ZR) {
 		newObj->type = type;
@@ -142,10 +142,6 @@ ECElement *createNewPoint(GroupType type, ECElement *gobj) { // EC_GROUP *group,
 		newObj->type = type;
 		newObj->P = EC_POINT_new(gobj->group);
 		newObj->elemZ = NULL;
-	}
-	else {
-		PyObject_Del(newObj);
-		return NULL;
 	}
 	newObj->point_init = TRUE;
 	newObj->nid = gobj->nid;
@@ -723,7 +719,8 @@ static PyObject *ECE_div(PyObject *o1, PyObject *o2) {
 				EC_POINT_add(ans->group, ans->P, lhs->P, rhs_neg->P, ans->ctx);
 				STOP_CLOCK(dBench);
 
-				PyObject_Del(rhs_neg);
+				//PyObject_Del(rhs_neg);
+				Py_XDECREF(rhs_neg);
 			}
 		}
 		else if(ElementZR(lhs, rhs)) {
@@ -929,7 +926,8 @@ ECElement *invertECElement(ECElement *self) {
 
 			return newObj;
 		}
-		PyObject_Del(newObj);
+		//PyObject_Del(newObj);
+		Py_XDECREF(newObj);
 	}
 	else if(self->type == ZR) {
 		// get modulus p and feed into
@@ -953,7 +951,8 @@ ECElement *invertECElement(ECElement *self) {
 
 			return newObj;
 		}
-		PyObject_Del(newObj);
+		//PyObject_Del(newObj);
+		Py_XDECREF(newObj);
 		BN_free(p);
 
 	}
@@ -1011,7 +1010,8 @@ static PyObject *ECE_neg(PyObject *o1) {
 				STOP_CLOCK(dBench);
 				return (PyObject *) obj2;
 			}
-			PyObject_Del(obj2);
+			//PyObject_Del(obj2);
+			Py_XDECREF(obj2);
 		}
 		else if(obj1->type == ZR) {
 			// consider supporting this type.
@@ -1024,7 +1024,8 @@ static PyObject *ECE_neg(PyObject *o1) {
 
 				return (PyObject *) obj2;
 			}
-			PyObject_Del(obj2);
+			//PyObject_Del(obj2);
+			Py_XDECREF(obj2);
 		}
 
 	}

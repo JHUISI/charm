@@ -1,5 +1,5 @@
+from charm.adapters.pksig_adapt_naor01 import Sig_Generic_ibetosig_Naor01
 from charm.schemes.ibenc.ibenc_bb03 import IBE_BB04
-from charm.schemes.pksig.pksig_adapt_naor01 import Sig_Generic_ibetosig_Naor01
 from charm.schemes.pksig.pksig_bls04 import IBSig
 from charm.schemes.pksig.pksig_boyen import Boyen
 from charm.schemes.pksig.pksig_chch import CHCH

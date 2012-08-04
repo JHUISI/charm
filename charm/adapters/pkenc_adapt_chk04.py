@@ -19,7 +19,7 @@ from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 debug = False
 class CHK04(PKEnc):
     """
-    >>> from charm.schemes.ibenc.ibenc_adapt_identityhash import HashIDAdapter
+    >>> from charm.adapters.ibenc_adapt_identityhash import HashIDAdapter
     >>> from charm.schemes.ibenc.ibenc_bb03 import IBE_BB04
     >>> from charm.schemes.pksig.pksig_bls04 import IBSig
     >>> group = PairingGroup('SS512')

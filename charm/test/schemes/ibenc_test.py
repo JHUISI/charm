@@ -1,5 +1,5 @@
-from charm.schemes.ibenc.ibenc_adapt_hybrid import HybridIBEnc
-from charm.schemes.ibenc.ibenc_adapt_identityhash import HashIDAdapter
+from charm.adapters.ibenc_adapt_hybrid import HybridIBEnc
+from charm.adapters.ibenc_adapt_identityhash import HashIDAdapter
 from charm.schemes.ibenc.ibenc_bb03 import IBE_BB04
 from charm.schemes.ibenc.ibenc_bf01 import IBE_BonehFranklin
 from charm.schemes.ibenc.ibenc_ckrs09 import IBE_CKRS

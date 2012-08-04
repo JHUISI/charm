@@ -59,6 +59,7 @@ void longObjToMPZ(mpz_t m, PyObject * o) {
 	}
 	mpz_clear(temp);
 	mpz_clear(temp2);
+	Py_XDECREF(p);
 }
 
 //void longObjToBN(BIGNUM *m, PyObject *o) {
@@ -449,8 +450,8 @@ PyObject *Integer_print(Integer *self) {
 Integer *createNewInteger(mpz_t m) {
 	Integer *newObject = PyObject_New(Integer, &IntegerType);
 
-	mpz_init(newObject->e);
-	mpz_init_set(newObject->m, m);
+	//mpz_init(newObject->e);
+	//mpz_init_set(newObject->m, m);
 	newObject->initialized = TRUE;
 
 	return newObject;
@@ -459,8 +460,8 @@ Integer *createNewInteger(mpz_t m) {
 Integer *createNewIntegerNoMod(void) {
 	Integer *newObject = PyObject_New(Integer, &IntegerType);
 
-	mpz_init(newObject->e);
-	mpz_init(newObject->m);
+	//mpz_init(newObject->e);
+	//mpz_init(newObject->m);
 	newObject->initialized = TRUE;
 
 	return newObject;
@@ -495,16 +496,22 @@ static PyObject *Integer_add(PyObject *o1, PyObject *o2) {
 	if (foundLHS) {
 		// debug("foundLHS\n");
 		rop = createNewInteger(rhs->m);
+		mpz_init(rop->e);
+		mpz_init_set(rop->m, rhs->m);
 		mpz_add_ui(rop->e, rhs->e, lhs_value);
 	} else if (foundRHS) {
 		// debug("foundRHS!\n");
 		rop = createNewInteger(lhs->m);
+		mpz_init(rop->e);
+		mpz_init_set(rop->m, lhs->m);
 		mpz_add_ui(rop->e, lhs->e, rhs_value);
 	} else {
 		if (lhs->initialized && rhs->initialized) {
 			debug("Modulus equal? %d =?= 0\n", mpz_cmp(lhs->m, rhs->m));
 			if (mpz_cmp(lhs->m, rhs->m) == 0) {
 				rop = createNewInteger(lhs->m);
+				mpz_init(rop->e);
+				mpz_init_set(rop->m, lhs->m);
 				mpz_add(rop->e, lhs->e, rhs->e);
 			} else {
 				EXIT_IF(TRUE, "cannot add integers with different modulus.");
@@ -527,16 +534,22 @@ static PyObject *Integer_sub(PyObject *o1, PyObject *o2) {
 	if (foundLHS) {
 		// debug("foundLHS\n");
 		rop = createNewInteger(rhs->m);
+		mpz_init(rop->e);
+		mpz_init_set(rop->m, rhs->m);
 		mpz_ui_sub(rop->e, lhs_value, rhs->e);
 	} else if (foundRHS) {
 		// debug("foundRHS!\n");
 		rop = createNewInteger(lhs->m);
+		mpz_init(rop->e);
+		mpz_init_set(rop->m, lhs->m);
 		mpz_sub_ui(rop->e, lhs->e, rhs_value);
 	} else {
 		if (lhs->initialized && rhs->initialized) {
 			debug("Modulus equal? %d =?= 0\n", mpz_cmp(lhs->m, rhs->m));
 			if (mpz_cmp(lhs->m, rhs->m) == 0) {
 				rop = createNewInteger(lhs->m);
+				mpz_init(rop->e);
+				mpz_init_set(rop->m, lhs->m);
 				mpz_sub(rop->e, lhs->e, rhs->e);
 			} else {
 				EXIT_IF(TRUE,"cannot subtract integers with different modulus.");
@@ -559,16 +572,22 @@ static PyObject *Integer_mul(PyObject *o1, PyObject *o2) {
 	if (foundLHS) {
 		// debug("foundLHS\n");
 		rop = createNewInteger(rhs->m);
+		mpz_init(rop->e);
+		mpz_init_set(rop->m, rhs->m);
 		mpz_mul_ui(rop->e, rhs->e, lhs_value);
 	} else if (foundRHS) {
 		// debug("foundRHS!\n");
 		rop = createNewInteger(lhs->m);
+		mpz_init(rop->e);
+		mpz_init_set(rop->m, lhs->m);
 		mpz_mul_ui(rop->e, lhs->e, rhs_value);
 	} else {
 		if (lhs->initialized && rhs->initialized) {
 			debug("Modulus equal? %d =?= 0\n", mpz_cmp(lhs->m, rhs->m));
 			if (mpz_cmp(lhs->m, rhs->m) == 0) {
 				rop = createNewInteger(lhs->m);
+				mpz_init(rop->e);
+				mpz_init_set(rop->m, lhs->m);
 				mpz_mul(rop->e, lhs->e, rhs->e);
 			} else {
 				EXIT_IF(TRUE, "cannot multiply integers with different modulus.");
@@ -587,6 +606,8 @@ static PyObject *Integer_invert(PyObject *o1) {
 		base = (Integer *) o1;
 		if (base->initialized) {
 			rop = createNewInteger(base->m);
+			mpz_init(rop->e);
+			mpz_init_set(rop->m, base->m);
 			int errcode = mpz_invert(rop->e, base->e, base->m);
 			if (errcode > 0) {
 				return (PyObject *) rop;
@@ -625,10 +646,14 @@ static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 		if (mpz_divisible_ui_p(lhs->e, rhs_value) != 0) {
 			if (mpz_sgn(lhs->m) == 0) {
 				rop = createNewInteger(lhs->m);
+				mpz_init(rop->e);
+				mpz_init_set(rop->m, lhs->m);
 				mpz_divexact_ui(rop->e, lhs->e, rhs_value);
 			}
 		} else {
 			rop = createNewInteger(lhs->m);
+			mpz_init(rop->e);
+			mpz_init_set(rop->m, lhs->m);
 			mpz_tdiv_q_ui(rop->e, lhs->e, rhs_value);
 		}
 	} else if (foundLHS && lhs_value > 0) {
@@ -637,6 +662,8 @@ static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 		mpz_init_set_ui(tmp, lhs_value);
 		if (mpz_divisible_p(tmp, rhs->e) != 0 && mpz_sgn(rhs->m) == 0) {
 			rop = createNewInteger(rhs->m);
+			mpz_init(rop->e);
+			mpz_init_set(rop->m, rhs->m);
 			mpz_divexact(rop->e, tmp, rhs->e);
 		}
 		mpz_clear(tmp);
@@ -651,18 +678,23 @@ static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 				print_mpz(rhs_inv, 10);
 
 				rop = createNewInteger(lhs->m);
+				mpz_init(rop->e);
+				mpz_init_set(rop->m, lhs->m);
 				mpz_mul(rop->e, lhs->e, rhs_inv);
 				mpz_mod(rop->e, rop->e, rop->m);
 				mpz_clear(rhs_inv);
 			} else if (mpz_cmp(lhs->m, rhs->m) == 0 && mpz_sgn(lhs->m) == 0) {
 				rop = createNewInteger(lhs->m);
+				mpz_init(rop->e);
+				mpz_init_set(rop->m, lhs->m);
 				mpz_div(rop->e, lhs->e, rhs->e);
 			}
 		}
 	}
 
 	if (mpz_sgn(rop->e) == 0) {
-		PyObject_Del(rop);
+		//PyObject_Del(rop);
+		Py_XDECREF(rop);
 		EXIT_IF(TRUE, "division failed: could not find modular inverse.");
 	}
 
@@ -681,17 +713,19 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 		debug("foundRHS!\n");
 		long rhs = PyLong_AsLong(o2);
 		if(PyErr_Occurred() || rhs >= 0) {
-			PyErr_Print(); // for debug purposes
+			//PyErr_Print(); // for debug purposes
 			PyErr_Clear();
 			debug("exponent is positive\n");
 			int sgn = mpz_sgn(lhs->m);
 			if(sgn > 0)  {
 				if(mpz_odd_p(lhs->m) > 0) {
 					mpz_t exp;
-					mpz_init(exp);
+ 					mpz_init(exp);
 					longObjToMPZ(exp, o2);
 					print_mpz(exp, 10);
 					rop = createNewInteger(lhs->m);
+					mpz_init(rop->e);
+					mpz_init_set(rop->m, lhs->m);
 					mpz_powm_sec(rop->e, lhs->e, exp, rop->m);
 					mpz_clear(exp);
 				 }
@@ -700,6 +734,8 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 				unsigned long int exp = PyLong_AsUnsignedLong(o2);
 				EXIT_IF(PyErr_Occurred(), "integer too large to exponentiate without modulus.");
 				rop = createNewInteger(lhs->m);
+				mpz_init(rop->e);
+				mpz_init_set(rop->m, lhs->m);
 				mpz_pow_ui(rop->e, lhs->e, exp);
 			}
 			else {
@@ -727,6 +763,8 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 			debug("both integer objects: ");
 			if (mpz_sgn(lhs->m) > 0) {
 				rop = createNewInteger(lhs->m);
+				mpz_init(rop->e);
+				mpz_init_set(rop->m, lhs->m);
 				mpz_powm_sec(rop->e, lhs->e, rhs->e, rop->m);
 			}
 			// lhs is a reg int
@@ -735,12 +773,16 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 				unsigned long int base = mpz_get_ui(lhs->e);
 				unsigned long int exp = mpz_get_ui(rhs->e);
 				rop = createNewIntegerNoMod();
+				mpz_init(rop->e);
+				mpz_init(rop->m);
 				mpz_ui_pow_ui(rop->e, base, exp);
 			}
 			// lhs reg int and rhs can be represented as ulong
 			else if (mpz_fits_ulong_p(rhs->e)) {
 				unsigned long int exp = mpz_get_ui(rhs->e);
 				rop = createNewIntegerNoMod();
+				mpz_init(rop->e);
+				mpz_init(rop->m);
 				mpz_pow_ui(rop->e, lhs->e, exp);
 			} else { // last option...
 				// cannot represent reg ints as ulong's, so error out.
@@ -748,7 +790,7 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 			}
 		}
 	}
-
+		
 	UPDATE_BENCHMARK(EXPONENTIATION, dBench);
 	return (PyObject *) rop;
 }
@@ -760,7 +802,7 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 static PyObject *Integer_hash(PyObject *self, PyObject *args) {
 	PyObject *object, *order, *order2;
 	Integer *pObj, *qObj;
-	uint8_t *rop_buf;
+	uint8_t *rop_buf = NULL;
 	mpz_t p, q, v, tmp;
 	mpz_init(p);
 	mpz_init(q);
@@ -888,7 +930,8 @@ static PyObject *Integer_hash(PyObject *self, PyObject *args) {
 			debug("print v => \n");
 			print_mpz(v, 10);
 			Integer *rop = createNewInteger(modulus);
-			mpz_set(rop->e, v);
+			mpz_init_set(rop->e, v);
+			mpz_init_set(rop->m, modulus);
 			mpz_clear(p);
 			mpz_clear(q);
 			mpz_clear(v);
@@ -965,7 +1008,8 @@ static PyObject *Integer_hash(PyObject *self, PyObject *args) {
 
 			print_mpz(v, 10);
 			Integer *rop = createNewInteger(modulus);
-			mpz_set(rop->e, v);
+			mpz_init_set(rop->e, v);
+			mpz_init_set(rop->e, modulus);
 			mpz_clear(v);
 			mpz_clear(p);
 			mpz_clear(q);
@@ -1009,6 +1053,8 @@ static PyObject *Integer_remainder(PyObject *o1, PyObject *o2) {
 
 	if (foundLHS) {
 		rop = createNewInteger(rhs->m);
+		mpz_init(rop->e);
+		mpz_init_set(rop->m, rhs->m);
 		if (_PyLong_Check(o1)) {
 			PyObject *tmp = PyNumber_Long(o1);
 			mpz_t modulus;
@@ -1017,6 +1063,7 @@ static PyObject *Integer_remainder(PyObject *o1, PyObject *o2) {
 			mpz_mod(rop->e, rhs->e, modulus);
 			mpz_set(rop->m, modulus);
 			mpz_clear(modulus);
+			Py_XDECREF(tmp);
 		} else if (PyInteger_Check(o1)) {
 			Integer *tmp_mod = (Integer *) o1;
 			// ignore the modulus of tmp_mod
@@ -1025,6 +1072,8 @@ static PyObject *Integer_remainder(PyObject *o1, PyObject *o2) {
 		}
 	} else if (foundRHS) {
 		rop = createNewInteger(lhs->m);
+		mpz_init(rop->e);
+		mpz_init_set(rop->m, lhs->m);
 		if (_PyLong_Check(o2)) {
 			PyObject *tmp = PyNumber_Long(o2);
 			mpz_t modulus;
@@ -1033,10 +1082,13 @@ static PyObject *Integer_remainder(PyObject *o1, PyObject *o2) {
 			mpz_mod(rop->e, lhs->e, modulus);
 			mpz_set(rop->m, modulus);
 			mpz_clear(modulus);
+			Py_XDECREF(tmp);
 		}
 	} else {
 		if (lhs->initialized && rhs->initialized) {
 			rop = createNewInteger(rhs->e);
+			mpz_init(rop->e);
+			mpz_init_set(rop->m, rhs->e);
 			mpz_mod(rop->e, lhs->e, rop->m);
 		}
 	}
@@ -1060,6 +1112,7 @@ static PyObject *testPrimality(PyObject *self, PyObject *arg) {
 			longObjToMPZ(value, obj);
 			result = mpz_probab_prime_p(value, MAX_RUN);
 			mpz_clear(value);
+			Py_XDECREF(obj);
 		} else if (PyInteger_Check(arg)) {
 			Integer *obj = (Integer *) arg;
 			if (obj->initialized)
@@ -1143,6 +1196,8 @@ static PyObject *genRandom(Integer *self, PyObject *args) {
 		BN_one(s);
 		mpzToBN(N, bN);
 		rop = createNewInteger(N);
+		mpz_init(rop->e);
+		mpz_init_set(rop->m, N);
 
 		BN_rand_range(s, bN);
 		bnToMPZ(s, rop->e);
@@ -1163,6 +1218,8 @@ static PyObject *genRandomPrime(Integer *self, PyObject *args) {
 		if (bits > 0) {
 			// mpz_t tmp;
 			Integer *rop = createNewIntegerNoMod();
+			mpz_init(rop->e);
+			mpz_init(rop->m);
 
 			BIGNUM *bn = BN_new();
 			/* This routine generates safe prime only when safe=TRUE in which prime, p is selected
@@ -1270,6 +1327,8 @@ static PyObject *encode_message(PyObject *self, PyObject *args) {
 			print_mpz(tmp, 10);
 
 			rop2 = createNewInteger(p);
+			mpz_init(rop2->e);
+			mpz_init_set(rop2->m, p);
 			mpz_set(rop2->e, tmp);
 		} else {
 			// debug("Order of group => '%zd'\n", mpz_sizeinbase(p, 2));
@@ -1283,6 +1342,8 @@ static PyObject *encode_message(PyObject *self, PyObject *args) {
 			print_mpz(p, 10);
 
 			rop2 = createNewInteger(p);
+			mpz_init(rop2->e);
+			mpz_init_set(rop2->m, p);
 			mpz_set(rop2->e, tmp);
 		}
 		mpz_clear(rop);
@@ -1387,6 +1448,7 @@ static PyObject *testCoPrime(Integer *self, PyObject *arg) {
 			print_mpz(rop, 1);
 			result = (mpz_cmp_ui(rop, 1) == 0) ? TRUE : FALSE;
 			mpz_clear(tmp);
+			Py_XDECREF(obj);
 		}
 
 	} else {
@@ -1423,6 +1485,7 @@ static PyObject *testCongruency(Integer *self, PyObject *args) {
 				mpz_t rop;
 				mpz_init(rop);
 				longObjToMPZ(rop, obj2);
+				Py_XDECREF(obj2);
 				if (mpz_congruent_p(rop, self->e, self->m) != 0) {
 					mpz_clear(rop);
 					Py_INCREF(Py_True);
@@ -1440,7 +1503,7 @@ static PyObject *testCongruency(Integer *self, PyObject *args) {
 				Py_INCREF(Py_True);
 				return Py_True;
 			} else {
-				Py_DECREF(Py_False);
+				Py_XDECREF(Py_False);
 				return Py_False;
 			}
 		}
@@ -1515,6 +1578,8 @@ static PyObject *gcdCall(PyObject *self, PyObject *args) {
 		}
 
 		Integer *rop = createNewIntegerNoMod();
+		mpz_init(rop->e);
+		mpz_init(rop->m);
 		mpz_gcd(rop->e, op1, op2);
 		mpz_clear(op1);
 		mpz_clear(op2);
@@ -1553,6 +1618,8 @@ static PyObject *lcmCall(PyObject *self, PyObject *args) {
 		}
 
 		Integer *rop = createNewIntegerNoMod();
+		mpz_init(rop->e);
+		mpz_init(rop->m);
 		mpz_lcm(rop->e, op1, op2);
 		mpz_clear(op1);
 		mpz_clear(op2);
@@ -1656,10 +1723,16 @@ static PyObject *deserialize(PyObject *self, PyObject *args) {
 	}
 
 	Integer *obj = NULL;
-	if(mpz_sgn(m) > 0)
+	if(mpz_sgn(m) > 0) {
 		obj = createNewInteger(m);
-	else
+		mpz_init(obj->e);
+		mpz_init_set(obj->m, m);
+	}
+	else {
 		obj = createNewIntegerNoMod();
+		mpz_init(obj->e);
+		mpz_init(obj->m);
+	}
 	mpz_set(obj->e, x);
 
 	mpz_clear(x);
@@ -1692,7 +1765,8 @@ static PyObject *toInt(PyObject *self, PyObject *args) {
 	if (PyInteger_Check(args)) {
 		intObj = (Integer *) args;
 		Integer *rop = createNewIntegerNoMod();
-		mpz_set(rop->e, intObj->e);
+		mpz_init_set(rop->e, intObj->e);
+		mpz_init(rop->m);
 
 		return (PyObject *) rop;
 	}
@@ -1712,6 +1786,8 @@ static PyObject *Integer_xor(PyObject *self, PyObject *other) {
 	EXIT_IF(op1 == NULL || op2 == NULL, "both types are not of charm integer types.");
 	if (PyInteger_Init(op1, op2)) {
 		rop = createNewIntegerNoMod();
+		mpz_init(rop->e);
+		mpz_init(rop->m);
 		mpz_xor(rop->e, op1->e, op2->e);
 		return (PyObject *) rop;
 	}

@@ -224,6 +224,7 @@ setup(name = 'Charm-Crypto',
 			'charm.schemes.pksig',
 			'charm.schemes.commit',
 			'charm.schemes.grpsig',
+		    'charm.adapters',
                 ],
     license = 'LGPL',
     cmdclass={'uninstall':UninstallCommand,'test':PyTest}

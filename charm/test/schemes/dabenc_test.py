@@ -1,5 +1,5 @@
 from charm.schemes.dabe_aw11 import Dabe
-from charm.schemes.dabenc_adapt_hybrid import HybridABEncMA
+from charm.adapters.dabenc_adapt_hybrid import HybridABEncMA
 from charm.toolbox.pairinggroup import PairingGroup, GT
 import unittest
 

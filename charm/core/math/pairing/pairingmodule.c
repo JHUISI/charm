@@ -1478,7 +1478,8 @@ static long Element_index(Element *o1) {
 		PyObject *temp = mpzToLongObj(o);
 		result = PyObject_Hash(temp);
 		mpz_clear(o);
-		PyObject_Del(temp);
+		//PyObject_Del(temp);
+		Py_XDECREF(temp);
 	}
 	return result;
 }
