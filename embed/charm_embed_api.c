@@ -269,6 +269,7 @@ Charm_t *InitIntegerGroup(Charm_t *pModule, int param_id)
 // returns the class object
 Charm_t *InitClass(const char *class_file, const char *class_name, Charm_t *pObject)
 {
+	if(pObject == NULL) return NULL;
 	PyObject *pClassName, *pModule, *pFunc, *pArgs, *pValue;
 	pClassName = PyUnicode_FromString(class_file);
 
@@ -310,10 +311,10 @@ Charm_t *CallMethod(Charm_t *pObject, const char *func_name, char *types, ...)
 	PyObject *pFunc, *pValue, *pArgs, *o = NULL, *l = NULL;
 	char *fmt, *list, *list2, *token, *token2;
 	char delims[] = "[,]";
-	pArgs = PyList_New(0);
 	va_list arg_list;
 
 	if(pObject == NULL) return NULL; /* can't do anything for you */
+	pArgs = PyList_New(0);
 
 	va_start(arg_list, types);
 

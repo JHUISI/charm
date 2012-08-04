@@ -3,7 +3,7 @@
 
 int main(int argc, char *argv[])
 {
-    PyObject *pName, *pModule = NULL, *pGroup = NULL, *pFunc, *pClass;
+    Charm_t *pModule = NULL, *pGroup = NULL, *pClass = NULL;
     int pRes = 0;
 
     InitializeCharm();
