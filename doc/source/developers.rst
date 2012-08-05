@@ -74,7 +74,7 @@ If you would like to define your own custom serialization routine in conjunction
 Using Charm in C/C++ Apps
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To make Charm easy to use conveniently with C/C++ applications, we have provided a C interface to encapsulate the details. While this feature is still in development, here is a code snippet that shows to utilize a Charm scheme in C:
+To make Charm easy to use conveniently with C/C++ applications, we have provided a C interface to encapsulate the details. While this feature is still in development, here is a code snippet that shows how to utilize a Charm scheme in C:
 
 ::
 
@@ -101,15 +101,28 @@ To make Charm easy to use conveniently with C/C++ applications, we have provided
 	/* call keygen algorithm */
 	Charm_t *skDict = CallMethod(class, "keygen", "%O%O%A", pkDict, mskDict, "[ONE, TWO, THREE]");
 
-	....
+	/* generate message */
+	Charm_t *msg = CallMethod(group, "random", "%I", GT);
+	/* call encrypt algorithm */
+	Charm_t *ctDict = CallMethod(class, "encrypt", "%O%O%s", pkDict, msg, "((THREE or ONE) and (THREE or TWO))");
+	/* call decrypt mesaage */
+	Charm_t *msg2 = CallMethod(class, "decrypt", "%O%O%O", pkDict, skDict, ctDict);
+	/* process the Charm objects */
+	/* .....see source for possibilities.... */
+	/* free the objects */
 	Free(module);
 	Free(group);
 	Free(class);
-	....
+	Free(master_keys);
+	Free(pkDict);
+	Free(mskDict);
+	Free(skDict);
+	Free(msg);
+	Free(msg2);
 	/* tear down the environment */
 	CleanupCharm();
 	....
 
-The rest of the example can be found in ``test.c`` source in the ``embed`` dir of Charm repository on github. 
+The rest of the example can be found in ``test.c`` in the ``embed`` dir of Charm repository on github. 
 	
 Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at support@charm-crypto.com.
