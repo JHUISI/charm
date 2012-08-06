@@ -74,6 +74,55 @@ If you would like to define your own custom serialization routine in conjunction
 Using Charm in C/C++ Apps
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-TODO
+To make Charm easy to use conveniently with C/C++ applications, we have provided a C interface to encapsulate the details. While this feature is still in development, here is a code snippet that shows how to utilize a Charm scheme in C:
 
+::
+
+	/* Charm C interface header */
+	#include "charm_embed_api.h"
+
+	Charm_t *module, *group, *class;	
+
+	/* initialize charm environment */
+	InitializeCharm();	
+
+	/* initialize a group object */
+	group = InitPairingGroup("SS512");
+
+	/* initialize a scheme */
+	class = InitClass("abenc_bsw07", "CPabe_BSW07", group);
+
+	/* call setup algorithm */
+	Charm_t *master_keys = CallMethod(class, "setup", "");
+
+	Charm_t *pkDict = GetIndex(master_keys, 0);
+	Charm_t *mskDict = GetIndex(master_keys, 1);
+
+	/* call keygen algorithm */
+	Charm_t *skDict = CallMethod(class, "keygen", "%O%O%A", pkDict, mskDict, "[ONE, TWO, THREE]");
+
+	/* generate message */
+	Charm_t *msg = CallMethod(group, "random", "%I", GT);
+	/* call encrypt algorithm */
+	Charm_t *ctDict = CallMethod(class, "encrypt", "%O%O%s", pkDict, msg, "((THREE or ONE) and (THREE or TWO))");
+	/* call decrypt mesaage */
+	Charm_t *msg2 = CallMethod(class, "decrypt", "%O%O%O", pkDict, skDict, ctDict);
+	/* process the Charm objects */
+	/* .....see source for possibilities.... */
+	/* free the objects */
+	Free(module);
+	Free(group);
+	Free(class);
+	Free(master_keys);
+	Free(pkDict);
+	Free(mskDict);
+	Free(skDict);
+	Free(msg);
+	Free(msg2);
+	/* tear down the environment */
+	CleanupCharm();
+	....
+
+The rest of the example can be found in ``test.c`` in the ``embed`` dir of Charm repository on github. 
+	
 Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at support@charm-crypto.com.

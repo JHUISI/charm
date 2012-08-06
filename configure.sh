@@ -111,6 +111,7 @@ integer_module="yes"
 ecc_module="yes"
 pairing_module="yes"
 pairing_miracl="no"
+pairing_relic="no"
 pairing_pbc="yes"
 disable_benchmark="no"
 integer_ssl="no"
@@ -337,11 +338,18 @@ for opt do
   ;;
   --enable-pairing-miracl) 
     echo "Enabling this option assumes you have unzipped the MIRACL library into charm-src/pairingmath/miracl/ and make sure the library is built in that directory."
-  	pairing_pbc="no"
+  	pairing_pbc="no";
   	pairing_miracl="yes" ;
+        pairing_relic="no"
   ;;	
   --enable-pairing-pbc)
     pairing_pbc="yes" ;
+    pairing_miracl="no";
+    pairing_relic="no"
+  ;;
+  --enable-pairing-relic)
+    pairing_relic="yes";
+    pairing_pbc="no" ;
     pairing_miracl="no"
   ;;
   --enable-integer-openssl)
@@ -352,6 +360,9 @@ for opt do
   --enable-integer-gmp)
     integer_gmp="yes" ;
     integer_ssl="no"
+  ;;
+  --enable-integer-relic)
+    echo "integer module using RELIC not supported yet."
   ;;
   --enable-debug)
       # Enable debugging options that aren't excessively noisy
@@ -832,6 +843,10 @@ if test "$pairing_pbc" = "yes" ; then
 elif test "$pairing_miracl" = "yes" ; then
     echo "USE_MIRACL=$pairing_miracl" >> $config_mk
     echo "USE_PBC=no" >> $config_mk
+elif test "$pairing_relic" = "yes" ; then
+    echo "USE_RELIC=$pairing_relic" >> $config_mk
+    echo "USE_PBC=no" >> $config_mk
+    echo "USE_MIRACL=no" >> $config_mk
 fi
 
 if test "$disable_benchmark" = "yes" ; then

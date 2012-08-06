@@ -118,15 +118,30 @@ if opt.get('PAIR_MOD') == 'yes':
                                         utils_path+'sha1.c',
                                         utils_path+'base64.c'],
                             libraries=['pbc', 'gmp'], define_macros=_macros, undef_macros=_undef_macro)
+    elif opt.get('USE_RELIC') == 'yes':
+        # TODO: check if RELIC lib has been built. if not, bail
+        if not os.path.exists(math_path + 'pairing/relic/lib/librelic_s.a'): 
+            print("Cannot find RELIC lib. Please run build script in <charm>/core/math/pairing/relic/")
+            exit(1)
+        pairing_module = Extension(math_prefix + '.pairing',
+                            include_dirs = [utils_path,
+                                            benchmark_path,
+                                            math_path + 'pairing/relic/include', 
+                                            math_path + 'pairing/relic-src/include'],
+                            sources = [math_path + 'pairing/relic/pairingmodule3.c',
+                                        math_path + 'pairing/relic/relic_interface.c',
+                                        utils_path + 'base64.c'],
+                            libraries=None, define_macros=_macros, undef_macros=_undef_macro,
+                            extra_objects=[math_path+'pairing/relic/lib/librelic_s.a'], extra_compile_args=None)
     else:
         # build MIRACL based pairing module - note that this is for experimental use only
         pairing_module = Extension(math_prefix + '.pairing',
                             include_dirs = [utils_path,
                                             benchmark_path,
                                             math_path + 'pairing/miracl/'], 
-                            sources = [math_path + 'pairing/pairingmodule2.c',
+                            sources = [math_path + 'pairing/miracl/pairingmodule2.c',
                                         utils_path + 'sha1.c', 
-                                        math_path + 'pairing/miracl/miraclwrapper.cc'],
+                                        math_path + 'pairing/miracl/miracl_interface.cc'],
                             libraries=['gmp','stdc++'],
                             extra_objects=[math_path+'pairing/miracl/miracl.a'], extra_compile_args=None)
 
@@ -196,10 +211,21 @@ setup(name = 'Charm-Crypto',
                         'charm.core.engine',
                         'charm.core.math',
                     'charm.test',
+                        'charm.test.schemes',
                         'charm.test.toolbox',
                     'charm.toolbox',
                     'charm.zkp_compiler',
+		    'charm.schemes',
+			'charm.schemes.ibenc',
+			'charm.schemes.abenc',
+			'charm.schemes.dabenc',
+			'charm.schemes.pkenc',
+			'charm.schemes.hibenc',
+			'charm.schemes.pksig',
+			'charm.schemes.commit',
+			'charm.schemes.grpsig',
+		    'charm.adapters',
                 ],
-    license = 'GPL',
+    license = 'LGPL',
     cmdclass={'uninstall':UninstallCommand,'test':PyTest}
 )

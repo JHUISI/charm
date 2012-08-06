@@ -314,8 +314,8 @@ PyObject *GetResults(Benchmark *self) {
 
 PyObject *Retrieve_result(Benchmark *self, MeasureType option) {
 	PyObject *result = NULL;
-	if(self != NULL) {
 
+	if(self != NULL) {
 		switch(option) {
 			case REAL_TIME:	result = PyFloat_FromDouble(self->real_time_ms); break;
 			case NATIVE_TIME: result = PyFloat_FromDouble(self->native_time_ms); break;

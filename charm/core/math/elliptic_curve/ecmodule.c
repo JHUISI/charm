@@ -1,6 +1,32 @@
 /*
- * Elliptic Curve Module - based on Openssl
+ * Charm-Crypto is a framework for rapidly prototyping cryptosystems.
+ *
+ * Charm-Crypto is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * Charm-Crypto is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Charm-Crypto. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Please contact the charm-crypto dev team at support@charm-crypto.com
+ * for any questions.
  */
+
+/*
+ *   @file    ecmodule.c
+ *
+ *   @brief   charm interface over OpenSSL Ellipic-curve module
+ *
+ *   @author  ayo.akinyele@charm-crypto.com
+ *
+ ************************************************************************/
+
 #include "ecmodule.h"
 
 void printf_buffer_as_hex(uint8_t * data, size_t len)
@@ -105,7 +131,7 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, int hash_size, uint8_t *out
  * Create a new point with an existing group object
  */
 ECElement *createNewPoint(GroupType type, ECElement *gobj) { // EC_GROUP *group, BN_CTX *ctx) {
-
+	if(type != ZR && type != G) return NULL;
 	ECElement *newObj = PyObject_New(ECElement, &ECType);
 	if(type == ZR) {
 		newObj->type = type;
@@ -116,10 +142,6 @@ ECElement *createNewPoint(GroupType type, ECElement *gobj) { // EC_GROUP *group,
 		newObj->type = type;
 		newObj->P = EC_POINT_new(gobj->group);
 		newObj->elemZ = NULL;
-	}
-	else {
-		PyObject_Del(newObj);
-		return NULL;
 	}
 	newObj->point_init = TRUE;
 	newObj->nid = gobj->nid;
@@ -697,7 +719,8 @@ static PyObject *ECE_div(PyObject *o1, PyObject *o2) {
 				EC_POINT_add(ans->group, ans->P, lhs->P, rhs_neg->P, ans->ctx);
 				STOP_CLOCK(dBench);
 
-				PyObject_Del(rhs_neg);
+				//PyObject_Del(rhs_neg);
+				Py_XDECREF(rhs_neg);
 			}
 		}
 		else if(ElementZR(lhs, rhs)) {
@@ -778,18 +801,6 @@ static PyObject *ECE_rem(PyObject *o1, PyObject *o2) {
 
 	EXIT_IF(TRUE, "invalid argument type.");
 }
-
-//ECElement *ec_point_mul(EC_GROUP *group, EC_POINT *point, BIGNUM *value, BN_CTX *ctx) {
-//
-////	ECElement *ans = createNewPoint(G, group, ctx);
-//	START_CLOCK(dBench);
-////	EC_POINT_mul(group, ans->P, value, NULL, NULL, ctx);
-//	EC_POINT_mul(group, ans->P, NULL, point, value, ctx);
-//	STOP_CLOCK(dBench);
-////	BN_free(cofactor);
-////	BN_free(order);
-//	return ans;
-//}
 
 static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 	ECElement *lhs = NULL, *rhs = NULL, *ans = NULL;
@@ -915,7 +926,8 @@ ECElement *invertECElement(ECElement *self) {
 
 			return newObj;
 		}
-		PyObject_Del(newObj);
+		//PyObject_Del(newObj);
+		Py_XDECREF(newObj);
 	}
 	else if(self->type == ZR) {
 		// get modulus p and feed into
@@ -939,7 +951,8 @@ ECElement *invertECElement(ECElement *self) {
 
 			return newObj;
 		}
-		PyObject_Del(newObj);
+		//PyObject_Del(newObj);
+		Py_XDECREF(newObj);
 		BN_free(p);
 
 	}
@@ -997,7 +1010,8 @@ static PyObject *ECE_neg(PyObject *o1) {
 				STOP_CLOCK(dBench);
 				return (PyObject *) obj2;
 			}
-			PyObject_Del(obj2);
+			//PyObject_Del(obj2);
+			Py_XDECREF(obj2);
 		}
 		else if(obj1->type == ZR) {
 			// consider supporting this type.
@@ -1010,7 +1024,8 @@ static PyObject *ECE_neg(PyObject *o1) {
 
 				return (PyObject *) obj2;
 			}
-			PyObject_Del(obj2);
+			//PyObject_Del(obj2);
+			Py_XDECREF(obj2);
 		}
 
 	}

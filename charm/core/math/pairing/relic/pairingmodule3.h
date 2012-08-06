@@ -19,41 +19,39 @@
  */
 
 /*
- *   @file    pairingmodule.h
- *
- *   @brief   charm interface over PBC library
- *
- *   @author  ayo.akinyele@charm-crypto.com
- *
- ************************************************************************/
+*   @file    pairingmodule3.h
+*
+*   @brief   charm interface over RELIC's pairing-based crypto module
+*
+*   @author  ayo.akinyele@charm-crypto.com
+*
+************************************************************************/
 
-#ifndef PAIRINGMODULE_H
-#define PAIRINGMODULE_H
+#ifndef PAIRINGMODULE3_H
+#define PAIRINGMODULE3_H
 
 #include <Python.h>
 #include <structmember.h>
 #include <longintrepr.h>
 #include <stdlib.h>
-#include <gmp.h>
-#include <pbc/pbc.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include "sha1.h"
 #include "benchmarkmodule.h"
 #include "base64.h"
+#include "relic_interface.h"
 
 //#define DEBUG	1
 //#define TRUE	1
 //#define FALSE	0
-#define BenchmarkIdentifier 1
+#define BenchmarkIdentifier 4
 #define MAX_LEN 2048
 #define HASH_LEN 20
 #define ID_LEN   4
 #define MAX_BENCH_OBJECTS	2
 // define element_types
-enum Group {ZR, G1, G2, GT, NONE_G};
-typedef enum Group GroupType;
+//enum Group {ZR, G1, G2, GT, NONE_G};
+//typedef enum Group GroupType;
 
 /* Index numbers for different hash functions.  These are all implemented as SHA1(index || message).	*/
 #define HASH_FUNCTION_ELEMENTS			0
@@ -100,8 +98,8 @@ PyNumberMethods element_number;
 
 typedef struct {
 	PyObject_HEAD
-	pbc_param_t p;
-	pairing_t pair_obj;
+//	pbc_param_t p;
+//	pairing_t pair_obj;
 	int safe;
 	uint8_t hash_id[ID_LEN+1];
 } Pairing;
@@ -113,6 +111,7 @@ typedef struct {
 
 	Pairing *pairing;
 	element_t e;
+//	element_ptr e;
 	GroupType element_type;
     int elem_initialized;
 	int safe_pairing_clear;
@@ -127,11 +126,11 @@ typedef struct {
 	int sub_ZR, sub_G1, sub_G2, sub_GT;
 } Operations;
 
-#define IS_PAIRING_OBJ_NULL(obj) \
-	if(obj->pairing == NULL) {	\
-		PyErr_SetString(ElementError, "pairing structure not initialized.");	\
-		return NULL;	\
-	}
+#define IS_PAIRING_OBJ_NULL(obj)   /* do nothing */
+//	if(obj->pairing == NULL) {
+//		PyErr_SetString(ElementError, "pairing structure not initialized.");
+//		return NULL;
+//	}
 
 #define Check_Elements(o1, o2)  PyElement_Check(o1) && PyElement_Check(o2)
 #define Check_Types2(o1, o2, lhs_o1, rhs_o2, longLHS_o1, longRHS_o2)  \
@@ -160,9 +159,9 @@ typedef struct {
 	if(PyElement_Check(g) && g->safe_pairing_clear == FALSE) {	\
 		PyErr_SetString(ElementError, "invalid group object specified.");  \
 		return NULL;  } 	\
-	if(g->pairing == NULL) {	\
-		PyErr_SetString(ElementError, "pairing object is NULL.");	\
-		return NULL;  }		\
+//	if(g->pairing == NULL) {
+//		PyErr_SetString(ElementError, "pairing object is NULL.");
+//		return NULL;  }
 
 PyObject *Element_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int Element_init(Element *self, PyObject *args, PyObject *kwds);
@@ -181,7 +180,7 @@ int add_rule(GroupType lhs, GroupType rhs);
 int sub_rule(GroupType lhs, GroupType rhs);
 int div_rule(GroupType lhs, GroupType rhs);
 int pair_rule(GroupType lhs, GroupType rhs);
-void print_mpz(mpz_t x, int base);
+//void print_int(integer_t x, int base);
 
 #ifdef BENCHMARK_ENABLED
 // for multiplicative notation
@@ -261,10 +260,11 @@ void print_mpz(mpz_t x, int base);
 	PyErr_SetString(ElementError, msg);	 \
 	return Py_BuildValue("i", code);	}
 
-#define IS_SAME_GROUP(a, b) \
-	if(strncmp((const char *) a->pairing->hash_id, (const char *) b->pairing->hash_id, ID_LEN) != 0) {	\
-		PyErr_SetString(ElementError, "mixing group elements from different curves.");	\
-		return NULL;	\
-	}
+#define IS_SAME_GROUP(a, b) 	/* doesn't apply */
+//#define IS_SAME_GROUP(a, b)
+//	if(strncmp((const char *) a->pairing->hash_id, (const char *) b->pairing->hash_id, ID_LEN) != 0) {
+//		PyErr_SetString(ElementError, "mixing group elements from different curves.");
+//		return NULL;
+//	}
 
 #endif
