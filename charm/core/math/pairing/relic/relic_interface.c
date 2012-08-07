@@ -24,6 +24,7 @@
 *   @brief   charm interface over RELIC's pairing-based crypto module
 *
 *   @author  ayo.akinyele@charm-crypto.com
+*   @status  not complete: g2_map and modular division operations not working correctly (as of 8/6/12)
 *
 ************************************************************************/
 
@@ -42,6 +43,13 @@ void print_as_hex(uint8_t *data, size_t len)
 	}
 
 	printf("\n");
+}
+
+int bn_is_one(bn_t a)
+{
+	if(a->used == 0) return 0; // false
+	else if((a->used == 1) && (a->dp[0] == 1)) return 1; // true
+	else return 0; // false
 }
 
 status_t pairing_init(void)
@@ -377,8 +385,21 @@ status_t element_div(element_t c, element_t a, element_t b)
 
 	if(type == ZR) {
 		if(bn_is_zero(b->bn)) return ELEMENT_DIV_ZERO;
-		bn_div(c->bn, a->bn, b->bn);
-		bn_mod(c->bn, c->bn, c->order);
+		// c = (1 / b) mod order
+		element_invert(c, b);
+		if(bn_is_one(a->bn))  return ELEMENT_OK;
+//		bn_div(c->bn, a->bn, b->bn);
+//		bn_mod(c->bn, c->bn, c->order);
+		// remainder of ((a * c) / order)
+		integer_t s;
+		bn_inits(s);
+		// c = (a * c) / order (remainder only)
+		bn_mul(s, a->bn, c->bn);
+		bn_div_rem(s, c->bn, s, a->order);
+//		if(bn_sign(c->bn) == BN_NEG) bn_add(c->bn, c->bn, a->order);
+		bn_free(s);
+
+
 	}
 	else if(type == G1) {
 		g1_sub(c->g1, a->g1, b->g1);
@@ -412,14 +433,43 @@ status_t element_div_int(element_t c, element_t a, integer_t b)
 
 	if(type == ZR) {
 		if(bn_is_zero(b)) return ELEMENT_DIV_ZERO;
-		bn_div(c->bn, a->bn, b);
-		bn_mod(c->bn, c->bn, c->order);
+//		if(bn_is_one(a->bn)) {
+//			element_set_int(a, b);
+//			return element_invert(c, a); // not going to work
+//		}
+
+		integer_t s;
+		bn_inits(s);
+		// compute c = (1 / b) mod order
+		bn_gcd_ext(s, c->bn, NULL, b, a->order);
+		if(bn_sign(c->bn) == BN_NEG) bn_add(c->bn, c->bn, a->order);
+		if(bn_is_one(a->bn) && bn_sign(a->bn) == BN_POS) {
+			bn_free(s);
+			return ELEMENT_OK;
+		}
+		// remainder of ((a * c) / order)
+		// c = (a * c) / order (remainder only)
+		bn_mul(s, a->bn, c->bn);
+		bn_div_rem(s, c->bn, s, a->order);
+//		if(bn_sign(c->bn) == BN_NEG) bn_add(c->bn, c->bn, a->order);
+		bn_free(s);
+//		bn_div(c->bn, a->bn, b);
+//		bn_mod(c->bn, c->bn, c->order);
+	}
+	else if(type == G1 || type == G2 || type == GT) {
+		if(bn_is_one(b)) {
+			return element_set(c, a);
+		}
+		// TODO: other cases: b > 1 (ZR)?
+	}
+	else {
+		return ELEMENT_INVALID_TYPES;
 	}
 
 	return ELEMENT_OK;
 }
 
-// int appears on lhs
+// int appears on lhs (1 / [ZR, G1, G2, GT])
 status_t element_int_div(element_t c, integer_t a, element_t b)
 {
 	GroupType type = b->type;
@@ -429,8 +479,22 @@ status_t element_int_div(element_t c, integer_t a, element_t b)
 
 	if(type == ZR) {
 		if(bn_is_zero(b->bn)) return ELEMENT_DIV_ZERO;
-		bn_div(c->bn, a, b->bn);
-		bn_mod(c->bn, c->bn, c->order);
+		element_invert(c, b);
+		if(bn_is_one(a)) return ELEMENT_OK;
+		integer_t s;
+		bn_inits(s);
+		bn_mul(s, a, c->bn);
+		bn_div_rem(s, c->bn, s, c->order);
+//		if(bn_sign(c->bn) == BN_NEG) bn_add(c->bn, c->bn, c->order);
+		bn_free(s);
+//		bn_div(c->bn, a, b->bn);
+//		bn_mod(c->bn, c->bn, c->order);
+	}
+	else if(type == G1 || type == G2 || type == GT) {
+		if(bn_is_one(a)) {
+			element_invert(c, b);
+		}
+		// TODO: other cases: a > 1 (ZR)?
 	}
 
 	return ELEMENT_OK;
@@ -593,8 +657,10 @@ status_t element_set_int(element_t e, integer_t x)
 	LEAVE_IF(e->isInitialized != TRUE, "uninitialized argument.");
 	if(e->type == ZR) {
 		bn_copy(e->bn, x);
+		return ELEMENT_OK;
 	}
-	return ELEMENT_OK;
+
+	return ELEMENT_INVALID_TYPES;
 }
 
 // x = e (copies for ZR, maps x-coordinate for G1, and not defined for G2 or GT)
@@ -632,15 +698,15 @@ status_t element_from_hash(element_t e, unsigned char *data, int len)
 	status_t result = ELEMENT_OK;
 	int digest_len = SHA_LEN;
 	unsigned char digest[digest_len + 1];
+	memset(digest, 0, digest_len);
+	SHA_FUNC(digest, data, len);
 
 	switch(type) {
-		case ZR: memset(digest, 0, digest_len);
-			     SHA_FUNC(digest, data, len);
-				 bn_read_bin(e->bn, digest, digest_len);
+		case ZR: bn_read_bin(e->bn, digest, digest_len);
 				 break;
-		case G1: g1_map(e->g1, data, len);
+		case G1: g1_map(e->g1, digest, digest_len);
 				 break;
-		case G2: g2_map(e->g2, data, len);
+		case G2: g2_map(e->g2, digest, digest_len);
 				 break;
 		default:
 				 result = ELEMENT_INVALID_TYPES;

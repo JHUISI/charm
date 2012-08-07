@@ -27,6 +27,8 @@
  *
  ************************************************************************/
 
+// TODO: fix 1 / a (ZR) ==> 0 instead of inverse of a!
+
 #include "pairingmodule3.h"
 
 int exp_rule(GroupType lhs, GroupType rhs)
@@ -689,12 +691,13 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 	if(PyElement_Check(lhs) && found_int) {
 		// lhs is the element type
 		START_CLOCK(dBench);
-		EXIT_IF(div_rule(self->element_type, ZR) == FALSE, "invalid div operation.");
+//		EXIT_IF(div_rule(self->element_type, ZR) == FALSE, "invalid div operation.");
 		newObject = createNewElement(self->element_type, self->pairing);
 		other = createNewElement(self->element_type, self->pairing);
 		if(element_div_int(newObject->e, self->e, z) == ELEMENT_DIV_ZERO) {
-			PyObject_Del(newObject);
-			newObject = NULL;
+			Py_XDECREF(newObject);
+			//newObject = NULL;
+			bn_free(z);
 			EXIT_IF(TRUE, "divide by zero error!");
 		}
 		STOP_CLOCK(dBench);
@@ -702,11 +705,12 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 	else if(PyElement_Check(rhs) && found_int) {
 		// rhs is the element type
 		START_CLOCK(dBench);
-		EXIT_IF(div_rule(ZR, other->element_type) == FALSE, "invalid div operation.");
+//		EXIT_IF(div_rule(ZR, other->element_type) == FALSE, "invalid div operation.");
 		newObject = createNewElement(other->element_type, other->pairing);
 		if(element_int_div(newObject->e, z, other->e) == ELEMENT_DIV_ZERO) {
-			PyObject_Del(newObject);
-			newObject = NULL;
+			Py_XDECREF(newObject);
+			// newObject = NULL;
+			bn_free(z);
 			EXIT_IF(TRUE, "divide by zero error!");
 		}
 		STOP_CLOCK(dBench);
@@ -731,6 +735,7 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 		return NULL;
 	}
 
+	bn_free(z);
 	if(newObject != NULL) UPDATE_BENCH(DIVISION, newObject->element_type, dBench);
 	return (PyObject *) newObject;
 }
