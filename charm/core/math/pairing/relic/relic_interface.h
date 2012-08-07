@@ -79,6 +79,7 @@ typedef struct element element_t[1];
 typedef struct element *element_ptr;
 typedef struct group group_t;
 typedef bn_t integer_t;
+int bn_is_one(bn_t a);
 
 /* Initialize 'e' to be an element of the ring Z_r of pairing.
  * r is the order of the groups G1, G2 and GT that are involved in the pairing.
