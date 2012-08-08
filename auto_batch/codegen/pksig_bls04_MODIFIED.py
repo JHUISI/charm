@@ -1,0 +1,72 @@
+'''
+Boneh-Lynn-Shacham Identity Based Signature
+ 
+| From: "D. Boneh, B. Lynn, H. Shacham Short Signatures from the Weil Pairing"
+| Published in: Journal of Cryptology 2004
+| Available from: http://
+| Notes: This is the IBE (2-level HIBE) implementation of the HIBE scheme BB_2.
+
+* type:           signature (identity-based)
+* setting:        bilinear groups (asymmetric)
+
+:Authors:    J. Ayo Akinyele
+:Date:       1/2011
+'''
+from toolbox.pairinggroup import *
+from charm.engine.util import *
+import sys, random, string
+
+debug = False
+class IBSig():
+    def __init__(self, groupObj):
+        global group, debug
+        group = groupObj
+        debug = False
+        
+    def dump(self, obj):
+        ser_a = serializeDict(obj, group)
+        dump_retVal = str(pickleObject(ser_a))
+        return dump_retVal
+            
+    def keygen(self, secparam=None):
+        g, x = group.random(G2), group.random()
+        g_x = g ** x
+        pk = { 'g^x':g_x, 'g':g, 'identity':str(g_x), 'secparam':secparam }
+        sk = { 'x':x }
+        keygen_retVal = (pk, sk)
+        return keygen_retVal
+        
+    def sign(self, x, message):
+        M = self.dump(message)
+        if debug: print("Message => '%s'" % M)
+        sign_retVal = group.hash(M, G1) ** x
+        return sign_retVal
+        
+    def verify(self, pk, sig, message):
+        M = self.dump(message)
+        h = group.hash(M, G1)
+        if pair(sig, pk['g']) == pair(h, pk['g^x']):
+            return True  
+        return False 
+
+def main():
+    N = 200
+
+    groupObj = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
+    
+    m = { 'a':"hello world!!!" , 'b':"test message" }
+    bls = IBSig(groupObj)
+    
+    (pk, sk) = bls.keygen(0)
+    
+    sig = bls.sign(sk['x'], m)
+    
+    if debug: print("Message: '%s'" % m)
+    if debug: print("Signature: '%s'" % sig)     
+    assert bls.verify(pk, sig, m), "Failure!!!"
+    if debug: print('SUCCESS!!!')
+    
+if __name__ == "__main__":
+    debug = True
+    main()
+    

@@ -946,7 +946,34 @@ class ASTVarVisitor(ast.NodeVisitor):
 					maxLineNo = varInSameFunc.getName().getLineNo()
 					continue
 				elif (type(nextVarToCheck).__name__ == con.strTypePython):
-					print(nextVarToCheck)
+					#print(nextVarToCheck)
+					if (nextVarToCheck not in returnNodes):
+						sys.exit("ASTVarVisitor->getVariableGroupType:  nextVarToCheck is a string (meaning we pursue a function call), but that function isn't in returnNodes.")
+
+					retNodeCallingFunc = returnNodes[nextVarToCheck]
+					if ( (type(retNodeCallingFunc) is not list) or (len(retNodeCallingFunc) != 1) or (con.valueType not in retNodeCallingFunc[0]._fields) ):
+						sys.exit("ASTVarVisitor->getVariableGroupType:  problem with retNodeCallingFunc value obtained.")
+
+					#print(retNodeCallingFunc[0].value)
+
+					retNode_NodeValue_CallingFunc = retNodeCallingFunc[0].value
+					#print(retNode_NodeValue_CallingFunc)
+
+					if (con.idType not in retNode_NodeValue_CallingFunc._fields):
+						sys.exit("ASTVarVisitor->getVariableGroupType:  return node obtained is not of the form, \"return [string variable name]\", which is currently not supported.")
+
+					#print(retNode_NodeValue_CallingFunc.id)
+
+					newVarNameForNextIter = StringName()
+					newVarNameForNextIter.setName(retNode_NodeValue_CallingFunc.id)
+					varName = newVarNameForNextIter
+
+					funcName = nextVarToCheck
+
+					if (con.lineNoType not in retNode_NodeValue_CallingFunc._fields):
+						sys.exit("ASTVarVisitor->getVariableGroupType:  retNode_NodeValue_CallingFunc doesn't have a line number field.")
+
+					#STARTHERE
 
 					#this is where we go into a function that was called in which the return value is what we are
 					#are looking for (e.g., sig = bls.sign(....) ).  There are 2 possibilities here.  One is that the
