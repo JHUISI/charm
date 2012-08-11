@@ -970,8 +970,12 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 					funcName = nextVarToCheck
 
-					if (con.lineNoType not in retNode_NodeValue_CallingFunc._fields):
-						sys.exit("ASTVarVisitor->getVariableGroupType:  retNode_NodeValue_CallingFunc doesn't have a line number field.")
+					maxLineNo = retNodeCallingFunc[0].lineno
+
+					continue
+
+					#if (con.lineNoType not in retNodeCallingFunc[0]._fields):
+						#sys.exit("ASTVarVisitor->getVariableGroupType:  retNode_NodeValue_CallingFunc doesn't have a line number field.")
 
 					#STARTHERE
 
