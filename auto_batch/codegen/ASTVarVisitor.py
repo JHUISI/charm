@@ -795,17 +795,20 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		return self.varNames
 
-	def getGroupTypeOfOneVar(self, varObj, groupTypeList):
-		if ( (varObj == None) or (type(varObj).__name__ != con.variable) ):
-			sys.exit("ASTVarVisitor->getGroupTypeOfOneVar:  problem with variable object input parameter passed in.")
+	def getGroupTypeOfOneVar(self, varValue, groupTypeList):
+		if (varValue == None):
+			#print(type(varValue).__name__)
+			sys.exit("ASTVarVisitor->getGroupTypeOfOneVar:  problem with variable object input parameter passed in (it's of None type).")
 
 		if ( (groupTypeList == None) or (type(groupTypeList).__name__ != con.listTypePython) or (len(groupTypeList) > 1) ):
 			sys.exit("ASTVarVisitor->getGroupTypeOfOneVar:  problem with the group type list parameter passed in.")
 
+		'''
 		try:
 			varValue = varObj.getValue()
 		except:
 			sys.exit("ASTVarVisitor->getGroupTypeOfOneVar:  could not extract the Value object from the Variable object passed in.")
+		'''
 
 		try:
 			retGroupTypeObj = varValue.getGroupType()
@@ -825,6 +828,9 @@ class ASTVarVisitor(ast.NodeVisitor):
 			else:
 				if (retGroupType != groupTypeList[0]):
 					sys.exit("ASTVarVisitor->getGroupTypeOfOneVar:  group type extracted is different from a previously extracted group type.")
+		else:
+			if (type(varValue).__name__ == con.binOpValue):
+				self.getGroupTypeOfOneVar(varValue.left, groupTypeList)
 
 	def getVarObjFromSameFunction(self, varName, funcName, varAssignments, maxLineNo=sys.maxsize):
 		if ( (varName == None) or (type(varName).__name__ not in con.variableNameTypes) ):
@@ -939,7 +945,12 @@ class ASTVarVisitor(ast.NodeVisitor):
 				sys.exit("ASTVarVisitor->getVariableGroupType:  problem with the variable object returned from getVarObjFromSameFunction.")
 
 			if (varInSameFunc != None):
-				self.getGroupTypeOfOneVar(varInSameFunc, groupTypeList)
+				try:
+					varInSameFuncValue = varInSameFunc.getValue()
+				except:
+					sys.exit("ASTVarVisitor->getVariableGroupType:  could not obtain Value portion of varInSameFunc Variable object.")
+
+				self.getGroupTypeOfOneVar(varInSameFuncValue, groupTypeList)
 				nextVarToCheck = self.getNextVarToCheck(varInSameFunc)
 				if (type(nextVarToCheck).__name__ == con.variable):
 					varName = nextVarToCheck.getName()

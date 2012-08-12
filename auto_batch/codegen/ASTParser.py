@@ -667,7 +667,8 @@ class ASTParser:
 		return retNode
 
 	def getLeftNodeOfBinOp(self, node):
-		if ( (node == None) or (type(node).__name__ != con.binOpTypeAST) ):
+		if ( (node == None) or ( (type(node).__name__ != con.binOpTypeAST) and (type(node).__name__ != con.binOpValue) ) ):
+			print(type(node).__name__)
 			sys.exit("ASTParser->getLeftNodeOfBinOp:  problem with node passed in to function.")
 
 		try:
