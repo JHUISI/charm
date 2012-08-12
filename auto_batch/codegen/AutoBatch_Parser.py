@@ -368,8 +368,60 @@ def getVariableTypes(variableTypes, assignmentsDict):
 
 	return variableTypes
 
+def getNonDuplicateName(origName, existingDict):
+	retName = origName
+	counter = 2
+	firstTime = True
 
-def writeBVFile(varAssignments, outputFileName):
+	while (retName in existingDict.values()):
+		if (firstTime == True):
+			retName += str(counter)
+			firstTime = False
+		else:
+			retName = retName[0:(len(retName) - 1)]
+			retName += str(counter)
+		counter += 1
+
+	return retName
+
+def getCleanVarsVerifyEqDict(varsVerifyEq):
+	retDict = {}
+
+	for varVerifyEq in varsVerifyEq:
+		if (varVerifyEq.getStringVarName() in retDict):
+			sys.exit("AutoBatch_Parser->getCleanVarsVerifyEqDict:  duplicate variable names in varsVerifyEq list input parameter passed in.")
+
+		if (type(varVerifyEq).__name__ == con.subscriptName):
+			sliceName = varVerifyEq.getSlice().getStringVarName().lstrip('\'').rstrip('\'')
+			sliceName = sliceName.replace('^','')
+			newCleanName = getNonDuplicateName(sliceName, retDict)
+			retDict[varVerifyEq.getStringVarName()] = newCleanName
+		else:
+			newCleanName = getNonDuplicateName(varVerifyEq.getStringVarName(), retDict)
+			retDict[varVerifyEq.getStringVarName()] = newCleanName
+
+	return retDict
+
+def getTypeFirstAttempt(myASTParser, varNameStruct, functionArgMappings, functionArgNames, returnNodes, varAssignments):
+	myASTVarVisitor = ASTVarVisitor(myASTParser)
+	return (myASTVarVisitor.getVariableGroupType(varNameStruct, con.verifyFuncName, functionArgMappings, functionArgNames, returnNodes, varAssignments))
+
+
+
+
+
+	#print(varNameStruct.getStringVarName())
+	#return "test"
+
+	#DELETESTRING = StringName()
+	#DELETESTRING.setName("sig")
+	#DELETESTRING.setLineNo(30)
+
+	#DELETEME = ASTVarVisitor(myASTParser)
+	#deletethistoo = DELETEME.getVariableGroupType(DELETESTRING, "verify", functionArgMappings, functionArgNames, returnNodes, varAssignments)
+	#print(deletethistoo)
+
+def writeBVFile(myASTParser, varAssignments, inputFileName, outputFileName, varsVerifyEq, functionArgMappings, functionArgNames, returnNodes):
 	try:
 		outputFile = open(outputFileName, 'w')
 	except:
@@ -377,15 +429,52 @@ def writeBVFile(varAssignments, outputFileName):
 
 	outputString = ""
 
+	inputFileNameNoPySuffix = inputFileName.rstrip(con.pySuffix)
+
+	outputString += con.commentChar + " " + inputFileNameNoPySuffix + " " + con.batchInputsString + "\n"
+
+	outputString += con.commentChar + " " + con.variablesString + "\n"
+
+	outputString += con.nameString + con.batchVerifierOutputAssignment + inputFileNameNoPySuffix + "\n"
+
 	numSignatures = getStringNameIntegerValue(varAssignments, con.numSignatures, con.mainFuncName)
 	if ( (numSignatures == None) or (type(numSignatures).__name__ != con.intTypePython) or (numSignatures < 1) ):
-		sys.exit("AutoBatch_Parser->writeBVFile:  problem with the value returned from getNumSignatures.")
+		sys.exit("AutoBatch_Parser->writeBVFile:  problem with the value returned from getStringNameIntegerValue for numSignatures.")
 
-	outputString += con.numSignatures + " = "
-	outputString += str(numSignatures)
-	outputString += "\n\n"
+	numSigners = getStringNameIntegerValue(varAssignments, con.numSigners, con.mainFuncName)
+
+	outputString += con.numSignatures + con.batchVerifierOutputAssignment
+	outputString += str(numSignatures) + "\n"
+
+	if (numSigners != None):
+		if ( (type(numSigners).__name__ != con.intTypePython) or (numSigners < 1) ):
+			sys.exit("AutoBatch_Parser->writeBVFile:  problem with value returned from getStringNameIntegerValue for numSigners.")
+		outputString += con.numSigners + con.batchVerifierOutputAssignment
+		outputString += str(numSigners) + "\n"
+
+	outputString += "\n"
 
 	outputString += "BEGIN :: types\n"
+
+	cleanVarsVerifyEqDict = getCleanVarsVerifyEqDict(varsVerifyEq)
+
+	#print(cleanVarsVerifyEqDict)
+
+	for cleanVarVerifyEqKey,varVerifyEq in zip(cleanVarsVerifyEqDict,varsVerifyEq):
+		cleanVarVerifyEqValue = cleanVarsVerifyEqDict[cleanVarVerifyEqKey]
+		outputString += "  " + cleanVarVerifyEqValue + con.batchVerifierOutputAssignment
+		typeFirstAttempt = getTypeFirstAttempt(myASTParser, varVerifyEq, functionArgMappings, functionArgNames, returnNodes, varAssignments)
+		print(cleanVarVerifyEqKey)
+		print(typeFirstAttempt)
+		print("\n\n")
+
+		outputString += "\n"
+
+			#outputString += "  " + varVerifyEq.getSlice().getStringVarName().lstrip('\'').rstrip('\'') + con.batchVerifierOutputAssignment
+			#outputString += "\n"
+		#else:
+			#outputString += "  " + varVerifyEq.getStringVarName() + con.batchVerifierOutputAssignment
+			#outputString += "\n"
 
 	try:
 		outputFile.write(outputString)
@@ -609,7 +698,7 @@ def main():
 	if (varAssignments == None):
 		sys.exit("AutoBatch_Parser->main:  getVarAssignments returned None when trying to get the variable assignments.")
 
-	writeBVFile(varAssignments, outputFileName)
+	writeBVFile(myASTParser, varAssignments, inputFileName, outputFileName, varsVerifyEq, functionArgMappings, functionArgNames, returnNodes)
 
 
 	DELETESTRING = StringName()
@@ -618,7 +707,7 @@ def main():
 
 	DELETEME = ASTVarVisitor(myASTParser)
 	deletethistoo = DELETEME.getVariableGroupType(DELETESTRING, "verify", functionArgMappings, functionArgNames, returnNodes, varAssignments)
-	print(deletethistoo)
+	#print(deletethistoo)
 
 
 '''

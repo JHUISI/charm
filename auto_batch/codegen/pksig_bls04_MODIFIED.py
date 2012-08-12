@@ -51,6 +51,7 @@ class IBSig():
 
 def main():
     N = 200
+    l = 10
 
     groupObj = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
     

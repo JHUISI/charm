@@ -2,6 +2,7 @@ addTypeAST = 'Add'
 ASTParser = 'ASTParser'
 ASTVarVisitor = 'ASTVarVisitor'
 backSlash = '\\'
+batchInputsString = 'batch inputs'
 batchVerifierOutputAssignment = ' := '
 binOpTypeAST = 'BinOp'
 binOpValue = 'BinOpValue'
@@ -94,6 +95,7 @@ mathOp = ('left', 'op', 'right')
 maxStrLengthForLoopNames = 4
 multTypeAST = 'Mult'
 nameOnlyTypeAST = 'Name'
+nameString = 'name'
 newLineChar = '\n'
 numSignatures = 'N'
 numSignaturesIndex = 'z'
@@ -106,7 +108,7 @@ pairingLetter = 'e'
 precomputeString = 'Precompute: '
 precomputeVarString = 'pre'
 productString = 'prod'
-
+pySuffix = '.py'
 pythonLoopPrefixes = ['for ', 'while ']
 
 randomType = 'random'
@@ -156,6 +158,7 @@ valueType = 'value'
 variable = 'Variable'
 variableDependencies = 'VariableDependencies'
 variableNamesValue = 'VariableNamesValue'
+variablesString = 'variables'
 verifyFuncName = 'verify'
 batchEqRemoveStrings = [pairingLetter, lParan, numSignersIndex, numSignaturesIndex, '1', productString, '{', '}', numSigners, numSignatures, ':=', '^', ',', dotDirector, ')', '==', '*', sumDirector, sumString]
 opTypesAST = [addTypeAST, divTypeAST, expTypeAST, multTypeAST, subTypeAST]
