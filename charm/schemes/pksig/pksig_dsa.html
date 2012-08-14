@@ -1,0 +1,179 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pksig_dsa &mdash; Charm-Crypto 0.42b documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.42b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../../../index.html" />
+    <link rel="up" title="Demonstration Schemes" href="../../../schemes.html" />
+    <link rel="next" title="pksig_ecdsa" href="../pksig/pksig_ecdsa.html" />
+    <link rel="prev" title="pksig_cyh" href="../pksig/pksig_cyh.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../pksig/pksig_ecdsa.html" title="pksig_ecdsa"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../pksig/pksig_cyh.html" title="pksig_cyh"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+          <li><a href="../../../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pksig_dsa">
+<span id="pksig-dsa"></span><h1>pksig_dsa<a class="headerlink" href="#module-pksig_dsa" title="Permalink to this headline">¶</a></h1>
+<p>Digital Signature Algorithm (DSA)</p>
+<div class="line-block">
+<div class="line">From: &#8220;NIST proposed in Aug 1991 for use in DSS.&#8221;</div>
+<div class="line">Published in: FIPS 186</div>
+<div class="line">Available from: </div>
+<div class="line">Notes: </div>
+</div>
+<ul class="simple">
+<li>type:           signature</li>
+<li>setting:        integer groups</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body"><ol class="first upperalpha simple" start="10">
+<li>Ayo Akinyele</li>
+</ol>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body"><p class="first last">5/2011</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="pksig_dsa.DSA">
+<em class="property">class </em><tt class="descclassname">pksig_dsa.</tt><tt class="descname">DSA</tt><big>(</big><em>p=0</em>, <em>q=0</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_dsa.html#DSA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_dsa.DSA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">charm.toolbox.PKSig.PKSig</span></tt></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="kn">import</span> <span class="n">integer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">156053402631691285300957066846581395905893621007563090607988086498527791650834395958624527746916581251903190331297268907675919283232442999706619659475326192111220545726433895802392432934926242553363253333261282122117343404703514696108330984423475697798156574052962658373571332699002716083130212467463571362679</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">78026701315845642650478533423290697952946810503781545303994043249263895825417197979312263873458290625951595165648634453837959641616221499853309829737663096055610272863216947901196216467463121276681626666630641061058671702351757348054165492211737848899078287026481329186785666349501358041565106233731785681339</span><span class="p">)</span>    
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dsa</span> <span class="o">=</span> <span class="n">DSA</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">dsa</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;hello world test message!!!&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span> <span class="o">=</span> <span class="n">dsa</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dsa</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="pksig_dsa.DSA.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>bits</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_dsa.html#DSA.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_dsa.DSA.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pksig_dsa.DSA.sign">
+<tt class="descname">sign</tt><big>(</big><em>pk</em>, <em>x</em>, <em>M</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_dsa.html#DSA.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_dsa.DSA.sign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pksig_dsa.DSA.verify">
+<tt class="descname">verify</tt><big>(</big><em>pk</em>, <em>sig</em>, <em>M</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_dsa.html#DSA.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_dsa.DSA.verify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../pksig/pksig_cyh.html"
+                        title="previous chapter">pksig_cyh</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../pksig/pksig_ecdsa.html"
+                        title="next chapter">pksig_ecdsa</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../../_sources/charm/schemes/pksig/pksig_dsa.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../pksig/pksig_ecdsa.html" title="pksig_ecdsa"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../pksig/pksig_cyh.html" title="pksig_cyh"
+             >previous</a> |</li>
+        <li><a href="../../../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+          <li><a href="../../../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 04, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,168 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pksig_cl03 &mdash; Charm-Crypto 0.42b documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.42b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../../../index.html" />
+    <link rel="up" title="Demonstration Schemes" href="../../../schemes.html" />
+    <link rel="next" title="pksig_cl04" href="../pksig/pksig_cl04.html" />
+    <link rel="prev" title="pksig_chp" href="../pksig/pksig_chp.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../pksig/pksig_cl04.html" title="pksig_cl04"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../pksig/pksig_chp.html" title="pksig_chp"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+          <li><a href="../../../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pksig_cl03">
+<span id="pksig-cl03"></span><h1>pksig_cl03<a class="headerlink" href="#module-pksig_cl03" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="pksig_cl03.SHA1">
+<tt class="descclassname">pksig_cl03.</tt><tt class="descname">SHA1</tt><big>(</big><em>bytes1</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_cl03.html#SHA1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_cl03.SHA1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="pksig_cl03.Sig_CL03">
+<em class="property">class </em><tt class="descclassname">pksig_cl03.</tt><tt class="descname">Sig_CL03</tt><big>(</big><em>lmin=160</em>, <em>lin=160</em>, <em>secparam=512</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_cl03.html#Sig_CL03"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_cl03.Sig_CL03" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">charm.toolbox.PKSig.PKSig</span></tt></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pksig</span> <span class="o">=</span> <span class="n">Sig_CL03</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">21281327767482252741932894893985715222965623124768085901716557791820905647984944443933101657552322341359898014680608292582311911954091137905079983298534519</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">25806791860198780216123533220157510131833627659100364815258741328806284055493647951841418122944864389129382151632630375439181728665686745203837140362092027</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">pksig</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">SHA1</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;This is the message I want to hash.&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span> <span class="o">=</span> <span class="n">pksig</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pksig</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="pksig_cl03.Sig_CL03.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>secparam=512</em>, <em>p=0</em>, <em>q=0</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_cl03.html#Sig_CL03.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_cl03.Sig_CL03.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pksig_cl03.Sig_CL03.sign">
+<tt class="descname">sign</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>m</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_cl03.html#Sig_CL03.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_cl03.Sig_CL03.sign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pksig_cl03.Sig_CL03.signCommit">
+<tt class="descname">signCommit</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>Cx</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_cl03.html#Sig_CL03.signCommit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_cl03.Sig_CL03.signCommit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pksig_cl03.Sig_CL03.verify">
+<tt class="descname">verify</tt><big>(</big><em>pk</em>, <em>m</em>, <em>sig</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_cl03.html#Sig_CL03.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_cl03.Sig_CL03.verify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pksig_cl03.randomQR">
+<tt class="descclassname">pksig_cl03.</tt><tt class="descname">randomQR</tt><big>(</big><em>n</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_cl03.html#randomQR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_cl03.randomQR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../pksig/pksig_chp.html"
+                        title="previous chapter">pksig_chp</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../pksig/pksig_cl04.html"
+                        title="next chapter">pksig_cl04</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../../_sources/charm/schemes/pksig/pksig_cl03.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../pksig/pksig_cl04.html" title="pksig_cl04"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../pksig/pksig_chp.html" title="pksig_chp"
+             >previous</a> |</li>
+        <li><a href="../../../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+          <li><a href="../../../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 04, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

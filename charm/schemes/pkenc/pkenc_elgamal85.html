@@ -1,0 +1,192 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pkenc_elgamal85 &mdash; Charm-Crypto 0.42b documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.42b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../../../index.html" />
+    <link rel="up" title="Demonstration Schemes" href="../../../schemes.html" />
+    <link rel="next" title="pkenc_paillier99" href="../pkenc/pkenc_paillier99.html" />
+    <link rel="prev" title="pkenc_cs98" href="../pkenc/pkenc_cs98.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../pkenc/pkenc_paillier99.html" title="pkenc_paillier99"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../pkenc/pkenc_cs98.html" title="pkenc_cs98"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+          <li><a href="../../../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pkenc_elgamal85">
+<span id="pkenc-elgamal85"></span><h1>pkenc_elgamal85<a class="headerlink" href="#module-pkenc_elgamal85" title="Permalink to this headline">¶</a></h1>
+<p>El Gamal Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption in groups of prime order)</p>
+<div class="line-block">
+<div class="line">Available from: <a class="reference external" href="http://en.wikipedia.org/wiki/ElGamal_encryption">http://en.wikipedia.org/wiki/ElGamal_encryption</a></div>
+<div class="line">Notes: </div>
+</div>
+<ul class="simple">
+<li>type:          encryption (public key)</li>
+<li>setting:       DDH-hard prime order group</li>
+<li>assumption:    DDH</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">J Ayo Akinyele</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">3/2011</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="pkenc_elgamal85.ElGamal">
+<em class="property">class </em><tt class="descclassname">pkenc_elgamal85.</tt><tt class="descname">ElGamal</tt><big>(</big><em>groupObj</em>, <em>p=0</em>, <em>q=0</em><big>)</big><a class="reference internal" href="../../../_modules/pkenc_elgamal85.html#ElGamal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_elgamal85.ElGamal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">charm.toolbox.PKEnc.PKEnc</span></tt></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.toolbox.eccurve</span> <span class="kn">import</span> <span class="n">prime192v2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.toolbox.ecgroup</span> <span class="kn">import</span> <span class="n">ECGroup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">groupObj</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">prime192v2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">el</span> <span class="o">=</span> <span class="n">ElGamal</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>    
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="n">b</span><span class="s">&quot;hello world!&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher_text</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">cipher_text</span><span class="p">)</span>    
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">==</span> <span class="n">msg</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="kn">import</span> <span class="n">IntegerGroupQ</span><span class="p">,</span> <span class="n">integer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">148829018183496626261556856344710600327516732500226144177322012998064772051982752493460332138204351040296264880017943408846937646702376203733370973197019636813306480144595809796154634625021213611577190781215296823124523899584781302512549499802030946698512327294159881907114777803654670044046376468983244647367</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">74414509091748313130778428172355300163758366250113072088661006499032386025991376246730166069102175520148132440008971704423468823351188101866685486598509818406653240072297904898077317312510606805788595390607648411562261949792390651256274749901015473349256163647079940953557388901827335022023188234491622323683</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">groupObj</span> <span class="o">=</span> <span class="n">IntegerGroupQ</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">el</span> <span class="o">=</span> <span class="n">ElGamal</span><span class="p">(</span><span class="n">groupObj</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>    
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="n">b</span><span class="s">&quot;hello world!&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher_text</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">cipher_text</span><span class="p">)</span>    
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">==</span> <span class="n">msg</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="pkenc_elgamal85.ElGamal.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>c</em><big>)</big><a class="reference internal" href="../../../_modules/pkenc_elgamal85.html#ElGamal.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_elgamal85.ElGamal.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pkenc_elgamal85.ElGamal.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>M</em><big>)</big><a class="reference internal" href="../../../_modules/pkenc_elgamal85.html#ElGamal.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_elgamal85.ElGamal.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pkenc_elgamal85.ElGamal.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>secparam=1024</em><big>)</big><a class="reference internal" href="../../../_modules/pkenc_elgamal85.html#ElGamal.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_elgamal85.ElGamal.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pkenc_elgamal85.ElGamalCipher">
+<em class="property">class </em><tt class="descclassname">pkenc_elgamal85.</tt><tt class="descname">ElGamalCipher</tt><big>(</big><em>ct</em><big>)</big><a class="reference internal" href="../../../_modules/pkenc_elgamal85.html#ElGamalCipher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_elgamal85.ElGamalCipher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.dict</span></tt></p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../pkenc/pkenc_cs98.html"
+                        title="previous chapter">pkenc_cs98</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../pkenc/pkenc_paillier99.html"
+                        title="next chapter">pkenc_paillier99</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../../_sources/charm/schemes/pkenc/pkenc_elgamal85.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../pkenc/pkenc_paillier99.html" title="pkenc_paillier99"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../pkenc/pkenc_cs98.html" title="pkenc_cs98"
+             >previous</a> |</li>
+        <li><a href="../../../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+          <li><a href="../../../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 04, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

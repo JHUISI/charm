@@ -1,0 +1,173 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chamhash_adm05 &mdash; Charm-Crypto 0.42b documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.42b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../../index.html" />
+    <link rel="up" title="Demonstration Schemes" href="../../schemes.html" />
+    <link rel="next" title="chamhash_rsa_hw09" href="../schemes/chamhash_rsa_hw09.html" />
+    <link rel="prev" title="Demonstration Schemes" href="../../schemes.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../schemes/chamhash_rsa_hw09.html" title="chamhash_rsa_hw09"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../../schemes.html" title="Demonstration Schemes"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+          <li><a href="../../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-chamhash_adm05">
+<span id="chamhash-adm05"></span><h1>chamhash_adm05<a class="headerlink" href="#module-chamhash_adm05" title="Permalink to this headline">¶</a></h1>
+<p>Ateneise-Medeiros (Schnorr group-based)</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">From: &#8220;Ateneise-Breno de Medeiros On the Key Exposure Problem in Chameleon Hashes&#8221;, Section 4.</div>
+<div class="line">Published in: SCN 2004</div>
+<div class="line">Available from:</div>
+<div class="line">Notes: </div>
+</div>
+<ul class="simple">
+<li>type:         hash function (chameleon)</li>
+<li>setting:      Schnorr groups</li>
+<li>assumption:   DL-Hard</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">J Ayo Akinyele</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">4/2011</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="chamhash_adm05.ChamHash_Adm05">
+<em class="property">class </em><tt class="descclassname">chamhash_adm05.</tt><tt class="descname">ChamHash_Adm05</tt><big>(</big><em>p=0</em>, <em>q=0</em><big>)</big><a class="reference internal" href="../../_modules/chamhash_adm05.html#ChamHash_Adm05"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chamhash_adm05.ChamHash_Adm05" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">charm.toolbox.Hash.ChamHash</span></tt></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="kn">import</span> <span class="n">integer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">141660875619984104245410764464185421040193281776686085728248762539241852738181649330509191671665849071206347515263344232662465937366909502530516774705282764748558934610432918614104329009095808618770549804432868118610669336907161081169097403439689930233383598055540343198389409225338204714777812724565461351567</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">70830437809992052122705382232092710520096640888343042864124381269620926369090824665254595835832924535603173757631672116331232968683454751265258387352641382374279467305216459307052164504547904309385274902216434059305334668453580540584548701719844965116691799027770171599194704612669102357388906362282730675783</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chamHash</span> <span class="o">=</span> <span class="n">ChamHash_Adm05</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">chamHash</span><span class="o">.</span><span class="n">paramgen</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;hello world this is the message&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">chamHash</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">==</span> <span class="n">chamHash</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="chamhash_adm05.ChamHash_Adm05.hash">
+<tt class="descname">hash</tt><big>(</big><em>pk</em>, <em>m</em>, <em>r=0</em>, <em>s=0</em><big>)</big><a class="reference internal" href="../../_modules/chamhash_adm05.html#ChamHash_Adm05.hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chamhash_adm05.ChamHash_Adm05.hash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="chamhash_adm05.ChamHash_Adm05.paramgen">
+<tt class="descname">paramgen</tt><big>(</big><em>secparam=1024</em><big>)</big><a class="reference internal" href="../../_modules/chamhash_adm05.html#ChamHash_Adm05.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chamhash_adm05.ChamHash_Adm05.paramgen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../../schemes.html"
+                        title="previous chapter">Demonstration Schemes</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../schemes/chamhash_rsa_hw09.html"
+                        title="next chapter">chamhash_rsa_hw09</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/charm/schemes/chamhash_adm05.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../schemes/chamhash_rsa_hw09.html" title="chamhash_rsa_hw09"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../../schemes.html" title="Demonstration Schemes"
+             >previous</a> |</li>
+        <li><a href="../../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+          <li><a href="../../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 04, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

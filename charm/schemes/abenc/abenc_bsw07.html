@@ -1,0 +1,188 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>abenc_bsw07 &mdash; Charm-Crypto 0.42b documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.42b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../../../index.html" />
+    <link rel="up" title="Demonstration Schemes" href="../../../schemes.html" />
+    <link rel="next" title="abenc_lsw08" href="../abenc/abenc_lsw08.html" />
+    <link rel="prev" title="pksig_waters09" href="../../schemes/pksig/pksig_waters09.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../abenc/abenc_lsw08.html" title="abenc_lsw08"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../../schemes/pksig/pksig_waters09.html" title="pksig_waters09"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+          <li><a href="../../../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-abenc_bsw07">
+<span id="abenc-bsw07"></span><h1>abenc_bsw07<a class="headerlink" href="#module-abenc_bsw07" title="Permalink to this headline">¶</a></h1>
+<p>John Bethencourt, Brent Waters (Pairing-based)</p>
+<div class="line-block">
+<div class="line">From: &#8220;Ciphertext-Policy Attribute-Based Encryption&#8221;.</div>
+<div class="line">Published in: 2007</div>
+<div class="line">Available from: </div>
+<div class="line">Notes: </div>
+<div class="line">Security Assumption: </div>
+<div class="line"><br /></div>
+<div class="line">type:           ciphertext-policy attribute-based encryption (public key)</div>
+<div class="line">setting:        Pairing</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">J Ayo Akinyele</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">04/2011</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="abenc_bsw07.CPabe_BSW07">
+<em class="property">class </em><tt class="descclassname">abenc_bsw07.</tt><tt class="descname">CPabe_BSW07</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../../../_modules/abenc_bsw07.html#CPabe_BSW07"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_bsw07.CPabe_BSW07" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">charm.toolbox.ABEnc.ABEnc</span></tt></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cpabe</span> <span class="o">=</span> <span class="n">CPabe_BSW07</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">attributes</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;ONE&#39;</span><span class="p">,</span> <span class="s">&#39;TWO&#39;</span><span class="p">,</span> <span class="s">&#39;THREE&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">access_policy</span> <span class="o">=</span> <span class="s">&#39;((four or three) and (three or one))&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">master_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">cpabe</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">secret_key</span> <span class="o">=</span> <span class="n">cpabe</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">master_key</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher_text</span> <span class="o">=</span> <span class="n">cpabe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">access_policy</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">=</span> <span class="n">cpabe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">cipher_text</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">==</span> <span class="n">decrypted_msg</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="abenc_bsw07.CPabe_BSW07.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../../../_modules/abenc_bsw07.html#CPabe_BSW07.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_bsw07.CPabe_BSW07.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="abenc_bsw07.CPabe_BSW07.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../../../_modules/abenc_bsw07.html#CPabe_BSW07.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_bsw07.CPabe_BSW07.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="abenc_bsw07.CPabe_BSW07.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../../../_modules/abenc_bsw07.html#CPabe_BSW07.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_bsw07.CPabe_BSW07.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="abenc_bsw07.CPabe_BSW07.setup">
+<tt class="descname">setup</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../../../_modules/abenc_bsw07.html#CPabe_BSW07.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_bsw07.CPabe_BSW07.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="abenc_bsw07.main">
+<tt class="descclassname">abenc_bsw07.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="headerlink" href="#abenc_bsw07.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../../schemes/pksig/pksig_waters09.html"
+                        title="previous chapter">pksig_waters09</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../abenc/abenc_lsw08.html"
+                        title="next chapter">abenc_lsw08</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../../_sources/charm/schemes/abenc/abenc_bsw07.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../abenc/abenc_lsw08.html" title="abenc_lsw08"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../../schemes/pksig/pksig_waters09.html" title="pksig_waters09"
+             >previous</a> |</li>
+        <li><a href="../../../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+          <li><a href="../../../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

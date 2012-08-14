@@ -1,0 +1,190 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pksig_chch &mdash; Charm-Crypto 0.42b documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.42b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../../../index.html" />
+    <link rel="up" title="Demonstration Schemes" href="../../../schemes.html" />
+    <link rel="next" title="pksig_chp" href="../pksig/pksig_chp.html" />
+    <link rel="prev" title="pksig_boyen" href="../pksig/pksig_boyen.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../pksig/pksig_chp.html" title="pksig_chp"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../pksig/pksig_boyen.html" title="pksig_boyen"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+          <li><a href="../../../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pksig_chch">
+<span id="pksig-chch"></span><h1>pksig_chch<a class="headerlink" href="#module-pksig_chch" title="Permalink to this headline">¶</a></h1>
+<p>Jae Choon Cha and Jung Hee Cheon - Identity-based Signatures</p>
+<div class="line-block">
+<div class="line">From: &#8220;J. Cha and J. Choen - An identity-based signature from gap Diffie-Hellman groups.&#8221;</div>
+<div class="line">Published in: PKC 2003</div>
+<div class="line">Available from: Vol. 2567. LNCS, pages 18-30</div>
+<div class="line">Notes: </div>
+</div>
+<ul class="simple">
+<li>type:           signature (ID-based)</li>
+<li>setting:        bilinear groups (asymmetric)</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body"><ol class="first upperalpha simple" start="10">
+<li>Ayo Akinyele</li>
+</ol>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body"><p class="first last">11/2011</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="pksig_chch.CHCH">
+<em class="property">class </em><tt class="descclassname">pksig_chch.</tt><tt class="descname">CHCH</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_chch.html#CHCH"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_chch.CHCH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">charm.toolbox.PKSig.PKSig</span></tt></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chch</span> <span class="o">=</span> <span class="n">CHCH</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">master_secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">chch</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ID</span> <span class="o">=</span> <span class="s">&quot;janedoe@email.com&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">chch</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">master_secret_key</span><span class="p">,</span> <span class="n">ID</span><span class="p">)</span>  
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;this is a message!&quot;</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span> <span class="o">=</span> <span class="n">chch</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chch</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="pksig_chch.CHCH.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>msk</em>, <em>ID</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_chch.html#CHCH.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_chch.CHCH.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pksig_chch.CHCH.setup">
+<tt class="descname">setup</tt><big>(</big><big>)</big><a class="reference internal" href="../../../_modules/pksig_chch.html#CHCH.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_chch.CHCH.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pksig_chch.CHCH.sign">
+<tt class="descname">sign</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>M</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_chch.html#CHCH.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_chch.CHCH.sign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pksig_chch.CHCH.verify">
+<tt class="descname">verify</tt><big>(</big><em>mpk</em>, <em>pk</em>, <em>M</em>, <em>sig</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_chch.html#CHCH.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_chch.CHCH.verify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pksig_chch.main">
+<tt class="descclassname">pksig_chch.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../../../_modules/pksig_chch.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_chch.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../pksig/pksig_boyen.html"
+                        title="previous chapter">pksig_boyen</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../pksig/pksig_chp.html"
+                        title="next chapter">pksig_chp</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../../_sources/charm/schemes/pksig/pksig_chch.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../pksig/pksig_chp.html" title="pksig_chp"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../pksig/pksig_boyen.html" title="pksig_boyen"
+             >previous</a> |</li>
+        <li><a href="../../../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+          <li><a href="../../../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 04, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
