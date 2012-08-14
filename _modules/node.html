@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>node &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>node &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -49,71 +49,118 @@
           <div class="body">
             
   <h1>Source code for node</h1><div class="highlight"><pre>
-<span class="n">OpType</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;or&#39;</span><span class="p">,</span> <span class="s">&#39;and&#39;</span><span class="p">,</span> <span class="s">&#39;attr&#39;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.enum</span> <span class="kn">import</span> <span class="o">*</span>
 
-<span class="k">class</span> <span class="nc">BinNode</span><span class="p">:</span>
+<span class="n">OpType</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;OR&#39;</span><span class="p">,</span> <span class="s">&#39;AND&#39;</span><span class="p">,</span> <span class="s">&#39;ATTR&#39;</span><span class="p">,</span> <span class="s">&#39;THRESHOLD&#39;</span><span class="p">,</span> <span class="s">&#39;CONDITIONAL&#39;</span><span class="p">,</span> <span class="s">&#39;NONE&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BinNode"><a class="viewcode-back" href="../toolbox/node.html#node.BinNode">[docs]</a><span class="k">class</span> <span class="nc">BinNode</span><span class="p">:</span>
   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>		
     <span class="c">#types of node</span>
-<div class="viewcode-block" id="BinNode"><a class="viewcode-back" href="../toolbox/node.html#node.BinNode">[docs]</a>    <span class="bp">self</span><span class="o">.</span><span class="n">OR</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">AND</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">ATTR</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="c">#    self.OR = 1</span>
+<span class="c">#    self.AND = 2</span>
+<span class="c">#    self.ATTR = 0</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">negated</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">index</span>   <span class="o">=</span> <span class="bp">None</span>
     <span class="c">#OF = &#39;&#39; # anything above 1 and 2</span>
     <span class="k">if</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
       <span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;!&#39;</span><span class="p">:</span> 
           <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="c"># remove but set flag</span>
           <span class="bp">self</span><span class="o">.</span><span class="n">negated</span> <span class="o">=</span> <span class="bp">True</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ATTR</span>
+      <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+          <span class="n">val</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="c"># index</span>
+          <span class="n">value</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">OpType</span><span class="o">.</span><span class="n">ATTR</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">attribute</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>      
-            
-    <span class="k">elif</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">OR</span> <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">OR</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">AND</span>
+      
+    <span class="k">elif</span><span class="p">(</span><span class="n">value</span> <span class="o">&gt;=</span> <span class="n">OpType</span><span class="o">.</span><span class="n">OR</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="n">OpType</span><span class="o">.</span><span class="n">NONE</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">value</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">OpType</span><span class="o">.</span><span class="n">OR</span><span class="p">:</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="mi">1</span>
+      <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">OpType</span><span class="o">.</span><span class="n">AND</span><span class="p">:</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="c">#      elif self.type == OpType.THRESHOLD: </span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">attribute</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="bp">None</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">attribute</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
     
     <span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">left</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span>
-
+  
+  <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+  
   <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">ATTR</span><span class="p">):</span>
-      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">negated</span><span class="p">:</span> <span class="n">prefix</span> <span class="o">=</span> <span class="s">&#39;!&#39;</span>
-      <span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute</span>
-      <span class="k">return</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute</span>
-    <span class="k">else</span><span class="p">:</span>			
+    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">OpType</span><span class="o">.</span><span class="n">ATTR</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">negated</span><span class="p">:</span> <span class="n">prefix</span> <span class="o">=</span> <span class="s">&#39;!&#39;</span>
+        <span class="k">else</span><span class="p">:</span> <span class="n">prefix</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> <span class="n">postfix</span> <span class="o">=</span> <span class="s">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> <span class="n">postfix</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute</span> <span class="o">+</span> <span class="n">postfix</span>
+    <span class="k">else</span><span class="p">:</span>
       <span class="n">left</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">)</span>
       <span class="n">right</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">)</span>
       
-      <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">OR</span><span class="p">):</span>
+      <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">OpType</span><span class="o">.</span><span class="n">OR</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="s">&#39;(&#39;</span><span class="o">+</span> <span class="n">left</span> <span class="o">+</span> <span class="s">&#39; or &#39;</span> <span class="o">+</span> <span class="n">right</span> <span class="o">+</span> <span class="s">&#39;)&#39;</span><span class="p">)</span>
-      <span class="k">else</span><span class="p">:</span>
+      <span class="k">elif</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">OpType</span><span class="o">.</span><span class="n">AND</span><span class="p">):</span>
       	<span class="k">return</span> <span class="p">(</span><span class="s">&#39;(&#39;</span> <span class="o">+</span> <span class="n">left</span> <span class="o">+</span> <span class="s">&#39; and &#39;</span> <span class="o">+</span> <span class="n">right</span> <span class="o">+</span> <span class="s">&#39;)&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">None</span>
   
-  <span class="k">def</span> <span class="nf">getAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">ATTR</span><span class="p">):</span>
+<div class="viewcode-block" id="BinNode.getAttribute"><a class="viewcode-back" href="../toolbox/node.html#node.BinNode.getAttribute">[docs]</a>  <span class="k">def</span> <span class="nf">getAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">OpType</span><span class="o">.</span><span class="n">ATTR</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">negated</span><span class="p">:</span> <span class="n">prefix</span> <span class="o">=</span> <span class="s">&#39;!&#39;</span>
-<div class="viewcode-block" id="BinNode.getAttribute"><a class="viewcode-back" href="../toolbox/node.html#node.BinNode.getAttribute">[docs]</a>        <span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute</span>
-        <span class="k">return</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute</span> 
+        <span class="k">else</span><span class="p">:</span> <span class="n">prefix</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>        
+        <span class="k">return</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute</span>
     <span class="k">return</span>
+</div>
+<div class="viewcode-block" id="BinNode.getAttributeAndIndex"><a class="viewcode-back" href="../toolbox/node.html#node.BinNode.getAttributeAndIndex">[docs]</a>  <span class="k">def</span> <span class="nf">getAttributeAndIndex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">OpType</span><span class="o">.</span><span class="n">ATTR</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">negated</span><span class="p">:</span> <span class="n">prefix</span> <span class="o">=</span> <span class="s">&#39;!&#39;</span>
+        <span class="k">else</span><span class="p">:</span> <span class="n">prefix</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> <span class="n">postfix</span> <span class="o">=</span> <span class="s">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> <span class="n">postfix</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        
+        <span class="k">return</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute</span> <span class="o">+</span> <span class="n">postfix</span>
+    <span class="k">return</span>
+</div>
+  <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="k">return</span> <span class="bp">self</span>
 
-  <span class="k">def</span> <span class="nf">getLeft</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+      <span class="c">#print(&quot;checking...:&quot;, self, str(other))</span>
+      <span class="k">if</span> <span class="n">other</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+          <span class="k">return</span> <span class="bp">False</span>
+      <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+          <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getAttribute</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">getAttribute</span><span class="p">()</span>
+      <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]:</span>
+          <span class="k">return</span> <span class="n">other</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getAttributeAndIndex</span><span class="p">()</span>
+      <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]:</span>
+          <span class="k">return</span> <span class="bp">self</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">getAttributeAndIndex</span><span class="p">()</span>
+      <span class="k">else</span><span class="p">:</span>
+          <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;BinNode - invalid comparison.&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BinNode.getLeft"><a class="viewcode-back" href="../toolbox/node.html#node.BinNode.getLeft">[docs]</a>  <span class="k">def</span> <span class="nf">getLeft</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span>
   </div>
-<div class="viewcode-block" id="BinNode.getLeft"><a class="viewcode-back" href="../toolbox/node.html#node.BinNode.getLeft">[docs]</a>  <span class="k">def</span> <span class="nf">getRight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BinNode.getRight"><a class="viewcode-back" href="../toolbox/node.html#node.BinNode.getRight">[docs]</a>  <span class="k">def</span> <span class="nf">getRight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span>
         </div>
-<div class="viewcode-block" id="BinNode.getRight"><a class="viewcode-back" href="../toolbox/node.html#node.BinNode.getRight">[docs]</a>  <span class="k">def</span> <span class="nf">getNodeType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BinNode.getNodeType"><a class="viewcode-back" href="../toolbox/node.html#node.BinNode.getNodeType">[docs]</a>  <span class="k">def</span> <span class="nf">getNodeType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span>
     </div>
-<div class="viewcode-block" id="BinNode.getNodeType"><a class="viewcode-back" href="../toolbox/node.html#node.BinNode.getNodeType">[docs]</a>  <span class="k">def</span> <span class="nf">addSubNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">):</span>
+<div class="viewcode-block" id="BinNode.addSubNode"><a class="viewcode-back" href="../toolbox/node.html#node.BinNode.addSubNode">[docs]</a>  <span class="k">def</span> <span class="nf">addSubNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">):</span>
     <span class="c"># set subNodes appropriately</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">left</span> <span class="k">if</span> <span class="n">left</span> <span class="o">!=</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">None</span></div>
-<div class="viewcode-block" id="BinNode.addSubNode"><a class="viewcode-back" href="../toolbox/node.html#node.BinNode.addSubNode">[docs]</a>    <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span> <span class="k">if</span> <span class="n">left</span> <span class="o">!=</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">left</span> <span class="k">if</span> <span class="n">left</span> <span class="o">!=</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span> <span class="k">if</span> <span class="n">left</span> <span class="o">!=</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">None</span>
 
-  <span class="c"># only applies function on leaf nodes</span>
-  <span class="k">def</span> <span class="nf">traverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">):</span>
+  <span class="c"># only applies function on leaf nodes</span></div>
+<div class="viewcode-block" id="BinNode.traverse"><a class="viewcode-back" href="../toolbox/node.html#node.BinNode.traverse">[docs]</a>  <span class="k">def</span> <span class="nf">traverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">):</span>
     <span class="c"># visit node then traverse left and right</span>
-    <span class="n">function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
-<div class="viewcode-block" id="BinNode.traverse"><a class="viewcode-back" href="../toolbox/node.html#node.BinNode.traverse">[docs]</a>    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">==</span> <span class="bp">None</span><span class="p">):</span>
+    <span class="n">function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">==</span> <span class="bp">None</span><span class="p">):</span>
       <span class="k">return</span> <span class="bp">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">traverse</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
     <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">==</span> <span class="bp">None</span><span class="p">):</span>
@@ -130,7 +177,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -153,14 +200,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

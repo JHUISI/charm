@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pk_vrf &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>pk_vrf &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,10 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
-    <link rel="up" title="Demonstration Schemes" href="../schemes.html" />
-    <link rel="next" title="pkenc_adapt_bchk05" href="pkenc_adapt_bchk05.html" />
-    <link rel="prev" title="kpabenc_adapt_hybrid" href="kpabenc_adapt_hybrid.html" /> 
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -40,14 +37,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="pkenc_adapt_bchk05.html" title="pkenc_adapt_bchk05"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="kpabenc_adapt_hybrid.html" title="kpabenc_adapt_hybrid"
-             accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
-          <li><a href="../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -84,10 +74,17 @@ and verifiable transaction escrow schemes to name a few</div>
 <dt id="pk_vrf.VRF10">
 <em class="property">class </em><tt class="descclassname">pk_vrf.</tt><tt class="descname">VRF10</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../_modules/pk_vrf.html#VRF10"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pk_vrf.VRF10" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
-<p>Definition in paper: behave as Pseudo Random Functions (PRFs) with an additional property that party
-holding the seed will publish a commitment to the function and is able to non-interactively convince
-a verifier that a given evaluation is correct (matches pub commitment) without sacrificing pseudo-
-randomness property on other inputs.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;MNT224&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vrf</span> <span class="o">=</span> <span class="n">VRF10</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">statement</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">statement</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">vrf</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">witness</span> <span class="o">=</span> <span class="n">vrf</span><span class="o">.</span><span class="n">prove</span><span class="p">(</span><span class="n">secret_key</span><span class="p">,</span> <span class="n">statement</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vrf</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">statement</span><span class="p">,</span> <span class="n">witness</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
 <dl class="method">
 <dt id="pk_vrf.VRF10.F">
 <tt class="descname">F</tt><big>(</big><em>sk</em>, <em>x</em><big>)</big><a class="reference internal" href="../_modules/pk_vrf.html#VRF10.F"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pk_vrf.VRF10.F" title="Permalink to this definition">¶</a></dt>
@@ -124,12 +121,6 @@ randomness property on other inputs.</p>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="kpabenc_adapt_hybrid.html"
-                        title="previous chapter">kpabenc_adapt_hybrid</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="pkenc_adapt_bchk05.html"
-                        title="next chapter">pkenc_adapt_bchk05</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/schemes/pk_vrf.txt"
@@ -138,7 +129,7 @@ randomness property on other inputs.</p>
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -161,20 +152,13 @@ randomness property on other inputs.</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="pkenc_adapt_bchk05.html" title="pkenc_adapt_bchk05"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="kpabenc_adapt_hybrid.html" title="kpabenc_adapt_hybrid"
-             >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
-          <li><a href="../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 04, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

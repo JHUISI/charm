@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pkenc_rsa &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>pkenc_rsa &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,164 +48,156 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for pkenc_rsa</h1><pre>
-| Published in: 1978
-| Security Assumption: RSA factoring
+  <h1>Source code for pkenc_rsa</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">| From: &quot;Rivest-Shamir-Adleman Standard algorithm&quot;.</span>
+<span class="sd">| Published in: 1978</span>
+<span class="sd">| Security Assumption: RSA factoring</span>
 
-* type:           public-key encryption
-* setting:        Integer
+<span class="sd">* type:           public-key encryption</span>
+<span class="sd">* setting:        Integer</span>
 
-:Authors: J Ayo Akinyele, Gary Belvin
-:Date:            07/2011
-'''
+<span class="sd">:Authors: J Ayo Akinyele, Gary Belvin</span>
+<span class="sd">:Date:            07/2011</span>
+<span class="sd">&#39;&#39;&#39;</span>
 
-from charm.integer import integer,isPrime,gcd,random,randomPrime
-from toolbox.PKEnc import PKEnc
-from toolbox.PKSig import PKSig
-from toolbox.paddingschemes import OAEPEncryptionPadding,PSSPadding
-from toolbox.conversion import Conversion
-from math import ceil
+<span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="kn">import</span> <span class="n">integer</span><span class="p">,</span><span class="n">isPrime</span><span class="p">,</span><span class="n">gcd</span><span class="p">,</span><span class="n">random</span><span class="p">,</span><span class="n">randomPrime</span><span class="p">,</span><span class="n">toInt</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.PKEnc</span> <span class="kn">import</span> <span class="n">PKEnc</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.PKSig</span> <span class="kn">import</span> <span class="n">PKSig</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.paddingschemes</span> <span class="kn">import</span> <span class="n">OAEPEncryptionPadding</span><span class="p">,</span><span class="n">PSSPadding</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.conversion</span> <span class="kn">import</span> <span class="n">Conversion</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span>
 
-debug = False
-class RSA():
-    '''RSA Module'''
-<div class="viewcode-block" id="RSA"><a class="viewcode-back" href="../schemes/pkenc_rsa.html#pkenc_rsa.RSA">[docs]</a>    def __init__(self):
-        pass
-    # generate p,q and n
-    def paramgen(self, secparam):
-        while True:
-<div class="viewcode-block" id="RSA.paramgen"><a class="viewcode-back" href="../schemes/pkenc_rsa.html#pkenc_rsa.RSA.paramgen">[docs]</a>            p, q = randomPrime(secparam), randomPrime(secparam)
-            if isPrime(p) and isPrime(q) and p != q:
-                N = p * q
-                phi_N = (p - 1) * (q - 1)
-                break
-        return (p, q, N, phi_N)
-    
-    def keygen(self, secparam=1024, params=None):
-        if params: </div>
-<div class="viewcode-block" id="RSA.keygen"><a class="viewcode-back" href="../schemes/pkenc_rsa.html#pkenc_rsa.RSA.keygen">[docs]</a>            (N, e, d, p, q) = self.convert(params)
-            phi_N = (p - 1) * (q - 1)
-            pk = { 'N':N, 'e':e }
-            sk = { 'phi_N':phi_N, 'd':d , 'N':N}
-            return (pk, sk)
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<div class="viewcode-block" id="RSA"><a class="viewcode-back" href="../schemes/pkenc/pkenc_rsa.html#pkenc_rsa.RSA">[docs]</a><span class="k">class</span> <span class="nc">RSA</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+    <span class="c"># generate p,q and n</span>
+<div class="viewcode-block" id="RSA.paramgen"><a class="viewcode-back" href="../schemes/pkenc/pkenc_rsa.html#pkenc_rsa.RSA.paramgen">[docs]</a>    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="p">):</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">randomPrime</span><span class="p">(</span><span class="n">secparam</span><span class="p">),</span> <span class="n">randomPrime</span><span class="p">(</span><span class="n">secparam</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">isPrime</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="ow">and</span> <span class="n">isPrime</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="ow">and</span> <span class="n">p</span> <span class="o">!=</span> <span class="n">q</span><span class="p">:</span>
+                <span class="n">N</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span>
+                <span class="n">phi_N</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">phi_N</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="RSA.keygen"><a class="viewcode-back" href="../schemes/pkenc/pkenc_rsa.html#pkenc_rsa.RSA.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">params</span><span class="p">:</span> 
+            <span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+            <span class="n">phi_N</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;N&#39;</span><span class="p">:</span><span class="n">N</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">:</span><span class="n">e</span> <span class="p">}</span>
+            <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;phi_N&#39;</span><span class="p">:</span><span class="n">phi_N</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">:</span><span class="n">d</span> <span class="p">,</span> <span class="s">&#39;N&#39;</span><span class="p">:</span><span class="n">N</span><span class="p">}</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
 
-        (p, q, N, phi_N) = self.paramgen(secparam)
+        <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">phi_N</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="n">secparam</span><span class="p">)</span>
         
-        while True:
-            e = random(phi_N)
-            if not gcd(e, phi_N) == 1:
-                continue
-            d = e ** -1
-            break
-        pk = { 'N':N, 'e':e }
-        sk = { 'phi_N':phi_N, 'd':d , 'N':N}
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">random</span><span class="p">(</span><span class="n">phi_N</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">gcd</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">phi_N</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">e</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">break</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;N&#39;</span><span class="p">:</span><span class="n">N</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">:</span><span class="n">toInt</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="p">}</span> <span class="c"># strip off \phi</span>
+        <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;phi_N&#39;</span><span class="p">:</span><span class="n">phi_N</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">:</span><span class="n">d</span> <span class="p">,</span> <span class="s">&#39;N&#39;</span><span class="p">:</span><span class="n">N</span><span class="p">}</span>
 
-        return (pk, sk)
-    
-    def convert(self, N, e, d, p, q):
-        return (integer(N), integer(e), integer(d), </div>
-<div class="viewcode-block" id="RSA.convert"><a class="viewcode-back" href="../schemes/pkenc_rsa.html#pkenc_rsa.RSA.convert">[docs]</a>                integer(p), integer(q))
-    
-class RSA_Enc(RSA,PKEnc):
-    def __init__(self, padding=OAEPEncryptionPadding(), params=None):</div></div>
-<div class="viewcode-block" id="RSA_Enc"><a class="viewcode-back" href="../schemes/pkenc_rsa.html#pkenc_rsa.RSA_Enc">[docs]</a>        RSA.__init__(self)
-        PKEnc.__init__(self)
-        self.paddingscheme = padding 
-    # m : Bytes
-    def encrypt(self, pk, m, salt=None):
-        octetlen = int(ceil(int(pk['N']).bit_length() / 8.0))
-<div class="viewcode-block" id="RSA_Enc.encrypt"><a class="viewcode-back" href="../schemes/pkenc_rsa.html#pkenc_rsa.RSA_Enc.encrypt">[docs]</a>        EM = self.paddingscheme.encode(m, octetlen, "", salt)
-        if debug: print("EM == &gt;", EM)
-        i = Conversion.OS2IP(EM)
-        ip = integer(i) % pk['N']  #Convert to modular integer
-        return (ip ** pk['e']) % pk['N']
-    
-    def decrypt(self, pk, sk, c):
-        octetlen = int(ceil(int(pk['N']).bit_length() / 8.0))</div>
-<div class="viewcode-block" id="RSA_Enc.decrypt"><a class="viewcode-back" href="../schemes/pkenc_rsa.html#pkenc_rsa.RSA_Enc.decrypt">[docs]</a>        M = (c ** (sk['d'] % sk['phi_N'])) % pk['N']
-        os = Conversion.IP2OS(int(M), octetlen)
-        if debug: print("OS  =&gt;", os)
-        return self.paddingscheme.decode(os)
-    
-class RSA_Sig(RSA, PKSig):
-    '''RSASSA-PSS'''</div></div>
-<div class="viewcode-block" id="RSA_Sig"><a class="viewcode-back" href="../schemes/pkenc_rsa.html#pkenc_rsa.RSA_Sig">[docs]</a>    def __init__(self, padding=PSSPadding()):
-        RSA.__init__(self)
-        PKSig.__init__(self)
-        self.paddingscheme = padding 
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="RSA.convert"><a class="viewcode-back" href="../schemes/pkenc/pkenc_rsa.html#pkenc_rsa.RSA.convert">[docs]</a>    <span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">integer</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">integer</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="n">integer</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> 
+                <span class="n">integer</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">integer</span><span class="p">(</span><span class="n">q</span><span class="p">))</span>
+    </div></div>
+<div class="viewcode-block" id="RSA_Enc"><a class="viewcode-back" href="../schemes/pkenc/pkenc_rsa.html#pkenc_rsa.RSA_Enc">[docs]</a><span class="k">class</span> <span class="nc">RSA_Enc</span><span class="p">(</span><span class="n">RSA</span><span class="p">,</span><span class="n">PKEnc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; rsa = RSA_Enc()</span>
+<span class="sd">    &gt;&gt;&gt; (public_key, secret_key) = rsa.keygen(1024)</span>
+<span class="sd">    &gt;&gt;&gt; msg = b&#39;This is a test&#39;</span>
+<span class="sd">    &gt;&gt;&gt; cipher_text = rsa.encrypt(public_key, msg)</span>
+<span class="sd">    &gt;&gt;&gt; decrypted_msg = rsa.decrypt(public_key, secret_key, cipher_text)</span>
+<span class="sd">    &gt;&gt;&gt; decrypted_msg == msg</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">OAEPEncryptionPadding</span><span class="p">(),</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">RSA</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">PKEnc</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paddingscheme</span> <span class="o">=</span> <span class="n">padding</span> 
+    <span class="c"># m : Bytes</span>
+<div class="viewcode-block" id="RSA_Enc.encrypt"><a class="viewcode-back" href="../schemes/pkenc/pkenc_rsa.html#pkenc_rsa.RSA_Enc.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">salt</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">octetlen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span> <span class="o">/</span> <span class="mf">8.0</span><span class="p">))</span>
+        <span class="n">EM</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paddingscheme</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">octetlen</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">salt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;EM == &gt;&quot;</span><span class="p">,</span> <span class="n">EM</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">OS2IP</span><span class="p">(</span><span class="n">EM</span><span class="p">)</span>
+        <span class="n">ip</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">%</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span>  <span class="c">#Convert to modular integer</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">ip</span> <span class="o">**</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;e&#39;</span><span class="p">])</span> <span class="o">%</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span>
+    </div>
+<div class="viewcode-block" id="RSA_Enc.decrypt"><a class="viewcode-back" href="../schemes/pkenc/pkenc_rsa.html#pkenc_rsa.RSA_Enc.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="n">octetlen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span> <span class="o">/</span> <span class="mf">8.0</span><span class="p">))</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span> <span class="o">**</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;d&#39;</span><span class="p">]</span> <span class="o">%</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;phi_N&#39;</span><span class="p">]))</span> <span class="o">%</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span>
+        <span class="n">os</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">M</span><span class="p">),</span> <span class="n">octetlen</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;OS  =&gt;&quot;</span><span class="p">,</span> <span class="n">os</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">paddingscheme</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">os</span><span class="p">)</span>
+    </div></div>
+<div class="viewcode-block" id="RSA_Sig"><a class="viewcode-back" href="../schemes/pkenc/pkenc_rsa.html#pkenc_rsa.RSA_Sig">[docs]</a><span class="k">class</span> <span class="nc">RSA_Sig</span><span class="p">(</span><span class="n">RSA</span><span class="p">,</span> <span class="n">PKSig</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; msg = b&#39;This is a test message.&#39;</span>
+<span class="sd">    &gt;&gt;&gt; rsa = RSA_Sig()</span>
+<span class="sd">    &gt;&gt;&gt; (public_key, secret_key) = rsa.keygen(1024)</span>
+<span class="sd">    &gt;&gt;&gt; signature = rsa.sign(secret_key, msg)</span>
+<span class="sd">    &gt;&gt;&gt; rsa.verify(public_key, msg, signature)</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&#39;&#39;&#39;RSASSA-PSS&#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">PSSPadding</span><span class="p">()):</span>
+        <span class="n">RSA</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">PKSig</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paddingscheme</span> <span class="o">=</span> <span class="n">padding</span> 
 
-    def sign(self,sk, M, salt=None):
-        #apply encoding
-<div class="viewcode-block" id="RSA_Sig.sign"><a class="viewcode-back" href="../schemes/pkenc_rsa.html#pkenc_rsa.RSA_Sig.sign">[docs]</a>        modbits = int(sk['N']).bit_length()
-        k = int(ceil(modbits / 8.0))
-        emLen = int(ceil((modbits -1) / 8.0))
+<div class="viewcode-block" id="RSA_Sig.sign"><a class="viewcode-back" href="../schemes/pkenc/pkenc_rsa.html#pkenc_rsa.RSA_Sig.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">salt</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="c">#apply encoding</span>
+        <span class="n">modbits</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="n">modbits</span> <span class="o">/</span> <span class="mf">8.0</span><span class="p">))</span>
+        <span class="n">emLen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">((</span><span class="n">modbits</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">8.0</span><span class="p">))</span>
         
         
-        em = self.paddingscheme.encode(M, modbits - 1, salt)
-        m = Conversion.OS2IP(em)
-        m = integer(m) % sk['N']  #ERRROR m is larger than N
-        s =  (m ** sk['d']) % sk['N']
-        S = Conversion.IP2OS(s, k)
-        if debug:
-            print("Signing")
-            print("k     =&gt;", k)
-            print("emLen =&gt;", emLen) 
-            print("m     =&gt;", m)
-            print("em    =&gt;", em)
-            print("s     =&gt;", s)
-            print("S     =&gt;", S)
-        return S
-    
-    def verify(self, pk, M, S):
-        modbits = int(pk['N']).bit_length()</div>
-<div class="viewcode-block" id="RSA_Sig.verify"><a class="viewcode-back" href="../schemes/pkenc_rsa.html#pkenc_rsa.RSA_Sig.verify">[docs]</a>        k = int(ceil(modbits / 8.0))
-        emLen = int(ceil((modbits -1) / 8.0))
-        if len(S) != k:
-            if debug: print("Sig is %s octets long, not %" %(len(S), k))
-            return False
-        s = Conversion.OS2IP(S)
-        s = integer(s) % pk['N']  #Convert to modular integer
-        m = (s ** pk['e']) % pk['N']
-        EM = Conversion.IP2OS(m, emLen)
-        if debug:
-            print("Verifying")
-            print("k     =&gt;", k)
-            print("emLen =&gt;", emLen)
-            print("s     =&gt;", s)
-            print("m       =&gt;", m)
-            print("em      =&gt;", EM)
-            print("S     =&gt;", S)
-        return self.paddingscheme.verify(M, EM, modbits-1)
+        <span class="n">em</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paddingscheme</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">modbits</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">salt</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">OS2IP</span><span class="p">(</span><span class="n">em</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">%</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span>  <span class="c">#ERRROR m is larger than N</span>
+        <span class="n">s</span> <span class="o">=</span>  <span class="p">(</span><span class="n">m</span> <span class="o">**</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;d&#39;</span><span class="p">])</span> <span class="o">%</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signing&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;k     =&gt;&quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;emLen =&gt;&quot;</span><span class="p">,</span> <span class="n">emLen</span><span class="p">)</span> 
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;m     =&gt;&quot;</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;em    =&gt;&quot;</span><span class="p">,</span> <span class="n">em</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;s     =&gt;&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;S     =&gt;&quot;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">S</span>
+    </div>
+<div class="viewcode-block" id="RSA_Sig.verify"><a class="viewcode-back" href="../schemes/pkenc/pkenc_rsa.html#pkenc_rsa.RSA_Sig.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+        <span class="n">modbits</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="n">modbits</span> <span class="o">/</span> <span class="mf">8.0</span><span class="p">))</span>
+        <span class="n">emLen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">((</span><span class="n">modbits</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">8.0</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">!=</span> <span class="n">k</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Sig is </span><span class="si">%s</span><span class="s"> octets long, not %&quot;</span> <span class="o">%</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">),</span> <span class="n">k</span><span class="p">))</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">OS2IP</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">%</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span>  <span class="c">#Convert to modular integer</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="p">(</span><span class="n">s</span> <span class="o">**</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;e&#39;</span><span class="p">])</span> <span class="o">%</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span>
+        <span class="n">EM</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">emLen</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verifying&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;k     =&gt;&quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;emLen =&gt;&quot;</span><span class="p">,</span> <span class="n">emLen</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;s     =&gt;&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;m       =&gt;&quot;</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;em      =&gt;&quot;</span><span class="p">,</span> <span class="n">EM</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;S     =&gt;&quot;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">paddingscheme</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">EM</span><span class="p">,</span> <span class="n">modbits</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         
     
-def main():
-    rsa = RSA_Enc()</div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pkenc_rsa.html#pkenc_rsa.main">[docs]</a>    
-    (pk, sk) = rsa.keygen(1024)
-    
-    m = b'This is a test'
-    c = rsa.encrypt(pk, m)
-    if debug: print("ct =&gt;", c)
-    
-    orig_m = rsa.decrypt(pk, sk, c)
-    if debug: print("recovered m =&gt;", orig_m)
-
-    assert m == orig_m
-    if debug: print("Successful Decryption!!!")
-    
-def main2():
-    M = b'This is a test message.'</div>
-<div class="viewcode-block" id="main2"><a class="viewcode-back" href="../schemes/pkenc_rsa.html#pkenc_rsa.main2">[docs]</a>    rsa = RSA_Sig()
-    (pk, sk) = rsa.keygen(1024)
-    S = rsa.sign(sk, M)
-    assert rsa.verify(pk, M, S)
-    if debug: print("Successful Signature!")
-        
-if __name__ == "__main__":
-    debug = True</div>
-    main()
-    main2()    
-</pre>
+    </div></div>
+</pre></div>
 
           </div>
         </div>
@@ -215,7 +207,7 @@ if __name__ == "__main__":
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -238,14 +230,14 @@ if __name__ == "__main__":
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

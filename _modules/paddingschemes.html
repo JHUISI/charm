@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>paddingschemes &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>paddingschemes &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -49,8 +49,10 @@
           <div class="body">
             
   <h1>Source code for paddingschemes</h1><div class="highlight"><pre>
-<span class="kn">from</span> <span class="nn">toolbox.securerandom</span> <span class="kn">import</span> <span class="n">SecureRandomFactory</span>
-<span class="kn">import</span> <span class="nn">charm.cryptobase</span>
+<span class="sd">&#39;&#39;&#39;A collection of encryption and signature padding schemes&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.bitstring</span> <span class="kn">import</span> <span class="n">Bytes</span><span class="p">,</span><span class="n">py3</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.securerandom</span> <span class="kn">import</span> <span class="n">SecureRandomFactory</span>
+<span class="kn">import</span> <span class="nn">charm.core.crypto.cryptobase</span>
 <span class="kn">import</span> <span class="nn">hashlib</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">struct</span>
@@ -59,9 +61,9 @@
 <span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
 
 
-<span class="k">class</span> <span class="nc">OAEPEncryptionPadding</span><span class="p">:</span>
+<div class="viewcode-block" id="OAEPEncryptionPadding"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.OAEPEncryptionPadding">[docs]</a><span class="k">class</span> <span class="nc">OAEPEncryptionPadding</span><span class="p">:</span>
     <span class="sd">&#39;&#39;&#39;</span>
-<div class="viewcode-block" id="OAEPEncryptionPadding"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.OAEPEncryptionPadding">[docs]</a><span class="sd">    :Authors: Gary Belvin</span>
+<span class="sd">    :Authors: Gary Belvin</span>
 <span class="sd">    </span>
 <span class="sd">    OAEPEncryptionPadding</span>
 <span class="sd">    </span>
@@ -76,9 +78,9 @@
     <span class="c"># outputBytes - the length in octets of the RSA modulus used</span>
     <span class="c">#             - the intended length of the encoded message </span>
     <span class="c"># emLen = the length of the rsa modulus in bits</span>
-    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">emLen</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="OAEPEncryptionPadding.encode"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.OAEPEncryptionPadding.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">emLen</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;:Return: a Bytes object&#39;&#39;&#39;</span>
-<div class="viewcode-block" id="OAEPEncryptionPadding.encode"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.OAEPEncryptionPadding.encode">[docs]</a>        <span class="c"># Skipped: label input length checking. (L must be less than 2^61 octets for SHA1)</span>
+        <span class="c"># Skipped: label input length checking. (L must be less than 2^61 octets for SHA1)</span>
         <span class="c"># First, make sure the message isn&#39;t too long.    emLen</span>
         <span class="n">hLen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashFnOutputBytes</span>
         <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">emLen</span> <span class="o">-</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">hLen</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)):</span>
@@ -119,10 +121,10 @@
             <span class="k">print</span><span class="p">(</span><span class="s">&quot;maskedSed=&gt;&quot;</span><span class="p">,</span> <span class="n">maskedSeed</span><span class="p">)</span>
       
         <span class="k">return</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;</span><span class="se">\x00</span><span class="s">&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">maskedSeed</span> <span class="o">+</span> <span class="n">maskedDB</span>
-    
-    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encMessage</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
-        <span class="n">hLen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashFnOutputBytes</span></div>
-<div class="viewcode-block" id="OAEPEncryptionPadding.decode"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.OAEPEncryptionPadding.decode">[docs]</a>        <span class="c"># Make sure the encoded string is at least L bytes long</span>
+    </div>
+<div class="viewcode-block" id="OAEPEncryptionPadding.decode"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.OAEPEncryptionPadding.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encMessage</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+        <span class="n">hLen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashFnOutputBytes</span>
+        <span class="c"># Make sure the encoded string is at least L bytes long</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">encMessage</span><span class="p">)</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">hLen</span> <span class="o">+</span> <span class="mi">2</span><span class="p">):</span>
             <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;encoded string not long enough.&quot;</span>
         <span class="k">if</span> <span class="n">py3</span><span class="p">:</span> <span class="n">lHash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashFn</span><span class="p">(</span><span class="n">Bytes</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
@@ -154,10 +156,10 @@
         <span class="n">M</span> <span class="o">=</span> <span class="n">DB</span><span class="p">[</span><span class="n">DB</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;</span><span class="se">\x01</span><span class="s">&#39;</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span> <span class="p">:</span> <span class="p">]</span>
         <span class="k">return</span> <span class="n">M</span>
 
-<span class="c">#def MGF1(seed:Bytes, maskBytes:int, hashFn, hLen:int):</span>
-<span class="k">def</span> <span class="nf">MGF1</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">maskBytes</span><span class="p">,</span> <span class="n">hashFn</span><span class="p">,</span> <span class="n">hLen</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; MGF1 Mask Generation Function</span></div></div>
-<div class="viewcode-block" id="MGF1"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.MGF1">[docs]</a><span class="sd">    </span>
+<span class="c">#def MGF1(seed:Bytes, maskBytes:int, hashFn, hLen:int):</span></div></div>
+<div class="viewcode-block" id="MGF1"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.MGF1">[docs]</a><span class="k">def</span> <span class="nf">MGF1</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">maskBytes</span><span class="p">,</span> <span class="n">hashFn</span><span class="p">,</span> <span class="n">hLen</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; MGF1 Mask Generation Function</span>
+<span class="sd">    </span>
 <span class="sd">    Implemented according to PKCS #1 specification, see appendix B.2.1:</span>
 <span class="sd">    </span>
 <span class="sd">    :Parameters:</span>
@@ -175,10 +177,10 @@
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;test =&gt;&quot;</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">b</span><span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">maskBytes</span><span class="p">])</span>
-
-<span class="k">class</span> <span class="nc">hashFunc</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_hash_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span></div>
-<div class="viewcode-block" id="hashFunc"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.hashFunc">[docs]</a>        <span class="k">if</span> <span class="n">_hash_type</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+</div>
+<div class="viewcode-block" id="hashFunc"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.hashFunc">[docs]</a><span class="k">class</span> <span class="nc">hashFunc</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_hash_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">_hash_type</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">hashObj</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&#39;sha1&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">hashObj</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">_hash_type</span><span class="p">)</span>
@@ -192,10 +194,10 @@
         <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">Bytes</span><span class="p">]:</span>
             <span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">message</span><span class="p">))</span> <span class="c"># bytes or custom Bytes</span>
         <span class="k">return</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span>  
-    
-<span class="k">class</span> <span class="nc">PSSPadding</span><span class="p">:</span>
-    <span class="sd">&#39;&#39;&#39;</span></div>
-<div class="viewcode-block" id="PSSPadding"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.PSSPadding">[docs]</a><span class="sd">    :Authors: Gary Belvin</span>
+    </div>
+<div class="viewcode-block" id="PSSPadding"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.PSSPadding">[docs]</a><span class="k">class</span> <span class="nc">PSSPadding</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    :Authors: Gary Belvin</span>
 <span class="sd">    </span>
 <span class="sd">    PSSSignaturePadding</span>
 <span class="sd">    </span>
@@ -207,9 +209,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">hLen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">_hash_type</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sLen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hLen</span> <span class="c"># The length of the default salt</span>
     
-    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">emBits</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">salt</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="PSSPadding.encode"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.PSSPadding.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">emBits</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">salt</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Encodes a message with PSS padding</span>
-<div class="viewcode-block" id="PSSPadding.encode"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.PSSPadding.encode">[docs]</a><span class="sd">        emLen will be set to the minimum allowed length if not explicitly set</span>
+<span class="sd">        emLen will be set to the minimum allowed length if not explicitly set</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="c"># assert len(M) &lt; (2^61 -1), Message too long</span>
         
@@ -275,10 +277,10 @@
             <span class="k">print</span><span class="p">(</span><span class="s">&quot;masked=&gt;&quot;</span><span class="p">,</span> <span class="n">maskedDB</span><span class="p">)</span>
             <span class="k">print</span><span class="p">(</span><span class="s">&quot;EM    =&gt;&quot;</span><span class="p">,</span> <span class="n">EM</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">EM</span>
-    
-    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">EM</span><span class="p">,</span> <span class="n">emBits</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span></div>
-<div class="viewcode-block" id="PSSPadding.verify"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.PSSPadding.verify">[docs]</a><span class="sd">        Verifies that EM is a correct encoding for M</span>
+    </div>
+<div class="viewcode-block" id="PSSPadding.verify"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.PSSPadding.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">EM</span><span class="p">,</span> <span class="n">emBits</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Verifies that EM is a correct encoding for M</span>
 <span class="sd">        </span>
 <span class="sd">        :Parameters:</span>
 <span class="sd">           - M - the message to verify</span>
@@ -375,10 +377,10 @@
         
         <span class="c">#If H = H&#39;, output &#39;consistent&#39;. Otherwise, output &#39;inconsistent&#39;.</span>
         <span class="k">return</span> <span class="n">H</span> <span class="o">==</span> <span class="n">HPrime</span>
-
-<span class="k">class</span> <span class="nc">SAEPEncryptionPadding</span><span class="p">:</span>
-    <span class="sd">&#39;&#39;&#39;</span></div></div>
-<div class="viewcode-block" id="SAEPEncryptionPadding"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.SAEPEncryptionPadding">[docs]</a><span class="sd">    :Authors: Christina Garman</span>
+</div></div>
+<div class="viewcode-block" id="SAEPEncryptionPadding"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.SAEPEncryptionPadding">[docs]</a><span class="k">class</span> <span class="nc">SAEPEncryptionPadding</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    :Authors: Christina Garman</span>
 <span class="sd">    </span>
 <span class="sd">    SAEPEncryptionPadding</span>
 <span class="sd">    &#39;&#39;&#39;</span>
@@ -387,9 +389,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">hashFn</span> <span class="o">=</span> <span class="n">hashFunc</span><span class="p">(</span><span class="n">_hash_type</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hashFnOutputBytes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">_hash_type</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span>
         
-    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">s0</span><span class="p">):</span>
+<div class="viewcode-block" id="SAEPEncryptionPadding.encode"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.SAEPEncryptionPadding.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">s0</span><span class="p">):</span>
         <span class="c">#n = m + s0 + s1</span>
-<div class="viewcode-block" id="SAEPEncryptionPadding.encode"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.SAEPEncryptionPadding.encode">[docs]</a>        <span class="n">m</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span> <span class="c">#usually 256 bits</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span> <span class="c">#usually 256 bits</span>
 
         <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">m</span><span class="o">/</span><span class="mi">8</span><span class="p">)):</span>
             <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;message too long&quot;</span>
@@ -424,10 +426,10 @@
             <span class="k">print</span><span class="p">(</span><span class="s">&quot;y        =&gt;&quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
       
         <span class="k">return</span> <span class="n">y</span>
-    
-    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encMessage</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">s0</span><span class="p">):</span>
-        <span class="n">m</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span></div>
-<div class="viewcode-block" id="SAEPEncryptionPadding.decode"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.SAEPEncryptionPadding.decode">[docs]</a>
+    </div>
+<div class="viewcode-block" id="SAEPEncryptionPadding.decode"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.SAEPEncryptionPadding.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encMessage</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">s0</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span>
+
         <span class="n">x</span> <span class="o">=</span> <span class="n">encMessage</span><span class="p">[:</span><span class="nb">int</span><span class="p">((</span><span class="n">m</span><span class="o">+</span><span class="n">s0</span><span class="p">)</span><span class="o">/</span><span class="mi">8</span><span class="p">)]</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">encMessage</span><span class="p">[</span><span class="nb">int</span><span class="p">((</span><span class="n">m</span><span class="o">+</span><span class="n">s0</span><span class="p">)</span><span class="o">/</span><span class="mi">8</span><span class="p">):</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="n">m</span><span class="o">-</span><span class="n">s0</span><span class="p">)]</span>
 
@@ -452,26 +454,26 @@
             <span class="k">print</span><span class="p">(</span><span class="s">&quot;r    =&gt;&quot;</span> <span class="p">,</span> <span class="n">r</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
-
-<span class="k">class</span> <span class="nc">PKCS7Padding</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">block_size</span> <span class="o">=</span> <span class="mi">16</span><span class="p">):</span></div></div>
-<div class="viewcode-block" id="PKCS7Padding"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.PKCS7Padding">[docs]</a>        <span class="bp">self</span><span class="o">.</span><span class="n">block_size</span> <span class="o">=</span> <span class="n">block_size</span>
+</div></div>
+<div class="viewcode-block" id="PKCS7Padding"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.PKCS7Padding">[docs]</a><span class="k">class</span> <span class="nc">PKCS7Padding</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">block_size</span> <span class="o">=</span> <span class="mi">16</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">block_size</span> <span class="o">=</span> <span class="n">block_size</span>
         
-    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">_bytes</span><span class="p">,</span><span class="n">block_size</span> <span class="o">=</span> <span class="mi">16</span><span class="p">):</span>
+<div class="viewcode-block" id="PKCS7Padding.encode"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.PKCS7Padding.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">_bytes</span><span class="p">,</span><span class="n">block_size</span> <span class="o">=</span> <span class="mi">16</span><span class="p">):</span>
         <span class="n">pad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_padlength</span><span class="p">(</span><span class="n">_bytes</span><span class="p">)</span>
-<div class="viewcode-block" id="PKCS7Padding.encode"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.PKCS7Padding.encode">[docs]</a>        <span class="k">return</span> <span class="n">_bytes</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="n">pad</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">_bytes</span><span class="p">),</span><span class="nb">bytes</span><span class="p">([</span><span class="n">pad</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">_bytes</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="n">pad</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">_bytes</span><span class="p">),</span><span class="nb">bytes</span><span class="p">([</span><span class="n">pad</span><span class="p">]))</span>
+</div>
+<div class="viewcode-block" id="PKCS7Padding.decode"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.PKCS7Padding.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">_bytes</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_bytes</span><span class="p">[:</span><span class="o">-</span><span class="p">(</span><span class="n">_bytes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])]</span>
 
-    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">_bytes</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_bytes</span><span class="p">[:</span><span class="o">-</span><span class="p">(</span><span class="n">_bytes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])]</span></div>
-<div class="viewcode-block" id="PKCS7Padding.decode"><a class="viewcode-back" href="../toolbox/paddingschemes.html#paddingschemes.PKCS7Padding.decode">[docs]</a>
-
+</div>
     <span class="k">def</span> <span class="nf">_padlength</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">_bytes</span><span class="p">):</span>
-        <span class="n">ln</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">_bytes</span><span class="p">)</span></div>
+        <span class="n">ln</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">_bytes</span><span class="p">)</span>
         <span class="n">pad_bytes_needed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">block_size</span> <span class="o">-</span><span class="p">(</span><span class="n">ln</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">block_size</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">pad_bytes_needed</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">pad_bytes_needed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">block_size</span>
-        <span class="k">return</span> <span class="n">pad_bytes_needed</span>
-</pre></div></div>
+        <span class="k">return</span> <span class="n">pad_bytes_needed</span></div>
+</pre></div>
 
           </div>
         </div>
@@ -481,7 +483,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -504,14 +506,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

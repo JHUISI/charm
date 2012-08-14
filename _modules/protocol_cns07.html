@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>protocol_cns07 &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>protocol_cns07 &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,273 +48,275 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for protocol_cns07</h1><pre>
+  <h1>Source code for protocol_cns07</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">Camenisch-Neven-shelat - Oblivious Transfer</span>
 
-| From: "J. Camenisch, G. Neven, a. shelat - Simulatable Adaptive Oblivious Transfer"
-| Published in: EUROCRYPT 2007
-| Available from: http://eprint.iacr.org/2008/014
-| Notes: 
+<span class="sd">| From: &quot;J. Camenisch, G. Neven, a. shelat - Simulatable Adaptive Oblivious Transfer&quot;</span>
+<span class="sd">| Published in: EUROCRYPT 2007</span>
+<span class="sd">| Available from: http://eprint.iacr.org/2008/014</span>
+<span class="sd">| Notes: </span>
 
-* type:           signature (ID-based)
-* setting:        bilinear groups (asymmetric)
+<span class="sd">* type:           signature (ID-based)</span>
+<span class="sd">* setting:        bilinear groups (asymmetric)</span>
 
-:Authors:    J. Ayo Akinyele
-:Date:       2/2012
-"""
-from charm.engine.protocol import *
-from charm.engine.util import *
-from socket import *
-from toolbox.pairinggroup import *
-from schemes.sigma1 import *
-from schemes.sigma2 import *
-from schemes.sigma3 import *
-import sys
+<span class="sd">:Authors:    J. Ayo Akinyele</span>
+<span class="sd">:Date:       2/2012</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">charm.core.engine.protocol</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">charm.core.engine.util</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">socket</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
+<span class="kn">from</span> <span class="nn">schemes.sigma1</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">schemes.sigma2</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">schemes.sigma3</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 
-SENDER,RECEIVER = 1,2
-HOST, PORT = "", 8083
+<span class="n">SENDER</span><span class="p">,</span><span class="n">RECEIVER</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="mi">2</span>
+<span class="n">HOST</span><span class="p">,</span> <span class="n">PORT</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="mi">8083</span>
 
-class ObliviousTransfer(Protocol):
-    def __init__(self, messages=None, groupObj=None, common_input=None):        
-<div class="viewcode-block" id="ObliviousTransfer"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer">[docs]</a>        Protocol.__init__(self, None)        
-        receiver_states = { 2:self.receiver_init2, 4:self.receiver_transfer4, 6:self.receiver_transfer6, 8:self.receiver_transfer8 }
-        sender_states = { 1:self.sender_init1, 3:self.sender_init3, 5:self.sender_transfer5, 7:self.sender_transfer7, 9:self.sender_transfer9 }
+<div class="viewcode-block" id="ObliviousTransfer"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer">[docs]</a><span class="k">class</span> <span class="nc">ObliviousTransfer</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">messages</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">groupObj</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">common_input</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>        
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>        
+        <span class="n">receiver_states</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">2</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver_init2</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver_transfer4</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver_transfer6</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver_transfer8</span> <span class="p">}</span>
+        <span class="n">sender_states</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">sender_init1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">sender_init3</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">sender_transfer5</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">sender_transfer7</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">sender_transfer9</span> <span class="p">}</span>
 
-        receiver_trans = { 2:4, 4:6, 6:8 }
-        sender_trans = { 1:3, 3:[3,5], 5:7, 7:9 }
-        # describe the parties involved and the valid transitions
-        Protocol.addPartyType(self, RECEIVER, receiver_states, receiver_trans)
-        Protocol.addPartyType(self, SENDER, sender_states, sender_trans, True)
-#        Protocol.setSerializers(self, self.serialize, self.deserialize)
-        # make sure 
-        if groupObj == None:
-            self.group = PairingGroup('SS512')
-        else:
-            self.group = groupObj
-        # proof parameter generation
-        if common_input == None: # generate common parameters to P and V
-            db = {}
-            self.__gen_setup = True
-        else: # can be used as a sub-protocol if common_input is specified by caller
-            db = common_input
-            self.__gen_setup = False
-        Protocol.setSubclassVars(self, self.group, db) 
-        if messages != None:
-            self.M, self.sig = [], []
-            for i in range(0, len(messages)):
-                self.M.append( bytes(messages[i], 'utf8') )
-                print("bytes =&gt;", self.M[i],", message =&gt;", messages[i])                
-#                self.M.append(self.group.hash(messages[i], ZR))
-#                self.sig.append(messages[i])
-        # dict to hold variables from interaction        
+        <span class="n">receiver_trans</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span><span class="mi">8</span> <span class="p">}</span>
+        <span class="n">sender_trans</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">:[</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="mi">5</span><span class="p">:</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span><span class="mi">9</span> <span class="p">}</span>
+        <span class="c"># describe the parties involved and the valid transitions</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">addPartyType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">RECEIVER</span><span class="p">,</span> <span class="n">receiver_states</span><span class="p">,</span> <span class="n">receiver_trans</span><span class="p">)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">addPartyType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SENDER</span><span class="p">,</span> <span class="n">sender_states</span><span class="p">,</span> <span class="n">sender_trans</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+<span class="c">#        Protocol.setSerializers(self, self.serialize, self.deserialize)</span>
+        <span class="c"># make sure </span>
+        <span class="k">if</span> <span class="n">groupObj</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+        <span class="c"># proof parameter generation</span>
+        <span class="k">if</span> <span class="n">common_input</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span> <span class="c"># generate common parameters to P and V</span>
+            <span class="n">db</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__gen_setup</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c"># can be used as a sub-protocol if common_input is specified by caller</span>
+            <span class="n">db</span> <span class="o">=</span> <span class="n">common_input</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__gen_setup</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setSubclassVars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span> 
+        <span class="k">if</span> <span class="n">messages</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">messages</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">messages</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s">&#39;utf8&#39;</span><span class="p">)</span> <span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;bytes =&gt;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="s">&quot;, message =&gt;&quot;</span><span class="p">,</span> <span class="n">messages</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>                
+<span class="c">#                self.M.append(self.group.hash(messages[i], ZR))</span>
+<span class="c">#                self.sig.append(messages[i])</span>
+        <span class="c"># dict to hold variables from interaction        </span>
 
-    def get_common(self):
-        if self.__gen_setup:
-<div class="viewcode-block" id="ObliviousTransfer.get_common"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.get_common">[docs]</a>            g, h = self.group.random(G1), self.group.random(G2)
-            H = pair(g, h)
-            Protocol.store(self, ('g', g), ('h', h), ('H', H) )
-            return (g, h, H)
-        else: # common parameters generated already
-            return Protocol.get(self, ['g', 'h', 'H'])
+<div class="viewcode-block" id="ObliviousTransfer.get_common"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.get_common">[docs]</a>    <span class="k">def</span> <span class="nf">get_common</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gen_setup</span><span class="p">:</span>
+            <span class="n">g</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
+            <span class="n">H</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+            <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;h&#39;</span><span class="p">,</span> <span class="n">h</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;H&#39;</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span> <span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c"># common parameters generated already</span>
+            <span class="k">return</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;h&#39;</span><span class="p">,</span> <span class="s">&#39;H&#39;</span><span class="p">])</span>
     
-    # msgs =&gt; dict of M -&gt; H(M)
-    def sender_init1(self):
-        M = self.M</div>
-<div class="viewcode-block" id="ObliviousTransfer.sender_init1"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_init1">[docs]</a>        print("SENDER 1: ")
-        (g, h, H) = self.get_common()  
-        x = self.group.random(ZR)
-        y = g ** x
-        print("send g =&gt;", g)
-        print("send h =&gt;", h)
-        print("send H =&gt;", H)
-        print("send x =&gt;", x)
-        print("send y =&gt;", y)
-        A, B, C = {}, {}, {}
-        for i in range(0, len(self.M)):
-            j = self.group.init(ZR, i+1)
-            print("j =&gt;", j)
-            A[i] = g ** ~(x + j)
-            B[i] = pair(A[i], h)  #, M[i])
-            C[i] = { 'A':A[i], 'B':B[i] }
+    <span class="c"># msgs =&gt; dict of M -&gt; H(M)</span></div>
+<div class="viewcode-block" id="ObliviousTransfer.sender_init1"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_init1">[docs]</a>    <span class="k">def</span> <span class="nf">sender_init1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;SENDER 1: &quot;</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_common</span><span class="p">()</span>  
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">x</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;send g =&gt;&quot;</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;send h =&gt;&quot;</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;send H =&gt;&quot;</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;send x =&gt;&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;send y =&gt;&quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">)):</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;j =&gt;&quot;</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+            <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="o">~</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">j</span><span class="p">)</span>
+            <span class="n">B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">h</span><span class="p">)</span>  <span class="c">#, M[i])</span>
+            <span class="n">C</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;A&#39;</span><span class="p">:</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s">&#39;B&#39;</span><span class="p">:</span><span class="n">B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">}</span>
         
-        S = { 'g':g, 'h':h, 'H':H, 'y':y }        
-        Protocol.store(self, ('x', y), ('y',y), ('C', C) )
-        Protocol.setState(self, 3)
-        return { 'S':S, 'C':C , 'PoK':'SigmaProtocol1' }
-    
-    def sender_init3(self, input):
-        print("SENDER 3: ", input)</div>
-<div class="viewcode-block" id="ObliviousTransfer.sender_init3"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_init3">[docs]</a>        result = 'FAIL'
-        pk = Protocol.get(self, ['g', 'H', 'h'], dict)
-        if input == 'GO':
-            PoK1 = SigmaProtocol1(self.group, pk)
-            PoK1.setup( {'name':'prover', 'type':PoK1.PROVER, 'socket':self._socket} )
-            PoK1.execute(PoK1.PROVER, close_sock=False)
-#            print("PoK1 prover result =&gt;", PoK1.result)
+        <span class="n">S</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s">&#39;h&#39;</span><span class="p">:</span><span class="n">h</span><span class="p">,</span> <span class="s">&#39;H&#39;</span><span class="p">:</span><span class="n">H</span><span class="p">,</span> <span class="s">&#39;y&#39;</span><span class="p">:</span><span class="n">y</span> <span class="p">}</span>        
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">,</span><span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="n">C</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;S&#39;</span><span class="p">:</span><span class="n">S</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">:</span><span class="n">C</span> <span class="p">,</span> <span class="s">&#39;PoK&#39;</span><span class="p">:</span><span class="s">&#39;SigmaProtocol1&#39;</span> <span class="p">}</span>
+    </div>
+<div class="viewcode-block" id="ObliviousTransfer.sender_init3"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_init3">[docs]</a>    <span class="k">def</span> <span class="nf">sender_init3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;SENDER 3: &quot;</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="s">&#39;FAIL&#39;</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;H&#39;</span><span class="p">,</span> <span class="s">&#39;h&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">input</span> <span class="o">==</span> <span class="s">&#39;GO&#39;</span><span class="p">:</span>
+            <span class="n">PoK1</span> <span class="o">=</span> <span class="n">SigmaProtocol1</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+            <span class="n">PoK1</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;prover&#39;</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="n">PoK1</span><span class="o">.</span><span class="n">PROVER</span><span class="p">,</span> <span class="s">&#39;socket&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">}</span> <span class="p">)</span>
+            <span class="n">PoK1</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">PoK1</span><span class="o">.</span><span class="n">PROVER</span><span class="p">,</span> <span class="n">close_sock</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="c">#            print(&quot;PoK1 prover result =&gt;&quot;, PoK1.result)</span>
 
-            if PoK1.result == 'OK':
-           # transition to transfer phase
-                Protocol.setState(self, 5)
-                result = PoK1.result
-#        else: # JAA - something to this effect (Error case doesn't work yet)
-#           Protocol.setState(self, 3); return {'PoK': 'REDO' }
-        # need store and get functions for db        
-        return {'PoK': result }
-    
-    def sender_transfer5(self, input):
-        print("SENDER 5: query =&gt;", input)</div>
-<div class="viewcode-block" id="ObliviousTransfer.sender_transfer5"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_transfer5">[docs]</a>        
-        if input.get('PoK') != None: # continue
-            Protocol.setState(self, 7)
-            return 'OK'    
-        Protocol.setState(self, None)
-        return None
-    
-    def sender_transfer7(self, input):
-#        print("SENDER 7: input =&gt;", input)</div>
-<div class="viewcode-block" id="ObliviousTransfer.sender_transfer7"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_transfer7">[docs]</a>        if input.get('PoK2') != None: 
-#            pk = Protocol.get(self, ['g','g2','y'], dict)           
-            V = Protocol.get(self, ['V'])
-            pk = { 'V':V }
-            PoK2 = SigmaProtocol2(self.group, pk)
-            PoK2.setup( {'name':'verifier', 'type':PoK2.VERIFIER, 'socket':self._socket} )
-            Protocol.send_msg(self, 'GO')
-            PoK2.execute(PoK2.VERIFIER, close_sock=False)
-#            print("PoK2 verifier result =&gt;", PoK2.result)
-            result = PoK2.result
+            <span class="k">if</span> <span class="n">PoK1</span><span class="o">.</span><span class="n">result</span> <span class="o">==</span> <span class="s">&#39;OK&#39;</span><span class="p">:</span>
+           <span class="c"># transition to transfer phase</span>
+                <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">PoK1</span><span class="o">.</span><span class="n">result</span>
+<span class="c">#        else: # JAA - something to this effect (Error case doesn&#39;t work yet)</span>
+<span class="c">#           Protocol.setState(self, 3); return {&#39;PoK&#39;: &#39;REDO&#39; }</span>
+        <span class="c"># need store and get functions for db        </span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;PoK&#39;</span><span class="p">:</span> <span class="n">result</span> <span class="p">}</span>
+    </div>
+<div class="viewcode-block" id="ObliviousTransfer.sender_transfer5"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_transfer5">[docs]</a>    <span class="k">def</span> <span class="nf">sender_transfer5</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;SENDER 5: query =&gt;&quot;</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;PoK&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> <span class="c"># continue</span>
+            <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s">&#39;OK&#39;</span>    
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    </div>
+<div class="viewcode-block" id="ObliviousTransfer.sender_transfer7"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_transfer7">[docs]</a>    <span class="k">def</span> <span class="nf">sender_transfer7</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+<span class="c">#        print(&quot;SENDER 7: input =&gt;&quot;, input)</span>
+        <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;PoK2&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> 
+<span class="c">#            pk = Protocol.get(self, [&#39;g&#39;,&#39;g2&#39;,&#39;y&#39;], dict)           </span>
+            <span class="n">V</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;V&#39;</span><span class="p">])</span>
+            <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;V&#39;</span><span class="p">:</span><span class="n">V</span> <span class="p">}</span>
+            <span class="n">PoK2</span> <span class="o">=</span> <span class="n">SigmaProtocol2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+            <span class="n">PoK2</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;verifier&#39;</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="n">PoK2</span><span class="o">.</span><span class="n">VERIFIER</span><span class="p">,</span> <span class="s">&#39;socket&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">}</span> <span class="p">)</span>
+            <span class="n">Protocol</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;GO&#39;</span><span class="p">)</span>
+            <span class="n">PoK2</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">PoK2</span><span class="o">.</span><span class="n">VERIFIER</span><span class="p">,</span> <span class="n">close_sock</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="c">#            print(&quot;PoK2 verifier result =&gt;&quot;, PoK2.result)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">PoK2</span><span class="o">.</span><span class="n">result</span>
 
-        if result == 'OK':
-#           print("transitioning to transfer9 result =&gt;", result)
-           h, V = Protocol.get(self, ['h','V'])             
-           W = pair(V, h)
-           Protocol.setState(self, 9)
-           return { 'PoK2':result, 'W':W, 'PoM':'SigmaProtocol3' }
-        Protocol.setState(self, None)
-        return None
-    
-    def sender_transfer9(self, input):
-#        print("SENDER 9: PoM init =&gt;", input)           </div>
-<div class="viewcode-block" id="ObliviousTransfer.sender_transfer9"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_transfer9">[docs]</a>        
-        if input == 'GO':    
-#           print("Executing the PoM interactive proof.")
-           pk = Protocol.get(self, ['h','g','H','V'], dict) 
-           PoM = SigmaProtocol3(self.group, pk)
-           PoM.setup( {'name':'prover', 'type':PoM.PROVER, 'socket':self._socket} )
-           PoM.execute(PoM.PROVER)
-           print("PoM prover result =&gt;", PoM.result)
+        <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="s">&#39;OK&#39;</span><span class="p">:</span>
+<span class="c">#           print(&quot;transitioning to transfer9 result =&gt;&quot;, result)</span>
+           <span class="n">h</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">,</span><span class="s">&#39;V&#39;</span><span class="p">])</span>             
+           <span class="n">W</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+           <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+           <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;PoK2&#39;</span><span class="p">:</span><span class="n">result</span><span class="p">,</span> <span class="s">&#39;W&#39;</span><span class="p">:</span><span class="n">W</span><span class="p">,</span> <span class="s">&#39;PoM&#39;</span><span class="p">:</span><span class="s">&#39;SigmaProtocol3&#39;</span> <span class="p">}</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    </div>
+<div class="viewcode-block" id="ObliviousTransfer.sender_transfer9"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_transfer9">[docs]</a>    <span class="k">def</span> <span class="nf">sender_transfer9</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+<span class="c">#        print(&quot;SENDER 9: PoM init =&gt;&quot;, input)           </span>
+        
+        <span class="k">if</span> <span class="nb">input</span> <span class="o">==</span> <span class="s">&#39;GO&#39;</span><span class="p">:</span>    
+<span class="c">#           print(&quot;Executing the PoM interactive proof.&quot;)</span>
+           <span class="n">pk</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">,</span><span class="s">&#39;g&#39;</span><span class="p">,</span><span class="s">&#39;H&#39;</span><span class="p">,</span><span class="s">&#39;V&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span> 
+           <span class="n">PoM</span> <span class="o">=</span> <span class="n">SigmaProtocol3</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+           <span class="n">PoM</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;prover&#39;</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="n">PoM</span><span class="o">.</span><span class="n">PROVER</span><span class="p">,</span> <span class="s">&#39;socket&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">}</span> <span class="p">)</span>
+           <span class="n">PoM</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">PoM</span><span class="o">.</span><span class="n">PROVER</span><span class="p">)</span>
+           <span class="k">print</span><span class="p">(</span><span class="s">&quot;PoM prover result =&gt;&quot;</span><span class="p">,</span> <span class="n">PoM</span><span class="o">.</span><span class="n">result</span><span class="p">)</span>
             
-        Protocol.setState(self, None)
-        return None
-#################################    
-# END of SENDER state functions #
-#################################    
-    
-    def receiver_init2(self, input):
-        print("RECEIVER 2: ")</div>
-<div class="viewcode-block" id="ObliviousTransfer.receiver_init2"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.receiver_init2">[docs]</a>        pk = Sigma.get(self, ['S'])
-        if input['PoK'] == 'SigmaProtocol1':
-            PoK1 = SigmaProtocol1(self.group, pk)
-            PoK1.setup( {'name':'verifier', 'type':PoK1.VERIFIER, 'socket': self._socket} )
-            Protocol.send_msg(self, 'GO') # important: 1. acknowledges sub-protocol transition, 2. sends a short message using this socket
-            PoK1.execute(PoK1.VERIFIER, close_sock=False)
-            print("PoK1 verifier result =&gt;", PoK1.result)
-            result = PoK1.result
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+<span class="c">#################################    </span>
+<span class="c"># END of SENDER state functions #</span>
+<span class="c">#################################    </span>
+    </div>
+<div class="viewcode-block" id="ObliviousTransfer.receiver_init2"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.receiver_init2">[docs]</a>    <span class="k">def</span> <span class="nf">receiver_init2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;RECEIVER 2: &quot;</span><span class="p">)</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="n">Sigma</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;S&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;PoK&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;SigmaProtocol1&#39;</span><span class="p">:</span>
+            <span class="n">PoK1</span> <span class="o">=</span> <span class="n">SigmaProtocol1</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+            <span class="n">PoK1</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;verifier&#39;</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="n">PoK1</span><span class="o">.</span><span class="n">VERIFIER</span><span class="p">,</span> <span class="s">&#39;socket&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">}</span> <span class="p">)</span>
+            <span class="n">Protocol</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;GO&#39;</span><span class="p">)</span> <span class="c"># important: 1. acknowledges sub-protocol transition, 2. sends a short message using this socket</span>
+            <span class="n">PoK1</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">PoK1</span><span class="o">.</span><span class="n">VERIFIER</span><span class="p">,</span> <span class="n">close_sock</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;PoK1 verifier result =&gt;&quot;</span><span class="p">,</span> <span class="n">PoK1</span><span class="o">.</span><span class="n">result</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">PoK1</span><span class="o">.</span><span class="n">result</span>
 
-        if result == 'OK':            
-            Protocol.setState(self, 4) # desired: 4 (TBD)
-        return {'PoK': result } # result should be R0 (state info) for Receiver
-        # let sender know to expect a PoK2 interaction next
-
-    def receiver_transfer4(self, input): # rec_tran4 -&gt; sender_tran5
-        print("RECEIVER 4: Get query from end user.")</div>
-<div class="viewcode-block" id="ObliviousTransfer.receiver_transfer4"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.receiver_transfer4">[docs]</a>        index = 0 # maps to position 0 in array (+1 indexed)
-        C = Protocol.get(self, ['C'])[0]
-        v = self.group.random(ZR) # secret for Receiver
-        V = C[index]['A'] ** v # public value
-        Protocol.setState(self, 6)
-        Protocol.store( self, ('v',v), ('V',V), ('query', index+1) )
-        return { 'V':V, 'PoK2':'SigmaProtocol2' }
-    
-    def receiver_transfer6(self, input):
-        print("RECEIVER 6: input =&gt;",input)</div>
-<div class="viewcode-block" id="ObliviousTransfer.receiver_transfer6"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.receiver_transfer6">[docs]</a>        if input == 'GO':
-            (pk, V, v, query) = Protocol.get(self, ['S','V','v','query'])
-            pk['V'], pk['v'], pk['sigma'] = V, v, query
-            # set up client end of PoK2
-            PoK2 = SigmaProtocol2(self.group, pk)
-            PoK2.setup( {'name':'prover', 'type':PoK2.PROVER, 'socket':self._socket} )
-            PoK2.execute(PoK2.PROVER, close_sock=False)
-            print("PoK2 prover result =&gt;", PoK2.result)
-            result = PoK2.result            
-            Protocol.setState(self, 8)
-            return {'Pok2':result}
+        <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="s">&#39;OK&#39;</span><span class="p">:</span>            
+            <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="c"># desired: 4 (TBD)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;PoK&#39;</span><span class="p">:</span> <span class="n">result</span> <span class="p">}</span> <span class="c"># result should be R0 (state info) for Receiver</span>
+        <span class="c"># let sender know to expect a PoK2 interaction next</span>
+</div>
+<div class="viewcode-block" id="ObliviousTransfer.receiver_transfer4"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.receiver_transfer4">[docs]</a>    <span class="k">def</span> <span class="nf">receiver_transfer4</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span> <span class="c"># rec_tran4 -&gt; sender_tran5</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;RECEIVER 4: Get query from end user.&quot;</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span> <span class="c"># maps to position 0 in array (+1 indexed)</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span> <span class="c"># secret for Receiver</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">C</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="s">&#39;A&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">v</span> <span class="c"># public value</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;v&#39;</span><span class="p">,</span><span class="n">v</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;V&#39;</span><span class="p">,</span><span class="n">V</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;query&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;V&#39;</span><span class="p">:</span><span class="n">V</span><span class="p">,</span> <span class="s">&#39;PoK2&#39;</span><span class="p">:</span><span class="s">&#39;SigmaProtocol2&#39;</span> <span class="p">}</span>
+    </div>
+<div class="viewcode-block" id="ObliviousTransfer.receiver_transfer6"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.receiver_transfer6">[docs]</a>    <span class="k">def</span> <span class="nf">receiver_transfer6</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;RECEIVER 6: input =&gt;&quot;</span><span class="p">,</span><span class="nb">input</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">input</span> <span class="o">==</span> <span class="s">&#39;GO&#39;</span><span class="p">:</span>
+            <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;S&#39;</span><span class="p">,</span><span class="s">&#39;V&#39;</span><span class="p">,</span><span class="s">&#39;v&#39;</span><span class="p">,</span><span class="s">&#39;query&#39;</span><span class="p">])</span>
+            <span class="n">pk</span><span class="p">[</span><span class="s">&#39;V&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;v&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;sigma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">V</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">query</span>
+            <span class="c"># set up client end of PoK2</span>
+            <span class="n">PoK2</span> <span class="o">=</span> <span class="n">SigmaProtocol2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+            <span class="n">PoK2</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;prover&#39;</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="n">PoK2</span><span class="o">.</span><span class="n">PROVER</span><span class="p">,</span> <span class="s">&#39;socket&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">}</span> <span class="p">)</span>
+            <span class="n">PoK2</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">PoK2</span><span class="o">.</span><span class="n">PROVER</span><span class="p">,</span> <span class="n">close_sock</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;PoK2 prover result =&gt;&quot;</span><span class="p">,</span> <span class="n">PoK2</span><span class="o">.</span><span class="n">result</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">PoK2</span><span class="o">.</span><span class="n">result</span>            
+            <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;Pok2&#39;</span><span class="p">:</span><span class="n">result</span><span class="p">}</span>
         
-        Protocol.setState(self, None)            
-        return None
-
-    def receiver_transfer8(self, input):
-        print("RECEIVER 8:")</div>
-<div class="viewcode-block" id="ObliviousTransfer.receiver_transfer8"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.receiver_transfer8">[docs]</a>        if input['PoK2'] != 'OK':
-            Protocol.setState(self, None)
-            return None
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>            
+        <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="ObliviousTransfer.receiver_transfer8"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.receiver_transfer8">[docs]</a>    <span class="k">def</span> <span class="nf">receiver_transfer8</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;RECEIVER 8:&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;PoK2&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;OK&#39;</span><span class="p">:</span>
+            <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">None</span>
         
-        if input.get('PoM') != None:    
-#            print("Executing the PoM interactive proof.")
-            pk = Protocol.get(self, ['W'], dict)
-            PoM = SigmaProtocol3(self.group, pk)
-            PoM.setup( {'name':'verifier', 'type':PoM.VERIFIER, 'socket': self._socket} )
-            Protocol.send_msg(self, 'GO') # important: 1. acknowledges sub-protocol transition, 2. sends a short message using this socket
-            PoM.execute(PoM.VERIFIER, close_sock=False)
-            result = PoM.result
-            print("PoM verifier result =&gt;", result)
+        <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;PoM&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>    
+<span class="c">#            print(&quot;Executing the PoM interactive proof.&quot;)</span>
+            <span class="n">pk</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;W&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span>
+            <span class="n">PoM</span> <span class="o">=</span> <span class="n">SigmaProtocol3</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+            <span class="n">PoM</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;verifier&#39;</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="n">PoM</span><span class="o">.</span><span class="n">VERIFIER</span><span class="p">,</span> <span class="s">&#39;socket&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">}</span> <span class="p">)</span>
+            <span class="n">Protocol</span><span class="o">.</span><span class="n">send_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;GO&#39;</span><span class="p">)</span> <span class="c"># important: 1. acknowledges sub-protocol transition, 2. sends a short message using this socket</span>
+            <span class="n">PoM</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">PoM</span><span class="o">.</span><span class="n">VERIFIER</span><span class="p">,</span> <span class="n">close_sock</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">PoM</span><span class="o">.</span><span class="n">result</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;PoM verifier result =&gt;&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
         
-        if result == 'OK':
-#            print("Now we recover ")
-            # W allows us to unlock the appropriate keyword, right?
-            # get query, B_query, and v
-            (W, v, C) = Protocol.get(self, ['W','v','C'])
-            index = 0
-            B = C[index]['B']
-            w = W ** ~v
-            # m = self.xor(B, w)
-            print("Query =&gt;", index)
-            print("Corresponding B =&gt;", B)
-            print("Original message key =&gt;", w)
-            print("Search complete!!!")
-        Protocol.setState(self, None)
-        return None    
+        <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="s">&#39;OK&#39;</span><span class="p">:</span>
+<span class="c">#            print(&quot;Now we recover &quot;)</span>
+            <span class="c"># W allows us to unlock the appropriate keyword, right?</span>
+            <span class="c"># get query, B_query, and v</span>
+            <span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">C</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;W&#39;</span><span class="p">,</span><span class="s">&#39;v&#39;</span><span class="p">,</span><span class="s">&#39;C&#39;</span><span class="p">])</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">B</span> <span class="o">=</span> <span class="n">C</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="s">&#39;B&#39;</span><span class="p">]</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">W</span> <span class="o">**</span> <span class="o">~</span><span class="n">v</span>
+            <span class="c"># m = self.xor(B, w)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Query =&gt;&quot;</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Corresponding B =&gt;&quot;</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Original message key =&gt;&quot;</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Search complete!!!&quot;</span><span class="p">)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>    
+</div></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Usage: </span><span class="si">%s</span><span class="s"> [-r or -s]&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="nb">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2:</div></div>
-        print("Usage: %s [-r or -s]" % sys.argv[0])
-        exit(-1)
-
-    if sys.argv[1] == "-r":
-        print("Operating as receiver...")
-        svr = socket(AF_INET, SOCK_STREAM)
-        svr.bind((HOST, PORT))
-        svr.listen(1)
-        svr_sock, addr = svr.accept()
-        print("Connected by ", addr)
-        msgs = None
-        _name, _type, _sock = "receiver", RECEIVER, svr_sock
-#       sp.setup( {'name':"receiver", 'type':_type, 'socket':svr_sock} )
-    elif sys.argv[1] == "-s":
-        print("Operating as sender...")
-        clt = socket(AF_INET, SOCK_STREAM)
-        clt.connect((HOST, PORT))
-        clt.settimeout(15)
-        msgs = ['one', 'two', 'three']
-        _name, _type, _sock = "sender", SENDER, clt
-    else:
-        print("Usage: %s -r or -s" % sys.argv[0])
-        exit(-1)
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;-r&quot;</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Operating as receiver...&quot;</span><span class="p">)</span>
+        <span class="n">svr</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">)</span>
+        <span class="n">svr</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="n">HOST</span><span class="p">,</span> <span class="n">PORT</span><span class="p">))</span>
+        <span class="n">svr</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">svr_sock</span><span class="p">,</span> <span class="n">addr</span> <span class="o">=</span> <span class="n">svr</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Connected by &quot;</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span>
+        <span class="n">msgs</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">_name</span><span class="p">,</span> <span class="n">_type</span><span class="p">,</span> <span class="n">_sock</span> <span class="o">=</span> <span class="s">&quot;receiver&quot;</span><span class="p">,</span> <span class="n">RECEIVER</span><span class="p">,</span> <span class="n">svr_sock</span>
+<span class="c">#       sp.setup( {&#39;name&#39;:&quot;receiver&quot;, &#39;type&#39;:_type, &#39;socket&#39;:svr_sock} )</span>
+    <span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;-s&quot;</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Operating as sender...&quot;</span><span class="p">)</span>
+        <span class="n">clt</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">)</span>
+        <span class="n">clt</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="n">HOST</span><span class="p">,</span> <span class="n">PORT</span><span class="p">))</span>
+        <span class="n">clt</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+        <span class="n">msgs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;one&#39;</span><span class="p">,</span> <span class="s">&#39;two&#39;</span><span class="p">,</span> <span class="s">&#39;three&#39;</span><span class="p">]</span>
+        <span class="n">_name</span><span class="p">,</span> <span class="n">_type</span><span class="p">,</span> <span class="n">_sock</span> <span class="o">=</span> <span class="s">&quot;sender&quot;</span><span class="p">,</span> <span class="n">SENDER</span><span class="p">,</span> <span class="n">clt</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Usage: </span><span class="si">%s</span><span class="s"> -r or -s&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="nb">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     
-#    group = PairingGroup('library/a.param')
-    sp = ObliviousTransfer(msgs)
-    sp.setup( {'name':_name, 'type':_type, 'socket':_sock} )
-    # run as a thread...
-    sp.execute(_type)
-</pre>
+<span class="c">#    group = PairingGroup(&#39;library/a.param&#39;)</span>
+    <span class="n">sp</span> <span class="o">=</span> <span class="n">ObliviousTransfer</span><span class="p">(</span><span class="n">msgs</span><span class="p">)</span>
+    <span class="n">sp</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="n">_name</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="n">_type</span><span class="p">,</span> <span class="s">&#39;socket&#39;</span><span class="p">:</span><span class="n">_sock</span><span class="p">}</span> <span class="p">)</span>
+    <span class="c"># run as a thread...</span>
+    <span class="n">sp</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">_type</span><span class="p">)</span>
+</pre></div>
 
           </div>
         </div>
@@ -324,7 +326,7 @@ if __name__ == "__main__":
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -347,14 +349,14 @@ if __name__ == "__main__":
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

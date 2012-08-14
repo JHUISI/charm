@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pksig_adapt_naor01 &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>pksig_adapt_naor01 &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,94 +48,81 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for pksig_adapt_naor01</h1><pre>
- 
-| From: "B. Franklin, M. Franklin: Identity-based encryption from the Weil pairing"
-| Published in: Eurocrypt 2009
-| Available from: http://eprint.iacr.org/2009/028.pdf
- 
-Notes:	This transform was first described by Boneh and Franklin but credited to Moni Naor.  It
-   converts any fully-secure IBE sheme into a signature by repurposing the identity key extraction
-   as a signing algorithm.  To verify, encrypt a random value under the message/identity,
-   and attempt to decrypt it using the signature/key.  It may be necessary to repeat this process,
-   depending on the size of the IBE's plaintext space.  Some IBE schemes support a more efficient
-   algorithm for verifying the structure of an identity key --- we will use it if it's available. 
-   *Warning*: this transform is not secure for selectively-secure schemes!
+  <h1>Source code for pksig_adapt_naor01</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Naor&#39;s generic IBE-to-Signature transform (generic composition)</span>
+<span class="sd"> </span>
+<span class="sd">| From: &quot;B. Franklin, M. Franklin: Identity-based encryption from the Weil pairing&quot;</span>
+<span class="sd">| Published in: Eurocrypt 2009</span>
+<span class="sd">| Available from: http://eprint.iacr.org/2009/028.pdf</span>
+<span class="sd"> </span>
+<span class="sd">Notes:	This transform was first described by Boneh and Franklin but credited to Moni Naor.  It</span>
+<span class="sd">   converts any fully-secure IBE sheme into a signature by repurposing the identity key extraction</span>
+<span class="sd">   as a signing algorithm.  To verify, encrypt a random value under the message/identity,</span>
+<span class="sd">   and attempt to decrypt it using the signature/key.  It may be necessary to repeat this process,</span>
+<span class="sd">   depending on the size of the IBE&#39;s plaintext space.  Some IBE schemes support a more efficient</span>
+<span class="sd">   algorithm for verifying the structure of an identity key --- we will use it if it&#39;s available. </span>
+<span class="sd">   *Warning*: this transform is not secure for selectively-secure schemes!</span>
 
-* type:			signature (public key)
-* setting:		n/a (any fully-secure IBE scheme)
-* assumption:	n/a (dependent on the IBE scheme)
+<span class="sd">* type:			signature (public key)</span>
+<span class="sd">* setting:		n/a (any fully-secure IBE scheme)</span>
+<span class="sd">* assumption:	n/a (dependent on the IBE scheme)</span>
 
-:Authors:	J. Ayo Akinyele
-:Date:		05/2011
-'''
+<span class="sd">:Authors:	J. Ayo Akinyele</span>
+<span class="sd">:Date:		05/2011</span>
+<span class="sd">&#39;&#39;&#39;</span>
 
-from schemes.ibenc_bb03 import IBE_BB04
-from toolbox.PKSig import *
-from toolbox.pairinggroup import *
-#from toolbox.ibe_bb03 import *
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.PKSig</span> <span class="kn">import</span> <span class="n">PKSig</span>
 
-debug = False
-class Sig_Generic_ibetosig_Naor01(PKSig):
-    def __init__(self, ibe_scheme, groupObj):
-<div class="viewcode-block" id="Sig_Generic_ibetosig_Naor01"><a class="viewcode-back" href="../schemes/pksig_adapt_naor01.html#pksig_adapt_naor01.Sig_Generic_ibetosig_Naor01">[docs]</a>        global ibe, group
-        ibe = ibe_scheme
-        group = groupObj
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<div class="viewcode-block" id="Sig_Generic_ibetosig_Naor01"><a class="viewcode-back" href="../schemes/pksig/pksig_adapt_naor01.html#pksig_adapt_naor01.Sig_Generic_ibetosig_Naor01">[docs]</a><span class="k">class</span> <span class="nc">Sig_Generic_ibetosig_Naor01</span><span class="p">(</span><span class="n">PKSig</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; from charm.toolbox.pairinggroup import PairingGroup,ZR</span>
+<span class="sd">    &gt;&gt;&gt; from schemes.ibenc.ibenc_bb03 import IBE_BB04</span>
+<span class="sd">    &gt;&gt;&gt; group = PairingGroup(&#39;MNT224&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ibe = IBE_BB04(group)</span>
+<span class="sd">    &gt;&gt;&gt; ibsig = Sig_Generic_ibetosig_Naor01(ibe, group)</span>
+<span class="sd">    &gt;&gt;&gt; (master_public_key, master_secret_key) = ibsig.keygen()</span>
+<span class="sd">    &gt;&gt;&gt; msg = group.random(ZR)</span>
+<span class="sd">    &gt;&gt;&gt; signature = ibsig.sign(master_secret_key, msg)</span>
+<span class="sd">    &gt;&gt;&gt; ibsig.verify(master_public_key, msg, signature) </span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">#TODO msg must be in Zp</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ibe_scheme</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">ibe</span><span class="p">,</span> <span class="n">group</span>
+        <span class="n">ibe</span> <span class="o">=</span> <span class="n">ibe_scheme</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
 				
-    def keygen(self, secparam=None):
-        (mpk, msk) = ibe.setup(secparam)
-<div class="viewcode-block" id="Sig_Generic_ibetosig_Naor01.keygen"><a class="viewcode-back" href="../schemes/pksig_adapt_naor01.html#pksig_adapt_naor01.Sig_Generic_ibetosig_Naor01.keygen">[docs]</a>        if debug: print("Keygen...")
-        group.debug(mpk)
-        group.debug(msk)
-        return (mpk, msk)
-
-    def sign(self, sk, message):
-        return ibe.extract(sk, message)</div>
-<div class="viewcode-block" id="Sig_Generic_ibetosig_Naor01.sign"><a class="viewcode-back" href="../schemes/pksig_adapt_naor01.html#pksig_adapt_naor01.Sig_Generic_ibetosig_Naor01.sign">[docs]</a>		
-    #TODO: this method does NOT validate the message it is given
-    def verify(self, pk, m, sig):
-        # Some IBE scheme support a native method for validating IBE keys.  Use this if it exists.</div>
-<div class="viewcode-block" id="Sig_Generic_ibetosig_Naor01.verify"><a class="viewcode-back" href="../schemes/pksig_adapt_naor01.html#pksig_adapt_naor01.Sig_Generic_ibetosig_Naor01.verify">[docs]</a>        if hasattr(ibe, 'verify'):
-            result = ibe.verify(pk, sig)
-            if result == False: return False
+<div class="viewcode-block" id="Sig_Generic_ibetosig_Naor01.keygen"><a class="viewcode-back" href="../schemes/pksig/pksig_adapt_naor01.html#pksig_adapt_naor01.Sig_Generic_ibetosig_Naor01.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">secparam</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Keygen...&quot;</span><span class="p">)</span>
+        <span class="n">group</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">mpk</span><span class="p">)</span>
+        <span class="n">group</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msk</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Sig_Generic_ibetosig_Naor01.sign"><a class="viewcode-back" href="../schemes/pksig/pksig_adapt_naor01.html#pksig_adapt_naor01.Sig_Generic_ibetosig_Naor01.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ibe</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
 		
-        # Encrypt a random message in the IBE's message space and try to decrypt it
-        message = group.random(GT)
-        if debug: print("\nRandom message =&gt;", message)
+    <span class="c">#TODO: this method does NOT validate the message it is given</span></div>
+<div class="viewcode-block" id="Sig_Generic_ibetosig_Naor01.verify"><a class="viewcode-back" href="../schemes/pksig/pksig_adapt_naor01.html#pksig_adapt_naor01.Sig_Generic_ibetosig_Naor01.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+        <span class="c"># Some IBE scheme support a native method for validating IBE keys.  Use this if it exists.</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ibe</span><span class="p">,</span> <span class="s">&#39;verify&#39;</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
+		
+        <span class="c"># Encrypt a random message in the IBE&#39;s message space and try to decrypt it</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">Random message =&gt;&quot;</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
 
-        C = ibe.encrypt(pk, sig['id'], message)
+        <span class="n">C</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">],</span> <span class="n">message</span><span class="p">)</span>
          
-        if (ibe.decrypt(pk, sig, C) == message):
-            return True
-        else:
-            return False
-def main():
-    groupObj = PairingGroup('MNT224')</div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pksig_adapt_naor01.html#pksig_adapt_naor01.main">[docs]</a>    
-    ibe = IBE_BB04(groupObj)
-    
-    ibsig = Sig_Generic_ibetosig_Naor01(ibe, groupObj)
-
-    (mpk, msk) = ibsig.keygen()
-    
-    #M = "I want a signature on this message!"
-    M = groupObj.random(ZR)
-
-    #TODO: M must be in Zp
-    sigma = ibsig.sign(msk, M)
-    if debug: print("\nMessage =&gt;", M)
-    if debug: print("Sigma =&gt;", sigma)
-    
-    assert ibsig.verify(mpk, M, sigma), "Failed Verification!!!"
-    if debug: print("Successful Verification!!!")
-    del groupObj
-
-if __name__ == "__main__":
-    debug = True</div>
-    main()
-    
-    
-</pre>
+        <span class="k">if</span> <span class="p">(</span><span class="n">ibe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">C</span><span class="p">)</span> <span class="o">==</span> <span class="n">message</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+</pre></div></div></div>
 
           </div>
         </div>
@@ -145,7 +132,7 @@ if __name__ == "__main__":
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -168,14 +155,14 @@ if __name__ == "__main__":
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

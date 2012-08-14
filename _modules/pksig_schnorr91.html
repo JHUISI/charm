@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pksig_schnorr91 &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>pksig_schnorr91 &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -49,38 +49,53 @@
           <div class="body">
             
   <h1>Source code for pksig_schnorr91</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="kn">import</span> <span class="n">IntegerGroupQ</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.PKSig</span> <span class="kn">import</span> <span class="n">PKSig</span>
+
 <span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
-<span class="k">class</span> <span class="nc">SchnorrSig</span><span class="p">(</span><span class="n">PKSig</span><span class="p">):</span>
+<div class="viewcode-block" id="SchnorrSig"><a class="viewcode-back" href="../schemes/pksig/pksig_schnorr91.html#pksig_schnorr91.SchnorrSig">[docs]</a><span class="k">class</span> <span class="nc">SchnorrSig</span><span class="p">(</span><span class="n">PKSig</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; from charm.core.math.integer import integer</span>
+<span class="sd">    &gt;&gt;&gt; p = integer(156816585111264668689583680968857341596876961491501655859473581156994765485015490912709775771877391134974110808285244016265856659644360836326566918061490651852930016078015163968109160397122004869749553669499102243382571334855815358562585736488447912605222780091120196023676916968821094827532746274593222577067)</span>
+<span class="sd">    &gt;&gt;&gt; q = integer(78408292555632334344791840484428670798438480745750827929736790578497382742507745456354887885938695567487055404142622008132928329822180418163283459030745325926465008039007581984054580198561002434874776834749551121691285667427907679281292868244223956302611390045560098011838458484410547413766373137296611288533)    </span>
+<span class="sd">    &gt;&gt;&gt; pksig = SchnorrSig()</span>
+<span class="sd">    &gt;&gt;&gt; pksig.params(p, q)</span>
+<span class="sd">    &gt;&gt;&gt; (public_key, secret_key) = pksig.keygen()</span>
+<span class="sd">    &gt;&gt;&gt; msg = &quot;hello world.&quot;</span>
+<span class="sd">    &gt;&gt;&gt; signature = pksig.sign(public_key, secret_key, msg)</span>
+<span class="sd">    &gt;&gt;&gt; pksig.verify(public_key, signature, msg)</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">PKSig</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-<div class="viewcode-block" id="SchnorrSig"><a class="viewcode-back" href="../schemes/pksig_schnorr91.html#pksig_schnorr91.SchnorrSig">[docs]</a>        
-    <span class="k">def</span> <span class="nf">params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">bits</span><span class="o">=</span><span class="mi">1024</span><span class="p">):</span>
+        
+<div class="viewcode-block" id="SchnorrSig.params"><a class="viewcode-back" href="../schemes/pksig/pksig_schnorr91.html#pksig_schnorr91.SchnorrSig.params">[docs]</a>    <span class="k">def</span> <span class="nf">params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">bits</span><span class="o">=</span><span class="mi">1024</span><span class="p">):</span>
         <span class="k">global</span> <span class="n">group</span>
         <span class="n">group</span> <span class="o">=</span> <span class="n">IntegerGroupQ</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<div class="viewcode-block" id="SchnorrSig.params"><a class="viewcode-back" href="../schemes/pksig_schnorr91.html#pksig_schnorr91.SchnorrSig.params">[docs]</a>        <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">group</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="n">bits</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">group</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">q</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="mi">2</span>
-    
-    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    </div>
+<div class="viewcode-block" id="SchnorrSig.keygen"><a class="viewcode-back" href="../schemes/pksig/pksig_schnorr91.html#pksig_schnorr91.SchnorrSig.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">p</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(),</span> <span class="n">group</span><span class="o">.</span><span class="n">randomGen</span><span class="p">()</span></div>
-<div class="viewcode-block" id="SchnorrSig.keygen"><a class="viewcode-back" href="../schemes/pksig_schnorr91.html#pksig_schnorr91.SchnorrSig.keygen">[docs]</a>        <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">g</span> <span class="o">**</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(),</span> <span class="n">group</span><span class="o">.</span><span class="n">randomGen</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">g</span> <span class="o">**</span> <span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">({</span><span class="s">&#39;y&#39;</span><span class="p">:</span><span class="n">y</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">},</span> <span class="n">x</span><span class="p">)</span>
-    
-    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+    </div>
+<div class="viewcode-block" id="SchnorrSig.sign"><a class="viewcode-back" href="../schemes/pksig/pksig_schnorr91.html#pksig_schnorr91.SchnorrSig.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
         <span class="n">p</span><span class="p">,</span><span class="n">q</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">q</span>
-        <span class="n">k</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span></div>
-<div class="viewcode-block" id="SchnorrSig.sign"><a class="viewcode-back" href="../schemes/pksig_schnorr91.html#pksig_schnorr91.SchnorrSig.sign">[docs]</a>        <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">k</span><span class="p">)</span> <span class="o">%</span> <span class="n">p</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">k</span><span class="p">)</span> <span class="o">%</span> <span class="n">p</span>
         <span class="n">e</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
         <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="n">x</span><span class="o">*</span><span class="n">e</span><span class="p">)</span> <span class="o">%</span> <span class="n">q</span>
 
         <span class="k">return</span> <span class="p">{</span><span class="s">&#39;e&#39;</span><span class="p">:</span><span class="n">e</span><span class="p">,</span> <span class="s">&#39;s&#39;</span><span class="p">:</span><span class="n">s</span> <span class="p">}</span>
-    
-    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+    </div>
+<div class="viewcode-block" id="SchnorrSig.verify"><a class="viewcode-back" href="../schemes/pksig/pksig_schnorr91.html#pksig_schnorr91.SchnorrSig.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">p</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="p">((</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;s&#39;</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;e&#39;</span><span class="p">]))</span> <span class="o">%</span> <span class="n">p</span></div>
-<div class="viewcode-block" id="SchnorrSig.verify"><a class="viewcode-back" href="../schemes/pksig_schnorr91.html#pksig_schnorr91.SchnorrSig.verify">[docs]</a>        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verifying...&quot;</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="p">((</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;s&#39;</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;e&#39;</span><span class="p">]))</span> <span class="o">%</span> <span class="n">p</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verifying...&quot;</span><span class="p">)</span>
         <span class="n">e</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;e =&gt; </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;r =&gt; </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">r</span><span class="p">)</span>
@@ -89,27 +104,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">False</span>
         <span class="k">return</span> <span class="bp">None</span>
-    
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="c"># test only parameters for p,q</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">156816585111264668689583680968857341596876961491501655859473581156994765485015490912709775771877391134974110808285244016265856659644360836326566918061490651852930016078015163968109160397122004869749553669499102243382571334855815358562585736488447912605222780091120196023676916968821094827532746274593222577067</span><span class="p">)</span></div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pksig_schnorr91.html#pksig_schnorr91.main">[docs]</a>    <span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">78408292555632334344791840484428670798438480745750827929736790578497382742507745456354887885938695567487055404142622008132928329822180418163283459030745325926465008039007581984054580198561002434874776834749551121691285667427907679281292868244223956302611390045560098011838458484410547413766373137296611288533</span><span class="p">)</span>    
-    <span class="n">pksig</span> <span class="o">=</span> <span class="n">SchnorrSig</span><span class="p">()</span>
-    
-    <span class="n">pksig</span><span class="o">.</span><span class="n">params</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
-    
-    <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">pksig</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
-    
-    <span class="n">M</span> <span class="o">=</span> <span class="s">&quot;hello world.&quot;</span>
-    <span class="n">sig</span> <span class="o">=</span> <span class="n">pksig</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
-    
-    <span class="k">assert</span> <span class="n">pksig</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">M</span><span class="p">),</span> <span class="s">&quot;Failed verification!&quot;</span>
-    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature verified!!!!&quot;</span><span class="p">)</span>
-    
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
-    <span class="n">main</span><span class="p">()</span></div>
-    
+    </div></div>
 </pre></div>
 
           </div>
@@ -120,7 +115,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -143,14 +138,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

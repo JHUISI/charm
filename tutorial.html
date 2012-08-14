@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>How To Get Started &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>How To Get Started &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,9 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="index.html" />
-    <link rel="next" title="Demonstration Schemes" href="schemes.html" />
-    <link rel="prev" title="Platform Install Manual" href="install_source.html" /> 
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -39,13 +37,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="schemes.html" title="Demonstration Schemes"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="install_source.html" title="Platform Install Manual"
-             accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li> 
+        <li><a href="index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -65,7 +57,7 @@
 <p>Interested in implementing your cryptographic scheme in Charm? Here&#8217;s a guide to navigate our framework to implement your cryptosystem. The following provides an example implementation compared with the algorithm described in the research paper.</p>
 <p>We begin with a public-key encryption scheme due to Cramer-Shoup 1998 <a class="reference external" href="http://knot.kaist.ac.kr/seminar/archive/46/46.pdf">http://knot.kaist.ac.kr/seminar/archive/46/46.pdf</a>, which is provably secure against adaptive chosen ciphertext attacks.</p>
 <p>Typical implementations follow an object-oriented model such that an implementation of a cryptosystem can be easily reused or extended for other purposes. To this end, we provide several base classes with standard interfaces for a variety of cryptographic primitives such as <tt class="docutils literal"><span class="pre">PKEnc</span></tt> or public-key encryption, <tt class="docutils literal"><span class="pre">PKSig</span></tt> or public-key signatures, <tt class="docutils literal"><span class="pre">ABEnc</span></tt> or attribute-based encryption and many more. So, the following describes the python code that implements the Cramer-Shoup PKEnc scheme in Charm:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">toolbox.ecgroup</span> <span class="kn">import</span> <span class="o">*</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.toolbox.ecgroup</span> <span class="kn">import</span> <span class="n">ECGroup</span>
 
 <span class="k">class</span> <span class="nc">CS98</span><span class="p">(</span><span class="n">PKEnc</span><span class="p">):</span>
      <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">curve</span><span class="p">):</span>
@@ -76,7 +68,7 @@
 </div>
 <p>Before we get started, it is important to understand that in our toolbox each cryptographic setting has a corresponding group abstraction such as elliptic curve group or <tt class="docutils literal"><span class="pre">ECGroup</span></tt>, pairing group or <tt class="docutils literal"><span class="pre">PairingGroup</span></tt>, and integer groups or <tt class="docutils literal"><span class="pre">IntegerGroup</span></tt>. This abstraction provides a simple interface for selecting group parameters, performing group operations, and etc. See the <tt class="docutils literal"><span class="pre">toolbox</span></tt> documentation for more details.</p>
 <p>Thus, at the beginning of the scheme, you must import the corresponding group setting in which the cryptographic scheme will be implemented</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">toolbox.ecgroup</span> <span class="kn">import</span> <span class="o">*</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.toolbox.ecgroup</span> <span class="kn">import</span> <span class="n">ECGroup</span>
 </pre></div>
 </div>
 <p>Next, let&#8217;s explain what goes on during class initialization. During <tt class="docutils literal"><span class="pre">__init__</span></tt>, you define the basic security properties of the <tt class="docutils literal"><span class="pre">PKEnc</span></tt> scheme and in this case accept as input a NIST standard elliptic curve identifier. The group object can either be defined globally or defined as a class member. The idea is that any routine within this scheme will have access to the group object to perform any operation. In our example, we define group as a global variable. Alternatively, you could define group as <tt class="docutils literal"><span class="pre">self.group</span> <span class="pre">=</span> <span class="pre">ECGroup(curve)</span></tt>.</p>
@@ -86,15 +78,15 @@
 </div>
 <p>We describe the first algorithm in the paper, <tt class="docutils literal"><span class="pre">keygen</span></tt>. Keygen only accepts a security parameter and generates the public and private keys and returns to the user. The paper description is as follows:</p>
 <div class="math" id="equation-keygen1">
-<p><span class="eqno">(1)</span><span class="math">g_1, g_2 \in G</span></p>
+<p><span class="eqno">(1)</span><img src="_images/math/babfd8689f532a9a2531927e2a0222e1663535ed.png" alt="g_1, g_2 \in G"/></p>
 </div><div class="math" id="equation-keygen2">
-<p><span class="eqno">(2)</span><span class="math">x_1, x_2, y_1, y_2, z \in Z_q</span></p>
+<p><span class="eqno">(2)</span><img src="_images/math/245216c199118f1ba4bf6b397943cfbf49441045.png" alt="x_1, x_2, y_1, y_2, z \in Z_q"/></p>
 </div><div class="math" id="equation-keygen3">
-<p><span class="eqno">(3)</span><span class="math">c = {g_1}^{x_1} \cdot {g_2}^{x_2}, d = {g_1}^{y_1} \cdot {g_2}^{y_2}, h = {g_1}^z</span></p>
+<p><span class="eqno">(3)</span><img src="_images/math/a1fb6cb03dd9d9d3ba6a62b376cf95b7cfb67ec4.png" alt="c = {g_1}^{x_1} \cdot {g_2}^{x_2}, d = {g_1}^{y_1} \cdot {g_2}^{y_2}, h = {g_1}^z"/></p>
 </div><div class="math" id="equation-pk">
-<p><span class="eqno">(4)</span><span class="math">pk = (g_1, g_2, c, d, h, H)</span></p>
+<p><span class="eqno">(4)</span><img src="_images/math/59711f4e0462a5b6ab884ed4e19d7e1892c1a541.png" alt="pk = (g_1, g_2, c, d, h, H)"/></p>
 </div><div class="math" id="equation-sk">
-<p><span class="eqno">(5)</span><span class="math">sk = (x_1, x_2, y_1, y_2, z)</span></p>
+<p><span class="eqno">(5)</span><img src="_images/math/9f601bd3bc30a1fbeb40505bf46c3c61d38b7497.png" alt="sk = (x_1, x_2, y_1, y_2, z)"/></p>
 </div><p>Random elements <a href="#equation-keygen1">(1)</a> are chosen and random elements <a href="#equation-keygen2">(2)</a> are also chosen. Next, the group elements <a href="#equation-keygen3">(3)</a> are computed. Select a hash function H from the family of universal one-way hash functions. The public key is defined by <a href="#equation-pk">(4)</a> and the private key is defined by <a href="#equation-sk">(5)</a>. Below is the Charm <tt class="docutils literal"><span class="pre">keygen</span></tt> function defined in the <tt class="docutils literal"><span class="pre">CS98</span></tt> class:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="p">):</span>
     <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
@@ -109,11 +101,11 @@
 </pre></div>
 </div>
 <div class="math" id="equation-prelim">
-<p><span class="eqno">(6)</span><span class="math">m \in G, r \in Z_q</span></p>
+<p><span class="eqno">(6)</span><img src="_images/math/41d2b200a4581da954de6de757f419bfef3ebcef.png" alt="m \in G, r \in Z_q"/></p>
 </div><div class="math" id="equation-encrypt">
-<p><span class="eqno">(7)</span><span class="math">u_1 = {g_1}^r, u_2 = {g_2}^r, e = h^r\cdot m, \alpha = H(u_1, u_2, e), v = c^r\cdot d^{r\alpha}</span></p>
+<p><span class="eqno">(7)</span><img src="_images/math/2d17612f9a0a0b76f35acc7acd3a52dbc2483454.png" alt="u_1 = {g_1}^r, u_2 = {g_2}^r, e = h^r\cdot m, \alpha = H(u_1, u_2, e), v = c^r\cdot d^{r\alpha}"/></p>
 </div><div class="math" id="equation-ciphertext">
-<p><span class="eqno">(8)</span><span class="math">(u_1, u_2, e, v)</span></p>
+<p><span class="eqno">(8)</span><img src="_images/math/ce422a7be60e2095d1997ff9f803453171760274.png" alt="(u_1, u_2, e, v)"/></p>
 </div><p>We now describe the encrypt routine as described by the paper. Given a message in G, the encryption algorithm first selects a random integer r <a href="#equation-prelim">(6)</a>, then computes <a href="#equation-encrypt">(7)</a> and returns the ciphertext as <a href="#equation-ciphertext">(8)</a>. The <tt class="docutils literal"><span class="pre">encrypt</span></tt> algorithm defined in Charm:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
     <span class="n">r</span>   <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
@@ -127,11 +119,11 @@
 </pre></div>
 </div>
 <div class="math" id="equation-decrypt1">
-<p><span class="eqno">(9)</span><span class="math">\alpha = H(u_1, u_2, e)</span></p>
+<p><span class="eqno">(9)</span><img src="_images/math/b3401ade40bb08743ae6d28562325096d202adbe.png" alt="\alpha = H(u_1, u_2, e)"/></p>
 </div><div class="math" id="equation-decrypt2">
-<p><span class="eqno">(10)</span><span class="math">{u_1}^{x_1 + y_1\alpha} {u_2}^{x_2 + y_2\alpha} = v</span></p>
+<p><span class="eqno">(10)</span><img src="_images/math/4c8c6ab5ce5f4c7eb58bb0927e2f398e82e6dcf5.png" alt="{u_1}^{x_1 + y_1\alpha} {u_2}^{x_2 + y_2\alpha} = v"/></p>
 </div><div class="math" id="equation-decrypt3">
-<p><span class="eqno">(11)</span><span class="math">m = e / {u_1}^z</span></p>
+<p><span class="eqno">(11)</span><img src="_images/math/373ff473647f7fff090a56d6f58c039f0aaeba10.png" alt="m = e / {u_1}^z"/></p>
 </div><p>Finally, the decryption routine as described by the paper. Given a ciphertext, the decryption algorithm runs as follows and first computes <a href="#equation-decrypt1">(9)</a>, and tests if <a href="#equation-decrypt2">(10)</a> condition holds, and if so outputs <a href="#equation-decrypt3">(11)</a> otherwise &#8220;reject&#8221;. The <tt class="docutils literal"><span class="pre">decrypt</span></tt> algorithm defined in Charm:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
     <span class="n">alpha</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;H&#39;</span><span class="p">](</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;u1&#39;</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;u2&#39;</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;e&#39;</span><span class="p">])</span>
@@ -151,10 +143,12 @@
 <div class="section" id="using-a-scheme">
 <h2>Using a Scheme<a class="headerlink" href="#using-a-scheme" title="Permalink to this headline">¶</a></h2>
 <p>To use any of our existing schemes in your application, each scheme includes a <tt class="docutils literal"><span class="pre">main</span></tt> routine that runs through every alorithm (with sample inputs) defined for that scheme. Thus, the <tt class="docutils literal"><span class="pre">main</span></tt> function provides a test that the scheme works in addition to demonstrate how to use it. For example, below is an example of how to instantiate the Cramer-Shoup scheme from above within your application:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">schemes.pkenc_cs98_ec.py</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">toolbox.eccurve</span> <span class="kn">import</span> <span class="n">prime192v1</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">schemes.pkenc.pkenc_cs98.py</span> <span class="kn">import</span> <span class="n">CS98</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.eccurve</span> <span class="kn">import</span> <span class="n">prime192v1</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.ecgroup</span> <span class="kn">import</span> <span class="n">ECGroup</span>
 
-<span class="n">pkenc</span> <span class="o">=</span> <span class="n">EC_CS98</span><span class="p">(</span><span class="n">prime192v1</span><span class="p">)</span>
+<span class="n">groupObj</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">prime192v1</span><span class="p">)</span>
+<span class="n">pkenc</span> <span class="o">=</span> <span class="n">CS98</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
 
 <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
 
@@ -171,14 +165,14 @@
 <p>At the moment, there are three cryptographic settings covered by Charm: <tt class="docutils literal"><span class="pre">integergroups</span></tt>, <tt class="docutils literal"><span class="pre">ecgroups</span></tt>, and <tt class="docutils literal"><span class="pre">pairinggroups</span></tt>.
 To initialize a group in the EC, refer to the <tt class="docutils literal"><span class="pre">toolbox.eccurve</span></tt> for all the full set of identifiers for supported NIST approved curves (e.g., <tt class="docutils literal"><span class="pre">prime192v1</span></tt>). For EC with billinear maps (or pairings), we provide a set of identifiers for both symmetric and asymmetric curves. For example, the <tt class="docutils literal"><span class="pre">'SS512'</span></tt> represents a symmetric curve with a 512-bit base field and <tt class="docutils literal"><span class="pre">'MNT159'</span></tt> represents an asymmetric curve with 159-bit base field.
 Finally, for integer groups, typically defining large primes <tt class="docutils literal"><span class="pre">p</span></tt> and <tt class="docutils literal"><span class="pre">q</span></tt> is enough to generate an RSA group. For schnorr groups, these group parameters may take some time to generate because they require safe primes (e.g., <tt class="docutils literal"><span class="pre">p</span> <span class="pre">=</span> <span class="pre">2q</span> <span class="pre">+</span> <span class="pre">1</span></tt>). Here are detailed examples below for integer and pairing groups (see above for EC group initialization):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">toolbox.integergroup</span> <span class="kn">import</span> <span class="o">*</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="kn">import</span> <span class="n">IntegerGroup</span>
 
 <span class="n">group1</span> <span class="o">=</span> <span class="n">IntegerGroup</span><span class="p">()</span>
 <span class="n">group1</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
 
 <span class="n">g</span> <span class="o">=</span> <span class="n">group1</span><span class="o">.</span><span class="n">randomGen</span><span class="p">()</span>
 
-<span class="kn">from</span> <span class="nn">toolbox.pairinggroup</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">G1</span>
 
 <span class="n">group2</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
 
@@ -199,18 +193,18 @@ We also show below how to customize our serialization routines:</p>
 </pre></div>
 </div>
 <p>If you would like to define your own custom serialization routine in conjunction with our API, the following example works for schemes based on the <tt class="docutils literal"><span class="pre">integergroup</span></tt> which in some cases do not utilize a group object:</p>
-<div class="highlight-python"><pre>from charm.integer import integer,serialize,deserialize
+<div class="highlight-python"><pre>from charm.core.math.integer import integer,serialize,deserialize
 
 class mySerializeAPI:
         def __init__(self)
                 ...
 
         def serialize(self, charm_object):
-            assert type(charm_object) == integer, "required type is integer, not: ", type(charm_object)
+            assert type(charm_object) == integer, &quot;required type is integer, not: &quot;, type(charm_object)
             return serialize(charm_object)
 
         def deserialize(self, object):
-            assert type(object) == bytes, "required type is bytes, not: ", type(object)
+            assert type(object) == bytes, &quot;required type is bytes, not: &quot;, type(object)
             return deserialize(object)</pre>
 </div>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.engine.util</span> <span class="kn">import</span> <span class="n">objectToBytes</span><span class="p">,</span><span class="n">bytesToObject</span>
@@ -244,12 +238,6 @@ class mySerializeAPI:
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="install_source.html"
-                        title="previous chapter">Platform Install Manual</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="schemes.html"
-                        title="next chapter">Demonstration Schemes</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/tutorial.txt"
@@ -258,7 +246,7 @@ class mySerializeAPI:
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -281,19 +269,13 @@ class mySerializeAPI:
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="schemes.html" title="Demonstration Schemes"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="install_source.html" title="Platform Install Manual"
-             >previous</a> |</li>
-        <li><a href="index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li> 
+        <li><a href="index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

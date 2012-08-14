@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pk_vrf &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>pk_vrf &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,116 +48,129 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for pk_vrf</h1><pre>
- 
-| From: "Constructing Verifiable Random Functions with Large Input Spaces"
-| Published in: ePrint
-| Available from: http://eprint.iacr.org/2010/102.pdf
-| Notes: applications to resetable ZK proofs, micropayment schemes, updatable ZK DBs
-         and verifiable transaction escrow schemes to name a few
+  <h1>Source code for pk_vrf</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Susan Hohenberger and Brent Waters (Pairing-based)</span>
+<span class="sd"> </span>
+<span class="sd">| From: &quot;Constructing Verifiable Random Functions with Large Input Spaces&quot;</span>
+<span class="sd">| Published in: ePrint</span>
+<span class="sd">| Available from: http://eprint.iacr.org/2010/102.pdf</span>
+<span class="sd">| Notes: applications to resetable ZK proofs, micropayment schemes, updatable ZK DBs</span>
+<span class="sd">         and verifiable transaction escrow schemes to name a few</span>
 
-* type:           verifiable random functions (family of pseudo random functions)
-* setting:        Pairing
+<span class="sd">* type:           verifiable random functions (family of pseudo random functions)</span>
+<span class="sd">* setting:        Pairing</span>
 
-:Authors:    J Ayo Akinyele
-:Date:       1/2012
-'''
-from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-from toolbox.iterate import dotprod 
+<span class="sd">:Authors:    J Ayo Akinyele</span>
+<span class="sd">:Date:       1/2012</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">pair</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.iterate</span> <span class="kn">import</span> <span class="n">dotprod</span> 
 
-debug = False
-class VRF10:
-    """Definition in paper: behave as Pseudo Random Functions (PRFs) with an additional property that party
-<div class="viewcode-block" id="VRF10"><a class="viewcode-back" href="../schemes/pk_vrf.html#pk_vrf.VRF10">[docs]</a>    holding the seed will publish a commitment to the function and is able to non-interactively convince
-    a verifier that a given evaluation is correct (matches pub commitment) without sacrificing pseudo-
-    randomness property on other inputs."""
-    def __init__(self, groupObj):
-        global group, lam_func
-        group = groupObj
-        lam_func = lambda i,a,b: a[i] ** b[i]
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<div class="viewcode-block" id="VRF10"><a class="viewcode-back" href="../schemes/pk_vrf.html#pk_vrf.VRF10">[docs]</a><span class="k">class</span> <span class="nc">VRF10</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; from charm.toolbox.pairinggroup import PairingGroup</span>
+<span class="sd">    &gt;&gt;&gt; group = PairingGroup(&#39;MNT224&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; vrf = VRF10(group)</span>
+<span class="sd">    &gt;&gt;&gt; statement = [0, 1, 1, 0, 1, 0, 1, 0]</span>
+<span class="sd">    &gt;&gt;&gt; n = len(statement) </span>
+<span class="sd">    &gt;&gt;&gt; (public_key, secret_key) = vrf.setup(n)</span>
+<span class="sd">    &gt;&gt;&gt; witness = vrf.prove(secret_key, statement)</span>
+<span class="sd">    &gt;&gt;&gt; vrf.verify(public_key, statement, witness)</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Definition in paper: behave as Pseudo Random Functions (PRFs) with an additional property that party</span>
+<span class="sd">    holding the seed will publish a commitment to the function and is able to non-interactively convince</span>
+<span class="sd">    a verifier that a given evaluation is correct (matches pub commitment) without sacrificing pseudo-</span>
+<span class="sd">    randomness property on other inputs.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">group</span><span class="p">,</span> <span class="n">lam_func</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+        <span class="n">lam_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">**</span> <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         
-    def setup(self, n):
-        """n = bit length of inputs"""
-<div class="viewcode-block" id="VRF10.setup"><a class="viewcode-back" href="../schemes/pk_vrf.html#pk_vrf.VRF10.setup">[docs]</a>        g1 = group.random(G1)
-        g2, h = group.random(G2), group.random(G2)
-        u_t = group.random(ZR)
-        u = [group.random(ZR) for i in range(n+1)]
-        U_t = g2 ** u_t
-        U1 = [g1 ** u[i] for i in range(len(u))]
-        U2 = [g2 ** u[i] for i in range(len(u))]
+<div class="viewcode-block" id="VRF10.setup"><a class="viewcode-back" href="../schemes/pk_vrf.html#pk_vrf.VRF10.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;n = bit length of inputs&quot;&quot;&quot;</span>
+        <span class="n">g1</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="n">g2</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
+        <span class="n">u_t</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+        <span class="n">U_t</span> <span class="o">=</span> <span class="n">g2</span> <span class="o">**</span> <span class="n">u_t</span>
+        <span class="n">U1</span> <span class="o">=</span> <span class="p">[</span><span class="n">g1</span> <span class="o">**</span> <span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="p">))]</span>
+        <span class="n">U2</span> <span class="o">=</span> <span class="p">[</span><span class="n">g2</span> <span class="o">**</span> <span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="p">))]</span>
         
-        pk = { 'U1':U1, 'U2':U2,'U_t':U_t, 'g1':g1, 'g2':g2, 'h':h,'n':n   }
-        sk = { 'u':u, 'u_t':u_t, 'g1':g1, 'h':h,'n':n }
-        return (pk, sk)
-    
-    def F(self, sk, x):
-        result = dotprod(1, -1, sk['n'], lam_func, sk['u'], x) </div>
-<div class="viewcode-block" id="VRF10.F"><a class="viewcode-back" href="../schemes/pk_vrf.html#pk_vrf.VRF10.F">[docs]</a>        return pair(sk['g1'] ** (sk['u_t'] * sk['u'][0] * result), sk['h'])
-    
-    def prove(self, sk, x):
-        pi = [i for i in range(sk['n'])]</div>
-<div class="viewcode-block" id="VRF10.prove"><a class="viewcode-back" href="../schemes/pk_vrf.html#pk_vrf.VRF10.prove">[docs]</a>        for i in range(sk['n']):
-            result = dotprod(1, -1, i+1, lam_func, sk['u'], x) 
-            pi[i] = sk['g1'] ** (sk['u_t'] * result)
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;U1&#39;</span><span class="p">:</span><span class="n">U1</span><span class="p">,</span> <span class="s">&#39;U2&#39;</span><span class="p">:</span><span class="n">U2</span><span class="p">,</span><span class="s">&#39;U_t&#39;</span><span class="p">:</span><span class="n">U_t</span><span class="p">,</span> <span class="s">&#39;g1&#39;</span><span class="p">:</span><span class="n">g1</span><span class="p">,</span> <span class="s">&#39;g2&#39;</span><span class="p">:</span><span class="n">g2</span><span class="p">,</span> <span class="s">&#39;h&#39;</span><span class="p">:</span><span class="n">h</span><span class="p">,</span><span class="s">&#39;n&#39;</span><span class="p">:</span><span class="n">n</span>   <span class="p">}</span>
+        <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;u&#39;</span><span class="p">:</span><span class="n">u</span><span class="p">,</span> <span class="s">&#39;u_t&#39;</span><span class="p">:</span><span class="n">u_t</span><span class="p">,</span> <span class="s">&#39;g1&#39;</span><span class="p">:</span><span class="n">g1</span><span class="p">,</span> <span class="s">&#39;h&#39;</span><span class="p">:</span><span class="n">h</span><span class="p">,</span><span class="s">&#39;n&#39;</span><span class="p">:</span><span class="n">n</span> <span class="p">}</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="VRF10.F"><a class="viewcode-back" href="../schemes/pk_vrf.html#pk_vrf.VRF10.F">[docs]</a>    <span class="k">def</span> <span class="nf">F</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">dotprod</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">],</span> <span class="n">lam_func</span><span class="p">,</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;u&#39;</span><span class="p">],</span> <span class="n">x</span><span class="p">)</span> 
+        <span class="k">return</span> <span class="n">pair</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;u_t&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;u&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">result</span><span class="p">),</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">])</span>
+    </div>
+<div class="viewcode-block" id="VRF10.prove"><a class="viewcode-back" href="../schemes/pk_vrf.html#pk_vrf.VRF10.prove">[docs]</a>    <span class="k">def</span> <span class="nf">prove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">pi</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">])]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">]):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">dotprod</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">lam_func</span><span class="p">,</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;u&#39;</span><span class="p">],</span> <span class="n">x</span><span class="p">)</span> 
+            <span class="n">pi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;u_t&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">result</span><span class="p">)</span>
         
-        result0 = dotprod(1, -1, sk['n'], lam_func, sk['u'], x)
-        pi_0 = sk['g1'] ** (sk['u_t'] * sk['u'][0] * result0)
-        y = self.F(sk, x)
-        return { 'y':y, 'pi':pi, 'pi0':pi_0 }
-                
-    def verify(self, pk, x, st):
-        n, y, pi, pi_0 = pk['n'], st['y'], st['pi'], st['pi0']</div>
-<div class="viewcode-block" id="VRF10.verify"><a class="viewcode-back" href="../schemes/pk_vrf.html#pk_vrf.VRF10.verify">[docs]</a>        # check first index 
-        check1 = pair(pi[0], pk['g2'])
-        if x[0] == 0 and check1 == pair(pk['g1'], pk['U_t']):
-            if debug: print("Verify: check 0 successful!\t\tcase:", x[0])
-        elif x[0] == 1 and check1 == pair(pk['U1'][0], pk['U_t']):
-            if debug: print("Verify: check 0 successful!\t\tcase:", x[0])            
-        else: 
-            if debug: print("Verify: check 0 FAILURE!\t\t failed case:", x[0])            
-            return False
+        <span class="n">result0</span> <span class="o">=</span> <span class="n">dotprod</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">],</span> <span class="n">lam_func</span><span class="p">,</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;u&#39;</span><span class="p">],</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">pi_0</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;u_t&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;u&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">result0</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">F</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;y&#39;</span><span class="p">:</span><span class="n">y</span><span class="p">,</span> <span class="s">&#39;pi&#39;</span><span class="p">:</span><span class="n">pi</span><span class="p">,</span> <span class="s">&#39;pi0&#39;</span><span class="p">:</span><span class="n">pi_0</span> <span class="p">}</span>
+                </div>
+<div class="viewcode-block" id="VRF10.verify"><a class="viewcode-back" href="../schemes/pk_vrf.html#pk_vrf.VRF10.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">st</span><span class="p">):</span>
+        <span class="n">n</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="n">pi_0</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">],</span> <span class="n">st</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">],</span> <span class="n">st</span><span class="p">[</span><span class="s">&#39;pi&#39;</span><span class="p">],</span> <span class="n">st</span><span class="p">[</span><span class="s">&#39;pi0&#39;</span><span class="p">]</span>
+        <span class="c"># check first index </span>
+        <span class="n">check1</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">pi</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">check1</span> <span class="o">==</span> <span class="n">pair</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;U_t&#39;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verify: check 0 successful!</span><span class="se">\t\t</span><span class="s">case:&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">check1</span> <span class="o">==</span> <span class="n">pair</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;U1&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;U_t&#39;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verify: check 0 successful!</span><span class="se">\t\t</span><span class="s">case:&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>            
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verify: check 0 FAILURE!</span><span class="se">\t\t</span><span class="s"> failed case:&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>            
+            <span class="k">return</span> <span class="bp">False</span>
         
-        for i in range(1, len(x)):
-            check2 = pair(pi[i], pk['g2'])
-            if x[i] == 0 and check2 == pair(pi[i-1], pk['g2']):
-                if debug: print("Verify: check", i ,"successful!\t\tcase:", x[i])
-            elif x[i] == 1 and check2 == pair(pi[i-1], pk['U2'][i]):
-                if debug: print("Verify: check", i ,"successful!\t\tcase:", x[i])
-            else:
-                if debug: print("Verify: check", i ,"FAILURE!\t\tcase:", x[i])
-                return False
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+            <span class="n">check2</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">pi</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">check2</span> <span class="o">==</span> <span class="n">pair</span><span class="p">(</span><span class="n">pi</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verify: check&quot;</span><span class="p">,</span> <span class="n">i</span> <span class="p">,</span><span class="s">&quot;successful!</span><span class="se">\t\t</span><span class="s">case:&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">check2</span> <span class="o">==</span> <span class="n">pair</span><span class="p">(</span><span class="n">pi</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;U2&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verify: check&quot;</span><span class="p">,</span> <span class="n">i</span> <span class="p">,</span><span class="s">&quot;successful!</span><span class="se">\t\t</span><span class="s">case:&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verify: check&quot;</span><span class="p">,</span> <span class="n">i</span> <span class="p">,</span><span class="s">&quot;FAILURE!</span><span class="se">\t\t</span><span class="s">case:&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">return</span> <span class="bp">False</span>
         
-        if pair(pi_0, pk['g2']) == pair(pi[n-1], pk['U2'][0]) and pair(pi_0, pk['h']) == y:
-            if debug: print("Verify: all and final check successful!!!")
-            return True
-        else:
-            return False
-        
-def main():
-    grp = PairingGroup('MNT224')</div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pk_vrf.html#pk_vrf.main">[docs]</a>    
-    # bits
-    x1 = [0, 1, 1, 0, 1, 0, 1, 0]
-#    x2 = [1, 1, 1, 0, 1, 0, 1, 0]
-    # block of bits
-    n = 8 
+        <span class="k">if</span> <span class="n">pair</span><span class="p">(</span><span class="n">pi_0</span><span class="p">,</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="n">pair</span><span class="p">(</span><span class="n">pi</span><span class="p">[</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;U2&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="n">pair</span><span class="p">(</span><span class="n">pi_0</span><span class="p">,</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="n">y</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verify: all and final check successful!!!&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        </div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pk_vrf.html#pk_vrf.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">grp</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;MNT224&#39;</span><span class="p">)</span>
     
-    vrf = VRF10(grp)
+    <span class="c"># bits</span>
+    <span class="n">x1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="c">#    x2 = [1, 1, 1, 0, 1, 0, 1, 0]</span>
+    <span class="c"># block of bits</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">8</span> 
     
-    # setup the VRF to accept input blocks of 8-bits 
-    (pk, sk) = vrf.setup(n)
+    <span class="n">vrf</span> <span class="o">=</span> <span class="n">VRF10</span><span class="p">(</span><span class="n">grp</span><span class="p">)</span>
     
-    # generate proof over block x (using sk)
-    st = vrf.prove(sk, x1)
+    <span class="c"># setup the VRF to accept input blocks of 8-bits </span>
+    <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">vrf</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
     
-    # verify bits using pk and proof
-    assert vrf.verify(pk, x1, st), "VRF failed verification"
-#    assert vrf.verify(pk, x2, st), "VRF should FAIL verification!!!"
+    <span class="c"># generate proof over block x (using sk)</span>
+    <span class="n">st</span> <span class="o">=</span> <span class="n">vrf</span><span class="o">.</span><span class="n">prove</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">x1</span><span class="p">)</span>
     
-if __name__ == "__main__":
-    debug = True</div>
-    main()
-    </pre>
+    <span class="c"># verify bits using pk and proof</span>
+    <span class="k">assert</span> <span class="n">vrf</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">st</span><span class="p">),</span> <span class="s">&quot;VRF failed verification&quot;</span>
+<span class="c">#    assert vrf.verify(pk, x2, st), &quot;VRF should FAIL verification!!!&quot;</span>
+    </div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
 
           </div>
         </div>
@@ -167,7 +180,7 @@ if __name__ == "__main__":
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -190,14 +203,14 @@ if __name__ == "__main__":
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

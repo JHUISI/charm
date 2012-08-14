@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>encap_bchk05 &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>encap_bchk05 &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -49,21 +49,30 @@
           <div class="body">
             
   <h1>Source code for encap_bchk05</h1><div class="highlight"><pre>
-<span class="kn">from</span> <span class="nn">toolbox.conversion</span> <span class="kn">import</span> <span class="n">Conversion</span>
+<span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="kn">import</span> <span class="n">randomBits</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
 
 <span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
-<span class="k">class</span> <span class="nc">EncapBCHK</span><span class="p">():</span>
+<div class="viewcode-block" id="EncapBCHK"><a class="viewcode-back" href="../schemes/encap_bchk05.html#encap_bchk05.EncapBCHK">[docs]</a><span class="k">class</span> <span class="nc">EncapBCHK</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; encap = EncapBCHK()</span>
+<span class="sd">    &gt;&gt;&gt; hout = encap.setup()</span>
+<span class="sd">    &gt;&gt;&gt; (r, com, dec) = encap.S(hout)</span>
+<span class="sd">    &gt;&gt;&gt; rout = encap.R(hout, com, dec)</span>
+<span class="sd">    &gt;&gt;&gt; r == rout</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<div class="viewcode-block" id="EncapBCHK"><a class="viewcode-back" href="../schemes/encap_bchk05.html#encap_bchk05.EncapBCHK">[docs]</a>        <span class="k">global</span> <span class="n">H</span>
+        <span class="k">global</span> <span class="n">H</span>
         <span class="n">H</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="EncapBCHK.setup"><a class="viewcode-back" href="../schemes/encap_bchk05.html#encap_bchk05.EncapBCHK.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">pub</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">()</span>
-<div class="viewcode-block" id="EncapBCHK.setup"><a class="viewcode-back" href="../schemes/encap_bchk05.html#encap_bchk05.EncapBCHK.setup">[docs]</a>        <span class="k">return</span> <span class="n">pub</span>
-
-    <span class="k">def</span> <span class="nf">S</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pub</span><span class="p">):</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">randomBits</span><span class="p">(</span><span class="mi">448</span><span class="p">)</span></div>
-<div class="viewcode-block" id="EncapBCHK.S"><a class="viewcode-back" href="../schemes/encap_bchk05.html#encap_bchk05.EncapBCHK.S">[docs]</a>        <span class="n">x</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">135</span><span class="p">)</span> 
+        <span class="k">return</span> <span class="n">pub</span>
+</div>
+<div class="viewcode-block" id="EncapBCHK.S"><a class="viewcode-back" href="../schemes/encap_bchk05.html#encap_bchk05.EncapBCHK.S">[docs]</a>    <span class="k">def</span> <span class="nf">S</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pub</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">randomBits</span><span class="p">(</span><span class="mi">448</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">135</span><span class="p">)</span> 
 
         <span class="n">r</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
 
@@ -72,33 +81,16 @@
         <span class="n">dec</span> <span class="o">=</span> <span class="n">x</span>
 
         <span class="k">return</span> <span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">com</span><span class="p">,</span> <span class="n">dec</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">R</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pub</span><span class="p">,</span> <span class="n">com</span><span class="p">,</span> <span class="n">dec</span><span class="p">):</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dec</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">digest</span><span class="p">()[:</span><span class="mi">128</span><span class="p">]</span></div>
-<div class="viewcode-block" id="EncapBCHK.R"><a class="viewcode-back" href="../schemes/encap_bchk05.html#encap_bchk05.EncapBCHK.R">[docs]</a>        
+</div>
+<div class="viewcode-block" id="EncapBCHK.R"><a class="viewcode-back" href="../schemes/encap_bchk05.html#encap_bchk05.EncapBCHK.R">[docs]</a>    <span class="k">def</span> <span class="nf">R</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pub</span><span class="p">,</span> <span class="n">com</span><span class="p">,</span> <span class="n">dec</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dec</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">digest</span><span class="p">()[:</span><span class="mi">128</span><span class="p">]</span>
+        
         <span class="k">if</span><span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">com</span><span class="p">):</span>
             <span class="n">m</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dec</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">m</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">b</span><span class="s">&#39;FALSE&#39;</span>
-    
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">encap</span> <span class="o">=</span> <span class="n">EncapBCHK</span><span class="p">()</span></div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/encap_bchk05.html#encap_bchk05.main">[docs]</a>
-    <span class="n">hout</span> <span class="o">=</span> <span class="n">encap</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
-
-    <span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">com</span><span class="p">,</span> <span class="n">dec</span><span class="p">)</span> <span class="o">=</span> <span class="n">encap</span><span class="o">.</span><span class="n">S</span><span class="p">(</span><span class="n">hout</span><span class="p">)</span>
-
-    <span class="n">rout</span> <span class="o">=</span> <span class="n">encap</span><span class="o">.</span><span class="n">R</span><span class="p">(</span><span class="n">hout</span><span class="p">,</span> <span class="n">com</span><span class="p">,</span> <span class="n">dec</span><span class="p">)</span>
-    
-    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;recovered m =&gt;&quot;</span><span class="p">,</span> <span class="n">rout</span><span class="p">)</span>
-
-    <span class="k">assert</span> <span class="n">r</span> <span class="o">==</span> <span class="n">rout</span><span class="p">,</span> <span class="s">&quot;Failed Decryption&quot;</span>
-    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Decryption!!!&quot;</span><span class="p">)</span>
-    
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span></div>
-    <span class="n">main</span><span class="p">()</span>   
+    </div></div>
 </pre></div>
 
           </div>
@@ -109,7 +101,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -132,14 +124,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

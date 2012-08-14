@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>ecgroup &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>ecgroup &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -49,74 +49,82 @@
           <div class="body">
             
   <h1>Source code for ecgroup</h1><div class="highlight"><pre>
-<span class="k">class</span> <span class="nc">ECGroup</span><span class="p">():</span>
+<span class="c">#from charm.core.math.elliptic_curve import *</span>
+<span class="kn">from</span> <span class="nn">charm.core.math.elliptic_curve</span> <span class="kn">import</span> <span class="n">elliptic_curve</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G</span><span class="p">,</span><span class="n">init</span><span class="p">,</span><span class="n">random</span><span class="p">,</span><span class="n">order</span><span class="p">,</span><span class="n">getGenerator</span><span class="p">,</span><span class="n">bitsize</span><span class="p">,</span><span class="n">serialize</span><span class="p">,</span><span class="n">deserialize</span><span class="p">,</span><span class="n">hashEC</span><span class="p">,</span><span class="n">encode</span><span class="p">,</span><span class="n">decode</span><span class="p">,</span><span class="n">getXY</span>
+<span class="c">#from charm.core.math.elliptic_curve import InitBenchmark,StartBenchmark,EndBenchmark,GetBenchmak,GetGeneralBenchmarks,ClearBenchmark</span>
+
+<div class="viewcode-block" id="ECGroup"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup">[docs]</a><span class="k">class</span> <span class="nc">ECGroup</span><span class="p">():</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">builtin_cv</span><span class="p">):</span>
-<div class="viewcode-block" id="ECGroup"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup">[docs]</a>        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">ecc</span><span class="p">(</span><span class="n">nid</span><span class="o">=</span><span class="n">builtin_cv</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">elliptic_curve</span><span class="p">(</span><span class="n">nid</span><span class="o">=</span><span class="n">builtin_cv</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param</span> <span class="o">=</span> <span class="n">builtin_cv</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="bp">True</span>
 
-    <span class="k">def</span> <span class="nf">order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ECGroup.order"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.order">[docs]</a>    <span class="k">def</span> <span class="nf">order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">order</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">)</span>
-<div class="viewcode-block" id="ECGroup.order"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.order">[docs]</a>
-    <span class="k">def</span> <span class="nf">bitsize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">bitsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">)</span></div>
-<div class="viewcode-block" id="ECGroup.bitsize"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.bitsize">[docs]</a>    
-    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">None</span></div>
-<div class="viewcode-block" id="ECGroup.paramgen"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.paramgen">[docs]</a>
-    <span class="k">def</span> <span class="nf">groupType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
-        <span class="k">return</span> <span class="s">&#39;ECGroup&#39;</span>     </div>
-<div class="viewcode-block" id="ECGroup.groupType"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.groupType">[docs]</a>
-    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">ZR</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">init</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span></div>
-<div class="viewcode-block" id="ECGroup.init"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.init">[docs]</a>    
-    <span class="k">def</span> <span class="nf">random</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">ZR</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="n">ZR</span> <span class="ow">or</span> <span class="nb">type</span> <span class="o">==</span> <span class="n">G</span><span class="p">:</span></div>
-<div class="viewcode-block" id="ECGroup.random"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.random">[docs]</a>            <span class="k">return</span> <span class="n">random</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ECGroup.bitsize"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.bitsize">[docs]</a>    <span class="k">def</span> <span class="nf">bitsize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">bitsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="ECGroup.paramgen"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.paramgen">[docs]</a>    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="ECGroup.groupSetting"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.groupSetting">[docs]</a>    <span class="k">def</span> <span class="nf">groupSetting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;elliptic_curve&#39;</span>
+</div>
+<div class="viewcode-block" id="ECGroup.groupType"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.groupType">[docs]</a>    <span class="k">def</span> <span class="nf">groupType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">param</span>
+</div>
+<div class="viewcode-block" id="ECGroup.init"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_type</span><span class="o">=</span><span class="n">ZR</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">init</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">_type</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="ECGroup.random"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.random">[docs]</a>    <span class="k">def</span> <span class="nf">random</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_type</span><span class="o">=</span><span class="n">ZR</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">_type</span> <span class="o">==</span> <span class="n">ZR</span> <span class="ow">or</span> <span class="n">_type</span> <span class="o">==</span> <span class="n">G</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">random</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">_type</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    </div>
+<div class="viewcode-block" id="ECGroup.encode"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">encode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="ECGroup.decode"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">decode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="ECGroup.serialize"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">serialize</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="ECGroup.deserialize"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytes_object</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">bytes_object</span><span class="p">)</span>
     
-    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">encode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span></div>
-<div class="viewcode-block" id="ECGroup.encode"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.encode">[docs]</a>    
-    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">decode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">msg_bytes</span><span class="p">)</span></div>
-<div class="viewcode-block" id="ECGroup.decode"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.decode">[docs]</a>    
-    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">serialize</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span></div>
-<div class="viewcode-block" id="ECGroup.serialize"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.serialize">[docs]</a>    
-    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytes_object</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">bytes_object</span><span class="p">)</span></div>
-<div class="viewcode-block" id="ECGroup.deserialize"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.deserialize">[docs]</a>    
-    <span class="c"># needs work to iterate over tuple</span>
-    <span class="k">def</span> <span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">_type</span><span class="o">=</span><span class="n">ZR</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span></div>
-<div class="viewcode-block" id="ECGroup.hash"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.hash">[docs]</a>            <span class="n">s</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">()</span>
+    <span class="c"># needs work to iterate over tuple</span></div>
+<div class="viewcode-block" id="ECGroup.hash"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.hash">[docs]</a>    <span class="k">def</span> <span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">_type</span><span class="o">=</span><span class="n">ZR</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">==</span> <span class="n">ecc</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">==</span> <span class="n">elliptic_curve</span><span class="p">:</span>
                     <span class="n">s</span> <span class="o">+=</span> <span class="n">serialize</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
                     <span class="n">s</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
                 <span class="c"># consider other types    </span>
             <span class="c">#print(&quot;s =&gt; %s&quot; % s)</span>
-            <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">_type</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="n">ecc</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">hashEC</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">_type</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="n">elliptic_curve</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">serialize</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
-            <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">_type</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">hashEC</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">_type</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">_type</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">hashEC</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">_type</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">None</span>
-    
-    <span class="k">def</span> <span class="nf">zr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">point</span><span class="p">)</span> <span class="o">==</span> <span class="n">ecc</span><span class="p">:</span></div>
-<div class="viewcode-block" id="ECGroup.zr"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.zr">[docs]</a>            <span class="k">return</span> <span class="n">getXY</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="ECGroup.zr"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.zr">[docs]</a>    <span class="k">def</span> <span class="nf">zr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">point</span><span class="p">)</span> <span class="o">==</span> <span class="n">elliptic_curve</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">getXY</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">None</span>
-
-    <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">point</span><span class="p">)</span> <span class="o">==</span> <span class="n">ecc</span><span class="p">:</span></div>
-<div class="viewcode-block" id="ECGroup.coordinates"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.coordinates">[docs]</a>            <span class="k">return</span> <span class="n">getXY</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
-        
-    <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span></div>
-<div class="viewcode-block" id="ECGroup.debug"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.debug">[docs]</a>           <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</div>
+<div class="viewcode-block" id="ECGroup.coordinates"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">point</span><span class="p">)</span> <span class="o">==</span> <span class="n">elliptic_curve</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">getXY</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="ECGroup.debug"><a class="viewcode-back" href="../toolbox/ecgroup.html#ecgroup.ECGroup.debug">[docs]</a>    <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
+           <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                <span class="k">print</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)):</span>
@@ -135,7 +143,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -158,14 +166,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

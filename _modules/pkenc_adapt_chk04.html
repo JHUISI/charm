@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pkenc_adapt_chk04 &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>pkenc_adapt_chk04 &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,95 +48,81 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for pkenc_adapt_chk04</h1><pre>
- 
-| From: "R. Canneti, S. Halevi, J. Katz: Chosen-Ciphertext Security from Identity-Based Encryption"
-| Published in: CRYPTO 2004
-| Available from: http://eprint.iacr.org/2003/182
-| Notes: 
+  <h1>Source code for pkenc_adapt_chk04</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform (generic composition of IBE+signature -&gt; PKE)</span>
+<span class="sd"> </span>
+<span class="sd">| From: &quot;R. Canneti, S. Halevi, J. Katz: Chosen-Ciphertext Security from Identity-Based Encryption&quot;</span>
+<span class="sd">| Published in: CRYPTO 2004</span>
+<span class="sd">| Available from: http://eprint.iacr.org/2003/182</span>
+<span class="sd">| Notes: </span>
 
-* type:         encryption (public key)
-* setting:      n/a --- requires a selective-ID secure IBE scheme an EU-CMA one-time signature (OTS) scheme
-* assumption:   n/a --- dependent on the underlying primitives
+<span class="sd">* type:         encryption (public key)</span>
+<span class="sd">* setting:      n/a --- requires a selective-ID secure IBE scheme an EU-CMA one-time signature (OTS) scheme</span>
+<span class="sd">* assumption:   n/a --- dependent on the underlying primitives</span>
 
-:Authors:  J. Ayo Akinyele
-:Date:         1/2011
-'''
-from schemes.ibenc_bb03 import IBE_BB04
-from schemes.pksig_bls04 import IBSig
-from schemes.ibenc_adapt_identityhash import HashIDAdapter
-from toolbox.PKEnc import PKEnc
-from toolbox.pairinggroup import * #PairingGroup,GT
+<span class="sd">:Authors:  J. Ayo Akinyele</span>
+<span class="sd">:Date:         1/2011</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.PKEnc</span> <span class="kn">import</span> <span class="n">PKEnc</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
 
-debug = False
-class CHK04(PKEnc):
-    def __init__(self, ibe_scheme, ots_scheme, groupObj):
-<div class="viewcode-block" id="CHK04"><a class="viewcode-back" href="../schemes/pkenc_adapt_chk04.html#pkenc_adapt_chk04.CHK04">[docs]</a>        global ibe, ots, group
-        ibe = ibe_scheme
-        ots = ots_scheme
-        group = groupObj
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<div class="viewcode-block" id="CHK04"><a class="viewcode-back" href="../schemes/pkenc/pkenc_adapt_chk04.html#pkenc_adapt_chk04.CHK04">[docs]</a><span class="k">class</span> <span class="nc">CHK04</span><span class="p">(</span><span class="n">PKEnc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; from schemes.ibenc.ibenc_adapt_identityhash import HashIDAdapter</span>
+<span class="sd">    &gt;&gt;&gt; from schemes.ibenc.ibenc_bb03 import IBE_BB04</span>
+<span class="sd">    &gt;&gt;&gt; from schemes.pksig.pksig_bls04 import IBSig</span>
+<span class="sd">    &gt;&gt;&gt; group = PairingGroup(&#39;SS512&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ibe = IBE_BB04(group)</span>
+<span class="sd">    &gt;&gt;&gt; hash_ibe = HashIDAdapter(ibe, group)</span>
+<span class="sd">    &gt;&gt;&gt; ots = IBSig(group)</span>
+<span class="sd">    &gt;&gt;&gt; pkenc = CHK04(hash_ibe, ots, group)</span>
+<span class="sd">    &gt;&gt;&gt; (public_key, secret_key) = pkenc.keygen(0)</span>
+<span class="sd">    &gt;&gt;&gt; msg = group.random(GT)</span>
+<span class="sd">    &gt;&gt;&gt; cipher_text = pkenc.encrypt(public_key, msg)</span>
+<span class="sd">    &gt;&gt;&gt; decrypted_msg = pkenc.decrypt(public_key, secret_key, cipher_text)</span>
+<span class="sd">    &gt;&gt;&gt; decrypted_msg == msg</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ibe_scheme</span><span class="p">,</span> <span class="n">ots_scheme</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">ibe</span><span class="p">,</span> <span class="n">ots</span><span class="p">,</span> <span class="n">group</span>
+        <span class="n">ibe</span> <span class="o">=</span> <span class="n">ibe_scheme</span>
+        <span class="n">ots</span> <span class="o">=</span> <span class="n">ots_scheme</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
 		
-    def keygen(self, secparam):
-        # Run the IBE Setup routine to generate (mpk, msk)
-<div class="viewcode-block" id="CHK04.keygen"><a class="viewcode-back" href="../schemes/pkenc_adapt_chk04.html#pkenc_adapt_chk04.CHK04.keygen">[docs]</a>        (mpk, msk) = ibe.setup()
+<div class="viewcode-block" id="CHK04.keygen"><a class="viewcode-back" href="../schemes/pkenc/pkenc_adapt_chk04.html#pkenc_adapt_chk04.CHK04.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="p">):</span>
+        <span class="c"># Run the IBE Setup routine to generate (mpk, msk)</span>
+        <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
         
-        pk = { 'mpk' : mpk, 'secparam':secparam }
-        return (pk, msk)
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;mpk&#39;</span> <span class="p">:</span> <span class="n">mpk</span><span class="p">,</span> <span class="s">&#39;secparam&#39;</span><span class="p">:</span><span class="n">secparam</span> <span class="p">}</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="CHK04.encrypt"><a class="viewcode-back" href="../schemes/pkenc/pkenc_adapt_chk04.html#pkenc_adapt_chk04.CHK04.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="c"># Generate a random keypair for the OTS</span>
+        <span class="p">(</span><span class="n">svk</span><span class="p">,</span> <span class="n">ssk</span><span class="p">)</span> <span class="o">=</span> <span class="n">ots</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;secparam&#39;</span><span class="p">])</span>		
 
-    def encrypt(self, pk, message):
-        # Generate a random keypair for the OTS</div>
-<div class="viewcode-block" id="CHK04.encrypt"><a class="viewcode-back" href="../schemes/pkenc_adapt_chk04.html#pkenc_adapt_chk04.CHK04.encrypt">[docs]</a>        (svk, ssk) = ots.keygen(pk['secparam'])		
+        <span class="c"># print(&quot;pub identity enc =&gt;&quot;, _id)</span>
 
-        # get identity (element of ZR)
-        _id = group.hash(svk['identity'])
-        # print("pub identity enc =&gt;", _id)
-
-        # Encrypt message with the IBE scheme under 'identity' vk
-        C = ibe.encrypt(pk['mpk'], _id, message)
-        # Sign the resulting ciphertext with sk
-        sigma = ots.sign(ssk['x'], C)
-        return { 'vk' : svk, 'C' : C, 'sigma' : sigma }
+        <span class="c"># Encrypt message with the IBE scheme under &#39;identity&#39; vk</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;mpk&#39;</span><span class="p">],</span><span class="n">svk</span><span class="p">[</span><span class="s">&#39;identity&#39;</span><span class="p">]</span> <span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+        <span class="c"># Sign the resulting ciphertext with sk</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="n">ots</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">ssk</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">],</span> <span class="n">C</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;vk&#39;</span> <span class="p">:</span> <span class="n">svk</span><span class="p">,</span> <span class="s">&#39;C&#39;</span> <span class="p">:</span> <span class="n">C</span><span class="p">,</span> <span class="s">&#39;sigma&#39;</span> <span class="p">:</span> <span class="n">sigma</span> <span class="p">}</span>
 		
-    # NOTE: need to transform c['vk'] into a string to use as key        
-    def decrypt(self, pk, sk, c):
-        # Given a ciphertext (vk, C, sigma), verify that sigma is a signature on C under public key vk</div>
-<div class="viewcode-block" id="CHK04.decrypt"><a class="viewcode-back" href="../schemes/pkenc_adapt_chk04.html#pkenc_adapt_chk04.CHK04.decrypt">[docs]</a>        if not ots.verify(c['vk'], c['sigma'], c['C']):
-            return False
+    <span class="c"># NOTE: need to transform c[&#39;vk&#39;] into a string to use as key        </span></div>
+<div class="viewcode-block" id="CHK04.decrypt"><a class="viewcode-back" href="../schemes/pkenc/pkenc_adapt_chk04.html#pkenc_adapt_chk04.CHK04.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="c"># Given a ciphertext (vk, C, sigma), verify that sigma is a signature on C under public key vk</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ots</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;vk&#39;</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;sigma&#39;</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="bp">False</span>
 
-        identity = c['vk']['identity']
-        # print("identity in dec =&gt;", identity)
-        # Otherwise, extract an IBE key for identity 'vk' under the master secret params
-        dk = ibe.extract(sk, identity)
-        # Return the decryption of the ciphertext element "C" under key dk
-        return ibe.decrypt(pk, dk, c['C'])
-
-def main():
-    groupObj = PairingGroup('SS512')</div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pkenc_adapt_chk04.html#pkenc_adapt_chk04.main">[docs]</a>    # instantiate an Identity-Based Encryption scheme
-    ibe = IBE_BB04(groupObj)
-    hash_ibe = HashIDAdapter(ibe, groupObj)
-   
-    # instantiate an one-time signature scheme such as BLS04
-    ots = IBSig(groupObj)
-    
-    pkenc = CHK04(hash_ibe, ots, groupObj)
-    
-    # not sure how to enforce secparam yet
-    (pk, sk) = pkenc.keygen(0)
-    
-    msg = groupObj.random(GT)
-    ciphertext = pkenc.encrypt(pk, msg)
-    
-    rec_msg = pkenc.decrypt(pk, sk, ciphertext)
-    assert rec_msg == msg, "FAILED Decryption!!!"
-    if debug: print("Successful Decryption!")       
-        
-if __name__ == "__main__":
-    debug = True</div>
-    main()
-     
-    
-</pre>
+        <span class="n">identity</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;vk&#39;</span><span class="p">][</span><span class="s">&#39;identity&#39;</span><span class="p">]</span>
+        <span class="c"># print(&quot;identity in dec =&gt;&quot;, identity)</span>
+        <span class="c"># Otherwise, extract an IBE key for identity &#39;vk&#39; under the master secret params</span>
+        <span class="n">dk</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">identity</span><span class="p">)</span>
+        <span class="c"># Return the decryption of the ciphertext element &quot;C&quot; under key dk</span>
+        <span class="k">return</span> <span class="n">ibe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">dk</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">])</span>
+</pre></div></div></div>
 
           </div>
         </div>
@@ -146,7 +132,7 @@ if __name__ == "__main__":
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -169,14 +155,14 @@ if __name__ == "__main__":
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

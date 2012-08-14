@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>abenc_adapt_hybrid &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>abenc_adapt_hybrid &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -49,27 +49,26 @@
           <div class="body">
             
   <h1>Source code for abenc_adapt_hybrid</h1><div class="highlight"><pre>
-<span class="kn">from</span> <span class="nn">toolbox.ABEnc</span> <span class="kn">import</span> <span class="n">ABEnc</span>
-<span class="kn">from</span> <span class="nn">schemes.abenc_bsw07</span> <span class="kn">import</span> <span class="n">CPabe_BSW07</span>
-<span class="kn">from</span> <span class="nn">toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">GT</span>
-<span class="kn">from</span> <span class="nn">toolbox.symcrypto</span> <span class="kn">import</span> <span class="n">AuthenticatedCryptoAbstraction</span>
-<span class="kn">from</span> <span class="nn">charm.pairing</span> <span class="kn">import</span> <span class="nb">hash</span> <span class="k">as</span> <span class="n">sha1</span>
-<span class="kn">from</span> <span class="nn">toolbox.conversion</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.ABEnc</span> <span class="kn">import</span> <span class="n">ABEnc</span>
+<span class="kn">from</span> <span class="nn">schemes.abenc.abenc_bsw07</span> <span class="kn">import</span> <span class="n">CPabe_BSW07</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">GT</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.symcrypto</span> <span class="kn">import</span> <span class="n">AuthenticatedCryptoAbstraction</span>
+<span class="kn">from</span> <span class="nn">charm.core.math.pairing</span> <span class="kn">import</span> <span class="n">hashPair</span> <span class="k">as</span> <span class="n">sha1</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span>
 
 <span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
 <span class="k">class</span> <span class="nc">HybridABEnc</span><span class="p">(</span><span class="n">ABEnc</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<div class="viewcode-block" id="HybridABEnc"><a class="viewcode-back" href="../schemes/abenc_adapt_hybrid.html#abenc_adapt_hybrid.HybridABEnc">[docs]</a><span class="sd">    &gt;&gt;&gt; groupObj = PairingGroup(&#39;../param/a.param&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; cpabe = CPabe_BSW07(groupObj)</span>
-<span class="sd">    &gt;&gt;&gt; hyb_abe = HybridABEnc(cpabe, groupObj)</span>
+<div class="viewcode-block" id="HybridABEnc"><a class="viewcode-back" href="../schemes/abenc/abenc_adapt_hybrid.html#abenc_adapt_hybrid.HybridABEnc">[docs]</a>    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; group = PairingGroup(&quot;SS512&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; cpabe = CPabe_BSW07(group)</span>
+<span class="sd">    &gt;&gt;&gt; hyb_abe = HybridABEnc(cpabe, group)</span>
 <span class="sd">    &gt;&gt;&gt; access_policy = &#39;((four or three) and (two or one))&#39;</span>
-<span class="sd">    &gt;&gt;&gt; message = &quot;hello world this is an important message.&quot;</span>
-<span class="sd">    &gt;&gt;&gt; (pk, mk) = hyb_abe.setup()</span>
-<span class="sd">    &gt;&gt;&gt; sk = hyb_abe.keygen(pk, mk, [&#39;ONE&#39;, &#39;TWO&#39;, &#39;THREE&#39;])</span>
-<span class="sd">    &gt;&gt;&gt; ct = hyb_abe.encrypt(pk, message, access_policy)</span>
-<span class="sd">    &gt;&gt;&gt; hyb_abe.decrypt(pk, sk, ct)</span>
-<span class="sd">    &#39;hello world this is an important message.&#39;</span>
+<span class="sd">    &gt;&gt;&gt; msg = b&quot;hello world this is an important message.&quot;</span>
+<span class="sd">    &gt;&gt;&gt; (master_public_key, master_key) = hyb_abe.setup()</span>
+<span class="sd">    &gt;&gt;&gt; secret_key = hyb_abe.keygen(master_public_key, master_key, [&#39;ONE&#39;, &#39;TWO&#39;, &#39;THREE&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; cipher_text = hyb_abe.encrypt(master_public_key, msg, access_policy)</span>
+<span class="sd">    &gt;&gt;&gt; hyb_abe.decrypt(master_public_key, secret_key, cipher_text)</span>
+<span class="sd">    b&#39;hello world this is an important message.&#39;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
         <span class="n">ABEnc</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -79,48 +78,31 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
             
     <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">abenc</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
-<div class="viewcode-block" id="HybridABEnc.setup"><a class="viewcode-back" href="../schemes/abenc_adapt_hybrid.html#abenc_adapt_hybrid.HybridABEnc.setup">[docs]</a>    
-    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">abenc</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span></div>
-<div class="viewcode-block" id="HybridABEnc.keygen"><a class="viewcode-back" href="../schemes/abenc_adapt_hybrid.html#abenc_adapt_hybrid.HybridABEnc.keygen">[docs]</a>    
-    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span></div>
-<div class="viewcode-block" id="HybridABEnc.encrypt"><a class="viewcode-back" href="../schemes/abenc_adapt_hybrid.html#abenc_adapt_hybrid.HybridABEnc.encrypt">[docs]</a>        <span class="n">c1</span> <span class="o">=</span> <span class="n">abenc</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span>
+<div class="viewcode-block" id="HybridABEnc.setup"><a class="viewcode-back" href="../schemes/abenc/abenc_adapt_hybrid.html#abenc_adapt_hybrid.HybridABEnc.setup">[docs]</a>        <span class="k">return</span> <span class="n">abenc</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span></div>
+<div class="viewcode-block" id="HybridABEnc.keygen"><a class="viewcode-back" href="../schemes/abenc/abenc_adapt_hybrid.html#abenc_adapt_hybrid.HybridABEnc.keygen">[docs]</a>        <span class="k">return</span> <span class="n">abenc</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span></div>
+<div class="viewcode-block" id="HybridABEnc.encrypt"><a class="viewcode-back" href="../schemes/abenc/abenc_adapt_hybrid.html#abenc_adapt_hybrid.HybridABEnc.encrypt">[docs]</a>        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+        <span class="n">c1</span> <span class="o">=</span> <span class="n">abenc</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span>
         <span class="c"># instantiate a symmetric enc scheme from this key</span>
         <span class="n">cipher</span> <span class="o">=</span> <span class="n">AuthenticatedCryptoAbstraction</span><span class="p">(</span><span class="n">sha1</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
         <span class="n">c2</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;c1&#39;</span><span class="p">:</span><span class="n">c1</span><span class="p">,</span> <span class="s">&#39;c2&#39;</span><span class="p">:</span><span class="n">c2</span> <span class="p">}</span>
     
-    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ct</span><span class="p">):</span>
-        <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span> <span class="o">=</span> <span class="n">ct</span><span class="p">[</span><span class="s">&#39;c1&#39;</span><span class="p">],</span> <span class="n">ct</span><span class="p">[</span><span class="s">&#39;c2&#39;</span><span class="p">]</span></div>
-<div class="viewcode-block" id="HybridABEnc.decrypt"><a class="viewcode-back" href="../schemes/abenc_adapt_hybrid.html#abenc_adapt_hybrid.HybridABEnc.decrypt">[docs]</a>        <span class="n">key</span> <span class="o">=</span> <span class="n">abenc</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c1</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ct</span><span class="p">):</span></div>
+<div class="viewcode-block" id="HybridABEnc.decrypt"><a class="viewcode-back" href="../schemes/abenc/abenc_adapt_hybrid.html#abenc_adapt_hybrid.HybridABEnc.decrypt">[docs]</a>        <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span> <span class="o">=</span> <span class="n">ct</span><span class="p">[</span><span class="s">&#39;c1&#39;</span><span class="p">],</span> <span class="n">ct</span><span class="p">[</span><span class="s">&#39;c2&#39;</span><span class="p">]</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">abenc</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c1</span><span class="p">)</span>
         <span class="n">cipher</span> <span class="o">=</span> <span class="n">AuthenticatedCryptoAbstraction</span><span class="p">(</span><span class="n">sha1</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
     
-    <span class="k">def</span> <span class="nf">instantiateCipher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">alg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_len</span> <span class="o">=</span> <span class="n">AES</span><span class="p">,</span> <span class="mi">16</span></div>
-<div class="viewcode-block" id="HybridABEnc.instantiateCipher"><a class="viewcode-back" href="../schemes/abenc_adapt_hybrid.html#abenc_adapt_hybrid.HybridABEnc.instantiateCipher">[docs]</a>        <span class="c"># hash GT msg into a hex string</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="n">sha1</span><span class="p">(</span><span class="n">message</span><span class="p">)[</span><span class="mi">0</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">key_len</span><span class="p">]</span>
-        <span class="n">iv</span>  <span class="o">=</span> <span class="s">&#39;6543210987654321&#39;</span> <span class="c"># static IV (for testing)    </span>
-        <span class="n">PRP_method</span> <span class="o">=</span> <span class="n">selectPRP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alg</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">iv</span><span class="p">))</span>        
-        <span class="k">return</span> <span class="n">PRP_method</span>
-    
-    <span class="k">def</span> <span class="nf">__pad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-        <span class="c"># calculate the ceiling of</span></div>
-        <span class="n">msg_len</span> <span class="o">=</span> <span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_len</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_len</span> 
-        <span class="n">extra</span> <span class="o">=</span> <span class="n">msg_len</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-        <span class="c"># append &#39;extra&#39; bytes to message</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">extra</span><span class="p">):</span>
-            <span class="n">message</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\x00</span><span class="s">&#39;</span>
-        <span class="k">return</span> <span class="n">message</span>
-
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/abenc_adapt_hybrid.html#abenc_adapt_hybrid.main">[docs]</a>    <span class="n">cpabe</span> <span class="o">=</span> <span class="n">CPabe_BSW07</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span></div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/abenc/abenc_adapt_hybrid.html#abenc_adapt_hybrid.main">[docs]</a>    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+    <span class="n">cpabe</span> <span class="o">=</span> <span class="n">CPabe_BSW07</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
     <span class="n">hyb_abe</span> <span class="o">=</span> <span class="n">HybridABEnc</span><span class="p">(</span><span class="n">cpabe</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">)</span>
     <span class="n">access_policy</span> <span class="o">=</span> <span class="s">&#39;((four or three) and (two or one))&#39;</span>
-    <span class="n">message</span> <span class="o">=</span> <span class="s">&quot;hello world this is an important message.&quot;</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">b</span><span class="s">&quot;hello world this is an important message.&quot;</span>
     <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">)</span> <span class="o">=</span> <span class="n">hyb_abe</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;pk =&gt; &quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;mk =&gt; &quot;</span><span class="p">,</span> <span class="n">mk</span><span class="p">)</span>
@@ -131,8 +113,8 @@
     <span class="k">assert</span> <span class="n">mdec</span> <span class="o">==</span> <span class="n">message</span><span class="p">,</span> <span class="s">&quot;Failed Decryption!!!&quot;</span>
     <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Decryption!!!&quot;</span><span class="p">)</span>
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span></div>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 
@@ -144,7 +126,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -167,14 +149,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

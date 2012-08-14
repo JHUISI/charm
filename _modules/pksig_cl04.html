@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pksig_cl04 &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>pksig_cl04 &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,75 +48,88 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for pksig_cl04</h1><pre>
- 
-| From: "J. Camenisch, A. Lysyanskaya. Signature Schemes and Anonymous Credentials from Bilinear Maps"
-| Published in: 2004
-| Available from: http://www.cs.brown.edu/~anna/papers/cl04.pdf
-| Notes: Scheme A on page 5 section 3.1.
+  <h1>Source code for pksig_cl04</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd"> Identity Based Signature</span>
+<span class="sd"> </span>
+<span class="sd">| From: &quot;J. Camenisch, A. Lysyanskaya. Signature Schemes and Anonymous Credentials from Bilinear Maps&quot;</span>
+<span class="sd">| Published in: 2004</span>
+<span class="sd">| Available from: http://www.cs.brown.edu/~anna/papers/cl04.pdf</span>
+<span class="sd">| Notes: Scheme A on page 5 section 3.1.</span>
 
-* type:           signature (identity-based)
-* setting:        bilinear groups (asymmetric)
+<span class="sd">* type:           signature (identity-based)</span>
+<span class="sd">* setting:        bilinear groups (asymmetric)</span>
 
-:Authors:    J. Ayo Akinyele
-:Date:       1/2012
- '''
-from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
-from toolbox.PKSig import PKSig
+<span class="sd">:Authors:    J. Ayo Akinyele</span>
+<span class="sd">:Date:       1/2012</span>
+<span class="sd"> &#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">pair</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.PKSig</span> <span class="kn">import</span> <span class="n">PKSig</span>
 
-debug = False
-class CL04(PKSig):
-    def __init__(self, groupObj):
-<div class="viewcode-block" id="CL04"><a class="viewcode-back" href="../schemes/pksig_cl04.html#pksig_cl04.CL04">[docs]</a>        global group
-        group = groupObj
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<div class="viewcode-block" id="CL04"><a class="viewcode-back" href="../schemes/pksig/pksig_cl04.html#pksig_cl04.CL04">[docs]</a><span class="k">class</span> <span class="nc">CL04</span><span class="p">(</span><span class="n">PKSig</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; from charm.toolbox.pairinggroup import PairingGroup</span>
+<span class="sd">    &gt;&gt;&gt; group = PairingGroup(&#39;MNT224&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; cl = CL04(group)</span>
+<span class="sd">    &gt;&gt;&gt; master_public_key = cl.setup()</span>
+<span class="sd">    &gt;&gt;&gt; (public_key, secret_key) = cl.keygen(master_public_key)</span>
+<span class="sd">    &gt;&gt;&gt; msg = &quot;Please sign this stupid message!&quot;</span>
+<span class="sd">    &gt;&gt;&gt; signature = cl.sign(public_key, secret_key, msg)</span>
+<span class="sd">    &gt;&gt;&gt; cl.verify(public_key, msg, signature)</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">group</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
         
-    def setup(self):
-        g = group.random(G1)
-<div class="viewcode-block" id="CL04.setup"><a class="viewcode-back" href="../schemes/pksig_cl04.html#pksig_cl04.CL04.setup">[docs]</a>        return { 'g': g }
-        
-    def keygen(self, mpk):
-        x, y = group.random(ZR), group.random(ZR)</div>
-<div class="viewcode-block" id="CL04.keygen"><a class="viewcode-back" href="../schemes/pksig_cl04.html#pksig_cl04.CL04.keygen">[docs]</a>        sk = { 'x':x, 'y':y }
-        pk = { 'X':mpk['g'] ** x, 'Y': mpk['g'] ** y, 'g':mpk['g'] }        
-        return (pk, sk)
+<div class="viewcode-block" id="CL04.setup"><a class="viewcode-back" href="../schemes/pksig/pksig_cl04.html#pksig_cl04.CL04.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;g&#39;</span><span class="p">:</span> <span class="n">g</span> <span class="p">}</span>
+        </div>
+<div class="viewcode-block" id="CL04.keygen"><a class="viewcode-back" href="../schemes/pksig/pksig_cl04.html#pksig_cl04.CL04.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpk</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;x&#39;</span><span class="p">:</span><span class="n">x</span><span class="p">,</span> <span class="s">&#39;y&#39;</span><span class="p">:</span><span class="n">y</span> <span class="p">}</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;X&#39;</span><span class="p">:</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">x</span><span class="p">,</span> <span class="s">&#39;Y&#39;</span><span class="p">:</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">y</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">:</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="p">}</span>        
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="CL04.sign"><a class="viewcode-back" href="../schemes/pksig/pksig_cl04.html#pksig_cl04.CL04.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">ZR</span><span class="p">)</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;a&#39;</span><span class="p">:</span><span class="n">a</span><span class="p">,</span> <span class="s">&#39;a_y&#39;</span><span class="p">:</span><span class="n">a</span> <span class="o">**</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">],</span> <span class="s">&#39;a_xy&#39;</span><span class="p">:</span><span class="n">a</span> <span class="o">**</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">]))</span> <span class="p">}</span>
+        <span class="k">return</span> <span class="n">sig</span>
+    </div>
+<div class="viewcode-block" id="CL04.verify"><a class="viewcode-back" href="../schemes/pksig/pksig_cl04.html#pksig_cl04.CL04.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;a&#39;</span><span class="p">],</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;a_y&#39;</span><span class="p">],</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;a_xy&#39;</span><span class="p">]</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">ZR</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pair</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;Y&#39;</span><span class="p">],</span> <span class="n">a</span><span class="p">)</span> <span class="o">==</span> <span class="n">pair</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">],</span> <span class="n">b</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;X&#39;</span><span class="p">],</span> <span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;X&#39;</span><span class="p">],</span> <span class="n">b</span><span class="p">)</span> <span class="o">**</span> <span class="n">m</span><span class="p">))</span> <span class="o">==</span> <span class="n">pair</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">],</span> <span class="n">c</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    </div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pksig/pksig_cl04.html#pksig_cl04.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">grp</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;MNT224&#39;</span><span class="p">)</span>
+    <span class="n">cl</span> <span class="o">=</span> <span class="n">CL04</span><span class="p">(</span><span class="n">grp</span><span class="p">)</span>
     
-    def sign(self, pk, sk, M):
-        a = group.random(G2)</div>
-<div class="viewcode-block" id="CL04.sign"><a class="viewcode-back" href="../schemes/pksig_cl04.html#pksig_cl04.CL04.sign">[docs]</a>        m = group.hash(M, ZR)
-        sig = {'a':a, 'a_y':a ** sk['y'], 'a_xy':a ** (sk['x'] + (m * sk['x'] * sk['y'])) }
-        return sig
+    <span class="n">mpk</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
     
-    def verify(self, pk, M, sig):
-        (a, b, c) = sig['a'], sig['a_y'], sig['a_xy']</div>
-<div class="viewcode-block" id="CL04.verify"><a class="viewcode-back" href="../schemes/pksig_cl04.html#pksig_cl04.CL04.verify">[docs]</a>        m = group.hash(M, ZR)
-        if pair(pk['Y'], a) == pair(pk['g'], b) and (pair(pk['X'], a) * (pair(pk['X'], b) ** m)) == pair(pk['g'], c):
-            return True
-        return False
+    <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">mpk</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Keygen...&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;pk :=&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;sk :=&quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
     
-def main():
-    grp = PairingGroup('MNT224')</div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pksig_cl04.html#pksig_cl04.main">[docs]</a>    cl = CL04(grp)
+    <span class="n">M</span> <span class="o">=</span> <span class="s">&quot;Please sign this stupid message!&quot;</span>
+    <span class="n">sig</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature: &quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
     
-    mpk = cl.setup()
-    
-    (pk, sk) = cl.keygen(mpk)
-    if debug:
-        print("Keygen...")
-        print("pk :=", pk)
-        print("sk :=", sk)
-    
-    M = "Please sign this stupid message!"
-    sig = cl.sign(pk, sk, M)
-    if debug: print("Signature: ", sig)
-    
-    result = cl.verify(pk, M, sig)
-    assert result, "INVALID signature!"
-    if debug: print("Successful Verification!!!")
-    
-if __name__ == "__main__":
-    debug = True</div>
-    main()
-    </pre>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span><span class="p">,</span> <span class="s">&quot;INVALID signature!&quot;</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Verification!!!&quot;</span><span class="p">)</span>
+    </div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
 
           </div>
         </div>
@@ -126,7 +139,7 @@ if __name__ == "__main__":
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -149,14 +162,14 @@ if __name__ == "__main__":
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

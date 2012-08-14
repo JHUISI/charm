@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>integergroup &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>integergroup &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -49,192 +49,203 @@
           <div class="body">
             
   <h1>Source code for integergroup</h1><div class="highlight"><pre>
-<span class="k">class</span> <span class="nc">IntegerGroup</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-<div class="viewcode-block" id="IntegerGroup"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup">[docs]</a>        <span class="k">pass</span>
+<span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="kn">import</span> <span class="n">integer</span><span class="p">,</span><span class="n">randomBits</span><span class="p">,</span><span class="n">random</span><span class="p">,</span><span class="n">randomPrime</span><span class="p">,</span><span class="n">isPrime</span><span class="p">,</span><span class="n">encode</span><span class="p">,</span><span class="n">decode</span><span class="p">,</span><span class="n">hashInt</span><span class="p">,</span><span class="n">bitsize</span><span class="p">,</span><span class="n">legendre</span><span class="p">,</span><span class="n">gcd</span><span class="p">,</span><span class="n">lcm</span><span class="p">,</span><span class="n">serialize</span><span class="p">,</span><span class="n">deserialize</span><span class="p">,</span><span class="n">int2Bytes</span><span class="p">,</span><span class="n">toInt</span>
 
-    <span class="k">def</span> <span class="nf">setparam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span> 
+<div class="viewcode-block" id="IntegerGroup"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup">[docs]</a><span class="k">class</span> <span class="nc">IntegerGroup</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="IntegerGroup.setparam"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.setparam">[docs]</a>    <span class="k">def</span> <span class="nf">setparam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span> 
         <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">q</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">isPrime</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="ow">and</span> <span class="n">isPrime</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
-<div class="viewcode-block" id="IntegerGroup.setparam"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.setparam">[docs]</a>            <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">print</span><span class="p">(</span><span class="s">&quot;p and q are not safe primes!&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">False</span>
 
-        
-    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-        <span class="c"># determine which group</span></div>
-<div class="viewcode-block" id="IntegerGroup.paramgen"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.paramgen">[docs]</a>        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        </div>
+<div class="viewcode-block" id="IntegerGroup.paramgen"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.paramgen">[docs]</a>    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="c"># determine which group</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">randomPrime</span><span class="p">(</span><span class="n">bits</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">isPrime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span> <span class="ow">and</span> <span class="n">isPrime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)):</span>
                 <span class="k">break</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">r</span>
         <span class="k">return</span> <span class="bp">None</span>    
-    
-    <span class="k">def</span> <span class="nf">randomGen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span></div>
-<div class="viewcode-block" id="IntegerGroup.randomGen"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.randomGen">[docs]</a>            <span class="n">h</span> <span class="o">=</span> <span class="n">random</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="IntegerGroup.randomGen"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.randomGen">[docs]</a>    <span class="k">def</span> <span class="nf">randomGen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="n">random</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
             <span class="n">g</span> <span class="o">=</span> <span class="p">(</span><span class="n">h</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">g</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">break</span>
         <span class="k">return</span> <span class="n">g</span>
-        
-    <span class="k">def</span> <span class="nf">groupType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
-        <span class="k">return</span> <span class="s">&#39;SchnorrGroup mod p&#39;</span>     </div>
-<div class="viewcode-block" id="IntegerGroup.groupType"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.groupType">[docs]</a>          
-    <span class="k">def</span> <span class="nf">groupOrder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">bitsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>    </div>
-<div class="viewcode-block" id="IntegerGroup.groupOrder"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.groupOrder">[docs]</a>    
-    <span class="k">def</span> <span class="nf">bitsize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>    
-        <span class="k">return</span> <span class="n">bitsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span> <span class="o">/</span> <span class="mi">8</span> </div>
-<div class="viewcode-block" id="IntegerGroup.bitsize"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.bitsize">[docs]</a>    
-    <span class="k">def</span> <span class="nf">isMember</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">isCongruent</span><span class="p">()</span></div>
-<div class="viewcode-block" id="IntegerGroup.isMember"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.isMember">[docs]</a>       
-    <span class="k">def</span> <span class="nf">random</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">max</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span></div>
-<div class="viewcode-block" id="IntegerGroup.random"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.random">[docs]</a>            <span class="k">return</span> <span class="n">random</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>        
+</div>
+<div class="viewcode-block" id="IntegerGroup.groupSetting"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.groupSetting">[docs]</a>    <span class="k">def</span> <span class="nf">groupSetting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;integer&#39;</span>
+        </div>
+<div class="viewcode-block" id="IntegerGroup.groupType"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.groupType">[docs]</a>    <span class="k">def</span> <span class="nf">groupType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="k">return</span> <span class="s">&#39;SchnorrGroup mod p&#39;</span>     
+          </div>
+<div class="viewcode-block" id="IntegerGroup.groupOrder"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.groupOrder">[docs]</a>    <span class="k">def</span> <span class="nf">groupOrder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">bitsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>    
+    </div>
+<div class="viewcode-block" id="IntegerGroup.bitsize"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.bitsize">[docs]</a>    <span class="k">def</span> <span class="nf">bitsize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>    
+        <span class="k">return</span> <span class="n">bitsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span> <span class="o">/</span> <span class="mi">8</span> 
+    </div>
+<div class="viewcode-block" id="IntegerGroup.isMember"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.isMember">[docs]</a>    <span class="k">def</span> <span class="nf">isMember</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">isCongruent</span><span class="p">()</span>
+       </div>
+<div class="viewcode-block" id="IntegerGroup.random"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.random">[docs]</a>    <span class="k">def</span> <span class="nf">random</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">max</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">random</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>        
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">random</span><span class="p">(</span><span class="nb">max</span><span class="p">)</span>
-    
-    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">encode</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span></div>
-<div class="viewcode-block" id="IntegerGroup.encode"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.encode">[docs]</a>     
-    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">decode</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span></div>
-<div class="viewcode-block" id="IntegerGroup.decode"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.decode">[docs]</a>
-    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="o">==</span> <span class="n">integer</span><span class="p">,</span> <span class="s">&quot;cannot serialize non-integer types&quot;</span></div>
-<div class="viewcode-block" id="IntegerGroup.serialize"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.serialize">[docs]</a>        <span class="k">return</span> <span class="n">serialize</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
-    
-    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytes_object</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">bytes_object</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bytes</span><span class="p">,</span> <span class="s">&quot;cannot deserialize object&quot;</span></div>
-<div class="viewcode-block" id="IntegerGroup.deserialize"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.deserialize">[docs]</a>        <span class="k">return</span> <span class="n">deserialize</span><span class="p">(</span><span class="n">bytes_object</span><span class="p">)</span>
-    
-    <span class="k">def</span> <span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span></div>
-<div class="viewcode-block" id="IntegerGroup.hash"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.hash">[docs]</a>            <span class="c">#print &quot;Hashing =&gt; &#39;%s&#39;&quot; % args</span>
-            <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="IntegerGroup.encode"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">encode</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>
+     </div>
+<div class="viewcode-block" id="IntegerGroup.decode"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">decode</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IntegerGroup.serialize"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="o">==</span> <span class="n">integer</span><span class="p">,</span> <span class="s">&quot;cannot serialize non-integer types&quot;</span>
+        <span class="k">return</span> <span class="n">serialize</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="IntegerGroup.deserialize"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytes_object</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">bytes_object</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bytes</span><span class="p">,</span> <span class="s">&quot;cannot deserialize object&quot;</span>
+        <span class="k">return</span> <span class="n">deserialize</span><span class="p">(</span><span class="n">bytes_object</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="IntegerGroup.hash"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup.hash">[docs]</a>    <span class="k">def</span> <span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="c">#print &quot;Hashing =&gt; &#39;%s&#39;&quot; % args</span>
+            <span class="k">return</span> <span class="n">hashInt</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">None</span>
-
-<span class="k">class</span> <span class="nc">IntegerGroupQ</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span></div></div>
-<div class="viewcode-block" id="IntegerGroupQ"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ">[docs]</a>        <span class="k">pass</span>
+</div></div>
+<div class="viewcode-block" id="IntegerGroupQ"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ">[docs]</a><span class="k">class</span> <span class="nc">IntegerGroupQ</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">pass</span>
         
-    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<div class="viewcode-block" id="IntegerGroupQ.paramgen"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.paramgen">[docs]</a>    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
         <span class="c"># determine which group</span>
-<div class="viewcode-block" id="IntegerGroupQ.paramgen"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.paramgen">[docs]</a>        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">randomPrime</span><span class="p">(</span><span class="n">bits</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">isPrime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span> <span class="ow">and</span> <span class="n">isPrime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)):</span>
                 <span class="k">break</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">r</span>
         <span class="k">return</span> <span class="bp">None</span>    
-    
-    <span class="k">def</span> <span class="nf">randomG</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">randomGen</span><span class="p">()</span></div>
-<div class="viewcode-block" id="IntegerGroupQ.randomG"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.randomG">[docs]</a>        
-    <span class="k">def</span> <span class="nf">randomGen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span></div>
-<div class="viewcode-block" id="IntegerGroupQ.randomGen"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.randomGen">[docs]</a>            <span class="n">h</span> <span class="o">=</span> <span class="n">random</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="IntegerGroupQ.randomG"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.randomG">[docs]</a>    <span class="k">def</span> <span class="nf">randomG</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">randomGen</span><span class="p">()</span>
+        </div>
+<div class="viewcode-block" id="IntegerGroupQ.randomGen"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.randomGen">[docs]</a>    <span class="k">def</span> <span class="nf">randomGen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="n">random</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
             <span class="n">g</span> <span class="o">=</span> <span class="p">(</span><span class="n">h</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">g</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="c">#print &quot;g =&gt; %s&quot; % g </span>
                 <span class="k">break</span>
         <span class="k">return</span> <span class="n">g</span>
-        
-    <span class="k">def</span> <span class="nf">groupType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
-        <span class="k">return</span> <span class="s">&#39;SchnorrGroup mod q&#39;</span>     </div>
-<div class="viewcode-block" id="IntegerGroupQ.groupType"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.groupType">[docs]</a>          
-    <span class="k">def</span> <span class="nf">groupOrder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">bitsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>    </div>
-<div class="viewcode-block" id="IntegerGroupQ.groupOrder"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.groupOrder">[docs]</a>    
-    <span class="k">def</span> <span class="nf">messageSize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>    
-        <span class="k">return</span> <span class="n">bitsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span> <span class="o">/</span> <span class="mi">8</span> </div>
-<div class="viewcode-block" id="IntegerGroupQ.messageSize"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.messageSize">[docs]</a>    
-    <span class="k">def</span> <span class="nf">isMember</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">isCongruent</span><span class="p">()</span></div>
-<div class="viewcode-block" id="IntegerGroupQ.isMember"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.isMember">[docs]</a>       
-    <span class="k">def</span> <span class="nf">random</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">max</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span></div>
-<div class="viewcode-block" id="IntegerGroupQ.random"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.random">[docs]</a>            <span class="k">return</span> <span class="n">random</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IntegerGroupQ.groupSetting"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.groupSetting">[docs]</a>    <span class="k">def</span> <span class="nf">groupSetting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;integer&#39;</span>
+        </div>
+<div class="viewcode-block" id="IntegerGroupQ.groupType"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.groupType">[docs]</a>    <span class="k">def</span> <span class="nf">groupType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="k">return</span> <span class="s">&#39;SchnorrGroup mod q&#39;</span>     
+          </div>
+<div class="viewcode-block" id="IntegerGroupQ.groupOrder"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.groupOrder">[docs]</a>    <span class="k">def</span> <span class="nf">groupOrder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">bitsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>    
+    </div>
+<div class="viewcode-block" id="IntegerGroupQ.messageSize"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.messageSize">[docs]</a>    <span class="k">def</span> <span class="nf">messageSize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>    
+        <span class="k">return</span> <span class="n">bitsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span> <span class="o">/</span> <span class="mi">8</span> 
+    </div>
+<div class="viewcode-block" id="IntegerGroupQ.isMember"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.isMember">[docs]</a>    <span class="k">def</span> <span class="nf">isMember</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">isCongruent</span><span class="p">()</span>
+       </div>
+<div class="viewcode-block" id="IntegerGroupQ.random"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.random">[docs]</a>    <span class="k">def</span> <span class="nf">random</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">max</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">random</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">random</span><span class="p">(</span><span class="nb">max</span><span class="p">)</span>
-    
-    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">encode</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span></div>
-<div class="viewcode-block" id="IntegerGroupQ.encode"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.encode">[docs]</a>     
-    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">decode</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span></div>
-<div class="viewcode-block" id="IntegerGroupQ.decode"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.decode">[docs]</a>    
-    <span class="k">def</span> <span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span></div>
-<div class="viewcode-block" id="IntegerGroupQ.hash"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.hash">[docs]</a>            <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="IntegerGroupQ.encode"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">encode</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>
+     </div>
+<div class="viewcode-block" id="IntegerGroupQ.decode"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">decode</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="IntegerGroupQ.hash"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.hash">[docs]</a>    <span class="k">def</span> <span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">hashInt</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
         <span class="n">List</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
             <span class="n">List</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">List</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">hashInt</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">List</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IntegerGroupQ.serialize"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="o">==</span> <span class="n">integer</span><span class="p">,</span> <span class="s">&quot;cannot serialize non-integer types&quot;</span>
+        <span class="k">return</span> <span class="n">serialize</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="IntegerGroupQ.deserialize"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytes_object</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">bytes_object</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bytes</span><span class="p">,</span> <span class="s">&quot;cannot deserialize object&quot;</span>
+        <span class="k">return</span> <span class="n">deserialize</span><span class="p">(</span><span class="n">bytes_object</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="o">==</span> <span class="n">integer</span><span class="p">,</span> <span class="s">&quot;cannot serialize non-integer types&quot;</span></div>
-<div class="viewcode-block" id="IntegerGroupQ.serialize"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.serialize">[docs]</a>        <span class="k">return</span> <span class="n">serialize</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+    </div></div>
+<div class="viewcode-block" id="RSAGroup"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup">[docs]</a><span class="k">class</span> <span class="nc">RSAGroup</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
     
-    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytes_object</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">bytes_object</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bytes</span><span class="p">,</span> <span class="s">&quot;cannot deserialize object&quot;</span></div>
-<div class="viewcode-block" id="IntegerGroupQ.deserialize"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroupQ.deserialize">[docs]</a>        <span class="k">return</span> <span class="n">deserialize</span><span class="p">(</span><span class="n">bytes_object</span><span class="p">)</span>
-
-    
-<span class="k">class</span> <span class="nc">RSAGroup</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div></div>
-<div class="viewcode-block" id="RSAGroup"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup">[docs]</a>        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
-    
-    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="p">):</span>
+<div class="viewcode-block" id="RSAGroup.paramgen"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup.paramgen">[docs]</a>    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="p">):</span>
         <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-<div class="viewcode-block" id="RSAGroup.paramgen"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup.paramgen">[docs]</a>           <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">randomPrime</span><span class="p">(</span><span class="n">secparam</span><span class="p">),</span> <span class="n">randomPrime</span><span class="p">(</span><span class="n">secparam</span><span class="p">)</span>
+           <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">randomPrime</span><span class="p">(</span><span class="n">secparam</span><span class="p">),</span> <span class="n">randomPrime</span><span class="p">(</span><span class="n">secparam</span><span class="p">)</span>
            <span class="k">if</span> <span class="n">isPrime</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="ow">and</span> <span class="n">isPrime</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="ow">and</span> <span class="n">gcd</span><span class="p">(</span><span class="n">p</span> <span class="o">*</span> <span class="n">q</span><span class="p">,</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
               <span class="k">break</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="n">q</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span><span class="p">)</span>    
-
-    <span class="k">def</span> <span class="nf">setparam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span> 
-        <span class="k">if</span> <span class="n">isPrime</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="ow">and</span> <span class="n">isPrime</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="ow">and</span> <span class="n">p</span> <span class="o">!=</span> <span class="n">q</span><span class="p">:</span></div>
-<div class="viewcode-block" id="RSAGroup.setparam"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup.setparam">[docs]</a>            <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="RSAGroup.setparam"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup.setparam">[docs]</a>    <span class="k">def</span> <span class="nf">setparam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span> 
+        <span class="k">if</span> <span class="n">isPrime</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="ow">and</span> <span class="n">isPrime</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="ow">and</span> <span class="n">p</span> <span class="o">!=</span> <span class="n">q</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span>
             <span class="k">return</span> <span class="bp">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">print</span><span class="p">(</span><span class="s">&quot;p and q are not primes!&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">False</span>
-
-    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="o">==</span> <span class="n">integer</span><span class="p">,</span> <span class="s">&quot;cannot serialize non-integer types&quot;</span></div>
-<div class="viewcode-block" id="RSAGroup.serialize"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup.serialize">[docs]</a>        <span class="k">return</span> <span class="n">serialize</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
-    
-    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytes_object</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">bytes_object</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bytes</span><span class="p">,</span> <span class="s">&quot;cannot deserialize object&quot;</span></div>
-<div class="viewcode-block" id="RSAGroup.deserialize"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup.deserialize">[docs]</a>        <span class="k">return</span> <span class="n">deserialize</span><span class="p">(</span><span class="n">bytes_object</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">random</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">max</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span></div>
-<div class="viewcode-block" id="RSAGroup.random"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup.random">[docs]</a>            <span class="k">return</span> <span class="n">random</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>        
+</div>
+<div class="viewcode-block" id="RSAGroup.serialize"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="o">==</span> <span class="n">integer</span><span class="p">,</span> <span class="s">&quot;cannot serialize non-integer types&quot;</span>
+        <span class="k">return</span> <span class="n">serialize</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="RSAGroup.deserialize"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytes_object</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">bytes_object</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bytes</span><span class="p">,</span> <span class="s">&quot;cannot deserialize object&quot;</span>
+        <span class="k">return</span> <span class="n">deserialize</span><span class="p">(</span><span class="n">bytes_object</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="RSAGroup.random"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup.random">[docs]</a>    <span class="k">def</span> <span class="nf">random</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">max</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">random</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>        
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">random</span><span class="p">(</span><span class="nb">max</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">groupType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
-        <span class="k">return</span> <span class="s">&#39;RSAGroup mod p&#39;</span>     </div>
-<div class="viewcode-block" id="RSAGroup.groupType"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup.groupType">[docs]</a>          
-    <span class="k">def</span> <span class="nf">groupOrder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">bitsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>    </div>
-<div class="viewcode-block" id="RSAGroup.groupOrder"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup.groupOrder">[docs]</a>        
-    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">pass</span></div>
-<div class="viewcode-block" id="RSAGroup.encode"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup.encode">[docs]</a>
-    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">pass</span></div>
-<div class="viewcode-block" id="RSAGroup.decode"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup.decode">[docs]</a></pre></div></div></div>
+</div>
+<div class="viewcode-block" id="RSAGroup.groupSetting"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup.groupSetting">[docs]</a>    <span class="k">def</span> <span class="nf">groupSetting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;integer&#39;</span>
+</div>
+<div class="viewcode-block" id="RSAGroup.groupType"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup.groupType">[docs]</a>    <span class="k">def</span> <span class="nf">groupType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="k">return</span> <span class="s">&#39;RSAGroup mod p&#39;</span>     
+          </div>
+<div class="viewcode-block" id="RSAGroup.groupOrder"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup.groupOrder">[docs]</a>    <span class="k">def</span> <span class="nf">groupOrder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">bitsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>    
+        </div>
+<div class="viewcode-block" id="RSAGroup.encode"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="RSAGroup.decode"><a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.RSAGroup.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">pass</span></div></div>
+</pre></div>
 
           </div>
         </div>
@@ -244,7 +255,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -267,14 +278,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>hash_module &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>hash_module &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -49,20 +49,23 @@
           <div class="body">
             
   <h1>Source code for hash_module</h1><div class="highlight"><pre>
-<span class="c">#from toolbox.pairinggroup import pairing,ZR</span>
-<span class="kn">from</span> <span class="nn">charm.integer</span> <span class="kn">import</span> <span class="n">integer</span><span class="p">,</span><span class="n">int2Bytes</span>
+<span class="kn">import</span> <span class="nn">charm.core.crypto.cryptobase</span>
+<span class="kn">from</span> <span class="nn">charm.core.math.pairing</span> <span class="kn">import</span> <span class="n">pairing</span><span class="p">,</span><span class="n">ZR</span>
+<span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="kn">import</span> <span class="n">integer</span><span class="p">,</span><span class="n">int2Bytes</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.conversion</span> <span class="kn">import</span> <span class="n">Conversion</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.bitstring</span> <span class="kn">import</span> <span class="n">Bytes</span>
 <span class="kn">import</span> <span class="nn">hashlib</span><span class="o">,</span> <span class="nn">base64</span>
 
-<span class="k">class</span> <span class="nc">Hash</span><span class="p">():</span>
+<div class="viewcode-block" id="Hash"><a class="viewcode-back" href="../toolbox/hash_module.html#hash_module.Hash">[docs]</a><span class="k">class</span> <span class="nc">Hash</span><span class="p">():</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">htype</span><span class="o">=</span><span class="s">&#39;sha1&#39;</span><span class="p">,</span> <span class="n">pairingElement</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">integerElement</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>        
-<div class="viewcode-block" id="Hash"><a class="viewcode-back" href="../toolbox/hash_module.html#hash_module.Hash">[docs]</a>        <span class="k">if</span> <span class="n">htype</span> <span class="o">==</span> <span class="s">&#39;sha1&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">htype</span> <span class="o">==</span> <span class="s">&#39;sha1&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">hash_type</span> <span class="o">=</span> <span class="n">htype</span> 
             <span class="c"># instance of PairingGroup</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">pairingElement</span>
         
-    <span class="k">def</span> <span class="nf">hashToZn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="Hash.hashToZn"><a class="viewcode-back" href="../toolbox/hash_module.html#hash_module.Hash.hashToZn">[docs]</a>    <span class="k">def</span> <span class="nf">hashToZn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="n">pairing</span><span class="p">:</span>
-<div class="viewcode-block" id="Hash.hashToZn"><a class="viewcode-back" href="../toolbox/hash_module.html#hash_module.Hash.hashToZn">[docs]</a>            <span class="n">h</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hash_type</span><span class="p">)</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hash_type</span><span class="p">)</span>
             <span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
             <span class="c">#print &quot;digest =&gt; %s&quot; % h.hexdigest()</span>
             <span class="c"># get raw bytes of digest and hash to Zr</span>
@@ -77,10 +80,10 @@
             <span class="k">return</span> <span class="n">integer</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">str_value</span><span class="p">,</span> <span class="n">ZR</span><span class="p">)))</span>
         <span class="k">return</span> <span class="bp">None</span>
     
-    <span class="c"># takes two arbitrary strings and hashes to an element of Zr</span>
-    <span class="k">def</span> <span class="nf">hashToZr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span></div>
-<div class="viewcode-block" id="Hash.hashToZr"><a class="viewcode-back" href="../toolbox/hash_module.html#hash_module.Hash.hashToZr">[docs]</a>            <span class="c">#print(&quot;Hashing =&gt;&quot;, args)</span>
+    <span class="c"># takes two arbitrary strings and hashes to an element of Zr</span></div>
+<div class="viewcode-block" id="Hash.hashToZr"><a class="viewcode-back" href="../toolbox/hash_module.html#hash_module.Hash.hashToZr">[docs]</a>    <span class="k">def</span> <span class="nf">hashToZr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="c">#print(&quot;Hashing =&gt;&quot;, args)</span>
             <span class="n">strs</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
@@ -96,7 +99,48 @@
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">strs</span><span class="p">,</span> <span class="n">ZR</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">None</span>
         
-</pre></div></div></div>
+</div></div>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Waters Hash technique: how to hash in standard model.</span>
+<span class="sd">Default - len=5 bits=32 ==&gt; 160-bits total</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Waters"><a class="viewcode-back" href="../toolbox/hash_module.html#hash_module.Waters">[docs]</a><span class="k">class</span> <span class="nc">Waters</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; from charm.toolbox.pairinggroup import *</span>
+<span class="sd">    &gt;&gt;&gt; from charm.toolbox.hash_module import Waters</span>
+<span class="sd">    &gt;&gt;&gt; group = PairingGroup(&quot;SS512&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; waters = Waters(group, length=5, bits=32)</span>
+<span class="sd">    &gt;&gt;&gt; a = waters.hash(&quot;user@email.com&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">bits</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">hash_func</span><span class="o">=</span><span class="s">&#39;sha1&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_group</span> <span class="o">=</span> <span class="n">group</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_length</span> <span class="o">=</span> <span class="n">length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bitsize</span> <span class="o">=</span> <span class="n">bits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hash_function</span> <span class="o">=</span> <span class="n">hash_func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hashObj</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hash_function</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hashLen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hashObj</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span>
+
+<div class="viewcode-block" id="Waters.sha1"><a class="viewcode-back" href="../toolbox/hash_module.html#hash_module.Waters.sha1">[docs]</a>    <span class="k">def</span> <span class="nf">sha1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hashObj</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span>    
+    </div>
+<div class="viewcode-block" id="Waters.hash"><a class="viewcode-back" href="../toolbox/hash_module.html#hash_module.Waters.hash">[docs]</a>    <span class="k">def</span> <span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strID</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Hash the identity string and break it up in to l bit pieces&#39;&#39;&#39;</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">strID</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">,</span> <span class="s">&quot;invalid input type&quot;</span>
+        <span class="nb">hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">strID</span><span class="p">)</span>
+        
+        <span class="n">val</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">OS2IP</span><span class="p">(</span><span class="nb">hash</span><span class="p">)</span> <span class="c">#Convert to integer format</span>
+        <span class="n">bstr</span> <span class="o">=</span> <span class="nb">bin</span><span class="p">(</span><span class="n">val</span><span class="p">)[</span><span class="mi">2</span><span class="p">:]</span>   <span class="c">#cut out the 0b header</span>
+
+        <span class="n">v</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_length</span><span class="p">):</span>  <span class="c">#z must be greater than or equal to 1</span>
+            <span class="n">binsubstr</span> <span class="o">=</span> <span class="n">bstr</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_bitsize</span><span class="o">*</span><span class="n">i</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bitsize</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+            <span class="n">intval</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">binsubstr</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">intelement</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="n">intval</span><span class="p">)</span>
+            <span class="n">v</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">intelement</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span></div></div>
+</pre></div>
 
           </div>
         </div>
@@ -106,7 +150,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -129,14 +173,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

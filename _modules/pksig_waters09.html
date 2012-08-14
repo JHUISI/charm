@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pksig_waters09 &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>pksig_waters09 &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,111 +48,122 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for pksig_waters09</h1><pre>
- 
-| From: "Dual System ENcryption: Realizing Fully Secure IBE and HIBE under Simple Assumptions"
-| Published in: CRYPTO 2009
-| Available from: http://eprint.iacr.org/2009/385.pdf
-| Notes: 
+  <h1>Source code for pksig_waters09</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Brent Waters (Pairing-based)</span>
+<span class="sd"> </span>
+<span class="sd">| From: &quot;Dual System ENcryption: Realizing Fully Secure IBE and HIBE under Simple Assumptions&quot;</span>
+<span class="sd">| Published in: CRYPTO 2009</span>
+<span class="sd">| Available from: http://eprint.iacr.org/2009/385.pdf</span>
+<span class="sd">| Notes: </span>
 
-* type:           identity-based encryption (public key)
-* setting:        Pairing
+<span class="sd">* type:           identity-based encryption (public key)</span>
+<span class="sd">* setting:        Pairing</span>
 
-:Authors:    J Ayo Akinyele
-:Date:       2/2012
-'''
-from toolbox.pairinggroup import *
-from toolbox.IBEnc import *
+<span class="sd">:Authors:    J Ayo Akinyele</span>
+<span class="sd">:Date:       2/2012</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.IBEnc</span> <span class="kn">import</span> <span class="n">IBEnc</span>
 
-debug = False
-class IBEWaters09(IBEnc):
-    def __init__(self, groupObj):
-<div class="viewcode-block" id="IBEWaters09"><a class="viewcode-back" href="../schemes/pksig_waters09.html#pksig_waters09.IBEWaters09">[docs]</a>        IBEnc.__init__(self)
-        global group, util
-        group = groupObj
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<div class="viewcode-block" id="IBEWaters09"><a class="viewcode-back" href="../schemes/pksig/pksig_waters09.html#pksig_waters09.IBEWaters09">[docs]</a><span class="k">class</span> <span class="nc">IBEWaters09</span><span class="p">(</span><span class="n">IBEnc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; group = PairingGroup(&#39;MNT224&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ibe = IBEWaters09(group)</span>
+<span class="sd">    &gt;&gt;&gt; (master_public_key, master_secret_key) = ibe.keygen()</span>
+<span class="sd">    &gt;&gt;&gt; msg = &quot;plese sign this message!!!!&quot;</span>
+<span class="sd">    &gt;&gt;&gt; signature = ibe.sign(master_public_key, master_secret_key, msg)</span>
+<span class="sd">    &gt;&gt;&gt; ibe.verify(master_public_key, signature, msg)</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+        <span class="n">IBEnc</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">global</span> <span class="n">group</span><span class="p">,</span> <span class="n">util</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
 
-    def keygen(self):
-        g1 = group.random(G1)
-<div class="viewcode-block" id="IBEWaters09.keygen"><a class="viewcode-back" href="../schemes/pksig_waters09.html#pksig_waters09.IBEWaters09.keygen">[docs]</a>        g2 = group.random(G2)
-        a1, a2, b, alpha = group.random(ZR, 4)
-        _w, _h, _v, _v1, _v2, _u = group.random(ZR, 6)
+<div class="viewcode-block" id="IBEWaters09.keygen"><a class="viewcode-back" href="../schemes/pksig/pksig_waters09.html#pksig_waters09.IBEWaters09.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">g1</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="n">g2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
+        <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">_w</span><span class="p">,</span> <span class="n">_h</span><span class="p">,</span> <span class="n">_v</span><span class="p">,</span> <span class="n">_v1</span><span class="p">,</span> <span class="n">_v2</span><span class="p">,</span> <span class="n">_u</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
         
-        v = g1 ** _v 
-        v1 = g1 ** _v1 
-        v2 = g1 ** _v2
+        <span class="n">v</span> <span class="o">=</span> <span class="n">g1</span> <span class="o">**</span> <span class="n">_v</span> 
+        <span class="n">v1</span> <span class="o">=</span> <span class="n">g1</span> <span class="o">**</span> <span class="n">_v1</span> 
+        <span class="n">v2</span> <span class="o">=</span> <span class="n">g1</span> <span class="o">**</span> <span class="n">_v2</span>
         
-        v_2 = g2 ** _v
-        v1_2 = g2 ** _v1
-        v2_2 = g2 ** _v2
-        w1, h1 = g1 ** _w, g1 ** _h
-        w2, h2 = g2 ** _w, g2 ** _h
-        u2 = g2 ** _u
-        u1 = g1 ** _u
+        <span class="n">v_2</span> <span class="o">=</span> <span class="n">g2</span> <span class="o">**</span> <span class="n">_v</span>
+        <span class="n">v1_2</span> <span class="o">=</span> <span class="n">g2</span> <span class="o">**</span> <span class="n">_v1</span>
+        <span class="n">v2_2</span> <span class="o">=</span> <span class="n">g2</span> <span class="o">**</span> <span class="n">_v2</span>
+        <span class="n">w1</span><span class="p">,</span> <span class="n">h1</span> <span class="o">=</span> <span class="n">g1</span> <span class="o">**</span> <span class="n">_w</span><span class="p">,</span> <span class="n">g1</span> <span class="o">**</span> <span class="n">_h</span>
+        <span class="n">w2</span><span class="p">,</span> <span class="n">h2</span> <span class="o">=</span> <span class="n">g2</span> <span class="o">**</span> <span class="n">_w</span><span class="p">,</span> <span class="n">g2</span> <span class="o">**</span> <span class="n">_h</span>
+        <span class="n">u2</span> <span class="o">=</span> <span class="n">g2</span> <span class="o">**</span> <span class="n">_u</span>
+        <span class="n">u1</span> <span class="o">=</span> <span class="n">g1</span> <span class="o">**</span> <span class="n">_u</span>
         
-        tau1 = v * (v1 ** a1)
-        tau2 = v * (v2 ** a2)
-        pk = { 'g1':g1, 'g2':g2, 'g1^b':g1 ** b, 'g^a1':g1 ** a1, 'g^a2':g1 ** a2, 
-              'g^ba1':g1 ** (b * a1), 'g^ba2':g1 ** (b * a2), 'tau1':tau1, 'tau2':tau2, 
-              'tau1^b':tau1 ** b, 'tau2^b':tau2 ** b, 'u':u1, 'u2':u2,'w1':w1, 'h1':h1, 'w2':w2, 'h2':h2,
-              'egg_alpha': pair(g1, g2) ** (alpha * a1 * b) }
-        sk = {'g^alph_a1':g2 ** (alpha * a1),
-              'g2^b':g2 ** b,'v':v_2, 'v1':v1_2, 'v2':v2_2, 'alpha':alpha }
-        return (pk, sk)
-    
-    def sign(self, mpk, msk, m):
-        r1, r2, z1, z2, tagk = group.random(ZR, 5)</div>
-<div class="viewcode-block" id="IBEWaters09.sign"><a class="viewcode-back" href="../schemes/pksig_waters09.html#pksig_waters09.IBEWaters09.sign">[docs]</a>        r = r1 + r2
-        M = group.hash(m)
+        <span class="n">tau1</span> <span class="o">=</span> <span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="n">v1</span> <span class="o">**</span> <span class="n">a1</span><span class="p">)</span>
+        <span class="n">tau2</span> <span class="o">=</span> <span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="n">v2</span> <span class="o">**</span> <span class="n">a2</span><span class="p">)</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;g1&#39;</span><span class="p">:</span><span class="n">g1</span><span class="p">,</span> <span class="s">&#39;g2&#39;</span><span class="p">:</span><span class="n">g2</span><span class="p">,</span> <span class="s">&#39;g1^b&#39;</span><span class="p">:</span><span class="n">g1</span> <span class="o">**</span> <span class="n">b</span><span class="p">,</span> <span class="s">&#39;g^a1&#39;</span><span class="p">:</span><span class="n">g1</span> <span class="o">**</span> <span class="n">a1</span><span class="p">,</span> <span class="s">&#39;g^a2&#39;</span><span class="p">:</span><span class="n">g1</span> <span class="o">**</span> <span class="n">a2</span><span class="p">,</span> 
+              <span class="s">&#39;g^ba1&#39;</span><span class="p">:</span><span class="n">g1</span> <span class="o">**</span> <span class="p">(</span><span class="n">b</span> <span class="o">*</span> <span class="n">a1</span><span class="p">),</span> <span class="s">&#39;g^ba2&#39;</span><span class="p">:</span><span class="n">g1</span> <span class="o">**</span> <span class="p">(</span><span class="n">b</span> <span class="o">*</span> <span class="n">a2</span><span class="p">),</span> <span class="s">&#39;tau1&#39;</span><span class="p">:</span><span class="n">tau1</span><span class="p">,</span> <span class="s">&#39;tau2&#39;</span><span class="p">:</span><span class="n">tau2</span><span class="p">,</span> 
+              <span class="s">&#39;tau1^b&#39;</span><span class="p">:</span><span class="n">tau1</span> <span class="o">**</span> <span class="n">b</span><span class="p">,</span> <span class="s">&#39;tau2^b&#39;</span><span class="p">:</span><span class="n">tau2</span> <span class="o">**</span> <span class="n">b</span><span class="p">,</span> <span class="s">&#39;u&#39;</span><span class="p">:</span><span class="n">u1</span><span class="p">,</span> <span class="s">&#39;u2&#39;</span><span class="p">:</span><span class="n">u2</span><span class="p">,</span><span class="s">&#39;w1&#39;</span><span class="p">:</span><span class="n">w1</span><span class="p">,</span> <span class="s">&#39;h1&#39;</span><span class="p">:</span><span class="n">h1</span><span class="p">,</span> <span class="s">&#39;w2&#39;</span><span class="p">:</span><span class="n">w2</span><span class="p">,</span> <span class="s">&#39;h2&#39;</span><span class="p">:</span><span class="n">h2</span><span class="p">,</span>
+              <span class="s">&#39;egg_alpha&#39;</span><span class="p">:</span> <span class="n">pair</span><span class="p">(</span><span class="n">g1</span><span class="p">,</span> <span class="n">g2</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">a1</span> <span class="o">*</span> <span class="n">b</span><span class="p">)</span> <span class="p">}</span>
+        <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;g^alph_a1&#39;</span><span class="p">:</span><span class="n">g2</span> <span class="o">**</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">a1</span><span class="p">),</span>
+              <span class="s">&#39;g2^b&#39;</span><span class="p">:</span><span class="n">g2</span> <span class="o">**</span> <span class="n">b</span><span class="p">,</span><span class="s">&#39;v&#39;</span><span class="p">:</span><span class="n">v_2</span><span class="p">,</span> <span class="s">&#39;v1&#39;</span><span class="p">:</span><span class="n">v1_2</span><span class="p">,</span> <span class="s">&#39;v2&#39;</span><span class="p">:</span><span class="n">v2_2</span><span class="p">,</span> <span class="s">&#39;alpha&#39;</span><span class="p">:</span><span class="n">alpha</span> <span class="p">}</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="IBEWaters09.sign"><a class="viewcode-back" href="../schemes/pksig/pksig_waters09.html#pksig_waters09.IBEWaters09.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+        <span class="n">r1</span><span class="p">,</span> <span class="n">r2</span><span class="p">,</span> <span class="n">z1</span><span class="p">,</span> <span class="n">z2</span><span class="p">,</span> <span class="n">tagk</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">r1</span> <span class="o">+</span> <span class="n">r2</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
 
-        S = {}
-        S[1] = msk['g^alph_a1'] * (msk['v'] ** r)
-        S[2] = (mpk['g2'] ** -msk['alpha']) * (msk['v1'] ** r) * (mpk['g2'] ** z1)
-        S[3] = msk['g2^b'] ** -z1
-        S[4] = (msk['v2'] ** r) * (mpk['g2'] ** z2)
-        S[5] = msk['g2^b'] ** -z2
-        S[6] = msk['g2^b'] ** r2
-        S[7] = mpk['g2'] ** r1
-        SK = ((mpk['u2'] ** M) * (mpk['w2'] ** tagk) * mpk['h2']) ** r1
+        <span class="n">S</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">S</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">msk</span><span class="p">[</span><span class="s">&#39;g^alph_a1&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">msk</span><span class="p">[</span><span class="s">&#39;v&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span>
+        <span class="n">S</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="o">-</span><span class="n">msk</span><span class="p">[</span><span class="s">&#39;alpha&#39;</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">msk</span><span class="p">[</span><span class="s">&#39;v1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">z1</span><span class="p">)</span>
+        <span class="n">S</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">msk</span><span class="p">[</span><span class="s">&#39;g2^b&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="o">-</span><span class="n">z1</span>
+        <span class="n">S</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">msk</span><span class="p">[</span><span class="s">&#39;v2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">z2</span><span class="p">)</span>
+        <span class="n">S</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">msk</span><span class="p">[</span><span class="s">&#39;g2^b&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="o">-</span><span class="n">z2</span>
+        <span class="n">S</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">msk</span><span class="p">[</span><span class="s">&#39;g2^b&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r2</span>
+        <span class="n">S</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r1</span>
+        <span class="n">SK</span> <span class="o">=</span> <span class="p">((</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;u2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">M</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;w2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">tagk</span><span class="p">)</span> <span class="o">*</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;h2&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="n">r1</span>
         
-        sigma = { 'sig':S, 'K':SK, 'tagk':tagk }
-        return sigma
+        <span class="n">sigma</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;sig&#39;</span><span class="p">:</span><span class="n">S</span><span class="p">,</span> <span class="s">&#39;K&#39;</span><span class="p">:</span><span class="n">SK</span><span class="p">,</span> <span class="s">&#39;tagk&#39;</span><span class="p">:</span><span class="n">tagk</span> <span class="p">}</span>
+        <span class="k">return</span> <span class="n">sigma</span>
+</div>
+<div class="viewcode-block" id="IBEWaters09.verify"><a class="viewcode-back" href="../schemes/pksig/pksig_waters09.html#pksig_waters09.IBEWaters09.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpk</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+        <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">tagc</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s1</span> <span class="o">+</span> <span class="n">s2</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        
+        <span class="n">sig1</span><span class="p">,</span> <span class="n">sig2</span><span class="p">,</span> <span class="n">sig3</span><span class="p">,</span> <span class="n">sig4</span><span class="p">,</span> <span class="n">sig5</span><span class="p">,</span> <span class="n">sig6</span><span class="p">,</span> <span class="n">sig7</span><span class="p">,</span> <span class="n">sigK</span><span class="p">,</span> <span class="n">tagk</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">[</span><span class="s">&#39;sig&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span><span class="n">sigma</span><span class="p">[</span><span class="s">&#39;sig&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span><span class="n">sigma</span><span class="p">[</span><span class="s">&#39;sig&#39;</span><span class="p">][</span><span class="mi">3</span><span class="p">],</span><span class="n">sigma</span><span class="p">[</span><span class="s">&#39;sig&#39;</span><span class="p">][</span><span class="mi">4</span><span class="p">],</span><span class="n">sigma</span><span class="p">[</span><span class="s">&#39;sig&#39;</span><span class="p">][</span><span class="mi">5</span><span class="p">],</span><span class="n">sigma</span><span class="p">[</span><span class="s">&#39;sig&#39;</span><span class="p">][</span><span class="mi">6</span><span class="p">],</span><span class="n">sigma</span><span class="p">[</span><span class="s">&#39;sig&#39;</span><span class="p">][</span><span class="mi">7</span><span class="p">],</span><span class="n">sigma</span><span class="p">[</span><span class="s">&#39;K&#39;</span><span class="p">],</span><span class="n">sigma</span><span class="p">[</span><span class="s">&#39;tagk&#39;</span><span class="p">]</span>
+        <span class="n">E1</span> <span class="o">=</span> <span class="p">((</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;u&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">M</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;w1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">tagc</span><span class="p">)</span> <span class="o">*</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;h1&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="n">t</span>
+        <span class="n">E2</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">t</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;egg_alpha&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s2</span><span class="p">)</span>
+        <span class="n">theta</span> <span class="o">=</span>  <span class="o">~</span><span class="p">(</span><span class="n">tagc</span> <span class="o">-</span> <span class="n">tagk</span><span class="p">)</span>
+        
+        <span class="n">lhs_pair</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g1^b&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">,</span> <span class="n">sig1</span><span class="p">)</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g^ba1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s1</span><span class="p">,</span> <span class="n">sig2</span><span class="p">)</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g^a1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s1</span><span class="p">,</span> <span class="n">sig3</span><span class="p">)</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g^ba2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s2</span><span class="p">,</span> <span class="n">sig4</span><span class="p">)</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g^a2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s2</span><span class="p">,</span> <span class="n">sig5</span><span class="p">)</span>        
+        <span class="n">rhs_pair</span> <span class="o">=</span> <span class="n">pair</span><span class="p">((</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;tau1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;tau2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s2</span><span class="p">),</span> <span class="n">sig6</span><span class="p">)</span> <span class="o">*</span> <span class="n">pair</span><span class="p">((</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;tau1^b&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;tau2^b&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;w1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="o">-</span><span class="n">t</span><span class="p">),</span> <span class="n">sig7</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span> <span class="n">pair</span><span class="p">(</span><span class="n">E1</span><span class="p">,</span> <span class="n">sig7</span><span class="p">)</span> <span class="o">/</span> <span class="n">pair</span><span class="p">(</span><span class="n">E2</span><span class="p">,</span> <span class="n">sigK</span><span class="p">)</span> <span class="p">)</span> <span class="o">**</span> <span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">A</span>
+        <span class="k">if</span> <span class="n">lhs_pair</span> <span class="o">==</span> <span class="n">rhs_pair</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="bp">False</span>
+</div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pksig/pksig_waters09.html#pksig_waters09.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c"># scheme designed for symmetric billinear groups</span>
+    <span class="n">grp</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;MNT224&#39;</span><span class="p">)</span>
 
-    def verify(self, mpk, sigma, m):
-        s1, s2, t, tagc = group.random(ZR, 4)</div>
-<div class="viewcode-block" id="IBEWaters09.verify"><a class="viewcode-back" href="../schemes/pksig_waters09.html#pksig_waters09.IBEWaters09.verify">[docs]</a>        s = s1 + s2
-        M = group.hash(m)
-        
-        sig1, sig2, sig3, sig4, sig5, sig6, sig7, sigK, tagk = sigma['sig'][1],sigma['sig'][2],sigma['sig'][3],sigma['sig'][4],sigma['sig'][5],sigma['sig'][6],sigma['sig'][7],sigma['K'],sigma['tagk']
-        E1 = ((mpk['u'] ** M) * (mpk['w1'] ** tagc) * mpk['h1']) ** t
-        E2 = mpk['g1'] ** t
-        A = (mpk['egg_alpha'] ** s2)
-        theta =  ~(tagc - tagk)
-        
-        lhs_pair = pair(mpk['g1^b'] ** s, sig1) * pair(mpk['g^ba1'] ** s1, sig2) * pair(mpk['g^a1'] ** s1, sig3) * pair(mpk['g^ba2'] ** s2, sig4) * pair(mpk['g^a2'] ** s2, sig5)        
-        rhs_pair = pair((mpk['tau1'] ** s1) * (mpk['tau2'] ** s2), sig6) * pair((mpk['tau1^b'] ** s1) * (mpk['tau2^b'] ** s2) * (mpk['w1'] ** -t), sig7) * (( pair(E1, sig7) / pair(E2, sigK) ) ** theta) * A
-        if lhs_pair == rhs_pair:
-            return True
-        return False
+    <span class="n">ibe</span> <span class="o">=</span> <span class="n">IBEWaters09</span><span class="p">(</span><span class="n">grp</span><span class="p">)</span>
 
-def main():
-    # scheme designed for symmetric billinear groups</div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pksig_waters09.html#pksig_waters09.main">[docs]</a>    grp = PairingGroup('MNT224')
-    
-    ibe = IBEWaters09(grp)
-    
-    (mpk, msk) = ibe.keygen()
-    
-    m = "plese sign this message!!!!"
-    sigma = ibe.sign(mpk, msk, m)
-    print("Signature :=", sigma)
-        
-    assert ibe.verify(mpk, sigma, m), "Invalid Verification!!!!"
-    print("Successful Individual Verification!")
-        
-if __name__ == "__main__":
-    debug = True</div>
-    main()
-</pre>
+    <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+
+    <span class="n">m</span> <span class="o">=</span> <span class="s">&quot;plese sign this message!!!!&quot;</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature :=&quot;</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">ibe</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="s">&quot;Invalid Verification!!!!&quot;</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Individual Verification!&quot;</span><span class="p">)</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
 
           </div>
         </div>
@@ -162,7 +173,7 @@ if __name__ == "__main__":
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -185,14 +196,14 @@ if __name__ == "__main__":
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

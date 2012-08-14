@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pksig_dsa &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>pksig_dsa &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,80 +48,77 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for pksig_dsa</h1><pre>
+  <h1>Source code for pksig_dsa</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">Digital Signature Algorithm (DSA)</span>
 
-| From: "NIST proposed in Aug 1991 for use in DSS."
-| Published in: FIPS 186
-| Available from: 
-| Notes: 
+<span class="sd">| From: &quot;NIST proposed in Aug 1991 for use in DSS.&quot;</span>
+<span class="sd">| Published in: FIPS 186</span>
+<span class="sd">| Available from: </span>
+<span class="sd">| Notes: </span>
 
-* type:           signature (ring-based)
-* setting:        integer and elliptic curve groups
+<span class="sd">* type:           signature (ring-based)</span>
+<span class="sd">* setting:        integer and elliptic curve groups</span>
 
-:Authors:    J. Ayo Akinyele
-:Date:       5/2011
-"""
+<span class="sd">:Authors:    J. Ayo Akinyele</span>
+<span class="sd">:Date:       5/2011</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
-from toolbox.integergroup import *
-from toolbox.PKSig import *
+<span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="kn">import</span> <span class="n">IntegerGroupQ</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.PKSig</span> <span class="kn">import</span> <span class="o">*</span>
 
-debug = False
-class DSA():
-    def __init__(self, p=0, q=0):
-<div class="viewcode-block" id="DSA"><a class="viewcode-back" href="../schemes/pksig_dsa.html#pksig_dsa.DSA">[docs]</a>        global group
-        group = IntegerGroupQ()
-        group.p, group.q, group.r = p, q, 2
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<div class="viewcode-block" id="DSA"><a class="viewcode-back" href="../schemes/pksig/pksig_dsa.html#pksig_dsa.DSA">[docs]</a><span class="k">class</span> <span class="nc">DSA</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; from charm.core.math.integer import integer</span>
+<span class="sd">    &gt;&gt;&gt; p = integer(156053402631691285300957066846581395905893621007563090607988086498527791650834395958624527746916581251903190331297268907675919283232442999706619659475326192111220545726433895802392432934926242553363253333261282122117343404703514696108330984423475697798156574052962658373571332699002716083130212467463571362679)</span>
+<span class="sd">    &gt;&gt;&gt; q = integer(78026701315845642650478533423290697952946810503781545303994043249263895825417197979312263873458290625951595165648634453837959641616221499853309829737663096055610272863216947901196216467463121276681626666630641061058671702351757348054165492211737848899078287026481329186785666349501358041565106233731785681339)    </span>
+<span class="sd">    &gt;&gt;&gt; dsa = DSA(p, q)</span>
+<span class="sd">    &gt;&gt;&gt; (public_key, secret_key) = dsa.keygen(1024)</span>
+<span class="sd">    &gt;&gt;&gt; msg = &quot;hello world test message!!!&quot;</span>
+<span class="sd">    &gt;&gt;&gt; signature = dsa.sign(public_key, secret_key, msg)</span>
+<span class="sd">    &gt;&gt;&gt; dsa.verify(public_key, signature, msg)</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">group</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">IntegerGroupQ</span><span class="p">()</span>
+        <span class="n">group</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">q</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="mi">2</span>
         
-    def keygen(self, bits):
-        if group.p == 0 or group.q == 0:
-<div class="viewcode-block" id="DSA.keygen"><a class="viewcode-back" href="../schemes/pksig_dsa.html#pksig_dsa.DSA.keygen">[docs]</a>            group.paramgen(bits)
-        global p,q
-        p,q = group.p, group.q 
-        x = group.random()
-        g = group.randomGen()
-        y = (g ** x) % p
-        return ({'g':g, 'y':y}, x)
-    
-    def sign(self, pk, x, M):
-        while True:</div>
-<div class="viewcode-block" id="DSA.sign"><a class="viewcode-back" href="../schemes/pksig_dsa.html#pksig_dsa.DSA.sign">[docs]</a>            k = group.random()
-            r = (pk['g'] ** k) % q
-            s = (k ** -1) * ((group.hash(M) + x*r) % q)
-            if (r == 0 or s == 0):
-                print("unlikely error r = %s, s = %s" % (r,s))
-                continue
-            else:
-                break
-        return { 'r':r, 's':s }
-        
-    def verify(self, pk, sig, M):
-        w = (sig['s'] ** -1) % q</div>
-<div class="viewcode-block" id="DSA.verify"><a class="viewcode-back" href="../schemes/pksig_dsa.html#pksig_dsa.DSA.verify">[docs]</a>        u1 = (group.hash(M) * w) % q
-        u2 = (sig['r'] * w) % q
-        v = ((pk['g'] ** u1) * (pk['y'] ** u2)) % p
-        v %= q   
-        if v == sig['r']:
-            return True
-        else:
-            return False
-        
-def main():
-    p = integer(156053402631691285300957066846581395905893621007563090607988086498527791650834395958624527746916581251903190331297268907675919283232442999706619659475326192111220545726433895802392432934926242553363253333261282122117343404703514696108330984423475697798156574052962658373571332699002716083130212467463571362679)</div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pksig_dsa.html#pksig_dsa.main">[docs]</a>    q = integer(78026701315845642650478533423290697952946810503781545303994043249263895825417197979312263873458290625951595165648634453837959641616221499853309829737663096055610272863216947901196216467463121276681626666630641061058671702351757348054165492211737848899078287026481329186785666349501358041565106233731785681339)    
-    dsa = DSA(p, q)
-
-    (pk, sk) = dsa.keygen(1024)
-    m = "hello world test message!!!"
-    sig = dsa.sign(pk, sk, m)
-
-    assert dsa.verify(pk, sig, m), "Failed verification!"
-    if debug: print("Signature Verified!!!")
-
-if __name__ == "__main__":
-    debug = True</div>
-    main()
-    
-</pre>
+<div class="viewcode-block" id="DSA.keygen"><a class="viewcode-back" href="../schemes/pksig/pksig_dsa.html#pksig_dsa.DSA.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">group</span><span class="o">.</span><span class="n">p</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">group</span><span class="o">.</span><span class="n">q</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">group</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="n">bits</span><span class="p">)</span>
+        <span class="k">global</span> <span class="n">p</span><span class="p">,</span><span class="n">q</span>
+        <span class="n">p</span><span class="p">,</span><span class="n">q</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">q</span> 
+        <span class="n">x</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">randomGen</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">g</span> <span class="o">**</span> <span class="n">x</span><span class="p">)</span> <span class="o">%</span> <span class="n">p</span>
+        <span class="k">return</span> <span class="p">({</span><span class="s">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s">&#39;y&#39;</span><span class="p">:</span><span class="n">y</span><span class="p">},</span> <span class="n">x</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="DSA.sign"><a class="viewcode-back" href="../schemes/pksig/pksig_dsa.html#pksig_dsa.DSA.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">k</span><span class="p">)</span> <span class="o">%</span> <span class="n">q</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="n">k</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">M</span><span class="p">)</span> <span class="o">+</span> <span class="n">x</span><span class="o">*</span><span class="n">r</span><span class="p">)</span> <span class="o">%</span> <span class="n">q</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">s</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;unlikely error r = </span><span class="si">%s</span><span class="s">, s = </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">s</span><span class="p">))</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;r&#39;</span><span class="p">:</span><span class="n">r</span><span class="p">,</span> <span class="s">&#39;s&#39;</span><span class="p">:</span><span class="n">s</span> <span class="p">}</span>
+        </div>
+<div class="viewcode-block" id="DSA.verify"><a class="viewcode-back" href="../schemes/pksig/pksig_dsa.html#pksig_dsa.DSA.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="p">(</span><span class="n">sig</span><span class="p">[</span><span class="s">&#39;s&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">q</span>
+        <span class="n">u1</span> <span class="o">=</span> <span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">M</span><span class="p">)</span> <span class="o">*</span> <span class="n">w</span><span class="p">)</span> <span class="o">%</span> <span class="n">q</span>
+        <span class="n">u2</span> <span class="o">=</span> <span class="p">(</span><span class="n">sig</span><span class="p">[</span><span class="s">&#39;r&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">w</span><span class="p">)</span> <span class="o">%</span> <span class="n">q</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="p">((</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">u1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">u2</span><span class="p">))</span> <span class="o">%</span> <span class="n">p</span>
+        <span class="n">v</span> <span class="o">%=</span> <span class="n">q</span>   
+        <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;r&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        </div></div>
+</pre></div>
 
           </div>
         </div>
@@ -131,7 +128,7 @@ if __name__ == "__main__":
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -154,14 +151,14 @@ if __name__ == "__main__":
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

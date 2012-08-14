@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pksig_boyen &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>pksig_boyen &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,140 +48,160 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for pksig_boyen</h1><pre>
+  <h1>Source code for pksig_boyen</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">Xavier Boyen - Anonymous Ring Signatures</span>
 
-| From: "X. Boyen. Mesh Signatures: How to Leak a Secret with Unwitting and Unwilling Participants"
-| Published in: EUROCRYPT 2007
-| Available from: http://eprint.iacr.org/2007/094.pdf
-| Notes: 
+<span class="sd">| From: &quot;X. Boyen. Mesh Signatures: How to Leak a Secret with Unwitting and Unwilling Participants&quot;</span>
+<span class="sd">| Published in: EUROCRYPT 2007</span>
+<span class="sd">| Available from: http://eprint.iacr.org/2007/094.pdf</span>
+<span class="sd">| Notes: </span>
 
-* type:           signature (ring-based)
-* setting:        bilinear groups (asymmetric)
+<span class="sd">* type:           signature (ring-based)</span>
+<span class="sd">* setting:        bilinear groups (asymmetric)</span>
 
-:Authors:    J. Ayo Akinyele
-:Date:       11/2011
+<span class="sd">:Authors:    J. Ayo Akinyele</span>
+<span class="sd">:Date:       11/2011</span>
 
-"""
-from toolbox.pairinggroup import *
-from toolbox.PKSig import PKSig
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.PKSig</span> <span class="kn">import</span> <span class="n">PKSig</span>
 
-debug = False
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
 
-# need RingSig
-class Boyen(PKSig):
-    def __init__(self, groupObj):
-<div class="viewcode-block" id="Boyen"><a class="viewcode-back" href="../schemes/pksig_boyen.html#pksig_boyen.Boyen">[docs]</a>        global group
-        group = groupObj
+<span class="c"># need RingSig</span>
+<div class="viewcode-block" id="Boyen"><a class="viewcode-back" href="../schemes/pksig/pksig_boyen.html#pksig_boyen.Boyen">[docs]</a><span class="k">class</span> <span class="nc">Boyen</span><span class="p">(</span><span class="n">PKSig</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; from charm.toolbox.pairinggroup import PairingGroup</span>
+<span class="sd">    &gt;&gt;&gt; group = PairingGroup(&#39;MNT224&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; boyen = Boyen(group)</span>
+<span class="sd">    &gt;&gt;&gt; master_public_key = boyen.setup()</span>
+<span class="sd">    &gt;&gt;&gt; num_signers = 3</span>
+<span class="sd">    &gt;&gt;&gt; keys = [ boyen.keygen(master_public_key) for i in range(num_signers)]     </span>
+<span class="sd">    &gt;&gt;&gt; public_keys, secret_keys = {},{}</span>
+<span class="sd">    &gt;&gt;&gt; for i in range(len(keys)):</span>
+<span class="sd">    ...     public_keys[ i+1 ] = keys[ i ][ 0 ]</span>
+<span class="sd">    ...     secret_keys[ i+1 ] = keys[ i ][ 1 ]</span>
+<span class="sd">    &gt;&gt;&gt; signer = 3</span>
+<span class="sd">    &gt;&gt;&gt; secret_key = secret_keys[signer] </span>
+<span class="sd">    &gt;&gt;&gt; msg = &#39;please sign this new message!&#39;</span>
+<span class="sd">    &gt;&gt;&gt; signature = boyen.sign(master_public_key, public_keys, secret_key, msg) </span>
+<span class="sd">    &gt;&gt;&gt; boyen.verify(master_public_key, public_keys, msg, signature) </span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">group</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
     
-    def setup(self):
-        global H
-<div class="viewcode-block" id="Boyen.setup"><a class="viewcode-back" href="../schemes/pksig_boyen.html#pksig_boyen.Boyen.setup">[docs]</a>        H = lambda a: group.hash(('1', str(a)), ZR)
-        g1, g2 = group.random(G1), group.random(G2)
-        a = [group.random(ZR) for i in range(3)]
-        A = []; At = [];
-        for i in range(3):
-            A.append(g1 ** a[i])
-            At.append(g2 ** a[i])
-        # public verification key "in the sky" for all users
-        return {'g1':g1, 'g2':g2, 'A':A[0],    'B':A[1],   'C':A[2], 
-                                  'At':At[0], 'Bt':At[1], 'Ct':At[2]}
-    
-    def keygen(self, mpk):
-        a, b, c = group.random(ZR), group.random(ZR), group.random(ZR)</div>
-<div class="viewcode-block" id="Boyen.keygen"><a class="viewcode-back" href="../schemes/pksig_boyen.html#pksig_boyen.Boyen.keygen">[docs]</a>        A = mpk['g1'] ** a; B = mpk['g1'] ** b; C = mpk['g1'] ** c 
-        At = mpk['g2'] ** a; Bt = mpk['g2'] ** b; Ct = mpk['g2'] ** c
-        sk = {'a':a, 'b':b, 'c':c}
-        pk = {'A':A, 'B':B, 'C':C, 'At':At, 'Bt':Bt, 'Ct':Ct}
-        return (pk, sk)
-
-    def getPKdict(self, mpk, pk, k):
-        A_pk, B_pk, C_pk = {}, {}, {}</div>
-<div class="viewcode-block" id="Boyen.getPKdict"><a class="viewcode-back" href="../schemes/pksig_boyen.html#pksig_boyen.Boyen.getPKdict">[docs]</a>        A_pk[ 0 ] = mpk[ k[0] ]
-        B_pk[ 0 ] = mpk[ k[1] ]
-        C_pk[ 0 ] = mpk[ k[2] ]
-        for i in pk.keys():
-            A_pk[ i ] = pk[ i ][ k[0] ]
-            B_pk[ i ] = pk[ i ][ k[1] ]
-            C_pk[ i ] = pk[ i ][ k[2] ]        
-        return A_pk, B_pk, C_pk
-    
-    def sign(self, mpk, pk, sk, M):
-        if debug: print("Signing....")</div>
-<div class="viewcode-block" id="Boyen.sign"><a class="viewcode-back" href="../schemes/pksig_boyen.html#pksig_boyen.Boyen.sign">[docs]</a>        if debug: print("pk =&gt;", pk.keys())
-        (A_pk, B_pk, C_pk) = self.getPKdict(mpk, pk, ['A', 'B', 'C'])
-        m = H(M)
-        l = len(A_pk.keys())
-        if debug: print("l defined as =&gt;", l)        
-        s = [group.random(ZR) for i in range(l-1)] # 0:l-1
-        t = [group.random(ZR) for i in range(l)]
-        S = {}
-        for i in range(l-1):
-            S[ i ] = mpk['g1'] ** s[i]
-#            print("S[", i, "] :=", S[i])         
-        # index=0
-        (A, B, C) = A_pk[ 0 ], B_pk[ 0 ], C_pk[ 0 ]
-        prod = (A * (B ** m) * (C ** t[0])) ** -s[0]
+<div class="viewcode-block" id="Boyen.setup"><a class="viewcode-back" href="../schemes/pksig/pksig_boyen.html#pksig_boyen.Boyen.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">H</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">((</span><span class="s">&#39;1&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)),</span> <span class="n">ZR</span><span class="p">)</span>
+        <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="p">[];</span> <span class="n">At</span> <span class="o">=</span> <span class="p">[];</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="n">A</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g1</span> <span class="o">**</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">At</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g2</span> <span class="o">**</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="c"># public verification key &quot;in the sky&quot; for all users</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;g1&#39;</span><span class="p">:</span><span class="n">g1</span><span class="p">,</span> <span class="s">&#39;g2&#39;</span><span class="p">:</span><span class="n">g2</span><span class="p">,</span> <span class="s">&#39;A&#39;</span><span class="p">:</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>    <span class="s">&#39;B&#39;</span><span class="p">:</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>   <span class="s">&#39;C&#39;</span><span class="p">:</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> 
+                                  <span class="s">&#39;At&#39;</span><span class="p">:</span><span class="n">At</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&#39;Bt&#39;</span><span class="p">:</span><span class="n">At</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s">&#39;Ct&#39;</span><span class="p">:</span><span class="n">At</span><span class="p">[</span><span class="mi">2</span><span class="p">]}</span>
+    </div>
+<div class="viewcode-block" id="Boyen.keygen"><a class="viewcode-back" href="../schemes/pksig/pksig_boyen.html#pksig_boyen.Boyen.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpk</span><span class="p">):</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">a</span><span class="p">;</span> <span class="n">B</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">b</span><span class="p">;</span> <span class="n">C</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">c</span> 
+        <span class="n">At</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">a</span><span class="p">;</span> <span class="n">Bt</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">b</span><span class="p">;</span> <span class="n">Ct</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">c</span>
+        <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;a&#39;</span><span class="p">:</span><span class="n">a</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">:</span><span class="n">b</span><span class="p">,</span> <span class="s">&#39;c&#39;</span><span class="p">:</span><span class="n">c</span><span class="p">}</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;A&#39;</span><span class="p">:</span><span class="n">A</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">:</span><span class="n">B</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">:</span><span class="n">C</span><span class="p">,</span> <span class="s">&#39;At&#39;</span><span class="p">:</span><span class="n">At</span><span class="p">,</span> <span class="s">&#39;Bt&#39;</span><span class="p">:</span><span class="n">Bt</span><span class="p">,</span> <span class="s">&#39;Ct&#39;</span><span class="p">:</span><span class="n">Ct</span><span class="p">}</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Boyen.getPKdict"><a class="viewcode-back" href="../schemes/pksig/pksig_boyen.html#pksig_boyen.Boyen.getPKdict">[docs]</a>    <span class="k">def</span> <span class="nf">getPKdict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="n">A_pk</span><span class="p">,</span> <span class="n">B_pk</span><span class="p">,</span> <span class="n">C_pk</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
+        <span class="n">A_pk</span><span class="p">[</span> <span class="mi">0</span> <span class="p">]</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span> <span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">]</span>
+        <span class="n">B_pk</span><span class="p">[</span> <span class="mi">0</span> <span class="p">]</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span> <span class="n">k</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">]</span>
+        <span class="n">C_pk</span><span class="p">[</span> <span class="mi">0</span> <span class="p">]</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span> <span class="n">k</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">pk</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">A_pk</span><span class="p">[</span> <span class="n">i</span> <span class="p">]</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span> <span class="n">i</span> <span class="p">][</span> <span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">]</span>
+            <span class="n">B_pk</span><span class="p">[</span> <span class="n">i</span> <span class="p">]</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span> <span class="n">i</span> <span class="p">][</span> <span class="n">k</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">]</span>
+            <span class="n">C_pk</span><span class="p">[</span> <span class="n">i</span> <span class="p">]</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span> <span class="n">i</span> <span class="p">][</span> <span class="n">k</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">]</span>        
+        <span class="k">return</span> <span class="n">A_pk</span><span class="p">,</span> <span class="n">B_pk</span><span class="p">,</span> <span class="n">C_pk</span>
+    </div>
+<div class="viewcode-block" id="Boyen.sign"><a class="viewcode-back" href="../schemes/pksig/pksig_boyen.html#pksig_boyen.Boyen.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signing....&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;pk =&gt;&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="p">(</span><span class="n">A_pk</span><span class="p">,</span> <span class="n">B_pk</span><span class="p">,</span> <span class="n">C_pk</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getPKdict</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">])</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">A_pk</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;l defined as =&gt;&quot;</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>        
+        <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span> <span class="c"># 0:l-1</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l</span><span class="p">)]</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">S</span><span class="p">[</span> <span class="n">i</span> <span class="p">]</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+<span class="c">#            print(&quot;S[&quot;, i, &quot;] :=&quot;, S[i])         </span>
+        <span class="c"># index=0</span>
+        <span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">)</span> <span class="o">=</span> <span class="n">A_pk</span><span class="p">[</span> <span class="mi">0</span> <span class="p">],</span> <span class="n">B_pk</span><span class="p">[</span> <span class="mi">0</span> <span class="p">],</span> <span class="n">C_pk</span><span class="p">[</span> <span class="mi">0</span> <span class="p">]</span>
+        <span class="n">prod</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span> <span class="o">*</span> <span class="p">(</span><span class="n">B</span> <span class="o">**</span> <span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">C</span> <span class="o">**</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">**</span> <span class="o">-</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         
-        # 1 -&gt; l-1
-        for i in range(1, l-1):
-            (A, B, C) = A_pk[i], B_pk[i], C_pk[i]
-            prod *= ((A * (B ** m) * (C ** t[i])) ** -s[i])            
+        <span class="c"># 1 -&gt; l-1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">l</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">)</span> <span class="o">=</span> <span class="n">A_pk</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">B_pk</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">C_pk</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">prod</span> <span class="o">*=</span> <span class="p">((</span><span class="n">A</span> <span class="o">*</span> <span class="p">(</span><span class="n">B</span> <span class="o">**</span> <span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">C</span> <span class="o">**</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span> <span class="o">**</span> <span class="o">-</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>            
 
-        final = l-1
-        d = (sk['a'] + (sk['b'] * m) + (sk['c'] * t[final]))  # s[l]
-        S[final] = (mpk['g1'] * prod) ** ~d # S[l]
-        if debug: print("S[", final, "] :=", S[final])
-        sig = { 'S':S, 't':t }
-        return sig
-    
-    def verify(self, mpk, pk, M, sig):
-        if debug: print("Verifying...")</div>
-<div class="viewcode-block" id="Boyen.verify"><a class="viewcode-back" href="../schemes/pksig_boyen.html#pksig_boyen.Boyen.verify">[docs]</a>        At, Bt, Ct = self.getPKdict(mpk, pk, ['At', 'Bt', 'Ct'])
-        l = len(At.keys())
-        if debug: print("Length =&gt;", l)
-        D = pair(mpk['g1'], mpk['g2'])
-        S, t = sig['S'], sig['t']
-        m = H(M)
-        prod_result = 1
-        for i in range(l):
-            prod_result *= pair(S[i], At[i] * (Bt[i] ** m) * (Ct[i] ** t[i]))
-        if debug: print("final result =&gt;", prod_result)
-        if debug: print("D =&gt;", D )
-        if prod_result == D:
-           return True
-        return False
-
-def main():
-   groupObj = PairingGroup('MNT224')</div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pksig_boyen.html#pksig_boyen.main">[docs]</a>   boyen = Boyen(groupObj)
-   mpk = boyen.setup()
-   if debug: print("Pub parameters")
-   if debug: print(mpk, "\n\n")
+        <span class="n">final</span> <span class="o">=</span> <span class="n">l</span><span class="o">-</span><span class="mi">1</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;a&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;b&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">m</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;c&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span><span class="p">[</span><span class="n">final</span><span class="p">]))</span>  <span class="c"># s[l]</span>
+        <span class="n">S</span><span class="p">[</span><span class="n">final</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">prod</span><span class="p">)</span> <span class="o">**</span> <span class="o">~</span><span class="n">d</span> <span class="c"># S[l]</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;S[&quot;</span><span class="p">,</span> <span class="n">final</span><span class="p">,</span> <span class="s">&quot;] :=&quot;</span><span class="p">,</span> <span class="n">S</span><span class="p">[</span><span class="n">final</span><span class="p">])</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;S&#39;</span><span class="p">:</span><span class="n">S</span><span class="p">,</span> <span class="s">&#39;t&#39;</span><span class="p">:</span><span class="n">t</span> <span class="p">}</span>
+        <span class="k">return</span> <span class="n">sig</span>
+    </div>
+<div class="viewcode-block" id="Boyen.verify"><a class="viewcode-back" href="../schemes/pksig/pksig_boyen.html#pksig_boyen.Boyen.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verifying...&quot;</span><span class="p">)</span>
+        <span class="n">At</span><span class="p">,</span> <span class="n">Bt</span><span class="p">,</span> <span class="n">Ct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getPKdict</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;At&#39;</span><span class="p">,</span> <span class="s">&#39;Bt&#39;</span><span class="p">,</span> <span class="s">&#39;Ct&#39;</span><span class="p">])</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">At</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Length =&gt;&quot;</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">],</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">])</span>
+        <span class="n">S</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;S&#39;</span><span class="p">],</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;t&#39;</span><span class="p">]</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">H</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+        <span class="n">prod_result</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+            <span class="n">prod_result</span> <span class="o">*=</span> <span class="n">pair</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">At</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">Bt</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">**</span> <span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">Ct</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">**</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;final result =&gt;&quot;</span><span class="p">,</span> <span class="n">prod_result</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;D =&gt;&quot;</span><span class="p">,</span> <span class="n">D</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">prod_result</span> <span class="o">==</span> <span class="n">D</span><span class="p">:</span>
+           <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="bp">False</span>
+</div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pksig/pksig_boyen.html#pksig_boyen.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+   <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;MNT224&#39;</span><span class="p">)</span>
+   <span class="n">boyen</span> <span class="o">=</span> <span class="n">Boyen</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+   <span class="n">mpk</span> <span class="o">=</span> <span class="n">boyen</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Pub parameters&quot;</span><span class="p">)</span>
+   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>
    
-   num_signers = 3
-   L_keys = [ boyen.keygen(mpk) for i in range(num_signers)]     
-   L_pk = {}; L_sk = {}
-   for i in range(len(L_keys)):
-       L_pk[ i+1 ] = L_keys[ i ][ 0 ] # pk
-       L_sk[ i+1 ] = L_keys[ i ][ 1 ]
+   <span class="n">num_signers</span> <span class="o">=</span> <span class="mi">3</span>
+   <span class="n">L_keys</span> <span class="o">=</span> <span class="p">[</span> <span class="n">boyen</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">mpk</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_signers</span><span class="p">)]</span>     
+   <span class="n">L_pk</span> <span class="o">=</span> <span class="p">{};</span> <span class="n">L_sk</span> <span class="o">=</span> <span class="p">{}</span>
+   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">L_keys</span><span class="p">)):</span>
+       <span class="n">L_pk</span><span class="p">[</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="p">]</span> <span class="o">=</span> <span class="n">L_keys</span><span class="p">[</span> <span class="n">i</span> <span class="p">][</span> <span class="mi">0</span> <span class="p">]</span> <span class="c"># pk</span>
+       <span class="n">L_sk</span><span class="p">[</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="p">]</span> <span class="o">=</span> <span class="n">L_keys</span><span class="p">[</span> <span class="n">i</span> <span class="p">][</span> <span class="mi">1</span> <span class="p">]</span>
 
-   if debug: print("Keygen...")
-   if debug: print("sec keys =&gt;", L_sk.keys(),"\n", L_sk) 
+   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Keygen...&quot;</span><span class="p">)</span>
+   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;sec keys =&gt;&quot;</span><span class="p">,</span> <span class="n">L_sk</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">L_sk</span><span class="p">)</span> 
 
-   signer = 3
-   sk = L_sk[signer] 
-   M = 'please sign this new message!'
-   sig = boyen.sign(mpk, L_pk, sk, M)
-   if debug: print("\nSignature...")
-   if debug: print("sig =&gt;", sig)
+   <span class="n">signer</span> <span class="o">=</span> <span class="mi">3</span>
+   <span class="n">sk</span> <span class="o">=</span> <span class="n">L_sk</span><span class="p">[</span><span class="n">signer</span><span class="p">]</span> 
+   <span class="n">M</span> <span class="o">=</span> <span class="s">&#39;please sign this new message!&#39;</span>
+   <span class="n">sig</span> <span class="o">=</span> <span class="n">boyen</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">L_pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">Signature...&quot;</span><span class="p">)</span>
+   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
 
-   assert boyen.verify(mpk, L_pk, M, sig), "invalid signature!"
-   if debug: print("Verification successful!")
-
-if __name__ == "__main__":
-    debug = True</div>
-    main()   
-</pre>
+   <span class="k">assert</span> <span class="n">boyen</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">L_pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s">&quot;invalid signature!&quot;</span>
+   <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verification successful!&quot;</span><span class="p">)</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
 
           </div>
         </div>
@@ -191,7 +211,7 @@ if __name__ == "__main__":
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -214,14 +234,14 @@ if __name__ == "__main__":
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

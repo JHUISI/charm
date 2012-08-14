@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>PKEnc &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>PKEnc &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,32 +48,34 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for PKEnc</h1><pre>
- 
-Notes: This class implements an interface for a standard public-key encryption scheme.
-A public key encryption consists of four algorithms: (paramgen, keygen, encrypt, decrypt).
-'''
-from toolbox.schemebase import *
+  <h1>Source code for PKEnc</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Base class for public-key encryption</span>
+<span class="sd"> </span>
+<span class="sd">Notes: This class implements an interface for a standard public-key encryption scheme.</span>
+<span class="sd">A public key encryption consists of four algorithms: (paramgen, keygen, encrypt, decrypt).</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.schemebase</span> <span class="kn">import</span> <span class="o">*</span>
 
-class PKEnc(SchemeBase):
-    def __init__(self):
-<div class="viewcode-block" id="PKEnc"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc">[docs]</a>        SchemeBase.__init__(self)
-        SchemeBase.setProperty(self, scheme="PKEnc")
-        self.baseSecDefs = Enum('OW_CPA','OW_CCA1','OW_CCA','IND_CPA','IND_CCA1','IND_CCA',
-                                'NM_CPA','NM_CCA1','NM_CCA','KA_CPA','KA_CCA1','KA_CCA')
+<div class="viewcode-block" id="PKEnc"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc">[docs]</a><span class="k">class</span> <span class="nc">PKEnc</span><span class="p">(</span><span class="n">SchemeBase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">&quot;PKEnc&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">baseSecDefs</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;OW_CPA&#39;</span><span class="p">,</span><span class="s">&#39;OW_CCA1&#39;</span><span class="p">,</span><span class="s">&#39;OW_CCA&#39;</span><span class="p">,</span><span class="s">&#39;IND_CPA&#39;</span><span class="p">,</span><span class="s">&#39;IND_CCA1&#39;</span><span class="p">,</span><span class="s">&#39;IND_CCA&#39;</span><span class="p">,</span>
+                                <span class="s">&#39;NM_CPA&#39;</span><span class="p">,</span><span class="s">&#39;NM_CCA1&#39;</span><span class="p">,</span><span class="s">&#39;NM_CCA&#39;</span><span class="p">,</span><span class="s">&#39;KA_CPA&#39;</span><span class="p">,</span><span class="s">&#39;KA_CCA1&#39;</span><span class="p">,</span><span class="s">&#39;KA_CCA&#39;</span><span class="p">)</span>
           
-    def paramgen(self, param1=None, param2=None):
-        return NotImplemented
-<div class="viewcode-block" id="PKEnc.paramgen"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc.paramgen">[docs]</a>
-    def keygen(self, securityparam):
-        return NotImplemented</div>
-<div class="viewcode-block" id="PKEnc.keygen"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc.keygen">[docs]</a>
-    def encrypt(self, pk, M):
-        return NotImplemented</div>
-<div class="viewcode-block" id="PKEnc.encrypt"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc.encrypt">[docs]</a>
-    def decrypt(self, pk, sk, c):
-        return NotImplemented</div>
-<div class="viewcode-block" id="PKEnc.decrypt"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc.decrypt">[docs]</a></pre></div></div>
+<div class="viewcode-block" id="PKEnc.paramgen"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc.paramgen">[docs]</a>    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param1</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">param2</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">NotImplemented</span>
+</div>
+<div class="viewcode-block" id="PKEnc.keygen"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">securityparam</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">NotImplemented</span>
+</div>
+<div class="viewcode-block" id="PKEnc.encrypt"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">NotImplemented</span>
+</div>
+<div class="viewcode-block" id="PKEnc.decrypt"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">NotImplemented</span></div></div>
+</pre></div>
 
           </div>
         </div>
@@ -83,7 +85,7 @@ class PKEnc(SchemeBase):
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -106,14 +108,14 @@ class PKEnc(SchemeBase):
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

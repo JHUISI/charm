@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Commit &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>Commit &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,30 +48,32 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for Commit</h1><pre>
- Notes: This class implements an interface for a standard commitment scheme.
-	 A commitment scheme consists of three algorithms: (setup, commit, decommit).
-	 
- Allows one to commit to a value while keeping it hidden, with the ability
- to reveal the committed value later (wiki).
-'''
-from toolbox.schemebase import *
+  <h1>Source code for Commit</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39; Base class for commitment schemes </span>
+<span class="sd"> </span>
+<span class="sd"> Notes: This class implements an interface for a standard commitment scheme.</span>
+<span class="sd">	 A commitment scheme consists of three algorithms: (setup, commit, decommit).</span>
+<span class="sd">	 </span>
+<span class="sd"> Allows one to commit to a value while keeping it hidden, with the ability</span>
+<span class="sd"> to reveal the committed value later (wiki).</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.schemebase</span> <span class="kn">import</span> <span class="o">*</span>
 
-class Commitment(SchemeBase):
-    def __init__(self):
-<div class="viewcode-block" id="Commitment"><a class="viewcode-back" href="../toolbox/Commit.html#Commit.Commitment">[docs]</a>        SchemeBase.__init__(self)
-        SchemeBase.setProperty(self, scheme='Commitment')
-        self.baseSecDefs = None
+<div class="viewcode-block" id="Commitment"><a class="viewcode-back" href="../toolbox/Commit.html#Commit.Commitment">[docs]</a><span class="k">class</span> <span class="nc">Commitment</span><span class="p">(</span><span class="n">SchemeBase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">&#39;Commitment&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">baseSecDefs</span> <span class="o">=</span> <span class="bp">None</span>
         
-    def setup(self, securityparam):
-        raise NotImplementedError		
-<div class="viewcode-block" id="Commitment.setup"><a class="viewcode-back" href="../toolbox/Commit.html#Commit.Commitment.setup">[docs]</a>
-    def commit(self, *args):
-        raise NotImplementedError</div>
-<div class="viewcode-block" id="Commitment.commit"><a class="viewcode-back" href="../toolbox/Commit.html#Commit.Commitment.commit">[docs]</a>    
-    def decommit(self, *args):
-        raise NotImplementedError</div>
-<div class="viewcode-block" id="Commitment.decommit"><a class="viewcode-back" href="../toolbox/Commit.html#Commit.Commitment.decommit">[docs]</a></pre></div></div>
+<div class="viewcode-block" id="Commitment.setup"><a class="viewcode-back" href="../toolbox/Commit.html#Commit.Commitment.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">securityparam</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>		
+</div>
+<div class="viewcode-block" id="Commitment.commit"><a class="viewcode-back" href="../toolbox/Commit.html#Commit.Commitment.commit">[docs]</a>    <span class="k">def</span> <span class="nf">commit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+    </div>
+<div class="viewcode-block" id="Commitment.decommit"><a class="viewcode-back" href="../toolbox/Commit.html#Commit.Commitment.decommit">[docs]</a>    <span class="k">def</span> <span class="nf">decommit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
+</pre></div>
 
           </div>
         </div>
@@ -81,7 +83,7 @@ class Commitment(SchemeBase):
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -104,14 +106,14 @@ class Commitment(SchemeBase):
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

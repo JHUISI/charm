@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pksig_waters &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>pksig_waters &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,126 +48,116 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for pksig_waters</h1><pre>
+  <h1>Source code for pksig_waters</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">Waters - Identity-based signatures</span>
 
-| From: "B. Waters - Efficient identity-based encryption without random oracles"
-| Published in: EUROCRYPT 2005
-| Available from: Vol 3494 of LNCS, pages 320-329
-| Notes: 
+<span class="sd">| From: &quot;B. Waters - Efficient identity-based encryption without random oracles&quot;</span>
+<span class="sd">| Published in: EUROCRYPT 2005</span>
+<span class="sd">| Available from: Vol 3494 of LNCS, pages 320-329</span>
+<span class="sd">| Notes: </span>
 
-* type:           signature (ID-based)
-* setting:        bilinear groups (asymmetric)
+<span class="sd">* type:           signature (ID-based)</span>
+<span class="sd">* setting:        bilinear groups (asymmetric)</span>
 
-:Authors:    J. Ayo Akinyele
-:Date:       11/2011
-"""
-from toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
-from toolbox.iterate import dotprod
-from toolbox.conversion import Conversion
-from toolbox.bitstring import Bytes
-import hashlib
+<span class="sd">:Authors:    J. Ayo Akinyele</span>
+<span class="sd">:Date:       11/2011</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">pair</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.iterate</span> <span class="kn">import</span> <span class="n">dotprod</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.hash_module</span> <span class="kn">import</span> <span class="n">Waters</span>
 
-debug = False
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<div class="viewcode-block" id="WatersSig"><a class="viewcode-back" href="../schemes/pksig/pksig_waters.html#pksig_waters.WatersSig">[docs]</a><span class="k">class</span> <span class="nc">WatersSig</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; from charm.toolbox.pairinggroup import PairingGroup</span>
+<span class="sd">    &gt;&gt;&gt; group = PairingGroup(&#39;SS512&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; water = WatersSig(group)</span>
+<span class="sd">    &gt;&gt;&gt; (master_public_key, master_secret_key) = water.setup(5)</span>
+<span class="sd">    &gt;&gt;&gt; ID = &#39;janedoe@email.com&#39;</span>
+<span class="sd">    &gt;&gt;&gt; secret_key = water.keygen(master_public_key, master_secret_key, ID)  </span>
+<span class="sd">    &gt;&gt;&gt; msg = &#39;please sign this new message!&#39;</span>
+<span class="sd">    &gt;&gt;&gt; signature = water.sign(master_public_key, secret_key, msg)</span>
+<span class="sd">    &gt;&gt;&gt; water.verify(master_public_key, ID, msg, signature)</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">group</span><span class="p">,</span><span class="n">lam_func</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+        <span class="n">lam_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">**</span> <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
-class WatersSig:
-    def __init__(self, groupObj):
-<div class="viewcode-block" id="WatersSig"><a class="viewcode-back" href="../schemes/pksig_waters.html#pksig_waters.WatersSig">[docs]</a>        global group,lam_func,hashObj
-        group = groupObj
-        lam_func = lambda i,a,b: a[i] ** b[i]
-        hashObj = hashlib.new('sha1')
+<div class="viewcode-block" id="WatersSig.setup"><a class="viewcode-back" href="../schemes/pksig/pksig_waters.html#pksig_waters.WatersSig.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="mi">32</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">waters</span>
+        <span class="n">waters</span> <span class="o">=</span> <span class="n">Waters</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+        <span class="n">alpha</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">g2</span><span class="p">)</span> <span class="o">**</span> <span class="n">alpha</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">z</span><span class="p">)]</span>
+        <span class="n">y1t</span><span class="p">,</span><span class="n">y2t</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
 
-    def sha1(self, message):
-        h = hashObj.copy()
-<div class="viewcode-block" id="WatersSig.sha1"><a class="viewcode-back" href="../schemes/pksig_waters.html#pksig_waters.WatersSig.sha1">[docs]</a>        h.update(bytes(message, 'utf-8'))
-        return Bytes(h.digest())    
+        <span class="n">u1t</span> <span class="o">=</span> <span class="n">g1</span> <span class="o">**</span> <span class="n">y1t</span><span class="p">;</span> <span class="n">u2t</span> <span class="o">=</span> <span class="n">g1</span> <span class="o">**</span> <span class="n">y2t</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="p">[</span><span class="n">g1</span> <span class="o">**</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">z</span><span class="p">)]</span>
 
-    def setup(self, z, l=32):
-        alpha, h = group.random(ZR), group.random(G1)</div>
-<div class="viewcode-block" id="WatersSig.setup"><a class="viewcode-back" href="../schemes/pksig_waters.html#pksig_waters.WatersSig.setup">[docs]</a>        g1, g2 = group.random(G1), group.random(G2)
-        A = pair(h, g2) ** alpha
-        y = [group.random(ZR) for i in range(z)]
-        y1t,y2t = group.random(ZR), group.random(ZR)
+        <span class="n">u1b</span> <span class="o">=</span> <span class="n">g2</span> <span class="o">**</span> <span class="n">y1t</span><span class="p">;</span> <span class="n">u2b</span> <span class="o">=</span> <span class="n">g2</span> <span class="o">**</span> <span class="n">y2t</span>
+        <span class="n">ub</span> <span class="o">=</span><span class="p">[</span><span class="n">g2</span> <span class="o">**</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">z</span><span class="p">)]</span>
 
-        u1t = g1 ** y1t; u2t = g1 ** y2t
-        u = [g1 ** y[i] for i in range(z)]
+        <span class="n">msk</span> <span class="o">=</span> <span class="n">h</span> <span class="o">**</span> <span class="n">alpha</span>
+        <span class="n">mpk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;g1&#39;</span><span class="p">:</span><span class="n">g1</span><span class="p">,</span> <span class="s">&#39;g2&#39;</span><span class="p">:</span><span class="n">g2</span><span class="p">,</span> <span class="s">&#39;A&#39;</span><span class="p">:</span><span class="n">A</span><span class="p">,</span> <span class="s">&#39;u1t&#39;</span><span class="p">:</span><span class="n">u1t</span><span class="p">,</span> <span class="s">&#39;u2t&#39;</span><span class="p">:</span><span class="n">u2t</span><span class="p">,</span> <span class="s">&#39;u&#39;</span><span class="p">:</span><span class="n">u</span><span class="p">,</span> <span class="s">&#39;u1b&#39;</span><span class="p">:</span><span class="n">u1b</span><span class="p">,</span> <span class="s">&#39;u2b&#39;</span><span class="p">:</span><span class="n">u2b</span><span class="p">,</span> <span class="s">&#39;ub&#39;</span><span class="p">:</span><span class="n">ub</span><span class="p">,</span> <span class="s">&#39;z&#39;</span><span class="p">:</span><span class="n">z</span><span class="p">,</span> <span class="s">&#39;l&#39;</span><span class="p">:</span><span class="n">l</span> <span class="p">}</span> 
+        <span class="k">return</span> <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span> 
+</div>
+<div class="viewcode-block" id="WatersSig.keygen"><a class="viewcode-back" href="../schemes/pksig/pksig_waters.html#pksig_waters.WatersSig.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">,</span> <span class="n">ID</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Keygen alg...&quot;</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">waters</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span> <span class="c"># return list from k1,...,kz</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;k =&gt;&quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">k1</span> <span class="o">=</span> <span class="n">msk</span> <span class="o">*</span> <span class="p">((</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;u1t&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">dotprod</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;z&#39;</span><span class="p">],</span> <span class="n">lam_func</span><span class="p">,</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;u&#39;</span><span class="p">],</span> <span class="n">k</span><span class="p">))</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span>  
+        <span class="n">k2</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="o">-</span><span class="n">r</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="WatersSig.sign"><a class="viewcode-back" href="../schemes/pksig/pksig_waters.html#pksig_waters.WatersSig.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Sign alg...&quot;</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">waters</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">M</span><span class="p">)</span> <span class="c"># return list from m1,...,mz</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;m =&gt;&quot;</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">)</span> <span class="o">=</span> <span class="n">sk</span>
+        <span class="n">s</span>  <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">S1</span> <span class="o">=</span> <span class="n">k1</span> <span class="o">*</span> <span class="p">((</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;u2t&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">dotprod</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;z&#39;</span><span class="p">],</span> <span class="n">lam_func</span><span class="p">,</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;u&#39;</span><span class="p">],</span> <span class="n">m</span><span class="p">))</span> <span class="o">**</span> <span class="n">s</span><span class="p">)</span>
+        <span class="n">S2</span> <span class="o">=</span> <span class="n">k2</span>
+        <span class="n">S3</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="o">-</span><span class="n">s</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;S1&#39;</span><span class="p">:</span><span class="n">S1</span><span class="p">,</span> <span class="s">&#39;S2&#39;</span><span class="p">:</span><span class="n">S2</span><span class="p">,</span> <span class="s">&#39;S3&#39;</span><span class="p">:</span><span class="n">S3</span><span class="p">}</span>
+    </div>
+<div class="viewcode-block" id="WatersSig.verify"><a class="viewcode-back" href="../schemes/pksig/pksig_waters.html#pksig_waters.WatersSig.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpk</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verify...&quot;</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">waters</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">waters</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">S1</span><span class="p">,</span> <span class="n">S2</span><span class="p">,</span> <span class="n">S3</span><span class="p">)</span> <span class="o">=</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;S1&#39;</span><span class="p">],</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;S2&#39;</span><span class="p">],</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;S3&#39;</span><span class="p">]</span>
+        <span class="n">A</span><span class="p">,</span> <span class="n">g2</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">],</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span>
+        <span class="n">comp1</span> <span class="o">=</span> <span class="n">dotprod</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;z&#39;</span><span class="p">],</span> <span class="n">lam_func</span><span class="p">,</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;ub&#39;</span><span class="p">],</span> <span class="n">k</span><span class="p">)</span>
+        <span class="n">comp2</span> <span class="o">=</span> <span class="n">dotprod</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;z&#39;</span><span class="p">],</span> <span class="n">lam_func</span><span class="p">,</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;ub&#39;</span><span class="p">],</span> <span class="n">m</span><span class="p">)</span>
+        <span class="n">lhs</span> <span class="o">=</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">S1</span><span class="p">,</span> <span class="n">g2</span><span class="p">)</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">S2</span><span class="p">,</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;u1b&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">comp1</span><span class="p">)</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">S3</span><span class="p">,</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;u2b&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">comp2</span><span class="p">))</span> 
+        <span class="c">#if ((pair(S1, g2) * pair(S2, mpk[&#39;u1b&#39;] * comp1) * pair(S3, mpk[&#39;u2b&#39;] * comp2)) == A): </span>
+        <span class="k">if</span> <span class="n">lhs</span> <span class="o">==</span> <span class="n">A</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="bp">False</span>
+</div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pksig/pksig_waters.html#pksig_waters.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+    <span class="n">wat</span> <span class="o">=</span> <span class="n">WatersSig</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">master_secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">wat</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">ID</span> <span class="o">=</span> <span class="s">&#39;janedoe@email.com&#39;</span>
+    <span class="n">secret_key</span> <span class="o">=</span> <span class="n">wat</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">master_secret_key</span><span class="p">,</span> <span class="n">ID</span><span class="p">)</span>  
+    <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;please sign this new message!&#39;</span>
 
-        u1b = g2 ** y1t; u2b = g2 ** y2t
-        ub =[g2 ** y[i] for i in range(z)]
+    <span class="n">sig</span> <span class="o">=</span> <span class="n">wat</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
-        msk = h ** alpha
-        mpk = {'g1':g1, 'g2':g2, 'A':A, 'u1t':u1t, 'u2t':u2t, 'u':u, 'u1b':u1b, 'u2b':u2b, 'ub':ub, 'z':z, 'l':l } 
-        return (mpk, msk) 
+    <span class="k">assert</span> <span class="n">wat</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s">&quot;invalid signature&quot;</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Verification!&quot;</span><span class="p">)</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">main</span><span class="p">()</span>
 
-    def strToId(self, pk, strID):
-        '''Hash the identity string and break it up in to l bit pieces'''</div>
-<div class="viewcode-block" id="WatersSig.strToId"><a class="viewcode-back" href="../schemes/pksig_waters.html#pksig_waters.WatersSig.strToId">[docs]</a>        hash = self.sha1(strID)
-        val = Conversion.OS2IP(hash) #Convert to integer format
-        bstr = bin(val)[2:]   #cut out the 0b header
-
-        v=[]
-        for i in range(pk['z']):  #z must be greater than or equal to 1
-            binsubstr = bstr[pk['l']*i : pk['l']*(i+1)]
-            intval = int(binsubstr, 2)
-            intelement = group.init(ZR, intval)
-            v.append(intelement)
-        return v
-    
-    def keygen(self, mpk, msk, ID):
-        if debug: print("Keygen alg...")</div>
-<div class="viewcode-block" id="WatersSig.keygen"><a class="viewcode-back" href="../schemes/pksig_waters.html#pksig_waters.WatersSig.keygen">[docs]</a>        k = self.strToId(mpk, ID) # return list from k1,...,kz
-        if debug: print("k =&gt;", k)
-        r = group.random(ZR)
-        k1 = msk * ((mpk['u1t'] * dotprod(group.init(G1), -1, mpk['z'], lam_func, mpk['u'], k)) ** r)  
-        k2 = mpk['g1'] ** -r
-        return (k1, k2)
-    
-    def sign(self, mpk, sk, M):
-        if debug: print("Sign alg...")</div>
-<div class="viewcode-block" id="WatersSig.sign"><a class="viewcode-back" href="../schemes/pksig_waters.html#pksig_waters.WatersSig.sign">[docs]</a>        m = self.strToId(mpk, M) # return list from m1,...,mz
-        if debug: print("m =&gt;", m)
-        (k1, k2) = sk
-        s  = group.random(ZR)
-        S1 = k1 * ((mpk['u2t'] * dotprod(group.init(G1), -1, mpk['z'], lam_func, mpk['u'], m)) ** s)
-        S2 = k2
-        S3 = mpk['g1'] ** -s
-        return {'S1':S1, 'S2':S2, 'S3':S3}
-    
-    def verify(self, mpk, ID, M, sig):
-        if debug: print("Verify...")</div>
-<div class="viewcode-block" id="WatersSig.verify"><a class="viewcode-back" href="../schemes/pksig_waters.html#pksig_waters.WatersSig.verify">[docs]</a>        k = self.strToId(mpk, ID)
-        m = self.strToId(mpk, M)
-        (S1, S2, S3) = sig['S1'], sig['S2'], sig['S3']
-        A, g2 = mpk['A'], mpk['g2']
-        comp1 = dotprod(group.init(G2), -1, mpk['z'], lam_func, mpk['ub'], k)
-        comp2 = dotprod(group.init(G2), -1, mpk['z'], lam_func, mpk['ub'], m)
-        if (pair(S1, g2) * pair(S2, mpk['u1b'] * comp1) * pair(S3, mpk['u2b'] * comp2)) == A: 
-            return True
-        return False
-
-def main():
-   z = 5</div></div>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../schemes/pksig_waters.html#pksig_waters.main">[docs]</a>   groupObj = PairingGroup('SS512')
-
-   waters = WatersSig(groupObj)
-   (mpk, msk) = waters.setup(z)
-
-   ID = 'janedoe@email.com'
-   sk = waters.keygen(mpk, msk, ID)  
-   if debug:
-    print("Keygen...")
-    print("sk =&gt;", sk)
- 
-   M = 'please sign this new message!'
-   sig = waters.sign(mpk, sk, M)
-   if debug: print("Signature...")
-
-   assert waters.verify(mpk, ID, M, sig), "invalid signature!"
-   if debug: print("Verification successful!")
-
-if __name__ == "__main__":
-    debug = True</div>
-    main()
-</pre>
+   
+</pre></div>
 
           </div>
         </div>
@@ -177,7 +167,7 @@ if __name__ == "__main__":
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -200,14 +190,14 @@ if __name__ == "__main__":
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Aug 14, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

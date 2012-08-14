@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pairinggroup &mdash; Charm-Crypto 0.4b documentation</title>
+    <title>pairinggroup &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4b',
+        VERSION:     '0.42b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.4b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
     <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
     <link rel="next" title="PKEnc" href="PKEnc.html" />
     <link rel="prev" title="pairingcurves" href="pairingcurves.html" /> 
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="pairingcurves.html" title="pairingcurves"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -60,7 +60,7 @@
 <span id="pairinggroup"></span><h1>pairinggroup<a class="headerlink" href="#module-pairinggroup" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="pairinggroup.PairingGroup">
-<em class="property">class </em><tt class="descclassname">pairinggroup.</tt><tt class="descname">PairingGroup</tt><big>(</big><em>param_file</em>, <em>secparam=512</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">pairinggroup.</tt><tt class="descname">PairingGroup</tt><big>(</big><em>param_id</em>, <em>param_file=False</em>, <em>secparam=512</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
 <dl class="method">
 <dt id="pairinggroup.PairingGroup.debug">
@@ -80,6 +80,11 @@
 <dl class="method">
 <dt id="pairinggroup.PairingGroup.encode">
 <tt class="descname">encode</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.encode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pairinggroup.PairingGroup.groupSetting">
+<tt class="descname">groupSetting</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.groupSetting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.groupSetting" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -108,23 +113,23 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="pairinggroup.PairingGroup.pair_prod">
+<tt class="descname">pair_prod</tt><big>(</big><em>lhs</em>, <em>rhs</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.pair_prod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.pair_prod" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="pairinggroup.PairingGroup.paramgen">
 <tt class="descname">paramgen</tt><big>(</big><em>qbits</em>, <em>rbits</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.paramgen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pairinggroup.PairingGroup.random">
-<tt class="descname">random</tt><big>(</big><em>type=0</em>, <em>count=1</em>, <em>seed=None</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.random" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">random</tt><big>(</big><em>_type=0</em>, <em>count=1</em>, <em>seed=None</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.random" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pairinggroup.PairingGroup.serialize">
 <tt class="descname">serialize</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.serialize" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pairinggroup.PairingGroup.validSize">
-<tt class="descname">validSize</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.validSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.validSize" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -151,7 +156,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -180,14 +185,14 @@
         <li class="right" >
           <a href="pairingcurves.html" title="pairingcurves"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.4b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Johns Hopkins University ISI.
-      Last updated on Feb 19, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+        &copy; Copyright 2012, Johns Hopkins University ISI.
+      Last updated on Jul 04, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>
