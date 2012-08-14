@@ -10,7 +10,7 @@ To use any of our existing schemes in your application, each scheme includes a `
 
 ::
 
-	from schemes.pkenc.pkenc_cs98.py import CS98
+	from charm.schemes.pkenc.pkenc_cs98.py import CS98
 	from charm.toolbox.eccurve import prime192v1
 	from charm.toolbox.ecgroup import ECGroup
 	
@@ -28,14 +28,14 @@ For a full list of schemes that are available to you, see the :ref:`schemes` sec
 
 Using serialization API
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-To support serialization of key material and ciphertexts, we provide two high-level API calls to serialize charm objects embedded in arbitrary python structures (e.g., lists, tuples, or dictionaries, etc) which are ``objectToBytes()`` and ``bytesToObject()`` from the ``charm.engine.util`` package. These functions provide the necessary functionality for converting keys and ciphertexts to base 64 encoded strings. Both calls require the object to be serialized/deserialized and a class that defines the serialize and deserialize methods such as the group object. 
+To support serialization of key material and ciphertexts, we provide two high-level API calls to serialize charm objects embedded in arbitrary python structures (e.g., lists, tuples, or dictionaries, etc) which are ``objectToBytes()`` and ``bytesToObject()`` from the ``charm.core.engine.util`` package. These functions provide the necessary functionality for converting keys and ciphertexts to base 64 encoded strings. Both calls require the object to be serialized/deserialized and a class that defines the serialize and deserialize methods such as the group object. 
 We also show below how to customize our serialization routines: 
 
 Here is an example of how to use the API with any of the supported group objects (``integergroup``, ``pairinggroup`` or ``ecgroup``):
 
 ::
 
-	from charm.engine.util import objectToBytes,bytesToObject
+	from charm.core.engine.util import objectToBytes,bytesToObject
 	
 	pk_bytes = objectToBytes(pk, group)	
 
@@ -62,7 +62,7 @@ If you would like to define your own custom serialization routine in conjunction
 
 ::
 
-	from charm.engine.util import objectToBytes,bytesToObject
+	from charm.core.engine.util import objectToBytes,bytesToObject
 	
 	serObject = mySerializeAPI()
 	
@@ -108,7 +108,7 @@ To make Charm easy to use conveniently with C/C++ applications, we have provided
 	/* call decrypt mesaage */
 	Charm_t *msg2 = CallMethod(class, "decrypt", "%O%O%O", pkDict, skDict, ctDict);
 	/* process the Charm objects */
-	/* .....see source for possibilities.... */
+	/* .....see source for a simple approach.... */
 	/* free the objects */
 	Free(module);
 	Free(group);
