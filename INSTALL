@@ -43,6 +43,8 @@ WARNING: Python 2.7 is not supported by apt on Ubuntu. Please see the python 3.x
 		sudo apt-get install m4
 	4. libssl-dev
 		sudo apt-get install libssl-dev
+    5. python-setuptools
+        sudo apt-get install python-setuptools
 
 2. Now we need to obtain a copy of Charm:
 	git clone git://github.com/JHUISI/charm.git
@@ -67,6 +69,8 @@ WARNING: Python 2.7 is not supported by apt on Ubuntu. Please see the python 3.x
 		sudo apt-get install python-dev
 	4. libssl-dev
 		sudo apt-get install
+    5. python-setuptools
+        sudo apt-get install python-setuptools
 
 2. Now we need to obtain a copy of Charm:
 	git clone git://github.com/JHUISI/charm.git
@@ -89,6 +93,8 @@ WARNING: Python 2.7 is not supported by apt on Ubuntu. Please see the python 3.x
 		su -c "yum install python-devel"
 	3. openssl-devel
 		su -c "yum install openssl-devel"
+    4. python-setuptools
+        su -c "yum install python-setuptools"
 
 2. Red Hat/Fedora has decided not to support ECC in OpenSSL due to patent concerns, so we now need to remove their restriction, manually import the required files, and build new shared libraries.
 	1. Remove the ECC restriction
