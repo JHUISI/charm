@@ -84,6 +84,7 @@ deps: build-gmp build-pbc
 .PHONY: build
 build: setup build-gmp build-pbc
 	@echo "Building the Charm Framework"
+	${PYTHON} distribute_setup.py
 	${PYTHON} setup.py build ${PYTHONFLAGS} ${PYTHONBUILDEXT}
 	@echo "Complete"
 
