@@ -7,6 +7,7 @@ class BinOpValue:
 		self.left = None
 		self.opType = None
 		self.right = None
+		self.groupType = None
 
 	def getType(self):
 		return con.binOpTypeAST
@@ -22,6 +23,9 @@ class BinOpValue:
 
 	def getRight(self):
 		return self.right
+
+	def getGroupType(self):
+		return self.groupType
 
 	def getOpString(self):
 		if (self.opType == con.addTypeAST):
@@ -42,7 +46,7 @@ class BinOpValue:
 		sys.exit("BinOpValue->getOpString:  self.opType is not one of the supported types.")
 
 	def getStringVarName(self):
-		if ( (self.left == None) or (self.opType == None) or (self.right == None) ):
+		if ( (self.left == None) or (self.opType == None) or (self.right == None) or (self.groupType == None) ):
 			return None
 
 		leftStringVarName = self.left.getStringVarName()
@@ -82,5 +86,11 @@ class BinOpValue:
 			sys.exit("BinOpValue->setRight:  right parameter passed in is of None type.")
 
 		self.right = right
+
+	def setGroupType(self, groupType):
+		if ( (groupType == None) or (type(groupType).__name__ != con.stringName) or (groupType.getStringVarName() not in con.groupTypes) ):
+			sys.exit("BinOpValue->setGroupType:  problem with groupType input parameter passed in.")
+
+		self.groupType = groupType
 
 Value.register(BinOpValue)
