@@ -332,14 +332,16 @@ Section Uninstall
 	${EndIf}  
 	  StrCmp $8 "" done hasPython27
   hasPython32:
-      RMDir /r "$8$9\Charm_Crypto-${PRODUCT_VERSION}-py2.7-win32.egg\"
-	  Delete "$8$9\charm.pth"
+      StrCpy $Python32Dir $8$9  
+      RMDir /r "$Python32Dir\Charm_Crypto-${PRODUCT_VERSION}-py3.2-win32.egg\"
+	  Delete "$Python32Dir\charm.pth"
       ; Delete "$SMPROGRAMS\charm-crypto\schemes-py32.lnk" 	  	  
-	  ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\3.2\InstallPath" ""
+	  ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\2.7\InstallPath" ""
 	  StrCmp $8 "" done hasPython27
   hasPython27:
-      RMDir /r "$8$9\Charm_Crypto-${PRODUCT_VERSION}-py2.7-win32.egg\"
-	  Delete "$8$9\charm.pth"
+      StrCpy $Python27Dir $8$9
+      RMDir /r "$Python27Dir\Charm_Crypto-${PRODUCT_VERSION}-py2.7-win32.egg\"
+	  Delete "$Python27Dir\charm.pth"
 	  ; Delete "$SMPROGRAMS\charm-crypto\schemes-py27.lnk"
   done:
       ;Don't do anything when done.
