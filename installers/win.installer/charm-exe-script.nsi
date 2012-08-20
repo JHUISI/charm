@@ -157,17 +157,15 @@ Section /o "" python32_detected
   ; Also need to split out Adapters. 
   ;
   SetOutPath "$INSTDIR\charm-usr-3.2\test"
-  File /r "C:\Python32\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py3.2-win32.egg\charm\test"
+  File /r "C:\Python32\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py3.2-win32.egg\charm\test\"
   SetOutPath "$INSTDIR\charm-usr-3.2\schemes"
-  File /r "C:\Python32\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py3.2-win32.egg\charm\schemes"  
+  File /r "C:\Python32\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py3.2-win32.egg\charm\schemes\"  
   SetOutPath "$INSTDIR\charm-usr-3.2\adapters"
-  File /r "C:\Python32\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py3.2-win32.egg\charm\adapters"
-  ;
-  ;
+  File /r "C:\Python32\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py3.2-win32.egg\charm\adapters\"
   SetOutPath "$Python32Dir"
   SetOverwrite ifnewer
-  ; CHANGEME on every new release.
-  ; No egg-info.  File "C:\Python32\Lib\site-packages\Charm_Crypto-0.41-py3.2.egg-info"
+  ; Need to have charm.pth to specify charm egg to PYTHONPATH.
+  File "C:\Python32\Lib\site-packages\charm.pth"
   ; Now bundling pyparsing, current version 1.5.6
   File "C:\Python32\Lib\site-packages\pyparsing-1.5.6-py3.2.egg-info"   
   File "C:\Python32\Lib\site-packages\pyparsing.py"
@@ -184,16 +182,15 @@ Section /o "" python27_detected
   ; Also need to split out Adapters. 
   ;
   SetOutPath "$INSTDIR\charm-usr-2.7\test"
-  File /r "C:\Python27\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py2.7-win32.egg\charm\test"
+  File /r "C:\Python27\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py2.7-win32.egg\charm\test\"
   SetOutPath "$INSTDIR\charm-usr-2.7\schemes"
-  File /r "C:\Python27\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py2.7-win32.egg\charm\schemes"
+  File /r "C:\Python27\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py2.7-win32.egg\charm\schemes\"
   SetOutPath "$INSTDIR\charm-usr-2.7\adapters"
-  File /r "C:\Python27\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py2.7-win32.egg\charm\adapters"
-  ;
-  ;  
+  File /r "C:\Python27\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py2.7-win32.egg\charm\adapters\"
+  SetOutPath "$Python27Dir"
   SetOverwrite ifnewer
-  ; CHANGEME on every new release.
-  ; No egg info.  File "C:\Python27\Lib\site-packages\Charm_Crypto-0.41-py2.7.egg-info"  
+  ; Need to have charm.pth to specify charm egg to PYTHONPATH.
+  File "C:\Python27\Lib\site-packages\charm.pth"  
   ; Now bundling pyparsing, current version 1.5.6
   File "C:\Python27\Lib\site-packages\pyparsing-1.5.6-py2.7.egg-info"  
   File "C:\Python27\Lib\site-packages\pyparsing.py"  
@@ -335,21 +332,15 @@ Section Uninstall
 	${EndIf}  
 	  StrCmp $8 "" done hasPython27
   hasPython32:
-      RMDir /r "$8$9\charm\"
-	  RMDir /r "$8$9\compiler\"
-	  ;RMDir /r "$8$9\schemes\"
-	  RMDir /r "$8$9\toolbox\"
-      Delete "$8$9\Charm_Crypto-0.41-py3.2.egg-info"
-      ;Delete "$SMPROGRAMS\charm-crypto\schemes-py32.lnk" 	  
+      RMDir /r "$8$9\Charm_Crypto-${PRODUCT_VERSION}-py2.7-win32.egg\"
+	  Delete "$8$9\charm.pth"
+      ; Delete "$SMPROGRAMS\charm-crypto\schemes-py32.lnk" 	  	  
 	  ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\3.2\InstallPath" ""
 	  StrCmp $8 "" done hasPython27
   hasPython27:
-      RMDir /r "$8$9\charm\"
-	  RMDir /r "$8$9\compiler\"
-	  ;RMDir /r "$8$9\schemes\"
-	  RMDir /r "$8$9\toolbox\"  
-      Delete "$8$9\Charm_Crypto-0.41-py2.7.egg-info"
-	  ;Delete "$SMPROGRAMS\charm-crypto\schemes-py27.lnk"
+      RMDir /r "$8$9\Charm_Crypto-${PRODUCT_VERSION}-py2.7-win32.egg\"
+	  Delete "$8$9\charm.pth"
+	  ; Delete "$SMPROGRAMS\charm-crypto\schemes-py27.lnk"
   done:
       ;Don't do anything when done.
   
