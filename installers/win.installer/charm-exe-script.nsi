@@ -151,7 +151,7 @@ Section /o "" python32_detected
   SetOutPath "$Python32Dir\Charm_Crypto-${PRODUCT_VERSION}-py3.2-win32.egg"
   SetOverwrite try
   ; Install on dev machine, then run the NSI script.
-  File /r "C:\Python32\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py3.2-win32.egg"
+  File /r "C:\Python32\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py3.2-win32.egg\"
   ;
   ; Notice how we split the schemes up, we should fix this.
   ; Also need to split out Adapters. 
@@ -176,7 +176,7 @@ SectionEnd
 Section /o "" python27_detected
   SetOutPath "$Python27Dir\Charm_Crypto-${PRODUCT_VERSION}-py2.7-win32.egg"
   SetOverwrite try
-  File /r "C:\Python27\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py2.7-win32.egg"
+  File /r "C:\Python27\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py2.7-win32.egg\"
   ;
   ; Notice how we split the schemes up, we should fix this.
   ; Also need to split out Adapters. 
