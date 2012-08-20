@@ -3,6 +3,8 @@
 # The following script will use file io to upate the constant variable VERSION in the NSIS installer script.
 # Note that this is probably an easy thing to-do in the script itself... eventually.
 
+# TODO: Update charm.pth with latest version.
+
 import fileinput, sys, re
 
 fver = open('../../VERSION', 'r')
