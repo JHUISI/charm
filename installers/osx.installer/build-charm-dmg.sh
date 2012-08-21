@@ -26,7 +26,7 @@ test -d "./build/" || {
 }
 
 # Maybe there is a better way to do this, for now just ask.
-echo "Please type the path of the top level directory of Charm, python 2.x build, surrounding input in quotes:"
+echo "Please type the path of the top level directory of Charm, python 2.x build, e.g. /Users/you/charm-2.7/charm:"
 read CHARM27
 echo "Please type the path of the top level directory of Charm, python 3.x build, surrounding input in quotes:"
 read CHARM32
@@ -38,12 +38,12 @@ cp -R "./build/Charm Crypto.mpkg" ./charmDMG/"Charm Crypto.mpkg"
 
 
 cp -R ${CHARM27}/schemes/ ./charmDMG/charm-usr2.7/schemes
-cp -R ${CHARM32}/schemes/ ./charmDMG/charm-usr3.2/schemes
-mv ./charmDMG/charm-usr2.7/schemes/*adapt* ./charmDMG/charm-usr2.7/adapters
-mv ./charmDMG/charm-usr3.2/schemes/*adapt* ./charmDMG/charm-usr3.2/adapters
+cp -R ${CHARM27}/adapters/ ./charmDMG/charm-usr2.7/adapters
+cp -R ${CHARM27}/test/ ./charmDMG/charm-usr2.7/test
 
-cp -R ${CHARM27}/tests/ ./charmDMG/charm-usr2.7/tests
-cp -R ${CHARM32}/tests/ ./charmDMG/charm-usr3.2/tests
+cp -R ${CHARM32}/schemes/ ./charmDMG/charm-usr3.2/schemes
+cp -R ${CHARM32}/adapters/ ./charmDMG/charm-usr3.2/adapters
+cp -R ${CHARM32}/test/ ./charmDMG/charm-usr3.2/test
 
 cp ./packages-src/README-OSX.rtf ./charmDMG/
 cp ./packages-src/charm-dmg-background.png ./charmDMG/.background/charm-dmg-background.png
@@ -93,6 +93,9 @@ end tell
 
 echo "For now, manually adjust the icons where they should be. Press enter when you're done." 
 read haltomodify
+
+echo "If you receive an error concerning the inability to unmount, you can optionally finish the process \
+by accessing Disk Utility, selecting the charm-temp.dmg and selecting Images->Convert with compression."
 
 # Finalize permissions.
 echo "Finalizing permissions."
