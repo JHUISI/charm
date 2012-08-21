@@ -14,7 +14,7 @@
 # Declare some useful variables.
 NAME="Charm Crypto"
 VERSION=`cat ../../VERSION`
-VOLName="${NAME} ${VERSION}
+VOLName="${NAME} ${VERSION}"
 TMPName="charm-temp.dmg"
 SRC="./charmDMG/"
 DMGName="Charm Crypto"
