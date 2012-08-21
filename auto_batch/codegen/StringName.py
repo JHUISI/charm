@@ -6,6 +6,7 @@ class StringName:
 		self.name = None
 		self.lineNo = None
 		self.defaultValue = None
+		self.groupType = None
 
 	def getName(self):
 		return self.name
@@ -18,6 +19,9 @@ class StringName:
 
 	def getDefaultValue(self):
 		return self.defaultValue
+
+	def getGroupType(self):
+		return self.groupType
 
 	def getStringVarName(self):
 		if (self.name == None):
@@ -57,5 +61,11 @@ class StringName:
 			sys.exit("StringName->setDefaultValue:  default value passed in is of None type.")
 
 		self.defaultValue = defaultValue
+
+	def setGroupType(self, groupType):
+		if ( (groupType == None) or (type(groupType).__name__ != con.stringName) or (groupType.getStringVarName() not in con.groupTypes) ):
+			sys.exit("StringName->setGroupType:  problem with group type input parameter passed in.")
+
+		self.groupType = groupType
 
 Name.register(StringName)

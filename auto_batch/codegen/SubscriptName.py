@@ -6,6 +6,7 @@ class SubscriptName:
 		self.lineNo = None
 		self.value = None
 		self.slice = None
+		self.groupType = None
 
 	def getValue(self):
 		return self.value
@@ -18,6 +19,9 @@ class SubscriptName:
 
 	def getLineNo(self):
 		return self.lineNo
+
+	def getGroupType(self):
+		return self.groupType
 
 	def getStringVarName(self):
 		if ( (self.value == None) or (self.slice == None) ):
@@ -65,5 +69,11 @@ class SubscriptName:
 			sys.exit("SubscriptName->setLineNo:  line number passed in is less than one.")
 
 		self.lineNo = lineNo
+
+	def setGroupType(self, groupType):
+		if ( (groupType == None) or (type(groupType).__name__ != con.stringName) or (groupType.getStringVarName() not in con.groupTypes) ):
+			sys.exit("SubscriptName->setGroupType:  problem with groupType input parameter.")
+
+		self.groupType = groupType
 
 Name.register(SubscriptName)

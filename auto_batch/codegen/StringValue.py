@@ -6,6 +6,7 @@ class StringValue:
 		self.value = None
 		self.lineNo = None
 		self.inQuotes = False
+		self.groupType = None
 
 	def getValue(self):
 		return self.value
@@ -15,6 +16,9 @@ class StringValue:
 
 	def getLineNo(self):
 		return self.lineNo
+
+	def getGroupType(self):
+		return self.groupType
 
 	def getStringVarName(self):
 		'''
@@ -46,5 +50,11 @@ class StringValue:
 
 	def setInQuotes(self, inQuotes):
 		self.inQuotes = inQuotes
+
+	def setGroupType(self, groupType):
+		if ( (groupType == None) or (type(groupType).__name__ != con.stringName) or (groupType.getStringVarName() not in con.groupTypes) ):
+			sys.exit("StringValue->setGroupType:  problem with groupType input parameter passed in.")
+
+		self.groupType = groupType
 
 Value.register(StringValue)

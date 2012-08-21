@@ -9,6 +9,7 @@ class SliceValue:
 		self.upper = None
 		self.step = None
 		self.lineNo = None
+		self.groupType = None
 
 	def getSliceType(self):
 		return self.sliceType
@@ -30,6 +31,9 @@ class SliceValue:
 
 	def getLineNo(self):
 		return self.lineNo
+
+	def getGroupType(self):
+		return self.groupType
 
 	def getStringVarName(self):
 		if (self.sliceType == None):
@@ -122,5 +126,11 @@ class SliceValue:
 			sys.exit("SliceValue->setLineNo:  problem with line number parameter passed in.")
 
 		self.lineNo = lineNo
+
+	def setGroupType(self, groupType):
+		if ( (groupType == None) or (type(groupType).__name__ != con.stringName) or (groupType.getStringVarName() not in con.groupTypes) ):
+			sys.exit("SliceValue->setGroupType:  problem with groupType parameter passed in.")
+
+		self.groupType = groupType
 
 Value.register(SliceValue)
