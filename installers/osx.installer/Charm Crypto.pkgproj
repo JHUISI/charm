@@ -33016,6 +33016,15 @@
 				<key>VERSION</key>
 				<integer>2</integer>
 			</dict>
+			<key>PACKAGE_SCRIPTS</key>
+			<dict>
+				<key>POSTINSTALL_PATH</key>
+				<dict/>
+				<key>PREINSTALL_PATH</key>
+				<dict/>
+				<key>RESOURCES</key>
+				<array/>
+			</dict>
 			<key>PACKAGE_SETTINGS</key>
 			<dict>
 				<key>AUTHENTICATION</key>
@@ -33235,7 +33244,7 @@
 										<key>LANGUAGE</key>
 										<string>English</string>
 										<key>VALUE</key>
-										<string>Mac Ports</string>
+										<string>MacPorts</string>
 									</dict>
 								</array>
 								<key>TYPE</key>
@@ -33390,7 +33399,7 @@
 										<key>LANGUAGE</key>
 										<string>English</string>
 										<key>VALUE</key>
-										<string>Installer</string>
+										<string>Python.org Installer</string>
 									</dict>
 								</array>
 								<key>TYPE</key>
@@ -33501,7 +33510,7 @@
 										<key>LANGUAGE</key>
 										<string>English</string>
 										<key>VALUE</key>
-										<string>Lion</string>
+										<string>OS X 10.7+</string>
 									</dict>
 								</array>
 								<key>TYPE</key>
