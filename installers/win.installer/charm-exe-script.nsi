@@ -14,16 +14,26 @@
 ; added all the bloat to this installer as it includes openssl, gmp, pbc.  
 ;
 ; Future Improvements:
-; Support a branch on the interpreter installs such that libmiracl is supported.
-; Currently doesn't remove pyparsing.
+; Support optional libs with user defined control.
 ;
 ; Author: Michael Rushanan (micharu1@cs.jhu.edu)
-; Date: 02/2012
+; Date: 08/2012
 ;
 ; --------------------------------
 
+; MUI 1.67 compatible ------
+!include "MUI.nsh"
+!include "Sections.nsh"
+!include "EnvVarUpdate.nsh"
+
+; For conditionals and 64-bit check.
+!include "LogicLib.nsh"
+!include "x64.nsh"
+!include "nsDialogs.nsh"
+
+; Constants.
 !define PRODUCT_NAME "charm-crypto"
-!define PRODUCT_VERSION "0.41b"
+!define PRODUCT_VERSION "0.42"
 !define PRODUCT_PUBLISHER "Johns Hopkins University, HMS Lab"
 !define PRODUCT_WEB_SITE "http://charm-crypto.com/Main.html"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -32,17 +42,6 @@
 ;bzip2 is an option
 SetCompressor lzma
 
-
-
-; MUI 1.67 compatible ------
-!include "MUI.nsh"
-!include "Sections.nsh"
-!include "EnvVarUpdate.nsh"
-; For conditionals and 64-bit check.
-!include "LogicLib.nsh"
-!include "x64.nsh"
-!include "nsDialogs.nsh"
-
 ; MUI Settings
 !define MUI_ABORTWARNING
 !define MUI_ICON "Charm-Package.ico"
@@ -50,17 +49,23 @@ SetCompressor lzma
 
 ; Welcome page
 !insertmacro MUI_PAGE_WELCOME
+
 ; Custom Changelog page
 Page custom changeLogPage
+
 ; License page
-!insertmacro MUI_PAGE_LICENSE "gpl_v3.txt"
+!insertmacro MUI_PAGE_LICENSE "lgpl.txt"
+
 ; Components page
 !insertmacro MUI_PAGE_COMPONENTS
+
 ; Directory page -- I think this will stop users from being able to modify
 ; the installation directory.
 ;!insertmacro MUI_PAGE_DIRECTORY
+
 ; Instfiles page
 !insertmacro MUI_PAGE_INSTFILES
+
 ; Finish page
 !insertmacro MUI_PAGE_FINISH
 
@@ -74,17 +79,13 @@ Page custom changeLogPage
 !insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
 ; MUI end ------
 
-
-
 ; Globals ------
 Var changeLog
 Var Python32Dir
 Var Python27Dir
+
 !define Python32Exe "$Python32Dir\python.exe"
 !define Python27Exe "$Python27Dir\python.exe"
-; Globals end ------
-
-
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 OutFile "charm-crypto.exe"
@@ -94,11 +95,8 @@ InstallDir "C:\charm-crypto"
 ShowInstDetails show
 ShowUnInstDetails show
 
-
-
 ; Changelog Page
 Function changeLogPage
-
     !insertmacro MUI_HEADER_TEXT "Change Log" "Please review the below for recent changes to this version of charm-crypto."
 	
 	nsDialogs::Create 1018
@@ -110,16 +108,12 @@ Function changeLogPage
 	"${__NSD_Text_STYLE}|${WS_VSCROLL}|${WS_HSCROLL}|${ES_MULTILINE}|${ES_WANTRETURN}" \
 	"${__NSD_Text_EXSTYLE}" \
 	0 0 100% 100% \
-	"- Several bug fixes to base modules: pairing (PBC & Miracl), ecc, and integer $\r$\n- Major changes to base module API. Recommend using the group abstraction wrappers: PairingGroup, ECGroup, and IntegerGroup $\r$\n- Removed pairing curve params in favor of a unified 'toolbox/pairingcurve.py' with curve identifiers (e.g., SS512, MNT224, etc)$\r$\n- Deleted the 'params' dir (See previous)$\r$\n- Added high-level serialization API to simplify managing ciphertexts and keys in applications$\r$\n- Added PKCS #7 padding to toolbox$\r$\n- Added public key encryption schemes: 2 new IBE schemes (ibenc_ckrs09, ibenc_lsw08)$\r$\n- Added signature schemes: CL04 (anony. creds)$\r$\n- Added verifiable random function (VRF) scheme$\r$\n- Updates to KPABE scheme with new adapter$\r$\n- Improved protocol engine: automatically store data transmitted between parties and inc flexibility in state transition map  $\r$\n- Updated CNS07 scheme $\r$\n- Name updates to authenticated crypto abstraction$\r$\n- Updated doc for generating group params and using our serialization interface$\r$\n"
-		
+	"- Major changes to base module API. $\r$\n- Added high-level serialization API to simplify managing ciphertexts and keys in applications$\r$\n- Additional schemes and testing fixes.$\r$\n- Egg support.$\r$\n"
 
 	Pop $changeLog
 	
 	nsDialogs::Show
-
 FunctionEnd
-
-
 
 ; This section, dependencies, must be installed.  So no user option control!
 Section # Install Charm Dependencies
@@ -154,64 +148,51 @@ Section # Install Charm Dependencies
 SectionEnd
 
 Section /o "" python32_detected
-  SetOutPath "$Python32Dir\charm"
+  SetOutPath "$Python32Dir\Charm_Crypto-${PRODUCT_VERSION}-py3.2-win32.egg"
   SetOverwrite try
-  File /r "C:\Python32\Lib\site-packages\charm\"
-  SetOutPath "$Python32Dir\compiler"
-  File /r "C:\Python32\Lib\site-packages\compiler\"
+  ; Install on dev machine, then run the NSI script.
+  File /r "C:\Python32\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py3.2-win32.egg\"
   ;
   ; Notice how we split the schemes up, we should fix this.
   ; Also need to split out Adapters. 
   ;
-  SetOutPath "$INSTDIR\charm-usr-3.2\tests"
-  File /r "C:\MinGW\msys\1.0\home\dev\charm-crypto-3.2\tests\"
+  SetOutPath "$INSTDIR\charm-usr-3.2\test"
+  File /r "C:\Python32\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py3.2-win32.egg\charm\test\"
   SetOutPath "$INSTDIR\charm-usr-3.2\schemes"
-  File /r "C:\MinGW\msys\1.0\home\dev\charm-crypto-3.2\schemes\"  
+  File /r "C:\Python32\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py3.2-win32.egg\charm\schemes\"  
   SetOutPath "$INSTDIR\charm-usr-3.2\adapters"
-  File /r "C:\MinGW\msys\1.0\home\dev\charm-crypto-3.2\adapters\"
-  ;
-  ;
-  SetOutPath "$Python32Dir\toolbox"
-  File /r "C:\Python32\Lib\site-packages\toolbox\"
+  File /r "C:\Python32\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py3.2-win32.egg\charm\adapters\"
   SetOutPath "$Python32Dir"
   SetOverwrite ifnewer
-  ; CHANGEME on every new release.
-  File "C:\Python32\Lib\site-packages\Charm_Crypto-0.41-py3.2.egg-info"
+  ; Need to have charm.pth to specify charm egg to PYTHONPATH.
+  File "C:\Python32\Lib\site-packages\charm.pth"
   ; Now bundling pyparsing, current version 1.5.6
-  File "C:\Python32\Lib\site-packages\pyparsing-1.5.6-py3.2.egg-info"  
-  File "C:\Python32\Lib\site-packages\pyparsing.pyc"  
+  File "C:\Python32\Lib\site-packages\pyparsing-1.5.6-py3.2.egg-info"   
   File "C:\Python32\Lib\site-packages\pyparsing.py"
   
   CreateShortCut "$SMPROGRAMS\charm-crypto\charm-usr-3.2.lnk" "$INSTDIR\charm-usr-3.2"
 SectionEnd
 
 Section /o "" python27_detected
-  SetOutPath "$Python27Dir\charm"
+  SetOutPath "$Python27Dir\Charm_Crypto-${PRODUCT_VERSION}-py2.7-win32.egg"
   SetOverwrite try
-  File /r "C:\Python27\Lib\site-packages\charm\"
-  SetOutPath "$Python27Dir\compiler"
-  File /r "C:\Python27\Lib\site-packages\compiler\"
+  File /r "C:\Python27\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py2.7-win32.egg\"
   ;
   ; Notice how we split the schemes up, we should fix this.
   ; Also need to split out Adapters. 
   ;
-  SetOutPath "$INSTDIR\charm-usr-2.7\tests"
-  File /r "C:\MinGW\msys\1.0\home\dev\charm-crypto-2.7\tests\"
+  SetOutPath "$INSTDIR\charm-usr-2.7\test"
+  File /r "C:\Python27\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py2.7-win32.egg\charm\test\"
   SetOutPath "$INSTDIR\charm-usr-2.7\schemes"
-  File /r "C:\MinGW\msys\1.0\home\dev\charm-crypto-2.7\schemes\"
+  File /r "C:\Python27\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py2.7-win32.egg\charm\schemes\"
   SetOutPath "$INSTDIR\charm-usr-2.7\adapters"
-  File /r "C:\MinGW\msys\1.0\home\dev\charm-crypto-2.7\adapters\"
-  ;
-  ;  
-  SetOutPath "$Python27Dir\toolbox"
-  File /r "C:\Python27\Lib\site-packages\toolbox\"
+  File /r "C:\Python27\Lib\site-packages\Charm_Crypto-${PRODUCT_VERSION}-py2.7-win32.egg\charm\adapters\"
   SetOutPath "$Python27Dir"
   SetOverwrite ifnewer
-  ; CHANGEME on every new release.
-  File "C:\Python27\Lib\site-packages\Charm_Crypto-0.41-py2.7.egg-info"  
+  ; Need to have charm.pth to specify charm egg to PYTHONPATH.
+  File "C:\Python27\Lib\site-packages\charm.pth"  
   ; Now bundling pyparsing, current version 1.5.6
   File "C:\Python27\Lib\site-packages\pyparsing-1.5.6-py2.7.egg-info"  
-  File "C:\Python27\Lib\site-packages\pyparsing.pyc"  
   File "C:\Python27\Lib\site-packages\pyparsing.py"  
   
   CreateShortCut "$SMPROGRAMS\charm-crypto\charm-usr-2.7.lnk" "$INSTDIR\charm-usr-2.7"  
@@ -231,15 +212,11 @@ Section -Post
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
 SectionEnd
 
-
-
 ; Section descriptions
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${python32_detected} "$(^Name) will be installed as a site-package of Python3.2"
   !insertmacro MUI_DESCRIPTION_TEXT ${python27_detected} "$(^Name) will be installed as a site-package of Python2.7"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
-
-
 
 ; Installation Callback Functions ------
 ; Callback function to ensure we have python installed, and that
@@ -316,8 +293,6 @@ Function .onInstSuccess
 FunctionEnd
 ; Installation Callback Functions end ------
 
-
-
 ; unInstallation Callback Functions ------
 Function un.onUninstSuccess
   HideWindow
@@ -329,8 +304,6 @@ Function un.onInit
   Abort
 FunctionEnd
 ; unInstallation Callback Functions end ------
-
-
 
 ; My first attempt to make this less painful than the installation bulk above...
 ; simple remove the top most dir, and be done with it.
@@ -359,21 +332,17 @@ Section Uninstall
 	${EndIf}  
 	  StrCmp $8 "" done hasPython27
   hasPython32:
-      RMDir /r "$8$9\charm\"
-	  RMDir /r "$8$9\compiler\"
-	  ;RMDir /r "$8$9\schemes\"
-	  RMDir /r "$8$9\toolbox\"
-      Delete "$8$9\Charm_Crypto-0.41-py3.2.egg-info"
-      ;Delete "$SMPROGRAMS\charm-crypto\schemes-py32.lnk" 	  
-	  ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\3.2\InstallPath" ""
+      StrCpy $Python32Dir $8$9  
+      RMDir /r "$Python32Dir\Charm_Crypto-${PRODUCT_VERSION}-py3.2-win32.egg\"
+	  Delete "$Python32Dir\charm.pth"
+      ; Delete "$SMPROGRAMS\charm-crypto\schemes-py32.lnk" 	  	  
+	  ReadRegStr $8 HKLM "SOFTWARE\Python\PythonCore\2.7\InstallPath" ""
 	  StrCmp $8 "" done hasPython27
   hasPython27:
-      RMDir /r "$8$9\charm\"
-	  RMDir /r "$8$9\compiler\"
-	  ;RMDir /r "$8$9\schemes\"
-	  RMDir /r "$8$9\toolbox\"  
-      Delete "$8$9\Charm_Crypto-0.41-py2.7.egg-info"
-	  ;Delete "$SMPROGRAMS\charm-crypto\schemes-py27.lnk"
+      StrCpy $Python27Dir $8$9
+      RMDir /r "$Python27Dir\Charm_Crypto-${PRODUCT_VERSION}-py2.7-win32.egg\"
+	  Delete "$Python27Dir\charm.pth"
+	  ; Delete "$SMPROGRAMS\charm-crypto\schemes-py27.lnk"
   done:
       ;Don't do anything when done.
   
