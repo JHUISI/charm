@@ -1,6 +1,5 @@
-from charm.core.math.pairing import pairing,ZR,G1,G2,GT,init,pair,hashPair,H,random,serialize,deserialize,ismember,order
 from charm.toolbox.pairingcurves import params as param_info
-#import os.path
+from charm.core.math.pairing import pairing,ZR,G1,G2,GT,init,pair,hashPair,H,random,serialize,deserialize,ismember,order
 
 class PairingGroup():
     def __init__(self, param_id, param_file=False, secparam=512):        

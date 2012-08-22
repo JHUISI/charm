@@ -22,7 +22,7 @@ from charm.toolbox.eccurve import prime192v2
 from charm.toolbox.integergroup import integer
 from charm.toolbox.hash_module import Waters
 import unittest
-import pytest
+#import pytest
 debug = False
 
 class PKSig_Naor01Test(unittest.TestCase):

@@ -154,16 +154,14 @@ void longObjToMPZ (mpz_t m, PyLongObject * p)
 char *convert_buffer_to_hex(uint8_t * data, size_t len)
 {
 	size_t i;
-	char tmp1[3];
-	char *tmp = (char *) malloc(len * 3);
-	memset(tmp, 0, len*3 - 1);
-	
-	for (i = 0; i < len; i++) {
-		snprintf(tmp1, 3, "%02x ", data[i]);
-		strcat(tmp, tmp1);
-	}	
-	
-	return tmp;
+	char *tmp = (char *) malloc(len*2 + 2);
+	char *tmp2 = tmp;
+	memset(tmp, 0, len*2+1);
+
+	for(i = 0; i < len; i++)
+		tmp += sprintf(tmp, "%02x", data[i]);
+
+	return tmp2;
 }
 
 void printf_buffer_as_hex(uint8_t * data, size_t len)
@@ -1236,10 +1234,9 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 		PyErr_SetString(ElementError, "failed to hash element");
 		return NULL;
 	}
-	
 	hash_hex = convert_buffer_to_hex(hash_buf, hash_size);
 	printf_buffer_as_hex(hash_buf, hash_size);
-	
+
 	str = PyBytes_FromString((const char *) hash_hex);
 	free(hash_hex);
 	//STOP_CLOCK(dBench);
