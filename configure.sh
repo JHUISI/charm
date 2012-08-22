@@ -111,7 +111,9 @@ integer_module="yes"
 ecc_module="yes"
 pairing_module="yes"
 pairing_miracl="no"
+pairing_relic="no"
 pairing_pbc="yes"
+disable_benchmark="no"
 integer_ssl="no"
 integer_gmp="yes"
 python_version=""
@@ -128,15 +130,8 @@ libdir="\${prefix}/lib"
 sysconfdir="\${prefix}/etc"
 confsuffix="/charm"
 profiler="no"
-python_path="$(which python3)"
 wget="$(which wget)"
-
-#fall back to python if for some reason python3 does not exist 
-# there is still a version check later so it sitll has to be
-# python 3 
-if !  [ -n "$python_path"  ]; then
-   python_path="$(which python)"
-fi 
+ 
 # set -x
 
 # parse CC options first
@@ -338,13 +333,22 @@ for opt do
   ;;
   --disable-pairing) pairing_module="no"
   ;;
+  --disable-benchmark) disable_benchmark="yes"
+  ;;
   --enable-pairing-miracl) 
     echo "Enabling this option assumes you have unzipped the MIRACL library into charm-src/pairingmath/miracl/ and make sure the library is built in that directory."
-  	pairing_pbc="no"
+  	pairing_pbc="no";
   	pairing_miracl="yes" ;
+        pairing_relic="no"
   ;;	
   --enable-pairing-pbc)
     pairing_pbc="yes" ;
+    pairing_miracl="no";
+    pairing_relic="no"
+  ;;
+  --enable-pairing-relic)
+    pairing_relic="yes";
+    pairing_pbc="no" ;
     pairing_miracl="no"
   ;;
   --enable-integer-openssl)
@@ -355,6 +359,9 @@ for opt do
   --enable-integer-gmp)
     integer_gmp="yes" ;
     integer_ssl="no"
+  ;;
+  --enable-integer-relic)
+    echo "integer module using RELIC not supported yet."
   ;;
   --enable-debug)
       # Enable debugging options that aren't excessively noisy
@@ -446,6 +453,7 @@ echo "  --enable-pairing-miracl  enable use of MIRACL lib for pairing module"
 echo "  --enable-pairing-pbc     enable use of PBC lib for pairing module (DEFAULT)"
 echo "  --enable-integer-openssl enable use of openssl for integer module"
 echo "  --enable-integer-gmp     enable use of GMP lib for integer module (DEFAULT)"
+echo "  --disable-benchmark      disable BENCHMARK base module (DEFAULT is no)"
 echo "  --disable-werror         disable compilation abort on warning"
 echo "  --enable-cocoa           enable COCOA (Mac OS X only)"
 echo "  --enable-docs            enable documentation build"
@@ -456,6 +464,56 @@ echo "NOTE: The object files are built at the place where configure is launched"
 exit 1
 fi
 
+# Python version handling logic. We prefer the argument path given by --python 
+# If not specified, we check if python is python 3. 
+#Baring that, we try python3,python3.2.python3.1,etc 
+
+python3_found="no"
+is_python_version(){
+cat > $TMPC << EOF
+import sys
+
+if float(sys.version[:3]) >= 3.0:
+    exit(0)
+else:
+   exit(-1)
+EOF
+
+if  [ -n "${1}"  ]; then
+    $1 $TMPC
+    result=$?
+    if [ "$result" -eq "0" ] ; then 
+        return  
+    fi
+fi
+return 1
+}
+
+if [ -n "$python_path" ]; then 
+        if (is_python_version $python_path); then
+            python3_found="yes"
+        else
+            echo "$python_path is not python 3.x. This version of charm requires"
+            echo "python 3.x. Please specify a valid python3 location with"
+            echo "--python=/path/to/python3, leave off the command to have this script"
+            echo "try finding it on its own, or install charm for python2.7"
+            exit 1
+        fi 
+else
+        for pyversion in python python3 python3.2 python3.1 
+        do 
+            if (is_python_version `which $pyversion`); then
+                python3_found="yes"
+                python_path=`which $pyversion`
+                break
+            fi
+        done
+        if test "$python3_found" = "no"; then 
+            echo "No python 3 version found. This version of Charm requires python version 3.x. Specify python3 location with --python=/path/to/python3"
+            echo "Otherwise, use the python 2.7+ version"
+            exit 1
+        fi
+fi
 # check that the C compiler works.
 cat > $TMPC <<EOF
 int main(void) {}
@@ -562,38 +620,6 @@ fi
 #  pkg_config=/bin/false
 #fi
 
-##########################################
-# python3 probe
-cat > $TMPC << EOF
-import sys
-
-if float(sys.version[:3]) >= 3.0:
-   exit(0)
-else:
-   print("Need 3.x. Specify --python=/path/to/python3")
-   exit(-1)
-EOF
-python3_found="no"
-$python_path $TMPC
-result=$?
-if test ${result} = 0 ; then
-	python3_found="yes"
-fi
-
-cat > $TMPC << EOF
-try:
-   from pyparsing import *
-   exit(0)
-except ImportError:
-   exit(-1)
-EOF
-
-pyparse_found="no"
-$python_path $TMPC
-result=$?
-if test ${result} = 0 ; then
-   pyparse_found="yes"
-fi
 ##########################################
 # check if the compiler defines offsetof
 
@@ -706,7 +732,7 @@ echo "-Werror enabled   $werror"
 echo "integer module    $integer_module"
 echo "ecc module        $ecc_module"
 echo "pairing module    $pairing_module"
-echo "pyparsing module  $pyparse_found"
+echo "disable benchmark $disable_benchmark"
 echo "libm found        $libm_found"
 echo "libgmp found      $libgmp_found"
 echo "libpbc found      $libpbc_found"
@@ -848,12 +874,22 @@ echo "ECC_MOD=$ecc_module" >> $config_mk
 echo "PAIR_MOD=$pairing_module" >> $config_mk
 
 if test "$pairing_pbc" = "yes" ; then
-	echo "USE_PBC=$pairing_pbc" >> $config_mk
-	echo "USE_GMP=$pairing_pbc" >> $config_mk
+    echo "USE_PBC=$pairing_pbc" >> $config_mk
+    echo "USE_GMP=$pairing_pbc" >> $config_mk
     echo "USE_MIRACL=no" >> $config_mk
 elif test "$pairing_miracl" = "yes" ; then
     echo "USE_MIRACL=$pairing_miracl" >> $config_mk
     echo "USE_PBC=no" >> $config_mk
+elif test "$pairing_relic" = "yes" ; then
+    echo "USE_RELIC=$pairing_relic" >> $config_mk
+    echo "USE_PBC=no" >> $config_mk
+    echo "USE_MIRACL=no" >> $config_mk
+fi
+
+if test "$disable_benchmark" = "yes" ; then
+    echo "DISABLE_BENCHMARK=yes" >> $config_mk
+else
+    echo "DISABLE_BENCHMARK=no" >> $config_mk
 fi
 
 if test "$wget" = "" ; then

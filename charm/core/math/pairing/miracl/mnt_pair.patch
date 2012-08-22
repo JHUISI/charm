@@ -1,0 +1,11 @@
+--- mnt_pair.cpp	2012-04-20 02:01:39.000000000 -0400
++++ mnt_pair.new.cpp	2012-04-20 02:02:07.000000000 -0400
+@@ -687,7 +687,7 @@
+ 	delete npoints;
+ 	delete trace;
+ 	delete frob;
+-	mirexit();
++//	mirexit();
+ }
+ 
+ G1 PFC::mult(const G1& w,const Big& k)
