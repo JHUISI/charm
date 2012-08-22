@@ -108,8 +108,7 @@ Function changeLogPage
 	"${__NSD_Text_STYLE}|${WS_VSCROLL}|${WS_HSCROLL}|${ES_MULTILINE}|${ES_WANTRETURN}" \
 	"${__NSD_Text_EXSTYLE}" \
 	0 0 100% 100% \
-	"- Major changes to base module API. $\r$\n- Added high-level serialization API to simplify managing ciphertexts and keys in applications$\r$\n- Additional schemes and testing fixes.$\r$\n- Egg support.$\r$\n"
-
+	"- Several bug fixes to base modules (mem leaks, interface issues): pairing (PBC & Miracl), ecc, and integer.$\r$\n- Added new base module for RELIC and fixed bugs for MIRACL (Note: unified abstract interface for base modules coming in v0.43).$\r$\n- Refactored charm package structure. This affects schemes, toolbox, adapters, etc.$\r$\n- setup.py now creates Python egg.$\r$\n- Integrated pytest to replace unit testing framework.$\r$\n- Added doctests to all Charm schemes.$\r$\n- Updated documentation.$\r$\n"
 	Pop $changeLog
 	
 	nsDialogs::Show
