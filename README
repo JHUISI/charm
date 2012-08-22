@@ -1,24 +1,21 @@
+Charm
+-----
+Charm is a framework for rapidly prototyping advanced cryptosystems.  Based on the Python language, it was designed from the ground up to minimize development time and code complexity while promoting the reuse of components.
+
+Charm uses a hybrid design: performance intensive mathematical operations are implemented in native C modules, while cryptosystems themselves are written in a readable, high-level language.  Charm additionally provides a number of new components to facilitate the rapid development of new schemes and protocols.
+
+Features of Charm include:
+    □ Support for various mathematical settings, including integer rings/fields, bilinear and non-bilinear Elliptic Curve groups
+    □ Base crypto library, including symmetric encryption schemes, hash functions, PRNGs   
+    □ Standard APIs for constructions such as digital signature, encryption, commitments
+    □ A “protocol engine” to simplify the process of implementing multi-party protocols
+    □ An integrated compiler for interactive and non-interactive ZK proofs
+    □ Integrated benchmarking capability
+
 Charm Documentation
 -------------------
-For more complete install docs see http://charm-crypto.com/pydocs/html/install_source.html
-[Intro]
-
-Dependencies
-------------
-To build the Charm framework, you will need to install at a minimum openssl, gmp, and pbc, python2.7 or 3.x, and its development package.
-Openssl is a dependency for Python so you should already have this library installed already. We have provided a make target for automatically building gmp and pbc. Just executing a 'make build' will build and install gmp and pbc in /usr/local directory. Change the install destination for pbc and gmp by specifying DESTDIR with 'make build'.
-
-Note that 'make build' may require super user privileges to install the dependencies.
- 
-Installation Steps
-------------------
-To install the Python package, simply execute the following:
-- make install 
-
-Note that this command may also require super user privileges.
+For complete install docs see http://jhuisi.github.com/charm/install_source.html
 
 Schemes
 -------
-We have provided several cryptographic scheme examples to get you going. However a few of the schemes (e.g. ABE) we provide require an additional Python package. The only package necessary for our Zero-Knowledge compiler and ABE schemes is the pyparsing package. Pyparsing can be easily installed using the 'easy_install' package:
-- easy_install http://cheeseshop.python.org/packages/source/p/pyparsing/pyparsing-1.5.5.tar.gz
-
+We have provided several cryptographic scheme examples to get you going.  See http://jhuisi.github.com/charm/schemes.html

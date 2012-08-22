@@ -1,8 +1,5 @@
-include VERSION README INSTALL configure.sh Makefile CHANGELOG
-recursive-include param/ *.param
-recursive-include tests/ *.py
-recursive-include charm-src/ *.h *.c *.cc *.py *.sh
-recursive-exclude schemes/ ake_ecmqv.py
-prune build auto_batch
+include VERSION README INSTALL configure.sh Makefile CHANGELOG setup.cfg
 graft doc
 graft doc/source
+recursive-include charm *.h *.c *.py
+include distribute_setup.py pytest.ini
