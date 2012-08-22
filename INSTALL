@@ -12,7 +12,7 @@ installation blocks highlighting each respective implementation.
 
 Before we begin, please note the current dependencies:
     
-	Python2.7 (Python 3.0 is supported in a different branch)
+	Python3
 	Pyparsing http://pyparsing.wikispaces.com/
 	GMP http://gmplib.org/ 
 	PBC http://crypto.stanford.edu/pbc/news.html 
@@ -32,13 +32,12 @@ The steps for building in linux this way are:
     3. sudo Make install
 	
 [Ubuntu 10.04 LTS]
-WARNING: Python 2.7 is not supported by apt on Ubuntu. Please see the python 3.x release.
 
 1. Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
 	1. Git
-		sudo apt-get install git
-        2. Python2.x and python2.x-dev where x >= 2.7.
-                You probably need to build these from source.
+		sudo apt-get git
+	2. Python 3 (By default, Ubuntu 10.04 LTS comes with 2.6, this build of charm requires 3.x) and header files/static library
+		sudo apt-get install python3 python3-dev
 	3. m4
 		sudo apt-get install m4
 	4. libssl-dev
@@ -46,7 +45,7 @@ WARNING: Python 2.7 is not supported by apt on Ubuntu. Please see the python 3.x
 
 2. Now we need to obtain a copy of Charm:
 	git clone git://github.com/JHUISI/charm.git
-        git branch 2.7-master 
+
 3. Next, we will install Charm. Navigate to the Charm directory.
 	1. We must first run the configuration script:
 		sudo ./configure.sh
@@ -60,17 +59,17 @@ WARNING: Python 2.7 is not supported by apt on Ubuntu. Please see the python 3.x
 
 1. Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
 	1. Git
-		sudo apt-get install git
+		sudo apt-get git
 	2. m4
 		sudo apt-get install m4
-	3. Header files/static library
-		sudo apt-get install python-dev
-	4. libssl-dev
-		sudo apt-get install
+	3. Python 3 and headers/ static library
+		sudo apt-get install python3
+	4. Header files/static library
+		sudo apt-get install python3-dev (if you did install Python 3)
 
 2. Now we need to obtain a copy of Charm:
 	git clone git://github.com/JHUISI/charm.git
-        git branch 2.7-master 
+
 3. Next, we will install Charm. Navigate to the Charm directory.
 	1. We must first run the configuration script:
 		sudo ./configure.sh
@@ -85,9 +84,11 @@ WARNING: Python 2.7 is not supported by apt on Ubuntu. Please see the python 3.x
 1. Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
 	1. m4
 		su -c "yum install m4"
-	2. Header files/static library
-		su -c "yum install python-devel"
-	3. openssl-devel
+    2. Python 3
+        su -c "yum install python3"
+	3. Header files/static library
+		su -c "yum install python3-devel"
+	4. openssl-devel
 		su -c "yum install openssl-devel"
 
 2. Red Hat/Fedora has decided not to support ECC in OpenSSL due to patent concerns, so we now need to remove their restriction, manually import the required files, and build new shared libraries.
@@ -148,7 +149,7 @@ WARNING: Python 2.7 is not supported by apt on Ubuntu. Please see the python 3.x
 		export LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
 
 3. Now we need to obtain a copy of Charm:
-	git clone -b 2.7-master https://github.com/JHUISI/charm.git
+	git clone -b master https://github.com/JHUISI/charm.git
 
 4. Next, we will install Charm. Navigate to the Charm directory.
 	1. We must first run the configuration script:
@@ -195,15 +196,17 @@ WARNING: Python 2.7 is not supported by apt on Ubuntu. Please see the python 3.x
                 sudo apt-get install git
         2. m4
                 sudo apt-get install m4
-        3. Header files/static library
-                sudo apt-get install python-dev
-        4. libssl-dev
+        3. Python 3
+                sudo apt-get install python3
+        4. Header files/static library
+                sudo apt-get install python3-dev
+        5. libssl-dev (only necessary if you did not install Python 3)
                 sudo apt-get install libssl-dev
-        5. This distro doesn't seem to come with binutils or gcc, install those.
+        6. This distro doesn't seem to come with binutils or gcc, install those.
 
 2. Now we need to obtain a copy of Charm:
 	git clone git://github.com/JHUISI/charm.git
-        git branch 2.7-master 
+
 3. Next, we will install Charm. Navigate to the Charm directory.
         1. We must first run the configuration script:
                 sudo bash ./configure.sh                * Bash to avoid unexpected operator error.

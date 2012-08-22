@@ -103,7 +103,6 @@ class MessageAuthenticatorTest(unittest.TestCase):
         a["alg"]= "alg" 
         assert not m1.verify(a), "expected message to verify";
 
-
-
-
+if __name__ == "__main__":
+    unittest.main()
 
