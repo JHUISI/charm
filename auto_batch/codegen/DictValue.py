@@ -54,6 +54,17 @@ class DictValue:
 
 		return dictStringVarName
 
+	def getListOfKeyNames(self):
+		if (self.keys == None):
+			return None
+
+		retList = []
+
+		for key in self.keys:
+			retList.append(key.getStringVarName())
+
+		return retList
+
 	def setKeys(self, keys):
 		if ( (keys == None) or (type(keys).__name__ != con.listTypePython) ):
 			sys.exit("DictValue->setKeys:  problem with input passed in to the function.")

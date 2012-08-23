@@ -19,6 +19,83 @@ from VariableNamesValue import VariableNamesValue
 from TupleValue import TupleValue
 from ListValue import ListValue
 
+def getValueOfVarNameOneFunc(varName, funcName, varAssignments, sliceName):
+	if (funcName not in varAssignments):
+		sys.exit("Parser_Codegen_Toolbox->getValueOfVarNameOneFunc:  function name passed in is not in varAssignments passed in.")
+
+	foundIt = None
+
+	for variable in varAssignments[funcName]:
+		currentVarName = variable.getName().getStringVarName()
+		if (currentVarName != varName):
+			continue
+
+		if (foundIt != None):
+			sys.exit("Parser_CodeGen_Toolbox->getValueOfVarNameOneFunc:  found duplicate Variable objects with names that are the same as the variable name passed in; not allowed right now.")
+
+		foundIt = variable.getValue()
+
+	if ( (foundIt != None) and (type(foundIt).__name__ == con.dictValue) ):
+		foundItDictValue = None
+		dictKeyCounter = -1
+
+		for currentKeyName in foundIt.getListOfKeyNames():
+			dictKeyCounter += 1
+
+			if (currentKeyName != sliceName):
+				continue
+
+			if (foundItDictValue != None):
+				sys.exit("Parser_CodeGen_Toolbox->getValueOfVarNameOneFunc:  found dictValue with 2 key names that are identical; not supported.")
+
+			foundItDictValue = foundIt.getValues()[dictKeyCounter]
+
+		#print(foundItDictValue)
+		return foundItDictValue
+
+	return foundIt
+
+def getValueOfVarName(varName, preferredFuncName, varAssignments):
+	if (preferredFuncName not in varAssignments):
+		sys.exit("Parser_CodeGen_Toolbox->getValueOfVarName:  preferred function name passed in is not in varAssignments passed in.")
+
+	sliceName = None
+
+	varNameDictBeginChar = varName.find(con.dictBeginChar)
+	if (varNameDictBeginChar != -1):
+		varNameDictName = varName[0:varNameDictBeginChar]
+		sliceName = varName[(varNameDictBeginChar+1):(len(varName)-1)]
+		#sliceName = sliceName.lstrip('\'').rstrip('\'')
+		#sliceName = sliceName.lstrip('"').rstrip('"')
+		#print(sliceName)
+		varName = varNameDictName
+
+	foundIt = getValueOfVarNameOneFunc(varName, preferredFuncName, varAssignments, sliceName)
+
+	if (foundIt != None):
+		return foundIt
+
+	for funcName in varAssignments:
+		if ( (funcName == preferredFuncName) or (funcName == con.mainFuncName) ):
+			continue
+
+		foundItTemp = getValueOfVarNameOneFunc(varName, funcName, varAssignments, sliceName)
+
+		if (foundItTemp == None):
+			continue
+
+		if (foundIt != None):
+			sys.exit("Parser_CodeGen_Toolbox->getValueOfVarName:  found multiple functions that have same variable name declared that aren't the preferred function name; not allowed.")
+
+		foundIt = foundItTemp
+
+	#if (foundIt == None):
+		#print(varName)
+		#print(preferredFuncName)
+		#sys.exit("Parser_CodeGen_Toolbox->getValueOfVarName:  did not find any Value objects in varAssignments that match the variable name passed in.")
+
+	return foundIt
+
 class ASTVarVisitor(ast.NodeVisitor):
 	def __init__(self, myASTParser):
 		if (myASTParser == None):
@@ -908,24 +985,56 @@ class ASTVarVisitor(ast.NodeVisitor):
 
 		return (callingFuncName, funcArgMapOfCallingFunction)
 
-	def getVariableGroupType(self, varName, funcName, functionArgMappings, functionArgNames, returnNodes, varAssignments):
-		if ( (varName == None) or (type(varName).__name__ not in con.variableNameTypes) ):
-			sys.exit("ASTVarVisitor->getVariableGroupType:  problem with variable name parameter passed in.")
+	def getVariableGroupTypeRecursive(self, valueObj, funcName, varAssignments):
+		if (funcName not in varAssignments):
+			sys.exit("ASTVarVisitor->getVariableGroupTypeRecursive:  funcName not in varAssignments.")
 
+		#valueObj = getValueOfVarName(varName, funcName, varAssignments)
+		if (valueObj.getGroupType() != None):
+			return valueObj.getGroupType().getStringVarName()
+
+		if (type(valueObj).__name__ == con.binOpValue):
+			leftType = self.getVariableGroupTypeRecursive(valueObj.getLeft(), funcName, varAssignments)
+			rightType = self.getVariableGroupTypeRecursive(valueObj.getRight(), funcName, varAssignments)
+			opType = valueObj.getOpType()
+			if ( (opType in con.leftAndRightTypesMustMatch) and (leftType != rightType) ):
+				sys.exit("ASTVarVisitor->getVariableGroupTypeRecursive:  found mismatching types in binary operation.")
+
+			return leftType
+		else:
+			nextValueObj = getValueOfVarName(valueObj.getStringVarName(), funcName, varAssignments)
+			if (nextValueObj != None):
+				return self.getVariableGroupTypeRecursive(nextValueObj, funcName, varAssignments)
+
+	#def getVariableGroupType(self, varName, funcName, functionArgMappings, functionArgNames, returnNodes, varAssignments):
+	def getVariableGroupType(self, varName, funcName, varAssignments):
+		#if ( (varName == None) or (type(varName).__name__ not in con.variableNameTypes) ):
+			#sys.exit("ASTVarVisitor->getVariableGroupType:  problem with variable name parameter passed in.")
+
+		'''
 		if ( (functionArgMappings == None) or (type(functionArgMappings).__name__ != con.dictTypePython) or (len(functionArgMappings) == 0) ):
 			sys.exit("ASTVarVisitor->getVariableGroupType:  problem with the function argument mappings dictionary passed in.")
 
 		if ( (functionArgNames == None) or (type(functionArgNames).__name__ != con.dictTypePython) or (len(functionArgNames) == 0) ):
 			sys.exit("ASTVarVisitor->getVariableGroupType:  problem with the function argument names dictionary passed in.")
+		'''
 
 		if ( (varAssignments == None) or (type(varAssignments).__name__ != con.dictTypePython) or (len(varAssignments) == 0) ):
 			sys.exit("ASTVarVisitor->getVariableGroupType:  problem with the variable assignments dictionary passed in.")
 
-		if ( (funcName == None) or (funcName not in varAssignments) or (funcName not in functionArgMappings) or (funcName not in functionArgNames) ):
+		if ( (funcName == None) or (funcName not in varAssignments) ): #or (funcName not in functionArgMappings) or (funcName not in functionArgNames) ):
 			sys.exit("ASTVarVisitor->getVariableGroupType:  problem with the function name passed in.")
 
+		'''
 		if ( (returnNodes == None) or (type(returnNodes).__name__ != con.dictTypePython) or (len(returnNodes) == 0) ):
 			sys.exit("ASTVarVisitor->getVariableGroupType:  problem with the return nodes dictionary passed in.")
+		'''
+
+		valueObj = getValueOfVarName(varName, funcName, varAssignments)
+		if (valueObj == None):
+			sys.exit("ASTVarVisitor->getVariableGroupType:  getValueOfVarname returned None.")
+
+		return self.getVariableGroupTypeRecursive(valueObj, funcName, varAssignments)
 
 		groupTypeList = []
 		maxLineNo = sys.maxsize

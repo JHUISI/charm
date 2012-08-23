@@ -404,7 +404,8 @@ def getCleanVarsVerifyEqDict(varsVerifyEq):
 
 def getTypeFirstAttempt(myASTParser, varNameStruct, functionArgMappings, functionArgNames, returnNodes, varAssignments):
 	myASTVarVisitor = ASTVarVisitor(myASTParser)
-	return (myASTVarVisitor.getVariableGroupType(varNameStruct, con.verifyFuncName, functionArgMappings, functionArgNames, returnNodes, varAssignments))
+	#print(myASTVarVisitor.getVariableGroupType("pk['g^x']", con.verifyFuncName, varAssignments))
+	return (myASTVarVisitor.getVariableGroupType(varNameStruct, con.verifyFuncName, varAssignments))
 
 
 
@@ -463,10 +464,12 @@ def writeBVFile(myASTParser, varAssignments, inputFileName, outputFileName, vars
 	for cleanVarVerifyEqKey,varVerifyEq in zip(cleanVarsVerifyEqDict,varsVerifyEq):
 		cleanVarVerifyEqValue = cleanVarsVerifyEqDict[cleanVarVerifyEqKey]
 		outputString += "  " + cleanVarVerifyEqValue + con.batchVerifierOutputAssignment
-		typeFirstAttempt = getTypeFirstAttempt(myASTParser, varVerifyEq, functionArgMappings, functionArgNames, returnNodes, varAssignments)
-		print(cleanVarVerifyEqKey)
-		print(typeFirstAttempt)
-		print("\n\n")
+		typeFirstAttempt = getTypeFirstAttempt(myASTParser, cleanVarVerifyEqKey, functionArgMappings, functionArgNames, returnNodes, varAssignments)
+		#print(cleanVarVerifyEqKey)
+		#print(typeFirstAttempt)
+		#print("\n\n")
+
+		outputString += typeFirstAttempt
 
 		outputString += "\n"
 
@@ -475,6 +478,16 @@ def writeBVFile(myASTParser, varAssignments, inputFileName, outputFileName, vars
 		#else:
 			#outputString += "  " + varVerifyEq.getStringVarName() + con.batchVerifierOutputAssignment
 			#outputString += "\n"
+
+	messageTypeValueObj = getValueOfVarName(con.messageType, con.mainFuncName, varAssignments)
+	if ( (messageTypeValueObj == None) or (type(messageTypeValueObj).__name__ != con.stringValue) ):
+		sys.exit("AutoBatch_Parser->writeBVFile:  problem with value object returned for message type.")
+
+	outputString += "  M := " + messageTypeValueObj.getStringVarName().lstrip('\'').rstrip('\'') + "\n"
+
+	outputString += "END :: types\n\n"
+
+	outputString += "BEGIN :: precompute\n"
 
 	try:
 		outputFile.write(outputString)
@@ -706,9 +719,10 @@ def main():
 	DELETESTRING.setLineNo(30)
 
 	DELETEME = ASTVarVisitor(myASTParser)
-	deletethistoo = DELETEME.getVariableGroupType(DELETESTRING, "verify", functionArgMappings, functionArgNames, returnNodes, varAssignments)
+	#deletethistoo = DELETEME.getVariableGroupType(DELETESTRING, "verify", functionArgMappings, functionArgNames, returnNodes, varAssignments)
 	#print(deletethistoo)
 
+	#print(getValueOfVarName("g", "dump", varAssignments))
 
 '''
 

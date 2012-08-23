@@ -71,6 +71,8 @@ lambdaTypeAST = 'Lambda'
 lambdaTypeCharm = 'lambda'
 lambdaValue = 'LambdaValue'
 left = 'left'
+
+
 lineNoType = 'lineno'
 lineNumbers = 'LineNumbers'
 
@@ -93,6 +95,7 @@ lParan = '('
 mainFuncName = 'main'
 mathOp = ('left', 'op', 'right')
 maxStrLengthForLoopNames = 4
+messageType = 'M_Type'
 multTypeAST = 'Mult'
 nameOnlyTypeAST = 'Name'
 nameString = 'name'
@@ -173,3 +176,4 @@ unaryOpTypesAST = [invertTypeAST, uSubTypeAST]
 variableNameTypes = [stringName, subscriptName]
 
 eqChecksSuffix = subscriptIndicator + eqChecksIndex
+leftAndRightTypesMustMatch = [addTypeAST, divTypeAST, multTypeAST, subTypeAST]

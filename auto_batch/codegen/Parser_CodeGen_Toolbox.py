@@ -2113,6 +2113,25 @@ def getReturnNodes(functionNames, myASTParser):
 
 	return returnNodes
 
+def getStringNameStringValue(varAssignments, stringNameOfVariable, nameOfFunction):
+	if (nameOfFunction not in varAssignments):
+		sys.exit("Parser_CodeGen_Toolbox->getStringNameStringValue:  nameOfFunction not in varAssignments.")
+
+	functionVariables = varAssignments[nameOfFunction]
+
+	foundIt = None
+
+	for var in functionVariables:
+		currentVarName = var.getName().getStringVarName()
+		if (currentVarName != stringNameOfVariable):
+			continue
+
+		matchingVarValue = var.getValue()
+		if (type(matchingVarValue).__name__ != con.stringValue):
+			sys.exit("Parser_CodeGen_Toolbox->getStringNameStringValue:  value object obtained that corresponds to the Name object found is not of type StringValue.")
+
+		#ddddddd
+
 def getStringNameIntegerValue(varAssignments, stringNameOfVariable, nameOfFunction):
 	if ( (varAssignments == None) or (type(varAssignments).__name__ != con.dictTypePython) or (len(varAssignments) == 0) ):
 		sys.exit("Parser_CodeGen_Toolbox->getStringNameIntegerValue:  problem with the variable assignments dictionary passed in.")

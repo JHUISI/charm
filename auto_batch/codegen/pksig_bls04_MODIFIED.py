@@ -39,8 +39,8 @@ class IBSig():
     def sign(self, x, message):
         M = self.dump(message)
         if debug: print("Message => '%s'" % M)
-        sign_retVal = group.hash(M, G1) ** x
-        return sign_retVal
+        sig = group.hash(M, G1) ** x
+        return sig
         
     def verify(self, pk, sig, message):
         M = self.dump(message)
@@ -52,6 +52,8 @@ class IBSig():
 def main():
     N = 200
     l = 10
+
+    M_Type = "str"
 
     groupObj = PairingGroup('/Users/matt/Documents/charm/param/d224.param')
     

@@ -46,7 +46,7 @@ class BinOpValue:
 		sys.exit("BinOpValue->getOpString:  self.opType is not one of the supported types.")
 
 	def getStringVarName(self):
-		if ( (self.left == None) or (self.opType == None) or (self.right == None) or (self.groupType == None) ):
+		if ( (self.left == None) or (self.opType == None) or (self.right == None) ): # or (self.groupType == None) ):
 			return None
 
 		leftStringVarName = self.left.getStringVarName()
