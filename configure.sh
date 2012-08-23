@@ -111,7 +111,9 @@ integer_module="yes"
 ecc_module="yes"
 pairing_module="yes"
 pairing_miracl="no"
+pairing_relic="no"
 pairing_pbc="yes"
+disable_benchmark="no"
 integer_ssl="no"
 integer_gmp="yes"
 python_version=""
@@ -130,13 +132,7 @@ confsuffix="/charm"
 profiler="no"
 python_path="$(which python)"
 wget="$(which wget)"
-
-#fall back to python if for some reason python3 does not exist 
-# there is still a version check later so it sitll has to be
-# python 3 
-if !  [ -n "$python_path"  ]; then
-   python_path="$(which python)"
-fi 
+ 
 # set -x
 
 # parse CC options first
@@ -338,13 +334,22 @@ for opt do
   ;;
   --disable-pairing) pairing_module="no"
   ;;
+  --disable-benchmark) disable_benchmark="yes"
+  ;;
   --enable-pairing-miracl) 
     echo "Enabling this option assumes you have unzipped the MIRACL library into charm-src/pairingmath/miracl/ and make sure the library is built in that directory."
-  	pairing_pbc="no"
+  	pairing_pbc="no";
   	pairing_miracl="yes" ;
+        pairing_relic="no"
   ;;	
   --enable-pairing-pbc)
     pairing_pbc="yes" ;
+    pairing_miracl="no";
+    pairing_relic="no"
+  ;;
+  --enable-pairing-relic)
+    pairing_relic="yes";
+    pairing_pbc="no" ;
     pairing_miracl="no"
   ;;
   --enable-integer-openssl)
@@ -355,6 +360,9 @@ for opt do
   --enable-integer-gmp)
     integer_gmp="yes" ;
     integer_ssl="no"
+  ;;
+  --enable-integer-relic)
+    echo "integer module using RELIC not supported yet."
   ;;
   --enable-debug)
       # Enable debugging options that aren't excessively noisy
@@ -446,6 +454,7 @@ echo "  --enable-pairing-miracl  enable use of MIRACL lib for pairing module"
 echo "  --enable-pairing-pbc     enable use of PBC lib for pairing module (DEFAULT)"
 echo "  --enable-integer-openssl enable use of openssl for integer module"
 echo "  --enable-integer-gmp     enable use of GMP lib for integer module (DEFAULT)"
+echo "  --disable-benchmark      disable BENCHMARK base module (DEFAULT is no)"
 echo "  --disable-werror         disable compilation abort on warning"
 echo "  --enable-cocoa           enable COCOA (Mac OS X only)"
 echo "  --enable-docs            enable documentation build"
@@ -563,37 +572,17 @@ fi
 #fi
 
 ##########################################
-# python3 probe
+# python probe
 cat > $TMPC << EOF
 import sys
 
-if sys.hexversion >= int(0x2070000):
+if sys.hexversion >= int(0x2070000) && sys.hexversion < int(0x3000000):
    exit(0)
 else:
    print("Need Python 2.7. Specify --python=/path/to/python")
    exit(-1)
 EOF
-python3_found="no"
-$python_path $TMPC
-result=$?
-if test ${result} = 0 ; then
-	python3_found="yes"
-fi
 
-cat > $TMPC << EOF
-try:
-   from pyparsing import *
-   exit(0)
-except ImportError:
-   exit(-1)
-EOF
-
-pyparse_found="no"
-$python_path $TMPC
-result=$?
-if test ${result} = 0 ; then
-   pyparse_found="yes"
-fi
 ##########################################
 # check if the compiler defines offsetof
 
@@ -706,7 +695,7 @@ echo "-Werror enabled   $werror"
 echo "integer module    $integer_module"
 echo "ecc module        $ecc_module"
 echo "pairing module    $pairing_module"
-echo "pyparsing module  $pyparse_found"
+echo "disable benchmark $disable_benchmark"
 echo "libm found        $libm_found"
 echo "libgmp found      $libgmp_found"
 echo "libpbc found      $libpbc_found"
@@ -848,12 +837,22 @@ echo "ECC_MOD=$ecc_module" >> $config_mk
 echo "PAIR_MOD=$pairing_module" >> $config_mk
 
 if test "$pairing_pbc" = "yes" ; then
-	echo "USE_PBC=$pairing_pbc" >> $config_mk
-	echo "USE_GMP=$pairing_pbc" >> $config_mk
+    echo "USE_PBC=$pairing_pbc" >> $config_mk
+    echo "USE_GMP=$pairing_pbc" >> $config_mk
     echo "USE_MIRACL=no" >> $config_mk
 elif test "$pairing_miracl" = "yes" ; then
     echo "USE_MIRACL=$pairing_miracl" >> $config_mk
     echo "USE_PBC=no" >> $config_mk
+elif test "$pairing_relic" = "yes" ; then
+    echo "USE_RELIC=$pairing_relic" >> $config_mk
+    echo "USE_PBC=no" >> $config_mk
+    echo "USE_MIRACL=no" >> $config_mk
+fi
+
+if test "$disable_benchmark" = "yes" ; then
+    echo "DISABLE_BENCHMARK=yes" >> $config_mk
+else
+    echo "DISABLE_BENCHMARK=no" >> $config_mk
 fi
 
 if test "$wget" = "" ; then

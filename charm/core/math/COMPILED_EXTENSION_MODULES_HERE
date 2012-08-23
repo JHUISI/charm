@@ -1,0 +1,6 @@
+Compiled extension modules go here
+
+As of 6/7/2012 these are :
+elliptic_curve.cpython-32mu.so  integer.cpython-32mu.so  pairing.cpython-32mu.so
+
+We need the folder so we get the __init__.py to make them actually importable
