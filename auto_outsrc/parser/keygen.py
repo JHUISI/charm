@@ -62,6 +62,10 @@ def updateCodeAndStructs():
     secretVarNames = getSecretVarNames()
     varDepList = externalGetVarDepList()
 
+    #print(publicVarNames)
+    #print(secretVarNames)
+    #sys.exit("test")
+
 def writeLinesToFuncAfterVarLastAssign(funcName, lineList, varName):
     if (varName == None):
         lineNo = getLineNoOfInputStatement(funcName) + 1
