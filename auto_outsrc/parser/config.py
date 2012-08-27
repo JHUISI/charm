@@ -3,6 +3,7 @@ schemeName = "BSW"
 M = 'M'
 
 blindingLoopVar = "y"
+blindingFactorPrefix = "blindingFactor"
 blindingSuffix = "Blinded"
 setupFuncName = "setup"
 keygenBlindingExponent = "zz"

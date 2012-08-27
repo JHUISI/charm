@@ -24,6 +24,9 @@ currentLambdaFuncName = None
 CPP_varTypesLines = None
 CPP_funcBodyLines = None
 
+blindingFactors_NonLists = None
+blindingFactors_Lists = None
+
 def writeCurrentNumTabsToString():
     outputString = ""
 
@@ -1536,11 +1539,17 @@ def generateMakefile():
 def main(SDL_Scheme):
     global setupFile, transformFile, decOutFile, userFuncsFile, assignInfo, varNamesToFuncs_All
     global varNamesToFuncs_Assign, inputOutputVars, userFuncsCPPFile, functionNameOrder
+    global blindingFactors_NonLists, blindingFactors_Lists
 
     if ( (type(SDL_Scheme) is not str) or (len(SDL_Scheme) == 0) ):
         sys.exit("codegen.py:  sys.argv[1] argument (file name for SDL scheme) passed in was invalid.")
 
-    keygen(SDL_Scheme)
+    (blindingFactors_NonLists, blindingFactors_Lists) = keygen(SDL_Scheme)
+
+    print(blindingFactors_NonLists)
+    print(blindingFactors_Lists)
+    sys.exit("test")
+
     astNodes = getAstNodes()
     assignInfo = getAssignInfo()
     inputOutputVars = getInputOutputVars()

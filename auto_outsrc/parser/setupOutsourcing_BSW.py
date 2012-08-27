@@ -11,6 +11,7 @@ Dj = {}
 Djp = {}
 Cr = {}
 Cpr = {}
+DjBlinded = {}
 
 def setup():
 	global g
@@ -34,6 +35,9 @@ def keygen(pk, mk, S):
 	global Y
 	global Dj
 	global Djp
+	global DjBlinded
+
+	blindingFactor_DjBlinded = {}
 
 	input = [pk, mk, S]
 	SBlinded = S
@@ -41,18 +45,21 @@ def keygen(pk, mk, S):
 	r = group.random(ZR)
 	p0 = (pk[1] ** r)
 	D = ((mk[1] * p0) ** (1 / mk[0]))
-	DBlinded = (D ** (1 / zz))
+	blindingFactor_DBlinded = group.random(ZR)
+	DBlinded = (D ** (1 / blindingFactor_DBlinded))
 	Y = len(S)
 	for y in range(0, Y):
 		s_y = group.random(ZR)
 		y0 = S[y]
-		Dj[y0] = (p0 * (group.hash(y0, G2) ** s_y))
+		Dj[y0] = (p0 * ((group.hash(y0, G2) ** s_y) * mk[1]))
 		Djp[y0] = (g ** s_y)
 	DjpBlinded = Djp
-	DjBlinded = Dj
+	for y in Dj:
+		blindingFactor_DjBlinded[y] = group.random(ZR)
+		DjBlinded[y] = (Dj[y] ** (1 / blindingFactor_DjBlinded[y]))
 	sk = [SBlinded, DBlinded, DjBlinded, DjpBlinded]
 	skBlinded = [SBlinded, DBlinded, DjBlinded, DjpBlinded]
-	output = (zz, skBlinded)
+	output = (blindingFactor_DBlinded, blindingFactor_DjBlinded, skBlinded)
 	return output
 
 def encrypt(pk, M, policy_str):
@@ -94,7 +101,7 @@ if __name__ == "__main__":
 	policy_str = '((four or three) and (two or one))'
 
 	(mk, pk) = setup()
-	(zz, skBlinded) = keygen(pk, mk, S)
+	(blindingFactor_DBlinded, blindingFactor_DjBlinded, skBlinded) = keygen(pk, mk, S)
 	(ct) = encrypt(pk, M, policy_str)
 
 	f_ct_BSW = open('ct_BSW.charmPickle', 'wb')
