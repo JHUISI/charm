@@ -249,6 +249,17 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
     writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls)
     return keygenOutputElem
 
+def getBlindingFactorsLine():
+    outputLine = ""
+
+    for blindingFactor_NonList in blindingFactors_NonLists:
+        outputLine += blindingFactor_NonList + ", "
+
+    for blindingFactor_List in blindingFactors_Lists:
+        outputLine += blindingFactor_List + ", "
+
+    return outputLine
+
 def keygen(file):
     SDLLinesForKeygen = []
 
@@ -286,11 +297,7 @@ def keygen(file):
     outputLine = ""
 
     outputLine += "output := list{"
-    for blindingFactor_NonList in blindingFactors_NonLists:
-        outputLine += blindingFactor_NonList + ", "
-
-    for blindingFactor_List in blindingFactors_Lists:
-        outputLine += blindingFactor_List + ", "
+    outputLine += getBlindingFactorsLine()
 
     outputLine += secretKeyName + blindingSuffix + "}\n"
 
@@ -307,6 +314,21 @@ def keygen(file):
     lineNoEndTypesSection = getEndLineNoOfFunc(TYPES_HEADER)
     appendToLinesOfCode(varNamesForListDecls, lineNoEndTypesSection)
     updateCodeAndStructs()
+
+    existingDecOutInputLineNo = getLineNoOfInputStatement(decOutFunctionName)
+    existingDecOutInputLineNo -= 1
+    existingDecOutInputLine = getLinesOfCode()[existingDecOutInputLineNo]
+
+    replacementBlindingFactorsLine = getBlindingFactorsLine()
+    replacementBlindingFactorsLine = replacementBlindingFactorsLine[0:(len(replacementBlindingFactorsLine) - 1)]
+    newDecOutInputLine = existingDecOutInputLine.replace(keygenBlindingExponent + ",", replacementBlindingFactorsLine, 1)
+
+    substituteOneLineOfCode(newDecOutInputLine, existingDecOutInputLineNo + 1)
+
+    updateCodeAndStructs()
+
+    #printLinesOfCode()
+    #sys.exit("test")
 
     return (blindingFactors_NonLists, blindingFactors_Lists)
 

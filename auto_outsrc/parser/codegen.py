@@ -1546,8 +1546,9 @@ def main(SDL_Scheme):
 
     (blindingFactors_NonLists, blindingFactors_Lists) = keygen(SDL_Scheme)
 
-    print(blindingFactors_NonLists)
-    print(blindingFactors_Lists)
+    printLinesOfCode()
+    #print(blindingFactors_NonLists)
+    #print(blindingFactors_Lists)
     sys.exit("test")
 
     astNodes = getAstNodes()
