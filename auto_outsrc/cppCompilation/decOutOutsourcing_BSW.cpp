@@ -1,6 +1,6 @@
 #include "userFuncs_BSW.h"
 
-string decout(PairingGroup & group, CharmDict & partCT, ZR & zz, GT & egg)
+string decout(PairingGroup & group, CharmDict & partCT, ZR & blindingFactor_DBlinded, ZR & blindingFactor_DjBlinded, GT & egg)
 {
 	GT T0;
 	string T1;

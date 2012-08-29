@@ -1546,10 +1546,10 @@ def main(SDL_Scheme):
 
     (blindingFactors_NonLists, blindingFactors_Lists) = keygen(SDL_Scheme)
 
-    printLinesOfCode()
+    #printLinesOfCode()
     #print(blindingFactors_NonLists)
     #print(blindingFactors_Lists)
-    sys.exit("test")
+    #sys.exit("test")
 
     astNodes = getAstNodes()
     assignInfo = getAssignInfo()
@@ -1593,6 +1593,8 @@ if __name__ == "__main__":
     main(sys.argv[1])
     parseLinesOfCode(getLinesOfCode(), True)
     #os.system("cp userFuncsPermanent.py userFuncs.py")
+    #printLinesOfCode()
+    #sys.exit("test")
     writeLinesOfCodeToFile(outputSDLFileName)
     #print("io vars:  ", getInputOutputVars())
     lll = getFinalVarType("gl#0", "setup")
