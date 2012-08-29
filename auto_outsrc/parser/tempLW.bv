@@ -21,6 +21,7 @@ K := list
 C1 := list
 C2 := list
 C3 := list
+gid := str
 END :: types
 
 BEGIN :: func:setup
@@ -48,8 +49,6 @@ msk#z := list{alpha, y}
 pk#z := list{eggalph, g2y}
 END :: for
 
-pk#123456 := e(g, g_2)
-
 output := list{msk, pk}
 END :: func:authsetup
 
@@ -58,6 +57,8 @@ input := list{gpk, msk, gid, userS}
 gpk := expand{g, g_2}
 h := H(gid, G1)
 
+deleteMeVar := msk#0#0
+
 Y := len(userS)
 BEGIN :: for
 for{i := 0, Y}
@@ -65,10 +66,9 @@ z := userS#i
 K#z := (g ^ msk#z#0) * (h ^ msk#z#1)
 END :: for
 
-sk := list{gid, userS, K}
+sk := list{gid, userS, K, deleteMeVar}
 output := sk
 END :: func:keygen
-
 
 BEGIN :: func:encrypt
 input := list{pk, gpk, M, policy_str}
@@ -97,12 +97,11 @@ ct := list{policy_str, C0, C1, C2, C3}
 output := ct
 END :: func:encrypt
 
-
 BEGIN :: func:decrypt
 input := list{gpk, sk, ct}
 gpk := expand{g, g_2}
 ct := expand{policy_str, C0, C1, C2, C3}
-sk := expand{gid, userS, K}
+sk := expand{gid, userS, K, deleteMeVar}
 
 policy := createPolicy(policy_str)
 attrs  := prune(policy, userS)

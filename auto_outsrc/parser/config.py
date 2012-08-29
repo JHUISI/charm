@@ -1,24 +1,26 @@
-schemeName = "BSW"
+schemeName = "LW"
 
 M = 'M'
 
 blindingLoopVar = "y"
+
 blindingFactorPrefix = "blindingFactor"
+
 blindingSuffix = "Blinded"
-setupFuncName = "setup"
+setupFuncName = "authsetup"
 keygenBlindingExponent = "zz"
 keygenBlindingExponentType = "ZR"
 keygenFuncName = "keygen"
 
 encryptFuncName = "encrypt"
 
+masterPubVars = ["gpk", "pk"]
+masterSecVars = ["msk"]
+
 # superset of variables we have used to represent public parameters in
 # our crypto schemes
-keygenPubVar = ["pk"]
+keygenPubVar = ["pk", "gpk"]
 keygenSecVar = "sk"
-
-masterPubVars = ["pk"]
-masterSecVars = ["mk"]
 
 pySuffix = ".py"
 cppSuffix = ".cpp"
