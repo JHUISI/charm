@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Charm for Android &mdash; Charm-Crypto 0.42b documentation</title>
+    <title>Charm Package Structure &mdash; Charm-Crypto 0.42b documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -26,8 +26,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Charm-Crypto 0.42b documentation" href="index.html" />
-    <link rel="next" title="Charm Package Structure" href="packages.html" />
-    <link rel="prev" title="For App Developers" href="developers.html" /> 
+    <link rel="next" title="Demonstration Schemes" href="schemes.html" />
+    <link rel="prev" title="Charm for Android" href="mobile.html" /> 
   </head>
   <body>
     <div class="related">
@@ -40,10 +40,10 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="packages.html" title="Charm Package Structure"
+          <a href="schemes.html" title="Demonstration Schemes"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="developers.html" title="For App Developers"
+          <a href="mobile.html" title="Charm for Android"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li> 
       </ul>
@@ -54,27 +54,50 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="charm-for-android">
-<h1>Charm for Android<a class="headerlink" href="#charm-for-android" title="Permalink to this headline">¶</a></h1>
-<p>Installing Charm on Android:</p>
+  <div class="section" id="charm-package-structure">
+<h1>Charm Package Structure<a class="headerlink" href="#charm-package-structure" title="Permalink to this headline">¶</a></h1>
+<p>Recent changes to the Charm infrastructure in 0.42b may break your existing scheme implementations:</p>
+<ul>
+<li><dl class="first docutils">
+<dt>charm/</dt>
+<dd><ul class="first last">
+<li><p class="first">adapters/ : charm.adapters pkg</p>
+</li>
+<li><p class="first">core/ : charm.core</p>
 <blockquote>
-<div><ol class="arabic simple">
-<li>Install <tt class="docutils literal"><span class="pre">Python3ForAndroid.apk</span></tt> found in github repository on your Android device. Note that this particular installer will be posted on github soon.</li>
-<li>Install the <tt class="docutils literal"><span class="pre">SL4A</span></tt> package at the following link: <a class="reference external" href="https://android-scripting.googlecode.com/files/sl4a_r6.apk">https://android-scripting.googlecode.com/files/sl4a_r6.apk</a></li>
-<li>Charm Advanced Setup: Download <tt class="docutils literal"><span class="pre">pkg_resources.py</span></tt> and place in the appropriate place using the ADB tool. Configure your device to enable the android debug bridge and connect to your machine via USB. Next, use <tt class="docutils literal"><span class="pre">adb</span></tt> to push the <tt class="docutils literal"><span class="pre">pkg_resources.py</span></tt> and <tt class="docutils literal"><span class="pre">charm-schemes</span></tt> to a specified location on your SD card. Execute the following command:</li>
-</ol>
-<ul class="simple">
-<li><tt class="docutils literal"><span class="pre">adb</span> <span class="pre">push</span> <span class="pre">pkg_resources</span> <span class="pre">/mnt/sdcard/com.googlecode.python3forandroid/extras/python3/lib/python3.2/site-packages</span></tt></li>
-<li><tt class="docutils literal"><span class="pre">adb</span> <span class="pre">push</span> <span class="pre">schemes</span> <span class="pre">/mnt/sdcard/sl4a/scripts/schemes</span></tt></li>
+<div><ul>
+<li><p class="first">benchmark/ : charm.core.benchmark</p>
+</li>
+<li><p class="first">crypto/ : charm.core.crypto : base modules</p>
+</li>
+<li><p class="first">engine/ : charm.core.engine : protocol engine core modules</p>
+</li>
+<li><p class="first">math/ : charm.core.math</p>
+<blockquote>
+<div><ul class="simple">
+<li>elliptic_curve/ : charm.core.math.elliptic_curve</li>
+<li>integer/ : charm.core.math.integer</li>
+<li>pairing/ : charm.core.math.pairing</li>
+<li>utilities/ : charm.core.math.utilities</li>
 </ul>
 </div></blockquote>
-<p>See more detailed blog posts on installing Charm on Android:</p>
-<blockquote>
-<div><ol class="arabic simple">
-<li><a class="reference external" href="http://mhlakhani.com/blog/2012/05/charm-on-android/">http://mhlakhani.com/blog/2012/05/charm-on-android/</a></li>
-<li><a class="reference external" href="http://michael-rushanan.blogspot.com/2012/07/charm4a-part-0-why-bother.html">http://michael-rushanan.blogspot.com/2012/07/charm4a-part-0-why-bother.html</a></li>
-</ol>
+</li>
+</ul>
 </div></blockquote>
+</li>
+<li><p class="first">schemes/ : charm.schemes</p>
+</li>
+<li><p class="first">test/ : charm.test</p>
+</li>
+<li><p class="first">toolbox/ charm.toolbox</p>
+</li>
+<li><p class="first">zkp_compiler/ : charm.zkp_compiler</p>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
 </div>
 
 
@@ -84,14 +107,14 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="developers.html"
-                        title="previous chapter">For App Developers</a></p>
+  <p class="topless"><a href="mobile.html"
+                        title="previous chapter">Charm for Android</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="packages.html"
-                        title="next chapter">Charm Package Structure</a></p>
+  <p class="topless"><a href="schemes.html"
+                        title="next chapter">Demonstration Schemes</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="_sources/mobile.txt"
+    <li><a href="_sources/packages.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
@@ -121,10 +144,10 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="packages.html" title="Charm Package Structure"
+          <a href="schemes.html" title="Demonstration Schemes"
              >next</a> |</li>
         <li class="right" >
-          <a href="developers.html" title="For App Developers"
+          <a href="mobile.html" title="Charm for Android"
              >previous</a> |</li>
         <li><a href="index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li> 
       </ul>
