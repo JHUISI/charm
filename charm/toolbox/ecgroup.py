@@ -1,6 +1,9 @@
-#from charm.core.math.elliptic_curve import *
-from charm.core.math.elliptic_curve import elliptic_curve,ZR,G,init,random,order,getGenerator,bitsize,serialize,deserialize,hashEC,encode,decode,getXY
-#from charm.core.math.elliptic_curve import InitBenchmark,StartBenchmark,EndBenchmark,GetBenchmak,GetGeneralBenchmarks,ClearBenchmark
+try:
+   from charm.core.math.elliptic_curve import elliptic_curve,ZR,G,init,random,order,getGenerator,bitsize,serialize,deserialize,hashEC,encode,decode,getXY
+   #from charm.core.math.elliptic_curve import InitBenchmark,StartBenchmark,EndBenchmark,GetBenchmark,GetGeneralBenchmarks,ClearBenchmark
+except Exception as err:
+   print(err)
+   exit(-1)
 
 class ECGroup():
     def __init__(self, builtin_cv):

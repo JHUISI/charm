@@ -1,9 +1,13 @@
-import charm.core.crypto.cryptobase
-from charm.core.math.pairing import pairing,ZR
-from charm.core.math.integer import integer,int2Bytes
-from charm.toolbox.conversion import Conversion
-from charm.toolbox.bitstring import Bytes
-import hashlib, base64
+try:
+  import charm.core.crypto.cryptobase
+  from charm.core.math.pairing import pairing,ZR
+  from charm.core.math.integer import integer,int2Bytes
+  from charm.toolbox.conversion import Conversion
+  from charm.toolbox.bitstring import Bytes
+  import hashlib, base64
+except Exception as err:
+  print(err)
+  exit(-1)
 
 class Hash():
     def __init__(self, htype='sha1', pairingElement=None, integerElement=None):        
@@ -23,9 +27,9 @@ class Hash():
             # do something related to that
         if type(value) == integer:
             str_value = int2Bytes(value)
-#            print("str_value =>", str_value)
-#            val = self.group.hash(str_value, ZR)
-#            print("hash =>", val)
+            #print("str_value =>", str_value)
+            #val = self.group.hash(str_value, ZR)
+            #print("hash =>", val)
             return integer(int(self.group.hash(str_value, ZR)))
         return None
     

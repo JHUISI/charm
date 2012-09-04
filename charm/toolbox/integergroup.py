@@ -1,5 +1,10 @@
-from charm.core.math.integer import integer,randomBits,random,randomPrime,isPrime,encode,decode,hashInt,bitsize,legendre,gcd,lcm,serialize,deserialize,int2Bytes,toInt
-
+try:
+  from charm.core.math.integer import integer,randomBits,random,randomPrime,isPrime,encode,decode,hashInt,bitsize,legendre,gcd,lcm,serialize,deserialize,int2Bytes,toInt
+  #from charm.core.math.integer import InitBenchmark,StartBenchmark,EndBenchmark,GetBenchmark,GetGeneralBenchmarks,ClearBenchmark
+except Exception as err:
+  print(err)
+  exit(-1)
+    
 class IntegerGroup:
     def __init__(self, start=0):
         pass
