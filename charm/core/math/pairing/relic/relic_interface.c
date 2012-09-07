@@ -24,7 +24,7 @@
 *   @brief   charm interface over RELIC's pairing-based crypto module
 *
 *   @author  ayo.akinyele@charm-crypto.com
-*   @status  not complete: g2_map and modular division operations not working correctly (as of 8/6/12)
+*   @status  not complete: modular division operations not working correctly (as of 8/6/12)
 *
 ************************************************************************/
 
@@ -279,6 +279,8 @@ status_t element_sub(element_t c, element_t a, element_t b)
 	if(type == ZR) {
 		bn_sub(c->bn, a->bn, b->bn);
 		bn_mod(c->bn, c->bn, c->order);
+		if(bn_sign(c->bn) == BN_NEG) bn_add(c->bn, c->bn, a->order);
+
 	}
 	else if(type == G1) {
 		g1_sub(c->g1, a->g1, b->g1);
@@ -508,6 +510,7 @@ status_t element_neg(element_t c, element_t a)
 
 	if(type == ZR) {
 		bn_neg(c->bn, a->bn);
+		bn_add(c->bn, c->bn, a->order);
 	}
 	else if(type == G1) {
 		g1_neg(c->g1, a->g1);
@@ -701,8 +704,14 @@ status_t element_from_hash(element_t e, unsigned char *data, int len)
 	memset(digest, 0, digest_len);
 	SHA_FUNC(digest, data, len);
 
+#ifdef DEBUG
+	printf("%s: digest: ", __FUNCTION__);
+	print_as_hex(digest, digest_len);
+#endif
+
 	switch(type) {
 		case ZR: bn_read_bin(e->bn, digest, digest_len);
+				 if(bn_cmp(e->bn, e->order) == CMP_GT) bn_mod(e->bn, e->bn, e->order);
 				 break;
 		case G1: g1_map(e->g1, digest, digest_len);
 				 break;
@@ -1057,13 +1066,20 @@ status_t hash_buffer_to_bytes(uint8_t *input, int input_len, uint8_t *output, in
 {
 	LEAVE_IF(input == NULL || output == NULL, "uninitialized argument.");
 	// adds an extra null byte by default - will use this last byte for the label
-	int digest_len = SHA_LEN;
+	int digest_len = SHA_LEN, i;
 
 	if(digest_len <= output_len) {
 		// hash buf using md_map_sh256 and store data_len bytes in data
 		uint8_t digest[digest_len + 1];
+		uint8_t input2[input_len + 2];
+		memset(input2, 0, input_len + 1);
+		// set prefix
+		input2[0] = 0xFF & label;
+		// copy remaining bytes
+		for(i = 1; i <= input_len; i++)
+			input2[i] = input[i];
 		memset(digest, 0, digest_len);
-		SHA_FUNC(digest, input, input_len);
+		SHA_FUNC(digest, input2, input_len+1);
 		memcpy(output, digest, digest_len);
 #ifdef DEBUG
 		printf("%s: digest: ", __FUNCTION__);
