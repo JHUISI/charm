@@ -1,6 +1,10 @@
 from __future__ import print_function
-from charm.toolbox.pairingcurves import params as param_info
-from charm.core.math.pairing import pairing,ZR,G1,G2,GT,init,pair,hashPair,H,random,serialize,deserialize,ismember,order
+try:
+  from charm.toolbox.pairingcurves import params as param_info
+  from charm.core.math.pairing import pairing,ZR,G1,G2,GT,init,pair,hashPair,H,random,serialize,deserialize,ismember,order
+except Exception as err:
+  print(err)
+  exit(-1)
 
 class PairingGroup():
     def __init__(self, param_id, param_file=False, secparam=512):        
