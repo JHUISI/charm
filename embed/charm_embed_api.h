@@ -139,7 +139,8 @@ Charm_t *InitPairingGroup(Charm_t *pModule, const char *param_id);
 Charm_t *InitECGroup(Charm_t *pModule, int param_id);
 Charm_t *InitIntegerGroup(Charm_t *pModule, int param_id);
 
-Charm_t *InitClass(const char *class_file, const char *class_name, Charm_t *pObject);
+Charm_t *InitScheme(const char *class_file, const char *class_name, Charm_t *pObject);
+Charm_t *InitAdapter(const char *class_file, const char *class_name, Charm_t *pObject1, Charm_t *pObject2);
 Charm_t *CallMethod(Charm_t *pObject, const char *func_name, char *types, ...);
 
 /* retrieve objects inside a Python tuple or list by index number: must decref result */
@@ -147,6 +148,9 @@ Charm_t *GetIndex(Charm_t *pObject, int index);
 /* retrieve objects inside a Python dictionary by key string: must decref result */
 Charm_t *GetDict(Charm_t *pObject, char *key);
 result_t getType(PyObject *o);
+
+Charm_t *objectToBytes(Charm_t *object, Charm_t *group);
+Charm_t *bytesToObject(Charm_t *object, Charm_t *group);
 
 #define Free Py_XDECREF
 
@@ -157,6 +161,7 @@ result_t getType(PyObject *o);
             	PyElement *elem;		\
             	uint8_t *b;				\
             	result_t r = getType(obj);	\
+            	if(obj == NULL) { printf("NULL object.\n"); r = NONE_T; } \
 				switch (r)						\
 				{								\
 					case PYDICT_T:				\
