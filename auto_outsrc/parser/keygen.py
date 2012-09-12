@@ -311,6 +311,9 @@ def keygen(file):
     for index_listVars in range(0, len(varNamesForListDecls)):
         varNamesForListDecls[index_listVars] = varNamesForListDecls[index_listVars] + blindingSuffix + " := list\n"
 
+    for blindingFactor_List in blindingFactors_Lists:
+        varNamesForListDecls.append(blindingFactor_List + " := list\n")
+
     lineNoEndTypesSection = getEndLineNoOfFunc(TYPES_HEADER)
     appendToLinesOfCode(varNamesForListDecls, lineNoEndTypesSection)
     updateCodeAndStructs()

@@ -23,127 +23,128 @@
 23:  C3 := list
 24:  gid := str
 25:  KBlinded := list
-26:  END :: types
-27:  
-28:  BEGIN :: func:setup
-29:  input := None
-30:  g := random(G1)
-31:  g_2 := random(G2)
-32:  gpk := list{g, g_2}
-33:  
-34:  output := gpk
-35:  END :: func:setup
-36:  
-37:  BEGIN :: func:authsetup
-38:  input := list{gpk, authS}
-39:  gpk := expand{g, g_2}
-40:  
-41:  Y := len(authS)
-42:  BEGIN :: for
-43:  for{i := 0, Y}
-44:  alpha := random(ZR)
-45:  y := random(ZR)
-46:  z := authS#i
-47:  eggalph := e(g, g_2)^alpha
-48:  g2y := g_2^y
-49:  msk#z := list{alpha, y}
-50:  pk#z := list{eggalph, g2y}
-51:  END :: for
-52:  
-53:  output := list{msk, pk}
-54:  END :: func:authsetup
-55:  
-56:  BEGIN :: func:keygen
-57:  input := list{gpk, msk, gid, userS}
-58:  userSBlinded := userS
-59:  gidBlinded := gid
-60:  zz := random(ZR)
-61:  gpk := expand{g, g_2}
-62:  h := H(gidBlinded,G1)
-63:  
-64:  deleteMeVar := msk#0#0
-65:  blindingFactor_deleteMeVarBlinded := random(ZR)
-66:  deleteMeVarBlinded := deleteMeVar ^ (1/blindingFactor_deleteMeVarBlinded)
-67:  
-68:  Y := len(userS)
-69:  BEGIN :: for
-70:  for{i := 0,Y}
-71:  z := userS#i
-72:  K#z := ((g^msk#z#0) * (h^msk#z#1))
-73:  END :: for
-74:  
-75:  BEGIN :: forall
-76:  forall{y := K}
-77:  blindingFactor_KBlinded#y := random(ZR)
-78:  KBlinded#y := (K#y^(1 / blindingFactor_KBlinded#y))
-79:  END :: forall
-80:  sk := list{gidBlinded, userSBlinded, KBlinded, deleteMeVarBlinded}
-81:  skBlinded := list{gidBlinded, userSBlinded, KBlinded, deleteMeVarBlinded}
-82:  output := list{blindingFactor_deleteMeVarBlinded, blindingFactor_KBlinded, skBlinded}
-83:  END :: func:keygen
-84:  
-85:  BEGIN :: func:encrypt
-86:  input := list{pk, gpk, M, policy_str}
-87:  gpk := expand{g, g_2}
-88:  
-89:  policy := createPolicy(policy_str)
-90:  attrs := getAttributeList(policy)
-91:  egg := e(g,g_2)
-92:  R := random(GT)
-93:  hashRandM := list{R,M}
-94:  s := H(hashRandM,ZR)
-95:  s_sesskey := DeriveKey(R)
-96:  C0 := (R * (egg^s))
-97:  w := 0
-98:  s_sh := calculateSharesDict(s, policy)
-99:  w_sh := calculateSharesDict(w, policy)
-100:  Y := len(s_sh)
-101:  
-102:  BEGIN :: for
-103:  for{y := 0, Y}
-104:  r := random(ZR)
-105:  k := attrs#y
-106:  C1#k := (egg ^ s_sh#k) * (pk#k#0 ^ r)
-107:  C2#k := g_2^r
-108:  C3#k := (pk#k#1 ^ r) * (g_2 ^ w_sh#k)
-109:  T1 := SymEnc(s_sesskey , M)
-110:  END :: for
-111:  
-112:  ct := list{policy_str, C0, C1, C2, C3, T1}
-113:  output := ct
-114:  END :: func:encrypt
-115:  
+26:  blindingFactor_KBlinded := list
+27:  END :: types
+28:  
+29:  BEGIN :: func:setup
+30:  input := None
+31:  g := random(G1)
+32:  g_2 := random(G2)
+33:  gpk := list{g, g_2}
+34:  
+35:  output := gpk
+36:  END :: func:setup
+37:  
+38:  BEGIN :: func:authsetup
+39:  input := list{gpk, authS}
+40:  gpk := expand{g, g_2}
+41:  
+42:  Y := len(authS)
+43:  BEGIN :: for
+44:  for{i := 0, Y}
+45:  alpha := random(ZR)
+46:  y := random(ZR)
+47:  z := authS#i
+48:  eggalph := e(g, g_2)^alpha
+49:  g2y := g_2^y
+50:  msk#z := list{alpha, y}
+51:  pk#z := list{eggalph, g2y}
+52:  END :: for
+53:  
+54:  output := list{msk, pk}
+55:  END :: func:authsetup
+56:  
+57:  BEGIN :: func:keygen
+58:  input := list{gpk, msk, gid, userS}
+59:  userSBlinded := userS
+60:  gidBlinded := gid
+61:  zz := random(ZR)
+62:  gpk := expand{g, g_2}
+63:  h := H(gidBlinded,G1)
+64:  
+65:  deleteMeVar := msk#0#0
+66:  blindingFactor_deleteMeVarBlinded := random(ZR)
+67:  deleteMeVarBlinded := deleteMeVar ^ (1/blindingFactor_deleteMeVarBlinded)
+68:  
+69:  Y := len(userS)
+70:  BEGIN :: for
+71:  for{i := 0,Y}
+72:  z := userS#i
+73:  K#z := ((g^msk#z#0) * (h^msk#z#1))
+74:  END :: for
+75:  
+76:  BEGIN :: forall
+77:  forall{y := K}
+78:  blindingFactor_KBlinded#y := random(ZR)
+79:  KBlinded#y := (K#y^(1 / blindingFactor_KBlinded#y))
+80:  END :: forall
+81:  sk := list{gidBlinded, userSBlinded, KBlinded, deleteMeVarBlinded}
+82:  skBlinded := list{gidBlinded, userSBlinded, KBlinded, deleteMeVarBlinded}
+83:  output := list{blindingFactor_deleteMeVarBlinded, blindingFactor_KBlinded, skBlinded}
+84:  END :: func:keygen
+85:  
+86:  BEGIN :: func:encrypt
+87:  input := list{pk, gpk, M, policy_str}
+88:  gpk := expand{g, g_2}
+89:  
+90:  policy := createPolicy(policy_str)
+91:  attrs := getAttributeList(policy)
+92:  egg := e(g,g_2)
+93:  R := random(GT)
+94:  hashRandM := list{R,M}
+95:  s := H(hashRandM,ZR)
+96:  s_sesskey := DeriveKey(R)
+97:  C0 := (R * (egg^s))
+98:  w := 0
+99:  s_sh := calculateSharesDict(s, policy)
+100:  w_sh := calculateSharesDict(w, policy)
+101:  Y := len(s_sh)
+102:  
+103:  BEGIN :: for
+104:  for{y := 0, Y}
+105:  r := random(ZR)
+106:  k := attrs#y
+107:  C1#k := (egg ^ s_sh#k) * (pk#k#0 ^ r)
+108:  C2#k := g_2^r
+109:  C3#k := (pk#k#1 ^ r) * (g_2 ^ w_sh#k)
+110:  T1 := SymEnc(s_sesskey , M)
+111:  END :: for
+112:  
+113:  ct := list{policy_str, C0, C1, C2, C3, T1}
+114:  output := ct
+115:  END :: func:encrypt
 116:  
-117:  # change rule for moving exp into a variable : only if it's a negative exponent! nothing else!
-118:  BEGIN :: func:transform
-119:  input := list{gpk, skBlinded, ct}
-120:  gpk := expand{g, g_2}
-121:  ct := expand{policy_str, C0, C1, C2, C3, T1}
-122:  skBlinded := expand{gid, userS, K, deleteMeVar}
-123:  policy := createPolicy(policy_str)
-124:  attrs := prune(policy, userS)
-125:  coeff := getCoefficients(policy)
-126:  h_gid := H(gid,G1)
-127:  Y := len(attrs)
-128:  A := (prod{y := attrs#1,Y} on (((C1#y^coeff#y) * e((h_gid^coeff#y),C3#y)) * e((K#y^-coeff#y),C2#y)))
-129:  T0 := C0
-130:  T2 := A
-131:  partCT := symmap{T0, T1, T2}
-132:  output := partCT
-133:  END :: func:transform
-134:  
-135:  BEGIN :: func:decout
-136:  input := list{partCT, blindingFactor_deleteMeVarBlinded, blindingFactor_KBlinded, egg}
-137:  partCT := expand{T0, T1, T2}
-138:  R := T0 / (T2^zz)
-139:  s_sesskey := DeriveKey( R )
-140:  M := SymDec(s_sesskey, T1)
-141:  hashRandM := list{R,M}
-142:  s := H(hashRandM,ZR)
-143:  BEGIN :: if
-144:  if { (T0 == (R * (egg ^ s))) and (T2 == (egg ^ (s / zz))) }
-145:  output := M
-146:  else
-147:  error('invalid ciphertext')
-148:  END :: if
-149:  END :: func:decout
+117:  
+118:  # change rule for moving exp into a variable : only if it's a negative exponent! nothing else!
+119:  BEGIN :: func:transform
+120:  input := list{gpk, skBlinded, ct}
+121:  gpk := expand{g, g_2}
+122:  ct := expand{policy_str, C0, C1, C2, C3, T1}
+123:  skBlinded := expand{gid, userS, K, deleteMeVar}
+124:  policy := createPolicy(policy_str)
+125:  attrs := prune(policy, userS)
+126:  coeff := getCoefficients(policy)
+127:  h_gid := H(gid,G1)
+128:  Y := len(attrs)
+129:  A := (prod{y := attrs#1,Y} on (((C1#y^coeff#y) * e((h_gid^coeff#y),C3#y)) * e((K#y^-coeff#y),C2#y)))
+130:  T0 := C0
+131:  T2 := A
+132:  partCT := symmap{T0, T1, T2}
+133:  output := partCT
+134:  END :: func:transform
+135:  
+136:  BEGIN :: func:decout
+137:  input := list{partCT, blindingFactor_deleteMeVarBlinded, blindingFactor_KBlinded, egg}
+138:  partCT := expand{T0, T1, T2}
+139:  R := T0 / (T2^zz)
+140:  s_sesskey := DeriveKey( R )
+141:  M := SymDec(s_sesskey, T1)
+142:  hashRandM := list{R,M}
+143:  s := H(hashRandM,ZR)
+144:  BEGIN :: if
+145:  if { (T0 == (R * (egg ^ s))) and (T2 == (egg ^ (s / zz))) }
+146:  output := M
+147:  else
+148:  error('invalid ciphertext')
+149:  END :: if
+150:  END :: func:decout
