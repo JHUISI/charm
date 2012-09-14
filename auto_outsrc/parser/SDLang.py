@@ -21,7 +21,7 @@ AST simple rules
 * support batch for different messages/signers/public keys.
 '''
 
-from toolbox.enum import *
+from charm.toolbox.enum import *
 import string, sys
 
 inputKeyword = "input"
