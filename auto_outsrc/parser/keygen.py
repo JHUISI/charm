@@ -2,6 +2,7 @@ from SDLParser import *
 from config import *
 from transform import *
 from rcca import *
+from secretListInKeygen import *
 from outsrctechniques import SubstituteVar
 import sys
 
