@@ -1309,6 +1309,7 @@ def getLineNoOfInputStatement(funcName):
         sys.exit("getLineNoOfInputStatement in SDLParser.py received as input for function name an invalid parameter.")
 
     if (funcName not in assignInfo):
+        print(funcName)
         sys.exit("Function name passed in to getLineNoOfInputStatement in SDLParser.py is not in assignInfo.")
 
     if (inputKeyword not in assignInfo[funcName]):
