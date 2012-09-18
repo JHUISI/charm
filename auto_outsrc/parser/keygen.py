@@ -2,6 +2,7 @@ from SDLParser import *
 from config import *
 from transform import *
 from rcca import *
+from secretListInKeygen import *
 from outsrctechniques import SubstituteVar
 import sys
 
@@ -267,8 +268,17 @@ def keygen(file):
         sys.exit("First argument passed to keygen.py is invalid.")
 
     parseFile2(file, False)
-    (varsToBlindList, rccaData) = (transform(False))
-    rcca(rccaData)
+
+
+    config = __import__('config')
+
+
+    varsToBlindList = getSecretList(config, False)
+
+    #(varsToBlindList, rccaData) = (transform(False))
+    #rcca(rccaData)
+
+
     varNamesForListDecls = []
 
     updateCodeAndStructs()
@@ -318,6 +328,13 @@ def keygen(file):
     appendToLinesOfCode(varNamesForListDecls, lineNoEndTypesSection)
     updateCodeAndStructs()
 
+
+    (varsToBlindList, rccaData) = (transform(False))
+    rcca(rccaData)
+
+
+
+
     existingDecOutInputLineNo = getLineNoOfInputStatement(decOutFunctionName)
     existingDecOutInputLineNo -= 1
     existingDecOutInputLine = getLinesOfCode()[existingDecOutInputLineNo]
@@ -332,6 +349,11 @@ def keygen(file):
 
     #printLinesOfCode()
     #sys.exit("test")
+
+
+    #(varsToBlindList, rccaData) = (transform(False))
+    #rcca(rccaData)
+
 
     return (blindingFactors_NonLists, blindingFactors_Lists)
 
