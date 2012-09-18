@@ -157,45 +157,10 @@ def benchBatchVerification(N, equation, sdl_dict, vars, precompute, _verbose):
         print_results(rop_batch.ops)
     return calculate_times(rop_batch.ops, curve[param_id], N)
 
-def proofHeader(lcg, title, const, sigs, indiv_eq, batch_eq):
-    const_str = ""; sig_str = ""
-    for i in const:
-        const_str += lcg.getLatexVersion(i) + ","
-    const_str = const_str[:len(const_str)-1]
-    for i in sigs:
-        sig_str += lcg.getLatexVersion(i) + ","
-    sig_str = sig_str[:len(sig_str)-1]
-    result = header % (title, title, const_str, sig_str, indiv_eq, batch_eq)
-    #print("header =>", result)
-    return result
-
-def proofBody(step, data):
-    pre_eq = data.get('preq')
-    cur_eq = data['eq']
-    if pre_eq != None:
-        result_eq = pre_eq + cur_eq
-    else: result_eq = cur_eq    
-    result = basic_step % (step, data['msg'], result_eq)
-    #print('[STEP', step, ']: ', result)
-    return result
-
-def writeConfig(lcg, latex_file, lcg_data, const, vars, sigs):
-    f = open('verification_gen' + latex_file + '.tex', 'w')
-    title = latex_file.upper()
-    outputStr = proofHeader(lcg, title, const, sigs, lcg_data[0]['eq'], lcg_data[0]['batch'])
-    for i in lcg_data.keys():
-        if i != 0:
-            outputStr += proofBody(i, lcg_data[i])
-    outputStr += footer
-    f.write(outputStr)
-    f.close()
-    return
- 
 def writeFile(file_name, file_contents):
      f = open(file_name, 'w')
      f.write(file_contents)
      f.close()
- 
  
 def runBatcher(opts, proofGen, file, verify, ast_struct, eq_number=0):
     global PROOFGEN_FLAG, THRESHOLD_FLAG, CODEGEN_FLAG, PRECOMP_CHECK, VERBOSE, CHOOSE_STRATEGY
@@ -347,13 +312,9 @@ def runBatcher(opts, proofGen, file, verify, ast_struct, eq_number=0):
            print(Tech.rule, "\n")
            print(option_str, ":",verify2, "\n")
         if PROOFGEN_FLAG:
-#            lcg_data[ lcg_steps ] = { 'msg':Tech.rule, 'eq': lcg.print_statement(verify2) }
-#            lcg_steps += 1
             proofGen.setNextStep(Tech.rule, verify2)
     
     if PROOFGEN_FLAG:
-#        lcg_data[ lcg_steps-1 ]['preq'] = final_batch_eq
-#        lcg_data[0]['batch'] = lcg_data[ lcg_steps-1 ]['eq']
         proofGen.setNextStep('finalbatcheq', None)
         
     if PRECOMP_CHECK:
@@ -426,13 +387,9 @@ def runBatcher(opts, proofGen, file, verify, ast_struct, eq_number=0):
               writeFile(SDL_OUT_FILE, out_str)
 
     if PROOFGEN_FLAG:
-        print("Generated the proof for the given signature scheme.")
         latex_file = metadata['name'].upper() + str(eq_number)
-#        writeConfig(lcg, latex_file, lcg_data, constants, vars, sig_vars)
+        print("Generated the proof written to file: verification_gen%s.tex" % latex_file)
         proofGen.compileProof(latex_file)
-#        lcg = LatexCodeGenerator(const, vars)
-#        equation = lcg.print_statement(verify2)
-#        print("Latex Equation: ", equation)
         
 def batcher_main(argv, prefix=None):
     global TEST_STATEMENT, THRESHOLD_FLAG, CODEGEN_FLAG, PROOFGEN_FLAG, PRECOMP_CHECK, VERBOSE, CHOOSE_STRATEGY
