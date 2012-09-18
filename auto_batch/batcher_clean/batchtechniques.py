@@ -634,7 +634,7 @@ tech3 = Tech_db # Enum('NoneApplied', 'ProductToSum','CombinePairing', 'SplitPai
 class Technique3(AbstractTechnique):
     def __init__(self, sdl_data, variables, meta):
         AbstractTechnique.__init__(self, sdl_data, variables, meta)
-        self.rule    = "Move dot products inside pairings to reduce N pairings to 1 (technique 3)"
+        self.rule    = "Move dot products inside pairings to reduce $\\numsigs$ pairings to 1 (technique 3)"
         self.applied = False
         self.score   = tech3.NoneApplied
         self.debug   = False

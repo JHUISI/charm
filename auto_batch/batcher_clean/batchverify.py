@@ -26,10 +26,12 @@ debug = False
 #THRESHOLD_FLAG = CODEGEN_FLAG = PROOFGEN_FLAG = PRECOMP_CHECK = VERBOSE = CHOOSE_STRATEGY = False
 THRESHOLD_FLAG = CODEGEN_FLAG = PRECOMP_CHECK = VERBOSE = CHOOSE_STRATEGY = False
 global_count   = 0
-flags = { 'multiple':None }
+flags = { 'multiple':None, 'step1':None }
+singleVE = True # flag to define whether working with a single or multi-eq for verification
 filePrefix = None
 
 def handleVerifyEq(equation, index):
+    global singleVE, VERBOSE, flags
 #    print("Input: ", Type(equation), equation)
     combined_equation = BinaryNode.copy(equation.right)
     if VERBOSE: print("Original eq:", combined_equation)
@@ -37,6 +39,7 @@ def handleVerifyEq(equation, index):
     ASTVisitor(tme).preorder(combined_equation)
     flags['multiple' + str(index)] = False
     if tme.multiple:
+        singleVE = False
         cme = CombineMultipleEq()
         ASTVisitor(cme).preorder(combined_equation)
         if len(cme.finalAND) == 1: 
@@ -47,6 +50,9 @@ def handleVerifyEq(equation, index):
             ASTVisitor(se_test).preorder(combined_equation2)            
             flags['multiple' + str(index)] = True
             flags[ str(index) ] = combined_equation2
+            flags[ 'verify' + str(index) ] = equation.right # used for verify in tex
+            # this is step0 for multi equation case
+            flags[ 'step1' ] = combined_equation2
         else:
             # may need to combine them further? or batch separaely
             print("Note: multiple equations left. Either batch each equation separately OR combine further.")
@@ -63,6 +69,7 @@ def handleVerifyEq(equation, index):
 #                exit(0)
                 flags['multiple' + str(index)] = True
                 flags[ str(index) ] = combined2
+                flags[ 'verify' + str(index) ] = equation.right # used for verify in tex           
                 return combined
 
             return cme.finalAND
@@ -190,7 +197,7 @@ def writeFile(file_name, file_contents):
      f.close()
  
  
-def runBatcher(opts, file, verify, ast_struct, eq_number=0):
+def runBatcher(opts, proofGen, file, verify, ast_struct, eq_number=0):
     global PROOFGEN_FLAG, THRESHOLD_FLAG, CODEGEN_FLAG, PRECOMP_CHECK, VERBOSE, CHOOSE_STRATEGY
     global global_count, flags
     PROOFGEN_FLAG, THRESHOLD_FLAG, CODEGEN_FLAG, PRECOMP_CHECK = opts['proof'], opts['threshold'], opts['codegen'], opts['pre_check']
@@ -269,20 +276,30 @@ def runBatcher(opts, file, verify, ast_struct, eq_number=0):
     # build data inputs for technique classes    
     sdl_data = { CONST : constants, PUBLIC: pub_vars, MESSAGE : msg_vars, SETTING : batch_count }    
     if PROOFGEN_FLAG:
-        lcg_data = {}; lcg_steps = 0
-        lcg = LatexCodeGenerator(constants, vars, latex_subs)
-
+#        lcg_data = {}; lcg_steps = 0
+#        lcg = LatexCodeGenerator(constants, vars, latex_subs)
+        # start the LCG
+        proofGen.initLCG(constants, vars, sig_vars, latex_subs)
+        if flags['step1']: proofGen.setStepOne(flags['step1'])
 
     techniques = {'2':Technique2, '3':Technique3, '4':Technique4, '5':DotProdInstanceFinder, '6':PairInstanceFinder, '7':Technique7, '8':Technique8 }
     #print("VERIFY EQUATION =>", verify)
     if PROOFGEN_FLAG: 
-        lcg_data[ lcg_steps ] = { 'msg':'Equation', 'eq': lcg.print_statement(verify) }
-        if flags['multiple' + str(eq_number)]: lcg_data[ lcg_steps ]['eq'] = lcg.print_statement(flags[ str(eq_number) ]) # shortcut!
-        lcg_steps += 1
+#        lcg_data[ lcg_steps ] = { 'msg':'Equation', 'eq': lcg.print_statement(verify) }
+        if flags['multiple' + str(eq_number)]: 
+#            lcg_data[ lcg_steps ]['eq'] = lcg.print_statement(flags[ str(eq_number) ]) # shortcut!
+#            print("JAA => EQUATIONS: ", lcg.print_statement(flags[ 'verify' + str(eq_number) ]))
+            proofGen.setIndVerifyEq(flags[ 'verify' + str(eq_number) ])
+        else:
+            proofGen.setIndVerifyEq( verify )
+#        lcg_steps += 1
+        
     verify2 = BinaryNode.copy(verify)
 #    ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
     ASTVisitor(CVForMultiSigner(vars, sig_vars, pub_vars, msg_vars, batch_count)).preorder(verify2)
-    if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Combined Equation', 'eq':lcg.print_statement(verify2) }; lcg_steps += 1
+    if PROOFGEN_FLAG: 
+#        lcg_data[ lcg_steps ] = { 'msg':'Combined Equation', 'eq':lcg.print_statement(verify2) }; lcg_steps += 1
+        proofGen.setNextStep( 'consolidate', verify2 )
     # check whether this step is necessary!    
     verify_test = BinaryNode.copy(verify2)
     pif = PairInstanceFinder()
@@ -295,8 +312,10 @@ def runBatcher(opts, file, verify, ast_struct, eq_number=0):
     if VERBOSE: print("\nStage A: Combined Equation =>", verify2)
     ASTVisitor(SmallExponent(constants, vars)).preorder(verify2)
     if VERBOSE: print("\nStage B: Small Exp Test =>", verify2, "\n")
-    if PROOFGEN_FLAG: lcg_data[ lcg_steps ] = { 'msg':'Apply the small exponents test, using exponents $\delta_1, \dots \delta_\\numsigs \in \left[1, 2^\lambda\right]$', 
-                                               'eq':lcg.print_statement(verify2), 'preq':small_exp_label }; lcg_steps += 1
+    if PROOFGEN_FLAG: 
+#        lcg_data[ lcg_steps ] = { 'msg':'Apply the small exponents test, using exponents $\delta_1, \dots \delta_\\numsigs \in \left[1, 2^\lambda\\right]$', 
+#                                               'eq':lcg.print_statement(verify2), 'preq':small_exp_label }; lcg_steps += 1
+        proofGen.setNextStep( 'smallexponents', verify2 )
 
     # figure out order automatically (if not specified in bv file)
     if FIND_ORDER:
@@ -328,13 +347,14 @@ def runBatcher(opts, file, verify, ast_struct, eq_number=0):
            print(Tech.rule, "\n")
            print(option_str, ":",verify2, "\n")
         if PROOFGEN_FLAG:
-            lcg_data[ lcg_steps ] = { 'msg':Tech.rule, 'eq': lcg.print_statement(verify2) }
-            lcg_steps += 1
-
+#            lcg_data[ lcg_steps ] = { 'msg':Tech.rule, 'eq': lcg.print_statement(verify2) }
+#            lcg_steps += 1
+            proofGen.setNextStep(Tech.rule, verify2)
     
     if PROOFGEN_FLAG:
-        lcg_data[ lcg_steps-1 ]['preq'] = final_batch_eq
-        lcg_data[0]['batch'] = lcg_data[ lcg_steps-1 ]['eq']
+#        lcg_data[ lcg_steps-1 ]['preq'] = final_batch_eq
+#        lcg_data[0]['batch'] = lcg_data[ lcg_steps-1 ]['eq']
+        proofGen.setNextStep('finalbatcheq', None)
         
     if PRECOMP_CHECK:
         countDict = countInstances(verify2) 
@@ -408,7 +428,8 @@ def runBatcher(opts, file, verify, ast_struct, eq_number=0):
     if PROOFGEN_FLAG:
         print("Generated the proof for the given signature scheme.")
         latex_file = metadata['name'].upper() + str(eq_number)
-        writeConfig(lcg, latex_file, lcg_data, constants, vars, sig_vars)
+#        writeConfig(lcg, latex_file, lcg_data, constants, vars, sig_vars)
+        proofGen.compileProof(latex_file)
 #        lcg = LatexCodeGenerator(const, vars)
 #        equation = lcg.print_statement(verify2)
 #        print("Latex Equation: ", equation)
@@ -515,6 +536,7 @@ def benchmark_batcher(argv, prefix=None):
     return
 
 def run_main(opts):
+    global singleVE
     verbose   = opts['verbose']
     statement = opts['test_stmt']
     file      = opts['sdl_file']
@@ -532,7 +554,7 @@ def run_main(opts):
     verify_eq, N = [], None; cnt = 0
     for n in ast_struct[ OTHER ]:
         if 'verify' in str(n.left):
-            result = handleVerifyEq(n, cnt); cnt += 1
+            result = handleVerifyEq(n, cnt); cnt += 1 # where we do actual verification on # of eqs
             if type(result) != list: verify_eq.append(result)
             else: verify_eq.extend(result)
 
@@ -547,10 +569,13 @@ def run_main(opts):
         ASTVisitor( cte ).preorder( eq )
         cte.report( eq )
 
+    # initiate the proof generator    
+    print("Single verification equation: ", singleVE)
+    genProof = GenerateProof(singleVE)
     # process settings
     for i in range(len(verify_eq)):    
         if verbose: print("\nRunning batcher....\n")
-        runBatcher(opts, file + str(i), verify_eq[i], ast_struct, i)
+        runBatcher(opts, genProof, file + str(i), verify_eq[i], ast_struct, i)
 
 if __name__ == "__main__":
    batcher_main(sys.argv)
