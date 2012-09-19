@@ -52,7 +52,7 @@ def handleVerifyEq(equation, index):
             flags[ str(index) ] = combined_equation2
             flags[ 'verify' + str(index) ] = equation.right # used for verify in tex
             # this is step0 for multi equation case
-            flags[ 'step1' ] = combined_equation2
+            flags[ 'step1' ] = combined_equation2 # add delta index #s here
         else:
             # may need to combine them further? or batch separaely
             print("Note: multiple equations left. Either batch each equation separately OR combine further.")
@@ -69,7 +69,8 @@ def handleVerifyEq(equation, index):
 #                exit(0)
                 flags['multiple' + str(index)] = True
                 flags[ str(index) ] = combined2
-                flags[ 'verify' + str(index) ] = equation.right # used for verify in tex           
+                flags[ 'verify' + str(index) ] = equation.right # used for verify in tex        
+                flags[ 'step1' ] = combined2 # add delta index #s here
                 return combined
 
             return cme.finalAND
@@ -278,8 +279,6 @@ def runBatcher(opts, proofGen, file, verify, ast_struct, eq_number=0):
     ASTVisitor(SmallExponent(constants, vars)).preorder(verify2)
     if VERBOSE: print("\nStage B: Small Exp Test =>", verify2, "\n")
     if PROOFGEN_FLAG: 
-#        lcg_data[ lcg_steps ] = { 'msg':'Apply the small exponents test, using exponents $\delta_1, \dots \delta_\\numsigs \in \left[1, 2^\lambda\\right]$', 
-#                                               'eq':lcg.print_statement(verify2), 'preq':small_exp_label }; lcg_steps += 1
         proofGen.setNextStep( 'smallexponents', verify2 )
 
     # figure out order automatically (if not specified in bv file)
