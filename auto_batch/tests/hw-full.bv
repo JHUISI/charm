@@ -34,15 +34,16 @@ output := list{pk, sk}
 END :: func:setup 
 
 BEGIN :: func:sign
-input := list{pk, sk, i, M}
+input := list{pk, sk, i, m}
  pk := expand{U, V, D, g1, g2, A, w1, w2, z1, z2, h1, h2, u, v, d}
  sk := expand{a}
  i := i + 1
- M := H(M, ZR)
-r := random(ZR)
-t := random(ZR)
-n := log(i)
-sig1:= (((u^M)*(v^r)*d)^a)*((w1^n)*(z1^i)*h1)^t sig2 := g1 ^ t
+ M := H(m, ZR)
+ r := random(ZR)
+ t := random(ZR)
+ n := log(i)
+ sig1:= (((u^)*(v^r)*d)^a)*((w1^n)*(z1^i)*h1)^t 
+ sig2 := g1 ^ t
 output := list{sig1, sig2, r, i}
 END :: func:sign
 
