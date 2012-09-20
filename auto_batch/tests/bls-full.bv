@@ -42,11 +42,11 @@ signature :=  sig
 message :=  h
 
 # single signer
-BEGIN :: setting
+BEGIN :: count
 message_count := N
 public_count := one
 signature_count := N
-END :: setting
+END :: count
 
 # variables computed before each signature verification
 BEGIN :: precompute
