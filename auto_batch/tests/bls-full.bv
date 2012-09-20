@@ -2,6 +2,16 @@ name := bls
 # number of signatures in a batch
 N := 100
 
+# types for variables used in verification.
+# all other variable types are inferred by SDL parser
+BEGIN :: types
+h := G1
+sig := G1
+g := G2
+pk := G2
+M := str
+END :: types
+
 # description of key generation and signing algorithms
 BEGIN :: func:keygen
 input := None
@@ -17,16 +27,6 @@ input := list{sk, M}
  sig := (H(M, G1))^sk
 output := sig
 END :: func:sign
-
-# types for variables used in verification.
-# all other variable types are inferred by SDL parser
-BEGIN :: types
-h := G1
-sig := G1
-g := G2
-pk := G2
-M := str
-END :: types
 
 constant := g
 public :=  pk
