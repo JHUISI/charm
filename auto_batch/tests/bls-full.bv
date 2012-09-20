@@ -28,6 +28,13 @@ input := list{sk, M}
 output := sig
 END :: func:sign
 
+BEGIN :: func:verify
+ input := list{pk, M, sig}
+ h := H(M, G1)
+ verify := {e(h, pk) == e(sig, g)}
+ output := verify 
+END :: func:verify
+
 constant := g
 public :=  pk
 signature :=  sig
