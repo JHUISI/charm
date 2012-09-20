@@ -6,10 +6,10 @@ def GetString(GetString_Arg):
 	getUserGlobals()
 	return GetString_Arg.getAttribute()
 
-def lam_func1(y, attrs, C1, coeff, h_gid, C3, K, C2):
+def lam_func1(y, attrs, C1, h_gid, C3, K, C2, coeff):
 	getUserGlobals()
 	y = GetString(attrs[y])
-	return (((C1[y] ** coeff[y]) * pair((h_gid ** coeff[y]), C3[y])) * pair((K[y] ** -coeff[y]), C2[y]))
+	return (((C1[y] * pair(h_gid, C3[y])) / pair(K[y], C2[y])) ** coeff[y])
 
 def getUserGlobals():
 	global groupUserFuncs

@@ -2,6 +2,8 @@ from keygen import *
 from config import *
 import sys, os
 
+ignoreCloudSourcing = None
+
 assignInfo = None
 inputOutputVars = None
 functionNameOrder = None
@@ -192,6 +194,7 @@ def getInputVariablesList(functionName):
     try:
         inputVariables = assignInfo[functionName][inputKeyword].getVarDeps()
     except:
+        print(functionName)
         sys.exit("getInputVariablesList in codegen.py:  could not obtain function's input variables from getVarDeps() on VarInfo obj.")
 
     return inputVariables
@@ -1536,15 +1539,20 @@ def generateMakefile():
     makefile_FileObject.write(outputString)
     makefile_FileObject.close()
 
-def main(SDL_Scheme):
+def main(SDL_Scheme, ignoreCloudSourcingArg):
     global setupFile, transformFile, decOutFile, userFuncsFile, assignInfo, varNamesToFuncs_All
     global varNamesToFuncs_Assign, inputOutputVars, userFuncsCPPFile, functionNameOrder
-    global blindingFactors_NonLists, blindingFactors_Lists
+    global blindingFactors_NonLists, blindingFactors_Lists, ignoreCloudSourcing
+
+    ignoreCloudSourcing = ignoreCloudSourcingArg
 
     if ( (type(SDL_Scheme) is not str) or (len(SDL_Scheme) == 0) ):
         sys.exit("codegen.py:  sys.argv[1] argument (file name for SDL scheme) passed in was invalid.")
 
-    (blindingFactors_NonLists, blindingFactors_Lists) = keygen(SDL_Scheme)
+    if (ignoreCloudSourcing == False):
+        (blindingFactors_NonLists, blindingFactors_Lists) = keygen(SDL_Scheme)
+    else:
+        parseFile2(SDL_Scheme, False)
 
     #printLinesOfCode()
     #print(blindingFactors_NonLists)
@@ -1578,7 +1586,9 @@ def main(SDL_Scheme):
     addImportLines()
     addGroupObjGlobalVar()
     writeSDLToFiles(astNodes)
-    writeMainFuncs()
+
+    if (ignoreCloudSourcing == False):
+        writeMainFuncs()
     addGetGlobalsToUserFuncs()
 
     setupFile.close()
@@ -1590,7 +1600,23 @@ def main(SDL_Scheme):
     generateMakefile()
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    #global ignoreCloudSourcing
+
+    lenSysArgv = len(sys.argv)
+
+    if ( (lenSysArgv == 1) or (lenSysArgv > 3) ):
+        sys.exit("Usage:  python " + sys.argv[0] + " [name of SDL file] [OPTIONAL:  if second argument passed, codegen does not run CloudSourcing]")
+
+    if ( (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
+        sys.exit("Usage:  python " + sys.argv[0] + " [name of SDL file] [OPTIONAL:  if second argument passed, codegen does not run CloudSourcing]")
+
+    if (lenSysArgv == 2):
+        main(sys.argv[1], False)
+    elif (lenSysArgv == 3):
+        main(sys.argv[1], True)
+    else:
+        sys.exit("error in system logic in first main method.")
+
     parseLinesOfCode(getLinesOfCode(), True)
     #os.system("cp userFuncsPermanent.py userFuncs.py")
     #printLinesOfCode()
