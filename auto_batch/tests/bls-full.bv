@@ -28,11 +28,6 @@ pk := G2
 M := str
 END :: types
 
-# variables computed before each signature verification
-BEGIN :: precompute
-  h := H(M, G1)
-END :: precompute
-
 constant := g
 public :=  pk
 signature :=  sig
@@ -40,10 +35,15 @@ message :=  h
 
 # single signer
 BEGIN :: setting
-message := N
-public := one
-signature := N
+message_count := N
+public_count := one
+signature_count := N
 END :: setting
+
+# variables computed before each signature verification
+BEGIN :: precompute
+  h := H(M, G1)
+END :: precompute
 
 # individual verification check
 verify := {e(h, pk) == e(sig, g)}
