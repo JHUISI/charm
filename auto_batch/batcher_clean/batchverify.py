@@ -10,7 +10,7 @@ from batchorder import BatchOrder
 from batchparser import BatchParser
 from batchcomboeq import TestForMultipleEq,CombineMultipleEq,SmallExpTestMul
 from batchsyntax import BasicTypeExist,PairingTypeCheck
-from benchmark_interface import curve,param_id
+from benchmark_interface import getBenchmarkInfo
 
 #try:
     #import benchmarks
@@ -29,9 +29,11 @@ global_count   = 0
 flags = { 'multiple':None, 'step1':None }
 singleVE = True # flag to define whether working with a single or multi-eq for verification
 filePrefix = None
+crypto_library = curve = param_id = None
 
-def handleVerifyEq(equation, index):
-    global singleVE, VERBOSE, flags
+def handleVerifyEq(equation, index, verbose):
+    global singleVE, flags
+    VERBOSE = verbose
 #    print("Input: ", Type(equation), equation)
     combined_equation = BinaryNode.copy(equation.right)
     if VERBOSE: print("Original eq:", combined_equation)
@@ -53,6 +55,8 @@ def handleVerifyEq(equation, index):
             flags[ 'verify' + str(index) ] = equation.right # used for verify in tex
             # this is step0 for multi equation case
             flags[ 'step1' ] = combined_equation2 # add delta index #s here
+            if VERBOSE: print("delta eq: ", combined_equation2)
+#            sys.exit("Testing stuff!!")
         else:
             # may need to combine them further? or batch separaely
             print("Note: multiple equations left. Either batch each equation separately OR combine further.")
@@ -165,7 +169,7 @@ def writeFile(file_name, file_contents):
  
 def runBatcher(opts, proofGen, file, verify, ast_struct, eq_number=0):
     global PROOFGEN_FLAG, THRESHOLD_FLAG, CODEGEN_FLAG, PRECOMP_CHECK, VERBOSE, CHOOSE_STRATEGY
-    global global_count, flags
+    global global_count, flags, singleVE
     PROOFGEN_FLAG, THRESHOLD_FLAG, CODEGEN_FLAG, PRECOMP_CHECK = opts['proof'], opts['threshold'], opts['codegen'], opts['pre_check']
     VERBOSE, CHOOSE_STRATEGY = opts['verbose'], opts['strategy']
     SDL_OUT_FILE = opts['out_file']
@@ -236,8 +240,8 @@ def runBatcher(opts, proofGen, file, verify, ast_struct, eq_number=0):
     vars = types
     vars['N'] = N
     vars.update(metadata)
-    #print("variables =>", vars)
-    #print("metadata =>", metadata)
+    if VERBOSE: print("variables =>", vars)
+    if VERBOSE: print("metadata =>", metadata)
 
     # build data inputs for technique classes    
     sdl_data = { CONST : constants, PUBLIC: pub_vars, MESSAGE : msg_vars, SETTING : batch_count }    
@@ -283,7 +287,7 @@ def runBatcher(opts, proofGen, file, verify, ast_struct, eq_number=0):
 
     # figure out order automatically (if not specified in bv file)
     if FIND_ORDER:
-        result = BatchOrder(sdl_data, types, vars, BinaryNode.copy(verify2)).strategy()
+        result = BatchOrder(sdl_data, types, vars, BinaryNode.copy(verify2), crypto_library).strategy()
         algorithm = [str(x) for x in result]
         print("<== Found Batch Algorithm ==>", algorithm)
 
@@ -302,7 +306,11 @@ def runBatcher(opts, proofGen, file, verify, ast_struct, eq_number=0):
             print("Unrecognized technique selection.")
             continue
         ASTVisitor(Tech).preorder(verify2)
-        if option == '6':
+        if option == '2' and not singleVE:
+            aftTech2 = AfterTech2AddIndex()
+            ASTVisitor(aftTech2).preorder(verify2)
+#            sys.exit("STOP HERE!!!")
+        elif option == '6':
             testVerify2 = Tech.makeSubstitution(verify2)
             if testVerify2 != None: verify2 = testVerify2
         if hasattr(Tech, 'precompute'):
@@ -492,10 +500,12 @@ def benchmark_batcher(argv, prefix=None):
     return
 
 def run_main(opts):
-    global singleVE
+    global singleVE, crypto_library, curve, param_id
     verbose   = opts['verbose']
     statement = opts['test_stmt']
     file      = opts['sdl_file']
+    crypto_library   = opts['library']
+    curve, param_id = getBenchmarkInfo(crypto_library)
     if statement:
         debug = levels.all
         parser = BatchParser()
@@ -510,7 +520,7 @@ def run_main(opts):
     verify_eq, N = [], None; cnt = 0
     for n in ast_struct[ OTHER ]:
         if 'verify' in str(n.left):
-            result = handleVerifyEq(n, cnt); cnt += 1 # where we do actual verification on # of eqs
+            result = handleVerifyEq(n, cnt, verbose); cnt += 1 # where we do actual verification on # of eqs
             if type(result) != list: verify_eq.append(result)
             else: verify_eq.extend(result)
 

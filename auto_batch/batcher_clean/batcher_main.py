@@ -12,12 +12,13 @@ verbose = precompute_check = threshold = codegen = proof = print_usage = print_o
 strategy = 'bfs' # default strategy
 input_file = test_statement = None
 output_file = None
+library = 'miracl'
 
 #print('ARGV      :', sys.argv[1:])
 
 try:
-    options, remainder = getopt.getopt(sys.argv[1:], 'o:bcdhpvs:f:', ['out_file=', 'sdl_file=', 'threshold', 'codegen', 'proof', 'strategy=', 
-                                                                    'verbose', 'query', 'print', 'help'])
+    options, remainder = getopt.getopt(sys.argv[1:], 'o:l:cdhpvts:f:', ['out_file=', 'sdl_file=', 'threshold', 'codegen', 'proof', 'strategy=', 
+                                                                    'verbose', 'library=','query', 'print', 'help'])
 except:
     sys.exit("ERROR: Specified invalid arguments.")
     
@@ -41,6 +42,8 @@ for opt, arg in options:
         proof = True
     elif opt in ('-s', '--strategy'):
         strategy = arg
+    elif opt in ('-l', '--library'):
+        library = arg
     elif opt in ('-q', '--query'):
         test_statement = arg
     elif opt == '--print':
@@ -62,7 +65,8 @@ if print_options:
     print('THRESHOLD  :', threshold)
     print('GEN PROOF  :', proof)
     print('STRATEGY   :', strategy)
-    print('REMAINING :', remainder)
+    print('LIBRARY    :', library)
+    print('REMAINING  :', remainder)
 
 sys.exit("Need to specify SDL file.") if input_file == None else None
 
@@ -77,6 +81,7 @@ opts_dict['proof']     = proof
 opts_dict['strategy']  = strategy
 opts_dict['pre_check'] = precompute_check
 opts_dict['test_stmt'] = test_statement
+opts_dict['library']   = library
 
 # execute batcher on the provided options
 batchverify.run_main(opts_dict)

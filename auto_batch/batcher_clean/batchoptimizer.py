@@ -111,6 +111,7 @@ class PairInstanceFinder:
                     if parent: data['rnode1_parent'].append(parent)
                     else: data['rnode1_parent'].append(node)                                 
                     found = True
+                    if data['pair_index']: data['pair_index'] = data['pair_index'].union(node.getAttrIndex())
                     break
             elif data['key'] == 'rnode':
                 if str(rnode) == str(data['rnode']):
@@ -123,6 +124,7 @@ class PairInstanceFinder:
                     if parent: data['lnode1_parent'].append(parent)
                     else: data['lnode1_parent'].append(node)                    
                     found = True
+                    if data['pair_index']: data['pair_index'] = data['pair_index'].union(node.getAttrIndex())
                     break
                 elif str(lnode) == str(data['lnode']):
                     # basically, find that non-constants match. for example,
@@ -140,11 +142,14 @@ class PairInstanceFinder:
                     if parent: data['rnode1_parent'].append(parent)
                     else: data['rnode1_parent'].append(node)                    
                     found = True
+                    if data['pair_index']: data['pair_index'] = data['pair_index'].union(node.getAttrIndex())
                     break
 
         # if not found
         if not found:
-            self.instance[ self.index ] = { 'key':key, 'lnode':lnode, 'rnode':rnode, 'keyside':whichSide,'instance':1, 'side':{} }
+            if not node.isAttrIndexEmpty(): attr_index = set(node.getAttrIndex())
+            else: attr_index = None
+            self.instance[ self.index ] = { 'key':key, 'lnode':lnode, 'rnode':rnode, 'keyside':whichSide,'instance':1, 'side':{}, 'pair_index':attr_index }
             self.index += 1
         return
 
@@ -326,6 +331,7 @@ class SubstitutePairs2:
         self.right = pairDict['rnode']
         self.node_side = pairDict['keyside']
         self.extra_side = pairDict['side']
+        self.extra_index = pairDict['pair_index']
         self.index = 0        
         if self.key == 'rnode': # if right, then extras will be on the left
             self.extra = pairDict['lnode1']
@@ -361,7 +367,7 @@ class SubstitutePairs2:
                 pass
         
     def visit_pair(self, node, data):
-        #print("complete list: ", self.extra_side)
+#        print("complete list: ", self.extra_side)
         if self.key == 'rnode':
             # find the attribute node on the right
             if self.debug: print(node.right, " =?= ", self.right, "left type:", Type(self.left), node.left, self.left)
@@ -388,6 +394,8 @@ class SubstitutePairs2:
                         if i < len(muls)-1: muls[i].right = muls[i+1]
                         else: muls[i].right = BinaryNode.copy(self.checkForInverse(self.extra[i+1]))
                     node.left = muls[0] # self.right doesn't change
+                    if self.extra_index: node.setAttrIndexFromSet(self.extra_index)
+                    if self.debug: print("modified nodes: ", node, node.getAttrIndex())                    
                     #print("new pairing node: ", muls[0], self.right) # MUL nodes absorb the exponent
                     self.deleteOtherPair = True                    
 
@@ -406,7 +414,7 @@ class SubstitutePairs2:
                 
         elif self.key == 'lnode':
             if str(node.left) == str(self.left) and Type(node.left) == ops.ATTR:
-                #print("handle this case: ", node)
+                if self.debug: print("handle this case: ", node)
                 if node.right == self.right and Type(self.right) == ops.ON:
                     if self.debug: print("combine other nodes with ON node: ", self.right)
                     target = self.right
@@ -427,6 +435,8 @@ class SubstitutePairs2:
                         else: 
                             muls[i].right = BinaryNode.copy(self.checkForInverse(self.extra[i+1]))
                     node.right = muls[0] # self.right doesn't change
+                    if self.extra_index: node.setAttrIndexFromSet(self.extra_index)
+                    if self.debug: print("modified nodes: ", node, node.getAttrIndex())
                     #print("new pairing node: ", self.left, muls[0]) # MUL nodes absorb the exponent
                     self.deleteOtherPair = True                    
 #                    print("New node: ", node)

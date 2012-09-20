@@ -1,7 +1,7 @@
 from batchparser import *
 from batchtechniques import Tech_db,Technique2,Technique3,Technique4,Technique7,Technique8
 from batchoptimizer import *
-from benchmark_interface import curve,param_id
+from benchmark_interface import getBenchmarkInfo
 import random
 
 #try:
@@ -27,7 +27,7 @@ def score(eq):
 # Class for pre-processing SDL to determine the order in which the optimization techniques
 # are applied to the batch equation.
 class BatchOrder:
-    def __init__(self, sdl, vars, metadata, equation):
+    def __init__(self, sdl, vars, metadata, equation, library):
         self.sdl_data = sdl
         self.vars  = vars
         self.meta  = metadata
@@ -36,6 +36,8 @@ class BatchOrder:
         self.techMap = { 2:Technique2, 3:Technique3, 4:Technique4, 7:Technique7, 8:Technique8 }
         # a quick way to test that a particular technique will transform the equation (pre-check)
         self.techMap2 = { 5:DotProdInstanceFinder, 6:PairInstanceFinder }
+        global curve, param_id
+        curve, param_id = getBenchmarkInfo(library)
 
     def testSequence(self, combo):
         eq = BinaryNode.copy(self.verify)

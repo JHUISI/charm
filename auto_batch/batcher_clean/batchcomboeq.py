@@ -2,6 +2,19 @@ from batchlang import *
 from batchtechniques import AbstractTechnique
 from batchparser import *
 
+class ApplyEqIndex(AbstractTechnique):
+    def __init__(self, index):
+        self.index = index
+    
+    def visit(self, node, data):
+        pass
+    
+    def visit_pair(self, node, data):
+        node.setAttrIndex(self.index)
+#        print("node : ", node)
+#        print("attr_index : ", node.getAttrIndex())
+    
+
 class TestForMultipleEq:
     def __init__(self):
         self.multiple = False
@@ -20,7 +33,8 @@ class CombineMultipleEq(AbstractTechnique):
             AbstractTechnique.__init__(self, sdl_data, variables, meta)
         self.inverse = BinaryNode("-1")
         self.finalAND   = [ ]
-        self.deltaCount = { }
+        self.attr_index = 0
+#        self.deltaCount = { }
         self.debug      = False
         
     def visit_and(self, node, data):
@@ -28,9 +42,14 @@ class CombineMultipleEq(AbstractTechnique):
         #print("handle left :=>", node.left, node.left.type)
         #print("handle right :=>", node.right, node.right.type)        
         if Type(node.left) == ops.EQ_TST:
-            left = self.visit_equality(node.left)
+            self.attr_index += 1
+            pair_eq_index = self.attr_index
+            left = self.visit_equality(node.left, pair_eq_index)
+
         if Type(node.right) == ops.EQ_TST:
-            right = self.visit_equality(node.right)
+            self.attr_index += 1
+            pair_eq_index2 = self.attr_index
+            right = self.visit_equality(node.right, pair_eq_index2)
         combined_eq = BinaryNode(ops.EQ_TST, left, right)
         # test whether technique 6 applies, if so, combine?
         tech6      = PairInstanceFinder()
@@ -41,12 +60,15 @@ class CombineMultipleEq(AbstractTechnique):
         return
     
     # won't be called automatically (ON PURPOSE)
-    def visit_equality(self, node):
+    def visit_equality(self, node, index):
+        #print("index :=", index, " => ", node)
+        aei = ApplyEqIndex(index)
+        ASTVisitor(aei).preorder(node)
         # count number of nodes on each side
         lchildnodes = []
         rchildnodes = []
         getListNodes(node.left, Type(node), lchildnodes)
-        getListNodes(node.right, Type(node), rchildnodes)        
+        getListNodes(node.right, Type(node), rchildnodes)
         lsize = len(lchildnodes)
         rsize = len(rchildnodes)
         _list = [ops.EXP, ops.PAIR, ops.ATTR]
@@ -78,6 +100,10 @@ class SmallExpTestMul:
         
     def visit(self, node, data):
         pass
+
+    def visit_pair(self, node, data):
+        pass
+#        print("pair node: ", node, ", delta_index: ", node.getAttrIndex())
 
     # find  'prod{i} on x' transform into ==> 'prod{i} on (x)^delta_i'
     def visit_eq_tst(self, node, data):

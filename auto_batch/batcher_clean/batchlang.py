@@ -251,9 +251,19 @@ class BinaryNode:
 		if self.attr_index != None:
 			if len(self.attr_index) > 0: return False
 		return True
+
+	def getAttrIndex(self):
+		return self.attr_index
+	
+	def setAttrIndexFromSet(self, value):
+		if type(value) != set: return
+		if value == None: return
+		# clean contents of attr_index
+		self.attr_index = list(value)
+		return
 	
 	def setAttrIndex(self, value):
-		if(self.type in [ops.ATTR, ops.HASH]):
+		if(self.type in [ops.ATTR, ops.HASH, ops.PAIR]):
 			if self.attr_index == None: # could be a list of indices
 				self.attr_index = [value]
 			else:
