@@ -1,6 +1,7 @@
 name := bls
 # number of signatures in a batch
 N := 100
+setting := asymmetric
 
 # types for variables used in verification.
 # all other variable types are inferred by SDL parser
