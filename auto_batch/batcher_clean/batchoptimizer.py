@@ -111,7 +111,7 @@ class PairInstanceFinder:
                     if parent: data['rnode1_parent'].append(parent)
                     else: data['rnode1_parent'].append(node)                                 
                     found = True
-                    if data['pair_index']: data['pair_index'] = data['pair_index'].union(node.getAttrIndex())
+                    if data['pair_index']: data['pair_index'] = data['pair_index'].union(node.getDeltaIndex())
                     break
             elif data['key'] == 'rnode':
                 if str(rnode) == str(data['rnode']):
@@ -124,7 +124,7 @@ class PairInstanceFinder:
                     if parent: data['lnode1_parent'].append(parent)
                     else: data['lnode1_parent'].append(node)                    
                     found = True
-                    if data['pair_index']: data['pair_index'] = data['pair_index'].union(node.getAttrIndex())
+                    if data['pair_index']: data['pair_index'] = data['pair_index'].union(node.getDeltaIndex())
                     break
                 elif str(lnode) == str(data['lnode']):
                     # basically, find that non-constants match. for example,
@@ -142,12 +142,12 @@ class PairInstanceFinder:
                     if parent: data['rnode1_parent'].append(parent)
                     else: data['rnode1_parent'].append(node)                    
                     found = True
-                    if data['pair_index']: data['pair_index'] = data['pair_index'].union(node.getAttrIndex())
+                    if data['pair_index']: data['pair_index'] = data['pair_index'].union(node.getDeltaIndex())
                     break
 
         # if not found
         if not found:
-            if not node.isAttrIndexEmpty(): attr_index = set(node.getAttrIndex())
+            if not node.isDeltaIndexEmpty(): attr_index = set(node.getDeltaIndex())
             else: attr_index = None
             self.instance[ self.index ] = { 'key':key, 'lnode':lnode, 'rnode':rnode, 'keyside':whichSide,'instance':1, 'side':{}, 'pair_index':attr_index }
             self.index += 1
@@ -394,8 +394,8 @@ class SubstitutePairs2:
                         if i < len(muls)-1: muls[i].right = muls[i+1]
                         else: muls[i].right = BinaryNode.copy(self.checkForInverse(self.extra[i+1]))
                     node.left = muls[0] # self.right doesn't change
-                    if self.extra_index: node.setAttrIndexFromSet(self.extra_index)
-                    if self.debug: print("modified nodes: ", node, node.getAttrIndex())                    
+                    if self.extra_index: node.setDeltaIndexFromSet(self.extra_index)
+                    if self.debug: print("modified nodes: ", node, node.getDeltaIndex())                    
                     #print("new pairing node: ", muls[0], self.right) # MUL nodes absorb the exponent
                     self.deleteOtherPair = True                    
 
@@ -435,8 +435,8 @@ class SubstitutePairs2:
                         else: 
                             muls[i].right = BinaryNode.copy(self.checkForInverse(self.extra[i+1]))
                     node.right = muls[0] # self.right doesn't change
-                    if self.extra_index: node.setAttrIndexFromSet(self.extra_index)
-                    if self.debug: print("modified nodes: ", node, node.getAttrIndex())
+                    if self.extra_index: node.setDeltaIndexFromSet(self.extra_index)
+                    if self.debug: print("modified nodes: ", node, node.getDeltaIndex())
                     #print("new pairing node: ", self.left, muls[0]) # MUL nodes absorb the exponent
                     self.deleteOtherPair = True                    
 #                    print("New node: ", node)

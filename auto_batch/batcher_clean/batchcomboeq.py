@@ -2,18 +2,50 @@ from batchlang import *
 from batchtechniques import AbstractTechnique
 from batchparser import *
 
+# BEGIN: Small Exponent Related classes to assist with tracking index numbers assigned to delta variables 
+# across multiple verification equations. 
 class ApplyEqIndex(AbstractTechnique):
     def __init__(self, index):
         self.index = index
     
     def visit(self, node, data):
         pass
+        
+    def visit_attr(self, node, data):
+        if node.getAttribute() != "1":
+            node.setDeltaIndex(self.index)
     
     def visit_pair(self, node, data):
-        node.setAttrIndex(self.index)
-#        print("node : ", node)
-#        print("attr_index : ", node.getAttrIndex())
+        node.setDeltaIndex(self.index)
     
+class AfterTech2AddIndex(AbstractTechnique):
+    def __init__(self):
+        pass
+    
+    def visit(self, node, data):
+        pass
+    
+    def visit_exp(self, node, data):
+        a = []
+        if data.get('pair_index'): a = data.get('pair_index') # [str(i) for i in data['pair_index']]
+        if Type(node.right) == ops.ATTR and node.right.getAttribute() == "delta":
+            if len(a) > 0: node.right.setDeltaIndexFromSet(a)
+            else: node.right.setDeltaIndexFromSet( node.left.getDeltaIndex() )
+        elif Type(node.right) == ops.MUL:
+            mul = node.right
+            if Type(mul.left) == ops.ATTR and mul.left.getAttribute() == "delta":
+                if len(a) > 0: mul.left.setDeltaIndexFromSet(a)
+                else: mul.left.setDeltaIndexFromSet( node.left.getDeltaIndex() )
+            if Type(mul.right) == ops.ATTR and mul.right.getAttribute() == "delta":
+                if len(a) > 0: mul.right.setDeltaIndexFromSet(a)
+                else: mul.right.setDeltaIndexFromSet( node.left.getDeltaIndex() )
+        return
+  
+    def visit_pair(self, node, data):
+        d = { 'pair_index':node.getDeltaIndex() }
+        return d
+
+# END
 
 class TestForMultipleEq:
     def __init__(self):
@@ -27,14 +59,16 @@ class TestForMultipleEq:
         pass
 
 # So called technique 0
+# addIndex: means that CombineMultipleEq will add index numbers to each equation for tracking purposes
+# so that deltas will have appropriate numbers later.
 class CombineMultipleEq(AbstractTechnique):
-    def __init__(self, sdl_data=None, variables=None, meta=None):
+    def __init__(self, sdl_data=None, variables=None, meta=None, addIndex=True):
         if sdl_data:
             AbstractTechnique.__init__(self, sdl_data, variables, meta)
         self.inverse = BinaryNode("-1")
         self.finalAND   = [ ]
         self.attr_index = 0
-#        self.deltaCount = { }
+        self.addIndex = addIndex
         self.debug      = False
         
     def visit_and(self, node, data):
@@ -62,8 +96,9 @@ class CombineMultipleEq(AbstractTechnique):
     # won't be called automatically (ON PURPOSE)
     def visit_equality(self, node, index):
         #print("index :=", index, " => ", node)
-        aei = ApplyEqIndex(index)
-        ASTVisitor(aei).preorder(node)
+        if self.addIndex:
+            aei = ApplyEqIndex(index)
+            ASTVisitor(aei).preorder(node)
         # count number of nodes on each side
         lchildnodes = []
         rchildnodes = []

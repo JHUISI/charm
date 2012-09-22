@@ -628,45 +628,11 @@ class Technique2(AbstractTechnique):
         elif target_attr_str == side.right: target_node.right = tmp_node
         else: return None
         return True
-
-#TODO: Clean this up for other cases!!!
-class AfterTech2AddIndex(AbstractTechnique):
-    def __init__(self):
-        pass
     
-    def visit(self, node, data):
-        pass
-    
-    def visit_exp(self, node, data):
-        a = []
-        if data.get('pair_index'): a = [str(i) for i in data['pair_index']]
-        if Type(node.right) == ops.ATTR and node.right.getAttribute() == "delta":
-            if node.right.attr_index: 
-                for x in a:
-                    if x not in node.right.attr_index:
-                        node.right.attr_index.append( x )
-        elif Type(node.right) == ops.MUL:
-            mul = node.right
-            if Type(mul.left) == ops.ATTR and mul.left.getAttribute() == "delta":
-                if mul.left.attr_index: 
-                    for x in a:
-                        if x not in mul.left.attr_index:
-                            mul.left.attr_index.append( x )
-            if Type(mul.right) == ops.ATTR and mul.right.getAttribute() == "delta":
-                if mul.right.attr_index: 
-                    for x in a:
-                        if x not in mul.right.attr_index:
-                            mul.right.attr_index.append( x )
-            
-        
-        return
-            # left or right
-#        print("pair_index so far: ", data['pair_index'], node.left, node.right)
-    
-    def visit_pair(self, node, data):
-        d = { 'pair_index':node.getAttrIndex() }
-        return d
-    
+#    def visit_attr(self, node, data):
+        #d = None
+        #d = { 'pair_index':node.getDeltaIndex() }
+        #return d
         
 tech3 = Tech_db # Enum('NoneApplied', 'ProductToSum','CombinePairing', 'SplitPairing')
 

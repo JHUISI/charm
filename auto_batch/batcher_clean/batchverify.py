@@ -8,7 +8,7 @@ from batchtechniques import *
 from batchproof import *
 from batchorder import BatchOrder
 from batchparser import BatchParser
-from batchcomboeq import TestForMultipleEq,CombineMultipleEq,SmallExpTestMul
+from batchcomboeq import TestForMultipleEq,CombineMultipleEq,SmallExpTestMul,AfterTech2AddIndex
 from batchsyntax import BasicTypeExist,PairingTypeCheck
 from benchmark_interface import getBenchmarkInfo
 
@@ -62,7 +62,7 @@ def handleVerifyEq(equation, index, verbose):
             print("Note: multiple equations left. Either batch each equation separately OR combine further.")
             if len(cme.finalAND) == 2:
                 combined_equation2 = BinaryNode(ops.AND, cme.finalAND[0], cme.finalAND[1])
-                cme2 = CombineMultipleEq()
+                cme2 = CombineMultipleEq(addIndex=False)
                 ASTVisitor(cme2).preorder(combined_equation2)
                 combined = cme2.finalAND.pop()
                 if VERBOSE: print("Combined: ", combined)
