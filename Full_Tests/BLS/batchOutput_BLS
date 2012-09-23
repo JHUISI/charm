@@ -1,0 +1,11 @@
+Final batch eq: e((prod{z := 1,N} on h_z^delta_z),pk) == e((prod{z := 1,N} on sig_z^delta_z),g)
+<====	PREP FOR CODE GEN	====>
+
+Final version => e(dotA,pk) == e(dotB,g) 
+
+Compute:  dotA := (prod{z := 0,N} on h_z^delta_z)
+Compute:  dotB := (prod{z := 0,N} on sig_z^delta_z)
+Precompute: h_z := H(M_z,G1)
+Precompute: delta := for{z := 0, N} do prng_z
+dotA := G1
+dotB := G1
