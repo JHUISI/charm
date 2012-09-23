@@ -1,0 +1,3 @@
+python ../../auto_outsrc/parser/codegen.py bls-full.bv pythonVersionOfSDLCode.py
+BATCHER's command to produce BATCHER output
+

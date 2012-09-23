@@ -2394,8 +2394,8 @@ def addCallToInit():
 
 	initArgString = getInitArgString()
 
-	batchOutputString += "\t__init__(" + initArgString + ")\n\n"
-	indOutputString += "\t__init__(" + initArgString + ")\n"
+	batchOutputString += "\t" + con.initFuncName + "(" + initArgString + ")\n\n"
+	indOutputString += "\t" + con.initFuncName + "(" + initArgString + ")\n"
 
 	verifySigsInitCall = batchOutputString
 

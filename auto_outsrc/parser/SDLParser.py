@@ -851,8 +851,14 @@ def getVarTypeInfoRecursive(node):
         if (currentFuncName in builtInTypes):
             return builtInTypes[currentFuncName]
         return types.NO_TYPE
+    if (node.type == ops.EQ_TST):
+        leftSideType = getVarTypeInfoRecursive(node.left)
+        rightSideType = getVarTypeInfoRecursive(node.right)
+        if (leftSideType != rightSideType):
+            sys.exit("getVarTypeInfoRecursive in SDLParser.py found an operation of type EQ_TST in which the left and right side types were unequal.")
+        return leftSideType
 
-    print(node)
+    print(node.type)
     sys.exit("getVarTypeInfoRecursive in SDLParser.py:  error in logic.")
 
 def getVarTypeInfo(node, i, varName):
@@ -1342,12 +1348,16 @@ def getEndLineNoOfFunc(funcName):
     return endLineNos_Functions[funcName]
 
 # NEW SDL PARSER
-def parseFile2(filename, verbosity):
+def parseFile2(filename, verbosity, ignoreCloudSourcing=False):
     global linesOfCode
 
     fd = open(filename, 'r')
     linesOfCode = fd.readlines()
-    parseLinesOfCode(linesOfCode, verbosity)
+    if (ignoreCloudSourcing == False):
+        parseLinesOfCode(linesOfCode, verbosity)
+    else:
+        parseLinesOfCode(linesOfCode, verbosity, ignoreCloudSourcing)
+       
     fd.close()
 
 def getAstNodes():
@@ -1389,6 +1399,7 @@ def updatePublicVarNames():
 
         (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, currentPubVarName)
         if ( (retFuncName == None) or (retVarInfoObj == None) ):
+            print(currentPubVarName)
             sys.exit("updatePublicVarNames in SDLParser.py:  at least one None value returned from getVarNameEntryFromAssignInfo called on one of the master public variable names.")
 
         getOutputVarsDictOfFuncRecursive(publicVarNames, retFuncName, retVarInfoObj)
@@ -1432,7 +1443,7 @@ def updateSecretVarNames():
         for varToRemove in varsToRemove:
             secretVarNames.remove(varToRemove)
 
-def parseLinesOfCode(code, verbosity):
+def parseLinesOfCode(code, verbosity, ignoreCloudSourcing=False):
     global varTypes, assignInfo, forLoops, currentFuncName, varDepList, varInfList, varsThatProtectM
     global algebraicSetting, startLineNo_ForLoop, startLineNos_Functions, endLineNos_Functions
     global getVarDepInfListsCalled, getVarsThatProtectMCalled, astNodes, varNamesToFuncs_All
@@ -1509,8 +1520,9 @@ def parseLinesOfCode(code, verbosity):
     getVarsThatProtectM()
     getVarsThatProtectMCalled = True
 
-    updatePublicVarNames()
-    updateSecretVarNames()
+    if (ignoreCloudSourcing == False):
+        updatePublicVarNames()
+        updateSecretVarNames()
 
 def getFuncStmts(funcName):
     if getVarDepInfListsCalled == False: 
