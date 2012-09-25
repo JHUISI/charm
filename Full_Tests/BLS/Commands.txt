@@ -1,3 +1,51 @@
+Represent your signature scheme in our SDL.  A few rules:
+
+1)  Variables can only be declared and defined once.  No re-assignments.
+2)  The "types" section must come first.  Please see our reference SDL implementation for an example.
+3)  You must have a "verify" method where individual verification occurs.  The name of this method must be
+"verify".  If there are variables whose values you need in "verify", and those values are not calculated
+within "verify", those variables must be passed in as arguments to "verify".  For example, if you have the
+following:
+4)  You must have functions named "init" and "main" for backwards compatibility.  These can be dummy
+functions.
+
+Run the following command, where "bls-full.bv" is your SDL file.
+
 python ../../auto_outsrc/parser/codegen.py bls-full.bv pythonVersionOfSDLCode.py
+
+Make sure pythonVersionOfSDLCode.py executes correctly for individual signature verification as 
+Python-Charm code, otherwise CodeGen won't be able to generate functional code for the individual, batch,
+and divide-and-conquer automatically generated Python-Charm code.
+
+To do so, first add the following import lines to pythonVersionOfSDLCode.py:
+
+from charm.toolbox.pairinggroup import *
+from charm.core.engine.util import *
+
+Next, declare a global variable named "group" and define it in the main() method as such:
+
+global group 
+.
+.
+.
+group = PairingGroup(MNT160)
+
+If you're having problems with this, try defining group as:
+
+group = PairingGroup(80)
+
+Now write your main routine to call your functions in the proper order and with the correct arguments.  For 
+example, in the reference file, you'll see this:
+
+(pk, sk, g) = keygen()
+sig = sign(sk, "test")
+print(verify(pk, "test", sig, g))
+
+Make sure this prints True if the messages are the same, and False if they are different.  Note that g had
+to be passed to verify b/c its value was necessary for verify's calculations, but g wasn't dervied within
+verify.
+
+
+
 BATCHER's command to produce BATCHER output
 

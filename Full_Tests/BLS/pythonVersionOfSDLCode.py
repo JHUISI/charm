@@ -1,13 +1,10 @@
+from charm.toolbox.pairinggroup import *
+from charm.core.engine.util import *
+
 h = {}
-
-def init():
-
-    input = None
-    tempVar = group.random(G2)
-    output = None
+group = None
 
 def keygen():
-
     input = None
     g = group.random(G2)
     x = group.random(ZR)
@@ -17,7 +14,6 @@ def keygen():
     return output
 
 def sign(sk, M):
-
     input = [sk, M]
     sig = (group.hash(M, G1) ** sk)
     output = sig
@@ -33,8 +29,15 @@ def verify(pk, M, sig, g):
     return output
 
 def main():
+    global group
 
-    input = None
-    tempVar2 = group.random(ZR)
-    output = None
+    group = PairingGroup(80)
 
+    #print(group)
+
+    (pk, sk, g) = keygen()
+    sig = sign(sk, "test")
+    #print(verify(pk, "test2", sig, g))
+
+if __name__ == "__main__":
+    main()
