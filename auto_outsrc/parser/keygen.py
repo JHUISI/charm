@@ -15,6 +15,7 @@ secretVarNames = None
 varDepList = None
 blindingFactors_Lists = []
 blindingFactors_NonLists = []
+varsThatAreBlinded = []
 
 def processListOrExpandNodes(binNode, origVarName, newVarName):
     binNodeRight = binNode.right
@@ -137,11 +138,12 @@ def removeListIndicesAndDupsFromList(inputList):
     return retList
 
 def writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls):
-    global blindingFactors_Lists
+    global blindingFactors_Lists, varsThatAreBlinded
 
     currentBlindingFactorName = blindingFactorPrefix + "_" + keygenOutputElem + blindingSuffix
 
     blindingFactors_Lists.append(currentBlindingFactorName)
+    varsThatAreBlinded.append(keygenOutputElem)
 
     SDLLinesForKeygen = []
 
@@ -195,7 +197,7 @@ def getShouldThisElemBeUnblinded(keygenOutputElem, varsModifiedInKeygen):
     return True
 
 def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListDecls):
-    global blindingFactors_NonLists
+    global blindingFactors_NonLists, varsThatAreBlinded
 
     SDLLinesForKeygen = []
 
@@ -227,6 +229,7 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
     if (isVarList == False):
         SDLLinesForKeygen.append(currentBlindingFactorName + " := random(ZR)\n")
         blindingFactors_NonLists.append(currentBlindingFactorName)
+        varsThatAreBlinded.append(keygenOutputElem)
         SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + " := " + keygenOutputElem + " ^ (1/" + currentBlindingFactorName + ")\n")
         varsToBlindList.remove(keygenOutputElem)
         lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, keygenOutputElem)
@@ -329,7 +332,8 @@ def keygen(file):
     updateCodeAndStructs()
 
 
-    (varsToBlindList, rccaData) = (transform(False))
+    #(varsToBlindList, rccaData) = (transform(False))
+    (varsToBlindList, rccaData) = (transform(varsThatAreBlinded))
     rcca(rccaData)
 
 

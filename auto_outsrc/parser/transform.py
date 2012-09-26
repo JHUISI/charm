@@ -17,7 +17,19 @@ debug = False
 # description: should return a list of VarObjects that make up the new
 # 
 
-def transform(sdl_scheme, verbosity=False):
+def doesThisStatementUseBlindedVars(assignNode, varsThatAreBlinded):
+    if (str(assignNode.left) == config.inputVarName):
+        return False
+    if (str(assignNode.left) == config.outputVarName):
+        return False
+    if (assignNode.right.type == ops.EXPAND):
+        return False
+    if (assignNode.type == ops.ATTR):
+        print(str(assignNode))
+
+    return True
+
+def transform(varsThatAreBlinded, verbosity=False):
     global AssignInfo
     partDecCT = { CTprime.T0: None, CTprime.T1: None, CTprime.T2: None, config.M:None, 'dec_op':None }
     print("Building partially decrypted CT: ", partDecCT)
@@ -134,6 +146,7 @@ def transform(sdl_scheme, verbosity=False):
         if stmtsDec.get(ref):
             # do substitution here
             ASTVisitor( SubstituteVar(config.keygenSecVar, config.keygenSecVar + config.blindingSuffix) ).preorder( stmtsDec[ref].getAssignNode() )             
+            usesBlindedVars = doesThisStatementUseBlindedVars(stmtsDec[ref].getAssignNode(), varsThatAreBlinded)
             cur_list.append(str(stmtsDec[ref].getAssignNode()) + "\n")
             cur_line += 1
 #            varName = stmtsDec[ref].getAssignVar()
