@@ -1,5 +1,8 @@
 schemeName = "LW"
 
+inputVarName = "input"
+outputVarName = "output"
+
 M = 'M'
 
 blindingLoopVar = "y"
