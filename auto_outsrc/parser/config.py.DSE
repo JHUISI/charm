@@ -1,4 +1,4 @@
-schemeName = "BSW"
+schemeName = "DSE"
 
 M = 'M'
 
@@ -13,8 +13,11 @@ encryptFuncName = "encrypt"
 
 # superset of variables we have used to represent public parameters in
 # our crypto schemes
-keygenPubVar = ["pk", "mpk", "gpk"]
+keygenPubVar = ["pk", "mpk"]
 keygenSecVar = "sk"
+
+masterPubVars = ["mpk"]
+masterSecVars = ["msk"]
 
 pySuffix = ".py"
 cppSuffix = ".cpp"

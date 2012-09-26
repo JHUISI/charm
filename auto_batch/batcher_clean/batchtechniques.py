@@ -58,6 +58,11 @@ class AbstractTechnique:
             return True
         return False
 
+    def varDefineValue(self, var_name):
+        var = self.vars.get(str(var_name))
+        return var
+        
+
     def getNodes(self, tree, parent_type, _list):
         if tree == None: return None
         elif parent_type == ops.MUL:
@@ -1117,7 +1122,7 @@ class Technique8(AbstractTechnique):
     
 class ASTIndexForIndiv(AbstractTechnique):
     def __init__(self, sdl_data, variables, meta):
-        AbstractTechnique.__init__(self, sdl_data, variables, meta)        
+        AbstractTechnique.__init__(self, sdl_data, variables, meta) 
         
     def visit_attr(self, node, data):
         if data['parent'].type in [ops.PROD, ops.EQ, ops.FOR, ops.SUM]:
@@ -1125,3 +1130,41 @@ class ASTIndexForIndiv(AbstractTechnique):
         if not self.isConstant(node) and not str(node) in ['1', '-1']:
             node.setAttrIndex('z') # add index to each attr that isn't constant
     
+
+
+class Technique10(AbstractTechnique):
+    def __init__(self, sdl_data, variables, meta):
+        AbstractTechnique.__init__(self, sdl_data, variables, meta)  
+        self.debug = False      
+        self.for_start = None
+        self.for_end = None
+        self.for_iterator = None
+
+    def visit_for(self, node, data):
+        if(Type(node.left) == ops.EQ):
+            start = node.left
+            self.for_iterator = start.left.getAttribute()
+            self.for_start = start.right.getAttribute()
+            if self.for_start == None or self.for_iterator == None: sys.exit("ERROR: for loop not well formed!") 
+            print("for: ", self.for_iterator, ":", self.for_start)                       
+        if(Type(node.right) == ops.ATTR):
+            val = node.right.getAttribute()
+            self.for_end = self.varDefineValue(val)
+            if self.for_end == None: sys.exit("ERROR: %s is not defined in SDL." % val)
+            print("until: ", node.right, self.for_end)
+    
+    def visit_attr(self, node, data):
+        self.checkExistenceOfAttribute(node, self.for_iterator)
+    
+    # need a function that can replace variables with integers from 1 until X. 
+    def checkExistenceOfAttribute(self, node, var):
+        if self.for_end == None: return False
+        attr = node.getAttribute()
+        s = attr.split('#') 
+        if( len(s) > 1):
+            print("attr: ", node, s)
+            match = False
+            for i in s:
+                if var in i: match = True; break            
+            return False
+        return False 

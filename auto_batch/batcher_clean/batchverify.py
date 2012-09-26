@@ -307,9 +307,9 @@ def runBatcher(opts, proofGen, file, verify, ast_struct, eq_number=0):
             continue
         ASTVisitor(Tech).preorder(verify2)
         if option == '2' and not singleVE:
+            # add index numbers to deltas if dealing with multiple verification equations
             aftTech2 = AfterTech2AddIndex()
             ASTVisitor(aftTech2).preorder(verify2)
-#            sys.exit("STOP HERE!!!")
         elif option == '6':
             testVerify2 = Tech.makeSubstitution(verify2)
             if testVerify2 != None: verify2 = testVerify2
@@ -320,6 +320,10 @@ def runBatcher(opts, proofGen, file, verify, ast_struct, eq_number=0):
            print(option_str, ":",verify2, "\n")
         if PROOFGEN_FLAG:
             proofGen.setNextStep(Tech.rule, verify2)
+    
+    # now we check if Technique 10 is applicable (aka loop unrolling)
+    Tech = Technique10(sdl_data, vars, metadata)
+    ASTVisitor(Tech).preorder(verify2)
     
     if PROOFGEN_FLAG:
         proofGen.setNextStep('finalbatcheq', None)

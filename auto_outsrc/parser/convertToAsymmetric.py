@@ -13,6 +13,8 @@
 from SDLParser import *
 from outsrctechniques import SubstituteVar, SubstitutePairings
 
+assignInfo = None
+
 class GetPairingVariables:
     def __init__(self, list1, list2):
         assert type(list1) == type(list2) and type(list1) == list, "GetPairingVariables: invalid input type"
@@ -32,6 +34,8 @@ class GetPairingVariables:
             pass
 
 def retrieveGenList():
+    global assignInfo
+    assignInfo = getAssignInfo()
     setting = getAssignInfo()[NONE_FUNC_NAME]['setting'].getAssignNode().right.getAttribute()
     print("setting is", setting)
     if setting != SYMMETRIC_SETTING:
@@ -72,28 +76,29 @@ def retrieveGenList():
 
     print("pair vars LHS:", pair_vars_G1)
     print("pair vars RHS:", pair_vars_G2) 
+    print("list of gens :", generators)
     info = {}
     info[ 'G1' ] = (pair_vars_G1, assignTraceback(generators, pair_vars_G1))
-    info[ 'G2' ] = (pair_vars_G2, assignTraceback(generators, pair_vars_G2))
-    info['generators'] = generators 
+#    info[ 'G2' ] = (pair_vars_G2, assignTraceback(generators, pair_vars_G2))
+#    info['generators'] = generators 
 
     # TODO: 
-    print("<===== Derive Rules =====>")
-    rules = deriveRules(info, generators)
-    print("<===== Derive Rules =====>\n")
-    print("<===== Determine Assignment =====>")
-    info['genMapG1'], info['genMapG2'] = determineTypeAssignments(rules)
-    print("<===== Determine Assignment =====>\n")
-
-    print("<===== Determine Splits =====>")    
-    replaceGenerators = deriveSetupGenerators(rules)
-    print("<===== Determine Splits =====>\n")
-    
-    info['rules'] = rules
-    info['setupGenerators'] = replaceGenerators 
-    print("<===== Transform Setup =====>")
-    transformSetup(stmtS, info)    
-    print("<===== Transform Setup =====>\n")    
+#    print("<===== Derive Rules =====>")
+#    rules = deriveRules(info, generators)
+#    print("<===== Derive Rules =====>\n")
+#    print("<===== Determine Assignment =====>")
+#    info['genMapG1'], info['genMapG2'] = determineTypeAssignments(rules)
+#    print("<===== Determine Assignment =====>\n")
+#
+#    print("<===== Determine Splits =====>")    
+#    replaceGenerators = deriveSetupGenerators(rules)
+#    print("<===== Determine Splits =====>\n")
+#    
+#    info['rules'] = rules
+#    info['setupGenerators'] = replaceGenerators 
+#    print("<===== Transform Setup =====>")
+#    transformSetup(stmtS, info)    
+#    print("<===== Transform Setup =====>\n")    
     
 #    print("info on G1 :=>", info['genMapG1'].keys())
 #    print("info on G2 :=>", info['genMapG2'].keys())    
@@ -116,22 +121,27 @@ def assignTraceback(generators, listVars):
 
         
 def buildMap(generators, varList, var):
+    global assignInfo
     if (not set(var).issubset(generators)):
-        (name, varInf) = getVarNameEntryFromAssignInfo(var)
+        print("var keys: ", var)
+        (name, varInf) = getVarNameEntryFromAssignInfo(assignInfo, var)
         if(name == None):             
-            #print("Var : ", varInf.getVarDepsNoExponents())
+            print("Var : ", varInf.getVarDepsNoExponents())
             return
         l = varInf.getVarDepsNoExponents()
 #        print("var:", var, ", output: ", l)
         # prune 'l' here
         for i in l:
-#            print("name: ", i) # uncomment for ckrs09 error
+            print("name: ", i) # uncomment for ckrs09 error
             typeI = getVarTypeFromVarName(i, None, True)
-#            print("getVarTypeFromVarName:  ", i,":", typeI)
+            print("getVarTypeFromVarName:  ", i,":", typeI)
             if typeI == types.NO_TYPE:
                 node = BinaryNode(ops.ATTR)
                 node.setAttribute(i)
-                (funcName , newVarName) = getVarNameFromListIndices(node, True)
+                print("getVarNameFromListIndices req node: ", node)
+                (funcName , newVarName) = getVarNameFromListIndices(assignInfo, node)#, True)
+                print("funcName: ", funcName)
+                print("newVarName: ", newVarName)
                 if newVarName != None: 
                     print("newVarName := ", newVarName)
                     resultVarName = getVarTypeFromVarName(newVarName, None, True)
@@ -156,8 +166,8 @@ def buildMap(generators, varList, var):
             if lenBefore == lenAfter:
                 node = BinaryNode(ops.ATTR)
                 node.setAttribute(i)
-#                print("Node :=>", node)
-                (funcName, string) = getVarNameFromListIndices(node, True)
+                print("Node :=>", node)
+                (funcName, string) = getVarNameFromListIndices(assignInfo, node)##, True)
                 if string != None: varList.append(string)
 
             

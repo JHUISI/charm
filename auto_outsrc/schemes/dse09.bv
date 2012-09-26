@@ -2,6 +2,7 @@ name := dsewaters09
 setting := symmetric
 
 BEGIN :: types
+id := str
 M := GT
 C := list
 D := list
