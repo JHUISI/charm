@@ -377,25 +377,26 @@ def runBatcher(opts, proofGen, file, verify, ast_struct, eq_number=0):
         if VERBOSE:  
           print("<====\tPREP FOR CODE GEN\t====>")
           print("\nFinal version =>", verify2, "\n")
-          out_str = "batch eq := { %s }\n" % verify2
-          for i in subProds.dotprod['list']:
-              print("compute: ", i,":=", subProds.dotprod['dict'][i])    
-              out_str += "%s := %s\n" % (i, subProds.dotprod['dict'][i])
-          for i in subProds1.dotprod['list']:
-              print("compute: ", i,":=", subProds1.dotprod['dict'][i])
-              out_str += "%s := %s\n" % (i, subProds1.dotprod['dict'][i])              
-          for i in batch_precompute.keys():
-              print("precompute:", i, ":=", batch_precompute[i])
-              out_str += "precompute: %s := %s\n" % (i, batch_precompute[i])                            
-          for i in subProds.dotprod['list']:
-              print(i,":=", subProds.dotprod['types'][i])
-              out_str += "%s := %s\n" % (i, subProds.dotprod['types'][i])              
-          for i in subProds1.dotprod['list']:
-              print(i,":=", subProds1.dotprod['types'][i])
-              out_str += "%s := %s\n" % (i, subProds1.dotprod['types'][i])              
+        out_str = "batch eq := { %s }\n" % verify2
+        for i in subProds.dotprod['list']:
+            if VERBOSE: print("compute: ", i,":=", subProds.dotprod['dict'][i])    
+            out_str += "%s := %s\n" % (i, subProds.dotprod['dict'][i])
+        for i in subProds1.dotprod['list']:
+            if VERBOSE: print("compute: ", i,":=", subProds1.dotprod['dict'][i])
+            out_str += "%s := %s\n" % (i, subProds1.dotprod['dict'][i])              
+        for i in batch_precompute.keys():
+            if VERBOSE: print("precompute:", i, ":=", batch_precompute[i])
+            out_str += "precompute: %s := %s\n" % (i, batch_precompute[i])                            
+        for i in subProds.dotprod['list']:
+            if VERBOSE: print(i,":=", subProds.dotprod['types'][i])
+            out_str += "%s := %s\n" % (i, subProds.dotprod['types'][i])              
+        for i in subProds1.dotprod['list']:
+            if VERBOSE: print(i,":=", subProds1.dotprod['types'][i])
+            out_str += "%s := %s\n" % (i, subProds1.dotprod['types'][i])
 #          print(out_str)
-          if SDL_OUT_FILE != None:
-              writeFile(SDL_OUT_FILE, out_str)
+        if SDL_OUT_FILE != None:
+            print("Writing partial SDL: ", SDL_OUT_FILE)
+            writeFile(SDL_OUT_FILE, out_str)
 
     if PROOFGEN_FLAG:
         latex_file = metadata['name'].upper() + str(eq_number)
