@@ -15,7 +15,6 @@ END :: types
 
 BEGIN :: func:init
 input := None
-tempVar := random(G2)
 output := None
 END :: func:init
 
@@ -38,13 +37,16 @@ END :: func:sign
 BEGIN :: func:verify
  input := list{pk, M, sig, g}
  h := H(M, G1)
- verify := {e(h, pk) == e(sig, g)}
- output := verify 
+ BEGIN :: if
+ if {e(h, pk) == e(sig, g)}
+ output := True
+ else
+ output := False
+ END :: if
 END :: func:verify
 
 BEGIN :: func:main
 input := None
-tempVar2 := random(ZR)
 output := None
 END :: func:main
 
