@@ -111,33 +111,3 @@ def encrypt(pk, gpk, M, policy_str):
     output = ct
     return output
 
-if __name__ == "__main__":
-    global group
-    group = PairingGroup(MNT160)
-
-    S = ['ONE', 'TWO', 'THREE']
-    M = "balls on fire345"
-    policy_str = '((four or three) and (two or one))'
-
-    (msk, pk) = authsetup(gpk, authS)
-    (blindingFactor_deleteMeVarBlinded, blindingFactor_KBlinded, skBlinded) = keygen(gpk, msk, gid, userS)
-    (ct) = encrypt(pk, gpk, M, policy_str)
-
-    f_ct_LW = open('ct_LW.charmPickle', 'wb')
-    pick_ct_LW = objectToBytes(ct, group)
-    f_ct_LW.write(pick_ct_LW)
-    f_ct_LW.close()
-
-    f_gpk_LW = open('gpk_LW.charmPickle', 'wb')
-    pick_gpk_LW = objectToBytes(gpk, group)
-    f_gpk_LW.write(pick_gpk_LW)
-    f_gpk_LW.close()
-
-    f_skBlinded_LW = open('skBlinded_LW.charmPickle', 'wb')
-    pick_skBlinded_LW = objectToBytes(skBlinded, group)
-    f_skBlinded_LW.write(pick_skBlinded_LW)
-    f_skBlinded_LW.close()
-
-    keys = {'sk':zz, 'pk':pk[4]}
-    writeToFile('keys_LW_.txt', objectOut(group, keys))
-

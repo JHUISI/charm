@@ -278,10 +278,6 @@ def keygen(file):
 
     varsToBlindList = getSecretList(config, False)
 
-    #(varsToBlindList, rccaData) = (transform(False))
-    #rcca(rccaData)
-
-
     varNamesForListDecls = []
 
     updateCodeAndStructs()
@@ -336,9 +332,6 @@ def keygen(file):
     (varsToBlindList, rccaData) = (transform(varsThatAreBlinded))
     rcca(rccaData)
 
-
-
-
     existingDecOutInputLineNo = getLineNoOfInputStatement(decOutFunctionName)
     existingDecOutInputLineNo -= 1
     existingDecOutInputLine = getLinesOfCode()[existingDecOutInputLineNo]
@@ -350,14 +343,6 @@ def keygen(file):
     substituteOneLineOfCode(newDecOutInputLine, existingDecOutInputLineNo + 1)
 
     updateCodeAndStructs()
-
-    #printLinesOfCode()
-    #sys.exit("test")
-
-
-    #(varsToBlindList, rccaData) = (transform(False))
-    #rcca(rccaData)
-
 
     return (blindingFactors_NonLists, blindingFactors_Lists)
 

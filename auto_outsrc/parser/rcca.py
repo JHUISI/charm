@@ -177,6 +177,7 @@ def rcca_decout(vars):
     decout_sdl = ["\n","BEGIN :: func:%s\n" % config.decOutFunctionName,
 "input := list{%s, %s, %s}\n" % (config.partialCT, config.keygenBlindingExponent, vars['pk_value']),
 "%s := expand{T0, T1, T2}\n" % config.partialCT,
+'''
 "%s := T0 %s (T2^%s)\n" % (config.rccaRandomVar, vars['dec_op'], config.keygenBlindingExponent), # recover R
 "%s := DeriveKey( %s )\n" % (vars['session_key'], config.rccaRandomVar), # recover session key
 "%s := SymDec(%s, T1)\n" % (config.M, vars['session_key']), # use session key to recover M
@@ -189,6 +190,7 @@ def rcca_decout(vars):
 "else\n",
 "error('invalid ciphertext')\n",
 "END :: if\n",
+'''
 "END :: func:%s\n" % config.decOutFunctionName]
     return decout_sdl
 

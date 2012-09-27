@@ -17,17 +17,46 @@ debug = False
 # description: should return a list of VarObjects that make up the new
 # 
 
+def dropListIndexForStringArg(stringArg):
+    if (stringArg.count(LIST_INDEX_SYMBOL) == 0):
+        return stringArg
+
+    listIndexPos = stringArg.find(LIST_INDEX_SYMBOL)
+    return stringArg[0:listIndexPos]
+
+def doesThisStatementUseBlindedVarsRecursive(assignNode, varsThatAreBlinded, listOfBlindedVarsUsed):
+    if (assignNode.left != None):
+        doesThisStatementUseBlindedVarsRecursive(assignNode.left, varsThatAreBlinded, listOfBlindedVarsUsed)
+
+    if (assignNode.right != None):
+        doesThisStatementUseBlindedVarsRecursive(assignNode.right, varsThatAreBlinded, listOfBlindedVarsUsed)
+
+    try:
+        listNodes = assignNode.listNodes
+    except:
+        listNodes = []
+
+    if (len(listNodes) > 0):
+        for listNode in listNodes:
+            if (dropListIndexForStringArg(listNode) in varsThatAreBlinded):
+                listOfBlindedVarsUsed.append(dropListIndexForStringArg(listNode))
+    else:
+        if ( (assignNode.type == ops.ATTR) and (dropListIndexForStringArg(str(assignNode)) in varsThatAreBlinded) ):
+            listOfBlindedVarsUsed.append(dropListIndexForStringArg(str(assignNode)))
+
 def doesThisStatementUseBlindedVars(assignNode, varsThatAreBlinded):
     if (str(assignNode.left) == config.inputVarName):
-        return False
+        return []
     if (str(assignNode.left) == config.outputVarName):
-        return False
+        return []
     if (assignNode.right.type == ops.EXPAND):
-        return False
-    if (assignNode.type == ops.ATTR):
-        print(str(assignNode))
+        return []
+    if (str(assignNode.left) in varsThatAreBlinded):
+        sys.exit("doesThisStatementUseBlindedVars in transform.py:  variable on left side of the assignment statement currently being considered is actually one of the variables that have been blinded, which means there's been a reassignment of the same variable (not allowed in SDL).")
 
-    return True
+    listOfBlindedVarsUsed = []
+    doesThisStatementUseBlindedVarsRecursive(assignNode.right, varsThatAreBlinded, listOfBlindedVarsUsed)
+    return listOfBlindedVarsUsed
 
 def transform(varsThatAreBlinded, verbosity=False):
     global AssignInfo
@@ -146,14 +175,11 @@ def transform(varsThatAreBlinded, verbosity=False):
         if stmtsDec.get(ref):
             # do substitution here
             ASTVisitor( SubstituteVar(config.keygenSecVar, config.keygenSecVar + config.blindingSuffix) ).preorder( stmtsDec[ref].getAssignNode() )             
-            usesBlindedVars = doesThisStatementUseBlindedVars(stmtsDec[ref].getAssignNode(), varsThatAreBlinded)
-            cur_list.append(str(stmtsDec[ref].getAssignNode()) + "\n")
-            cur_line += 1
-#            varName = stmtsDec[ref].getAssignVar()
-#            newVF   = VarInfo.copy(stmtsDec[ref])
-            #print("new lines :=>\t", cur_line, newVF.getAssignNode())
-#            newVF.setLineNo(cur_line)
-#            AssignInfo[newFunc][varName] = newVF
+            listOfBlindedVarsUsed = doesThisStatementUseBlindedVars(stmtsDec[ref].getAssignNode(), varsThatAreBlinded)
+            if (len(listOfBlindedVarsUsed) == 0):
+                cur_list.append(str(stmtsDec[ref].getAssignNode()) + "\n")
+                cur_line += 1
+
     
     for o in range(len(newObj)):
         if newObj[o] != None:
