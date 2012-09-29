@@ -36,12 +36,7 @@ Make sure pythonVersionOfSDLCode.py executes correctly for individual signature 
 Python-Charm code, otherwise CodeGen won't be able to generate functional code for the individual, batch,
 and divide-and-conquer automatically generated Python-Charm code.
 
-To do so, first add the following import lines to pythonVersionOfSDLCode.py:
-
-from charm.toolbox.pairinggroup import *
-from charm.core.engine.util import *
-
-Next, declare a global variable named "group" and define it in the main() method as such:
+To do so, declare a global variable named "group" and define it in the main() method as such:
 
 global group 
 .

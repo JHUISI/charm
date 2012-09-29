@@ -79,7 +79,12 @@ def addImportLines():
     cppImportLines += "#define DEBUG  true\n"
     cppImportLines += "\n"
 
-    #setupFile.write(pythonImportLines)
+    if (ignoreCloudSourcing == True):
+        setupFile.write("from charm.toolbox.pairinggroup import *\n")
+        setupFile.write("from charm.core.engine.util import *\n\n")
+
+
+        #setupFile.write(pythonImportLines)
     #transformFile.write(pythonImportLines)
     #decOutFile.write(cppImportLines)
     #decOutFile.write(pythonImportLines)
@@ -110,6 +115,9 @@ def addGroupObjGlobalVar():
     outputString = ""
     outputString += groupObjName + "UserFuncs = NULL\n\n"
     #userFuncsCPPFile.write(outputString)
+
+    if (ignoreCloudSourcing == True):
+        setupFile.write("group = None\n\n")
 
 def isFunctionStart(binNode):
     if (binNode.type != ops.BEGIN):
@@ -1537,6 +1545,10 @@ def writeMainFuncOfDecOut_Python():
 
     decOutFile.write(outputString)
 
+def writeMainFunc_IgnoreCloudSourcing():
+    global setupFile
+    setupFile.write("    global group\n    group = PairingGroup(MNT160)\n\n")
+
 def writeMainFuncs():
     writeMainFuncOfSetup()
     writeMainFuncOfTransform()
@@ -1670,10 +1682,17 @@ def main(SDL_Scheme, ignoreCloudSourcingArg, nonCloudSourcingFileNameArg=None):
 
     addImportLines()
     addGroupObjGlobalVar()
+
+    if (ignoreCloudSourcing == True):
+        setupFile.write("bodyKey = 'Body'\n\n")
+
     writeSDLToFiles(astNodes)
 
     if (ignoreCloudSourcing == False):
         writeMainFuncs()
+    else:
+        writeMainFunc_IgnoreCloudSourcing()
+
     addGetGlobalsToUserFuncs()
 
     setupFile.close()
