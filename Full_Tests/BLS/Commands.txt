@@ -36,12 +36,7 @@ Make sure pythonVersionOfSDLCode.py executes correctly for individual signature 
 Python-Charm code, otherwise CodeGen won't be able to generate functional code for the individual, batch,
 and divide-and-conquer automatically generated Python-Charm code.
 
-To do so, first add the following import lines to pythonVersionOfSDLCode.py:
-
-from charm.toolbox.pairinggroup import *
-from charm.core.engine.util import *
-
-Next, declare a global variable named "group" and define it in the main() method as such:
+To do so, declare a global variable named "group" and define it in the main() method as such:
 
 global group 
 .
@@ -71,5 +66,17 @@ their values weren't  derived within verify.
 
 The next step is to run the SDL file through Batcher.  To do that, execute the following command:
 
+python 
+
+
+
+
+
 BATCHER's command to produce BATCHER output
 
+then, change directory into "batcher_clean" dir
+then execute the following...
+python batcher_main.py -f ../tests/bls.bv -c -o myfile.cg
+this does the basic thing: take SDL and run Batcher to produce the codegen partial SDL output file
+4:19
+in the near future, you'll be able to run python batcher_main.py —help to see all the command line options

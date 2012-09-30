@@ -2,7 +2,6 @@ from charm.toolbox.pairinggroup import *
 from charm.core.engine.util import *
 
 h = {}
-group = None
 
 def init():
 
@@ -43,11 +42,7 @@ def main():
     output = None
 
     global group
-    group = PairingGroup(80)
-
-    (pk, sk, g) = keygen()
-    sig = sign(sk, "test")
-    print(verify(pk, "test2", sig, g))
+    group = PairingGroup(MNT160)
 
 if __name__ == '__main__':
     main()
