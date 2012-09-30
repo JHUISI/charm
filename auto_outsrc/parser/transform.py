@@ -17,6 +17,9 @@ debug = False
 # description: should return a list of VarObjects that make up the new
 # 
 
+def getDecomposedExpressionsList(assignNode, listOfBlindedVarsUsed):
+    print("test")
+
 def dropListIndexForStringArg(stringArg):
     if (stringArg.count(LIST_INDEX_SYMBOL) == 0):
         return stringArg
@@ -179,6 +182,9 @@ def transform(varsThatAreBlinded, verbosity=False):
             if (len(listOfBlindedVarsUsed) == 0):
                 cur_list.append(str(stmtsDec[ref].getAssignNode()) + "\n")
                 cur_line += 1
+            else:
+                decomposedExpressionsList = getDecomposedExpressionsList(stmtsDec[ref].getAssignNode(), listOfBlindedVarsUsed)
+
 
     
     for o in range(len(newObj)):

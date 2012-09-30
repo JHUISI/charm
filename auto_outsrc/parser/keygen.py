@@ -327,9 +327,11 @@ def keygen(file):
     appendToLinesOfCode(varNamesForListDecls, lineNoEndTypesSection)
     updateCodeAndStructs()
 
-
-    #(varsToBlindList, rccaData) = (transform(False))
     (varsToBlindList, rccaData) = (transform(varsThatAreBlinded))
+
+    printLinesOfCode()
+    sys.exit("test")
+
     rcca(rccaData)
 
     existingDecOutInputLineNo = getLineNoOfInputStatement(decOutFunctionName)
