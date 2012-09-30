@@ -662,6 +662,114 @@ class Technique3(AbstractTechnique):
                 print("len r: ", len(r))
             pass # do nothing
 
+# Formerly 'DotProdInstanceFinder' from AutoBatch
+# Focuses on simplifying dot products of the form
+# prod{} on (x * y)
+class Technique4(AbstractTechnique):
+    def __init__(self, allStmtsInBlock):
+        AbstractTechnique.__init__(self, allStmtsInBlock)
+        self.rule = "Distribute dot products (technique 5): "
+        self.applied = False
+
+    def getMulTokens(self, subtree, parent_type, target_type, _list):
+        if subtree == None: return None
+        elif parent_type == ops.EXP and Type(subtree) == ops.MUL:
+            return               
+        elif parent_type == ops.MUL:
+            if Type(subtree) in target_type: 
+                found = False
+                for i in _list:
+                    if isNodeInSubtree(i, subtree): found = True
+                if not found: _list.append(subtree)
+
+        if subtree.left: self.getMulTokens(subtree.left, subtree.type, target_type, _list)
+        if subtree.right: self.getMulTokens(subtree.right, subtree.type, target_type, _list)
+        return
+        
+    def visit(self, node, data):
+        pass
+
+    def visit_pair(self, node, data):
+        return { 'visited_pair': True }
+    
+    # Bandaid: cleaning up when about to distribute a dot products where PROD node has no ON node
+    # in other words, dangling PROD node in verify equation
+    def visit_prod(self, node, data):
+        if Type(data['parent']) != ops.ON:
+            #print("Found a candidate for cleaning!!!")
+            new_node = BinaryNode(ops.ATTR)
+            new_node.setAttribute("1")
+            BinaryNode.clearNode(node)
+            BinaryNode.setNodeAs(node, new_node)
+            
+            
+    # visit all the ON nodes and test whether we can distribute the product to children nodes
+    # e.g., prod{} on (x * y) => prod{} on x * prod{} on y    
+    def visit_on(self, node, data):
+#        print("DP finder: ", data.get('visited_pair'))
+        if Type(data['parent']) == ops.PAIR or data.get('visited_pair'): # bail if dot prod already a child of a pairing node
+            return
+        #print("T5: right node type =>", Type(node.right), node.right)
+        if Type(node.right) == ops.ON: # prod{} on (prod{} on x). thus, we should bail
+            return
+        #print("test: right node of prod =>", node.right, ": type =>", node.right.type)
+        #print("parent type =>", Type(data['parent']))
+#        _type = node.right.type
+        if Type(node.right) == ops.MUL:            
+            # must distribute prod to both children of mul
+            r = []
+            mul_node = node.right
+            self.getMulTokens(mul_node, ops.NONE, [ops.EXP, ops.HASH, ops.PAIR, ops.ATTR], r)
+            #for i in r:
+            #    print("node =>", i)
+            
+            if len(r) == 0:
+                pass
+            elif len(r) <= 2:
+            # in case we're dealing with prod{} on attr1 * attr2 
+            # no need to simply further, so we can simply return
+                if mul_node.left.type == ops.ATTR and mul_node.right.type == ops.ATTR:
+                    return
+
+                node.right = None
+                prod_node2 = BinaryNode.copy(node)
+            
+            # add prod nodes to children of mul_node
+                prod_node2.right = mul_node.right
+                mul_node.right = prod_node2
+            
+                node.right = mul_node.left
+                mul_node.left = node
+                #self.rule += "True "
+                # move mul_node one level up to replace the "on" node.
+                addAsChildNodeToParent(data, mul_node) # from SDLParser
+                self.applied = True
+            elif len(r) > 2:
+                #print("original node =>", node)
+                muls = [BinaryNode(ops.MUL) for i in range(len(r)-1)]
+                prod = [BinaryNode.copy(node) for i in r]
+                # distribute the products to all nodes in r
+                for i in range(len(r)):
+                    prod[i].right = r[i]
+#                    print("n =>", prod[i])
+                # combine prod nodes into mul nodes                     
+                for i in range(len(muls)):
+                    muls[i].left = prod[i]
+                    if i < len(muls)-1:
+                        muls[i].right = muls[i+1]
+                    else:
+                        muls[i].right = prod[i+1]
+#                print("final node =>", muls[0])
+                addAsChildNodeToParent(data, muls[0]) # from SDLParser
+                self.applied = True
+                #self.rule += "True "
+            else:
+                #self.rule += "False "
+                return                
+    def testForApplication(self):
+        return self.applied
+
+
 class FindT1:
     def __init__(self, T0_var):
         self.T0 = T0_var
@@ -721,25 +829,71 @@ class SubstitutePairings:
         else:
             print("TODO: handle this case - ", Type(node.left), Type(node.right))
 
+techMap = {1:Technique1, 2:Technique2, 3:Technique3, 4:Technique4}
+
+def testTechnique(tech_option, equation, code_block=None):
+    if code_block == None: code_block = {} 
+    eq2 = BinaryNode.copy(equation)
+        
+    tech = None
+    if tech_option in techMap.keys():
+        tech = techMap[tech_option](code_block)
+    else:
+        return None
+        
+    # traverse equation with the specified technique
+    ASTVisitor(tech).preorder(eq2)
+
+    # return the results
+    return (tech, eq2)
+
+# figures out which optimizations apply
+def SimplifySDLNode(equation, path, code_block=None, debug=False):
+    tech_list = [1, 2, 3, 4]
+    # 1. apply the start technique to equation
+    new_eq = equation
+    while True:
+        cur_tech = tech_list.pop()
+        if debug: print("Testing technique: ", cur_tech)
+        (tech, new_eq) = testTechnique(cur_tech, new_eq, code_block)
+        
+        if tech.applied:
+            if debug: print("Technique ", cur_tech, " successfully applied.")
+            path.append(cur_tech)
+            tech_list = [1, 2, 3, 4]
+            continue
+        else:
+            if len(tech_list) == 0: break
+    if debug: 
+        print("path: ", path)
+        print("optimized equation: ", new_eq)
+    return new_eq
 
 if __name__ == "__main__":
     statement = sys.argv[1]
     parser = SDLParser()
     equation = parser.parse(statement)
-
+    path_applied = []
+    
     print("Original: ", equation)
-    tech2 = Technique2()
-    ASTVisitor(tech2).preorder(equation)
-    print("Tech 2: ", equation)
-        
-    tech1 = Technique1()
-    ASTVisitor(tech1).preorder(equation)
-    print("Tech 1: ", equation)
-    
-    tech3 = Technique3()
-    ASTVisitor(tech3).preorder(equation)
-    print("Tech 3: ", equation)
-    
+    equation2 = SimplifySDLNode(equation, path_applied)
+    print("Final Optimized: ", equation2)
+    print("Techniques: ", path_applied)
+#    tech2 = Technique2({})
+#    ASTVisitor(tech2).preorder(equation)
+#    print("Tech 2: ", equation)
+#        
+#    tech1 = Technique1({})
+#    ASTVisitor(tech1).preorder(equation)
+#    print("Tech 1: ", equation)
+#    
+#    tech3 = Technique3({})
+#    ASTVisitor(tech3).preorder(equation)
+#    print("Tech 3: ", equation)
+#    
+#    tech4 = Technique4({})
+#    ASTVisitor(tech4).preorder(equation)
+#    print("Tech 4: ", equation)
     
     
     

@@ -244,10 +244,8 @@ def runBatcher(opts, proofGen, file, verify, ast_struct, eq_number=0):
     if VERBOSE: print("metadata =>", metadata)
 
     # build data inputs for technique classes    
-    sdl_data = { CONST : constants, PUBLIC: pub_vars, MESSAGE : msg_vars, SETTING : batch_count }    
+    sdl_data = { CONST : constants, PUBLIC: pub_vars, MESSAGE : msg_vars, SETTING : batch_count } 
     if PROOFGEN_FLAG:
-#        lcg_data = {}; lcg_steps = 0
-#        lcg = LatexCodeGenerator(constants, vars, latex_subs)
         # start the LCG
         proofGen.initLCG(constants, vars, sig_vars, latex_subs)
         if flags['step1']: proofGen.setStepOne(flags['step1'])
@@ -268,7 +266,6 @@ def runBatcher(opts, proofGen, file, verify, ast_struct, eq_number=0):
 #    ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
     ASTVisitor(CVForMultiSigner(vars, sig_vars, pub_vars, msg_vars, batch_count)).preorder(verify2)
     if PROOFGEN_FLAG: 
-#        lcg_data[ lcg_steps ] = { 'msg':'Combined Equation', 'eq':lcg.print_statement(verify2) }; lcg_steps += 1
         proofGen.setNextStep( 'consolidate', verify2 )
     # check whether this step is necessary!    
     verify_test = BinaryNode.copy(verify2)

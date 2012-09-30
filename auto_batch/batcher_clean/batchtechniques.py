@@ -2,7 +2,7 @@
 from batchlang import *
 from batchparser import *
 
-Tech_db = Enum('NoneApplied', 'ExpIntoPairing', 'DistributeExpToPairing', 'ProductToSum', 'CombinePairing', 'SplitPairing', 'ConstantPairing', 'MoveExpOutPairing')
+Tech_db = Enum('NoneApplied', 'ExpIntoPairing', 'DistributeExpToPairing', 'ProductToSum', 'CombinePairing', 'SplitPairing', 'ConstantPairing', 'MoveExpOutPairing', 'ConstantSizeLoop')
 
 #TODO: code up reverse 2 : pull values from pairing outside, 
 
@@ -1131,10 +1131,14 @@ class ASTIndexForIndiv(AbstractTechnique):
             node.setAttrIndex('z') # add index to each attr that isn't constant
     
 
+tech10 = Tech_db
 
 class Technique10(AbstractTechnique):
     def __init__(self, sdl_data, variables, meta):
         AbstractTechnique.__init__(self, sdl_data, variables, meta)  
+        self.rule    = "Unroll constant-size for loop (technique 10)"
+        self.applied = False 
+        self.score   = tech10.NoneApplied
         self.debug = False      
         self.for_start = None
         self.for_end = None
@@ -1152,6 +1156,8 @@ class Technique10(AbstractTechnique):
             self.for_end = self.varDefineValue(val)
             if self.for_end == None: sys.exit("ERROR: %s is not defined in SDL." % val)
             print("until: ", node.right, self.for_end)
+    
+#    def check
     
     def visit_attr(self, node, data):
         self.checkExistenceOfAttribute(node, self.for_iterator)
