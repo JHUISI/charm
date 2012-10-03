@@ -26,7 +26,7 @@ calculated in "verify".  This does not apply to "h" since "h" is calculated in "
 
 
 4)  You must have functions named "init" and "main" for backwards compatibility.  These can be dummy
-functions.
+functions.  Please see our reference SDL implementation for an example.
 
 Run the following command, where "bls-full.bv" is your SDL file.
 
@@ -36,17 +36,8 @@ Make sure pythonVersionOfSDLCode.py executes correctly for individual signature 
 Python-Charm code, otherwise CodeGen won't be able to generate functional code for the individual, batch,
 and divide-and-conquer automatically generated Python-Charm code.
 
-To do so, declare a global variable named "group" and define it in the main() method as such:
-
-global group 
-.
-.
-.
-group = PairingGroup(MNT160)
-
-If you're having problems with this, try defining group as:
-
-group = PairingGroup(80)
+We've generated some template code for you to test out your individual signature verification algorithm
+in Python-Charm.  Note the generated template code in the "main" method.
 
 Now write your "main" routine to call your functions in the proper order and with the correct arguments.  For 
 example, in the reference file, you'll see this:
@@ -55,14 +46,17 @@ example, in the reference file, you'll see this:
 sig = sign(sk, "test")
 print(verify(pk, "test", sig, g))
 
-Also add the following lines so the "main" routine gets called when you run pythonVersionOfSDLCode.py.
-
-if __name__ == '__main__':
-    main()
-
 Make sure this prints True if the messages are the same, and False if they are different.  Note that "pk", 
 "sig", and "g" had to be passed to verify b/c their values were necessary for verify's calculations, but
 their values weren't  derived within verify.
+
+Note that if you're having problems with this statement:
+
+group = PairingGroup(MNT160)
+
+try changing it to the following:
+
+group = PairingGroup(80)
 
 The next step is to run the SDL file through Batcher.  To do that, execute the following command:
 

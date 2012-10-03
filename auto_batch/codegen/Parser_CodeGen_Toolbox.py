@@ -1331,7 +1331,7 @@ def determineIfWithinQuotes(lineOfCode, R_index, withinQuotes, lastQuoteChar):
 	sys.exit("Parser_CodeGen_Toolbox->determineIfWithinQuotes:  reached end of function without finding case for the input parameters passed in.")
 
 def ensureSpacesBtwnTokens_CodeGen(lineOfCode):
-	if ( (lineOfCode == None) or (type(lineOfCode).__name__ != con.strTypePython) or (len(lineOfCode) == 0) ):
+	if ( (lineOfCode == None) or (type(lineOfCode).__name__ != con.strTypePython) ):
 		sys.exit("Parser_CodeGen_Toolbox->ensureSpacesBtwnTokens_CodeGen:  problem with line of code parameter passed in.")
 
 	if (len(lineOfCode) < 3):

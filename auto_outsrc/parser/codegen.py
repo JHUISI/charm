@@ -1548,6 +1548,9 @@ def writeMainFuncOfDecOut_Python():
 def writeMainFunc_IgnoreCloudSourcing():
     global setupFile
     setupFile.write("    global group\n    group = PairingGroup(MNT160)\n\n")
+    setupFile.write("if __name__ == '__main__':\n")
+    setupFile.write("    main()\n\n")
+
 
 def writeMainFuncs():
     writeMainFuncOfSetup()
@@ -1683,8 +1686,8 @@ def main(SDL_Scheme, ignoreCloudSourcingArg, nonCloudSourcingFileNameArg=None):
     addImportLines()
     addGroupObjGlobalVar()
 
-    if (ignoreCloudSourcing == True):
-        setupFile.write("bodyKey = 'Body'\n\n")
+    #if (ignoreCloudSourcing == True):
+        #setupFile.write("bodyKey = 'Body'\n\n")
 
     writeSDLToFiles(astNodes)
 

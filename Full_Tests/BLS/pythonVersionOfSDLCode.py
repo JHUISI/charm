@@ -1,14 +1,17 @@
 from charm.toolbox.pairinggroup import *
 from charm.core.engine.util import *
+from delIND import *
+
+group = None
 
 h = {}
 
-def init():
+def __init__():
 
     input = None
     output = None
 
-def keygen():
+def keygen(secParam):
 
     input = None
     g = group.random(G2)
@@ -42,7 +45,11 @@ def main():
     output = None
 
     global group
-    group = PairingGroup(MNT160)
+    group = PairingGroup(80)
+
+    (pk, sk, g) = keygen(80)
+    sig = sign(sk, "test")
+    print(verify(pk, "test2", sig, g))
 
 if __name__ == '__main__':
     main()
