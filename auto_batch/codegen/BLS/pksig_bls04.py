@@ -12,12 +12,15 @@ Boneh-Lynn-Shacham Identity Based Signature
 :Authors:    J. Ayo Akinyele
 :Date:       1/2011
 '''
-from toolbox.pairinggroup import *
-from charm.engine.util import *
+from charm.toolbox.pairinggroup import *
+from charm.core.engine.util import *
 import sys, random, string
 
 debug = False
+N = 100
 class IBSig():
+   #@variables(signature='sig', message='M', public_key='pk', secret_key='sk')
+   #@count(signature=N, message=N, public_key=1)
     def __init__(self, groupObj):
         global group, debug
         group = groupObj
@@ -30,13 +33,12 @@ class IBSig():
         sk = { 'x':x }
         return (pk, sk)
         
-    def sign(self, x, message):
-        M = message
+    def sign(self, x, M):
         if debug: print("Message => '%s'" % M)
-        return group.hash(M, G1) ** x
+        sig = group.hash(M, G1) ** x
+        return sig
         
-    def verify(self, pk, sig, message):
-        M = message
+    def verify(self, pk, sig, M):
         h = group.hash(M, G1)
         if pair(sig, pk['g']) == pair(h, pk['g^x']):
             return True  
@@ -46,8 +48,8 @@ def main():
     #if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
         #sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
 
-    groupObj = PairingGroup(MNT160)
-    
+    groupObj = PairingGroup('MNT224') # MNT160)
+    N = 100 
     m = "rest"
     bls = IBSig(groupObj)
     

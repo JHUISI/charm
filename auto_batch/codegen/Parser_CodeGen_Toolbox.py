@@ -2144,7 +2144,7 @@ def getStringNameIntegerValue(varAssignments, stringNameOfVariable, nameOfFuncti
 
 	if (nameOfFunction not in varAssignments):
 		sys.exit("Parser_CodeGen_Toolbox->getStringNameIntegerValue:  could not find a function named " + nameOfFunction + " in the varAssignments dictionary passed in.")
-
+	
 	functionVariables = varAssignments[nameOfFunction]
 	if ( (functionVariables == None) or (type(functionVariables).__name__ != con.listTypePython) or (len(functionVariables) == 0) ):
 		sys.exit("Parser_CodeGen_Toolbox->getStringNameIntegerValue:  problem with the list of variables obtained from varAssignments for the " + nameOfFunction + " function.")

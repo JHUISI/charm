@@ -389,7 +389,8 @@ def getCleanVarsVerifyEqDict(varsVerifyEq):
 
 	for varVerifyEq in varsVerifyEq:
 		if (varVerifyEq.getStringVarName() in retDict):
-			sys.exit("AutoBatch_Parser->getCleanVarsVerifyEqDict:  duplicate variable names in varsVerifyEq list input parameter passed in.")
+			continue # not a bad thing
+#			sys.exit("AutoBatch_Parser->getCleanVarsVerifyEqDict:  duplicate variable names in varsVerifyEq list input parameter passed in.")
 
 		if (type(varVerifyEq).__name__ == con.subscriptName):
 			sliceName = varVerifyEq.getSlice().getStringVarName().lstrip('\'').rstrip('\'')
@@ -401,6 +402,14 @@ def getCleanVarsVerifyEqDict(varsVerifyEq):
 			retDict[varVerifyEq.getStringVarName()] = newCleanName
 
 	return retDict
+
+def getCleanVerifyEq(verifyEqStr, varsVerifyEqDict):
+	verifyEq = verifyEqStr
+	for k in varsVerifyEqDict.keys():
+		# replace variables in str with ones identified in dictionary
+		verifyEq = verifyEq.replace(k, varsVerifyEqDict[k])
+	return verifyEq
+			
 
 def getTypeFirstAttempt(myASTParser, varNameStruct, functionArgMappings, functionArgNames, returnNodes, varAssignments):
 	myASTVarVisitor = ASTVarVisitor(myASTParser)
@@ -422,7 +431,7 @@ def getTypeFirstAttempt(myASTParser, varNameStruct, functionArgMappings, functio
 	#deletethistoo = DELETEME.getVariableGroupType(DELETESTRING, "verify", functionArgMappings, functionArgNames, returnNodes, varAssignments)
 	#print(deletethistoo)
 
-def writeBVFile(myASTParser, varAssignments, inputFileName, outputFileName, varsVerifyEq, functionArgMappings, functionArgNames, returnNodes):
+def writeBVFile(myASTParser, varAssignments, inputFileName, outputFileName, varsVerifyEq, functionArgMappings, functionArgNames, returnNodes, precomputeList, cleanVerifyEqLn):
 	try:
 		outputFile = open(outputFileName, 'w')
 	except:
@@ -437,10 +446,11 @@ def writeBVFile(myASTParser, varAssignments, inputFileName, outputFileName, vars
 	outputString += con.commentChar + " " + con.variablesString + "\n"
 
 	outputString += con.nameString + con.batchVerifierOutputAssignment + inputFileNameNoPySuffix + "\n"
-
+	
+	# looks for 'N' = '<Int>' in the main() method
 	numSignatures = getStringNameIntegerValue(varAssignments, con.numSignatures, con.mainFuncName)
 	if ( (numSignatures == None) or (type(numSignatures).__name__ != con.intTypePython) or (numSignatures < 1) ):
-		sys.exit("AutoBatch_Parser->writeBVFile:  problem with the value returned from getStringNameIntegerValue for numSignatures.")
+		sys.exit("AutoBatch_Parser->writeBVFile:  problem with the value returned from getStringNameIntegerValue for numSignatures: %s" % numSignatures)
 
 	numSigners = getStringNameIntegerValue(varAssignments, con.numSigners, con.mainFuncName)
 
@@ -458,6 +468,7 @@ def writeBVFile(myASTParser, varAssignments, inputFileName, outputFileName, vars
 	outputString += "BEGIN :: types\n"
 
 	cleanVarsVerifyEqDict = getCleanVarsVerifyEqDict(varsVerifyEq)
+	cleanVerifyEqStr      = getCleanVerifyEq(cleanVerifyEqLn, cleanVarsVerifyEqDict)
 
 	#print(cleanVarsVerifyEqDict)
 
@@ -468,8 +479,10 @@ def writeBVFile(myASTParser, varAssignments, inputFileName, outputFileName, vars
 		#print(cleanVarVerifyEqKey)
 		#print(typeFirstAttempt)
 		#print("\n\n")
-
-		outputString += typeFirstAttempt
+		if typeFirstAttempt == None: 
+			outputString += "ERROR!"
+		else:
+			outputString += typeFirstAttempt
 
 		outputString += "\n"
 
@@ -479,16 +492,32 @@ def writeBVFile(myASTParser, varAssignments, inputFileName, outputFileName, vars
 			#outputString += "  " + varVerifyEq.getStringVarName() + con.batchVerifierOutputAssignment
 			#outputString += "\n"
 
-	messageTypeValueObj = getValueOfVarName(con.messageType, con.mainFuncName, varAssignments)
-	if ( (messageTypeValueObj == None) or (type(messageTypeValueObj).__name__ != con.stringValue) ):
-		sys.exit("AutoBatch_Parser->writeBVFile:  problem with value object returned for message type.")
+#	messageTypeValueObj = getValueOfVarName(con.messageType, con.mainFuncName, varAssignments)
+	messageTypeValueObj = con.messageType    
+##	if ( (messageTypeValueObj == None) or (type(messageTypeValueObj).__name__ != con.stringValue) ):
+##		sys.exit("AutoBatch_Parser->writeBVFile:  problem with value object returned for message type.")
 
-	outputString += "  M := " + messageTypeValueObj.getStringVarName().lstrip('\'').rstrip('\'') + "\n"
+##	outputString += "  M := " + messageTypeValueObj.getStringVarName().lstrip('\'').rstrip('\'') + "\n"
+	outputString += "  M := " + messageTypeValueObj + "\n"
 
 	outputString += "END :: types\n\n"
 
 	outputString += "BEGIN :: precompute\n"
+	
+	for index in precomputeList.keys():
+		outputString += precomputeList[index].getName().getStringVarName()
+		outputString += " := "
+		outputString += precomputeList[index].getValue().getStringVarName()
+		outputString += "\n"
 
+	outputString += "END :: precompute\n\n"
+	
+	outputString += "# verify equation\n"
+	outputString += cleanVerifyEqStr
+	outputString += "\n"
+
+	#TODO: write the count, plus 'constant',  
+	
 	try:
 		outputFile.write(outputString)
 		outputFile.close()
@@ -710,15 +739,30 @@ def main():
 	varAssignments = getVarAssignments(rootNode, functionNames, myASTParser)
 	if (varAssignments == None):
 		sys.exit("AutoBatch_Parser->main:  getVarAssignments returned None when trying to get the variable assignments.")
+	
+	precomputeList = {}
+	index = 0
+	for _var in varAssignments[con.verifyFuncName]:
+		_leftVar = _var.getName().getStringVarName()
+		# JAA: means a variable assignment and doesn't constitute as something that needs precomputing by definition
+		if (type(_var.getValue()).__name__ == con.subscriptName):
+			continue
+		for v in varsVerifyEq:
+#			print("varsVerifyEq: ", v.getStringVarName())
+			if _leftVar == v.getStringVarName():
+				precomputeList[index] = _var
+				index += 1
+				#print("Found stmt: ", _var.getName().getStringVarName(), ":=", _var.getValue().getStringVarName())
+			
+	# write the final .bv file for Batcher
+	writeBVFile(myASTParser, varAssignments, inputFileName, outputFileName, varsVerifyEq, functionArgMappings, functionArgNames, returnNodes, precomputeList, cleanVerifyEqLn)
 
-	writeBVFile(myASTParser, varAssignments, inputFileName, outputFileName, varsVerifyEq, functionArgMappings, functionArgNames, returnNodes)
 
+#	DELETESTRING = StringName()
+#	DELETESTRING.setName("sig")
+#	DELETESTRING.setLineNo(30)
 
-	DELETESTRING = StringName()
-	DELETESTRING.setName("sig")
-	DELETESTRING.setLineNo(30)
-
-	DELETEME = ASTVarVisitor(myASTParser)
+#	DELETEME = ASTVarVisitor(myASTParser)
 	#deletethistoo = DELETEME.getVariableGroupType(DELETESTRING, "verify", functionArgMappings, functionArgNames, returnNodes, varAssignments)
 	#print(deletethistoo)
 

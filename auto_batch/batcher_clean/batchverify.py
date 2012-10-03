@@ -319,8 +319,23 @@ def runBatcher(opts, proofGen, file, verify, ast_struct, eq_number=0):
             proofGen.setNextStep(Tech.rule, verify2)
     
     # now we check if Technique 10 is applicable (aka loop unrolling)
-    Tech = Technique10(sdl_data, vars, metadata)
-    ASTVisitor(Tech).preorder(verify2)
+    Tech10 = Technique10(sdl_data, vars, metadata)
+    ASTVisitor(Tech10).preorder(verify2)
+    
+    if Tech10.testForApplication():
+        evalint = EvaluateAtIntValue(Tech10.for_iterator, Tech10.for_start)
+        testEq = BinaryNode.copy(Tech10.loopStmt)
+        ASTVisitor(evalint).preorder(testEq)
+        print("Evaluated version at %d: %s" % (Tech10.for_start, testEq))
+        print("Combine the rest into this one...")
+        for t in range(Tech10.for_start+1, Tech10.for_end):
+            evalint = EvaluateAtIntValue(Tech10.for_iterator, t)  
+            testEq2 = BinaryNode.copy(Tech10.loopStmt)
+            ASTVisitor(evalint).preorder(testEq2)
+            print("Eval-n-Combine version at %d: %s" % (t, testEq2))
+            # Combine testEq2 into testEq! Need a class to do this for me.
+        
+#        sys.exit("DONE TESTING!")
     
     if PROOFGEN_FLAG:
         proofGen.setNextStep('finalbatcheq', None)

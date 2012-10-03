@@ -12,9 +12,9 @@ Hess - Identity-based Signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from toolbox.pairinggroup import *
-from toolbox.PKSig import PKSig
-from charm.engine.util import *
+from charm.toolbox.pairinggroup import *
+from charm.toolbox.PKSig import PKSig
+from charm.core.engine.util import *
 import sys, random, string
 
 debug = False
@@ -27,35 +27,33 @@ class CHCH(PKSig):
         
     def setup(self):
         global H1,H2
-        H1 = lambda x: group.hash(x, G1)
-        H2 = lambda x,y: group.hash((x,y), ZR)
+        H1 = lambda x,t: group.hash(x, G1)
+        H2 = lambda x,y,t: group.hash((x,y), ZR)
         g2, alpha = group.random(G2), group.random(ZR)
-        msk = alpha
         P = g2 ** alpha 
         mpk = {'P':P, 'g2':g2}
-        return (mpk, msk)
+        return (mpk, alpha)
 
-    def keygen(self, msk, ID):
-        alpha = msk
-        sk = H1(ID) ** alpha
-        pk = H1(ID)
+    def keygen(self, alpha, ID):
+        sk = H1(ID, G1) ** alpha
+        pk = H1(ID, G1)
         return (pk, sk)
     
     def sign(self, pk, sk, M):
         if debug: print("sign...")
-        h, s = group.random(G1), group.random(ZR)
+        h = group.random(G1)
+        s = group.random(ZR)
         S1 = pair(h,pk['g2']) ** s 
-        a = H2(M, S1)
+        a = H2(M, S1, ZR)
         S2 = (sk ** a) * (h ** s)
-        return {'S1':S1, 'S2':S2}
+        sig = {'S1':S1, 'S2':S2}
+        return sig
 
     def verify(self, mpk, pk, M, sig):
         if debug: print("verify...")
-
         S1 = sig['S1']
         S2 = sig['S2']
-
-        a = H2(M, S1)
+        a = H2(M, S1, ZR)
         if pair(S2, mpk['g2']) == (pair(pk, mpk['P']) ** a) * S1: 
             return True
         return False
@@ -64,7 +62,8 @@ def main():
     #if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
         #sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
 
-    groupObj = PairingGroup(MNT160)
+    groupObj = PairingGroup('MNT224') #MNT160)
+    N = 100
     chch = CHCH(groupObj)
     (mpk, msk) = chch.setup()
 

@@ -13,9 +13,9 @@ Camenisch-Hohenberger-Pedersen - Identity-based Signatures
 :Date:       11/2011
 """
 
-from toolbox.pairinggroup import *
-from toolbox.PKSig import PKSig
-from charm.engine.util import *
+from charm.toolbox.pairinggroup import *
+from charm.toolbox.PKSig import PKSig
+from charm.core.engine.util import *
 import sys, random, string
 
 debug = False
@@ -28,8 +28,8 @@ class CHP(PKSig):
         
     def setup(self):
         global H,H3
-        H = lambda prefix,x: group.hash((str(prefix), str(x)), G1)
-        H3 = lambda a,b: group.hash(('3', str(a), str(b)), ZR)
+        H = lambda prefix,x,t: group.hash( (str(prefix), str(x)), G1 )
+        H3 = lambda a,b,t: group.hash( ('3', str(a), str(b)), ZR )
         g = group.random(G2) 
         mpk = { 'g' : g }
         return mpk
@@ -41,16 +41,16 @@ class CHP(PKSig):
         return (pk, sk)
     
     def sign(self, pk, sk, M):
-        a = H(1, M['t1'])
-        h = H(2, M['t2'])
-        b = H3(M['str'], M['t3'])
+        a = H(1, M['t1'], G1)
+        h = H(2, M['t2'], G1)
+        b = H3(M['str'], M['t3'], ZR)
         sig = (a ** sk) * (h ** (sk * b))        
         return sig
     
     def verify(self, mpk, pk, M, sig):
-        a = H(1, M['t1'])
-        h = H(2, M['t2'])
-        b = H3(M['str'], M['t3'])
+        a = H(1, M['t1'], G1)
+        h = H(2, M['t2'], G1)
+        b = H3(M['str'], M['t3'], ZR)
         if pair(sig, mpk['g']) == (pair(a, pk) * (pair(h, pk) ** b)):
             return True
         return False
@@ -59,7 +59,8 @@ def main():
     #if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
         #sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
    
-    groupObj = PairingGroup(MNT160)
+    groupObj = PairingGroup('MNT224') #MNT160)
+    N = 100
     chp = CHP(groupObj)
     mpk = chp.setup()
 

@@ -42,9 +42,10 @@ class HashValue:
 			argStringVarName = arg.getStringVarName()
 			if ( (argStringVarName == None) or (type(argStringVarName).__name__ != con.strTypePython) or (len(argStringVarName) == 0) ):
 				return None
-
+			if argStringVarName in con.groupTypes: #JAA: we don't want to include group type in arg list
+				continue
 			stringVarName += argStringVarName
-			stringVarName += ", "
+			stringVarName += " | "
 
 		groupTypeStringVarName = self.groupType.getStringVarName()
 		if ( (groupTypeStringVarName == None) or (type(groupTypeStringVarName).__name__ != con.strTypePython) or (len(groupTypeStringVarName) == 0) ):
@@ -52,8 +53,9 @@ class HashValue:
 
 		if (groupTypeStringVarName not in con.groupTypes):
 			sys.exit("HashValue->getStringVarName:  group type string var name extracted from self.groupTypes is not one of the supported group types.")
-
-		stringVarName += groupTypeStringVarName
+		
+		stringVarName = stringVarName[:-3]
+		stringVarName += ", " + groupTypeStringVarName
 		stringVarName += ")"
 
 		return stringVarName

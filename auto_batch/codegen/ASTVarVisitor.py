@@ -990,7 +990,7 @@ class ASTVarVisitor(ast.NodeVisitor):
 			sys.exit("ASTVarVisitor->getVariableGroupTypeRecursive:  funcName not in varAssignments.")
 
 		#valueObj = getValueOfVarName(varName, funcName, varAssignments)
-		if (valueObj.getGroupType() != None):
+		if hasattr(valueObj, 'getGroupType') and (valueObj.getGroupType() != None):
 			return valueObj.getGroupType().getStringVarName()
 
 		if (type(valueObj).__name__ == con.binOpValue):
@@ -1001,9 +1001,16 @@ class ASTVarVisitor(ast.NodeVisitor):
 				sys.exit("ASTVarVisitor->getVariableGroupTypeRecursive:  found mismatching types in binary operation.")
 
 			return leftType
+		# JAA: this takes care of the x = dict['x'] case...leads to infinite loop.
+		elif (type(valueObj).__name__ == con.subscriptName):
+			nextValueObj = getValueOfVarName(valueObj.getStringVarName(), funcName, varAssignments)
+			if valueObj.getSlice().getStringVarName() == nextValueObj.getStringVarName():
+				return None
 		else:
 			nextValueObj = getValueOfVarName(valueObj.getStringVarName(), funcName, varAssignments)
 			if (nextValueObj != None):
+#				print("valueObj: ", valueObj.getStringVarName(), type(valueObj).__name__)
+#				print("nextValueObj: ", nextValueObj.getStringVarName())
 				return self.getVariableGroupTypeRecursive(nextValueObj, funcName, varAssignments)
 
 	#def getVariableGroupType(self, varName, funcName, functionArgMappings, functionArgNames, returnNodes, varAssignments):

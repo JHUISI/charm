@@ -1133,6 +1133,10 @@ class ASTIndexForIndiv(AbstractTechnique):
 
 tech10 = Tech_db
 
+# This class determines whether a binary node tree that includes a for loop node can actually be unrolled
+# if so, proceed to execute the UnrollLoop made up of two sub classes:
+# 1) Evaluates a given binary node tree at a particular iteration point and proceeds to combine it with the previous equation, 
+# 2) Applies combo techniques to optimize the unrolled equations, etc.
 class Technique10(AbstractTechnique):
     def __init__(self, sdl_data, variables, meta):
         AbstractTechnique.__init__(self, sdl_data, variables, meta)  
@@ -1140,37 +1144,75 @@ class Technique10(AbstractTechnique):
         self.applied = False 
         self.score   = tech10.NoneApplied
         self.debug = False      
+        self.loopStmt   = None
         self.for_start = None
         self.for_end = None
         self.for_iterator = None
+
+    def visit_do(self, node, data):
+        if Type(node.left) == ops.FOR:
+            self.loopStmt = node.right
 
     def visit_for(self, node, data):
         if(Type(node.left) == ops.EQ):
             start = node.left
             self.for_iterator = start.left.getAttribute()
-            self.for_start = start.right.getAttribute()
+            self.for_start = int(start.right.getAttribute())
             if self.for_start == None or self.for_iterator == None: sys.exit("ERROR: for loop not well formed!") 
             print("for: ", self.for_iterator, ":", self.for_start)                       
         if(Type(node.right) == ops.ATTR):
             val = node.right.getAttribute()
-            self.for_end = self.varDefineValue(val)
+            self.for_end = int(self.varDefineValue(val)) # abstract class call
             if self.for_end == None: sys.exit("ERROR: %s is not defined in SDL." % val)
             print("until: ", node.right, self.for_end)
     
-#    def check
+    def testForApplication(self):
+        if self.for_start != None and self.for_iterator != None and self.for_end != None:
+            self.applied = True
+            self.score   = tech10.ConstantSizeLoop
+        else:
+            self.applied = False
+        return self.applied
+
+
+# performs step 1 from above. Replaces 't' (target variables) with integer values in each attribute
+class EvaluateAtIntValue:
+    def __init__(self, target_var, int_value):
+        self.target_var = target_var
+        self.int_value  = int_value
+        self.debug      = False
     
-    def visit_attr(self, node, data):
-        self.checkExistenceOfAttribute(node, self.for_iterator)
-    
-    # need a function that can replace variables with integers from 1 until X. 
-    def checkExistenceOfAttribute(self, node, var):
-        if self.for_end == None: return False
+    def visit(self, node, data):
+        pass
+   
+    def visit_attr(self, node, data):#    
         attr = node.getAttribute()
+        new_attr = ''
         s = attr.split('#') 
-        if( len(s) > 1):
-            print("attr: ", node, s)
-            match = False
+        if( len(s) > 1 ):
+            if self.debug: print("attr: ", node, s)
             for i in s:
-                if var in i: match = True; break            
-            return False
-        return False 
+                if i == self.target_var:
+                    new_attr += str(self.int_value)
+                elif self.target_var in i: # instead of t+1 or t-1 or etc replace with the evaluated result                    
+                    exec("%s = %s" % (self.target_var, self.int_value))
+                    new_attr += str(eval(i))
+                else:
+                    new_attr += i
+                new_attr += '#'
+            new_attr = new_attr[:-1] # cut off last character
+            if self.debug: print("new_attr: ", new_attr)
+            node.setAttribute(new_attr)
+            
+#    # need a function that can replace variables with integers from 1 until X. 
+#    def checkExistenceOfAttribute(self, node, var):
+#        if self.for_end == None: return False
+#        attr = node.getAttribute()
+#        s = attr.split('#') 
+#        if( len(s) > 1):
+#            print("attr: ", node, s)
+#            match = False
+#            for i in s:
+#                if var in i: match = True; break            
+#            return False
+#        return False 
