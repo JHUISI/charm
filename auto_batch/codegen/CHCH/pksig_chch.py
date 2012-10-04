@@ -26,9 +26,9 @@ class CHCH(PKSig):
         debug = False
         
     def setup(self):
-        global H1,H2
-        H1 = lambda x,t: group.hash(x, G1)
-        H2 = lambda x,y,t: group.hash((x,y), ZR)
+        #global H1,H2
+        #H1 = lambda x,t: group.hash(x, G1)
+        #H2 = lambda x,y,t: group.hash((x,y), ZR)
         g2 = group.random(G2)
         alpha = group.random(ZR)
         P = g2 ** alpha 
@@ -36,15 +36,15 @@ class CHCH(PKSig):
         return (mpk, alpha)
 
     def keygen(self, alpha, ID):
-        sk = H1(ID, G1) ** alpha
-        pk = H1(ID, G1)
+        sk = group.hash(ID, G1) ** alpha
+        pk = group.hash(ID, G1)
         return (pk, sk)
     
     def sign(self, pk, sk, M):
         if debug: print("sign...")
         s = group.random(ZR)
         S1 = pk ** s
-        a = H2(M, S1, ZR)
+        a = group.hash((M, S1), ZR)
         S2 = sk ** (s + a)
         sig = {'S1':S1, 'S2':S2}
         return sig
@@ -53,8 +53,7 @@ class CHCH(PKSig):
         if debug: print("verify...")
         S1 = sig['S1']
         S2 = sig['S2']
-        a = H2(M, S1, ZR)
-        #a = group.hash((M, S1), ZR)
+        a = group.hash((M, S1), ZR)
         if pair(S2, mpk['g2']) == pair(S1 * (pk ** a), mpk['P']): 
             return True
         return False

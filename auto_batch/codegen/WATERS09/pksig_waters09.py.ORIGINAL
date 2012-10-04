@@ -22,7 +22,6 @@ import sys, random, string
 debug = False
 class IBE_Revoke(IBEnc):
     def __init__(self, groupObj):
-        #IBEnc.__init__(self)
         global group, util
         group = groupObj
 
@@ -53,7 +52,7 @@ class IBE_Revoke(IBEnc):
     def sign(self, mpk, msk, m):
         r1, r2, z1, z2, tagk = group.random(ZR, 5)
         r = r1 + r2
-        M = group.hash(m)
+        M = group.hash(m, ZR)
 
         S = {}
         S[1] = msk['g^alph_a1'] * (msk['v'] ** r)
@@ -74,7 +73,7 @@ class IBE_Revoke(IBEnc):
         
         sig1, sig2, sig3, sig4, sig5, sig6, sig7, sigK, tagk = sigma['sig'][1],sigma['sig'][2],sigma['sig'][3],sigma['sig'][4],sigma['sig'][5],sigma['sig'][6],sigma['sig'][7],sigma['K'],sigma['tagk']
 
-        M = group.hash(m)
+        M = group.hash(m, ZR)
 
         E1 = ((mpk['u'] ** M) * (mpk['w1'] * tagc) * mpk['h1']) ** t
         E2 = mpk['g1'] ** t
@@ -92,6 +91,7 @@ def main():
         #sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
 
     grp = PairingGroup(MNT160)
+    N = 100
     
     ibe = IBE_Revoke(grp)
     

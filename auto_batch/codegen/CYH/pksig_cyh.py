@@ -12,10 +12,10 @@ Chow-Yiu-Hui - Identity-based ring signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from toolbox.pairinggroup import *
-from toolbox.PKSig import PKSig
-from toolbox.iterate import dotprod
-from charm.engine.util import *
+from charm.toolbox.pairinggroup import *
+from charm.toolbox.PKSig import PKSig
+from charm.toolbox.iterate import dotprod
+from charm.core.engine.util import *
 import sys, random, string
 
 debug = False
@@ -33,9 +33,10 @@ class CYH(PKSig):
         return result
 
     def setup(self):
-        global H1,H2,lam_func
-        H1 = lambda x: group.hash(('1', str(x)), G1)
-        H2 = lambda a, b, c: group.hash(('2', a, b, c), ZR)
+#        global H1,H2
+#        H1 = lambda x: group.hash(('1', str(x)), G1)
+#        H2 = lambda a, b, c: group.hash(('2', a, b, c), ZR)
+        global lam_func
         lam_func = lambda i,a,b,c: a[i] * (b[i] ** c[i]) # => u * (pk ** h) for all signers
         g, alpha = group.random(G2), group.random(ZR)
         P = g ** alpha
@@ -44,8 +45,8 @@ class CYH(PKSig):
         return (mpk, msk) 
     
     def keygen(self, msk, ID):
-        sk = H1(ID) ** msk
-        pk = H1(ID)
+        sk = group.hash(ID, G1) ** msk
+        pk = group.hash(ID, G1)
         return (ID, pk, sk)
     
     def sign(self, sk, L, M):
@@ -64,9 +65,9 @@ class CYH(PKSig):
                 s = i
         
         r = group.random(ZR)
-        pk = [ H1(i) for i in L] # get all signers pub keys
+        pk = [ group.hash(i, G1) for i in L] # get all signers pub keys
         u[s] = (IDpk ** r) * ~dotprod(group.init(G1), s, l, lam_func, u, pk, h)
-        h[s] = H2(M, Lt, u[s])
+        h[s] = group.hash((M, Lt, u[s]), ZR)
         S = IDsk ** (h[s] + r)
         sig = { 'u':u, 'S':S }
         return sig

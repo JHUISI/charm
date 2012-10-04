@@ -12,10 +12,10 @@ Hohenberger-Waters - Realizing hash-and-sign signatures
 :Authors:    J. Ayo Akinyele
 :Date:       11/2011
 """
-from toolbox.pairinggroup import *
-from toolbox.PKSig import PKSig
+from charm.toolbox.pairinggroup import *
+from charm.toolbox.PKSig import PKSig
 from math import *
-from charm.engine.util import *
+from charm.core.engine.util import *
 import sys, random, string
 
 debug=False
