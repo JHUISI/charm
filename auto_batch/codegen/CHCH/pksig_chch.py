@@ -51,10 +51,8 @@ class CHCH(PKSig):
     
     def verify(self, mpk, pk, M, sig):
         if debug: print("verify...")
-        S1 = sig['S1']
-        S2 = sig['S2']
-        a = group.hash((M, S1), ZR)
-        if pair(S2, mpk['g2']) == pair(S1 * (pk ** a), mpk['P']): 
+        a = group.hash((M, sig['S1']), ZR)
+        if pair(sig['S2'], mpk['g2']) == pair(sig['S1'] * (pk ** a), mpk['P']): 
             return True
         return False
 
