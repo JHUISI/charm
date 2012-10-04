@@ -1,12 +1,12 @@
 """ 
-Hess - Identity-based Signatures
+Chow-Yiu-Hui - Identity-based ring signatures
 
-| From: "Hess - Efficient identity based signature schemes based on pairings."
-| Published in: Selected Areas in Cryptography
-| Available from: Vol. 2595. LNCS, pages 310-324
+| From: "S. Chow, S. Yiu and L. Hui - Efficient identity based ring signature."
+| Published in: ACNS 2005
+| Available from: Vol 3531 of LNCS, pages 499-512
 | Notes: 
 
-* type:           signature (ID-based)
+* type:           signature (ring-based)
 * setting:        bilinear groups (asymmetric)
 
 :Authors:    J. Ayo Akinyele
@@ -14,49 +14,74 @@ Hess - Identity-based Signatures
 """
 from toolbox.pairinggroup import *
 from toolbox.PKSig import PKSig
+from toolbox.iterate import dotprod
 from charm.engine.util import *
 import sys, random, string
 
 debug = False
 
-class CHCH(PKSig):
+class CYH(PKSig):
     def __init__(self, groupObj):
         global group, debug
         group = groupObj
         debug = False
-        
-    def setup(self):
-        global H1,H2
-        H1 = lambda x: group.hash(x, G1)
-        H2 = lambda x,y: group.hash((x,y), ZR)
-        g2, alpha = group.random(G2), group.random(ZR)
-        msk = alpha
-        P = g2 ** alpha 
-        mpk = {'P':P, 'g2':g2}
-        return (mpk, msk)
-
-    def keygen(self, msk, ID):
-        alpha = msk
-        sk = H1(ID) ** alpha
-        pk = H1(ID)
-        return (pk, sk)
     
-    def sign(self, pk, sk, M):
-        if debug: print("sign...")
-        h, s = group.random(G1), group.random(ZR)
-        S1 = pair(h,pk['g2']) ** s 
-        a = H2(M, S1)
-        S2 = (sk ** a) * (h ** s)
-        return {'S1':S1, 'S2':S2}
+    def concat(self, L_id):
+        result = ""
+        for i in L_id:
+            result += ":"+i 
+        return result
 
-    def verify(self, mpk, pk, M, sig):
-        if debug: print("verify...")
+    def setup(self):
+        global H1,H2,lam_func
+        H1 = lambda x: group.hash(('1', str(x)), G1)
+        H2 = lambda a, b, c: group.hash(('2', a, b, c), ZR)
+        lam_func = lambda i,a,b,c: a[i] * (b[i] ** c[i]) # => u * (pk ** h) for all signers
+        g, alpha = group.random(G2), group.random(ZR)
+        P = g ** alpha
+        msk = alpha
+        mpk = {'Pub':P, 'g':g }
+        return (mpk, msk) 
+    
+    def keygen(self, msk, ID):
+        sk = H1(ID) ** msk
+        pk = H1(ID)
+        return (ID, pk, sk)
+    
+    def sign(self, sk, L, M):
+        (IDs, IDpk, IDsk) = sk
+        assert IDs in L, "signer should be an element in L"
+        Lt = self.concat(L) 
+        l = len(L)
+ 
+        u = [group.init(G1) for i in range(l)]
+        h = [group.init(ZR, 1) for i in range(l)]
+        for i in range(l):
+            if IDs != L[i]:
+                u[i] = group.random(G1)
+                h[i] = H2(M, Lt, u[i])
+            else:
+                s = i
+        
+        r = group.random(ZR)
+        pk = [ H1(i) for i in L] # get all signers pub keys
+        u[s] = (IDpk ** r) * ~dotprod(group.init(G1), s, l, lam_func, u, pk, h)
+        h[s] = H2(M, Lt, u[s])
+        S = IDsk ** (h[s] + r)
+        sig = { 'u':u, 'S':S }
+        return sig
+    
+    def verify(self, mpk, L, M, sig):
+        u, S = sig['u'], sig['S']
+        Lt = self.concat(L) 
+        l = len(L)
+        h = [group.init(ZR, 1) for i in range(l)]
+        for i in range(l):
+            h[i] = H2(M, Lt, u[i])
 
-        S1 = sig['S1']
-        S2 = sig['S2']
-
-        a = H2(M, S1)
-        if pair(S2, mpk['g2']) == (pair(pk, mpk['P']) ** a) * S1: 
+        pk = [ H1(i) for i in L] # get all signers pub keys
+        result = dotprod(group.init(G1), -1, l, lam_func, u, pk, h) 
+        if pair(result, mpk['Pub']) == pair(S, mpk['g']):
             return True
         return False
 
@@ -64,26 +89,28 @@ def main():
     #if ( (len(sys.argv) != 7) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
         #sys.exit("Usage:  python " + sys.argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
 
+    L = [ "alice", "bob", "carlos", "dexter", "eddie"] 
+
+    ID = "bob"
     groupObj = PairingGroup(MNT160)
-    chch = CHCH(groupObj)
-    (mpk, msk) = chch.setup()
+    cyh = CYH(groupObj)
+    (mpk, msk) = cyh.setup()
 
-    _id = "janedoe@email.com"
-    (pk, sk) = chch.keygen(msk, _id)
-    if debug:  
+    (ID, Pk, Sk) = cyh.keygen(msk, ID)  
+    sk = (ID, Pk, Sk)
+    if debug:
         print("Keygen...")
-        print("pk =>", pk)
         print("sk =>", sk)
- 
-    M = "this is a message!" 
-    sig = chch.sign(mpk, sk, M)
-
+  
+    M = 'please sign this new message!'
+    sig = cyh.sign(sk, L, M)
     if debug:
         print("Signature...")
         print("sig =>", sig)
 
-    assert chch.verify(mpk, pk, M, sig), "invalid signature!"
+    assert cyh.verify(mpk, L, M, sig), "invalid signature!"
     if debug: print("Verification successful!")
+
 
     '''
     numValidMessages = int(sys.argv[1])
@@ -99,32 +126,32 @@ def main():
     f_mpk.close()
 
     f_pk = open('pk.charmPickle', 'wb')
-    pick_pk = objectToBytes(pk, groupObj)
+    pick_pk = objectToBytes(L, groupObj)
     f_pk.write(pick_pk)
     f_pk.close()
 
     validOutputDict = {}
     validOutputDict[0] = {}
     validOutputDict[0]['mpk'] = 'mpk.charmPickle'
-    validOutputDict[0]['pk'] = 'pk.charmPickle'
+    validOutputDict[0]['L'] = 'pk.charmPickle'
 
     invalidOutputDict = {}
     invalidOutputDict[0] = {}
     invalidOutputDict[0]['mpk'] = 'mpk.charmPickle'
-    invalidOutputDict[0]['pk'] = 'pk.charmPickle'
+    invalidOutputDict[0]['L'] = 'pk.charmPickle'
   
     for index in range(0, numValidMessages):
         if (index != 0):
             validOutputDict[index] = {}
             validOutputDict[index]['mpk'] = 'mpk.charmPickle'
-            validOutputDict[index]['pk'] = 'pk.charmPickle'
+            validOutputDict[index]['L'] = 'pk.charmPickle'
 
         message = ""
         for randomChar in range(0, messageSize):
             message += random.choice(string.printable)
 
-        sig = chch.sign(mpk, sk, message)
-        assert chch.verify(mpk, pk, message, sig), "invalid Sig!"
+        sig = cyh.sign(sk, L, message)
+        assert cyh.verify(mpk, L, message, sig), "invalid signature!"
 
         f_message = open(prefixName + str(index) + '_ValidMessage.pythonPickle', 'wb')
         validOutputDict[index]['M'] = prefixName + str(index) + '_ValidMessage.pythonPickle'
@@ -134,7 +161,6 @@ def main():
         
         pickle.dump(message, f_message)
         f_message.close()
-
         pick_sig = objectToBytes(sig, groupObj)
 
         f_sig.write(pick_sig)
@@ -153,18 +179,19 @@ def main():
     del dict_pickle
     del f
 
+
     for index in range(0, numInvalidMessages):
         if (index != 0):
             invalidOutputDict[index] = {}
             invalidOutputDict[index]['mpk'] = 'mpk.charmPickle'
-            invalidOutputDict[index]['pk'] = 'pk.charmPickle'
+            invalidOutputDict[index]['L'] = 'pk.charmPickle'
 
         message = ""
         for randomChar in range(0, messageSize):
             message += random.choice(string.printable)
 
-        sig = chch.sign(mpk, sk, message)
-        assert chch.verify(mpk, pk, message, sig), "invalid Sig!"
+        sig = cyh.sign(sk, L, message)
+        assert cyh.verify(mpk, L, message, sig), "invalid signature!"
 
         f_message = open(prefixName + str(index) + '_InvalidMessage.pythonPickle', 'wb')
         invalidOutputDict[index]['M'] = prefixName + str(index) + '_InvalidMessage.pythonPickle'
@@ -209,3 +236,4 @@ def main():
 if __name__ == "__main__":
     debug = True
     main()
+   
