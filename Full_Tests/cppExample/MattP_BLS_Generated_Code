@@ -1,0 +1,47 @@
+#include "sdlconfig.h"
+#include <iostream>
+#include <sstream>
+#include <string>
+using namespace std;
+
+void init(PairingGroup & group)
+{
+    return;
+}
+
+void keygen(PairingGroup & group, G2 & pk, ZR & sk, G2 & g)
+{
+    ZR * x = new ZR();
+    g = group.random(G2_t);
+    *x = group.random(ZR_t);
+    pk = group.exp(g, *x);
+    sk = *x;
+    return;
+}
+
+void sign(PairingGroup & group, ZR & sk, string M, G1 & sig)
+{
+    sig = group.exp(group.hashListToG1(M), sk);
+    return;
+}
+
+void verify(PairingGroup & group, G2 & pk, string M, G1 & sig, G2 & g)
+{
+    G1 * h = new G1();
+    *h = group.hashListToG1(M);
+    if ( ( (group.pair(*h, pk)) == (group.pair(sig, g)) ) )
+    {
+        return True;
+    }
+    else
+    {
+        return False;
+    }
+    return;
+}
+
+void main(PairingGroup & group)
+{
+    return;
+}
+
