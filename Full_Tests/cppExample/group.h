@@ -159,7 +159,7 @@ public:
 	bool ismember(G2);
 	G2 mul(G2, G2);
 	G2 div(G2, G2);
-	G2 *exp(G2, ZR);
+	G2 exp(G2, ZR);
 	GT pair(G1, G2);
 //	void *hash(char *s, Type t);
 #endif

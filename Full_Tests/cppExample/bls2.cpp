@@ -9,7 +9,7 @@ void keygen(PairingGroup & group, G2 & pk, ZR & sk, G2 & g) {
     
     group.random(g);
     group.random(*x);
-    pk = *group.exp(g, *x); // make sure group operations return dynamic memory
+    pk = group.exp(g, *x); // make sure group operations return dynamic memory
     sk = *x;
      
     return;

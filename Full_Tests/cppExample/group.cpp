@@ -628,11 +628,11 @@ G2 PairingGroup::div(G2 g, G2 h)
 	return l;
 }
 
-G2 *PairingGroup::exp(G2 g, ZR r)
+G2 PairingGroup::exp(G2 g, ZR r)
 {
 	// g ^ r == g * r OR scalar multiplication
 	G2 l = pfcObject->mult(g, r);
-	return new G2(l);
+	return l;
 }
 
 GT PairingGroup::pair(G1 g, G2 h)
