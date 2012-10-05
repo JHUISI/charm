@@ -4,6 +4,8 @@
 # to apply the techniques 2, 3a, 3b and 4.
 
 import sys, time
+sys.path.extend(['../', '../sdlparser']) # make sdlparser pkg visible
+from sdlparser.SDLParser import *
 from batchtechniques import *
 from batchproof import *
 from batchorder import BatchOrder
@@ -517,7 +519,7 @@ def benchmark_batcher(argv, prefix=None):
     return
 
 def run_main(opts):
-    global singleVE, crypto_library, curve, param_id
+    global singleVE, crypto_library, curve, param_id, assignInfo
     verbose   = opts['verbose']
     statement = opts['test_stmt']
     file      = opts['sdl_file']
@@ -531,18 +533,23 @@ def run_main(opts):
         exit(0)
     else:
         # Parse the SDL file into binary tree
-        ast_struct = parseFile(file)
-
+#        ast_struct = parseFile(file)
+        parseFile2(file, verbose, ignoreCloudSourcing=True)
+        setting = SDLSetting()
+        setting.parse(assignInfo) # check for errors and pass on to user before continuing
+        
     # process single or multiple equations
     verify_eq, N = [], None; cnt = 0
-    for n in ast_struct[ OTHER ]:
+    #for n in ast_struct[ OTHER ]:
+    for n in setting.getVerifyEq():    
         if 'verify' in str(n.left):
             result = handleVerifyEq(n, cnt, verbose); cnt += 1 # where we do actual verification on # of eqs
             if type(result) != list: verify_eq.append(result)
             else: verify_eq.extend(result)
 
     # santiy checks to verify setting makes sense for given equation 
-    variables = ast_struct[ TYPE ]
+#    variables = ast_struct[ TYPE ]
+    variables = setting.getTypes()
     for eq in verify_eq:
         bte = BasicTypeExist( variables )
         ASTVisitor( bte ).preorder( eq )
@@ -558,7 +565,8 @@ def run_main(opts):
     # process settings
     for i in range(len(verify_eq)):    
         if verbose: print("\nRunning batcher....\n")
-        runBatcher(opts, genProof, file + str(i), verify_eq[i], ast_struct, i)
+#        runBatcher(opts, genProof, file + str(i), verify_eq[i], ast_struct, i)
+        runBatcher(opts, genProof, file + str(i), verify_eq[i], setting, i)
 
 if __name__ == "__main__":
    batcher_main(sys.argv)

@@ -4,11 +4,11 @@
 
 from pyparsing import *
 try:
-   from parser.SDLang import *
-   from parser.VarInfo import *
-   from parser.VarType import *
-   from parser.ForLoop import *
-   from parser.IfElseBranch import *
+   from sdlparser.SDLang import *
+   from sdlparser.VarInfo import *
+   from sdlparser.VarType import *
+   from sdlparser.ForLoop import *
+   from sdlparser.IfElseBranch import *
 except:
    from SDLang import *
    from VarInfo import *
@@ -574,7 +574,10 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
 
     varName = getFullVarName(node.left, True)
     if (varName in varTypes[currentFuncName]):
-        sys.exit("updateVarTypes in SDLParser.py received as input a node whose full variable name is already in varTypes[currentFuncName].")
+        if (varTypes[currentFuncName][varName].getType() == newType): 
+            return
+        else:
+            sys.exit("updateVarTypes in SDLParser.py received as input a node whose full variable name is already in varTypes[currentFuncName]. Discrepancy in types.")
 
     varTypeObj = VarType()
     varTypeObj.setLineNo(i)
@@ -851,7 +854,16 @@ def getVarTypeInfoForAttr_List(node):
     (funcNameOfVar, varNameInList) = getVarNameFromListIndices(assignInfo, node)
     if ( (funcNameOfVar != None) and (varNameInList != None) ):
         if ( (funcNameOfVar in varTypes) and (varNameInList in varTypes[funcNameOfVar]) ):
-            return varTypes[funcNameOfVar][varNameInList].getType()
+            firstReturnType = varTypes[funcNameOfVar][varNameInList].getType()
+            if firstReturnType == types.listZR: 
+                return types.ZR
+            elif firstReturnType == types.listG1: 
+                return types.G1
+            elif firstReturnType == types.listG2: 
+                return types.G2
+            elif firstReturnType == types.listGT: 
+                return types.GT
+            return firstReturnType
 
         (outsideFunctionName, retVarInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, varNameInList)
         if ( (outsideFunctionName != None) and (retVarInfoObj != None) and (outsideFunctionName in varTypes) and (varNameInList in varTypes[outsideFunctionName]) ):
@@ -864,7 +876,7 @@ def getVarTypeInfoForAttr_List(node):
 
 def getVarTypeInfoForAttr(node):
     nodeAttrFullName = getFullVarName(node, False)
-
+    
     if (nodeAttrFullName in varTypes[currentFuncName]):
         return varTypes[currentFuncName][nodeAttrFullName].getType()
 
@@ -874,9 +886,11 @@ def getVarTypeInfoForAttr(node):
 
     if (nodeAttrFullName.find(LIST_INDEX_SYMBOL) != -1):
         return getVarTypeInfoForAttr_List(node)
-
-    if (nodeAttrFullName == "1"):
-        return types.ZR
+    
+    if (nodeAttrFullName.isdigit()):
+        return types.int # JAA: make int and ZR synonymous although they have separate Enum values. Conceptually the same for our purposes
+#    if (nodeAttrFullName == "1"): 
+#        return types.ZR
 
     return types.NO_TYPE
 
@@ -920,6 +934,9 @@ def getVarTypeInfoRecursive(node):
         currentFuncName = getFullVarName(node, False)
         if (currentFuncName in builtInTypes):
             return builtInTypes[currentFuncName]
+        elif (currentFuncName == INIT_FUNC_NAME):
+            trythis = node.listNodes[0]
+            return types[trythis] # types[trythis]
         return types.NO_TYPE
     if (node.type == ops.EQ_TST):
         leftSideType = getVarTypeInfoRecursive(node.left)

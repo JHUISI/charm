@@ -50,7 +50,7 @@ DECL_FUNC_HEADER = "func:"
 INIT_FUNC_NAME = "init"
 FUNC_SYMBOL = "def func :"
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
-types = Enum('NO_TYPE','G1', 'G2', 'GT', 'ZR', 'str', 'list', 'object', 'listStr', 'listG1', 'listG2', 'listGT', 'listZR', 'symmap')
+types = Enum('NO_TYPE','G1', 'G2', 'GT', 'ZR', 'int', 'str', 'list', 'object', 'listStr', 'listG1', 'listG2', 'listGT', 'listZR', 'symmap')
 declarator = Enum('func', 'verify')
 ops = Enum('BEGIN', 'ERROR', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO', 'FORALL', 'PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'SYMMAP', 'EXPAND', 'FUNC', 'SEQ', 'IF', 'ELSEIF', 'ELSE', 'END', 'NONE')
 side = Enum('left', 'right')
@@ -428,7 +428,7 @@ class BinaryNode:
 	def __init__(self, value, left=None, right=None):		
 		self.negated = False	
 		if(isinstance(value, str)):
-			if value in ['G1', 'G2', 'GT', 'ZR', 'str', 'list', 'object']:
+			if value in ['G1', 'G2', 'GT', 'ZR', 'int', 'str', 'list', 'object']: # JAA: change me ASAP!!!
                 # denotes group type of an attribute value
 				self.type = ops.TYPE
 				self.attr = types[value]

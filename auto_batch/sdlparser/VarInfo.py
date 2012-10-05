@@ -321,11 +321,11 @@ class VarInfo:
         elif (self.assignNode.right.type == ops.HASH):
             self.isBaseElement = True
             self.assignBaseElemsOnly = self.assignNode.left            
-
-        if (self.assignBaseElemsOnly == None):
-            assignNodeRightDeepCopy = copy.deepcopy(self.assignNode.right)
-            newAssignBaseElemsOnlyNode = self.traverseAssignBaseElemsOnlyRecursive(assignNodeRightDeepCopy)
-            self.assignBaseElemsOnly = newAssignBaseElemsOnlyNode
+# JAA: activates the awesome symbolic executor!
+#        if (self.assignBaseElemsOnly == None):
+#            assignNodeRightDeepCopy = copy.deepcopy(self.assignNode.right)
+#            newAssignBaseElemsOnlyNode = self.traverseAssignBaseElemsOnlyRecursive(assignNodeRightDeepCopy)
+#            self.assignBaseElemsOnly = newAssignBaseElemsOnlyNode
 
         self.traverseAssignNodeRecursive(self.assignNode.right, False)
 
