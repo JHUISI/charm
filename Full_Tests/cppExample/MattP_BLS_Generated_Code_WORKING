@@ -1,0 +1,70 @@
+#include "sdlconfig.h"
+#include <iostream>
+#include <sstream>
+#include <string>
+using namespace std;
+
+void init(PairingGroup & group)
+{
+    return;
+}
+
+void keygen(PairingGroup & group, G2 & pk, ZR & sk, G2 & g)
+{
+    ZR *x = new ZR();
+    g = group.random(G2_t); // add to group.cpp
+    *x = group.random(ZR_t);
+    pk = group.exp(g, *x);
+    sk = *x;
+    delete x;
+    return;
+}
+
+void sign(PairingGroup & group, ZR & sk, string M, G1 & sig)
+{
+    sig = group.exp(group.hashListToG1(M), sk);
+    return;
+}
+
+bool verify(PairingGroup & group, G2 & pk, string M, G1 & sig, G2 & g)
+{
+    G1 *h = new G1();
+    *h = group.hashListToG1(M); // return memory ref
+    if ( ( (group.pair(*h, pk)) == (group.pair(sig, g)) ) )
+    {
+        cout << "Successful Verification for BLS!!" << endl;
+        delete h;
+        return true;
+    }
+    else
+    {
+        delete h;
+        return false;
+    }
+}
+
+int main()
+{
+    PairingGroup group(AES_SECURITY);
+
+    G2 pk, g;
+    ZR sk;
+    string M = "hello, world! this is the message.";
+    G1 sig; // should be *sig since group.exp() will return newlly allocated memory 
+
+    keygen(group, pk, sk, g);
+  
+    cout << "pk :=> " << convert_str(pk) << endl; 
+    cout << "sk :=> " << sk << endl;
+
+    cout << "Signing: " << M << endl;
+
+    sign(group, sk, M, sig);
+
+    cout << convert_str(sig) << endl;
+
+    verify(group, pk, M, sig, g);
+
+    return 0;
+}
+

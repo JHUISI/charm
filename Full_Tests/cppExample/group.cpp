@@ -307,7 +307,7 @@ Element Element::operator=(const Element& e)
 ostream& operator<<(ostream& s, const Element& e)
 {
 	Element e2 = e;
-	Type t = e2.type;
+	int t = e2.type;
 	if(t == Str_t)
 		s << "str: ";
 	else if(t == ZR_t)
@@ -344,7 +344,7 @@ void Element::deserialize(Element & e, string & s)
 	if(found != string::npos) {
 		int type = atoi(s.substr(0, found).c_str());
 		if(type >= ZR_t && type < Str_t) {
-			element_from_bytes(e, (Type) type, (unsigned char *) s.substr(found+1, s.size()).c_str());
+			element_from_bytes(e, (int) type, (unsigned char *) s.substr(found+1, s.size()).c_str());
 		}
 		else if(type == Str_t) {
 			e = Element(s.substr(found+1, s.size()).c_str());
@@ -453,7 +453,7 @@ string CharmList::printAtIndex(int index)
 
 	if(index >= 0 && index < (int) list.size()) {
 		i = index;
-		Type t = list[i].type;
+		int t = list[i].type;
 		if(t == Str_t) {
 			ss << list[i].strPtr;
 		}
@@ -578,7 +578,7 @@ PairingGroup::~PairingGroup()
 	delete pfcObject;
 	delete gt;
 }
-
+/*
 void PairingGroup::random(ZR & b)
 {
 	pfcObject->random(b);
@@ -597,6 +597,7 @@ void PairingGroup::random(GT & g)
 	g = pfcObject->power(*gt, *zr);
 	delete zr;
 }
+*/
 
 void PairingGroup::init(ZR & r, char *value)
 {
@@ -605,10 +606,43 @@ void PairingGroup::init(ZR & r, char *value)
 	r = x; //should copy this
 }
 
+ZR PairingGroup::random(ZR_type t)
+{
+	ZR zr; // = new ZR();
+	pfcObject->random(zr);
+	return zr;
+}
+
+G1 PairingGroup::random(G1_type t)
+{
+	G1  g1; // = new G1();
+	pfcObject->random(g1);
+	return g1;
+}
+
+GT PairingGroup::random(GT_type t)
+{
+	// choose random ZR
+	ZR zr;
+	GT gt; // = new GT();
+	pfcObject->random(zr);
+	gt = pfcObject->power(gt, zr);
+        return gt;
+}
+
 #ifdef ASYMMETRIC
+/*
 void PairingGroup::random(G2 & g)
 {
 	pfcObject->random(g);
+}
+*/
+
+G2 PairingGroup::random(G2_type t)
+{
+	G2 g2; // = new G2();
+	pfcObject->random(g2);
+	return g2;
 }
 
 bool PairingGroup::ismember(G2 g)
@@ -713,25 +747,28 @@ GT PairingGroup::exp(GT g, ZR r)
 	return l;
 }
 
-ZR PairingGroup::hashToZR(char *str)
+ZR PairingGroup::hashListToZR(string str)
 {
-	ZR r = pfcObject->hash_to_group(str);
+	ZR r = pfcObject->hash_to_group((char *) str.c_str());
 	return r;
 }
 
-G1 PairingGroup::hashToG1(string str)
+G1 PairingGroup::hashListToG1(string str)
 {
-	G1 l;
+	G1 l; 
+	pfcObject->hash_and_map(l, (char *) str.c_str());
+	return l; 
+}
+
+#ifdef ASYMMETRIC
+G2 PairingGroup::hashListToG2(string str)
+{
+	G2 l;
 	pfcObject->hash_and_map(l, (char *) str.c_str());
 	return l;
 }
+#endif
 
-G2 PairingGroup::hashToG2(char *str)
-{
-	G2 l;
-	pfcObject->hash_and_map(l, str);
-	return l;
-}
 // serialize helper methods for going from Big to bytes and back
 string bigToBytes(Big x)
 {
@@ -795,7 +832,7 @@ Big bytesToBigS(string str, int *counter)
 }
 
 
-ZR PairingGroup::hashListToZR(CharmList & list)
+ZR &PairingGroup::hashListToZR(CharmList & list)
 {
 	int len = list.length();
 	pfcObject->start_hash();
@@ -815,11 +852,11 @@ ZR PairingGroup::hashListToZR(CharmList & list)
 			pfcObject->add_to_hash(*e.gt);
 	}
 
-	ZR result = pfcObject->finish_hash_to_group();
-	return result;
+	ZR *result = new ZR(pfcObject->finish_hash_to_group());
+	return *result;
 }
 
-G1 PairingGroup::hashListToG1(CharmList & list)
+G1 &PairingGroup::hashListToG1(CharmList & list)
 {
 	int len = list.length();
 	pfcObject->start_hash();
@@ -840,14 +877,14 @@ G1 PairingGroup::hashListToG1(CharmList & list)
 	}
 
 	ZR tmp1 = pfcObject->finish_hash_to_group();
-	G1 g1;
+	G1 *g1 = new G1();
 	// convert result to bytes and hash to G1
-	pfcObject->hash_and_map(g1, (char *) bigToBytes(tmp1).c_str());
-	return g1;
+	pfcObject->hash_and_map(*g1, (char *) bigToBytes(tmp1).c_str());
+	return *g1;
 }
 
 #ifdef ASYMMETRIC
-G2 PairingGroup::hashListToG2(CharmList & list)
+G2 &PairingGroup::hashListToG2(CharmList & list)
 {
 	int len = list.length();
 	pfcObject->start_hash();
@@ -868,16 +905,16 @@ G2 PairingGroup::hashListToG2(CharmList & list)
 	}
 
 	ZR tmp1 = pfcObject->finish_hash_to_group();
-	G2 g2;
+	G2 *g2 = new G2();
 	// convert result to bytes and hash to G2
-	pfcObject->hash_and_map(g2, (char *) bigToBytes(tmp1).c_str());
-	return g2;
+	pfcObject->hash_and_map(*g2, (char *) bigToBytes(tmp1).c_str());
+	return *g2;
 }
 #endif
 
 string element_to_bytes(Element & e) {
 	string t;
-	Type type = e.type;
+	int type = e.type;
 
 	if(type == ZR_t) {
 		Big s = *e.zr;
@@ -947,7 +984,7 @@ string element_to_bytes(Element & e) {
 	throw new string("element_to_bytes: invalid type specified");
 }
 
-void element_from_bytes(Element& elem, Type type, unsigned char *data)
+void element_from_bytes(Element& elem, int type, unsigned char *data)
 {
 	if(type == ZR_t) {
 		if(is_base64((unsigned char) data[0])) {

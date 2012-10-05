@@ -12,7 +12,7 @@ void init(PairingGroup & group)
 void keygen(PairingGroup & group, G2 & pk, ZR & sk, G2 & g)
 {
     ZR * x = new ZR();
-    g = group.random(G2_t);
+    g = group.random(G2_t); // add to group.cpp
     *x = group.random(ZR_t);
     pk = group.exp(g, *x);
     sk = *x;
@@ -28,7 +28,7 @@ void sign(PairingGroup & group, ZR & sk, string M, G1 & sig)
 void verify(PairingGroup & group, G2 & pk, string M, G1 & sig, G2 & g)
 {
     G1 * h = new G1();
-    *h = group.hashListToG1(M);
+    *h = group.hashListToG1(M); // return memory ref
     if ( ( (group.pair(*h, pk)) == (group.pair(sig, g)) ) )
     {
         return True;

@@ -27,7 +27,13 @@
 #define deleteDict(k, v) \
      delete k[v].delGroupElement();
 
-enum Type { ZR_t = 0, G1_t, G2_t, GT_t, Str_t, None_t };
+//enum Type { ZR_t = 0, G1_t, G2_t, GT_t, Str_t, None_t };
+enum ZR_type { ZR_t = 0 };
+enum G1_type { G1_t = 1 };
+enum G2_type { G2_t = 2 };
+enum GT_type { GT_t = 3 };
+enum Str_type { Str_t = 4 };
+enum None_type { None_t = 5 };
 
 string _base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len);
 string _base64_decode(string const& encoded_string);
@@ -37,7 +43,7 @@ class Element
 {
 public:
 	// public values for now
-	Type type;
+	int type;
 	ZR *zr;
 	G1 *g1;
 	G2 *g2;
@@ -82,7 +88,7 @@ private:
 };
 
 string element_to_bytes(Element & e);
-void element_from_bytes(Element&, Type type, unsigned char *data);
+void element_from_bytes(Element&, int type, unsigned char *data);
 
 class CharmList
 {
@@ -147,33 +153,36 @@ public:
 	~PairingGroup();
 	// generate random
 	void init(ZR&, char*);
-	void random(ZR&);
-	void random(G1&);
-	void random(GT&);
+	//void random(ZR&);
+	//void random(G1&);
+	//void random(GT&);
+	ZR random(ZR_type);
+	G1 random(G1_type);
+	GT random(GT_type);
 	bool ismember(G1&);
 	bool ismember(GT&);
 	bool ismember(ZR&);
 
 #ifdef ASYMMETRIC
-	void random(G2&);
+	//void random(G2&);
+	G2 random(G2_type);
 	bool ismember(G2);
 	G2 mul(G2, G2);
 	G2 div(G2, G2);
 	G2 exp(G2, ZR);
 	GT pair(G1, G2);
-//	void *hash(char *s, Type t);
 #endif
-
-	ZR hashToZR(char *str);
-	G1 hashToG1(string str);
-	G2 hashToG2(char *str);
 
 	Big order(); // returns the order of the group
 
 	// hash -- not done
-	ZR hashListToZR(CharmList&);
-	G1 hashListToG1(CharmList&);
-	G2 hashListToG2(CharmList&);
+	ZR hashListToZR(string);
+	G1 hashListToG1(string);
+	G2 hashListToG2(string);
+
+	ZR & hashListToZR(CharmList&);
+	G1 & hashListToG1(CharmList&);
+	G2 & hashListToG2(CharmList&);
 
 	GT pair(G1, G1);
 	ZR mul(ZR, ZR);
