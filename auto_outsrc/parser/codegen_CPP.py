@@ -259,7 +259,14 @@ def writeFunctionDecl_CPP(outputFile, functionName):
     currentFuncOutputVars = []
     currentFuncNonOutputVars = []
 
-    outputString = "void " + functionName + "("
+    if (functionName == mainFuncName):
+        outputFile.write("int main()\n{\n    PairingGroup group(AES_SECURITY);\n")
+        return
+
+    if (functionName == verifyFuncName):
+        outputString = "bool " + functionName + "("
+    else:
+        outputString = "void " + functionName + "("
 
     inputVariables = getInputVariablesList(functionName)
     outputVariables = getOutputVariablesList(functionName)
@@ -320,7 +327,11 @@ def writeFunctionEnd_CPP(outputFile, functionName):
     #outputFile.write("\treturn " + outputKeyword + ";\n}\n\n")
     #CPP_funcBodyLines += "\treturn " + outputKeyword + ";\n}\n\n"
     #CPP_funcBodyLines += "    return " + outputKeyword + ";\n}\n\n"
-    CPP_funcBodyLines += "    return;\n}\n\n"
+
+    if (functionName != verifyFuncName):
+        CPP_funcBodyLines += "    return;\n}\n\n"
+    else:
+        CPP_funcBodyLines += "}\n\n"
 
     outputFile.write(CPP_varTypesLines)
     #outputFile.write("\n")
@@ -897,12 +908,12 @@ def writeAssignStmt_CPP(outputFile, binNode):
     if (variableName == outputKeyword):
         if ( (str(binNode) == "output := True") or (str(binNode) == "output := true") ):
             trueOutputString = writeCurrentNumTabsToString()
-            trueOutputString += "return True;\n"
+            trueOutputString += "return true;\n"
             CPP_funcBodyLines += trueOutputString
             return
         elif ( (str(binNode) == "output := False") or (str(binNode) == "output := false") ):
             falseOutputString = writeCurrentNumTabsToString()
-            falseOutputString += "return False;\n"
+            falseOutputString += "return false;\n"
             CPP_funcBodyLines += falseOutputString
             return
         else:
@@ -926,7 +937,7 @@ def writeAssignStmt_CPP(outputFile, binNode):
         #outputString += makeTypeReplacementsForCPP(variableType) + " "
         #outputString_Types += "\t" + makeTypeReplacementsForCPP(variableType) + " "
         if (variableName not in currentFuncOutputVars):
-            outputString_Types += "    " + makeTypeReplacementsForCPP(variableType) + " * "
+            outputString_Types += "    " + makeTypeReplacementsForCPP(variableType) + " *"
 
     variableName = replacePoundsWithBrackets(variableName)
 

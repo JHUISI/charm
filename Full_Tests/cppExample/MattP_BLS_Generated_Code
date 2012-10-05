@@ -11,8 +11,8 @@ void init(PairingGroup & group)
 
 void keygen(PairingGroup & group, G2 & pk, ZR & sk, G2 & g)
 {
-    ZR * x = new ZR();
-    g = group.random(G2_t); // add to group.cpp
+    ZR *x = new ZR();
+    g = group.random(G2_t);
     *x = group.random(ZR_t);
     pk = group.exp(g, *x);
     sk = *x;
@@ -25,23 +25,23 @@ void sign(PairingGroup & group, ZR & sk, string M, G1 & sig)
     return;
 }
 
-void verify(PairingGroup & group, G2 & pk, string M, G1 & sig, G2 & g)
+bool verify(PairingGroup & group, G2 & pk, string M, G1 & sig, G2 & g)
 {
-    G1 * h = new G1();
-    *h = group.hashListToG1(M); // return memory ref
+    G1 *h = new G1();
+    *h = group.hashListToG1(M);
     if ( ( (group.pair(*h, pk)) == (group.pair(sig, g)) ) )
     {
-        return True;
+        return true;
     }
     else
     {
-        return False;
+        return false;
     }
-    return;
 }
 
-void main(PairingGroup & group)
+int main()
 {
+    PairingGroup group(AES_SECURITY);
     return;
 }
 

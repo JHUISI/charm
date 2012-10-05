@@ -17,6 +17,9 @@ keygenFuncName = "keygen"
 
 encryptFuncName = "encrypt"
 
+mainFuncName = "main"
+verifyFuncName = "verify"
+
 masterPubVars = ["gpk", "pk"]
 masterSecVars = ["msk"]
 
