@@ -1,0 +1,119 @@
+from charm.toolbox.pairinggroup import *
+from charm.core.engine.util import *
+
+group = None
+
+N = 2
+
+h = {}
+
+def keygen():
+
+    input = None
+    g = group.random(G2)
+    x = group.random(ZR)
+    pk = (g ** x)
+    sk = x
+    output = (pk, sk, g)
+    return output
+
+def sign(sk, M):
+
+    input = [sk, M]
+    sig = (group.hash(M, G1) ** sk)
+    output = sig
+    return output
+
+def verify(pk, M, sig, g):
+    global h
+
+    input = [pk, M, sig, g]
+    h = group.hash(M, G1)
+    if ( ( (pair(h, pk)) == (pair(sig, g)) ) ):
+        output = True
+    else:
+        output = False
+    return output
+
+def batchverify(pk, Mlist, siglist, g, incorrectIndices):
+    global h
+
+    delta = {}
+    dotBCache = {}
+    dotACache = {}
+
+    input = [pk, Mlist, siglist, g, incorrectIndices]
+    for z in range(0, N):
+        delta[z] = prng_bits(80)
+    for z in range(0, N):
+        if ( ( (membership(pk, Mlist, siglist, g)) == (False) ) ):
+            output = False
+    for z in range(0, N):
+        h = group.hash(Mlist[z], G1)
+        dotACache[z] = (h ** delta[z])
+        dotBCache[z] = (siglist[z] ** delta[z])
+    dividenconquer(delta, dotACache, dotBCache, 0, N, incorrectIndices, pk, Mlist, siglist, g)
+    output = incorrectIndices
+    return output
+
+def dividenconquer(delta, dotACache, dotBCache, startSigNum, endSigNum, incorrectIndices, pk, Mlist, siglist, g):
+
+    input = [delta, dotACache, dotBCache, startSigNum, endSigNum, incorrectIndices, pk, Mlist, siglist, g]
+    dotALoopVal = 1
+    dotBLoopVal = 1
+    for z in range(startSigNum, endSigNum):
+        dotALoopVal = (dotALoopVal * dotACache[z])
+        dotBLoopVal = (dotBLoopVal * dotBCache[z])
+    if ( ( (pair(dotALoopVal, pk)) == (pair(dotBLoopVal, g)) ) ):
+        output = True
+    else:
+        midway = ((endSigNum - startSigNum) / 2)
+    if ( ( (midway) == (0) ) ):
+        incorrectIndices.append(startSigNum)
+        output = None
+    else:
+        midSigNum = (startSigNum + midway)
+        dividenconquer(delta, dotACache, dotBCache, startSigNum, midway, incorrectIndices, pk, Mlist, siglist, g)
+        dividenconquer(delta, dotACache, dotBCache, midSigNum, endSigNum, incorrectIndices, pk, Mlist, siglist, g)
+    output = None
+    return output
+
+def membership(pk, Mlist, siglist, g):
+
+    input = [pk, Mlist, siglist, g]
+    if ( ( (ismember(pk)) == (False) ) ):
+        output = False
+    if ( ( (ismember(Mlist)) == (False) ) ):
+        output = False
+    if ( ( (ismember(siglist)) == (False) ) ):
+        output = False
+    if ( ( (ismember(g)) == (False) ) ):
+        output = False
+    output = True
+    return output
+
+def prng_bits(bits=80):
+    return group.init(ZR, randomBits(bits))
+
+def main():
+    global group
+    group = PairingGroup(80)
+
+    (pk, sk, g) = keygen()
+    M1 = "test1"
+    M2 = "test2"
+    sig1 = sign(sk, M1)
+    sig2 = sign(sk, M2)
+    Mlist = []
+    Mlist.append(M1)
+    Mlist.append(M2)
+    siglist = []
+    siglist.append(sig1)
+    siglist.append(sig2)
+    incorrectIndices = batchverify(pk, Mlist, siglist, g, [])
+    print(incorrectIndices)
+
+
+if __name__ == '__main__':
+    main()
+

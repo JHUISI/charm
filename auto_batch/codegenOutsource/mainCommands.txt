@@ -1,0 +1,13 @@
+    (pk, sk, g) = keygen()
+    M1 = "test1"
+    M2 = "test2"
+    sig1 = sign(sk, M1)
+    sig2 = sign(sk, M2)
+    Mlist = []
+    Mlist.append(M1)
+    Mlist.append(M2)
+    siglist = []
+    siglist.append(sig1)
+    siglist.append(sig2)
+    incorrectIndices = batchverify(pk, Mlist, siglist, g, [])
+    print(incorrectIndices)

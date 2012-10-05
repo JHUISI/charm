@@ -1,6 +1,6 @@
 name := bls
 # number of signatures in a batch
-N := 100
+N := 2
 setting := asymmetric
 
 # types for variables used in verification.
@@ -22,11 +22,6 @@ endSigNum := int
 dotALoopVal := G1
 dotBLoopVal := G1
 END :: types
-
-BEGIN :: func:init
-input := None
-output := None
-END :: func:init
 
 # description of key generation and signing algorithms
 BEGIN :: func:keygen
@@ -55,11 +50,6 @@ BEGIN :: func:verify
  END :: if
 END :: func:verify
 
-BEGIN :: func:main
-input := None
-output := None
-END :: func:main
-
 constant := g
 public :=  pk
 signature :=  sig
@@ -84,7 +74,7 @@ verify := {e(h, pk) == e(sig, g)}
 
 
 BEGIN :: func:batchverify
-input := list{pk, Mlist, siglist, g}
+input := list{pk, Mlist, siglist, g, incorrectIndices}
 
 BEGIN :: for
 for{z:=0, N}
@@ -141,7 +131,7 @@ BEGIN :: if
     dividenconquer(delta, dotACache, dotBCache, midSigNum, endSigNum, incorrectIndices, pk, Mlist, siglist, g)
 END :: if
 
- ouptut := None
+ output := None
 END ::func:dividenconquer
 
 
