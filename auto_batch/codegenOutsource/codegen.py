@@ -794,7 +794,12 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
         nodeName = replacePoundsWithBrackets(nodeName)
         if (nodeName == INIT_FUNC_NAME):
             return "1"
-        funcOutputString = nodeName + "("
+        elif (nodeName == ISMEMBER_FUNC_NAME):
+            funcOutputString = groupObjName + "." + nodeName + "("
+        elif (nodeName == INTEGER_FUNC_NAME):
+            funcOutputString = "int("
+        else:
+            funcOutputString = nodeName + "("
         for listNodeInFunc in node.listNodes:
             listNodeAsString = getAssignStmtAsString(listNodeInFunc, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
             funcOutputString += listNodeAsString + ", "

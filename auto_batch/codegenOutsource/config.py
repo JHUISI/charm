@@ -1,6 +1,8 @@
 schemeName = "LW"
 
 INIT_FUNC_NAME = "init"
+ISMEMBER_FUNC_NAME = "ismember"
+INTEGER_FUNC_NAME = "integer"
 ADD_TO_LIST = "addToList"
 NONE_FUNC_NAME = "NONE_FUNC_NAME"
 numSignaturesVarName = "N"
