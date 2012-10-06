@@ -37,6 +37,7 @@ blindingFactors_Lists = None
 currentFuncOutputVars = None
 currentFuncNonOutputVars = None
 SDLListVars = []
+integerVars = []
 
 def writeCurrentNumTabsToString():
     outputString = ""
@@ -79,6 +80,11 @@ def addNumSignatures():
         sys.exit("addNumSignatures in codegen_CPP:  could not obtain number of signatures from SDL file.")
 
     setupFile.write("int N = " + str(numSignatures) + ";\n\n")
+
+def addGlobalPairingGroupObject():
+    global setupFile
+
+    setupFile.write("PairingGroup group(AES_SECURITY);\n\n")
 
 def addSmallExpFunc():
     global setupFile
@@ -286,6 +292,10 @@ def makeTypeReplacementsForCPP(SDL_Type):
         return "CharmListGT"
     if (SDLTypeAsString == "listZR"):
         return "CharmListZR"
+    if (SDLTypeAsString == "listInt"):
+        return "list<int>"
+    if (SDLTypeAsString == "listStr"):
+        return "CharmListStr"
 
     return SDLTypeAsString
 
@@ -347,9 +357,9 @@ def writeFunctionDecl_CPP(outputFile, functionName):
     currentFuncOutputVars = []
     currentFuncNonOutputVars = []
 
-    if (functionName == mainFuncName):
-        outputFile.write("int main()\n{\n    PairingGroup group(AES_SECURITY);\n")
-        return
+    #if (functionName == mainFuncName):
+        #outputFile.write("int main()\n{\n    PairingGroup group(AES_SECURITY);\n")
+        #return
 
     if (functionName in [verifyFuncName, membershipFuncName, batchVerifyFuncName]):
         outputString = "bool " + functionName + "("
@@ -365,20 +375,22 @@ def writeFunctionDecl_CPP(outputFile, functionName):
     #funcOutputType = getFinalVarType(outputVariables[0], currentFuncName)
 
     #outputString += makeTypeReplacementsForCPP(funcOutputType) + " " + functionName + "("
-    outputString += PairingGroupClassName_CPP + " & " + groupObjName + ", "
+    #outputString += PairingGroupClassName_CPP + " & " + groupObjName + ", "
 
     for inputVariable in inputVariables:
         currentType = getFinalVarType(inputVariable, currentFuncName)
-        if (str(currentType) == "str"):
+        if (str(currentType) in ["str","int"]):
             outputString += makeTypeReplacementsForCPP(currentType) + " " + inputVariable + ", "
         else:
             outputString += makeTypeReplacementsForCPP(currentType) + " & " + inputVariable + ", "
         currentFuncOutputVars.append(inputVariable)
 
     for outputVariable in outputVariables:
+        if (outputVariable in inputVariables):
+            continue
         if ( (outputVariable != "True") and (outputVariable != "False") ):
             currentType = getFinalVarType(outputVariable, currentFuncName)
-            if (str(currentType) == "str"):
+            if (str(currentType) in ["str","int"]):
                 outputString += makeTypeReplacementsForCPP(currentType) + " " + outputVariable + ", "
             else:
                 outputString += makeTypeReplacementsForCPP(currentType) + " & " + outputVariable + ", "
@@ -419,7 +431,7 @@ def writeFunctionEnd_CPP(outputFile, functionName):
     if (functionName not in [verifyFuncName, membershipFuncName, batchVerifyFuncName]):
         CPP_funcBodyLines += "    return;\n}\n\n"
     elif (functionName == batchVerifyFuncName):
-        CPP_funcBodyLines += "    return True;\n}\n\n"
+        CPP_funcBodyLines += "    return true;\n}\n\n"
     else:
         CPP_funcBodyLines += "}\n\n"
 
@@ -1026,13 +1038,15 @@ def getVarDeclForListVar(variableName):
     return outputString_Types
 
 def writeAssignStmt_CPP(outputFile, binNode):
-    global CPP_varTypesLines, CPP_funcBodyLines, setupFile, currentFuncNonOutputVars, SDLListVars
+    global CPP_varTypesLines, CPP_funcBodyLines, setupFile, currentFuncNonOutputVars, SDLListVars, integerVars
 
     if (str(binNode) == RETURN_STATEMENT):
         CPP_funcBodyLines += writeCurrentNumTabsToString()
         CPP_funcBodyLines += "return;\n"
         return
 
+    if ( (str(binNode).find(":= init(") != -1) or (str(binNode).find(":=init(") != -1) ):
+        return
 
     variableName = getFullVarName(binNode.left, False)
 
@@ -1069,24 +1083,31 @@ def writeAssignStmt_CPP(outputFile, binNode):
             currentFuncNonOutputVars.append(variableName)
             #print(variableName)
 
+    variableType = getFinalVarType(variableName, currentFuncName)
+
     if ( (variableName.find(LIST_INDEX_SYMBOL) == -1) and (binNode.right.type != ops.EXPAND) ):
-        variableType = getFinalVarType(variableName, currentFuncName)
-        #outputString += makeTypeReplacementsForCPP(variableType) + " "
-        #outputString_Types += "\t" + makeTypeReplacementsForCPP(variableType) + " "
-        if (variableName not in currentFuncOutputVars):
+        #variableType = getFinalVarType(variableName, currentFuncName)
+        if ( (variableName not in currentFuncOutputVars) and (variableType != types.int) ):
             outputString_Types += "    " + makeTypeReplacementsForCPP(variableType) + " *"
+        elif ( (variableName not in currentFuncOutputVars) and (variableType == types.int) ):
+            outputString_Types += "    int "
 
     if (variableName in SDLListVars):
         outputString_Types += getVarDeclForListVar(variableName)
 
     if ( (binNode.right.type != ops.EXPAND) and (variableName not in currentFuncOutputVars) and (variableName not in SDLListVars) ):
-        variableType = getFinalVarType(variableName, currentFuncName)
-        outputString_Types += variableName + " = new " + makeTypeReplacementsForCPP(variableType) + "();\n"
+        #variableType = getFinalVarType(variableName, currentFuncName)
+        if (variableType == types.int):
+            outputString_Types += variableName + " = 0;\n"
+        else:    
+            outputString_Types += variableName + " = new " + makeTypeReplacementsForCPP(variableType) + "();\n"
 
     variableNamePounds = replacePoundsWithBrackets(variableName)
+    if ( (variableType == types.int) and (variableNamePounds not in integerVars) ):
+        integerVars.append(variableNamePounds)
 
     if ( (binNode.right.type != ops.EXPAND) and (binNode.right.type != ops.LIST) ):
-        if ( (variableNamePounds in currentFuncOutputVars) or (variableName in SDLListVars) ):
+        if ( (variableNamePounds in currentFuncOutputVars) or (variableName in SDLListVars) or (variableType == types.int) ):
             outputString_Body += variableNamePounds
         else:
             outputString_Body += "*" + variableNamePounds
@@ -1847,6 +1868,8 @@ def main(inputSDLScheme, outputFileName):
     addImportLines()
 
     addNumSignatures()
+
+    addGlobalPairingGroupObject()
 
     addSmallExpFunc()
 
