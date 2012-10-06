@@ -5,7 +5,7 @@ ISMEMBER_FUNC_NAME = "ismember"
 INTEGER_FUNC_NAME = "integer"
 ADD_TO_LIST = "addToList"
 NONE_FUNC_NAME = "NONE_FUNC_NAME"
-RETURN_STATEMENT = "return := True"
+RETURN_STATEMENT = "return := None"
 numSignaturesVarName = "N"
 smallExp = "smallexp"
 

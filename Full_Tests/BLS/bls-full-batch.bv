@@ -116,8 +116,7 @@ END :: for
 
 BEGIN :: if
  if { e(dotALoopVal, pk) == e(dotBLoopVal, g) }
-    output := True
-    return := True
+    return := None
  else
     midwayFloat := ((endSigNum - startSigNum) / 2)
     midway := integer(midwayFloat) 
