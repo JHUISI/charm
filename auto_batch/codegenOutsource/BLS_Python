@@ -66,7 +66,7 @@ def dividenconquer(delta, dotACache, dotBCache, startSigNum, endSigNum, incorrec
         dotBLoopVal = (dotBLoopVal * dotBCache[z])
     if ( ( (pair(dotALoopVal, pk)) == (pair(dotBLoopVal, g)) ) ):
         output = True
-        return = True
+        return
     else:
         midwayFloat = ((endSigNum - startSigNum) / 2)
         midway = int(midwayFloat)
@@ -100,6 +100,21 @@ def prng_bits(bits=80):
 def main():
     global group
     group = PairingGroup(80)
+
+    (pk, sk, g) = keygen()
+    M1 = "test1"
+    M2 = "test2"
+    sig1 = sign(sk, M1)
+    sig2 = sign(sk, M2)
+    Mlist = []
+    Mlist.append(M1)
+    Mlist.append(M2)
+    siglist = []
+    siglist.append(sig1)
+    siglist.append(sig2)
+    incorrectIndices = batchverify(pk, Mlist, siglist, g, [])
+    print(incorrectIndices)
+
 
 if __name__ == '__main__':
     main()

@@ -927,6 +927,10 @@ def writeAssignStmt_CPP(outputFile, binNode):
 def writeAssignStmt_Python(outputFile, binNode):
     writeCurrentNumTabsIn(outputFile)
 
+    if (str(binNode) == RETURN_STATEMENT):
+        outputFile.write("return\n")
+        return
+
     outputString = ""
     dotProdObj = None
     lambdaReplacements = None
