@@ -1,6 +1,8 @@
-from batchlang import *
+#from batchlang import *
+#from batchparser import *
+import sdlpath
+from sdlparser.SDLParser import *
 from batchtechniques import AbstractTechnique
-from batchparser import *
 
 # BEGIN: Small Exponent Related classes to assist with tracking index numbers assigned to delta variables 
 # across multiple verification equations. 

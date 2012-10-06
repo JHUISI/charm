@@ -1,6 +1,8 @@
-from batchparser import *
+import sdlpath
+from sdlparser.SDLParser import *
 from batchtechniques import Tech_db,Technique2,Technique3,Technique4,Technique7,Technique8
 from batchoptimizer import *
+from batchstats import *
 from benchmark_interface import getBenchmarkInfo
 import random
 
@@ -27,10 +29,9 @@ def score(eq):
 # Class for pre-processing SDL to determine the order in which the optimization techniques
 # are applied to the batch equation.
 class BatchOrder:
-    def __init__(self, sdl, vars, metadata, equation, library):
+    def __init__(self, sdl, vars, equation, library):
         self.sdl_data = sdl
         self.vars  = vars
-        self.meta  = metadata
         self.verify = equation
         self.debug  = False
         self.techMap = { 2:Technique2, 3:Technique3, 4:Technique4, 7:Technique7, 8:Technique8 }
@@ -57,7 +58,7 @@ class BatchOrder:
         
         tech = None
         if tech_option in self.techMap.keys():
-            tech = self.techMap[tech_option](self.sdl_data, self.vars, self.meta)
+            tech = self.techMap[tech_option](self.sdl_data, self.vars)
         elif tech_option in self.techMap2.keys():
             tech = self.techMap2[tech_option]()
         else:

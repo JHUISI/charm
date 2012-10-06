@@ -1,6 +1,5 @@
-from batchlang import *
-from batchparser import *
-import sys
+import sdlpath
+from sdlparser.SDLParser import *
 
 class PrintLambdaStatement:
     def __init__(self, constants):

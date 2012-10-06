@@ -171,8 +171,8 @@ class VarInfo:
         if (node.type == ops.PAIR):
             self.hasPairings = True
         elif (node.type == ops.HASH):
-            if (node.left.type != ops.ATTR):
-                sys.exit("traverseAssignNodeRecursive in VarInfo.py:  left child node of ops.HASH node encountred is not of type ops.ATTR.")
+            if (node.left.type not in [ops.ATTR, ops.CONCAT]): # JAA: added ops.CONCAT to account for hashing a concatenation of multiple variables
+                sys.exit("traverseAssignNodeRecursive in VarInfo.py:  left child node of ops.HASH node encountred is not of type ATTR or CONCAT.")
             hashInputName = getFullVarName(node.left, False)
             if (hashInputName not in self.hashArgsInAssignNode):
                 self.hashArgsInAssignNode.append(hashInputName)

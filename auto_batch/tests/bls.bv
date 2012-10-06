@@ -3,9 +3,11 @@
 name := bls
 N := 100
 S := 10
+setting := asymmetric
 
 BEGIN :: types
-  sig := G1; M := str
+  sig := G1
+  M := str
   g := G2
   pk := G2
   h := G1
@@ -15,26 +17,17 @@ BEGIN :: precompute
   h_z := H(M_z, G1)
 END :: precompute
 
-BEGIN :: constant
-  g
-END :: constant
-
-BEGIN :: public 
-  pk
-END :: public
-
-BEGIN :: signature
-  sig
-END :: signature
-
-BEGIN :: message
-  h
-END :: message
+constant := g
+signature := sig
+public := pk
+message := h
 
 # different messages/sigs under a single signer
-message := N
-public := one
-signature := N
+BEGIN :: count
+message_count := N
+public_count := one
+signature_count := N
+END :: count
 
 # same message. different signatures/signers
 #message := one

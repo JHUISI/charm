@@ -350,7 +350,7 @@ def handle(lines, target):
         return code
     
     # parse as usual
-    parser = BatchParser()
+    parser = SDLParser()
     if type(lines) != list:
         return parser.parse(lines)
 
@@ -1805,7 +1805,7 @@ class CombineVerifyEq:
             node.setAttrIndex('z') # add index to each attr that isn't constant
     
     def newProdNode(self):
-        p = BatchParser()
+        p = SDLParser()
         new_node = p.parse("prod{z:=0, N} on x")
         return new_node
 
@@ -1924,7 +1924,7 @@ class CVForMultiSigner:
             node.setAttrIndex('z')
     
     def newProdNode(self, key=None, end=None):
-        p = BatchParser()
+        p = SDLParser()
         if key and end:
             new_node = p.parse("prod{"+key+":=0,"+end+"} on x")        
         else:

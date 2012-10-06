@@ -2,9 +2,11 @@
 # If one is detected, that is, more than one instance of an exponentiation or pairing with
 # the same variables is found, then it is a candidate for further optimization. This is separate
 # from the techniques in batch parser, however.
-from batchlang import *
 import batchtechniques 
-import batchparser
+import sdlpath
+import sdlparser.SDLParser as batchparser
+from sdlparser.SDLang import *
+
 import string
 
 

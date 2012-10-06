@@ -1,5 +1,6 @@
 
-from batchlang import Type,Enum,ops
+import sdlpath
+from sdlparser.SDLParser import *
 from batchtechniques import AbstractTechnique
 
 pairing = Enum('Asymmetric', 'Symmetric')
@@ -7,7 +8,7 @@ pairing = Enum('Asymmetric', 'Symmetric')
 # post-order traversal needed here?
 class BasicTypeExist(AbstractTechnique):
     def __init__(self, variables):
-        AbstractTechnique.__init__(self, None, variables, None)
+        AbstractTechnique.__init__(self, None, variables)
         self.missing_symbols = []
         self.exclude_list = []
     
@@ -51,7 +52,7 @@ class BasicTypeExist(AbstractTechnique):
 # pairing curve.           
 class PairingTypeCheck(AbstractTechnique):
     def __init__(self, variables, curve=pairing.Asymmetric):
-        AbstractTechnique.__init__(self, None, variables, None)
+        AbstractTechnique.__init__(self, None, variables)
         self.left_errors  = []
         self.right_errors = []
         self.curve_type   = curve
@@ -101,11 +102,4 @@ class PairingTypeCheck(AbstractTechnique):
             exit(0)
         else:
             pass
- 
- 
-# TODO: amke sure every exponent has a ZR type  
-class ExpTypeCheck(AbstractTechnique):
-    def __init__(self, variables, curve=pairing.Asymmetric):
-        AbstractTechnique.__init__(self, None, variables, None)
-        self.exponent = []
         

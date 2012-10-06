@@ -1,10 +1,14 @@
 # variables
 name := chp
+setting := asymmetric
 N := 100
 S := 100
 
 BEGIN :: types
 M := str
+t1 := str
+t2 := str
+t3 := str
 g2 := G2
 pk := G2
 sig := G1
@@ -19,26 +23,17 @@ h := H(t2, G1)
 b := H(M | t3, ZR)
 END :: precompute
 
-BEGIN :: constant
-a, g2, h
-END :: constant
-
-BEGIN :: public
-pk
-END :: public
-
-BEGIN :: signature
-sig, b
-END :: signature
-
-BEGIN :: message
-h
-END :: message
+constant := list{a, g2, h}
+public := pk
+signature := list{sig, b}
+message := h
 
 # different messages/sigs under a single signer
-message := one
-public := N
-signature := N
+BEGIN :: count
+message_count := one
+public_count := N
+signature_count := N
+END :: count
 
 
 verify := { e(sig, g2) == e(a, pk) * e(h, pk)^b }

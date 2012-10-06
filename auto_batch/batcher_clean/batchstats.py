@@ -1,7 +1,8 @@
 # Used for benchmarking operations of intermediate representation
 # and providing routines to determine when independent verification 
 # is more efficient than batch verification.
-from batchlang import *
+import sdlpath
+from sdlparser.SDLParser import *
 
 SmallExp = 'delta'
 
@@ -19,7 +20,7 @@ class RecordOperations:
     def __init__(self, vars):
         if debug >= levels.some:
             print("vars =>", vars)
-        self.debug = False
+        self.debug = True
         self.vars_def = vars
         N = self.vars_def.get('N')
         if N == None:

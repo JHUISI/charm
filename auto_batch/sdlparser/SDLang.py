@@ -432,9 +432,11 @@ class BinaryNode:
                 # denotes group type of an attribute value
 				self.type = ops.TYPE
 				self.attr = types[value]
-				self.attr_index = None
+				self.attr_index = None                
+				self.delta_index = None                
 			else:
 				self.type = ops.ATTR
+				self.delta_index = None                
 				arr = value.split('_')
 				attr = arr[0]
 				# test for negation in attribute
@@ -451,10 +453,12 @@ class BinaryNode:
 			self.type = value
 			self.attr = None
 			self.attr_index = None
+			self.delta_index = None                
 		else:
 			self.type = ops.NONE
 			self.attr = None
 			self.attr_index = None
+			self.delta_index = None                
 		self.left = left
 		self.right = right
 
@@ -466,6 +470,11 @@ class BinaryNode:
 				msg = "-" + self.attr
 			else:
 				msg = self.attr
+			if self.delta_index != None and type(self.delta_index) == list and self.attr == "delta":
+                		token = ""
+                		for t in self.delta_index:
+                    			token += t + "#"
+                		msg += token[:len(token)-1]
 			if self.attr_index != None and type(self.attr_index) == list:
 				token = ""
 				for t in self.attr_index:
@@ -587,6 +596,33 @@ class BinaryNode:
 		if (self.type == ops.ATTR):
 			return str(self.attr)
 		return None
+    
+    # Delta specific adds to BinaryNode to account for small exps
+	def isDeltaIndexEmpty(self):
+		if self.delta_index != None:
+			if len(self.delta_index) > 0: return False
+		return True
+
+	def getDeltaIndex(self):
+		return self.delta_index
+    
+	def setDeltaIndexFromSet(self, value):
+		if type(value) not in [set, list]: return
+		if value == None: return
+		value2 = [str(i) for i in sorted(value)]
+		self.delta_index = value2
+		return
+    
+	def setDeltaIndex(self, value):
+		if(self.type in [ops.ATTR, ops.HASH, ops.PAIR]):
+		    value2 = str(value)
+		    if self.delta_index == None: # could be a list of indices
+		        self.delta_index = [value2]
+		    else:
+		        if not value2 in self.delta_index:
+		           self.delta_index.append(value2)
+		    return True
+		return False
 
 	def getRefAttribute(self):
 		if (self.type == ops.ATTR):
@@ -644,6 +680,7 @@ class BinaryNode:
 		new_node.negated = this.negated
 		new_node.attr = this.attr
 		new_node.attr_index = this.attr_index
+		new_node.delta_index = this.delta_index
 		if this.type in [ops.LIST, ops.EXPAND]:
 			new_node.listNodes  = this.listNodes
 		# recursively call copy on left 
@@ -661,6 +698,10 @@ class BinaryNode:
 			dest.attr_index = list(src.attr_index)
 		else:
 			dest.attr_index = None
+		if src.delta_index:
+			dest.delta_index = list(src.delta_index)
+		else:
+			dest.delta_index = None           
 		dest.left = src.left
 		dest.right = src.right
 		return
@@ -671,7 +712,7 @@ class BinaryNode:
 		dest.attr = None
 		dest.negated = False
 		dest.attr_index = None
-#		del dest.left, dest.right
+		dest.delta_index = None        
 		dest.left = None
 		dest.right = None
 	# only applies function on leaf nodes
@@ -685,6 +726,4 @@ class BinaryNode:
 			return None
 		self.right.traverse(function)
 		return None	
-	
-	
 	

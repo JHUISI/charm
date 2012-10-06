@@ -7,7 +7,7 @@ Tech_db = Enum('NoneApplied', 'ExpIntoPairing', 'DistributeExpToPairing', 'Produ
 #TODO: code up reverse 2 : pull values from pairing outside, 
 
 class AbstractTechnique:
-    def __init__(self, sdl_data, variables, meta):
+    def __init__(self, sdl_data, variables):
         if sdl_data != None:
             self.consts = sdl_data['constant']
             self.public = sdl_data['public']
@@ -16,10 +16,6 @@ class AbstractTechnique:
         else:
             self.consts = self.public = self.message = self.setting = None
         self.vars   = variables
-        if meta != None:
-            self.meta   = meta
-        else:
-            self.meta   = None
         self.debug  = None
 
     def visit(self, node, data):
@@ -462,8 +458,8 @@ class AbstractTechnique:
 tech2 = Tech_db # Enum('NoneApplied', 'ExpIntoPairing', 'DistributeExpToPairing')
 
 class Technique2(AbstractTechnique):
-    def __init__(self, sdl_data, variables, meta):
-        AbstractTechnique.__init__(self, sdl_data, variables, meta)
+    def __init__(self, sdl_data, variables):
+        AbstractTechnique.__init__(self, sdl_data, variables)
         self.rule    = "Move the exponent(s) into the pairing (technique 2)"
         self.applied = False 
         self.score   = tech2.NoneApplied
@@ -642,8 +638,8 @@ class Technique2(AbstractTechnique):
 tech3 = Tech_db # Enum('NoneApplied', 'ProductToSum','CombinePairing', 'SplitPairing')
 
 class Technique3(AbstractTechnique):
-    def __init__(self, sdl_data, variables, meta):
-        AbstractTechnique.__init__(self, sdl_data, variables, meta)
+    def __init__(self, sdl_data, variables):
+        AbstractTechnique.__init__(self, sdl_data, variables)
         self.rule    = "Move dot products inside pairings to reduce $\\numsigs$ pairings to 1 (technique 3)"
         self.applied = False
         self.score   = tech3.NoneApplied
@@ -861,7 +857,7 @@ class Technique3(AbstractTechnique):
             exp = node.right
             isattr = exp.left
             if Type(isattr) == ops.ATTR and isattr.attr_index == None and self.isConstant(isattr):
-                bp = BatchParser()
+                bp = SDLParser()
                 prod = node.left
                 sumOf = bp.parse("sum{x,y} of z")
                 sumOf.left = node.left
@@ -961,13 +957,12 @@ class Technique3(AbstractTechnique):
 tech4 = Tech_db # Enum('NoneApplied', 'ConstantPairing')
 
 class Technique4(AbstractTechnique):
-    def __init__(self, sdl_data, variables, meta):
-        AbstractTechnique.__init__(self, sdl_data, variables, meta)
+    def __init__(self, sdl_data, variables):
+        AbstractTechnique.__init__(self, sdl_data, variables)
         self.rule = "Applied waters hash technique (technique 4)"
         self.applied = False
         self.score   = tech4.NoneApplied
         self.debug   = False
-        #print("Metadata =>", meta)
     
     # need to handle cases where there are more than one dot product nodes that need to be switched!
     def visit_on(self, node, data):
@@ -976,7 +971,7 @@ class Technique4(AbstractTechnique):
             return
         
         prod = node.left
-        var_index = int(self.meta[str(prod.right)])
+        var_index = int(self.vars[str(prod.right)])
         my_val = str(prod.right)
         # check right subnode for another prod node
         node_tuple = []
@@ -990,7 +985,7 @@ class Technique4(AbstractTechnique):
                 if self.debug:
                     print("node: ", node2)
                     print("parent: ", parent, "\n")
-                if var_index > int(self.meta[str(prod2.right)]):
+                if var_index > int(self.vars[str(prod2.right)]):
                     node.left = BinaryNode.copy(prod2)
                     node2.left = BinaryNode.copy(prod)
                     if Type(parent) == ops.PAIR:
@@ -1065,8 +1060,8 @@ class Technique4(AbstractTechnique):
     
 class Technique7(AbstractTechnique):
     """ looks for e( a^c_z, b^d_z ) where a and b are constants and c and d are variable"""
-    def __init__(self, sdl_data, variables, meta):
-        AbstractTechnique.__init__(self, sdl_data, variables, meta)        
+    def __init__(self, sdl_data, variables):
+        AbstractTechnique.__init__(self, sdl_data, variables)        
         self.applied = False
         self.score   = Tech_db.NoneApplied
         self.rule    = "Reverse technique 2. Move exponents outside pairing"
@@ -1089,8 +1084,8 @@ class Technique7(AbstractTechnique):
                     
     
 class Technique8(AbstractTechnique):
-    def __init__(self, sdl_data, variables, meta):
-        AbstractTechnique.__init__(self, sdl_data, variables, meta)        
+    def __init__(self, sdl_data, variables):
+        AbstractTechnique.__init__(self, sdl_data, variables)        
         self.applied = False
         self.score   = Tech_db.NoneApplied
         self.rule    = "Precompute pairings with constant first and second elements."
@@ -1121,8 +1116,8 @@ class Technique8(AbstractTechnique):
         return keyNode
     
 class ASTIndexForIndiv(AbstractTechnique):
-    def __init__(self, sdl_data, variables, meta):
-        AbstractTechnique.__init__(self, sdl_data, variables, meta) 
+    def __init__(self, sdl_data, variables):
+        AbstractTechnique.__init__(self, sdl_data, variables) 
         
     def visit_attr(self, node, data):
         if data['parent'].type in [ops.PROD, ops.EQ, ops.FOR, ops.SUM]:
@@ -1138,8 +1133,8 @@ tech10 = Tech_db
 # 1) Evaluates a given binary node tree at a particular iteration point and proceeds to combine it with the previous equation, 
 # 2) Applies combo techniques to optimize the unrolled equations, etc.
 class Technique10(AbstractTechnique):
-    def __init__(self, sdl_data, variables, meta):
-        AbstractTechnique.__init__(self, sdl_data, variables, meta)  
+    def __init__(self, sdl_data, variables):
+        AbstractTechnique.__init__(self, sdl_data, variables)  
         self.rule    = "Unroll constant-size for loop (technique 10)"
         self.applied = False 
         self.score   = tech10.NoneApplied

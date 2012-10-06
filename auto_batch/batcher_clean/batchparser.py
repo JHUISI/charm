@@ -1,329 +1,322 @@
 # batch parser provides majority of the functionality for parsing bv files and the mechanics of the 
 # techniques for generating an optimized batch equation (tech 2, 3, 4 and simplifying products, etc.)
-# 
 
+import sdlpath
+from sdlparser.SDLParser import *
 from pyparsing import *
-#from batchlang import *
 from batchgen import *
 from batchstats import *
 from batchoptimizer import *
 import string,sys
 
 objStack = []
-
-def createNode(s, loc, toks):
-    print('createNode => ', toks)
-    return BinaryNode(toks[0])
-
-# convert 'attr < value' to a binary tree based on 'or' and 'and'
-def parseNumConditional(s, loc, toks):
-    print("print: %s" % toks)
-    return BinaryNode(toks[0])
-
-def debugParser(s, loc, toks):
-    print("tokens: %s" % toks)
-    return toks
-
-def markSecret(s, loc, toks):
-    print("secret: %s" % toks)
-    return toks
-        
-def pushFirst( s, loc, toks ):
-    if debug >= levels.some:
-       print("Pushing first =>", toks[0])
-    objStack.append( toks[0] )
-
-def pushSecond(s, loc, toks ):
-    print("input: ", toks)
-    objStack.append( toks[0] )
+#BatchParser = None
+#def createNode(s, loc, toks):
+#    print('createNode => ', toks)
+#    return BinaryNode(toks[0])
+#
+## convert 'attr < value' to a binary tree based on 'or' and 'and'
+#def parseNumConditional(s, loc, toks):
+#    print("print: %s" % toks)
+#    return BinaryNode(toks[0])
+#
+#def debugParser(s, loc, toks):
+#    print("tokens: %s" % toks)
+#    return toks
+#
+#def markSecret(s, loc, toks):
+#    print("secret: %s" % toks)
+#    return toks
+#        
+#def pushFirst( s, loc, toks ):
+#    if debug >= levels.some:
+#       print("Pushing first =>", toks[0])
+#    objStack.append( toks[0] )
+#
+#def pushSecond(s, loc, toks ):
+#    print("input: ", toks)
+#    objStack.append( toks[0] )
 
 # Implements language parser for our signature descriptive language (SDL) and returns
 # a binary tree (AST) representation of valid SDL statements.
-class BatchParser:
-    def __init__(self, verbose=False):
-        self.finalPol = self.getBNF()
-        self.verbose = verbose
-
-    def getBNF(self):
-        # supported operators => (OR, AND, <, prod{
-        #OperatorOR = Literal("OR") | Literal("or").setParseAction(upcaseTokens)
-#        ANDOp = Literal("AND") | Literal("and").setParseAction(upcaseTokens)
-        AndOp = Literal("and")
-        lpar = Literal("(").suppress() | Literal("{").suppress()
-        rpar = Literal(")").suppress() | Literal("}").suppress()
-        rcurly = Literal("}").suppress()
-
-        MulOp = Literal("*")
-        DivOp = Literal("/")
-        Concat = Literal("|")
-        ExpOp = Literal("^")
-        AddOp = Literal("+")
-        SubOp = Literal("-")        
-        Equality = Literal("==") # | Word("<>", max=1)
-        Assignment =  Literal(":=")
-        Pairing = Literal("e(") # Pairing token
-        Hash = Literal("H(") # TODO: provide a way to specify arbitrary func. calls
-        Random = Literal("random(")
-        Prod = Literal("prod{") # dot product token
-        For = Literal("for{")
-        Sum = Literal("sum{")
-        ProdOf = Literal("on")
-        ForDo = Literal("do") # for{x,y} do y
-        SumOf = Literal("of")
-        List  = Literal("list{") # represents a list
-
-        # captures the binary operators allowed (and, ^, *, /, +, |, ==)        
-        BinOp = AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | Concat | Equality
-        # captures order of parsing token operators
-        Token =  Equality | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | ForDo | ProdOf | SumOf | Concat | Assignment
-        Operator = Token 
-        #Operator = OperatorAND | OperatorOR | Token
-
-        # describes an individual leaf node
-        leafNode = Word(alphanums + '_-#\\').setParseAction( createNode )
-        expr = Forward()
-        term = Forward()
-        factor = Forward()
-        atom = (Hash + expr + ',' + expr + rpar).setParseAction( pushFirst ) | \
-               (Pairing + expr + ',' + expr + rpar).setParseAction( pushFirst ) | \
-               (Prod + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
-               (For + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
-               (Sum + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
-               (Random + leafNode + rpar).setParseAction( pushFirst ) | \
-               (List + delimitedList(leafNode)).setParseAction( pushFirst ) | \
-               lpar + expr + rpar | (leafNode).setParseAction( pushFirst )
-
-        # Represents the order of operations (^, *, |, ==)
-        # Place more value on atom [ ^ factor}, so gets pushed on the stack before atom [ = factor], right?
-        # In other words, adds order of precedence to how we parse the string. This means we are parsing from right
-        # to left. a^b has precedence over b = c essentially
-        #factor << atom + ZeroOrMore( ( ExpOp + factor ).setParseAction( pushFirst ) )
-        factor << atom + ZeroOrMore( ( BinOp + factor ).setParseAction( pushFirst ) )
-        
-        term = atom + ZeroOrMore((Operator + factor).setParseAction( pushFirst ))
-        # define placeholder set earlier with a 'term' + Operator + another term, where there can be
-        # more than zero or more of the latter. Once we find a term, we first push that into
-        # the stack, then if ther's an operand + term, then we first push the term, then the Operator.
-        # so on and so forth (follows post fix notation).
-        expr << term + ZeroOrMore((Operator + term).setParseAction( pushFirst ))
-        # final bnf object
-        finalPol = expr#.setParseAction( debugParser )
-        return finalPol
-    
-    # method for evaluating stack assumes operators have two operands and pops them accordingly
-    def evalStack(self, stack):
-        op = stack.pop()
-        if debug >= levels.some:
-            print("op: %s" % op)
-        if op in ["+","-","*", "^", ":=", "==", "e(", "for{", "do","prod{", "on", "sum{", "of", "|", "and"]:
-            op2 = self.evalStack(stack)
-            op1 = self.evalStack(stack)
-            return createTree(op, op1, op2)
-        elif op in ["H("]:
-            op2 = self.evalStack(stack)
-            op1 = self.evalStack(stack)
-            return createTree(op, op1, op2)
-        elif op in ["list{"]:
-            ops = []
-            while(len(stack) > 0):
-                ops.append(self.evalStack(stack))
-            newList = createTree(op, None, None)
-            ops.reverse()
-            newList.listNodes = list(ops)
-            return newList
-        elif op in ["random("]:
-            op1 = self.evalStack(stack)
-            return createTree(op, op1, None)
-        else:
-            # Node value
-            return op
-    
-    # main loop for parser. 1) declare new stack, then parse the string (using defined BNF) to extract all
-    # the tokens from the string (not used for anything). 3) evaluate the stack which is in a post
-    # fix format so that we can pop an OR, AND, ^ or = nodes then pull 2 subsequent variables off the stack. Then,
-    # recursively evaluate those variables whether they are internal nodes or leaf nodes, etc.
-    def parse(self, line):
-        # use lineCtr to track line of code.
-        if len(line) == 0 or line[0] == '#': 
-#            print("comments or empty strings will be ignored.")
-            return None 
-        global objStack
-        del objStack[:]
-        tokens = self.finalPol.parseString(line)
-        if debug >= levels.some:
-           print("stack =>", objStack)
-        return self.evalStack(objStack)
-   
-
-# valid keywords
-signer_mode  = Enum('single', 'multi', 'ring')
-START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
-TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
-ARBITRARY_FUNC = 'func:'
-MESSAGE, SIGNATURE, PUBLIC, LATEX, SETTING = 'message','signature', 'public', 'latex', 'setting'
-# qualifier (means only one instance of that particular keyword exists)
-SAME, DIFF = 'one', 'many'
-LINE_DELIM, COMMENT = ';', '#'
-
-
-def clean(arr):
-    return [i.strip() for i in arr]
-
-def handle(lines, target):
-    if target == LATEX:
-        code = {}; EQ = ':='
-        for line in lines:
-            line = line.rstrip()
-            if line.find(EQ) != -1:
-                x = line.split(EQ)
-                lhs, rhs = x[0].strip(), x[1].strip()
-                code [ lhs ] = rhs
-        #print("latex =>", code)
-        return code
-    
-    # parse as usual
-    parser = BatchParser()
-    if type(lines) != list:
-        return parser.parse(lines)
-
-    if (target in [CONST, TRANSFORM, PUBLIC, SIGNATURE, MESSAGE]) or (ARBITRARY_FUNC in target):
-        # parse differently 'a, b, etc.\n'
-        _ast = []
-        for line in lines:
-            l = line.split(',')
-            _ast = [i.strip() for i in l]
-        # JAA: uncomment for debug
-        # print(target, " =>", _ast)
-        return _ast
-    elif target == TYPE:
-        _ast = {}
-        for line in lines:
-            ast_node = parser.parse(line)
-            # make sure it's an assignment node
-            # otherwise, ignore the node
-            if ast_node.type == ops.EQ:
-                left = str(ast_node.left)
-                right = str(ast_node.right)
-                _ast[ left ] = right
-        # JAA: uncomment for debug
-        # print(target, " =>", _ast)
-        return _ast
-    elif target == PRECOMP:
-        indiv_ast = {}
-        batch_ast = {}
-        for line in lines:
-            ast_node = parser.parse(line)
-            # make sure it's an assignment node
-            # otherwise, ignore the node
-            if ast_node.type == ops.EQ:
-                left = ast_node.left
-                right = ast_node.right
-                indiv_ast[ left ] = right
-                batch_ast[ BinaryNode.copy(left) ] = BinaryNode.copy(right)
-        #print(target, " =>", indiv_ast)
-        return (indiv_ast, batch_ast)
-    return None
-
-debugs = levels.none
-
-def parseFile(filename):
-    fd = open(filename, 'r')
-    ast = {TYPE: None, CONST: None, PRECOMP: None, TRANSFORM: None, 
-           MESSAGE: None, SIGNATURE: None, PUBLIC: None, LATEX: None, 
-           OTHER: [] }
-    AcceptedEnclosures = [TYPE, CONST, PRECOMP, TRANSFORM, MESSAGE, SIGNATURE, PUBLIC, LATEX]
-    # parser = BatchParser()
-    code = fd.readlines(); i = 1
-    inStruct = (False, None)
-    queue = []
-    for line in code:
-        if len(line.strip()) == 0 or line[0] == COMMENT:
-            continue
-        elif line.find(BLOCK_SEP) != -1: # parse differently
-            token = clean(line.split(BLOCK_SEP))
-            if token[0] == START_TOKEN and (token[1] in AcceptedEnclosures or ARBITRARY_FUNC in token[1]):
-                inStruct = (True, token[1])
-                if debugs == levels.all: print("Got a section!!!")
-                continue
-            elif inStruct[0]:
-                # continue until we reach an end token, then
-                # test if end token matches the start token, if so can handle queue 
-                key = token[1]
-                if token[0] == END_TOKEN and inStruct[1] == key:
-                    ast[ key ] = handle(queue, key)
-                    if debugs == levels.all:
-                        print("section =>", key)
-                        # print("queue =>", queue)
-                        # print("result =>", ast[key])
-                    # check for global syntax error and exit
-                    queue = [] # tmp remove everything
-                    inStruct = (False, None)  
-            else:
-                print("Syntax Error while parsing section: ", line)
-
-        else: # if not, keep going and assume that we can safely add lines to queue
-            if inStruct[0]:
-                if line.find(LINE_DELIM) != -1: # if a ';' exists in string then we can probably split into two
-                    queue.extend(line.split(LINE_DELIM))
-                else:
-                    queue.append(line)
-            elif len(line.strip()) == 0 or line[0] == COMMENT:
-                if debugs == levels.all:
-                    print(line)
-                continue
-            else:
-                if debugs == levels.all: 
-                    print("Not in a type enclosure: ", line)
-                result = handle(line, None)
-                #print("result =>", result)
-                #print("type =>", type(result))
-                ast[ OTHER ].append(result)                
-                
-    fd.close()
-    return ast
-
-# Takes the tree and iterates through each line 
-# and verifies X # of rules. This serves to notify
-# the user on any errors that might have been made in
-# specifying the batch inputs.
-def astSyntaxChecker(astTree):
-    pass
-
-# Perform some type checking here?
-# rules: find constants, verify, variable definitions
-def astParser(astList):
-    constants = []
-    verify_eq = None
-    variables = {}
-    
-    for i in astList:
-        s = str(i.left)
-        if s == 'constant':
-            constants.append(str(i.right))
-        elif s == 'verify':
-            verify_eq = i
-        else:
-            variables[s] = str(i.right)
-
-    return (constants, verify_eq, variables)
-
-class ASTIterator:
-    def __init__(self, _node, _type):
-        self.cur_node = _node
-        self.of_type = _type
-    
-    def __iter__(self):
-        # if we've found a match
-        if self.cur_node.type == _type:
-            return self.cur_node
-        else:
-            self.cur_node = self.cur_node.right
-    
-    def next(self):
-        if self.cur_node:
-            raise StopIteration
-        else:
-            self.cur_node = _node.right
+#class BatchParser:
+#    def __init__(self, verbose=False):
+#        self.finalPol = self.getBNF()
+#        self.verbose = verbose
+#
+#    def getBNF(self):
+#        # supported operators => (OR, AND, <, prod{
+#        #OperatorOR = Literal("OR") | Literal("or").setParseAction(upcaseTokens)
+##        ANDOp = Literal("AND") | Literal("and").setParseAction(upcaseTokens)
+#        AndOp = Literal("and")
+#        lpar = Literal("(").suppress() | Literal("{").suppress()
+#        rpar = Literal(")").suppress() | Literal("}").suppress()
+#        rcurly = Literal("}").suppress()
+#
+#        MulOp = Literal("*")
+#        DivOp = Literal("/")
+#        Concat = Literal("|")
+#        ExpOp = Literal("^")
+#        AddOp = Literal("+")
+#        SubOp = Literal("-")        
+#        Equality = Literal("==") # | Word("<>", max=1)
+#        Assignment =  Literal(":=")
+#        Pairing = Literal("e(") # Pairing token
+#        Hash = Literal("H(") # TODO: provide a way to specify arbitrary func. calls
+#        Random = Literal("random(")
+#        Prod = Literal("prod{") # dot product token
+#        For = Literal("for{")
+#        Sum = Literal("sum{")
+#        ProdOf = Literal("on")
+#        ForDo = Literal("do") # for{x,y} do y
+#        SumOf = Literal("of")
+#        List  = Literal("list{") # represents a list
+#
+#        # captures the binary operators allowed (and, ^, *, /, +, |, ==)        
+#        BinOp = AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | Concat | Equality
+#        # captures order of parsing token operators
+#        Token =  Equality | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | ForDo | ProdOf | SumOf | Concat | Assignment
+#        Operator = Token 
+#        #Operator = OperatorAND | OperatorOR | Token
+#
+#        # describes an individual leaf node
+#        leafNode = Word(alphanums + '_-#\\').setParseAction( createNode )
+#        expr = Forward()
+#        term = Forward()
+#        factor = Forward()
+#        atom = (Hash + expr + ',' + expr + rpar).setParseAction( pushFirst ) | \
+#               (Pairing + expr + ',' + expr + rpar).setParseAction( pushFirst ) | \
+#               (Prod + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
+#               (For + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
+#               (Sum + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
+#               (Random + leafNode + rpar).setParseAction( pushFirst ) | \
+#               (List + delimitedList(leafNode)).setParseAction( pushFirst ) | \
+#               lpar + expr + rpar | (leafNode).setParseAction( pushFirst )
+#
+#        # Represents the order of operations (^, *, |, ==)
+#        # Place more value on atom [ ^ factor}, so gets pushed on the stack before atom [ = factor], right?
+#        # In other words, adds order of precedence to how we parse the string. This means we are parsing from right
+#        # to left. a^b has precedence over b = c essentially
+#        #factor << atom + ZeroOrMore( ( ExpOp + factor ).setParseAction( pushFirst ) )
+#        factor << atom + ZeroOrMore( ( BinOp + factor ).setParseAction( pushFirst ) )
+#        
+#        term = atom + ZeroOrMore((Operator + factor).setParseAction( pushFirst ))
+#        # define placeholder set earlier with a 'term' + Operator + another term, where there can be
+#        # more than zero or more of the latter. Once we find a term, we first push that into
+#        # the stack, then if ther's an operand + term, then we first push the term, then the Operator.
+#        # so on and so forth (follows post fix notation).
+#        expr << term + ZeroOrMore((Operator + term).setParseAction( pushFirst ))
+#        # final bnf object
+#        finalPol = expr#.setParseAction( debugParser )
+#        return finalPol
+#    
+#    # method for evaluating stack assumes operators have two operands and pops them accordingly
+#    def evalStack(self, stack):
+#        op = stack.pop()
+#        if debug >= levels.some:
+#            print("op: %s" % op)
+#        if op in ["+","-","*", "^", ":=", "==", "e(", "for{", "do","prod{", "on", "sum{", "of", "|", "and"]:
+#            op2 = self.evalStack(stack)
+#            op1 = self.evalStack(stack)
+#            return createTree(op, op1, op2)
+#        elif op in ["H("]:
+#            op2 = self.evalStack(stack)
+#            op1 = self.evalStack(stack)
+#            return createTree(op, op1, op2)
+#        elif op in ["list{"]:
+#            ops = []
+#            while(len(stack) > 0):
+#                ops.append(self.evalStack(stack))
+#            newList = createTree(op, None, None)
+#            ops.reverse()
+#            newList.listNodes = list(ops)
+#            return newList
+#        elif op in ["random("]:
+#            op1 = self.evalStack(stack)
+#            return createTree(op, op1, None)
+#        else:
+#            # Node value
+#            return op
+#    
+#    # main loop for parser. 1) declare new stack, then parse the string (using defined BNF) to extract all
+#    # the tokens from the string (not used for anything). 3) evaluate the stack which is in a post
+#    # fix format so that we can pop an OR, AND, ^ or = nodes then pull 2 subsequent variables off the stack. Then,
+#    # recursively evaluate those variables whether they are internal nodes or leaf nodes, etc.
+#    def parse(self, line):
+#        # use lineCtr to track line of code.
+#        if len(line) == 0 or line[0] == '#': 
+##            print("comments or empty strings will be ignored.")
+#            return None 
+#        global objStack
+#        del objStack[:]
+#        tokens = self.finalPol.parseString(line)
+#        if debug >= levels.some:
+#           print("stack =>", objStack)
+#        return self.evalStack(objStack)
+#   
+#
+## valid keywords
+#signer_mode  = Enum('single', 'multi', 'ring')
+#START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
+#TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
+#ARBITRARY_FUNC = 'func:'
+#MESSAGE, SIGNATURE, PUBLIC, LATEX, SETTING = 'message','signature', 'public', 'latex', 'setting'
+## qualifier (means only one instance of that particular keyword exists)
+#SAME, DIFF = 'one', 'many'
+#LINE_DELIM, COMMENT = ';', '#'
+#
+#
+#def clean(arr):
+#    return [i.strip() for i in arr]
+#
+#def handle(lines, target):
+#    if target == LATEX:
+#        code = {}; EQ = ':='
+#        for line in lines:
+#            line = line.rstrip()
+#            if line.find(EQ) != -1:
+#                x = line.split(EQ)
+#                lhs, rhs = x[0].strip(), x[1].strip()
+#                code [ lhs ] = rhs
+#        #print("latex =>", code)
+#        return code
+#    
+#    # parse as usual
+#    parser = SDLParser()
+#    if type(lines) != list:
+#        return parser.parse(lines)
+#
+#    if (target in [CONST, TRANSFORM, PUBLIC, SIGNATURE, MESSAGE]) or (ARBITRARY_FUNC in target):
+#        # parse differently 'a, b, etc.\n'
+#        _ast = []
+#        for line in lines:
+#            l = line.split(',')
+#            _ast = [i.strip() for i in l]
+#        # JAA: uncomment for debug
+#        # print(target, " =>", _ast)
+#        return _ast
+#    elif target == TYPE:
+#        _ast = {}
+#        for line in lines:
+#            ast_node = parser.parse(line)
+#            # make sure it's an assignment node
+#            # otherwise, ignore the node
+#            if ast_node.type == ops.EQ:
+#                left = str(ast_node.left)
+#                right = str(ast_node.right)
+#                _ast[ left ] = right
+#        # JAA: uncomment for debug
+#        # print(target, " =>", _ast)
+#        return _ast
+#    elif target == PRECOMP:
+#        indiv_ast = {}
+#        batch_ast = {}
+#        for line in lines:
+#            ast_node = parser.parse(line)
+#            # make sure it's an assignment node
+#            # otherwise, ignore the node
+#            if ast_node.type == ops.EQ:
+#                left = ast_node.left
+#                right = ast_node.right
+#                indiv_ast[ left ] = right
+#                batch_ast[ BinaryNode.copy(left) ] = BinaryNode.copy(right)
+#        #print(target, " =>", indiv_ast)
+#        return (indiv_ast, batch_ast)
+#    return None
+#
+#debugs = levels.none
+#
+#def parseFile(filename):
+#    fd = open(filename, 'r')
+#    ast = {TYPE: None, CONST: None, PRECOMP: None, TRANSFORM: None, 
+#           MESSAGE: None, SIGNATURE: None, PUBLIC: None, LATEX: None, 
+#           OTHER: [] }
+#    AcceptedEnclosures = [TYPE, CONST, PRECOMP, TRANSFORM, MESSAGE, SIGNATURE, PUBLIC, LATEX]
+#    # parser = BatchParser()
+#    code = fd.readlines(); i = 1
+#    inStruct = (False, None)
+#    queue = []
+#    for line in code:
+#        if len(line.strip()) == 0 or line[0] == COMMENT:
+#            continue
+#        elif line.find(BLOCK_SEP) != -1: # parse differently
+#            token = clean(line.split(BLOCK_SEP))
+#            if token[0] == START_TOKEN and (token[1] in AcceptedEnclosures or ARBITRARY_FUNC in token[1]):
+#                inStruct = (True, token[1])
+#                if debugs == levels.all: print("Got a section!!!")
+#                continue
+#            elif inStruct[0]:
+#                # continue until we reach an end token, then
+#                # test if end token matches the start token, if so can handle queue 
+#                key = token[1]
+#                if token[0] == END_TOKEN and inStruct[1] == key:
+#                    ast[ key ] = handle(queue, key)
+#                    if debugs == levels.all:
+#                        print("section =>", key)
+#                        # print("queue =>", queue)
+#                        # print("result =>", ast[key])
+#                    # check for global syntax error and exit
+#                    queue = [] # tmp remove everything
+#                    inStruct = (False, None)  
+#            else:
+#                print("Syntax Error while parsing section: ", line)
+#
+#        else: # if not, keep going and assume that we can safely add lines to queue
+#            if inStruct[0]:
+#                if line.find(LINE_DELIM) != -1: # if a ';' exists in string then we can probably split into two
+#                    queue.extend(line.split(LINE_DELIM))
+#                else:
+#                    queue.append(line)
+#            elif len(line.strip()) == 0 or line[0] == COMMENT:
+#                if debugs == levels.all:
+#                    print(line)
+#                continue
+#            else:
+#                if debugs == levels.all: 
+#                    print("Not in a type enclosure: ", line)
+#                result = handle(line, None)
+#                #print("result =>", result)
+#                #print("type =>", type(result))
+#                ast[ OTHER ].append(result)                
+#                
+#    fd.close()
+#    return ast
+#
+## Perform some type checking here?
+## rules: find constants, verify, variable definitions
+#def astParser(astList):
+#    constants = []
+#    verify_eq = None
+#    variables = {}
+#    
+#    for i in astList:
+#        s = str(i.left)
+#        if s == 'constant':
+#            constants.append(str(i.right))
+#        elif s == 'verify':
+#            verify_eq = i
+#        else:
+#            variables[s] = str(i.right)
+#
+#    return (constants, verify_eq, variables)
+#
+#class ASTIterator:
+#    def __init__(self, _node, _type):
+#        self.cur_node = _node
+#        self.of_type = _type
+#    
+#    def __iter__(self):
+#        # if we've found a match
+#        if self.cur_node.type == _type:
+#            return self.cur_node
+#        else:
+#            self.cur_node = self.cur_node.right
+#    
+#    def next(self):
+#        if self.cur_node:
+#            raise StopIteration
+#        else:
+#            self.cur_node = _node.right
 
 # decorator for selecting which operation to call on 
 # each node visit...
@@ -466,7 +459,7 @@ class CombineVerifyEq:
             node.setAttrIndex('z') # add index to each attr that isn't constant
     
     def newProdNode(self):
-        p = BatchParser()
+        p = SDLParser()
         new_node = p.parse("prod{z:=0, N} on x")
         return new_node
 
@@ -605,7 +598,7 @@ class CVForMultiSigner:
             node.setAttrIndex('z')
     
     def newProdNode(self, key=None, end=None):
-        p = BatchParser()
+        p = SDLParser()
         if key and end:
             new_node = p.parse("prod{"+key+":=0,"+end+"} on x")        
         else:
@@ -767,7 +760,7 @@ class SmallExponent:
     
     def newExpNode(self):
 #        exp = BinaryNode(ops.EXP)
-        p = BatchParser()
+        p = SDLParser()
         _node = p.parse("a ^ b_i")
         return _node
 
@@ -806,123 +799,4 @@ def calculate_times(opcount, curve, N, debugging=False):
         print_results(result)
         print("Total Verification Time =>", total_time)
         print("Per Signature =>", total_time / N, "\n")
-    return (result, total_time / N)
-
-#if __name__ == "__main__":
-#    print(sys.argv[1:])
-#    if sys.argv[1] == '-t':
-#        debug = levels.all
-#        statement = sys.argv[2]
-#        parser = BatchParser()
-#        final = parser.parse(statement)
-#        print("Final statement:  '%s'" % final)
-#        exit(0)
-#    elif sys.argv[1] == '-p':
-#        print_results(None)
-#        exit(0)
-#    #elif sys.argv[1] == '-n':
-#    
-#    # main for batch input parser    
-#    file = sys.argv[1]
-#    ast_struct = parseFile(file)
-#    const, types = ast_struct[ CONST ], ast_struct[ TYPE ]
-#    precompute = ast_struct[ PRECOMP ]
-#    algorithm = ast_struct [ TRANSFORM ]
-#    verify, N = None, None
-#    metadata = {}
-#    for n in ast_struct[ OTHER ]:
-#        if str(n.left) == 'verify':
-#            verify = n
-#        elif str(n.left) == 'N':
-#            N = int(str(n.right))
-#            metadata['N'] = str(n.right)
-#        else:
-#            metadata[ str(n.left) ] = str(n.right)
-#
-#    vars = types
-#    vars['N'] = N
-#    print("variables =>", vars)
-#    print("batch algorithm =>", algorithm)
-#
-#    print("\nVERIFY EQUATION =>", verify, "\n")
-#    verify2 = BinaryNode.copy(verify)
-#    ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
-#    ASTVisitor(SimplifyDotProducts()).preorder(verify2.right)
-#
-#    print("\nStage A: Combined Equation =>", verify2, "\n")
-#    ASTVisitor(SmallExponent(const, vars)).preorder(verify2.right)
-#    print("\nStage B: Small Exp Test =>", verify2, "\n")
-#    T2 = Technique2(const, vars)
-#    ASTVisitor(T2).preorder(verify2.right)
-#    print("\nApply tech 2 =>", verify2, "\n")
-#    print(T2.rule)
-#    
-#    T3 = Technique3(const, vars)
-#    ASTVisitor(T3).preorder(verify2.right)
-#    print("\nApply tech 3 =>", verify2, "\n")
-#    print(T3.rule)    
-
-#    T2 = Technique2(const, vars)
-#    ASTVisitor(T2).preorder(verify2.right)
-#    print("\nApply tech 2 =>", verify2, "\n")
-#    print(T2.rule)
-#    ASTVisitor(SimplifyDotProducts()).preorder(verify2.right)
-#    print("\nSimplify dot prod =>", verify2, "\n")
-    
-#    T4 = Technique4(const, vars, metadata)
-#    ASTVisitor(T4).preorder(verify2.right)
-#    print("\nApply tech 4 =>", verify2, "\n")
-#    print(T4.rule)
-#
-#    ASTVisitor(SimplifyDotProducts()).preorder(verify2.right)
-#    print("\nSimplify dot prod =>", verify2, "\n")
-#    T3 = Technique3(const, vars)
-#    ASTVisitor(T3).preorder(verify2.right)
-#    print("\nApply tech 3 =>", verify2, "\n")
-#    print(T3.rule)
-        
-    # Further precomputations
-    #Instfind = InstanceFinder()
-    #ASTVisitor(Instfind).preorder(verify2.right)
-    #print("Instances found =>", Instfind.instance)
-    
-    #ASTVisitor(Substitute(Instfind.instance, precompute, vars)).preorder(verify2.right)
-    #print("Precomputation =>", precompute)
-    #print("Type information =>", vars)
-    #print("\nFinal Equation =>", verify2)
-        
-#    cg = CodeGenerator(const, vars, verify2.right)
-#    result = cg.print_batchverify()
-#    result = cg.print_statement(verify2.right)    
-    #curve = {'a.param': {'pair': 1.90786, 'mul': {'GT': 0.00328, 'G2': 0.0092, 'G1': 0.0093, 'ZR':0}, 
-    #                     'exp': {'GT': 0.37146, 'G2': 2.41154, 'G1': 2.40242, 'ZR':0}, 'hash':{'ZR':0, 'G1':0, 'G2':0, 'GT':0}}}
-    #print("Python => '%s'" % result) # should be able to compile this
-#    try:
-#        import benchmarks
-#        curve = benchmarks.benchmarks
-#    except:
-#        print("Could not find the 'benchmarks' file that has measurement results! Generate and re-run.")
-#        exit(0)
-#    
-#    print("<===== Benchmark Results =====>")
-#    print("Assumption is N =", N)
-#    rop_ind = RecordOperations(vars)
-#    # add attrIndex to non constants
-#    ASTVisitor(ASTAddIndex(const, vars)).preorder(verify.right)
-#    print("<====\tINDIVIDUAL\t====>")
-#    print("Equation =>", verify.right)
-#    rop_ind.visit(verify.right, {'key':['N'], 'N': N })
-#    print("<===\tOperations count\t===>")
-#    print_results(rop_ind.ops)
-#    calculate_times(rop_ind.ops, curve['d224.param'], N)
-#    
-#    # Apply results on optimized batch algorithm
-#    rop_batch = RecordOperations(vars)
-#    rop_batch.visit(verify2.right, {})
-#    print("<====\tBATCH\t====>")    
-#    print("Equation =>", verify2.right)
-#    print("<===\tOperations count\t===>")
-#    print_results(rop_batch.ops)
-#    calculate_times(rop_batch.ops, curve['d224.param'], N)
-#    exit(0)
-    
+    return (result, total_time / N)    
