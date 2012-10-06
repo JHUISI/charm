@@ -1,5 +1,6 @@
 name := vrf
 N := 100
+setting := asymmetric
 n := 8 
 
 BEGIN :: types
@@ -9,26 +10,17 @@ BEGIN :: types
  y := GT; h := G2; U2#t := G2
 END :: types
 
-BEGIN :: constant
- g1, g2, h
-END :: constant
-
-BEGIN :: message
- x#0, x#t
-END :: message
-
-BEGIN :: public
- U1#0, U2#0, U2#t, Ut
-END :: public
-
-BEGIN :: signature
- pi#0, pi#1, pi#n, pi#t, pi#t-1, y
-END :: signature
+constant := list{g1, g2, h}
+message := list{x#0, x#t}
+public := list{U1#0, U2#0, U2#t, Ut}
+signature := pi#0, pi#1, pi#n, pi#t, pi#t-1, y
 
 # same signer
-message := N
-public := one
-signature := N
+BEGIN :: count
+message_count := N
+public_count := one
+signature_count := N
+END :: count
 
 verify1 := { e(pi#1, g2) == e((g1^(1 + -x#0)) * (U1#0^x#0), Ut) } and {{ e(pi#0, g2) == e(pi#n, U2#0) } and { e(pi#0, h) == y }}
 verify2 := { for{t:=1, n} do { e(pi#t, g2) == (e((pi#t-1^(1 - x#t)), g2) * e(pi#t-1^x#t, U2#t)) } }

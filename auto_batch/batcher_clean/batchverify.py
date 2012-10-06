@@ -703,7 +703,7 @@ def run_main(opts):
         parser = SDLParser()
         final = parser.parse(statement)
         print("Final statement(%s): '%s'" % (type(final), final))
-        exit(0)
+        sys.exit(0)
     else:
         # Parse the SDL file into binary tree
 #        ast_struct = parseFile(file)
@@ -722,16 +722,11 @@ def run_main(opts):
             else: verify_eq.extend(result)
 
     # santiy checks to verify setting makes sense for given equation 
-#    variables = ast_struct[ TYPE ]
-#    variables = setting.getTypes()
-#    for eq in verify_eq:
-#        bte = BasicTypeExist( variables )
-#        ASTVisitor( bte ).preorder( eq )
-#        bte.report( eq )
-#        
-#        cte = PairingTypeCheck( variables )
-#        ASTVisitor( cte ).preorder( eq )
-#        cte.report( eq )
+    variables = setting.getTypes()
+    for eq in verify_eq:
+        bte = BasicTypeExist( variables )
+        ASTVisitor( bte ).preorder( eq )
+        bte.report( eq )
 
     # initiate the proof generator    
     print("Single verification equation: ", singleVE)
@@ -739,5 +734,4 @@ def run_main(opts):
     # process settings
     for i in range(len(verify_eq)):    
         if verbose: print("\nRunning batcher....\n")
-#        runBatcher(opts, genProof, file + str(i), verify_eq[i], ast_struct, i)
         runBatcher2(opts, genProof, file + str(i), verify_eq[i], setting, i)

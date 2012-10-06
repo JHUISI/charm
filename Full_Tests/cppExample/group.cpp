@@ -479,6 +479,283 @@ string CharmList::printAtIndex(int index)
 
 // end CharmList implementation
 
+// start CharmListZR implementation
+
+CharmListZR::CharmListZR(void)
+{
+	// increases as elements are appended
+	cur_index = 0;
+}
+
+CharmListZR::~CharmListZR()
+{
+	for(int i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+}
+
+void CharmListZR::append(ZR & zr)
+{
+	list[cur_index] = zr;
+	cur_index++;
+}
+
+ZR& CharmListZR::operator[](const int index)
+{
+	if(index == cur_index) { // means we are creating reference.
+		list[cur_index] = NULL;
+		cur_index++;
+		return list[index];
+	}
+
+	int len = (int) list.size();
+	if(index >= 0 && index < len) {
+		return list[index];
+	}
+	else {
+		throw new string("Invalid access.\n");
+	}
+}
+
+int CharmListZR::length()
+{
+	return (int) list.size();
+}
+
+string CharmListZR::printAtIndex(int index)
+{
+	stringstream ss;
+	int i;
+
+	if(index >= 0 && index < (int) list.size()) {
+		i = index;
+		ss << list[i];
+	}
+
+	string s = ss.str();
+	return s;
+}
+
+ostream& operator<<(ostream& s, const CharmListZR& cList)
+{
+	CharmListZR cList2 = cList;
+	for(int i = 0; i < cList2.length(); i++) {
+		s << i << ": " << cList2.printAtIndex(i) << endl;
+	}
+
+	return s;
+}
+
+// end CharmListZR implementation
+
+// start CharmListG1 implementation
+
+CharmListG1::CharmListG1(void)
+{
+	// increases as elements are appended
+	cur_index = 0;
+}
+
+CharmListG1::~CharmListG1()
+{
+	for(int i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+}
+
+void CharmListG1::append(G1 & g)
+{
+	list[cur_index] = g;
+	cur_index++;
+}
+
+G1& CharmListG1::operator[](const int index)
+{
+	if(index == cur_index) { // means we are creating reference.
+		G1 tmp;
+		list[cur_index] = tmp;
+		cur_index++;
+		return list[index];
+	}
+
+	int len = (int) list.size();
+	if(index >= 0 && index < len) {
+		return list[index];
+	}
+	else {
+		throw new string("Invalid access.\n");
+	}
+}
+
+int CharmListG1::length()
+{
+	return (int) list.size();
+}
+
+string CharmListG1::printAtIndex(int index)
+{
+	stringstream ss;
+	int i;
+
+	if(index >= 0 && index < (int) list.size()) {
+		i = index;
+		ss << list[i].g;
+	}
+
+	string s = ss.str();
+	return s;
+}
+
+ostream& operator<<(ostream& s, const CharmListG1& cList)
+{
+	CharmListG1 cList2 = cList;
+	for(int i = 0; i < cList2.length(); i++) {
+		s << i << ": " << cList2.printAtIndex(i) << endl;
+	}
+
+	return s;
+}
+
+// end CharmListG1 implementation
+
+// start CharmListG2 implementation
+
+CharmListG2::CharmListG2(void)
+{
+	// increases as elements are appended
+	cur_index = 0;
+}
+
+CharmListG2::~CharmListG2()
+{
+	for(int i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+}
+
+void CharmListG2::append(G2 & g)
+{
+	list[cur_index] = g;
+	cur_index++;
+}
+
+G2& CharmListG2::operator[](const int index)
+{
+	if(index == cur_index) { // means we are creating reference.
+		G2 tmp;
+		list[cur_index] = tmp; // this type will disappear and just for creating reference only. caller expected to set result
+		cur_index++;
+		return list[index];
+	}
+
+	int len = (int) list.size();
+	if(index >= 0 && index < len) {
+		return list[index];
+	}
+	else {
+		throw new string("Invalid access.\n");
+	}
+}
+
+int CharmListG2::length()
+{
+	return (int) list.size();
+}
+
+string CharmListG2::printAtIndex(int index)
+{
+	stringstream ss;
+	int i;
+
+	if(index >= 0 && index < (int) list.size()) {
+		i = index;
+		ss << list[i].g;
+	}
+
+	string s = ss.str();
+	return s;
+}
+
+ostream& operator<<(ostream& s, const CharmListG2& cList)
+{
+	CharmListG2 cList2 = cList;
+	for(int i = 0; i < cList2.length(); i++) {
+		s << i << ": " << cList2.printAtIndex(i) << endl;
+	}
+
+	return s;
+}
+
+// end CharmListG2 implementation
+
+// start CharmListGT implementation
+
+CharmListGT::CharmListGT(void)
+{
+	// increases as elements are appended
+	cur_index = 0;
+}
+
+CharmListGT::~CharmListGT()
+{
+	for(int i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+}
+
+void CharmListGT::append(GT & g)
+{
+	list[cur_index] = g;
+	cur_index++;
+}
+
+GT& CharmListGT::operator[](const int index)
+{
+	if(index == cur_index) { // means we are creating reference.
+		GT tmp;
+		list[cur_index] = tmp; // this type will disappear and just for creating reference only. caller expected to set result
+		cur_index++;
+		return list[index];
+	}
+
+	int len = (int) list.size();
+	if(index >= 0 && index < len) {
+		return list[index];
+	}
+	else {
+		throw new string("Invalid access.\n");
+	}
+}
+
+int CharmListGT::length()
+{
+	return (int) list.size();
+}
+
+string CharmListGT::printAtIndex(int index)
+{
+	stringstream ss;
+	int i;
+
+	if(index >= 0 && index < (int) list.size()) {
+		i = index;
+		ss << list[i].g;
+	}
+
+	string s = ss.str();
+	return s;
+}
+
+ostream& operator<<(ostream& s, const CharmListGT& cList)
+{
+	CharmListGT cList2 = cList;
+	for(int i = 0; i < cList2.length(); i++) {
+		s << i << ": " << cList2.printAtIndex(i) << endl;
+	}
+
+	return s;
+}
+
+// end CharmListGT implementation
+
+
+
 // start CharmDict implementation
 
 CharmDict::CharmDict()
@@ -578,26 +855,6 @@ PairingGroup::~PairingGroup()
 	delete pfcObject;
 	delete gt;
 }
-/*
-void PairingGroup::random(ZR & b)
-{
-	pfcObject->random(b);
-}
-
-void PairingGroup::random(G1 & g)
-{
-	pfcObject->random(g);
-}
-
-void PairingGroup::random(GT & g)
-{
-	// choose random ZR
-	ZR *zr = new ZR();
-	pfcObject->random(*zr);
-	g = pfcObject->power(*gt, *zr);
-	delete zr;
-}
-*/
 
 void PairingGroup::init(ZR & r, char *value)
 {
@@ -624,10 +881,11 @@ GT PairingGroup::random(GT_type t)
 {
 	// choose random ZR
 	ZR zr;
-	GT gt; // = new GT();
+	GT gts; // = new GT();
 	pfcObject->random(zr);
-	gt = pfcObject->power(gt, zr);
-        return gt;
+
+	gts = pfcObject->power(*gt, zr);
+    return gts;
 }
 
 #ifdef ASYMMETRIC

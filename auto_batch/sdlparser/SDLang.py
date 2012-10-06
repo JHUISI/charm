@@ -44,6 +44,7 @@ FORALL_LOOP_HEADER = "forall"
 TYPES_HEADER = "types"
 COUNT_HEADER = "count" # JAA: app-specific
 PRECOMPUTE_HEADER = "precompute" # JAA: app-specific
+LATEX_HEADER = "latex" # JAA: standard
 LIST_TYPE = "list"
 OTHER_TYPES = ['list', 'object']
 DECL_FUNC_HEADER = "func:"

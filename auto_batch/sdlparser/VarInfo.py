@@ -10,6 +10,7 @@ class VarInfo:
     def __init__(self):
         self.assignNode = None
         self.lineNo = None
+        self.lineStr = None
         self.varDeps = []
         self.varDepsNoExponents = []
         self.hasPairings = None
@@ -75,6 +76,9 @@ class VarInfo:
 
     def getLineNo(self):
         return self.lineNo
+
+    def getLineStr(self):
+        return self.lineStr
 
     def getVarDeps(self):
         return self.varDeps
@@ -366,6 +370,20 @@ class VarInfo:
             sys.exit("Line number passed to VarInfo is invalid.")
 
         self.lineNo = lineNo
+    
+    def setLineStr(self, lineStr):
+        if type(lineStr) != str:
+            return
+        
+        tokens = lineStr.split(':=')
+        if len(tokens) != 2:
+            print("lineNo: ", self.lineNo)
+            print("lineStr: ", lineStr)
+            sys.exit("Latex symbol not formatted correctly.")
+        
+        tokens[0] = tokens[0].strip()
+        tokens[1] = tokens[1].strip()
+        self.lineStr = (tokens[0], tokens[1])
 
     def setIsTypeEntryOnly(self, isTypeEntryOnly):
         if (self.isTypeEntryOnly == True):

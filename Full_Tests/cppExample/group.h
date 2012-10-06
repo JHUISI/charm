@@ -115,6 +115,75 @@ private:
 	map<int, Element> list;
 };
 
+class CharmListZR
+{
+public:
+	CharmListZR(void); // static list
+	~CharmListZR();
+	void append(ZR&);
+	int length(); // return length of lists
+	string printAtIndex(int index);
+
+	// retrieve a particular index
+	ZR& operator[](const int index);
+    friend ostream& operator<<(ostream&, const CharmListZR&);
+private:
+	int cur_index;
+	map<int, ZR> list;
+};
+
+class CharmListG1
+{
+public:
+	CharmListG1(void); // static list
+	~CharmListG1();
+	void append(G1&);
+	int length(); // return length of lists
+	string printAtIndex(int index);
+
+	// retrieve a particular index
+	G1& operator[](const int index);
+    friend ostream& operator<<(ostream&, const CharmListG1&);
+private:
+	int cur_index;
+	map<int, G1> list;
+};
+
+class CharmListG2
+{
+public:
+	CharmListG2(void); // static list
+	~CharmListG2();
+	void append(G2&);
+	int length(); // return length of lists
+	string printAtIndex(int index);
+
+	// retrieve a particular index
+	G2& operator[](const int index);
+    friend ostream& operator<<(ostream&, const CharmListG2&);
+private:
+	int cur_index;
+	map<int, G2> list;
+};
+
+class CharmListGT
+{
+public:
+	CharmListGT(void); // static list
+	~CharmListGT();
+	void append(GT&);
+	int length(); // return length of lists
+	string printAtIndex(int index);
+
+	// retrieve a particular index
+	GT& operator[](const int index);
+    friend ostream& operator<<(ostream&, const CharmListGT&);
+private:
+	int cur_index;
+	map<int, GT> list;
+};
+
+
 struct cmp_str
 {
 	bool operator()(const string a, const string b) {

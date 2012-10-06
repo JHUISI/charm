@@ -301,6 +301,17 @@ class SDLParser:
                         sys.exit("SDLParser.py found multiple PRECOMPUTE_HEADER end token declarations.")
                     endLineNos_Functions[currentFuncName] = line_number
                     currentFuncName = NONE_FUNC_NAME
+            elif (op1 == LATEX_HEADER):
+                if (op == START_TOKEN):
+                    currentFuncName = LATEX_HEADER
+                    if (currentFuncName in startLineNos_Functions):
+                        sys.exit("SDLParser.py found multiple LATEX_HEADER start token declarations.")
+                    startLineNos_Functions[currentFuncName] = line_number
+                elif (op == END_TOKEN):
+                    if (currentFuncName in endLineNos_Functions):
+                        sys.exit("SDLParser.py found multiple LATEX_HEADER end token declarations.")
+                    endLineNos_Functions[currentFuncName] = line_number
+                    currentFuncName = NONE_FUNC_NAME
                     
             return createTree(op, op1, None)
         else:
@@ -659,6 +670,21 @@ def updatePrecomputeStmts(node, lineNum):
     if (varName in assignInfo[currentFuncName]):
         sys.exit("In updatePrecomputeStmts in SDLParser.py, found duplicate entries for variable name in PRECOMPUTE_HEADER function.")
 
+    assignInfo[currentFuncName][varName] = varInfoObj
+    return None
+
+def updateLatexStmts(lineStr, lineNum):
+    global assignInfo
+    
+    if assignInfo.get(currentFuncName) == None:
+        assignInfo[currentFuncName] = {}
+        
+    assignInfo_Func = assignInfo[currentFuncName]
+    varInfoObj = VarInfo()
+    varInfoObj.setLineNo(lineNum)
+    varInfoObj.setLineStr(lineStr)
+    
+    varName = varInfoObj.getLineStr()[0]
     assignInfo[currentFuncName][varName] = varInfoObj
     return None
 
@@ -1600,6 +1626,8 @@ def parseLinesOfCode(code, verbosity, ignoreCloudSourcing=False):
                     updateKeywordStmts(node, lineNumberInCode)
                 elif (currentFuncName == PRECOMPUTE_HEADER): # JAA: see previous comment
                     updateKeywordStmts(node, lineNumberInCode)
+                elif (currentFuncName == LATEX_HEADER): # JAA: need to custom parse source and SDL version here
+                    updateLatexStmts(line, lineNumberInCode)
                 else:
                     updateAssignInfo(node, lineNumberInCode)
             elif (node.type == ops.FOR):
