@@ -36,6 +36,7 @@ blindingFactors_Lists = None
 
 currentFuncOutputVars = None
 currentFuncNonOutputVars = None
+SDLListVars = []
 
 def writeCurrentNumTabsToString():
     outputString = ""
@@ -956,13 +957,36 @@ def writeLambdaFuncAssignStmt(outputFile, binNode):
     #outputFile.write(lambdaOutputString)
     return (dotProdObj, lambdaReplacements)
 
+def getVarDeclForListVar(variableName):
+    listSymbolLoc = variableName.find(LIST_INDEX_SYMBOL)
+    trueVarName = variableName[0:listSymbolLoc]
+
+    outputString_Types = ""
+
+    listVarType = getFinalVarType(variableName, currentFuncName)
+    if (listVarType == types.G1):
+        outputString_Types += "    CharmListG1 " + trueVarName + ";\n"
+    elif (listVarType == types.G2):
+        outputString_Types += "    CharmListG2 " + trueVarName + ";\n"
+    elif (listVarType == types.GT):
+        outputString_Types += "    CharmListGT " + trueVarName + ";\n"
+    elif (listVarType == types.ZR):
+        outputString_Types += "    CharmListZR " + trueVarName + ";\n"
+    else:
+        outputString_Types += "    NO TYPE FOUND FOR " + trueVarName + "\n"
+
+    return outputString_Types
+
 def writeAssignStmt_CPP(outputFile, binNode):
-    global CPP_varTypesLines, CPP_funcBodyLines, setupFile, currentFuncNonOutputVars
+    global CPP_varTypesLines, CPP_funcBodyLines, setupFile, currentFuncNonOutputVars, SDLListVars
 
     variableName = getFullVarName(binNode.left, False)
 
     if (variableName == inputKeyword):
         return
+
+    if (variableName.find(LIST_INDEX_SYMBOL) != -1):
+        SDLListVars.append(variableName)
 
     if (variableName == outputKeyword):
         if ( (str(binNode) == "output := True") or (str(binNode) == "output := true") ):
@@ -998,22 +1022,25 @@ def writeAssignStmt_CPP(outputFile, binNode):
         if (variableName not in currentFuncOutputVars):
             outputString_Types += "    " + makeTypeReplacementsForCPP(variableType) + " *"
 
-    variableName = replacePoundsWithBrackets(variableName)
+    if (variableName in SDLListVars):
+        outputString_Types += getVarDeclForListVar(variableName)
 
-    if ( (binNode.right.type != ops.EXPAND) and (variableName not in currentFuncOutputVars) ):
+    if ( (binNode.right.type != ops.EXPAND) and (variableName not in currentFuncOutputVars) and (variableName not in SDLListVars) ):
         variableType = getFinalVarType(variableName, currentFuncName)
         outputString_Types += variableName + " = new " + makeTypeReplacementsForCPP(variableType) + "();\n"
 
+    variableNamePounds = replacePoundsWithBrackets(variableName)
+
     if ( (binNode.right.type != ops.EXPAND) and (binNode.right.type != ops.LIST) ):
-        if (variableName in currentFuncOutputVars):
-            outputString_Body += variableName
+        if ( (variableNamePounds in currentFuncOutputVars) or (variableName in SDLListVars) ):
+            outputString_Body += variableNamePounds
         else:
-            outputString_Body += "*" + variableName
+            outputString_Body += "*" + variableNamePounds
 
     if ( (binNode.right.type != ops.LIST) and (binNode.right.type != ops.SYMMAP) and (binNode.right.type != ops.EXPAND) ):
         outputString_Body += " = "
 
-    outputString_Body += getAssignStmtAsString_CPP(binNode.right, None, variableName)
+    outputString_Body += getAssignStmtAsString_CPP(binNode.right, None, variableNamePounds)
     if ( (binNode.right.type != ops.LIST) and (binNode.right.type != ops.SYMMAP) and (binNode.right.type != ops.EXPAND) ):
         outputString_Body += ";\n"
     #outputFile.write(outputString)
