@@ -351,7 +351,7 @@ def writeFunctionDecl_CPP(outputFile, functionName):
         outputFile.write("int main()\n{\n    PairingGroup group(AES_SECURITY);\n")
         return
 
-    if ( (functionName == verifyFuncName) or (functionName == membershipFuncName) ):
+    if (functionName in [verifyFuncName, membershipFuncName, batchVerifyFuncName]):
         outputString = "bool " + functionName + "("
     else:
         outputString = "void " + functionName + "("
@@ -416,8 +416,10 @@ def writeFunctionEnd_CPP(outputFile, functionName):
     #CPP_funcBodyLines += "\treturn " + outputKeyword + ";\n}\n\n"
     #CPP_funcBodyLines += "    return " + outputKeyword + ";\n}\n\n"
 
-    if ( (functionName != verifyFuncName) and (functionName != membershipFuncName) ):
+    if (functionName not in [verifyFuncName, membershipFuncName, batchVerifyFuncName]):
         CPP_funcBodyLines += "    return;\n}\n\n"
+    elif (functionName == batchVerifyFuncName):
+        CPP_funcBodyLines += "    return True;\n}\n\n"
     else:
         CPP_funcBodyLines += "}\n\n"
 
@@ -1025,6 +1027,12 @@ def getVarDeclForListVar(variableName):
 
 def writeAssignStmt_CPP(outputFile, binNode):
     global CPP_varTypesLines, CPP_funcBodyLines, setupFile, currentFuncNonOutputVars, SDLListVars
+
+    if (str(binNode) == RETURN_STATEMENT):
+        CPP_funcBodyLines += writeCurrentNumTabsToString()
+        CPP_funcBodyLines += "return;\n"
+        return
+
 
     variableName = getFullVarName(binNode.left, False)
 

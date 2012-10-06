@@ -903,7 +903,27 @@ G2 PairingGroup::random(G2_type t)
 	return g2;
 }
 
-bool PairingGroup::ismember(G2 g)
+bool PairingGroup::ismember(CharmList & g)
+{
+	return true;
+}
+
+bool PairingGroup::ismember(CharmListG1 & g)
+{
+	return true;
+}
+
+bool PairingGroup::ismember(ZR & g)
+{
+	return true;
+}
+
+bool PairingGroup::ismember(G1 & g)
+{
+	return true;
+}
+
+bool PairingGroup::ismember(G2 & g)
 {
 	return true; // add code to check
 }
@@ -1016,6 +1036,12 @@ G1 PairingGroup::hashListToG1(string str)
 	G1 l; 
 	pfcObject->hash_and_map(l, (char *) str.c_str());
 	return l; 
+}
+
+G1 PairingGroup::hashListToG1(Element & e)
+{
+	G1 tmp;
+	return tmp; 
 }
 
 #ifdef ASYMMETRIC

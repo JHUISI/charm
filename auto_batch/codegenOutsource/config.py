@@ -29,6 +29,7 @@ encryptFuncName = "encrypt"
 mainFuncName = "main"
 verifyFuncName = "verify"
 membershipFuncName = "membership"
+batchVerifyFuncName = "batchverify"
 
 masterPubVars = ["gpk", "pk"]
 masterSecVars = ["msk"]
