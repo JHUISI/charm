@@ -62,6 +62,7 @@ builtInTypes["calculateSharesDict"] = types.symmap
 builtInTypes["calculateSharesList"] = types.list
 builtInTypes["prune"] = types.list
 builtInTypes["getCoefficients"] = types.symmap
+builtInTypes["integer"] = types.int
 
 def createNode(s, loc, toks):
     print('createNode => ', toks)

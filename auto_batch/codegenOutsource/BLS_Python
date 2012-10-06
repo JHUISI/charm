@@ -68,7 +68,8 @@ def dividenconquer(delta, dotACache, dotBCache, startSigNum, endSigNum, incorrec
         output = True
         return = True
     else:
-        midway = ((endSigNum - startSigNum) / 2)
+        midwayFloat = ((endSigNum - startSigNum) / 2)
+        midway = int(midwayFloat)
     if ( ( (midway) == (0) ) ):
         incorrectIndices.append(startSigNum)
         output = None
