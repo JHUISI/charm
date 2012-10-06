@@ -878,6 +878,9 @@ def getVarTypeInfoForAttr_List(node):
 def getVarTypeInfoForAttr(node):
     nodeAttrFullName = getFullVarName(node, False)
     
+    # ignore "_" underscores to make finding type values consistent
+    nodeAttrFullName = nodeAttrFullName.split('_')[0]
+    
     if (nodeAttrFullName in varTypes[currentFuncName]):
         return varTypes[currentFuncName][nodeAttrFullName].getType()
 

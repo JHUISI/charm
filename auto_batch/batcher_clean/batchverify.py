@@ -723,15 +723,15 @@ def run_main(opts):
 
     # santiy checks to verify setting makes sense for given equation 
 #    variables = ast_struct[ TYPE ]
-    variables = setting.getTypes()
-    for eq in verify_eq:
-        bte = BasicTypeExist( variables )
-        ASTVisitor( bte ).preorder( eq )
-        bte.report( eq )
-        
-        cte = PairingTypeCheck( variables )
-        ASTVisitor( cte ).preorder( eq )
-        cte.report( eq )
+#    variables = setting.getTypes()
+#    for eq in verify_eq:
+#        bte = BasicTypeExist( variables )
+#        ASTVisitor( bte ).preorder( eq )
+#        bte.report( eq )
+#        
+#        cte = PairingTypeCheck( variables )
+#        ASTVisitor( cte ).preorder( eq )
+#        cte.report( eq )
 
     # initiate the proof generator    
     print("Single verification equation: ", singleVE)
