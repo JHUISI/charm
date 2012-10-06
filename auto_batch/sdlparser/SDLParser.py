@@ -559,6 +559,8 @@ def setVarTypeObjForTypedList(varTypeObj, listType):
         varTypeObj.setType(types.listGT)
     elif (listType == "ZR"):
         varTypeObj.setType(types.listZR)
+    elif (listType == "str"):
+        varTypeObj.setType(types.listStr)
     else:
         sys.exit("setVarTypeObjForTypedList in SDLParser.py:  listType passed in is not one of the supported types.")
 

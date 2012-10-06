@@ -229,13 +229,14 @@ public:
 	G1 random(G1_type);
 	GT random(GT_type);
 	bool ismember(CharmList&);
+	bool ismember(CharmListZR&);
 	bool ismember(CharmListG1&);
+	bool ismember(CharmListG2&);
 	bool ismember(ZR&);
 	bool ismember(G1&);
 	bool ismember(GT&);
 
 #ifdef ASYMMETRIC
-	//void random(G2&);
 	G2 random(G2_type);
 	bool ismember(G2&);
 	G2 mul(G2, G2);
@@ -249,7 +250,6 @@ public:
 	// hash -- not done
 	ZR hashListToZR(string);
 	G1 hashListToG1(string);
-	G1 hashListToG1(Element&);
 	G2 hashListToG2(string);
 
 	ZR & hashListToZR(CharmList&);

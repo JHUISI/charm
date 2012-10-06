@@ -2,6 +2,7 @@ name := bls
 # number of signatures in a batch
 N := 2
 setting := asymmetric
+secparam := 80
 
 # types for variables used in verification.
 # all other variable types are inferred by SDL parser
@@ -11,7 +12,7 @@ sig := G1
 g := G2
 pk := G2
 M := str
-Mlist := list
+Mlist := list{str}
 siglist := list{G1}
 delta := list{ZR} # add as a result of batch verify
 dotACache := list{G1}
@@ -78,13 +79,13 @@ input := list{pk, Mlist, siglist, g, incorrectIndices}
 
 BEGIN :: for
 for{z:=0, N}
- delta#z := smallexp()
+ delta#z := smallexp(secparam)
 END :: for
 
 BEGIN :: for
 for{z :=0, N}
  BEGIN :: if
-  if {(membership(pk, Mlist, siglist, g) == False)}
+  if {(membership(pk, siglist, g) == False)}
      output := False
  END :: if
 END :: for
@@ -138,15 +139,10 @@ END ::func:dividenconquer
 
 
 BEGIN :: func:membership
- input := list{pk, Mlist, siglist, g}
+ input := list{pk, siglist, g}
  
  BEGIN :: if
   if { ismember(pk) == False }
-     output := False
- END :: if
-
- BEGIN :: if
-  if { ismember(Mlist) == False }
      output := False
  END :: if
  

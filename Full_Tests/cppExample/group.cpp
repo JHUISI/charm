@@ -888,22 +888,12 @@ GT PairingGroup::random(GT_type t)
     return gts;
 }
 
-#ifdef ASYMMETRIC
-/*
-void PairingGroup::random(G2 & g)
-{
-	pfcObject->random(g);
-}
-*/
-
-G2 PairingGroup::random(G2_type t)
-{
-	G2 g2; // = new G2();
-	pfcObject->random(g2);
-	return g2;
-}
-
 bool PairingGroup::ismember(CharmList & g)
+{
+	return true;
+}
+
+bool PairingGroup::ismember(CharmListZR & g)
 {
 	return true;
 }
@@ -923,9 +913,23 @@ bool PairingGroup::ismember(G1 & g)
 	return true;
 }
 
+#ifdef ASYMMETRIC
+
+G2 PairingGroup::random(G2_type t)
+{
+	G2 g2; // = new G2();
+	pfcObject->random(g2);
+	return g2;
+}
+
 bool PairingGroup::ismember(G2 & g)
 {
 	return true; // add code to check
+}
+
+bool PairingGroup::ismember(CharmListG2 & g)
+{
+	return true;
 }
 
 G2 PairingGroup::mul(G2 g, G2 h)
@@ -1036,12 +1040,6 @@ G1 PairingGroup::hashListToG1(string str)
 	G1 l; 
 	pfcObject->hash_and_map(l, (char *) str.c_str());
 	return l; 
-}
-
-G1 PairingGroup::hashListToG1(Element & e)
-{
-	G1 tmp;
-	return tmp; 
 }
 
 #ifdef ASYMMETRIC
