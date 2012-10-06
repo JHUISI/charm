@@ -1,6 +1,10 @@
-from keygen import *
-from config import *
+#from keygen import *
 import sys, os
+
+sys.path.extend(['../', '../sdlparser']) 
+
+from SDLParser import *
+from config import *
 
 ignoreCloudSourcing = None
 nonCloudSourcingFileName = None
@@ -253,6 +257,55 @@ def makeTypeReplacementsForCPP(SDL_Type):
 def getFinalVarType(varName, funcName):
     return getVarTypeFromVarName(varName, funcName)
 
+def executeAddToListCPP(binNode):
+    global CPP_funcBodyLines
+
+    #print(numTabsIn)
+
+    outputString = writeCurrentNumTabsToString()
+
+    listNodes = None
+
+    try:
+        listNodes = binNode.listNodes
+    except:
+        sys.exit("executeAddToListPythonn in codegen_CPP.py:  could not obtain binary node's list nodes; must be 2 of them (list, data item to add).")
+
+    if (len(listNodes) != 2):
+        sys.exit("executeAddToListPython in codegen_CPP.py:  number of binary node's list nodes isn't 2; this must be the case (list, data item to add to it).")
+
+    outputString += listNodes[0] + ".push(" + listNodes[1] + ");\n"
+
+    CPP_funcBodyLines += outputString    
+
+def writeFuncCall(binNode):
+    global CPP_funcBodyLines
+
+    outputString = writeCurrentNumTabsToString()
+
+    if (str(binNode.attr) == ADD_TO_LIST):
+        executeAddToListCPP(binNode)
+        return
+
+    outputString += binNode.attr + "("
+
+    listNodes = None
+
+    try:
+        listNodes = binNode.listNodes
+    except:
+        sys.exit("writeFuncCall in codegen_CPP.py:  couldn't obtain listNodes for func call binary node; make sure that even if passing no arguments to function, you put \"None\" in the parentheses.")
+
+    if (listNodes[0] != "None"):
+        for listNode in listNodes:
+            outputString += listNode + ", "
+        lenString = len(outputString)
+        outputString = outputString[0:(lenString - 2)]
+
+    outputString += ");\n"
+
+    CPP_funcBodyLines += outputString
+
 def writeFunctionDecl_CPP(outputFile, functionName):
     global currentFuncOutputVars, currentFuncNonOutputVars
 
@@ -341,6 +394,12 @@ def writeFunctionEnd(functionName):
     global setupFile
 
     writeFunctionEnd_CPP(setupFile, functionName)
+
+def isFuncCall(binNode):
+    if (binNode.type == ops.FUNC):
+        return True
+
+    return False
 
 def isErrorFunc(binNode):
     if (binNode.type == ops.ERROR):
@@ -942,6 +1001,7 @@ def writeAssignStmt_CPP(outputFile, binNode):
     variableName = replacePoundsWithBrackets(variableName)
 
     if ( (binNode.right.type != ops.EXPAND) and (variableName not in currentFuncOutputVars) ):
+        variableType = getFinalVarType(variableName, currentFuncName)
         outputString_Types += variableName + " = new " + makeTypeReplacementsForCPP(variableType) + "();\n"
 
     if ( (binNode.right.type != ops.EXPAND) and (binNode.right.type != ops.LIST) ):
@@ -1356,6 +1416,8 @@ def writeSDLToFiles(astNodes):
             writeIfStmtEnd(astNode)
         elif (isErrorFunc(astNode) == True):
             writeErrorFunc(astNode)
+        elif (isFuncCall(astNode) == True):
+            writeFuncCall(astNode)
         elif ( (processedAsFunctionStart == True) or (isUnnecessaryNodeForCodegen(astNode) == True) ):
             continue
         else:
@@ -1697,6 +1759,7 @@ def main(inputSDLScheme, outputFileName):
     varNamesToFuncs_Assign = getVarNamesToFuncs_Assign()
 
     setupFile = open(outputFileName, 'w')
+    userFuncsCPPFile = open("userFuncsCPPFile.h", 'w')
 
     getGlobalVarNames()
 
@@ -1714,6 +1777,7 @@ def main(inputSDLScheme, outputFileName):
     #addGetGlobalsToUserFuncs()
 
     setupFile.close()
+    userFuncsCPPFile.close()
 
     #if (ignoreCloudSourcing == False):
         #generateMakefile()

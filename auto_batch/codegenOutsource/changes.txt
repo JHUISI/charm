@@ -1,3 +1,7 @@
 - changed "ismember" to "group.ismember"
 - add explicit "return True" to divideanconquer iff verification equation check is OK
 - added "int" call to midway calculation in div/conq
+
+CPP
+
+
