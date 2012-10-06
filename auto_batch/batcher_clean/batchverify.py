@@ -14,18 +14,7 @@ from batchcomboeq import TestForMultipleEq,CombineMultipleEq,SmallExpTestMul,Aft
 from batchsyntax import BasicTypeExist,PairingTypeCheck
 from benchmark_interface import getBenchmarkInfo
 
-#try:
-    #import benchmarks
-    #import miraclbench2
-    #import miraclbench2_relic
-    #curve = miraclbench2_relic.benchmarks
-    #curve_key = 'mnt160'
-#except:
-#    print("Could not find the 'benchmarks' file that has measurement results! Generate and re-run.")
-#    exit(0)
-
 debug = False
-#THRESHOLD_FLAG = CODEGEN_FLAG = PROOFGEN_FLAG = PRECOMP_CHECK = VERBOSE = CHOOSE_STRATEGY = False
 THRESHOLD_FLAG = CODEGEN_FLAG = PRECOMP_CHECK = VERBOSE = CHOOSE_STRATEGY = False
 global_count   = 0
 flags = { 'multiple':None, 'step1':None }
@@ -113,7 +102,7 @@ def checkForSigs(node):
 def benchIndivVerification(N, equation, sdl_dict, vars, precompute, _verbose):
     rop_ind = RecordOperations(vars)
     # add attrIndex to non constants
-    ASTVisitor(ASTIndexForIndiv(sdl_dict, vars, None)).preorder(equation)
+    ASTVisitor(ASTIndexForIndiv(sdl_dict, vars)).preorder(equation)
     if VERBOSE: print("Final indiv eq:", equation, "\n")
     if _verbose:
         print("<====\tINDIVIDUAL\t====>")
@@ -436,7 +425,7 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, eq_number=0):
     FIND_ORDER     = False
     if not algorithm: FIND_ORDER = True
 
-    N = None    
+    N = settingObj.getNumSignatures()    
 #    sig_vars, pub_vars, msg_vars = ast_struct[ SIGNATURE ], ast_struct[ PUBLIC ], ast_struct[ MESSAGE ]
     setting = settingObj.getBatchCount()
     batch_count = {} # F = more than one, T = only one exists
@@ -476,9 +465,6 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, eq_number=0):
     
     if VERBOSE: print("setting: ", batch_count)
     
-#    vars = types
-#    vars['N'] = N
-#    vars.update(metadata)
     if VERBOSE: print("variables =>", types)
     # build data inputs for technique classes    
     sdl_data = { CONST : constants, PUBLIC: pubVars, MESSAGE : msgVars, SETTING : batch_count } 
@@ -490,14 +476,10 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, eq_number=0):
     techniques = {'2':Technique2, '3':Technique3, '4':Technique4, '5':DotProdInstanceFinder, '6':PairInstanceFinder, '7':Technique7, '8':Technique8 }
     #print("VERIFY EQUATION =>", verify)
     if PROOFGEN_FLAG: 
-#        lcg_data[ lcg_steps ] = { 'msg':'Equation', 'eq': lcg.print_statement(verify) }
         if flags['multiple' + str(eq_number)]: 
-#            lcg_data[ lcg_steps ]['eq'] = lcg.print_statement(flags[ str(eq_number) ]) # shortcut!
-#            print("JAA => EQUATIONS: ", lcg.print_statement(flags[ 'verify' + str(eq_number) ]))
             proofGen.setIndVerifyEq(flags[ 'verify' + str(eq_number) ])
         else:
             proofGen.setIndVerifyEq( verify )
-#        lcg_steps += 1
         
     verify2 = BinaryNode.copy(verify)
     ASTVisitor(CVForMultiSigner(types, sigVars, pubVars, msgVars, batch_count)).preorder(verify2)
@@ -597,7 +579,7 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, eq_number=0):
         output_indiv = open(indiv, 'w'); output_batch = open(batch, 'w')
         threshold = -1
         for i in range(1, N+1):
-            vars['N'] = i
+            types['N'] = i
             (batch_msmt, batch_avg_msmt) = benchBatchVerification(i, verify2, sdl_data, types, batch_precompute, VERBOSE)
             output_indiv.write(str(i) + " " + str(indiv_avg_msmt) + "\n")
             output_batch.write(str(i) + " " + str(batch_avg_msmt) + "\n")
@@ -651,7 +633,7 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, eq_number=0):
         print("Generated the proof written to file: verification_gen%s.tex" % latex_file)
         proofGen.compileProof(latex_file)
 
-def benchmark_batcher(argv, prefix=None):
+def benchmark_batcherOLD(argv, prefix=None):
     global THRESHOLD_FLAG, PROOFGEN_FLAG, PRECOMP_CHECK, VERBOSE, CHOOSE_STRATEGY
     global filePrefix
     ast_struct = None
@@ -708,7 +690,7 @@ def run_main(opts):
         # Parse the SDL file into binary tree
 #        ast_struct = parseFile(file)
         parseFile2(file, verbose, ignoreCloudSourcing=True)
-        setting = SDLSetting()
+        setting = SDLSetting(verbose)
         setting.parse(getAssignInfo(), getVarTypes()) # check for errors and pass on to user before continuing
 
 
