@@ -1,8 +1,11 @@
 name := boyen
+setting := asymmetric
 N := 100
 l := 2
 
 BEGIN :: types
+g1 := G1
+g2 := G2
 m := ZR
 t := ZR
 At := G2
@@ -16,28 +19,19 @@ BEGIN :: precompute
 D := e(g1, g2)
 END :: precompute
 
-BEGIN :: constant
-At, Bt, Ct
-END :: constant
-
-BEGIN :: public
-At, Bt, Ct
-END :: public
-
-BEGIN :: signature
-S, t
-END :: signature
-
-BEGIN :: message
-m
-END :: message
+constant := list{At, Bt, Ct}
+public := list{At, Bt, Ct}
+signature := list{S, t}
+message := m
 
 # different messages/sigs under different signers (ring)
-message := N
-public := l
-signature := N
+BEGIN :: count
+message_count := N
+public_count := l
+signature_count := N
+END :: count
 
-verify :=  { prod{y:=0, l} on e(S_y, At_y * (Bt_y^m_y) * (Ct_y^t_y)) } == D
+verify :=  {{ prod{y:=0, l} on e(S_y, At_y * (Bt_y^m_y) * (Ct_y^t_y)) } == D}
 
 # rearrange => verify :=  { prod{y:=0, l} on e(At_y * (Bt_y^m_y) * (Ct_y^t_y), S_y) } == D
 # correct transform => 2, 4, 3, 5, 3 

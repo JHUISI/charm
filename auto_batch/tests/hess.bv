@@ -1,4 +1,5 @@
 name := hess
+setting := asymmetric
 N := 100
 
 BEGIN :: types
@@ -16,26 +17,17 @@ BEGIN :: precompute
 a := H(M_z | S1_z, ZR)
 END :: precompute
 
-BEGIN :: constant
-P, g2
-END :: constant
-
-BEGIN :: public
-pk
-END :: public
-
-BEGIN :: signature
-S1, S2, S3
-END :: signature
-
-BEGIN :: message
-a
-END :: message
+constant := list{P, g2}
+public := pk
+signature := list{S1, S2, S3}
+message := a
 
 # different messages/sigs under different signers
-message := N
-public := N
-signature := N
+BEGIN :: count
+message_count := N
+public_count := N
+signature_count := N
+END :: count
 
 verify := { e(S2, g2) == ( e(pk, P)^a ) * S1 }
 

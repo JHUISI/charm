@@ -2,35 +2,30 @@ name := cl04
 N := 100
 
 BEGIN :: types
- a := G2; b := G2; c := G2
- g := G1; X := G1; Y := G1
+ a := G2
+ b := G2
+ c := G2
+ g := G1
+ X := G1
+ Y := G1
  m := ZR
 END :: types
 
 BEGIN :: precompute
-m_z := H(M_z, ZR)
+ m_z := H(M_z, ZR)
 END :: precompute
 
-BEGIN :: constant
-g
-END :: constant
-
-BEGIN :: message
-m
-END :: message
-
-BEGIN :: public
-X, Y
-END :: public
-
-BEGIN :: signature
-a, b, c
-END :: signature
+constant := g
+message := m
+public := list{X, Y}
+signature := list{a, b, c}
 
 # same signer
-message := N
-public := one
-signature := N
+BEGIN :: count
+message_count := N
+public_count := one
+signature_count := N
+END :: count
 
 #BEGIN :: transform
 #2, 6, 6

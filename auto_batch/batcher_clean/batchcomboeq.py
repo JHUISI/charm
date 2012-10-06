@@ -3,6 +3,7 @@
 import sdlpath
 from sdlparser.SDLParser import *
 from batchtechniques import AbstractTechnique
+from batchoptimizer import PairInstanceFinder
 
 # BEGIN: Small Exponent Related classes to assist with tracking index numbers assigned to delta variables 
 # across multiple verification equations. 
@@ -64,9 +65,9 @@ class TestForMultipleEq:
 # addIndex: means that CombineMultipleEq will add index numbers to each equation for tracking purposes
 # so that deltas will have appropriate numbers later.
 class CombineMultipleEq(AbstractTechnique):
-    def __init__(self, sdl_data=None, variables=None, meta=None, addIndex=True):
+    def __init__(self, sdl_data=None, variables=None, addIndex=True):
         if sdl_data:
-            AbstractTechnique.__init__(self, sdl_data, variables, meta)
+            AbstractTechnique.__init__(self, sdl_data, variables)
         self.inverse = BinaryNode("-1")
         self.finalAND   = [ ]
         self.attr_index = 0

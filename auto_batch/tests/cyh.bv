@@ -1,5 +1,5 @@
-
 name := cyh
+setting := asymmetric
 N := 100
 l := 10
 
@@ -19,26 +19,17 @@ h_z := H(M | L | u_z, ZR)
 END :: precompute
 #S := sk^(h + r)
 
-BEGIN :: constant
-P, g
-END :: constant
-
-BEGIN :: public
-pk
-END :: public
-
-BEGIN :: signature
-S, u
-END :: signature
-
-BEGIN :: message
-h
-END :: message
+constant := list{P, g}
+public := pk
+signature := list{S, u}
+message := h
 
 # different messages/sigs under different signers
-message := N
 # number of signers already in verify equation
-public := one
-signature := N
+BEGIN :: count
+message_count := N
+public_count := one
+signature_count := N
+END :: count
 
 verify := { e((prod{y:=0, l} on (u_y * (pk_y^h_y))) , P) == e(S, g) }

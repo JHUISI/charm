@@ -904,7 +904,8 @@ def getVarTypeInfoRecursive(node):
         return getVarTypeInfoRecursive(node.right)
     if (node.type == ops.LIST):
         return node
-
+    if (node.type == ops.AND):
+        return types.int
     #TODO:  THIS MUST BE FIXED!!!!  MODEL SYMMAP AFTER LIST
     if (node.type == ops.SYMMAP):
         return types.symmap
