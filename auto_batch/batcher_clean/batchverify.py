@@ -13,6 +13,7 @@ from batchorder import BatchOrder
 from batchcomboeq import TestForMultipleEq,CombineMultipleEq,SmallExpTestMul,AfterTech2AddIndex
 from batchsyntax import BasicTypeExist,PairingTypeCheck
 from benchmark_interface import getBenchmarkInfo
+from constructbatch import *
 
 debug = False
 THRESHOLD_FLAG = CODEGEN_FLAG = PRECOMP_CHECK = VERBOSE = CHOOSE_STRATEGY = False
@@ -589,6 +590,9 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, eq_number=0):
         print("Threshold: ", threshold)
     # STOP BENCHMARK : THRESHOLD ESTIMATOR 
     # TODO: check avg for when batch is more efficient than 
+#    sdlBatch = SDLBatch(sdl_data, types, verify2, batch_precompute)
+#    sdlBatch.construct()
+    
     if CODEGEN_FLAG:
         print("Final batch eq:", verify2)
         subProds = SubstituteSigDotProds(types, 'z', 'N', global_count)
@@ -629,7 +633,7 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, eq_number=0):
             writeFile(SDL_OUT_FILE, out_str)
 
     if PROOFGEN_FLAG:
-        latex_file = metadata['name'].upper() + str(eq_number)
+        latex_file = types['name'].upper() + str(eq_number)
         print("Generated the proof written to file: verification_gen%s.tex" % latex_file)
         proofGen.compileProof(latex_file)
 

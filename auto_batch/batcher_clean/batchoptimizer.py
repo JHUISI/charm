@@ -560,6 +560,9 @@ class SubstituteSigDotProds:
         #print('key =>', key)
         return key
     
+    def getVarCount(self):
+        return self.cnt
+    
     def store(self, key, value, the_type=None):
         self.dotprod[ 'dict' ][ key ] = value
         self.dotprod[ 'types' ][ key ] = the_type
