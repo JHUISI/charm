@@ -28,6 +28,7 @@ encryptFuncName = "encrypt"
 
 mainFuncName = "main"
 verifyFuncName = "verify"
+membershipFuncName = "membership"
 
 masterPubVars = ["gpk", "pk"]
 masterSecVars = ["msk"]

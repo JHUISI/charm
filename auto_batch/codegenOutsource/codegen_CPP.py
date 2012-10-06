@@ -70,6 +70,32 @@ def addImportLines():
 
     setupFile.write(cppImportLines)
 
+def addNumSignatures():
+    global setupFile
+
+    try:
+        numSignatures = assignInfo[NONE_FUNC_NAME][numSignaturesVarName].getAssignNode().right
+    except:
+        sys.exit("addNumSignatures in codegen_CPP:  could not obtain number of signatures from SDL file.")
+
+    setupFile.write("int N = " + str(numSignatures) + ";\n\n")
+
+def addSmallExpFunc():
+    global setupFile
+
+    outputString = ""
+
+    outputString += "ZR & SmallExp(int bits) {\n"
+    outputString += "    big t = mirvar(0);\n"
+    outputString += "    bigbits(bits, t);\n\n"
+    outputString += "    ZR *z = new ZR(t);\n"
+    outputString += "    mr_free(t);\n"
+    outputString += "    return *z;\n"
+    outputString += "}\n\n"
+
+    setupFile.write(outputString)
+
+
 def addGroupObjGlobalVar():
     global setupFile, transformFile, decOutFile, userFuncsFile, userFuncsCPPFile
 
@@ -252,6 +278,14 @@ def makeTypeReplacementsForCPP(SDL_Type):
         return charmListType
     if (SDLTypeAsString == "symmap"):
         return charmDictType
+    if (SDLTypeAsString == "listG1"):
+        return "CharmListG1"
+    if (SDLTypeAsString == "listG2"):
+        return "CharmListG2"
+    if (SDLTypeAsString == "listGT"):
+        return "CharmListGT"
+    if (SDLTypeAsString == "listZR"):
+        return "CharmListZR"
 
     return SDLTypeAsString
 
@@ -317,7 +351,7 @@ def writeFunctionDecl_CPP(outputFile, functionName):
         outputFile.write("int main()\n{\n    PairingGroup group(AES_SECURITY);\n")
         return
 
-    if (functionName == verifyFuncName):
+    if ( (functionName == verifyFuncName) or (functionName == membershipFuncName) ):
         outputString = "bool " + functionName + "("
     else:
         outputString = "void " + functionName + "("
@@ -382,7 +416,7 @@ def writeFunctionEnd_CPP(outputFile, functionName):
     #CPP_funcBodyLines += "\treturn " + outputKeyword + ";\n}\n\n"
     #CPP_funcBodyLines += "    return " + outputKeyword + ";\n}\n\n"
 
-    if (functionName != verifyFuncName):
+    if ( (functionName != verifyFuncName) and (functionName != membershipFuncName) ):
         CPP_funcBodyLines += "    return;\n}\n\n"
     else:
         CPP_funcBodyLines += "}\n\n"
@@ -609,6 +643,9 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
     if (type(node) is str):
         return processStrAssignStmt(node, replacementsDict)
 
+    elif ( (node.type == ops.ATTR) and (str(node.attr) == smallExp) ):
+        return "SmallExp(80)"
+
     elif ( (node.type == ops.ATTR) or (node.type == ops.TYPE) ):
         returnString = processAttrOrTypeAssignStmt(node, replacementsDict)
         if (returnString in currentFuncNonOutputVars):
@@ -732,7 +769,16 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
     elif (node.type == ops.FUNC):
         nodeName = applyReplacementsDict(replacementsDict, getFullVarName(node, False))
         nodeName = replacePoundsWithBrackets(nodeName)
-        funcOutputString = nodeName + "("
+
+        if (nodeName == INIT_FUNC_NAME):
+            return "1"
+        elif (nodeName == ISMEMBER_FUNC_NAME):
+            funcOutputString = groupObjName + "." + nodeName + "("
+        elif (nodeName == INTEGER_FUNC_NAME):
+            funcOutputString = "int("
+        else:
+            funcOutputString = nodeName + "("
+
         for listNodeInFunc in node.listNodes:
             listNodeAsString = getAssignStmtAsString_CPP(listNodeInFunc, replacementsDict, variableName)
             funcOutputString += listNodeAsString + ", "
@@ -1791,6 +1837,10 @@ def main(inputSDLScheme, outputFileName):
     getGlobalVarNames()
 
     addImportLines()
+
+    addNumSignatures()
+
+    addSmallExpFunc()
 
     #addGroupObjGlobalVar()
 
