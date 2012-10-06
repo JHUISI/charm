@@ -85,7 +85,8 @@ def addImportLines():
 
     if (ignoreCloudSourcing == True):
         setupFile.write("from charm.toolbox.pairinggroup import *\n")
-        setupFile.write("from charm.core.engine.util import *\n\n")
+        setupFile.write("from charm.core.engine.util import *\n")
+        setupFile.write("from charm.core.math.integer import randomBits\n\n")
 
 
         #setupFile.write(pythonImportLines)

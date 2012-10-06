@@ -1,5 +1,6 @@
 from charm.toolbox.pairinggroup import *
 from charm.core.engine.util import *
+from charm.core.math.integer import randomBits
 
 group = None
 
@@ -100,21 +101,6 @@ def prng_bits(bits=80):
 def main():
     global group
     group = PairingGroup(80)
-
-    (pk, sk, g) = keygen()
-    M1 = "test1"
-    M2 = "test2"
-    sig1 = sign(sk, M1)
-    sig2 = sign(sk, M2)
-    Mlist = []
-    Mlist.append(M1)
-    Mlist.append(M2)
-    siglist = []
-    siglist.append(sig1)
-    siglist.append(sig2)
-    incorrectIndices = batchverify(pk, Mlist, siglist, g, [])
-    print(incorrectIndices)
-
 
 if __name__ == '__main__':
     main()
