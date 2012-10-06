@@ -77,8 +77,11 @@ class VarInfo:
     def getLineNo(self):
         return self.lineNo
 
-    def getLineStr(self):
-        return self.lineStr
+    def getLineStrKey(self):
+        return self.lineStr[0]
+    
+    def getLineStrValue(self):
+        return self.lineStr[1]
 
     def getVarDeps(self):
         return self.varDeps

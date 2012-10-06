@@ -684,7 +684,7 @@ def updateLatexStmts(lineStr, lineNum):
     varInfoObj.setLineNo(lineNum)
     varInfoObj.setLineStr(lineStr)
     
-    varName = varInfoObj.getLineStr()[0]
+    varName = varInfoObj.getLineStrKey()
     assignInfo[currentFuncName][varName] = varInfoObj
     return None
 
