@@ -479,7 +479,7 @@ string CharmList::printAtIndex(int index)
 
 // end CharmList implementation
 
-// start CharmListZR implementation
+// start CharmListStr implementation
 
 CharmListStr::CharmListStr(void)
 {
@@ -502,7 +502,8 @@ void CharmListStr::append(string & s)
 string& CharmListStr::operator[](const int index)
 {
 	if(index == cur_index) { // means we are creating reference.
-		list[cur_index] = NULL;
+		string s;
+		list[cur_index] = s; // create tmp value
 		cur_index++;
 		return list[index];
 	}
@@ -545,7 +546,7 @@ ostream& operator<<(ostream& s, const CharmListStr& cList)
 	return s;
 }
 
-// end CharmListZR implementation
+// end CharmListStr implementation
 
 
 // start CharmListZR implementation
@@ -1039,6 +1040,22 @@ ZR PairingGroup::order()
 	return ZR(pfcObject->order());
 }
 
+int PairingGroup::add(int g, int h)
+{
+	return g + h;
+}
+
+int PairingGroup::sub(int g, int h)
+{
+	return g - h;
+}
+
+int PairingGroup::mul(int g, int h)
+{
+	return g * h;
+}
+
+
 ZR PairingGroup::mul(ZR g, ZR h)
 {
 	ZR o = pfcObject->order();
@@ -1075,6 +1092,11 @@ GT PairingGroup::div(GT g, GT h)
 {
 	GT l(g / h);
 	return l;
+}
+
+int PairingGroup::div(int g, int h)
+{
+	return g / h;
 }
 
 ZR PairingGroup::exp(ZR x, ZR y)

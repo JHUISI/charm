@@ -284,6 +284,11 @@ public:
 	ZR exp(ZR, ZR);
 	G1 exp(G1, ZR);
 	GT exp(GT, ZR);
+
+	int add(int, int);
+	int sub(int, int);
+	int mul(int, int);
+	int div(int, int);
 	string aes_key(GT & g);
 
 private:
