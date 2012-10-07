@@ -65,6 +65,7 @@ def addImportLines():
     cppImportLines += "#include <iostream>\n"
     cppImportLines += "#include <sstream>\n"
     cppImportLines += "#include <string>\n"
+    cppImportLines += "#include <list>\n"
     cppImportLines += "using namespace std;\n"
     #cppImportLines += "#define DEBUG  true\n"
     cppImportLines += "\n"
@@ -275,7 +276,7 @@ def writeFunctionDecl_Python(outputFile, functionName, toWriteGlobalVarDecls, re
 
     writeInitDictDefs(outputFile, functionName)
 
-def makeTypeReplacementsForCPP(SDL_Type):
+def makeTypeReplacementsForCPP(SDL_Type, isList=False):
     SDLTypeAsString = str(SDL_Type)
 
     if (SDLTypeAsString == "str"):
@@ -296,6 +297,14 @@ def makeTypeReplacementsForCPP(SDL_Type):
         return "list<int>"
     if (SDLTypeAsString == "listStr"):
         return "CharmListStr"
+    if ( (SDLTypeAsString == "G1") and (isList == True) ):
+        return "CharmListG1"
+    if ( (SDLTypeAsString == "G2") and (isList == True) ):
+        return "CharmListG2"
+    if ( (SDLTypeAsString == "GT") and (isList == True) ):
+        return "CharmListGT"
+    if ( (SDLTypeAsString == "ZR") and (isList == True) ):
+        return "CharmListZR"
 
     return SDLTypeAsString
 
@@ -319,7 +328,7 @@ def executeAddToListCPP(binNode):
     if (len(listNodes) != 2):
         sys.exit("executeAddToListPython in codegen_CPP.py:  number of binary node's list nodes isn't 2; this must be the case (list, data item to add to it).")
 
-    outputString += listNodes[0] + ".push(" + listNodes[1] + ");\n"
+    outputString += listNodes[0] + ".push_back(" + listNodes[1] + ");\n"
 
     CPP_funcBodyLines += outputString    
 
@@ -351,6 +360,24 @@ def writeFuncCall(binNode):
 
     CPP_funcBodyLines += outputString
 
+def isFuncDeclVarAList(variableName, functionName):
+    (possibleFuncName, possibleVarInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, variableName)
+    if (possibleVarInfoObj == None):
+        return False
+
+    assignNode = possibleVarInfoObj.getAssignNode()
+    if (assignNode == None):
+        return False
+
+    assignNodeLeft = assignNode.left
+    if (assignNodeLeft == None):
+        return False
+
+    if (str(assignNodeLeft).find(LIST_INDEX_SYMBOL) != -1):
+        return True
+
+    return False
+
 def writeFunctionDecl_CPP(outputFile, functionName):
     global currentFuncOutputVars, currentFuncNonOutputVars
 
@@ -378,22 +405,24 @@ def writeFunctionDecl_CPP(outputFile, functionName):
     #outputString += PairingGroupClassName_CPP + " & " + groupObjName + ", "
 
     for inputVariable in inputVariables:
+        varIsAList = isFuncDeclVarAList(inputVariable, functionName)
         currentType = getFinalVarType(inputVariable, currentFuncName)
         if (str(currentType) in ["str","int"]):
             outputString += makeTypeReplacementsForCPP(currentType) + " " + inputVariable + ", "
         else:
-            outputString += makeTypeReplacementsForCPP(currentType) + " & " + inputVariable + ", "
+            outputString += makeTypeReplacementsForCPP(currentType, varIsAList) + " & " + inputVariable + ", "
         currentFuncOutputVars.append(inputVariable)
 
     for outputVariable in outputVariables:
         if (outputVariable in inputVariables):
             continue
         if ( (outputVariable != "True") and (outputVariable != "False") ):
+            varIsAList = isFuncDeclVarAList(outputVariable, functionName)
             currentType = getFinalVarType(outputVariable, currentFuncName)
             if (str(currentType) in ["str","int"]):
                 outputString += makeTypeReplacementsForCPP(currentType) + " " + outputVariable + ", "
             else:
-                outputString += makeTypeReplacementsForCPP(currentType) + " & " + outputVariable + ", "
+                outputString += makeTypeReplacementsForCPP(currentType, varIsAList) + " & " + outputVariable + ", "
             currentFuncOutputVars.append(outputVariable)
 
     outputString = outputString[0:(len(outputString) - len(", "))]
@@ -646,6 +675,28 @@ def processAttrOrTypeAssignStmt(node, replacementsDict):
         strNameToReturn = "-" + strNameToReturn
     return strNameToReturn
 
+def doesVarNeedStar(variable):
+    if (variable in integerVars):
+        return False
+
+    if (variable in currentFuncNonOutputVars):
+        return True
+
+    return False
+
+def writeMathStatement(leftSide, rightSide, opString):
+    leftNeedsStar = doesVarNeedStar(leftSide)
+    rightNeedsStar = doesVarNeedStar(rightSide)
+
+    if ( (leftNeedsStar == True) and (rightNeedsStar == True) ):
+        return groupObjName + "." + opString + "(*" + leftSide + ", *" + rightSide + ")"
+    elif ( (leftNeedsStar == True) and (rightNeedsStar == False) ):
+        return groupObjName + "." + opString + "(*" + leftSide + ", " + rightSide + ")"
+    elif ( (leftNeedsStar == False) and (rightNeedsStar == True) ):
+        return groupObjName + "." + opString + "(" + leftSide + ", *" + rightSide + ")"
+    elif ( (leftNeedsStar == False) and (rightNeedsStar == False) ):
+        return groupObjName + "." + opString + "(" + leftSide + ", " + rightSide + ")"
+
 def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
     global userFuncsCPPFile, userFuncsList_CPP
 
@@ -662,7 +713,7 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
 
     elif ( (node.type == ops.ATTR) or (node.type == ops.TYPE) ):
         returnString = processAttrOrTypeAssignStmt(node, replacementsDict)
-        if (returnString in currentFuncNonOutputVars):
+        if (doesVarNeedStar(returnString)):
             return "*" + returnString
         else:
             return returnString
@@ -670,62 +721,27 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
     elif (node.type == ops.ADD):
         leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
         rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
-        if ( (leftSide in currentFuncNonOutputVars) and (rightSide in currentFuncNonOutputVars) ):
-            return groupObjName + ".add(*" + leftSide + ", *" + rightSide + ")"
-        elif ( (leftSide in currentFuncNonOutputVars) and (rightSide not in currentFuncNonOutputVars) ):
-            return groupObjName + ".add(*" + leftSide + ", " + rightSide + ")"
-        elif ( (leftSide not in currentFuncNonOutputVars) and (rightSide in currentFuncNonOutputVars) ):
-            return groupObjName + ".add(" + leftSide + ", *" + rightSide + ")"
-        else:
-            return groupObjName + ".add(" + leftSide + ", " + rightSide + ")"
+        return writeMathStatement(leftSide, rightSide, "add")
 
     elif (node.type == ops.SUB):
         leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
         rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
-        if ( (leftSide in currentFuncNonOutputVars) and (rightSide in currentFuncNonOutputVars) ):
-            return groupObjName + ".sub(*" + leftSide + ", *" + rightSide + ")"
-        elif ( (leftSide in currentFuncNonOutputVars) and (rightSide not in currentFuncNonOutputVars) ):
-            return groupObjName + ".sub(*" + leftSide + ", " + rightSide + ")"
-        elif ( (leftSide not in currentFuncNonOutputVars) and (rightSide in currentFuncNonOutputVars) ):
-            return groupObjName + ".sub(" + leftSide + ", *" + rightSide + ")"
-        else:
-            return groupObjName + ".sub(" + leftSide + ", " + rightSide + ")"
+        return writeMathStatement(leftSide, rightSide, "sub")
 
     elif (node.type == ops.MUL):
         leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
         rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
-        if ( (leftSide in currentFuncNonOutputVars) and (rightSide in currentFuncNonOutputVars) ):
-            return groupObjName + ".mul(*" + leftSide + ", *" + rightSide + ")"
-        elif ( (leftSide in currentFuncNonOutputVars) and (rightSide not in currentFuncNonOutputVars) ):
-            return groupObjName + ".mul(*" + leftSide + ", " + rightSide + ")"
-        elif ( (leftSide not in currentFuncNonOutputVars) and (rightSide in currentFuncNonOutputVars) ):
-            return groupObjName + ".mul(" + leftSide + ", *" + rightSide + ")"
-        else:
-            return groupObjName + ".mul(" + leftSide + ", " + rightSide + ")"
+        return writeMathStatement(leftSide, rightSide, "mul")
 
     elif (node.type == ops.DIV):
         leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
         rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
-        if ( (leftSide in currentFuncNonOutputVars) and (rightSide in currentFuncNonOutputVars) ):
-            return groupObjName + ".div(*" + leftSide + ", *" + rightSide + ")"
-        elif ( (leftSide in currentFuncNonOutputVars) and (rightSide not in currentFuncNonOutputVars) ):
-            return groupObjName + ".div(*" + leftSide + ", " + rightSide + ")"
-        elif ( (leftSide not in currentFuncNonOutputVars) and (rightSide in currentFuncNonOutputVars) ):
-            return groupObjName + ".div(" + leftSide + ", *" + rightSide + ")"
-        else:
-            return groupObjName + ".div(" + leftSide + ", " + rightSide + ")"
+        return writeMathStatement(leftSide, rightSide, "div")
 
     elif (node.type == ops.EXP):
         leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
         rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
-        if ( (leftSide in currentFuncNonOutputVars) and (rightSide in currentFuncNonOutputVars) ):
-            return groupObjName + ".exp(*" + leftSide + ", *" + rightSide + ")"
-        elif ( (leftSide in currentFuncNonOutputVars) and (rightSide not in currentFuncNonOutputVars) ):
-            return groupObjName + ".exp(*" + leftSide + ", " + rightSide + ")"
-        elif ( (leftSide not in currentFuncNonOutputVars) and (rightSide in currentFuncNonOutputVars) ):
-            return groupObjName + ".exp(" + leftSide + ", *" + rightSide + ")"
-        else:
-            return groupObjName + ".exp(" + leftSide + ", " + rightSide + ")"
+        return writeMathStatement(leftSide, rightSide, "exp")  
 
     elif (node.type == ops.AND):
         leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
@@ -734,6 +750,10 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
     elif (node.type == ops.EQ_TST):
         leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
         rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
+        if (rightSide == "False"):
+            rightSide = "false"
+        elif (rightSide == "True"):
+            rightSide = "true"
         return "( (" + leftSide + ") == (" + rightSide + ") )"
     elif ( (node.type == ops.LIST) ): #or ( (node.type == ops.EXPAND) and (variableType == types.list) ) ):
         if (variableName == None):
@@ -769,16 +789,7 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
     elif (node.type == ops.PAIR):
         pairLeftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
         pairRightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
-        if ( (pairLeftSide in currentFuncNonOutputVars) and (pairRightSide in currentFuncNonOutputVars) ):
-            pairOutputString = groupObjName + ".pair(*" + pairLeftSide + ", *" + pairRightSide + ")"
-        elif ( (pairLeftSide in currentFuncNonOutputVars) and (pairRightSide not in currentFuncNonOutputVars) ):
-            pairOutputString = groupObjName + ".pair(*" + pairLeftSide + ", " + pairRightSide + ")"
-        elif ( (pairLeftSide not in currentFuncNonOutputVars) and (pairRightSide in currentFuncNonOutputVars) ):
-            pairOutputString = groupObjName + ".pair(" + pairLeftSide + ", *" + pairRightSide + ")"
-        else:
-            pairOutputString = groupObjName + ".pair(" + pairLeftSide + ", " + pairRightSide + ")"
-
-        return pairOutputString
+        return writeMathStatement(pairLeftSide, pairRightSide, "pair")
 
     elif (node.type == ops.FUNC):
         nodeName = applyReplacementsDict(replacementsDict, getFullVarName(node, False))
@@ -1053,7 +1064,7 @@ def writeAssignStmt_CPP(outputFile, binNode):
     if (variableName == inputKeyword):
         return
 
-    if (variableName.find(LIST_INDEX_SYMBOL) != -1):
+    if ( (variableName.find(LIST_INDEX_SYMBOL) != -1) and (variableName not in SDLListVars) ):
         SDLListVars.append(variableName)
 
     if (variableName == outputKeyword):
