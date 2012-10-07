@@ -481,6 +481,75 @@ string CharmList::printAtIndex(int index)
 
 // start CharmListZR implementation
 
+CharmListStr::CharmListStr(void)
+{
+	// increases as elements are appended
+	cur_index = 0;
+}
+
+CharmListStr::~CharmListStr()
+{
+	for(int i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+}
+
+void CharmListStr::append(string & s)
+{
+	list[cur_index] = s;
+	cur_index++;
+}
+
+string& CharmListStr::operator[](const int index)
+{
+	if(index == cur_index) { // means we are creating reference.
+		list[cur_index] = NULL;
+		cur_index++;
+		return list[index];
+	}
+
+	int len = (int) list.size();
+	if(index >= 0 && index < len) {
+		return list[index];
+	}
+	else {
+		throw new string("Invalid access.\n");
+	}
+}
+
+int CharmListStr::length()
+{
+	return (int) list.size();
+}
+
+string CharmListStr::printAtIndex(int index)
+{
+	stringstream ss;
+	int i;
+
+	if(index >= 0 && index < (int) list.size()) {
+		i = index;
+		ss << list[i];
+	}
+
+	string s = ss.str();
+	return s;
+}
+
+ostream& operator<<(ostream& s, const CharmListStr& cList)
+{
+	CharmListStr cList2 = cList;
+	for(int i = 0; i < cList2.length(); i++) {
+		s << i << ": " << cList2.printAtIndex(i) << endl;
+	}
+
+	return s;
+}
+
+// end CharmListZR implementation
+
+
+// start CharmListZR implementation
+
 CharmListZR::CharmListZR(void)
 {
 	// increases as elements are appended

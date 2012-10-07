@@ -115,6 +115,23 @@ private:
 	map<int, Element> list;
 };
 
+class CharmListStr
+{
+public:
+	CharmListStr(void); // static list
+	~CharmListStr();
+	void append(string&);
+	int length(); // return length of lists
+	string printAtIndex(int index);
+
+	// retrieve a particular index
+	string& operator[](const int index);
+    friend ostream& operator<<(ostream&, const CharmListStr&);
+private:
+	int cur_index;
+	map<int, string> list;
+};
+
 class CharmListZR
 {
 public:
