@@ -72,36 +72,26 @@ END :: precompute
 verify := {e(h, pk) == e(sig, g)}
 
 
-
-
-BEGIN :: func:batchverify
-input := list{pk, Mlist, siglist, g, incorrectIndices}
-
-BEGIN :: for
-for{z:=0, N}
- delta#z := smallexp(secparam)
-END :: for
-
-BEGIN :: for
-for{z :=0, N}
+BEGIN :: func:membership
+ input := list{pk, siglist, g}
+ 
  BEGIN :: if
-  if {(membership(pk, siglist, g) == False)}
+  if { ismember(pk) == False }
      output := False
  END :: if
-END :: for
+ 
+ BEGIN :: if
+  if { ismember(siglist) == False }
+     output := False
+ END :: if
 
-BEGIN :: for
-for{z:=0, N}
- h := H(Mlist#z, G1)
- dotACache#z := h ^ delta#z
- dotBCache#z := siglist#z ^ delta#z
-END :: for
+ BEGIN :: if
+  if { ismember(g) == False }
+     output := False
+ END :: if
 
- dividenconquer(delta, dotACache, dotBCache, 0, N, incorrectIndices, pk, Mlist, siglist, g)
-
- output := incorrectIndices
-END ::func:batchverify
-
+ output := True
+END :: func:membership
 
 BEGIN :: func:dividenconquer
  input := list{delta, dotACache, dotBCache, startSigNum, endSigNum, incorrectIndices, pk, Mlist, siglist, g}
@@ -138,23 +128,30 @@ END ::func:dividenconquer
 
 
 
-BEGIN :: func:membership
- input := list{pk, siglist, g}
- 
- BEGIN :: if
-  if { ismember(pk) == False }
-     output := False
- END :: if
- 
- BEGIN :: if
-  if { ismember(siglist) == False }
-     output := False
- END :: if
+BEGIN :: func:batchverify
+input := list{pk, Mlist, siglist, g, incorrectIndices}
 
+BEGIN :: for
+for{z:=0, N}
+ delta#z := SmallExp(secparam)
+END :: for
+
+BEGIN :: for
+for{z :=0, N}
  BEGIN :: if
-  if { ismember(g) == False }
+  if {(membership(pk, siglist, g) == False)}
      output := False
  END :: if
+END :: for
 
- output := True
-END :: func:membership
+BEGIN :: for
+for{z:=0, N}
+ h := H(Mlist#z, G1)
+ dotACache#z := h ^ delta#z
+ dotBCache#z := siglist#z ^ delta#z
+END :: for
+
+ dividenconquer(delta, dotACache, dotBCache, 0, N, incorrectIndices, pk, Mlist, siglist, g)
+
+ output := incorrectIndices
+END ::func:batchverify
