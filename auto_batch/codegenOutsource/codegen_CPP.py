@@ -80,7 +80,17 @@ def addNumSignatures():
     except:
         sys.exit("addNumSignatures in codegen_CPP:  could not obtain number of signatures from SDL file.")
 
-    setupFile.write("int N = " + str(numSignatures) + ";\n\n")
+    setupFile.write("int " + str(numSignaturesVarName) + " = " + str(numSignatures) + ";\n\n")
+
+def addSecParam():
+    global setupFile
+
+    try:
+        secParam = assignInfo[NONE_FUNC_NAME][secParamVarName].getAssignNode().right
+    except:
+        sys.exit("addSecParamin codegen_CPP:  couldn't obtain secparam number from SDL file.")
+
+    setupFile.write("int " + str(secParamVarName) + " = " + str(secParam) + ";\n\n")
 
 def addGlobalPairingGroupObject():
     global setupFile
@@ -1879,6 +1889,8 @@ def main(inputSDLScheme, outputFileName):
     addImportLines()
 
     addNumSignatures()
+
+    addSecParam()
 
     addGlobalPairingGroupObject()
 

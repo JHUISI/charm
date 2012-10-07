@@ -8,6 +8,7 @@ NONE_FUNC_NAME = "NONE_FUNC_NAME"
 RETURN_STATEMENT = "return := None"
 numSignaturesVarName = "N"
 smallExp = "SmallExp(secparam)"
+secParamVarName = "secparam"
 
 inputVarName = "input"
 outputVarName = "output"
