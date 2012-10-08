@@ -41,8 +41,12 @@ END :: func:sign
 BEGIN :: func:verify
  input := list{pk, M, sig, g}
  h := H(M, G1)
- verify := {e(h, pk) == e(sig, g)}
- output := verify 
+ BEGIN :: if
+ if {e(h, pk) == e(sig, g)}
+ output := True
+ else
+ output := False
+ END :: if
 END :: func:verify
 
 constant := g
@@ -62,7 +66,6 @@ BEGIN :: precompute
   h := H(M, G1)
 END :: precompute
 
-# test := someCall(None)
 # individual verification check
 verify := {e(h, pk) == e(sig, g)}
 secparam := 80
