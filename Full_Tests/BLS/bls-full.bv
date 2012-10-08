@@ -1,6 +1,6 @@
 name := bls
 # number of signatures in a batch
-N := 100
+N := 2
 setting := asymmetric
 
 # types for variables used in verification.
@@ -12,11 +12,6 @@ g := G2
 pk := G2
 M := str
 END :: types
-
-BEGIN :: func:init
-input := None
-output := None
-END :: func:init
 
 # description of key generation and signing algorithms
 BEGIN :: func:keygen
@@ -44,11 +39,6 @@ BEGIN :: func:verify
  output := False
  END :: if
 END :: func:verify
-
-BEGIN :: func:main
-input := None
-output := None
-END :: func:main
 
 constant := g
 public :=  pk

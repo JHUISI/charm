@@ -4,7 +4,7 @@ from charm.core.math.integer import randomBits
 
 group = None
 
-N = 100
+N = 2
 
 secparam = 80
 
@@ -105,8 +105,8 @@ def main():
     sig1 = sign(sk, M1)
     sig2 = sign(sk, M2)
     Mlist = []
-    Mlist.append(M1)
     Mlist.append(M2)
+    Mlist.append(M1)
     siglist = []
     siglist.append(sig1)
     siglist.append(sig2)

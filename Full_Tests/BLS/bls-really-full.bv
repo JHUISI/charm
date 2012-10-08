@@ -1,6 +1,6 @@
 name := bls
 # number of signatures in a batch
-N := 100
+N := 2
 setting := asymmetric
 
 # types for variables used in verification.
@@ -21,12 +21,6 @@ dotACache := list{G1}
 Mlist := list{str}
 siglist := list{G1}
 END :: types
-
-BEGIN :: func:init
-input := None
-tempVar := random(G2)
-output := None
-END :: func:init
 
 # description of key generation and signing algorithms
 BEGIN :: func:keygen
@@ -50,12 +44,6 @@ BEGIN :: func:verify
  verify := {e(h, pk) == e(sig, g)}
  output := verify 
 END :: func:verify
-
-BEGIN :: func:main
-input := None
-tempVar2 := random(ZR)
-output := None
-END :: func:main
 
 constant := g
 public :=  pk
