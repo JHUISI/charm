@@ -22,6 +22,12 @@ Mlist := list{str}
 siglist := list{G1}
 END :: types
 
+BEGIN :: func:init
+input := None
+tempVar := random(G2)
+output := None
+END :: func:init
+
 # description of key generation and signing algorithms
 BEGIN :: func:keygen
 input := None
@@ -44,6 +50,12 @@ BEGIN :: func:verify
  verify := {e(h, pk) == e(sig, g)}
  output := verify 
 END :: func:verify
+
+BEGIN :: func:main
+input := None
+tempVar2 := random(ZR)
+output := None
+END :: func:main
 
 constant := g
 public :=  pk
@@ -146,8 +158,8 @@ END :: if
 BEGIN :: for
 for{z := 0, N}
 h := H(Mlist#z,G1)
-dotACache#z := (h#z^delta#z)
-dotBCache#z := (sig#z^delta#z)
+dotACache#z := (h^delta#z)
+dotBCache#z := (siglist#z^delta#z)
 END :: for
  dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, Mlist, pk, siglist, g)
 
