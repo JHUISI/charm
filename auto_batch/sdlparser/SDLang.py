@@ -479,7 +479,7 @@ class BinaryNode:
 			if self.attr_index != None and type(self.attr_index) == list:
 				token = ""
 				for t in self.attr_index:
-					token += t + "%"
+					token += t + "#"
 				l = len(token) 
 				token = token[:l-1]
 				msg += '_' + token
@@ -575,6 +575,117 @@ class BinaryNode:
 				# return ( left + ' on ' + right )				
 		return None
 	    
+	def sdl_print(self):
+		if self == None: return None
+		elif(self.type == ops.ATTR):
+			# check for negation
+			if self.negated:
+				msg = "-" + self.attr
+			else:
+				msg = self.attr
+			if self.delta_index != None and type(self.delta_index) == list and self.attr == "delta":
+                		token = ""
+                		for t in self.delta_index:
+                    			token += t + "#"
+                		msg += token[:len(token)-1]
+			if self.attr_index != None and type(self.attr_index) == list:
+				token = ""
+				for t in self.attr_index:
+					token += t + "#"
+				l = len(token) 
+				token = token[:l-1]
+				msg += '#' + token
+			return msg
+		elif(self.type == ops.TYPE):
+			return str(self.attr)
+		else:
+			left = self.left.sdl_print()
+			right = self.right.sdl_print()
+			
+			if debug >= levels.some:
+			   print("Operation: ", self.type)
+			   print("Left operand: ", left, "type: ", self.left.type)
+			   print("Right operand: ", right, "type: ", self.right.type)
+			if(self.type == ops.BEGIN):
+				return (START_TOKEN + ' :: ' + left)
+			elif(self.type == ops.END):
+				return (END_TOKEN + ' :: ' + left)
+			elif(self.type == ops.EXP):
+				return ('(' + left + '^' + right + ')')
+			elif(self.type == ops.MUL):
+				return ('(' + left + ' * ' + right + ')')
+			elif(self.type == ops.DIV):
+				return ('(' + left + ' / ' + right + ')')
+			elif(self.type == ops.ADD):
+				return ('(' + left + ' + ' + right + ')')
+			elif(self.type == ops.SUB):
+				return ('(' + left + ' - ' + right + ')')
+			elif(self.type == ops.EQ):
+				return (left + ' := ' + right)
+			elif(self.type == ops.EQ_TST):
+				return (left + ' == ' + right)
+			elif(self.type == ops.PAIR):
+				return ('e(' + left + ',' + right + ')')
+			elif(self.type == ops.HASH):
+				return ('H(' + left + ',' + right + ')')
+			elif(self.type == ops.PROD):
+				return ('prod{' + left + ',' + right + '}')
+			elif(self.type == ops.SUM):
+				return ('sum{' + left + ',' + right + '}')			
+			elif(self.type == ops.ON):
+				 return ('(' + left + ' on ' + right + ')')
+			elif(self.type == ops.FOR):
+				return ('for{' + left + ',' + right + '}')
+			elif(self.type == ops.FORALL):
+				return ('forall{' + left + '}')
+			elif(self.type == ops.RANDOM):
+				return ('random(' + left + ')')
+			elif(self.type == ops.ERROR):
+				return ('error(' + self.attr.sdl_print() + ')')
+			elif(self.type == ops.DO):
+				 return (left + ' do { ' + right + ' }')
+			elif(self.type == ops.IF):
+				 return ('if {' + left + '}')
+			elif(self.type == ops.ELSEIF):
+    			 return ('elseif {' + left + '}')
+			elif(self.type == ops.ELSE):
+    			 return 'else '
+			elif(self.type == ops.OF):
+				 return ( left + ' of ' + right)
+			elif(self.type == ops.CONCAT):
+				 return (left + ' | ' + right)
+			elif(self.type == ops.AND):
+				 return ("{" + left + "} and {" + right + "}") 
+			elif(self.type == ops.LIST):
+				 listVal = ""
+				 for i in self.listNodes:
+				 	listVal += str(i) + ', '
+				 listVal = listVal[:len(listVal)-2]
+				 return 'list{' + listVal + '}'
+			elif(self.type == ops.SYMMAP):
+				 listVal = ""
+				 for i in self.listNodes:
+				 	listVal += str(i) + ', '
+				 listVal = listVal[:len(listVal)-2]
+				 return 'symmap{' + listVal + '}'    
+			elif(self.type == ops.EXPAND):
+				 listVal = ""
+				 for i in self.listNodes:
+				 	listVal += str(i) + ', '
+				 listVal = listVal[:len(listVal)-2]
+				 return 'expand{' + listVal + '}'
+			elif(self.type == ops.FUNC):
+				 listVal = ""
+				 for i in self.listNodes:
+				 	listVal += str(i) + ', '
+				 listVal = listVal[:len(listVal)-2]
+				 return self.attr + '(' + listVal + ')'
+			elif(self.type == ops.SEQ):
+				return (left + '; ' + right)
+			elif(self.type == ops.NONE):
+				 return 'NONE'
+		return None
+
 	def isAttrIndexEmpty(self):
 		if self.attr_index != None:
 			if len(self.attr_index) > 0: return False
@@ -636,10 +747,10 @@ class BinaryNode:
 			return str(self)
 		return None	
 
-	def setAttribute(self, value):
+	def setAttribute(self, value, clearAttrIndex=True):
 		if self.type in [ops.ATTR, ops.FUNC, ops.ERROR]:
 			self.attr = str(value)
-			self.attr_index = None
+			if clearAttrIndex: self.attr_index = None
 			return True
 		return False
 	

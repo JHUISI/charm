@@ -742,3 +742,19 @@ class DotProdInstanceFinder:
                 return                
     def testForApplication(self):
         return self.applied
+
+class SubstituteAttr:
+    def __init__(self, variable_map, loopVar=None):
+        self.variable_map = variable_map
+        self.loopVar = loopVar
+        
+    def visit(self, node, data):
+        pass
+    
+    def visit_attr(self, node, data):
+        varName = node.getAttribute() # just retrieve the name and do not include any index info
+        if varName in self.variable_map.keys():
+            node.setAttribute(self.variable_map[varName], clearAttrIndex=False)
+        if self.loopVar:
+            node.setAttrIndex(self.loopVar)
+            

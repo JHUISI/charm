@@ -468,7 +468,7 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, eq_number=0):
     
     if VERBOSE: print("variables =>", types)
     # build data inputs for technique classes    
-    sdl_data = { CONST : constants, PUBLIC: pubVars, MESSAGE : msgVars, SETTING : batch_count } 
+    sdl_data = { CONST : constants, PUBLIC: pubVars, MESSAGE : msgVars, SETTING : batch_count, BATCH_VERIFY:settingObj.getVerifyInputArgs(), BATCH_VERIFY_MAP:settingObj.getVerifyInputArgsMap() } 
     if PROOFGEN_FLAG:
         # start the LCG
         proofGen.initLCG(constants, types, sigVars, latex_subs)
@@ -590,8 +590,8 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, eq_number=0):
         print("Threshold: ", threshold)
     # STOP BENCHMARK : THRESHOLD ESTIMATOR 
     # TODO: check avg for when batch is more efficient than 
-#    sdlBatch = SDLBatch(sdl_data, types, verify2, batch_precompute)
-#    sdlBatch.construct()
+    sdlBatch = SDLBatch(sdl_data, types, verify2, batch_precompute)
+    sdlBatch.construct()
     
     if CODEGEN_FLAG:
         print("Final batch eq:", verify2)
