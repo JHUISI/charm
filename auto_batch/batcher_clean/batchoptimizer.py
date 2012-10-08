@@ -755,6 +755,6 @@ class SubstituteAttr:
         varName = node.getAttribute() # just retrieve the name and do not include any index info
         if varName in self.variable_map.keys():
             node.setAttribute(self.variable_map[varName], clearAttrIndex=False)
-        if self.loopVar:
+        if self.loopVar not in node.attr_index:
             node.setAttrIndex(self.loopVar)
             
