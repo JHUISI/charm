@@ -1,7 +1,6 @@
 name := chch
 N := 2
 setting := asymmetric
-secparam := 80
 
 BEGIN :: types
  S2 := G1

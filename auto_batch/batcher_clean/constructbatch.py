@@ -102,6 +102,7 @@ batch_verify_footer = """
 END ::func:batchverify\n
 """
 
+SPACES = ' '
 sigIterator = 'z'
 signerIterator = 'y'
 
@@ -225,12 +226,13 @@ class SDLBatch:
         newTypeList = []
         # 1.5 record old type definitions from sdl
         for i in range(startTypeLine, endTypeLine-1):
-            newTypeList.append(oldSDL[i])
+            stripI = oldSDL[i].strip(SPACES)
+            newTypeList.append(stripI)
         # 1.8 record new type definitions into list
         for i in typesLinesList:
-            if i not in newTypeList:
-                newTypeList.append(i)
-        print(newTypeList)
+            stripI = i.strip(SPACES)
+            if stripI not in newTypeList:
+                newTypeList.append(stripI)
         
         removeRangeFromLinesOfCode(startTypeLine, endTypeLine-1)
         appendToLinesOfCode(newTypeList, startTypeLine)
@@ -246,7 +248,8 @@ class SDLBatch:
         for i in outputBatchVerifyLines:
             outputBatchVerifyLinesFinal.append(i + '\n')
         appendToLinesOfCode(outputBatchVerifyLinesFinal, lastLineSDL)        
-        parseLinesOfCode(getLinesOfCode(), False, True)
+        parseLinesOfCode(getLinesOfCode(), True, True)
+        print("DONE!!")
         
         # 4. write the file to 
         writeLinesOfCodeToFileOnly(self.sdlOutfile)
