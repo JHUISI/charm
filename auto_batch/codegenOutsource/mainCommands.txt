@@ -9,5 +9,5 @@
     siglist = []
     siglist.append(sig1)
     siglist.append(sig2)
-    incorrectIndices = batchverify(pk, Mlist, siglist, g, [])
+    incorrectIndices = batchverify(Mlist, pk, siglist, g, [])
     print(incorrectIndices)

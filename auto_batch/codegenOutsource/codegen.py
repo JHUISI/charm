@@ -146,10 +146,10 @@ def addSecParamValue():
     outputString = secParamVarName + " = " + str(theSecParamValue) + "\n\n"
     setupFile.write(outputString)
 
-def addPRNGBitsFunc():
+def addSmallExpFunc():
     global setupFile
 
-    outputString = "def prng_bits(bits=80):\n"
+    outputString = "def SmallExp(bits=80):\n"
     outputString += "    return group.init(ZR, randomBits(bits))\n\n"
 
     setupFile.write(outputString)
@@ -729,7 +729,7 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
     if (type(node) is str):
         return processStrAssignStmt(node, replacementsDict)
     elif ( (node.type == ops.ATTR) and (str(node.attr) == smallExp) ):
-        return "prng_bits(80)"
+        return "SmallExp(80)"
     elif ( (node.type == ops.ATTR) or (node.type == ops.TYPE) ):
         return processAttrOrTypeAssignStmt(node, replacementsDict)
     elif (node.type == ops.ADD):
@@ -1791,14 +1791,13 @@ def main(SDL_Scheme, ignoreCloudSourcingArg, nonCloudSourcingFileNameArg=None):
     addGroupObjGlobalVar()
     addNumSignatures()
     addSecParamValue()
-    #addPRNGBitsFunc()
 
     #if (ignoreCloudSourcing == True):
         #setupFile.write("bodyKey = 'Body'\n\n")
 
     writeSDLToFiles(astNodes)
 
-    addPRNGBitsFunc()
+    addSmallExpFunc()
 
     if (ignoreCloudSourcing == False):
         writeMainFuncs()
