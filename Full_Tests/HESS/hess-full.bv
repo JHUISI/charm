@@ -1,4 +1,4 @@
-name := chch
+name := hess
 N := 2
 setting := asymmetric
 secparam := 80
@@ -6,7 +6,7 @@ secparam := 80
 BEGIN :: types
  S2 := G1
  g2 := G2
- S1 := G1
+ S1 := GT
  pk := G1
  a := ZR
  P := G2
