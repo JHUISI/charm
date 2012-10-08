@@ -594,7 +594,7 @@ class BinaryNode:
 					token += t + "#"
 				l = len(token) 
 				token = token[:l-1]
-				msg += '#' + token
+				if token != '': msg += '#' + token
 			return msg
 		elif(self.type == ops.TYPE):
 			return str(self.attr)
