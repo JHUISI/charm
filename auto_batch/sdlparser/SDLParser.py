@@ -979,6 +979,8 @@ def getVarTypeInfoRecursive(node):
         if (leftSideType != rightSideType):
             sys.exit("getVarTypeInfoRecursive in SDLParser.py found an operation of type EQ_TST in which the left and right side types were unequal.")
         return leftSideType
+    if (node.type == ops.TYPE):
+        return node.attr
 
     print(node.type)
     sys.exit("getVarTypeInfoRecursive in SDLParser.py:  error in logic.")
@@ -1278,6 +1280,27 @@ def writeLinesOfCodeToFile(outputFileName):
     outputFile.write(outputString)
 
     outputFile.close()
+
+def writeLinesOfCodeToFileOnly(outputFileName):
+    outputFile = open(outputFileName, 'w')
+    outputString = ""
+
+    lineNo = 0
+
+    for line in linesOfCode:
+        lineNo += 1
+        outputString += line # does not include line No.
+        lenLine = len(line)
+        if (lenLine == 0):
+            outputString += "\n"
+            continue
+        if (line[lenLine - 1] != "\n"):
+            outputString += "\n"
+
+    outputFile.write(outputString)
+
+    outputFile.close()
+
 
 def printLinesOfCode():
     lineNo = 0

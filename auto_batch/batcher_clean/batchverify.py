@@ -590,7 +590,8 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, eq_number=0):
         print("Threshold: ", threshold)
     # STOP BENCHMARK : THRESHOLD ESTIMATOR 
     # TODO: check avg for when batch is more efficient than 
-    sdlBatch = SDLBatch(sdl_data, types, verify2, batch_precompute)
+    if SDL_OUT_FILE == None: SDL_OUT_FILE = types['name']
+    sdlBatch = SDLBatch(SDL_OUT_FILE, sdl_data, types, verify2, batch_precompute)
     sdlBatch.construct()
     
     if CODEGEN_FLAG:
