@@ -11,6 +11,7 @@ BEGIN :: types
  a := ZR
  P := G2
  ID := str
+ M := str
 END :: types
 
 BEGIN :: func:setup
@@ -51,7 +52,7 @@ END :: func:verify
 constant := list{P, g2}
 public :=  pk
 signature :=  list{S1, S2}
-message :=  a
+message :=  list{a, M}
 
 BEGIN :: count
 message_count := N
