@@ -132,7 +132,18 @@ def addNumSignatures():
     except:
         sys.exit("addNumSignatures in codegen.py:  could not obtain the number of signatures from the input .bv file.")
 
-    outputString = "N = " + str(numSignatures) + "\n\n"
+    outputString = numSignaturesVarName + " = " + str(numSignatures) + "\n\n"
+    setupFile.write(outputString)
+
+def addSecParamValue():
+    global setupFile
+
+    try:
+        theSecParamValue = assignInfo[NONE_FUNC_NAME][secParamVarName].getAssignNode().right
+    except:
+        sys.exit("addSecParamValue in codegen.py:  couldn't obtain secparam value.  Make sure it's in the SDL file, but not in an explicitly defined function (it needs to be outside the functions.")
+
+    outputString = secParamVarName + " = " + str(theSecParamValue) + "\n\n"
     setupFile.write(outputString)
 
 def addPRNGBitsFunc():
@@ -1295,7 +1306,7 @@ def addTypeDeclToGlobalVars(binNode):
     if (varName not in varNamesToFuncs_Assign):
         return
 
-    if ( (varName not in globalVarNames) and (varName in varNamesToFuncs_Assign) and (varName != inputKeyword) and (varName != outputKeyword) and (varName not in inputOutputVars) ):
+    if ( (varName != secParamVarName) and (varName not in globalVarNames) and (varName in varNamesToFuncs_Assign) and (varName != inputKeyword) and (varName != outputKeyword) and (varName not in inputOutputVars) ):
         globalVarNames.append(varName)
 
 def writeGlobalVars_Python(outputFile):
@@ -1663,7 +1674,7 @@ def getGlobalVarNames():
             listForThisVar.remove(decOutFunctionName)
         if (len(listForThisVar) <= 1):
             continue
-        if ( (varName not in globalVarNames) and (varName in varNamesToFuncs_Assign) and (varName != inputKeyword) and (varName != outputKeyword) and (varName not in inputOutputVars) ):
+        if ( (varName != secParamVarName) and (varName not in globalVarNames) and (varName in varNamesToFuncs_Assign) and (varName != inputKeyword) and (varName != outputKeyword) and (varName not in inputOutputVars) ):
             globalVarNames.append(varName)
 
 def addGetGlobalsToUserFuncs():
@@ -1779,6 +1790,7 @@ def main(SDL_Scheme, ignoreCloudSourcingArg, nonCloudSourcingFileNameArg=None):
     addImportLines()
     addGroupObjGlobalVar()
     addNumSignatures()
+    addSecParamValue()
     #addPRNGBitsFunc()
 
     #if (ignoreCloudSourcing == True):
