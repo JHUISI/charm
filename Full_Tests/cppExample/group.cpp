@@ -963,6 +963,11 @@ bool PairingGroup::ismember(CharmList & g)
 	return true;
 }
 
+bool PairingGroup::ismember(CharmListStr & g)
+{
+	return true;
+}
+
 bool PairingGroup::ismember(CharmListZR & g)
 {
 	return true;

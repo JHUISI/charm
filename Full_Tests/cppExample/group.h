@@ -246,6 +246,7 @@ public:
 	G1 random(G1_type);
 	GT random(GT_type);
 	bool ismember(CharmList&);
+	bool ismember(CharmListStr&);
 	bool ismember(CharmListZR&);
 	bool ismember(CharmListG1&);
 	bool ismember(CharmListG2&);
