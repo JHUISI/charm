@@ -760,6 +760,10 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
         leftString = getAssignStmtAsString(node.left, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
         rightString = getAssignStmtAsString(node.right, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
         return "( (" + leftString + ") == (" + rightString + ") )"
+    elif (node.type == ops.CONCAT):
+        leftString = getAssignStmtAsString(node.left, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
+        rightString = getAssignStmtAsString(node.right, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
+        return "(" + leftString + ", " + rightString + ")"
     #elif (node.type == ops.OR):
         #leftString = getAssignStmtAsString(node.left, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
         #rightString = getAssignStmtAsString(node.right, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
@@ -1651,7 +1655,7 @@ def writeMainFunc_IgnoreCloudSourcing():
     global setupFile
 
     outputString = "def main():\n"
-    outputString += "    global group\n    group = PairingGroup(80)\n\n"
+    outputString += "    global group\n    group = PairingGroup(" + secParamVarName + ")\n\n"
     outputString += "if __name__ == '__main__':\n"
     outputString += "    main()\n\n"
     setupFile.write(outputString)

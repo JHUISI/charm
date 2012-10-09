@@ -1,0 +1,20 @@
+    (g2, alpha, P) = setup()
+    (pk1, sk1) = keygen(alpha, "test1")
+    (pk2, sk2) = keygen(alpha, "test2")
+    pklist = []
+    pklist.append(pk1)
+    pklist.append(pk2)
+    Mlist = []
+    Mlist.append("test3")
+    Mlist.append("test4")
+    (S1_1, S2_1) = sign(pklist[0], sk1, Mlist[0])
+    (S1_2, S2_2) = sign(pklist[1], sk2, Mlist[1])
+    S1list = []
+    S1list.append(S1_1)
+    S1list.append(S1_2)
+    S2list = []
+    S2list.append(S2_1)
+    S2list.append(S2_2)
+    incorrectIndices = []
+    batchverify(g2, pklist, Mlist, P, S1list, S2list, incorrectIndices)
+    print(incorrectIndices)
