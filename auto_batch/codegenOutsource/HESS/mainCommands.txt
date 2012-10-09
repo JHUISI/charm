@@ -1,0 +1,6 @@
+    (g2, alpha, P) = setup()
+    (pk1, sk1) = keygen(alpha, "test1")
+    (pk2, sk2) = keygen(alpha, "test2")
+    (S1_1, S2_1) = sign(pk1, sk1, "mess1")
+    (S1_2, S2_2) = sign(pk2, sk2, "mess2")
+    print(verify(P, g2, pk1, "mess1", S1_1, S2_1))
