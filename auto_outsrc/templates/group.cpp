@@ -1125,10 +1125,25 @@ int PairingGroup::add(int g, int h)
 	return g + h;
 }
 
+ZR PairingGroup::add(ZR g, ZR h)
+{
+	ZR o = pfcObject->order();
+
+	return (g + h) % o;
+}
+
 int PairingGroup::sub(int g, int h)
 {
 	return g - h;
 }
+
+ZR PairingGroup::sub(ZR g, ZR h)
+{
+	ZR o = pfcObject->order();
+
+	return (g - h) % o;
+}
+
 
 int PairingGroup::mul(int g, int h)
 {
@@ -1285,7 +1300,7 @@ Big bytesToBigS(string str, int *counter)
 }
 
 
-ZR &PairingGroup::hashListToZR(CharmList & list)
+ZR PairingGroup::hashListToZR(CharmList list)
 {
 	int len = list.length();
 	pfcObject->start_hash();
@@ -1305,11 +1320,11 @@ ZR &PairingGroup::hashListToZR(CharmList & list)
 			pfcObject->add_to_hash(*e.gt);
 	}
 
-	ZR *result = new ZR(pfcObject->finish_hash_to_group());
-	return *result;
+	//ZR *result = new ZR(pfcObject->finish_hash_to_group());
+	return pfcObject->finish_hash_to_group();
 }
 
-G1 &PairingGroup::hashListToG1(CharmList & list)
+G1 PairingGroup::hashListToG1(CharmList list)
 {
 	int len = list.length();
 	pfcObject->start_hash();
@@ -1330,14 +1345,15 @@ G1 &PairingGroup::hashListToG1(CharmList & list)
 	}
 
 	ZR tmp1 = pfcObject->finish_hash_to_group();
-	G1 *g1 = new G1();
+//	G1 *g1 = new G1();
+	G1 g1;
 	// convert result to bytes and hash to G1
-	pfcObject->hash_and_map(*g1, (char *) bigToBytes(tmp1).c_str());
-	return *g1;
+	pfcObject->hash_and_map(g1, (char *) bigToBytes(tmp1).c_str());
+	return g1;
 }
 
 #ifdef ASYMMETRIC
-G2 &PairingGroup::hashListToG2(CharmList & list)
+G2 PairingGroup::hashListToG2(CharmList list)
 {
 	int len = list.length();
 	pfcObject->start_hash();
@@ -1358,10 +1374,11 @@ G2 &PairingGroup::hashListToG2(CharmList & list)
 	}
 
 	ZR tmp1 = pfcObject->finish_hash_to_group();
-	G2 *g2 = new G2();
+//	G2 *g2 = new G2();
+	G2 g2;
 	// convert result to bytes and hash to G2
-	pfcObject->hash_and_map(*g2, (char *) bigToBytes(tmp1).c_str());
-	return *g2;
+	pfcObject->hash_and_map(g2, (char *) bigToBytes(tmp1).c_str());
+	return g2;
 }
 #endif
 

@@ -279,14 +279,16 @@ public:
 	G1 hashListToG1(string);
 	G2 hashListToG2(string);
 
-	ZR & hashListToZR(CharmList&);
-	G1 & hashListToG1(CharmList&);
-	G2 & hashListToG2(CharmList&);
+	ZR hashListToZR(CharmList);
+	G1 hashListToG1(CharmList);
+	G2 hashListToG2(CharmList);
 
 	GT pair(G1, G1);
+	int mul(int, int);
 	ZR mul(ZR, ZR);
 	G1 mul(G1, G1);
 	GT mul(GT, GT);
+	int div(int, int);
 	ZR div(ZR, ZR);
 	G1 div(G1, G1);
 	GT div(GT, GT);
@@ -295,10 +297,11 @@ public:
 	G1 exp(G1, ZR);
 	GT exp(GT, ZR);
 
+	ZR add(ZR, ZR);
 	int add(int, int);
+
 	int sub(int, int);
-	int mul(int, int);
-	int div(int, int);
+	ZR sub(ZR, ZR);
 	string aes_key(GT & g);
 
 private:
