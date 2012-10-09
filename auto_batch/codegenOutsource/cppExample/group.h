@@ -259,6 +259,7 @@ public:
 	bool ismember(CharmListZR&);
 	bool ismember(CharmListG1&);
 	bool ismember(CharmListG2&);
+	bool ismember(CharmListGT&);
 	bool ismember(ZR&);
 	bool ismember(G1&);
 	bool ismember(GT&);

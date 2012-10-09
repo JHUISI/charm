@@ -1053,6 +1053,11 @@ bool PairingGroup::ismember(CharmListG1 & g)
 	return true;
 }
 
+bool PairingGroup::ismember(CharmListGT & g)
+{
+	return true;
+}
+
 bool PairingGroup::ismember(ZR & g)
 {
 	return true;
