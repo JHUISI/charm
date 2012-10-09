@@ -1,0 +1,201 @@
+# variables
+name := chp
+setting := asymmetric
+N := 2
+
+BEGIN :: types
+t1 := str
+t2 := str
+t3 := str
+g2 := G2
+pk := G2
+sig := G1
+b := ZR
+a := G1
+h := G1
+incorrectIndices := list{int}
+endSigNum  := int
+startSigNum := int
+delta := list{ZR}
+dotCLoopVal := G2
+dotALoopVal := G1
+dotBLoopVal := G2
+dotBCache := list{G2}
+dotACache := list{G1}
+dotCCache := list{G2}
+pklist := list{G2}
+M := str
+t1list := list{str}
+t2list := list{str}
+t3list := list{str}
+siglist := list{G1}
+END :: types
+
+BEGIN :: func:setup
+input := list{None}
+ g2 := random(G2)
+output := g2
+END :: func:setup
+
+BEGIN :: func:keygen
+input := list{g2}
+ alpha := random(ZR)
+ sk := alpha 
+ pk := g2^alpha
+output := list{pk, sk}
+END :: func:keygen
+
+BEGIN :: func:sign
+input := list{pk, sk, M, t1, t2, t3}
+a := H(t1, G1)
+h := H(t2, G1)
+b := H(M | t3, ZR)
+sig := (a^sk) * (h^(sk*b))
+output := sig
+END :: func:sign
+
+BEGIN :: func:verify
+input := list{pk, g2, sig, M, t1, t2, t3} 
+a := H(t1, G1)
+h := H(t2, G1)
+b := H(M | t3, ZR)
+BEGIN :: if
+if { e(sig, g2) == (e(a, pk) * e(h, pk)^b) }
+   output := True
+else
+   output := False
+END :: if
+END :: func:verify
+
+BEGIN :: precompute
+a := H(t1, G1)
+h := H(t2, G1)
+b := H(M | t3, ZR)
+END :: precompute
+
+constant := list{a, g2, h}
+public := pk
+signature := list{sig, b}
+message := list{h, M}
+
+# different messages/sigs under a single signer
+BEGIN :: count
+message_count := one
+public_count := N
+signature_count := N
+END :: count
+
+
+verify := { e(sig, g2) == e(a, pk) * e(h, pk)^b }
+
+
+secparam := 80
+
+BEGIN :: func:membership
+ input := list{g2, pklist, M, t1list, t2list, t3list, siglist}
+
+
+BEGIN :: if
+if { ismember(g2) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(pklist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(M) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(t1list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(t2list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(t3list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(siglist) == False }
+    output := False
+END :: if
+
+ output := True
+END :: func:membership
+
+
+BEGIN :: func:dividenconquer
+ input := list{delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g2, pklist, M, t1list, t2list, t3list, siglist}
+dotALoopVal := init(G1)
+dotBLoopVal := init(G2)
+dotCLoopVal := init(G2)
+
+BEGIN :: for
+for{z := startSigNum, endSigNum}
+dotALoopVal := dotALoopVal * dotACache#z
+dotBLoopVal := dotBLoopVal * dotBCache#z
+dotCLoopVal := dotCLoopVal * dotCCache#z
+END :: for
+BEGIN :: if
+ if { e(dotALoopVal,g2) == (e(a,dotBLoopVal) * e(h,dotCLoopVal)) }
+    return := None
+ else
+    midwayFloat := ((endSigNum - startSigNum) / 2)
+    midway := integer(midwayFloat)
+END :: if
+
+
+BEGIN :: if
+ if { midway == 0 } 
+    addToList(incorrectIndices, startSigNum)
+    output := None
+ else
+    midSigNum := startSigNum + midway
+    dividenconquer(delta, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, g2, pklist, M, t1list, t2list, t3list, siglist)
+    dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g2, pklist, M, t1list, t2list, t3list, siglist)
+END :: if
+
+
+ output := None
+END ::func:dividenconquer
+
+
+BEGIN :: func:batchverify
+input := list{g2, pklist, M, t1list, t2list, t3list, siglist, incorrectIndices}
+
+BEGIN :: for
+for{z := 0, N}
+ delta#z := SmallExp(secparam)
+END :: for
+
+BEGIN :: if
+ if {(membership(g2, pklist, M, t1list, t2list, t3list, siglist) == False)}
+     output := False
+END :: if
+
+
+BEGIN :: for
+for{z := 0, N}
+b := H(M#z | t3list#z,ZR)
+a := H(t1list#z,G1)
+h := H(t2list#z,G1)
+dotACache#z := (siglist#z^delta#z)
+dotBCache#z := (pklist#z^delta#z)
+dotCCache#z := (pklist#z^(b * delta#z))
+END :: for
+ dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, g2, pklist, M, t1list, t2list, t3list, siglist)
+
+ output := incorrectIndices
+END ::func:batchverify
+
+

@@ -1,0 +1,76 @@
+# variables
+name := chp
+setting := asymmetric
+N := 2
+
+BEGIN :: types
+M := str
+t1 := str
+t2 := str
+t3 := str
+g2 := G2
+pk := G2
+sig := G1
+b := ZR
+a := G1
+h := G1
+END :: types
+
+BEGIN :: func:setup
+input := list{None}
+ g2 := random(G2)
+output := g2
+END :: func:setup
+
+BEGIN :: func:keygen
+input := list{g2}
+ alpha := random(ZR)
+ sk := alpha 
+ pk := g2^alpha
+output := list{pk, sk}
+END :: func:keygen
+
+BEGIN :: func:sign
+input := list{pk, sk, M, t1, t2, t3}
+a := H(t1, G1)
+h := H(t2, G1)
+b := H(M | t3, ZR)
+sig := (a^sk) * (h^(sk*b))
+output := sig
+END :: func:sign
+
+BEGIN :: func:verify
+input := list{pk, g2, sig, M, t1, t2, t3} 
+a := H(t1, G1)
+h := H(t2, G1)
+b := H(M | t3, ZR)
+BEGIN :: if
+if { e(sig, g2) == (e(a, pk) * e(h, pk)^b) }
+   output := True
+else
+   output := False
+END :: if
+END :: func:verify
+
+BEGIN :: precompute
+a := H(t1, G1)
+h := H(t2, G1)
+b := H(M | t3, ZR)
+END :: precompute
+
+constant := list{a, g2, h}
+public := pk
+signature := list{sig, b}
+message := list{h, M}
+
+# different messages/sigs under a single signer
+BEGIN :: count
+message_count := one
+public_count := N
+signature_count := N
+END :: count
+
+
+verify := { e(sig, g2) == e(a, pk) * e(h, pk)^b }
+
+
