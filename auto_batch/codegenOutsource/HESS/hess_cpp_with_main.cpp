@@ -93,9 +93,9 @@ bool membership(G2 & g2, CharmListG1 & pklist, CharmListStr & Mlist, G2 & P, Cha
 
 void dividenconquer(CharmListZR & delta, int startSigNum, int endSigNum, list<int> & incorrectIndices, CharmListG1 & dotACache, CharmListG1 & dotBCache, CharmListGT & dotCCache, G2 & g2, CharmListG1 & pklist, CharmListStr & Mlist, G2 & P, CharmListGT & S1list, CharmListG1 & S2list)
 {
-    G1 *dotALoopVal = new G1();
-    G1 *dotBLoopVal = new G1();
-    GT *dotCLoopVal = new GT();
+    G1 *dotALoopVal = group.init(G1_t);
+    G1 *dotBLoopVal = group.init(G1_t);
+    GT *dotCLoopVal = group.init(GT_t);
     int midwayFloat = 0;
     int midway = 0;
     int midSigNum = 0;
@@ -186,7 +186,7 @@ int main()
    list<int> incorrectIndices;
    CharmListG1 pklist;
    CharmListStr Mlist;
-   CharmListG1 S1list;
+   CharmListGT S1list;
    CharmListG1 S2list;
 
    pklist[0] = pk;

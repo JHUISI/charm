@@ -993,6 +993,8 @@ PairingGroup::PairingGroup(int sec_level)
     gt = new GT(pfcObject->pairing(*g1, *g1));
 #endif
     delete g1;
+
+	gt_id = new GT(pfcObject->power(*gt, ZR(0)));
 }
 
 PairingGroup::~PairingGroup()
@@ -1006,6 +1008,32 @@ void PairingGroup::init(ZR & r, char *value)
 	big x = mirvar(0);
 	cinstr(x, value);
 	r = x; //should copy this
+}
+
+ZR *PairingGroup::init(ZR_type t)
+{
+	ZR *zr = new ZR();
+	return zr;
+}
+
+G1 *PairingGroup::init(G1_type t)
+{
+	G1 *g1 = new G1();
+	return g1;
+}
+
+#ifdef ASYMMETRIC
+G2 *PairingGroup::init(G2_type t)
+{
+	G2 *g2 = new G2();
+	return g2;
+}
+#endif
+
+GT *PairingGroup::init(GT_type t)
+{
+	GT *g = new GT(*gt_id);
+	return g;
 }
 
 ZR PairingGroup::random(ZR_type t)
@@ -1171,8 +1199,8 @@ G1 PairingGroup::mul(G1 g, G1 h)
 
 GT PairingGroup::mul(GT g, GT h)
 {
-	GT l(g * h);
-	return l;
+//	GT l(g * h);
+	return g * h;
 }
 
 ZR PairingGroup::div(ZR g, ZR h)

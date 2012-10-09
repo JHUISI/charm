@@ -248,6 +248,9 @@ public:
 	~PairingGroup();
 	// generate random
 	void init(ZR&, char*);
+	ZR* init(ZR_type);
+	G1* init(G1_type);
+	GT* init(GT_type);
 	//void random(ZR&);
 	//void random(G1&);
 	//void random(GT&);
@@ -265,6 +268,7 @@ public:
 	bool ismember(GT&);
 
 #ifdef ASYMMETRIC
+	G2* init(G2_type);
 	G2 random(G2_type);
 	bool ismember(G2&);
 	G2 mul(G2, G2);
@@ -307,7 +311,7 @@ public:
 
 private:
 	PFC *pfcObject; // defined by above #defines SYMMETRIC or ASYMMETRIC (for now)
-	GT *gt;
+	GT *gt, *gt_id;
 };
 
 #define aes_block_size 16
