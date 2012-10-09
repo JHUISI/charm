@@ -27,10 +27,10 @@ def keygen(alpha, ID):
     output = (pk, sk)
     return output
 
-def sign(pk, sk, M):
+def sign(pk, sk, M, g2):
     global a
 
-    input = [pk, sk, M]
+    input = [pk, sk, M, g2]
     h = group.random(G1)
     s = group.random(ZR)
     S1 = (pair(h, g2) ** s)
@@ -120,12 +120,25 @@ def SmallExp(bits=80):
 def main():
     global group
     group = PairingGroup(secparam)
+
+
     (g2, alpha, P) = setup()
     (pk1, sk1) = keygen(alpha, "test1")
     (pk2, sk2) = keygen(alpha, "test2")
-    (S1_1, S2_1) = sign(pk1, sk1, "mess1")
-    (S1_2, S2_2) = sign(pk2, sk2, "mess2")
-    print(verify(P, g2, pk1, "mess1", S1_1, S2_1))
+    (S1_1, S2_1) = sign(pk1, sk1, "mess1", g2)
+    (S1_2, S2_2) = sign(pk2, sk2, "mess2", g2)
+    #print(verify(P, g2, pk1, "mess1", S1_1, S2_1))
+    pklist = [pk1, pk2]
+    Mlist = ["mess2", "mess2"]
+    S1list = [S1_1, S1_2]
+    S2list = [S2_1, S2_2]
+    incorrectIndices = []
+    batchverify(g2, pklist, Mlist, P, S1list, S2list, incorrectIndices)
+    print(incorrectIndices)
+
+
+
+
 
 if __name__ == '__main__':
     main()

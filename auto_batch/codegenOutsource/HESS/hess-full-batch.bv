@@ -43,7 +43,7 @@ output := list{pk, sk}
 END :: func:keygen
 
 BEGIN :: func:sign
-input := list{pk, sk, M}
+input := list{pk, sk, M, g2}
  h := random(G1)
  s := random(ZR)
  S1 := (e(h, g2))^s
