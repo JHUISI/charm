@@ -28,7 +28,7 @@ void setup(G2 & g2)
 
 void keygen(G2 & g2, G2 & pk, ZR & sk)
 {
-    ZR *alpha = new ZR();
+    ZR *alpha = group.init(ZR_t);
     *alpha = group.random(ZR_t);
     sk = *alpha;
     pk = group.exp(g2, *alpha);
@@ -37,9 +37,9 @@ void keygen(G2 & g2, G2 & pk, ZR & sk)
 
 void sign(G2 & pk, ZR & sk, string M, string t1, string t2, string t3, G1 & sig)
 {
-    G1 *a = new G1();
-    G1 *h = new G1();
-    ZR *b = new ZR();
+    G1 *a = group.init(G1_t);
+    G1 *h = group.init(G1_t);
+    ZR *b = group.init(ZR_t);
     *a = group.hashListToG1(t1);
     *h = group.hashListToG1(t2);
     *b = group.hashListToZR(( Element(M) + Element(t3) ));
@@ -49,9 +49,9 @@ void sign(G2 & pk, ZR & sk, string M, string t1, string t2, string t3, G1 & sig)
 
 bool verify(G2 & pk, G2 & g2, G1 & sig, string M, string t1, string t2, string t3)
 {
-    G1 *a = new G1();
-    G1 *h = new G1();
-    ZR *b = new ZR();
+    G1 *a = group.init(G1_t);
+    G1 *h = group.init(G1_t);
+    ZR *b = group.init(ZR_t);
     *a = group.hashListToG1(t1);
     *h = group.hashListToG1(t2);
     *b = group.hashListToZR(( Element(M) + Element(t3) ));
@@ -100,9 +100,9 @@ bool membership(G2 & g2, CharmListG2 & pklist, string M, CharmListStr & t1list, 
 
 void dividenconquer(CharmListZR & delta, int startSigNum, int endSigNum, list<int> & incorrectIndices, CharmListG1 & dotACache, CharmListG2 & dotBCache, CharmListG2 & dotCCache, G2 & g2, CharmListG2 & pklist, string M, CharmListStr & t1list, CharmListStr & t2list, CharmListStr & t3list, CharmListG1 & siglist)
 {
-    G1 *dotALoopVal = new G1();
-    G2 *dotBLoopVal = new G2();
-    G2 *dotCLoopVal = new G2();
+    G1 *dotALoopVal = group.init(G1_t);
+    G2 *dotBLoopVal = group.init(G2_t);
+    G2 *dotCLoopVal = group.init(G2_t);
     int midwayFloat = 0;
     int midway = 0;
     int midSigNum = 0;
@@ -137,9 +137,9 @@ void dividenconquer(CharmListZR & delta, int startSigNum, int endSigNum, list<in
 bool batchverify(G2 & g2, CharmListG2 & pklist, string M, CharmListStr & t1list, CharmListStr & t2list, CharmListStr & t3list, CharmListG1 & siglist, list<int> & incorrectIndices)
 {
     CharmListZR delta;
-    ZR *b = new ZR();
-    G1 *a = new G1();
-    G1 *h = new G1();
+    ZR *b = group.init(ZR_t);
+    G1 *a = group.init(G1_t);
+    G1 *h = group.init(G1_t);
     CharmListG1 dotACache;
     CharmListG2 dotBCache;
     CharmListG2 dotCCache;

@@ -143,15 +143,16 @@ def main():
     t1_1 = "4"
     t2_1 = "5"
     t3_1 = "6"
-    Mlist = ["mess1", "mess2"]
-    sig0 = sign(pk0, sk0, Mlist[0], t1_0, t2_0, t3_0)
-    sig1 = sign(pk1, sk1, Mlist[1], t1_1, t2_1, t3_1)
-    #print(verify(pk0, g2, sig0, Mlist[0], t1, t2, t3))
-    pklist = [pk0, pk1]
-    M = Mlist
     t1list = [t1_0, t1_1]    
     t2list = [t2_0, t2_1]
     t3list = [t3_0, t3_1]
+    Mlist = ["mess1", "mess2"]
+    sig0 = sign(pk0, sk0, Mlist[0], t1list[0], t2list[0], t3list[0])
+    sig1 = sign(pk1, sk1, Mlist[1], t1list[1], t2list[1], t3list[1])
+    print(verify(pk0, g2, sig0, Mlist[0], t1list[0], t2list[0], t3list[0]))
+    print(verify(pk1, g2, sig1, Mlist[1], t1list[1], t2list[1], t3list[1]))
+    pklist = [pk0, pk1]
+    M = Mlist
     siglist = [sig0, sig1]
     incorrectIndices = []
     batchverify(g2, pklist, M, t1list, t2list, t3list, siglist, incorrectIndices)

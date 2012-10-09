@@ -153,3 +153,56 @@ bool batchverify(G2 & g2, CharmListG1 & pklist, CharmListStr & Mlist, G2 & P, Ch
     return true;
 }
 
+int main()
+{
+   G1 pk, sk;
+   GT S1;
+   G1 S2;
+   GT S1_1;
+   G1 S2_1;
+   G2 g2, P;
+   ZR alpha;
+   string ID = "<somedude>@email.com";
+   string MI = "test1";
+   string MII = "test2";
+
+   setup(g2, alpha, P);
+
+   keygen(alpha, ID, pk, sk);
+
+   cout << "sk :=" << convert_str(sk) << endl;
+
+   sign(pk, sk, MI, g2, S1, S2);
+   sign(pk, sk, MII, g2, S1_1, S2_1);
+
+   cout << "S1 := " << convert_str(S1) << endl;
+   cout << "S2 := " << convert_str(S2) << endl;
+
+   if(verify(P, g2, pk, MI, S1, S2))
+	   cout << "Successful Verification!!" << endl;
+   else
+	   cout << "FAILED verification!!" << endl;
+
+   list<int> incorrectIndices;
+   CharmListG1 pklist;
+   CharmListStr Mlist;
+   CharmListGT S1list;
+   CharmListG1 S2list;
+
+   pklist[0] = pk;
+   pklist[1] = pk;
+   Mlist[0] = MI;
+   Mlist[1] = MII;
+   S1list[0] = S1;
+   S1list[1] = S1_1;
+   S2list[0] = S2;
+   S2list[1] = S2_1;
+
+   batchverify(g2, pklist, Mlist, P, S1list, S2list, incorrectIndices);
+   cout << "Incorrect indices: ";
+   for (list<int>::iterator it = incorrectIndices.begin(); it != incorrectIndices.end(); it++)
+        cout << *it << " ";
+   cout << endl;
+
+   return 0;
+}
