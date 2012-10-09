@@ -210,6 +210,12 @@ ZR Element::getZR()
 	throw new string("invalid type.");
 }
 
+ZR & Element::getRefZR()
+{
+	if(type == ZR_t) return *zr;
+	throw new string("invalid type.");
+}
+
 G1 Element::getG1()
 {
 	if(type == G1_t) return *g1;
@@ -218,6 +224,12 @@ G1 Element::getG1()
 
 #ifdef ASYMMETRIC
 G2 Element::getG2()
+{
+	if(type == G2_t) return *g2;
+	throw new string("invalid type.");
+}
+
+G2 & Element::getRefG2()
 {
 	if(type == G2_t) return *g2;
 	throw new string("invalid type.");
@@ -262,6 +274,18 @@ Element::~Element()
 	}
 }
 
+void Element::delGroupElement()
+{
+	if(type == ZR_t)
+	    delete zr;
+	else if(type == G1_t)
+	    delete g1;
+	else if(type == G2_t)
+	    delete g2;
+	else if(type == GT_t)
+	    delete gt;
+}
+
 Element Element::operator=(const Element& e)
 {
 	type = e.type;
@@ -280,10 +304,50 @@ Element Element::operator=(const Element& e)
 	return *this;
 }
 
+CharmList Element::operator+ (const Element& e) const
+{
+	CharmList c;
+	if (this->type == Str_t)
+	      	c.append(this->strPtr);
+	else if(this->type == ZR_t)
+		c.append(*this->zr);
+	else if(this->type == G1_t)
+		c.append(*this->g1);
+	else if(this->type == G2_t)
+		c.append(*this->g2);
+	else if(this->type == GT_t)
+		c.append(*this->gt);
+
+	if (e.type == Str_t)
+     	c.append(e.strPtr);
+	else if(e.type == ZR_t)
+		c.append(*e.zr);
+	else if(e.type == G1_t)
+		c.append(*e.g1);
+	else if(e.type == G2_t)
+		c.append(*e.g2);
+	else if(e.type == GT_t)
+		c.append(*e.gt);
+
+	return c;
+}
+
+CharmList Element::operator+(const CharmList& c) const
+{
+	CharmList c2 = c;
+	CharmList result;
+	Element e2 = *this;
+
+	result.append(e2);
+	result.append(c2);
+
+	return result;
+}
+
 ostream& operator<<(ostream& s, const Element& e)
 {
 	Element e2 = e;
-	Type t = e2.type;
+	int t = e2.type;
 	if(t == Str_t)
 		s << "str: ";
 	else if(t == ZR_t)
@@ -320,7 +384,7 @@ void Element::deserialize(Element & e, string & s)
 	if(found != string::npos) {
 		int type = atoi(s.substr(0, found).c_str());
 		if(type >= ZR_t && type < Str_t) {
-			element_from_bytes(e, (Type) type, (unsigned char *) s.substr(found+1, s.size()).c_str());
+			element_from_bytes(e, (int) type, (unsigned char *) s.substr(found+1, s.size()).c_str());
 		}
 		else if(type == Str_t) {
 			e = Element(s.substr(found+1, s.size()).c_str());
@@ -396,6 +460,23 @@ void CharmList::append(GT & gt)
 	cur_index++;
 }
 
+void CharmList::append(Element & e)
+{
+	list[cur_index] = e;
+	cur_index++;
+}
+
+void CharmList::append(const CharmList & c)
+{
+	CharmList c2 = c;
+	for(int i = 0; i < (int) c2.length(); i++) {
+		list[cur_index] = c2[i];
+		cur_index++;
+	}
+}
+
+
+
 Element& CharmList::operator[](const int index)
 {
 	int len = (int) list.size();
@@ -410,6 +491,24 @@ Element& CharmList::operator[](const int index)
 int CharmList::length()
 {
 	return (int) list.size();
+}
+
+CharmList CharmList::operator+(const Element& e) const
+{
+	CharmList result;
+	Element e2 = e;
+	result.append(*this);
+	result.append(e2);
+	return result;
+}
+
+CharmList CharmList::operator+(const CharmList& r) const
+{
+	CharmList result;
+	result.append(*this);
+	result.append(r);
+
+	return result;
 }
 
 ostream& operator<<(ostream& s, const CharmList& cList)
@@ -429,7 +528,7 @@ string CharmList::printAtIndex(int index)
 
 	if(index >= 0 && index < (int) list.size()) {
 		i = index;
-		Type t = list[i].type;
+		int t = list[i].type;
 		if(t == Str_t) {
 			ss << list[i].strPtr;
 		}
@@ -454,6 +553,353 @@ string CharmList::printAtIndex(int index)
 }
 
 // end CharmList implementation
+
+// start CharmListStr implementation
+
+CharmListStr::CharmListStr(void)
+{
+	// increases as elements are appended
+	cur_index = 0;
+}
+
+CharmListStr::~CharmListStr()
+{
+	for(int i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+}
+
+void CharmListStr::append(string & s)
+{
+	list[cur_index] = s;
+	cur_index++;
+}
+
+string& CharmListStr::operator[](const int index)
+{
+	if(index == cur_index) { // means we are creating reference.
+		string s;
+		list[cur_index] = s; // create tmp value
+		cur_index++;
+		return list[index];
+	}
+
+	int len = (int) list.size();
+	if(index >= 0 && index < len) {
+		return list[index];
+	}
+	else {
+		throw new string("Invalid access.\n");
+	}
+}
+
+int CharmListStr::length()
+{
+	return (int) list.size();
+}
+
+string CharmListStr::printAtIndex(int index)
+{
+	stringstream ss;
+	int i;
+
+	if(index >= 0 && index < (int) list.size()) {
+		i = index;
+		ss << list[i];
+	}
+
+	string s = ss.str();
+	return s;
+}
+
+ostream& operator<<(ostream& s, const CharmListStr& cList)
+{
+	CharmListStr cList2 = cList;
+	for(int i = 0; i < cList2.length(); i++) {
+		s << i << ": " << cList2.printAtIndex(i) << endl;
+	}
+
+	return s;
+}
+
+// end CharmListStr implementation
+
+
+// start CharmListZR implementation
+
+CharmListZR::CharmListZR(void)
+{
+	// increases as elements are appended
+	cur_index = 0;
+}
+
+CharmListZR::~CharmListZR()
+{
+	for(int i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+}
+
+void CharmListZR::append(ZR & zr)
+{
+	list[cur_index] = zr;
+	cur_index++;
+}
+
+ZR& CharmListZR::operator[](const int index)
+{
+	if(index == cur_index) { // means we are creating reference.
+		list[cur_index] = NULL;
+		cur_index++;
+		return list[index];
+	}
+
+	int len = (int) list.size();
+	if(index >= 0 && index < len) {
+		return list[index];
+	}
+	else {
+		throw new string("Invalid access.\n");
+	}
+}
+
+int CharmListZR::length()
+{
+	return (int) list.size();
+}
+
+string CharmListZR::printAtIndex(int index)
+{
+	stringstream ss;
+	int i;
+
+	if(index >= 0 && index < (int) list.size()) {
+		i = index;
+		ss << list[i];
+	}
+
+	string s = ss.str();
+	return s;
+}
+
+ostream& operator<<(ostream& s, const CharmListZR& cList)
+{
+	CharmListZR cList2 = cList;
+	for(int i = 0; i < cList2.length(); i++) {
+		s << i << ": " << cList2.printAtIndex(i) << endl;
+	}
+
+	return s;
+}
+
+// end CharmListZR implementation
+
+// start CharmListG1 implementation
+
+CharmListG1::CharmListG1(void)
+{
+	// increases as elements are appended
+	cur_index = 0;
+}
+
+CharmListG1::~CharmListG1()
+{
+	for(int i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+}
+
+void CharmListG1::append(G1 & g)
+{
+	list[cur_index] = g;
+	cur_index++;
+}
+
+G1& CharmListG1::operator[](const int index)
+{
+	if(index == cur_index) { // means we are creating reference.
+		G1 tmp;
+		list[cur_index] = tmp;
+		cur_index++;
+		return list[index];
+	}
+
+	int len = (int) list.size();
+	if(index >= 0 && index < len) {
+		return list[index];
+	}
+	else {
+		throw new string("Invalid access.\n");
+	}
+}
+
+int CharmListG1::length()
+{
+	return (int) list.size();
+}
+
+string CharmListG1::printAtIndex(int index)
+{
+	stringstream ss;
+	int i;
+
+	if(index >= 0 && index < (int) list.size()) {
+		i = index;
+		ss << list[i].g;
+	}
+
+	string s = ss.str();
+	return s;
+}
+
+ostream& operator<<(ostream& s, const CharmListG1& cList)
+{
+	CharmListG1 cList2 = cList;
+	for(int i = 0; i < cList2.length(); i++) {
+		s << i << ": " << cList2.printAtIndex(i) << endl;
+	}
+
+	return s;
+}
+
+// end CharmListG1 implementation
+
+// start CharmListG2 implementation
+
+CharmListG2::CharmListG2(void)
+{
+	// increases as elements are appended
+	cur_index = 0;
+}
+
+CharmListG2::~CharmListG2()
+{
+	for(int i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+}
+
+void CharmListG2::append(G2 & g)
+{
+	list[cur_index] = g;
+	cur_index++;
+}
+
+G2& CharmListG2::operator[](const int index)
+{
+	if(index == cur_index) { // means we are creating reference.
+		G2 tmp;
+		list[cur_index] = tmp; // this type will disappear and just for creating reference only. caller expected to set result
+		cur_index++;
+		return list[index];
+	}
+
+	int len = (int) list.size();
+	if(index >= 0 && index < len) {
+		return list[index];
+	}
+	else {
+		throw new string("Invalid access.\n");
+	}
+}
+
+int CharmListG2::length()
+{
+	return (int) list.size();
+}
+
+string CharmListG2::printAtIndex(int index)
+{
+	stringstream ss;
+	int i;
+
+	if(index >= 0 && index < (int) list.size()) {
+		i = index;
+		ss << list[i].g;
+	}
+
+	string s = ss.str();
+	return s;
+}
+
+ostream& operator<<(ostream& s, const CharmListG2& cList)
+{
+	CharmListG2 cList2 = cList;
+	for(int i = 0; i < cList2.length(); i++) {
+		s << i << ": " << cList2.printAtIndex(i) << endl;
+	}
+
+	return s;
+}
+
+// end CharmListG2 implementation
+
+// start CharmListGT implementation
+
+CharmListGT::CharmListGT(void)
+{
+	// increases as elements are appended
+	cur_index = 0;
+}
+
+CharmListGT::~CharmListGT()
+{
+	for(int i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+}
+
+void CharmListGT::append(GT & g)
+{
+	list[cur_index] = g;
+	cur_index++;
+}
+
+GT& CharmListGT::operator[](const int index)
+{
+	if(index == cur_index) { // means we are creating reference.
+		GT tmp;
+		list[cur_index] = tmp; // this type will disappear and just for creating reference only. caller expected to set result
+		cur_index++;
+		return list[index];
+	}
+
+	int len = (int) list.size();
+	if(index >= 0 && index < len) {
+		return list[index];
+	}
+	else {
+		throw new string("Invalid access.\n");
+	}
+}
+
+int CharmListGT::length()
+{
+	return (int) list.size();
+}
+
+string CharmListGT::printAtIndex(int index)
+{
+	stringstream ss;
+	int i;
+
+	if(index >= 0 && index < (int) list.size()) {
+		i = index;
+		ss << list[i].g;
+	}
+
+	string s = ss.str();
+	return s;
+}
+
+ostream& operator<<(ostream& s, const CharmListGT& cList)
+{
+	CharmListGT cList2 = cList;
+	for(int i = 0; i < cList2.length(); i++) {
+		s << i << ": " << cList2.printAtIndex(i) << endl;
+	}
+
+	return s;
+}
+
+// end CharmListGT implementation
+
+
 
 // start CharmDict implementation
 
@@ -555,34 +1001,85 @@ PairingGroup::~PairingGroup()
 	delete gt;
 }
 
-void PairingGroup::random(ZR & b)
+void PairingGroup::init(ZR & r, char *value)
 {
-	pfcObject->random(b);
+	big x = mirvar(0);
+	cinstr(x, value);
+	r = x; //should copy this
 }
 
-void PairingGroup::random(G1 & g)
+ZR PairingGroup::random(ZR_type t)
 {
-	pfcObject->random(g);
+	ZR zr; // = new ZR();
+	pfcObject->random(zr);
+	return zr;
 }
 
-void PairingGroup::random(GT & g)
+G1 PairingGroup::random(G1_type t)
+{
+	G1  g1; // = new G1();
+	pfcObject->random(g1);
+	return g1;
+}
+
+GT PairingGroup::random(GT_type t)
 {
 	// choose random ZR
-	ZR *zr = new ZR();
-	pfcObject->random(*zr);
-	g = pfcObject->power(*gt, *zr);
-	delete zr;
+	ZR zr;
+	GT gts; // = new GT();
+	pfcObject->random(zr);
+
+	gts = pfcObject->power(*gt, zr);
+    return gts;
+}
+
+bool PairingGroup::ismember(CharmList & g)
+{
+	return true;
+}
+
+bool PairingGroup::ismember(CharmListStr & g)
+{
+	return true;
+}
+
+bool PairingGroup::ismember(CharmListZR & g)
+{
+	return true;
+}
+
+bool PairingGroup::ismember(CharmListG1 & g)
+{
+	return true;
+}
+
+bool PairingGroup::ismember(ZR & g)
+{
+	return true;
+}
+
+bool PairingGroup::ismember(G1 & g)
+{
+	return true;
 }
 
 #ifdef ASYMMETRIC
-void PairingGroup::random(G2 & g)
+
+G2 PairingGroup::random(G2_type t)
 {
-	pfcObject->random(g);
+	G2 g2; // = new G2();
+	pfcObject->random(g2);
+	return g2;
 }
 
-bool PairingGroup::ismember(G2 g)
+bool PairingGroup::ismember(G2 & g)
 {
 	return true; // add code to check
+}
+
+bool PairingGroup::ismember(CharmListG2 & g)
+{
+	return true;
 }
 
 G2 PairingGroup::mul(G2 g, G2 h)
@@ -623,6 +1120,22 @@ ZR PairingGroup::order()
 	return ZR(pfcObject->order());
 }
 
+int PairingGroup::add(int g, int h)
+{
+	return g + h;
+}
+
+int PairingGroup::sub(int g, int h)
+{
+	return g - h;
+}
+
+int PairingGroup::mul(int g, int h)
+{
+	return g * h;
+}
+
+
 ZR PairingGroup::mul(ZR g, ZR h)
 {
 	ZR o = pfcObject->order();
@@ -661,6 +1174,11 @@ GT PairingGroup::div(GT g, GT h)
 	return l;
 }
 
+int PairingGroup::div(int g, int h)
+{
+	return g / h;
+}
+
 ZR PairingGroup::exp(ZR x, ZR y)
 {
 	ZR z = pfcObject->order();
@@ -681,6 +1199,28 @@ GT PairingGroup::exp(GT g, ZR r)
 	GT l = pfcObject->power(g, r);
 	return l;
 }
+
+ZR PairingGroup::hashListToZR(string str)
+{
+	ZR r = pfcObject->hash_to_group((char *) str.c_str());
+	return r;
+}
+
+G1 PairingGroup::hashListToG1(string str)
+{
+	G1 l; 
+	pfcObject->hash_and_map(l, (char *) str.c_str());
+	return l; 
+}
+
+#ifdef ASYMMETRIC
+G2 PairingGroup::hashListToG2(string str)
+{
+	G2 l;
+	pfcObject->hash_and_map(l, (char *) str.c_str());
+	return l;
+}
+#endif
 
 // serialize helper methods for going from Big to bytes and back
 string bigToBytes(Big x)
@@ -745,7 +1285,7 @@ Big bytesToBigS(string str, int *counter)
 }
 
 
-ZR PairingGroup::hashListToZR(CharmList & list)
+ZR &PairingGroup::hashListToZR(CharmList & list)
 {
 	int len = list.length();
 	pfcObject->start_hash();
@@ -765,11 +1305,11 @@ ZR PairingGroup::hashListToZR(CharmList & list)
 			pfcObject->add_to_hash(*e.gt);
 	}
 
-	ZR result = pfcObject->finish_hash_to_group();
-	return result;
+	ZR *result = new ZR(pfcObject->finish_hash_to_group());
+	return *result;
 }
 
-G1 PairingGroup::hashListToG1(CharmList & list)
+G1 &PairingGroup::hashListToG1(CharmList & list)
 {
 	int len = list.length();
 	pfcObject->start_hash();
@@ -790,14 +1330,14 @@ G1 PairingGroup::hashListToG1(CharmList & list)
 	}
 
 	ZR tmp1 = pfcObject->finish_hash_to_group();
-	G1 g1;
+	G1 *g1 = new G1();
 	// convert result to bytes and hash to G1
-	pfcObject->hash_and_map(g1, (char *) bigToBytes(tmp1).c_str());
-	return g1;
+	pfcObject->hash_and_map(*g1, (char *) bigToBytes(tmp1).c_str());
+	return *g1;
 }
 
 #ifdef ASYMMETRIC
-G2 PairingGroup::hashListToG2(CharmList & list)
+G2 &PairingGroup::hashListToG2(CharmList & list)
 {
 	int len = list.length();
 	pfcObject->start_hash();
@@ -818,16 +1358,16 @@ G2 PairingGroup::hashListToG2(CharmList & list)
 	}
 
 	ZR tmp1 = pfcObject->finish_hash_to_group();
-	G2 g2;
+	G2 *g2 = new G2();
 	// convert result to bytes and hash to G2
-	pfcObject->hash_and_map(g2, (char *) bigToBytes(tmp1).c_str());
-	return g2;
+	pfcObject->hash_and_map(*g2, (char *) bigToBytes(tmp1).c_str());
+	return *g2;
 }
 #endif
 
 string element_to_bytes(Element & e) {
 	string t;
-	Type type = e.type;
+	int type = e.type;
 
 	if(type == ZR_t) {
 		Big s = *e.zr;
@@ -897,7 +1437,7 @@ string element_to_bytes(Element & e) {
 	throw new string("element_to_bytes: invalid type specified");
 }
 
-void element_from_bytes(Element& elem, Type type, unsigned char *data)
+void element_from_bytes(Element& elem, int type, unsigned char *data)
 {
 	if(type == ZR_t) {
 		if(is_base64((unsigned char) data[0])) {

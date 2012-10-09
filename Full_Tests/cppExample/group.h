@@ -39,6 +39,38 @@ string _base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len)
 string _base64_decode(string const& encoded_string);
 bool is_base64(unsigned char c);
 
+class Element;
+
+class CharmList
+{
+public:
+	CharmList(void); // static list
+	~CharmList();
+	// consider adding remove
+	void append(const char *);
+	void append(string);
+	void append(ZR&);
+	void append(G1&);
+#ifdef ASYMMETRIC
+	void append(G2&);
+#endif
+	void append(GT&);
+	void append(Element&);
+	void append(const CharmList&);
+
+	int length(); // return length of lists
+	string printAtIndex(int index);
+
+	// retrieve a particular index
+	CharmList operator+(const Element&) const;
+	CharmList operator+(const CharmList&) const;
+	Element& operator[](const int index);
+    friend ostream& operator<<(ostream&, const CharmList&);
+private:
+	int cur_index;
+	map<int, Element> list;
+};
+
 class Element
 {
 public:
@@ -61,8 +93,8 @@ public:
  	G2& getRefG2(); // returns reference for G2 (for cleanup)
 	void createNew(G2);
 #endif
-
 	Element(GT&);
+	Element(CharmList&);
  	Element(const Element& e);
  	ZR getZR(); // returns value (or copy)
  	ZR& getRefZR(); // returns reference for ZR (for cleanup)
@@ -79,8 +111,10 @@ public:
 	static string serialize(Element&);
 	static void deserialize(Element&, string&);
 
+	CharmList operator+(const Element&) const;       // operator+()
+	CharmList operator+(const CharmList&) const;
  	Element operator=(const Element& e);
-    friend ostream& operator<<(ostream&, const Element&);
+    	friend ostream& operator<<(ostream&, const Element&);
 private:
     bool isAllocated; // if True, means Element class responsible
     // for releasing the memory.
@@ -89,31 +123,6 @@ private:
 
 string element_to_bytes(Element & e);
 void element_from_bytes(Element&, int type, unsigned char *data);
-
-class CharmList
-{
-public:
-	CharmList(void); // static list
-	~CharmList();
-	// consider adding remove
-	void append(const char *);
-	void append(string);
-	void append(ZR&);
-	void append(G1&);
-#ifdef ASYMMETRIC
-	void append(G2&);
-#endif
-	void append(GT&);
-	int length(); // return length of lists
-	string printAtIndex(int index);
-
-	// retrieve a particular index
-	Element& operator[](const int index);
-    friend ostream& operator<<(ostream&, const CharmList&);
-private:
-	int cur_index;
-	map<int, Element> list;
-};
 
 class CharmListStr
 {

@@ -304,6 +304,46 @@ Element Element::operator=(const Element& e)
 	return *this;
 }
 
+CharmList Element::operator+ (const Element& e) const
+{
+	CharmList c;
+	if (this->type == Str_t)
+	      	c.append(this->strPtr);
+	else if(this->type == ZR_t)
+		c.append(*this->zr);
+	else if(this->type == G1_t)
+		c.append(*this->g1);
+	else if(this->type == G2_t)
+		c.append(*this->g2);
+	else if(this->type == GT_t)
+		c.append(*this->gt);
+
+	if (e.type == Str_t)
+     	c.append(e.strPtr);
+	else if(e.type == ZR_t)
+		c.append(*e.zr);
+	else if(e.type == G1_t)
+		c.append(*e.g1);
+	else if(e.type == G2_t)
+		c.append(*e.g2);
+	else if(e.type == GT_t)
+		c.append(*e.gt);
+
+	return c;
+}
+
+CharmList Element::operator+(const CharmList& c) const
+{
+	CharmList c2 = c;
+	CharmList result;
+	Element e2 = *this;
+
+	result.append(e2);
+	result.append(c2);
+
+	return result;
+}
+
 ostream& operator<<(ostream& s, const Element& e)
 {
 	Element e2 = e;
@@ -420,6 +460,23 @@ void CharmList::append(GT & gt)
 	cur_index++;
 }
 
+void CharmList::append(Element & e)
+{
+	list[cur_index] = e;
+	cur_index++;
+}
+
+void CharmList::append(const CharmList & c)
+{
+	CharmList c2 = c;
+	for(int i = 0; i < (int) c2.length(); i++) {
+		list[cur_index] = c2[i];
+		cur_index++;
+	}
+}
+
+
+
 Element& CharmList::operator[](const int index)
 {
 	int len = (int) list.size();
@@ -434,6 +491,24 @@ Element& CharmList::operator[](const int index)
 int CharmList::length()
 {
 	return (int) list.size();
+}
+
+CharmList CharmList::operator+(const Element& e) const
+{
+	CharmList result;
+	Element e2 = e;
+	result.append(*this);
+	result.append(e2);
+	return result;
+}
+
+CharmList CharmList::operator+(const CharmList& r) const
+{
+	CharmList result;
+	result.append(*this);
+	result.append(r);
+
+	return result;
 }
 
 ostream& operator<<(ostream& s, const CharmList& cList)
