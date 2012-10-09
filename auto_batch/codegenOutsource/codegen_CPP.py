@@ -707,6 +707,28 @@ def writeMathStatement(leftSide, rightSide, opString):
     elif ( (leftNeedsStar == False) and (rightNeedsStar == False) ):
         return groupObjName + "." + opString + "(" + leftSide + ", " + rightSide + ")"
 
+def processATTR_CPP(node, replacementsDict):
+    returnString = processAttrOrTypeAssignStmt(node, replacementsDict)
+    if (doesVarNeedStar(returnString)):
+        return "*" + returnString
+    else:
+        return returnString
+
+def getListOfAttrNamesFromConcatNode(node, replacementsDict, returnList):
+    if (node.left.type not in [ops.ATTR, ops.CONCAT]):
+        sys.exit("getListOfAttrNamesFromConcatNode in codegen_CPP.py in node.left:  concat nodes can only contain other concat nodes or attr nodes.")
+    if (node.right.type not in [ops.ATTR, ops.CONCAT]):
+        sys.exit("getListOfAttrNamesFromConcatNode in codegen_CPP.py in node.right:  concat nodes can only contain other concat nodes or attr nodes.")
+
+    if (node.left.type == ops.CONCAT):
+        getListOfAttrNamesFromConcatNode(node.left, replacementsDict, returnList)
+    if (node.right.type == ops.CONCAT):
+        getListOfAttrNamesFromConcatNode(node.right, replacementsDict, returnList)
+
+    returnList.append(processATTR_CPP(node.left, replacementsDict))
+    returnList.append(processATTR_CPP(node.right, replacementsDict))
+
+
 def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
     global userFuncsCPPFile, userFuncsList_CPP
 
@@ -801,6 +823,16 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
         pairRightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
         return writeMathStatement(pairLeftSide, pairRightSide, "pair")
 
+    elif (node.type == ops.CONCAT):
+        returnList = []
+        getListOfAttrNamesFromConcatNode(node, replacementsDict, returnList)
+        outputString = "( "
+        for attrName in returnList:
+            outputString += elementName + "(" + attrName + ") + "
+        lenString = len(outputString)
+        outputString = outputString[0:(lenString - 3)]
+        outputString += " )"
+        return outputString
     elif (node.type == ops.FUNC):
         nodeName = applyReplacementsDict(replacementsDict, getFullVarName(node, False))
         nodeName = replacePoundsWithBrackets(nodeName)

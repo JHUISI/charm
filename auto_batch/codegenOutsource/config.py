@@ -9,6 +9,7 @@ RETURN_STATEMENT = "return := None"
 numSignaturesVarName = "N"
 smallExp = "SmallExp(secparam)"
 secParamVarName = "secparam"
+elementName = "Element"
 
 inputVarName = "input"
 outputVarName = "output"
