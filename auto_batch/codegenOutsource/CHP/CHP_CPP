@@ -1,0 +1,166 @@
+#include "sdlconfig.h"
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <list>
+using namespace std;
+
+int N = 2;
+
+int secparam = 80;
+
+PairingGroup group(AES_SECURITY);
+
+ZR & SmallExp(int bits) {
+    big t = mirvar(0);
+    bigbits(bits, t);
+
+    ZR *z = new ZR(t);
+    mr_free(t);
+    return *z;
+}
+
+void setup(G2 & g2)
+{
+    g2 = group.random(G2_t);
+    return;
+}
+
+void keygen(G2 & g2, G2 & pk, ZR & sk)
+{
+    ZR *alpha = new ZR();
+    *alpha = group.random(ZR_t);
+    sk = *alpha;
+    pk = group.exp(g2, *alpha);
+    return;
+}
+
+void sign(G2 & pk, ZR & sk, string M, string t1, string t2, string t3, G1 & sig)
+{
+    G1 *a = new G1();
+    G1 *h = new G1();
+    ZR *b = new ZR();
+    *a = group.hashListToG1(t1);
+    *h = group.hashListToG1(t2);
+    *b = group.hashListToZR(( Element(M) + Element(t3) ));
+    sig = group.mul(group.exp(*a, sk), group.exp(*h, group.mul(sk, *b)));
+    return;
+}
+
+bool verify(G2 & pk, G2 & g2, G1 & sig, string M, string t1, string t2, string t3)
+{
+    G1 *a = new G1();
+    G1 *h = new G1();
+    ZR *b = new ZR();
+    *a = group.hashListToG1(t1);
+    *h = group.hashListToG1(t2);
+    *b = group.hashListToZR(( Element(M) + Element(t3) ));
+    if ( ( (group.pair(sig, g2)) == (group.mul(group.pair(*a, pk), group.exp(group.pair(*h, pk), *b))) ) )
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool membership(G2 & g2, CharmListG2 & pklist, string M, CharmListStr & t1list, CharmListStr & t2list, CharmListStr & t3list, CharmListG1 & siglist)
+{
+    if ( ( (group.ismember(g2)) == (false) ) )
+    {
+        return false;
+    }
+    if ( ( (group.ismember(pklist)) == (false) ) )
+    {
+        return false;
+    }
+    if ( ( (group.ismember(M)) == (false) ) )
+    {
+        return false;
+    }
+    if ( ( (group.ismember(t1list)) == (false) ) )
+    {
+        return false;
+    }
+    if ( ( (group.ismember(t2list)) == (false) ) )
+    {
+        return false;
+    }
+    if ( ( (group.ismember(t3list)) == (false) ) )
+    {
+        return false;
+    }
+    if ( ( (group.ismember(siglist)) == (false) ) )
+    {
+        return false;
+    }
+    return true;
+}
+
+void dividenconquer(CharmListZR & delta, int startSigNum, int endSigNum, list<int> & incorrectIndices, CharmListG1 & dotACache, CharmListG2 & dotBCache, CharmListG2 & dotCCache, G2 & g2, CharmListG2 & pklist, string M, CharmListStr & t1list, CharmListStr & t2list, CharmListStr & t3list, CharmListG1 & siglist)
+{
+    G1 *dotALoopVal = new G1();
+    G2 *dotBLoopVal = new G2();
+    G2 *dotCLoopVal = new G2();
+    int midwayFloat = 0;
+    int midway = 0;
+    int midSigNum = 0;
+    for (int z = startSigNum; z < endSigNum; z++)
+    {
+        *dotALoopVal = group.mul(*dotALoopVal, dotACache[z]);
+        *dotBLoopVal = group.mul(*dotBLoopVal, dotBCache[z]);
+        *dotCLoopVal = group.mul(*dotCLoopVal, dotCCache[z]);
+    }
+    if ( ( (group.pair(*dotALoopVal, g2)) == (group.mul(group.pair(a, *dotBLoopVal), group.pair(h, *dotCLoopVal))) ) )
+    {
+        return;
+    }
+    else
+    {
+        midwayFloat = group.div(group.sub(endSigNum, startSigNum), 2);
+        midway = int(midwayFloat);
+    }
+    if ( ( (midway) == (0) ) )
+    {
+        incorrectIndices.push_back(startSigNum);
+    }
+    else
+    {
+        midSigNum = group.add(startSigNum, midway);
+        dividenconquer(delta, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, g2, pklist, M, t1list, t2list, t3list, siglist);
+        dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g2, pklist, M, t1list, t2list, t3list, siglist);
+    }
+    return;
+}
+
+bool batchverify(G2 & g2, CharmListG2 & pklist, string M, CharmListStr & t1list, CharmListStr & t2list, CharmListStr & t3list, CharmListG1 & siglist, list<int> & incorrectIndices)
+{
+    CharmListZR delta;
+    ZR *b = new ZR();
+    G1 *a = new G1();
+    G1 *h = new G1();
+    CharmListG1 dotACache;
+    CharmListG2 dotBCache;
+    CharmListG2 dotCCache;
+    for (int z = 0; z < N; z++)
+    {
+        delta[z] = SmallExp(secparam);
+    }
+    if ( ( (membership(g2, pklist, M, t1list, t2list, t3list, siglist)) == (false) ) )
+    {
+        return false;
+    }
+    for (int z = 0; z < N; z++)
+    {
+        *b = group.hashListToZR(( Element(M[z]) + Element(t3list[z]) ));
+        *a = group.hashListToG1(t1list[z]);
+        *h = group.hashListToG1(t2list[z]);
+        dotACache[z] = group.exp(siglist[z], delta[z]);
+        dotBCache[z] = group.exp(pklist[z], delta[z]);
+        dotCCache[z] = group.exp(pklist[z], group.mul(*b, delta[z]));
+    }
+    dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, g2, pklist, M, t1list, t2list, t3list, siglist);
+    return true;
+}
+
