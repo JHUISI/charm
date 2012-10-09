@@ -9,7 +9,6 @@ from batchtechniques import *
 from batchproof import *
 from batchconfig import *
 from batchorder import BatchOrder
-#from batchparser import BatchParser
 from batchcomboeq import TestForMultipleEq,CombineMultipleEq,SmallExpTestMul,AfterTech2AddIndex
 from batchsyntax import BasicTypeExist,PairingTypeCheck
 from benchmark_interface import getBenchmarkInfo
@@ -468,7 +467,7 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, eq_number=0):
     
     if VERBOSE: print("variables =>", types)
     # build data inputs for technique classes    
-    sdl_data = { CONST : constants, PUBLIC: pubVars, MESSAGE : msgVars, SETTING : batch_count, BATCH_VERIFY:settingObj.getVerifyInputArgs(), BATCH_VERIFY_MAP:settingObj.getVerifyInputArgsMap() } 
+    sdl_data = { SECPARAM: settingObj.getSecParam(), CONST : constants, PUBLIC: pubVars, MESSAGE : msgVars, SETTING : batch_count, BATCH_VERIFY:settingObj.getVerifyInputArgs(), BATCH_VERIFY_MAP:settingObj.getVerifyInputArgsMap() } 
     if PROOFGEN_FLAG:
         # start the LCG
         proofGen.initLCG(constants, types, sigVars, latex_subs)

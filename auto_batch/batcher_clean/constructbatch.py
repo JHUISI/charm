@@ -64,7 +64,7 @@ defaultBatchTypes = {"delta" : "list{ZR}",
 "startSigNum" : "int",
 "endSigNum " : "int"}
                  
-secparamLine = "secparam := 80\n" # JAA make configurable
+secparamLine = ""
 
 membership_test = """
 BEGIN :: if\n
@@ -256,6 +256,8 @@ class SDLBatch:
         return
     
     def construct(self):
+        secparamLine = ""
+        if self.sdlData[SECPARAM] == None: secparamLine = "secparam := 80\n" # means NOT already defined in SDL
         # compute pre-cache values for signatures
         subProds = SubstituteSigDotProds(self.varTypes, sigIterator, NUM_SIGNATURES, self.variableCount)
         ASTVisitor(subProds).preorder(self.finalBatchEq)

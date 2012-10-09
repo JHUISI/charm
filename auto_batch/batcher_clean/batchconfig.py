@@ -6,7 +6,7 @@ TYPE, CONST, PRECOMP, TRANSFORM = 'types', 'constant', 'precompute', 'transform'
 MESSAGE, SIGNATURE, PUBLIC, SETTING, VERIFY = 'message','signature', 'public','setting', 'verify'
 BATCH_VERIFY = 'batch_verify'
 BATCH_VERIFY_MAP = BATCH_VERIFY + "_map"
-SCHEME_NAME, BATCH_COUNT = 'name', 'count'
+SCHEME_NAME, BATCH_COUNT, SECPARAM = 'name', 'count', 'secparam'
 MSG_CNT, SIG_CNT, PUB_CNT = 'message_count', 'signature_count', 'public_count'
 # qualifier (means only one instance of that particular keyword exists)
 SAME = 'one'
@@ -30,6 +30,7 @@ class SDLSetting():
         self.__parseTypes(assignInfoDict, theVarTypes.get(TYPE))
         self.__parseNumSignatures(assignInfoDict)
         self.__parseOneValueInKey(assignInfoDict, SCHEME_NAME)
+        self.__parseOneValueInKey(assignInfoDict, SECPARAM)
         self.varTypes[SCHEME_NAME] = self.data[SCHEME_NAME]
         for i in NUM_SIGNER_TYPES:
             self.__parseOneValueInKey(assignInfoDict, i)
@@ -163,6 +164,9 @@ class SDLSetting():
 
     def getNumSignatures(self):
         return self.varTypes[NUM_SIGNATURES]
+    
+    def getSecParam(self):
+        return self.data[SECPARAM]
     
     def getConstantVars(self):
         return self.data[CONST]

@@ -11,6 +11,7 @@ BEGIN :: types
  a := ZR
  P := G2
  ID := str
+ M := str
 END :: types
 
 BEGIN :: func:setup
