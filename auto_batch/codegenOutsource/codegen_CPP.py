@@ -1153,7 +1153,9 @@ def writeAssignStmt_CPP(outputFile, binNode):
         if (variableType == types.int):
             outputString_Types += variableName + " = 0;\n"
         else:    
-            outputString_Types += variableName + " = new " + makeTypeReplacementsForCPP(variableType) + "();\n"
+            #outputString_Types += variableName + " = new " + makeTypeReplacementsForCPP(variableType) + "();\n"
+            outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t);\n"
+
 
     variableNamePounds = replacePoundsWithBrackets(variableName)
     if ( (variableType == types.int) and (variableNamePounds not in integerVars) ):
