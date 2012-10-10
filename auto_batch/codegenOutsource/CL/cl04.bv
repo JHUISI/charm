@@ -26,31 +26,28 @@ input := list{g}
  sk := list{x, y}
  X := g^x
  Y := g^y
- pk := list{X, Y, g}
+ pk := list{X, Y}
 output := list{pk, sk}
 END :: func:keygen
 
 BEGIN :: func:sign
 input := list{pk, sk, M}
+ sk := expand{x, y}
  a := random(G2)
  m := H(M, ZR)
- ay := a^sk#1
- axy := a^(sk#0 + (m * sk#0 * sk#1))
- sig := list{a, ay, axy}
+ b := a^y
+ c := a^(x + (m * x * y))
+ sig := list{a, b, c}
 output := sig
 END :: func:sign
 
 BEGIN :: func:verify
-input := list{pk, M, sig}
- a := sig#0
- b := sig#1
- c := sig#2
- X := pk#0
- Y := pk#1
- g := pk#2
+input := list{pk, g, M, sig}
+ sig := expand{a, b, c}
+ pk := expand{X, Y}
  m := H(M, ZR)
 BEGIN :: if
-if { (e(Y, a) * (e(g, b)^-1)) == (e(X, a) * ((e(X, b)^m) * (e(g, c)^-1))) }
+if {{ e(g, b) == e(Y, a) } and { (e(X, a) * e(X, b)^m) == e(g, c) }}
    output := True
 else
    output := False
@@ -61,7 +58,7 @@ BEGIN :: precompute
 m := H(M, ZR)
 END :: precompute
 
-constant := g
+constant := g, pk
 public := list{X, Y}
 signature := list{a, b, c}
 message := m
@@ -72,4 +69,4 @@ public_count := one
 signature_count := N
 END :: count
 
-verify := { (e(Y, a) * (e(g, b)^-1)) == (e(X, a) * ((e(X, b)^m) * (e(g, c)^-1))) }
+verify := {{ e(g, b) == e(Y, a) } and { (e(X, a) * e(X, b)^m) == e(g, c) }}

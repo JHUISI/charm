@@ -744,9 +744,10 @@ class DotProdInstanceFinder:
         return self.applied
 
 class SubstituteAttr:
-    def __init__(self, variable_map, loopVar=None):
+    def __init__(self, variable_map, loopVar=None, constants=None):
         self.variable_map = variable_map
         self.loopVar = loopVar
+        self.constants = constants
         
     def visit(self, node, data):
         pass
@@ -755,6 +756,8 @@ class SubstituteAttr:
         varName = node.getAttribute() # just retrieve the name and do not include any index info
         if varName in self.variable_map.keys():
             node.setAttribute(self.variable_map[varName], clearAttrIndex=False)
+        if self.constants: # if variable is a constant, then no need adding the loopVar index since it is always the same value.
+            if varName in self.constants: return
         if self.loopVar:
             node.setAttrIndex(self.loopVar)
 
@@ -770,4 +773,20 @@ class DropIndexForPrecomputes:
     def visit_attr(self, node, data):
         varName = node.getAttribute()
         if varName in self.variable_list:
-            node.attr_index.remove(self.loopVarTarget)            
+            node.attr_index.remove(self.loopVarTarget)           
+            
+class GetVarsInEq:
+    def __init__(self, dotList):
+        self.varList = []
+        self.dotList = dotList
+    
+    def visit(self, node, data):
+        pass
+    
+    def visit_attr(self, node, data):
+        varName = node.getAttribute()
+        if varName not in self.varList and varName not in self.dotList:
+            self.varList.append(varName)
+    
+    def getVarList(self):
+        return self.varList 

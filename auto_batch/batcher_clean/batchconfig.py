@@ -47,15 +47,15 @@ class SDLSetting():
         
         if self.debug: 
             print("variable types: ", self.varTypes)
-            print("constants: ", self.data[CONST])
-            print("public: ", self.data[PUBLIC])
-            print("signature: ", self.data[SIGNATURE])
-            print("message: ", self.data[MESSAGE])
-            print("batch_count: ", self.data[COUNT_HEADER])
+            print("constants: ", self.data.get(CONST))
+            print("public: ", self.data.get(PUBLIC))
+            print("signature: ", self.data.get(SIGNATURE))
+            print("message: ", self.data.get(MESSAGE))
+            print("batch_count: ", self.data.get(COUNT_HEADER))
             print("precompute: ", self.batch_precompute)
-            print("transform: ", self.data[TRANSFORM])
+            print("transform: ", self.data.get(TRANSFORM))
             print("latex: ", self.latex_symbols)
-            print("verify args: ", self.data[VERIFY])
+            print("verify args: ", self.data.get(VERIFY))
     
     def __parseVerifyInputArgs(self, assignInfoDict):
         verifyDict = assignInfoDict.get(VERIFY)
@@ -163,22 +163,22 @@ class SDLSetting():
         return self.varTypes
 
     def getNumSignatures(self):
-        return self.varTypes[NUM_SIGNATURES]
+        return self.varTypes.get(NUM_SIGNATURES)
     
     def getSecParam(self):
-        return self.data[SECPARAM]
+        return self.data.get(SECPARAM)
     
     def getConstantVars(self):
-        return self.data[CONST]
+        return self.data.get(CONST)
 
     def getPublicVars(self):
-        return self.data[PUBLIC]
+        return self.data.get(PUBLIC)
     
     def getMessageVars(self):
-        return self.data[MESSAGE]
+        return self.data.get(MESSAGE)
     
     def getSignatureVars(self):
-        return self.data[SIGNATURE]
+        return self.data.get(SIGNATURE)
     
     def getLatexVars(self):
         return self.latex_symbols
@@ -187,14 +187,14 @@ class SDLSetting():
         return self.indiv_precompute, self.batch_precompute
 
     def getTransformList(self):
-        return self.data[TRANSFORM]
+        return self.data.get(TRANSFORM)
     
     def getBatchCount(self):
-        return self.data[COUNT_HEADER]
+        return self.data.get(COUNT_HEADER)
     
     def getVerifyInputArgs(self):
-        return self.data[BATCH_VERIFY]
+        return self.data.get(BATCH_VERIFY)
     
     def getVerifyInputArgsMap(self):
-        return self.data[BATCH_VERIFY_MAP]
+        return self.data.get(BATCH_VERIFY_MAP)
     

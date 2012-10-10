@@ -58,14 +58,14 @@ h := H(t2, G1)
 b := H(M | t3, ZR)
 END :: precompute
 
-constant := list{a, g2, h}
+constant := list{a, g2, h, t1, t2, t3}
 public := pk
 signature := list{sig, b}
-message := list{h, M}
+message := list{M}
 
 # different messages/sigs under a single signer
 BEGIN :: count
-message_count := one
+message_count := N
 public_count := N
 signature_count := N
 END :: count

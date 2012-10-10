@@ -183,17 +183,21 @@ BEGIN :: if
      output := False
 END :: if
 
+# precompute variables AND appear in constant list means prolog of loop over sigs
+a := H(t1,G1)
+h := H(t2,G1)
 
 BEGIN :: for
 for{z := 0, N}
-b := H(M#z | t3list#z,ZR)
-a := H(t1list#z,G1)
-h := H(t2list#z,G1)
+b := H(M#z | t3,ZR)
 dotACache#z := (siglist#z^delta#z)
 dotBCache#z := (pklist#z^delta#z)
 dotCCache#z := (pklist#z^(b * delta#z))
 END :: for
- dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, g2, pklist, M, t1list, t2list, t3list, siglist)
+
+# if vars do not appear in verifyArgsList, then don't need to pass to div/conq: so remove M, t1-t3list and add [a, h]
+#dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, g2, pklist, M, t1list, t2list, t3list, siglist)
+dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, g2, a, h, pklist, siglist)
 
  output := incorrectIndices
 END ::func:batchverify
