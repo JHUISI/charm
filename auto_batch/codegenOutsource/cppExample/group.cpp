@@ -1061,17 +1061,7 @@ GT PairingGroup::random(GT_type t)
     return gts;
 }
 
-bool PairingGroup::ismember(string str)
-{
-	return true;
-}
-
 bool PairingGroup::ismember(CharmList & g)
-{
-	return true;
-}
-
-bool PairingGroup::ismember(CharmListStr & g)
 {
 	return true;
 }

@@ -2,7 +2,6 @@ name := bls
 # number of signatures in a batch
 N := 2
 setting := asymmetric
-secparam := 80
 
 # types for variables used in verification.
 # all other variable types are inferred by SDL parser
@@ -12,16 +11,16 @@ sig := G1
 g := G2
 pk := G2
 M := str
-Mlist := list{str}
-siglist := list{G1}
-delta := list{ZR} # add as a result of batch verify
-dotACache := list{G1}
-dotBCache := list{G1}
 incorrectIndices := list{int}
+endSigNum  := int
 startSigNum := int
-endSigNum := int
+delta := list{ZR}
 dotALoopVal := G1
 dotBLoopVal := G1
+dotBCache := list{G1}
+dotACache := list{G1}
+Mlist := list{str}
+siglist := list{G1}
 END :: types
 
 # description of key generation and signing algorithms
@@ -70,48 +69,49 @@ END :: precompute
 
 # individual verification check
 verify := {e(h, pk) == e(sig, g)}
-
+secparam := 80
 
 BEGIN :: func:membership
  input := list{pk, siglist, g}
- 
- BEGIN :: if
-  if { ismember(pk) == False }
-     output := False
- END :: if
- 
- BEGIN :: if
-  if { ismember(siglist) == False }
-     output := False
- END :: if
 
- BEGIN :: if
-  if { ismember(g) == False }
-     output := False
- END :: if
+
+BEGIN :: if
+if { ismember(pk) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(siglist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(g) == False }
+    output := False
+END :: if
 
  output := True
 END :: func:membership
 
+
 BEGIN :: func:dividenconquer
- input := list{delta, dotACache, dotBCache, startSigNum, endSigNum, incorrectIndices, pk, Mlist, siglist, g}
- 
- dotALoopVal := init(G1)
- dotBLoopVal := init(G1)
+ input := list{delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, pk, g}
+dotALoopVal := init(G1)
+dotBLoopVal := init(G1)
 
 BEGIN :: for
-for{z:=startSigNum, endSigNum} 
- dotALoopVal := dotALoopVal * dotACache#z
- dotBLoopVal := dotBLoopVal * dotBCache#z
+for{z := startSigNum, endSigNum}
+dotALoopVal := dotALoopVal * dotACache#z
+dotBLoopVal := dotBLoopVal * dotBCache#z
 END :: for
-
 BEGIN :: if
- if { e(dotALoopVal, pk) == e(dotBLoopVal, g) }
+ if { e(dotALoopVal,pk) == e(dotBLoopVal,g) }
     return := None
  else
     midwayFloat := ((endSigNum - startSigNum) / 2)
-    midway := integer(midwayFloat) 
+    midway := integer(midwayFloat)
 END :: if
+
 
 BEGIN :: if
  if { midway == 0 } 
@@ -119,39 +119,38 @@ BEGIN :: if
     output := None
  else
     midSigNum := startSigNum + midway
-    dividenconquer(delta, dotACache, dotBCache, startSigNum, midway, incorrectIndices, pk, Mlist, siglist, g)
-    dividenconquer(delta, dotACache, dotBCache, midSigNum, endSigNum, incorrectIndices, pk, Mlist, siglist, g)
+    dividenconquer(delta, startSigNum, midway, incorrectIndices, dotACache, dotBCache, pk, g)
+    dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, pk, g)
 END :: if
+
 
  output := None
 END ::func:dividenconquer
 
 
-
 BEGIN :: func:batchverify
-input := list{pk, Mlist, siglist, g, incorrectIndices}
+input := list{Mlist, pk, siglist, g, incorrectIndices}
 
 BEGIN :: for
-for{z:=0, N}
+for{z := 0, N}
  delta#z := SmallExp(secparam)
 END :: for
 
-BEGIN :: for
-for{z :=0, N}
- BEGIN :: if
-  if {(membership(pk, siglist, g) == False)}
+BEGIN :: if
+ if {(membership(pk, siglist, g) == False)}
      output := False
- END :: if
-END :: for
+END :: if
+
 
 BEGIN :: for
-for{z:=0, N}
- h := H(Mlist#z, G1)
- dotACache#z := h ^ delta#z
- dotBCache#z := siglist#z ^ delta#z
+for{z := 0, N}
+h := H(Mlist#z,G1)
+dotACache#z := (h^delta#z)
+dotBCache#z := (siglist#z^delta#z)
 END :: for
-
- dividenconquer(delta, dotACache, dotBCache, 0, N, incorrectIndices, pk, Mlist, siglist, g)
+ dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, pk, g)
 
  output := incorrectIndices
 END ::func:batchverify
+
+

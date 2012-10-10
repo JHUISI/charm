@@ -225,6 +225,7 @@ class SDLBatch:
         output = ""
         bVerifyArgs = str(list(batchVerifyArgList)).replace("[", '').replace("]",'').replace("'", '')
         divConqArgs = str(list(divConqArgList)).replace("[", '').replace("]",'').replace("'", '')
+        # pruned list of values we need to pass on to the membership test.
         membershipTest = str(list(membershipTestList)).replace("[", '').replace("]",'').replace("'", '')
 
         outputBeforePrecompute, outputPrecompute = self.__generatePrecomputeLines(sigIterator, dotCacheVarList)
@@ -250,9 +251,11 @@ class SDLBatch:
         endTypeLine = getEndLineNoOfFunc(TYPES_HEADER)
         newTypeList = []
         # 1.5 record old type definitions from sdl
-        for i in range(startTypeLine, endTypeLine-1):
+        for i in range(startTypeLine-1, endTypeLine-1):
+            print(i, ":", oldSDL[i], end="")
             stripI = oldSDL[i].strip(SPACES)
             newTypeList.append(stripI)
+            
         # 1.8 record new type definitions into list
         for i in typesLinesList:
             stripI = i.strip(SPACES)

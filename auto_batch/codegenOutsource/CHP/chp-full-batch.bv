@@ -7,6 +7,7 @@ BEGIN :: types
 t1 := str
 t2 := str
 t3 := str
+M := str
 g2 := G2
 pk := G2
 sig := G1
@@ -24,10 +25,7 @@ dotBCache := list{G2}
 dotACache := list{G1}
 dotCCache := list{G2}
 pklist := list{G2}
-M := str
-t1list := list{str}
-t2list := list{str}
-t3list := list{str}
+Mlist := list{str}
 siglist := list{G1}
 END :: types
 
@@ -73,14 +71,14 @@ h := H(t2, G1)
 b := H(M | t3, ZR)
 END :: precompute
 
-constant := list{a, g2, h}
+constant := list{a, g2, h, t1, t2, t3}
 public := pk
 signature := list{sig, b}
-message := list{h, M}
+message := list{M}
 
 # different messages/sigs under a single signer
 BEGIN :: count
-message_count := one
+message_count := N
 public_count := N
 signature_count := N
 END :: count
@@ -92,7 +90,7 @@ verify := { e(sig, g2) == e(a, pk) * e(h, pk)^b }
 secparam := 80
 
 BEGIN :: func:membership
- input := list{g2, pklist, M, t1list, t2list, t3list, siglist}
+ input := list{g2, pklist, siglist}
 
 
 BEGIN :: if
@@ -106,26 +104,6 @@ if { ismember(pklist) == False }
 END :: if
 
 BEGIN :: if
-if { ismember(M) == False }
-    output := False
-END :: if
-
-BEGIN :: if
-if { ismember(t1list) == False }
-    output := False
-END :: if
-
-BEGIN :: if
-if { ismember(t2list) == False }
-    output := False
-END :: if
-
-BEGIN :: if
-if { ismember(t3list) == False }
-    output := False
-END :: if
-
-BEGIN :: if
 if { ismember(siglist) == False }
     output := False
 END :: if
@@ -135,7 +113,7 @@ END :: func:membership
 
 
 BEGIN :: func:dividenconquer
- input := list{delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g2, pklist, M, t1list, t2list, t3list, siglist}
+ input := list{delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g2, a, h}
 dotALoopVal := init(G1)
 dotBLoopVal := init(G2)
 dotCLoopVal := init(G2)
@@ -161,8 +139,8 @@ BEGIN :: if
     output := None
  else
     midSigNum := startSigNum + midway
-    dividenconquer(delta, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, g2, pklist, M, t1list, t2list, t3list, siglist)
-    dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g2, pklist, M, t1list, t2list, t3list, siglist)
+    dividenconquer(delta, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, g2, a, h)
+    dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g2, a, h)
 END :: if
 
 
@@ -171,7 +149,7 @@ END ::func:dividenconquer
 
 
 BEGIN :: func:batchverify
-input := list{g2, pklist, M, t1list, t2list, t3list, siglist, incorrectIndices}
+input := list{g2, pklist, t2, t3, t1, Mlist, siglist, incorrectIndices}
 
 BEGIN :: for
 for{z := 0, N}
@@ -179,25 +157,21 @@ for{z := 0, N}
 END :: for
 
 BEGIN :: if
- if {(membership(g2, pklist, M, t1list, t2list, t3list, siglist) == False)}
+ if {(membership(g2, pklist, siglist) == False)}
      output := False
 END :: if
 
-# precompute variables AND appear in constant list means prolog of loop over sigs
 a := H(t1,G1)
 h := H(t2,G1)
 
 BEGIN :: for
 for{z := 0, N}
-b := H(M#z | t3,ZR)
+b := H(Mlist#z | t3,ZR)
 dotACache#z := (siglist#z^delta#z)
 dotBCache#z := (pklist#z^delta#z)
 dotCCache#z := (pklist#z^(b * delta#z))
 END :: for
-
-# if vars do not appear in verifyArgsList, then don't need to pass to div/conq: so remove M, t1-t3list and add [a, h]
-#dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, g2, pklist, M, t1list, t2list, t3list, siglist)
-dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, g2, a, h, pklist, siglist)
+ dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, g2, a, h)
 
  output := incorrectIndices
 END ::func:batchverify
