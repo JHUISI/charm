@@ -1,0 +1,75 @@
+name := cl04
+setting := asymmetric
+N := 2
+
+BEGIN :: types
+ a := G2
+ b := G2
+ c := G2
+ g := G1
+ X := G1
+ Y := G1
+ m := ZR
+ M := str
+END :: types
+
+BEGIN :: func:setup
+input := list{None}
+ g := random(G1)
+output := g
+END :: func:setup
+
+BEGIN :: func:keygen
+input := list{g}
+ x := random(ZR)
+ y := random(ZR)
+ sk := list{x, y}
+ X := g^x
+ Y := g^y
+ pk := list{X, Y, g}
+output := list{pk, sk}
+END :: func:keygen
+
+BEGIN :: func:sign
+input := list{pk, sk, M}
+ a := random(G2)
+ m := H(M, ZR)
+ ay := a^sk#1
+ axy := a^(sk#0 + (m * sk#0 * sk#1))
+ sig := list{a, ay, axy}
+output := sig
+END :: func:sign
+
+BEGIN :: func:verify
+input := list{pk, M, sig}
+ a := sig#0
+ b := sig#1
+ c := sig#2
+ X := pk#0
+ Y := pk#1
+ g := pk#2
+ m := H(M, ZR)
+BEGIN :: if
+if { (e(Y, a) * (e(g, b)^-1)) == (e(X, a) * ((e(X, b)^m) * (e(g, c)^-1))) }
+   output := True
+else
+   output := False
+END :: if
+END :: func:verify
+
+BEGIN :: precompute
+m := H(M, ZR)
+END :: precompute
+
+constant := g
+public := list{X, Y}
+signature := list{a, b, c}
+message := m
+
+BEGIN :: count
+message_count := N
+public_count := one
+signature_count := N
+END :: count
+
+verify := { (e(Y, a) * (e(g, b)^-1)) == (e(X, a) * ((e(X, b)^m) * (e(g, c)^-1))) }
