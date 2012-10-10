@@ -9,6 +9,8 @@ BEGIN :: types
  g := G1
  X := G1
  Y := G1
+ sk := list{ZR}
+ pk := list{G1}
  m := ZR
  M := str
 END :: types

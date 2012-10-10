@@ -40,6 +40,7 @@ LIST_INDEX_END_SYMBOL = "?"
 IF_BRANCH_HEADER = "if"
 ELSE_BRANCH_HEADER = "else"
 FOR_LOOP_HEADER = "for"
+FOR_LOOP_INNER_HEADER = "forinner"
 FORALL_LOOP_HEADER = "forall"
 TYPES_HEADER = "types"
 COUNT_HEADER = "count" # JAA: app-specific
@@ -53,7 +54,7 @@ FUNC_SYMBOL = "def func :"
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
 types = Enum('NO_TYPE','G1', 'G2', 'GT', 'ZR', 'int', 'str', 'list', 'object', 'listInt', 'listStr', 'listG1', 'listG2', 'listGT', 'listZR','symmap')
 declarator = Enum('func', 'verify')
-ops = Enum('BEGIN', 'ERROR', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO', 'FORALL', 'PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'SYMMAP', 'EXPAND', 'FUNC', 'SEQ', 'IF', 'ELSEIF', 'ELSE', 'END', 'NONE')
+ops = Enum('BEGIN', 'ERROR', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO', 'FORINNER', 'FORALL', 'PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'SYMMAP', 'EXPAND', 'FUNC', 'SEQ', 'IF', 'ELSEIF', 'ELSE', 'END', 'NONE')
 side = Enum('left', 'right')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
@@ -382,6 +383,8 @@ def createTree(op, node1, node2, op_value=None):
         node = BinaryNode(ops.ON)
     elif(op == "for{"):
     	node = BinaryNode(ops.FOR)
+    elif(op == "forinner{"):
+        node = BinaryNode(ops.FORINNER)
     elif(op == "forall{"):
         node = BinaryNode(ops.FORALL)        
     elif(op == "do"):
@@ -524,6 +527,8 @@ class BinaryNode:
 				 return ('(' + left + ' on ' + right + ')')
 			elif(self.type == ops.FOR):
 				return ('for{' + left + ',' + right + '}')
+			elif(self.type == ops.FORINNER):
+				return ('forinner{' + left + ',' + right + '}')
 			elif(self.type == ops.FORALL):
 				return ('forall{' + left + '}')
 			elif(self.type == ops.RANDOM):
@@ -636,6 +641,8 @@ class BinaryNode:
 				 return ('(' + left + ' on ' + right + ')')
 			elif(self.type == ops.FOR):
 				return ('for{' + left + ',' + right + '}')
+			elif(self.type == ops.FORINNER):
+				return ('forinner{' + left + ',' + right + '}')
 			elif(self.type == ops.FORALL):
 				return ('forall{' + left + '}')
 			elif(self.type == ops.RANDOM):

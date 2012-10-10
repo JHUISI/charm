@@ -8,12 +8,14 @@ try:
    from sdlparser.VarInfo import *
    from sdlparser.VarType import *
    from sdlparser.ForLoop import *
+   from sdlparser.ForLoopInner import *
    from sdlparser.IfElseBranch import *
 except:
    from SDLang import *
    from VarInfo import *
    from VarType import *
    from ForLoop import *
+   from ForLoopInner import *   
    from IfElseBranch import *
    
 import string,sys
@@ -124,7 +126,7 @@ class SDLParser:
         Hash = Literal("H(") # TODO: provide a way to specify arbitrary func. calls
         Random = Literal("random(")
         Prod = Literal("prod{") # dot product token
-        For = Literal("for{")
+        For = Literal("for{") | Literal("forinner{")
         ForAll = Literal("forall{")
         Sum = Literal("sum{")
         ProdOf = Literal("on")
@@ -187,14 +189,14 @@ class SDLParser:
     
     # method for evaluating stack assumes operators have two operands and pops them accordingly
     def evalStack(self, stack, line_number):
-        global currentFuncName, forLoops, startLineNo_ForLoop, startLineNos_Functions
+        global currentFuncName, forLoops, startLineNo_ForLoop, startLineNo_ForLoopInner, startLineNos_Functions
         global endLineNos_Functions, ifElseBranches, startLineNo_IfBranch, startLineNo_ElseBranch
         global functionNameOrder
 
         op = stack.pop()
         if debug >= levels.some:
             print("op: %s" % op)
-        if op in ["+","-","*", "/","^", ":=", "==", "e(", "for{", "do","prod{", "on", "sum{", "of", "|", "and", ";"]:
+        if op in ["+","-","*", "/","^", ":=", "==", "e(", "for{", "forinner{", "do","prod{", "on", "sum{", "of", "|", "and", ";"]:
             op2 = self.evalStack(stack, line_number)
             op1 = self.evalStack(stack, line_number)
             return createTree(op, op1, op2)
@@ -270,6 +272,15 @@ class SDLParser:
                     if (forLoops[currentFuncName][lenForLoops - 1].getEndLineNo() != None):
                         sys.exit("Ending line number of one of the for loops was set prematurely.")
                     forLoops[currentFuncName][lenForLoops - 1].setEndLineNo(int(line_number))
+            elif (op1 == FOR_LOOP_INNER_HEADER):
+                if (op == START_TOKEN):
+                    startLineNo_ForLoopInner = line_number
+                elif (op == END_TOKEN):
+                    startLineNo_ForLoopInner = None
+                    lenForLoops = len(forLoopsInner[currentFuncName])
+                    if (forLoopsInner[currentFuncName][lenForLoops - 1].getEndLineNo() != None):
+                        sys.exit("Ending line number of one of the for loops inner was set prematurely.")
+                    forLoopsInner[currentFuncName][lenForLoops - 1].setEndLineNo(int(line_number))
             elif (op1 == IF_BRANCH_HEADER):
                 if (op == START_TOKEN):
                     startLineNo_IfBranch = line_number
@@ -1118,6 +1129,11 @@ def updateAssignInfo(node, i):
         lenForLoops = len(forLoops[currentFuncName])
         currentForLoopObj = forLoops[currentFuncName][lenForLoops - 1]
 
+    currentForLoopInnerObj = None
+    if (startLineNo_ForLoopInner != None):
+        lenForLoopsInner = len(forLoopsInner[currentFuncName])
+        currentForLoopInnerObj = forLoopsInner[currentFuncName][lenForLoopsInner - 1]
+
     currentIfElseBranch = None
     if (startLineNo_IfBranch != None):
         lenIfElseBranches = len(ifElseBranches[currentFuncName])
@@ -1156,6 +1172,10 @@ def updateAssignInfo(node, i):
     if (currentForLoopObj != None):
         currentForLoopObj.appendToBinaryNodeList(node)
         currentForLoopObj.appendToVarInfoNodeList(assignInfo_Func[varName])
+
+    if (currentForLoopInnerObj != None):
+        currentForLoopInnerObj.appendToBinaryNodeList(node)
+        currentForLoopInnerObj.appendToVarInfoNodeList(assignInfo_Func[varName])
 
     if (currentIfElseBranch != None):
         currentIfElseBranch.appendToBinaryNodeDict(node, i)
@@ -1249,6 +1269,21 @@ def updateForLoops(node, lineNo):
     retForLoopStruct.updateForLoopStruct(node, startLineNo_ForLoop, currentFuncName)
 
     forLoops[currentFuncName].append(retForLoopStruct)
+
+def updateForLoopsInner(node, lineNo):
+    if (startLineNo_ForLoopInner == None):
+        sys.exit("updateForLoopsInner function entered in SDLParser.py when startLineNo_ForLoopInner is set to None.")
+
+    global forLoops, forLoopsInner
+
+    retForLoopInnerStruct = ForLoopInner()
+    retForLoopInnerStruct.updateForLoopInnerStruct(node, startLineNo_ForLoopInner, currentFuncName)
+
+    forLoopsInner[currentFuncName].append(retForLoopInnerStruct)
+    lenForLoops = len(forLoops[currentFuncName])
+    
+    # TODO: make sure we're really inside a for loop
+    forLoops[currentFuncName][lenForLoops - 1].setInnerLoop(retForLoopInnerStruct)
 
 def updateIfElseBranches(node, lineNo):
     if (startLineNo_IfBranch == None):
@@ -1351,6 +1386,9 @@ def getVarTypes():
 
 def getForLoops():
     return forLoops
+
+def getForLoopsInner():
+    return forLoopsInner
 
 def getIfElseBranches():
     return ifElseBranches
@@ -1589,8 +1627,8 @@ def updateSecretVarNames():
             secretVarNames.remove(varToRemove)
 
 def parseLinesOfCode(code, verbosity, ignoreCloudSourcing=False):
-    global varTypes, assignInfo, forLoops, currentFuncName, varDepList, varInfList, varsThatProtectM
-    global algebraicSetting, startLineNo_ForLoop, startLineNos_Functions, endLineNos_Functions
+    global varTypes, assignInfo, forLoops, forLoopsInner, currentFuncName, varDepList, varInfList, varsThatProtectM
+    global algebraicSetting, startLineNo_ForLoop, startLineNo_ForLoopInner, startLineNos_Functions, endLineNos_Functions
     global getVarDepInfListsCalled, getVarsThatProtectMCalled, astNodes, varNamesToFuncs_All
     global varNamesToFuncs_Assign, ifElseBranches, startLineNo_IfBranch, startLineNo_ElseBranch
     global inputOutputVars, varDepListNoExponents, varInfListNoExponents, functionNameOrder
@@ -1602,6 +1640,7 @@ def parseLinesOfCode(code, verbosity, ignoreCloudSourcing=False):
     varNamesToFuncs_All = {}
     varNamesToFuncs_Assign = {}
     forLoops = {}
+    forLoopsInner = {}
     ifElseBranches = {}
     currentFuncName = NONE_FUNC_NAME
     varDepList = {}
@@ -1611,6 +1650,7 @@ def parseLinesOfCode(code, verbosity, ignoreCloudSourcing=False):
     varsThatProtectM = {}
     algebraicSetting = None
     startLineNo_ForLoop = None
+    startLineNo_ForLoopInner = None    
     startLineNo_IfBranch = None
     startLineNo_ElseBranch = None
     startLineNos_Functions = {}
@@ -1643,6 +1683,9 @@ def parseLinesOfCode(code, verbosity, ignoreCloudSourcing=False):
 
                 if (currentFuncName not in forLoops):
                     forLoops[currentFuncName] = []
+                    
+                if (currentFuncName not in forLoopsInner):
+                    forLoopsInner[currentFuncName] = []
 
                 if (currentFuncName not in ifElseBranches):
                     ifElseBranches[currentFuncName] = []
@@ -1659,6 +1702,8 @@ def parseLinesOfCode(code, verbosity, ignoreCloudSourcing=False):
                     updateAssignInfo(node, lineNumberInCode)
             elif (node.type == ops.FOR):
                 updateForLoops(node, lineNumberInCode)
+            elif (node.type == ops.FORINNER):
+                updateForLoopsInner(node, lineNumberInCode)                
             elif (node.type == ops.IF):
                 updateIfElseBranches(node, lineNumberInCode)
         else:
@@ -2168,6 +2213,23 @@ def printForLoops():
             print("Function name:  " + str(forLoopObj.getFuncName()))
             print("Binary Nodes:")
             for binaryNode in forLoopObj.getBinaryNodeList():
+                print("\t" + str(binaryNode))
+            print("Note:  we also have a list of the VarInfo objects associated with each line of the for loop.")
+            print("\n")
+
+def printForLoopsInner():
+    for funcName in forLoopsInner:
+        print("FUNCTION NAME:  " + funcName)
+        print("\n")
+        for forLoopInnerObj in forLoopsInner[funcName]:
+            print("Starting value:  " + str(forLoopInnerObj.getStartVal()))
+            print("Ending value:  " + str(forLoopInnerObj.getEndVal()))
+            print("Loop variable name:  " + str(forLoopInnerObj.getLoopVar()))
+            print("Starting line number:  " + str(forLoopInnerObj.getStartLineNo()))
+            print("Ending line number:  " + str(forLoopInnerObj.getEndLineNo()))
+            print("Function name:  " + str(forLoopInnerObj.getFuncName()))
+            print("Binary Nodes:")
+            for binaryNode in forLoopInnerObj.getBinaryNodeList():
                 print("\t" + str(binaryNode))
             print("Note:  we also have a list of the VarInfo objects associated with each line of the for loop.")
             print("\n")

@@ -1,7 +1,7 @@
 import sys
 from SDLang import *
 
-class ForLoop:
+class ForLoopInner:
     def __init__(self):
         self.startVal = None
         self.endVal = None
@@ -11,7 +11,6 @@ class ForLoop:
         self.funcName = None
         self.binaryNodeList = []
         self.varInfoNodeList = []
-        self.forLoopInner = None
 
     def getStartVal(self):
         return self.startVal
@@ -37,38 +36,32 @@ class ForLoop:
     def getVarInfoNodeList(self):
         return self.varInfoNodeList
 
-    def getInnerLoop(self):
-        return self.forLoopInner
-
-    def updateForLoopStruct(self, node, startLineNo, funcName):
-        if (node.type != ops.FOR):
-            sys.exit("updateForLoopStruct in ForLoop was passed a node that is not of type " + str(ops.FOR))
+    def updateForLoopInnerStruct(self, node, startLineNo, funcName):
+        if (node.type != ops.FORINNER):
+            sys.exit("updateForLoopInnerStruct in ForLoopInner was passed a node that is not of type " + str(ops.FORINNER))
 
         if ( (type(startLineNo) is not int) or (startLineNo < 1) ):
-            sys.exit("Problem with start line number passed to updateForLoopStruct in ForLoop.")
+            sys.exit("Problem with start line number passed to updateForLoopInnerStruct in ForLoopInner.")
         self.startLineNo = startLineNo
 
         if ( (type(funcName) is not str) or (len(funcName) == 0) ):
-            sys.exit("Problem with function name passed to updateForLoopStruct in ForLoop.")
+            sys.exit("Problem with function name passed to updateForLoopInnerStruct in ForLoopInner.")
         self.funcName = funcName
 
         loopVar = node.left.left.attr
         if ( (type(loopVar) is not str) or (len(loopVar) == 0) ):
-            sys.exit("Problem with loop variable extracted in updateForLoopStruct method in ForLoop.")
+            sys.exit("Problem with loop variable extracted in updateForLoopInnerStruct method in ForLoopInner.")
         self.loopVar = loopVar
 
         self.startVal = node.left.right.attr
         self.endVal = node.right.attr
 
-    def setInnerLoop(self, forLoopInnerStruct):
-        self.forLoopInner = forLoopInnerStruct
-        
     def setEndLineNo(self, endLineNo):
         if ( (type(endLineNo) is not int) or (endLineNo < 1) ):
-            sys.exit("Problem with ending line number passed to setEndLineNo in ForLoop.")
+            sys.exit("Problem with ending line number passed to setEndLineNo in ForLoopInner.")
 
         if (self.startLineNo >= endLineNo):
-            sys.exit("setEndLineNo in ForLoop.py:  end line number passed in is less than or equal to start line number.")
+            sys.exit("setEndLineNo in ForLoopInner.py:  end line number passed in is less than or equal to start line number.")
 
         self.endLineNo = endLineNo
 
