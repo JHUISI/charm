@@ -1,0 +1,55 @@
+name := boyen
+setting := asymmetric
+N := 100
+l := 2
+
+# make sure list{G2} is pulled properly in Batcher
+BEGIN :: types
+g1 := G1
+g2 := G2
+M := str
+m := ZR
+t := ZR
+At := G2
+Bt := G2
+Ct := G2 
+D := GT
+S := G1
+END :: types
+
+BEGIN :: precompute
+D := e(g1, g2)
+END :: precompute
+
+constant := list{At, Bt, Ct}
+public := list{At, Bt, Ct}
+signature := list{S, t}
+message := m
+
+# different messages/sigs under different signers (ring)
+BEGIN :: count
+message_count := N
+public_count := l
+signature_count := N
+END :: count
+
+verify :=  {{ prod{y:=0, l} on e(S_y, At_y * (Bt_y^m_y) * (Ct_y^t_y)) } == D}
+
+BEGIN :: func:verify
+ input := list{At, Bt, Ct, M, S, g1, g2}  
+  D := e(g1, g2)
+  m := H(M, ZR) 
+  result := init(GT)
+BEGIN :: for
+for{y := 0, l}
+ result := result * e(S#y, At#y * (Bt#y^m#y) * (Ct#y^t#y))
+END :: for  
+
+BEGIN :: if
+ if { result == D}
+    output := True
+ else
+    output := False
+END :: if
+END :: func:verify
+

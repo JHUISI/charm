@@ -356,7 +356,7 @@ class SDLBatch:
         typeOutputLines = self.__generateTypes(dotLoopValTypesSig, dotCacheTypesSig, verifyArgTypes)
         output = secparamLine + outputLines1 + outputLines2 + outputLines3
         self.__generateNewSDL(typeOutputLines, output)
-#                
+
 #        print("Pre-compute over signers...")
 #        dotLoopValTypesSigner = []
 #        dotCacheTypesSigner = []
