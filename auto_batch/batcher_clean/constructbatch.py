@@ -289,24 +289,41 @@ class SDLBatch:
         writeLinesOfCodeToFileOnly(self.sdlOutfile)
         return
     
+    def __computeDotProducts(self):
+        # compute pre-cache values for signatures
+        subProdsOverSigs = SubstituteSigDotProds(self.varTypes, sigIterator, NUM_SIGNATURES, self.variableCount)
+        ASTVisitor(subProdsOverSigs).preorder(self.finalBatchEq)
+        # update variable counter
+        self.variableCount = subProdsOverSigs.getVarCount()
+        
+        # for loop over signers, right?
+        subProdsOverSigners = SubstituteSigDotProds(self.varTypes, signerIterator, 'l', self.variableCount)
+        ASTVisitor(subProdsOverSigners).preorder(self.finalBatchEq)
+        self.variableCount = subProdsOverSigners.getVarCount()
+        
+        return (subProdsOverSigs, subProdsOverSigners)
+        
+    
     def construct(self):
         secparamLine = ""
         if self.sdlData[SECPARAM] == None: secparamLine = "secparam := 80\n" # means NOT already defined in SDL
-        # compute pre-cache values for signatures
-        subProds = SubstituteSigDotProds(self.varTypes, sigIterator, NUM_SIGNATURES, self.variableCount)
-        ASTVisitor(subProds).preorder(self.finalBatchEq)
-        # update variable counter
-        self.variableCount = subProds.getVarCount()
-        
-        # for loop over signers, right?
-        subProds1 = SubstituteSigDotProds(self.varTypes, signerIterator, 'l', self.variableCount)
-        ASTVisitor(subProds1).preorder(self.finalBatchEq)
-        self.variableCount = subProds1.getVarCount()
-        
         verifyArgTypes = self.sdlData[BATCH_VERIFY]
         if verifyArgTypes: verifyArgKeys = verifyArgTypes.keys()
         else: verifyArgKeys = verifyArgTypes = {}
         
+        (subProds, subProds1) = self.__computeDotProducts()
+        
+        VarsForDotOverSigs = subProds.dotprod['list']
+        VarsForDotTypesOverSigs = subProds.dotprod['types']
+        VarsForDotASTOverSigs = subProds.dotprod['dict']
+
+        VarsForDotOverSign = subProds1.dotprod['list']
+        VarsForDotTypesOverSign = subProds1.dotprod['types']
+        VarsForDotASTOverSign = subProds1.dotprod['dict']
+        print("list over signers: ", VarsForDotOverSign)
+        
+        
+        # everything as before
         dotLoopValTypesSig = {}
         dotCacheTypesSig = {}
         dotInitStmtDivConqSig = []
@@ -319,18 +336,18 @@ class SDLBatch:
         gvi = GetVarsInEq([])
         
         print("Pre-compute over signatures...")
-        for i in subProds.dotprod['list']:
-            if self.debug: print(i,":=", subProds.dotprod['types'][i])
+        for i in VarsForDotOverSigs:
+            if self.debug: print(i,":=", VarsForTypesOverSigs[i])
             loopVal = "%sLoopVal" % i
             dotCache = "%sCache" % i
-            dotLoopValTypesSig[ loopVal ] = str(subProds.dotprod['types'][i])
-            dotInitStmtDivConqSig.append("%s := init(%s)\n" % (loopVal, subProds.dotprod['types'][i]))
+            dotLoopValTypesSig[ loopVal ] = str(VarsForTypesOverSigs[i])
+            dotInitStmtDivConqSig.append("%s := init(%s)\n" % (loopVal, VarsForTypesOverSigs[i]))
             divConqLoopValStmtSig.append("%s := %s * %s#%s\n" % (loopVal, loopVal, dotCache, sigIterator)) # this is mul specifically
             dotVerifyEq[str(i)] = loopVal
-            dotCacheTypesSig[dotCache] = "list{%s}" % subProds.dotprod['types'][i]
+            dotCacheTypesSig[dotCache] = "list{%s}" % VarsForTypesOverSigs[i]
             divConqArgList.append(dotCache)
             dotList.append(str(i))
-            dotCacheRHS = subProds.dotprod['dict'][i].getRight()
+            dotCacheRHS = VarsForDotASTOverSigs[i].getRight()
             ASTVisitor(gvi).preorder(dotCacheRHS)
             dotCacheVarList.extend(gvi.getVarList())
             dotCacheVarList = list(set(dotCacheVarList))
