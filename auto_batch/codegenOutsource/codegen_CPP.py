@@ -435,7 +435,8 @@ def writeFunctionDecl_CPP(outputFile, functionName):
                 outputString += makeTypeReplacementsForCPP(currentType, varIsAList) + " & " + outputVariable + ", "
             currentFuncOutputVars.append(outputVariable)
 
-    outputString = outputString[0:(len(outputString) - len(", "))]
+    if ( (inputVariables != []) or (outputVariables != []) ):
+        outputString = outputString[0:(len(outputString) - len(", "))]
     outputString += ")\n{\n"
 
     #print(currentFuncOutputVars)
@@ -508,7 +509,7 @@ def isElseStmtStart(binNode):
     return False
 
 def isForLoopStart(binNode):
-    if ( (binNode.type == ops.FOR) or (binNode.type == ops.FORALL) ):
+    if ( (binNode.type == ops.FOR) or (binNode.type == ops.FORALL) or (binNode.type == ops.FORINNER) ):
         return True
 
     return False
@@ -521,7 +522,7 @@ def isIfStmtEnd(binNode):
 
 def isForLoopEnd(binNode):
     if (binNode.type == ops.END):
-        if ( (binNode.left.attr == FOR_LOOP_HEADER) or (binNode.left.attr == FORALL_LOOP_HEADER) ):
+        if ( (binNode.left.attr == FOR_LOOP_HEADER) or (binNode.left.attr == FORALL_LOOP_HEADER) or (binNode.left.attr == FOR_LOOP_INNER_HEADER) ):
             return True
 
     return False
@@ -1345,7 +1346,7 @@ def writeForLoopDecl_CPP(outputFile, binNode):
     outputString = ""
     outputString += writeCurrentNumTabsToString()
 
-    if (binNode.type == ops.FOR):
+    if ( (binNode.type == ops.FOR) or (binNode.type == ops.FORINNER) ):
         outputString += "for (int "
         currentLoopIncVarName = getAssignStmtAsString_CPP(binNode.left.left, None, None)
         outputString += currentLoopIncVarName + " = "
@@ -1516,6 +1517,9 @@ def isUnnecessaryNodeForCodegen(astNode):
         return True
 
     if ( (astNode.type == ops.BEGIN) and (astNode.left.attr == FORALL_LOOP_HEADER) ):
+        return True
+
+    if ( (astNode.type == ops.BEGIN) and (astNode.left.attr == FOR_LOOP_INNER_HEADER) ):
         return True
 
     if ( (astNode.type == ops.BEGIN) and (astNode.left.attr == IF_BRANCH_HEADER) ):
