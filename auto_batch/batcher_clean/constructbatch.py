@@ -250,17 +250,22 @@ class SDLBatch:
         startTypeLine = getStartLineNoOfFunc(TYPES_HEADER)+1
         endTypeLine = getEndLineNoOfFunc(TYPES_HEADER)
         newTypeList = []
+
         # 1.5 record old type definitions from sdl
         for i in range(startTypeLine-1, endTypeLine-1):
             print(i, ":", oldSDL[i], end="")
-            stripI = oldSDL[i].strip(SPACES)
-            newTypeList.append(stripI)
-            
+            stripI = oldSDL[i].replace(SPACES, "")
+            addDelibSpace = stripI.replace(":=", " := ")             
+            newTypeList.append(addDelibSpace)
+        
         # 1.8 record new type definitions into list
         for i in typesLinesList:
-            stripI = i.strip(SPACES)
-            if stripI not in newTypeList:
-                newTypeList.append(stripI)
+            stripI = i.replace(SPACES, "")
+            addDelibSpace = stripI.replace(":=", " := ") 
+            if addDelibSpace not in newTypeList:
+                newTypeList.append(addDelibSpace)
+        
+#        print("newTypeList: ", newTypeList)
         
         removeRangeFromLinesOfCode(startTypeLine, endTypeLine-1)
         appendToLinesOfCode(newTypeList, startTypeLine)
