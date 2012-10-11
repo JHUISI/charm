@@ -127,7 +127,8 @@ class SDLBatch:
         gdi = GetDeltaIndex()
         ASTVisitor(gdi).preorder(finalSdlBatchEq)
         self.deltaListFirst, self.deltaListSecond = gdi.getDeltaList() # default is none if single equation
-        self.__generateDeltaLines(sigIterator)
+        self.newDeltaList = []
+        self.__generateDeltaLines(sigIterator, self.newDeltaList)
         self.debug = False
         
     def ReplaceAppropArgs(self, map, forLoopIndex, node):
@@ -237,13 +238,16 @@ class SDLBatch:
             s += i
         return s
     
-    def __generateDeltaLines(self, loopVar):
+    def __generateDeltaLines(self, loopVar, newList=None):
         output = ""
         for i in self.deltaListFirst:
             output += delta_stmt % (i + "#" + loopVar)
+            if newList != None: newList.append(delta_word + i)
                 
         for i in self.deltaListSecond:
-            output += delta_word + self.getShortForm(i) + "#" + loopVar + " := " 
+            new_var = delta_word + self.getShortForm(i)  
+            if newList != None: newList.append(new_var) # adding to our list
+            output += new_var + "#" + loopVar + " := "
             line = ""
             for k in i:
                 line += delta_word + k + "#" + loopVar + " * "
@@ -252,6 +256,7 @@ class SDLBatch:
             
         if output == "":
             output = delta_stmt % ("#" + loopVar)
+            if newList != None: newList.append(delta_word)
         return output
     
     def __generateBatchVerify(self, batchVerifyArgList, membershipTestList, divConqArgList, dotCacheCalcList, dotCacheVarList):
@@ -368,7 +373,7 @@ class SDLBatch:
         dotCacheCalc = []
         dotList = []
         dotCacheVarList = [] # list of variables that appear in dotCache list of precompute section
-        divConqArgList = ["delta", "startSigNum", "endSigNum", "incorrectIndices"] # JAA: make variable names more configurable
+        divConqArgList = self.newDeltaList + ["startSigNum", "endSigNum", "incorrectIndices"] # JAA: make variable names more configurable
         gvi = GetVarsInEq([])
         
         print("Pre-compute over signatures...")
