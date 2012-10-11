@@ -9,8 +9,6 @@ N = 2
 secparam = 80
 
 m = {}
-y = {}
-x = {}
 
 def setup():
 
@@ -20,24 +18,19 @@ def setup():
     return output
 
 def keygen(g):
-    global y
-    global x
 
     input = [g]
     x = group.random(ZR)
     y = group.random(ZR)
-    sk = [x, y]
     X = (g ** x)
     Y = (g ** y)
-    pk = [X, Y]
-    output = (pk, sk)
+    output = (X, Y, x, y)
     return output
 
-def sign(pk, sk, M):
+def sign(x, y, M):
     global m
 
-    input = [pk, sk, M]
-    x, y = sk
+    input = [x, y, M]
     a = group.random(G2)
     m = group.hash(M, ZR)
     b = (a ** y)
@@ -133,12 +126,17 @@ def main():
     group = PairingGroup(secparam)
 
     g = setup()
-    (pk0, sk0) = keygen(g)
-    (pk1, sk1) = keygen(g)
-    Mlist = ["mess1", "mess2"]    
-    sig0 = sign(pk0, sk0, Mlist[0])
-    sig1 = sign(pk1, sk1, Mlist[1])
-    print(verify(pk[0], pk[1], g, Mlist[0], sig0[0], sig0[1], sig0[2]))
+    (X, Y, x, y) = keygen(g)
+    Mlist = ["mess1", "mess2"]
+    sig0 = sign(x, y, Mlist[0])
+    sig1 = sign(x, y, Mlist[1])
+    print(verify(X, Y, g, Mlist[0], sig0[0], sig0[1], sig0[2]))
+    alist = [sig0[0], sig1[0]]
+    blist = [sig0[1], sig1[1]]
+    clist = [sig0[2], sig1[2]]
+    incorrectIndices = []
+    batchverify(g, alist, Mlist, clist, blist, Y, X, incorrectIndices)
+    print(incorrectIndices)
 
 
 if __name__ == '__main__':
