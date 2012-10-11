@@ -3,8 +3,6 @@ from sdlparser.SDLParser import *
 from batchoptimizer import SubstituteSigDotProds, SubstituteAttr, DropIndexForPrecomputes, GetVarsInEq, GetDeltaIndex
 from batchconfig import *
 
-#JAA: notes - updates types structure and fill in precompute / dotCache computations
-
 membership_check = """\n
 BEGIN :: if
 if { ismember(%s) == False }

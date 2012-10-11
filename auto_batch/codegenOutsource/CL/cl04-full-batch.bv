@@ -1,0 +1,195 @@
+name := cl04
+setting := asymmetric
+N := 2
+
+BEGIN :: types
+a := G2
+b := G2
+c := G2
+g := G1
+X := G1
+Y := G1
+sk := list{ZR}
+pk := list{G1}
+m := ZR
+M := str
+sig := list{G2}
+incorrectIndices := list{int}
+endSigNum := int
+startSigNum := int
+delta := list{ZR}
+dotCLoopVal := G2
+dotALoopVal := G2
+dotBLoopVal := G2
+dotBCache := list{G2}
+dotACache := list{G2}
+dotCCache := list{G2}
+alist := list{G2}
+Mlist := list{str}
+clist := list{G2}
+blist := list{G2}
+END :: types
+
+BEGIN :: func:setup
+input := list{None}
+ g := random(G1)
+output := g
+END :: func:setup
+
+BEGIN :: func:keygen
+input := list{g}
+ x := random(ZR)
+ y := random(ZR)
+ sk := list{x, y}
+ X := g^x
+ Y := g^y
+ pk := list{X, Y}
+output := list{pk, sk}
+END :: func:keygen
+
+BEGIN :: func:sign
+input := list{pk, sk, M}
+ sk := expand{x, y}
+ a := random(G2)
+ m := H(M, ZR)
+ b := a^y
+ c := a^(x + (m * x * y))
+ sig := list{a, b, c}
+output := sig
+END :: func:sign
+
+# sig := expand{a, b, c}
+# pk := expand{X, Y}
+BEGIN :: func:verify
+input := list{X, Y, g, M, a, b, c}
+ m := H(M, ZR)
+BEGIN :: if
+if {{ e(Y, a) == e(g, b) } and { (e(X, a) * (e(X, b)^m)) == e(g, c) }}
+   output := True
+else
+   output := False
+END :: if
+END :: func:verify
+
+BEGIN :: precompute
+m := H(M, ZR)
+END :: precompute
+
+constant := g
+public := list{X, Y}
+signature := list{a, b, c}
+message := m
+
+BEGIN :: count
+message_count := N
+public_count := one
+signature_count := N
+END :: count
+
+#verify := {{ e(g, b) == e(Y, a) } and { (e(X, a) * e(X, b)^m) == e(g, c) }}
+verify := { e(Y, a) == e(g, b) } and { (e(X, a) * (e(X, b)^m)) == e(g, c) }
+secparam := 80
+
+BEGIN :: func:membership
+ input := list{g, alist, clist, blist, Y, X}
+
+
+BEGIN :: if
+if { ismember(g) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(alist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(clist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(blist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(Y) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(X) == False }
+    output := False
+END :: if
+
+ output := True
+END :: func:membership
+
+
+BEGIN :: func:dividenconquer
+ input := list{delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X}
+dotALoopVal := init(G2)
+dotBLoopVal := init(G2)
+dotCLoopVal := init(G2)
+
+BEGIN :: for
+for{z := startSigNum, endSigNum}
+dotALoopVal := dotALoopVal * dotACache#z
+dotBLoopVal := dotBLoopVal * dotBCache#z
+dotCLoopVal := dotCLoopVal * dotCCache#z
+END :: for
+BEGIN :: if
+ if { (e(g,dotALoopVal) * e(Y,dotBLoopVal)) == e(X,dotCLoopVal) }
+    return := None
+ else
+    midwayFloat := ((endSigNum - startSigNum) / 2)
+    midway := integer(midwayFloat)
+END :: if
+
+
+BEGIN :: if
+ if { midway == 0 } 
+    addToList(incorrectIndices, startSigNum)
+    output := None
+ else
+    midSigNum := startSigNum + midway
+    dividenconquer(delta, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X)
+    dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X)
+END :: if
+
+
+ output := None
+END ::func:dividenconquer
+
+
+BEGIN :: func:batchverify
+input := list{g, alist, Mlist, clist, blist, Y, X, incorrectIndices}
+
+BEGIN :: for
+for{z := 0, N}
+ delta1#z := SmallExp(secparam)
+delta2#z := SmallExp(secparam)
+delta12#z := delta1#z * delta2#z 
+END :: for
+
+BEGIN :: if
+ if {(membership(g, alist, clist, blist, Y, X) == False)}
+     output := False
+END :: if
+
+
+BEGIN :: for
+for{z := 0, N}
+m := H(Mlist#z,ZR)
+dotACache#z := ((blist#z^delta12#z) * (clist#z^-delta12#z))
+dotBCache#z := (alist#z^-delta1#z)
+dotCCache#z := ((alist#z^delta2#z) * (blist#z^(m * delta2#z)))
+END :: for
+ dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X)
+
+ output := incorrectIndices
+END ::func:batchverify
+
+
