@@ -1,6 +1,6 @@
 import sdlpath
 from sdlparser.SDLParser import *
-from batchoptimizer import SubstituteSigDotProds, SubstituteAttr, DropIndexForPrecomputes, GetVarsInEq
+from batchoptimizer import SubstituteSigDotProds, SubstituteAttr, DropIndexForPrecomputes, GetVarsInEq, GetDeltaIndex
 from batchconfig import *
 
 #JAA: notes - updates types structure and fill in precompute / dotCache computations
@@ -78,12 +78,18 @@ BEGIN :: for
 for{%s := 0, %s}
 """
 
+delta_word = "delta"
+delta_stmt = delta_word + "%s := SmallExp(secparam)\n"
+delta_lhs = delta_word + "%s := "
+
+
 batch_verify_header = """
 BEGIN :: func:batchverify
 input := list{%s, incorrectIndices}
-%s delta#z := SmallExp(secparam)
-END :: for
+%s %sEND :: for
+"""
 
+membershipTestLine = """
 BEGIN :: if
  if {(membership(%s) == False)}
      output := False
@@ -120,6 +126,10 @@ class SDLBatch:
             if str(i) != 'delta': self.precomputeVarList.append(i.getAttribute())
         self.finalBatchEq = BinaryNode.copy(finalSdlBatchEq)
         self.variableCount = variableCount
+        gdi = GetDeltaIndex()
+        ASTVisitor(gdi).preorder(finalSdlBatchEq)
+        self.deltaListFirst, self.deltaListSecond = gdi.getDeltaList() # default is none if single equation
+        self.__generateDeltaLines(sigIterator)
         self.debug = False
         
     def ReplaceAppropArgs(self, map, forLoopIndex, node):
@@ -163,8 +173,10 @@ class SDLBatch:
         for i,j in verifyArgTypes.items():
             output.append(typeSdlFormat % (i, j))
         
-        print("New SDL types for Batch Stuff...")
-        print(output)
+        if self.debug:
+            print("New SDL types for Batch Stuff...")
+            for i in output:
+                print(i, end="")        
         return output
 
     def __generateDivideAndConquer(self, dotInitStmtDivConqSig,  divConqLoopValStmtSig, eqStr, divConqArgList):
@@ -219,7 +231,30 @@ class SDLBatch:
                 if self.debug: print(line)
                 outputPrecompute += line
         return (outputBeforePrecompute, outputPrecompute)
+    
+    
+    def getShortForm(self, indexList):
+        s = ""
+        for i in indexList:
+            s += i
+        return s
+    
+    def __generateDeltaLines(self, loopVar):
+        output = ""
+        for i in self.deltaListFirst:
+            output += delta_stmt % (i + "#" + loopVar)
                 
+        for i in self.deltaListSecond:
+            output += delta_word + self.getShortForm(i) + "#" + loopVar + " := " 
+            line = ""
+            for k in i:
+                line += delta_word + k + "#" + loopVar + " * "
+            line = line[:-2]
+            output += line + "\n"
+            
+        if output == "":
+            output = delta_stmt % ("#" + loopVar)
+        return output
     
     def __generateBatchVerify(self, batchVerifyArgList, membershipTestList, divConqArgList, dotCacheCalcList, dotCacheVarList):
         output = ""
@@ -229,8 +264,11 @@ class SDLBatch:
         membershipTest = str(list(membershipTestList)).replace("[", '').replace("]",'').replace("'", '')
 
         outputBeforePrecompute, outputPrecompute = self.__generatePrecomputeLines(sigIterator, dotCacheVarList)
+        deltaLines = self.__generateDeltaLines(sigIterator)
+        
         forLoopStmtOverSigs = sigForLoop % (sigIterator, NUM_SIGNATURES)
-        output += batch_verify_header % (bVerifyArgs, forLoopStmtOverSigs, membershipTest)
+        output += batch_verify_header % (bVerifyArgs, forLoopStmtOverSigs, deltaLines)# membershipTest)
+        output += membershipTestLine % membershipTest
         output += outputBeforePrecompute # if non empty
         output += forLoopStmtOverSigs
         output += outputPrecompute
@@ -320,7 +358,7 @@ class SDLBatch:
         VarsForDotOverSign = subProds1.dotprod['list']
         VarsForDotTypesOverSign = subProds1.dotprod['types']
         VarsForDotASTOverSign = subProds1.dotprod['dict']
-        print("list over signers: ", VarsForDotOverSign)
+#        print("list over signers: ", VarsForDotOverSign)
         
         
         # everything as before
@@ -337,14 +375,14 @@ class SDLBatch:
         
         print("Pre-compute over signatures...")
         for i in VarsForDotOverSigs:
-            if self.debug: print(i,":=", VarsForTypesOverSigs[i])
+            if self.debug: print(i,":=", VarsForDotTypesOverSigs[i])
             loopVal = "%sLoopVal" % i
             dotCache = "%sCache" % i
-            dotLoopValTypesSig[ loopVal ] = str(VarsForTypesOverSigs[i])
-            dotInitStmtDivConqSig.append("%s := init(%s)\n" % (loopVal, VarsForTypesOverSigs[i]))
+            dotLoopValTypesSig[ loopVal ] = str(VarsForDotTypesOverSigs[i])
+            dotInitStmtDivConqSig.append("%s := init(%s)\n" % (loopVal, VarsForDotTypesOverSigs[i]))
             divConqLoopValStmtSig.append("%s := %s * %s#%s\n" % (loopVal, loopVal, dotCache, sigIterator)) # this is mul specifically
             dotVerifyEq[str(i)] = loopVal
-            dotCacheTypesSig[dotCache] = "list{%s}" % VarsForTypesOverSigs[i]
+            dotCacheTypesSig[dotCache] = "list{%s}" % VarsForDotTypesOverSigs[i]
             divConqArgList.append(dotCache)
             dotList.append(str(i))
             dotCacheRHS = VarsForDotASTOverSigs[i].getRight()

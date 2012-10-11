@@ -13,6 +13,7 @@ BEGIN :: types
  pk := list{G1}
  m := ZR
  M := str
+ sig := list{G2}
 END :: types
 
 BEGIN :: func:setup
@@ -43,13 +44,13 @@ input := list{pk, sk, M}
 output := sig
 END :: func:sign
 
+# sig := expand{a, b, c}
+# pk := expand{X, Y}
 BEGIN :: func:verify
-input := list{pk, g, M, sig}
- sig := expand{a, b, c}
- pk := expand{X, Y}
+input := list{X, Y, g, M, a, b, c}
  m := H(M, ZR)
 BEGIN :: if
-if {{ e(g, b) == e(Y, a) } and { (e(X, a) * e(X, b)^m) == e(g, c) }}
+if {{ e(Y, a) == e(g, b) } and { (e(X, a) * (e(X, b)^m)) == e(g, c) }}
    output := True
 else
    output := False
@@ -60,7 +61,7 @@ BEGIN :: precompute
 m := H(M, ZR)
 END :: precompute
 
-constant := g, pk
+constant := g
 public := list{X, Y}
 signature := list{a, b, c}
 message := m
@@ -71,4 +72,5 @@ public_count := one
 signature_count := N
 END :: count
 
-verify := {{ e(g, b) == e(Y, a) } and { (e(X, a) * e(X, b)^m) == e(g, c) }}
+#verify := {{ e(g, b) == e(Y, a) } and { (e(X, a) * e(X, b)^m) == e(g, c) }}
+verify := { e(Y, a) == e(g, b) } and { (e(X, a) * (e(X, b)^m)) == e(g, c) }

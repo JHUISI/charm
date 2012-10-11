@@ -69,14 +69,40 @@ class SDLSetting():
                     if (k in self.data[CONST]) or (k in self.data[SIGNATURE] and self.data[COUNT_HEADER][SIG_CNT] != NUM_SIGNATURES) or (k in self.data[PUBLIC] and self.data[COUNT_HEADER][PUB_CNT] != NUM_SIGNATURES) or (k in self.data[MESSAGE] and self.data[COUNT_HEADER][MSG_CNT] != NUM_SIGNATURES):
                         self.data[BATCH_VERIFY][k] = self.varTypes[k]
                     else:
-                        self.data[BATCH_VERIFY][k + "list"] = "list{%s}" % self.varTypes[k]  # it is variable
-                        self.data[BATCH_VERIFY_MAP][k] = k + "list"
+                        # change type into a list
+                        self.setTypeString(k, self.varTypes[k])# "list{%s}" % self.varTypes[k]  # it is variable
+#                        self.data[BATCH_VERIFY][k + "list"]
+#                        self.data[BATCH_VERIFY_MAP][k] = k + "list"
 #                print("batchverify input types: ", self.data[BATCH_VERIFY], "\n", self.data[BATCH_VERIFY].items()) 
 #                print("new map for batch verify vars: ", self.data[BATCH_VERIFY_MAP])
 #                sys.exit(0)
                 self.partialSDL = False
         else:
             self.partialSDL = True
+    
+    def setTypeString(self, k, typeVar):
+        newType = "list{%s}"
+        newTypeTmp = ""
+        if typeVar == "listZR":
+            newTypeTmp = "list{ZR}"
+        elif typeVar == "listG1":
+            newTypeTmp = "list{G1}"
+        elif typeVar == "listG2":
+            newTypeTmp = "list{G2}"
+        elif typeVar == "listGT":
+            newTypeTmp = "list{GT}"
+        elif typeVar == "listStr":
+            newTypeTmp = "list{str}"
+        
+        
+        if newTypeTmp != "":
+            self.data[BATCH_VERIFY_OTHER_TYPES][k + "_link"] = newTypeTmp
+            self.data[BATCH_VERIFY][k + "list"] = newType % (k + "_link")
+            self.data[BATCH_VERIFY_MAP][k] = k + "list"
+        else:
+            self.data[BATCH_VERIFY][k + "list"] = newType % typeVar
+            self.data[BATCH_VERIFY_MAP][k] = k + "list"
+
     
     def __parseBatchCount(self, assignInfoDict):
         countDict = assignInfoDict.get(COUNT_HEADER)

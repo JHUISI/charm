@@ -790,3 +790,24 @@ class GetVarsInEq:
     
     def getVarList(self):
         return self.varList 
+    
+class GetDeltaIndex:
+    def __init__(self):
+        self.delta_single_list = [] # e.g. delta1#z goes first
+        self.delta_double_list = [] # e.g., delta#1#2#z goes second
+    def visit(self, node, data):
+        pass
+    
+    def visit_attr(self, node, data):
+        varName = node.getAttribute()
+        deltaList = node.getDeltaIndex()
+        if deltaList == None: return
+        if varName == "delta" and (deltaList not in self.delta_single_list) and (deltaList not in self.delta_double_list):
+            if len(deltaList) == 1: 
+                self.delta_single_list.extend( deltaList )
+            elif len(deltaList) > 1:
+                self.delta_double_list.append( deltaList )
+                
+    def getDeltaList(self):
+        newList = list(set(self.delta_single_list))
+        return (newList, self.delta_double_list)

@@ -591,8 +591,8 @@ class BinaryNode:
 			if self.delta_index != None and type(self.delta_index) == list and self.attr == "delta":
                 		token = ""
                 		for t in self.delta_index:
-                    			token += t + "#"
-                		msg += token[:len(token)-1]
+                    			token += t + ""
+                		msg += token # [:len(token)-1]
 			if self.attr_index != None and type(self.attr_index) == list:
 				token = ""
 				for t in self.attr_index:

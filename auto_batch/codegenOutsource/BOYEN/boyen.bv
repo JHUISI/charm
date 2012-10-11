@@ -107,10 +107,11 @@ END :: for
 
  result := prod0 * prod1
  d := ((a + (b * m)) + (c * t#l-1))
- S#l-1 := (g1 * result) ^ (1 / d)
+ Y := (g1 * result) ^ (1 / d)
 
  output := list{S, t}
 END :: func:sign
+#S#l-1 := (g1 * result) ^ (1 / d)
 
 
 BEGIN :: func:verify
