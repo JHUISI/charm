@@ -7,10 +7,10 @@ BEGIN :: types
  b := G2
  c := G2
  g := G1
+ x := ZR
+ y := ZR
  X := G1
  Y := G1
- sk := list{ZR}
- pk := list{G1}
  m := ZR
  M := str
  sig := list{G2}
@@ -26,16 +26,13 @@ BEGIN :: func:keygen
 input := list{g}
  x := random(ZR)
  y := random(ZR)
- sk := list{x, y}
  X := g^x
  Y := g^y
- pk := list{X, Y}
-output := list{pk, sk}
+output := list{X, Y, x, y}
 END :: func:keygen
 
 BEGIN :: func:sign
-input := list{pk, sk, M}
- sk := expand{x, y}
+input := list{x, y, M}
  a := random(G2)
  m := H(M, ZR)
  b := a^y
