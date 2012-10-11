@@ -1,0 +1,7 @@
+    g = setup()
+    (pk0, sk0) = keygen(g)
+    (pk1, sk1) = keygen(g)
+    Mlist = ["mess1", "mess2"]    
+    sig0 = sign(pk0, sk0, Mlist[0])
+    sig1 = sign(pk1, sk1, Mlist[1])
+    print(verify(pk[0], pk[1], g, Mlist[0], sig0[0], sig0[1], sig0[2]))
