@@ -5,3 +5,10 @@
     sig0 = sign(pk0, sk0, Mlist[0])
     sig1 = sign(pk1, sk1, Mlist[1])
     print(verify(pk[0], pk[1], g, Mlist[0], sig0[0], sig0[1], sig0[2]))
+    alist = [sig0[0], sig1[0]]
+    blist = [sig0[1], sig1[1]]
+    clist = [sig0[2], sig1[2]]
+
+
+
+batchverify(g, alist, Mlist, clist, blist, Y, X, incorrectIndices)
