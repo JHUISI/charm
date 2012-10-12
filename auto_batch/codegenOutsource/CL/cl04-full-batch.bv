@@ -126,7 +126,7 @@ END :: func:membership
 
 
 BEGIN :: func:dividenconquer
- input := list{delta1, delta2, delta12, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X}
+ input := list{delta1, delta2, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X}
 dotALoopVal := init(G2)
 dotBLoopVal := init(G2)
 dotCLoopVal := init(G2)
@@ -152,8 +152,8 @@ BEGIN :: if
     output := None
  else
     midSigNum := startSigNum + midway
-    dividenconquer(delta1, delta2, delta12, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X)
-    dividenconquer(delta1, delta2, delta12, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X)
+    dividenconquer(delta1, delta2, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X)
+    dividenconquer(delta1, delta2, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X)
 END :: if
 
 
@@ -168,7 +168,6 @@ BEGIN :: for
 for{z := 0, N}
  delta1#z := SmallExp(secparam)
 delta2#z := SmallExp(secparam)
-delta12#z := delta1#z * delta2#z 
 END :: for
 
 BEGIN :: if
@@ -180,11 +179,11 @@ END :: if
 BEGIN :: for
 for{z := 0, N}
 m := H(Mlist#z,ZR)
-dotACache#z := ((blist#z^delta12#z) * (clist#z^-delta12#z))
+dotACache#z := ((blist#z^delta1#z) * (clist#z^delta2#z))
 dotBCache#z := (alist#z^-delta1#z)
 dotCCache#z := ((alist#z^delta2#z) * (blist#z^(m * delta2#z)))
 END :: for
- dividenconquer(delta1, delta2, delta12, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X)
+ dividenconquer(delta1, delta2, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X)
 
  output := incorrectIndices
 END ::func:batchverify

@@ -41,10 +41,13 @@ def sign(x, y, M):
 
 def verify(X, Y, g, M, a, b, c):
     global m
-
+    delta1 = SmallExp(secparam)
+    delta2 = SmallExp(secparam)
+    delta12 = (delta1 * delta2)
     input = [X, Y, g, M, a, b, c]
     m = group.hash(M, ZR)
-    if ( ( (( (pair(Y, a)) == (pair(g, b)) )) and (( ((pair(X, a) * (pair(X, b) ** m))) == (pair(g, c)) )) ) ):
+    if ((pair(g, b * c) * pair(Y, a ** -1)) == (pair(X, a * b ** (m * delta2))):   
+#   if ( ( (( (pair(g, b)) == (pair(Y, a)) )) and (( ((pair(X, a) * (pair(X, b) ** m))) == (pair(g, c)) )) ) ):
         output = True
     else:
         output = False
@@ -105,13 +108,13 @@ def batchverify(g, alist, Mlist, clist, blist, Y, X, incorrectIndices):
     input = [g, alist, Mlist, clist, blist, Y, X, incorrectIndices]
     for z in range(0, N):
         delta1[z] = SmallExp(secparam)
-        delta2[z] = SmallExp(secparam)
+        delta2[z] = delta1[z] # SmallExp(secparam)
         delta12[z] = (delta1[z] * delta2[z])
     if ( ( (membership(g, alist, clist, blist, Y, X)) == (False) ) ):
         output = False
     for z in range(0, N):
         m = group.hash(Mlist[z], ZR)
-        dotACache[z] = ((blist[z] ** delta12[z]) * (clist[z] ** -delta12[z]))
+        dotACache[z] = (blist[z] * clist[z]) ** delta12[z]
         dotBCache[z] = (alist[z] ** -delta1[z])
         dotCCache[z] = ((alist[z] ** delta2[z]) * (blist[z] ** (m * delta2[z])))
     dividenconquer(delta1, delta2, delta12, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X)
@@ -123,7 +126,7 @@ def SmallExp(bits=80):
 
 def main():
     global group
-    group = PairingGroup(secparam)
+    group = PairingGroup("MNT224")
 
     g = setup()
     (X, Y, x, y) = keygen(g)

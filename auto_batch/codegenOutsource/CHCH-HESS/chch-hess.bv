@@ -1,0 +1,64 @@
+# hess + chch
+name := chchhess 
+N := 100
+
+BEGIN :: types
+M := str
+S1h := GT
+S2h := G1
+S1c := G1
+S2c := G1
+pk := G1
+ah := ZR
+ac := ZR
+P := G2
+g2 := G2
+END :: types
+
+BEGIN :: precompute
+ah := H(M | S1h, ZR)
+ac := H(M | S1c, ZR)
+END :: precompute
+
+constant := list{P, g2}
+public := pk
+signature := list{S1h, S2h, S1c, S2c}
+message := list{ah, ac}
+
+# different messages/sigs under different signers
+BEGIN :: count
+message_count := N
+public_count := N
+signature_count := N
+END :: count
+
+#verify := { (((e(pk, P)^ah ) * S1h) * ((e(S2h, g2)^-1) * ((e(S1c * pk^ac, P)^-1) * e(S2c, g2)))) == 1 }
+# original
+verify := { e(S2h, g2) == ( e(pk^ah, P) ) * S1h } and { e(S2c, g2) == (e(S1c * pk^ac, P)) }
+
+BEGIN :: latex
+S1h := Sh_1
+S2h := Sh_2
+S1c := Sc_1
+S2c := Sc_2
+g2 := g_2
+P := P_{pub}
+ah := ah
+ac := ac
+END :: latex
+
+BEGIN :: func:verify
+input := list{S1h, S2h, S1c, S2c, pk, P, g2, M}
+
+ ah := H(M | S1h, ZR)
+ ac := H(M | S1c, ZR)
+
+BEGIN :: if
+if {{ e(S2h, g2) == (( e(pk^ah, P) ) * S1h) } and { e(S2c, g2) == (e(S1c * pk^ac, P)) }}
+    output := True
+else
+    output := False
+END :: if
+
+END :: func:verify
+

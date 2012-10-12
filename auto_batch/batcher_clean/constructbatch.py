@@ -244,15 +244,15 @@ class SDLBatch:
             output += delta_stmt % (i + "#" + loopVar)
             if newList != None: newList.append(delta_word + i)
                 
-        for i in self.deltaListSecond:
-            new_var = delta_word + self.getShortForm(i)  
-            if newList != None: newList.append(new_var) # adding to our list
-            output += new_var + "#" + loopVar + " := "
-            line = ""
-            for k in i:
-                line += delta_word + k + "#" + loopVar + " * "
-            line = line[:-2]
-            output += line + "\n"
+#        for i in self.deltaListSecond:
+#            new_var = delta_word + self.getShortForm(i)  
+#            if newList != None: newList.append(new_var) # adding to our list
+#            output += new_var + "#" + loopVar + " := "
+#            line = ""
+#            for k in i:
+#                line += delta_word + k + "#" + loopVar + " * "
+#            line = line[:-2]
+#            output += line + "\n"
             
         if output == "":
             output = delta_stmt % ("#" + loopVar)
@@ -323,11 +323,11 @@ class SDLBatch:
             outputBatchVerifyLinesFinal.append(i + '\n')
         appendToLinesOfCode(outputBatchVerifyLinesFinal, lastLineSDL)        
         parseLinesOfCode(getLinesOfCode(), True, True)
-        print("DONE!!")
         
         if ".bv" not in self.sdlOutfile: self.sdlOutfile += ".bv" # add appropriate extension to filename
         # 4. write the file to 
         writeLinesOfCodeToFileOnly(self.sdlOutfile)
+        print("SDL file written to: ", self.sdlOutfile)
         return
     
     def __computeDotProducts(self):
@@ -394,6 +394,8 @@ class SDLBatch:
             dotCacheVarList = list(set(dotCacheVarList))
             dotCacheCalc.append("%s#%s := %s\n" % (dotCache, sigIterator, self.ReplaceAppropArgs(self.sdlData[BATCH_VERIFY_MAP], sigIterator, dotCacheRHS))) # JAA: need to write Filter function
         
+        # get divide and conquer argument list and append to divConqArgList list
+        # these are the values that are needed in the divide and conquer routine
         gvi2 = GetVarsInEq(dotList)
         ASTVisitor(gvi2).preorder(self.finalBatchEq)
         divConqArgList.extend(gvi2.getVarList())

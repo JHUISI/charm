@@ -3,7 +3,7 @@
 import sdlpath
 from sdlparser.SDLParser import *
 from batchtechniques import AbstractTechnique
-from batchoptimizer import PairInstanceFinder
+from batchoptimizer import PairInstanceFinder, PairInstanceFinderImproved
 
 # BEGIN: Small Exponent Related classes to assist with tracking index numbers assigned to delta variables 
 # across multiple verification equations. 
@@ -48,6 +48,34 @@ class AfterTech2AddIndex(AbstractTechnique):
         d = { 'pair_index':node.getDeltaIndex() }
         return d
 
+class UpdateDeltaIndex(AbstractTechnique):
+    def __init__(self):
+        pass
+    
+    def visit(self, node, data):
+        pass
+    
+    def visit_exp(self, node, data):
+        a = []
+        if data.get('attr'): a = data.get('attr')
+        if Type(node.right) == ops.ATTR and node.right.getAttribute() == "delta":
+            if len(a) > 0: node.right.setDeltaIndexFromSet(a)
+            else: node.right.setDeltaIndexFromSet( node.left.getDeltaIndex() )
+        elif Type(node.right) == ops.MUL:
+            mul = node.right
+            if Type(mul.left) == ops.ATTR and mul.left.getAttribute() == "delta":
+                if len(a) > 0: mul.left.setDeltaIndexFromSet(a)
+                else: mul.left.setDeltaIndexFromSet( node.left.getDeltaIndex() )
+            if Type(mul.right) == ops.ATTR and mul.right.getAttribute() == "delta":
+                if len(a) > 0: mul.right.setDeltaIndexFromSet(a)
+                else: mul.right.setDeltaIndexFromSet( node.left.getDeltaIndex() )
+        return
+  
+    def visit_attr(self, node, data):
+        d = { 'attr':node.getDeltaIndex() }
+        return d
+
+
 # END
 
 class TestForMultipleEq:
@@ -75,7 +103,8 @@ class CombineMultipleEq(AbstractTechnique):
         self.debug      = False
         
     def visit_and(self, node, data):
-        left = right = BinaryNode("1")
+        left = BinaryNode("1")
+        right = BinaryNode("1")
         #print("handle left :=>", node.left, node.left.type)
         #print("handle right :=>", node.right, node.right.type)        
         if Type(node.left) == ops.EQ_TST:
@@ -88,8 +117,14 @@ class CombineMultipleEq(AbstractTechnique):
             pair_eq_index2 = self.attr_index
             right = self.visit_equality(node.right, pair_eq_index2)
         combined_eq = BinaryNode(ops.EQ_TST, left, right)
+        print("combined_eq first: ", combined_eq)
+        
         # test whether technique 6 applies, if so, combine?
-        tech6      = PairInstanceFinder()
+#        tech6      = PairInstanceFinder()
+#        ASTVisitor(tech6).preorder(combined_eq)
+#        if tech6.testForApplication(): tech6.makeSubstitution(combined_eq); print("Result: ", combined_eq)# ; exit(-1)
+#        if self.debug: print("Combined eq: ", combined_eq)
+        tech6      = PairInstanceFinderImproved()
         ASTVisitor(tech6).preorder(combined_eq)
         if tech6.testForApplication(): tech6.makeSubstitution(combined_eq); print("Result: ", combined_eq)# ; exit(-1)
         if self.debug: print("Combined eq: ", combined_eq)

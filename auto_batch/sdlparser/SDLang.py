@@ -765,7 +765,8 @@ class BinaryNode:
  		if self.type  in [ops.LIST, ops.EXPAND]:
  			if type(value) == str:
  				self.listNodes.append(value)
-    
+	def __repr__(self):
+   		return str(self) 
 #	def getMySide(self):
 #		return self.myside
 	

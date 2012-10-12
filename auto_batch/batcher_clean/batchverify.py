@@ -9,7 +9,7 @@ from batchtechniques import *
 from batchproof import *
 from batchconfig import *
 from batchorder import BatchOrder
-from batchcomboeq import TestForMultipleEq,CombineMultipleEq,SmallExpTestMul,AfterTech2AddIndex
+from batchcomboeq import TestForMultipleEq,CombineMultipleEq,SmallExpTestMul,AfterTech2AddIndex,UpdateDeltaIndex
 from batchsyntax import BasicTypeExist,PairingTypeCheck
 from benchmark_interface import getBenchmarkInfo
 from constructbatch import *
@@ -67,6 +67,7 @@ def handleVerifyEq(equation, index, verbose):
                 flags[ 'verify' + str(index) ] = equation.right # used for verify in tex        
                 flags[ 'step1' ] = combined2 # add delta index #s here
                 return combined
+#            sys.exit("Testing Stuff 2!!!")
 
             return cme.finalAND
     return combined_equation
@@ -499,7 +500,7 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, eq_number=0):
     if VERBOSE: print("\nStage B: Small Exp Test =>", verify2, "\n")
     if PROOFGEN_FLAG: 
         proofGen.setNextStep( 'smallexponents', verify2 )
-
+        
     # figure out order automatically (if not specified in bv file)
     if FIND_ORDER:
         result = BatchOrder(sdl_data, types, BinaryNode.copy(verify2), crypto_library).strategy()
@@ -524,7 +525,7 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, eq_number=0):
         if option == '2' and not singleVE:
             # add index numbers to deltas if dealing with multiple verification equations
             aftTech2 = AfterTech2AddIndex()
-            ASTVisitor(aftTech2).preorder(verify2)
+            ASTVisitor(aftTech2).preorder(verify2)            
         elif option == '6':
             testVerify2 = Tech.makeSubstitution(verify2)
             if testVerify2 != None: verify2 = testVerify2
@@ -554,6 +555,10 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, eq_number=0):
             # Combine testEq2 into testEq! Need a class to do this for me.
         
 #        sys.exit("DONE TESTING!")
+    
+    if singleVE == False: # if multiple verification equations
+        updateDeltaIndex = UpdateDeltaIndex()
+        ASTVisitor(updateDeltaIndex).preorder(verify2)
     
     if PROOFGEN_FLAG:
         proofGen.setNextStep('finalbatcheq', None)

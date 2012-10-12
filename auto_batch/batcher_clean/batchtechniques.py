@@ -16,7 +16,7 @@ class AbstractTechnique:
         else:
             self.consts = self.public = self.message = self.setting = None
         self.vars   = variables
-        self.debug  = None
+        self.debug  = False
 
     def visit(self, node, data):
         return
@@ -309,6 +309,7 @@ class AbstractTechnique:
             if Type(left.right) == ops.ATTR:
                 value = left.right.getAttribute()
                 if value.isdigit() and int(value) <= 1:  
+                    #print("createExp: ", value, " => AYO!!!!!!! right :=> ", right, "...negated: ", right.negated)
 #                    exp.left = left.left
                     if right.negated: left.right.negated = False; right.negated = False 
                     #left.right.setAttribute(str(right))
@@ -321,9 +322,14 @@ class AbstractTechnique:
 #                    print("post: ", left.right.attr_index)
                     mul = left.right
                 else:
-                    mul = BinaryNode(ops.MUL)
-                    mul.left = left.right
-                    mul.right = right                    
+                    value = right.getAttribute()
+                    if value and value.isdigit() and int(value) <= 1: # attr => -1 * ATTR => negate(left.right)
+                        left.right.negated = not left.right.negated
+                        mul = left.right
+                    else: # build a mul node with MUL.left = left.right and MUL.right = right 
+                        mul = BinaryNode(ops.MUL)
+                        mul.left = left.right
+                        mul.right = right         
             else:
                 mul = BinaryNode(ops.MUL)
                 mul.left = left.right
@@ -339,7 +345,7 @@ class AbstractTechnique:
             nodes = []
             self.getMulTokens(left, ops.NONE, [ops.EXP, ops.PAIR, ops.HASH, ops.ATTR], nodes)
             #getListNodes(left, ops.NONE, nodes)
-#            print("createExp sub nodes:")
+#            print("JAA: createExp sub nodes:")
 #            for i in nodes:
 #                print("subnodes: ", i)
             if len(nodes) > 2: # only distribute exponent when there are 
@@ -601,11 +607,11 @@ class Technique2(AbstractTechnique):
                 print("left: ", mul_node.left)
                 print("right: ", mul_node.right, Type(mul_node.right))
             if Type(data['parent']) != ops.PAIR: 
-                pass
                 mul_node.left = self.createExp(mul_node.left, BinaryNode.copy(node.right))
                 mul_node.right = self.createExp(mul_node.right, BinaryNode.copy(node.right))
 #                print("result for right: ", mul_node.right, "\n\n")
                 addAsChildNodeToParent(data, mul_node)
+
                 self.applied = True
                 self.score   = tech2.DistributeExpToPairing
             #else:
