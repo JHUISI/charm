@@ -1904,6 +1904,12 @@ def generateMakefile():
     makefile_FileObject.write(outputString)
     makefile_FileObject.close()
 
+def write_Main_Function():
+    global setupFile
+
+    outputString = "int main()\n{\n    return 0;\n}\n"
+    setupFile.write(outputString)
+
 def main(inputSDLScheme, outputFileName):
     global setupFile, transformFile, decOutFile, userFuncsFile, assignInfo, varNamesToFuncs_All
     global varNamesToFuncs_Assign, inputOutputVars, userFuncsCPPFile, functionNameOrder
@@ -1937,6 +1943,8 @@ def main(inputSDLScheme, outputFileName):
     #addGroupObjGlobalVar()
 
     writeSDLToFiles(astNodes)
+
+    write_Main_Function()
 
     #if (ignoreCloudSourcing == False):
         #writeMainFuncs()

@@ -26,34 +26,21 @@ void setup(G1 & g)
     return;
 }
 
-void keygen(G1 & g, CharmList & pk, CharmList & sk)
+void keygen(G1 & g, G1 & X, G1 & Y, ZR & x, ZR & y)
 {
-    ZR *x = group.init(ZR_t);
-    ZR *y = group.init(ZR_t);
-    G1 *X = group.init(G1_t);
-    G1 *Y = group.init(G1_t);
-    *x = group.random(ZR_t);
-    *y = group.random(ZR_t);
-    sk.append(x);
-    sk.append(y);
-    *X = group.exp(g, *x);
-    *Y = group.exp(g, *y);
-    pk.append(X);
-    pk.append(Y);
+    x = group.random(ZR_t);
+    y = group.random(ZR_t);
+    X = group.exp(g, x);
+    Y = group.exp(g, y);
     return;
 }
 
-void sign(CharmList & pk, CharmList & sk, string M, CharmList & sig)
+void sign(ZR & x, ZR & y, string M, CharmList & sig)
 {
-    ZR x;
-    ZR y;
     G2 *a = group.init(G2_t);
     ZR *m = group.init(ZR_t);
     G2 *b = group.init(G2_t);
     G2 *c = group.init(G2_t);
-    
-    x = sk["x"].getZR();
-    y = sk["y"].getZR();
     *a = group.random(G2_t);
     *m = group.hashListToZR(M);
     *b = group.exp(*a, y);
@@ -107,7 +94,7 @@ bool membership(G1 & g, CharmListG2 & alist, CharmListG2 & clist, CharmListG2 & 
     return true;
 }
 
-void dividenconquer(NO_TYPE & delta1, NO_TYPE & delta2, NO_TYPE & delta12, int startSigNum, int endSigNum, list<int> & incorrectIndices, CharmListG2 & dotACache, CharmListG2 & dotBCache, CharmListG2 & dotCCache, G1 & g, G1 & Y, G1 & X)
+void dividenconquer(CharmListZR & delta1, CharmListZR & delta2, int startSigNum, int endSigNum, list<int> & incorrectIndices, CharmListG2 & dotACache, CharmListG2 & dotBCache, CharmListG2 & dotCCache, G1 & g, G1 & Y, G1 & X)
 {
     G2 *dotALoopVal = group.init(G2_t);
     G2 *dotBLoopVal = group.init(G2_t);
@@ -137,17 +124,16 @@ void dividenconquer(NO_TYPE & delta1, NO_TYPE & delta2, NO_TYPE & delta12, int s
     else
     {
         midSigNum = group.add(startSigNum, midway);
-        dividenconquer(delta1, delta2, delta12, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X);
-        dividenconquer(delta1, delta2, delta12, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X);
+        dividenconquer(delta1, delta2, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X);
+        dividenconquer(delta1, delta2, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X);
     }
     return;
 }
 
 bool batchverify(G1 & g, CharmListG2 & alist, CharmListStr & Mlist, CharmListG2 & clist, CharmListG2 & blist, G1 & Y, G1 & X, list<int> & incorrectIndices)
 {
-    NO TYPE FOUND FOR delta1
-    NO TYPE FOUND FOR delta2
-    NO TYPE FOUND FOR delta12
+    CharmListZR delta1;
+    CharmListZR delta2;
     ZR *m = group.init(ZR_t);
     CharmListG2 dotACache;
     CharmListG2 dotBCache;
@@ -156,7 +142,6 @@ bool batchverify(G1 & g, CharmListG2 & alist, CharmListStr & Mlist, CharmListG2 
     {
         delta1[z] = SmallExp(secparam);
         delta2[z] = SmallExp(secparam);
-        delta12[z] = group.mul(delta1[z], delta2[z]);
     }
     if ( ( (membership(g, alist, clist, blist, Y, X)) == (false) ) )
     {
@@ -165,11 +150,15 @@ bool batchverify(G1 & g, CharmListG2 & alist, CharmListStr & Mlist, CharmListG2 
     for (int z = 0; z < N; z++)
     {
         *m = group.hashListToZR(Mlist[z]);
-        dotACache[z] = group.mul(group.exp(blist[z], delta12[z]), group.exp(clist[z], -delta12[z]));
+        dotACache[z] = group.mul(group.exp(blist[z], delta1[z]), group.exp(clist[z], delta2[z]));
         dotBCache[z] = group.exp(alist[z], -delta1[z]);
         dotCCache[z] = group.mul(group.exp(alist[z], delta2[z]), group.exp(blist[z], group.mul(*m, delta2[z])));
     }
-    dividenconquer(delta1, delta2, delta12, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X);
+    dividenconquer(delta1, delta2, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X);
     return true;
 }
 
+int main()
+{
+    return 0;
+}
