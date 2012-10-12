@@ -461,7 +461,7 @@ def replacePoundsWithBrackets(nameWithPounds):
     for counter in range(0, (lenNameSplit - 1)):
         nameToReturn += "[" + nameSplit[counter + 1] + "]"
 
-    return nameToReturn
+    return nameToReturn.replace("?","",1) #in case we're directly accessing a list element (e.g., S[k-1])
 
 def getLambdaReplacementsString(lambdaReplacements, includeLoopVar, loopVarName):
     if (type(lambdaReplacements) is not dict):
