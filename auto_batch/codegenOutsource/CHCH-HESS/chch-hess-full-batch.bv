@@ -1,0 +1,190 @@
+# hess + chch
+name := chchhess 
+N := 100
+
+BEGIN :: types
+M := str
+S1h := GT
+S2h := G1
+S1c := G1
+S2c := G1
+pk := G1
+ah := ZR
+ac := ZR
+P := G2
+g2 := G2
+incorrectIndices := list{int}
+endSigNum := int
+startSigNum := int
+delta := list{ZR}
+dotCLoopVal := G1
+dotALoopVal := G1
+dotBLoopVal := GT
+dotBCache := list{GT}
+dotACache := list{G1}
+dotCCache := list{G1}
+S1clist := list{G1}
+pklist := list{G1}
+Mlist := list{str}
+S2clist := list{G1}
+S2hlist := list{G1}
+S1hlist := list{GT}
+END :: types
+
+BEGIN :: precompute
+ah := H(M | S1h, ZR)
+ac := H(M | S1c, ZR)
+END :: precompute
+
+constant := list{P, g2}
+public := pk
+signature := list{S1h, S2h, S1c, S2c}
+message := list{ah, ac}
+
+# different messages/sigs under different signers
+BEGIN :: count
+message_count := N
+public_count := N
+signature_count := N
+END :: count
+
+#verify := { (((e(pk, P)^ah ) * S1h) * ((e(S2h, g2)^-1) * ((e(S1c * pk^ac, P)^-1) * e(S2c, g2)))) == 1 }
+# original
+verify := { e(S2h, g2) == ( e(pk^ah, P) ) * S1h } and { e(S2c, g2) == (e(S1c * pk^ac, P)) }
+
+BEGIN :: latex
+S1h := Sh_1
+S2h := Sh_2
+S1c := Sc_1
+S2c := Sc_2
+g2 := g_2
+P := P_{pub}
+ah := ah
+ac := ac
+END :: latex
+
+BEGIN :: func:verify
+input := list{S1h, S2h, S1c, S2c, pk, P, g2, M}
+
+ ah := H(M | S1h, ZR)
+ ac := H(M | S1c, ZR)
+
+BEGIN :: if
+if {{ e(S2h, g2) == (( e(pk^ah, P) ) * S1h) } and { e(S2c, g2) == (e(S1c * pk^ac, P)) }}
+    output := True
+else
+    output := False
+END :: if
+
+END :: func:verify
+
+secparam := 80
+
+BEGIN :: func:membership
+ input := list{g2, P, S1clist, pklist, S2clist, S2hlist, S1hlist}
+
+
+BEGIN :: if
+if { ismember(g2) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(P) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(S1clist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(pklist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(S2clist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(S2hlist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(S1hlist) == False }
+    output := False
+END :: if
+
+ output := True
+END :: func:membership
+
+
+BEGIN :: func:dividenconquer
+ input := list{delta1, delta2, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, P, g2}
+dotALoopVal := init(G1)
+dotBLoopVal := init(GT)
+dotCLoopVal := init(G1)
+
+BEGIN :: for
+for{z := startSigNum, endSigNum}
+dotALoopVal := dotALoopVal * dotACache#z
+dotBLoopVal := dotBLoopVal * dotBCache#z
+dotCLoopVal := dotCLoopVal * dotCCache#z
+END :: for
+BEGIN :: if
+ if { (e(dotALoopVal,P) * (dotBLoopVal * e(dotCLoopVal,g2))) == 1 }
+    return := None
+ else
+    midwayFloat := ((endSigNum - startSigNum) / 2)
+    midway := integer(midwayFloat)
+END :: if
+
+
+BEGIN :: if
+ if { midway == 0 } 
+    addToList(incorrectIndices, startSigNum)
+    output := None
+ else
+    midSigNum := startSigNum + midway
+    dividenconquer(delta1, delta2, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, P, g2)
+    dividenconquer(delta1, delta2, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, P, g2)
+END :: if
+
+
+ output := None
+END ::func:dividenconquer
+
+
+BEGIN :: func:batchverify
+input := list{g2, P, S1clist, pklist, Mlist, S2clist, S2hlist, S1hlist, incorrectIndices}
+
+BEGIN :: for
+for{z := 0, N}
+ delta1#z := SmallExp(secparam)
+delta2#z := SmallExp(secparam)
+END :: for
+
+BEGIN :: if
+ if {(membership(g2, P, S1clist, pklist, S2clist, S2hlist, S1hlist) == False)}
+     output := False
+END :: if
+
+
+BEGIN :: for
+for{z := 0, N}
+ac := H(Mlist#z | S1clist#z,ZR)
+ah := H(Mlist#z | S1hlist#z,ZR)
+dotACache#z := ((pklist#z^(ah * delta1#z)) * ((S1clist#z^-delta2#z) * (pklist#z^(-ac * delta2#z))))
+dotBCache#z := (S1hlist#z^delta1#z)
+dotCCache#z := ((S2hlist#z^-delta1#z) * (S2clist#z^delta2#z))
+END :: for
+ dividenconquer(delta1, delta2, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, P, g2)
+
+ output := incorrectIndices
+END ::func:batchverify
+
+
