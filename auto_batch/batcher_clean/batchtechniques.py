@@ -5,6 +5,7 @@ from batchparser import *
 Tech_db = Enum('NoneApplied', 'ExpIntoPairing', 'DistributeExpToPairing', 'ProductToSum', 'CombinePairing', 'SplitPairing', 'ConstantPairing', 'MoveExpOutPairing', 'ConstantSizeLoop')
 
 #TODO: code up reverse 2 : pull values from pairing outside, 
+delta_word = "delta"
 
 class AbstractTechnique:
     def __init__(self, sdl_data, variables):
@@ -476,7 +477,7 @@ class Technique2(AbstractTechnique):
     # find: 'e(g, h)^d_i' transform into ==> 'e(g^d_i, h)' iff g or h is constant
     # move exponent towards the non-constant attribute
     def visit_exp(self, node, data):
-        #print("left node =>", node.left.type,"target right node =>", node.right)
+#        print("left node =>", node.left.type,"target right node =>", node.right)
         if(Type(node.left) == ops.PAIR):   # and (node.right.attr_index == 'i'): # (node.right.getAttribute() == 'delta'):
             pair_node = node.left
                                   # make cur node the left child of pair node
@@ -599,8 +600,7 @@ class Technique2(AbstractTechnique):
         elif(Type(node.left) == ops.MUL):    
             # distributing exponent over a MUL node (which may have more MUL nodes)        
             #print("Consider: node.left.type =>", node.left.type)
-                
-                
+            #print("left node: ", node.left, "\tleft type =>", node.left.type, "\ttarget right =>", node.right)                
             mul_node = node.left
             if self.debug: 
                 print("distribute exp correctly =>")
@@ -611,7 +611,16 @@ class Technique2(AbstractTechnique):
                 mul_node.right = self.createExp(mul_node.right, BinaryNode.copy(node.right))
 #                print("result for right: ", mul_node.right, "\n\n")
                 addAsChildNodeToParent(data, mul_node)
-
+                
+                self.applied = True
+                self.score   = tech2.DistributeExpToPairing
+            elif Type(node.right) == ops.ATTR and node.right.getAttribute() == delta_word: 
+                # JAA ADDED 10/12/12: attr node and is a delta we should probably distribute it
+                mul_node.left = self.createExp(mul_node.left, BinaryNode.copy(node.right))
+                mul_node.right = self.createExp(mul_node.right, BinaryNode.copy(node.right))
+#                print("result for right: ", mul_node.right, "\n\n")
+                addAsChildNodeToParent(data, mul_node)
+                
                 self.applied = True
                 self.score   = tech2.DistributeExpToPairing
             #else:

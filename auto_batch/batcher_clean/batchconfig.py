@@ -6,6 +6,7 @@ TYPE, CONST, PRECOMP, TRANSFORM = 'types', 'constant', 'precompute', 'transform'
 MESSAGE, SIGNATURE, PUBLIC, SETTING, VERIFY = 'message','signature', 'public','setting', 'verify'
 BATCH_VERIFY = 'batch_verify'
 BATCH_VERIFY_MAP = BATCH_VERIFY + "_map"
+BATCH_VERIFY_OTHER_TYPES = BATCH_VERIFY + "_other_types"
 SCHEME_NAME, BATCH_COUNT, SECPARAM = 'name', 'count', 'secparam'
 MSG_CNT, SIG_CNT, PUB_CNT = 'message_count', 'signature_count', 'public_count'
 # qualifier (means only one instance of that particular keyword exists)
@@ -64,6 +65,7 @@ class SDLSetting():
                 self.data[VERIFY] = list(verifyDict.get('input').getListNodesList())
                 self.data[BATCH_VERIFY] = {}
                 self.data[BATCH_VERIFY_MAP] = {}
+                self.data[BATCH_VERIFY_OTHER_TYPES] = {}
                 # figure out which bach verify args are constant and which ones are not
                 for k in self.data[VERIFY]:
                     if (k in self.data[CONST]) or (k in self.data[SIGNATURE] and self.data[COUNT_HEADER][SIG_CNT] != NUM_SIGNATURES) or (k in self.data[PUBLIC] and self.data[COUNT_HEADER][PUB_CNT] != NUM_SIGNATURES) or (k in self.data[MESSAGE] and self.data[COUNT_HEADER][MSG_CNT] != NUM_SIGNATURES):

@@ -524,8 +524,8 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, eq_number=0):
         ASTVisitor(Tech).preorder(verify2)
         if option == '2' and not singleVE:
             # add index numbers to deltas if dealing with multiple verification equations
-            aftTech2 = AfterTech2AddIndex()
-            ASTVisitor(aftTech2).preorder(verify2)            
+            aftTech2 = UpdateDeltaIndex()
+            ASTVisitor(aftTech2).preorder(verify2)  
         elif option == '6':
             testVerify2 = Tech.makeSubstitution(verify2)
             if testVerify2 != None: verify2 = testVerify2
@@ -556,9 +556,9 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, eq_number=0):
         
 #        sys.exit("DONE TESTING!")
     
-    if singleVE == False: # if multiple verification equations
-        updateDeltaIndex = UpdateDeltaIndex()
-        ASTVisitor(updateDeltaIndex).preorder(verify2)
+#    if singleVE == False: # if multiple verification equations
+#        updateDeltaIndex = UpdateDeltaIndex()
+#        ASTVisitor(updateDeltaIndex).preorder(verify2)
     
     if PROOFGEN_FLAG:
         proofGen.setNextStep('finalbatcheq', None)
