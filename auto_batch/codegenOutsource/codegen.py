@@ -258,8 +258,11 @@ def writeInitDictDefs(outputFile, functionName):
         if (assignInfo[functionName][currentVarName].getHasListIndexSymInLeftAssign() == False):
             continue
 
-        if (currentVarName not in inputOutputVars):
+        if (currentVarName.find(LIST_INDEX_END_SYMBOL) != -1):
             continue
+
+        #if (currentVarName not in inputOutputVars):
+            #continue
 
         if (currentVarName not in varNamesToFuncs_Assign):
             sys.exit("writeInitDictDefs in codegen.py:  current variable name in loop is not in varNamesToFuncs_Assign.")

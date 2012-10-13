@@ -1,0 +1,13 @@
+    (mpk, g1, g2) = setup()
+    (pk0, sk0) = keygen(g1, g2)
+    (pk1, sk1) = keygen(g1, g2)
+    Alist = [pk0[0], pk1[0]]
+    Blist = [pk0[1], pk1[1]]
+    Clist = [pk0[2], pk1[2]]
+    (S0, t0) = sign(g1, mpk, Alist, Blist, Clist, sk0, "m0", 2)
+    (S1, t1) = sign(g1, mpk, Alist, Blist, Clist, sk1, "m1", 2)
+    Atlist = [pk0[3], pk1[3]]
+    Btlist = [pk0[4], pk1[4]]
+    Ctlist = [pk0[5], pk1[5]]    
+    print(verify(g1, g2, Atlist, Btlist, Ctlist, "m0", S0, t0, 2))
+    print(verify(g1, g2, Atlist, Btlist, Ctlist, "m1", S1, t1, 2))
