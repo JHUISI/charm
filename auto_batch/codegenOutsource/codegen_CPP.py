@@ -82,6 +82,16 @@ def addNumSignatures():
 
     setupFile.write("int " + str(numSignaturesVarName) + " = " + str(numSignatures) + ";\n\n")
 
+def addNumSigners():
+    global setupFile
+
+    try:
+        numSigners = assignInfo[NONE_FUNC_NAME][numSignersVarName].getAssignNode().right
+    except:
+        return #this value isn't necessary for all schemes
+
+    setupFile.write("int " + str(numSignersVarName) + " = " + str(numSigners) + ";\n\n")
+
 def addSecParam():
     global setupFile
 
@@ -1933,6 +1943,8 @@ def main(inputSDLScheme, outputFileName):
     addImportLines()
 
     addNumSignatures()
+
+    addNumSigners()
 
     addSecParam()
 

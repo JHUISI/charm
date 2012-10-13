@@ -135,6 +135,17 @@ def addNumSignatures():
     outputString = numSignaturesVarName + " = " + str(numSignatures) + "\n\n"
     setupFile.write(outputString)
 
+def addNumSigners():
+    global setupFile
+
+    try:
+        numSigners = assignInfo[NONE_FUNC_NAME][numSignersVarName].getAssignNode().right
+    except:
+        return #this value isn't necessary for all schemes
+
+    outputString = numSignersVarName + " = " + str(numSigners) + "\n\n"
+    setupFile.write(outputString)
+
 def addSecParamValue():
     global setupFile
 
@@ -1800,6 +1811,7 @@ def main(SDL_Scheme, ignoreCloudSourcingArg, nonCloudSourcingFileNameArg=None):
     addImportLines()
     addGroupObjGlobalVar()
     addNumSignatures()
+    addNumSigners()
     addSecParamValue()
 
     #if (ignoreCloudSourcing == True):
