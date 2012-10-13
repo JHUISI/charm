@@ -130,7 +130,7 @@ def main():
     Clist[1] = pk0[2]
     Clist[2] = pk1[2]
 
-    (S, t) = sign(g1, Alist, Blist, Clist, sk0, M, l)
+    (S, t) = sign(g1, Alist, Blist, Clist, sk1, M, l)
 
     Atlist = {}
     Btlist = {}
