@@ -101,6 +101,15 @@ batch_verify_footer = """
 END ::func:batchverify\n
 """
 
+batch_loop_signer = """
+BEGIN :: for
+%s
+BEGIN :: forinner
+%s
+END :: forinner
+
+END :: for
+"""
 SPACES = ' '
 sigIterator = 'z'
 signerIterator = 'y'
@@ -345,20 +354,69 @@ class SDLBatch:
         return (subProdsOverSigs, subProdsOverSigners)
         
     
+    def __searchForDependencies(self, dict1, dict2):
+        """ if there are no deps, then the two can be calculated over their respective for loops separately,
+            otherwise, need to figure out which calculation goes in the outer and which one in the inner."""
+        # if dict2 has any var references into dict1 or vice versa, then the list that HAS the reference should
+        # be in the OUTER LOOP and the variable that IS referenced is in the INNER LOOP
+        outerLoop = {}
+        innerLoop = {}
+        references = {}
+        dotPrefix = "dot"
+        dotList1 = list(dict1.keys())
+        dotList2 = list(dict2.keys())
+        print("list over signatures:", dotList1)
+        for i,j in dict1.items():
+            gviq = GetVarsInEq([])
+            ASTVisitor(gviq).preorder(j.getRight())
+            references[str(i)] = [x for x in gviq.getVarList() if dotPrefix in x]
+            print(i, ":", j, ", var list: ", references[str(i)])
+        print("list over signers:", dotList2)
+        for i, j in dict2.items():
+            gviq = GetVarsInEq([])
+            ASTVisitor(gviq).preorder(j.getRight())
+            references[str(i)] = [x for x in gviq.getVarList() if dotPrefix in x]
+            print(i, ":", j, ", var list: ", references[str(i)])
+        
+        for i, j in references.items():
+            print(i, ":", j)
+        
+        sys.exit(0)
+    
     def construct(self):        
         (subProds, subProds1) = self.__computeDotProducts()
         
+        # dot products over signatures
+        # keys: dotA, dotB ... dotZ
         VarsForDotOverSigs = subProds.dotprod['list']
-        VarsForDotTypesOverSigs = subProds.dotprod['types']
-        VarsForDotASTOverSigs = subProds.dotprod['dict']
+        # types: dotA: G1 , dotB: G2, ..., dotZ: GT
+        VarsForDotTypesOverSigs = subProds.dotprod['types'] 
+        # assignment for each dot value.
+        # dotA := x#z ^ y#z , etc
+        VarsForDotASTOverSigs = subProds.dotprod['dict'] 
 
+        # dot products over signers
+        # keys: dotA, dotB ...
         VarsForDotOverSign = subProds1.dotprod['list']
+        # types: see above
         VarsForDotTypesOverSign = subProds1.dotprod['types']
+        # assignment AST for each dot value
         VarsForDotASTOverSign = subProds1.dotprod['dict']
 #        print("list over signers: ", VarsForDotOverSign)
-        
-        self.__constructSDLBatchOverSignaturesOnly(VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs)
-    
+
+        # dotValues in signature list is greater than 1 and the one of the signers is 0, then no brainer
+        if len(VarsForDotOverSigs) >= 1 and len(VarsForDotOverSign) == 0:
+            self.__constructSDLBatchOverSignaturesOnly(VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs)
+        elif len(VarsForDotOverSigs) >= 1 and len(VarsForDotOverSign) >= 1:
+            # mixed mode between loops over ...
+            self.__searchForDependencies(VarsForDotASTOverSigs, VarsForDotASTOverSign)
+            self.__constructSDLBatchOverSignaturesAndSigners(VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs, 
+                                                             VarsForDotOverSign, VarsForDotTypesOverSign, VarsForDotASTOverSign)
+        elif len(VarsForDotOverSigs) == 0 and len(VarsForDotOverSign) >= 1:
+            print("TODO: this is a new case.")
+            sys.exit(0)
+        else:
+            print("TODO: JAA - what case is this: ", len(VarsForDotOverSigs), len(VarsForDotOverSign))
     
     def __constructSDLBatchOverSignaturesOnly(self, VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs):
         secparamLine = ""
@@ -439,6 +497,9 @@ class SDLBatch:
 #            print("None Yet")
 
         return
+
+    def __constructSDLBatchOverSignaturesAndSigners(self, VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs, VarsForDotOverSign, VarsForDotTypesOverSign, VarsForDotASTOverSign):
+        pass
 
         
         

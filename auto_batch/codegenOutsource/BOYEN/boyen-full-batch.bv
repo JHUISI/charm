@@ -108,19 +108,34 @@ END :: func:membership
 
 
 BEGIN :: func:dividenconquer
- input := list{delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotE}
+ input := list{delta, startSigNum, endSigNum, incorrectIndices, dotDCache, dotE}
+
+
+dotELoopVal := init(
+BEGIN :: for
+for {y := 0, l}
 dotALoopVal := init(G1)
 dotBLoopVal := init(G1)
 dotCLoopVal := init(G1)
-dotDLoopVal := init(GT)
 
-BEGIN :: for
+BEGIN :: forinner
 for{z := startSigNum, endSigNum}
+dotACache#z := (Slist#y#z^delta#z)
+dotBCache#z := (Slist#y#z^(m#y#z * delta#z))
+dotCCache#z := (Slist#y#z^(t#y#z * delta#z))
 dotALoopVal := dotALoopVal * dotACache#z
 dotBLoopVal := dotBLoopVal * dotBCache#z
 dotCLoopVal := dotCLoopVal * dotCCache#z
+END :: forinner
+
+END :: for
+
+dotDLoopVal := init(GT)
+BEGIN :: for
+for{z := startSigNum, endSigNum}
 dotDLoopVal := dotDLoopVal * dotDCache#z
 END :: for
+
 BEGIN :: if
  if { dotE == dotDLoopVal }
     return := None
@@ -159,15 +174,12 @@ BEGIN :: if
 END :: if
 
 
+D := e(g1,g2)
 BEGIN :: for
 for{z := 0, N}
-D := e(g1,g2)
-dotACache#z := (Slist#y#z^delta#z)
-dotBCache#z := (Slist#y#z^(m#y#z * delta#z))
-dotCCache#z := (Slist#y#z^(t#y#z * delta#z))
 dotDCache#z := (D^delta#z)
 END :: for
- dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotE)
+ dividenconquer(delta, 0, N, incorrectIndices, dotDCache, dotE)
 
  output := incorrectIndices
 END ::func:batchverify
