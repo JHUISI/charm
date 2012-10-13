@@ -45,9 +45,9 @@ void sign(ZR & x, ZR & y, string M, CharmList & sig)
     *m = group.hashListToZR(M);
     *b = group.exp(*a, y);
     *c = group.exp(*a, group.add(x, group.mul(*m, group.mul(x, y))));
-    sig.append(a);
-    sig.append(b);
-    sig.append(c);
+    sig.append(*a);
+    sig.append(*b);
+    sig.append(*c);
     return;
 }
 
@@ -160,5 +160,50 @@ bool batchverify(G1 & g, CharmListG2 & alist, CharmListStr & Mlist, CharmListG2 
 
 int main()
 {
+    ZR x, y;
+    G1 g, X, Y;
+    string m0 = "test message 0.";
+    string m1 = "test message 1.";
+    CharmList sig0, sig1;
+ 
+    setup(g);
+
+    keygen(g, X, Y, x, y);
+ 
+    sign(x, y, m0, sig0);
+    sign(x, y, m1, sig1);
+
+    G2 a = sig0[0].getG2();
+    G2 b = sig0[1].getG2();
+    G2 c = sig0[2].getG2();
+
+    if(verify(X, Y, g, m0, a, b, c)) {
+      cout << "Successful Verification!" << endl;
+    }
+    else {
+      cout << "FAILED Verification!" << endl;
+    }
+
+    list<int> incorrectIndices;
+    CharmListStr Mlist;
+    Mlist[0] = m0; // replace with m1 if you want to test invalid sigs
+    Mlist[1] = m1;
+    CharmListG2 alist, blist, clist;
+    alist[0] = sig0[0].getG2();
+    alist[1] = sig1[0].getG2();
+
+    blist[0] = sig0[1].getG2();
+    blist[1] = sig1[1].getG2();
+    clist[0] = sig0[2].getG2();
+    clist[1] = sig1[2].getG2();
+
+    batchverify(g, alist, Mlist, clist, blist, Y, X, incorrectIndices);
+
+    cout << "Incorrect indices: ";
+    for (list<int>::iterator it = incorrectIndices.begin(); it != incorrectIndices.end(); it++)
+	cout << *it << " ";
+    cout << endl;
+    
+    
     return 0;
 }

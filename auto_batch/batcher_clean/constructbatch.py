@@ -56,11 +56,6 @@ BEGIN :: if
     dividenconquer(%s)
 END :: if\n
 """
-
-defaultBatchTypes = {"delta" : "list{ZR}",
-"incorrectIndices" : "list{int}",
-"startSigNum" : "int",
-"endSigNum " : "int"}
                  
 secparamLine = ""
 
@@ -120,6 +115,7 @@ class SDLBatch:
         self.varTypes = varTypes
         self.precomputeDict = precompDict
         self.precomputeVarList = []
+        self.defaultBatchTypes = {"incorrectIndices" : "list{int}", "startSigNum" : "int", "endSigNum " : "int"}
         for i in list(precompDict.keys()):
             if str(i) != 'delta': self.precomputeVarList.append(i.getAttribute())
         self.finalBatchEq = BinaryNode.copy(finalSdlBatchEq)
@@ -163,7 +159,7 @@ class SDLBatch:
     def __generateTypes(self, dotLoopValTypesSig, dotCacheTypesSig, verifyArgTypes):
         output = []
         typeSdlFormat = "%s := %s\n"
-        for i,j in defaultBatchTypes.items():
+        for i,j in self.defaultBatchTypes.items():
             output.append(typeSdlFormat % (i, j))
         for i,j in dotLoopValTypesSig.items():
             output.append(typeSdlFormat % (i, j))
@@ -240,10 +236,12 @@ class SDLBatch:
     
     def __generateDeltaLines(self, loopVar, newList=None):
         output = ""
+        delta_type = "list{ZR}"
         for i in self.deltaListFirst:
             output += delta_stmt % (i + "#" + loopVar)
-            if newList != None: newList.append(delta_word + i)
-                
+            if newList != None: 
+                newList.append(delta_word + i)
+                self.defaultBatchTypes[delta_word + i] = delta_type
 #        for i in self.deltaListSecond:
 #            new_var = delta_word + self.getShortForm(i)  
 #            if newList != None: newList.append(new_var) # adding to our list
@@ -256,7 +254,9 @@ class SDLBatch:
             
         if output == "":
             output = delta_stmt % ("#" + loopVar)
-            if newList != None: newList.append(delta_word)
+            if newList != None: 
+                newList.append(delta_word)
+                self.defaultBatchTypes[delta_word] = delta_type
         return output
     
     def __generateBatchVerify(self, batchVerifyArgList, membershipTestList, divConqArgList, dotCacheCalcList, dotCacheVarList):
@@ -345,13 +345,7 @@ class SDLBatch:
         return (subProdsOverSigs, subProdsOverSigners)
         
     
-    def construct(self):
-        secparamLine = ""
-        if self.sdlData[SECPARAM] == None: secparamLine = "secparam := 80\n" # means NOT already defined in SDL
-        verifyArgTypes = self.sdlData[BATCH_VERIFY]
-        if verifyArgTypes: verifyArgKeys = verifyArgTypes.keys()
-        else: verifyArgKeys = verifyArgTypes = {}
-        
+    def construct(self):        
         (subProds, subProds1) = self.__computeDotProducts()
         
         VarsForDotOverSigs = subProds.dotprod['list']
@@ -363,7 +357,15 @@ class SDLBatch:
         VarsForDotASTOverSign = subProds1.dotprod['dict']
 #        print("list over signers: ", VarsForDotOverSign)
         
-        
+        self.__constructSDLBatchOverSignaturesOnly(VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs)
+    
+    
+    def __constructSDLBatchOverSignaturesOnly(self, VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs):
+        secparamLine = ""
+        if self.sdlData[SECPARAM] == None: secparamLine = "secparam := 80\n" # means NOT already defined in SDL
+        verifyArgTypes = self.sdlData[BATCH_VERIFY]
+        if verifyArgTypes: verifyArgKeys = verifyArgTypes.keys()
+        else: verifyArgKeys = verifyArgTypes = {}
         # everything as before
         dotLoopValTypesSig = {}
         dotCacheTypesSig = {}
