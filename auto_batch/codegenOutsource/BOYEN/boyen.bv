@@ -1,6 +1,6 @@
 name := boyen
 setting := asymmetric
-N := 100
+N := 2
 l := 2
 secparam := 80
 
@@ -118,10 +118,10 @@ BEGIN :: func:verify
  input := list{g1, g2, Atlist, Btlist, Ctlist, M, S, t, l}  
   D := e(g1, g2)
   result := init(GT)
+  m := H(M, ZR) 
 BEGIN :: for
 for{y := 0, l}
-  m#y := H(M#y, ZR) 
- result := result * e(S#y, Atlist#y * (Btlist#y^m#y) * (Ctlist#y^t#y))
+ result := result * e(S#y, Atlist#y * (Btlist#y^m) * (Ctlist#y^t#y))
 END :: for  
 
 BEGIN :: if
