@@ -1,6 +1,6 @@
 name := boyen
 setting := asymmetric
-N := 2
+N := 100
 l := 2
 secparam := 80
 

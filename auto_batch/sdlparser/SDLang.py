@@ -2,7 +2,7 @@
 
 * ADD, SUB, DIV, MUL, EXP - '+','-','*', '/' for division,'^' for exponentiation
 * EQ - ':=' for assignment
-* EQ_TST - '==' for equality testing
+* EQ_TST, NON_EQ_TST - '==' for equality testing and '!=' for inequality testing
 * PAIR - 'e(' arg1, arg2 ')'
 * RANDOM - 'random assignment'
 * HASH - 'H(val, ZR)' compute 'hash' of a variable to ZR, G1 or G2 
@@ -27,6 +27,7 @@ import string, sys
 inputKeyword = "input"
 outputKeyword = "output"
 
+hash_table_size = 10000
 BINARY_NODE_CLASS_NAME = 'BinaryNode'
 ENUM_VALUE_CLASS_NAME = 'EnumValue'
 VAR_INFO_CLASS_NAME = 'VarInfo'
@@ -54,7 +55,7 @@ FUNC_SYMBOL = "def func :"
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
 types = Enum('NO_TYPE','G1', 'G2', 'GT', 'ZR', 'int', 'str', 'list', 'object', 'listInt', 'listStr', 'listG1', 'listG2', 'listGT', 'listZR','symmap')
 declarator = Enum('func', 'verify')
-ops = Enum('BEGIN', 'ERROR', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO', 'FORINNER', 'FORALL', 'PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'SYMMAP', 'EXPAND', 'FUNC', 'SEQ', 'IF', 'ELSEIF', 'ELSE', 'END', 'NONE')
+ops = Enum('BEGIN', 'ERROR', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'NON_EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO', 'FORINNER', 'FORALL', 'PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'SYMMAP', 'EXPAND', 'FUNC', 'SEQ', 'IF', 'ELSEIF', 'ELSE', 'END', 'NONE')
 side = Enum('left', 'right')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
@@ -376,6 +377,8 @@ def createTree(op, node1, node2, op_value=None):
         node = BinaryNode(ops.EQ)
     elif(op == "=="):
         node = BinaryNode(ops.EQ_TST)
+    elif(op == "!="):
+        node = BinaryNode(ops.NON_EQ_TST)
     elif(op == "e("):
         node = BinaryNode(ops.PAIR)
     elif(op == "H("):
@@ -470,6 +473,11 @@ class BinaryNode:
 		self.left = left
 		self.right = right
 
+
+	def __hash__(self):
+		if self.type == ops.ATTR:
+		   return hash(self.attr) % hash_table_size
+
 	def __str__(self):
 		if self == None: return None
 		elif(self.type == ops.ATTR):
@@ -519,6 +527,8 @@ class BinaryNode:
 				return (left + ' := ' + right)
 			elif(self.type == ops.EQ_TST):
 				return (left + ' == ' + right)
+			elif(self.type == ops.NON_EQ_TST):
+				return (left + ' != ' + right)
 			elif(self.type == ops.PAIR):
 				return ('e(' + left + ',' + right + ')')
 			elif(self.type == ops.HASH):
@@ -633,6 +643,8 @@ class BinaryNode:
 				return (left + ' := ' + right)
 			elif(self.type == ops.EQ_TST):
 				return (left + ' == ' + right)
+			elif(self.type == ops.NON_EQ_TST):
+				return (left + ' != ' + right)
 			elif(self.type == ops.PAIR):
 				return ('e(' + left + ',' + right + ')')
 			elif(self.type == ops.HASH):

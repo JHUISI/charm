@@ -113,6 +113,8 @@ END :: for
 SPACES = ' '
 sigIterator = 'z'
 signerIterator = 'y'
+signatureProd = "prod{z := 0,N}"
+signerProd = "prod{y := 0,l}"
 
 def Filter(node):
     return node.sdl_print()
@@ -251,15 +253,6 @@ class SDLBatch:
             if newList != None: 
                 newList.append(delta_word + i)
                 self.defaultBatchTypes[delta_word + i] = delta_type
-#        for i in self.deltaListSecond:
-#            new_var = delta_word + self.getShortForm(i)  
-#            if newList != None: newList.append(new_var) # adding to our list
-#            output += new_var + "#" + loopVar + " := "
-#            line = ""
-#            for k in i:
-#                line += delta_word + k + "#" + loopVar + " * "
-#            line = line[:-2]
-#            output += line + "\n"
             
         if output == "":
             output = delta_stmt % ("#" + loopVar)
@@ -359,8 +352,8 @@ class SDLBatch:
             otherwise, need to figure out which calculation goes in the outer and which one in the inner."""
         # if dict2 has any var references into dict1 or vice versa, then the list that HAS the reference should
         # be in the OUTER LOOP and the variable that IS referenced is in the INNER LOOP
-        outerLoop = {}
-        innerLoop = {}
+        precomputeBeforeDV = {}
+        notPrecomputeBeforeDV = {}
         references = {}
         dotPrefix = "dot"
         dotList1 = list(dict1.keys())
@@ -369,19 +362,45 @@ class SDLBatch:
         for i,j in dict1.items():
             gviq = GetVarsInEq([])
             ASTVisitor(gviq).preorder(j.getRight())
-            references[str(i)] = [x for x in gviq.getVarList() if dotPrefix in x]
+            references[str(i)] = ([x for x in gviq.getVarList() if dotPrefix in x], j.getLeft())
             print(i, ":", j, ", var list: ", references[str(i)])
         print("list over signers:", dotList2)
         for i, j in dict2.items():
             gviq = GetVarsInEq([])
             ASTVisitor(gviq).preorder(j.getRight())
-            references[str(i)] = [x for x in gviq.getVarList() if dotPrefix in x]
+            references[str(i)] = ([x for x in gviq.getVarList() if dotPrefix in x], j.getLeft())
             print(i, ":", j, ", var list: ", references[str(i)])
         
-        for i, j in references.items():
-            print(i, ":", j)
+        listOfDots = list(references.keys())
+        listOfDots.sort()
+        for i in listOfDots:
+            # for each dot value, go through the list of dependencies
+            for k in references[i][0]:
+                if dotPrefix in k:
+                    del references[k]                
+
+        # pruned version
+        print("pruned dot lists")
+        listOfDots = list(references.keys())
+        listOfDots.sort()
+        for i in listOfDots:
+            print(i, ":", references[i][0], ": range:", references[i][1])
+            if str(references[i][1]) == signatureProd and len(references[i][0]) == 0:
+                # means we can precompute this entirely b/c it doesn't have any dependencies
+                precomputeBeforeDV[i] = references[i]
+            elif str(references[i][1]) == signatureProd and len(references[i][0]) > 1:
+                # search list to see if any of the dotValues have the same 'signatureProd' reference[i][1]
+                # if so, then we can precompute as before
+                pass
+            elif str(references[i][1]) == signerProd and len(references[i][0]) == 0:
+                precomputeBeforeDV[i] = references[i]
+            elif str(references[i][1]) == signerProd and len(references[i][0]) > 1: 
+                notPrecomputeBeforeDV[i] = references[i]
+            else:
+                pass
         
-        sys.exit(0)
+        return precomputeBeforeDV, notPrecomputeBeforeDV  
+#        sys.exit(0)
     
     def construct(self):        
         (subProds, subProds1) = self.__computeDotProducts()
@@ -409,14 +428,67 @@ class SDLBatch:
             self.__constructSDLBatchOverSignaturesOnly(VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs)
         elif len(VarsForDotOverSigs) >= 1 and len(VarsForDotOverSign) >= 1:
             # mixed mode between loops over ...
-            self.__searchForDependencies(VarsForDotASTOverSigs, VarsForDotASTOverSign)
-            self.__constructSDLBatchOverSignaturesAndSigners(VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs, 
-                                                             VarsForDotOverSign, VarsForDotTypesOverSign, VarsForDotASTOverSign)
+            refSignatureDict, refSignerDict = self.__searchForDependencies(VarsForDotASTOverSigs, VarsForDotASTOverSign)
+            print("refSignatureDict", refSignatureDict)
+            print("refSignerDict", refSignerDict)
+#            print("refSignatureDict :=> ", list(refSignatureDict.keys()))
+#            print("VarsForDotTypesOverSigs :=> ", VarsForDotTypesOverSigs)
+#            print("VarsForDotASTOverSigs :=> ", VarsForDotASTOverSigs)
+
+            self.__createStatements(list(refSignatureDict.keys()), VarsForDotTypesOverSigs, VarsForDotASTOverSigs, sigIterator)
+            
+            # check if there are dependencies
+            ## self.__createStatements(list(refSignerDict.keys()), VarsForDotTypesOverSign, VarsForDotASTOverSign, signerIterator)
+
+#            self.__constructSDLBatchOverSignaturesAndSigners(VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs, 
+#                                                             VarsForDotOverSign, VarsForDotTypesOverSign, VarsForDotASTOverSign)
         elif len(VarsForDotOverSigs) == 0 and len(VarsForDotOverSign) >= 1:
             print("TODO: this is a new case.")
             sys.exit(0)
         else:
             print("TODO: JAA - what case is this: ", len(VarsForDotOverSigs), len(VarsForDotOverSign))
+    
+    # FINISH THIS
+    def __createStatements(self, VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs, varIterator):
+        dotLoopValTypesSig = {}
+        dotCacheTypesSig = {}
+        dotInitStmtDivConqSig = []
+        divConqLoopValStmtSig = []
+        dotVerifyEq = {}
+        dotCacheCalc = []
+        dotList = []
+        dotCacheVarList = [] # list of variables that appear in dotCache list of precompute section
+        divConqArgList = []
+#        divConqArgList = self.newDeltaList + ["startSigNum", "endSigNum", "incorrectIndices"] # JAA: make variable names more configurable
+        gvi = GetVarsInEq([])
+        
+#        print("Pre-compute over signatures...")
+        for i in VarsForDotOverSigs:
+            print(i,":=", VarsForDotTypesOverSigs[i])
+            loopVal = "%sLoopVal" % i
+            dotCache = "%sCache" % i
+            dotLoopValTypesSig[ loopVal ] = str(VarsForDotTypesOverSigs[i])
+            dotInitStmtDivConqSig.append("%s := init(%s)\n" % (loopVal, VarsForDotTypesOverSigs[i]))
+            divConqLoopValStmtSig.append("%s := %s * %s#%s\n" % (loopVal, loopVal, dotCache, varIterator)) # this is mul specifically
+            dotVerifyEq[str(i)] = loopVal
+            dotCacheTypesSig[dotCache] = "list{%s}" % VarsForDotTypesOverSigs[i]
+            divConqArgList.append(dotCache)
+            dotList.append(str(i))
+            dotCacheRHS = VarsForDotASTOverSigs[i].getRight()
+            ASTVisitor(gvi).preorder(dotCacheRHS)
+            dotCacheVarList.extend(gvi.getVarList())
+            dotCacheVarList = list(set(dotCacheVarList))
+            dotCacheCalc.append("%s#%s := %s\n" % (dotCache, varIterator, self.ReplaceAppropArgs(self.sdlData[BATCH_VERIFY_MAP], varIterator, dotCacheRHS))) # JAA: need to write Filter function
+        
+        self.printList("dotLoopValTypesSig", dotLoopValTypesSig)
+        self.printList("dotCacheTypesSig", dotCacheTypesSig)
+        self.printList("dotInitStmtDivConqSig", dotInitStmtDivConqSig)
+        self.printList("dotVerifyEq", dotVerifyEq)
+        self.printList("dotCacheCalc", dotCacheCalc)
+        self.printList("dotList", dotList)
+        self.printList("dotCacheVarList", dotCacheVarList)
+        self.printList("divConqArgList", divConqArgList)
+        return dotLoopValTypesSig, dotCacheTypesSig, dotInitStmtDivConqSig, divConqLoopValStmtSig, dotVerifyEq, dotCacheCalc, dotList, dotCacheVarList, divConqArgList
     
     def __constructSDLBatchOverSignaturesOnly(self, VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs):
         secparamLine = ""
@@ -501,7 +573,9 @@ class SDLBatch:
     def __constructSDLBatchOverSignaturesAndSigners(self, VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs, VarsForDotOverSign, VarsForDotTypesOverSign, VarsForDotASTOverSign):
         pass
 
-        
-        
-        
+    def printList(self, prefix, theList):
+        print(prefix, "statements...")
+        for i in theList:
+            print("DEBUG: ", i)
+        return
         

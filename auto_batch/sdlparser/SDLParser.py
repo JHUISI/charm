@@ -120,7 +120,7 @@ class SDLParser:
         ExpOp = Literal("^")
         AddOp = Literal("+")
         SubOp = Literal("-")        
-        Equality = Literal("==") # | Word("<>", max=1)
+        Equality = Literal("==") | Literal("!=") # | Word("<>", max=1)
         Assignment =  Literal(":=")
         Pairing = Literal("e(") # Pairing token
         Hash = Literal("H(") # TODO: provide a way to specify arbitrary func. calls
@@ -196,7 +196,7 @@ class SDLParser:
         op = stack.pop()
         if debug >= levels.some:
             print("op: %s" % op)
-        if op in ["+","-","*", "/","^", ":=", "==", "e(", "for{", "forinner{", "do","prod{", "on", "sum{", "of", "|", "and", ";"]:
+        if op in ["+","-","*", "/","^", ":=", "==", "!=", "e(", "for{", "forinner{", "do","prod{", "on", "sum{", "of", "|", "and", ";"]:
             op2 = self.evalStack(stack, line_number)
             op1 = self.evalStack(stack, line_number)
             return createTree(op, op1, op2)

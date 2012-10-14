@@ -597,9 +597,9 @@ class SubstituteSigDotProds:
         return self.cnt
     
     def store(self, key, value, the_type=None):
-        self.dotprod[ 'dict' ][ key ] = value
-        self.dotprod[ 'types' ][ key ] = the_type
-        self.dotprod[ 'list' ].append( key )
+        self.dotprod[ 'dict' ][ str(key) ] = value
+        self.dotprod[ 'types' ][ str(key) ] = the_type
+        self.dotprod[ 'list' ].append( str(key) )
     
     def visit(self, node, data):
         pass
