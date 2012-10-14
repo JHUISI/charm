@@ -80,14 +80,12 @@ Ct := g2 ^ c
 END :: func:keygen
 
 BEGIN :: func:sign
- input := list{g1, mpk, Alist, Blist, Clist, sk, Mlist, l}
- mpk := expand{A0, B0, C0}
+ input := list{g1, Alist, Blist, Clist, sk, Mlist, l}
 
-# s := init(ZR)
-# S := init(G1)
  prod0 := init(G1)
  prod1 := init(G1)
  m := H(M, ZR)
+ 
 BEGIN :: for
 for{y := 0, l-1}
  s#y := random(ZR)
@@ -99,10 +97,9 @@ for{y := 0, l}
  t#y := random(ZR)
 END :: for
 
- prod0 := ((A0 * (B0 ^ m)) * (C0 ^ t#0)) ^ -s#0
+ prod0 := ((Alist#0 * (Blist#0 ^ m)) * (Clist#0 ^ t#0)) ^ -s#0
 BEGIN :: for
 for{y := 1, l-1}
- 
  prod1 := prod1 * ((Alist#y * (Blist#y ^ m#y) * (Clist#y ^ t#y)) ^ -s#y)            
 END :: for
 
