@@ -1,0 +1,140 @@
+name := cyh
+setting := asymmetric
+N := 100
+l := 3
+secparam := 80
+
+BEGIN :: types
+M := str
+ID := str
+L := str
+u := list{ZR}
+h := list{ZR}
+s := int
+pkList := list{G1}
+dotProd := G1
+P := G2
+S := G1
+g := G2
+END :: types
+
+BEGIN :: precompute
+
+END :: precompute
+
+constant := list{}
+public := list{}
+signature := list{}
+message := m
+
+# different messages/sigs under different signers (ring)
+BEGIN :: count
+message_count := N
+public_count := l
+signature_count := N
+END :: count
+
+verify := {e(dotProd, P) == e(S, g)}
+
+BEGIN :: func:setup
+ input := None
+ g := random(G2)
+ alpha := random(ZR)
+ P := g ^ alpha
+ output := list{P, g, alpha}
+END :: func:setup
+
+BEGIN :: func:concat
+ input := ID_List
+ L := init(str)
+ l := len(L)
+BEGIN :: for
+for{y := 0, l}
+ L := (L | ID_List#y)
+END :: for
+output := L
+END :: func:concat
+
+BEGIN :: func:keygen
+ input := list{alpha, ID}
+ sk := H(ID, G1) ^ alpha
+ pk := H(ID, G1)
+ output := list{pk, sk}
+END :: func:keygen
+
+BEGIN :: func:sign
+ input := list{ID, pk, sk, L, M}
+ Lt := concat(L)
+ num_signers := len(L)
+# u := init{ZR}
+# h := init{ZR}
+BEGIN :: for
+for{y := 0, num_signers}
+ u#y := init(ZR)
+ h#y := init(ZR)
+END :: for
+
+BEGIN :: for
+for{i := 0, num_signers}
+BEGIN :: if
+ if { ID != L#i }
+    u#i := random(G1)
+    h#i := H(M | Lt | u#i, ZR)
+ else
+    s := i
+END :: if
+
+ r := random(ZR)
+BEGIN :: for
+for {i := 0, num_signers}
+   pkList#i := H(L#i, G1)
+END :: for
+
+dotProd := init(G1)
+
+BEGIN :: for
+for {i := 0, num_signers}
+BEGIN :: if
+if (ID != L#i)
+   dotProd = dotProd * (u#i * (pk#i ^ h#i))
+END :: if
+END :: for
+
+  u#s := (pk ^ r) * dotProd
+  h#s := H(M | Lt | u#s, ZR)
+  S := sk ^ (h#s + r)
+output := list{u, S}
+END :: func:sign
+
+BEGIN :: func:verify
+input := list{P, g, L, M, u, S}
+ Lt := concat(L)
+ num_signers := len(L)
+
+ h := init{ZR}
+BEGIN :: for
+for{y := 0, num_signers}
+ h#y := H(M | Lt | u#i, ZR)
+END :: for
+
+BEGIN :: for
+for {i := 0, num_signers}
+   pkList#i := H(L#i, G1)
+END :: for
+
+dotProd := init(G1)
+
+BEGIN :: for
+for {i := 0, num_signers}
+   dotProd = dotProd * (u#i * (pk#i ^ h#i))
+END :: for
+
+BEGIN :: if
+if {e(dotProd, P) == e(S, g)}
+   output := True
+else
+   output := False
+END :: if
+END :: func:verify
+
+

@@ -958,6 +958,8 @@ def getVarTypeInfoRecursive(node):
 
     if (node.type == ops.EXP):
         return getVarTypeInfoRecursive(node.left)
+    if (node.type == ops.CONCAT):
+        return getVarTypeInfoRecursive(node.left)
     if ( (node.type == ops.ADD) or (node.type == ops.SUB) or (node.type == ops.MUL) or (node.type == ops.DIV) ):
         leftSideType = getVarTypeInfoRecursive(node.left)
         rightSideType = getVarTypeInfoRecursive(node.right)
