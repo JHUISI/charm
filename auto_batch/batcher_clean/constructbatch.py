@@ -617,15 +617,15 @@ class SDLBatch:
         gvi2 = GetVarsInEq(dotList)
         ASTVisitor(gvi2).preorder(self.finalBatchEq)
         divConqArgList.extend(gvi2.getVarList())
-#        divConqArgList.extend(verifyArgKeys)
-        print("Results over signatures...")
-        num_types = len(dotInitStmtDivConqSig)
-        for i in range(num_types):
-            print(i, ": ", dotInitStmtDivConqSig[i], end='')
 
-        num_types = len(divConqLoopValStmtSig)
-        for i in range(num_types):
-            print(i, ": ", divConqLoopValStmtSig[i], end='')
+#        print("Results over signatures...")
+#        num_types = len(dotInitStmtDivConqSig)
+#        for i in range(num_types):
+#            print(i, ": ", dotInitStmtDivConqSig[i], end='')
+#
+#        num_types = len(divConqLoopValStmtSig)
+#        for i in range(num_types):
+#            print(i, ": ", divConqLoopValStmtSig[i], end='')
 
         eqStr = str(self.finalBatchEq)
         for k,v in dotVerifyEq.items():
@@ -646,10 +646,16 @@ class SDLBatch:
         print("refSignatureDict", refSignatureDict)
         print("refSignerDict", refSignerDict)
 
-        batchVerifyArgList = self.sdlData[BATCH_VERIFY].keys()
+        batchVerifyArgList = list(self.sdlData[BATCH_VERIFY].keys())
         batchVerifyArgTypes = self.sdlData[BATCH_VERIFY]
+        batchVerifyArgList.sort()
         print("batch: ", batchVerifyArgList, batchVerifyArgTypes)
-        membershipTestList, outputLines1 = self.__generateMembershipTest(batchVerifyArgList, batchVerifyArgTypes) 
+        # get the membership list
+        membershipTestList, outputLines1 = self.__generateMembershipTest(batchVerifyArgList, batchVerifyArgTypes)
+        print("membership test ...")
+        print("outputLines: ", outputLines1, end="\n\n")
+        
+         
         dotLoopValTypesSig, dotCacheTypesSig, dotInitStmtDivConqSig, divConqLoopValStmtSig, dotVerifyEq, dotCacheCalc, dotList, dotCacheVarList, _divConqArgList = \
                           self.__createStatements(list(refSignatureDict.keys()), VarsForDotTypesOverSigs, VarsForDotASTOverSigs, sigIterator)
         
@@ -660,16 +666,17 @@ class SDLBatch:
 
         dotList2 = listForSigs[6]
         listForSigner = self.__createStatementsNoCache(list(refSignerDict.keys()), VarsForDotTypesOverSign, VarsForDotASTOverSign, signerIterator, dotList2)
-        sys.exit(0)
 
 #        self.__generateDivideAndConquerMixedMode(dotInitStmtDivConqSig, divConqLoopValStmtSig, eqStr, divConqArgList)
         
         
         divConqArgList = self.newDeltaList + ["startSigNum", "endSigNum", "incorrectIndices"] + _divConqArgList + list(batchVerifyArgList)
 
-        outputLines = self.__generateBatchVerify(batchVerifyArgList, membershipTestList, divConqArgList, dotCacheCalc, dotCacheVarList)
-            
-        print("outputLines: ", outputLines)
+        
+        outputLines2 = self.__generateBatchVerify(batchVerifyArgList, membershipTestList, divConqArgList, dotCacheCalc, dotCacheVarList)
+        print("Batch Verify ....")    
+        print("outputLines: ", outputLines2, end="\n\n")
+        sys.exit(0)
 
     def printList(self, prefix, theList):
         print(prefix, "statements...")

@@ -131,9 +131,9 @@ dotCLoopVal := init(G1)
 BEGIN :: forinner
 forinner{z := startSigNum, endSigNum}
 m := H(Mlist#z, ZR)
-dotALoopVal := dotALoopVal * (Slist#y#z^delta#z)
-dotBLoopVal := dotBLoopVal * (Slist#y#z^(m * delta#z))
-dotCLoopVal := dotCLoopVal * (Slist#y#z^(tlist#y#z * delta#z))
+dotALoopVal := dotALoopVal * (Slist#z#y^delta#z)
+dotBLoopVal := dotBLoopVal * (Slist#z#y^(m * delta#z))
+dotCLoopVal := dotCLoopVal * (Slist#z#y^(tlist#z#y * delta#z))
 END :: forinner
 
 dotELoopVal := dotELoopVal * e(dotALoopVal, Atlist#y) * (e(dotBLoopVal, Btlist#y) * e(dotCLoopVal, Ctlist#y))
