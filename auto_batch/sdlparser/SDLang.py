@@ -815,8 +815,14 @@ class BinaryNode:
 		new_node = BinaryNode(this.type)
 		new_node.negated = this.negated
 		new_node.attr = this.attr
-		new_node.attr_index = this.attr_index
-		new_node.delta_index = this.delta_index
+		if this.attr_index:
+			new_node.attr_index = list(this.attr_index)
+		else:
+			new_node.attr_index = None
+		if this.delta_index:
+			new_node.delta_index = this.delta_index
+		else:
+			new_node.delta_index = this.delta_index
 		if this.type in [ops.LIST, ops.EXPAND]:
 			new_node.listNodes  = this.listNodes
 		# recursively call copy on left 

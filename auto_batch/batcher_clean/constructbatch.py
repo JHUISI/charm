@@ -33,7 +33,18 @@ BEGIN :: for
 for{%s := startSigNum, endSigNum}\n"""
 # dotALoopVal := dotALoopVal * dotACache#z
 # dotBLoopVal := dotBLoopVal * dotBCache#z
-end_for_loop = """END :: for"""
+
+dc_for_begin = """
+BEGIN :: for
+for{%s := %s, %s}\n"""
+end_for_loop = "END :: for"
+
+
+dc_for_inner_begin = """
+BEGIN :: forinner
+forinner{%s := %s, %s}\n"""
+
+end_for_inner_loop = "END :: forinner"
 
 dc_batch_verify_check = """
 BEGIN :: if
@@ -225,6 +236,29 @@ class SDLBatch:
             print("Divide and Conquer: ")
             print(output)
         return output
+
+    def __generateDivideAndConquerFlexible(self, eqStr, divConqArgList, divAndConqBodyFunction, *args):
+        """think about how to make this more flexible"""
+        divConqArgs = str(divConqArgList).replace("[", '').replace("]",'').replace("'", '')
+        output = ""
+        output += dc_header % divConqArgs
+        
+        output += divAndConqBodyFunction(output, *args)        
+        # add the verification check(s)
+        if type(eqStr) == str:
+            output += dc_batch_verify_check % eqStr
+            output += dc_recursive_call % (divConqArgs.replace("endSigNum", "midway"), divConqArgs.replace("startSigNum", "midSigNum"))
+        elif type(eqStr) == list:
+            pass
+        else:
+            pass
+        
+        output += dc_footer
+        if self.debug:
+            print("Divide and Conquer...")
+            print(output)
+        return output
+
     
     def __isVarDepsAllConstants(self, node_tree):
         constList = self.sdlData.get(CONST)
@@ -482,22 +516,18 @@ class SDLBatch:
             print("TODO: JAA - what case is this: ", len(VarsForDotOverSigs), len(VarsForDotOverSign))
     
     # FINISH THIS
-    def __createStatements(self, VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs, varIterator, dotList2=None):
+    def __createStatements(self, VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs, varIterator, combineLoopAndCacheStmt=False):
         dotLoopValTypesSig = {}
         dotCacheTypesSig = {}
         dotInitStmtDivConqSig = []
         divConqLoopValStmtSig = []
         dotVerifyEq = {}
         dotCacheCalc = []
-        if dotList2:
-            dotList = dotList2
-            print("dotList: ", dotList)
-        else:
-            dotList = []
+        dotList = []
         dotCacheVarList = [] # list of variables that appear in dotCache list of precompute section
         divConqArgList = []
 #        divConqArgList = self.newDeltaList + ["startSigNum", "endSigNum", "incorrectIndices"] # JAA: make variable names more configurable
-        gvi = GetVarsInEq(dotList)
+        gvi = GetVarsInEq([])
         
 #        print("Pre-compute over signatures...")
         for i in VarsForDotOverSigs:
@@ -506,16 +536,20 @@ class SDLBatch:
             dotCache = "%sCache" % i
             dotLoopValTypesSig[ loopVal ] = str(VarsForDotTypesOverSigs[i])
             dotInitStmtDivConqSig.append("%s := init(%s)\n" % (loopVal, VarsForDotTypesOverSigs[i]))
-            divConqLoopValStmtSig.append("%s := %s * %s#%s\n" % (loopVal, loopVal, dotCache, varIterator)) # this is mul specifically
             dotVerifyEq[str(i)] = loopVal
-            dotCacheTypesSig[dotCache] = "list{%s}" % VarsForDotTypesOverSigs[i]
-            divConqArgList.append(dotCache)
             dotList.append(str(i))
             dotCacheRHS = VarsForDotASTOverSigs[i].getRight()
             ASTVisitor(gvi).preorder(dotCacheRHS)
             dotCacheVarList.extend(gvi.getVarList())
-            dotCacheVarList = list(set(dotCacheVarList))
-            dotCacheCalc.append("%s#%s := %s\n" % (dotCache, varIterator, self.ReplaceAppropArgs(self.sdlData[BATCH_VERIFY_MAP], varIterator, dotCacheRHS))) # JAA: need to write Filter function
+            dotCacheVarList = list(set(dotCacheVarList))            
+            if combineLoopAndCacheStmt:
+                compStmt = self.ReplaceAppropArgs(self.sdlData[BATCH_VERIFY_MAP], varIterator, dotCacheRHS)
+                divConqLoopValStmtSig.append("%s := %s * %s\n" % (loopVal, loopVal, compStmt)) # this is mul specifically
+            else:
+                divConqLoopValStmtSig.append("%s := %s * %s#%s\n" % (loopVal, loopVal, dotCache, varIterator)) # this is mul specifically
+                dotCacheTypesSig[dotCache] = "list{%s}" % VarsForDotTypesOverSigs[i]
+                divConqArgList.append(dotCache)
+                dotCacheCalc.append("%s#%s := %s\n" % (dotCache, varIterator, self.ReplaceAppropArgs(self.sdlData[BATCH_VERIFY_MAP], varIterator, dotCacheRHS))) # JAA: need to write Filter function
         
         self.printList("0: dotLoopValTypesSig", dotLoopValTypesSig)
         self.printList("1: dotCacheTypesSig", dotCacheTypesSig)
@@ -642,9 +676,11 @@ class SDLBatch:
         return
 
     def __constructSDLBatchOverSignaturesAndSigners(self, VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs, VarsForDotOverSign, VarsForDotTypesOverSign, VarsForDotASTOverSign):
+        global secparamLine
+        if self.sdlData[SECPARAM] == None: secparamLine = "secparam := 80\n" # means NOT already defined in SDL
         refSignatureDict, refSignerDict = self.__searchForDependencies(VarsForDotASTOverSigs, VarsForDotASTOverSign)
-        print("refSignatureDict", refSignatureDict)
-        print("refSignerDict", refSignerDict)
+#        print("refSignatureDict", refSignatureDict)
+#        print("refSignerDict", refSignerDict)
 
         batchVerifyArgList = list(self.sdlData[BATCH_VERIFY].keys())
         batchVerifyArgTypes = self.sdlData[BATCH_VERIFY]
@@ -654,29 +690,76 @@ class SDLBatch:
         membershipTestList, outputLines1 = self.__generateMembershipTest(batchVerifyArgList, batchVerifyArgTypes)
         print("membership test ...")
         print("outputLines: ", outputLines1, end="\n\n")
-        
+        finalEqDotMap = {}
          
         dotLoopValTypesSig, dotCacheTypesSig, dotInitStmtDivConqSig, divConqLoopValStmtSig, dotVerifyEq, dotCacheCalc, dotList, dotCacheVarList, _divConqArgList = \
-                          self.__createStatements(list(refSignatureDict.keys()), VarsForDotTypesOverSigs, VarsForDotASTOverSigs, sigIterator)
-        
+                          self.__createStatements(list(refSignatureDict.keys()), VarsForDotTypesOverSigs, VarsForDotASTOverSigs, sigIterator)        
+        finalEqDotMap.update(dotVerifyEq)
+                          
         for i in list(refSignerDict.keys()):
             if len(refSignerDict[i][0]) > 0 and str(refSignerDict[i][1]) == signerProd:
                 print("\n\n\n")
-                listForSigs = self.__createStatements(refSignerDict[i][0], VarsForDotTypesOverSigs, VarsForDotASTOverSigs, sigIterator)
+                listForSigs = self.__createStatements(refSignerDict[i][0], VarsForDotTypesOverSigs, VarsForDotASTOverSigs, sigIterator, combineLoopAndCacheStmt=True)
+                finalEqDotMap.update(listForSigs[4])
 
         dotList2 = listForSigs[6]
         listForSigner = self.__createStatementsNoCache(list(refSignerDict.keys()), VarsForDotTypesOverSign, VarsForDotASTOverSign, signerIterator, dotList2)
-
-#        self.__generateDivideAndConquerMixedMode(dotInitStmtDivConqSig, divConqLoopValStmtSig, eqStr, divConqArgList)
-        
-        
+        finalEqDotMap.update(listForSigner[4])
         divConqArgList = self.newDeltaList + ["startSigNum", "endSigNum", "incorrectIndices"] + _divConqArgList + list(batchVerifyArgList)
-
         
-        outputLines2 = self.__generateBatchVerify(batchVerifyArgList, membershipTestList, divConqArgList, dotCacheCalc, dotCacheVarList)
-        print("Batch Verify ....")    
-        print("outputLines: ", outputLines2, end="\n\n")
-        sys.exit(0)
+        eqStr = str(self.finalBatchEq)
+        for k,v in finalEqDotMap.items():
+            eqStr = eqStr.replace(k, v)
+        statementForSig = (dotInitStmtDivConqSig, divConqLoopValStmtSig, False)
+        statementForSubSig = (listForSigs[2], listForSigs[3], False)
+        statementForSigner = (listForSigner[2], listForSigner[3], True, signatureProd, statementForSubSig)
+        
+        outputLines2 = self.__generateDivideAndConquerFlexible(eqStr, divConqArgList, self.callBackForDVSignerThenSignature, statementForSig, statementForSigner)
+        
+        outputLines3 = self.__generateBatchVerify(batchVerifyArgList, membershipTestList, divConqArgList, dotCacheCalc, dotCacheVarList)
+        output = secparamLine + outputLines1 + outputLines2 + outputLines3
+        
+        dotLoopValTypesSig.update(listForSigs[0])
+        dotCacheTypesSig.update(listForSigs[1])
+        dotLoopValTypesSig.update(listForSigner[0])
+        dotCacheTypesSig.update(listForSigner[1])
+
+        typeOutputLines = self.__generateTypes(dotLoopValTypesSig, dotCacheTypesSig, batchVerifyArgTypes)
+        self.printList("New type section", typeOutputLines)
+        self.__generateNewSDL(typeOutputLines, output)
+
+
+    def callBackForDVSignerThenSignature(self, output, statementForSig, statementForSigner):
+        my_output = ""
+        dotInitStmtDivConqSig, divConqLoopValStmtSig = statementForSig[0], statementForSig[1]
+        for l in dotInitStmtDivConqSig:
+            my_output += l
+        my_output += dc_for_begin % (sigIterator, "startSigNum", "endSigNum")
+        for l in divConqLoopValStmtSig:
+            my_output += l
+        my_output += end_for_loop + "\n\n"
+        
+        dotInitStmtDivConqSign, divConqLoopValStmtSign = statementForSigner[0], statementForSigner[1]
+        for l in dotInitStmtDivConqSign:
+            my_output += l
+        my_output += dc_for_begin % (signerIterator, "0", "l")
+        if statementForSigner[2] == True and statementForSigner[3] == signatureProd:
+            # need to add sub stuff
+            dotInitStmtDivConqSig, divConqLoopValStmtSig = statementForSigner[4][0], statementForSigner[4][1]
+            for l in dotInitStmtDivConqSig:
+                my_output += l
+            my_output += dc_for_inner_begin % (sigIterator, "startSigNum", "endSigNum")
+            for l in divConqLoopValStmtSig:
+                my_output += l
+            my_output += end_for_inner_loop + "\n"            
+            
+        for l in divConqLoopValStmtSign:
+            my_output += l
+        my_output += end_for_loop
+#        print("<==== Div and Conq BODY ====>\n")
+#        print(my_output)
+#        print("<==== Div and Conq BODY ====>\n")        
+        return my_output
 
     def printList(self, prefix, theList):
         print(prefix, "statements...")

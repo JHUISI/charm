@@ -120,7 +120,14 @@ END :: func:membership
 BEGIN :: func:dividenconquer
  input := list{delta, startSigNum, endSigNum, incorrectIndices, dotDCache, Mlist, Atlist, Btlist, Ctlist, tlist, Slist}
 
-# if cannot be precomputed before DV, then it shouldn't be passed in to the DV call. 
+# if cannot be precomputed before DV, then it shouldn't be passed in to the DV call.
+# START BODY 
+dotDLoopVal := init(GT)
+BEGIN :: for
+for{z := startSigNum, endSigNum}
+dotDLoopVal := dotDLoopVal * dotDCache#z
+END :: for
+
 dotELoopVal := init(GT)
 BEGIN :: for
 for{y := 0, l}
@@ -138,12 +145,7 @@ END :: forinner
 
 dotELoopVal := dotELoopVal * e(dotALoopVal, Atlist#y) * (e(dotBLoopVal, Btlist#y) * e(dotCLoopVal, Ctlist#y))
 END :: for
-
-dotDLoopVal := init(GT)
-BEGIN :: for
-for{z := startSigNum, endSigNum}
-dotDLoopVal := dotDLoopVal * dotDCache#z
-END :: for
+# END BODY
 
 BEGIN :: if
  if { dotELoopVal == dotDLoopVal }

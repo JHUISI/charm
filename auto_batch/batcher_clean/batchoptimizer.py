@@ -791,8 +791,9 @@ class SubstituteAttr:
             node.setAttribute(self.variable_map[varName], clearAttrIndex=False)
         if self.constants: # if variable is a constant, then no need adding the loopVar index since it is always the same value.
             if varName in self.constants: return
-        if self.loopVar:
+        if self.loopVar:            
             node.setAttrIndex(self.loopVar)
+            node.attr_index.reverse()
 
 
 class DropIndexForPrecomputes:

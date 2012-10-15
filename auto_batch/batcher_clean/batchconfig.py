@@ -72,7 +72,7 @@ class SDLSetting():
                         self.data[BATCH_VERIFY][k] = self.varTypes[k]
                     else:
                         # change type into a list
-                        self.setTypeString(k, self.varTypes[k])# "list{%s}" % self.varTypes[k]  # it is variable
+                        self.setTypeString(k, self.varTypes[k]) # "list{%s}" % self.varTypes[k]  # it is variable
 #                        self.data[BATCH_VERIFY][k + "list"]
 #                        self.data[BATCH_VERIFY_MAP][k] = k + "list"
 #                print("batchverify input types: ", self.data[BATCH_VERIFY], "\n", self.data[BATCH_VERIFY].items()) 
@@ -98,9 +98,11 @@ class SDLSetting():
         
         
         if newTypeTmp != "":
-            self.data[BATCH_VERIFY_OTHER_TYPES][k + "_link"] = newTypeTmp
-            self.data[BATCH_VERIFY][k + "list"] = newType % (k + "_link")
+            self.data[BATCH_VERIFY][k + "list"] = newTypeTmp
             self.data[BATCH_VERIFY_MAP][k] = k + "list"
+#            self.data[BATCH_VERIFY_OTHER_TYPES][k + "_link"] = newTypeTmp
+#            self.data[BATCH_VERIFY][k + "list"] = newType % (k + "_link")
+#            self.data[BATCH_VERIFY_MAP][k] = k + "list"
         else:
             self.data[BATCH_VERIFY][k + "list"] = newType % typeVar
             self.data[BATCH_VERIFY_MAP][k] = k + "list"
