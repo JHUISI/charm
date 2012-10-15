@@ -13,27 +13,29 @@ m := ZR
 A := G1
 B := G1
 C := G1
-At := G2
-Bt := G2
-Ct := G2
+Atlist := G2
+Btlist := G2
+Ctlist := G2
 Alist := list{G1}
 Blist := list{G1}
 Clist := list{G1}
-Atlist := list{G2}
-Btlist := list{G2}
-Ctlist := list{G2} 
 D := GT
 s := list{ZR}
 S := G1
 t := list{ZR}
 END :: types
 
+#Atlist := list{G2}
+#Btlist := list{G2}
+#Ctlist := list{G2} 
+
+
 BEGIN :: precompute
 D := e(g1, g2)
 END :: precompute
 
-constant := list{At, Bt, Ct, g1, g2}
-public := list{At, Bt, Ct}
+constant := list{Atlist, Btlist, Ctlist, g1, g2}
+public := list{Atlist, Btlist, Ctlist}
 signature := list{S, t}
 message := m
 
@@ -44,7 +46,10 @@ public_count := l
 signature_count := N
 END :: count
 
-verify :=  {{ prod{y:=0, l} on e(S_y, At_y * (Bt_y^m_y) * (Ct_y^t_y)) } == D}
+# m could be a list of messages over l
+#verify :=  {{ prod{y:=0, l} on e(S_y, Atlist_y * (Btlist_y^m_y) * (Ctlist_y^t_y)) } == D}
+verify :=  {{ prod{y:=0, l} on e(S_y, Atlist_y * (Btlist_y^m) * (Ctlist_y^t_y)) } == D}
+
 
 BEGIN :: func:setup
  input := None
@@ -80,7 +85,7 @@ Ct := g2 ^ c
 END :: func:keygen
 
 BEGIN :: func:sign
- input := list{g1, Alist, Blist, Clist, sk, Mlist, l}
+ input := list{g1, Alist, Blist, Clist, sk, Mlist}
 
  prod0 := init(G1)
  prod1 := init(G1)
@@ -112,7 +117,7 @@ END :: func:sign
 
 
 BEGIN :: func:verify
- input := list{g1, g2, Atlist, Btlist, Ctlist, M, S, t, l}  
+ input := list{g1, g2, Atlist, Btlist, Ctlist, M, S, t}  
   D := e(g1, g2)
   result := init(GT)
   m := H(M, ZR) 

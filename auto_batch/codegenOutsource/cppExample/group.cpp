@@ -730,6 +730,12 @@ G1& CharmListG1::operator[](const int index)
 	}
 }
 
+CharmListG1& CharmListG1::operator=(const CharmListG1 & newList)
+{
+    list = newList.list;
+    return *this;
+}
+
 int CharmListG1::length()
 {
 	return (int) list.size();

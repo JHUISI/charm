@@ -169,7 +169,8 @@ public:
 
 	// retrieve a particular index
 	G1& operator[](const int index);
-    friend ostream& operator<<(ostream&, const CharmListG1&);
+	CharmListG1& operator=(const CharmListG1&);
+        friend ostream& operator<<(ostream&, const CharmListG1&);
 private:
 	int cur_index;
 	map<int, G1> list;
