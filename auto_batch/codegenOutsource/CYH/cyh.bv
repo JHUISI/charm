@@ -8,7 +8,7 @@ BEGIN :: types
 M := str
 ID := str
 L := str
-u := list{ZR}
+u := list{G1}
 h := list{ZR}
 s := int
 pkList := list{G1}
@@ -66,13 +66,6 @@ BEGIN :: func:sign
  input := list{ID, pk, sk, L, M}
  Lt := concat(L)
  num_signers := len(L)
-# u := init{ZR}
-# h := init{ZR}
-BEGIN :: for
-for{y := 0, num_signers}
- u#y := init(ZR)
- h#y := init(ZR)
-END :: for
 
 BEGIN :: for
 for{i := 0, num_signers}
@@ -83,25 +76,26 @@ BEGIN :: if
  else
     s := i
 END :: if
+END :: for
 
  r := random(ZR)
 BEGIN :: for
-for {i := 0, num_signers}
+for{i := 0, num_signers}
    pkList#i := H(L#i, G1)
 END :: for
 
 dotProd := init(G1)
 
 BEGIN :: for
-for {i := 0, num_signers}
+for{i := 0, num_signers}
 BEGIN :: if
-if (ID != L#i)
-   dotProd = dotProd * (u#i * (pk#i ^ h#i))
+if {ID != L#i}
+   dotProd := dotProd * (u#i * (pk#i ^ h#i))
 END :: if
 END :: for
 
-  u#s := (pk ^ r) * dotProd
-  h#s := H(M | Lt | u#s, ZR)
+  u#s? := (pk ^ r) * dotProd
+  h#s? := H(M | Lt | u#s, ZR)
   S := sk ^ (h#s + r)
 output := list{u, S}
 END :: func:sign
@@ -111,22 +105,22 @@ input := list{P, g, L, M, u, S}
  Lt := concat(L)
  num_signers := len(L)
 
- h := init{ZR}
+ h := init(ZR)
 BEGIN :: for
 for{y := 0, num_signers}
  h#y := H(M | Lt | u#i, ZR)
 END :: for
 
 BEGIN :: for
-for {i := 0, num_signers}
+for{i := 0, num_signers}
    pkList#i := H(L#i, G1)
 END :: for
 
 dotProd := init(G1)
 
 BEGIN :: for
-for {i := 0, num_signers}
-   dotProd = dotProd * (u#i * (pk#i ^ h#i))
+for{i := 0, num_signers}
+   dotProd := dotProd * (u#i * (pk#i ^ h#i))
 END :: for
 
 BEGIN :: if

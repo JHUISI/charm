@@ -636,6 +636,8 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
         leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
         rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
         return "( (" + leftSide + ") == (" + rightSide + ") )"
+    #elif (node.type == ops.NON_EQ_TST):
+        #leftSide = 
     elif ( (node.type == ops.LIST) ): #or ( (node.type == ops.EXPAND) and (variableType == types.list) ) ):
         if (variableName == None):
             sys.exit("getAssignStmtAsString_CPP in codegen.py:  encountered node of type ops.LIST, but variableName parameter passed in is of type None.")
@@ -774,6 +776,13 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
         leftString = getAssignStmtAsString(node.left, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
         rightString = getAssignStmtAsString(node.right, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
         return "( (" + leftString + ") == (" + rightString + ") )"
+
+    elif (node.type == ops.NON_EQ_TST):
+        leftString = getAssignStmtAsString(node.left, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
+        rightString = getAssignStmtAsString(node.right, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
+        return "( (" + leftString + ") != (" + rightString + ") )"
+
+
     elif (node.type == ops.CONCAT):
         leftString = getAssignStmtAsString(node.left, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
         rightString = getAssignStmtAsString(node.right, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
