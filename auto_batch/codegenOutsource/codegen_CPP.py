@@ -798,6 +798,17 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
         elif (rightSide == "True"):
             rightSide = "true"
         return "( (" + leftSide + ") == (" + rightSide + ") )"
+
+    elif (node.type == ops.NON_EQ_TST):
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
+        if (rightSide == "False"):
+            rightSide = "false"
+        elif (rightSide == "True"):
+            rightSide = "true"
+        return "( (" + leftSide + ") != (" + rightSide + ") )"
+
+
     elif ( (node.type == ops.LIST) ): #or ( (node.type == ops.EXPAND) and (variableType == types.list) ) ):
         if (variableName == None):
             sys.exit("getAssignStmtAsString_CPP in codegen.py:  encountered node of type ops.LIST, but variableName parameter passed in is of type None.")

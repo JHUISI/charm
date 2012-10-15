@@ -59,13 +59,13 @@ END :: count
 verify :=  {{ prod{y:=0, l} on e(S_y, At_y * (Bt_y^m_y) * (Ct_y^t_y)) } == D}
 
 BEGIN :: func:verify
- input := list{At, Bt, Ct, M, S, g1, g2}  
+ input := list{At, Bt, Ct, M, S, t, g1, g2}  
   D := e(g1, g2)
   m := H(M, ZR) 
   result := init(GT)
 BEGIN :: for
 for{y := 0, l}
- result := result * e(S#y, At#y * (Bt#y^m#y) * (Ct#y^t#y))
+ result := result * e(S#y, At#y * (Bt#y^m) * (Ct#y^t#y))
 END :: for  
 
 BEGIN :: if
@@ -117,12 +117,12 @@ END :: func:membership
 
 
 BEGIN :: func:dividenconquer
- input := list{delta, startSigNum, endSigNum, incorrectIndices, D, dotDCache, Atlist, Btlist, Ctlist, tlist, Slistlist}
+ input := list{delta, startSigNum, endSigNum, incorrectIndices, D, dotDCache, Atlist, Btlist, Ctlist, tlist, Slist}
 
 # if cannot be precomputed before DV, then it shouldn't be passed in to the DV call. 
 dotELoopVal := init(GT)
 BEGIN :: for
-for {y := 0, l}
+for{y := 0, l}
 dotALoopVal := init(G1)
 dotBLoopVal := init(G1)
 dotCLoopVal := init(G1)
@@ -135,7 +135,7 @@ dotBLoopVal := dotBLoopVal * (Slistlist#y#z^(m * delta#z))
 dotCLoopVal := dotCLoopVal * (Slistlist#y#z^(tlist#y#z * delta#z))
 END :: forinner
 
-dotELoopVal := dotELoopVal * e(dotALoopVal, Atlist#y) * (e(dotBLoopVal, Btlist#y) * e(dotCLoopVal, Ctlist#y)
+dotELoopVal := dotELoopVal * e(dotALoopVal, Atlist#y) * (e(dotBLoopVal, Btlist#y) * e(dotCLoopVal, Ctlist#y))
 END :: for
 
 dotDLoopVal := init(GT)
@@ -185,7 +185,7 @@ BEGIN :: for
 for{z := 0, N}
  dotDCache#z := (D^delta#z)
 END :: for
- dividenconquer(delta, 0, N, incorrectIndices, dotDCache, Mlist, Slist, Atlist, Btlist, Ctlist, )
+ dividenconquer(delta, 0, N, incorrectIndices, dotDCache, Mlist, Slist, Atlist, Btlist, Ctlist, tlist, Slistlist)
 
  output := incorrectIndices
 END ::func:batchverify
