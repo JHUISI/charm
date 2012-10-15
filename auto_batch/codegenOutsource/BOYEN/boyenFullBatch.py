@@ -57,13 +57,13 @@ def keygen(g1, g2):
     output = (pk, sk)
     return output
 
-def sign(g1, Alist, Blist, Clist, sk, M, l):
+def sign(g1, Alist, Blist, Clist, sk, M):
 
     S = {}
     s = {}
     t = {}
 
-    input = [g1, Alist, Blist, Clist, sk, M, l]
+    input = [g1, Alist, Blist, Clist, sk, M]
     a, b, c = sk
     prod0 = 1
     prod1 = 1
@@ -83,6 +83,7 @@ def sign(g1, Alist, Blist, Clist, sk, M, l):
     d = ((a + (b * m)) + (c * t[l-1]))
     S[l-1] = ((g1 * prod0) ** (1 / d))
     print("S[%s] :=> %s" % (l-1, S[l-1]))
+    print("\n\n\n")
     output = (S, t)
     return output
 
@@ -175,7 +176,7 @@ def SmallExp(bits=80):
 
 def main():
     global group
-    group = PairingGroup(secparam)
+    group = PairingGroup("MNT224")
 
     (mpk, g1, g2) = setup()
     #mpk = [A0, B0, C0, At0, Bt0, Ct0]
@@ -183,27 +184,29 @@ def main():
     # l = 2 so need two keys
     # pk = [A, B, C, At, Bt, Ct]
     (pk0, sk0) = keygen(g1, g2)
+    (pk1, sk1) = keygen(g1, g2)
     print("pk0 :=>", pk0)
     print("sk0 :=>", sk0)
-    (pk1, sk1) = keygen(g1, g2)
+    #print("pk1 :=>", pk1)
+    #print("sk1 :=>", sk1)
 
     M = "this is my message."
-    M2 = "test"
+    M2 = "this is my message."
     Mlist = [M, M2]
     Alist = {} 
     Blist = {}
     Clist = {}
     Alist[0] = mpk[0]
-    Alist[1] = pk0[0]
-    Alist[2] = pk1[0]
+    Alist[1] = pk1[0]
+    Alist[2] = pk0[0]
 
     Blist[0] = mpk[1]
-    Blist[1] = pk0[1]
-    Blist[2] = pk1[1]
+    Blist[1] = pk1[1]
+    Blist[2] = pk0[1]
     
     Clist[0] = mpk[2]
-    Clist[1] = pk0[2]
-    Clist[2] = pk1[2]
+    Clist[1] = pk1[2]
+    Clist[2] = pk0[2]
 
     Alist2 = {}
     Blist2 = {}
@@ -221,8 +224,8 @@ def main():
     Clist2[1] = pk1[2]
     Clist2[2] = pk0[2]
 
-    (S0, t0) = sign(g1, Alist, Blist, Clist, sk1, M, l)
-    (S1, t1) = sign(g1, Alist2, Blist2, Clist2, sk0, M2, l)
+    (S0, t0) = sign(g1, Alist, Blist, Clist, sk0, M)
+    (S1, t1) = sign(g1, Alist, Blist, Clist, sk0, M2)
 
     Atlist = {}
     Btlist = {}
@@ -241,7 +244,7 @@ def main():
     Ctlist[2] = pk1[5]
 
     assert verify(Atlist, Btlist, Ctlist, M, S0, t0, g1, g2), "failed verification!!"
-    assert verify(Atlist, Btlist, Ctlist, M2, S1, t1, g1, g2), "failed verification!!"
+    assert verify(Atlist, Btlist, Ctlist, M2, S1, t1, g1, g2), "failed verification 2!!"
     print("Successful Verification")
 
     #batchverify(Mlist, Slist, tlist, g2, g1, Btlist, Atlist, Ctlist, incorrectIndices)

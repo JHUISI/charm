@@ -59,14 +59,84 @@ END :: count
 
 verify :=  {{ prod{y:=0, l} on e(S_y, At_y * (Bt_y^m_y) * (Ct_y^t_y)) } == D}
 
+BEGIN :: func:setup
+ input := None
+g1 := random(G1) 
+g2 := random(G2)
+ a0 := random(ZR)
+ b0 := random(ZR)
+ c0 := random(ZR)
+ A0 := g1 ^ a0
+ B0 := g1 ^ b0
+ C0 := g1 ^ c0
+ At0 := g2 ^ a0
+ Bt0 := g2 ^ b0
+ Ct0 := g2 ^ c0
+ mpk := list{A0, B0, C0, At0, Bt0, Ct0}
+ output := list{mpk, g1, g2}
+END :: func:setup
+
+BEGIN :: func:keygen
+ input := list{g1, g2}
+a := random(ZR)
+b := random(ZR)
+c := random(ZR)
+A := g1 ^ a
+At := g2 ^ a 
+B := g1 ^ b
+Bt := g2 ^ b
+C := g1 ^ c
+Ct := g2 ^ c
+ sk := list{a, b, c}
+ pk := list{A, B, C, At, Bt, Ct} 
+ output := list{pk, sk}
+END :: func:keygen
+
+BEGIN :: func:sign
+ input := list{g1, Alist, Blist, Clist, sk, Mlist, index}
+
+ prod0 := init(G1)
+ prod1 := init(G1)
+ m := H(M, ZR)
+ 
+BEGIN :: for
+for{y := 0, l}
+BEGIN :: if
+if{ y != index}
+ s#y := random(ZR)
+ S#y := g1 ^ s#y
+END :: if
+END :: for
+
+BEGIN :: for
+for{y := 0, l}
+ t#y := random(ZR)
+END :: for
+
+ prod0 := ((Alist#0 * (Blist#0 ^ m)) * (Clist#0 ^ t#0)) ^ -s#0
+BEGIN :: for
+for{y := 1, l}
+BEGIN :: if
+if{ y != index}
+ prod1 := prod1 * ((Alist#y * (Blist#y ^ m#y) * (Clist#y ^ t#y)) ^ -s#y)
+END :: if
+END :: for
+
+ result := prod0 * prod1
+ d := ((a + (b * m)) + (c * t#index))
+ S#index := (g1 * result) ^ (1 / d)
+
+ output := list{S, t}
+END :: func:sign
+
 BEGIN :: func:verify
- input := list{At, Bt, Ct, M, S, t, g1, g2}  
+ input := list{Atlist, Btlist, Ctlist, M, S, t, g1, g2}  
   D := e(g1, g2)
   m := H(M, ZR) 
   result := init(GT)
 BEGIN :: for
 for{y := 0, l}
- result := result * e(S#y, At#y * (Bt#y^m) * (Ct#y^t#y))
+ result := result * e(S#y, Atlist#y * (Btlist#y^m) * (Ctlist#y^t#y))
 END :: for  
 
 BEGIN :: if

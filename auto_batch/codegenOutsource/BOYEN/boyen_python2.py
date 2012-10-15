@@ -53,32 +53,34 @@ def keygen(g1, g2):
     output = (pk, sk)
     return output
 
-def sign(g1, Alist, Blist, Clist, sk, M, l):
+def sign(g1, Alist, Blist, Clist, sk, M, index):
 
     S = {}
     s = {}
     t = {}
 
-    input = [g1, Alist, Blist, Clist, sk, M, l]
+    input = [g1, Alist, Blist, Clist, sk, M]
     a, b, c = sk
     prod0 = 1
     prod1 = 1
     m = group.hash(M, ZR)
-    for y in range(0, l-1):
-        s[y] = group.random(ZR)
-        S[y] = (g1 ** s[y])
-        print("S[%s] :=> %s" % (y, S[y]))
+    for y in range(0, l):
+        if y != index:
+           s[y] = group.random(ZR)
+           S[y] = (g1 ** s[y])
+           print("S[%s] :=> %s" % (y, S[y]))
     for y in range(0, l):
         t[y] = group.random(ZR)
         print("t[%s] = %s" % (y, t[y])) 
     prod0 = (((Alist[0] * (Blist[0] ** m)) * (Clist[0] ** t[0])) ** -s[0])
-    for y in range(1, l-1):
-        print("sign loop: ", y)
-        prod0 *= (((Alist[y] * ((Blist[y] ** m) * (Clist[y] ** t[y]))) ** -s[y]))
+    for y in range(1, l):
+        if y != index:
+           print("sign loop: ", y)
+           prod0 *= (((Alist[y] * ((Blist[y] ** m) * (Clist[y] ** t[y]))) ** -s[y]))
     #result = (prod0 * prod1)
-    d = ((a + (b * m)) + (c * t[l-1]))
-    S[l-1] = ((g1 * prod0) ** (1 / d))
-    print("S[%s] :=> %s" % (l-1, S[l-1]))
+    d = ((a + (b * m)) + (c * t[index]))
+    S[index] = ((g1 * prod0) ** (1 / d))
+    print("S[%s] :=> %s" % (index, S[index]))
     output = (S, t)
     return output
 
@@ -102,7 +104,7 @@ def SmallExp(bits=80):
 
 def main():
     global group
-    group = PairingGroup(secparam)
+    group = PairingGroup("MNT224")
 
     (mpk, g1, g2) = setup()
     #mpk = [A0, B0, C0, At0, Bt0, Ct0]
@@ -130,7 +132,10 @@ def main():
     Clist[1] = pk0[2]
     Clist[2] = pk1[2]
 
-    (S, t) = sign(g1, Alist, Blist, Clist, sk1, M, l)
+    my_index = 1
+    (S0, t0) = sign(g1, Alist, Blist, Clist, sk0, M, my_index)
+    my_index = l-1
+    (S1, t1) = sign(g1, Alist, Blist, Clist, sk1, M, my_index)
 
     Atlist = {}
     Btlist = {}
@@ -148,7 +153,8 @@ def main():
     Ctlist[1] = pk0[5]
     Ctlist[2] = pk1[5]
 
-    assert verify(g1, g2, Atlist, Btlist, Ctlist, M, S, t, l), "failed verification!!"
+    assert verify(g1, g2, Atlist, Btlist, Ctlist, M, S0, t0, l), "failed verification!!"
+    assert verify(g1, g2, Atlist, Btlist, Ctlist, M, S1, t1, l), "failed verification!!"
     print("Successful Verification")
 
     

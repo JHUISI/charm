@@ -598,15 +598,15 @@ class SDLBatch:
 #            dotCacheVarList = list(set(dotCacheVarList))
 #            dotCacheCalc.append("%s#%s := %s\n" % (dotCache, varIterator, self.ReplaceAppropArgs(self.sdlData[BATCH_VERIFY_MAP], varIterator, dotCacheRHS))) # JAA: need to write Filter function
         
-        self.printList("0: dotLoopValTypesSig", dotLoopValTypesSig)
-        self.printList("1: dotCacheTypesSig", dotCacheTypesSig)
-        self.printList("2: dotInitStmtDivConqSig", dotInitStmtDivConqSig)
-        self.printList("3: divConqLoopValStmtSig", divConqLoopValStmtSig)
-        self.printList("4: dotVerifyEq", dotVerifyEq)
-        self.printList("5: dotCacheCalc", dotCacheCalc)
-        self.printList("6: dotList", dotList)
-        self.printList("7: dotCacheVarList", dotCacheVarList)
-        self.printList("8: divConqArgList", divConqArgList)
+#        self.printList("0: dotLoopValTypesSig", dotLoopValTypesSig)
+#        self.printList("1: dotCacheTypesSig", dotCacheTypesSig)
+#        self.printList("2: dotInitStmtDivConqSig", dotInitStmtDivConqSig)
+#        self.printList("3: divConqLoopValStmtSig", divConqLoopValStmtSig)
+#        self.printList("4: dotVerifyEq", dotVerifyEq)
+#        self.printList("5: dotCacheCalc", dotCacheCalc)
+#        self.printList("6: dotList", dotList)
+#        self.printList("7: dotCacheVarList", dotCacheVarList)
+#        self.printList("8: divConqArgList", divConqArgList)
         return dotLoopValTypesSig, dotCacheTypesSig, dotInitStmtDivConqSig, divConqLoopValStmtSig, dotVerifyEq, dotCacheCalc, dotList, dotCacheVarList, divConqArgList
 
     
