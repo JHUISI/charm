@@ -15,18 +15,27 @@ Bt := G2
 Ct := G2
 D := GT
 S := G1
+Alist := list{G1}
+Blist := list{G1}
+Clist := list{G1}
+Atlist := list{G2}
+Btlist := list{G2}
+Ctlist := list{G2}
+
 incorrectIndices := list{int}
 endSigNum := int
 startSigNum := int
 delta := list{ZR}
-dotCLoopVal := G1
-dotDLoopVal := GT
 dotALoopVal := G1
 dotBLoopVal := G1
+dotCLoopVal := G1
+dotDLoopVal := GT
+dotELoopVal := GT
 dotBCache := list{G1}
 dotACache := list{G1}
-dotDCache := list{GT}
 dotCCache := list{G1}
+dotDCache := list{GT}
+dotECache := list{GT}
 Mlist := list{str}
 Slist := list{G1}
 END :: types
@@ -108,10 +117,10 @@ END :: func:membership
 
 
 BEGIN :: func:dividenconquer
- input := list{delta, startSigNum, endSigNum, incorrectIndices, dotDCache, dotE}
+ input := list{delta, startSigNum, endSigNum, incorrectIndices, D, dotDCache, Atlist, Btlist, Ctlist, tlist, Slistlist}
 
-
-dotELoopVal := init(
+# if cannot be precomputed before DV, then it shouldn't be passed in to the DV call. 
+dotELoopVal := init(GT)
 BEGIN :: for
 for {y := 0, l}
 dotALoopVal := init(G1)
@@ -119,15 +128,14 @@ dotBLoopVal := init(G1)
 dotCLoopVal := init(G1)
 
 BEGIN :: forinner
-for{z := startSigNum, endSigNum}
-dotACache#z := (Slist#y#z^delta#z)
-dotBCache#z := (Slist#y#z^(m#y#z * delta#z))
-dotCCache#z := (Slist#y#z^(t#y#z * delta#z))
-dotALoopVal := dotALoopVal * dotACache#z
-dotBLoopVal := dotBLoopVal * dotBCache#z
-dotCLoopVal := dotCLoopVal * dotCCache#z
+forinner{z := startSigNum, endSigNum}
+m := H(M#z, ZR) # OR m := H(M#y#z, ZR)
+dotALoopVal := dotALoopVal * (Slistlist#y#z^delta#z)
+dotBLoopVal := dotBLoopVal * (Slistlist#y#z^(m * delta#z))
+dotCLoopVal := dotCLoopVal * (Slistlist#y#z^(t#y#z * delta#z))
 END :: forinner
 
+dotELoopVal := dotELoopVal * e(dotALoopVal, Atlist#y) * (e(dotBLoopVal, Btlist#y) * e(dotCLoopVal, Ctlist#y)
 END :: for
 
 dotDLoopVal := init(GT)
@@ -137,7 +145,7 @@ dotDLoopVal := dotDLoopVal * dotDCache#z
 END :: for
 
 BEGIN :: if
- if { dotE == dotDLoopVal }
+ if { dotELoopVal == dotDLoopVal }
     return := None
  else
     midwayFloat := ((endSigNum - startSigNum) / 2)
@@ -161,7 +169,7 @@ END ::func:dividenconquer
 
 
 BEGIN :: func:batchverify
-input := list{Mlist, Slist, g2, g1, Bt, At, Ct, incorrectIndices}
+input := list{Mlist, Slistlist, tlist, g2, g1, Btlist, Atlist, Ctlist, incorrectIndices}
 
 BEGIN :: for
 for{z := 0, N}
@@ -169,17 +177,16 @@ for{z := 0, N}
 END :: for
 
 BEGIN :: if
- if {(membership(Slist, g2, g1, Bt, At, Ct) == False)}
+ if {(membership(Slistlist, t1list, g2, g1, Bt, At, Ct) == False)}
      output := False
 END :: if
 
-
-D := e(g1,g2)
+D := e(g1,g2) # both values are constant so can safely precompute
 BEGIN :: for
 for{z := 0, N}
 dotDCache#z := (D^delta#z)
 END :: for
- dividenconquer(delta, 0, N, incorrectIndices, dotDCache, dotE)
+ dividenconquer(delta, 0, N, incorrectIndices, dotDCache, Mlist, Slist, Atlist, Btlist, Ctlist)
 
  output := incorrectIndices
 END ::func:batchverify
