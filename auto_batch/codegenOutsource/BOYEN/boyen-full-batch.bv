@@ -38,6 +38,7 @@ dotDCache := list{GT}
 dotECache := list{GT}
 Mlist := list{str}
 Slist := list{G1}
+tlist := list{ZR}
 END :: types
 
 BEGIN :: precompute
@@ -79,7 +80,7 @@ END :: func:verify
 secparam := 80
 
 BEGIN :: func:membership
- input := list{Slist, g2, g1, Bt, At, Ct}
+ input := list{Slist, tlist, g2, g1, Atlist, Btlist, Ctlist}
 
 
 BEGIN :: if
@@ -98,17 +99,17 @@ if { ismember(g1) == False }
 END :: if
 
 BEGIN :: if
-if { ismember(Bt) == False }
+if { ismember(Atlist) == False }
     output := False
 END :: if
 
 BEGIN :: if
-if { ismember(At) == False }
+if { ismember(Btlist) == False }
     output := False
 END :: if
 
 BEGIN :: if
-if { ismember(Ct) == False }
+if { ismember(Ctlist) == False }
     output := False
 END :: if
 
@@ -117,7 +118,7 @@ END :: func:membership
 
 
 BEGIN :: func:dividenconquer
- input := list{delta, startSigNum, endSigNum, incorrectIndices, D, dotDCache, Atlist, Btlist, Ctlist, tlist, Slist}
+ input := list{delta, startSigNum, endSigNum, incorrectIndices, dotDCache, Mlist, Atlist, Btlist, Ctlist, tlist, Slist}
 
 # if cannot be precomputed before DV, then it shouldn't be passed in to the DV call. 
 dotELoopVal := init(GT)
@@ -129,10 +130,10 @@ dotCLoopVal := init(G1)
 
 BEGIN :: forinner
 forinner{z := startSigNum, endSigNum}
-m := H(M#z, ZR)
-dotALoopVal := dotALoopVal * (Slistlist#y#z^delta#z)
-dotBLoopVal := dotBLoopVal * (Slistlist#y#z^(m * delta#z))
-dotCLoopVal := dotCLoopVal * (Slistlist#y#z^(tlist#y#z * delta#z))
+m := H(Mlist#z, ZR)
+dotALoopVal := dotALoopVal * (Slist#y#z^delta#z)
+dotBLoopVal := dotBLoopVal * (Slist#y#z^(m * delta#z))
+dotCLoopVal := dotCLoopVal * (Slist#y#z^(tlist#y#z * delta#z))
 END :: forinner
 
 dotELoopVal := dotELoopVal * e(dotALoopVal, Atlist#y) * (e(dotBLoopVal, Btlist#y) * e(dotCLoopVal, Ctlist#y))
@@ -159,8 +160,8 @@ BEGIN :: if
     output := None
  else
     midSigNum := startSigNum + midway
-    dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, D, dotDCache, Atlist, Btlist, Ctlist, tlist, Slistlist)
-    dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, D, dotDCache, Atlist, Btlist, Ctlist, tlist, Slistlist)
+    dividenconquer(delta, startSigNum, midSigNum, incorrectIndices, dotDCache, Mlist, Atlist, Btlist, Ctlist, tlist, Slist)
+    dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotDCache, Mlist, Atlist, Btlist, Ctlist, tlist, Slist)
 END :: if
 
  output := None
@@ -168,7 +169,7 @@ END ::func:dividenconquer
 
 
 BEGIN :: func:batchverify
-input := list{Mlist, Slistlist, tlist, g2, g1, Btlist, Atlist, Ctlist, incorrectIndices}
+input := list{Mlist, Slist, tlist, g2, g1, Btlist, Atlist, Ctlist, incorrectIndices}
 
 BEGIN :: for
 for{z := 0, N}
@@ -176,7 +177,7 @@ for{z := 0, N}
 END :: for
 
 BEGIN :: if
- if {(membership(Slistlist, t1list, g2, g1, Bt, At, Ct) == False)}
+ if {(membership(Slist, t1list, g2, g1, Bt, At, Ct) == False)}
      output := False
 END :: if
 
@@ -185,7 +186,7 @@ BEGIN :: for
 for{z := 0, N}
  dotDCache#z := (D^delta#z)
 END :: for
- dividenconquer(delta, 0, N, incorrectIndices, dotDCache, Mlist, Slist, Atlist, Btlist, Ctlist, tlist, Slistlist)
+ dividenconquer(delta, 0, N, incorrectIndices, dotDCache, dotDCache, Mlist, Atlist, Btlist, Ctlist, tlist, Slist)
 
  output := incorrectIndices
 END ::func:batchverify
