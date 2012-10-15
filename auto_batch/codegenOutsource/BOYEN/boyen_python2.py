@@ -1,5 +1,4 @@
 from charm.toolbox.pairinggroup import *
-from charm.core.engine.util import *
 from charm.core.math.integer import randomBits
 
 group = None
@@ -104,7 +103,7 @@ def SmallExp(bits=80):
 
 def main():
     global group
-    group = PairingGroup("MNT224")
+    group = PairingGroup(secparam)
 
     (mpk, g1, g2) = setup()
     #mpk = [A0, B0, C0, At0, Bt0, Ct0]

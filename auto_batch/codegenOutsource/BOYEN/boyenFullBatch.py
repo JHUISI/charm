@@ -1,14 +1,11 @@
-try:
-   from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-   from charm.core.math.integer import randomBits
-except:
-   print("ERROR!!")
+from charm.toolbox.pairinggroup import *
+from charm.core.math.integer import randomBits
 
 group = None
 
 N = 100
 
-l = 2
+l = 3
 
 secparam = 80
 
@@ -84,7 +81,7 @@ def sign(g1, Alist, Blist, Clist, sk, Mlist, index):
     prod0 = (((Alist[0] * (Blist[0] ** m)) * (Clist[0] ** t[0])) ** -s[0])
     for y in range(1, l):
         if ( ( (y) != (index) ) ):
-            prod1 = (prod1 * ((Alist[y] * ((Blist[y] ** m[y]) * (Clist[y] ** t[y]))) ** -s[y]))
+            prod1 = (prod1 * ((Alist[y] * ((Blist[y] ** m) * (Clist[y] ** t[y]))) ** -s[y]))
     result = (prod0 * prod1)
     d = ((a + (b * m)) + (c * t[index]))
     S[index] = ((g1 * result) ** (1 / d))
