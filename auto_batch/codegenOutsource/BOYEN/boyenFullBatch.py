@@ -1,22 +1,28 @@
-from charm.toolbox.pairinggroup import *
-from charm.core.engine.util import *
-from charm.core.math.integer import randomBits
+try:
+   from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+   from charm.core.math.integer import randomBits
+except:
+   print("ERROR!!")
 
 group = None
 
-N = 2
+N = 100
 
-l = 3
+l = 2
 
 secparam = 80
 
-#D = {}
-#m = {}
+result = {}
+Bt = {}
+c = {}
+D = {}
+a = {}
+b = {}
+m = {}
+At = {}
+Ct = {}
 
 def setup():
-#    global A0
-#    global C0
-#    global B0
 
     input = None
     g1 = group.random(G1)
@@ -35,12 +41,12 @@ def setup():
     return output
 
 def keygen(g1, g2):
-#    global Bt
-#    global c
-#    global a
-#    global b
-#    global At
-#    global Ct
+    global Bt
+    global c
+    global a
+    global b
+    global At
+    global Ct
 
     input = [g1, g2]
     a = group.random(ZR)
@@ -57,46 +63,45 @@ def keygen(g1, g2):
     output = (pk, sk)
     return output
 
-def sign(g1, Alist, Blist, Clist, sk, M):
+def sign(g1, Alist, Blist, Clist, sk, Mlist, index):
+    global result
+    global m
 
     S = {}
     s = {}
     t = {}
 
-    input = [g1, Alist, Blist, Clist, sk, M]
-    a, b, c = sk
+    input = [g1, Alist, Blist, Clist, sk, Mlist, index]
     prod0 = 1
     prod1 = 1
-    m = group.hash(M, ZR)
-    for y in range(0, l-1):
-        s[y] = group.random(ZR)
-        S[y] = (g1 ** s[y])
-        print("S[%s] :=> %s" % (y, S[y]))
+    m = group.hash(Mlist, ZR)
+    for y in range(0, l):
+        if ( ( (y) != (index) ) ):
+            s[y] = group.random(ZR)
+            S[y] = (g1 ** s[y])
     for y in range(0, l):
         t[y] = group.random(ZR)
-        print("t[%s] = %s" % (y, t[y])) 
     prod0 = (((Alist[0] * (Blist[0] ** m)) * (Clist[0] ** t[0])) ** -s[0])
-    for y in range(1, l-1):
-        print("sign loop: ", y)
-        prod0 *= (((Alist[y] * ((Blist[y] ** m) * (Clist[y] ** t[y]))) ** -s[y]))
-    #result = (prod0 * prod1)
-    d = ((a + (b * m)) + (c * t[l-1]))
-    S[l-1] = ((g1 * prod0) ** (1 / d))
-    print("S[%s] :=> %s" % (l-1, S[l-1]))
-    print("\n\n\n")
+    for y in range(1, l):
+        if ( ( (y) != (index) ) ):
+            prod1 = (prod1 * ((Alist[y] * ((Blist[y] ** m[y]) * (Clist[y] ** t[y]))) ** -s[y]))
+    result = (prod0 * prod1)
+    d = ((a + (b * m)) + (c * t[index]))
+    S[index] = ((g1 * result) ** (1 / d))
     output = (S, t)
     return output
 
-def verify(At, Bt, Ct, M, S, t, g1, g2):
-    #global D
-    #global m
+def verify(Atlist, Btlist, Ctlist, M, S, t, g1, g2):
+    global result
+    global D
+    global m
 
-    input = [At, Bt, Ct, M, S, t, g1, g2]
+    input = [Atlist, Btlist, Ctlist, M, S, t, g1, g2]
     D = pair(g1, g2)
     m = group.hash(M, ZR)
     result = 1
     for y in range(0, l):
-        result = (result * pair(S[y], (At[y] * ((Bt[y] ** m) * (Ct[y] ** t[y])))))
+        result = (result * pair(S[y], (Atlist[y] * ((Btlist[y] ** m) * (Ctlist[y] ** t[y])))))
     if ( ( (result) == (D) ) ):
         output = True
     else:
@@ -122,7 +127,7 @@ def membership(Slist, tlist, g2, g1, Atlist, Btlist, Ctlist):
     return output
 
 def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotDCache, Mlist, Atlist, Btlist, Ctlist, tlist, Slist):
-    #global m
+    global m
 
     input = [delta, startSigNum, endSigNum, incorrectIndices, dotDCache, Mlist, Atlist, Btlist, Ctlist, tlist, Slist]
     dotDLoopVal = 1
@@ -154,7 +159,7 @@ def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotDCache, M
     output = None
 
 def batchverify(Mlist, Slist, tlist, g2, g1, Btlist, Atlist, Ctlist, incorrectIndices):
-    #global D
+    global D
 
     dotDCache = {}
     delta = {}
@@ -176,56 +181,37 @@ def SmallExp(bits=80):
 
 def main():
     global group
-    group = PairingGroup("MNT224")
+    group = PairingGroup(secparam)
 
     (mpk, g1, g2) = setup()
     #mpk = [A0, B0, C0, At0, Bt0, Ct0]
 
-    # l = 2 so need two keys
     # pk = [A, B, C, At, Bt, Ct]
     (pk0, sk0) = keygen(g1, g2)
-    (pk1, sk1) = keygen(g1, g2)
     print("pk0 :=>", pk0)
     print("sk0 :=>", sk0)
-    #print("pk1 :=>", pk1)
-    #print("sk1 :=>", sk1)
+    (pk1, sk1) = keygen(g1, g2)
 
     M = "this is my message."
-    M2 = "this is my message."
-    Mlist = [M, M2]
     Alist = {} 
     Blist = {}
     Clist = {}
     Alist[0] = mpk[0]
-    Alist[1] = pk1[0]
-    Alist[2] = pk0[0]
+    Alist[1] = pk0[0]
+    Alist[2] = pk1[0]
 
     Blist[0] = mpk[1]
-    Blist[1] = pk1[1]
-    Blist[2] = pk0[1]
+    Blist[1] = pk0[1]
+    Blist[2] = pk1[1]
     
     Clist[0] = mpk[2]
-    Clist[1] = pk1[2]
-    Clist[2] = pk0[2]
+    Clist[1] = pk0[2]
+    Clist[2] = pk1[2]
 
-    Alist2 = {}
-    Blist2 = {}
-    Clist2 = {}
-
-    Alist2[0] = mpk[0]
-    Alist2[1] = pk1[0]
-    Alist2[2] = pk0[0]
-
-    Blist2[0] = mpk[1]
-    Blist2[1] = pk1[1]
-    Blist2[2] = pk0[1]
-
-    Clist2[0] = mpk[2]
-    Clist2[1] = pk1[2]
-    Clist2[2] = pk0[2]
-
-    (S0, t0) = sign(g1, Alist, Blist, Clist, sk0, M)
-    (S1, t1) = sign(g1, Alist, Blist, Clist, sk0, M2)
+    my_index = 1
+    (S0, t0) = sign(g1, Alist, Blist, Clist, sk0, M, my_index)
+    my_index = 2
+    (S1, t1) = sign(g1, Alist, Blist, Clist, sk1, M, my_index)
 
     Atlist = {}
     Btlist = {}
@@ -244,10 +230,9 @@ def main():
     Ctlist[2] = pk1[5]
 
     assert verify(Atlist, Btlist, Ctlist, M, S0, t0, g1, g2), "failed verification!!"
-    assert verify(Atlist, Btlist, Ctlist, M2, S1, t1, g1, g2), "failed verification 2!!"
+#    assert verify(Atlist, Btlist, Ctlist, M, S1, t1, g1, g2), "failed verification!!"
     print("Successful Verification")
 
-    #batchverify(Mlist, Slist, tlist, g2, g1, Btlist, Atlist, Ctlist, incorrectIndices)
 
 if __name__ == '__main__':
     main()
