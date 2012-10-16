@@ -901,7 +901,11 @@ def getCPPAsstStringForExpand(node, variableName, replacementsDict):
     outputString = ""
     outputString += "\n"
 
+    variableType = getFinalVarType(variableName, currentFuncName)
+    counter = -1
+
     for listNode in node.listNodes:
+        counter += 1
         listNodeName = applyReplacementsDict(replacementsDict, listNode)
         listNodeName = replacePoundsWithBrackets(listNodeName)
         listNodeType = getFinalVarType(listNodeName, currentFuncName)
@@ -913,19 +917,23 @@ def getCPPAsstStringForExpand(node, variableName, replacementsDict):
         CPP_varTypesLines += "    " + makeTypeReplacementsForCPP(listNodeType) + " " + listNodeName + ";\n"
         outputString += listNodeName + " = "
 
-        outputString += variableName + "[\"" + listNodeName + "\"]."
-        if (listNodeType == types.G1):
-            outputString += "getG1()"
-        elif (listNodeType == types.G2):
-            outputString += "getG2()"
-        elif (listNodeType == types.GT):
-            outputString += "getGT()"
-        elif (listNodeType == types.ZR):
-            outputString += "getZR()"
-        elif (listNodeType == types.str):
-            outputString += "strPtr"
-        else:
-            sys.exit("getCPPAsstStringForExpand in codegen.py:  one of the types of the listNodes is not one of the supported types (G1, G2, GT, ZR, or string).")
+        #outputString += variableName + "[\"" + listNodeName + "\"]."
+        outputString += variableName + "[" + str(counter) + "]"
+
+        if (variableType == types.list):
+            outputString += "."
+            if (listNodeType == types.G1):
+                outputString += "getG1()"
+            elif (listNodeType == types.G2):
+                outputString += "getG2()"
+            elif (listNodeType == types.GT):
+                outputString += "getGT()"
+            elif (listNodeType == types.ZR):
+                outputString += "getZR()"
+            elif (listNodeType == types.str):
+                outputString += "strPtr"
+            else:
+                sys.exit("getCPPAsstStringForExpand in codegen.py:  one of the types of the listNodes is not one of the supported types (G1, G2, GT, ZR, or string).")
 
         outputString += ";\n"
 

@@ -97,9 +97,9 @@ void sign(G1 & g1, CharmListG1 & Alist, CharmListG1 & Blist, CharmListG1 & Clist
     G1 *result0 = group.init(G1_t);
     ZR *d = group.init(ZR_t);
     
-    a = sk["a"].getZR();
-    b = sk["b"].getZR();
-    c = sk["c"].getZR();
+    a = sk[0].getZR();
+    b = sk[1].getZR();
+    c = sk[2].getZR();
     *m = group.hashListToZR(M);
     for (int y = 0; y < l; y++)
     {
