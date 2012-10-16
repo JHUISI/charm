@@ -177,12 +177,12 @@ def batchverify(Mlist, Slist, tlist, g2, g1, Btlist, Atlist, Ctlist, incorrectIn
     input = [Mlist, Slist, tlist, g2, g1, Btlist, Atlist, Ctlist, incorrectIndices]
     for z in range(0, N):
         delta[z] = SmallExp(secparam)
-    if ( ( (membership(Slist, t1list, g2, g1, Bt, At, Ct)) == (False) ) ):
+    if ( ( (membership(Slist, tlist, g2, g1, Btlist, Atlist, Ctlist)) == (False) ) ):
         output = False
     D = pair(g1, g2)
     for z in range(0, N):
         dotDCache[z] = (D ** delta[z])
-    dividenconquer(delta, 0, N, incorrectIndices, dotDCache, dotDCache, Mlist, Atlist, Btlist, Ctlist, tlist, Slist)
+    dividenconquer(delta, 0, N, incorrectIndices, dotDCache, Mlist, Atlist, Btlist, Ctlist, tlist, Slist)
     output = incorrectIndices
     return output
 
