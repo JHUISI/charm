@@ -7,34 +7,34 @@ secparam := 80
 BEGIN :: types
 M := str
 ID := str
-L := str
+L := list{str}
 u := list{G1}
 h := list{ZR}
 s := int
 pkList := list{G1}
-dotProd := G1
+sk := G1
 P := G2
 S := G1
 g := G2
+r := ZR
 END :: types
 
 BEGIN :: precompute
-
+h := H(M | L | u, ZR)
 END :: precompute
 
-constant := list{}
-public := list{}
-signature := list{}
-message := m
+constant := list{P, g}
+public := pk
+signature := list{S, u}
+message := h
 
-# different messages/sigs under different signers (ring)
 BEGIN :: count
 message_count := N
 public_count := l
 signature_count := N
 END :: count
 
-verify := {e(dotProd, P) == e(S, g)}
+verify := { e((prod{y:=0, l} on (u_y * (pk_y^h_y))) , P) == e(S, g) }
 
 BEGIN :: func:setup
  input := None
@@ -80,8 +80,8 @@ END :: for
 
  r := random(ZR)
 BEGIN :: for
-for{i := 0, num_signers}
-   pkList#i := H(L#i, G1)
+for{y := 0, num_signers}
+   pklist#y := H(L#y, G1)
 END :: for
 
 dotProd := init(G1)
@@ -103,24 +103,20 @@ END :: func:sign
 BEGIN :: func:verify
 input := list{P, g, L, M, u, S}
  Lt := concat(L)
- num_signers := len(L)
+ num_sign := len(L)
 
  h := init(ZR)
 BEGIN :: for
-for{y := 0, num_signers}
- h#y := H(M | Lt | u#i, ZR)
-END :: for
-
-BEGIN :: for
-for{i := 0, num_signers}
-   pkList#i := H(L#i, G1)
+for{y := 0, num_sign}
+ h#y := H(M | Lt | u#y, ZR)
+ pk#y := H(L#y, G1)
 END :: for
 
 dotProd := init(G1)
 
 BEGIN :: for
-for{i := 0, num_signers}
-   dotProd := dotProd * (u#i * (pk#i ^ h#i))
+for{y := 0, num_sign}
+   dotProd := dotProd * (u#y * (pk#y ^ h#y))
 END :: for
 
 BEGIN :: if

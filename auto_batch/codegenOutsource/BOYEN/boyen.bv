@@ -24,6 +24,7 @@ s := list{ZR}
 S := G1
 t := list{ZR}
 result1 := GT
+index := int
 END :: types
 
 
