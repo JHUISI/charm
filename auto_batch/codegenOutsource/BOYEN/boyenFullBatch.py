@@ -1,5 +1,8 @@
+#try:
 from charm.toolbox.pairinggroup import *
 from charm.core.math.integer import randomBits
+#except:
+#    print("error")
 
 group = None
 
@@ -200,6 +203,8 @@ def main():
     (pk1, sk1) = keygen(g1, g2)
 
     M = "this is my message."
+    M2 = "test"
+    Mlist = [M, M2]
     Alist = {} 
     Blist = {}
     Clist = {}
@@ -218,7 +223,10 @@ def main():
     my_index = 1
     (S0, t0) = sign(g1, Alist, Blist, Clist, sk0, M, my_index)
     my_index = 2
-    (S1, t1) = sign(g1, Alist, Blist, Clist, sk1, M, my_index)
+    (S1, t1) = sign(g1, Alist, Blist, Clist, sk1, M2, my_index)
+
+    Slist = [S0, S1]
+    tlist = [t0, t1]
 
     Atlist = {}
     Btlist = {}
@@ -237,9 +245,15 @@ def main():
     Ctlist[2] = pk1[5]
 
     assert verify(Atlist, Btlist, Ctlist, M, S0, t0, g1, g2), "failed verification!!"
-#    assert verify(Atlist, Btlist, Ctlist, M, S1, t1, g1, g2), "failed verification!!"
+    print("first")
+    assert verify(Atlist, Btlist, Ctlist, M2, S1, t1, g1, g2), "failed verification!!"
     print("Successful Verification")
 
+    incorrectIndices = []
+
+    batchverify(Mlist, Slist, tlist, g2, g1, Btlist, Atlist, Ctlist, incorrectIndices)
+
+    print(incorrectIndices)
 
 if __name__ == '__main__':
     main()
