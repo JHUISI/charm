@@ -1114,6 +1114,14 @@ def getVarDeclForListVar(variableName):
 
     return outputString_Types
 
+def getRidOfListIndexEndSymbol(variableName):
+    loc = variableName.find(LIST_INDEX_END_SYMBOL)
+    if (loc == -1):
+        return variableName
+
+    loc = variableName.find(LIST_INDEX_SYMBOL)
+    return variableName[0:loc]
+
 def writeAssignStmt_CPP(outputFile, binNode):
     global CPP_varTypesLines, CPP_funcBodyLines, setupFile, currentFuncNonOutputVars, SDLListVars, integerVars
 
@@ -1126,6 +1134,7 @@ def writeAssignStmt_CPP(outputFile, binNode):
         return
 
     variableName = getFullVarName(binNode.left, False)
+    variableNameWOListIndices = getRidOfListIndexEndSymbol(getFullVarName(binNode.left, True))
 
     if (variableName == inputKeyword):
         return
@@ -1169,7 +1178,7 @@ def writeAssignStmt_CPP(outputFile, binNode):
         elif ( (variableName not in currentFuncOutputVars) and (variableType == types.int) ):
             outputString_Types += "    int "
 
-    if (variableName in SDLListVars):
+    if ( (variableName in SDLListVars) and (variableNameWOListIndices not in currentFuncOutputVars) ):
         outputString_Types += getVarDeclForListVar(variableName)
 
     if ( (binNode.right.type != ops.EXPAND) and (variableName not in currentFuncOutputVars) and (variableName not in SDLListVars) ):
