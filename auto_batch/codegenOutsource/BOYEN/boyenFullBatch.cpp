@@ -44,12 +44,12 @@ void setup(CharmList & mpk, G1 & g1, G2 & g2)
     *At0 = group.exp(g2, *a0);
     *Bt0 = group.exp(g2, *b0);
     *Ct0 = group.exp(g2, *c0);
-    mpk.append(A0);
-    mpk.append(B0);
-    mpk.append(C0);
-    mpk.append(At0);
-    mpk.append(Bt0);
-    mpk.append(Ct0);
+    mpk.append(*A0);
+    mpk.append(*B0);
+    mpk.append(*C0);
+    mpk.append(*At0);
+    mpk.append(*Bt0);
+    mpk.append(*Ct0);
     return;
 }
 
@@ -73,29 +73,29 @@ void keygen(G1 & g1, G2 & g2, CharmList & pk, CharmList & sk)
     *Bt = group.exp(g2, *b);
     *C = group.exp(g1, *c);
     *Ct = group.exp(g2, *c);
-    sk.append(a);
-    sk.append(b);
-    sk.append(c);
-    pk.append(A);
-    pk.append(B);
-    pk.append(C);
-    pk.append(At);
-    pk.append(Bt);
-    pk.append(Ct);
+    sk.append(*a);
+    sk.append(*b);
+    sk.append(*c);
+    pk.append(*A);
+    pk.append(*B);
+    pk.append(*C);
+    pk.append(*At);
+    pk.append(*Bt);
+    pk.append(*Ct);
     return;
 }
 
-void sign(G1 & g1, CharmListG1 & Alist, CharmListG1 & Blist, CharmListG1 & Clist, CharmList & sk, CharmListStr & Mlist, NO_TYPE & index, CharmListG1 & S, CharmListZR & t)
+void sign(G1 & g1, CharmListG1 & Alist, CharmListG1 & Blist, CharmListG1 & Clist, CharmListZR & sk, CharmListStr & Mlist, int index, CharmListG1 & S, CharmListZR & t)
 {
     ZR *m = group.init(ZR_t);
     CharmListZR s;
-    CharmListG1 S;
-    CharmListZR t;
+    ZR a = sk[0];
+    ZR b = sk[1];
+    ZR c = sk[2];
     G1 *prod0 = group.init(G1_t);
     G1 *prod1 = group.init(G1_t);
     G1 *resultSign = group.init(G1_t);
     ZR *d = group.init(ZR_t);
-    CharmListG1 S;
     *m = group.hashListToZR(M);
     for (int y = 0; y < l; y++)
     {

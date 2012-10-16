@@ -1,0 +1,272 @@
+name := boyen
+setting := asymmetric
+N := 100
+l := 2
+secparam := 80
+
+# make sure list{G2} is pulled properly in Batcher
+BEGIN :: types
+g1 := G1
+g2 := G2
+M := str
+m := ZR
+A := G1
+B := G1
+C := G1
+Atlist := G2
+Btlist := G2
+Ctlist := G2
+Alist := list{G1}
+Blist := list{G1}
+Clist := list{G1}
+D := GT
+s := list{ZR}
+S := G1
+t := list{ZR}
+incorrectIndices := list{int}
+endSigNum := int
+startSigNum := int
+delta := list{ZR}
+dotCLoopVal := G1
+dotDLoopVal := GT
+dotELoopVal := GT
+dotALoopVal := G1
+dotBLoopVal := G1
+dotDCache := list{GT}
+Slist := list{G1}
+Mlist := list{str}
+tlist := list{ZR}
+END :: types
+
+#Atlist := list{G2}
+#Btlist := list{G2}
+#Ctlist := list{G2} 
+
+
+BEGIN :: precompute
+D := e(g1, g2)
+END :: precompute
+
+constant := list{Atlist, Btlist, Ctlist, g1, g2}
+public := list{Atlist, Btlist, Ctlist}
+signature := list{S, t}
+message := m
+
+# different messages/sigs under different signers (ring)
+BEGIN :: count
+message_count := N
+public_count := l
+signature_count := N
+END :: count
+
+# m could be a list of messages over l
+#verify :=  {{ prod{y:=0, l} on e(S_y, Atlist_y * (Btlist_y^m_y) * (Ctlist_y^t_y)) } == D}
+verify :=  {{ prod{y:=0, l} on e(S_y, Atlist_y * (Btlist_y^m) * (Ctlist_y^t_y)) } == D}
+
+BEGIN :: func:setup
+ input := None
+g1 := random(G1) 
+g2 := random(G2)
+ a0 := random(ZR)
+ b0 := random(ZR)
+ c0 := random(ZR)
+ A0 := g1 ^ a0
+ B0 := g1 ^ b0
+ C0 := g1 ^ c0
+ At0 := g2 ^ a0
+ Bt0 := g2 ^ b0
+ Ct0 := g2 ^ c0
+ mpk := list{A0, B0, C0, At0, Bt0, Ct0}
+ output := list{mpk, g1, g2}
+END :: func:setup
+
+BEGIN :: func:keygen
+ input := list{g1, g2}
+a := random(ZR)
+b := random(ZR)
+c := random(ZR)
+A := g1 ^ a
+At := g2 ^ a 
+B := g1 ^ b
+Bt := g2 ^ b
+C := g1 ^ c
+Ct := g2 ^ c
+ sk := list{a, b, c}
+ pk := list{A, B, C, At, Bt, Ct} 
+ output := list{pk, sk}
+END :: func:keygen
+
+BEGIN :: func:sign
+ input := list{g1, Alist, Blist, Clist, sk, Mlist, index}
+
+ prod0 := init(G1)
+ prod1 := init(G1)
+ m := H(M, ZR)
+ 
+BEGIN :: for
+for{y := 0, l}
+BEGIN :: if
+if {y != index}
+ s#y := random(ZR)
+ S#y := g1 ^ s#y
+END :: if
+END :: for
+
+BEGIN :: for
+for{y := 0, l}
+ t#y := random(ZR)
+END :: for
+
+ prod0 := ((Alist#0 * (Blist#0 ^ m)) * (Clist#0 ^ t#0)) ^ -s#0
+BEGIN :: for
+for{y := 1, l}
+BEGIN :: if
+if {y != index}
+ prod1 := prod1 * ((Alist#y * (Blist#y ^ m#y) * (Clist#y ^ t#y)) ^ -s#y)
+END :: if
+END :: for
+
+ result := prod0 * prod1
+ d := ((a + (b * m)) + (c * t#index))
+ S#index? := (g1 * result) ^ (1 / d)
+
+ output := list{S, t}
+END :: func:sign
+
+
+BEGIN :: func:verify
+ input := list{g1, g2, Atlist, Btlist, Ctlist, M, S, t}  
+  D := e(g1, g2)
+  result := init(GT)
+  m := H(M, ZR) 
+BEGIN :: for
+for{y := 0, l}
+ result := result * e(S#y, Atlist#y * (Btlist#y^m) * (Ctlist#y^t#y))
+END :: for  
+
+BEGIN :: if
+ if { result == D}
+    output := True
+ else
+    output := False
+END :: if
+END :: func:verify
+
+
+BEGIN :: func:membership
+ input := list{Atlist, Btlist, Ctlist, Slist, g1, g2, tlist}
+
+
+BEGIN :: if
+if { ismember(Atlist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(Btlist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(Ctlist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(Slist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(g1) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(g2) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(tlist) == False }
+    output := False
+END :: if
+
+ output := True
+END :: func:membership
+
+
+BEGIN :: func:dividenconquer
+ input := list{delta, startSigNum, endSigNum, incorrectIndices, dotDCache, Atlist, Btlist, Ctlist, Mlist, Slist, g1, g2, tlist}
+dotDLoopVal := init(GT)
+
+BEGIN :: for
+for{z := startSigNum, endSigNum}
+dotDLoopVal := dotDLoopVal * dotDCache#z
+END :: for
+
+dotELoopVal := init(GT)
+
+BEGIN :: for
+for{y := 0, l}
+dotALoopVal := init(G1)
+dotBLoopVal := init(G1)
+dotCLoopVal := init(G1)
+
+BEGIN :: forinner
+forinner{z := startSigNum, endSigNum}
+dotALoopVal := dotALoopVal * (Slist#z#y^delta#z)
+dotBLoopVal := dotBLoopVal * (Slist#z#y^(m#z * delta#z))
+dotCLoopVal := dotCLoopVal * (Slist#z#y^(tlist#z#y * delta#z))
+END :: forinner
+dotELoopVal := dotELoopVal * (e(dotALoopVal,Atlist#y) * (e(dotBLoopVal,Btlist#y) * e(dotCLoopVal,Ctlist#y)))
+END :: for
+BEGIN :: if
+ if { dotELoopVal == dotDLoopVal }
+    return := None
+ else
+    midwayFloat := ((endSigNum - startSigNum) / 2)
+    midway := integer(midwayFloat)
+END :: if
+
+
+BEGIN :: if
+ if { midway == 0 } 
+    addToList(incorrectIndices, startSigNum)
+    output := None
+ else
+    midSigNum := startSigNum + midway
+    dividenconquer(delta, startSigNum, midway, incorrectIndices, dotDCache, Atlist, Btlist, Ctlist, Mlist, Slist, g1, g2, tlist)
+    dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotDCache, Atlist, Btlist, Ctlist, Mlist, Slist, g1, g2, tlist)
+END :: if
+
+
+ output := None
+END ::func:dividenconquer
+
+
+BEGIN :: func:batchverify
+input := list{Atlist, Btlist, Ctlist, Mlist, Slist, g1, g2, tlist, incorrectIndices}
+
+BEGIN :: for
+for{z := 0, N}
+ delta#z := SmallExp(secparam)
+END :: for
+
+BEGIN :: if
+ if {(membership(Atlist, Btlist, Ctlist, Slist, g1, g2, tlist) == False)}
+     output := False
+END :: if
+
+D := e(g1,g2)
+
+BEGIN :: for
+for{z := 0, N}
+dotDCache#z := (D^delta#z)
+END :: for
+ dividenconquer(delta, 0, N, incorrectIndices, dotDCache, Atlist, Btlist, Ctlist, Mlist, Slist, g1, g2, tlist)
+
+ output := incorrectIndices
+END ::func:batchverify
+
+
