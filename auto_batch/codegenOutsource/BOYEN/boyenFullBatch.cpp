@@ -87,12 +87,19 @@ void keygen(G1 & g1, G2 & g2, CharmList & pk, CharmList & sk)
 
 void sign(G1 & g1, CharmListG1 & Alist, CharmListG1 & Blist, CharmListG1 & Clist, CharmList & sk, CharmListStr & Mlist, NO_TYPE & index, CharmListG1 & S, CharmListZR & t)
 {
+    ZR a;
+    ZR b;
+    ZR c;
     ZR *m = group.init(ZR_t);
     CharmListZR s;
     G1 *prod0 = group.init(G1_t);
     G1 *prod1 = group.init(G1_t);
-    G1 *resultSign = group.init(G1_t);
+    G1 *result0 = group.init(G1_t);
     ZR *d = group.init(ZR_t);
+    
+    a = sk["a"].getZR();
+    b = sk["b"].getZR();
+    c = sk["c"].getZR();
     *m = group.hashListToZR(M);
     for (int y = 0; y < l; y++)
     {
@@ -114,9 +121,9 @@ void sign(G1 & g1, CharmListG1 & Alist, CharmListG1 & Blist, CharmListG1 & Clist
             *prod1 = group.mul(*prod1, group.exp(group.mul(Alist[y], group.mul(group.exp(Blist[y], m[y]), group.exp(Clist[y], t[y]))), -s[y]));
         }
     }
-    *resultSign = group.mul(*prod0, *prod1);
+    *result0 = group.mul(*prod0, *prod1);
     *d = group.add(group.add(a, group.mul(b, *m)), group.mul(c, t[index]));
-    S[index] = group.exp(group.mul(g1, *resultSign), group.div(1, *d));
+    S[index] = group.exp(group.mul(g1, *result0), group.div(1, *d));
     return;
 }
 
@@ -124,14 +131,14 @@ bool verify(G1 & g1, G2 & g2, G2 & Atlist, G2 & Btlist, G2 & Ctlist, string M, C
 {
     GT *D = group.init(GT_t);
     ZR *m = group.init(ZR_t);
-    GT *resultVerify = group.init(GT_t);
+    GT *result1 = group.init(GT_t);
     *D = group.pair(g1, g2);
     *m = group.hashListToZR(M);
     for (int y = 0; y < l; y++)
     {
-        *resultVerify = group.mul(*resultVerify, group.pair(S[y], group.mul(Atlist[y], group.mul(group.exp(Btlist[y], *m), group.exp(Ctlist[y], t[y])))));
+        *result1 = group.mul(*result1, group.pair(S[y], group.mul(Atlist[y], group.mul(group.exp(Btlist[y], *m), group.exp(Ctlist[y], t[y])))));
     }
-    if ( ( (*resultVerify) == (*D) ) )
+    if ( ( (*result1) == (*D) ) )
     {
         return true;
     }
