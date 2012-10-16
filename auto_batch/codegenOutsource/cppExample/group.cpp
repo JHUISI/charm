@@ -692,6 +692,77 @@ ostream& operator<<(ostream& s, const CharmListZR& cList)
 
 // end CharmListZR implementation
 
+// start CharmMetaListZR implementation
+
+CharmMetaListZR::CharmMetaListZR(void)
+{
+	// increases as elements are appended
+	cur_index = 0;
+}
+
+CharmMetaListZR::~CharmMetaListZR()
+{
+	for(int i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+}
+
+void CharmMetaListZR::append(CharmListZR & zr)
+{
+	list[cur_index] = zr;
+	cur_index++;
+}
+
+CharmListZR& CharmMetaListZR::operator[](const int index)
+{
+	if(index == cur_index) { // means we are creating reference.
+//		CharmListZR tmp;
+//		list[cur_index] = tmp;
+		cur_index++;
+		return list[index];
+	}
+
+	int len = (int) list.size();
+	if(index >= 0 && index < len) {
+		return list[index];
+	}
+	else {
+		throw new string("Invalid access.\n");
+	}
+}
+
+int CharmMetaListZR::length()
+{
+	return (int) list.size();
+}
+
+string CharmMetaListZR::printAtIndex(int index)
+{
+	stringstream ss;
+	int i;
+
+	if(index >= 0 && index < (int) list.size()) {
+		i = index;
+		ss << list[i];
+	}
+
+	string s = ss.str();
+	return s;
+}
+
+ostream& operator<<(ostream& s, const CharmMetaListZR& cList)
+{
+	CharmMetaListZR cList2 = cList;
+	for(int i = 0; i < cList2.length(); i++) {
+		s << "list " << i << "\n";
+		s << cList2.printAtIndex(i) << endl;
+	}
+
+	return s;
+}
+
+// end CharmMetaListZR implementation
+
+
 // start CharmListG1 implementation
 
 CharmListG1::CharmListG1(void)
@@ -712,11 +783,22 @@ void CharmListG1::append(G1 & g)
 	cur_index++;
 }
 
+//G1& CharmListG1::get(const int index)
+//{
+//	int len = (int) list.size();
+//	if(index >= 0 && index < len) {
+//		return list[index];
+//	}
+//	else {
+//		throw new string("Invalid access.\n");
+//	}
+//}
+
 G1& CharmListG1::operator[](const int index)
 {
 	if(index == cur_index) { // means we are creating reference.
-		G1 tmp;
-		list[cur_index] = tmp;
+//		G1 tmp;
+//		list[cur_index] = tmp;
 		cur_index++;
 		return list[index];
 	}
@@ -767,6 +849,77 @@ ostream& operator<<(ostream& s, const CharmListG1& cList)
 
 // end CharmListG1 implementation
 
+// start CharmMetaListG1 implementation
+
+CharmMetaListG1::CharmMetaListG1(void)
+{
+	// increases as elements are appended
+	cur_index = 0;
+}
+
+CharmMetaListG1::~CharmMetaListG1()
+{
+	for(int i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+}
+
+void CharmMetaListG1::append(CharmListG1 & zr)
+{
+	list[cur_index] = zr;
+	cur_index++;
+}
+
+CharmListG1& CharmMetaListG1::operator[](const int index)
+{
+	if(index == cur_index) { // means we are creating reference.
+		CharmListG1 tmp;
+		list[cur_index] = tmp;
+		cur_index++;
+		return list[index];
+	}
+
+	int len = (int) list.size();
+	if(index >= 0 && index < len) {
+		return list[index];
+	}
+	else {
+		throw new string("Invalid access.\n");
+	}
+}
+
+int CharmMetaListG1::length()
+{
+	return (int) list.size();
+}
+
+string CharmMetaListG1::printAtIndex(int index)
+{
+	stringstream ss;
+	int i;
+
+	if(index >= 0 && index < (int) list.size()) {
+		i = index;
+		ss << list[i];
+	}
+
+	string s = ss.str();
+	return s;
+}
+
+ostream& operator<<(ostream& s, const CharmMetaListG1& cList)
+{
+	CharmMetaListG1 cList2 = cList;
+	for(int i = 0; i < cList2.length(); i++) {
+		s << "list " << i << "\n";
+		s << cList2.printAtIndex(i) << endl;
+	}
+
+	return s;
+}
+
+// end CharmMetaListG1 implementation
+
+
 // start CharmListG2 implementation
 
 CharmListG2::CharmListG2(void)
@@ -790,8 +943,8 @@ void CharmListG2::append(G2 & g)
 G2& CharmListG2::operator[](const int index)
 {
 	if(index == cur_index) { // means we are creating reference.
-		G2 tmp;
-		list[cur_index] = tmp; // this type will disappear and just for creating reference only. caller expected to set result
+//		G2 tmp;
+//		list[cur_index] = tmp; // this type will disappear and just for creating reference only. caller expected to set result
 		cur_index++;
 		return list[index];
 	}
@@ -835,6 +988,74 @@ ostream& operator<<(ostream& s, const CharmListG2& cList)
 }
 
 // end CharmListG2 implementation
+
+// start CharmMetaListG1 implementation
+
+CharmMetaListG2::CharmMetaListG2(void)
+{
+	// increases as elements are appended
+	cur_index = 0;
+}
+
+CharmMetaListG2::~CharmMetaListG2()
+{
+	for(int i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+}
+
+void CharmMetaListG2::append(CharmListG2 & g2)
+{
+	list[cur_index] = g2;
+	cur_index++;
+}
+
+CharmListG2& CharmMetaListG2::operator[](const int index)
+{
+	if(index == cur_index) { // means we are creating reference.
+		cur_index++;
+		return list[index];
+	}
+
+	int len = (int) list.size();
+	if(index >= 0 && index < len) {
+		return list[index];
+	}
+	else {
+		throw new string("Invalid access.\n");
+	}
+}
+
+int CharmMetaListG2::length()
+{
+	return (int) list.size();
+}
+
+string CharmMetaListG2::printAtIndex(int index)
+{
+	stringstream ss;
+	int i;
+
+	if(index >= 0 && index < (int) list.size()) {
+		i = index;
+		ss << list[i];
+	}
+
+	string s = ss.str();
+	return s;
+}
+
+ostream& operator<<(ostream& s, const CharmMetaListG2& cList)
+{
+	CharmMetaListG2 cList2 = cList;
+	for(int i = 0; i < cList2.length(); i++) {
+		s << "list " << i << "\n";
+		s << cList2.printAtIndex(i) << endl;
+	}
+
+	return s;
+}
+
+// end CharmMetaListG2 implementation
 
 // start CharmListGT implementation
 
@@ -905,6 +1126,73 @@ ostream& operator<<(ostream& s, const CharmListGT& cList)
 
 // end CharmListGT implementation
 
+// start CharmMetaListGT implementation
+
+CharmMetaListGT::CharmMetaListGT(void)
+{
+	// increases as elements are appended
+	cur_index = 0;
+}
+
+CharmMetaListGT::~CharmMetaListGT()
+{
+	for(int i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+}
+
+void CharmMetaListGT::append(CharmListGT & gt)
+{
+	list[cur_index] = gt;
+	cur_index++;
+}
+
+CharmListGT& CharmMetaListGT::operator[](const int index)
+{
+	if(index == cur_index) { // means we are creating reference.
+		cur_index++;
+		return list[index];
+	}
+
+	int len = (int) list.size();
+	if(index >= 0 && index < len) {
+		return list[index];
+	}
+	else {
+		throw new string("Invalid access.\n");
+	}
+}
+
+int CharmMetaListGT::length()
+{
+	return (int) list.size();
+}
+
+string CharmMetaListGT::printAtIndex(int index)
+{
+	stringstream ss;
+	int i;
+
+	if(index >= 0 && index < (int) list.size()) {
+		i = index;
+		ss << list[i];
+	}
+
+	string s = ss.str();
+	return s;
+}
+
+ostream& operator<<(ostream& s, const CharmMetaListGT& cList)
+{
+	CharmMetaListGT cList2 = cList;
+	for(int i = 0; i < cList2.length(); i++) {
+		s << "list " << i << "\n";
+		s << cList2.printAtIndex(i) << endl;
+	}
+
+	return s;
+}
+
+// end CharmMetaListGT implementation
 
 
 // start CharmDict implementation
@@ -1065,6 +1353,26 @@ GT PairingGroup::random(GT_type t)
 
 	gts = pfcObject->power(*gt, zr);
     return gts;
+}
+
+bool PairingGroup::ismember(CharmMetaListZR & g)
+{
+	return true;
+}
+
+bool PairingGroup::ismember(CharmMetaListG1 & g)
+{
+	return true;
+}
+
+bool PairingGroup::ismember(CharmMetaListG2 & g)
+{
+	return true;
+}
+
+bool PairingGroup::ismember(CharmMetaListGT & g)
+{
+	return true;
 }
 
 bool PairingGroup::ismember(CharmList & g)

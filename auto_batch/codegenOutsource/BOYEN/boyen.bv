@@ -83,7 +83,7 @@ Ct := g2 ^ c
 END :: func:keygen
 
 BEGIN :: func:sign
- input := list{g1, Alist, Blist, Clist, sk, Mlist, index}
+ input := list{g1, Alist, Blist, Clist, sk, M, index}
  
  sk := expand{a, b, c}
  prod0 := init(G1)

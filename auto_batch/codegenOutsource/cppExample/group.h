@@ -158,12 +158,33 @@ private:
 	map<int, ZR> list;
 };
 
+class CharmMetaListZR
+{
+public:
+	CharmMetaListZR(void); // static list
+	~CharmMetaListZR();
+	// consider adding remove
+	void append(CharmListZR&);
+
+	int length(); // return length of lists
+	string printAtIndex(int index);
+
+	// retrieve a particular index
+	CharmListZR& operator[](const int index);
+
+    friend ostream& operator<<(ostream&, const CharmMetaListZR&);
+private:
+	int cur_index;
+	map<int, CharmListZR> list;
+};
+
 class CharmListG1
 {
 public:
 	CharmListG1(void); // static list
 	~CharmListG1();
 	void append(G1&);
+	G1& get(const int index);
 	int length(); // return length of lists
 	string printAtIndex(int index);
 
@@ -174,6 +195,26 @@ public:
 private:
 	int cur_index;
 	map<int, G1> list;
+};
+
+class CharmMetaListG1
+{
+public:
+	CharmMetaListG1(void); // static list
+	~CharmMetaListG1();
+	// consider adding remove
+	void append(CharmListG1&);
+
+	int length(); // return length of lists
+	string printAtIndex(int index);
+
+	// retrieve a particular index
+	CharmListG1& operator[](const int index);
+
+    friend ostream& operator<<(ostream&, const CharmMetaListG1&);
+private:
+	int cur_index;
+	map<int, CharmListG1> list;
 };
 
 class CharmListG2
@@ -193,6 +234,27 @@ private:
 	map<int, G2> list;
 };
 
+class CharmMetaListG2
+{
+public:
+	CharmMetaListG2(void); // static list
+	~CharmMetaListG2();
+	// consider adding remove
+	void append(CharmListG2&);
+
+	int length(); // return length of lists
+	string printAtIndex(int index);
+
+	// retrieve a particular index
+	CharmListG2& operator[](const int index);
+
+    friend ostream& operator<<(ostream&, const CharmMetaListG2&);
+private:
+	int cur_index;
+	map<int, CharmListG2> list;
+};
+
+
 class CharmListGT
 {
 public:
@@ -208,6 +270,26 @@ public:
 private:
 	int cur_index;
 	map<int, GT> list;
+};
+
+class CharmMetaListGT
+{
+public:
+	CharmMetaListGT(void); // static list
+	~CharmMetaListGT();
+	// consider adding remove
+	void append(CharmListGT&);
+
+	int length(); // return length of lists
+	string printAtIndex(int index);
+
+	// retrieve a particular index
+	CharmListGT& operator[](const int index);
+
+    friend ostream& operator<<(ostream&, const CharmMetaListGT&);
+private:
+	int cur_index;
+	map<int, CharmListGT> list;
 };
 
 
@@ -258,6 +340,10 @@ public:
 	ZR random(ZR_type);
 	G1 random(G1_type);
 	GT random(GT_type);
+	bool ismember(CharmMetaListZR&);
+	bool ismember(CharmMetaListG1&);
+	bool ismember(CharmMetaListG2&);
+	bool ismember(CharmMetaListGT&);
 	bool ismember(CharmList&);
 	bool ismember(CharmListStr&);
 	bool ismember(CharmListZR&);

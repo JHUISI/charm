@@ -7,7 +7,7 @@ using namespace std;
 
 int N = 100;
 
-int l = 2;
+int l = 3;
 
 int secparam = 80;
 
@@ -85,7 +85,7 @@ void keygen(G1 & g1, G2 & g2, CharmList & pk, CharmList & sk)
     return;
 }
 
-void sign(G1 & g1, CharmListG1 & Alist, CharmListG1 & Blist, CharmListG1 & Clist, CharmList & sk, CharmListStr & Mlist, int index, CharmListG1 & S, CharmListZR & t)
+void sign(G1 & g1, CharmListG1 & Alist, CharmListG1 & Blist, CharmListG1 & Clist, CharmList & sk, string M, int index, CharmListG1 & S, CharmListZR & t)
 {
     ZR a;
     ZR b;
@@ -103,12 +103,15 @@ void sign(G1 & g1, CharmListG1 & Alist, CharmListG1 & Blist, CharmListG1 & Clist
     *m = group.hashListToZR(M);
     for (int y = 0; y < l; y++)
     {
-        if ( ( (y) != (index) ) )
+        if ( ( y != index ) )
         {
-            s[y] = group.random(ZR_t);
-            S[y] = group.exp(g1, s[y]);
+            ZR tmp = group.random(ZR_t);
+            s.append(tmp);
+            G1 tmp2 = group.exp(g1, s[y]);
+            S.append(tmp2);
         }
     }
+
     for (int y = 0; y < l; y++)
     {
         t[y] = group.random(ZR_t);
@@ -118,16 +121,16 @@ void sign(G1 & g1, CharmListG1 & Alist, CharmListG1 & Blist, CharmListG1 & Clist
     {
         if ( ( (y) != (index) ) )
         {
-            *prod1 = group.mul(*prod1, group.exp(group.mul(Alist[y], group.mul(group.exp(Blist[y], m[y]), group.exp(Clist[y], t[y]))), -s[y]));
+            *prod1 = group.mul(*prod1, group.exp(group.mul(Alist[y], group.mul(group.exp(Blist[y], *m), group.exp(Clist[y], t[y]))), -s[y]));
         }
     }
     *result0 = group.mul(*prod0, *prod1);
     *d = group.add(group.add(a, group.mul(b, *m)), group.mul(c, t[index]));
-    S[index] = group.exp(group.mul(g1, *result0), group.div(1, *d));
+    S[index] = group.exp(group.mul(g1, *result0), group.div(ZR(1), *d));
     return;
 }
 
-bool verify(G1 & g1, G2 & g2, G2 & Atlist, G2 & Btlist, G2 & Ctlist, string M, CharmListG1 & S, CharmListZR & t)
+bool verify(G1 & g1, G2 & g2, CharmListG2 & Atlist, CharmListG2 & Btlist, CharmListG2 & Ctlist, string M, CharmListG1 & S, CharmListZR & t)
 {
     GT *D = group.init(GT_t);
     ZR *m = group.init(ZR_t);
@@ -148,7 +151,7 @@ bool verify(G1 & g1, G2 & g2, G2 & Atlist, G2 & Btlist, G2 & Ctlist, string M, C
     }
 }
 
-bool membership(G2 & Atlist, G2 & Btlist, G2 & Ctlist, CharmListG1 & Slist, G1 & g1, G2 & g2, CharmListZR & tlist)
+bool membership(CharmListG2 & Atlist, CharmListG2 & Btlist, CharmListG2 & Ctlist, CharmMetaListG1 & Slist, G1 & g1, G2 & g2, CharmMetaListZR & tlist)
 {
     if ( ( (group.ismember(Atlist)) == (false) ) )
     {
@@ -181,8 +184,9 @@ bool membership(G2 & Atlist, G2 & Btlist, G2 & Ctlist, CharmListG1 & Slist, G1 &
     return true;
 }
 
-void dividenconquer(CharmListZR & delta, int startSigNum, int endSigNum, list<int> & incorrectIndices, CharmListGT & dotDCache, G2 & Atlist, G2 & Btlist, G2 & Ctlist, CharmListStr & Mlist, CharmListG1 & Slist, G1 & g1, G2 & g2, CharmListZR & tlist)
+void dividenconquer(CharmListZR & delta, int startSigNum, int endSigNum, list<int> & incorrectIndices, CharmListGT & dotDCache, CharmListG2 & Atlist, CharmListG2 & Btlist, CharmListG2 & Ctlist, CharmListStr & Mlist, CharmMetaListG1 Slist, G1 & g1, G2 & g2, CharmMetaListZR & tlist)
 {
+    ZR *m = group.init(ZR_t);
     GT *dotDLoopVal = group.init(GT_t);
     G1 *dotALoopVal = group.init(G1_t);
     G1 *dotBLoopVal = group.init(G1_t);
@@ -199,35 +203,37 @@ void dividenconquer(CharmListZR & delta, int startSigNum, int endSigNum, list<in
     {
         for (int z = startSigNum; z < endSigNum; z++)
         {
+            *m = group.hashListToZR(Mlist[z]);
+            cout << "Slist := " << Slist[z][y].g << endl;
             *dotALoopVal = group.mul(*dotALoopVal, group.exp(Slist[z][y], delta[z]));
-            *dotBLoopVal = group.mul(*dotBLoopVal, group.exp(Slist[z][y], group.mul(m[z], delta[z])));
-            *dotCLoopVal = group.mul(*dotCLoopVal, group.exp(Slist[z][y], group.mul(tlist[z][y], delta[z])));
+//            *dotBLoopVal = group.mul(*dotBLoopVal, group.exp(Slist[z][y], group.mul(*m, delta[z])));
+//            *dotCLoopVal = group.mul(*dotCLoopVal, group.exp(Slist[z][y], group.mul(tlist[z][y], delta[z])));
         }
-        *dotELoopVal = group.mul(*dotELoopVal, group.mul(group.pair(*dotALoopVal, Atlist[y]), group.mul(group.pair(*dotBLoopVal, Btlist[y]), group.pair(*dotCLoopVal, Ctlist[y]))));
+//        *dotELoopVal = group.mul(*dotELoopVal, group.mul(group.pair(*dotALoopVal, Atlist[y]), group.mul(group.pair(*dotBLoopVal, Btlist[y]), group.pair(*dotCLoopVal, Ctlist[y]))));
     }
-    if ( ( (*dotELoopVal) == (*dotDLoopVal) ) )
-    {
-        return;
-    }
-    else
-    {
-        midwayFloat = group.div(group.sub(endSigNum, startSigNum), 2);
-        midway = int(midwayFloat);
-    }
-    if ( ( (midway) == (0) ) )
-    {
-        incorrectIndices.push_back(startSigNum);
-    }
-    else
-    {
-        midSigNum = group.add(startSigNum, midway);
-        dividenconquer(delta, startSigNum, midway, incorrectIndices, dotDCache, Atlist, Btlist, Ctlist, Mlist, Slist, g1, g2, tlist);
-        dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotDCache, Atlist, Btlist, Ctlist, Mlist, Slist, g1, g2, tlist);
-    }
+//    if ( ( (*dotELoopVal) == (*dotDLoopVal) ) )
+//    {
+//        return;
+//    }
+//    else
+//    {
+//        midwayFloat = group.div(group.sub(endSigNum, startSigNum), 2);
+//        midway = int(midwayFloat);
+//    }
+//    if ( ( (midway) == (0) ) )
+//    {
+//        incorrectIndices.push_back(startSigNum);
+//    }
+//    else
+//    {
+//        midSigNum = group.add(startSigNum, midway);
+//        dividenconquer(delta, startSigNum, midway, incorrectIndices, dotDCache, Atlist, Btlist, Ctlist, Mlist, Slist, g1, g2, tlist);
+//        dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotDCache, Atlist, Btlist, Ctlist, Mlist, Slist, g1, g2, tlist);
+//    }
     return;
 }
 
-bool batchverify(G2 & Atlist, G2 & Btlist, G2 & Ctlist, CharmListStr & Mlist, CharmListG1 & Slist, G1 & g1, G2 & g2, CharmListZR & tlist, list<int> & incorrectIndices)
+bool batchverify(CharmListG2 & Atlist, CharmListG2 & Btlist, CharmListG2 & Ctlist, CharmListStr & Mlist, CharmMetaListG1 & Slist, G1 & g1, G2 & g2, CharmMetaListZR & tlist, list<int> & incorrectIndices)
 {
     CharmListZR delta;
     GT *D = group.init(GT_t);
@@ -251,5 +257,76 @@ bool batchverify(G2 & Atlist, G2 & Btlist, G2 & Ctlist, CharmListStr & Mlist, Ch
 
 int main()
 {
+    G1 g1;
+    G2 g2;
+    CharmList mpk, pk0, sk0, pk1, sk1;
+    CharmListG1 Alist, Blist, Clist;
+    CharmListG2 Atlist, Btlist, Ctlist;
+    string M = "hello world";
+    string M_2 = "hello worlds";
+    setup(mpk, g1, g2);
+
+    cout << "mpk :=> " << endl;
+    cout << mpk << endl;
+
+    keygen(g1, g2, pk0, sk0);
+    keygen(g1, g2, pk1, sk1);
+    
+    Alist[0] = mpk[0].getG1();
+    Alist[1] = pk0[0].getG1();
+    Alist[2] = pk1[0].getG1();
+    Blist[0] = mpk[1].getG1();
+    Blist[1] = pk0[1].getG1();
+    Blist[2] = pk1[1].getG1();
+    Clist[0] = mpk[2].getG1();
+    Clist[1] = pk0[2].getG1();
+    Clist[2] = pk1[2].getG1();
+
+
+    CharmListG1 S0, S1;
+    CharmListZR t0, t1;
+    sign(g1, Alist, Blist, Clist, sk0, M, 1, S0, t0);
+    sign(g1, Alist, Blist, Clist, sk1, M_2, 2, S1, t1);
+    //cout << "S :=> " << endl;
+    //cout << S << endl;
+
+    Atlist[0] = mpk[3].getRefG2();
+    Atlist[1] = pk0[3].getRefG2();
+    Atlist[2] = pk1[3].getRefG2();
+    Btlist[0] = mpk[4].getRefG2();
+    Btlist[1] = pk0[4].getRefG2();
+    Btlist[2] = pk1[4].getRefG2();
+    Ctlist[0] = mpk[5].getRefG2();
+    Ctlist[1] = pk0[5].getRefG2();
+    Ctlist[2] = pk1[5].getRefG2();
+
+    if(verify(g1, g2, Atlist, Btlist, Ctlist, M, S0, t0)) {
+	cout << "Successful Verification!!!" << endl;
+    }
+    else {
+         cout << "FAILED Verification!" << endl; 
+    }
+    
+    if(verify(g1, g2, Atlist, Btlist, Ctlist, M_2, S1, t1)) {
+	cout << "Successful Verification!!!" << endl;
+    }
+    else {
+         cout << "FAILED Verification!" << endl; 
+    }
+
+    list<int> incorrectIndices;
+    CharmListStr Mlist;
+    Mlist[0] = M;
+    Mlist[1] = M_2;
+
+    CharmMetaListG1 Slist;
+    CharmMetaListZR tlist;
+    Slist[0] = S0;
+    Slist[1] = S1;
+    tlist[0] = t0;
+    tlist[1] = t1;
+
+    batchverify(Atlist, Btlist, Ctlist, Mlist, Slist, g1, g2, tlist, incorrectIndices);
+
     return 0;
 }
