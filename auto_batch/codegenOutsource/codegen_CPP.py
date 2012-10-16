@@ -818,6 +818,8 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
             listOutputString += writeCurrentNumTabsToString()
             listOutputString += variableName + ".append("
             listNodeAsString = getAssignStmtAsString_CPP(listNode, replacementsDict, variableName)
+            if (doesVarNeedStar(listNodeAsString) == True):
+                listNodeAsString = "*" + listNodeAsString
             listOutputString += listNodeAsString + ");\n"
         return listOutputString
     elif ( (node.type == ops.SYMMAP) ): #or ( (node.type == ops.EXPAND) and (variableType == types.symmap) ) ):
