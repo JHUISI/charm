@@ -249,7 +249,7 @@ for{z := 0, N}
 END :: for
 
 BEGIN :: if
- if {(membership(Slist, t1list, g2, g1, Bt, At, Ct) == False)}
+ if {(membership(Slist, tlist, g2, g1, Btlist, Atlist, Ctlist) == False)}
      output := False
 END :: if
 
