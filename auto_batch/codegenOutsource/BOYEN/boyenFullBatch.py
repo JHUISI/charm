@@ -3,12 +3,13 @@ from charm.core.math.integer import randomBits
 
 group = None
 
-N = 100
+N = 2
 
 l = 3
 
 secparam = 80
 
+'''
 result = {}
 Bt = {}
 c = {}
@@ -18,6 +19,7 @@ b = {}
 m = {}
 At = {}
 Ct = {}
+'''
 
 def setup():
 
@@ -38,12 +40,14 @@ def setup():
     return output
 
 def keygen(g1, g2):
+    '''
     global Bt
     global c
     global a
     global b
     global At
     global Ct
+    '''
 
     input = [g1, g2]
     a = group.random(ZR)
@@ -61,12 +65,16 @@ def keygen(g1, g2):
     return output
 
 def sign(g1, Alist, Blist, Clist, sk, Mlist, index):
+    '''
     global result
     global m
+    '''
 
     S = {}
     s = {}
     t = {}
+
+    (a, b, c) = sk
 
     input = [g1, Alist, Blist, Clist, sk, Mlist, index]
     prod0 = 1
@@ -89,9 +97,11 @@ def sign(g1, Alist, Blist, Clist, sk, Mlist, index):
     return output
 
 def verify(Atlist, Btlist, Ctlist, M, S, t, g1, g2):
+    '''
     global result
     global D
     global m
+    '''
 
     input = [Atlist, Btlist, Ctlist, M, S, t, g1, g2]
     D = pair(g1, g2)
@@ -124,7 +134,7 @@ def membership(Slist, tlist, g2, g1, Atlist, Btlist, Ctlist):
     return output
 
 def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotDCache, Mlist, Atlist, Btlist, Ctlist, tlist, Slist):
-    global m
+    #global m
 
     input = [delta, startSigNum, endSigNum, incorrectIndices, dotDCache, Mlist, Atlist, Btlist, Ctlist, tlist, Slist]
     dotDLoopVal = 1
