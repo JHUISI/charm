@@ -85,7 +85,7 @@ void keygen(G1 & g1, G2 & g2, CharmList & pk, CharmList & sk)
     return;
 }
 
-void sign(G1 & g1, CharmListG1 & Alist, CharmListG1 & Blist, CharmListG1 & Clist, CharmList & sk, CharmListStr & Mlist, NO_TYPE & index, CharmListG1 & S, CharmListZR & t)
+void sign(G1 & g1, CharmListG1 & Alist, CharmListG1 & Blist, CharmListG1 & Clist, CharmList & sk, CharmListStr & Mlist, int index, CharmListG1 & S, CharmListZR & t)
 {
     ZR a;
     ZR b;

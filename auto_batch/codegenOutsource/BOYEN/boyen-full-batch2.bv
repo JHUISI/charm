@@ -37,6 +37,7 @@ dotDCache := list{GT}
 Slist := list{G1}
 Mlist := list{str}
 tlist := list{ZR}
+index := int
 END :: types
 
 
