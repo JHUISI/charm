@@ -23,11 +23,9 @@ D := GT
 s := list{ZR}
 S := G1
 t := list{ZR}
+result1 := GT
 END :: types
 
-#Atlist := list{G2}
-#Btlist := list{G2}
-#Ctlist := list{G2} 
 
 
 BEGIN :: precompute
@@ -85,7 +83,8 @@ END :: func:keygen
 
 BEGIN :: func:sign
  input := list{g1, Alist, Blist, Clist, sk, Mlist, index}
-
+ 
+ sk := expand{a, b, c}
  prod0 := init(G1)
  prod1 := init(G1)
  m := H(M, ZR)
@@ -113,9 +112,9 @@ if {y != index}
 END :: if
 END :: for
 
- result := prod0 * prod1
+ result0 := prod0 * prod1
  d := ((a + (b * m)) + (c * t#index))
- S#index? := (g1 * result) ^ (1 / d)
+ S#index? := (g1 * result0) ^ (1 / d)
 
  output := list{S, t}
 END :: func:sign
@@ -124,15 +123,15 @@ END :: func:sign
 BEGIN :: func:verify
  input := list{g1, g2, Atlist, Btlist, Ctlist, M, S, t}  
   D := e(g1, g2)
-  result := init(GT)
+  result1 := init(GT)
   m := H(M, ZR) 
 BEGIN :: for
 for{y := 0, l}
- result := result * e(S#y, Atlist#y * (Btlist#y^m) * (Ctlist#y^t#y))
+ result1 := result1 * e(S#y, Atlist#y * (Btlist#y^m) * (Ctlist#y^t#y))
 END :: for  
 
 BEGIN :: if
- if { result == D}
+ if { result1 == D}
     output := True
  else
     output := False
