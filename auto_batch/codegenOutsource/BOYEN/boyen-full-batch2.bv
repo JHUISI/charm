@@ -34,11 +34,11 @@ dotELoopVal := GT
 dotALoopVal := G1
 dotBLoopVal := G1
 dotDCache := list{GT}
-Slist := list{Slist_link}
 Slist_link := list{G1}
+Slist := list{Slist_link}
 Mlist := list{str}
-tlist := list{tlist_link}
 tlist_link := list{ZR}
+tlist := list{tlist_link}
 index := int
 END :: types
 

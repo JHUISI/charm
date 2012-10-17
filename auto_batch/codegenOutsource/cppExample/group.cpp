@@ -2,6 +2,8 @@
 #include "miracl.h"
 #include <sstream>
 
+#define MAX_LIST 100
+
 /* helper methods to assist with serializing and base-64 encoding group elements */
 static const string base64_chars =
              "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -644,11 +646,20 @@ void CharmListZR::append(ZR & zr)
 	cur_index++;
 }
 
+void CharmListZR::set(int index, ZR zr)
+{
+	ZR *zr2 = new ZR(zr);
+	list[index] = *zr2;
+}
+
 ZR& CharmListZR::operator[](const int index)
 {
 	if(index == cur_index) { // means we are creating reference.
 		list[cur_index] = NULL;
 		cur_index++;
+		return list[index];
+	}
+	else if(index < MAX_LIST) {
 		return list[index];
 	}
 
@@ -783,6 +794,12 @@ void CharmListG1::append(G1 & g)
 	cur_index++;
 }
 
+void CharmListG1::set(int index, G1 g1)
+{
+	G1 *g = new G1(g1);
+	list[index] = *g;
+}
+
 //G1& CharmListG1::get(const int index)
 //{
 //	int len = (int) list.size();
@@ -800,6 +817,9 @@ G1& CharmListG1::operator[](const int index)
 //		G1 tmp;
 //		list[cur_index] = tmp;
 		cur_index++;
+		return list[index];
+	}
+	else if(index < MAX_LIST) {
 		return list[index];
 	}
 

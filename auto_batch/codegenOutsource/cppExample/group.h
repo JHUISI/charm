@@ -147,6 +147,7 @@ public:
 	CharmListZR(void); // static list
 	~CharmListZR();
 	void append(ZR&);
+	void set(int index, ZR);
 	int length(); // return length of lists
 	string printAtIndex(int index);
 
@@ -184,7 +185,8 @@ public:
 	CharmListG1(void); // static list
 	~CharmListG1();
 	void append(G1&);
-	G1& get(const int index);
+	void set(int index, G1);
+//	G1& get(const int index);
 	int length(); // return length of lists
 	string printAtIndex(int index);
 
