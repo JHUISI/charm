@@ -94,7 +94,47 @@ def hasDefinedListMembers(assignInfo, listName):
 
     return False
 
-def getVarNameFromListIndices(assignInfo, node, failSilently=False):
+def isNode2DArrayLetterIndices(nodeName):
+    nodeNameSplit = nodeName.split(LIST_INDEX_SYMBOL)
+    currentListName = nodeNameSplit[0]
+    nodeNameSplit.remove(currentListName)
+    lenNodeNameSplit = len(nodeNameSplit)
+
+    if (len(nodeNameSplit) != 2):
+        return False
+
+    if ( (nodeNameSplit[0].isdigit() == True) or (nodeNameSplit[1].isdigit() == True) ):
+        return False
+
+    return True
+
+def process2DArrayLetterIndices(nodeName, assignInfo, varTypes):
+    nodeNameSplit = nodeName.split(LIST_INDEX_SYMBOL)
+    currentListName = nodeNameSplit[0]
+
+    try:
+        varTypesEntry = varTypes[TYPES_HEADER][currentListName]
+    except:
+        return (None, None)
+
+    if (varTypesEntry.getType() != types.list):
+        return (None, None)
+
+    try:
+        listNodesList = varTypesEntry.getListNodesList()
+    except:
+        return (None, None)
+
+    if (len(listNodesList) != 1):
+        return (None, None)
+
+    (funcName, varInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, listNodesList[0])
+    if ( (funcName != None) and (varInfoObj != None) ):
+        return (funcName, listNodesList[0])
+
+    return (None, None)
+
+def getVarNameFromListIndices(assignInfo, varTypes, node, failSilently=False):
     if (node.type != ops.ATTR):
         if (failSilently == True):
             return (None, None)
@@ -108,6 +148,11 @@ def getVarNameFromListIndices(assignInfo, node, failSilently=False):
             return (None, None)
         else:
             sys.exit("Node passed to getVarNameFromListIndex is not a reference to an index in a list.")
+
+    if (isNode2DArrayLetterIndices(nodeAttrFullName)):
+        (possibleFuncName, possibleListName) =  process2DArrayLetterIndices(nodeAttrFullName, assignInfo, varTypes)
+        if ( (possibleFuncName != None) and (possibleListName != None) ):
+            return (possibleFuncName, possibleListName)
 
     nodeName = nodeAttrFullName
     nodeNameSplit = nodeName.split(LIST_INDEX_SYMBOL)
