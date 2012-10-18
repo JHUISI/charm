@@ -65,10 +65,9 @@ END :: func:keygen
 BEGIN :: func:sign
  input := list{ID, pk, sk, L, M}
  Lt := concat(L)
- num_signers := len(L)
 
 BEGIN :: for
-for{i := 0, num_signers}
+for{i := 0, l}
 BEGIN :: if
  if { ID != L#i }
     u#i := random(G1)
@@ -80,14 +79,14 @@ END :: for
 
  r := random(ZR)
 BEGIN :: for
-for{y := 0, num_signers}
+for{y := 0, l}
    pklist#y := H(L#y, G1)
 END :: for
 
 dotProd := init(G1)
 
 BEGIN :: for
-for{i := 0, num_signers}
+for{i := 0, l}
 BEGIN :: if
 if {ID != L#i}
    dotProd := dotProd * (u#i * (pk#i ^ h#i))
@@ -107,7 +106,7 @@ input := list{P, g, L, M, u, S}
 
  h := init(ZR)
 BEGIN :: for
-for{y := 0, num_sign}
+for{y := 0, l}
  h#y := H(M | Lt | u#y, ZR)
  pk#y := H(L#y, G1)
 END :: for
@@ -115,7 +114,7 @@ END :: for
 dotProd := init(G1)
 
 BEGIN :: for
-for{y := 0, num_sign}
+for{y := 0, l}
    dotProd := dotProd * (u#y * (pk#y ^ h#y))
 END :: for
 

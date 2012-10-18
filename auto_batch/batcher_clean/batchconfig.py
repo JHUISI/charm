@@ -76,7 +76,7 @@ class SDLSetting():
 #                        self.data[BATCH_VERIFY][k + "list"]
 #                        self.data[BATCH_VERIFY_MAP][k] = k + "list"
 #                print("batchverify input types: ", self.data[BATCH_VERIFY], "\n", self.data[BATCH_VERIFY].items()) 
-#                print("new map for batch verify vars: ", self.data[BATCH_VERIFY_MAP])
+#                print("\n\n<=======>\nNew map for batch verify vars: ", self.data[BATCH_VERIFY_MAP])
 #                sys.exit(0)
                 self.partialSDL = False
         else:
@@ -98,8 +98,15 @@ class SDLSetting():
         
         
         if newTypeTmp != "":
-            self.data[BATCH_VERIFY][k + "list"] = newTypeTmp
-            self.data[BATCH_VERIFY_MAP][k] = k + "list"
+            self.data[BATCH_VERIFY][k + "_link"] = newTypeTmp
+            if "list" not in k:
+                self.data[BATCH_VERIFY][k + "list"] = newType % (k + "_link")
+                self.data[BATCH_VERIFY_MAP][k] = k + "list"
+            else:
+                self.data[BATCH_VERIFY][k] = newType % (k + "_link")                
+                self.data[BATCH_VERIFY_MAP][k] = k
+#            self.data[BATCH_VERIFY][k + "list"] = newTypeTmp
+#            self.data[BATCH_VERIFY_MAP][k] = k + "list"
 #            self.data[BATCH_VERIFY_OTHER_TYPES][k + "_link"] = newTypeTmp
 #            self.data[BATCH_VERIFY][k + "list"] = newType % (k + "_link")
 #            self.data[BATCH_VERIFY_MAP][k] = k + "list"

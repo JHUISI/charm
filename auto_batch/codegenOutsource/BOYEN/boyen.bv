@@ -13,9 +13,9 @@ m := ZR
 A := G1
 B := G1
 C := G1
-Atlist := G2
-Btlist := G2
-Ctlist := G2
+Atlist := list{G2}
+Btlist := list{G2}
+Ctlist := list{G2}
 Alist := list{G1}
 Blist := list{G1}
 Clist := list{G1}
@@ -31,6 +31,7 @@ END :: types
 
 BEGIN :: precompute
 D := e(g1, g2)
+m := H(M, ZR)
 END :: precompute
 
 constant := list{Atlist, Btlist, Ctlist, g1, g2}

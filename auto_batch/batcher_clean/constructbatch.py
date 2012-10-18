@@ -271,15 +271,20 @@ class SDLBatch:
         else:
             return False # TODO: might need to look for other cases here
     
-    def __generatePrecomputeLines(self, loopIndex, dotCacheVarList):
+    def __generatePrecomputeLinesForBV(self, loopIndex, dotCacheVarList):
+#        self.debug = True
         outputBeforePrecompute = ""
         outputPrecompute = ""
         nonPrecomputeDict = {}
-        newPrecomputeDict = {}        
+        newPrecomputeDict = {}
+            
         # preprocess precompute lines
-        if self.debug: print("compute outside the loop over signatures:")
+        if self.debug: 
+            print("compute outside the loop over signatures:")
+            print("dotCacheVarList: ", dotCacheVarList)
         for i,j in self.precomputeDict.items():
             if str(i) not in dotCacheVarList:
+                print("took this branch: ", i, ":", dotCacheVarList)
                 nonPrecomputeDict[i] = j
                 if self.debug: print(i, ":= ", j)
                 outputBeforePrecompute += "%s := %s\n" % (i, j)
@@ -291,17 +296,70 @@ class SDLBatch:
             else:
                 newPrecomputeDict[i] = j
         
-        if self.debug: print("compute inside loop over signatures but before dotCache calculations:")
+        if self.debug: 
+            print("compute inside loop over signatures but before dotCache calculations:")
+            print("dotCacheVarList: ", dotCacheVarList)
         for i,j in newPrecomputeDict.items():
-            if str(i) != "delta": # JAA: bandaid. fix: remove delta from batch precompute list
+            if str(i) != "delta" and str(i) in dotCacheVarList: # JAA: bandaid. fix: remove delta from batch precompute list
                 sa = SubstituteAttr(self.sdlData[BATCH_VERIFY_MAP], loopIndex, self.sdlData.get(CONST))
                 eq = BinaryNode.copy(j)
                 ASTVisitor(sa).preorder(eq)                
                 line = "%s := %s\n" % (i, Filter(eq))
                 if self.debug: print(line)
                 outputPrecompute += line
+        
+       # mark precompute variables we have already seen
+        keysToPrecomputeVars = list(self.precomputeDict.keys())
+        for i in keysToPrecomputeVars:
+            if str(i) in dotCacheVarList:
+                del self.precomputeDict[i]
+       
+        print("outputBeforePrecompute: ", outputBeforePrecompute)
+        print("outputPrecompute: ", outputPrecompute)
         return (outputBeforePrecompute, outputPrecompute)
     
+    def __generatePrecomputeLinesForDV(self, loopIndex, dotCacheVarList):
+        # note: dotCacheVarList needs to be comprehensive for all variables needed in DV
+        outputBeforePrecompute = ""
+        outputPrecompute = ""
+        nonPrecomputeDict = {}
+        newPrecomputeDict = {}
+            
+        # preprocess precompute lines
+        if self.debug: 
+            print("compute outside the loop over signatures:")
+            print("dotCacheVarList: ", dotCacheVarList)
+        for i,j in self.precomputeDict.items():
+            # see if attrs in statement are all constants...
+            if str(i) != delta_word and (self.__isVarDepsAllConstants(j) and str(i) in dotCacheVarList):
+                nonPrecomputeDict[i] = j
+                if self.debug: print(i, ":= ", j)
+                outputBeforePrecompute += "%s := %s\n" % (i, j)   
+            else:
+                newPrecomputeDict[i] = j
+        
+        if self.debug: 
+            print("compute inside loop over signatures but before dotCache calculations:")
+            print("dotCacheVarList: ", dotCacheVarList)
+        for i,j in newPrecomputeDict.items():
+            if str(i) != "delta" and str(i) in dotCacheVarList: # JAA: bandaid. fix: remove delta from batch precompute list
+                sa = SubstituteAttr(self.sdlData[BATCH_VERIFY_MAP], loopIndex, self.sdlData.get(CONST))
+                eq = BinaryNode.copy(j)
+                ASTVisitor(sa).preorder(eq)                
+                line = "%s := %s\n" % (i, Filter(eq))
+                if self.debug: print(line)
+                outputPrecompute += line
+        
+       # mark precompute variables we have already seen
+        keysToPrecomputeVars = list(self.precomputeDict.keys())
+        for i in keysToPrecomputeVars:
+            if str(i) in dotCacheVarList:
+                del self.precomputeDict[i]
+       
+#        print("outputBeforePrecompute: ", outputBeforePrecompute)
+#        print("outputPrecompute: ", outputPrecompute)
+        return (outputBeforePrecompute, outputPrecompute)
+
     
     def getShortForm(self, indexList):
         s = ""
@@ -332,7 +390,7 @@ class SDLBatch:
         # pruned list of values we need to pass on to the membership test.
         membershipTest = str(list(membershipTestList)).replace("[", '').replace("]",'').replace("'", '')
 
-        outputBeforePrecompute, outputPrecompute = self.__generatePrecomputeLines(sigIterator, dotCacheVarList)
+        outputBeforePrecompute, outputPrecompute = self.__generatePrecomputeLinesForBV(sigIterator, dotCacheVarList)
         deltaLines = self.__generateDeltaLines(sigIterator)
         
         forLoopStmtOverSigs = sigForLoop % (sigIterator, NUM_SIGNATURES)
@@ -711,7 +769,7 @@ class SDLBatch:
         for k,v in finalEqDotMap.items():
             eqStr = eqStr.replace(k, v)
         statementForSig = (dotInitStmtDivConqSig, divConqLoopValStmtSig, False)
-        statementForSubSig = (listForSigs[2], listForSigs[3], False)
+        statementForSubSig = (listForSigs[2], listForSigs[3], False, listForSigs[7] + listForSigner[7])
         statementForSigner = (listForSigner[2], listForSigner[3], True, signatureProd, statementForSubSig)
         
         outputLines2 = self.__generateDivideAndConquerFlexible(eqStr, divConqArgList, self.callBackForDVSignerThenSignature, statementForSig, statementForSigner)
@@ -746,9 +804,13 @@ class SDLBatch:
         if statementForSigner[2] == True and statementForSigner[3] == signatureProd:
             # need to add sub stuff
             dotInitStmtDivConqSig, divConqLoopValStmtSig = statementForSigner[4][0], statementForSigner[4][1]
+            dotCacheVarListForSigners = statementForSigner[4][3]
+            outputBeforePrecompute, outputPrecompute = self.__generatePrecomputeLinesForDV(sigIterator, dotCacheVarListForSigners)
             for l in dotInitStmtDivConqSig:
                 my_output += l
+            my_output += outputBeforePrecompute # precompute values outside of for loop
             my_output += dc_for_inner_begin % (sigIterator, "startSigNum", "endSigNum")
+            my_output += outputPrecompute # precompute values inside but before dot calculations
             for l in divConqLoopValStmtSig:
                 my_output += l
             my_output += end_for_inner_loop + "\n"            
@@ -756,9 +818,6 @@ class SDLBatch:
         for l in divConqLoopValStmtSign:
             my_output += l
         my_output += end_for_loop
-#        print("<==== Div and Conq BODY ====>\n")
-#        print(my_output)
-#        print("<==== Div and Conq BODY ====>\n")        
         return my_output
 
     def printList(self, prefix, theList):

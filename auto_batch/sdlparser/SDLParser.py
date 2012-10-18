@@ -604,6 +604,9 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
         if (varTypes[currentFuncName][varName].getType() == newType): 
             return
         else:
+            print("varName: ", varName)
+            print("oldType: ", varTypes[currentFuncName][varName].getType())
+            print("newType: ", newType)
             sys.exit("updateVarTypes in SDLParser.py received as input a node whose full variable name is already in varTypes[currentFuncName]. Discrepancy in types.")
 
     varTypeObj = VarType()
@@ -711,10 +714,10 @@ def checkPairingInputTypes_Symmetric(leftType, rightType):
         sys.exit("Problem with the right side of one of the pairings in the symmetric setting.")
 
 def checkPairingInputTypes_Asymmetric(leftType, rightType):
-    if (leftType != types.G1):
+    if (leftType not in [types.G1, types.listG1]):
         sys.exit("One of the pairings in the asymmetric setting does not have a left side of type " + str(types.G1))
 
-    if (rightType != types.G2):
+    if (rightType not in [types.G2, types.listG2]):
         sys.exit("One of the pairings in the asymmetric setting does not have a right side of type " + str(types.G2))
 
 def checkPairingInputTypes(node):
