@@ -740,7 +740,7 @@ def getListOfAttrNamesFromConcatNode(node, replacementsDict, returnList):
     returnList.append(processATTR_CPP(node.right, replacementsDict))
 
 
-def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
+def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideNameForInit=None):
     global userFuncsCPPFile, userFuncsList_CPP
 
     variableType = types.NO_TYPE
@@ -862,7 +862,7 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName):
         nodeName = replacePoundsWithBrackets(nodeName)
 
         if (nodeName == INIT_FUNC_NAME):
-            return "1"
+            return groupObjName + "." + INIT_FUNC_NAME + "(" + str(leftSideNameForInit) + ")"
         elif (nodeName == ISMEMBER_FUNC_NAME):
             funcOutputString = groupObjName + "." + nodeName + "("
         elif (nodeName == INTEGER_FUNC_NAME):
@@ -1130,6 +1130,12 @@ def getRidOfListIndexEndSymbol(variableName):
     loc = variableName.find(LIST_INDEX_SYMBOL)
     return variableName[0:loc]
 
+def isInitCall(binNode):
+    if ( (str(binNode).find(":= init(") != -1) or (str(binNode).find(":=init(") != -1) ):
+        return True
+
+    return False
+
 def writeAssignStmt_CPP(outputFile, binNode):
     global CPP_varTypesLines, CPP_funcBodyLines, setupFile, currentFuncNonOutputVars, SDLListVars, integerVars
 
@@ -1138,8 +1144,8 @@ def writeAssignStmt_CPP(outputFile, binNode):
         CPP_funcBodyLines += "return;\n"
         return
 
-    if ( (str(binNode).find(":= init(") != -1) or (str(binNode).find(":=init(") != -1) ):
-        return
+    #if ( (str(binNode).find(":= init(") != -1) or (str(binNode).find(":=init(") != -1) ):
+        #return
 
     variableName = getFullVarName(binNode.left, False)
     variableNameWOListIndices = getRidOfListIndexEndSymbol(getFullVarName(binNode.left, True))
@@ -1202,16 +1208,22 @@ def writeAssignStmt_CPP(outputFile, binNode):
     if ( (variableType == types.int) and (variableNamePounds not in integerVars) ):
         integerVars.append(variableNamePounds)
 
+    leftSideNameForInit = None
+
     if ( (binNode.right.type != ops.EXPAND) and (binNode.right.type != ops.LIST) ):
         if ( (variableNamePounds in currentFuncOutputVars) or (variableName in SDLListVars) or (variableType == types.int) ):
-            outputString_Body += variableNamePounds
+            leftSideNameForInit = variableNamePounds
+            if (isInitCall(binNode) == False):
+                outputString_Body += variableNamePounds  
         else:
-            outputString_Body += "*" + variableNamePounds
+            leftSideNameForInit = "*" + variableNamePounds
+            if (isInitCall(binNode) == False):
+                outputString_Body += "*" + variableNamePounds
 
-    if ( (binNode.right.type != ops.LIST) and (binNode.right.type != ops.SYMMAP) and (binNode.right.type != ops.EXPAND) ):
+    if ( (isInitCall(binNode) == False) and (binNode.right.type != ops.LIST) and (binNode.right.type != ops.SYMMAP) and (binNode.right.type != ops.EXPAND) ):
         outputString_Body += " = "
 
-    outputString_Body += getAssignStmtAsString_CPP(binNode.right, None, variableNamePounds)
+    outputString_Body += getAssignStmtAsString_CPP(binNode.right, None, variableNamePounds, leftSideNameForInit)
     if ( (binNode.right.type != ops.LIST) and (binNode.right.type != ops.SYMMAP) and (binNode.right.type != ops.EXPAND) ):
         outputString_Body += ";\n"
     #outputFile.write(outputString)
