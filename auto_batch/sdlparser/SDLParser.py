@@ -896,7 +896,7 @@ def checkForListWithOneNumIndex(nodeName):
     return retVarType
 
 def getVarTypeInfoForAttr_List(node):
-    (funcNameOfVar, varNameInList) = getVarNameFromListIndices(assignInfo, node)
+    (funcNameOfVar, varNameInList) = getVarNameFromListIndices(assignInfo, varTypes, node)
     if ( (funcNameOfVar != None) and (varNameInList != None) ):
         if ( (funcNameOfVar in varTypes) and (varNameInList in varTypes[funcNameOfVar]) ):
             firstReturnType = varTypes[funcNameOfVar][varNameInList].getType()
