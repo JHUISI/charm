@@ -11,7 +11,8 @@ L := list{str}
 u := list{G1}
 h := list{ZR}
 s := int
-pk := list{G1}
+pkList := list{G1}
+pk := G1
 sk := G1
 P := G2
 S := G1
@@ -34,7 +35,7 @@ public_count := l
 signature_count := N
 END :: count
 
-verify := { e((prod{y:=0, l} on (u_y * (pk_y^h_y))) , P) == e(S, g) }
+verify := { e((prod{y:=0, l} on (u_y * (pkList_y^h_y))) , P) == e(S, g) }
 
 BEGIN :: func:setup
  input := None
@@ -47,7 +48,7 @@ END :: func:setup
 BEGIN :: func:concat
  input := ID_List
  L := init(str)
- l := len(L)
+ l := len(ID_List)
 BEGIN :: for
 for{y := 0, l}
  L := (L | ID_List#y)
@@ -80,7 +81,7 @@ END :: for
  r := random(ZR)
 BEGIN :: for
 for{y := 0, l}
-   pklist#y := H(L#y, G1)
+   pkList#y := H(L#y, G1)
 END :: for
 
 dotProd := init(G1)
@@ -89,7 +90,7 @@ BEGIN :: for
 for{i := 0, l}
 BEGIN :: if
 if {ID != L#i}
-   dotProd := dotProd * (u#i * (pk#i ^ h#i))
+   dotProd := dotProd * (u#i * (pkList#i ^ h#i))
 END :: if
 END :: for
 
@@ -104,18 +105,18 @@ input := list{P, g, L, M, u, S}
  Lt := concat(L)
  num_sign := len(L)
 
- h := init(ZR)
+# h := init(ZR)
 BEGIN :: for
 for{y := 0, l}
  h#y := H(M | Lt | u#y, ZR)
- pk#y := H(L#y, G1)
+ pkList#y := H(L#y, G1)
 END :: for
 
 dotProd := init(G1)
 
 BEGIN :: for
 for{y := 0, l}
-   dotProd := dotProd * (u#y * (pk#y ^ h#y))
+   dotProd := dotProd * (u#y * (pkList#y ^ h#y))
 END :: for
 
 BEGIN :: if

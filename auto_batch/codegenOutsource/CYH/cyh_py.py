@@ -12,6 +12,7 @@ secparam = 80
 
 Lt = {}
 dotProd = {}
+pkList = {}
 h = {}
 l = {}
 
@@ -28,11 +29,12 @@ def concat(ID_List):
     global l
 
     input = ID_List
-    L = 1
-    l = len(L)
+    L = ""
+    l = len(ID_List)
     for y in range(0, l):
         L = (L, ID_List[y])
     output = L
+    print(L)
     return output
 
 def keygen(alpha, ID):
@@ -46,11 +48,12 @@ def keygen(alpha, ID):
 def sign(ID, pk, sk, L, M):
     global Lt
     global dotProd
+    global pkList
     global h
 
     h = {}
     u = {}
-    pklist = {}
+    pkList = {}
 
     input = [ID, pk, sk, L, M]
     Lt = concat(L)
@@ -62,11 +65,11 @@ def sign(ID, pk, sk, L, M):
             s = i
     r = group.random(ZR)
     for y in range(0, l):
-        pklist[y] = group.hash(L[y], G1)
+        pkList[y] = group.hash(L[y], G1)
     dotProd = 1
     for i in range(0, l):
         if ( ( (ID) != (L[i]) ) ):
-            dotProd = (dotProd * (u[i] * (pk[i] ** h[i])))
+            dotProd = (dotProd * (u[i] * (pkList[i] ** h[i])))
     u[s] = ((pk ** r) * dotProd)
     h[s] = group.hash((M, (Lt, u[s])), ZR)
     S = (sk ** (h[s] + r))
@@ -76,18 +79,18 @@ def sign(ID, pk, sk, L, M):
 def verify(P, g, L, M, u, S):
     global Lt
     global dotProd
+    global pkList
     global h
 
     input = [P, g, L, M, u, S]
     Lt = concat(L)
     num_sign = len(L)
-    h = 1
     for y in range(0, l):
         h[y] = group.hash((M, (Lt, u[y])), ZR)
-        pk[y] = group.hash(L[y], G1)
+        pkList[y] = group.hash(L[y], G1)
     dotProd = 1
     for y in range(0, l):
-        dotProd = (dotProd * (u[y] * (pk[y] ** h[y])))
+        dotProd = (dotProd * (u[y] * (pkList[y] ** h[y])))
     if ( ( (pair(dotProd, P)) == (pair(S, g)) ) ):
         output = True
     else:
