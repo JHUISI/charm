@@ -13,17 +13,18 @@ m := ZR
 A := G1
 B := G1
 C := G1
-Atlist := G2
-Btlist := G2
-Ctlist := G2
+Atlist := list{G2}
+Btlist := list{G2}
+Ctlist := list{G2}
 Alist := list{G1}
 Blist := list{G1}
 Clist := list{G1}
 D := GT
 s := list{ZR}
-S := G1
+S := list{G1}
 t := list{ZR}
 result1 := GT
+index := int
 incorrectIndices := list{int}
 endSigNum := int
 startSigNum := int
@@ -34,18 +35,18 @@ dotELoopVal := GT
 dotALoopVal := G1
 dotBLoopVal := G1
 dotDCache := list{GT}
-Slist_link := list{G1}
-Slist := list{Slist_link}
+Slist := list{S_link}
+S_link := list{G1}
 Mlist := list{str}
-tlist_link := list{ZR}
-tlist := list{tlist_link}
-index := int
+tlist := list{t_link}
+t_link := list{ZR}
 END :: types
 
 
 
 BEGIN :: precompute
 D := e(g1, g2)
+m := H(M, ZR)
 END :: precompute
 
 constant := list{Atlist, Btlist, Ctlist, g1, g2}
@@ -98,7 +99,7 @@ Ct := g2 ^ c
 END :: func:keygen
 
 BEGIN :: func:sign
- input := list{g1, Alist, Blist, Clist, sk, Mlist, index}
+ input := list{g1, Alist, Blist, Clist, sk, M, index}
  
  sk := expand{a, b, c}
  prod0 := init(G1)
@@ -217,8 +218,9 @@ dotCLoopVal := init(G1)
 
 BEGIN :: forinner
 forinner{z := startSigNum, endSigNum}
+m := H(Mlist#z,ZR)
 dotALoopVal := dotALoopVal * (Slist#z#y^delta#z)
-dotBLoopVal := dotBLoopVal * (Slist#z#y^(m#z * delta#z))
+dotBLoopVal := dotBLoopVal * (Slist#z#y^(m * delta#z))
 dotCLoopVal := dotCLoopVal * (Slist#z#y^(tlist#z#y * delta#z))
 END :: forinner
 dotELoopVal := dotELoopVal * (e(dotALoopVal,Atlist#y) * (e(dotBLoopVal,Btlist#y) * e(dotCLoopVal,Ctlist#y)))
