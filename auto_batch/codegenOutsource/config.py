@@ -11,6 +11,7 @@ numSignersVarName = "l"
 smallExp = "SmallExp(secparam)"
 secParamVarName = "secparam"
 elementName = "Element"
+strArgName = "str"
 
 inputVarName = "input"
 outputVarName = "output"

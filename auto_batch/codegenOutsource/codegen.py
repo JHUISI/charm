@@ -832,7 +832,10 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
         nodeName = applyReplacementsDict(replacementsDict, getFullVarName(node, False))
         nodeName = replacePoundsWithBrackets(nodeName)
         if (nodeName == INIT_FUNC_NAME):
-            return "1"
+            if ( (len(node.listNodes) == 1) and (node.listNodes[0] == strArgName) ):
+                return "\"\""
+            else:
+                return "1"
         elif (nodeName == ISMEMBER_FUNC_NAME):
             funcOutputString = groupObjName + "." + nodeName + "("
         elif (nodeName == INTEGER_FUNC_NAME):
