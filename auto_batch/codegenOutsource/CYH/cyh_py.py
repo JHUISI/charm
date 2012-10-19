@@ -4,7 +4,7 @@ from charm.core.engine.util import *
 
 group = None
 
-N = 100
+N = 2
 
 l = 3
 
@@ -32,7 +32,7 @@ def concat(ID_List):
     L = ""
     l = len(ID_List)
     for y in range(0, l):
-        L = (L, ID_List[y])
+        L = L + ID_List[y] + ":"
     output = L
     print(L)
     return output
@@ -46,11 +46,12 @@ def keygen(alpha, ID):
     return output
 
 def sign(ID, pk, sk, L, M):
+    """
     global Lt
     global dotProd
     global pkList
     global h
-
+    """
     h = {}
     u = {}
     pkList = {}
@@ -70,21 +71,23 @@ def sign(ID, pk, sk, L, M):
     for i in range(0, l):
         if ( ( (ID) != (L[i]) ) ):
             dotProd = (dotProd * (u[i] * (pkList[i] ** h[i])))
-    u[s] = ((pk ** r) * dotProd)
+    u[s] = ((pk ** r) * (dotProd ** -1))
     h[s] = group.hash((M, (Lt, u[s])), ZR)
     S = (sk ** (h[s] + r))
     output = (u, S)
     return output
 
 def verify(P, g, L, M, u, S):
+    """ 
     global Lt
     global dotProd
     global pkList
     global h
+    """
 
     input = [P, g, L, M, u, S]
     Lt = concat(L)
-    num_sign = len(L)
+
     for y in range(0, l):
         h[y] = group.hash((M, (Lt, u[y])), ZR)
         pkList[y] = group.hash(L[y], G1)

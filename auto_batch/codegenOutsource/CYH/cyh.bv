@@ -94,7 +94,7 @@ if {ID != L#i}
 END :: if
 END :: for
 
-  u#s? := (pk ^ r) * dotProd
+  u#s? := (pk ^ r) * (dotProd ^ -1)
   h#s? := H(M | Lt | u#s, ZR)
   S := sk ^ (h#s + r)
 output := list{u, S}
