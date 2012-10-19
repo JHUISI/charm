@@ -650,6 +650,7 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
         varTypes[currentFuncName][varName] = varTypeObj
         return
 
+    print(varName, " : ", typeNode.type)
     sys.exit("updateVarTypes in SDLParser.py was passed a node that it is not currently capable of processing.")
 
 def updateKeywordStmts(node, lineNum):

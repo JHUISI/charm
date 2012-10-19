@@ -34,7 +34,7 @@ public_count := l
 signature_count := N
 END :: count
 
-verify := { e((prod{y:=0, l} on (u_y * (pk_y^h_y))) , P) == e(S, g) }
+verify := { e((prod{y := 0, l} on (u_y * (pk_y^h_y))) , P) == e(S, g) }
 
 BEGIN :: func:setup
  input := None

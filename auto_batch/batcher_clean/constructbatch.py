@@ -85,7 +85,7 @@ for{%s := 0, %s}
 delta_word = "delta"
 delta_stmt = delta_word + "%s := SmallExp(secparam)\n"
 delta_lhs = delta_word + "%s := "
-
+linkVar = "_link"
 
 batch_verify_header = """
 BEGIN :: func:batchverify
@@ -573,7 +573,22 @@ class SDLBatch:
         else:
             print("TODO: JAA - what case is this: ", len(VarsForDotOverSigs), len(VarsForDotOverSign))
     
-    # FINISH THIS
+    def __cleanType(self, typeVar):
+        newTypeTmp = ""
+        if typeVar == "listZR":
+            newTypeTmp = "ZR"
+        elif typeVar == "listG1":
+            newTypeTmp = "G1"
+        elif typeVar == "listG2":
+            newTypeTmp = "G2"
+        elif typeVar == "listGT":
+            newTypeTmp = "GT"
+        elif typeVar == "listStr":
+            newTypeTmp = "str"
+        else:
+            return typeVar
+        return newTypeTmp
+
     def __createStatements(self, VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs, varIterator, combineLoopAndCacheStmt=False):
         dotLoopValTypesSig = {}
         dotCacheTypesSig = {}
@@ -592,8 +607,9 @@ class SDLBatch:
             print(i,":=", VarsForDotTypesOverSigs[i])
             loopVal = "%sLoopVal" % i
             dotCache = "%sCache" % i
-            dotLoopValTypesSig[ loopVal ] = str(VarsForDotTypesOverSigs[i])
-            dotInitStmtDivConqSig.append("%s := init(%s)\n" % (loopVal, VarsForDotTypesOverSigs[i]))
+            getType = self.__cleanType(VarsForDotTypesOverSigs[i])
+            dotLoopValTypesSig[ loopVal ] = getType
+            dotInitStmtDivConqSig.append("%s := init(%s)\n" % (loopVal, getType))
             dotVerifyEq[str(i)] = loopVal
             dotList.append(str(i))
             dotCacheRHS = VarsForDotASTOverSigs[i].getRight()
@@ -605,7 +621,7 @@ class SDLBatch:
                 divConqLoopValStmtSig.append("%s := %s * %s\n" % (loopVal, loopVal, compStmt)) # this is mul specifically
             else:
                 divConqLoopValStmtSig.append("%s := %s * %s#%s\n" % (loopVal, loopVal, dotCache, varIterator)) # this is mul specifically
-                dotCacheTypesSig[dotCache] = "list{%s}" % VarsForDotTypesOverSigs[i]
+                dotCacheTypesSig[dotCache] = "list{%s}" % getType
                 divConqArgList.append(dotCache)
                 dotCacheCalc.append("%s#%s := %s\n" % (dotCache, varIterator, self.ReplaceAppropArgs(self.sdlData[BATCH_VERIFY_MAP], varIterator, dotCacheRHS))) # JAA: need to write Filter function
         
@@ -642,8 +658,9 @@ class SDLBatch:
         for i in VarsForDotOverSigs:
             print(i,":=", VarsForDotTypesOverSigs[i])
             loopVal = "%sLoopVal" % i
-            dotLoopValTypesSig[ loopVal ] = str(VarsForDotTypesOverSigs[i])
-            dotInitStmtDivConqSig.append("%s := init(%s)\n" % (loopVal, VarsForDotTypesOverSigs[i]))
+            getType = self.__cleanType(VarsForDotTypesOverSigs[i])
+            dotLoopValTypesSig[ loopVal ] = getType
+            dotInitStmtDivConqSig.append("%s := init(%s)\n" % (loopVal, getType))
             dotVerifyEq[str(i)] = loopVal
 #            dotCacheTypesSig[dotCache] = "list{%s}" % VarsForDotTypesOverSigs[i]
 #            divConqArgList.append(dotCache)
@@ -740,7 +757,11 @@ class SDLBatch:
 #        print("refSignatureDict", refSignatureDict)
 #        print("refSignerDict", refSignerDict)
 
-        batchVerifyArgList = list(self.sdlData[BATCH_VERIFY].keys())
+        batchVerifyArgList = []
+        _batchVerifyArgList = list(self.sdlData[BATCH_VERIFY].keys())
+        for i in _batchVerifyArgList:
+            if linkVar not in str(i):
+                batchVerifyArgList.append(i)
         batchVerifyArgTypes = self.sdlData[BATCH_VERIFY]
         batchVerifyArgList.sort()
         print("batch: ", batchVerifyArgList, batchVerifyArgTypes)

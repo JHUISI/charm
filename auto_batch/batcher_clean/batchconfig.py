@@ -65,22 +65,37 @@ class SDLSetting():
                 self.data[VERIFY] = list(verifyDict.get('input').getListNodesList())
                 self.data[BATCH_VERIFY] = {}
                 self.data[BATCH_VERIFY_MAP] = {}
-                self.data[BATCH_VERIFY_OTHER_TYPES] = {}
+#                self.data[BATCH_VERIFY_OTHER_TYPES] = {}
                 # figure out which bach verify args are constant and which ones are not
                 for k in self.data[VERIFY]:
                     if (k in self.data[CONST]) or (k in self.data[SIGNATURE] and self.data[COUNT_HEADER][SIG_CNT] != NUM_SIGNATURES) or (k in self.data[PUBLIC] and self.data[COUNT_HEADER][PUB_CNT] != NUM_SIGNATURES) or (k in self.data[MESSAGE] and self.data[COUNT_HEADER][MSG_CNT] != NUM_SIGNATURES):
-                        self.data[BATCH_VERIFY][k] = self.varTypes[k]
+                        self.data[BATCH_VERIFY][k] = self.returnRealType(self.varTypes[k])
                     else:
                         # change type into a list
                         self.setTypeString(k, self.varTypes[k]) # "list{%s}" % self.varTypes[k]  # it is variable
-#                        self.data[BATCH_VERIFY][k + "list"]
-#                        self.data[BATCH_VERIFY_MAP][k] = k + "list"
+
 #                print("batchverify input types: ", self.data[BATCH_VERIFY], "\n", self.data[BATCH_VERIFY].items()) 
 #                print("\n\n<=======>\nNew map for batch verify vars: ", self.data[BATCH_VERIFY_MAP])
 #                sys.exit(0)
                 self.partialSDL = False
         else:
             self.partialSDL = True
+
+    def returnRealType(self, typeVar):
+        newTypeTmp = ""
+        if typeVar == "listZR":
+            newTypeTmp = "list{ZR}"
+        elif typeVar == "listG1":
+            newTypeTmp = "list{G1}"
+        elif typeVar == "listG2":
+            newTypeTmp = "list{G2}"
+        elif typeVar == "listGT":
+            newTypeTmp = "list{GT}"
+        elif typeVar == "listStr":
+            newTypeTmp = "list{str}"
+        else:
+            return typeVar
+        return newTypeTmp
     
     def setTypeString(self, k, typeVar):
         newType = "list{%s}"
@@ -98,6 +113,7 @@ class SDLSetting():
         
         
         if newTypeTmp != "":
+            # if variable name includes the "list" keyword, then no need adding a list to the name.
             self.data[BATCH_VERIFY][k + "_link"] = newTypeTmp
             if "list" not in k:
                 self.data[BATCH_VERIFY][k + "list"] = newType % (k + "_link")
@@ -105,11 +121,6 @@ class SDLSetting():
             else:
                 self.data[BATCH_VERIFY][k] = newType % (k + "_link")                
                 self.data[BATCH_VERIFY_MAP][k] = k
-#            self.data[BATCH_VERIFY][k + "list"] = newTypeTmp
-#            self.data[BATCH_VERIFY_MAP][k] = k + "list"
-#            self.data[BATCH_VERIFY_OTHER_TYPES][k + "_link"] = newTypeTmp
-#            self.data[BATCH_VERIFY][k + "list"] = newType % (k + "_link")
-#            self.data[BATCH_VERIFY_MAP][k] = k + "list"
         else:
             self.data[BATCH_VERIFY][k + "list"] = newType % typeVar
             self.data[BATCH_VERIFY_MAP][k] = k + "list"
