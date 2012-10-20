@@ -543,28 +543,17 @@ class SDLBatch:
         # assignment AST for each dot value
         VarsForDotASTOverSign = subProds1.dotprod['dict']
 #        print("list over signers: ", VarsForDotOverSign)
-
+        
+#        print("len over signatures: ", len(VarsForDotOverSigs))
+#        for i in VarsForDotOverSigs:
+#            print(i, ":=", VarsForDotASTOverSigs[i])
+#        print("len over signers: ", len(VarsForDotOverSign))
+#        sys.exit(0)
         # dotValues in signature list is greater than 1 and the one of the signers is 0, then no brainer
         if len(VarsForDotOverSigs) >= 1 and len(VarsForDotOverSign) == 0:
             self.__constructSDLBatchOverSignaturesOnly(VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs)
         elif len(VarsForDotOverSigs) >= 1 and len(VarsForDotOverSign) >= 1:
             # mixed mode between loops over ...
-#            refSignatureDict, refSignerDict = self.__searchForDependencies(VarsForDotASTOverSigs, VarsForDotASTOverSign)
-#            print("refSignatureDict", refSignatureDict)
-#            print("refSignerDict", refSignerDict)
-#
-#            batchVerifyArgList = self.sdlData[BATCH_VERIFY].keys()
-#            batchVerifyArgTypes = self.sdlData[BATCH_VERIFY]
-#            print("batch: ", batchVerifyArgList, batchVerifyArgTypes)
-#            membershipTestList, outputLines1 = self.__generateMembershipTest(batchVerifyArgList, batchVerifyArgTypes) 
-#            dotLoopValTypesSig, dotCacheTypesSig, dotInitStmtDivConqSig, divConqLoopValStmtSig, dotVerifyEq, dotCacheCalc, dotList, dotCacheVarList, divConqArgList = \
-#                          self.__createStatements(list(refSignatureDict.keys()), VarsForDotTypesOverSigs, VarsForDotASTOverSigs, sigIterator)
-#            outputLines = self.__generateBatchVerify(batchVerifyArgList, membershipTestList, divConqArgList, dotCacheCalc, dotCacheVarList)
-#            
-#            print("outputLines: ", outputLines)
-#            # check if there are dependencies
-#            ## self.__createStatements(list(refSignerDict.keys()), VarsForDotTypesOverSign, VarsForDotASTOverSign, signerIterator)
-
             self.__constructSDLBatchOverSignaturesAndSigners(VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs, 
                                                              VarsForDotOverSign, VarsForDotTypesOverSign, VarsForDotASTOverSign)
         elif len(VarsForDotOverSigs) == 0 and len(VarsForDotOverSign) >= 1:

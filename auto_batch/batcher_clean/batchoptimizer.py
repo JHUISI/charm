@@ -606,27 +606,35 @@ class SubstituteSigDotProds:
     
     def visit_on(self, node, data):
         index = str(node.left.right.attr)
-        dot_type = self.deriveNodeType(node.right)
+        dot_type = self.extractType(self.deriveNodeType(node.right))
         #print("node.right type +=> ", dot_type, node.right)
         #print("index =>", index)
 
         n = self.searchProd(node.right, node)
+#        print("visit_on :=> ", node.right, Type(node.right))
         if n:
             (t, p) = n
-#            print("Found it:", t)
-            dot_type2 = self.deriveNodeType(t.right)
+#            print("Found parent : ", p)
+#            print("Found it : ", t)
+            dot_type2 = self.extractType(self.deriveNodeType(t.right))
             # perform substition
             subkey = BinaryNode(self.getkey())
             self.store(subkey, t, dot_type2)
+
             if p.left == t:
                 p.left = subkey
-#                print("p =>", p)
+#                print("p after substitution =>", p)
+            elif p.right == t:
+#                print("new substitution: ", p)
+#                print("subkey: ", subkey)
+                p.right = subkey
         
         if index == self.sig:
             key = BinaryNode(self.getkey())
             self.store(key, node, dot_type)
             
             batchparser.addAsChildNodeToParent(data, key)
+
     
     def visit_of(self, node, data):
         sig = str(node.left.right.attr)
@@ -642,13 +650,24 @@ class SubstituteSigDotProds:
                 
     def searchProd(self, node, parent):
         if node == None: return None
-        elif node.type == ops.ON:
+        elif node.type in [ops.ON]:
             return (node, parent)
         else:
             result = self.searchProd(node.left, node)
             if result: return result            
             result = self.searchProd(node.right, node)
             return result
+
+    def extractType(self, typeValue):
+        if typeValue == str(types.listZR):
+            return 'ZR'
+        elif typeValue == str(types.listG1):
+            return 'G1'
+        elif typeValue == str(types.listG2):
+            return 'G2'
+        elif typeValue == str(types.listGT):
+            return 'GT'
+        return typeValue
 
     def deriveNodeType(self, node):
         if node.type == ops.ATTR:

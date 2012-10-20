@@ -896,6 +896,20 @@ def checkForListWithOneNumIndex(nodeName):
 
     return retVarType
 
+def getVarTypeFromVarTypesDict(possibleFuncName, nodeAttrFullName):
+    typeDef = varTypes[possibleFuncName][nodeAttrFullName].getType()
+    
+    if typeDef == types.listZR:
+        return types.ZR
+    elif typeDef == types.listG1:
+        return types.G1
+    elif typeDef == types.listG2:
+        return types.G2
+    elif typeDef == types.listGT:
+        return types.GT
+    
+    return typeDef
+
 def getVarTypeInfoForAttr_List(node):
     (funcNameOfVar, varNameInList) = getVarNameFromListIndices(assignInfo, varTypes, node)
     if ( (funcNameOfVar != None) and (varNameInList != None) ):
@@ -931,7 +945,8 @@ def getVarTypeInfoForAttr(node):
 
     (possibleFuncName, possibleVarInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, nodeAttrFullName)
     if ( (possibleFuncName != None) and (possibleVarInfoObj != None) and (nodeAttrFullName in varTypes[possibleFuncName]) ):
-        return varTypes[possibleFuncName][nodeAttrFullName].getType()
+#        print("just before: ", nodeAttrFullName)
+        return getVarTypeFromVarTypesDict(possibleFuncName, nodeAttrFullName)   # varTypes[possibleFuncName][nodeAttrFullName].getType()
 
     if (nodeAttrFullName.find(LIST_INDEX_SYMBOL) != -1):
         return getVarTypeInfoForAttr_List(node)
@@ -968,6 +983,8 @@ def getVarTypeInfoRecursive(node):
         leftSideType = getVarTypeInfoRecursive(node.left)
         rightSideType = getVarTypeInfoRecursive(node.right)
         if (leftSideType != rightSideType):
+            print("left side: ", leftSideType, ":", node.left)
+            print("right side: ", rightSideType)
             sys.exit("getVarTypeInfoRecursive in SDLParser.py found an operation of type ADD, SUB, MUL, or DIV in which the left and right sides were not of the same type.")
         return leftSideType
     if (node.type == ops.PAIR):
