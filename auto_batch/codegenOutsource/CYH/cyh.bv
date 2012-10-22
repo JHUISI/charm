@@ -21,12 +21,11 @@ g := G2
 r := ZR
 END :: types
 
-#Lt := concat(L)
 BEGIN :: precompute
 h := H(M | Lt | u, ZR)
 END :: precompute
 
-constant := list{P, g}
+constant := list{P, g, Lt}
 public := pklist
 signature := list{S, u}
 message := h
@@ -99,12 +98,11 @@ END :: for
   u#s? := (pk ^ r) * (dotProd ^ -1)
   h#s? := H(M | Lt | u#s, ZR)
   S := sk ^ (h#s + r)
-output := list{pklist, u, S}
+output := list{Lt, pklist, u, S}
 END :: func:sign
 
 BEGIN :: func:verify
-input := list{P, g, L, M, u, S, pklist}
- Lt := concat(L)
+input := list{Lt, pklist, P, g, M, u, S}
 
 BEGIN :: for
 for{y := 0, l}

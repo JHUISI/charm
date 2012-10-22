@@ -1,0 +1,239 @@
+name := cyh
+setting := asymmetric
+N := 100
+l := 3
+secparam := 80
+
+BEGIN :: types
+M := str
+ID := str
+L := str
+Lt := list{str}
+u := list{G1}
+h := list{ZR}
+s := int
+pklist := list{G1}
+pk := G1
+sk := G1
+P := G2
+S := G1
+g := G2
+r := ZR
+incorrectIndices := list{int}
+endSigNum := int
+startSigNum := int
+delta := list{ZR}
+dotCLoopVal := G1
+dotBLoopVal := G1
+dotBCache := list{G1}
+dotCCache := list{G1}
+Slist := list{G1}
+Mlist := list{str}
+u_link := list{G1}
+ulist := list{u_link}
+END :: types
+
+BEGIN :: precompute
+h := H(M | Lt | u, ZR)
+END :: precompute
+
+constant := list{P, g, Lt}
+public := pklist
+signature := list{S, u}
+message := h
+
+BEGIN :: count
+message_count := N
+public_count := l
+signature_count := N
+END :: count
+
+verify := { e((prod{y := 0, l} on (u_y * (pklist_y^h_y))) , P) == e(S, g) }
+
+BEGIN :: func:setup
+ input := None
+ g := random(G2)
+ alpha := random(ZR)
+ P := g ^ alpha
+ output := list{P, g, alpha}
+END :: func:setup
+
+BEGIN :: func:concat
+ input := ID_List
+ L := init(str)
+ l := len(ID_List)
+BEGIN :: for
+for{y := 0, l}
+ L := (L | ID_List#y)
+END :: for
+output := L
+END :: func:concat
+
+BEGIN :: func:keygen
+ input := list{alpha, ID}
+ sk := H(ID, G1) ^ alpha
+ pk := H(ID, G1)
+ output := list{pk, sk}
+END :: func:keygen
+
+BEGIN :: func:sign
+ input := list{ID, pk, sk, L, M}
+ Lt := concat(L)
+
+BEGIN :: for
+for{i := 0, l}
+BEGIN :: if
+ if { ID != L#i }
+    u#i := random(G1)
+    h#i := H(M | Lt | u#i, ZR)
+ else
+    s := i
+END :: if
+END :: for
+
+ r := random(ZR)
+BEGIN :: for
+for{y := 0, l}
+   pklist#y := H(L#y, G1)
+END :: for
+
+dotProd := init(G1)
+
+BEGIN :: for
+for{i := 0, l}
+BEGIN :: if
+if {ID != L#i}
+   dotProd := dotProd * (u#i * (pklist#i ^ h#i))
+END :: if
+END :: for
+
+  u#s? := (pk ^ r) * (dotProd ^ -1)
+  h#s? := H(M | Lt | u#s, ZR)
+  S := sk ^ (h#s + r)
+output := list{Lt, pklist, u, S}
+END :: func:sign
+
+BEGIN :: func:verify
+input := list{Lt, pklist, P, g, M, u, S}
+
+BEGIN :: for
+for{y := 0, l}
+ h#y := H(M | Lt | u#y, ZR)
+END :: for
+
+dotProd := init(G1)
+
+BEGIN :: for
+for{y := 0, l}
+   dotProd := dotProd * (u#y * (pklist#y ^ h#y))
+END :: for
+
+BEGIN :: if
+if {e(dotProd, P) == e(S, g)}
+   output := True
+else
+   output := False
+END :: if
+END :: func:verify
+
+
+
+BEGIN :: func:membership
+ input := list{P, Slist, g, pklist, ulist}
+
+
+BEGIN :: if
+if { ismember(P) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(Slist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(g) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(pklist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(ulist) == False }
+    output := False
+END :: if
+
+ output := True
+END :: func:membership
+
+
+BEGIN :: func:dividenconquer
+ input := list{delta, startSigNum, endSigNum, incorrectIndices, dotBCache, dotCCache, P, g}
+dotBLoopVal := init(G1)
+dotCLoopVal := init(G1)
+
+BEGIN :: for
+for{z := startSigNum, endSigNum}
+dotBLoopVal := dotBLoopVal * dotBCache#z
+dotCLoopVal := dotCLoopVal * dotCCache#z
+END :: for
+BEGIN :: if
+ if { e(dotBLoopVal,P) == e(dotCLoopVal,g) }
+    return := None
+ else
+    midwayFloat := ((endSigNum - startSigNum) / 2)
+    midway := integer(midwayFloat)
+END :: if
+
+
+BEGIN :: if
+ if { midway == 0 } 
+    addToList(incorrectIndices, startSigNum)
+    output := None
+ else
+    midSigNum := startSigNum + midway
+    dividenconquer(delta, startSigNum, midway, incorrectIndices, dotBCache, dotCCache, P, g)
+    dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotBCache, dotCCache, P, g)
+END :: if
+
+
+ output := None
+END ::func:dividenconquer
+
+
+BEGIN :: func:batchverify
+input := list{Lt, Mlist, P, Slist, g, pklist, ulist, incorrectIndices}
+
+BEGIN :: for
+for{z := 0, N}
+ delta#z := SmallExp(secparam)
+END :: for
+
+BEGIN :: if
+ if {(membership(P, Slist, g, pklist, ulist) == False)}
+     output := False
+END :: if
+
+
+BEGIN :: for
+for{z := 0, N}
+dotALoopVal := init(G1)
+
+BEGIN :: forinner
+forinner{y := 0, l}
+h := H(Mlist#y | Lt | ulist#y,ZR)
+dotALoopVal := dotALoopVal * ((ulist#z#y^delta#z) * (pklist#y^(h#z * delta#z)))
+END :: forinner
+dotBCache#z := dotALoopVal
+dotCCache#z := (Slist#z^delta#z)
+END :: for
+ dividenconquer(delta, 0, N, incorrectIndices, dotBCache, dotCCache, P, g)
+
+ output := incorrectIndices
+END ::func:batchverify
+
+

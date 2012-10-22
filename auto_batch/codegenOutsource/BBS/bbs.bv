@@ -45,10 +45,12 @@ input := list{gpk, A_ind, x_ind, M}
  delta1 := x_ind * alpha
  delta2 := x_ind * beta
 
-BEGIN :: for
-for{y := 0, 5}
- r#y := random(ZR)
-END :: for
+ r#0 := random(ZR)
+ r#1 := random(ZR)
+ r#2 := random(ZR)
+ r#3 := random(ZR)
+ r#4 := random(ZR)
+ r#5 := random(ZR)
 
  R1 := gpk#3 ^ r#0
  R2 := gpk#4 ^ r#1

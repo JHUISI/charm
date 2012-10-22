@@ -122,10 +122,15 @@ END :: forinner
 END :: for
 """
 SPACES = ' '
+zero = '0'
 sigIterator = 'z'
 signerIterator = 'y'
-signatureProd = "prod{z := 0,N}"
-signerProd = "prod{y := 0,l}"
+signerVarCount = 'l'
+
+sigIteratorTuple = (sigIterator, zero, NUM_SIGNATURES)
+signerIteratorTuple = (signerIterator, zero, signerVarCount)
+signatureProd = "prod{%s := %s,%s}" % sigIteratorTuple
+signerProd = "prod{%s := %s,%s}" % signerIteratorTuple
 
 def Filter(node):
     return node.sdl_print()
@@ -150,11 +155,11 @@ class SDLBatch:
         self.debug = False
 
     # for variables that are precomputed over signatures        
-    def ReplaceAppropArgs(self, map, forLoopIndex, node):
+    def ReplaceAppropArgs(self, map, forLoopIndex, node, exceptList=[]):
         sa = SubstituteAttr(map, forLoopIndex)
         eq = BinaryNode.copy(node)
         ASTVisitor(sa).preorder(eq)
-        dp = DropIndexForPrecomputes(self.precomputeVarList, forLoopIndex)
+        dp = DropIndexForPrecomputes(self.precomputeVarList + exceptList, forLoopIndex)
         ASTVisitor(dp).preorder(eq)
         return Filter(eq)
 
@@ -642,7 +647,7 @@ class SDLBatch:
             return typeVar
         return newTypeTmp
 
-    def __createStatements(self, VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs, varIterator, combineLoopAndCacheStmt=False):
+    def __createStatements(self, VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs, varIterator, combineLoopAndCacheStmt=False, exceptList=[]):
         dotLoopValTypesSig = {}
         dotCacheTypesSig = {}
         dotInitStmtDivConqSig = []
@@ -676,7 +681,7 @@ class SDLBatch:
                 divConqLoopValStmtSig.append("%s := %s * %s#%s\n" % (loopVal, loopVal, dotCache, varIterator)) # this is mul specifically
                 dotCacheTypesSig[dotCache] = "list{%s}" % getType
                 divConqArgList.append(dotCache)
-                dotCacheCalc.append("%s#%s := %s\n" % (dotCache, varIterator, self.ReplaceAppropArgs(self.sdlData[BATCH_VERIFY_MAP], varIterator, dotCacheRHS))) # JAA: need to write Filter function
+                dotCacheCalc.append("%s#%s := %s\n" % (dotCache, varIterator, self.ReplaceAppropArgs(self.sdlData[BATCH_VERIFY_MAP], varIterator, dotCacheRHS, exceptList))) # JAA: need to write Filter function
         
         self.printList("0: dotLoopValTypesSig", dotLoopValTypesSig)
         self.printList("1: dotCacheTypesSig", dotCacheTypesSig)
@@ -755,14 +760,15 @@ class SDLBatch:
         
         for i in dotKeys:
             print("<====== CREATING STATEMENTS ======> : ", i)
-            listForSigs = self.__createStatements([i], VarsForDotTypesOverSigs, VarsForDotASTOverSigs, sigIterator)
             if refSignatureDict[i]['hasDep']: # 
                 # if so, then need to precompute those dot values as well since they're necessary
                 # to compute this top level dot computation.
                 print("<====== CREATING NO CACHE STATEMENTS ======> : ", refSignatureDict[i]['dotDep'][0])
                 listForDepSigs = self.__createStatementsNoCache(refSignatureDict[i]['dotDep'][0], VarsForDotTypesOverSigs, VarsForDotASTOverSigs, signerIterator, [])
+                listForSigs = self.__createStatements([i], VarsForDotTypesOverSigs, VarsForDotASTOverSigs, sigIterator, False, listForDepSigs[6])
                 topLevelDotDict[i] = (listForSigs, listForDepSigs)
             else: # this doesn't have any dependencies can pre-calc as usual
+                listForSigs = self.__createStatements([i], VarsForDotTypesOverSigs, VarsForDotASTOverSigs, sigIterator)
                 topLevelDotDict[i] = (listForSigs, None)  
             
         # now we should combine everything into the lists & dicts expected by: div-n-conq, membershiptest and batch_verify
@@ -792,7 +798,7 @@ class SDLBatch:
             divConqArgList.extend(statementTuple[8])
             statementDep = topLevelDotDict[i][1] # this means current statementTuple has a ref in tree to statementDep
             if statementDep: # meaning this top level computation has dependencies, then proceed as follows:
-                depOutput = self.__buildInnerForLoop(statementDep, ('y', '0', 'l'))
+                depOutput = self.__buildInnerForLoop(statementDep, signerIteratorTuple)
                 for k in range(len(dotCacheCalc)):
                     for r,c in statementDep[4].items():
                         newCacheCalc = dotCacheCalc[k].replace(r, c)
