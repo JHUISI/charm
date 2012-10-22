@@ -1,0 +1,9 @@
+name := waters05
+N := 2
+setting := asymmetric
+
+BEGIN :: types
+END :: types
+
+BEGIN :: func:keygen
+input := n

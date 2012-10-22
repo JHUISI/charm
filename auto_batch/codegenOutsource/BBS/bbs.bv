@@ -1,0 +1,85 @@
+name := bbs
+N := 2
+setting := asymmetric
+
+BEGIN :: types
+ n := int
+ x := list{ZR}
+ A := list{G1}
+ M := str
+ A_ind := G1
+ x_ind := ZR
+ r := list{ZR}
+END :: types
+
+BEGIN :: func:keygen
+input := n
+ g1 := random(G1)
+ g2 := random(G2)
+ h := random(G1)
+ xi1 := random(ZR)
+ xi2 := random(ZR)
+ u := h ^ (1 / xi1)
+ v := h ^ (1 / xi2)
+ gamma := random(ZR)
+ w := g2 ^ gamma
+ gpk := list{g1, g2, h, u, v, w}
+ gmsk := list{xi1, xi2}
+ 
+BEGIN :: for
+for{y := 0, n}
+ x#y := random(ZR)
+ A#y := g1 ^ (1 / (gamma + x#y))
+END :: for
+
+ output := list{gpk, gmsk, A, x}
+END :: func:keygen
+
+BEGIN :: func:sign
+input := list{gpk, A_ind, x_ind, M}
+ alpha := random(ZR)
+ beta := random(ZR)
+ T1 := gpk#3 ^ alpha
+ T2 := gpk#4 ^ beta
+ T3 := A_ind * (gpk#2 ^ (alpha + beta))
+ delta1 := x_ind * alpha
+ delta2 := x_ind * beta
+
+BEGIN :: for
+for{y := 0, 5}
+ r#y := random(ZR)
+END :: for
+
+ R1 := gpk#3 ^ r#0
+ R2 := gpk#4 ^ r#1
+ R3 := (e(T3, gpk#1) ^ r#2) * (e(gpk#2, gpk#5) ^ (-r#0 - r#1)) * (e(gpk#2, gpk#1) ^ (-r#3 - r#4))
+ R4 := (T1 ^ r#2) * (gpk#3 ^ -r#3)
+ R5 := (T2 ^ r#2) * (gpk#4 ^ -r#4)
+
+ c := H(M | T1 | T2 | T3 | R1 | R2 | R3 | R4 | R5, ZR)
+ s1 := r#0 + c * alpha
+ s2 := r#1 + c * beta
+ s3 := r#2 + c * x_ind
+ s4 := r#3 + c * delta1
+ s5 := r#4 + c * delta2
+ sig := list{T1, T2, T3, c, s1, s2, s3, s4, s5}
+ output := sig
+END :: func:sign
+
+BEGIN :: func:verify
+input := list{gpk, M, sig}
+ R1_verify := (gpk#3 ^ sig#4) * (sig#0 ^ -sig#3)
+ R2_verify := (gpk#4 ^ sig#5) * (sig#1 ^ -sig#3)
+ R3_verify := (e(sig#2, gpk#1) ^ sig#6) * (e(gpk#2, gpk#5) ^ (-sig#4 - sig#5)) * (e(gpk#2, gpk#1) ^ (-sig#7 - sig#8)) * ((e(sig#2, gpk#5) / e(gpk#0, gpk#1)) ^ sig#3)
+ R4_verify := (sig#0 ^ sig#6) * (gpk#3 ^ -sig#7)
+ R5_verify := (sig#1 ^ sig#6) * (gpk#4 ^ -sig#8)
+
+ c_verify := H(M | sig#0 | sig#1 | sig#2 | R1_verify | R2_verify | R3_verify | R4_verify | R5_verify, ZR)
+
+BEGIN :: if
+ if {sig#3 == c_verify}
+    output := True
+ else
+    output := False
+END :: if
+END :: func:verify

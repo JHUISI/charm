@@ -1,0 +1,45 @@
+name := waters09
+N := 2
+setting := asymmetric
+
+BEGIN :: types
+END :: types
+
+BEGIN :: func:keygen
+input := None
+ g1 := random(G1)
+ g2 := random(G2)
+ a1 := random(ZR)
+ a2 := random(ZR)
+ b := random(ZR)
+ alpha := random(ZR)
+ wExp := random(ZR)
+ hExp := random(ZR)
+ vExp := random(ZR)
+ v1Exp := random(ZR)
+ v2Exp := random(ZR)
+ u := random(ZR)
+
+ vG1 := g1 ^ vExp
+ v1G1 := g1 ^ v1Exp
+ v2G1 := g1 ^ v2Exp
+
+ vG2 := g2 ^ vExp
+ v1G2 := g2 ^ v1Exp
+ v2G2 := g2 ^ v2Exp
+
+ wG1 := g1 ^ wExp
+ hG1 := g1 ^ hExp
+ wG2 := g2 ^ wExp
+ hG2 := g2 ^ hExp
+
+ uG1 := g1 ^ u
+ uG2 := g2 ^ u
+
+ tau1 := vG1 * (v1G1 ^ a1)
+ tau2 := vG1 * (v2G1 ^ a2)
+
+ g1b := g1 ^ b
+ g1a1 := g1 ^ a1
+ g1a2 := g1 ^ a2
+ 
