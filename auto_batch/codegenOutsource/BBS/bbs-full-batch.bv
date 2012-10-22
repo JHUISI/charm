@@ -1,0 +1,320 @@
+name := bbs
+N := 100
+setting := asymmetric
+
+BEGIN :: types
+n := int
+x := list{ZR}
+A := list{G1}
+A_ind := G1
+x_ind := ZR
+r := list{ZR}
+M := str
+g1 := G1
+g2 := G2
+T1 := G1
+T2 := G1
+T3 := G1
+h := G1
+u := G1
+v := G1
+w := G2
+R3 := GT
+sx := ZR
+salpha := ZR
+sbeta := ZR
+sgamma1 := ZR
+sgamma2 := ZR
+c := ZR
+cver := ZR
+incorrectIndices := list{int}
+endSigNum := int
+startSigNum := int
+delta := list{ZR}
+dotCLoopVal := GT
+dotALoopVal := G1
+dotBLoopVal := G1
+dotBCache := list{G1}
+dotACache := list{G1}
+dotCCache := list{GT}
+salphalist := list{ZR}
+sbetalist := list{ZR}
+R3list := list{GT}
+sxlist := list{ZR}
+Mlist := list{str}
+clist := list{ZR}
+T1list := list{G1}
+T3list := list{G1}
+sgamma1list := list{ZR}
+T2list := list{G1}
+sgamma2list := list{ZR}
+END :: types
+
+BEGIN :: func:precheck
+input := list{g1, g2, h, u, v, w, c, M, T1, T2, T3, R3, sx, salpha, sbeta, sgamma1, sgamma2} 
+ R1ver := (u ^ salpha) * (T1 ^ -c)
+ R2ver := (v ^ sbeta) * (T2 ^ -c)
+ R4ver := (T1 ^ sx) * (u ^ -sgamma1)
+ R5ver := (T2 ^ sx) * (v ^ -sgamma2)
+
+BEGIN :: if 
+ if { c != H(M | T1 | T2 | T3 | R1ver | R2ver | R3 | R4ver | R5ver, ZR) }
+   output := False  
+ else
+   output := True
+END :: if
+END :: func:precheck
+
+BEGIN :: precompute
+check := { precheck(g1, g2, h, u, v, w, c, M, T1, T2, T3, R3, sx, salpha, sbeta, sgamma1, sgamma2) }
+END :: precompute
+
+constant := list{g1, g2, h, u, v, w}
+public := list{h, u, v, w}
+signature := list{T1, T2, T3, R3, c, salpha, sbeta, sx, sgamma1, sgamma2}
+message := M
+
+# different messages/sigs under a single signer
+BEGIN :: count
+message_count := N
+public_count := one
+signature_count := N
+END :: count
+
+verify := { ((e(T3, g2)^sx) * ((e(h, w)^(-salpha + -sbeta)) * ((e(h, g2)^(-sgamma1 + -sgamma2)) * ((e(T3, w)^c) * (e(g1, g2)^-c)))))) == R3 }
+
+BEGIN :: func:keygen
+input := n
+ g1 := random(G1)
+ g2 := random(G2)
+ h := random(G1)
+ xi1 := random(ZR)
+ xi2 := random(ZR)
+ u := h ^ (1 / xi1)
+ v := h ^ (1 / xi2)
+ gamma := random(ZR)
+ w := g2 ^ gamma
+ gpk := list{g1, g2, h, u, v, w}
+ gmsk := list{xi1, xi2}
+ 
+BEGIN :: for
+for{y := 0, n}
+ x#y := random(ZR)
+ A#y := g1 ^ (1 / (gamma + x#y))
+END :: for
+
+ output := list{gpk, gmsk, A, x}
+END :: func:keygen
+
+BEGIN :: func:sign
+input := list{gpk, A_ind, x_ind, M}
+gpk := expand{g1, g2, h, u, v, w}
+
+ alpha := random(ZR)
+ beta := random(ZR)
+ T1 := u ^ alpha
+ T2 := v ^ beta
+ T3 := A_ind * (h ^ (alpha + beta))
+ delta1 := x_ind * alpha
+ delta2 := x_ind * beta
+
+ r#0 := random(ZR)
+ r#1 := random(ZR)
+ r#2 := random(ZR)
+ r#3 := random(ZR)
+ r#4 := random(ZR)
+ r#5 := random(ZR)
+
+ R1 := u ^ r#0
+ R2 := v ^ r#1
+ R3 := (e(T3, g2) ^ r#2) * (e(h, w) ^ (-r#0 - r#1)) * (e(h, g2) ^ (-r#3 - r#4))
+ R4 := (T1 ^ r#2) * (u ^ -r#3)
+ R5 := (T2 ^ r#2) * (v ^ -r#4)
+
+ c := H(M | T1 | T2 | T3 | R1 | R2 | R3 | R4 | R5, ZR)
+ s1 := r#0 + c * alpha
+ s2 := r#1 + c * beta
+ s3 := r#2 + c * x_ind
+ s4 := r#3 + c * delta1
+ s5 := r#4 + c * delta2
+ sig := list{T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2}
+ output := sig
+END :: func:sign
+
+#input := list{gpk, M, sig}
+# gpk := expand{g1, g2, h, u, v, w}
+# sig := expand{T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2}
+
+BEGIN :: func:verify
+input := list{g1, g2, h, u, v, w, c, M, T1, T2, T3, R3, sx, salpha, sbeta, sgamma1, sgamma2}
+
+BEGIN :: if
+ if { precheck(g1, g2, h, u, v, w, c, M, T1, T2, T3, R3, sx, salpha, sbeta, sgamma1, sgamma2) == False }
+    output == False
+END :: if
+
+BEGIN :: if
+ if { ((e(T3, g2) ^ sx) * (e(h, w) ^ (-salpha - sbeta)) * (e(h, g2) ^ (-sgamma1 - sgamma2)) * ((e(T3, w)^c) * (e(g1, g2) ^ -c))) == R3}
+    output := True
+ else
+    output := False
+END :: if
+END :: func:verify
+
+BEGIN :: func:membership
+ input := list{R3list, T1list, T2list, T3list, clist, g1, g2, h, salphalist, sbetalist, sgamma1list, sgamma2list, sxlist, u, v, w}
+
+
+BEGIN :: if
+if { ismember(R3list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(T1list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(T2list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(T3list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(clist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(g1) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(g2) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(h) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(salphalist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(sbetalist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(sgamma1list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(sgamma2list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(sxlist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(u) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(v) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(w) == False }
+    output := False
+END :: if
+
+ output := True
+END :: func:membership
+
+
+BEGIN :: func:dividenconquer
+ input := list{delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g2, w}
+dotALoopVal := init(G1)
+dotBLoopVal := init(G1)
+dotCLoopVal := init(GT)
+
+BEGIN :: for
+for{z := startSigNum, endSigNum}
+dotALoopVal := dotALoopVal * dotACache#z
+dotBLoopVal := dotBLoopVal * dotBCache#z
+dotCLoopVal := dotCLoopVal * dotCCache#z
+END :: for
+BEGIN :: if
+ if { (e(dotALoopVal,g2) * e(dotBLoopVal,w)) == dotCLoopVal }
+    return := None
+ else
+    midwayFloat := ((endSigNum - startSigNum) / 2)
+    midway := integer(midwayFloat)
+END :: if
+
+
+BEGIN :: if
+ if { midway == 0 } 
+    addToList(incorrectIndices, startSigNum)
+    output := None
+ else
+    midSigNum := startSigNum + midway
+    dividenconquer(delta, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, g2, w)
+    dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g2, w)
+END :: if
+
+
+ output := None
+END ::func:dividenconquer
+
+
+BEGIN :: func:batchverify
+input := list{Mlist, R3list, T1list, T2list, T3list, clist, g1, g2, h, salphalist, sbetalist, sgamma1list, sgamma2list, sxlist, u, v, w, incorrectIndices}
+
+BEGIN :: for
+for{z := 0, N}
+ delta#z := SmallExp(secparam)
+END :: for
+
+BEGIN :: if
+ if {(membership(R3list, T1list, T2list, T3list, clist, g1, g2, h, salphalist, sbetalist, sgamma1list, sgamma2list, sxlist, u, v, w) == False)}
+     output := False
+END :: if
+
+
+BEGIN :: for
+for{z := 0, N}
+BEGIN :: if
+if {precheck(g1, g2, h, u, v, w, clist#z, Mlist#z, T1list#z, T2list#z, T3list#z, R3list#z, sxlist#z, salphalist#z, sbetalist#z, sgamma1list#z, sgamma2list#z) == False } output := False
+END :: if
+END :: for
+
+BEGIN :: for
+for{z := 0, N}
+dotACache#z := ((T3list#z^(sxlist#z * delta#z)) * ((h#z^((-sgamma1list#z + -sgamma2list#z) * delta#z)) * (g1#z^(-clist#z * delta#z))))
+dotBCache#z := ((h#z^((-salphalist#z + -sbetalist#z) * delta#z)) * (T3list#z^(clist#z * delta#z)))
+dotCCache#z := (R3list#z^delta#z)
+END :: for
+ dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, g2, w)
+
+ output := incorrectIndices
+END ::func:batchverify
+
+
