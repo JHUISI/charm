@@ -826,7 +826,9 @@ class DropIndexForPrecomputes:
     def visit_attr(self, node, data):
         varName = node.getAttribute()
         if varName in self.variable_list:
-            node.attr_index.remove(self.loopVarTarget)           
+            node.attr_index.remove(self.loopVarTarget)
+#        elif varName == delta_word:
+#            node.attr_index.remove(self.loopVarTarget)                       
             
 class GetVarsInEq:
     def __init__(self, dotList):

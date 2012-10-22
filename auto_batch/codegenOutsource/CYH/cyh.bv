@@ -7,11 +7,12 @@ secparam := 80
 BEGIN :: types
 M := str
 ID := str
-L := list{str}
+L := str
+Lt := list{str}
 u := list{G1}
 h := list{ZR}
 s := int
-pkList := list{G1}
+pklist := list{G1}
 pk := G1
 sk := G1
 P := G2
@@ -20,12 +21,13 @@ g := G2
 r := ZR
 END :: types
 
+#Lt := concat(L)
 BEGIN :: precompute
-h := H(M | L | u, ZR)
+h := H(M | Lt | u, ZR)
 END :: precompute
 
 constant := list{P, g}
-public := pk
+public := pklist
 signature := list{S, u}
 message := h
 
@@ -35,7 +37,7 @@ public_count := l
 signature_count := N
 END :: count
 
-verify := { e((prod{y := 0, l} on (u_y * (pk_y^h_y))) , P) == e(S, g) }
+verify := { e((prod{y := 0, l} on (u_y * (pklist_y^h_y))) , P) == e(S, g) }
 
 BEGIN :: func:setup
  input := None
@@ -81,7 +83,7 @@ END :: for
  r := random(ZR)
 BEGIN :: for
 for{y := 0, l}
-   pkList#y := H(L#y, G1)
+   pklist#y := H(L#y, G1)
 END :: for
 
 dotProd := init(G1)
@@ -90,33 +92,30 @@ BEGIN :: for
 for{i := 0, l}
 BEGIN :: if
 if {ID != L#i}
-   dotProd := dotProd * (u#i * (pkList#i ^ h#i))
+   dotProd := dotProd * (u#i * (pklist#i ^ h#i))
 END :: if
 END :: for
 
   u#s? := (pk ^ r) * (dotProd ^ -1)
   h#s? := H(M | Lt | u#s, ZR)
   S := sk ^ (h#s + r)
-output := list{u, S}
+output := list{pklist, u, S}
 END :: func:sign
 
 BEGIN :: func:verify
-input := list{P, g, L, M, u, S}
+input := list{P, g, L, M, u, S, pklist}
  Lt := concat(L)
- num_sign := len(L)
 
-# h := init(ZR)
 BEGIN :: for
 for{y := 0, l}
  h#y := H(M | Lt | u#y, ZR)
- pkList#y := H(L#y, G1)
 END :: for
 
 dotProd := init(G1)
 
 BEGIN :: for
 for{y := 0, l}
-   dotProd := dotProd * (u#y * (pkList#y ^ h#y))
+   dotProd := dotProd * (u#y * (pklist#y ^ h#y))
 END :: for
 
 BEGIN :: if

@@ -162,9 +162,10 @@ class SDLBatch:
         sa = SubstituteAttr(map, forLoopIndex)
         eq = BinaryNode.copy(node)
         ASTVisitor(sa).preorder(eq)
+        exceptList.append(delta_word) # just added
         dp = DropIndexForPrecomputes(self.precomputeVarList + exceptList, forLoopIndex)
         ASTVisitor(dp).preorder(eq)
-        
+
         eqStr = Filter(eq)
         for k,v in exceptMap.items():
             eqStr = eqStr.replace(k, v)
@@ -383,7 +384,7 @@ class SDLBatch:
                 self.defaultBatchTypes[delta_word] = delta_type
         return output
     
-    def __generateBatchVerify(self, batchVerifyArgList, membershipTestList, divConqArgList, dotCacheCalcList, dotCacheVarList):
+    def __generateBatchVerify(self, batchVerifyArgList, membershipTestList, divConqArgList, dotCacheCalcList, dotCacheVarList, dotDepComputationMap=None):
         output = ""
         bVerifyArgs = str(list(batchVerifyArgList)).replace("[", '').replace("]",'').replace("'", '')
         divConqArgs = str(list(divConqArgList)).replace("[", '').replace("]",'').replace("'", '')
@@ -400,6 +401,8 @@ class SDLBatch:
         output += forLoopStmtOverSigs
         output += outputPrecompute
         for i in dotCacheCalcList:
+            if dotDepComputationMap != None and dotDepComputationMap.get(i) != None:
+                output += dotDepComputationMap[i]
             output += i
         output += end_for_loop
         output += batch_verify_footer % (divConqArgs.replace("startSigNum", "0").replace("endSigNum", NUM_SIGNATURES))
@@ -510,20 +513,79 @@ class SDLBatch:
             if str(references[i][1]) == signatureProd and len(references[i][0]) == 0:
                 # means we can precompute this entirely b/c it doesn't have any dependencies
                 precomputeBeforeDV[i] = references[i]
-            elif str(references[i][1]) == signatureProd and len(references[i][0]) > 1:
+            elif str(references[i][1]) == signatureProd and len(references[i][0]) >= 1:
                 # search list to see if any of the dotValues have the same 'signatureProd' reference[i][1]
                 # if so, then we can precompute as before
-                pass
+                precomputeBeforeDV[i] = references[i] # handles case where sigProd on outside and signerProd on inside too
+#                print("this condition met for: ", i, "len()", len(references[i][0]))                
             elif str(references[i][1]) == signerProd and len(references[i][0]) == 0:
                 precomputeBeforeDV[i] = references[i]
-            elif str(references[i][1]) == signerProd and len(references[i][0]) > 1: 
+            elif str(references[i][1]) == signerProd and len(references[i][0]) >= 1: 
                 notPrecomputeBeforeDV[i] = references[i]
             else:
                 pass
-        
         return precomputeBeforeDV, notPrecomputeBeforeDV  
+
+    def __searchForDependenciesGeneric(self, dict1, dict2):
+        """ if there are no deps, then the two can be calculated over their respective for loops separately,
+            otherwise, need to figure out which calculation goes in the outer and which one in the inner."""
+        # if dict2 has any var references into dict1 or vice versa, then the list that HAS the reference should
+        # be in the OUTER LOOP and the variable that IS referenced is in the INNER LOOP
+        precomputeBeforeDV = {}
+        notPrecomputeBeforeDV = {}
+        references = {}
+        dotPrefix = "dot"
+        dotList1 = list(dict1.keys())
+        dotList2 = list(dict2.keys())
+        print("list over signatures:", dotList1)
+        for i,j in dict1.items():
+            gviq = GetVarsInEq([])
+            ASTVisitor(gviq).preorder(j.getRight())
+            references[str(i)] = ([x for x in gviq.getVarList() if dotPrefix in x], j.getLeft())
+            print(i, ":", j, ", var list: ", references[str(i)])
+        print("list over signers:", dotList2)
+        for i, j in dict2.items():
+            gviq = GetVarsInEq([])
+            ASTVisitor(gviq).preorder(j.getRight())
+            references[str(i)] = ([x for x in gviq.getVarList() if dotPrefix in x], j.getLeft())
+            print(i, ":", j, ", var list: ", references[str(i)])
+        
+        listOfDots = list(references.keys())
+        listOfDots.sort()
+        for i in listOfDots:
+            # for each dot value, go through the list of dependencies
+            for k in references[i][0]:
+                if dotPrefix in k:
+                    del references[k]                
+
+        # pruned version
+        print("pruned dot lists")
+        listOfDots = list(references.keys())
+        listOfDots.sort()
+        dotDependency = None
+        for i in listOfDots:
+            print(i, ":", references[i][0], ": range:", references[i][1])
+            if str(references[i][1]) == signatureProd and len(references[i][0]) == 0:
+                # means we can precompute this entirely b/c it doesn't have any dependencies
+                dotDependency = False
+                precomputeBeforeDV[i] = {'dotDep': references[i], 'hasDep':dotDependency} # second argument represents dependency
+            elif str(references[i][1]) == signatureProd and len(references[i][0]) >= 1:
+                # search list to see if any of the dotValues have the same 'signatureProd' reference[i][1]
+                # if so, then we can precompute as before
+                dotDependency = True
+                precomputeBeforeDV[i] = {'dotDep': references[i], 'hasDep':dotDependency} # handles case where sigProd on outside and signerProd on inside too
+            elif str(references[i][1]) == signerProd and len(references[i][0]) == 0:
+                dotDependency = False
+                precomputeBeforeDV[i] = {'dotDep': references[i], 'hasDep':dotDependency}
+            elif str(references[i][1]) == signerProd and len(references[i][0]) >= 1: 
+                dotDependency = True
+                notPrecomputeBeforeDV[i] = {'dotDep': references[i], 'hasDep':dotDependency}
+            else:
+                pass
+        return precomputeBeforeDV, notPrecomputeBeforeDV  
+
     
-    def construct(self):        
+    def construct(self):
         (subProds, subProds1) = self.__computeDotProducts()
         
         # dot products over signatures
@@ -551,7 +613,9 @@ class SDLBatch:
 #        sys.exit(0)
         # dotValues in signature list is greater than 1 and the one of the signers is 0, then no brainer
         if len(VarsForDotOverSigs) >= 1 and len(VarsForDotOverSign) == 0:
-            self.__constructSDLBatchOverSignaturesOnly(VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs)
+            # TODO: Rework this to handle dependencies between dotValues better.
+            self.__constructSDLBatchOverSignaturesGeneric(VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs)
+#            self.__constructSDLBatchOverSignaturesOnly(VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs)
         elif len(VarsForDotOverSigs) >= 1 and len(VarsForDotOverSign) >= 1:
             # mixed mode between loops over ...
             self.__constructSDLBatchOverSignaturesAndSigners(VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs, 
@@ -658,21 +722,122 @@ class SDLBatch:
             ASTVisitor(gvi).preorder(dotCacheRHS)
             # need to modify it a bit differently here: replace dot values with real computations
             divConqLoopValStmtSig.append("%s := %s * %s\n" % (loopVal, loopVal, self.ReplaceAppropArgsExcept(self.sdlData[BATCH_VERIFY_MAP], varIterator, dotCacheRHS, dotList2, dotList2Map))) # this is mul specifically
-#            dotCacheVarList.extend(gvi.getVarList())
-#            dotCacheVarList = list(set(dotCacheVarList))
+            dotCacheVarList.extend(gvi.getVarList())
+            dotCacheVarList = list(set(dotCacheVarList))
 #            dotCacheCalc.append("%s#%s := %s\n" % (dotCache, varIterator, self.ReplaceAppropArgs(self.sdlData[BATCH_VERIFY_MAP], varIterator, dotCacheRHS))) # JAA: need to write Filter function
         
-#        self.printList("0: dotLoopValTypesSig", dotLoopValTypesSig)
-#        self.printList("1: dotCacheTypesSig", dotCacheTypesSig)
-#        self.printList("2: dotInitStmtDivConqSig", dotInitStmtDivConqSig)
-#        self.printList("3: divConqLoopValStmtSig", divConqLoopValStmtSig)
-#        self.printList("4: dotVerifyEq", dotVerifyEq)
-#        self.printList("5: dotCacheCalc", dotCacheCalc)
-#        self.printList("6: dotList", dotList)
-#        self.printList("7: dotCacheVarList", dotCacheVarList)
-#        self.printList("8: divConqArgList", divConqArgList)
+        self.printList("0: dotLoopValTypesSig", dotLoopValTypesSig)
+        self.printList("1: dotCacheTypesSig", dotCacheTypesSig)
+        self.printList("2: dotInitStmtDivConqSig", dotInitStmtDivConqSig)
+        self.printList("3: divConqLoopValStmtSig", divConqLoopValStmtSig)
+        self.printList("4: dotVerifyEq", dotVerifyEq)
+        self.printList("5: dotCacheCalc", dotCacheCalc)
+        self.printList("6: dotList", dotList)
+        self.printList("7: dotCacheVarList", dotCacheVarList)
+        self.printList("8: divConqArgList", divConqArgList)
         return dotLoopValTypesSig, dotCacheTypesSig, dotInitStmtDivConqSig, divConqLoopValStmtSig, dotVerifyEq, dotCacheCalc, dotList, dotCacheVarList, divConqArgList
 
+
+    def __constructSDLBatchOverSignaturesGeneric(self, VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs):
+        batchVerifyArgList = []
+        _batchVerifyArgList = list(self.sdlData[BATCH_VERIFY].keys())
+        for i in _batchVerifyArgList:
+            if linkVar not in str(i):
+                batchVerifyArgList.append(i)
+        batchVerifyArgTypes = self.sdlData[BATCH_VERIFY]
+        batchVerifyArgList.sort()
+        
+        refSignatureDict, refSignerDict = self.__searchForDependenciesGeneric(VarsForDotASTOverSigs, {})
+        dotKeys = list(refSignatureDict.keys())
+        print("refSignatureDict keys: ", dotKeys)
+        
+        topLevelDotDict = {}
+        
+        for i in dotKeys:
+            print("<====== CREATING STATEMENTS ======> : ", i)
+            listForSigs = self.__createStatements([i], VarsForDotTypesOverSigs, VarsForDotASTOverSigs, sigIterator)
+            if refSignatureDict[i]['hasDep']: # 
+                # if so, then need to precompute those dot values as well since they're necessary
+                # to compute this top level dot computation.
+                print("<====== CREATING NO CACHE STATEMENTS ======> : ", refSignatureDict[i]['dotDep'][0])
+                listForDepSigs = self.__createStatementsNoCache(refSignatureDict[i]['dotDep'][0], VarsForDotTypesOverSigs, VarsForDotASTOverSigs, signerIterator, [])
+                topLevelDotDict[i] = (listForSigs, listForDepSigs)
+            else: # this doesn't have any dependencies can pre-calc as usual
+                topLevelDotDict[i] = (listForSigs, None)  
+            
+        # now we should combine everything into the lists & dicts expected by: div-n-conq, membershiptest and batch_verify
+        dotLoopValTypesSig = {}
+        dotCacheTypesSig = {}
+        dotInitStmtDivConqSig = []
+        divConqLoopValStmtSig = []
+        dotVerifyEq = {}
+        dotCacheCalc = []
+        dotList = []
+        dotCacheVarList = [] # list of variables that appear in dotCache list of precompute section
+        divConqArgList = self.newDeltaList + ["startSigNum", "endSigNum", "incorrectIndices"] # JAA: make variable names more configurable
+        dotDepComputationMap = {}
+        
+        topLevelKeys = list(topLevelDotDict.keys())
+        topLevelKeys.sort()
+        for i in topLevelKeys:
+            statementTuple = topLevelDotDict[i][0]            
+            dotLoopValTypesSig.update(statementTuple[0])
+            dotCacheTypesSig.update(statementTuple[1])
+            dotInitStmtDivConqSig.extend(statementTuple[2])
+            divConqLoopValStmtSig.extend(statementTuple[3])
+            dotVerifyEq.update(statementTuple[4])
+            dotCacheCalc.extend(statementTuple[5])
+            dotList.extend(statementTuple[6])
+            dotCacheVarList.extend(statementTuple[7])
+            divConqArgList.extend(statementTuple[8])
+            statementDep = topLevelDotDict[i][1] # this means current statementTuple has a ref in tree to statementDep
+            if statementDep: # meaning this top level computation has dependencies, then proceed as follows:
+                depOutput = self.__buildInnerForLoop(statementDep, ('y', '0', 'l'))
+                for k in range(len(dotCacheCalc)):
+                    for r,c in statementDep[4].items():
+                        newCacheCalc = dotCacheCalc[k].replace(r, c)
+                        if len(newCacheCalc) > len(dotCacheCalc[k]): # replacement was successful!
+                            dotCacheCalc[ k ] = newCacheCalc
+                            dotDepComputationMap[ newCacheCalc ] = depOutput
+                        
+        
+        gvi2 = GetVarsInEq(dotList)
+        ASTVisitor(gvi2).preorder(self.finalBatchEq)
+        divConqArgList.extend(gvi2.getVarList())
+
+        eqStr = str(self.finalBatchEq)
+        for k,v in dotVerifyEq.items():
+            eqStr = eqStr.replace(k, v)
+        print("Final eq: ", eqStr)
+
+        membershipTestList, outputLines1 = self.__generateMembershipTest(batchVerifyArgList, batchVerifyArgTypes) 
+        outputLines2 = self.__generateDivideAndConquer(dotInitStmtDivConqSig,  divConqLoopValStmtSig, eqStr, divConqArgList)
+        outputLines3 = self.__generateBatchVerify(batchVerifyArgList, membershipTestList, divConqArgList, dotCacheCalc, dotCacheVarList, dotDepComputationMap)
+
+        typeOutputLines = self.__generateTypes(dotLoopValTypesSig, dotCacheTypesSig, batchVerifyArgTypes)
+        output = secparamLine + outputLines1 + outputLines2 + outputLines3
+        self.__generateNewSDL(typeOutputLines, output)
+        return
+    
+    def __buildInnerForLoop(self, dotDepStmts, loopIterator):
+        #TODO: need to get var list so that we can properly pull the precompute variables needed
+        my_output = ""
+        dotCacheVarList = dotDepStmts[7]
+        outputBeforePrecompute, outputPrecompute = self.__generatePrecomputeLinesForBV(loopIterator[0], dotCacheVarList)
+        
+        dotInitStmtDivConqSig, divConqLoopValStmtSig = dotDepStmts[2], dotDepStmts[3]
+        for i in dotInitStmtDivConqSig:
+            my_output += i
+        my_output += outputBeforePrecompute # precompute values outside of for loop
+        my_output += dc_for_inner_begin % (loopIterator[0], loopIterator[1], loopIterator[2])
+        my_output += outputPrecompute # precompute values inside but before dot calculations
+        for l in divConqLoopValStmtSig:
+            my_output += l
+        my_output += end_for_inner_loop + "\n"            
+        
+        print("Build inner For loop :=> ")
+        print(my_output)
+        return my_output
     
     def __constructSDLBatchOverSignaturesOnly(self, VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs):
         secparamLine = ""
