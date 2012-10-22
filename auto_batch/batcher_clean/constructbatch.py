@@ -126,6 +126,7 @@ zero = '0'
 sigIterator = 'z'
 signerIterator = 'y'
 signerVarCount = 'l'
+PRECHECK = "check" # means we need to check stuff over signatures
 
 sigIteratorTuple = (sigIterator, zero, NUM_SIGNATURES)
 signerIteratorTuple = (signerIterator, zero, signerVarCount)
@@ -289,8 +290,23 @@ class SDLBatch:
             print("compute outside the loop over signatures:")
             print("dotCacheVarList: ", dotCacheVarList)
         for i,j in self.precomputeDict.items():
-            if str(i) not in dotCacheVarList:
-                print("took this branch: ", i, ":", dotCacheVarList)
+            if str(i) == PRECHECK:
+                print("variable map :=>>> ", self.sdlData[BATCH_VERIFY_MAP])
+                mapDict = self.sdlData[BATCH_VERIFY_MAP]
+                mapKeys = [ str(x) for x in mapDict.keys() ]
+                jList = j.getListNode()
+                for k in range(len(jList)):
+                    if jList[k] in mapKeys:
+                        jList[k] = mapDict[ jList[k] ] + "#" + sigIterator
+                
+                outputBeforePrecompute += dc_for_begin % (sigIteratorTuple)
+                outputBeforePrecompute += "BEGIN :: if\n"
+                outputBeforePrecompute += "if {" + str( j ) + " == False }"
+                outputBeforePrecompute += " output := False\n"
+                outputBeforePrecompute += "END :: if\n"
+                outputBeforePrecompute += end_for_loop + "\n"
+            elif str(i) not in dotCacheVarList:
+#                print("took this branch: ", i, ":", dotCacheVarList)
                 nonPrecomputeDict[i] = j
                 if self.debug: print(i, ":= ", j)
                 outputBeforePrecompute += "%s := %s\n" % (i, j)

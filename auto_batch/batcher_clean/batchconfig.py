@@ -5,6 +5,7 @@ from sdlparser.SDLParser import *
 TYPE, CONST, PRECOMP, TRANSFORM = 'types', 'constant', 'precompute', 'transform'
 MESSAGE, SIGNATURE, PUBLIC, SETTING, VERIFY = 'message','signature', 'public','setting', 'verify'
 BATCH_VERIFY = 'batch_verify'
+PRECHECK_HEADER = 'precheck' # special section for computation and variables that need to be check before verification check
 BATCH_VERIFY_MAP = BATCH_VERIFY + "_map"
 BATCH_VERIFY_OTHER_TYPES = BATCH_VERIFY + "_other_types"
 SCHEME_NAME, BATCH_COUNT, SECPARAM = 'name', 'count', 'secparam'
@@ -35,7 +36,7 @@ class SDLSetting():
         self.varTypes[SCHEME_NAME] = self.data[SCHEME_NAME]
         for i in NUM_SIGNER_TYPES:
             self.__parseOneValueInKey(assignInfoDict, i)
-            self.varTypes[i] = self.data[i]       
+            self.varTypes[i] = self.data[i]
         self.__parseValuesInKey(assignInfoDict, CONST)
         self.__parseValuesInKey(assignInfoDict, PUBLIC)
         self.__parseValuesInKey(assignInfoDict, SIGNATURE)
@@ -43,6 +44,7 @@ class SDLSetting():
         self.__parseValuesInKey(assignInfoDict, TRANSFORM)
         self.__parseBatchCount(assignInfoDict)
         self.__parsePrecomputeAssign(assignInfoDict)
+#        self.__parsePreCheckIfExists(assignInfoDict)
         self.__parseLatexAssign(assignInfoDict)
         self.__parseVerifyInputArgs(assignInfoDict)
         
@@ -136,6 +138,7 @@ class SDLSetting():
     def __parsePrecomputeAssign(self, assignInfoDict):
         precomp = assignInfoDict.get(PRECOMPUTE_HEADER)
         self.data[PRECOMPUTE_HEADER] = {}
+        if precomp == None: return
         if type(precomp) == dict:
             for k,v in precomp.items():
                 node = v.getAssignNode() # might need 
@@ -143,6 +146,19 @@ class SDLSetting():
                     self.indiv_precompute[ node.left ] = node.right
                     self.batch_precompute[ BinaryNode.copy(node.left) ] = BinaryNode.copy(node.right)
         return
+    
+#    def __parsePreCheckIfExists(self, assignInfoDict):
+#        precheck = assignInfoDict.get(PRECHECK_HEADER)
+#        self.data[PRECHECK_HEADER] = []
+#        if precheck == None: return
+#        startIndex = getLineNoOfInputStatement(PRECHECK_HEADER)
+#        endIndex = getLineNoOfOutputStatement(PRECHECK_HEADER)
+#        listOfStmts = getLinesOfCodeFromLineNos(list(range(startIndex, endIndex)))
+#        
+#        # verify that arguments of 'precheck' are a subset of 'verify' otherwise, doesn't make sense
+#        for i in listOfStmts:
+#            print("c: ", i, type(i))
+#        sys.exit(0)
     
     def __parseLatexAssign(self, assignInfoDict):
         latex = assignInfoDict.get(LATEX_HEADER)

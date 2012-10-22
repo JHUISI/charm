@@ -311,7 +311,7 @@ class SDLParser:
                     if (currentFuncName in endLineNos_Functions):
                         sys.exit("SDLParser.py found multiple PRECOMPUTE_HEADER end token declarations.")
                     endLineNos_Functions[currentFuncName] = line_number
-                    currentFuncName = NONE_FUNC_NAME
+                    currentFuncName = NONE_FUNC_NAME                    
             elif (op1 == LATEX_HEADER):
                 if (op == START_TOKEN):
                     currentFuncName = LATEX_HEADER

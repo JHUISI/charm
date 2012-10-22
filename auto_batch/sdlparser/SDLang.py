@@ -517,7 +517,7 @@ class BinaryNode:
 			self.delta_index = None                
 		self.left = left
 		self.right = right
-
+		self.listNodes = []
 
 	def __hash__(self):
 		if self.type == ops.ATTR:
@@ -837,6 +837,9 @@ class BinaryNode:
 	def getRight(self):
 		return self.right if self.right != None else None
 
+	def getListNode(self):
+		return self.listNodes
+
 	def addSubNode(self, left, right):
 		# set subNodes appropriately
 		self.left = self.createSubNode(left) if left != None else None
@@ -868,7 +871,7 @@ class BinaryNode:
 			new_node.delta_index = this.delta_index
 		else:
 			new_node.delta_index = this.delta_index
-		if this.type in [ops.LIST, ops.EXPAND]:
+		if this.type in [ops.LIST, ops.EXPAND, ops.SYMMAP, ops.FUNC]:
 			new_node.listNodes  = this.listNodes
 		# recursively call copy on left 
 		new_node.left = self.copy(this.left)
