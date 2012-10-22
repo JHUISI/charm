@@ -3,6 +3,7 @@ N := 2
 setting := asymmetric
 
 BEGIN :: types
+ m := str
 END :: types
 
 BEGIN :: func:keygen
@@ -42,4 +43,53 @@ input := None
  g1b := g1 ^ b
  g1a1 := g1 ^ a1
  g1a2 := g1 ^ a2
+ g1ba1 := g1 ^ (b * a1)
+ g1ba2 := g1 ^ (b * a2)
+ tau1b := tau1 ^ b
+ tau2b := tau2 ^ b
+ eggAlpha := (e(g1, g2)) ^ (alpha * a1 * b)
  
+ g2AlphaA1 := g2 ^ (alpha * a1)
+ g2b := g2 ^ b
+
+ pk := list{g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, uG1, uG2, wG1, hG1, wG2, hG2, eggAlpha}
+ sk := list{g2AlphaA1, g2b, vG2, v1G2, v2G2, alpha}
+ output := list{pk, sk}
+END :: func:keygen
+
+BEGIN :: func:sign
+input := list{pk, sk, m}
+ r1 := random(ZR)
+ r2 := random(ZR)
+ z1 := random(ZR)
+ z2 := random(ZR)
+ tagk := random(ZR)
+
+ r := r1 + r2
+ M := H(m, ZR)
+
+ S#1 := sk#0 * (sk#2 ^ r)
+ S#2 := (pk#1 ^ -sk#5) * (sk#3 ^ r) * (pk#1 ^ z1)
+ S#3 := sk#1 ^ -z1
+ S#4 := (sk#4 ^ r) * (pk#1 ^ z2)
+ S#5 := sk#1 ^ -z2
+ S#6 := sk#1 ^ r2
+ S#7 := pk#1 ^ r1
+ SK := ((pk#12 ^ M) * (pk#15 ^ tagk) * (pk#16) ^ r1
+
+ output := list{S, SK, tagk}
+END :: func:sign
+
+BEGIN :: func:verify
+input := list{pk, S, SK, tagk, m}
+ s1 := random(ZR)
+ s2 := random(ZR)
+ t := random(ZR)
+ tagc := random(ZR)
+
+ s := s1 + s2
+ M := H(m, ZR)
+
+ E1 := ((pk#11 ^ M) * (pk#13 ^ tagc) * pk#14) ^ t
+ E2 := pk#0 ^ t
+ A :=  
