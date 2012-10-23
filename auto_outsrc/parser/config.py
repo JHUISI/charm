@@ -5,6 +5,9 @@ outputVarName = "output"
 
 M = 'M'
 
+varNameLeftSideNoBlindedVars = "neverUseThisVarNameNoBlindedVars"
+varNameLeftSideBlindedVars = "neverUseThisVarNameBlindedVars"
+
 blindingLoopVar = "y"
 
 blindingFactorPrefix = "blindingFactor"
