@@ -128,7 +128,7 @@ input := list{g1, g2, h, u, v, w, c, M, T1, T2, T3, R3, sx, salpha, sbeta, sgamm
 
 BEGIN :: if
  if { precheck(g1, g2, h, u, v, w, c, M, T1, T2, T3, R3, sx, salpha, sbeta, sgamma1, sgamma2) == False }
-    output == False
+    output := False
 END :: if
 
 BEGIN :: if

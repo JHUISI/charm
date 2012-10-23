@@ -59,6 +59,9 @@ END :: func:keygen
 
 BEGIN :: func:sign
 input := list{pk, sk, m}
+ pk := expand{g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, uG1, uG2, wG1, hG1, wG2, hG2, eggAlpha}
+ sk := expand{g2AlphaA1, g2b, vG2, v1G2, v2G2, alpha}
+
  r1 := random(ZR)
  r2 := random(ZR)
  z1 := random(ZR)
