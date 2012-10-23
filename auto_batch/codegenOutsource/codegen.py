@@ -34,6 +34,8 @@ CPP_funcBodyLines = None
 blindingFactors_NonLists = None
 blindingFactors_Lists = None
 
+initDictDefsAlreadyMade = None
+
 def writeCurrentNumTabsToString():
     outputString = ""
 
@@ -260,6 +262,8 @@ def getInputVariablesList(functionName):
     return inputVariables
 
 def writeInitDictDefs(outputFile, functionName):
+    global initDictDefsAlreadyMade
+
     if (functionName not in assignInfo):
         sys.exit("writeInitDictDefs in codegen.py:  function name parameter passed in is not in assignInfo.")
 
@@ -275,6 +279,11 @@ def writeInitDictDefs(outputFile, functionName):
         #if (currentVarName not in inputOutputVars):
             #continue
 
+        if (currentVarName.count(LIST_INDEX_SYMBOL) == 1):
+            currentVarNameSplit = currentVarName.split(LIST_INDEX_SYMBOL)
+            if (currentVarNameSplit[1].isdigit()):
+                currentVarName = currentVarNameSplit[0]
+
         if (currentVarName not in varNamesToFuncs_Assign):
             sys.exit("writeInitDictDefs in codegen.py:  current variable name in loop is not in varNamesToFuncs_Assign.")
 
@@ -282,13 +291,18 @@ def writeInitDictDefs(outputFile, functionName):
             continue
 
         #outputString += "\t" + currentVarName + " = {}\n"
-        outputString += "    " + currentVarName + " = {}\n"
+
+        if (currentVarName not in initDictDefsAlreadyMade):
+            outputString += "    " + currentVarName + " = {}\n"
+            initDictDefsAlreadyMade.append(currentVarName)
 
     if (len(outputString) > 0):
         outputString += "\n"
         outputFile.write(outputString)
 
 def writeFunctionDecl_Python(outputFile, functionName, toWriteGlobalVarDecls, retainGlobals):
+    global initDictDefsAlreadyMade
+
     outputString = ""
 
     inputVariables = getInputVariablesList(functionName)
@@ -312,6 +326,7 @@ def writeFunctionDecl_Python(outputFile, functionName, toWriteGlobalVarDecls, re
     if (toWriteGlobalVarDecls == True):
         writeGlobalVarDecls(outputFile, functionName)
 
+    initDictDefsAlreadyMade = []
     writeInitDictDefs(outputFile, functionName)
 
 def makeTypeReplacementsForCPP(SDL_Type):
