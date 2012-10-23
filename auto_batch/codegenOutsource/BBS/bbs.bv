@@ -26,7 +26,6 @@ BEGIN :: types
  sgamma1 := ZR
  sgamma2 := ZR
  c := ZR
- cver := ZR
 END :: types
 
 BEGIN :: func:precheck

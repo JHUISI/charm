@@ -758,8 +758,13 @@ class SDLBatch:
         self.printList("8: divConqArgList", divConqArgList)
         return dotLoopValTypesSig, dotCacheTypesSig, dotInitStmtDivConqSig, divConqLoopValStmtSig, dotVerifyEq, dotCacheCalc, dotList, dotCacheVarList, divConqArgList
 
+    def __getSecParamLine(self):
+        secparamLine = ""
+        if self.sdlData[SECPARAM] == None: secparamLine = "secparam := 80\n" # means NOT already defined in SDL        
+        return secparamLine
 
     def __constructSDLBatchOverSignaturesGeneric(self, VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs):
+        secparamLine = self.__getSecParamLine()
         batchVerifyArgList = []
         _batchVerifyArgList = list(self.sdlData[BATCH_VERIFY].keys())
         for i in _batchVerifyArgList:
@@ -862,8 +867,7 @@ class SDLBatch:
         return my_output
     
     def __constructSDLBatchOverSignaturesOnly(self, VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs):
-        secparamLine = ""
-        if self.sdlData[SECPARAM] == None: secparamLine = "secparam := 80\n" # means NOT already defined in SDL
+        secparamLine = self.__getSecParamLine()
         verifyArgTypes = self.sdlData[BATCH_VERIFY]
         if verifyArgTypes: verifyArgKeys = verifyArgTypes.keys()
         else: verifyArgKeys = verifyArgTypes = {}
@@ -927,8 +931,7 @@ class SDLBatch:
         return
 
     def __constructSDLBatchOverSignaturesAndSigners(self, VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs, VarsForDotOverSign, VarsForDotTypesOverSign, VarsForDotASTOverSign):
-        global secparamLine
-        if self.sdlData[SECPARAM] == None: secparamLine = "secparam := 80\n" # means NOT already defined in SDL
+        secparamLine = self.__getSecParamLine()
         refSignatureDict, refSignerDict = self.__searchForDependencies(VarsForDotASTOverSigs, VarsForDotASTOverSign)
 #        print("refSignatureDict", refSignatureDict)
 #        print("refSignerDict", refSignerDict)

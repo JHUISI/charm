@@ -26,7 +26,6 @@ sbeta := ZR
 sgamma1 := ZR
 sgamma2 := ZR
 c := ZR
-cver := ZR
 incorrectIndices := list{int}
 endSigNum := int
 startSigNum := int
@@ -160,6 +159,7 @@ BEGIN :: if
     output := False
 END :: if
 END :: func:verify
+secparam := 80
 
 BEGIN :: func:membership
  input := list{R3list, T1list, T2list, T3list, clist, g1, g2, h, salphalist, sbetalist, sgamma1list, sgamma2list, sxlist, u, v, w}
