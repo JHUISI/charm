@@ -92,4 +92,17 @@ input := list{pk, S, SK, tagk, m}
 
  E1 := ((pk#11 ^ M) * (pk#13 ^ tagc) * pk#14) ^ t
  E2 := pk#0 ^ t
- A :=  
+ A := (pk#17 ^ s2)
+ theta := (1 / (tagc - tagk))
+
+ lhs_pair := e(pk#2 ^ s, S#1) * e(pk#5 ^ s1, S#2) * e(pk#3 ^ s1, S#3) * e(pk#6 ^ s2, S#4) * e(pk#4 ^ s2, S#5)
+ rhs_pair := e((pk#7 ^ s1) * (pk#8 ^ s2), S#6) * e((pk#9 ^ s1) * (pk#10 ^ s2) * (pk#13 ^ -t), S#7) * ((e(E1, S#7) / e(E2, SK)) ^ theta) * A
+
+BEGIN :: if
+if {lhs_pair == rhs_pair}
+   output := True
+else
+   output := False
+END :: if
+END :: func:verify
+

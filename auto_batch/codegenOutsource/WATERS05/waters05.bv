@@ -3,7 +3,70 @@ N := 2
 setting := asymmetric
 
 BEGIN :: types
+ U := list{ZR}
+ M := str
 END :: types
 
 BEGIN :: func:keygen
-input := n
+input := list{l, n}
+ g := random(G1)
+#WATERS HASH:  waters = Waters(group, n, l, sha1_func)
+#where sha1_func='sha1'
+ alpha := random(ZR)
+ g1 := g ^ alpha
+ g2 := random(G2)
+ uprime := random(G2)
+ 
+BEGIN :: for
+for{y := 0, n}
+ U#y := random(ZR)
+END :: for
+
+ egg := e(g, g2) ^ alpha
+ pk := list{g, g1, g2, uprime, U, n, l, egg}
+ g2Alpha := g2 ^ alpha
+ sk := list{g, g1, g2, uprime, U, n, l, egg, g2Alpha}
+ output := list{pk, sk}
+END :: func:keygen
+
+BEGIN :: func:sign
+ input := list{pk, sk, M}
+ m := WATERS_HASH(M)
+ r := random(ZR)
+
+ d1 := sk#3
+ nSign := sk#5
+ USign := sk#4
+
+BEGIN :: for
+for{y := 0, nSign}
+ d1 := d1 * (USign#y ^ m#y)
+END :: for
+
+ d1Return := sk#8 * (d1 ^ r)
+ d2Return := sk#0 ^ r
+ output := list{d1Return, d2Return}
+END :: func:sign
+
+BEGIN :: func:verify
+ input := list{pk, M, d1Return, d2Return}
+ mVerify := WATERS_HASH(M)
+ c3 := pk#3 
+ nVerify := pk#5
+ UVerify := pk#4
+
+BEGIN :: for
+for{y := 0, nVerify}
+ c3 := c3 * (UVerify#y ^ m#y)
+END :: for
+
+ num := e(pk#0, d1Return)
+ dem := e(d2Return, c3)
+
+BEGIN :: if
+if {pk#7 == (num / dem)}
+   output := True
+else
+   output := False
+END :: if
+END :: func:verify
