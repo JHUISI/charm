@@ -1,5 +1,6 @@
 from SDLParser import *
-from outsrctechniques import AbstractTechnique,Technique1,Technique2,Technique3,FindT1,SubstituteVar
+#from outsrctechniques import AbstractTechnique,Technique1,Technique2,Technique3,FindT1,SubstituteVar
+from outsrctechniques import *
 import config
 import sys
 
@@ -7,6 +8,9 @@ CTprime = Enum('T0', 'T1', 'T2') # T2 is for RCCA security
 
 techMap = {1:Technique1, 2:Technique2, 3:Technique3}
 debug = False
+
+varNameLeftSideNoBlindedVarsCounter = 0
+varNameLeftSideBlindedVarsCounter = 0
 
 # 1. Get the assignment that protects the message in encrypt
 # 2. find this variable in the decrypt routine and retrieve a program slice that affects M (potentially the entire routine)
@@ -17,8 +21,60 @@ debug = False
 # description: should return a list of VarObjects that make up the new
 # 
 
+def getStrProdDecomposedBlindedVars(decomposedBlindedVars, cur_list):
+    global varNameLeftSideBlindedVarsCounter
+
+    varNameLeftSide = config.varNameLeftSideBlindedVars
+
+    for exp in decomposedBlindedVars:
+        outputString = varNameLeftSide + str(varNameLeftSideBlindedVarsCounter) + " := "
+        varNameLeftSideBlindedVarsCounter += 1
+        outputString += str(exp) + "\n"
+        cur_list.append(outputString)
+
+def getStrProdDecomposedNoBlindedVars(decomposedNoBlindedVars):
+    global varNameLeftSideNoBlindedVarsCounter
+
+    varNameLeftSide = config.varNameLeftSideNoBlindedVars
+
+    outputString = varNameLeftSide + str(varNameLeftSideNoBlindedVarsCounter) + " := "
+    varNameLeftSideNoBlindedVarsCounter += 1
+
+    for exp in decomposedNoBlindedVars:
+        outputString += str(exp) + " * "
+
+    lenString = len(outputString)
+    lenSubtractString = len(" * ")
+    outputString = outputString[0:(lenString - lenSubtractString)]
+
+    return outputString
+
+def distillDecomposedExpressionsList(decomposedExpressionsList, varsThatAreBlinded):
+    retListBlindedVars = []
+    retListNoBlindedVars = []
+
+    for exp in decomposedExpressionsList:
+        listOfBlindedVarsUsed = doesThisStatementUseBlindedVars(exp, varsThatAreBlinded)
+        if (len(listOfBlindedVarsUsed) == 0):
+            retListNoBlindedVars.append(exp)
+        else:
+            retListBlindedVars.append(exp)
+
+    return (retListBlindedVars, retListNoBlindedVars)
+
+def getDecomposedExpressionsListRecursive(parentNode, node, retNodesList):
+    if (node.type == ops.MUL):
+        retNodesList.append(node.left)
+        getDecomposedExpressionsListRecursive(node, node.right, retNodesList)
+    else:
+        retNodesList.append(parentNode.right)
+
 def getDecomposedExpressionsList(assignNode, listOfBlindedVarsUsed):
-    print("test")
+    path_applied = []
+    decomposedExpression = SimplifySDLNode(assignNode, path_applied)
+    retNodesList = []
+    getDecomposedExpressionsListRecursive(None, decomposedExpression.right, retNodesList)
+    return retNodesList
 
 def dropListIndexForStringArg(stringArg):
     if (stringArg.count(LIST_INDEX_SYMBOL) == 0):
@@ -184,7 +240,14 @@ def transform(varsThatAreBlinded, verbosity=False):
                 cur_line += 1
             else:
                 decomposedExpressionsList = getDecomposedExpressionsList(stmtsDec[ref].getAssignNode(), listOfBlindedVarsUsed)
-
+                (decomposedBlindedVars, decomposedNoBlindedVars) = distillDecomposedExpressionsList(decomposedExpressionsList, varsThatAreBlinded)
+                cur_list.append(getStrProdDecomposedNoBlindedVars(decomposedNoBlindedVars) + "\n")
+                cur_line += 1
+                getStrProdDecomposedBlindedVars(decomposedBlindedVars, cur_list)
+                cur_line += len(decomposedBlindedVars)
+                #for decomposedExpression in decomposedExpressionsList:
+                    #cur_list.append(str(decomposedExpression) + "\n")
+                    #cur_line += 1
 
     
     for o in range(len(newObj)):
