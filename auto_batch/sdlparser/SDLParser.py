@@ -136,6 +136,8 @@ class SDLParser:
         IfCond = Literal("if {") | Literal("elseif {")
         ElseCond = Literal("else") 
         List  = Literal("list{") | Literal("expand{") | Literal("symmap{") # represents a list
+        Concat = Literal("concat{")
+        StrConcat = Literal("strconcat{")
         MultiLine = Literal(";") + Optional(Literal("\\n").suppress())
         funcName = Word(alphanums + '_')
         blockName = Word(alphanums + '_:')
@@ -144,9 +146,9 @@ class SDLParser:
         ErrorName  = Literal("error(") 
 
         # captures the binary operators allowed (and, ^, *, /, +, |, ==)        
-        BinOp = MultiLine | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | StrConcat | Concat | Equality
+        BinOp = MultiLine | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | Equality
         # captures order of parsing token operators
-        Token = Equality | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | ForDo | ProdOf | SumOf | IfCond | StrConcat | Concat | Assignment | MultiLine
+        Token = Equality | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | ForDo | ProdOf | SumOf | IfCond | Assignment | MultiLine
         Operator = Token 
         #Operator = OperatorAND | OperatorOR | Token
 
@@ -165,6 +167,8 @@ class SDLParser:
                (Sum + expr + ',' + expr + rcurly).setParseAction( pushFirst ) | \
                (Random + leafNode + rpar).setParseAction( pushFirst ) | \
                (List + delimitedList(leafNode).setParseAction( checkCount ) + rcurly).setParseAction( pushFirst ) | \
+               (Concat + delimitedList(leafNode).setParseAction( checkCount ) + rcurly).setParseAction( pushFirst ) | \
+               (StrConcat + delimitedList(leafNode).setParseAction( checkCount ) + rcurly).setParseAction( pushFirst ) | \
                (funcName + '(' + delimitedList(leafNode).setParseAction( checkCount ) + ')').setParseAction( pushFunc ) | \
                (IfCond + expr + rpar).setParseAction( pushFirst ) | \
                (ElseCond ).setParseAction( pushFirst ) | \
@@ -197,7 +201,7 @@ class SDLParser:
         op = stack.pop()
         if debug >= levels.some:
             print("op: %s" % op)
-        if op in ["+","-","*", "/","^", ":=", "==", "!=", "e(", "for{", "forinner{", "do","prod{", "on", "sum{", "of", "||", "|", "and", ";"]:
+        if op in ["+","-","*", "/","^", ":=", "==", "!=", "e(", "for{", "forinner{", "do","prod{", "on", "sum{", "of", "and", ";"]:
             op2 = self.evalStack(stack, line_number)
             op1 = self.evalStack(stack, line_number)
             return createTree(op, op1, op2)
@@ -205,7 +209,7 @@ class SDLParser:
             op2 = self.evalStack(stack, line_number)
             op1 = self.evalStack(stack, line_number)
             return createTree(op, op1, op2)
-        elif op in ["list{", "expand{", "symmap{"]:
+        elif op in ["list{", "expand{", "symmap{", "concat{", "strconcat{"]: # list of arguments
             ops = []
             cnt = self.evalStack(stack, line_number)
 #            print("count: ", cnt)
@@ -908,6 +912,8 @@ def getVarTypeFromVarTypesDict(possibleFuncName, nodeAttrFullName):
         return types.G2
     elif typeDef == types.listGT:
         return types.GT
+    elif typeDef == types.listStr:
+        return types.str
     
     return typeDef
 
@@ -924,6 +930,8 @@ def getVarTypeInfoForAttr_List(node):
                 return types.G2
             elif firstReturnType == types.listGT: 
                 return types.GT
+            elif firstReturnType == types.listStr:
+                return types.str
             return firstReturnType
 
         (outsideFunctionName, retVarInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, varNameInList)
@@ -934,6 +942,26 @@ def getVarTypeInfoForAttr_List(node):
 
     lastAttemptAtType = checkForListWithOneNumIndex(nodeAttrFullName)
     return lastAttemptAtType
+
+def getVarTypeInfoForStringVar(nodeAttrFullName):
+    # ignore "_" underscores to make finding type values consistent
+    nodeAttrFullName = nodeAttrFullName.split('_')[0]
+    
+    if (nodeAttrFullName in varTypes[currentFuncName]):
+        return varTypes[currentFuncName][nodeAttrFullName].getType()
+
+    (possibleFuncName, possibleVarInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, nodeAttrFullName)
+    if ( (possibleFuncName != None) and (possibleVarInfoObj != None) and (nodeAttrFullName in varTypes[possibleFuncName]) ):
+        if (nodeAttrFullName.find(LIST_INDEX_SYMBOL) != -1):
+            nodeAttrFullListName = nodeAttrFullName.split(LIST_INDEX_SYMBOL)[0]
+            return getVarTypeFromVarTypesDict(possibleFuncName, nodeAttrFullListName)
+        return getVarTypeFromVarTypesDict(possibleFuncName, nodeAttrFullName)   # varTypes[possibleFuncName][nodeAttrFullName].getType()
+
+    if (nodeAttrFullName.isdigit()):
+        return types.int # JAA: make int and ZR synonymous although they have separate Enum values. Conceptually the same for our purposes
+
+    return types.NO_TYPE
+
 
 def getVarTypeInfoForAttr(node):
     nodeAttrFullName = getFullVarName(node, False)
@@ -978,8 +1006,17 @@ def getVarTypeInfoRecursive(node):
 
     if (node.type == ops.EXP):
         return getVarTypeInfoRecursive(node.left)
-    if (node.type in [ops.CONCAT, ops.STRCONCAT]):
-        return getVarTypeInfoRecursive(node.left)
+    if (node.type  == ops.CONCAT):
+        for i in node.getListNode():
+            if getVarTypeInfoForStringVar(i) == NO_TYPE:
+                sys.exit("getVarTypeInfoRecursive in SDLParser.py found a variable with NO_TYPE in a CONCAT operation. Variable name: ", i)
+        return getVarTypeInfoForStringVar(node.getListNode()[0])
+    if (node.type  == ops.STRCONCAT):
+        for i in node.getListNode():
+            if getVarTypeInfoForStringVar(i) != types.str:
+                sys.exit("getVarTypeInfoRecursive in SDLParser.py found a variable that isn't a STRING type in a STRCONCAT operation. Variable name: ", i)
+        return types.str
+#        for i in node.getListNode():
     if ( (node.type == ops.ADD) or (node.type == ops.SUB) or (node.type == ops.MUL) or (node.type == ops.DIV) ):
         leftSideType = getVarTypeInfoRecursive(node.left)
         rightSideType = getVarTypeInfoRecursive(node.right)

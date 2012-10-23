@@ -6,6 +6,10 @@ BEGIN :: types
  m := str
 END :: types
 
+
+verify := { (e(gb^s, sig1) * (e(gba1^s1, sig2) * (e(ga1^s1, sig3) * (e(gba2^s2, sig4) * e(ga2^s2, sig5))))) == (e(sig6, (tau1^s1) * (tau2^s2)) * (e(sig7, ((tau1b^s1) * ((tau2b^s2) * w^-t))) * ( ( ( e(sig7, ((u^(M * t)) * (w^(tagc * t))) * h^t) * (e(g1^-t, sigK)) )^theta) * (A^s2)))) }
+
+
 BEGIN :: func:keygen
 input := None
  g1 := random(G1)
@@ -71,14 +75,14 @@ input := list{pk, sk, m}
  r := r1 + r2
  M := H(m, ZR)
 
- S#1 := sk#0 * (sk#2 ^ r)
- S#2 := (pk#1 ^ -sk#5) * (sk#3 ^ r) * (pk#1 ^ z1)
- S#3 := sk#1 ^ -z1
- S#4 := (sk#4 ^ r) * (pk#1 ^ z2)
- S#5 := sk#1 ^ -z2
- S#6 := sk#1 ^ r2
- S#7 := pk#1 ^ r1
- SK := ((pk#12 ^ M) * (pk#15 ^ tagk) * (pk#16) ^ r1
+ S#1 := g2AlphaA1 * (vG2 ^ r)
+ S#2 := (g2 ^ -alpha) * (v1G2 ^ r) * (g2 ^ z1)
+ S#3 := g2b ^ -z1
+ S#4 := (v2G2 ^ r) * (g2 ^ z2)
+ S#5 := g2b ^ -z2
+ S#6 := g2b ^ r2
+ S#7 := g2 ^ r1
+ SK := ((uG2 ^ M) * (wG2 ^ tagk) * (hG2) ^ r1
 
  output := list{S, SK, tagk}
 END :: func:sign
@@ -98,14 +102,15 @@ input := list{pk, S, SK, tagk, m}
  A := (pk#17 ^ s2)
  theta := (1 / (tagc - tagk))
 
- lhs_pair := e(pk#2 ^ s, S#1) * e(pk#5 ^ s1, S#2) * e(pk#3 ^ s1, S#3) * e(pk#6 ^ s2, S#4) * e(pk#4 ^ s2, S#5)
- rhs_pair := e((pk#7 ^ s1) * (pk#8 ^ s2), S#6) * e((pk#9 ^ s1) * (pk#10 ^ s2) * (pk#13 ^ -t), S#7) * ((e(E1, S#7) / e(E2, SK)) ^ theta) * A
+# lhs_pair := e(pk#2 ^ s, S#1) * e(pk#5 ^ s1, S#2) * e(pk#3 ^ s1, S#3) * e(pk#6 ^ s2, S#4) * e(pk#4 ^ s2, S#5)
+# rhs_pair := e((pk#7 ^ s1) * (pk#8 ^ s2), S#6) * e((pk#9 ^ s1) * (pk#10 ^ s2) * (pk#13 ^ -t), S#7) * ((e(E1, S#7) / e(E2, SK)) ^ theta) * A
 
 BEGIN :: if
-if {lhs_pair == rhs_pair}
+if { (e(gb^s, sig1) * (e(gba1^s1, sig2) * (e(ga1^s1, sig3) * (e(gba2^s2, sig4) * e(ga2^s2, sig5))))) == (e(sig6, (tau1^s1) * (tau2^s2)) * (e(sig7, ((tau1b^s1) * ((tau2b^s2) * w^-t))) * ( ( ( e(sig7, ((u^(M * t)) * (w^(tagc * t))) * h^t) * (e(g1^-t, sigK)) )^theta) * (A^s2)))) }
    output := True
 else
    output := False
 END :: if
 END :: func:verify
+
 

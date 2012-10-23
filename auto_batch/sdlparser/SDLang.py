@@ -451,9 +451,9 @@ def createTree(op, node1, node2, op_value=None):
         node = BinaryNode(ops.ELSEIF)
     elif(op == "else"):
         node = BinaryNode(ops.ELSE)
-    elif(op == "||"):
+    elif(op == "strconcat{"):
         node = BinaryNode(ops.STRCONCAT)        
-    elif(op == "|"):
+    elif(op == "concat{"):
         node = BinaryNode(ops.CONCAT)
     elif(op == "and"):
     	node = BinaryNode(ops.AND)
@@ -606,12 +606,20 @@ class BinaryNode:
     			 return 'else '
 			elif(self.type == ops.OF):
 				 return ( left + ' of ' + right)
-			elif(self.type == ops.CONCAT):
-				 return (left + ' | ' + right)
-			elif(self.type == ops.STRCONCAT):
-				return (left + ' || ' + right)
 			elif(self.type == ops.AND):
 				 return ("{" + left + "} and {" + right + "}") 
+			elif(self.type == ops.STRCONCAT):
+				 listVal = ""
+				 for i in self.listNodes:
+				 	listVal += str(i) + ', '
+				 listVal = listVal[:len(listVal)-2]
+				 return 'strconcat{' + listVal + '}'
+			elif(self.type == ops.CONCAT):
+				 listVal = ""
+				 for i in self.listNodes:
+				 	listVal += str(i) + ', '
+				 listVal = listVal[:len(listVal)-2]
+				 return 'concat{' + listVal + '}'
 			elif(self.type == ops.LIST):
 				 listVal = ""
 				 for i in self.listNodes:
@@ -667,8 +675,9 @@ class BinaryNode:
 		elif(self.type == ops.TYPE):
 			return str(self.attr)
 		else:
-			left = self.left.sdl_print()
-			right = self.right.sdl_print()
+			if self.type not in [ops.FUNC, ops.LIST, ops.EXPAND, ops.SYMMAP, ops.CONCAT, ops.STRCONCAT]:
+				left = self.left.sdl_print()
+				right = self.right.sdl_print()
 			
 			if debug >= levels.some:
 			   print("Operation: ", self.type)
@@ -724,12 +733,20 @@ class BinaryNode:
     			 return 'else '
 			elif(self.type == ops.OF):
 				 return ( left + ' of ' + right)
-			elif(self.type == ops.CONCAT):
-				 return (left + ' | ' + right)
-			elif(self.type == ops.STRCONCAT):
-				return (left + ' || ' + right)    
 			elif(self.type == ops.AND):
 				 return ("{" + left + "} and {" + right + "}") 
+			elif(self.type == ops.STRCONCAT):
+				 listVal = ""
+				 for i in self.listNodes:
+				 	listVal += str(i) + ', '
+				 listVal = listVal[:len(listVal)-2]
+				 return 'strconcat{' + listVal + '}'
+			elif(self.type == ops.CONCAT):
+				 listVal = ""
+				 for i in self.listNodes:
+				 	listVal += str(i) + ', '
+				 listVal = listVal[:len(listVal)-2]
+				 return 'concat{' + listVal + '}'
 			elif(self.type == ops.LIST):
 				 listVal = ""
 				 for i in self.listNodes:
@@ -877,7 +894,7 @@ class BinaryNode:
 			new_node.delta_index = this.delta_index
 		else:
 			new_node.delta_index = this.delta_index
-		if this.type in [ops.LIST, ops.EXPAND, ops.SYMMAP, ops.FUNC]:
+		if this.type in [ops.LIST, ops.EXPAND, ops.SYMMAP, ops.FUNC, ops.CONCAT, ops.STRCONCAT]:
 			new_node.listNodes  = this.listNodes
 		# recursively call copy on left 
 		new_node.left = self.copy(this.left)

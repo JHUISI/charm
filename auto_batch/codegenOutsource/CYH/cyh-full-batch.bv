@@ -34,7 +34,7 @@ ulist := list{u_link}
 END :: types
 
 BEGIN :: precompute
-h := H(M | Lt | u, ZR)
+h := H(concat{M, Lt, u}, ZR)
 END :: precompute
 
 constant := list{P, g, Lt}
@@ -64,7 +64,7 @@ BEGIN :: func:concat
  l := len(ID_List)
 BEGIN :: for
 for{y := 0, l}
- L := (L || ID_List#y)
+ L := strconcat{L, ID_List#y}
 END :: for
 output := L
 END :: func:concat
@@ -85,7 +85,7 @@ for{i := 0, l}
 BEGIN :: if
  if { ID != L#i }
     u#i := random(G1)
-    h#i := H(M | Lt | u#i, ZR)
+    h#i := H(concat{M, Lt, u#i}, ZR)
  else
     s := i
 END :: if
@@ -108,7 +108,7 @@ END :: if
 END :: for
 
   u#s? := (pk ^ r) * (dotProd ^ -1)
-  h#s? := H(M | Lt | u#s, ZR)
+  h#s? := H(concat{M, Lt, u#s}, ZR)
   S := sk ^ (h#s + r)
 output := list{Lt, pklist, u, S}
 END :: func:sign
@@ -118,7 +118,7 @@ input := list{Lt, pklist, P, g, M, u, S}
 
 BEGIN :: for
 for{y := 0, l}
- h#y := H(M | Lt | u#y, ZR)
+ h#y := H(concat{M, Lt, u#y}, ZR)
 END :: for
 
 dotProd := init(G1)
@@ -225,7 +225,7 @@ dotALoopVal := init(G1)
 
 BEGIN :: forinner
 forinner{y := 0, l}
-h := H(Mlist#y | Lt | ulist#y,ZR)
+h := H(concat{Mlist#y, Lt, ulist#y},ZR)
 dotALoopVal := dotALoopVal * ((ulist#z#y^delta#z) * (pklist#y^(h#z * delta#z)))
 END :: forinner
 dotBCache#z := dotALoopVal

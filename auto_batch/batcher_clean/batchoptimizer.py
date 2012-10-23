@@ -800,6 +800,7 @@ class SubstituteAttr:
         self.variable_map = variable_map
         self.loopVar = loopVar
         self.constants = constants
+        self.variable_keys = list(variable_map.keys())
         
     def visit(self, node, data):
         pass
@@ -813,7 +814,14 @@ class SubstituteAttr:
         if self.loopVar:            
             node.setAttrIndex(self.loopVar)
             node.attr_index.reverse()
-
+    
+    def visit_concat(self, node, data):
+        varList = node.getListNode()
+        if self.loopVar == None:
+            newVarList = [self.variable_map[ x ] if x in self.variable_keys else x for x in varList]
+        else:
+            newVarList = [self.variable_map[ x ] + "#" + self.loopVar if x in self.variable_keys else x for x in varList]
+        node.listNodes = newVarList
 
 class DropIndexForPrecomputes:
     def __init__(self, variable_list, loopVarTarget):

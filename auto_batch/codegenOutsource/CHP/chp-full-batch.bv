@@ -47,7 +47,7 @@ BEGIN :: func:sign
 input := list{pk, sk, M, t1, t2, t3}
 a := H(t1, G1)
 h := H(t2, G1)
-b := H(M | t3, ZR)
+b := H(concat{M, t3}, ZR)
 sig := (a^sk) * (h^(sk*b))
 output := sig
 END :: func:sign
@@ -56,7 +56,7 @@ BEGIN :: func:verify
 input := list{pk, g2, sig, M, t1, t2, t3} 
 a := H(t1, G1)
 h := H(t2, G1)
-b := H(M | t3, ZR)
+b := H(concat{M, t3}, ZR)
 BEGIN :: if
 if { e(sig, g2) == (e(a, pk) * e(h, pk)^b) }
    output := True
@@ -68,7 +68,7 @@ END :: func:verify
 BEGIN :: precompute
 a := H(t1, G1)
 h := H(t2, G1)
-b := H(M | t3, ZR)
+b := H(concat{M, t3}, ZR)
 END :: precompute
 
 constant := list{a, g2, h, t1, t2, t3}
@@ -166,7 +166,7 @@ h := H(t2,G1)
 
 BEGIN :: for
 for{z := 0, N}
-b := H(Mlist#z | t3,ZR)
+b := H(concat{Mlist#z, t3}, ZR)
 dotACache#z := (siglist#z^delta#z)
 dotBCache#z := (pklist#z^delta#z)
 dotCCache#z := (pklist#z^(b * delta#z))
