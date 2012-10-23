@@ -55,7 +55,7 @@ FUNC_SYMBOL = "def func :"
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
 types = Enum('NO_TYPE','G1', 'G2', 'GT', 'ZR', 'int', 'str', 'list', 'object', 'listInt', 'listStr', 'listG1', 'listG2', 'listGT', 'listZR','symmap')
 declarator = Enum('func', 'verify')
-ops = Enum('BEGIN', 'ERROR', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'NON_EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO', 'FORINNER', 'FORALL', 'PROD', 'SUM', 'ON', 'OF','CONCAT', 'LIST', 'SYMMAP', 'EXPAND', 'FUNC', 'SEQ', 'IF', 'ELSEIF', 'ELSE', 'END', 'NONE')
+ops = Enum('BEGIN', 'ERROR', 'TYPE', 'AND', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'NON_EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO', 'FORINNER', 'FORALL', 'PROD', 'SUM', 'ON', 'OF', 'STRCONCAT', 'CONCAT', 'LIST', 'SYMMAP', 'EXPAND', 'FUNC', 'SEQ', 'IF', 'ELSEIF', 'ELSE', 'END', 'NONE')
 side = Enum('left', 'right')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
@@ -451,6 +451,8 @@ def createTree(op, node1, node2, op_value=None):
         node = BinaryNode(ops.ELSEIF)
     elif(op == "else"):
         node = BinaryNode(ops.ELSE)
+    elif(op == "||"):
+        node = BinaryNode(ops.STRCONCAT)        
     elif(op == "|"):
         node = BinaryNode(ops.CONCAT)
     elif(op == "and"):
@@ -606,6 +608,8 @@ class BinaryNode:
 				 return ( left + ' of ' + right)
 			elif(self.type == ops.CONCAT):
 				 return (left + ' | ' + right)
+			elif(self.type == ops.STRCONCAT):
+				return (left + ' || ' + right)
 			elif(self.type == ops.AND):
 				 return ("{" + left + "} and {" + right + "}") 
 			elif(self.type == ops.LIST):
@@ -722,6 +726,8 @@ class BinaryNode:
 				 return ( left + ' of ' + right)
 			elif(self.type == ops.CONCAT):
 				 return (left + ' | ' + right)
+			elif(self.type == ops.STRCONCAT):
+				return (left + ' || ' + right)    
 			elif(self.type == ops.AND):
 				 return ("{" + left + "} and {" + right + "}") 
 			elif(self.type == ops.LIST):

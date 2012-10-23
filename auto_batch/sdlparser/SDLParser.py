@@ -117,6 +117,7 @@ class SDLParser:
         MulOp = Literal("*")
         DivOp = Literal("/")
         Concat = Literal("|")
+        StrConcat = Literal("||")
         ExpOp = Literal("^")
         AddOp = Literal("+")
         SubOp = Literal("-")        
@@ -143,9 +144,9 @@ class SDLParser:
         ErrorName  = Literal("error(") 
 
         # captures the binary operators allowed (and, ^, *, /, +, |, ==)        
-        BinOp = MultiLine | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | Concat | Equality
+        BinOp = MultiLine | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | StrConcat | Concat | Equality
         # captures order of parsing token operators
-        Token = Equality | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | ForDo | ProdOf | SumOf | IfCond | Concat | Assignment | MultiLine
+        Token = Equality | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | ForDo | ProdOf | SumOf | IfCond | StrConcat | Concat | Assignment | MultiLine
         Operator = Token 
         #Operator = OperatorAND | OperatorOR | Token
 
@@ -196,7 +197,7 @@ class SDLParser:
         op = stack.pop()
         if debug >= levels.some:
             print("op: %s" % op)
-        if op in ["+","-","*", "/","^", ":=", "==", "!=", "e(", "for{", "forinner{", "do","prod{", "on", "sum{", "of", "|", "and", ";"]:
+        if op in ["+","-","*", "/","^", ":=", "==", "!=", "e(", "for{", "forinner{", "do","prod{", "on", "sum{", "of", "||", "|", "and", ";"]:
             op2 = self.evalStack(stack, line_number)
             op1 = self.evalStack(stack, line_number)
             return createTree(op, op1, op2)
@@ -977,7 +978,7 @@ def getVarTypeInfoRecursive(node):
 
     if (node.type == ops.EXP):
         return getVarTypeInfoRecursive(node.left)
-    if (node.type == ops.CONCAT):
+    if (node.type in [ops.CONCAT, ops.STRCONCAT]):
         return getVarTypeInfoRecursive(node.left)
     if ( (node.type == ops.ADD) or (node.type == ops.SUB) or (node.type == ops.MUL) or (node.type == ops.DIV) ):
         leftSideType = getVarTypeInfoRecursive(node.left)

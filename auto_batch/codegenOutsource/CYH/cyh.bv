@@ -52,7 +52,7 @@ BEGIN :: func:concat
  l := len(ID_List)
 BEGIN :: for
 for{y := 0, l}
- L := (L | ID_List#y)
+ L := (L || ID_List#y)
 END :: for
 output := L
 END :: func:concat
