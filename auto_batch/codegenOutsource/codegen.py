@@ -801,7 +801,10 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
     elif (node.type == ops.CONCAT):
         leftString = getAssignStmtAsString(node.left, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
         rightString = getAssignStmtAsString(node.right, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
-        return "(" + leftString + ", " + rightString + ")"
+        #return "(" + leftString + ", " + rightString + ")"
+        return leftString + ", " + rightString
+
+
     #elif (node.type == ops.OR):
         #leftString = getAssignStmtAsString(node.left, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
         #rightString = getAssignStmtAsString(node.right, replacementsDict, dotProdObj, lambdaReplacements, forOutput)

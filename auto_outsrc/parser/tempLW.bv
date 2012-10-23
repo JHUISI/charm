@@ -109,6 +109,10 @@ coeff := getCoefficients(policy)
 h_gid := H(gid, G1)
 
 Y := len(attrs)
+
+AAAA := { prod{y := attrs#1, Y} on (((C1#y * e(h_gid, C3#y)) * e(K#y, C3#y) / e(K#y, C2#y))^coeff#y) }
+
+
 A := { prod{y := attrs#1, Y} on (((C1#y * e(h_gid, C3#y)) * e(K#y, C3#y) / e(K#y, C2#y))^coeff#y) }
 
 M := C0 / A

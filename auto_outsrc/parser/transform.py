@@ -233,6 +233,9 @@ def transform(varsThatAreBlinded, verbosity=False):
         ref = transformVarInfos[i]
         if stmtsDec.get(ref):
             # do substitution here
+
+            deleteMe = stmtsDec[ref].getAssignNode()
+
             ASTVisitor( SubstituteVar(config.keygenSecVar, config.keygenSecVar + config.blindingSuffix) ).preorder( stmtsDec[ref].getAssignNode() )             
             listOfBlindedVarsUsed = doesThisStatementUseBlindedVars(stmtsDec[ref].getAssignNode(), varsThatAreBlinded)
             if (len(listOfBlindedVarsUsed) == 0):
