@@ -4,14 +4,14 @@ from charm.core.math.integer import randomBits
 
 group = None
 
-N = 2
+N = 100
 
 secparam = 80
 
 
-def precheck(g1, g2, h, u, v, w, c, M, T1, T2, T3, R3, sx, salpha, sbeta, sgamma1, sgamma2):
+def precheck(g1, g2, h, u, v, w, M, T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3):
 
-    input = [g1, g2, h, u, v, w, c, M, T1, T2, T3, R3, sx, salpha, sbeta, sgamma1, sgamma2]
+    input = [g1, g2, h, u, v, w, M, T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3]
     R1ver = ((u ** salpha) * (T1 ** -c))
     R2ver = ((v ** sbeta) * (T2 ** -c))
     R4ver = ((T1 ** sx) * (u ** -sgamma1))
@@ -56,8 +56,8 @@ def sign(gpk, A_ind, x_ind, M):
     T1 = (u ** alpha)
     T2 = (v ** beta)
     T3 = (A_ind * (h ** (alpha + beta)))
-    delta1 = (x_ind * alpha)
-    delta2 = (x_ind * beta)
+    gamma1 = (x_ind * alpha)
+    gamma2 = (x_ind * beta)
     r[0] = group.random(ZR)
     r[1] = group.random(ZR)
     r[2] = group.random(ZR)
@@ -70,19 +70,19 @@ def sign(gpk, A_ind, x_ind, M):
     R4 = ((T1 ** r[2]) * (u ** -r[3]))
     R5 = ((T2 ** r[2]) * (v ** -r[4]))
     c = group.hash((M, T1, T2, T3, R1, R2, R3, R4, R5), ZR)
-    s1 = (r[0] + (c * alpha))
-    s2 = (r[1] + (c * beta))
-    s3 = (r[2] + (c * x_ind))
-    s4 = (r[3] + (c * delta1))
-    s5 = (r[4] + (c * delta2))
+    salpha = (r[0] + (c * alpha))
+    sbeta = (r[1] + (c * beta))
+    sx = (r[2] + (c * x_ind))
+    sgamma1 = (r[3] + (c * gamma1))
+    sgamma2 = (r[4] + (c * gamma2))
     sig = [T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3]
     output = sig
     return output
 
-def verify(g1, g2, h, u, v, w, c, M, T1, T2, T3, R3, sx, salpha, sbeta, sgamma1, sgamma2):
+def verify(g1, g2, h, u, v, w, M, T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3):
 
-    input = [g1, g2, h, u, v, w, c, M, T1, T2, T3, R3, sx, salpha, sbeta, sgamma1, sgamma2]
-    if ( ( (precheck(g1, g2, h, u, v, w, c, M, T1, T2, T3, R3, sx, salpha, sbeta, sgamma1, sgamma2)) == (False) ) ):
+    input = [g1, g2, h, u, v, w, M, T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3]
+    if ( ( (precheck(g1, g2, h, u, v, w, M, T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3)) == (False) ) ):
         output = False
     if ( ( (((pair(T3, g2) ** sx) * ((pair(h, w) ** (-salpha - sbeta)) * ((pair(h, g2) ** (-sgamma1 - sgamma2)) * ((pair(T3, w) ** c) * (pair(g1, g2) ** -c)))))) == (R3) ) ):
         output = True
@@ -165,7 +165,7 @@ def batchverify(Mlist, R3list, T1list, T2list, T3list, clist, g1, g2, h, salphal
     if ( ( (membership(R3list, T1list, T2list, T3list, clist, g1, g2, h, salphalist, sbetalist, sgamma1list, sgamma2list, sxlist, u, v, w)) == (False) ) ):
         output = False
     for z in range(0, N):
-        if ( ( (precheck(g1, g2, h, u, v, w, clist[z], Mlist[z], T1list[z], T2list[z], T3list[z], R3list[z], sxlist[z], salphalist[z], sbetalist[z], sgamma1list[z], sgamma2list[z])) == (False) ) ):
+        if ( ( (precheck(g1, g2, h, u, v, w, Mlist[z], T1list[z], T2list[z], T3list[z], clist[z], salphalist[z], sbetalist[z], sxlist[z], sgamma1list[z], sgamma2list[z], R3list[z])) == (False) ) ):
             output = False
     for z in range(0, N):
         dotACache[z] = ((T3list[z] ** (sxlist[z] * delta[z])) * ((h[z] ** ((-sgamma1list[z] + -sgamma2list[z]) * delta[z])) * (g1[z] ** (-clist[z] * delta[z]))))
@@ -181,6 +181,17 @@ def SmallExp(bits=80):
 def main():
     global group
     group = PairingGroup(secparam)
+
+    (gpk, gmsk, A, x) = keygen(3)
+    T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3 = sign(gpk, A[0], x[0], "message")
+    g1 = gpk[0]
+    g2 = gpk[1]
+    h = gpk[2]
+    u = gpk[3]
+    v = gpk[4]
+    w = gpk[5]
+    verify(g1, g2, h, u, v, w, "message", T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3), "failed verification!"
+    print("Successful Verification!")
 
 if __name__ == '__main__':
     main()

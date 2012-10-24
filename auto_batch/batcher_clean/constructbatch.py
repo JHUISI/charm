@@ -301,7 +301,7 @@ class SDLBatch:
                 
                 outputBeforePrecompute += dc_for_begin % (sigIteratorTuple)
                 outputBeforePrecompute += "BEGIN :: if\n"
-                outputBeforePrecompute += "if {" + str( j ) + " == False }"
+                outputBeforePrecompute += "if {" + str( j ) + " == False }\n"
                 outputBeforePrecompute += " output := False\n"
                 outputBeforePrecompute += "END :: if\n"
                 outputBeforePrecompute += end_for_loop + "\n"
