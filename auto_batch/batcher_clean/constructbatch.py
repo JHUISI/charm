@@ -160,6 +160,7 @@ class SDLBatch:
         sa = SubstituteAttr(map, forLoopIndex)
         eq = BinaryNode.copy(node)
         ASTVisitor(sa).preorder(eq)
+        exceptList.extend(self.sdlData.get(CONST)) # add list of constant variables here
         dp = DropIndexForPrecomputes(self.precomputeVarList + exceptList, forLoopIndex)
         ASTVisitor(dp).preorder(eq)
         return Filter(eq)
@@ -169,6 +170,7 @@ class SDLBatch:
         eq = BinaryNode.copy(node)
         ASTVisitor(sa).preorder(eq)
         exceptList.append(delta_word) # just added
+        exceptList.extend(self.sdlData.get(CONST)) # add list of constant variables here        
         dp = DropIndexForPrecomputes(self.precomputeVarList + exceptList, forLoopIndex)
         ASTVisitor(dp).preorder(eq)
 
@@ -303,6 +305,7 @@ class SDLBatch:
                 outputBeforePrecompute += "BEGIN :: if\n"
                 outputBeforePrecompute += "if {" + str( j ) + " == False }\n"
                 outputBeforePrecompute += " output := False\n"
+                outputBeforePrecompute += " return := output\n"
                 outputBeforePrecompute += "END :: if\n"
                 outputBeforePrecompute += end_for_loop + "\n"
             elif str(i) not in dotCacheVarList:

@@ -4,7 +4,7 @@ from charm.core.math.integer import randomBits
 
 group = None
 
-N = 100
+N = 2
 
 secparam = 80
 
@@ -166,10 +166,11 @@ def batchverify(Mlist, R3list, T1list, T2list, T3list, clist, g1, g2, h, salphal
         output = False
     for z in range(0, N):
         if ( ( (precheck(g1, g2, h, u, v, w, Mlist[z], T1list[z], T2list[z], T3list[z], clist[z], salphalist[z], sbetalist[z], sxlist[z], sgamma1list[z], sgamma2list[z], R3list[z])) == (False) ) ):
-            output = False
+            return False
+
     for z in range(0, N):
-        dotACache[z] = ((T3list[z] ** (sxlist[z] * delta[z])) * ((h[z] ** ((-sgamma1list[z] + -sgamma2list[z]) * delta[z])) * (g1[z] ** (-clist[z] * delta[z]))))
-        dotBCache[z] = ((h[z] ** ((-salphalist[z] + -sbetalist[z]) * delta[z])) * (T3list[z] ** (clist[z] * delta[z])))
+        dotACache[z] = ((T3list[z] ** (sxlist[z] * delta[z])) * ((h ** ((-sgamma1list[z] + -sgamma2list[z]) * delta[z])) * (g1 ** (-clist[z] * delta[z]))))
+        dotBCache[z] = ((h ** ((-salphalist[z] + -sbetalist[z]) * delta[z])) * (T3list[z] ** (clist[z] * delta[z])))
         dotCCache[z] = (R3list[z] ** delta[z])
     dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, g2, w)
     output = incorrectIndices
@@ -184,6 +185,8 @@ def main():
 
     (gpk, gmsk, A, x) = keygen(3)
     T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3 = sign(gpk, A[0], x[0], "message")
+    sig0 = sign(gpk, A[0], x[0], "message0")
+    sig1 = sign(gpk, A[0], x[0], "message1")
     g1 = gpk[0]
     g2 = gpk[1]
     h = gpk[2]
@@ -192,6 +195,23 @@ def main():
     w = gpk[5]
     verify(g1, g2, h, u, v, w, "message", T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3), "failed verification!"
     print("Successful Verification!")
+
+    Mlist = ["message0", "message1"]
+    T1list = [sig0[0], sig1[0]]
+    T2list = [sig0[1], sig1[1]]
+    T3list = [sig0[2], sig1[2]]
+    clist = [sig0[3], sig1[3]]
+    salphalist = [sig0[4], sig1[4]]
+    sbetalist = [sig0[5], sig1[5]]
+    sxlist = [sig0[6], sig1[6]]
+    sgamma1list = [sig0[7], sig1[7]]
+    sgamma2list = [sig0[8], sig1[8]]
+    R3list = [sig0[9], sig1[9]]
+    incorrectIndices = []
+    if batchverify(Mlist, R3list, T1list, T2list, T3list, clist, g1, g2, h, salphalist, sbetalist, sgamma1list, sgamma2list, sxlist, u, v, w, incorrectIndices) == False:
+       print("Failed batch verification!")
+    else:
+       print("incorrectIndices: ", incorrectIndices)
 
 if __name__ == '__main__':
     main()

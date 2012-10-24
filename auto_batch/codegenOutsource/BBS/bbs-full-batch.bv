@@ -159,6 +159,18 @@ BEGIN :: if
     output := False
 END :: if
 END :: func:verify
+
+BEGIN :: latex
+T3 := T_3
+g1 := g_1
+g2 := g_2
+R3 := R_3
+sx := s_x
+salpha := s_\alpha
+sbeta := s_\beta
+sgamma1 := s_\gamma1
+sgamma2 := s_\gamma2
+END :: latex
 secparam := 80
 
 BEGIN :: func:membership
@@ -309,8 +321,8 @@ END :: for
 
 BEGIN :: for
 for{z := 0, N}
-dotACache#z := ((T3list#z^(sxlist#z * delta#z)) * ((h#z^((-sgamma1list#z + -sgamma2list#z) * delta#z)) * (g1#z^(-clist#z * delta#z))))
-dotBCache#z := ((h#z^((-salphalist#z + -sbetalist#z) * delta#z)) * (T3list#z^(clist#z * delta#z)))
+dotACache#z := ((T3list#z^(sxlist#z * delta#z)) * ((h^((-sgamma1list#z + -sgamma2list#z) * delta#z)) * (g1^(-clist#z * delta#z))))
+dotBCache#z := ((h^((-salphalist#z + -sbetalist#z) * delta#z)) * (T3list#z^(clist#z * delta#z)))
 dotCCache#z := (R3list#z^delta#z)
 END :: for
  dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, g2, w)
