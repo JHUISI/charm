@@ -1,34 +1,24 @@
-schemeName = "LW"
-
-inputVarName = "input"
-outputVarName = "output"
+schemeName = "BSW"
 
 M = 'M'
 
-varNameLeftSideNoBlindedVars = "neverUseThisVarNameNoBlindedVars"
-varNameLeftSideBlindedVars = "neverUseThisVarNameBlindedVars"
-
 blindingLoopVar = "y"
-
-blindingFactorPrefix = "blindingFactor"
-
 blindingSuffix = "Blinded"
-setupFuncName = "authsetup"
+setupFuncName = "setup"
 keygenBlindingExponent = "zz"
 keygenBlindingExponentType = "ZR"
-keygenFuncName = "keygen"
+keygenFuncName = "extract"
 
 encryptFuncName = "encrypt"
 
-mainFuncName = "main"
-verifyFuncName = "verify"
-
-masterPubVars = ["gpk", "pk"]
+masterPubVars = ["mpk"]
 masterSecVars = ["msk"]
+
+blindingFactorPrefix = "blindingFactor"
 
 # superset of variables we have used to represent public parameters in
 # our crypto schemes
-keygenPubVar = ["pk", "gpk"]
+keygenPubVar = ["pk", "mpk", "gpk"]
 keygenSecVar = "sk"
 
 pySuffix = ".py"
@@ -109,7 +99,7 @@ serializeFuncName = "writeToFile"
 serializeExt = ".txt"
 serializeObjectOutFuncName = "objectOut"
 serializeKeysName = "keys"
-serializePubKey = "pk[4]"
+serializePubKey = "mpk[0]"
 serializePubKeyType = "GT"
 serializePubKey_DecOut = "pk"
 
@@ -117,6 +107,9 @@ linesForSetupMain = []
 linesForSetupMain.append("S = ['ONE', 'TWO', 'THREE']")
 linesForSetupMain.append("M = \"balls on fire345\"")
 linesForSetupMain.append("policy_str = '((four or three) and (two or one))'")
+linesForSetupMain.append("n = 10")
+linesForSetupMain.append("l = 5")
+linesForSetupMain.append("id = 'example@email.com'")
 
 structsToPickleInSetupMain = []
 structsToPickleInSetupMain.append("")
