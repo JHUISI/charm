@@ -625,7 +625,7 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, eq_number=0):
             out_str += "%s := %s\n" % (i, subProds1.dotprod['dict'][i])              
         for i in batch_precompute.keys():
             if VERBOSE: print("precompute:", i, ":=", batch_precompute[i])
-            out_str += "precompute: %s := %s\n" % (i, batch_precompute[i])                            
+            out_str += "precompute: %s := %s\n" % (i, batch_precompute[i])
         for i in subProds.dotprod['list']:
             if VERBOSE: print(i,":=", subProds.dotprod['types'][i])
             out_str += "%s := %s\n" % (i, subProds.dotprod['types'][i])              

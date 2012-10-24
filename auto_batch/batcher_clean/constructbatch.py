@@ -131,7 +131,11 @@ PRECHECK = "check" # means we need to check stuff over signatures
 sigIteratorTuple = (sigIterator, zero, NUM_SIGNATURES)
 signerIteratorTuple = (signerIterator, zero, signerVarCount)
 signatureProd = "prod{%s := %s,%s}" % sigIteratorTuple
+signatureSum = "sum{%s := %s,%s}" % sigIteratorTuple
 signerProd = "prod{%s := %s,%s}" % signerIteratorTuple
+dotPrefix = "dot"
+sumPrefix = "sum"
+
 
 def Filter(node):
     return node.sdl_print()
@@ -142,10 +146,13 @@ class SDLBatch:
         self.sdlData = sdlData
         self.varTypes = varTypes
         self.precomputeDict = precompDict
+        del self.precomputeDict['delta']
         self.precomputeVarList = []
         self.defaultBatchTypes = {"incorrectIndices" : "list{int}", "startSigNum" : "int", "endSigNum " : "int"}
-        for i in list(precompDict.keys()):
-            if str(i) != 'delta': self.precomputeVarList.append(i.getAttribute())
+        for k in list(self.precomputeDict.keys()):
+            (i, j) = self.precomputeDict[k]
+            self.precomputeVarList.append(i.getAttribute())
+
         self.finalBatchEq = BinaryNode.copy(finalSdlBatchEq)
         self.variableCount = variableCount
         gdi = GetDeltaIndex()
@@ -160,7 +167,11 @@ class SDLBatch:
         sa = SubstituteAttr(map, forLoopIndex)
         eq = BinaryNode.copy(node)
         ASTVisitor(sa).preorder(eq)
-        exceptList.extend(self.sdlData.get(CONST)) # add list of constant variables here
+        constList = []
+        for i in self.sdlData.get(CONST): # prune constants that 
+            if self.varTypes[i] not in listGroupTypes:
+                constList.append(i)
+        exceptList.extend(constList) # add list of constant variables here
         dp = DropIndexForPrecomputes(self.precomputeVarList + exceptList, forLoopIndex)
         ASTVisitor(dp).preorder(eq)
         return Filter(eq)
@@ -170,7 +181,11 @@ class SDLBatch:
         eq = BinaryNode.copy(node)
         ASTVisitor(sa).preorder(eq)
         exceptList.append(delta_word) # just added
-        exceptList.extend(self.sdlData.get(CONST)) # add list of constant variables here        
+        constList = [] # [i if self.varTypes[i] not in listGroupTypes for i in self.sdlData.get(CONST) ]
+        for i in self.sdlData.get(CONST): # prune constants that 
+            if self.varTypes[i] not in listGroupTypes:
+                constList.append(i)
+        exceptList.extend(constList) # add list of constant variables here        
         dp = DropIndexForPrecomputes(self.precomputeVarList + exceptList, forLoopIndex)
         ASTVisitor(dp).preorder(eq)
 
@@ -290,8 +305,11 @@ class SDLBatch:
         if self.debug: 
             print("compute outside the loop over signatures:")
             print("dotCacheVarList: ", dotCacheVarList)
-        for i,j in self.precomputeDict.items():
-            if str(i) == PRECHECK:
+#        for i,j in self.precomputeDict.items():
+        precomputeKeys = list(self.precomputeDict.keys())
+        for h in precomputeKeys:
+            i,j = self.precomputeDict[h]
+            if str(i) == PRECHECK: # intended for loop over signatures only
                 print("variable map :=>>> ", self.sdlData[BATCH_VERIFY_MAP])
                 mapDict = self.sdlData[BATCH_VERIFY_MAP]
                 mapKeys = [ str(x) for x in mapDict.keys() ]
@@ -309,22 +327,24 @@ class SDLBatch:
                 outputBeforePrecompute += end_for_loop + "\n"
             elif str(i) not in dotCacheVarList:
 #                print("took this branch: ", i, ":", dotCacheVarList)
-                nonPrecomputeDict[i] = j
+                nonPrecomputeDict[ h ] = (i, j)
                 if self.debug: print(i, ":= ", j)
                 outputBeforePrecompute += "%s := %s\n" % (i, j)
             # see if attrs in statement are all constants, if so then non
             elif str(i) != delta_word and self.__isVarDepsAllConstants(j):
-                nonPrecomputeDict[i] = j
+                nonPrecomputeDict[ h ] = (i, j)
                 if self.debug: print(i, ":= ", j)
                 outputBeforePrecompute += "%s := %s\n" % (i, j)   
             else:
-                newPrecomputeDict[i] = j
+                newPrecomputeDict[ h ] = (i, j)
         
         if self.debug: 
             print("compute inside loop over signatures but before dotCache calculations:")
             print("dotCacheVarList: ", dotCacheVarList)
-        for i,j in newPrecomputeDict.items():
-            if str(i) != "delta" and str(i) in dotCacheVarList: # JAA: bandaid. fix: remove delta from batch precompute list
+#        for i,j in newPrecomputeDict.items():
+        for h in newPrecomputeDict.keys():
+            i, j = newPrecomputeDict[ h ]
+            if str(i) in dotCacheVarList: # JAA: bandaid. fix: remove delta from batch precompute list
                 sa = SubstituteAttr(self.sdlData[BATCH_VERIFY_MAP], loopIndex, self.sdlData.get(CONST) + self.precomputeVarList)
                 eq = BinaryNode.copy(j)
                 ASTVisitor(sa).preorder(eq)                
@@ -334,9 +354,10 @@ class SDLBatch:
         
        # mark precompute variables we have already seen
         keysToPrecomputeVars = list(self.precomputeDict.keys())
-        for i in keysToPrecomputeVars:
+        for k in keysToPrecomputeVars:
+            i,j = self.precomputeDict[k]
             if str(i) in dotCacheVarList:
-                del self.precomputeDict[i]
+                del self.precomputeDict[k]
        
         print("outputBeforePrecompute: ", outputBeforePrecompute)
         print("outputPrecompute: ", outputPrecompute)
@@ -353,20 +374,23 @@ class SDLBatch:
         if self.debug: 
             print("compute outside the loop over signatures:")
             print("dotCacheVarList: ", dotCacheVarList)
-        for i,j in self.precomputeDict.items():
+        precomputeKeys = list(self.precomputeDict.keys())
+        for h in precomputeKeys:
+            i,j = self.precomputeDict[h]
             # see if attrs in statement are all constants...
-            if str(i) != delta_word and (self.__isVarDepsAllConstants(j) and str(i) in dotCacheVarList):
-                nonPrecomputeDict[i] = j
+            if (self.__isVarDepsAllConstants(j) and str(i) in dotCacheVarList):
+                nonPrecomputeDict[h] = (i, j)
                 if self.debug: print(i, ":= ", j)
                 outputBeforePrecompute += "%s := %s\n" % (i, j)   
             else:
-                newPrecomputeDict[i] = j
+                newPrecomputeDict[h] = (i, j)
         
         if self.debug: 
             print("compute inside loop over signatures but before dotCache calculations:")
             print("dotCacheVarList: ", dotCacheVarList)
-        for i,j in newPrecomputeDict.items():
-            if str(i) != "delta" and str(i) in dotCacheVarList: # JAA: bandaid. fix: remove delta from batch precompute list
+        for h in newPrecomputeDict.keys():
+            i, j = newPrecomputeDict[ h ]
+            if str(i) in dotCacheVarList: # JAA: bandaid. fix: remove delta from batch precompute list
                 sa = SubstituteAttr(self.sdlData[BATCH_VERIFY_MAP], loopIndex, self.sdlData.get(CONST) + self.precomputeVarList)
                 eq = BinaryNode.copy(j)
                 ASTVisitor(sa).preorder(eq)                
@@ -376,9 +400,10 @@ class SDLBatch:
         
        # mark precompute variables we have already seen
         keysToPrecomputeVars = list(self.precomputeDict.keys())
-        for i in keysToPrecomputeVars:
+        for k in keysToPrecomputeVars:
+            i,j = self.precomputeDict[k]
             if str(i) in dotCacheVarList:
-                del self.precomputeDict[i]
+                del self.precomputeDict[k]
        
 #        print("outputBeforePrecompute: ", outputBeforePrecompute)
 #        print("outputPrecompute: ", outputPrecompute)
@@ -557,7 +582,6 @@ class SDLBatch:
         precomputeBeforeDV = {}
         notPrecomputeBeforeDV = {}
         references = {}
-        dotPrefix = "dot"
         dotList1 = list(dict1.keys())
         dotList2 = list(dict2.keys())
         print("list over signatures:", dotList1)
@@ -572,14 +596,14 @@ class SDLBatch:
             ASTVisitor(gviq).preorder(j.getRight())
             references[str(i)] = ([x for x in gviq.getVarList() if dotPrefix in x], j.getLeft())
             print(i, ":", j, ", var list: ", references[str(i)])
-        
+                
         listOfDots = list(references.keys())
         listOfDots.sort()
         for i in listOfDots:
             # for each dot value, go through the list of dependencies
             for k in references[i][0]:
                 if dotPrefix in k:
-                    del references[k]                
+                    del references[k]
 
         # pruned version
         print("pruned dot lists")
@@ -597,6 +621,9 @@ class SDLBatch:
                 # if so, then we can precompute as before
                 dotDependency = True
                 precomputeBeforeDV[i] = {'dotDep': references[i], 'hasDep':dotDependency} # handles case where sigProd on outside and signerProd on inside too
+            elif str(references[i][1]) == signatureSum and len(references[i][0]) == 0:
+                dotDependency = False
+                precomputeBeforeDV[i] = {'sumDep': references[i], 'hasDep':dotDependency} # second argument represents dependency
             elif str(references[i][1]) == signerProd and len(references[i][0]) == 0:
                 dotDependency = False
                 precomputeBeforeDV[i] = {'dotDep': references[i], 'hasDep':dotDependency}
@@ -610,7 +637,6 @@ class SDLBatch:
     
     def construct(self):
         (subProds, subProds1) = self.__computeDotProducts()
-        
         # dot products over signatures
         # keys: dotA, dotB ... dotZ
         VarsForDotOverSigs = subProds.dotprod['list']
@@ -680,6 +706,12 @@ class SDLBatch:
         
 #        print("Pre-compute over signatures...")
         for i in VarsForDotOverSigs:
+            if dotPrefix in i:
+                groupOp = "*" # for MUL
+            elif sumPrefix in i:
+                groupOp = "+" # for ADD
+            else:
+                sys.exit("constructbatch.py: unrecognized group operation for prefix ", i)
             print(i,":=", VarsForDotTypesOverSigs[i])
             loopVal = "%sLoopVal" % i
             dotCache = "%sCache" % i
@@ -694,9 +726,9 @@ class SDLBatch:
             dotCacheVarList = list(set(dotCacheVarList))            
             if combineLoopAndCacheStmt:
                 compStmt = self.ReplaceAppropArgs(self.sdlData[BATCH_VERIFY_MAP], varIterator, dotCacheRHS)
-                divConqLoopValStmtSig.append("%s := %s * %s\n" % (loopVal, loopVal, compStmt)) # this is mul specifically
+                divConqLoopValStmtSig.append("%s := %s %s %s\n" % (loopVal, loopVal, groupOp, compStmt)) # this is mul specifically
             else:
-                divConqLoopValStmtSig.append("%s := %s * %s#%s\n" % (loopVal, loopVal, dotCache, varIterator)) # this is mul specifically
+                divConqLoopValStmtSig.append("%s := %s %s %s#%s\n" % (loopVal, loopVal, groupOp, dotCache, varIterator)) # this is mul specifically
                 dotCacheTypesSig[dotCache] = "list{%s}" % getType
                 divConqArgList.append(dotCache)
                 dotCacheCalc.append("%s#%s := %s\n" % (dotCache, varIterator, self.ReplaceAppropArgs(self.sdlData[BATCH_VERIFY_MAP], varIterator, dotCacheRHS, exceptList))) # JAA: need to write Filter function
@@ -732,6 +764,13 @@ class SDLBatch:
         
 #        print("Pre-compute over signatures...")
         for i in VarsForDotOverSigs:
+            if dotPrefix in i:
+                groupOp = "*" # for MUL
+            elif sumPrefix in i:
+                groupOp = "+" # for ADD
+            else:
+                sys.exit("constructbatch.py: unrecognized group operation for prefix ", i)
+
             print(i,":=", VarsForDotTypesOverSigs[i])
             loopVal = "%sLoopVal" % i
             getType = self.__cleanType(VarsForDotTypesOverSigs[i])
@@ -744,7 +783,7 @@ class SDLBatch:
             dotCacheRHS = VarsForDotASTOverSigs[i].getRight()
             ASTVisitor(gvi).preorder(dotCacheRHS)
             # need to modify it a bit differently here: replace dot values with real computations
-            divConqLoopValStmtSig.append("%s := %s * %s\n" % (loopVal, loopVal, self.ReplaceAppropArgsExcept(self.sdlData[BATCH_VERIFY_MAP], varIterator, dotCacheRHS, dotList2, dotList2Map))) # this is mul specifically
+            divConqLoopValStmtSig.append("%s := %s %s %s\n" % (loopVal, loopVal, groupOp, self.ReplaceAppropArgsExcept(self.sdlData[BATCH_VERIFY_MAP], varIterator, dotCacheRHS, dotList2, dotList2Map))) # this is mul specifically
             dotCacheVarList.extend(gvi.getVarList())
             dotCacheVarList = list(set(dotCacheVarList))
 #            dotCacheCalc.append("%s#%s := %s\n" % (dotCache, varIterator, self.ReplaceAppropArgs(self.sdlData[BATCH_VERIFY_MAP], varIterator, dotCacheRHS))) # JAA: need to write Filter function
@@ -864,8 +903,8 @@ class SDLBatch:
             my_output += l
         my_output += end_for_inner_loop + "\n"            
         
-        print("Build inner For loop :=> ")
-        print(my_output)
+        #print("Build inner For loop :=> ")
+        #print(my_output)
         return my_output
     
     def __constructSDLBatchOverSignaturesOnly(self, VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs):

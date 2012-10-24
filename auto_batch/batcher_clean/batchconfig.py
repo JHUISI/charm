@@ -142,27 +142,17 @@ class SDLSetting():
         precomp = assignInfoDict.get(PRECOMPUTE_HEADER)
         self.data[PRECOMPUTE_HEADER] = {}
         if precomp == None: return
+        index = 0
         if type(precomp) == dict:
             for k,v in precomp.items():
                 node = v.getAssignNode() # might need 
                 if(node.type == ops.EQ):
                     self.indiv_precompute[ node.left ] = node.right
-                    self.batch_precompute[ BinaryNode.copy(node.left) ] = BinaryNode.copy(node.right)
+#                    self.batch_precompute[ BinaryNode.copy(node.left) ] = BinaryNode.copy(node.right)
+                    self.batch_precompute [ index ] = (BinaryNode.copy(node.left), BinaryNode.copy(node.right)) 
+                    index += 1
         return
-    
-#    def __parsePreCheckIfExists(self, assignInfoDict):
-#        precheck = assignInfoDict.get(PRECHECK_HEADER)
-#        self.data[PRECHECK_HEADER] = []
-#        if precheck == None: return
-#        startIndex = getLineNoOfInputStatement(PRECHECK_HEADER)
-#        endIndex = getLineNoOfOutputStatement(PRECHECK_HEADER)
-#        listOfStmts = getLinesOfCodeFromLineNos(list(range(startIndex, endIndex)))
-#        
-#        # verify that arguments of 'precheck' are a subset of 'verify' otherwise, doesn't make sense
-#        for i in listOfStmts:
-#            print("c: ", i, type(i))
-#        sys.exit(0)
-    
+        
     def __parseLatexAssign(self, assignInfoDict):
         latex = assignInfoDict.get(LATEX_HEADER)
         if type(latex) == dict:

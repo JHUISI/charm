@@ -938,6 +938,8 @@ def getVarTypeInfoForAttr_List(node):
             return firstReturnType
 
         (outsideFunctionName, retVarInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, varNameInList)
+        if retVarInfoObj.getType() == types.NO_TYPE: # try something else first before returning
+            return getVarTypeFromVarTypesDict(TYPES_HEADER, varNameInList)
         if ( (outsideFunctionName != None) and (retVarInfoObj != None) and (outsideFunctionName in varTypes) and (varNameInList in varTypes[outsideFunctionName]) ):
             return varTypes[outsideFunctionName][varNameInList].getType()
 
@@ -1025,7 +1027,7 @@ def getVarTypeInfoRecursive(node):
         rightSideType = getVarTypeInfoRecursive(node.right)
         if (leftSideType != rightSideType):
             print("left side: ", leftSideType, ":", node.left)
-            print("right side: ", rightSideType)
+            print("right side: ", rightSideType, ":", node.right)
             sys.exit("getVarTypeInfoRecursive in SDLParser.py found an operation of type ADD, SUB, MUL, or DIV in which the left and right sides were not of the same type.")
         return leftSideType
     if (node.type == ops.PAIR):
