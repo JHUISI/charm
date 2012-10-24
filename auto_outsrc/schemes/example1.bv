@@ -1,0 +1,71 @@
+name := example
+setting := asymmetric
+
+N := 2
+secparam := 80
+
+BEGIN :: types
+M := GT
+END :: types
+
+BEGIN :: func:setup
+input := None
+a := random(ZR)
+g1 := random(G1)
+g2 := random(G2)
+egga := (e(g1, g2)^a)
+
+msk := a
+output := list{g1, g2, egga, msk}
+END :: func:setup
+
+
+
+
+
+BEGIN :: func:keygen
+input := list{g2, egga, msk} 
+
+t := random(ZR)
+
+d := g2 ^ (msk * t)
+eggat := egga^t 
+
+pk := eggat
+sk := d
+output := list{pk, sk}
+END :: func:keygen
+
+
+
+
+
+BEGIN :: func:encrypt
+input := list{g1, pk, M}
+
+s1 := random(ZR)
+s2 := random(ZR)
+s3 := random(ZR)
+s := s1 + s2 + s3
+
+c#0 := M * (pk ^ s)
+c#1 := g1 ^ s1
+c#2 := g1 ^ s2
+c#3 := g1 ^ s3
+
+output := c
+END :: func:encrypt
+
+
+
+
+
+BEGIN :: func:decrypt
+input := list{pk, sk, c}
+
+result := e(c#1, d) * e(c#2, d) * e(c#3, d)
+M := c#0 / result
+
+output := M
+END :: func:decrypt
+

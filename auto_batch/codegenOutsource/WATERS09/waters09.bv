@@ -1,15 +1,40 @@
 name := waters09
-N := 2
+N := 100
 setting := asymmetric
+# g1 := G1
+# g1b := G1
+# g1a1 := G1
+# g1a2 := G1
+# g1ba1 := G1
+# g1ba2 := G1
+# g2 := G2
 
 BEGIN :: types
  m := str
+ tagc := ZR
+ tagk := ZR
+ gb := G1
+ gba1 := G1
+ gba2 := G1
+ ga2 := G1
+ ga1 := G1
+ tau1 := G2
+ tau2 := G2
+ tau1b := G1
+ tau2b := G1
+ w := G2
+ u := G2
+ h := G2
+ S1 := G2
+ S2 := G2
+ S3 := G2
+ S4 := G2
+ S5 := G2
+ S6 := G1
+ S7 := G1
+ SK := G2 
+ A := GT
 END :: types
-
-
-verify := { (e(gb^s, S#1) * (e(gba1^s1, S#2) * (e(ga1^s1, S#3) * (e(gba2^s2, S#4) * e(ga2^s2, S#5))))) == (e(S#6, (tau1^s1) * (tau2^s2)) * (e(S#7, ((tau1b^s1) * ((tau2b^s2) * w^-t))) * ( ( ( e(S#7, ((u^(M * t)) * (w^(tagc * t))) * h^t) * (e(g1^-t, SK)) )^theta) * (A^s2)))) }
-#verify := { (e(gb^s, sig1) * (e(gba1^s1, sig2) * (e(ga1^s1, sig3) * (e(gba2^s2, sig4) * e(ga2^s2, sig5))))) == (e(sig6, (tau1^s1) * (tau2^s2)) * (e(sig7, ((tau1b^s1) * ((tau2b^s2) * w^-t))) * ( ( ( e(sig7, ((u^(M * t)) * (w^(tagc * t))) * h^t) * (e(g1^-t, sigK)) )^theta) * (A^s2)))) }
-
 
 BEGIN :: func:keygen
 input := None
@@ -24,11 +49,7 @@ input := None
  vExp := random(ZR)
  v1Exp := random(ZR)
  v2Exp := random(ZR)
- u := random(ZR)
-
- vG1 := g1 ^ vExp
- v1G1 := g1 ^ v1Exp
- v2G1 := g1 ^ v2Exp
+ uExp := random(ZR)
 
  vG2 := g2 ^ vExp
  v1G2 := g2 ^ v1Exp
@@ -36,14 +57,14 @@ input := None
 
  wG1 := g1 ^ wExp
  hG1 := g1 ^ hExp
- wG2 := g2 ^ wExp
- hG2 := g2 ^ hExp
+ w := g2 ^ wExp
+ h := g2 ^ hExp
 
- uG1 := g1 ^ u
- uG2 := g2 ^ u
+ uG1 := g1 ^ uExp
+ u := g2 ^ uExp
 
- tau1 := vG1 * (v1G1 ^ a1)
- tau2 := vG1 * (v2G1 ^ a2)
+ tau1 := vG2 * (v1G2 ^ a1)
+ tau2 := vG2 * (v2G2 ^ a2)
 
  g1b := g1 ^ b
  g1a1 := g1 ^ a1
@@ -52,19 +73,19 @@ input := None
  g1ba2 := g1 ^ (b * a2)
  tau1b := tau1 ^ b
  tau2b := tau2 ^ b
- eggAlpha := (e(g1, g2)) ^ (alpha * a1 * b)
+ A := (e(g1, g2)) ^ (alpha * a1 * b)
  
  g2AlphaA1 := g2 ^ (alpha * a1)
  g2b := g2 ^ b
 
- pk := list{g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, uG1, uG2, wG1, hG1, wG2, hG2, eggAlpha}
+ pk := list{g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, uG1, u, wG1, hG1, w, h, A}
  sk := list{g2AlphaA1, g2b, vG2, v1G2, v2G2, alpha}
  output := list{pk, sk}
 END :: func:keygen
 
 BEGIN :: func:sign
 input := list{pk, sk, m}
- pk := expand{g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, uG1, uG2, wG1, hG1, wG2, hG2, eggAlpha}
+ pk := expand{g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, uG1, u, wG1, hG1, w, h, A}
  sk := expand{g2AlphaA1, g2b, vG2, v1G2, v2G2, alpha}
 
  r1 := random(ZR)
@@ -76,42 +97,87 @@ input := list{pk, sk, m}
  r := r1 + r2
  M := H(m, ZR)
 
- S#1 := g2AlphaA1 * (vG2 ^ r)
- S#2 := (g2 ^ -alpha) * (v1G2 ^ r) * (g2 ^ z1)
- S#3 := g2b ^ -z1
- S#4 := (v2G2 ^ r) * (g2 ^ z2)
- S#5 := g2b ^ -z2
- S#6 := g2b ^ r2
- S#7 := g2 ^ r1
- SK := ((uG2 ^ M) * (wG2 ^ tagk) * (hG2) ^ r1
+ S1 := g2AlphaA1 * (vG2 ^ r)
+ S2 := (g2 ^ -alpha) * (v1G2 ^ r) * (g2 ^ z1)
+ S3 := g2b ^ -z1
+ S4 := (v2G2 ^ r) * (g2 ^ z2)
+ S5 := g2b ^ -z2
+ S6 := g1b ^ r2
+ S7 := g1 ^ r1
+ SK := ((u ^ M) * (w ^ tagk)) * (h ^ r1)
 
  output := list{S, SK, tagk}
 END :: func:sign
 
+# pk := expand{g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, uG1, u, wG1, hG1, w, h, A}
 BEGIN :: func:verify
-input := list{pk, S, SK, tagk, m}
- pk := expand{g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, uG1, uG2, wG1, hG1, wG2, hG2, eggAlpha}
- sk := expand{g2AlphaA1, g2b, vG2, v1G2, v2G2, alpha}
+input := list{g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, u, w, h, A, S1, S2, S3, S4, S5, S6, S7, SK, tagk, m}
 
  s1 := random(ZR)
  s2 := random(ZR)
  t := random(ZR)
  tagc := random(ZR)
-
  s := s1 + s2
  M := H(m, ZR)
-
- E1 := ((uG1 ^ M) * (pk#13 ^ tagc) * pk#14) ^ t
- E2 := g1 ^ t
- A := (eggAlpha ^ s2)
- theta := (1 / (tagc - tagk))
+ theta := ((tagc - tagk)^-1)
 
 BEGIN :: if
-if { (e(gb^s, S#1) * (e(gba1^s1, S#2) * (e(ga1^s1, S#3) * (e(gba2^s2, S#4) * e(ga2^s2, S#5))))) == (e(S#6, (tau1^s1) * (tau2^s2)) * (e(S#7, ((tau1b^s1) * ((tau2b^s2) * w^-t))) * ( ( ( e(S#7, ((u^(M * t)) * (w^(tagc * t))) * h^t) * (e(g1^-t, SK)) )^theta) * (A^s2)))) }
+if { (e(gb^s, S1) * (e(gba1^s1, S2) * (e(ga1^s1, S3) * (e(gba2^s2, S4) * e(ga2^s2, S5))))) == (e(S6, (tau1^s1) * (tau2^s2)) * (e(S7, ((tau1b^s1) * ((tau2b^s2) * w^-t))) * ( ( ( e(S7, ((u^(M * t)) * (w^(tagc * t))) * h^t) * (e(g1^-t, SK)) )^theta) * (A^s2)))) }
    output := True
 else
    output := False
 END :: if
 END :: func:verify
+
+BEGIN :: precompute
+ s1 := random(ZR)
+ s2 := random(ZR)
+ t := random(ZR)
+ tagc := random(ZR)
+ s := s1 + s2
+ M := H(m, ZR)
+ theta := ((tagc - tagk)^-1)
+END :: precompute
+
+constant := list{g1, g2}
+public := list{gb, gba1, g1b, g1a1, g1a2, g1ba1, g1ba2, ga1, ga2, gba2, tau1, tau2, tau1b, tau2b, w, u, h, A}
+signature := list{theta, S1, S2, S3, S4, S5, S6, S7, SK, s, s1, s2, t, tagc}
+message := M
+
+BEGIN :: count
+message_count := N
+public_count := one
+signature_count := N
+END :: count
+
+verify := { (e(gb^s, S1) * (e(gba1^s1, S2) * (e(ga1^s1, S3) * (e(gba2^s2, S4) * e(ga2^s2, S5))))) == (e(S6, (tau1^s1) * (tau2^s2)) * (e(S7, ((tau1b^s1) * ((tau2b^s2) * w^-t))) * ( ( ( e(S7, ((u^(M * t)) * (w^(tagc * t))) * h^t) * (e(g1^-t, SK)) )^theta) * (A^s2)))) }
+
+
+# BEGIN :: latex
+# S#1 := \sigma_1
+# S#2 := \sigma_2
+# S#3 := \sigma_3
+# S#4 := \sigma_4
+# S#5 := \sigma_5
+# S#6 := \sigma_6
+# S#7 := \sigma_7
+# SK := \sigma_K
+# theta := \theta
+# s2 := s_2
+# s1 := s_1
+# tagc := tag_c
+# tau1 := \tau_1
+# tau2 := \tau_2
+# tau1b := {\tau_1}^b
+# tau2b := {\tau_2}^b
+# gb := {g_1}^b
+# gba1 := {g_1}^{b \cdot a_1}
+# gba2 := {g_1}^{b \cdot a_2}
+# ga2 := {g_1}^{a_2}
+# ga1 := {g_1}^{a_1}
+# g1 := g_1
+# g2 := g_2
+# END :: latex
+
 
 

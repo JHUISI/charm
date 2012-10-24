@@ -30,6 +30,9 @@ class SDLSetting():
     def parse(self, assignInfoDict, theVarTypes):
         self.__parseVerifyEq(assignInfoDict)
         self.__parseTypes(assignInfoDict, theVarTypes.get(TYPE))
+        self.__parseTypes(assignInfoDict, theVarTypes.get("keygen"))
+        self.__parseTypes(assignInfoDict, theVarTypes.get("sign"))
+        self.__parseTypes(assignInfoDict, theVarTypes.get(VERIFY))
         self.__parseNumSignatures(assignInfoDict)
         self.__parseOneValueInKey(assignInfoDict, SCHEME_NAME)
         self.__parseOneValueInKey(assignInfoDict, SECPARAM)

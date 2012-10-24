@@ -677,7 +677,8 @@ class BinaryNode:
 		else:
 			if self.type not in [ops.FUNC, ops.LIST, ops.EXPAND, ops.SYMMAP, ops.CONCAT, ops.STRCONCAT]:
 				left = self.left.sdl_print()
-				right = self.right.sdl_print()
+				if self.type not in [ops.RANDOM, ops.FORALL, ops.IF, ops.ELSE]:
+					right = self.right.sdl_print()
 			
 			if debug >= levels.some:
 			   print("Operation: ", self.type)

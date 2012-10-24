@@ -736,6 +736,9 @@ def checkPairingInputTypes(node):
     if (algebraicSetting == SYMMETRIC_SETTING):
         checkPairingInputTypes_Symmetric(leftType, rightType)
     elif (algebraicSetting == ASYMMETRIC_SETTING):
+        if leftType != types.G1 or rightType != types.G2:
+            print("node.left: ", node.left, leftType)
+            print("node.right: ", node.right, rightType)
         checkPairingInputTypes_Asymmetric(leftType, rightType)
     else:
         sys.exit("Algebraic setting is set to unsupported value (found in checkPairingInputTypes in SDLParser).")
