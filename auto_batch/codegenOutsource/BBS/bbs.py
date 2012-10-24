@@ -4,7 +4,7 @@ from charm.core.math.integer import randomBits
 
 group = None
 
-N = 100
+N = 2
 
 secparam = 80
 
@@ -16,7 +16,7 @@ def precheck(g1, g2, h, u, v, w, c, M, T1, T2, T3, R3, sx, salpha, sbeta, sgamma
     R2ver = ((v ** sbeta) * (T2 ** -c))
     R4ver = ((T1 ** sx) * (u ** -sgamma1))
     R5ver = ((T2 ** sx) * (v ** -sgamma2))
-    if ( ( (c) != (group.hash(M, T1, T2, T3, R1ver, R2ver, R3, R4ver, R5ver, ZR)) ) ):
+    if ( ( (c) != (group.hash((M, T1, T2, T3, R1ver, R2ver, R3, R4ver, R5ver), ZR)) ) ):
         output = False
     else:
         output = True
@@ -69,13 +69,13 @@ def sign(gpk, A_ind, x_ind, M):
     R3 = ((pair(T3, g2) ** r[2]) * ((pair(h, w) ** (-r[0] - r[1])) * (pair(h, g2) ** (-r[3] - r[4]))))
     R4 = ((T1 ** r[2]) * (u ** -r[3]))
     R5 = ((T2 ** r[2]) * (v ** -r[4]))
-    c = group.hash(M, T1, T2, T3, R1, R2, R3, R4, R5, ZR)
+    c = group.hash((M, T1, T2, T3, R1, R2, R3, R4, R5), ZR)
     s1 = (r[0] + (c * alpha))
     s2 = (r[1] + (c * beta))
     s3 = (r[2] + (c * x_ind))
     s4 = (r[3] + (c * delta1))
     s5 = (r[4] + (c * delta2))
-    sig = [T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2]
+    sig = [T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3]
     output = sig
     return output
 
@@ -166,6 +166,7 @@ def batchverify(Mlist, R3list, T1list, T2list, T3list, clist, g1, g2, h, salphal
         output = False
     for z in range(0, N):
         if ( ( (precheck(g1, g2, h, u, v, w, clist[z], Mlist[z], T1list[z], T2list[z], T3list[z], R3list[z], sxlist[z], salphalist[z], sbetalist[z], sgamma1list[z], sgamma2list[z])) == (False) ) ):
+            output = False
     for z in range(0, N):
         dotACache[z] = ((T3list[z] ** (sxlist[z] * delta[z])) * ((h[z] ** ((-sgamma1list[z] + -sgamma2list[z]) * delta[z])) * (g1[z] ** (-clist[z] * delta[z]))))
         dotBCache[z] = ((h[z] ** ((-salphalist[z] + -sbetalist[z]) * delta[z])) * (T3list[z] ** (clist[z] * delta[z])))

@@ -1,1 +1,9 @@
-test
+    (gpk, gmsk, A, x) = keygen(3)
+    (T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3) = sign(gpk, A[0], x[0], "message")
+    g1 = gpk[0]
+    g2 = gpk[1]
+    h = gpk[2]
+    u = gpk[3]
+    v = gpk[4]
+    w = gpk[5]
+    verify(g1, g2, h, u, v, w, c, "message", T1, T2, T3, R3, sx, salpha, sbeta, sgamma1, sgamma2)

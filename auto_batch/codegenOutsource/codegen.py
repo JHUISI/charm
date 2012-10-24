@@ -798,17 +798,32 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
         return "( (" + leftString + ") != (" + rightString + ") )"
 
 
-    elif (node.type == ops.CONCAT):
-        leftString = getAssignStmtAsString(node.left, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
-        rightString = getAssignStmtAsString(node.right, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
+    #elif (node.type == ops.CONCAT):
+        #leftString = getAssignStmtAsString(node.left, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
+        #rightString = getAssignStmtAsString(node.right, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
         #return "(" + leftString + ", " + rightString + ")"
-        return leftString + ", " + rightString
+        #return leftString + ", " + rightString
 
 
     #elif (node.type == ops.OR):
         #leftString = getAssignStmtAsString(node.left, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
         #rightString = getAssignStmtAsString(node.right, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
         #return "(" + leftString + " or " + rightString + ")"
+    elif (node.type == ops.STRCONCAT):
+        strconcatOutputString = "("
+        for listNode in node.listNodes:
+            listNodeAsString = getAssignStmtAsString(listNode, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
+            strconcatOutputString += listNodeAsString + " + "
+        strconcatOutputString = strConcatOutputString[0:(len(strconcatOutputString) - len(" + "))]
+        return strconcatOutputString
+    elif (node.type == ops.CONCAT):
+        concatOutputString = "("
+        for listNode in node.listNodes:
+            listNodeAsString = getAssignStmtAsString(listNode, replacementsDict, dotProdObj, lambdaReplacements, forOutput)          
+            concatOutputString += listNodeAsString + ", "
+        concatOutputString = concatOutputString[0:(len(concatOutputString) - len(", "))]
+        concatOutputString += ")"
+        return concatOutputString
     elif (node.type == ops.LIST):
         if (forOutput == True):
             listOutputString = "("
