@@ -13,6 +13,7 @@ gl := list
 c := list
 d := list
 z := list
+id := str
 END :: types
 
 BEGIN :: func:setup

@@ -172,6 +172,9 @@ def varListContainsParentDict(varList, parentDict):
     return False
 
 def getShouldThisElemBeUnblinded(keygenOutputElem, varsModifiedInKeygen):
+    if (keygenOutputElem == config.keygenSecVar):
+        return False
+
     if (keygenOutputElem in publicVarNames):
         return True
 
