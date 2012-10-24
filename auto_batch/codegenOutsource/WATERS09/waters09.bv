@@ -20,8 +20,8 @@ BEGIN :: types
  ga1 := G1
  tau1 := G2
  tau2 := G2
- tau1b := G1
- tau2b := G1
+ tau1b := G2
+ tau2b := G2
  w := G2
  u := G2
  h := G2

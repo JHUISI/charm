@@ -612,7 +612,7 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
             print("varName: ", varName)
             print("oldType: ", varTypes[currentFuncName][varName].getType())
             print("newType: ", newType)
-            sys.exit("updateVarTypes in SDLParser.py received as input a node whose full variable name is already in varTypes[currentFuncName]. Discrepancy in types.")
+            sys.exit("updateVarTypes in SDLParser.py received as input a node whose full variable name is already in varTypes[%s]. Discrepancy in types, so check type section." % currentFuncName)
 
     varTypeObj = VarType()
     varTypeObj.setLineNo(i)

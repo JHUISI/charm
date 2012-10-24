@@ -189,7 +189,9 @@ class SDLSetting():
     def __parseTypes(self, assignInfoDict, varTypeDict):
         for key in varTypeDict.keys():
             # save types
-            self.varTypes[ key ] = str(varTypeDict[key].getType())
+            if varTypeDict[key].getType() != types.NO_TYPE:
+                self.varTypes[ key ] = str(varTypeDict[key].getType())
+            
         return
     
     def __parseNumSignatures(self, assignInfoDict):

@@ -286,7 +286,6 @@ class SDLBatch:
         outputPrecompute = ""
         nonPrecomputeDict = {}
         newPrecomputeDict = {}
-            
         # preprocess precompute lines
         if self.debug: 
             print("compute outside the loop over signatures:")
@@ -326,7 +325,7 @@ class SDLBatch:
             print("dotCacheVarList: ", dotCacheVarList)
         for i,j in newPrecomputeDict.items():
             if str(i) != "delta" and str(i) in dotCacheVarList: # JAA: bandaid. fix: remove delta from batch precompute list
-                sa = SubstituteAttr(self.sdlData[BATCH_VERIFY_MAP], loopIndex, self.sdlData.get(CONST))
+                sa = SubstituteAttr(self.sdlData[BATCH_VERIFY_MAP], loopIndex, self.sdlData.get(CONST) + self.precomputeVarList)
                 eq = BinaryNode.copy(j)
                 ASTVisitor(sa).preorder(eq)                
                 line = "%s := %s\n" % (i, Filter(eq))
@@ -368,7 +367,7 @@ class SDLBatch:
             print("dotCacheVarList: ", dotCacheVarList)
         for i,j in newPrecomputeDict.items():
             if str(i) != "delta" and str(i) in dotCacheVarList: # JAA: bandaid. fix: remove delta from batch precompute list
-                sa = SubstituteAttr(self.sdlData[BATCH_VERIFY_MAP], loopIndex, self.sdlData.get(CONST))
+                sa = SubstituteAttr(self.sdlData[BATCH_VERIFY_MAP], loopIndex, self.sdlData.get(CONST) + self.precomputeVarList)
                 eq = BinaryNode.copy(j)
                 ASTVisitor(sa).preorder(eq)                
                 line = "%s := %s\n" % (i, Filter(eq))

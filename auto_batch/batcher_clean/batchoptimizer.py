@@ -807,6 +807,7 @@ class SubstituteAttr:
     
     def visit_attr(self, node, data):
         varName = node.getAttribute() # just retrieve the name and do not include any index info
+        if varName.isdigit(): return
         if varName in self.variable_map.keys():
             node.setAttribute(self.variable_map[varName], clearAttrIndex=False)
         if self.constants: # if variable is a constant, then no need adding the loopVar index since it is always the same value.
