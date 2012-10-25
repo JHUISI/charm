@@ -1,0 +1,464 @@
+name := waters09
+N := 100
+setting := asymmetric
+# g1 := G1
+# g1b := G1
+# g1a1 := G1
+# g1a2 := G1
+# g1ba1 := G1
+# g1ba2 := G1
+# g2 := G2
+
+BEGIN :: types
+m := str
+tagc := ZR
+tagk := ZR
+gb := G1
+gba1 := G1
+gba2 := G1
+ga2 := G1
+ga1 := G1
+tau1 := G2
+tau2 := G2
+tau1b := G2
+tau2b := G2
+w := G2
+u := G2
+h := G2
+S1 := G2
+S2 := G2
+S3 := G2
+S4 := G2
+S5 := G2
+S6 := G1
+S7 := G1
+SK := G2
+A := GT
+incorrectIndices := list{int}
+endSigNum := int
+startSigNum := int
+delta := list{ZR}
+dotCLoopVal := G2
+dotMLoopVal := G2
+dotILoopVal := G1
+dotKLoopVal := G1
+sumNLoopVal := ZR
+dotGLoopVal := G1
+dotBLoopVal := G2
+dotDLoopVal := G2
+dotJLoopVal := G1
+dotLLoopVal := G1
+dotELoopVal := G2
+dotFLoopVal := G1
+dotHLoopVal := G1
+dotALoopVal := G2
+dotLCache := list{G1}
+dotKCache := list{G1}
+dotFCache := list{G1}
+dotECache := list{G2}
+sumNCache := list{ZR}
+dotDCache := list{G2}
+dotCCache := list{G2}
+dotJCache := list{G1}
+dotICache := list{G1}
+dotHCache := list{G1}
+dotGCache := list{G1}
+dotBCache := list{G2}
+dotACache := list{G2}
+dotMCache := list{G2}
+SKlist := list{G2}
+S5list := list{G2}
+S6list := list{G1}
+g1b := G1
+g1ba1 := G1
+g1ba2 := G1
+g2 := G2
+g1 := G1
+tagklist := list{ZR}
+mlist := list{str}
+S2list := list{G2}
+S3list := list{G2}
+g1a2 := G1
+g1a1 := G1
+S4list := list{G2}
+S7list := list{G1}
+S1list := list{G2}
+END :: types
+
+BEGIN :: func:keygen
+input := None
+ g1 := random(G1)
+ g2 := random(G2)
+ a1 := random(ZR)
+ a2 := random(ZR)
+ b := random(ZR)
+ alpha := random(ZR)
+ wExp := random(ZR)
+ hExp := random(ZR)
+ vExp := random(ZR)
+ v1Exp := random(ZR)
+ v2Exp := random(ZR)
+ uExp := random(ZR)
+
+ vG2 := g2 ^ vExp
+ v1G2 := g2 ^ v1Exp
+ v2G2 := g2 ^ v2Exp
+
+ wG1 := g1 ^ wExp
+ hG1 := g1 ^ hExp
+ w := g2 ^ wExp
+ h := g2 ^ hExp
+
+ uG1 := g1 ^ uExp
+ u := g2 ^ uExp
+
+ tau1 := vG2 * (v1G2 ^ a1)
+ tau2 := vG2 * (v2G2 ^ a2)
+
+ g1b := g1 ^ b
+ g1a1 := g1 ^ a1
+ g1a2 := g1 ^ a2
+ g1ba1 := g1 ^ (b * a1)
+ g1ba2 := g1 ^ (b * a2)
+ tau1b := tau1 ^ b
+ tau2b := tau2 ^ b
+ A := (e(g1, g2)) ^ (alpha * a1 * b)
+ 
+ g2AlphaA1 := g2 ^ (alpha * a1)
+ g2b := g2 ^ b
+
+ pk := list{g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, uG1, u, wG1, hG1, w, h, A}
+ sk := list{g2AlphaA1, g2b, vG2, v1G2, v2G2, alpha}
+ output := list{pk, sk}
+END :: func:keygen
+
+BEGIN :: func:sign
+input := list{pk, sk, m}
+ pk := expand{g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, uG1, u, wG1, hG1, w, h, A}
+ sk := expand{g2AlphaA1, g2b, vG2, v1G2, v2G2, alpha}
+
+ r1 := random(ZR)
+ r2 := random(ZR)
+ z1 := random(ZR)
+ z2 := random(ZR)
+ tagk := random(ZR)
+
+ r := r1 + r2
+ M := H(m, ZR)
+
+ S1 := g2AlphaA1 * (vG2 ^ r)
+ S2 := (g2 ^ -alpha) * (v1G2 ^ r) * (g2 ^ z1)
+ S3 := g2b ^ -z1
+ S4 := (v2G2 ^ r) * (g2 ^ z2)
+ S5 := g2b ^ -z2
+ S6 := g1b ^ r2
+ S7 := g1 ^ r1
+ SK := ((u ^ M) * (w ^ tagk)) * (h ^ r1)
+
+ output := list{S, SK, tagk}
+END :: func:sign
+
+# pk := expand{g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, uG1, u, wG1, hG1, w, h, A}
+BEGIN :: func:verify
+input := list{g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, u, w, h, A, S1, S2, S3, S4, S5, S6, S7, SK, tagk, m}
+
+ s1 := random(ZR)
+ s2 := random(ZR)
+ t := random(ZR)
+ tagc := random(ZR)
+ s := s1 + s2
+ M := H(m, ZR)
+ theta := ((tagc - tagk)^-1)
+
+BEGIN :: if
+if { (e(gb^s, S1) * (e(gba1^s1, S2) * (e(ga1^s1, S3) * (e(gba2^s2, S4) * e(ga2^s2, S5))))) == (e(S6, (tau1^s1) * (tau2^s2)) * (e(S7, ((tau1b^s1) * ((tau2b^s2) * w^-t))) * ( ( ( e(S7, ((u^(M * t)) * (w^(tagc * t))) * h^t) * (e(g1^-t, SK)) )^theta) * (A^s2)))) }
+   output := True
+else
+   output := False
+END :: if
+END :: func:verify
+
+BEGIN :: precompute
+ s1 := random(ZR)
+ s2 := random(ZR)
+ t := random(ZR)
+ tagc := random(ZR)
+ s := s1 + s2
+ M := H(m, ZR)
+ theta := ((tagc - tagk)^-1)
+END :: precompute
+
+constant := list{g1, g2}
+public := list{gb, gba1, g1b, g1a1, g1a2, g1ba1, g1ba2, ga1, ga2, gba2, tau1, tau2, tau1b, tau2b, w, u, h, A}
+signature := list{theta, S1, S2, S3, S4, S5, S6, S7, SK, s, s1, s2, t, tagc}
+message := M
+
+BEGIN :: count
+message_count := N
+public_count := one
+signature_count := N
+END :: count
+
+verify := { (e(gb^s, S1) * (e(gba1^s1, S2) * (e(ga1^s1, S3) * (e(gba2^s2, S4) * e(ga2^s2, S5))))) == (e(S6, (tau1^s1) * (tau2^s2)) * (e(S7, ((tau1b^s1) * ((tau2b^s2) * w^-t))) * ( ( ( e(S7, ((u^(M * t)) * (w^(tagc * t))) * h^t) * (e(g1^-t, SK)) )^theta) * (A^s2)))) }
+
+
+# BEGIN :: latex
+# S#1 := \sigma_1
+# S#2 := \sigma_2
+# S#3 := \sigma_3
+# S#4 := \sigma_4
+# S#5 := \sigma_5
+# S#6 := \sigma_6
+# S#7 := \sigma_7
+# SK := \sigma_K
+# theta := \theta
+# s2 := s_2
+# s1 := s_1
+# tagc := tag_c
+# tau1 := \tau_1
+# tau2 := \tau_2
+# tau1b := {\tau_1}^b
+# tau2b := {\tau_2}^b
+# gb := {g_1}^b
+# gba1 := {g_1}^{b \cdot a_1}
+# gba2 := {g_1}^{b \cdot a_2}
+# ga2 := {g_1}^{a_2}
+# ga1 := {g_1}^{a_1}
+# g1 := g_1
+# g2 := g_2
+# END :: latex
+
+
+
+secparam := 80
+
+BEGIN :: func:membership
+ input := list{A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlist, g1, g1a1, g1a2, g1b, g1ba1, g1ba2, g2, h, tagklist, tau1, tau1b, tau2, tau2b, u, w}
+
+
+BEGIN :: if
+if { ismember(A) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(S1list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(S2list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(S3list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(S4list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(S5list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(S6list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(S7list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(SKlist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(g1) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(g1a1) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(g1a2) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(g1b) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(g1ba1) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(g1ba2) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(g2) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(h) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(tagklist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(tau1) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(tau1b) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(tau2) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(tau2b) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(u) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(w) == False }
+    output := False
+END :: if
+
+ output := True
+END :: func:membership
+
+
+BEGIN :: func:dividenconquer
+ input := list{delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, gb, gba1, ga1, gba2, ga2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A}
+dotALoopVal := init(G2)
+dotBLoopVal := init(G2)
+dotCLoopVal := init(G2)
+dotDLoopVal := init(G2)
+dotELoopVal := init(G2)
+dotFLoopVal := init(G1)
+dotGLoopVal := init(G1)
+dotHLoopVal := init(G1)
+dotILoopVal := init(G1)
+dotJLoopVal := init(G1)
+dotKLoopVal := init(G1)
+dotLLoopVal := init(G1)
+dotMLoopVal := init(G2)
+sumNLoopVal := init(ZR)
+
+BEGIN :: for
+for{z := startSigNum, endSigNum}
+dotALoopVal := dotALoopVal * dotACache#z
+dotBLoopVal := dotBLoopVal * dotBCache#z
+dotCLoopVal := dotCLoopVal * dotCCache#z
+dotDLoopVal := dotDLoopVal * dotDCache#z
+dotELoopVal := dotELoopVal * dotECache#z
+dotFLoopVal := dotFLoopVal * dotFCache#z
+dotGLoopVal := dotGLoopVal * dotGCache#z
+dotHLoopVal := dotHLoopVal * dotHCache#z
+dotILoopVal := dotILoopVal * dotICache#z
+dotJLoopVal := dotJLoopVal * dotJCache#z
+dotKLoopVal := dotKLoopVal * dotKCache#z
+dotLLoopVal := dotLLoopVal * dotLCache#z
+dotMLoopVal := dotMLoopVal * dotMCache#z
+sumNLoopVal := sumNLoopVal + sumNCache#z
+END :: for
+BEGIN :: if
+ if { (e(gb,dotALoopVal) * (e(gba1,dotBLoopVal) * (e(ga1,dotCLoopVal) * (e(gba2,dotDLoopVal) * e(ga2,dotELoopVal))))) == (e(dotFLoopVal,tau1) * (e(dotGLoopVal,tau2) * (e(dotHLoopVal,tau1b) * (e(dotILoopVal,tau2b) * (e(dotJLoopVal,w) * (e(dotKLoopVal,u) * (e(dotLLoopVal,h) * (e(g1,dotMLoopVal) * (A^sumNLoopVal))))))))) }
+    return := None
+ else
+    midwayFloat := ((endSigNum - startSigNum) / 2)
+    midway := integer(midwayFloat)
+END :: if
+
+
+BEGIN :: if
+ if { midway == 0 } 
+    addToList(incorrectIndices, startSigNum)
+    output := None
+ else
+    midSigNum := startSigNum + midway
+    dividenconquer(delta, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, gb, gba1, ga1, gba2, ga2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A)
+    dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, gb, gba1, ga1, gba2, ga2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A)
+END :: if
+
+
+ output := None
+END ::func:dividenconquer
+
+
+BEGIN :: func:batchverify
+input := list{A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlist, g1, g1a1, g1a2, g1b, g1ba1, g1ba2, g2, h, mlist, tagklist, tau1, tau1b, tau2, tau2b, u, w, incorrectIndices}
+
+BEGIN :: for
+for{z := 0, N}
+ delta#z := SmallExp(secparam)
+END :: for
+
+BEGIN :: if
+ if {(membership(A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlist, g1, g1a1, g1a2, g1b, g1ba1, g1ba2, g2, h, tagklist, tau1, tau1b, tau2, tau2b, u, w) == False)}
+     output := False
+END :: if
+
+
+BEGIN :: for
+for{z := 0, N}
+s2 := random(ZR)
+s1 := random(ZR)
+M := H(mlist#z,ZR)
+s := (s1 + s2)
+t := random(ZR)
+tagc := random(ZR)
+theta := ((tagc - tagklist#z)^-1)
+dotACache#z := (S1list#z^(s * delta#z))
+dotBCache#z := (S2list#z^(s1 * delta#z))
+dotCCache#z := (S3list#z^(s1 * delta#z))
+dotDCache#z := (S4list#z^(s2 * delta#z))
+dotECache#z := (S5list#z^(s2 * delta#z))
+dotFCache#z := (S6list#z^(delta#z * s1))
+dotGCache#z := (S6list#z^(delta#z * s2))
+dotHCache#z := (S7list#z^(delta#z * s1))
+dotICache#z := (S7list#z^(delta#z * s2))
+dotJCache#z := (S7list#z^((delta#z * -t) + ((theta * delta#z) * (tagc * t))))
+dotKCache#z := (S7list#z^((theta * delta#z) * (M * t)))
+dotLCache#z := (S7list#z^((theta * delta#z) * t))
+dotMCache#z := (SKlist#z^(-t * (theta * delta#z)))
+sumNCache#z := (s2 * delta#z)
+END :: for
+ dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, gb, gba1, ga1, gba2, ga2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A)
+
+ output := incorrectIndices
+END ::func:batchverify
+
+

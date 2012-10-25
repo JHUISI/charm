@@ -185,7 +185,7 @@ class SDLBatch:
         for i in self.sdlData.get(CONST): # prune constants that 
             if self.varTypes[i] not in listGroupTypes:
                 constList.append(i)
-        exceptList.extend(constList) # add list of constant variables here        
+        exceptList.extend(constList) # add list of constant variables here
         dp = DropIndexForPrecomputes(self.precomputeVarList + exceptList, forLoopIndex)
         ASTVisitor(dp).preorder(eq)
 
