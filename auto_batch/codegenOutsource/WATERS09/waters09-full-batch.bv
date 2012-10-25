@@ -155,7 +155,7 @@ input := list{pk, sk, m}
  S7 := g1 ^ r1
  SK := ((u ^ M) * (w ^ tagk)) * (h ^ r1)
 
- output := list{S, SK, tagk}
+ output := list{S1, S2, S3, S4, S5, S6, S7, SK, tagk}
 END :: func:sign
 
 # pk := expand{g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, uG1, u, wG1, hG1, w, h, A}

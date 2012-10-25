@@ -1,70 +1,90 @@
 name := waters05
-N := 2
+N := 100
 setting := asymmetric
 
 BEGIN :: types
- U := list{ZR}
- M := str
+
 END :: types
 
-BEGIN :: func:keygen
-input := list{l, n}
- g := random(G1)
-#WATERS HASH:  waters = Waters(group, n, l, sha1_func)
-#where sha1_func='sha1'
- alpha := random(ZR)
- g1 := g ^ alpha
+BEGIN :: func:setup
+input := list{zz, ll}
+ alpha := random(ZR) 
+ h := random(G1)
+ g1 := random(G1)
  g2 := random(G2)
- uprime := random(G2)
+ A := (e(h, g2) ^ alpha)
+
+BEGIN :: for
+for{i := 0, zz}
+ y#i := random(ZR)
+ u#i := g1 ^ y#i
+ ub#i := g2 ^ y#i
+END :: for
+
+ y1t := random(ZR)
+ y2t := random(ZR)
+
+ u1t := g1 ^ y1t
+ u2t := g1 ^ y2t
+
+ u1b := g2 ^ y1t
+ u2b := g2 ^ y2t
+
+ msk := h ^ alpha
+ mpk := list{g1, g2, A, u1t, u2t, u, u1b, u2b, ub, zz, ll} 
+output := list{mpk, msk}
+END :: func:setup
+
+BEGIN :: func:keygen
+input := list{mpk, msk, ID}
+ mpk := expand{g1, g2, A, u1t, u2t, u, u1b, u2b, ub, zz, ll}
+ 
+ k := stringToInt(ID, zz, ll)
  
 BEGIN :: for
-for{y := 0, n}
- U#y := random(ZR)
+for{i := 1, zz}
+ dotProd = dotProd * (u#i ^ k#i)
 END :: for
 
- egg := e(g, g2) ^ alpha
- pk := list{g, g1, g2, uprime, U, n, l, egg}
- g2Alpha := g2 ^ alpha
- sk := list{g, g1, g2, uprime, U, n, l, egg, g2Alpha}
- output := list{pk, sk}
+ r := group.random(ZR)
+ k1 := msk * ((u1t * dotProd) ^ r)
+ k2 := g1 ^ -r
+ output := list{k1, k2}
 END :: func:keygen
 
+
+
 BEGIN :: func:sign
- input := list{pk, sk, M}
- m := WATERS_HASH(M)
- r := random(ZR)
-
- d1 := sk#3
- nSign := sk#5
- USign := sk#4
-
+input := list{mpk, sk, M}
+ mpk := expand{g1, g2, A, u1t, u2t, u, u1b, u2b, ub, zz, ll}
+ m := stringToID(M, zz, ll)
+ sk := expand{k1, k2}
+ s  := group.random(ZR)
 BEGIN :: for
-for{y := 0, nSign}
- d1 := d1 * (USign#y ^ m#y)
+for{i := 0, zz}
+ dotProd := dotProd * (u#i * m#i)
 END :: for
 
- d1Return := sk#8 * (d1 ^ r)
- d2Return := sk#0 ^ r
- output := list{d1Return, d2Return}
+ S1 := k1 * ((u2t * dotProd) ^ s)
+ S2 := k2
+ S3 := g1 ^ -s
+output := list{S1, S2, S3}
 END :: func:sign
 
 BEGIN :: func:verify
- input := list{pk, M, d1Return, d2Return}
- mVerify := WATERS_HASH(M)
- c3 := pk#3 
- nVerify := pk#5
- UVerify := pk#4
+ input := list{A, g2, ub, u1b, u2b, ID, M, S1, S2, S3}
+
+kver := stringToInt(ID, zz, ll)
+mver := stringToInt(M, zz, ll)
 
 BEGIN :: for
-for{y := 0, nVerify}
- c3 := c3 * (UVerify#y ^ m#y)
+for{i := 0, zz}
+  dotProd1 = dotProd1 * (ub#i ^ kver#i)
+  dotProd2 = dotProd2 * (ub#i ^ mver#i)
 END :: for
 
- num := e(pk#0, d1Return)
- dem := e(d2Return, c3)
-
 BEGIN :: if
-if {pk#7 == (num / dem)}
+if { ((pair(S1, g2) * pair(S2, u1b * dotProd1) * pair(S3, u2b * dotProd2)) == A) }
    output := True
 else
    output := False
