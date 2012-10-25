@@ -82,7 +82,7 @@ BEGIN :: for
 for{%s := 0, %s}
 """
 
-delta_word = "delta"
+#delta_word = "delta"
 delta_stmt = delta_word + "%s := SmallExp(secparam)\n"
 delta_lhs = delta_word + "%s := "
 linkVar = "_link"
@@ -146,7 +146,7 @@ class SDLBatch:
         self.sdlData = sdlData
         self.varTypes = varTypes
         self.precomputeDict = precompDict
-        del self.precomputeDict['delta']
+        del self.precomputeDict[delta_word]
         self.precomputeVarList = []
         self.defaultBatchTypes = {"incorrectIndices" : "list{int}", "startSigNum" : "int", "endSigNum " : "int"}
         for k in list(self.precomputeDict.keys()):
@@ -162,7 +162,8 @@ class SDLBatch:
         self.__generateDeltaLines(sigIterator, self.newDeltaList)
         self.debug = False
 
-    # for variables that are precomputed over signatures        
+    # for variables that are precomputed over signatures and doesn't include a "#z" to variables 
+    # stored inside the exceptList      
     def ReplaceAppropArgs(self, map, forLoopIndex, node, exceptList=[]):
         sa = SubstituteAttr(map, forLoopIndex)
         eq = BinaryNode.copy(node)
@@ -176,6 +177,8 @@ class SDLBatch:
         ASTVisitor(dp).preorder(eq)
         return Filter(eq)
 
+    # slightly different use case than previous function. Basically, when we want to replace variables
+    # in the statement with specific variable names that are stored in exceptList and exceptMap
     def ReplaceAppropArgsExcept(self, map, forLoopIndex, node, exceptList, exceptMap):
         sa = SubstituteAttr(map, forLoopIndex)
         eq = BinaryNode.copy(node)
@@ -344,7 +347,7 @@ class SDLBatch:
 #        for i,j in newPrecomputeDict.items():
         for h in newPrecomputeDict.keys():
             i, j = newPrecomputeDict[ h ]
-            if str(i) in dotCacheVarList: # JAA: bandaid. fix: remove delta from batch precompute list
+            if str(i) in dotCacheVarList: # JAA:
                 sa = SubstituteAttr(self.sdlData[BATCH_VERIFY_MAP], loopIndex, self.sdlData.get(CONST) + self.precomputeVarList)
                 eq = BinaryNode.copy(j)
                 ASTVisitor(sa).preorder(eq)                
@@ -848,7 +851,7 @@ class SDLBatch:
         topLevelKeys = list(topLevelDotDict.keys())
         topLevelKeys.sort()
         for i in topLevelKeys:
-            statementTuple = topLevelDotDict[i][0]            
+            statementTuple = topLevelDotDict[i][0]
             dotLoopValTypesSig.update(statementTuple[0])
             dotCacheTypesSig.update(statementTuple[1])
             dotInitStmtDivConqSig.extend(statementTuple[2])
@@ -860,11 +863,11 @@ class SDLBatch:
             divConqArgList.extend(statementTuple[8])
             statementDep = topLevelDotDict[i][1] # this means current statementTuple has a ref in tree to statementDep
             if statementDep: # meaning this top level computation has dependencies, then proceed as follows:
-                depOutput = self.__buildInnerForLoop(statementDep, signerIteratorTuple)
+                depOutput = self.__buildInnerForLoop(statementDep, sigIteratorTuple, signerIteratorTuple)
                 for k in range(len(dotCacheCalc)):
                     for r,c in statementDep[4].items():
                         newCacheCalc = dotCacheCalc[k].replace(r, c)
-                        if len(newCacheCalc) > len(dotCacheCalc[k]): # replacement was successful!
+                        if len(newCacheCalc) > len(dotCacheCalc[ k ]): # replacement was successful!
                             dotCacheCalc[ k ] = newCacheCalc
                             dotDepComputationMap[ newCacheCalc ] = depOutput
                         
@@ -887,17 +890,17 @@ class SDLBatch:
         self.__generateNewSDL(typeOutputLines, output)
         return
     
-    def __buildInnerForLoop(self, dotDepStmts, loopIterator):
+    def __buildInnerForLoop(self, dotDepStmts, signatureLoopIterator, signerLoopIterator):
         #TODO: need to get var list so that we can properly pull the precompute variables needed
         my_output = ""
         dotCacheVarList = dotDepStmts[7]
-        outputBeforePrecompute, outputPrecompute = self.__generatePrecomputeLinesForBV(loopIterator[0], dotCacheVarList)
+        outputBeforePrecompute, outputPrecompute = self.__generatePrecomputeLinesForBV([ signatureLoopIterator[0], signerLoopIterator[0] ], dotCacheVarList)
         
         dotInitStmtDivConqSig, divConqLoopValStmtSig = dotDepStmts[2], dotDepStmts[3]
         for i in dotInitStmtDivConqSig:
             my_output += i
         my_output += outputBeforePrecompute # precompute values outside of for loop
-        my_output += dc_for_inner_begin % (loopIterator[0], loopIterator[1], loopIterator[2])
+        my_output += dc_for_inner_begin % (signerLoopIterator[0], signerLoopIterator[1], signerLoopIterator[2])
         my_output += outputPrecompute # precompute values inside but before dot calculations
         for l in divConqLoopValStmtSig:
             my_output += l

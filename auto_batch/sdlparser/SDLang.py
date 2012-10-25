@@ -28,6 +28,7 @@ inputKeyword = "input"
 outputKeyword = "output"
 
 hash_table_size = 10000
+delta_word = "delta"
 BINARY_NODE_CLASS_NAME = 'BinaryNode'
 ENUM_VALUE_CLASS_NAME = 'EnumValue'
 VAR_INFO_CLASS_NAME = 'VarInfo'
@@ -791,6 +792,10 @@ class BinaryNode:
 		if(self.type in [ops.ATTR, ops.HASH]):
 			if self.attr_index == None: # could be a list of indices
 				self.attr_index = [value]
+			elif type(value) == list:
+				for i in self.attr_index:
+					if i not in self.attr_index:
+						self.attr_index.append(i)
 			else:
 				if not value in self.attr_index:
 					self.attr_index.append(value)

@@ -225,8 +225,8 @@ dotALoopVal := init(G1)
 
 BEGIN :: forinner
 forinner{y := 0, l}
-h := H(concat{Mlist#y, Lt, ulist#y},ZR)
-dotALoopVal := dotALoopVal * ((ulist#z#y^delta#z) * (pklist#y^(h#z * delta#z)))
+h := H(concat{Mlist#z#y, Lt, ulist#z#y},ZR)
+dotALoopVal := dotALoopVal * ((ulist#z#y^delta#z) * (pklist#y^(h * delta#z)))
 END :: forinner
 dotBCache#z := dotALoopVal
 dotCCache#z := (Slist#z^delta#z)

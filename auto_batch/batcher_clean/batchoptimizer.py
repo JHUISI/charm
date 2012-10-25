@@ -799,6 +799,13 @@ class SubstituteAttr:
     def __init__(self, variable_map, loopVar=None, constants=None):
         self.variable_map = variable_map
         self.loopVar = loopVar
+        self.loopVarStmt = ""
+        if loopVar and type(loopVar) == list:
+            for i in loopVar:
+                self.loopVarStmt += "#" + str(i)
+        elif loopVar and type(loopVar) == str:
+            self.loopVarStmt += "#" + loopVar
+
         self.constants = constants
         self.variable_keys = list(variable_map.keys())
         
@@ -821,7 +828,7 @@ class SubstituteAttr:
         if self.loopVar == None:
             newVarList = [self.variable_map[ x ] if x in self.variable_keys else x for x in varList]
         else:
-            newVarList = [self.variable_map[ x ] + "#" + self.loopVar if x in self.variable_keys else x for x in varList]
+            newVarList = [self.variable_map[ x ] + self.loopVarStmt if x in self.variable_keys else x for x in varList]
         node.listNodes = newVarList
 
 class DropIndexForPrecomputes:
@@ -834,9 +841,12 @@ class DropIndexForPrecomputes:
     
     def visit_attr(self, node, data):
         varName = node.getAttribute()
-        if varName in self.variable_list:
-#            print("varName: ", varName, " in ", self.variable_list)
+        if varName == delta_word and varName in self.variable_list:
             node.attr_index.remove(self.loopVarTarget)
+        elif varName in self.variable_list:
+            del node.attr_index[:] # remove all index numbers
+#            print("varName: ", varName, " in ", self.variable_list)
+#            node.attr_index.remove(self.loopVarTarget)
 #            print("node: ", node, self.loopVarTarget)
 #        elif varName == delta_word:
 #            node.attr_index.remove(self.loopVarTarget)                       
