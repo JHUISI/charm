@@ -1,5 +1,11 @@
     (P, g, alpha) = setup()
     (pk, sk) = keygen(alpha, "alice")
-    L = ["alice", "bob", "charlie"]
-    (u, S) = sign("alice", pk, sk, L, "message")
-    print(verify(P, g, L, "message", u, S))
+    L = ["alice", "bob"]
+    (Lt, pklist, u1, S1) = sign("alice", pk, sk, L, "message")
+    (Lt, pklist, u2, S2) = sign("alice", pk, sk, L, "message2")
+    Mlist = ["message", "message2"]
+    Slist = [S1, S2]
+    ulist = [u1, u2]
+    incorrectIndices = []
+    batchverify(Lt, Mlist, P, Slist, g, pklist, ulist, incorrectIndices)
+    print(incorrectIndices)
