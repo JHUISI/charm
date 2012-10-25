@@ -6,7 +6,7 @@ group = None
 
 N = 2
 
-l = 2
+l = 3
 
 secparam = 80
 
@@ -147,9 +147,7 @@ def batchverify(Lt, Mlist, P, Slist, g, pklist, ulist, incorrectIndices):
     for z in range(0, N):
         dotALoopVal = 1
         for y in range(0, l):
-            h = group.hash((Mlist[y], Lt, ulist[y]), ZR)
-            print("y = ", y)
-            print("z = ", z)
+            h = group.hash((Mlist[z], Lt, ulist[z][y]), ZR)
             dotALoopVal = (dotALoopVal * ((ulist[z][y] ** delta[z]) * (pklist[y] ** (h * delta[z]))))
         dotBCache[z] = dotALoopVal
         dotCCache[z] = (Slist[z] ** delta[z])
@@ -175,7 +173,6 @@ def main():
     incorrectIndices = []
     batchverify(Lt, Mlist, P, Slist, g, pklist, ulist, incorrectIndices)
     print(incorrectIndices)
-
 
 if __name__ == '__main__':
     main()

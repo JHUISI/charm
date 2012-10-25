@@ -796,15 +796,19 @@ class DotProdInstanceFinder:
         return self.applied
 
 class SubstituteAttr:
-    def __init__(self, variable_map, loopVar=None, constants=None):
+    def __init__(self, variable_map, loopVar=None, constants=None, loopDict=None):
         self.variable_map = variable_map
-        self.loopVar = loopVar
-        self.loopVarStmt = ""
-        if loopVar and type(loopVar) == list:
-            for i in loopVar:
-                self.loopVarStmt += "#" + str(i)
-        elif loopVar and type(loopVar) == str:
-            self.loopVarStmt += "#" + loopVar
+        if loopDict != None:
+            self.loopDict = loopDict
+        elif loopVar != None:
+            # if loopDict not provided
+            self.loopVar = loopVar
+            self.loopVarStmt = ""
+            if loopVar and type(loopVar) == list:
+                for i in loopVar:
+                    self.loopVarStmt += "#" + str(i)
+            elif loopVar and type(loopVar) == str:
+                self.loopVarStmt += "#" + loopVar
 
         self.constants = constants
         self.variable_keys = list(variable_map.keys())
@@ -819,16 +823,22 @@ class SubstituteAttr:
             node.setAttribute(self.variable_map[varName], clearAttrIndex=False)
         if self.constants: # if variable is a constant, then no need adding the loopVar index since it is always the same value.
             if varName in self.constants: return
-        if self.loopVar:            
+        if self.loopVar != None:            
             node.setAttrIndex(self.loopVar)
             node.attr_index.reverse()
+        elif self.loopDict != None:
+            node.setAttrIndex(self.loopDict[ varName ])
     
     def visit_concat(self, node, data):
         varList = node.getListNode()
-        if self.loopVar == None:
-            newVarList = [self.variable_map[ x ] if x in self.variable_keys else x for x in varList]
-        else:
+        if self.loopVar != None:
             newVarList = [self.variable_map[ x ] + self.loopVarStmt if x in self.variable_keys else x for x in varList]
+        elif self.loopDict != None:
+            for i in self.loopDict[x]:
+                loopVarStmt += "#" + str(i)
+            newVarList = [self.variable_map[ x ] + loopVarStmt if x in self.variable_keys else x for x in varList]
+        else:
+            newVarList = [self.variable_map[ x ] if x in self.variable_keys else x for x in varList]
         node.listNodes = newVarList
 
 class DropIndexForPrecomputes:
