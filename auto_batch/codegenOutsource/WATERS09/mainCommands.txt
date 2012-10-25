@@ -1,0 +1,6 @@
+    (pk, sk) = keygen()
+    (S, SK, tagk) = sign(pk, sk, "message")
+    g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, uG1, u, wG1, hG1, w, h, A = pk
+
+
+verify(g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, u, w, h, A, S1, S2, S3, S4, S5, S6, S7, SK, tagk, "message")
