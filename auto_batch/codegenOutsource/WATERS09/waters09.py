@@ -4,7 +4,7 @@ from charm.core.math.integer import randomBits
 
 group = None
 
-N = 100
+N = 1
 
 secparam = 80
 
@@ -90,7 +90,7 @@ def sign(pk, sk, m):
     S6 = (g1b ** r2)
     S7 = (g1 ** r1)
     SK = (((u ** M) * (w ** tagk)) * (h ** r1))
-    output = (S, SK, tagk)
+    output = (S1, S2, S3, S4, S5, S6, S7, SK, tagk)
     return output
 
 def verify(g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, u, w, h, A, S1, S2, S3, S4, S5, S6, S7, SK, tagk, m):
@@ -110,7 +110,7 @@ def verify(g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, u, w
     s = (s1 + s2)
     M = group.hash(m, ZR)
     theta = ((tagc - tagk) ** -1)
-    if ( ( ((pair((gb ** s), S1) * (pair((gba1 ** s1), S2) * (pair((ga1 ** s1), S3) * (pair((gba2 ** s2), S4) * pair((ga2 ** s2), S5)))))) == ((pair(S6, ((tau1 ** s1) * (tau2 ** s2))) * (pair(S7, ((tau1b ** s1) * ((tau2b ** s2) * (w ** -t)))) * (((pair(S7, (((u ** (M * t)) * (w ** (tagc * t))) * (h ** t))) * pair((g1 ** -t), SK)) ** theta) * (A ** s2))))) ) ):
+    if ( ( ((pair((g1b ** s), S1) * (pair((gba1 ** s1), S2) * (pair((ga1 ** s1), S3) * (pair((gba2 ** s2), S4) * pair((ga2 ** s2), S5)))))) == ((pair(S6, ((tau1 ** s1) * (tau2 ** s2))) * (pair(S7, ((tau1b ** s1) * ((tau2b ** s2) * (w ** -t)))) * (((pair(S7, (((u ** (M * t)) * (w ** (tagc * t))) * (h ** t))) * pair((g1 ** -t), SK)) ** theta) * (A ** s2))))) ) ):
         output = True
     else:
         output = False
@@ -195,9 +195,9 @@ def membership(A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlist
     output = True
     return output
 
-def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, gb, gba1, ga1, gba2, ga2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A):
+def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, g1b, gba1, ga1, gba2, ga2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A):
 
-    input = [delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, gb, gba1, ga1, gba2, ga2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A]
+    input = [delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, g1b, gba1, ga1, gba2, ga2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A]
     dotALoopVal = 1
     dotBLoopVal = 1
     dotCLoopVal = 1
@@ -227,7 +227,7 @@ def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotACache, d
         dotLLoopVal = (dotLLoopVal * dotLCache[z])
         dotMLoopVal = (dotMLoopVal * dotMCache[z])
         sumNLoopVal = (sumNLoopVal + sumNCache[z])
-    if ( ( ((pair(gb, dotALoopVal) * (pair(gba1, dotBLoopVal) * (pair(ga1, dotCLoopVal) * (pair(gba2, dotDLoopVal) * pair(ga2, dotELoopVal)))))) == ((pair(dotFLoopVal, tau1) * (pair(dotGLoopVal, tau2) * (pair(dotHLoopVal, tau1b) * (pair(dotILoopVal, tau2b) * (pair(dotJLoopVal, w) * (pair(dotKLoopVal, u) * (pair(dotLLoopVal, h) * (pair(g1, dotMLoopVal) * (A ** sumNLoopVal)))))))))) ) ):
+    if ( ( ((pair(g1b, dotALoopVal) * (pair(gba1, dotBLoopVal) * (pair(ga1, dotCLoopVal) * (pair(gba2, dotDLoopVal) * pair(ga2, dotELoopVal)))))) == ((pair(dotFLoopVal, tau1) * (pair(dotGLoopVal, tau2) * (pair(dotHLoopVal, tau1b) * (pair(dotILoopVal, tau2b) * (pair(dotJLoopVal, w) * (pair(dotKLoopVal, u) * (pair(dotLLoopVal, h) * (pair(g1, dotMLoopVal) * (A ** sumNLoopVal)))))))))) ) ):
         return
     else:
         midwayFloat = ((endSigNum - startSigNum) / 2)
@@ -237,8 +237,8 @@ def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotACache, d
         output = None
     else:
         midSigNum = (startSigNum + midway)
-        dividenconquer(delta, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, gb, gba1, ga1, gba2, ga2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A)
-        dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, gb, gba1, ga1, gba2, ga2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A)
+        dividenconquer(delta, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, g1b, gba1, ga1, gba2, ga2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A)
+        dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, g1b, gba1, ga1, gba2, ga2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A)
     output = None
 
 def batchverify(A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlist, g1, g1a1, g1a2, g1b, g1ba1, g1ba2, g2, h, mlist, tagklist, tau1, tau1b, tau2, tau2b, u, w, incorrectIndices):
@@ -294,7 +294,7 @@ def batchverify(A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlis
         dotLCache[z] = (S7list[z] ** ((theta * delta[z]) * t))
         dotMCache[z] = (SKlist[z] ** (-t * (theta * delta[z])))
         sumNCache[z] = (s2 * delta[z])
-    dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, gb, gba1, ga1, gba2, ga2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A)
+    dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, g1b, gba1, ga1, gba2, ga2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A)
     output = incorrectIndices
     return output
 
@@ -304,6 +304,12 @@ def SmallExp(bits=80):
 def main():
     global group
     group = PairingGroup(secparam)
+
+    (pk, sk) = keygen()
+    (S1, S2, S3, S4, S5, S6, S7, SK, tagk) = sign(pk, sk, "message")
+    g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, uG1, u, wG1, hG1, w, h, A = pk
+    verify(g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, u, w, h, A, S1, S2, S3, S4, S5, S6, S7, SK, tagk, "message")
+
 
 if __name__ == '__main__':
     main()
