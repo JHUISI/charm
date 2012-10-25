@@ -814,7 +814,8 @@ def getAssignStmtAsString(node, replacementsDict, dotProdObj, lambdaReplacements
         for listNode in node.listNodes:
             listNodeAsString = getAssignStmtAsString(listNode, replacementsDict, dotProdObj, lambdaReplacements, forOutput)
             strconcatOutputString += listNodeAsString + " + "
-        strconcatOutputString = strConcatOutputString[0:(len(strconcatOutputString) - len(" + "))]
+        strconcatOutputString = strconcatOutputString[0:(len(strconcatOutputString) - len(" + "))]
+        strconcatOutputString += ")"
         return strconcatOutputString
     elif (node.type == ops.CONCAT):
         concatOutputString = "("
@@ -1015,6 +1016,14 @@ def writeAssignStmt_Python(outputFile, binNode):
         #writeCurrentNumTabsIn(outputFile)
 
     variableName = replacePoundsWithBrackets(getFullVarName(binNode.left, False))
+
+    if (variableName == outputKeyword):
+        if ( (str(binNode) == "output := False") or (str(binNode) == "output := false") ):
+            falseOutputString = "output = False\n"
+            falseOutputString += writeCurrentNumTabsToString()
+            falseOutputString += "return output\n"
+            outputFile.write(falseOutputString)
+            return
 
     if (binNode.right.type != ops.EXPAND):
         outputString += variableName
