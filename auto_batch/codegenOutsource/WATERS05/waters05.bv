@@ -1,10 +1,37 @@
 name := waters05
 N := 100
+l := 5
 setting := asymmetric
 
 BEGIN :: types
-
+alpha := ZR
+m := ZR
+k := ZR
+S1 := G1
+S2 := G1
+S3 := G1
+h := G1
+ub := G2
+u1b := G2
+u2b := G2
+g2 := G2
+A := GT
 END :: types
+
+BEGIN :: precompute
+A := e(h, g2)^alpha
+END :: precompute
+
+constant := list{A, g2, ub, u1b, u2b}
+public := k
+signature := list{S1, S2, S3}
+message := m
+
+BEGIN :: count
+message_count := N
+public_count := N
+signature_count := N
+END :: count
 
 BEGIN :: func:setup
 input := list{zz, ll}
@@ -42,7 +69,7 @@ input := list{mpk, msk, ID}
  k := stringToInt(ID, zz, ll)
  
 BEGIN :: for
-for{i := 1, zz}
+for{i := 0, zz}
  dotProd = dotProd * (u#i ^ k#i)
 END :: for
 

@@ -171,7 +171,7 @@ input := list{g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, u
  theta := ((tagc - tagk)^-1)
 
 BEGIN :: if
-if { (e(gb^s, S1) * (e(gba1^s1, S2) * (e(ga1^s1, S3) * (e(gba2^s2, S4) * e(ga2^s2, S5))))) == (e(S6, (tau1^s1) * (tau2^s2)) * (e(S7, ((tau1b^s1) * ((tau2b^s2) * w^-t))) * ( ( ( e(S7, ((u^(M * t)) * (w^(tagc * t))) * h^t) * (e(g1^-t, SK)) )^theta) * (A^s2)))) }
+if { (e(g1b^s, S1) * (e(g1ba1^s1, S2) * (e(g1a1^s1, S3) * (e(g1ba2^s2, S4) * e(g1a2^s2, S5))))) == (e(S6, (tau1^s1) * (tau2^s2)) * (e(S7, ((tau1b^s1) * ((tau2b^s2) * w^-t))) * ( ( ( e(S7, ((u^(M * t)) * (w^(tagc * t))) * h^t) * (e(g1^-t, SK)) )^theta) * (A^s2)))) }
    output := True
 else
    output := False
@@ -189,7 +189,7 @@ BEGIN :: precompute
 END :: precompute
 
 constant := list{g1, g2}
-public := list{gb, gba1, g1b, g1a1, g1a2, g1ba1, g1ba2, ga1, ga2, gba2, tau1, tau2, tau1b, tau2b, w, u, h, A}
+public := list{g1b, g1ba1, g1a1, g1a2, g1ba1, g1ba2, g1a2, tau1, tau2, tau1b, tau2b, w, u, h, A}
 signature := list{theta, S1, S2, S3, S4, S5, S6, S7, SK, s, s1, s2, t, tagc}
 message := M
 
@@ -199,7 +199,7 @@ public_count := one
 signature_count := N
 END :: count
 
-verify := { (e(gb^s, S1) * (e(gba1^s1, S2) * (e(ga1^s1, S3) * (e(gba2^s2, S4) * e(ga2^s2, S5))))) == (e(S6, (tau1^s1) * (tau2^s2)) * (e(S7, ((tau1b^s1) * ((tau2b^s2) * w^-t))) * ( ( ( e(S7, ((u^(M * t)) * (w^(tagc * t))) * h^t) * (e(g1^-t, SK)) )^theta) * (A^s2)))) }
+verify := { (e(g1b^s, S1) * (e(g1ba1^s1, S2) * (e(g1a1^s1, S3) * (e(g1ba2^s2, S4) * e(g1a2^s2, S5))))) == (e(S6, (tau1^s1) * (tau2^s2)) * (e(S7, ((tau1b^s1) * ((tau2b^s2) * w^-t))) * ( ( ( e(S7, ((u^(M * t)) * (w^(tagc * t))) * h^t) * (e(g1^-t, SK)) )^theta) * (A^s2)))) }
 
 
 # BEGIN :: latex
@@ -361,7 +361,7 @@ END :: func:membership
 
 
 BEGIN :: func:dividenconquer
- input := list{delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, gb, gba1, ga1, gba2, ga2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A}
+ input := list{delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, g1b, g1ba1, g1a1, g1ba2, g1a2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A}
 dotALoopVal := init(G2)
 dotBLoopVal := init(G2)
 dotCLoopVal := init(G2)
@@ -395,7 +395,7 @@ dotMLoopVal := dotMLoopVal * dotMCache#z
 sumNLoopVal := sumNLoopVal + sumNCache#z
 END :: for
 BEGIN :: if
- if { (e(gb,dotALoopVal) * (e(gba1,dotBLoopVal) * (e(ga1,dotCLoopVal) * (e(gba2,dotDLoopVal) * e(ga2,dotELoopVal))))) == (e(dotFLoopVal,tau1) * (e(dotGLoopVal,tau2) * (e(dotHLoopVal,tau1b) * (e(dotILoopVal,tau2b) * (e(dotJLoopVal,w) * (e(dotKLoopVal,u) * (e(dotLLoopVal,h) * (e(g1,dotMLoopVal) * (A^sumNLoopVal))))))))) }
+ if { (e(g1b,dotALoopVal) * (e(g1ba1,dotBLoopVal) * (e(g1a1,dotCLoopVal) * (e(g1ba2,dotDLoopVal) * e(g1a2,dotELoopVal))))) == (e(dotFLoopVal,tau1) * (e(dotGLoopVal,tau2) * (e(dotHLoopVal,tau1b) * (e(dotILoopVal,tau2b) * (e(dotJLoopVal,w) * (e(dotKLoopVal,u) * (e(dotLLoopVal,h) * (e(g1,dotMLoopVal) * (A^sumNLoopVal))))))))) }
     return := None
  else
     midwayFloat := ((endSigNum - startSigNum) / 2)
@@ -409,8 +409,8 @@ BEGIN :: if
     output := None
  else
     midSigNum := startSigNum + midway
-    dividenconquer(delta, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, gb, gba1, ga1, gba2, ga2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A)
-    dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, gb, gba1, ga1, gba2, ga2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A)
+    dividenconquer(delta, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, g1b, g1ba1, g1a1, g1ba2, g1a2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A)
+    dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, g1b, g1ba1, g1a1, g1ba2, g1a2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A)
 END :: if
 
 
@@ -456,7 +456,7 @@ dotLCache#z := (S7list#z^((theta * delta#z) * t))
 dotMCache#z := (SKlist#z^(-t * (theta * delta#z)))
 sumNCache#z := (s2 * delta#z)
 END :: for
- dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, gb, gba1, ga1, gba2, ga2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A)
+ dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, g1b, g1ba1, g1a1, g1ba2, g1a2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A)
 
  output := incorrectIndices
 END ::func:batchverify
