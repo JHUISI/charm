@@ -21,8 +21,10 @@ g2 := G2
 A := GT
 END :: types
 
+# k := stringToInt(ID, zz, ll)
+# m := stringToInt(M, zz, ll)
 BEGIN :: precompute
-A := e(h, g2)^alpha
+ A := e(h, g2)^alpha
 END :: precompute
 
 constant := list{A, g2, ub, u1b, u2b}

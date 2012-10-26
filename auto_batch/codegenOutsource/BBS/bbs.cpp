@@ -237,9 +237,6 @@ void dividenconquer(CharmListZR & delta, int startSigNum, int endSigNum, list<in
     G1 *dotALoopVal = group.init(G1_t, 1);
     G1 *dotBLoopVal = group.init(G1_t, 1);
     GT *dotCLoopVal = group.init(GT_t, 1);
-    G1 *dotALoopVal = group.init(G1_t, 1);
-    G1 *dotBLoopVal = group.init(G1_t, 1);
-    GT *dotCLoopVal = group.init(GT_t, 1);
     int midwayFloat = 0;
     int midway = 0;
     int midSigNum = 0;

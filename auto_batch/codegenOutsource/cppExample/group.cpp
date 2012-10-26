@@ -1324,6 +1324,21 @@ void PairingGroup::init(ZR & r, char *value)
 	r = x; //should copy this
 }
 
+ZR *PairingGroup::init(ZR_type t, int value)
+{
+	big x = mirvar(value);
+	ZR *zr = new ZR(x);
+        mr_free(x);
+	return zr;
+}
+
+void PairingGroup::init(ZR & r, int value)
+{
+	big x = mirvar(value);
+	r = x;
+	return;
+}
+
 ZR *PairingGroup::init(ZR_type t)
 {
 	ZR *zr = new ZR();
@@ -1336,11 +1351,37 @@ G1 *PairingGroup::init(G1_type t)
 	return g1;
 }
 
+void PairingGroup::init(G1 & t, int value)
+{
+	G1 g1;
+	t = g1; // set to the identity element
+	return;
+}
+
+G1 *PairingGroup::init(G1_type t, int value)
+{
+	G1 *g1 = new G1();
+	return g1;
+}
+
 #ifdef ASYMMETRIC
 G2 *PairingGroup::init(G2_type t)
 {
 	G2 *g2 = new G2();
 	return g2;
+}
+
+G2 *PairingGroup::init(G2_type t, int value)
+{
+	G2 *g2 = new G2();
+	return g2;
+}
+
+void PairingGroup::init(G2 & t, int value)
+{
+	G2 g2;
+	t = g2;
+	return;
 }
 #endif
 
@@ -1348,6 +1389,19 @@ GT *PairingGroup::init(GT_type t)
 {
 	GT *g = new GT(*gt_id);
 	return g;
+}
+
+GT *PairingGroup::init(GT_type t, int value)
+{
+	GT *g = new GT(*gt_id);
+	return g;
+}
+
+void PairingGroup::init(GT & t, int value)
+{
+	GT g(*gt_id);
+	t = g;
+	return;
 }
 
 ZR PairingGroup::random(ZR_type t)

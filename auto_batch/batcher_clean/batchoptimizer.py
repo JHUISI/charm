@@ -63,7 +63,7 @@ class PairInstanceFinder:
         self.debug = False
         
     def visit(self, node, data):
-        pass        
+        pass
 
     def visit_eq_tst(self, node, data):
         lnodes = []
@@ -845,6 +845,11 @@ class DropIndexForPrecomputes:
     def __init__(self, variable_list, loopVarTarget):
         self.variable_list = variable_list
         self.loopVarTarget = loopVarTarget
+    
+    def __isNotOfTypeList(self, varName):
+        getType = self.varTypes[varName]
+        print("getType: ", getType, type(getType))
+        return True
         
     def visit(self, node, data):
         pass
@@ -853,7 +858,7 @@ class DropIndexForPrecomputes:
         varName = node.getAttribute()
         if varName == delta_word and varName in self.variable_list:
             node.attr_index.remove(self.loopVarTarget)
-        elif varName in self.variable_list:
+        elif varName in self.variable_list and self.__isNotOfTypeList(varName):
             del node.attr_index[:] # remove all index numbers
 #            print("varName: ", varName, " in ", self.variable_list)
 #            node.attr_index.remove(self.loopVarTarget)

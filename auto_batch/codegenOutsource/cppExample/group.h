@@ -333,9 +333,15 @@ public:
 	~PairingGroup();
 	// generate random
 	void init(ZR&, char*);
+	void init(ZR&, int);
 	ZR* init(ZR_type);
+	ZR* init(ZR_type, int);
 	G1* init(G1_type);
+	G1* init(G1_type, int);
+	void init(G1&, int);
 	GT* init(GT_type);
+	GT* init(GT_type, int);
+	void init(GT&, int);
 	//void random(ZR&);
 	//void random(G1&);
 	//void random(GT&);
@@ -358,6 +364,8 @@ public:
 
 #ifdef ASYMMETRIC
 	G2* init(G2_type);
+	G2* init(G2_type, int);
+	void init(G2&, int);
 	G2 random(G2_type);
 	bool ismember(G2&);
 	G2 mul(G2, G2);
