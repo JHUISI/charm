@@ -30,11 +30,11 @@ void setup(G2 & P, G2 & g, ZR & alpha)
     return;
 }
 
-void concat(CharmListStr & ID_list, string L)
+void concat(CharmListStr & ID_list, string & L)
 {
     int l = 0;
-    group.init(L);
-    l = len(ID_list);
+    L = "";
+    l = ID_list.length();
     for (int y = 0; y < l; y++)
     {
         L = (L + ID_list[y]);
@@ -49,16 +49,26 @@ void keygen(ZR & alpha, string ID, G1 & pk, G1 & sk)
     return;
 }
 
-void sign(string ID, CharmListStr & ID_list, G1 & pk, G1 & sk, string M, CharmListStr & Lt, CharmListG1 & pklist, CharmListG1 & u, G1 & S)
+bool isNotEqual(string value1, string value2)
+{
+    string s1 = value1;
+    string s2 = value2;
+    if (strcmp(s1.c_str(), s2.c_str()) != 0)
+	return true;
+    else
+	return false;
+}
+
+void sign(string ID, CharmListStr & ID_list, G1 & pk, G1 & sk, string M, string & Lt, CharmListG1 & pklist, CharmListG1 & u, G1 & S)
 {
     CharmListZR h;
     int s = 0;
     ZR *r = group.init(ZR_t);
     G1 *dotProd = group.init(G1_t, 1);
-    Lt = concat(ID_list);
+    concat(ID_list, Lt); // need to change to follow C++ semantics
     for (int i = 0; i < l; i++)
     {
-        if ( ( (ID) != (ID_list[i]) ) )
+        if ( ( isNotEqual(ID, ID_list[i]) ) ) // add this call to api
         {
             u[i] = group.random(G1_t);
             h[i] = group.hashListToZR((Element(M) + Element(Lt) + Element(u[i])));
@@ -76,7 +86,7 @@ void sign(string ID, CharmListStr & ID_list, G1 & pk, G1 & sk, string M, CharmLi
     group.init(*dotProd, 1);
     for (int i = 0; i < l; i++)
     {
-        if ( ( (ID) != (ID_list[i]) ) )
+        if ( ( isNotEqual(ID, ID_list[i]) ) )
         {
             *dotProd = group.mul(*dotProd, group.mul(u[i], group.exp(pklist[i], h[i])));
         }
@@ -87,7 +97,7 @@ void sign(string ID, CharmListStr & ID_list, G1 & pk, G1 & sk, string M, CharmLi
     return;
 }
 
-bool verify(CharmListStr & Lt, CharmListG1 & pklist, G2 & P, G2 & g, string M, CharmListG1 & u, G1 & S)
+bool verify(string & Lt, CharmListG1 & pklist, G2 & P, G2 & g, string M, CharmListG1 & u, G1 & S)
 {
     CharmListZR h;
     G1 *dotProd = group.init(G1_t, 1);
@@ -110,7 +120,7 @@ bool verify(CharmListStr & Lt, CharmListG1 & pklist, G2 & P, G2 & g, string M, C
     }
 }
 
-bool membership(G2 & P, CharmListG1 & Slist, G2 & g, CharmListG1 & pklist, CharmList & ulist)
+bool membership(G2 & P, CharmListG1 & Slist, G2 & g, CharmListG1 & pklist, CharmMetaListG1 & ulist)
 {
     if ( ( (group.ismember(P)) == (false) ) )
     {
@@ -171,7 +181,7 @@ void dividenconquer(CharmListZR & delta, int startSigNum, int endSigNum, list<in
     return;
 }
 
-bool batchverify(CharmListStr & Lt, CharmListStr & Mlist, G2 & P, CharmListG1 & Slist, G2 & g, CharmListG1 & pklist, CharmList & ulist, list<int> & incorrectIndices)
+bool batchverify(string & Lt, CharmListStr & Mlist, G2 & P, CharmListG1 & Slist, G2 & g, CharmListG1 & pklist, CharmMetaListG1 & ulist, list<int> & incorrectIndices)
 {
     CharmListZR delta;
     G1 *dotALoopVal = group.init(G1_t, 1);
@@ -191,7 +201,7 @@ bool batchverify(CharmListStr & Lt, CharmListStr & Mlist, G2 & P, CharmListG1 & 
         group.init(*dotALoopVal, 1);
         for (int y = 0; y < l; y++)
         {
-            *h = group.hashListToZR((Element(Mlist[z][y]) + Element(Lt) + Element(ulist[z][y])));
+            *h = group.hashListToZR((Element(Mlist[z]) + Element(Lt) + Element(ulist[z][y])));
             *dotALoopVal = group.mul(*dotALoopVal, group.mul(group.exp(ulist[z][y], delta[z]), group.exp(pklist[y], group.mul(*h, delta[z]))));
         }
         dotBCache[z] = *dotALoopVal;
@@ -209,21 +219,28 @@ int main()
 
     setup(P, g, alpha);
 
-    string ID = "alice";
+    string id0 = "alice";
+    string id1 = "bob";
+
     string M = "message";
     CharmListStr ID_list;
-    ID_list.append("alice");
-    ID_list.append("bob");
+    ID_list.append(id0);
+    ID_list.append(id1);
     G1 pk;
     G1 sk;
-    CharmListStr Lt;
+    string Lt;
     CharmListG1 pklist;
     CharmListG1 u;
     G1 S;
 
-    keygen(alpha, ID, pk, sk);
-    sign(ID, ID_list, pk, sk, M, Lt, pklist, u, S);
-    verify(Lt, pklist, P, g, M, u, S);
+    keygen(alpha, id0, pk, sk);
+    sign(id0, ID_list, pk, sk, M, Lt, pklist, u, S);
+    bool status = verify(Lt, pklist, P, g, M, u, S);
+
+    if (status == true)
+  	cout << "Successful verification!" << endl;
+    else
+	cout << "FAILED verification!" << endl;
 
     return 0;
 }
