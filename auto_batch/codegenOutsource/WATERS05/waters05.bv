@@ -80,7 +80,7 @@ for{i := 0, zz}
  dotProd := dotProd * (u#i ^ k#i)
 END :: for
 
- r := group.random(ZR)
+ r := random(ZR)
  k1 := msk * ((u1t * dotProd) ^ r)
  k2 := g1 ^ -r
  output := list{k1, k2}
@@ -93,7 +93,7 @@ input := list{mpk, sk, M}
  mpk := expand{g1, g2, A, u1t, u2t, u, u1b, u2b, ub, zz, ll}
  m := stringToInt(M, zz, ll)
  sk := expand{k1, k2}
- s  := group.random(ZR)
+ s  := random(ZR)
  dotProd1 := init(G1)
 BEGIN :: for
 for{i := 0, zz}

@@ -8,6 +8,7 @@ BEGIN :: types
 M := str
 ID := str
 L := str
+ID_list := list{str}
 Lt := list{str}
 u := list{G1}
 h := list{ZR}
@@ -65,13 +66,13 @@ BEGIN :: func:keygen
 END :: func:keygen
 
 BEGIN :: func:sign
- input := list{ID, pk, sk, L, M}
- Lt := concat(L)
+ input := list{ID, ID_list, pk, sk, M}
+ Lt := concat(ID_list)
 
 BEGIN :: for
 for{i := 0, l}
 BEGIN :: if
- if { ID != L#i }
+ if { ID != ID_list#i }
     u#i := random(G1)
     h#i := H(concat{M, Lt, u#i}, ZR)
  else
@@ -82,7 +83,7 @@ END :: for
  r := random(ZR)
 BEGIN :: for
 for{y := 0, l}
-   pklist#y := H(L#y, G1)
+   pklist#y := H(ID_list#y, G1)
 END :: for
 
 dotProd := init(G1)
@@ -90,7 +91,7 @@ dotProd := init(G1)
 BEGIN :: for
 for{i := 0, l}
 BEGIN :: if
-if {ID != L#i}
+if {ID != ID_list#i}
    dotProd := dotProd * (u#i * (pklist#i ^ h#i))
 END :: if
 END :: for
