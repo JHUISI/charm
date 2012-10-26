@@ -5,16 +5,22 @@
     setup(P, g, alpha);
 
     string ID = "alice";
+    string M = "message";
+    CharmListStr ID_list;
+    ID_list.append("alice");
+    ID_list.append("bob");
     G1 pk;
     G1 sk;
+    CharmListStr Lt;
+    CharmListG1 pklist;
+    CharmListG1 u;
+    G1 S;
 
     keygen(alpha, ID, pk, sk);
+    sign(ID, ID_list, pk, sk, M, Lt, pklist, u, S);
+    verify(Lt, pklist, P, g, M, u, S);
 
 
-
-
-
-void sign(string ID, G1 & pk, G1 & sk, string L, string M, CharmListStr & Lt, CharmListG1 & pklist, CharmListG1 & u, G1 & S)
 
 
 

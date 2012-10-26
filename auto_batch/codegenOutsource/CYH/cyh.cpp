@@ -5,9 +5,9 @@
 #include <list>
 using namespace std;
 
-int N = 100;
+int N = 2;
 
-int l = 3;
+int l = 2;
 
 int secparam = 80;
 
@@ -30,14 +30,14 @@ void setup(G2 & P, G2 & g, ZR & alpha)
     return;
 }
 
-void concat(NO_TYPE & ID_List, string L)
+void concat(CharmListStr & ID_list, string L)
 {
     int l = 0;
     group.init(L);
-    l = len(ID_List);
+    l = len(ID_list);
     for (int y = 0; y < l; y++)
     {
-        L = (L + ID_List[y]);
+        L = (L + ID_list[y]);
     }
     return;
 }
@@ -203,5 +203,27 @@ bool batchverify(CharmListStr & Lt, CharmListStr & Mlist, G2 & P, CharmListG1 & 
 
 int main()
 {
+    G2 P;
+    G2 g;
+    ZR alpha;
+
+    setup(P, g, alpha);
+
+    string ID = "alice";
+    string M = "message";
+    CharmListStr ID_list;
+    ID_list.append("alice");
+    ID_list.append("bob");
+    G1 pk;
+    G1 sk;
+    CharmListStr Lt;
+    CharmListG1 pklist;
+    CharmListG1 u;
+    G1 S;
+
+    keygen(alpha, ID, pk, sk);
+    sign(ID, ID_list, pk, sk, M, Lt, pklist, u, S);
+    verify(Lt, pklist, P, g, M, u, S);
+
     return 0;
 }

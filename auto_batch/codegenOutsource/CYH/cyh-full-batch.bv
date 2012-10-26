@@ -60,12 +60,12 @@ BEGIN :: func:setup
 END :: func:setup
 
 BEGIN :: func:concat
- input := ID_List
+ input := ID_list
  L := init(str)
- l := len(ID_List)
+ l := len(ID_list)
 BEGIN :: for
 for{y := 0, l}
- L := strconcat{L, ID_List#y}
+ L := strconcat{L, ID_list#y}
 END :: for
 output := L
 END :: func:concat
