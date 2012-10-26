@@ -28,7 +28,7 @@ END :: precompute
 constant := list{P, g, Lt}
 public := pklist
 signature := list{S, u}
-message := h
+message := list{h, M}
 
 BEGIN :: count
 message_count := N

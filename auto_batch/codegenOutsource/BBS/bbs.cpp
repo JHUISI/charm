@@ -285,6 +285,7 @@ bool batchverify(CharmListStr & Mlist, CharmListGT & R3list, CharmListG1 & T1lis
     {
         return false;
     }
+    // if you want to test divide and conquer, comment out precheck and swap signatures
     for (int z = 0; z < N; z++)
     {
         if ( ( (precheck(g1, g2, h, u, v, w, Mlist[z], T1list[z], T2list[z], T3list[z], clist[z], salphalist[z], sbetalist[z], sxlist[z], sgamma1list[z], sgamma2list[z], R3list[z])) == (false) ) )
@@ -292,6 +293,7 @@ bool batchverify(CharmListStr & Mlist, CharmListGT & R3list, CharmListG1 & T1lis
             return false;
         }
     }
+
     for (int z = 0; z < N; z++)
     {
         dotACache[z] = group.mul(group.exp(T3list[z], group.mul(sxlist[z], delta[z])), group.mul(group.exp(h, group.mul(group.add(-sgamma1list[z], -sgamma2list[z]), delta[z])), group.exp(g1, group.mul(-clist[z], delta[z]))));
@@ -305,16 +307,19 @@ bool batchverify(CharmListStr & Mlist, CharmListGT & R3list, CharmListG1 & T1lis
 int main()
 {
     CharmList gpk, gmsk;
-    CharmListG1 A;
-    CharmListZR x;
+    CharmListG1 A, T1list, T2list, T3list;
+    CharmListZR x, clist, salphalist, sbetalist, sxlist, sgamma1list, sgamma2list;
+    CharmListGT R3list;
 
     keygen(2, gpk, gmsk, A, x);
-    G1 A_ind = A[0].getG1();
-    ZR x_ind = x[0].getZR();
-    CharmList sig;
-    string m = "message";
+    G1 A_ind = A[0];
+    ZR x_ind = x[0];
+    CharmList sig0, sig1;
+    string m0 = "message0";
+    string m1 = "message1";
 
-    sign(gpk, A_ind, x_ind, m, sig);
+    sign(gpk, A_ind, x_ind, m0, sig0);
+    sign(gpk, A_ind, x_ind, m1, sig1);
 
     G1 g1 = gpk[0].getG1();
     G2 g2 = gpk[1].getG2();
@@ -323,24 +328,50 @@ int main()
     G1 v = gpk[4].getG1();
     G2 w = gpk[5].getG2();
 
-    G1 T1 = sig[0].getG1();
-    G1 T2 = sig[1].getG1();
-    G1 T3 = sig[2].getG1();
-    ZR c =  sig[3].getZR();
-    ZR salpha = sig[4].getZR();
-    ZR sbeta = sig[5].getZR();
-    ZR sx = sig[6].getZR();
-    ZR sgamma1 = sig[7].getZR();
-    ZR sgamma2 = sig[8].getZR();
-    GT R3 = sig[9].getGT();    
+    T1list[0] = sig0[0].getG1();
+    T2list[0] = sig0[1].getG1();
+    T3list[0] = sig0[2].getG1();
+    clist[0] =  sig0[3].getZR();
+    salphalist[0] = sig0[4].getZR();
+    sbetalist[0] = sig0[5].getZR();
+    sxlist[0] = sig0[6].getZR();
+    sgamma1list[0] = sig0[7].getZR();
+    sgamma2list[0] = sig0[8].getZR();
+    R3list[0] = sig0[9].getGT();    
 
-    bool status = verify(g1, g2, h, u, v, w, m, T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3);
+    T1list[1] = sig1[0].getG1();
+    T2list[1] = sig1[1].getG1();
+    T3list[1] = sig1[2].getG1();
+    clist[1] =  sig1[3].getZR();
+    salphalist[1] = sig1[4].getZR();
+    sbetalist[1] = sig1[5].getZR();
+    sxlist[1] = sig1[6].getZR();
+    sgamma1list[1] = sig1[7].getZR();
+    sgamma2list[1] = sig1[8].getZR();
+    R3list[1] = sig1[9].getGT();    
+    bool status0 = verify(g1, g2, h, u, v, w, m0, T1list[0], T2list[0], T3list[0], clist[0], salphalist[0], sbetalist[0], sxlist[0], sgamma1list[0], sgamma2list[0], R3list[0]);
 
-    if (status == true)
+    if (status0 == true)
+        cout << "True" << endl;
+    else
+        cout << "False" << endl;
+
+    bool status1 = verify(g1, g2, h, u, v, w, m1, T1list[1], T2list[1], T3list[1], clist[1], salphalist[1], sbetalist[1], sxlist[1], sgamma1list[1], sgamma2list[1], R3list[1]);
+    if (status1 == true)
         cout << "True" << endl;
     else
         cout << "False" << endl;
 
 
+    CharmListStr Mlist;
+    list<int> incorrectIndices;
+    Mlist[0] = m0;
+    Mlist[1] = m1;
+    batchverify(Mlist, R3list, T1list, T2list, T3list, clist, g1, g2, h, salphalist, sbetalist, sgamma1list, sgamma2list, sxlist, u, v, w, incorrectIndices);
+
+    cout << "Incorrect indices: ";
+    for (list<int>::iterator it = incorrectIndices.begin(); it != incorrectIndices.end(); it++)
+             cout << *it << " ";
+    cout << endl;
     return 0;
 }

@@ -40,12 +40,18 @@ class SDLSetting():
         for i in NUM_SIGNER_TYPES:
             self.__parseOneValueInKey(assignInfoDict, i)
             self.varTypes[i] = self.data[i]
+        self.__parseBatchCount(assignInfoDict)
         self.__parseValuesInKey(assignInfoDict, CONST)
         self.__parseValuesInKey(assignInfoDict, PUBLIC)
         self.__parseValuesInKey(assignInfoDict, SIGNATURE)
         self.__parseValuesInKey(assignInfoDict, MESSAGE)
+
+        # this part will fail if Batch Count and CONST, PUBLIC, SIGNATURE and MESSAGE sections are not filled in.
+#        self.__processPublicVars()   
+#        self.__processSignatureVars()
+#        self.__processMessageVars()
+        
         self.__parseValuesInKey(assignInfoDict, TRANSFORM)
-        self.__parseBatchCount(assignInfoDict)
         self.__parsePrecomputeAssign(assignInfoDict)
 #        self.__parsePreCheckIfExists(assignInfoDict)
         self.__parseLatexAssign(assignInfoDict)
@@ -62,6 +68,22 @@ class SDLSetting():
             print("transform: ", self.data.get(TRANSFORM))
             print("latex: ", self.latex_symbols)
             print("verify args: ", self.data.get(VERIFY))
+    
+    def __processPublicVars(self):
+        batchCount = self.data[COUNT_HEADER]
+        publicKeyCount = batchCount.get(PUB_CNT)
+        for i in self.data.get(PUBLIC):
+            if publicKeyCount == NUM_SIGNATURES: # N number of keys
+                print("i: ", i, " goes to N. group type: ", self.varTypes.get(i))
+            elif publicKeyCount == SAME: # one
+                print("i: ", i, " is thesame for all signers.")
+            else:
+                # check if variable defined somewhere in globals. For example, 'l' could be 3 or 300 or etc. Such is the case for ring or group sigs
+                pass
+
+        print("__processPublicVars in batchconfig.py")
+        sys.exit(0)
+    
     
     def __parseVerifyInputArgs(self, assignInfoDict):
         verifyDict = assignInfoDict.get(VERIFY)

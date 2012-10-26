@@ -174,7 +174,7 @@ class SDLBatch:
             if self.varTypes[i] not in listGroupTypes:
                 constList.append(i)
         exceptList.extend(constList) # add list of constant variables here
-        dp = DropIndexForPrecomputes(self.precomputeVarList + exceptList, forLoopIndex)
+        dp = DropIndexForPrecomputes(self.precomputeVarList + exceptList, forLoopIndex, self.varTypes)
         ASTVisitor(dp).preorder(eq)
         return Filter(eq)
 
@@ -190,7 +190,7 @@ class SDLBatch:
             if self.varTypes[i] not in listGroupTypes:
                 constList.append(i)
         exceptList.extend(constList) # add list of constant variables here
-        dp = DropIndexForPrecomputes(self.precomputeVarList + exceptList, forLoopIndex)
+        dp = DropIndexForPrecomputes(self.precomputeVarList + exceptList, forLoopIndex, self.varTypes)
         ASTVisitor(dp).preorder(eq)
 
         eqStr = Filter(eq)

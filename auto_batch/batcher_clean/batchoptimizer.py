@@ -842,14 +842,18 @@ class SubstituteAttr:
         node.listNodes = newVarList
 
 class DropIndexForPrecomputes:
-    def __init__(self, variable_list, loopVarTarget):
+    def __init__(self, variable_list, loopVarTarget, varTypes={}):
         self.variable_list = variable_list
         self.loopVarTarget = loopVarTarget
+        self.varTypes = varTypes
     
     def __isNotOfTypeList(self, varName):
-        getType = self.varTypes[varName]
-        print("getType: ", getType, type(getType))
-        return True
+        theType = self.varTypes.get(varName)
+#        print("DEBUG!!!!! getType: ", theType, type(theType))
+        if theType not in listGroupTypes:
+            return True
+        else:
+            return False
         
     def visit(self, node, data):
         pass
@@ -860,6 +864,8 @@ class DropIndexForPrecomputes:
             node.attr_index.remove(self.loopVarTarget)
         elif varName in self.variable_list and self.__isNotOfTypeList(varName):
             del node.attr_index[:] # remove all index numbers
+        elif varName in self.variable_list and not self.__isNotOfTypeList(varName):
+            node.attr_index.remove(self.loopVarTarget) #only
 #            print("varName: ", varName, " in ", self.variable_list)
 #            node.attr_index.remove(self.loopVarTarget)
 #            print("node: ", node, self.loopVarTarget)

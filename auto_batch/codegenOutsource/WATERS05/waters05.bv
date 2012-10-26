@@ -6,7 +6,7 @@ setting := asymmetric
 BEGIN :: types
 alpha := ZR
 m := list{ZR}
-k := ZR
+k := list{ZR}
 ID := str
 M := str
 S1 := G1
@@ -21,16 +21,16 @@ g2 := G2
 A := GT
 END :: types
 
-# k := stringToInt(ID, zz, ll)
-# m := stringToInt(M, zz, ll)
 BEGIN :: precompute
+ k := stringToInt(ID, zz, ll)
+ m := stringToInt(M, zz, ll)
  A := e(h, g2)^alpha
 END :: precompute
 
 constant := list{A, g2, ub, u1b, u2b}
-public := k
+public := list{k, ID}
 signature := list{S1, S2, S3}
-message := m
+message := list{m, M}
 
 BEGIN :: count
 message_count := N
