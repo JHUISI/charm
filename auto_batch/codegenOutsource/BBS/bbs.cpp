@@ -30,7 +30,7 @@ bool precheck(G1 & g1, G2 & g2, G1 & h, G1 & u, G1 & v, G2 & w, string M, G1 & T
     *R2ver = group.mul(group.exp(v, sbeta), group.exp(T2, -c));
     *R4ver = group.mul(group.exp(T1, sx), group.exp(u, -sgamma1));
     *R5ver = group.mul(group.exp(T2, sx), group.exp(v, -sgamma2));
-    if ( ( (c) != (group.hashListToZR((Element(M) + Element(T1) + Element(T2) + Element(T3) + Element(R1ver) + Element(R2ver) + Element(R3) + Element(R4ver) + Element(R5ver)))) ) )
+    if ( ( (c) != (group.hashListToZR((Element(M) + Element(T1) + Element(T2) + Element(T3) + Element(*R1ver) + Element(*R2ver) + Element(R3) + Element(*R4ver) + Element(*R5ver)))) ) )
     {
         return false;
     }
@@ -128,7 +128,7 @@ void sign(CharmList & gpk, G1 & A_ind, ZR & x_ind, string M, CharmList & sig)
     *R3 = group.mul(group.exp(group.pair(*T3, g2), r[2]), group.mul(group.exp(group.pair(h, w), group.sub(-r[0], r[1])), group.exp(group.pair(h, g2), group.sub(-r[3], r[4]))));
     *R4 = group.mul(group.exp(*T1, r[2]), group.exp(u, -r[3]));
     *R5 = group.mul(group.exp(*T2, r[2]), group.exp(v, -r[4]));
-    *c = group.hashListToZR((Element(M) + Element(T1) + Element(T2) + Element(T3) + Element(R1) + Element(R2) + Element(R3) + Element(R4) + Element(R5)));
+    *c = group.hashListToZR((Element(M) + Element(*T1) + Element(*T2) + Element(*T3) + Element(*R1) + Element(*R2) + Element(*R3) + Element(*R4) + Element(*R5)));
     *salpha = group.add(r[0], group.mul(*c, *alpha));
     *sbeta = group.add(r[1], group.mul(*c, *beta));
     *sx = group.add(r[2], group.mul(*c, x_ind));

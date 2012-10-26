@@ -811,14 +811,20 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
     elif (node.type == ops.CONCAT):
         concatOutputString = "("
         for listNode in node.listNodes:
-            concatOutputString += elementName + "(" + listNode + ") + "
+            if (doesVarNeedStar(listNode) == True):
+                concatOutputString += elementName + "(*" + listNode + ") + "
+            else:
+                concatOutputString += elementName + "(" + listNode + ") + "
         concatOutputString = concatOutputString[0:(len(concatOutputString) - len(" + "))]
         concatOutputString += ")"
         return concatOutputString
     elif (node.type == ops.STRCONCAT):
         strconcatOutputString = "("
         for listNode in node.listNodes:
-            strconcatOutputString += listNode + " + "
+            if (doesVarNeedStar(listNode) == True):
+                strconcatOutputString += "*" + listNode + " + "
+            else:
+                strconcatOutputString += listNode + " + "
         strconcatOutputString = strconcatOutputString[0:(len(strconcatOutputString) - len(" + "))]
         strconcatOutputString += ")"
         return strconcatOutputString
