@@ -5,15 +5,18 @@ setting := asymmetric
 
 BEGIN :: types
 alpha := ZR
-m := ZR
+m := list{ZR}
 k := ZR
+ID := str
+M := str
 S1 := G1
 S2 := G1
 S3 := G1
 h := G1
-ub := G2
-u1b := G2
-u2b := G2
+ub := list{G2}
+u1b := list{G2}
+u2b := list{G2}
+g1 := G1
 g2 := G2
 A := GT
 END :: types
@@ -32,6 +35,8 @@ message_count := N
 public_count := N
 signature_count := N
 END :: count
+
+verify := { (e(S1, g2) * e(S2, u1b * (prod{y:=0, l} on ub_y^k_y)) * e(S3, u2b * (prod{y:=0,l} on ub_y^m_y))) == A }
 
 BEGIN :: func:setup
 input := list{zz, ll}
@@ -67,10 +72,10 @@ input := list{mpk, msk, ID}
  mpk := expand{g1, g2, A, u1t, u2t, u, u1b, u2b, ub, zz, ll}
  
  k := stringToInt(ID, zz, ll)
- 
+ dotProd := init(G1) 
 BEGIN :: for
 for{i := 0, zz}
- dotProd = dotProd * (u#i ^ k#i)
+ dotProd := dotProd * (u#i ^ k#i)
 END :: for
 
  r := group.random(ZR)
@@ -84,15 +89,16 @@ END :: func:keygen
 BEGIN :: func:sign
 input := list{mpk, sk, M}
  mpk := expand{g1, g2, A, u1t, u2t, u, u1b, u2b, ub, zz, ll}
- m := stringToID(M, zz, ll)
+ m := stringToInt(M, zz, ll)
  sk := expand{k1, k2}
  s  := group.random(ZR)
+ dotProd1 := init(G1)
 BEGIN :: for
 for{i := 0, zz}
- dotProd := dotProd * (u#i * m#i)
+ dotProd1 := dotProd1 * (u#i ^ m#i)
 END :: for
 
- S1 := k1 * ((u2t * dotProd) ^ s)
+ S1 := k1 * ((u2t * dotProd1) ^ s)
  S2 := k2
  S3 := g1 ^ -s
 output := list{S1, S2, S3}
@@ -101,19 +107,32 @@ END :: func:sign
 BEGIN :: func:verify
  input := list{A, g2, ub, u1b, u2b, ID, M, S1, S2, S3}
 
-kver := stringToInt(ID, zz, ll)
-mver := stringToInt(M, zz, ll)
-
+ kver := stringToInt(ID, zz, ll)
+ mver := stringToInt(M, zz, ll)
+ dotProd2 := init(G2)
+ dotProd3 := init(G2)
+ 
 BEGIN :: for
 for{i := 0, zz}
-  dotProd1 = dotProd1 * (ub#i ^ kver#i)
-  dotProd2 = dotProd2 * (ub#i ^ mver#i)
+  dotProd2 := dotProd2 * (ub#i ^ kver#i)
+  dotProd3 := dotProd3 * (ub#i ^ mver#i)
 END :: for
 
 BEGIN :: if
-if { ((pair(S1, g2) * pair(S2, u1b * dotProd1) * pair(S3, u2b * dotProd2)) == A) }
+if { ((e(S1, g2) * e(S2, u1b * dotProd2) * e(S3, u2b * dotProd3)) == A) }
    output := True
 else
    output := False
 END :: if
 END :: func:verify
+
+# BEGIN :: latex
+# S1 := S_1
+# S2 := S_2
+# S3 := S_3
+# g2 := g_2
+# u1b := \hat{u_1\prime}
+# u2b := \hat{u_2\prime}
+# ub := \hat{u}
+# END :: latex
+

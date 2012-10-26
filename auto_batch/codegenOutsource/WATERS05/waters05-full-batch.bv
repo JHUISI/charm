@@ -1,0 +1,286 @@
+name := waters05
+N := 100
+l := 5
+setting := asymmetric
+
+BEGIN :: types
+alpha := ZR
+m := list{ZR}
+k := ZR
+ID := str
+M := str
+S1 := G1
+S2 := G1
+S3 := G1
+h := G1
+ub := list{G2}
+u1b := list{G2}
+u2b := list{G2}
+g1 := G1
+g2 := G2
+A := GT
+incorrectIndices := list{int}
+endSigNum := int
+startSigNum := int
+delta := list{ZR}
+dotCLoopVal := G1
+dotDLoopVal := G1
+sumELoopVal := ZR
+dotFLoopVal := GT
+dotALoopVal := G1
+dotBLoopVal := G1
+dotBCache := list{G1}
+dotACache := list{G1}
+dotDCache := list{G1}
+sumECache := list{ZR}
+IDlist := list{str}
+Mlist := list{str}
+S1list := list{G1}
+S3list := list{G1}
+S2list := list{G1}
+END :: types
+
+BEGIN :: precompute
+A := e(h, g2)^alpha
+END :: precompute
+
+constant := list{A, g2, ub, u1b, u2b}
+public := k
+signature := list{S1, S2, S3}
+message := m
+
+BEGIN :: count
+message_count := N
+public_count := N
+signature_count := N
+END :: count
+
+verify := { (e(S1, g2) * e(S2, u1b * (prod{y:=0, l} on ub_y^k_y)) * e(S3, u2b * (prod{y:=0,l} on ub_y^m_y))) == A }
+
+BEGIN :: func:setup
+input := list{zz, ll}
+ alpha := random(ZR) 
+ h := random(G1)
+ g1 := random(G1)
+ g2 := random(G2)
+ A := (e(h, g2) ^ alpha)
+
+BEGIN :: for
+for{i := 0, zz}
+ y#i := random(ZR)
+ u#i := g1 ^ y#i
+ ub#i := g2 ^ y#i
+END :: for
+
+ y1t := random(ZR)
+ y2t := random(ZR)
+
+ u1t := g1 ^ y1t
+ u2t := g1 ^ y2t
+
+ u1b := g2 ^ y1t
+ u2b := g2 ^ y2t
+
+ msk := h ^ alpha
+ mpk := list{g1, g2, A, u1t, u2t, u, u1b, u2b, ub, zz, ll} 
+output := list{mpk, msk}
+END :: func:setup
+
+BEGIN :: func:keygen
+input := list{mpk, msk, ID}
+ mpk := expand{g1, g2, A, u1t, u2t, u, u1b, u2b, ub, zz, ll}
+ 
+ k := stringToInt(ID, zz, ll)
+ dotProd := init(G1) 
+BEGIN :: for
+for{i := 0, zz}
+ dotProd := dotProd * (u#i ^ k#i)
+END :: for
+
+ r := group.random(ZR)
+ k1 := msk * ((u1t * dotProd) ^ r)
+ k2 := g1 ^ -r
+ output := list{k1, k2}
+END :: func:keygen
+
+
+
+BEGIN :: func:sign
+input := list{mpk, sk, M}
+ mpk := expand{g1, g2, A, u1t, u2t, u, u1b, u2b, ub, zz, ll}
+ m := stringToInt(M, zz, ll)
+ sk := expand{k1, k2}
+ s  := group.random(ZR)
+ dotProd1 := init(G1)
+BEGIN :: for
+for{i := 0, zz}
+ dotProd1 := dotProd1 * (u#i ^ m#i)
+END :: for
+
+ S1 := k1 * ((u2t * dotProd1) ^ s)
+ S2 := k2
+ S3 := g1 ^ -s
+output := list{S1, S2, S3}
+END :: func:sign
+
+BEGIN :: func:verify
+ input := list{A, g2, ub, u1b, u2b, ID, M, S1, S2, S3}
+
+ kver := stringToInt(ID, zz, ll)
+ mver := stringToInt(M, zz, ll)
+ dotProd2 := init(G2)
+ dotProd3 := init(G2)
+ 
+BEGIN :: for
+for{i := 0, zz}
+  dotProd2 := dotProd2 * (ub#i ^ kver#i)
+  dotProd3 := dotProd3 * (ub#i ^ mver#i)
+END :: for
+
+BEGIN :: if
+if { ((e(S1, g2) * e(S2, u1b * dotProd2) * e(S3, u2b * dotProd3)) == A) }
+   output := True
+else
+   output := False
+END :: if
+END :: func:verify
+
+# BEGIN :: latex
+# S1 := S_1
+# S2 := S_2
+# S3 := S_3
+# g2 := g_2
+# u1b := \hat{u_1\prime}
+# u2b := \hat{u_2\prime}
+# ub := \hat{u}
+# END :: latex
+
+secparam := 80
+
+BEGIN :: func:membership
+ input := list{A, S1list, S2list, S3list, g2, u1b, u2b, ub}
+
+
+BEGIN :: if
+if { ismember(A) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(S1list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(S2list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(S3list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(g2) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(u1b) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(u2b) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(ub) == False }
+    output := False
+END :: if
+
+ output := True
+END :: func:membership
+
+
+BEGIN :: func:dividenconquer
+ input := list{delta, startSigNum, endSigNum, incorrectIndices, dotBCache, dotACache, sumECache, dotDCache, A, IDlist, Mlist, S1list, S2list, S3list, g2, u1b, u2b, ub}
+dotBLoopVal := init(G1)
+dotALoopVal := init(G1)
+sumELoopVal := init(ZR)
+dotDLoopVal := init(G1)
+
+BEGIN :: for
+for{z := startSigNum, endSigNum}
+dotBLoopVal := dotBLoopVal * dotBCache#z
+dotALoopVal := dotALoopVal * dotACache#z
+sumELoopVal := sumELoopVal + sumECache#z
+dotDLoopVal := dotDLoopVal * dotDCache#z
+END :: for
+
+dotFLoopVal := init(GT)
+
+BEGIN :: for
+for{y := 0, l}
+dotCLoopVal := init(G1)
+
+BEGIN :: forinner
+forinner{z := startSigNum, endSigNum}
+dotCLoopVal := dotCLoopVal * ((S2list#z^(delta#z * k#z#y)) * (S3list#z^(delta#z * m#z#y)))
+END :: forinner
+dotFLoopVal := dotFLoopVal * e(dotCLoopVal,ub#y)
+END :: for
+BEGIN :: if
+ if { (e(dotALoopVal,g2) * ((e(dotBLoopVal,u1b) * dotFLoopVal) * e(dotDLoopVal,u2b))) == (A^sumELoopVal) }
+    return := None
+ else
+    midwayFloat := ((endSigNum - startSigNum) / 2)
+    midway := integer(midwayFloat)
+END :: if
+
+
+BEGIN :: if
+ if { midway == 0 } 
+    addToList(incorrectIndices, startSigNum)
+    output := None
+ else
+    midSigNum := startSigNum + midway
+    dividenconquer(delta, startSigNum, midway, incorrectIndices, dotBCache, dotACache, sumECache, dotDCache, A, IDlist, Mlist, S1list, S2list, S3list, g2, u1b, u2b, ub)
+    dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotBCache, dotACache, sumECache, dotDCache, A, IDlist, Mlist, S1list, S2list, S3list, g2, u1b, u2b, ub)
+END :: if
+
+
+ output := None
+END ::func:dividenconquer
+
+
+BEGIN :: func:batchverify
+input := list{A, IDlist, Mlist, S1list, S2list, S3list, g2, u1b, u2b, ub, incorrectIndices}
+
+BEGIN :: for
+for{z := 0, N}
+ delta#z := SmallExp(secparam)
+END :: for
+
+BEGIN :: if
+ if {(membership(A, S1list, S2list, S3list, g2, u1b, u2b, ub) == False)}
+     output := False
+END :: if
+
+A := (e(h,g2)^alpha)
+
+BEGIN :: for
+for{z := 0, N}
+dotBCache#z := (S2list#z^delta#z)
+dotACache#z := (S1list#z^delta#z)
+sumECache#z := delta#z
+dotDCache#z := (S3list#z^delta#z)
+END :: for
+ dividenconquer(delta, 0, N, incorrectIndices, dotBCache, dotACache, sumECache, dotDCache, A, IDlist, Mlist, S1list, S2list, S3list, g2, u1b, u2b, ub)
+
+ output := incorrectIndices
+END ::func:batchverify
+
+
