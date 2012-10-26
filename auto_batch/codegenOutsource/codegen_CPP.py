@@ -38,6 +38,7 @@ currentFuncOutputVars = None
 currentFuncNonOutputVars = None
 SDLListVars = []
 listVarsDeclaredInThisFunc = []
+nonListVarsDeclaredInThisFunc = []
 integerVars = []
 
 def writeCurrentNumTabsToString():
@@ -1164,15 +1165,12 @@ def isInitCall(binNode):
 
 def writeAssignStmt_CPP(outputFile, binNode):
     global CPP_varTypesLines, CPP_funcBodyLines, setupFile, currentFuncNonOutputVars, SDLListVars, integerVars
-    global listVarsDeclaredInThisFunc
+    global listVarsDeclaredInThisFunc, nonListVarsDeclaredInThisFunc
 
     if (str(binNode) == RETURN_STATEMENT):
         CPP_funcBodyLines += writeCurrentNumTabsToString()
         CPP_funcBodyLines += "return;\n"
         return
-
-    #if ( (str(binNode).find(":= init(") != -1) or (str(binNode).find(":=init(") != -1) ):
-        #return
 
     variableName = getFullVarName(binNode.left, False)
     variableNameWOListIndices = getRidOfAllListIndices(getFullVarName(binNode.left, True))
@@ -1203,17 +1201,13 @@ def writeAssignStmt_CPP(outputFile, binNode):
     if (binNode.right.type != ops.LIST):
         outputString_Body += writeCurrentNumTabsToString()
 
-    #writeCurrentNumTabsIn(outputFile)
-
     if (variableName not in currentFuncOutputVars):
         if (variableName not in currentFuncNonOutputVars):
             currentFuncNonOutputVars.append(variableName)
-            #print(variableName)
 
     variableType = getFinalVarType(variableName, currentFuncName)
 
-    if ( (variableName.find(LIST_INDEX_SYMBOL) == -1) and (binNode.right.type != ops.EXPAND) ):
-        #variableType = getFinalVarType(variableName, currentFuncName)
+    if ( (variableName.find(LIST_INDEX_SYMBOL) == -1) and (binNode.right.type != ops.EXPAND) and (variableName not in nonListVarsDeclaredInThisFunc) ):
         if ( (variableName not in currentFuncOutputVars) and (variableType != types.int) ):
             outputString_Types += "    " + makeTypeReplacementsForCPP(variableType) + " *"
         elif ( (variableName not in currentFuncOutputVars) and (variableType == types.int) ):
@@ -1223,18 +1217,17 @@ def writeAssignStmt_CPP(outputFile, binNode):
         outputString_Types += getVarDeclForListVar(variableName)
         listVarsDeclaredInThisFunc.append(variableNameWOListIndices)
 
-    if ( (binNode.right.type != ops.EXPAND) and (variableName not in currentFuncOutputVars) and (variableName not in SDLListVars) ):
-        #variableType = getFinalVarType(variableName, currentFuncName)
+    if ( (binNode.right.type != ops.EXPAND) and (variableName not in currentFuncOutputVars) and (variableName not in SDLListVars) and (variableName not in nonListVarsDeclaredInThisFunc) ):
         if (variableType == types.int):
             outputString_Types += variableName + " = 0;\n"
         else:    
-            #outputString_Types += variableName + " = new " + makeTypeReplacementsForCPP(variableType) + "();\n"
             if (variableName.startswith(DOT_PROD_WORD) == True):
                 outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t, 1);\n"
             elif (variableName.startswith(SUM_PROD_WORD) == True):
                 outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t, 0);\n"
             else:
                 outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t);\n"
+        nonListVarsDeclaredInThisFunc.append(variableName)
 
     variableNamePounds = replacePoundsWithBrackets(variableName)
     if ( (variableType == types.int) and (variableNamePounds not in integerVars) ):
@@ -1258,13 +1251,9 @@ def writeAssignStmt_CPP(outputFile, binNode):
     outputString_Body += getAssignStmtAsString_CPP(binNode.right, None, variableNamePounds, leftSideNameForInit)
     if ( (binNode.right.type != ops.LIST) and (binNode.right.type != ops.SYMMAP) and (binNode.right.type != ops.EXPAND) ):
         outputString_Body += ";\n"
-    #outputFile.write(outputString)
 
     CPP_varTypesLines += outputString_Types
     CPP_funcBodyLines += outputString_Body
-
-    #setupFile.write(CPP_varTypesLines)
-    #setupFile.write(CPP_funcBodyLines)
 
 def writeAssignStmt_Python(outputFile, binNode):
     writeCurrentNumTabsIn(outputFile)
@@ -1613,7 +1602,7 @@ def isUnnecessaryNodeForCodegen(astNode):
 
 def writeSDLToFiles(astNodes):
     global currentFuncName, numTabsIn, setupFile, transformFile, lineNoBeingProcessed
-    global CPP_varTypesLines, CPP_funcBodyLines, listVarsDeclaredInThisFunc
+    global CPP_varTypesLines, CPP_funcBodyLines, listVarsDeclaredInThisFunc, nonListVarsDeclaredInThisFunc
 
     for astNode in astNodes:
         lineNoBeingProcessed += 1
@@ -1625,6 +1614,7 @@ def writeSDLToFiles(astNodes):
             CPP_varTypesLines = ""
             CPP_funcBodyLines = ""
             listVarsDeclaredInThisFunc = []
+            nonListVarsDeclaredInThisFunc = []
             processedAsFunctionStart = True
         elif (isFunctionEnd(astNode) == True):
             writeFunctionEnd(currentFuncName)

@@ -5,7 +5,7 @@
 #include <list>
 using namespace std;
 
-int N = 100;
+int N = 2;
 
 int secparam = 80;
 
@@ -304,5 +304,43 @@ bool batchverify(CharmListStr & Mlist, CharmListGT & R3list, CharmListG1 & T1lis
 
 int main()
 {
+    CharmList gpk, gmsk;
+    CharmListG1 A;
+    CharmListZR x;
+
+    keygen(2, gpk, gmsk, A, x);
+    G1 A_ind = A[0].getG1();
+    ZR x_ind = x[0].getZR();
+    CharmList sig;
+    string m = "message";
+
+    sign(gpk, A_ind, x_ind, m, sig);
+
+    G1 g1 = gpk[0].getG1();
+    G2 g2 = gpk[1].getG2();
+    G1 h = gpk[2].getG1();
+    G1 u = gpk[3].getG1();
+    G1 v = gpk[4].getG1();
+    G2 w = gpk[5].getG2();
+
+    G1 T1 = sig[0].getG1();
+    G1 T2 = sig[1].getG1();
+    G1 T3 = sig[2].getG1();
+    ZR c =  sig[3].getZR();
+    ZR salpha = sig[4].getZR();
+    ZR sbeta = sig[5].getZR();
+    ZR sx = sig[6].getZR();
+    ZR sgamma1 = sig[7].getZR();
+    ZR sgamma2 = sig[8].getZR();
+    GT R3 = sig[9].getGT();    
+
+    bool status = verify(g1, g2, h, u, v, w, m, T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3);
+
+    if (status == true)
+        cout << "True" << endl;
+    else
+        cout << "False" << endl;
+
+
     return 0;
 }
