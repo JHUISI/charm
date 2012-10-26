@@ -4,7 +4,7 @@ from charm.core.math.integer import randomBits
 
 group = None
 
-N = 1
+N = 2
 
 secparam = 80
 """
@@ -112,9 +112,7 @@ def verify(g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, u, w
     tagc = group.random(ZR)
     s = (s1 + s2)
     M = group.hash(m, ZR)
-    print("M := ", M)
     theta = (1 / (tagc - tagk))
-    print("theta := ", theta)
 
     if ((pair((g1b ** s), S1) * (pair((g1ba1 ** s1), S2) * (pair((g1a1 ** s1), S3) * (pair((g1ba2 ** s2), S4) * pair((g1a2 ** s2), S5)))))) == ((pair(S6, ((tau1 ** s1) * (tau2 ** s2))) * (pair(S7, ((tau1b ** s1) * ((tau2b ** s2) * (w ** -t)))) * (((pair(S7, (((u ** (M * t)) * (w ** (tagc * t))) * (h ** t))) * pair((g1 ** -t), SK)) ** theta) * (A ** s2))))):
         output = True
@@ -217,7 +215,7 @@ def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotACache, d
     dotKLoopVal = 1
     dotLLoopVal = 1
     dotMLoopVal = 1
-    sumNLoopVal = 1
+    sumNLoopVal = 0
     for z in range(startSigNum, endSigNum):
         dotALoopVal = (dotALoopVal * dotACache[z])
         dotBLoopVal = (dotBLoopVal * dotBCache[z])
@@ -283,12 +281,11 @@ def batchverify(A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlis
         s2 = group.random(ZR)
         s1 = group.random(ZR)
         M = group.hash(mlist[z], ZR)
-        print("M := ", M)
         s = (s1 + s2)
         t = group.random(ZR)
         tagc = group.random(ZR)
-        theta = (~(tagc - tagklist[z]))
-        print("theta bv := ", theta)
+        theta = (1 / (tagc - tagklist[z]))
+
         dotACache[z] = (S1list[z] ** (s * delta[z]))
         dotBCache[z] = (S2list[z] ** (s1 * delta[z]))
         dotCCache[z] = (S3list[z] ** (s1 * delta[z]))
@@ -328,11 +325,11 @@ def main():
     tagklist = [0, 1]
     mlist = [m0, m1]
     (S1list[0], S2list[0], S3list[0], S4list[0], S5list[0], S6list[0], S7list[0], SKlist[0], tagklist[0]) = sign(pk, sk, m0)
-    #(S1list[1], S2list[1], S3list[1], S4list[1], S5list[1], S6list[1], S7list[1], SKlist[1], tagklist[1]) = sign(pk, sk, m1)
+    (S1list[1], S2list[1], S3list[1], S4list[1], S5list[1], S6list[1], S7list[1], SKlist[1], tagklist[1]) = sign(pk, sk, m1)
 
     g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, uG1, u, wG1, hG1, w, h, A = pk
     print(verify(g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, u, w, h, A, S1list[0], S2list[0], S3list[0], S4list[0], S5list[0], S6list[0], S7list[0], SKlist[0], tagklist[0], m0))
-    #print(verify(g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, u, w, h, A, S1list[1], S2list[1], S3list[1], S4list[1], S5list[1], S6list[1], S7list[1], SKlist[1], tagklist[1], m1))
+    print(verify(g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, u, w, h, A, S1list[1], S2list[1], S3list[1], S4list[1], S5list[1], S6list[1], S7list[1], SKlist[1], tagklist[1], m1))
     
     incorrectIndices = []
     batchverify(A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlist, g1, g1a1, g1a2, g1b, g1ba1, g1ba2, g2, h, mlist, tagklist, tau1, tau1b, tau2, tau2b, u, w, incorrectIndices)

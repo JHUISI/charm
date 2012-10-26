@@ -1,4 +1,23 @@
+    m0 = "message0"
+    m1 = "message1"
     (pk, sk) = keygen()
-    (S1, S2, S3, S4, S5, S6, S7, SK, tagk) = sign(pk, sk, "message")
+    S1list = [0, 1]
+    S2list = [0, 1]
+    S3list = [0, 1]
+    S4list = [0, 1]
+    S5list = [0, 1]
+    S6list = [0, 1]
+    S7list = [0, 1]
+    SKlist = [0, 1]
+    tagklist = [0, 1]
+    mlist = [m0, m1]
+    (S1list[0], S2list[0], S3list[0], S4list[0], S5list[0], S6list[0], S7list[0], SKlist[0], tagklist[0]) = sign(pk, sk, m0)
+    (S1list[1], S2list[1], S3list[1], S4list[1], S5list[1], S6list[1], S7list[1], SKlist[1], tagklist[1]) = sign(pk, sk, m1)
+
     g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, uG1, u, wG1, hG1, w, h, A = pk
-    verify(g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, u, w, h, A, S1, S2, S3, S4, S5, S6, S7, SK, tagk, "message")
+    print(verify(g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, u, w, h, A, S1list[0], S2list[0], S3list[0], S4list[0], S5list[0], S6list[0], S7list[0], SKlist[0], tagklist[0], m0))
+    print(verify(g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, u, w, h, A, S1list[1], S2list[1], S3list[1], S4list[1], S5list[1], S6list[1], S7list[1], SKlist[1], tagklist[1], m1))
+    
+    incorrectIndices = []
+    batchverify(A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlist, g1, g1a1, g1a2, g1b, g1ba1, g1ba2, g2, h, mlist, tagklist, tau1, tau1b, tau2, tau2b, u, w, incorrectIndices)
+    print("incorrectIndices: ", incorrectIndices)
