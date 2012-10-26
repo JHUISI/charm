@@ -49,16 +49,16 @@ void keygen(ZR & alpha, string ID, G1 & pk, G1 & sk)
     return;
 }
 
-void sign(string ID, G1 & pk, G1 & sk, string L, string M, CharmListStr & Lt, CharmListG1 & pklist, CharmListG1 & u, G1 & S)
+void sign(string ID, CharmListStr & ID_list, G1 & pk, G1 & sk, string M, CharmListStr & Lt, CharmListG1 & pklist, CharmListG1 & u, G1 & S)
 {
     CharmListZR h;
     int s = 0;
     ZR *r = group.init(ZR_t);
     G1 *dotProd = group.init(G1_t, 1);
-    Lt = concat(L);
+    Lt = concat(ID_list);
     for (int i = 0; i < l; i++)
     {
-        if ( ( (ID) != (L[i]) ) )
+        if ( ( (ID) != (ID_list[i]) ) )
         {
             u[i] = group.random(G1_t);
             h[i] = group.hashListToZR((Element(M) + Element(Lt) + Element(u[i])));
@@ -71,12 +71,12 @@ void sign(string ID, G1 & pk, G1 & sk, string L, string M, CharmListStr & Lt, Ch
     *r = group.random(ZR_t);
     for (int y = 0; y < l; y++)
     {
-        pklist[y] = group.hashListToG1(L[y]);
+        pklist[y] = group.hashListToG1(ID_list[y]);
     }
     group.init(*dotProd, 1);
     for (int i = 0; i < l; i++)
     {
-        if ( ( (ID) != (L[i]) ) )
+        if ( ( (ID) != (ID_list[i]) ) )
         {
             *dotProd = group.mul(*dotProd, group.mul(u[i], group.exp(pklist[i], h[i])));
         }
