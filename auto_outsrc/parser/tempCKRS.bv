@@ -11,7 +11,7 @@ ct := list
 hl := list
 gl := list
 c := list
-d := list
+#d := list
 z := list
 id := str
 END :: types
@@ -57,16 +57,21 @@ hID := strToId(mpk, id)
 hashIDDotProd := (prod{y := 0, n} on { hl#y ^ hID#y })
 hashID := hl#0 * hashIDDotProd
 
-d#0 := h ^ ((r1 * (t1 * t2)) + (r2 * (t3 * t4)))
+#d#0 := h ^ ((r1 * (t1 * t2)) + (r2 * (t3 * t4)))
+d0 := h ^ ((r1 * (t1 * t2)) + (r2 * (t3 * t4)))
 halpha := (h ^ -alpha)
 hashID2r1 := hashID ^ -r1
-d#1 := (halpha ^ t2) * (hashID2r1 ^ t2)
-d#2 := (halpha ^ t1) * (hashID2r1 ^ t1)
+#d#1 := (halpha ^ t2) * (hashID2r1 ^ t2)
+d1 := (halpha ^ t2) * (hashID2r1 ^ t2)
+#d#2 := (halpha ^ t1) * (hashID2r1 ^ t1)
+d2 := (halpha ^ t1) * (hashID2r1 ^ t1)
 hashID2r2 := hashID ^ -r2
-d#3 := (hashID2r2 ^ t4)
-d#4 := (hashID2r2 ^ t3)
+#d#3 := (hashID2r2 ^ t4)
+d3 := (hashID2r2 ^ t4)
+#d#4 := (hashID2r2 ^ t3)
+d4 := (hashID2r2 ^ t3)
         
-sk := list{id, d}
+sk := list{id, d0, d1, d2, d3, d4}
 output := sk
 END :: func:extract
 
@@ -96,10 +101,10 @@ END :: func:encrypt
 
 BEGIN :: func:decrypt
 input := list{sk, ct}
-sk := expand{id, d}
+sk := expand{id, d0, d1, d2, d3, d4}
 ct := expand{c, c_pr}
 
-result := e(c#0, d#0) * e(c#1, d#1) * e(c#2, d#2) * e(c#3, d#3) * e(c#4, d#4)        
+result := e(c#0, d0) * e(c#1, d1) * e(c#2, d2) * e(c#3, d3) * e(c#4, d4)        
 M := c_pr * result   
 output := M
 END :: func:decrypt

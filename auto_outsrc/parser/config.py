@@ -1,6 +1,13 @@
 schemeName = "BSW"
 
+inputVarName = "input"
+outputVarName = "output"
+
 M = 'M'
+
+varNameLeftSideNoBlindedVars = "neverUseThisVarNameNoBlindedVars"
+varNameLeftSideBlindedVars = "neverUseThisVarNameBlindedVars"
+
 
 blindingLoopVar = "y"
 blindingSuffix = "Blinded"

@@ -266,6 +266,9 @@ def transform(varsThatAreBlinded, verbosity=False):
     cur_list.append(transformOutro)
     appendToLinesOfCode(cur_list, last_line)
     removeRangeFromLinesOfCode(startLineNo, endLineNo)
+
+    printLinesOfCode()
+    sys.exit("testing")
     
     parseLinesOfCode(getLinesOfCode(), False)
     # Confirm that transform was added correctly by retrieving its statements 
