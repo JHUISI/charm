@@ -228,27 +228,29 @@ int main()
     ID_list.append(id0);
     ID_list.append(id1);
 
-    G1 pk;
-    G1 sk;
+    G1 pk0, pk1;
+    G1 sk0, sk1;
     string Lt;
-    CharmListG1 pklist;
+    CharmListG1 pklist0, pklist1;
     CharmListG1 u0, u1;
     CharmMetaListG1 ulist;
     G1 S;
     CharmListG1 Slist;
 
-    keygen(alpha, id0, pk, sk);
-    sign(id0, ID_list, pk, sk, m0, Lt, pklist, u0, Slist[0]);
-    sign(id0, ID_list, pk, sk, m1, Lt, pklist, u1, Slist[1]);
+    keygen(alpha, id0, pk0, sk0);
+    keygen(alpha, id1, pk1, sk1);
 
-    bool status = verify(Lt, pklist, P, g, m0, u0, Slist[0]);
+    sign(id0, ID_list, pk0, sk0, m0, Lt, pklist0, u0, Slist[0]);
+    sign(id1, ID_list, pk1, sk1, m1, Lt, pklist1, u1, Slist[1]);
+
+    bool status = verify(Lt, pklist0, P, g, m0, u0, Slist[0]);
 
     if (status == true)
   	cout << "True!" << endl;
     else
 	cout << "FALSE!!" << endl;
 
-    bool status2 = verify(Lt, pklist, P, g, m1, u1, Slist[1]);
+    bool status2 = verify(Lt, pklist1, P, g, m1, u1, Slist[1]);
 
     if (status2 == true)
   	cout << "True!" << endl;
@@ -262,7 +264,7 @@ int main()
     ulist[0] = u0;
     ulist[1] = u1;
     
-    batchverify(Lt, Mlist, P, Slist, g, pklist, ulist, incorrectIndices);
+    batchverify(Lt, Mlist, P, Slist, g, pklist0, ulist, incorrectIndices);
     cout << "Incorrect indices: ";
     for (list<int>::iterator it = incorrectIndices.begin(); it != incorrectIndices.end(); it++)
              cout << *it << " ";
