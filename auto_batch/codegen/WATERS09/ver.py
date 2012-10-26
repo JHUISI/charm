@@ -1,8 +1,12 @@
-from toolbox.pairinggroup import *
-from toolbox.IBEnc import *
-from toolbox.PKSig import PKSig
-from toolbox.iterate import dotprod
-from charm.engine.util import *
+#NB:  I had to change the imports shown below from the original files that we used for the AutoBatch
+#paper.  This is because the Charm namespace has changed.  However, this should not affectt the
+#behavior of this file at all.
+
+from charm.toolbox.pairinggroup import *
+from charm.toolbox.IBEnc import *
+from charm.toolbox.PKSig import PKSig
+from charm.toolbox.iterate import dotprod
+from charm.core.engine.util import *
 import sys, random, string
 import sys
 

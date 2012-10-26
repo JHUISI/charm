@@ -1,0 +1,66 @@
+name := chch
+N := 2
+setting := asymmetric
+
+BEGIN :: types
+ S2 := G1
+ g2 := G2
+ S1 := G1
+ pk := G1
+ a := ZR
+ P := G2
+ ID := str
+ M := str
+END :: types
+
+BEGIN :: func:setup
+input := None
+ g2 := random(G2)
+ alpha := random(ZR)
+ P := g2^alpha
+output := list{g2, alpha, P}
+END :: func:setup
+
+BEGIN :: func:keygen
+input := list{alpha, ID}
+ sk := (H(ID, G1))^alpha
+ pk := H(ID, G1)
+output := list{pk, sk}
+END :: func:keygen
+
+BEGIN :: func:sign
+input := list{pk, sk, M}
+ s := random(ZR)
+ S1 := pk^s
+ a := H(M | S1, ZR)
+ S2 := sk^(s+a)
+output := list{S1, S2}
+END :: func:sign
+
+BEGIN :: func:verify
+input := list{P, g2, pk, M, S1, S2}
+ a := H(M | S1, ZR}
+ BEGIN :: if
+ if {e(S2, g2) == e(S1*(pk^a), P)}
+ output := True
+ else
+ output := False
+ END :: if
+END :: func:verify
+
+constant := list{P, g2}
+public :=  pk
+signature :=  list{S1, S2}
+message :=  list{a, M}
+
+BEGIN :: count
+message_count := N
+public_count := N
+signature_count := N
+END :: count
+
+BEGIN :: precompute
+  a := H(M | S1, ZR}
+END :: precompute
+
+verify := {e(S2, g2) == e(S1*(pk^a), P)}

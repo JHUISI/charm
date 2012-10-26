@@ -37,6 +37,7 @@ blindingFactors_Lists = None
 currentFuncOutputVars = None
 currentFuncNonOutputVars = None
 SDLListVars = []
+listVarsDeclaredInThisFunc = []
 integerVars = []
 
 def writeCurrentNumTabsToString():
@@ -408,7 +409,7 @@ def writeFunctionDecl_CPP(outputFile, functionName):
         #outputFile.write("int main()\n{\n    PairingGroup group(AES_SECURITY);\n")
         #return
 
-    if (functionName in [verifyFuncName, membershipFuncName, batchVerifyFuncName]):
+    if (functionName in [verifyFuncName, membershipFuncName, batchVerifyFuncName, precheckFuncName]):
         outputString = "bool " + functionName + "("
     else:
         outputString = "void " + functionName + "("
@@ -478,7 +479,7 @@ def writeFunctionEnd_CPP(outputFile, functionName):
     #CPP_funcBodyLines += "\treturn " + outputKeyword + ";\n}\n\n"
     #CPP_funcBodyLines += "    return " + outputKeyword + ";\n}\n\n"
 
-    if (functionName not in [verifyFuncName, membershipFuncName, batchVerifyFuncName]):
+    if (functionName not in [verifyFuncName, membershipFuncName, batchVerifyFuncName, precheckFuncName]):
         CPP_funcBodyLines += "    return;\n}\n\n"
     elif (functionName == batchVerifyFuncName):
         CPP_funcBodyLines += "    return true;\n}\n\n"
@@ -807,7 +808,20 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
         elif (rightSide == "True"):
             rightSide = "true"
         return "( (" + leftSide + ") != (" + rightSide + ") )"
-
+    elif (node.type == ops.CONCAT):
+        concatOutputString = "("
+        for listNode in node.listNodes:
+            concatOutputString += elementName + "(" + listNode + ") + "
+        concatOutputString = concatOutputString[0:(len(concatOutputString) - len(" + "))]
+        concatOutputString += ")"
+        return concatOutputString
+    elif (node.type == ops.STRCONCAT):
+        strconcatOutputString = "("
+        for listNode in node.listNodes:
+            strconcatOutputString += listNode + " + "
+        strconcatOutputString = strconcatOutputString[0:(len(strconcatOutputString) - len(" + "))]
+        strconcatOutputString += ")"
+        return strconcatOutputString
 
     elif ( (node.type == ops.LIST) ): #or ( (node.type == ops.EXPAND) and (variableType == types.list) ) ):
         if (variableName == None):
@@ -846,23 +860,29 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
         pairLeftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
         pairRightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
         return writeMathStatement(pairLeftSide, pairRightSide, "pair")
+    
+    #elif (node.type == ops.CONCAT):
+        #returnList = []
+        #getListOfAttrNamesFromConcatNode(node, replacementsDict, returnList)
+        #outputString = "( "
+        #for attrName in returnList:
+            #outputString += elementName + "(" + attrName + ") + "
+        #lenString = len(outputString)
+        #outputString = outputString[0:(lenString - 3)]
+        #outputString += " )"
+        #return outputString
 
-    elif (node.type == ops.CONCAT):
-        returnList = []
-        getListOfAttrNamesFromConcatNode(node, replacementsDict, returnList)
-        outputString = "( "
-        for attrName in returnList:
-            outputString += elementName + "(" + attrName + ") + "
-        lenString = len(outputString)
-        outputString = outputString[0:(lenString - 3)]
-        outputString += " )"
-        return outputString
     elif (node.type == ops.FUNC):
         nodeName = applyReplacementsDict(replacementsDict, getFullVarName(node, False))
         nodeName = replacePoundsWithBrackets(nodeName)
 
         if (nodeName == INIT_FUNC_NAME):
-            return groupObjName + "." + INIT_FUNC_NAME + "(" + str(leftSideNameForInit) + ")"
+            if (variableName.startswith(DOT_PROD_WORD) == True):
+                return groupObjName + "." + INIT_FUNC_NAME + "(" + str(leftSideNameForInit) + ", 1)"
+            elif (variableName.startswith(SUM_PROD_WORD) == True):
+                return groupObjName + "." + INIT_FUNC_NAME + "(" + str(leftSideNameForInit) + ", 0)"
+            else:
+                return groupObjName + "." + INIT_FUNC_NAME + "(" + str(leftSideNameForInit) + ")"
         elif (nodeName == ISMEMBER_FUNC_NAME):
             funcOutputString = groupObjName + "." + nodeName + "("
         elif (nodeName == INTEGER_FUNC_NAME):
@@ -1122,8 +1142,8 @@ def getVarDeclForListVar(variableName):
 
     return outputString_Types
 
-def getRidOfListIndexEndSymbol(variableName):
-    loc = variableName.find(LIST_INDEX_END_SYMBOL)
+def getRidOfAllListIndices(variableName):
+    loc = variableName.find(LIST_INDEX_SYMBOL)
     if (loc == -1):
         return variableName
 
@@ -1138,6 +1158,7 @@ def isInitCall(binNode):
 
 def writeAssignStmt_CPP(outputFile, binNode):
     global CPP_varTypesLines, CPP_funcBodyLines, setupFile, currentFuncNonOutputVars, SDLListVars, integerVars
+    global listVarsDeclaredInThisFunc
 
     if (str(binNode) == RETURN_STATEMENT):
         CPP_funcBodyLines += writeCurrentNumTabsToString()
@@ -1148,7 +1169,7 @@ def writeAssignStmt_CPP(outputFile, binNode):
         #return
 
     variableName = getFullVarName(binNode.left, False)
-    variableNameWOListIndices = getRidOfListIndexEndSymbol(getFullVarName(binNode.left, True))
+    variableNameWOListIndices = getRidOfAllListIndices(getFullVarName(binNode.left, True))
 
     if (variableName == inputKeyword):
         return
@@ -1192,8 +1213,9 @@ def writeAssignStmt_CPP(outputFile, binNode):
         elif ( (variableName not in currentFuncOutputVars) and (variableType == types.int) ):
             outputString_Types += "    int "
 
-    if ( (variableName in SDLListVars) and (variableNameWOListIndices not in currentFuncOutputVars) ):
+    if ( (variableName in SDLListVars) and (variableNameWOListIndices not in currentFuncOutputVars) and (variableNameWOListIndices not in listVarsDeclaredInThisFunc) ):
         outputString_Types += getVarDeclForListVar(variableName)
+        listVarsDeclaredInThisFunc.append(variableNameWOListIndices)
 
     if ( (binNode.right.type != ops.EXPAND) and (variableName not in currentFuncOutputVars) and (variableName not in SDLListVars) ):
         #variableType = getFinalVarType(variableName, currentFuncName)
@@ -1201,8 +1223,12 @@ def writeAssignStmt_CPP(outputFile, binNode):
             outputString_Types += variableName + " = 0;\n"
         else:    
             #outputString_Types += variableName + " = new " + makeTypeReplacementsForCPP(variableType) + "();\n"
-            outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t);\n"
-
+            if (variableName.startswith(DOT_PROD_WORD) == True):
+                outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t, 1);\n"
+            elif (variableName.startswith(SUM_PROD_WORD) == True):
+                outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t, 0);\n"
+            else:
+                outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t);\n"
 
     variableNamePounds = replacePoundsWithBrackets(variableName)
     if ( (variableType == types.int) and (variableNamePounds not in integerVars) ):
@@ -1581,7 +1607,7 @@ def isUnnecessaryNodeForCodegen(astNode):
 
 def writeSDLToFiles(astNodes):
     global currentFuncName, numTabsIn, setupFile, transformFile, lineNoBeingProcessed
-    global CPP_varTypesLines, CPP_funcBodyLines
+    global CPP_varTypesLines, CPP_funcBodyLines, listVarsDeclaredInThisFunc
 
     for astNode in astNodes:
         lineNoBeingProcessed += 1
@@ -1592,6 +1618,7 @@ def writeSDLToFiles(astNodes):
             writeFunctionDecl(currentFuncName)
             CPP_varTypesLines = ""
             CPP_funcBodyLines = ""
+            listVarsDeclaredInThisFunc = []
             processedAsFunctionStart = True
         elif (isFunctionEnd(astNode) == True):
             writeFunctionEnd(currentFuncName)

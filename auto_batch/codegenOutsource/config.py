@@ -6,6 +6,9 @@ INTEGER_FUNC_NAME = "integer"
 ADD_TO_LIST = "addToList"
 NONE_FUNC_NAME = "NONE_FUNC_NAME"
 RETURN_STATEMENT = "return := None"
+DOT_PROD_WORD = "dot"
+SUM_PROD_WORD = "sum"
+
 numSignaturesVarName = "N"
 numSignersVarName = "l"
 smallExp = "SmallExp(secparam)"
@@ -34,6 +37,7 @@ mainFuncName = "main"
 verifyFuncName = "verify"
 membershipFuncName = "membership"
 batchVerifyFuncName = "batchverify"
+precheckFuncName = "precheck"
 
 masterPubVars = ["gpk", "pk"]
 masterSecVars = ["msk"]

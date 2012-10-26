@@ -1,5 +1,5 @@
-from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair
-from charm.engine.util import *
+from charm.toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair
+from charm.core.engine.util import *
 import sys, copy, random
 from bat import run_Batch
 from ind import run_Ind
