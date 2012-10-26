@@ -22,8 +22,8 @@ A := GT
 END :: types
 
 BEGIN :: precompute
- k := stringToInt(ID, zz, ll)
- m := stringToInt(M, zz, ll)
+ k := stringToInt(ID#z, zz, ll)
+ m := stringToInt(M#z, zz, ll)
  A := e(h, g2)^alpha
 END :: precompute
 

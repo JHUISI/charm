@@ -47,9 +47,9 @@ BEGIN :: precompute
 END :: precompute
 
 constant := list{A, g2, ub, u1b, u2b}
-public := k
+public := list{k, ID}
 signature := list{S1, S2, S3}
-message := m
+message := list{m, M}
 
 BEGIN :: count
 message_count := N
