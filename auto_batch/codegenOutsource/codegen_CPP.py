@@ -699,6 +699,8 @@ def processAttrOrTypeAssignStmt(node, replacementsDict):
     return strNameToReturn
 
 def doesVarNeedStar(variable):
+    variable = getRidOfAllListIndices(variable)
+
     if (variable in integerVars):
         return False
 
@@ -813,9 +815,9 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
         concatOutputString = "("
         for listNode in node.listNodes:
             if (doesVarNeedStar(listNode) == True):
-                concatOutputString += elementName + "(*" + listNode + ") + "
+                concatOutputString += elementName + "(*" + getAssignStmtAsString_CPP(listNode, replacementsDict, variableName) + ") + "
             else:
-                concatOutputString += elementName + "(" + listNode + ") + "
+                concatOutputString += elementName + "(" + getAssignStmtAsString_CPP(listNode, replacementsDict, variableName) + ") + "
         concatOutputString = concatOutputString[0:(len(concatOutputString) - len(" + "))]
         concatOutputString += ")"
         return concatOutputString
@@ -823,9 +825,9 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
         strconcatOutputString = "("
         for listNode in node.listNodes:
             if (doesVarNeedStar(listNode) == True):
-                strconcatOutputString += "*" + listNode + " + "
+                strconcatOutputString += "*" + getAssignStmtAsString_CPP(listNode, replacementsDict, variableName) + " + "
             else:
-                strconcatOutputString += listNode + " + "
+                strconcatOutputString += getAssignStmtAsString_CPP(listNode, replacementsDict, variableName) + " + "
         strconcatOutputString = strconcatOutputString[0:(len(strconcatOutputString) - len(" + "))]
         strconcatOutputString += ")"
         return strconcatOutputString
@@ -1201,9 +1203,9 @@ def writeAssignStmt_CPP(outputFile, binNode):
     if (binNode.right.type != ops.LIST):
         outputString_Body += writeCurrentNumTabsToString()
 
-    if (variableName not in currentFuncOutputVars):
-        if (variableName not in currentFuncNonOutputVars):
-            currentFuncNonOutputVars.append(variableName)
+    if (variableNameWOListIndices not in currentFuncOutputVars):
+        if (variableNameWOListIndices not in currentFuncNonOutputVars):
+            currentFuncNonOutputVars.append(variableNameWOListIndices)
 
     variableType = getFinalVarType(variableName, currentFuncName)
 
