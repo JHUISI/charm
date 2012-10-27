@@ -1,0 +1,26 @@
+    (mpk, msk) = setup(zz, l)
+
+    IDlist = {}
+    S1list = {}
+    S2list = {}
+    S3list = {}
+
+    IDlist[0] = "janedoe@gmail.com"
+    IDlist[1] = "gijoe@email.com"
+    sk0 = keygen(mpk, msk, IDlist[0])
+    sk1 = keygen(mpk, msk, IDlist[1])
+
+    M0 = "my message 0."
+    M1 = "my message 1."
+    Mlist = [M0, M1]
+    S1list[0], S2list[0], S3list[0] = sign(mpk, sk0, M0)
+    S1list[1], S2list[1], S3list[1] = sign(mpk, sk1, M1)
+
+    g1, g2, A, u1t, u2t, u, u1b, u2b, ub, zz, l = mpk
+    assert verify(A, g2, ub, u1b, u2b, IDlist[0], M0, S1list[0], S2list[0], S3list[0]), "failed verification!"
+    assert verify(A, g2, ub, u1b, u2b, IDlist[1], M1, S1list[1], S2list[1], S3list[1]), "failed verification!"
+    print("Successful Verification!")
+
+    incorrectIndices = []
+    batchverify(A, IDlist, Mlist, S1list, S2list, S3list, g2, u1b, u2b, ub, incorrectIndices)
+    print("Incorrect indices: ", incorrectIndices)
