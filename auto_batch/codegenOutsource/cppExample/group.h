@@ -435,3 +435,4 @@ private:
 void parsePartCT(const char *filename, CharmDict & d);
 void parseKeys(const char *filename, ZR & sk, GT & pk);
 string SymDec(string k, string c_encoded);
+bool isNotEqual(string value1, string value2);

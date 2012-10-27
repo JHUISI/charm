@@ -2124,3 +2124,13 @@ string SymDec(string k, string c_encoded)
 	int c_len = (int) c_encoded.size();
 	return Symm.decrypt(key, ciphertext, c_len);
 }
+
+bool isNotEqual(string value1, string value2)
+{
+    string s1 = value1;
+    string s2 = value2;
+    if (strcmp(s1.c_str(), s2.c_str()) != 0)
+	return true;
+    else
+	return false;
+}

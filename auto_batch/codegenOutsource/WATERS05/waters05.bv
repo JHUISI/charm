@@ -24,7 +24,6 @@ END :: types
 BEGIN :: precompute
  k := stringToInt(ID#z, zz, ll)
  m := stringToInt(M#z, zz, ll)
- A := e(h, g2)^alpha
 END :: precompute
 
 constant := list{A, g2, ub, u1b, u2b}
