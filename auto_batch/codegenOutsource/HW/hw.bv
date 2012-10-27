@@ -16,7 +16,7 @@ BEGIN :: types
  A := G2
  r := ZR
  n := ZR
- i := ZR
+ i := int
  g2 := G2
 END :: types
 
@@ -41,7 +41,7 @@ input := None
  z2 := g2 ^ z
  h1 := g1 ^ h
  h2 := g2 ^ h
- i := 0
+ i := init(int)
  pk := list{U, V, D, g1, g2, A, w1, w2, z1, z2, h1, h2, u, v, d, i}
  sk := list{a}
 output := list{pk, sk}
