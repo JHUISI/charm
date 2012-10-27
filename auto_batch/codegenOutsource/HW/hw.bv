@@ -63,19 +63,20 @@ END :: func:sign
 
 # pk  := expand{U, V, D, g1, g2, A, w1, w2, z1, z2, h1, h2, u, v, d}
 # sig := expand{sig1, sig2, r, i}
+
 BEGIN :: func:verify
-input := list{U, V, D, g1, g2, A, w1, w2, z1, z2, h1, h2, u, v, d, M, sig1, sig2, r, i}
+input := list{U, V, D, g2, A, w2, z2, h2, u, v, d, M, sig1, sig2, r, i}
  n := log(i)
 
 BEGIN :: if
- if { e(sig1, g2) == ((U^M) * (V^r) * D * e(sig2, ((w^n)*((z^i)*h2)))) }
+ if { e(sig1, g2) == ((U^M) * (V^r) * D * e(sig2, ((w2^n)*((z2^i)*h2)))) }
     output := True
  else
     output := False
 END :: if
 END :: func:verify
 
-constant := list{g, w, Z, h}
+constant := list{g1, g2, w2, z2, h2}
 public := list{U, V, D}
 signature := list{sig1, sig2, r, i, n}
 message := M
@@ -91,4 +92,4 @@ public_count := one
 signature_count := N
 END :: count
 
-verify := { e(sig1, g2) == ((U^M) * (V^r) * D * e(sig2, ((w^n)*((z^i)*h2)))) }
+verify := { e(sig1, g2) == ((U^M) * (V^r) * D * e(sig2, ((w2^n)*((z2^i)*h2)))) }
