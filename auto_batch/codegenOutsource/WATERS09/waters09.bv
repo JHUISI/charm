@@ -1,13 +1,6 @@
 name := waters09
 N := 100
 setting := asymmetric
-# g1 := G1
-# g1b := G1
-# g1a1 := G1
-# g1a2 := G1
-# g1ba1 := G1
-# g1ba2 := G1
-# g2 := G2
 
 BEGIN :: types
  m := str

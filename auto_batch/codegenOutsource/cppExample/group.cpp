@@ -2173,7 +2173,6 @@ void stringToInt(PairingGroup & group, string strID, int z, int l, CharmListZR &
     /* 1. hash string. */
     ZR intval;
     Big mask( pow(Big(2), l) - 1 ); 
-//    CharmListZR *zrlist = new CharmListZR;
     ZR id = group.hashListToZR(strID); 
 
     /* 2. cut up result into zz pieces of ll size */
@@ -2186,4 +2185,14 @@ void stringToInt(PairingGroup & group, string strID, int z, int l, CharmListZR &
     return;
 }
 
-
+string concat(CharmListStr & list)
+{
+    int l = 0;
+    string L = "";
+    l = list.length();
+    for (int y = 0; y < l; y++)
+    {
+        L = (L + list[y]);
+    }
+    return L;
+}
