@@ -404,6 +404,8 @@ public:
 
 	int sub(int, int);
 	ZR sub(ZR, ZR);
+	ZR neg(ZR);
+	ZR inv(ZR);
 	string aes_key(GT & g);
 
 private:

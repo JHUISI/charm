@@ -1429,6 +1429,19 @@ GT PairingGroup::random(GT_type t)
     return gts;
 }
 
+ZR PairingGroup::neg(ZR r)
+{
+     ZR zr = r;
+     zr.negate();
+     return zr;
+}
+
+ZR PairingGroup::inv(ZR r)
+{
+     ZR zr = inverse(r, pfcObject->order());
+     return zr;
+}
+
 bool PairingGroup::ismember(CharmMetaListZR & g)
 {
 	return true;
@@ -1530,6 +1543,11 @@ GT PairingGroup::pair(G1 g, G1 h)
 	return gt;
 }
 #endif
+
+bool PairingGroup::ismember(GT & g)
+{
+	return true; // add code to check
+}
 
 ZR PairingGroup::order()
 {
