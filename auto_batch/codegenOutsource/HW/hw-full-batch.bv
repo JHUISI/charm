@@ -72,15 +72,15 @@ input := list{g1, g2}
  z2 := g2 ^ z
  h1 := g1 ^ h
  h2 := g2 ^ h
- i := init(int)
- pk := list{U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d, i}
+ i := 0
+ pk := list{U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d}
  sk := a
-output := list{pk, sk}
+output := list{i, pk, sk}
 END :: func:keygen 
 
 BEGIN :: func:sign
 input := list{pk, sk, i, m}
- pk := expand{U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d, i}
+ pk := expand{U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d}
  i := i + 1
  M := H(m, ZR)
  r := random(ZR)
@@ -91,8 +91,6 @@ input := list{pk, sk, i, m}
 output := list{sig1, sig2, r, i}
 END :: func:sign
 
-# pk  := expand{U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d}
-# sig := expand{sig1, sig2, r, i}
 
 BEGIN :: func:verify
 input := list{U, V, D, g2, w2, z2, h2, m, sig1, sig2, r, i}

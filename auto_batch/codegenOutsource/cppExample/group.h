@@ -17,6 +17,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <math.h>
 
 #define ZR Big
 #define convert_str(point) point.g
@@ -440,5 +441,5 @@ string SymDec(string k, string c_encoded);
 bool isNotEqual(string value1, string value2);
 void stringToInt(PairingGroup & group, string strID, int z, int l, CharmListZR & zrlist);
 string concat(CharmListStr & list);
-
+ZR ceillog(int base, int value);
 

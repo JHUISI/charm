@@ -2196,3 +2196,13 @@ string concat(CharmListStr & list)
     }
     return L;
 }
+
+ZR ceillog(int base, int value)
+{
+   // logb(x) ==> log(x) / log(b)
+   big x = mirvar((int) ceil(log10(value) / log10(base))); 
+   ZR zr(x);
+   mr_free(x);
+   return zr;
+}
+
