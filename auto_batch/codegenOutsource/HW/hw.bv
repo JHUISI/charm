@@ -5,25 +5,32 @@ setting := asymmetric
 BEGIN :: types
  sig1 := G1
  sig2 := G1
+ m := str
  M := ZR
  D := GT
  V := GT
  U := GT
- w := G2
- Z := G2
- h := G2
- z := G2
+ w1 := G1
+ w2 := G2
+ z1 := G1
+ z2 := G2
+ h1 := G1
+ h2 := G2
  A := G2
  r := ZR
  n := ZR
  i := int
- g2 := G2
 END :: types
 
 BEGIN :: func:setup
 input := None
  g1 := random(G1)
  g2 := random(G2)
+output := list{g1, g2}
+END :: func:setup
+
+BEGIN :: func:keygen
+input := list{g1, g2} 
  a := random(ZR)
  A := g2^a
  u := random(G1)
@@ -42,31 +49,31 @@ input := None
  h1 := g1 ^ h
  h2 := g2 ^ h
  i := init(int)
- pk := list{U, V, D, g1, g2, A, w1, w2, z1, z2, h1, h2, u, v, d, i}
- sk := list{a}
+ pk := list{U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d, i}
+ sk := a
 output := list{pk, sk}
-END :: func:setup 
+END :: func:keygen 
 
 BEGIN :: func:sign
 input := list{pk, sk, i, m}
- pk := expand{U, V, D, g1, g2, A, w1, w2, z1, z2, h1, h2, u, v, d}
- sk := expand{a}
+ pk := expand{U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d, i}
  i := i + 1
  M := H(m, ZR)
  r := random(ZR)
  t := random(ZR)
- n := log(i)
- sig1:= (((u^)*(v^r)*d)^a)*((w1^n)*(z1^i)*h1)^t 
+ n := ceillog(2, i)
+ sig1:= (((u^M)*(v^r)*d)^sk)*((w1^n)*(z1^i)*h1)^t 
  sig2 := g1 ^ t
 output := list{sig1, sig2, r, i}
 END :: func:sign
 
-# pk  := expand{U, V, D, g1, g2, A, w1, w2, z1, z2, h1, h2, u, v, d}
+# pk  := expand{U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d}
 # sig := expand{sig1, sig2, r, i}
 
 BEGIN :: func:verify
-input := list{U, V, D, g2, A, w2, z2, h2, u, v, d, M, sig1, sig2, r, i}
- n := log(i)
+input := list{U, V, D, g2, w2, z2, h2, m, sig1, sig2, r, i}
+ M := H(m, ZR)
+ n := ceillog(2, i)
 
 BEGIN :: if
  if { e(sig1, g2) == ((U^M) * (V^r) * D * e(sig2, ((w2^n)*((z2^i)*h2)))) }
@@ -82,7 +89,8 @@ signature := list{sig1, sig2, r, i, n}
 message := M
 
 BEGIN :: precompute
-n := log(i)
+ M := H(m, ZR)
+ n := ceillog(2, i)
 END :: precompute
 
 # single signer

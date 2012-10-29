@@ -1,0 +1,268 @@
+name := hw
+N := 100
+setting := asymmetric
+
+BEGIN :: types
+sig1 := G1
+sig2 := G1
+m := str
+M := ZR
+D := GT
+V := GT
+U := GT
+w1 := G1
+w2 := G2
+z1 := G1
+z2 := G2
+h1 := G1
+h2 := G2
+A := G2
+r := ZR
+n := ZR
+i := int
+incorrectIndices := list{int}
+endSigNum := int
+startSigNum := int
+delta := list{ZR}
+sumBLoopVal := ZR
+sumCLoopVal := ZR
+dotELoopVal := G1
+dotFLoopVal := G1
+dotGLoopVal := G1
+sumDLoopVal := ZR
+dotALoopVal := G1
+dotFCache := list{G1}
+dotECache := list{G1}
+sumDCache := list{ZR}
+dotGCache := list{G1}
+dotACache := list{G1}
+sumBCache := list{ZR}
+sumCCache := list{ZR}
+ilist := list{int}
+rlist := list{ZR}
+mlist := list{str}
+sig2list := list{G1}
+sig1list := list{G1}
+g2 := G2
+END :: types
+
+BEGIN :: func:setup
+input := None
+ g1 := random(G1)
+ g2 := random(G2)
+output := list{g1, g2}
+END :: func:setup
+
+BEGIN :: func:keygen
+input := list{g1, g2} 
+ a := random(ZR)
+ A := g2^a
+ u := random(G1)
+ v := random(G1)
+ d := random(G1)
+ U := e(u, A)
+ V := e(v, A)
+ D := e(d, A)
+ w := random(ZR)
+ z := random(ZR)
+ h := random(ZR)
+ w1 := g1 ^ w
+ w2 := g2 ^ w
+ z1 := g1 ^ z
+ z2 := g2 ^ z
+ h1 := g1 ^ h
+ h2 := g2 ^ h
+ i := init(int)
+ pk := list{U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d, i}
+ sk := a
+output := list{pk, sk}
+END :: func:keygen 
+
+BEGIN :: func:sign
+input := list{pk, sk, i, m}
+ pk := expand{U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d, i}
+ i := i + 1
+ M := H(m, ZR)
+ r := random(ZR)
+ t := random(ZR)
+ n := ceillog(2, i)
+ sig1:= (((u^M)*(v^r)*d)^sk)*((w1^n)*(z1^i)*h1)^t 
+ sig2 := g1 ^ t
+output := list{sig1, sig2, r, i}
+END :: func:sign
+
+# pk  := expand{U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d}
+# sig := expand{sig1, sig2, r, i}
+
+BEGIN :: func:verify
+input := list{U, V, D, g2, w2, z2, h2, m, sig1, sig2, r, i}
+ M := H(m, ZR)
+ n := ceillog(2, i)
+
+BEGIN :: if
+ if { e(sig1, g2) == ((U^M) * (V^r) * D * e(sig2, ((w2^n)*((z2^i)*h2)))) }
+    output := True
+ else
+    output := False
+END :: if
+END :: func:verify
+
+constant := list{g1, g2, w2, z2, h2}
+public := list{U, V, D}
+signature := list{sig1, sig2, r, i, n}
+message := M
+
+BEGIN :: precompute
+ M := H(m, ZR)
+ n := ceillog(2, i)
+END :: precompute
+
+# single signer
+BEGIN :: count
+message_count := N
+public_count := one
+signature_count := N
+END :: count
+
+verify := { e(sig1, g2) == ((U^M) * (V^r) * D * e(sig2, ((w2^n)*((z2^i)*h2)))) }
+secparam := 80
+
+BEGIN :: func:membership
+ input := list{D, U, V, g2, h2, ilist, rlist, sig1list, sig2list, w2, z2}
+
+
+BEGIN :: if
+if { ismember(D) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(U) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(V) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(g2) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(h2) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(ilist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(rlist) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(sig1list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(sig2list) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(w2) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(z2) == False }
+    output := False
+END :: if
+
+ output := True
+END :: func:membership
+
+
+BEGIN :: func:dividenconquer
+ input := list{delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotECache, dotFCache, dotGCache, sumBCache, sumCCache, sumDCache, g2, U, V, D, w2, z2, h2}
+dotALoopVal := init(G1)
+dotELoopVal := init(G1)
+dotFLoopVal := init(G1)
+dotGLoopVal := init(G1)
+sumBLoopVal := init(ZR)
+sumCLoopVal := init(ZR)
+sumDLoopVal := init(ZR)
+
+BEGIN :: for
+for{z := startSigNum, endSigNum}
+dotALoopVal := dotALoopVal * dotACache#z
+dotELoopVal := dotELoopVal * dotECache#z
+dotFLoopVal := dotFLoopVal * dotFCache#z
+dotGLoopVal := dotGLoopVal * dotGCache#z
+sumBLoopVal := sumBLoopVal + sumBCache#z
+sumCLoopVal := sumCLoopVal + sumCCache#z
+sumDLoopVal := sumDLoopVal + sumDCache#z
+END :: for
+BEGIN :: if
+ if { e(dotALoopVal,g2) == ((U^sumBLoopVal) * ((V^sumCLoopVal) * ((D^sumDLoopVal) * (e(dotELoopVal,w2) * (e(dotFLoopVal,z2) * e(dotGLoopVal,h2)))))) }
+    return := None
+ else
+    midwayFloat := ((endSigNum - startSigNum) / 2)
+    midway := integer(midwayFloat)
+END :: if
+
+
+BEGIN :: if
+ if { midway == 0 } 
+    addToList(incorrectIndices, startSigNum)
+    output := None
+ else
+    midSigNum := startSigNum + midway
+    dividenconquer(delta, startSigNum, midway, incorrectIndices, dotACache, dotECache, dotFCache, dotGCache, sumBCache, sumCCache, sumDCache, g2, U, V, D, w2, z2, h2)
+    dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotACache, dotECache, dotFCache, dotGCache, sumBCache, sumCCache, sumDCache, g2, U, V, D, w2, z2, h2)
+END :: if
+
+
+ output := None
+END ::func:dividenconquer
+
+
+BEGIN :: func:batchverify
+input := list{D, U, V, g2, h2, ilist, mlist, rlist, sig1list, sig2list, w2, z2, incorrectIndices}
+
+BEGIN :: for
+for{z := 0, N}
+ delta#z := SmallExp(secparam)
+END :: for
+
+BEGIN :: if
+ if {(membership(D, U, V, g2, h2, ilist, rlist, sig1list, sig2list, w2, z2) == False)}
+     output := False
+END :: if
+
+
+BEGIN :: for
+for{z := 0, N}
+M := H(mlist#z,ZR)
+n := ceillog(2, i)
+dotACache#z := (sig1list#z^delta#z)
+dotECache#z := (sig2list#z^(delta#z * n))
+dotFCache#z := (sig2list#z^(delta#z * ilist#z))
+dotGCache#z := (sig2list#z^delta#z)
+sumBCache#z := (M * delta#z)
+sumCCache#z := (rlist#z * delta#z)
+sumDCache#z := delta#z
+END :: for
+ dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotECache, dotFCache, dotGCache, sumBCache, sumCCache, sumDCache, g2, U, V, D, w2, z2, h2)
+
+ output := incorrectIndices
+END ::func:batchverify
+
+

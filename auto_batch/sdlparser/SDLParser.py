@@ -989,7 +989,11 @@ def getVarTypeInfoForAttr(node):
         return types.int # JAA: make int and ZR synonymous although they have separate Enum values. Conceptually the same for our purposes
 #    if (nodeAttrFullName == "1"): 
 #        return types.ZR
-
+    
+    if (varTypes.get("types") and nodeAttrFullName in varTypes["types"]):
+        return varTypes["types"][nodeAttrFullName].getType()
+#        return varTypes["type"].get(nodeAttrFullName).getType()
+    
     return types.NO_TYPE
 
 def getVarTypeInfoRecursive(node):

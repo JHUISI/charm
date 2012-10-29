@@ -3,7 +3,7 @@ from sdlparser.SDLParser import *
 
 
 TYPE, CONST, PRECOMP, TRANSFORM = 'types', 'constant', 'precompute', 'transform'
-MESSAGE, SIGNATURE, PUBLIC, SETTING, KEYGEN, SIGN, VERIFY = 'message','signature', 'public','setting', 'keygen', 'sign', 'verify'
+MESSAGE, SIGNATURE, PUBLIC, SETTING, SETUP, KEYGEN, SIGN, VERIFY = 'message','signature', 'public','setting', 'setup', 'keygen', 'sign', 'verify'
 BATCH_VERIFY = 'batch_verify'
 PRECHECK_HEADER = 'precheck' # special section for computation and variables that need to be check before verification check
 BATCH_VERIFY_MAP = BATCH_VERIFY + "_map"
@@ -30,6 +30,7 @@ class SDLSetting():
     def parse(self, assignInfoDict, theVarTypes):
         self.__parseVerifyEq(assignInfoDict)
         self.__parseTypes(assignInfoDict, theVarTypes.get(TYPE))
+        self.__parseTypes(assignInfoDict, theVarTypes.get(SETUP))
         self.__parseTypes(assignInfoDict, theVarTypes.get(KEYGEN))
         self.__parseTypes(assignInfoDict, theVarTypes.get(SIGN))
         self.__parseTypes(assignInfoDict, theVarTypes.get(VERIFY))
@@ -199,6 +200,7 @@ class SDLSetting():
         return self.verifyEqList
 
     def __parseTypes(self, assignInfoDict, varTypeDict):
+        if not varTypeDict: return
         for key in varTypeDict.keys():
             # save types
             if varTypeDict[key].getType() != types.NO_TYPE and self.varTypes.get(key) == None:

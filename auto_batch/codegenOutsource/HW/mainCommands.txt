@@ -1,0 +1,27 @@
+    # note that this is a same signer test    
+    (g1, g2) = setup()
+    
+    (pk, sk) = keygen(g1, g2)
+    U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d, i = pk
+    
+    sig1list = {}
+    sig2list = {}
+    ilist = {}
+    rlist = {}
+        
+    m0 = "message0"
+    m1 = "message1"
+    (sig1list[0], sig2list[0], rlist[0], ilist[0]) = sign(pk, sk, i, m0)
+    (sig1list[1], sig2list[1], rlist[1], ilist[1]) = sign(pk, sk, ilist[0], m1)
+    
+    assert verify(U, V, D, g2, w2, z2, h2, m0, sig1list[0], sig2list[0], rlist[0], ilist[0]), "failed verification!!"
+    assert verify(U, V, D, g2, w2, z2, h2, m1, sig1list[1], sig2list[1], rlist[1], ilist[1]), "failed verification!!"    
+    print("Successful Verification!!")
+
+    Mlist = [m0, m1]    
+    incorrectIndices = []
+    batchverify(D, Mlist, U, V, g2, h2, ilist, rlist, sig1list, sig2list, w2, z2, incorrectIndices)
+    print("Incorrect indicies: ", incorrectIndices)
+
+
+

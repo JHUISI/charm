@@ -2,6 +2,7 @@ from charm.core.math.pairing import ZR
 from charm.core.math.integer import randomBits
 from charm.toolbox.bitstring import Bytes
 from charm.toolbox.conversion import Conversion
+import math
 import hashlib
 
 def stringToInt(group, strID, zz, ll):
@@ -20,5 +21,5 @@ def stringToInt(group, strID, zz, ll):
         v.append(intelement)
     return v
 
-def log(base, value):
-    pass
+def ceillog(group, base, value):
+    return group.init(ZR, math.ceil(math.log(value, base)))
