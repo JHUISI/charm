@@ -1,9 +1,10 @@
+from charm.core.math.pairing import ZR
 from charm.core.math.integer import randomBits
 from charm.toolbox.bitstring import Bytes
 from charm.toolbox.conversion import Conversion
+import hashlib
 
-
-def stringToInt(strID, zz, ll):
+def stringToInt(group, strID, zz, ll):
     '''Hash the identity string and break it up in to l bit pieces'''
     h = hashlib.new('sha1')
     h.update(bytes(strID, 'utf-8'))

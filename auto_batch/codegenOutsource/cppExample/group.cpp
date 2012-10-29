@@ -2125,6 +2125,18 @@ string SymDec(string k, string c_encoded)
 	return Symm.decrypt(key, ciphertext, c_len);
 }
 
+/* test inequality for two strings */
+bool isEqual(string value1, string value2)
+{
+    string s1 = value1;
+    string s2 = value2;
+    if (strcmp(s1.c_str(), s2.c_str()) == 0)
+	return true;
+    else
+	return false;
+}
+
+/* test inequality for two strings */
 bool isNotEqual(string value1, string value2)
 {
     string s1 = value1;
@@ -2134,3 +2146,26 @@ bool isNotEqual(string value1, string value2)
     else
 	return false;
 }
+
+/* converts a string to a z-list of integers of size l-bits. 
+   Result is stored in zrlist.
+*/  
+void stringToInt(PairingGroup & group, string strID, int z, int l, CharmListZR & zrlist)
+{
+    /* 1. hash string. */
+    ZR intval;
+    Big mask( pow(Big(2), l) - 1 ); 
+//    CharmListZR *zrlist = new CharmListZR;
+    ZR id = group.hashListToZR(strID); 
+
+    /* 2. cut up result into zz pieces of ll size */
+    for(int i = 0; i < z; i++) {
+        intval = land(id, mask); 
+        zrlist.append(intval);
+        id = id >> l; // shift to the right by ll bits
+    }
+
+    return;
+}
+
+

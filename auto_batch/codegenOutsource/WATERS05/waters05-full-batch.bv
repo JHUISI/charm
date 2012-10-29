@@ -41,8 +41,8 @@ S2list := list{G1}
 END :: types
 
 BEGIN :: precompute
- k := stringToInt(ID#z, zz, ll)
- m := stringToInt(M#z, zz, ll)
+ k := stringToInt(ID#z, zz, l)
+ m := stringToInt(M#z, zz, l)
  A := e(h, g2)^alpha
 END :: precompute
 
@@ -60,7 +60,7 @@ END :: count
 verify := { (e(S1, g2) * e(S2, u1b * (prod{y:=0, l} on ub_y^k_y)) * e(S3, u2b * (prod{y:=0,l} on ub_y^m_y))) == A }
 
 BEGIN :: func:setup
-input := list{zz, ll}
+input := list{zz, l}
  alpha := random(ZR) 
  h := random(G1)
  g1 := random(G1)
@@ -84,15 +84,15 @@ END :: for
  u2b := g2 ^ y2t
 
  msk := h ^ alpha
- mpk := list{g1, g2, A, u1t, u2t, u, u1b, u2b, ub, zz, ll} 
+ mpk := list{g1, g2, A, u1t, u2t, u, u1b, u2b, ub, zz} 
 output := list{mpk, msk}
 END :: func:setup
 
 BEGIN :: func:keygen
 input := list{mpk, msk, ID}
- mpk := expand{g1, g2, A, u1t, u2t, u, u1b, u2b, ub, zz, ll}
+ mpk := expand{g1, g2, A, u1t, u2t, u, u1b, u2b, ub, zz}
  
- k := stringToInt(ID, zz, ll)
+ k := stringToInt(ID, zz, l)
  dotProd := init(G1) 
 BEGIN :: for
 for{i := 0, zz}
@@ -109,8 +109,8 @@ END :: func:keygen
 
 BEGIN :: func:sign
 input := list{mpk, sk, M}
- mpk := expand{g1, g2, A, u1t, u2t, u, u1b, u2b, ub, zz, ll}
- m := stringToInt(M, zz, ll)
+ mpk := expand{g1, g2, A, u1t, u2t, u, u1b, u2b, ub, zz}
+ m := stringToInt(M, zz, l)
  sk := expand{k1, k2}
  s  := group.random(ZR)
  dotProd1 := init(G1)
@@ -128,8 +128,8 @@ END :: func:sign
 BEGIN :: func:verify
  input := list{A, g2, ub, u1b, u2b, ID, M, S1, S2, S3}
 
- kver := stringToInt(ID, zz, ll)
- mver := stringToInt(M, zz, ll)
+ kver := stringToInt(ID, zz, l)
+ mver := stringToInt(M, zz, l)
  dotProd2 := init(G2)
  dotProd3 := init(G2)
  
@@ -230,8 +230,8 @@ dotCLoopVal := init(G1)
 
 BEGIN :: forinner
 forinner{z := startSigNum, endSigNum}
-k := stringToInt(ID#z, zz, ll)
-m := stringToInt(M#z, zz, ll)
+k := stringToInt(ID#z, zz, l)
+m := stringToInt(M#z, zz, l)
 dotCLoopVal := dotCLoopVal * ((S2list#z^(delta#z * k#y)) * (S3list#z^(delta#z * m#y)))
 END :: forinner
 dotFLoopVal := dotFLoopVal * e(dotCLoopVal,ub#y)
