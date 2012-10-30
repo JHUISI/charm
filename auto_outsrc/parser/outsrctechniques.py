@@ -849,8 +849,8 @@ class EvaluateAtIntValue:
             if self.debug: print("new_attr: ", new_attr)
             node.setAttribute(new_attr)
 
-def testTechnique11(equation, code_block={}):
-    sdl_data = {'N':10}
+def applyTechnique11(equation, code_block={}):
+#    sdl_data = {'N':10} # example input?
     Tech11 = Technique11( code_block )
     ASTVisitor(Tech11).preorder(equation)
     
@@ -870,6 +870,8 @@ def testTechnique11(equation, code_block={}):
             dot_prod_list.append(testEq2)
         testEqCombined = Tech11.createMulFromList( dot_prod_list )
         print("Result: ", testEqCombined)
+        return testEqCombined
+    return None
 
 class FindT1:
     def __init__(self, T0_var):
@@ -930,7 +932,7 @@ class SubstitutePairings:
         else:
             print("TODO: handle this case - ", Type(node.left), Type(node.right))
 
-techMap = {1:Technique1, 2:Technique2, 3:Technique3, 4:Technique4}
+techMap = {1:Technique1, 2:Technique2, 3:Technique3, 4:Technique4, 11:Technique11}
 
 def testTechnique(tech_option, equation, code_block=None):
     if code_block == None: code_block = {} 
@@ -981,7 +983,7 @@ if __name__ == "__main__":
     equation2 = SimplifySDLNode(equation, path_applied)
     print("Final Optimized: ", equation2)
     print("Techniques: ", path_applied)
-    testTechnique11(equation2)
+    applyTechnique11(equation2)
 #    tech2 = Technique2({})
 #    ASTVisitor(tech2).preorder(equation)
 #    print("Tech 2: ", equation)
