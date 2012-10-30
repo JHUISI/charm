@@ -19,6 +19,7 @@ u2b := list{G2}
 g1 := G1
 g2 := G2
 A := GT
+zz := int
 END :: types
 
 BEGIN :: precompute
