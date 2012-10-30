@@ -330,8 +330,8 @@ def makeTypeReplacementsForCPP(SDL_Type, isList=False):
 
     return SDLTypeAsString
 
-def getFinalVarType(varName, funcName):
-    return getVarTypeFromVarName(varName, funcName)
+def getFinalVarType(varName, funcName, failSilently=False):
+    return getVarTypeFromVarName(varName, funcName, failSilently)
 
 def executeAddToListCPP(binNode):
     global CPP_funcBodyLines
@@ -429,7 +429,7 @@ def writeFunctionDecl_CPP(outputFile, functionName):
     for inputVariable in inputVariables:
         varIsAList = isFuncDeclVarAList(inputVariable, functionName)
         currentType = getFinalVarType(inputVariable, currentFuncName)
-        if (str(currentType) in ["str","int"]):
+        if (str(currentType) in ["int"]):
             outputString += makeTypeReplacementsForCPP(currentType) + " " + inputVariable + ", "
         else:
             outputString += makeTypeReplacementsForCPP(currentType, varIsAList) + " & " + inputVariable + ", "
@@ -441,7 +441,7 @@ def writeFunctionDecl_CPP(outputFile, functionName):
         if ( (outputVariable != "True") and (outputVariable != "False") ):
             varIsAList = isFuncDeclVarAList(outputVariable, functionName)
             currentType = getFinalVarType(outputVariable, currentFuncName)
-            if (str(currentType) in ["str","int"]):
+            if (str(currentType) in ["int"]):
                 outputString += makeTypeReplacementsForCPP(currentType) + " " + outputVariable + ", "
             else:
                 outputString += makeTypeReplacementsForCPP(currentType, varIsAList) + " & " + outputVariable + ", "
@@ -743,6 +743,29 @@ def getListOfAttrNamesFromConcatNode(node, replacementsDict, returnList):
     returnList.append(processATTR_CPP(node.left, replacementsDict))
     returnList.append(processATTR_CPP(node.right, replacementsDict))
 
+def returnAllUpToLeftBrace(varName):
+    leftBracePos = varName.find("[")
+    if (leftBracePos == -1):
+        return varName
+
+    return varName[0:leftBracePos]
+
+def areBothSidesStringVars(leftSide, rightSide):
+    leftType = getFinalVarType(returnAllUpToLeftBrace(leftSide), currentFuncName, True)
+    rightType = getFinalVarType(returnAllUpToLeftBrace(rightSide), currentFuncName, True)
+
+    #print(str(leftSide))
+    #print(str(leftType))
+    #print(str(rightSide))
+    #print(str(rightType))
+
+    if (str(leftType) not in ["str", "listStr"]):
+        return False
+
+    if (str(rightType) not in ["str", "listStr"]):
+        return False
+
+    return True
 
 def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideNameForInit=None):
     global userFuncsCPPFile, userFuncsList_CPP
@@ -801,8 +824,10 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
             rightSide = "false"
         elif (rightSide == "True"):
             rightSide = "true"
-        return "( (" + leftSide + ") == (" + rightSide + ") )"
-
+        if (areBothSidesStringVars(leftSide, rightSide) == True):
+            return "( isEqual(" + leftSide + ", " + rightSide + ") )"
+        else:
+            return "( (" + leftSide + ") == (" + rightSide + ") )"
     elif (node.type == ops.NON_EQ_TST):
         leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
         rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
@@ -810,7 +835,11 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
             rightSide = "false"
         elif (rightSide == "True"):
             rightSide = "true"
-        return "( (" + leftSide + ") != (" + rightSide + ") )"
+
+        if (areBothSidesStringVars(leftSide, rightSide) == True):
+            return "( isNotEqual(" + leftSide + ", " + rightSide + ") )"
+        else:
+            return "( (" + leftSide + ") != (" + rightSide + ") )"
     elif (node.type == ops.CONCAT):
         concatOutputString = "("
         for listNode in node.listNodes:
@@ -884,18 +913,26 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
     elif (node.type == ops.FUNC):
         nodeName = applyReplacementsDict(replacementsDict, getFullVarName(node, False))
         nodeName = replacePoundsWithBrackets(nodeName)
+        variableTypeForFuncNode = getFinalVarType(variableName, currentFuncName, True)
 
         if (nodeName == INIT_FUNC_NAME):
             if (variableName.startswith(DOT_PROD_WORD) == True):
                 return groupObjName + "." + INIT_FUNC_NAME + "(" + str(leftSideNameForInit) + ", 1)"
             elif (variableName.startswith(SUM_PROD_WORD) == True):
                 return groupObjName + "." + INIT_FUNC_NAME + "(" + str(leftSideNameForInit) + ", 0)"
+            elif (str(variableTypeForFuncNode) == "str"):
+                return variableName + " = \"\""
             else:
                 return groupObjName + "." + INIT_FUNC_NAME + "(" + str(leftSideNameForInit) + ")"
         elif (nodeName == ISMEMBER_FUNC_NAME):
             funcOutputString = groupObjName + "." + nodeName + "("
         elif (nodeName == INTEGER_FUNC_NAME):
             funcOutputString = "int("
+        elif (nodeName == LEN_FUNC_NAME):
+             if (len(node.listNodes) != 1):
+                 sys.exit("getAssignStmtAsString_CPP in codegen_CPP.py:  len() function called, but either less than or more than one parameter was passed in (only one parameter can be passed in for len().")
+             nameOfVarForLen = getAssignStmtAsString_CPP(node.listNodes[0], replacementsDict, variableName)
+             return nameOfVarForLen + ".length()"
         else:
             funcOutputString = nodeName + "("
 
