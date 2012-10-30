@@ -770,6 +770,107 @@ class Technique4(AbstractTechnique):
         return self.applied
 
 
+class Technique11(AbstractTechnique):
+    def __init__(self, allStmtsInBlock, varTypes={}):
+        AbstractTechnique.__init__(self, allStmtsInBlock)
+        self.varTypes = varTypes
+        self.rule    = "Unroll constant-size dot product (technique 10)"
+        self.applied = False 
+#        self.score   = tech10.NoneApplied
+        self.debug = False      
+        self.loopStmt   = None
+        self.prod_start = None
+        self.prod_end = None
+        self.prod_iterator = None
+
+    def visit_on(self, node, data):
+        if Type(node.left) == ops.PROD:
+            self.loopStmt = node.right
+
+    def visit_prod(self, node, data):
+        if(Type(node.left) == ops.EQ):
+            start = node.left
+            self.prod_iterator = start.left.getAttribute()
+            self.prod_start = int(start.right.getAttribute())
+            if self.prod_start == None or self.prod_iterator == None: sys.exit("ERROR: for loop not well formed!") 
+            print("prod: ", self.prod_iterator, ":", self.prod_start)                       
+        if(Type(node.right) == ops.ATTR):
+            val = node.right.getAttribute()
+            if val.isdigit():
+                self.prod_end = int(val)
+            elif self.varTypes.get(val):
+                # if the val is actually a variable, then need to find var definition in sdl
+                self.prod_end = int(self.varTypes.get(val)) # abstract class call
+            else:
+                self.prod_end = None
+                
+            if self.prod_end == None: sys.exit("ERROR: %s is not defined in SDL." % val)
+            print("until: ", node.right, self.prod_end)
+    
+    def testForApplication(self):
+        if self.prod_start != None and self.prod_iterator != None and self.prod_end != None:
+            self.applied = True
+#            self.score   = tech10.ConstantSizeLoop
+        else:
+            self.applied = False
+        return self.applied
+
+#    def varDefineValue(self, var_name):
+#        var = self.vars.get(str(var_name))
+#        return var
+
+
+# performs step 1 from above. Replaces 't' (target variables) with integer values in each attribute
+class EvaluateAtIntValue:
+    def __init__(self, target_var, int_value):
+        self.target_var = target_var
+        self.int_value  = int_value
+        self.debug      = False
+    
+    def visit(self, node, data):
+        pass
+   
+    def visit_attr(self, node, data):#    
+        attr = node.getAttribute()
+        new_attr = ''
+        s = attr.split('#') 
+        if( len(s) > 1 ):
+            if self.debug: print("attr: ", node, s)
+            for i in s:
+                if i == self.target_var:
+                    new_attr += str(self.int_value)
+                elif self.target_var in i: # instead of t+1 or t-1 or etc replace with the evaluated result                    
+                    exec("%s = %s" % (self.target_var, self.int_value))
+                    new_attr += str(eval(i))
+                else:
+                    new_attr += i
+                new_attr += '#'
+            new_attr = new_attr[:-1] # cut off last character
+            if self.debug: print("new_attr: ", new_attr)
+            node.setAttribute(new_attr)
+
+def testTechnique11(equation, code_block={}):
+    sdl_data = {'N':10}
+    Tech11 = Technique11( code_block )
+    ASTVisitor(Tech11).preorder(equation)
+    
+    if Tech11.testForApplication():
+        dot_prod_list = []
+        evalint = EvaluateAtIntValue(Tech11.prod_iterator, Tech11.prod_start)
+        testEq = BinaryNode.copy(Tech11.loopStmt)
+        ASTVisitor(evalint).preorder(testEq)
+        dot_prod_list.append(testEq)
+#        print("Evaluated version at %d: %s" % (Tech10.prod_start, testEq))
+#        print("Combine the rest into this one...")
+        for t in range(Tech11.prod_start+1, Tech11.prod_end):
+            evalint = EvaluateAtIntValue(Tech11.prod_iterator, t)  
+            testEq2 = BinaryNode.copy(Tech11.loopStmt)
+            ASTVisitor(evalint).preorder(testEq2)
+#            print("Eval-n-Combine version at %d: %s" % (t, testEq2))
+            dot_prod_list.append(testEq2)
+        testEqCombined = Tech11.createMulFromList( dot_prod_list )
+        print("Result: ", testEqCombined)
+
 class FindT1:
     def __init__(self, T0_var):
         self.T0 = T0_var
@@ -849,7 +950,7 @@ def testTechnique(tech_option, equation, code_block=None):
 
 # figures out which optimizations apply
 def SimplifySDLNode(equation, path, code_block=None, debug=False):
-    tech_list = [1, 2, 3, 4]
+    tech_list = [1, 2, 3] # 4
     # 1. apply the start technique to equation
     new_eq = equation
     while True:
@@ -860,7 +961,7 @@ def SimplifySDLNode(equation, path, code_block=None, debug=False):
         if tech.applied:
             if debug: print("Technique ", cur_tech, " successfully applied.")
             path.append(cur_tech)
-            tech_list = [1, 2, 3, 4]
+            tech_list = [1, 2, 3]
             continue
         else:
             if len(tech_list) == 0: break
@@ -873,12 +974,14 @@ if __name__ == "__main__":
     statement = sys.argv[1]
     parser = SDLParser()
     equation = parser.parse(statement)
+    
     path_applied = []
     
     print("Original: ", equation)
     equation2 = SimplifySDLNode(equation, path_applied)
     print("Final Optimized: ", equation2)
     print("Techniques: ", path_applied)
+    testTechnique11(equation2)
 #    tech2 = Technique2({})
 #    ASTVisitor(tech2).preorder(equation)
 #    print("Tech 2: ", equation)
