@@ -1,18 +1,23 @@
 name := waters05
 N := 100
 l := 5
+zz := 32
+
 setting := asymmetric
 
 BEGIN :: types
 alpha := ZR
 m := list{ZR}
 k := list{ZR}
+mver := list{ZR}
+kver := list{ZR}
 ID := str
 M := str
 S1 := G1
 S2 := G1
 S3 := G1
 h := G1
+u := list{G1}
 ub := list{G2}
 u1b := list{G2}
 u2b := list{G2}
@@ -23,8 +28,8 @@ zz := int
 END :: types
 
 BEGIN :: precompute
- k := stringToInt(ID#z, zz, ll)
- m := stringToInt(M#z, zz, ll)
+ k := stringToInt(ID#z, l, zz)
+ m := stringToInt(M#z, l, zz)
 END :: precompute
 
 constant := list{A, g2, ub, u1b, u2b}
@@ -41,7 +46,7 @@ END :: count
 verify := { (e(S1, g2) * e(S2, u1b * (prod{y:=0, l} on ub_y^k_y)) * e(S3, u2b * (prod{y:=0,l} on ub_y^m_y))) == A }
 
 BEGIN :: func:setup
-input := list{zz, ll}
+input := None
  alpha := random(ZR) 
  h := random(G1)
  g1 := random(G1)
@@ -49,10 +54,10 @@ input := list{zz, ll}
  A := (e(h, g2) ^ alpha)
 
 BEGIN :: for
-for{i := 0, zz}
- y#i := random(ZR)
- u#i := g1 ^ y#i
- ub#i := g2 ^ y#i
+for{i := 0, l}
+ y0#i := random(ZR)
+ u#i := g1 ^ y0#i
+ ub#i := g2 ^ y0#i
 END :: for
 
  y1t := random(ZR)
@@ -65,38 +70,39 @@ END :: for
  u2b := g2 ^ y2t
 
  msk := h ^ alpha
- mpk := list{g1, g2, A, u1t, u2t, u, u1b, u2b, ub, zz, ll} 
-output := list{mpk, msk}
+ mpk := list{g1, g2, A, u1t, u2t, u1b, u2b} 
+output := list{mpk, u, ub, msk}
 END :: func:setup
 
 BEGIN :: func:keygen
-input := list{mpk, msk, ID}
- mpk := expand{g1, g2, A, u1t, u2t, u, u1b, u2b, ub, zz, ll}
+input := list{mpk, u, msk, ID}
+ mpk := expand{g1, g2, A, u1t, u2t, u1b, u2b}
  
- k := stringToInt(ID, zz, ll)
+ k := stringToInt(ID, l, zz)
  dotProd := init(G1) 
 BEGIN :: for
-for{i := 0, zz}
+for{i := 0, l}
  dotProd := dotProd * (u#i ^ k#i)
 END :: for
 
  r := random(ZR)
  k1 := msk * ((u1t * dotProd) ^ r)
  k2 := g1 ^ -r
- output := list{k1, k2}
+ sk := list{k1, k2}
+ output := sk
 END :: func:keygen
 
 
 
 BEGIN :: func:sign
-input := list{mpk, sk, M}
- mpk := expand{g1, g2, A, u1t, u2t, u, u1b, u2b, ub, zz, ll}
- m := stringToInt(M, zz, ll)
+input := list{mpk, u, sk, M}
+ mpk := expand{g1, g2, A, u1t, u2t, u1b, u2b}
+ m := stringToInt(M, l, zz)
  sk := expand{k1, k2}
  s  := random(ZR)
  dotProd1 := init(G1)
 BEGIN :: for
-for{i := 0, zz}
+for{i := 0, l}
  dotProd1 := dotProd1 * (u#i ^ m#i)
 END :: for
 
@@ -109,13 +115,13 @@ END :: func:sign
 BEGIN :: func:verify
  input := list{A, g2, ub, u1b, u2b, ID, M, S1, S2, S3}
 
- kver := stringToInt(ID, zz, ll)
- mver := stringToInt(M, zz, ll)
+ kver := stringToInt(ID, l, zz)
+ mver := stringToInt(M, l, zz)
  dotProd2 := init(G2)
  dotProd3 := init(G2)
  
 BEGIN :: for
-for{i := 0, zz}
+for{i := 0, l}
   dotProd2 := dotProd2 * (ub#i ^ kver#i)
   dotProd3 := dotProd3 * (ub#i ^ mver#i)
 END :: for
