@@ -134,13 +134,13 @@ else
 END :: if
 END :: func:verify
 
-# BEGIN :: latex
-# S1 := S_1
-# S2 := S_2
-# S3 := S_3
-# g2 := g_2
-# u1b := \hat{u_1\prime}
-# u2b := \hat{u_2\prime}
-# ub := \hat{u}
-# END :: latex
+BEGIN :: latex
+S1 := S_1
+S2 := S_2
+S3 := S_3
+g2 := g_2
+u1b := \hat{u_1\prime}
+u2b := \hat{u_2\prime}
+ub := \hat{u}
+END :: latex
 

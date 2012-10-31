@@ -6,11 +6,6 @@ BEGIN :: types
  m := str
  tagc := ZR
  tagk := ZR
- gb := G1
- gba1 := G1
- gba2 := G1
- ga2 := G1
- ga1 := G1
  tau1 := G2
  tau2 := G2
  tau1b := G2
@@ -146,31 +141,29 @@ END :: count
 verify := { (e(g1b^s, S1) * (e(g1ba1^s1, S2) * (e(g1a1^s1, S3) * (e(g1ba2^s2, S4) * e(g1a2^s2, S5))))) == (e(S6, (tau1^s1) * (tau2^s2)) * (e(S7, ((tau1b^s1) * ((tau2b^s2) * w^-t))) * ( ( ( e(S7, ((u^(M * t)) * (w^(tagc * t))) * h^t) * (e(g1^-t, SK)) )^theta) * (A^s2)))) }
 
 
-# BEGIN :: latex
-# S#1 := \sigma_1
-# S#2 := \sigma_2
-# S#3 := \sigma_3
-# S#4 := \sigma_4
-# S#5 := \sigma_5
-# S#6 := \sigma_6
-# S#7 := \sigma_7
-# SK := \sigma_K
-# theta := \theta
-# s2 := s_2
-# s1 := s_1
-# tagc := tag_c
-# tau1 := \tau_1
-# tau2 := \tau_2
-# tau1b := {\tau_1}^b
-# tau2b := {\tau_2}^b
-# gb := {g_1}^b
-# gba1 := {g_1}^{b \cdot a_1}
-# gba2 := {g_1}^{b \cdot a_2}
-# ga2 := {g_1}^{a_2}
-# ga1 := {g_1}^{a_1}
-# g1 := g_1
-# g2 := g_2
-# END :: latex
-
-
+BEGIN :: latex
+S1 := \sigma_1
+S2 := \sigma_2
+S3 := \sigma_3
+S4 := \sigma_4
+S5 := \sigma_5
+S6 := \sigma_6
+S7 := \sigma_7
+SK := \sigma_K
+theta := \theta
+s2 := s_2
+s1 := s_1
+tagc := tag_c
+tau1 := \tau_1
+tau2 := \tau_2
+tau1b := {\tau_1}^b
+tau2b := {\tau_2}^b
+g1b := {g_1}^b
+g1ba1 := {g_1}^{b \cdot a_1}
+g1ba2 := {g_1}^{b \cdot a_2}
+g1a2 := {g_1}^{a_2}
+g1a1 := {g_1}^{a_1}
+g1 := g_1
+g2 := g_2
+END :: latex
 
