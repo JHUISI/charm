@@ -1903,6 +1903,13 @@ GT PairingGroup::mul(GT g, GT h)
 	return g * h;
 }
 
+ZR PairingGroup::div(int g, ZR h)
+{
+	ZR o = pfcObject->order();
+	return moddiv(ZR(g), h, o);
+}
+
+
 ZR PairingGroup::div(ZR g, ZR h)
 {
 	ZR o = pfcObject->order();

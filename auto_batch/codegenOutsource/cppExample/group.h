@@ -428,6 +428,7 @@ public:
 	G1 mul(G1, G1);
 	GT mul(GT, GT);
 	int div(int, int);
+	ZR div(int, ZR);
 	ZR div(ZR, ZR);
 	G1 div(G1, G1);
 	GT div(GT, GT);

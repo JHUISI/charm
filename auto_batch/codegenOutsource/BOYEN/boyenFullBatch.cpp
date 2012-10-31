@@ -115,7 +115,7 @@ void sign(G1 & g1, CharmListG1 & Alist, CharmListG1 & Blist, CharmListG1 & Clist
     }
     result0 = group.mul(prod0, prod1);
     d = group.add(group.add(a, group.mul(b, m)), group.mul(c, t[index]));
-    S[index] = group.exp(group.mul(g1, result0), group.div(ZR(1), d));
+    S[index] = group.exp(group.mul(g1, result0), group.div(1, d));
 //    cout << "S[" << index << "] :=> " << S[index].g << endl;
     return;
 }

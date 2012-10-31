@@ -801,6 +801,7 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
 #        if (doesVarNeedStar(returnString)):
 #            returnThisString = starRef + returnString
 #        else:
+#            returnThisString = returnString
         
         if node.isNegated() and not returnString.isdigit(): # now wrap in negate call.
             return groupObjName + ".neg" + "(" + returnThisString + ")"
