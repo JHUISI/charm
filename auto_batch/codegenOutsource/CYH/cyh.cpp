@@ -13,32 +13,11 @@ int secparam = 80;
 
 PairingGroup group(AES_SECURITY);
 
-ZR & SmallExp(int bits) {
-    big t = mirvar(0);
-    bigbits(bits, t);
-
-    ZR *z = new ZR(t);
-    mr_free(t);
-    return *z;
-}
-
 void setup(G2 & P, G2 & g, ZR & alpha)
 {
     g = group.random(G2_t);
     alpha = group.random(ZR_t);
     P = group.exp(g, alpha);
-    return;
-}
-
-void concat(CharmListStr & ID_list, string & L)
-{
-    int l = 0;
-    L = "";
-    l = ID_list.length();
-    for (int y = 0; y < l; y++)
-    {
-        L = (L + ID_list[y]);
-    }
     return;
 }
 
@@ -49,26 +28,16 @@ void keygen(ZR & alpha, string ID, G1 & pk, G1 & sk)
     return;
 }
 
-bool isNotEqual(string value1, string value2)
-{
-    string s1 = value1;
-    string s2 = value2;
-    if (strcmp(s1.c_str(), s2.c_str()) != 0)
-	return true;
-    else
-	return false;
-}
-
 void sign(string ID, CharmListStr & ID_list, G1 & pk, G1 & sk, string M, string & Lt, CharmListG1 & pklist, CharmListG1 & u, G1 & S)
 {
     CharmListZR h;
     int s = 0;
-    ZR *r = group.init(ZR_t);
-    G1 *dotProd = group.init(G1_t, 1);
-    concat(ID_list, Lt); // need to change to follow C++ semantics
+    ZR r = group.init(ZR_t);
+    G1 dotProd = group.init(G1_t, 1);
+    Lt = concat(ID_list);
     for (int i = 0; i < l; i++)
     {
-        if ( ( isNotEqual(ID, ID_list[i]) ) ) // add this call to api
+        if ( ( isNotEqual(ID, ID_list[i]) ) ) // add to SDL codegen
         {
             u[i] = group.random(G1_t);
             h[i] = group.hashListToZR((Element(M) + Element(Lt) + Element(u[i])));
@@ -78,39 +47,39 @@ void sign(string ID, CharmListStr & ID_list, G1 & pk, G1 & sk, string M, string 
             s = i;
         }
     }
-    *r = group.random(ZR_t);
+    r = group.random(ZR_t);
     for (int y = 0; y < l; y++)
     {
         pklist[y] = group.hashListToG1(ID_list[y]);
     }
-    group.init(*dotProd, 1);
+    group.init(dotProd, 1);
     for (int i = 0; i < l; i++)
     {
         if ( ( isNotEqual(ID, ID_list[i]) ) )
         {
-            *dotProd = group.mul(*dotProd, group.mul(u[i], group.exp(pklist[i], h[i])));
+            dotProd = group.mul(dotProd, group.mul(u[i], group.exp(pklist[i], h[i])));
         }
     }
-    u[s] = group.mul(group.exp(pk, *r), group.exp(*dotProd, -1));
+    u[s] = group.mul(group.exp(pk, r), group.exp(dotProd, -1));
     h[s] = group.hashListToZR((Element(M) + Element(Lt) + Element(u[s])));
-    S = group.exp(sk, group.add(h[s], *r));
+    S = group.exp(sk, group.add(h[s], r));
     return;
 }
 
 bool verify(string & Lt, CharmListG1 & pklist, G2 & P, G2 & g, string M, CharmListG1 & u, G1 & S)
 {
     CharmListZR h;
-    G1 *dotProd = group.init(G1_t, 1);
+    G1 dotProd = group.init(G1_t, 1);
     for (int y = 0; y < l; y++)
     {
         h[y] = group.hashListToZR((Element(M) + Element(Lt) + Element(u[y])));
     }
-    group.init(*dotProd, 1);
+    group.init(dotProd, 1);
     for (int y = 0; y < l; y++)
     {
-        *dotProd = group.mul(*dotProd, group.mul(u[y], group.exp(pklist[y], h[y])));
+        dotProd = group.mul(dotProd, group.mul(u[y], group.exp(pklist[y], h[y])));
     }
-    if ( ( (group.pair(*dotProd, P)) == (group.pair(S, g)) ) )
+    if ( ( (group.pair(dotProd, P)) == (group.pair(S, g)) ) )
     {
         return true;
     }
@@ -147,19 +116,19 @@ bool membership(G2 & P, CharmListG1 & Slist, G2 & g, CharmListG1 & pklist, Charm
 
 void dividenconquer(CharmListZR & delta, int startSigNum, int endSigNum, list<int> & incorrectIndices, CharmListG1 & dotBCache, CharmListG1 & dotCCache, G2 & P, G2 & g)
 {
-    G1 *dotBLoopVal = group.init(G1_t, 1);
-    G1 *dotCLoopVal = group.init(G1_t, 1);
+    G1 dotBLoopVal = group.init(G1_t, 1);
+    G1 dotCLoopVal = group.init(G1_t, 1);
     int midwayFloat = 0;
     int midway = 0;
     int midSigNum = 0;
-    group.init(*dotBLoopVal, 1);
-    group.init(*dotCLoopVal, 1);
+    group.init(dotBLoopVal, 1);
+    group.init(dotCLoopVal, 1);
     for (int z = startSigNum; z < endSigNum; z++)
     {
-        *dotBLoopVal = group.mul(*dotBLoopVal, dotBCache[z]);
-        *dotCLoopVal = group.mul(*dotCLoopVal, dotCCache[z]);
+        dotBLoopVal = group.mul(dotBLoopVal, dotBCache[z]);
+        dotCLoopVal = group.mul(dotCLoopVal, dotCCache[z]);
     }
-    if ( ( (group.pair(*dotBLoopVal, P)) == (group.pair(*dotCLoopVal, g)) ) )
+    if ( ( (group.pair(dotBLoopVal, P)) == (group.pair(dotCLoopVal, g)) ) )
     {
         return;
     }
@@ -184,8 +153,8 @@ void dividenconquer(CharmListZR & delta, int startSigNum, int endSigNum, list<in
 bool batchverify(string & Lt, CharmListStr & Mlist, G2 & P, CharmListG1 & Slist, G2 & g, CharmListG1 & pklist, CharmMetaListG1 & ulist, list<int> & incorrectIndices)
 {
     CharmListZR delta;
-    G1 *dotALoopVal = group.init(G1_t, 1);
-    ZR *h = group.init(ZR_t);
+    G1 dotALoopVal = group.init(G1_t, 1);
+    ZR h = group.init(ZR_t);
     CharmListG1 dotBCache;
     CharmListG1 dotCCache;
     for (int z = 0; z < N; z++)
@@ -198,13 +167,13 @@ bool batchverify(string & Lt, CharmListStr & Mlist, G2 & P, CharmListG1 & Slist,
     }
     for (int z = 0; z < N; z++)
     {
-        group.init(*dotALoopVal, 1);
+        group.init(dotALoopVal, 1);
         for (int y = 0; y < l; y++)
         {
-            *h = group.hashListToZR((Element(Mlist[z]) + Element(Lt) + Element(ulist[z][y])));
-            *dotALoopVal = group.mul(*dotALoopVal, group.mul(group.exp(ulist[z][y], delta[z]), group.exp(pklist[y], group.mul(*h, delta[z]))));
+            h = group.hashListToZR((Element(Mlist[z]) + Element(Lt) + Element(ulist[z][y])));
+            dotALoopVal = group.mul(dotALoopVal, group.mul(group.exp(ulist[z][y], delta[z]), group.exp(pklist[y], group.mul(h, delta[z]))));
         }
-        dotBCache[z] = *dotALoopVal;
+        dotBCache[z] = dotALoopVal;
         dotCCache[z] = group.exp(Slist[z], delta[z]);
     }
     dividenconquer(delta, 0, N, incorrectIndices, dotBCache, dotCCache, P, g);
@@ -248,14 +217,14 @@ int main()
     if (status == true)
   	cout << "True!" << endl;
     else
-	cout << "FALSE!!" << endl;
+	cout << "False!" << endl;
 
     bool status2 = verify(Lt, pklist1, P, g, m1, u1, Slist[1]);
 
     if (status2 == true)
   	cout << "True!" << endl;
     else
-	cout << "FALSE!!" << endl;
+	cout << "False!" << endl;
 
     list<int> incorrectIndices;
     CharmListStr Mlist;
