@@ -1927,6 +1927,20 @@ int PairingGroup::div(int g, int h)
 	return g / h;
 }
 
+ZR PairingGroup::exp(ZR x, int y)
+{
+	ZR z = pfcObject->order();
+	if(y == -1) {
+	     return inverse(x, z);
+	}
+	else if(y > 0) {
+		return pow(x, y, z);
+	}
+	else {
+		throw new string("Raising to a negative that isn't -1 is not allowed.\n");
+	}
+}
+
 ZR PairingGroup::exp(ZR x, ZR y)
 {
 	ZR z = pfcObject->order();

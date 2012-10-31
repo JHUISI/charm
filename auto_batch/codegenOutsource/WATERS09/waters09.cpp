@@ -197,7 +197,7 @@ bool verify(G1 & g1, G2 & g2, G1 & g1b, G1 & g1a1, G1 & g1a2, G1 & g1ba1, G1 & g
     tagc = group.random(ZR_t);
     s = group.add(s1, s2);
     M = group.hashListToZR(m);
-    theta = group.inv(group.sub(tagc, tagk));
+    theta = group.exp(group.sub(tagc, tagk), -1);
     if ( ( (group.mul(group.pair(group.exp(g1b, s), S1), group.mul(group.pair(group.exp(g1ba1, s1), S2), group.mul(group.pair(group.exp(g1a1, s1), S3), group.mul(group.pair(group.exp(g1ba2, s2), S4), group.pair(group.exp(g1a2, s2), S5)))))) == (group.mul(group.pair(S6, group.mul(group.exp(tau1, s1), group.exp(tau2, s2))), group.mul(group.pair(S7, group.mul(group.exp(tau1b, s1), group.mul(group.exp(tau2b, s2), group.exp(w, group.neg(t))))), group.mul(group.exp(group.mul(group.pair(S7, group.mul(group.mul(group.exp(u, group.mul(M, t)), group.exp(w, group.mul(tagc, t))), group.exp(h, t))), group.pair(group.exp(g1, group.neg(t)), SK)), theta), group.exp(A, s2))))) ) )
     {
         return true;
@@ -421,7 +421,7 @@ bool batchverify(GT & A, CharmListG2 & S1list, CharmListG2 & S2list, CharmListG2
         s = group.add(s1, s2);
         t = group.random(ZR_t);
         tagc = group.random(ZR_t);
-        theta = group.inv(group.sub(tagc, tagklist[z]));
+        theta = group.exp(group.sub(tagc, tagklist[z]), -1);
         dotACache[z] = group.exp(S1list[z], group.mul(s, delta[z]));
         dotBCache[z] = group.exp(S2list[z], group.mul(s1, delta[z]));
         dotCCache[z] = group.exp(S3list[z], group.mul(s1, delta[z]));

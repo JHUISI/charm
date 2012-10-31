@@ -432,6 +432,7 @@ public:
 	G1 div(G1, G1);
 	GT div(GT, GT);
 
+	ZR exp(ZR, int);
 	ZR exp(ZR, ZR);
 	G1 exp(G1, ZR);
 	GT exp(GT, ZR);

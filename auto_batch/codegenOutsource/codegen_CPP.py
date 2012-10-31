@@ -796,14 +796,16 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
         returnString = processAttrOrTypeAssignStmt(node, replacementsDict)
         if node.isNegated():
             returnString = returnString[1:] # remove the preceding "-" symbol
+        returnThisString = returnString
         
-        if (doesVarNeedStar(returnString)):
-            returnThisString = "*" + returnString
-        else:
-            returnThisString = returnString
+#        if (doesVarNeedStar(returnString)):
+#            returnThisString = starRef + returnString
+#        else:
         
-        if node.isNegated(): # now wrap in negate call.
-            return groupObjName + ".neg" + "(" + returnThisString + ")" 
+        if node.isNegated() and not returnString.isdigit(): # now wrap in negate call.
+            return groupObjName + ".neg" + "(" + returnThisString + ")"
+        elif node.isNegated() and returnString.isdigit():
+            return "-" + returnThisString
         else:
             return returnThisString
 
