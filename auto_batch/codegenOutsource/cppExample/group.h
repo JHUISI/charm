@@ -158,6 +158,7 @@ public:
 	CharmListZR(void); // static list
 	~CharmListZR();
     CharmListZR(const CharmListZR&); // copy constructor
+    CharmListZR& operator=(const CharmListZR&);
 	void append(ZR&);
 	void set(int index, ZR);
 	ZR& get(const int index);
@@ -166,7 +167,6 @@ public:
 
 	// retrieve a particular index
 	ZR& operator[](const int index);
-    CharmListZR& operator=(const CharmListZR&); // TODO: important!
         
     friend ostream& operator<<(ostream&, const CharmListZR&);
 private:
@@ -179,6 +179,8 @@ class CharmMetaListZR
 public:
 	CharmMetaListZR(void); // static list
 	~CharmMetaListZR();
+    CharmMetaListZR(const CharmMetaListZR&); // copy constructor
+    CharmMetaListZR& operator=(const CharmMetaListZR&);
 	// consider adding remove
 	void append(CharmListZR&);
 
@@ -199,9 +201,9 @@ class CharmListG1
 public:
 	CharmListG1(void); // static list
 	~CharmListG1();
+    CharmListG1(const CharmListG1&);
 	void append(G1&);
 	void set(int index, G1);
-    CharmListG1(const CharmListG1&);
 //	G1& get(const int index);
 	int length(); // return length of lists
 	string printAtIndex(int index);
@@ -220,6 +222,9 @@ class CharmMetaListG1
 public:
 	CharmMetaListG1(void); // static list
 	~CharmMetaListG1();
+    CharmMetaListG1(const CharmMetaListG1&); // copy constructor
+    CharmMetaListG1& operator=(const CharmMetaListG1&);
+
 	// consider adding remove
 	void append(CharmListG1&);
 
@@ -259,6 +264,9 @@ class CharmMetaListG2
 public:
 	CharmMetaListG2(void); // static list
 	~CharmMetaListG2();
+    CharmMetaListG2(const CharmMetaListG2&); // copy constructor
+    CharmMetaListG2& operator=(const CharmMetaListG2&);
+
 	// consider adding remove
 	void append(CharmListG2&);
 
@@ -299,6 +307,8 @@ class CharmMetaListGT
 public:
 	CharmMetaListGT(void); // static list
 	~CharmMetaListGT();
+    CharmMetaListGT(const CharmMetaListGT&); // copy constructor
+    CharmMetaListGT& operator=(const CharmMetaListGT&);
 	// consider adding remove
 	void append(CharmListGT&);
 

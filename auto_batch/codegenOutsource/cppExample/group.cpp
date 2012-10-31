@@ -846,6 +846,13 @@ CharmMetaListZR::~CharmMetaListZR()
 		list.erase(i);
 }
 
+CharmMetaListZR::CharmMetaListZR(const CharmMetaListZR& cList)
+{
+	//copy constructor
+	cur_index = cList.cur_index;
+	list = cList.list;
+}
+
 void CharmMetaListZR::append(CharmListZR & zr)
 {
 	list[cur_index] = zr;
@@ -899,6 +906,23 @@ ostream& operator<<(ostream& s, const CharmMetaListZR& cList)
 
 	return s;
 }
+
+CharmMetaListZR& CharmMetaListZR::operator=(const CharmMetaListZR& cList)
+{
+	if(this == &cList)
+		return *this;
+
+	// delete current list contents first
+	int i;
+	for(i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+	cur_index = 0;
+
+	cur_index = cList.cur_index;
+	list = cList.list;
+	return *this;
+}
+
 
 // end CharmMetaListZR implementation
 
@@ -1036,6 +1060,13 @@ CharmMetaListG1::~CharmMetaListG1()
 		list.erase(i);
 }
 
+CharmMetaListG1::CharmMetaListG1(const CharmMetaListG1& cList)
+{
+	//copy constructor
+	cur_index = cList.cur_index;
+	list = cList.list;
+}
+
 void CharmMetaListG1::append(CharmListG1 & zr)
 {
 	list[cur_index] = zr;
@@ -1088,6 +1119,22 @@ ostream& operator<<(ostream& s, const CharmMetaListG1& cList)
 	}
 
 	return s;
+}
+
+CharmMetaListG1& CharmMetaListG1::operator=(const CharmMetaListG1& cList)
+{
+	if(this == &cList)
+		return *this;
+
+	// delete current list contents first
+	int i;
+	for(i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+	cur_index = 0;
+
+	cur_index = cList.cur_index;
+	list = cList.list;
+	return *this;
 }
 
 // end CharmMetaListG1 implementation
@@ -1199,6 +1246,13 @@ CharmMetaListG2::~CharmMetaListG2()
 		list.erase(i);
 }
 
+CharmMetaListG2::CharmMetaListG2(const CharmMetaListG2& cList)
+{
+	//copy constructor
+	cur_index = cList.cur_index;
+	list = cList.list;
+}
+
 void CharmMetaListG2::append(CharmListG2 & g2)
 {
 	list[cur_index] = g2;
@@ -1250,6 +1304,23 @@ ostream& operator<<(ostream& s, const CharmMetaListG2& cList)
 
 	return s;
 }
+
+CharmMetaListG2& CharmMetaListG2::operator=(const CharmMetaListG2& cList)
+{
+	if(this == &cList)
+		return *this;
+
+	// delete current list contents first
+	int i;
+	for(i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+	cur_index = 0;
+
+	cur_index = cList.cur_index;
+	list = cList.list;
+	return *this;
+}
+
 
 // end CharmMetaListG2 implementation
 
@@ -1359,6 +1430,13 @@ CharmMetaListGT::~CharmMetaListGT()
 		list.erase(i);
 }
 
+CharmMetaListGT::CharmMetaListGT(const CharmMetaListGT& cList)
+{
+	//copy constructor
+	cur_index = cList.cur_index;
+	list = cList.list;
+}
+
 void CharmMetaListGT::append(CharmListGT & gt)
 {
 	list[cur_index] = gt;
@@ -1410,6 +1488,23 @@ ostream& operator<<(ostream& s, const CharmMetaListGT& cList)
 
 	return s;
 }
+
+CharmMetaListGT& CharmMetaListGT::operator=(const CharmMetaListGT& cList)
+{
+	if(this == &cList)
+		return *this;
+
+	// delete current list contents first
+	int i;
+	for(i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+	cur_index = 0;
+
+	cur_index = cList.cur_index;
+	list = cList.list;
+	return *this;
+}
+
 
 // end CharmMetaListGT implementation
 
