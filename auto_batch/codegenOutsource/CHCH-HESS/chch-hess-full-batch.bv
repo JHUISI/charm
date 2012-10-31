@@ -32,8 +32,8 @@ S1hlist := list{GT}
 END :: types
 
 BEGIN :: precompute
-ah := H(M | S1h, ZR)
-ac := H(M | S1c, ZR)
+ah := H(concat{M, S1h}, ZR)
+ac := H(concat{M, S1c}, ZR)
 END :: precompute
 
 constant := list{P, g2}
@@ -66,8 +66,8 @@ END :: latex
 BEGIN :: func:verify
 input := list{S1h, S2h, S1c, S2c, pk, P, g2, M}
 
- ah := H(M | S1h, ZR)
- ac := H(M | S1c, ZR)
+ ah := H(concat{M, S1h}, ZR)
+ ac := H(concat{M, S1c}, ZR)
 
 BEGIN :: if
 if {{ e(S2h, g2) == (( e(pk^ah, P) ) * S1h) } and { e(S2c, g2) == (e(S1c * pk^ac, P)) }}
@@ -176,8 +176,8 @@ END :: if
 
 BEGIN :: for
 for{z := 0, N}
-ac := H(Mlist#z | S1clist#z,ZR)
-ah := H(Mlist#z | S1hlist#z,ZR)
+ac := H(concat{Mlist#z, S1clist#z}, ZR)
+ah := H(concat{Mlist#z, S1hlist#z}, ZR)
 dotACache#z := ((pklist#z^(ah * delta1#z)) * ((S1clist#z^-delta2#z) * (pklist#z^(-ac * delta2#z))))
 dotBCache#z := (S1hlist#z^delta1#z)
 dotCCache#z := ((S2hlist#z^-delta1#z) * (S2clist#z^delta2#z))

@@ -566,6 +566,11 @@ def getVarTypeFromVarName(varName, functionNameArg_TieBreaker, failSilently=Fals
     varNameSplit = varName.split(LIST_INDEX_SYMBOL)
     return getVarTypeFromVarName(varNameSplit[0], functionNameArg_TieBreaker, False, True)
 
+def isValidMetaType(varTypeObj):
+    if varTypeObj != None:
+        return isValidType(varTypeObj.getType())
+    return False
+
 def setVarTypeObjForTypedList(varTypeObj, listType):
     if (listType == "G1"):
         varTypeObj.setType(types.listG1)
@@ -582,6 +587,25 @@ def setVarTypeObjForTypedList(varTypeObj, listType):
     else:
         sys.exit("setVarTypeObjForTypedList in SDLParser.py:  listType passed in is not one of the supported types.")
 
+def setVarTypeObjForTypedMetaList(varTypeObj, listType):
+    if (listType == types.listG1):
+        varTypeObj.setType(types.metalistG1)
+    elif (listType == types.listG2):
+        varTypeObj.setType(types.metalistG2)
+    elif (listType == types.listGT):
+        varTypeObj.setType(types.metalistGT)
+    elif (listType == types.listZR):
+        varTypeObj.setType(types.metalistZR)
+    elif (listType == types.listStr):
+        varTypeObj.setType(types.metalistStr)
+    elif (listType == types.listInt):
+        varTypeObj.setType(types.metalistInt)
+    else:
+        return False
+    return True
+#        sys.exit("setVarTypeObjForTypedList in SDLParser.py:  listType passed in is not one of the supported types.")
+
+
 def setVarTypeObjForList(varTypeObj, typeNode):
     if (type(typeNode).__name__ != BINARY_NODE_CLASS_NAME):
         sys.exit("setVarTypeObjForList in SDLParser.py received as input for typeNode a parameter that is not a Binary Node.")
@@ -591,9 +615,15 @@ def setVarTypeObjForList(varTypeObj, typeNode):
 
     if ( (len(typeNode.listNodes) == 1) and (isValidType(typeNode.listNodes[0]) == True) ):
         setVarTypeObjForTypedList(varTypeObj, typeNode.listNodes[0])
+    elif ( (len(typeNode.listNodes) == 1) and (isValidMetaType(varTypes[TYPES_HEADER].get(typeNode.listNodes[0])) == True) ):
+        retValue = setVarTypeObjForTypedMetaList(varTypeObj, varTypes[TYPES_HEADER].get(typeNode.listNodes[0]).getType())
+        if retValue == False:
+            varTypeObj.setType(types.list)
+            addListNodesToList(typeNode, varTypeObj.getListNodesList())
     else:
         varTypeObj.setType(types.list)
         addListNodesToList(typeNode, varTypeObj.getListNodesList())
+        
 
 def updateVarTypes(node, i, newType=types.NO_TYPE):
     global varTypes, assignInfo
@@ -907,16 +937,18 @@ def checkForListWithOneNumIndex(nodeName):
 def getVarTypeFromVarTypesDict(possibleFuncName, nodeAttrFullName):
     typeDef = varTypes[possibleFuncName][nodeAttrFullName].getType()
     
-    if typeDef == types.listZR:
+    if typeDef in [types.listZR, types.metalistZR]:
         return types.ZR
-    elif typeDef == types.listG1:
+    elif typeDef in [types.listG1, types.metalistG1]:
         return types.G1
-    elif typeDef == types.listG2:
+    elif typeDef in [types.listG2, types.metalistG2]:
         return types.G2
-    elif typeDef == types.listGT:
+    elif typeDef in [types.listGT, types.metalistGT]:
         return types.GT
-    elif typeDef == types.listStr:
+    elif typeDef in [types.listStr, types.metalistStr]:
         return types.str
+    elif typeDef in [types.listInt, types.metalistInt]:
+        return types.int
     
     return typeDef
 
@@ -925,15 +957,15 @@ def getVarTypeInfoForAttr_List(node):
     if ( (funcNameOfVar != None) and (varNameInList != None) ):
         if ( (funcNameOfVar in varTypes) and (varNameInList in varTypes[funcNameOfVar]) ):
             firstReturnType = varTypes[funcNameOfVar][varNameInList].getType()
-            if firstReturnType == types.listZR: 
+            if firstReturnType in [types.listZR, types.metalistZR]: 
                 return types.ZR
-            elif firstReturnType == types.listG1: 
+            elif firstReturnType in [types.listG1, types.metalistG1]: 
                 return types.G1
-            elif firstReturnType == types.listG2: 
+            elif firstReturnType in [types.listG2, types.metalistG2]: 
                 return types.G2
-            elif firstReturnType == types.listGT: 
+            elif firstReturnType in [types.listGT, types.metalistGT]: 
                 return types.GT
-            elif firstReturnType == types.listStr:
+            elif firstReturnType in [types.listStr, types.metalistStr]:
                 return types.str
             return firstReturnType
 
@@ -990,8 +1022,8 @@ def getVarTypeInfoForAttr(node):
 #    if (nodeAttrFullName == "1"): 
 #        return types.ZR
     
-    if (varTypes.get("types") and nodeAttrFullName in varTypes["types"]):
-        return varTypes["types"][nodeAttrFullName].getType()
+    if (varTypes.get(TYPES_HEADER) and nodeAttrFullName in varTypes[TYPES_HEADER]):
+        return varTypes[TYPES_HEADER][nodeAttrFullName].getType()
 #        return varTypes["type"].get(nodeAttrFullName).getType()
     
     return types.NO_TYPE
