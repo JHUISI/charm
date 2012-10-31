@@ -3,6 +3,7 @@ N := 2
 setting := asymmetric
 
 BEGIN :: types
+S2 := G1
 g2 := G2
 S1 := G1
 pk := G1
@@ -11,7 +12,7 @@ P := G2
 ID := str
 M := str
 incorrectIndices := list{int}
-endSigNum  := int
+endSigNum := int
 startSigNum := int
 delta := list{ZR}
 dotALoopVal := G1
@@ -78,23 +79,8 @@ verify := {e(S2, g2) == e(S1*(pk^a), P)}
 secparam := 80
 
 BEGIN :: func:membership
- input := list{g2, pklist, Mlist, P, S1list, S2list}
+ input := list{P, S1list, S2list, g2, pklist}
 
-
-BEGIN :: if
-if { ismember(g2) == False }
-    output := False
-END :: if
-
-BEGIN :: if
-if { ismember(pklist) == False }
-    output := False
-END :: if
-
-BEGIN :: if
-if { ismember(Mlist) == False }
-    output := False
-END :: if
 
 BEGIN :: if
 if { ismember(P) == False }
@@ -111,12 +97,22 @@ if { ismember(S2list) == False }
     output := False
 END :: if
 
+BEGIN :: if
+if { ismember(g2) == False }
+    output := False
+END :: if
+
+BEGIN :: if
+if { ismember(pklist) == False }
+    output := False
+END :: if
+
  output := True
 END :: func:membership
 
 
 BEGIN :: func:dividenconquer
- input := list{delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, g2, pklist, Mlist, P, S1list, S2list}
+ input := list{delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, g2, P}
 dotALoopVal := init(G1)
 dotBLoopVal := init(G1)
 
@@ -140,8 +136,8 @@ BEGIN :: if
     output := None
  else
     midSigNum := startSigNum + midway
-    dividenconquer(delta, startSigNum, midway, incorrectIndices, dotACache, dotBCache, g2, pklist, Mlist, P, S1list, S2list)
-    dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, g2, pklist, Mlist, P, S1list, S2list)
+    dividenconquer(delta, startSigNum, midway, incorrectIndices, dotACache, dotBCache, g2, P)
+    dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, g2, P)
 END :: if
 
 
@@ -150,7 +146,7 @@ END ::func:dividenconquer
 
 
 BEGIN :: func:batchverify
-input := list{g2, pklist, Mlist, P, S1list, S2list, incorrectIndices}
+input := list{Mlist, P, S1list, S2list, g2, pklist, incorrectIndices}
 
 BEGIN :: for
 for{z := 0, N}
@@ -158,18 +154,18 @@ for{z := 0, N}
 END :: for
 
 BEGIN :: if
- if {(membership(g2, pklist, Mlist, P, S1list, S2list) == False)}
+ if {(membership(P, S1list, S2list, g2, pklist) == False)}
      output := False
 END :: if
 
 
 BEGIN :: for
 for{z := 0, N}
-a := H(concat{Mlist#z, S1list#z}, ZR)
+a := H(concat{Mlist#z, S1list#z},ZR)
 dotACache#z := (S2list#z^delta#z)
 dotBCache#z := ((S1list#z^delta#z) * (pklist#z^(a * delta#z)))
 END :: for
- dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, g2, pklist, Mlist, P, S1list, S2list)
+ dividenconquer(delta, 0, N, incorrectIndices, dotACache, dotBCache, g2, P)
 
  output := incorrectIndices
 END ::func:batchverify
