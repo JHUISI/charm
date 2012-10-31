@@ -138,12 +138,14 @@ class CharmListStr
 public:
 	CharmListStr(void); // static list
 	~CharmListStr();
+    CharmListStr(const CharmListStr&); // copy constructor
 	void append(string&);
 	int length(); // return length of lists
 	string printAtIndex(int index);
 
 	// retrieve a particular index
 	string& operator[](const int index);
+    CharmListStr& operator=(const CharmListStr&);
     friend ostream& operator<<(ostream&, const CharmListStr&);
 private:
 	int cur_index;

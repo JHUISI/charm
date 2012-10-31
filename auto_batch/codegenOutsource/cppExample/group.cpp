@@ -561,7 +561,6 @@ CharmList& CharmList::operator=(const CharmList& cList)
 	return *this;
 }
 
-
 int CharmList::length()
 {
 	return (int) list.size();
@@ -642,6 +641,13 @@ CharmListStr::~CharmListStr()
 		list.erase(i);
 }
 
+CharmListStr::CharmListStr(const CharmListStr& cList)
+{
+	//copy constructor
+	cur_index = cList.cur_index;
+	list = cList.list;
+}
+
 void CharmListStr::append(string & s)
 {
 	list[cur_index] = s;
@@ -664,6 +670,22 @@ string& CharmListStr::operator[](const int index)
 	else {
 		throw new string("Invalid access.\n");
 	}
+}
+
+CharmListStr& CharmListStr::operator=(const CharmListStr& cList)
+{
+	if(this == &cList)
+		return *this;
+
+	// delete current list contents first
+	int i;
+	for(i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+	cur_index = 0;
+
+	cur_index = cList.cur_index;
+	list = cList.list;
+	return *this;
 }
 
 int CharmListStr::length()
