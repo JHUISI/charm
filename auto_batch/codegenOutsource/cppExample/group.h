@@ -47,16 +47,23 @@ class CharmList
 public:
 	CharmList(void); // static list
 	~CharmList();
+    CharmList(const CharmList&); // copy constructor
 	// consider adding remove
 	void append(const char *);
 	void append(string);
 	void append(ZR&);
+	void append(const ZR&);
 	void append(G1&);
+	void append(const G1&);
 #ifdef ASYMMETRIC
 	void append(G2&);
+	void append(const G2&);
 #endif
 	void append(GT&);
+	void append(const GT&);
 	void append(Element&);
+	void append(const Element&);
+
 	void append(const CharmList&);
 
 	int length(); // return length of lists
@@ -66,6 +73,7 @@ public:
 	CharmList operator+(const Element&) const;
 	CharmList operator+(const CharmList&) const;
 	Element& operator[](const int index);
+	CharmList& operator=(const CharmList&);
     friend ostream& operator<<(ostream&, const CharmList&);
 private:
 	int cur_index;
@@ -77,10 +85,10 @@ class Element
 public:
 	// public values for now
 	int type;
-	ZR *zr;
-	G1 *g1;
-	G2 *g2;
-	GT *gt;
+	ZR zr;
+	G1 g1;
+	G2 g2;
+	GT gt;
 	string strPtr;
 	Element();
 	~Element();
@@ -147,6 +155,7 @@ class CharmListZR
 public:
 	CharmListZR(void); // static list
 	~CharmListZR();
+    CharmListZR(const CharmListZR&); // copy constructor
 	void append(ZR&);
 	void set(int index, ZR);
 	ZR& get(const int index);
@@ -155,6 +164,8 @@ public:
 
 	// retrieve a particular index
 	ZR& operator[](const int index);
+    CharmListZR& operator=(const CharmListZR&); // TODO: important!
+        
     friend ostream& operator<<(ostream&, const CharmListZR&);
 private:
 	int cur_index;
@@ -188,6 +199,7 @@ public:
 	~CharmListG1();
 	void append(G1&);
 	void set(int index, G1);
+    CharmListG1(const CharmListG1&);
 //	G1& get(const int index);
 	int length(); // return length of lists
 	string printAtIndex(int index);
@@ -195,7 +207,7 @@ public:
 	// retrieve a particular index
 	G1& operator[](const int index);
 	CharmListG1& operator=(const CharmListG1&);
-        friend ostream& operator<<(ostream&, const CharmListG1&);
+    friend ostream& operator<<(ostream&, const CharmListG1&);
 private:
 	int cur_index;
 	map<int, G1> list;
@@ -226,12 +238,14 @@ class CharmListG2
 public:
 	CharmListG2(void); // static list
 	~CharmListG2();
+    CharmListG2(const CharmListG2&);
 	void append(G2&);
 	int length(); // return length of lists
 	string printAtIndex(int index);
 
 	// retrieve a particular index
 	G2& operator[](const int index);
+	CharmListG2& operator=(const CharmListG2&);
     friend ostream& operator<<(ostream&, const CharmListG2&);
 private:
 	int cur_index;
@@ -262,14 +276,16 @@ private:
 class CharmListGT
 {
 public:
-	CharmListGT(void); // static list
+	CharmListGT(void);
 	~CharmListGT();
+    CharmListGT(const CharmListGT&);
 	void append(GT&);
 	int length(); // return length of lists
 	string printAtIndex(int index);
 
 	// retrieve a particular index
 	GT& operator[](const int index);
+	CharmListGT& operator=(const CharmListGT&);
     friend ostream& operator<<(ostream&, const CharmListGT&);
 private:
 	int cur_index;
@@ -336,17 +352,22 @@ public:
 	// generate random
 	void init(ZR&, char*);
 	void init(ZR&, int);
-	ZR* init(ZR_type);
-	ZR* init(ZR_type, int);
-	G1* init(G1_type);
-	G1* init(G1_type, int);
+//	ZR* init(ZR_type);
+//	ZR* init(ZR_type, int);
+//	G1* init(G1_type);
+//	G1* init(G1_type, int);
 	void init(G1&, int);
-	GT* init(GT_type);
-	GT* init(GT_type, int);
+//	GT* init(GT_type);
+//	GT* init(GT_type, int);
 	void init(GT&, int);
-	//void random(ZR&);
-	//void random(G1&);
-	//void random(GT&);
+
+	ZR init(ZR_type);
+	ZR init(ZR_type, int);
+	G1 init(G1_type);
+	G1 init(G1_type, int);
+	GT init(GT_type);
+	GT init(GT_type, int);
+
 	ZR random(ZR_type);
 	G1 random(G1_type);
 	GT random(GT_type);
@@ -365,8 +386,10 @@ public:
 	bool ismember(GT&);
 
 #ifdef ASYMMETRIC
-	G2* init(G2_type);
-	G2* init(G2_type, int);
+//	G2* init(G2_type);
+//	G2* init(G2_type, int);
+	G2 init(G2_type);
+	G2 init(G2_type, int);
 	void init(G2&, int);
 	G2 random(G2_type);
 	bool ismember(G2&);
@@ -436,12 +459,13 @@ private:
 };
 
 // to support codegen
+ZR SmallExp(int bits);
 void parsePartCT(const char *filename, CharmDict & d);
 void parseKeys(const char *filename, ZR & sk, GT & pk);
 string SymDec(string k, string c_encoded);
 bool isNotEqual(string value1, string value2);
 void stringToInt(PairingGroup & group, string strID, int z, int l, CharmListZR & zrlist);
-CharmListZR & stringToInt(PairingGroup & group, string strID, int z, int l);
+CharmListZR stringToInt(PairingGroup & group, string strID, int z, int l);
 string concat(CharmListStr & list);
 ZR ceillog(int base, int value);
 

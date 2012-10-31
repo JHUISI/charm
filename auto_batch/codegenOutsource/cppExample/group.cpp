@@ -137,55 +137,55 @@ Element::Element(string s)
 Element::Element(ZR & z)
 {
 	type = ZR_t;
-	zr   = &z;
+	zr   = z;
 	isAllocated = false;
 }
 
 void Element::createNew(ZR &z)
 {
 	type = ZR_t;
-	zr   = new ZR(z);
+	zr   = z; // new ZR(z);
 	isAllocated = true;
 }
 
 Element::Element(G1 & g)
 {
 	type = G1_t;
-	g1   = &g;
+	g1   = g;
 	isAllocated = false;
 }
 
 void Element::createNew(G1 g)
 {
 	type = G1_t;
-	g1   = new G1(g);
+	g1   = g; // new G1(g);
 }
 
 Element::Element(G2 & g)
 {
 	type = G2_t;
-	g2   = &g;
+	g2   = g;
 	isAllocated = false;
 }
 
 void Element::createNew(G2 g)
 {
 	type = G2_t;
-	g2   = new G2(g);
+	g2   = g; // new G2(g);
 	isAllocated = true;
 }
 
 Element::Element(GT & g)
 {
 	type = GT_t;
-	gt   = &g;
+	gt   = g;
 	isAllocated = false;
 }
 
 void Element::createNew(GT g)
 {
 	type = GT_t;
-	gt   = new GT(g);
+	gt   = g; // new GT(g);
 	isAllocated = true;
 }
 
@@ -208,39 +208,39 @@ Element::Element(const Element& e)
 
 ZR Element::getZR()
 {
-	if(type == ZR_t) return *zr;
+	if(type == ZR_t) return zr;
 	throw new string("invalid type.");
 }
 
 ZR & Element::getRefZR()
 {
-	if(type == ZR_t) return *zr;
+	if(type == ZR_t) return zr;
 	throw new string("invalid type.");
 }
 
 G1 Element::getG1()
 {
-	if(type == G1_t) return *g1;
+	if(type == G1_t) return g1;
 	throw new string("invalid type.");
 }
 
 #ifdef ASYMMETRIC
 G2 Element::getG2()
 {
-	if(type == G2_t) return *g2;
+	if(type == G2_t) return g2;
 	throw new string("invalid type.");
 }
 
 G2 & Element::getRefG2()
 {
-	if(type == G2_t) return *g2;
+	if(type == G2_t) return g2;
 	throw new string("invalid type.");
 }
 #endif
 
 GT Element::getGT()
 {
-	if(type == GT_t) return *gt;
+	if(type == GT_t) return gt;
 	throw new string("invalid type.");
 }
 
@@ -250,46 +250,49 @@ string Element::str()
 	if(type == Str_t)
 		ss << strPtr;
 	else if(type == ZR_t)
-		ss << *zr;
+		ss << zr;
 	else if(type == G1_t)
-		ss << g1->g;
+		ss << g1.g;
 	else if(type == G2_t)
-		ss << g2->g;
+		ss << g2.g;
 	else if(type == GT_t)
-		ss << gt->g;
+		ss << gt.g;
 	return ss.str();
 }
 
 Element::~Element()
 {
 	if(type == ZR_t && isAllocated) {
-		delete zr;
+//		delete zr;
 	}
 	if(type == G1_t && isAllocated) {
-		delete g1;
+//		delete g1;
 	}
 	if(type == G2_t && isAllocated) {
-		delete g2;
+//		delete g2;
 	}
 	if(type == GT_t && isAllocated) {
-		delete gt;
+//		delete gt;
 	}
 }
 
 void Element::delGroupElement()
 {
-	if(type == ZR_t)
-	    delete zr;
-	else if(type == G1_t)
-	    delete g1;
-	else if(type == G2_t)
-	    delete g2;
-	else if(type == GT_t)
-	    delete gt;
+//	if(type == ZR_t)
+//	    delete zr;
+//	else if(type == G1_t)
+//	    delete g1;
+//	else if(type == G2_t)
+//	    delete g2;
+//	else if(type == GT_t)
+//	    delete gt;
 }
 
 Element Element::operator=(const Element& e)
 {
+	if(this == &e)
+		return *this;
+
 	type = e.type;
 	if(type == Str_t)
 		strPtr = e.strPtr;
@@ -312,24 +315,24 @@ CharmList Element::operator+ (const Element& e) const
 	if (this->type == Str_t)
 	      	c.append(this->strPtr);
 	else if(this->type == ZR_t)
-		c.append(*this->zr);
+		c.append(this->zr);
 	else if(this->type == G1_t)
-		c.append(*this->g1);
+		c.append(this->g1);
 	else if(this->type == G2_t)
-		c.append(*this->g2);
+		c.append(this->g2);
 	else if(this->type == GT_t)
-		c.append(*this->gt);
+		c.append(this->gt);
 
 	if (e.type == Str_t)
      	c.append(e.strPtr);
 	else if(e.type == ZR_t)
-		c.append(*e.zr);
+		c.append(e.zr);
 	else if(e.type == G1_t)
-		c.append(*e.g1);
+		c.append(e.g1);
 	else if(e.type == G2_t)
-		c.append(*e.g2);
+		c.append(e.g2);
 	else if(e.type == GT_t)
-		c.append(*e.gt);
+		c.append(e.gt);
 
 	return c;
 }
@@ -417,6 +420,14 @@ CharmList::~CharmList()
 		list.erase(i);
 }
 
+CharmList::CharmList(const CharmList& cList)
+{
+	//copy constructor
+	cur_index = cList.cur_index;
+	list = cList.list;
+}
+
+
 void CharmList::append(const char *s)
 {
 	Element elem(s);
@@ -438,12 +449,30 @@ void CharmList::append(ZR & zr)
 	cur_index++;
 }
 
+void CharmList::append(const ZR & zr)
+{
+	ZR zr_1 = zr;
+	Element elem(zr_1);
+	list[cur_index] = elem;
+	cur_index++;
+}
+
+
 void CharmList::append(G1 & g1)
 {
 	Element elem(g1);
 	list[cur_index] = elem;
 	cur_index++;
 }
+
+void CharmList::append(const G1 & g1)
+{
+	G1 g1_1 = g1;
+	Element elem(g1_1);
+	list[cur_index] = elem;
+	cur_index++;
+}
+
 
 #ifdef ASYMMETRIC
 void CharmList::append(G2 & g2)
@@ -452,21 +481,47 @@ void CharmList::append(G2 & g2)
 	list[cur_index] = elem;
 	cur_index++;
 }
+
+void CharmList::append(const G2 & g2)
+{
+	G2 g2_1 = g2;
+	Element elem(g2_1);
+	list[cur_index] = elem;
+	cur_index++;
+}
+
+
 #endif
 
 void CharmList::append(GT & gt)
 {
 	Element elem(gt);
-
 	list[cur_index] = elem;
 	cur_index++;
 }
+
+void CharmList::append(const GT & gt)
+{
+	GT gt_1 = gt;
+	Element elem(gt_1);
+	list[cur_index] = elem;
+	cur_index++;
+}
+
 
 void CharmList::append(Element & e)
 {
 	list[cur_index] = e;
 	cur_index++;
 }
+
+void CharmList::append(const Element & e)
+{
+	Element e1 = e;
+	list[cur_index] = e1;
+	cur_index++;
+}
+
 
 void CharmList::append(const CharmList & c)
 {
@@ -489,6 +544,23 @@ Element& CharmList::operator[](const int index)
 		throw new string("Invalid access.\n");
 	}
 }
+
+CharmList& CharmList::operator=(const CharmList& cList)
+{
+	if(this == &cList)
+		return *this;
+
+	// delete current list contents first
+	int i;
+	for(i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+	cur_index = 0;
+
+	cur_index = cList.cur_index;
+	list = cList.list;
+	return *this;
+}
+
 
 int CharmList::length()
 {
@@ -535,18 +607,18 @@ string CharmList::printAtIndex(int index)
 			ss << list[i].strPtr;
 		}
 		else if(t == ZR_t) {
-			ss << *list[i].zr;
+			ss << list[i].zr;
 		}
 		else if(t == G1_t) {
-			ss << list[i].g1->g;
+			ss << list[i].g1.g;
 		}
 #ifdef ASYMMETRIC
 		else if(t == G2_t) {
-			ss << list[i].g2->g;
+			ss << list[i].g2.g;
 		}
 #endif
 		else if(t == GT_t) {
-			ss << list[i].gt->g;
+			ss << list[i].gt.g;
 		}
 	}
 
@@ -640,6 +712,13 @@ CharmListZR::~CharmListZR()
 		list.erase(i);
 }
 
+CharmListZR::CharmListZR(const CharmListZR& cList)
+{
+	//copy constructor
+	cur_index = cList.cur_index;
+	list = cList.list;
+}
+
 void CharmListZR::append(ZR & zr)
 {
 	list[cur_index] = zr;
@@ -705,11 +784,28 @@ string CharmListZR::printAtIndex(int index)
 ostream& operator<<(ostream& s, const CharmListZR& cList)
 {
 	CharmListZR cList2 = cList;
+
 	for(int i = 0; i < cList2.length(); i++) {
 		s << i << ": " << cList2.printAtIndex(i) << endl;
 	}
 
 	return s;
+}
+
+CharmListZR& CharmListZR::operator=(const CharmListZR& cList)
+{
+	if(this == &cList)
+		return *this;
+
+	// delete current list contents first
+	int i;
+	for(i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+	cur_index = 0;
+
+	cur_index = cList.cur_index;
+	list = cList.list;
+	return *this;
 }
 
 // end CharmListZR implementation
@@ -799,6 +895,13 @@ CharmListG1::~CharmListG1()
 		list.erase(i);
 }
 
+CharmListG1::CharmListG1(const CharmListG1& cList)
+{
+	//copy constructor
+	cur_index = cList.cur_index;
+	list = cList.list;
+}
+
 void CharmListG1::append(G1 & g)
 {
 	list[cur_index] = g;
@@ -843,11 +946,28 @@ G1& CharmListG1::operator[](const int index)
 	}
 }
 
-CharmListG1& CharmListG1::operator=(const CharmListG1 & newList)
+//CharmListG1& CharmListG1::operator=(const CharmListG1 & newList)
+//{
+//    list = newList.list;
+//    return *this;
+//}
+
+CharmListG1& CharmListG1::operator=(const CharmListG1& cList)
 {
-    list = newList.list;
-    return *this;
+	if(this == &cList)
+		return *this;
+
+	// delete current list contents first
+	int i;
+	for(i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+	cur_index = 0;
+
+	cur_index = cList.cur_index;
+	list = cList.list;
+	return *this;
 }
+
 
 int CharmListG1::length()
 {
@@ -965,6 +1085,13 @@ CharmListG2::~CharmListG2()
 		list.erase(i);
 }
 
+CharmListG2::CharmListG2(const CharmListG2& cList)
+{
+	//copy constructor
+	cur_index = cList.cur_index;
+	list = cList.list;
+}
+
 void CharmListG2::append(G2 & g)
 {
 	list[cur_index] = g;
@@ -987,6 +1114,22 @@ G2& CharmListG2::operator[](const int index)
 	else {
 		throw new string("Invalid access.\n");
 	}
+}
+
+CharmListG2& CharmListG2::operator=(const CharmListG2& cList)
+{
+	if(this == &cList)
+		return *this;
+
+	// delete current list contents first
+	int i;
+	for(i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+	cur_index = 0;
+
+	cur_index = cList.cur_index;
+	list = cList.list;
+	return *this;
 }
 
 int CharmListG2::length()
@@ -1102,6 +1245,13 @@ CharmListGT::~CharmListGT()
 		list.erase(i);
 }
 
+CharmListGT::CharmListGT(const CharmListGT& cList)
+{
+	//copy constructor
+	cur_index = cList.cur_index;
+	list = cList.list;
+}
+
 void CharmListGT::append(GT & g)
 {
 	list[cur_index] = g;
@@ -1124,6 +1274,22 @@ GT& CharmListGT::operator[](const int index)
 	else {
 		throw new string("Invalid access.\n");
 	}
+}
+
+CharmListGT& CharmListGT::operator=(const CharmListGT& cList)
+{
+	if(this == &cList)
+		return *this;
+
+	// delete current list contents first
+	int i;
+	for(i = 0; i < (int) list.size(); i++)
+		list.erase(i);
+	cur_index = 0;
+
+	cur_index = cList.cur_index;
+	list = cList.list;
+	return *this;
 }
 
 int CharmListGT::length()
@@ -1306,18 +1472,20 @@ PairingGroup::PairingGroup(int sec_level)
 	time(&seed);
     irand((long)seed);
 
-    G1 *g1 = new G1();
-    pfcObject->random(*g1);
+//    G1 *g1 = new G1();
+    G1 g1;
+    pfcObject->random(g1);
 #ifdef ASYMMETRIC
-    G2 *g2 = new G2();
-    pfcObject->random(*g2);
+//    G2 *g2 = new G2();
+    G2 g2;
+    pfcObject->random(g2);
 
-    gt = new GT(pfcObject->pairing(*g2, *g1));
-    delete g2;
+    gt = new GT(pfcObject->pairing(g2, g1));
+//    delete g2;
 #else
     gt = new GT(pfcObject->pairing(*g1, *g1));
 #endif
-    delete g1;
+//    delete g1;
 
 	gt_id = new GT(pfcObject->power(*gt, ZR(0)));
 }
@@ -1326,39 +1494,42 @@ PairingGroup::~PairingGroup()
 {
 	delete pfcObject;
 	delete gt;
+	delete gt_id;
 }
 
 void PairingGroup::init(ZR & r, char *value)
 {
 	big x = mirvar(0);
 	cinstr(x, value);
-	r = x; //should copy this
+	r = ZR(x); //should copy this
+	mr_free(x);
 }
 
-ZR *PairingGroup::init(ZR_type t, int value)
+ZR PairingGroup::init(ZR_type t, int value)
 {
 	big x = mirvar(value);
-	ZR *zr = new ZR(x);
-        mr_free(x);
+	ZR zr(x); // = new ZR(x);
+    mr_free(x);
 	return zr;
 }
 
 void PairingGroup::init(ZR & r, int value)
 {
 	big x = mirvar(value);
-	r = x;
+	r = ZR(x); //should copy this
+	mr_free(x);
 	return;
 }
 
-ZR *PairingGroup::init(ZR_type t)
+ZR PairingGroup::init(ZR_type t)
 {
-	ZR *zr = new ZR();
+	ZR zr; // = new ZR();
 	return zr;
 }
 
-G1 *PairingGroup::init(G1_type t)
+G1 PairingGroup::init(G1_type t)
 {
-	G1 *g1 = new G1();
+	G1 g1;// = new G1();
 	return g1;
 }
 
@@ -1369,22 +1540,22 @@ void PairingGroup::init(G1 & t, int value)
 	return;
 }
 
-G1 *PairingGroup::init(G1_type t, int value)
+G1 PairingGroup::init(G1_type t, int value)
 {
-	G1 *g1 = new G1();
+	G1 g1; // = new G1();
 	return g1;
 }
 
 #ifdef ASYMMETRIC
-G2 *PairingGroup::init(G2_type t)
+G2 PairingGroup::init(G2_type t)
 {
-	G2 *g2 = new G2();
+	G2 g2; // = new G2();
 	return g2;
 }
 
-G2 *PairingGroup::init(G2_type t, int value)
+G2 PairingGroup::init(G2_type t, int value)
 {
-	G2 *g2 = new G2();
+	G2 g2; // = new G2();
 	return g2;
 }
 
@@ -1396,15 +1567,15 @@ void PairingGroup::init(G2 & t, int value)
 }
 #endif
 
-GT *PairingGroup::init(GT_type t)
+GT PairingGroup::init(GT_type t)
 {
-	GT *g = new GT(*gt_id);
+	GT g(*gt_id); // = new GT(*gt_id);
 	return g;
 }
 
-GT *PairingGroup::init(GT_type t, int value)
+GT PairingGroup::init(GT_type t, int value)
 {
-	GT *g = new GT(*gt_id);
+	GT g(*gt_id); // = new GT(*gt_id);
 	return g;
 }
 
@@ -1756,13 +1927,13 @@ ZR PairingGroup::hashListToZR(CharmList list)
 			pfcObject->add_to_hash(tmp);
 		}
 		else if(e.type == ZR_t)
-			pfcObject->add_to_hash(*e.zr);
+			pfcObject->add_to_hash(e.zr);
 		else if(e.type == G1_t)
-			pfcObject->add_to_hash(*e.g1);
+			pfcObject->add_to_hash(e.g1);
 		else if(e.type == G2_t)
-			pfcObject->add_to_hash(*e.g2);
+			pfcObject->add_to_hash(e.g2);
 		else if(e.type == GT_t)
-			pfcObject->add_to_hash(*e.gt);
+			pfcObject->add_to_hash(e.gt);
 	}
 
 	//ZR *result = new ZR(pfcObject->finish_hash_to_group());
@@ -1780,13 +1951,13 @@ G1 PairingGroup::hashListToG1(CharmList list)
 			pfcObject->add_to_hash(tmp);
 		}
 		else if(e.type == ZR_t)
-			pfcObject->add_to_hash(*e.zr);
+			pfcObject->add_to_hash(e.zr);
 		else if(e.type == G1_t)
-			pfcObject->add_to_hash(*e.g1);
+			pfcObject->add_to_hash(e.g1);
 		else if(e.type == G2_t)
-			pfcObject->add_to_hash(*e.g2);
+			pfcObject->add_to_hash(e.g2);
 		else if(e.type == GT_t)
-			pfcObject->add_to_hash(*e.gt);
+			pfcObject->add_to_hash(e.gt);
 	}
 
 	ZR tmp1 = pfcObject->finish_hash_to_group();
@@ -1809,13 +1980,13 @@ G2 PairingGroup::hashListToG2(CharmList list)
 			pfcObject->add_to_hash(tmp);
 		}
 		else if(e.type == ZR_t)
-			pfcObject->add_to_hash(*e.zr);
+			pfcObject->add_to_hash(e.zr);
 		else if(e.type == G1_t)
-			pfcObject->add_to_hash(*e.g1);
+			pfcObject->add_to_hash(e.g1);
 		else if(e.type == G2_t)
-			pfcObject->add_to_hash(*e.g2);
+			pfcObject->add_to_hash(e.g2);
 		else if(e.type == GT_t)
-			pfcObject->add_to_hash(*e.gt);
+			pfcObject->add_to_hash(e.gt);
 	}
 
 	ZR tmp1 = pfcObject->finish_hash_to_group();
@@ -1832,13 +2003,13 @@ string element_to_bytes(Element & e) {
 	int type = e.type;
 
 	if(type == ZR_t) {
-		Big s = *e.zr;
+		Big s = e.zr;
 		t.append(bigToBytes(s));
 		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
 		return encoded;
 	}
 	else if(type == G1_t) {
-		G1 p = *e.g1;
+		G1 p = e.g1;
 		Big x, y;
 		p.g.get(x, y);
 		string t;
@@ -1850,7 +2021,7 @@ string element_to_bytes(Element & e) {
 	}
 #ifdef ASYMMETRIC
 	else if(type == G2_t) {
-		G2 P = *e.g2; // embeds an ECn3 element (for MNT curves)
+		G2 P = e.g2; // embeds an ECn3 element (for MNT curves)
 		ZZn3 x, y;
 			// ZZn a,b,c;
  		ZZn *a = new ZZn[6];
@@ -1870,7 +2041,7 @@ string element_to_bytes(Element & e) {
 	}
 #endif
 	else if(type == GT_t) {
-		GT P = *e.gt; // embeds an ZZn6 element (for MNT curves) is equivalent to
+		GT P = e.gt; // embeds an ZZn6 element (for MNT curves) is equivalent to
 			// control this w/ a flag
 #ifdef ASYMMETRIC
 		ZZn2 x, y, z; // each zzn2 has a (x,y) coordinates of type Big
@@ -2196,10 +2367,10 @@ void stringToInt(PairingGroup & group, string strID, int z, int l, CharmListZR &
     return;
 }
 
-CharmListZR & stringToInt(PairingGroup & group, string strID, int z, int l)
+CharmListZR stringToInt(PairingGroup & group, string strID, int z, int l)
 {
     /* 1. hash string. */
-    CharmListZR *zrlist = new CharmListZR;
+    CharmListZR zrlist; // = new CharmListZR;
     ZR intval;
     Big mask( pow(Big(2), l) - 1 ); 
     ZR id = group.hashListToZR(strID); 
@@ -2207,13 +2378,20 @@ CharmListZR & stringToInt(PairingGroup & group, string strID, int z, int l)
     /* 2. cut up result into zz pieces of ll size */
     for(int i = 0; i < z; i++) {
         intval = land(id, mask); 
-        zrlist->append(intval);
+        zrlist.append(intval);
         id = id >> l; // shift to the right by ll bits
     }
 
-    return *zrlist;
+    return zrlist;
 }
 
+ZR SmallExp(int bits) {
+	big t = mirvar(0);
+	bigbits(bits, t);
+    ZR zr(t);
+    mr_free(t);
+	return zr;
+}
 
 string concat(CharmListStr & list)
 {

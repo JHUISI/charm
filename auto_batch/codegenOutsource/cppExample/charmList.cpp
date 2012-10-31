@@ -4,13 +4,12 @@
 #include <string>
 using namespace std;
 
-ZR & SmallExp(int bits) {
+ZR SmallExp(int bits) {
 	big t = mirvar(0);
 	bigbits(bits, t);
-
-	ZR *z = new ZR(t);
-	mr_free(t);
-	return *z;
+    ZR zr(t);
+    mr_free(t);
+	return zr;
 }
 
 
@@ -44,43 +43,93 @@ void verify(PairingGroup & group, G2 & pk, G2 & g, G1 & sig, string M, bool & ou
    }
 }
 
+CharmListZR testRetByValueZR(CharmListZR & s)
+{
+	CharmListZR x(s);
+
+	return x;
+}
+
+CharmListG1 testRetByValueG1(CharmListG1 & s)
+{
+	CharmListG1 x(s);
+	return x;
+}
+
+CharmListG2 testRetByValueG2(CharmListG2 & s)
+{
+	CharmListG2 x(s);
+	return x;
+}
+
+CharmListGT testRetByValueGT(CharmListGT & s)
+{
+	CharmListGT x(s);
+	return x;
+}
+
+
 int main()
 {
 	// example for using CharmList* data structures
     PairingGroup group(AES_SECURITY);
 
-    int N = 10;
-    CharmListZR sk;
-    CharmListG1 g;
-    CharmListG2 g2;
-    CharmListGT gt;
+    int N = 2;
+    CharmListZR sk0;
+    CharmListG1 g1_0;
+    CharmListG2 g2_0;
+    CharmListGT gt_0;
+
 
     for(int z = 0; z < N; z++) {
-    	sk[z] = SmallExp(80);
+    	sk0[z] = SmallExp(80);
     }
 
     cout << "list of deltas: " << endl;
-    cout << sk << endl;
+    cout << sk0 << endl;
 
+    CharmListZR sk1 = testRetByValueZR(sk0);
+
+    cout << "new list of deltas: " << endl;
+    cout << sk1 << endl;
+
+    // test CharmListG1 ****************************** //
     for(int z = 0; z < N; z++) {
-    	g[z] = group.random(G1_t);
+    	g1_0[z] = group.random(G1_t);
     }
 
     cout << "list of G1: " << endl;
-    cout << g << endl;
+    cout << g1_0 << endl;
 
+    CharmListG1 g1_1 = testRetByValueG1(g1_0);
+    cout << "new list of G1: " << endl;
+    cout << g1_1 << endl;
+
+
+    // test CharmListG2 ****************************** //
     for(int z = 0; z < N; z++) {
-    	g2[z] = group.random(G2_t);
+    	g2_0[z] = group.random(G2_t);
     }
-    cout << "list of G2: " << endl;
-    cout << g2 << endl;
 
+    cout << "list of G2: " << endl;
+    cout << g2_0 << endl;
+
+    CharmListG2 g2_1 = testRetByValueG2(g2_0);
+    cout << "new list of G2: " << endl;
+    cout << g2_1 << endl;
+
+
+    // test CharmListGT ****************************** //
     for(int z = 0; z < N; z++) {
-    	gt[z] = group.random(GT_t);
+    	gt_0[z] = group.random(GT_t);
     }
 
     cout << "list of GT: " << endl;
-    cout << gt << endl;
+    cout << gt_0 << endl;
+
+    CharmListGT gt_1 = testRetByValueGT(gt_0);
+    cout << "new list of GT: " << endl;
+    cout << gt_1 << endl;
 
 
     return 0;

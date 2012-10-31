@@ -40,6 +40,7 @@ SDLListVars = []
 listVarsDeclaredInThisFunc = []
 nonListVarsDeclaredInThisFunc = []
 integerVars = []
+starRef = ""# "*"
 
 def writeCurrentNumTabsToString():
     outputString = ""
@@ -109,6 +110,7 @@ def addGlobalPairingGroupObject():
 
     setupFile.write("PairingGroup group(AES_SECURITY);\n\n")
 
+""" No longer necessary
 def addSmallExpFunc():
     global setupFile
 
@@ -123,7 +125,7 @@ def addSmallExpFunc():
     outputString += "}\n\n"
 
     setupFile.write(outputString)
-
+"""
 
 def addGroupObjGlobalVar():
     global setupFile, transformFile, decOutFile, userFuncsFile, userFuncsCPPFile
@@ -710,11 +712,11 @@ def processAttrOrTypeAssignStmt(node, replacementsDict):
 def doesVarNeedStar(variable):
     variable = getRidOfAllListIndices(variable)
 
-    if (variable in integerVars):
-        return False
+#    if (variable in integerVars):
+#        return False
 
-    if (variable in currentFuncNonOutputVars):
-        return True
+#    if (variable in currentFuncNonOutputVars):
+#        return True
 
     return False
 
@@ -1221,7 +1223,7 @@ def isInitCall(binNode):
         return True
 
     return False
-
+# TODO: clean-up need for "*"
 def writeAssignStmt_CPP(outputFile, binNode):
     global CPP_varTypesLines, CPP_funcBodyLines, setupFile, currentFuncNonOutputVars, SDLListVars, integerVars
     global listVarsDeclaredInThisFunc, nonListVarsDeclaredInThisFunc
@@ -1268,7 +1270,7 @@ def writeAssignStmt_CPP(outputFile, binNode):
 
     if ( (variableName.find(LIST_INDEX_SYMBOL) == -1) and (binNode.right.type != ops.EXPAND) and (variableName not in nonListVarsDeclaredInThisFunc) ):
         if ( (variableName not in currentFuncOutputVars) and (variableType != types.int) ):
-            outputString_Types += "    " + makeTypeReplacementsForCPP(variableType) + " *"
+            outputString_Types += "    " + makeTypeReplacementsForCPP(variableType) + " " + starRef
         elif ( (variableName not in currentFuncOutputVars) and (variableType == types.int) ):
             outputString_Types += "    int "
 
@@ -1302,9 +1304,9 @@ def writeAssignStmt_CPP(outputFile, binNode):
             if (isInitCall(binNode) == False):
                 outputString_Body += variableNamePounds  
         else:
-            leftSideNameForInit = "*" + variableNamePounds
+            leftSideNameForInit = starRef + variableNamePounds
             if (isInitCall(binNode) == False):
-                outputString_Body += "*" + variableNamePounds
+                outputString_Body += starRef + variableNamePounds
 
     if ( (isInitCall(binNode) == False) and (binNode.right.type != ops.LIST) and (binNode.right.type != ops.SYMMAP) and (binNode.right.type != ops.EXPAND) ):
         outputString_Body += " = "
@@ -2077,7 +2079,7 @@ def main(inputSDLScheme, outputFileName):
 
     addGlobalPairingGroupObject()
 
-    addSmallExpFunc()
+    #addSmallExpFunc()
 
     #addGroupObjGlobalVar()
 
