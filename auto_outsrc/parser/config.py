@@ -17,6 +17,8 @@ keygenBlindingExponentType = "ZR"
 keygenFuncName = "extract"
 
 encryptFuncName = "encrypt"
+decryptFuncName = "decrypt"
+transformFuncName = "transform"
 
 masterPubVars = ["mpk"]
 masterSecVars = ["msk"]
