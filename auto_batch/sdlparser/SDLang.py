@@ -887,6 +887,9 @@ class BinaryNode:
 			return node
 		return value
 
+	def isNegated(self):
+		return self.negated
+
 	@classmethod
 	def copy(self, this):
 		if this == None: return None

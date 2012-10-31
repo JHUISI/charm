@@ -319,6 +319,15 @@ def makeTypeReplacementsForCPP(SDL_Type, isList=False):
         return "list<int>"
     if (SDLTypeAsString == "listStr"):
         return "CharmListStr"
+    if (SDLTypeAsString == "metalistG1"):
+        return "CharmMetaListG1"
+    if (SDLTypeAsString == "metalistG2"):
+        return "CharmMetaListG2"
+    if (SDLTypeAsString == "metalistGT"):
+        return "CharmMetaListGT"
+    if (SDLTypeAsString == "metalistZR"):
+        return "CharmMetaListZR"
+    
     if ( (SDLTypeAsString == "G1") and (isList == True) ):
         return "CharmListG1"
     if ( (SDLTypeAsString == "G2") and (isList == True) ):
@@ -783,10 +792,18 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
 
     elif ( (node.type == ops.ATTR) or (node.type == ops.TYPE) ):
         returnString = processAttrOrTypeAssignStmt(node, replacementsDict)
+        if node.isNegated():
+            returnString = returnString[1:]
+        
         if (doesVarNeedStar(returnString)):
-            return "*" + returnString
+            returnThisString = "*" + returnString
         else:
-            return returnString
+            returnThisString = returnString
+        
+        if node.isNegated():
+            return groupObjName + ".neg" + "(" + returnThisString + ")" 
+        else:
+            return returnThisString
 
     elif (node.type == ops.ADD):
         leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
@@ -1290,7 +1307,7 @@ def writeAssignStmt_CPP(outputFile, binNode):
     outputString_Body += getAssignStmtAsString_CPP(binNode.right, None, variableNamePounds, leftSideNameForInit)
     if ( (binNode.right.type != ops.LIST) and (binNode.right.type != ops.SYMMAP) and (binNode.right.type != ops.EXPAND) ):
         outputString_Body += ";\n"
-
+        
     CPP_varTypesLines += outputString_Types
     CPP_funcBodyLines += outputString_Body
 
