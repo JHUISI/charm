@@ -793,14 +793,14 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
     elif ( (node.type == ops.ATTR) or (node.type == ops.TYPE) ):
         returnString = processAttrOrTypeAssignStmt(node, replacementsDict)
         if node.isNegated():
-            returnString = returnString[1:]
+            returnString = returnString[1:] # remove the preceding "-" symbol
         
         if (doesVarNeedStar(returnString)):
             returnThisString = "*" + returnString
         else:
             returnThisString = returnString
         
-        if node.isNegated():
+        if node.isNegated(): # now wrap in negate call.
             return groupObjName + ".neg" + "(" + returnThisString + ")" 
         else:
             return returnThisString
@@ -941,10 +941,13 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
                 return variableName + " = \"\""
             else:
                 return groupObjName + "." + INIT_FUNC_NAME + "(" + str(leftSideNameForInit) + ")"
+
         elif (nodeName == ISMEMBER_FUNC_NAME):
             funcOutputString = groupObjName + "." + nodeName + "("
         elif (nodeName == INTEGER_FUNC_NAME):
             funcOutputString = "int("
+        elif (nodeName == STRING_TO_INT):
+            funcOutputString = STRING_TO_INT + "(" + groupObjName + ", " 
         elif (nodeName == LEN_FUNC_NAME):
              if (len(node.listNodes) != 1):
                  sys.exit("getAssignStmtAsString_CPP in codegen_CPP.py:  len() function called, but either less than or more than one parameter was passed in (only one parameter can be passed in for len().")
@@ -1281,6 +1284,8 @@ def writeAssignStmt_CPP(outputFile, binNode):
                 outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t, 1);\n"
             elif (variableName.startswith(SUM_PROD_WORD) == True):
                 outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t, 0);\n"
+            elif variableType in [types.listZR, types.listG1, types.listG2, types.listGT, types.metalistZR, types.metalistG1, types.metalistG2, types.metalistGT]:
+                outputString_Types += variableName + ";\n"
             else:
                 outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t);\n"
         nonListVarsDeclaredInThisFunc.append(variableName)
@@ -1305,6 +1310,7 @@ def writeAssignStmt_CPP(outputFile, binNode):
         outputString_Body += " = "
 
     outputString_Body += getAssignStmtAsString_CPP(binNode.right, None, variableNamePounds, leftSideNameForInit)
+    
     if ( (binNode.right.type != ops.LIST) and (binNode.right.type != ops.SYMMAP) and (binNode.right.type != ops.EXPAND) ):
         outputString_Body += ";\n"
         

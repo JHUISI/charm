@@ -141,12 +141,11 @@ void sign(CharmList & mpk, CharmListG1 & u, CharmList & sk, string & M, G1 & S1,
 
 bool verify(GT & A, G2 & g2, CharmListG2 & ub, G2 & u1b, G2 & u2b, string & ID, string & M, G1 & S1, G1 & S2, G1 & S3)
 {
-    CharmListZR kver; // = group.init(CharmListZR_t);
-    CharmListZR mver; // = group.init(CharmListZR_t);
+    CharmListZR kver, mver; // = group.init(CharmListZR_t);
     G2 *dotProd2 = group.init(G2_t, 1);
     G2 *dotProd3 = group.init(G2_t, 1);
-    stringToInt(group, ID, l, zz, kver);
-    stringToInt(group, M, l, zz, mver);
+    kver = stringToInt(group, ID, l, zz);
+    mver = stringToInt(group, M, l, zz);
     group.init(*dotProd2, 1);
     group.init(*dotProd3, 1);
     for (int i = 0; i < l; i++)

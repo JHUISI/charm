@@ -5,6 +5,7 @@ ISMEMBER_FUNC_NAME = "ismember"
 INTEGER_FUNC_NAME = "integer"
 LEN_FUNC_NAME = "len"
 ADD_TO_LIST = "addToList"
+STRING_TO_INT = "stringToInt" # args: 1. group, 2. three args, 3. output arg
 NONE_FUNC_NAME = "NONE_FUNC_NAME"
 RETURN_STATEMENT = "return := None"
 DOT_PROD_WORD = "dot"

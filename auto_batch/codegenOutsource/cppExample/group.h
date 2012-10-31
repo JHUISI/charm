@@ -149,6 +149,7 @@ public:
 	~CharmListZR();
 	void append(ZR&);
 	void set(int index, ZR);
+	ZR& get(const int index);
 	int length(); // return length of lists
 	string printAtIndex(int index);
 
@@ -440,6 +441,7 @@ void parseKeys(const char *filename, ZR & sk, GT & pk);
 string SymDec(string k, string c_encoded);
 bool isNotEqual(string value1, string value2);
 void stringToInt(PairingGroup & group, string strID, int z, int l, CharmListZR & zrlist);
+CharmListZR & stringToInt(PairingGroup & group, string strID, int z, int l);
 string concat(CharmListStr & list);
 ZR ceillog(int base, int value);
 

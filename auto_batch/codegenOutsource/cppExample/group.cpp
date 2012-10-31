@@ -672,6 +672,17 @@ ZR& CharmListZR::operator[](const int index)
 	}
 }
 
+ZR& CharmListZR::get(const int index)
+{
+	int len = (int) list.size();
+	if(index >= 0 && index < len) {
+		return list[index];
+	}
+	else {
+		throw new string("Invalid access.\n");
+	}
+}
+
 int CharmListZR::length()
 {
 	return (int) list.size();
@@ -2184,6 +2195,25 @@ void stringToInt(PairingGroup & group, string strID, int z, int l, CharmListZR &
 
     return;
 }
+
+CharmListZR & stringToInt(PairingGroup & group, string strID, int z, int l)
+{
+    /* 1. hash string. */
+    CharmListZR *zrlist = new CharmListZR;
+    ZR intval;
+    Big mask( pow(Big(2), l) - 1 ); 
+    ZR id = group.hashListToZR(strID); 
+
+    /* 2. cut up result into zz pieces of ll size */
+    for(int i = 0; i < z; i++) {
+        intval = land(id, mask); 
+        zrlist->append(intval);
+        id = id >> l; // shift to the right by ll bits
+    }
+
+    return *zrlist;
+}
+
 
 string concat(CharmListStr & list)
 {
