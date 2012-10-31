@@ -1,6 +1,7 @@
 from SDLParser import *
 from config import *
 from transform import *
+from transformNEW import *
 from rcca import *
 from secretListInKeygen import *
 from outsrctechniques import SubstituteVar
@@ -329,6 +330,13 @@ def keygen(file):
     lineNoEndTypesSection = getEndLineNoOfFunc(TYPES_HEADER)
     appendToLinesOfCode(varNamesForListDecls, lineNoEndTypesSection)
     updateCodeAndStructs()
+
+
+
+
+    transformNEW(varsThatAreBlinded)
+
+
 
     (varsToBlindList, rccaData) = (transform(varsThatAreBlinded))
 
