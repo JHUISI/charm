@@ -81,7 +81,7 @@ END :: precompute
 verify := {e(S2, g2) == ((e(pk, P)^a) * S1)}
 
 BEGIN :: func:membership
- input := list{g2, pklist, Mlist, P, S1list, S2list}
+ input := list{g2, pklist, P, S1list, S2list}
 
 
 BEGIN :: if
@@ -91,11 +91,6 @@ END :: if
 
 BEGIN :: if
 if { ismember(pklist) == False }
-    output := False
-END :: if
-
-BEGIN :: if
-if { ismember(Mlist) == False }
     output := False
 END :: if
 
@@ -163,7 +158,7 @@ for{z := 0, N}
 END :: for
 
 BEGIN :: if
- if {(membership(g2, pklist, Mlist, P, S1list, S2list) == False)}
+ if {(membership(g2, pklist, P, S1list, S2list) == False)}
      output := False
 END :: if
 
