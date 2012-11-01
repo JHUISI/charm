@@ -333,7 +333,7 @@ def keygen(file):
 
 
 
-
+    varsThatAreBlinded = {"c":["zz"], "d0":["yy"], "d1":["aa", "bb"]}
     transformNEW(varsThatAreBlinded)
 
 
