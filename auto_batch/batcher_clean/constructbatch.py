@@ -207,7 +207,7 @@ class SDLBatch:
         for i in verifyArgKeys:
             if self.varTypes.get(i) not in strTypeList and verifyArgTypes.get(i) not in strTypeList:
                 # add to lists
-                print("verify membership of: ", i)
+                if self.debug: print("verify membership of: ", i)
                 verifyArgList.append(i)
                  
         verifyArgs = str(list(verifyArgList)).replace("[", '').replace("]",'').replace("'", '')        
@@ -362,9 +362,9 @@ class SDLBatch:
             i,j = self.precomputeDict[k]
             if str(i) in dotCacheVarList:
                 del self.precomputeDict[k]
-       
-        print("outputBeforePrecompute: ", outputBeforePrecompute)
-        print("outputPrecompute: ", outputPrecompute)
+        if self.debug:
+            print("outputBeforePrecompute: ", outputBeforePrecompute)
+            print("outputPrecompute: ", outputPrecompute)
         return (outputBeforePrecompute, outputPrecompute)
     
     def __generatePrecomputeLinesForDV(self, loopIndex, dotCacheVarList):
@@ -409,8 +409,9 @@ class SDLBatch:
             if str(i) in dotCacheVarList:
                 del self.precomputeDict[k]
        
-#        print("outputBeforePrecompute: ", outputBeforePrecompute)
-#        print("outputPrecompute: ", outputPrecompute)
+        if self.debug:
+            print("outputBeforePrecompute: ", outputBeforePrecompute)
+            print("outputPrecompute: ", outputPrecompute)
         return (outputBeforePrecompute, outputPrecompute)
 
     
@@ -473,7 +474,7 @@ class SDLBatch:
 
         # 1.5 record old type definitions from sdl
         for i in range(startTypeLine-1, endTypeLine-1):
-            print(i, ":", oldSDL[i], end="")
+            if self.debug: print(i, ":", oldSDL[i], end="")
             stripI = oldSDL[i].replace(SPACES, "")
             addDelibSpace = stripI.replace(":=", " := ")             
             newTypeList.append(addDelibSpace)
@@ -501,12 +502,12 @@ class SDLBatch:
         for i in outputBatchVerifyLines:
             outputBatchVerifyLinesFinal.append(i + '\n')
         appendToLinesOfCode(outputBatchVerifyLinesFinal, lastLineSDL)        
-        parseLinesOfCode(getLinesOfCode(), True, True)
+        parseLinesOfCode(getLinesOfCode(), self.debug, True)
         
         if ".bv" not in self.sdlOutfile: self.sdlOutfile += ".bv" # add appropriate extension to filename
         # 4. write the file to 
         writeLinesOfCodeToFileOnly(self.sdlOutfile)
-        print("SDL file written to: ", self.sdlOutfile)
+        print("SDL batch verifier file written to filename: ", self.sdlOutfile)
         return
     
     def __computeDotProducts(self):
@@ -535,18 +536,18 @@ class SDLBatch:
         dotPrefix = "dot"
         dotList1 = list(dict1.keys())
         dotList2 = list(dict2.keys())
-        print("list over signatures:", dotList1)
+        if self.debug: print("list over signatures:", dotList1)
         for i,j in dict1.items():
             gviq = GetVarsInEq([])
             ASTVisitor(gviq).preorder(j.getRight())
             references[str(i)] = ([x for x in gviq.getVarList() if dotPrefix in x], j.getLeft())
-            print(i, ":", j, ", var list: ", references[str(i)])
-        print("list over signers:", dotList2)
+            if self.debug: print(i, ":", j, ", var list: ", references[str(i)])
+        if self.debug: print("list over signers:", dotList2)
         for i, j in dict2.items():
             gviq = GetVarsInEq([])
             ASTVisitor(gviq).preorder(j.getRight())
             references[str(i)] = ([x for x in gviq.getVarList() if dotPrefix in x], j.getLeft())
-            print(i, ":", j, ", var list: ", references[str(i)])
+            if self.debug: print(i, ":", j, ", var list: ", references[str(i)])
         
         listOfDots = list(references.keys())
         listOfDots.sort()
@@ -557,7 +558,7 @@ class SDLBatch:
                     del references[k]                
 
         # pruned version
-        print("pruned dot lists")
+        if self.debug: print("pruned dot lists")
         listOfDots = list(references.keys())
         listOfDots.sort()
         for i in listOfDots:
@@ -589,18 +590,18 @@ class SDLBatch:
         references = {}
         dotList1 = list(dict1.keys())
         dotList2 = list(dict2.keys())
-        print("list over signatures:", dotList1)
+        if self.debug: print("list over signatures:", dotList1)
         for i,j in dict1.items():
             gviq = GetVarsInEq([])
             ASTVisitor(gviq).preorder(j.getRight())
             references[str(i)] = ([x for x in gviq.getVarList() if dotPrefix in x], j.getLeft())
-            print(i, ":", j, ", var list: ", references[str(i)])
-        print("list over signers:", dotList2)
+            if self.debug: print(i, ":", j, ", var list: ", references[str(i)])
+        if self.debug: print("list over signers:", dotList2)
         for i, j in dict2.items():
             gviq = GetVarsInEq([])
             ASTVisitor(gviq).preorder(j.getRight())
             references[str(i)] = ([x for x in gviq.getVarList() if dotPrefix in x], j.getLeft())
-            print(i, ":", j, ", var list: ", references[str(i)])
+            if self.debug: print(i, ":", j, ", var list: ", references[str(i)])
                 
         listOfDots = list(references.keys())
         listOfDots.sort()
@@ -611,12 +612,12 @@ class SDLBatch:
                     del references[k]
 
         # pruned version
-        print("pruned dot lists")
+        if self.debug: print("pruned dot lists")
         listOfDots = list(references.keys())
         listOfDots.sort()
         dotDependency = None
         for i in listOfDots:
-            print(i, ":", references[i][0], ": range:", references[i][1])
+            if self.debug: print(i, ":", references[i][0], ": range:", references[i][1])
             if str(references[i][1]) == signatureProd and len(references[i][0]) == 0:
                 # means we can precompute this entirely b/c it doesn't have any dependencies
                 dotDependency = False
@@ -640,8 +641,9 @@ class SDLBatch:
         return precomputeBeforeDV, notPrecomputeBeforeDV  
 
     
-    def construct(self):
+    def construct(self, verbosity):
         """main routine for constructing SDL batch verifier, divide and conquer search and membership test routines"""
+        self.debug = verbosity
         (subProds, subProds1) = self.__computeDotProducts()
         # dot products over signatures
         # keys are either 'sum' or 'dot': dotA, dotB ... dotZ, s
@@ -714,7 +716,7 @@ class SDLBatch:
                 groupOp = "+" # for ADD
             else:
                 sys.exit("constructbatch.py: unrecognized group operation for prefix ", i)
-            print(i,":=", VarsForDotTypesOverSigs[i])
+#            print(i,":=", VarsForDotTypesOverSigs[i])
             loopVal = "%sLoopVal" % i
             dotCache = "%sCache" % i
             getType = self.__cleanType(VarsForDotTypesOverSigs[i])
@@ -773,7 +775,7 @@ class SDLBatch:
             else:
                 sys.exit("constructbatch.py: unrecognized group operation for prefix ", i)
 
-            print(i,":=", VarsForDotTypesOverSigs[i])
+#            print(i,":=", VarsForDotTypesOverSigs[i])
             loopVal = "%sLoopVal" % i
             getType = self.__cleanType(VarsForDotTypesOverSigs[i])
             dotLoopValTypesSig[ loopVal ] = getType
@@ -818,16 +820,16 @@ class SDLBatch:
         
         refSignatureDict, refSignerDict = self.__searchForDependenciesGeneric(VarsForDotASTOverSigs, {})
         dotKeys = list(refSignatureDict.keys())
-        print("refSignatureDict keys: ", dotKeys)
+        if self.debug: print("In __constructSDLBatchOverSignaturesGeneric => refSignatureDict keys: ", dotKeys)
         
         topLevelDotDict = {}
         
         for i in dotKeys:
-            print("<====== CREATING STATEMENTS ======> : ", i)
+            if self.debug: print("<====== CREATING STATEMENTS ======> : ", i)
             if refSignatureDict[i]['hasDep']: # 
                 # if so, then need to precompute those dot values as well since they're necessary
                 # to compute this top level dot computation.
-                print("<====== CREATING NO CACHE STATEMENTS ======> : ", refSignatureDict[i]['dotDep'][0])
+                if self.debug: print("<====== CREATING NO CACHE STATEMENTS ======> : ", refSignatureDict[i]['dotDep'][0])
                 listForDepSigs = self.__createStatementsNoCache(refSignatureDict[i]['dotDep'][0], VarsForDotTypesOverSigs, VarsForDotASTOverSigs, signerIterator, [])
                 listForSigs = self.__createStatements([i], VarsForDotTypesOverSigs, VarsForDotASTOverSigs, sigIterator, False, listForDepSigs[6])
                 topLevelDotDict[i] = (listForSigs, listForDepSigs)
@@ -878,7 +880,7 @@ class SDLBatch:
         eqStr = str(self.finalBatchEq)
         for k,v in dotVerifyEq.items():
             eqStr = eqStr.replace(k, v)
-        print("Final eq: ", eqStr)
+        if self.debug: print("Final eq: ", eqStr)
 
         membershipTestList, outputLines1 = self.__generateMembershipTest(batchVerifyArgList, batchVerifyArgTypes) 
         outputLines2 = self.__generateDivideAndConquer(dotInitStmtDivConqSig,  divConqLoopValStmtSig, eqStr, divConqArgList)
@@ -986,11 +988,12 @@ class SDLBatch:
                 batchVerifyArgList.append(i)
         batchVerifyArgTypes = self.sdlData[BATCH_VERIFY]
         batchVerifyArgList.sort()
-        print("batch: ", batchVerifyArgList, batchVerifyArgTypes)
+        if self.debug: print("batch: ", batchVerifyArgList, batchVerifyArgTypes)
         # get the membership list
         membershipTestList, outputLines1 = self.__generateMembershipTest(batchVerifyArgList, batchVerifyArgTypes)
-        print("membership test ...")
-        print("outputLines: ", outputLines1, end="\n\n")
+        if self.debug:
+            print("membership test ...")
+            print("outputLines: ", outputLines1, end="\n\n")
         finalEqDotMap = {}
          
         dotLoopValTypesSig, dotCacheTypesSig, dotInitStmtDivConqSig, divConqLoopValStmtSig, dotVerifyEq, dotCacheCalc, dotList, dotCacheVarList, _divConqArgList = \
@@ -999,7 +1002,7 @@ class SDLBatch:
                           
         for i in list(refSignerDict.keys()):
             if len(refSignerDict[i][0]) > 0 and str(refSignerDict[i][1]) == signerProd:
-                print("\n\n\n")
+                if self.debug: print("\n\n\n")
                 listForSigs = self.__createStatements(refSignerDict[i][0], VarsForDotTypesOverSigs, VarsForDotASTOverSigs, sigIterator, combineLoopAndCacheStmt=True)
                 finalEqDotMap.update(listForSigs[4])
 
@@ -1065,8 +1068,9 @@ class SDLBatch:
         return my_output
 
     def printList(self, prefix, theList):
-        print(prefix, "statements...")
-        for i in theList:
-            print("DEBUG: ", i)
+        if self.debug:
+            print(prefix, "statements...")
+            for i in theList:
+                print("DEBUG: ", i)
         return
         

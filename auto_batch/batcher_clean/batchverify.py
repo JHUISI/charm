@@ -417,6 +417,7 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, eq_number=0):
     constants, types = settingObj.getConstantVars(), settingObj.getTypes()
     sigVars, pubVars, msgVars = settingObj.getSignatureVars(), settingObj.getPublicVars(), settingObj.getMessageVars()
     latex_subs = settingObj.getLatexVars()
+
     if settingObj.getPrecomputeVars():
         (indiv_precompute, batch_precompute) = settingObj.getPrecomputeVars()
     else:
@@ -596,7 +597,7 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, eq_number=0):
     # TODO: check avg for when batch is more efficient than 
     if SDL_OUT_FILE == None: SDL_OUT_FILE = types['name']
     sdlBatch = SDLBatch(SDL_OUT_FILE, sdl_data, types, verify2, batch_precompute)
-    sdlBatch.construct()
+    sdlBatch.construct(VERBOSE)
     
     if CODEGEN_FLAG:
         print("Final batch eq:", verify2)
