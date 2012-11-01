@@ -8,6 +8,7 @@ M = 'M'
 varNameLeftSideNoBlindedVars = "neverUseThisVarNameNoBlindedVars"
 varNameLeftSideBlindedVars = "neverUseThisVarNameBlindedVars"
 
+transformOutputList = "transformOutputList"
 
 blindingLoopVar = "y"
 blindingSuffix = "Blinded"
