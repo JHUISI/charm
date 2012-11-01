@@ -1888,6 +1888,7 @@ ZR PairingGroup::mul(ZR g, ZR h)
 {
 	ZR o = pfcObject->order();
 	return modmult(g, h, o);
+//	return (g * h) % o;
 }
 
 // mul for G1 & GT
@@ -1940,7 +1941,7 @@ ZR PairingGroup::exp(ZR x, int y)
 	if(y == -1) {
 	     return inverse(x, z);
 	}
-	else if(y > 0) {
+	else if(y >= 0) {
 		return pow(x, y, z);
 	}
 	else {
@@ -1951,7 +1952,9 @@ ZR PairingGroup::exp(ZR x, int y)
 ZR PairingGroup::exp(ZR x, ZR y)
 {
 	ZR z = pfcObject->order();
-	return pow(x, y, z);
+	ZR result = pow(x, y, z);
+	cout << "exp result: " << result << endl;
+	return result;
 }
 
 // exp for G1 & GT
@@ -1959,7 +1962,7 @@ G1 PairingGroup::exp(G1 g, ZR r)
 {
 	// g ^ r == g * r OR scalar multiplication
 	G1 l = pfcObject->mult(g, r);
-	return l;
+ 	return l;
 }
 
 GT PairingGroup::exp(GT g, ZR r)
