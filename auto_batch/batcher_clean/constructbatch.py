@@ -85,7 +85,6 @@ for{%s := 0, %s}
 #delta_word = "delta"
 delta_stmt = delta_word + "%s := SmallExp(secparam)\n"
 delta_lhs = delta_word + "%s := "
-linkVar = "_link"
 
 batch_verify_header = """
 BEGIN :: func:batchverify
@@ -142,11 +141,12 @@ def Filter(node):
     return node.sdl_print()
 
 class SDLBatch:
-    def __init__(self, sdlOutfile, sdlData, varTypes, finalSdlBatchEq, precompDict, variableCount=0):
+    def __init__(self, sdlOutfile, sdlData, varTypes, finalSdlBatchEq, precompDict, variableCount=0, settingObj=None):
         self.sdlOutfile = sdlOutfile
         self.sdlData = sdlData
         self.varTypes = varTypes
         self.precomputeDict = precompDict
+        self.setting = settingObj
         del self.precomputeDict[delta_word]
         self.precomputeVarList = []
         self.defaultBatchTypes = {"incorrectIndices" : "list{int}", "startSigNum" : "int", "endSigNum " : "int"}
@@ -163,6 +163,8 @@ class SDLBatch:
         self.__generateDeltaLines(sigIterator, self.newDeltaList)
         self.debug = False
 
+    def getVariableCount(self):
+        return self.variableCount
     # for variables that are precomputed over signatures and doesn't include a "#z" to variables 
     # stored inside the exceptList      
     def ReplaceAppropArgs(self, map, forLoopIndex, node, exceptList=[]):
@@ -174,6 +176,8 @@ class SDLBatch:
             if self.varTypes[i] not in listGroupTypes:
                 constList.append(i)
         exceptList.extend(constList) # add list of constant variables here
+        if self.setting.getPublicVarsCount().get(SAME) != None:
+            exceptList.extend(self.setting.getPublicVarsCount().get(SAME))
         dp = DropIndexForPrecomputes(self.precomputeVarList + exceptList, forLoopIndex, self.varTypes)
         ASTVisitor(dp).preorder(eq)
         return Filter(eq)
@@ -190,6 +194,8 @@ class SDLBatch:
             if self.varTypes[i] not in listGroupTypes:
                 constList.append(i)
         exceptList.extend(constList) # add list of constant variables here
+        if self.setting.getPublicVarsCount().get(SAME) != None:
+            exceptList.extend(self.setting.getPublicVarsCount().get(SAME)) 
         dp = DropIndexForPrecomputes(self.precomputeVarList + exceptList, forLoopIndex, self.varTypes)
         ASTVisitor(dp).preorder(eq)
 
@@ -240,7 +246,8 @@ class SDLBatch:
 
     def __generateDivideAndConquer(self, dotInitStmtDivConqSig,  divConqLoopValStmtSig, eqStr, divConqArgList):
         """think about how to make this more flexible"""
-        divConqArgs = str(divConqArgList).replace("[", '').replace("]",'').replace("'", '')
+        newDivConqArgList = self.__stripListIndex(divConqArgList)
+        divConqArgs = str(newDivConqArgList).replace("[", '').replace("]",'').replace("'", '')
         output = ""
         output += dc_header % divConqArgs
         for l in dotInitStmtDivConqSig:
@@ -267,7 +274,8 @@ class SDLBatch:
 
     def __generateDivideAndConquerFlexible(self, eqStr, divConqArgList, divAndConqBodyFunction, *args):
         """think about how to make this more flexible"""
-        divConqArgs = str(divConqArgList).replace("[", '').replace("]",'').replace("'", '')
+        newDivConqArgList = self.__stripListIndex(divConqArgList)
+        divConqArgs = str(newDivConqArgList).replace("[", '').replace("]",'').replace("'", '')
         output = ""
         output += dc_header % divConqArgs
         
@@ -440,7 +448,8 @@ class SDLBatch:
     def __generateBatchVerify(self, batchVerifyArgList, membershipTestList, divConqArgList, dotCacheCalcList, dotCacheVarList, dotDepComputationMap=None):
         output = ""
         bVerifyArgs = str(list(batchVerifyArgList)).replace("[", '').replace("]",'').replace("'", '')
-        divConqArgs = str(list(divConqArgList)).replace("[", '').replace("]",'').replace("'", '')
+        newdivConqArgList = self.__stripListIndex(divConqArgList)
+        divConqArgs = str(list(newdivConqArgList)).replace("[", '').replace("]",'').replace("'", '')
         # pruned list of values we need to pass on to the membership test.
         membershipTest = str(list(membershipTestList)).replace("[", '').replace("]",'').replace("'", '')
 
@@ -695,6 +704,15 @@ class SDLBatch:
             return typeVar
         return newTypeTmp
 
+    def __stripListIndex(self, someList):
+        newList = []
+        if someList == None or len(someList) == 0: return someList
+        for i in someList:
+            if type(i) == str:
+                new_i = i.split(LIST_INDEX_SYMBOL)[0]
+                if new_i not in newList: newList.append(new_i) # remove trailing "#"
+        return newList
+
     def __createStatements(self, VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs, varIterator, combineLoopAndCacheStmt=False, exceptList=[]):
         dotLoopValTypesSig = {}
         dotCacheTypesSig = {}
@@ -727,7 +745,7 @@ class SDLBatch:
             dotCacheRHS = VarsForDotASTOverSigs[i].getRight()
             ASTVisitor(gvi).preorder(dotCacheRHS)
             dotCacheVarList.extend(gvi.getVarList())
-            dotCacheVarList = list(set(dotCacheVarList))            
+            dotCacheVarList = list(set(dotCacheVarList)) 
             if combineLoopAndCacheStmt:
                 compStmt = self.ReplaceAppropArgs(self.sdlData[BATCH_VERIFY_MAP], varIterator, dotCacheRHS)
                 divConqLoopValStmtSig.append("%s := %s %s %s\n" % (loopVal, loopVal, groupOp, compStmt)) # this is mul specifically
@@ -746,7 +764,7 @@ class SDLBatch:
         self.printList("6: dotList", dotList)
         self.printList("7: dotCacheVarList", dotCacheVarList)
         self.printList("8: divConqArgList", divConqArgList)
-        return dotLoopValTypesSig, dotCacheTypesSig, dotInitStmtDivConqSig, divConqLoopValStmtSig, dotVerifyEq, dotCacheCalc, dotList, dotCacheVarList, divConqArgList
+        return dotLoopValTypesSig, dotCacheTypesSig, dotInitStmtDivConqSig, divConqLoopValStmtSig, dotVerifyEq, dotCacheCalc, dotList, dotCacheVarList, self.__stripListIndex(divConqArgList)
 
     def __createStatementsNoCache(self, VarsForDotOverSigs, VarsForDotTypesOverSigs, VarsForDotASTOverSigs, varIterator, dotList2):
         dotLoopValTypesSig = {}
@@ -801,7 +819,7 @@ class SDLBatch:
         self.printList("6: dotList", dotList)
         self.printList("7: dotCacheVarList", dotCacheVarList)
         self.printList("8: divConqArgList", divConqArgList)
-        return dotLoopValTypesSig, dotCacheTypesSig, dotInitStmtDivConqSig, divConqLoopValStmtSig, dotVerifyEq, dotCacheCalc, dotList, dotCacheVarList, divConqArgList
+        return dotLoopValTypesSig, dotCacheTypesSig, dotInitStmtDivConqSig, divConqLoopValStmtSig, dotVerifyEq, dotCacheCalc, dotList, dotCacheVarList, self.__stripListIndex(divConqArgList)
 
     def __getSecParamLine(self):
         secparamLine = ""

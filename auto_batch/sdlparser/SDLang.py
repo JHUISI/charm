@@ -790,7 +790,9 @@ class BinaryNode:
 	
 	def setAttrIndex(self, value):
 		if(self.type in [ops.ATTR, ops.HASH]):
-			if self.attr_index == None: # could be a list of indices
+			if self.attr_index == None and type(value) == list: # could be a list of indices
+				self.attr_index = list(value)
+			elif self.attr_index == None:
 				self.attr_index = [value]
 			elif type(value) == list:
 				for i in self.attr_index:
@@ -848,7 +850,7 @@ class BinaryNode:
 	def setAttribute(self, value, clearAttrIndex=True):
 		if self.type in [ops.ATTR, ops.FUNC, ops.ERROR]:
 			self.attr = str(value)
-			if clearAttrIndex: self.attr_index = None
+			#if clearAttrIndex: self.attr_index = None
 			return True
 		return False
 	

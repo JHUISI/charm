@@ -14,6 +14,9 @@ MSG_CNT, SIG_CNT, PUB_CNT = 'message_count', 'signature_count', 'public_count'
 SAME = 'one'
 NUM_SIGNATURES = 'N'
 NUM_SIGNER_TYPES = ['L', 'l']
+linkVar = "link"
+listVar = "list"
+hasLoop, loopVar, startVal, endVal = "hasLoop", "loopVar", "startVal", "endVal"
 
 class SDLSetting():
     def __init__(self, debug=False):
@@ -46,13 +49,13 @@ class SDLSetting():
         self.__parseValuesInKey(assignInfoDict, PUBLIC)
         self.__parseValuesInKey(assignInfoDict, SIGNATURE)
         self.__parseValuesInKey(assignInfoDict, MESSAGE)
+        self.__parseValuesInKey(assignInfoDict, TRANSFORM)
 
         # this part will fail if Batch Count and CONST, PUBLIC, SIGNATURE and MESSAGE sections are not filled in.
-#        self.__processPublicVars()   
+        self.__processPublicVars()   
 #        self.__processSignatureVars()
-#        self.__processMessageVars()
+        self.__processMessageVars()
         
-        self.__parseValuesInKey(assignInfoDict, TRANSFORM)
         self.__parsePrecomputeAssign(assignInfoDict)
 #        self.__parsePreCheckIfExists(assignInfoDict)
         self.__parseLatexAssign(assignInfoDict)
@@ -72,19 +75,30 @@ class SDLSetting():
     
     def __processPublicVars(self):
         batchCount = self.data[COUNT_HEADER]
-        publicKeyCount = batchCount.get(PUB_CNT)
+        self.data[PUB_CNT] = {SAME:[], NUM_SIGNATURES:[], }
+        publicKeyCount = batchCount.get(PUB_CNT) # either SAME, NUM_SIGS, etc
+        if publicKeyCount not in self.data[PUB_CNT].keys():
+            # add to pub_cnt dict
+            self.data[PUB_CNT][publicKeyCount] = []
+            
         for i in self.data.get(PUBLIC):
-            if publicKeyCount == NUM_SIGNATURES: # N number of keys
-                print("i: ", i, " goes to N. group type: ", self.varTypes.get(i))
-            elif publicKeyCount == SAME: # one
-                print("i: ", i, " is thesame for all signers.")
-            else:
-                # check if variable defined somewhere in globals. For example, 'l' could be 3 or 300 or etc. Such is the case for ring or group sigs
-                pass
+            self.data[PUB_CNT].get(publicKeyCount).append(i)
 
-        print("__processPublicVars in batchconfig.py")
-        sys.exit(0)
+        print("__processPublicVars in batchconfig.py: ", self.data[PUB_CNT])
+        return
     
+    def __processMessageVars(self):
+        batchCount = self.data[COUNT_HEADER]
+        self.data[MSG_CNT] = {SAME:[], NUM_SIGNATURES:[], }
+        messageKeyCount = batchCount.get(MSG_CNT) # either SAME, NUM_SIGS, etc
+        if messageKeyCount not in self.data[MSG_CNT].keys():
+            # add to pub_cnt dict
+            self.data[MSG_CNT][messageKeyCount] = []
+        for i in self.data.get(MESSAGE):
+            self.data[MSG_CNT].get(messageKeyCount).append(i)
+
+        print("__processMessageVars in batchconfig.py: ", self.data[MSG_CNT])
+        return
     
     def __parseVerifyInputArgs(self, assignInfoDict):
         verifyDict = assignInfoDict.get(VERIFY)
@@ -103,6 +117,7 @@ class SDLSetting():
                         self.setTypeString(k, self.varTypes[k]) # "list{%s}" % self.varTypes[k]  # it is variable
 
 #                print("batchverify input types: ", self.data[BATCH_VERIFY], "\n", self.data[BATCH_VERIFY].items()) 
+#                print("Sorted: ", self.data[BATCH_VERIFY].keys())
 #                print("\n\n<=======>\nNew map for batch verify vars: ", self.data[BATCH_VERIFY_MAP])
 #                sys.exit(0)
                 self.partialSDL = False
@@ -121,12 +136,14 @@ class SDLSetting():
             newTypeTmp = "list{GT}"
         elif typeVar == "listStr":
             newTypeTmp = "list{str}"
+        elif typeVar == "listInt":
+            newTypeTmp = "list{int}"
         else:
             return typeVar
         return newTypeTmp
     
     def setTypeString(self, k, typeVar):
-        newType = "list{%s}"
+        newType = listVar + "{%s}"
         newTypeTmp = ""
         if typeVar == "listZR":
             newTypeTmp = "list{ZR}"
@@ -138,20 +155,22 @@ class SDLSetting():
             newTypeTmp = "list{GT}"
         elif typeVar == "listStr":
             newTypeTmp = "list{str}"
+        elif typeVar == "listInt":
+            newTypeTmp = "list{int}"
         
         
         if newTypeTmp != "":
             # if variable name includes the "list" keyword, then no need adding a list to the name.
-            self.data[BATCH_VERIFY][k + "_link"] = newTypeTmp
-            if "list" not in k:
-                self.data[BATCH_VERIFY][k + "list"] = newType % (k + "_link")
-                self.data[BATCH_VERIFY_MAP][k] = k + "list"
+            self.data[BATCH_VERIFY][k + linkVar] = newTypeTmp
+            if listVar not in k:
+                self.data[BATCH_VERIFY][k + listVar] = newType % (k + linkVar)
+                self.data[BATCH_VERIFY_MAP][k] = k + listVar
             else:
-                self.data[BATCH_VERIFY][k] = newType % (k + "_link")                
+                self.data[BATCH_VERIFY][k] = newType % (k + linkVar)                
                 self.data[BATCH_VERIFY_MAP][k] = k
         else:
-            self.data[BATCH_VERIFY][k + "list"] = newType % typeVar
-            self.data[BATCH_VERIFY_MAP][k] = k + "list"
+            self.data[BATCH_VERIFY][k + listVar] = newType % typeVar
+            self.data[BATCH_VERIFY_MAP][k] = k + listVar
 
     
     def __parseBatchCount(self, assignInfoDict):
@@ -185,19 +204,29 @@ class SDLSetting():
       
     def __parseVerifyEq(self, assignInfoDict):
         non_funcDict = assignInfoDict.get(NONE_FUNC_NAME)
+        self.verifyEqMap = {}
         if non_funcDict:
             if non_funcDict.get(VERIFY): #  and hasattr(non_funcDict[VERIFY], 'getAssignNode'):
                 eq = non_funcDict[VERIFY].getAssignNode() # assumes VarInfo object
                 if self.debug: print("Found verify eq: ", eq)
-                self.verifyEqList.append(eq)
+#                self.verifyEqList.append(eq)
+                if non_funcDict[VERIFY].getOutsideForLoopObj() != None:
+                    self.verifyEqMap[ VERIFY ] = { hasLoop:True, VERIFY: non_funcDict[VERIFY].getAssignNode() }
+                else:
+                    self.verifyEqMap[ VERIFY ] = { hasLoop:False, VERIFY: non_funcDict[VERIFY].getAssignNode() }                    
             else:
-                for k in non_funcDict.items():
+                for k,v in non_funcDict.items():
                     if VERIFY in k:# and hasattr(non_funcDict[k], 'getAssignNode'):
-                        self.verifyEqList.append(non_funcDict[k].getAssignNode()) # assumes VarInfo object
+                        if non_funcDict[k].getOutsideForLoopObj() != None:
+                            forLoopObj = non_funcDict[k].getOutsideForLoopObj()
+                            self.verifyEqMap[ k ] = { hasLoop:True, loopVar: forLoopObj.getLoopVar(), startVal:forLoopObj.getStartVal(), endVal: forLoopObj.getEndVal(), VERIFY : non_funcDict[k].getAssignNode() }
+                        else:
+#                            self.verifyEqList.append(non_funcDict[k].getAssignNode()) # assumes VarInfo object
+                            self.verifyEqMap[ k ] = { hasLoop:False, VERIFY: non_funcDict[k].getAssignNode() }
         return
     
     def getVerifyEq(self):
-        return self.verifyEqList
+        return self.verifyEqMap # dictionary
 
     def __parseTypes(self, assignInfoDict, varTypeDict):
         if not varTypeDict: return
@@ -216,15 +245,17 @@ class SDLSetting():
             assert numSigs.isdigit(), "variable '%s' needs to be an integer." % (NUM_SIGNATURES)
             self.varTypes[NUM_SIGNATURES] = int(numSigs)                 
         return
-    
+        
     def __parseValuesInKey(self, assignInfoDict, key):
         non_funcDict = assignInfoDict.get(NONE_FUNC_NAME)
         self.data[key] = []
         values = non_funcDict.get(key)
         if values:
             if type(values) == VarInfo: # check that it is VarInfo
+#                if values.type == ops.LIST and len(values.getListNodesList()) > 0:
+#                    self.data[key].extend(values.getListNodesList())
                 if values.type == ops.LIST:
-                    self.data[key].extend(values.getListNodesList())
+                    self.data[key].extend(values.getAssignNode().getRight().getListNode())
                 else:
                     self.data[key].append(values.getAssignNode().getRight().getAttribute())
             return True
@@ -262,7 +293,7 @@ class SDLSetting():
     
     def getSignatureVars(self):
         return self.data.get(SIGNATURE)
-    
+        
     def getLatexVars(self):
         return self.latex_symbols
     
@@ -281,3 +312,8 @@ class SDLSetting():
     def getVerifyInputArgsMap(self):
         return self.data.get(BATCH_VERIFY_MAP)
     
+    def getPublicVarsCount(self):
+        return self.data.get(PUB_CNT)
+    
+    def getMessageVarsCount(self):
+        return self.data.get(MSG_CNT)

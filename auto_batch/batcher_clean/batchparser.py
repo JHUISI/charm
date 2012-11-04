@@ -371,7 +371,7 @@ class ASTVisitor(object):
         # if parent_node == None: parent_node = root_node
         info = { 'parent': parent_node, 'sibling': sib_node }
         if pass_info and type(pass_info) == dict: 
-            #print("special info passed: ", pass_info)
+            print("special info passed: ", pass_info)
             info.update(pass_info) 
 
         result = self.visit(self.visitor, root_node, info) 

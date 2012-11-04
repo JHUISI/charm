@@ -1,7 +1,7 @@
 name := vrf
 N := 100
 setting := asymmetric
-n := 8 
+l := 4 
 secparam := 80
 
 # pi#0 := G1
@@ -16,8 +16,8 @@ secparam := 80
 # U2#t := G2
 
 BEGIN :: types
- pi := list{G1} 
  pi0 := G1
+ pi := list{G1} 
  g1 := G1
  g2 := G2
  x := list{int}
@@ -32,9 +32,9 @@ BEGIN :: types
 END :: types
 
 constant := list{g1, g2, h}
-message := list{x#0, x#t}
-public := list{U1#0, U2#0, U2#t, Ut}
-signature := list{pi#0, pi#1, pi#n, pi#t, pi#t-1, y0}
+message := list{x#0?, x#t?}
+public := list{U1, U2, U1#0?, U2#0?, U2#t?, Ut}
+signature := list{pi0?, pi#0?, pi#1?, pi#l-1?, pi#t?, pi#t-1?, y0}
 
 # same signer
 BEGIN :: count
@@ -43,15 +43,17 @@ public_count := one
 signature_count := N
 END :: count
 
-#BEGIN :: transform
 #2, 6, 5, 3, 2
-#END :: transform
+#transform := list{2, 3, 5, 3, 6}
 
-verify1 := { e(pi#1, g2) == e((g1^(1 - x#0)) * (U1#0^x#0), Ut) } and {{ e(pi#0, g2) == e(pi#n, U2#0) } and { e(pi#0, h) == y0 }}
+verify1 := { e(pi#1?, g2) == e((g1^(1 - x#0?)) * (U1#0?^x#0?), Ut) } and {{ e(pi#0?, g2) == e(pi#l?, U2#0?) } and { e(pi#0?, h) == y0 }}
+
+# l + 1
 #BEGIN :: for
-#for{t := 1, n}
-#verify2 := { e(pi#t, g2) == (e((pi#t-1^(1 - x#t)), g2) * e(pi#t-1^x#t, U2#t)) }
+#for{t := 2, 5}
+#verify2 := { e(pi#t?, g2) == (e((pi#t-1?^(1 - x#t-1?)), g2) * e(pi#t-1?^x#t-1?, U2#t-1?)) }
 #END :: for
+
 
 BEGIN :: func:setup
 input := list{n}
@@ -86,7 +88,7 @@ sk := expand{ut, g1, h}
 
 dotProd := init(ZR)
 BEGIN :: for
-for{i:= 0, n}
+for{i:= 0, l}
 dotProd := dotProd * (u#i ^ x#i)
 END :: for
 
@@ -103,30 +105,30 @@ input := list{sk, u, x}
 sk := expand{ut, g1, h}
 
 BEGIN :: for
-for{i := 0, n}
+for{i := 0, l}
 dotProd0 := init(ZR)
 BEGIN :: forinner
 forinner{j := 0, i+1}
    dotProd0 := dotProd0 * (u#j ^ x#j)
 END :: forinner
-pi#i := g1 ^ (ut * dotProd0)
+pi#i+1? := g1 ^ (ut * dotProd0)
 END :: for
 
 dotProd1 := init(ZR)
 BEGIN :: for
-for{i := 0, n}
+for{i := 0, l}
    dotProd1 := dotProd1 * (u#i ^ x#i)
 END :: for
-pi0 := g1 ^ (ut * u#0 * dotProd1)
+pi#0 := g1 ^ (ut * u#0 * dotProd1)
 y0 := polyF(sk, u, x)
-output := list{y0, pi, pi0}
+output := list{y0, pi}
 END :: func:prove
 
 
 BEGIN :: func:verify
-input := list{U1, U2, Ut, g1, g2, h, y0, pi, pi0, x}
+input := list{U1, U2, Ut, g1, g2, h, y0, pi, x}
 
-proof0 := e(pi#0?, g2)
+proof0 := e(pi#1?, g2)
 
 BEGIN :: if
 if { { x#0? == 0} and {proof0 != e(g1, Ut)} }
@@ -144,45 +146,47 @@ if { { x#0? != 0 } and { x#0? != 1 } }
 END :: if 
 
 BEGIN :: for
-for{i := 1, n}
+for{i := 2, l+1}
 
 proof1 := e(pi#i?, g2)
 BEGIN :: if
-if { { x#i? == 0 } and { proof1 != e(pi#i-1?, g2) } }
+if { { x#i-1? == 0 } and { proof1 != e(pi#i-1?, g2) } }
    output := False
 END :: if
 
 BEGIN :: if
-if { { x#i? == 1 } and { proof1 != e(pi#i-1?, U2#i?) } } 
+if { { x#i-1? == 1 } and { proof1 != e(pi#i-1?, U2#i-1?) } } 
    output := False
 END :: if
 
 BEGIN :: if
-if { { x#i? != 0 } and { x#i? != 1 } }
+if { { x#i-1? != 0 } and { x#i-1? != 1 } }
    output := False
 END :: if 
 END :: for
 
 BEGIN :: if
-if { e(pi0, g2 * h) != (e(pi#n-1?, U2#0?) * y0) }
+if { e(pi#0, g2 * h) != (e(pi#l?, U2#0?) * y0) }
    output := False
 END :: if
 
 output := True
 END :: func:verify
 
+
 BEGIN :: latex
-pi#0 := \pi_0
-pi#1 := \pi_1
-pi#n := \pi_n
-pi#t := \pi_t
-pi#t-1 := \pi_{t-1}
+pi0? := \pi_0
+pi#0? := \pi_1
+pi#1? := \pi_1
+pi#l-1? := \pi_{l-1}
+pi#t? := \pi_t
+pi#t-1? := \pi_{t-1}
 g1 := g_1
 g2 := g_2
-x#0 := x_1
-x#t := x_t
+x#0? := x_1
+x#t? := x_t
 Ut := \hat{U}
-U1#0 := U_1
-U2#0 := U_0
-U2#t := U_t
+U1#0? := U_1
+U2#0? := U_0
+U2#t? := U_t
 END :: latex

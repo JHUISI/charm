@@ -100,6 +100,7 @@ class RecordOperations:
                 else: # incase there are 
                     data['key'].append(key)
 
+                key = key.split(LIST_INDEX_SYMBOL)[0]
                 assert self.vars_def.get(key) != None, "key = '%s' not found in vars db." % key
                 data[key] = int(self.vars_def.get(key)) # need to handle error
 
@@ -133,6 +134,7 @@ class RecordOperations:
                 else: # incase there are 
                     data['key'].append(key)
 
+                key = key.split(LIST_INDEX_SYMBOL)[0]
                 assert self.vars_def.get(key) != None, "key = '%s' not found in vars db." % key
                 data[key] = int(self.vars_def.get(key)) # need to handle error
 
@@ -172,6 +174,8 @@ class RecordOperations:
     def map(self, node_type):
         if node_type in ['listZR', 'listG1', 'listG2', 'listGT']:
             return node_type.strip('list')
+        elif node_type in ['int', 'listInt']:
+            return 'ZR'
         return node_type
     
     def deriveNodeType(self, node):
@@ -193,7 +197,8 @@ class RecordOperations:
             return self.deriveNodeType(node.left)
         #print("printing type =>", _type)
         #print("node =>", node)
+        _type = _type.split(LIST_INDEX_SYMBOL)[0] # get rid of "#" if present
         if _type == 'delta': return 'ZR'
         if _type == '1': return 'ZR' # probably computing an inverse here 
-        assert self.vars_def.get(_type) != None, "Key error in vars db => '%s'" % _type
+        assert self.vars_def.get(_type) != None, "Key error in vars db! => '%s'" % _type
         return self.vars_def[_type]

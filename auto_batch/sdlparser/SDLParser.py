@@ -58,6 +58,7 @@ builtInTypes["DeriveKey"] = types.str
 builtInTypes["SymEnc"] = types.str
 builtInTypes["SymDec"] = types.str
 builtInTypes["strToId"] = types.listZR
+builtInTypes["stringToInt"] = types.listZR
 builtInTypes["createPolicy"] = types.object
 builtInTypes["getAttributeList"] = types.listStr
 builtInTypes["calculateSharesDict"] = types.symmap
@@ -153,7 +154,7 @@ class SDLParser:
         #Operator = OperatorAND | OperatorOR | Token
 
         # describes an individual leaf node
-        leafNode = Word(alphanums + '_-#\\?').setParseAction( createNode )
+        leafNode = Word(alphanums + '_-+#\\?').setParseAction( createNode )
         expr = Forward()
         term = Forward()
         factor = Forward()

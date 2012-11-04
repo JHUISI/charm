@@ -4,7 +4,6 @@ from sdlparser.SDLParser import *
 from batchtechniques import AbstractTechnique
 
 pairing = Enum('Asymmetric', 'Symmetric')
-
 # post-order traversal needed here?
 class BasicTypeExist(AbstractTechnique):
     def __init__(self, variables):
@@ -31,11 +30,13 @@ class BasicTypeExist(AbstractTechnique):
     def visit_attr(self, node, data):
         variable = node.getAttribute()
         # ignore reserved keywords
+        variableMinusListIndex = variable.split(LIST_INDEX_SYMBOL)[0]
         if variable in ['0', '1', '-1', 'y', 'l', 'z', 'N'] or variable in self.exclude_list: pass
         # consider storing variables in a list?
-        elif not variable in self.vars.keys(): 
+        elif not variable in self.vars.keys() and not variableMinusListIndex in self.vars.keys(): 
             print("Error: ", variable, "does not have a type!")
             self.missing_symbols.append(variable)
+            
     
     def report(self, equation):
         if len(self.missing_symbols) > 0:

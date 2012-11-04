@@ -1,6 +1,8 @@
 
 from batchlang import *
 from batchparser import *
+#import sdlpath
+#from sdlparser.SDLParser import *
 
 Tech_db = Enum('NoneApplied', 'ExpIntoPairing', 'DistributeExpToPairing', 'ProductToSum', 'CombinePairing', 'SplitPairing', 'ConstantPairing', 'MoveExpOutPairing', 'ConstantSizeLoop')
 
@@ -284,6 +286,38 @@ class AbstractTechnique:
             return self.createExp(new, inv_node)
         return new
     
+    @classmethod    
+    def createInvExpImproved(self, left):
+        inv_node = BinaryNode("-1")
+        new = BinaryNode.copy(left)
+        if Type(new) == ops.EXP:
+            if Type(new.right) == ops.ATTR:
+                new.right.negated = not new.right.negated
+            elif Type(new.right) == ops.MUL:
+                # JAA: fix the logic below and swap all calls to prior function to use this one. (TODO)
+                # case 1: a^(b * c) transforms to a^(-b * -c)
+                # case 2: a^((x + y) * b) transforms to a^((x + y) * -b) 
+                subnodes = []
+                getListNodes(new.right, ops.EXP, subnodes)
+                if len(subnodes) > 0:
+                    for i in subnodes: 
+                        if Type(i) == ops.ATTR: i.negated = not i.negated
+                else:
+                    return self.createMul(new, inv_node)
+#                print("Result: ", new)
+                return new
+            else: # ADD, DIV, SUB, etc
+                print("warning: not tested yet in createInvExp():", Type(new), 
+                      self.createMul(new, inv_node))
+                return new
+        elif Type(new) == ops.ON:
+            new.right = self.createInvExp(new.right)
+        else:
+#            print("handle case 2.")
+            return self.createExpImproved(new, inv_node)
+        return new
+        
+    
     def createMulFromList(self, _list):
         if len(_list) > 1:
             muls = [ BinaryNode(ops.MUL) for i in range(len(_list)-1) ]
@@ -365,6 +399,76 @@ class AbstractTechnique:
             exp.left = left
             exp.right = right
         return exp
+
+    @classmethod
+    def createExpImproved(self, left, right):
+#        print("createExpImproved: ", left, "^", right)
+        if left.type == ops.EXP: # left => a^b , then => a^(b * c)
+#            exp = BinaryNode(ops.EXP)
+            if Type(left.right) == ops.ATTR:
+#                print("handle EXP case: ", left.right.getAttribute(), " ^ ", right)
+                value = left.right.getAttribute()                
+                if str(left.right) == str(right) and str(left.right) == "-1": # in other words ((left ^ -1) ^ -1)
+                    # by negation rule we are left with left node without an EXP node
+                    return BinaryNode.copy(left.left)                    
+                elif value.isdigit() and int(value) <= 1:  
+#                    exp.left = left.left
+                    if right.negated: 
+                        left.right.negated = False 
+                        right.negated = False 
+                    #left.right.setAttribute(str(right))
+                    self.negateThis(right)
+                    BinaryNode.setNodeAs(left.right, right)
+                    #print("adjusted negation nodes: ", left.right)
+# JAA commented out to avoid extra index, for example, 'delta_z_z' for VRF 
+#                    print("original: ", left.right.attr_index)
+#                    left.right.attr_index = right.attr_index                    
+#                    print("post: ", left.right.attr_index)
+                    mul = left.right
+                else:
+                    value = right.getAttribute()
+                    if value and value.isdigit() and int(value) <= 1: # attr => -1 * ATTR => negate(left.right)
+                        left.right.negated = not left.right.negated
+                        mul = left.right
+                    else: # build a mul node with MUL.left = left.right and MUL.right = right 
+                        mul = BinaryNode(ops.MUL)
+                        mul.left = left.right
+                        mul.right = right         
+            else:
+                mul = BinaryNode(ops.MUL)
+                mul.left = left.right
+                mul.right = right
+            exp = BinaryNode(ops.EXP)
+            exp.left = left.left
+            exp.right = mul                
+        elif left.type in [ops.ATTR, ops.PAIR, ops.HASH]: # left: attr ^ right
+            exp = BinaryNode(ops.EXP)
+            exp.left = left
+            exp.right = right
+        elif left.type == ops.MUL:
+            nodes = []
+            self.getMulTokens(left, ops.NONE, [ops.EXP, ops.PAIR, ops.HASH, ops.ATTR], nodes)
+            #getListNodes(left, ops.NONE, nodes)
+#            print("JAA: createExp sub nodes:")
+#            for i in nodes:
+#                print("subnodes: ", i)
+            if len(nodes) > 2: # only distribute exponent when there are 
+                muls = [ BinaryNode(ops.MUL) for i in range(len(nodes)-1) ]
+                for i in range(len(muls)):
+                    muls[i].left = self.createExpImproved(nodes[i], BinaryNode.copy(right))
+                    if i < len(muls)-1: muls[i].right = muls[i+1]
+                    else: muls[i].right = self.createExpImproved(nodes[i+1], BinaryNode.copy(right))
+                exp = muls[0] # MUL nodes absorb the exponent
+            else:
+                exp = BinaryNode(ops.EXP)
+                exp.left = left
+                exp.right = right
+        else:
+            exp = BinaryNode(ops.EXP)
+            exp.left = left
+            exp.right = right
+        return exp
+
 
     @classmethod
     def createExp2(self, left, right, _listIFMul=None):
@@ -1143,76 +1247,6 @@ class ASTIndexForIndiv(AbstractTechnique):
 
 tech10 = Tech_db
 
-# This class determines whether a binary node tree that includes a for loop node can actually be unrolled
-# if so, proceed to execute the UnrollLoop made up of two sub classes:
-# 1) Evaluates a given binary node tree at a particular iteration point and proceeds to combine it with the previous equation, 
-# 2) Applies combo techniques to optimize the unrolled equations, etc.
-class Technique10(AbstractTechnique):
-    def __init__(self, sdl_data, variables):
-        AbstractTechnique.__init__(self, sdl_data, variables)  
-        self.rule    = "Unroll constant-size for loop (technique 10)"
-        self.applied = False 
-        self.score   = tech10.NoneApplied
-        self.debug = False      
-        self.loopStmt   = None
-        self.for_start = None
-        self.for_end = None
-        self.for_iterator = None
-
-    def visit_do(self, node, data):
-        if Type(node.left) == ops.FOR:
-            self.loopStmt = node.right
-
-    def visit_for(self, node, data):
-        if(Type(node.left) == ops.EQ):
-            start = node.left
-            self.for_iterator = start.left.getAttribute()
-            self.for_start = int(start.right.getAttribute())
-            if self.for_start == None or self.for_iterator == None: sys.exit("ERROR: for loop not well formed!") 
-            print("for: ", self.for_iterator, ":", self.for_start)                       
-        if(Type(node.right) == ops.ATTR):
-            val = node.right.getAttribute()
-            self.for_end = int(self.varDefineValue(val)) # abstract class call
-            if self.for_end == None: sys.exit("ERROR: %s is not defined in SDL." % val)
-            print("until: ", node.right, self.for_end)
-    
-    def testForApplication(self):
-        if self.for_start != None and self.for_iterator != None and self.for_end != None:
-            self.applied = True
-            self.score   = tech10.ConstantSizeLoop
-        else:
-            self.applied = False
-        return self.applied
-
-
-# performs step 1 from above. Replaces 't' (target variables) with integer values in each attribute
-class EvaluateAtIntValue:
-    def __init__(self, target_var, int_value):
-        self.target_var = target_var
-        self.int_value  = int_value
-        self.debug      = False
-    
-    def visit(self, node, data):
-        pass
-   
-    def visit_attr(self, node, data):#    
-        attr = node.getAttribute()
-        new_attr = ''
-        s = attr.split('#') 
-        if( len(s) > 1 ):
-            if self.debug: print("attr: ", node, s)
-            for i in s:
-                if i == self.target_var:
-                    new_attr += str(self.int_value)
-                elif self.target_var in i: # instead of t+1 or t-1 or etc replace with the evaluated result                    
-                    exec("%s = %s" % (self.target_var, self.int_value))
-                    new_attr += str(eval(i))
-                else:
-                    new_attr += i
-                new_attr += '#'
-            new_attr = new_attr[:-1] # cut off last character
-            if self.debug: print("new_attr: ", new_attr)
-            node.setAttribute(new_attr)
             
 #    # need a function that can replace variables with integers from 1 until X. 
 #    def checkExistenceOfAttribute(self, node, var):
