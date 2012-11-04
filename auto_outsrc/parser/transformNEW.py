@@ -119,6 +119,29 @@ def getNodePairingObjs(node):
     pairingsList = []
     getNodePairingObjsRecursive(node, pairingsList)
     return pairingsList
+
+def getAreAllVarsOnLineKnownByTransformRecursive(node, knownVars, varsNotKnownByTransform):
+    if (node.left != None):
+        getAreAllVarsOnLineKnownByTransformRecursive(node.left, knownVars, varsNotKnownByTransform)
+
+    if (node.right != None):
+        getAreAllVarsOnLineKnownByTransformRecursive(node.right, knownVars, varsNotKnownByTransform)
+
+    if (node.type == ops.ATTR):
+        if (dropListSymbol(str(node)) not in knownVars):
+            if (str(node) not in varsNotKnownByTransform):
+                varsNotKnownByTransform.append(str(node))
+
+def getAreAllVarsOnLineKnownByTransform(node, knownVars):
+    varsNotKnownByTransform = []
+    getAreAllVarsOnLineKnownByTransformRecursive(node, knownVars, varsNotKnownByTransform)
+    if (len(varsNotKnownByTransform) == 0):
+        return True
+    else:
+        return False
+
+def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines):
+    pass
     
 def transformNEW(varsThatAreBlindedDict):
     #addTransformFuncIntro()
@@ -159,16 +182,8 @@ def transformNEW(varsThatAreBlindedDict):
             startLineNoOfSearch = lineNo
             break
 
-    #print(knownVars)
-
-    #print(transformLines)
-    #print(decoutLines)
-
     if (startLineNoOfSearch == None):
         sys.exit("transformNEW in transformNEW.py:  couldn't locate either input statement or EXPAND nodes.")
-
-    #print("start search", startLineNoOfSearch)
-    
 
     for lineNo in range(startLineNoOfSearch, (lastLineOfTransform + 1)):
         currentNode = astNodes[lineNo - 1]
@@ -178,6 +193,8 @@ def transformNEW(varsThatAreBlindedDict):
         currentNodePairings = getNodePairingObjs(currentNode)
         if (len(currentNodePairings) > 0):
             groupedPairings = groupPairings(currentNodePairings, varsThatAreBlindedDict)
-        areAllVarsOnLineKnownByTransform = getAreAllVarsOnLineKnownByTransform(
+            writeOutPairingCalcs(groupedPairings, transformLines, decoutLines)
+        else:
+            areAllVarsOnLineKnownByTransform = getAreAllVarsOnLineKnownByTransform(currentNode.right, knownVars)
 
     sys.exit("TEST")
