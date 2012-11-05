@@ -104,6 +104,7 @@ input := list{sk, ct}
 sk := expand{id, d0, d1, d2, d3, d4}
 ct := expand{c, c_pr}
 
+testVar := d0 * d1
 result := e(c#0, d0) * e(c#1, d1) * e(c#2, d2) * e(c#3, d3) * e(c#4, d4)        
 M := c_pr * result   
 output := M

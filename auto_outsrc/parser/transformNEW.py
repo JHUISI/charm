@@ -3,6 +3,9 @@ from outsrctechniques import *
 import config
 import sys
 
+transformListCounter = 0
+decoutListCounter = 0
+
 def addTransformFuncIntro():
     firstLineOfDecryptFunc = getStartLineNoOfFunc(decryptFuncName)
     transformFuncIntro = ["BEGIN :: func:" + transformFuncName + "\n"]
@@ -85,6 +88,8 @@ def groupPairings(nodePairings, varsThatAreBlindedDict):
         blindingExponents.sort()
         addExpsAndPairingNodeToRetList(blindingExponents, pairing, retList)
 
+    return retList
+
 def dropListSymbol(attrName):
     listIndexSymbolPos = attrName.find(LIST_INDEX_SYMBOL)
     if (listIndexSymbolPos == -1):
@@ -140,9 +145,62 @@ def getAreAllVarsOnLineKnownByTransform(node, knownVars):
     else:
         return False
 
-def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines):
-    pass
-    
+def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode):
+    global transformListCounter, decoutListCounter
+
+    decoutListCounter = transformListCounter
+
+    for groupedPairing in groupedPairings:
+        lineForTransformLines = ""
+
+        lineForTransformLines += transformOutputList + LIST_INDEX_SYMBOL + str(transformListCounter) + " := "
+        transformListCounter += 1
+        listOfPairings = groupedPairing[1]
+        for pairing in listOfPairings:
+            lineForTransformLines += str(pairing) + " * " 
+
+        lineForTransformLines = lineForTransformLines[0:(len(lineForTransformLines) - len(" * "))]
+        transformLines.append(lineForTransformLines + "\n")
+        #print(str(currentNode.left))
+
+    lineForDecoutLines = ""
+    lineForDecoutLines += str(currentNode.left) + " := "
+    subLineForDecoutLines = ""
+    for groupedPairing in groupedPairings:
+         #subLineForDecoutLines = ""
+         subLineForDecoutLines += "(" + transformOutputList + LIST_INDEX_SYMBOL + str(decoutListCounter)
+         decoutListCounter += 1
+         subLineForDecoutLines += " ^ ("
+         blindingExponents = groupedPairing[0]
+         for blindingExponent in blindingExponents:
+             subLineForDecoutLines += blindingExponent + " * "
+         subLineForDecoutLines = subLineForDecoutLines[0:(len(subLineForDecoutLines) - len(" * "))]
+         subLineForDecoutLines += ") )"
+         subLineForDecoutLines += " * "
+
+    subLineForDecoutLines = subLineForDecoutLines[0:(len(subLineForDecoutLines) - len(" * "))]
+
+    lineForDecoutLines += subLineForDecoutLines
+
+    decoutLines.append(lineForDecoutLines + "\n")
+
+def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines):
+    global transformListCounter, decoutListCounter
+
+    decoutListCounter = transformListCounter
+
+    lineForTransformLines = transformOutputList + LIST_INDEX_SYMBOL + str(transformListCounter) + " := "
+    transformListCounter += 1
+    lineForTransformLines += str(currentNode.right)
+
+    transformLines.append(lineForTransformLines + "\n")
+
+    lineForDecoutLines = str(currentNode.left) + " := " 
+    lineForDecoutLines += transformOutputList + LIST_INDEX_SYMBOL + str(decoutListCounter)
+    decoutListCounter += 1
+
+    decoutLines.append(lineForDecoutLines + "\n")
+
 def transformNEW(varsThatAreBlindedDict):
     #addTransformFuncIntro()
     (stmtsDec, typesDec, depListDec, depListNoExponentsDec, infListDec, infListNoExponentsDec) = getFuncStmts(decryptFuncName)
@@ -185,6 +243,8 @@ def transformNEW(varsThatAreBlindedDict):
     if (startLineNoOfSearch == None):
         sys.exit("transformNEW in transformNEW.py:  couldn't locate either input statement or EXPAND nodes.")
 
+    #transformLines += transformOutputList + " = []\n"
+
     for lineNo in range(startLineNoOfSearch, (lastLineOfTransform + 1)):
         currentNode = astNodes[lineNo - 1]
         path_applied = []
@@ -193,8 +253,43 @@ def transformNEW(varsThatAreBlindedDict):
         currentNodePairings = getNodePairingObjs(currentNode)
         if (len(currentNodePairings) > 0):
             groupedPairings = groupPairings(currentNodePairings, varsThatAreBlindedDict)
-            writeOutPairingCalcs(groupedPairings, transformLines, decoutLines)
+            writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode)
         else:
             areAllVarsOnLineKnownByTransform = getAreAllVarsOnLineKnownByTransform(currentNode.right, knownVars)
+            if (areAllVarsOnLineKnownByTransform == False):
+                decoutLines.append(str(currentNode) + "\n")
+            else:
+                writeOutLineKnownByTransform(currentNode, transformLines, decoutLines)
+
+    print(transformLines)
+    print(decoutLines)
+
+    transformLines.append("output := " + transformOutputList + "\n")
+    transformLines.append("END :: func:" + transformFuncName + "\n")
+
+    transformLines.append("\n")
+
+    decoutLines.append("output := " + M + "\n")
+    decoutLines.append("END :: func:" + decOutFunctionName + "\n\n")
+
+    transformPlusDecoutLines = transformLines + decoutLines
+
+    transformOutputListDecl = [transformOutputList + " := list\n"]
+
+    appendToLinesOfCode(transformOutputListDecl, getEndLineNoOfFunc(TYPES_HEADER))
+
+    parseLinesOfCode(getLinesOfCode(), False)
+
+    appendToLinesOfCode(transformPlusDecoutLines, getStartLineNoOfFunc(decryptFuncName))
+
+    parseLinesOfCode(getLinesOfCode(), False)
+
+
+
+
+
+    #removeRangeFromLinesOfCode(getStartLineNoOfFunc(decryptFuncName), getEndLineNoOfFunc(decryptFuncName))
+
+    printLinesOfCode()
 
     sys.exit("TEST")
