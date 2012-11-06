@@ -284,12 +284,10 @@ def transformNEW(varsThatAreBlindedDict):
 
     parseLinesOfCode(getLinesOfCode(), False)
 
+    removeRangeFromLinesOfCode(getStartLineNoOfFunc(decryptFuncName), getEndLineNoOfFunc(decryptFuncName))
 
-
-
-
-    #removeRangeFromLinesOfCode(getStartLineNoOfFunc(decryptFuncName), getEndLineNoOfFunc(decryptFuncName))
+    parseLinesOfCode(getLinesOfCode(), False)
 
     printLinesOfCode()
 
-    sys.exit("TEST")
+    #sys.exit("TEST")

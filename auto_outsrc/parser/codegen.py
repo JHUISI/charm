@@ -1641,7 +1641,7 @@ def main(SDL_Scheme, ignoreCloudSourcingArg, nonCloudSourcingFileNameArg=None):
     #printLinesOfCode()
     #print(blindingFactors_NonLists)
     #print(blindingFactors_Lists)
-    #sys.exit("test")
+    sys.exit("test")
 
     astNodes = getAstNodes()
     assignInfo = getAssignInfo()

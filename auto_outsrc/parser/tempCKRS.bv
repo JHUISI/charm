@@ -13,6 +13,7 @@ gl := list
 c := list
 #d := list
 z := list
+testList := list
 id := str
 END :: types
 
@@ -58,11 +59,19 @@ hashIDDotProd := (prod{y := 0, n} on { hl#y ^ hID#y })
 hashID := hl#0 * hashIDDotProd
 
 #d#0 := h ^ ((r1 * (t1 * t2)) + (r2 * (t3 * t4)))
-d0 := h ^ ((r1 * (t1 * t2)) + (r2 * (t3 * t4)))
+#d0 := h ^ ((r1 * (t1 * t2)) + (r2 * (t3 * t4)))
+d0 := h ^ t1
+
+
 halpha := (h ^ -alpha)
 hashID2r1 := hashID ^ -r1
+
+
 #d#1 := (halpha ^ t2) * (hashID2r1 ^ t2)
-d1 := (halpha ^ t2) * (hashID2r1 ^ t2)
+#d1 := (halpha ^ t2) * (hashID2r1 ^ t2)
+d1 := h ^ t1
+
+
 #d#2 := (halpha ^ t1) * (hashID2r1 ^ t1)
 d2 := (halpha ^ t1) * (hashID2r1 ^ t1)
 hashID2r2 := hashID ^ -r2
@@ -70,8 +79,13 @@ hashID2r2 := hashID ^ -r2
 d3 := (hashID2r2 ^ t4)
 #d#4 := (hashID2r2 ^ t3)
 d4 := (hashID2r2 ^ t3)
+
+BEGIN :: for
+for{y := 0, n}
+testList#y := t2
+END :: for
         
-sk := list{id, d0, d1, d2, d3, d4}
+sk := list{testList, id, d0, d1, d2, d3, d4}
 output := sk
 END :: func:extract
 

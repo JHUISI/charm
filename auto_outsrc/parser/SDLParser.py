@@ -920,7 +920,8 @@ def getOutputVarsDictOfFuncRecursive(retList, funcName, outputVarInfoObj):
 
         (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, newOutputVarName)
         if ( (retFuncName == None) or (retFuncName != funcName) or (retVarInfoObj == None) ):
-            sys.exit("getOutputVarsDictOfFuncRecursive in SDLParser.py:  problem with values returned from getVarNameEntryFromAssignInfo.")
+            #sys.exit("getOutputVarsDictOfFuncRecursive in SDLParser.py:  problem with values returned from getVarNameEntryFromAssignInfo.")
+            return
 
         getOutputVarsDictOfFuncRecursive(retList, funcName, retVarInfoObj)
 
@@ -1161,8 +1162,11 @@ def printLinesOfCode():
     lineNo = 0
 
     for line in linesOfCode:
+        printLine = line
+        if (printLine[len(printLine) - 1] != "\n"):
+            printLine += "\n"
         lineNo += 1
-        print(lineNo, ":", line, end=" ")
+        print(lineNo, ":", printLine, end=" ")
 
 def getLinesOfCodeFromLineNos(listOfLineNos):
     if ( (type(listOfLineNos) is not list) or (len(listOfLineNos) == 0) ):

@@ -1,124 +1,112 @@
 from userFuncs_BSW import *
 
-Y = {}
-g = {}
+t3 = {}
+t1 = {}
+gl = {}
+v1 = {}
+v2 = {}
+v3 = {}
+v4 = {}
+hl = {}
+alpha = {}
+omega = {}
 h = {}
-attrs = {}
-sh = {}
-coeff = {}
-share = {}
-Dj = {}
-Djp = {}
-Cr = {}
-Cpr = {}
-DjBlinded = {}
+t4 = {}
+t2 = {}
+c = {}
+z = {}
 
-def setup():
-	global g
-	global h
+def setup(n, l):
+    global t3
+    global t1
+    global gl
+    global v1
+    global v2
+    global v3
+    global v4
+    global hl
+    global alpha
+    global omega
+    global h
+    global t4
+    global t2
+    global z
 
-	input = None
-	g = group.random(G1)
-	g2 = group.random(G2)
-	alpha = group.random(ZR)
-	beta = group.random(ZR)
-	h = (g ** beta)
-	f = (g ** (1 / beta))
-	i = (g2 ** alpha)
-	egg = (pair(g, g2) ** alpha)
-	mk = [beta, i]
-	pk = [g, g2, h, f, egg]
-	output = (mk, pk)
-	return output
+    input = [n, l]
+    alpha = group.random(ZR)
+    t1 = group.random(ZR)
+    t2 = group.random(ZR)
+    t3 = group.random(ZR)
+    t4 = group.random(ZR)
+    g = group.random(G1)
+    h = group.random(G2)
+    omega = (pair(g, h) ** (t1 * (t2 * alpha)))
+    for y in range(0, n):
+        z[y] = group.random(ZR)
+        gl[y] = (g ** z[y])
+        hl[y] = (h ** z[y])
+    v1 = (g ** t1)
+    v2 = (g ** t2)
+    v3 = (g ** t3)
+    v4 = (g ** t4)
+    mpk = [omega, g, h, gl, hl, v1, v2, v3, v4, n, l]
+    msk = [alpha, t1, t2, t3, t4]
+    output = (mpk, msk)
+    return output
 
-def keygen(pk, mk, S):
-	global Y
-	global Dj
-	global Djp
-	global DjBlinded
+def extract(mpk, msk, id):
 
-	blindingFactor_DjBlinded = {}
+    input = [mpk, msk, id]
+    idBlinded = id
+    zz = group.random(ZR)
+    omega, g, h, gl, hl, v1, v2, v3, v4, n, l = mpk
+    alpha, t1, t2, t3, t4 = msk
+    r1 = group.random(ZR)
+    r2 = group.random(ZR)
+    hID = strToId(mpk, id)
+    hashIDDotProd = dotprod2(range(0,n), lam_func1, hl, hID)
+    hashID = (hl[0] * hashIDDotProd)
+    d0 = (h ** ((r1 * (t1 * t2)) + (r2 * (t3 * t4))))
+    blindingFactor_d0Blinded = group.random(ZR)
+    d0Blinded = (d0 ** (1 / blindingFactor_d0Blinded))
+    halpha = (h ** -alpha)
+    hashID2r1 = (hashID ** -r1)
+    d1 = ((halpha ** t2) * (hashID2r1 ** t2))
+    blindingFactor_d1Blinded = group.random(ZR)
+    d1Blinded = (d1 ** (1 / blindingFactor_d1Blinded))
+    d2 = ((halpha ** t1) * (hashID2r1 ** t1))
+    blindingFactor_d2Blinded = group.random(ZR)
+    d2Blinded = (d2 ** (1 / blindingFactor_d2Blinded))
+    hashID2r2 = (hashID ** -r2)
+    d3 = (hashID2r2 ** t4)
+    blindingFactor_d3Blinded = group.random(ZR)
+    d3Blinded = (d3 ** (1 / blindingFactor_d3Blinded))
+    d4 = (hashID2r2 ** t3)
+    blindingFactor_d4Blinded = group.random(ZR)
+    d4Blinded = (d4 ** (1 / blindingFactor_d4Blinded))
+    sk = [idBlinded, d0Blinded, d1Blinded, d2Blinded, d3Blinded, d4Blinded]
+    skBlinded = [idBlinded, d0Blinded, d1Blinded, d2Blinded, d3Blinded, d4Blinded]
+    output = (blindingFactor_d0Blinded, blindingFactor_d1Blinded, blindingFactor_d2Blinded, blindingFactor_d3Blinded, blindingFactor_d4Blinded, skBlinded)
+    return output
 
-	input = [pk, mk, S]
-	SBlinded = S
-	zz = group.random(ZR)
-	r = group.random(ZR)
-	p0 = (pk[1] ** r)
-	D = ((mk[1] * p0) ** (1 / mk[0]))
-	blindingFactor_DBlinded = group.random(ZR)
-	DBlinded = (D ** (1 / blindingFactor_DBlinded))
-	Y = len(S)
-	for y in range(0, Y):
-		s_y = group.random(ZR)
-		y0 = S[y]
-		Dj[y0] = (p0 * ((group.hash(y0, G2) ** s_y) * mk[1]))
-		Djp[y0] = (g ** s_y)
-	DjpBlinded = Djp
-	for y in Dj:
-		blindingFactor_DjBlinded[y] = group.random(ZR)
-		DjBlinded[y] = (Dj[y] ** (1 / blindingFactor_DjBlinded[y]))
-	sk = [SBlinded, DBlinded, DjBlinded, DjpBlinded]
-	skBlinded = [SBlinded, DBlinded, DjBlinded, DjpBlinded]
-	output = (blindingFactor_DBlinded, blindingFactor_DjBlinded, skBlinded)
-	return output
+def encrypt(mpk, M, id):
+    global c
 
-def encrypt(pk, M, policy_str):
-	global Y
-	global attrs
-	global sh
-	global share
-	global Cr
-	global Cpr
-
-	input = [pk, M, policy_str]
-	g, g2, h, f, egg = pk
-	policy = createPolicy(policy_str)
-	attrs = getAttributeList(policy)
-	R = group.random(GT)
-	hashRandM = [R, M]
-	s = group.hash(hashRandM, ZR)
-	s_sesskey = DeriveKey(R)
-	Ctl = (R * (egg ** s))
-	sh = calculateSharesDict(s, policy)
-	Y = len(sh)
-	C = (h ** s)
-	for y in range(0, Y):
-		y1 = attrs[y]
-		share[y1] = sh[y1]
-		Cr[y1] = (g ** share[y1])
-		Cpr[y1] = (group.hash(y1, G2) ** share[y1])
-		T1 = SymEnc(s_sesskey, M)
-	ct = [policy_str, Ctl, C, Cr, Cpr, T1]
-	output = ct
-	return output
-
-if __name__ == "__main__":
-	global group
-	group = PairingGroup(MNT160)
-
-	S = ['ONE', 'TWO', 'THREE']
-	M = "balls on fire345"
-	policy_str = '((four or three) and (two or one))'
-
-	(mk, pk) = setup()
-	(blindingFactor_DBlinded, blindingFactor_DjBlinded, skBlinded) = keygen(pk, mk, S)
-	(ct) = encrypt(pk, M, policy_str)
-
-	f_ct_BSW = open('ct_BSW.charmPickle', 'wb')
-	pick_ct_BSW = objectToBytes(ct, group)
-	f_ct_BSW.write(pick_ct_BSW)
-	f_ct_BSW.close()
-
-	f_pk_BSW = open('pk_BSW.charmPickle', 'wb')
-	pick_pk_BSW = objectToBytes(pk, group)
-	f_pk_BSW.write(pick_pk_BSW)
-	f_pk_BSW.close()
-
-	f_skBlinded_BSW = open('skBlinded_BSW.charmPickle', 'wb')
-	pick_skBlinded_BSW = objectToBytes(skBlinded, group)
-	f_skBlinded_BSW.write(pick_skBlinded_BSW)
-	f_skBlinded_BSW.close()
-
-	keys = {'sk':zz, 'pk':pk[4]}
-	writeToFile('keys_BSW_.txt', objectOut(group, keys))
+    input = [mpk, M, id]
+    omega, g, h, gl, hl, v1, v2, v3, v4, n, l = mpk
+    s = group.random(ZR)
+    s1 = group.random(ZR)
+    s2 = group.random(ZR)
+    hID1 = strToId(mpk, id)
+    hashID1DotProd = dotprod2(range(0,n), lam_func2, gl, hID1)
+    hashID1 = (gl[0] * hashID1DotProd)
+    c_pr = ((omega ** s) * M)
+    c[0] = (hashID1 ** s)
+    c[1] = (v1 ** (s - s1))
+    c[2] = (v2 ** s1)
+    c[3] = (v3 ** (s - s2))
+    c[4] = (v4 ** s2)
+    ct = [c, c_pr]
+    output = ct
+    return output
 
