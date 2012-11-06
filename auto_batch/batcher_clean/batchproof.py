@@ -23,7 +23,7 @@ header = """\n
 # needs => delta = {\delta_j}, \prod{j=1}^\numsigs == prod{j:=1, N}, 
 
 basic_step = """\medskip \\noindent
-{\\bf Step %d:} %s:
+{\\bf %s Step %d:} %s:
 \\begin{equation}
 %s
 \end{equation}
@@ -32,6 +32,8 @@ basic_step = """\medskip \\noindent
 small_exp_label = "\label{eqn:smallexponents}\n"
 final_batch_eq  = "\label{eqn:finalequation}\n"
 footer = "\n}\n"
+
+main_proof_header_standalone = """\n"""
 
 class PrintLambdaStatement:
     def __init__(self, constants):
@@ -232,7 +234,7 @@ class LatexCodeGenerator:
                  return ( left + ' \\text{ it holds: }  ' + right)
             elif(node.type == ops.AND):
                  return ( left + " \mbox{ and } " + right )
-        return None    
+        return None
 
 
 # 1. Finish rewriting proof generator for single equation sig schemes
@@ -245,6 +247,12 @@ class GenerateProof:
         self.lcg_data = {} 
         self.__lcg_steps = 0
         self.lcg = None
+        self.stepPrefix = ''
+    
+    def setPrefix(self, prefixStr):
+        assert type(prefixStr) == str, "expecting string for the step prefix."
+        self.stepPrefix = prefixStr
+        return
         
     def initLCG(self, constants, vars, sig_vars, latex_vars):
         if self.lcg == None:
@@ -267,6 +275,15 @@ class GenerateProof:
     def setStepOne(self, equation):
         if not self.single_mode: self.setNextStep('step1', equation)
         return
+    
+    def changeMode(self, truthValue):
+        self.single_mode = truthValue
+        return
+    
+#    def setBreakPoint(self):
+#        self.lcg_data[ self.__lcg_steps ] = {} # how should this work?
+#        self.__lcg_steps += 1
+#        return
     
     def setNextStep(self, msg, equation):
         preq = None
@@ -292,7 +309,7 @@ class GenerateProof:
                 self.lcg_data['batch'] = self.lcg_data[ self.__lcg_steps-1 ]['eq']
                 return
                 
-        self.lcg_data[ self.__lcg_steps ] = {'msg': msg, 'eq': self.lcg.print_statement( equation ), 'preq':preq }
+        self.lcg_data[ self.__lcg_steps ] = {'msg': msg, 'eq': self.lcg.print_statement( equation ), 'preq':preq, 'stepPrefix':self.stepPrefix }
 #        if new_msg != None: self.lcg_data[ self.__lcg_steps ]['new_msg'] = new_msg
         self.__lcg_steps += 1
         return
@@ -312,10 +329,11 @@ class GenerateProof:
     def proofBody(self, step, data):
         pre_eq = data.get('preq')
         cur_eq = data['eq']
+        step_prefix = data.get('stepPrefix')
         if pre_eq != None:
             result_eq = pre_eq + cur_eq
-        else: result_eq = cur_eq    
-        result = basic_step % (step, data['msg'], result_eq)
+        else: result_eq = cur_eq
+        result = basic_step % (step_prefix, step, data['msg'], result_eq)
         #print('[STEP', step, ']: ', result)
         return result
 

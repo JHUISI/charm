@@ -698,7 +698,7 @@ class SubstituteSigDotProds:
 # prod{} on (x * y)
 class DotProdInstanceFinder:
     def __init__(self):
-        self.rule = "Distribute dot products (technique 5): "
+        self.rule = "Distribute dot products (technique 5)"
         self.applied = False
 
     def getMulTokens(self, subtree, parent_type, target_type, _list):

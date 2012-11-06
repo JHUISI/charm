@@ -16,7 +16,6 @@ secparam := 80
 # U2#t := G2
 
 BEGIN :: types
- pi0 := G1
  pi := list{G1} 
  g1 := G1
  g2 := G2
@@ -34,7 +33,7 @@ END :: types
 constant := list{g1, g2, h}
 message := list{x#0?, x#t?}
 public := list{U1, U2, U1#0?, U2#0?, U2#t?, Ut}
-signature := list{pi0?, pi#0?, pi#1?, pi#l-1?, pi#t?, pi#t-1?, y0}
+signature := list{pi#0?, pi#1?, pi#l?, pi#t?, pi#t-1?, y0}
 
 # same signer
 BEGIN :: count
@@ -176,18 +175,42 @@ END :: func:verify
 
 
 BEGIN :: latex
-pi0? := \pi_0
-pi#0? := \pi_1
+pi#0? := \pi_0
 pi#1? := \pi_1
-pi#l-1? := \pi_{l-1}
+pi#2? := \pi_2
+pi#3? := \pi_3
+pi#4? := \pi_4
+pi#5? := \pi_5
+pi#6? := \pi_6
+pi#7? := \pi_7
+pi#8? := \pi_8
+pi#l? := \pi_l
 pi#t? := \pi_t
 pi#t-1? := \pi_{t-1}
+y0 := y
 g1 := g_1
 g2 := g_2
-x#0? := x_1
+x#0? := x_0
+x#1? := x_1
+x#2? := x_2
+x#3? := x_3
+x#4? := x_4
+x#5? := x_5
+x#6? := x_6
+x#7? := x_7
+x#8? := x_8
 x#t? := x_t
+x#t-1? := x_{t-1}
 Ut := \hat{U}
-U1#0? := U_1
-U2#0? := U_0
-U2#t? := U_t
+U1#0? := U_0
+U2#0? := \bar{U}_0
+U2#1? := \bar{U}_1
+U2#2? := \bar{U}_2
+U2#3? := \bar{U}_3
+U2#4? := \bar{U}_4
+U2#5? := \bar{U}_5
+U2#6? := \bar{U}_6
+U2#7? := \bar{U}_7
+U2#t? := \bar{U}_t
+U2#t-1? := \bar{U}_{t-1}
 END :: latex
