@@ -46,13 +46,14 @@ END :: count
 #2, 6, 5, 3, 2
 #transform := list{2, 3, 5, 3, 6}
 
-verify1 := { e(pi#1?, g2) == e((g1^(1 - x#0?)) * (U1#0?^x#0?), Ut) } and {{ e(pi#0?, g2) == e(pi#l?, U2#0?) } and { e(pi#0?, h) == y0 }}
+#verify1 := { e(pi#1?, g2) == e((g1^(1 - x#0?)) * (U1#0?^x#0?), Ut) } and {{ e(pi#0?, g2) == e(pi#l?, U2#0?) } and { e(pi#0?, h) == y0 }}
+verify1 := { e(pi#1?, g2) == e((g1^(1 - x#0?)) * (U1#0?^x#0?), Ut) } and {{ e(pi#0?, g2 * (h^-1)) == (e(pi#l?, U2#0?) * (y0^-1)) }}
 
 # l + 1
-#BEGIN :: for
-#for{t := 2, 5}
-#verify2 := { e(pi#t?, g2) == (e((pi#t-1?^(1 - x#t-1?)), g2) * e(pi#t-1?^x#t-1?, U2#t-1?)) }
-#END :: for
+BEGIN :: for
+for{t := 2, 5}
+verify2 := { e(pi#t?, g2) == (e((pi#t-1?^(1 - x#t-1?)), g2) * e(pi#t-1?^x#t-1?, U2#t-1?)) }
+END :: for
 
 
 BEGIN :: func:setup

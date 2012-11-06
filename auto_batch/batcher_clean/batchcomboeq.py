@@ -163,8 +163,22 @@ class CombineMultipleEq(AbstractTechnique):
             if self.debug: print("Result R to L: ", new_node)
             return new_node
         else:
-            print("CE: missing case!")
-            print("node: ", lsize, rsize, node)
+            lsize_pair = 0
+            rsize_pair = 0
+            for i in lchildnodes:
+                if Type(i) == ops.PAIR: lsize_pair += 1
+            for i in rchildnodes:
+                if Type(i) == ops.PAIR: rsize_pair += 1
+            if lsize_pair <= rsize_pair:
+                if self.debug: print("Moving from L to R: ", node)
+                new_left = self.createExp2(BinaryNode.copy(node.left), BinaryNode.copy(self.inverse), _list)
+                new_node = self.createMul(BinaryNode.copy(node.right), new_left)
+                if self.debug: print("Result L to R: ", new_node)
+                return new_node
+            else:               
+                print("CE: missing case!") # count pairings?
+                print("node: ", lsize_pair, rsize_pair, node)
+                sys.exit(0)
             return
 
 class SmallExpTestMul:
