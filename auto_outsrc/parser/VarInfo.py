@@ -321,8 +321,8 @@ class VarInfo:
 
         if (self.assignBaseElemsOnly == None):
             assignNodeRightDeepCopy = copy.deepcopy(self.assignNode.right)
-            newAssignBaseElemsOnlyNode = self.traverseAssignBaseElemsOnlyRecursive(assignNodeRightDeepCopy)
-            self.assignBaseElemsOnly = newAssignBaseElemsOnlyNode
+            #newAssignBaseElemsOnlyNode = self.traverseAssignBaseElemsOnlyRecursive(assignNodeRightDeepCopy)
+            #self.assignBaseElemsOnly = newAssignBaseElemsOnlyNode
 
         self.traverseAssignNodeRecursive(self.assignNode.right, False)
 
