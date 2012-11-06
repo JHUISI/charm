@@ -207,14 +207,16 @@ class SDLBatch:
 
     def __generateMembershipTest(self, verifyArgKeys, verifyArgTypes):
         output = ""
-        strTypeList = ["str", "list{str}"]
+        strTypeList = ["str", "list{str}", "int", "list{int}"]
         verifyArgList = []
+        modTypes = self.setting.getModifiedTypes()
         # prune "str" and "list{str}" types out of membership test
         for i in verifyArgKeys:
             if self.varTypes.get(i) not in strTypeList and verifyArgTypes.get(i) not in strTypeList:
                 # add to lists
-                if self.debug: print("verify membership of: ", i)
-                verifyArgList.append(i)
+                if modTypes.get(i) not in strTypeList:
+                    if self.debug: print("verify membership of: ", i)
+                    verifyArgList.append(i)
                  
         verifyArgs = str(list(verifyArgList)).replace("[", '').replace("]",'').replace("'", '')        
         output += membership_header % verifyArgs
@@ -432,12 +434,16 @@ class SDLBatch:
     def __generateDeltaLines(self, loopVar, newList=None):
         output = ""
         delta_type = "list{ZR}"
+        # multi-equation case "delta1#z, delta2#z, etc" and in some cases includes a "delta#z"
         for i in self.deltaListFirst:
-            output += delta_stmt % (i + "#" + loopVar)
+            if i == '0': j = ''
+            else: j = i
+            output += delta_stmt % (j + "#" + loopVar)
             if newList != None: 
-                newList.append(delta_word + i)
-                self.defaultBatchTypes[delta_word + i] = delta_type
-            
+                newList.append(delta_word + j)
+                self.defaultBatchTypes[delta_word + j] = delta_type
+        
+        # normal case: "delta#z"
         if output == "":
             output = delta_stmt % ("#" + loopVar)
             if newList != None: 

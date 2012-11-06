@@ -915,15 +915,19 @@ class GetDeltaIndex:
     def visit_attr(self, node, data):
         varName = node.getAttribute()
         deltaList = node.getDeltaIndex()
-        if deltaList == None: return
-        if varName == "delta" and (deltaList not in self.delta_single_list) and (deltaList not in self.delta_double_list):
-            if len(deltaList) == 1: 
+        if varName == delta_word and (deltaList not in self.delta_single_list): # and (deltaList not in self.delta_double_list):
+            if deltaList != None:
                 self.delta_single_list.extend( deltaList )
-            elif len(deltaList) > 1:
-                self.delta_double_list.append( deltaList )
+            else:
+                self.delta_single_list.append( '0' )
+        elif deltaList == None: 
+            return
+#            elif len(deltaList) > 1:
+#                self.delta_double_list.append( deltaList )
                 
     def getDeltaList(self):
         newList = list(set(self.delta_single_list))
+        newList.sort()
         return (newList, self.delta_double_list)
 
 # Technique 6 - combining pairings with common elements (1st or 2nd)

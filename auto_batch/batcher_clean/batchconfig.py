@@ -10,6 +10,7 @@ BATCH_VERIFY_MAP = BATCH_VERIFY + "_map"
 BATCH_VERIFY_OTHER_TYPES = BATCH_VERIFY + "_other_types"
 SCHEME_NAME, BATCH_COUNT, SECPARAM = 'name', 'count', 'secparam'
 MSG_CNT, SIG_CNT, PUB_CNT = 'message_count', 'signature_count', 'public_count'
+MEMBERSHIP_TEST_CHECK = 'membership'
 # qualifier (means only one instance of that particular keyword exists)
 SAME = 'one'
 NUM_SIGNATURES = 'N'
@@ -22,7 +23,7 @@ class SDLSetting():
     def __init__(self, debug=False):
         self.verifyEqList = []
         self.latex_symbols = {}
-        self.data = { CONST : None, PUBLIC: None, MESSAGE : None, SIGNATURE: None, SETTING : None }
+        self.data = { CONST : None, PUBLIC: None, MESSAGE : None, SIGNATURE: None, SETTING : None, MEMBERSHIP_TEST_CHECK:{} }
         self.numSignatures = 0
         self.varTypes = {}
         self.indiv_precompute = {}
@@ -165,9 +166,12 @@ class SDLSetting():
             if listVar not in k:
                 self.data[BATCH_VERIFY][k + listVar] = newType % (k + linkVar)
                 self.data[BATCH_VERIFY_MAP][k] = k + listVar
+                self.data[MEMBERSHIP_TEST_CHECK][k + listVar] = newTypeTmp
             else:
+                self.data[MEMBERSHIP_TEST_CHECK][k] = newTypeTmp
                 self.data[BATCH_VERIFY][k] = newType % (k + linkVar)                
                 self.data[BATCH_VERIFY_MAP][k] = k
+                
         else:
             self.data[BATCH_VERIFY][k + listVar] = newType % typeVar
             self.data[BATCH_VERIFY_MAP][k] = k + listVar
@@ -317,3 +321,6 @@ class SDLSetting():
     
     def getMessageVarsCount(self):
         return self.data.get(MSG_CNT)
+    
+    def getModifiedTypes(self): # e.g., someVar := list{someVarLink}; someVarLink := list{ZR} # or G1, etc
+        return self.data.get(MEMBERSHIP_TEST_CHECK)

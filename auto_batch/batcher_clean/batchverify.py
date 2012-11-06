@@ -683,7 +683,7 @@ def benchmark_batcherOLD(argv, prefix=None):
 """
 
 def buildSDLBatchVerifier(sdlOutFile, sdl_data, types, verify2, batch_precompute, var_count, setting):
-    if sdlOutFile == None: sdlOutFile = types['name'] + "_batch_verifier"
+    if sdlOutFile == None: sdlOutFile = types['name'] + "-full-batch"
     sdlBatch = SDLBatch(sdlOutFile, sdl_data, types, verify2, batch_precompute, var_count, setting)
     sdlBatch.construct(VERBOSE)
     return sdlBatch.getVariableCount()
