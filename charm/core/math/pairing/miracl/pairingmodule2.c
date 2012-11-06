@@ -906,18 +906,32 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 //		if(lhs_o1->element_type != ZR_t) {
 		START_CLOCK(dBench);
 		long rhs = PyLong_AsLong(o2);
-		if(PyErr_Occurred() || rhs > 0) {
+		if(PyErr_Occurred() || rhs >= 0) {
 			// clear error and continue
 			//PyErr_Print(); // for debug purposes
 			PyErr_Clear();
 			newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
 			rhs_o2 = createNewElement(ZR_t, lhs_o1->pairing);
-			mpz_init(n);
-			longObjToMPZ(n, (PyLongObject *) o2);
-			element_set_mpz(rhs_o2, n);
-			element_pow_zr(newObject, lhs_o1, rhs_o2);
-			PyObject_Del(rhs_o2);
-			mpz_clear(n);
+			if(newObject->element_type != ZR_t) {
+				mpz_init(n);
+				longObjToMPZ(n, (PyLongObject *) o2);
+				element_set_mpz(rhs_o2, n);
+				element_pow_zr(newObject, lhs_o1, rhs_o2);
+				PyObject_Del(rhs_o2);
+				mpz_clear(n);
+			}
+			else if(rhs >= 0 && rhs <= INT_MAX) {
+				// if less than int for given architecture
+				element_pow_int(newObject, lhs_o1, rhs);
+			}
+			else { // anything larger: convert to an MPZ type then raise to EXP value
+				mpz_init(n);
+				longObjToMPZ(n, (PyLongObject *) o2);
+				element_set_mpz(rhs_o2, n);
+				element_pow_zr(newObject, lhs_o1, rhs_o2);
+				PyObject_Del(rhs_o2);
+				mpz_clear(n);
+			}
 			STOP_CLOCK(dBench);
 		}
 		else if(rhs == -1) {

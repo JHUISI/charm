@@ -19,7 +19,7 @@ int runABETest(Charm_t *pGroup)
 	Charm_t *pValue = GetDict(pkDict, "g");
 	Charm_t *pValue1 = GetDict(mskDict, "beta");
 
-	char *attrList = "[ONE, TWO, THREE]";
+	char *attrList = "[ONE, TWO]";
 
 	debug("calling keygen...\n");
 	char *policy = "((THREE or ONE) and (THREE or TWO))";
@@ -82,7 +82,7 @@ int runHybridABETest(Charm_t *pGroup)
 	Charm_t *pValue = GetDict(pkDict, "g");
 	Charm_t *pValue1 = GetDict(mskDict, "beta");
 
-	char *attrList = "[ONE, TWO, THREE]";
+	char *attrList = "[ONE, TWO]";
 
 	debug("calling keygen...\n");
 	char *policy = "((THREE or ONE) and (THREE or TWO))";

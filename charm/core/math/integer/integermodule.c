@@ -44,13 +44,16 @@ inline size_t size(mpz_t n) {
 void longObjToMPZ(mpz_t m, PyObject * o) {
 	PyLongObject *p = (PyLongObject *) PyNumber_Long(o);
 	int size, i, tmp = Py_SIZE(p);
+	int isNeg = FALSE;
 	mpz_t temp, temp2;
 	mpz_init(temp);
 	mpz_init(temp2);
 	if (tmp > 0)
 		size = tmp;
-	else
+	else {
 		size = -tmp;
+		isNeg = TRUE;
+	}
 	mpz_set_ui(m, 0);
 	for (i = 0; i < size; i++) {
 		mpz_set_ui(temp, p->ob_digit[i]);
@@ -60,6 +63,7 @@ void longObjToMPZ(mpz_t m, PyObject * o) {
 	mpz_clear(temp);
 	mpz_clear(temp2);
 	Py_XDECREF(p);
+	if(isNeg) mpz_neg(m, m);
 }
 
 //void longObjToBN(BIGNUM *m, PyObject *o) {
@@ -147,7 +151,7 @@ int mpzToBN(mpz_t m, BIGNUM *b) {
 PyObject *mpzToLongObj(mpz_t m) {
 	/* borrowed from gmpy */
 	int size = (mpz_sizeinbase(m, 2) + PyLong_SHIFT - 1) / PyLong_SHIFT;
-	int i;
+	int i, isNeg = (mpz_sgn(m) < 0) ? TRUE : FALSE;
 	mpz_t temp;
 	PyLongObject *l = _PyLong_New(size);
 	if (!l)
@@ -160,7 +164,12 @@ PyObject *mpzToLongObj(mpz_t m) {
 	i = size;
 	while ((i > 0) && (l->ob_digit[i - 1] == 0))
 		i--;
-	Py_SIZE( l) = i;
+	if(isNeg) {
+		Py_SIZE(l) = -i;
+	}
+	else {
+		Py_SIZE(l) = i;
+	}
 	mpz_clear(temp);
 	return (PyObject *) l;
 }
@@ -1631,6 +1640,7 @@ static PyObject *lcmCall(PyObject *self, PyObject *args) {
 
 static PyObject *serialize(PyObject *self, PyObject *args) {
 	Integer *obj = NULL;
+	int isNeg;
 
 	if (!PyArg_ParseTuple(args, "O", &obj)) {
 		ErrorMsg("invalid argument");
@@ -1640,17 +1650,18 @@ static PyObject *serialize(PyObject *self, PyObject *args) {
 	size_t count1 = 0, count2 = 0;
 	char *base64_rop = NULL, *base64_rop2 = NULL;
 	PyObject *bytes1 = NULL, *bytes2 = NULL;
-	if (mpz_sgn(obj->e) > 0) {
+//	if (mpz_sgn(obj->e) > 0) {
 		uint8_t *rop = (uint8_t *) mpz_export(NULL, &count1, 1, sizeof(char),
 				0, 0, obj->e);
 		// convert string to base64 encoding
 		size_t length = 0;
 		base64_rop = NewBase64Encode(rop, count1, FALSE, &length);
+		isNeg = mpz_sgn(obj->e) < 0 ? TRUE : FALSE;
 		// convert to bytes (length : base64 integer)
-		bytes1 = PyBytes_FromFormat("%d:%s:", (int) length,
+		bytes1 = PyBytes_FromFormat("%d:%d:%s:", isNeg, (int) length,
 				(const char *) base64_rop);
 		free(base64_rop);
-	}
+//	}
 
 	if (mpz_sgn(obj->m) > 0) {
 		uint8_t *rop2 = (uint8_t *) mpz_export(NULL, &count2, 1, sizeof(char),
@@ -1696,6 +1707,9 @@ static PyObject *deserialize(PyObject *self, PyObject *args) {
 	char delim[] = ":";
 	char *token = NULL;
 	token = strtok((char *) serial_buf, delim);
+	// positive or negative
+	int isNeg = atoi((const char *) token);
+	token = strtok(NULL, delim);
 	// length
 	int int_len = atoi((const char *) token);
 	debug("length => '%d'\n", int_len);
@@ -1734,6 +1748,7 @@ static PyObject *deserialize(PyObject *self, PyObject *args) {
 		mpz_init(obj->m);
 	}
 	mpz_set(obj->e, x);
+	if(isNeg) mpz_neg(obj->e, obj->e);
 
 	mpz_clear(x);
 	mpz_clear(m);

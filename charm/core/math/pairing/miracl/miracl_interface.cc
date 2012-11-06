@@ -454,10 +454,12 @@ void _element_div(Group_t type, element_t *c, const element_t *a, const element_
 element_t *_element_pow_zr_zr(Group_t type, const pairing_t *pairing, const element_t *a, const int b, const element_t *o)
 {
 	Big *o1 = (Big *) o;
+
 	if(type == ZR_t) {
 		Big *x = (Big *) a;
 		return (element_t *) new Big(pow(*x, b, *o1));
 	}
+
 	return NULL;
 }
 
