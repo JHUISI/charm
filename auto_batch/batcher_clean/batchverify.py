@@ -545,7 +545,9 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, loopDetails, eq_number
     
     if Tech10.testForApplication():
         verify2 = Tech10.makeSubsitution(verify2)
-        print(Tech10.rule, ":", verify2, "\n")        
+        if VERBOSE: print(Tech10.rule, ":", verify2, "\n")
+        if PROOFGEN_FLAG:
+            proofGen.setNextStep(Tech10.rule, verify2)
     ##################################################################
             
             # Combine testEq2 into testEq! Need a class to do this for me.
@@ -726,14 +728,9 @@ def run_main(opts):
             result = handleVerifyEq(verifyEqDict[k].get(VERIFY), cnt, verbose)
             cnt += 1 # where we do actual verification on # of eqs
             verifyEqUpdated[ k ] = result
-#            if type(result) != list: 
-#                verify_eq.append(result)
-#            else: 
-#                verify_eq.extend(result)
 
     # santiy checks to verify setting makes sense for given equation 
     variables = setting.getTypes()
-#    for eq in verify_eq:
     for k,v in verifyEqUpdated.items():
         bte = BasicTypeExist( variables )
         ASTVisitor( bte ).preorder( v )
@@ -753,7 +750,12 @@ def run_main(opts):
         for k in verifyList:
             loopDetails = None
             if verifyEqDict[ k ][ hasLoop ]:
-                loopDetails = (verifyEqDict[k][loopVar], verifyEqDict[k][startVal], verifyEqDict[k][endVal])            
+                try:
+                    endValue = str(eval(verifyEqDict[k][endVal], setting.getTypes()))
+                except:
+                    print("Could not determine loop end value. Please define: ", verifyEqDict[k][endVal])
+                    sys.exit(0)
+                loopDetails = (verifyEqDict[k][loopVar], verifyEqDict[k][startVal], endValue) 
             (sdlOutFile, sdl_data0, types0, verify2, batch_precompute0, var_count) = runBatcher2(opts, genProof, file + str(i), verifyEqUpdated[k], setting, loopDetails, i)
             i += 1
 #            print("BATCH EQUATION: ", verify2)
@@ -770,7 +772,12 @@ def run_main(opts):
         for k in verifyList:
             loopDetails = None
             if verifyEqDict[ k ][ hasLoop ]:
-                loopDetails = (verifyEqDict[k][loopVar], verifyEqDict[k][startVal], verifyEqDict[k][endVal])                        
+                try:
+                    endValue = str(eval(verifyEqDict[k][endVal], setting.getTypes()))
+                except:
+                    print("Could not determine loop end value. Please define: ", verifyEqDict[k][endVal])
+                    sys.exit(0)
+                loopDetails = (verifyEqDict[k][loopVar], verifyEqDict[k][startVal], endValue)                        
             (sdlOutFile, sdl_data, types, verify2, batch_precompute, var_count) = runBatcher2(opts, genProof, file, verifyEqUpdated[k], setting, loopDetails)
             buildSDLBatchVerifier(sdlOutFile, sdl_data, types, verify2, batch_precompute, var_count, setting)
         

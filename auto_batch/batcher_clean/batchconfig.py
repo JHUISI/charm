@@ -273,6 +273,7 @@ class SDLSetting():
         if values:
             if type(values) == VarInfo: # check that it is VarInfo
                 self.data[key] = values.getAssignNode().getRight().getAttribute()
+                if self.data.get(key).isdigit(): self.data[key] = int(self.data[key])
                 return True
         else:
             return False

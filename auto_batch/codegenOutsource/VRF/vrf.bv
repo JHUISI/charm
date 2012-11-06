@@ -1,7 +1,7 @@
 name := vrf
 N := 100
 setting := asymmetric
-l := 4 
+l := 8 
 secparam := 80
 
 # pi#0 := G1
@@ -51,7 +51,7 @@ verify1 := { e(pi#1?, g2) == e((g1^(1 - x#0?)) * (U1#0?^x#0?), Ut) } and {{ e(pi
 
 # l + 1
 BEGIN :: for
-for{t := 2, 5}
+for{t := 2, l+1}
 verify2 := { e(pi#t?, g2) == (e((pi#t-1?^(1 - x#t-1?)), g2) * e(pi#t-1?^x#t-1?, U2#t-1?)) }
 END :: for
 
