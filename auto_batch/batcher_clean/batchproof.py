@@ -251,7 +251,7 @@ class GenerateProof:
             self.lcg = LatexCodeGenerator(constants, vars, latex_vars)
             self.constants = constants
             self.vars      = vars
-            self.sig_vars  = sig_vars
+            self.sig_vars  = sig_vars            
             return True
         else:
             # init'ed already

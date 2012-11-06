@@ -28,8 +28,8 @@ zz := int
 END :: types
 
 BEGIN :: precompute
- k := stringToInt(ID#z, l, zz)
- m := stringToInt(M#z, l, zz)
+ k := stringToInt(ID, l, zz)
+ m := stringToInt(M, l, zz)
 END :: precompute
 
 constant := list{A, g2, ub, u1b, u2b}

@@ -780,10 +780,6 @@ def run_main(opts):
                 loopDetails = (verifyEqDict[k][loopVar], verifyEqDict[k][startVal], endValue)                        
             (sdlOutFile, sdl_data, types, verify2, batch_precompute, var_count) = runBatcher2(opts, genProof, file, verifyEqUpdated[k], setting, loopDetails)
             buildSDLBatchVerifier(sdlOutFile, sdl_data, types, verify2, batch_precompute, var_count, setting)
-        
-#    for i in range(len(verify_eq)):    
-#        if verbose: print("\nRunning batcher....\n")
-#        (sdlOutFile, sdl_data, types, verify2, batch_precompute, var_count) = runBatcher2(opts, genProof, file + str(i), verify_eq[i], setting, i)
-    
+            
     return None
 

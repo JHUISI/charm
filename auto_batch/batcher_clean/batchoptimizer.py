@@ -856,6 +856,18 @@ class SubstituteAttr:
         else:
             newVarList = [self.variable_map[ x ] if x in self.variable_keys else x for x in varList]
         node.listNodes = newVarList
+    
+    def visit_func(self, node, data):
+        varList = node.getListNode()
+        if self.loopVar != None:
+            newVarList = [self.variable_map[ x ] + self.loopVarStmt if x in self.variable_keys else x for x in varList]
+        elif self.loopDict != None:
+            for i in self.loopDict[x]:
+                loopVarStmt += "#" + str(i)
+            newVarList = [self.variable_map[ x ] + loopVarStmt if x in self.variable_keys else x for x in varList]
+        else:
+            newVarList = [self.variable_map[ x ] if x in self.variable_keys else x for x in varList]
+        node.listNodes = newVarList
 
 class DropIndexForPrecomputes:
     def __init__(self, variable_list, loopVarTarget, varTypes={}):
