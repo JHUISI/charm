@@ -408,6 +408,7 @@ public:
 	G2 mul(G2, G2);
 	G2 div(G2, G2);
 	G2 exp(G2, ZR);
+	G2 exp(G2, int);
 	GT pair(G1, G2);
 #endif
 
@@ -436,7 +437,9 @@ public:
 	ZR exp(ZR, int);
 	ZR exp(ZR, ZR);
 	G1 exp(G1, ZR);
+	G1 exp(G1, int);
 	GT exp(GT, ZR);
+	GT exp(GT, int);
 
 	ZR add(ZR, ZR);
 	int add(int, int);

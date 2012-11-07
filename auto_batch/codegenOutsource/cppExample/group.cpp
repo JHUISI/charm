@@ -1829,6 +1829,13 @@ G2 PairingGroup::exp(G2 g, ZR r)
 	return l;
 }
 
+G2 PairingGroup::exp(G2 g, int r)
+{
+	// g ^ r == g * r OR scalar multiplication
+	G2 l = pfcObject->mult(g, ZR(r));
+	return l;
+}
+
 GT PairingGroup::pair(G1 g, G2 h)
 {
 	GT gt = pfcObject->pairing(h, g);
@@ -1965,10 +1972,24 @@ G1 PairingGroup::exp(G1 g, ZR r)
  	return l;
 }
 
+G1 PairingGroup::exp(G1 g, int r)
+{
+	// g ^ r == g * r OR scalar multiplication
+	G1 l = pfcObject->mult(g, ZR(r));
+ 	return l;
+}
+
 GT PairingGroup::exp(GT g, ZR r)
 {
 	// g ^ r == g * r OR scalar multiplication
 	GT l = pfcObject->power(g, r);
+	return l;
+}
+
+GT PairingGroup::exp(GT g, int r)
+{
+	// g ^ r == g * r OR scalar multiplication
+	GT l = pfcObject->power(g, ZR(r));
 	return l;
 }
 
