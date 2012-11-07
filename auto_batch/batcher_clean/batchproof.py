@@ -162,6 +162,9 @@ class LatexCodeGenerator:
                 msg = self.getLatexVersion(str(msg))
 #                if msg.find('_') != -1: msg = "{" + msg + "}" # prevent subscript
 #            print("msg : ", msg)
+            if node.delta_index != None and 'delta' in node.attr:
+#                print("Found IT!!!")
+                msg = msg + '_{' + node.delta_index[0] + '}'
             if node.attr_index != None:
                 keys = ""
                 if msg.find('_') != -1:
@@ -266,7 +269,13 @@ class GenerateProof:
             return False
         
     def setIndVerifyEq(self, equation):
-        self.lcg_data['indiv'] = self.lcg.print_statement( equation )
+        if self.lcg_data.get('indiv') == None:
+            self.lcg_data['indiv'] = self.lcg.print_statement( equation )
+            self.lcg_data['indiv_original'] = equation
+        else: # update
+            andOp = BinaryNode(ops.AND, self.lcg_data['indiv_original'], equation)
+            self.lcg_data['indiv_original'] = andOp
+            self.lcg_data['indiv'] = self.lcg.print_statement( andOp )
         return
     
 #    def setBatchVerifyEq(self, equation):

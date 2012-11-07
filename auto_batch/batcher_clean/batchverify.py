@@ -44,14 +44,16 @@ def handleVerifyEq(equation, index, verbose):
             if VERBOSE: print("Final combined eq: ", combined_equation)
             se_test = SmallExpTestMul()
             combined_equation2 = BinaryNode.copy(combined_equation)
-            ASTVisitor(se_test).preorder(combined_equation2)            
+            ASTVisitor(se_test).preorder(combined_equation2)    
+            aftTech2 = UpdateDeltaIndex()
+            ASTVisitor(aftTech2).preorder(combined_equation2)                      
             flags['multiple' + str(index)] = True
             flags[ str(index) ] = combined_equation2
             flags[ 'verify' + str(index) ] = equation.right # used for verify in tex
             # this is step0 for multi equation case
             flags[ 'step1' ] = combined_equation2 # add delta index #s here
             if VERBOSE: print("delta eq: ", combined_equation2)
-#            sys.exit("Testing stuff!!")
+            #sys.exit("Testing stuff!!")
         else:
             # may need to combine them further? or batch separaely
             print("Note: multiple equations left. Either batch each equation separately OR combine further.")
@@ -65,6 +67,8 @@ def handleVerifyEq(equation, index, verbose):
                 se_test = SmallExpTestMul()
                 combined2 = BinaryNode.copy(combined)
                 ASTVisitor(se_test).preorder(combined2)
+                aftTech2 = UpdateDeltaIndex()
+                ASTVisitor(aftTech2).preorder(combined2)                      
                 if VERBOSE: print("combined: ", combined2)               
 #                exit(0)
                 flags['multiple' + str(index)] = True
