@@ -15,23 +15,16 @@ class BasicTypeExist(AbstractTechnique):
         left_node = node.left
         if Type(left_node) == ops.EQ:
             self.exclude_list.append(str(left_node.left))
-        right_node = node.right 
-        if Type(right_node) == ops.ATTR:      
+        right_node = node.right
+        if Type(right_node) in [ops.ATTR, ops.ADD, ops.SUB, ops.MUL, ops.DIV]:      
             self.exclude_list.append(str(right_node))
-
-#    def visit_prod(self, node, data):
-#        left_node = node.left
-#        if Type(left_node) == ops.EQ:
-#            self.exclude_list.append(str(left_node.left))
-#        right_node = node.right 
-#        if Type(right_node) == ops.ATTR:      
-#            self.exclude_list.append(str(right_node))
     
     def visit_attr(self, node, data):
         variable = node.getAttribute()
         # ignore reserved keywords
         variableMinusListIndex = variable.split(LIST_INDEX_SYMBOL)[0]
-        if variable in ['0', '1', '-1', 'y', 'l', 'z', 'N'] or variable in self.exclude_list: pass
+        if variable.isdigit(): pass # handles attributes that are really integers
+        elif variable in ['y', 'l', 'z', 'N'] or variable in self.exclude_list: pass
         # consider storing variables in a list?
         elif not variable in self.vars.keys() and not variableMinusListIndex in self.vars.keys(): 
             print("Error: ", variable, "does not have a type!")

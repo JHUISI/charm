@@ -1,5 +1,5 @@
 name := vrf
-N := 2
+N := 100
 setting := asymmetric
 l := 8 
 secparam := 80
@@ -16,7 +16,6 @@ secparam := 80
 # U2#t := G2
 
 BEGIN :: types
-pi0 := G1
 pi := list{G1}
 g1 := G1
 g2 := G2
@@ -31,9 +30,15 @@ u := list{ZR}
 result0 := GT
 delta1 := list{ZR}
 delta2 := list{ZR}
+delta3 := list{ZR}
+delta4 := list{ZR}
+delta5 := list{ZR}
+delta6 := list{ZR}
+delta7 := list{ZR}
+delta8 := list{ZR}
+delta9 := list{ZR}
 startSigNum := int
 endSigNum := int
-delta := list{ZR}
 incorrectIndices := list{int}
 dotCLoopVal := G1
 dotILoopVal := G1
@@ -69,7 +74,7 @@ END :: types
 constant := list{g1, g2, h}
 message := list{x#0?, x#t?}
 public := list{U1, U2, U1#0?, U2#0?, U2#t?, Ut}
-signature := list{pi0?, pi#0?, pi#1?, pi#l-1?, pi#t?, pi#t-1?, y0}
+signature := list{pi#0?, pi#1?, pi#l?, pi#t?, pi#t-1?, y0}
 
 # same signer
 BEGIN :: count
@@ -211,20 +216,44 @@ END :: func:verify
 
 
 BEGIN :: latex
-pi0? := \pi_0
-pi#0? := \pi_1
+pi#0? := \pi_0
 pi#1? := \pi_1
-pi#l-1? := \pi_{l-1}
+pi#2? := \pi_2
+pi#3? := \pi_3
+pi#4? := \pi_4
+pi#5? := \pi_5
+pi#6? := \pi_6
+pi#7? := \pi_7
+pi#8? := \pi_8
+pi#l? := \pi_l
 pi#t? := \pi_t
 pi#t-1? := \pi_{t-1}
+y0 := y
 g1 := g_1
 g2 := g_2
-x#0? := x_1
+x#0? := x_0
+x#1? := x_1
+x#2? := x_2
+x#3? := x_3
+x#4? := x_4
+x#5? := x_5
+x#6? := x_6
+x#7? := x_7
+x#8? := x_8
 x#t? := x_t
+x#t-1? := x_{t-1}
 Ut := \hat{U}
-U1#0? := U_1
-U2#0? := U_0
-U2#t? := U_t
+U1#0? := U_0
+U2#0? := \bar{U}_0
+U2#1? := \bar{U}_1
+U2#2? := \bar{U}_2
+U2#3? := \bar{U}_3
+U2#4? := \bar{U}_4
+U2#5? := \bar{U}_5
+U2#6? := \bar{U}_6
+U2#7? := \bar{U}_7
+U2#t? := \bar{U}_t
+U2#t-1? := \bar{U}_{t-1}
 END :: latex
 
 BEGIN :: func:membership
@@ -276,7 +305,7 @@ END :: func:membership
 
 
 BEGIN :: func:dividenconquer
- input := list{delta, delta1, delta2, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, Ut, g2, U2, h}
+ input := list{delta1, delta2, delta3, delta4, delta5, delta6, delta7, delta8, delta9, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, Ut, g2, U2, h}
 dotALoopVal := init(G1)
 dotBLoopVal := init(G1)
 dotCLoopVal := init(G1)
@@ -320,8 +349,8 @@ BEGIN :: if
     output := None
  else
     midSigNum := startSigNum + midway
-    dividenconquer(delta, delta1, delta2, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, Ut, g2, U2, h)
-    dividenconquer(delta, delta1, delta2, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, Ut, g2, U2, h)
+    dividenconquer(delta1, delta2, delta3, delta4, delta5, delta6, delta7, delta8, delta9, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, Ut, g2, U2, h)
+    dividenconquer(delta1, delta2, delta3, delta4, delta5, delta6, delta7, delta8, delta9, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, Ut, g2, U2, h)
 END :: if
 
 
@@ -334,9 +363,15 @@ input := list{U1, U2, Ut, g1, g2, h, pilist, xlist, y0list, incorrectIndices}
 
 BEGIN :: for
 for{z := 0, N}
- delta#z := SmallExp(secparam)
-delta1#z := SmallExp(secparam)
+ delta1#z := SmallExp(secparam)
 delta2#z := SmallExp(secparam)
+delta3#z := SmallExp(secparam)
+delta4#z := SmallExp(secparam)
+delta5#z := SmallExp(secparam)
+delta6#z := SmallExp(secparam)
+delta7#z := SmallExp(secparam)
+delta8#z := SmallExp(secparam)
+delta9#z := SmallExp(secparam)
 END :: for
 
 BEGIN :: if
@@ -348,19 +383,19 @@ END :: if
 BEGIN :: for
 for{z := 0, N}
 dotACache#z := ((g1^((1 - xlist#z#0?) * delta1#z)) * (U1#0?^(xlist#z#0? * delta1#z)))
-dotBCache#z := ((pilist#z#1?^-delta1#z) * ((((((((pilist#z#2?^delta#z) * (pilist#z#1?^((1 - xlist#z#1?) * -delta#z))) * ((pilist#z#3?^-delta#z) * (pilist#z#2?^(((1 - xlist#z#2?) * -delta#z) * -1)))) * ((pilist#z#4?^-delta#z) * (pilist#z#3?^(((1 - xlist#z#3?) * -delta#z) * -1)))) * ((pilist#z#5?^-delta#z) * (pilist#z#4?^(((1 - xlist#z#4?) * -delta#z) * -1)))) * ((pilist#z#6?^-delta#z) * (pilist#z#5?^(((1 - xlist#z#5?) * -delta#z) * -1)))) * ((pilist#z#7?^-delta#z) * (pilist#z#6?^(((1 - xlist#z#6?) * -delta#z) * -1)))) * ((pilist#z#8?^-delta#z) * (pilist#z#7?^(((1 - xlist#z#7?) * -delta#z) * -1)))))
+dotBCache#z := ((pilist#z#1?^-delta1#z) * ((((((((pilist#z#2?^delta3#z) * (pilist#z#1?^((1 - xlist#z#1?) * -delta3#z))) * ((pilist#z#3?^-delta4#z) * (pilist#z#2?^(((1 - xlist#z#2?) * -delta4#z) * -1)))) * ((pilist#z#4?^-delta5#z) * (pilist#z#3?^(((1 - xlist#z#3?) * -delta5#z) * -1)))) * ((pilist#z#5?^-delta6#z) * (pilist#z#4?^(((1 - xlist#z#4?) * -delta6#z) * -1)))) * ((pilist#z#6?^-delta7#z) * (pilist#z#5?^(((1 - xlist#z#5?) * -delta7#z) * -1)))) * ((pilist#z#7?^-delta8#z) * (pilist#z#6?^(((1 - xlist#z#6?) * -delta8#z) * -1)))) * ((pilist#z#8?^-delta9#z) * (pilist#z#7?^(((1 - xlist#z#7?) * -delta9#z) * -1)))))
 dotCCache#z := (pilist#z#l?^delta2#z)
 dotDCache#z := (y0list#z^-delta2#z)
 dotECache#z := (pilist#z#0?^-delta2#z)
-dotFCache#z := (pilist#z#1?^(xlist#z#1? * delta#z))
-dotGCache#z := ((pilist#z#2?^(xlist#z#2? * delta#z))^-1)
-dotHCache#z := ((pilist#z#3?^(xlist#z#3? * delta#z))^-1)
-dotICache#z := ((pilist#z#4?^(xlist#z#4? * delta#z))^-1)
-dotJCache#z := ((pilist#z#5?^(xlist#z#5? * delta#z))^-1)
-dotKCache#z := ((pilist#z#6?^(xlist#z#6? * delta#z))^-1)
-dotLCache#z := ((pilist#z#7?^(xlist#z#7? * delta#z))^-1)
+dotFCache#z := (pilist#z#1?^(xlist#z#1? * delta3#z))
+dotGCache#z := ((pilist#z#2?^(xlist#z#2? * delta4#z))^-1)
+dotHCache#z := ((pilist#z#3?^(xlist#z#3? * delta5#z))^-1)
+dotICache#z := ((pilist#z#4?^(xlist#z#4? * delta6#z))^-1)
+dotJCache#z := ((pilist#z#5?^(xlist#z#5? * delta7#z))^-1)
+dotKCache#z := ((pilist#z#6?^(xlist#z#6? * delta8#z))^-1)
+dotLCache#z := ((pilist#z#7?^(xlist#z#7? * delta9#z))^-1)
 END :: for
- dividenconquer(delta, delta1, delta2, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, Ut, g2, U2, h)
+ dividenconquer(delta1, delta2, delta3, delta4, delta5, delta6, delta7, delta8, delta9, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, Ut, g2, U2, h)
 
  output := incorrectIndices
 END ::func:batchverify

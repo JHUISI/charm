@@ -12,6 +12,7 @@ class ForLoop:
         self.binaryNodeList = []
         self.varInfoNodeList = []
         self.forLoopInner = None
+        self.assignNode = None
 
     def getStartVal(self):
         return self.startVal
@@ -40,6 +41,9 @@ class ForLoop:
     def getInnerLoop(self):
         return self.forLoopInner
 
+    def getAssignNode(self):
+        return self.assignNode
+
     def updateForLoopStruct(self, node, startLineNo, funcName):
         if (node.type != ops.FOR):
             sys.exit("updateForLoopStruct in ForLoop was passed a node that is not of type " + str(ops.FOR))
@@ -59,6 +63,7 @@ class ForLoop:
 
         self.startVal = node.left.right.attr
         self.endVal = node.right.attr
+        self.assignNode = BinaryNode.copy(node)
 
     def setInnerLoop(self, forLoopInnerStruct):
         self.forLoopInner = forLoopInnerStruct

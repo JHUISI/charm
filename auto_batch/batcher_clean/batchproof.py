@@ -214,7 +214,7 @@ class LatexCodeGenerator:
             elif(node.type == ops.SUB):
                 return ("("+ left + ' - ' + right + ")")
             elif(node.type == ops.EQ):
-                return (left + ' = ' + str(int(right) + 1)) 
+                return (left + ' = ' + str(right)) 
             elif(node.type == ops.EQ_TST):
                 return (left + ' \stackrel{?}{=} ' + right)
             elif(node.type == ops.PAIR):

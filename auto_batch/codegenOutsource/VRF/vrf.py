@@ -125,9 +125,9 @@ def membership(U1, U2, Ut, g1, g2, h, pilist, y0list):
     output = True
     return output
 
-def dividenconquer(delta, delta1, delta2, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, Ut, g2, U2, h):
+def dividenconquer(delta1, delta2, delta3, delta4, delta5, delta6, delta7, delta8, delta9, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, Ut, g2, U2, h):
 
-    input = [delta, delta1, delta2, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, Ut, g2, U2, h]
+    input = [delta1, delta2, delta3, delta4, delta5, delta6, delta7, delta8, delta9, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, Ut, g2, U2, h]
     dotALoopVal = 1
     dotBLoopVal = 1
     dotCLoopVal = 1
@@ -163,50 +163,62 @@ def dividenconquer(delta, delta1, delta2, startSigNum, endSigNum, incorrectIndic
         output = None
     else:
         midSigNum = (startSigNum + midway)
-        dividenconquer(delta, delta1, delta2, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, Ut, g2, U2, h)
-        dividenconquer(delta, delta1, delta2, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, Ut, g2, U2, h)
+        dividenconquer(delta1, delta2, delta3, delta4, delta5, delta6, delta7, delta8, delta9, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, Ut, g2, U2, h)
+        dividenconquer(delta1, delta2, delta3, delta4, delta5, delta6, delta7, delta8, delta9, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, Ut, g2, U2, h)
     output = None
 
 def batchverify(U1, U2, Ut, g1, g2, h, pilist, xlist, y0list, incorrectIndices):
 
+    dotLCache = {}
+    dotKCache = {}
+    dotDCache = {}
+    dotJCache = {}
+    dotECache = {}
+    dotICache = {}
+    dotBCache = {}
     delta1 = {}
     delta2 = {}
-    dotCCache = {}
-    dotFCache = {}
-    dotECache = {}
-    dotDCache = {}
-    delta = {}
-    dotLCache = {}
-    dotJCache = {}
-    dotICache = {}
-    dotKCache = {}
+    delta3 = {}
+    delta4 = {}
+    delta5 = {}
+    delta6 = {}
+    delta7 = {}
+    delta8 = {}
+    delta9 = {}
     dotHCache = {}
-    dotBCache = {}
     dotGCache = {}
     dotACache = {}
+    dotFCache = {}
+    dotCCache = {}
 
     input = [U1, U2, Ut, g1, g2, h, pilist, xlist, y0list, incorrectIndices]
     for z in range(0, N):
-        delta[z] = SmallExp(secparam)
         delta1[z] = SmallExp(secparam)
         delta2[z] = SmallExp(secparam)
+        delta3[z] = SmallExp(secparam)
+        delta4[z] = SmallExp(secparam)
+        delta5[z] = SmallExp(secparam)
+        delta6[z] = SmallExp(secparam)
+        delta7[z] = SmallExp(secparam)
+        delta8[z] = SmallExp(secparam)
+        delta9[z] = SmallExp(secparam)
     if ( ( (membership(U1, U2, Ut, g1, g2, h, pilist, y0list)) == (False) ) ):
         output = False
         return output
     for z in range(0, N):
         dotACache[z] = ((g1 ** ((1 - xlist[z][0]) * delta1[z])) * (U1[0] ** (xlist[z][0] * delta1[z])))
-        dotBCache[z] = ((pilist[z][1] ** -delta1[z]) * ((((((((pilist[z][2] ** delta[z]) * (pilist[z][1] ** ((1 - xlist[z][1]) * -delta[z]))) * ((pilist[z][3] ** -delta[z]) * (pilist[z][2] ** (((1 - xlist[z][2]) * -delta[z]) * -1)))) * ((pilist[z][4] ** -delta[z]) * (pilist[z][3] ** (((1 - xlist[z][3]) * -delta[z]) * -1)))) * ((pilist[z][5] ** -delta[z]) * (pilist[z][4] ** (((1 - xlist[z][4]) * -delta[z]) * -1)))) * ((pilist[z][6] ** -delta[z]) * (pilist[z][5] ** (((1 - xlist[z][5]) * -delta[z]) * -1)))) * ((pilist[z][7] ** -delta[z]) * (pilist[z][6] ** (((1 - xlist[z][6]) * -delta[z]) * -1)))) * ((pilist[z][8] ** -delta[z]) * (pilist[z][7] ** (((1 - xlist[z][7]) * -delta[z]) * -1)))))
+        dotBCache[z] = ((pilist[z][1] ** -delta1[z]) * ((((((((pilist[z][2] ** delta3[z]) * (pilist[z][1] ** ((1 - xlist[z][1]) * -delta3[z]))) * ((pilist[z][3] ** -delta4[z]) * (pilist[z][2] ** (((1 - xlist[z][2]) * -delta4[z]) * -1)))) * ((pilist[z][4] ** -delta5[z]) * (pilist[z][3] ** (((1 - xlist[z][3]) * -delta5[z]) * -1)))) * ((pilist[z][5] ** -delta6[z]) * (pilist[z][4] ** (((1 - xlist[z][4]) * -delta6[z]) * -1)))) * ((pilist[z][6] ** -delta7[z]) * (pilist[z][5] ** (((1 - xlist[z][5]) * -delta7[z]) * -1)))) * ((pilist[z][7] ** -delta8[z]) * (pilist[z][6] ** (((1 - xlist[z][6]) * -delta8[z]) * -1)))) * ((pilist[z][8] ** -delta9[z]) * (pilist[z][7] ** (((1 - xlist[z][7]) * -delta9[z]) * -1)))))
         dotCCache[z] = (pilist[z][l] ** delta2[z])
         dotDCache[z] = (y0list[z] ** -delta2[z])
         dotECache[z] = (pilist[z][0] ** -delta2[z])
-        dotFCache[z] = (pilist[z][1] ** (xlist[z][1] * delta[z]))
-        dotGCache[z] = ((pilist[z][2] ** (xlist[z][2] * delta[z])) ** -1)
-        dotHCache[z] = ((pilist[z][3] ** (xlist[z][3] * delta[z])) ** -1)
-        dotICache[z] = ((pilist[z][4] ** (xlist[z][4] * delta[z])) ** -1)
-        dotJCache[z] = ((pilist[z][5] ** (xlist[z][5] * delta[z])) ** -1)
-        dotKCache[z] = ((pilist[z][6] ** (xlist[z][6] * delta[z])) ** -1)
-        dotLCache[z] = ((pilist[z][7] ** (xlist[z][7] * delta[z])) ** -1)
-    dividenconquer(delta, delta1, delta2, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, Ut, g2, U2, h)
+        dotFCache[z] = (pilist[z][1] ** (xlist[z][1] * delta3[z]))
+        dotGCache[z] = ((pilist[z][2] ** (xlist[z][2] * delta4[z])) ** -1)
+        dotHCache[z] = ((pilist[z][3] ** (xlist[z][3] * delta5[z])) ** -1)
+        dotICache[z] = ((pilist[z][4] ** (xlist[z][4] * delta6[z])) ** -1)
+        dotJCache[z] = ((pilist[z][5] ** (xlist[z][5] * delta7[z])) ** -1)
+        dotKCache[z] = ((pilist[z][6] ** (xlist[z][6] * delta8[z])) ** -1)
+        dotLCache[z] = ((pilist[z][7] ** (xlist[z][7] * delta9[z])) ** -1)
+    dividenconquer(delta1, delta2, delta3, delta4, delta5, delta6, delta7, delta8, delta9, 0, N, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, Ut, g2, U2, h)
     output = incorrectIndices
     return output
 
@@ -216,7 +228,7 @@ def SmallExp(bits=80):
 def main():
     global group
     group = PairingGroup(secparam)
-
+    
     (pk, U1, U2, sk, u) = setup(l)
     Ut, g1, g2, h = pk
     

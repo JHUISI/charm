@@ -1,7 +1,7 @@
 import sdlpath
 from sdlparser.SDLParser import *
 from batchtechniques import *
-
+from batchcomboeq import ApplyEqIndex,UpdateDeltaIndex
 tech10 = Tech_db
 
 # performs step 1 from above. Replaces 't' (target variables) with integer values in each attribute
@@ -269,17 +269,31 @@ class Technique10(AbstractTechnique):
             self.applied = False
         return self.applied
 
-    def makeSubsitution(self, equation):
+    def makeSubsitution(self, equation, delta_count=0):
         evalint = EvaluateAtIntValue(self.for_iterator, self.for_start)
         testEq = BinaryNode.copy(equation)
         ASTVisitor(evalint).preorder(testEq)
+        
+        aei = ApplyEqIndex(delta_count)
+        ASTVisitor(aei).preorder(testEq)
+        delta_count += 1
+        aftTech2 = UpdateDeltaIndex()
+        ASTVisitor(aftTech2).preorder(testEq)  
+
 #        print("Evaluated version at %d: %s" % (Tech10.for_start, testEq))
 #        print("Combine the rest into this one...")
         for t in range(self.for_start+1, self.for_end):
             evalint = EvaluateAtIntValue(self.for_iterator, t)  
             testEq2 = BinaryNode.copy(equation)
             ASTVisitor(evalint).preorder(testEq2)
-            #print("Eval-n-Combine version at %d: %s" % (t, testEq2))  
+            
+            aei = ApplyEqIndex(delta_count)
+            ASTVisitor(aei).preorder(testEq2)
+            delta_count += 1
+            aftTech2 = UpdateDeltaIndex()
+            ASTVisitor(aftTech2).preorder(testEq2)
+            
+#            print("Eval-n-Combine version at %d: %s" % (t, testEq2))  
             # break up
             if Type(testEq2) == ops.EQ_TST:
                 lhsNode = testEq2.left
@@ -295,7 +309,7 @@ class Technique10(AbstractTechnique):
                 # simplify exponents    
                 tech2 = Technique2(self.sdl_data, self.types)
                 ASTVisitor(tech2).preorder(testEq)
-    
+        
         return testEq
         
         # simplify exponents

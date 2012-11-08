@@ -17,7 +17,7 @@ NUM_SIGNATURES = 'N'
 NUM_SIGNER_TYPES = ['L', 'l']
 linkVar = "link"
 listVar = "list"
-hasLoop, loopVar, startVal, endVal = "hasLoop", "loopVar", "startVal", "endVal"
+hasLoop, loopVar, startVal, endVal, forNode = "hasLoop", "loopVar", "startVal", "endVal", "forNode"
 
 class SDLSetting():
     def __init__(self, debug=False):
@@ -73,7 +73,7 @@ class SDLSetting():
             print("transform: ", self.data.get(TRANSFORM))
             print("latex: ", self.latex_symbols)
             print("verify args: ", self.data.get(VERIFY))
-    
+        
     def __processPublicVars(self):
         batchCount = self.data[COUNT_HEADER]
         self.data[PUB_CNT] = {SAME:[], NUM_SIGNATURES:[], }
@@ -215,15 +215,21 @@ class SDLSetting():
                 if self.debug: print("Found verify eq: ", eq)
 #                self.verifyEqList.append(eq)
                 if non_funcDict[VERIFY].getOutsideForLoopObj() != None:
-                    self.verifyEqMap[ VERIFY ] = { hasLoop:True, VERIFY: non_funcDict[VERIFY].getAssignNode() }
+                    forRoot = BinaryNode(ops.DO)
+                    forRoot.left = non_funcDict[VERIFY].getOutsideForLoopObj().getAssignNode()
+                    forRoot.right = non_funcDict[VERIFY].getAssignNode().getRight()
+                    self.verifyEqMap[ VERIFY ] = { hasLoop:True, VERIFY:forRoot }
                 else:
-                    self.verifyEqMap[ VERIFY ] = { hasLoop:False, VERIFY: non_funcDict[VERIFY].getAssignNode() }                    
+                    self.verifyEqMap[ VERIFY ] = { hasLoop:False, VERIFY: non_funcDict[VERIFY].getAssignNode() } 
             else:
                 for k,v in non_funcDict.items():
                     if VERIFY in k:# and hasattr(non_funcDict[k], 'getAssignNode'):
                         if non_funcDict[k].getOutsideForLoopObj() != None:
                             forLoopObj = non_funcDict[k].getOutsideForLoopObj()
-                            self.verifyEqMap[ k ] = { hasLoop:True, loopVar: forLoopObj.getLoopVar(), startVal:forLoopObj.getStartVal(), endVal: forLoopObj.getEndVal(), VERIFY : non_funcDict[k].getAssignNode() }
+                            forRoot = BinaryNode(ops.DO)
+                            forRoot.left = forLoopObj.getAssignNode()
+                            forRoot.right = non_funcDict[k].getAssignNode().getRight()
+                            self.verifyEqMap[ k ] = { hasLoop:True, loopVar: forLoopObj.getLoopVar(), startVal:forLoopObj.getStartVal(), endVal: forLoopObj.getEndVal(), VERIFY:forRoot }
                         else:
 #                            self.verifyEqList.append(non_funcDict[k].getAssignNode()) # assumes VarInfo object
                             self.verifyEqMap[ k ] = { hasLoop:False, VERIFY: non_funcDict[k].getAssignNode() }

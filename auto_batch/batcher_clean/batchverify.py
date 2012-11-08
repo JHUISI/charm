@@ -19,6 +19,7 @@ from constructbatch import *
 debug = False
 THRESHOLD_FLAG = CODEGEN_FLAG = PRECOMP_CHECK = VERBOSE = CHOOSE_STRATEGY = False
 global_count   = 0
+delta_count    = 1
 flags = { 'multiple':None, 'step1':None }
 singleVE = True # flag to define whether working with a single or multi-eq for verification
 filePrefix = None
@@ -29,7 +30,11 @@ def handleVerifyEq(equation, index, verbose):
     VERBOSE = verbose
     multipleEquationsHere = False
 #    print("Input: ", Type(equation), equation)
-    combined_equation = BinaryNode.copy(equation.right)
+    if Type(equation) == ops.EQ:
+        combined_equation = BinaryNode.copy(equation.right)
+    else:
+        combined_equation = BinaryNode.copy(equation)
+    
     if VERBOSE: print("Original eq:", combined_equation)
     tme = TestForMultipleEq()
     ASTVisitor(tme).preorder(combined_equation)
@@ -417,9 +422,9 @@ def runBatcher(opts, proofGen, file, verify, ast_struct, eq_number=0):
         proofGen.compileProof(latex_file)
         
 
-def runBatcher2(opts, proofGen, file, verify, settingObj, loopDetails, eq_number=0):
+def runBatcher2(opts, proofGen, file, verify, settingObj, loopDetails, eq_number=1):
     global PROOFGEN_FLAG, THRESHOLD_FLAG, CODEGEN_FLAG, PRECOMP_CHECK, VERBOSE, CHOOSE_STRATEGY
-    global global_count, flags, singleVE
+    global global_count, delta_count, flags, singleVE
     PROOFGEN_FLAG, THRESHOLD_FLAG, CODEGEN_FLAG, PRECOMP_CHECK = opts['proof'], opts['threshold'], opts['codegen'], opts['pre_check']
     VERBOSE, CHOOSE_STRATEGY = opts['verbose'], opts['strategy']
     SDL_OUT_FILE = opts['out_file']
@@ -551,7 +556,7 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, loopDetails, eq_number
     Tech10 = Technique10(sdl_data, types, loopDetails)
     
     if Tech10.testForApplication():
-        verify2 = Tech10.makeSubsitution(verify2)
+        verify2 = Tech10.makeSubsitution(verify2.right, delta_count) # strips the FOR loop node
         if VERBOSE: print(Tech10.rule, ":", verify2, "\n")
         if PROOFGEN_FLAG:
             proofGen.setNextStep(Tech10.rule, verify2)
@@ -607,7 +612,7 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, loopDetails, eq_number
 #        latex_file = types['name'].upper() + str(eq_number)
 #        print("Generated the proof written to file: verification_gen%s.tex" % latex_file)
 #        proofGen.compileProof(latex_file)
-    return (SDL_OUT_FILE, sdl_data, types, verify2, batch_precompute, global_count)
+    return (SDL_OUT_FILE, sdl_data, verify2, batch_precompute, global_count)
     
 """ 
     if CODEGEN_FLAG:
@@ -698,7 +703,7 @@ def buildSDLBatchVerifier(sdlOutFile, sdl_data, types, verify2, batch_precompute
     return sdlBatch.getVariableCount()
 
 def run_main(opts):
-    global singleVE, crypto_library, curve, param_id, assignInfo, varTypes, global_count
+    global singleVE, crypto_library, curve, param_id, assignInfo, varTypes, global_count, delta_count
     verbose   = opts['verbose']
     statement = opts['test_stmt']
     file      = opts['sdl_file']
@@ -720,7 +725,7 @@ def run_main(opts):
 
 
     # process single or multiple equations
-    verify_eq, N = [], None; cnt = 0
+    verify_eq, N = [], None
     #for n in ast_struct[ OTHER ]:
     if len(setting.getVerifyEq()) == 0:
         sys.exit("Could not locate the individual verification equation. Please edit SDL file.\n");
@@ -734,8 +739,8 @@ def run_main(opts):
     for k in verifyList:
 #        print("k := ", k, ", v := ", verifyEqDict[k])
         if VERIFY in k:
-            (result, singleEq) = handleVerifyEq(verifyEqDict[k].get(VERIFY), cnt, verbose)
-            cnt += 1 # where we do actual verification on # of eqs
+            (result, singleEq) = handleVerifyEq(verifyEqDict[k].get(VERIFY), delta_count, verbose)
+            delta_count += 1 # where we do actual verification on # of eqs
             verifyEqUpdated[ k ] = result
             isSingleEquation[ k ] = singleEq 
 
@@ -745,16 +750,16 @@ def run_main(opts):
         bte = BasicTypeExist( variables )
         ASTVisitor( bte ).preorder( v )
         bte.report( v )
-
+    
+    #sys.exit(0)
     # initiate the proof generator    
     print("Single verification equation: ", singleVE)
     genProof = GenerateProof(singleVE)
     # process settings
-    i = 0
+    i = 1
     finalVerifyList = []
+    types = setting.getTypes()
     if len(verifyList) == 2:
-        sdl_data = {}
-        types = {}
         batch_precompute = {}
         sdlOutFile = None
         for k in verifyList:
@@ -762,18 +767,20 @@ def run_main(opts):
             if verifyEqDict[ k ][ hasLoop ]:
                 try:
                     endValue = str(eval(verifyEqDict[k][endVal], setting.getTypes()))
+                    # updates the types section to store the value for estimation purposes
+                    setting.getTypes()[verifyEqDict[k][endVal]] = endValue
                 except:
                     print("Could not determine loop end value. Please define: ", verifyEqDict[k][endVal])
                     sys.exit(0)
                 loopDetails = (verifyEqDict[k][loopVar], verifyEqDict[k][startVal], endValue) 
             genProof.setPrefix('EQ' + str(i + 1))
-            (sdlOutFile, sdl_data0, types0, verify2, batch_precompute0, var_count) = runBatcher2(opts, genProof, file + str(i), verifyEqUpdated[k], setting, loopDetails, i)
+            (sdlOutFile, sdl_data, verify2, batch_precompute0, var_count) = runBatcher2(opts, genProof, file + str(i), verifyEqUpdated[k], setting, loopDetails, i)
             genProof.changeMode( isSingleEquation[ k ] )
             i += 1
 #            print("BATCH EQUATION: ", verify2)
             finalVerifyList.append(verify2)
-            sdl_data.update(sdl_data0)
-            types.update(types0)
+#            sdl_data.update(sdl_data0)
+#            types.update(types0)
             batch_precompute.update(batch_precompute0)
 
         eq1, eq2 = finalVerifyList
@@ -790,11 +797,12 @@ def run_main(opts):
             if verifyEqDict[ k ][ hasLoop ]:
                 try:
                     endValue = str(eval(verifyEqDict[k][endVal], setting.getTypes()))
+                    setting.getTypes()[verifyEqDict[k][endVal]] = endValue
                 except:
                     print("Could not determine loop end value. Please define: ", verifyEqDict[k][endVal])
                     sys.exit(0)
-                loopDetails = (verifyEqDict[k][loopVar], verifyEqDict[k][startVal], endValue)                        
-            (sdlOutFile, sdl_data, types, verify2, batch_precompute, global_count) = runBatcher2(opts, genProof, file, verifyEqUpdated[k], setting, loopDetails)
+                loopDetails = (verifyEqDict[k][loopVar], verifyEqDict[k][startVal], endValue)
+            (sdlOutFile, sdl_data, verify2, batch_precompute, global_count) = runBatcher2(opts, genProof, file, verifyEqUpdated[k], setting, loopDetails)
             finalEq = verify2
             #buildSDLBatchVerifier(sdlOutFile, sdl_data, types, finalEq, batch_precompute, global_count, setting)
     if proof_flag:
@@ -802,8 +810,8 @@ def run_main(opts):
         latex_file = types['name'].upper()
         print("Generated the proof written to file: verification_gen%s.tex" % latex_file)
         genProof.compileProof(latex_file)
-
-    buildSDLBatchVerifier(sdlOutFile, sdl_data, types, finalEq, batch_precompute, global_count, setting)
-        
-    return None
+    
+    # last step:construct SDL batch verifier
+    return buildSDLBatchVerifier(sdlOutFile, sdl_data, types, finalEq, batch_precompute, global_count, setting)        
+    
 
