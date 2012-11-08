@@ -1,4 +1,5 @@
-from SDLParser import *
+import sdlpath
+from sdlparser.SDLParser import *
 from config import *
 from transform import *
 from transformNEW import *

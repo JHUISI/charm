@@ -1,4 +1,5 @@
-from SDLParser import *
+import sdlpath
+from sdlparser.SDLParser import *
 from outsrctechniques import *
 import config
 import sys
