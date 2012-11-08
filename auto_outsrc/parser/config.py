@@ -15,32 +15,35 @@ blindingSuffix = "Blinded"
 setupFuncName = "setup"
 keygenBlindingExponent = "zz"
 keygenBlindingExponentType = "ZR"
-keygenFuncName = "extract"
+keygenFuncName = "keygen"
 
 encryptFuncName = "encrypt"
 decryptFuncName = "decrypt"
 transformFuncName = "transform"
 
-masterPubVars = ["mpk"]
+masterPubVars = []
 masterSecVars = ["msk"]
 
 blindingFactorPrefix = "blindingFactor"
 
 # superset of variables we have used to represent public parameters in
 # our crypto schemes
-keygenPubVar = ["pk", "mpk", "gpk"]
+keygenPubVar = "pk"
 keygenSecVar = "sk"
 
 pySuffix = ".py"
-cppSuffix = ".cpp"
-#cppSuffix = ".py"
+#cppSuffix = ".cpp"
+cppSuffix = ".py"
 cppHeaderSuffix = ".h"
 
 setupFileName = "setupOutsourcing_" + schemeName + pySuffix
 transformFileName = "transformOutsourcing_" + schemeName + pySuffix
-decOutFolderName = "../cppCompilation/"
-decOutFileName = "decOutOutsourcing_" + schemeName + cppSuffix
-#decOutFileName = "decOutOutsourcing_" + schemeName + pySuffix
+
+#decOutFolderName = "../cppCompilation/"
+decOutFolderName = ""
+
+#decOutFileName = "decOutOutsourcing_" + schemeName + cppSuffix
+decOutFileName = "decOutOutsourcing_" + schemeName + pySuffix
 
 decOutObjFileName = "client_decout_" + schemeName
 

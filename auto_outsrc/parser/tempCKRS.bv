@@ -82,7 +82,7 @@ d4 := (hashID2r2 ^ t3)
 
 BEGIN :: for
 for{y := 0, n}
-testList#y := t2
+testList#y := t1 * t2 * t3
 END :: for
         
 sk := list{testList, id, d0, d1, d2, d3, d4}
@@ -115,7 +115,7 @@ END :: func:encrypt
 
 BEGIN :: func:decrypt
 input := list{sk, ct}
-sk := expand{id, d0, d1, d2, d3, d4}
+sk := expand{testList, id, d0, d1, d2, d3, d4}
 ct := expand{c, c_pr}
 
 testVar := d0 * d1

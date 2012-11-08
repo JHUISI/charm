@@ -19,12 +19,12 @@ def getSecretList(config, verbose=False):
     # secret = str(stmtsKg[outputKgLine].getAssignNode().right)
     print("output :=>", secret)
     secretVars = AssignInfo[keygen][secret].getAssignNode().right
-    print("list :=>", secretVars.listNodes)
+    #print("list :=>", secretVars.listNodes)
 
     if Type(secretVars) == ops.LIST:
         secretList = secretVars.listNodes
     elif Type(secretVars) == ops.ATTR:
-        secretList = [secretVars]
+        secretList = [str(secretVars)]
     else:
         sys.exit("ERROR: invalid structure definition in", keygen)
     

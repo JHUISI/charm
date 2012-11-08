@@ -1,5 +1,5 @@
-SDL_SRC := decOutOutsourcing_LW
-NAME    := client_decout_LW
+SDL_SRC := decOutOutsourcing_BSW
+NAME    := client_decout_BSW
 
 CXX	:= g++
 #CXXFLAGS := -fno-strict-aliasing -fno-common -g -m64 -O2 -fwrapv -O3 -Wall

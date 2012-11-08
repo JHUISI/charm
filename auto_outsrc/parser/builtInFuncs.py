@@ -1,6 +1,6 @@
-from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair, MNT160, SymEnc, SymDec
+from charm.toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair, MNT160, SymEnc, SymDec
 
-from toolbox.secretutil import SecretUtil
+from charm.toolbox.secretutil import SecretUtil
 from charm.pairing import pairing
 from toolbox.iterate import dotprod2
 from charm.pairing import hash as DeriveKey

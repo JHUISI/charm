@@ -256,10 +256,10 @@ def transformNEW(varsThatAreBlindedDict):
             writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode)
         else:
             areAllVarsOnLineKnownByTransform = getAreAllVarsOnLineKnownByTransform(currentNode.right, knownVars)
-            if (areAllVarsOnLineKnownByTransform == False):
-                decoutLines.append(str(currentNode) + "\n")
-            else:
-                writeOutLineKnownByTransform(currentNode, transformLines, decoutLines)
+            #if (areAllVarsOnLineKnownByTransform == False):
+            decoutLines.append(str(currentNode) + "\n")
+            #else:
+                #writeOutLineKnownByTransform(currentNode, transformLines, decoutLines)
 
     print(transformLines)
     print(decoutLines)

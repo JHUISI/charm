@@ -909,7 +909,8 @@ def getOutputVarsDictOfFuncRecursive(retList, funcName, outputVarInfoObj):
             retList.append(outputVarName)
     else:
         if (outputVarInfoObj.getAssignNode().right.type != ops.ATTR):
-            sys.exit("getOutputVarsDictOfFuncRecursive in SDLParser.py:  current outputVarInfoObj is not one of the following types:  list, symmap, or attribute.")
+            #sys.exit("getOutputVarsDictOfFuncRecursive in SDLParser.py:  current outputVarInfoObj is not one of the following types:  list, symmap, or attribute.")
+            return
 
         newOutputVarName = str(outputVarInfoObj.getAssignNode().right)
 

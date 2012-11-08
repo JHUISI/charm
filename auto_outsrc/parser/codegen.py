@@ -309,8 +309,8 @@ def writeFunctionDecl(functionName):
     if (currentFuncName == transformFunctionName):
         writeFunctionDecl_Python(transformFile, functionName, False, True)
     elif (currentFuncName == decOutFunctionName):
-        writeFunctionDecl_CPP(decOutFile, functionName)
-        #writeFunctionDecl_Python(decOutFile, functionName, False, True)
+        #writeFunctionDecl_CPP(decOutFile, functionName)
+        writeFunctionDecl_Python(decOutFile, functionName, False, True)
     else:
         writeFunctionDecl_Python(setupFile, functionName, True, False)
 
@@ -340,8 +340,8 @@ def writeFunctionEnd(functionName):
     if (currentFuncName == transformFunctionName):
         writeFunctionEnd_Python(transformFile, functionName, True)
     elif (currentFuncName == decOutFunctionName):
-        writeFunctionEnd_CPP(decOutFile, functionName)
-        #writeFunctionEnd_Python(decOutFile, functionName, True)
+        #writeFunctionEnd_CPP(decOutFile, functionName)
+        writeFunctionEnd_Python(decOutFile, functionName, True)
     else:
         writeFunctionEnd_Python(setupFile, functionName, False)
 
@@ -918,8 +918,8 @@ def writeAssignStmt(binNode):
     if (currentFuncName == transformFunctionName):
         writeAssignStmt_Python(transformFile, binNode)
     elif (currentFuncName == decOutFunctionName):
-        writeAssignStmt_CPP(decOutFile, binNode)
-        #writeAssignStmt_Python(decOutFile, binNode)
+        #writeAssignStmt_CPP(decOutFile, binNode)
+        writeAssignStmt_Python(decOutFile, binNode)
     else:
         writeAssignStmt_Python(setupFile, binNode)
 
@@ -1112,8 +1112,8 @@ def writeErrorFunc(binNode):
     if (currentFuncName == transformFunctionName):
         writeErrorFunc_Python(transformFile, binNode)
     elif (currentFuncName == decOutFunctionName):
-        writeErrorFunc_CPP(decOutFile, binNode)
-        #writeErrorFunc_Python(decOutFile, binNode)
+        #writeErrorFunc_CPP(decOutFile, binNode)
+        writeErrorFunc_Python(decOutFile, binNode)
     else:
         writeErrorFunc_Python(setupFile, binNode)
 
@@ -1121,8 +1121,8 @@ def writeElseStmtDecl(binNode):
     if (currentFuncName == transformFunctionName):
         writeElseStmt_Python(transformFile, binNode)
     elif (currentFuncName == decOutFunctionName):
-        writeElseStmt_CPP(decOutFile, binNode)
-        #writeElseStmt_Python(decOutFile, binNode)
+        #writeElseStmt_CPP(decOutFile, binNode)
+        writeElseStmt_Python(decOutFile, binNode)
     else:
         writeElseStmt_Python(setupFile, binNode)
 
@@ -1130,8 +1130,8 @@ def writeIfStmtDecl(binNode):
     if (currentFuncName == transformFunctionName):
         writeIfStmt_Python(transformFile, binNode)
     elif (currentFuncName == decOutFunctionName):
-        writeIfStmt_CPP(decOutFile, binNode)
-        #writeIfStmt_Python(decOutFile, binNode)
+        #writeIfStmt_CPP(decOutFile, binNode)
+        writeIfStmt_Python(decOutFile, binNode)
     else:
         writeIfStmt_Python(setupFile, binNode)
 
@@ -1168,8 +1168,8 @@ def writeForLoopDecl(binNode):
     if (currentFuncName == transformFunctionName):
         writeForLoopDecl_Python(transformFile, binNode)
     elif (currentFuncName == decOutFunctionName):
-        writeForLoopDecl_CPP(decOutFile, binNode)
-        #writeForLoopDecl_Python(decOutFile, binNode)
+        #writeForLoopDecl_CPP(decOutFile, binNode)
+        writeForLoopDecl_Python(decOutFile, binNode)
     else:
         writeForLoopDecl_Python(setupFile, binNode)
 
@@ -1641,7 +1641,7 @@ def main(SDL_Scheme, ignoreCloudSourcingArg, nonCloudSourcingFileNameArg=None):
     #printLinesOfCode()
     #print(blindingFactors_NonLists)
     #print(blindingFactors_Lists)
-    sys.exit("test")
+    #sys.exit("test")
 
     astNodes = getAstNodes()
     assignInfo = getAssignInfo()
