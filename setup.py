@@ -4,7 +4,14 @@ from setuptools import setup
 from setuptools.command.test import test as TestCommand
 from distutils.core import  Command, Extension
 from distutils.sysconfig import get_python_lib
-import os, platform, sys, shutil, re
+import os, platform, sys, shutil, re, fileinput
+
+def replaceString(file,searchExp,replaceExp):
+    if file == None: return # fail silently
+    for line in fileinput.input(file, inplace=1):
+        if searchExp in line:
+            line = line.replace(searchExp,replaceExp)
+        sys.stdout.write(line)
 
 class PyTest(TestCommand):
     def finalize_options(self):
@@ -97,7 +104,6 @@ cryptobase_path = crypto_path + "cryptobase/"
 core_prefix = 'charm.core'
 math_prefix = core_prefix + '.math'
 crypto_prefix = core_prefix + '.crypto'
-
 #default is no unless benchmark module explicitly disabled
 if opt.get('DISABLE_BENCHMARK') == 'yes':
    _macros = None
@@ -108,9 +114,11 @@ else:
     
 
 _charm_version = opt.get('VERSION')
+lib_config_file = 'charm/config.py'
 
 if opt.get('PAIR_MOD') == 'yes':
     if opt.get('USE_PBC') == 'yes':
+        replaceString(lib_config_file, "pairing_lib=libs ", "pairing_lib=libs.pbc")
         pairing_module = Extension(math_prefix+'.pairing', 
                             include_dirs = [utils_path,
                                             benchmark_path], 
@@ -120,6 +128,7 @@ if opt.get('PAIR_MOD') == 'yes':
                             libraries=['pbc', 'gmp'], define_macros=_macros, undef_macros=_undef_macro)
     elif opt.get('USE_RELIC') == 'yes':
         # TODO: check if RELIC lib has been built. if not, bail
+        replaceString(lib_config_file, "pairing_lib=libs", "pairing_lib=libs.relic")
         if not os.path.exists(math_path + 'pairing/relic/lib/librelic_s.a'): 
             print("Cannot find RELIC lib. Please run build script in <charm>/core/math/pairing/relic/")
             exit(1)
@@ -135,19 +144,21 @@ if opt.get('PAIR_MOD') == 'yes':
                             extra_objects=[math_path+'pairing/relic/lib/librelic_s.a'], extra_compile_args=None)
     else:
         # build MIRACL based pairing module - note that this is for experimental use only
+        replaceString(lib_config_file, "pairing_lib=libs ", "pairing_lib=libs.miracl")
         pairing_module = Extension(math_prefix + '.pairing',
                             include_dirs = [utils_path,
                                             benchmark_path,
                                             math_path + 'pairing/miracl/'], 
                             sources = [math_path + 'pairing/miracl/pairingmodule2.c',
                                         utils_path + 'sha1.c', 
-                                        math_path + 'pairing/miracl/miracl_interface.cc'],
+                                        math_path + 'pairing/miracl/miracl_interface2.cc'],
                             libraries=['gmp','stdc++'],
                             extra_objects=[math_path+'pairing/miracl/miracl.a'], extra_compile_args=None)
 
     _ext_modules.append(pairing_module)
    
 if opt.get('INT_MOD') == 'yes':
+   replaceString(lib_config_file, "int_lib=libs ", "int_lib=libs.gmp")
    integer_module = Extension(math_prefix + '.integer', 
                             include_dirs = [utils_path,
                                             benchmark_path],
@@ -158,6 +169,7 @@ if opt.get('INT_MOD') == 'yes':
    _ext_modules.append(integer_module)
    
 if opt.get('ECC_MOD') == 'yes':
+   replaceString(lib_config_file, "ec_lib=libs ", "ec_lib=libs.openssl")    
    ecc_module = Extension(math_prefix + '.elliptic_curve',
                 include_dirs = [utils_path,
                                 benchmark_path], 

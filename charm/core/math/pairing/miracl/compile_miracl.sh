@@ -2,10 +2,35 @@
 
 # untar MIRACL source into this directory, then run this script 
 set -x
-[ -e miracl.zip ] && unzip -j -aa -L miracl.zip
+#[ -e miracl.zip ] && unzip -j -aa -L miracl.zip
 
 # patch mnt_pair.cpp, ssp_pair.cpp, etc here
-patch -N < mnt_pair.patch
+curve=$1
+
+if [ $curve = "mnt" ]; then
+   curve=mnt
+   echo "Building MNT curve in miracl."
+   patch -N < mnt_pair.patch
+fi
+
+if [ $curve = "bn" ]; then
+   curve=bn
+   echo "Building BN curve in miracl."
+   #patch -N < bn_pair.patch
+fi
+
+if [ -e miracl-$curve.a ]; then
+    echo "Already built miracl-$curve" 
+    exit 0
+fi
+
+# if length of string is zero
+if [ -z $curve ]; then
+   curve=mnt
+   echo "Building default curve in miracl: $curve"
+   patch -N < mnt_pair.patch  
+fi
+
 
 rm -f miracl.a
 cp mirdef.hpp mirdef.h
@@ -69,14 +94,9 @@ g++ -c -m64 -O2 ecn.cpp
 g++ -c -m64 -O2 ec2.cpp
 g++ -c -m64 -O2 flash.cpp
 g++ -c -m64 -O2 crt.cpp
-# KSS curve
-g++ -c -m64 -O2 kss_pair.cpp zzn18.cpp zzn6.cpp ecn3.cpp zzn3.cpp
-# MNT curve
-g++ -c -m64 -O2 mnt_pair.cpp zzn6a.cpp ecn3.cpp zzn3.cpp zzn2.cpp
 # Cocks-Pinch curve
-g++ -c -m64 -O2 cp_pair.cpp
-# Barreto-Naehrig curve
-g++ -c -m64 -O2 bn_pair.cpp
+#g++ -c -m64 -O2 cp_pair.cpp
+
 ar rc miracl.a mrcore.o mrarth0.o mrarth1.o mrarth2.o mralloc.o mrsmall.o mrzzn2.o mrzzn3.o
 ar r miracl.a mrio1.o mrio2.o mrjack.o mrgcd.o mrxgcd.o mrarth3.o mrbits.o mrecn2.o
 ar r miracl.a mrrand.o mrprime.o mrcrt.o mrscrt.o mrmonty.o mrcurve.o mrsroot.o mrzzn2b.o
@@ -84,26 +104,28 @@ ar r miracl.a mrpower.o mrfast.o mrshs.o mrshs256.o mraes.o mrlucas.o mrstrong.o
 ar r miracl.a mrflash.o mrfrnd.o mrdouble.o mrround.o mrbuild.o
 ar r miracl.a mrflsh1.o mrpi.o mrflsh2.o mrflsh3.o mrflsh4.o 
 ar r miracl.a mrbrick.o mrebrick.o mrec2m.o mrgf2m.o mrmuldv.o mrshs512.o
-#ar r miracl.a big.o zzn.o zzn2.o zzn3.o zzn6a.o ecn.o ecn3.o ec2.o flash.o crt.o mnt_pair.o 
-#cp miracl.a miracl-mnt.a
-cp miracl.a miracl-kss.a
-ar r miracl.a big.o zzn.o zzn2.o zzn3.o zzn6a.o ecn.o ecn3.o ec2.o flash.o crt.o mnt_pair.o 
-ar r miracl-kss.a big.o zzn.o zzn3.o zzn6.o zzn18.o ecn.o ecn3.o ec2.o flash.o crt.o kss_pair.o
+
+if [ $curve = "mnt" ]; then
+   # MNT curve
+   g++ -c -m64 -O2 mnt_pair.cpp zzn6a.cpp ecn3.cpp zzn3.cpp zzn2.cpp
+   cp miracl.a miracl-mnt.a
+   ar r miracl-mnt.a big.o zzn.o zzn2.o zzn3.o zzn6a.o ecn.o ecn3.o ec2.o flash.o crt.o mnt_pair.o
+fi
+
+if [ $curve = "bn" ]; then
+   # Barreto-Naehrig curve
+   g++ -c -m64 -O2 bn_pair.cpp zzn12a.cpp zzn4.cpp ecn2.cpp zzn2.cpp
+   cp miracl.a miracl-bn.a
+   ar r miracl-bn.a big.o zzn.o zzn2.o zzn4.o zzn12a.o ecn.o ecn2.o ecn3.o ec2.o flash.o crt.o bn_pair.o 
+fi
+
+if [ $curve = "kss" ]; then
+   # KSS curve
+   g++ -c -m64 -O2 kss_pair.cpp zzn18.cpp zzn6.cpp ecn3.cpp zzn3.cpp
+   cp miracl.a miracl-kss.a
+   ar r miracl-kss.a big.o zzn.o zzn3.o zzn6.o zzn18.o ecn.o ecn3.o ec2.o flash.o crt.o kss_pair.o
+fi
+ln -sf miracl-$curve.a miracl.a
 
 rm mr*.o
-#g++ -m64 -O2 bls_gen.cpp miracl.a -o bls_gen
-#g++ -m64 -O2 bls_sign.cpp miracl.a -o bls_sign
-#g++ -m64 -O2 bls_ver.cpp miracl.a -o bls_ver
-#g++ -m64 -O2 bmark.c miracl.a -o bmark
-#g++ -m64 -O2 fact.c miracl.a -o fact
-#g++ -m64 -O2 mersenne.cpp miracl.a -o mersenne
-#g++ -m64 -O2 brent.cpp miracl.a -o brent
-#g++ -m64 -O2 sample.cpp miracl.a -o sample
-#g++ -m64 -O2 ecsgen.cpp miracl.a -o ecsgen
-#g++ -m64 -O2 ecsign.cpp miracl.a -o ecsign
-#g++ -m64 -O2 ecsver.cpp miracl.a -o ecsver
-#g++ -m64 -O2 pk-demo.cpp miracl.a -o pk-demo
-#g++ -c -m64 -O2 polymod.cpp
-#g++ -c -m64 -O2 poly.cpp
-#g++ -m64 -O2 schoof.cpp polymod.o poly.o miracl.a -o schoof
 set +x

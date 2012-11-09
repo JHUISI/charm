@@ -91,7 +91,7 @@ class IBE_N04_Sig(PKSig):
 
 
 def main():
-    groupObj = PairingGroup('SS512')
+    groupObj = PairingGroup(128) # 'SS512')
     ibe = IBE_N04_Sig(groupObj)
     waters = Waters(group)
     (pk, sk) = ibe.keygen()

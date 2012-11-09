@@ -89,7 +89,7 @@ class WatersSig:
         return False
 
 def main():
-    groupObj = PairingGroup('SS512')
+    groupObj = PairingGroup(128) # 'SS512')
     wat = WatersSig(groupObj)
     (master_public_key, master_secret_key) = wat.setup(5)
     ID = 'janedoe@email.com'
