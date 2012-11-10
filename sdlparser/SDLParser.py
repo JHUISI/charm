@@ -1030,7 +1030,8 @@ def getOutputVarsDictOfFuncRecursive(retList, funcName, outputVarInfoObj):
             retList.append(outputVarName)
     else:
         if (outputVarInfoObj.getAssignNode().right.type != ops.ATTR):
-            sys.exit("getOutputVarsDictOfFuncRecursive in SDLParser.py:  current outputVarInfoObj is not one of the following types:  list, symmap, or attribute.")
+            #sys.exit("getOutputVarsDictOfFuncRecursive in SDLParser.py:  current outputVarInfoObj is not one of the following types:  list, symmap, or attribute.")
+            return
 
         newOutputVarName = str(outputVarInfoObj.getAssignNode().right)
 
@@ -1041,7 +1042,8 @@ def getOutputVarsDictOfFuncRecursive(retList, funcName, outputVarInfoObj):
 
         (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, newOutputVarName)
         if ( (retFuncName == None) or (retFuncName != funcName) or (retVarInfoObj == None) ):
-            sys.exit("getOutputVarsDictOfFuncRecursive in SDLParser.py:  problem with values returned from getVarNameEntryFromAssignInfo.")
+            #sys.exit("getOutputVarsDictOfFuncRecursive in SDLParser.py:  problem with values returned from getVarNameEntryFromAssignInfo.")
+            return
 
         getOutputVarsDictOfFuncRecursive(retList, funcName, retVarInfoObj)
 

@@ -295,7 +295,8 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
 
     if (isVarList == False):
         if (repeatBlindingFactor == False):
-            namesOfAllNonListBlindingFactors.append(currentBlindingFactorName)
+            if (currentBlindingFactorName not in namesOfAllNonListBlindingFactors):
+                namesOfAllNonListBlindingFactors.append(currentBlindingFactorName)
             #SDLLinesForKeygen.append(currentBlindingFactorName + " := random(ZR)\n")
             blindingFactors_NonLists.append(currentBlindingFactorName)
         varsThatAreBlinded.append(keygenOutputElem)

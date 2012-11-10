@@ -10,10 +10,10 @@ sk := list
 ct := list
 hl := list
 gl := list
-c := list
+#c := list
 #d := list
 z := list
-testList := list
+#testList := list
 id := str
 END :: types
 
@@ -59,33 +59,33 @@ hashIDDotProd := (prod{y := 0, n} on { hl#y ^ hID#y })
 hashID := hl#0 * hashIDDotProd
 
 #d#0 := h ^ ((r1 * (t1 * t2)) + (r2 * (t3 * t4)))
-#d0 := h ^ ((r1 * (t1 * t2)) + (r2 * (t3 * t4)))
-d0 := h ^ t1
-
+d0 := h ^ ((r1 * (t1 * t2)) + (r2 * (t3 * t4)))
 
 halpha := (h ^ -alpha)
 hashID2r1 := hashID ^ -r1
 
 
 #d#1 := (halpha ^ t2) * (hashID2r1 ^ t2)
-#d1 := (halpha ^ t2) * (hashID2r1 ^ t2)
-d1 := h ^ t1
-
+d1 := (halpha ^ t2) * (hashID2r1 ^ t2)
 
 #d#2 := (halpha ^ t1) * (hashID2r1 ^ t1)
 d2 := (halpha ^ t1) * (hashID2r1 ^ t1)
+
 hashID2r2 := hashID ^ -r2
+
 #d#3 := (hashID2r2 ^ t4)
 d3 := (hashID2r2 ^ t4)
+
 #d#4 := (hashID2r2 ^ t3)
 d4 := (hashID2r2 ^ t3)
 
-BEGIN :: for
-for{y := 0, n}
-testList#y := t1 * t2 * t3
-END :: for
+#BEGIN :: for
+#for{y := 0, n}
+#testList#y := t1 * t2 * t3
+#END :: for
         
-sk := list{testList, id, d0, d1, d2, d3, d4}
+#sk := list{testList, id, d0, d1, d2, d3, d4}
+sk := list{id, d0, d1, d2, d3, d4}
 output := sk
 END :: func:extract
 
@@ -102,24 +102,23 @@ hID1 := strToId(mpk, id) # list <-: strToId(list, str)
 hashID1DotProd := (prod{y := 0, n} on { gl#y ^ hID1#y })
 hashID1 := gl#0 * hashID1DotProd
 
-c_pr := (omega ^ s) * M
-c#0 := hashID1 ^ s
-c#1 := v1 ^ (s - s1)
-c#2 := v2 ^ s1
-c#3 := v3 ^ (s - s2)
-c#4 := v4 ^ s2
+cpr := (omega ^ s) * M
+c0 := hashID1 ^ s
+c1 := v1 ^ (s - s1)
+c2 := v2 ^ s1
+c3 := v3 ^ (s - s2)
+c4 := v4 ^ s2
 
-ct := list{c, c_pr}
+ct := list{c0, c1, c2, c3, c4, cpr}
 output := ct
 END :: func:encrypt
 
 BEGIN :: func:decrypt
 input := list{sk, ct}
-sk := expand{testList, id, d0, d1, d2, d3, d4}
-ct := expand{c, c_pr}
+sk := expand{id, d0, d1, d2, d3, d4}
+ct := expand{c0, c1, c2, c3, c4, cpr}
 
-testVar := d0 * d1
-result := e(c#0, d0) * e(c#1, d1) * e(c#2, d2) * e(c#3, d3) * e(c#4, d4)        
-M := c_pr * result   
+result := e(c0, d0) * e(c1, d1) * e(c2, d2) * e(c3, d3) * e(c4, d4)        
+M := cpr * result   
 output := M
 END :: func:decrypt

@@ -3,8 +3,11 @@
 
     (g1, g2, egga, msk) = setup()
     (pkBlinded, blindingFactor0Blinded, skBlinded) = keygen(g2, egga, msk)
-    (c0, c1, c2, c3) = encrypt(g1, pkBlinded, "test")
-    transformOutputList = transform(pkBlinded, skBlinded, c0, c1, c2, c3)
-    M = decout(pkBlinded, skBlinded, c0, c1, c2, c3, transformOutputList, blindingFactor0Blinded)
+    M = group.random(GT)
     print(M)
+    print("\n\n\n")
+    (c0, c1, c2, c3) = encrypt(g1, pkBlinded, M)
+    transformOutputList = transform(pkBlinded, skBlinded, c0, c1, c2, c3)
+    M2 = decout(pkBlinded, skBlinded, c0, c1, c2, c3, transformOutputList, blindingFactor0Blinded)
+    print(M2)
 

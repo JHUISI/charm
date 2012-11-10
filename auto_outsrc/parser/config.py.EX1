@@ -15,20 +15,20 @@ blindingSuffix = "Blinded"
 setupFuncName = "setup"
 keygenBlindingExponent = "zz"
 keygenBlindingExponentType = "ZR"
-keygenFuncName = "extract"
+keygenFuncName = "keygen"
 
 encryptFuncName = "encrypt"
 decryptFuncName = "decrypt"
 transformFuncName = "transform"
 
-masterPubVars = ["mpk"]
+masterPubVars = []
 masterSecVars = ["msk"]
 
 blindingFactorPrefix = "blindingFactor"
 
 # superset of variables we have used to represent public parameters in
 # our crypto schemes
-keygenPubVar = ["pk", "mpk", "gpk"]
+keygenPubVar = "pk"
 keygenSecVar = "sk"
 
 pySuffix = ".py"

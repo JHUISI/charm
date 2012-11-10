@@ -6,7 +6,6 @@ secparam := 80
 
 BEGIN :: types
 M := GT
-c := list
 END :: types
 
 BEGIN :: func:setup
@@ -15,20 +14,23 @@ a := random(ZR)
 g1 := random(G1)
 g2 := random(G2)
 egga := (e(g1, g2)^a)
+dummyVar := random(ZR)
 
-msk := a
+msk := list{a, dummyVar}
 output := list{g1, g2, egga, msk}
 END :: func:setup
 
 BEGIN :: func:keygen
-input := list{g2, egga, msk} 
+input := list{g2, egga, msk}
+msk := expand{a, dummyVar}
 t := random(ZR)
 
 d := g2 ^ (a * t)
 eggat := egga^t 
 
 pk := eggat
-sk := d
+dummyVar2 := random(ZR)
+sk := list{d, dummyVar2}
 output := list{pk, sk}
 END :: func:keygen
 
@@ -50,7 +52,7 @@ END :: func:encrypt
 
 BEGIN :: func:decrypt
 input := list{pk, sk, c0, c1, c2, c3}
-d := sk
+sk := expand{d, dummyVar2}
 result := e(c1, d) * e(c2, d) * e(c3, d)
 M := c0 / result
 
