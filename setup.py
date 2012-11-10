@@ -128,7 +128,7 @@ if opt.get('PAIR_MOD') == 'yes':
                             libraries=['pbc', 'gmp'], define_macros=_macros, undef_macros=_undef_macro)
     elif opt.get('USE_RELIC') == 'yes':
         # TODO: check if RELIC lib has been built. if not, bail
-        replaceString(lib_config_file, "pairing_lib=libs", "pairing_lib=libs.relic")
+        replaceString(lib_config_file, "pairing_lib=libs ", "pairing_lib=libs.relic")
         if not os.path.exists(math_path + 'pairing/relic/lib/librelic_s.a'): 
             print("Cannot find RELIC lib. Please run build script in <charm>/core/math/pairing/relic/")
             exit(1)
