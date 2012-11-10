@@ -753,9 +753,33 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 		}
 		else if(rhs == -1) {
 			debug("find modular inverse.\n");
-			PyObject *obj = Integer_invert((PyObject *) lhs);
-			if(obj == NULL) return NULL;
-			rop = (Integer *) obj;
+			rop = createNewInteger(lhs->m);
+			mpz_init(rop->e);
+			mpz_init_set(rop->m, lhs->m);
+			int errcode = mpz_invert(rop->e, lhs->e, lhs->m);
+			if(errcode == 0) {
+				Py_XDECREF(rop);
+				ErrorMsg("failed to find modular inverse.\n");
+			}
+		}
+		else {
+			// less than -1.
+			rop = createNewInteger(lhs->m);
+			mpz_init(rop->e);
+			mpz_init_set(rop->m, lhs->m);
+			int errcode = mpz_invert(rop->e, lhs->e, rop->m);
+			if(errcode > 0) {
+				mpz_t exp;
+				mpz_init(exp);
+				longObjToMPZ(exp, o2);
+				mpz_neg(exp, exp);
+				mpz_powm_sec(rop->e, rop->e, exp, rop->m);
+				mpz_clear(exp);
+			}
+			else {
+				Py_XDECREF(rop);
+				ErrorMsg("failed to find modular inverse.\n");
+			}
 		}
 	} else if (foundLHS) {
 		// find modular inverse
@@ -768,9 +792,33 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 		ErrorMsg("left operand should be a charm.integer type.");
 	} else {
 		if (lhs->initialized && rhs->initialized) {
+			// if rhs has negative exponent
+			if (mpz_sgn(rhs->e) < 0) {
+				if(mpz_sgn(lhs->m) > 0) {
+					// base modulus is positive
+					rop = createNewInteger(lhs->m);
+					mpz_init(rop->e);
+					mpz_init_set(rop->m, lhs->m);
+					int errcode = mpz_invert(rop->e, lhs->e, rop->m);
+					if(errcode > 0) {
+						mpz_t exp;
+						mpz_init_set(exp, rhs->e);
+						mpz_neg(exp, exp);
+						mpz_powm_sec(rop->e, rop->e, exp, rop->m);
+						mpz_clear(exp);
+						goto leave;
+					}
+					else {
+						Py_XDECREF(rop);
+						ErrorMsg("failed to find modular inverse.\n");
+					}
+				}
+			}
+
 			// result takes modulus of base
 			debug("both integer objects: ");
 			if (mpz_sgn(lhs->m) > 0) {
+				// common case for modular exponentiation
 				rop = createNewInteger(lhs->m);
 				mpz_init(rop->e);
 				mpz_init_set(rop->m, lhs->m);
@@ -799,7 +847,8 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 			}
 		}
 	}
-		
+
+leave:
 	UPDATE_BENCHMARK(EXPONENTIATION, dBench);
 	return (PyObject *) rop;
 }
