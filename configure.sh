@@ -903,4 +903,7 @@ echo "PYPARSING=$pyparse_found" >> $config_mk
 if test "$docs" = "yes" ; then
     echo "SPHINX=$sphinx_build" >> $config_mk
 fi
+
+# needed for keeping track of crypto libs installed
+cp config.dist.py charm/config.py
 exit 0

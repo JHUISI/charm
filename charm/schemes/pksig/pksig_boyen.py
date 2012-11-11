@@ -34,7 +34,7 @@ class Boyen(PKSig):
     >>> signer = 3
     >>> secret_key = secret_keys[signer] 
     >>> msg = 'please sign this new message!'
-    >>> signature = boyen.sign(master_public_key, public_keys, secret_key, msg) 
+    >>> signature = boyen.sign(signer, master_public_key, public_keys, secret_key, msg) 
     >>> boyen.verify(master_public_key, public_keys, msg, signature) 
     True
     """
@@ -74,32 +74,33 @@ class Boyen(PKSig):
             C_pk[ i ] = pk[ i ][ k[2] ]        
         return A_pk, B_pk, C_pk
     
-    def sign(self, mpk, pk, sk, M):
-        if debug: print("Signing....")
+    def sign(self, index, mpk, pk, sk, M):
         if debug: print("pk =>", pk.keys())
         (A_pk, B_pk, C_pk) = self.getPKdict(mpk, pk, ['A', 'B', 'C'])
         m = H(M)
         l = len(A_pk.keys())
+        assert index >= 0 and index < l, "invalid index"
         if debug: print("l defined as =>", l)        
-        s = [group.random(ZR) for i in range(l-1)] # 0:l-1
-        t = [group.random(ZR) for i in range(l)]
+        s = {}
         S = {}
-        for i in range(l-1):
-            S[ i ] = mpk['g1'] ** s[i]
-#            print("S[", i, "] :=", S[i])         
+        for i in range(0, l):
+            if i != index:
+               s[i] = group.random(ZR)	
+               S[i] = mpk['g1'] ** s[i]   
+        t = [group.random(ZR) for i in range(l)]
         # index=0
         (A, B, C) = A_pk[ 0 ], B_pk[ 0 ], C_pk[ 0 ]
         prod = (A * (B ** m) * (C ** t[0])) ** -s[0]
         
-        # 1 -> l-1
-        for i in range(1, l-1):
-            (A, B, C) = A_pk[i], B_pk[i], C_pk[i]
-            prod *= ((A * (B ** m) * (C ** t[i])) ** -s[i])            
+        # 1 -> l
+        for i in range(1, l):
+            if i != index:
+               (A, B, C) = A_pk[i], B_pk[i], C_pk[i]
+               prod *= ((A * (B ** m) * (C ** t[i])) ** -s[i])            
 
-        final = l-1
-        d = (sk['a'] + (sk['b'] * m) + (sk['c'] * t[final]))  # s[l]
-        S[final] = (mpk['g1'] * prod) ** ~d # S[l]
-        if debug: print("S[", final, "] :=", S[final])
+        d = (sk['a'] + (sk['b'] * m) + (sk['c'] * t[index]))  # s[l]
+        S[index] = (mpk['g1'] * prod) ** (1 / d) # S[l]
+        if debug: print("S[", index, "] :=", S[index])
         sig = { 'S':S, 't':t }
         return sig
     
@@ -107,16 +108,13 @@ class Boyen(PKSig):
         if debug: print("Verifying...")
         At, Bt, Ct = self.getPKdict(mpk, pk, ['At', 'Bt', 'Ct'])
         l = len(At.keys())
-        if debug: print("Length =>", l)
         D = pair(mpk['g1'], mpk['g2'])
         S, t = sig['S'], sig['t']
         m = H(M)
-        prod_result = 1
+        dotProd0 = 1
         for i in range(l):
-            prod_result *= pair(S[i], At[i] * (Bt[i] ** m) * (Ct[i] ** t[i]))
-        if debug: print("final result =>", prod_result)
-        if debug: print("D =>", D )
-        if prod_result == D:
+            dotProd0 *= pair(S[i], At[i] * (Bt[i] ** m) * (Ct[i] ** t[i]))
+        if dotProd0 == D:
            return True
         return False
 
@@ -140,7 +138,7 @@ def main():
    signer = 3
    sk = L_sk[signer] 
    M = 'please sign this new message!'
-   sig = boyen.sign(mpk, L_pk, sk, M)
+   sig = boyen.sign(signer, mpk, L_pk, sk, M)
    if debug: print("\nSignature...")
    if debug: print("sig =>", sig)
 

@@ -39,7 +39,7 @@
 #include <structmember.h>
 #include <longintrepr.h>
 #include <stdlib.h>
-#include "miracl_interface.h"
+#include "miracl_interface2.h"
 #include <gmp.h>
 #include <limits.h>
 #include <sys/types.h>
@@ -50,6 +50,7 @@
 
 /* supported pairing curves */
 #define MNT160  	80
+#define BN256	  	128
 /* buf sizes */
 #define BUF_MAX_LEN 512
 #define HASH_LEN 	20
@@ -167,13 +168,13 @@ typedef struct {
 	c->element_type = ZR_t;
 
 #define pairing_apply(c, a, b) \
-	if(a->pairing->curve == MNT) { \
+	if(a->pairing->curve == MNT || a->pairing->curve == BN) { \
 		c->e = _element_pairing_type3(a->pairing->pair_obj, a->e, b->e); \
 		c->element_type = GT_t;   \
 	} else { /* TODO: do other stuff for SS-curves */ }
 
 #define element_prod_pairing(c, a, b, l) \
-	if(c->pairing->curve == MNT) { \
+	if(c->pairing->curve == MNT || c->pairing->curve == BN) { \
 		c->e = _element_prod_pairing_type3(c->pairing->pair_obj, a, b, l); \
 		c->element_type = GT_t;  }
 

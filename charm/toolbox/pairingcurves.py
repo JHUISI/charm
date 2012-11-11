@@ -1,3 +1,5 @@
+from charm.config import libs, pairing_lib
+
 a = """type a
 q 8780710799663312522437781984754049815806883199414208211028653399266475630880222957078625179422662221423155858769582317459277713367317481324925129998224791
 h 12016012264891146079388821366740534204802954401251311822919615131047207289359704531102844802183906537786776
@@ -64,4 +66,11 @@ nqr 142721363302176037340346936780070353538541593770301992936740616924
 # Notes: pbc library parameters : SS means super singular curve with the following digits 
 # represents the size of the base field in bits. MNT curves were created by 
 # Miyaji, Nakabayashi and Takano.
-params = {'SS512':a, 'SS1024':a1, 'MNT159':d159, 'MNT201':d201, 'MNT224':d224 }
+params = None
+if pairing_lib == libs.pbc:
+   params = {'SS512':a, 'SS1024':a1, 'MNT159':d159, 'MNT201':d201, 'MNT224':d224 }
+elif pairing_lib == libs.miracl:
+   params = {'MNT160':80, 'BN256':128}
+elif pairing_lib == libs.relic:
+   params = {'BN158':0, 'BN254':1, 'BN256':2}
+

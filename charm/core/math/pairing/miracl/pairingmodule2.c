@@ -497,11 +497,20 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 	}
 
     if(aes_sec != -1) {
-    	pairing = PyObject_New(Pairing, &PairingType);
-		pairing->pair_obj = pairing_init(aes_sec);
-		pairing->order    = order(pairing->pair_obj);
-		pairing->curve	  = MNT; // only supported at this point
-		pairing_init_finished 	  = FALSE;
+    	if(aes_sec == MNT160) {
+    		pairing = PyObject_New(Pairing, &PairingType);
+			pairing->pair_obj = pairing_init(aes_sec);
+			pairing->order    = order(pairing->pair_obj);
+			pairing->curve	  = MNT; // only supported at this point
+			pairing_init_finished 	  = FALSE;
+    	}
+    	else if(aes_sec == BN256) {
+    		pairing = PyObject_New(Pairing, &PairingType);
+			pairing->pair_obj = pairing_init(aes_sec);
+			pairing->order    = order(pairing->pair_obj);
+			pairing->curve	  = BN; // only supported at this point
+			pairing_init_finished 	  = FALSE;
+    	}
     }
 
 	self->pairing = pairing;
@@ -714,17 +723,17 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 	debug("Starting '%s'\n", __func__);
 	if(PyElement_Check(lhs) && found_int) {
 		// lhs is the element type
-		START_CLOCK(dBench);
+		// START_CLOCK(dBench);
 		newObject = createNewElement(self->element_type, self->pairing);
 		element_mul_si(newObject, self, z);
-		STOP_CLOCK(dBench);
+		// STOP_CLOCK(dBench);
 	}
 	else if(PyElement_Check(rhs) && found_int) {
 		// rhs is the element type
-		START_CLOCK(dBench);
+		// START_CLOCK(dBench);
 		newObject = createNewElement(other->element_type, other->pairing);
 		element_mul_si(newObject, other, z);
-		STOP_CLOCK(dBench);
+		// STOP_CLOCK(dBench);
 	}
 	else if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
 		// both are element types
@@ -734,24 +743,24 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 		}
 
 		if(self->element_type != ZR_t && other->element_type == ZR_t) {
-			START_CLOCK(dBench);
+			// START_CLOCK(dBench);
 			newObject = createNewElement(self->element_type, self->pairing);
 			element_mul_zn(newObject, self, other);
-			STOP_CLOCK(dBench);
+			// STOP_CLOCK(dBench);
 		}
 		else if(other->element_type != ZR_t && self->element_type == ZR_t) {
 			// START_CLOCK
-			START_CLOCK(dBench);
+			// START_CLOCK(dBench);
 			newObject = createNewElement(other->element_type, self->pairing);
 			element_mul_zn(newObject, other, self);
-			STOP_CLOCK(dBench);
+			// STOP_CLOCK(dBench);
 		}
 		else { // all other cases
 			// START_CLOCK
-			START_CLOCK(dBench);
+			// START_CLOCK(dBench);
 			newObject = createNewElement(self->element_type, self->pairing);
 			element_mul(newObject, self, other);
-			STOP_CLOCK(dBench);
+			// STOP_CLOCK(dBench);
 		}
 	}
 	else {
@@ -2069,6 +2078,7 @@ void initpairing(void) 		{
 	pairing_init_finished = TRUE;
 	// builtin curves
 	PyModule_AddIntConstant(m, "MNT160", MNT160);
+	PyModule_AddIntConstant(m, "BN256", BN256);
 
 #if PY_MAJOR_VERSION >= 3
 	return m;

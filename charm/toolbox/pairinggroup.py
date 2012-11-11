@@ -2,6 +2,7 @@ from __future__ import print_function
 try:
   from charm.toolbox.pairingcurves import params as param_info
   from charm.core.math.pairing import pairing,ZR,G1,G2,GT,init,pair,hashPair,H,random,serialize,deserialize,ismember,order
+  from charm.config import libs, pairing_lib
 except Exception as err:
   print(err)
   exit(-1)
@@ -14,10 +15,13 @@ class PairingGroup():
         elif type(param_id) == str:
           pairID = param_info.get(param_id)
           assert pairID != None, "'%s' not recognized! See 'pairingcurves.py' in toolbox." % param_id
-          self.Pairing = pairing(string=pairID)
-          self.param = param_id
+          if pairing_lib == libs.pbc:
+             self.Pairing = pairing(string=pairID)
+             self.param = param_id
+          elif pairing_lib in [libs.miracl, libs.relic]:
+             self.Pairing = pairing(pairID)
+             self.param = pairID
         elif type(param_id) == int:
-            # support for MIRACL initialization : default arg := MNT160
           self.Pairing = pairing(param_id)
           self.param   = param_id
  

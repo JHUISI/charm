@@ -85,7 +85,7 @@ class BoyenTest(unittest.TestCase):
        signer = 3
        sk = L_sk[signer] 
        M = 'please sign this new message!'
-       sig = boyen.sign(mpk, L_pk, sk, M)
+       sig = boyen.sign(signer, mpk, L_pk, sk, M)
        if debug: print("\nSignature...")
        if debug: print("sig =>", sig)
 
