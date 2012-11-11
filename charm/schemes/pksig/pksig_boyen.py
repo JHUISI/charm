@@ -34,7 +34,7 @@ class Boyen(PKSig):
     >>> signer = 3
     >>> secret_key = secret_keys[signer] 
     >>> msg = 'please sign this new message!'
-    >>> signature = boyen.sign(master_public_key, public_keys, secret_key, msg) 
+    >>> signature = boyen.sign(signer, master_public_key, public_keys, secret_key, msg) 
     >>> boyen.verify(master_public_key, public_keys, msg, signature) 
     True
     """
