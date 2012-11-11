@@ -66,7 +66,7 @@ string bigToBytes(Big x)
 {
 	char c[MAX_LEN+1];
 	memset(c, 0, MAX_LEN);
-	int size = to_binary(x, MAX_LEN, c, TRUE);
+	int size = to_binary(x, MAX_LEN, c, FALSE); // working w/ TRUE
 	string bytes(c, size);
 //	cout << "length :=> " << size << endl;
 //	printf("bigToBytes before => ");
@@ -84,15 +84,27 @@ string bigToBytes(Big x)
 Big *bytesToBig(string str, int *counter)
 {
 	int pos = str.find_first_of(':');
-	int len = atoi( str.substr(0, pos).c_str() );
-	const char *elem = str.substr(pos+1, pos + len).c_str();
 //	cout << "pos of elem => " << pos << endl;
+	int len = atoi( str.substr(0, pos).c_str() );
+	int add_zeroes = PAD_SIZE;
+	const char *elem = str.substr(pos+1, pos + len).c_str();
+	char elem2[MAX_LEN + 1];
+	memset(elem2, 0, MAX_LEN);
+	// right justify elem2 before call to 'from_binary'
+	if(len < BIG_SIZE) {
+		// need to prepend additional zero's
+		add_zeroes += (BIG_SIZE - len);
+	}
+
+	for(int i = add_zeroes; i < BIG_SIZE + add_zeroes; i++)
+		elem2[i] = elem[i-add_zeroes];
+
 //	printf("bytesToBig before => ");
 //	_printf_buffer_as_hex((uint8_t *) elem, len);
 //	cout << "len => " << len << endl;
-//    big x = mirvar(0);
-//    bytes_to_big(len, (char *) elem, x);
-	Big x = from_binary(len, (char *) elem);
+//	printf("bytesToBig before2 => ");
+//	_printf_buffer_as_hex((uint8_t *) elem2, MAX_LEN);
+	Big x = from_binary(MAX_LEN, (char *) elem2);
 	Big *X  = new Big(x);
 //	cout << "Big => " << *X << endl;
 	*counter  = pos + len + 1;
@@ -104,7 +116,7 @@ pairing_t *pairing_init(int securitylevel) {
 
 	PFC *pfc = new PFC(securitylevel);
 	miracl *mip=get_mip();  // get handle on mip (Miracl Instance Pointer)
-	mip->IOBASE = 16;
+	mip->IOBASE = 10;
 
 	//cout << "Initialized: " << pfc << endl;
     //cout << "Order = " << pfc->order() << endl;
@@ -588,7 +600,7 @@ G1 *charToG1(char *c, int len)
 	Big *x0 = charToBig(c, len); // convert to a char
 	while(!point->g.set(*x0, *x0)) *x0 += 1;
 
-	// cout << "Point in G1 => " << point->g << endl;
+    //cout << "Point in G1 => " << point->g << endl;
 	return point;
 }
 
@@ -664,13 +676,20 @@ element_t *finish_hash(Group_t type, const pairing_t *pairing)
 	}
 	else if(type == G1_t) {
 		G1 *g1 = new G1();
-		pfc->hash_and_map(*g1, (char *) bigToBytes(*b).c_str());
+		string str = bigToRawBytes(*b);
+		char *c_str = (char *) str.c_str();
+		pfc->hash_and_map(*g1, c_str);
+		delete b;
 		return (element_t *) g1;
 	}
 	else if(type == G2_t) {
 		G2 *g2 = new G2();
-		pfc->hash_and_map(*g2, (char *) bigToBytes(*b).c_str());
+		string str = bigToRawBytes(*b);
+		char *c_str = (char *) str.c_str();
+		pfc->hash_and_map(*g2,  c_str);
+		delete b;
 		return (element_t *) g2;
+//		_printf_buffer_as_hex((uint8_t *) c_str, str.size());
 	}
 	else {
 		cout << "Hashing to an invalid type: " << type << endl;

@@ -44,7 +44,6 @@ typedef enum Curve Curve_t;
 #define TRUE		1
 #define FALSE		0
 #define CF        	2 // Co-factor = 2 in MNT curves
-#define MAX_LEN		40
 #define LEN_BITS	4
 #define aes_block_size 16
 

@@ -114,7 +114,7 @@ fi
 
 if [ $curve = "bn" ]; then
    # Barreto-Naehrig curve
-   g++ -c -m64 -O2 bn_pair.cpp zzn12a.cpp zzn4.cpp ecn2.cpp zzn2.cpp
+   g++ -c -m64 -O2 bn_pair.cpp zzn12a.cpp zzn4.cpp ecn2.cpp ecn3.cpp zzn2.cpp
    cp miracl.a miracl-bn.a
    ar r miracl-bn.a big.o zzn.o zzn2.o zzn4.o zzn12a.o ecn.o ecn2.o ecn3.o ec2.o flash.o crt.o bn_pair.o 
 fi
