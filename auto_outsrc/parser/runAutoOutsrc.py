@@ -21,7 +21,7 @@ def writeLOCFromKeygenToFile(LOCFromKeygen, inputSDLScheme):
 def main(inputSDLScheme, outputFile, outputUserDefFile):
     (linesOfCodeFromKeygen, blindingFactors_NonLists, blindingFactors_Lists) = keygen(inputSDLScheme)
     writeLOCFromKeygenToFile(linesOfCodeFromKeygen, inputSDLScheme)
-    #codegen_PY_main(inputSDLScheme + finalSDLSuffix, outputFile, outputUserDefFile)
+    codegen_PY_main(inputSDLScheme + finalSDLSuffix, outputFile, outputUserDefFile)
 
 if __name__ == "__main__":
     lenSysArgv = len(sys.argv)

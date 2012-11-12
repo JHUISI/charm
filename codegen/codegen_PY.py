@@ -3,7 +3,7 @@ import sys, os
 sys.path.extend(['../', '../sdlparser']) 
 
 from SDLParser import *
-from config import *
+from codegenConfig import *
 
 assignInfo = None
 inputOutputVars = None

@@ -1,7 +1,6 @@
 import sdlpath
 from sdlparser.SDLParser import *
 from outsrctechniques import *
-import config
 import sys
 
 transformListCounter = 0
@@ -252,11 +251,12 @@ def transformNEW(varsThatAreBlindedDict):
         currentNode = SimplifySDLNode(currentNode, path_applied)
         applyTechnique11(currentNode)
         currentNodePairings = getNodePairingObjs(currentNode)
-        if (len(currentNodePairings) > 0):
+        areAllVarsOnLineKnownByTransform = getAreAllVarsOnLineKnownByTransform(currentNode.right, knownVars)
+
+        if ( (len(currentNodePairings) > 0) and (areAllVarsOnLineKnownByTransform == True) ):
             groupedPairings = groupPairings(currentNodePairings, varsThatAreBlindedDict)
             writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode)
         else:
-            areAllVarsOnLineKnownByTransform = getAreAllVarsOnLineKnownByTransform(currentNode.right, knownVars)
             #if (areAllVarsOnLineKnownByTransform == False):
             decoutLines.append(str(currentNode) + "\n")
             #else:
