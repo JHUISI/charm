@@ -449,7 +449,7 @@ def keygen(file):
     print(newDecOutInputLine)
     #sys.exit("TESTTEST")
 
-    return (blindingFactors_NonLists, blindingFactors_Lists)
+    return (getLinesOfCode(), blindingFactors_NonLists, blindingFactors_Lists)
 
 if __name__ == "__main__":
     keygen(sys.argv[1])

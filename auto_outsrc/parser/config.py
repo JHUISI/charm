@@ -1,49 +1,34 @@
-schemeName = "BSW"
-
-inputVarName = "input"
-outputVarName = "output"
+schemeName = "DSE"
 
 M = 'M'
-
-varNameLeftSideNoBlindedVars = "neverUseThisVarNameNoBlindedVars"
-varNameLeftSideBlindedVars = "neverUseThisVarNameBlindedVars"
-
-transformOutputList = "transformOutputList"
 
 blindingLoopVar = "y"
 blindingSuffix = "Blinded"
 setupFuncName = "setup"
 keygenBlindingExponent = "zz"
 keygenBlindingExponentType = "ZR"
-keygenFuncName = "extract"
+keygenFuncName = "keygen"
 
 encryptFuncName = "encrypt"
-decryptFuncName = "decrypt"
-transformFuncName = "transform"
+
+# superset of variables we have used to represent public parameters in
+# our crypto schemes
+keygenPubVar = ["pk", "mpk"]
+keygenSecVar = "sk"
 
 masterPubVars = ["mpk"]
 masterSecVars = ["msk"]
 
-blindingFactorPrefix = "blindingFactor"
-
-# superset of variables we have used to represent public parameters in
-# our crypto schemes
-keygenPubVar = ["pk", "mpk", "gpk"]
-keygenSecVar = "sk"
-
 pySuffix = ".py"
-#cppSuffix = ".cpp"
-cppSuffix = ".py"
+cppSuffix = ".cpp"
+#cppSuffix = ".py"
 cppHeaderSuffix = ".h"
 
 setupFileName = "setupOutsourcing_" + schemeName + pySuffix
 transformFileName = "transformOutsourcing_" + schemeName + pySuffix
-
-#decOutFolderName = "../cppCompilation/"
-decOutFolderName = ""
-
-#decOutFileName = "decOutOutsourcing_" + schemeName + cppSuffix
-decOutFileName = "decOutOutsourcing_" + schemeName + pySuffix
+decOutFolderName = "../cppCompilation/"
+decOutFileName = "decOutOutsourcing_" + schemeName + cppSuffix
+#decOutFileName = "decOutOutsourcing_" + schemeName + pySuffix
 
 decOutObjFileName = "client_decout_" + schemeName
 
@@ -112,7 +97,7 @@ serializeFuncName = "writeToFile"
 serializeExt = ".txt"
 serializeObjectOutFuncName = "objectOut"
 serializeKeysName = "keys"
-serializePubKey = "mpk[0]"
+serializePubKey = "mpk[24]"
 serializePubKeyType = "GT"
 serializePubKey_DecOut = "pk"
 
@@ -120,8 +105,6 @@ linesForSetupMain = []
 linesForSetupMain.append("S = ['ONE', 'TWO', 'THREE']")
 linesForSetupMain.append("M = \"balls on fire345\"")
 linesForSetupMain.append("policy_str = '((four or three) and (two or one))'")
-linesForSetupMain.append("n = 10")
-linesForSetupMain.append("l = 5")
 linesForSetupMain.append("id = 'example@email.com'")
 
 structsToPickleInSetupMain = []
