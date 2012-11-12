@@ -1,6 +1,6 @@
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-import bls
 from charm.core.engine.util import *
+import bls
 
 import sys, random, string, time
 
@@ -180,11 +180,17 @@ def run_batch_verification(argv, same_signer=True):
     batchResultsFile = sys.argv[2]
     indResultsFile = sys.argv[3]
 
+    batchResultsRawFilename = 'raw_' + batchResultsFile
+    indResultsRawFilename   = 'raw_' + indResultsFile
+    
     validDictFile = bytesToObject(validDictArg, groupParamArg)
     validDict = loadDictDataFromFile(validDictFile, groupParamArg)
 
     batchResultsTimes = {}
     indResultsTimes = {}
+
+    batchResultsRaw = open(batchResultsRawFilename, 'w')
+    indResultsRaw = open(indResultsRawFilename, 'w')
 
     for initIndex in range(0, NUM_PROGRAM_ITERATIONS):
         batchResultsTimes[initIndex] = {}
@@ -221,6 +227,8 @@ def run_batch_verification(argv, same_signer=True):
                 sys.exit("Batch verification returned invalid signatures.")
 
             batchResultsTimes[programIteration][cycle] = ( float(result) / float(cycle+1) )
+            currentBatchOutputString = str(batchResultsTimes[programIteration][cycle]) + ","
+            batchResultsRaw.write(currentBatchOutputString)            
 
             startTime = time.clock()
             incorrectSigIndices = bls.indivverify(Mlist, pk, siglist, g, [])
@@ -233,7 +241,16 @@ def run_batch_verification(argv, same_signer=True):
                 sys.exit("Ind. verification returned invalid signatures.")
 
             indResultsTimes[programIteration][cycle] = ( float(result) / float(cycle+1) )
+            currentIndOutputString = str(indResultsTimes[programIteration][cycle]) + ","
+            indResultsRaw.write(currentIndOutputString)
+            
+        batchResultsRaw.write("\n")
+        indResultsRaw.write("\n")
 
+    batchResultsRaw.close()
+    del batchResultsRaw
+    indResultsRaw.close()
+    del indResultsRaw
     batchResultsString = getResults(batchResultsTimes)
     indResultsString = getResults(indResultsTimes)
 
@@ -260,7 +277,4 @@ if __name__ == "__main__":
         run_batch_verification(sys.argv)
     else:
         sys.exit("Usage:  python " + sys.argv[0] + "\t[ -g or -b ]\t[ command-arguments ]\n-g : generate signatures.\n-b : benchmark with generated signatures.")
-    
-
-
     
