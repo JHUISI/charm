@@ -3,8 +3,8 @@ import sys, os
 
 sys.path.extend(['../', '../sdlparser']) 
 
+from codegenConfig import *
 from SDLParser import *
-from config import *
 
 ignoreCloudSourcing = None
 nonCloudSourcingFileName = None
@@ -247,8 +247,9 @@ def writeGlobalVarDecls(outputFile, functionName):
             outputString += "    global " + varName + "\n"
 
     outputString += "\n"
-
-    outputFile.write(outputString)
+    # JAA removed
+    #outputFile.write(outputString)
+    return
 
 def getInputVariablesList(functionName):
     inputVariables = None
@@ -453,7 +454,9 @@ def isForLoopEnd(binNode):
     return False
 
 def isAssignStmt(binNode):
-    if (binNode.type == ops.EQ):
+    if (binNode.type == ops.EQ and str(binNode.left) == inputKeyword):  # JAA added
+        pass
+    elif (binNode.type == ops.EQ):
         return True
 
     return False
@@ -1021,7 +1024,10 @@ def writeAssignStmt_Python(outputFile, binNode):
         #writeCurrentNumTabsIn(outputFile)
 
     variableName = replacePoundsWithBrackets(getFullVarName(binNode.left, False))
-
+    
+#    if (variableName == inputKeyword):
+#        return
+    
     if (variableName == outputKeyword):
         if ( (str(binNode) == "output := False") or (str(binNode) == "output := false") ):
             falseOutputString = "output = False\n"
@@ -1418,6 +1424,9 @@ def isUnnecessaryNodeForCodegen(astNode):
         return True
 
     if ( (astNode.type == ops.BEGIN) and (astNode.left.attr == IF_BRANCH_HEADER) ):
+        return True
+
+    if (astNode.type == ops.EQ and str(astNode.left) == inputKeyword): # JAA added
         return True
 
     return False
