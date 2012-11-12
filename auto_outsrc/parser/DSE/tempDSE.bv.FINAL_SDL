@@ -13,6 +13,7 @@ msk := list
 sk := list
 ct := list
 
+transformOutputList := list
 END :: types
 
 BEGIN :: func:setup
@@ -65,29 +66,44 @@ END :: func:setup
 
 BEGIN :: func:keygen
 input := list{mpk, msk, id}
+blindingFactorD1Blinded := random(ZR)
+blindingFactorD2Blinded := random(ZR)
+blindingFactor0Blinded := random(ZR)
+idBlinded := id
+zz := random(ZR)
 mpk := expand{g, g2, gb, gbus2, ga1, ga2, gba1, gba1us2, gba2, gba2us2, tau1, tau1us2, tau2, tau2us2, tau1b, tau1bus2, tau2b, tau2bus2, w, w2, u, u2, h, hus2, egga}
 msk := expand{galpha, galphausa1, v, vus2, v1, v1us2, v2, v2us2, alpha}
 
 r1 := random(ZR)
 r2 := random(ZR)
-z1 := random(ZR) 
+z1 := random(ZR)
 z2 := random(ZR)
 tagusk := random(ZR)
+taguskBlinded := tagusk
 
-r := r1 + r2
-idushash := H(id, ZR)
+r := (r1 + r2)
+idushash := H(idBlinded,ZR)
 
-D1 := galphausa1 * (vus2 ^ r)
-D2 := (g2 ^ -alpha) * (v1us2 ^ r) * (g2 ^ z1)
-D3 := gbus2 ^ -z1
-D4 := (v2us2 ^ r) * (g2 ^ z2)
-D5 := gbus2 ^ -z2
-D6 := gbus2 ^ r2
-D7 := g2 ^ r1
-K := (((u2 ^ idushash) * (w2 ^ tagusk)) * hus2) ^ r1
-        
-sk := list{id, D1, D2, D3, D4, D5, D6, D7, K, tagusk}
-output := sk
+D1 := (galphausa1 * (vus2^r))
+D1Blinded := (D1^(1 / blindingFactorD1Blinded))
+D2 := ((g2^-alpha) * ((v1us2^r) * (g2^z1)))
+D2Blinded := (D2^(1 / blindingFactorD2Blinded))
+D3 := (gbus2^-z1)
+D3Blinded := D3
+D4 := ((v2us2^r) * (g2^z2))
+D4Blinded := (D4^(1 / blindingFactor0Blinded))
+D5 := (gbus2^-z2)
+D5Blinded := D5
+D6 := (gbus2^r2)
+D6Blinded := D6
+D7 := (g2^r1)
+D7Blinded := D7
+K := ((((u2^idushash) * (w2^taguskBlinded)) * hus2)^r1)
+KBlinded := K
+
+sk := list{idBlinded, D1Blinded, D2Blinded, D3Blinded, D4Blinded, D5Blinded, D6Blinded, D7Blinded, KBlinded, taguskBlinded}
+skBlinded := list{idBlinded, D1Blinded, D2Blinded, D3Blinded, D4Blinded, D5Blinded, D6Blinded, D7Blinded, KBlinded, taguskBlinded}
+output := list{blindingFactorD1Blinded, blindingFactorD2Blinded, blindingFactor0Blinded, blindingFactor0Blinded, skBlinded}
 END :: func:keygen
 
 
@@ -117,16 +133,28 @@ ct := list{C1, C2, C3, C4, C5, C6, C7, E1, E2, tagusc}
 output := ct
 END :: func:encrypt
 
-BEGIN :: func:decrypt
+BEGIN :: func:transform
 input := list{ct, sk}
 sk := expand{id, D1, D2, D3, D4, D5, D6, D7, K, tagusk}
 ct := expand{C1, C2, C3, C4, C5, C6, C7, E1, E2, tagusc}
+transformOutputList#0 := e(C1,D1)
+transformOutputList#1 := e(C2,D2)
+transformOutputList#2 := e(C3,D3) * e(C5,D5)
+transformOutputList#3 := e(C4,D4)
+transformOutputList#4 := e(C6,D6) * e(C7,D7)
+output := transformOutputList
+END :: func:transform
 
-tag := ( (tagusc - tagusk) ^ -1)
-A1 := (e(C1, D1) * (e(C2, D2) * (e(C3, D3) * (e(C4, D4) * e(C5, D5)))))
-A2 := (e(C6, D6) * e(C7, D7))
-A3 := A1 / A2
-A4 := (e(E1, D7) / e(E2, K)) ^ tag
-M := C0 / (A3 / A4)
+BEGIN :: func:decout
+input := list{ct, sk, transformOutputList, blindingFactorD1Blinded, blindingFactorD2Blinded, blindingFactor0Blinded, blindingFactor0Blinded}
+sk := expand{id, D1, D2, D3, D4, D5, D6, D7, K, tagusk}
+ct := expand{C1, C2, C3, C4, C5, C6, C7, E1, E2, tagusc}
+tag := ((tagusc - tagusk)^-1)
+A1 := (transformOutputList#0 ^ (blindingFactorD1Blinded) ) * (transformOutputList#1 ^ (blindingFactorD2Blinded) ) * (transformOutputList#2 ) ) * (transformOutputList#3 ^ (blindingFactor0Blinded) )
+A2 := (transformOutputList#4 ) )
+A3 := (A1 * (A2^-1))
+A4 := (e((E1^tag),D7) * e((E2^-tag),K))
+M := (C0 / (A3 * (A4^-1)))
 output := M
-END :: func:decrypt
+END :: func:decout
+

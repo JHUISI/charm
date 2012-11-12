@@ -1,9 +1,6 @@
 import sdlpath
 from sdlparser.SDLParser import *
-from config import *
-from transform import *
 from transformNEW import *
-from rcca import *
 from secretListInKeygen import *
 from outsrctechniques import SubstituteVar
 import sys
@@ -191,7 +188,7 @@ def varListContainsParentDict(varList, parentDict):
     return False
 
 def getShouldThisElemBeUnblinded(keygenOutputElem, varsModifiedInKeygen):
-    if (keygenOutputElem == config.keygenSecVar):
+    if (keygenOutputElem == keygenSecVar):
         return False
 
     if (keygenOutputElem in publicVarNames):
