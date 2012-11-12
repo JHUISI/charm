@@ -1,5 +1,7 @@
 schemeName = "BSW"
 
+finalSDLSuffix = ".FINAL_SDL"
+
 inputVarName = "input"
 outputVarName = "output"
 

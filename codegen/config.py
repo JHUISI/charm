@@ -1,5 +1,3 @@
-schemeName = "LW"
-
 INIT_FUNC_NAME = "init"
 ISMEMBER_FUNC_NAME = "ismember"
 INTEGER_FUNC_NAME = "integer"
@@ -51,41 +49,18 @@ keygenSecVar = "sk"
 
 pySuffix = ".py"
 cppSuffix = ".cpp"
-#cppSuffix = ".py"
 cppHeaderSuffix = ".h"
-
-setupFileName = "setupOutsourcing_" + schemeName + pySuffix
-transformFileName = "transformOutsourcing_" + schemeName + pySuffix
-decOutFolderName = "../cppCompilation/"
-decOutFileName = "decOutOutsourcing_" + schemeName + cppSuffix
-#decOutFileName = "decOutOutsourcing_" + schemeName + pySuffix
-
-decOutObjFileName = "client_decout_" + schemeName
-
-userFuncsName = "userFuncs_" + schemeName
-userFuncsFileName = userFuncsName + pySuffix
-userFuncsCPPFileName = userFuncsName + cppHeaderSuffix
-outputSDLFileName = "outsourcedSDL_" + schemeName + pySuffix
-makefileFolderName = "../cppCompilation/"
-makefileFileName = "Makefile"
-makefileTemplateFileName = "../cppCompilation/Makefile_Template"
 
 errorFuncName = "userErrorFunction"
 errorFuncArgString = "userErrorFunctionArgString"
 errorFuncArgString_CPPType = "string"
 
-transformFunctionName = "transform"
 partialCT = "partCT"
-decOutFunctionName = "decout"
 getStringFunctionName = "GetString"
 
 setupFunctionOrder = [setupFuncName, keygenFuncName, encryptFuncName]
-transformFunctionOrder = [transformFunctionName]
-decOutFunctionOrder = [decOutFunctionName]
 
 argsToFirstSetupFunc = []
-argsToFirstTransformFunc = ["sys.argv[1]", "sys.argv[2]", "sys.argv[3]"]
-argsToFirstDecOutFunc = ["sys.argv[1]", "sys.argv[2]", "sys.argv[3]"]
 
 PairingGroupClassName_CPP = "PairingGroup"
 SecurityParameter_CPP = "MNT160"

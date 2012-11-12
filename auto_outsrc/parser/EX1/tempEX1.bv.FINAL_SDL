@@ -1,0 +1,75 @@
+name := example
+setting := asymmetric
+
+N := 2
+secparam := 80
+
+BEGIN :: types
+M := GT
+transformOutputList := list
+END :: types
+
+BEGIN :: func:setup
+input := None
+a := random(ZR)
+g1 := random(G1)
+g2 := random(G2)
+egga := (e(g1, g2)^a)
+dummyVar := random(ZR)
+
+msk := list{a, dummyVar}
+output := list{g1, g2, egga, msk}
+END :: func:setup
+
+BEGIN :: func:keygen
+input := list{g2, egga, msk}
+blindingFactor0Blinded := random(ZR)
+zz := random(ZR)
+msk := expand{a, dummyVar}
+t := random(ZR)
+
+d := g2 ^ (a * t)
+dBlinded := d ^ (1/blindingFactor0Blinded)
+eggat := (egga^t)
+
+pk := eggat
+pkBlinded := pk
+dummyVar2 := random(ZR)
+dummyVar2Blinded := dummyVar2
+sk := list{dBlinded, dummyVar2Blinded}
+skBlinded := list{dBlinded, dummyVar2Blinded}
+output := list{pkBlinded, blindingFactor0Blinded, skBlinded}
+END :: func:keygen
+
+BEGIN :: func:encrypt
+input := list{g1, pk, M}
+
+s1 := random(ZR)
+s2 := random(ZR)
+s3 := random(ZR)
+s := s1 + s2 + s3
+
+c0 := M * (pk ^ s)
+c1 := g1 ^ s1
+c2 := g1 ^ s2
+c3 := g1 ^ s3
+
+output := list{c0, c1, c2, c3}
+END :: func:encrypt
+
+BEGIN :: func:transform
+input := list{pk, sk, c0, c1, c2, c3}
+sk := expand{d, dummyVar2}
+transformOutputList#0 := e(c1,d) * e(c2,d) * e(c3,d)
+output := transformOutputList
+END :: func:transform
+
+BEGIN :: func:decout
+input := list{pk, sk, c0, c1, c2, c3, transformOutputList, blindingFactor0Blinded}
+sk := expand{d, dummyVar2}
+result := (transformOutputList#0 ^ (blindingFactor0Blinded) )
+M := (c0 * (result^-1))
+output := M
+END :: func:decout
+
+

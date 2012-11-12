@@ -1,6 +1,9 @@
 name := ibeckrs09 
 setting := asymmetric
 
+N := 2
+secparam := 80
+
 BEGIN :: types
 n := ZR
 l := ZR
