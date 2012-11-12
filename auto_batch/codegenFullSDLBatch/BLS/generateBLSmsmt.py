@@ -149,10 +149,11 @@ def generate_signatures_main(argv):
     validOutputDictName = sys.argv[5]
     invalidOutputDictName = sys.argv[6]
     
-    # generate keys
+    # 1. generate keys
     (pk, sk, g) = bls.keygen()
     
     f_mpk = open('mpk.charmPickle', 'wb')
+    # 2. serialize the pk's
     pick_mpk = objectToBytes({'pk':pk, 'g':g}, group)
     f_mpk.write(pick_mpk)
     f_mpk.close()
@@ -165,6 +166,7 @@ def generate_signatures_main(argv):
     invalidOutputDict[0] = {}
     invalidOutputDict[0]['pk'] = 'mpk.charmPickle'
     
+    # 3. pass right arguments at the end
     genOutputDictFile(numValidMessages, messageSize, 'mpk.charmPickle', validOutputDict, validOutputDictName, '_ValidMessage.pythonPickle', '_ValidSignature.charmPickle', True, sk, pk, g)
     genOutputDictFile(numInvalidMessages, messageSize, 'mpk.charmPickle', invalidOutputDict, invalidOutputDictName, '_InvalidMessage.pythonPickle', '_InvalidSignature.charmPickle', False, sk, pk, g)
     return
@@ -173,7 +175,6 @@ def run_batch_verification(argv, same_signer=True):
     if ( (len(argv) != 4) or (argv[1] == "-help") or (argv[1] == "--help") ):
         sys.exit("Usage:  python " + argv[0] + "\n\t[dictionary with valid messages/signatures]\n\t[name of output file for batch results]\n\t[name of output file for ind. results]")
     
-#    global groupParamArg
     validDictArg = open(sys.argv[1], 'rb').read()
     groupParamArg = PairingGroup('BN256')
     bls.group = groupParamArg
@@ -207,7 +208,7 @@ def run_batch_verification(argv, same_signer=True):
             #print("verifyFuncArgs: ", verifyFuncArgs)
             N = len(sigsDict.keys())
             bls.N = N
-            # public values/generator
+            # 4. public values/generator
             g = sigsDict[0]['pk'][bodyKey]['g']
             if same_signer:
                 pk = sigsDict[0]['pk'][bodyKey]['pk']
