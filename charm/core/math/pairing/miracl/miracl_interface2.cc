@@ -1218,7 +1218,7 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 			x = *bytesToBig(s, &cnt);
 			s = s.substr(cnt);
 			y = *bytesToBig(s, &cnt);
-			cout << "point => (" << x << ", " << y << ")" << endl;
+			//cout << "point => (" << x << ", " << y << ")" << endl;
 			G1 *p = new G1();
 			p->g.set(x,y);
 			return (element_t *) p;
