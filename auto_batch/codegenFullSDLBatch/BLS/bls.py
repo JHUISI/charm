@@ -30,7 +30,7 @@ def sign(sk, M):
 def verify(pk, M, sig, g):
     global h
 
-    input = [pk, M, sig, g]
+    #input = [pk, M, sig, g]
     h = group.hash(M, G1)
     if ( ( (pair(h, pk)) == (pair(sig, g)) ) ):
         output = True
@@ -41,7 +41,7 @@ def verify(pk, M, sig, g):
 
 def membership(pk, siglist, g):
 
-    input = [pk, siglist, g]
+    #input = [pk, siglist, g]
     if ( ( (group.ismember(pk)) == (False) ) ):
         output = False
         return output
@@ -56,7 +56,7 @@ def membership(pk, siglist, g):
 
 def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, pk, g):
 
-    input = [delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, pk, g]
+    #input = [delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, pk, g]
     dotALoopVal = 1
     dotBLoopVal = 1
     for z in range(startSigNum, endSigNum):
@@ -77,15 +77,15 @@ def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotACache, d
     output = None
 
 def batchverify(Mlist, pk, siglist, g, incorrectIndices):
-    global h
+    #global h
 
     delta = {}
     dotBCache = {}
     dotACache = {}
 
-    input = [Mlist, pk, siglist, g, incorrectIndices]
+    #input = [Mlist, pk, siglist, g, incorrectIndices]
     for z in range(0, N):
-        delta[z] = SmallExp(secparam)
+        delta[z] = SmallExp(group, secparam)
     if ( ( (membership(pk, siglist, g)) == (False) ) ):
         output = False
         return output
@@ -97,17 +97,28 @@ def batchverify(Mlist, pk, siglist, g, incorrectIndices):
     output = incorrectIndices
     return output
 
-def SmallExp(bits=80):
+def indivverify(Mlist, pk, siglist, g, incorrectIndices):
+    if ( ( (membership(pk, siglist, g)) == (False) ) ):
+        output = False
+        return output
+    
+    for z in range(0, N):
+        if verify(pk, Mlist[z], siglist[z], g) == False:
+            incorrectIndices.append(i)
+    
+    return incorrectIndices
+
+def SmallExp(group, bits=80):
     return group.init(ZR, randomBits(bits))
 
 def main():
     global group
     group = PairingGroup('BN256')
-    (pk, sk, g) = keygen()
+    (pk, sk, g) = keygen(group)
     M1 = "test1"
     M2 = "test2"
-    sig1 = sign(sk, M1)
-    sig2 = sign(sk, M2)
+    sig1 = sign(group, sk, M1)
+    sig2 = sign(group, sk, M2)
 
     assert verify(pk, M1, sig1, g), "failed verification 1"
     assert verify(pk, M2, sig2, g), "failed verification 2"
