@@ -1,10 +1,11 @@
-from charm.toolbox.pairinggroup import *
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.core.engine.util import *
 from charm.core.math.integer import randomBits
+import random
 
 group = None
 
-N = 2
+N = 10
 
 secparam = 80
 
@@ -65,11 +66,7 @@ def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotACache, d
     for z in range(startSigNum, endSigNum):
         dotALoopVal = (dotALoopVal * dotACache[z])
         dotBLoopVal = (dotBLoopVal * dotBCache[z])
-    print("dotA :=>", dotALoopVal)
-    print("dotB :=>", dotBLoopVal)
-    print("startSigNum :=>", startSigNum, " endSigNum :=>", endSigNum)
-    print("g2 :=>", g2)
-    print("P :=>", P)
+    
     if ( ( (pair(dotALoopVal, g2)) == (pair(dotBLoopVal, P)) ) ):
         return
     else:
@@ -80,7 +77,7 @@ def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotACache, d
         output = None
     else:
         midSigNum = (startSigNum + midway)
-        dividenconquer(delta, startSigNum, midway, incorrectIndices, dotACache, dotBCache, g2, P)
+        dividenconquer(delta, startSigNum, midSigNum, incorrectIndices, dotACache, dotBCache, g2, P)
         dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, g2, P)
     output = None
 
@@ -120,19 +117,31 @@ def main():
     group = PairingGroup('BN256')
     
     (g2, alpha, P) = setup()
-    (pk1, sk1) = keygen(alpha, "test1")
-    (pk2, sk2) = keygen(alpha, "test2")
-    pklist = []
-    pklist.append(pk1)
-    pklist.append(pk2)
-    Mlist = ["test1", "test2"]
+    pklist = {}
+    sklist = {}
+    for z in range(0, N):
+        (pklist[z], sklist[z]) = keygen(alpha, "test" + str(z))
 
-    (S1_1, S2_1) = sign(pklist[0], sk1, Mlist[0])
-    (S1_2, S2_2) = sign(pklist[1], sk2, Mlist[1])
-    S1list = [S1_1, S1_2]
-    S2list = [S2_1, S2_2]
+    Mlist = ["test" + str(z) for z in range(0, N)]
+
+    S1list = {}
+    S2list = {}
+    for z in range(0, N):
+        (S1list[z], S2list[z]) = sign(pklist[z], sklist[z], Mlist[z])
+        assert verify(P, g2, pklist[z], Mlist[z], S1list[z], S2list[z]), "invalid signature generated"
+    
+    badList = []
+    for i in range(0, int(N/2)):
+        randomIndex = random.randint(0, N-1)
+        if randomIndex not in badList:
+            badList.append(randomIndex)
+    
+    badList.sort()
+    for i in badList:
+        Mlist[i] = "foo"
+    print("badList         : ", badList)
     incorrectIndices = batchverify(Mlist, P, S1list, S2list, g2, pklist, [])
-    print(incorrectIndices)
+    print("incorrectIndices: ", incorrectIndices)
 
 
 if __name__ == '__main__':

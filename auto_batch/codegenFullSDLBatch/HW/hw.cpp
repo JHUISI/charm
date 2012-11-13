@@ -224,7 +224,7 @@ void dividenconquer(CharmListZR & delta, int startSigNum, int endSigNum, list<in
     else
     {
         midSigNum = group.add(startSigNum, midway);
-        dividenconquer(delta, startSigNum, midway, incorrectIndices, dotACache, dotECache, dotFCache, dotGCache, sumBCache, sumCCache, sumDCache, g2, U, V, D, w2, z2, h2);
+        dividenconquer(delta, startSigNum, midSigNum, incorrectIndices, dotACache, dotECache, dotFCache, dotGCache, sumBCache, sumCCache, sumDCache, g2, U, V, D, w2, z2, h2);
         dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotACache, dotECache, dotFCache, dotGCache, sumBCache, sumCCache, sumDCache, g2, U, V, D, w2, z2, h2);
     }
     return;

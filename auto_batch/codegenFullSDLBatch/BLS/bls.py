@@ -72,7 +72,7 @@ def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotACache, d
         output = None
     else:
         midSigNum = (startSigNum + midway)
-        dividenconquer(delta, startSigNum, midway, incorrectIndices, dotACache, dotBCache, pk, g)
+        dividenconquer(delta, startSigNum, midSigNum, incorrectIndices, dotACache, dotBCache, pk, g)
         dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, pk, g)
     output = None
 

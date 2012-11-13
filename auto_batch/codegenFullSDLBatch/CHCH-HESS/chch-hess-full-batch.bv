@@ -150,7 +150,7 @@ BEGIN :: if
     output := None
  else
     midSigNum := startSigNum + midway
-    dividenconquer(delta1, delta2, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, P, g2)
+    dividenconquer(delta1, delta2, startSigNum, midSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, P, g2)
     dividenconquer(delta1, delta2, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, P, g2)
 END :: if
 

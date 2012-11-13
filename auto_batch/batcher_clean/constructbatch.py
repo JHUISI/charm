@@ -262,7 +262,7 @@ class SDLBatch:
         # add the verification check(s)
         if type(eqStr) == str:
             output += dc_batch_verify_check % eqStr
-            output += dc_recursive_call % (divConqArgs.replace("endSigNum", "midway"), divConqArgs.replace("startSigNum", "midSigNum"))
+            output += dc_recursive_call % (divConqArgs.replace("endSigNum", "midSigNum"), divConqArgs.replace("startSigNum", "midSigNum"))
         elif type(eqStr) == list:
             pass
         else:
@@ -285,7 +285,7 @@ class SDLBatch:
         # add the verification check(s)
         if type(eqStr) == str:
             output += dc_batch_verify_check % eqStr
-            output += dc_recursive_call % (divConqArgs.replace("endSigNum", "midway"), divConqArgs.replace("startSigNum", "midSigNum"))
+            output += dc_recursive_call % (divConqArgs.replace("endSigNum", "midSigNum"), divConqArgs.replace("startSigNum", "midSigNum"))
         elif type(eqStr) == list:
             pass
         else:

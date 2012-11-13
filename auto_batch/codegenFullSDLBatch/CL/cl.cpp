@@ -118,7 +118,7 @@ void dividenconquer(CharmListZR & delta1, CharmListZR & delta2, int startSigNum,
     else
     {
         midSigNum = group.add(startSigNum, midway);
-        dividenconquer(delta1, delta2, startSigNum, midway, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X);
+        dividenconquer(delta1, delta2, startSigNum, midSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X);
         dividenconquer(delta1, delta2, midSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g, Y, X);
     }
     return;
