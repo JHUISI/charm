@@ -25,6 +25,9 @@ C1 := list
 C2 := list
 C3 := list
 gid := str
+KBlinded := list
+blindingFactorKBlinded := list
+transformOutputList := list
 END :: types
 
 BEGIN :: func:setup
@@ -57,18 +60,28 @@ END :: func:authsetup
 
 BEGIN :: func:keygen
 input := list{gpk, msk, gid, userS}
+blindingFactor0Blinded := random(ZR)
+userSBlinded := userS
+gidBlinded := gid
+zz := random(ZR)
 gpk := expand{g, gus2}
-h := H(gid, G1)
+h := H(gidBlinded,G1)
 
 Y := len(userS)
 BEGIN :: for
-for{i := 0, Y}
+for{i := 0,Y}
 z := userS#i
-K#z := (g ^ msk#z#0) * (h ^ msk#z#1)
+K#z := ((g^msk#z#0) * (h^msk#z#1))
 END :: for
 
-sk := list{gid, userS, K}
-output := sk
+BEGIN :: forall
+forall{y := K}
+blindingFactorKBlinded#y := blindingFactor0Blinded
+KBlinded#y := K#y ^ (1/blindingFactorKBlinded#y)
+END :: forall
+sk := list{gidBlinded, userSBlinded, KBlinded}
+skBlinded := list{gidBlinded, userSBlinded, KBlinded}
+output := list{blindingFactor0Blinded, blindingFactorKBlinded, skBlinded}
 END :: func:keygen
 
 BEGIN :: func:encrypt
@@ -98,22 +111,33 @@ ct := list{policyusstr, C0, C1, C2, C3}
 output := ct
 END :: func:encrypt
 
-BEGIN :: func:decrypt
+BEGIN :: func:transform
 input := list{gpk, sk, ct}
 gpk := expand{g, gus2}
 ct := expand{policyusstr, C0, C1, C2, C3}
 sk := expand{gid, userS, K}
+transformOutputList#0 := createPolicy(policyusstr)
+transformOutputList#1 := prune(policy, userS)
+transformOutputList#2 := getCoefficients(policy)
+transformOutputList#3 := H(gid,G1)
+transformOutputList#4 := len(attrs)
+output := transformOutputList
+END :: func:transform
 
-policy := createPolicy(policyusstr)
-attrs  := prune(policy, userS)
-coeff := getCoefficients(policy)
-husgid := H(gid, G1)
-
-Y := len(attrs)
-A := { prod{y := attrs#1, Y} on (((C1#y * e(husgid, C3#y)) * e(K#y, C3#y) / e(K#y, C2#y))^coeff#y) }
-
-M := C0 / A
+BEGIN :: func:decout
+input := list{gpk, sk, ct, transformOutputList, blindingFactor0Blinded, blindingFactorKBlinded}
+gpk := expand{g, gus2}
+ct := expand{policyusstr, C0, C1, C2, C3}
+sk := expand{gid, userS, K}
+policy := transformOutputList#0
+attrs := transformOutputList#1
+coeff := transformOutputList#2
+husgid := transformOutputList#3
+Y := transformOutputList#4
+A := (prod{y := attrs#1,Y} on (((C1#y^coeff#y) * e((husgid^coeff#y),C3#y)) * (e((K#y^coeff#y),C3#y) * e((K#y^-coeff#y),C2#y))))
+M := (C0 * (A^-1))
 output := M
-END :: func:decrypt
+END :: func:decout
+
 
 # change rule for moving exp into a variable : only if it's a negative exponent! nothing else!

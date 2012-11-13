@@ -5,6 +5,7 @@ import sys
 
 transformListCounter = 0
 decoutListCounter = 0
+mappingOfTransformListToVarNames = {}
 
 def addTransformFuncIntro():
     firstLineOfDecryptFunc = getStartLineNoOfFunc(decryptFuncName)
@@ -154,7 +155,7 @@ def getAreAllVarsOnLineKnownByTransform(node, knownVars):
         return False
 
 def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode):
-    global transformListCounter, decoutListCounter
+    global transformListCounter, decoutListCounter, mappingOfTransformListToVarNames
 
     decoutListCounter = transformListCounter
 
@@ -162,6 +163,7 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
         lineForTransformLines = ""
 
         lineForTransformLines += transformOutputList + LIST_INDEX_SYMBOL + str(transformListCounter) + " := "
+        mappingOfTransformListToVarNames[str(currentNode.left)] = str(transformListCounter)
         transformListCounter += 1
         listOfPairings = groupedPairing[1]
         for pairing in listOfPairings:
@@ -193,11 +195,12 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
     decoutLines.append(lineForDecoutLines + "\n")
 
 def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines):
-    global transformListCounter, decoutListCounter
+    global transformListCounter, decoutListCounter, mappingOfTransformListToVarNames
 
     decoutListCounter = transformListCounter
 
     lineForTransformLines = transformOutputList + LIST_INDEX_SYMBOL + str(transformListCounter) + " := "
+    mappingOfTransformListToVarNames[str(currentNode.left)] = str(transformListCounter)
     transformListCounter += 1
     lineForTransformLines += str(currentNode.right)
 
@@ -264,6 +267,8 @@ def transformNEW(varsThatAreBlindedDict):
 
     for lineNo in range(startLineNoOfSearch, (lastLineOfTransform + 1)):
         currentNode = astNodes[lineNo - 1]
+        if (currentNode.type == ops.NONE):
+            continue
         path_applied = []
         currentNode = SimplifySDLNode(currentNode, path_applied)
         applyTechnique11(currentNode)
@@ -311,4 +316,7 @@ def transformNEW(varsThatAreBlindedDict):
 
     printLinesOfCode()
 
+    #sys.exit("TEST")
+
+    #print(mappingOfTransformListToVarNames)
     #sys.exit("TEST")
