@@ -104,7 +104,7 @@ def indivverify(Mlist, pk, siglist, g, incorrectIndices):
     
     for z in range(0, N):
         if verify(pk, Mlist[z], siglist[z], g) == False:
-            incorrectIndices.append(i)
+            incorrectIndices.append(z)
     
     return incorrectIndices
 
