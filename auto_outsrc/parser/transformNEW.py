@@ -125,6 +125,12 @@ def getNodePairingObjs(node):
     getNodePairingObjsRecursive(node, pairingsList)
     return pairingsList
 
+def dropNegativeSign(nodeAsString):
+    if (nodeAsString[0] != "-"):
+        return nodeAsString
+
+    return nodeAsString[1:len(nodeAsString)]
+
 def getAreAllVarsOnLineKnownByTransformRecursive(node, knownVars, varsNotKnownByTransform):
     if (node.left != None):
         getAreAllVarsOnLineKnownByTransformRecursive(node.left, knownVars, varsNotKnownByTransform)
@@ -133,7 +139,9 @@ def getAreAllVarsOnLineKnownByTransformRecursive(node, knownVars, varsNotKnownBy
         getAreAllVarsOnLineKnownByTransformRecursive(node.right, knownVars, varsNotKnownByTransform)
 
     if (node.type == ops.ATTR):
-        if (dropListSymbol(str(node)) not in knownVars):
+        nodeAsString = str(node)
+        nodeAsString = dropNegativeSign(nodeAsString)
+        if ( (dropNegativeSign(dropListSymbol(str(node))) not in knownVars) and (nodeAsString.isdigit() == False) ):
             if (str(node) not in varsNotKnownByTransform):
                 varsNotKnownByTransform.append(str(node))
 
@@ -201,6 +209,15 @@ def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines):
 
     decoutLines.append(lineForDecoutLines + "\n")
 
+'''
+def writeOutNonPairingCalcs(currentNode, transformLines, decoutLines):
+    global transformListCounter
+
+    lineForTransformLines = transformOutputList + LIST_INDEX_SYMBOL + str(transformListCounter) + " := "
+    transformListCounter += 1
+    lineForTransformLines += str(
+'''
+
 def transformNEW(varsThatAreBlindedDict):
     #addTransformFuncIntro()
     (stmtsDec, typesDec, depListDec, depListNoExponentsDec, infListDec, infListNoExponentsDec) = getFuncStmts(decryptFuncName)
@@ -256,6 +273,9 @@ def transformNEW(varsThatAreBlindedDict):
         if ( (len(currentNodePairings) > 0) and (areAllVarsOnLineKnownByTransform == True) ):
             groupedPairings = groupPairings(currentNodePairings, varsThatAreBlindedDict)
             writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode)
+        elif (areAllVarsOnLineKnownByTransform == True):
+            writeOutLineKnownByTransform(currentNode, transformLines, decoutLines)
+            knownVars.append(str(currentNode.left))
         else:
             #if (areAllVarsOnLineKnownByTransform == False):
             decoutLines.append(str(currentNode) + "\n")

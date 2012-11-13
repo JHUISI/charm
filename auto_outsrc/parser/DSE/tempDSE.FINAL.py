@@ -1,3 +1,13 @@
+from DSE/userFuncs import *
+
+from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair, SymEnc, SymDec
+from toolbox.secretutil import SecretUtil
+from toolbox.iterate import dotprod2
+from charm.pairing import hash as DeriveKey
+from charm.engine.util import objectToBytes, bytesToObject
+from builtInFuncs import *
+
+
 from charm.toolbox.pairinggroup import *
 from charm.core.engine.util import *
 from charm.core.math.integer import randomBits
@@ -42,6 +52,7 @@ C5 = {}
 C4 = {}
 g = {}
 v2us2 = {}
+tag = {}
 egga = {}
 alpha = {}
 u = {}
@@ -212,24 +223,27 @@ def transform(ct, sk):
     input = [ct, sk]
     id, D1, D2, D3, D4, D5, D6, D7, K, tagusk = sk
     C1, C2, C3, C4, C5, C6, C7, E1, E2, tagusc = ct
-    transformOutputList[0] = pair(C1, D1)
-    transformOutputList[1] = pair(C2, D2)
-    transformOutputList[2] = (pair(C3, D3) * pair(C5, D5))
-    transformOutputList[3] = pair(C4, D4)
-    transformOutputList[4] = (pair(C6, D6) * pair(C7, D7))
+    transformOutputList[0] = ((tagusc - tagusk) ** -1)
+    transformOutputList[1] = pair(C1, D1)
+    transformOutputList[2] = pair(C2, D2)
+    transformOutputList[3] = (pair(C3, D3) * pair(C5, D5))
+    transformOutputList[4] = pair(C4, D4)
+    transformOutputList[5] = (pair(C6, D6) * pair(C7, D7))
+    transformOutputList[6] = (pair((E1 ** tag), D7) * pair((E2 ** -tag), K))
     output = transformOutputList
     return output
 
 def decout(ct, sk, transformOutputList, blindingFactorD1Blinded, blindingFactorD2Blinded, blindingFactor0Blinded):
+    global tag
 
     input = [ct, sk, transformOutputList, blindingFactorD1Blinded, blindingFactorD2Blinded, blindingFactor0Blinded, blindingFactor0Blinded]
     id, D1, D2, D3, D4, D5, D6, D7, K, tagusk = sk
     C1, C2, C3, C4, C5, C6, C7, E1, E2, tagusc = ct
-    tag = ((tagusc - tagusk) ** -1)
-    A1 = ((transformOutputList[0] ** blindingFactorD1Blinded) * ((transformOutputList[1] ** blindingFactorD2Blinded) * transformOutputList[2]))
-    A2 = transformOutputList[4]
+    tag = transformOutputList[0]
+    A1 = ((transformOutputList[1] ** blindingFactorD1Blinded) * ((transformOutputList[2] ** blindingFactorD2Blinded) * transformOutputList[3]))
+    A2 = transformOutputList[5]
     A3 = (A1 * (A2 ** -1))
-    A4 = (pair((E1 ** tag), D7) * pair((E2 ** -tag), K))
+    A4 = transformOutputList[6]
     M = (C0 / (A3 * (A4 ** -1)))
     output = M
     return output
@@ -240,16 +254,6 @@ def SmallExp(bits=80):
 def main():
     global group
     group = PairingGroup(secparam)
-
-    (mpk, msk) = setup()
-    (blindingFactorD1Blinded, blindingFactorD2Blinded, blindingFactor0Blinded, blindingFactor0Blinded, skBlinded) = keygen(mpk, msk, "test")
-    M = group.random(GT)
-    print(M)
-    print("\n\n\n")
-    ct = encrypt(mpk, M, "test")
-    transformOutputList = transform(ct, skBlinded)
-    M2 = decout(ct, skBlinded, transformOutputList, blindingFactorD1Blinded, blindingFactorD2Blinded, blindingFactor0Blinded)
-    print(M2)
 
 if __name__ == '__main__':
     main()

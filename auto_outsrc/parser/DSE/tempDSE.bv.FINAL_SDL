@@ -137,11 +137,13 @@ BEGIN :: func:transform
 input := list{ct, sk}
 sk := expand{id, D1, D2, D3, D4, D5, D6, D7, K, tagusk}
 ct := expand{C1, C2, C3, C4, C5, C6, C7, E1, E2, tagusc}
-transformOutputList#0 := e(C1,D1)
-transformOutputList#1 := e(C2,D2)
-transformOutputList#2 := e(C3,D3) * e(C5,D5)
-transformOutputList#3 := e(C4,D4)
-transformOutputList#4 := e(C6,D6) * e(C7,D7)
+transformOutputList#0 := ((tagusc - tagusk)^-1)
+transformOutputList#1 := e(C1,D1)
+transformOutputList#2 := e(C2,D2)
+transformOutputList#3 := e(C3,D3) * e(C5,D5)
+transformOutputList#4 := e(C4,D4)
+transformOutputList#5 := e(C6,D6) * e(C7,D7)
+transformOutputList#6 := e((E1^tag),D7) * e((E2^-tag),K)
 output := transformOutputList
 END :: func:transform
 
@@ -149,11 +151,11 @@ BEGIN :: func:decout
 input := list{ct, sk, transformOutputList, blindingFactorD1Blinded, blindingFactorD2Blinded, blindingFactor0Blinded, blindingFactor0Blinded}
 sk := expand{id, D1, D2, D3, D4, D5, D6, D7, K, tagusk}
 ct := expand{C1, C2, C3, C4, C5, C6, C7, E1, E2, tagusc}
-tag := ((tagusc - tagusk)^-1)
-A1 := (transformOutputList#0 ^ (blindingFactorD1Blinded) ) * (transformOutputList#1 ^ (blindingFactorD2Blinded) ) * (transformOutputList#2 ) ) * (transformOutputList#3 ^ (blindingFactor0Blinded) )
-A2 := (transformOutputList#4 ) )
+tag := transformOutputList#0
+A1 := (transformOutputList#1 ^ (blindingFactorD1Blinded) ) * (transformOutputList#2 ^ (blindingFactorD2Blinded) ) * (transformOutputList#3 ) ) * (transformOutputList#4 ^ (blindingFactor0Blinded) )
+A2 := (transformOutputList#5 ) )
 A3 := (A1 * (A2^-1))
-A4 := (e((E1^tag),D7) * e((E2^-tag),K))
+A4 := (transformOutputList#6 ) )
 M := (C0 / (A3 * (A4^-1)))
 output := M
 END :: func:decout
