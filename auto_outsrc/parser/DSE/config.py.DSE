@@ -2,6 +2,10 @@ schemeName = "DSE"
 
 M = 'M'
 
+finalSDLSuffix = ".FINAL_SDL"
+
+blindingFactorPrefix = "blindingFactor"
+
 blindingLoopVar = "y"
 blindingSuffix = "Blinded"
 setupFuncName = "setup"
@@ -10,6 +14,10 @@ keygenBlindingExponentType = "ZR"
 keygenFuncName = "keygen"
 
 encryptFuncName = "encrypt"
+decryptFuncName = "decrypt"
+transformFuncName = "transform"
+
+transformOutputList = "transformOutputList"
 
 # superset of variables we have used to represent public parameters in
 # our crypto schemes

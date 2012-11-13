@@ -1,14 +1,23 @@
-schemeName = "DSE"
+schemeName = "LW"
 
-M = 'M'
+inputVarName = "input"
+outputVarName = "output"
 
 finalSDLSuffix = ".FINAL_SDL"
 
-blindingFactorPrefix = "blindingFactor"
+transformOutputList = "transformOutputList"
+
+M = 'M'
+
+varNameLeftSideNoBlindedVars = "neverUseThisVarNameNoBlindedVars"
+varNameLeftSideBlindedVars = "neverUseThisVarNameBlindedVars"
 
 blindingLoopVar = "y"
+
+blindingFactorPrefix = "blindingFactor"
+
 blindingSuffix = "Blinded"
-setupFuncName = "setup"
+setupFuncName = "authsetup"
 keygenBlindingExponent = "zz"
 keygenBlindingExponentType = "ZR"
 keygenFuncName = "keygen"
@@ -17,15 +26,16 @@ encryptFuncName = "encrypt"
 decryptFuncName = "decrypt"
 transformFuncName = "transform"
 
-transformOutputList = "transformOutputList"
+mainFuncName = "main"
+verifyFuncName = "verify"
+
+masterPubVars = ["gpk", "pk"]
+masterSecVars = ["msk"]
 
 # superset of variables we have used to represent public parameters in
 # our crypto schemes
-keygenPubVar = ["pk", "mpk"]
+keygenPubVar = ["pk", "gpk"]
 keygenSecVar = "sk"
-
-masterPubVars = ["mpk"]
-masterSecVars = ["msk"]
 
 pySuffix = ".py"
 cppSuffix = ".cpp"
@@ -105,7 +115,7 @@ serializeFuncName = "writeToFile"
 serializeExt = ".txt"
 serializeObjectOutFuncName = "objectOut"
 serializeKeysName = "keys"
-serializePubKey = "mpk[24]"
+serializePubKey = "pk[4]"
 serializePubKeyType = "GT"
 serializePubKey_DecOut = "pk"
 
@@ -113,7 +123,6 @@ linesForSetupMain = []
 linesForSetupMain.append("S = ['ONE', 'TWO', 'THREE']")
 linesForSetupMain.append("M = \"balls on fire345\"")
 linesForSetupMain.append("policy_str = '((four or three) and (two or one))'")
-linesForSetupMain.append("id = 'example@email.com'")
 
 structsToPickleInSetupMain = []
 structsToPickleInSetupMain.append("")

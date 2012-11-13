@@ -1,0 +1,13 @@
+    gpk = setup()
+    authS = ['ONE', 'TWO', 'THREE', 'FOUR']
+    (msk, pk) = authsetup(gpk, authS)
+    gid = "bob"
+    userS = ['THREE', 'ONE', 'TWO']
+    (blindingFactor0Blinded, blindingFactorKBlinded, skBlinded) = keygen(gpk, msk, gid, userS)
+    M = group.random(GT)
+    policyusstr = '((ONE or THREE) and (TWO or FOUR))'
+    print(M)
+    print("\n\n\n")
+    ct = encrypt(pk, gpk, M, policyusstr)
+    transformOutputList = transform(gpk, skBlinded, ct)
+    M2 = decout(gpk, skBlinded, ct, transformOutputList, blindingFactor0Blinded, blindingFactorKBlinded)
