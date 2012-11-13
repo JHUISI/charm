@@ -1,3 +1,4 @@
+import sdlpath
 from SDLParser import *
 from SDLang import *
 #from toolbox.pairinggroup import pair
@@ -972,18 +973,72 @@ def SimplifySDLNode(equation, path, code_block=None, debug=False):
         print("optimized equation: ", new_eq)
     return new_eq
 
+class SubstituteAttrBasic:
+    def __init__(self, variable_map):
+        self.variable_map = variable_map
+        self.variable_keys = list(variable_map.keys())
+        self.count = 0
+        
+    def getMatchCount(self):
+        return self.count
+    
+    def visit(self, node, data):
+        pass
+    
+    def visit_attr(self, node, data):
+        varName = node.getAttribute() # just retrieve the name and do not include any index info
+        if varName.isdigit(): return
+        # rewrite if it has a "#" baked into it.
+        appendix = None
+        if varName.find(LIST_INDEX_SYMBOL) != -1:
+            varResults = varName.split(LIST_INDEX_SYMBOL)
+            varName = varResults[0]
+            appendix = varResults[1:]
+        
+        s = ""
+        if appendix: # handles case in which "#" appears in attr definition
+            for i in appendix:
+                s += "#" + i
+
+        if varName in self.variable_map.keys():
+            node.setAttribute(self.variable_map[varName] + s)
+            self.count += 1
+    
+    def visit_concat(self, node, data):
+        varList = node.getListNode()
+        newVarList = [self.variable_map[ x ] if x in self.variable_keys else x for x in varList]
+        if varList != newVarList: self.count += 1
+        node.listNodes = newVarList
+    
+    def visit_func(self, node, data):
+        varList = node.getListNode()
+        newVarList = [self.variable_map[ x ] if x in self.variable_keys else x for x in varList]
+        if varList != newVarList: self.count += 1
+        node.listNodes = newVarList
+
+
+def InPlaceReplaceAttr(node, originalAttr, replacedAttr):
+    # verify that values are not null
+    sab = SubstituteAttrBasic({ str(originalAttr) : str(replacedAttr) })
+    ASTVisitor(sab).preorder(node)
+    return sab.getMatchCount()
+
 if __name__ == "__main__":
     statement = sys.argv[1]
     parser = SDLParser()
     equation = parser.parse(statement)
     
-    path_applied = []
+#    path_applied = []    
+#    print("Original: ", equation)
+#    equation2 = SimplifySDLNode(equation, path_applied)
+#    print("Final Optimized: ", equation2)
+#    print("Techniques: ", path_applied)
+#    applyTechnique11(equation2)
     
-    print("Original: ", equation)
-    equation2 = SimplifySDLNode(equation, path_applied)
-    print("Final Optimized: ", equation2)
-    print("Techniques: ", path_applied)
-    applyTechnique11(equation2)
+    print("Before: ", equation)
+    InPlaceReplaceAttr(equation, "A", "B")
+    print("After: ", equation)
+
 #    tech2 = Technique2({})
 #    ASTVisitor(tech2).preorder(equation)
 #    print("Tech 2: ", equation)

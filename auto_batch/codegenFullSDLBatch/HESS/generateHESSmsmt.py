@@ -164,9 +164,7 @@ def generate_signatures_main(argv, same_signer=True):
     pklist = {}
     sklist = {}
     for z in range(0, numValidMessages):
-        (pklist[z], sklist[z]) = hess.keygen(alpha, "test@email.com") # "test" + str(z) + "@email.com")
-#        pklist[z] = pk
-#        sklist[z] = sk
+        (pklist[z], sklist[z]) = hess.keygen(alpha, "test" + str(z) + "@email.com")
     
     f_pk = open('pk.charmPickle', 'wb')
     # 2. serialize the pk's
