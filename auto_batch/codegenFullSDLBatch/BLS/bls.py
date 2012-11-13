@@ -114,11 +114,11 @@ def SmallExp(group, bits=80):
 def main():
     global group
     group = PairingGroup('BN256')
-    (pk, sk, g) = keygen(group)
+    (pk, sk, g) = keygen()
     M1 = "test1"
     M2 = "test2"
-    sig1 = sign(group, sk, M1)
-    sig2 = sign(group, sk, M2)
+    sig1 = sign(sk, M1)
+    sig2 = sign(sk, M2)
 
     assert verify(pk, M1, sig1, g), "failed verification 1"
     assert verify(pk, M2, sig2, g), "failed verification 2"
