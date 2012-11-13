@@ -939,13 +939,14 @@ status_t gt_write_bin(gt_t g, uint8_t *data, int data_len)
 
 	memcpy(data, d, data_len);
 
+#ifdef DEBUG
 	uint8_t *d2 = data;
 	int i;
 	for(i = 0; i < 12; i++) {
 		print_as_hex(d2, FP_BYTES+1);
 		d2 = &(d2[FP_BYTES + 1]);
 	}
-
+#endif
 	memset(d, 0, GT_LEN);
 	return ELEMENT_OK;
 }

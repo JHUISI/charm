@@ -1013,7 +1013,7 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 	// hash element to a buffer
 	element_to_key(object->e, hash_buf, hash_size, label);
 
-	hash_hex = convert_buffer_to_hex(hash_buf, (size_t) hash_size);
+	hash_hex = (uint8_t *) convert_buffer_to_hex(hash_buf, (size_t) hash_size);
 //	printf_buffer_as_hex(hash_buf, hash_size);
 
 //	str = PyBytes_FromStringAndSize((const char *) hash_buf, hash_size);
@@ -1333,7 +1333,7 @@ static PyObject *Group_Check(Element *self, PyObject *args) {
 			Element *elem = (Element *) object;
 
 			int result = element_is_member(elem->e);
-			LEAVE_IF(result == ELEMENT_INVALID_ARG, "invalid object type.");
+			EXIT_IF(result == (int) ELEMENT_INVALID_ARG, "invalid object type.");
 
 			if(result == TRUE) {
 				Py_INCREF(Py_True);
