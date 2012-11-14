@@ -21,15 +21,15 @@ NUM_CYCLES = 10
 def genNewMessage(messageSize):
     message = ""
     for randomChar in range(0, messageSize):
-        message += random.choice(string.printable)
+        message += random.choice(string.ascii_letters + string.digits)
     return message
 
 def genBadMessage(message, messageSize):
     randomIndex = random.randint(0, (messageSize - 1))
     oldValue = message[randomIndex]
-    newValue = random.choice(string.printable)
+    newValue = random.choice(string.ascii_letters + string.digits)
     while (newValue == oldValue):
-        newValue = random.choice(string.printable)
+        newValue = random.choice(string.ascii_letters + string.digits)
 
     if (messageSize == 1):
         message = newValue
@@ -153,7 +153,6 @@ def generate_signatures_main(argv, same_signer=True):
     
     # 1. generate keys
     (g2, alpha, P) = hess.setup()
-
        
     f_mpk = open('mpk.charmPickle', 'wb')
     # 2. serialize the pk's
@@ -294,9 +293,11 @@ if __name__ == "__main__":
     command = sys.argv[1]
     same_signer = False
     if command == "-g":
+        print("Generating signatures...")        
         sys.argv.remove(command)        
         generate_signatures_main(sys.argv, same_signer)
     elif command == "-b":
+        print("Running batch verification...")
         sys.argv.remove(command)
         run_batch_verification(sys.argv, same_signer) # different signers
     else:

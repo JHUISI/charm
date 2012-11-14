@@ -1,5 +1,5 @@
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-from charm.core.engine.util import *
+from charm.core.engine.util import objectToBytes, bytesToObject, pickle
 import chp
 
 import sys, random, string, time
@@ -278,8 +278,10 @@ if __name__ == "__main__":
     command = sys.argv[1]
     if command == "-g":
         sys.argv.remove(command)        
+        print("Generating signatures...")
         generate_signatures_main(sys.argv)
     elif command == "-b":
+        print("Running batch verification...")
         sys.argv.remove(command)
         run_batch_verification(sys.argv, same_signer=False) # different signers
     else:

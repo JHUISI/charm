@@ -1,10 +1,11 @@
-from charm.toolbox.pairinggroup import *
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.core.engine.util import *
 from charm.core.math.integer import randomBits
+import random
 
 group = None
 
-N = 2
+N = 10
 
 secparam = 80
 
@@ -117,19 +118,33 @@ def SmallExp(bits=80):
 def main():
     global group
     group = PairingGroup('BN256')
+
     (g2, alpha, P) = setup()
-    (pk1, sk1) = keygen(alpha, "test1")
-    (pk2, sk2) = keygen(alpha, "test2")
-    (S1_1, S2_1) = sign(pk1, sk1, "mess1", g2)
-    (S1_2, S2_2) = sign(pk2, sk2, "mess2", g2)
-    print(verify(P, g2, pk1, "mess1", S1_1, S2_1))
-    pklist = [pk1, pk2]
-    Mlist = ["mess1", "mess2"]
-    S1list = [S1_1, S1_2]
-    S2list = [S2_1, S2_2]
-    incorrectIndices = []
-    batchverify(g2, pklist, Mlist, P, S1list, S2list, incorrectIndices)
-    print(incorrectIndices)
+    pklist = {}
+    sklist = {}
+    for z in range(0, N):
+        (pklist[z], sklist[z]) = keygen(alpha, "test" + str(z))
+
+    Mlist = ["test" + str(z) for z in range(0, N)]
+
+    S1list = {}
+    S2list = {}
+    for z in range(0, N):
+        (S1list[z], S2list[z]) = sign(pklist[z], sklist[z], Mlist[z], g2)
+        assert verify(P, g2, pklist[z], Mlist[z], S1list[z], S2list[z]), "invalid signature generated"
+    
+    badList = []
+    for i in range(0, int(N/2)):
+        randomIndex = random.randint(0, N-1)
+        if randomIndex not in badList:
+            badList.append(randomIndex)
+    
+    badList.sort()
+    for i in badList:
+        Mlist[i] = "foo"
+    print("badList         : ", badList)
+    incorrectIndices = batchverify(g2, pklist, Mlist, P, S1list, S2list, [])
+    print("incorrectIndices: ", incorrectIndices)
 
 
 if __name__ == '__main__':

@@ -34,6 +34,7 @@ def sign(pk, sk, M):
 
 def verify(P, g2, pk, M, S1, S2):
     a = group.hash((M, S1), ZR)
+
     if ( ( (pair(S2, g2)) == (pair((S1 * (pk ** a)), P)) ) ):
         output = True
     else:
