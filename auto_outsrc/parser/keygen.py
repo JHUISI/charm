@@ -224,12 +224,24 @@ def getSecretVarsUsed(keygenOutputElem):
         tempVarDep = varDep
         listSymIndex = tempVarDep.find(LIST_INDEX_SYMBOL)
         if (listSymIndex != -1):
-            tempVarDep = tempVarDep[0:listSymIndex]
-        if (tempVarDep in secretVarNames):
+            #tempVarDep = tempVarDep[0:listSymIndex]
+            pass
+        #if (tempVarDep in secretVarNames):
+        if (isVarNameInList(tempVarDep, secretVarNames) == True):
             if (tempVarDep not in retList):
                 retList.append(tempVarDep)
 
     return retList
+
+def isVarNameInList(varName, varList):
+    listSymIndex = varName.find(LIST_INDEX_SYMBOL)
+    if (listSymIndex != -1):
+        varName = varName[0:listSymIndex]
+
+    if (varName in varList):
+        return True
+
+    return False
 
 def getCurrentBlindingFactorName(keygenOutputElem):
     global sharedBlindingFactorNames, sharedBlindingFactorCounter, blindingFactors_NonLists

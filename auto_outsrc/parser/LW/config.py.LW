@@ -3,6 +3,10 @@ schemeName = "LW"
 inputVarName = "input"
 outputVarName = "output"
 
+finalSDLSuffix = ".FINAL_SDL"
+
+transformOutputList = "transformOutputList"
+
 M = 'M'
 
 varNameLeftSideNoBlindedVars = "neverUseThisVarNameNoBlindedVars"
@@ -19,6 +23,8 @@ keygenBlindingExponentType = "ZR"
 keygenFuncName = "keygen"
 
 encryptFuncName = "encrypt"
+decryptFuncName = "decrypt"
+transformFuncName = "transform"
 
 mainFuncName = "main"
 verifyFuncName = "verify"

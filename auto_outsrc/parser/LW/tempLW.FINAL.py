@@ -1,14 +1,6 @@
-from LW/userFuncs import *
+from userFuncs import *
 
-from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair, SymEnc, SymDec
-from toolbox.secretutil import SecretUtil
-from toolbox.iterate import dotprod2
-from charm.pairing import hash as DeriveKey
-from charm.engine.util import objectToBytes, bytesToObject
-from builtInFuncs import *
-
-
-from charm.toolbox.pairinggroup import *
+from charm.toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair
 from charm.core.engine.util import *
 from charm.core.math.integer import randomBits
 
@@ -18,6 +10,7 @@ N = 2
 
 secparam = 80
 
+husgid = {}
 attrs = {}
 gus2 = {}
 policy = {}
@@ -30,9 +23,9 @@ C2 = {}
 g = {}
 y = {}
 z = {}
+coeff = {}
 sussh = {}
 wussh = {}
-coeff = {}
 KBlinded = {}
 
 def setup():
@@ -79,7 +72,6 @@ def keygen(gpk, msk, gid, userS):
     blindingFactorKBlinded = {}
 
     input = [gpk, msk, gid, userS]
-    blindingFactor0Blinded = group.random(ZR)
     userSBlinded = userS
     gidBlinded = gid
     zz = group.random(ZR)
@@ -90,11 +82,13 @@ def keygen(gpk, msk, gid, userS):
         z = userS[i]
         K[z] = ((g ** msk[z][0]) * (h ** msk[z][1]))
     for y in K:
-        blindingFactorKBlinded[y] = blindingFactor0Blinded
+        blindingFactorKBlinded[y] = group.random(ZR)
         KBlinded[y] = (K[y] ** (1 / blindingFactorKBlinded[y]))
     sk = [gidBlinded, userSBlinded, KBlinded]
     skBlinded = [gidBlinded, userSBlinded, KBlinded]
-    output = (blindingFactor0Blinded, blindingFactorKBlinded, skBlinded)
+    output = (blindingFactorKBlinded, skBlinded)
+    sk = [gid, userS, K]
+    output = sk
     return output
 
 def encrypt(pk, gpk, M, policyusstr):
@@ -133,7 +127,26 @@ def encrypt(pk, gpk, M, policyusstr):
     output = ct
     return output
 
+def decrypt(gpk, sk, ct):
+    g, gus2 = gpk
+    policyusstr, C0, C1, C2, C3 = ct
+    gid, userS, K = sk
+    policy = createPolicy(policyusstr)
+    attrs = prune(policy, userS)
+    coeff = getCoefficients(policy)
+    husgid = group.hash(gid, G1)
+    Y = len(attrs)
+    
+    A = dotprod2(range(0, Y), lam_func1, attrs, C1, coeff, husgid, C3, K, C2)
+    M = (C0 * (A ** -1))
+    return M
+
 def transform(gpk, sk, ct):
+    global husgid
+    global attrs
+    global policy
+    global Y
+    global coeff
 
     transformOutputList = {}
 
@@ -142,20 +155,26 @@ def transform(gpk, sk, ct):
     policyusstr, C0, C1, C2, C3 = ct
     gid, userS, K = sk
     transformOutputList[0] = createPolicy(policyusstr)
+    policy = transformOutputList[0]
     transformOutputList[1] = prune(policy, userS)
+    attrs = transformOutputList[1]
     transformOutputList[2] = getCoefficients(policy)
+    coeff = transformOutputList[2]
     transformOutputList[3] = group.hash(gid, G1)
+    husgid = transformOutputList[3]
     transformOutputList[4] = len(attrs)
+    Y = transformOutputList[4]
     output = transformOutputList
     return output
 
-def decout(gpk, sk, ct, transformOutputList, blindingFactor0Blinded, blindingFactorKBlinded):
+def decout(gpk, sk, ct, transformOutputList, blindingFactorKBlinded):
+    global husgid
     global attrs
     global policy
     global Y
     global coeff
 
-    input = [gpk, sk, ct, transformOutputList, blindingFactor0Blinded, blindingFactorKBlinded]
+    input = [gpk, sk, ct, transformOutputList, blindingFactorKBlinded]
     g, gus2 = gpk
     policyusstr, C0, C1, C2, C3 = ct
     gid, userS, K = sk
@@ -164,6 +183,12 @@ def decout(gpk, sk, ct, transformOutputList, blindingFactor0Blinded, blindingFac
     coeff = transformOutputList[2]
     husgid = transformOutputList[3]
     Y = transformOutputList[4]
+
+    for y in K:
+        K[y] = (K[y] ** blindingFactorKBlinded[y])
+
+
+
     A = dotprod2(range(0, Y), lam_func1, attrs, C1, coeff, husgid, C3, K, C2)
     M = (C0 * (A ** -1))
     output = M
@@ -175,6 +200,26 @@ def SmallExp(bits=80):
 def main():
     global group
     group = PairingGroup(secparam)
+
+    gpk = setup()
+    authS = ['ONE', 'TWO', 'THREE', 'FOUR']
+    (msk, pk) = authsetup(gpk, authS)
+    gid = "bob"
+    userS = ['THREE', 'ONE', 'TWO']
+    #(blindingFactorKBlinded, skBlinded) = keygen(gpk, msk, gid, userS)
+    sk = keygen(gpk, msk, gid, userS)
+    M = group.random(GT)
+    policyusstr = '((ONE or THREE) and (TWO or FOUR))'
+    print(M)
+    print("\n\n\n")
+    ct = encrypt(pk, gpk, M, policyusstr)
+
+    M3 = decrypt(gpk, sk, ct)
+    print(M3)
+
+    #transformOutputList = transform(gpk, skBlinded, ct)
+    #M2 = decout(gpk, skBlinded, ct, transformOutputList, blindingFactorKBlinded)
+    #print(M2)
 
 if __name__ == '__main__':
     main()
