@@ -21,6 +21,7 @@ Clist := list{G1}
 Atlist := list{G2}
 Btlist := list{G2}
 Ctlist := list{G2}
+prod0 := G1
 
 incorrectIndices := list{int}
 endSigNum := int
@@ -94,8 +95,7 @@ END :: func:keygen
 
 BEGIN :: func:sign
  input := list{g1, Alist, Blist, Clist, sk, Mlist, index}
-
- prod0 := init(G1)
+ 
  prod1 := init(G1)
  m := H(M, ZR)
  

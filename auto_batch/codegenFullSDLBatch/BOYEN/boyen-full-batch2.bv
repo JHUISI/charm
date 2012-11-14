@@ -1,7 +1,7 @@
 name := boyen
 setting := asymmetric
-N := 100
-l := 2
+N := 2
+l := 3
 secparam := 80
 
 # make sure list{G2} is pulled properly in Batcher
@@ -23,7 +23,6 @@ D := GT
 s := list{ZR}
 S := list{G1}
 t := list{ZR}
-result1 := GT
 index := int
 incorrectIndices := list{int}
 endSigNum := int
@@ -102,8 +101,8 @@ BEGIN :: func:sign
  input := list{g1, Alist, Blist, Clist, sk, M, index}
  
  sk := expand{a, b, c}
- prod0 := init(G1)
- prod1 := init(G1)
+ dotProd0 := init(G1)
+ dotProd1 := init(G1)
  m := H(M, ZR)
  
 BEGIN :: for
@@ -120,16 +119,16 @@ for{y := 0, l}
  t#y := random(ZR)
 END :: for
 
- prod0 := ((Alist#0 * (Blist#0 ^ m)) * (Clist#0 ^ t#0)) ^ -s#0
+ dotProd0 := ((Alist#0 * (Blist#0 ^ m)) * (Clist#0 ^ t#0)) ^ -s#0
 BEGIN :: for
 for{y := 1, l}
 BEGIN :: if
 if {y != index}
- prod1 := prod1 * ((Alist#y * (Blist#y ^ m#y) * (Clist#y ^ t#y)) ^ -s#y)
+ dotProd1 := dotProd1 * ((Alist#y * (Blist#y ^ m) * (Clist#y ^ t#y)) ^ -s#y)
 END :: if
 END :: for
 
- result0 := prod0 * prod1
+ result0 := dotProd0 * dotProd1
  d := ((a + (b * m)) + (c * t#index))
  S#index? := (g1 * result0) ^ (1 / d)
 
@@ -140,15 +139,15 @@ END :: func:sign
 BEGIN :: func:verify
  input := list{g1, g2, Atlist, Btlist, Ctlist, M, S, t}  
   D := e(g1, g2)
-  result1 := init(GT)
+  dotProd2 := init(GT)
   m := H(M, ZR) 
 BEGIN :: for
 for{y := 0, l}
- result1 := result1 * e(S#y, Atlist#y * (Btlist#y^m) * (Ctlist#y^t#y))
+ dotProd2 := dotProd2 * e(S#y, Atlist#y * (Btlist#y^m) * (Ctlist#y^t#y))
 END :: for  
 
 BEGIN :: if
- if { result1 == D}
+ if { dotProd2 == D}
     output := True
  else
     output := False

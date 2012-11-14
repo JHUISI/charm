@@ -1,8 +1,6 @@
-#try:
 from charm.toolbox.pairinggroup import *
+from charm.core.engine.util import *
 from charm.core.math.integer import randomBits
-#except:
-#    print("error")
 
 group = None
 
@@ -12,21 +10,13 @@ l = 3
 
 secparam = 80
 
-'''
-result = {}
-Bt = {}
-c = {}
 D = {}
+c = {}
 a = {}
 b = {}
 m = {}
-At = {}
-Ct = {}
-'''
 
 def setup():
-
-    input = None
     g1 = group.random(G1)
     g2 = group.random(G2)
     a0 = group.random(ZR)
@@ -43,16 +33,6 @@ def setup():
     return output
 
 def keygen(g1, g2):
-    '''
-    global Bt
-    global c
-    global a
-    global b
-    global At
-    global Ct
-    '''
-
-    input = [g1, g2]
     a = group.random(ZR)
     b = group.random(ZR)
     c = group.random(ZR)
@@ -67,79 +47,70 @@ def keygen(g1, g2):
     output = (pk, sk)
     return output
 
-def sign(g1, Alist, Blist, Clist, sk, Mlist, index):
-    '''
-    global result
-    global m
-    '''
-
+def sign(g1, Alist, Blist, Clist, sk, M, index):
     S = {}
     s = {}
     t = {}
 
-    (a, b, c) = sk
-
-    input = [g1, Alist, Blist, Clist, sk, Mlist, index]
-    prod0 = 1
-    prod1 = 1
-    m = group.hash(Mlist, ZR)
+    a, b, c = sk
+    dotProd0 = 1
+    dotProd1 = 1
+    m = group.hash(M, ZR)
     for y in range(0, l):
         if ( ( (y) != (index) ) ):
             s[y] = group.random(ZR)
             S[y] = (g1 ** s[y])
     for y in range(0, l):
         t[y] = group.random(ZR)
-    prod0 = (((Alist[0] * (Blist[0] ** m)) * (Clist[0] ** t[0])) ** -s[0])
+    dotProd0 = (((Alist[0] * (Blist[0] ** m)) * (Clist[0] ** t[0])) ** -s[0])
     for y in range(1, l):
         if ( ( (y) != (index) ) ):
-            prod1 = (prod1 * ((Alist[y] * ((Blist[y] ** m) * (Clist[y] ** t[y]))) ** -s[y]))
-    result = (prod0 * prod1)
+            dotProd1 = (dotProd1 * ((Alist[y] * ((Blist[y] ** m) * (Clist[y] ** t[y]))) ** -s[y]))
+    result0 = (dotProd0 * dotProd1)
     d = ((a + (b * m)) + (c * t[index]))
-    S[index] = ((g1 * result) ** (1 / d))
+    S[index] = ((g1 * result0) ** (1 / d))
     output = (S, t)
     return output
 
-def verify(Atlist, Btlist, Ctlist, M, S, t, g1, g2):
-    '''
-    global result
-    global D
-    global m
-    '''
-
-    input = [Atlist, Btlist, Ctlist, M, S, t, g1, g2]
+def verify(g1, g2, Atlist, Btlist, Ctlist, M, S, t):
     D = pair(g1, g2)
+    dotProd2 = 1
     m = group.hash(M, ZR)
-    result = 1
     for y in range(0, l):
-        result = (result * pair(S[y], (Atlist[y] * ((Btlist[y] ** m) * (Ctlist[y] ** t[y])))))
-    if ( ( (result) == (D) ) ):
+        dotProd2 = (dotProd2 * pair(S[y], (Atlist[y] * ((Btlist[y] ** m) * (Ctlist[y] ** t[y])))))
+    if ( ( (dotProd2) == (D) ) ):
         output = True
     else:
         output = False
+        return output
     return output
 
-def membership(Slist, tlist, g2, g1, Atlist, Btlist, Ctlist):
-
-    input = [Slist, tlist, g2, g1, Atlist, Btlist, Ctlist]
-    if ( ( (group.ismember(Slist)) == (False) ) ):
-        output = False
-    if ( ( (group.ismember(g2)) == (False) ) ):
-        output = False
-    if ( ( (group.ismember(g1)) == (False) ) ):
-        output = False
+def membership(Atlist, Btlist, Ctlist, Slist, g1, g2, tlist):
     if ( ( (group.ismember(Atlist)) == (False) ) ):
         output = False
+        return output
     if ( ( (group.ismember(Btlist)) == (False) ) ):
         output = False
+        return output
     if ( ( (group.ismember(Ctlist)) == (False) ) ):
         output = False
+        return output
+    if ( ( (group.ismember(Slist)) == (False) ) ):
+        output = False
+        return output
+    if ( ( (group.ismember(g1)) == (False) ) ):
+        output = False
+        return output
+    if ( ( (group.ismember(g2)) == (False) ) ):
+        output = False
+        return output
+    if ( ( (group.ismember(tlist)) == (False) ) ):
+        output = False
+        return output
     output = True
     return output
 
-def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotDCache, Mlist, Atlist, Btlist, Ctlist, tlist, Slist):
-    #global m
-
-    input = [delta, startSigNum, endSigNum, incorrectIndices, dotDCache, Mlist, Atlist, Btlist, Ctlist, tlist, Slist]
+def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotDCache, Atlist, Btlist, Ctlist, Mlist, Slist, g1, g2, tlist):
     dotDLoopVal = 1
     for z in range(startSigNum, endSigNum):
         dotDLoopVal = (dotDLoopVal * dotDCache[z])
@@ -164,34 +135,41 @@ def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotDCache, M
         output = None
     else:
         midSigNum = (startSigNum + midway)
-        dividenconquer(delta, startSigNum, midSigNum, incorrectIndices, dotDCache, Mlist, Atlist, Btlist, Ctlist, tlist, Slist)
-        dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotDCache, Mlist, Atlist, Btlist, Ctlist, tlist, Slist)
+        dividenconquer(delta, startSigNum, midSigNum, incorrectIndices, dotDCache, Atlist, Btlist, Ctlist, Mlist, Slist, g1, g2, tlist)
+        dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotDCache, Atlist, Btlist, Ctlist, Mlist, Slist, g1, g2, tlist)
     output = None
 
-def batchverify(Mlist, Slist, tlist, g2, g1, Btlist, Atlist, Ctlist, incorrectIndices):
-    global D
-
+def batchverify(Atlist, Btlist, Ctlist, Mlist, Slist, g1, g2, tlist, incorrectIndices):
     dotDCache = {}
     delta = {}
 
-    input = [Mlist, Slist, tlist, g2, g1, Btlist, Atlist, Ctlist, incorrectIndices]
     for z in range(0, N):
         delta[z] = SmallExp(secparam)
-    if ( ( (membership(Slist, tlist, g2, g1, Btlist, Atlist, Ctlist)) == (False) ) ):
+    if ( ( (membership(Atlist, Btlist, Ctlist, Slist, g1, g2, tlist)) == (False) ) ):
         output = False
+        return output
     D = pair(g1, g2)
     for z in range(0, N):
         dotDCache[z] = (D ** delta[z])
-    dividenconquer(delta, 0, N, incorrectIndices, dotDCache, Mlist, Atlist, Btlist, Ctlist, tlist, Slist)
+    dividenconquer(delta, 0, N, incorrectIndices, dotDCache, Atlist, Btlist, Ctlist, Mlist, Slist, g1, g2, tlist)
     output = incorrectIndices
     return output
 
+def indivverify(Atlist, Btlist, Ctlist, Mlist, Slist, g1, g2, tlist, incorrectIndices):
+    if ( ( (membership(Atlist, Btlist, Ctlist, Slist, g1, g2, tlist)) == (False) ) ):
+        output = False
+        return output
+    for z in range(0, N):
+        if verify(g1, g2, Atlist, Btlist, Ctlist, Mlist[z], Slist[z], tlist[z]) == False:
+            incorrectIndices.append(z)
+    return incorrectIndices
+    
 def SmallExp(bits=80):
     return group.init(ZR, randomBits(bits))
 
 def main():
     global group
-    group = PairingGroup(secparam)
+    group = PairingGroup('BN256')
 
     (mpk, g1, g2) = setup()
     #mpk = [A0, B0, C0, At0, Bt0, Ct0]
@@ -202,9 +180,9 @@ def main():
     print("sk0 :=>", sk0)
     (pk1, sk1) = keygen(g1, g2)
 
-    M = "this is my message."
-    M2 = "test"
-    Mlist = [M, M2]
+    M0 = "test message 0"
+    M1 = "test message 1"
+    Mlist = [M0, M1]
     Alist = {} 
     Blist = {}
     Clist = {}
@@ -221,9 +199,9 @@ def main():
     Clist[2] = pk1[2]
 
     my_index = 1
-    (S0, t0) = sign(g1, Alist, Blist, Clist, sk0, M, my_index)
+    (S0, t0) = sign(g1, Alist, Blist, Clist, sk0, Mlist[0], my_index)
     my_index = 2
-    (S1, t1) = sign(g1, Alist, Blist, Clist, sk1, M2, my_index)
+    (S1, t1) = sign(g1, Alist, Blist, Clist, sk1, Mlist[1], my_index)
 
     Slist = [S0, S1]
     tlist = [t0, t1]
@@ -244,14 +222,15 @@ def main():
     Ctlist[1] = pk0[5]
     Ctlist[2] = pk1[5]
 
-    assert verify(Atlist, Btlist, Ctlist, M, S0, t0, g1, g2), "failed verification!!"
-    print("first")
-    assert verify(Atlist, Btlist, Ctlist, M2, S1, t1, g1, g2), "failed verification!!"
+    assert verify(g1, g2, Atlist, Btlist, Ctlist, Mlist[0], Slist[0], tlist[0]), "failed verification!!"
+    assert verify(g1, g2, Atlist, Btlist, Ctlist, Mlist[1], Slist[1], tlist[1]), "failed verification!!"
     print("Successful Verification")
 
     incorrectIndices = []
-    batchverify(Mlist, Slist, tlist, g2, g1, Btlist, Atlist, Ctlist, incorrectIndices)
+    #Mlist[0] = Mlist[1] = "foo"
+    batchverify(Atlist, Btlist, Ctlist, Mlist, Slist, g1, g2, tlist, incorrectIndices)
     print(incorrectIndices)
+
 
 if __name__ == '__main__':
     main()
