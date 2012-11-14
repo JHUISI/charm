@@ -138,7 +138,7 @@ def getResults(resultsDict):
     return resultsString
 
 
-def generate_signatures_main(argv, same_signer=True):
+def generate_signatures_main(argv, num_signer):
     if ( (len(argv) != 7) or (argv[1] == "-help") or (argv[1] == "--help") ):
         sys.exit("Usage:  python " + argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
     
@@ -166,7 +166,7 @@ def generate_signatures_main(argv, same_signer=True):
     Atlist, Btlist, Ctlist = {0:mpk[3]}, {0:mpk[4]}, {0:mpk[5]}
     sklist = {}
     # number of signers
-    boyen.l = 3 # numValidMessages + 1 # add one to represent key in the sky
+    boyen.l = num_signers # numValidMessages + 1 # add one to represent key in the sky
     for z in range(1, boyen.l):
         (pklist, sklist[z-1]) = boyen.keygen(g1, g2)
         Alist[z], Blist[z], Clist[z] = pklist[0], pklist[1], pklist[2]
@@ -193,7 +193,7 @@ def generate_signatures_main(argv, same_signer=True):
     genOutputDictFile(numInvalidMessages, messageSize, 'mpk.charmPickle', 'pk.charmPickle', invalidOutputDict, invalidOutputDictName, '_InvalidMessage.pythonPickle', '_InvalidSignature.charmPickle', False, g1, g2, Alist, Blist, Clist, Atlist, Btlist, Ctlist, sklist)
     return
 
-def run_batch_verification(argv, same_signer=True):
+def run_batch_verification(argv):
     if ( (len(argv) != 4) or (argv[1] == "-help") or (argv[1] == "--help") ):
         sys.exit("Usage:  python " + argv[0] + "\n\t[dictionary with valid messages/signatures]\n\t[name of output file for batch results]\n\t[name of output file for ind. results]")
     
@@ -233,7 +233,7 @@ def run_batch_verification(argv, same_signer=True):
             # 4. public values/generator
             g1  = sigsDict[0]['mpk'][bodyKey]['g1']
             g2 = sigsDict[0]['mpk'][bodyKey]['g2']
-            Alist = sigsDict[0]['pk'][bodyKey]['Alist']            
+            Alist = sigsDict[0]['pk'][bodyKey]['Alist']
             Blist = sigsDict[0]['pk'][bodyKey]['Blist']            
             Clist = sigsDict[0]['pk'][bodyKey]['Clist']            
             Atlist = sigsDict[0]['pk'][bodyKey]['Atlist']            
@@ -243,7 +243,6 @@ def run_batch_verification(argv, same_signer=True):
             Slist = [ sigsDict[i]['sig'][bodyKey][0] for i in range(0, N) ]
             tlist = [ sigsDict[i]['sig'][bodyKey][1] for i in range(0, N) ]
             boyen.l = len(Alist)
-
             startTime = time.clock()
             incorrectSigIndices = boyen.batchverify(Atlist, Btlist, Ctlist, Mlist, Slist, g1, g2, tlist, [])
             endTime = time.clock()
@@ -296,17 +295,21 @@ def run_batch_verification(argv, same_signer=True):
 if __name__ == "__main__":
     print(sys.argv)
     if len(sys.argv) < 2:
-        sys.exit("Usage:  python " + sys.argv[0] + "\t[ -g or -b ]\t[ command-arguments ]\n-g : generate signatures.\n -b : benchmark with generated signatures.")
+        sys.exit("Usage: python " + sys.argv[0] + "\t[ -g or -b ]\t[ command-arguments ]\n-g : generate signatures.\n -b : benchmark with generated signatures.")
     command = sys.argv[1]
-    same_signer = False
     if command == "-g":
-        print("Generating signatures...")        
-        sys.argv.remove(command)        
-        generate_signatures_main(sys.argv, same_signer)
+        print("Generating signatures...")
+        num_signers = sys.argv[-1]# very last argument
+        assert num_signers.isdigit(), "size of ring should be an INT."
+        num_signers = int(num_signers)
+        print("Ring size: ", num_signers) 
+        sys.argv = sys.argv[:-1]
+        sys.argv.remove(command)
+        generate_signatures_main(sys.argv, num_signers)
     elif command == "-b":
         print("Running batch verification...")
         sys.argv.remove(command)
-        run_batch_verification(sys.argv, same_signer) # different signers
+        run_batch_verification(sys.argv) # different signers
     else:
         sys.exit("Usage:  python " + sys.argv[0] + "\t[ -g or -b ]\t[ command-arguments ]\n-g : generate signatures.\n-b : benchmark with generated signatures.")
     
