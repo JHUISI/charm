@@ -199,6 +199,17 @@ void printf_buffer_as_hex(uint8_t * data, size_t len)
 #endif
 }
 
+void printf_buffer_as_hex_debug(uint8_t * data, size_t len)
+{
+	size_t i;
+
+	for (i = 0; i < len; i++) {
+		printf("%02x ", data[i]);
+	}
+	printf("\n");
+}
+
+
 // simply checks that the elements satisfy the properties for the given
 // binary operation. Whitelist approach: only return TRUE for valid cases, otherwise FALSE
 int Check_Types(GroupType l_type, GroupType r_type, char op)
@@ -333,14 +344,21 @@ int hash2_element_to_bytes(element_t *e, uint8_t* last_buf, int hash_size, uint8
 	uint8_t temp_buf[SHA_LEN + 1];
 	memset(temp_buf, 0, SHA_LEN);
 	element_to_key(*e, temp_buf, SHA_LEN, HASH_FUNCTION_ELEMENTS);
+	int i;
 
 	uint8_t temp2_buf[last_buflen + buf_len + 1];
 	memset(temp2_buf, 0, (last_buflen + buf_len));
-	strncat((char *) temp2_buf, (char *) last_buf, last_buflen);
-	strncat((char *) temp2_buf, (char *) temp_buf, SHA_LEN);
+	for(i = 0; i < last_buflen; i++)
+		temp2_buf[i] = last_buf[i];
+
+	int j = 0;
+	for(i = last_buflen; i < (last_buflen + buf_len); i++) {
+		temp2_buf[i] = temp_buf[j]; j++;
+	}
 
 	debug("%s: input buf...\n", __FUNCTION__);
 	printf_buffer_as_hex(temp2_buf, last_buflen + buf_len);
+
 	// hash the temp2_buf to bytes
 	int result = hash_buffer_to_bytes(temp2_buf, (last_buflen + buf_len), output_buf, hash_size, HASH_FUNCTION_STRINGS);
 	return result;
@@ -444,7 +462,7 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 	}
 	
 	debug("init an element.\n");
-	if(type == ZR) {
+	if(type >= ZR && type <= GT) {
 		retObject = createNewElement(type, group->pairing);
 	}
 	else {
@@ -475,8 +493,9 @@ PyObject *Element_print(Element* self)
 
 		char str[MAX_BUF + 1];
 		memset(str, 0, MAX_BUF);
-	 	element_to_str(str, MAX_BUF, self->e);;
-		strObj = PyUnicode_FromStringAndSize((const char *) str, MAX_BUF);
+	 	element_to_str(str, MAX_BUF, self->e);
+	 	int len = strlen(str);
+		strObj = PyUnicode_FromStringAndSize((const char *) str, len);
 		if(strObj != NULL)
 			return strObj;
 		else
@@ -1033,7 +1052,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 	// hashing element to Zr
 	uint8_t hash_buf[SHA_LEN+1];
 	memset(hash_buf, '\0', SHA_LEN);
-	int result, i;
+	int result, i, j;
 	GroupType type = ZR;
 	char *tmp = NULL, *str;
 
@@ -1128,6 +1147,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 					// this assumes that the string is the first object (NOT GOOD, change)
 					result = hash2_buffer_to_bytes((uint8_t *) str, strlen(str), hash_buf, SHA_LEN, out_buf); // TODO: fix this
 					memcpy(hash_buf, out_buf, SHA_LEN);
+
 					// hash2_element_to_bytes()
 					STOP_CLOCK(dBench);
 				}

@@ -107,6 +107,7 @@ static PyObject *f(PyObject *v, PyObject *w) { \
 	return NULL;				\
 }
 
+// TODO: update these two functions to convert neg numbers
 PyObject *mpzToLongObj (mpz_t m)
 {
 	/* borrowed from gmpy */

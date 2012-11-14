@@ -712,6 +712,7 @@ status_t element_from_hash(element_t e, unsigned char *data, int len)
 	switch(type) {
 		case ZR: bn_read_bin(e->bn, digest, digest_len);
 				 if(bn_cmp(e->bn, e->order) == CMP_GT) bn_mod(e->bn, e->bn, e->order);
+//		    	 bn_print(e->bn);
 				 break;
 		case G1: g1_map(e->g1, digest, digest_len);
 				 break;
@@ -1078,10 +1079,18 @@ status_t hash_buffer_to_bytes(uint8_t *input, int input_len, uint8_t *output, in
 		input2[0] = 0xFF & label;
 		// copy remaining bytes
 		for(i = 1; i <= input_len; i++)
-			input2[i] = input[i];
+			input2[i] = input[i-1];
+#ifdef DEBUG
+		printf("%s: original input: ", __FUNCTION__);
+		print_as_hex(input, input_len);
+
+		printf("%s: new input: ", __FUNCTION__);
+		print_as_hex(input2, input_len + 1);
+#endif
 		memset(digest, 0, digest_len);
 		SHA_FUNC(digest, input2, input_len+1);
 		memcpy(output, digest, digest_len);
+
 #ifdef DEBUG
 		printf("%s: digest: ", __FUNCTION__);
 		print_as_hex(output, digest_len);
