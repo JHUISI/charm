@@ -279,7 +279,9 @@ def transformNEW(varsThatAreBlindedDict):
             continue
         path_applied = []
         currentNode = SimplifySDLNode(currentNode, path_applied)
-        applyTechnique11(currentNode)
+        currentNodeTechnique11RightSide = applyTechnique11(currentNode)
+        if (currentNodeTechnique11RightSide != None):
+            currentNode.right = currentNodeTechnique11RightSide
         currentNodePairings = getNodePairingObjs(currentNode)
         areAllVarsOnLineKnownByTransform = getAreAllVarsOnLineKnownByTransform(currentNode.right, knownVars)
 
