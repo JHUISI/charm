@@ -29,8 +29,8 @@ transformFuncName = "transform"
 mainFuncName = "main"
 verifyFuncName = "verify"
 
-masterPubVars = ["gpk", "pk"]
-masterSecVars = ["msk"]
+masterPubVars = ["mpk"]
+masterSecVars = ["mk"]
 
 # superset of variables we have used to represent public parameters in
 # our crypto schemes

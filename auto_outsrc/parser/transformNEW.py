@@ -164,14 +164,17 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
 
         lineForTransformLines += transformOutputList + LIST_INDEX_SYMBOL + str(transformListCounter) + " := "
         mappingOfTransformListToVarNames[str(currentNode.left)] = str(transformListCounter)
-        transformListCounter += 1
         listOfPairings = groupedPairing[1]
         for pairing in listOfPairings:
             lineForTransformLines += str(pairing) + " * " 
 
         lineForTransformLines = lineForTransformLines[0:(len(lineForTransformLines) - len(" * "))]
         transformLines.append(lineForTransformLines + "\n")
-        #print(str(currentNode.left))
+
+        lineForTransformLines = str(currentNode.left) + " := " + transformOutputList + LIST_INDEX_SYMBOL + str(transformListCounter)
+        transformLines.append(lineForTransformLines + "\n")
+
+        transformListCounter += 1
 
     lineForDecoutLines = ""
     lineForDecoutLines += str(currentNode.left) + " := "
@@ -201,10 +204,15 @@ def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines):
 
     lineForTransformLines = transformOutputList + LIST_INDEX_SYMBOL + str(transformListCounter) + " := "
     mappingOfTransformListToVarNames[str(currentNode.left)] = str(transformListCounter)
-    transformListCounter += 1
+
     lineForTransformLines += str(currentNode.right)
 
     transformLines.append(lineForTransformLines + "\n")
+
+    lineForTransformLines = str(currentNode.left) + " := " + transformOutputList + LIST_INDEX_SYMBOL + str(transformListCounter)
+    transformLines.append(lineForTransformLines + "\n")
+
+    transformListCounter += 1
 
     lineForDecoutLines = str(currentNode.left) + " := " 
     lineForDecoutLines += transformOutputList + LIST_INDEX_SYMBOL + str(decoutListCounter)
@@ -271,7 +279,9 @@ def transformNEW(varsThatAreBlindedDict):
             continue
         path_applied = []
         currentNode = SimplifySDLNode(currentNode, path_applied)
-        applyTechnique11(currentNode)
+        currentNodeTechnique11RightSide = applyTechnique11(currentNode)
+        if (currentNodeTechnique11RightSide != None):
+            currentNode.right = currentNodeTechnique11RightSide
         currentNodePairings = getNodePairingObjs(currentNode)
         areAllVarsOnLineKnownByTransform = getAreAllVarsOnLineKnownByTransform(currentNode.right, knownVars)
 

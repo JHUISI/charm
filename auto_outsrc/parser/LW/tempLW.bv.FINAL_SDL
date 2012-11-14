@@ -60,7 +60,6 @@ END :: func:authsetup
 
 BEGIN :: func:keygen
 input := list{gpk, msk, gid, userS}
-blindingFactor0Blinded := random(ZR)
 userSBlinded := userS
 gidBlinded := gid
 zz := random(ZR)
@@ -76,12 +75,12 @@ END :: for
 
 BEGIN :: forall
 forall{y := K}
-blindingFactorKBlinded#y := blindingFactor0Blinded
+blindingFactorKBlinded#y := random(ZR)
 KBlinded#y := K#y ^ (1/blindingFactorKBlinded#y)
 END :: forall
 sk := list{gidBlinded, userSBlinded, KBlinded}
 skBlinded := list{gidBlinded, userSBlinded, KBlinded}
-output := list{blindingFactor0Blinded, blindingFactorKBlinded, skBlinded}
+output := list{blindingFactorKBlinded, skBlinded}
 END :: func:keygen
 
 BEGIN :: func:encrypt
@@ -117,15 +116,20 @@ gpk := expand{g, gus2}
 ct := expand{policyusstr, C0, C1, C2, C3}
 sk := expand{gid, userS, K}
 transformOutputList#0 := createPolicy(policyusstr)
+policy := transformOutputList#0
 transformOutputList#1 := prune(policy, userS)
+attrs := transformOutputList#1
 transformOutputList#2 := getCoefficients(policy)
+coeff := transformOutputList#2
 transformOutputList#3 := H(gid,G1)
+husgid := transformOutputList#3
 transformOutputList#4 := len(attrs)
+Y := transformOutputList#4
 output := transformOutputList
 END :: func:transform
 
 BEGIN :: func:decout
-input := list{gpk, sk, ct, transformOutputList, blindingFactor0Blinded, blindingFactorKBlinded}
+input := list{gpk, sk, ct, transformOutputList, blindingFactorKBlinded}
 gpk := expand{g, gus2}
 ct := expand{policyusstr, C0, C1, C2, C3}
 sk := expand{gid, userS, K}
