@@ -170,6 +170,9 @@ def main():
     M2 = decout(pkBlinded, skBlinded, ct, transformOutputList, blindingFactor0Blinded)
     print(M2)
 
+    if (M == M2):
+        print("it worked")
+
 if __name__ == '__main__':
     main()
 
