@@ -1,4 +1,4 @@
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.pairinggroup import *
 from charm.core.engine.util import *
 from charm.core.math.integer import randomBits
 
@@ -22,8 +22,16 @@ s1 = {}
 M = {}
 alpha = {}
 """
-
 def keygen():
+    """
+    global vG2
+    global v1G2
+    global g2b
+    global v2G2
+    global g2AlphaA1
+    global alpha
+    """
+    input = None
     g1 = group.random(G1)
     g2 = group.random(G2)
     a1 = group.random(ZR)
@@ -63,6 +71,10 @@ def keygen():
     return output
 
 def sign(pk, sk, m):
+    """
+    global M
+    """
+    input = [pk, sk, m]
     g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, uG1, u, wG1, hG1, w, h, A = pk
     g2AlphaA1, g2b, vG2, v1G2, v2G2, alpha = sk
     r1 = group.random(ZR)
@@ -79,19 +91,30 @@ def sign(pk, sk, m):
     S5 = (g2b ** -z2)
     S6 = (g1b ** r2)
     S7 = (g1 ** r1)
-    SK = ((((u ** M) * (w ** tagk)) * h) ** r1)
+    SK = (((u ** M) * (w ** tagk)) * h) ** r1
     output = (S1, S2, S3, S4, S5, S6, S7, SK, tagk)
     return output
 
 def verify(g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, u, w, h, A, S1, S2, S3, S4, S5, S6, S7, SK, tagk, m):
+    """
+    global t
+    global theta
+    global tagc
+    global s
+    global s2
+    global s1
+    global M
+    """
+    input = [g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, u, w, h, A, S1, S2, S3, S4, S5, S6, S7, SK, tagk, m]
     s1 = group.random(ZR)
     s2 = group.random(ZR)
     t = group.random(ZR)
     tagc = group.random(ZR)
     s = (s1 + s2)
     M = group.hash(m, ZR)
-    theta = ((tagc - tagk) ** -1)
-    if ( ( ((pair((g1b ** s), S1) * (pair((g1ba1 ** s1), S2) * (pair((g1a1 ** s1), S3) * (pair((g1ba2 ** s2), S4) * pair((g1a2 ** s2), S5)))))) == ((pair(S6, ((tau1 ** s1) * (tau2 ** s2))) * (pair(S7, ((tau1b ** s1) * ((tau2b ** s2) * (w ** -t)))) * (((pair(S7, (((u ** (M * t)) * (w ** (tagc * t))) * (h ** t))) * pair((g1 ** -t), SK)) ** theta) * (A ** s2))))) ) ):
+    theta = (1 / (tagc - tagk))
+
+    if ((pair((g1b ** s), S1) * (pair((g1ba1 ** s1), S2) * (pair((g1a1 ** s1), S3) * (pair((g1ba2 ** s2), S4) * pair((g1a2 ** s2), S5)))))) == ((pair(S6, ((tau1 ** s1) * (tau2 ** s2))) * (pair(S7, ((tau1b ** s1) * ((tau2b ** s2) * (w ** -t)))) * (((pair(S7, (((u ** (M * t)) * (w ** (tagc * t))) * (h ** t))) * pair((g1 ** -t), SK)) ** theta) * (A ** s2))))):
         output = True
     else:
         output = False
@@ -99,6 +122,8 @@ def verify(g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, u, w
     return output
 
 def membership(A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlist, g1, g1a1, g1a2, g1b, g1ba1, g1ba2, g2, h, tagklist, tau1, tau1b, tau2, tau2b, u, w):
+
+    input = [A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlist, g1, g1a1, g1a2, g1b, g1ba1, g1ba2, g2, h, tagklist, tau1, tau1b, tau2, tau2b, u, w]
     if ( ( (group.ismember(A)) == (False) ) ):
         output = False
         return output
@@ -175,6 +200,8 @@ def membership(A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlist
     return output
 
 def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, g1b, g1ba1, g1a1, g1ba2, g1a2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A):
+
+    input = [delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, dotMCache, sumNCache, g1b, g1ba1, g1a1, g1ba2, g1a2, tau1, tau2, tau1b, tau2b, w, u, h, g1, A]
     dotALoopVal = 1
     dotBLoopVal = 1
     dotCLoopVal = 1
@@ -219,6 +246,15 @@ def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotACache, d
     output = None
 
 def batchverify(A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlist, g1, g1a1, g1a2, g1b, g1ba1, g1ba2, g2, h, mlist, tagklist, tau1, tau1b, tau2, tau2b, u, w, incorrectIndices):
+    """
+    global t
+    global theta
+    global tagc
+    global s
+    global s2
+    global s1
+    global M
+    """
     dotLCache = {}
     dotKCache = {}
     dotDCache = {}
@@ -235,6 +271,7 @@ def batchverify(A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlis
     dotCCache = {}
     dotMCache = {}
 
+    input = [A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlist, g1, g1a1, g1a2, g1b, g1ba1, g1ba2, g2, h, mlist, tagklist, tau1, tau1b, tau2, tau2b, u, w, incorrectIndices]
     for z in range(0, N):
         delta[z] = SmallExp(secparam)
     if ( ( (membership(A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlist, g1, g1a1, g1a2, g1b, g1ba1, g1ba2, g2, h, tagklist, tau1, tau1b, tau2, tau2b, u, w)) == (False) ) ):
@@ -247,7 +284,8 @@ def batchverify(A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlis
         s = (s1 + s2)
         t = group.random(ZR)
         tagc = group.random(ZR)
-        theta = ((tagc - tagklist[z]) ** -1)
+        theta = (1 / (tagc - tagklist[z]))
+
         dotACache[z] = (S1list[z] ** (s * delta[z]))
         dotBCache[z] = (S2list[z] ** (s1 * delta[z]))
         dotCCache[z] = (S3list[z] ** (s1 * delta[z]))
@@ -266,23 +304,13 @@ def batchverify(A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlis
     output = incorrectIndices
     return output
 
-def indivverify(A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlist, g1, g1a1, g1a2, g1b, g1ba1, g1ba2, g2, h, mlist, tagklist, tau1, tau1b, tau2, tau2b, u, w, incorrectIndices):
-    if ( ( (membership(A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlist, g1, g1a1, g1a2, g1b, g1ba1, g1ba2, g2, h, tagklist, tau1, tau1b, tau2, tau2b, u, w)) == (False) ) ):
-        output = False
-        return output
-    
-    for z in range(0, N):
-        if verify(g1, g2, g1b, g1a1, g1a2, g1ba1, g1ba2, tau1, tau2, tau1b, tau2b, u, w, h, A, S1list[z], S2list[z], S3list[z], S4list[z], S5list[z], S6list[z], S7list[z], SKlist[z], tagklist[z], mlist[z]) == False:
-            incorrectIndices.append(z)
-    return incorrectIndices
-
 def SmallExp(bits=80):
     return group.init(ZR, randomBits(bits))
 
 def main():
     global group
-    group = PairingGroup('BN256')
-    
+    group = PairingGroup(secparam)
+
     m0 = "message0"
     m1 = "message1"
     (pk, sk) = keygen()
@@ -306,7 +334,6 @@ def main():
     incorrectIndices = []
     batchverify(A, S1list, S2list, S3list, S4list, S5list, S6list, S7list, SKlist, g1, g1a1, g1a2, g1b, g1ba1, g1ba2, g2, h, mlist, tagklist, tau1, tau1b, tau2, tau2b, u, w, incorrectIndices)
     print("incorrectIndices: ", incorrectIndices)
-
 
 if __name__ == '__main__':
     main()
