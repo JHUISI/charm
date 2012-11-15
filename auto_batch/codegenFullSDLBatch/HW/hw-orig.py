@@ -1,4 +1,4 @@
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.pairinggroup import *
 from charm.core.engine.util import *
 from charm.core.math.integer import randomBits
 import math
@@ -9,16 +9,36 @@ N = 2
 
 secparam = 80
 
-def ceillog(base, value):
-    return group.init(ZR, math.ceil(math.log(value, base)))
+"""
+h1 = {}
+w1 = {}
+z1 = {}
+d = {}
+a = {}
+n = {}
+u = {}
+v = {}
+"""
 
 def setup():
+
+    input = None
     g1 = group.random(G1)
     g2 = group.random(G2)
     output = (g1, g2)
     return output
 
 def keygen(g1, g2):
+    """
+    global h1
+    global w1
+    global z1
+    global d
+    global a
+    global u
+    global v
+    """
+    input = [g1, g2]
     a = group.random(ZR)
     A = (g2 ** a)
     u = group.random(G1)
@@ -37,24 +57,33 @@ def keygen(g1, g2):
     h1 = (g1 ** h)
     h2 = (g2 ** h)
     i = 0
-    pk = [U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d]
+    pk = [U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d, i]
     sk = a
-    output = (i, pk, sk)
+    output = (pk, sk)
     return output
 
 def sign(pk, sk, i, m):
-    U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d = pk
+    """
+    global n
+    """
+    input = [pk, sk, i, m]
+    U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d, i = pk
+    a = sk
     i = (i + 1)
     M = group.hash(m, ZR)
     r = group.random(ZR)
     t = group.random(ZR)
     n = ceillog(2, i)
-    sig1 = ((((u ** M) * ((v ** r) * d)) ** sk) * (((w1 ** n) * ((z1 ** i) * h1)) ** t))
+
+    sig1 = ((((u ** M) * ((v ** r) * d)) ** a) * (((w1 ** n) * ((z1 ** i) * h1)) ** t))
     sig2 = (g1 ** t)
     output = (sig1, sig2, r, i)
     return output
 
 def verify(U, V, D, g2, w2, z2, h2, m, sig1, sig2, r, i):
+    """global n"""
+
+    input = [U, V, D, g2, w2, z2, h2, m, sig1, sig2, r, i]
     M = group.hash(m, ZR)
     n = ceillog(2, i)
     if ( ( (pair(sig1, g2)) == (((U ** M) * ((V ** r) * (D * pair(sig2, ((w2 ** n) * ((z2 ** i) * h2))))))) ) ):
@@ -64,8 +93,13 @@ def verify(U, V, D, g2, w2, z2, h2, m, sig1, sig2, r, i):
         return output
     return output
 
-def membership(D, U, V, g2, h2, ilist, rlist, sig1list, sig2list, w2, z2):
+def membership(D, Mlist, U, V, g2, h2, ilist, rlist, sig1list, sig2list, w2, z2):
+
+    input = [D, Mlist, U, V, g2, h2, ilist, rlist, sig1list, sig2list, w2, z2]
     if ( ( (group.ismember(D)) == (False) ) ):
+        output = False
+        return output
+    if ( ( (group.ismember(Mlist)) == (False) ) ):
         output = False
         return output
     if ( ( (group.ismember(U)) == (False) ) ):
@@ -102,6 +136,8 @@ def membership(D, U, V, g2, h2, ilist, rlist, sig1list, sig2list, w2, z2):
     return output
 
 def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotECache, dotFCache, dotGCache, sumBCache, sumCCache, sumDCache, g2, U, V, D, w2, z2, h2):
+
+    input = [delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotECache, dotFCache, dotGCache, sumBCache, sumCCache, sumDCache, g2, U, V, D, w2, z2, h2]
     dotALoopVal = 1
     dotELoopVal = 1
     dotFLoopVal = 1
@@ -131,7 +167,9 @@ def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotACache, d
         dividenconquer(delta, midSigNum, endSigNum, incorrectIndices, dotACache, dotECache, dotFCache, dotGCache, sumBCache, sumCCache, sumDCache, g2, U, V, D, w2, z2, h2)
     output = None
 
-def batchverify(D, U, V, g2, h2, ilist, mlist, rlist, sig1list, sig2list, w2, z2, incorrectIndices):
+def batchverify(D, mlist, U, V, g2, h2, ilist, rlist, sig1list, sig2list, w2, z2, incorrectIndices):
+    """global n"""
+
     dotGCache = {}
     dotFCache = {}
     dotECache = {}
@@ -141,14 +179,15 @@ def batchverify(D, U, V, g2, h2, ilist, mlist, rlist, sig1list, sig2list, w2, z2
     sumBCache = {}
     dotACache = {}
 
+    input = [D, mlist, U, V, g2, h2, ilist, rlist, sig1list, sig2list, w2, z2, incorrectIndices]
     for z in range(0, N):
         delta[z] = SmallExp(secparam)
-    if ( ( (membership(D, U, V, g2, h2, ilist, rlist, sig1list, sig2list, w2, z2)) == (False) ) ):
+    if ( ( (membership(D, mlist, U, V, g2, h2, ilist, rlist, sig1list, sig2list, w2, z2)) == (False) ) ):
         output = False
         return output
     for z in range(0, N):
+        n = ceillog(2, ilist[z])
         M = group.hash(mlist[z], ZR)
-        n = ceillog(2, ilist[z]) # fix in SDL
         dotACache[z] = (sig1list[z] ** delta[z])
         dotECache[z] = (sig2list[z] ** (delta[z] * n))
         dotFCache[z] = (sig2list[z] ** (delta[z] * ilist[z]))
@@ -160,27 +199,22 @@ def batchverify(D, U, V, g2, h2, ilist, mlist, rlist, sig1list, sig2list, w2, z2
     output = incorrectIndices
     return output
 
-def indivverify(D, U, V, g2, h2, ilist, mlist, rlist, sig1list, sig2list, w2, z2, incorrectIndices):
-    if group.ismember(D) == False or group.ismember(U) == False or group.ismember(V) == False or group.ismember(g2) == False or group.ismember(h2) == False:
-        return False
-    for z in range(0, N):
-        if group.ismember(sig1list[z]) == False or group.ismember(sig2list[z]) == False or group.ismember(rlist[z]) == False:
-            return False
-        if verify(U, V, D, g2, w2, z2, h2, mlist[z], sig1list[z], sig2list[z], rlist[z], ilist[z]) == False:
-            incorrectIndices.append(z)
-    return incorrectIndices
+def ceillog(base, value):
+    return group.init(ZR, math.ceil(math.log(value, base)))
 
 def SmallExp(bits=80):
     return group.init(ZR, randomBits(bits))
 
+
 def main():
     global group
-    group = PairingGroup('BN256')
-    
+    group = PairingGroup(secparam)
+
+    # note that this is a same signer test    
     (g1, g2) = setup()
     
-    (i, pk, sk) = keygen(g1, g2)
-    U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d = pk
+    (pk, sk) = keygen(g1, g2)
+    U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d, i = pk
     
     sig1list = {}
     sig2list = {}
@@ -196,9 +230,9 @@ def main():
     assert verify(U, V, D, g2, w2, z2, h2, m1, sig1list[1], sig2list[1], rlist[1], ilist[1]), "failed verification!!"    
     print("Successful Verification!!")
 
-    Mlist = [m0, m1]
-    incorrectIndices = batchverify(D, U, V, g2, h2, ilist, Mlist, rlist, sig1list, sig2list, w2, z2, [])
-    #batchverify(D, Mlist, U, V, g2, h2, ilist, rlist, sig1list, sig2list, w2, z2, incorrectIndices)
+    Mlist = [m0, m1]    
+    incorrectIndices = []
+    batchverify(D, Mlist, U, V, g2, h2, ilist, rlist, sig1list, sig2list, w2, z2, incorrectIndices)
     print("Incorrect indicies: ", incorrectIndices)
 
 if __name__ == '__main__':
