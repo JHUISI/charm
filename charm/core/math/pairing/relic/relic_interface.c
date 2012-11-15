@@ -306,7 +306,10 @@ status_t element_mul(element_t c, element_t a, element_t b)
 
 	if(type == ZR) {
 		bn_mul(c->bn, a->bn, b->bn);
-		bn_mod(c->bn, c->bn, c->order);
+		if(bn_sign(c->bn) == BN_NEG) bn_add(c->bn, c->bn, a->order);
+		else {
+			bn_mod(c->bn, c->bn, c->order);
+		}
 	}
 	else if(type == G1) {
 		g1_add(c->g1, a->g1, b->g1);
@@ -354,13 +357,15 @@ status_t element_mul_zr(element_t c, element_t a, element_t b)
 status_t element_mul_int(element_t c, element_t a, integer_t b)
 {
 	GroupType type = a->type;
-	// TODO: c (type) = a (type) * b (ZR)
 	LEAVE_IF(a->isInitialized != TRUE, "invalid argument.");
 	LEAVE_IF(c->isInitialized != TRUE || c->type != type, "result not initialized or invalid type.");
 
 	if(type == ZR) {
 		bn_mul(c->bn, a->bn, b);
-		bn_mod(c->bn, c->bn, c->order);
+		if(bn_sign(c->bn) == BN_NEG) bn_add(c->bn, c->bn, a->order);
+		else {
+			bn_mod(c->bn, c->bn, c->order);
+		}
 	}
 	else if(type == G1) {
 		g1_mul(c->g1, a->g1, b);

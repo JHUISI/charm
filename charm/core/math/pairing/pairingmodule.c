@@ -112,7 +112,7 @@ PyObject *mpzToLongObj (mpz_t m)
 {
 	/* borrowed from gmpy */
 	int size = (mpz_sizeinbase (m, 2) + PyLong_SHIFT - 1) / PyLong_SHIFT;
-	int i;
+	int i, isNeg = (mpz_sgn(m) < 0) ? TRUE : FALSE;
 	mpz_t temp;
 	PyLongObject *l = _PyLong_New (size);
 	if (!l)
@@ -126,7 +126,12 @@ PyObject *mpzToLongObj (mpz_t m)
 	i = size;
 	while ((i > 0) && (l->ob_digit[i - 1] == 0))
 		i--;
-	Py_SIZE(l) = i;
+	if(isNeg) {
+		Py_SIZE(l) = -i;
+	}
+	else {
+		Py_SIZE(l) = i;
+	}
 	mpz_clear (temp);
 	return (PyObject *) l;
 }
@@ -134,13 +139,16 @@ PyObject *mpzToLongObj (mpz_t m)
 void longObjToMPZ (mpz_t m, PyLongObject * p)
 {
 	int size, i, tmp = Py_SIZE(p);
+	int isNeg = FALSE;
 	mpz_t temp, temp2;
 	mpz_init (temp);
 	mpz_init (temp2);
 	if (tmp > 0)
 		size = tmp;
-	else
+	else {
 		size = -tmp;
+		isNeg = TRUE;
+	}
 	mpz_set_ui (m, 0);
 	for (i = 0; i < size; i++)
 	{
@@ -150,6 +158,7 @@ void longObjToMPZ (mpz_t m, PyLongObject * p)
 	}
 	mpz_clear (temp);
 	mpz_clear (temp2);
+	if(isNeg) mpz_neg(m, m);
 }
 
 char *convert_buffer_to_hex(uint8_t * data, size_t len)

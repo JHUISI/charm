@@ -351,10 +351,18 @@ void _element_mul(Group_t type, element_t *c, const element_t *a, const element_
 		Big *x = (Big *) a;
 		Big *y = (Big *) b;
 		Big *z = (Big *) c;
-//		*z = *x * *y;
 		Big *o1 = (Big *) o;
-		*z = modmult(*x, *y, *o1);
-//		cout << "Result => " << *z << endl;
+		if(*y == Big(-1)) {
+			*z = *x;
+			z->negate();
+		}
+		else if(y->isone()) {
+			*z = *x;
+		}
+		else {
+			*z = modmult(*x, *y, *o1);
+		}
+		cout << "Result => " << *z << endl;
 	}
 	else if(type == G1_t) {
 		G1 *x = (G1 *) a;  G1 *y = (G1 *) b; G1 *z = (G1 *) c;
@@ -386,8 +394,16 @@ void _element_mul_si(Group_t type, const pairing_t *pairing, element_t *c, const
 		Big *z  = (Big *) c;
 		Big *x  = (Big *) a;
 		Big *o1 = (Big *) o;
-
-		*z = modmult(*x, Big(b), *o1);
+		if(b == -1) {
+			*z = *x;
+			z->negate();
+		}
+		else if(b == 1) {
+			*z = *x;
+		}
+		else {
+			*z = modmult(*x, Big(b), *o1);
+		}
 	}
 	else if(type == G1_t) {
 		G1 *z = (G1 *) c;
@@ -414,8 +430,16 @@ void _element_mul_zn(Group_t type, const pairing_t *pairing, element_t *c, const
 		Big *z = (Big *) c;
 		Big *x = (Big *) a;
 		Big *o1 = (Big *) o;
-
-		*z = modmult(*x, *b1, *o1);
+		if(*b1 == Big(-1)) {
+			*z = *x;
+			z->negate();
+		}
+		else if(b1->isone()) {
+			*z = *x;
+		}
+		else {
+			*z = modmult(*x, *b1, *o1);
+		}
 	}
 	else if(type == G1_t) {
 		G1 *z = (G1 *) c;

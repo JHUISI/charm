@@ -110,39 +110,45 @@ static PyObject *f(PyObject *v, PyObject *w) { \
 	return NULL;				\
 }
 
-PyObject *mpzToLongObj (mpz_t m)
-{
-	/* borrowed from gmpy */
-	int size = (mpz_sizeinbase (m, 2) + PyLong_SHIFT - 1) / PyLong_SHIFT;
-	int i;
+PyObject *mpzToLongObj(mpz_t m) {
+	/* borrowed from gmpy - then modified */
+	int size = (mpz_sizeinbase(m, 2) + PyLong_SHIFT - 1) / PyLong_SHIFT;
+	int i, isNeg = (mpz_sgn(m) < 0) ? TRUE : FALSE;
 	mpz_t temp;
-	PyLongObject *l = _PyLong_New (size);
+	PyLongObject *l = _PyLong_New(size);
 	if (!l)
 		return NULL;
-	mpz_init_set (temp, m);
-	for (i = 0; i < size; i++)
-	{
-		l->ob_digit[i] = (digit) (mpz_get_ui (temp) & PyLong_MASK);
-		mpz_fdiv_q_2exp (temp, temp, PyLong_SHIFT);
+	mpz_init_set(temp, m);
+	for (i = 0; i < size; i++) {
+		l->ob_digit[i] = (digit)(mpz_get_ui(temp) & PyLong_MASK);
+		mpz_fdiv_q_2exp(temp, temp, PyLong_SHIFT);
 	}
 	i = size;
 	while ((i > 0) && (l->ob_digit[i - 1] == 0))
 		i--;
-	Py_SIZE(l) = i;
-	mpz_clear (temp);
+	if(isNeg) {
+		Py_SIZE(l) = -i;
+	}
+	else {
+		Py_SIZE(l) = i;
+	}
+	mpz_clear(temp);
 	return (PyObject *) l;
 }
 
 void longObjToMPZ (mpz_t m, PyLongObject * p)
 {
 	int size, i, tmp = Py_SIZE(p);
+	int isNeg = FALSE;
 	mpz_t temp, temp2;
 	mpz_init (temp);
 	mpz_init (temp2);
 	if (tmp > 0)
 		size = tmp;
-	else
+	else {
 		size = -tmp;
+		isNeg = TRUE;
+	}
 	mpz_set_ui (m, 0);
 	for (i = 0; i < size; i++)
 	{
@@ -152,6 +158,7 @@ void longObjToMPZ (mpz_t m, PyLongObject * p)
 	}
 	mpz_clear (temp);
 	mpz_clear (temp2);
+	if(isNeg) mpz_neg(m, m);
 }
 
 char *convert_buffer_to_hex(uint8_t * data, size_t len)
@@ -290,26 +297,6 @@ void	Element_dealloc(Element* self)
 	Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
-//// helper method
-//ssize_t read_file(FILE *f, char** out)
-//{
-//	if(f != NULL) {
-//		/* See how big the file is */
-//		fseek(f, 0L, SEEK_END);
-//		ssize_t out_len = ftell(f);
-//		debug("out_len: %zd\n", out_len);
-//		if(out_len <= MAX_LEN) {
-//			/* allocate that amount of memory only */
-//			if((*out = (char *) malloc(out_len+1)) != NULL) {
-//				fseek(f, 0L, SEEK_SET);
-//				fread(*out, sizeof(char), out_len, f);
-//				return out_len;
-//			}
-//		}
-//	}
-//
-//	return 0;
-//}
 
 /*!
  * Hash a null-terminated string to a byte array.
@@ -381,73 +368,6 @@ int hash_element_to_bytes(Element *element, int hash_size, uint8_t* output_buf, 
 
 	free(temp_buf);
 
-	return TRUE;
-}
-
-// take a previous hash and concatenate with serialized bytes of element and hashes into output buf
-int hash2_element_to_bytes(Element *element, uint8_t* last_buf, int hash_size, uint8_t* output_buf) {
-	int result = TRUE;
-	// assume last buf contains a hash
-	unsigned int last_buflen = hash_size;
-	unsigned int buf_len = element_length_in_bytes(element);
-
-	uint8_t* temp_buf = (uint8_t *) malloc(buf_len + 1);
-	memset(temp_buf, '\0', buf_len);
-	if(temp_buf == NULL) {
-		return FALSE;
-	}
-
-	element_to_bytes((unsigned char *) temp_buf, element);
-	// create output buffer
-	uint8_t* temp2_buf = (uint8_t *) malloc(last_buflen + buf_len + 4);
-	memset(temp2_buf, 0, (last_buflen + buf_len));
-//	// copy first input buffer (last_buf) into target buffer
-//	strncat((char *) temp2_buf, (char *) last_buf, last_buflen);
-//	// copy element buffer (temp_buf) into target buffer
-//	strncat((char *) temp2_buf, (char *) temp_buf, buf_len);
-	int i;
-	for(i = 0; i < last_buflen; i++) {
-		temp2_buf[i] = last_buf[i];
-	}
-
-	int j = 0;
-	for(i = last_buflen; i < (last_buflen + buf_len); i++) {
-		temp2_buf[i] = temp_buf[j];
-		j++;
-	}
-	// hash the temp2_buf to bytes
-	result = hash_to_bytes(temp2_buf, (last_buflen + buf_len), hash_size, output_buf, HASH_FUNCTION_ELEMENTS);
-
-	free(temp2_buf);
-	free(temp_buf);
-	return TRUE;
-}
-
-int hash2_buffer_to_bytes(uint8_t *input_str, int input_len, uint8_t *last_hash, int hash_size, uint8_t *output_buf) {
-
-	// concatenate last_buf + input_str (to len), then hash to bytes into output_buf
-	int result;
-	// copy the last hash buffer into temp buf
-	// copy the current input string into buffer
-	PyObject *last = PyBytes_FromStringAndSize((const char *) last_hash, (Py_ssize_t) hash_size);
-	PyObject *input = PyBytes_FromStringAndSize((const char *) input_str, (Py_ssize_t) input_len);
-
-	PyBytes_ConcatAndDel(&last, input);
-	uint8_t *temp_buf = (uint8_t *) PyBytes_AsString(last);
-
-	// hash the contents of temp_buf
-	debug("last_hash => ");
-	printf_buffer_as_hex(last_hash, hash_size);
-
-	debug("input_str => ");
-	printf_buffer_as_hex(input_str, input_len);
-
-	debug("temp_buf => ");
-	printf_buffer_as_hex(temp_buf, input_len + hash_size);
-
-	result = hash_to_bytes(temp_buf, (input_len + hash_size), hash_size, output_buf, HASH_FUNCTION_STRINGS);
-
-	PyObject_Del(last);
 	return TRUE;
 }
 

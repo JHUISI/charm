@@ -112,7 +112,7 @@ static PyObject *f(PyObject *v, PyObject *w) { \
 PyObject *intToLongObj(integer_t x)
 {
 	/* borrowed from gmpy */
-	int size;
+	int size, isNeg = (bn_sign(x) == BN_NEG) ? TRUE : FALSE;
 	bn_size_str(&size, x, 2);
 	size = (size + PyLong_SHIFT - 1) / PyLong_SHIFT;
 	int i;
@@ -140,14 +140,19 @@ PyObject *intToLongObj(integer_t x)
 	i = size;
 	while ((i > 0) && (l->ob_digit[i - 1] == 0))
 		i--;
-	Py_SIZE(l) = i;
+	if(isNeg) {
+		Py_SIZE(l) = -i;
+	}
+	else {
+		Py_SIZE(l) = i;
+	}
 	bn_free(m);
 	return (PyObject *) l;
 }
 
 int longObjToInt(integer_t m, PyLongObject * p)
 {
-	int size, i, tmp = Py_SIZE(p);
+	int size, i, isNeg = FALSE, tmp = Py_SIZE(p);
 	if(m == NULL) return -1;
 	integer_t t, t2;
 	bn_inits(t);
@@ -155,8 +160,10 @@ int longObjToInt(integer_t m, PyLongObject * p)
 
 	if (tmp > 0)
 		size = tmp;
-	else
+	else {
 		size = -tmp; // negate size value
+		isNeg = TRUE;
+	}
 
 	bn_zero(m);
 	for (i = 0; i < size; i++)
@@ -165,6 +172,7 @@ int longObjToInt(integer_t m, PyLongObject * p)
 		bn_lsh(t2, t, PyLong_SHIFT * i);
 		bn_add(m, m, t2);
 	}
+	if(isNeg == TRUE) bn_neg(m, m);
 	bn_free(t);
 	bn_free(t2);
 
@@ -1052,7 +1060,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 	// hashing element to Zr
 	uint8_t hash_buf[SHA_LEN+1];
 	memset(hash_buf, '\0', SHA_LEN);
-	int result, i, j;
+	int result, i;
 	GroupType type = ZR;
 	char *tmp = NULL, *str;
 
@@ -1110,16 +1118,12 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 			tmpObject = PySequence_GetItem(objList, 0);
 			if(PyElement_Check(tmpObject)) {
 				object = (Element *) tmpObject;
-				START_CLOCK(dBench);
 				result = element_to_key(object->e, hash_buf, SHA_LEN, 0);
-				STOP_CLOCK(dBench);
 			}
 			else if(PyBytes_CharmCheck(tmpObject)) {
 				str = NULL;
 				PyBytes_ToString(str, tmpObject);
-				START_CLOCK(dBench);
 				result = hash_buffer_to_bytes((uint8_t *) str, strlen(str), hash_buf, SHA_LEN, HASH_FUNCTION_STR_TO_Zr_CRH);
-				STOP_CLOCK(dBench);
 				debug("hash str element =>");
 				printf_buffer_as_hex(hash_buf, SHA_LEN);
 			}
@@ -1131,11 +1135,9 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 				tmpObject = PySequence_GetItem(objList, i);
 				if(PyElement_Check(tmpObject)) {
 					object = (Element *) tmpObject;
-					START_CLOCK(dBench);
 					memset(out_buf, '\0', SHA_LEN);
 					// current hash_buf output concatenated with object are sha1 hashed into hash_buf
 					result = hash2_element_to_bytes(&object->e, hash_buf, SHA_LEN, out_buf); // TODO: fix this
-					STOP_CLOCK(dBench);
 					debug("hash element => ");
 					printf_buffer_as_hex(out_buf, SHA_LEN);
 					memcpy(hash_buf, out_buf, SHA_LEN);
@@ -1143,17 +1145,14 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 				else if(PyBytes_CharmCheck(tmpObject)) {
 					str = NULL;
 					PyBytes_ToString(str, tmpObject);
-					START_CLOCK(dBench);
 					// this assumes that the string is the first object (NOT GOOD, change)
 					result = hash2_buffer_to_bytes((uint8_t *) str, strlen(str), hash_buf, SHA_LEN, out_buf); // TODO: fix this
 					memcpy(hash_buf, out_buf, SHA_LEN);
 
 					// hash2_element_to_bytes()
-					STOP_CLOCK(dBench);
 				}
 				Py_DECREF(tmpObject);
 			}
-			START_CLOCK(dBench);
 			if(type == ZR) { newObject = createNewElement(ZR, group->pairing); }
 			else if(type == G1) { newObject = createNewElement(G1, group->pairing); }
 			else {
@@ -1162,7 +1161,6 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 			}
 
 			element_from_hash(newObject->e, hash_buf, SHA_LEN);
-			STOP_CLOCK(dBench);
 		}
 	}
 	// third case: a tuple with one element and
@@ -1177,17 +1175,14 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 		// TODO: add type == ZR?
 		// Hash an element of Zr to an element of G1.
 		if(type == G1) {
-			START_CLOCK(dBench);
 			newObject = createNewElement(G1, group->pairing);
 			// hash the element to the G1 field (uses sha2 as well)
-			// START_CLOCK
 			result = element_to_key(object->e, hash_buf, SHA_LEN, 0);
 			if(result != ELEMENT_OK) {
 				tmp = "could not hash to bytes";
 				goto cleanup;
 			}
 			element_from_hash(newObject->e, hash_buf, HASH_LEN);
-			STOP_CLOCK(dBench);
 		}
 		else {
 			tmp = "can only hash an element of Zr to G1. Random Oracle model.";
