@@ -1,5 +1,5 @@
 name := vrf
-N := 100
+N := 2
 setting := asymmetric
 l := 8 
 secparam := 80

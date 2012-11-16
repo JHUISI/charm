@@ -1,6 +1,6 @@
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.core.engine.util import *
-import hw
+import vrf
 
 import sys, random, string, time
 
@@ -19,36 +19,25 @@ NUM_PROGRAM_ITERATIONS = 10
 NUM_CYCLES = 10
 
 def genNewMessage(messageSize):
-    message = ""
+    message = []
     for randomChar in range(0, messageSize):
-        message += random.choice(string.ascii_letters + string.digits)
+        message.append(random.randint(0, 1))
     return message
 
 def genBadMessage(message, messageSize):
     randomIndex = random.randint(0, (messageSize - 1))
     oldValue = message[randomIndex]
-    newValue = random.choice(string.ascii_letters + string.digits)
-    while (newValue == oldValue):
-        newValue = random.choice(string.ascii_letters + string.digits)
-
-    if (messageSize == 1):
-        message = newValue
-    elif (randomIndex != (messageSize -1) ):
-        message = message[0:randomIndex] + newValue + message[(randomIndex + 1):messageSize]
+    if (message[randomIndex] == 0): # flib the bit
+        message[randomIndex] = 1
     else:
-        message = message[0:randomIndex] + newValue
+        message[randomIndex] = 0
     return message
 
-def genValidSignature(message, index, pk, sk, ilist):
-    if index == 0:
-        sig = hw.sign(pk, sk, ilist[index], message)
-        (sig1, sig2, r, ilist[index]) = sig
-    else:
-        sig = hw.sign(pk, sk, ilist[index-1], message)
-        (sig1, sig2, r, ilist[index]) = sig
-
-    U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d = pk
-    assert hw.verify(U, V, D, g2, w2, z2, h2, message, sig1, sig2, r, ilist[index]), "failed verification"
+def genValidSignature(message, index, U1, U2, pk, sk, u):
+    sig = vrf.prove(sk, u, message)
+    (y, pi) = sig
+    Ut, g1, g2, h = pk
+    assert vrf.verify(U1, U2, Ut, g1, g2, h, y, pi, message), "failed verification"
     return sig
 
 def genOutputDictFile(numCount, messageSize, keyName1, keyName2, outputDict, outputDictName, outputMsgSuffix, outputSigSuffix, isValid, *signVars):
@@ -148,7 +137,7 @@ def generate_signatures_main(argv, same_signer=True):
     
     global group, prefixName
     group = PairingGroup('BN256')
-    hw.group = group
+    vrf.group = group
     #setup parameters
     numValidMessages = int(sys.argv[1])
     numInvalidMessages = int(sys.argv[2])
@@ -158,13 +147,12 @@ def generate_signatures_main(argv, same_signer=True):
     invalidOutputDictName = sys.argv[6]
     
     # 1. generate keys
-    (g1, g2) = hw.setup()
-    ilist = {}
-    (ilist[0], pk, sk) = hw.keygen(g1, g2)
-    
+    (pk, U1, U2, sk, u) = vrf.setup(messageSize)
+    vrf.l = messageSize # set this to l
+       
     f_mpk = open('mpk.charmPickle', 'wb')
     # 2. serialize the pk's
-    pick_mpk = objectToBytes({ 'pk':pk, 'g1':g1, 'g2':g2 }, group)
+    pick_mpk = objectToBytes({ 'pk':pk, 'U1':U1, 'U2':U2, 'blocksize':messageSize }, group)
     f_mpk.write(pick_mpk)
     f_mpk.close()
     
@@ -187,8 +175,8 @@ def generate_signatures_main(argv, same_signer=True):
 #    invalidOutputDict[0]['pk'] = 'pk.charmPickle'
     
     # 3. pass right arguments at the end
-    genOutputDictFile(numValidMessages, messageSize, 'mpk.charmPickle', 'pk.charmPickle', validOutputDict, validOutputDictName, '_ValidMessage.pythonPickle', '_ValidSignature.charmPickle', True, pk, sk, ilist)
-    genOutputDictFile(numInvalidMessages, messageSize, 'mpk.charmPickle', 'pk.charmPickle', invalidOutputDict, invalidOutputDictName, '_InvalidMessage.pythonPickle', '_InvalidSignature.charmPickle', False, pk, sk, ilist)
+    genOutputDictFile(numValidMessages, messageSize, 'mpk.charmPickle', 'pk.charmPickle', validOutputDict, validOutputDictName, '_ValidMessage.pythonPickle', '_ValidSignature.charmPickle', True, U1, U2, pk, sk, u)
+    genOutputDictFile(numInvalidMessages, messageSize, 'mpk.charmPickle', 'pk.charmPickle', invalidOutputDict, invalidOutputDictName, '_InvalidMessage.pythonPickle', '_InvalidSignature.charmPickle', False, U1, U2, pk, sk, u)
     return
 
 def run_batch_verification(argv, same_signer=True):
@@ -197,7 +185,7 @@ def run_batch_verification(argv, same_signer=True):
     
     validDictArg = open(sys.argv[1], 'rb').read()
     groupParamArg = PairingGroup('BN256')
-    hw.group = groupParamArg
+    vrf.group = groupParamArg
     batchResultsFile = sys.argv[2]
     indResultsFile = sys.argv[3]
 
@@ -227,19 +215,18 @@ def run_batch_verification(argv, same_signer=True):
             verifyFuncArgs = list(sigsDict[0].keys())
             #print("verifyFuncArgs: ", verifyFuncArgs)
             N = len(sigsDict.keys())
-            hw.N = N
+            vrf.N = N
             # 4. public values/generator
-            g1, g2 = sigsDict[0]['mpk'][bodyKey]['g1'], sigsDict[0]['mpk'][bodyKey]['g2']
-            U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d = sigsDict[0]['mpk'][bodyKey]['pk'][:]
+            vrf.l = int(sigsDict[0]['mpk'][bodyKey]['blocksize'])
+            U1, U2 = sigsDict[0]['mpk'][bodyKey]['U1'], sigsDict[0]['mpk'][bodyKey]['U2']
+            Ut, g1, g2, h = sigsDict[0]['mpk'][bodyKey]['pk'][:]
 
-            Mlist =  [ sigsDict[i]['message'][bodyKey] for i in range(0, N) ]
-            sig1list = [ sigsDict[i]['sig'][bodyKey][0] for i in range(0, N) ]
-            sig2list = [ sigsDict[i]['sig'][bodyKey][1] for i in range(0, N) ]
-            rlist = [ sigsDict[i]['sig'][bodyKey][2] for i in range(0, N) ]
-            ilist = [ sigsDict[i]['sig'][bodyKey][3] for i in range(0, N) ]
+            xlist =  [ sigsDict[i]['message'][bodyKey] for i in range(0, N) ]
+            y0list = [ sigsDict[i]['sig'][bodyKey][0] for i in range(0, N) ]
+            pilist = [ sigsDict[i]['sig'][bodyKey][1] for i in range(0, N) ]
 
             startTime = time.clock()
-            incorrectSigIndices = hw.batchverify(D, U, V, g2, h2, ilist, Mlist, rlist, sig1list, sig2list, w2, z2, [])
+            incorrectSigIndices = vrf.batchverify(U1, U2, Ut, g1, g2, h, pilist, xlist, y0list, [])
             endTime = time.clock()
 
             result = (endTime - startTime) * time_in_ms
@@ -254,7 +241,7 @@ def run_batch_verification(argv, same_signer=True):
             batchResultsRaw.write(currentBatchOutputString)
 
             startTime = time.clock()
-            incorrectSigIndices = hw.indivverify(D, U, V, g2, h2, ilist, Mlist, rlist, sig1list, sig2list, w2, z2, [])
+            incorrectSigIndices = vrf.indivverify(U1, U2, Ut, g1, g2, h, pilist, xlist, y0list, [])
             endTime = time.clock()
 
             result = (endTime - startTime) * time_in_ms

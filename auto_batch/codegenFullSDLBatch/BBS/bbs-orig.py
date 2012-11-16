@@ -1,4 +1,4 @@
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.pairinggroup import *
 from charm.core.engine.util import *
 from charm.core.math.integer import randomBits
 
@@ -8,22 +8,26 @@ N = 2
 
 secparam = 80
 
+
 def precheck(g1, g2, h, u, v, w, M, T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3):
+
+    input = [g1, g2, h, u, v, w, M, T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3]
     R1ver = ((u ** salpha) * (T1 ** -c))
     R2ver = ((v ** sbeta) * (T2 ** -c))
     R4ver = ((T1 ** sx) * (u ** -sgamma1))
     R5ver = ((T2 ** sx) * (v ** -sgamma2))
     if ( ( (c) != (group.hash((M, T1, T2, T3, R1ver, R2ver, R3, R4ver, R5ver), ZR)) ) ):
         output = False
-        return output
     else:
         output = True
     return output
 
 def keygen(n):
+
     A = {}
     x = {}
 
+    input = n
     g1 = group.random(G1)
     g2 = group.random(G2)
     h = group.random(G1)
@@ -42,8 +46,10 @@ def keygen(n):
     return output
 
 def sign(gpk, A_ind, x_ind, M):
+
     r = {}
 
+    input = [gpk, A_ind, x_ind, M]
     g1, g2, h, u, v, w = gpk
     alpha = group.random(ZR)
     beta = group.random(ZR)
@@ -74,69 +80,57 @@ def sign(gpk, A_ind, x_ind, M):
     return output
 
 def verify(g1, g2, h, u, v, w, M, T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3):
+
+    input = [g1, g2, h, u, v, w, M, T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3]
     if ( ( (precheck(g1, g2, h, u, v, w, M, T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3)) == (False) ) ):
         output = False
-        return output
     if ( ( (((pair(T3, g2) ** sx) * ((pair(h, w) ** (-salpha - sbeta)) * ((pair(h, g2) ** (-sgamma1 - sgamma2)) * ((pair(T3, w) ** c) * (pair(g1, g2) ** -c)))))) == (R3) ) ):
         output = True
     else:
         output = False
-        return output
     return output
 
 def membership(R3list, T1list, T2list, T3list, clist, g1, g2, h, salphalist, sbetalist, sgamma1list, sgamma2list, sxlist, u, v, w):
+
+    input = [R3list, T1list, T2list, T3list, clist, g1, g2, h, salphalist, sbetalist, sgamma1list, sgamma2list, sxlist, u, v, w]
     if ( ( (group.ismember(R3list)) == (False) ) ):
         output = False
-        return output
     if ( ( (group.ismember(T1list)) == (False) ) ):
         output = False
-        return output
     if ( ( (group.ismember(T2list)) == (False) ) ):
         output = False
-        return output
     if ( ( (group.ismember(T3list)) == (False) ) ):
         output = False
-        return output
     if ( ( (group.ismember(clist)) == (False) ) ):
         output = False
-        return output
     if ( ( (group.ismember(g1)) == (False) ) ):
         output = False
-        return output
     if ( ( (group.ismember(g2)) == (False) ) ):
         output = False
-        return output
     if ( ( (group.ismember(h)) == (False) ) ):
         output = False
-        return output
     if ( ( (group.ismember(salphalist)) == (False) ) ):
         output = False
-        return output
     if ( ( (group.ismember(sbetalist)) == (False) ) ):
         output = False
-        return output
     if ( ( (group.ismember(sgamma1list)) == (False) ) ):
         output = False
-        return output
     if ( ( (group.ismember(sgamma2list)) == (False) ) ):
         output = False
-        return output
     if ( ( (group.ismember(sxlist)) == (False) ) ):
         output = False
-        return output
     if ( ( (group.ismember(u)) == (False) ) ):
         output = False
-        return output
     if ( ( (group.ismember(v)) == (False) ) ):
         output = False
-        return output
     if ( ( (group.ismember(w)) == (False) ) ):
         output = False
-        return output
     output = True
     return output
 
 def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g2, w):
+
+    input = [delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, g2, w]
     dotALoopVal = 1
     dotBLoopVal = 1
     dotCLoopVal = 1
@@ -159,20 +153,21 @@ def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotACache, d
     output = None
 
 def batchverify(Mlist, R3list, T1list, T2list, T3list, clist, g1, g2, h, salphalist, sbetalist, sgamma1list, sgamma2list, sxlist, u, v, w, incorrectIndices):
+
     dotCCache = {}
     delta = {}
     dotBCache = {}
     dotACache = {}
 
+    input = [Mlist, R3list, T1list, T2list, T3list, clist, g1, g2, h, salphalist, sbetalist, sgamma1list, sgamma2list, sxlist, u, v, w, incorrectIndices]
     for z in range(0, N):
         delta[z] = SmallExp(secparam)
     if ( ( (membership(R3list, T1list, T2list, T3list, clist, g1, g2, h, salphalist, sbetalist, sgamma1list, sgamma2list, sxlist, u, v, w)) == (False) ) ):
         output = False
-        return output
     for z in range(0, N):
         if ( ( (precheck(g1, g2, h, u, v, w, Mlist[z], T1list[z], T2list[z], T3list[z], clist[z], salphalist[z], sbetalist[z], sxlist[z], sgamma1list[z], sgamma2list[z], R3list[z])) == (False) ) ):
-            output = False
-            return output
+            return False
+
     for z in range(0, N):
         dotACache[z] = ((T3list[z] ** (sxlist[z] * delta[z])) * ((h ** ((-sgamma1list[z] + -sgamma2list[z]) * delta[z])) * (g1 ** (-clist[z] * delta[z]))))
         dotBCache[z] = ((h ** ((-salphalist[z] + -sbetalist[z]) * delta[z])) * (T3list[z] ** (clist[z] * delta[z])))
@@ -181,22 +176,13 @@ def batchverify(Mlist, R3list, T1list, T2list, T3list, clist, g1, g2, h, salphal
     output = incorrectIndices
     return output
 
-def indivverify(Mlist, R3list, T1list, T2list, T3list, clist, g1, g2, h, salphalist, sbetalist, sgamma1list, sgamma2list, sxlist, u, v, w, incorrectIndices):
-    if ( ( (membership(R3list, T1list, T2list, T3list, clist, g1, g2, h, salphalist, sbetalist, sgamma1list, sgamma2list, sxlist, u, v, w)) == (False) ) ):
-        output = False
-        return output
-    for z in range(0, N):
-        if verify(g1, g2, h, u, v, w, Mlist[z], T1list[z], T2list[z], T3list[z], clist[z], salphalist[z], sbetalist[z], sxlist[z], sgamma1list[z], sgamma2list[z], R3list[z]) == False:
-           incorrectIndices.append(z)
-    return incorrectIndices
-
 def SmallExp(bits=80):
     return group.init(ZR, randomBits(bits))
 
 def main():
     global group
-    group = PairingGroup('BN256')
-    
+    group = PairingGroup(secparam)
+
     (gpk, gmsk, A, x) = keygen(3)
     T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3 = sign(gpk, A[0], x[0], "message")
     sig0 = sign(gpk, A[0], x[0], "message0")
@@ -226,7 +212,6 @@ def main():
        print("Failed batch verification!")
     else:
        print("incorrectIndices: ", incorrectIndices)
-
 
 if __name__ == '__main__':
     main()

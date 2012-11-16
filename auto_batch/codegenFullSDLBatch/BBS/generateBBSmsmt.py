@@ -1,6 +1,6 @@
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.core.engine.util import *
-import hw
+import bbs
 
 import sys, random, string, time
 
@@ -39,16 +39,13 @@ def genBadMessage(message, messageSize):
         message = message[0:randomIndex] + newValue
     return message
 
-def genValidSignature(message, index, pk, sk, ilist):
-    if index == 0:
-        sig = hw.sign(pk, sk, ilist[index], message)
-        (sig1, sig2, r, ilist[index]) = sig
-    else:
-        sig = hw.sign(pk, sk, ilist[index-1], message)
-        (sig1, sig2, r, ilist[index]) = sig
-
-    U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d = pk
-    assert hw.verify(U, V, D, g2, w2, z2, h2, message, sig1, sig2, r, ilist[index]), "failed verification"
+def genValidSignature(message, index, num_signers, gpk, A, x):    
+    signer = index % num_signers # not including key in the sky
+    print("signer: ", signer)
+    sig = bbs.sign(gpk, A[signer], x[signer], message)
+    (T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3) = sig
+    g1, g2, h, u, v, w = gpk[0:6]
+    assert bbs.verify(g1, g2, h, u, v, w, message, T1, T2, T3, c, salpha, sbeta, sx, sgamma1, sgamma2, R3), "failed individual verification"
     return sig
 
 def genOutputDictFile(numCount, messageSize, keyName1, keyName2, outputDict, outputDictName, outputMsgSuffix, outputSigSuffix, isValid, *signVars):
@@ -56,7 +53,7 @@ def genOutputDictFile(numCount, messageSize, keyName1, keyName2, outputDict, out
         if (index != 0):
             outputDict[index] = {}
             outputDict[index]['mpk'] = keyName1
-#            outputDict[index]['pk'] = keyName2
+            #outputDict[index]['pk']  = keyName2
 
         message = genNewMessage(messageSize)
         # inputs change for each scheme        
@@ -142,13 +139,13 @@ def getResults(resultsDict):
     return resultsString
 
 
-def generate_signatures_main(argv, same_signer=True):
+def generate_signatures_main(argv, num_signer=3):
     if ( (len(argv) != 7) or (argv[1] == "-help") or (argv[1] == "--help") ):
         sys.exit("Usage:  python " + argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
     
     global group, prefixName
     group = PairingGroup('BN256')
-    hw.group = group
+    bbs.group = group
     #setup parameters
     numValidMessages = int(sys.argv[1])
     numInvalidMessages = int(sys.argv[2])
@@ -158,24 +155,29 @@ def generate_signatures_main(argv, same_signer=True):
     invalidOutputDictName = sys.argv[6]
     
     # 1. generate keys
-    (g1, g2) = hw.setup()
-    ilist = {}
-    (ilist[0], pk, sk) = hw.keygen(g1, g2)
-    
+    num_signers = num_signer # default = 3
+    (gpk, gmsk, A, x) = bbs.keygen(num_signers)
+       
     f_mpk = open('mpk.charmPickle', 'wb')
     # 2. serialize the pk's
-    pick_mpk = objectToBytes({ 'pk':pk, 'g1':g1, 'g2':g2 }, group)
+    pick_mpk = objectToBytes({ 'gpk':gpk }, group)
     f_mpk.write(pick_mpk)
     f_mpk.close()
     
-    
+#    pk = {}
+#    sk = {}
+#    # number of signers
+#    bbs.l = num_signers # numValidMessages + 1 # add one to represent key in the sky
+#    userIDs = [ "test" + str(z) for z in range(bbs.l) ]
+#    for z in range(0, bbs.l):
+#        (pk[z], sk[z]) = bbs.keygen(alpha, userIDs[z])
+#    
 #    f_pk = open('pk.charmPickle', 'wb')
 #    # 2. serialize the pk's
-#    pick_pk = objectToBytes( pklist, group)
+#    pick_pk = objectToBytes( { 'pk':pk }, group)
 #    f_pk.write(pick_pk)
 #    f_pk.close()
 
-    
     validOutputDict = {}
     validOutputDict[0] = {}
     validOutputDict[0]['mpk'] = 'mpk.charmPickle'
@@ -187,17 +189,17 @@ def generate_signatures_main(argv, same_signer=True):
 #    invalidOutputDict[0]['pk'] = 'pk.charmPickle'
     
     # 3. pass right arguments at the end
-    genOutputDictFile(numValidMessages, messageSize, 'mpk.charmPickle', 'pk.charmPickle', validOutputDict, validOutputDictName, '_ValidMessage.pythonPickle', '_ValidSignature.charmPickle', True, pk, sk, ilist)
-    genOutputDictFile(numInvalidMessages, messageSize, 'mpk.charmPickle', 'pk.charmPickle', invalidOutputDict, invalidOutputDictName, '_InvalidMessage.pythonPickle', '_InvalidSignature.charmPickle', False, pk, sk, ilist)
+    genOutputDictFile(numValidMessages, messageSize, 'mpk.charmPickle', 'pk.charmPickle', validOutputDict, validOutputDictName, '_ValidMessage.pythonPickle', '_ValidSignature.charmPickle', True, num_signers, gpk, A, x)
+    genOutputDictFile(numInvalidMessages, messageSize, 'mpk.charmPickle', 'pk.charmPickle', invalidOutputDict, invalidOutputDictName, '_InvalidMessage.pythonPickle', '_InvalidSignature.charmPickle', False, num_signers, gpk, A, x)
     return
 
-def run_batch_verification(argv, same_signer=True):
+def run_batch_verification(argv):
     if ( (len(argv) != 4) or (argv[1] == "-help") or (argv[1] == "--help") ):
         sys.exit("Usage:  python " + argv[0] + "\n\t[dictionary with valid messages/signatures]\n\t[name of output file for batch results]\n\t[name of output file for ind. results]")
     
     validDictArg = open(sys.argv[1], 'rb').read()
     groupParamArg = PairingGroup('BN256')
-    hw.group = groupParamArg
+    bbs.group = groupParamArg
     batchResultsFile = sys.argv[2]
     indResultsFile = sys.argv[3]
 
@@ -227,19 +229,23 @@ def run_batch_verification(argv, same_signer=True):
             verifyFuncArgs = list(sigsDict[0].keys())
             #print("verifyFuncArgs: ", verifyFuncArgs)
             N = len(sigsDict.keys())
-            hw.N = N
+            bbs.N = N
             # 4. public values/generator
-            g1, g2 = sigsDict[0]['mpk'][bodyKey]['g1'], sigsDict[0]['mpk'][bodyKey]['g2']
-            U, V, D, g1, g2, w1, w2, z1, z2, h1, h2, u, v, d = sigsDict[0]['mpk'][bodyKey]['pk'][:]
-
-            Mlist =  [ sigsDict[i]['message'][bodyKey] for i in range(0, N) ]
-            sig1list = [ sigsDict[i]['sig'][bodyKey][0] for i in range(0, N) ]
-            sig2list = [ sigsDict[i]['sig'][bodyKey][1] for i in range(0, N) ]
-            rlist = [ sigsDict[i]['sig'][bodyKey][2] for i in range(0, N) ]
-            ilist = [ sigsDict[i]['sig'][bodyKey][3] for i in range(0, N) ]
+            g1, g2, h, u, v, w = sigsDict[0]['mpk'][bodyKey]['gpk'][0:6]
+            Mlist  = [ sigsDict[i]['message'][bodyKey] for i in range(0, N) ]
+            T1list  = [ sigsDict[i]['sig'][bodyKey][0] for i in range(0, N) ]            
+            T2list  = [ sigsDict[i]['sig'][bodyKey][1] for i in range(0, N) ]
+            T3list  = [ sigsDict[i]['sig'][bodyKey][2] for i in range(0, N) ]
+            clist  = [ sigsDict[i]['sig'][bodyKey][3] for i in range(0, N) ]
+            salphalist  = [ sigsDict[i]['sig'][bodyKey][4] for i in range(0, N) ]
+            sbetalist  = [ sigsDict[i]['sig'][bodyKey][5] for i in range(0, N) ]
+            sxlist  = [ sigsDict[i]['sig'][bodyKey][6] for i in range(0, N) ]
+            sgamma1list  = [ sigsDict[i]['sig'][bodyKey][7] for i in range(0, N) ]
+            sgamma2list  = [ sigsDict[i]['sig'][bodyKey][8] for i in range(0, N) ]
+            R3list  = [ sigsDict[i]['sig'][bodyKey][9] for i in range(0, N) ]            
 
             startTime = time.clock()
-            incorrectSigIndices = hw.batchverify(D, U, V, g2, h2, ilist, Mlist, rlist, sig1list, sig2list, w2, z2, [])
+            incorrectSigIndices = bbs.batchverify(Mlist, R3list, T1list, T2list, T3list, clist, g1, g2, h, salphalist, sbetalist, sgamma1list, sgamma2list, sxlist, u, v, w, [])
             endTime = time.clock()
 
             result = (endTime - startTime) * time_in_ms
@@ -254,7 +260,7 @@ def run_batch_verification(argv, same_signer=True):
             batchResultsRaw.write(currentBatchOutputString)
 
             startTime = time.clock()
-            incorrectSigIndices = hw.indivverify(D, U, V, g2, h2, ilist, Mlist, rlist, sig1list, sig2list, w2, z2, [])
+            incorrectSigIndices = bbs.indivverify(Mlist, R3list, T1list, T2list, T3list, clist, g1, g2, h, salphalist, sbetalist, sgamma1list, sgamma2list, sxlist, u, v, w, [])
             endTime = time.clock()
 
             result = (endTime - startTime) * time_in_ms
@@ -290,17 +296,21 @@ def run_batch_verification(argv, same_signer=True):
 if __name__ == "__main__":
     print(sys.argv)
     if len(sys.argv) < 2:
-        sys.exit("Usage:  python " + sys.argv[0] + "\t[ -g or -b ]\t[ command-arguments ]\n-g : generate signatures.\n -b : benchmark with generated signatures.")
+        sys.exit("Usage: python " + sys.argv[0] + "\t[ -g or -b ]\t[ command-arguments ]\n-g : generate signatures.\n -b : benchmark with generated signatures.")
     command = sys.argv[1]
-    same_signer = False
     if command == "-g":
-        print("Generating signatures...")        
-        sys.argv.remove(command)        
-        generate_signatures_main(sys.argv, same_signer)
+        print("Generating signatures...")
+        num_signers = sys.argv[-1]# very last argument
+        assert num_signers.isdigit(), "size of ring should be an INT."
+        num_signers = int(num_signers)
+        print("Ring size: ", num_signers) 
+        sys.argv = sys.argv[:-1]
+        sys.argv.remove(command)
+        generate_signatures_main(sys.argv, num_signers)
     elif command == "-b":
         print("Running batch verification...")
         sys.argv.remove(command)
-        run_batch_verification(sys.argv, same_signer) # different signers
+        run_batch_verification(sys.argv) # different signers
     else:
         sys.exit("Usage:  python " + sys.argv[0] + "\t[ -g or -b ]\t[ command-arguments ]\n-g : generate signatures.\n-b : benchmark with generated signatures.")
     

@@ -1,5 +1,5 @@
 name := bbs
-N := 100
+N := 2
 setting := asymmetric
 
 BEGIN :: types

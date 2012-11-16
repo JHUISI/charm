@@ -10,13 +10,16 @@ l = 8
 
 secparam = 80
 
-#ut = {}
+ut = {}
 
 def setup(n):
+    #global ut
+
     U1 = {}
     U2 = {}
     u = {}
 
+    input = [n]
     g1 = group.random(G1)
     g2 = group.random(G2)
     h = group.random(G2)
@@ -33,6 +36,8 @@ def setup(n):
     return output
 
 def polyF(sk, u, x):
+
+    input = [sk, u, x]
     ut, g1, h = sk
     dotProd = 1
     for i in range(0, l):
@@ -42,8 +47,10 @@ def polyF(sk, u, x):
     return output
 
 def prove(sk, u, x):
+
     pi = {}
 
+    input = [sk, u, x]
     ut, g1, h = sk
     for i in range(0, l):
         dotProd0 = 1
@@ -59,6 +66,8 @@ def prove(sk, u, x):
     return output
 
 def verify(U1, U2, Ut, g1, g2, h, y0, pi, x):
+
+    input = [U1, U2, Ut, g1, g2, h, y0, pi, x]
     proof0 = pair(pi[1], g2)
     if ( ( (( (x[0]) == (0) )) and (( (proof0) != (pair(g1, Ut)) )) ) ):
         output = False
@@ -87,6 +96,8 @@ def verify(U1, U2, Ut, g1, g2, h, y0, pi, x):
     return output
 
 def membership(U1, U2, Ut, g1, g2, h, pilist, y0list):
+
+    input = [U1, U2, Ut, g1, g2, h, pilist, y0list]
     if ( ( (group.ismember(U1)) == (False) ) ):
         output = False
         return output
@@ -115,6 +126,8 @@ def membership(U1, U2, Ut, g1, g2, h, pilist, y0list):
     return output
 
 def dividenconquer(delta1, delta2, delta3, delta4, delta5, delta6, delta7, delta8, delta9, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, Ut, g2, U2, h):
+
+    input = [delta1, delta2, delta3, delta4, delta5, delta6, delta7, delta8, delta9, startSigNum, endSigNum, incorrectIndices, dotACache, dotBCache, dotCCache, dotDCache, dotECache, dotFCache, dotGCache, dotHCache, dotICache, dotJCache, dotKCache, dotLCache, Ut, g2, U2, h]
     dotALoopVal = 1
     dotBLoopVal = 1
     dotCLoopVal = 1
@@ -155,6 +168,7 @@ def dividenconquer(delta1, delta2, delta3, delta4, delta5, delta6, delta7, delta
     output = None
 
 def batchverify(U1, U2, Ut, g1, g2, h, pilist, xlist, y0list, incorrectIndices):
+
     dotLCache = {}
     dotKCache = {}
     dotDCache = {}
@@ -177,6 +191,7 @@ def batchverify(U1, U2, Ut, g1, g2, h, pilist, xlist, y0list, incorrectIndices):
     dotFCache = {}
     dotCCache = {}
 
+    input = [U1, U2, Ut, g1, g2, h, pilist, xlist, y0list, incorrectIndices]
     for z in range(0, N):
         delta1[z] = SmallExp(secparam)
         delta2[z] = SmallExp(secparam)
@@ -207,21 +222,13 @@ def batchverify(U1, U2, Ut, g1, g2, h, pilist, xlist, y0list, incorrectIndices):
     output = incorrectIndices
     return output
 
-def indivverify(U1, U2, Ut, g1, g2, h, pilist, xlist, y0list, incorrectIndices):
-    if ( ( (membership(U1, U2, Ut, g1, g2, h, pilist, y0list)) == (False) ) ):
-        output = False
-        return output
-    for z in range(0, N):
-        if verify(U1, U2, Ut, g1, g2, h, y0list[z], pilist[z], xlist[z]) == False:
-            incorrectIndices.append(z)
-    return incorrectIndices
-
 def SmallExp(bits=80):
     return group.init(ZR, randomBits(bits))
 
 def main():
     global group
     group = PairingGroup('BN256')
+    
     (pk, U1, U2, sk, u) = setup(l)
     Ut, g1, g2, h = pk
     
