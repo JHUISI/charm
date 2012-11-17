@@ -3,15 +3,6 @@ setting := asymmetric
 N := 2
 
 BEGIN :: types
- a := G2
- b := G2
- c := G2
- g := G1
- x := ZR
- y := ZR
- X := G1
- Y := G1
- m := ZR
  M := str
  sig := list{G2}
 END :: types

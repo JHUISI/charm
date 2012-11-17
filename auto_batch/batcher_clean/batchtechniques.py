@@ -763,7 +763,7 @@ class Technique3(AbstractTechnique):
         self.applied = False
         self.score   = tech3.NoneApplied
         self.debug   = False
-
+        self.tech_list = set()
 
     def checkSubtreeForSameBase(self, node, parent, data):
         if node.left: 
@@ -861,6 +861,7 @@ class Technique3(AbstractTechnique):
             addAsChildNodeToParent(data, self.createMulFromList(n))
             self.applied = True
             self.score   = tech3.SplitPairing
+            self.tech_list.update([9])
         else:
             return
 
@@ -900,6 +901,7 @@ class Technique3(AbstractTechnique):
                 node.right = self.createSplitPairings(left, pair_node.right, r)
                 self.applied = True
                 self.score   = tech3.SplitPairing
+                self.tech_list.update([9])                
                 #self.rule += "split one pairing into two or three."
                 #addAsChildNodeToParent(data, muls[0])
             else:                        
@@ -935,6 +937,7 @@ class Technique3(AbstractTechnique):
                         self.visit_pair(pair_node, data) # organize exponents that maybe in the wrong side
                         self.applied    = True
                         self.score      = tech3.CombinePairing
+                        self.tech_list.update([3])
                     elif loop_right_check:
                         #print("move dot prod to right: ", pair_node.right)                        
                         addAsChildNodeToParent(data, pair_node) # move pair one level up                          
@@ -943,6 +946,7 @@ class Technique3(AbstractTechnique):
                         self.visit_pair(pair_node, data)
                         self.applied    = True
                         self.score      = tech3.CombinePairing
+                        self.tech_list.update([3])
                     
                 elif left_check: # if F, then can apply prod node to left child of pair node  
                     addAsChildNodeToParent(data, pair_node) # move pair one level up                                  
@@ -954,6 +958,7 @@ class Technique3(AbstractTechnique):
 #                    print("T3: after _pair left: combinepair: ", pair_node, "\n") 
                     self.applied = True
                     self.score   = tech3.CombinePairing  
+                    self.tech_list.update([3])
                 elif right_check:
                     addAsChildNodeToParent(data, pair_node) # move pair one level up                                                      
 #                    print("T3: before _pair right: combinepair: ", node)                                      
@@ -963,6 +968,7 @@ class Technique3(AbstractTechnique):
                     self.visit_pair(pair_node, data)
                     self.applied = True
                     self.score   = tech3.CombinePairing
+                    self.tech_list.update([3])
 #                    print("T3: after _pair right: combinepair: ", node,"\n")                                                          
                 else:
                     if self.debug: print("did nothing here.") # do nothing if previous criteria isn't met.
@@ -987,6 +993,7 @@ class Technique3(AbstractTechnique):
                 addAsChildNodeToParent(data, exp)
                 self.applied = True
                 self.score   = tech3.ProductToSum
+                self.tech_list.update([7])
         else:
             if self.debug: print("T3: missing type check :=>", Type(node.right))
             pass

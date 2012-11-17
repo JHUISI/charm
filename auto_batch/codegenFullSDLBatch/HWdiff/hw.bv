@@ -3,21 +3,7 @@ N := 100
 setting := asymmetric
 
 BEGIN :: types
- sig1 := G1
- sig2 := G1
  m := str
- M := ZR
- D := GT
- V := GT
- U := GT
- w1 := G1
- w2 := G2
- z1 := G1
- z2 := G2
- h1 := G1
- h2 := G2
- A := G2
- r := ZR
  n := ZR
  i := int
 END :: types

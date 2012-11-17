@@ -16,8 +16,8 @@ g2 := G2
 END :: types
 
 BEGIN :: precompute
-ah := H(M | S1h, ZR)
-ac := H(M | S1c, ZR)
+ah := H(concat{M, S1h}, ZR)
+ac := H(concat{M, S1c}, ZR)
 END :: precompute
 
 constant := list{P, g2}
@@ -50,8 +50,8 @@ END :: latex
 BEGIN :: func:verify
 input := list{S1h, S2h, S1c, S2c, pk, P, g2, M}
 
- ah := H(M | S1h, ZR)
- ac := H(M | S1c, ZR)
+ ah := H(concat{M, S1h}, ZR)
+ ac := H(concat{M, S1c}, ZR)
 
 BEGIN :: if
 if {{ e(S2h, g2) == (( e(pk^ah, P) ) * S1h) } and { e(S2c, g2) == (e(S1c * pk^ac, P)) }}

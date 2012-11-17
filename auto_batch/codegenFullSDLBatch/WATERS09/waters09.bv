@@ -4,24 +4,6 @@ setting := asymmetric
 
 BEGIN :: types
  m := str
- tagc := ZR
- tagk := ZR
- tau1 := G2
- tau2 := G2
- tau1b := G2
- tau2b := G2
- w := G2
- u := G2
- h := G2
- S1 := G2
- S2 := G2
- S3 := G2
- S4 := G2
- S5 := G2
- S6 := G1
- S7 := G1
- SK := G2 
- A := GT
 END :: types
 
 BEGIN :: func:keygen

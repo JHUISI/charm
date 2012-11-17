@@ -24,6 +24,7 @@ flags = { 'multiple':None, 'step1':None }
 singleVE = True # flag to define whether working with a single or multi-eq for verification
 filePrefix = None
 crypto_library = curve = param_id = None
+applied_technique_list = []
 
 def handleVerifyEq(equation, index, verbose):
     global singleVE, flags
@@ -171,260 +172,11 @@ def benchBatchVerification(N, equation, sdl_dict, vars, precompute, _verbose):
 def writeFile(file_name, file_contents):
      f = open(file_name, 'w')
      f.write(file_contents)
-     f.close()
- 
-def runBatcher(opts, proofGen, file, verify, ast_struct, eq_number=0):
-    global PROOFGEN_FLAG, THRESHOLD_FLAG, CODEGEN_FLAG, PRECOMP_CHECK, VERBOSE, CHOOSE_STRATEGY
-    global global_count, flags, singleVE
-    PROOFGEN_FLAG, THRESHOLD_FLAG, CODEGEN_FLAG, PRECOMP_CHECK = opts['proof'], opts['threshold'], opts['codegen'], opts['pre_check']
-    VERBOSE, CHOOSE_STRATEGY = opts['verbose'], opts['strategy']
-    SDL_OUT_FILE = opts['out_file']
-    constants, types = ast_struct[ CONST ], ast_struct[ TYPE ]
-    latex_subs = ast_struct[ LATEX ]
-    if ast_struct.get(PRECOMP):
-        (indiv_precompute, batch_precompute) = ast_struct[ PRECOMP ]
-    else:
-        (indiv_precompute, batch_precompute) = {}, {}
-    batch_precompute[ "delta" ] = "for{z := 1, N} do prng_z"
-    
-    algorithm = ast_struct [ TRANSFORM ]
-    FIND_ORDER     = False
-    if not algorithm: FIND_ORDER = True
-
-    N = None
-    setting = {}
-    metadata = {}
-    for n in ast_struct[ OTHER ]:
-        if 'verify' in str(n.left):
-            pass
-        elif str(n.left) == 'N':
-            N = int(str(n.right))
-            metadata['N'] = str(n.right)
-        elif str(n.left) in [SIGNATURE, PUBLIC, MESSAGE]:
-            setting[ str(n.left) ] = str(n.right)
-        else:
-            metadata[ str(n.left) ] = str(n.right)
-    
-    sig_vars, pub_vars, msg_vars = ast_struct[ SIGNATURE ], ast_struct[ PUBLIC ], ast_struct[ MESSAGE ]
-    batch_count = {} # F = more than one, T = only one exists
-    MSG_set = setting.get(MESSAGE)
-    PUB_set = setting.get(PUBLIC)
-    SIG_set = setting.get(SIGNATURE)
-    if MSG_set == SAME:
-        batch_count[ MESSAGE ] = SAME 
-    elif MSG_set in metadata.keys():
-        checkDotProd = CheckExistingDotProduct(MSG_set)
-        ASTVisitor(checkDotProd).preorder(verify)
-        if not checkDotProd.applied:
-            batch_count[ MESSAGE ] = MSG_set
-        else:
-            batch_count[ MESSAGE ] = None
-    else:
-        print("variable not defined but referenced: ", MSG_set)
-    
-    # check public key setting (can either be many keys or just one single key)
-    if PUB_set == SAME:
-        batch_count[ PUBLIC ] = SAME 
-    elif PUB_set in metadata.keys():
-        checkDotProd = CheckExistingDotProduct(PUB_set)
-        ASTVisitor(checkDotProd).preorder(verify)
-        if not checkDotProd.applied:
-            batch_count[ PUBLIC ] = PUB_set
-        else:
-            batch_count[ PUBLIC ] = None
-        
-    else:
-        print("variable not defined but referenced: ", PUB_set)
-    
-    if SIG_set in metadata.keys():
-        batch_count[ SIGNATURE ] = SIG_set
-    else:
-        print("variable not defined but referenced: ", SIG_set)    
-    
-    if VERBOSE: print("setting: ", batch_count)
-    
-    vars = types
-    vars['N'] = N
-    vars.update(metadata)
-    if VERBOSE: print("variables =>", vars)
-    if VERBOSE: print("metadata =>", metadata)
-
-    # build data inputs for technique classes    
-    sdl_data = { CONST : constants, PUBLIC: pub_vars, MESSAGE : msg_vars, SETTING : batch_count } 
-    if PROOFGEN_FLAG:
-        # start the LCG
-        proofGen.initLCG(constants, vars, sig_vars, latex_subs)
-        if flags['step1']: proofGen.setStepOne(flags['step1'])
-
-    techniques = {'2':Technique2, '3':Technique3, '4':Technique4, '5':DotProdInstanceFinder, '6':PairInstanceFinder, '7':Technique7, '8':Technique8 }
-    #print("VERIFY EQUATION =>", verify)
-    if PROOFGEN_FLAG: 
-#        lcg_data[ lcg_steps ] = { 'msg':'Equation', 'eq': lcg.print_statement(verify) }
-        if flags['multiple' + str(eq_number)]: 
-#            lcg_data[ lcg_steps ]['eq'] = lcg.print_statement(flags[ str(eq_number) ]) # shortcut!
-#            print("JAA => EQUATIONS: ", lcg.print_statement(flags[ 'verify' + str(eq_number) ]))
-            proofGen.setIndVerifyEq(flags[ 'verify' + str(eq_number) ])
-        else:
-            proofGen.setIndVerifyEq( verify )
-#        lcg_steps += 1
-        
-    verify2 = BinaryNode.copy(verify)
-#    ASTVisitor(CombineVerifyEq(const, vars)).preorder(verify2.right)
-    ASTVisitor(CVForMultiSigner(vars, sig_vars, pub_vars, msg_vars, batch_count)).preorder(verify2)
-    if PROOFGEN_FLAG: 
-        proofGen.setNextStep( 'consolidate', verify2 )
-    # check whether this step is necessary!    
-    verify_test = BinaryNode.copy(verify2)
-    pif = PairInstanceFinder()
-    ASTVisitor(pif).preorder(verify_test)
-    if pif.testForApplication(): # if we can combine some pairings, then no need to distribute just yet
-        pass
-    else:
-        ASTVisitor(SimplifyDotProducts()).preorder(verify2)
-
-    if VERBOSE: print("\nStage A: Combined Equation =>", verify2)
-    ASTVisitor(SmallExponent(constants, vars)).preorder(verify2)
-    if VERBOSE: print("\nStage B: Small Exp Test =>", verify2, "\n")
-    if PROOFGEN_FLAG: 
-        proofGen.setNextStep( 'smallexponents', verify2 )
-
-    # figure out order automatically (if not specified in bv file)
-    if FIND_ORDER:
-        result = BatchOrder(sdl_data, types, vars, BinaryNode.copy(verify2), crypto_library).strategy()
-        algorithm = [str(x) for x in result]
-        print("<== Found Batch Algorithm ==>", algorithm)
-
-    # execute the batch algorithm sequence 
-    for option in algorithm:
-        if option == '5':
-            option_str = "Simplifying =>"
-            Tech = techniques[option]()
-        elif option == '6':
-            option_str = "Combine Pairings:"
-            Tech = techniques[option]()            
-        elif option in techniques.keys():
-            option_str = "Applying technique " + option
-            Tech = techniques[option](sdl_data, vars, metadata)
-        else:
-            print("Unrecognized technique selection.")
-            continue
-        ASTVisitor(Tech).preorder(verify2)
-        if option == '2' and not singleVE:
-            # add index numbers to deltas if dealing with multiple verification equations
-            aftTech2 = AfterTech2AddIndex()
-            ASTVisitor(aftTech2).preorder(verify2)
-        elif option == '6':
-            testVerify2 = Tech.makeSubstitution(verify2)
-            if testVerify2 != None: verify2 = testVerify2
-        if hasattr(Tech, 'precompute'):
-            batch_precompute.update(Tech.precompute)
-        if VERBOSE:
-           print(Tech.rule, "\n")
-           print(option_str, ":",verify2, "\n")
-        if PROOFGEN_FLAG:
-            proofGen.setNextStep(Tech.rule, verify2)
-    
-    # now we check if Technique 10 is applicable (aka loop unrolling)
-    Tech10 = Technique10(sdl_data, vars, metadata)
-    ASTVisitor(Tech10).preorder(verify2)
-    
-    if Tech10.testForApplication():
-        evalint = EvaluateAtIntValue(Tech10.for_iterator, Tech10.for_start)
-        testEq = BinaryNode.copy(Tech10.loopStmt)
-        ASTVisitor(evalint).preorder(testEq)
-        print("Evaluated version at %d: %s" % (Tech10.for_start, testEq))
-        print("Combine the rest into this one...")
-        for t in range(Tech10.for_start+1, Tech10.for_end):
-            evalint = EvaluateAtIntValue(Tech10.for_iterator, t)  
-            testEq2 = BinaryNode.copy(Tech10.loopStmt)
-            ASTVisitor(evalint).preorder(testEq2)
-            print("Eval-n-Combine version at %d: %s" % (t, testEq2))
-            # Combine testEq2 into testEq! Need a class to do this for me.
-        
-#        sys.exit("DONE TESTING!")
-    
-    if PROOFGEN_FLAG:
-        proofGen.setNextStep('finalbatcheq', None)
-        
-    if PRECOMP_CHECK:
-        countDict = countInstances(verify2) 
-        if not isOptimized(countDict):
-            ASTVisitor(SubstituteExps(countDict, batch_precompute, vars)).preorder(verify2)
-            print("Final batch eq:", verify2)
-        else:
-            print("Final batch eq:", verify2)
-
-    # START BENCHMARK : THRESHOLD ESTIMATOR
-    if THRESHOLD_FLAG:
-        print("<== Running threshold estimator ==>")
-        (indiv_msmt, indiv_avg_msmt) = benchIndivVerification(N, verify, sdl_data, vars, indiv_precompute, VERBOSE)
-        print("Result N =",N, ":", indiv_avg_msmt)
-
-        outfile = file.split('.bv')[0]
-        indiv, batch = outfile + "_indiv.dat", outfile + "_batch.dat"
-        if filePrefix: indiv = filePrefix + indiv; batch = filePrefix + batch # redirect output file
-    
-        output_indiv = open(indiv, 'w'); output_batch = open(batch, 'w')
-        threshold = -1
-        for i in range(1, N+1):
-            vars['N'] = i
-            (batch_msmt, batch_avg_msmt) = benchBatchVerification(i, verify2, sdl_data, vars, batch_precompute, VERBOSE)
-            output_indiv.write(str(i) + " " + str(indiv_avg_msmt) + "\n")
-            output_batch.write(str(i) + " " + str(batch_avg_msmt) + "\n")
-            if batch_avg_msmt <= indiv_avg_msmt and threshold == -1: threshold = i 
-        output_indiv.close(); output_batch.close()
-        print("Result N =",N, ":", batch_avg_msmt)
-        print("Threshold: ", threshold)
-    # STOP BENCHMARK : THRESHOLD ESTIMATOR 
-    # TODO: check avg for when batch is more efficient than 
-    if CODEGEN_FLAG:
-        print("Final batch eq:", verify2)
-        subProds = SubstituteSigDotProds(vars, 'z', 'N', global_count)
-        ASTVisitor(subProds).preorder(verify2)
-        # update variable counter
-        global_count = subProds.cnt
-        # print("Dot prod =>", subProds.dotprod)
-        # need to check for presence of other variables
-#        key = None
-#        for i in metadata.keys():
-#            if i != 'N': key = i
-        subProds1 = SubstituteSigDotProds(vars, 'y', 'l', global_count)
-        global_count = subProds1.cnt
-#        subProds1.setState(subProds.cnt)
-        ASTVisitor(subProds1).preorder(verify2)
-        if VERBOSE:  
-          print("<====\tPREP FOR CODE GEN\t====>")
-          print("\nFinal version =>", verify2, "\n")
-        out_str = "batch eq := { %s }\n" % verify2
-        for i in subProds.dotprod['list']:
-            if VERBOSE: print("compute: ", i,":=", subProds.dotprod['dict'][i])    
-            out_str += "%s := %s\n" % (i, subProds.dotprod['dict'][i])
-        for i in subProds1.dotprod['list']:
-            if VERBOSE: print("compute: ", i,":=", subProds1.dotprod['dict'][i])
-            out_str += "%s := %s\n" % (i, subProds1.dotprod['dict'][i])              
-        for i in batch_precompute.keys():
-            if VERBOSE: print("precompute:", i, ":=", batch_precompute[i])
-            out_str += "precompute: %s := %s\n" % (i, batch_precompute[i])                            
-        for i in subProds.dotprod['list']:
-            if VERBOSE: print(i,":=", subProds.dotprod['types'][i])
-            out_str += "%s := %s\n" % (i, subProds.dotprod['types'][i])              
-        for i in subProds1.dotprod['list']:
-            if VERBOSE: print(i,":=", subProds1.dotprod['types'][i])
-            out_str += "%s := %s\n" % (i, subProds1.dotprod['types'][i])
-#          print(out_str)
-        if SDL_OUT_FILE != None:
-            print("Writing partial SDL: ", SDL_OUT_FILE)
-            writeFile(SDL_OUT_FILE, out_str)
-
-    if PROOFGEN_FLAG:
-        latex_file = metadata['name'].upper() + str(eq_number)
-        print("Generated the proof written to file: verification_gen%s.tex" % latex_file)
-        proofGen.compileProof(latex_file)
-        
+     f.close()        
 
 def runBatcher2(opts, proofGen, file, verify, settingObj, loopDetails, eq_number=1):
     global PROOFGEN_FLAG, THRESHOLD_FLAG, CODEGEN_FLAG, PRECOMP_CHECK, VERBOSE, CHOOSE_STRATEGY
-    global global_count, delta_count, flags, singleVE
+    global global_count, delta_count, flags, singleVE, applied_technique_list
     PROOFGEN_FLAG, THRESHOLD_FLAG, CODEGEN_FLAG, PRECOMP_CHECK = opts['proof'], opts['threshold'], opts['codegen'], opts['pre_check']
     VERBOSE, CHOOSE_STRATEGY = opts['verbose'], opts['strategy']
     SDL_OUT_FILE = opts['out_file']
@@ -551,6 +303,11 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, loopDetails, eq_number
            print(option_str, ":",verify2, "\n")
         if PROOFGEN_FLAG:
             proofGen.setNextStep(Tech.rule, verify2)
+        # record final technique list
+        if option == '3':
+            applied_technique_list.extend( list(Tech.tech_list) )
+        else:
+            applied_technique_list.append( int(option) )
     
     # now we check if Technique 10 is applicable (aka loop unrolling)
     Tech10 = Technique10(sdl_data, types, loopDetails)
@@ -560,14 +317,8 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, loopDetails, eq_number
         if VERBOSE: print(Tech10.rule, ":", verify2, "\n")
         if PROOFGEN_FLAG:
             proofGen.setNextStep(Tech10.rule, verify2)
+        applied_technique_list.append(10) # add to list
     ##################################################################
-            
-            # Combine testEq2 into testEq! Need a class to do this for me.
-        
-#        sys.exit("DONE TESTING!")
-    
-#    if PROOFGEN_FLAG:
-#        proofGen.setNextStep('finalbatcheq', None)
         
     if PRECOMP_CHECK:
         countDict = countInstances(verify2) 
@@ -598,104 +349,9 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, loopDetails, eq_number
         output_indiv.close(); output_batch.close()
         print("Result N =",N, ":", batch_avg_msmt)
         print("Threshold: ", threshold)
-    # STOP BENCHMARK : THRESHOLD ESTIMATOR 
-    # TODO: check avg for when batch is more efficient than 
-    
-##    if eq_number > 0: suffix = str(eq_number)
-##    else: suffix = ""
-##    if SDL_OUT_FILE == None: SDL_OUT_FILE = types['name'] + suffix
-##    sdlBatch = SDLBatch(SDL_OUT_FILE, sdl_data, types, verify2, batch_precompute, global_count)
-##    sdlBatch.construct(VERBOSE)
-##    global_count = sdlBatch.getVariableCount()
-    
-#    if PROOFGEN_FLAG:
-#        latex_file = types['name'].upper() + str(eq_number)
-#        print("Generated the proof written to file: verification_gen%s.tex" % latex_file)
-#        proofGen.compileProof(latex_file)
+
     return (SDL_OUT_FILE, sdl_data, verify2, batch_precompute, global_count)
     
-""" 
-    if CODEGEN_FLAG:
-        print("Final batch eq:", verify2)
-        subProds = SubstituteSigDotProds(types, 'z', 'N', global_count)
-        ASTVisitor(subProds).preorder(verify2)
-        # update variable counter
-        global_count = subProds.cnt
-        # print("Dot prod =>", subProds.dotprod)
-        # need to check for presence of other variables
-#        key = None
-#        for i in metadata.keys():
-#            if i != 'N': key = i
-
-        subProds1 = SubstituteSigDotProds(types, 'y', 'l', global_count)
-        global_count = subProds1.cnt
-#        subProds1.setState(subProds.cnt)
-        ASTVisitor(subProds1).preorder(verify2)
-        if VERBOSE:  
-          print("<====\tPREP FOR CODE GEN\t====>")
-          print("\nFinal version =>", verify2, "\n")
-        out_str = "batch eq := { %s }\n" % verify2
-        for i in subProds.dotprod['list']:
-            if VERBOSE: print("compute: ", i,":=", subProds.dotprod['dict'][i])    
-            out_str += "%s := %s\n" % (i, subProds.dotprod['dict'][i])
- #        for i in subProds1.dotprod['list']:
- #            if VERBOSE: print("compute: ", i,":=", subProds1.dotprod['dict'][i])
- #            out_str += "%s := %s\n" % (i, subProds1.dotprod['dict'][i])              
- #        for i in batch_precompute.keys():
- #            if VERBOSE: print("precompute:", i, ":=", batch_precompute[i])
- #            out_str += "precompute: %s := %s\n" % (i, batch_precompute[i])
- #        for i in subProds.dotprod['list']:
- #            if VERBOSE: print(i,":=", subProds.dotprod['types'][i])
- #            out_str += "%s := %s\n" % (i, subProds.dotprod['types'][i])              
- #        for i in subProds1.dotprod['list']:
- #            if VERBOSE: print(i,":=", subProds1.dotprod['types'][i])
- #            out_str += "%s := %s\n" % (i, subProds1.dotprod['types'][i])
- #          print(out_str)
- #        if SDL_OUT_FILE != None:
- #            print("Writing partial SDL: ", SDL_OUT_FILE)
- #            writeFile(SDL_OUT_FILE, out_str)
-
-def benchmark_batcherOLD(argv, prefix=None):
-    global THRESHOLD_FLAG, PROOFGEN_FLAG, PRECOMP_CHECK, VERBOSE, CHOOSE_STRATEGY
-    global filePrefix
-    ast_struct = None
-    THRESHOLD_FLAG = PROOFGEN_FLAG = PRECOMP_CHECK = VERBOSE = CHOOSE_STRATEGY = False
-    
-    # main for batch input parser    
-    print(argv)
-    file = argv[1]
-    if prefix: filePrefix = prefix
-    for i in argv:
-        if i == "-b": THRESHOLD_FLAG = True
-        elif i == "-v": VERBOSE = True
-        elif i == "-p": PROOFGEN_FLAG = True
-        elif i == "-s": CHOOSE_STRATEGY = True
-    ast_struct = parseFile(file)
-    
-    verify_eq, N = [], None; cnt = 0
-    for n in ast_struct[ OTHER ]:
-        if 'verify' in str(n.left):
-            result = handleVerifyEq(n, cnt); cnt += 1
-            if type(result) != list: verify_eq.append(result)
-            else: verify_eq.extend(result)
-
-    # verify 
-    variables = ast_struct[ TYPE ]
-    for eq in verify_eq:
-        bte = BasicTypeExist( variables )
-        ASTVisitor( bte ).preorder( eq )
-        bte.report( eq )
-        
-        cte = PairingTypeCheck( variables )
-        ASTVisitor( cte ).preorder( eq )
-        cte.report( eq )
-
-    # process settings
-    for i in range(len(verify_eq)):    
-        runBatcher(file + str(i), verify_eq[i], ast_struct, i)
-    return
-"""
-
 def buildSDLBatchVerifier(sdlOutFile, sdl_data, types, verify2, batch_precompute, var_count, setting):
     if sdlOutFile == None: sdlOutFile = types['name'] + "-full-batch"
     sdlBatch = SDLBatch(sdlOutFile, sdl_data, types, verify2, batch_precompute, var_count, setting)
@@ -703,7 +359,7 @@ def buildSDLBatchVerifier(sdlOutFile, sdl_data, types, verify2, batch_precompute
     return sdlBatch.getVariableCount()
 
 def run_main(opts):
-    global singleVE, crypto_library, curve, param_id, assignInfo, varTypes, global_count, delta_count
+    global singleVE, crypto_library, curve, param_id, assignInfo, varTypes, global_count, delta_count, applied_technique_list
     verbose   = opts['verbose']
     statement = opts['test_stmt']
     file      = opts['sdl_file']
@@ -812,6 +468,7 @@ def run_main(opts):
         genProof.compileProof(latex_file)
     
     # last step:construct SDL batch verifier
+    print("technique list: ", applied_technique_list)
     return buildSDLBatchVerifier(sdlOutFile, sdl_data, types, finalEq, batch_precompute, global_count, setting)        
     
 
