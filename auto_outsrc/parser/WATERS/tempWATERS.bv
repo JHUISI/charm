@@ -1,6 +1,9 @@
 name := waters09
 setting := asymmetric
 
+N := 2
+secparam := 80
+
 BEGIN :: types
 policy_str := str
 policy := object
@@ -95,8 +98,9 @@ coeff := getCoefficients(policy)
 Y := len(attrs)
 A := { prod{y := attrs#1, Y} on ((e(Cn#y, L) * e(Kl#y, Dn#y) ) ^coeff#y) }
 
-result0 := e(Cpr, K) / A
-M := C / result0
+result0 := e(Cpr, K)
+result1 := result0 / A
+M := C / result1
 
 output := M
 END :: func:decrypt
