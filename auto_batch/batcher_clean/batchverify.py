@@ -175,6 +175,9 @@ def writeFile(file_name, file_contents):
      f.close()        
 
 def runBatcher2(opts, proofGen, file, verify, settingObj, loopDetails, eq_number=1):
+    """core of the Batcher algorithm. handles a variety of things from 
+    technique search, proof generation, benchmarking of batch and individual, and so on.
+    """
     global PROOFGEN_FLAG, THRESHOLD_FLAG, CODEGEN_FLAG, PRECOMP_CHECK, VERBOSE, CHOOSE_STRATEGY
     global global_count, delta_count, flags, singleVE, applied_technique_list
     PROOFGEN_FLAG, THRESHOLD_FLAG, CODEGEN_FLAG, PRECOMP_CHECK = opts['proof'], opts['threshold'], opts['codegen'], opts['pre_check']
@@ -353,12 +356,14 @@ def runBatcher2(opts, proofGen, file, verify, settingObj, loopDetails, eq_number
     return (SDL_OUT_FILE, sdl_data, verify2, batch_precompute, global_count)
     
 def buildSDLBatchVerifier(sdlOutFile, sdl_data, types, verify2, batch_precompute, var_count, setting):
+    """constructs the SDL batch verifier"""
     if sdlOutFile == None: sdlOutFile = types['name'] + "-full-batch"
     sdlBatch = SDLBatch(sdlOutFile, sdl_data, types, verify2, batch_precompute, var_count, setting)
     sdlBatch.construct(VERBOSE)
     return sdlBatch.getVariableCount()
 
 def run_main(opts):
+    """main entry point for generating batch verification algorithms"""
     global singleVE, crypto_library, curve, param_id, assignInfo, varTypes, global_count, delta_count, applied_technique_list
     verbose   = opts['verbose']
     statement = opts['test_stmt']
@@ -378,7 +383,6 @@ def run_main(opts):
         parseFile2(file, verbose, ignoreCloudSourcing=True)
         setting = SDLSetting(verbose)
         setting.parse(getAssignInfo(), getVarTypes()) # check for errors and pass on to user before continuing
-
 
     # process single or multiple equations
     verify_eq, N = [], None

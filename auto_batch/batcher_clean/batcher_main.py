@@ -3,11 +3,39 @@ import sys
 import batchverify
 
 version  = '1.0'
-banner   = """
-Batcher:
-- takes as input a SDL file representation of a signature algorithm.
-- produces modified SDL of batch verification equation
+help_info   = """
+\t-f, --sdl_file  [ filename ]
+\t\t: input SDL file description of signature scheme.
+
+\t-o, --out_file  [ filename ]
+\t\t: output file for SDL batch verifier.
+
+\t-p, --proof [ no-argument ]
+\t\t: generate proof of security for batch verification algorithm
+
+\t-v, --verbose   [ no-argument ]
+\t\t: enable verbose output to highest level for Batcher.
+
+\t-t, --threshold [ no-argument ]
+\t\t: measure the "cross-over" point between batch and individual verification from 0 to N.
+
+\t-d, --precompute [ no-argument ]
+\t\t: determine if there are additional variables that can be precomputed in verification equation
+
+\t-c, --codegen  [ no-argument ]
+\t\t: output internal format for partial SDL required codegen (backwards compatibility).
+
+\t-s, --strategy [ no-argument ]
+\t\t: select a technique search strategy for Batcher. Pruned-BFS is only search supported.
+
+\t-l, --library [ miracl or relic ]
+\t\t: underlying crypto library being used.
+
+\t-q, --query [ no-argument ]
+\t\t: takes a test statement for debugging SDL parser
+
 """
+
 verbose = precompute_check = threshold = codegen = proof = print_usage = print_options = False
 strategy = 'bfs' # default strategy
 input_file = test_statement = None
@@ -54,7 +82,7 @@ if verbose:
 if print_usage:
     print("Batcher,", version, "\n")
     print("Arguments: ")
-    print("...")
+    print(help_info)
     sys.exit(0)
 if print_options:
     print('VERSION    :', version)
