@@ -132,23 +132,38 @@ def dropNegativeSign(nodeAsString):
 
     return nodeAsString[1:len(nodeAsString)]
 
-def getAreAllVarsOnLineKnownByTransformRecursive(node, knownVars, varsNotKnownByTransform):
+def shouldWeAddToUnknownVarsList(node, nodeAsString, knownVars, dotProdLoopVar, varsNotKnownByTransform):
+    if (dropNegativeSign(dropListSymbol(str(node))) in knownVars):
+        return False
+
+    if (nodeAsString.isdigit() == True):
+        return False
+
+    if (str(node) in varsNotKnownByTransform):
+        return False
+
+    if ( (dotProdLoopVar != None) and (nodeAsString == str(dotProdLoopVar)) ):
+        return False
+
+    return True
+
+def getAreAllVarsOnLineKnownByTransformRecursive(node, knownVars, dotProdLoopVar, varsNotKnownByTransform):
     if (node.left != None):
-        getAreAllVarsOnLineKnownByTransformRecursive(node.left, knownVars, varsNotKnownByTransform)
+        getAreAllVarsOnLineKnownByTransformRecursive(node.left, knownVars, dotProdLoopVar, varsNotKnownByTransform)
 
     if (node.right != None):
-        getAreAllVarsOnLineKnownByTransformRecursive(node.right, knownVars, varsNotKnownByTransform)
+        getAreAllVarsOnLineKnownByTransformRecursive(node.right, knownVars, dotProdLoopVar, varsNotKnownByTransform)
 
     if (node.type == ops.ATTR):
         nodeAsString = str(node)
         nodeAsString = dropNegativeSign(nodeAsString)
-        if ( (dropNegativeSign(dropListSymbol(str(node))) not in knownVars) and (nodeAsString.isdigit() == False) ):
-            if (str(node) not in varsNotKnownByTransform):
-                varsNotKnownByTransform.append(str(node))
+        addToUnknownVarsList = shouldWeAddToUnknownVarsList(node, nodeAsString, knownVars, dotProdLoopVar, varsNotKnownByTransform)
+        if (addToUnknownVarsList == True):
+            varsNotKnownByTransform.append(str(node))
 
-def getAreAllVarsOnLineKnownByTransform(node, knownVars):
+def getAreAllVarsOnLineKnownByTransform(node, knownVars, dotProdLoopVar):
     varsNotKnownByTransform = []
-    getAreAllVarsOnLineKnownByTransformRecursive(node, knownVars, varsNotKnownByTransform)
+    getAreAllVarsOnLineKnownByTransformRecursive(node, knownVars, dotProdLoopVar, varsNotKnownByTransform)
     if (len(varsNotKnownByTransform) == 0):
         return True
     else:
@@ -164,11 +179,19 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
 
         lineForTransformLines += transformOutputList + LIST_INDEX_SYMBOL + str(transformListCounter) + " := "
         mappingOfTransformListToVarNames[str(currentNode.left)] = str(transformListCounter)
+
+        if (currentNode.right.type == ops.ON):
+            lineForTransformLines += "{ " + str(currentNode.right.left) + " on ( "
+
         listOfPairings = groupedPairing[1]
         for pairing in listOfPairings:
             lineForTransformLines += str(pairing) + " * " 
 
         lineForTransformLines = lineForTransformLines[0:(len(lineForTransformLines) - len(" * "))]
+
+        if (currentNode.right.type == ops.ON):
+            lineForTransformLines += " ) }"
+
         transformLines.append(lineForTransformLines + "\n")
 
         lineForTransformLines = str(currentNode.left) + " := " + transformOutputList + LIST_INDEX_SYMBOL + str(transformListCounter)
@@ -229,6 +252,16 @@ def writeOutNonPairingCalcs(currentNode, transformLines, decoutLines):
     lineForTransformLines += str(
 '''
 
+def getDotProdLoopVar(node):
+    dotProdLoopVar = None
+
+    try:
+        dotProdLoopVar = node.right.left.left.left
+    except:
+        sys.exit("getDotProdLoopVar in transformNEW.py:  couldn't obtain the dot product loop variable name.")
+
+    return str(dotProdLoopVar)
+
 def transformNEW(varsThatAreBlindedDict):
     #addTransformFuncIntro()
     (stmtsDec, typesDec, depListDec, depListNoExponentsDec, infListDec, infListNoExponentsDec) = getFuncStmts(decryptFuncName)
@@ -283,11 +316,16 @@ def transformNEW(varsThatAreBlindedDict):
         if (currentNodeTechnique11RightSide != None):
             currentNode.right = currentNodeTechnique11RightSide
         currentNodePairings = getNodePairingObjs(currentNode)
-        areAllVarsOnLineKnownByTransform = getAreAllVarsOnLineKnownByTransform(currentNode.right, knownVars)
+        dotProdLoopVar = None
+        if (currentNode.right.type == ops.ON):
+            dotProdLoopVar = getDotProdLoopVar(currentNode)
+        areAllVarsOnLineKnownByTransform = getAreAllVarsOnLineKnownByTransform(currentNode.right, knownVars, dotProdLoopVar)
 
         if ( (len(currentNodePairings) > 0) and (areAllVarsOnLineKnownByTransform == True) ):
             groupedPairings = groupPairings(currentNodePairings, varsThatAreBlindedDict)
             writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode)
+            if (groupedPairings[0][0] == []):
+                knownVars.append(str(currentNode.left))
         elif (areAllVarsOnLineKnownByTransform == True):
             writeOutLineKnownByTransform(currentNode, transformLines, decoutLines)
             knownVars.append(str(currentNode.left))
