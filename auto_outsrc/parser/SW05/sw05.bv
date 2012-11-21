@@ -1,0 +1,11 @@
+name := sw05
+setting := asymmetric
+
+N := 2
+secparam := 80
+
+BEGIN :: types
+END :: types
+
+BEGIN :: func:setup
+

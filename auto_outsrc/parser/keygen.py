@@ -171,7 +171,7 @@ def writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls):
     SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + LIST_INDEX_SYMBOL + blindingLoopVar + " := " + keygenOutputElem + LIST_INDEX_SYMBOL + blindingLoopVar + " ^ (1/" + listBlindingFactorName + LIST_INDEX_SYMBOL + blindingLoopVar + ")\n")
     SDLLinesForKeygen.append("END :: forall\n")
     mappingOfSecretVarsToBlindingFactors[keygenOutputElem] = [listBlindingFactorName]
-    varsToBlindList.remove(keygenOutputElem)
+    #varsToBlindList.remove(keygenOutputElem)
     if (keygenOutputElem in varNamesForListDecls):
         sys.exit("writeForAllLoop in keygen.py attempted to add duplicate keygenOutputElem to varNamesForListDecls -- 2 of 2.")
     varNamesForListDecls.append(keygenOutputElem)
@@ -280,8 +280,8 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
     if (shouldThisElemBeUnblinded == True):
         varsNameToSecretVarsUsed[keygenOutputElem] = []
         SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + " := " + keygenOutputElem + "\n")
-        if (keygenOutputElem in varsToBlindList):
-            varsToBlindList.remove(keygenOutputElem)
+        #if (keygenOutputElem in varsToBlindList):
+            #varsToBlindList.remove(keygenOutputElem)
         lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, keygenOutputElem)
         replaceVarInstancesInLineNoRange(lineNoAfterThisAddition, getEndLineNoOfFunc(keygenFuncName), keygenOutputElem, (keygenOutputElem + blindingSuffix))
         return keygenOutputElem
@@ -311,7 +311,7 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
         varsThatAreBlinded.append(keygenOutputElem)
         SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + " := " + keygenOutputElem + " ^ (1/" + currentBlindingFactorName + ")\n")
         mappingOfSecretVarsToBlindingFactors[keygenOutputElem] = [currentBlindingFactorName]
-        varsToBlindList.remove(keygenOutputElem)
+        #varsToBlindList.remove(keygenOutputElem)
         lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, keygenOutputElem)
         replaceVarInstancesInLineNoRange(lineNoAfterThisAddition, getEndLineNoOfFunc(keygenFuncName), keygenOutputElem, (keygenOutputElem + blindingSuffix))
         return keygenOutputElem
@@ -403,8 +403,8 @@ def keygen(file):
     for keygenOutput_ind in keygenOutput:
         secretKeyName = blindKeygenOutputElement(keygenOutput_ind, varsToBlindList, varNamesForListDecls)
 
-    if (len(varsToBlindList) != 0):
-        sys.exit("keygen.py completed without blinding all of the variables passed to it by transform.py.")
+    #if (len(varsToBlindList) != 0):
+        #sys.exit("keygen.py completed without blinding all of the variables passed to it by transform.py.")
 
     SDLLinesForKeygen = []
     for nonListBlindingFactor in namesOfAllNonListBlindingFactors:

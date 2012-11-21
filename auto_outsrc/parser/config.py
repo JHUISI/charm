@@ -7,7 +7,7 @@ finalSDLSuffix = ".FINAL_SDL"
 
 transformOutputList = "transformOutputList"
 
-M = 'M'
+M = 'Message2'
 
 varNameLeftSideNoBlindedVars = "neverUseThisVarNameNoBlindedVars"
 varNameLeftSideBlindedVars = "neverUseThisVarNameBlindedVars"
