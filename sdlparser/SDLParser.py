@@ -66,6 +66,7 @@ builtInTypes["calculateSharesList"] = types.list
 builtInTypes["prune"] = types.list
 builtInTypes["getCoefficients"] = types.symmap
 builtInTypes["integer"] = types.int
+builtInTypes["isList"] = types.int
 
 def createNode(s, loc, toks):
     print('createNode => ', toks)
@@ -637,8 +638,11 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
         sys.exit("updateVarTypes in SDLParser.py received newType unequal to types.NO_TYPE when currentFuncName was TYPES_HEADER.")
 
     varName = getFullVarName(node.left, True)
-    if (varName in varTypes[currentFuncName]):
+    if ( (varName in varTypes[currentFuncName]) and (varName != outputVarName) ):
         if (varTypes[currentFuncName][varName].getType() == newType): 
+            return
+        elif (checkForIntAndZR(varTypes[currentFuncName][varName].getType(), newType) == True):
+            varTypes[currentFuncName][varName].setType(types.ZR)
             return
         else:
             print("varName: ", varName)
@@ -912,6 +916,15 @@ def getVarTypeInfoForAttr(node):
     
     return types.NO_TYPE
 
+def checkForIntAndZR(leftSideType, rightSideType):
+    if ( (leftSideType == types.int) and (rightSideType == types.ZR) ):
+        return True
+
+    if ( (leftSideType == types.ZR) and (rightSideType == types.int) ):
+        return True
+
+    return False
+
 def getVarTypeInfoRecursive(node):
     if (node.type == ops.RANDOM):
         retRandomType = node.left.attr
@@ -946,6 +959,8 @@ def getVarTypeInfoRecursive(node):
         leftSideType = getVarTypeInfoRecursive(node.left)
         rightSideType = getVarTypeInfoRecursive(node.right)
         if (leftSideType != rightSideType):
+            if (checkForIntAndZR(leftSideType, rightSideType) == True):
+                return types.ZR
             print("left side: ", leftSideType, ":", node.left)
             print("right side: ", rightSideType, ":", node.right)
             sys.exit("getVarTypeInfoRecursive in SDLParser.py found an operation of type ADD, SUB, MUL, or DIV in which the left and right sides were not of the same type.")
@@ -968,7 +983,11 @@ def getVarTypeInfoRecursive(node):
             return builtInTypes[currentFuncName]
         elif (currentFuncName == INIT_FUNC_NAME):
             trythis = node.listNodes[0]
-            return types[trythis] # types[trythis]
+            #return types[trythis] # types[trythis]
+            if (trythis.isdigit() == True):
+                return types.int
+            else:
+                return types[trythis]
         return types.NO_TYPE
     if (node.type == ops.EQ_TST):
         leftSideType = getVarTypeInfoRecursive(node.left)
@@ -1137,7 +1156,7 @@ def updateAssignInfo(node, i):
     resultingHashInputArgNames = []
 
     if (varName in assignInfo_Func):
-        if ( (assignInfo_Func[varName].hasBeenSet() == True) and (varName != outputVarName) ):
+        if ( (assignInfo_Func[varName].hasBeenSet() == True) and (varName != outputVarName) and (startLineNo_IfBranch == None) ):
             sys.exit("Found multiple assignments of same variable name within same function.")
         assignInfo_Func[varName].setLineNo(i)
         (resultingVarDeps, resultingHashInputArgNames) = assignInfo_Func[varName].setAssignNode(assignInfo, node, currentFuncName, currentForLoopObj, currentIfElseBranch)

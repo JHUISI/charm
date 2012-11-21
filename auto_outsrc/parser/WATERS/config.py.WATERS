@@ -1,8 +1,21 @@
-schemeName = "BSW"
+schemeName = "LW"
+
+inputVarName = "input"
+outputVarName = "output"
+
+finalSDLSuffix = ".FINAL_SDL"
+
+transformOutputList = "transformOutputList"
 
 M = 'M'
 
+varNameLeftSideNoBlindedVars = "neverUseThisVarNameNoBlindedVars"
+varNameLeftSideBlindedVars = "neverUseThisVarNameBlindedVars"
+
 blindingLoopVar = "y"
+
+blindingFactorPrefix = "blindingFactor"
+
 blindingSuffix = "Blinded"
 setupFuncName = "setup"
 keygenBlindingExponent = "zz"
@@ -10,10 +23,18 @@ keygenBlindingExponentType = "ZR"
 keygenFuncName = "keygen"
 
 encryptFuncName = "encrypt"
+decryptFuncName = "decrypt"
+transformFuncName = "transform"
+
+mainFuncName = "main"
+verifyFuncName = "verify"
+
+masterPubVars = ["pk"]
+masterSecVars = ["msk"]
 
 # superset of variables we have used to represent public parameters in
 # our crypto schemes
-keygenPubVar = ["pk", "mpk", "gpk"]
+keygenPubVar = ["pk"]
 keygenSecVar = "sk"
 
 pySuffix = ".py"
@@ -94,7 +115,7 @@ serializeFuncName = "writeToFile"
 serializeExt = ".txt"
 serializeObjectOutFuncName = "objectOut"
 serializeKeysName = "keys"
-serializePubKey = "pk[2]"
+serializePubKey = "pk[4]"
 serializePubKeyType = "GT"
 serializePubKey_DecOut = "pk"
 

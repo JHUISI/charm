@@ -1,0 +1,160 @@
+name := hve08
+setting := asymmetric
+
+N := 2
+secparam := 80
+
+BEGIN :: types
+Message := GT
+Message2 := GT
+n := int
+END :: types
+
+BEGIN :: func:setup
+input := n
+
+g1 := random(G1)
+g2 := random(G2)
+egg := e(g1, g2)
+y := random(ZR)
+Y := egg ^ y
+
+BEGIN :: for
+for{i := 0, n}
+t#i := random(ZR)
+v#i := random(ZR)
+r#i := random(ZR)
+m#i := random(ZR)
+T#i := g1 ^ t#i
+V#i := g1 ^ v#i
+R#i := g1 ^ r#i
+M#i := g1 ^ m#i
+END :: for
+
+pk := list{g1, g2, n, Y, T, V, R, M}
+msk := list{y, t, v, r, m}
+output := list{pk, msk}
+END :: func:setup
+
+BEGIN :: func:keygen
+input := list{pk, msk, yVector}
+g1 := pk#0
+g2 := pk#1
+n := pk#2
+y := msk#0
+
+numNonDontCares := init(0)
+BEGIN :: for
+for{i := 0, n}
+BEGIN :: if
+if { yVector#i != 2 }
+numNonDontCares := numNonDontCares + 1
+END :: if
+END :: for
+
+BEGIN :: if
+if { numNonDontCares == 0 }
+sk := g2 ^ y
+output := sk
+return := output
+END :: if
+
+sumUSaisUSsoFar := init(0)
+
+endForLoop := numNonDontCares - 1
+BEGIN :: for
+for{i := 0, endForLoop}
+a#i := random(ZR)
+sumUSaisUSsoFar := sumUSaisUSsoFar + a#i
+END :: for
+
+a#numNonDontCares-1? := (y - sumUSaisUSsoFar)
+
+currentUSaUSindex := init(0)
+
+BEGIN :: for
+for{i := 0, n}
+BEGIN :: if
+if { yVector#i == 0 }
+YVector#i := g2 ^ (a#currentUSaUSindex / msk#3#i)
+LVector#i := g2 ^ (a#currentUSaUSindex / msk#4#i)
+currentUSaUSindex := currentUSaUSindex + 1
+END :: if
+BEGIN :: if
+if { yVector#i == 1 }
+YVector#i := g2 ^ (a#currentUSaUSindex / msk#1#i)
+LVector#i := g2 ^ (a#currentUSaUSindex / msk#2#i)
+currentUSaUSindex := currentUSaUSindex + 1
+END :: if
+BEGIN :: if
+if { yVector#i == 2 }
+YVector#i := init(G2)
+LVector#i := init(G2)
+END :: if
+END :: for
+
+sk2 := list{YVector, LVector}
+output := sk2
+END :: func:keygen
+
+BEGIN :: func:encrypt
+input := list{Message, xVector, pk}
+g1 := pk#0
+n := pk#2
+Y := pk#3
+
+s := random(ZR)
+
+BEGIN :: for
+for{i := 0, n}
+sUSi#i := random(ZR)
+END :: for
+
+omega := Message * (Y ^ (-s))
+C0 := g1 ^ s
+
+BEGIN :: for
+for{i := 0, n}
+BEGIN :: if
+if { xVector#i == 0 }
+XVector#i := pk#6#i ^ (s - sUSi#i)
+WVector#i := pk#7#i ^ (sUSi#i)
+END :: if
+BEGIN :: if
+if { xVector#i == 1 }
+XVector#i := pk#4#i ^ (s - sUSi#i)
+WVector#i := pk#5#i ^ (sUSi#i)
+END :: if
+END :: for
+
+CT := list{omega, C0, XVector, WVector}
+output := CT
+END :: func:encrypt
+
+BEGIN :: func:decrypt
+input := list{CT, sk}
+CT := expand{omega, C0, XVector, WVector}
+BEGIN :: if
+if { isList(sk)==0 }
+Message := omega * e(C0, sk)
+output := Message
+return := output
+END :: if
+
+sk := expand{YVector, LVector}
+
+dotProd := init(GT)
+
+n := len(YVector)
+
+BEGIN :: for
+for{i := 0, n}
+BEGIN :: if
+if { (YVector#i != init(G2)) and (LVector#i != init(G2)) }
+dotProd := dotProd * e(XVector#i, YVector#i) * e(WVector#i, LVector#i)
+END :: if
+END :: for
+
+Message2 := omega * dotProd
+output := Message2
+END :: func:decrypt

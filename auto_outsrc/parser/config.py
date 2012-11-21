@@ -35,7 +35,7 @@ masterSecVars = ["msk"]
 # superset of variables we have used to represent public parameters in
 # our crypto schemes
 keygenPubVar = ["pk"]
-keygenSecVar = "sk"
+keygenSecVar = "sk2"
 
 pySuffix = ".py"
 cppSuffix = ".cpp"

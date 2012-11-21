@@ -202,6 +202,9 @@ def writeGlobalVarDecls(outputFile, functionName):
         if (varName not in varNamesToFuncs_Assign):
             sys.exit("writeGlobalVarDecls in codegen.py:  current global variable name is not in varNamesToFuncs_Assign.")
 
+        if (varName == RETURN_KEYWORD):
+            continue
+
         funcsInWhichThisVarHasAssignment = varNamesToFuncs_Assign[varName]
         if (functionName in funcsInWhichThisVarHasAssignment):
             #outputString += "\tglobal " + varName + "\n"
@@ -239,6 +242,9 @@ def writeInitDictDefs(outputFile, functionName):
 
         #if (currentVarName not in inputOutputVars):
             #continue
+
+        if (currentVarName == RETURN_KEYWORD):
+            continue
 
         if (currentVarName.count(LIST_INDEX_SYMBOL) == 1):
             currentVarNameSplit = currentVarName.split(LIST_INDEX_SYMBOL)
@@ -619,6 +625,10 @@ def getAssignStmtAsString(variableName, node, replacementsDict, dotProdObj, lamb
         if (nodeName == INIT_FUNC_NAME):
             if ( (len(node.listNodes) == 1) and (node.listNodes[0] == strArgName) ):
                 return "\"\""
+            elif ( (len(node.listNodes) == 1) and (node.listNodes[0].isdigit() == True) ):
+                return str(node.listNodes[0])
+            elif ( (len(node.listNodes) == 1) and (node.listNodes[0] in possibleGroupTypes) ):
+                return groupObjName + "." + INIT_FUNC_NAME + "(" + node.listNodes[0] + ")"
             elif (variableName.startswith(DOT_PROD_WORD) == True):
                 return "1"
             elif (variableName.startswith(SUM_PROD_WORD) == True):
@@ -720,6 +730,10 @@ def writeAssignStmt_Python(outputFile, binNode):
 
     if (str(binNode) == RETURN_STATEMENT):
         outputFile.write("return\n")
+        return
+
+    if (str(binNode) == "return := output"):
+        outputFile.write("return output\n")
         return
 
     outputString = ""
@@ -943,6 +957,9 @@ def writeGlobalVars_Python(outputFile):
     outputString = ""
 
     for varName in globalVarNames:
+        if (varName == RETURN_KEYWORD):
+            continue
+
         outputString += varName
         outputString += " = {}\n"
 
