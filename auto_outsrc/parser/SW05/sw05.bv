@@ -1,6 +1,3 @@
-        H = lambda x: group.hash(('0', x), ZR)
-        util = SecretShare(group, False)
-
 name := sw05
 setting := asymmetric
 
@@ -33,7 +30,7 @@ BEGIN :: func:evalT
 input := list{pk, n, x}
 BEGIN :: for
 for{i := 0, n+1}
-N#i := init(i + 1)
+N#i := init(i+1)
 Nint#i := i + 1
 END :: for
 
