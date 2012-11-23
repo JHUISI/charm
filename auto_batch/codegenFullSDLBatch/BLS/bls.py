@@ -40,12 +40,11 @@ def verify(pk, M, sig, g):
     return output
 
 def membership(pk, siglist, g):
-
     #input = [pk, siglist, g]
     if ( ( (group.ismember(pk)) == (False) ) ):
         output = False
         return output
-    if ( ( (group.ismember(siglist)) == (False) ) ):
+    if ( ( (group.ismemberList(siglist)) == (False) ) ):
         output = False
         return output
     if ( ( (group.ismember(g)) == (False) ) ):
@@ -98,11 +97,10 @@ def batchverify(Mlist, pk, siglist, g, incorrectIndices):
     return output
 
 def indivverify(Mlist, pk, siglist, g, incorrectIndices):
-    if ( ( (membership(pk, siglist, g)) == (False) ) ):
-        output = False
-        return output
-    
     for z in range(0, N):
+        assert group.ismember(pk), "failed membership test"
+        assert group.ismember(g), "failed membership test"
+        assert group.ismember(siglist[z]), "failed membership test"
         if verify(pk, Mlist[z], siglist[z], g) == False:
             incorrectIndices.append(z)
     

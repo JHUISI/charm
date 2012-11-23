@@ -4,6 +4,7 @@ import bls
 
 import sys, random, string, time
 
+CURVE = 'BN256' # 'MNT160'
 group = None
 prefixName = None
 sigNumKey = 'Signature_Number'
@@ -139,7 +140,7 @@ def generate_signatures_main(argv):
         sys.exit("Usage:  python " + argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
     
     global group, prefixName
-    group = PairingGroup('BN256')
+    group = PairingGroup(CURVE) #'BN256')
     bls.group = group
     #setup parameters
     numValidMessages = int(sys.argv[1])
@@ -176,7 +177,7 @@ def run_batch_verification(argv, same_signer=True):
         sys.exit("Usage:  python " + argv[0] + "\n\t[dictionary with valid messages/signatures]\n\t[name of output file for batch results]\n\t[name of output file for ind. results]")
     
     validDictArg = open(sys.argv[1], 'rb').read()
-    groupParamArg = PairingGroup('BN256')
+    groupParamArg = PairingGroup(CURVE) #'BN256')
     bls.group = groupParamArg
     batchResultsFile = sys.argv[2]
     indResultsFile = sys.argv[3]
@@ -206,7 +207,8 @@ def run_batch_verification(argv, same_signer=True):
             loadDataFromDictInMemory(validDict, 0, (cycle+1), sigsDict, 0)
             verifyFuncArgs = list(sigsDict[0].keys())
             #print("verifyFuncArgs: ", verifyFuncArgs)
-            N = len(sigsDict.keys())
+            ##N = len(sigsDict.keys())
+            N = cycle + 1
             bls.N = N
             # 4. public values/generator
             g = sigsDict[0]['pk'][bodyKey]['g']
