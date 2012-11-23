@@ -4,7 +4,8 @@ import bls
 
 import sys, random, string, time
 
-CURVE = 'BN256' # 'MNT160'
+#CURVE = 'BN256'
+CURVE = 'MNT160'
 group = None
 prefixName = None
 sigNumKey = 'Signature_Number'
@@ -17,7 +18,7 @@ lenRepeatSuffix = len(repeatSuffix)
 trials = 1
 time_in_ms = 1000
 NUM_PROGRAM_ITERATIONS = 10
-NUM_CYCLES = 10
+NUM_CYCLES = 100
 
 def genNewMessage(messageSize):
     message = ""
