@@ -1,7 +1,7 @@
 
 /* auto-generated configuration */
-#define BUILD_MNT_CURVE  0
-#define BUILD_BN_CURVE	 1
+//#define BUILD_MNT_CURVE  0
+//#define BUILD_BN_CURVE   0
 #define PAD_SIZE		 2 // 2 bytes for zero padding on deserialization
 
 #if BUILD_MNT_CURVE == 1

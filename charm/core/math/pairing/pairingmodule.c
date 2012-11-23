@@ -66,6 +66,7 @@ int div_rule(GroupType lhs, GroupType rhs)
 int pair_rule(GroupType lhs, GroupType rhs)
 {
 	if(lhs == G1 && rhs == G2) return TRUE;
+	else if(lhs == G2 && rhs == G1) return TRUE;
 	return FALSE; /* Fall all other cases: only for MNT case */
 }
 
@@ -1214,7 +1215,10 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 			debug_e("RHS: '%B'\n", rhs->e);
 			//START_CLOCK(dBench);
 			newObject = createNewElement(GT, lhs->pairing);
-			pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing->pair_obj);
+			if(lhs->element_type == G1)
+				pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing->pair_obj);
+			else if(lhs->element_type == G2)
+				pairing_apply(newObject->e, rhs->e, lhs->e, rhs->pairing->pair_obj);
 			//STOP_CLOCK(dBench);
 			UPDATE_BENCHMARK(PAIRINGS, dBench);
 			return (PyObject *) newObject;

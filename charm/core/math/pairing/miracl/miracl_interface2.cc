@@ -362,7 +362,7 @@ void _element_mul(Group_t type, element_t *c, const element_t *a, const element_
 		else {
 			*z = modmult(*x, *y, *o1);
 		}
-		cout << "Result => " << *z << endl;
+//		cout << "Result => " << *z << endl;
 	}
 	else if(type == G1_t) {
 		G1 *x = (G1 *) a;  G1 *y = (G1 *) b; G1 *z = (G1 *) c;

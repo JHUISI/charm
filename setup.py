@@ -111,7 +111,15 @@ if opt.get('DISABLE_BENCHMARK') == 'yes':
 else:
    _macros = [('BENCHMARK_ENABLED', '1')]
    _undef_macro = None
-    
+
+if opt.get('USE_MIRACL') == 'yes' and opt.get('MIRACL_MNT') == 'yes': 
+    mnt_opt = [('BUILD_MNT_CURVE', '1'), ('BUILD_BN_CURVE', '0')]
+    if _macros: _macros.extend( mnt_opt )
+    else: _macros = mnt_opt
+elif opt.get('USE_MIRACL') == 'yes' and opt.get('MIRACL_BN') == 'yes':
+    bn_opt = [('BUILD_MNT_CURVE', '0'), ('BUILD_BN_CURVE', '1')]
+    if _macros: _macros.extend( bn_opt )
+    else: _macros = bn_opt    
 
 _charm_version = opt.get('VERSION')
 lib_config_file = 'charm/config.py'
@@ -152,7 +160,7 @@ if opt.get('PAIR_MOD') == 'yes':
                             sources = [math_path + 'pairing/miracl/pairingmodule2.c',
                                         utils_path + 'sha1.c', 
                                         math_path + 'pairing/miracl/miracl_interface2.cc'],
-                            libraries=['gmp','stdc++'],
+                            libraries=['gmp','stdc++'], define_macros=_macros, undef_macros=_undef_macro,
                             extra_objects=[math_path+'pairing/miracl/miracl.a'], extra_compile_args=None)
 
     _ext_modules.append(pairing_module)
