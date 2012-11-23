@@ -10,7 +10,8 @@
 
 # 4. Label ciphertext elements and identify all the variables that can be moved to G1 vs. G2: 
 #     - must verify that we don't compromise on the security
-from SDLParser import *
+import sdlpath
+from sdlparser.SDLParser import *
 from outsrctechniques import SubstituteVar, SubstitutePairings
 
 assignInfo = None
@@ -44,6 +45,7 @@ def retrieveGenList():
     
     setupFuncName = "setup"
     setup = setupFuncName
+    varTypes = getVarTypes()
     (stmtS, typesS, depList, depListNoExp, infList, infListNoExp) = getFuncStmts( setup )
 #    (stmtS, typesS, depList, depListNoExp, infList, infListNoExp) = getFuncStmts( setup ) 
     generators = []
@@ -78,9 +80,12 @@ def retrieveGenList():
     print("pair vars RHS:", pair_vars_G2) 
     print("list of gens :", generators)
     info = {}
-    info[ 'G1' ] = (pair_vars_G1, assignTraceback(generators, pair_vars_G1))
-#    info[ 'G2' ] = (pair_vars_G2, assignTraceback(generators, pair_vars_G2))
-#    info['generators'] = generators 
+    info[ 'G1' ] = (pair_vars_G1, assignTraceback(generators, varTypes, pair_vars_G1))
+    info[ 'G2' ] = (pair_vars_G2, assignTraceback(generators, varTypes, pair_vars_G2))
+    info['generators'] = generators 
+
+    print("info => G1 : ", info['G1'])
+    print("info => G2 : ", info['G2'])
 
     # TODO: 
 #    print("<===== Derive Rules =====>")
@@ -89,28 +94,39 @@ def retrieveGenList():
 #    print("<===== Determine Assignment =====>")
 #    info['genMapG1'], info['genMapG2'] = determineTypeAssignments(rules)
 #    print("<===== Determine Assignment =====>\n")
-#
-#    print("<===== Determine Splits =====>")    
-#    replaceGenerators = deriveSetupGenerators(rules)
-#    print("<===== Determine Splits =====>\n")
-#    
+
+    print("<===== Determine Asymmetric Generators =====>")
+    (generatorLines, generatorMapG1, generatorMapG2) = Step1_DeriveSetupGenerators(generators)
+    print("Generators in G1: ", generatorMapG1)
+    print("Generators in G2: ", generatorMapG2)
+    print("<===== Determine Asymmetric Generators =====>\n")
+    
+    print("<===== Generate XOR clauses =====>")  
+    # let the user's preference for fixing the keys or ciphertext guide this portion of the algorithm.
+    # info[ 'G1' ] : represents (varKeyList, depVarMap). 
+#    for i in pair_vars_G1:
+#        xor = BinaryNode(ops.XOR)
+#        xor.left = 
+#        xor.right = 
+    print("<===== Generate XOR clauses =====>")
+    
 #    info['rules'] = rules
 #    info['setupGenerators'] = replaceGenerators 
 #    print("<===== Transform Setup =====>")
 #    transformSetup(stmtS, info)    
 #    print("<===== Transform Setup =====>\n")    
-    
+#    
 #    print("info on G1 :=>", info['genMapG1'].keys())
 #    print("info on G2 :=>", info['genMapG2'].keys())    
 
-def assignTraceback(generators, listVars):
+def assignTraceback(generators, varTypes, listVars):
     varProp = []
     data = {}
     # get variable names from all pairing
     for i in listVars:
         #print("var name := ", i)
         var = i
-        buildMap(generators, varProp, var)
+        buildMap(generators, varTypes, varProp, var)
         data[i] = set(varProp)
         varProp = []
     
@@ -120,7 +136,7 @@ def assignTraceback(generators, listVars):
     return data
 
         
-def buildMap(generators, varList, var):
+def buildMap(generators, varTypes, varList, var):
     global assignInfo
     if (not set(var).issubset(generators)):
         print("var keys: ", var)
@@ -139,7 +155,7 @@ def buildMap(generators, varList, var):
                 node = BinaryNode(ops.ATTR)
                 node.setAttribute(i)
                 print("getVarNameFromListIndices req node: ", node)
-                (funcName , newVarName) = getVarNameFromListIndices(assignInfo, node)#, True)
+                (funcName , newVarName) = getVarNameFromListIndices(assignInfo, varTypes, node, True)
                 print("funcName: ", funcName)
                 print("newVarName: ", newVarName)
                 if newVarName != None: 
@@ -161,13 +177,13 @@ def buildMap(generators, varList, var):
         varsToCheck = list(l)
         for i in varsToCheck:
             lenBefore = len(varList)
-            buildMap(generators, varList, i)
+            buildMap(generators, varTypes, varList, i)
             lenAfter  = len(varList)
             if lenBefore == lenAfter:
                 node = BinaryNode(ops.ATTR)
                 node.setAttribute(i)
                 print("Node :=>", node)
-                (funcName, string) = getVarNameFromListIndices(assignInfo, node)##, True)
+                (funcName, string) = getVarNameFromListIndices(assignInfo, varTypes, node, True)
                 if string != None: varList.append(string)
 
             
@@ -195,19 +211,53 @@ def deriveRules(info, generators):
     print("Rules: ", uniqueRules)
     return uniqueRules
 
-def determineTypeAssignments(rules):
-    listG1 = {}
-    listG2 = {}
-    for l, r in rules:
-        # mapping
-        listG1[ l ] = str(l + "_G1")
-        listG2[ r ] = str(r + "_G2")
-        
-    print("Left changes: ", listG1)
-    print("Right changes: ", listG2)
-    return (listG1, listG2)
+#def determineTypeAssignments(rules):
+#    listG1 = {}
+#    listG2 = {}
+#    for l, r in rules:
+#        # mapping
+#        listG1[ l ] = str(l + "_G1")
+#        listG2[ r ] = str(r + "_G2")
+#        
+#    print("Left changes: ", listG1)
+#    print("Right changes: ", listG2)
+#    return (listG1, listG2)
 
-def deriveSetupGenerators(rules):
+# TODO: this needs to be redone
+def Step1_DeriveSetupGenerators(generators):
+    generatorLines = []
+    generatorMapG1 = {}
+    generatorMapG2 = {}
+
+    if len(generators) == 0:
+        sys.exit("The scheme selects no generators in setup? Please try again.\n")
+    
+    G1Prefix = "_G1"
+    G2Prefix = "_G2"
+    base_generator = generators[0]
+    # split the first generator
+    base_generatorG1 = base_generator + G1Prefix
+    base_generatorG2 = base_generator + G2Prefix
+    generatorLines.append(base_generatorG1 + " := random(G1)")
+    generatorLines.append(base_generatorG2 + " := random(G2)")
+    generatorMapG1[ base_generator ] = base_generatorG1
+    generatorMapG2[ base_generator ] = base_generatorG2
+    
+    for j in range(1, len(generators)):
+        i = generators[j]
+        generatorLines.append(i + " := random(ZR)")
+        generatorLines.append(i + G1Prefix + " := " + base_generatorG1 + " ^ " + i)
+        generatorLines.append(i + G2Prefix + " := " + base_generatorG2 + " ^ " + i)
+        generatorMapG1[ i ] = i + G1Prefix
+        generatorMapG2[ i ] = i + G2Prefix
+    
+    print("....New Generators...")
+    for line in generatorLines:
+        print(line)
+    print("....New Generators...")
+    return (generatorLines, generatorMapG1, generatorMapG2)
+
+def deriveSetupGeneratorsOLD(rules):
     # there should be 
     setupLines = []
     generatorSet = False
@@ -396,7 +446,7 @@ def transformSetup(setupStmts, info):
                 
         print()
         
-        print(".....NEW SETUP.....")
+        #print(".....NEW SETUP.....")
         for i in setupLines:
             print(i)
 

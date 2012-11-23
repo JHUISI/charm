@@ -106,7 +106,7 @@ input := list{ct, sk}
 sk := expand{id, D, K, tag_k}
 ct := expand{C, E1, E2, tag_c}
 
-tag := (1 / (tag_c - tag_k))
+tag := ((tag_c - tag_k)^-1)
 A1 := (e(C#1, D#1) * (e(C#2, D#2) * (e(C#3, D#3) * (e(C#4, D#4) * e(C#5, D#5)))))
 A2 := (e(C#6, D#6) * e(C#7, D#7))
 A3 := A1 / A2
