@@ -633,6 +633,8 @@ def getAssignStmtAsString(variableName, node, replacementsDict, dotProdObj, lamb
                 return "1"
             elif (variableName.startswith(SUM_PROD_WORD) == True):
                 return "0"
+            elif (len(node.listNodes) == 1):
+                return "(" + str(node.listNodes[0]) + ")"
             else:
                 sys.exit("getAssignStmtAsString in codegen.py:  received node of name " + variableName + " in initialization call, but parameter passed in initialization call is unrecognized.")
 

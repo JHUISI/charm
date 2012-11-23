@@ -1156,7 +1156,7 @@ def updateAssignInfo(node, i):
     resultingHashInputArgNames = []
 
     if (varName in assignInfo_Func):
-        if ( (assignInfo_Func[varName].hasBeenSet() == True) and (varName != outputVarName) and (startLineNo_IfBranch == None) ):
+        if ( (assignInfo_Func[varName].hasBeenSet() == True) and (varName != outputVarName) and (startLineNo_IfBranch == None) and (startLineNo_ForLoop == None) and (startLineNo_ForLoopInner == None) ):
             sys.exit("Found multiple assignments of same variable name within same function.")
         assignInfo_Func[varName].setLineNo(i)
         (resultingVarDeps, resultingHashInputArgNames) = assignInfo_Func[varName].setAssignNode(assignInfo, node, currentFuncName, currentForLoopObj, currentIfElseBranch)
@@ -1270,18 +1270,25 @@ def updateForLoops(node, lineNo):
     if (startLineNo_ForLoop == None):
         sys.exit("updateForLoops function entered in SDLParser.py when startLineNo_ForLoop is set to None.")
 
-    global forLoops
+    global forLoops, varTypes
 
     retForLoopStruct = ForLoop()
     retForLoopStruct.updateForLoopStruct(node, startLineNo_ForLoop, currentFuncName)
 
     forLoops[currentFuncName].append(retForLoopStruct)
 
+    loopVarName = str(node.left.left)
+    if (loopVarName not in varTypes[currentFuncName]):
+        varTypeObj = VarType()
+        varTypeObj.setType(types.int)
+        varTypeObj.setLineNo(lineNo)
+        varTypes[currentFuncName][loopVarName] = varTypeObj
+
 def updateForLoopsInner(node, lineNo):
     if (startLineNo_ForLoopInner == None):
         sys.exit("updateForLoopsInner function entered in SDLParser.py when startLineNo_ForLoopInner is set to None.")
 
-    global forLoops, forLoopsInner
+    global forLoops, forLoopsInner, varTypes
 
     retForLoopInnerStruct = ForLoopInner()
     retForLoopInnerStruct.updateForLoopInnerStruct(node, startLineNo_ForLoopInner, currentFuncName)
@@ -1291,6 +1298,13 @@ def updateForLoopsInner(node, lineNo):
     
     # TODO: make sure we're really inside a for loop
     forLoops[currentFuncName][lenForLoops - 1].setInnerLoop(retForLoopInnerStruct)
+
+    loopVarName = str(node.left.left)
+    if (loopVarName not in varTypes[currentFuncName]):
+        varTypeObj = VarType()
+        varTypeObj.setType(types.int)
+        varTypeObj.setLineNo(lineNo)
+        varTypes[currentFuncName][loopVarName] = varTypeObj
 
 def updateIfElseBranches(node, lineNo):
     if (startLineNo_IfBranch == None):
