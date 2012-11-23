@@ -761,11 +761,10 @@ def checkPairingInputTypes_Symmetric(leftType, rightType):
         sys.exit("Problem with the right side of one of the pairings in the symmetric setting.")
 
 def checkPairingInputTypes_Asymmetric(leftType, rightType):
-    if (leftType not in [types.G1, types.listG1]):
-        sys.exit("One of the pairings in the asymmetric setting does not have a left side of type " + str(types.G1))
-
-    if (rightType not in [types.G2, types.listG2]):
-        sys.exit("One of the pairings in the asymmetric setting does not have a right side of type " + str(types.G2))
+    if(leftType in [types.G1, types.listG1] and rightType in [types.G2, types.listG2]): return
+    if(leftType in [types.G2, types.listG2] and rightType in [types.G1, types.listG1]): return
+    else:
+        sys.exit("Asymmetric setting requires that left side and right side not be the same type or a type in GT.")
 
 def checkPairingInputTypes(node):
     if (node.type != ops.PAIR):
@@ -777,7 +776,7 @@ def checkPairingInputTypes(node):
     if (algebraicSetting == SYMMETRIC_SETTING):
         checkPairingInputTypes_Symmetric(leftType, rightType)
     elif (algebraicSetting == ASYMMETRIC_SETTING):
-        if leftType != types.G1 or rightType != types.G2:
+        if leftType == types.NO_TYPE or rightType == types.NO_TYPE:
             print("node.left: ", node.left, leftType)
             print("node.right: ", node.right, rightType)
         checkPairingInputTypes_Asymmetric(leftType, rightType)
