@@ -1,0 +1,11 @@
+--- bn_pair.cpp	2012-11-23 16:29:13.000000000 -0500
++++ bn_pair_fix.cpp	2012-11-23 16:36:37.000000000 -0500
+@@ -786,7 +786,7 @@
+ 
+ 	delete Beta;
+ 	delete frob;
+-	mirexit();
++	//mirexit();
+ }
+ 
+ // GLV method

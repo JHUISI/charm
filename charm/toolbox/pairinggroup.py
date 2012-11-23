@@ -31,21 +31,36 @@ class PairingGroup():
     def paramgen(self, qbits, rbits):
         return None
 
+#        if type(obj) in [set, tuple, list]:
+#           for i in obj:
+#               if type(i) == pairing:
+#                  if ismember(self.Pairing, i) == False: return False 
+#           return True
+#        elif type(obj) == dict:
+#           for i in obj.keys():
+#               if type(i) == pairing:
+#                  if ismember(self.Pairing, obj[i]) == False: return False
+#           return True
+#        else:
+#           if type(obj) == pairing:
+#               return ismember(self.Pairing, obj)
+#           return None # ignore non-pairing types
+
     def ismember(self, obj):
-        if type(obj) in [set, tuple, list]:
-           for i in obj:
-               if type(i) == pairing:
-                  if ismember(self.Pairing, i) == False: return False 
-           return True
-        elif type(obj) == dict:
-           for i in obj.keys():
-               if type(i) == pairing:
-                  if ismember(self.Pairing, obj[i]) == False: return False
-           return True
-        else:
-           if type(obj) == pairing:
-               return ismember(self.Pairing, obj)
-           return None # ignore non-pairing types
+#        assert type(obj) == pairing, "not a pairing object."
+        return ismember(self.Pairing, obj)
+
+    def ismemberList(self, obj):
+        for i in range(len(obj)):
+#            assert type(obj[i]) == pairing, "not a pairing object."
+            if ismember(self.Pairing, obj[i]) == False: return False
+        return True
+
+    def ismemberDict(self, obj):
+        for i in obj.keys():
+#            assert type(obj[i]) == pairing, "not a pairing object."
+            if ismember(self.Pairing, obj[i]) == False: return False
+        return True
 
     def groupSetting(self):
         return 'pairing'

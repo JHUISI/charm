@@ -112,14 +112,30 @@ else:
    _macros = [('BENCHMARK_ENABLED', '1')]
    _undef_macro = None
 
-if opt.get('USE_MIRACL') == 'yes' and opt.get('MIRACL_MNT') == 'yes': 
+# base module config
+if opt.get('USE_PBC') == 'yes':
+   pass
+elif opt.get('USE_RELIC') == 'yes':
+   relic_lib = "/usr/local/lib/librelic_s.a"
+   relic_inc = "/usr/local/include/relic"
+elif opt.get('USE_MIRACL') == 'yes' and opt.get('MIRACL_MNT') == 'yes': 
     mnt_opt = [('BUILD_MNT_CURVE', '1'), ('BUILD_BN_CURVE', '0')]
-    if _macros: _macros.extend( mnt_opt )
-    else: _macros = mnt_opt
+    if _macros: 
+       _macros.extend( mnt_opt )
+    else: 
+      _macros = mnt_opt
+    miracl_lib = "/usr/local/lib/miracl-mnt.a"
+    miracl_inc = "/usr/local/include/miracl"
 elif opt.get('USE_MIRACL') == 'yes' and opt.get('MIRACL_BN') == 'yes':
     bn_opt = [('BUILD_MNT_CURVE', '0'), ('BUILD_BN_CURVE', '1')]
-    if _macros: _macros.extend( bn_opt )
-    else: _macros = bn_opt    
+    if _macros: 
+       _macros.extend( bn_opt )
+    else: 
+       _macros = bn_opt 
+    miracl_lib = "/usr/local/lib/miracl-bn.a"
+    miracl_inc = "/usr/local/include/miracl"
+else:
+    sys.exit("Need to select which module to build for pairing.")
 
 _charm_version = opt.get('VERSION')
 lib_config_file = 'charm/config.py'
@@ -134,34 +150,36 @@ if opt.get('PAIR_MOD') == 'yes':
                                         utils_path+'sha1.c',
                                         utils_path+'base64.c'],
                             libraries=['pbc', 'gmp'], define_macros=_macros, undef_macros=_undef_macro)
+
     elif opt.get('USE_RELIC') == 'yes':
-        # TODO: check if RELIC lib has been built. if not, bail
-        replaceString(lib_config_file, "pairing_lib=libs ", "pairing_lib=libs.relic")
-        if not os.path.exists(math_path + 'pairing/relic/lib/librelic_s.a'): 
-            print("Cannot find RELIC lib. Please run build script in <charm>/core/math/pairing/relic/")
+        # check if RELIC lib has been built. if not, bail
+        if not os.path.exists(relic_lib): 
+            print("Cannot find RELIC lib. Follow instructions in build script placed in <charm>/core/math/pairing/relic/ dir.")
             exit(1)
+        replaceString(lib_config_file, "pairing_lib=libs ", "pairing_lib=libs.relic")
         pairing_module = Extension(math_prefix + '.pairing',
                             include_dirs = [utils_path,
-                                            benchmark_path,
-                                            math_path + 'pairing/relic/include', 
-                                            math_path + 'pairing/relic-src/include'],
+                                            benchmark_path, relic_inc],
                             sources = [math_path + 'pairing/relic/pairingmodule3.c',
                                         math_path + 'pairing/relic/relic_interface.c',
                                         utils_path + 'base64.c'],
                             libraries=None, define_macros=_macros, undef_macros=_undef_macro,
-                            extra_objects=[math_path+'pairing/relic/lib/librelic_s.a'], extra_compile_args=None)
-    else:
+                            extra_objects=[relic_lib], extra_compile_args=None)
+
+    elif opt.get('USE_MIRACL') == 'yes':
         # build MIRACL based pairing module - note that this is for experimental use only
+        if not os.path.exists(miracl_lib): 
+            print("Cannot find MIRACL lib. Follow instructions in build script placed in <charm>/core/math/pairing/miracl/ dir.")
+            exit(1)
         replaceString(lib_config_file, "pairing_lib=libs ", "pairing_lib=libs.miracl")
         pairing_module = Extension(math_prefix + '.pairing',
                             include_dirs = [utils_path,
-                                            benchmark_path,
-                                            math_path + 'pairing/miracl/'], 
+                                            benchmark_path, miracl_inc],
                             sources = [math_path + 'pairing/miracl/pairingmodule2.c',
                                         utils_path + 'sha1.c', 
                                         math_path + 'pairing/miracl/miracl_interface2.cc'],
                             libraries=['gmp','stdc++'], define_macros=_macros, undef_macros=_undef_macro,
-                            extra_objects=[math_path+'pairing/miracl/miracl.a'], extra_compile_args=None)
+                            extra_objects=[miracl_lib], extra_compile_args=None)
 
     _ext_modules.append(pairing_module)
    

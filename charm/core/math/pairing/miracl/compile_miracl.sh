@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Note: this script might require super-user privileges to install
+# binaries
+
 # untar MIRACL source into this directory, then run this script 
 set -x
 #[ -e miracl.zip ] && unzip -j -aa -L miracl.zip
@@ -11,12 +14,14 @@ if [ $curve = "mnt" ]; then
    curve=mnt
    echo "Building MNT curve in miracl."
    patch -N < mnt_pair.patch
+   rm -f *.rej
 fi
 
 if [ $curve = "bn" ]; then
    curve=bn
    echo "Building BN curve in miracl."
-   #patch -N < bn_pair.patch
+   patch -N < bn_pair.patch
+   rm -f *.rej
 fi
 
 if [ -e miracl-$curve.a ]; then
@@ -125,7 +130,11 @@ if [ $curve = "kss" ]; then
    cp miracl.a miracl-kss.a
    ar r miracl-kss.a big.o zzn.o zzn3.o zzn6.o zzn18.o ecn.o ecn3.o ec2.o flash.o crt.o kss_pair.o
 fi
-ln -sf miracl-$curve.a miracl.a
+#ln -sf miracl-$curve.a miracl.a
+install -d /usr/local/include/miracl
+install -d /usr/local/lib
+install -m 0644 miracl-$curve.a /usr/local/lib
+install -m 0644 *.h /usr/local/include/miracl
 
-rm mr*.o
+rm -f mr*.o *.a
 set +x
