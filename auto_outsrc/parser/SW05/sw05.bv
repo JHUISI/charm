@@ -5,6 +5,9 @@ N := 2
 secparam := 80
 
 BEGIN :: types
+evalTVar := G2
+M := GT
+S := list
 END :: types
 
 BEGIN :: func:setup
@@ -28,6 +31,7 @@ END :: func:setup
 
 BEGIN :: func:evalT
 input := list{pk, n, x}
+t := pk#3
 BEGIN :: for
 for{i := 0, n+1}
 N#i := init(i+1)
@@ -35,13 +39,14 @@ Nint#i := i + 1
 END :: for
 
 coeffs := recoverCoefficients(N)
-prodResult := init(1)
+prodResult := init(G2)
 lenNint := len(Nint)
 BEGIN :: for
 for{i := 0, lenNint}
 loopVar := Nint#i
-j = init(i)
-prodResult := prodResult * (pk#3#i-1? ^ coeffs[j])
+j := init(i)
+iMinusOne := i-1
+prodResult := prodResult * (t#iMinusOne ^ coeffs#j)
 END :: for
 
 T := (pk#2 ^ (x * n)) * prodResult
@@ -60,7 +65,7 @@ END :: for
 r := random(ZR)
 
 BEGIN :: for
-for {i := 0, dOver}
+for{i := 0, dOver}
 q#i := random(ZR)
 END :: for
 
@@ -69,20 +74,22 @@ shares := genShares(mk#0, dOver, n, q, wHash)
 
 wHashLen := len(wHash)
 BEGIN :: for
-for {i := 0, wHashLen}
+for{i := 0, wHashLen}
 loopVar := wHash#i
-D#loopVar := (pk#2 ^ shares#i#1) * (evalT(pk, n, loopVar) ^ r)
+evalTVar := evalT(pk, n, loopVar)
+D#loopVar := (pk#2 ^ shares#i#1) * (evalTVar ^ r)
 d#loopVar := pk#0 ^ r
 END :: for
 
-output := list{wHash, D, d}
+sk := list{wHash, D, d}
+output := sk
 END :: func:extract
 
 BEGIN :: func:encrypt
 input := list{pk, wPrime, M, n}
 wPrimeLen := len(wPrime)
 BEGIN :: for
-for {i := 0, wPrimeLen}
+for{i := 0, wPrimeLen}
 loopVar := wPrime#i
 wPrimeHash#i := H(loopVar, ZR)
 END :: for
@@ -94,24 +101,36 @@ Eprimeprime := pk#0 ^ s
 
 wPrimeHashLen := len(wPrimeHash)
 BEGIN :: for
-for {i := 0, wPrimeHashLen}
+for{i := 0, wPrimeHashLen}
 loopVar := wPrimeHash#i
-E#i := evalT(pk, n, loopVar) ^ s
+evalTVar := evalT(pk, n, loopVar)
+E#i := evalTVar ^ s
 END :: for
         
-output := list{wPrimeHash, Eprime, Eprimeprime, E}
+CT := list{wPrimeHash, Eprime, Eprimeprime, E}
+output := CT
 END :: func:encrypt
 
 BEGIN :: func:decrypt
 input := list{pk, sk, CT, w, d}
+
+wPrimeHash := CT#0
+Eprime := CT#1
+Eprimeprime := CT#2
+E := CT#3
+
+wHash := sk#0
+D := sk#1
+d := sk#2
+
 S := intersection_subset(w, CT#0, d)
 coeffs := recoverCoefficients(S)
-prod := init(1)
+prod := init(GT)
 SLen := len(S)
 BEGIN :: for
-for {i := 0, SLen}
+for{i := 0, SLen}
 loopVar := S#i
-prod := prod * (e(sk#2#loopVar, CT#3#loopVar) / e(CT#2, sk#1#loopVar)) ^ coeffs#loopVar
+prod := prod * (e(d#loopVar, E#loopVar) / e(CT#2, D#loopVar)) ^ coeffs#loopVar
 END :: for
 
 M := CT#1 * prod

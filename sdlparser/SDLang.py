@@ -76,7 +76,7 @@ debug = levels.none
 def getNextListName(assignInfo, origListName, index):
     (listFuncNameInAssignInfo, listEntryInAssignInfo) = getVarNameEntryFromAssignInfo(assignInfo, origListName)
     if ( (listFuncNameInAssignInfo == None) or (listEntryInAssignInfo == None) ):
-        sys.exit("Problem with return values from getVarNameEntryFromAssignInfo in getNextListName in SDLParser.py.")
+        sys.exit("Problem with return values from getVarNameEntryFromAssignInfo in getNextListName in SDLang.py.")
     if ( (listEntryInAssignInfo.getIsList() == False) or (len(listEntryInAssignInfo.getListNodesList()) == 0) ):
         #sys.exit("Problem with list obtained from assignInfo in getNextListName in SDLParser.")
         return (None, None)
