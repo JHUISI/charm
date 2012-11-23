@@ -44,9 +44,9 @@ lenNint := len(Nint)
 BEGIN :: for
 for{i := 0, lenNint}
 loopVar := Nint#i
-j := init(i)
-iMinusOne := i-1
-prodResult := prodResult * (t#iMinusOne ^ coeffs#j)
+j := init(loopVar)
+loopVarMinusOne := loopVar - 1
+prodResult := prodResult * (t#loopVarMinusOne ^ coeffs#j)
 END :: for
 
 T := (pk#2 ^ (x * n)) * prodResult

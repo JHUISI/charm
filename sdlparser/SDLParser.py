@@ -67,6 +67,9 @@ builtInTypes["prune"] = types.list
 builtInTypes["getCoefficients"] = types.symmap
 builtInTypes["integer"] = types.int
 builtInTypes["isList"] = types.int
+builtInTypes["recoverCoefficients"] = types.symmap
+builtInTypes["genShares"] = types.list
+builtInTypes["intersection_subset"] = types.list
 
 def createNode(s, loc, toks):
     print('createNode => ', toks)

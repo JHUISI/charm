@@ -8,7 +8,7 @@ from charm.engine.util import objectToBytes, bytesToObject
 from builtInFuncs import *
 
 
-from charm.toolbox.pairinggroup import *
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.core.engine.util import *
 from charm.core.math.integer import randomBits
 
@@ -67,9 +67,9 @@ def evalT(pk, n, x):
     lenNint = len(Nint)
     for i in range(0, lenNint):
         loopVar = Nint[i]
-        j = (i)
-        iMinusOne = i-1
-        prodResult = (prodResult * (t[iMinusOne] ** coeffs[j]))
+        j = (loopVar)
+        loopVarMinusOne = (loopVar - 1)
+        prodResult = (prodResult * (t[loopVarMinusOne] ** coeffs[j]))
     T = ((pk[2] ** (x * n)) * prodResult)
     output = T
     return output

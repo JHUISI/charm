@@ -242,8 +242,8 @@ def main():
     msg = group.random(GT)
     cipher_text = ibe.encrypt(master_public_key, public_identity, msg, max_attributes)
     decrypted_msg = ibe.decrypt(master_public_key, secret_key, cipher_text, pub_ID_hashed, required_overlap)
-    #print("msg:  ", msg)
-    #print("decrypted_msg:  ", decrypted_msg)
+    print("msg:  ", msg)
+    print("decrypted_msg:  ", decrypted_msg)
     assert msg == decrypted_msg, "failed decryption!"
     print("Successful Decryption!")
 

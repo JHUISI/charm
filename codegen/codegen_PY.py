@@ -63,7 +63,8 @@ def addImportLines(userFuncsFileArg):
     pythonImportLines += "\n\n"
 
     setupFile.write(pythonImportLines)
-    setupFile.write("from charm.toolbox.pairinggroup import *\n")
+    #setupFile.write("from charm.toolbox.pairinggroup import *\n")
+    setupFile.write("from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair\n")
     setupFile.write("from charm.core.engine.util import *\n")
     setupFile.write("from charm.core.math.integer import randomBits\n\n")
 
@@ -649,7 +650,7 @@ def getAssignStmtAsString(variableName, node, replacementsDict, dotProdObj, lamb
             funcOutputString += listNodeAsString + ", "
         funcOutputString = funcOutputString[0:(len(funcOutputString) - len(", "))]
         funcOutputString += ")"
-        if ( (nodeName not in pythonDefinedFuncs) and (nodeName not in userFuncsList) and (nodeName not in builtInTypes) ):
+        if ( (nodeName not in pythonDefinedFuncs) and (nodeName not in assignInfo) and (nodeName not in userFuncsList) and (nodeName not in builtInTypes) ):
             userFuncsList.append(nodeName)
             funcOutputForUser = funcOutputString
             funcOutputForUser = funcOutputForUser.replace("[", "")
