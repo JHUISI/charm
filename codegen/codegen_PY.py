@@ -57,10 +57,10 @@ def addImportLines(userFuncsFileArg):
     setupFile.write(pythonImportLines)
 
     pythonImportLines = ""
-    for charmImportFunc in charmImportFuncs:
-        pythonImportLines += charmImportFunc + "\n"
+    #for charmImportFunc in charmImportFuncs:
+        #pythonImportLines += charmImportFunc + "\n"
 
-    pythonImportLines += "\n\n"
+    #pythonImportLines += "\n\n"
 
     setupFile.write(pythonImportLines)
     #setupFile.write("from charm.toolbox.pairinggroup import *\n")

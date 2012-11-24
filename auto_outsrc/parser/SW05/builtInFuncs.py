@@ -1,8 +1,9 @@
 import hashlib, sys
 
-from charm.toolbox.pairinggroup import *
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 
 from charm.toolbox.secretutil import SecretUtil
+from charm.toolbox.secretshare import SecretShare
 from charm.core.math import pairing
 from charm.toolbox.iterate import dotprod2
 from charm.core.math.pairing import hashPair as DeriveKey
@@ -14,6 +15,7 @@ from charm.toolbox.bitstring import Bytes
 
 groupObjBuiltInFuncs = None
 utilBuiltInFuncs = None
+shareBuiltInFuncs = None
 
 listIndexNoOfN_StrToId = 9
 listIndexNoOfl_StrToId = 10
@@ -76,15 +78,15 @@ def getCoefficients(policy):
 
 def recoverCoefficients(inputList):
 	getUserGlobals()
-	return utilBuiltInFuncs.recoverCoefficients(inputList)
+	return shareBuiltInFuncs.recoverCoefficients(inputList)
 
 def genShares(mk0, dOver, n, q, wHash):
 	getUserGlobals()
-	return utilBuiltInFuncs.genShares(mk0, dOver, n, q, wHash)
+	return shareBuiltInFuncs.genShares(mk0, dOver, n, q, wHash)
 
 def intersection_subset(w, CT0, d):
 	getUserGlobals()
-	return utilBuiltInFuncs.intersection_subset(w, CT0, d)
+	return shareBuiltInFuncs.intersection_subset(w, CT0, d)
 
 def sha1(message):
 	getUserGlobals()
@@ -111,10 +113,13 @@ def strToId(pk, strID):
 	return v
 
 def getUserGlobals():
-	global groupObjBuiltInFuncs, utilBuiltInFuncs
+	global groupObjBuiltInFuncs, utilBuiltInFuncs, shareBuiltInFuncs
 
 	if (groupObjBuiltInFuncs == None):
 		groupObjBuiltInFuncs = PairingGroup(MNT160)
 
 	if (utilBuiltInFuncs == None):
 		utilBuiltInFuncs = SecretUtil(groupObjBuiltInFuncs, verbose=False)
+
+	if (shareBuiltInFuncs == None):
+		shareBuiltInFuncs = SecretShare(groupObjBuiltInFuncs, False)

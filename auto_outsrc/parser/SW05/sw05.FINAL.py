@@ -1,12 +1,4 @@
-from /Users/matt/Documents/charm/auto_outsrc/parser/SW05/userFuncs import *
-
-from toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair, SymEnc, SymDec
-from toolbox.secretutil import SecretUtil
-from toolbox.iterate import dotprod2
-from charm.pairing import hash as DeriveKey
-from charm.engine.util import objectToBytes, bytesToObject
-from builtInFuncs import *
-
+from userFuncs import *
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.core.engine.util import *
@@ -24,19 +16,19 @@ Eprimeprime = {}
 D = {}
 wHash = {}
 E = {}
-N = {}
+N = []
+coeffs = {}
 wPrimeHash = {}
 evalTVar = {}
 t = {}
-coeffs = {}
 S = {}
 
-def setup(n):
+def setup(n, d):
     global t
 
     t = {}
 
-    input = n
+    input = [n, d]
     g = group.random(G1)
     y = group.random(ZR)
     g1 = (g ** y)
@@ -52,24 +44,34 @@ def setup(n):
 def evalT(pk, n, x):
     global loopVar
     global N
-    global t
     global coeffs
+    global t
 
     Nint = {}
 
     input = [pk, n, x]
     t = pk[3]
     for i in range(0, n+1):
-        N[i] = (i+1)
+        N[i] = group.init(ZR, i+1)
         Nint[i] = (i + 1)
     coeffs = recoverCoefficients(N)
     prodResult = group.init(G2)
     lenNint = len(Nint)
+
+    print("N:  ", N)
+    #print("t:  ", t)
+    print("coeffs:  ", coeffs)
+
     for i in range(0, lenNint):
         loopVar = Nint[i]
         j = (loopVar)
         loopVarMinusOne = (loopVar - 1)
+
+        #print("loopVarMinusOne:  ", loopVarMinusOne)
+        #print("j:  ", j)
+
         prodResult = (prodResult * (t[loopVarMinusOne] ** coeffs[j]))
+        #prodResult = (prodResult * (t[loopVarMinusOne]))
     T = ((pk[2] ** (x * n)) * prodResult)
     output = T
     return output
@@ -140,8 +142,8 @@ def decrypt(pk, sk, CT, w, d):
     global D
     global wHash
     global E
-    global wPrimeHash
     global coeffs
+    global wPrimeHash
     global S
 
     input = [pk, sk, CT, w, d]
@@ -169,6 +171,21 @@ def SmallExp(bits=80):
 def main():
     global group
     group = PairingGroup(secparam)
+
+    max_attributes = 6
+    required_overlap = 4
+    (master_public_key, master_key) = setup(max_attributes, required_overlap)
+    private_identity = ['insurance', 'id=2345', 'oncology', 'doctor', 'nurse', 'JHU'] #private identity
+    public_identity = ['insurance', 'id=2345', 'doctor', 'oncology', 'JHU', 'billing', 'misc'] #public identity for encrypt
+    (pub_ID_hashed, secret_key) = extract(master_key, private_identity, master_public_key, required_overlap, max_attributes)
+    msg = group.random(GT)
+    cipher_text = encrypt(master_public_key, public_identity, msg, max_attributes)
+    decrypted_msg = decrypt(master_public_key, secret_key, cipher_text, pub_ID_hashed, required_overlap)
+    print("msg:  ", msg)
+    print("decrypted_msg:  ", decrypted_msg)
+    assert msg == decrypted_msg, "failed decryption!"
+    print("Successful Decryption!")
+
 
 if __name__ == '__main__':
     main()

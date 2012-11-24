@@ -164,6 +164,10 @@ class IBE_SW05_LUC(IBEnc):
         N_int = [(x + 1) for x in range(n + 1)]
         
         coeffs = util.recoverCoefficients(N)
+
+        print("N:  ", N)
+        print("coeffs:  ", coeffs)
+
         prod_result = 1
         for i in N_int:
             j = group.init(ZR, i)

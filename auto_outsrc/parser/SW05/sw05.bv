@@ -11,7 +11,7 @@ S := list
 END :: types
 
 BEGIN :: func:setup
-input := n
+input := list{n, d}
 g := random(G1)
 y := random(ZR)
 g1 := g ^ y
