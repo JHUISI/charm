@@ -196,6 +196,7 @@ void element_random(Group_t type, const pairing_t *pairing, element_t *e) {
 	if(type == ZR_t) {
 		Big *x = (Big *) e;
 		pfc->random(*x);
+		*x = *x % pfc->order();
 		// cout << "1st: generated a random value x = " << *x << endl;
 	}
 	else if(type == G1_t) {
