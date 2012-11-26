@@ -76,9 +76,10 @@ def getCoefficients(policy):
 	getUserGlobals()
 	return utilBuiltInFuncs.getCoefficients(policy)
 
-def recoverCoefficients(inputList):
+def recoverCoefficientsDict(inputDict):
 	getUserGlobals()
-	return shareBuiltInFuncs.recoverCoefficients(inputList)
+	print("it got here")
+	return shareBuiltInFuncs.recoverCoefficientsDict(inputDict)
 
 def genShares(mk0, dOver, n, q, wHash):
 	getUserGlobals()

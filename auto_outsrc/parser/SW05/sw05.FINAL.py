@@ -16,7 +16,7 @@ Eprimeprime = {}
 D = {}
 wHash = {}
 E = {}
-N = []
+N = {}
 coeffs = {}
 wPrimeHash = {}
 evalTVar = {}
@@ -52,26 +52,16 @@ def evalT(pk, n, x):
     input = [pk, n, x]
     t = pk[3]
     for i in range(0, n+1):
-        N[i] = group.init(ZR, i+1)
+        N[i] = (i+1)
         Nint[i] = (i + 1)
-    coeffs = recoverCoefficients(N)
+    coeffs = recoverCoefficientsDict(N)
     prodResult = group.init(G2)
     lenNint = len(Nint)
-
-    print("N:  ", N)
-    #print("t:  ", t)
-    print("coeffs:  ", coeffs)
-
     for i in range(0, lenNint):
         loopVar = Nint[i]
         j = (loopVar)
         loopVarMinusOne = (loopVar - 1)
-
-        #print("loopVarMinusOne:  ", loopVarMinusOne)
-        #print("j:  ", j)
-
         prodResult = (prodResult * (t[loopVarMinusOne] ** coeffs[j]))
-        #prodResult = (prodResult * (t[loopVarMinusOne]))
     T = ((pk[2] ** (x * n)) * prodResult)
     output = T
     return output
@@ -185,7 +175,6 @@ def main():
     print("decrypted_msg:  ", decrypted_msg)
     assert msg == decrypted_msg, "failed decryption!"
     print("Successful Decryption!")
-
 
 if __name__ == '__main__':
     main()

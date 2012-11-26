@@ -1,0 +1,14 @@
+    max_attributes = 6
+    required_overlap = 4
+    (master_public_key, master_key) = setup(max_attributes, required_overlap)
+    private_identity = ['insurance', 'id=2345', 'oncology', 'doctor', 'nurse', 'JHU'] #private identity
+    public_identity = ['insurance', 'id=2345', 'doctor', 'oncology', 'JHU', 'billing', 'misc'] #public identity for encrypt
+    (pub_ID_hashed, secret_key) = extract(master_key, private_identity, master_public_key, required_overlap, max_attributes)
+    msg = group.random(GT)
+    cipher_text = encrypt(master_public_key, public_identity, msg, max_attributes)
+    decrypted_msg = decrypt(master_public_key, secret_key, cipher_text, pub_ID_hashed, required_overlap)
+    print("msg:  ", msg)
+    print("decrypted_msg:  ", decrypted_msg)
+    assert msg == decrypted_msg, "failed decryption!"
+    print("Successful Decryption!")
+

@@ -68,6 +68,7 @@ builtInTypes["getCoefficients"] = types.symmap
 builtInTypes["integer"] = types.int
 builtInTypes["isList"] = types.int
 builtInTypes["recoverCoefficients"] = types.symmap
+builtInTypes["recoverCoefficientsDict"] = types.symmap
 builtInTypes["genShares"] = types.list
 builtInTypes["intersection_subset"] = types.list
 

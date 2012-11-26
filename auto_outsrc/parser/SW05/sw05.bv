@@ -38,7 +38,7 @@ N#i := init(i+1)
 Nint#i := i + 1
 END :: for
 
-coeffs := recoverCoefficients(N)
+coeffs := recoverCoefficientsDict(N)
 prodResult := init(G2)
 lenNint := len(Nint)
 BEGIN :: for
