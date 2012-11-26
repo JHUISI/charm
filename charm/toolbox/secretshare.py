@@ -54,6 +54,19 @@ class SecretShare:
             if self.verbose: print("coeff '%d' => '%s'" % (i, result))
             coeff[i] = result
         return coeff
+
+    # shares is a dictionary
+    def recoverCoefficientsDict(self, dict):
+        coeff = {}
+        for i in dict.values():
+            result = 1
+            for j in dict.values:
+                if not (i == j):
+                    # lagrange basis poly
+                    result *= (0 - j) / (i - j)
+            if self.verbose: print("coeff '%d' => '%s'" % (i, result))
+            coeff[i] = result
+        return coeff
         
     def recoverSecret(self, shares):
         list = shares.keys()
