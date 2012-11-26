@@ -60,7 +60,7 @@ class SecretShare:
         coeff = {}
         for i in dict.values():
             result = 1
-            for j in dict.values:
+            for j in dict.values():
                 if not (i == j):
                     # lagrange basis poly
                     result *= (0 - j) / (i - j)
