@@ -5,7 +5,7 @@
 
 # untar MIRACL source into this directory, then run this script 
 set -x
-#[ -e miracl.zip ] && unzip -j -aa -L miracl.zip
+[ -e miracl.zip ] && unzip -j -aa -L miracl.zip
 
 # patch mnt_pair.cpp, ssp_pair.cpp, etc here
 curve=$1

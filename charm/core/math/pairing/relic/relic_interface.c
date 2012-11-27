@@ -255,12 +255,12 @@ status_t element_add(element_t c, element_t a, element_t b)
 	else if(type == G1) {
 		LEAVE_IF( c->type != G1, "result initialized but invalid type.");
 		g1_add(c->g1, a->g1, b->g1);
-		g1_norm(c->g1, c->g1);
+		//g1_norm(c->g1, c->g1);
 	}
 	else if(type == G2) {
 		LEAVE_IF( c->type != G2, "result initialized but invalid type.");
 		g2_add(c->g2, a->g2, b->g2);
-		g2_norm(c->g2, c->g2);
+		//g2_norm(c->g2, c->g2);
 	}
 	else {
 		return ELEMENT_INVALID_TYPES;
@@ -284,11 +284,11 @@ status_t element_sub(element_t c, element_t a, element_t b)
 	}
 	else if(type == G1) {
 		g1_sub(c->g1, a->g1, b->g1);
-		g1_norm(c->g1, c->g1);
+		//g1_norm(c->g1, c->g1);
 	}
 	else if(type == G2) {
 		g2_sub(c->g2, a->g2, b->g2);
-		g2_norm(c->g2, c->g2);
+		//g2_norm(c->g2, c->g2);
 	}
 	else {
 		return ELEMENT_INVALID_TYPES;
@@ -313,11 +313,11 @@ status_t element_mul(element_t c, element_t a, element_t b)
 	}
 	else if(type == G1) {
 		g1_add(c->g1, a->g1, b->g1);
-		g1_norm(c->g1, c->g1);
+		//g1_norm(c->g1, c->g1);
 	}
 	else if(type == G2) {
 		g2_add(c->g2, a->g2, b->g2);
-		g2_norm(c->g2, c->g2);
+		//g2_norm(c->g2, c->g2);
 	}
 	else if(type == GT) {
 		gt_mul(c->gt, a->gt, b->gt);
@@ -410,11 +410,11 @@ status_t element_div(element_t c, element_t a, element_t b)
 	}
 	else if(type == G1) {
 		g1_sub(c->g1, a->g1, b->g1);
-		g1_norm(c->g1, c->g1);
+		//g1_norm(c->g1, c->g1);
 	}
 	else if(type == G2) {
 		g2_sub(c->g2, a->g2, b->g2);
-		g2_norm(c->g2, c->g2);
+		//g2_norm(c->g2, c->g2);
 	}
 	else if(type == GT) {
 		gt_t t;
@@ -716,7 +716,7 @@ status_t element_from_hash(element_t e, unsigned char *data, int len)
 
 	switch(type) {
 		case ZR: bn_read_bin(e->bn, digest, digest_len);
-				 if(bn_cmp(e->bn, e->order) == CMP_GT) bn_mod(e->bn, e->bn, e->order);
+			 if(bn_cmp(e->bn, e->order) == CMP_GT) bn_mod(e->bn, e->bn, e->order);
 //		    	 bn_print(e->bn);
 				 break;
 		case G1: g1_map(e->g1, digest, digest_len);
