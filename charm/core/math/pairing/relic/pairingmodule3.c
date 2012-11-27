@@ -104,8 +104,8 @@ static PyObject *f(PyObject *v, PyObject *w) { \
 		return NULL; }		\
 	if(Check_Types(obj1->element_type, obj2->element_type, m))	{ \
 		PyObject *obj3 = (n)(obj1, obj2); \
-		if(obj1_long) PyObject_Del(obj1); 	\
-		if(obj2_long) PyObject_Del(obj2);	\
+		if(obj1_long) Py_XDECREF(obj1); 	\
+		if(obj2_long) Py_XDECREF(obj2);	\
 		return obj3;  }	\
 	return NULL;				\
 }
@@ -295,10 +295,10 @@ Element *convertToZR(PyObject *longObj, PyObject *elemObj) {
 
 void 	Pairing_dealloc(Pairing *self)
 {
-	if(self->safe) {
+	//if(self->safe) {
 		debug("Clear pairing => \n");
 		pairing_clear();
-	}
+	//}
 
 	debug("Releasing pairing object!\n");
 	Py_TYPE(self)->tp_free((PyObject *) self);
@@ -309,6 +309,7 @@ void	Element_dealloc(Element* self)
 	if(self->elem_initialized && self->e) {
 		debug_e("Clear element_t => \n", self->e);
 		element_clear(self->e);
+		Py_XDECREF(self->pairing);
 	}
 	
 	if(self->param_buf) {
@@ -317,6 +318,7 @@ void	Element_dealloc(Element* self)
 	
 	if(self->safe_pairing_clear) {
 		/* do nothing */
+		Py_XDECREF(self->pairing);
 	}
 
 	Py_TYPE(self)->tp_free((PyObject*)self);
@@ -397,7 +399,8 @@ int hash2_buffer_to_bytes(uint8_t *input_str, int input_len, uint8_t *last_hash,
 
 	result = hash_buffer_to_bytes(temp_buf, (input_len + hash_size), output_buf, hash_size, HASH_FUNCTION_STRINGS+1);
 
-	PyObject_Del(last);
+	//PyObject_Del(last);
+	Py_XDECREF(last);
 	return result;
 }
 
@@ -1273,7 +1276,8 @@ static long Element_index(Element *o1) {
 		PyObject *temp = intToLongObj(o); // fix this
 		result = PyObject_Hash(temp);
 		bn_free(o);
-		PyObject_Del(temp);
+//		PyObject_Del(temp);
+		Py_XDECREF(temp);
 	}
 	return result;
 }
@@ -1761,10 +1765,11 @@ static int pairings_traverse(PyObject *m, visitproc visit, void *arg) {
 
 static int pairings_clear(PyObject *m) {
 	Py_CLEAR(GETSTATE(m)->error);
+    Py_XDECREF(ElementError);
 #ifdef BENCHMARK_ENABLED
 	Operations *c = (Operations *) dBench->data_ptr;
 	free(c);
-	Py_CLEAR(GETSTATE(m)->dBench);
+	Py_XDECREF(dBench); //Py_CLEAR(GETSTATE(m)->dBench);
 #endif
 	return 0;
 }
@@ -1785,43 +1790,46 @@ static struct PyModuleDef moduledef = {
 	(freefunc) pairings_free //
 };
 
+#define CLEAN_EXIT goto LEAVE;
 #define INITERROR return NULL
 PyMODINIT_FUNC
 PyInit_pairing(void) 		{
 #else
+#define CLEAN_EXIT goto LEAVE;
 #define INITERROR return
 void initpairing(void) 		{
 #endif
     PyObject* m;
 	
     if(PyType_Ready(&PairingType) < 0)
-    	INITERROR;
+        CLEAN_EXIT;
     if(PyType_Ready(&ElementType) < 0)
-        INITERROR;
+        CLEAN_EXIT;
 #if PY_MAJOR_VERSION >= 3
     m = PyModule_Create(&moduledef);
 #else
     m = Py_InitModule("pairing", pairing_methods);
 #endif
 
-    if(m == NULL)
-		INITERROR;
-	struct module_state *st = GETSTATE(m);
-	st->error = PyErr_NewException("pairing.Error", NULL, NULL);
-	if(st->error == NULL) {
-		Py_DECREF(m);
-		INITERROR;
-	}
-	ElementError = st->error;
+//    if(m == NULL)
+//		INITERROR;
+    struct module_state *st = GETSTATE(m);
+    st->error = PyErr_NewException("pairing.Error", NULL, NULL);
+    if(st->error == NULL)
+        CLEAN_EXIT;
+    ElementError = st->error;
+    Py_INCREF(ElementError);
 #ifdef BENCHMARK_ENABLED
     if(import_benchmark() < 0) {
-    	Py_DECREF(m);
-    	INITERROR;
+        CLEAN_EXIT;
     }
     if(PyType_Ready(&BenchmarkType) < 0)
-    	INITERROR;
+        CLEAN_EXIT;
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);
+    if(st->dBench == NULL)
+        CLEAN_EXIT;
     dBench = st->dBench;
+    Py_INCREF(dBench);
     dBench->bench_initialized = FALSE;
 
     Operations *cntr = (Operations *) malloc(sizeof(Operations));
@@ -1854,7 +1862,13 @@ void initpairing(void) 		{
 //    PyModule_AddIntConstant(m, "BN638", 3);
 //    PyModule_AddIntConstant(m, "KSS508",4);
 
+LEAVE:
+   if (PyErr_Occurred()) {
+       Py_DECREF(m);
+       INITERROR;
+   }
+
 #if PY_MAJOR_VERSION >= 3
-	return m;
+    return m;
 #endif
 }

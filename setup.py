@@ -153,9 +153,9 @@ if opt.get('PAIR_MOD') == 'yes':
 
     elif opt.get('USE_RELIC') == 'yes':
         # check if RELIC lib has been built. if not, bail
-        if not os.path.exists(relic_lib): 
-            print("Cannot find RELIC lib. Follow instructions in build script placed in <charm>/core/math/pairing/relic/ dir.")
-            exit(1)
+        #if not os.path.exists(relic_lib): 
+        #    print("Cannot find RELIC lib. Follow instructions in build script placed in <charm>/core/math/pairing/relic/ dir.")
+        #    exit(1)
         replaceString(lib_config_file, "pairing_lib=libs ", "pairing_lib=libs.relic")
         pairing_module = Extension(math_prefix + '.pairing',
                             include_dirs = [utils_path,
@@ -163,8 +163,8 @@ if opt.get('PAIR_MOD') == 'yes':
                             sources = [math_path + 'pairing/relic/pairingmodule3.c',
                                         math_path + 'pairing/relic/relic_interface.c',
                                         utils_path + 'base64.c'],
-                            libraries=['gmp'], define_macros=_macros, undef_macros=_undef_macro,
-                            extra_objects=[relic_lib], extra_compile_args=None)
+                            libraries=['relic', 'gmp'], define_macros=_macros, undef_macros=_undef_macro)
+                            #extra_objects=[relic_lib], extra_compile_args=None)
 
     elif opt.get('USE_MIRACL') == 'yes':
         # build MIRACL based pairing module - note that this is for experimental use only

@@ -2053,7 +2053,7 @@ static int pairings_traverse(PyObject *m, visitproc visit, void *arg) {
 
 static int pairings_clear(PyObject *m) {
 	Py_CLEAR(GETSTATE(m)->error);
-        Py_XDECREF(ElementError);
+    Py_XDECREF(ElementError);
 #ifdef BENCHMARK_ENABLED
 	Operations *c = (Operations *) dBench->data_ptr;
 	free(c);
