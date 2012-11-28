@@ -79,6 +79,7 @@ static Benchmark *dBench;
 #else
 /* check for just unicode stuff */
 #define PyBytes_CharmCheck(obj)	PyUnicode_Check(obj) || PyString_Check(obj)
+#define PyUnicode_FromString PyString_FromString
 #endif
 
 #if PY_MAJOR_VERSION >= 3

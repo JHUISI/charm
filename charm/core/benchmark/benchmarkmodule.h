@@ -33,7 +33,9 @@ extern "C" {
 	#define _PyLong_Check(o) (PyInt_Check(o) || PyLong_Check(o))
 	#define ConvertToInt(o) PyInt_AsLong(o)
 	#define PyToLongObj(o) PyInt_FromSize_t(o)
+    #define PyUnicode_FromString PyString_FromString
 #endif
+
 
 #define BENCHMARK_MOD_NAME "charm.core.benchmark._C_API"
 
