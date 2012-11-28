@@ -129,25 +129,29 @@ def transform(pk, sk, CT, dInputParam):
     input = [pk, sk, CT, dInputParam]
     wPrimeHash, Eprime, Eprimeprime, E = CT
     wHash, D, d = sk
+
     transformOutputList[0] = intersectionSubset(wHash, wPrimeHash, dInputParam)
     S = transformOutputList[0]
+
     transformOutputList[1] = recoverCoefficientsDict(S)
     coeffs = transformOutputList[1]
+
     transformOutputList[2] = group.init(GT)
     prod = transformOutputList[2]
+
     transformOutputList[3] = len(S)
     SLen = transformOutputList[3]
+
     for i in range(0, SLen):
-        transformOutputList[4] = S[i]
-        loopVar = transformOutputList[4]
-        transformOutputList[5] = pair((d[loopVar] ** coeffs[loopVar]), E[loopVar])
-        loopPairings = transformOutputList[5]
-        transformOutputList[6] = pair((Eprimeprime ** -coeffs[loopVar]), D[loopVar])
-        loopPairings = transformOutputList[6]
-        transformOutputList[7] = (prod * loopPairings)
-        prod = transformOutputList[7]
-    transformOutputList[8] = (Eprime * prod)
-    M = transformOutputList[8]
+        transformOutputList[4 + (4 * i)] = S[i]
+        loopVar = transformOutputList[4 + (4 * i)]
+
+        transformOutputList[5 + (4 * i)] = pair((d[loopVar] ** coeffs[loopVar]), E[loopVar])
+        loopPairings = transformOutputList[5 + (4 * i)]
+
+        transformOutputList[6 + (4 * i)] = pair((Eprimeprime ** -coeffs[loopVar]), D[loopVar])
+        loopPairings = transformOutputList[6 + (4 * i)]
+
     output = transformOutputList
     return output
 
@@ -155,15 +159,14 @@ def decout(pk, sk, CT, dInputParam, transformOutputList, blindingFactor0Blinded,
     input = [pk, sk, CT, dInputParam, transformOutputList, blindingFactor0Blinded, blindingFactorDBlinded]
     wPrimeHash, Eprime, Eprimeprime, E = CT
     wHash, D, d = sk
-    S = transformOutputList[0]
-    coeffs = transformOutputList[1]
-    prod = transformOutputList[2]
+    prod = group.init(GT)
     SLen = transformOutputList[3]
     for i in range(0, SLen):
-        loopVar = transformOutputList[4]
-        loopPairings = transformOutputList[5]
-        prod = transformOutputList[7]
-    M = transformOutputList[8]
+
+        unblinded = transformOutputList[6 + (4 * i)] ** blindingFactor0Blinded
+        prod = prod * unblinded * transformOutputList[5 + (4 * i)]
+
+    M = Eprime * prod
     output = M
     return output
 
@@ -173,6 +176,24 @@ def SmallExp(bits=80):
 def main():
     global group
     group = PairingGroup(secparam)
+
+    max_attributes = 6
+    required_overlap = 4
+    (master_public_key, master_key) = setup(max_attributes, required_overlap)
+    private_identity = ['insurance', 'id=2345', 'oncology', 'doctor', 'nurse', 'JHU'] #private identity
+    public_identity = ['insurance', 'id=2345', 'doctor', 'oncology', 'JHU', 'billing', 'misc'] #public identity for encrypt
+    (blindingFactor0Blinded, blindingFactorDBlinded, skBlinded) = extract(master_key, private_identity, master_public_key, required_overlap, max_attributes)
+    msg = group.random(GT)
+    cipher_text = encrypt(master_public_key, public_identity, msg, max_attributes)
+    #decrypted_msg = decrypt(master_public_key, secret_key, cipher_text, required_overlap)
+    transformOutputList = transform(master_public_key, skBlinded, cipher_text, required_overlap)
+    decrypted_msg = decout(master_public_key, skBlinded, cipher_text, required_overlap, transformOutputList, blindingFactor0Blinded, blindingFactorDBlinded)
+
+    print("msg:  ", msg)
+    print("decrypted_msg:  ", decrypted_msg)
+    assert msg == decrypted_msg, "failed decryption!"
+    print("Successful Decryption!")
+
 
 if __name__ == '__main__':
     main()
