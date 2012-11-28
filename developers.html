@@ -63,7 +63,7 @@
 <div class="section" id="using-a-scheme">
 <h2>Using a Scheme<a class="headerlink" href="#using-a-scheme" title="Permalink to this headline">¶</a></h2>
 <p>To use any of our existing schemes in your application, each scheme includes a <tt class="docutils literal"><span class="pre">main</span></tt> routine that runs through every alorithm (with sample inputs) defined for that scheme. Thus, the <tt class="docutils literal"><span class="pre">main</span></tt> function provides a test that the scheme works in addition to demonstrate how to use it. For example, below is an example of how to instantiate the Cramer-Shoup scheme from above within your application:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.schemes.pkenc.pkenc_cs98.py</span> <span class="kn">import</span> <span class="n">CS98</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.schemes.pkenc.pkenc_cs98</span> <span class="kn">import</span> <span class="n">CS98</span>
 <span class="kn">from</span> <span class="nn">charm.toolbox.eccurve</span> <span class="kn">import</span> <span class="n">prime192v1</span>
 <span class="kn">from</span> <span class="nn">charm.toolbox.ecgroup</span> <span class="kn">import</span> <span class="n">ECGroup</span>
 
