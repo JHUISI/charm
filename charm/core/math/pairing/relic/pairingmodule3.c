@@ -527,7 +527,7 @@ static PyObject *Element_random(Element* self, PyObject* args)
 	if(!PyArg_ParseTuple(args, "Oi|i", &group, &arg1, &seed))
 		return NULL;
 
-	START_CLOCK(dBench);
+
 	VERIFY_GROUP(group);
 	retObject = PyObject_New(Element, &ElementType);
 	debug("init random element in '%d'\n", arg1);
@@ -554,7 +554,7 @@ static PyObject *Element_random(Element* self, PyObject* args)
 
 	/* create new Element object */
 	element_random(retObject->e);
-	STOP_CLOCK(dBench);
+
 	retObject->elem_initialized = TRUE;
 	retObject->pairing = NULL;
 	retObject->safe_pairing_clear = FALSE;
@@ -580,11 +580,13 @@ static PyObject *Element_add(Element *self, Element *other)
 	IS_SAME_GROUP(self, other);
 	EXIT_IF(add_rule(self->element_type, other->element_type) == FALSE, "invalid add operation.");
 	// start micro benchmark
-	START_CLOCK(dBench);
+
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_add(newObject->e, self->e, other->e);
-	STOP_CLOCK(dBench);
+
+#ifdef BENCHMARK_ENABLED
 	if(newObject != NULL) UPDATE_BENCH(ADDITION, newObject->element_type, dBench);
+#endif
 	return (PyObject *) newObject;
 }
 
@@ -605,11 +607,13 @@ static PyObject *Element_sub(Element *self, Element *other)
 	IS_SAME_GROUP(self, other);
 	EXIT_IF(sub_rule(self->element_type, other->element_type) == FALSE, "invalid sub operation.");
 
-	START_CLOCK(dBench);
+
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_sub(newObject->e, self->e, other->e);		
-	STOP_CLOCK(dBench);
+
+#ifdef BENCHMARK_ENABLED
 	if(newObject != NULL) UPDATE_BENCH(SUBTRACTION, newObject->element_type, dBench);
+#endif
 	return (PyObject *) newObject;
 }
 
@@ -643,21 +647,21 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 	debug("Starting '%s'\n", __func__);
 	if(PyElement_Check(lhs) && found_int) {
 		// lhs is the element type
-		START_CLOCK(dBench);
+
 		newObject = createNewElement(self->element_type, self->pairing);
 		// multiplication is commutative
 		element_mul_int(newObject->e, self->e, z);
 		bn_free(z);
-		STOP_CLOCK(dBench);
+
 	}
 	else if(PyElement_Check(rhs) && found_int) {
 		// rhs is the element type
-		START_CLOCK(dBench);
+
 		newObject = createNewElement(other->element_type, other->pairing);
 		// multiplication is commutative
 		element_mul_int(newObject->e, other->e, z);
 		bn_free(z);
-		STOP_CLOCK(dBench);
+
 	}
 	else if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
 		// both are element types
@@ -665,31 +669,32 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 		EXIT_IF(mul_rule(self->element_type, other->element_type) == FALSE, "invalid mul operation.");
 
 		if(self->element_type != ZR && other->element_type == ZR) {
-			START_CLOCK(dBench);
+
 			newObject = createNewElement(self->element_type, self->pairing);
 			element_mul_zr(newObject->e, self->e, other->e);
-			STOP_CLOCK(dBench);
+
 		}
 		else if(other->element_type != ZR && self->element_type == ZR) {
 			// START_CLOCK
-			START_CLOCK(dBench);
+
 			newObject = createNewElement(other->element_type, self->pairing);
 			element_mul_zr(newObject->e, other->e, self->e);
-			STOP_CLOCK(dBench);
+
 		}
 		else { // all other cases
 			// START_CLOCK
-			START_CLOCK(dBench);
+
 			newObject = createNewElement(self->element_type, self->pairing);
 			element_mul(newObject->e, self->e, other->e);
-			STOP_CLOCK(dBench);
+
 		}
 	}
 	else {
 		EXIT_IF(TRUE, "invalid types.");
 	}
-
+#ifdef BENCHMARK_ENABLED
 	if(newObject != NULL) UPDATE_BENCH(MULTIPLICATION, newObject->element_type, dBench);
+#endif
 	return (PyObject *) newObject;
 }
 
@@ -721,7 +726,7 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 	debug("Starting '%s'\n", __func__);
 	if(PyElement_Check(lhs) && found_int) {
 		// lhs is the element type
-		START_CLOCK(dBench);
+
 //		EXIT_IF(div_rule(self->element_type, ZR) == FALSE, "invalid div operation.");
 		newObject = createNewElement(self->element_type, self->pairing);
 		other = createNewElement(self->element_type, self->pairing);
@@ -731,11 +736,11 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 			bn_free(z);
 			EXIT_IF(TRUE, "divide by zero error!");
 		}
-		STOP_CLOCK(dBench);
+
 	}
 	else if(PyElement_Check(rhs) && found_int) {
 		// rhs is the element type
-		START_CLOCK(dBench);
+
 //		EXIT_IF(div_rule(ZR, other->element_type) == FALSE, "invalid div operation.");
 		newObject = createNewElement(other->element_type, other->pairing);
 		if(element_int_div(newObject->e, z, other->e) == ELEMENT_DIV_ZERO) {
@@ -744,21 +749,21 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 			bn_free(z);
 			EXIT_IF(TRUE, "divide by zero error!");
 		}
-		STOP_CLOCK(dBench);
+
 	}
 	else if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
 		// both are element types
 		IS_SAME_GROUP(self, other);
 		EXIT_IF(div_rule(self->element_type, other->element_type) == FALSE, "invalid div operation.");
 
-		START_CLOCK(dBench);
+
 		newObject = createNewElement(self->element_type, self->pairing);
 		if(element_div(newObject->e, self->e, other->e) == ELEMENT_DIV_ZERO) {
-			PyObject_Del(newObject);
-			newObject = NULL;
+			Py_XDECREF(newObject);
+			//newObject = NULL;
 			EXIT_IF(TRUE, "divide by zero error!");
 		}
-		STOP_CLOCK(dBench);
+
 	}
 	else {
 		EXIT_IF(TRUE, "invalid types.");
@@ -767,7 +772,9 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 	}
 
 	bn_free(z);
+#ifdef BENCHMARK_ENABLED
 	if(newObject != NULL) UPDATE_BENCH(DIVISION, newObject->element_type, dBench);
+#endif
 	return (PyObject *) newObject;
 }
  
@@ -782,10 +789,10 @@ static PyObject *Element_invert(Element *self)
 	}
 #endif
 	
-	START_CLOCK(dBench);
+
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_invert(newObject->e, self->e);
-	STOP_CLOCK(dBench);
+
 	return (PyObject *) newObject;
 }
 
@@ -800,10 +807,10 @@ static PyObject *Element_negate(Element *self)
 	}
 #endif
 
-	START_CLOCK(dBench);
+
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_neg(newObject->e, self->e);
-	STOP_CLOCK(dBench);
+
 
 	return (PyObject *) newObject;
 }
@@ -821,7 +828,7 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		// o1 should be element and o2 should be mpz
 		if(rhs_o2->element_type == ZR) {
 //			printf("%s: testing longFoundLHS\n", __FUNCTION__);
-			START_CLOCK(dBench);
+
 			bn_inits(n);
 			longObjToInt(n, (PyLongObject *) o1);
 			newObject = createNewElement(rhs_o2->element_type, rhs_o2->pairing);
@@ -829,7 +836,7 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 			element_pow_zr(newObject->e, newObject->e, rhs_o2->e);
 			bn_free(n);
 			PyObject_Del(lhs_o1);
-			STOP_CLOCK(dBench);
+
 		}
 		else {
 			EXIT_IF(TRUE, "undefined exponentiation operation.");
@@ -837,7 +844,7 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 	}
 	else if(longFoundRHS) {
 		// o2 is a long type
-		START_CLOCK(dBench);
+
 		long rhs = PyLong_AsLong(o2);
 		if(PyErr_Occurred() || rhs >= 0) {
 //			printf("%s: testing longFoundLHS\n", __FUNCTION__);
@@ -858,17 +865,17 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		else {
 			EXIT_IF(TRUE, "undefined exponentiation operation.");
 		}
-		STOP_CLOCK(dBench);
+
 	}
 	else if(Check_Elements(o1, o2)) {
 		debug("Starting '%s'\n", __func__);
 		IS_SAME_GROUP(lhs_o1, rhs_o2);
 		EXIT_IF(exp_rule(lhs_o1->element_type, rhs_o2->element_type) == FALSE, "invalid exp operation");
 		if(rhs_o2->element_type == ZR) {
-			START_CLOCK(dBench);
+
 			newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
 			element_pow_zr(newObject->e, lhs_o1->e, rhs_o2->e);
-			STOP_CLOCK(dBench);
+
 		}
 		else {
 			// we have a problem
@@ -881,7 +888,9 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 	}
 
 	// STOP_CLOCK
+#ifdef BENCHMARK_ENABLED
 	if(newObject != NULL) UPDATE_BENCH(EXPONENTIATION, newObject->element_type, dBench);
+#endif
 	return (PyObject *) newObject;
 }
 
@@ -901,14 +910,14 @@ static PyObject *Element_set(Element *self, PyObject *args)
     if(PyArg_ParseTuple(args, "i", &value)) {
             // convert into an int using PyArg_Parse(...)
             // set the element
-            START_CLOCK(dBench);
+
             element_set_si(self->e, value);
-            STOP_CLOCK(dBench);
+
     }
     else if(PyArg_ParseTuple(args, "O", &object)){
-            START_CLOCK(dBench);
+
             element_set(self->e, object->e);
-            STOP_CLOCK(dBench);
+
     }
     else { //
     	EXITCODE_IF(TRUE, "type not supported: signed int or Element object", FALSE);
@@ -1016,7 +1025,7 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 			debug("Pairing is symmetric.\n");
 			debug_e("LHS: '%B'\n", lhs->e);
 			debug_e("RHS: '%B'\n", rhs->e);
-			//START_CLOCK(dBench);
+			//
 			newObject = createNewElement(GT, lhs->pairing);
 			if(lhs->element_type == G1) {
 				pairing_apply(newObject->e, lhs->e, rhs->e);
@@ -1024,8 +1033,10 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 			else if(lhs->element_type == G2) {
 				pairing_apply(newObject->e, rhs->e, lhs->e);
 			}
-			//STOP_CLOCK(dBench);
+			//
+#ifdef BENCHMARK_ENABLED
 			UPDATE_BENCHMARK(PAIRINGS, dBench);
+#endif
 			return (PyObject *) newObject;
 		}
 	}
@@ -1042,7 +1053,7 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 	EXIT_IF(!PyArg_ParseTuple(args, "O|c", &object, &label), "missing element object");
 
 	EXIT_IF(object->elem_initialized == FALSE, "null element object.");
-	START_CLOCK(dBench);
+
 	int hash_size = SHA_LEN;
 	uint8_t hash_buf[hash_size + 1];
 	memset(hash_buf, 0, hash_size);
@@ -1055,7 +1066,7 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 //	str = PyBytes_FromStringAndSize((const char *) hash_buf, hash_size);
 	str = PyBytes_FromString((const char *) hash_hex);
 	free(hash_hex);
-	STOP_CLOCK(dBench);
+
 	return str;
 }
 
@@ -1088,7 +1099,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 			debug("Hashing string '%s' to Zr...\n", str);
 			// create an element of Zr
 			// hash bytes using SHA1
-			START_CLOCK(dBench);
+
 			newObject = createNewElement(ZR, group->pairing);
 			// extract element in hash
 			result = element_from_hash(newObject->e, (uint8_t *) str, strlen(str));
@@ -1096,13 +1107,13 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 				tmp = "could not hash to bytes.";
 				goto cleanup;
 			}
-			STOP_CLOCK(dBench);
+
 		}
 		else if(type == G1 || type == G2) {
 		    // element to G1
 			debug("Hashing string '%s'\n", str);
 			debug("Target GroupType => '%d'", type);
-			START_CLOCK(dBench);
+
 			newObject = createNewElement(type, group->pairing);
 			// hash bytes using SHA
 			result = element_from_hash(newObject->e, (uint8_t *) str, strlen(str));
@@ -1110,7 +1121,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 				tmp = "could not hash to bytes.";
 				goto cleanup;
 			}
-			STOP_CLOCK(dBench);
+
 		}
 		else {
 			// not supported, right?
@@ -1223,7 +1234,7 @@ static PyObject *Element_equals(PyObject *lhs, PyObject *rhs, int opid) {
 	}
 
 	debug("Starting '%s'\n", __func__);
-	START_CLOCK(dBench);
+
 	if(self != NULL && other != NULL) {
 		// lhs and rhs are both elements
 		IS_SAME_GROUP(self, other);
@@ -1234,7 +1245,7 @@ static PyObject *Element_equals(PyObject *lhs, PyObject *rhs, int opid) {
 			debug("one of the elements is not initialized.\n");
 		}
 	}
-	STOP_CLOCK(dBench);
+
 
 	if(opid == Py_EQ) {
 		if(result == 0) {
@@ -1295,7 +1306,7 @@ static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 
 	int elem_len = 0;
 	EXIT_IF(check_type(self->element_type) == FALSE, "invalid type.");
-	START_CLOCK(dBench);
+
 	// determine size of buffer we need to allocate
 	elem_len = element_length(self->e);
 	EXIT_IF(elem_len == 0, "uninitialized element.");
@@ -1313,7 +1324,7 @@ static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 	PyObject *result = PyBytes_FromFormat("%d:%s", self->element_type, (const char *) base64_data_buf);
 	debug("base64 enc => '%s'\n", base64_data_buf);
 	free(base64_data_buf);
-	STOP_CLOCK(dBench);
+
 	return result;
 }
 
@@ -1322,7 +1333,7 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 	PyObject *object;
 
 	if(PyArg_ParseTuple(args, "OO", &group, &object)) {
-		START_CLOCK(dBench);
+
 		VERIFY_GROUP(group);
 		if(PyBytes_Check(object)) {
 			uint8_t *serial_buf = (uint8_t *) PyBytes_AsString(object);
@@ -1338,7 +1349,7 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 				origObject = createNewElement(type, group->pairing);
 				element_from_bytes(origObject->e, binary_buf, deserialized_len);
 				free(binary_buf);
-				STOP_CLOCK(dBench);
+
 				return (PyObject *) origObject;
 			}
 		}
@@ -1775,6 +1786,9 @@ static int pairings_clear(PyObject *m) {
 }
 
 static int pairings_free(PyObject *m) {
+//#ifdef BENCHMARK_ENABLED
+//    printf("enabled benchmark despite request!\n");
+//#endif
 	return 0;
 }
 

@@ -66,11 +66,13 @@ typedef enum Group GroupType;
 #else
 #define debug_e(...)
 #endif
+#ifdef BENCHMARK_ENABLED
+static Benchmark *dBench;
+#endif
 
 PyTypeObject ElementType;
 PyTypeObject PairingType;
 static PyObject *ElementError;
-static Benchmark *dBench;
 #define PyElement_Check(obj) PyObject_TypeCheck(obj, &ElementType)
 #define PyPairing_Check(obj) PyObject_TypeCheck(obj, &PairingType)
 #if PY_MAJOR_VERSION >= 3
@@ -119,6 +121,7 @@ typedef struct {
 	int safe_pairing_clear;
 } Element;
 
+#ifdef BENCHMARK_ENABLED
 typedef struct {
 	int exp_ZR, exp_G1, exp_G2, exp_GT;
 	int mul_ZR, mul_G1, mul_G2, mul_GT;
@@ -127,6 +130,7 @@ typedef struct {
 	int add_ZR, add_G1, add_G2, add_GT;
 	int sub_ZR, sub_G1, sub_G2, sub_GT;
 } Operations;
+#endif
 
 #define IS_PAIRING_OBJ_NULL(obj) \
 	if(obj->pairing == NULL) {	\
@@ -174,7 +178,6 @@ Element *convertToZR(PyObject *LongObj, PyObject *elemObj);
 
 PyObject *Apply_pairing(Element *self, PyObject *args);
 PyObject *sha1_hash(Element *self, PyObject *args);
-void Operations_clear(void);
 
 int exp_rule(GroupType lhs, GroupType rhs);
 int mul_rule(GroupType lhs, GroupType rhs);
@@ -186,6 +189,7 @@ void print_mpz(mpz_t x, int base);
 
 #ifdef BENCHMARK_ENABLED
 // for multiplicative notation
+void Operations_clear(void);
 #define Op_MUL(op_var_type, op_group_type, group, bench_obj)  \
 	if(op_var_type == MULTIPLICATION && op_group_type == group)      \
 		((Operations *) bench_obj->data_ptr)->mul_ ##group += 1;

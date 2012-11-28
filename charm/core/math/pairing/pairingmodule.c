@@ -766,7 +766,9 @@ static PyObject *Element_add(Element *self, Element *other)
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_add(newObject->e, self->e, other->e);
 	//STOP_CLOCK(dBench);
+#ifdef BENCHMARK_ENABLED
 	if(newObject != NULL) UPDATE_BENCH(ADDITION, newObject->element_type, dBench);
+#endif
 	return (PyObject *) newObject;
 }
 
@@ -791,7 +793,9 @@ static PyObject *Element_sub(Element *self, Element *other)
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_sub(newObject->e, self->e, other->e);		
 	//STOP_CLOCK(dBench);
+#ifdef BENCHMARK_ENABLED
 	if(newObject != NULL) UPDATE_BENCH(SUBTRACTION, newObject->element_type, dBench);
+#endif
 	return (PyObject *) newObject;
 }
 
@@ -866,8 +870,9 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 	else {
 		EXIT_IF(TRUE, "invalid types.");
 	}
-
+#ifdef BENCHMARK_ENABLED
 	if(newObject != NULL) UPDATE_BENCH(MULTIPLICATION, newObject->element_type, dBench);
+#endif
 	return (PyObject *) newObject;
 }
 
@@ -938,8 +943,9 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 		PyErr_SetString(ElementError, "invalid types");
 		return NULL;
 	}
-
+#ifdef BENCHMARK_ENABLED
 	if(newObject != NULL) UPDATE_BENCH(DIVISION, newObject->element_type, dBench);
+#endif
 	return (PyObject *) newObject;
 }
  
@@ -1059,7 +1065,9 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 	}
 	
 	// STOP_CLOCK
+#ifdef BENCHMARK_ENABLED
 	if(newObject != NULL) UPDATE_BENCH(EXPONENTIATION, newObject->element_type, dBench);
+#endif
 	return (PyObject *) newObject;
 }
 
@@ -1205,7 +1213,9 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 			newObject = createNewElement(GT, lhs->pairing);
 			pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing->pair_obj);
 			//STOP_CLOCK(dBench);
+#ifdef BENCHMARK_ENABLED
 			UPDATE_BENCHMARK(PAIRINGS, dBench);
+#endif
 			return (PyObject *) newObject;
 		}
 
@@ -1220,7 +1230,9 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 			else if(lhs->element_type == G2)
 				pairing_apply(newObject->e, rhs->e, lhs->e, rhs->pairing->pair_obj);
 			//STOP_CLOCK(dBench);
+#ifdef BENCHMARK_ENABLED
 			UPDATE_BENCHMARK(PAIRINGS, dBench);
+#endif
 			return (PyObject *) newObject;
 		}
 	}

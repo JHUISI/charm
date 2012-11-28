@@ -528,7 +528,9 @@ static PyObject *Integer_add(PyObject *o1, PyObject *o2) {
 		}
 	}
 
+#ifdef BENCHMARK_ENABLED
 	UPDATE_BENCHMARK(ADDITION, dBench);
+#endif
 	return (PyObject *) rop;
 }
 
@@ -566,7 +568,9 @@ static PyObject *Integer_sub(PyObject *o1, PyObject *o2) {
 		}
 	}
 
+#ifdef BENCHMARK_ENABLED
 	UPDATE_BENCHMARK(SUBTRACTION, dBench);
+#endif
 	return (PyObject *) rop;
 }
 
@@ -603,8 +607,9 @@ static PyObject *Integer_mul(PyObject *o1, PyObject *o2) {
 			}
 		}
 	}
-
+#ifdef BENCHMARK_ENABLED
 	UPDATE_BENCHMARK(MULTIPLICATION, dBench);
+#endif
 	return (PyObject *) rop;
 }
 
@@ -706,8 +711,9 @@ static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 		Py_XDECREF(rop);
 		EXIT_IF(TRUE, "division failed: could not find modular inverse.");
 	}
-
+#ifdef BENCHMARK_ENABLED
 	UPDATE_BENCHMARK(DIVISION, dBench);
+#endif
 	return (PyObject *) rop;
 }
 
@@ -849,7 +855,9 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 	}
 
 leave:
+#ifdef BENCHMARK_ENABLED
 	UPDATE_BENCHMARK(EXPONENTIATION, dBench);
+#endif
 	return (PyObject *) rop;
 }
 
@@ -2093,34 +2101,41 @@ static int int_traverse(PyObject *m, visitproc visit, void *arg) {
 
 static int int_clear(PyObject *m) {
 	Py_CLEAR(GETSTATE(m)->error);
+    Py_XDECREF(IntegerError);
 #ifdef BENCHMARK_ENABLED
-	Py_CLEAR(GETSTATE(m)->dBench);
+	Py_XDECREF(dBench); //Py_CLEAR(GETSTATE(m)->dBench);
 #endif
+	return 0;
+}
+
+static int int_free(PyObject *m) {
 	return 0;
 }
 
 static struct PyModuleDef moduledef = {
 	PyModuleDef_HEAD_INIT,
-	"ecc",
+	"integer",
 	NULL,
 	sizeof(struct module_state),
 	module_methods,
 	NULL,
 	int_traverse,
-	int_clear,
-	NULL
+	(inquiry) int_clear,
+	(freefunc) int_free
 };
 
+#define CLEAN_EXIT goto LEAVE;
 #define INITERROR return NULL
 PyMODINIT_FUNC
 PyInit_integer(void) {
 #else
+#define CLEAN_EXIT goto LEAVE;
 #define INITERROR return
 void initinteger(void) {
 #endif
 	PyObject *m;
 	if (PyType_Ready(&IntegerType) < 0)
-		INITERROR;
+		CLEAN_EXIT;
 	// initialize module
 #if PY_MAJOR_VERSION >= 3
 	m = PyModule_Create(&moduledef);
@@ -2130,27 +2145,26 @@ void initinteger(void) {
 	// add integer type to module
 	struct module_state *st = GETSTATE(m);
 	st->error = PyErr_NewException("integer.Error", NULL, NULL);
-	if (st->error == NULL) {
-		Py_DECREF(m);
-		INITERROR;
-	}
+	if (st->error == NULL)
+        CLEAN_EXIT;
 	IntegerError = st->error;
+    Py_INCREF(IntegerError);
 #ifdef BENCHMARK_ENABLED
-	if (import_benchmark() < 0) {
-    	Py_DECREF(m);
-    	INITERROR;
-	}
+	if (import_benchmark() < 0)
+		CLEAN_EXIT;
 	if (PyType_Ready(&BenchmarkType) < 0)
-		INITERROR;
+		CLEAN_EXIT;
 	st->dBench = PyObject_New(Benchmark, &BenchmarkType);
 	dBench = st->dBench;
+    Py_INCREF(dBench);
 	dBench->bench_initialized = FALSE;
 	InitClear(dBench);
-#endif
-	Py_INCREF(&IntegerType);
-	PyModule_AddObject(m, "integer", (PyObject *) &IntegerType);
     Py_INCREF(&BenchmarkType);
     PyModule_AddObject(m, "benchmark", (PyObject *)&BenchmarkType);
+#endif
+
+	Py_INCREF(&IntegerType);
+	PyModule_AddObject(m, "integer", (PyObject *) &IntegerType);
 
 #ifdef BENCHMARK_ENABLED
 	// add integer error to module
@@ -2166,6 +2180,12 @@ void initinteger(void) {
 	debug("Windows: seeding openssl prng.\n");
 	RAND_screen();
 #endif
+
+LEAVE:
+	if (PyErr_Occurred()) {
+       Py_XDECREF(m);
+       INITERROR;
+   }
 
 #if PY_MAJOR_VERSION >= 3
 	return m;
