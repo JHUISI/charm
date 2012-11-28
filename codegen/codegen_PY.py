@@ -44,12 +44,19 @@ def writeCurrentNumTabsIn(outputFile):
 
     outputFile.write(outputString)
 
+def removeDirectoryName(path):
+    pathSplit = path.split('/')
+
+    lenPathSplit = len(pathSplit)
+    return pathSplit[lenPathSplit - 1]
+
 def addImportLines(userFuncsFileArg):
     global setupFile, userFuncsFile
 
     userFuncsLibName = userFuncsFileArg
     if (userFuncsLibName.endswith(pySuffix) == True):
         userFuncsLibName = userFuncsLibName[0:(len(userFuncsLibName) - len(pySuffix))]
+        userFuncsLibName = removeDirectoryName(userFuncsLibName)
 
     pythonImportLines = ""
     pythonImportLines += "from " + str(userFuncsLibName) + " import *\n\n"
@@ -255,8 +262,8 @@ def writeInitDictDefs(outputFile, functionName):
         if (currentVarName not in varNamesToFuncs_Assign):
             sys.exit("writeInitDictDefs in codegen.py:  current variable name in loop is not in varNamesToFuncs_Assign.")
 
-        if (functionName != varNamesToFuncs_Assign[currentVarName][0]):
-            continue
+        #if (functionName != varNamesToFuncs_Assign[currentVarName][0]):
+            #continue
 
         #outputString += "\t" + currentVarName + " = {}\n"
 
@@ -292,7 +299,8 @@ def writeFunctionDecl_Python(outputFile, functionName, toWriteGlobalVarDecls, re
     outputFile.write(outputString)
 
     if (toWriteGlobalVarDecls == True):
-        writeGlobalVarDecls(outputFile, functionName)
+        #writeGlobalVarDecls(outputFile, functionName)
+        pass
 
     initDictDefsAlreadyMade = []
     writeInitDictDefs(outputFile, functionName)
@@ -636,6 +644,8 @@ def getAssignStmtAsString(variableName, node, replacementsDict, dotProdObj, lamb
                 return "0"
             elif (len(node.listNodes) == 1):
                 return "(" + str(node.listNodes[0]) + ")"
+            elif (len(node.listNodes) == 2):
+                return groupObjName + "." + INIT_FUNC_NAME + "(" + node.listNodes[0] + ", (" + node.listNodes[1] + ") )"
             else:
                 sys.exit("getAssignStmtAsString in codegen.py:  received node of name " + variableName + " in initialization call, but parameter passed in initialization call is unrecognized.")
 
@@ -1007,7 +1017,7 @@ def writeSDLToFiles(astNodes):
             currentFuncName = TYPES_HEADER
         elif (isTypesEnd(astNode) == True):
             currentFuncName = NONE_FUNC_NAME
-            writeGlobalVars()
+            #writeGlobalVars()
             setupFile.write("\n")
 
         if (currentFuncName == NONE_FUNC_NAME):

@@ -34,7 +34,7 @@ input := list{pk, n, x}
 t := pk#3
 BEGIN :: for
 for{i := 0, n+1}
-N#i := init(i+1)
+N#i := init(ZR,i+1)
 Nint#i := i + 1
 END :: for
 
@@ -44,7 +44,7 @@ lenNint := len(Nint)
 BEGIN :: for
 for{i := 0, lenNint}
 loopVar := Nint#i
-j := init(loopVar)
+j := init(ZR, loopVar)
 loopVarMinusOne := loopVar - 1
 prodResult := prodResult * (t#loopVarMinusOne ^ coeffs#j)
 END :: for
@@ -52,6 +52,31 @@ END :: for
 T := (pk#2 ^ (x * n)) * prodResult
 output := T
 END :: func:evalT
+
+BEGIN :: func:intersectionSubset
+input := list{w, wPrime, d}
+wLen := len(w)
+wPrimeLen := len(wPrime)
+SIndex := 0
+BEGIN :: for
+for{i := 0, wLen}
+BEGIN :: forinner
+forinner{j := 0, wPrimeLen}
+BEGIN :: if
+if {w#i == wPrime#j}
+S#SIndex := w#i
+SIndex := SIndex + 1
+END :: if
+END :: forinner
+END :: for
+
+BEGIN :: for
+for{k := 0, d}
+SSub#k := S#k
+END :: for
+       
+output := SSub
+END :: func:intersectionSubset
 
 BEGIN :: func:extract
 input := list{mk, ID, pk, dOver, n}
@@ -104,7 +129,7 @@ BEGIN :: for
 for{i := 0, wPrimeHashLen}
 loopVar := wPrimeHash#i
 evalTVar := evalT(pk, n, loopVar)
-E#i := evalTVar ^ s
+E#loopVar := evalTVar ^ s
 END :: for
         
 CT := list{wPrimeHash, Eprime, Eprimeprime, E}
@@ -112,27 +137,22 @@ output := CT
 END :: func:encrypt
 
 BEGIN :: func:decrypt
-input := list{pk, sk, CT, w, d}
+input := list{pk, sk, CT, dInputParam}
 
-wPrimeHash := CT#0
-Eprime := CT#1
-Eprimeprime := CT#2
-E := CT#3
+CT := expand{wPrimeHash, Eprime, Eprimeprime, E}
+sk := expand{wHash, D, d}
 
-wHash := sk#0
-D := sk#1
-d := sk#2
-
-S := intersection_subset(w, CT#0, d)
-coeffs := recoverCoefficients(S)
+S := intersectionSubset(wHash, wPrimeHash, dInputParam)
+coeffs := recoverCoefficientsDict(S)
 prod := init(GT)
 SLen := len(S)
 BEGIN :: for
 for{i := 0, SLen}
 loopVar := S#i
-prod := prod * (e(d#loopVar, E#loopVar) / e(CT#2, D#loopVar)) ^ coeffs#loopVar
+loopPairings := (e(d#loopVar, E#loopVar) / e(Eprimeprime, D#loopVar)) ^ coeffs#loopVar
+prod := prod * loopPairings
 END :: for
 
-M := CT#1 * prod
+M := Eprime * prod
 output := M
 END :: func:decrypt

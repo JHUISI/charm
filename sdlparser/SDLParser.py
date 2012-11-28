@@ -1206,6 +1206,11 @@ def updateAssignInfo(node, i):
 
         algebraicSetting = algSettingVarDepList[0]
 
+def getJustListName(listName):
+    listIndexSymbolPos = listName.find(LIST_INDEX_SYMBOL)
+
+    return listName[0:listIndexSymbolPos]
+
 def getVarDepList(funcName, varName, retVarDepList, varsVisitedSoFar, includeExponents):
     varsVisitedSoFar.append(varName)
     assignInfo_Var = assignInfo[funcName][varName]
@@ -1218,6 +1223,10 @@ def getVarDepList(funcName, varName, retVarDepList, varsVisitedSoFar, includeExp
             retVarDepList.append(currentVarDep)
         if ( (currentVarDep in assignInfo[funcName]) and  (currentVarDep not in varsVisitedSoFar) ):
             getVarDepList(funcName, currentVarDep, retVarDepList, varsVisitedSoFar, includeExponents)
+        elif (currentVarDep.find(LIST_INDEX_SYMBOL) != -1):
+            justListName = getJustListName(currentVarDep)
+            if ( (justListName in assignInfo[funcName]) and (justListName not in varsVisitedSoFar) ):
+                getVarDepList(funcName, justListName, retVarDepList, varsVisitedSoFar, includeExponents)
 
 def getVarInfList(retList, includeExponents):
     if (includeExponents == True):

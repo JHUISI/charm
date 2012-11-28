@@ -69,10 +69,6 @@ def updateCodeAndStructs():
     secretVarNames = getSecretVarNames()
     varDepList = externalGetVarDepList()
 
-    #print(publicVarNames)
-    #print(secretVarNames)
-    #sys.exit("test")
-
 def writeLinesToFuncAfterVarLastAssign(funcName, lineList, varName):
     if (varName == None):
         lineNo = getLineNoOfInputStatement(funcName) + 1
@@ -112,6 +108,9 @@ def getLineNoOfLastAssign(funcName, varNameToFind):
 
 def getIsVarList(keygenOutputElem, keygenOutputVarInfo):
     if ( (keygenOutputVarInfo.getIsList() == True) or (keygenOutputVarInfo.getIsSymmap() == True) or (len(keygenOutputVarInfo.getListNodesList()) > 0) ):
+        return True
+
+    if (str(keygenOutputVarInfo.getAssignNode().left).find(LIST_INDEX_SYMBOL) != -1):
         return True
 
     try:

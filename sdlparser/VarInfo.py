@@ -15,6 +15,7 @@ class VarInfo:
         self.varDepsNoExponents = []
         self.hasPairings = None
         self.protectsM = None
+        self.initType = None
         self.initValue = None
         self.beenSet = False
         self.initCall = None
@@ -47,6 +48,7 @@ class VarInfo:
         v.varDepsNoExponents = list(obj.varDepsNoExponents)
         v.hasPairings = obj.hasPairings
         v.protectsM   = obj.protectsM
+        v.initType    = obj.initType
         v.initValue   = obj.initValue
         v.beenSet     = obj.beenSet
         v.initCall    = obj.initCall
@@ -110,6 +112,9 @@ class VarInfo:
         if str(self.assignNode.left) in ['input', 'output']:
             return False         
         return self.protectsM
+
+    def getInitType(self):
+        return self.initType
 
     def getInitValue(self):
         return self.initValue
@@ -196,9 +201,16 @@ class VarInfo:
                     sys.exit("traverseAssignNodeRecursive found multiple calls to " + INIT_FUNC_NAME + " for the same variable in the same function.")
                 self.initCallHappenedAlready = True
                 listNodes = getListNodeNames(node)
-                if (len(listNodes) != 1):
-                    sys.exit("Init function call discovered by traverseAssignNodeRecursive has a number of arguments other than 1 (not supported).")
-                self.initValue = listNodes[0]
+                #if (len(listNodes) != 1):
+                    #sys.exit("Init function call discovered by traverseAssignNodeRecursive has a number of arguments other than 1 (not supported).")
+                if (len(listNodes) == 1):
+                    self.initValue = listNodes[0]
+                elif (len(listNodes) == 2):
+                    self.initType = listNodes[0]
+                    self.initValue = listNodes[1]
+                else:
+                    sys.exit("Init function call discovered by traverseAssignNodeRecursive has a number of arguments unequal to one or two (not supported).")
+
                 if (self.initValue == LIST_TYPE):
                     self.isList = True
                 self.initCall = True

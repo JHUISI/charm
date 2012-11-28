@@ -10,22 +10,8 @@ N = 2
 
 secparam = 80
 
-Eprime = {}
-loopVar = {}
-Eprimeprime = {}
-D = {}
-wHash = {}
-E = {}
-N = {}
-coeffs = {}
-wPrimeHash = {}
-evalTVar = {}
-t = {}
-S = {}
 
 def setup(n, d):
-    global t
-
     t = {}
 
     input = [n, d]
@@ -42,46 +28,60 @@ def setup(n, d):
     return output
 
 def evalT(pk, n, x):
-    global loopVar
-    global N
-    global coeffs
-    global t
-
     Nint = {}
+    N = {}
 
     input = [pk, n, x]
     t = pk[3]
     for i in range(0, n+1):
-        N[i] = (i+1)
+        N[i] = group.init(ZR, (i+1) )
         Nint[i] = (i + 1)
     coeffs = recoverCoefficientsDict(N)
     prodResult = group.init(G2)
     lenNint = len(Nint)
     for i in range(0, lenNint):
         loopVar = Nint[i]
-        j = (loopVar)
+        j = group.init(ZR, (loopVar) )
         loopVarMinusOne = (loopVar - 1)
         prodResult = (prodResult * (t[loopVarMinusOne] ** coeffs[j]))
     T = ((pk[2] ** (x * n)) * prodResult)
     output = T
     return output
 
-def extract(mk, ID, pk, dOver, n):
-    global loopVar
-    global D
-    global wHash
-    global evalTVar
+def intersectionSubset(w, wPrime, d):
+    SSub = {}
+    S = {}
 
+    input = [w, wPrime, d]
+    wLen = len(w)
+    wPrimeLen = len(wPrime)
+    SIndex = 0
+    for i in range(0, wLen):
+        for j in range(0, wPrimeLen):
+            if ( ( (w[i]) == (wPrime[j]) ) ):
+                S[SIndex] = w[i]
+                SIndex = (SIndex + 1)
+    for k in range(0, d):
+        SSub[k] = S[k]
+    output = SSub
+    return output
+
+def extract(mk, ID, pk, dOver, n):
     q = {}
-    D = {}
     wHash = {}
     d = {}
+    blindingFactorDBlinded = {}
+    DBlinded = {}
+    D = {}
 
     input = [mk, ID, pk, dOver, n]
+    blindingFactor0Blinded = group.random(ZR)
+    zz = group.random(ZR)
     lenID = len(ID)
     for i in range(0, lenID):
         loopVar = ID[i]
         wHash[i] = group.hash(loopVar, ZR)
+    wHashBlinded = wHash
     r = group.random(ZR)
     for i in range(0, dOver):
         q[i] = group.random(ZR)
@@ -93,18 +93,16 @@ def extract(mk, ID, pk, dOver, n):
         evalTVar = evalT(pk, n, loopVar)
         D[loopVar] = ((pk[2] ** shares[i][1]) * (evalTVar ** r))
         d[loopVar] = (pk[0] ** r)
-    sk = [wHash, D, d]
-    output = sk
+    dBlinded = d
+    for y in D:
+        blindingFactorDBlinded[y] = blindingFactor0Blinded
+        DBlinded[y] = (D[y] ** (1 / blindingFactorDBlinded[y]))
+    sk = [wHashBlinded, DBlinded, dBlinded]
+    skBlinded = [wHashBlinded, DBlinded, dBlinded]
+    output = (blindingFactor0Blinded, blindingFactorDBlinded, skBlinded)
     return output
 
 def encrypt(pk, wPrime, M, n):
-    global Eprime
-    global loopVar
-    global Eprimeprime
-    global E
-    global wPrimeHash
-    global evalTVar
-
     E = {}
     wPrimeHash = {}
 
@@ -120,38 +118,52 @@ def encrypt(pk, wPrime, M, n):
     for i in range(0, wPrimeHashLen):
         loopVar = wPrimeHash[i]
         evalTVar = evalT(pk, n, loopVar)
-        E[i] = (evalTVar ** s)
+        E[loopVar] = (evalTVar ** s)
     CT = [wPrimeHash, Eprime, Eprimeprime, E]
     output = CT
     return output
 
-def decrypt(pk, sk, CT, w, d):
-    global Eprime
-    global loopVar
-    global Eprimeprime
-    global D
-    global wHash
-    global E
-    global coeffs
-    global wPrimeHash
-    global S
+def transform(pk, sk, CT, dInputParam):
+    transformOutputList = {}
 
-    input = [pk, sk, CT, w, d]
-    wPrimeHash = CT[0]
-    Eprime = CT[1]
-    Eprimeprime = CT[2]
-    E = CT[3]
-    wHash = sk[0]
-    D = sk[1]
-    d = sk[2]
-    S = intersection_subset(w, CT[0], d)
-    coeffs = recoverCoefficients(S)
-    prod = group.init(GT)
-    SLen = len(S)
+    input = [pk, sk, CT, dInputParam]
+    wPrimeHash, Eprime, Eprimeprime, E = CT
+    wHash, D, d = sk
+    transformOutputList[0] = intersectionSubset(wHash, wPrimeHash, dInputParam)
+    S = transformOutputList[0]
+    transformOutputList[1] = recoverCoefficientsDict(S)
+    coeffs = transformOutputList[1]
+    transformOutputList[2] = group.init(GT)
+    prod = transformOutputList[2]
+    transformOutputList[3] = len(S)
+    SLen = transformOutputList[3]
     for i in range(0, SLen):
-        loopVar = S[i]
-        prod = (prod * ((pair(d[loopVar], E[loopVar]) / pair(CT[2], D[loopVar])) ** coeffs[loopVar]))
-    M = (CT[1] * prod)
+        transformOutputList[4] = S[i]
+        loopVar = transformOutputList[4]
+        transformOutputList[5] = pair((d[loopVar] ** coeffs[loopVar]), E[loopVar])
+        loopPairings = transformOutputList[5]
+        transformOutputList[6] = pair((Eprimeprime ** -coeffs[loopVar]), D[loopVar])
+        loopPairings = transformOutputList[6]
+        transformOutputList[7] = (prod * loopPairings)
+        prod = transformOutputList[7]
+    transformOutputList[8] = (Eprime * prod)
+    M = transformOutputList[8]
+    output = transformOutputList
+    return output
+
+def decout(pk, sk, CT, dInputParam, transformOutputList, blindingFactor0Blinded, blindingFactorDBlinded):
+    input = [pk, sk, CT, dInputParam, transformOutputList, blindingFactor0Blinded, blindingFactorDBlinded]
+    wPrimeHash, Eprime, Eprimeprime, E = CT
+    wHash, D, d = sk
+    S = transformOutputList[0]
+    coeffs = transformOutputList[1]
+    prod = transformOutputList[2]
+    SLen = transformOutputList[3]
+    for i in range(0, SLen):
+        loopVar = transformOutputList[4]
+        loopPairings = transformOutputList[5]
+        prod = transformOutputList[7]
+    M = transformOutputList[8]
     output = M
     return output
 
@@ -161,20 +173,6 @@ def SmallExp(bits=80):
 def main():
     global group
     group = PairingGroup(secparam)
-
-    max_attributes = 6
-    required_overlap = 4
-    (master_public_key, master_key) = setup(max_attributes, required_overlap)
-    private_identity = ['insurance', 'id=2345', 'oncology', 'doctor', 'nurse', 'JHU'] #private identity
-    public_identity = ['insurance', 'id=2345', 'doctor', 'oncology', 'JHU', 'billing', 'misc'] #public identity for encrypt
-    (pub_ID_hashed, secret_key) = extract(master_key, private_identity, master_public_key, required_overlap, max_attributes)
-    msg = group.random(GT)
-    cipher_text = encrypt(master_public_key, public_identity, msg, max_attributes)
-    decrypted_msg = decrypt(master_public_key, secret_key, cipher_text, pub_ID_hashed, required_overlap)
-    print("msg:  ", msg)
-    print("decrypted_msg:  ", decrypted_msg)
-    assert msg == decrypted_msg, "failed decryption!"
-    print("Successful Decryption!")
 
 if __name__ == '__main__':
     main()

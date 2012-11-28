@@ -148,6 +148,9 @@ def shouldWeAddToUnknownVarsList(node, nodeAsString, knownVars, dotProdLoopVar, 
     return True
 
 def getAreAllVarsOnLineKnownByTransformRecursive(node, knownVars, dotProdLoopVar, varsNotKnownByTransform):
+    if (node == None):
+        return
+
     if (node.left != None):
         getAreAllVarsOnLineKnownByTransformRecursive(node.left, knownVars, dotProdLoopVar, varsNotKnownByTransform)
 
@@ -317,11 +320,14 @@ def transformNEW(varsThatAreBlindedDict):
             currentNode.right = currentNodeTechnique11RightSide
         currentNodePairings = getNodePairingObjs(currentNode)
         dotProdLoopVar = None
-        if (currentNode.right.type == ops.ON):
+        if ( (currentNode.right != None) and (currentNode.right.type == ops.ON) ):
             dotProdLoopVar = getDotProdLoopVar(currentNode)
         areAllVarsOnLineKnownByTransform = getAreAllVarsOnLineKnownByTransform(currentNode.right, knownVars, dotProdLoopVar)
 
-        if ( (len(currentNodePairings) > 0) and (areAllVarsOnLineKnownByTransform == True) ):
+        if (currentNode.type != ops.EQ):
+            transformLines.append(str(currentNode) + "\n")
+            decoutLines.append(str(currentNode) + "\n")
+        elif ( (len(currentNodePairings) > 0) and (areAllVarsOnLineKnownByTransform == True) ):
             groupedPairings = groupPairings(currentNodePairings, varsThatAreBlindedDict)
             writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode)
             if (groupedPairings[0][0] == []):

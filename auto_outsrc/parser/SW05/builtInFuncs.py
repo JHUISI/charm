@@ -8,7 +8,7 @@ from charm.core.math import pairing
 from charm.toolbox.iterate import dotprod2
 from charm.core.math.pairing import hashPair as DeriveKey
 from charm.core.engine.util import objectToBytes, bytesToObject
-from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
+#from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from charm.toolbox.conversion import Conversion
 from charm.toolbox.bitstring import Bytes
 #import hashlib
@@ -78,7 +78,7 @@ def getCoefficients(policy):
 
 def recoverCoefficientsDict(inputDict):
 	getUserGlobals()
-	print("it got here")
+	#print("it got here")
 	return shareBuiltInFuncs.recoverCoefficientsDict(inputDict)
 
 def genShares(mk0, dOver, n, q, wHash):

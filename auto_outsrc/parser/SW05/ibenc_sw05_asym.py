@@ -165,8 +165,10 @@ class IBE_SW05_LUC(IBEnc):
         
         coeffs = util.recoverCoefficients(N)
 
-        print("N:  ", N)
-        print("coeffs:  ", coeffs)
+        #print("N:  ", N)
+        #print("coeffs:  ", coeffs)
+
+        #print("t:  ", pk['t'])
 
         prod_result = 1
         for i in N_int:
@@ -185,6 +187,10 @@ class IBE_SW05_LUC(IBEnc):
 
         if(len(S) < d):
             assert False, "Cannot decrypt.  w and w' do not have enough attributes in common."
+
+        #print("dLen:  ", len(d))
+        #print("S:  ", S)
+        print("d:  ", d)
 
         S_sub  = [S[k] for k in range(d)]
         return S_sub
@@ -230,6 +236,8 @@ class IBE_SW05_LUC(IBEnc):
         coeffs = util.recoverCoefficients(S)
         prod = 1
         for i in S:
+            #print("i:  ", i)
+            #print("sk['d']:  ", sk['d'])
             prod *= (pair(sk['d'][i], CT['E'][i]) / pair(CT['Eprimeprime'], sk['D'][i])) ** coeffs[i]
             
         return CT['Eprime'] * prod
