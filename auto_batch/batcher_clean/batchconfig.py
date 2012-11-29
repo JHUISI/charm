@@ -85,7 +85,7 @@ class SDLSetting():
         for i in self.data.get(PUBLIC):
             self.data[PUB_CNT].get(publicKeyCount).append(i)
 
-        print("__processPublicVars in batchconfig.py: ", self.data[PUB_CNT])
+        if self.debug: print("__processPublicVars in batchconfig.py: ", self.data[PUB_CNT])
         return
     
     def __processMessageVars(self):
@@ -98,7 +98,7 @@ class SDLSetting():
         for i in self.data.get(MESSAGE):
             self.data[MSG_CNT].get(messageKeyCount).append(i)
 
-        print("__processMessageVars in batchconfig.py: ", self.data[MSG_CNT])
+        if self.debug: print("__processMessageVars in batchconfig.py: ", self.data[MSG_CNT])
         return
     
     def __parseVerifyInputArgs(self, assignInfoDict):

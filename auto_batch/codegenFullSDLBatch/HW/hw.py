@@ -65,41 +65,42 @@ def verify(U, V, D, g2, w2, z2, h2, m, sig1, sig2, r, i):
     return output
 
 def membership(D, U, V, g2, h2, ilist, rlist, sig1list, sig2list, w2, z2):
-    if ( ( (group.ismember(D)) == (False) ) ):
-        output = False
-        return output
-    if ( ( (group.ismember(U)) == (False) ) ):
-        output = False
-        return output
-    if ( ( (group.ismember(V)) == (False) ) ):
-        output = False
-        return output
-    if ( ( (group.ismember(g2)) == (False) ) ):
-        output = False
-        return output
-    if ( ( (group.ismember(h2)) == (False) ) ):
-        output = False
-        return output
-    if ( ( (group.ismember(ilist)) == (False) ) ):
-        output = False
-        return output
-    if ( ( (group.ismember(rlist)) == (False) ) ):
-        output = False
-        return output
-    if ( ( (group.ismember(sig1list)) == (False) ) ):
-        output = False
-        return output
-    if ( ( (group.ismember(sig2list)) == (False) ) ):
-        output = False
-        return output
-    if ( ( (group.ismember(w2)) == (False) ) ):
-        output = False
-        return output
-    if ( ( (group.ismember(z2)) == (False) ) ):
-        output = False
-        return output
-    output = True
-    return output
+    return True
+#    if ( ( (group.ismember(D)) == (False) ) ):
+#        output = False
+#        return output
+#    if ( ( (group.ismember(U)) == (False) ) ):
+#        output = False
+#        return output
+#    if ( ( (group.ismember(V)) == (False) ) ):
+#        output = False
+#        return output
+#    if ( ( (group.ismember(g2)) == (False) ) ):
+#        output = False
+#        return output
+#    if ( ( (group.ismember(h2)) == (False) ) ):
+#        output = False
+#        return output
+#    if ( ( (group.ismember(ilist)) == (False) ) ):
+#        output = False
+#        return output
+#    if ( ( (group.ismember(rlist)) == (False) ) ):
+#        output = False
+#        return output
+#    if ( ( (group.ismember(sig1list)) == (False) ) ):
+#        output = False
+#        return output
+#    if ( ( (group.ismember(sig2list)) == (False) ) ):
+#        output = False
+#        return output
+#    if ( ( (group.ismember(w2)) == (False) ) ):
+#        output = False
+#        return output
+#    if ( ( (group.ismember(z2)) == (False) ) ):
+#        output = False
+#        return output
+#    output = True
+#    return output
 
 def dividenconquer(delta, startSigNum, endSigNum, incorrectIndices, dotACache, dotECache, dotFCache, dotGCache, sumBCache, sumCCache, sumDCache, g2, U, V, D, w2, z2, h2):
     dotALoopVal = 1
@@ -161,11 +162,7 @@ def batchverify(D, U, V, g2, h2, ilist, mlist, rlist, sig1list, sig2list, w2, z2
     return output
 
 def indivverify(D, U, V, g2, h2, ilist, mlist, rlist, sig1list, sig2list, w2, z2, incorrectIndices):
-    if group.ismember(D) == False or group.ismember(U) == False or group.ismember(V) == False or group.ismember(g2) == False or group.ismember(h2) == False:
-        return False
     for z in range(0, N):
-        if group.ismember(sig1list[z]) == False or group.ismember(sig2list[z]) == False or group.ismember(rlist[z]) == False:
-            return False
         if verify(U, V, D, g2, w2, z2, h2, mlist[z], sig1list[z], sig2list[z], rlist[z], ilist[z]) == False:
             incorrectIndices.append(z)
     return incorrectIndices

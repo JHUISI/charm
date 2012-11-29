@@ -92,13 +92,13 @@ def membership(A, S1list, S2list, S3list, g2, u1b, u2b, ub):
     if ( ( (group.ismember(A)) == (False) ) ):
         output = False
         return output
-    if ( ( (group.ismember(S1list)) == (False) ) ):
+    if ( ( (group.ismemberList(S1list)) == (False) ) ):
         output = False
         return output
-    if ( ( (group.ismember(S2list)) == (False) ) ):
+    if ( ( (group.ismemberList(S2list)) == (False) ) ):
         output = False
         return output
-    if ( ( (group.ismember(S3list)) == (False) ) ):
+    if ( ( (group.ismemberList(S3list)) == (False) ) ):
         output = False
         return output
     if ( ( (group.ismember(g2)) == (False) ) ):
@@ -110,7 +110,7 @@ def membership(A, S1list, S2list, S3list, g2, u1b, u2b, ub):
     if ( ( (group.ismember(u2b)) == (False) ) ):
         output = False
         return output
-    if ( ( (group.ismember(ub)) == (False) ) ):
+    if ( ( (group.ismemberList(ub)) == (False) ) ):
         output = False
         return output
     output = True

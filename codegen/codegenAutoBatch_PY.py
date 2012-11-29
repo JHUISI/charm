@@ -1934,6 +1934,6 @@ if __name__ == "__main__":
     if (ignoreCloudSourcing == False):
         writeLinesOfCodeToFile(outputSDLFileName)
     #print("io vars:  ", getInputOutputVars())
-    lll = getFinalVarType("gl#0", "setup")
+    #lll = getFinalVarType("gl#0", "setup")
     #print(str(lll))
     #print("Function Name Order:  ", functionNameOrder)

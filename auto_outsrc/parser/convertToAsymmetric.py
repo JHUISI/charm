@@ -15,6 +15,9 @@ from sdlparser.SDLParser import *
 from outsrctechniques import SubstituteVar, SubstitutePairings
 
 assignInfo = None
+SHORT_KEYS = "keys" # for 
+SHORT_CIPHERTEXT = "ciphertext" # in case, an encryption scheme
+SHORT_SIGNATURE  = "signature" # in case, a sig algorithm
 
 class GetPairingVariables:
     def __init__(self, list1, list2):
@@ -34,7 +37,7 @@ class GetPairingVariables:
         elif Type(node.left) != ops.ATTR and Type(node.right) == ops.ATTR:
             pass
 
-def retrieveGenList():
+def main():
     global assignInfo
     assignInfo = getAssignInfo()
     setting = getAssignInfo()[NONE_FUNC_NAME]['setting'].getAssignNode().right.getAttribute()
@@ -43,6 +46,19 @@ def retrieveGenList():
         print("No need to convert to asymmetric setting.\n")
         exit(0) # or continue
     
+    # determine user preference in terms of keygen or encrypt
+    contarget = getAssignInfo()[NONE_FUNC_NAME]['short']
+    if contarget:
+        target = contarget.getAssignNode().right.getAttribute()
+    if contarget == None:
+        short = SHORT_KEYS
+    elif contarget != SHORT_KEYS and contarget != SHORT_CIPHERTEXT and contarget != SHORT_SIGNATURE:
+        # choose default
+        short = SHORT_KEYS
+    else:
+        pass
+    print("reducing size of '%s'" % short) 
+        
     setupFuncName = "setup"
     setup = setupFuncName
     varTypes = getVarTypes()
@@ -87,7 +103,7 @@ def retrieveGenList():
     print("info => G1 : ", info['G1'])
     print("info => G2 : ", info['G2'])
 
-    # TODO: 
+# TODO: 
 #    print("<===== Derive Rules =====>")
 #    rules = deriveRules(info, generators)
 #    print("<===== Derive Rules =====>\n")
@@ -223,7 +239,7 @@ def deriveRules(info, generators):
 #    print("Right changes: ", listG2)
 #    return (listG1, listG2)
 
-# TODO: this needs to be redone
+
 def Step1_DeriveSetupGenerators(generators):
     generatorLines = []
     generatorMapG1 = {}
@@ -458,4 +474,4 @@ if __name__ == "__main__":
     sdlVerbose = False
     if len(sys.argv) > 2 and sys.argv[2] == "-v":  sdlVerbose = True
     parseFile2(sdl_file, sdlVerbose)
-    retrieveGenList()
+    main()
