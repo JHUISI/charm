@@ -241,7 +241,7 @@ class Technique10(AbstractTechnique):
         AbstractTechnique.__init__(self, sdl_data, variables) 
         self.sdl_data = sdl_data
         self.types = variables 
-        self.rule    = "Unroll constant-size for loop (technique 10)"
+        self.rule    = "Unrolling for loop (technique 10)"
         self.applied = False 
         self.score   = tech10.NoneApplied
         self.debug = False      

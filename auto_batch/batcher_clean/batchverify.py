@@ -41,9 +41,10 @@ def handleVerifyEq(equation, index, verbose):
     ASTVisitor(tme).preorder(combined_equation)
     flags['multiple' + str(index)] = False
     if tme.multiple:
-        singleVE = False
+        singleVE = False        
         cme = CombineMultipleEq()
-        ASTVisitor(cme).preorder(combined_equation)
+        ASTVisitor(cme).postorder(combined_equation)
+        #print("Equation: ", combined_equation)
         if len(cme.finalAND) == 1: 
             multipleEquationsHere = True            
             combined_equation = cme.finalAND.pop()
@@ -64,8 +65,11 @@ def handleVerifyEq(equation, index, verbose):
             # may need to combine them further? or batch separaely
             print("Note: multiple equations left. Either batch each equation separately OR combine further.")
             if len(cme.finalAND) == 2:
+                if VERBOSE: # since we did post-order traversal it should be the same way
+                    print("equation 1: ", cme.finalAND[1])
+                    print("equation 2: ", cme.finalAND[0])                
                 multipleEquationsHere = True
-                combined_equation2 = BinaryNode(ops.AND, cme.finalAND[0], cme.finalAND[1])
+                combined_equation2 = BinaryNode(ops.AND, cme.finalAND[1], cme.finalAND[0])
                 cme2 = CombineMultipleEq(addIndex=False)
                 ASTVisitor(cme2).preorder(combined_equation2)
                 combined = cme2.finalAND.pop()
@@ -81,8 +85,8 @@ def handleVerifyEq(equation, index, verbose):
                 flags[ str(index) ] = combined2
                 flags[ 'verify' + str(index) ] = equation.right # used for verify in tex        
                 flags[ 'step1' ] = combined2 # add delta index #s here
+                #sys.exit("Testing Stuff 2!!!")
                 return (combined, multipleEquationsHere)
-#            sys.exit("Testing Stuff 2!!!")
 
             return (cme.finalAND, multipleEquationsHere)
     return (combined_equation, multipleEquationsHere)

@@ -149,7 +149,7 @@ class LatexCodeGenerator:
             return self.latex[ name ]
         return name
     
-    def print_statement(self, node):
+    def print_statement(self, node, parent=None):
         if node == None:
             return None
         elif(node.type == ops.ATTR):
@@ -191,8 +191,8 @@ class LatexCodeGenerator:
         elif(node.type == ops.TYPE):
             return str(node.attr)
         else:
-            left = self.print_statement(node.left)
-            right = self.print_statement(node.right)
+            left = self.print_statement(node.left, node)
+            right = self.print_statement(node.right, node)
 
             if debug >= levels.some:
                print("Operation: ", node.type)
@@ -214,7 +214,10 @@ class LatexCodeGenerator:
             elif(node.type == ops.SUB):
                 return ("("+ left + ' - ' + right + ")")
             elif(node.type == ops.EQ):
-                return (left + ' = ' + str(right)) 
+                if parent != None and parent.type == ops.PROD:
+                    return (left + ' = ' + str(right).replace("0", "1"))
+                else:
+                    return (left + ' = ' + str(right))
             elif(node.type == ops.EQ_TST):
                 return (left + ' \stackrel{?}{=} ' + right)
             elif(node.type == ops.PAIR):
