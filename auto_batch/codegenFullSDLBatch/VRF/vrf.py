@@ -197,6 +197,21 @@ def batchverify(U, U0, U1, Ub, g1, g2, h, pilist, xlist, y0list, incorrectIndice
     output = incorrectIndices
     return output
 
+def indivverify(U, U0, U1, Ub, g1, g2, h, pilist, xlist, y0list, incorrectIndices):
+    for z in range(0, N):
+        assert group.ismemberDict(U), "failed membership test"
+        assert group.ismember(U0), "failed membership test"
+        assert group.ismember(U1), "failed membership test"
+        assert group.ismember(Ub), "failed membership test"
+        assert group.ismember(g1), "failed membership test"
+        assert group.ismember(g2), "failed membership test"
+        assert group.ismember(h), "failed membership test"
+        assert group.ismember(y0list[z]), "failed membership test"
+        assert group.ismemberList(pilist[z]), "failed membership test"
+        if verify(U0, U1, U, Ub, g1, g2, h, y0list[z], pilist[z], xlist[z]) == False:
+           incorrectIndices.append(z)
+    return incorrectIndices  
+ 
 def SmallExp(bits=80):
     return group.init(ZR, randomBits(bits))
 
