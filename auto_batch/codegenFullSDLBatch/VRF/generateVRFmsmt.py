@@ -1,9 +1,10 @@
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-from charm.core.engine.util import *
+from charm.core.engine.util import * #objectToBytes, bytesToObject
 import vrf
 
 import sys, random, string, time
 
+CURVE='BN256'
 group = None
 prefixName = None
 sigNumKey = 'Signature_Number'
@@ -16,16 +17,16 @@ lenRepeatSuffix = len(repeatSuffix)
 trials = 1
 time_in_ms = 1000
 NUM_PROGRAM_ITERATIONS = 10
-NUM_CYCLES = 10
+NUM_CYCLES = 100
 
 def genNewMessage(messageSize):
-    message = []
-    for randomChar in range(0, messageSize):
-        message.append(random.randint(0, 1))
+    message = {} 
+    for randomChar in range(1, messageSize+1):
+        message[ randomChar ] = random.randint(0, 1)
     return message
 
 def genBadMessage(message, messageSize):
-    randomIndex = random.randint(0, (messageSize - 1))
+    randomIndex = random.randint(1, messageSize)
     oldValue = message[randomIndex]
     if (message[randomIndex] == 0): # flib the bit
         message[randomIndex] = 1
@@ -33,11 +34,11 @@ def genBadMessage(message, messageSize):
         message[randomIndex] = 0
     return message
 
-def genValidSignature(message, index, U1, U2, pk, sk, u):
+def genValidSignature(message, index, U0, U1, U, pk, sk, u):
     sig = vrf.prove(sk, u, message)
     (y, pi) = sig
-    Ut, g1, g2, h = pk
-    assert vrf.verify(U1, U2, Ut, g1, g2, h, y, pi, message), "failed verification"
+    Ub, g1, g2, h = pk
+    assert vrf.verify(U0, U1, U, Ub, g1, g2, h, y, pi, message), "failed verification"
     return sig
 
 def genOutputDictFile(numCount, messageSize, keyName1, keyName2, outputDict, outputDictName, outputMsgSuffix, outputSigSuffix, isValid, *signVars):
@@ -136,7 +137,7 @@ def generate_signatures_main(argv, same_signer=True):
         sys.exit("Usage:  python " + argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
     
     global group, prefixName
-    group = PairingGroup('BN256')
+    group = PairingGroup(CURVE)
     vrf.group = group
     #setup parameters
     numValidMessages = int(sys.argv[1])
@@ -147,12 +148,12 @@ def generate_signatures_main(argv, same_signer=True):
     invalidOutputDictName = sys.argv[6]
     
     # 1. generate keys
-    (pk, U1, U2, sk, u) = vrf.setup(messageSize)
+    (pk, U0, U1, U, sk, u) = vrf.setup(messageSize)
     vrf.l = messageSize # set this to l
        
     f_mpk = open('mpk.charmPickle', 'wb')
     # 2. serialize the pk's
-    pick_mpk = objectToBytes({ 'pk':pk, 'U1':U1, 'U2':U2, 'blocksize':messageSize }, group)
+    pick_mpk = objectToBytes({ 'pk':pk, 'U0':U0, 'U1':U1, 'U':U, 'blocksize':messageSize }, group)
     f_mpk.write(pick_mpk)
     f_mpk.close()
     
@@ -175,8 +176,8 @@ def generate_signatures_main(argv, same_signer=True):
 #    invalidOutputDict[0]['pk'] = 'pk.charmPickle'
     
     # 3. pass right arguments at the end
-    genOutputDictFile(numValidMessages, messageSize, 'mpk.charmPickle', 'pk.charmPickle', validOutputDict, validOutputDictName, '_ValidMessage.pythonPickle', '_ValidSignature.charmPickle', True, U1, U2, pk, sk, u)
-    genOutputDictFile(numInvalidMessages, messageSize, 'mpk.charmPickle', 'pk.charmPickle', invalidOutputDict, invalidOutputDictName, '_InvalidMessage.pythonPickle', '_InvalidSignature.charmPickle', False, U1, U2, pk, sk, u)
+    genOutputDictFile(numValidMessages, messageSize, 'mpk.charmPickle', 'pk.charmPickle', validOutputDict, validOutputDictName, '_ValidMessage.pythonPickle', '_ValidSignature.charmPickle', True, U0, U1, U, pk, sk, u)
+    genOutputDictFile(numInvalidMessages, messageSize, 'mpk.charmPickle', 'pk.charmPickle', invalidOutputDict, invalidOutputDictName, '_InvalidMessage.pythonPickle', '_InvalidSignature.charmPickle', False, U0, U1, U, pk, sk, u)
     return
 
 def run_batch_verification(argv, same_signer=True):
@@ -184,7 +185,7 @@ def run_batch_verification(argv, same_signer=True):
         sys.exit("Usage:  python " + argv[0] + "\n\t[dictionary with valid messages/signatures]\n\t[name of output file for batch results]\n\t[name of output file for ind. results]")
     
     validDictArg = open(sys.argv[1], 'rb').read()
-    groupParamArg = PairingGroup('BN256')
+    groupParamArg = PairingGroup(CURVE)
     vrf.group = groupParamArg
     batchResultsFile = sys.argv[2]
     indResultsFile = sys.argv[3]
@@ -218,15 +219,15 @@ def run_batch_verification(argv, same_signer=True):
             vrf.N = N
             # 4. public values/generator
             vrf.l = int(sigsDict[0]['mpk'][bodyKey]['blocksize'])
-            U1, U2 = sigsDict[0]['mpk'][bodyKey]['U1'], sigsDict[0]['mpk'][bodyKey]['U2']
-            Ut, g1, g2, h = sigsDict[0]['mpk'][bodyKey]['pk'][:]
+            U0, U1, U = sigsDict[0]['mpk'][bodyKey]['U0'], sigsDict[0]['mpk'][bodyKey]['U1'], sigsDict[0]['mpk'][bodyKey]['U']
+            Ub, g1, g2, h = sigsDict[0]['mpk'][bodyKey]['pk'][:]
 
             xlist =  [ sigsDict[i]['message'][bodyKey] for i in range(0, N) ]
             y0list = [ sigsDict[i]['sig'][bodyKey][0] for i in range(0, N) ]
             pilist = [ sigsDict[i]['sig'][bodyKey][1] for i in range(0, N) ]
 
             startTime = time.clock()
-            incorrectSigIndices = vrf.batchverify(U1, U2, Ut, g1, g2, h, pilist, xlist, y0list, [])
+            incorrectSigIndices = vrf.batchverify(U, U0, U1, Ub, g1, g2, h, pilist, xlist, y0list, [])
             endTime = time.clock()
 
             result = (endTime - startTime) * time_in_ms
@@ -241,7 +242,7 @@ def run_batch_verification(argv, same_signer=True):
             batchResultsRaw.write(currentBatchOutputString)
 
             startTime = time.clock()
-            incorrectSigIndices = vrf.indivverify(U1, U2, Ut, g1, g2, h, pilist, xlist, y0list, [])
+            incorrectSigIndices = vrf.indivverify(U, U0, U1, Ub, g1, g2, h, pilist, xlist, y0list, [])
             endTime = time.clock()
 
             result = (endTime - startTime) * time_in_ms

@@ -1,4 +1,4 @@
-from charm.toolbox.pairinggroup import * #PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.pairinggroup import *
 from charm.core.engine.util import *
 from charm.core.math.integer import randomBits
 import random
@@ -91,15 +91,14 @@ def verify(U0, U1, U, Ub, g1, g2, h, y0, pi, x):
     return output
 
 def membership(U, U0, U1, Ub, g1, g2, h, pilist, y0list):
-    assert group.ismemberDict(U), "failed membership test"
+    assert group.ismemberList(list(U.values())), "failed membership test"
     assert group.ismember(U0), "failed membership test"
     assert group.ismember(U1), "failed membership test"
     assert group.ismember(Ub), "failed membership test"
     assert group.ismember(g1), "failed membership test"
     assert group.ismember(g2), "failed membership test"
     assert group.ismember(h), "failed membership test"
-    for z in range(len(y0list)):
-        assert group.ismember(y0list[z]), "failed membership test"
+    assert group.ismemberList(y0list), "failed membership test"
     for z in range(len(pilist)):
         assert group.ismemberList(pilist[z]), "failed membership test"
     return True
@@ -130,7 +129,7 @@ def dividenconquer(delta1, delta2, delta3, delta4, delta5, delta6, delta7, delta
         dotJLoopVal = (dotJLoopVal * dotJCache[z])
         dotKLoopVal = (dotKLoopVal * dotKCache[z])
         dotLLoopVal = (dotLLoopVal * dotLCache[z])
-    if ( ( ((pair(dotALoopVal, Ub) * pair(dotBLoopVal, g2))) == (((pair(dotCLoopVal, U0) * (dotDLoopVal * pair(dotELoopVal, (g2 * (h ** 1))))) * ((((((pair(dotFLoopVal, U[2]) * pair(dotGLoopVal, U[3])) * pair(dotHLoopVal, U[4])) * pair(dotILoopVal, U[5])) * pair(dotJLoopVal, U[6])) * pair(dotKLoopVal, U[7])) * pair(dotLLoopVal, U[8])))) ) ):
+    if ( ( ((pair(dotALoopVal, Ub) * pair(dotBLoopVal, g2))) == (((pair(dotCLoopVal, U0) * (dotDLoopVal * pair(dotELoopVal, (g2 * h)))) * ((((((pair(dotFLoopVal, U[2]) * pair(dotGLoopVal, U[3])) * pair(dotHLoopVal, U[4])) * pair(dotILoopVal, U[5])) * pair(dotJLoopVal, U[6])) * pair(dotKLoopVal, U[7])) * pair(dotLLoopVal, U[8])))) ) ):
         return
     else:
         midwayFloat = ((endSigNum - startSigNum) / 2)
@@ -181,11 +180,11 @@ def batchverify(U, U0, U1, Ub, g1, g2, h, pilist, xlist, y0list, incorrectIndice
         output = False
         return output
     for z in range(0, N):
-        dotACache[z] = ((g1 ** ((1 - xlist[z][1]) * delta1[z])) * (U1 ** (xlist[z][1] * delta1[z])))
-        dotBCache[z] = ((pilist[z][1] ** -delta1[z]) * ((((((((pilist[z][2] ** delta3[z]) * (pilist[z][1] ** ((1 - xlist[z][2]) * -delta3[z]))) * ((pilist[z][3] ** -delta4[z]) * (pilist[z][2] ** (((1 - xlist[z][3]) * -delta4[z]) * -1)))) * ((pilist[z][4] ** -delta5[z]) * (pilist[z][3] ** (((1 - xlist[z][4]) * -delta5[z]) * -1)))) * ((pilist[z][5] ** -delta6[z]) * (pilist[z][4] ** (((1 - xlist[z][5]) * -delta6[z]) * -1)))) * ((pilist[z][6] ** -delta7[z]) * (pilist[z][5] ** (((1 - xlist[z][6]) * -delta7[z]) * -1)))) * ((pilist[z][7] ** -delta8[z]) * (pilist[z][6] ** (((1 - xlist[z][7]) * -delta8[z]) * -1)))) * ((pilist[z][8] ** -delta9[z]) * (pilist[z][7] ** (((1 - xlist[z][8]) * -delta9[z]) * -1)))))
-        dotCCache[z] = (pilist[z][l] ** delta2[z])
-        dotDCache[z] = (y0list[z] ** delta2[z])
-        dotECache[z] = (pilist[z][0] ** -delta2[z])
+        dotACache[z] = ((g1 ** ((1 - xlist[z][1]) * delta2[z])) * (U1 ** (xlist[z][1] * delta2[z])))
+        dotBCache[z] = ((pilist[z][1] ** -delta2[z]) * ((((((((pilist[z][2] ** delta3[z]) * (pilist[z][1] ** ((1 - xlist[z][2]) * -delta3[z]))) * ((pilist[z][3] ** -delta4[z]) * (pilist[z][2] ** (((1 - xlist[z][3]) * -delta4[z]) * -1)))) * ((pilist[z][4] ** -delta5[z]) * (pilist[z][3] ** (((1 - xlist[z][4]) * -delta5[z]) * -1)))) * ((pilist[z][5] ** -delta6[z]) * (pilist[z][4] ** (((1 - xlist[z][5]) * -delta6[z]) * -1)))) * ((pilist[z][6] ** -delta7[z]) * (pilist[z][5] ** (((1 - xlist[z][6]) * -delta7[z]) * -1)))) * ((pilist[z][7] ** -delta8[z]) * (pilist[z][6] ** (((1 - xlist[z][7]) * -delta8[z]) * -1)))) * ((pilist[z][8] ** -delta9[z]) * (pilist[z][7] ** (((1 - xlist[z][8]) * -delta9[z]) * -1)))))
+        dotCCache[z] = (pilist[z][l] ** delta1[z])
+        dotDCache[z] = (y0list[z] ** delta1[z])
+        dotECache[z] = (pilist[z][0] ** -delta1[z])
         dotFCache[z] = (pilist[z][1] ** (xlist[z][2] * delta3[z]))
         dotGCache[z] = ((pilist[z][2] ** (xlist[z][3] * delta4[z])) ** -1)
         dotHCache[z] = ((pilist[z][3] ** (xlist[z][4] * delta5[z])) ** -1)
@@ -199,7 +198,7 @@ def batchverify(U, U0, U1, Ub, g1, g2, h, pilist, xlist, y0list, incorrectIndice
 
 def indivverify(U, U0, U1, Ub, g1, g2, h, pilist, xlist, y0list, incorrectIndices):
     for z in range(0, N):
-        assert group.ismemberDict(U), "failed membership test"
+        assert group.ismemberList(list(U.values())), "failed membership test"
         assert group.ismember(U0), "failed membership test"
         assert group.ismember(U1), "failed membership test"
         assert group.ismember(Ub), "failed membership test"
@@ -211,7 +210,8 @@ def indivverify(U, U0, U1, Ub, g1, g2, h, pilist, xlist, y0list, incorrectIndice
         if verify(U0, U1, U, Ub, g1, g2, h, y0list[z], pilist[z], xlist[z]) == False:
            incorrectIndices.append(z)
     return incorrectIndices  
- 
+
+
 def SmallExp(bits=80):
     return group.init(ZR, randomBits(bits))
 
@@ -220,9 +220,6 @@ def main():
     group = PairingGroup('BN256')
     (pk, U0, U1, U, sk, u) = setup(l)
     [Ub, g1, g2, h] = pk
-
-#    print("current dir...")
-#    print(dir())
 
     x0 = {}
     x1 = {}
