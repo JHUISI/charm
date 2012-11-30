@@ -1926,13 +1926,14 @@ if __name__ == "__main__":
     else:
         sys.exit("error in system logic in first main method.")
 
-    parseLinesOfCode(getLinesOfCode(), True, True)
+    #parseLinesOfCode(getLinesOfCode(), True, True)
     #os.system("cp userFuncsPermanent.py userFuncs.py")
     #printLinesOfCode()
     #sys.exit("test")
 
-    if (ignoreCloudSourcing == False):
-        writeLinesOfCodeToFile(outputSDLFileName)
+    #if (ignoreCloudSourcing == False):
+    #    writeLinesOfCodeToFile(outputSDLFileName)
+    
     #print("io vars:  ", getInputOutputVars())
     #lll = getFinalVarType("gl#0", "setup")
     #print(str(lll))

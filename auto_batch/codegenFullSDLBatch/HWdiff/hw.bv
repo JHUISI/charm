@@ -87,3 +87,14 @@ signature_count := N
 END :: count
 
 verify := { e(sig1, g2) == ((U^M) * (V^r) * D * e(sig2, ((w2^n)*((z2^i)*h2)))) }
+
+BEGIN :: latex
+sig1 := \sigma_1
+sig2 := \sigma_2
+n := \lceil\lg(i)\rceil
+g2 := g
+w2 := w
+z2 := z
+h2 := h
+END :: latex
+
