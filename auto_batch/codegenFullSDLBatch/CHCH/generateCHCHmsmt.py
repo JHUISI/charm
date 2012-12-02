@@ -16,7 +16,9 @@ lenRepeatSuffix = len(repeatSuffix)
 trials = 1
 time_in_ms = 1000
 NUM_PROGRAM_ITERATIONS = 10
-NUM_CYCLES = 10
+NUM_CYCLES = 100
+cycleRun = range(NUM_CYCLES-1, NUM_CYCLES)
+#cycleRun = range(0, NUM_CYCLES)
 
 def genNewMessage(messageSize):
     message = ""
@@ -123,7 +125,7 @@ def loadDataFromDictInMemory(verifyParamFilesDict, startIndex, numSigsToProcess,
 def getResults(resultsDict):
     resultsString = ""
 
-    for cycle in range(0, NUM_CYCLES):
+    for cycle in cycleRun:
         value = 0.0
 
         for programIteration in range(0, NUM_PROGRAM_ITERATIONS):
@@ -216,8 +218,8 @@ def run_batch_verification(argv, same_signer=True):
     for programIteration in range(0, NUM_PROGRAM_ITERATIONS):
         print("program iteration ", programIteration, " with ", NUM_CYCLES, " sigs.")
 
-        for cycle in range(0, NUM_CYCLES):
-#            print("cycle is ", cycle)
+        for cycle in cycleRun:
+            print("cycle is ", cycle)
             sigsDict = {}
             loadDataFromDictInMemory(validDict, 0, (cycle+1), sigsDict, 0)
             verifyFuncArgs = list(sigsDict[0].keys())
