@@ -2,10 +2,11 @@ from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.core.engine.util import *
 import chch
 import hess
-#import chchhess
+import chchhess
 
 import sys, random, string, time
 
+CURVE='BN256' # 'MNT160'
 group = None
 prefixName = None
 sigNumKey = 'Signature_Number'
@@ -17,7 +18,7 @@ lenRepeatSuffix = len(repeatSuffix)
 
 trials = 1
 time_in_ms = 1000
-NUM_PROGRAM_ITERATIONS = 10
+NUM_PROGRAM_ITERATIONS = 1
 NUM_CYCLES = 100
 cycleRun = range(NUM_CYCLES-1, NUM_CYCLES)
 #cycleRun = range(0, NUM_CYCLES)
@@ -43,19 +44,16 @@ def genBadMessage(message, messageSize):
         message = message[0:randomIndex] + newValue
     return message
 
-def genValidSignatureHESS(message, index, pk, sk, P, g2):
-    sig = hess.sign(pk[index], sk[index], message, g2)
-    (S1, S2) = sig
-    assert hess.verify(P, g2, pk[index], message, S1, S2)
-    return sig
-
-def genValidSignatureCHCH(message, index, pk, sk, P, g2):
-    sig = chch.sign(pk[index], sk[index], message)
-    (S1, S2) = sig
-    assert chch.verify(P, g2, pk[index], message, S1, S2)
-    return sig
-
-def genOutputDictFile(genValidSignature, numCount, messageSize, keyName1, keyName2, outputDict, outputDictName, outputMsgSuffix, outputSigSuffix, isValid, *signVars):
+def genValidSignature(message, index, pk, sk, P, g2):
+    sig1 = hess.sign(pk[index], sk[index], message, g2)
+    (S1h, S2h) = sig1
+    assert hess.verify(P, g2, pk[index], message, S1h, S2h)
+    sig2 = chch.sign(pk[index], sk[index], message)
+    (S1c, S2c) = sig2
+    assert chch.verify(P, g2, pk[index], message, S1c, S2c)
+    return (S1c, S2c, S1h, S2h)
+    
+def genOutputDictFile(numCount, messageSize, keyName1, keyName2, outputDict, outputDictName, outputMsgSuffix, outputSigSuffix, isValid, *signVars):
     for index in range(0, numCount):
         if (index != 0):
             outputDict[index] = {}
@@ -151,7 +149,8 @@ def generate_signatures_main(argv, same_signer=True):
         sys.exit("Usage:  python " + argv[0] + " [# of valid messages] [# of invalid messages] [size of each message] [prefix name of each message] [name of valid output dictionary] [name of invalid output dictionary]")
     
     global group, prefixName
-    group = PairingGroup('BN256')
+    group = PairingGroup(CURVE)
+    chch.group = group
     hess.group = group
     #setup parameters
     numValidMessages = int(sys.argv[1])
@@ -193,9 +192,7 @@ def generate_signatures_main(argv, same_signer=True):
     invalidOutputDict[0]['pk'] = 'pk.charmPickle'
     
     # 3. pass right arguments at the end
-    genOutputDictFile(genValidSignatureHESS, numValidMessages, messageSize, 'mpk.charmPickle', 'pk.charmPickle', validOutputDict, validOutputDictName, '_ValidMessageHE.pythonPickle', '_ValidSignatureHE.charmPickle', True, pklist, sklist, P, g2)
-    genOutputDictFile(genValidSignatureCHCH, numValidMessages, messageSize, 'mpk.charmPickle', 'pk.charmPickle', validOutputDict, validOutputDictName, '_ValidMessageCH.pythonPickle', '_ValidSignatureCH.charmPickle', True, pklist, sklist, P, g2)
-
+    genOutputDictFile(numValidMessages, messageSize, 'mpk.charmPickle', 'pk.charmPickle', validOutputDict, validOutputDictName, '_ValidMessage.pythonPickle', '_ValidSignature.charmPickle', True, pklist, sklist, P, g2)
     #genOutputDictFile(numInvalidMessages, messageSize, 'mpk.charmPickle', 'pk.charmPickle', invalidOutputDict, invalidOutputDictName, '_InvalidMessage.pythonPickle', '_InvalidSignature.charmPickle', False, pklist, sklist, P, g2)
     return
 
@@ -204,8 +201,10 @@ def run_batch_verification(argv, same_signer=True):
         sys.exit("Usage:  python " + argv[0] + "\n\t[dictionary with valid messages/signatures]\n\t[name of output file for batch results]\n\t[name of output file for ind. results]")
     
     validDictArg = open(sys.argv[1], 'rb').read()
-    groupParamArg = PairingGroup('BN256')
+    groupParamArg = PairingGroup(CURVE)
+    chch.group = groupParamArg
     hess.group = groupParamArg
+    chchhess.group = groupParamArg
     batchResultsFile = sys.argv[2]
     indResultsFile = sys.argv[3]
 
@@ -229,7 +228,7 @@ def run_batch_verification(argv, same_signer=True):
         print("program iteration ", programIteration)
 
         for cycle in cycleRun:
-            print("cycle is ", cycle)
+            print("cycle is ", cycle+1)
             sigsDict = {}
             loadDataFromDictInMemory(validDict, 0, (cycle+1), sigsDict, 0)
             verifyFuncArgs = list(sigsDict[0].keys())
@@ -248,14 +247,15 @@ def run_batch_verification(argv, same_signer=True):
                 # select first N of them
                 pklist = [ _list[i] for i in range(0, N) ]
             Mlist =  [ sigsDict[i]['message'][bodyKey] for i in range(0, N) ]
-            S1hlist = [ sigsDict[i]['sig'][bodyKey][0] for i in range(0, N) ]
-            S2hlist = [ sigsDict[i]['sig'][bodyKey][1] for i in range(0, N) ]
-
             S1clist = [ sigsDict[i]['sig'][bodyKey][0] for i in range(0, N) ]
             S2clist = [ sigsDict[i]['sig'][bodyKey][1] for i in range(0, N) ]
 
+            S1hlist = [ sigsDict[i]['sig'][bodyKey][2] for i in range(0, N) ]
+            S2hlist = [ sigsDict[i]['sig'][bodyKey][3] for i in range(0, N) ]
+
             startTime = time.clock()
-            incorrectSigIndices = chchhess.batchverify(g2, P, S1clist, pklist, Mlist, S2clist, S2hlist, S1hlist, [])#(g2, pklist, Mlist, P, S1list, S2list, [])
+            incorrectSigIndices = []
+            #incorrectSigIndices = chchhess.batchverify(g2, P, S1clist, pklist, Mlist, S2clist, S2hlist, S1hlist, [])
             endTime = time.clock()
 
             result = (endTime - startTime) * time_in_ms
@@ -270,7 +270,7 @@ def run_batch_verification(argv, same_signer=True):
             batchResultsRaw.write(currentBatchOutputString)
 
             startTime = time.clock()
-            #incorrectSigIndices = chchhess.indivverify#(g2, pklist, Mlist, P, S1list, S2list, [])
+            incorrectSigIndices = chchhess.indivverify(g2, P, S1clist, pklist, Mlist, S2clist, S2hlist, S1hlist, [])
             endTime = time.clock()
 
             result = (endTime - startTime) * time_in_ms
