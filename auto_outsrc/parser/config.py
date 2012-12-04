@@ -5,14 +5,21 @@ outputVarName = "output"
 
 finalSDLSuffix = ".FINAL_SDL"
 
+doNotIncludeInTransformList = ["prod"]
+
 transformOutputList = "transformOutputList"
 
 M = 'M'
+
+forLoopSeed = 1000
+
+listNameIndicator = "LISTNAMEINDICATOR"
 
 varNameLeftSideNoBlindedVars = "neverUseThisVarNameNoBlindedVars"
 varNameLeftSideBlindedVars = "neverUseThisVarNameBlindedVars"
 
 blindingLoopVar = "y"
+blindingLoopVarLength = "yLength"
 
 blindingFactorPrefix = "blindingFactor"
 

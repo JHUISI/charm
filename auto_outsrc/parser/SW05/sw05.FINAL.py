@@ -67,12 +67,12 @@ def intersectionSubset(w, wPrime, d):
     return output
 
 def extract(mk, ID, pk, dOver, n):
-    q = {}
-    wHash = {}
-    d = {}
-    blindingFactorDBlinded = {}
     DBlinded = {}
+    wHash = {}
+    blindingFactorDBlinded = {}
+    q = {}
     D = {}
+    d = {}
 
     input = [mk, ID, pk, dOver, n]
     blindingFactor0Blinded = group.random(ZR)
@@ -94,7 +94,8 @@ def extract(mk, ID, pk, dOver, n):
         D[loopVar] = ((pk[2] ** shares[i][1]) * (evalTVar ** r))
         d[loopVar] = (pk[0] ** r)
     dBlinded = d
-    for y in D:
+    yLength = len(D)
+    for y in range(0, yLength):
         blindingFactorDBlinded[y] = blindingFactor0Blinded
         DBlinded[y] = (D[y] ** (1 / blindingFactorDBlinded[y]))
     sk = [wHashBlinded, DBlinded, dBlinded]
@@ -133,21 +134,15 @@ def transform(pk, sk, CT, dInputParam):
     S = transformOutputList[0]
     transformOutputList[1] = recoverCoefficientsDict(S)
     coeffs = transformOutputList[1]
-    transformOutputList[2] = group.init(GT)
-    prod = transformOutputList[2]
-    transformOutputList[3] = len(S)
-    SLen = transformOutputList[3]
+    transformOutputList[2] = len(S)
+    SLen = transformOutputList[2]
     for i in range(0, SLen):
-        transformOutputList[4] = S[i]
-        loopVar = transformOutputList[4]
-        transformOutputList[5] = pair((d[loopVar] ** coeffs[loopVar]), E[loopVar])
+        transformOutputList[3] = S[i]
+        loopVar = transformOutputList[3]
+        transformOutputList[4] = pair((d[loopVar] ** coeffs[loopVar]), E[loopVar])
+        loopPairings = transformOutputList[4]
+        transformOutputList[5] = pair((Eprimeprime ** -coeffs[loopVar]), D[loopVar])
         loopPairings = transformOutputList[5]
-        transformOutputList[6] = pair((Eprimeprime ** -coeffs[loopVar]), D[loopVar])
-        loopPairings = transformOutputList[6]
-        transformOutputList[7] = (prod * loopPairings)
-        prod = transformOutputList[7]
-    transformOutputList[8] = (Eprime * prod)
-    M = transformOutputList[8]
     output = transformOutputList
     return output
 
@@ -157,13 +152,13 @@ def decout(pk, sk, CT, dInputParam, transformOutputList, blindingFactor0Blinded,
     wHash, D, d = sk
     S = transformOutputList[0]
     coeffs = transformOutputList[1]
-    prod = transformOutputList[2]
-    SLen = transformOutputList[3]
+    prod = group.init(GT)
+    SLen = transformOutputList[2]
     for i in range(0, SLen):
-        loopVar = transformOutputList[4]
-        loopPairings = transformOutputList[5]
-        prod = transformOutputList[7]
-    M = transformOutputList[8]
+        loopVar = transformOutputList[3]
+        loopPairings = (transformOutputList[4] * (transformOutputList[5] ** blindingFactorDBlinded[i]))
+        prod = (prod * loopPairings)
+    M = (Eprime * prod)
     output = M
     return output
 

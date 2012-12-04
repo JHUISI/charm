@@ -156,8 +156,13 @@ def writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls):
 
     SDLLinesForKeygen = []
 
-    SDLLinesForKeygen.append("BEGIN :: forall\n")
-    SDLLinesForKeygen.append("forall{" + blindingLoopVar + " := " + keygenOutputElem + "}\n")
+    SDLLinesForKeygen.append(blindingLoopVarLength + " := len(" + keygenOutputElem + ")\n")
+
+    #SDLLinesForKeygen.append("BEGIN :: forall\n")
+    SDLLinesForKeygen.append("BEGIN :: for\n")
+
+    #SDLLinesForKeygen.append("forall{" + blindingLoopVar + " := " + keygenOutputElem + "}\n")
+    SDLLinesForKeygen.append("for{" + blindingLoopVar + " := 0, " + blindingLoopVarLength + "}\n")
 
     if (sameMasterSecret == True):
         SDLLinesForKeygen.append(listBlindingFactorName + LIST_INDEX_SYMBOL + blindingLoopVar + " := " + sharedBlindingFactorName + "\n")
@@ -168,8 +173,13 @@ def writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls):
 
 
     SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + LIST_INDEX_SYMBOL + blindingLoopVar + " := " + keygenOutputElem + LIST_INDEX_SYMBOL + blindingLoopVar + " ^ (1/" + listBlindingFactorName + LIST_INDEX_SYMBOL + blindingLoopVar + ")\n")
-    SDLLinesForKeygen.append("END :: forall\n")
+
+    #SDLLinesForKeygen.append("END :: forall\n")
+    SDLLinesForKeygen.append("END :: for\n")
+
     mappingOfSecretVarsToBlindingFactors[keygenOutputElem] = [listBlindingFactorName]
+    mappingOfSecretVarsToBlindingFactors[keygenOutputElem].append(listNameIndicator)
+
     #varsToBlindList.remove(keygenOutputElem)
     if (keygenOutputElem in varNamesForListDecls):
         sys.exit("writeForAllLoop in keygen.py attempted to add duplicate keygenOutputElem to varNamesForListDecls -- 2 of 2.")

@@ -1,0 +1,8 @@
+-- each line with at least one pairing contains only pairings, no other calculations
+
+-- last line of decrypt is assignment of message itself, and the calculation can only be an operation
+on at most two variables
+
+-- in Decrypt, for loops must run from 0 to their length, NOT entries in a different dictionary.  If the
+keys must be entries in a different dictionary, the first statement of the for loop can contain that
+assignment.

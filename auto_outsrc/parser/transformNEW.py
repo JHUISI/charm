@@ -5,7 +5,68 @@ import sys
 
 transformListCounter = 0
 decoutListCounter = 0
-mappingOfTransformListToVarNames = {}
+
+forLoopsStruct = None
+forLoopsInnerStruct = None
+
+currentNumberOfForLoops = 0
+withinForLoop = False
+
+def getOriginalVarNameFromBlindedName(blindedName):
+    retName = blindedName.lstrip(blindingFactorPrefix)
+    retName = retName.rstrip(blindingSuffix)
+    return retName
+
+def getForLoopStructsInfo():
+    global forLoopsStruct, forLoopsInnerStruct
+
+    parseLinesOfCode(getLinesOfCode(), False)
+    forLoopsStruct = getForLoops()
+    forLoopsInnerStruct = getForLoopsInner()
+
+def getNumStatementsInForLoopFromLineNo(lineNo):
+    forLoopIndivStruct = None
+
+    for funcName in forLoopsInnerStruct:
+        for forLoopInnerObj in forLoopsInnerStruct[funcName]:
+            startLineNo = forLoopInnerObj.getStartLineNo()
+            endLineNo = forLoopInnerObj.getEndLineNo()
+            if ( (lineNo >= startLineNo) and (lineNo <= endLineNo) ):
+                forLoopIndivStruct = forLoopInnerObj
+
+    if (forLoopIndivStruct == None):
+        for funcName in forLoopsStruct:
+            for forLoopObj in forLoopsStruct[funcName]:
+                startLineNo = forLoopObj.getStartLineNo()
+                endLineNo = forLoopObj.getEndLineNo()
+                if ( (lineNo >= startLineNo) and (lineNo <= endLineNo) ):
+                    forLoopIndivStruct = forLoopObj
+
+    if (forLoopIndivStruct == None):
+        return None
+
+    # the "- 2" is b/c of how we structure for loops in SDLParser (3 statements for the for loop itself,
+    # but you have to add 1 b/c the # of total lines is end line no - start line no + 1
+    numStatementsInForLoop = forLoopIndivStruct.getEndLineNo() - forLoopIndivStruct.getStartLineNo() - 2
+    return numStatementsInForLoop
+
+def getLoopVarNameFromLineNo(lineNo):
+
+    for funcName in forLoopsInnerStruct:
+        for forLoopInnerObj in forLoopsInnerStruct[funcName]:
+            startLineNo = forLoopInnerObj.getStartLineNo()
+            endLineNo = forLoopInnerObj.getEndLineNo()
+            if ( (lineNo >= startLineNo) and (lineNo <= endLineNo) ):
+                return str(forLoopInnerObj.getLoopVar())
+
+    for funcName in forLoopsStruct:
+        for forLoopObj in forLoopsStruct[funcName]:
+            startLineNo = forLoopObj.getStartLineNo()
+            endLineNo = forLoopObj.getEndLineNo()
+            if ( (lineNo >= startLineNo) and (lineNo <= endLineNo) ):
+                return str(forLoopObj.getLoopVar())
+
+    return None
 
 def addTransformFuncIntro():
     firstLineOfDecryptFunc = getStartLineNoOfFunc(decryptFuncName)
@@ -106,7 +167,7 @@ def getAllBlindingExponentsForThisPairing(pairing, varsThatAreBlindedDict):
         ATTRNoListSym = dropListSymbol(ATTRind)
         if (ATTRNoListSym in varsThatAreBlindedDict):
             for blindingExponent in varsThatAreBlindedDict[ATTRNoListSym]:
-                if blindingExponent not in retList:
+                if ( (blindingExponent not in retList) and (blindingExponent != listNameIndicator) ):
                     retList.append(blindingExponent)
 
     return retList
@@ -172,8 +233,8 @@ def getAreAllVarsOnLineKnownByTransform(node, knownVars, dotProdLoopVar):
     else:
         return False
 
-def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode):
-    global transformListCounter, decoutListCounter, mappingOfTransformListToVarNames
+def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode, blindingVarsThatAreLists, currentLineNo):
+    global transformListCounter, decoutListCounter
 
     decoutListCounter = transformListCounter
 
@@ -181,7 +242,6 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
         lineForTransformLines = ""
 
         lineForTransformLines += transformOutputList + LIST_INDEX_SYMBOL + str(transformListCounter) + " := "
-        mappingOfTransformListToVarNames[str(currentNode.left)] = str(transformListCounter)
 
         if (currentNode.right.type == ops.ON):
             lineForTransformLines += "{ " + str(currentNode.right.left) + " on ( "
@@ -206,15 +266,23 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
     lineForDecoutLines += str(currentNode.left) + " := "
     subLineForDecoutLines = ""
     for groupedPairing in groupedPairings:
-         #subLineForDecoutLines = ""
          subLineForDecoutLines += "(" + transformOutputList + LIST_INDEX_SYMBOL + str(decoutListCounter)
          decoutListCounter += 1
-         subLineForDecoutLines += " ^ ("
          blindingExponents = groupedPairing[0]
+         if (len(blindingExponents) > 0):
+             subLineForDecoutLines += " ^ ("
          for blindingExponent in blindingExponents:
-             subLineForDecoutLines += blindingExponent + " * "
-         subLineForDecoutLines = subLineForDecoutLines[0:(len(subLineForDecoutLines) - len(" * "))]
-         subLineForDecoutLines += ") )"
+             originalVarName = getOriginalVarNameFromBlindedName(blindingExponent)
+             if (originalVarName in blindingVarsThatAreLists):
+                 loopVarNameToUse = getLoopVarNameFromLineNo(currentLineNo)
+                 subLineForDecoutLines += blindingExponent + LIST_INDEX_SYMBOL + loopVarNameToUse + " * "
+             else:
+                 subLineForDecoutLines += blindingExponent + " * "
+         if (len(blindingExponents) > 0):
+             subLineForDecoutLines = subLineForDecoutLines[0:(len(subLineForDecoutLines) - len(" * "))]
+             subLineForDecoutLines += ") ) "
+         else:
+             subLineForDecoutLines += ") "
          subLineForDecoutLines += " * "
 
     subLineForDecoutLines = subLineForDecoutLines[0:(len(subLineForDecoutLines) - len(" * "))]
@@ -224,12 +292,11 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
     decoutLines.append(lineForDecoutLines + "\n")
 
 def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines):
-    global transformListCounter, decoutListCounter, mappingOfTransformListToVarNames
+    global transformListCounter, decoutListCounter
 
     decoutListCounter = transformListCounter
 
     lineForTransformLines = transformOutputList + LIST_INDEX_SYMBOL + str(transformListCounter) + " := "
-    mappingOfTransformListToVarNames[str(currentNode.left)] = str(transformListCounter)
 
     lineForTransformLines += str(currentNode.right)
 
@@ -265,13 +332,27 @@ def getDotProdLoopVar(node):
 
     return str(dotProdLoopVar)
 
+def getBlindingVarsThatAreLists(varsThatAreBlindedDict):
+    retList = []
+
+    for blindingVarName in varsThatAreBlindedDict:
+        blindingVarListObj = varsThatAreBlindedDict[blindingVarName]
+        if (listNameIndicator in blindingVarListObj):
+            if (blindingVarName not in retList):
+                retList.append(blindingVarName)
+
+    return retList
+
 def transformNEW(varsThatAreBlindedDict):
+    global currentNumberOfForLoops, withinForLoop
+
     #addTransformFuncIntro()
     (stmtsDec, typesDec, depListDec, depListNoExponentsDec, infListDec, infListNoExponentsDec) = getFuncStmts(decryptFuncName)
     astNodes = getAstNodes()
     firstLineOfDecryptFunc = getStartLineNoOfFunc(decryptFuncName)
     lastLineOfDecryptFunc = getEndLineNoOfFunc(decryptFuncName)
     lastLineOfTransform = getLastLineOfTransform(stmtsDec)
+    getForLoopStructsInfo()
 
     print("\n\n\n")
     #printLinesOfCode()
@@ -279,6 +360,8 @@ def transformNEW(varsThatAreBlindedDict):
 
     knownVars = []
     startLineNoOfSearch = None
+
+    blindingVarsThatAreLists = getBlindingVarsThatAreLists(varsThatAreBlindedDict)
 
     transformLines = ["BEGIN :: func:" + transformFuncName + "\n"]
     decoutLines = ["BEGIN :: func:" + decOutFunctionName + "\n"]
@@ -325,11 +408,20 @@ def transformNEW(varsThatAreBlindedDict):
         areAllVarsOnLineKnownByTransform = getAreAllVarsOnLineKnownByTransform(currentNode.right, knownVars, dotProdLoopVar)
 
         if (currentNode.type != ops.EQ):
+            if (currentNode.type == ops.FOR):
+                withinForLoop = True
+                currentNumberOfForLoops += 1
+            if ( (currentNode.type == ops.END) and (withinForLoop == True) ):
+                withinForLoop = False
             transformLines.append(str(currentNode) + "\n")
+            decoutLines.append(str(currentNode) + "\n")
+        elif (str(currentNode.left) == M):
+            decoutLines.append(str(currentNode) + "\n")
+        elif (str(currentNode.left) in doNotIncludeInTransformList):
             decoutLines.append(str(currentNode) + "\n")
         elif ( (len(currentNodePairings) > 0) and (areAllVarsOnLineKnownByTransform == True) ):
             groupedPairings = groupPairings(currentNodePairings, varsThatAreBlindedDict)
-            writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode)
+            writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode, blindingVarsThatAreLists, lineNo)
             if (groupedPairings[0][0] == []):
                 knownVars.append(str(currentNode.left))
         elif (areAllVarsOnLineKnownByTransform == True):
@@ -367,10 +459,3 @@ def transformNEW(varsThatAreBlindedDict):
     removeRangeFromLinesOfCode(getStartLineNoOfFunc(decryptFuncName), getEndLineNoOfFunc(decryptFuncName))
 
     parseLinesOfCode(getLinesOfCode(), False)
-
-    printLinesOfCode()
-
-    #sys.exit("TEST")
-
-    #print(mappingOfTransformListToVarNames)
-    #sys.exit("TEST")
