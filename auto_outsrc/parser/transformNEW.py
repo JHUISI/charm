@@ -233,15 +233,40 @@ def getAreAllVarsOnLineKnownByTransform(node, knownVars, dotProdLoopVar):
     else:
         return False
 
+def getTransformListIndex(currentLineNo):
+    if (withinForLoop == False):
+        return transformListCounter
+
+    return getForLoopListIndex(currentLineNo)
+
+def getDecoutListIndex(currentLineNo):
+    if (withinForLoop == False):
+        return decoutListCounter
+
+    return getForLoopListIndex(currentLineNo)
+
+def getForLoopListIndex(currentLineNo):
+    numStatementsInForLoop = getNumStatementsInForLoopFromLineNo(currentLineNo)
+    currentForLoopSeed = forLoopSeed * currentNumberOfForLoops
+    loopVarName = getLoopVarNameFromLineNo(currentLineNo)
+
+    return str(str(currentForLoopSeed) + " + (" + str(numStatementsInForLoop) + " * " + str(loopVarName) + ")")
+
 def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode, blindingVarsThatAreLists, currentLineNo):
     global transformListCounter, decoutListCounter
 
     decoutListCounter = transformListCounter
 
+    transformListIndex = getTransformListIndex(currentLineNo)
+    decoutListIndex = getDecoutListIndex(currentLineNo)
+
     for groupedPairing in groupedPairings:
         lineForTransformLines = ""
 
-        lineForTransformLines += transformOutputList + LIST_INDEX_SYMBOL + str(transformListCounter) + " := "
+        if (withinForLoop == True):
+            lineForTransformLines += transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + "? := "
+        else:
+            lineForTransformLines += transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + " := "
 
         if (currentNode.right.type == ops.ON):
             lineForTransformLines += "{ " + str(currentNode.right.left) + " on ( "
@@ -257,17 +282,25 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
 
         transformLines.append(lineForTransformLines + "\n")
 
-        lineForTransformLines = str(currentNode.left) + " := " + transformOutputList + LIST_INDEX_SYMBOL + str(transformListCounter)
+        if (withinForLoop == True):
+            lineForTransformLines = str(currentNode.left) + " := " + transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + "?"
+        else:
+            lineForTransformLines = str(currentNode.left) + " := " + transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex)
+
         transformLines.append(lineForTransformLines + "\n")
 
-        transformListCounter += 1
+        if (withinForLoop == False):
+            transformListCounter += 1
 
     lineForDecoutLines = ""
     lineForDecoutLines += str(currentNode.left) + " := "
     subLineForDecoutLines = ""
     for groupedPairing in groupedPairings:
-         subLineForDecoutLines += "(" + transformOutputList + LIST_INDEX_SYMBOL + str(decoutListCounter)
-         decoutListCounter += 1
+         if (withinForLoop == True):
+             subLineForDecoutLines += "(" + transformOutputList + LIST_INDEX_SYMBOL + str(decoutListIndex) + "?"
+         else:
+             subLineForDecoutLines += "(" + transformOutputList + LIST_INDEX_SYMBOL + str(decoutListIndex)
+             decoutListCounter += 1
          blindingExponents = groupedPairing[0]
          if (len(blindingExponents) > 0):
              subLineForDecoutLines += " ^ ("
@@ -291,25 +324,42 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
 
     decoutLines.append(lineForDecoutLines + "\n")
 
-def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines):
+def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, currentLineNo):
     global transformListCounter, decoutListCounter
 
     decoutListCounter = transformListCounter
 
-    lineForTransformLines = transformOutputList + LIST_INDEX_SYMBOL + str(transformListCounter) + " := "
+    transformListIndex = getTransformListIndex(currentLineNo)
+    decoutListIndex = getDecoutListIndex(currentLineNo)
+
+    if (withinForLoop == True):
+        lineForTransformLines = transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + "? := "
+    else:
+        lineForTransformLines = transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + " := "
 
     lineForTransformLines += str(currentNode.right)
 
     transformLines.append(lineForTransformLines + "\n")
 
-    lineForTransformLines = str(currentNode.left) + " := " + transformOutputList + LIST_INDEX_SYMBOL + str(transformListCounter)
+    if (withinForLoop == True):
+        lineForTransformLines = str(currentNode.left) + " := " + transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + "?"
+    else:
+        lineForTransformLines = str(currentNode.left) + " := " + transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex)
+
     transformLines.append(lineForTransformLines + "\n")
 
-    transformListCounter += 1
+    if (withinForLoop == False):
+        transformListCounter += 1
 
-    lineForDecoutLines = str(currentNode.left) + " := " 
-    lineForDecoutLines += transformOutputList + LIST_INDEX_SYMBOL + str(decoutListCounter)
-    decoutListCounter += 1
+    lineForDecoutLines = str(currentNode.left) + " := "
+
+    if (withinForLoop == True): 
+        lineForDecoutLines += transformOutputList + LIST_INDEX_SYMBOL + str(decoutListIndex) + "?"
+    else:
+        lineForDecoutLines += transformOutputList + LIST_INDEX_SYMBOL + str(decoutListIndex)
+
+    if (withinForLoop == False):
+        decoutListCounter += 1
 
     decoutLines.append(lineForDecoutLines + "\n")
 
@@ -425,16 +475,10 @@ def transformNEW(varsThatAreBlindedDict):
             if (groupedPairings[0][0] == []):
                 knownVars.append(str(currentNode.left))
         elif (areAllVarsOnLineKnownByTransform == True):
-            writeOutLineKnownByTransform(currentNode, transformLines, decoutLines)
+            writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, lineNo)
             knownVars.append(str(currentNode.left))
         else:
-            #if (areAllVarsOnLineKnownByTransform == False):
             decoutLines.append(str(currentNode) + "\n")
-            #else:
-                #writeOutLineKnownByTransform(currentNode, transformLines, decoutLines)
-
-    print(transformLines)
-    print(decoutLines)
 
     transformLines.append("output := " + transformOutputList + "\n")
     transformLines.append("END :: func:" + transformFuncName + "\n")
