@@ -2,6 +2,9 @@
 #if ".../batcher2" not in sys.path:
 #   sys.path.insert(0, '../batcher2')
 #from batchverify import *
+import gc, os
+
+gc.enable()
 
 def clearBatcherGlobals():
     """clear all globals"""
@@ -11,20 +14,23 @@ def clearBatcherGlobals():
 #        print("del global =>", uniquevar)
 #        del globals()[uniquevar]
 
-def Batcher(sys_args, prefix=None):
+def getBatcherInstance(sys_args, prefix=None):
 #    batcher_main(sys_args, prefix)
 #    return benchmark_batcher(sys_args, prefix)
     BatcherCall = """\n
-import sys, time
+import sys
 sys.path.insert(0, '../batcher_clean/')
 sys.path.insert(0, '../../')
 sys.path.insert(0, '../../sdlparser')
 import sdlpath
 import batchverify
 
-start = time.time()
-batchverify.run_main(%s)
-stop = time.time()
+startList = [0.0]
+stopList = [0.0]
+batchverify.run_main(%s, startList, stopList)
+start = startList[0]
+stop = stopList[0]
+print("result: ", (stop - start) * 1000)
 # reset globals
 batchverify.global_count   = 0
 batchverify.delta_count    = 1
@@ -37,11 +43,17 @@ batchverify.applied_technique_list = []
 """ % (str(sys_args))
     dummy_class = '<string>'
     Benchmark_batcher = compile(BatcherCall, dummy_class, 'exec')
+    return Benchmark_batcher
 
-    ns = {} # local variables
-    exec(Benchmark_batcher, None, ns)    
-    del Benchmark_batcher
-    return (ns['start'], ns['stop'])
+def runBatcherTimer(argsStr):
+    print("Batcher args: ", argsStr)
+    os.system("cd ../batcher_clean/; python batcher_main.py " + argsStr)
+    return
+
+def runCodegenPyTimer(argsStr):
+    print("Codegen ars: ", argsStr)
+    os.system("cd ../../codegen; python codegenAutoBatch_PY.py " + argsStr) # TODO: complete
+    return
 
 def CodegenPY(sys_args, prefix=None):
     CodegenCall = """\n

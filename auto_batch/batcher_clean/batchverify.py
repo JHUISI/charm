@@ -15,6 +15,7 @@ from batchoptimizer import PairInstanceFinderImproved
 from loopunroll import *
 from benchmark_interface import getBenchmarkInfo
 from constructbatch import *
+import time
 
 debug = False
 THRESHOLD_FLAG = CODEGEN_FLAG = PRECOMP_CHECK = VERBOSE = CHOOSE_STRATEGY = False
@@ -366,7 +367,7 @@ def buildSDLBatchVerifier(sdlOutFile, sdl_data, types, verify2, batch_precompute
     sdlBatch.construct(VERBOSE)
     return sdlBatch.getVariableCount()
 
-def run_main(opts):
+def run_main(opts, start=None, stop=None):
     """main entry point for generating batch verification algorithms"""
     global singleVE, crypto_library, curve, param_id, assignInfo, varTypes, global_count, delta_count, applied_technique_list
     verbose   = opts['verbose']
@@ -374,6 +375,7 @@ def run_main(opts):
     file      = opts['sdl_file']
     crypto_library   = opts['library']
     proof_flag = opts['proof']
+    benchmark_batcher = opts['benchmark']
     curve, param_id = getBenchmarkInfo(crypto_library)
     if statement:
         debug = levels.all
@@ -416,7 +418,8 @@ def run_main(opts):
         bte.report( v )
     
     #sys.exit(0)
-    # initiate the proof generator    
+    # initiate the proof generator 
+    if benchmark_batcher and type(start) == list: start[0] = time.clock()   
     print("Single verification equation: ", singleVE)
     genProof = GenerateProof(singleVE)
     # process settings
@@ -472,11 +475,13 @@ def run_main(opts):
     if proof_flag:
         genProof.setNextStep('finalbatcheq', None)
         latex_file = types['name'].upper()
-        print("Generated the proof written to file: verification_gen%s.tex" % latex_file)
+        if verbose: print("Generated the proof written to file: verification_gen%s.tex" % latex_file)
         genProof.compileProof(latex_file)
     
     # last step:construct SDL batch verifier
-    print("technique list: ", applied_technique_list)
+    #print("technique list: ", applied_technique_list)
+    stopTime = time.clock() # in case we're benchmarking
+    if benchmark_batcher and stop and type(stop) == list: stop[0] = stopTime
     return buildSDLBatchVerifier(sdlOutFile, sdl_data, types, finalEq, batch_precompute, global_count, setting)        
     
 

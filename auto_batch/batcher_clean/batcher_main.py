@@ -1,6 +1,8 @@
 import getopt
-import sys
+import sys, time
 import batchverify
+
+time_in_ms = 1000
 
 version  = '1.0'
 help_info   = """
@@ -38,15 +40,15 @@ help_info   = """
 
 verbose = precompute_check = threshold = codegen = proof = print_usage = print_options = False
 strategy = 'bfs' # default strategy
-input_file = test_statement = None
+input_file = test_statement = benchmark = None
 output_file = None
 library = 'miracl'
 
 #print('ARGV      :', sys.argv[1:])
 
 try:
-    options, remainder = getopt.getopt(sys.argv[1:], 'o:l:cdhpvts:f:', ['out_file=', 'sdl_file=', 'threshold', 'codegen', 'proof', 'strategy=', 
-                                                                    'verbose', 'library=','query', 'print', 'help'])
+    options, remainder = getopt.getopt(sys.argv[1:], 'o:l:cdhpvtb:s:f:', ['out_file=', 'sdl_file=', 'threshold', 'codegen', 'proof', 'strategy=', 
+                                                                    'verbose', 'library=','query', 'benchmark', 'print', 'help'])
 except:
     sys.exit("ERROR: Specified invalid arguments.")
     
@@ -74,6 +76,8 @@ for opt, arg in options:
         library = arg
     elif opt in ('-q', '--query'):
         test_statement = arg
+    elif opt in ('-b', '--benchmark'):
+        benchmark = arg
     elif opt == '--print':
         print_options = True
 
@@ -110,7 +114,17 @@ opts_dict['strategy']  = strategy
 opts_dict['pre_check'] = precompute_check
 opts_dict['test_stmt'] = test_statement
 opts_dict['library']   = library
-
+opts_dict['benchmark'] = benchmark
 # execute batcher on the provided options
-batchverify.run_main(opts_dict)
-
+if benchmark != None:
+    f = open(benchmark, 'a')
+    start = [0.0]
+    stop = [0.0]
+    batchverify.run_main(opts_dict, start, stop)
+    result = ((stop[0] - start[0]) * time_in_ms)
+    outputString = str(result) + ","
+    f.write(outputString)
+    f.close()
+    print("result : ", result)
+else:
+    batchverify.run_main(opts_dict)

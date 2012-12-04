@@ -1,5 +1,5 @@
 #from keygen import *
-import sys, os
+import sys, os, time
 
 sys.path.extend(['../', '../sdlparser']) 
 
@@ -35,6 +35,8 @@ blindingFactors_NonLists = None
 blindingFactors_Lists = None
 
 initDictDefsAlreadyMade = None
+BENCH = "-b"
+time_in_ms = 1000
 
 def writeCurrentNumTabsToString():
     outputString = ""
@@ -1813,12 +1815,14 @@ def generateMakefile():
     makefile_FileObject.write(outputString)
     makefile_FileObject.close()
 
-def main(SDL_Scheme, ignoreCloudSourcingArg, nonCloudSourcingFileNameArg=None):
+def main(SDL_Scheme, ignoreCloudSourcingArg, nonCloudSourcingFileNameArg=None, benchmark=None):
     global setupFile, transformFile, decOutFile, userFuncsFile, assignInfo, varNamesToFuncs_All
     global varNamesToFuncs_Assign, inputOutputVars, userFuncsCPPFile, functionNameOrder
     global blindingFactors_NonLists, blindingFactors_Lists, ignoreCloudSourcing
     global nonCloudSourcingFileName
-
+    
+    start = 0.0
+    stop = 0.0
     ignoreCloudSourcing = ignoreCloudSourcingArg
     if (nonCloudSourcingFileNameArg != None):
         nonCloudSourcingFileName = nonCloudSourcingFileNameArg
@@ -1826,6 +1830,7 @@ def main(SDL_Scheme, ignoreCloudSourcingArg, nonCloudSourcingFileNameArg=None):
     if ( (type(SDL_Scheme) is not str) or (len(SDL_Scheme) == 0) ):
         sys.exit("codegen.py:  sys.argv[1] argument (file name for SDL scheme) passed in was invalid.")
 
+    if benchmark: start = time.clock()
     if (ignoreCloudSourcing == False):
         (blindingFactors_NonLists, blindingFactors_Lists) = keygen(SDL_Scheme)
     else:
@@ -1835,7 +1840,6 @@ def main(SDL_Scheme, ignoreCloudSourcingArg, nonCloudSourcingFileNameArg=None):
     #print(blindingFactors_NonLists)
     #print(blindingFactors_Lists)
     #sys.exit("test")
-
     astNodes = getAstNodes()
     assignInfo = getAssignInfo()
     inputOutputVars = getInputOutputVars()
@@ -1894,6 +1898,9 @@ def main(SDL_Scheme, ignoreCloudSourcingArg, nonCloudSourcingFileNameArg=None):
     else:
         writeMainFunc_IgnoreCloudSourcing()
 
+    stopTime = time.clock()
+    if benchmark: stop = stopTime
+    
     addGetGlobalsToUserFuncs()
 
     setupFile.close()
@@ -1907,12 +1914,22 @@ def main(SDL_Scheme, ignoreCloudSourcingArg, nonCloudSourcingFileNameArg=None):
 
     if (ignoreCloudSourcing != False):
         os.system("mv " + setupFileName + " " + nonCloudSourcingFileName)
+    
+    return (start, stop)
 
 if __name__ == "__main__":
     #global ignoreCloudSourcing
-
+    print(sys.argv[1:])
+    benchmark = False
     lenSysArgv = len(sys.argv)
-
+    if (lenSysArgv > 2):
+        if sys.argv[1] == BENCH: # benchmark codegen
+            bench_file = str(sys.argv[2])
+            benchmark = True
+            sys.argv.remove(BENCH)
+            sys.argv.remove(bench_file)
+            lenSysArgv = len(sys.argv)
+            
     if ( (lenSysArgv == 1) or (lenSysArgv > 3) ):
         sys.exit("Usage:  python " + sys.argv[0] + " [name of SDL file] [OPTIONAL:  if second argument passed, codegen does not run CloudSourcing]")
 
@@ -1922,7 +1939,12 @@ if __name__ == "__main__":
     if (lenSysArgv == 2):
         main(sys.argv[1], False)
     elif (lenSysArgv == 3):
-        main(sys.argv[1], True, sys.argv[2])
+        (start, stop) = main(sys.argv[1], True, sys.argv[2], benchmark)
+        if benchmark: 
+            f = open(bench_file, 'a')
+            outputString = str((stop - start) * time_in_ms) + ","
+            f.write(outputString)
+            f.close()
     else:
         sys.exit("error in system logic in first main method.")
 

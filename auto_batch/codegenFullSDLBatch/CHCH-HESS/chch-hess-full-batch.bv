@@ -63,6 +63,11 @@ ah := ah
 ac := ac
 END :: latex
 
+BEGIN :: keygen
+input := None
+output := None
+END ::keygen
+
 BEGIN :: func:verify
 input := list{S1h, S2h, S1c, S2c, pk, P, g2, M}
 
@@ -165,7 +170,7 @@ input := list{g2, P, S1clist, pklist, Mlist, S2clist, S2hlist, S1hlist, incorrec
 BEGIN :: for
 for{z := 0, N}
  delta1#z := SmallExp(secparam)
-delta2#z := SmallExp(secparam)
+ delta2#z := SmallExp(secparam)
 END :: for
 
 BEGIN :: if

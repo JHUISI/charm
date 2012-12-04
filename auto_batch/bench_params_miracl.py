@@ -1,8 +1,9 @@
-from toolbox.pairinggroup import *
-from charm.integer import randomBits
+from charm.toolbox.pairinggroup import *
+from charm.core.math.pairing import InitBenchmark,StartBenchmark,EndBenchmark,GetBenchmark,GetGeneralBenchmarks,GetGranularBenchmarks,ClearBenchmark,RealTime,Mul,Div,Exp,Pair
+from charm.core.math.integer import randomBits
 import sys
 
-paramList = [MNT160]
+paramList = ['BN256'] #160]
 trials = 1
 curve = {}
 time_in_ms = 1000

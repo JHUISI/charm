@@ -1282,7 +1282,6 @@ def codegen_PY_main(SDL_Scheme, setupFileArg, userFuncsFileArg):
     userFuncsFile.close()
 
 if __name__ == "__main__":
-
     lenSysArgv = len(sys.argv)
 
     if ( (lenSysArgv != 4) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
