@@ -6,7 +6,8 @@ import chchhess
 
 import sys, random, string, time
 
-CURVE='BN256' # 'MNT160'
+CURVE='MNT160'
+#CURVE='BN256'
 group = None
 prefixName = None
 sigNumKey = 'Signature_Number'
@@ -254,8 +255,7 @@ def run_batch_verification(argv, same_signer=True):
             S2hlist = [ sigsDict[i]['sig'][bodyKey][3] for i in range(0, N) ]
 
             startTime = time.clock()
-            incorrectSigIndices = []
-            #incorrectSigIndices = chchhess.batchverify(g2, P, S1clist, pklist, Mlist, S2clist, S2hlist, S1hlist, [])
+            incorrectSigIndices = chchhess.batchverify(g2, P, S1clist, pklist, Mlist, S2clist, S2hlist, S1hlist, [])
             endTime = time.clock()
 
             result = (endTime - startTime) * time_in_ms
