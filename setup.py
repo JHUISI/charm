@@ -119,7 +119,7 @@ elif opt.get('USE_RELIC') == 'yes':
    relic_lib = "/usr/local/lib/librelic_s.a"
    relic_inc = "/usr/local/include/relic"
 elif opt.get('USE_MIRACL') == 'yes' and opt.get('MIRACL_MNT') == 'yes': 
-    mnt_opt = [('BUILD_MNT_CURVE', '1'), ('BUILD_BN_CURVE', '0')]
+    mnt_opt = [('BUILD_MNT_CURVE', '1'), ('BUILD_BN_CURVE', '0'), ('BUILD_SS_CURVE', '0')]
     if _macros: 
        _macros.extend( mnt_opt )
     else: 
@@ -127,12 +127,20 @@ elif opt.get('USE_MIRACL') == 'yes' and opt.get('MIRACL_MNT') == 'yes':
     miracl_lib = "/usr/local/lib/miracl-mnt.a"
     miracl_inc = "/usr/local/include/miracl"
 elif opt.get('USE_MIRACL') == 'yes' and opt.get('MIRACL_BN') == 'yes':
-    bn_opt = [('BUILD_MNT_CURVE', '0'), ('BUILD_BN_CURVE', '1')]
+    bn_opt = [('BUILD_MNT_CURVE', '0'), ('BUILD_BN_CURVE', '1'), ('BUILD_SS_CURVE', '0')]
     if _macros: 
        _macros.extend( bn_opt )
     else: 
        _macros = bn_opt 
     miracl_lib = "/usr/local/lib/miracl-bn.a"
+    miracl_inc = "/usr/local/include/miracl"
+elif opt.get('USE_MIRACL') == 'yes' and opt.get('MIRACL_SS') == 'yes':
+    bn_opt = [('BUILD_MNT_CURVE', '0'), ('BUILD_BN_CURVE', '0'), ('BUILD_SS_CURVE', '1')]
+    if _macros: 
+       _macros.extend( bn_opt )
+    else: 
+       _macros = bn_opt 
+    miracl_lib = "/usr/local/lib/miracl-ss.a"
     miracl_inc = "/usr/local/include/miracl"
 else:
     sys.exit("Need to select which module to build for pairing.")

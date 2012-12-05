@@ -450,7 +450,7 @@ echo "  --enable-debug           enable common debug build options"
 echo "  --disable-integer        disable INTEGER base module"
 echo "  --disable-ecc            disable ECC base module"
 echo "  --disable-pairing        disable PAIRING base module"
-echo "  --enable-pairing-miracl= enable use of MIRACL lib for pairing module. Options: 'mnt', 'bn'"
+echo "  --enable-pairing-miracl= enable use of MIRACL lib for pairing module. Options: 'mnt', 'bn', 'ss'"
 echo "  --enable-pairing-pbc     enable use of PBC lib for pairing module (DEFAULT)"
 echo "  --enable-integer-openssl enable use of openssl for integer module"
 echo "  --enable-integer-gmp     enable use of GMP lib for integer module (DEFAULT)"
@@ -891,9 +891,15 @@ if test "$pairing_miracl" = "yes" ; then
 	if test "$pairing_arg" = "mnt" ; then
 		echo "MIRACL_MNT=yes" >> $config_mk
 		echo "MIRACL_BN=no" >> $config_mk
+		echo "MIRACL_SS=no" >> $config_mk
 	elif test "$pairing_arg" = "bn" ; then
 		echo "MIRACL_MNT=no" >> $config_mk
 		echo "MIRACL_BN=yes" >> $config_mk	
+		echo "MIRACL_SS=no" >> $config_mk
+	elif test "$pairing_arg" = "ss" ; then
+		echo "MIRACL_MNT=no" >> $config_mk
+		echo "MIRACL_BN=no" >> $config_mk	
+		echo "MIRACL_SS=yes" >> $config_mk
 	fi
 fi
 

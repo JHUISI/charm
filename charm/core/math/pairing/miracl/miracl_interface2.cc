@@ -27,8 +27,8 @@
 *
 ************************************************************************/
 
-#include "miracl_interface2.h"
 #include "miracl_config.h"
+#include "miracl_interface2.h"
 #include "miracl.h"
 #include <sstream>
 
@@ -468,7 +468,6 @@ void _element_div(Group_t type, element_t *c, const element_t *a, const element_
 		Big *o1 = (Big *) o;
 
 		if(!y->iszero()) *z = moddiv(*x, *y, *o1);
-//		cout << "y => " << *y << endl;
 //		cout << "Result => " << *z << endl;
 	}
 	else if(type == G1_t) {
@@ -483,7 +482,6 @@ void _element_div(Group_t type, element_t *c, const element_t *a, const element_
 		GT *x = (GT *) a;  GT *y = (GT *) b; GT *z = (GT *) c;
 		*z = *x / *y;
 	}
-//	else if(type == )
 
 }
 
@@ -833,6 +831,12 @@ void _element_set(Curve_t ctype, Group_t type, element_t *dst, const element_t *
 			h->g.get(x1, y1);
 			g->g.set(x1, y1);
 		}
+#elif BUILD_SS_CURVE == 1
+		if(ctype == SS) {
+			Big x, y;
+			h->g.get(x, y);
+			g->g.set(x, y);
+		}
 #endif
 	}
 	else if(type == GT_t) {
@@ -849,6 +853,12 @@ void _element_set(Curve_t ctype, Group_t type, element_t *dst, const element_t *
 			ZZn4 x, y, z;
 			h->g.get(x, y, z);
 			g->g.set(x, y, z);
+		}
+#elif BUILD_SS_CURVE == 1
+		if(ctype == SS) {
+			ZZn x, y;
+			h->g.get(x, y);
+			g->g.set(x, y);
 		}
 #endif
 	}
@@ -918,39 +928,31 @@ void _element_hash_key(const pairing_t *pairing, Group_t type, element_t *e, voi
 		memcpy((char *) data, tmp_str.c_str(), (size_t) strlen(tmp_str.c_str()));
 	}
 }
+
+// #ifdef ASYMMETRIC == 1
 /* Note the following type definition from MIRACL pairing_3.h
  * G1 is a point over the base field, and G2 is a point over an extension field.
  * GT is a finite field point over the k-th extension, where k is the embedding degree.
  */
-element_t *_element_pairing_type3(const pairing_t *pairing, const element_t *in1, const element_t *in2) {
+element_t *_element_pairing(const pairing_t *pairing, const element_t *in1, const element_t *in2) {
 	// we assume that in1 is G1 and in2 is G2 otherwise bad things happen
 	PFC *pfc = (PFC *) pairing;
 	G1 *g1 = (G1 *) in1;
 	G2 *g2 = (G2 *) in2;
 	G1 g_id = pfc->mult(*g1, Big(0)); // get identity elements
 	G2 g2_id = pfc->mult(*g2, Big(0));
+	GT *gt = new GT();
+	// check whether g1 and g2 != identity element
+	if(*g1 == g_id || *g2 == g2_id) {
+		*gt = pfc->power(*gt, Big(0)); // gt ^ 0 = identity element?
+//		cout << "One of the above is the identity element!" << endl;
+	}
+	else {
 #if BUILD_MNT_CURVE == 1
-	GT *gt = new GT();
-	// check whetehr g1 and g2 != identity element
-	if(*g1 == g_id || *g2 == g2_id) {
-		*gt = pfc->power(*gt, Big(0)); // gt ^ 0 = identity element?
-//		cout << "One of the above is the identity element!" << endl;
-	}
-	else {
 		pfc->precomp_for_pairing(*g2);
-		gt = new GT(pfc->pairing(*g2, *g1)); // assumes type-3 pairings for now
-	}
-#elif BUILD_BN_CURVE == 1
-	GT *gt = new GT();
-	// check whetehr g1 and g2 != identity element
-	if(*g1 == g_id || *g2 == g2_id) {
-		*gt = pfc->power(*gt, Big(0)); // gt ^ 0 = identity element?
-//		cout << "One of the above is the identity element!" << endl;
-	}
-	else {
-		gt = new GT(pfc->pairing(*g2, *g1)); // assumes type-3 pairings for now
-	}
 #endif
+		gt = new GT(pfc->pairing(*g2, *g1)); // assumes type-3 pairings for now
+	}
 //	cout << "Result of pairing => " << gt->g << endl;
 //	GT *gt_res = new GT(gt);
 //	cout << "Result of pairing2 => " << gt_res->g << endl;
@@ -958,7 +960,7 @@ element_t *_element_pairing_type3(const pairing_t *pairing, const element_t *in1
 }
 
 /* Does NOT perform any error checking */
-element_t *_element_prod_pairing_type3(const pairing_t *pairing, const element_t **in1, const element_t **in2, int length)
+element_t *_element_prod_pairing(const pairing_t *pairing, const element_t **in1, const element_t **in2, int length)
 {
 	if(length <= 0) { return NULL; }
 
@@ -974,6 +976,51 @@ element_t *_element_prod_pairing_type3(const pairing_t *pairing, const element_t
 	GT *gt = new GT(pfc->multi_pairing(length, g2_list, g1_list));
 	return (element_t *) gt;
 }
+//#else
+///* Note the following type definition from MIRACL pairing_3.h
+// * G1 is a point over the base field, and G2 is a point over an extension field.
+// * GT is a finite field point over the k-th extension, where k is the embedding degree.
+// */
+//element_t *_element_pairing_type1(const pairing_t *pairing, const element_t *in1, const element_t *in2) {
+//	// we assume that in1 is G1 and in2 is G2 otherwise bad things happen
+//	PFC *pfc = (PFC *) pairing;
+//	G1 *g1 = (G1 *) in1;
+//	G2 *g2 = (G1 *) in2;
+//	G1 g_id = pfc->mult(*g1, Big(0)); // get identity elements
+//	G1 g2_id = pfc->mult(*g1, Big(0));
+//	GT *gt = new GT();
+//	// check whether g1 and g2 != identity element
+//	if(*g1 == g_id || *g2 == g2_id) {
+//		*gt = pfc->power(*gt, Big(0)); // gt ^ 0 = identity element?
+////		cout << "One of the above is the identity element!" << endl;
+//	}
+//	else {
+//		gt = new GT(pfc->pairing(*g2, *g1)); // assumes type-3 pairings for now
+//	}
+////	cout << "Result of pairing => " << gt->g << endl;
+////	GT *gt_res = new GT(gt);
+////	cout << "Result of pairing2 => " << gt_res->g << endl;
+//	return (element_t *) gt;
+//}
+//
+///* Does NOT perform any error checking */
+//element_t *_element_prod_pairing_type1(const pairing_t *pairing, const element_t **in1, const element_t **in2, int length)
+//{
+//	if(length <= 0) { return NULL; }
+//
+//	PFC *pfc = (PFC *) pairing;
+//	G1 *g1_list[length];
+//	G1 *g2_list[length];
+//
+//	for(int i = 0; i < length; i++) {
+//		g1_list[i] = (G1 *) in1[i];
+//		g2_list[i] = (G1 *) in2[i];
+//	}
+//
+//	GT *gt = new GT(pfc->multi_pairing(length, g2_list, g1_list));
+//	return (element_t *) gt;
+//}
+//#endif
 
 int _element_length_in_bytes(Curve_t ctype, Group_t type, element_t *e) {
 	char c[MAX_LEN+1];
@@ -1001,6 +1048,7 @@ int _element_length_in_bytes(Curve_t ctype, Group_t type, element_t *e) {
 		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
 		return encoded.size();
 	}
+#if ASYMMETRIC == 1
 	else if(type == G2_t) {
 		t = "";
 #if BUILD_MNT_CURVE == 1
@@ -1038,6 +1086,7 @@ int _element_length_in_bytes(Curve_t ctype, Group_t type, element_t *e) {
 		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
 		return encoded.size();
 	}
+#endif
 	else if(type == GT_t) {
 		t = "";
 		// control this w/ a flag
@@ -1127,6 +1176,7 @@ int _element_to_bytes(unsigned char *data, Curve_t ctype, Group_t type, element_
 		data[enc_len] = '\0';
 		return enc_len;
 	}
+#if ASYMMETRIC == 1
 	else if(type == G2_t) {
 		G2 *P = (G2 *) e; // embeds an ECn3 element (for MNT curves)
 		string t;
@@ -1166,6 +1216,7 @@ int _element_to_bytes(unsigned char *data, Curve_t ctype, Group_t type, element_
 		data[enc_len] = '\0';
 		return enc_len;
 	}
+#endif
 	else if(type == GT_t) {
 #if BUILD_MNT_CURVE == 1
 		if(ctype == MNT) {
@@ -1249,6 +1300,7 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 			return (element_t *) p;
 		}
 	}
+#if ASYMMETRIC == 1
 	else if(type == G2_t) {
 #if BUILD_MNT_CURVE == 1
 		if(ctype == MNT && is_base64((unsigned char) data[0])) {
@@ -1290,6 +1342,7 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 		}
 #endif
 	}
+#endif
 	else if(type == GT_t) {
 #if BUILD_MNT_CURVE == 1
 		if(ctype == MNT && is_base64((unsigned char) data[0])) {

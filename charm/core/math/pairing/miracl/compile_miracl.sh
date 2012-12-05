@@ -121,7 +121,7 @@ if [ $curve = "bn" ]; then
    # Barreto-Naehrig curve
    g++ -c -m64 -O2 bn_pair.cpp zzn12a.cpp zzn4.cpp ecn2.cpp ecn3.cpp zzn2.cpp
    cp miracl.a miracl-bn.a
-   ar r miracl-bn.a big.o zzn.o zzn2.o zzn4.o zzn12a.o ecn.o ecn2.o ecn3.o ec2.o flash.o crt.o bn_pair.o 
+   ar r miracl-bn.a big.o zzn.o zzn2.o zzn4.o zzn12a.o ecn.o ecn2.o ecn3.o ec2.o flash.o crt.o bn_pair.o
 fi
 
 if [ $curve = "kss" ]; then
@@ -129,6 +129,13 @@ if [ $curve = "kss" ]; then
    g++ -c -m64 -O2 kss_pair.cpp zzn18.cpp zzn6.cpp ecn3.cpp zzn3.cpp
    cp miracl.a miracl-kss.a
    ar r miracl-kss.a big.o zzn.o zzn3.o zzn6.o zzn18.o ecn.o ecn3.o ec2.o flash.o crt.o kss_pair.o
+fi
+
+if [ $curve = "ss" ]; then
+	# SS curve
+	g++ -c -m64 -O2 ssp_pair.cpp 
+	cp miracl.a miracl-ss.a
+	ar r miracl-ss.a big.o ecn.o zzn.o zzn2.o ssp_pair.o
 fi
 #ln -sf miracl-$curve.a miracl.a
 install -d /usr/local/include/miracl

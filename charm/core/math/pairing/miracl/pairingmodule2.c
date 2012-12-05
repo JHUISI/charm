@@ -432,6 +432,13 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 			pairing->curve	  = BN; // only supported at this point
 			pairing_init_finished 	  = FALSE;
     	}
+    	else if(aes_sec == SS512) {
+    		pairing = PyObject_New(Pairing, &PairingType);
+			pairing->pair_obj = pairing_init(aes_sec);
+			pairing->order    = order(pairing->pair_obj);
+			pairing->curve	  = SS; // only supported at this point
+			pairing_init_finished 	  = FALSE;
+    	}
     }
 
 	self->pairing = pairing;
@@ -1070,7 +1077,6 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 		rhs = (Element *) rhs2;
 
 		if(Check_Elements(lhs, rhs) && pair_rule(lhs->element_type, rhs->element_type) == TRUE) {
-			//
 			newObject = createNewElement(NONE_G, lhs->pairing);
 			if(lhs->element_type == G1_t) {
 				pairing_apply(newObject, lhs, rhs);
@@ -2081,6 +2087,7 @@ void initpairing(void) 		{
 	// builtin curves
 	PyModule_AddIntConstant(m, "MNT160", MNT160);
 	PyModule_AddIntConstant(m, "BN256", BN256);
+	PyModule_AddIntConstant(m, "SS512", SS512);
 
 LEAVE:
     if (PyErr_Occurred()) {

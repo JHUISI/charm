@@ -51,6 +51,8 @@
 /* supported pairing curves */
 #define MNT160  	80
 #define BN256	  	128
+#define SS512		80
+
 /* buf sizes */
 #define BenchmarkIdentifier 1
 #define BUF_MAX_LEN 512
@@ -182,14 +184,14 @@ typedef struct {
 	c->element_type = ZR_t;
 
 #define pairing_apply(c, a, b) \
-	if(a->pairing->curve == MNT || a->pairing->curve == BN) { \
-		c->e = _element_pairing_type3(a->pairing->pair_obj, a->e, b->e); \
+	if(a->pairing->curve == MNT || a->pairing->curve == BN || a->pairing->curve == SS) { \
+		c->e = _element_pairing(a->pairing->pair_obj, a->e, b->e); \
 		c->element_type = GT_t;   \
-	} else { /* TODO: do other stuff for SS-curves */ }
+	}
 
 #define element_prod_pairing(c, a, b, l) \
-	if(c->pairing->curve == MNT || c->pairing->curve == BN) { \
-		c->e = _element_prod_pairing_type3(c->pairing->pair_obj, a, b, l); \
+	if(c->pairing->curve == MNT || c->pairing->curve == BN || c->pairing->curve == SS) { \
+		c->e = _element_prod_pairing(c->pairing->pair_obj, a, b, l); \
 		c->element_type = GT_t;  }
 
 #define element_from_hash(a, d, l) \

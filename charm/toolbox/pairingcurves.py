@@ -70,7 +70,7 @@ params = None
 if pairing_lib == libs.pbc:
    params = {'SS512':a, 'SS1024':a1, 'MNT159':d159, 'MNT201':d201, 'MNT224':d224 }
 elif pairing_lib == libs.miracl:
-   params = {'MNT160':80, 'BN256':128}
+   params = {'MNT160':80, 'BN256':128, 'SS512':80}
 elif pairing_lib == libs.relic:
    params = {'BN158':0, 'BN254':1, 'BN256':2}
 

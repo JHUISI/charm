@@ -26,7 +26,6 @@
 *   @author  ayo.akinyele@charm-crypto.com
 *
 ************************************************************************/
-
 #include <gmp.h>
 
 typedef void pairing_t;
@@ -37,7 +36,14 @@ extern "C" {
 #endif
 
 enum Curve {MNT, BN, SS, NONE_C}; // control what type of curve we are dealing with
+#if (BUILD_MNT_CURVE == 1 || BUILD_BN_CURVE == 1)
 enum Group {ZR_t = 0, G1_t, G2_t, GT_t, NONE_G}; // clashes with types in pairing_3.h
+#else
+enum Group {ZR_t = 0, G1_t, GT_t, NONE_G};
+#define G2_t 	G1_t // for backwards compatibility
+#define G2 	 	G1
+#endif
+
 typedef enum Group Group_t;
 typedef enum Curve Curve_t;
 
@@ -90,8 +96,9 @@ void _element_set(Curve_t ctype, Group_t type, element_t *dst, const element_t *
 char *print_mpz(mpz_t x, int base);
 void _element_set_mpz(Group_t type, element_t *dst, mpz_t src);
 void _element_to_mpz(Group_t type, element_t *src, mpz_t dst);
-element_t *_element_pairing_type3(const pairing_t *pairing, const element_t *in1, const element_t *in2);
-element_t *_element_prod_pairing_type3(const pairing_t *pairing, const element_t **in1, const element_t **in2, int length);
+
+element_t *_element_pairing(const pairing_t *pairing, const element_t *in1, const element_t *in2);
+element_t *_element_prod_pairing(const pairing_t *pairing, const element_t **in1, const element_t **in2, int length);
 
 // I/O functions start
 int _element_length_in_bytes(Curve_t ctype, Group_t type, element_t *e);
