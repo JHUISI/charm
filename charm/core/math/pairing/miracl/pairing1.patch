@@ -1,0 +1,11 @@
+--- pairing_1.h	2012-12-05 02:33:57.000000000 -0500
++++ pairing_1.new.h	2012-12-05 02:20:54.000000000 -0500
+@@ -187,7 +187,7 @@
+ #ifdef MR_PAIRING_SSP
+ 		delete mod; delete cof; 
+ #endif
+-		delete ord; mirexit(); }
++		delete ord; } // mirexit(); }
+ };
+ 
+ #ifdef MR_PAIRING_SSP

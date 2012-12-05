@@ -24,6 +24,13 @@ if [ $curve = "bn" ]; then
    rm -f *.rej
 fi
 
+if [ $curve = "ss" ]; then
+   curve=ss
+   echo "Building SS curve in miracl."
+   patch -N < pairing1.patch
+   rm -f *.rej
+fi
+
 if [ -e miracl-$curve.a ]; then
     echo "Already built miracl-$curve" 
     exit 0
