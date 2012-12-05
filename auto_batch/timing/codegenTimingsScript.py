@@ -126,5 +126,8 @@ def main(prefixName, schemeName):
 if __name__ == '__main__':
 	if ( (len(sys.argv) != 2) or (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
 		sys.exit("Usage:  " + str(sys.argv[0]) + " [PREFIX OF OUTPUT FILES]")
-
-	main(sys.argv[1], "BLS")
+	arg = sys.argv[1]	
+	schemes = ["BLS", "Boyen", "ChCh_Hess", "VRF", "CL", "HW_Different", "Waters09", "CHP", "HESS", "CHCH", "WATERS", "CYH", "BBS"]
+	for s in schemes:
+		main(sys.argv[1], s)
+	
