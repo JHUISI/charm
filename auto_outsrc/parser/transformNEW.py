@@ -492,7 +492,7 @@ def transformNEW(varsThatAreBlindedDict):
 
     transformOutputListDecl = [transformOutputList + " := list\n"]
 
-    appendToLinesOfCode(transformOutputListDecl, getEndLineNoOfFunc(TYPES_HEADER))
+    #appendToLinesOfCode(transformOutputListDecl, getEndLineNoOfFunc(TYPES_HEADER))
 
     #printLinesOfCode()
 
