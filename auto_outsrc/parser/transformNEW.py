@@ -250,7 +250,7 @@ def getForLoopListIndex(currentLineNo):
     currentForLoopSeed = forLoopSeed * currentNumberOfForLoops
     loopVarName = getLoopVarNameFromLineNo(currentLineNo)
 
-    return str(str(currentForLoopSeed) + " + (" + str(numStatementsInForLoop) + " * " + str(loopVarName) + ")")
+    return str(str(currentForLoopSeed) + "+" + str(numStatementsInForLoop) + "*" + str(loopVarName))
 
 def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode, blindingVarsThatAreLists, currentLineNo):
     global transformListCounter, decoutListCounter
@@ -404,7 +404,7 @@ def transformNEW(varsThatAreBlindedDict):
     lastLineOfTransform = getLastLineOfTransform(stmtsDec)
     getForLoopStructsInfo()
 
-    print("\n\n\n")
+    #print("\n\n\n")
     #printLinesOfCode()
     #print("fristlinedecrypt", firstLineOfDecryptFunc)
 
@@ -494,9 +494,13 @@ def transformNEW(varsThatAreBlindedDict):
 
     appendToLinesOfCode(transformOutputListDecl, getEndLineNoOfFunc(TYPES_HEADER))
 
+    #printLinesOfCode()
+
     parseLinesOfCode(getLinesOfCode(), False)
 
     appendToLinesOfCode(transformPlusDecoutLines, getStartLineNoOfFunc(decryptFuncName))
+
+    printLinesOfCode()
 
     parseLinesOfCode(getLinesOfCode(), False)
 

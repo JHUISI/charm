@@ -964,6 +964,8 @@ def getVarTypeInfoRecursive(node):
         if (leftSideType != rightSideType):
             if (checkForIntAndZR(leftSideType, rightSideType) == True):
                 return types.ZR
+            if ( (str(node.left).find(transformOutputList) != -1) or (str(node.right).find(transformOutputList) != -1) ):
+                return types.int
             print("left side: ", leftSideType, ":", node.left)
             print("right side: ", rightSideType, ":", node.right)
             sys.exit("getVarTypeInfoRecursive in SDLParser.py found an operation of type ADD, SUB, MUL, or DIV in which the left and right sides were not of the same type.")
@@ -1699,6 +1701,8 @@ def parseLinesOfCode(code, verbosity, ignoreCloudSourcing=False):
     lineNumberInCode = 0 
     for line in code:
         lineNumberInCode += 1
+        if (lineNumberInCode == 160):
+            pass
         if len(line.strip()) > 0 and line[0] != '#':
             if currentFuncName not in [LATEX_HEADER]: # only concerned about latex section b/c parsing is slightly different
                 node = parser.parse(line, lineNumberInCode)

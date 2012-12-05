@@ -322,6 +322,9 @@ def getVarNameWithoutIndices(node):
     return varName[0:indexOfListSymbol]
 
 def getFullVarName(node, dropListIndexIfNonNum_Arg):
+    if (node == None):
+        print("getFullVarName in SDLang.py:  None node passed in.")
+
     if ( (dropListIndexIfNonNum_Arg != True) and (dropListIndexIfNonNum_Arg != False) ):
         sys.exit("getFullVarName in SDLang.py:  dropListIndexIfNonNum_Arg parameter passed in is not set to True or False.")
 
@@ -330,9 +333,14 @@ def getFullVarName(node, dropListIndexIfNonNum_Arg):
         for index in node.attr_index:
             varName += "_" + index
 
+    #print(str(varName))
+
     #exception we're putting in so you can address direct elements in a list (e.g., S#k-1?) w/o errors
     if ( (type(varName) is str) and (varName.count(LIST_INDEX_END_SYMBOL) == 1) ):
         return varName
+
+    #if (len(varName) == 0):
+        #print("getFullVarName in SDLang.py:  varName length is zero.")
 
     if (dropListIndexIfNonNum_Arg == True):
         return dropListIndexIfNonNum(varName)

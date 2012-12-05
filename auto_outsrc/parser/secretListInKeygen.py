@@ -17,7 +17,7 @@ def getSecretList(config, verbose=False):
     outputKgLine = getLineNoOfOutputStatement(keygen)
     secret = config.keygenSecVar
     # secret = str(stmtsKg[outputKgLine].getAssignNode().right)
-    print("output :=>", secret)
+    #print("output :=>", secret)
     secretVars = AssignInfo[keygen][secret].getAssignNode().right
     #print("list :=>", secretVars.listNodes)
 
@@ -35,7 +35,7 @@ def getSecretList(config, verbose=False):
     for i in secretList:
         for k,v in depListDec.items():
             if  i in v: finalSecretList.append(i); break
-    print("INFO: Variables in Keygen that need to be blinded: ", finalSecretList)
+    #print("INFO: Variables in Keygen that need to be blinded: ", finalSecretList)
     return finalSecretList
 
 if __name__ == "__main__":

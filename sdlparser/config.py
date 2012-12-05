@@ -5,6 +5,8 @@ outputVarName = "output"
 
 M = 'M'
 
+transformOutputList = "transformOutputList"
+
 blindingLoopVar = "y"
 
 blindingFactorPrefix = "blindingFactor"
