@@ -21,6 +21,11 @@ varNameLeftSideBlindedVars = "neverUseThisVarNameBlindedVars"
 blindingLoopVar = "y"
 blindingLoopVarLength = "yLength"
 
+blindingLoopVarForOrigKeygenElem = "loopVarOrigKeygenElem"
+
+loopVarForKeygenElemKeys = "KeyLoopVar"
+keysForKeygenElemSuffix = "KeysSuffix"
+
 blindingFactorPrefix = "blindingFactor"
 
 blindingSuffix = "Blinded"

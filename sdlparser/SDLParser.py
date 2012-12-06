@@ -648,6 +648,9 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
         elif (checkForIntAndZR(varTypes[currentFuncName][varName].getType(), newType) == True):
             varTypes[currentFuncName][varName].setType(types.ZR)
             return
+        elif (varName.find(transformOutputList) != -1):
+            varTypes[currentFuncName][varName].setType(newType)
+            return
         else:
             print("varName: ", varName)
             print("oldType: ", varTypes[currentFuncName][varName].getType())
@@ -993,6 +996,8 @@ def getVarTypeInfoRecursive(node):
                 return types.int
             else:
                 return types[trythis]
+        elif (currentFuncName == KEYS_FUNC_NAME):
+            return types.list
         return types.NO_TYPE
     if (node.type == ops.EQ_TST):
         leftSideType = getVarTypeInfoRecursive(node.left)

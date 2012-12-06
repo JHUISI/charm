@@ -10,6 +10,7 @@ forLoopsStruct = None
 forLoopsInnerStruct = None
 
 currentNumberOfForLoops = 0
+iterationNo = None
 withinForLoop = False
 
 def getOriginalVarNameFromBlindedName(blindedName):
@@ -24,7 +25,33 @@ def getForLoopStructsInfo():
     forLoopsStruct = getForLoops()
     forLoopsInnerStruct = getForLoopsInner()
 
-def getNumStatementsInForLoopFromLineNo(lineNo):
+def getPairingNodesRecursive(node, pairingNodesList):
+    if (node.left != None):
+        getPairingNodesRecursive(node.left, pairingNodesList)
+
+    if (node.right != None):
+        getPairingNodesRecursive(node.right, pairingNodesList)
+
+    if (node.type == ops.PAIR):
+        pairingNodesList.append(node)
+
+def getNumPairingsInForLoopFromLineNo(lineNo, astNodes):
+    forLoopIndivStruct = getForLoopStructFromLineNo(lineNo)
+    if (forLoopIndivStruct == None):
+        sys.exit("getNumPairingsInForLoopFromLineNo in transformNEW.py:  couldn't get for loop structure from getForLoopStructFromLineNo.")
+
+    startLineNo = forLoopIndivStruct.getStartLineNo()
+    endLineNo = forLoopIndivStruct.getEndLineNo()
+
+    pairingNodesList = []
+
+    for forLoopLineNo in range(startLineNo, (endLineNo + 1)):
+        currentNode = astNodes[forLoopLineNo - 1]        
+        getPairingNodesRecursive(currentNode, pairingNodesList)
+
+    return (len(pairingNodesList))
+
+def getForLoopStructFromLineNo(lineNo):
     forLoopIndivStruct = None
 
     for funcName in forLoopsInnerStruct:
@@ -44,6 +71,14 @@ def getNumStatementsInForLoopFromLineNo(lineNo):
 
     if (forLoopIndivStruct == None):
         return None
+
+    return forLoopIndivStruct
+
+def getNumStatementsInForLoopFromLineNo(lineNo):
+
+    forLoopIndivStruct = getForLoopStructFromLineNo(lineNo)
+    if (forLoopIndivStruct == None):
+        sys.exit("getNumStatementsInForLoopFromLineNo in transformNEW.py:  couldn't get for loop structure from getForLoopStructFromLineNo.")
 
     # the "- 2" is b/c of how we structure for loops in SDLParser (3 statements for the for loop itself,
     # but you have to add 1 b/c the # of total lines is end line no - start line no + 1
@@ -233,34 +268,38 @@ def getAreAllVarsOnLineKnownByTransform(node, knownVars, dotProdLoopVar):
     else:
         return False
 
-def getTransformListIndex(currentLineNo):
+def getTransformListIndex(currentLineNo, astNodes):
     if (withinForLoop == False):
         return transformListCounter
 
-    return getForLoopListIndex(currentLineNo)
+    return getForLoopListIndex(currentLineNo, astNodes)
 
-def getDecoutListIndex(currentLineNo):
+def getDecoutListIndex(currentLineNo, astNodes):
     if (withinForLoop == False):
         return decoutListCounter
 
-    return getForLoopListIndex(currentLineNo)
+    return getForLoopListIndex(currentLineNo, astNodes)
 
-def getForLoopListIndex(currentLineNo):
-    numStatementsInForLoop = getNumStatementsInForLoopFromLineNo(currentLineNo)
-    currentForLoopSeed = forLoopSeed * currentNumberOfForLoops
+def getForLoopListIndex(currentLineNo, astNodes):
+    numStatementsInForLoop = int(getNumStatementsInForLoopFromLineNo(currentLineNo))
+    numPairingsInForLoop = int(getNumPairingsInForLoopFromLineNo(currentLineNo, astNodes))
+    currentForLoopSeed = int(forLoopSeed * currentNumberOfForLoops)
     loopVarName = getLoopVarNameFromLineNo(currentLineNo)
 
-    return str(str(currentForLoopSeed) + "+" + str(numStatementsInForLoop) + "*" + str(loopVarName))
+    return str(str(currentForLoopSeed + int(iterationNo)) + "+" + str(numStatementsInForLoop + numPairingsInForLoop) + "*" + str(loopVarName))
 
-def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode, blindingVarsThatAreLists, currentLineNo):
-    global transformListCounter, decoutListCounter
+def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode, blindingVarsThatAreLists, currentLineNo, astNodes):
+    global transformListCounter, decoutListCounter, iterationNo
 
     decoutListCounter = transformListCounter
+    origIterationNo = iterationNo
 
-    transformListIndex = getTransformListIndex(currentLineNo)
-    decoutListIndex = getDecoutListIndex(currentLineNo)
+    #transformListIndex = getTransformListIndex(currentLineNo)
+    #decoutListIndex = getDecoutListIndex(currentLineNo)
 
     for groupedPairing in groupedPairings:
+        transformListIndex = getTransformListIndex(currentLineNo, astNodes)
+
         lineForTransformLines = ""
 
         if (withinForLoop == True):
@@ -292,10 +331,16 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
         if (withinForLoop == False):
             transformListCounter += 1
 
+        iterationNo += 1
+
     lineForDecoutLines = ""
     lineForDecoutLines += str(currentNode.left) + " := "
     subLineForDecoutLines = ""
+    iterationNo = origIterationNo
+
     for groupedPairing in groupedPairings:
+         decoutListIndex = getDecoutListIndex(currentLineNo, astNodes)
+
          if (withinForLoop == True):
              subLineForDecoutLines += "(" + transformOutputList + LIST_INDEX_SYMBOL + str(decoutListIndex) + "?"
          else:
@@ -318,22 +363,26 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
              subLineForDecoutLines += ") "
          subLineForDecoutLines += " * "
 
+         iterationNo += 1
+
     subLineForDecoutLines = subLineForDecoutLines[0:(len(subLineForDecoutLines) - len(" * "))]
 
     lineForDecoutLines += subLineForDecoutLines
 
     decoutLines.append(lineForDecoutLines + "\n")
 
-def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, currentLineNo):
-    global transformListCounter, decoutListCounter
+def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, currentLineNo, astNodes):
+    global transformListCounter, decoutListCounter, iterationNo
 
     decoutListCounter = transformListCounter
+    origIterationNo = iterationNo
 
-    transformListIndex = getTransformListIndex(currentLineNo)
-    decoutListIndex = getDecoutListIndex(currentLineNo)
+    transformListIndex = getTransformListIndex(currentLineNo, astNodes)
+    #decoutListIndex = getDecoutListIndex(currentLineNo)
 
     if (withinForLoop == True):
         lineForTransformLines = transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + "? := "
+        #iterationNo += 1
     else:
         lineForTransformLines = transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + " := "
 
@@ -341,8 +390,13 @@ def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, curre
 
     transformLines.append(lineForTransformLines + "\n")
 
+    #iterationNo = origIterationNo
+
+    #decoutListIndex = getDecoutListIndex(currentLineNo)
+
     if (withinForLoop == True):
         lineForTransformLines = str(currentNode.left) + " := " + transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + "?"
+        iterationNo += 1
     else:
         lineForTransformLines = str(currentNode.left) + " := " + transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex)
 
@@ -353,8 +407,12 @@ def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, curre
 
     lineForDecoutLines = str(currentNode.left) + " := "
 
+    iterationNo = origIterationNo
+    decoutListIndex = getDecoutListIndex(currentLineNo, astNodes)
+
     if (withinForLoop == True): 
         lineForDecoutLines += transformOutputList + LIST_INDEX_SYMBOL + str(decoutListIndex) + "?"
+        iterationNo += 1
     else:
         lineForDecoutLines += transformOutputList + LIST_INDEX_SYMBOL + str(decoutListIndex)
 
@@ -394,7 +452,7 @@ def getBlindingVarsThatAreLists(varsThatAreBlindedDict):
     return retList
 
 def transformNEW(varsThatAreBlindedDict):
-    global currentNumberOfForLoops, withinForLoop
+    global currentNumberOfForLoops, withinForLoop, iterationNo
 
     #addTransformFuncIntro()
     (stmtsDec, typesDec, depListDec, depListNoExponentsDec, infListDec, infListNoExponentsDec) = getFuncStmts(decryptFuncName)
@@ -461,6 +519,7 @@ def transformNEW(varsThatAreBlindedDict):
             if (currentNode.type == ops.FOR):
                 withinForLoop = True
                 currentNumberOfForLoops += 1
+                iterationNo = 0
             if ( (currentNode.type == ops.END) and (withinForLoop == True) ):
                 withinForLoop = False
             transformLines.append(str(currentNode) + "\n")
@@ -471,11 +530,11 @@ def transformNEW(varsThatAreBlindedDict):
             decoutLines.append(str(currentNode) + "\n")
         elif ( (len(currentNodePairings) > 0) and (areAllVarsOnLineKnownByTransform == True) ):
             groupedPairings = groupPairings(currentNodePairings, varsThatAreBlindedDict)
-            writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode, blindingVarsThatAreLists, lineNo)
+            writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode, blindingVarsThatAreLists, lineNo, astNodes)
             if (groupedPairings[0][0] == []):
                 knownVars.append(str(currentNode.left))
         elif (areAllVarsOnLineKnownByTransform == True):
-            writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, lineNo)
+            writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, lineNo, astNodes)
             knownVars.append(str(currentNode.left))
         else:
             decoutLines.append(str(currentNode) + "\n")
@@ -492,7 +551,7 @@ def transformNEW(varsThatAreBlindedDict):
 
     transformOutputListDecl = [transformOutputList + " := list\n"]
 
-    #appendToLinesOfCode(transformOutputListDecl, getEndLineNoOfFunc(TYPES_HEADER))
+    appendToLinesOfCode(transformOutputListDecl, getEndLineNoOfFunc(TYPES_HEADER))
 
     #printLinesOfCode()
 

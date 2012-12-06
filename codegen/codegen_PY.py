@@ -653,6 +653,8 @@ def getAssignStmtAsString(variableName, node, replacementsDict, dotProdObj, lamb
             funcOutputString = groupObjName + "." + nodeName + "("
         elif (nodeName == INTEGER_FUNC_NAME):
             funcOutputString = "int("
+        elif (nodeName == KEYS_FUNC_NAME):
+            return "list(" + node.listNodes[0] + ".keys())"
         else:
             funcOutputString = nodeName + "("
         for listNodeInFunc in node.listNodes:

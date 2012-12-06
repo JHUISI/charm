@@ -158,11 +158,15 @@ def writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls):
 
     SDLLinesForKeygen.append(blindingLoopVarLength + " := len(" + keygenOutputElem + ")\n")
 
+    SDLLinesForKeygen.append(keygenOutputElem + keysForKeygenElemSuffix + " := " + KEYS_FUNC_NAME + "(" + keygenOutputElem + ")\n")
+
     #SDLLinesForKeygen.append("BEGIN :: forall\n")
     SDLLinesForKeygen.append("BEGIN :: for\n")
 
     #SDLLinesForKeygen.append("forall{" + blindingLoopVar + " := " + keygenOutputElem + "}\n")
     SDLLinesForKeygen.append("for{" + blindingLoopVar + " := 0, " + blindingLoopVarLength + "}\n")
+
+    SDLLinesForKeygen.append(keygenOutputElem + loopVarForKeygenElemKeys + " := " + keygenOutputElem + keysForKeygenElemSuffix + LIST_INDEX_SYMBOL + blindingLoopVar + "\n")
 
     if (sameMasterSecret == True):
         SDLLinesForKeygen.append(listBlindingFactorName + LIST_INDEX_SYMBOL + blindingLoopVar + " := " + sharedBlindingFactorName + "\n")
@@ -171,8 +175,7 @@ def writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls):
     else:
         SDLLinesForKeygen.append(listBlindingFactorName + LIST_INDEX_SYMBOL + blindingLoopVar + " := random(ZR)\n")
 
-
-    SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + LIST_INDEX_SYMBOL + blindingLoopVar + " := " + keygenOutputElem + LIST_INDEX_SYMBOL + blindingLoopVar + " ^ (1/" + listBlindingFactorName + LIST_INDEX_SYMBOL + blindingLoopVar + ")\n")
+    SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + LIST_INDEX_SYMBOL + keygenOutputElem + loopVarForKeygenElemKeys + " := " + keygenOutputElem + LIST_INDEX_SYMBOL + keygenOutputElem + loopVarForKeygenElemKeys + " ^ (1/" + listBlindingFactorName + LIST_INDEX_SYMBOL + blindingLoopVar + ")\n")
 
     #SDLLinesForKeygen.append("END :: forall\n")
     SDLLinesForKeygen.append("END :: for\n")

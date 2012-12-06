@@ -52,6 +52,7 @@ LIST_TYPE = "list"
 OTHER_TYPES = ['list', 'object']
 DECL_FUNC_HEADER = "func:"
 INIT_FUNC_NAME = "init"
+KEYS_FUNC_NAME = "keys"
 FUNC_SYMBOL = "def func :"
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
 types = Enum('NO_TYPE','G1', 'G2', 'GT', 'ZR', 'int', 'str', 'list', 'object', 'listInt', 'listStr', 'listG1', 'listG2', 'listGT', 'listZR', 'metalistInt', 'metalistStr', 'metalistZR', 'metalistG1', 'metalistG2', 'metalistGT','symmap')
