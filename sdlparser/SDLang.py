@@ -619,6 +619,8 @@ class BinaryNode:
 				 return ( left + ' of ' + right)
 			elif(self.type == ops.AND):
 				 return ("{" + left + "} and {" + right + "}") 
+			elif(self.type == ops.XOR):
+				 return ("XOR(" + left + "," + right + ")") 
 			elif(self.type == ops.STRCONCAT):
 				 listVal = ""
 				 for i in self.listNodes:

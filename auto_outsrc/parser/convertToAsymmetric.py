@@ -10,14 +10,18 @@
 
 # 4. Label ciphertext elements and identify all the variables that can be moved to G1 vs. G2: 
 #     - must verify that we don't compromise on the security
-import sdlpath
-from sdlparser.SDLParser import *
+import sdlpath, sys, os
+import sdlparser.SDLParser as sdl
+from sdlparser.SDLang import *
 from outsrctechniques import SubstituteVar, SubstitutePairings
 
 assignInfo = None
 SHORT_KEYS = "keys" # for 
 SHORT_CIPHERTEXT = "ciphertext" # in case, an encryption scheme
 SHORT_SIGNATURE  = "signature" # in case, a sig algorithm
+variableKeyword = "variables"
+clauseKeyword = "clauses"
+
 
 class GetPairingVariables:
     def __init__(self, list1, list2):
@@ -37,17 +41,70 @@ class GetPairingVariables:
         elif Type(node.left) != ops.ATTR and Type(node.right) == ops.ATTR:
             pass
 
+class transformXOR:
+    def __init__(self, fixedValues):
+        self.groundTruth = fixedValues
+        self.varMap = {}
+        self.varsList = [] # records variable instances?
+        self.xorList = [] # records tuple
+        self.alphabet = list(string.ascii_lowercase)
+        self.count = 0
+
+    def __getNextVar(self):
+        suffixCount = int(self.count / len(self.alphabet))
+        if suffixCount > 0: suffix = str(suffixCount)
+        else: suffix = ''
+        
+        count = self.count % len(self.alphabet)
+        a = self.alphabet[ count ] + suffix
+        self.count += 1
+        return a
+    
+    def visit(self, node, data):
+        return
+    
+    def visit_xor(self, node, data):
+        var1 = str(node.left)
+        var2 = str(node.right)
+        if var1 not in self.varMap.keys():
+            alpha_x = self.__getNextVar()
+        else:
+            alpha_x = self.varMap[ var1 ]
+            
+        if var2 not in self.varMap.keys():
+            alpha_y = self.__getNextVar()
+        else:
+            alpha_y = self.varMap[ var2 ]
+        
+        self.varMap[ var1 ] = alpha_x
+        self.varMap[ var2 ] = alpha_y
+        
+        self.xorList.append( (alpha_x, alpha_y) )
+        return
+        
+    def getVarMap(self):
+        return self.varMap
+    
+    def getVariables(self):
+        keys = list(set(self.varMap.values()))
+        keys.sort()
+        return keys
+    
+    def getClauses(self):
+        return self.xorList        
+    
+
 def main():
     global assignInfo
-    assignInfo = getAssignInfo()
-    setting = getAssignInfo()[NONE_FUNC_NAME]['setting'].getAssignNode().right.getAttribute()
+    assignInfo = sdl.getAssignInfo()
+    setting = sdl.getAssignInfo()[sdl.NONE_FUNC_NAME]['setting'].getAssignNode().right.getAttribute()
     print("setting is", setting)
-    if setting != SYMMETRIC_SETTING:
+    if setting != sdl.SYMMETRIC_SETTING:
         print("No need to convert to asymmetric setting.\n")
         exit(0) # or continue
     
     # determine user preference in terms of keygen or encrypt
-    contarget = getAssignInfo()[NONE_FUNC_NAME]['short']
+    contarget = sdl.getAssignInfo()[sdl.NONE_FUNC_NAME]['short']
     if contarget:
         target = contarget.getAssignNode().right.getAttribute()
     if contarget == None:
@@ -61,8 +118,8 @@ def main():
         
     setupFuncName = "setup"
     setup = setupFuncName
-    varTypes = getVarTypes()
-    (stmtS, typesS, depList, depListNoExp, infList, infListNoExp) = getFuncStmts( setup )
+    varTypes = sdl.getVarTypes()
+    (stmtS, typesS, depList, depListNoExp, infList, infListNoExp) = sdl.getFuncStmts( setup )
 #    (stmtS, typesS, depList, depListNoExp, infList, infListNoExp) = getFuncStmts( setup ) 
     generators = []
     print("List of generators for scheme")
@@ -82,35 +139,26 @@ def main():
     #print("infListNoExp :=", infListNoExp)
 
     # need a Visitor class to build these variables   
-    pair_vars_G1 = [] # ['C#1', 'C#2', 'C#3', 'C#4', 'C#5', 'C#6', 'C#7', 'E1', 'E2']
-    pair_vars_G2 = [] # ['D#1', 'D#2', 'D#3', 'D#4', 'D#5', 'D#6', 'D#7', 'D#7', 'K']
-    gpv = GetPairingVariables(pair_vars_G1, pair_vars_G2) 
+    pair_vars_G1_lhs = [] # ['C#1', 'C#2', 'C#3', 'C#4', 'C#5', 'C#6', 'C#7', 'E1', 'E2']
+    pair_vars_G1_rhs = [] # ['D#1', 'D#2', 'D#3', 'D#4', 'D#5', 'D#6', 'D#7', 'D#7', 'K']
+    gpv = GetPairingVariables(pair_vars_G1_lhs, pair_vars_G1_rhs) 
     decrypt = "decrypt"
-    (stmtD, typesD, depListD, depListNoExpD, infListD, infListNoExpD) = getFuncStmts( decrypt )
+    (stmtD, typesD, depListD, depListNoExpD, infListD, infListNoExpD) = sdl.getFuncStmts( decrypt )
     lines = stmtD.keys()
     for i in lines:
         if stmtD[i].getHasPairings():
-            ASTVisitor( gpv ).preorder( stmtD[i].getAssignNode() )
+            sdl.ASTVisitor( gpv ).preorder( stmtD[i].getAssignNode() )
 
-    print("pair vars LHS:", pair_vars_G1)
-    print("pair vars RHS:", pair_vars_G2) 
+    print("pair vars LHS:", pair_vars_G1_lhs)
+    print("pair vars RHS:", pair_vars_G1_rhs) 
     print("list of gens :", generators)
     info = {}
-    info[ 'G1' ] = (pair_vars_G1, assignTraceback(generators, varTypes, pair_vars_G1))
-    info[ 'G2' ] = (pair_vars_G2, assignTraceback(generators, varTypes, pair_vars_G2))
+    info[ 'G1_lhs' ] = (pair_vars_G1_lhs, assignTraceback(generators, varTypes, pair_vars_G1_lhs))
+    info[ 'G1_rhs' ] = (pair_vars_G1_rhs, assignTraceback(generators, varTypes, pair_vars_G1_rhs))
     info['generators'] = generators 
 
-    print("info => G1 : ", info['G1'])
-    print("info => G2 : ", info['G2'])
-
-# TODO: 
-#    print("<===== Derive Rules =====>")
-#    rules = deriveRules(info, generators)
-#    print("<===== Derive Rules =====>\n")
-#    print("<===== Determine Assignment =====>")
-#    info['genMapG1'], info['genMapG2'] = determineTypeAssignments(rules)
-#    print("<===== Determine Assignment =====>\n")
-
+    print("info => G1 lhs : ", info['G1_lhs'])
+    print("info => G1 rhs : ", info['G1_rhs'])
     print("<===== Determine Asymmetric Generators =====>")
     (generatorLines, generatorMapG1, generatorMapG2) = Step1_DeriveSetupGenerators(generators)
     print("Generators in G1: ", generatorMapG1)
@@ -120,13 +168,53 @@ def main():
     print("<===== Generate XOR clauses =====>")  
     # let the user's preference for fixing the keys or ciphertext guide this portion of the algorithm.
     # info[ 'G1' ] : represents (varKeyList, depVarMap). 
-#    for i in pair_vars_G1:
-#        xor = BinaryNode(ops.XOR)
-#        xor.left = 
-#        xor.right = 
+    if len(pair_vars_G1_lhs) == len(pair_vars_G1_rhs):
+        varsLen = len(pair_vars_G1_lhs)
+    xorList = []
+    for i in range(varsLen):
+        xor = BinaryNode(ops.XOR)
+        xor.left = BinaryNode(pair_vars_G1_lhs[i])
+        xor.right = BinaryNode(pair_vars_G1_rhs[i])     
+        xorList.append(xor)
+    
+    ANDs = [ BinaryNode(ops.AND) for i in range(len(xorList)-1) ]
+    for i in range(len(ANDs)):
+        ANDs[i].left = BinaryNode.copy(xorList[i])
+        if i < len(ANDs)-1: ANDs[i].right = ANDs[i+1]
+        else: ANDs[i].right = BinaryNode.copy(xorList[i+1])
+    print("XOR clause: ", ANDs[0])    
+
     print("<===== Generate XOR clauses =====>")
     
-#    info['rules'] = rules
+    print("<===== Generate SAT solver input =====>")
+    txor = transformXOR(None) # accepts dictionary of fixed values
+    sdl.ASTVisitor(txor).preorder(ANDs[0])
+    
+    # TODO: process constraints and add to output
+    print("map: ", txor.getVarMap())
+    print("variables = ", txor.getVariables())
+    outputVariables = variableKeyword + " = " + str(txor.getVariables()) + "\n"
+    print("clauses = ", txor.getClauses())
+    outputClauses   = clauseKeyword + " = " + str(txor.getClauses()) + "\n"
+    # get random file
+    name = "test0.py"
+    f = open(name, 'w')
+    f.write(outputVariables)
+    f.write(outputClauses)
+    f.close()
+    print("<===== Instantiate Z3 solver =====>")
+    os.system("python2.7 z3solver.py %s" % name)
+    newName = name.split('.')[0]
+    results = __import__(newName)
+    print(results.resultDictionary)
+    print("<===== Instantiate Z3 solver =====>")
+    
+    res, resMap = NaiveEvaluation(results.resultDictionary)
+    print("Group Mapping: ", res)
+    # determine whether to make True = G1 and False = G2. 
+    # It depends on which counts more since they're interchangeable...
+    DeriveSolution(res, resMap, txor.getVarMap(), info)
+        
 #    info['setupGenerators'] = replaceGenerators 
 #    print("<===== Transform Setup =====>")
 #    transformSetup(stmtS, info)    
@@ -134,6 +222,51 @@ def main():
 #    
 #    print("info on G1 :=>", info['genMapG1'].keys())
 #    print("info on G2 :=>", info['genMapG2'].keys())    
+
+# temporary placement
+def NaiveEvaluation(solutionList):
+    trueCount = 0
+    falseCount = 0
+    resMap = {}
+    for tupl in solutionList:
+        (k, v) = tupl
+        if v == True: trueCount += 1
+        elif v == False: falseCount += 1
+        else: sys.exit("z3 results have been tampered with.")
+        resMap[ k ] = v
+    
+    if trueCount >= falseCount: 
+        G1 = True; G2 = False
+    elif falseCount > trueCount:
+        G1 = False; G2 = True
+
+    return { G1:'G1', G2:'G2' }, resMap
+
+def DeriveSolution(groupMap, resultMap, xorMap, info):
+    print("<===== Deriving Solution from Results =====>")
+    G1_deps = set()
+    G2_deps = set()
+    for i in info['G1_lhs'][0] + info['G1_rhs'][0]:
+        # get the z3 var for it
+        z3Var = xorMap.get(i) # gives us an alphabet
+        # look up value in resultMap
+        varValue = resultMap.get(z3Var)
+        # get group
+        group = groupMap.get(varValue)
+        if i in info['G1_lhs'][0]: deps = info['G1_lhs'][1].get(i)
+        else: deps = info['G1_rhs'][1].get(i)
+        print(i, ":=>", group, ": deps =>", deps)
+        if group == 'G1': G1_deps = G1_deps.union(list(deps))
+        elif group == 'G2': G2_deps = G2_deps.union(list(deps))
+    print("<===== Deriving Solution from Results =====>")    
+    both = G1_deps.intersection(G2_deps)
+    G1 = G1_deps.difference(both)
+    G2 = G2_deps.difference(both)
+    print("Both G1 & G2: ", both)
+    print("Just G1: ", G1)
+    print("Just G2: ", G2)
+    return
+    
 
 def assignTraceback(generators, varTypes, listVars):
     varProp = []
@@ -165,7 +298,7 @@ def buildMap(generators, varTypes, varList, var):
         # prune 'l' here
         for i in l:
             print("name: ", i) # uncomment for ckrs09 error
-            typeI = getVarTypeFromVarName(i, None, True)
+            typeI = sdl.getVarTypeFromVarName(i, None, True)
             print("getVarTypeFromVarName:  ", i,":", typeI)
             if typeI == types.NO_TYPE:
                 node = BinaryNode(ops.ATTR)
@@ -204,41 +337,6 @@ def buildMap(generators, varTypes, varList, var):
 
             
     return    
-
-# 
-def deriveRules(info, generators):
-    keyG1, G1data = info[ 'G1' ]
-    keyG2, G2data = info [ 'G2' ]
-    assert len(keyG1) == len(keyG2), "cannot have an uneven number of pairing lhs and rhs."
-    
-    rules = []
-    for i in range(len(keyG1)):
-        list1 = G1data[ keyG1[i] ].intersection( generators )        
-        list2 = G2data[ keyG2[i] ].intersection( generators )
-#        print("lhs: ", keyG1[i], ":", list1)
-#        print("rhs: ", keyG2[i], ":", list2)
-        for k in list1:
-            for v in list2:
-        #        print(k, "!=", v)
-                rules.append( (k, v) )
-        print()
-    # all the rules
-    uniqueRules = set(rules)
-    print("Rules: ", uniqueRules)
-    return uniqueRules
-
-#def determineTypeAssignments(rules):
-#    listG1 = {}
-#    listG2 = {}
-#    for l, r in rules:
-#        # mapping
-#        listG1[ l ] = str(l + "_G1")
-#        listG2[ r ] = str(r + "_G2")
-#        
-#    print("Left changes: ", listG1)
-#    print("Right changes: ", listG2)
-#    return (listG1, listG2)
-
 
 def Step1_DeriveSetupGenerators(generators):
     generatorLines = []
@@ -472,6 +570,17 @@ if __name__ == "__main__":
     print(sys.argv)
     sdl_file = sys.argv[1]
     sdlVerbose = False
-    if len(sys.argv) > 2 and sys.argv[2] == "-v":  sdlVerbose = True
-    parseFile2(sdl_file, sdlVerbose)
+    if len(sys.argv) > 2: # and sys.argv[3] == "-v":  sdlVerbose = True
+        config = sys.argv[2]
+        config = config.split('.')[0]
+
+        configModule = __import__(config)
+        print(dir(configModule))
+        sdl.masterPubVars = configModule.masterPubVars
+        sdl.masterSecVars = configModule.masterSecVars
+#        except:
+#            print("Could not find module: ", config)
+#            sys.exit(-1)
+            
+    sdl.parseFile2(sdl_file, sdlVerbose)
     main()

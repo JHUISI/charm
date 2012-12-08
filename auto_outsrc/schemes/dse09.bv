@@ -1,5 +1,6 @@
 name := dsewaters09
 setting := symmetric
+short := keys
 
 BEGIN :: types
 id := str
