@@ -37,8 +37,10 @@ static PyObject *selectPRF(Base *self, PyObject *args) {
 	}
 
 	module = PyImport_ImportModule(ALG);
-	if (!module)
+	if (!module) {
+		Py_XDECREF (module);
 		return NULL;
+	}
 	// printf("module ptr => %p\n", module);
 	module_dict = PyModule_GetDict (module);
 	Py_DECREF (module);
@@ -72,9 +74,10 @@ static PyObject *selectPRP(Base *self, PyObject *args) {
 	}
 
 	module = PyImport_ImportModule(ALG);
-	if (!module)
+	if (!module) {
+		Py_XDECREF (module);
 		return NULL;
-
+	}
 	module_dict = PyModule_GetDict (module);
 	Py_DECREF (module);
 	new_func = PyDict_GetItemString(module_dict, "new");
@@ -142,6 +145,7 @@ static int base_traverse(PyObject *m, visitproc visit, void *arg) {
 
 static int base_clear(PyObject *m) {
 	Py_CLEAR(GETSTATE(m)->error);
+    Py_XDECREF(BaseError);
 	return 0;
 }
 
@@ -198,7 +202,7 @@ void initcryptobase(void) 		{
 		INITERROR;
 	}
     BaseError = st->error;
-//    Py_INCREF(BaseError);
+    Py_INCREF(BaseError);
 //    PyModule_AddObject(m, "base.error", BaseError);
 #if PY_MAJOR_VERSION >= 3
 	return m;

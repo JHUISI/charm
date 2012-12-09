@@ -344,9 +344,11 @@ int Integer_init(Integer *self, PyObject *args, PyObject *kwds) {
 		mpz_import(self->e, bytes_len, 1, sizeof(bytes[0]), 0, 0, bytes);
 	} else if (PyUnicode_Check(num)) {
 		// cast to a bytes object, then interpret as a string of bytes
-		const char *bytes = PyBytes_AS_STRING(PyUnicode_AsUTF8String(num));
+		PyObject *_num = PyUnicode_AsUTF8String(num);
+		const char *bytes = PyBytes_AS_STRING(_num);
 		int bytes_len = strlen(bytes);
 		mpz_import(self->e, bytes_len, 1, sizeof(bytes[0]), 0, 0, bytes);
+		Py_DECREF(_num);
 	} else {
 		return -1;
 	}
