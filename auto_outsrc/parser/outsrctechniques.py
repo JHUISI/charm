@@ -905,6 +905,8 @@ class SubstituteVar:
     
     def visit_attr(self, node, data):
         if str(node) == self.target:
+            if node.attr_index: 
+                del node.attr_index[:]; node.attr_index = None
             node.setAttribute(self.new_var)
 
     def visit_list(self, node, data):
