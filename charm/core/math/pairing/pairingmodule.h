@@ -87,8 +87,8 @@ static PyObject *ElementError;
 #if PY_MAJOR_VERSION >= 3
 /* if unicode then add extra conversion step. two possibilities: unicode or bytes */
 #define PyBytes_ToString(a, obj) \
-	if(PyUnicode_Check(obj)) { obj = PyUnicode_AsUTF8String(obj); } \
-	a = PyBytes_AS_STRING(obj);
+	if(PyUnicode_Check(obj)) { PyObject *_obj = PyUnicode_AsUTF8String(obj); a = PyBytes_AS_STRING(_obj); Py_DECREF(_obj); }	\
+	else { a = PyBytes_AS_STRING(obj); }
 #else
 /* treat everything as string in 2.x */
 #define PyBytes_ToString(a, obj) a = PyString_AsString(obj);
