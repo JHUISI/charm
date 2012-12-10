@@ -289,9 +289,6 @@ Charm_t *InitScheme(const char *class_file, const char *class_name, Charm_t *pOb
         	// instantiate pValue = ClassName( pObject )
             pValue = PyObject_CallObject(pFunc, pArgs);
             debug("success: \n");
-            Free(pArgs);
-            Free(pFunc);
-            Free(pModule);
     	}
     	else {
     		// call failed
@@ -299,7 +296,9 @@ Charm_t *InitScheme(const char *class_file, const char *class_name, Charm_t *pOb
     			PyErr_Print();
     		fprintf(stderr, "Cannot find function.\n");
     	}
-
+        Free(pArgs);
+        Free(pFunc);
+        Free(pModule);
     	return (Charm_t *) pValue;
     }
 
@@ -330,9 +329,6 @@ Charm_t *InitAdapter(const char *class_file, const char *class_name, Charm_t *pO
         	// instantiate pValue = ClassName( pObject )
             pValue = PyObject_CallObject(pFunc, pArgs);
             debug("success: \n");
-            Free(pArgs);
-            Free(pFunc);
-            Free(pModule);
     	}
     	else {
     		// call failed
@@ -340,7 +336,9 @@ Charm_t *InitAdapter(const char *class_file, const char *class_name, Charm_t *pO
     			PyErr_Print();
     		fprintf(stderr, "Cannot find function.\n");
     	}
-
+        Free(pArgs);
+        Free(pFunc);
+        Free(pModule);
     	return (Charm_t *) pValue;
     }
 
