@@ -650,8 +650,7 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 	}
 	
 	debug("init an element.\n");
-//	if(type >= ZR && type <= GT) {
-	if(type == ZR) {
+	if(type >= ZR && type <= GT) {
 		retObject = createNewElement(type, group->pairing);
 	}
 	else {
