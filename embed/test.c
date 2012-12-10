@@ -122,7 +122,8 @@ int runHybridABETest(Charm_t *pGroup)
 	Free(pkDict);
 	Free(mskDict);
 	Free(pKeys);
-
+    Free(pABEClass);
+    Free(pGroup);
 	return 0;
 }
 

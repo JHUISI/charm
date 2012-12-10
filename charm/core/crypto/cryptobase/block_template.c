@@ -415,10 +415,11 @@ ALG_Encrypt(ALGobject *self, PyObject *args)
 					return NULL;
 				}
 				Py_UNBLOCK_THREADS;
-				block_encrypt(&(self->st), (unsigned char *)PyBytes_AsString(PyUnicode_AsASCIIString(ctr)),
+				PyObject *_ctr = PyUnicode_AsASCIIString(ctr);
+				block_encrypt(&(self->st), (unsigned char *)PyBytes_AsString(_ctr),
 					      self->IV);
 				Py_BLOCK_THREADS;
-				Py_DECREF(ctr);
+				Py_DECREF(_ctr);
 				Py_UNBLOCK_THREADS;
 			}
 
