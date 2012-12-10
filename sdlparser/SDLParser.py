@@ -1166,7 +1166,7 @@ def updateAssignInfo(node, i):
     resultingHashInputArgNames = []
 
     if (varName in assignInfo_Func):
-        if ( (assignInfo_Func[varName].hasBeenSet() == True) and (varName != outputVarName) and (startLineNo_IfBranch == None) and (startLineNo_ForLoop == None) and (startLineNo_ForLoopInner == None) ):
+        if ( (assignInfo_Func[varName].hasBeenSet() == True) and (varName != outputVarName) and (startLineNo_IfBranch == None) and (startLineNo_ForLoop == None) and (startLineNo_ForLoopInner == None) and (varName != blindingLoopVarLength) ):
             sys.exit("Found multiple assignments of same variable name within same function.")
         assignInfo_Func[varName].setLineNo(i)
         (resultingVarDeps, resultingHashInputArgNames) = assignInfo_Func[varName].setAssignNode(assignInfo, node, currentFuncName, currentForLoopObj, currentIfElseBranch)

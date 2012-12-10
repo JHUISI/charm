@@ -8,6 +8,11 @@ BEGIN :: types
 Message := GT
 Message2 := GT
 n := int
+YVectorBlinded := list
+LVectorBlinded := list
+blindingFactorYVectorBlinded := list
+blindingFactorLVectorBlinded := list
+transformOutputList := list
 END :: types
 
 BEGIN :: func:setup
@@ -38,6 +43,7 @@ END :: func:setup
 
 BEGIN :: func:keygen
 input := list{pk, msk, yVector}
+zz := random(ZR)
 g1 := pk#0
 g2 := pk#1
 n := pk#2
@@ -52,12 +58,12 @@ numNonDontCares := numNonDontCares + 1
 END :: if
 END :: for
 
-BEGIN :: if
-if { numNonDontCares == 0 }
-sk := g2 ^ y
-output := sk
-return := output
-END :: if
+#BEGIN :: if
+#if { numNonDontCares == 0 }
+#sk := g2 ^ y
+#output := sk
+#return := output
+#END :: if
 
 sumUSaisUSsoFar := init(0)
 
@@ -93,8 +99,25 @@ LVector#i := init(G2)
 END :: if
 END :: for
 
-sk2 := list{YVector, LVector}
-output := sk2
+yLength := len(LVector)
+LVectorKeysSuffix := keys(LVector)
+BEGIN :: for
+for{y := 0, yLength}
+LVectorKeyLoopVar := LVectorKeysSuffix#y
+blindingFactorLVectorBlinded#y := random(ZR)
+LVectorBlinded#LVectorKeyLoopVar := LVector#LVectorKeyLoopVar ^ (1/blindingFactorLVectorBlinded#y)
+END :: for
+yLength := len(YVector)
+YVectorKeysSuffix := keys(YVector)
+BEGIN :: for
+for{y := 0,yLength}
+YVectorKeyLoopVar := YVectorKeysSuffix#y
+blindingFactorYVectorBlinded#y := random(ZR)
+YVectorBlinded#YVectorKeyLoopVar := (YVector#YVectorKeyLoopVar^(1 / blindingFactorYVectorBlinded#y))
+END :: for
+sk2 := list{YVectorBlinded, LVectorBlinded}
+sk2Blinded := list{YVectorBlinded, LVectorBlinded}
+output := list{blindingFactorYVectorBlinded, blindingFactorLVectorBlinded, sk2Blinded}
 END :: func:keygen
 
 BEGIN :: func:encrypt
@@ -131,31 +154,40 @@ CT := list{omega, C0, XVector, WVector}
 output := CT
 END :: func:encrypt
 
-BEGIN :: func:decrypt
+BEGIN :: func:transform
 input := list{CT, sk}
 CT := expand{omega, C0, XVector, WVector}
-BEGIN :: if
-if { isList(sk)==0 }
-Message := omega * e(C0, sk)
-output := Message
-return := output
-END :: if
-
 sk := expand{YVector, LVector}
-
-dotProd := init(GT)
-
-n := len(YVector)
-
+transformOutputList#0 := len(YVector)
+n := transformOutputList#0
 BEGIN :: for
-for{i := 0, n}
+for{i := 0,n}
 BEGIN :: if
-if { (YVector#i != init(G2)) and (LVector#i != init(G2)) }
-intermediateResults := e(XVector#i, YVector#i) * e(WVector#i, LVector#i)
-dotProd := dotProd * intermediateResults
+if {{YVector#i != init(G2)} and {LVector#i != init(G2)}}
+transformOutputList#1000+7*i? := e(XVector#i,YVector#i)
+intermediateResults := transformOutputList#1000+7*i?
+transformOutputList#1001+7*i? := e(WVector#i,LVector#i)
+intermediateResults := transformOutputList#1001+7*i?
 END :: if
 END :: for
+output := transformOutputList
+END :: func:transform
 
-Message2 := omega * dotProd
+BEGIN :: func:decout
+input := list{CT, sk, transformOutputList, blindingFactorYVectorBlinded, blindingFactorLVectorBlinded}
+CT := expand{omega, C0, XVector, WVector}
+sk := expand{YVector, LVector}
+dotProd := init(GT)
+n := transformOutputList#0
+BEGIN :: for
+for{i := 0,n}
+BEGIN :: if
+if {{YVector#i != init(G2)} and {LVector#i != init(G2)}}
+intermediateResults := (transformOutputList#1000+7*i? ^ (blindingFactorYVectorBlinded#i) )  * (transformOutputList#1001+7*i? ^ (blindingFactorLVectorBlinded#i) ) 
+dotProd := (dotProd * intermediateResults)
+END :: if
+END :: for
+Message2 := (omega * dotProd)
 output := Message2
-END :: func:decrypt
+END :: func:decout
+

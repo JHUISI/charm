@@ -7,12 +7,19 @@ finalSDLSuffix = ".FINAL_SDL"
 
 transformOutputList = "transformOutputList"
 
+doNotIncludeInTransformList = ["dotProd"]
+
+forLoopSeed = 1000
+
 M = 'Message2'
+
+listNameIndicator = "LISTNAMEINDICATOR"
 
 varNameLeftSideNoBlindedVars = "neverUseThisVarNameNoBlindedVars"
 varNameLeftSideBlindedVars = "neverUseThisVarNameBlindedVars"
 
 blindingLoopVar = "y"
+blindingLoopVarLength = "yLength"
 
 blindingFactorPrefix = "blindingFactor"
 
@@ -21,6 +28,10 @@ setupFuncName = "setup"
 keygenBlindingExponent = "zz"
 keygenBlindingExponentType = "ZR"
 keygenFuncName = "keygen"
+
+keysForKeygenElemSuffix = "KeysSuffix"
+
+loopVarForKeygenElemKeys = "KeyLoopVar"
 
 encryptFuncName = "encrypt"
 decryptFuncName = "decrypt"

@@ -1,8 +1,6 @@
 from userFuncs import *
-
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-from charm.core.engine.util import *
-from charm.core.math.integer import randomBits
+import sys
 
 group = None
 
@@ -10,8 +8,23 @@ N = 2
 
 secparam = 80
 
+WVector = {}
+C0 = {}
+g2 = {}
+g1 = {}
+LVector = {}
+Y = {}
+XVector = {}
+omega = {}
+y = {}
+YVector = {}
 
 def setup(n):
+    global g2
+    global g1
+    global Y
+    global y
+
     M = {}
     V = {}
     m = {}
@@ -42,16 +55,17 @@ def setup(n):
     return output
 
 def keygen(pk, msk, yVector):
-    LVectorBlinded = {}
-    LVector = {}
-    YVectorBlinded = {}
+    global g2
+    global g1
+    global LVector
+    global y
+    global YVector
+
     a = {}
-    blindingFactorLVectorBlinded = {}
-    blindingFactorYVectorBlinded = {}
+    LVector = {}
     YVector = {}
 
     input = [pk, msk, yVector]
-    zz = group.random(ZR)
     g1 = pk[0]
     g2 = pk[1]
     n = pk[2]
@@ -60,6 +74,10 @@ def keygen(pk, msk, yVector):
     for i in range(0, n):
         if ( ( (yVector[i]) != (2) ) ):
             numNonDontCares = (numNonDontCares + 1)
+    if ( ( (numNonDontCares) == (0) ) ):
+        sk = (g2 ** y)
+        output = sk
+        return output
     sumUSaisUSsoFar = 0
     endForLoop = (numNonDontCares - 1)
     for i in range(0, endForLoop):
@@ -79,24 +97,18 @@ def keygen(pk, msk, yVector):
         if ( ( (yVector[i]) == (2) ) ):
             YVector[i] = group.init(G2)
             LVector[i] = group.init(G2)
-    yLength = len(LVector)
-    LVectorKeysSuffix = list(LVector.keys())
-    for y in range(0, yLength):
-        LVectorKeyLoopVar = LVectorKeysSuffix[y]
-        blindingFactorLVectorBlinded[y] = group.random(ZR)
-        LVectorBlinded[LVectorKeyLoopVar] = (LVector[LVectorKeyLoopVar] ** (1 / blindingFactorLVectorBlinded[y]))
-    yLength = len(YVector)
-    YVectorKeysSuffix = list(YVector.keys())
-    for y in range(0, yLength):
-        YVectorKeyLoopVar = YVectorKeysSuffix[y]
-        blindingFactorYVectorBlinded[y] = group.random(ZR)
-        YVectorBlinded[YVectorKeyLoopVar] = (YVector[YVectorKeyLoopVar] ** (1 / blindingFactorYVectorBlinded[y]))
-    sk2 = [YVectorBlinded, LVectorBlinded]
-    sk2Blinded = [YVectorBlinded, LVectorBlinded]
-    output = (blindingFactorYVectorBlinded, blindingFactorLVectorBlinded, sk2Blinded)
+    sk2 = [YVector, LVector]
+    output = sk2
     return output
 
 def encrypt(Message, xVector, pk):
+    global WVector
+    global C0
+    global g1
+    global Y
+    global XVector
+    global omega
+
     WVector = {}
     sUSi = {}
     XVector = {}
@@ -121,32 +133,20 @@ def encrypt(Message, xVector, pk):
     output = CT
     return output
 
-def transform(CT, sk):
-    transformOutputList = {}
+def decrypt(CT, sk):
 
     input = [CT, sk]
     omega, C0, XVector, WVector = CT
-    YVector, LVector = sk
-    transformOutputList[0] = len(YVector)
-    n = transformOutputList[0]
-    for i in range(0, n):
-        if ( ( (( (YVector[i]) != (group.init(G2)) )) and (( (LVector[i]) != (group.init(G2)) )) ) ):
-            transformOutputList[1000+7*i] = pair(XVector[i], YVector[i])
-            intermediateResults = transformOutputList[1000+7*i]
-            transformOutputList[1001+7*i] = pair(WVector[i], LVector[i])
-            intermediateResults = transformOutputList[1001+7*i]
-    output = transformOutputList
-    return output
-
-def decout(CT, sk, transformOutputList, blindingFactorYVectorBlinded, blindingFactorLVectorBlinded):
-    input = [CT, sk, transformOutputList, blindingFactorYVectorBlinded, blindingFactorLVectorBlinded]
-    omega, C0, XVector, WVector = CT
+    if ( ( (isList(sk)) == (0) ) ):
+        Message = (omega * pair(C0, sk))
+        output = Message
+        return output
     YVector, LVector = sk
     dotProd = group.init(GT)
-    n = transformOutputList[0]
+    n = len(YVector)
     for i in range(0, n):
         if ( ( (( (YVector[i]) != (group.init(G2)) )) and (( (LVector[i]) != (group.init(G2)) )) ) ):
-            intermediateResults = ((transformOutputList[1000+7*i] ** blindingFactorYVectorBlinded[i]) * (transformOutputList[1001+7*i] ** blindingFactorLVectorBlinded[i]))
+            intermediateResults = (pair(XVector[i], YVector[i]) * pair(WVector[i], LVector[i]))
             dotProd = (dotProd * intermediateResults)
     Message2 = (omega * dotProd)
     output = Message2
@@ -160,20 +160,17 @@ def main():
     group = PairingGroup(secparam)
 
     (pk, msk) = setup(4)
-    (blindingFactorYVectorBlinded, blindingFactorLVectorBlinded, sk2Blinded) = keygen(pk, msk, [2, 1, 0, 2])
+    sk = keygen(pk, msk, [2, 2, 0, 1])
     M = group.random(GT)
     print(M)
     print("\n\n")
     CT = encrypt(M, [1, 1, 0, 1], pk)
-    transformOutputList = transform(CT, sk2Blinded)
-    M2 = decout(CT, sk2Blinded, transformOutputList, blindingFactorYVectorBlinded, blindingFactorLVectorBlinded)
-
+    M2 = decrypt(CT, sk)
     print(M2)
     if (M == M2):
         print("success")
     else:
         print("failed")
-
 
 
 if __name__ == '__main__':

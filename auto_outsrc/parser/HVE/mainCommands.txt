@@ -1,0 +1,15 @@
+    (pk, msk) = setup(4)
+    (blindingFactorskBlinded, blindingFactorYVectorBlinded, blindingFactorLVectorBlinded, sk2Blinded) = keygen(pk, msk, [1, 1, 0, 1])
+    M = group.random(GT)
+    print(M)
+    print("\n\n")
+    CT = encrypt(M, [1, 1, 0, 1], pk)
+    transformOutputList = transform(CT, sk2Blinded)
+    M2 = decout(CT, sk2Blinded, transformOutputList, blindingFactorskBlinded, blindingFactorYVectorBlinded, blindingFactorLVectorBlinded)
+
+    print(M2)
+    if (M == M2):
+        print("success")
+    else:
+        print("failed")
+

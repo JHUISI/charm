@@ -52,12 +52,12 @@ numNonDontCares := numNonDontCares + 1
 END :: if
 END :: for
 
-BEGIN :: if
-if { numNonDontCares == 0 }
-sk := g2 ^ y
-output := sk
-return := output
-END :: if
+#BEGIN :: if
+#if { numNonDontCares == 0 }
+#sk := g2 ^ y
+#output := sk
+#return := output
+#END :: if
 
 sumUSaisUSsoFar := init(0)
 
@@ -134,12 +134,12 @@ END :: func:encrypt
 BEGIN :: func:decrypt
 input := list{CT, sk}
 CT := expand{omega, C0, XVector, WVector}
-BEGIN :: if
-if { isList(sk)==0 }
-Message := omega * e(C0, sk)
-output := Message
-return := output
-END :: if
+#BEGIN :: if
+#if { isList(sk)==0 }
+#Message := omega * e(C0, sk)
+#output := Message
+#return := output
+#END :: if
 
 sk := expand{YVector, LVector}
 

@@ -10,7 +10,7 @@ forLoopsStruct = None
 forLoopsInnerStruct = None
 
 currentNumberOfForLoops = 0
-iterationNo = None
+iterationNo = 0
 withinForLoop = False
 
 def getOriginalVarNameFromBlindedName(blindedName):
