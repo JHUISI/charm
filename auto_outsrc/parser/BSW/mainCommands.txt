@@ -1,0 +1,23 @@
+    group = PairingGroup('SS512')
+
+    attrs = ['ONE', 'TWO', 'THREE']
+    access_policy = '((four or three) and (three or one))'
+    print("Attributes =>", attrs); print("Policy =>", access_policy)
+
+    (mk, pk) = setup()
+
+    sk = keygen(pk, mk, attrs)
+    print("sk :=>", sk)
+
+    rand_msg = group.random(GT)
+    print("msg =>", rand_msg)
+    ct = encrypt(pk, rand_msg, access_policy)
+    print("\n\nCiphertext...\n")
+    group.debug(ct)
+
+    rec_msg = decrypt(pk, sk, ct)
+    print("\n\nDecrypt...\n")
+    print("Rec msg =>", rec_msg)
+
+    assert rand_msg == rec_msg, "FAILED Decryption: message is incorrect"
+    print("Successful Decryption!!!")
