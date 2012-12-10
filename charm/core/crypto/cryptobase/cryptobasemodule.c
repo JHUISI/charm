@@ -52,7 +52,14 @@ static PyObject *selectPRF(Base *self, PyObject *args) {
 		return NULL;
 	}
 	prf = PyObject_CallObject(new_func, tuple);
-	PyObject_CallMethod(prf, "setMode", "i", TRUE);
+	PyObject *ret = PyObject_CallMethod(prf, "setMode", "i", TRUE);
+	if(ret == NULL) {
+		// return error
+		PyErr_SetString(BaseError, "Could not call setMode on ALG object.");
+		Py_DECREF(prf);
+		return NULL;
+	}
+	Py_DECREF(ret);
 	return prf;
 }
 
