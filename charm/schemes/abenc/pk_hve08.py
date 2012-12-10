@@ -9,7 +9,7 @@ Vincenzo Iovino, Giuseppe Persiano (Pairing-based)
 * type:        predicate encryption (public key)
 * setting:     Pairing
 
-:Authors:    Matthew Pagano
+:Authors:    Matthew W. Pagano
 :Date:       12/2012
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
