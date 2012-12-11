@@ -29,11 +29,14 @@ outputKeyword = "output"
 
 hash_table_size = 10000
 delta_word = "delta"
+inputVarName = "input"
+outputVarName = "output"
 BINARY_NODE_CLASS_NAME = 'BinaryNode'
 ENUM_VALUE_CLASS_NAME = 'EnumValue'
 VAR_INFO_CLASS_NAME = 'VarInfo'
 NONE_FUNC_NAME = "NONE_FUNC_NAME"
 NONE_STRING = 'None'
+BV_NAME = "name"
 SYMMETRIC_SETTING = "symmetric"
 ASYMMETRIC_SETTING = "asymmetric"
 ALGEBRAIC_SETTING = "setting"

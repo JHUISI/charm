@@ -11,6 +11,7 @@ clauses = [ ('x', 'y'), ('y', 'z'), ('x', 'z') ]
 """
 variableKeyword = "variables"
 clauseKeyword = "clauses"
+constraintKeyword = "constraints"
 unSat = "unsat"
 def read_config(filename):
     print("Importing file: ", filename)
@@ -18,13 +19,13 @@ def read_config(filename):
 
     fileVars = __import__(file)
     definitions = dir(fileVars)
-    if variableKeyword in definitions and clauseKeyword in definitions:
-        return (fileVars.variables, fileVars.clauses)
+    if variableKeyword in definitions and clauseKeyword in definitions and constraintKeyword in definitions:
+        return (fileVars.variables, fileVars.clauses, fileVars.constraints)
     else:
         sys.exit("File doesn't contain definitions for '%s' and/or '%s'" % (variableKeyword, clauseKeyword))
         
 
-def solveBooleanCircuit(file, variables, clauses):
+def solveBooleanCircuit(file, variables, clauses, constraints):
     vars = {}
     for v in variables:
         vars[ str(v) ] = Bool(str(v)) # create refs
@@ -40,6 +41,14 @@ def solveBooleanCircuit(file, variables, clauses):
         elif vars.get(y) == None:
             print("Need to add '%s' to variable list." % y)
             return
+    
+    andObjects = []
+    for i in constraints:
+        if vars.get(i) != None:
+            andObjects.append(vars.get(i))
+            
+    if len(andObjects) > 0:
+        mySolver.add(And(andObjects))
     
     isSat = mySolver.check()
     if str(isSat) == unSat: sys.exit("Clauses are not satisfiable. Try again!")
@@ -64,8 +73,8 @@ if __name__ == "__main__":
     file = sys.argv[1]
 #    variables = [ 'x', 'y', 'z' ]
 #    clauses = [ ('x', 'y'), ('y', 'x'), ('y', 'z') ]
-    variables, clauses = read_config(file)
-    solveBooleanCircuit(file, variables, clauses)
+    variables, clauses, constraints = read_config(file)
+    solveBooleanCircuit(file, variables, clauses, constraints)
 
 
  

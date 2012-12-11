@@ -10,18 +10,22 @@
 
 # 4. Label ciphertext elements and identify all the variables that can be moved to G1 vs. G2: 
 #     - must verify that we don't compromise on the security
-import sdlpath, sys, os
+import sdlpath, sys, os, random, string
 import sdlparser.SDLParser as sdl
 from sdlparser.SDLang import *
 from outsrctechniques import SubstituteVar, SubstitutePairings
 
 assignInfo = None
-SHORT_KEYS = "keys" # for 
+SHORT_KEYS = "keys" # for
 SHORT_CIPHERTEXT = "ciphertext" # in case, an encryption scheme
 SHORT_SIGNATURE  = "signature" # in case, a sig algorithm
+SHORT_FORALL = "both"
 variableKeyword = "variables"
 clauseKeyword = "clauses"
-
+constraintKeyword = "constraints"
+PUB_SCHEME = "PUB"
+SIG_SCHEME = "SIG"
+length = 5 # length of temporary file
 
 class GetPairingVariables:
     def __init__(self, list1, list2):
@@ -107,7 +111,7 @@ class transformXOR:
 def transformFunction(funcName, blockStmts, info, noChangeList, startLines=[]):
     begin = "BEGIN :: func:" + funcName
     end = "END :: func:" + funcName
-    newLines = [begin] + list(startLines)
+    newLines = [begin] # + list(startLines)
     lines = list(blockStmts.keys())
     lines.sort()
     for i in lines:
@@ -116,7 +120,10 @@ def transformFunction(funcName, blockStmts, info, noChangeList, startLines=[]):
         if Type(assign) == ops.EQ:
             assignVar = blockStmts[i].getAssignVar()
             # store for later
-            if blockStmts[i].getHasRandomness():
+            if assignVar == sdl.inputVarName:
+                newLines.append(str(assign))
+                newLines.extend(startLines)
+            elif blockStmts[i].getHasRandomness():
                 if not assignVarIsGenerator(assignVar, info):
                     print(" :-> not a generator, so add to newLines.", end="") # do not include in new setup 
                     newLines.append(str(assign)) # unmodified
@@ -138,46 +145,51 @@ def transformFunction(funcName, blockStmts, info, noChangeList, startLines=[]):
             elif blockStmts[i].getIsList() or blockStmts[i].getIsExpandNode():
                 print(" :-> updating list...", end="")
                 newLines.append(updateForLists(blockStmts[i], info))
+            else:
+                newLines.append(str(assign))
         else:
             newLines.append(str(assign)) 
             # TODO: expand for IF, FOR and other types of non-EQ nodes that will come up.
             # TODO: will need to update this section as you see more schemes
         print("")
     
-    #print("<=============== new function ===============>")
-    #for i in newLines:
-    #    print("new:", i)
-    #print("<=============== new function ===============>")
     newLines.append(end)
     return newLines
     
-def main():
+def main(config):
     global assignInfo
     assignInfo = sdl.getAssignInfo()
-    setting = sdl.getAssignInfo()[sdl.NONE_FUNC_NAME]['setting'].getAssignNode().right.getAttribute()
+    setting = sdl.assignInfo[sdl.NONE_FUNC_NAME][ALGEBRAIC_SETTING].getAssignNode().getRight().getAttribute()
+    bv_name = sdl.assignInfo[sdl.NONE_FUNC_NAME][BV_NAME].getAssignNode().getRight().getAttribute()
+    typesBlock = sdl.getFuncStmts( TYPES_HEADER )
+    print("name is", bv_name)
     print("setting is", setting)
+    
+    lines = list(typesBlock[0].keys())
+    lines.sort()
+    typesBlockLines = [ i.rstrip() for i in sdl.getLinesOfCodeFromLineNos(lines) ]
+    begin = ["BEGIN :: " + TYPES_HEADER]
+    end = ["END :: " + TYPES_HEADER]
+
+    newLines0 = [ BV_NAME + " := " + bv_name, setting + " := " + sdl.ASYMMETRIC_SETTING ] 
+    newLines1 = begin + typesBlockLines + end
+    
     if setting != sdl.SYMMETRIC_SETTING:
         print("No need to convert to asymmetric setting.\n")
         exit(0) # or continue
     
     # determine user preference in terms of keygen or encrypt
-    contarget = sdl.getAssignInfo()[sdl.NONE_FUNC_NAME]['short']
+    contarget = sdl.assignInfo[sdl.NONE_FUNC_NAME]['short']
     if contarget:
         target = contarget.getAssignNode().right.getAttribute()
     if contarget == None:
         short = SHORT_KEYS
-    elif contarget != SHORT_KEYS and contarget != SHORT_CIPHERTEXT and contarget != SHORT_SIGNATURE:
-        # choose default
-        short = SHORT_KEYS
     else:
-        pass
+        short = target
     print("reducing size of '%s'" % short) 
-        
-    setupFuncName = "setup"
-    setup = setupFuncName
+
     varTypes = sdl.getVarTypes()
-    (stmtS, typesS, depList, depListNoExp, infList, infListNoExp) = sdl.getFuncStmts( setup )
-#    (stmtS, typesS, depList, depListNoExp, infList, infListNoExp) = getFuncStmts( setup ) 
+    (stmtS, typesS, depListS, depListNoExpS, infListS, infListNoExpS) = sdl.getFuncStmts( config.setupFuncName )
     generators = []
     print("List of generators for scheme")
     lines = stmtS.keys()
@@ -199,8 +211,7 @@ def main():
     pair_vars_G1_lhs = [] # ['C#1', 'C#2', 'C#3', 'C#4', 'C#5', 'C#6', 'C#7', 'E1', 'E2']
     pair_vars_G1_rhs = [] # ['D#1', 'D#2', 'D#3', 'D#4', 'D#5', 'D#6', 'D#7', 'D#7', 'K']
     gpv = GetPairingVariables(pair_vars_G1_lhs, pair_vars_G1_rhs) 
-    decrypt = "decrypt"
-    (stmtD, typesD, depListD, depListNoExpD, infListD, infListNoExpD) = sdl.getFuncStmts( decrypt )
+    (stmtD, typesD, depListD, depListNoExpD, infListD, infListNoExpD) = sdl.getFuncStmts( config.decryptFuncName )
     lines = stmtD.keys()
     for i in lines:
         if stmtD[i].getHasPairings():
@@ -230,7 +241,7 @@ def main():
     for i in range(varsLen):
         xor = BinaryNode(ops.XOR)
         xor.left = BinaryNode(pair_vars_G1_lhs[i])
-        xor.right = BinaryNode(pair_vars_G1_rhs[i])     
+        xor.right = BinaryNode(pair_vars_G1_rhs[i])
         xorList.append(xor)
     
     ANDs = [ BinaryNode(ops.AND) for i in range(len(xorList)-1) ]
@@ -238,25 +249,54 @@ def main():
         ANDs[i].left = BinaryNode.copy(xorList[i])
         if i < len(ANDs)-1: ANDs[i].right = ANDs[i+1]
         else: ANDs[i].right = BinaryNode.copy(xorList[i+1])
-    print("XOR clause: ", ANDs[0])    
-
-    print("<===== Generate XOR clauses =====>")
-    
-    print("<===== Generate SAT solver input =====>")
+    print("XOR clause: ", ANDs[0])
     txor = transformXOR(None) # accepts dictionary of fixed values
     sdl.ASTVisitor(txor).preorder(ANDs[0])
+    print("<===== Generate XOR clauses =====>")
+    
+    print("\n<===== Generate Constraints =====>")
+    xorVarMap = txor.getVarMap()
+    (stmtK, typesK, depListK, depListNoExpK, infListK, infListNoExpK) = sdl.getFuncStmts( config.keygenFuncName )
+    (stmtE, typesE, depListE, depListNoExpE, infListE, infListNoExpE) = sdl.getFuncStmts( config.encryptFuncName )
+    constraints = "[]"
+    if short == SHORT_KEYS:
+        # create constraints around keys
+        assert type(config.keygenSecVar) == list, "keygenSecVar in config file expected as list of variables"
+        keygenSecVarList = []
+        for i in config.keygenSecVar:
+            if xorVarMap.get(i) != None: keygenSecVarList.append( xorVarMap.get(i) )
+        constraints = str(keygenSecVarList)
+    elif short == SHORT_CIPHERTEXT:
+        assert type(config.ciphertextVar) == list, "ciphertextVar in config file expected as list of variables"
+        ciphertextVarList = []
+        for i in config.ciphertextVar:
+            if xorVarMap.get(i) != None: ciphertextVarList.append( xorVarMap.get(i) )
+        constraints = str(ciphertextVarList)
+    elif short == SHORT_SIGNATURES:
+        pass #TODO
+    elif short == SHORT_FORALL:
+        pass #default
+    print("<===== Generate Constraints =====>\n")    
+    
+    print("<===== Generate SAT solver input =====>")
     
     # TODO: process constraints and add to output
-    print("map: ", txor.getVarMap())
+    print("map: ", xorVarMap)
     print("variables = ", txor.getVariables())
     outputVariables = variableKeyword + " = " + str(txor.getVariables()) + "\n"
     print("clauses = ", txor.getClauses())
     outputClauses   = clauseKeyword + " = " + str(txor.getClauses()) + "\n"
+    print("constraints = ", constraints)
+    outputConstraints = constraintKeyword + " = " + str(constraints) + "\n"
     # get random file
-    name = "test0.py"
+    name = ""
+    for i in range(length):
+        name += random.choice(string.ascii_lowercase + string.digits)
+    name += ".py"
     f = open(name, 'w')
     f.write(outputVariables)
     f.write(outputClauses)
+    f.write(outputConstraints)
     f.close()
     print("<===== Instantiate Z3 solver =====>")
     os.system("python2.7 z3solver.py %s" % name)
@@ -264,12 +304,12 @@ def main():
     results = __import__(newName)
     print(results.resultDictionary)
     print("<===== Instantiate Z3 solver =====>")
-    
-    res, resMap = NaiveEvaluation(results.resultDictionary)
+        
+    res, resMap = NaiveEvaluation(results.resultDictionary, short)
     print("Group Mapping: ", res)
     # determine whether to make True = G1 and False = G2. 
     # It depends on which counts more since they're interchangeable...
-    groupInfo = DeriveSolution(res, resMap, txor.getVarMap(), info)
+    groupInfo = DeriveSolution(res, resMap, xorVarMap, info)
     groupInfo['generators'] = generators 
     groupInfo['generatorMapG1'] = generatorMapG1
     groupInfo['generatorMapG2'] = generatorMapG2
@@ -278,27 +318,29 @@ def main():
     groupInfo['varTypes'] = {}
     
     noChangeList = []
+    
+    assert config.schemeType == PUB_SCHEME, "Cannot work with any other type of scheme at the moment"
     print("<===== transforming setup =====>")
     groupInfo['varTypes'].update(typesS)
-    newLinesS = transformFunction(setup, stmtS, groupInfo, noChangeList, generatorLines)
+    newLinesS = transformFunction(config.setupFuncName, stmtS, groupInfo, noChangeList, generatorLines)
     print("<===== transforming setup =====>\n")
     
-    keygen = "keygen"
-    (stmtK, typesK, depListK, depListNoExpK, infListK, infListNoExpK) = sdl.getFuncStmts( keygen )
     print("<===== transforming keygen =====>")            
     groupInfo['varTypes'].update(typesK)
-    newLinesK = transformFunction(keygen, stmtK, groupInfo, noChangeList)
+    newLinesK = transformFunction(config.keygenFuncName, stmtK, groupInfo, noChangeList)
     print("<===== transforming keygen =====>")            
 
-    encrypt = "encrypt"
-    (stmtE, typesE, depListE, depListNoExpE, infListE, infListNoExpE) = sdl.getFuncStmts( encrypt )
     print("<===== transforming encrypt =====>")
     groupInfo['varTypes'].update(typesE)
-    newLinesE = transformFunction(encrypt, stmtE, groupInfo, noChangeList)
-    print("<===== transforming encrypt =====>")            
+    newLinesE = transformFunction(config.encryptFuncName, stmtE, groupInfo, noChangeList)
+    print("<===== transforming encrypt =====>")
 
-    
-    print("<===== new SDL =====>")            
+    print("<===== transforming decrypt =====>")
+    groupInfo['varTypes'].update(typesD)
+    newLinesD = transformFunction(config.decryptFuncName, stmtD, groupInfo, noChangeList)
+    print("<===== transforming decrypt =====>")
+
+    print("<===== new SDL =====>")
     for i in newLinesS:
         print(i)
     print("\n\n")
@@ -307,18 +349,17 @@ def main():
     print("\n\n")
     for i in newLinesE:
         print(i)
-    print("<===== new SDL =====>")            
+    print("\n\n")
+    for i in newLinesD:
+        print(i)
+    print("<===== new SDL =====>")
     
-#    info['setupGenerators'] = replaceGenerators 
-#    print("<===== Transform Setup =====>")
-#    transformSetup(stmtS, info)    
-#    print("<===== Transform Setup =====>\n")    
-#    
-#    print("info on G1 :=>", info['genMapG1'].keys())
-#    print("info on G2 :=>", info['genMapG2'].keys())    
+    writeConfig(bv_name + "_asym.bv", newLines0, newLines1, newLinesS, newLinesK, newLinesE, newLinesD)
+    os.system("rm -f " + name + "*")
+    return
 
 # temporary placement
-def NaiveEvaluation(solutionList):
+def NaiveEvaluation(solutionList, preference):
     trueCount = 0
     falseCount = 0
     resMap = {}
@@ -328,6 +369,9 @@ def NaiveEvaluation(solutionList):
         elif v == False: falseCount += 1
         else: sys.exit("z3 results have been tampered with.")
         resMap[ k ] = v
+    
+    if preference in [SHORT_KEYS, SHORT_CIPHERTEXT, SHORT_SIGNATURE]:
+        return {True:'G1', False:'G2'}, resMap
     
     if trueCount >= falseCount: 
         G1 = True; G2 = False
@@ -569,6 +613,16 @@ def updatForPairing(varInfo, info):
     print("\n\t Changed: ", node)
     return str(node)
 
+def writeConfig(filename, *args):
+    f = open(filename, 'w')
+    for block in args:
+        for line in block:
+            f.write(line + "\n")
+        f.write('\n')
+    f.close()
+    return
+    
+
 if __name__ == "__main__":
     print(sys.argv)
     sdl_file = sys.argv[1]
@@ -586,4 +640,4 @@ if __name__ == "__main__":
 #            sys.exit(-1)
             
     sdl.parseFile2(sdl_file, sdlVerbose)
-    main()
+    main(configModule)
