@@ -321,12 +321,14 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
 
         transformLines.append(lineForTransformLines + "\n")
 
-        if (withinForLoop == True):
-            lineForTransformLines = str(currentNode.left) + " := " + transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + "?"
-        else:
-            lineForTransformLines = str(currentNode.left) + " := " + transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex)
+        if (len(groupedPairings) == 1):
+            if (withinForLoop == True):
+                lineForTransformLines = str(currentNode.left) + " := " + transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + "?"
+            else:
+                lineForTransformLines = str(currentNode.left) + " := " + transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex)
 
-        transformLines.append(lineForTransformLines + "\n")
+            transformLines.append(lineForTransformLines + "\n")
+
 
         if (withinForLoop == False):
             transformListCounter += 1

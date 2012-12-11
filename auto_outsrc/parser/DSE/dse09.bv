@@ -2,6 +2,9 @@ name := dsewaters09
 setting := symmetric
 short := keys
 
+N := 2
+secparam := 80
+
 BEGIN :: types
 id := str
 M := GT

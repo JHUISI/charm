@@ -10,4 +10,10 @@ on at most two variables
 keys must be entries in a different dictionary, the first statement of the for loop can contain that
 assignment.
 
--- doNotIncludeInTransformList in config.py must be completed.
+-- doNotIncludeInTransformList in config.py must be completed.  Right now, the only thing you'd include here
+is the name of a variable that stores the results of a dot product computed in a for loop.
+
+-- dot products using "dotprod" cannot contain blinded variables, only unblinded variables.
+
+-- elements of the secret key shouldn't be given as lists if they have a predetermined number of entries
+(e.g., D#0, D#1, and D#2).  Instead, break them up into separate variables (e.g., D0, D1, and D2).
