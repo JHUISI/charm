@@ -2,6 +2,9 @@ name := lw10
 setting := symmetric
 short := keys
 
+N := 2
+secparam := 80
+
 BEGIN :: types
 msk := list
 pk1 := list{GT, G1}
