@@ -1,5 +1,6 @@
 name := bsw07
 setting := symmetric
+short := keys
 
 BEGIN :: types
 policy_str := str
@@ -8,7 +9,7 @@ attrs := list
 sh := list
 coeff := list
 share := list
-S := list
+S := list{str}
 M := GT
 Dj := list
 Djp := list
@@ -24,16 +25,16 @@ alpha := random(ZR)
 beta := random(ZR)
 
 h := g^beta
-f := g^(1/beta)
 i := g^alpha
 egg := e(g, g)^alpha
 
 mk := list{beta, i}
-pk := list{g, h, f, egg}
+pk := list{g, h, egg}
 
 output := list{mk, pk}
 END :: func:setup
 
+#f := g^(1/beta)
 
 BEGIN :: func:keygen
 input := list{pk, mk, S} 

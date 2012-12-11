@@ -119,7 +119,7 @@ class VarInfo:
     def getInitValue(self):
         return self.initValue
 
-    def isUsedInHashCalc(self):
+    def getIsUsedInHashCalc(self):
         return self.isUsedInHashCalc
 
     def getHashArgsInAssignNode(self):

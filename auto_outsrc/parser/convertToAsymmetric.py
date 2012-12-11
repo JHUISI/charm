@@ -26,6 +26,8 @@ constraintKeyword = "constraints"
 PUB_SCHEME = "PUB"
 SIG_SCHEME = "SIG"
 length = 5 # length of temporary file
+oldListTypeRefs = {}
+newListTypeRefs = {}
 
 class GetPairingVariables:
     def __init__(self, list1, list2):
@@ -137,14 +139,14 @@ def transformFunction(funcName, blockStmts, info, noChangeList, startLines=[]):
             elif assignVarOccursInG2(assignVar, info):
                 print(" :-> just in G2:", blockStmts[i].getVarDepsNoExponents(), end="")
                 noChangeList.append(str(assignVar))
-                newLines.append(updateAllForG2(assign, assignVar, blockStmts[i].getVarDepsNoExponents(), info, False, noChangeList))                
+                newLines.append(updateAllForG2(assign, assignVar, blockStmts[i].getVarDepsNoExponents(), info, False, noChangeList)) 
             elif blockStmts[i].getHasPairings(): # in GT so don't need to touch assignVar
                 print(" :-> update pairing.", end="")
                 noChangeList.append(str(assignVar))
                 newLines.append(updatForPairing(blockStmts[i], info))
             elif blockStmts[i].getIsList() or blockStmts[i].getIsExpandNode():
                 print(" :-> updating list...", end="")
-                newLines.append(updateForLists(blockStmts[i], info))
+                newLines.append(updateForLists(blockStmts[i], assignVar, info))
             else:
                 newLines.append(str(assign))
         else:
@@ -188,8 +190,15 @@ def main(config):
         short = target
     print("reducing size of '%s'" % short) 
 
-    varTypes = sdl.getVarTypes()
+    varTypes = dict(sdl.getVarTypes().get(TYPES_HEADER))
     (stmtS, typesS, depListS, depListNoExpS, infListS, infListNoExpS) = sdl.getFuncStmts( config.setupFuncName )
+    (stmtK, typesK, depListK, depListNoExpK, infListK, infListNoExpK) = sdl.getFuncStmts( config.keygenFuncName )
+    (stmtE, typesE, depListE, depListNoExpE, infListE, infListNoExpE) = sdl.getFuncStmts( config.encryptFuncName )    
+    (stmtD, typesD, depListD, depListNoExpD, infListD, infListNoExpD) = sdl.getFuncStmts( config.decryptFuncName )
+    varTypes.update(typesS)
+    varTypes.update(typesK)
+    varTypes.update(typesE)
+    varTypes.update(typesD)
     generators = []
     print("List of generators for scheme")
     lines = stmtS.keys()
@@ -211,7 +220,6 @@ def main(config):
     pair_vars_G1_lhs = [] # ['C#1', 'C#2', 'C#3', 'C#4', 'C#5', 'C#6', 'C#7', 'E1', 'E2']
     pair_vars_G1_rhs = [] # ['D#1', 'D#2', 'D#3', 'D#4', 'D#5', 'D#6', 'D#7', 'D#7', 'K']
     gpv = GetPairingVariables(pair_vars_G1_lhs, pair_vars_G1_rhs) 
-    (stmtD, typesD, depListD, depListNoExpD, infListD, infListNoExpD) = sdl.getFuncStmts( config.decryptFuncName )
     lines = stmtD.keys()
     for i in lines:
         if stmtD[i].getHasPairings():
@@ -221,16 +229,20 @@ def main(config):
     print("pair vars RHS:", pair_vars_G1_rhs) 
     print("list of gens :", generators)
     info = {}
-    info[ 'G1_lhs' ] = (pair_vars_G1_lhs, assignTraceback(generators, varTypes, pair_vars_G1_lhs))
-    info[ 'G1_rhs' ] = (pair_vars_G1_rhs, assignTraceback(generators, varTypes, pair_vars_G1_rhs))
+    constraintList = []
+    info[ 'G1_lhs' ] = (pair_vars_G1_lhs, assignTraceback(generators, varTypes, pair_vars_G1_lhs, constraintList))
+    info[ 'G1_rhs' ] = (pair_vars_G1_rhs, assignTraceback(generators, varTypes, pair_vars_G1_rhs, constraintList))
 
     print("info => G1 lhs : ", info['G1_lhs'])
     print("info => G1 rhs : ", info['G1_rhs'])
+    
+    
     print("<===== Determine Asymmetric Generators =====>")
     (generatorLines, generatorMapG1, generatorMapG2) = Step1_DeriveSetupGenerators(generators, info)
     print("Generators in G1: ", generatorMapG1)
     print("Generators in G2: ", generatorMapG2)
     print("<===== Determine Asymmetric Generators =====>\n")
+#    sys.exit("...\n")
     
     print("<===== Generate XOR clauses =====>")  
     # let the user's preference for fixing the keys or ciphertext guide this portion of the algorithm.
@@ -254,28 +266,38 @@ def main(config):
     sdl.ASTVisitor(txor).preorder(ANDs[0])
     print("<===== Generate XOR clauses =====>")
     
-    print("\n<===== Generate Constraints =====>")
+    print("\n<===== Generate Constraints =====>")    
     xorVarMap = txor.getVarMap()
-    (stmtK, typesK, depListK, depListNoExpK, infListK, infListNoExpK) = sdl.getFuncStmts( config.keygenFuncName )
-    (stmtE, typesE, depListE, depListNoExpE, infListE, infListNoExpE) = sdl.getFuncStmts( config.encryptFuncName )
     constraints = "[]"
+    fileSuffix = ""
     if short == SHORT_KEYS:
         # create constraints around keys
+        fileSuffix = 'ky'
         assert type(config.keygenSecVar) == list, "keygenSecVar in config file expected as list of variables"
         keygenSecVarList = []
         for i in config.keygenSecVar:
             if xorVarMap.get(i) != None: keygenSecVarList.append( xorVarMap.get(i) )
+        if len(constraintList) > 0:
+            for i in constraintList: # in case there are hash values
+                if xorVarMap.get(i) != None and xorVarMap.get(i) not in keygenSecVarList:
+                    keygenSecVarList.append( xorVarMap.get(i) )
         constraints = str(keygenSecVarList)
     elif short == SHORT_CIPHERTEXT:
+        fileSuffix = 'ct'
         assert type(config.ciphertextVar) == list, "ciphertextVar in config file expected as list of variables"
         ciphertextVarList = []
         for i in config.ciphertextVar:
             if xorVarMap.get(i) != None: ciphertextVarList.append( xorVarMap.get(i) )
+        if len(constraintList) > 0:
+            for i in constraintList: # in case there are hash values
+                if xorVarMap.get(i) != None and xorVarMap.get(i) not in ciphertextVarList: 
+                    ciphertextVarList.append( xorVarMap.get(i) )
         constraints = str(ciphertextVarList)
     elif short == SHORT_SIGNATURES:
         pass #TODO
     elif short == SHORT_FORALL:
         pass #default
+
     print("<===== Generate Constraints =====>\n")    
     
     print("<===== Generate SAT solver input =====>")
@@ -316,27 +338,28 @@ def main(config):
     groupInfo['baseGeneratorG1'] = info['baseGeneratorG1'] # usually 'g'
     groupInfo['baseGeneratorG2'] = info['baseGeneratorG2']
     groupInfo['varTypes'] = {}
+    groupInfo['varTypes'].update(varTypes)
     
     noChangeList = []
     
     assert config.schemeType == PUB_SCHEME, "Cannot work with any other type of scheme at the moment"
     print("<===== transforming setup =====>")
-    groupInfo['varTypes'].update(typesS)
+#    groupInfo['varTypes'].update(typesS)
     newLinesS = transformFunction(config.setupFuncName, stmtS, groupInfo, noChangeList, generatorLines)
     print("<===== transforming setup =====>\n")
     
     print("<===== transforming keygen =====>")            
-    groupInfo['varTypes'].update(typesK)
+#    groupInfo['varTypes'].update(typesK)
     newLinesK = transformFunction(config.keygenFuncName, stmtK, groupInfo, noChangeList)
     print("<===== transforming keygen =====>")            
 
     print("<===== transforming encrypt =====>")
-    groupInfo['varTypes'].update(typesE)
+#    groupInfo['varTypes'].update(typesE)
     newLinesE = transformFunction(config.encryptFuncName, stmtE, groupInfo, noChangeList)
     print("<===== transforming encrypt =====>")
 
     print("<===== transforming decrypt =====>")
-    groupInfo['varTypes'].update(typesD)
+#    groupInfo['varTypes'].update(typesD)
     newLinesD = transformFunction(config.decryptFuncName, stmtD, groupInfo, noChangeList)
     print("<===== transforming decrypt =====>")
 
@@ -354,7 +377,7 @@ def main(config):
         print(i)
     print("<===== new SDL =====>")
     
-    writeConfig(bv_name + "_asym.bv", newLines0, newLines1, newLinesS, newLinesK, newLinesE, newLinesD)
+    writeConfig(bv_name + "_asym_" + fileSuffix + ".bv", newLines0, newLines1, newLinesS, newLinesK, newLinesE, newLinesD)
     os.system("rm -f " + name + "*")
     return
 
@@ -407,14 +430,14 @@ def DeriveSolution(groupMap, resultMap, xorMap, info):
     return {'G1':G1, 'G2':G2, 'both':both}
     
 
-def assignTraceback(generators, varTypes, listVars):
+def assignTraceback(generators, varTypes, listVars, constraintList):
     varProp = []
     data = {}
     # get variable names from all pairing
     for i in listVars:
         #print("var name := ", i)
         var = i
-        buildMap(generators, varTypes, varProp, var)
+        buildMap(generators, varTypes, varProp, var, constraintList)
         data[i] = set(varProp)
         varProp = []
     
@@ -424,14 +447,15 @@ def assignTraceback(generators, varTypes, listVars):
     return data
 
         
-def buildMap(generators, varTypes, varList, var):
+def buildMap(generators, varTypes, varList, var, constraintList):
     global assignInfo
     removeList = []
     if (not set(var).issubset(generators)):
         print("var keys: ", var)
         (name, varInf) = getVarNameEntryFromAssignInfo(assignInfo, var)
         if(name == None):             
-            print("Var : ", varInf.getVarDepsNoExponents())
+            if varInf != None: print("Var : ", varInf.getVarDepsNoExponents())
+            else: print("ERROR: could not locate type: ", var)
             return
         l = varInf.getVarDepsNoExponents()
 #        print("var:", var, ", output: ", l)
@@ -449,15 +473,21 @@ def buildMap(generators, varTypes, varList, var):
                 print("newVarName: ", newVarName)
                 if newVarName != None: 
                     print("newVarName := ", newVarName)
-                    resultVarName = getVarTypeFromVarName(newVarName, None, True)
-#                    print("second attempt: ", newVarName, ":", resultVarName)
-                    varList.append(newVarName)
+                    resultVarName = sdl.getVarTypeFromVarName(newVarName, None, True)
+                    #print("second attempt: ", newVarName, ":", resultVarName)
+                    varList.append(newVarName)              
                 else:
-                    varList.append(i)
+                    pass
+#                    print("JAA: ADDING to varList: ", i)
+#                    varList.append(i)
             elif typeI in [types.G1]:
                 varList.append(i)
             elif typeI in [types.ZR, types.str, types.list, types.object]:
-                removeList.append(str(i))
+                (name, varInf) = getVarNameEntryFromAssignInfo(assignInfo, i)
+                if varInf.getIsUsedInHashCalc():
+                    print("adding", i, "to the list")
+                    varList.append(str(i))
+                    constraintList.append(str(var))
                 continue
             else:
                 pass
@@ -467,7 +497,7 @@ def buildMap(generators, varTypes, varList, var):
         varsToCheck = list(l)
         for i in varsToCheck:
             lenBefore = len(varList)
-            buildMap(generators, varTypes, varList, i)
+            buildMap(generators, varTypes, varList, i, constraintList)
             lenAfter  = len(varList)
             if lenBefore == lenAfter:
                 node = BinaryNode(ops.ATTR)
@@ -476,13 +506,20 @@ def buildMap(generators, varTypes, varList, var):
                 (funcName, string) = getVarNameFromListIndices(assignInfo, varTypes, node, True)
                 if string != None: varList.append(string)
 
-        for i in removeList:
-            print("REMOVING: ", i)
-            print("varList: ", varList)
+#        for i in removeList:
+#            print("REMOVING: ", i)
+#            print("varList: ", varList)
             
     return    
 
 def Step1_DeriveSetupGenerators(generators, info):
+    """derive generators used by the scheme using the following rules:
+    1. first generator is selected as the base generator, "g". We split into two. 1 in G1 and other in G2.
+    2. second generator and thereafter are defined in terms of base generator, g in both groups as follows (DH):
+         h = random(ZR)
+         h_G1 = g_G1 ^ h
+         h_G2 = g_G2 ^ h
+    """
     generatorLines = []
     generatorMapG1 = {}
     generatorMapG2 = {}
@@ -517,19 +554,42 @@ def Step1_DeriveSetupGenerators(generators, info):
     print("....New Generators...")
     return (generatorLines, generatorMapG1, generatorMapG2)
 
-
 def assignVarOccursInBoth(varName, info):
+    """determines if varName occurs in the 'both' set. For varName's that have a '#' indicator, we first split it
+    then see if arg[0] is in the 'both' set."""
+    if varName.find(LIST_INDEX_SYMBOL) != -1:
+        varNameStrip = varName.split(LIST_INDEX_SYMBOL)[0]
+    else:
+        varNameStrip = None
     if varName in info['both']:
+        return True
+    elif varNameStrip != None and varNameStrip in info['both']:
         return True
     return False
 
 def assignVarOccursInG1(varName, info):
+    """determines if varName occurs in the 'G1' set. For varName's that have a '#' indicator, we first split it
+    then see if arg[0] is in the 'G1' set."""
+    if varName.find(LIST_INDEX_SYMBOL) != -1:
+        varNameStrip = varName.split(LIST_INDEX_SYMBOL)[0]
+    else:
+        varNameStrip = None
     if varName in info['G1']:
+        return True
+    elif varNameStrip != None and varNameStrip in info['G1']:
         return True
     return False
 
 def assignVarOccursInG2(varName, info):
+    """determines if varName occurs in the 'G2' set. For varName's that have a '#' indicator, we first split it
+    then see if arg[0] is in the 'G2' set."""    
+    if varName.find(LIST_INDEX_SYMBOL) != -1:
+        varNameStrip = varName.split(LIST_INDEX_SYMBOL)[0]
+    else:
+        varNameStrip = None
     if varName in info['G2']:
+        return True
+    elif varNameStrip != None and varNameStrip in info['G2']:
         return True
     return False
 
@@ -537,6 +597,35 @@ def assignVarOccursInG2(varName, info):
 def assignVarIsGenerator(varName, info):
     generatorList = info['generators']
     return varName in generatorList
+
+def handleListTypeRefs(varTypes, ref, info, isForBoth, groupType):
+    global oldListTypeRefs, newListTypeRefs
+    
+    refDetails = ref.split(LIST_INDEX_SYMBOL)
+    if len(refDetails) == 2:
+        refName = refDetails[0]
+        refStr  = refDetails[1]
+        if refStr.isdigit(): refNum = int(refDetails[1])
+        else: return False
+    else:
+        print("JAA: can't handle reference lists of length %s yet." % len(refDetails))
+        return False
+
+    oldVar = oldListTypeRefs.get(refName)[refNum]
+    
+    print("checking in handleListTypeRefs...")
+    if assignVarIsGenerator(oldVar, info) or assignVarOccursInBoth(oldVar, info):
+       # look for either G1 or G2?
+       print("")
+       if groupType == types.G1: newRef = newListTypeRefs.get(refName).index(oldVar + "_G1")
+       elif groupType == types.G2: newRef = newListTypeRefs.get(refName).index(oldVar + "_G2")
+    else:
+        # means either G1 or G2, we don't have to look for "_G?" extensions
+        newRef = newListTypeRefs.get(refName).index(oldVar)
+    
+    newRefName = refName + "#" + str(newRef)
+    return newRefName
+    
 
 def updateAllForBoth(node, assignVar, varDeps, info, changeLeftVar=True, noChangeList=[]):
     newLine1 = updateAllForG1(node, assignVar, varDeps, info, changeLeftVar, noChangeList)
@@ -553,12 +642,21 @@ def updateAllForG1(node, assignVar, varDeps, info, changeLeftVar, noChangeList=[
     info['generatorMapG1'][assignVar] = new_assignVar
     newVarDeps = set(varDeps).difference(noChangeList)
     for i in newVarDeps:
-        v = varTypes.get(i)
-        if v != None: v = v.getType()
-        # prune (as a second effort)
-        if v in [types.ZR, types.listZR, types.int, types.listInt, types.str, types.listStr]: 
-            continue        
         new_i = i + "_G1"
+        updatedRefAlready = False
+        if i.find(sdl.LIST_INDEX_SYMBOL) != -1: 
+            newRef = handleListTypeRefs(varTypes, i, info, changeLeftVar, types.G1)
+            if newRef == False: print("ERROR in handleListTypeRefs"); return
+            elif newRef == i: continue # meaning no change in refrence
+            else: new_i = newRef; updatedRefAlready = True
+        
+        if not updatedRefAlready:
+            v = varTypes.get(i)
+            if v != None: v = v.getType()
+            # prune (as a second effort)
+            if v in [types.ZR, types.listZR, types.int, types.listInt, types.str, types.listStr]: 
+                continue
+
         sdl.ASTVisitor( SubstituteVar(i, new_i) ).preorder( new_node2 )
         info['generatorMapG1'][i] = new_i
     print("\n\tChanged: ", new_node2, end="")
@@ -574,21 +672,30 @@ def updateAllForG2(node, assignVar, varDeps, info, changeLeftVar, noChangeList=[
     info['generatorMapG2'][assignVar] = new_assignVar
     newVarDeps = set(varDeps).difference(noChangeList)
     for i in newVarDeps:
-        v = varTypes.get(i)
-        if v != None: v = v.getType()
-        # prune (as a second effort)
-        if v in [types.ZR, types.listZR, types.int, types.listInt, types.str, types.listStr]: 
-            continue
         new_i = i + "_G2"
+        updatedRefAlready = False
+        if i.find(sdl.LIST_INDEX_SYMBOL) != -1: # detect references such as <var>#<int> which are treated like indirect pointers
+            newRef = handleListTypeRefs(varTypes, i, info, changeLeftVar, types.G2)
+            if newRef == False: print("ERROR in handleListTypeRefs"); return
+            elif newRef == i: continue # meaning no change in refrence
+            else: new_i = newRef; updatedRefAlready = True
+        if not updatedRefAlready:   
+            v = varTypes.get(i)
+            if v != None: v = v.getType()
+            # prune (as a second effort)
+            if v in [types.ZR, types.listZR, types.int, types.listInt, types.str, types.listStr]: 
+                continue
         sdl.ASTVisitor( SubstituteVar(i, new_i) ).preorder( new_node2 )
         info['generatorMapG2'][i] = new_i
     print("\n\tChanged: ", new_node2, end="")
     return str(new_node2)
 
-def updateForLists(varInfo, info):
+def updateForLists(varInfo, assignVar, info):
+    global oldListTypeRefs, newListTypeRefs
     newList = []
     inBoth = info['both']
     orig_list = varInfo.getAssignNode().getRight().listNodes
+    oldListTypeRefs[ str(assignVar) ] = list(orig_list) # record the original list
 #    orig_list = varInfo.getListNodesList()
 
     for i in orig_list:
@@ -599,6 +706,7 @@ def updateForLists(varInfo, info):
     new_node = BinaryNode.copy(varInfo.getAssignNode())
     new_node.right.listNodes = newList
     print("\n\tnewList: ", new_node)
+    newListTypeRefs[ str(assignVar) ] = list(newList) # record the updates
     return str(new_node)
 
 def updatForPairing(varInfo, info):    
@@ -632,7 +740,6 @@ if __name__ == "__main__":
         config = config.split('.')[0]
 
         configModule = __import__(config)
-#        print(dir(configModule))
         sdl.masterPubVars = configModule.masterPubVars
         sdl.masterSecVars = configModule.masterSecVars
 #        except:

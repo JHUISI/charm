@@ -1,6 +1,6 @@
 name := dse09
 setting := symmetric
-short := keys
+short := ciphertext
 
 BEGIN :: types
 id := str
