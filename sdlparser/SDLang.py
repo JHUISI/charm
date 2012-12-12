@@ -37,6 +37,7 @@ VAR_INFO_CLASS_NAME = 'VarInfo'
 NONE_FUNC_NAME = "NONE_FUNC_NAME"
 NONE_STRING = 'None'
 BV_NAME = "name"
+SETTING = "setting"
 SYMMETRIC_SETTING = "symmetric"
 ASYMMETRIC_SETTING = "asymmetric"
 ALGEBRAIC_SETTING = "setting"

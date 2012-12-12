@@ -70,7 +70,6 @@ def addImportLines(userFuncsFileArg):
     #pythonImportLines += "\n\n"
 
     setupFile.write(pythonImportLines)
-    #setupFile.write("from charm.toolbox.pairinggroup import *\n")
     setupFile.write("from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair\n")
     setupFile.write("from charm.core.engine.util import *\n")
     setupFile.write("from charm.core.math.integer import randomBits\n\n")
@@ -101,7 +100,7 @@ def addNumSignatures():
     try:
         numSignatures = assignInfo[NONE_FUNC_NAME][numSignaturesVarName].getAssignNode().right
     except:
-        sys.exit("addNumSignatures in codegen.py:  could not obtain the number of signatures from the input .bv file.")
+        return # this value isn't necessary for all schemes
 
     outputString = numSignaturesVarName + " = " + str(numSignatures) + "\n\n"
     setupFile.write(outputString)
@@ -117,13 +116,15 @@ def addNumSigners():
     outputString = numSignersVarName + " = " + str(numSigners) + "\n\n"
     setupFile.write(outputString)
 
+# TODO: clean this up
 def addSecParamValue():
     global setupFile
 
     try:
         theSecParamValue = assignInfo[NONE_FUNC_NAME][secParamVarName].getAssignNode().right
     except:
-        sys.exit("addSecParamValue in codegen.py:  couldn't obtain secparam value.  Make sure it's in the SDL file, but not in an explicitly defined function (it needs to be outside the functions.")
+        theSecParamValue = 80
+        #sys.exit("addSecParamValue in codegen.py:  couldn't obtain secparam value.  Make sure it's in the SDL file, but not in an explicitly defined function (it needs to be outside the functions.")
 
     outputString = secParamVarName + " = " + str(theSecParamValue) + "\n\n"
     setupFile.write(outputString)
@@ -219,8 +220,8 @@ def writeGlobalVarDecls(outputFile, functionName):
             outputString += "    global " + varName + "\n"
 
     outputString += "\n"
-
-    outputFile.write(outputString)
+    # JAA removed
+    #outputFile.write(outputString)
 
 def getInputVariablesList(functionName):
     inputVariables = None
@@ -362,7 +363,9 @@ def isForLoopEnd(binNode):
     return False
 
 def isAssignStmt(binNode):
-    if (binNode.type == ops.EQ):
+    if (binNode.type == ops.EQ and str(binNode.left) == inputKeyword):  # JAA added
+        pass
+    elif (binNode.type == ops.EQ):
         return True
 
     return False
@@ -997,6 +1000,9 @@ def isUnnecessaryNodeForCodegen(astNode):
         return True
 
     if ( (astNode.type == ops.BEGIN) and (astNode.left.attr == IF_BRANCH_HEADER) ):
+        return True
+
+    if (astNode.type == ops.EQ and str(astNode.left) == inputKeyword): # JAA added
         return True
 
     return False

@@ -20,7 +20,6 @@ END :: types
 BEGIN :: func:setup
 input := None
 g := random(G1)
-#g2 := random(G1)
 alpha := random(ZR)
 beta := random(ZR)
 
@@ -34,6 +33,7 @@ pk := list{g, h, egg}
 output := list{mk, pk}
 END :: func:setup
 
+#g2 := random(G1)
 #f := g^(1/beta)
 
 BEGIN :: func:keygen
@@ -59,7 +59,7 @@ END :: func:keygen
 
 BEGIN :: func:encrypt
 input := list{pk, M, policy_str}
-pk := expand{g, h, f, egg}
+pk := expand{g, h, egg}
 
 policy := createPolicy(policy_str)
 attrs := getAttributeList(policy)
