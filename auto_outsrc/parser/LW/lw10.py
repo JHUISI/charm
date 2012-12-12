@@ -62,6 +62,8 @@ def encrypt(pk, gpk, M, policy_str):
     attrs = getAttributeList(policy)
     s = group.random(ZR)
     w = 0
+    print("s:  ", s)
+    print("policy:  ", policy)
     s_sh = calculateShares(s, policy)
     print(s_sh)
     w_sh = calculateShares(w, policy)
