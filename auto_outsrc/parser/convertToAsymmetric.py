@@ -114,7 +114,7 @@ class transformXOR:
 """
 def transformFunction(funcName, blockStmts, info, noChangeList, startLines=[]):
     endLine = -1
-    inALoopAlready = False
+    inALoopAlready = inIfBranchAlready = False
     begin = "BEGIN :: func:" + funcName
     end = "END :: func:" + funcName
     newLines = [begin] # + list(startLines)
@@ -168,6 +168,11 @@ def transformFunction(funcName, blockStmts, info, noChangeList, startLines=[]):
         elif inALoopAlready and i == (endLine-1): # iff endLine right after current statement
             newLines.append(END_TOKEN + BLOCK_SEP + ' for')
             inALoopAlready = False
+        
+#        if index + 1 < len(lines) and not inIfBranchAlready:
+#            pass
+#        elif inIfBranchAlready and i == (endLine-1):
+#            pass
         print("")
     newLines.append(end)
     return newLines
