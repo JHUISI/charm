@@ -84,7 +84,6 @@ def decrypt(sk, ct):
     dotProd = group.init(GT)
     for y in range(0, Y):
         k = GetString(attrs[y])
-        print(k)
         result0 = pair(h_gid, C3[k])
         result1 = (result0 ** coeff[k])
         result2 = (C1[k] ** coeff[k])
@@ -110,10 +109,11 @@ def main():
     M = group.random(GT)
     ct = encrypt(pk, gpk, M, '((four or three) and (two or one))')
     M2 = decrypt(sk, ct)
+    #'''
     print(M)
     print("\n\n\n")
     print(M2)
-
+    #'''
 
 if __name__ == '__main__':
     main()

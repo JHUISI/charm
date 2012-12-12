@@ -1,0 +1,177 @@
+name := lw10
+setting := symmetric
+short := keys
+
+N := 2
+secparam := 80
+
+BEGIN :: types
+msk := list
+pk1 := list{GT, G1}
+pk := list{pk1, None}
+sk := list
+ct := list
+policy_str := str
+policy := object
+attrs := list
+s_sh := list
+w_sh := list
+coeff := list
+share := list
+authS := list
+userS := list
+M := GT
+K := list
+C1 := list
+C2 := list
+C3 := list
+KBlinded := list
+blindingFactorKBlinded := list
+transformOutputList := list
+END :: types
+
+BEGIN :: func:setup
+input := None
+g := random(G1)
+dummyVar := random(G1)
+gpk := list{g, dummyVar}
+
+output := gpk
+END :: func:setup
+
+BEGIN :: func:authsetup
+input := list{gpk, authS}
+gpk := expand{g, dummyVar}
+
+Y := len(authS)
+BEGIN :: for
+for{i := 0, Y}
+alpha := random(ZR)
+y := random(ZR)
+z := authS#i
+eggalph := e(g, g)^alpha
+gy := g^y
+msk#z := list{alpha, y}
+pk#z := list{eggalph, gy}
+END :: for
+
+output := list{msk, pk}
+END :: func:authsetup
+
+BEGIN :: func:keygen
+input := list{gpk, msk, gid, userS} 
+userSBlinded := userS
+gidBlinded := gid
+zz := random(ZR)
+gpk := expand{g, dummyVar}
+h := H(gidBlinded,G1)
+
+Y := len(userS)
+BEGIN :: for
+for{i := 0,Y}
+z := userS#i
+K#z := ((g^msk#z#0) * (h^msk#z#1))
+END :: for
+
+yLength := len(K)
+KKeysSuffix := keys(K)
+BEGIN :: for
+for{y := 0, yLength}
+KKeyLoopVar := KKeysSuffix#y
+blindingFactorKBlinded#y := random(ZR)
+KBlinded#KKeyLoopVar := K#KKeyLoopVar ^ (1/blindingFactorKBlinded#y)
+END :: for
+sk := list{gidBlinded, userSBlinded, KBlinded}
+skBlinded := list{gidBlinded, userSBlinded, KBlinded}
+output := list{blindingFactorKBlinded, skBlinded}
+END :: func:keygen
+
+
+BEGIN :: func:encrypt
+input := list{pk, gpk, M, policy_str}
+gpk := expand{g, dummyVar}
+
+policy := createPolicy(policy_str)
+attrs := getAttributeList(policy)
+s := random(ZR)
+w := 0
+s_sh := calculateSharesDict(s, policy)
+w_sh := calculateSharesDict(w, policy)
+Y := len(s_sh)
+egg := e(g,g)
+C0 := (M * (egg^s))
+
+BEGIN :: for
+for{y := 0, Y}
+r := random(ZR)
+k := attrs#y
+C1#k := (egg ^ s_sh#k) * (pk#k#0 ^ r)
+C2#k := g^r
+C3#k := (pk#k#1 ^ r) * (g ^ w_sh#k)
+END :: for
+
+ct := list{policy_str, C0, C1, C2, C3}
+output := ct
+END :: func:encrypt
+
+
+BEGIN :: func:transform
+input := list{sk, ct}
+ct := expand{policy_str, C0, C1, C2, C3}
+sk := expand{gid, userS, K}
+transformOutputList#0 := createPolicy(policy_str)
+policy := transformOutputList#0
+transformOutputList#1 := prune(policy, userS)
+attrs := transformOutputList#1
+transformOutputList#2 := getCoefficients(policy)
+coeff := transformOutputList#2
+transformOutputList#3 := H(gid,G1)
+h_gid := transformOutputList#3
+transformOutputList#4 := len(attrs)
+Y := transformOutputList#4
+BEGIN :: for
+for{y := 0,Y}
+transformOutputList#1000+11*y? := GetString(attrs#y)
+k := transformOutputList#1000+11*y?
+transformOutputList#1001+11*y? := e(h_gid,C3#k)
+result0 := transformOutputList#1001+11*y?
+transformOutputList#1002+11*y? := (result0^coeff#k)
+result1 := transformOutputList#1002+11*y?
+transformOutputList#1003+11*y? := (C1#k^coeff#k)
+result2 := transformOutputList#1003+11*y?
+transformOutputList#1004+11*y? := (result1 * result2)
+numerator := transformOutputList#1004+11*y?
+transformOutputList#1005+11*y? := e(K#k,C2#k)
+denominator0 := transformOutputList#1005+11*y?
+END :: for
+output := transformOutputList
+END :: func:transform
+
+BEGIN :: func:decout
+input := list{sk, ct, transformOutputList, blindingFactorKBlinded}
+ct := expand{policy_str, C0, C1, C2, C3}
+sk := expand{gid, userS, K}
+policy := transformOutputList#0
+attrs := transformOutputList#1
+coeff := transformOutputList#2
+h_gid := transformOutputList#3
+Y := transformOutputList#4
+dotProd := init(GT)
+BEGIN :: for
+for{y := 0,Y}
+k := transformOutputList#1000+11*y?
+result0 := (transformOutputList#1001+11*y?) 
+result1 := transformOutputList#1002+11*y?
+result2 := transformOutputList#1003+11*y?
+numerator := transformOutputList#1004+11*y?
+denominator0 := (transformOutputList#1005+11*y? ^ (blindingFactorKBlinded#y) ) 
+denominator := (denominator0^coeff#k)
+fraction := (numerator * (denominator^-1))
+dotProd := (dotProd * fraction)
+END :: for
+M := (C0 * (dotProd^-1))
+output := M
+END :: func:decout
+
+
+# change rule for moving exp into a variable : only if it's a negative exponent! nothing else!

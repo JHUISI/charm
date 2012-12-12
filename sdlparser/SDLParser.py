@@ -71,6 +71,7 @@ builtInTypes["recoverCoefficients"] = types.symmap
 builtInTypes["recoverCoefficientsDict"] = types.symmap
 builtInTypes["genShares"] = types.list
 builtInTypes["intersection_subset"] = types.list
+builtInTypes["GetString"] = types.str
 
 def createNode(s, loc, toks):
     print('createNode => ', toks)

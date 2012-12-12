@@ -2,10 +2,6 @@ from builtInFuncs import *
 
 groupUserFuncs = None
 
-def GetString(attrsy):
-    getUserGlobals()
-    return
-
 def getUserGlobals():
     global groupUserFuncs
 
