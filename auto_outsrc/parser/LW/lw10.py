@@ -12,7 +12,6 @@ secparam = 80
 
 
 def setup():
-    input = None
     g = group.random(G1)
     dummyVar = group.random(G1)
     gpk = [g, dummyVar]
@@ -23,7 +22,6 @@ def authsetup(gpk, authS):
     msk = {}
     pk = {}
 
-    input = [gpk, authS]
     g, dummyVar = gpk
     Y = len(authS)
     for i in range(0, Y):
@@ -40,7 +38,6 @@ def authsetup(gpk, authS):
 def keygen(gpk, msk, gid, userS):
     K = {}
 
-    input = [gpk, msk, gid, userS]
     g, dummyVar = gpk
     h = group.hash(gid, G1)
     Y = len(userS)
@@ -56,17 +53,13 @@ def encrypt(pk, gpk, M, policy_str):
     C1 = {}
     C3 = {}
 
-    input = [pk, gpk, M, policy_str]
     g, dummyVar = gpk
     policy = createPolicy(policy_str)
     attrs = getAttributeList(policy)
     s = group.random(ZR)
     w = 0
-    print("s:  ", s)
-    print("policy:  ", policy)
-    s_sh = calculateShares(s, policy)
-    print(s_sh)
-    w_sh = calculateShares(w, policy)
+    s_sh = calculateSharesDict(s, policy)
+    w_sh = calculateSharesDict(w, policy)
     Y = len(s_sh)
     egg = pair(g, g)
     C0 = (M * (egg ** s))
@@ -81,7 +74,6 @@ def encrypt(pk, gpk, M, policy_str):
     return output
 
 def decrypt(sk, ct):
-    input = [sk, ct]
     policy_str, C0, C1, C2, C3 = ct
     gid, userS, K = sk
     policy = createPolicy(policy_str)
@@ -91,11 +83,14 @@ def decrypt(sk, ct):
     Y = len(attrs)
     dotProd = group.init(GT)
     for y in range(0, Y):
-        k = attrs[y]
-        result0 = (pair(h_gid, C3[k]) ** coeff[k])
-        result1 = (C1[k] ** coeff[k])
-        numerator = (result0 * result1)
-        denominator = (pair(K[k], C2[k]) ** coeff[k])
+        k = GetString(attrs[y])
+        print(k)
+        result0 = pair(h_gid, C3[k])
+        result1 = (result0 ** coeff[k])
+        result2 = (C1[k] ** coeff[k])
+        numerator = (result1 * result2)
+        denominator0 = pair(K[k], C2[k])
+        denominator = (denominator0 ** coeff[k])
         fraction = (numerator / denominator)
         dotProd = (dotProd * fraction)
     M = (C0 / dotProd)
@@ -113,7 +108,12 @@ def main():
     (msk, pk) = authsetup(gpk, ['ONE', 'TWO', 'THREE', 'FOUR'])
     sk = keygen(gpk, msk, "john@example.com", ['ONE', 'TWO', 'THREE'])
     M = group.random(GT)
-    encrypt(pk, gpk, M, '((four or three) and (two or one))')
+    ct = encrypt(pk, gpk, M, '((four or three) and (two or one))')
+    M2 = decrypt(sk, ct)
+    print(M)
+    print("\n\n\n")
+    print(M2)
+
 
 if __name__ == '__main__':
     main()

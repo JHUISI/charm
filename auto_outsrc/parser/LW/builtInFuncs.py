@@ -50,6 +50,10 @@ def writeToFile(name, s):
 	fd.write(s)
 	fd.close()
 
+def GetString(GetString_Arg):
+    getUserGlobals()
+    return GetString_Arg.getAttribute()
+
 def createPolicy(policy_str):
 	getUserGlobals()
 	return utilBuiltInFuncs.createPolicy(policy_str)
