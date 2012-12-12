@@ -208,6 +208,7 @@ def main(sdlFile, config, sdlVerbose=False):
     print("reducing size of '%s'" % short) 
 
     varTypes = dict(sdl.getVarTypes().get(TYPES_HEADER))
+    assert config.schemeType == PUB_SCHEME, "Cannot work with any other type of scheme at the moment"
     (stmtS, typesS, depListS, depListNoExpS, infListS, infListNoExpS) = sdl.getFuncStmts( config.setupFuncName )
     (stmtK, typesK, depListK, depListNoExpK, infListK, infListNoExpK) = sdl.getFuncStmts( config.keygenFuncName )
     (stmtE, typesE, depListE, depListNoExpE, infListE, infListNoExpE) = sdl.getFuncStmts( config.encryptFuncName )    
@@ -233,7 +234,8 @@ def main(sdlFile, config, sdlVerbose=False):
     #print("depListNoExp :=", depListNoExp)
     #print("infListNoExp :=", infListNoExp)
 
-    # need a Visitor class to build these variables   
+    # need a Visitor class to build these variables  
+    # TODO: expand to other parts of algorithm including setup, keygen, encrypt 
     pair_vars_G1_lhs = [] # ['C#1', 'C#2', 'C#3', 'C#4', 'C#5', 'C#6', 'C#7', 'E1', 'E2']
     pair_vars_G1_rhs = [] # ['D#1', 'D#2', 'D#3', 'D#4', 'D#5', 'D#6', 'D#7', 'D#7', 'K']
     gpv = GetPairingVariables(pair_vars_G1_lhs, pair_vars_G1_rhs) 
@@ -357,8 +359,7 @@ def main(sdlFile, config, sdlVerbose=False):
     groupInfo['varTypes'].update(varTypes)
     
     noChangeList = []
-    
-    assert config.schemeType == PUB_SCHEME, "Cannot work with any other type of scheme at the moment"
+        
     print("<===== transforming setup =====>")
     newLinesS = transformFunction(config.setupFuncName, stmtS, groupInfo, noChangeList, generatorLines)
     print("<===== transforming setup =====>\n")
