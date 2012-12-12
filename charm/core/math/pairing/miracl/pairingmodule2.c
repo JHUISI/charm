@@ -830,7 +830,7 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 	if(longFoundLHS) {
 		// o1 is a long type and o2 is a element type
 		// o1 should be element and o2 should be mpz
-		printf("operation undefined: <Python Int> ^ '%d'\n", rhs_o2->element_type);
+		printf("operation undefined: '%d' ^ <pairing element>\n", rhs_o2->element_type);
 //		if(rhs_o2->element_type == ZR) {
 //
 //			mpz_init(n);
@@ -860,7 +860,6 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 				longObjToMPZ(n, (PyLongObject *) o2);
 				element_set_mpz(rhs_o2, n);
 				element_pow_zr(newObject, lhs_o1, rhs_o2);
-				PyObject_Del(rhs_o2);
 				mpz_clear(n);
 			}
 			else if(rhs >= 0 && rhs <= INT_MAX) {
@@ -872,9 +871,9 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 				longObjToMPZ(n, (PyLongObject *) o2);
 				element_set_mpz(rhs_o2, n);
 				element_pow_zr(newObject, lhs_o1, rhs_o2);
-				PyObject_Del(rhs_o2);
 				mpz_clear(n);
 			}
+			Py_DECREF(rhs_o2);
 
 		}
 		else if(rhs == -1) {

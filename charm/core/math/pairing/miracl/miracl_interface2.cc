@@ -511,6 +511,7 @@ element_t *_element_pow_zr(Group_t type, const pairing_t *pairing, element_t *a,
 	else if(type == G1_t) {
 		G1 *x  = (G1 *)  a;
 		G1 *z = new G1();
+		if(*x == *z) { return (element_t *) z; }
 		// (x->point)^y
 //		z->g = *y * x->g;
 		// TODO: overflow error occurs if "y" is too big w/in miracl. Need to investigate
@@ -520,6 +521,7 @@ element_t *_element_pow_zr(Group_t type, const pairing_t *pairing, element_t *a,
 	else if(type == G2_t) {
 		G2 *x  = (G2 *)  a;
 		G2 *z = new G2();
+		if(*x == *z) { return (element_t *) z; }
 		// (x->point)^y
 		*z = pfc->mult(*x, *y);
 		return (element_t *) z;

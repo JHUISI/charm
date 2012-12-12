@@ -135,11 +135,11 @@ elif opt.get('USE_MIRACL') == 'yes' and opt.get('MIRACL_BN') == 'yes':
     miracl_lib = "/usr/local/lib/miracl-bn.a"
     miracl_inc = "/usr/local/include/miracl"
 elif opt.get('USE_MIRACL') == 'yes' and opt.get('MIRACL_SS') == 'yes':
-    bn_opt = [('BUILD_MNT_CURVE', '0'), ('BUILD_BN_CURVE', '0'), ('BUILD_SS_CURVE', '1')]
+    ss_opt = [('BUILD_MNT_CURVE', '0'), ('BUILD_BN_CURVE', '0'), ('BUILD_SS_CURVE', '1')]
     if _macros: 
-       _macros.extend( bn_opt )
+       _macros.extend( ss_opt )
     else: 
-       _macros = bn_opt 
+       _macros = ss_opt 
     miracl_lib = "/usr/local/lib/miracl-ss.a"
     miracl_inc = "/usr/local/include/miracl"
 else:
@@ -176,9 +176,9 @@ if opt.get('PAIR_MOD') == 'yes':
 
     elif opt.get('USE_MIRACL') == 'yes':
         # build MIRACL based pairing module - note that this is for experimental use only
-        if not os.path.exists(miracl_lib): 
-            print("Cannot find MIRACL lib. Follow instructions in build script placed in <charm>/core/math/pairing/miracl/ dir.")
-            exit(1)
+        #if not os.path.exists(miracl_lib): 
+        #    print("Cannot find MIRACL lib. Follow instructions in build script placed in <charm>/core/math/pairing/miracl/ dir.")
+        #    exit(1)
         replaceString(lib_config_file, "pairing_lib=libs ", "pairing_lib=libs.miracl")
         pairing_module = Extension(math_prefix + '.pairing',
                             include_dirs = [utils_path,
