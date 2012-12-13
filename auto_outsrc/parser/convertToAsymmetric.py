@@ -10,7 +10,7 @@
 
 # 4. Label ciphertext elements and identify all the variables that can be moved to G1 vs. G2: 
 #     - must verify that we don't compromise on the security
-import sdlpath, sys, os, random, string
+import sdlpath, sys, os, random, string, re
 import sdlparser.SDLParser as sdl
 from sdlparser.SDLang import *
 from outsrctechniques import SubstituteVar, SubstitutePairings
@@ -176,7 +176,37 @@ def transformFunction(funcName, blockStmts, info, noChangeList, startLines=[]):
         print("")
     newLines.append(end)
     return newLines
+
+def instantiateSolver(variables, clauses, constraints):
+    print("variables = ", variables) # txor.getVariables())
+    outputVariables = variableKeyword + " = " + str(variables) + "\n"
+    print("clauses = ", clauses)
+    outputClauses   = clauseKeyword + " = " + str(clauses) + "\n"
+    print("constraints = ", constraints)
+    outputConstraints = constraintKeyword + " = " + str(constraints) + "\n"
+    # get random file
+    name = ""
+    for i in range(length):
+        name += random.choice(string.ascii_lowercase + string.digits)
+    name += ".py"
+    f = open(name, 'w')
+    f.write(outputVariables)
+    f.write(outputClauses)
+    f.write(outputConstraints)
+    f.close()
+
+    os.system("python2.7 z3solver.py %s" % name)
+    newName = name.split('.')[0]
+    results = __import__(newName)
+    if(not results.satisfiable):
+        os.system("rm -f " + name + "*")
+        sys.exit("SAT solver could not find a suitable solution. Change configuration and try again!")
     
+    print(results.resultDictionary)
+    os.system("rm -f " + name + "*")    
+    return results.resultDictionary
+
+
 def main(sdlFile, config, sdlVerbose=False):
     sdl.parseFile2(sdlFile, sdlVerbose)
     global assignInfo
@@ -219,23 +249,15 @@ def main(sdlFile, config, sdlVerbose=False):
     varTypes.update(typesD)
     generators = []
     print("List of generators for scheme")
-    lines = stmtS.keys()
-    for i in lines:
-        if stmtS[i].getHasRandomness() and Type(stmtS[i].getAssignNode()) == ops.EQ:
-            t = stmtS[i].getAssignVar()
-            if typesS.get(t) == None: 
-                typ = stmtS[i].getAssignNode().right.left.attr
-                print("Retrieved type directly: ", typ)
-            else:
-                typ = typesS[t].getType()
-            if typ == types.G1:
-                print(i, ": ", typ, " :=> ", stmtS[i].getAssignNode())
-                generators.append(str(stmtS[i].getAssignVar()))
-    #print("depListNoExp :=", depListNoExp)
-    #print("infListNoExp :=", infListNoExp)
+    if hasattr(config, "extraSetupFuncName"):
+        (stmtSe, typesSe, depListSe, depListNoExpSe, infListSe, infListNoExpSe) = sdl.getFuncStmts( config.extraSetupFuncName )
+        extractGeneratorList(stmtSe, typesSe, generators)
+        varTypes.update(typesSe)
+    extractGeneratorList(stmtS, typesS, generators)
 
     # need a Visitor class to build these variables  
     # TODO: expand to other parts of algorithm including setup, keygen, encrypt 
+    hashVarList = []
     pair_vars_G1_lhs = [] # ['C#1', 'C#2', 'C#3', 'C#4', 'C#5', 'C#6', 'C#7', 'E1', 'E2']
     pair_vars_G1_rhs = [] # ['D#1', 'D#2', 'D#3', 'D#4', 'D#5', 'D#6', 'D#7', 'D#7', 'K']
     gpv = GetPairingVariables(pair_vars_G1_lhs, pair_vars_G1_rhs) 
@@ -243,18 +265,27 @@ def main(sdlFile, config, sdlVerbose=False):
     for i in lines:
         if stmtD[i].getHasPairings():
             sdl.ASTVisitor( gpv ).preorder( stmtD[i].getAssignNode() )
-            
+        elif stmtD[i].getHashArgsInAssignNode(): 
+            # in case, there's a hashed values...build up list and check later to see if it appears
+            # in pairing variable list
+            hashVarList.append(str(stmtD[i].getAssignVar()))
+        
+                
+    constraintList = []
+    # determine if any hashed values in decrypt show up in a pairing
+    for i in hashVarList:
+        if i in pair_vars_G1_lhs or i in pair_vars_G1_rhs:
+            constraintList.append(i)
     print("pair vars LHS:", pair_vars_G1_lhs)
     print("pair vars RHS:", pair_vars_G1_rhs) 
     print("list of gens :", generators)
     info = {}
-    constraintList = []
     info[ 'G1_lhs' ] = (pair_vars_G1_lhs, assignTraceback(generators, varTypes, pair_vars_G1_lhs, constraintList))
     info[ 'G1_rhs' ] = (pair_vars_G1_rhs, assignTraceback(generators, varTypes, pair_vars_G1_rhs, constraintList))
 
     print("info => G1 lhs : ", info['G1_lhs'])
     print("info => G1 rhs : ", info['G1_rhs'])
-    
+#    sys.exit(0)
     
     print("<===== Determine Asymmetric Generators =====>")
     (generatorLines, generatorMapG1, generatorMapG2) = Step1_DeriveSetupGenerators(generators, info)
@@ -321,31 +352,39 @@ def main(sdlFile, config, sdlVerbose=False):
     print("<===== Generate SAT solver input =====>")
     
     # TODO: process constraints and add to output
+    print("<===== Instantiate Z3 solver =====>")
     print("map: ", xorVarMap)
-    print("variables = ", txor.getVariables())
-    outputVariables = variableKeyword + " = " + str(txor.getVariables()) + "\n"
-    print("clauses = ", txor.getClauses())
-    outputClauses   = clauseKeyword + " = " + str(txor.getClauses()) + "\n"
-    print("constraints = ", constraints)
-    outputConstraints = constraintKeyword + " = " + str(constraints) + "\n"
-    # get random file
-    name = ""
-    for i in range(length):
-        name += random.choice(string.ascii_lowercase + string.digits)
-    name += ".py"
-    f = open(name, 'w')
-    f.write(outputVariables)
-    f.write(outputClauses)
-    f.write(outputConstraints)
-    f.close()
+    resultDict = instantiateSolver(txor.getVariables(), txor.getClauses(), constraints)
     print("<===== Instantiate Z3 solver =====>")
-    os.system("python2.7 z3solver.py %s" % name)
-    newName = name.split('.')[0]
-    results = __import__(newName)
-    print(results.resultDictionary)
-    print("<===== Instantiate Z3 solver =====>")
+    
+#    print("variables = ", txor.getVariables())
+#    outputVariables = variableKeyword + " = " + str(txor.getVariables()) + "\n"
+#    print("clauses = ", txor.getClauses())
+#    outputClauses   = clauseKeyword + " = " + str(txor.getClauses()) + "\n"
+#    print("constraints = ", constraints)
+#    outputConstraints = constraintKeyword + " = " + str(constraints) + "\n"
+#    # get random file
+#    name = ""
+#    for i in range(length):
+#        name += random.choice(string.ascii_lowercase + string.digits)
+#    name += ".py"
+#    f = open(name, 'w')
+#    f.write(outputVariables)
+#    f.write(outputClauses)
+#    f.write(outputConstraints)
+#    f.close()
+#    print("<===== Instantiate Z3 solver =====>")
+#    os.system("python2.7 z3solver.py %s" % name)
+#    newName = name.split('.')[0]
+#    results = __import__(newName)
+#    if(not results.satisfiable):
+#        os.system("rm -f " + name + "*")
+#        sys.exit("SAT solver could not find a suitable solution. Change configuration and try again!")
+#    
+#    print(results.resultDictionary)
+#    print("<===== Instantiate Z3 solver =====>")
         
-    res, resMap = NaiveEvaluation(results.resultDictionary, short)
+    res, resMap = NaiveEvaluation(resultDict, short)
     print("Group Mapping: ", res)
     # determine whether to make True = G1 and False = G2. 
     # It depends on which counts more since they're interchangeable...
@@ -359,22 +398,28 @@ def main(sdlFile, config, sdlVerbose=False):
     groupInfo['varTypes'].update(varTypes)
     
     noChangeList = []
-        
-    print("<===== transforming setup =====>")
+    
+    newLinesSe = []
+    if hasattr(config, "extraSetupFuncName"):
+        print("<===== transforming %s =====>" % config.extraSetupFuncName)
+        newLinesSe = transformFunction(config.extraSetupFuncName, stmtSe, groupInfo, noChangeList, generatorLines)
+        print("<===== transforming %s =====>" % config.extraSetupFuncName)
+    
+    print("<===== transforming %s =====>" % config.setupFuncName)
     newLinesS = transformFunction(config.setupFuncName, stmtS, groupInfo, noChangeList, generatorLines)
-    print("<===== transforming setup =====>\n")
+    print("<===== transforming %s =====>" % config.setupFuncName)
     
-    print("<===== transforming keygen =====>")            
+    print("<===== transforming %s =====>" % config.keygenFuncName) 
     newLinesK = transformFunction(config.keygenFuncName, stmtK, groupInfo, noChangeList)
-    print("<===== transforming keygen =====>")            
+    print("<===== transforming %s =====>" % config.keygenFuncName)            
     
-    print("<===== transforming encrypt =====>")
+    print("<===== transforming %s =====>" % config.encryptFuncName)
     newLinesE = transformFunction(config.encryptFuncName, stmtE, groupInfo, noChangeList)
-    print("<===== transforming encrypt =====>")
+    print("<===== transforming %s =====>" % config.encryptFuncName)
 
-    print("<===== transforming decrypt =====>")
+    print("<===== transforming %s =====>" % config.decryptFuncName)
     newLinesD = transformFunction(config.decryptFuncName, stmtD, groupInfo, noChangeList)
-    print("<===== transforming decrypt =====>")
+    print("<===== transforming %s =====>" % config.decryptFuncName)
 
     print("<===== new SDL =====>")
     for i in newLinesS:
@@ -391,8 +436,7 @@ def main(sdlFile, config, sdlVerbose=False):
     print("<===== new SDL =====>")
     
     outputFile = bv_name + "_asym_" + fileSuffix
-    writeConfig(outputFile + ".bv", newLines0, newLines1, newLinesS, newLinesK, newLinesE, newLinesD)
-    os.system("rm -f " + name + "*")
+    writeConfig(outputFile + ".bv", newLines0, newLines1, newLinesSe, newLinesS, newLinesK, newLinesE, newLinesD)
     return outputFile
 
 # temporary placement
@@ -442,7 +486,19 @@ def DeriveSolution(groupMap, resultMap, xorMap, info):
     print("Just G1: ", G1)
     print("Just G2: ", G2)
     return {'G1':G1, 'G2':G2, 'both':both}
-    
+
+def findVarInfo(var, varTypes):
+    if var.find(LIST_INDEX_SYMBOL) != -1:
+        v = var.split(LIST_INDEX_SYMBOL) 
+        vName = v[0] 
+#        vRef  = v[-1] # get last argument
+#        levelsOfIndirection = len(v[1:])
+#        print("vName :", vName)
+#        print("type info :", varTypes.get(vName).getType())
+#        print("vRef :", vRef)
+#        print("levels :", levelsOfIndirection)
+        return varTypes.get(vName)
+        
 
 def assignTraceback(generators, varTypes, listVars, constraintList):
     varProp = []
@@ -467,9 +523,9 @@ def buildMap(generators, varTypes, varList, var, constraintList):
     if (not set(var).issubset(generators)):
         print("var keys: ", var)
         (name, varInf) = getVarNameEntryFromAssignInfo(assignInfo, var)
-        if(name == None):             
+        if(name == None): 
             if varInf != None: print("Var : ", varInf.getVarDepsNoExponents())
-            else: print("ERROR: could not locate type: ", var)
+            elif var.find(LIST_INDEX_SYMBOL) != -1: varInf = findVarInfo(var, varTypes)
             return
         l = varInf.getVarDepsNoExponents()
 #        print("var:", var, ", output: ", l)
@@ -525,6 +581,23 @@ def buildMap(generators, varTypes, varList, var, constraintList):
 #            print("varList: ", varList)
             
     return    
+
+def extractGeneratorList(stmtS, typesS, generators):
+    lines = list(stmtS.keys())
+    lines.sort()
+    for i in lines:
+        if stmtS[i].getHasRandomness() and Type(stmtS[i].getAssignNode()) == ops.EQ:
+            t = stmtS[i].getAssignVar()
+            if typesS.get(t) == None: 
+                typ = stmtS[i].getAssignNode().right.left.attr
+                print("Retrieved type directly: ", typ)
+            else:
+                typ = typesS[t].getType()
+            if typ == types.G1:
+                print(i, ": ", typ, " :=> ", stmtS[i].getAssignNode())
+                generators.append(str(stmtS[i].getAssignVar()))
+    return
+
 
 def Step1_DeriveSetupGenerators(generators, info):
     """derive generators used by the scheme using the following rules:
@@ -611,15 +684,30 @@ def assignVarIsGenerator(varName, info):
 
 def handleListTypeRefs(varTypes, ref, info, isForBoth, groupType):
     global oldListTypeRefs, newListTypeRefs
-    
+    changeBack = None
     refDetails = ref.split(LIST_INDEX_SYMBOL)
-    if len(refDetails) == 2:
+    length = len(refDetails)
+    if length == 2: # one level of indirection var#<int>
         refName = refDetails[0]
         refStr  = refDetails[1]
         if refStr.isdigit(): refNum = int(refDetails[1])
         else: return False
+    elif length == 3: # two level of indirection...var#*#<int>
+        refName = refDetails[0]
+        refStr  = refDetails[-1]
+        if refStr.isdigit(): refNum = int(refDetails[-1]) # refNum 
+        # look for "varName#*" type def
+        #print("oldListTypeRefs: ", oldListTypeRefs.keys())
+        searchRE = refName + "#." # try to match
+        for i in oldListTypeRefs.keys():
+            result = re.search(searchRE, i)
+            if result:
+                changeBack = ref[:-2] # cut off last two characters '#<int>'
+                refName = result.group(0) # update the refName
+                break
+
     else:
-        print("JAA: can't handle reference lists of length %s yet." % len(refDetails))
+        print("JAA: can't handle reference lists of length %s yet." % length)
         return False
 
     oldVar = oldListTypeRefs.get(refName)[refNum]
@@ -632,6 +720,7 @@ def handleListTypeRefs(varTypes, ref, info, isForBoth, groupType):
         # means either G1 or G2, we don't have to look for "_G?" extensions
         newRef = newListTypeRefs.get(refName).index(oldVar)
     
+    if changeBack != None: refName = changeBack #TODO: handle this better in the future
     newRefName = refName + "#" + str(newRef)
     return newRefName
     
@@ -734,7 +823,7 @@ def writeConfig(filename, *args):
     for block in args:
         for line in block:
             f.write(line + "\n")
-        f.write('\n')
+        if len(block) > 0: f.write('\n') # in case block = [] (empty)
     f.close()
     return
     

@@ -22,6 +22,7 @@ K := list
 C1 := list
 C2 := list
 C3 := list
+gid := str
 END :: types
 
 BEGIN :: func:setup
@@ -76,8 +77,8 @@ policy := createPolicy(policy_str)
 attrs := getAttributeList(policy)
 s := random(ZR)
 w := 0
-s_sh := calculateShares(s, policy)
-w_sh := calculateShares(w, policy)
+s_sh := calculateSharesDict(s, policy)
+w_sh := calculateSharesDict(w, policy)
 Y := len(s_sh)
 egg := e(g,g)
 C0 := (M * (egg^s))
@@ -112,5 +113,3 @@ A := { prod{y := attrs#1, Y} on (((C1#y * e(h_gid, C3#y)) / e(K#y, C2#y))^coeff#
 M := C0 / A
 output := M
 END :: func:decrypt
-
-# change rule for moving exp into a variable : only if it's a negative exponent! nothing else!

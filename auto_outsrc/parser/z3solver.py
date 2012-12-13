@@ -13,6 +13,8 @@ variableKeyword = "variables"
 clauseKeyword = "clauses"
 constraintKeyword = "constraints"
 unSat = "unsat"
+satisfiableKeyword = "satisfiable"
+
 def read_config(filename):
     print("Importing file: ", filename)
     file = filename.split('.')[0]
@@ -50,8 +52,14 @@ def solveBooleanCircuit(file, variables, clauses, constraints):
     if len(andObjects) > 0:
         mySolver.add(And(andObjects))
     
+    f = open(file, 'a')
     isSat = mySolver.check()
-    if str(isSat) == unSat: sys.exit("Clauses are not satisfiable. Try again!")
+    if str(isSat) == unSat:
+        f.write(satisfiableKeyword + " = False\n")
+        f.close()
+        sys.exit("Clauses are not satisfiable. Try again!") 
+    else:
+        f.write(satisfiableKeyword + " = True\n")
     m = mySolver.model()
     print(m)
     results = {}
@@ -62,7 +70,6 @@ def solveBooleanCircuit(file, variables, clauses, constraints):
         output += "('" + str(key) + "' , " + str(m[key]) + "), "
         results[ str(key) ] = m[key]
     output += "]"
-    f = open(file, 'a')
     f.write(output)
     f.close()
     return results
