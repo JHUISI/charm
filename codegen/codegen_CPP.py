@@ -1200,7 +1200,7 @@ def write_Main_Function():
     outputString = "int main()\n{\n    return 0;\n}\n"
     setupFile.write(outputString)
 
-def codegen_CPP(inputSDLScheme, outputFileName):
+def codegen_CPP_main(inputSDLScheme, outputFileName):
     global setupFile, assignInfo, varNamesToFuncs_All
     global varNamesToFuncs_Assign, inputOutputVars, userFuncsCPPFile, functionNameOrder
     global blindingFactors_NonLists, blindingFactors_Lists
@@ -1238,4 +1238,4 @@ if __name__ == "__main__":
     if ( (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
         sys.exit("Usage:  python " + sys.argv[0] + " [name of input SDL file] [name of output C++ file]")
 
-    codegen_CPP(sys.argv[1], sys.argv[2])
+    codegen_CPP_main(sys.argv[1], sys.argv[2])

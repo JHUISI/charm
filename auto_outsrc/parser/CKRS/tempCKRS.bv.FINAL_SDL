@@ -146,7 +146,7 @@ BEGIN :: func:decout
 input := list{sk, ct, transformOutputList, blindingFactord0Blinded, blindingFactord1Blinded, blindingFactord2Blinded, blindingFactor0Blinded, blindingFactor0Blinded, blindingFactor1Blinded, blindingFactor1Blinded}
 sk := expand{id, d0, d1, d2, d3, d4}
 ct := expand{c0, c1, c2, c3, c4, cpr}
-result := (transformOutputList#0 ^ (blindingFactord0Blinded) ) * (transformOutputList#1 ^ (blindingFactord1Blinded) ) * (transformOutputList#2 ^ (blindingFactord2Blinded) ) * (transformOutputList#3 ^ (blindingFactor0Blinded) ) * (transformOutputList#4 ^ (blindingFactor1Blinded) )
+result := (transformOutputList#0 ^ (blindingFactord0Blinded) )  * (transformOutputList#1 ^ (blindingFactord1Blinded) )  * (transformOutputList#2 ^ (blindingFactord2Blinded) )  * (transformOutputList#3 ^ (blindingFactor0Blinded) )  * (transformOutputList#4 ^ (blindingFactor1Blinded) ) 
 M := (cpr * result)
 output := M
 END :: func:decout
