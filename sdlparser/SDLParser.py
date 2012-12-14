@@ -1571,6 +1571,23 @@ def getEndLineNoOfFunc(funcName):
 
     return endLineNos_Functions[funcName]
 
+def getFuncNameFromLineNo(lineNo):
+    if (lineNo < 1):
+        sys.exit("getFuncNameFromLineNo in SDLParser.py:  line number passed in was less than one.")
+
+    for funcName in startLineNos_Functions:
+        startLineNo = startLineNos_Functions[funcName]
+        if (lineNo < startLineNo):
+            continue
+
+        endLineNo = endLineNos_Functions[funcName]
+        if (lineNo > endLineNo):
+            continue
+
+        return funcName
+
+    return None
+
 # NEW SDL PARSER
 def parseFile2(filename, verbosity, ignoreCloudSourcing=False):
     global linesOfCode

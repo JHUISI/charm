@@ -38,6 +38,7 @@ class VarInfo:
         self.isBaseElement = False
         self.assignBaseElemsOnly = None
         self.assignInfo = None
+        self.isResultOfPruneFunc = False
     
     @classmethod
     def copy(self, obj):
@@ -71,6 +72,7 @@ class VarInfo:
         v.isBaseElement = obj.isBaseElement
         v.assignBaseElemsOnly = obj.assignBaseElemsOnly
         v.assignInfo = obj.assignInfo
+        v.isResultOfPruneFunc = obj.isResultOfPruneFunc
         return v
         
     def getAssignNode(self):
@@ -179,6 +181,9 @@ class VarInfo:
     def getAssignBaseElemsOnly(self):
         return self.assignBaseElemsOnly
 
+    def getIsResultOfPruneFunc(self):
+        return self.isResultOfPruneFunc
+
     def traverseAssignNodeRecursive(self, node, isExponent):
         if (node.type == ops.PAIR):
             self.hasPairings = True
@@ -214,6 +219,8 @@ class VarInfo:
                 if (self.initValue == LIST_TYPE):
                     self.isList = True
                 self.initCall = True
+            elif (userFuncName == PRUNE_FUNC_NAME):
+                self.isResultOfPruneFunc = True
         elif (node.type == ops.RANDOM):
             self.hasRandomness = True
 

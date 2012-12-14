@@ -73,10 +73,19 @@ def fixPairingsMixedWithNonExpCalcs(astNode, outputFile):
 
     outputFile.write(str(astNode) + "\n")
 
-def isVarResultOfPruneFunc(assignInfo, varName):
-    ddddd
+def isDotProdLoopVarResultOfPruneFunc(assignInfo, lineNo, varName):
+    listIndexPos = varName.find(LIST_INDEX_SYMBOL)
+    if (listIndexPos != -1):
+        varName = varName[0:listIndexPos]
 
-def expandDotProdIntoForLoop(assignInfo, astNode, outputFile):
+    funcName = getFuncNameFromLineNo(lineNo)
+    if (varName not in assignInfo[funcName]):
+        sys.exit("isDotProdLoopVarResultOfPruneFunc in SDLPreProcessor.py:  couldn't find variabe in assignInfo.")
+
+    varInfoObj = assignInfo[funcName][varName]
+    return varInfoObj.getIsResultOfPruneFunc()
+
+def expandDotProdIntoForLoop(assignInfo, astNode, lineNo, outputFile):
     global reservedVarNameNumber
 
     outputString = ""
@@ -93,7 +102,7 @@ def expandDotProdIntoForLoop(assignInfo, astNode, outputFile):
     outputString += str(loopStart) + ", "
     outputString += str(loopEnd) + "}\n"
 
-    loopVarFromPrune = isDotProdLoopVarResultOfPruneFunc(assignInfo, loopVar)
+    loopVarFromPrune = isDotProdLoopVarResultOfPruneFunc(assignInfo, lineNo, loopVar)
 
     outputString += RESERVED_VAR_NAME + str(reservedVarNameNumber) + " := "
     outputString += RESERVED_VAR_NAME + str(reservedVarNameNumber) + " * "
@@ -116,14 +125,17 @@ def SDLPreProcessor_main(inputFileName, outputFileName):
     assignInfo = getAssignInfo()
     astNodes = getAstNodes()
 
+    lineNo = 0
+
     for astNode in astNodes:
+        lineNo += 1
         if (isUsingOurReservedVarName(astNode) == True):
             print(astNode)
             sys.exit("SDLPreProcessor_main in SDLPreProcessor.py:  one of the ops.EQ assignments is using a variable name on the left that begins with our reserved variable name string.")
         elif (astNode.type == ops.NONE):
             outputFile.write("\n")
         elif ( (astNode.right != None) and (astNode.right.type == ops.ON) ):
-            expandDotProdIntoForLoop(assignInfo, astNode, outputFile)
+            expandDotProdIntoForLoop(assignInfo, astNode, lineNo, outputFile)
         elif (hasPairingsMixedWithNonExpCalcs(astNode) == True):
             fixPairingsMixedWithNonExpCalcs(astNode, outputFile)
         else:
