@@ -1804,6 +1804,24 @@ def getFuncStmts(funcName):
             sys.exit("getFuncStmts in SDLParser.py found multiple VarInfo objects in assignInfo in same function that have the same line number.")
         retDict[lineNoKey] = currentVarInfoObj
 
+    for currentForLoop in forLoops[funcName]:
+        startLineNo = currentForLoop.getStartLineNo()
+        if (startLineNo in retDict):
+            sys.exit("getFuncStmts in SDLParser.py found duplicate entries for the same line number in for loops.")
+        retDict[startLineNo] = currentForLoop
+
+    for currentForLoopInner in forLoopsInner[funcName]:
+        startLineNo = currentForLoopInner.getStartLineNo()
+        if (startLineNo in retDict):
+            sys.exit("getFuncStmts in SDLParser.py found duplicate entries for the same line number in for loops inner.")
+        retDict[startLineNo] = currentForLoopInner
+
+    for currentIfElseBranch in ifElseBranches[funcName]:
+        startLineNo = currentIfElseBranch.getStartLineNo()
+        if (startLineNo in retDict):
+            sys.exit("getFuncStmts in SDLParser.py found duplicate entries for the same line number in if else branches.")
+        retDict[startLineNo] = currentIfElseBranch
+
     return (retDict, varTypes[funcName], varDepList[funcName], varDepListNoExponents[funcName], varInfList[funcName], varInfListNoExponents[funcName])
 
 # Perform some type checking here?
@@ -2341,4 +2359,5 @@ if __name__ == "__main__":
         getVarDepInfLists()
         getVarsThatProtectM()
         printFinalOutput()
-        #(retFuncStmts, retFuncTypes, retVarDepList, retVarDepListNoExponents, retVarInfList, retVarInfListNoExponents) = getFuncStmts("decrypt")
+        (retFuncStmts, retFuncTypes, retVarDepList, retVarDepListNoExponents, retVarInfList, retVarInfListNoExponents) = getFuncStmts("intersectionSubset")
+        print(retFuncStmts)
