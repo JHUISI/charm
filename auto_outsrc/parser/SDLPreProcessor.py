@@ -4,6 +4,7 @@ sys.path.extend(['../../', '../../sdlparser'])
 
 from SDLParser import *
 
+reservedVarNameNumber = 0
 RESERVED_VAR_NAME = "reservedVarName"
 
 def hasPairingsSomewhereRecursive(astNode, pairingsList):
@@ -67,6 +68,44 @@ def isUsingOurReservedVarName(astNode):
 
     return False
 
+def fixPairingsMixedWithNonExpCalcs(astNode, outputFile):
+    global reservedVarNameNumber
+
+    outputFile.write(str(astNode) + "\n")
+
+def isVarResultOfPruneFunc(assignInfo, varName):
+    ddddd
+
+def expandDotProdIntoForLoop(assignInfo, astNode, outputFile):
+    global reservedVarNameNumber
+
+    outputString = ""
+    outputString += RESERVED_VAR_NAME + str(reservedVarNameNumber)
+    outputString += " := init(1)\n"
+    outputString += "BEGIN :: for\n"
+    outputString += "for{"
+
+    loopVar = astNode.right.left.left.left
+    loopStart = astNode.right.left.left.right
+    loopEnd = astNode.right.left.right
+
+    outputString += str(loopVar) + " := "
+    outputString += str(loopStart) + ", "
+    outputString += str(loopEnd) + "}\n"
+
+    loopVarFromPrune = isDotProdLoopVarResultOfPruneFunc(assignInfo, loopVar)
+
+    outputString += RESERVED_VAR_NAME + str(reservedVarNameNumber) + " := "
+    outputString += RESERVED_VAR_NAME + str(reservedVarNameNumber) + " * "
+    outputString += str(astNode.right.right) + "\n"
+    outputString += "END :: for\n"
+
+    outputString += str(astNode.left) + " := "
+    outputString += RESERVED_VAR_NAME + str(reservedVarNameNumber) + "\n"
+
+    reservedVarNameNumber += 1
+    outputFile.write(outputString)
+
 def SDLPreProcessor_main(inputFileName, outputFileName):
     try:
         outputFile = open(outputFileName, 'w')
@@ -74,6 +113,7 @@ def SDLPreProcessor_main(inputFileName, outputFileName):
         sys.exit("SDLPreProcessor_main in SDLPreProcessor.py:  could not open output file name passed in.")
 
     parseFile2(inputFileName, False, True)
+    assignInfo = getAssignInfo()
     astNodes = getAstNodes()
 
     for astNode in astNodes:
@@ -82,8 +122,10 @@ def SDLPreProcessor_main(inputFileName, outputFileName):
             sys.exit("SDLPreProcessor_main in SDLPreProcessor.py:  one of the ops.EQ assignments is using a variable name on the left that begins with our reserved variable name string.")
         elif (astNode.type == ops.NONE):
             outputFile.write("\n")
+        elif ( (astNode.right != None) and (astNode.right.type == ops.ON) ):
+            expandDotProdIntoForLoop(assignInfo, astNode, outputFile)
         elif (hasPairingsMixedWithNonExpCalcs(astNode) == True):
-            print(astNode)
+            fixPairingsMixedWithNonExpCalcs(astNode, outputFile)
         else:
             outputFile.write(str(astNode) + "\n")
 

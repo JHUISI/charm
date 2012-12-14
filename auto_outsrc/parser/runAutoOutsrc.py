@@ -4,8 +4,8 @@ import sys, os
 
 sys.path.extend(['../../', '../../codegen'])
 
-from codegen_PY import *
-from codegen_CPP import *
+import codegen_PY
+import codegen_CPP
 
 def writeLOCFromKeygenToFile(LOCFromKeygen, inputSDLScheme):
     f = open(inputSDLScheme + finalSDLSuffix, 'w')
@@ -22,8 +22,8 @@ def writeLOCFromKeygenToFile(LOCFromKeygen, inputSDLScheme):
 def main(inputSDLScheme, outputFile, outputUserDefFile):
     (linesOfCodeFromKeygen, blindingFactors_NonLists, blindingFactors_Lists) = keygen(inputSDLScheme)
     writeLOCFromKeygenToFile(linesOfCodeFromKeygen, inputSDLScheme)
-    codegen_PY_main(inputSDLScheme + finalSDLSuffix, outputFile + ".py", outputUserDefFile)
-    codegen_CPP_main(inputSDLScheme + finalSDLSuffix, outputFile + ".cpp")
+    codegen_PY.codegen_PY_main(inputSDLScheme + finalSDLSuffix, outputFile + ".py", outputUserDefFile)
+    codegen_CPP.codegen_CPP_main(inputSDLScheme + finalSDLSuffix, outputFile + ".cpp")
 
 if __name__ == "__main__":
     lenSysArgv = len(sys.argv)
