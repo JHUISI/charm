@@ -25,6 +25,14 @@ class VarInfo:
         self.isList = False
         self.isSymmap = False
         self.listNodesList = []
+        # new var info fields
+        self.isForLoopBegin = False
+        self.isForLoopEnd = False
+        self.isForLoopInnerBegin = False
+        self.isForLoopInnerEnd = False        
+        self.isIfElseBegin = False
+        self.isElseBegin = False
+        self.isIfElseEnd = False  
         self.dotProdObj = None
         self.outsideForLoopObj = None
         self.outsideIfElseBranchObj = None
@@ -39,11 +47,12 @@ class VarInfo:
         self.assignBaseElemsOnly = None
         self.assignInfo = None
         self.isResultOfPruneFunc = False
+        self.topLevelNode = True
     
     @classmethod
     def copy(self, obj):
         v = VarInfo()
-        v.assignNode  = obj.assignNode 
+        v.assignNode  = BinaryNode.copy(obj.assignNode) 
         v.lineNo      = obj.lineNo
         v.varDeps     = list(obj.varDeps)
         v.varDepsNoExponents = list(obj.varDepsNoExponents)
@@ -59,6 +68,13 @@ class VarInfo:
         v.isList      = obj.isList
         v.isSymmap    = obj.isSymmap
         v.listNodesList = list(obj.listNodesList)
+        v.isForLoopBegin = obj.isForLoopBegin
+        v.isForLoopEnd = obj.isForLoopEnd
+        v.isForLoopInnerBegin = obj.isForLoopInnerBegin
+        v.isForLoopInnerEnd = obj.isForLoopInnerEnd
+        v.isIfElseBegin = obj.isIfElseBegin
+        v.isElseBegin   = obj.isElseBegin
+        v.isIfElseEnd = obj.isIfElseEnd
         v.dotProdObj  = obj.dotProdObj
         v.outsideForLoopObj = obj.outsideForLoopObj
         v.outsideIfElseBranchObj = obj.outsideIfElseBranchObj
@@ -73,8 +89,30 @@ class VarInfo:
         v.assignBaseElemsOnly = obj.assignBaseElemsOnly
         v.assignInfo = obj.assignInfo
         v.isResultOfPruneFunc = obj.isResultOfPruneFunc
+        v.topLevelNode = obj.topLevelNode
         return v
-        
+    
+    def getIsForLoopBegin(self):
+        return self.isForLoopBegin
+    
+    def getIsForLoopEnd(self):
+        return self.isForLoopEnd
+    
+    def getIsForLoopInnerBegin(self):
+        return self.isForLoopInnerBegin
+
+    def getIsForLoopInnerEnd(self):
+        return self.isForLoopInnerEnd
+    
+    def getIsIfElseBegin(self):
+        return self.isIfElseBegin
+    
+    def getIsElseBegin(self):
+        return self.isElseBegin
+
+    def getIsIfElseEnd(self):
+        return self.isIfElseEnd
+    
     def getAssignNode(self):
         return self.assignNode
 
@@ -183,6 +221,9 @@ class VarInfo:
 
     def getIsResultOfPruneFunc(self):
         return self.isResultOfPruneFunc
+
+    def isTopLevelNode(self):
+        return self.topLevelNode
 
     def traverseAssignNodeRecursive(self, node, isExponent):
         if (node.type == ops.PAIR):
@@ -371,7 +412,7 @@ class VarInfo:
         self.funcName = funcName
         self.outsideForLoopObj = outsideForLoopObj
         self.outsideIfElseBranchObj = outsideIfElseBranchObj
-
+                
         if (getFullVarName(self.assignNode.left, False).find(LIST_INDEX_SYMBOL) != -1):
             self.hasListIndexSymInLeftAssign = True
 

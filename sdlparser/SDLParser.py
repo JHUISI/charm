@@ -25,6 +25,7 @@ currentFuncName = NONE_FUNC_NAME
 ASSIGN_KEYWORDS = ['input', 'output']
 astNodes = []
 assignInfo = {}
+assignVarInfo = {} # global dict for all var info in SDL. keys are line no
 varNamesToFuncs_All = {}
 varNamesToFuncs_Assign = {}
 forLoops = {}
@@ -203,7 +204,7 @@ class SDLParser:
     def evalStack(self, stack, line_number):
         global currentFuncName, forLoops, startLineNo_ForLoop, startLineNo_ForLoopInner, startLineNos_Functions
         global endLineNos_Functions, ifElseBranches, startLineNo_IfBranch, startLineNo_ElseBranch
-        global functionNameOrder
+        global functionNameOrder, assignVarInfo
 
         op = stack.pop()
         if debug >= levels.some:
@@ -236,7 +237,14 @@ class SDLParser:
             startLineNo_ElseBranch = line_number
             lenIfElseBranches = len(ifElseBranches[currentFuncName])
             ifElseBranches[currentFuncName][lenIfElseBranches - 1].appendToElseLineNos(int(line_number))
-            return createTree(op, None, None)
+            # create varinfo
+            return_node = createTree(op, None, None)
+            viElseBegin = VarInfo()
+            viElseBegin.setLineNo(startLineNo_ElseBranch)
+            viElseBegin.isElseBegin = True
+            viElseBegin.assignNode = BinaryNode.copy(return_node)
+            assignVarInfo[currentFuncName][startLineNo_ElseBranch] = viElseBegin
+            return return_node
         elif op in ["error("]:
             op1 = self.evalStack(stack, line_number)
             return createTree(op, None, None, op1)
@@ -284,6 +292,11 @@ class SDLParser:
                     if (forLoops[currentFuncName][lenForLoops - 1].getEndLineNo() != None):
                         sys.exit("Ending line number of one of the for loops was set prematurely.")
                     forLoops[currentFuncName][lenForLoops - 1].setEndLineNo(int(line_number))
+                    viForLoopEnd = VarInfo()
+                    viForLoopEnd.setLineNo(line_number)
+                    viForLoopEnd.isForLoopEnd = True
+                    viForLoopEnd.assignNode = createTree(op, op1, None)
+                    assignVarInfo[currentFuncName][line_number] = viForLoopEnd
             elif (op1 == FOR_LOOP_INNER_HEADER):
                 if (op == START_TOKEN):
                     startLineNo_ForLoopInner = line_number
@@ -293,6 +306,12 @@ class SDLParser:
                     if (forLoopsInner[currentFuncName][lenForLoops - 1].getEndLineNo() != None):
                         sys.exit("Ending line number of one of the for loops inner was set prematurely.")
                     forLoopsInner[currentFuncName][lenForLoops - 1].setEndLineNo(int(line_number))
+                    viForLoopInnerEnd = VarInfo()
+                    viForLoopInnerEnd.setLineNo(line_number)
+                    viForLoopInnerEnd.isForLoopInnerEnd = True
+                    viForLoopInnerEnd.assignNode = createTree(op, op1, None)
+                    assignVarInfo[currentFuncName][line_number] = viForLoopInnerEnd
+                    
             elif (op1 == IF_BRANCH_HEADER):
                 if (op == START_TOKEN):
                     startLineNo_IfBranch = line_number
@@ -302,6 +321,11 @@ class SDLParser:
                     if (ifElseBranches[currentFuncName][lenIfElseBranches - 1].getEndLineNo() != None):
                         sys.exit("Ending line number of one of the if-else branches was set prematurely.")
                     ifElseBranches[currentFuncName][lenIfElseBranches - 1].setEndLineNo(int(line_number))
+                    viIfElseEnd = VarInfo()
+                    viIfElseEnd.setLineNo(line_number)
+                    viIfElseEnd.isIfElseEnd = True
+                    viIfElseEnd.assignNode = createTree(op, op1, None)
+                    assignVarInfo[currentFuncName][line_number] = viIfElseEnd
             elif (op1 == COUNT_HEADER):
                 if (op == START_TOKEN):
                     currentFuncName = COUNT_HEADER
@@ -1138,7 +1162,7 @@ def updateHashArgNames_Entries(resultingHashInputArgNames):
             assignInfo[funcName][varName].setIsUsedInHashCalc(True)
 
 def updateAssignInfo(node, i):
-    global assignInfo, forLoops, ifElseBranches, varNamesToFuncs_All, varNamesToFuncs_Assign
+    global assignInfo, assignVarInfo, forLoops, ifElseBranches, varNamesToFuncs_All, varNamesToFuncs_Assign
 
     assignInfo_Func = assignInfo[currentFuncName]
 
@@ -1171,11 +1195,40 @@ def updateAssignInfo(node, i):
             sys.exit("Found multiple assignments of same variable name within same function.")
         assignInfo_Func[varName].setLineNo(i)
         (resultingVarDeps, resultingHashInputArgNames) = assignInfo_Func[varName].setAssignNode(assignInfo, node, currentFuncName, currentForLoopObj, currentIfElseBranch)
+        # figure out whether this node is top level
+        if currentForLoopObj != None and currentIfElseBranch == None:
+            assignInfo_Func[varName].topLevelNode = False
+        elif currentForLoopObj == None and currentIfElseBranch != None:
+            assignInfo_Func[varName].topLevelNode = False
+        elif currentForLoopObj != None and currentIfElseBranch != None:
+            # check which one came first based on lineNo
+            if currentForLoopObj.getStartLineNo() < currentIfElseBranch.getStartLineNo(): 
+                currentIfElseBranch.topLevelNode = False
+            else:
+                currentForLoopObj.topLevelNode = True
+        else:
+            pass # do nothing
+
     else:
         varInfoObj = VarInfo()
         varInfoObj.setLineNo(i)
         (resultingVarDeps, resultingHashInputArgNames) = varInfoObj.setAssignNode(assignInfo, node, currentFuncName, currentForLoopObj, currentIfElseBranch)
+        # figure out whether this node is top level
+        if currentForLoopObj != None and currentIfElseBranch == None:
+            varInfoObj.topLevelNode = False
+        elif currentForLoopObj == None and currentIfElseBranch != None:
+            varInfoObj.topLevelNode = False
+        elif currentForLoopObj != None and currentIfElseBranch != None:
+            # check which one came first based on lineNo
+            if currentForLoopObj.getStartLineNo() < currentIfElseBranch.getStartLineNo(): 
+                currentIfElseBranch.topLevelNode = False
+            else:
+                currentForLoopObj.topLevelNode = True
+        else:
+            pass # do nothing
         assignInfo_Func[varName] = varInfoObj
+    
+    assignVarInfo[currentFuncName][i] = VarInfo.copy(assignInfo_Func[varName])
 
     updateHashArgNames_Entries(resultingHashInputArgNames)
 
@@ -1290,13 +1343,19 @@ def updateForLoops(node, lineNo):
     if (startLineNo_ForLoop == None):
         sys.exit("updateForLoops function entered in SDLParser.py when startLineNo_ForLoop is set to None.")
 
-    global forLoops, varTypes
+    global forLoops, varTypes, assignVarInfo
 
     retForLoopStruct = ForLoop()
     retForLoopStruct.updateForLoopStruct(node, startLineNo_ForLoop, currentFuncName)
 
     forLoops[currentFuncName].append(retForLoopStruct)
-
+    
+    viForBegin = VarInfo()
+    viForBegin.setLineNo(startLineNo_ForLoop)
+    viForBegin.isForLoopBegin = True
+    viForBegin.assignNode = BinaryNode.copy(node)
+    assignVarInfo[currentFuncName][startLineNo_ForLoop] = viForBegin
+    
     loopVarName = str(node.left.left)
     if (loopVarName not in varTypes[currentFuncName]):
         varTypeObj = VarType()
@@ -1308,7 +1367,7 @@ def updateForLoopsInner(node, lineNo):
     if (startLineNo_ForLoopInner == None):
         sys.exit("updateForLoopsInner function entered in SDLParser.py when startLineNo_ForLoopInner is set to None.")
 
-    global forLoops, forLoopsInner, varTypes
+    global forLoops, forLoopsInner, varTypes, assignVarInfo
 
     retForLoopInnerStruct = ForLoopInner()
     retForLoopInnerStruct.updateForLoopInnerStruct(node, startLineNo_ForLoopInner, currentFuncName)
@@ -1318,6 +1377,12 @@ def updateForLoopsInner(node, lineNo):
     
     # TODO: make sure we're really inside a for loop
     forLoops[currentFuncName][lenForLoops - 1].setInnerLoop(retForLoopInnerStruct)
+
+    viForInnerBegin = VarInfo()
+    viForInnerBegin.setLineNo(startLineNo_ForLoopInner)
+    viForInnerBegin.isForLoopInnerBegin = True
+    viForInnerBegin.assignNode = BinaryNode.copy(node)
+    assignVarInfo[currentFuncName][startLineNo_ForLoopInner] = viForInnerBegin
 
     loopVarName = str(node.left.left)
     if (loopVarName not in varTypes[currentFuncName]):
@@ -1330,12 +1395,21 @@ def updateIfElseBranches(node, lineNo):
     if (startLineNo_IfBranch == None):
         sys.exit("updateIfElseBranches in SDLParser.py:  function entered when startLineNo_IfBranch is set to None.")
 
-    global ifElseBranches
+    global ifElseBranches, assignVarInfo
 
     retIfElseBranchStruct = IfElseBranch()
     retIfElseBranchStruct.updateIfElseBranchStruct(node, startLineNo_IfBranch, currentFuncName)
 
     ifElseBranches[currentFuncName].append(retIfElseBranchStruct)
+
+    viIfElseBegin = VarInfo()
+    viIfElseBegin.setLineNo(startLineNo_IfBranch)
+    viIfElseBegin.isIfElseBegin = True
+    viIfElseBegin.assignNode = BinaryNode.copy(node)
+    viIfElseBegin.varDeps = list(retIfElseBranchStruct.getVarDeps())
+    viIfElseBegin.varDepsNoExponents = list(retIfElseBranchStruct.getVarDepsNoExponents())
+    assignVarInfo[currentFuncName][startLineNo_IfBranch] = viIfElseBegin
+    
 
 def writeLinesOfCodeToFile(outputFileName):
     outputFile = open(outputFileName, 'w')
@@ -1690,11 +1764,12 @@ def parseLinesOfCode(code, verbosity, ignoreCloudSourcing=False):
     global getVarDepInfListsCalled, getVarsThatProtectMCalled, astNodes, varNamesToFuncs_All
     global varNamesToFuncs_Assign, ifElseBranches, startLineNo_IfBranch, startLineNo_ElseBranch
     global inputOutputVars, varDepListNoExponents, varInfListNoExponents, functionNameOrder
-    global publicVarNames, secretVarNames
+    global publicVarNames, secretVarNames, assignVarInfo
 
     astNodes = []
     varTypes = {}
     assignInfo = {}
+    assignVarInfo = {}
     varNamesToFuncs_All = {}
     varNamesToFuncs_Assign = {}
     forLoops = {}
@@ -1748,6 +1823,9 @@ def parseLinesOfCode(code, verbosity, ignoreCloudSourcing=False):
 
                 if (currentFuncName not in assignInfo):
                     assignInfo[currentFuncName] = {}
+                    
+                if (currentFuncName not in assignVarInfo):
+                    assignVarInfo[currentFuncName] = {}
 
                 if (currentFuncName not in forLoops):
                     forLoops[currentFuncName] = []
@@ -1840,6 +1918,40 @@ def getFuncStmts(funcName):
         retDict[startLineNo] = currentIfElseBranch
 
     return (retDict, varTypes[funcName], varDepList[funcName], varDepListNoExponents[funcName], varInfList[funcName], varInfListNoExponents[funcName])
+
+def getVarInfoFuncStmts(funcName):
+    if getVarDepInfListsCalled == False: 
+        sys.exit("ERROR: Need to call getVarDepInfLists()")
+    
+    if (funcName not in assignVarInfo):
+        sys.exit("ERROR: Function name passed to getFuncStmts in SDLParser.py as input does not exist in assignVarInfo: %s not in %s." % (funcName, assignVarInfo.keys()))
+
+    if (funcName not in varTypes):
+        sys.exit("ERROR: Function name passed to getFuncStmts in SDLParser.py as input does not exist in varTypes.")
+
+    if (funcName not in varDepList):
+        sys.exit("ERROR: Function name passed to getFuncStmts in SDLParser.py as input does not exist in varDepList.")
+
+    if (funcName not in varDepListNoExponents):
+        sys.exit("ERROR: Function name passed to getFuncStmts in SDLParser.py as input does not exist in varDepListNoExponents.")
+
+    if (funcName not in varInfList):
+        sys.exit("ERROR: Function name passed to getFuncStmts in SDLParser.py as input does not exist in varInfList.")
+
+    if (funcName not in varInfListNoExponents):
+        sys.exit("ERROR: Function name passed to getFuncStmts in SDLParser.py as input does not exist in varInfListNoExponents.")
+
+    retDict = {}
+
+    for currentVarName in assignVarInfo[funcName]:
+        currentVarInfoObj = assignVarInfo[funcName][currentVarName]
+        lineNoKey = currentVarInfoObj.getLineNo()
+        if (lineNoKey in retDict):
+            sys.exit("getFuncStmts in SDLParser.py found multiple VarInfo objects in assignVarInfo in same function that have the same line number.")
+        retDict[lineNoKey] = currentVarInfoObj
+
+    return (retDict, varTypes[funcName], varDepList[funcName], varDepListNoExponents[funcName], varInfList[funcName], varInfListNoExponents[funcName])
+
 
 # Perform some type checking here?
 # rules: find constants, verify, variable definitions

@@ -1,5 +1,6 @@
 import sys
 from SDLang import *
+from VarInfo import *
 
 class IfElseBranch:
     def __init__(self):
@@ -10,6 +11,9 @@ class IfElseBranch:
         self.assignStmtsAsBinNodes_Dict = {}
         self.assignStmtsAsVarInfoObjs_Dict = {}
         self.funcName = None
+        self.topLevelNode = True
+        self.varDeps = []
+        self.varDepsNoExponents = []
 
     def getStartLineNo(self):
         return self.startLineNo
@@ -31,6 +35,15 @@ class IfElseBranch:
 
     def getFuncName(self):
         return self.funcName
+
+    def getVarDeps(self):
+        return self.varDeps
+
+    def getVarDepsNoExponents(self):
+        return self.varDepsNoExponents
+
+    def isTopLevelNode(self):
+        return self.topLevelNode
 
     def setStartLineNo(self, startLineNo):
         if ( (type(startLineNo) is not int) or (startLineNo < 1) ):
@@ -86,7 +99,43 @@ class IfElseBranch:
             sys.exit("appendToVarInfoNodeList in IfElseBranch.py:  varInfo object parameter passed in is not of type VarInfo.")
 
         self.checkLineNoAgainstDict(self.assignStmtsAsVarInfoObjs_Dict, line_number)
-        self.assignStmtsAsVarInfoObjs_Dict[line_number] = varInfoObj
+        self.assignStmtsAsVarInfoObjs_Dict[line_number] = VarInfo.copy(varInfoObj)
+#        self.assignStmtsAsVarInfoObjs_Dict[line_number] = varInfoObj
+
+    def traverseAssignNodeRecursive(self, node, isExponent):
+        if (node.type == ops.PAIR):
+            self.hasPairings = True
+        elif (node.type == ops.HASH):
+            if (node.left.type not in [ops.ATTR, ops.CONCAT]): # JAA: added ops.CONCAT to account for hashing a concatenation of multiple variables
+                sys.exit("traverseAssignNodeRecursive in VarInfo.py:  left child node of ops.HASH node encountred is not of type ATTR or CONCAT.")
+            hashInputName = getFullVarName(node.left, False)
+            if (hashInputName not in self.hashArgsInAssignNode):
+                self.hashArgsInAssignNode.append(hashInputName)
+        elif (node.type == ops.ATTR):
+            varName = getFullVarName(node, True)
+            if ( (varName not in self.varDeps) and (varName.isdigit() == False) and (varName != NONE_STRING) ):
+                self.varDeps.append(varName)
+                if (isExponent == False):
+                    self.varDepsNoExponents.append(varName)
+
+        if (node.left != None):
+            self.traverseAssignNodeRecursive(node.left, False)
+        if (node.right != None):
+            if (node.type == ops.EXP):
+                self.traverseAssignNodeRecursive(node.right, True)
+            else:
+                self.traverseAssignNodeRecursive(node.right, False)
+
+
+    def traverseAssignNode(self):
+        if (self.conditionalAsNode == None):
+            sys.exit("IfElseBranch: Attempting to run traverseAssignNode in VarInfo when self.conditionalAsNode is still None.")
+
+        if (self.conditionalAsNode.type in [ops.AND, ops.OR, ops.EQ_TST, ops.NON_EQ_TST]):
+            self.traverseAssignNodeRecursive(self.conditionalAsNode.left, False)
+            self.traverseAssignNodeRecursive(self.conditionalAsNode.right, False)
+        else:
+            sys.exit("IfElseBranch: unrecognized conditional structure: ", self.conditionalAsNode)
 
     def updateIfElseBranchStruct(self, node, startLineNo, funcName):
         if (node.type != ops.IF):
@@ -101,3 +150,4 @@ class IfElseBranch:
         self.funcName = funcName
 
         self.conditionalAsNode = node.left
+        self.traverseAssignNode()

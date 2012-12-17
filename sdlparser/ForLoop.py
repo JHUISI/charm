@@ -12,7 +12,9 @@ class ForLoop:
         self.binaryNodeList = []
         self.varInfoNodeList = []
         self.forLoopInner = None
+        self.ifElseInner = None
         self.assignNode = None
+        self.topLevelNode = True
 
     def getStartVal(self):
         return self.startVal
@@ -43,6 +45,9 @@ class ForLoop:
 
     def getAssignNode(self):
         return self.assignNode
+
+    def isTopLevelNode(self):
+        return self.topLevelNode
 
     def updateForLoopStruct(self, node, startLineNo, funcName):
         if (node.type != ops.FOR):

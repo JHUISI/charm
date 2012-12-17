@@ -918,6 +918,12 @@ class SubstituteVar:
             ind = node.listNodes.index(self.target)
             node.listNodes[ind] = self.new_var
 
+    def visit_func(self, node, data):
+        if node.attr == INIT_FUNC_NAME:
+            del node.listNodes[:] # remove previous argument
+            node.listNodes.append(self.new_var) # add new one
+#            print("node: ", node.attr, node.listNodes)
+
 class SubstitutePairings:
     def __init__(self, this, this_new, side='left'):
         self.this_target = this
