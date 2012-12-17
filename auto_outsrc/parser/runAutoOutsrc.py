@@ -1,11 +1,14 @@
 from keygen import *
 from config import *
+import SDLPreProcessor
 import sys, os
 
 sys.path.extend(['../../', '../../codegen'])
 
 import codegen_PY
 import codegen_CPP
+
+PREPROCESSED_STRING = "_PREPROCESSED"
 
 def writeLOCFromKeygenToFile(LOCFromKeygen, inputSDLScheme):
     f = open(inputSDLScheme + finalSDLSuffix, 'w')
@@ -22,8 +25,9 @@ def writeLOCFromKeygenToFile(LOCFromKeygen, inputSDLScheme):
 def main(inputSDLScheme, outputFile, outputUserDefFile):
     (linesOfCodeFromKeygen, blindingFactors_NonLists, blindingFactors_Lists) = keygen(inputSDLScheme)
     writeLOCFromKeygenToFile(linesOfCodeFromKeygen, inputSDLScheme)
-    codegen_PY.codegen_PY_main(inputSDLScheme + finalSDLSuffix, outputFile + ".py", outputUserDefFile)
-    codegen_CPP.codegen_CPP_main(inputSDLScheme + finalSDLSuffix, outputFile + ".cpp")
+    SDLPreProcessor.SDLPreProcessor_main(inputSDLScheme + finalSDLSuffix, inputSDLScheme + finalSDLSuffix + PREPROCESSED_STRING)
+    codegen_PY.codegen_PY_main(inputSDLScheme + finalSDLSuffix + PREPROCESSED_STRING, outputFile + ".py", outputUserDefFile)
+    codegen_CPP.codegen_CPP_main(inputSDLScheme + finalSDLSuffix + PREPROCESSED_STRING, outputFile + ".cpp")
 
 if __name__ == "__main__":
     lenSysArgv = len(sys.argv)

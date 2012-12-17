@@ -4,6 +4,7 @@ sys.path.extend(['../../', '../../sdlparser'])
 
 from SDLParser import *
 
+ORIGINAL_LOOP_VAR_NAME = "originalLoopVarName"
 reservedVarNameNumber = 0
 RESERVED_VAR_NAME = "reservedVarName"
 
@@ -57,13 +58,16 @@ def hasPairingsMixedWithNonExpCalcs(astNode):
 
     return True
 
-def isUsingOurReservedVarName(astNode):
+def isUsingOurReservedVarNames(astNode):
     if (astNode.type != ops.EQ):
         return False
 
     varName = str(astNode.left)
 
     if (varName.startswith(RESERVED_VAR_NAME) == True):
+        return True
+
+    if (varName.startswith(ORIGINAL_LOOP_VAR_NAME) == True):
         return True
 
     return False
@@ -73,14 +77,15 @@ def fixPairingsMixedWithNonExpCalcs(astNode, outputFile):
 
     outputFile.write(str(astNode) + "\n")
 
-def isDotProdLoopVarResultOfPruneFunc(assignInfo, lineNo, varName):
+def isDotProdLoopStartResultOfPruneFunc(assignInfo, lineNo, varName):
     listIndexPos = varName.find(LIST_INDEX_SYMBOL)
     if (listIndexPos != -1):
         varName = varName[0:listIndexPos]
 
     funcName = getFuncNameFromLineNo(lineNo)
     if (varName not in assignInfo[funcName]):
-        sys.exit("isDotProdLoopVarResultOfPruneFunc in SDLPreProcessor.py:  couldn't find variabe in assignInfo.")
+        #sys.exit("isDotProdLoopStartResultOfPruneFunc in SDLPreProcessor.py:  couldn't find variabe in assignInfo.")
+        return False
 
     varInfoObj = assignInfo[funcName][varName]
     return varInfoObj.getIsResultOfPruneFunc()
@@ -90,7 +95,7 @@ def expandDotProdIntoForLoop(assignInfo, astNode, lineNo, outputFile):
 
     outputString = ""
     outputString += RESERVED_VAR_NAME + str(reservedVarNameNumber)
-    outputString += " := init(1)\n"
+    outputString += " := init(GT)\n"
     outputString += "BEGIN :: for\n"
     outputString += "for{"
 
@@ -98,15 +103,32 @@ def expandDotProdIntoForLoop(assignInfo, astNode, lineNo, outputFile):
     loopStart = astNode.right.left.left.right
     loopEnd = astNode.right.left.right
 
+    loopVarFromPrune = isDotProdLoopStartResultOfPruneFunc(assignInfo, lineNo, str(loopStart))
+
     outputString += str(loopVar) + " := "
-    outputString += str(loopStart) + ", "
+    if (loopVarFromPrune == True):
+        outputString += "0, "
+    else:
+        outputString += str(loopStart) + ", "
     outputString += str(loopEnd) + "}\n"
 
-    loopVarFromPrune = isDotProdLoopVarResultOfPruneFunc(assignInfo, lineNo, loopVar)
+    if (loopVarFromPrune == True):
+        if (str(loopStart).find(LIST_INDEX_SYMBOL) != -1):
+            listIndexPos = str(loopStart).find(LIST_INDEX_SYMBOL)
+            loopStartNoListEntry = str(loopStart)[0:listIndexPos]
+        else:
+            loopStartNoListEntry = str(loopStart)
+        outputString += ORIGINAL_LOOP_VAR_NAME + " := " + str(loopVar) + "\n"
+        outputString += str(loopVar) + " := GetString(" + loopStartNoListEntry + LIST_INDEX_SYMBOL + str(loopVar) + ")\n"
+
 
     outputString += RESERVED_VAR_NAME + str(reservedVarNameNumber) + " := "
     outputString += RESERVED_VAR_NAME + str(reservedVarNameNumber) + " * "
     outputString += str(astNode.right.right) + "\n"
+
+    if (loopVarFromPrune == True):
+        outputString += str(loopVar) + " := " + ORIGINAL_LOOP_VAR_NAME + "\n"
+
     outputString += "END :: for\n"
 
     outputString += str(astNode.left) + " := "
@@ -129,9 +151,9 @@ def SDLPreProcessor_main(inputFileName, outputFileName):
 
     for astNode in astNodes:
         lineNo += 1
-        if (isUsingOurReservedVarName(astNode) == True):
+        if (isUsingOurReservedVarNames(astNode) == True):
             print(astNode)
-            sys.exit("SDLPreProcessor_main in SDLPreProcessor.py:  one of the ops.EQ assignments is using a variable name on the left that begins with our reserved variable name string.")
+            sys.exit("SDLPreProcessor_main in SDLPreProcessor.py:  one of the ops.EQ assignments is using a variable name on the left that begins with one of our reserved variable name strings.")
         elif (astNode.type == ops.NONE):
             outputFile.write("\n")
         elif ( (astNode.right != None) and (astNode.right.type == ops.ON) ):
