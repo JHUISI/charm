@@ -1,20 +1,37 @@
-from charm.toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair, MNT160, SymEnc, SymDec
+import hashlib, sys
+
+from charm.toolbox.pairinggroup import *
 
 from charm.toolbox.secretutil import SecretUtil
-from charm.pairing import pairing
-from toolbox.iterate import dotprod2
-from charm.pairing import hash as DeriveKey
-from charm.engine.util import objectToBytes, bytesToObject
-from toolbox.symcrypto import AuthenticatedCryptoAbstraction
-from toolbox.conversion import Conversion
-from toolbox.bitstring import Bytes
-import hashlib
+from charm.core.math import pairing
+from charm.toolbox.iterate import dotprod2
+from charm.core.math.pairing import hashPair as DeriveKey
+from charm.core.engine.util import objectToBytes, bytesToObject
+from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
+from charm.toolbox.conversion import Conversion
+from charm.toolbox.bitstring import Bytes
+#import hashlib
 
 groupObjBuiltInFuncs = None
 utilBuiltInFuncs = None
 
 listIndexNoOfN_StrToId = 9
 listIndexNoOfl_StrToId = 10
+
+MNT160 = 80
+
+def isList(object):
+    objectTypeName = None
+
+    try:
+        objectTypeName = type(object).__name__
+    except:
+        sys.exit("builtInFuncs.py:  could not obtain type/name of object passed in to isList.")
+
+    if (objectTypeName == 'list'):
+        return 1
+
+    return 0
 
 def objectOut(group, d):
 	getUserGlobals()
@@ -32,6 +49,10 @@ def writeToFile(name, s):
 	fd = open(name, 'w')
 	fd.write(s)
 	fd.close()
+
+def GetString(GetString_Arg):
+    getUserGlobals()
+    return GetString_Arg.getAttribute()
 
 def createPolicy(policy_str):
 	getUserGlobals()

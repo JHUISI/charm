@@ -9,6 +9,8 @@ transformOutputList = "transformOutputList"
 
 M = 'M'
 
+forLoopSeed = 1000
+
 doNotIncludeInTransformList = []
 
 listNameIndicator = "LISTNAMEINDICATOR"

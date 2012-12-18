@@ -4,7 +4,8 @@ sys.path.extend(['../../', '../../sdlparser'])
 
 from SDLParser import *
 
-ORIGINAL_LOOP_VAR_NAME = "originalLoopVarName"
+#ORIGINAL_LOOP_VAR_NAME = "originalLoopVarName"
+GET_STRING_SUFFIX = "GetStringSuffix"
 reservedVarNameNumber = 0
 RESERVED_VAR_NAME = "reservedVarName"
 
@@ -67,8 +68,8 @@ def isUsingOurReservedVarNames(astNode):
     if (varName.startswith(RESERVED_VAR_NAME) == True):
         return True
 
-    if (varName.startswith(ORIGINAL_LOOP_VAR_NAME) == True):
-        return True
+    #if (varName.startswith(ORIGINAL_LOOP_VAR_NAME) == True):
+        #return True
 
     return False
 
@@ -95,7 +96,10 @@ def expandDotProdIntoForLoop(assignInfo, astNode, lineNo, outputFile):
 
     outputString = ""
     outputString += RESERVED_VAR_NAME + str(reservedVarNameNumber)
-    outputString += " := init(GT)\n"
+    if (hasPairingsSomewhere(astNode) == True):
+        outputString += " := init(GT)\n"
+    else:
+        outputString += " := init(1)\n"
     outputString += "BEGIN :: for\n"
     outputString += "for{"
 
@@ -118,23 +122,29 @@ def expandDotProdIntoForLoop(assignInfo, astNode, lineNo, outputFile):
             loopStartNoListEntry = str(loopStart)[0:listIndexPos]
         else:
             loopStartNoListEntry = str(loopStart)
-        outputString += ORIGINAL_LOOP_VAR_NAME + " := " + str(loopVar) + "\n"
-        outputString += str(loopVar) + " := GetString(" + loopStartNoListEntry + LIST_INDEX_SYMBOL + str(loopVar) + ")\n"
+        #outputString += ORIGINAL_LOOP_VAR_NAME + " := " + str(loopVar) + "\n"
+        outputString += str(loopVar) + GET_STRING_SUFFIX + " := GetString(" + loopStartNoListEntry + LIST_INDEX_SYMBOL + str(loopVar) + ")\n"
 
 
-    outputString += RESERVED_VAR_NAME + str(reservedVarNameNumber) + " := "
-    outputString += RESERVED_VAR_NAME + str(reservedVarNameNumber) + " * "
-    outputString += str(astNode.right.right) + "\n"
+    outputString += RESERVED_VAR_NAME + str(reservedVarNameNumber + 1) + " := "
+    #outputString += RESERVED_VAR_NAME + str(reservedVarNameNumber) + " * "
 
     if (loopVarFromPrune == True):
-        outputString += str(loopVar) + " := " + ORIGINAL_LOOP_VAR_NAME + "\n"
+        outputString += str(astNode.right.right).replace(LIST_INDEX_SYMBOL + str(loopVar), LIST_INDEX_SYMBOL + str(loopVar) + GET_STRING_SUFFIX) + "\n"
+    else:
+        outputString += str(astNode.right.right) + "\n"
+
+    #if (loopVarFromPrune == True):
+        #outputString += str(loopVar) + " := " + ORIGINAL_LOOP_VAR_NAME + "\n"
+
+    outputString += RESERVED_VAR_NAME + str(reservedVarNameNumber) + " := " + RESERVED_VAR_NAME + str(reservedVarNameNumber) + " * " + RESERVED_VAR_NAME + str(reservedVarNameNumber + 1) + "\n"
 
     outputString += "END :: for\n"
 
     outputString += str(astNode.left) + " := "
     outputString += RESERVED_VAR_NAME + str(reservedVarNameNumber) + "\n"
 
-    reservedVarNameNumber += 1
+    reservedVarNameNumber += 2
     outputFile.write(outputString)
 
 def SDLPreProcessor_main(inputFileName, outputFileName):
