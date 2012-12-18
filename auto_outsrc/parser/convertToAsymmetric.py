@@ -144,94 +144,26 @@ def transformFunction(entireSDL, funcName, blockStmts, info, noChangeList, start
             assign = blockStmts[i].getAssignNode()
             print(i, ":", assign, end="")
             handleVarInfo(newLines, assign, blockStmts[i], info, noChangeList, startLines)
-#        elif type(blockStmts[i]) == sdl.ForLoop and blockStmts[i].isTopLevelNode():
-#            newLines.append(START_TOKEN + " " + BLOCK_SEP + ' for')
-#            assign = blockStmts[i].getAssignNode()
-#            print(i, ":", assign, end="\n")
-#            newLines.append(str(assign))
-#            forBlock = blockStmts[i].getVarInfoNodeList()
-#            for f in forBlock:
-#                asgn = f.getAssignNode()
-#                print(f.getLineNo(), ":", asgn, end="")
-#                handleVarInfo(newLines, asgn, f, info, noChangeList)
-#                print("")
-#            newLines.append(END_TOKEN + " " + BLOCK_SEP + ' for')
-#
-#        elif type(blockStmts[i]) == sdl.IfElseBranch and blockStmts[i].isTopLevelNode():
-#            newLines.append(START_TOKEN + " " + BLOCK_SEP + ' if')
-#            assign = blockStmts[i].getConditionalAsNode() # transform as well
-#            print(i, ":", assign, end="\n")
-#            newLines.append("if { " + str(assign) + " }")
-#            ifBlock = blockStmts[i].getAssignStmtsAsVarInfoObjs_Dict()
-#            for j,k in ifBlock.items():
-#                asgn = k.getAssignNode()
-#                handleVarInfo(newLines, asgn, k, info, noChangeList)
-#        else:
-#            pass
 
         print("")
     newLines.append(end)
     return newLines
 
-#        if Type(assign) == ops.EQ:
-#            assignVar = blockStmts[i].getAssignVar()
-#            # store for later
-#            if assignVar == sdl.inputVarName:
-#                newLines.append(str(assign))
-#                newLines.extend(startLines)
-#            elif blockStmts[i].getHasRandomness():
-#                if not assignVarIsGenerator(assignVar, info):
-#                    print(" :-> not a generator, so add to newLines.", end="") # do not include in new setup 
-#                    newLines.append(str(assign)) # unmodified
-#            elif assignVarOccursInBoth(assignVar, info):
-#                print(" :-> split computation in G1 & G2:", blockStmts[i].getVarDepsNoExponents(), end="")
-#                newLines.extend(updateAllForBoth(assign, assignVar, blockStmts[i], info, True, noChangeList))
-#            elif assignVarOccursInG1(assignVar, info):
-#                print(" :-> just in G1:", blockStmts[i].getVarDepsNoExponents(), end="")
-#                noChangeList.append(str(assignVar))
-#                newLines.append(updateAllForG1(assign, assignVar, blockStmts[i], info, False, noChangeList))
-#            elif assignVarOccursInG2(assignVar, info):
-#                print(" :-> just in G2:", blockStmts[i].getVarDepsNoExponents(), end="")
-#                noChangeList.append(str(assignVar))
-#                newLines.append(updateAllForG2(assign, assignVar, blockStmts[i], info, False, noChangeList)) 
-#            elif blockStmts[i].getHasPairings(): # in GT so don't need to touch assignVar
-#                print(" :-> update pairing.", end="")
-#                noChangeList.append(str(assignVar))
-#                newLines.append(updatForPairing(blockStmts[i], info))
-#            elif blockStmts[i].getIsList() or blockStmts[i].getIsExpandNode():
-#                print(" :-> updating list...", end="")
-#                newLines.append(updateForLists(blockStmts[i], assignVar, info))
-#            else:
-#                newLines.append(str(assign))
-#        else:
-#            newLines.append(str(assign)) 
-#        print("")
-#    newLines.append(end)
-            # TODO: expand for IF, FOR and other types of non-EQ nodes that will come up.
-            # TODO: will need to update this section as you see more schemes
-#        if index + 1 < len(lines) and not inALoopAlready:
-#            nextLine = lines[index+1]
-#            if blockStmts[nextLine].getOutsideForLoopObj() != None:
-#                forLoop = blockStmts[nextLine].getOutsideForLoopObj().getAssignNode()
-#                newLines.append(START_TOKEN + " " + BLOCK_SEP + ' for')
-#                newLines.append(str(forLoop))
-#                inALoopAlready = True
-#                endLineFor = blockStmts[nextLine].getOutsideForLoopObj().getEndLineNo()
-#        elif inALoopAlready and i == (endLineFor-1): # iff endLine right after current statement
-#            newLines.append(END_TOKEN + BLOCK_SEP + ' for')
-#            inALoopAlready = False
-#
-#        if index + 1 < len(lines) and not inIfBranchAlready:
-#            nextLine = lines[index+1]
-#            if blockStmts[nextLine].getOutsideIfElseBranchObj() != None:
-#                ifCond = blockStmts[nextLine].getOutsideIfElseBranchObj().getConditionalAsNode()
-#                newLines.append(START_TOKEN + " " + BLOCK_SEP + ' if')
-#                newLines.append("if { " + str(ifCond) + " }")
-#                inIfBranchAlready = True
-#                endLineIf = blockStmts[nextLine].getOutsideIfElseBranchObj().getEndLineNo()
-#        elif inIfBranchAlready and i == (endLineIf-1): # iff endLine right after current statement
-#            newLines.append(END_TOKEN + BLOCK_SEP + ' if')
-#            inALoopAlready = False
+"""theType either types.G1 or types.G2"""
+def updateForIfConditional(node, assignVar, varInfo, info, theType, noChangeList):
+    new_node2 = BinaryNode.copy(node)
+    
+    if assignVar not in noChangeList: new_assignVar = assignVar + G1Prefix
+    else: new_assignVar = str(assignVar)
+
+    sdl.ASTVisitor( SubstituteVar(assignVar, new_assignVar) ).preorder( new_node2 )
+    info['generatorMapG1'][assignVar] = new_assignVar
+    
+    # in case of init() calls...
+    sdl.ASTVisitor( SubstituteVar('', str(theType)) ).preorder( new_node2 )
+    return new_node2
+    
+
 
 def handleVarInfo(newLines, assign, blockStmt, info, noChangeList, startLines=[]):
     if Type(assign) == ops.EQ:
@@ -269,12 +201,27 @@ def handleVarInfo(newLines, assign, blockStmt, info, noChangeList, startLines=[]
         # add to newLines
         if type(newLine) == list:
             newLines.extend(newLine)
-        else:
+        elif newLine != None:
             #if newLine not in newLines:
             newLines.append(newLine)
         return True
     elif Type(assign) == ops.IF:
-        print("JAA type: ", Type(assign), blockStmt.getVarDepsNoExponents())
+#        print("JAA type: ", Type(assign), blockStmt.getVarDepsNoExponents())
+        # TODO: there might be some missing cases in updateForIfConditional. Revise as appropriate.
+        assignVars = blockStmt.getVarDepsNoExponents()
+        assign2 = assign
+        for assignVar in assignVars:
+            if assignVarOccursInG1(assignVar, info):
+                print(" :-> just in G1:", assignVar, end="")
+                assign2 = updateForIfConditional(assign2, assignVar, blockStmt, info, types.G1, noChangeList)
+            elif assignVarOccursInG2(assignVar, info):
+                print(" :-> just in G2:", assignVar, end="")
+                assign2 = updateForIfConditional(assign2, assignVar, blockStmt, info, types.G2, noChangeList)
+            #print("TODO: Not a good sign. how do we handle this case for ", assignVar, "in", assign)
+        if str(assign2) == str(assign):
+            newLines.append(str(assign))
+        else:
+            newLines.append(str(assign2))
     else:
         print("Unrecognized type: ", Type(assign))
     return False
@@ -481,7 +428,7 @@ def main(sdlFile, config, sdlVerbose=False):
     groupInfo['varTypes'].update(varTypes)
     
     noChangeList = []
-    
+        
     newLinesSe = []
     entireSDL = sdl.getLinesOfCode()
     if hasattr(config, "extraSetupFuncName"):
