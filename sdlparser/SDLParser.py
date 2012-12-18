@@ -1023,6 +1023,8 @@ def getVarTypeInfoRecursive(node):
                 return types[trythis]
         elif (currentFuncName == KEYS_FUNC_NAME):
             return types.list
+        elif (currentFuncName == LEN_FUNC_NAME):
+            return types.int
         return types.NO_TYPE
     if (node.type == ops.EQ_TST):
         leftSideType = getVarTypeInfoRecursive(node.left)
