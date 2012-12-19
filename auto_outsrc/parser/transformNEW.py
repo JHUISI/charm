@@ -304,8 +304,14 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
 
         if (withinForLoop == True):
             lineForTransformLines += transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + "? := "
+            lineForTypesSection = transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + "? := GT\n"
+            appendToLinesOfCode([lineForTypesSection], getEndLineNoOfFunc(TYPES_HEADER))
+            parseLinesOfCode(getLinesOfCode(), False)
         else:
             lineForTransformLines += transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + " := "
+            lineForTypesSection = transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + " := GT\n"
+            appendToLinesOfCode([lineForTypesSection], getEndLineNoOfFunc(TYPES_HEADER))
+            parseLinesOfCode(getLinesOfCode(), False)
 
         if (currentNode.right.type == ops.ON):
             lineForTransformLines += "{ " + str(currentNode.right.left) + " on ( "
@@ -384,6 +390,7 @@ def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, curre
     #decoutListIndex = getDecoutListIndex(currentLineNo)
 
     if (withinForLoop == True):
+        #STARTHERE
         lineForTransformLines = transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + "? := "
         #iterationNo += 1
     else:
@@ -562,7 +569,7 @@ def transformNEW(varsThatAreBlindedDict):
 
     appendToLinesOfCode(transformPlusDecoutLines, getStartLineNoOfFunc(decryptFuncName))
 
-    printLinesOfCode()
+    #printLinesOfCode()
 
     parseLinesOfCode(getLinesOfCode(), False)
 

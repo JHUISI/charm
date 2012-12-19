@@ -413,7 +413,9 @@ def keygen(file):
     lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, None)
 
     for keygenOutput_ind in keygenOutput:
-        secretKeyName = blindKeygenOutputElement(keygenOutput_ind, varsToBlindList, varNamesForListDecls)
+        blindKeygenOutputElement(keygenOutput_ind, varsToBlindList, varNamesForListDecls)
+
+    secretKeyName = keygenSecVar
 
     #if (len(varsToBlindList) != 0):
         #sys.exit("keygen.py completed without blinding all of the variables passed to it by transform.py.")
@@ -448,7 +450,7 @@ def keygen(file):
 
     #(varsToBlindList, rccaData) = (transform(varsThatAreBlinded))
 
-    printLinesOfCode()
+    #printLinesOfCode()
     #sys.exit("test")
 
     #rcca(rccaData)
@@ -467,7 +469,7 @@ def keygen(file):
 
     printLinesOfCode()
 
-    print(newDecOutInputLine)
+    #print(newDecOutInputLine)
     #sys.exit("TESTTEST")
 
     return (getLinesOfCode(), blindingFactors_NonLists, blindingFactors_Lists)

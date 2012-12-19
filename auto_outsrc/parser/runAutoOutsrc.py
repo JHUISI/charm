@@ -27,6 +27,7 @@ def main(inputSDLScheme, outputFile, outputUserDefFile):
     (linesOfCodeFromKeygen, blindingFactors_NonLists, blindingFactors_Lists) = keygen(inputSDLScheme + PREPROCESSED_STRING)
     writeLOCFromKeygenToFile(linesOfCodeFromKeygen, inputSDLScheme + PREPROCESSED_STRING)
     codegen_PY.codegen_PY_main(inputSDLScheme + PREPROCESSED_STRING + finalSDLSuffix, outputFile + ".py", outputUserDefFile + ".py")
+    codegen_CPP.transformOutputList = transformOutputList
     codegen_CPP.codegen_CPP_main(inputSDLScheme + PREPROCESSED_STRING + finalSDLSuffix, outputFile + ".cpp")
 
 if __name__ == "__main__":

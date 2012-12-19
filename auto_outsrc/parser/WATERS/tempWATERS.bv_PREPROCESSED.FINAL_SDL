@@ -17,6 +17,8 @@ Cn := list
 Dn := list
 Kl := list
 
+transformOutputList#1001+5*y? := GT
+transformOutputList#6 := GT
 transformOutputList := list
 END :: types
 

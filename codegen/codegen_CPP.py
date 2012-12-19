@@ -32,6 +32,8 @@ nonListVarsDeclaredInThisFunc = []
 integerVars = []
 starRef = ""# "*"
 
+transformOutputList = None
+
 def writeCurrentNumTabsToString():
     outputString = ""
 
@@ -474,6 +476,24 @@ def areBothSidesStringVars(leftSide, rightSide):
 
     return True
 
+def addGetTypeToAttrNode(inputString, variableType):
+    if (variableType == types.G1):
+        return inputString + ".getG1()"
+
+    if (variableType == types.G2):
+        return inputString + ".getG2()"
+
+    if (variableType == types.GT):
+        return inputString + ".getGT()"
+
+    if (variableType == types.ZR):
+        return inputString + ".getZR()"
+
+    if (variableType == types.str):
+        return inputString + ".strPtr"
+
+    sys.exit("addGetTypeToAttrNode in codegen_CPP.py:  variable type passed in is not one of the supported types.")
+
 def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideNameForInit=None):
     global userFuncsCPPFile, userFuncsList_CPP
 
@@ -490,6 +510,10 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
 
     elif ( (node.type == ops.ATTR) or (node.type == ops.TYPE) ):
         returnString = processAttrOrTypeAssignStmt(node, replacementsDict)
+
+        if (str(node).startswith(transformOutputList) == True):
+            returnString = addGetTypeToAttrNode(returnString, variableType)
+
         if node.isNegated():
             returnString = returnString[1:] # remove the preceding "-" symbol
         returnThisString = returnString
