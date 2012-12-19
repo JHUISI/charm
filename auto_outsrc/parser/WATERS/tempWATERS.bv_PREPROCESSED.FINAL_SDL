@@ -1,0 +1,149 @@
+name := waters09
+setting := asymmetric
+
+N := 2
+secparam := 80
+
+BEGIN :: types
+policy_str := str
+policy := object
+attrs := list
+sh := list
+coeff := list
+share := list
+S := list
+M := GT
+Cn := list
+Dn := list
+Kl := list
+
+transformOutputList := list
+END :: types
+
+BEGIN :: func:setup
+input := None
+g1 := random(G1)
+g2 := random(G2)
+alpha := random(ZR)
+a := random(ZR)
+egg := (e(g1,g2)^alpha)
+
+g1alph := (g1^alpha)
+g2alph := (g2^alpha)
+g1a := (g1^a)
+g2a := (g2^a)
+
+msk := list{g1alph, g2alph}
+pk := list{g1, g2, egg, g1a, g2a}
+
+output := list{msk, pk}
+END :: func:setup
+
+
+BEGIN :: func:keygen
+input := list{pk, msk, S}
+blindingFactor0Blinded := random(ZR)
+SBlinded := S
+zz := random(ZR)
+pk := expand{g1, g2, egg, g1a, g2a}
+msk := expand{g1alph, g2alph}
+
+t := random(ZR)
+K := (g2alph * (g2a^t))
+KBlinded := K ^ (1/blindingFactor0Blinded)
+L := (g2^t)
+LBlinded := L
+Y := len(S)
+
+BEGIN :: for
+for{y := 0,Y}
+z := S#y
+Kl#z := (H(z,G1)^t)
+END :: for
+
+KlBlinded := Kl
+sk := list{SBlinded, KBlinded, LBlinded, KlBlinded}
+skBlinded := list{SBlinded, KBlinded, LBlinded, KlBlinded}
+output := list{blindingFactor0Blinded, skBlinded}
+END :: func:keygen
+
+
+BEGIN :: func:encrypt
+input := list{pk, M, policy_str}
+pk := expand{g1, g2, egg, g1a, g2a}
+
+policy := createPolicy(policy_str)
+attrs := getAttributeList(policy)
+s := random(ZR)
+sh := calculateSharesList(s, policy)
+Y := len(sh)
+C := (M * (egg^s))
+Cpr := (g1^s)
+
+BEGIN :: for
+for{y := 0,Y}
+r := random(ZR)
+k := attrs#y
+x := sh#y
+Cn#k := ((g1a^x#1) * (H(k,G1)^-r))
+Dn#k := (g2^r)
+END :: for
+
+ct := list{policy_str, C, Cpr, Cn, Dn}
+output := ct
+END :: func:encrypt
+
+
+BEGIN :: func:transform
+input := list{pk, sk, ct}
+ct := expand{policy_str, C, Cpr, Cn, Dn}
+sk := expand{S, K, L, Kl}
+transformOutputList#0 := createPolicy(policy_str)
+policy := transformOutputList#0
+transformOutputList#1 := prune(policy, S)
+attrs := transformOutputList#1
+transformOutputList#2 := getCoefficients(policy)
+coeff := transformOutputList#2
+transformOutputList#3 := len(attrs)
+Y := transformOutputList#3
+transformOutputList#4 := init(GT)
+reservedVarName0 := transformOutputList#4
+BEGIN :: for
+for{y := 0,Y}
+transformOutputList#1000+5*y? := GetString(attrs#y)
+yGetStringSuffix := transformOutputList#1000+5*y?
+transformOutputList#1001+5*y? := e((Cn#yGetStringSuffix^coeff#yGetStringSuffix),L) * e((Kl#yGetStringSuffix^coeff#yGetStringSuffix),Dn#yGetStringSuffix)
+reservedVarName1 := transformOutputList#1001+5*y?
+transformOutputList#1002+5*y? := (reservedVarName0 * reservedVarName1)
+reservedVarName0 := transformOutputList#1002+5*y?
+END :: for
+transformOutputList#5 := reservedVarName0
+A := transformOutputList#5
+transformOutputList#6 := e(Cpr,K)
+result0 := transformOutputList#6
+output := transformOutputList
+END :: func:transform
+
+BEGIN :: func:decout
+input := list{pk, sk, ct, transformOutputList, blindingFactor0Blinded}
+ct := expand{policy_str, C, Cpr, Cn, Dn}
+sk := expand{S, K, L, Kl}
+policy := transformOutputList#0
+attrs := transformOutputList#1
+coeff := transformOutputList#2
+Y := transformOutputList#3
+reservedVarName0 := transformOutputList#4
+BEGIN :: for
+for{y := 0,Y}
+yGetStringSuffix := transformOutputList#1000+5*y?
+reservedVarName1 := (transformOutputList#1001+5*y?) 
+reservedVarName0 := transformOutputList#1002+5*y?
+END :: for
+A := transformOutputList#5
+result0 := (transformOutputList#6 ^ (blindingFactor0Blinded) ) 
+result1 := (result0 * (A^-1))
+M := (C * (result1^-1))
+output := M
+END :: func:decout
+
+

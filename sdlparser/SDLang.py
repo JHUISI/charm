@@ -57,6 +57,7 @@ OTHER_TYPES = ['list', 'object']
 DECL_FUNC_HEADER = "func:"
 INIT_FUNC_NAME = "init"
 KEYS_FUNC_NAME = "keys"
+LEN_FUNC_NAME = "len"
 PRUNE_FUNC_NAME = "prune"
 FUNC_SYMBOL = "def func :"
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
