@@ -64,6 +64,21 @@ public:
 	void append(Element&);
 	void append(const Element&);
 
+	void insert(int, const char *);
+	void insert(int, string);
+	void insert(int, ZR&);
+	void insert(int, const ZR&);
+	void insert(int, G1&);
+	void insert(int, const G1&);
+#ifdef ASYMMETRIC
+	void insert(int, G2&);
+	void insert(int, const G2&);
+#endif
+	void insert(int, GT&);
+	void insert(int, const GT&);
+	void insert(int, Element&);
+	void insert(int, const Element&);
+
 	void append(const CharmList&);
 
 	int length(); // return length of lists
@@ -74,6 +89,7 @@ public:
 	CharmList operator+(const CharmList&) const;
 	Element& operator[](const int index);
 	CharmList& operator=(const CharmList&);
+	//Element& operator=(const GT&);
     friend ostream& operator<<(ostream&, const CharmList&);
 private:
 	int cur_index;
@@ -123,6 +139,8 @@ public:
 	CharmList operator+(const Element&) const;       // operator+()
 	CharmList operator+(const CharmList&) const;
  	Element operator=(const Element& e);
+// 	Element operator=(const GT& g);
+
     	friend ostream& operator<<(ostream&, const Element&);
 private:
     bool isAllocated; // if True, means Element class responsible

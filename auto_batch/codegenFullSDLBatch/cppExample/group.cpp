@@ -309,6 +309,27 @@ Element Element::operator=(const Element& e)
 	return *this;
 }
 
+
+//Element Element::operator=(const GT& g)
+//{
+//	cout << "Element op= was called...." << endl;
+//	GT new_g = g;
+//	Element e = Element(new_g);
+//	this->type = GT_t;
+//	this->gt = new_g;
+//	cout << "operator= GT :=> " << this->gt.g << endl;
+//	return *this;
+////	if(this->gt == g)
+////		return *this;
+////	cout << "operator= GT :=> " << gt.g << endl;
+////	type = GT_t;
+////	gt = GT(g);
+////
+////
+////	isAllocated = false; // in case e.createNew() was called.
+////	return *this;
+//}
+
 CharmList Element::operator+ (const Element& e) const
 {
 	CharmList c;
@@ -427,6 +448,12 @@ CharmList::CharmList(const CharmList& cList)
 	list = cList.list;
 }
 
+void CharmList::insert(int index, const char *s)
+{
+	Element elem(s);
+	list[index] = elem;
+	cur_index++;
+}
 
 void CharmList::append(const char *s)
 {
@@ -435,6 +462,14 @@ void CharmList::append(const char *s)
 	cur_index++;
 }
 
+void CharmList::insert(int index, string strs)
+{
+	Element elem(strs);
+	list[index] = elem;
+	cur_index++;
+}
+
+
 void CharmList::append(string strs)
 {
 	Element elem(strs);
@@ -442,10 +477,26 @@ void CharmList::append(string strs)
 	cur_index++;
 }
 
+void CharmList::insert(int index, ZR & zr)
+{
+	Element elem(zr);
+	list[index] = elem;
+	cur_index++;
+}
+
+
 void CharmList::append(ZR & zr)
 {
 	Element elem(zr);
 	list[cur_index] = elem;
+	cur_index++;
+}
+
+void CharmList::insert(int index, const ZR & zr)
+{
+	ZR zr_1 = zr;
+	Element elem(zr_1);
+	list[index] = elem;
 	cur_index++;
 }
 
@@ -457,11 +508,25 @@ void CharmList::append(const ZR & zr)
 	cur_index++;
 }
 
+void CharmList::insert(int index, G1 & g1)
+{
+	Element elem(g1);
+	list[index] = elem;
+	cur_index++;
+}
 
 void CharmList::append(G1 & g1)
 {
 	Element elem(g1);
 	list[cur_index] = elem;
+	cur_index++;
+}
+
+void CharmList::insert(int index, const G1 & g1)
+{
+	G1 g1_1 = g1;
+	Element elem(g1_1);
+	list[index] = elem;
 	cur_index++;
 }
 
@@ -475,10 +540,25 @@ void CharmList::append(const G1 & g1)
 
 
 #ifdef ASYMMETRIC
+void CharmList::insert(int index, G2 & g2)
+{
+	Element elem(g2);
+	list[index] = elem;
+	cur_index++;
+}
+
 void CharmList::append(G2 & g2)
 {
 	Element elem(g2);
 	list[cur_index] = elem;
+	cur_index++;
+}
+
+void CharmList::insert(int index, const G2 & g2)
+{
+	G2 g2_1 = g2;
+	Element elem(g2_1);
+	list[index] = elem;
 	cur_index++;
 }
 
@@ -490,13 +570,27 @@ void CharmList::append(const G2 & g2)
 	cur_index++;
 }
 
-
 #endif
+
+void CharmList::insert(int index, GT & gt)
+{
+	Element elem(gt);
+	list[index] = elem;
+	cur_index++;
+}
 
 void CharmList::append(GT & gt)
 {
 	Element elem(gt);
 	list[cur_index] = elem;
+	cur_index++;
+}
+
+void CharmList::insert(int index, const GT & gt)
+{
+	GT gt_1 = gt;
+	Element elem(gt_1);
+	list[index] = elem;
 	cur_index++;
 }
 
@@ -509,9 +603,22 @@ void CharmList::append(const GT & gt)
 }
 
 
+void CharmList::insert(int index, Element & e)
+{
+	list[index] = e;
+	cur_index++;
+}
+
 void CharmList::append(Element & e)
 {
 	list[cur_index] = e;
+	cur_index++;
+}
+
+void CharmList::insert(int index, const Element & e)
+{
+	Element e1 = e;
+	list[index] = e1;
 	cur_index++;
 }
 
@@ -1960,7 +2067,7 @@ ZR PairingGroup::exp(ZR x, ZR y)
 {
 	ZR z = pfcObject->order();
 	ZR result = pow(x, y, z);
-	cout << "exp result: " << result << endl;
+	//cout << "exp result: " << result << endl;
 	return result;
 }
 
