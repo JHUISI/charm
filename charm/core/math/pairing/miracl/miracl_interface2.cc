@@ -1140,6 +1140,19 @@ int _element_length_in_bytes(Curve_t ctype, Group_t type, element_t *e) {
 
 			delete [] a;
 		}
+#elif BUILD_SS_CURVE == 1
+		GT *P = (GT *) e;
+		// if(ctype == SS) {
+			Big *a = new Big[2];
+
+			P->g.get(a[0], a[1]);
+
+			for(int i = 0; i < 2; i++) {
+				t.append( bigToBytes(a[i]) );
+			}
+
+			delete [] a;
+		//}
 #endif
 		// base64 encode t and return
 		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
@@ -1266,6 +1279,18 @@ int _element_to_bytes(unsigned char *data, Curve_t ctype, Group_t type, element_
 
 			delete [] a;
 		}
+#elif BUILD_SS_CURVE == 1
+		//if(ctype == SS) {
+			GT *P = (GT *) e;
+			Big *a = new Big[2];
+			P->g.get(a[0], a[1]);
+
+			for(int i = 0; i < 2; i++) {
+				t.append( bigToBytes(a[i]) );
+			}
+
+			delete [] a;
+		//}
 #endif
 //		cout << "Pre-encoding => ";
 //		_printf_buffer_as_hex((uint8_t *) t.c_str(), t.size());
@@ -1414,6 +1439,25 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 
 			GT *point = new GT();
 			point->g.set(x, y, z);
+			delete [] a;
+			return (element_t *) point;
+		}
+#elif BUILD_SS_CURVE == 1
+		if(is_base64((unsigned char) data[0])) {
+			string b64_encoded((char *) data);
+			string s = _base64_decode(b64_encoded);
+	//		cout << "original => " << s << endl;
+			int cnt = 0;
+			Big *a = new Big[2];
+			for(int i = 0; i < 2; i++) {
+				Big *b = bytesToBig(s, &cnt);
+				a[i] = Big(*b); // retrieve all six coordinates
+				s = s.substr(cnt);
+				delete b;
+			}
+
+			GT *point = new GT();
+			point->g.set(a[0], a[1]);
 			delete [] a;
 			return (element_t *) point;
 		}

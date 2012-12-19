@@ -1447,6 +1447,7 @@ static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 			PyErr_SetString(ElementError, "out of memory.");
 			return NULL;
 		}
+
 		// write to char buffer
 		bytes_written = element_to_bytes(data_buf, self);
 		if(elem_len != bytes_written) {
