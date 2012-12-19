@@ -60,7 +60,7 @@ endForLoop := numNonDontCares - 1
 BEGIN :: for
 for{i := 0, endForLoop}
 a#i := random(ZR)
-sumUSaisUSsoFar := sumUSaisUSsoFar + 1
+sumUSaisUSsoFar := sumUSaisUSsoFar + a#i
 END :: for
 
 a#numNonDontCares-1? := (y - sumUSaisUSsoFar)
@@ -128,7 +128,7 @@ BEGIN :: func:decrypt
 input := list{CT, sk}
 CT := expand{omega, C0, XVector, WVector}
 BEGIN :: if
-if { isTuple(sk)==False }
+if { isList(sk) == False }
 Message := omega * e(C0, sk)
 output := Message
 return := output

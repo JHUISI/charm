@@ -468,7 +468,7 @@ def main(sdlFile, config, sdlVerbose=False):
     print("<===== new SDL =====>")
     
     outputFile = bv_name + "_asym_" + fileSuffix
-#    writeConfig(outputFile + ".bv", newLines0, newLines1, newLinesSe, newLinesS, newLinesK, newLinesE, newLinesD)
+    writeConfig(outputFile + ".bv", newLines0, newLines1, newLinesSe, newLinesS, newLinesK, newLinesE, newLinesD)
     return outputFile
 
 # temporary placement
