@@ -84,6 +84,9 @@ string bigToBytes(Big x)
 Big *bytesToBig(string str, int *counter)
 {
 	int pos = str.find_first_of(':');
+	if(pos > BIG_SIZE || pos < 0) {
+		return new Big(0);
+	}
 //	cout << "pos of elem => " << pos << endl;
 	int len = atoi( str.substr(0, pos).c_str() );
 	int add_zeroes = PAD_SIZE;
@@ -1168,7 +1171,6 @@ int _element_to_bytes(unsigned char *data, Curve_t ctype, Group_t type, element_
 		G1 *p = (G1 *) e;
 		Big x, y;
 		p->g.get(x, y);
-		string t;
 		t.append(bigToBytes(x));
 		t.append(bigToBytes(y));
 
@@ -1181,7 +1183,7 @@ int _element_to_bytes(unsigned char *data, Curve_t ctype, Group_t type, element_
 #if ASYMMETRIC == 1
 	else if(type == G2_t) {
 		G2 *P = (G2 *) e; // embeds an ECn3 element (for MNT curves)
-		string t;
+
 #if BUILD_MNT_CURVE == 1
 		if(ctype == MNT) { // handling only MNT curves at the moment
 			ZZn3 x, y;
@@ -1194,6 +1196,8 @@ int _element_to_bytes(unsigned char *data, Curve_t ctype, Group_t type, element_
 			for(int i = 0; i < 6; i++) {
 				t.append( bigToBytes(Big(a[i])) );
 			}
+
+			delete [] a;
 		}
 #elif BUILD_BN_CURVE == 1
 		if(ctype == BN) {
@@ -1232,7 +1236,6 @@ int _element_to_bytes(unsigned char *data, Curve_t ctype, Group_t type, element_
 			y.get(a[2], a[3]);
 		    z.get(a[4], a[5]);
 	//	    cout << "Point => (" << x << ", " << y << ", " << z << ")" << endl;
-		    string t;
 		    for(int i = 0; i < 6; i++) {
 		    	t.append( bigToBytes(a[i]) );
 		    }
@@ -1292,13 +1295,16 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 			string s = _base64_decode(b64_encoded);
 
 			int cnt = 0;
-			Big x,y;
-			x = *bytesToBig(s, &cnt);
+			Big *x, *y;
+//			cout << "point => (" << x << ", " << y << ")" << endl;
+			x = bytesToBig(s, &cnt);
 			s = s.substr(cnt);
-			y = *bytesToBig(s, &cnt);
-			//cout << "point => (" << x << ", " << y << ")" << endl;
+			y = bytesToBig(s, &cnt);
+//			if (x == 0 || y == 0) { return NULL; }
 			G1 *p = new G1();
-			p->g.set(x,y);
+			p->g.set(*x, *y);
+			delete x;
+			delete y;
 			return (element_t *) p;
 		}
 	}
@@ -1312,8 +1318,10 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 			int cnt = 0;
 			ZZn *a = new ZZn[6];
 			for(int i = 0; i < 6; i++) {
-				a[i] = ZZn(*bytesToBig(s, &cnt) ); // retrieve all six coordinates
+				Big *b = bytesToBig(s, &cnt);
+				a[i] = ZZn(*b); // retrieve all six coordinates
 				s = s.substr(cnt);
+				delete b;
 			}
 			ZZn3 x (a[0], a[1], a[2]);
 			ZZn3 y (a[3], a[4], a[5]);
@@ -1321,6 +1329,7 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 			G2 *point = new G2();
 			point->g.set(x, y);
 			// cout << "Recovered pt => " << point->g << endl;
+			delete [] a;
 			return (element_t *) point;
 		}
 #elif BUILD_BN_CURVE == 1
@@ -1331,8 +1340,10 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 			int cnt = 0;
 			Big *a = new Big[4];
 			for(int i = 0; i < 4; i++) {
-				a[i] = *bytesToBig(s, &cnt); // retrieve all six coordinates
+				Big *b = bytesToBig(s, &cnt);
+				a[i] = Big(*b); // retrieve all six coordinates
 				s = s.substr(cnt);
+				delete b;
 			}
 
 			ZZn2 x1(a[0], a[1]); // each zzn2 has a (x, y) coordinate of type Big
@@ -1340,6 +1351,7 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 
 			G2 *point = new G2();
 			point->g.set(x1, y1);
+			delete [] a;
 			return (element_t *) point;
 		}
 #endif
@@ -1356,9 +1368,10 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 			for(int i = 0; i < 6; i++) {
 				// cout << "buffer => ";
 			    // printf_buffer_as_hex((uint8_t *) s.c_str(), s.size());
-				a[i] = *bytesToBig(s, &cnt); // retrieve all six coordinates
+				Big *b = bytesToBig(s, &cnt);
+				a[i] = Big(*b); // retrieve all six coordinates
 				s = s.substr(cnt);
-				// cout << "i => " << a[i] << endl;
+				delete b;
 			}
 			ZZn2 x, y, z;
 			x.set(a[0], a[1]);
@@ -1367,6 +1380,7 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 
 			GT *point = new GT();
 			point->g.set(x, y, z);
+			delete [] a;
 			return (element_t *) point;
 		}
 #elif BUILD_BN_CURVE == 1
@@ -1379,8 +1393,10 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 			for(int i = 0; i < 12; i++) {
 				// cout << "buffer => ";
 			    // printf_buffer_as_hex((uint8_t *) s.c_str(), s.size());
-				a[i] = *bytesToBig(s, &cnt); // retrieve all six coordinates
+				Big *b = bytesToBig(s, &cnt);
+				a[i] = Big(*b); // retrieve all six coordinates
 				s = s.substr(cnt);
+				delete b;
 				// cout << "i => " << a[i] << endl;
 			}
 
@@ -1398,6 +1414,7 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 
 			GT *point = new GT();
 			point->g.set(x, y, z);
+			delete [] a;
 			return (element_t *) point;
 		}
 #endif
