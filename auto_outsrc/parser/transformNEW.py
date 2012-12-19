@@ -311,6 +311,7 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
             lineForTransformLines += "{ " + str(currentNode.right.left) + " on ( "
 
         listOfPairings = groupedPairing[1]
+        listOfPairings = CombinePairings(listOfPairings)
         for pairing in listOfPairings:
             lineForTransformLines += str(pairing) + " * " 
 
