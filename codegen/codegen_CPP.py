@@ -387,7 +387,7 @@ def applyReplacementsDict(replacementsDict, currentStrName):
 
     return retString
 
-def replacePoundsWithBrackets(nameWithPounds):
+def replacePoundsWithBrackets(nameWithPounds, switchToInsert=False):
     if ( (type(nameWithPounds) is not str) or (len(nameWithPounds) == 0) ):
         sys.exit("replacePoundsWithBrackets in codegen.py:  problem with nameWithPounds parameter passed in.")
 
@@ -397,9 +397,15 @@ def replacePoundsWithBrackets(nameWithPounds):
 
     nameToReturn = nameSplit[0]
     lenNameSplit = len(nameSplit)
-
-    for counter in range(0, (lenNameSplit - 1)):
-        nameToReturn += "[" + nameSplit[counter + 1] + "]"
+    
+    if switchToInsert:
+        #print("DEBUG: JAA nameToReturn => ", nameToReturn)
+        nums = nameSplit[1:]
+        if len(nums) == 1:
+            nameToReturn += ".insert(" + nums[0] + ", "
+    else:
+        for counter in range(0, (lenNameSplit - 1)):
+            nameToReturn += "[" + nameSplit[counter + 1] + "]"
 
     return nameToReturn.replace("?","",1) #in case we're directly accessing list element (e.g., S[k-1])
 
@@ -511,7 +517,7 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
     elif ( (node.type == ops.ATTR) or (node.type == ops.TYPE) ):
         returnString = processAttrOrTypeAssignStmt(node, replacementsDict)
 
-        if (str(node).startswith(transformOutputList) == True):
+        if transformOutputList != None and (str(node).startswith(transformOutputList) == True):
             returnString = addGetTypeToAttrNode(returnString, variableType)
 
         if node.isNegated():
@@ -602,13 +608,15 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
         if (variableName == None):
             sys.exit("getAssignStmtAsString_CPP in codegen.py:  encountered node of type ops.LIST, but variableName parameter passed in is of type None.")
         listOutputString = ""
-        for listNode in node.listNodes:
+        for listIndex, listNode in enumerate(node.listNodes):
             listOutputString += writeCurrentNumTabsToString()
-            listOutputString += variableName + ".append("
+# JAA: modified append to use insert instead
+#            listOutputString += variableName + ".append("            
+            listOutputString += variableName + ".insert("
             listNodeAsString = getAssignStmtAsString_CPP(listNode, replacementsDict, variableName)
-            if (doesVarNeedStar(listNodeAsString) == True):
-                listNodeAsString = "*" + listNodeAsString
-            listOutputString += listNodeAsString + ");\n"
+            #if (doesVarNeedStar(listNodeAsString) == True):
+            #    listNodeAsString = "*" + listNodeAsString
+            listOutputString += str(listIndex) + ", " + listNodeAsString + ");\n"
         return listOutputString
     elif ( (node.type == ops.SYMMAP) ): #or ( (node.type == ops.EXPAND) and (variableType == types.symmap) ) ):
         if (variableName == None):
@@ -685,7 +693,8 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
             sys.exit("getAssignStmtAsString_CPP in codegen.py:  ops.EXPAND node encountered, but variableName is set to None.")
         return getCPPAsstStringForExpand(node, variableName, replacementsDict)
 
-    sys.exit("getAssignStmtAsString_CPP in codegen.py:  unsupported node type detected.")
+    assert False,"getAssignStmtAsString_CPP in codegen.py:  unsupported node type detected."
+    return
 
 def getCPPAsstStringForExpand(node, variableName, replacementsDict):
     global CPP_varTypesLines
@@ -834,28 +843,36 @@ def writeAssignStmt_CPP(outputFile, binNode):
         nonListVarsDeclaredInThisFunc.append(variableName)
 
     variableNamePounds = replacePoundsWithBrackets(variableName)
-    if ( (variableType == types.int) and (variableNamePounds not in integerVars) ):
-        integerVars.append(variableNamePounds)
+    skipTheRest = False
+    if (variableName != variableNamePounds):
+        variableNamePound = replacePoundsWithBrackets(variableName, True)
+        rhsAssignment = getAssignStmtAsString_CPP(binNode.right, None, variableNamePound, None)
+        #print("DEBUG: JAA stmt =>", variableNamePound, rhsAssignment, ")")
+        outputString_Body += variableNamePound + rhsAssignment + ");\n"
+        skipTheRest = True
 
-    leftSideNameForInit = None
-
-    if ( (binNode.right.type != ops.EXPAND) and (binNode.right.type != ops.LIST) ):
-        if ( (variableNamePounds in currentFuncOutputVars) or (variableName in SDLListVars) or (variableType == types.int) ):
-            leftSideNameForInit = variableNamePounds
-            if (isInitCall(binNode) == False):
-                outputString_Body += variableNamePounds  
-        else:
-            leftSideNameForInit = starRef + variableNamePounds
-            if (isInitCall(binNode) == False):
-                outputString_Body += starRef + variableNamePounds
-
-    if ( (isInitCall(binNode) == False) and (binNode.right.type != ops.LIST) and (binNode.right.type != ops.SYMMAP) and (binNode.right.type != ops.EXPAND) ):
-        outputString_Body += " = "
-
-    outputString_Body += getAssignStmtAsString_CPP(binNode.right, None, variableNamePounds, leftSideNameForInit)
+    if not skipTheRest:    
+        if ( (variableType == types.int) and (variableNamePounds not in integerVars) ):
+            integerVars.append(variableNamePounds)
     
-    if ( (binNode.right.type != ops.LIST) and (binNode.right.type != ops.SYMMAP) and (binNode.right.type != ops.EXPAND) ):
-        outputString_Body += ";\n"
+        leftSideNameForInit = None
+        if ( (binNode.right.type != ops.EXPAND) and (binNode.right.type != ops.LIST) ):
+            if ( (variableNamePounds in currentFuncOutputVars) or (variableName in SDLListVars) or (variableType == types.int) ):
+                leftSideNameForInit = variableNamePounds
+                if (isInitCall(binNode) == False):
+                    outputString_Body += variableNamePounds  
+            else:
+                leftSideNameForInit = starRef + variableNamePounds
+                if (isInitCall(binNode) == False):
+                    outputString_Body += starRef + variableNamePounds        
+            
+        if ( (isInitCall(binNode) == False) and (binNode.right.type != ops.LIST) and (binNode.right.type != ops.SYMMAP) and (binNode.right.type != ops.EXPAND) ):
+            outputString_Body += " = "   
+    
+        outputString_Body += getAssignStmtAsString_CPP(binNode.right, None, variableNamePounds, leftSideNameForInit)
+         
+        if ( (binNode.right.type != ops.LIST) and (binNode.right.type != ops.SYMMAP) and (binNode.right.type != ops.EXPAND) ):
+            outputString_Body += ";\n"
         
     CPP_varTypesLines += outputString_Types
     CPP_funcBodyLines += outputString_Body
