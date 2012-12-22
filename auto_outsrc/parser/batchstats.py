@@ -214,5 +214,11 @@ asymmetric_curves = { 'MNT160':MNT160, 'BN256':BN256 }
 
 class RecordSize:
     def __init__(self, varObjs, varTypes):
-        pass
+        self.varObjs = varObjs
+        self.varTypes = varTypes
+        
+    def estimate(self, nodeList):
+        print("RecordSize: ", nodeList)
+        if nodeList.type != ops.EQ:
+            return None
     

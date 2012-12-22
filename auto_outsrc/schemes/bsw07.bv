@@ -1,6 +1,6 @@
 name := bsw07
 setting := symmetric
-short := keys
+short := ciphertext
 
 BEGIN :: types
 policy_str := str

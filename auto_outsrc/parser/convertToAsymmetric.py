@@ -23,6 +23,7 @@ SHORT_FORALL = "both"
 variableKeyword = "variables"
 clauseKeyword = "clauses"
 constraintKeyword = "constraints"
+mofnKeyword = "mofn"
 PUB_SCHEME = "PUB"
 SIG_SCHEME = "SIG"
 G1Prefix = "G1"
@@ -226,13 +227,18 @@ def handleVarInfo(newLines, assign, blockStmt, info, noChangeList, startLines=[]
         print("Unrecognized type: ", Type(assign))
     return False
 
-def instantiateSolver(variables, clauses, constraints):
+def instantiateSolver(variables, clauses, constraints, mofnConstraints):
     print("variables = ", variables) # txor.getVariables())
     outputVariables = variableKeyword + " = " + str(variables) + "\n"
     print("clauses = ", clauses)
     outputClauses   = clauseKeyword + " = " + str(clauses) + "\n"
     print("constraints = ", constraints)
     outputConstraints = constraintKeyword + " = " + str(constraints) + "\n"
+    outputMofN = ""
+    if mofnConstraints != None:
+        print("mofn = ", mofnConstraints)
+        outputMofN += mofnKeyword + " = " + str(mofnConstraints) + "\n"
+        
     # get random file
     name = ""
     for i in range(length):
@@ -242,18 +248,128 @@ def instantiateSolver(variables, clauses, constraints):
     f.write(outputVariables)
     f.write(outputClauses)
     f.write(outputConstraints)
+    f.write(outputMofN)
     f.close()
 
     os.system("python2.7 z3solver.py %s" % name)
     newName = name.split('.')[0]
     results = __import__(newName)
     if(not results.satisfiable):
-        os.system("rm -f " + name + "*")
-        sys.exit("SAT solver could not find a suitable solution. Change configuration and try again!")
+        #os.system("rm -f " + name + "*")
+        print("SAT solver could not find a suitable solution. Change configuration and try again!")
+        return results.satisfiable, None
     
     print(results.resultDictionary)
-    os.system("rm -f " + name + "*")    
-    return results.resultDictionary
+    #os.system("rm -f " + name + "*")    
+    return results.satisfiable, results.resultDictionary
+
+def getAssignmentForName(var, varTypes):
+    global assignInfo
+    (funcName, varInfo) = getVarNameEntryFromAssignInfo(assignInfo, var)
+    if funcName != None:
+        funcStmts = sdl.getVarInfoFuncStmts( funcName )
+        Stmts = funcStmts[0]
+        StmtTypes = funcStmts[1]
+    if varInfo.getIsList():
+        assignNode = varInfo.getAssignNode()
+        varList = assignNode.getRight().listNodes
+        #print("assignNode: ", assignNode)
+        #print("full varList: ", varList)
+        resultVars = []
+        for i in varList:
+            varType = varTypes.get(i)
+            theType = varType.getType()
+            if theType == types.G1:
+                print(i, ":", theType)
+                resultVars.append(i)
+            if theType in [types.list, types.listG1]:
+                print("Find all refs: ", i)
+                for j,k in Stmts.items():
+                    if Type(k.getAssignNode()) == ops.EQ:
+                        kvar = k.getAssignVar()
+                        if i in kvar and StmtTypes.get(kvar).getType() == types.G1:
+                            if kvar not in resultVars: resultVars.append(str(kvar))
+                            
+    print("pruned varList: ", resultVars)
+    return resultVars
+
+def getConstraintList(constraintList, configVarName, xorVarMap, varTypes, returnList=False):
+    VarNames = getAssignmentForName(configVarName, varTypes)
+    VarNameList = []
+    for i in VarNames:
+        if xorVarMap.get(i) != None: VarNameList.append( xorVarMap.get(i) )
+    if len(constraintList) > 0:
+        for i in constraintList: # in case there are hash values
+            if xorVarMap.get(i) != None and xorVarMap.get(i) not in VarNameList: 
+                VarNameList.append( xorVarMap.get(i) )
+    if returnList:
+        return VarNameList # list
+    return str(VarNameList) # string
+ 
+
+def searchForSolution(short, constraintList, txor, varTypes, conf):
+    resultDict = None
+    satisfiable = False
+    adjustConstraints = False
+    mofnConstraints = None # only used if necessary
+    fileSuffix = ""
+    while not satisfiable:
+        print("\n<===== Generate Constraints =====>")    
+        xorVarMap = txor.getVarMap()
+        if short == SHORT_KEYS:
+            # create constraints around keys
+            fileSuffix = 'ky'
+            assert type(conf.keygenSecVar) == str, "keygenSecVar in config file expected as a string"
+            if not adjustConstraints:
+                constraints = getConstraintList(constraintList, conf.keygenSecVar, xorVarMap, varTypes)
+            else:
+                flexConstraints = getConstraintList([], conf.keygenSecVar, xorVarMap, varTypes, returnList=True)
+                newConstraintList = [xorVarMap.get(i) for i in constraintList]
+                flexConstraints = list(set(flexConstraints).difference(newConstraintList))
+                print("DEBUG: n-of-n constraints: ", newConstraintList)
+                print("DEBUG: m-of-n constraints: ", flexConstraints)
+                constraints = newConstraintList
+                mofnConstraints = flexConstraints
+        elif short == SHORT_CIPHERTEXT:
+            fileSuffix = 'ct'
+            assert type(conf.ciphertextVar) == str, "ciphertextVar in config file expected as a string"
+            if not adjustConstraints:
+                constraints = getConstraintList(constraintList, conf.ciphertextVar, xorVarMap, varTypes)
+            else:
+                flexConstraints = getConstraintList([], conf.ciphertextVar, xorVarMap, varTypes, returnList=True)
+                newConstraintList = [xorVarMap.get(i) for i in constraintList]
+                flexConstraints = list(set(flexConstraints).difference(newConstraintList))
+                print("DEBUG: n-of-n constraints: ", newConstraintList)
+                print("DEBUG: m-of-n constraints: ", flexConstraints)
+                constraints = newConstraintList
+                mofnConstraints = flexConstraints
+        elif short == SHORT_SIGNATURE:
+            pass #TODO
+        elif short == SHORT_FORALL:
+            fileSuffix = 'both' #default
+            print("default constraints: ", constraintList)
+            constraints_ky = getConstraintList([], conf.keygenSecVar, xorVarMap, varTypes, returnList=True)
+            constraints_ky = list(set(constraints_ky).difference(constraintList))
+            print("Constraints for ky: ", constraints_ky)
+            constraints_ct = getConstraintList([], conf.ciphertextVar, xorVarMap, varTypes, returnList=True)
+            constraints_ct = list(set(constraints_ct).difference(constraintList))
+            print("Constraints for ct: ", constraints_ct)
+            sys.exit(0)
+            
+        print("<===== Generate Constraints =====>\n")
+        
+        print("<===== Generate SAT solver input =====>")
+        
+        # TODO: process constraints and add to output
+        print("<===== Instantiate Z3 solver =====>")
+        print("map: ", xorVarMap)
+        (satisfiable, resultDict) = instantiateSolver(txor.getVariables(), txor.getClauses(), constraints, mofnConstraints)
+        if satisfiable == False: 
+            print("Adjusing constraints...")
+            adjustConstraints = True
+        print("<===== Instantiate Z3 solver =====>")
+
+    return fileSuffix, resultDict
 
 
 def main(sdlFile, config, sdlVerbose=False):
@@ -308,8 +424,8 @@ def main(sdlFile, config, sdlVerbose=False):
     # need a Visitor class to build these variables  
     # TODO: expand to other parts of algorithm including setup, keygen, encrypt 
     hashVarList = []
-    pair_vars_G1_lhs = [] # ['C#1', 'C#2', 'C#3', 'C#4', 'C#5', 'C#6', 'C#7', 'E1', 'E2']
-    pair_vars_G1_rhs = [] # ['D#1', 'D#2', 'D#3', 'D#4', 'D#5', 'D#6', 'D#7', 'D#7', 'K']
+    pair_vars_G1_lhs = [] 
+    pair_vars_G1_rhs = []
     gpv = GetPairingVariables(pair_vars_G1_lhs, pair_vars_G1_rhs) 
     lines = stmtD.keys()
     for i in lines:
@@ -322,12 +438,7 @@ def main(sdlFile, config, sdlVerbose=False):
                 # in case, there's a hashed values...build up list and check later to see if it appears
                 # in pairing variable list
                 hashVarList.append(str(stmtD[i].getAssignVar()))
-#        elif type(stmtD[i]) == sdl.ForLoop:
-#            print("forLoop: ", stmtD[i].getAssignNode())
-#            print("forLoop-BN: ", stmtD[i].getBinaryNodeList())
-#            print("forLoop-VI: ", stmtD[i].getVarInfoNodeList())
-        
-    
+
     constraintList = []
     # determine if any hashed values in decrypt show up in a pairing
     for i in hashVarList:
@@ -371,53 +482,51 @@ def main(sdlFile, config, sdlVerbose=False):
     txor = transformXOR(None) # accepts dictionary of fixed values
     sdl.ASTVisitor(txor).preorder(ANDs[0])
     print("<===== Generate XOR clauses =====>")
-    
-    print("\n<===== Generate Constraints =====>")    
-    xorVarMap = txor.getVarMap()
-    constraints = "[]"
-    fileSuffix = ""
-    if short == SHORT_KEYS:
-        # create constraints around keys
-        fileSuffix = 'ky'
-        assert type(config.keygenSecVar) == list, "keygenSecVar in config file expected as list of variables"
-        keygenSecVarList = []
-        for i in config.keygenSecVar:
-            if xorVarMap.get(i) != None: keygenSecVarList.append( xorVarMap.get(i) )
-        if len(constraintList) > 0:
-            for i in constraintList: # in case there are hash values
-                if xorVarMap.get(i) != None and xorVarMap.get(i) not in keygenSecVarList:
-                    keygenSecVarList.append( xorVarMap.get(i) )
-        constraints = str(keygenSecVarList)
-    elif short == SHORT_CIPHERTEXT:
-        fileSuffix = 'ct'
-        assert type(config.ciphertextVar) == list, "ciphertextVar in config file expected as list of variables"
-        ciphertextVarList = []
-        for i in config.ciphertextVar:
-            if xorVarMap.get(i) != None: ciphertextVarList.append( xorVarMap.get(i) )
-        if len(constraintList) > 0:
-            for i in constraintList: # in case there are hash values
-                if xorVarMap.get(i) != None and xorVarMap.get(i) not in ciphertextVarList: 
-                    ciphertextVarList.append( xorVarMap.get(i) )
-        constraints = str(ciphertextVarList)
-    elif short == SHORT_SIGNATURES:
-        pass #TODO
-    elif short == SHORT_FORALL:
-        pass #default
+        
+#    print("\n<===== Generate Constraints =====>")    
+#    xorVarMap = txor.getVarMap()
+#    constraints = "[]"
+#    fileSuffix = ""
+#    if short == SHORT_KEYS:
+#        # create constraints around keys
+#        fileSuffix = 'ky'
+#        assert type(config.keygenSecVar) == str, "keygenSecVar in config file expected as a string"
+#        constraints = getConstraintList(constraintList, config.keygenSecVar, xorVarMap, varTypes)
+#    elif short == SHORT_CIPHERTEXT:
+#        fileSuffix = 'ct'
+#        assert type(config.ciphertextVar) == str, "ciphertextVar in config file expected as a string"
+#        constraints = getConstraintList(constraintList, config.ciphertextVar, xorVarMap, varTypes)
+#    elif short == SHORT_SIGNATURE:
+#        pass #TODO
+#    elif short == SHORT_FORALL:
+#        fileSuffix = 'both' #default
+#        print("default constraints: ", constraintList)
+#        constraints_ky = getConstraintList([], config.keygenSecVar, xorVarMap, varTypes, returnList=True)
+#        constraints_ky = list(set(constraints_ky).difference(constraintList))
+#        print("Constraints for ky: ", constraints_ky)
+#        constraints_ct = getConstraintList([], config.ciphertextVar, xorVarMap, varTypes, returnList=True)
+#        constraints_ct = list(set(constraints_ct).difference(constraintList))
+#        print("Constraints for ct: ", constraints_ct)
+#        sys.exit(0)
+#        
+#    print("<===== Generate Constraints =====>\n")    
+#    
+#    print("<===== Generate SAT solver input =====>")
+#    
+#    # TODO: process constraints and add to output
+#    print("<===== Instantiate Z3 solver =====>")
+#    print("map: ", xorVarMap)
+#    resultDict = instantiateSolver(txor.getVariables(), txor.getClauses(), constraints)
+#    print("<===== Instantiate Z3 solver =====>")
 
-    print("<===== Generate Constraints =====>\n")    
-    
-    print("<===== Generate SAT solver input =====>")
-    
-    # TODO: process constraints and add to output
-    print("<===== Instantiate Z3 solver =====>")
-    print("map: ", xorVarMap)
-    resultDict = instantiateSolver(txor.getVariables(), txor.getClauses(), constraints)
-    print("<===== Instantiate Z3 solver =====>")
+    constraints = "[]"
+    fileSuffix, resultDict = searchForSolution(short, constraintList, txor, varTypes, config)
         
     res, resMap = NaiveEvaluation(resultDict, short)
     print("Group Mapping: ", res)
     # determine whether to make True = G1 and False = G2. 
     # It depends on which counts more since they're interchangeable...
+    xorVarMap = txor.getVarMap()
     groupInfo = DeriveSolution(res, resMap, xorVarMap, info)
     groupInfo['generators'] = generators 
     groupInfo['generatorMapG1'] = generatorMapG1
