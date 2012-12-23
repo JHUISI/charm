@@ -163,8 +163,6 @@ def updateForIfConditional(node, assignVar, varInfo, info, theType, noChangeList
     # in case of init() calls...
     sdl.ASTVisitor( SubstituteVar('', str(theType)) ).preorder( new_node2 )
     return new_node2
-    
-
 
 def handleVarInfo(newLines, assign, blockStmt, info, noChangeList, startLines=[]):
     if Type(assign) == ops.EQ:
@@ -227,7 +225,7 @@ def handleVarInfo(newLines, assign, blockStmt, info, noChangeList, startLines=[]
         print("Unrecognized type: ", Type(assign))
     return False
 
-def instantiateSolver(variables, clauses, constraints, mofnConstraints):
+def instantiateSolver(variables, clauses, constraints, mofnConstraints, bothConstraints):
     print("variables = ", variables) # txor.getVariables())
     outputVariables = variableKeyword + " = " + str(variables) + "\n"
     print("clauses = ", clauses)
@@ -238,7 +236,15 @@ def instantiateSolver(variables, clauses, constraints, mofnConstraints):
     if mofnConstraints != None:
         print("mofn = ", mofnConstraints)
         outputMofN += mofnKeyword + " = " + str(mofnConstraints) + "\n"
-        
+    
+    # options of the user wants to minimize both
+    keys = list(bothConstraints.keys())
+    outputForBoth = ""
+    if len(keys) > 0:
+        outputForBoth = "searchBoth = True\n"
+        for k in keys:
+            outputForBoth += str(k) + " = " + str(bothConstraints[k]) + "\n"
+        print(outputForBoth)
     # get random file
     name = ""
     for i in range(length):
@@ -247,10 +253,11 @@ def instantiateSolver(variables, clauses, constraints, mofnConstraints):
     f = open(name, 'w')
     f.write(outputVariables)
     f.write(outputClauses)
+    if outputForBoth != "": f.write(outputForBoth)
+    if outputMofN != "":    f.write(outputMofN)
     f.write(outputConstraints)
-    f.write(outputMofN)
     f.close()
-
+    
     os.system("python2.7 z3solver.py %s" % name)
     newName = name.split('.')[0]
     results = __import__(newName)
@@ -313,6 +320,7 @@ def searchForSolution(short, constraintList, txor, varTypes, conf):
     adjustConstraints = False
     mofnConstraints = None # only used if necessary
     fileSuffix = ""
+    bothConstraints = {}
     while not satisfiable:
         print("\n<===== Generate Constraints =====>")    
         xorVarMap = txor.getVarMap()
@@ -347,14 +355,17 @@ def searchForSolution(short, constraintList, txor, varTypes, conf):
             pass #TODO
         elif short == SHORT_FORALL:
             fileSuffix = 'both' #default
-            print("default constraints: ", constraintList)
+            _constraintList = [xorVarMap.get(i) for i in constraintList]
+            print("default constraints: ", _constraintList)
             constraints_ky = getConstraintList([], conf.keygenSecVar, xorVarMap, varTypes, returnList=True)
-            constraints_ky = list(set(constraints_ky).difference(constraintList))
+            constraints_ky = list(set(constraints_ky).difference(_constraintList))
             print("Constraints for ky: ", constraints_ky)
             constraints_ct = getConstraintList([], conf.ciphertextVar, xorVarMap, varTypes, returnList=True)
-            constraints_ct = list(set(constraints_ct).difference(constraintList))
+            constraints_ct = list(set(constraints_ct).difference(_constraintList))
             print("Constraints for ct: ", constraints_ct)
-            sys.exit(0)
+            constraints = list(_constraintList) + [conf.keygenSecVar, conf.ciphertextVar]
+            bothConstraints[ conf.keygenSecVar ] = constraints_ky
+            bothConstraints[ conf.ciphertextVar ] = constraints_ct
             
         print("<===== Generate Constraints =====>\n")
         
@@ -363,7 +374,7 @@ def searchForSolution(short, constraintList, txor, varTypes, conf):
         # TODO: process constraints and add to output
         print("<===== Instantiate Z3 solver =====>")
         print("map: ", xorVarMap)
-        (satisfiable, resultDict) = instantiateSolver(txor.getVariables(), txor.getClauses(), constraints, mofnConstraints)
+        (satisfiable, resultDict) = instantiateSolver(txor.getVariables(), txor.getClauses(), constraints, mofnConstraints, bothConstraints)
         if satisfiable == False: 
             print("Adjusing constraints...")
             adjustConstraints = True
@@ -482,52 +493,19 @@ def main(sdlFile, config, sdlVerbose=False):
     txor = transformXOR(None) # accepts dictionary of fixed values
     sdl.ASTVisitor(txor).preorder(ANDs[0])
     print("<===== Generate XOR clauses =====>")
-        
-#    print("\n<===== Generate Constraints =====>")    
-#    xorVarMap = txor.getVarMap()
-#    constraints = "[]"
-#    fileSuffix = ""
-#    if short == SHORT_KEYS:
-#        # create constraints around keys
-#        fileSuffix = 'ky'
-#        assert type(config.keygenSecVar) == str, "keygenSecVar in config file expected as a string"
-#        constraints = getConstraintList(constraintList, config.keygenSecVar, xorVarMap, varTypes)
-#    elif short == SHORT_CIPHERTEXT:
-#        fileSuffix = 'ct'
-#        assert type(config.ciphertextVar) == str, "ciphertextVar in config file expected as a string"
-#        constraints = getConstraintList(constraintList, config.ciphertextVar, xorVarMap, varTypes)
-#    elif short == SHORT_SIGNATURE:
-#        pass #TODO
-#    elif short == SHORT_FORALL:
-#        fileSuffix = 'both' #default
-#        print("default constraints: ", constraintList)
-#        constraints_ky = getConstraintList([], config.keygenSecVar, xorVarMap, varTypes, returnList=True)
-#        constraints_ky = list(set(constraints_ky).difference(constraintList))
-#        print("Constraints for ky: ", constraints_ky)
-#        constraints_ct = getConstraintList([], config.ciphertextVar, xorVarMap, varTypes, returnList=True)
-#        constraints_ct = list(set(constraints_ct).difference(constraintList))
-#        print("Constraints for ct: ", constraints_ct)
-#        sys.exit(0)
-#        
-#    print("<===== Generate Constraints =====>\n")    
-#    
-#    print("<===== Generate SAT solver input =====>")
-#    
-#    # TODO: process constraints and add to output
-#    print("<===== Instantiate Z3 solver =====>")
-#    print("map: ", xorVarMap)
-#    resultDict = instantiateSolver(txor.getVariables(), txor.getClauses(), constraints)
-#    print("<===== Instantiate Z3 solver =====>")
 
     constraints = "[]"
     fileSuffix, resultDict = searchForSolution(short, constraintList, txor, varTypes, config)
-        
-    res, resMap = NaiveEvaluation(resultDict, short)
-    print("Group Mapping: ", res)
-    # determine whether to make True = G1 and False = G2. 
-    # It depends on which counts more since they're interchangeable...
+    
     xorVarMap = txor.getVarMap()
-    groupInfo = DeriveSolution(res, resMap, xorVarMap, info)
+    if short != SHORT_FORALL:
+        res, resMap = NaiveEvaluation(resultDict, short)
+        print("Group Mapping: ", res)
+        # determine whether to make True = G1 and False = G2. 
+        # It depends on which counts more since they're interchangeable...
+        groupInfo = DeriveGeneralSolution(res, resMap, xorVarMap, info)
+    else:
+        groupInfo = DeriveSpecificSolution(resultDict, xorVarMap, info)
     groupInfo['generators'] = generators 
     groupInfo['generatorMapG1'] = generatorMapG1
     groupInfo['generatorMapG2'] = generatorMapG2
@@ -602,7 +580,7 @@ def NaiveEvaluation(solutionList, preference):
 
     return { G1:'G1', G2:'G2' }, resMap
 
-def DeriveSolution(groupMap, resultMap, xorMap, info):
+def DeriveGeneralSolution(groupMap, resultMap, xorMap, info):
     print("<===== Deriving Solution from Results =====>")
     G1_deps = set()
     G2_deps = set()
@@ -627,6 +605,40 @@ def DeriveSolution(groupMap, resultMap, xorMap, info):
     print("Just G1: ", G1)
     print("Just G2: ", G2)
     return {'G1':G1, 'G2':G2, 'both':both}
+
+def DeriveSpecificSolution(resultDict, xorMap, info):  #groupMap, resultMap, xorMap, info):
+    print("<===== Deriving Specific Solution from Results =====>")
+    G1_deps = set()
+    G2_deps = set()
+    resultMap = {}
+    for tupl in resultDict:
+        (k, v) = tupl
+        resultMap[ k ] = v
+        
+    for i in info['G1_lhs'][0] + info['G1_rhs'][0]:
+        # get the z3 var for it
+        z3Var = xorMap.get(i) # gives us an alphabet
+        # look up value in resultMap
+        varValue = resultMap.get(z3Var)
+        # get group
+        if varValue == True: group = 'G1'
+        else: group = 'G2'
+        
+        if i in info['G1_lhs'][0]: deps = info['G1_lhs'][1].get(i)
+        else: deps = info['G1_rhs'][1].get(i)
+        deps = list(deps); deps.append(i) # var name to the list
+        print(i, ":=>", group, ": deps =>", deps)
+        if group == 'G1': G1_deps = G1_deps.union(deps)
+        elif group == 'G2': G2_deps = G2_deps.union(deps)
+    print("<===== Deriving Specific Solution from Results =====>")    
+    both = G1_deps.intersection(G2_deps)
+    G1 = G1_deps.difference(both)
+    G2 = G2_deps.difference(both)
+    print("Both G1 & G2: ", both)
+    print("Just G1: ", G1)
+    print("Just G2: ", G2)
+    return {'G1':G1, 'G2':G2, 'both':both}
+
 
 def findVarInfo(var, varTypes):
     if var.find(LIST_INDEX_SYMBOL) != -1:
