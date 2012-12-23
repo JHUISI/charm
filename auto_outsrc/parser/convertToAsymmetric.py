@@ -352,7 +352,18 @@ def searchForSolution(short, constraintList, txor, varTypes, conf):
                 constraints = newConstraintList
                 mofnConstraints = flexConstraints
         elif short == SHORT_SIGNATURE:
-            pass #TODO
+            fileSuffix = 'sig'
+            assert type(conf.signatureVar) == str, "signatureVar in config file expected as a string"
+            if not adjustConstraints:
+                constraints = getConstraintList(constraintList, conf.signatureVar, xorVarMap, varTypes)
+            else:
+                flexConstraints = getConstraintList([], conf.signatureVar, xorVarMap, varTypes, returnList=True)
+                newConstraintList = [xorVarMap.get(i) for i in constraintList]
+                flexConstraints = list(set(flexConstraints).difference(newConstraintList))
+                print("DEBUG: n-of-n constraints: ", newConstraintList)
+                print("DEBUG: m-of-n constraints: ", flexConstraints)
+                constraints = newConstraintList
+                mofnConstraints = flexConstraints
         elif short == SHORT_FORALL:
             fileSuffix = 'both' #default
             _constraintList = [xorVarMap.get(i) for i in constraintList]
@@ -414,15 +425,29 @@ def main(sdlFile, config, sdlVerbose=False):
     print("reducing size of '%s'" % short) 
 
     varTypes = dict(sdl.getVarTypes().get(TYPES_HEADER))
-    assert config.schemeType == PUB_SCHEME, "Cannot work with any other type of scheme at the moment"
-    (stmtS, typesS, depListS, depListNoExpS, infListS, infListNoExpS) = sdl.getVarInfoFuncStmts( config.setupFuncName )
-    (stmtK, typesK, depListK, depListNoExpK, infListK, infListNoExpK) = sdl.getVarInfoFuncStmts( config.keygenFuncName )
-    (stmtE, typesE, depListE, depListNoExpE, infListE, infListNoExpE) = sdl.getVarInfoFuncStmts( config.encryptFuncName )    
-    (stmtD, typesD, depListD, depListNoExpD, infListD, infListNoExpD) = sdl.getVarInfoFuncStmts( config.decryptFuncName )
-    varTypes.update(typesS)
-    varTypes.update(typesK)
-    varTypes.update(typesE)
-    varTypes.update(typesD)
+    if not hasattr(config, 'schemeType'):
+        sys.exit("'schemeType' option missing in specified config file.")
+        
+    if config.schemeType == PUB_SCHEME:
+        (stmtS, typesS, depListS, depListNoExpS, infListS, infListNoExpS) = sdl.getVarInfoFuncStmts( config.setupFuncName )
+        (stmtK, typesK, depListK, depListNoExpK, infListK, infListNoExpK) = sdl.getVarInfoFuncStmts( config.keygenFuncName )
+        (stmtE, typesE, depListE, depListNoExpE, infListE, infListNoExpE) = sdl.getVarInfoFuncStmts( config.encryptFuncName )    
+        (stmtD, typesD, depListD, depListNoExpD, infListD, infListNoExpD) = sdl.getVarInfoFuncStmts( config.decryptFuncName )
+        varTypes.update(typesS)
+        varTypes.update(typesK)
+        varTypes.update(typesE)
+        varTypes.update(typesD)
+    elif config.schemeType == SIG_SCHEME:
+        (stmtK, typesK, depListK, depListNoExpK, infListK, infListNoExpK) = sdl.getVarInfoFuncStmts( config.keygenFuncName )
+        (stmtS, typesS, depListS, depListNoExpS, infListS, infListNoExpS) = sdl.getVarInfoFuncStmts( config.signFuncName )    
+        (stmtV, typesV, depListV, depListNoExpV, infListV, infListNoExpV) = sdl.getVarInfoFuncStmts( config.verifyFuncName )
+        varTypes.update(typesK)
+        varTypes.update(typesS)
+        varTypes.update(typesV)
+        sys.exit("Still working on this...")
+    else:
+        sys.exit("'schemeType' options are 'PUB' or 'SIG'")
+        
     generators = []
     print("List of generators for scheme")
     if hasattr(config, "extraSetupFuncName"):
