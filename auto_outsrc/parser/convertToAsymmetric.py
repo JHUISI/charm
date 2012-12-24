@@ -50,6 +50,19 @@ class GetPairingVariables:
         elif Type(node.left) != ops.ATTR and Type(node.right) == ops.ATTR:
             pass
 
+class CheckForPairing:
+    def __init__(self):
+        self.hasPairings = False
+    
+    def visit(self, node, data):
+        pass
+    
+    def visit_pair(self, node, data):
+        self.hasPairings = True
+        
+    def getHasPairings(self):
+        return self.hasPairings
+
 class transformXOR:
     def __init__(self, fixedValues):
         self.groundTruth = fixedValues
@@ -395,7 +408,7 @@ def searchForSolution(short, constraintList, txor, varTypes, conf):
 
 
 def main(sdlFile, config, sdlVerbose=False):
-    sdl.parseFile2(sdlFile, sdlVerbose)
+    sdl.parseFile2(sdlFile, sdlVerbose, ignoreCloudSourcing=True)
     global assignInfo
     assignInfo = sdl.getAssignInfo()
     setting = sdl.assignInfo[sdl.NONE_FUNC_NAME][ALGEBRAIC_SETTING].getAssignNode().getRight().getAttribute()
@@ -437,14 +450,18 @@ def main(sdlFile, config, sdlVerbose=False):
         varTypes.update(typesK)
         varTypes.update(typesE)
         varTypes.update(typesD)
+        # TODO: expand search to encrypt and portentially setup
+        pairingSearch = [stmtD] # aka start with decrypt.
     elif config.schemeType == SIG_SCHEME:
+        if hasattr(config, 'setupFuncName'): (stmtS, typesS, depListS, depListNoExpS, infListS, infListNoExpS) = sdl.getVarInfoFuncStmts( config.setupFuncName )
         (stmtK, typesK, depListK, depListNoExpK, infListK, infListNoExpK) = sdl.getVarInfoFuncStmts( config.keygenFuncName )
-        (stmtS, typesS, depListS, depListNoExpS, infListS, infListNoExpS) = sdl.getVarInfoFuncStmts( config.signFuncName )    
+        (stmtSi, typesSi, depListSi, depListNoExpSi, infListSi, infListNoExpSi) = sdl.getVarInfoFuncStmts( config.signFuncName )    
         (stmtV, typesV, depListV, depListNoExpV, infListV, infListNoExpV) = sdl.getVarInfoFuncStmts( config.verifyFuncName )
         varTypes.update(typesK)
-        varTypes.update(typesS)
+        varTypes.update(typesSi)
         varTypes.update(typesV)
-        sys.exit("Still working on this...")
+        pairingSearch = [stmtV] # aka start with verify
+#        sys.exit("Still working on this...")
     else:
         sys.exit("'schemeType' options are 'PUB' or 'SIG'")
         
@@ -454,8 +471,11 @@ def main(sdlFile, config, sdlVerbose=False):
         (stmtSe, typesSe, depListSe, depListNoExpSe, infListSe, infListNoExpSe) = sdl.getVarInfoFuncStmts( config.extraSetupFuncName )
         extractGeneratorList(stmtSe, typesSe, generators)
         varTypes.update(typesSe)
-    extractGeneratorList(stmtS, typesS, generators)
     
+    if hasattr(config, 'setupFuncName'):
+        extractGeneratorList(stmtS, typesS, generators) # extract generators from setup if defined
+    else:
+        sys.exit("Assumption failed: setup not defined for this function. Where to extract generators?")
     
     # need a Visitor class to build these variables  
     # TODO: expand to other parts of algorithm including setup, keygen, encrypt 
@@ -463,18 +483,24 @@ def main(sdlFile, config, sdlVerbose=False):
     pair_vars_G1_lhs = [] 
     pair_vars_G1_rhs = []
     gpv = GetPairingVariables(pair_vars_G1_lhs, pair_vars_G1_rhs) 
-    lines = stmtD.keys()
-    for i in lines:
-#        print("type: ", type(stmtD[i]))
-#        print("type: ",  type(stmtS[i]), type(stmtS[i]) == sdl.VarInfo, type(stmtS[i]) == sdl.ForLoop)
-        if type(stmtD[i]) == sdl.VarInfo:
-            if stmtD[i].getHasPairings():
-                sdl.ASTVisitor( gpv ).preorder( stmtD[i].getAssignNode() )
-            elif stmtD[i].getHashArgsInAssignNode(): 
-                # in case, there's a hashed values...build up list and check later to see if it appears
-                # in pairing variable list
-                hashVarList.append(str(stmtD[i].getAssignVar()))
-
+    for eachStmt in pairingSearch:
+        lines = eachStmt.keys()
+        for i in lines:
+            if type(eachStmt[i]) == sdl.VarInfo:
+                print("Each: ", eachStmt[i].getAssignNode())
+                cfp = CheckForPairing()
+                if eachStmt[i].getHasPairings():
+                    sdl.ASTVisitor( gpv ).preorder( eachStmt[i].getAssignNode() )
+                elif eachStmt[i].getHashArgsInAssignNode(): 
+                    # in case, there's a hashed values...build up list and check later to see if it appears
+                    # in pairing variable list
+                    hashVarList.append(str(eachStmt[i].getAssignVar()))
+                else:
+                    assignNode = eachStmt[i].getAssignNode()
+                    sdl.ASTVisitor( cfp ).preorder( assignNode )
+                    if cfp.getHasPairings():
+                        sdl.ASTVisitor( gpv ).preorder( assignNode )
+                
     constraintList = []
     # determine if any hashed values in decrypt show up in a pairing
     for i in hashVarList:
@@ -482,6 +508,7 @@ def main(sdlFile, config, sdlVerbose=False):
             constraintList.append(i)
     print("pair vars LHS:", pair_vars_G1_lhs)
     print("pair vars RHS:", pair_vars_G1_rhs) 
+    if config.schemeType == SIG_SCHEME: sys.exit(0) # TODO: need to resolve when to incorporate the split pairings technique 
     print("list of gens :", generators)
     info = {}
     info[ 'G1_lhs' ] = (pair_vars_G1_lhs, assignTraceback(generators, varTypes, pair_vars_G1_lhs, constraintList))
@@ -489,7 +516,6 @@ def main(sdlFile, config, sdlVerbose=False):
 
     print("info => G1 lhs : ", info['G1_lhs'])
     print("info => G1 rhs : ", info['G1_rhs'])
-#    sys.exit(0)
     
     print("<===== Determine Asymmetric Generators =====>")
     (generatorLines, generatorMapG1, generatorMapG2) = Step1_DeriveSetupGenerators(generators, info)
@@ -542,45 +568,44 @@ def main(sdlFile, config, sdlVerbose=False):
     noChangeList = []
         
     newLinesSe = []
-    entireSDL = sdl.getLinesOfCode()
+    newLinesS = []
+#    entireSDL = sdl.getLinesOfCode()
     if hasattr(config, "extraSetupFuncName"):
         print("<===== transforming %s =====>" % config.extraSetupFuncName)
         newLinesSe = transformFunction(entireSDL, config.extraSetupFuncName, stmtSe, groupInfo, noChangeList, generatorLines)
         print("<===== transforming %s =====>" % config.extraSetupFuncName)
-    
-    print("<===== transforming %s =====>" % config.setupFuncName)
-    newLinesS = transformFunction(entireSDL, config.setupFuncName, stmtS, groupInfo, noChangeList, generatorLines)
-    print("<===== transforming %s =====>" % config.setupFuncName)
+
+    if hasattr(config, 'setupFuncName'):    
+        print("<===== transforming %s =====>" % config.setupFuncName)
+        newLinesS = transformFunction(entireSDL, config.setupFuncName, stmtS, groupInfo, noChangeList, generatorLines)
+        print("<===== transforming %s =====>" % config.setupFuncName)
 
     print("<===== transforming %s =====>" % config.keygenFuncName) 
     newLinesK = transformFunction(entireSDL, config.keygenFuncName, stmtK, groupInfo, noChangeList)
     print("<===== transforming %s =====>" % config.keygenFuncName)
-    
-    print("<===== transforming %s =====>" % config.encryptFuncName)
-    newLinesE = transformFunction(entireSDL, config.encryptFuncName, stmtE, groupInfo, noChangeList)
-    print("<===== transforming %s =====>" % config.encryptFuncName)
 
-    print("<===== transforming %s =====>" % config.decryptFuncName)
-    newLinesD = transformFunction(entireSDL, config.decryptFuncName, stmtD, groupInfo, noChangeList)
-    print("<===== transforming %s =====>" % config.decryptFuncName)
+    if config.schemeType == PUB_SCHEME:
+        print("<===== transforming %s =====>" % config.encryptFuncName)
+        newLines2 = transformFunction(entireSDL, config.encryptFuncName, stmtE, groupInfo, noChangeList)
+        print("<===== transforming %s =====>" % config.encryptFuncName)
     
-
-    print("<===== new SDL =====>")
-    for i in newLinesS:
-        print(i)
-    print("\n\n")
-    for i in newLinesK:
-        print(i)
-    print("\n\n")
-    for i in newLinesE:
-        print(i)
-    print("\n\n")
-    for i in newLinesD:
-        print(i)
-    print("<===== new SDL =====>")
+        print("<===== transforming %s =====>" % config.decryptFuncName)
+        newLines3 = transformFunction(entireSDL, config.decryptFuncName, stmtD, groupInfo, noChangeList)
+        print("<===== transforming %s =====>" % config.decryptFuncName)
+    elif config.schemeType == SIG_SCHEME:
+        print("<===== transforming %s =====>" % config.signFuncName)
+        newLines2 = transformFunction(entireSDL, config.signFuncName, stmtSi, groupInfo, noChangeList)
+        print("<===== transforming %s =====>" % config.signFuncName)
+    
+        print("<===== transforming %s =====>" % config.verifyFuncName)
+        newLines3 = transformFunction(entireSDL, config.verifyFuncName, stmtV, groupInfo, noChangeList)
+        print("<===== transforming %s =====>" % config.verifyFuncName)
+        
+    # debug 
+    print_sdl(False, newLinesS, newLinesK, newLines2, newLines3)
     
     outputFile = bv_name + "_asym_" + fileSuffix
-    writeConfig(outputFile + ".bv", newLines0, newLines1, newLinesSe, newLinesS, newLinesK, newLinesE, newLinesD)
+    writeConfig(outputFile + ".bv", newLines0, newLines1, newLinesSe, newLinesS, newLinesK, newLines2, newLines3)
     return outputFile
 
 # temporary placement
@@ -1010,6 +1035,17 @@ def updatForPairing(varInfo, info):
             sdl.ASTVisitor( SubstitutePairings(i, info['baseGeneratorG2'], 'right')).preorder( node )    
     print("\n\t Changed: ", node)
     return str(node)
+
+def print_sdl(verbose, *args):
+    if verbose:
+        print("<===== new SDL =====>")    
+        for block in args:
+            for i in block:
+                print(i)
+            print("\n\n")
+        print("<===== new SDL =====>")
+    return
+    
 
 def writeConfig(filename, *args):
     f = open(filename, 'w')

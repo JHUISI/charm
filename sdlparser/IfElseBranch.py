@@ -15,6 +15,7 @@ class IfElseBranch:
         self.varDeps = []
         self.varDepsNoExponents = []
         self.equalityDepsNoExponents = []
+        self.hashArgsInAssignNode = []
         
     def getStartLineNo(self):
         return self.startLineNo
