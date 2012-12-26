@@ -174,7 +174,7 @@ def updateForIfConditional(node, assignVar, varInfo, info, theType, noChangeList
     info['generatorMapG1'][assignVar] = new_assignVar
     
     # in case of init() calls...
-    sdl.ASTVisitor( SubstituteVar('', str(theType)) ).preorder( new_node2 )
+    sdl.ASTVisitor( SubstituteVar('', str(theType), initChange=True) ).preorder( new_node2 )
     return new_node2
 
 def handleVarInfo(newLines, assign, blockStmt, info, noChangeList, startLines=[]):
@@ -946,7 +946,7 @@ def updateAllForG1(node, assignVar, varInfo, info, changeLeftVar, noChangeList=[
     # see if it is initCall:
     if varInfo.getInitCall():
         # make change and return here
-        sdl.ASTVisitor( SubstituteVar('', str(types.G1)) ).preorder( new_node2 )
+        sdl.ASTVisitor( SubstituteVar('', str(types.G1), initChange=True) ).preorder( new_node2 )
         return str(new_node2)
     
     newVarDeps = set(varDeps).difference(noChangeList)
@@ -983,7 +983,7 @@ def updateAllForG2(node, assignVar, varInfo, info, changeLeftVar, noChangeList=[
     # see if it is initCall:
     if varInfo.getInitCall():
         # make change and return here
-        sdl.ASTVisitor( SubstituteVar('', str(types.G2)) ).preorder( new_node2 )
+        sdl.ASTVisitor( SubstituteVar('', str(types.G2), initChange=True) ).preorder( new_node2 )
         return str(new_node2)
     
     newVarDeps = set(varDeps).difference(noChangeList)

@@ -902,9 +902,11 @@ class FindT1:
                 print("T1 left :=", self.T1)
 
 class SubstituteVar:
-    def __init__(self, target, new_var):
+    def __init__(self, target, new_var, initChange=False):
         self.target = target
         self.new_var = new_var
+        self.initChange = initChange
+        
     def visit(self, node, data):
         pass
     
@@ -924,7 +926,7 @@ class SubstituteVar:
             node.listNodes[ind] = self.new_var
 
     def visit_func(self, node, data):
-        if node.attr == INIT_FUNC_NAME:
+        if node.attr == INIT_FUNC_NAME and self.initChange:
             del node.listNodes[:] # remove previous argument
             node.listNodes.append(self.new_var) # add new one
 #            print("node: ", node.attr, node.listNodes)

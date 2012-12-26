@@ -1,0 +1,37 @@
+name := dfa12
+setting := symmetric
+
+BEGIN :: types
+M := GT
+mpk := list
+msk := list
+sk := list
+ct := list
+END :: types
+
+
+BEGIN :: func:setup
+input := list{alphabet}
+g := random(G1)
+z := random(G1)
+h_start := random(G1)
+h_end := random(G1)
+
+A := len(alphabet)
+BEGIN :: for
+for{i := 0, A}
+a := alphabet#i
+h#a? = group.random(G1)
+END :: for
+
+alpha := random(ZR)        
+egg := e(g, g)^alpha
+msk := g ^ -alpha
+mpk := list{egg, g, z, h, h_start, h_end}
+
+output := list{mpk, msk}
+END :: func:setup
+
+
+BEGIN :: func:keygen
+input := list{mpk, msk, dfaM}
