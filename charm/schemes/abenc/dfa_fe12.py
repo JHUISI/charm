@@ -16,6 +16,7 @@ Brent Waters (Pairing-based)
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.DFA import DFA
 
+debug = False
 class FE_DFA:
     def __init__(self, _groupObj, _dfaObj):
         global group, dfaObj
@@ -96,7 +97,7 @@ class FE_DFA:
         B[0] = pair(C[0][1],  K['start1']) * (pair(C[0][2], K['start2']) ** -1)
         for i in range(1, l+1):
             ti = Ti[i]
-            print("transition: ", ti)
+            if debug: print("transition: ", ti)
             B[i] = B[i-1] * pair(C[i-1][1], K[str(ti)][1]) * (pair(C[i][2], K[str(ti)][2]) ** -1) * pair(C[i][1], K[str(ti)][3])
         
         x = dfaObj.getAcceptState(Ti) # retrieve accept state
@@ -115,10 +116,10 @@ def main():
     fe = FE_DFA(group, dfa)
     
     (mpk, msk) = fe.setup(alphabet)
-    print("mpk :=>", mpk, "\n\n")
+    if debug: print("mpk :=>", mpk, "\n\n")
     
     sk = fe.keygen(mpk, msk, dfaM)
-    print("sk :=>", sk)
+    if debug: print("sk :=>", sk)
     
     w = dfa.getSymbols("abba")
     M = group.random(GT)
@@ -126,9 +127,10 @@ def main():
     
     origM = fe.decrypt(sk, ct)
     assert M == origM, "failed decryption!"
-    print("Successful Decryption!!!!!")
+    if debug: print("Successful Decryption!!!!!")
     
 if __name__ == "__main__":
+    debug = True
     main()
     
     
