@@ -5,6 +5,7 @@ from secretListInKeygen import *
 from outsrctechniques import SubstituteVar
 import sys
 
+linesOfCode = None
 assignInfo = None
 varTypes = None
 astNodes = None
@@ -58,9 +59,10 @@ def replaceVarInstancesInLineNoRange(startLineNo, endLineNo, origVarName, newVar
     updateCodeAndStructs()
 
 def updateCodeAndStructs():
-    global assignInfo, varTypes, astNodes, forLoops, publicVarNames, secretVarNames, varDepList
+    global linesOfCode, assignInfo, varTypes, astNodes, forLoops, publicVarNames, secretVarNames, varDepList
 
     parseLinesOfCode(getLinesOfCode(), False)
+    linesOfCode = getLinesOfCode()
     assignInfo = getAssignInfo()
     varTypes = getVarTypes()
     astNodes = getAstNodes()

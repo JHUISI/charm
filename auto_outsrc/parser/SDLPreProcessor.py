@@ -96,8 +96,17 @@ def expandDotProdIntoForLoop(assignInfo, astNode, lineNo, outputFile):
 
     outputString = ""
     outputString += RESERVED_VAR_NAME + str(reservedVarNameNumber)
-    if (hasPairingsSomewhere(astNode) == True):
+
+    dotProdType = getVarTypeInfoRecursive(astNode.right.right)
+
+    if (dotProdType == types.G1):
+        outputString += " := init(G1)\n"
+    elif (dotProdType == types.G2):
+        outputString += " := init(G2)\n"
+    elif (dotProdType == types.GT):
         outputString += " := init(GT)\n"
+    elif (dotProdType == types.ZR):
+        outputString += " := init(ZR)\n"
     else:
         outputString += " := init(1)\n"
     outputString += "BEGIN :: for\n"
