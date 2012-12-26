@@ -68,11 +68,9 @@ class FE_DFA:
         C = {}
         C['m'] = M * (mpk['egg'] ** s[l])
         
-        C['start1'] = mpk['g'] ** s[0]
-        C['start2'] = mpk['h']['start'] ** s[0]
-        
         C[0] = {}
-        C[0][1] = C['start1']
+        C[0][1] = mpk['g'] ** s[0]
+        C[0][2] = mpk['h']['start'] ** s[0]
         
         for i in range(1, l+1):
             C[i] = {}
@@ -95,7 +93,7 @@ class FE_DFA:
             return False
         
         Ti = dfaObj.getTransitions(dfaM, w) # returns a tuple of transitions 
-        B[0] = pair(C['start1'],  K['start1']) * (pair(C['start2'], K['start2']) ** -1)
+        B[0] = pair(C[0][1],  K['start1']) * (pair(C[0][2], K['start2']) ** -1)
         for i in range(1, l+1):
             ti = Ti[i]
             print("transition: ", ti)
