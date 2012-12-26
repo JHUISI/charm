@@ -7,6 +7,10 @@ outputVarName = "output"
 
 M = 'M'
 
+doNotIncludeInTransformList = []
+
+listNameIndicator = "LISTNAMEINDICATOR"
+
 varNameLeftSideNoBlindedVars = "neverUseThisVarNameNoBlindedVars"
 varNameLeftSideBlindedVars = "neverUseThisVarNameBlindedVars"
 

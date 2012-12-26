@@ -57,7 +57,8 @@ msk := expand{alpha, t1, t2, t3, t4}
 
 r1 := random(ZR)
 r2 := random(ZR)
-hID := strToId(mpk, id)
+#hID := strToId(mpk, id)
+hID := stringToInt(id, 5, 32)
 hashIDDotProd := (prod{y := 0, n} on { hl#y ^ hID#y })
 hashID := hl#0 * hashIDDotProd
 
@@ -101,7 +102,8 @@ s := random(ZR)
 s1 := random(ZR)
 s2 := random(ZR)
 
-hID1 := strToId(mpk, id) # list <-: strToId(list, str)
+#hID1 := strToId(mpk, id) # list <-: strToId(list, str)
+hID1 := stringToInt(id, 5, 32)
 hashID1DotProd := (prod{y := 0, n} on { gl#y ^ hID1#y })
 hashID1 := gl#0 * hashID1DotProd
 
