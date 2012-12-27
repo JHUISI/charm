@@ -7,6 +7,13 @@ mpk := list
 msk := list
 sk := list
 ct := list
+T := list
+KList := list{G1, G1, G1}
+K := list{KList}
+KendList := list{G1, G1}
+Kend := list{KendList}
+C := list{G1}
+Cend1 := 
 END :: types
 
 
@@ -14,8 +21,8 @@ BEGIN :: func:setup
 input := list{alphabet}
 g := random(G1)
 z := random(G1)
-h_start := random(G1)
-h_end := random(G1)
+hstart := random(G1)
+hend := random(G1)
 
 A := len(alphabet)
 BEGIN :: for
@@ -27,7 +34,7 @@ END :: for
 alpha := random(ZR)        
 egg := e(g, g)^alpha
 msk := g ^ -alpha
-mpk := list{egg, g, z, h, h_start, h_end}
+mpk := list{egg, g, z, h, hstart, hend}
 
 output := list{mpk, msk}
 END :: func:setup
@@ -35,3 +42,101 @@ END :: func:setup
 
 BEGIN :: func:keygen
 input := list{mpk, msk, dfaM}
+mpk := expand{egg, g, z, h, hstart, hend}
+dfaM := expand{Q, S, T, q0, F}
+
+qlen = len(Q)
+BEGIN :: for
+for{i := 0, qlen+1}
+D#i := random(G1)
+END :: for
+
+rstart := random(ZR)
+Kstart1 := D#0 * (hstart ^ rstart)
+Kstart2 := g ^ rstart
+
+Tlen := len(T)
+BEGIN :: for
+for{i := 0, Tlen}
+r := random(ZR)
+x := t#0
+y := t#1
+tt := t#2
+key := str(t)
+
+K#key#1? := (D#x ^ -1) * (z ^ r)
+K#key#2? := g ^ r
+K#key#3? := D#y * (h#tt ^ r)
+END :: for
+        
+
+Flen := len(F)
+BEGIN :: for
+for{i := 0, Flen}
+n := F#i
+rx := random(ZR)
+Kend#x#1? := msk * D#x * (hend ^ rx)
+Kend#x#2? := g ^ rx
+END :: for
+            
+sk := list{Kstart1, Kstart2, K, Kend, dfaM}
+output := sk
+END :: func:keygen
+
+
+
+BEGIN :: func:encrypt
+input := list{mpk, w, M}
+mpk := expand{egg, g, z, h, h_start, h_end}
+l := len(w)
+
+BEGIN :: for
+for{i := 0, l+1}
+s#i := random(G1)
+END :: for
+
+Cm := M * (egg ^ s#l)
+        
+C#0#1? := g ^ s#0
+C#0#2? := h_start ^ s#0
+
+BEGIN :: for
+for{i := 1, l+1}
+a := str(w#i)        
+C#i#1? := g ^ s#i
+C#i#2? := (h#a ^ s#i) * (z ^ s#i-1?)
+
+Cend1 := g ^ s#l
+Cend2 := h_end ^ s#l        
+
+ct := list{Cm, C, Cend1, Cend2, w}
+output := ct
+END :: func:encrypt
+
+
+
+BEGIN :: func:decrypt
+input := list{sk, ct}
+sk := expand{Kstart1, Kstart2, K, Kend, dfaM}
+ct := expand{Cm, C, Cend1, Cend2, w}
+l := len(w)
+
+BEGIN :: if
+if { accept(dfaM, w) == False }
+   output := False
+   return
+END :: if
+
+Ti := getTransitions(dfaM, w)
+B#0 := e(C#0#1, Kstart1) * (e(C#0#2, Kstart2)^-1)
+BEGIN :: for
+for{i := 1, l+1}
+ti := str(Ti#i)
+B#i := (B#i-1? * (e(C#i-1#1, K#ti#1) * (e(C#i#2, K#ti#2)^-1) * e(C#i#1, K#ti#3)))
+END :: for
+        
+x := getAcceptState(Ti)
+Bend := (B#l * (e(Cend1, Kend#x#1)^-1) * e(Cend2, Kend#x#2)) 
+M := Cm / Bend
+output := M
+END :: func:decrypt

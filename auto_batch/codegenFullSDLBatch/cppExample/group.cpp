@@ -141,6 +141,27 @@ Element::Element(ZR & z)
 	isAllocated = false;
 }
 
+Element::Element(CharmListZR & zList)
+{
+	type 	 = listZR_t;
+	zrList   = zList;
+	isAllocated = false;
+}
+
+Element::Element(CharmListG1 & gList)
+{
+	type 	 = listG1_t;
+	g1List   = gList;
+	isAllocated = false;
+}
+
+Element::Element(CharmListGT & gList)
+{
+	type 	 = listGT_t;
+	gtList   = gList;
+	isAllocated = false;
+}
+
 void Element::createNew(ZR &z)
 {
 	type = ZR_t;
@@ -196,12 +217,20 @@ Element::Element(const Element& e)
 		strPtr = e.strPtr;
 	else if(type == ZR_t)
 		zr = e.zr;
+	else if(type == listZR_t)
+		zrList = e.zrList;
 	else if(type == G1_t)
 		g1 = e.g1;
+	else if(type == listG1_t)
+		g1List = e.g1List;
 	else if(type == G2_t)
 		g2 = e.g2;
+	else if(type == listG2_t)
+		g2List = e.g2List;
 	else if(type == GT_t)
 		gt = e.gt;
+	else if(type == listGT_t)
+		gtList = e.gtList;
 
 	isAllocated = false; // in case e.createNew() was called.
 }
@@ -211,6 +240,13 @@ ZR Element::getZR()
 	if(type == ZR_t) return zr;
 	throw new string("invalid type.");
 }
+
+CharmListZR Element::getListZR()
+{
+	if(type == listZR_t) return zrList;
+	throw new string("invalid type.");
+}
+
 
 ZR & Element::getRefZR()
 {
@@ -224,10 +260,30 @@ G1 Element::getG1()
 	throw new string("invalid type.");
 }
 
+CharmListG1 Element::getListG1()
+{
+	if(type == listG1_t) return g1List;
+	throw new string("invalid type.");
+}
+
+
 #ifdef ASYMMETRIC
+Element::Element(CharmListG2 & gList)
+{
+	type 	 = listG2_t;
+	g2List   = gList;
+	isAllocated = false;
+}
+
 G2 Element::getG2()
 {
 	if(type == G2_t) return g2;
+	throw new string("invalid type.");
+}
+
+CharmListG2 Element::getListG2()
+{
+	if(type == listG2_t) return g2List;
 	throw new string("invalid type.");
 }
 
@@ -244,6 +300,12 @@ GT Element::getGT()
 	throw new string("invalid type.");
 }
 
+CharmListGT Element::getListGT()
+{
+	if(type == listGT_t) return gtList;
+	throw new string("invalid type.");
+}
+
 string Element::str()
 {
 	stringstream ss;
@@ -251,12 +313,20 @@ string Element::str()
 		ss << strPtr;
 	else if(type == ZR_t)
 		ss << zr;
+	else if(type == listZR_t)
+		ss << zrList;
 	else if(type == G1_t)
 		ss << g1.g;
+	else if(type == listG1_t)
+		ss << g1List;
 	else if(type == G2_t)
 		ss << g2.g;
+	else if(type == listG2_t)
+		ss << g2List;
 	else if(type == GT_t)
 		ss << gt.g;
+	else if(type == listGT_t)
+		ss << gtList;
 	return ss.str();
 }
 
@@ -276,8 +346,8 @@ Element::~Element()
 	}
 }
 
-void Element::delGroupElement()
-{
+//void Element::delGroupElement()
+//{
 //	if(type == ZR_t)
 //	    delete zr;
 //	else if(type == G1_t)
@@ -286,7 +356,7 @@ void Element::delGroupElement()
 //	    delete g2;
 //	else if(type == GT_t)
 //	    delete gt;
-}
+//}
 
 Element Element::operator=(const Element& e)
 {
@@ -298,37 +368,24 @@ Element Element::operator=(const Element& e)
 		strPtr = e.strPtr;
 	else if(type == ZR_t)
 		zr = e.zr;
+	else if(type == listZR_t)
+		zrList = e.zrList;
 	else if(type == G1_t)
 		g1 = e.g1;
+	else if(type == listG1_t)
+		g1List = e.g1List;
 	else if(type == G2_t)
 		g2 = e.g2;
+	else if(type == listG2_t)
+		g2List = e.g2List;
 	else if(type == GT_t)
 		gt = e.gt;
+	else if(type == listGT_t)
+		gtList = e.gtList;
 
 	isAllocated = false; // in case e.createNew() was called.
 	return *this;
 }
-
-
-//Element Element::operator=(const GT& g)
-//{
-//	cout << "Element op= was called...." << endl;
-//	GT new_g = g;
-//	Element e = Element(new_g);
-//	this->type = GT_t;
-//	this->gt = new_g;
-//	cout << "operator= GT :=> " << this->gt.g << endl;
-//	return *this;
-////	if(this->gt == g)
-////		return *this;
-////	cout << "operator= GT :=> " << gt.g << endl;
-////	type = GT_t;
-////	gt = GT(g);
-////
-////
-////	isAllocated = false; // in case e.createNew() was called.
-////	return *this;
-//}
 
 CharmList Element::operator+ (const Element& e) const
 {
@@ -485,6 +542,7 @@ void CharmList::insert(int index, ZR & zr)
 }
 
 
+
 void CharmList::append(ZR & zr)
 {
 	Element elem(zr);
@@ -639,7 +697,38 @@ void CharmList::append(const CharmList & c)
 	}
 }
 
+void CharmList::insert(int index, CharmListZR c)
+{
+	CharmListZR c2 = c;
+	Element elem(c2);
+	list[index] = elem;
+	cur_index++;
+}
 
+void CharmList::insert(int index, CharmListG1 c)
+{
+	CharmListG1 c2 = c;
+	Element elem(c2);
+	list[index] = elem;
+	cur_index++;
+}
+#ifdef ASYMMETRIC
+void CharmList::insert(int index, CharmListG2 c)
+{
+	CharmListG2 c2 = c;
+	Element elem(c2);
+	list[index] = elem;
+	cur_index++;
+}
+#endif
+
+void CharmList::insert(int index, CharmListGT c)
+{
+	CharmListGT c2 = c;
+	Element elem(c2);
+	list[index] = elem;
+	cur_index++;
+}
 
 Element& CharmList::operator[](const int index)
 {
@@ -695,7 +784,7 @@ ostream& operator<<(ostream& s, const CharmList& cList)
 {
 	CharmList cList2 = cList;
 	for(int i = 0; i < cList2.length(); i++) {
-		s << i << ": " << cList2.printAtIndex(i) << endl;
+		s << "[" << i << "]:" << cList2.printAtIndex(i) << endl;
 	}
 
 	return s;
@@ -715,16 +804,28 @@ string CharmList::printAtIndex(int index)
 		else if(t == ZR_t) {
 			ss << list[i].zr;
 		}
+		else if(t == listZR_t) {
+			ss << "ZR list\n" << list[i].zrList;
+		}
 		else if(t == G1_t) {
 			ss << list[i].g1.g;
+		}
+		else if(t == listG1_t) {
+			ss << "G1 list\n" << list[i].g1List;
 		}
 #ifdef ASYMMETRIC
 		else if(t == G2_t) {
 			ss << list[i].g2.g;
 		}
+		else if(t == listG2_t) {
+			ss << "G2 list\n" << list[i].g2List;
+		}
 #endif
 		else if(t == GT_t) {
 			ss << list[i].gt.g;
+		}
+		else if(t == listGT_t) {
+			ss << "GT list\n" << list[i].gtList;
 		}
 	}
 
@@ -846,6 +947,12 @@ CharmListZR::CharmListZR(const CharmListZR& cList)
 	//copy constructor
 	cur_index = cList.cur_index;
 	list = cList.list;
+}
+
+void CharmListZR::insert(int index, ZR zr)
+{
+	list[index] = zr;
+	cur_index++;
 }
 
 void CharmListZR::append(ZR & zr)
@@ -1053,6 +1160,12 @@ CharmListG1::CharmListG1(const CharmListG1& cList)
 	//copy constructor
 	cur_index = cList.cur_index;
 	list = cList.list;
+}
+
+void CharmListG1::insert(int index, G1 g)
+{
+	list[index] = g;
+	cur_index++;
 }
 
 void CharmListG1::append(G1 & g)
@@ -1266,6 +1379,12 @@ CharmListG2::CharmListG2(const CharmListG2& cList)
 	//copy constructor
 	cur_index = cList.cur_index;
 	list = cList.list;
+}
+
+void CharmListG2::insert(int index, G2 g)
+{
+	list[index] = g;
+	cur_index++;
 }
 
 void CharmListG2::append(G2 & g)

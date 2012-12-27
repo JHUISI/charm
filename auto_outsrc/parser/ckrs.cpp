@@ -5,10 +5,6 @@
 #include <list>
 using namespace std;
 
-int N = 2;
-
-int secparam = 80;
-
 PairingGroup group(AES_SECURITY);
 
 void setup(ZR & n, ZR & l, CharmList & mpk, CharmList & msk)
@@ -67,13 +63,13 @@ void setup(ZR & n, ZR & l, CharmList & mpk, CharmList & msk)
 
 void extract(CharmList & mpk, CharmList & msk, string & id, ZR & blindingFactord0Blinded, ZR & blindingFactord1Blinded, ZR & blindingFactord2Blinded, ZR & blindingFactor0Blinded, ZR & blindingFactor1Blinded, CharmList & skBlinded)
 {
-    string idBlinded = group.init(string_t);
+    string idBlinded; //= group.init(string_t); fix in CG
     ZR zz = group.init(ZR_t);
     GT omega;
     G1 g;
     G2 h;
-    G1 gl;
-    G2 hl;
+    CharmListG1 gl; // incorrect type -- fix in CG
+    CharmListG2 hl; // incorrect type -- fix in CG
     G1 v1;
     G1 v2;
     G1 v3;
@@ -117,8 +113,8 @@ void extract(CharmList & mpk, CharmList & msk, string & id, ZR & blindingFactord
     omega = mpk[0].getGT();
     g = mpk[1].getG1();
     h = mpk[2].getG2();
-    gl = mpk[3].getG1();
-    hl = mpk[4].getG2();
+    gl = mpk[3].getListG1();
+    hl = mpk[4].getListG2();
     v1 = mpk[5].getG1();
     v2 = mpk[6].getG1();
     v3 = mpk[7].getG1();
@@ -134,7 +130,7 @@ void extract(CharmList & mpk, CharmList & msk, string & id, ZR & blindingFactord
     r1 = group.random(ZR_t);
     r2 = group.random(ZR_t);
     hID = stringToInt(group, id, 5, 32);
-    group.init(reservedVarName0);
+    //group.init(reservedVarName0);
     for (int y = 0; y < n; y++)
     {
         reservedVarName1 = group.exp(hl[y], hID[y]);
@@ -175,8 +171,8 @@ void encrypt(CharmList & mpk, GT & M, string & id, CharmList & ct)
     GT omega;
     G1 g;
     G2 h;
-    G1 gl;
-    G2 hl;
+    CharmListG1 gl; // fix in CG ==> G1 gl;
+    CharmListG2 hl; // fix in CG ==> G2 hl;
     G1 v1;
     G1 v2;
     G1 v3;
@@ -201,8 +197,8 @@ void encrypt(CharmList & mpk, GT & M, string & id, CharmList & ct)
     omega = mpk[0].getGT();
     g = mpk[1].getG1();
     h = mpk[2].getG2();
-    gl = mpk[3].getG1();
-    hl = mpk[4].getG2();
+    gl = mpk[3].getListG1();
+    hl = mpk[4].getListG2();
     v1 = mpk[5].getG1();
     v2 = mpk[6].getG1();
     v3 = mpk[7].getG1();
@@ -213,7 +209,7 @@ void encrypt(CharmList & mpk, GT & M, string & id, CharmList & ct)
     s1 = group.random(ZR_t);
     s2 = group.random(ZR_t);
     hID1 = stringToInt(group, id, 5, 32);
-    group.init(reservedVarName2);
+    //group.init(reservedVarName2); // fix in CG
     for (int y = 0; y < n; y++)
     {
         reservedVarName3 = group.exp(gl[y], hID1[y]);
@@ -308,7 +304,7 @@ void decout(CharmList & sk, CharmList & ct, CharmList & transformOutputList, ZR 
 
 int main()
 {
-    CharmList mpk, msk, skBlinded, ct, transformOutputList;;
+    CharmList mpk, msk, skBlinded, ct, transformOutputList;
     ZR blindingFactord0Blinded, blindingFactord1Blinded, blindingFactord2Blinded, blindingFactor0Blinded, blindingFactor1Blinded;
     ZR n = 5;
     ZR l = 32;

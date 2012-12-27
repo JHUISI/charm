@@ -29,17 +29,21 @@
      delete k[v].delGroupElement();
 
 //enum Type { ZR_t = 0, G1_t, G2_t, GT_t, Str_t, None_t };
-enum ZR_type { ZR_t = 0 };
-enum G1_type { G1_t = 1 };
-enum G2_type { G2_t = 2 };
-enum GT_type { GT_t = 3 };
-enum Str_type { Str_t = 4 };
-enum None_type { None_t = 5 };
+enum ZR_type { ZR_t = 0, listZR_t = 1 };
+enum G1_type { G1_t = 2, listG1_t = 3 };
+enum G2_type { G2_t = 4, listG2_t = 5 };
+enum GT_type { GT_t = 6, listGT_t = 7 };
+enum Str_type { Str_t = 8, listStr_t = 9 };
+enum None_type { None_t = 10 };
 
 string _base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len);
 string _base64_decode(string const& encoded_string);
 bool is_base64(unsigned char c);
 
+class CharmListZR;
+class CharmListG1;
+class CharmListG2;
+class CharmListGT;
 class Element;
 
 class CharmList
@@ -63,23 +67,27 @@ public:
 	void append(const GT&);
 	void append(Element&);
 	void append(const Element&);
+	void append(const CharmList&);
 
 	void insert(int, const char *);
 	void insert(int, string);
 	void insert(int, ZR&);
 	void insert(int, const ZR&);
+	void insert(int, CharmListZR);
 	void insert(int, G1&);
 	void insert(int, const G1&);
+	void insert(int, CharmListG1);
 #ifdef ASYMMETRIC
 	void insert(int, G2&);
 	void insert(int, const G2&);
+	void insert(int, CharmListG2);
 #endif
 	void insert(int, GT&);
 	void insert(int, const GT&);
+	void insert(int, CharmListGT);
 	void insert(int, Element&);
 	void insert(int, const Element&);
-
-	void append(const CharmList&);
+	//void append(const CharmList&);
 
 	int length(); // return length of lists
 	string printAtIndex(int index);
@@ -96,6 +104,92 @@ private:
 	map<int, Element> list;
 };
 
+class CharmListZR
+{
+public:
+	CharmListZR(void); // static list
+	~CharmListZR();
+    CharmListZR(const CharmListZR&); // copy constructor
+    CharmListZR& operator=(const CharmListZR&);
+	void insert(int, ZR);
+	void append(ZR&);
+	void set(int index, ZR);
+	ZR& get(const int index);
+	int length(); // return length of lists
+	string printAtIndex(int index);
+
+	// retrieve a particular index
+	ZR& operator[](const int index);
+
+    friend ostream& operator<<(ostream&, const CharmListZR&);
+private:
+	int cur_index;
+	map<int, ZR> list;
+};
+
+class CharmListG1
+{
+public:
+	CharmListG1(void); // static list
+	~CharmListG1();
+    CharmListG1(const CharmListG1&);
+	void insert(int, G1);
+	void append(G1&);
+	void set(int index, G1);
+//	G1& get(const int index);
+	int length(); // return length of lists
+	string printAtIndex(int index);
+
+	// retrieve a particular index
+	G1& operator[](const int index);
+	CharmListG1& operator=(const CharmListG1&);
+    friend ostream& operator<<(ostream&, const CharmListG1&);
+private:
+	int cur_index;
+	map<int, G1> list;
+};
+
+class CharmListG2
+{
+public:
+	CharmListG2(void); // static list
+	~CharmListG2();
+    CharmListG2(const CharmListG2&);
+	void insert(int, G2);
+	void append(G2&);
+	int length(); // return length of lists
+	string printAtIndex(int index);
+
+	// retrieve a particular index
+	G2& operator[](const int index);
+	CharmListG2& operator=(const CharmListG2&);
+    friend ostream& operator<<(ostream&, const CharmListG2&);
+private:
+	int cur_index;
+	map<int, G2> list;
+};
+
+class CharmListGT
+{
+public:
+	CharmListGT(void);
+	~CharmListGT();
+    CharmListGT(const CharmListGT&);
+	void insert(int, GT&);
+	void append(GT&);
+	int length(); // return length of lists
+	string printAtIndex(int index);
+
+	// retrieve a particular index
+	GT& operator[](const int index);
+	CharmListGT& operator=(const CharmListGT&);
+    friend ostream& operator<<(ostream&, const CharmListGT&);
+private:
+	int cur_index;
+	map<int, GT> list;
+};
+
+
 class Element
 {
 public:
@@ -105,33 +199,45 @@ public:
 	G1 g1;
 	G2 g2;
 	GT gt;
+	CharmListZR zrList;
+	CharmListG1 g1List;
+	CharmListG2 g2List;
+	CharmListGT gtList;
 	string strPtr;
 	Element();
 	~Element();
 	Element(const char *);
 	Element(string);
 	Element(ZR&);
+	Element(CharmListZR&);
 	Element(G1&);
+	Element(CharmListG1&);
 #ifdef ASYMMETRIC
 	Element(G2&);
+	Element(CharmListG2&);
  	G2 getG2(); // returns value (or copy)
+ 	CharmListG2 getListG2(); // returns value (or copy)
  	G2& getRefG2(); // returns reference for G2 (for cleanup)
 	void createNew(G2);
 #endif
 	Element(GT&);
+	Element(CharmListGT&);
 	Element(CharmList&);
  	Element(const Element& e);
  	ZR getZR(); // returns value (or copy)
  	ZR& getRefZR(); // returns reference for ZR (for cleanup)
+ 	CharmListZR getListZR(); // returns value (or copy)
  	G1 getG1(); // getter methods
+ 	CharmListG1 getListG1(); // returns value (or copy)
  	G1& getRefG1(); // getter methods
  	GT getGT();
+ 	CharmListGT getListGT(); // returns value (or copy)
  	GT& getRefGT();
 	string str();
 	void createNew(ZR&);
 	void createNew(G1);
 	void createNew(GT);
-	void delGroupElement();
+	//void delGroupElement();
 
 	static string serialize(Element&);
 	static void deserialize(Element&, string&);
@@ -170,28 +276,6 @@ private:
 	map<int, string> list;
 };
 
-class CharmListZR
-{
-public:
-	CharmListZR(void); // static list
-	~CharmListZR();
-    CharmListZR(const CharmListZR&); // copy constructor
-    CharmListZR& operator=(const CharmListZR&);
-	void append(ZR&);
-	void set(int index, ZR);
-	ZR& get(const int index);
-	int length(); // return length of lists
-	string printAtIndex(int index);
-
-	// retrieve a particular index
-	ZR& operator[](const int index);
-        
-    friend ostream& operator<<(ostream&, const CharmListZR&);
-private:
-	int cur_index;
-	map<int, ZR> list;
-};
-
 class CharmMetaListZR
 {
 public:
@@ -212,27 +296,6 @@ public:
 private:
 	int cur_index;
 	map<int, CharmListZR> list;
-};
-
-class CharmListG1
-{
-public:
-	CharmListG1(void); // static list
-	~CharmListG1();
-    CharmListG1(const CharmListG1&);
-	void append(G1&);
-	void set(int index, G1);
-//	G1& get(const int index);
-	int length(); // return length of lists
-	string printAtIndex(int index);
-
-	// retrieve a particular index
-	G1& operator[](const int index);
-	CharmListG1& operator=(const CharmListG1&);
-    friend ostream& operator<<(ostream&, const CharmListG1&);
-private:
-	int cur_index;
-	map<int, G1> list;
 };
 
 class CharmMetaListG1
@@ -258,25 +321,6 @@ private:
 	map<int, CharmListG1> list;
 };
 
-class CharmListG2
-{
-public:
-	CharmListG2(void); // static list
-	~CharmListG2();
-    CharmListG2(const CharmListG2&);
-	void append(G2&);
-	int length(); // return length of lists
-	string printAtIndex(int index);
-
-	// retrieve a particular index
-	G2& operator[](const int index);
-	CharmListG2& operator=(const CharmListG2&);
-    friend ostream& operator<<(ostream&, const CharmListG2&);
-private:
-	int cur_index;
-	map<int, G2> list;
-};
-
 class CharmMetaListG2
 {
 public:
@@ -298,26 +342,6 @@ public:
 private:
 	int cur_index;
 	map<int, CharmListG2> list;
-};
-
-
-class CharmListGT
-{
-public:
-	CharmListGT(void);
-	~CharmListGT();
-    CharmListGT(const CharmListGT&);
-	void append(GT&);
-	int length(); // return length of lists
-	string printAtIndex(int index);
-
-	// retrieve a particular index
-	GT& operator[](const int index);
-	CharmListGT& operator=(const CharmListGT&);
-    friend ostream& operator<<(ostream&, const CharmListGT&);
-private:
-	int cur_index;
-	map<int, GT> list;
 };
 
 class CharmMetaListGT

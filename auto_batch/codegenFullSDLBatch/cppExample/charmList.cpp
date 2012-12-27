@@ -4,13 +4,15 @@
 #include <string>
 using namespace std;
 
-ZR SmallExp(int bits) {
+/*
+ZR smallExp(int bits) {
 	big t = mirvar(0);
 	bigbits(bits, t);
     ZR zr(t);
     mr_free(t);
 	return zr;
 }
+*/
 
 
 void keygen(PairingGroup & group, G2 & pk, ZR & sk, G2 & g) {
@@ -75,6 +77,7 @@ int main()
     PairingGroup group(AES_SECURITY);
 
     int N = 2;
+    CharmList test;
     CharmListZR sk0;
     CharmListG1 g1_0;
     CharmListG2 g2_0;
@@ -92,7 +95,7 @@ int main()
 
     cout << "new list of deltas: " << endl;
     cout << sk1 << endl;
-
+    
     // test CharmListG1 ****************************** //
     for(int z = 0; z < N; z++) {
     	g1_0[z] = group.random(G1_t);
@@ -130,6 +133,14 @@ int main()
     CharmListGT gt_1 = testRetByValueGT(gt_0);
     cout << "new list of GT: " << endl;
     cout << gt_1 << endl;
+
+    test.insert(0, sk0);
+    test.insert(1, g1_0);
+    test.insert(2, g2_0);
+    test.insert(3, gt_0);
+    
+    cout << "CharmLists : " << endl;
+    cout << test << endl;
 
 
     return 0;
