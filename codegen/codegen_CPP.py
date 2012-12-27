@@ -655,7 +655,8 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
             elif (str(variableTypeForFuncNode) == "str"):
                 return variableName + " = \"\""
             else:
-                return groupObjName + "." + INIT_FUNC_NAME + "(" + str(leftSideNameForInit) + ")"
+                #return groupObjName + "." + INIT_FUNC_NAME + "(" + str(leftSideNameForInit) + ")"
+                return "//"
         elif (nodeName == ISMEMBER_FUNC_NAME):
             funcOutputString = groupObjName + "." + nodeName + "("
         elif (nodeName == INTEGER_FUNC_NAME):
@@ -696,6 +697,17 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
     assert False,"getAssignStmtAsString_CPP in codegen.py:  unsupported node type detected."
     return
 
+def isVarInSDLListVars(varName):
+    for listVar in SDLListVars:
+        newListVarName = listVar
+        listSymIndexPos = newListVarName.find(LIST_INDEX_SYMBOL)
+        if (listSymIndexPos != -1):
+            newListVarName = newListVarName[0:listSymIndexPos]
+        if (varName == newListVarName):
+            return True
+
+    return False
+
 def getCPPAsstStringForExpand(node, variableName, replacementsDict):
     global CPP_varTypesLines
 
@@ -714,26 +726,42 @@ def getCPPAsstStringForExpand(node, variableName, replacementsDict):
             sys.exit("getCPPAsstStringForExpand in codegen.py:  could not obtain one of the types for the variable names included in the expand node.")
         outputString += writeCurrentNumTabsToString()
 
-        #CPP_varTypesLines += "\t" + makeTypeReplacementsForCPP(listNodeType) + " " + listNodeName + ";\n"
-        CPP_varTypesLines += "    " + makeTypeReplacementsForCPP(listNodeType) + " " + listNodeName + ";\n"
+        if (isVarInSDLListVars(listNodeName) == True):
+            CPP_varTypesLines += getVarDeclForListVar(listNodeName)
+        else:
+            #CPP_varTypesLines += "\t" + makeTypeReplacementsForCPP(listNodeType) + " " + listNodeName + ";\n"
+            CPP_varTypesLines += "    " + makeTypeReplacementsForCPP(listNodeType) + " " + listNodeName + ";\n"
+
         outputString += listNodeName + " = "
 
         outputString += variableName + "[" + str(counter) + "]"
 
         if (variableType == types.list):
             outputString += "."
-            if (listNodeType == types.G1):
-                outputString += "getG1()"
-            elif (listNodeType == types.G2):
-                outputString += "getG2()"
-            elif (listNodeType == types.GT):
-                outputString += "getGT()"
-            elif (listNodeType == types.ZR):
-                outputString += "getZR()"
-            elif (listNodeType == types.str):
-                outputString += "strPtr"
+            if (isVarInSDLListVars(listNodeName) == True):
+                if (listNodeType == types.G1):
+                    outputString += "getListG1()"
+                elif (listNodeType == types.G2):
+                    outputString += "getListG2()"
+                elif (listNodeType == types.GT):
+                    outputString += "getListGT()"
+                elif (listNodeType == types.ZR):
+                    outputString += "getListZR()"
+                else:
+                    sys.exit("getCPPAsstStringForExpand in codegen.py:  one of the types of the listNodes is not one of the supported types (G1, G2, GT, ZR, or string), and is itself a list.")
             else:
-                sys.exit("getCPPAsstStringForExpand in codegen.py:  one of the types of the listNodes is not one of the supported types (G1, G2, GT, ZR, or string).")
+                if (listNodeType == types.G1):
+                    outputString += "getG1()"
+                elif (listNodeType == types.G2):
+                    outputString += "getG2()"
+                elif (listNodeType == types.GT):
+                    outputString += "getGT()"
+                elif (listNodeType == types.ZR):
+                    outputString += "getZR()"
+                elif (listNodeType == types.str):
+                    outputString += "strPtr"
+                else:
+                    sys.exit("getCPPAsstStringForExpand in codegen.py:  one of the types of the listNodes is not one of the supported types (G1, G2, GT, ZR, or string), and is not a list.")
 
         outputString += ";\n"
 
@@ -741,7 +769,10 @@ def getCPPAsstStringForExpand(node, variableName, replacementsDict):
 
 def getVarDeclForListVar(variableName):
     listSymbolLoc = variableName.find(LIST_INDEX_SYMBOL)
-    trueVarName = variableName[0:listSymbolLoc]
+    if (listSymbolLoc != -1):
+        trueVarName = variableName[0:listSymbolLoc]
+    else:
+        trueVarName = variableName
 
     outputString_Types = ""
 
@@ -836,7 +867,7 @@ def writeAssignStmt_CPP(outputFile, binNode):
                 outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t, 1);\n"
             elif (variableName.startswith(SUM_PROD_WORD) == True):
                 outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t, 0);\n"
-            elif variableType in [types.list, types.listZR, types.listG1, types.listG2, types.listGT, types.metalistZR, types.metalistG1, types.metalistG2, types.metalistGT]:
+            elif variableType in [types.str, types.list, types.listZR, types.listG1, types.listG2, types.listGT, types.metalistZR, types.metalistG1, types.metalistG2, types.metalistGT]:
                 outputString_Types += variableName + ";\n"
             else:
                 outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t);\n"
