@@ -389,12 +389,20 @@ def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, curre
     transformListIndex = getTransformListIndex(currentLineNo, astNodes)
     #decoutListIndex = getDecoutListIndex(currentLineNo)
 
+    currentNodeRightType = getVarTypeInfoRecursive(currentNode.right)
+
     if (withinForLoop == True):
-        #STARTHERE
         lineForTransformLines = transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + "? := "
-        #iterationNo += 1
+        lineForTypesSection = transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + "? := "
+        lineForTypesSection += str(currentNodeRightType) + "\n"
+        appendToLinesOfCode([lineForTypesSection], getEndLineNoOfFunc(TYPES_HEADER))
+        parseLinesOfCode(getLinesOfCode(), False)
     else:
         lineForTransformLines = transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + " := "
+        lineForTypesSection = transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + " := "
+        lineForTypesSection += str(currentNodeRightType) + "\n"
+        appendToLinesOfCode([lineForTypesSection], getEndLineNoOfFunc(TYPES_HEADER))
+        parseLinesOfCode(getLinesOfCode(), False)
 
     lineForTransformLines += str(currentNode.right)
 
