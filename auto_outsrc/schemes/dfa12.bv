@@ -18,12 +18,14 @@ K := list{Klist}
 KendList := list{G1, G1}
 Kend := list{KendList}
 B := list{GT}
-C := list{G1}
+Clist := list{G1, G1}
+C := list{Clist}
 D := list{G1}
 D#0 := G1
 h := list{G1}
 x := int
 st := int
+j := int
 END :: types
 
 
@@ -37,7 +39,7 @@ hend := random(G1)
 A := len(alphabet)
 BEGIN :: for
 for{i := 0, A}
-a := alphabet#i
+a := string(alphabet#i)
 h#a? := random(G1)
 END :: for
 
@@ -69,15 +71,18 @@ Tlen := len(T)
 BEGIN :: for
 for{i := 0, Tlen}
 r := random(ZR)
-x := T#0
-y := T#1
-tt := T#2
-key := hashToInt(T)
+t := T#i
+x := t#0
+y := t#1
+tt := string(t#2)
+key := hashToInt(t)
 
+K#key := init(list)
+Klist := init(list)
 Klist#1? := (D#x ^ -1) * (z ^ r)
 Klist#2? := g ^ r
 Klist#3? := D#y * (h#tt ^ r)
-K#key := list{Klist}
+K#key := copy(Klist)
 END :: for
         
 
@@ -86,14 +91,14 @@ BEGIN :: for
 for{i := 0, Flen}
 x := F#i
 rx := random(ZR)
-Kend#x#1? := msk * D#x * (hend ^ rx)
-Kend#x#2? := g ^ rx
+KendList#1? := msk * D#x * (hend ^ rx)
+KendList#2? := g ^ rx
+Kend#x := copy(KendList)
 END :: for
             
 sk := list{Kstart1, Kstart2, K, Kend, dfaM}
 output := sk
 END :: func:keygen
-
 
 
 BEGIN :: func:encrypt
@@ -103,17 +108,17 @@ l := len(w)
 
 BEGIN :: for
 for{i := 0, l+1}
-s#i := random(G1)
+s#i := random(ZR)
 END :: for
 
 Cm := M * (egg ^ s#l)
-        
+
 C#0#1? := g ^ s#0
 C#0#2? := hstart ^ s#0
 
 BEGIN :: for
 for{i := 1, l+1}
-a := str(w#i)        
+a := string(w#i)        
 C#i#1? := g ^ s#i
 C#i#2? := (h#a ^ s#i) * (z ^ s#i-1?)
 END :: for
@@ -136,7 +141,6 @@ l := len(w)
 BEGIN :: if
 if { accept(dfaM, w) == False }
    output := False
-   return := output
 END :: if
 
 Ti := getTransitions(dfaM, w)
@@ -145,11 +149,12 @@ BEGIN :: for
 for{i := 1, l+1}
 st := hashToInt(Ti#i)
 Klist := K#st
-B#i? := (B#i-1? * (e(C#i-1#1?, Klist#1?) * (e(C#i#2?, Klist#2?)^-1) * e(C#i#1?, Klist#3?)))
+j := i - 1
+B#i? := (B#i-1? * (e(C#j#1?, Klist#1?) * (e(C#i#2?, Klist#2?)^-1) * e(C#i#1?, Klist#3?)))
 END :: for
-        
 x := getAcceptState(Ti)
-Bend := (B#l * (e(Cend1, Kend#x#1?)^-1) * e(Cend2, Kend#x#2?)) 
+KendList := Kend#x
+Bend := (B#l * (e(Cend1, KendList#1?)^-1) * e(Cend2, KendList#2?)) 
 M := Cm / Bend
 output := M
 END :: func:decrypt
