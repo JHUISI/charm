@@ -748,6 +748,10 @@ def getCPPAsstStringForExpand(node, variableName, replacementsDict):
                 elif (listNodeType == types.ZR):
                     outputString += "getListZR()"
                 else:
+                    print(node)
+                    print(variableName)
+                    print(listNodeName)
+                    print(listNodeType)
                     sys.exit("getCPPAsstStringForExpand in codegen.py:  one of the types of the listNodes is not one of the supported types (G1, G2, GT, ZR, or string), and is itself a list.")
             else:
                 if (listNodeType == types.G1):
