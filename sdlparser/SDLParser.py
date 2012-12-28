@@ -886,6 +886,18 @@ def getVarTypeInfoForAttr_List(node):
                 return types.GT
             elif firstReturnType in [types.listStr, types.metalistStr]:
                 return types.str
+            secondReturnType_ListNodes = varTypes[funcNameOfVar][varNameInList].getListNodesList()
+            if (len(secondReturnType_ListNodes) == 1):
+                if (secondReturnType_ListNodes[0] == "G1"):
+                    return types.G1
+                if (secondReturnType_ListNodes[0] == "G2"):
+                    return types.G2
+                if (secondReturnType_ListNodes[0] == "GT"):
+                    return types.GT
+                if (secondReturnType_ListNodes[0] == "ZR"):
+                    return types.ZR
+                if (secondReturnType_ListNodes[0] == "str"):
+                    return types.str
             return firstReturnType
 
         (outsideFunctionName, retVarInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, varNameInList)
