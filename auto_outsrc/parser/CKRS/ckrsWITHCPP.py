@@ -124,20 +124,6 @@ def main():
     global group
     group = PairingGroup(secparam)
 
-    (mpk, msk) = setup(5, 32)
-    (blindingFactord0Blinded, blindingFactord1Blinded, blindingFactord2Blinded, blindingFactor0Blinded, blindingFactor0Blinded, blindingFactor1Blinded, blindingFactor1Blinded, skBlinded) = extract(mpk, msk, "test")
-    M = group.random(GT)
-    print(M)
-    print("\n\n\n")
-    ct = encrypt(mpk, M, "test")
-    transformOutputList = transform(skBlinded, ct)
-    M2 = decout(skBlinded, ct, transformOutputList, blindingFactord0Blinded, blindingFactord1Blinded, blindingFactord2Blinded, blindingFactor0Blinded, blindingFactor1Blinded)
-    print(M2)
-
-    if (M == M2):
-        print("it worked")
-
-
 if __name__ == '__main__':
     main()
 
