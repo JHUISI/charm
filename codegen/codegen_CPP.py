@@ -498,6 +498,9 @@ def addGetTypeToAttrNode(inputString, variableType):
     if (variableType == types.str):
         return inputString + ".strPtr"
 
+    print(variableType)
+    print(inputString)
+
     sys.exit("addGetTypeToAttrNode in codegen_CPP.py:  variable type passed in is not one of the supported types.")
 
 def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideNameForInit=None):
