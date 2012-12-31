@@ -111,9 +111,10 @@ def addTransformFuncIntro():
 def getLastLineOfTransform(stmtsDec):
     for lineNo in stmtsDec:
         stmt = stmtsDec[lineNo]
-        if (str(stmt.getAssignNode().left) == M):
-            #print("last lineNo transform is ", lineNo)
-            return lineNo
+        #print(type(stmt).__name__)
+        if (type(stmt).__name__ == VAR_INFO_CLASS_NAME):
+            if (str(stmt.getAssignNode().left) == M):
+                return lineNo
 
     sys.exit("getLastLineOfTransform in transformNEW:  could not locate the line in decrypt where the message is assigned its value.")
 

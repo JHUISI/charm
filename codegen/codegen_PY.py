@@ -246,8 +246,8 @@ def writeInitDictDefs(outputFile, functionName):
         if (assignInfo[functionName][currentVarName].getHasListIndexSymInLeftAssign() == False):
             continue
 
-        if (currentVarName.find(LIST_INDEX_END_SYMBOL) != -1):
-            continue
+        #if (currentVarName.find(LIST_INDEX_END_SYMBOL) != -1):
+            #continue
 
         #if (currentVarName not in inputOutputVars):
             #continue
@@ -960,8 +960,8 @@ def addTypeDeclToGlobalVars(binNode):
 
     varName = getFullVarName(binNode.left, False)
 
-    if (varName.find(LIST_INDEX_SYMBOL) != -1):
-        sys.exit("addTypeDeclToGlobalVars in codegen.py:  variable name in types section has # sign in it.")
+    #if (varName.find(LIST_INDEX_SYMBOL) != -1):
+        #sys.exit("NOTE WELL:  addTypeDeclToGlobalVars in codegen.py:  variable name in types section has # sign in it.")
 
     varName = getVarNameWithoutIndices(binNode.left)
 

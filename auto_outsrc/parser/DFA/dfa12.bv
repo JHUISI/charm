@@ -1,6 +1,9 @@
 name := dfa12
 setting := symmetric
 
+N := 2
+secparam := 80
+
 BEGIN :: types
 M := GT
 alphabet := list{int}
@@ -150,11 +153,13 @@ for{i := 1, l+1}
 st := hashToInt(Ti#i)
 Klist := K#st
 j := i - 1
-B#i? := (B#i-1? * (e(C#j#1?, Klist#1?) * (e(C#i#2?, Klist#2?)^-1) * e(C#i#1?, Klist#3?)))
+result0 := (e(C#j#1?, Klist#1?) * (e(C#i#2?, Klist#2?)^-1) * e(C#i#1?, Klist#3?))
+B#i? := (B#i-1? * result0)
 END :: for
 x := getAcceptState(Ti)
 KendList := Kend#x
-Bend := (B#l * (e(Cend1, KendList#1?)^-1) * e(Cend2, KendList#2?)) 
+result1 := (e(Cend1, KendList#1?)^-1) * e(Cend2, KendList#2?)) 
+Bend := (B#l * result1)
 M := Cm / Bend
 output := M
 END :: func:decrypt

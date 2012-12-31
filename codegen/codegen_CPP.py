@@ -1094,8 +1094,8 @@ def addTypeDeclToGlobalVars(binNode):
 
     varName = getFullVarName(binNode.left, False)
 
-    if (varName.find(LIST_INDEX_SYMBOL) != -1):
-        sys.exit("addTypeDeclToGlobalVars in codegen.py:  variable name in types section has # sign in it.")
+    #if (varName.find(LIST_INDEX_SYMBOL) != -1):
+        #sys.exit("addTypeDeclToGlobalVars in codegen.py:  variable name in types section has # sign in it.")
 
     varName = getVarNameWithoutIndices(binNode.left)
 

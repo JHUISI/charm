@@ -73,6 +73,13 @@ builtInTypes["recoverCoefficientsDict"] = types.symmap
 builtInTypes["genShares"] = types.list
 builtInTypes["intersection_subset"] = types.list
 builtInTypes["GetString"] = types.str
+builtInTypes["hashToInt"] = types.int
+builtInTypes["getAcceptState"] = types.int
+builtInTypes["accept"] = types.int
+
+#TODO:  CHANGE THIS TO SYMMAP
+#builtInTypes["getTransitions"] = types.symmap
+builtInTypes["getTransitions"] = types.list
 
 def createNode(s, loc, toks):
     print('createNode => ', toks)
@@ -655,7 +662,16 @@ def setVarTypeObjForList(varTypeObj, typeNode):
     else:
         varTypeObj.setType(types.list)
         addListNodesToList(typeNode, varTypeObj.getListNodesList())
-        
+
+def setVarTypeObjForSymmap(varTypeObj, typeNode):
+    if (type(typeNode).__name__ != BINARY_NODE_CLASS_NAME):
+        sys.exit("setVarTypeObjForSymmap in SDLParser.py received as input for typeNode a parameter that is not a Binary Node.")
+
+    if (typeNode.type != ops.SYMMAP):
+        sys.exit("setVarTypeObjForSymmap in SDLParser.py:  typeNode parameter passed in is not of type ops.SYMMAP.")
+
+    varTypeObj.setType(types.symmap)
+    addListNodesToList(typeNode, varTypeObj.getListNodesList())
 
 def updateVarTypes(node, i, newType=types.NO_TYPE):
     global varTypes, assignInfo
@@ -720,6 +736,12 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
 
     if (typeNode.type == ops.LIST):
         setVarTypeObjForList(varTypeObj, typeNode)
+        varTypes[currentFuncName][varName] = varTypeObj
+        return
+
+
+    if (typeNode.type == ops.SYMMAP):
+        setVarTypeObjForSymmap(varTypeObj, typeNode)
         varTypes[currentFuncName][varName] = varTypeObj
         return
 
@@ -1286,6 +1308,15 @@ def getJustListName(listName):
 
     return listName[0:listIndexSymbolPos]
 
+def getIndividualListEntriesForVarName(funcName, varName):
+    retList = []
+
+    for currentVarName in assignInfo[funcName]:
+        if (currentVarName.startswith(varName + LIST_INDEX_SYMBOL) == True):
+            retList.append(currentVarName)
+    
+    return retList
+
 def getVarDepList(funcName, varName, retVarDepList, varsVisitedSoFar, includeExponents):
     varsVisitedSoFar.append(varName)
     assignInfo_Var = assignInfo[funcName][varName]
@@ -1302,6 +1333,12 @@ def getVarDepList(funcName, varName, retVarDepList, varsVisitedSoFar, includeExp
             justListName = getJustListName(currentVarDep)
             if ( (justListName in assignInfo[funcName]) and (justListName not in varsVisitedSoFar) ):
                 getVarDepList(funcName, justListName, retVarDepList, varsVisitedSoFar, includeExponents)
+        else:
+            #e.g., ListName#k-1?
+            indivListEntries = getIndividualListEntriesForVarName(funcName, currentVarDep)
+            for indivListEntry in indivListEntries:
+                if (indivListEntry not in varsVisitedSoFar):
+                    getVarDepList(funcName, indivListEntry, retVarDepList, varsVisitedSoFar, includeExponents)
 
 def getVarInfList(retList, includeExponents):
     if (includeExponents == True):
