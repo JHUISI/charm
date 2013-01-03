@@ -1,0 +1,28 @@
+CXX	:= g++
+#CXXFLAGS := -fno-strict-aliasing -fno-common -g -m64 -O2 -fwrapv -O3 -Wall
+CXXFLAGS += -g -m64 -O2 -O3 -Wall -DBUILD_RELIC=1 -DBUILD_MIRACL=0
+
+# should be set by codegen
+NAME    := testRelicAPI
+INCPATH := -I. -I.. -I../relic -I/usr/local/include
+# CURVE := ssp
+#CURVE   := mnt
+
+OBJECTS	:= TestCharm.o
+LIB     := -lCharmRelic -lrelic
+ 
+# link SDL object file with miracl lib 
+.PHONY: $(NAME)
+$(NAME): $(OBJECTS) 
+	$(CXX) $(CXXFLAGS) $(INCPATH) $(OBJECTS) $(LIB) -o $(NAME)
+
+# compile target SDL sourcefile
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c $< -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(INCPATH) -c $< -o $@
+
+clean:
+	rm -f *.o $(NAME)
+

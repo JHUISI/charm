@@ -113,6 +113,7 @@ END :: for
 
 Cm := M * (egg ^ s#l)
 
+C#0 := init(list)
 C#0#1? := g ^ s#0
 C#0#2? := hstart ^ s#0
 
@@ -150,7 +151,7 @@ for{i := 1, l+1}
 st := hashToInt(Ti#i)
 Klist := K#st
 j := i - 1
-B#i? := (B#i-1? * (e(C#j#1?, Klist#1?) * (e(C#i#2?, Klist#2?)^-1) * e(C#i#1?, Klist#3?)))
+B#i? := (B#i-1? * (e(C#i-1#1?, Klist#1?) * (e(C#i#2?, Klist#2?)^-1) * e(C#i#1?, Klist#3?)))
 END :: for
 x := getAcceptState(Ti)
 KendList := Kend#x

@@ -1,0 +1,30 @@
+CXX	:= g++
+CXXFLAGS := -g -m64 -O2 -O3 -Wall -DASYMMETRIC=0 -DBUILD_SS_CURVE=1 -DBUILD_RELIC=0 -DBUILD_MIRACL=1
+
+# should be set by codegen
+NAME    := testMiraclAPI
+#INCLUDES += -I. -I$(incdir)
+INCLUDES := -I. -I.. -I../miracl -I/usr/local/include
+#CURVE := ssp
+#CURVE   := mnt
+
+OBJECTS	:= TestCharm.o
+LIB     := -lCharmMiracl
+
+.PHONY: all
+all: $(NAME)
+
+.PHONY: $(NAME)
+$(NAME): $(OBJECTS) 
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJECTS) $(LIB) -o $(NAME)
+
+# compile target SDL sourcefile
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+clean:
+	rm -f *.o $(NAME)
+
