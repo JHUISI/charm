@@ -18,8 +18,9 @@ F := list
 Klist := list{G1, G1, G1}
 key := int
 K := list{Klist}
-KendList := list{G1, G1}
-Kend := list{KendList}
+KendList1 := list{G1}
+KendList2 := list{G1}
+#Kend := list{KendList}
 B := list{GT}
 Clist := list{G1, G1}
 C := list{Clist}
@@ -94,12 +95,12 @@ BEGIN :: for
 for{i := 0, Flen}
 x := F#i
 rx := random(ZR)
-KendList#1? := msk * D#x * (hend ^ rx)
-KendList#2? := g ^ rx
-Kend#x := copy(KendList)
+KendList1#x := msk * D#x * (hend ^ rx)
+KendList2#x := g ^ rx
+#Kend#x := copy(KendList)
 END :: for
             
-sk := list{Kstart1, Kstart2, K, Kend, dfaM}
+sk := list{Kstart1, Kstart2, K, KendList1, KendList2, dfaM}
 output := sk
 END :: func:keygen
 
@@ -137,7 +138,7 @@ END :: func:encrypt
 
 BEGIN :: func:decrypt
 input := list{sk, ct}
-sk := expand{Kstart1, Kstart2, K, Kend, dfaM}
+sk := expand{Kstart1, Kstart2, K, KendList1, KendList2, dfaM}
 ct := expand{Cm, C, Cend1, Cend2, w}
 l := len(w)
 
@@ -157,8 +158,8 @@ result0 := (e(C#j#1?, Klist#1?) * (e(C#i#2?, Klist#2?)^-1) * e(C#i#1?, Klist#3?)
 B#i? := (B#i-1? * result0)
 END :: for
 x := getAcceptState(Ti)
-KendList := Kend#x
-result1 := (e(Cend1, KendList#1?)^-1) * e(Cend2, KendList#2?)) 
+#KendList := Kend#x
+result1 := (e(Cend1, KendList1#x)^-1) * e(Cend2, KendList2#x)) 
 Bend := (B#l * result1)
 M := Cm / Bend
 output := M

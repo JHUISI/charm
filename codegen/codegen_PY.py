@@ -255,10 +255,10 @@ def writeInitDictDefs(outputFile, functionName):
         if (currentVarName == RETURN_KEYWORD):
             continue
 
-        if (currentVarName.count(LIST_INDEX_SYMBOL) == 1):
+        if (currentVarName.find(LIST_INDEX_SYMBOL) != -1):
             currentVarNameSplit = currentVarName.split(LIST_INDEX_SYMBOL)
-            if (currentVarNameSplit[1].isdigit()):
-                currentVarName = currentVarNameSplit[0]
+            #if (currentVarNameSplit[1].isdigit()):
+            currentVarName = currentVarNameSplit[0]
 
         if (currentVarName not in varNamesToFuncs_Assign):
             sys.exit("writeInitDictDefs in codegen.py:  current variable name in loop is not in varNamesToFuncs_Assign.")

@@ -289,6 +289,33 @@ def getForLoopListIndex(currentLineNo, astNodes):
 
     return str(str(currentForLoopSeed + int(iterationNo)) + "+" + str(numStatementsInForLoop + numPairingsInForLoop) + "*" + str(loopVarName))
 
+def getIndexVarNameFromBinaryNodeRecursive(node, varName, possibleIndexVarNames):
+    if (node.left != None):
+        getIndexVarNameFromBinaryNodeRecursive(node.left, varName, possibleIndexVarNames)
+
+    if (node.right != None):
+        getIndexVarNameFromBinaryNodeRecursive(node.right, varName, possibleIndexVarNames)
+
+    if (node.type == ops.ATTR):
+        nodeName = node.attr
+        nodeNameIndexPos = nodeName.find(LIST_INDEX_SYMBOL)
+        if (nodeNameIndexPos != -1):
+            if (nodeName[0:nodeNameIndexPos] == varName):
+                possibleIndexVarNames.append(nodeName[(nodeNameIndexPos + 1):(len(nodeName))])
+
+def getIndexVarNameFromBinaryNode(node, varName):
+    possibleIndexVarNames = []
+    getIndexVarNameFromBinaryNodeRecursive(node, varName, possibleIndexVarNames)
+    if (len(possibleIndexVarNames) == 1):
+        return possibleIndexVarNames[0]
+
+    firstPossibleName = possibleIndexVarNames[0]
+    for possibleName in possibleIndexVarNames:
+        if (possibleName != firstPossibleName):
+            sys.exit("getIndexVarNameFromBinaryNode in transformNEW.py:  found different possible index names in binary node passed in for the variable name passed in; not supported.")
+
+    return firstPossibleName
+
 def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode, blindingVarsThatAreLists, currentLineNo, astNodes):
     global transformListCounter, decoutListCounter, iterationNo
 
@@ -361,9 +388,12 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
              subLineForDecoutLines += " ^ ("
          for blindingExponent in blindingExponents:
              originalVarName = getOriginalVarNameFromBlindedName(blindingExponent)
-             if (originalVarName in blindingVarsThatAreLists):
+             if ( (originalVarName in blindingVarsThatAreLists) and (withinForLoop == True) ):
                  loopVarNameToUse = getLoopVarNameFromLineNo(currentLineNo)
                  subLineForDecoutLines += blindingExponent + LIST_INDEX_SYMBOL + loopVarNameToUse + " * "
+             elif ( (originalVarName in blindingVarsThatAreLists) and (withinForLoop == False) ):
+                 indexVarNameToUse = getIndexVarNameFromBinaryNode(currentNode, originalVarName)
+                 subLineForDecoutLines += blindingExponent + LIST_INDEX_SYMBOL + indexVarNameToUse + " * "
              else:
                  subLineForDecoutLines += blindingExponent + " * "
          if (len(blindingExponents) > 0):

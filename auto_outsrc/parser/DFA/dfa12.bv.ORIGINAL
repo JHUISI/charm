@@ -14,13 +14,12 @@ ct := list
 Q := list
 T := list
 Ti := list
-F := list
+F := list 
 Klist := list{G1, G1, G1}
 key := int
 K := list{Klist}
-KendList1 := list{G1}
-KendList2 := list{G1}
-
+KendList := list{G1, G1}
+Kend := list{KendList}
 B := list{GT}
 Clist := list{G1, G1}
 C := list{Clist}
@@ -42,14 +41,14 @@ hend := random(G1)
 
 A := len(alphabet)
 BEGIN :: for
-for{i := 0,A}
+for{i := 0, A}
 a := string(alphabet#i)
 h#a? := random(G1)
 END :: for
 
-alpha := random(ZR)
-egg := (e(g,g)^alpha)
-msk := (g^-alpha)
+alpha := random(ZR)        
+egg := e(g, g)^alpha
+msk := g ^ -alpha
 mpk := list{egg, g, z, h, hstart, hend}
 
 output := list{mpk, msk}
@@ -63,17 +62,17 @@ dfaM := expand{Q, S, T, q0, F}
 
 qlen := len(Q)
 BEGIN :: for
-for{i := 0,qlen+1}
+for{i := 0, qlen+1}
 D#i := random(G1)
 END :: for
 
 rstart := random(ZR)
-Kstart1 := (D#0 * (hstart^rstart))
-Kstart2 := (g^rstart)
+Kstart1 := D#0 * (hstart ^ rstart)
+Kstart2 := g ^ rstart
 
 Tlen := len(T)
 BEGIN :: for
-for{i := 0,Tlen}
+for{i := 0, Tlen}
 r := random(ZR)
 t := T#i
 x := t#0
@@ -83,24 +82,24 @@ key := hashToInt(t)
 
 K#key := init(list)
 Klist := init(list)
-Klist#1? := ((D#x^-1) * (z^r))
-Klist#2? := (g^r)
-Klist#3? := (D#y * (h#tt^r))
+Klist#1? := (D#x ^ -1) * (z ^ r)
+Klist#2? := g ^ r
+Klist#3? := D#y * (h#tt ^ r)
 K#key := copy(Klist)
 END :: for
-
+        
 
 Flen := len(F)
 BEGIN :: for
-for{i := 0,Flen}
+for{i := 0, Flen}
 x := F#i
 rx := random(ZR)
-KendList1#x := (msk * (D#x * (hend^rx)))
-KendList2#x := (g^rx)
-
+KendList#1? := msk * D#x * (hend ^ rx)
+KendList#2? := g ^ rx
+Kend#x := copy(KendList)
 END :: for
-
-sk := list{Kstart1, Kstart2, K, KendList1, KendList2, dfaM}
+            
+sk := list{Kstart1, Kstart2, K, Kend, dfaM}
 output := sk
 END :: func:keygen
 
@@ -111,24 +110,24 @@ mpk := expand{egg, g, z, h, hstart, hend}
 l := len(w)
 
 BEGIN :: for
-for{i := 0,l+1}
+for{i := 0, l+1}
 s#i := random(ZR)
 END :: for
 
-Cm := (M * (egg^s#l))
+Cm := M * (egg ^ s#l)
 
-C#0#1? := (g^s#0)
-C#0#2? := (hstart^s#0)
+C#0#1? := g ^ s#0
+C#0#2? := hstart ^ s#0
 
 BEGIN :: for
-for{i := 1,l+1}
-a := string(w#i)
-C#i#1? := (g^s#i)
-C#i#2? := ((h#a^s#i) * (z^s#i-1?))
+for{i := 1, l+1}
+a := string(w#i)        
+C#i#1? := g ^ s#i
+C#i#2? := (h#a ^ s#i) * (z ^ s#i-1?)
 END :: for
 
-Cend1 := (g^s#l)
-Cend2 := (hend^s#l)
+Cend1 := g ^ s#l
+Cend2 := hend ^ s#l        
 
 ct := list{Cm, C, Cend1, Cend2, w}
 output := ct
@@ -138,29 +137,29 @@ END :: func:encrypt
 
 BEGIN :: func:decrypt
 input := list{sk, ct}
-sk := expand{Kstart1, Kstart2, K, KendList1, KendList2, dfaM}
+sk := expand{Kstart1, Kstart2, K, Kend, dfaM}
 ct := expand{Cm, C, Cend1, Cend2, w}
 l := len(w)
 
 BEGIN :: if
-if {accept(dfaM, w) == False}
-output := False
+if { accept(dfaM, w) == False }
+   output := False
 END :: if
 
 Ti := getTransitions(dfaM, w)
-B#0 := (e(C#0#1?,Kstart1) * (e(C#0#2?,Kstart2)^-1))
+B#0 := e(C#0#1?, Kstart1) * (e(C#0#2?, Kstart2)^-1)
 BEGIN :: for
-for{i := 1,l+1}
+for{i := 1, l+1}
 st := hashToInt(Ti#i)
 Klist := K#st
-j := (i - 1)
-result0 := (e(C#j#1?,Klist#1?) * ((e(C#i#2?,Klist#2?)^-1) * e(C#i#1?,Klist#3?)))
+j := i - 1
+result0 := (e(C#j#1?, Klist#1?) * (e(C#i#2?, Klist#2?)^-1) * e(C#i#1?, Klist#3?))
 B#i? := (B#i-1? * result0)
 END :: for
 x := getAcceptState(Ti)
-
-result1 := ((e(Cend1,KendList1#x)^-1) * e(Cend2,KendList2#x))
+KendList := Kend#x
+result1 := (e(Cend1, KendList#1?)^-1) * e(Cend2, KendList#2?)) 
 Bend := (B#l * result1)
-M := (Cm / Bend)
+M := Cm / Bend
 output := M
 END :: func:decrypt
