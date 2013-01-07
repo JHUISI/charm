@@ -955,7 +955,7 @@ def getVarTypeInfoForStringVar(nodeAttrFullName):
     return types.NO_TYPE
 
 
-def getVarTypeInfoForAttr(node):
+def getVarTypeInfoForAttr(node, funcNameInputParam=currentFuncName):
     nodeAttrFullName = getFullVarName(node, False)
     
     # ignore "_" underscores to make finding type values consistent
@@ -963,6 +963,12 @@ def getVarTypeInfoForAttr(node):
     
     if (nodeAttrFullName in varTypes[currentFuncName]):
         return varTypes[currentFuncName][nodeAttrFullName].getType()
+
+    if (funcNameInputParam not in varTypes):
+        sys.exit("getVarTypeInfoForAttr in SDLParser.py:  funcNameInputParam passed in is not in varTypes.")
+
+    if (nodeAttrFullName in varTypes[funcNameInputParam]):
+        return varTypes[funcNameInputParam][nodeAttrFullName].getType()
 
     (possibleFuncName, possibleVarInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, nodeAttrFullName)
     if ( (possibleFuncName != None) and (possibleVarInfoObj != None) and (nodeAttrFullName in varTypes[possibleFuncName]) ):
@@ -992,7 +998,7 @@ def checkForIntAndZR(leftSideType, rightSideType):
 
     return False
 
-def getVarTypeInfoRecursive(node):
+def getVarTypeInfoRecursive(node, funcNameInputParam=currentFuncName):
     if (node.type == ops.RANDOM):
         retRandomType = node.left.attr
         if (str(retRandomType) not in [str(types.G1), str(types.G2), str(types.GT), str(types.ZR)]):
@@ -1023,8 +1029,8 @@ def getVarTypeInfoRecursive(node):
         return types.str
 #        for i in node.getListNode():
     if ( (node.type == ops.ADD) or (node.type == ops.SUB) or (node.type == ops.MUL) or (node.type == ops.DIV) ):
-        leftSideType = getVarTypeInfoRecursive(node.left)
-        rightSideType = getVarTypeInfoRecursive(node.right)
+        leftSideType = getVarTypeInfoRecursive(node.left, funcNameInputParam)
+        rightSideType = getVarTypeInfoRecursive(node.right, funcNameInputParam)
         if (leftSideType != rightSideType):
             if (checkForIntAndZR(leftSideType, rightSideType) == True):
                 return types.ZR
@@ -1043,7 +1049,9 @@ def getVarTypeInfoRecursive(node):
             sys.exit("getVarTypeInfoRecursive in SDLParser.py found a hash operation that does not hash to a supported hash type (" + str(types.ZR) + ", " + str(types.G1) + ", and " + str(types.G2) + ").")
         return retHashType
     if (node.type == ops.ATTR):
-        return getVarTypeInfoForAttr(node)
+        if (str(node) in ["True", "true", "False", "false"]):
+            return types.int
+        return getVarTypeInfoForAttr(node, funcNameInputParam)
     if (node.type == ops.EXPAND):
         return types.NO_TYPE
     if (node.type == ops.FUNC):
@@ -1183,8 +1191,8 @@ def updateInputOutputVars(varsDepList):
         return
 
     for varDep in varsDepList:
-        if (varDep.find(LIST_INDEX_SYMBOL) != -1):
-            sys.exit("updateInputOutputVars in SDLParser.py:  found variable dependency of either input or output statement that contains a list index symbol.")
+        #if (varDep.find(LIST_INDEX_SYMBOL) != -1):
+            #sys.exit("updateInputOutputVars in SDLParser.py:  found variable dependency of either input or output statement that contains a list index symbol.")
         if (varDep not in inputOutputVars):
             inputOutputVars.append(varDep)
 

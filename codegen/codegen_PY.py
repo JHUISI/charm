@@ -197,7 +197,7 @@ def writeFunctionEnd_Python(outputFile, functionName, retainGlobals):
     if (numOutputVariables > 0):
         returnValues[functionName] = outputVariablesString
         #outputString += "\treturn output\n"
-        outputString += "    return output\n"
+        #outputString += "    return output\n"
     else:
         returnValues[functionName] = ""
 
@@ -359,6 +359,12 @@ def isForLoopEnd(binNode):
     if (binNode.type == ops.END):
         if ( (binNode.left.attr == FOR_LOOP_HEADER) or (binNode.left.attr == FORALL_LOOP_HEADER) or (binNode.left.attr == FOR_LOOP_INNER_HEADER) ):
             return True
+
+    return False
+
+def isNOP(binNode):
+    if (binNode.type == ops.NOP):
+        return True
 
     return False
 
@@ -639,6 +645,8 @@ def getAssignStmtAsString(variableName, node, replacementsDict, dotProdObj, lamb
                 return "\"\""
             elif ( (len(node.listNodes) == 1) and (node.listNodes[0].isdigit() == True) ):
                 return str(node.listNodes[0])
+            elif ( (len(node.listNodes) == 1) and (node.listNodes[0] == LIST_TYPE) ):
+                return "{}"
             elif ( (len(node.listNodes) == 1) and (node.listNodes[0] in possibleGroupTypes) ):
                 return groupObjName + "." + INIT_FUNC_NAME + "(" + node.listNodes[0] + ")"
             elif (variableName.startswith(DOT_PROD_WORD) == True):
@@ -656,6 +664,8 @@ def getAssignStmtAsString(variableName, node, replacementsDict, dotProdObj, lamb
             funcOutputString = groupObjName + "." + nodeName + "("
         elif (nodeName == INTEGER_FUNC_NAME):
             funcOutputString = "int("
+        elif (nodeName == COPY_FUNC_NAME):
+            funcOutputString = "("
         elif (nodeName == KEYS_FUNC_NAME):
             return "list(" + node.listNodes[0] + ".keys())"
         else:
@@ -778,6 +788,11 @@ def writeAssignStmt_Python(outputFile, binNode):
 
     if (variableName == outputKeyword):
         outputString += getAssignStmtAsString(variableName, binNode.right, None, dotProdObj, lambdaReplacements, True)
+        outputString += "\n"
+        outputString += writeCurrentNumTabsToString()
+        outputString += "return output\n"
+        outputFile.write(outputString)
+        return
     else:
         outputString += getAssignStmtAsString(variableName, binNode.right, None, dotProdObj, lambdaReplacements, False)
 
@@ -786,6 +801,14 @@ def writeAssignStmt_Python(outputFile, binNode):
     
     outputString += "\n"
     outputFile.write(outputString)
+
+def writeNOP():
+    global setupFile
+
+    outputString = writeCurrentNumTabsToString()
+    outputString += "pass\n"
+
+    setupFile.write(outputString)
 
 def writeAssignStmt(binNode):
     global setupFile
@@ -1056,6 +1079,8 @@ def writeSDLToFiles(astNodes):
             writeErrorFunc(astNode)
         elif (isFuncCall(astNode) == True):
             writeFuncCall(astNode)
+        elif (isNOP(astNode) == True):
+            writeNOP()
         elif ( (processedAsFunctionStart == True) or (isUnnecessaryNodeForCodegen(astNode) == True) ):
             continue
         else:

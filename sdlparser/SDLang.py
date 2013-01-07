@@ -55,6 +55,7 @@ LATEX_HEADER = "latex" # JAA: standard
 LIST_TYPE = "list"
 OTHER_TYPES = ['list', 'object']
 DECL_FUNC_HEADER = "func:"
+COPY_FUNC_NAME = "copy"
 INIT_FUNC_NAME = "init"
 KEYS_FUNC_NAME = "keys"
 LEN_FUNC_NAME = "len"

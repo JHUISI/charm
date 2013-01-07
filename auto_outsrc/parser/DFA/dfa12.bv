@@ -117,12 +117,15 @@ END :: for
 
 Cm := M * (egg ^ s#l)
 
+C#0 := init(list)
+
 C#0#1? := g ^ s#0
 C#0#2? := hstart ^ s#0
 
 BEGIN :: for
 for{i := 1, l+1}
-a := string(w#i)        
+a := string(w#i) 
+C#i := init(list)       
 C#i#1? := g ^ s#i
 C#i#2? := (h#a ^ s#i) * (z ^ s#i-1?)
 END :: for

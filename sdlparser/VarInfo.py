@@ -48,6 +48,7 @@ class VarInfo:
         self.assignInfo = None
         self.isResultOfPruneFunc = False
         self.topLevelNode = True
+        self.isNOP = False
     
     @classmethod
     def copy(self, obj):
@@ -90,6 +91,7 @@ class VarInfo:
         v.assignInfo = obj.assignInfo
         v.isResultOfPruneFunc = obj.isResultOfPruneFunc
         v.topLevelNode = obj.topLevelNode
+        v.isNOP = obj.isNOP
         return v
     
     def getIsForLoopBegin(self):
@@ -130,6 +132,9 @@ class VarInfo:
 
     def getVarDepsNoExponents(self):
         return self.varDepsNoExponents
+
+    def getIsNOP(self):
+        return self.isNOP
 
     def getAssignVar(self):
         if self.assignNode and Type(self.assignNode) == ops.EQ:
@@ -387,7 +392,9 @@ class VarInfo:
             self.assignBaseElemsOnly = self.assignNode.left
         elif (self.assignNode.right.type == ops.HASH):
             self.isBaseElement = True
-            self.assignBaseElemsOnly = self.assignNode.left            
+            self.assignBaseElemsOnly = self.assignNode.left
+        elif (self.assignNode.right.type == ops.NOP):
+            self.isNOP = True            
 # JAA: activates the awesome symbolic executor!
 #        if (self.assignBaseElemsOnly == None):
 #            assignNodeRightDeepCopy = copy.deepcopy(self.assignNode.right)

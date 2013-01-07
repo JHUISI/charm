@@ -239,6 +239,9 @@ def shouldWeAddToUnknownVarsList(node, nodeAsString, knownVars, dotProdLoopVar, 
     if (str(node) in varsNotKnownByTransform):
         return False
 
+    if (str(node) in ["True", "true", "False", "false"]):
+        return False
+
     if ( (dotProdLoopVar != None) and (nodeAsString == str(dotProdLoopVar)) ):
         return False
 
@@ -420,7 +423,7 @@ def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, curre
     transformListIndex = getTransformListIndex(currentLineNo, astNodes)
     #decoutListIndex = getDecoutListIndex(currentLineNo)
 
-    currentNodeRightType = getVarTypeInfoRecursive(currentNode.right)
+    currentNodeRightType = getVarTypeInfoRecursive(currentNode.right, decryptFuncName)
 
     if (withinForLoop == True):
         lineForTransformLines = transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + "? := "
@@ -500,6 +503,10 @@ def getBlindingVarsThatAreLists(varsThatAreBlindedDict):
 
     return retList
 
+def getForLoopIndexVarName(node):
+
+    return str(node.left.left)
+
 def transformNEW(varsThatAreBlindedDict):
     global currentNumberOfForLoops, withinForLoop, iterationNo
 
@@ -571,8 +578,12 @@ def transformNEW(varsThatAreBlindedDict):
                 iterationNo = 0
             if ( (currentNode.type == ops.END) and (withinForLoop == True) ):
                 withinForLoop = False
-            transformLines.append(str(currentNode) + "\n")
-            decoutLines.append(str(currentNode) + "\n")
+            if ( (currentNode.type == ops.FOR) or (currentNode.type == ops.IF) ):
+                transformLines.append(str(currentNode) + "\nNOP\n")
+                decoutLines.append(str(currentNode) + "\nNOP\n")
+            else:
+                transformLines.append(str(currentNode) + "\n")
+                decoutLines.append(str(currentNode) + "\n")
         elif (str(currentNode.left) == M):
             decoutLines.append(str(currentNode) + "\n")
         elif (str(currentNode.left) in doNotIncludeInTransformList):
@@ -587,6 +598,10 @@ def transformNEW(varsThatAreBlindedDict):
             knownVars.append(str(currentNode.left))
         else:
             decoutLines.append(str(currentNode) + "\n")
+
+        if (currentNode.type == ops.FOR):
+            forLoopIndexVarName = getForLoopIndexVarName(currentNode)
+            knownVars.append(forLoopIndexVarName)
 
     transformLines.append("output := " + transformOutputList + "\n")
     transformLines.append("END :: func:" + transformFuncName + "\n")
