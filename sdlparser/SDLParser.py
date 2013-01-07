@@ -265,6 +265,8 @@ class SDLParser:
             ops.reverse()
             newList.listNodes = list(ops)
             return newList
+        elif op in ["nop", "NOP"]: # adding the NOP symbol
+            return createTree(op, None, None)
         elif op in [START_TOKEN, END_TOKEN]: # start and end block lines
             op1 = self.evalStack(stack, line_number)
             if (op1.startswith(DECL_FUNC_HEADER) == True):

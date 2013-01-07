@@ -64,7 +64,7 @@ START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
 types = Enum('NO_TYPE','G1', 'G2', 'GT', 'ZR', 'int', 'str', 'list', 'object', 'listInt', 'listStr', 'listG1', 'listG2', 'listGT', 'listZR', 'metalistInt', 'metalistStr', 'metalistZR', 'metalistG1', 'metalistG2', 'metalistGT','symmap')
 listGroupTypes = ['listZR', 'listG1', 'listG2', 'listGT']
 declarator = Enum('func', 'verify')
-ops = Enum('BEGIN', 'ERROR', 'TYPE','AND', 'OR', 'XOR', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'NON_EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO', 'FORINNER', 'FORALL', 'PROD', 'SUM', 'ON', 'OF', 'STRCONCAT', 'CONCAT', 'LIST', 'SYMMAP', 'EXPAND', 'FUNC', 'SEQ', 'IF', 'ELSEIF', 'ELSE', 'END', 'NONE')
+ops = Enum('BEGIN', 'ERROR', 'TYPE','AND', 'OR', 'XOR', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'NON_EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO', 'FORINNER', 'FORALL', 'PROD', 'SUM', 'ON', 'OF', 'STRCONCAT', 'CONCAT', 'LIST', 'SYMMAP', 'EXPAND', 'FUNC', 'SEQ', 'IF', 'ELSEIF', 'ELSE', 'NOP', 'END', 'NONE')
 side = Enum('left', 'right')
 levels = Enum('none', 'some', 'all')
 debug = levels.none
@@ -485,6 +485,8 @@ def createTree(op, node1, node2, op_value=None):
     elif(op == "error("):
         node = BinaryNode(ops.ERROR)
         node.setAttribute(op_value)
+    elif(op in ["nop", "NOP"]):
+        node = BinaryNode(ops.NOP)
     elif(FUNC_SYMBOL in op):
     	node = BinaryNode(ops.FUNC)
     	node.setAttribute(op_value)
@@ -667,6 +669,8 @@ class BinaryNode:
 				return (left + '; ' + right)
 			elif(self.type == ops.NONE):
 				 return 'NONE'
+			elif(self.type == ops.NOP):
+				 return 'NOP'
 				# return ( left + ' on ' + right )				
 		return None
 	    
@@ -795,6 +799,8 @@ class BinaryNode:
 				return (left + '; ' + right)
 			elif(self.type == ops.NONE):
 				 return 'NONE'
+			elif(self.type == ops.NOP):
+				 return 'NOP'
 		return None
 
 	def isAttrIndexEmpty(self):
