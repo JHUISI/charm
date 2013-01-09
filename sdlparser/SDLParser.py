@@ -567,10 +567,12 @@ def getVarTypeFromVarName(varName, functionNameArg_TieBreaker, failSilently=Fals
             if (currentVarType == retVarType):
                 continue
             if (varName != outputKeyword):
+                if (checkForIntAndZR(retVarType, currentVarType) == True):
+                    retVarType = types.ZR
+                    continue
                 if (failSilently == True):
                     return types.NO_TYPE
-                else:
-                    sys.exit("getVarTypeFromVarName in SDLParser.py:  found mismatching variable type information for variable name passed in.")
+                sys.exit("getVarTypeFromVarName in SDLParser.py:  found mismatching variable type information for variable name passed in.")
             if (retFunctionName == functionNameArg_TieBreaker):
                 continue
             if (funcName == functionNameArg_TieBreaker):

@@ -391,10 +391,10 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
              subLineForDecoutLines += " ^ ("
          for blindingExponent in blindingExponents:
              originalVarName = getOriginalVarNameFromBlindedName(blindingExponent)
-             #if ( (originalVarName in blindingVarsThatAreLists) and (withinForLoop == True) ):
-                 #loopVarNameToUse = getLoopVarNameFromLineNo(currentLineNo)
-                 #subLineForDecoutLines += blindingExponent + LIST_INDEX_SYMBOL + loopVarNameToUse + " * "
-             if (originalVarName in blindingVarsThatAreLists):
+             if ( (originalVarName in blindingVarsThatAreLists) and (withinForLoop == True) ):
+                 loopVarNameToUse = getLoopVarNameFromLineNo(currentLineNo)
+                 subLineForDecoutLines += blindingExponent + LIST_INDEX_SYMBOL + loopVarNameToUse + " * "
+             elif ( (originalVarName in blindingVarsThatAreLists) and (withinForLoop == False) ):
                  indexVarNameToUse = getIndexVarNameFromBinaryNode(currentNode, originalVarName)
                  subLineForDecoutLines += blindingExponent + LIST_INDEX_SYMBOL + indexVarNameToUse + " * "
              else:

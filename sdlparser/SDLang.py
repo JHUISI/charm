@@ -506,7 +506,7 @@ class BinaryNode:
 	def __init__(self, value, left=None, right=None):		
 		self.negated = False	
 		if(isinstance(value, str)):
-			if value in ['G1', 'G2', 'GT', 'ZR', 'int', 'str', 'list', 'object']: # JAA: change me ASAP!!!
+			if value in ['G1', 'G2', 'GT', 'ZR', 'int', 'str', 'list', 'symmap', 'object']: # JAA: change me ASAP!!!
                 # denotes group type of an attribute value
 				self.type = ops.TYPE
 				self.attr = types[value]
