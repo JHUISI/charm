@@ -116,13 +116,13 @@ Y := len(attrs)
 dotProd := init(GT)
 BEGIN :: for
 for{y := 0, Y}
-k := GetString(attrs#y)
-result0 := e(h_gid, C3#k)
-result1 := result0 ^ coeff#k
-result2 := C1#k ^ coeff#k
+kDecrypt := GetString(attrs#y)
+result0 := e(h_gid, C3#kDecrypt)
+result1 := result0 ^ coeff#kDecrypt
+result2 := C1#kDecrypt ^ coeff#kDecrypt
 numerator := result1 * result2
-denominator0 := e(K#k, C2#k)
-denominator := denominator0 ^ coeff#k
+denominator0 := e(K#kDecrypt, C2#kDecrypt)
+denominator := denominator0 ^ coeff#kDecrypt
 fraction := numerator / denominator
 dotProd := dotProd * fraction
 END :: for

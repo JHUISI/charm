@@ -153,7 +153,9 @@ def writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls):
     if (listBlindingFactorName != sharedBlindingFactorName):
         sameMasterSecret = True
 
-    blindingFactors_Lists.append(listBlindingFactorName)
+    if (sameMasterSecret == False):
+        blindingFactors_Lists.append(listBlindingFactorName)
+
     varsThatAreBlinded.append(keygenOutputElem)
 
     SDLLinesForKeygen = []
@@ -182,12 +184,17 @@ def writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls):
     SDLLinesForKeygen.append("END :: forall\n")
     #SDLLinesForKeygen.append("END :: for\n")
 
-    mappingOfSecretVarsToBlindingFactors[keygenOutputElem] = [listBlindingFactorName]
-    mappingOfSecretVarsToBlindingFactors[keygenOutputElem].append(listNameIndicator)
+    if (sameMasterSecret == True):
+        mappingOfSecretVarsToBlindingFactors[keygenOutputElem] = [sharedBlindingFactorName]
+    else:
+        mappingOfSecretVarsToBlindingFactors[keygenOutputElem] = [listBlindingFactorName]
+        mappingOfSecretVarsToBlindingFactors[keygenOutputElem].append(listNameIndicator)
 
     #varsToBlindList.remove(keygenOutputElem)
     if (keygenOutputElem in varNamesForListDecls):
         sys.exit("writeForAllLoop in keygen.py attempted to add duplicate keygenOutputElem to varNamesForListDecls -- 2 of 2.")
+
+    #if (sameMasterSecret == False):
     varNamesForListDecls.append(keygenOutputElem)
 
     lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, keygenOutputElem)

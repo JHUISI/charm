@@ -76,6 +76,7 @@ builtInTypes["GetString"] = types.str
 builtInTypes["hashToInt"] = types.int
 builtInTypes["getAcceptState"] = types.int
 builtInTypes["accept"] = types.int
+builtInTypes["intersectionSubset"] = types.list
 
 #TODO:  CHANGE THIS TO SYMMAP
 #builtInTypes["getTransitions"] = types.symmap
@@ -750,6 +751,7 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
         return
 
     print(varName, " : ", typeNode.type)
+    print(node)
     sys.exit("updateVarTypes in SDLParser.py was passed a node that it is not currently capable of processing.")
 
 def updateKeywordStmts(node, lineNum):

@@ -5,13 +5,13 @@ outputVarName = "output"
 
 finalSDLSuffix = ".FINAL_SDL"
 
+doNotIncludeInTransformList = ["prod"]
+
 transformOutputList = "transformOutputList"
 
-doNotIncludeInTransformList = ["dotProd"]
+M = 'M'
 
 forLoopSeed = 1000
-
-M = 'M'
 
 listNameIndicator = "LISTNAMEINDICATOR"
 
@@ -21,17 +21,18 @@ varNameLeftSideBlindedVars = "neverUseThisVarNameBlindedVars"
 blindingLoopVar = "y"
 blindingLoopVarLength = "yLength"
 
+blindingLoopVarForOrigKeygenElem = "loopVarOrigKeygenElem"
+
+loopVarForKeygenElemKeys = "KeyLoopVar"
+keysForKeygenElemSuffix = "KeysSuffix"
+
 blindingFactorPrefix = "blindingFactor"
 
 blindingSuffix = "Blinded"
-setupFuncName = "authsetup"
+setupFuncName = "setup"
 keygenBlindingExponent = "zz"
 keygenBlindingExponentType = "ZR"
-keygenFuncName = "keygen"
-
-keysForKeygenElemSuffix = "KeysSuffix"
-
-loopVarForKeygenElemKeys = "KeyLoopVar"
+keygenFuncName = "extract"
 
 encryptFuncName = "encrypt"
 decryptFuncName = "decrypt"
@@ -40,8 +41,8 @@ transformFuncName = "transform"
 mainFuncName = "main"
 verifyFuncName = "verify"
 
-masterPubVars = ["gpk", "pk"]
-masterSecVars = ["msk"]
+masterPubVars = ["pk"]
+masterSecVars = ["mk"]
 
 # superset of variables we have used to represent public parameters in
 # our crypto schemes
