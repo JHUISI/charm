@@ -216,9 +216,9 @@ class CharacterSet:
     
     def __str__(self):
         """
-        >>> print CharacterSet([('a', 'a')])
+        ### print(CharacterSet([('a', 'a')]))
         a
-        >>> print CharacterSet([('a', 'b')])
+        ### print(CharacterSet([('a', 'b')]))
         [ab]
         """
         if self == self.ANY:
