@@ -21,6 +21,7 @@ sharedBlindingFactorNames = {}
 sharedBlindingFactorCounter = 0
 namesOfAllNonListBlindingFactors = []
 mappingOfSecretVarsToBlindingFactors = {}
+mappingOfSecretVarsToGroupType = {}
 
 def processListOrExpandNodes(binNode, origVarName, newVarName):
     binNodeRight = binNode.right
@@ -264,9 +265,48 @@ def isVarNameInList(varName, varList):
 
     return False
 
+def getElementsOfSameGroupType(keygenOutputElem):
+    retList = []
+
+    groupTypeOfThisElement = mappingOfSecretVarsToGroupType[keygenOutputElem]
+
+    for currentElement in mappingOfSecretVarsToGroupType:
+        currentGroupType = mappingOfSecretVarsToGroupType[currentElement]
+        if ( (currentGroupType == groupTypeOfThisElement) and (currentElement != keygenOutputElem) ):
+            retList.append(currentElement)
+
+    return retList
+
+def getBlindingNonListFactorsOfSameGroupType(elementsOfSameGroupType):
+    retList = []
+
+    for element in elementsOfSameGroupType:
+        currentBlindingFactorList = mappingOfSecretVarsToBlindingFactors[element]
+        if ( (currentBlindingFactorList[0] not in retList) and (currentBlindingFactorList[0] in namesOfAllNonListBlindingFactors) ):
+            retList.append(currentBlindingFactorList[0])
+
+    return retList
+
 def getCurrentBlindingFactorName(keygenOutputElem):
     global sharedBlindingFactorNames, sharedBlindingFactorCounter, blindingFactors_NonLists
     global namesOfAllNonListBlindingFactors
+
+    groupTypeOfThisElement = mappingOfSecretVarsToGroupType[keygenOutputElem]
+
+    elementsOfSameGroupType = getElementsOfSameGroupType(keygenOutputElem)
+
+    #print("current element is ", keygenOutputElem)
+    #print("of same type are ", elementsOfSameGroupType)
+
+    blindingNonListFactorsOfSameGroupType = getBlindingNonListFactorsOfSameGroupType(elementsOfSameGroupType)
+
+    #print("BFs of same group type:  ", blindingNonListFactorsOfSameGroupType)
+
+    if (len(blindingNonListFactorsOfSameGroupType) > 1):
+        sys.exit("getCurrentBlindingFactorName in keygen.py:  more than one blinding factor of same group type; should never happen -- error in system logic.")
+
+    if (len(blindingNonListFactorsOfSameGroupType) == 1):
+        return (blindingNonListFactorsOfSameGroupType[0], True)
 
     if (len(varsNameToSecretVarsUsed[keygenOutputElem]) > 1):
         return (blindingFactorPrefix + keygenOutputElem + blindingSuffix, False)
@@ -289,7 +329,10 @@ def getCurrentBlindingFactorName(keygenOutputElem):
 
 def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListDecls):
     global blindingFactors_NonLists, varsThatAreBlinded, varsNameToSecretVarsUsed, namesOfAllNonListBlindingFactors
-    global mappingOfSecretVarsToBlindingFactors
+    global mappingOfSecretVarsToBlindingFactors, mappingOfSecretVarsToGroupType
+
+    groupTypeOfThisElement = getVarTypeInfoRecursive(BinaryNode(keygenOutputElem), keygenFuncName)
+    mappingOfSecretVarsToGroupType[keygenOutputElem] = groupTypeOfThisElement
 
     SDLLinesForKeygen = []
 
