@@ -13,7 +13,7 @@ test: ${OBJECTS}
 	${CC} ${OBJECTS} $(LIBS) $(PYLIB) -o test
 
 charm_embed_api.o: charm_embed_api.c
-	${CC} charm_embed_api.c -c $(PYINC) $(OPTS)
+	${CC} $(PYINC) $(OPTS) -c charm_embed_api.c
 
 test.o: test.c
 	${CC} test.c -c $(PYINC) $(OPTS)

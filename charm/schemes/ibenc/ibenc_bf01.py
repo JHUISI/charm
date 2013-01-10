@@ -52,7 +52,7 @@ class IBE_BonehFranklin(IBEnc):
     
     def extract(self, sk, ID):        
         d_ID = sk['s'] * group.hash(ID, G1)
-        k = { 'id':d_ID }
+        k = { 'id':d_ID, 'IDstr':ID }
         if(debug):
             print("Key for id => '%s'" % ID)
             group.debug(k)

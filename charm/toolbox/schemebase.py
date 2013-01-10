@@ -1,44 +1,75 @@
 from charm.toolbox.enum import *
 
+# user-map
+EU_CMA,SU_CMA="EU_CMA","SU_CMA"
+SM,ROM,CRS = "SM","ROM","CRS"
+OW,RSA,StrongRSA,DL,DH,CDH,DDH,DBDH,q_SDH,LRSW = "OW","RSA","StrongRSA","DL","DH","CDH","DDH","DBDH","q_SDH","LRSW"
+
+#def Enum(*sequential, **named):
+#    enums = dict(zip(sequential, range(len(sequential))), **named)
+#    print("declared Enums: ", enums)
+#    orig_map = dict((key, value) for key, value in enums.items())
+#    reverse = dict((value, key) for key, value in enums.items())
+#    enums['map'] = orig_map
+#    enums['rev_map'] = reverse
+#    enums['getList'] = enums.keys()
+#    return type('Enum', (), enums)
+
+baseSecModels = Enum('SM', 'ROM', 'CRS')
+# scheme types
+SchemeType = Enum('PKEnc', 'PKSig', 'IBEnc', 'IBSig', 'RingSig', 'GroupSig', 'ABEnc', 'DABEnc','Commitment', 'Hash', 'ChamHash', 'Protocol')
+secAssump = Enum('OW','RSA','StrongRSA','DL','DH','CDH','DDH','DBDH','q_SDH','LRSW') # need to expand this since it captures implications
+
+schemeType = "scheme"
+assumptionType = "assumption"
+messageSpaceType = "messageSpace"
+secModelType = "secModel"
+secDefType   = "secDef"
+
 class SchemeBase:
-    '''Base class for all crypto, which defines certain attributes'''
+    '''Base class for all crypto, which defines security properties of cryptosystem'''
     def __init__(self):
-        self.baseSchemeTypes = Enum('PKEnc', 'PKSig', 'IBEnc', 'IBSig', 'ABEnc', 'Commitment', 'Hash', 'Protocol')
-	    # self.baseSecDefs defined by derived scheme types
-        self.baseSecDefs = None
-        self.baseAssumptions = Enum('RSA','StrongRSA','DL','DH','CDH','DDH','DBDH','q_SDH','LRSW') 
-        self.baseSecModels = Enum('SM', 'ROM')
+        self.properties = {}
         
-    def setProperty(self, scheme=None, secdef=None, assumption=None, message_space=None, secmodel=None, other=None):
-        if scheme != None: self.schemeType = self.baseSchemeTypes[scheme]
-        if secdef != None: self.secdef = self.baseSecDefs[secdef]
-        if assumption != None: self.assumption = self.baseAssumptions[assumption]
+    def _setProperty(self, scheme=None, secDef=None, assumption=None, messageSpace=None, secModel=None, **kwargs):
+        if scheme is not None and scheme in SchemeType.getList(): self.properties[ schemeType ] = SchemeType[scheme]
+        if assumption is not None and assumption in secAssump.getList(): self.properties[ assumptionType ] = secAssump[assumption]
+        if messageSpace is not None and type(messageSpace) == list:
+            self.properties[ messageSpaceType ] = list(messageSpace)
+        elif messageSpace is not None:
+            self.properties[ messageSpaceType ] = messageSpace # TODO: better error handling here
 
-        self.message_space = message_space
-        if secmodel != None: self.secmodel = self.baseSecModels[secmodel]
+        if secModel is not None and secModel in baseSecModels.getList(): self.properties[ secModelType ] = baseSecModels[secModel]
+        if secDef is not None: self.properties[ secDefType ] = secDef # defined by subclass
+        for key in kwargs.keys():
+            self.properties[ key ] = kwargs[key]
+        return True
 
-        self.other = other
-        return None
+    def _getProperty(self):
+        return dict(self.properties)
 
-    def getProperty(self):
-        props = []
-        if hasattr(self, 'schemeType'): props.append(self.schemeType)
-        if hasattr(self, 'secdef'): props.append(self.secdef)
-        if hasattr(self, 'assumption'): props.append(self.assumption)
-        if hasattr(self, 'message_space'): props.extend(self.message_space)
-        if hasattr(self, 'secmodel'): props.append(self.secmodel)
-        if type(self.other) == dict: props.extend(self.other.values())
-        return set(props)
+    def _checkProperty(self, scheme, prop):
+        # verify scheme is a subclass of SchemeBase
+        if not hasattr(scheme, 'getProperty'): 
+            assert False, "ERROR: Scheme class not derived from any of the Charm scheme types."
 
-    def checkProperty(self, scheme, prop):
-        if type(prop) == dict:
-           values = set(prop.values())           
-           #print("values =>", values)
-           check = scheme.getProperty()
-           #print("check list =>", check)
-           if(values.issubset(check)):
-               return True
-        return False
+        if type(prop) == list:
+           criteria = list(prop)
+           print("criteria: ", criteria)
+           targetProps = scheme.getProperty()
+           print("check list =>", targetProps)
+           for k,v in criteria:
+               print(k, ":", v)
+               if k in targetProps.keys():
+                   # found a match
+                   if (v == str(targetProps[k])):
+                       continue
+                   # criteria value is less than target value
+                   elif v in baseSecModels.getList() and baseSecModels[v] < targetProps[k]:
+                       continue
+               else:
+                   assert False, "ERROR: required property not in scheme dictionary or not satisfied: %s" % k
+        return True
     
     @classmethod
     def verifyTypeStruct(self, source, target, _types=dict):

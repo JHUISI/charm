@@ -129,9 +129,11 @@ status_t element_random(element_t e)
 			bn_inits(n);
 			g1_get_ord(n);
 
-			bn_t t = e->bn;
-			bn_rand(t, BN_POS, bn_bits(n));
-			bn_mod(t,  t, n);
+//			bn_t t;
+//			bn_inits(t);
+//			bn_copy(t, e->bn);
+			bn_rand(e->bn, BN_POS, bn_bits(n));
+			bn_mod(e->bn,  e->bn, n);
 			bn_free(n);
 		}
 		else if(e->type == G1) {
@@ -515,7 +517,7 @@ status_t element_neg(element_t c, element_t a)
 
 	if(type == ZR) {
 		bn_neg(c->bn, a->bn);
-		bn_add(c->bn, c->bn, a->order);
+		if(bn_sign(c->bn) == BN_NEG) bn_add(c->bn, c->bn, a->order);
 	}
 	else if(type == G1) {
 		g1_neg(c->g1, a->g1);

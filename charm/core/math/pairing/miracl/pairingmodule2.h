@@ -35,6 +35,7 @@
 #ifndef PAIRINGMODULE2_H
 #define PAIRINGMODULE2_H
 
+
 #include <Python.h>
 #include <structmember.h>
 #include <longintrepr.h>
@@ -122,12 +123,12 @@ typedef struct {
 
 #ifdef BENCHMARK_ENABLED
 typedef struct {
-	int exp_ZR_t, exp_G1_t, exp_G2_t, exp_GT_t;
-	int mul_ZR_t, mul_G1_t, mul_G2_t, mul_GT_t;
-	int div_ZR_t, div_G1_t, div_G2_t, div_GT_t;
+	int exp_pyZR_t, exp_pyG1_t, exp_pyG2_t, exp_pyGT_t;
+	int mul_pyZR_t, mul_pyG1_t, mul_pyG2_t, mul_pyGT_t;
+	int div_pyZR_t, div_pyG1_t, div_pyG2_t, div_pyGT_t;
 	// optional
-	int add_ZR_t, add_G1_t, add_G2_t, add_GT_t;
-	int sub_ZR_t, sub_G1_t, sub_G2_t, sub_GT_t;
+	int add_pyZR_t, add_pyG1_t, add_pyG2_t, add_pyGT_t;
+	int sub_pyZR_t, sub_pyG1_t, sub_pyG2_t, sub_pyGT_t;
 } Operations;
 #endif
 
@@ -162,11 +163,11 @@ typedef struct {
 #define element_setG1(c, a, b) _element_setG1(c->element_type, c->e, a->e, b->e);
 
 #define element_set_si(a, b) \
-	if(a->element_type == ZR_t) { _element_set_si(a->element_type, a->e, b); }
+	if(a->element_type == pyZR_t) { _element_set_si(a->element_type, a->e, b); }
 
 #define element_set_mpz(a, b)	_element_set_mpz(a->element_type, a->e, b);
-#define element_to_mpz(a, b)	_element_to_mpz(ZR_t, a->e, b);
-#define object_to_mpz(a, b)	_element_to_mpz(ZR_t, a, b);
+#define element_to_mpz(a, b)	_element_to_mpz(pyZR_t, a->e, b);
+#define object_to_mpz(a, b)	_element_to_mpz(pyZR_t, a, b);
 
 #define element_neg(a, b) \
 	a->e = _element_neg(a->element_type, b->e, b->pairing->order);
@@ -180,19 +181,19 @@ typedef struct {
 	c->element_type = a->element_type; }
 
 #define element_pow_int(c, a, b) \
-	c->e = _element_pow_zr_zr(ZR_t, a->pairing->pair_obj, a->e, b, a->pairing->order);	\
-	c->element_type = ZR_t;
+	c->e = _element_pow_zr_zr(pyZR_t, a->pairing->pair_obj, a->e, b, a->pairing->order);	\
+	c->element_type = pyZR_t;
 
 #define pairing_apply(c, a, b) \
 	if(a->pairing->curve == MNT || a->pairing->curve == BN || a->pairing->curve == SS) { \
 		c->e = _element_pairing(a->pairing->pair_obj, a->e, b->e); \
-		c->element_type = GT_t;   \
+		c->element_type = pyGT_t;   \
 	}
 
 #define element_prod_pairing(c, a, b, l) \
 	if(c->pairing->curve == MNT || c->pairing->curve == BN || c->pairing->curve == SS) { \
 		c->e = _element_prod_pairing(c->pairing->pair_obj, a, b, l); \
-		c->element_type = GT_t;  }
+		c->element_type = pyGT_t;  }
 
 #define element_from_hash(a, d, l) \
 		a->e = _element_from_hash(a->element_type, a->pairing->pair_obj, d, l);
@@ -286,13 +287,13 @@ void Operations_clear(void);
 		((Operations *) bench_obj->data_ptr)->exp_ ##group += 1;
 
 #define Update_Op(name, op_type, elem_type, bench_obj)	\
-	Op_ ##name(op_type, elem_type, ZR_t, bench_obj)	\
-	Op_ ##name(op_type, elem_type, G1_t, bench_obj)	\
-	Op_ ##name(op_type, elem_type, G2_t, bench_obj)	\
-	Op_ ##name(op_type, elem_type, GT_t, bench_obj)	\
+	Op_ ##name(op_type, elem_type, pyZR_t, bench_obj)	\
+	Op_ ##name(op_type, elem_type, pyG1_t, bench_obj)	\
+	Op_ ##name(op_type, elem_type, pyG2_t, bench_obj)	\
+	Op_ ##name(op_type, elem_type, pyGT_t, bench_obj)	\
 
 #define UPDATE_BENCH(op_type, elem_type, bench_obj) \
-	if(bench_obj->granular_option == TRUE && elem_type >= ZR_t && elem_type <= GT_t) {		\
+	if(bench_obj->granular_option == TRUE && elem_type >= pyZR_t && elem_type <= pyGT_t) {		\
 		Update_Op(MUL, op_type, elem_type, bench_obj) \
 		Update_Op(DIV, op_type, elem_type, bench_obj) \
 		Update_Op(ADD, op_type, elem_type, bench_obj) \
@@ -302,10 +303,10 @@ void Operations_clear(void);
 	UPDATE_BENCHMARK(op_type, bench_obj);
 
 #define CLEAR_ALLDBENCH(bench_obj)  \
-	    CLEAR_DBENCH(bench_obj, ZR_t);	\
-	    CLEAR_DBENCH(bench_obj, G1_t);	\
-	    CLEAR_DBENCH(bench_obj, G2_t);	\
-	    CLEAR_DBENCH(bench_obj, GT_t);	\
+	    CLEAR_DBENCH(bench_obj, pyZR_t);	\
+	    CLEAR_DBENCH(bench_obj, pyG1_t);	\
+	    CLEAR_DBENCH(bench_obj, pyG2_t);	\
+	    CLEAR_DBENCH(bench_obj, pyGT_t);	\
 
 #define CLEAR_DBENCH(bench_obj, group)   \
 	((Operations *) bench_obj->data_ptr)->mul_ ##group = 0;	\

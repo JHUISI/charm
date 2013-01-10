@@ -15,7 +15,7 @@ Boneh-Boyen Identity Based Encryption
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.core.crypto.cryptobase import *
-from charm.toolbox.IBEnc import IBEnc
+from charm.toolbox.IBEnc import *
 from charm.core.math.pairing import hashPair as sha1
 
 debug = False
@@ -34,8 +34,8 @@ class IBE_BB04(IBEnc):
     """
     def __init__(self, groupObj):
         IBEnc.__init__(self)
-        IBEnc.setProperty(self, secdef='IND_sID_CPA', assumption='DBDH', 
-                          message_space=[GT, 'KEM'], secmodel='ROM', other={'id':ZR})
+        IBEnc.setProperty(self, secDef=IND_sID_CPA, assumption=DBDH, 
+                          messageSpace=[GT, 'KEM'], secModel=ROM, id=ZR)
         global group
         group = groupObj
         

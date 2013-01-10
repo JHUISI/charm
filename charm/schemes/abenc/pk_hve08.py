@@ -23,18 +23,11 @@ class HVE08:
     def setup(self, n):
         g1 = group.random(G1)
         g2 = group.random(G2)
-        egg = pair(g1, g2)
         y = group.random(ZR)
-        Y = egg ** y
+        Y = pair(g1, g2) ** y
 
-        T = {}
-        t = {}
-        V = {}
-        v = {}
-        R = {}
-        r = {}
-        M = {}
-        m = {}
+        T = {}; t = {}; V = {}; v = {}; R = {}
+        r = {}; M = {}; m = {}
 
         for i in range(0, n):
             t[i] = group.random(ZR)

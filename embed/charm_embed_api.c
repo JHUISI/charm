@@ -125,6 +125,7 @@ result_t getType(PyObject *o)
 		return NONE_T;
 	else {
 		printf("%s: unrecognized type.\n", __FUNCTION__);
+		printf("%s: type => '%s'\n", __FUNCTION__, t->tp_name);
 	}
 
 	return NONE_T;
@@ -275,7 +276,8 @@ Charm_t *InitScheme(const char *class_file, const char *class_name, Charm_t *pOb
 
 	pModule = PyImport_Import(pClassName);
     Free(pClassName);
-    debug("successful import: '%s'\n", pModule->ob_type->tp_name);
+	if(pModule != NULL)
+		debug("successful import: '%s'\n", pModule->ob_type->tp_name);
 
     if(pModule != NULL) {
     	pFunc = PyObject_GetAttrString(pModule, class_name);
@@ -300,6 +302,11 @@ Charm_t *InitScheme(const char *class_file, const char *class_name, Charm_t *pOb
         Free(pFunc);
         Free(pModule);
     	return (Charm_t *) pValue;
+    }
+    else {
+		if (PyErr_Occurred())
+			PyErr_Print();
+		fprintf(stderr, "Cannot complete import.\n");
     }
 
     return NULL;

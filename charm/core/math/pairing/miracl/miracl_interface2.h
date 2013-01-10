@@ -37,10 +37,10 @@ extern "C" {
 
 enum Curve {MNT, BN, SS, NONE_C}; // control what type of curve we are dealing with
 #if (BUILD_MNT_CURVE == 1 || BUILD_BN_CURVE == 1)
-enum Group {ZR_t = 0, G1_t, G2_t, GT_t, NONE_G}; // clashes with types in pairing_3.h
+enum Group {pyZR_t = 0, pyG1_t, pyG2_t, pyGT_t, NONE_G}; // clashes with types in pairing_3.h
 #else
-enum Group {ZR_t = 0, G1_t, GT_t, NONE_G};
-#define G2_t 	G1_t // for backwards compatibility
+enum Group {pyZR_t = 0, pyG1_t, pyGT_t, NONE_G};
+#define pyG2_t 	pyG1_t // for backwards compatibility
 #define G2 	 	G1
 #endif
 

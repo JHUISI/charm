@@ -30,16 +30,27 @@
 #ifndef CHARM_EMBED_API_H
 #define CHARM_EMBED_API_H
 
+#include <gmp.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <Python.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 
+#define DEBUG	1
+
 #if defined(BUILD_PAIR) && defined(BUILD_PBC)
 
-#include <gmp.h>
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
 #include <pbc/pbc.h>
+//#ifdef __cplusplus
+//}
+//#endif
 
 #define ID_LEN	4
 
@@ -84,7 +95,7 @@ typedef struct {
 
 #elif defined(BUILD_INT)
 
-#include <gmp.h>
+//#include <gmp.h>
 
 typedef struct {
 	PyObject_HEAD
@@ -186,5 +197,9 @@ Charm_t *bytesToObject(Charm_t *object, Charm_t *group);
 						break;									\
 				}	}
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

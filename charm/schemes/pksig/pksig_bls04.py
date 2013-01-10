@@ -14,14 +14,15 @@
  '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
 from charm.core.engine.util import objectToBytes
+from charm.toolbox.IBSig import *
 
 debug = False
-class IBSig():
+class BLS01(IBSig):
     """
     >>> from charm.toolbox.pairinggroup import PairingGroup
     >>> group = PairingGroup('MNT224')
     >>> messages = { 'a':"hello world!!!" , 'b':"test message" }
-    >>> ib = IBSig(group)
+    >>> ib = BLS01(group)
     >>> (public_key, secret_key) = ib.keygen()
     >>> signature = ib.sign(secret_key['x'], messages)
     >>> ib.verify(public_key, signature, messages) 
@@ -57,7 +58,7 @@ def main():
     groupObj = PairingGroup('MNT224')
     
     m = { 'a':"hello world!!!" , 'b':"test message" }
-    bls = IBSig(groupObj)
+    bls = BLS01(groupObj)
     
     (pk, sk) = bls.keygen()
     
