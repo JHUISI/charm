@@ -5,19 +5,11 @@ EU_CMA,SU_CMA="EU_CMA","SU_CMA"
 SM,ROM,CRS = "SM","ROM","CRS"
 OW,RSA,StrongRSA,DL,DH,CDH,DDH,DBDH,q_SDH,LRSW = "OW","RSA","StrongRSA","DL","DH","CDH","DDH","DBDH","q_SDH","LRSW"
 
-#def Enum(*sequential, **named):
-#    enums = dict(zip(sequential, range(len(sequential))), **named)
-#    print("declared Enums: ", enums)
-#    orig_map = dict((key, value) for key, value in enums.items())
-#    reverse = dict((value, key) for key, value in enums.items())
-#    enums['map'] = orig_map
-#    enums['rev_map'] = reverse
-#    enums['getList'] = enums.keys()
-#    return type('Enum', (), enums)
-
+# security models: standard, random oracle and common reference string
 baseSecModels = Enum('SM', 'ROM', 'CRS')
 # scheme types
 SchemeType = Enum('PKEnc', 'PKSig', 'IBEnc', 'IBSig', 'RingSig', 'GroupSig', 'ABEnc', 'DABEnc','Commitment', 'Hash', 'ChamHash', 'Protocol')
+# security hardness assumptions
 secAssump = Enum('OW','RSA','StrongRSA','DL','DH','CDH','DDH','DBDH','q_SDH','LRSW') # need to expand this since it captures implications
 
 schemeType = "scheme"

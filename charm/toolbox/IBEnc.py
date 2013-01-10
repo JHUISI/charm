@@ -16,18 +16,6 @@ class IBEnc(SchemeBase):
         SchemeBase.__init__(self)
         SchemeBase._setProperty(self, scheme='IBEnc')
     
-#    def setScheme(self, schemeObj):
-#        assert hasattr(schemeObj, 'getProperty'), "scheme is not a derived class from SchemeBase"
-#        name = str(schemeObj.getProperty()[schemeType]).lower() # lowercase
-#        setattr(self, name, schemeObj)
-#        setattr(self, ibeSchemeType, name)
-#        
-#    def getScheme(self):
-#        schemeName = getattr(self, ibeSchemeType)
-#        if schemeName != None:
-#            return getattr(self, schemeName)
-#        return None
-    
     def setProperty(self, secDef=None, assumption=None, messageSpace=None, secModel=None, **kwargs):
         assert secDef is not None and secDef in ibeBaseSecDefs.getList(), "not a valid security definition for this scheme type."
         SchemeBase._setProperty(self, None, ibeBaseSecDefs[secDef], str(assumption), messageSpace, str(secModel), **kwargs)
@@ -42,7 +30,6 @@ class IBEnc(SchemeBase):
         result = SchemeBase._checkProperty(self, schemeObj, reqProps)
         return result
 
-#    @classmethod
     def updateProperty(self, scheme, secDef=None, assumption=None, messageSpace=None, secModel=None, **kwargs):
         # 1. inherit the scheme's properties
         assert hasattr(scheme, 'properties'), "schemeObj does not have getProperty() method."

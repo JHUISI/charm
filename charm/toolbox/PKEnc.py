@@ -35,7 +35,6 @@ class PKEnc(SchemeBase):
         result = SchemeBase._checkProperty(self, schemeObj, reqProps)
         return result
 
-#    @classmethod
     def updateProperty(self, scheme, secDef=None, assumption=None, messageSpace=None, secModel=None, **kwargs):
         # 1. inherit the scheme's properties
         assert hasattr(scheme, 'properties'), "schemeObj does not have getProperty() method."
