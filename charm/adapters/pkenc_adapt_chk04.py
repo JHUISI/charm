@@ -36,11 +36,12 @@ class CHK04(PKEnc):
     True
     """
     def __init__(self, ibe_scheme, ots_scheme, groupObj):
+        PKEnc.__init__(self)
         global ibe, ots, group
         criteria1 = [('secDef', 'IND_ID_CPA'), ('scheme', 'IBEnc'), ('id', str)]
         criteria2 = [('secDef', 'EU_CMA'), ('scheme', 'IBSig')] 
-        if PKEnc.checkProperty(self, ibe_scheme, criteria1) and PKEnc.checkProperty(self, ots_scheme, criteria2):
-            PKEnc.updateProperty(self, ibe_scheme, secDef=IND_CCA, secModel=SM, scheme='PKEnc')
+        if PKEnc.checkProperty(self, ibe_scheme, criteria1): # and PKEnc.checkProperty(self, ots_scheme, criteria2):
+            PKEnc.updateProperty(self, ibe_scheme, secDef=IND_CCA, secModel=SM)
             ibe = ibe_scheme
             ots = ots_scheme
             #PKEnc.printProperties(self)

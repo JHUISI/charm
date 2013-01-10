@@ -29,6 +29,7 @@ class BLS01(IBSig):
     True
     """
     def __init__(self, groupObj):
+        IBSig.__init__(self)
         global group
         group = groupObj
         
