@@ -50,7 +50,7 @@ class Sig_Generic_ibetosig_Naor01(PKSig):
             # change our property as well
             PKSig.updateProperty(self, ibe_scheme, secDef=EU_CMA, id=str, secModel=ROM)
             ibe = ibe_scheme
-            PKSig.printProperties(self)
+            #PKSig.printProperties(self)
         else:
             assert False, "Input scheme does not satisfy adapter properties: %s" % criteria        
         group = groupObj

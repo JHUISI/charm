@@ -47,11 +47,11 @@ class SchemeBase:
 
         if type(prop) == list:
            criteria = list(prop)
-           print("criteria: ", criteria)
+           #print("criteria: ", criteria)
            targetProps = scheme.getProperty()
-           print("check list =>", targetProps)
+           #print("check list =>", targetProps)
            for k,v in criteria:
-               print(k, ":", v)
+               #print(k, ":", v)
                if k in targetProps.keys():
                    # found a match
                    if (v == str(targetProps[k])):

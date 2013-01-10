@@ -28,7 +28,7 @@ class HashIDAdapter(IBEnc):
             # change our property as well
             IBEnc.updateProperty(self, scheme, secDef=IND_ID_CPA, id=str, secModel=ROM)
             ibe = scheme
-            IBEnc.printProperties(self)
+            #IBEnc.printProperties(self)
         else:
             assert False, "Input scheme does not satisfy adapter properties: %s" % criteria
 

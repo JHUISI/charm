@@ -11,7 +11,7 @@
 ''' 
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-from charm.toolbox.IBEnc import IBEnc
+from charm.toolbox.IBEnc import *
 from charm.toolbox.bitstring import Bytes
 from charm.toolbox.hash_module import Waters
 import hashlib, math
@@ -38,9 +38,7 @@ class IBE_N04(IBEnc):
     """Implementation of David Naccahe Identity Based Encryption"""
     def __init__(self, groupObj):
         IBEnc.__init__(self)
-        IBEnc.setProperty(self, secdef='IND_ID_CPA', assumption='DBDH', secmodel='Standard')
-        #, other={'id':ZR}
-        #message_space=[GT, 'KEM']
+        IBEnc.setProperty(self, secDef=IND_ID_CPA, assumption=DBDH, secModel=SM, id=ZR, messageSpace=[GT, 'KEM'])
         global group
         group = groupObj
 
