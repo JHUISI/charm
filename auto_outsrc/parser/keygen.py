@@ -240,6 +240,9 @@ def getShouldThisElemBeUnblinded(keygenOutputElem, varsModifiedInKeygen):
 def getSecretVarsUsed(keygenOutputElem):
     retList = []
 
+    if keygenOutputElem not in varDepList[keygenFuncName]:
+        return []
+
     varDepsOfThisElem = varDepList[keygenFuncName][keygenOutputElem]
 
     for varDep in varDepsOfThisElem:
@@ -327,6 +330,36 @@ def getCurrentBlindingFactorName(keygenOutputElem):
 
     return (sharedBlindingFactorNames[secretVarForThisKeygenElem], False)
 
+def rearrangeListWRTSecretVars(inputList):
+    mappingOfVarNameToSecretVarsUsedLocal = {}
+
+    for element in inputList:
+        secretVarsUsed = getSecretVarsUsed(element)
+        mappingOfVarNameToSecretVarsUsedLocal[element] = secretVarsUsed
+
+    outputList = []
+
+    for element in mappingOfVarNameToSecretVarsUsedLocal:
+        if (len(mappingOfVarNameToSecretVarsUsedLocal[element]) > 0):
+            outputList.append(element)
+
+    for element in mappingOfVarNameToSecretVarsUsedLocal:
+        if (element not in outputList):
+            outputList.append(element)
+
+    return outputList
+
+def useAlternateBlinding(keygenOutputElem):
+    elementType = getVarTypeInfoRecursive(BinaryNode(keygenOutputElem), keygenFuncName)
+
+    if (elementType in [types.G1, types.G2, types.GT, types.ZR, types.list]):
+        return True
+
+    if (elementType in [types.listG1, types.listG2, types.listGT, types.listZR]):
+        return True
+
+    return False
+
 def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListDecls):
     global blindingFactors_NonLists, varsThatAreBlinded, varsNameToSecretVarsUsed, namesOfAllNonListBlindingFactors
     global mappingOfSecretVarsToBlindingFactors, mappingOfSecretVarsToGroupType
@@ -342,13 +375,14 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
     shouldThisElemBeUnblinded = getShouldThisElemBeUnblinded(keygenOutputElem, varsModifiedInKeygen)
 
     if (shouldThisElemBeUnblinded == True):
-        varsNameToSecretVarsUsed[keygenOutputElem] = []
-        SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + " := " + keygenOutputElem + "\n")
-        #if (keygenOutputElem in varsToBlindList):
-            #varsToBlindList.remove(keygenOutputElem)
-        lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, keygenOutputElem)
-        replaceVarInstancesInLineNoRange(lineNoAfterThisAddition, getEndLineNoOfFunc(keygenFuncName), keygenOutputElem, (keygenOutputElem + blindingSuffix))
-        return keygenOutputElem
+        #if (isGroupElement(keygenOutputElem) == False):
+        if (useAlternateBlinding(keygenOutputElem) == False):
+            varsNameToSecretVarsUsed[keygenOutputElem] = []
+            SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + " := " + keygenOutputElem + "\n")
+            lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, keygenOutputElem)
+            replaceVarInstancesInLineNoRange(lineNoAfterThisAddition, getEndLineNoOfFunc(keygenFuncName), keygenOutputElem, (keygenOutputElem + blindingSuffix))
+            return keygenOutputElem
+        ddddddddddd
 
     secretVarsUsed = getSecretVarsUsed(keygenOutputElem)
     varsNameToSecretVarsUsed[keygenOutputElem] = secretVarsUsed
@@ -382,6 +416,7 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
 
     if ( (keygenOutputVarInfo.getIsList() == True) and (len(keygenOutputVarInfo.getListNodesList()) > 0) ):
         listMembers = keygenOutputVarInfo.getListNodesList()
+        listMembers = rearrangeListWRTSecretVars(listMembers)
         listMembersString = ""
         for listMember in listMembers:
             listMembersString += listMember + blindingSuffix + ", "
