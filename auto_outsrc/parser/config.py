@@ -40,12 +40,12 @@ transformFuncName = "transform"
 mainFuncName = "main"
 verifyFuncName = "verify"
 
-masterPubVars = ["pk"]
-masterSecVars = ["mk"]
+masterPubVars = ["mpk"]
+masterSecVars = ["msk"]
 
 # superset of variables we have used to represent public parameters in
 # our crypto schemes
-keygenPubVar = ["pk"]
+keygenPubVar = ["mpk"]
 keygenSecVar = "sk"
 
 pySuffix = ".py"
