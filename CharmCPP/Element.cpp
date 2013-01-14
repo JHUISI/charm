@@ -52,6 +52,12 @@ Element::Element(string s)
 	strPtr = s;
 }
 
+Element::Element(CharmList & List)
+{
+	type 	 = list_t;
+	aList   = List;
+}
+
 Element::Element(ZR & z)
 {
 	type = ZR_t;
@@ -119,6 +125,14 @@ Element::Element(const Element& e)
 		gt = e.gt;
 	else if(type == listGT_t)
 		gtList = e.gtList;
+	else if(type == list_t)
+		aList = e.aList;
+}
+
+CharmList Element::getList()
+{   // only successful if the Element type is of list_t
+	if(type == list_t) return aList;
+	throw new string("invalid type.");
 }
 
 ZR Element::getZR()
@@ -214,6 +228,8 @@ string Element::str()
 		ss << convert_str(gt);
 	else if(type == listGT_t)
 		ss << gtList;
+	else if(type == list_t);
+	    ss << aList;
 	return ss.str();
 }
 
@@ -247,7 +263,8 @@ Element Element::operator=(const Element& e)
 		gt = e.gt;
 	else if(type == listGT_t)
 		gtList = e.gtList;
-
+	else if(type == list_t)
+		aList = e.aList;
 	return *this;
 }
 

@@ -212,6 +212,14 @@ void CharmList::append(const CharmList & c)
 	}
 }
 
+void CharmList::insert(int index, CharmList c)
+{
+	CharmList c2 = c;
+	Element elem(c2);
+	list[index] = elem;
+	cur_index++;
+}
+
 void CharmList::insert(int index, CharmListZR c)
 {
 	CharmListZR c2 = c;
@@ -342,6 +350,9 @@ string CharmList::printAtIndex(int index)
 		}
 		else if(t == listGT_t) {
 			ss << "GT list\n" << list[i].gtList;
+		}
+		else if(t == list_t) {
+			ss << "\nBegin CharmList\n" << list[i].aList << "End CharmList" << endl;
 		}
 	}
 

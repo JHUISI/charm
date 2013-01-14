@@ -5,8 +5,8 @@ using namespace std;
 
 int main()
 {
-    PairingGroup group(SS512);
-    CharmList list, list2;
+    PairingGroup group(MNT160);
+    CharmList list, list2, list3;
     CharmListG1 g1List;
     G1 g1;
     G2 g2;
@@ -62,6 +62,16 @@ int main()
     cout << "Deserialize G1 : " << e1 << endl;
     cout << "Deserialize G2 : " << e2 << endl;
     cout << "Deserialize GT : " << e3 << endl;
+
+    list3.insert(0, testg1);
+    list3.insert(1, list);
+    list3.insert(2, testg2);
+
+    CharmList list4 = list3[1].getList();
+    cout << "\nCharmList Test list3\n" << list3 << endl;
+    cout << "\nCharmList Test list4\n" << list4 << endl;
+
+    cout << "list4 index 1: " << list4[1].getZR() << endl;
 /*
     a = 1024;
     cout << "ZR: " << a << endl;

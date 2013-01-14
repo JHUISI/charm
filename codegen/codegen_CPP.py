@@ -56,7 +56,7 @@ def addImportLines():
     global setupFile
 
     cppImportLines = ""
-    cppImportLines += "#include \"sdlconfig.h\"\n"
+    cppImportLines += "#include \"Charm.h\"\n"
     cppImportLines += "#include <iostream>\n"
     cppImportLines += "#include <sstream>\n"
     cppImportLines += "#include <string>\n"
@@ -73,7 +73,7 @@ def addNumSignatures():
     try:
         numSignatures = assignInfo[NONE_FUNC_NAME][numSignaturesVarName].getAssignNode().right
     except:
-        sys.exit("addNumSignatures in codegen_CPP:  could not obtain number of signatures from SDL file.")
+        return #sys.exit("addNumSignatures in codegen_CPP:  could not obtain number of signatures from SDL file.")
 
     setupFile.write("int " + str(numSignaturesVarName) + " = " + str(numSignatures) + ";\n\n")
 
@@ -93,7 +93,7 @@ def addSecParam():
     try:
         secParam = assignInfo[NONE_FUNC_NAME][secParamVarName].getAssignNode().right
     except:
-        sys.exit("addSecParamin codegen_CPP:  couldn't obtain secparam number from SDL file.")
+        return #sys.exit("addSecParamin codegen_CPP:  couldn't obtain secparam number from SDL file.")
 
     setupFile.write("int " + str(secParamVarName) + " = " + str(secParam) + ";\n\n")
 
@@ -519,8 +519,10 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
 
     elif ( (node.type == ops.ATTR) or (node.type == ops.TYPE) ):
         returnString = processAttrOrTypeAssignStmt(node, replacementsDict)
-
-        if transformOutputList != None and (str(node).startswith(transformOutputList) == True):
+        # JAA: added clause to look for direct references to lists and replace with the ".get<Type>()" extension
+        if leftSideNameForInit != None and str(node).find(LIST_INDEX_SYMBOL) != -1:
+            returnString = addGetTypeToAttrNode(returnString, variableType)
+        elif transformOutputList != None and (str(node).startswith(transformOutputList) == True):
             returnString = addGetTypeToAttrNode(returnString, variableType)
 
         if node.isNegated():
@@ -535,37 +537,37 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
             return returnThisString
 
     elif (node.type == ops.ADD):
-        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
-        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
         return writeMathStatement(leftSide, rightSide, "add")
 
     elif (node.type == ops.SUB):
-        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
-        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
         return writeMathStatement(leftSide, rightSide, "sub")
 
     elif (node.type == ops.MUL):
-        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
-        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
         return writeMathStatement(leftSide, rightSide, "mul")
 
     elif (node.type == ops.DIV):
-        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
-        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
         return writeMathStatement(leftSide, rightSide, "div")
 
     elif (node.type == ops.EXP):
-        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
-        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
         return writeMathStatement(leftSide, rightSide, "exp")  
 
     elif (node.type == ops.AND):
-        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
-        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
         return "( (" + leftSide + ") && (" + rightSide + ") )"
     elif (node.type == ops.EQ_TST):
-        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
-        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
         if (rightSide == "False"):
             rightSide = "false"
         elif (rightSide == "True"):
@@ -575,8 +577,8 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
         else:
             return "( (" + leftSide + ") == (" + rightSide + ") )"
     elif (node.type == ops.NON_EQ_TST):
-        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
-        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
+        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
+        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
         if (rightSide == "False"):
             rightSide = "false"
         elif (rightSide == "True"):
@@ -590,9 +592,9 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
         concatOutputString = "("
         for listNode in node.listNodes:
             if (doesVarNeedStar(listNode) == True):
-                concatOutputString += elementName + "(*" + getAssignStmtAsString_CPP(listNode, replacementsDict, variableName) + ") + "
+                concatOutputString += elementName + "(*" + getAssignStmtAsString_CPP(listNode, replacementsDict, variableName, leftSideNameForInit) + ") + "
             else:
-                concatOutputString += elementName + "(" + getAssignStmtAsString_CPP(listNode, replacementsDict, variableName) + ") + "
+                concatOutputString += elementName + "(" + getAssignStmtAsString_CPP(listNode, replacementsDict, variableName, leftSideNameForInit) + ") + "
         concatOutputString = concatOutputString[0:(len(concatOutputString) - len(" + "))]
         concatOutputString += ")"
         return concatOutputString
@@ -600,9 +602,9 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
         strconcatOutputString = "("
         for listNode in node.listNodes:
             if (doesVarNeedStar(listNode) == True):
-                strconcatOutputString += "*" + getAssignStmtAsString_CPP(listNode, replacementsDict, variableName) + " + "
+                strconcatOutputString += "*" + getAssignStmtAsString_CPP(listNode, replacementsDict, variableName, leftSideNameForInit) + " + "
             else:
-                strconcatOutputString += getAssignStmtAsString_CPP(listNode, replacementsDict, variableName) + " + "
+                strconcatOutputString += getAssignStmtAsString_CPP(listNode, replacementsDict, variableName, leftSideNameForInit) + " + "
         strconcatOutputString = strconcatOutputString[0:(len(strconcatOutputString) - len(" + "))]
         strconcatOutputString += ")"
         return strconcatOutputString
@@ -616,7 +618,7 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
 # JAA: modified append to use insert instead
 #            listOutputString += variableName + ".append("            
             listOutputString += variableName + ".insert("
-            listNodeAsString = getAssignStmtAsString_CPP(listNode, replacementsDict, variableName)
+            listNodeAsString = getAssignStmtAsString_CPP(listNode, replacementsDict, variableName, leftSideNameForInit)
             #if (doesVarNeedStar(listNodeAsString) == True):
             #    listNodeAsString = "*" + listNodeAsString
             listOutputString += str(listIndex) + ", " + listNodeAsString + ");\n"
@@ -629,21 +631,21 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
         for symmapNode in node.listNodes:
             symmapOutputString += writeCurrentNumTabsToString()
             symmapOutputString += variableName + ".set(\""
-            symmapNodeAsString = getAssignStmtAsString_CPP(symmapNode, replacementsDict, variableName)
+            symmapNodeAsString = getAssignStmtAsString_CPP(symmapNode, replacementsDict, variableName, leftSideNameForInit)
             symmapOutputString += "\":" + variableName + ");\n"
         return symmapOutputString
     elif (node.type == ops.RANDOM):
-        randomGroupType = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
+        randomGroupType = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
         randomOutputString = groupObjName + ".random(" + randomGroupType + "_t)"
         return randomOutputString
     elif (node.type == ops.HASH):
-        hashMessage = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
-        hashGroupType = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
+        hashMessage = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
+        hashGroupType = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
         hashOutputString = groupObjName + ".hashListTo" + (str(hashGroupType)).upper() + "(" + hashMessage + ")"
         return hashOutputString
     elif (node.type == ops.PAIR):
-        pairLeftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName)
-        pairRightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName)
+        pairLeftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
+        pairRightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
         return writeMathStatement(pairLeftSide, pairRightSide, "pair")
     elif (node.type == ops.FUNC):
         nodeName = applyReplacementsDict(replacementsDict, getFullVarName(node, False))
@@ -669,13 +671,13 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
         elif (nodeName == LEN_FUNC_NAME):
              if (len(node.listNodes) != 1):
                  sys.exit("getAssignStmtAsString_CPP in codegen_CPP.py:  len() function called, but either less than or more than one parameter was passed in (only one parameter can be passed in for len().")
-             nameOfVarForLen = getAssignStmtAsString_CPP(node.listNodes[0], replacementsDict, variableName)
+             nameOfVarForLen = getAssignStmtAsString_CPP(node.listNodes[0], replacementsDict, variableName, leftSideNameForInit)
              return nameOfVarForLen + ".length()"
         else:
             funcOutputString = nodeName + "("
 
         for listNodeInFunc in node.listNodes:
-            listNodeAsString = getAssignStmtAsString_CPP(listNodeInFunc, replacementsDict, variableName)
+            listNodeAsString = getAssignStmtAsString_CPP(listNodeInFunc, replacementsDict, variableName, leftSideNameForInit)
             funcOutputString += listNodeAsString + ", "
         funcOutputString = funcOutputString[0:(len(funcOutputString) - len(", "))]
         funcOutputString += ")"
@@ -696,7 +698,9 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
         if (variableName == None):
             sys.exit("getAssignStmtAsString_CPP in codegen.py:  ops.EXPAND node encountered, but variableName is set to None.")
         return getCPPAsstStringForExpand(node, variableName, replacementsDict)
-
+    
+#    print("Current Node: ", node)
+#    print("Type: ", node.type)
     assert False,"getAssignStmtAsString_CPP in codegen.py:  unsupported node type detected."
     return
 
@@ -750,12 +754,14 @@ def getCPPAsstStringForExpand(node, variableName, replacementsDict):
                     outputString += "getListGT()"
                 elif (listNodeType == types.ZR):
                     outputString += "getListZR()"
+                elif (listNodeType == types.list):
+                    outputString += "getList()"
                 else:
                     print(node)
                     print(variableName)
                     print(listNodeName)
                     print(listNodeType)
-                    sys.exit("getCPPAsstStringForExpand in codegen.py:  one of the types of the listNodes is not one of the supported types (G1, G2, GT, ZR, or string), and is itself a list.")
+                    sys.exit("getCPPAsstStringForExpand in codegen.py:  one of the types of the listNodes is not one of the supported types (G1, G2, GT, ZR, string or list types)")
             else:
                 if (listNodeType == types.G1):
                     outputString += "getG1()"
@@ -792,6 +798,8 @@ def getVarDeclForListVar(variableName):
         outputString_Types += "    CharmListGT " + trueVarName + ";\n"
     elif (listVarType == types.ZR):
         outputString_Types += "    CharmListZR " + trueVarName + ";\n"
+    elif (listVarType == types.list):
+        outputString_Types += "    CharmList " + trueVarName + ";\n"        
     else:
         outputString_Types += "    NO TYPE FOUND FOR " + trueVarName + "\n"
 

@@ -51,6 +51,7 @@ public:
 	void insert(int, GT&);
 	void insert(int, const GT&);
 	void insert(int, CharmListGT);
+	void insert(int, CharmList); // TODO: test
 	void insert(int, Element&);
 	void insert(int, const Element&);
 	//void append(const CharmList&);
@@ -78,6 +79,7 @@ public:
 	ZR zr;
 	G1 g1;
 	GT gt;
+	CharmList aList;
 	CharmListZR zrList;
 	CharmListG1 g1List;
 	CharmListGT gtList;
@@ -103,6 +105,7 @@ public:
 	Element(CharmListGT&);
 	Element(CharmList&);
  	Element(const Element& e);
+ 	CharmList getList(); // TODO: test
  	ZR getZR(); // returns value (or copy)
  	ZR& getRefZR(); // returns reference for ZR (for cleanup)
  	CharmListZR getListZR(); // returns value (or copy)
