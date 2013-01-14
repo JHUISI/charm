@@ -1,0 +1,160 @@
+from bswUSER import *
+
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.core.engine.util import *
+from charm.core.math.integer import randomBits
+
+group = None
+
+N = 2
+
+secparam = 80
+
+
+def setup():
+    g = group.random(G1)
+    alpha = group.random(ZR)
+    beta = group.random(ZR)
+    h = (g ** beta)
+    f = (g ** (1 / beta))
+    i = (g ** alpha)
+    egg = (pair(g, g) ** alpha)
+    mk = [beta, i]
+    pk = [g, h, f, egg]
+    output = (mk, pk)
+    return output
+
+def keygen(pk, mk, S):
+    Djp = {}
+    blindingFactorDjpBlinded = {}
+    Dj = {}
+    DjBlinded = {}
+    DjpBlinded = {}
+    blindingFactorDjBlinded = {}
+
+    blindingFactorDBlinded = group.random(ZR)
+    SBlinded = S
+    zz = group.random(ZR)
+    g, h, f, egg = pk
+    beta, i = mk
+    r = group.random(ZR)
+    p0 = (pk[1] ** r)
+    D = ((mk[1] * p0) ** (1 / mk[0]))
+    DBlinded = (D ** (1 / blindingFactorDBlinded))
+    Y = len(S)
+    for y in range(0, Y):
+        s_y = group.random(ZR)
+        y0 = S[y]
+        Dj[y0] = (p0 * (group.hash(y0, G1) ** s_y))
+        Djp[y0] = (g ** s_y)
+    for y in Dj:
+        blindingFactorDjBlinded[y] = blindingFactorDBlinded
+        DjBlinded[y] = (Dj[y] ** (1 / blindingFactorDjBlinded[y]))
+    for y in Djp:
+        blindingFactorDjpBlinded[y] = blindingFactorDBlinded
+        DjpBlinded[y] = (Djp[y] ** (1 / blindingFactorDjpBlinded[y]))
+    sk = [SBlinded, DBlinded, DjBlinded, DjpBlinded]
+    skBlinded = [DBlinded, DjpBlinded, SBlinded, DjBlinded]
+    output = (blindingFactorDBlinded, skBlinded)
+    return output
+
+def encrypt(pk, M, policy_str):
+    share = {}
+    Cpr = {}
+    Cr = {}
+
+    g, h, f, egg = pk
+    policy = createPolicy(policy_str)
+    attrs = getAttributeList(policy)
+    s = group.random(ZR)
+    sh = calculateSharesDict(s, policy)
+    Y = len(sh)
+    Ctl = (M * (egg ** s))
+    C = (h ** s)
+    for y in range(0, Y):
+        y1 = attrs[y]
+        share[y1] = sh[y1]
+        Cr[y1] = (g ** share[y1])
+        Cpr[y1] = (group.hash(y1, G1) ** share[y1])
+    ct = [policy_str, Ctl, C, Cr, Cpr]
+    output = ct
+    return output
+
+def transform(pk, sk, ct):
+    transformOutputList = {}
+
+    policy_str, Ctl, C, Cr, Cpr = ct
+    S, D, Dj, Djp = sk
+    transformOutputList[0] = createPolicy(policy_str)
+    policy = transformOutputList[0]
+    print("policy:  ", policy)
+    print("S:  ", S)
+    transformOutputList[1] = prune(policy, S)
+    attrs = transformOutputList[1]
+    transformOutputList[2] = getCoefficients(policy)
+    coeff = transformOutputList[2]
+    transformOutputList[3] = len(attrs)
+    Y = transformOutputList[3]
+    transformOutputList[4] = group.init(GT)
+    reservedVarName0 = transformOutputList[4]
+    for y in range(0, Y):
+        pass
+        transformOutputList[1000+5*y] = GetString(attrs[y])
+        yGetStringSuffix = transformOutputList[1000+5*y]
+        transformOutputList[1001+5*y] = (pair((Cr[yGetStringSuffix] ** coeff[yGetStringSuffix]), Dj[yGetStringSuffix]) * pair((Djp[yGetStringSuffix] ** -coeff[yGetStringSuffix]), Cpr[yGetStringSuffix]))
+        reservedVarName1 = transformOutputList[1001+5*y]
+    transformOutputList[5] = reservedVarName0
+    A = transformOutputList[5]
+    transformOutputList[6] = pair(C, D)
+    result0 = transformOutputList[6]
+    output = transformOutputList
+    return output
+
+def decout(pk, sk, ct, transformOutputList, blindingFactorDBlinded):
+    policy_str, Ctl, C, Cr, Cpr = ct
+    S, D, Dj, Djp = sk
+    policy = transformOutputList[0]
+    attrs = transformOutputList[1]
+    coeff = transformOutputList[2]
+    Y = transformOutputList[3]
+    reservedVarName0 = transformOutputList[4]
+    for y in range(0, Y):
+        pass
+        yGetStringSuffix = transformOutputList[1000+5*y]
+        reservedVarName1 = (transformOutputList[1001+5*y] ** blindingFactorDBlinded)
+        reservedVarName0 = (reservedVarName0 * reservedVarName1)
+    A = transformOutputList[5]
+    result0 = (transformOutputList[6] ** blindingFactorDBlinded)
+    result1 = (result0 * (A ** -1))
+    M = (Ctl * (result1 ** -1))
+    output = M
+    return output
+
+def SmallExp(bits=80):
+    return group.init(ZR, randomBits(bits))
+
+def main():
+    global group
+    group = PairingGroup('SS512')
+
+    attrs = ['ONE', 'TWO', 'THREE']
+    access_policy = '((four or three) and (two or one))'
+
+    (mk, pk) = setup()
+
+    (blindingFactorDBlinded, skBlinded) = keygen(pk, mk, attrs)
+
+    rand_msg = group.random(GT)
+    print("msg =>", rand_msg)
+    ct = encrypt(pk, rand_msg, access_policy)
+    transformOutputList = transform(pk, skBlinded, ct)
+    rec_msg = decout(pk, skBlinded, ct, transformOutputList, blindingFactorDBlinded)
+    print("Rec msg =>", rec_msg)
+
+    assert rand_msg == rec_msg, "FAILED Decryption: message is incorrect"
+    print("Successful Decryption!!!")
+
+
+if __name__ == '__main__':
+    main()
+
