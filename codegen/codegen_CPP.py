@@ -31,7 +31,7 @@ listVarsDeclaredInThisFunc = []
 nonListVarsDeclaredInThisFunc = []
 integerVars = []
 starRef = ""# "*"
-
+INSERT_FUNC_NAME = ".insert("
 transformOutputList = None
 
 def writeCurrentNumTabsToString():
@@ -507,7 +507,7 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
     global userFuncsCPPFile, userFuncsList_CPP
 
     variableType = types.NO_TYPE
-
+    
     if (variableName != None):
         variableType = getFinalVarType(variableName, currentFuncName)
 
@@ -516,12 +516,14 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
 
     elif ( (node.type == ops.ATTR) and (str(node.attr) == smallExp) ):
         return "SmallExp(80)"
-
+    
     elif ( (node.type == ops.ATTR) or (node.type == ops.TYPE) ):
         returnString = processAttrOrTypeAssignStmt(node, replacementsDict)
         # JAA: added clause to look for direct references to lists and replace with the ".get<Type>()" extension
-        if leftSideNameForInit != None and str(node).find(LIST_INDEX_SYMBOL) != -1:
+        if leftSideNameForInit != None and str(node).find(LIST_INDEX_SYMBOL) != -1: # if it appears on rhs of an assignment stateme
             returnString = addGetTypeToAttrNode(returnString, variableType)
+        elif str(node).find(LIST_INDEX_SYMBOL) != -1 and INSERT_FUNC_NAME in variableName: # JAA: if list ref appears on rhs inside a "insert(" call. 
+            returnString = addGetTypeToAttrNode(returnString, getFinalVarType(str(node), currentFuncName)) 
         elif transformOutputList != None and (str(node).startswith(transformOutputList) == True):
             returnString = addGetTypeToAttrNode(returnString, variableType)
 
@@ -789,7 +791,8 @@ def getVarDeclForListVar(variableName):
 
     outputString_Types = ""
 
-    listVarType = getFinalVarType(variableName, currentFuncName)
+    listVarType = getFinalVarType(trueVarName, currentFuncName)
+
     if (listVarType == types.G1):
         outputString_Types += "    CharmListG1 " + trueVarName + ";\n"
     elif (listVarType == types.G2):

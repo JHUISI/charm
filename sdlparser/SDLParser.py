@@ -281,6 +281,8 @@ class SDLParser:
                     if (currentFuncName in endLineNos_Functions):
                         sys.exit("SDLParser.py found multiple END_TOKEN declarations for the same function.")
                     endLineNos_Functions[currentFuncName] = line_number
+                    # post cleanup
+                    postTypeCleanup()
                     currentFuncName = NONE_FUNC_NAME
             elif (op1 == TYPES_HEADER):
                 if (op == START_TOKEN):
@@ -1085,6 +1087,40 @@ def getVarTypeInfoRecursive(node, funcNameInputParam=currentFuncName):
 
     print(node.type)
     sys.exit("getVarTypeInfoRecursive in SDLParser.py:  error in logic.")
+
+def postTypeCleanup():
+    global varTypes
+    
+#    globalTypes = varTypes[TYPES_HEADER]
+    localTypes = varTypes[currentFuncName]
+    
+    allTypes = localTypes.keys()
+    curTypes = {}
+    for i in allTypes:
+        if i.find(LIST_INDEX_SYMBOL) != -1:
+            ii = i.split(LIST_INDEX_SYMBOL)
+            if len(ii) >= 2 and ii[1].isdigit():
+                if curTypes.get(ii[0]) == None:
+                    curTypes[ii[0]] = []
+                curTypes[ii[0]].append(localTypes[i].getType())
+                curTypes[ii[0]] = list(set(curTypes[ii[0]]))
+    
+    # update the local type for all list variable
+    for i,j in curTypes.items():
+        if len(j) > 1: # needs to be a list type
+            # update in varTypes
+            if varTypes[currentFuncName].get(i) == None:
+                # create new var type for i
+                vt = VarType()
+                vt.setType(types.list)
+                varTypes[currentFuncName][i] = vt
+            else:
+                # update exisitng var type for i
+                varTypes[currentFuncName][i].setType(types.list)
+#    for i,j in varTypes[currentFuncName].items():
+#        print(i, ":", j.getType())
+#    print("DEBUG: ", curTypes)
+    return
 
 def getVarTypeInfo(node, i, varName):
     retVarType = getVarTypeInfoRecursive(node.right)

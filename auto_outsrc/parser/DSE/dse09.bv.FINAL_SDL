@@ -5,10 +5,10 @@ short := keys
 N := 2
 secparam := 80
 
+#C := list
 BEGIN :: types
 id := str
 M := GT
-C := list
 D := list
 mpk := list
 msk := list
