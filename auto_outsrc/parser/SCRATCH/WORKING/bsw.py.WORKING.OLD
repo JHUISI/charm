@@ -47,14 +47,19 @@ def keygen(pk, mk, S):
         y0 = S[y]
         Dj[y0] = (p0 * (group.hash(y0, G1) ** s_y))
         Djp[y0] = (g ** s_y)
+    
     for y in Dj:
         blindingFactorDjBlinded[y] = blindingFactorDBlinded
         DjBlinded[y] = (Dj[y] ** (1 / blindingFactorDjBlinded[y]))
     for y in Djp:
         blindingFactorDjpBlinded[y] = blindingFactorDBlinded
         DjpBlinded[y] = (Djp[y] ** (1 / blindingFactorDjpBlinded[y]))
-    sk = [SBlinded, DBlinded, DjBlinded, DjpBlinded]
-    skBlinded = [DBlinded, DjpBlinded, SBlinded, DjBlinded]
+    
+    #DjBlinded = Dj
+    #DjpBlinded = Djp
+    print("SBlinded:  ", SBlinded)
+    skBlinded = [SBlinded, DBlinded, DjBlinded, DjpBlinded]
+    #skBlinded = [DBlinded, DjpBlinded, SBlinded, DjBlinded]
     output = (blindingFactorDBlinded, skBlinded)
     return output
 
@@ -105,6 +110,8 @@ def transform(pk, sk, ct):
         reservedVarName1 = transformOutputList[1001+5*y]
     transformOutputList[5] = reservedVarName0
     A = transformOutputList[5]
+    #A = dotprod2(range(0, Y), lam_func1, attrs, Cr, coeff, Dj, Djp, Cpr)
+    transformOutputList[5] = A
     transformOutputList[6] = pair(C, D)
     result0 = transformOutputList[6]
     output = transformOutputList
@@ -122,8 +129,10 @@ def decout(pk, sk, ct, transformOutputList, blindingFactorDBlinded):
         pass
         yGetStringSuffix = transformOutputList[1000+5*y]
         reservedVarName1 = (transformOutputList[1001+5*y] ** blindingFactorDBlinded)
+        #reservedVarName1 = (transformOutputList[1001+5*y])
         reservedVarName0 = (reservedVarName0 * reservedVarName1)
-    A = transformOutputList[5]
+    #A = transformOutputList[5] ** blindingFactorDBlinded
+    A = reservedVarName0
     result0 = (transformOutputList[6] ** blindingFactorDBlinded)
     result1 = (result0 * (A ** -1))
     M = (Ctl * (result1 ** -1))

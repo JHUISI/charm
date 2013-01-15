@@ -49,7 +49,8 @@ input := list{mpk, mk, id}
 mpk := expand{g, g1, h, gb, g1b, hb, v, l, z}
 mk := expand{g0b, dummyVar}
 
-Id := stringToID(z, 5, id)
+#Id := stringToID(z, 5, id)
+Id := stringToInt(id, 5, 32)
 BEGIN :: for
 for{y := 0, 5}
 r#y := random(ZR)
@@ -60,7 +61,8 @@ END :: for
 d0DotProdCalc := { prod{y := 0, 5} on { (((g1b ^ Id#y) * hb#y) ^ r#y) }}
 d0 := g0b * d0DotProdCalc
 #pk := list{id, j}
-pk := list{id, None}
+dummyVar3 := random(ZR)
+pk := list{id, dummyVar3}
 sk := list{d0, d}
 output := list{pk, sk}
 END :: func:keygen
@@ -75,12 +77,15 @@ s := random(ZR)
 A := M * (v ^ s)
 B :=  g ^ s
 
+Id := stringToInt(id, 5, 32)
+
+
 BEGIN :: for
 for{y := 0, 5}
 
-use stringToInt call here for id#y (same as in keygen)
+#use stringToInt call here for id#y (same as in keygen)
 
-C#y := (((g1 ^ id#y) * h#y) ^ s)
+C#y := (((g1 ^ Id#y) * h#y) ^ s)
 END :: for
             
 #ct := list{A, B, C, j}

@@ -153,6 +153,8 @@ def expandDotProdIntoForLoop(assignInfo, astNode, lineNo, outputFile):
     outputString += str(astNode.left) + " := "
     outputString += RESERVED_VAR_NAME + str(reservedVarNameNumber) + "\n"
 
+    doNotIncludeInTransformList.append(RESERVED_VAR_NAME + str(reservedVarNameNumber))
+
     reservedVarNameNumber += 2
     outputFile.write(outputString)
 

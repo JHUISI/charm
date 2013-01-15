@@ -284,6 +284,8 @@ def getBlindingNonListFactorsOfSameGroupType(elementsOfSameGroupType):
     retList = []
 
     for element in elementsOfSameGroupType:
+        if element not in mappingOfSecretVarsToBlindingFactors:
+            continue
         currentBlindingFactorList = mappingOfSecretVarsToBlindingFactors[element]
         if ( (currentBlindingFactorList[0] not in retList) and (currentBlindingFactorList[0] in blindingFactors_NonLists) ):
             retList.append(currentBlindingFactorList[0])
@@ -425,12 +427,16 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
 
     if ( (keygenOutputVarInfo.getIsList() == True) and (len(keygenOutputVarInfo.getListNodesList()) > 0) ):
         listMembers = keygenOutputVarInfo.getListNodesList()
+        listMembersORIGINAL = listMembers
         listMembers = rearrangeListWRTSecretVars(listMembers)
         listMembersString = ""
         for listMember in listMembers:
-            listMembersString += listMember + blindingSuffix + ", "
+            #listMembersString += listMember + blindingSuffix + ", "
             blindKeygenOutputElement(listMember, varsToBlindList, varNamesForListDecls)
-        listMembersString = listMembersString[0:(len(listMembersString)-2)]
+        #listMembersString = listMembersString[0:(len(listMembersString)-2)]
+        for listMember in listMembersORIGINAL:
+            listMembersString += listMember + blindingSuffix + ", "
+        listMembersString = listMembersString[0:(len(listMembersString) - 2)]
         SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + " := list{" + listMembersString + "}\n")
         if (keygenOutputElem in varNamesForListDecls):
             sys.exit("blindKeygenOutputElement in keygen.py attempted to add duplicate keygenOutputElem to varNamesForListDecls -- 1 of 2.")

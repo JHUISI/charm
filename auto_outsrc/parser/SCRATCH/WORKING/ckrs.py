@@ -1,4 +1,4 @@
-from ckrsWITHCPPUSER import *
+from ckrsUSER import *
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.core.engine.util import *
@@ -8,7 +8,7 @@ group = None
 
 N = 2
 
-secparam = "SS512"
+secparam = 80
 
 
 def setup(n, l):
@@ -38,11 +38,7 @@ def setup(n, l):
     return output
 
 def extract(mpk, msk, id):
-    blindingFactord0Blinded = group.random(ZR)
-    blindingFactord1Blinded = group.random(ZR)
-    blindingFactord2Blinded = group.random(ZR)
     blindingFactor0Blinded = group.random(ZR)
-    blindingFactor1Blinded = group.random(ZR)
     idBlinded = id
     zz = group.random(ZR)
     omega, g, h, gl, hl, v1, v2, v3, v4, n, l = mpk
@@ -57,21 +53,21 @@ def extract(mpk, msk, id):
     hashIDDotProd = reservedVarName0
     hashID = (hl[0] * hashIDDotProd)
     d0 = (h ** ((r1 * (t1 * t2)) + (r2 * (t3 * t4))))
-    d0Blinded = (d0 ** (1 / blindingFactord0Blinded))
+    d0Blinded = (d0 ** (1 / blindingFactor0Blinded))
     halpha = (h ** -alpha)
     hashID2r1 = (hashID ** -r1)
     d1 = ((halpha ** t2) * (hashID2r1 ** t2))
-    d1Blinded = (d1 ** (1 / blindingFactord1Blinded))
+    d1Blinded = (d1 ** (1 / blindingFactor0Blinded))
     d2 = ((halpha ** t1) * (hashID2r1 ** t1))
-    d2Blinded = (d2 ** (1 / blindingFactord2Blinded))
+    d2Blinded = (d2 ** (1 / blindingFactor0Blinded))
     hashID2r2 = (hashID ** -r2)
     d3 = (hashID2r2 ** t4)
     d3Blinded = (d3 ** (1 / blindingFactor0Blinded))
     d4 = (hashID2r2 ** t3)
-    d4Blinded = (d4 ** (1 / blindingFactor1Blinded))
+    d4Blinded = (d4 ** (1 / blindingFactor0Blinded))
     sk = [idBlinded, d0Blinded, d1Blinded, d2Blinded, d3Blinded, d4Blinded]
     skBlinded = [idBlinded, d0Blinded, d1Blinded, d2Blinded, d3Blinded, d4Blinded]
-    output = (blindingFactord0Blinded, blindingFactord1Blinded, blindingFactord2Blinded, blindingFactor0Blinded, blindingFactor0Blinded, blindingFactor1Blinded, blindingFactor1Blinded, skBlinded)
+    output = (blindingFactor0Blinded, skBlinded)
     return output
 
 def encrypt(mpk, M, id):
@@ -101,18 +97,15 @@ def transform(sk, ct):
 
     id, d0, d1, d2, d3, d4 = sk
     c0, c1, c2, c3, c4, cpr = ct
-    transformOutputList[0] = pair(c0, d0)
-    transformOutputList[1] = pair(c1, d1)
-    transformOutputList[2] = pair(c2, d2)
-    transformOutputList[3] = pair(c3, d3)
-    transformOutputList[4] = pair(c4, d4)
+    transformOutputList[0] = (pair(c0, d0) * (pair(c1, d1) * (pair(c2, d2) * (pair(c3, d3) * pair(c4, d4)))))
+    result = transformOutputList[0]
     output = transformOutputList
     return output
 
-def decout(sk, ct, transformOutputList, blindingFactord0Blinded, blindingFactord1Blinded, blindingFactord2Blinded, blindingFactor0Blinded, blindingFactor1Blinded):
+def decout(sk, ct, transformOutputList, blindingFactor0Blinded):
     id, d0, d1, d2, d3, d4 = sk
     c0, c1, c2, c3, c4, cpr = ct
-    result = ((transformOutputList[0] ** blindingFactord0Blinded) * ((transformOutputList[1] ** blindingFactord1Blinded) * ((transformOutputList[2] ** blindingFactord2Blinded) * ((transformOutputList[3] ** blindingFactor0Blinded) * (transformOutputList[4] ** blindingFactor1Blinded)))))
+    result = (transformOutputList[0] ** blindingFactor0Blinded)
     M = (cpr * result)
     output = M
     return output
@@ -122,7 +115,22 @@ def SmallExp(bits=80):
 
 def main():
     global group
-    group = PairingGroup(secparam)
+    group = PairingGroup("SS512")
+
+
+    (mpk, msk) = setup(5, 32)
+    (blindingFactord0Blinded, skBlinded) = extract(mpk, msk, "test")
+    M = group.random(GT)
+    print(M)
+    print("\n\n\n")
+    ct = encrypt(mpk, M, "test")
+    transformOutputList = transform(skBlinded, ct)
+    M2 = decout(skBlinded, ct, transformOutputList, blindingFactord0Blinded)
+    print(M2)
+
+    if (M == M2):
+        print("it worked")
+
 
 if __name__ == '__main__':
     main()
