@@ -8,7 +8,7 @@ group = None
 
 N = 2
 
-secparam = 80
+secparam = "SS512"
 
 
 def setup(n, d):
@@ -38,9 +38,9 @@ def evalT(pk, n, x):
     prodResult = group.init(G2)
     lenNint = len(Nint)
     for i in range(0, lenNint):
-        loopVar = Nint[i]
-        j = group.init(ZR, (loopVar) )
-        loopVarMinusOne = (loopVar - 1)
+        loopVarEvalT = Nint[i]
+        j = group.init(ZR, (loopVarEvalT) )
+        loopVarMinusOne = (loopVarEvalT - 1)
         prodResult = (prodResult * (t[loopVarMinusOne] ** coeffs[j]))
     T = ((pk[2] ** (x * n)) * prodResult)
     output = T
@@ -64,12 +64,14 @@ def intersectionSubset(w, wPrime, d):
     return output
 
 def extract(mk, ID, pk, dOver, n):
-    q = {}
-    wHash = {}
-    d = {}
-    blindingFactorDBlinded = {}
     DBlinded = {}
+    wHash = {}
+    blindingFactorDBlinded = {}
+    q = {}
     D = {}
+    d = {}
+    dBlinded = {}
+    blindingFactordBlinded = {}
 
     blindingFactor0Blinded = group.random(ZR)
     zz = group.random(ZR)
@@ -89,7 +91,9 @@ def extract(mk, ID, pk, dOver, n):
         evalTVar = evalT(pk, n, loopVar)
         D[loopVar] = ((pk[2] ** shares[i][1]) * (evalTVar ** r))
         d[loopVar] = (pk[0] ** r)
-    dBlinded = d
+    for y in d:
+        blindingFactordBlinded[y] = blindingFactor0Blinded
+        dBlinded[y] = (d[y] ** (1 / blindingFactordBlinded[y]))
     for y in D:
         blindingFactorDBlinded[y] = blindingFactor0Blinded
         DBlinded[y] = (D[y] ** (1 / blindingFactorDBlinded[y]))
@@ -133,8 +137,8 @@ def transform(pk, sk, CT, dInputParam):
         pass
         transformOutputList[1000+5*i] = S[i]
         loopVar = transformOutputList[1000+5*i]
-        transformOutputList[1001+5*i] = pair((d[loopVar] ** coeffs[loopVar]), E[loopVar])
-        transformOutputList[1002+5*i] = pair((Eprimeprime ** -coeffs[loopVar]), D[loopVar])
+        transformOutputList[1001+5*i] = (pair((d[loopVar] ** coeffs[loopVar]), E[loopVar]) * pair((Eprimeprime ** -coeffs[loopVar]), D[loopVar]))
+        loopPairings = transformOutputList[1001+5*i]
     output = transformOutputList
     return output
 
@@ -148,7 +152,7 @@ def decout(pk, sk, CT, dInputParam, transformOutputList, blindingFactor0Blinded)
     for i in range(0, SLen):
         pass
         loopVar = transformOutputList[1000+5*i]
-        loopPairings = (transformOutputList[1001+5*i] * (transformOutputList[1002+5*i] ** blindingFactor0Blinded))
+        loopPairings = (transformOutputList[1001+5*i] ** blindingFactor0Blinded)
         prod = (prod * loopPairings)
     M = (Eprime * prod)
     output = M
@@ -160,6 +164,24 @@ def SmallExp(bits=80):
 def main():
     global group
     group = PairingGroup(secparam)
+
+    max_attributes = 6
+    required_overlap = 4
+    (master_public_key, master_key) = setup(max_attributes, required_overlap)
+    private_identity = ['insurance', 'id=2345', 'oncology', 'doctor', 'nurse', 'JHU'] #private identity
+    public_identity = ['insurance', 'id=2345', 'doctor', 'oncology', 'JHU', 'billing', 'misc'] #public identity for encrypt
+    (blindingFactor0Blinded, skBlinded) = extract(master_key, private_identity, master_public_key, required_overlap, max_attributes)
+    msg = group.random(GT)
+    cipher_text = encrypt(master_public_key, public_identity, msg, max_attributes)
+    #decrypted_msg = decrypt(master_public_key, secret_key, cipher_text, required_overlap)
+    transformOutputList = transform(master_public_key, skBlinded, cipher_text, required_overlap)
+    decrypted_msg = decout(master_public_key, skBlinded, cipher_text, required_overlap, transformOutputList, blindingFactor0Blinded)
+
+    print("msg:  ", msg)
+    print("decrypted_msg:  ", decrypted_msg)
+    assert msg == decrypted_msg, "failed decryption!"
+    print("Successful Decryption!")
+
 
 if __name__ == '__main__':
     main()

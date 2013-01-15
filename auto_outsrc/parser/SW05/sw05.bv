@@ -43,9 +43,9 @@ prodResult := init(G2)
 lenNint := len(Nint)
 BEGIN :: for
 for{i := 0, lenNint}
-loopVar := Nint#i
-j := init(ZR, loopVar)
-loopVarMinusOne := loopVar - 1
+loopVarEvalT := Nint#i
+j := init(ZR, loopVarEvalT)
+loopVarMinusOne := loopVarEvalT - 1
 prodResult := prodResult * (t#loopVarMinusOne ^ coeffs#j)
 END :: for
 

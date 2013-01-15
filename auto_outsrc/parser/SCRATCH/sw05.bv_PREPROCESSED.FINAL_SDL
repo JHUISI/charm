@@ -8,12 +8,14 @@ BEGIN :: types
 evalTVar := G2
 M := GT
 S := list
+DBlinded := list
+wHashBlinded := list
+dBlinded := list
 transformOutputList#0 := list
 transformOutputList#1 := symmap
 transformOutputList#2 := int
 transformOutputList#1000+5*i? := list
 transformOutputList#1001+5*i? := GT
-transformOutputList#1002+5*i? := GT
 transformOutputList := list
 END :: types
 
@@ -96,7 +98,11 @@ loopVar := ID#i
 wHash#i := H(loopVar,ZR)
 END :: for
 
-wHashBlinded := wHash
+BEGIN :: forall
+forall{y := wHash}
+blindingFactorwHashBlinded#y := blindingFactor0Blinded
+wHashBlinded#y := wHash#y ^ (1/blindingFactorwHashBlinded#y)
+END :: forall
 r := random(ZR)
 
 BEGIN :: for
@@ -116,7 +122,11 @@ D#loopVar := ((pk#2^shares#i#1) * (evalTVar^r))
 d#loopVar := (pk#0^r)
 END :: for
 
-dBlinded := d
+BEGIN :: forall
+forall{y := d}
+blindingFactordBlinded#y := blindingFactor0Blinded
+dBlinded#y := d#y ^ (1/blindingFactordBlinded#y)
+END :: forall
 BEGIN :: forall
 forall{y := D}
 blindingFactorDBlinded#y := blindingFactor0Blinded
@@ -168,8 +178,8 @@ for{i := 0,SLen}
 NOP
 transformOutputList#1000+5*i? := S#i
 loopVar := transformOutputList#1000+5*i?
-transformOutputList#1001+5*i? := e((d#loopVar^coeffs#loopVar),E#loopVar)
-transformOutputList#1002+5*i? := e((Eprimeprime^-coeffs#loopVar),D#loopVar)
+transformOutputList#1001+5*i? := e((d#loopVar^coeffs#loopVar),E#loopVar) * e((Eprimeprime^-coeffs#loopVar),D#loopVar)
+loopPairings := transformOutputList#1001+5*i?
 END :: for
 output := transformOutputList
 END :: func:transform
@@ -186,7 +196,7 @@ BEGIN :: for
 for{i := 0,SLen}
 NOP
 loopVar := transformOutputList#1000+5*i?
-loopPairings := (transformOutputList#1001+5*i?)  * (transformOutputList#1002+5*i? ^ (blindingFactor0Blinded) ) 
+loopPairings := (transformOutputList#1001+5*i? ^ (blindingFactor0Blinded) ) 
 prod := (prod * loopPairings)
 END :: for
 M := (Eprime * prod)

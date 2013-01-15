@@ -1,15 +1,15 @@
 import hashlib, sys
 
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.pairinggroup import *
 
-from charm.toolbox.enum import Enum
 from charm.toolbox.secretutil import SecretUtil
 from charm.toolbox.secretshare import SecretShare
+
 from charm.core.math import pairing
 from charm.toolbox.iterate import dotprod2
 from charm.core.math.pairing import hashPair as DeriveKey
 from charm.core.engine.util import objectToBytes, bytesToObject
-#from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
+from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from charm.toolbox.conversion import Conversion
 from charm.toolbox.bitstring import Bytes
 #import hashlib
@@ -22,6 +22,24 @@ listIndexNoOfN_StrToId = 9
 listIndexNoOfl_StrToId = 10
 
 MNT160 = "SS512"
+
+def stringToInt(strID, zz, ll):
+    getUserGlobals()
+
+    '''Hash the identity string and break it up in to l bit pieces'''
+    h = hashlib.new('sha1')
+    h.update(bytes(strID, 'utf-8'))
+    _hash = Bytes(h.digest())
+    val = Conversion.OS2IP(_hash) #Convert to integer format
+    bstr = bin(val)[2:]   #cut out the 0b header
+
+    v=[]
+    for i in range(zz):  #z must be greater than or equal to 1
+        binsubstr = bstr[ll*i : ll*(i+1)]
+        intval = int(binsubstr, 2)
+        intelement = groupObjBuiltInFuncs.init(ZR, intval)
+        v.append(intelement)
+    return v
 
 def isList(object):
     objectTypeName = None
@@ -53,6 +71,10 @@ def writeToFile(name, s):
 	fd.write(s)
 	fd.close()
 
+def GetString(GetString_Arg):
+    getUserGlobals()
+    return GetString_Arg.getAttribute()
+
 def createPolicy(policy_str):
 	getUserGlobals()
 	return utilBuiltInFuncs.createPolicy(policy_str)
@@ -77,19 +99,6 @@ def getCoefficients(policy):
 	getUserGlobals()
 	return utilBuiltInFuncs.getCoefficients(policy)
 
-def recoverCoefficientsDict(inputDict):
-	getUserGlobals()
-	#print("it got here")
-	return shareBuiltInFuncs.recoverCoefficientsDict(inputDict)
-
-def genShares(mk0, dOver, n, q, wHash):
-	getUserGlobals()
-	return shareBuiltInFuncs.genShares(mk0, dOver, n, q, wHash)
-
-def intersection_subset(w, CT0, d):
-	getUserGlobals()
-	return shareBuiltInFuncs.intersection_subset(w, CT0, d)
-
 def sha1(message):
 	getUserGlobals()
 	hashObj = hashlib.new('sha1') 
@@ -113,6 +122,16 @@ def strToId(pk, strID):
 		v.append(intelement)
 
 	return v
+
+def genShares(mk0, dOver, n, q, wHash):
+	getUserGlobals()
+	return shareBuiltInFuncs.genShares(mk0, dOver, n, q, wHash)
+
+def recoverCoefficientsDict(inputDict):
+	getUserGlobals()
+	#print("it got here")
+	return shareBuiltInFuncs.recoverCoefficientsDict(inputDict)
+
 
 def getUserGlobals():
 	global groupObjBuiltInFuncs, utilBuiltInFuncs, shareBuiltInFuncs

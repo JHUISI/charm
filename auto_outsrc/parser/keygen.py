@@ -351,10 +351,38 @@ def rearrangeListWRTSecretVars(inputList):
 
     return outputList
 
+def getVarsUsedInFuncs(funcName):
+    retList = []
+
+    if funcName not in assignInfo:
+        sys.exit("getVarsUsedInFuncs in keygen.py:  function name passed in is not in AssignInfo.")
+
+    varsInThatFunc = assignInfo[funcName]
+
+    for currentVarName in varsInThatFunc:
+        varInfoObj = varsInThatFunc[currentVarName]
+        assignNode = varInfoObj.getAssignNode()
+        assignNodeRight = assignNode.right
+        if (assignNodeRight.type != ops.FUNC):
+            continue
+
+        if (str(assignNodeRight.attr) == LEN_FUNC_NAME):
+            continue
+
+        for listNode in assignNodeRight.listNodes:
+            if (listNode not in retList):
+                retList.append(listNode)
+
+    return retList
+
 def useAlternateBlinding(keygenOutputElem):
     elementType = getVarTypeInfoRecursive(BinaryNode(keygenOutputElem), keygenFuncName)
 
-    if (elementType in [types.G1, types.G2, types.GT, types.ZR, types.list]):
+    decryptVarsUsedInFuncs = getVarsUsedInFuncs(decryptFuncName)
+    if (keygenOutputElem in decryptVarsUsedInFuncs):
+        return False
+
+    if (elementType in [types.G1, types.G2, types.GT, types.ZR]):
         return True
 
     if (elementType in [types.listG1, types.listG2, types.listGT, types.listZR]):
