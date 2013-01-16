@@ -1,6 +1,7 @@
 #ifndef CHARM_H
 #define CHARM_H
 
+#include "SecretUtil.h"
 #include "CryptoLib.h"
 #include "CharmList.h"
 #include "CharmListStr.h"
@@ -9,6 +10,7 @@
 #include "CharmListG2.h"
 #include "CharmListGT.h"
 #include "CharmCAPI.h"
+
 
 /* sec-level identifiers for security equivalent to AES-80bit or 128-bit security*/
 #define MNT160			80

@@ -9,12 +9,14 @@ CXXFLAGS += -fPIC
 # should be set by codegen
 rsrc := relic
 msrc := miracl
-subdir := $(rsrc)/*.o $(msrc)/*.o
-INCLUDES += -I. -I$(incdir)
+util := builtin
+subdir := $(util)/*.o $(rsrc)/*.o $(msrc)/*.o
+INCLUDES += -I. -I$(incdir) -I$(util)
 
 OBJECTS	:= CharmListStr.o CharmListZR.o CharmListG1.o CharmListG2.o CharmListGT.o CharmList.o Element.o
 RELIC_OBJECTS := $(rsrc)/Builtin.o $(rsrc)/relic_api.o $(rsrc)/common.o
 MIRACL_OBJECTS := $(msrc)/MiraclAPI.o
+COMMON_OBJECTS := $(util)/util.o $(util)/policy.tab.o $(util)/SecretUtil.o
 CHARM := charm
 CHARM_LIB1 := libCharmRelic.dylib 
 CHARM_LIB2 := libCharmMiracl.dylib
@@ -39,11 +41,15 @@ MLIB	:= $(libdir)/miracl-$(CURVE).a
 .PHONY: all
 all: $(CHARM_LIB)
 
-$(CHARM_LIB1): $(OBJECTS) $(RELIC_OBJECTS)
-	$(CXX) $(LDFLAGS) -o $(CHARM_LIB1) $(OBJECTS) $(RELIC_OBJECTS) $(RLIB)
+.PHONY: sub
+sub:
+	$(MAKE) -C $(util)/
 
-$(CHARM_LIB2): $(OBJECTS) $(MIRACL_OBJECTS)
-	$(CXX) $(LDFLAGS) -o $(CHARM_LIB2) $(OBJECTS) $(MIRACL_OBJECTS) $(MLIB)
+$(CHARM_LIB1): sub $(OBJECTS) $(RELIC_OBJECTS)
+	$(CXX) $(LDFLAGS) -o $(CHARM_LIB1) $(OBJECTS) $(RELIC_OBJECTS) $(COMMON_OBJECTS) $(RLIB)
+
+$(CHARM_LIB2): sub $(OBJECTS) $(MIRACL_OBJECTS)
+	$(CXX) $(LDFLAGS) -o $(CHARM_LIB2) $(OBJECTS) $(MIRACL_OBJECTS) $(COMMON_OBJECTS) $(MLIB)
 
 .PHONY: install
 install: $(CHARM_LIB)

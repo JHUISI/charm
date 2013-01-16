@@ -55,11 +55,37 @@ CharmListStr::CharmListStr(const CharmListStr& cList)
 	list = cList.list;
 }
 
+//void CharmListStr::append(char *s)
+//{
+//	string s2(s);
+//	list[cur_index] = s2;
+//	cur_index++;
+//}
+
 void CharmListStr::append(string & s)
 {
 	list[cur_index] = s;
 	cur_index++;
 }
+
+void CharmListStr::append(string s)
+{
+	list[cur_index] = s;
+	cur_index++;
+}
+
+void CharmListStr::insert(int index, string s)
+{
+	list[index] = s;
+	cur_index++;
+}
+
+void CharmListStr::insert(int index, string & s)
+{
+	list[index] = s;
+	cur_index++;
+}
+
 
 string& CharmListStr::operator[](const int index)
 {

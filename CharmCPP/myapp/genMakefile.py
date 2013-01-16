@@ -8,7 +8,7 @@ prefix := %s
 CXX := %s
 CXXFLAGS := %s
 
-INCLUDES := -I. -I.. -I%s %s
+INCLUDES := -I. -I.. -I../builtin -I%s %s
 
 NAME := %s
 OBJECTS := $(NAME).o

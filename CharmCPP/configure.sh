@@ -694,6 +694,7 @@ if test "$pairing_pbc" = "yes" ; then
         echo "BUILD_MIRACL=no" >> $config_mk
         echo "BUILD_RELIC=no" >> $config_mk
         echo "BUILD_PBC=yes" >> $config_mk
+        echo "underlib=pbc" >> $config_mk
 elif test "$pairing_miracl" = "yes" ; then
 	INCLUDES="-Imiracl/ $INCLUDES"
 	CFLAGS="-DBUILD_RELIC=0 -DBUILD_MIRACL=1 $CFLAGS"
@@ -701,6 +702,7 @@ elif test "$pairing_miracl" = "yes" ; then
         echo "BUILD_MIRACL=yes" >> $config_mk
         echo "BUILD_RELIC=no" >> $config_mk
         echo "BUILD_PBC=no" >> $config_mk
+        echo "underlib=miracl" >> $config_mk
 elif test "$pairing_relic" = "yes" ; then
 	INCLUDES="-Irelic/ $INCLUDES"
 	CFLAGS="-DBUILD_RELIC=1 -DBUILD_MIRACL=0 $CFLAGS"
@@ -708,6 +710,7 @@ elif test "$pairing_relic" = "yes" ; then
         echo "BUILD_MIRACL=no" >> $config_mk
         echo "BUILD_RELIC=yes" >> $config_mk
         echo "BUILD_PBC=no" >> $config_mk
+        echo "underlib=relic" >> $config_mk
 fi
 
 if test "$pairing_miracl" = "yes" ; then

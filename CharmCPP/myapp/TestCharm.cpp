@@ -19,60 +19,79 @@ int main()
     gt = group.random(GT_t);
     cout << "a: " << a << endl;
     cout << "b: " << b << endl;
-    cout << "c: " << group.add(a, b) << endl;
-    cout << "d: " << group.sub(a, b) << endl;
-    cout << "e: " << group.mul(a, b) << endl;
-    cout << "f: " << group.div(a, b) << endl;
-    cout << "G1 Tests..." << endl;
-    cout << convert_str(g1) << endl;
-    cout << "G2 Tests..." << endl;
-    cout << convert_str(g2) << endl;
 
-    cout << "GT Tests..." << endl;
-    cout << convert_str(gt) << endl;
-    list.insert(0, "hello world");
-    list.insert(1, a);
-    list.insert(2, g1);
-    list.insert(3, g2);
-    list.insert(4, gt);
-    list2.insert(0, "hello world");
-    list2.insert(1, g1);
-    list2.insert(2, g1);
-    G1 testg1 = group.hashListToG1(list);
-    G2 testg2 = group.hashListToG2(list);
-    cout << "ZR hashList1 : " << group.hashListToZR(list) << endl;
-    cout << "ZR hashList2 : " << group.hashListToZR(list2) << endl;
-    cout << "G1 hashList1 : " << convert_str(testg1) << endl;
-    cout << "G2 hashList1 : " << convert_str(testg2) << endl;
-    string s1 = serialize(list[1]);
-    string s2 = serialize(list[2]);
-    string s3 = serialize(list[3]);
-    string s4 = serialize(list[4]);
-    cout << "Original ZR : " << list[1] << endl;
-    cout << "Serialize ZR : " << s1 << endl;    
-    cout << "Serialize G1 : " << s2 << endl;    
-    cout << "Serialize G2 : " << s3 << endl;    
-    cout << "Serialize GT : " << s4 << endl;    
-    Element e0, e1, e2, e3; 
-    deserialize(e0, s1);
-    deserialize(e1, s2);
-    deserialize(e2, s3);
-    deserialize(e3, s4);
-    cout << "Deserialize ZR : " << e0 << endl;
-    cout << "Deserialize G1 : " << e1 << endl;
-    cout << "Deserialize G2 : " << e2 << endl;
-    cout << "Deserialize GT : " << e3 << endl;
+    SecretUtil util;
+    CharmListStr attrs;
+    attrs.append("ONE");
+    attrs.append("TWO");
+    attrs.append("THREE");
+//    attrs.append("FOUR");
 
-    list3.insert(0, testg1);
-    list3.insert(1, list);
-    list3.insert(2, testg2);
+    Policy p = util.createPolicy("(ONE and TWO)");
 
-    CharmList list4 = list3[1].getList();
-    cout << "\nCharmList Test list3\n" << list3 << endl;
-    cout << "\nCharmList Test list4\n" << list4 << endl;
+    CharmListStr pruned_list = util.prune(p, attrs);
 
-    cout << "list4 index 1: " << list4[1].getZR() << endl;
-/*
+    cout << "Pruned:\n" << pruned_list << endl;
+
+    CharmListStr attr_list = util.getAttributeList(p);
+
+    cout << "Attr list:\n" << attr_list << endl;
+
+//    cout << "c: " << group.add(a, b) << endl;
+//    cout << "d: " << group.sub(a, b) << endl;
+//    cout << "e: " << group.mul(a, b) << endl;
+//    cout << "f: " << group.div(a, b) << endl;
+//    cout << "G1 Tests..." << endl;
+//    cout << convert_str(g1) << endl;
+//    cout << "G2 Tests..." << endl;
+//    cout << convert_str(g2) << endl;
+//
+//    cout << "GT Tests..." << endl;
+//    cout << convert_str(gt) << endl;
+//    list.insert(0, "hello world");
+//    list.insert(1, a);
+//    list.insert(2, g1);
+//    list.insert(3, g2);
+//    list.insert(4, gt);
+//    list2.insert(0, "hello world");
+//    list2.insert(1, g1);
+//    list2.insert(2, g1);
+//    G1 testg1 = group.hashListToG1(list);
+//    G2 testg2 = group.hashListToG2(list);
+//    cout << "ZR hashList1 : " << group.hashListToZR(list) << endl;
+//    cout << "ZR hashList2 : " << group.hashListToZR(list2) << endl;
+//    cout << "G1 hashList1 : " << convert_str(testg1) << endl;
+//    cout << "G2 hashList1 : " << convert_str(testg2) << endl;
+//    string s1 = serialize(list[1]);
+//    string s2 = serialize(list[2]);
+//    string s3 = serialize(list[3]);
+//    string s4 = serialize(list[4]);
+//    cout << "Original ZR : " << list[1] << endl;
+//    cout << "Serialize ZR : " << s1 << endl;
+//    cout << "Serialize G1 : " << s2 << endl;
+//    cout << "Serialize G2 : " << s3 << endl;
+//    cout << "Serialize GT : " << s4 << endl;
+//    Element e0, e1, e2, e3;
+//    deserialize(e0, s1);
+//    deserialize(e1, s2);
+//    deserialize(e2, s3);
+//    deserialize(e3, s4);
+//    cout << "Deserialize ZR : " << e0 << endl;
+//    cout << "Deserialize G1 : " << e1 << endl;
+//    cout << "Deserialize G2 : " << e2 << endl;
+//    cout << "Deserialize GT : " << e3 << endl;
+//
+//    list3.insert(0, testg1);
+//    list3.insert(1, list);
+//    list3.insert(2, testg2);
+//
+//    CharmList list4 = list3[1].getList();
+//    cout << "\nCharmList Test list3\n" << list3 << endl;
+//    cout << "\nCharmList Test list4\n" << list4 << endl;
+//
+//    cout << "list4 index 1: " << list4[1].getZR() << endl;
+
+    /*
     a = 1024;
     cout << "ZR: " << a << endl;
     cout << "a << 8: " << (a << 8) << endl;

@@ -520,7 +520,7 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
     elif ( (node.type == ops.ATTR) or (node.type == ops.TYPE) ):
         returnString = processAttrOrTypeAssignStmt(node, replacementsDict)
         # JAA: added clause to look for direct references to lists and replace with the ".get<Type>()" extension
-        if leftSideNameForInit != None and str(node).find(LIST_INDEX_SYMBOL) != -1: # if it appears on rhs of an assignment stateme
+        if leftSideNameForInit != None and str(node).find(LIST_INDEX_SYMBOL) != -1: # if it appears on rhs of an assignment stmt
             returnString = addGetTypeToAttrNode(returnString, variableType)
         elif str(node).find(LIST_INDEX_SYMBOL) != -1 and INSERT_FUNC_NAME in variableName: # JAA: if list ref appears on rhs inside a "insert(" call. 
             returnString = addGetTypeToAttrNode(returnString, getFinalVarType(str(node), currentFuncName)) 

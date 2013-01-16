@@ -10,6 +10,9 @@ public:
 	~CharmListStr();
     CharmListStr(const CharmListStr&); // copy constructor
 	void append(string&);
+	void append(string);
+	void insert(int, string&);
+	void insert(int, string);
 	int length(); // return length of lists
 	string printAtIndex(int index);
 
