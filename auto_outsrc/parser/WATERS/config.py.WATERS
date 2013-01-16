@@ -5,6 +5,12 @@ outputVarName = "output"
 
 finalSDLSuffix = ".FINAL_SDL"
 
+listNameIndicator = "LISTNAMEINDICATOR"
+
+doNotIncludeInTransformList = []
+
+forLoopSeed = 1000
+
 transformOutputList = "transformOutputList"
 
 M = 'M'
