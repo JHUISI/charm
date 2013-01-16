@@ -9,6 +9,7 @@ namesOfFutureDeclVars = [keygenSecVar + blindingSuffix, "T1", keygenBlindingExpo
 class VarInfo:
     def __init__(self):
         self.assignNode = None
+        self.varTypes = None
         self.lineNo = None
         self.lineStr = None
         self.varDeps = []
@@ -54,6 +55,7 @@ class VarInfo:
     def copy(self, obj):
         v = VarInfo()
         v.assignNode  = BinaryNode.copy(obj.assignNode) 
+        v.varTypes = obj.varTypes
         v.lineNo      = obj.lineNo
         v.varDeps     = list(obj.varDeps)
         v.varDepsNoExponents = list(obj.varDepsNoExponents)
@@ -117,6 +119,9 @@ class VarInfo:
     
     def getAssignNode(self):
         return self.assignNode
+
+    def getVarTypes(self):
+        return self.varTypes
 
     def getLineNo(self):
         return self.lineNo
@@ -302,7 +307,11 @@ class VarInfo:
         if (numListIndexSymbols == 0):
             (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(self.assignInfo, varNameString)
         else:
-            (retFuncName, retVarInfoObjString) = getVarNameFromListIndices(self.assignInfo, node)
+            if (node.type == ops.ATTR):
+                (retFuncName, retVarInfoObjString) = getVarNameFromListIndices(self.assignInfo, self.varTypes, node)
+            else:
+                (retFuncName, retVarInfoObjString) = getVarNameFromListIndices(self.assignInfo, self.varTypes, BinaryNode(varNameString))
+
             (retFuncName, retVarInfoObj) = getVarNameEntryFromAssignInfo(self.assignInfo, retVarInfoObjString)
         return (retFuncName, retVarInfoObj)
 
@@ -341,10 +350,11 @@ class VarInfo:
             for oldListItem in node.listNodes:
                 (retFuncName, retVarInfoObj) = self.getVarNameEntryFromAssignInfo_Wrapper(node, oldListItem)
                 if ( (retFuncName == None) or (retVarInfoObj == None) ):
-                    if (oldListItem in namesOfFutureDeclVars):
-                        newListNodesList.append(oldListItem)
-                    else:
-                        sys.exit("traverseAssignBaseElemsOnlyRecursive in VarInfo.py:  call to getVarNameEntryFromAssignInfo() for node.getListNodesList() failed.")
+                    #if (oldListItem in namesOfFutureDeclVars):
+                        #newListNodesList.append(oldListItem)
+                    #else:
+                        #sys.exit("traverseAssignBaseElemsOnlyRecursive in VarInfo.py:  call to getVarNameEntryFromAssignInfo() for node.getListNodesList() failed.")
+                    newListNodesList.append(oldListItem)
                 else:
                     baseElemsReplacement = retVarInfoObj.getAssignBaseElemsOnly()
                     if (baseElemsReplacement == None):
@@ -396,17 +406,17 @@ class VarInfo:
         elif (self.assignNode.right.type == ops.NOP):
             self.isNOP = True            
 # JAA: activates the awesome symbolic executor!
-#        if (self.assignBaseElemsOnly == None):
-#            assignNodeRightDeepCopy = copy.deepcopy(self.assignNode.right)
-#            newAssignBaseElemsOnlyNode = self.traverseAssignBaseElemsOnlyRecursive(assignNodeRightDeepCopy)
-#            self.assignBaseElemsOnly = newAssignBaseElemsOnlyNode
+        if (self.assignBaseElemsOnly == None):
+            assignNodeRightDeepCopy = copy.deepcopy(self.assignNode.right)
+            newAssignBaseElemsOnlyNode = self.traverseAssignBaseElemsOnlyRecursive(assignNodeRightDeepCopy)
+            self.assignBaseElemsOnly = newAssignBaseElemsOnlyNode
 
         self.traverseAssignNodeRecursive(self.assignNode.right, False)
 
         if (M in self.varDeps):
             self.protectsM = True
 
-    def setAssignNode(self, assignInfo, assignNode, funcName, outsideForLoopObj, outsideIfElseBranchObj, traverseAssignNode=True):
+    def setAssignNode(self, assignInfo, varTypes, assignNode, funcName, outsideForLoopObj, outsideIfElseBranchObj, traverseAssignNode=True):
         if (type(assignNode).__name__ != BINARY_NODE_CLASS_NAME):
             sys.exit("Assignment node passed to VarInfo is invalid.")
 
@@ -415,6 +425,7 @@ class VarInfo:
 
         self.initCall = False
         self.assignInfo = assignInfo
+        self.varTypes = varTypes
         self.assignNode = assignNode
         self.funcName = funcName
         self.outsideForLoopObj = outsideForLoopObj

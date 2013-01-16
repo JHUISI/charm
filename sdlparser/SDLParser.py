@@ -767,7 +767,7 @@ def updateKeywordStmts(node, lineNum):
 
     varInfoObj = VarInfo()
     varInfoObj.setLineNo(lineNum)
-    varInfoObj.setAssignNode(assignInfo, node, currentFuncName, None, None)
+    varInfoObj.setAssignNode(assignInfo, varTypes, node, currentFuncName, None, None)
     if (varName in assignInfo[currentFuncName]):
         sys.exit("In updateKeywordStmts in SDLParser.py, found duplicate entries for variable name in HEADER function.")
 
@@ -788,7 +788,7 @@ def updatePrecomputeStmts(node, lineNum):
 
     varInfoObj = VarInfo()
     varInfoObj.setLineNo(lineNum)
-    varInfoObj.setAssignNode(assignInfo, node, currentFuncName, None, None, traverseAssignNode=False)
+    varInfoObj.setAssignNode(assignInfo, varTypes, node, currentFuncName, None, None, traverseAssignNode=False)
     if (varName in assignInfo[currentFuncName]):
         sys.exit("In updatePrecomputeStmts in SDLParser.py, found duplicate entries for variable name in PRECOMPUTE_HEADER function.")
 
@@ -1280,7 +1280,7 @@ def updateAssignInfo(node, i):
         if ( (assignInfo_Func[varName].hasBeenSet() == True) and (varName != outputVarName) and (startLineNo_IfBranch == None) and (startLineNo_ForLoop == None) and (startLineNo_ForLoopInner == None) and (varName != blindingLoopVarLength) ):
             sys.exit("Found multiple assignments of same variable name within same function.")
         assignInfo_Func[varName].setLineNo(i)
-        (resultingVarDeps, resultingHashInputArgNames) = assignInfo_Func[varName].setAssignNode(assignInfo, node, currentFuncName, currentForLoopObj, currentIfElseBranch)
+        (resultingVarDeps, resultingHashInputArgNames) = assignInfo_Func[varName].setAssignNode(assignInfo, varTypes, node, currentFuncName, currentForLoopObj, currentIfElseBranch)
         # figure out whether this node is top level
         if currentForLoopObj != None and currentIfElseBranch == None:
             assignInfo_Func[varName].topLevelNode = False
@@ -1298,7 +1298,7 @@ def updateAssignInfo(node, i):
     else:
         varInfoObj = VarInfo()
         varInfoObj.setLineNo(i)
-        (resultingVarDeps, resultingHashInputArgNames) = varInfoObj.setAssignNode(assignInfo, node, currentFuncName, currentForLoopObj, currentIfElseBranch)
+        (resultingVarDeps, resultingHashInputArgNames) = varInfoObj.setAssignNode(assignInfo, varTypes, node, currentFuncName, currentForLoopObj, currentIfElseBranch)
         # figure out whether this node is top level
         if currentForLoopObj != None and currentIfElseBranch == None:
             varInfoObj.topLevelNode = False
