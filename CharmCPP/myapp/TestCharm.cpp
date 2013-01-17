@@ -25,10 +25,11 @@ int main()
     attrs.append("ONE");
     attrs.append("TWO");
     attrs.append("THREE");
-//    attrs.append("FOUR");
+    attrs.append("FOUR");
 
-    Policy p = util.createPolicy("(ONE and TWO)");
+    Policy p = util.createPolicy("((ONE or TWO) and THREE)");
 
+    cout << "Policy: " << p << endl;
     CharmListStr pruned_list = util.prune(p, attrs);
 
     cout << "Pruned:\n" << pruned_list << endl;
@@ -36,6 +37,32 @@ int main()
     CharmListStr attr_list = util.getAttributeList(p);
 
     cout << "Attr list:\n" << attr_list << endl;
+
+//    CharmListZR shares = util.genShares(group, a, 1, 2);
+    ZR secret = a;
+    CharmDictZR sh = util.calculateSharesDict(group, secret, p);
+    cout << "Secret: " << secret << endl;
+    cout << "Shares:\n" << sh << endl;
+
+	CharmDictZR coeff = util.getCoefficients(group, p);
+
+	cout << "Final coeff dict:\n" << coeff << endl;
+
+//    CharmListStr listKeys;
+//    listKeys.append("ONE");
+//    listKeys.append("TWO");
+//    int i, _list[] = {1, 2};
+//    CharmListZR coeffs = util.computelagrangeBasis(group, _list, 2);
+//
+//    cout << "Coeffs list:\n" << coeffs << endl;
+
+    // recover secret
+//    ZR sec = 0;
+//    for(i = 0; i < 2; i++) {
+//    	sec = group.add(sec, group.mul(coeffs[ _list[i] ], sh[ listKeys[i] ]));
+//    }
+//    cout << "Recovered secret: " << sec << endl;
+
 
 //    cout << "c: " << group.add(a, b) << endl;
 //    cout << "d: " << group.sub(a, b) << endl;

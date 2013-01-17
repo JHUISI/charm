@@ -9,15 +9,17 @@ extern "C" {
 #include "util.h"
 #include "policy.h"
 }
-#include "CharmDict.h"
+#include "CharmListZR.h"
 #include "CharmListStr.h"
+#include "Charm.h"
 
 class Policy
 {
 public:
 	charm_attribute_policy *p;
 	bool isInit;
-	Policy();
+//	Policy();
+	Policy(string);
 	~Policy();
 	Policy(const Policy&);
 	Policy& operator=(const Policy&);
@@ -29,16 +31,15 @@ public:
 class SecretUtil
 {
 public: 
-	SecretUtil(); // PairingGroup&);
+	SecretUtil();
 	~SecretUtil();
 	Policy createPolicy(string s);
-	CharmListStr prune(Policy& pol, CharmListStr attrs);
-	CharmListStr getAttributeList(Policy& pol);
-	// CharmDict getCoefficients(Policy& pol); // TODO: implement
-	// CharmDict calculateSharesDict(ZR, Policy&); // TODO: implement
-	// CharmList? calculateSharesList(ZR, Policy&); // TODO: implement
-
-
+	CharmListStr prune(Policy&, CharmListStr attrs);
+	CharmListStr getAttributeList(Policy&);
+	CharmListZR genShares(PairingGroup & group, ZR secret, int k, int n);
+	CharmDictZR calculateSharesDict(PairingGroup & group, ZR, Policy&);
+// CharmList? calculateSharesList(ZR, Policy&); // TODO: implement
+	CharmDictZR getCoefficients(PairingGroup & group, Policy&);
 private:
 //	PairingGroup group;
 };

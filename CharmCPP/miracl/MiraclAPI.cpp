@@ -38,6 +38,11 @@ ZR SmallExp(int bits) {
 	return zr;
 }
 
+PairingGroup::PairingGroup()
+{
+	pfcObject = NULL;
+}
+
 PairingGroup::PairingGroup(int sec_level)
 {
 	cout << "Initializing underlying curve." << endl;
@@ -340,8 +345,11 @@ int PairingGroup::sub(int g, int h)
 ZR PairingGroup::sub(ZR g, ZR h)
 {
 	ZR o = pfcObject->order();
-
-	return (g - h) % o;
+	ZR r = (g - h) % o;
+	if(r < 0) {
+		return (r + o) % o;
+	}
+	return r;
 }
 
 
@@ -354,8 +362,12 @@ int PairingGroup::mul(int g, int h)
 ZR PairingGroup::mul(ZR g, ZR h)
 {
 	ZR o = pfcObject->order();
-	return modmult(g, h, o);
-//	return (g * h) % o;
+	ZR r = modmult(g, h, o);
+
+	if(r < 0) {
+		return (r + o) % o;
+	}
+	return r;
 }
 
 // mul for G1 & GT

@@ -592,6 +592,7 @@ CHARM_ERROR charm_attribute_subtree_clear(charm_attribute_subtree *subtree)
 	/* Leaf nodes.							*/
 	if (subtree->node_type == CHARM_ATTRIBUTE_POLICY_NODE_LEAF) {
 		/* Clear the attribute.			*/
+		//printf("Visiting: '%s'\n", (char *) subtree->attribute.attribute_str);
 		charm_attribute_clear(&(subtree->attribute));
 		return CHARM_ERROR_NONE;
 	}
@@ -601,6 +602,7 @@ CHARM_ERROR charm_attribute_subtree_clear(charm_attribute_subtree *subtree)
 		/* Recurse.	 Ignore the error codes.	*/
 		for (i = 0; i < subtree->num_subnodes; i++) {
 			err_code = charm_attribute_subtree_clear(subtree->subnode[i]);
+			SAFE_FREE(subtree->subnode[i]);
 		}
 		
 		/* Deallocate the list.		*/

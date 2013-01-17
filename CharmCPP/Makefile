@@ -13,7 +13,7 @@ util := builtin
 subdir := $(util)/*.o $(rsrc)/*.o $(msrc)/*.o
 INCLUDES += -I. -I$(incdir) -I$(util)
 
-OBJECTS	:= CharmListStr.o CharmListZR.o CharmListG1.o CharmListG2.o CharmListGT.o CharmList.o Element.o
+OBJECTS	:= CharmDictZR.o CharmListStr.o CharmListZR.o CharmListG1.o CharmListG2.o CharmListGT.o CharmList.o Element.o
 RELIC_OBJECTS := $(rsrc)/Builtin.o $(rsrc)/relic_api.o $(rsrc)/common.o
 MIRACL_OBJECTS := $(msrc)/MiraclAPI.o
 COMMON_OBJECTS := $(util)/util.o $(util)/policy.tab.o $(util)/SecretUtil.o

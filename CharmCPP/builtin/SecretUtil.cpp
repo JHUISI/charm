@@ -1,17 +1,33 @@
 #include "SecretUtil.h"
 
-Policy::Policy()
+//Policy::Policy()
+//{
+////	p = (charm_attribute_policy *) SAFE_MALLOC(sizeof(charm_attribute_policy));
+////	isInit = false;
+//	p = NULL;
+//	isInit = false;
+//}
+
+Policy::Policy(string str)
 {
-	p = (charm_attribute_policy *) SAFE_MALLOC(sizeof(charm_attribute_policy));
-	isInit = false;
+	p = charm_create_func_input_for_policy((char *) str.c_str());
+	isInit = true;
 }
 
 Policy::Policy(const Policy& pol)
 {
 	/* copy constructor */
 	Policy pol2 = pol;
-	memcpy(p, pol2.p, sizeof(charm_attribute_policy));
-	isInit = pol.isInit;
+//	memcpy(p, pol2.p, sizeof(charm_attribute_policy));
+//	isInit = pol2.isInit;
+	if(pol2.isInit) {
+		p = charm_create_func_input_for_policy(pol2.p->str);
+		isInit = true;
+	}
+	else {
+		p = NULL;
+		isInit = false;
+	}
 }
 
 Policy::~Policy()
@@ -26,8 +42,8 @@ Policy::~Policy()
 			}
 		SAFE_FREE(p->root->subnode);
 		SAFE_FREE(p->root);
+		SAFE_FREE(p);
 	}
-	SAFE_FREE(p);
 }
 
 Policy& Policy::operator=(const Policy& pol)
@@ -35,11 +51,23 @@ Policy& Policy::operator=(const Policy& pol)
 	if(this == &pol)
 		return *this;
 
-	memset(p, 0, sizeof(charm_attribute_policy));
-	memcpy(p, pol.p, sizeof(charm_attribute_policy));
-	isInit = pol.isInit;
+	if(pol.isInit) {
+//		memset(p, 0, sizeof(charm_attribute_policy));
+//		memcpy(p, pol.p, sizeof(charm_attribute_policy));
+		p = pol.p;
+		isInit = pol.isInit;
+	}
+	else {
+		isInit = false;
+	}
 	return *this;
 
+}
+
+ostream& operator<<(ostream& s, const Policy& pol)
+{
+	s << charm_get_policy_string(pol.p);
+	return s;
 }
 
 SecretUtil::SecretUtil()
@@ -52,10 +80,10 @@ SecretUtil::~SecretUtil()
 
 Policy SecretUtil::createPolicy(string s)
 {
-	Policy pol;
-	charm_policy_from_string(pol.p, (char *) s.c_str());
-	cout << "DEBUG: policy string: " << charm_get_policy_string(pol.p) << endl;
-	pol.isInit = true;
+	Policy pol(s);
+//	charm_policy_from_string(pol.p, (char *) s.c_str());
+//	cout << "DEBUG: policy string: " << charm_get_policy_string(pol.p) << endl;
+//	pol.isInit = true;
 	return pol;
 }
 
@@ -127,9 +155,178 @@ CharmListStr SecretUtil::getAttributeList(Policy & pol)
 	return attrList;
 }
 
-//CharmDict SecretUtil::getCoefficients(Policy & pol)
-//{
-//	CharmDict dict;
-//	return dict;
-//}
+/*
+ * Evaluate a polynomial: arguments are a list of coefficients and the value of x to evaluate
+ */
+ZR _evalPoly(PairingGroup & group, CharmListZR & coeff, int x)
+{
+	int i, len = coeff.length();
+	ZR share(0);
+	for(i = 0; i < len; i++) {
+		share = group.add(share, group.mul(coeff[i], group.exp(ZR(x), i)));
+	}
+	return share;
+}
+
+/*
+ * Standard secret sharing: generates shares for a secret given the threshold, k,
+ * and the number of participants, n.
+ */
+CharmListZR _genShares(PairingGroup & group, ZR secret, int k, int n)
+{
+	int i;
+	CharmListZR a, shares;
+	if(k <= n) {
+		a[0] = secret; // F(0) = secret
+		for(i = 1; i < k; i++) {
+			a[i] = group.random(ZR_t);
+		}
+
+		for(i = 0; i <= n; i++) {
+			shares[i] = _evalPoly(group, a, i);
+		}
+	}
+
+	return shares;
+}
+
+CharmListZR SecretUtil::genShares(PairingGroup & group, ZR secret, int k, int n)
+{
+	return _genShares(group, secret, k, n);
+}
+
+/*
+ * Computes secret sharing over a tree utilizing the above functions.
+ */
+CHARM_ERROR _computeSharesOverTree(PairingGroup & group, ZR secret, charm_attribute_subtree *subtree, CharmDictZR & dict)
+{
+	CHARM_ERROR err_code;
+	uint32 k, i;
+	string attr;
+	switch(subtree->node_type) {
+		case CHARM_ATTRIBUTE_POLICY_NODE_LEAF:
+				attr = string((char *) subtree->attribute.attribute_str);
+				//cout << "store: k=" << attr << ", v=" << secret << endl;
+				dict[ attr ] = secret;
+			return CHARM_ERROR_NONE;
+
+		case CHARM_ATTRIBUTE_POLICY_NODE_AND:
+			/* AND gates are N-of-N threshold gates */
+			k = subtree->num_subnodes;
+			break;
+
+		case CHARM_ATTRIBUTE_POLICY_NODE_OR:
+			/* OR gates are 1-of-N threshold gates	*/
+			k = 1;
+			break;
+
+		case CHARM_ATTRIBUTE_POLICY_NODE_THRESHOLD:
+			/* THRESHOLD gates have a k parameter associated with them. */
+			k = subtree->threshold_k;
+			break;
+
+		default:
+			//LOG_ERROR("prune_tree: encountered unknown gate type");
+			printf("%s: encountered unknown gate type.\n", __FUNCTION__);
+			return CHARM_ERROR_INVALID_INPUT;
+	}
+
+	CharmListZR shares = _genShares(group, secret, k, (int) subtree->num_subnodes);
+    //cout << "Shares:\n" << shares << endl;
+
+	for (i = 0; i < subtree->num_subnodes; i++) {
+		err_code = _computeSharesOverTree(group, shares[i+1], subtree->subnode[i], dict);
+		if(err_code != CHARM_ERROR_NONE)
+			return err_code;
+	}
+
+	return CHARM_ERROR_NONE;
+}
+
+CharmDictZR SecretUtil::calculateSharesDict(PairingGroup & group, ZR secret, Policy& pol)
+{
+	CharmDictZR dict;
+	_computeSharesOverTree(group, secret, pol.p->root, dict);
+	return dict;
+}
+
+
+CharmListZR _computelagrangeBasis(PairingGroup & group, int list[], int length)
+{
+	CharmListZR coeffs;
+	int i, ii, j, jj;
+	for(i = 0; i < length; i++) {
+		ZR result = 1;
+		ii = list[i];
+		for(j = 0; j < length; j++) {
+			jj = list[j];
+			if( ii != jj) {
+				result = group.mul(result, group.div(group.sub(ZR(0), ZR(jj)), group.sub(ZR(ii), ZR(jj))));
+			}
+		}
+		coeffs[ ii ] = result;
+	}
+
+	return coeffs;
+}
+
+CHARM_ERROR _getCoefficients(PairingGroup & group, charm_attribute_subtree *subtree, ZR coeff_result, CharmDictZR & coeffDict)
+{
+	CHARM_ERROR err_code;
+	uint32 k, i;
+	string attr;
+	switch(subtree->node_type) {
+		case CHARM_ATTRIBUTE_POLICY_NODE_LEAF:
+				attr = string((char *) subtree->attribute.attribute_str);
+				//cout << "coeff: k=" << attr << ", v=" << coeff_result << endl;
+				coeffDict[ attr ] = coeff_result;
+			return CHARM_ERROR_NONE;
+
+		case CHARM_ATTRIBUTE_POLICY_NODE_AND:
+			/* AND gates are N-of-N threshold gates */
+			k = subtree->num_subnodes;
+			break;
+
+		case CHARM_ATTRIBUTE_POLICY_NODE_OR:
+			/* OR gates are 1-of-N threshold gates	*/
+			k = 1;
+			break;
+
+//		case CHARM_ATTRIBUTE_POLICY_NODE_THRESHOLD:
+//			/* THRESHOLD gates have a k parameter associated with them. */
+//			k = subtree->threshold_k;
+//			break;
+
+		default:
+			//LOG_ERROR("prune_tree: encountered unknown gate type");
+			printf("%s: encountered unknown gate type.\n", __FUNCTION__);
+			return CHARM_ERROR_INVALID_INPUT;
+	}
+	int list[k];
+	for(i = 0; i < k; i++) list[i] = (i + 1);
+    CharmListZR coeffs = _computelagrangeBasis(group, list, k); // for subtree nodes
+
+	/* recursively apply to subtrees from 1 to n */
+	for (i = 0; i < subtree->num_subnodes; i++) {
+		if(subtree->node_type == CHARM_ATTRIBUTE_POLICY_NODE_AND) {
+			err_code = _getCoefficients(group, subtree->subnode[i], coeff_result * coeffs[ list[i] ], coeffDict);
+		}
+		else if(subtree->node_type == CHARM_ATTRIBUTE_POLICY_NODE_OR) {
+			err_code = _getCoefficients(group, subtree->subnode[i], coeff_result * coeffs[ list[0] ], coeffDict);
+		}
+		if(err_code != CHARM_ERROR_NONE)
+			return err_code;
+
+	}
+
+	return CHARM_ERROR_NONE;
+
+}
+
+CharmDictZR SecretUtil::getCoefficients(PairingGroup & group, Policy& pol)
+{
+	CharmDictZR coeffDict;
+	_getCoefficients(group, pol.p->root, ZR(1), coeffDict);
+	return coeffDict;
+}
 

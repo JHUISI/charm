@@ -37,6 +37,7 @@ class CharmMetaListGT;
 class PairingGroup
 {
 public:
+	PairingGroup();
 	PairingGroup(int);
 	~PairingGroup();
 	// generate random
