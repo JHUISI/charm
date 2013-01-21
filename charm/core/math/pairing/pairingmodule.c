@@ -2160,9 +2160,9 @@ void initpairing(void) 		{
 	PyModule_AddIntConstant(m, "GT", GT);
 
 #if BENCHMARK_ENABLED == 1
-	PA_ADD_BENCHMARK_OPTIONS(m);
-	PyModule_AddStringConstant(m, "Pair", PAIR_OPT);
-	PyModule_AddStringConstant(m, "Granular", GRAN_OPT);
+	ADD_BENCHMARK_OPTIONS(m);
+	PyModule_AddStringConstant(m, "Pair", 	  _PAIR_OPT);
+	PyModule_AddStringConstant(m, "Granular", _GRAN_OPT);
 #endif
 
 LEAVE:
