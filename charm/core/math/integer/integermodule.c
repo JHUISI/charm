@@ -1871,12 +1871,12 @@ static PyObject *Integer_xor(PyObject *self, PyObject *other) {
 
 #ifdef BENCHMARK_ENABLED
 /* END: helper function definition */
-InitBenchmark_CAPI(_init_benchmark, dBench, 3);
-StartBenchmark_CAPI( _start_benchmark, dBench);
-EndBenchmark_CAPI( _end_benchmark, dBench);
-GetBenchmark_CAPI( _get_benchmark, dBench);
-GetAllBenchmarks_CAPI(_get_all_results, dBench);
-ClearBenchmarks_CAPI(_clear_benchmark, dBench);
+InitBenchmark_CAPI(int_init_benchmark, dBench, 3);
+StartBenchmark_CAPI(int_start_benchmark, dBench);
+EndBenchmark_CAPI(int_end_benchmark, dBench);
+GetBenchmark_CAPI(int_get_benchmark, dBench);
+GetAllBenchmarks_CAPI(int_get_all_results, dBench, GetResults);
+ClearBenchmarks_CAPI(int_clear_benchmark, dBench);
 #endif
 
 PyMethodDef Integer_methods[] = {
@@ -2068,7 +2068,7 @@ static struct module_state _state;
 #endif
 
 /* global module methods (include isPrime, randomPrime, etc. here). */
-static PyMethodDef module_methods[] = {
+PyMethodDef module_methods[] = {
 	{ "randomBits", (PyCFunction) genRandomBits, METH_VARARGS, "generate a random number of bits from 0 to 2^n-1." },
 	{ "random", (PyCFunction) genRandom, METH_VARARGS, "generate a random number in range of 0 to n-1 where n is large number." },
 	{ "randomPrime", (PyCFunction) genRandomPrime, METH_VARARGS, "generate a probabilistic random prime number that is n-bits." },
@@ -2083,12 +2083,12 @@ static PyMethodDef module_methods[] = {
 	{ "serialize", (PyCFunction) serialize, METH_VARARGS, "Serialize an integer type into bytes." },
 	{ "deserialize", (PyCFunction) deserialize, METH_VARARGS, "De-serialize an bytes object into an integer object" },
 #ifdef BENCHMARK_ENABLED
-	{ "InitBenchmark", (PyCFunction) _init_benchmark, METH_NOARGS, "Initialize a benchmark object" },
-	{ "StartBenchmark", (PyCFunction) _start_benchmark, METH_VARARGS, "Start a new benchmark with some options" },
-	{ "EndBenchmark", (PyCFunction) _end_benchmark, METH_VARARGS, "End a given benchmark" },
-	{ "GetBenchmark", (PyCFunction) _get_benchmark, METH_VARARGS, "Returns contents of a benchmark object" },
-	{ "GetGeneralBenchmarks", (PyCFunction) _get_all_results, METH_VARARGS, "Retrieve general benchmark info as a dictionary."},
-	{ "ClearBenchmark", (PyCFunction)_clear_benchmark, METH_VARARGS, "Clears content of benchmark object"},
+	{ "InitBenchmark", (PyCFunction) int_init_benchmark, METH_NOARGS, "Initialize a benchmark object" },
+	{ "StartBenchmark", (PyCFunction) int_start_benchmark, METH_VARARGS, "Start a new benchmark with some options" },
+	{ "EndBenchmark", (PyCFunction) int_end_benchmark, METH_VARARGS, "End a given benchmark" },
+	{ "GetBenchmark", (PyCFunction) int_get_benchmark, METH_VARARGS, "Returns contents of a benchmark object" },
+	{ "GetGeneralBenchmarks", (PyCFunction) int_get_all_results, METH_VARARGS, "Retrieve general benchmark info as a dictionary."},
+	{ "ClearBenchmark", (PyCFunction) int_clear_benchmark, METH_VARARGS, "Clears content of benchmark object"},
 #endif
 	{ "int2Bytes", (PyCFunction) toBytes, METH_O, "convert an integer object to a bytes object." },
 	{ "toInt", (PyCFunction) toInt, METH_O, "convert modular integer into an integer object."},
@@ -2105,7 +2105,8 @@ static int int_clear(PyObject *m) {
 	Py_CLEAR(GETSTATE(m)->error);
     Py_XDECREF(IntegerError);
 #ifdef BENCHMARK_ENABLED
-	Py_XDECREF(dBench); //Py_CLEAR(GETSTATE(m)->dBench);
+	//Py_CLEAR(GETSTATE(m)->dBench);
+	Py_XDECREF(dBench);
 #endif
 	return 0;
 }
@@ -2152,17 +2153,17 @@ void initinteger(void) {
 	IntegerError = st->error;
     Py_INCREF(IntegerError);
 #ifdef BENCHMARK_ENABLED
-	if (import_benchmark() < 0)
-		CLEAN_EXIT;
-	if (PyType_Ready(&BenchmarkType) < 0)
-		CLEAN_EXIT;
-	st->dBench = PyObject_New(Benchmark, &BenchmarkType);
-	dBench = st->dBench;
+    if(import_benchmark() < 0)
+    	CLEAN_EXIT;
+
+    if(PyType_Ready(&BenchmarkType) < 0)
+    	INITERROR;
+    st->dBench = PyObject_New(Benchmark, &BenchmarkType);
+    dBench = st->dBench;
     Py_INCREF(dBench);
-	dBench->bench_initialized = FALSE;
-	InitClear(dBench);
-    Py_INCREF(&BenchmarkType);
-    PyModule_AddObject(m, "benchmark", (PyObject *)&BenchmarkType);
+    InitClear(dBench);
+//    Py_INCREF(&BenchmarkType);
+//    PyModule_AddObject(m, "benchmark", (PyObject *)&BenchmarkType);
 #endif
 
 	Py_INCREF(&IntegerType);
@@ -2185,8 +2186,9 @@ void initinteger(void) {
 
 LEAVE:
 	if (PyErr_Occurred()) {
-       Py_XDECREF(m);
-       INITERROR;
+		printf("ERROR: module load failed!\n");
+		Py_XDECREF(m);
+		INITERROR;
    }
 
 #if PY_MAJOR_VERSION >= 3

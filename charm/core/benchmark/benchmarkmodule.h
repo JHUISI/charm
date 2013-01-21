@@ -29,14 +29,22 @@ extern "C" {
 	#define _PyLong_Check(o1) PyLong_Check(o1)
 	#define ConvertToInt(o) PyLong_AsLong(o)
 	#define PyToLongObj(o) PyLong_FromLong(o)
+	/* check for both unicode and bytes objects */
+	#define PyBytes_CharmCheck(obj) PyUnicode_Check(obj) || PyBytes_Check(obj)
+	/* if unicode then add extra conversion step. two possibilities: unicode or bytes */
+	#define PyBytes_ToString(a, obj) \
+if(PyUnicode_Check(obj)) { PyObject *_obj = PyUnicode_AsUTF8String(obj); a = PyBytes_AS_STRING(_obj); Py_DECREF(_obj); }	\
+else { a = PyBytes_AS_STRING(obj); }
 #else
 	#define _PyLong_Check(o) (PyInt_Check(o) || PyLong_Check(o))
 	#define ConvertToInt(o) PyInt_AsLong(o)
 	#define PyToLongObj(o) PyInt_FromSize_t(o)
 	#define PyUnicode_FromFormat PyString_FromFormat
     #define PyUnicode_FromString PyString_FromString
+	/* treat everything as string in 2.x */
+	#define PyBytes_CharmCheck(obj)	PyUnicode_Check(obj) || PyString_Check(obj)
+	#define PyBytes_ToString(a, obj) a = PyString_AsString(obj);
 #endif
-
 
 #define BENCHMARK_MOD_NAME "charm.core.benchmark._C_API"
 
@@ -50,6 +58,15 @@ PyObject *BenchmarkError;
 #define MAX_MEASURE 10
 enum Measure {CPU_TIME = 0, REAL_TIME, NATIVE_TIME, ADDITION, SUBTRACTION, MULTIPLICATION, DIVISION, EXPONENTIATION, PAIRINGS, GRANULAR, NONE};
 typedef enum Measure MeasureType;
+const char *_CPUTIME_OPT 	= "CpuTime";
+const char *_REALTIME_OPT 	= "RealTime";
+const char *_ADD_OPT		= "Add";
+const char *_SUB_OPT		= "Sub";
+const char *_MUL_OPT		= "Mul";
+const char *_DIV_OPT		= "Div";
+const char *_EXP_OPT		= "Exp";
+const char *_PAIR_OPT		= "Pair";
+const char *_GRAN_OPT		= "Granular";
 
 // for recording native time
 #ifdef BENCHMARK_ENABLED
@@ -93,7 +110,8 @@ void Benchmark_dealloc(Benchmark *self);
 int Benchmark_init(Benchmark *self, PyObject *args, PyObject *kwds);
 PyObject *Benchmark_print(Benchmark *self);
 PyObject *GetResults(Benchmark *self);
-PyObject *Retrieve_result(Benchmark *self, MeasureType option);
+PyObject *GetResultsWithPair(Benchmark *self);
+PyObject *Retrieve_result(Benchmark *self, char *option);
 
 /* c api functions */
 #define PyBenchmark_Start 		  0
@@ -152,7 +170,7 @@ static void **PyBenchmark_API;
 
 /* start - api helper functions */
 #define InitBenchmark_CAPI(func_name, bench, id) \
-static PyObject *func_name(PyObject *self, PyObject *args) { 	\
+PyObject *func_name(PyObject *self, PyObject *args) { 	\
 	if(bench->bench_initialized == FALSE) {   		\
 		bench->bench_initialized = TRUE;		\
 		bench->identifier = id;				\
@@ -162,10 +180,10 @@ static PyObject *func_name(PyObject *self, PyObject *args) { 	\
 	Py_RETURN_FALSE;				}
 
 #define StartBenchmark_CAPI(func_name, bench) 	\
-static PyObject *func_name(PyObject *self, PyObject *args) { \
+PyObject *func_name(PyObject *self, PyObject *args) { \
 	PyObject *list = NULL; int id = -1;			\
 	if(PyArg_ParseTuple(args, "iO", &id, &list)) {		\
-		if(bench->bench_initialized && id == bench->identifier) { \
+		if(bench->bench_initialized == TRUE && id == bench->identifier) { \
 			size_t size = PyList_Size(list);	\
 			PyStartBenchmark(bench, list, size);	\
 		debug("list size => %zd\n", size);		\
@@ -175,10 +193,10 @@ static PyObject *func_name(PyObject *self, PyObject *args) { \
 	return NULL;	}
 
 #define EndBenchmark_CAPI(func_name, bench)		\
-static PyObject *func_name(PyObject *self, PyObject *args) { \
+PyObject *func_name(PyObject *self, PyObject *args) { \
 	int id = -1;					\
 	if(PyArg_ParseTuple(args, "i", &id)) {		\
-		if(id == bench->identifier) {		\
+		if(bench->bench_initialized == TRUE && id == bench->identifier) {		\
 			PyEndBenchmark(bench);		\
 			bench->bench_initialized = FALSE; \
 			Py_RETURN_TRUE;		}	\
@@ -186,31 +204,30 @@ static PyObject *func_name(PyObject *self, PyObject *args) { \
 	Py_RETURN_FALSE;			}
 
 #define GetBenchmark_CAPI(func_name, bench) \
-static PyObject *func_name(PyObject *self, PyObject *args) { \
+PyObject *func_name(PyObject *self, PyObject *args) { \
 	int id = -1;					\
-	MeasureType option = NONE;			\
-	if(PyArg_ParseTuple(args, "i|i", &id, &option)) { \
-		return Retrieve_result(dBench, option); \
-		Py_RETURN_FALSE;	}		\
+	char *opt = NULL;			\
+	if(PyArg_ParseTuple(args, "i|s", &id, &opt)) { \
+		return Retrieve_result(bench, opt); \
+		}		\
 	Py_RETURN_FALSE;	}
 
-// 		else if(id == bench->identifier) return Benchmark_print(dBench);
-
-#define GetAllBenchmarks_CAPI(func_name, bench)	\
-static PyObject *func_name(PyObject *self, PyObject *args) { \
+#define GetAllBenchmarks_CAPI(func_name, bench, getResultFunc)	\
+PyObject *func_name(PyObject *self, PyObject *args) { \
 	int id = -1;					\
 	if(PyArg_ParseTuple(args, "i", &id)) {		\
 		if(id == bench->identifier)		\
-			return GetResults(bench);	\
+			return getResultFunc(bench);	\
 	debug("Invalid benchmark idenifier.\n"); }	\
 	Py_RETURN_FALSE;	}
 
 #define ClearBenchmarks_CAPI(func_name, bench) \
-static PyObject *func_name(PyObject *self, PyObject *args) { \
+PyObject *func_name(PyObject *self, PyObject *args) { \
 	int id = -1;					\
 	if(PyArg_ParseTuple(args, "i", &id)) {		\
 		if(id == bench->identifier)	{	\
 			PyClearBenchmark(bench);	\
+			debug("Benchmark object cleared!\n");	\
 			Py_RETURN_TRUE;    } 		\
 	debug("Invalid benchmark idenifier.\n"); }	\
 	Py_RETURN_FALSE;	}
@@ -220,17 +237,17 @@ static PyObject *func_name(PyObject *self, PyObject *args) { \
 	bench->bench_initialized = bench->granular_option = FALSE; \
 	bench->op_add = bench->op_sub = bench->op_mult = 0;	\
 	bench->op_div = bench->op_exp = bench->op_pair = 0; \
-	bench->native_time_ms = bench->cpu_time_ms = bench->real_time_ms = 0.0;
+	bench->native_time_ms = bench->cpu_time_ms = bench->real_time_ms = 0.0; \
+	bench->identifier = -1;
 
 #define ADD_BENCHMARK_OPTIONS(m)		\
-	PyModule_AddIntConstant(m, "CpuTime", CPU_TIME);		\
-	PyModule_AddIntConstant(m, "RealTime", REAL_TIME);		\
-	PyModule_AddIntConstant(m, "NativeTime", NATIVE_TIME);	\
-	PyModule_AddIntConstant(m, "Add", ADDITION);			\
-	PyModule_AddIntConstant(m, "Sub", SUBTRACTION);		\
-	PyModule_AddIntConstant(m, "Mul", MULTIPLICATION);		\
-	PyModule_AddIntConstant(m, "Div", DIVISION);			\
-	PyModule_AddIntConstant(m, "Exp", EXPONENTIATION);
+	PyModule_AddStringConstant(m, "CpuTime", "CpuTime");		\
+	PyModule_AddStringConstant(m, "RealTime", "RealTime");		\
+	PyModule_AddStringConstant(m, "Add", "Add");			\
+	PyModule_AddStringConstant(m, "Sub", "Sub");		\
+	PyModule_AddStringConstant(m, "Mul", "Mul");		\
+	PyModule_AddStringConstant(m, "Div", "Div");			\
+	PyModule_AddStringConstant(m, "Exp", "Exp");
 
 
 /* end - api helper functions */

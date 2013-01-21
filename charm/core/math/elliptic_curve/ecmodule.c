@@ -643,9 +643,9 @@ static PyObject *ECE_mul(PyObject *o1, PyObject *o2) {
 
 		if(ElementG(lhs, rhs)) {
 			ans = createNewPoint(G, lhs); // ->group, lhs->ctx);
-			START_CLOCK(dBench);
+			//START_CLOCK(dBench);
 			EC_POINT_add(ans->group, ans->P, lhs->P, rhs->P, ans->ctx);
-			STOP_CLOCK(dBench);
+			//STOP_CLOCK(dBench);
 		}
 		else if(ElementZR(lhs, rhs)) {
 			order = BN_new();
@@ -790,7 +790,7 @@ static PyObject *ECE_rem(PyObject *o1, PyObject *o2) {
 			ans = createNewPoint(ZR, lhs); // ->group, lhs->ctx);
 			//START_CLOCK(dBench);
 			BN_mod(ans->elemZ, lhs->elemZ, rhs_val, ans->ctx);
-			STOP_CLOCK(dBench);
+			//STOP_CLOCK(dBench);
 			BN_free(rhs_val);
 			return (PyObject *) ans;
 		}
@@ -833,7 +833,7 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 			EC_GROUP_get_order(ans->group, order, ans->ctx);
 			//START_CLOCK(dBench);
 			BN_mod_exp(ans->elemZ, lhs_val, rhs->elemZ, order, ans->ctx);
-			STOP_CLOCK(dBench);
+			//STOP_CLOCK(dBench);
 			BN_free(lhs_val);
 			BN_free(order);
 #ifdef BENCHMARK_ENABLED
@@ -861,7 +861,7 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 					BN_mod_exp(ans->elemZ, lhs->elemZ, rhs_val, order, ans->ctx);
 					BN_free(rhs_val);
 					BN_free(order);
-					STOP_CLOCK(dBench);
+					//STOP_CLOCK(dBench);
 			}
 			else if(rhs == -1) {
 				debug("finding modular inverse.\n");
@@ -1561,9 +1561,7 @@ static PyObject *Deserialize(ECElement *self, PyObject *args)
 			}
 			else if(type == ZR) {
 				ECElement *newObj = createNewPoint(type, gobj); // ->group, gobj->ctx);
-				//START_CLOCK(dBench);
 				BN_bin2bn((const uint8_t *) buf, len, newObj->elemZ);
-				//STOP_CLOCK(dBench);
 				return (PyObject *) newObj;
 			}
 
@@ -1582,7 +1580,7 @@ InitBenchmark_CAPI(_init_benchmark, dBench, 2);
 StartBenchmark_CAPI(_start_benchmark, dBench);
 EndBenchmark_CAPI(_end_benchmark, dBench);
 GetBenchmark_CAPI(_get_benchmark, dBench);
-GetAllBenchmarks_CAPI(_get_all_results, dBench);
+GetAllBenchmarks_CAPI(_get_all_results, dBench, GetResults);
 ClearBenchmarks_CAPI(_clear_benchmark, dBench);
 #endif
 
@@ -1813,7 +1811,8 @@ static int ec_clear(PyObject *m) {
 	Py_CLEAR(GETSTATE(m)->error);
     Py_XDECREF(PyECErrorObject);
 #ifdef BENCHMARK_ENABLED
-	Py_XDECREF(dBench); //Py_CLEAR(GETSTATE(m)->dBench);
+	//Py_CLEAR(GETSTATE(m)->dBench);
+	Py_XDECREF(dBench);
 #endif
 	return 0;
 }
@@ -1865,7 +1864,7 @@ void initelliptic_curve(void) 		{
 //		INITERROR;
 //	}
 
-#ifdef BENCHMARK_ENABLED
+#if BENCHMARK_ENABLED == 1
     if(import_benchmark() < 0)
     	CLEAN_EXIT;
 
@@ -1876,8 +1875,8 @@ void initelliptic_curve(void) 		{
     Py_INCREF(dBench);
     dBench->bench_initialized = FALSE;
     InitClear(dBench);
-    Py_INCREF(&BenchmarkType);
-    PyModule_AddObject(m, "benchmark", (PyObject *)&BenchmarkType);
+//    Py_INCREF(&BenchmarkType);
+//    PyModule_AddObject(m, "benchmark", (PyObject *)&BenchmarkType);
 #endif
 
 	Py_INCREF(&ECType);

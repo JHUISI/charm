@@ -1727,12 +1727,23 @@ static PyObject *Granular_benchmark(PyObject *self, PyObject *args)
 	}
 
 	if(id == BenchmarkIdentifier) {
+		PyObject *MulList = PyCreateList(MULTIPLICATION);
+		PyObject *DivList = PyCreateList(DIVISION);
+		PyObject *AddList = PyCreateList(ADDITION);
+		PyObject *SubList = PyCreateList(SUBTRACTION);
+		PyObject *ExpList = PyCreateList(EXPONENTIATION);
 		dict = PyDict_New();
-		PyDict_SetItem(dict, Py_BuildValue("i", MULTIPLICATION), PyCreateList(MULTIPLICATION));
-		PyDict_SetItem(dict, Py_BuildValue("i", DIVISION), PyCreateList(DIVISION));
-		PyDict_SetItem(dict, Py_BuildValue("i", ADDITION), PyCreateList(ADDITION));
-		PyDict_SetItem(dict, Py_BuildValue("i", SUBTRACTION), PyCreateList(SUBTRACTION));
-		PyDict_SetItem(dict, Py_BuildValue("i", EXPONENTIATION), PyCreateList(EXPONENTIATION));
+		PyDict_SetItemString(dict, "Mul", MulList);
+		Py_XDECREF(MulList);
+		PyDict_SetItemString(dict, "Div", DivList);
+		Py_XDECREF(DivList);
+		PyDict_SetItemString(dict, "Add", AddList);
+		Py_XDECREF(AddList);
+		PyDict_SetItemString(dict, "Sub", SubList);
+		Py_XDECREF(SubList);
+		PyDict_SetItemString(dict, "Exp", ExpList);
+		Py_XDECREF(ExpList);
+
 	}
 
 	return dict;
@@ -1833,7 +1844,7 @@ InitBenchmark_CAPI(_init_benchmark, dBench, BenchmarkIdentifier);
 StartBenchmark_CAPI(_start_benchmark, dBench);
 EndBenchmark_CAPI(_end_benchmark, dBench);
 GetBenchmark_CAPI(_get_benchmark, dBench);
-GetAllBenchmarks_CAPI(_get_all_results, dBench);
+GetAllBenchmarks_CAPI(_get_all_results, dBench, GetResultsWithPair);
 ClearBenchmarks_CAPI(_clear_benchmark, dBench);
 #endif
 // new
@@ -2148,10 +2159,10 @@ void initpairing(void) 		{
 	PyModule_AddIntConstant(m, "G2", G2);
 	PyModule_AddIntConstant(m, "GT", GT);
 
-#ifdef BENCHMARK_ENABLED
-	ADD_BENCHMARK_OPTIONS(m);
-	PyModule_AddIntConstant(m, "Pair", PAIRINGS);
-	PyModule_AddIntConstant(m, "Granular", GRANULAR);
+#if BENCHMARK_ENABLED == 1
+	PA_ADD_BENCHMARK_OPTIONS(m);
+	PyModule_AddStringConstant(m, "Pair", PAIR_OPT);
+	PyModule_AddStringConstant(m, "Granular", GRAN_OPT);
 #endif
 
 LEAVE:

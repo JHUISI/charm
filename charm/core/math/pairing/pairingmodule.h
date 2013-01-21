@@ -52,7 +52,7 @@
 #define ID_LEN   4
 #define MAX_BENCH_OBJECTS	2
 // define element_types
-enum Group {ZR, G1, G2, GT, NONE_G};
+enum Group {ZR = 0, G1, G2, GT, NONE_G};
 typedef enum Group GroupType;
 
 /* Index numbers for different hash functions.  These are all implemented as SHA1(index || message).	*/
@@ -75,26 +75,45 @@ PyTypeObject PairingType;
 static PyObject *ElementError;
 #define PyElement_Check(obj) PyObject_TypeCheck(obj, &ElementType)
 #define PyPairing_Check(obj) PyObject_TypeCheck(obj, &PairingType)
-#if PY_MAJOR_VERSION >= 3
-/* check for both unicode and bytes objects */
-#define PyBytes_CharmCheck(obj) PyUnicode_Check(obj) || PyBytes_Check(obj)
-#else
-/* check for just unicode stuff */
-#define PyBytes_CharmCheck(obj)	PyUnicode_Check(obj) || PyString_Check(obj)
-#define PyUnicode_FromString PyString_FromString
-#endif
+//#if PY_MAJOR_VERSION >= 3
+///* check for both unicode and bytes objects */
+//#define PyBytes_CharmCheck(obj) PyUnicode_Check(obj) || PyBytes_Check(obj)
+//#else
+///* check for just unicode stuff */
+//#define PyBytes_CharmCheck(obj)	PyUnicode_Check(obj) || PyString_Check(obj)
+//#define PyUnicode_FromString PyString_FromString
+//#endif
 
-#if PY_MAJOR_VERSION >= 3
-/* if unicode then add extra conversion step. two possibilities: unicode or bytes */
-#define PyBytes_ToString(a, obj) \
-	if(PyUnicode_Check(obj)) { PyObject *_obj = PyUnicode_AsUTF8String(obj); a = PyBytes_AS_STRING(_obj); Py_DECREF(_obj); }	\
-	else { a = PyBytes_AS_STRING(obj); }
-#else
-/* treat everything as string in 2.x */
-#define PyBytes_ToString(a, obj) a = PyString_AsString(obj);
-#endif
+//#if PY_MAJOR_VERSION >= 3
+///* if unicode then add extra conversion step. two possibilities: unicode or bytes */
+//#define PyBytes_ToString(a, obj) \
+//	if(PyUnicode_Check(obj)) { PyObject *_obj = PyUnicode_AsUTF8String(obj); a = PyBytes_AS_STRING(_obj); Py_DECREF(_obj); }	\
+//	else { a = PyBytes_AS_STRING(obj); }
+//#else
+///* treat everything as string in 2.x */
+//#define PyBytes_ToString(a, obj) a = PyString_AsString(obj);
+//#endif
 
 // static Benchmark *dObjects[MAX_BENCH_OBJECTS], *activeObject = NULL;
+const char *CPUTIME_OPT 	= "CpuTime";
+const char *REALTIME_OPT 	= "RealTime";
+const char *ADD_OPT			= "Add";
+const char *SUB_OPT			= "Sub";
+const char *MUL_OPT			= "Mul";
+const char *DIV_OPT			= "Div";
+const char *EXP_OPT			= "Exp";
+const char *PAIR_OPT		= "Pair";
+const char *GRAN_OPT		= "Granular";
+
+#define PA_ADD_BENCHMARK_OPTIONS(m)		\
+	PyModule_AddStringConstant(m, "CpuTime", CPUTIME_OPT);		\
+	PyModule_AddStringConstant(m, "RealTime", REALTIME_OPT);		\
+	PyModule_AddStringConstant(m, "Add", ADD_OPT);			\
+	PyModule_AddStringConstant(m, "Sub", SUB_OPT);		\
+	PyModule_AddStringConstant(m, "Mul", MUL_OPT);		\
+	PyModule_AddStringConstant(m, "Div", DIV_OPT);			\
+	PyModule_AddStringConstant(m, "Exp", EXP_OPT);
+
 
 PyMethodDef Element_methods[];
 PyMethodDef pairing_methods[];
