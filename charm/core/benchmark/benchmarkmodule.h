@@ -58,15 +58,15 @@ PyObject *BenchmarkError;
 #define MAX_MEASURE 10
 enum Measure {CPU_TIME = 0, REAL_TIME, NATIVE_TIME, ADDITION, SUBTRACTION, MULTIPLICATION, DIVISION, EXPONENTIATION, PAIRINGS, GRANULAR, NONE};
 typedef enum Measure MeasureType;
-const char *_CPUTIME_OPT 	= "CpuTime";
-const char *_REALTIME_OPT 	= "RealTime";
-const char *_ADD_OPT		= "Add";
-const char *_SUB_OPT		= "Sub";
-const char *_MUL_OPT		= "Mul";
-const char *_DIV_OPT		= "Div";
-const char *_EXP_OPT		= "Exp";
-const char *_PAIR_OPT		= "Pair";
-const char *_GRAN_OPT		= "Granular";
+#define _CPUTIME_OPT 	"CpuTime"
+#define _REALTIME_OPT 	"RealTime"
+#define _ADD_OPT		"Add"
+#define _SUB_OPT		"Sub"
+#define _MUL_OPT		"Mul"
+#define _DIV_OPT		"Div"
+#define _EXP_OPT		"Exp"
+#define _PAIR_OPT		"Pair"
+#define _GRAN_OPT		"Granular"
 
 // for recording native time
 #ifdef BENCHMARK_ENABLED

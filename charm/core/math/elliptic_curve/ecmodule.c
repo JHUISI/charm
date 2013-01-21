@@ -1817,10 +1817,6 @@ static int ec_clear(PyObject *m) {
 	return 0;
 }
 
-static int ec_free(PyObject *m) {
-	return 0;
-}
-
 static struct PyModuleDef moduledef = {
 		PyModuleDef_HEAD_INIT,
 		"elliptic_curve",
@@ -1830,7 +1826,7 @@ static struct PyModuleDef moduledef = {
 		NULL,
 		ec_traverse,
 		ec_clear,
-		ec_free
+		NULL
 };
 
 #define CLEAN_EXIT goto LEAVE;
