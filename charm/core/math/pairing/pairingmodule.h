@@ -76,16 +76,6 @@ static PyObject *ElementError;
 #define PyElement_Check(obj) PyObject_TypeCheck(obj, &ElementType)
 #define PyPairing_Check(obj) PyObject_TypeCheck(obj, &PairingType)
 
-//const char *CPUTIME_OPT 	= "CpuTime";
-//const char *REALTIME_OPT 	= "RealTime";
-//const char *ADD_OPT			= "Add";
-//const char *SUB_OPT			= "Sub";
-//const char *MUL_OPT			= "Mul";
-//const char *DIV_OPT			= "Div";
-//const char *EXP_OPT			= "Exp";
-//const char *PAIR_OPT		= "Pair";
-//const char *GRAN_OPT		= "Granular";
-
 PyMethodDef Element_methods[];
 PyMethodDef pairing_methods[];
 PyMemberDef Element_members[];
