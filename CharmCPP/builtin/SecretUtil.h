@@ -38,7 +38,7 @@ public:
 	CharmListStr getAttributeList(Policy&);
 	CharmListZR genShares(PairingGroup & group, ZR secret, int k, int n);
 	CharmDictZR calculateSharesDict(PairingGroup & group, ZR, Policy&);
-// CharmList? calculateSharesList(ZR, Policy&); // TODO: implement
+	CharmListZR calculateSharesList(PairingGroup & group, ZR, Policy&);
 	CharmDictZR getCoefficients(PairingGroup & group, Policy&);
 private:
 //	PairingGroup group;

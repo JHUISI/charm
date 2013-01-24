@@ -5,6 +5,14 @@
 
 #if ASYMMETRIC == 1
 
+struct g2_cmp_str
+{
+	bool operator()(const string a, const string b) {
+		return strcmp(a.c_str(), b.c_str()) < 0;
+	}
+};
+
+
 class CharmListG2
 {
 public:
@@ -12,17 +20,20 @@ public:
 	~CharmListG2();
     CharmListG2(const CharmListG2&);
 	void insert(int, G2);
+	void insert(string, G2);
 	void append(G2&);
 	int length(); // return length of lists
 	string printAtIndex(int index);
-
+	string printStrKeyIndex(int index);
 	// retrieve a particular index
+	G2& operator[](const string index);
 	G2& operator[](const int index);
 	CharmListG2& operator=(const CharmListG2&);
     friend ostream& operator<<(ostream&, const CharmListG2&);
 private:
 	int cur_index;
 	map<int, G2> list;
+	map<string, int, g2_cmp_str> strList;
 };
 
 class CharmMetaListG2

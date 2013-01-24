@@ -18,12 +18,29 @@ CharmListG2::CharmListG2(const CharmListG2& cList)
 {
 	//copy constructor
 	cur_index = cList.cur_index;
+	strList = cList.strList;
 	list = cList.list;
 }
 
 void CharmListG2::insert(int index, G2 g)
 {
 	list[index] = g;
+	cur_index++;
+}
+
+void CharmListG2::insert(string index, G2 g)
+{
+	int the_index;
+	// see if index exists in strList. If so, use that index
+	if(strList.find(index) == strList.end()) {
+		the_index = cur_index; // select current index
+		strList.insert(pair<string, int>(index, the_index));
+	}
+	else {
+		// retrieve the index
+		the_index = strList[index];
+	}
+	list[the_index] = g;
 	cur_index++;
 }
 
@@ -36,8 +53,6 @@ void CharmListG2::append(G2 & g)
 G2& CharmListG2::operator[](const int index)
 {
 	if(index == cur_index) { // means we are creating reference.
-//		G2 tmp;
-//		list[cur_index] = tmp; // this type will disappear and just for creating reference only. caller expected to set result
 		cur_index++;
 		return list[index];
 	}
@@ -49,6 +64,22 @@ G2& CharmListG2::operator[](const int index)
 	else {
 		throw new string("Invalid access.\n");
 	}
+}
+
+G2& CharmListG2::operator[](const string index)
+{
+	int the_index;
+	if(strList.find(index) == strList.end()) {
+		the_index = cur_index; // select current index
+		strList[index] = the_index;
+		cur_index++;
+	}
+	else {
+		// retrieve the index
+		the_index = strList[index];
+	}
+
+	return list[the_index];
 }
 
 CharmListG2& CharmListG2::operator=(const CharmListG2& cList)
@@ -63,6 +94,7 @@ CharmListG2& CharmListG2::operator=(const CharmListG2& cList)
 	cur_index = 0;
 
 	cur_index = cList.cur_index;
+	strList = cList.strList;
 	list = cList.list;
 	return *this;
 }
@@ -86,11 +118,26 @@ string CharmListG2::printAtIndex(int index)
 	return s;
 }
 
+string CharmListG2::printStrKeyIndex(int index)
+{
+	map<string, int, g2_cmp_str>::iterator it;
+	if(((int) strList.size()) > 0) {
+		//cout << "iterate over length: " << strList.size() << endl;
+		for(it = strList.begin(); it != strList.end(); ++it) {
+			//cout << "Compare: " << it->second << " == " << index << endl;
+			if(it->second == index) {
+				return ": " + it->first;
+			}
+		}
+	}
+	return "";
+}
+
 ostream& operator<<(ostream& s, const CharmListG2& cList)
 {
 	CharmListG2 cList2 = cList;
 	for(int i = 0; i < cList2.length(); i++) {
-		s << i << ": " << cList2.printAtIndex(i) << endl;
+		s << i << ": " << cList2.printAtIndex(i) << cList2.printStrKeyIndex(i) << endl;
 	}
 
 	return s;

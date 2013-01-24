@@ -1,5 +1,5 @@
 CONFIG=config.mk
-include ./${CONFIG}
+include ./$(CONFIG)
 
 #CXX	:= g++
 #CXXFLAGS := -fno-strict-aliasing -fno-common -g -m64 -O2 -fwrapv -O3 -Wall
@@ -55,6 +55,9 @@ $(CHARM_LIB2): sub $(OBJECTS) $(MIRACL_OBJECTS)
 install: $(CHARM_LIB)
 	$(INSTALL_PROG) $(CHARM_LIB) $(libdir)
         #$(INSTALL_PROG) *.h $(incdir)
+
+distclean:
+	rm -f *.o *.log $(subdir) $(NAME) $(CHARM_LIB) $(CONFIG)
 clean:
 	rm -f *.o $(subdir) $(NAME) $(CHARM_LIB)
 

@@ -244,11 +244,64 @@ CHARM_ERROR _computeSharesOverTree(PairingGroup & group, ZR secret, charm_attrib
 	return CHARM_ERROR_NONE;
 }
 
+CHARM_ERROR _computeSharesOverTree(PairingGroup & group, ZR secret, charm_attribute_subtree *subtree, CharmListZR & list)
+{
+	CHARM_ERROR err_code;
+	uint32 k, i;
+	string attr;
+	switch(subtree->node_type) {
+		case CHARM_ATTRIBUTE_POLICY_NODE_LEAF:
+				attr = string((char *) subtree->attribute.attribute_str);
+				//cout << "store: k=" << attr << ", v=" << secret << endl;
+				list.insert(attr, secret);
+			return CHARM_ERROR_NONE;
+
+		case CHARM_ATTRIBUTE_POLICY_NODE_AND:
+			/* AND gates are N-of-N threshold gates */
+			k = subtree->num_subnodes;
+			break;
+
+		case CHARM_ATTRIBUTE_POLICY_NODE_OR:
+			/* OR gates are 1-of-N threshold gates	*/
+			k = 1;
+			break;
+
+		case CHARM_ATTRIBUTE_POLICY_NODE_THRESHOLD:
+			/* THRESHOLD gates have a k parameter associated with them. */
+			k = subtree->threshold_k;
+			break;
+
+		default:
+			//LOG_ERROR("prune_tree: encountered unknown gate type");
+			printf("%s: encountered unknown gate type.\n", __FUNCTION__);
+			return CHARM_ERROR_INVALID_INPUT;
+	}
+
+	CharmListZR shares = _genShares(group, secret, k, (int) subtree->num_subnodes);
+    //cout << "Shares:\n" << shares << endl;
+
+	for (i = 0; i < subtree->num_subnodes; i++) {
+		err_code = _computeSharesOverTree(group, shares[i+1], subtree->subnode[i], list);
+		if(err_code != CHARM_ERROR_NONE)
+			return err_code;
+	}
+
+	return CHARM_ERROR_NONE;
+}
+
+
 CharmDictZR SecretUtil::calculateSharesDict(PairingGroup & group, ZR secret, Policy& pol)
 {
 	CharmDictZR dict;
 	_computeSharesOverTree(group, secret, pol.p->root, dict);
 	return dict;
+}
+
+CharmListZR SecretUtil::calculateSharesList(PairingGroup & group, ZR secret, Policy& pol)
+{
+	CharmListZR list;
+	_computeSharesOverTree(group, secret, pol.p->root, list);
+	return list;
 }
 
 

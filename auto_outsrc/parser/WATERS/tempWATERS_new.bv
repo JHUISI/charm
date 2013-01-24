@@ -1,9 +1,6 @@
 name := waters09
 setting := asymmetric
 
-#N := 2
-#secparam := 80
-
 BEGIN :: types
 policy_str := str
 S := list{str}
@@ -20,12 +17,12 @@ g1 := random(G1)
 g2 := random(G2)
 alpha := random(ZR)
 a := random(ZR)
-egg := e(g1, g2)^alpha
+egg := (e(g1,g2)^alpha)
 
-g1alph := g1^alpha
-g2alph := g2^alpha 
-g1a := g1^a
-g2a := g2^a
+g1alph := (g1^alpha)
+g2alph := (g2^alpha)
+g1a := (g1^a)
+g2a := (g2^a)
 
 msk := list{g1alph, g2alph}
 pk := list{g1, g2, egg, g1a, g2a}
@@ -35,22 +32,22 @@ END :: func:setup
 
 
 BEGIN :: func:keygen
-input := list{pk, msk, S} 
+input := list{pk, msk, S}
 pk := expand{g1, g2, egg, g1a, g2a}
 msk := expand{g1alph, g2alph}
 
 t := random(ZR)
-K := g2alph * (g2a^t)
-L := g2^t
+K := (g2alph * (g2a^t))
+L := (g2^t)
 Y := len(S)
 
 BEGIN :: for
-for{y := 0, Y}
+for{y := 0,Y}
 z := S#y
-Kl#z := H(z, G1)^t
+Kl#z := (H(z,G1)^t)
 END :: for
 
-sk := list{S, K, L, Kl}
+sk := list{K, L, Kl}
 output := sk
 END :: func:keygen
 
@@ -64,16 +61,16 @@ attrs := getAttributeList(policy)
 s := random(ZR)
 sh := calculateSharesList(s, policy)
 Y := len(sh)
-C := M * egg^s
-Cpr := g1 ^ s
+C := (M * (egg^s))
+Cpr := (g1^s)
 
 BEGIN :: for
-for{y := 0, Y}
+for{y := 0,Y}
 r := random(ZR)
 k := attrs#y
 x := sh#y
-Cn#k := (g1a ^ x#1) * (H(k, G1)^-r)
-Dn#k := g2^r
+Cn#k := ((g1a^x) * (H(k,G1)^-r))
+Dn#k := (g2^r)
 END :: for
 
 ct := list{policy_str, C, Cpr, Cn, Dn}
@@ -82,20 +79,27 @@ END :: func:encrypt
 
 
 BEGIN :: func:decrypt
-input := list{pk, sk, ct}
+input := list{pk, sk, S, ct}
 ct := expand{policy_str, C, Cpr, Cn, Dn}
-sk := expand{S, K, L, Kl}
+sk := expand{K, L, Kl}
 
 policy := createPolicy(policy_str)
-attrs  := prune(policy, S)
+attrs := prune(policy, S)
 coeff := getCoefficients(policy)
 
 Y := len(attrs)
-A := { prod{y := attrs#1, Y} on ((e(Cn#y, L) * e(Kl#y, Dn#y) ) ^coeff#y) }
+reservedVarName0 := init(GT)
+BEGIN :: for
+for{y := 0, Y}
+yGetStringSuffix := GetString(attrs#y)
+reservedVarName1 := ((e(Cn#yGetStringSuffix,L) * e(Kl#yGetStringSuffix,Dn#yGetStringSuffix))^coeff#yGetStringSuffix)
+reservedVarName0 := reservedVarName0 * reservedVarName1
+END :: for
+A := reservedVarName0
 
-result0 := e(Cpr, K)
-result1 := result0 / A
-M := C / result1
+result0 := e(Cpr,K)
+result1 := (result0 / A)
+M := (C / result1)
 
 output := M
 END :: func:decrypt

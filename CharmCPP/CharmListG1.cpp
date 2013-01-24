@@ -42,7 +42,6 @@ void CharmListG1::insert(string index, G1 g)
 	cur_index++;
 }
 
-
 void CharmListG1::append(G1 & g)
 {
 	list[cur_index] = g;

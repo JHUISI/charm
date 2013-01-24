@@ -19,12 +19,29 @@ CharmListZR::CharmListZR(const CharmListZR& cList)
 {
 	//copy constructor
 	cur_index = cList.cur_index;
+	strList = cList.strList;
 	list = cList.list;
 }
 
 void CharmListZR::insert(int index, ZR zr)
 {
 	list[index] = zr;
+	cur_index++;
+}
+
+void CharmListZR::insert(string index, ZR zr)
+{
+	int the_index;
+	// see if index exists in strList. If so, use that index
+	if(strList.find(index) == strList.end()) {
+		the_index = cur_index; // select current index
+		strList.insert(pair<string, int>(index, the_index));
+	}
+	else {
+		// retrieve the index
+		the_index = strList[index];
+	}
+	list[the_index] = zr;
 	cur_index++;
 }
 
@@ -43,7 +60,6 @@ void CharmListZR::set(int index, ZR zr)
 ZR& CharmListZR::operator[](const int index)
 {
 	if(index == cur_index) { // means we are creating reference.
-//		list[cur_index] = NULL;
 		cur_index++;
 		return list[index];
 	}
@@ -58,6 +74,22 @@ ZR& CharmListZR::operator[](const int index)
 	else {
 		throw new string("Invalid access.\n");
 	}
+}
+
+ZR& CharmListZR::operator[](const string index)
+{
+	int the_index;
+	if(strList.find(index) == strList.end()) {
+		the_index = cur_index; // select current index
+		strList[index] = the_index;
+		cur_index++;
+	}
+	else {
+		// retrieve the index
+		the_index = strList[index];
+	}
+
+	return list[the_index];
 }
 
 ZR& CharmListZR::get(const int index)
@@ -90,12 +122,27 @@ string CharmListZR::printAtIndex(int index)
 	return s;
 }
 
+string CharmListZR::printStrKeyIndex(int index)
+{
+	map<string, int, zr_cmp_str>::iterator it;
+	if(((int) strList.size()) > 0) {
+		//cout << "iterate over length: " << strList.size() << endl;
+		for(it = strList.begin(); it != strList.end(); ++it) {
+			//cout << "Compare: " << it->second << " == " << index << endl;
+			if(it->second == index) {
+				return ": " + it->first;
+			}
+		}
+	}
+	return "";
+}
+
 ostream& operator<<(ostream& s, const CharmListZR& cList)
 {
 	CharmListZR cList2 = cList;
 
 	for(int i = 0; i < cList2.length(); i++) {
-		s << i << ": " << cList2.printAtIndex(i) << endl;
+		s << i << ": " << cList2.printAtIndex(i) << cList2.printStrKeyIndex(i) << endl;
 	}
 
 	return s;
@@ -113,6 +160,7 @@ CharmListZR& CharmListZR::operator=(const CharmListZR& cList)
 	cur_index = 0;
 
 	cur_index = cList.cur_index;
+	strList = cList.strList;
 	list = cList.list;
 	return *this;
 }

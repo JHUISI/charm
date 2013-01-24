@@ -364,10 +364,6 @@ charm_attribute_list_to_buffer(charm_attribute_list *attribute_list, uint8 *buff
 			
 			/* JAA removed quotes around attributes to make parsing straightforward */
 			*result_len += strlen((char *) attribute_list->attribute[i].attribute_str);  // + 2;
-		} else if (attribute_list->attribute[i].is_hashed == TRUE) {
-			// element_snprintf(token, 300, "{%B}", attribute_list->attribute[i].attribute_hash);
-			// if (buffer != NULL) {	buf_ptr += snprintf((char *) buf_ptr, (buf_len - *result_len), "%s", token);	}
-			//*result_len += strlen(token) + 2;
 		} else {
 			return CHARM_ERROR_INVALID_INPUT;
 		}
@@ -495,7 +491,7 @@ charm_buffer_to_attribute_list(char **str_list, charm_attribute_list *attribute_
 		
 	attribute_list->num_attributes = i;
 
-	debug_print_attribute_list(attribute_list);
+	//debug_print_attribute_list(attribute_list);
 	SAFE_FREE(list_cpy);
 	return err_code;
 }
