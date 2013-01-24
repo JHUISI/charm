@@ -80,6 +80,7 @@ public:
 	G2 div(G2, G2);
 	G2 exp(G2, ZR);
 	G2 exp(G2, int);
+	G2 inv(G2);
 	GT pair(G1, G2);
 	G2 hashListToG2(string);
 	G2 hashListToG2(CharmList);
@@ -118,6 +119,7 @@ public:
 	ZR sub(ZR, ZR);
 	ZR neg(ZR);
 	ZR inv(ZR);
+	G1 inv(G1);
 	string aes_key(GT & g);
 
 private:

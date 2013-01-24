@@ -7,11 +7,10 @@ secparam := 80
 BEGIN :: types
 policy_str := str
 policy := object
-attrs := list
-sh := list
+attrs := list{str}
+sh := symmap
 coeff := list
-share := list
-S := list
+S := list{str}
 M := GT
 Dj := list
 Djp := list
@@ -57,7 +56,7 @@ Dj#y0 := p0 * (H(y0, G1)^s_y)
 Djp#y0 := g^s_y
 END :: for
 
-sk := list{S, D, Dj, Djp}
+sk := list{D, Dj, Djp}
 output := sk
 END :: func:keygen
 
@@ -78,9 +77,8 @@ C    := h ^ s
 BEGIN :: for
 for{y := 0, Y}
 y1 := attrs#y
-share#y1 := sh#y1
-Cr#y1 := g ^ share#y1
-Cpr#y1 := (H(y1, G1))^share#y1
+Cr#y1 := g ^ sh#y1
+Cpr#y1 := (H(y1, G1))^sh#y1
 END :: for
 
 ct := list{policy_str, Ctl, C, Cr, Cpr}
@@ -89,9 +87,9 @@ END :: func:encrypt
 
 
 BEGIN :: func:decrypt
-input := list{pk, sk, ct}
+input := list{pk, sk, S, ct}
 ct := expand{policy_str, Ctl, C, Cr, Cpr}
-sk := expand{S, D, Dj, Djp}
+sk := expand{D, Dj, Djp}
 
 policy := createPolicy(policy_str)
 attrs  := prune(policy, S)

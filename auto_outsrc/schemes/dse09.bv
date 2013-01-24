@@ -1,6 +1,6 @@
 name := dse09
 setting := symmetric
-short := both 
+short := keys
 
 BEGIN :: types
 id := str

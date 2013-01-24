@@ -18,7 +18,7 @@ class Policy
 public:
 	charm_attribute_policy *p;
 	bool isInit;
-//	Policy();
+	Policy();
 	Policy(string);
 	~Policy();
 	Policy(const Policy&);

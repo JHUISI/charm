@@ -32,6 +32,9 @@ nonListVarsDeclaredInThisFunc = []
 integerVars = []
 starRef = ""# "*"
 INSERT_FUNC_NAME = ".insert("
+UTIL_FUNC_NAME = "util"
+secretUtils = ['createPolicy', 'getAttributeList', 'calculateSharesDict', 'calculateSharesList', 'prune', 'getCoefficients']
+secretUtilsWithGroup = ['calculateSharesDict', 'calculateSharesList', 'getCoefficients']
 transformOutputList = None
 
 def writeCurrentNumTabsToString():
@@ -100,7 +103,14 @@ def addSecParam():
 def addGlobalPairingGroupObject():
     global setupFile
 
-    setupFile.write("PairingGroup group(AES_SECURITY);\n\n")
+    setupFile.write("PairingGroup group(AES_SECURITY);\n\n") # TODO: make AES_SECURITY a command line parameter
+
+def addBuiltinObjects():
+    global setupFile
+    
+    bFuncs = set(getUsedBuiltinList()).intersection(secretUtils)
+    # JAA: TODO is to add one for the DFA class in C++
+    if len(bFuncs) > 0: setupFile.write("SecretUtil %s;\n\n" % UTIL_FUNC_NAME)
 
 def isFunctionStart(binNode):
     if (binNode.type != ops.BEGIN):
@@ -154,8 +164,12 @@ def makeTypeReplacementsForCPP(SDL_Type, isList=False):
         return "string"
     if (SDLTypeAsString == "list"):
         return charmListType
+    if (SDLTypeAsString == "pol"):
+        return "Policy"
     if (SDLTypeAsString == "symmap"):
         return charmDictType
+    if (SDLTypeAsString == "symmapZR"):
+        return "CharmDictZR"    
     if (SDLTypeAsString == "listG1"):
         return "CharmListG1"
     if (SDLTypeAsString == "listG2"):
@@ -255,6 +269,28 @@ def isFuncDeclVarAList(variableName, functionName):
         return True
 
     return False
+
+# JAA:
+def isFuncDeclVarAListAndSameType(variableName, functionName):
+    (possibleFuncName, possibleVarInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, variableName)
+    if (possibleVarInfoObj == None):
+        return False
+
+    assignNode = possibleVarInfoObj.getAssignNode()
+    if (assignNode == None):
+        return False
+
+    assignNodeLeft = assignNode.left
+    if (assignNodeLeft == None):
+        return False
+
+    print("possibleVarInfoObj=", possibleVarInfoObj.getType())
+
+    if (str(assignNodeLeft).find(LIST_INDEX_SYMBOL) != -1):
+        return True
+
+    return False
+
 
 def writeFunctionDecl_CPP(outputFile, functionName):
     global currentFuncOutputVars, currentFuncNonOutputVars
@@ -496,11 +532,14 @@ def addGetTypeToAttrNode(inputString, variableType):
         return inputString + ".getZR()"
 
     if (variableType == types.str):
-        return inputString + ".strPtr"
-
+        return inputString # + ".strPtr"
+    
+    if (variableType == types.symmapZR):
+        return inputString
+    
     print(variableType)
     print(inputString)
-
+    
     sys.exit("addGetTypeToAttrNode in codegen_CPP.py:  variable type passed in is not one of the supported types.")
 
 def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideNameForInit=None):
@@ -508,9 +547,12 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
 
     variableType = types.NO_TYPE
     
-    if (variableName != None):
+    if (variableName != None) and INSERT_FUNC_NAME not in variableName:
         variableType = getFinalVarType(variableName, currentFuncName)
-
+    elif str(node).find(LIST_INDEX_SYMBOL) != -1:
+        # in case it is being inserted, we want to find the type of the right variable name
+        variableType = getFinalVarType(str(node).split(LIST_INDEX_SYMBOL)[0], currentFuncName)
+        #print("updated var type: ", variableType, ", name: ", node) # JAA: added to find types in "insert" situations
     if (type(node) is str):
         return processStrAssignStmt(node, replacementsDict)
 
@@ -521,9 +563,23 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
         returnString = processAttrOrTypeAssignStmt(node, replacementsDict)
         # JAA: added clause to look for direct references to lists and replace with the ".get<Type>()" extension
         if leftSideNameForInit != None and str(node).find(LIST_INDEX_SYMBOL) != -1: # if it appears on rhs of an assignment stmt
-            returnString = addGetTypeToAttrNode(returnString, variableType)
+            varName2 = str(node).split(LIST_INDEX_SYMBOL)[0]
+            varIsAList = isFuncDeclVarAList(varName2, currentFuncName)
+            variableType = getVarTypeInfoRecursive(node)
+            if varIsAList:
+                varT = getRawListTypes().get(varName2)
+                #print("DEBUG: is it a listType or just list: ", varName2, ", type=", varT)
+                if varT in [types.listZR, types.listG1, types.listG2, types.listGT]:
+                    pass
+                else:
+                    returnString = addGetTypeToAttrNode(returnString, variableType)
+            else:
+                pass # do nothing to returnString since the type is not embedded in a 'list'
+
+#            print("DEBUG: node=", node, ", variableType=", variableType, ", RealType=", getFinalVarType(str(node), currentFuncName), ", SearchType=", getVarTypeInfoRecursive(node), ", isList=", varIsAList)
+#            variableType = getFinalVarType(str(node), currentFuncName)
         elif str(node).find(LIST_INDEX_SYMBOL) != -1 and INSERT_FUNC_NAME in variableName: # JAA: if list ref appears on rhs inside a "insert(" call. 
-            returnString = addGetTypeToAttrNode(returnString, getFinalVarType(str(node), currentFuncName)) 
+            returnString = addGetTypeToAttrNode(returnString, variableType) # getFinalVarType(str(node), currentFuncName) 
         elif transformOutputList != None and (str(node).startswith(transformOutputList) == True):
             returnString = addGetTypeToAttrNode(returnString, variableType)
 
@@ -675,9 +731,13 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
                  sys.exit("getAssignStmtAsString_CPP in codegen_CPP.py:  len() function called, but either less than or more than one parameter was passed in (only one parameter can be passed in for len().")
              nameOfVarForLen = getAssignStmtAsString_CPP(node.listNodes[0], replacementsDict, variableName, leftSideNameForInit)
              return nameOfVarForLen + ".length()"
+        elif (nodeName in builtInTypes.keys()) and (nodeName in secretUtils):
+            funcOutputString = UTIL_FUNC_NAME + "." + nodeName + "("
+            if nodeName in secretUtilsWithGroup:
+                funcOutputString += groupObjName + ", "            
         else:
             funcOutputString = nodeName + "("
-
+        
         for listNodeInFunc in node.listNodes:
             listNodeAsString = getAssignStmtAsString_CPP(listNodeInFunc, replacementsDict, variableName, leftSideNameForInit)
             funcOutputString += listNodeAsString + ", "
@@ -776,6 +836,7 @@ def getCPPAsstStringForExpand(node, variableName, replacementsDict):
                 elif (listNodeType == types.str):
                     outputString += "strPtr"
                 else:
+                    print("listNodeType: ", listNodeType)
                     sys.exit("getCPPAsstStringForExpand in codegen.py:  one of the types of the listNodes is not one of the supported types (G1, G2, GT, ZR, or string), and is not a list.")
 
         outputString += ";\n"
@@ -802,7 +863,9 @@ def getVarDeclForListVar(variableName):
     elif (listVarType == types.ZR):
         outputString_Types += "    CharmListZR " + trueVarName + ";\n"
     elif (listVarType == types.list):
-        outputString_Types += "    CharmList " + trueVarName + ";\n"        
+        outputString_Types += "    CharmList " + trueVarName + ";\n"
+    elif (listVarType == types.pol):
+        outputString_Types += "    Policy " + trueVarName + ";\n"        
     else:
         outputString_Types += "    NO TYPE FOUND FOR " + trueVarName + "\n"
 
@@ -885,7 +948,7 @@ def writeAssignStmt_CPP(outputFile, binNode):
                 outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t, 1);\n"
             elif (variableName.startswith(SUM_PROD_WORD) == True):
                 outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t, 0);\n"
-            elif variableType in [types.str, types.list, types.listZR, types.listG1, types.listG2, types.listGT, types.metalistZR, types.metalistG1, types.metalistG2, types.metalistGT]:
+            elif variableType in [types.str, types.listStr, types.pol, types.list, types.listZR, types.listG1, types.listG2, types.listGT, types.metalistZR, types.metalistG1, types.metalistG2, types.metalistGT, types.symmapZR]:
                 outputString_Types += variableName + ";\n"
             else:
                 outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t);\n"
@@ -1313,6 +1376,7 @@ def codegen_CPP_main(inputSDLScheme, outputFileName):
     addNumSigners()
     addSecParam()
     addGlobalPairingGroupObject()
+    addBuiltinObjects()
     writeSDLToFiles(astNodes)
     write_Main_Function()
 

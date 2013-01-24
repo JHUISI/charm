@@ -28,7 +28,7 @@ private:
 bool isEqual(string value1, string value2);
 bool isNotEqual(string value1, string value2);
 string concat(CharmListStr & list);
-
+string GetString(string & list);
 
 #endif
 

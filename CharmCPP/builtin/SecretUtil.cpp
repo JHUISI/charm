@@ -1,12 +1,10 @@
 #include "SecretUtil.h"
 
-//Policy::Policy()
-//{
-////	p = (charm_attribute_policy *) SAFE_MALLOC(sizeof(charm_attribute_policy));
-////	isInit = false;
-//	p = NULL;
-//	isInit = false;
-//}
+Policy::Policy()
+{
+	p = NULL;
+	isInit = false;
+}
 
 Policy::Policy(string str)
 {
@@ -18,16 +16,14 @@ Policy::Policy(const Policy& pol)
 {
 	/* copy constructor */
 	Policy pol2 = pol;
-//	memcpy(p, pol2.p, sizeof(charm_attribute_policy));
-//	isInit = pol2.isInit;
-	if(pol2.isInit) {
-		p = charm_create_func_input_for_policy(pol2.p->str);
-		isInit = true;
-	}
-	else {
-		p = NULL;
+
+	if(p == NULL) {
+		p = (charm_attribute_policy *) SAFE_MALLOC(sizeof(charm_attribute_policy));
 		isInit = false;
 	}
+
+	memcpy(p, pol2.p, sizeof(charm_attribute_policy));
+	isInit = pol2.isInit;
 }
 
 Policy::~Policy()
@@ -51,15 +47,20 @@ Policy& Policy::operator=(const Policy& pol)
 	if(this == &pol)
 		return *this;
 
-	if(pol.isInit) {
-//		memset(p, 0, sizeof(charm_attribute_policy));
-//		memcpy(p, pol.p, sizeof(charm_attribute_policy));
-		p = pol.p;
-		isInit = pol.isInit;
+	if(p != NULL) {
+		SAFE_FREE(p->str);
+			uint32 i;
+			for(i = 0; i < p->root->num_subnodes; i++) {
+				charm_attribute_subtree_clear(p->root->subnode[i]);
+				SAFE_FREE(p->root->subnode[i]);
+			}
+		SAFE_FREE(p->root->subnode);
+		SAFE_FREE(p->root);
+		SAFE_FREE(p);
 	}
-	else {
-		isInit = false;
-	}
+
+	p = charm_create_func_input_for_policy(pol.p->str);
+	isInit = true;
 	return *this;
 
 }
@@ -80,11 +81,11 @@ SecretUtil::~SecretUtil()
 
 Policy SecretUtil::createPolicy(string s)
 {
-	Policy pol(s);
+//	Policy pol(s);
 //	charm_policy_from_string(pol.p, (char *) s.c_str());
 //	cout << "DEBUG: policy string: " << charm_get_policy_string(pol.p) << endl;
 //	pol.isInit = true;
-	return pol;
+	return Policy(s);
 }
 
 CharmListStr SecretUtil::prune(Policy& pol, CharmListStr attrs)

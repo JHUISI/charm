@@ -5,9 +5,9 @@ using namespace std;
 
 int main()
 {
-    PairingGroup group(MNT160);
+    PairingGroup group(SS512);
     CharmList list, list2, list3;
-    CharmListG1 g1List;
+    CharmListG1 g1List, tmpList;
     G1 g1;
     G2 g2;
     GT gt;
@@ -26,8 +26,9 @@ int main()
     attrs.append("TWO");
     attrs.append("THREE");
     attrs.append("FOUR");
+    Policy p;
 
-    Policy p = util.createPolicy("((ONE or TWO) and THREE)");
+    p = util.createPolicy("((ONE or TWO) and THREE)");
 
     cout << "Policy: " << p << endl;
     CharmListStr pruned_list = util.prune(p, attrs);
@@ -37,6 +38,7 @@ int main()
     CharmListStr attr_list = util.getAttributeList(p);
 
     cout << "Attr list:\n" << attr_list << endl;
+
 
 //    CharmListZR shares = util.genShares(group, a, 1, 2);
     ZR secret = a;
@@ -48,6 +50,11 @@ int main()
 
 	cout << "Final coeff dict:\n" << coeff << endl;
 
+    tmpList.insert("ONE", g1);
+    tmpList.insert("THREE", group.mul(g1, g1));
+    cout << "tmpList:\n" << tmpList << endl;
+
+    cout << "ONE: " << convert_str(tmpList["ONE"]) << endl;
 //    CharmListStr listKeys;
 //    listKeys.append("ONE");
 //    listKeys.append("TWO");

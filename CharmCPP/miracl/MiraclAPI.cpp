@@ -54,20 +54,16 @@ PairingGroup::PairingGroup(int sec_level)
 	time(&seed);
     irand((long)seed);
 
-//    G1 *g1 = new G1();
     G1 g1;
     pfcObject->random(g1);
-#ifdef ASYMMETRIC
-//    G2 *g2 = new G2();
+#if ASYMMETRIC == 1
     G2 g2;
     pfcObject->random(g2);
 
     gt = new GT(pfcObject->pairing(g2, g1));
-//    delete g2;
 #else
-    gt = new GT(pfcObject->pairing(*g1, *g1));
+    gt = new GT(pfcObject->pairing(g1, g1));
 #endif
-//    delete g1;
 
 	gt_id = new GT(pfcObject->power(*gt, ZR(0)));
 }
@@ -206,6 +202,11 @@ ZR PairingGroup::inv(ZR r)
      return zr;
 }
 
+G1 PairingGroup::inv(G1 g)
+{
+	return -g;
+}
+
 bool PairingGroup::ismember(CharmMetaListZR & g)
 {
 	return true;
@@ -299,6 +300,11 @@ G2 PairingGroup::exp(G2 g, int r)
 	// g ^ r == g * r OR scalar multiplication
 	G2 l = pfcObject->mult(g, ZR(r));
 	return l;
+}
+
+G2 PairingGroup::inv(G2 g)
+{
+	return -g;
 }
 
 GT PairingGroup::pair(G1 g, G2 h)

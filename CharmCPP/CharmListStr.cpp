@@ -35,6 +35,11 @@ string concat(CharmListStr & list)
     return L;
 }
 
+string GetString(string & str)
+{
+	return str;
+}
+
 
 CharmListStr::CharmListStr(void)
 {

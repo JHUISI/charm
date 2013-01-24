@@ -36,6 +36,7 @@ varInfList = {}
 varInfListNoExponents = {}
 varsThatProtectM = {}
 varTypes = {}
+listRawTypes = {}
 algebraicSetting = None
 startLineNo_ForLoop = None
 startLineNo_IfBranch = None
@@ -54,23 +55,24 @@ SAME, DIFF = 'one', 'many'
 publicVarNames = []
 secretVarNames = []
 
+usedBuiltinsFunc = []
 builtInTypes = {}
 builtInTypes["DeriveKey"] = types.str
 builtInTypes["SymEnc"] = types.str
 builtInTypes["SymDec"] = types.str
 builtInTypes["strToId"] = types.listZR
 builtInTypes["stringToInt"] = types.listZR
-builtInTypes["createPolicy"] = types.object
-builtInTypes["getAttributeList"] = types.list
-builtInTypes["calculateSharesDict"] = types.symmap
+builtInTypes["createPolicy"] = types.pol # these are app specific
+builtInTypes["getAttributeList"] = types.listStr
+builtInTypes["calculateSharesDict"] = types.symmapZR
 builtInTypes["calculateSharesList"] = types.list
-builtInTypes["prune"] = types.list
-builtInTypes["getCoefficients"] = types.symmap
+builtInTypes["prune"] = types.listStr
+builtInTypes["getCoefficients"] = types.symmapZR
 builtInTypes["integer"] = types.int
 builtInTypes["isList"] = types.int
 builtInTypes["recoverCoefficients"] = types.symmap
 builtInTypes["recoverCoefficientsDict"] = types.symmap
-builtInTypes["genShares"] = types.list
+builtInTypes["genShares"] = types.symmapZR
 builtInTypes["intersection_subset"] = types.list
 builtInTypes["GetString"] = types.str
 builtInTypes["hashToInt"] = types.int
@@ -689,7 +691,9 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
     if ( (type(newType).__name__ == ENUM_VALUE_CLASS_NAME) and (newType != types.NO_TYPE) and (currentFuncName == TYPES_HEADER) ):
         sys.exit("updateVarTypes in SDLParser.py received newType unequal to types.NO_TYPE when currentFuncName was TYPES_HEADER.")
 
+    origName = str(node.left)
     varName = getFullVarName(node.left, True)
+#    print("DEBUG: varName=", varName, ", origName=", node.left)
     if ( (varName in varTypes[currentFuncName]) and (varName != outputVarName) ):
         if (varTypes[currentFuncName][varName].getType() == newType): 
             return
@@ -707,7 +711,8 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
 
     varTypeObj = VarType()
     varTypeObj.setLineNo(i)
-
+    if origName.find(LIST_INDEX_SYMBOL) != -1: # definitely in a list
+        varTypeObj.isInAList = True
     if (type(newType).__name__ == BINARY_NODE_CLASS_NAME):
         if (newType.type != ops.LIST):
             sys.exit("updateVarTypes in SDLParser.py received newType that is a Binary Node, but not of type ops.LIST.")
@@ -859,7 +864,7 @@ def checkForListWithOneNumIndex(nodeName):
         return types.NO_TYPE
 
     x = varTypes[TYPES_HEADER][listName].getType()
-    #print(varTypes[TYPES_HEADER][listName].getType())
+    print("listName=", listName, ", type=", varTypes[TYPES_HEADER][listName].getType())
     if (varTypes[TYPES_HEADER][listName].getType() != types.list):
         return types.NO_TYPE
 
@@ -1063,6 +1068,7 @@ def getVarTypeInfoRecursive(node, funcNameInputParam=currentFuncName):
     if (node.type == ops.FUNC):
         currentFuncName = getFullVarName(node, False)
         if (currentFuncName in builtInTypes):
+            if currentFuncName not in usedBuiltinsFunc: usedBuiltinsFunc.append(currentFuncName)
             return builtInTypes[currentFuncName]
         elif (currentFuncName == INIT_FUNC_NAME):
             trythis = node.listNodes[0]
@@ -1089,22 +1095,49 @@ def getVarTypeInfoRecursive(node, funcNameInputParam=currentFuncName):
     sys.exit("getVarTypeInfoRecursive in SDLParser.py:  error in logic.")
 
 def postTypeCleanup():
-    global varTypes
+    global varTypes, listRawTypes
     
-#    globalTypes = varTypes[TYPES_HEADER]
+    #globalTypes = varTypes[TYPES_HEADER]
     localTypes = varTypes[currentFuncName]
+    _listRawTypes = {}; isUpdated = False
     
     allTypes = localTypes.keys()
-    curTypes = {}
+    curTypes = {};
+
     for i in allTypes:
+#        print("DEBUG: i=", i, localTypes.get(i).getType(), localTypes.get(i).isInAList)
+        iType = localTypes.get(i).getType()
+        iInList = localTypes.get(i).isInAList
         if i.find(LIST_INDEX_SYMBOL) != -1:
             ii = i.split(LIST_INDEX_SYMBOL)
             if len(ii) >= 2 and ii[1].isdigit():
                 if curTypes.get(ii[0]) == None:
                     curTypes[ii[0]] = []
-                curTypes[ii[0]].append(localTypes[i].getType())
+                curTypes[ii[0]].append(iType)
                 curTypes[ii[0]] = list(set(curTypes[ii[0]]))
+        elif iInList and iType in [types.ZR, types.G1, types.G2, types.GT]:
+            if _listRawTypes.get(i) == None:
+                _listRawTypes[i] = []
+            _listRawTypes[i].append(types['list' + str(iType)])
+            _listRawTypes[i] = list(set(_listRawTypes[i]))
     
+    for i,j in _listRawTypes.items():
+        #print("DEBUG: ", i, ":", j)
+        if len(j) > 1: # more than unique type in a list means that we should update the type to a list type.
+            if varTypes[currentFuncName].get(i) == None:
+                # create new var type for i
+                vt = VarType()
+                vt.setType(types.list)
+                varTypes[currentFuncName][i] = vt
+            else:
+                # update exisitng var type for i
+                varTypes[currentFuncName][i].setType(types.list)
+        elif len(j) == 1:
+            _listRawTypes[i] = _listRawTypes[i][0] # get rid of list
+            isUpdated = True
+            
+    if isUpdated: listRawTypes.update(_listRawTypes)
+
     # update the local type for all list variable
     for i,j in curTypes.items():
         if len(j) > 1: # needs to be a list type
@@ -1117,8 +1150,12 @@ def postTypeCleanup():
             else:
                 # update exisitng var type for i
                 varTypes[currentFuncName][i].setType(types.list)
+#    print("<=== %s ===>" % currentFuncName)
+#    for i,j in listRawTypes.items():
+#        print(i, ": ", j)
 #    for i,j in varTypes[currentFuncName].items():
 #        print(i, ":", j.getType())
+#    print("<=== %s ===>" % currentFuncName)     
 #    print("DEBUG: ", curTypes)
     return
 
@@ -1599,6 +1636,12 @@ def getAssignInfo():
 
 def getVarTypes():
     return varTypes
+
+def getRawListTypes():
+    return listRawTypes
+
+def getUsedBuiltinList():
+    return usedBuiltinsFunc
 
 def getForLoops():
     return forLoops
