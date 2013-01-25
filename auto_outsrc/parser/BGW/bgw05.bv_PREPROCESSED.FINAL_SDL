@@ -1,0 +1,120 @@
+name := bgw05
+setting := symmetric
+
+N := 2
+secparam := 80
+
+BEGIN :: types
+n := int
+giValues := list{G1}
+sk := list{G1}
+skBlinded := list
+transformOutputList#0 := GT
+transformOutputList#1 := G1
+transformOutputList#2 := G1
+transformOutputList#3 := GT
+transformOutputList#4 := GT
+transformOutputList := list
+END :: types
+
+BEGIN :: func:setup
+input := list{nParam}
+n := nParam
+g := random(G1)
+alpha := random(ZR)
+endIndexOfList := ((2 * n) + 1)
+BEGIN :: for
+for{i := 1,endIndexOfList}
+giValues#i := (g^(alpha^i))
+END :: for
+gamma := random(ZR)
+v := (g^gamma)
+pk := list{g, n, giValues, v}
+dummyVar := random(ZR)
+msk := list{gamma, dummyVar}
+output := list{pk, msk}
+END :: func:setup
+
+BEGIN :: func:keygen
+input := list{pk, msk}
+blindingFactor0Blinded := random(ZR)
+zz := random(ZR)
+pk := expand{g, n, giValues, v}
+msk := expand{gamma, dummyVar}
+BEGIN :: for
+for{i := 1,n+1}
+sk#i := (giValues#i^gamma)
+END :: for
+dummyVar2 := random(ZR)
+dummyVar2Blinded := dummyVar2
+BEGIN :: forall
+forall{y := sk}
+blindingFactorskBlinded#y := blindingFactor0Blinded
+skBlinded#y := (sk#y^(1 / blindingFactorskBlinded#y))
+END :: forall
+skComplete := list{skBlinded, dummyVar2Blinded}
+skCompleteBlinded := list{skBlinded, dummyVar2Blinded}
+output := list{blindingFactor0Blinded, skCompleteBlinded}
+END :: func:keygen
+
+BEGIN :: func:encrypt
+input := list{S, pk}
+pk := expand{g, n, giValues, v}
+t := random(ZR)
+K := (e(giValues#n,giValues#1)^t)
+
+dotProdEncrypt := init(G1)
+BEGIN :: forall
+forall{jEncrypt := S}
+dotProdEncrypt := (dotProdEncrypt * giValues#n+1-jEncrypt?)
+END :: forall
+
+Hdr2 := ((v * dotProdEncrypt)^t)
+Hdr1 := (g^t)
+Hdr := list{Hdr1, Hdr2}
+output := list{Hdr, K}
+END :: func:encrypt
+
+BEGIN :: func:transform
+input := list{S, i, Hdr, pk, skComplete}
+Hdr := expand{Hdr1, Hdr2}
+pk := expand{g, n, giValues, v}
+skComplete := expand{sk, dummyVar2}
+transformOutputList#0 := e(giValues#i,Hdr2)
+numerator := transformOutputList#0
+transformOutputList#1 := init(G1)
+dotProdDecrypt := transformOutputList#1
+BEGIN :: forall
+forall{jDecrypt := S}
+BEGIN :: if
+if {jDecrypt != i}
+NOP
+transformOutputList#2 := (dotProdDecrypt * giValues#n+1-jDecrypt+i?)
+dotProdDecrypt := transformOutputList#2
+END :: if
+END :: forall
+transformOutputList#3 := e(sk#i,Hdr1)
+transformOutputList#4 := e(dotProdDecrypt,Hdr1)
+output := transformOutputList
+END :: func:transform
+
+BEGIN :: func:decout
+input := list{S, i, Hdr, pk, skComplete, transformOutputList, blindingFactor0Blinded}
+Hdr := expand{Hdr1, Hdr2}
+pk := expand{g, n, giValues, v}
+skComplete := expand{sk, dummyVar2}
+numerator := (transformOutputList#0) 
+dotProdDecrypt := transformOutputList#1
+BEGIN :: forall
+forall{jDecrypt := S}
+BEGIN :: if
+if {jDecrypt != i}
+NOP
+dotProdDecrypt := transformOutputList#2
+END :: if
+END :: forall
+denominator := (transformOutputList#3 ^ (blindingFactor0Blinded) )  * (transformOutputList#4) 
+KDecrypt := (numerator * (denominator^-1))
+output := KDecrypt
+END :: func:decout
+

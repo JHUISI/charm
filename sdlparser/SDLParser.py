@@ -864,6 +864,16 @@ def checkForListWithOneNumIndex(nodeName):
         return types.NO_TYPE
 
     x = varTypes[TYPES_HEADER][listName].getType()
+
+    if (x == types.listG1):
+        return types.G1
+    if (x == types.listG2):
+        return types.G2
+    if (x == types.listGT):
+        return types.GT
+    if (x == types.listZR):
+        return types.ZR
+
     print("listName=", listName, ", type=", varTypes[TYPES_HEADER][listName].getType())
     if (varTypes[TYPES_HEADER][listName].getType() != types.list):
         return types.NO_TYPE

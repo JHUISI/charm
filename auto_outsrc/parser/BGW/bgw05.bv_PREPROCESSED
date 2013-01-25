@@ -15,13 +15,13 @@ input := list{nParam}
 n := nParam
 g := random(G1)
 alpha := random(ZR)
-endIndexOfList := (2 * n) + 1
+endIndexOfList := ((2 * n) + 1)
 BEGIN :: for
-for{i := 1, endIndexOfList}
-giValues#i := g ^ (alpha ^ i)
+for{i := 1,endIndexOfList}
+giValues#i := (g^(alpha^i))
 END :: for
 gamma := random(ZR)
-v := g ^ gamma
+v := (g^gamma)
 pk := list{g, n, giValues, v}
 dummyVar := random(ZR)
 msk := list{gamma, dummyVar}
@@ -33,8 +33,8 @@ input := list{pk, msk}
 pk := expand{g, n, giValues, v}
 msk := expand{gamma, dummyVar}
 BEGIN :: for
-for{i := 1, n+1}
-sk#i := (giValues#i) ^ gamma
+for{i := 1,n+1}
+sk#i := (giValues#i^gamma)
 END :: for
 dummyVar2 := random(ZR)
 skComplete := list{sk, dummyVar2}
@@ -45,16 +45,16 @@ BEGIN :: func:encrypt
 input := list{S, pk}
 pk := expand{g, n, giValues, v}
 t := random(ZR)
-K := (e(giValues#n, giValues#1)) ^ t
+K := (e(giValues#n,giValues#1)^t)
 
 dotProdEncrypt := init(G1)
 BEGIN :: forall
 forall{jEncrypt := S}
-dotProdEncrypt := dotProdEncrypt * giValues#n+1-jEncrypt?
+dotProdEncrypt := (dotProdEncrypt * giValues#n+1-jEncrypt?)
 END :: forall
 
-Hdr2 := (v * dotProdEncrypt) ^ t
-Hdr1 := g ^ t
+Hdr2 := ((v * dotProdEncrypt)^t)
+Hdr1 := (g^t)
 Hdr := list{Hdr1, Hdr2}
 output := list{Hdr, K}
 END :: func:encrypt
@@ -65,17 +65,17 @@ Hdr := expand{Hdr1, Hdr2}
 pk := expand{g, n, giValues, v}
 skComplete := expand{sk, dummyVar2}
 
-numerator := e(giValues#i, Hdr2)
+numerator := e(giValues#i,Hdr2)
 
 dotProdDecrypt := init(G1)
 BEGIN :: forall
 forall{jDecrypt := S}
 BEGIN :: if
-if { jDecrypt != i }
-dotProdDecrypt := dotProdDecrypt * giValues#n+1-jDecrypt+i?
+if {jDecrypt != i}
+dotProdDecrypt := (dotProdDecrypt * giValues#n+1-jDecrypt+i?)
 END :: if
 END :: forall
-denominator := e(sk#i * dotProdDecrypt, Hdr1)
-KDecrypt := numerator / denominator
+denominator := e((sk#i * dotProdDecrypt),Hdr1)
+KDecrypt := (numerator / denominator)
 output := KDecrypt
 END :: func:decrypt
