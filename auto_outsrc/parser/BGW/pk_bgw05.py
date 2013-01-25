@@ -21,52 +21,61 @@ class BGW05:
         group = groupObj
 
         n = None
-        g = None
 
     def setup(self, nParam):
-        global n, g
+        global n
 
         n = nParam
         g = group.random(G1)
         alpha = group.random(ZR)
         giValues = {}
         for i in range(1, n):
-            giValues[i] = g ^ (alpha ^ i)
+            giValues[i] = g ** (alpha ** i)
 
         endIndexOfSecondList = (2 * n) + 1
         for i in range(n, endIndexOfSecondList, 2):
-            giValues[i] = g ^ (alpha ^ i)
+            giValues[i] = g ** (alpha ** i)
+
+        #print("giValues:  ", giValues)
 
         gamma = group.random(ZR)
-        v = g ^ gamma
+        v = g ** gamma
 
-        pk = {'giValues':giValues, 'v':v}
+        pk = {'g':g, 'giValues':giValues, 'v':v}
         sk = {}
 
         for i in range(1, (n + 1)):
-            sk[i] = (giValues[i]) ^ gamma
+            sk[i] = (giValues[i]) ** gamma
 
         return (pk, sk)
 
     def encrypt(self, S, pk):
-        giValues, v = pk
+        g = pk['g']
+        giValues = pk['giValues']
+        v = pk['v']
 
         t = group.random(ZR)
 
-        K = (pair(giValues[n+1], g)) ^ t
+        #print("giValues:  ", giValues)
+
+        #K = (pair(giValues[n+1], g)) ** t
+
+        K = (pair(giValues[n], giValues[1])) ** t
 
         dotProd = group.init(G1)
         for j in S:
             dotProd *= giValues[n + 1 - j]
 
-        Hdr2 = (v * dotProd) ^ t
-        Hdr = ((g ^ t), Hdr2)
+        Hdr2 = (v * dotProd) ** t
+        Hdr = ((g ** t), Hdr2)
 
         return (Hdr, K)
 
     def decrypt(self, S, i, di, Hdr, pk):
         C0, C1 = Hdr
-        giValues, v = pk
+        g = pk['g']
+        giValues = pk['giValues']
+        v = pk['v']
 
         numerator = pair(giValues[i], C1)
 
