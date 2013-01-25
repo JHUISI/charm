@@ -647,7 +647,7 @@ static PyObject *Integer_long(PyObject *o1) {
 
 /** a / b mod N ...
  *  only defined when b is invertible modulo N, meaning a*b mod N = c*b mod N iff b has b^-1 s.t.
- *  b*b^-1 = 1 mod N. NOT IMPLEMENTED CORRECTLY! TODO: redo
+ *  b*b^-1 = 1 mod N.
  */
 static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 	Integer *lhs = NULL, *rhs = NULL, *rop = NULL;
@@ -656,9 +656,9 @@ static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 
 	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value);
 
-	//	printf("does this really work?!?\n");
 	if (foundRHS && rhs_value > 0) {
 		//		printf("foundRHS + rhs_value > 0.");
+		// TODO: fix <charm Int> / <py Int> w/o mod
 		if (mpz_divisible_ui_p(lhs->e, rhs_value) != 0) {
 			if (mpz_sgn(lhs->m) == 0) {
 				rop = createNewInteger(lhs->m);
@@ -673,14 +673,18 @@ static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 			mpz_tdiv_q_ui(rop->e, lhs->e, rhs_value);
 		}
 	} else if (foundLHS && lhs_value > 0) {
-		//		printf("foundLHS + lhs_value > 0.");
+		//printf("foundLHS + lhs_value > 0.");
 		mpz_t tmp;
 		mpz_init_set_ui(tmp, lhs_value);
-		if (mpz_divisible_p(tmp, rhs->e) != 0 && mpz_sgn(rhs->m) == 0) {
-			rop = createNewInteger(rhs->m);
-			mpz_init(rop->e);
+		rop = createNewInteger(rhs->m);
+		mpz_init(rop->e);
+		if(mpz_sgn(rhs->m) > 0) {
 			mpz_init_set(rop->m, rhs->m);
-			mpz_divexact(rop->e, tmp, rhs->e);
+			mpz_invert(rop->e, rhs->e, rhs->m);
+			if(lhs_value != 1) {
+				mpz_mul(rop->e, tmp, rop->e);
+				mpz_mod(rop->e, rop->e, rop->m);
+			}
 		}
 		mpz_clear(tmp);
 	} else {
@@ -708,7 +712,7 @@ static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 		}
 	}
 
-	if (mpz_sgn(rop->e) == 0) {
+	if (rop != NULL && mpz_sgn(rop->e) == 0) {
 		//PyObject_Del(rop);
 		Py_XDECREF(rop);
 		EXIT_IF(TRUE, "division failed: could not find modular inverse.");
