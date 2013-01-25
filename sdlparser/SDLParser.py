@@ -1105,9 +1105,9 @@ def postTypeCleanup():
     curTypes = {};
 
     for i in allTypes:
-#        print("DEBUG: i=", i, localTypes.get(i).getType(), localTypes.get(i).isInAList)
         iType = localTypes.get(i).getType()
         iInList = localTypes.get(i).isInAList
+        #print("DEBUG: i=", i, iType, iInList)
         if i.find(LIST_INDEX_SYMBOL) != -1:
             ii = i.split(LIST_INDEX_SYMBOL)
             if len(ii) >= 2 and ii[1].isdigit():

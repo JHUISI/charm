@@ -4,6 +4,7 @@ sys.path.extend(['../', '../sdlparser'])
 
 from SDLParser import *
 from codegenConfig import *
+import inlinePreprocessor as inlinePP
 
 assignInfo = None
 inputOutputVars = None
@@ -36,6 +37,25 @@ UTIL_FUNC_NAME = "util"
 secretUtils = ['createPolicy', 'getAttributeList', 'calculateSharesDict', 'calculateSharesList', 'prune', 'getCoefficients']
 secretUtilsWithGroup = ['calculateSharesDict', 'calculateSharesList', 'getCoefficients']
 transformOutputList = None
+preprocessTypes = Enum('listWithinListAssign', 'dotProductAssign', 'NoMatch')
+
+varCount = 0
+
+
+def preProcessCheck(binNode):
+    global varCount
+    listCheck = inlinePP.ListCheck(varCount)
+    ASTVisitor(listCheck).preorder(binNode)
+    if listCheck.isMatch():
+        varCount = listCheck.getVarCount()
+        getVarTypes()[TYPES_HEADER].update(listCheck.getNewVarTypes())
+#        print("New types: ", getVarTypes()[TYPES_HEADER].keys())
+        return (preprocessTypes.listWithinListAssign, listCheck.getNewNodes())
+#    dotProdCheck = inlinePP.DotProdCheck(count)
+#    ASTVisitor(dotProdCheck).preorder(binNode)
+#    if dotProdCheck.isMatch():
+#        return (preprocessTypes.dotProductAssign, dotProdCheck.getNewNodes())
+    return (preprocessTypes.NoMatch, None)
 
 def writeCurrentNumTabsToString():
     outputString = ""
@@ -542,6 +562,21 @@ def addGetTypeToAttrNode(inputString, variableType):
     
     sys.exit("addGetTypeToAttrNode in codegen_CPP.py:  variable type passed in is not one of the supported types.")
 
+def exhaustSearchType(node, currentFuncName):
+    nodeParts = str(node).split(LIST_INDEX_SYMBOL)
+    varName = nodeParts[0]
+    _variableType = types.NO_TYPE
+    if len(nodeParts) == 2:
+        _variableType = getFinalVarType(varName, currentFuncName)
+    elif len(nodeParts) == 3:
+        _variableType = getFinalVarType(str(node), currentFuncName)
+        #print("DEBUG: Figure something out: ", _variableType, getVarTypes()[TYPES_HEADER].keys())
+    else: # last chance
+        _variableType = getVarTypeInfoRecursive(node) # getFinalVarType(str(node), currentFuncName)
+        #print("DEBUG: getVarTypeInfoRecursive=", _variableType)
+    #print("updated var type: ", _variableType, ", name: ", node, ", rawType=", getRawListTypes()) # JAA: added to find types in "insert" situations
+    return _variableType
+
 def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideNameForInit=None):
     global userFuncsCPPFile, userFuncsList_CPP
 
@@ -551,8 +586,8 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
         variableType = getFinalVarType(variableName, currentFuncName)
     elif str(node).find(LIST_INDEX_SYMBOL) != -1:
         # in case it is being inserted, we want to find the type of the right variable name
-        variableType = getFinalVarType(str(node).split(LIST_INDEX_SYMBOL)[0], currentFuncName)
-        #print("updated var type: ", variableType, ", name: ", node) # JAA: added to find types in "insert" situations
+        variableType = exhaustSearchType(node, currentFuncName)
+        
     if (type(node) is str):
         return processStrAssignStmt(node, replacementsDict)
 
@@ -572,6 +607,7 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
                 if varT in [types.listZR, types.listG1, types.listG2, types.listGT]:
                     pass
                 else:
+#                    print("DEBUG: variableName=", variableName)
                     returnString = addGetTypeToAttrNode(returnString, variableType)
             else:
                 pass # do nothing to returnString since the type is not embedded in a 'list'
@@ -958,8 +994,12 @@ def writeAssignStmt_CPP(outputFile, binNode):
     skipTheRest = False
     if (variableName != variableNamePounds):
         variableNamePound = replacePoundsWithBrackets(variableName, True)
-        rhsAssignment = getAssignStmtAsString_CPP(binNode.right, None, variableNamePound, None)
-        #print("DEBUG: JAA stmt =>", variableNamePound, rhsAssignment, ")")
+        #print("DEBUG: variableNamePound=", variableNamePound, ", variableName=", variableName)
+        if(binNode.right.type != ops.LIST):
+            rhsAssignment = getAssignStmtAsString_CPP(binNode.right, None, variableNamePound, None)
+        else:
+            rhsAssignment = getAssignStmtAsString_CPP(binNode.right, None, variableNamePound, None)
+            #print("DEBUG: variableNamePound='", variableNamePound, "', rhsAssignment='", rhsAssignment, "'")
         outputString_Body += variableNamePound + rhsAssignment + ");\n"
         skipTheRest = True
 
@@ -990,9 +1030,16 @@ def writeAssignStmt_CPP(outputFile, binNode):
     CPP_funcBodyLines += outputString_Body
 
 def writeAssignStmt(binNode):
-    global setupFile
-
-    writeAssignStmt_CPP(setupFile, binNode)
+    global setupFile    
+    # inline SDL assignment pre-processor
+    resultPreType, binNodeList = preProcessCheck(binNode)
+    if resultPreType == preprocessTypes.listWithinListAssign:
+        for binNode2 in binNodeList:
+            writeAssignStmt_CPP(setupFile, binNode2)            
+    elif resultPreType == preprocessTypes.dotProductAssign:
+        pass # TODO: writeAssignStmt on each element in the binNodeList
+    else:
+        writeAssignStmt_CPP(setupFile, binNode)
 
 def writeErrorFunc_CPP(outputFile, binNode):
     global userFuncsCPPFile, userFuncsList_CPP, CPP_funcBodyLines
