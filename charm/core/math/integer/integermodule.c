@@ -1125,12 +1125,12 @@ static PyObject *Integer_remainder(PyObject *o1, PyObject *o2) {
 		mpz_init_set(rop->m, rhs->m);
 		if (_PyLong_Check(o1)) {
 			PyObject *tmp = PyNumber_Long(o1);
-			mpz_t modulus;
-			mpz_init(modulus);
-			longObjToMPZ(modulus, tmp);
-			mpz_mod(rop->e, rhs->e, modulus);
-			mpz_set(rop->m, modulus);
-			mpz_clear(modulus);
+			mpz_t e;
+			mpz_init(e);
+			longObjToMPZ(e, tmp);
+			mpz_mod(rop->e, e, rhs->e);
+			mpz_set(rop->m, rhs->e);
+			mpz_clear(e);
 			Py_XDECREF(tmp);
 		} else if (PyInteger_Check(o1)) {
 			Integer *tmp_mod = (Integer *) o1;
