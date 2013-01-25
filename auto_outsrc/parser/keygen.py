@@ -376,6 +376,8 @@ def getVarsUsedInFuncs(funcName):
     return retList
 
 def useAlternateBlinding(keygenOutputElem):
+    return False
+
     elementType = getVarTypeInfoRecursive(BinaryNode(keygenOutputElem), keygenFuncName)
 
     decryptVarsUsedInFuncs = getVarsUsedInFuncs(decryptFuncName)
