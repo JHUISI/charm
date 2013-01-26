@@ -337,6 +337,10 @@ void _element_sub(Group_t type, element_t *c, const element_t *a, const element_
 		Big *z = (Big *) c;
 		Big *o1 = (Big *) o;
 		*z = ((*x - *y) % *o1);
+		if(*z < 0) {
+			*z = (*z + *o1) % *o1;
+		}
+
 	}
 	else if(type == pyG1_t) {
 		G1 *x = (G1 *) a;  G1 *y = (G1 *) b; G1 *z = (G1 *) c;
@@ -356,15 +360,17 @@ void _element_mul(Group_t type, element_t *c, const element_t *a, const element_
 		Big *y = (Big *) b;
 		Big *z = (Big *) c;
 		Big *o1 = (Big *) o;
-		if(*y == Big(-1)) {
-			*z = *x;
-			z->negate();
-		}
-		else if(y->isone()) {
-			*z = *x;
-		}
-		else {
-			*z = modmult(*x, *y, *o1);
+//		if(*y == Big(-1)) {
+//			*z = *x;
+//			z->negate();
+//		}
+//		else if(y->isone()) {
+//			*z = *x;
+//		}
+//		else {
+		*z = modmult(*x, *y, *o1);
+		if(*z < 0) {
+			*z = (*z + *o1) % *o1;
 		}
 //		cout << "Result => " << *z << endl;
 	}
