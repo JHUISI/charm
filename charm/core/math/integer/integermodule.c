@@ -285,7 +285,7 @@ int hash_to_group_element(mpz_t x, int block_num, uint8_t *output_buf) {
 }
 
 void _reduce(Integer *object) {
-	if (object != NULL)
+	if (object != NULL && mpz_sgn(object->m) > 0)
 		mpz_mod(object->e, object->e, object->m);
 }
 
@@ -365,10 +365,10 @@ static PyObject *Integer_equals(PyObject *o1, PyObject *o2, int opid) {
 	int foundLHS = FALSE, foundRHS = FALSE, result = -1;
 	unsigned long int lhs_value = 0, rhs_value = 0;
 
-	if(opid != Py_EQ && opid != Py_NE) {
-		ErrorMsg("only comparison supported is '==' or '!='");
-		return NULL;
-	}
+//	if(opid != Py_EQ && opid != Py_NE && opid != Py_LT && ) {
+//		ErrorMsg("only comparison supported is '==' or '!='");
+//		return NULL;
+//	}
 
 	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value);
 	mpz_t l, r;
@@ -397,8 +397,11 @@ static PyObject *Integer_equals(PyObject *o1, PyObject *o2, int opid) {
 		if (lhs->initialized && rhs->initialized) {
 			debug("Modulus equal? %d =?= 0\n", mpz_cmp(lhs->m, rhs->m));
 			if (mpz_sgn(lhs->m) == 0 && mpz_sgn(rhs->m) == 0) {
+				// comparing ints without a modulous
 				result = mpz_cmp(lhs->e, rhs->e);
-			} else if (mpz_cmp(lhs->m, rhs->m) == 0) {
+			}
+			else if (mpz_cmp(lhs->m, rhs->m) == 0) {
+				// comparing ints with a modolus that are equal
 				mpz_init(l);
 				mpz_init(r);
 				mpz_mod(l, lhs->e, lhs->m);
@@ -406,24 +409,39 @@ static PyObject *Integer_equals(PyObject *o1, PyObject *o2, int opid) {
 				result = mpz_cmp(l, r);
 				mpz_clear(l);
 				mpz_clear(r);
-			} else {
+			}
+			else {
 				ErrorMsg("cannot compare integers with different modulus.");
 			}
 		}
 	}
 
 	if(opid == Py_EQ) {
-		if(result == 0) {
-			Py_INCREF(Py_True); return Py_True;
-		}
-		Py_INCREF(Py_False); return Py_False;
+		if(result == 0) Py_RETURN_TRUE;
+		else Py_RETURN_FALSE;
 	}
-	else { /* Py_NE */
-		if(result != 0) {
-			Py_INCREF(Py_True); return Py_True;
-		}
-		Py_INCREF(Py_False); return Py_False;
+	else if(opid == Py_NE) { /* Py_NE */
+		if(result != 0) Py_RETURN_TRUE;
+		else Py_RETURN_FALSE;
 	}
+	else if(opid == Py_LT) {
+		if(result < 0) Py_RETURN_TRUE;
+		else Py_RETURN_FALSE;
+	}
+	else if(opid == Py_LE) {
+		if(result <= 0) Py_RETURN_TRUE;
+		else Py_RETURN_FALSE;
+	}
+	else if(opid == Py_GT) {
+		if(result > 0) Py_RETURN_TRUE;
+		else Py_RETURN_FALSE;
+	}
+	else if(opid == Py_GE) {
+		if(result >= 0) Py_RETURN_TRUE;
+		else Py_RETURN_FALSE;
+	}
+
+	ErrorMsg("unexpected comparison operator.");
 }
 
 PyObject *Integer_print(Integer *self) {
@@ -525,6 +543,10 @@ static PyObject *Integer_add(PyObject *o1, PyObject *o2) {
 		}
 	}
 
+//	if(mpz_sgn(rop->e) < 0 || mpz_cmp(rop->e, rop->m) > 0) {
+//		_reduce(rop);
+//	}
+
 #ifdef BENCHMARK_ENABLED
 	UPDATE_BENCHMARK(ADDITION, dBench);
 #endif
@@ -565,6 +587,9 @@ static PyObject *Integer_sub(PyObject *o1, PyObject *o2) {
 		}
 	}
 
+	if(mpz_sgn(rop->e) < 0) {
+		_reduce(rop);
+	}
 #ifdef BENCHMARK_ENABLED
 	UPDATE_BENCHMARK(SUBTRACTION, dBench);
 #endif
@@ -595,15 +620,28 @@ static PyObject *Integer_mul(PyObject *o1, PyObject *o2) {
 		if (lhs->initialized && rhs->initialized) {
 			debug("Modulus equal? %d =?= 0\n", mpz_cmp(lhs->m, rhs->m));
 			if (mpz_cmp(lhs->m, rhs->m) == 0) {
+				// compute ((lhs % m) * (rhs % m)) % m (reduce before)
 				rop = createNewInteger();
-				mpz_init(rop->e);
+				mpz_t e;
+				mpz_init_set(rop->e, lhs->e);
 				mpz_init_set(rop->m, lhs->m);
-				mpz_mul(rop->e, lhs->e, rhs->e);
+//				_reduce(rop);
+//				if(mpz_cmp(rhs->e, rhs->m) < 0) {
+				mpz_mul(rop->e, rop->e, rhs->e);
+//				}
+//				else {
+//					mpz_init_set(e, lhs->e);
+//					if(mpz_sgn(lhs->m) > 0) mpz_mod(e, e, lhs->m);
+//					mpz_mul(rop->e, rop->e, e);
+//					mpz_clear(e);
+//				}
 			} else {
 				EXIT_IF(TRUE, "cannot multiply integers with different modulus.");
 			}
 		}
 	}
+
+//	_reduce(rop);
 #ifdef BENCHMARK_ENABLED
 	UPDATE_BENCHMARK(MULTIPLICATION, dBench);
 #endif
@@ -654,12 +692,20 @@ static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 	if (foundRHS && rhs_value > 0) {
 		/* Let d = gcd(a, n). The congruence equation ax = b (mod n) has a solution x if and only if d divides b,
 		 * in which case there are exactly d solutions between [0, n-1] these solutions are all congruent modulo n/d. */
-		mpz_t tmp;
+		//mpz_t tmp;
 		rop = createNewInteger();
 		mpz_init(rop->e);
 		mpz_init_set(rop->e, lhs->e);
 		mpz_init_set(rop->m, lhs->m);
-		if(mpz_sgn(rop->m) > 0 && rhs_value > 1) {
+		if (mpz_divisible_ui_p(lhs->e, rhs_value) != 0) {
+			if (mpz_sgn(lhs->m) == 0) {
+				rop = createNewInteger();
+				mpz_init(rop->e);
+				mpz_init_set(rop->m, lhs->m);
+				mpz_divexact_ui(rop->e, lhs->e, rhs_value);
+			}
+		}
+		else if(mpz_sgn(rop->m) > 0 && rhs_value > 1) {
 			mpz_mod(rop->e, rop->e, rop->m);
 			if(mpz_cmp(rop->e, rop->m) < 0) { // check if e < m, then divide e / rhs_value.
 				printf("Unimplemented.\n");
@@ -675,7 +721,8 @@ static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 		mpz_init_set_ui(tmp, lhs_value);
 		rop = createNewInteger();
 		mpz_init(rop->e);
-		if(mpz_sgn(rhs->m) > 0) {
+		int rhs_mod = mpz_sgn(rhs->m);
+		if(rhs_mod > 0) {
 			mpz_init_set(rop->m, rhs->m);
 			int errcode = mpz_invert(rop->e, rhs->e, rhs->m);
 			if(errcode == 0) {
@@ -689,6 +736,12 @@ static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 				mpz_mul(rop->e, tmp, rop->e);
 				mpz_mod(rop->e, rop->e, rop->m);
 			}
+		}
+		else if(rhs_mod == 0 && mpz_divisible_p(tmp, rhs->e) != 0) {
+			rop = createNewInteger();
+			mpz_init(rop->e);
+			mpz_init_set(rop->m, rhs->m);
+			mpz_divexact(rop->e, tmp, rhs->e);
 		}
 		mpz_clear(tmp);
 	} else {
@@ -2113,8 +2166,8 @@ static int int_clear(PyObject *m) {
 	Py_CLEAR(GETSTATE(m)->error);
     Py_XDECREF(IntegerError);
 #ifdef BENCHMARK_ENABLED
-	//Py_CLEAR(GETSTATE(m)->dBench);
-	Py_XDECREF(dBench);
+	Py_CLEAR(GETSTATE(m)->dBench);
+//	Py_XDECREF(dBench);
 #endif
 	return 0;
 }
@@ -2168,7 +2221,7 @@ void initinteger(void) {
     	INITERROR;
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);
     dBench = st->dBench;
-    Py_INCREF(dBench);
+//    Py_INCREF(dBench);
     InitClear(dBench);
 //    Py_INCREF(&BenchmarkType);
 //    PyModule_AddObject(m, "benchmark", (PyObject *)&BenchmarkType);
@@ -2195,7 +2248,7 @@ void initinteger(void) {
 LEAVE:
 	if (PyErr_Occurred()) {
 		printf("ERROR: module load failed!\n");
-		Py_XDECREF(m);
+		//Py_XDECREF(m);
 		INITERROR;
    }
 
