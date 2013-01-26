@@ -154,8 +154,7 @@ void	Integer_dealloc(Integer* self);
 PyObject *Integer_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int Integer_init(Integer *self, PyObject *args, PyObject *kwds);
 PyObject *Integer_print(Integer *self);
-Integer *createNewInteger(mpz_t m);
-Integer *createNewIntegerNoMod(void);
+Integer *createNewInteger(void);
 void print_mpz(mpz_t x, int base);
 void print_bn_dec(const BIGNUM *bn);
 
