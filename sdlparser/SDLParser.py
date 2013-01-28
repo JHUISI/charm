@@ -54,13 +54,14 @@ MESSAGE, SIGNATURE, PUBLIC, LATEX, SETTING = 'message','signature', 'public', 'l
 SAME, DIFF = 'one', 'many'
 publicVarNames = []
 secretVarNames = []
+refType = 'refType'
 
 usedBuiltinsFunc = []
 builtInTypes = {}
 builtInTypes["DeriveKey"] = types.str
 builtInTypes["SymEnc"] = types.str
 builtInTypes["SymDec"] = types.str
-builtInTypes["strToId"] = types.listZR
+builtInTypes["stringToId"] = types.listZR
 builtInTypes["stringToInt"] = types.listZR
 builtInTypes["createPolicy"] = types.pol # these are app specific
 builtInTypes["getAttributeList"] = types.listStr
@@ -550,7 +551,8 @@ def getVarTypeFromVarName(varName, functionNameArg_TieBreaker, failSilently=Fals
 
     retVarType = types.NO_TYPE
     retFunctionName = None
-
+    isInAList = None
+    
     outputKeywordDisagreement = False
 
     for funcName in varTypes:
@@ -562,12 +564,14 @@ def getVarTypeFromVarName(varName, functionNameArg_TieBreaker, failSilently=Fals
             if (retVarType == types.NO_TYPE):
                 retVarType = currentVarType
                 retFunctionName = funcName
+                isInAList = varTypes[funcName][currentVarName].isInAList                
                 continue
             if (funcName == TYPES_HEADER):
                 continue
             if (retFunctionName == TYPES_HEADER):
                 retVarType = currentVarType
                 retFunctionName = funcName
+                isInAList = varTypes[funcName][currentVarName].isInAList                
                 continue
             if (currentVarType == retVarType):
                 continue
@@ -609,6 +613,7 @@ def getVarTypeFromVarName(varName, functionNameArg_TieBreaker, failSilently=Fals
         return types.NO_TYPE
 
     if ( (retVarType != types.NO_TYPE) or (varName.count(LIST_INDEX_SYMBOL) != 1) ):
+        # check whether varName isInAList field is set
         return retVarType
 
     varNameSplit = varName.split(LIST_INDEX_SYMBOL)
@@ -847,6 +852,9 @@ def checkPairingInputTypes(node):
     else:
         sys.exit("Algebraic setting is set to unsupported value (found in checkPairingInputTypes in SDLParser).")
 
+def checkRawListTypes(nodeName):
+    pass
+
 def checkForListWithOneNumIndex(nodeName):
     if (nodeName.count(LIST_INDEX_SYMBOL) != 1):
         return types.NO_TYPE
@@ -856,28 +864,26 @@ def checkForListWithOneNumIndex(nodeName):
         return types.NO_TYPE
 
     listName = nodeNameSplit[0]
-
+    
+    # bad sign if this is true
     if (TYPES_HEADER not in varTypes):
         return types.NO_TYPE
 
-    if (listName not in varTypes[TYPES_HEADER]):
-        return types.NO_TYPE
-
-    x = varTypes[TYPES_HEADER][listName].getType()
-
-    if (x == types.listG1):
-        return types.G1
-    if (x == types.listG2):
-        return types.G2
-    if (x == types.listGT):
-        return types.GT
-    if (x == types.listZR):
-        return types.ZR
-
-    print("listName=", listName, ", type=", varTypes[TYPES_HEADER][listName].getType())
-    if (varTypes[TYPES_HEADER][listName].getType() != types.list):
-        return types.NO_TYPE
-
+    if (listName in varTypes[TYPES_HEADER]):
+        x = varTypes[TYPES_HEADER][listName].getType()
+    
+        if (x == types.listG1):
+            return types.G1
+        elif (x == types.listG2):
+            return types.G2
+        elif (x == types.listGT):
+            return types.GT
+        elif (x == types.listZR):
+            return types.ZR
+    
+        if (varTypes[TYPES_HEADER][listName].getType() != types.list):
+            return types.NO_TYPE
+        
     retVarType = types.NO_TYPE
 
     for currentFuncName in varTypes:
@@ -951,8 +957,8 @@ def getVarTypeInfoForAttr_List(node):
         if ( (outsideFunctionName != None) and (retVarInfoObj != None) and (outsideFunctionName in varTypes) and (varNameInList in varTypes[outsideFunctionName]) ):
             return varTypes[outsideFunctionName][varNameInList].getType()
 
-    nodeAttrFullName = getFullVarName(node, False)
-
+    nodeAttrFullName = getFullVarName(node, False)    
+    # last attempt to figure out the type of the given node
     lastAttemptAtType = checkForListWithOneNumIndex(nodeAttrFullName)
     return lastAttemptAtType
 
@@ -997,6 +1003,7 @@ def getVarTypeInfoForAttr(node, funcNameInputParam=currentFuncName):
         return getVarTypeFromVarTypesDict(possibleFuncName, nodeAttrFullName)   # varTypes[possibleFuncName][nodeAttrFullName].getType()
 
     if (nodeAttrFullName.find(LIST_INDEX_SYMBOL) != -1):
+        # if node has a list reference, then find type for node in then getVarTypeInfoForAttr_List
         return getVarTypeInfoForAttr_List(node)
     
     if (nodeAttrFullName.isdigit()):
@@ -1130,10 +1137,36 @@ def postTypeCleanup():
                 _listRawTypes[i] = []
             _listRawTypes[i].append(types['list' + str(iType)])
             _listRawTypes[i] = list(set(_listRawTypes[i]))
+        elif iInList and iType in [types.list]:
+            #print("DEBUG: handle this===> ", i, localTypes.get(i).getListNodesList())
+            listTypes = []
+            for l in localTypes.get(i).getListNodesList():
+                listTypes.append(localTypes.get(l).getType())
+            (iFuncName, iVarInfo) = getVarNameEntryFromAssignInfo(assignInfo, i)
+            if(iFuncName == currentFuncName): # assignment in currentFunc
+                #print("FOUND: funcName=", iFuncName, ", assignNode=", iVarInfo.getAssignNode())
+                origName = iVarInfo.getAssignVar()
+                o = origName.split(LIST_INDEX_SYMBOL)
+                if len(o) == 1: # x : no list refs
+                    _refType = 'concrete' # common case
+                elif len(o) == 2: # x#y : one list refs
+                    if str(o[-1]).isdigit(): _refType = 'concrete'
+                    else: _refType = 'abstract'
+                    # JAA: upgrade type of variable
+                    varTypes[currentFuncName][i].setType(types.metalist)
+                    #print("DEBUG: name=", o[0], ", newType=", types.metalist, ", oldType=", varTypes[currentFuncName][i].getType())
+                elif len(o) == 3: # x#y#z : two list refs
+                    print("TODO: how to handle: ", o)
+                else:
+                    pass # can't handle this many levels of lists
+                _listRawTypes[i] = { refType: _refType, _refType:listTypes }
+                #print(i, ':', _listRawTypes)
+                isUpdated = True
+
     
     for i,j in _listRawTypes.items():
         #print("DEBUG: ", i, ":", j)
-        if len(j) > 1: # more than unique type in a list means that we should update the type to a list type.
+        if len(j) > 1 and type(j) == list: # more than unique type in a list means that we should update the type to a list type.
             if varTypes[currentFuncName].get(i) == None:
                 # create new var type for i
                 vt = VarType()
@@ -1141,10 +1174,12 @@ def postTypeCleanup():
                 varTypes[currentFuncName][i] = vt
             else:
                 # update exisitng var type for i
+#                print("DEBUG: Update= ", i, " with types.list...")
                 varTypes[currentFuncName][i].setType(types.list)
-        elif len(j) == 1:
-            _listRawTypes[i] = _listRawTypes[i][0] # get rid of list
+        elif len(j) == 1 and type(j) == list:
+            _listRawTypes[i] = { refType:'concrete', 'concrete': _listRawTypes[i][0] } # get rid of list
             isUpdated = True
+            # attempt to sync listRawTypes and varTypes
             
     if isUpdated: listRawTypes.update(_listRawTypes)
 
@@ -1160,13 +1195,15 @@ def postTypeCleanup():
             else:
                 # update exisitng var type for i
                 varTypes[currentFuncName][i].setType(types.list)
-#    print("<=== %s ===>" % currentFuncName)
+#    print("listRawTypes <=== %s ===> start" % currentFuncName)
 #    for i,j in listRawTypes.items():
 #        print(i, ": ", j)
+#    print("listRawTypes <=== %s ===> end" % currentFuncName)
+#
+#    print("varTypes <=== %s ===> start" % currentFuncName)
 #    for i,j in varTypes[currentFuncName].items():
 #        print(i, ":", j.getType())
-#    print("<=== %s ===>" % currentFuncName)     
-#    print("DEBUG: ", curTypes)
+#    print("varTypes <=== %s ===> end" % currentFuncName)
     return
 
 def getVarTypeInfo(node, i, varName):
@@ -1177,7 +1214,16 @@ def getVarTypeInfo(node, i, varName):
     elif (type(retVarType).__name__ == BINARY_NODE_CLASS_NAME):
         if (retVarType.type == ops.LIST):
             updateVarTypes(node, i, retVarType)
+    if Type(node.left) == Type(node.right) == ops.ATTR and Type(node) == ops.EQ: # see if we are mapping a new variable to an existing variable
+        rhsVarTypeObj = varTypes[currentFuncName].get(str(node.right))
+        lhsVarTypeObj = varTypes[currentFuncName].get(varName)
+        if varName.find(LIST_INDEX_SYMBOL) == -1: # no '#' in attr name
+            if lhsVarTypeObj != None and rhsVarTypeObj != None: # there exists VarType objects
+                lhsVarTypeObj.isInAList = rhsVarTypeObj.isInAList
+                #print("DEBUG: getVarTypeInfo retVarType=", retVarType, ", node=", node, ", isInAList=", lhsVarTypeObj.isInAList)
+        
 
+    
 def updateVarNamesDicts(node, varNameList, dictToUpdate):
     if (type(varNameList) is not list):
         sys.exit("updateVarNamesDicts in SDLParser.py:  varNameList passed in is not of type list.")

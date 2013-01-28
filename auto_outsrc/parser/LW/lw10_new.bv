@@ -1,0 +1,124 @@
+name := lw10
+setting := symmetric
+
+#msk1 := list{ZR, ZR}
+#msk := list{msk1}
+#pk1 := list{GT, G1}
+#pk := list{pk1, None}
+
+BEGIN :: types
+gid := str
+sk := list
+ct := list
+policy_str := str
+authS := list{str}
+userS := list{str}
+M := GT
+K := list
+C1 := list
+C2 := list
+C3 := list
+END :: types
+
+BEGIN :: func:setup
+input := None
+g := random(G1)
+gpk := list{g}
+
+output := gpk
+END :: func:setup
+
+BEGIN :: func:authsetup
+input := list{gpk, authS}
+gpk := expand{g}
+
+Y := len(authS)
+BEGIN :: for
+for{i := 0, Y}
+alpha := random(ZR)
+y := random(ZR)
+z := authS#i
+eggalph := e(g, g)^alpha
+gy := g^y
+msk#z := list{alpha, y}
+pk#z := list{eggalph, gy}
+END :: for
+
+output := list{msk, pk}
+END :: func:authsetup
+
+BEGIN :: func:keygen
+input := list{gpk, msk, gid, userS} 
+gpk := expand{g}
+h := H(gid, G1)
+
+Y := len(userS)
+BEGIN :: for
+for{i := 0, Y}
+z := userS#i
+K#z := (g ^ msk#z#0) * (h ^ msk#z#1)
+END :: for
+
+sk := list{gid, K}
+output := sk
+END :: func:keygen
+
+
+BEGIN :: func:encrypt
+input := list{pk, gpk, M, policy_str}
+gpk := expand{g}
+
+policy := createPolicy(policy_str)
+attrs := getAttributeList(policy)
+s := random(ZR)
+w := 0
+s_sh := calculateSharesDict(s, policy)
+w_sh := calculateSharesDict(w, policy)
+Y := len(s_sh)
+egg := e(g,g)
+C0 := (M * (egg^s))
+
+BEGIN :: for
+for{y := 0, Y}
+r := random(ZR)
+k := attrs#y
+C1#k := (egg ^ s_sh#k) * (pk#k#0 ^ r)
+C2#k := g^r
+C3#k := (pk#k#1 ^ r) * (g ^ w_sh#k)
+END :: for
+
+ct := list{policy_str, C0, C1, C2, C3}
+output := ct
+END :: func:encrypt
+
+#A := { prod{y := attrs#1, Y} on (((C1#y * e(h_gid, C3#y)) / e(K#y, C2#y))^coeff#y) }
+
+BEGIN :: func:decrypt
+input := list{sk, userS, ct}
+ct := expand{policy_str, C0, C1, C2, C3}
+sk := expand{gid, K}
+
+policy := createPolicy(policy_str)
+attrs  := prune(policy, userS)
+coeff := getCoefficients(policy)
+h_gid := H(gid, G1)
+
+Y := len(attrs)
+dotProd := init(GT)
+BEGIN :: for
+for{y := 0, Y}
+kDecrypt := GetString(attrs#y)
+result0 := e(h_gid, C3#kDecrypt)
+result1 := result0 ^ coeff#kDecrypt
+result2 := C1#kDecrypt ^ coeff#kDecrypt
+numerator := result1 * result2
+denominator0 := e(K#kDecrypt, C2#kDecrypt)
+denominator := denominator0 ^ coeff#kDecrypt
+fraction := numerator / denominator
+dotProd := dotProd * fraction
+END :: for
+
+M := C0 / dotProd
+output := M
+END :: func:decrypt
+

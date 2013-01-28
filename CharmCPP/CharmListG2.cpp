@@ -10,8 +10,8 @@ CharmListG2::CharmListG2(void)
 
 CharmListG2::~CharmListG2()
 {
-	for(int i = 0; i < (int) list.size(); i++)
-		list.erase(i);
+	list.clear();
+	strList.clear();
 }
 
 CharmListG2::CharmListG2(const CharmListG2& cList)

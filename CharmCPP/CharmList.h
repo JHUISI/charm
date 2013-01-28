@@ -14,6 +14,13 @@
 /* forward declare Element class */
 class Element;
 
+struct e_cmp_str
+{
+	bool operator()(const string a, const string b) {
+		return strcmp(a.c_str(), b.c_str()) < 0;
+	}
+};
+
 class CharmList
 {
 public:
@@ -51,24 +58,29 @@ public:
 	void insert(int, GT&);
 	void insert(int, const GT&);
 	void insert(int, CharmListGT);
-	void insert(int, CharmList); // TODO: test
+	void insert(int, CharmList);
+	void insert(string, CharmList);
 	void insert(int, Element&);
 	void insert(int, const Element&);
 	//void append(const CharmList&);
 
 	int length(); // return length of lists
 	string printAtIndex(int index);
+	string printStrKeyIndex(int index);
 
 	// retrieve a particular index
 	CharmList operator+(const Element&) const;
 	CharmList operator+(const CharmList&) const;
 	Element& operator[](const int index);
+	Element& operator[](const string index);
 	CharmList& operator=(const CharmList&);
 	//Element& operator=(const GT&);
     friend ostream& operator<<(ostream&, const CharmList&);
 private:
 	int cur_index;
 	map<int, Element> list;
+	map<string, int, e_cmp_str> strList;
+
 };
 
 class Element
@@ -125,6 +137,32 @@ public:
  	Element operator=(const Element& e);
 
     friend ostream& operator<<(ostream&, const Element&);
+};
+
+// TODO: update MetaListZR -> GT according to MetaList
+class CharmMetaList
+{
+public:
+	CharmMetaList(void); // static list
+	~CharmMetaList();
+    CharmMetaList(const CharmMetaList&); // copy constructor
+    CharmMetaList& operator=(const CharmMetaList&);
+
+	void insert(int, CharmList);
+	void insert(string, CharmList);
+	void append(CharmList&);
+
+	int length(); // return length of lists
+	string printAtIndex(int index);
+	string printStrKeyIndex(int index);
+	// retrieve a particular index
+	CharmList& operator[](const int index);
+	CharmList& operator[](const string index);
+    friend ostream& operator<<(ostream&, const CharmMetaList&);
+private:
+	int cur_index;
+	map<int, CharmList> list;
+	map<string, int, e_cmp_str> strList;
 };
 
 /* base-64 encoding functions */

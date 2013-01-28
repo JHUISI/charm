@@ -9,14 +9,15 @@ CharmList::CharmList(void)
 
 CharmList::~CharmList()
 {
-	for(int i = 0; i < (int) list.size(); i++)
-		list.erase(i);
+	list.clear();
+	strList.clear();
 }
 
 CharmList::CharmList(const CharmList& cList)
 {
 	//copy constructor
 	cur_index = cList.cur_index;
+	strList = cList.strList;
 	list = cList.list;
 }
 
@@ -220,6 +221,25 @@ void CharmList::insert(int index, CharmList c)
 	cur_index++;
 }
 
+void CharmList::insert(string index, CharmList c)
+{
+	int the_index;
+	// see if index exists in strList. If so, use that index
+	if(strList.find(index) == strList.end()) {
+		the_index = cur_index; // select current index
+		strList.insert(pair<string, int>(index, the_index));
+	}
+	else {
+		// retrieve the index
+		the_index = strList[index];
+	}
+	CharmList c2 = c;
+	Element elem(c2);
+	list[the_index] = elem;
+	cur_index++;
+}
+
+
 void CharmList::insert(int index, CharmListZR c)
 {
 	CharmListZR c2 = c;
@@ -263,6 +283,22 @@ Element& CharmList::operator[](const int index)
 	else {
 		throw new string("Invalid access.\n");
 	}
+}
+
+Element& CharmList::operator[](const string index)
+{
+	int the_index;
+	if(strList.find(index) == strList.end()) {
+		the_index = cur_index; // select current index
+		strList[index] = the_index;
+		cur_index++;
+	}
+	else {
+		// retrieve the index
+		the_index = strList[index];
+	}
+
+	return list[the_index];
 }
 
 CharmList& CharmList::operator=(const CharmList& cList)
@@ -359,3 +395,164 @@ string CharmList::printAtIndex(int index)
 	string s = ss.str();
 	return s;
 }
+
+string CharmList::printStrKeyIndex(int index)
+{
+	map<string, int, g_cmp_str>::iterator it;
+	if(((int) strList.size()) > 0) {
+		//cout << "iterate over length: " << strList.size() << endl;
+		for(it = strList.begin(); it != strList.end(); ++it) {
+			//cout << "Compare: " << it->second << " == " << index << endl;
+			if(it->second == index) {
+				return ": " + it->first;
+			}
+		}
+	}
+	return "";
+}
+
+CharmMetaList::CharmMetaList(void)
+{
+	// increases as elements are appended
+	cur_index = 0;
+}
+
+CharmMetaList::~CharmMetaList()
+{
+	list.clear();
+	strList.clear();
+}
+
+CharmMetaList::CharmMetaList(const CharmMetaList& cList)
+{
+	//copy constructor
+	cur_index = cList.cur_index;
+	strList = cList.strList;
+	list = cList.list;
+}
+
+void CharmMetaList::insert(int index, CharmList zr)
+{
+	list[index] = zr;
+	cur_index++;
+}
+
+void CharmMetaList::insert(string index, CharmList zr)
+{
+	int the_index;
+	// see if index exists in strList. If so, use that index
+	if(strList.find(index) == strList.end()) {
+		the_index = cur_index; // select current index
+		strList.insert(pair<string, int>(index, the_index));
+	}
+	else {
+		// retrieve the index
+		the_index = strList[index];
+	}
+
+	list[the_index] = zr;
+	cur_index++;
+}
+
+
+void CharmMetaList::append(CharmList & zr)
+{
+	list[cur_index] = zr;
+	cur_index++;
+}
+
+CharmList& CharmMetaList::operator[](const int index)
+{
+	if(index == cur_index) { // means we are creating reference.
+		cur_index++;
+		return list[index];
+	}
+
+	int len = (int) list.size();
+	if(index >= 0 && index < len) {
+		return list[index];
+	}
+	else {
+		throw new string("Invalid access.\n");
+	}
+}
+
+CharmList& CharmMetaList::operator[](const string index)
+{
+	int the_index;
+	if(strList.find(index) == strList.end()) {
+		the_index = cur_index; // select current index
+		strList[index] = the_index;
+		cur_index++;
+	}
+	else {
+		// retrieve the index
+		the_index = strList[index];
+	}
+
+	return list[the_index];
+}
+
+
+int CharmMetaList::length()
+{
+	return (int) list.size();
+}
+
+string CharmMetaList::printAtIndex(int index)
+{
+	stringstream ss;
+	int i;
+
+	if(index >= 0 && index < (int) list.size()) {
+		i = index;
+		ss << list[i];
+	}
+
+	string s = ss.str();
+	return s;
+}
+
+string CharmMetaList::printStrKeyIndex(int index)
+{
+	map<string, int, e_cmp_str>::iterator it;
+	if(((int) strList.size()) > 0) {
+		//cout << "iterate over length: " << strList.size() << endl;
+		for(it = strList.begin(); it != strList.end(); ++it) {
+			//cout << "Compare: " << it->second << " == " << index << endl;
+			if(it->second == index) {
+				return ": " + it->first;
+			}
+		}
+	}
+	return "";
+}
+
+
+ostream& operator<<(ostream& s, const CharmMetaList& cList)
+{
+	CharmMetaList cList2 = cList;
+	for(int i = 0; i < cList2.length(); i++) {
+		s << "list " << i << " " << cList2.printStrKeyIndex(i) << "\n";
+		s << cList2.printAtIndex(i) << endl;
+	}
+
+	return s;
+}
+
+CharmMetaList& CharmMetaList::operator=(const CharmMetaList& cList)
+{
+	if(this == &cList)
+		return *this;
+
+	// delete current list contents first
+	list.clear();
+	if(strList.size() > 0) strList.clear();
+
+	cur_index = cList.cur_index;
+	strList = cList.strList;
+	list = cList.list;
+	return *this;
+}
+
+

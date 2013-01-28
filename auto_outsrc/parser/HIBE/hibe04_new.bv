@@ -1,0 +1,115 @@
+name := hibe_bb04
+setting := asymmetric
+
+l := 5
+z := 32
+
+BEGIN :: types
+l := int
+z := int
+d := list{G2}
+id := str
+M := GT
+transformOutputList := list
+END :: types
+
+BEGIN :: func:setup
+input := list{l, z}
+
+alpha := random(ZR) 
+beta := random(ZR)
+g := random(G1)
+gb := random(G2)
+g1 := g ^ alpha
+g1b := gb ^ alpha
+
+BEGIN :: for
+for{y := 0, l}
+delta#y := random(ZR)
+h#y := g ^ delta#y
+hb#y := gb ^ delta#y
+END :: for
+
+g0b := gb ^ (alpha * beta)
+v := e(g, g0b)
+    
+mpk := list{g, g1, h, gb, g1b, hb, v}
+mk := list{g0b}
+output := list{mpk, mk}
+END :: func:setup
+
+
+BEGIN :: func:keygen
+input := list{mpk, mk, id}
+blindingFactor0Blinded := random(ZR)
+zz := random(ZR)
+mpk := expand{g, g1, h, gb, g1b, hb, v}
+mk := expand{g0b}
+
+Id := stringToInt(id, z, l)
+BEGIN :: for
+for{y := 0, 5}
+r#y := random(ZR)
+d#y := gb ^ r#y
+END :: for
+
+dBlinded := d
+
+d0DotProdCalc := init(G2)
+BEGIN :: for
+for{y := 0, 5}
+d0DotProdCalc := d0DotProdCalc * (((g1b^Id#y) * hb#y)^r#y))
+END :: for
+
+d0 := (g0b * d0DotProdCalc)
+d0Blinded := (d0^(1 / blindingFactor0Blinded))
+
+pk := list{id}
+pkBlinded := pk
+skBlinded := list{d0Blinded, dBlinded}
+output := list{pkBlinded, blindingFactor0Blinded, skBlinded}
+END :: func:keygen
+
+
+BEGIN :: func:encrypt
+input := list{mpk, pk, M}
+mpk := expand{g, g1, h, gb, g1b, hb, v}
+pk := expand{id}
+s := random(ZR)
+A := M * (v ^ s)
+B :=  g ^ s
+
+Id2 := stringToInt(id, z, l)
+
+BEGIN :: for
+for{y := 0, 5}
+C#y := (((g1 ^ Id2#y) * h#y) ^ s)
+END :: for
+            
+ct := list{A, B, C}
+output := ct
+END :: func:encrypt
+
+
+BEGIN :: func:transform
+input := list{pk, skBlinded, ct}
+skBlinded := expand{d0Blinded, dBlinded}
+ct := expand{A, B, C}
+transformOutputList#0 := e(C#0,dBlinded#0) * e(C#1,dBlinded#1) * e(C#2,dBlinded#2) * e(C#3,dBlinded#3) * e(C#4,dBlinded#4)
+#D := transformOutputList#0
+transformOutputList#1 := e(B,d0Blinded)
+transformOutputList#2 := A
+#denominator := transformOutputList#1
+output := transformOutputList
+END :: func:transform
+
+BEGIN :: func:decout
+input := list{pk, transformOutputList, blindingFactor0Blinded}
+D := transformOutputList#0
+A := transformOutputList#2
+denominator := (transformOutputList#1 ^ (blindingFactor0Blinded))
+fraction := (D * (denominator^-1))
+M := (A * fraction)
+output := M
+END :: func:decout
+

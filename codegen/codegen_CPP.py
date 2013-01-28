@@ -36,7 +36,8 @@ INSERT_FUNC_NAME = ".insert("
 UTIL_FUNC_NAME = "util"
 secretUtils = ['createPolicy', 'getAttributeList', 'calculateSharesDict', 'calculateSharesList', 'prune', 'getCoefficients']
 secretUtilsWithGroup = ['calculateSharesDict', 'calculateSharesList', 'getCoefficients']
-transformOutputList = None
+# default unless specified otherwise by caller
+transformOutputList = "transformOutputList" #None
 preprocessTypes = Enum('listWithinListAssign', 'dotProductAssign', 'NoMatch')
 
 varCount = 0
@@ -210,6 +211,8 @@ def makeTypeReplacementsForCPP(SDL_Type, isList=False):
         return "CharmMetaListGT"
     if (SDLTypeAsString == "metalistZR"):
         return "CharmMetaListZR"
+    if (SDLTypeAsString == "metalist"):
+        return "CharmMetaList"    
     
     if ( (SDLTypeAsString == "G1") and (isList == True) ):
         return "CharmListG1"
@@ -539,6 +542,7 @@ def areBothSidesStringVars(leftSide, rightSide):
     return True
 
 def addGetTypeToAttrNode(inputString, variableType):
+    #print("DEBUG: inputString=", inputString, ", variableType=", variableType)
     if (variableType == types.G1):
         return inputString + ".getG1()"
 
@@ -550,12 +554,12 @@ def addGetTypeToAttrNode(inputString, variableType):
 
     if (variableType == types.ZR):
         return inputString + ".getZR()"
-
-    if (variableType == types.str):
-        return inputString # + ".strPtr"
     
     if (variableType == types.symmapZR):
         return inputString
+
+    if (variableType in [types.str, types.listZR, types.listG1, types.listG2, types.listGT]):
+        return inputString # + ".strPtr"
     
     print(variableType)
     print(inputString)
@@ -563,20 +567,46 @@ def addGetTypeToAttrNode(inputString, variableType):
     sys.exit("addGetTypeToAttrNode in codegen_CPP.py:  variable type passed in is not one of the supported types.")
 
 def exhaustSearchType(node, currentFuncName):
+    if Type(node) != ops.ATTR: return
     nodeParts = str(node).split(LIST_INDEX_SYMBOL)
     varName = nodeParts[0]
     _variableType = types.NO_TYPE
-    if len(nodeParts) == 2:
-        _variableType = getFinalVarType(varName, currentFuncName)
-    elif len(nodeParts) == 3:
-        _variableType = getFinalVarType(str(node), currentFuncName)
-        #print("DEBUG: Figure something out: ", _variableType, getVarTypes()[TYPES_HEADER].keys())
+    if len(nodeParts) == 2: # pattern => var#ref1
+        _rawType = searchForRawType(node, currentFuncName)
+        if _rawType == types.NO_TYPE: _variableType = getFinalVarType(varName, currentFuncName)
+        else: _variableType = _rawType
+        #print("DEBUG: varName=", varName, ", type=", _variableType, ", currentFunc=", currentFuncName)
+    elif len(nodeParts) == 3: # pattern => var#ref1#ref2
+        _variableType = searchForRawType(node, currentFuncName)
     else: # last chance
+        print("DEBUG: exhaustSearchType -> handle case: ", node)
         _variableType = getVarTypeInfoRecursive(node) # getFinalVarType(str(node), currentFuncName)
         #print("DEBUG: getVarTypeInfoRecursive=", _variableType)
     #print("updated var type: ", _variableType, ", name: ", node, ", rawType=", getRawListTypes()) # JAA: added to find types in "insert" situations
     return _variableType
 
+# TODO: this function needs refinement to handle all possible cases...
+def searchForRawType(node, currentFuncName):
+    nodeParts = str(node).split(LIST_INDEX_SYMBOL)
+    rawTypes = getRawListTypes()
+    #print("rawTypes: ", rawTypes)
+    key = nodeParts[0]
+    typeDict = rawTypes.get(key)
+    if typeDict != None:
+        typeRef = typeDict[refType]
+        typeInfo = typeDict[typeRef]
+    else:
+        return types.NO_TYPE
+    if len(nodeParts) == 2:
+        #print("2=typeInfo: ", typeInfo)
+        return types[str(typeInfo)]
+    elif len(nodeParts) == 3:
+        lastKey = nodeParts[-1]
+        #print("3=typeInfo: ", typeInfo, lastKey)
+        if lastKey.isdigit() and int(lastKey) < len(typeInfo): return typeInfo[ int(lastKey) ]
+        else: return typeInfo[0] # must be abstract reference
+    return types.NO_TYPE
+    
 def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideNameForInit=None):
     global userFuncsCPPFile, userFuncsList_CPP
 
@@ -602,21 +632,16 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
             varIsAList = isFuncDeclVarAList(varName2, currentFuncName)
             variableType = getVarTypeInfoRecursive(node)
             if varIsAList:
-                varT = getRawListTypes().get(varName2)
-                #print("DEBUG: is it a listType or just list: ", varName2, ", type=", varT)
+                varT = searchForRawType(node, currentFuncName)
                 if varT in [types.listZR, types.listG1, types.listG2, types.listGT]:
                     pass
                 else:
-#                    print("DEBUG: variableName=", variableName)
                     returnString = addGetTypeToAttrNode(returnString, variableType)
             else:
                 pass # do nothing to returnString since the type is not embedded in a 'list'
-
-#            print("DEBUG: node=", node, ", variableType=", variableType, ", RealType=", getFinalVarType(str(node), currentFuncName), ", SearchType=", getVarTypeInfoRecursive(node), ", isList=", varIsAList)
-#            variableType = getFinalVarType(str(node), currentFuncName)
         elif str(node).find(LIST_INDEX_SYMBOL) != -1 and INSERT_FUNC_NAME in variableName: # JAA: if list ref appears on rhs inside a "insert(" call. 
             returnString = addGetTypeToAttrNode(returnString, variableType) # getFinalVarType(str(node), currentFuncName) 
-        elif transformOutputList != None and (str(node).startswith(transformOutputList) == True):
+        if transformOutputList != None and (str(node).startswith(transformOutputList) == True):
             returnString = addGetTypeToAttrNode(returnString, variableType)
 
         if node.isNegated():
