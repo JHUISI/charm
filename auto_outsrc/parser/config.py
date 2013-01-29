@@ -1,4 +1,4 @@
-schemeName = "BGW"
+schemeName = "LW"
 
 inputVarName = "input"
 outputVarName = "output"
@@ -7,12 +7,11 @@ finalSDLSuffix = ".FINAL_SDL"
 
 transformOutputList = "transformOutputList"
 
-#doNotIncludeInTransformList = ["dotProdDecrypt"]
 doNotIncludeInTransformList = []
 
 forLoopSeed = 1000
 
-M = 'KDecrypt'
+M = 'M'
 
 listNameIndicator = "LISTNAMEINDICATOR"
 
@@ -41,13 +40,13 @@ transformFuncName = "transform"
 mainFuncName = "main"
 verifyFuncName = "verify"
 
-masterPubVars = ["pk"]
+masterPubVars = ["mpk"]
 masterSecVars = ["msk"]
 
 # superset of variables we have used to represent public parameters in
 # our crypto schemes
-keygenPubVar = ["pk"]
-keygenSecVar = "skComplete"
+keygenPubVar = ["mpk"]
+keygenSecVar = "sk"
 
 pySuffix = ".py"
 cppSuffix = ".cpp"

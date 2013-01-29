@@ -7,7 +7,8 @@ finalSDLSuffix = ".FINAL_SDL"
 
 transformOutputList = "transformOutputList"
 
-doNotIncludeInTransformList = ["dotProdDecrypt"]
+#doNotIncludeInTransformList = ["dotProdDecrypt"]
+doNotIncludeInTransformList = []
 
 forLoopSeed = 1000
 

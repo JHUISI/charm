@@ -22,6 +22,7 @@ sharedBlindingFactorCounter = 0
 #namesOfAllNonListBlindingFactors = []
 mappingOfSecretVarsToBlindingFactors = {}
 mappingOfSecretVarsToGroupType = {}
+keygenElemToExponents = {}
 
 def processListOrExpandNodes(binNode, origVarName, newVarName):
     binNodeRight = binNode.right
@@ -399,9 +400,44 @@ def getWhichNonListBFToShare():
     for keyName in sharedBlindingFactorNames:
         return sharedBlindingFactorNames[keyName]
 
+def searchForExponentsRecursive(node, exponentsList):
+    if (node.type == ops.EXP):
+        if (str(node.right) not in exponentsList):
+            exponentsList.append(str(node.right))
+    #else:
+    if (node.left != None):
+        searchForExponentsRecursive(node.left, exponentsList)
+    if (node.right != None):
+        searchForExponentsRecursive(node.right, exponentsList)
+
+def searchForExponents(node):
+    exponentsList = []
+
+    searchForExponentsRecursive(node, exponentsList)
+    return exponentsList
+
+def getKeygenElemToExponentsDictEntry(keygenOutputElem):
+    global keygenElemToExponents
+
+    if (keygenOutputElem not in assignInfo[keygenFuncName]):
+        #sys.exit("getKeygenElemToExponentsDictEntry in keygen.py:  keygenOutputElem parameter passed in is not in assignInfo[keygenFuncName].")
+        keygenElemToExponents[keygenOutputElem] = []
+        return
+
+    assignInfoVarEntry = assignInfo[keygenFuncName][keygenOutputElem]
+    baseElemsOnly = assignInfoVarEntry.getAssignBaseElemsOnly()
+    keygenElemToExponents[keygenOutputElem] = searchForExponents(baseElemsOnly)
+
+    #if (baseElemsOnly.type == ops.EXP):
+        #keygenElemToExponents[keygenOutputElem] = baseElemsOnly.right
+
 def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListDecls):
     global blindingFactors_NonLists, varsThatAreBlinded, varsNameToSecretVarsUsed
     global mappingOfSecretVarsToBlindingFactors, mappingOfSecretVarsToGroupType
+    global keygenElemToExponents
+
+    #keygenElemToExponents[keygenOutputElem] = []
+    getKeygenElemToExponentsDictEntry(keygenOutputElem)
 
     groupTypeOfThisElement = getVarTypeInfoRecursive(BinaryNode(keygenOutputElem), keygenFuncName)
     mappingOfSecretVarsToGroupType[keygenOutputElem] = groupTypeOfThisElement
