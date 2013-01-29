@@ -607,6 +607,82 @@ def searchForRawType(node, currentFuncName):
         else: return typeInfo[0] # must be abstract reference
     return types.NO_TYPE
     
+def getCondStmtAsString_CPP(node, replacementsDict):
+    if type(node) == str:
+        return node
+    
+    if (node.type == ops.AND):
+        leftSide = getCondStmtAsString_CPP(node.left, replacementsDict)
+        rightSide = getCondStmtAsString_CPP(node.right, replacementsDict)
+        return "( (" + leftSide + ") && (" + rightSide + ") )"
+    elif (node.type == ops.EQ_TST):
+        leftSide = getCondStmtAsString_CPP(node.left, replacementsDict)
+        rightSide = getCondStmtAsString_CPP(node.right, replacementsDict)
+        if (rightSide == "False"):
+            rightSide = "false"
+        elif (rightSide == "True"):
+            rightSide = "true"
+        if (areBothSidesStringVars(leftSide, rightSide) == True):
+            return "( isEqual(" + leftSide + ", " + rightSide + ") )"
+        else:
+            return "( (" + leftSide + ") == (" + rightSide + ") )"
+    elif (node.type == ops.NON_EQ_TST):
+        leftSide = getCondStmtAsString_CPP(node.left, replacementsDict)
+        rightSide = getCondStmtAsString_CPP(node.right, replacementsDict)
+        if (rightSide == "False"):
+            rightSide = "false"
+        elif (rightSide == "True"):
+            rightSide = "true"
+
+        if (areBothSidesStringVars(leftSide, rightSide) == True):
+            return "( isNotEqual(" + leftSide + ", " + rightSide + ") )"
+        else:
+            return "( (" + leftSide + ") != (" + rightSide + ") )"
+    elif (node.type == ops.ATTR):
+        returnString = processAttrOrTypeAssignStmt(node, replacementsDict)
+        return returnString
+    elif (node.type == ops.FUNC):
+        nodeName = applyReplacementsDict(replacementsDict, getFullVarName(node, False))
+        nodeName = replacePoundsWithBrackets(nodeName)
+        variableTypeForFuncNode = getFinalVarType(nodeName, currentFuncName, True)
+        
+        variableName = nodeName
+        if (nodeName == INIT_FUNC_NAME):
+            return groupObjName + "." + INIT_FUNC_NAME + "(" + str(node.listNodes[0]) + "_t)"
+        elif (nodeName == ISMEMBER_FUNC_NAME):
+            funcOutputString = groupObjName + "." + nodeName + "("
+        elif (nodeName == INTEGER_FUNC_NAME):
+            funcOutputString = "int("
+        elif (nodeName == STRING_TO_INT):
+            funcOutputString = STRING_TO_INT + "(" + groupObjName + ", " 
+        elif (nodeName in builtInTypes.keys()) and (nodeName in secretUtils):
+            funcOutputString = UTIL_FUNC_NAME + "." + nodeName + "("
+            if nodeName in secretUtilsWithGroup:
+                funcOutputString += groupObjName + ", "
+        else:
+            funcOutputString = nodeName + "("
+        
+        for listNodeInFunc in node.listNodes:
+            listNodeAsString = getCondStmtAsString_CPP(listNodeInFunc, replacementsDict)
+            funcOutputString += listNodeAsString + ", "
+        funcOutputString = funcOutputString[0:(len(funcOutputString) - len(", "))]
+        funcOutputString += ")"
+        if ( (nodeName not in userFuncsList_CPP) and (nodeName not in builtInTypes) ):
+            userFuncsList_CPP.append(nodeName)
+            funcOutputForUser = funcOutputString
+            funcOutputForUser = funcOutputForUser.replace("[", "")
+            funcOutputForUser = funcOutputForUser.replace("]", "")
+            userFuncsOutputString = ""
+            userFuncsOutputString += "void " + funcOutputForUser + "\n{\n"
+            #userFuncsOutputString += "\t" + userGlobalsFuncName + "();\n"
+            userFuncsOutputString += "    " + userGlobalsFuncName + "();\n"
+            #userFuncsOutputString += "\treturn;\n}\n\n"
+            userFuncsOutputString += "    return;\n}\n\n"
+            userFuncsCPPFile.write(userFuncsOutputString)
+        return funcOutputString
+        
+    return
+    
 def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideNameForInit=None):
     global userFuncsCPPFile, userFuncsList_CPP
 
@@ -639,7 +715,7 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
                     returnString = addGetTypeToAttrNode(returnString, variableType)
             else:
                 pass # do nothing to returnString since the type is not embedded in a 'list'
-        elif str(node).find(LIST_INDEX_SYMBOL) != -1 and INSERT_FUNC_NAME in variableName: # JAA: if list ref appears on rhs inside a "insert(" call. 
+        elif str(node).find(LIST_INDEX_SYMBOL) != -1 and variableName != None and INSERT_FUNC_NAME in variableName: # JAA: if list ref appears on rhs inside a "insert(" call. 
             returnString = addGetTypeToAttrNode(returnString, variableType) # getFinalVarType(str(node), currentFuncName) 
         if transformOutputList != None and (str(node).startswith(transformOutputList) == True):
             returnString = addGetTypeToAttrNode(returnString, variableType)
@@ -680,33 +756,33 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
         rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
         return writeMathStatement(leftSide, rightSide, "exp")  
 
-    elif (node.type == ops.AND):
-        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
-        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
-        return "( (" + leftSide + ") && (" + rightSide + ") )"
-    elif (node.type == ops.EQ_TST):
-        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
-        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
-        if (rightSide == "False"):
-            rightSide = "false"
-        elif (rightSide == "True"):
-            rightSide = "true"
-        if (areBothSidesStringVars(leftSide, rightSide) == True):
-            return "( isEqual(" + leftSide + ", " + rightSide + ") )"
-        else:
-            return "( (" + leftSide + ") == (" + rightSide + ") )"
-    elif (node.type == ops.NON_EQ_TST):
-        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
-        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
-        if (rightSide == "False"):
-            rightSide = "false"
-        elif (rightSide == "True"):
-            rightSide = "true"
-
-        if (areBothSidesStringVars(leftSide, rightSide) == True):
-            return "( isNotEqual(" + leftSide + ", " + rightSide + ") )"
-        else:
-            return "( (" + leftSide + ") != (" + rightSide + ") )"
+#    elif (node.type == ops.AND):
+#        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
+#        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
+#        return "( (" + leftSide + ") && (" + rightSide + ") )"
+#    elif (node.type == ops.EQ_TST):
+#        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
+#        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
+#        if (rightSide == "False"):
+#            rightSide = "false"
+#        elif (rightSide == "True"):
+#            rightSide = "true"
+#        if (areBothSidesStringVars(leftSide, rightSide) == True):
+#            return "( isEqual(" + leftSide + ", " + rightSide + ") )"
+#        else:
+#            return "( (" + leftSide + ") == (" + rightSide + ") )"
+#    elif (node.type == ops.NON_EQ_TST):
+#        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
+#        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
+#        if (rightSide == "False"):
+#            rightSide = "false"
+#        elif (rightSide == "True"):
+#            rightSide = "true"
+#
+#        if (areBothSidesStringVars(leftSide, rightSide) == True):
+#            return "( isNotEqual(" + leftSide + ", " + rightSide + ") )"
+#        else:
+#            return "( (" + leftSide + ") != (" + rightSide + ") )"
     elif (node.type == ops.CONCAT):
         concatOutputString = "("
         for listNode in node.listNodes:
@@ -772,14 +848,17 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
         variableTypeForFuncNode = getFinalVarType(variableName, currentFuncName, True)
 
         if (nodeName == INIT_FUNC_NAME):
-            if (variableName.startswith(DOT_PROD_WORD) == True):
+            if variableName == None: 
+                return
+            elif (variableName.startswith(DOT_PROD_WORD) == True):
                 return groupObjName + "." + INIT_FUNC_NAME + "(" + str(leftSideNameForInit) + ", 1)"
             elif (variableName.startswith(SUM_PROD_WORD) == True):
                 return groupObjName + "." + INIT_FUNC_NAME + "(" + str(leftSideNameForInit) + ", 0)"
             elif (str(variableTypeForFuncNode) == "str"):
                 return variableName + " = \"\""
+            elif INSERT_FUNC_NAME in variableName:
+                return groupObjName + "." + INIT_FUNC_NAME + "(" + str(node.listNodes[0]) + "_t)"
             else:
-                #return groupObjName + "." + INIT_FUNC_NAME + "(" + str(leftSideNameForInit) + ")"
                 return "//"
         elif (nodeName == ISMEMBER_FUNC_NAME):
             funcOutputString = groupObjName + "." + nodeName + "("
@@ -1112,8 +1191,9 @@ def writeElseStmt_CPP(outputFile, binNode):
         outputString += writeCurrentNumTabsToString()
         outputString += "{\n"
     else:
-        outputString += "else if ( \n"
-        outputString += getAssignStmtAsString_CPP(binNode.left, None, None)
+        #print("DEBUG: condition=", binNode.left)
+        outputString += "else if ( \n" 
+        outputString += getCondStmtAsString_CPP(binNode.left, None) #getAssignStmtAsString_CPP(binNode.left, None, None)
         outputString += " )\n"
         outputString += writeCurrentNumTabsToString()
         outputString += "{\n"
@@ -1125,9 +1205,10 @@ def writeIfStmt_CPP(outputFile, binNode):
 
     outputString = ""
     outputString += writeCurrentNumTabsToString()
-
+    # JAA: fix this
+    #print("DEBUG: condition=", binNode.left)
     outputString += "if ( "
-    outputString += getAssignStmtAsString_CPP(binNode.left, None, None)
+    outputString += getCondStmtAsString_CPP(binNode.left, None)
     outputString += " )\n"
     outputString += writeCurrentNumTabsToString()
     outputString += "{\n"

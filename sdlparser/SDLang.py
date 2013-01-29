@@ -26,7 +26,7 @@ import string, sys
 
 inputKeyword = "input"
 outputKeyword = "output"
-
+returnKeyword = "return"
 hash_table_size = 10000
 delta_word = "delta"
 inputVarName = "input"

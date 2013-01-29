@@ -575,7 +575,7 @@ def getVarTypeFromVarName(varName, functionNameArg_TieBreaker, failSilently=Fals
                 continue
             if (currentVarType == retVarType):
                 continue
-            if (varName != outputKeyword):
+            if (varName not in [outputKeyword, returnKeyword]):
                 if (checkForIntAndZR(retVarType, currentVarType) == True):
                     retVarType = types.ZR
                     continue

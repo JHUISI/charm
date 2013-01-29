@@ -1,19 +1,23 @@
 name := hve08
-setting := symmetric
-short := keys 
+setting := asymmetric
+
+n := 5
 
 BEGIN :: types
 Message := GT
 Message2 := GT
 n := int
+xVector := list{int}
 yVector := list{int}
 END :: types
 
 BEGIN :: func:setup
 input := n
-g := random(G1)
+
+g1 := random(G1)
+g2 := random(G2)
+egg := e(g1, g2)
 y := random(ZR)
-egg := e(g, g)
 Y := egg ^ y
 
 BEGIN :: for
@@ -22,21 +26,20 @@ t#i := random(ZR)
 v#i := random(ZR)
 r#i := random(ZR)
 m#i := random(ZR)
-T#i := g ^ t#i
-V#i := g ^ v#i
-R#i := g ^ r#i
-M#i := g ^ m#i
+T#i := g1 ^ t#i
+V#i := g1 ^ v#i
+R#i := g1 ^ r#i
+M#i := g1 ^ m#i
 END :: for
 
-pk := list{g, Y, T, V, R, M}
+pk := list{g1, g2, Y, T, V, R, M}
 msk := list{y, t, v, r, m}
 output := list{pk, msk}
 END :: func:setup
 
-
 BEGIN :: func:keygen
 input := list{pk, msk, yVector}
-pk := expand{g, Y, T, V, R, M}
+pk := expand{g1, g2, Y, T, V, R, M}
 msk := expand{y, t, v, r, m}
 
 numNonDontCares := init(0)
@@ -48,12 +51,12 @@ numNonDontCares := numNonDontCares + 1
 END :: if
 END :: for
 
-BEGIN :: if
-if { numNonDontCares == 0 }
-sk := g ^ y
-output := sk
-return := output
-END :: if
+#BEGIN :: if
+#if { numNonDontCares == 0 }
+#sk := g2 ^ y
+#output := sk
+#return := output
+#END :: if
 
 sumUSaisUSsoFar := init(0)
 
@@ -72,30 +75,31 @@ BEGIN :: for
 for{i := 0, n}
 BEGIN :: if
 if { yVector#i == 0 }
-YVector#i := g ^ (a#currentUSaUSindex / r#i)
-LVector#i := g ^ (a#currentUSaUSindex / m#i)
+YVector#i := g2 ^ (a#currentUSaUSindex / r#i)
+LVector#i := g2 ^ (a#currentUSaUSindex / m#i)
 currentUSaUSindex := currentUSaUSindex + 1
 END :: if
 BEGIN :: if
 if { yVector#i == 1 }
-YVector#i := g ^ (a#currentUSaUSindex / t#i)
-LVector#i := g ^ (a#currentUSaUSindex / v#i)
+YVector#i := g2 ^ (a#currentUSaUSindex / t#i)
+LVector#i := g2 ^ (a#currentUSaUSindex / v#i)
 currentUSaUSindex := currentUSaUSindex + 1
 END :: if
 BEGIN :: if
 if { yVector#i == 2 }
-YVector#i := init(G1)
-LVector#i := init(G1)
+YVector#i := init(G2)
+LVector#i := init(G2)
 END :: if
 END :: for
 
-sk2 := list{YVector, LVector}
-output := sk2
+sk := list{YVector, LVector}
+output := sk
 END :: func:keygen
+
 
 BEGIN :: func:encrypt
 input := list{Message, xVector, pk}
-pk := expand{g, Y, T, V, R, M}
+pk := expand{g1, g2, Y, T, V, R, M}
 
 s := random(ZR)
 
@@ -105,7 +109,7 @@ sUSi#i := random(ZR)
 END :: for
 
 omega := Message * (Y ^ (-s))
-C0 := g ^ s
+C0 := g1 ^ s
 
 BEGIN :: for
 for{i := 0, n}
@@ -125,27 +129,30 @@ CT := list{omega, C0, XVector, WVector}
 output := CT
 END :: func:encrypt
 
+
 BEGIN :: func:decrypt
 input := list{CT, sk}
 CT := expand{omega, C0, XVector, WVector}
-BEGIN :: if
-if { isList(sk) == False }
-Message := omega * e(C0, sk)
-output := Message
-return := output
-END :: if
+#BEGIN :: if
+#if { isList(sk)==0 }
+#Message := omega * e(C0, sk)
+#output := Message
+#return := output
+#END :: if
 
 sk := expand{YVector, LVector}
 
 dotProd := init(GT)
+g2Id := init(G2)
 
-n := len(YVector)
+nn := len(YVector)
 
 BEGIN :: for
-for{i := 0, n}
+for{i := 0, nn}
 BEGIN :: if
-if { (YVector#i != init(G1)) and (LVector#i != init(G1)) }
-dotProd := dotProd * e(XVector#i, YVector#i) * e(WVector#i, LVector#i)
+if { ((YVector#i != g2Id) and (LVector#i != g2Id)) }
+intermediateResults := e(XVector#i, YVector#i) * e(WVector#i, LVector#i)
+dotProd := dotProd * intermediateResults
 END :: if
 END :: for
 
