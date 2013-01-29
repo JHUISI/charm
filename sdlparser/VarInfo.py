@@ -406,7 +406,8 @@ class VarInfo:
         elif (self.assignNode.right.type == ops.NOP):
             self.isNOP = True            
 # JAA: activates the awesome symbolic executor!
-        if (self.assignBaseElemsOnly == None):
+        #if ( (self.assignBaseElemsOnly == None) or (self.beenSet == :
+        if (self.isBaseElement == False):
             assignNodeRightDeepCopy = copy.deepcopy(self.assignNode.right)
             newAssignBaseElemsOnlyNode = self.traverseAssignBaseElemsOnlyRecursive(assignNodeRightDeepCopy)
             self.assignBaseElemsOnly = newAssignBaseElemsOnlyNode
