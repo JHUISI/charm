@@ -1231,7 +1231,7 @@ def writeForLoopDecl_CPP(outputFile, binNode):
         outputString += "; " + currentLoopIncVarName + "++)\n"
         outputString += writeCurrentNumTabsToString()
         outputString += "{\n"
-    elif (binNode.type == ops.FORALL):
+    elif (binNode.type == ops.FORALL): # JAA: fix this
         currentLoopVariableName = getAssignStmtAsString_CPP(binNode.left.right, None, None)
         outputString += charmListType + " " + currentLoopVariableName + KeysListSuffix_CPP + " = " + currentLoopVariableName + ".keys();\n"
         outputString += writeCurrentNumTabsToString()
@@ -1239,7 +1239,7 @@ def writeForLoopDecl_CPP(outputFile, binNode):
         outputString += writeCurrentNumTabsToString()
         outputString += "for (int "
         currentLoopIncVarName = getAssignStmtAsString_CPP(binNode.left.left, None, None)
-        outputString += currentLoopIncVarName + TempLoopVar_CPP + "; " + currentLoopIncVarName + TempLoopVar_CPP + " < " + currentLoopVariableName + ListLengthSuffix_CPP + "; " + currentLoopIncVarName + TempLoopVar_CPP + "++)\n"
+        outputString += currentLoopIncVarName + TempLoopVar_CPP + " = 0; " + currentLoopIncVarName + TempLoopVar_CPP + " < " + currentLoopVariableName + ListLengthSuffix_CPP + "; " + currentLoopIncVarName + TempLoopVar_CPP + "++)\n"
         outputString += writeCurrentNumTabsToString()
         outputString += "{\n"
         #outputString += writeCurrentNumTabsToString() + "\t"

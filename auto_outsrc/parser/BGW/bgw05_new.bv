@@ -1,0 +1,77 @@
+name := bgw05
+setting := symmetric
+
+BEGIN :: types
+n := int
+S := list{int}
+giValues := list{G1}
+sk := list{G1}
+END :: types
+
+BEGIN :: func:setup
+input := list{n}
+g := random(G1)
+alpha := random(ZR)
+endIndexOfList := ((2 * n) + 1)
+BEGIN :: for
+for{i := 1,endIndexOfList}
+giValues#i := (g^(alpha^i))
+END :: for
+gamma := random(ZR)
+v := (g^gamma)
+
+pk := list{g, giValues, v}
+msk := list{gamma}
+output := list{pk, msk, n}
+END :: func:setup
+
+BEGIN :: func:keygen
+input := list{pk, msk, n}
+pk := expand{g, giValues, v}
+msk := expand{gamma}
+BEGIN :: for
+for{i := 1,n+1}
+sk#i := (giValues#i^gamma)
+END :: for
+skComplete := list{sk}
+output := skComplete
+END :: func:keygen
+
+BEGIN :: func:encrypt
+input := list{S, pk, n}
+pk := expand{g, giValues, v}
+t := random(ZR)
+K := (e(giValues#n,giValues#1)^t)
+
+dotProdEncrypt := init(G1)
+BEGIN :: forall
+forall{jEncrypt := S}
+dotProdEncrypt := (dotProdEncrypt * giValues#n+1-jEncrypt?)
+END :: forall
+
+Hdr2 := ((v * dotProdEncrypt)^t)
+Hdr1 := (g^t)
+Hdr := list{Hdr1, Hdr2}
+output := list{Hdr, K}
+END :: func:encrypt
+
+BEGIN :: func:decrypt
+input := list{S, i, n, Hdr, pk, skComplete}
+Hdr := expand{Hdr1, Hdr2}
+pk := expand{g, giValues, v}
+skComplete := expand{sk}
+
+numerator := e(giValues#i,Hdr2)
+
+dotProdDecrypt := init(G1)
+BEGIN :: forall
+forall{jDecrypt := S}
+BEGIN :: if
+if {jDecrypt != i}
+dotProdDecrypt := (dotProdDecrypt * giValues#n+1-jDecrypt+i?)
+END :: if
+END :: forall
+denominator := e((sk#i * dotProdDecrypt),Hdr1)
+KDecrypt := (numerator / denominator)
+output := KDecrypt
+END :: func:decrypt

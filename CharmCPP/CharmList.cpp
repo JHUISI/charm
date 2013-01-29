@@ -493,7 +493,6 @@ CharmList& CharmMetaList::operator[](const string index)
 	return list[the_index];
 }
 
-
 int CharmMetaList::length()
 {
 	return (int) list.size();

@@ -179,16 +179,41 @@ CharmMetaListG1::CharmMetaListG1(void)
 
 CharmMetaListG1::~CharmMetaListG1()
 {
-	for(int i = 0; i < (int) list.size(); i++)
-		list.erase(i);
+	list.clear();
+	strList.clear();
 }
 
 CharmMetaListG1::CharmMetaListG1(const CharmMetaListG1& cList)
 {
 	//copy constructor
 	cur_index = cList.cur_index;
+	strList = cList.strList;
 	list = cList.list;
 }
+
+void CharmMetaListG1::insert(int index, CharmListG1 m)
+{
+	list[index] = m;
+	cur_index++;
+}
+
+void CharmMetaListG1::insert(string index, CharmListG1 m)
+{
+	int the_index;
+	// see if index exists in strList. If so, use that index
+	if(strList.find(index) == strList.end()) {
+		the_index = cur_index; // select current index
+		strList.insert(pair<string, int>(index, the_index));
+	}
+	else {
+		// retrieve the index
+		the_index = strList[index];
+	}
+
+	list[the_index] = m;
+	cur_index++;
+}
+
 
 void CharmMetaListG1::append(CharmListG1 & zr)
 {
@@ -214,6 +239,22 @@ CharmListG1& CharmMetaListG1::operator[](const int index)
 	}
 }
 
+CharmListG1& CharmMetaListG1::operator[](const string index)
+{
+	int the_index;
+	if(strList.find(index) == strList.end()) {
+		the_index = cur_index; // select current index
+		strList[index] = the_index;
+		cur_index++;
+	}
+	else {
+		// retrieve the index
+		the_index = strList[index];
+	}
+
+	return list[the_index];
+}
+
 int CharmMetaListG1::length()
 {
 	return (int) list.size();
@@ -233,11 +274,26 @@ string CharmMetaListG1::printAtIndex(int index)
 	return s;
 }
 
+string CharmMetaListG1::printStrKeyIndex(int index)
+{
+	map<string, int, g_cmp_str>::iterator it;
+	if(((int) strList.size()) > 0) {
+		//cout << "iterate over length: " << strList.size() << endl;
+		for(it = strList.begin(); it != strList.end(); ++it) {
+			//cout << "Compare: " << it->second << " == " << index << endl;
+			if(it->second == index) {
+				return ": " + it->first;
+			}
+		}
+	}
+	return "";
+}
+
 ostream& operator<<(ostream& s, const CharmMetaListG1& cList)
 {
 	CharmMetaListG1 cList2 = cList;
 	for(int i = 0; i < cList2.length(); i++) {
-		s << "list " << i << "\n";
+		s << "list " << i << " " << cList2.printStrKeyIndex(i) << "\n";
 		s << cList2.printAtIndex(i) << endl;
 	}
 
@@ -250,12 +306,11 @@ CharmMetaListG1& CharmMetaListG1::operator=(const CharmMetaListG1& cList)
 		return *this;
 
 	// delete current list contents first
-	int i;
-	for(i = 0; i < (int) list.size(); i++)
-		list.erase(i);
-	cur_index = 0;
+	list.clear();
+	if(strList.size() > 0) strList.clear();
 
 	cur_index = cList.cur_index;
+	strList = cList.strList;
 	list = cList.list;
 	return *this;
 }

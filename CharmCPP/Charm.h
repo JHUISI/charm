@@ -3,6 +3,7 @@
 
 #include "CryptoLib.h"
 #include "CharmList.h"
+#include "CharmListInt.h"
 #include "CharmListStr.h"
 #include "CharmListZR.h"
 #include "CharmDictZR.h"
