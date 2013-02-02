@@ -1,0 +1,136 @@
+name := sw05
+setting := asymmetric
+
+BEGIN :: types
+evalTVar := G2
+M := GT
+n := int
+x := ZR
+dParam := int
+wHash := list{ZR}
+w := list{str}
+wPrime := list{str}
+SKeys := list{str}
+END :: types
+
+BEGIN :: func:setup
+input := list{n}
+g := random(G1)
+y := random(ZR)
+g1 := g ^ y
+g2 := random(G2)
+
+BEGIN :: for
+for{i := 0, n+1}
+t#i := random(G2)
+END :: for
+        
+pk := list{g, g1, g2, t}
+mk := y
+output := list{pk, mk}
+END :: func:setup        
+
+
+BEGIN :: func:evalT
+input := list{pk, n, x}
+pk := expand{g, g1, g2, t}
+
+BEGIN :: for
+for{i := 0, n+1}
+N#i := init(ZR,i+1)
+Nint#i := i + 1
+END :: for
+
+coeffs := recoverCoefficientsDict(N)
+prodResult := init(G2)
+lenNint := len(Nint)
+BEGIN :: for
+for{i := 0, lenNint}
+loopVarEvalT := Nint#i
+loopVarM1 := loopVarEvalT - 1
+prodResult := prodResult * (t#loopVarM1 ^ coeffs#loopVarEvalT)
+END :: for
+
+T := (g2 ^ (x * n)) * prodResult
+output := T
+END :: func:evalT
+
+
+BEGIN :: func:extract
+input := list{mk, w, pk, dParam, n}
+pk := expand{g, g1, g2, t}
+
+lenw := len(w)
+BEGIN :: for
+for{i := 0, lenw}
+loopVar1 := w#i
+wHash#i := H(loopVar1, ZR)
+END :: for
+
+r := random(ZR)
+q#0 := mk
+BEGIN :: for
+for{i := 1, dParam}
+q#i := random(ZR)
+END :: for
+
+shares := genSharesForX(mk, q, wHash)
+wHashLen := len(wHash)
+
+BEGIN :: for
+for{i := 0, wHashLen}
+loopVar2 := wHash#i
+loopVar2Str := w#i
+evalTVar := evalT(pk, n, loopVar2)
+D#loopVar2Str := (g2 ^ shares#i) * (evalTVar ^ r)
+d#loopVar2Str := g ^ r
+END :: for
+
+sk := list{w, D, d}
+output := sk
+END :: func:extract
+
+
+BEGIN :: func:encrypt
+input := list{pk, wPrime, M, n}
+pk := expand{g, g1, g2, t}
+
+s := random(ZR)
+Eprime := M * (e(g1, g2) ^ s)
+Eprimeprime := g ^ s
+
+wPrimeLen := len(wPrime)
+BEGIN :: for
+for{i := 0, wPrimeLen}
+loopVar := H(wPrime#i, ZR)
+loopVarStr := wPrime#i
+evalTVar := evalT(pk, n, loopVar)
+E#loopVarStr := evalTVar ^ s
+END :: for
+        
+CT := list{wPrime, Eprime, Eprimeprime, E}
+output := CT
+END :: func:encrypt
+
+
+BEGIN :: func:decrypt
+input := list{pk, sk, CT, dParam}
+CT := expand{wPrime, Eprime, Eprimeprime, E}
+sk := expand{w, D, d}
+
+S := intersectionSubset(wHash, wPrimeHash, dParam)
+coeffs := recoverCoefficientsDict(S)
+prod := init(GT)
+SKeys := strkeys(S)
+SLen := len(S)
+
+BEGIN :: for
+for{i := 0, SLen}
+loopVar3 := SKeys#i
+loopProd := (e(d#loopVar3, E#loopVar3) / e(Eprimeprime, D#loopVar3)) ^ coeffs#loopVar3
+prod := prod * loopProd
+END :: for
+
+M := Eprime * prod
+output := M
+END :: func:decrypt
