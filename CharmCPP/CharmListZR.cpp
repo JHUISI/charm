@@ -29,6 +29,13 @@ void CharmListZR::insert(int index, ZR zr)
 	cur_index++;
 }
 
+void CharmListZR::insert(int index, ZR zr, string zs)
+{
+	list[index] = zr;
+	strList.insert(pair<string, int>(zs, index));
+	cur_index++;
+}
+
 void CharmListZR::insert(string index, ZR zr)
 {
 	int the_index;
@@ -101,6 +108,21 @@ ZR& CharmListZR::get(const int index)
 	else {
 		throw new string("Invalid access.\n");
 	}
+}
+
+CharmListStr CharmListZR::strkeys()
+{
+	CharmListStr s;
+	map<string, int, zr_cmp_str>::iterator it;
+	if(((int) strList.size()) > 0) {
+		//cout << "iterate over length: " << strList.size() << endl;
+		for(it = strList.begin(); it != strList.end(); ++it) {
+			// cout << "Compare: " << it->second << " == " << it->second << " => " << it->first << endl;
+			s.insert((int) it->second, it->first);
+			// index++;
+		}
+	}
+	return s;
 }
 
 int CharmListZR::length()

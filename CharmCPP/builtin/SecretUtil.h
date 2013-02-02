@@ -37,11 +37,12 @@ public:
 	CharmListStr prune(Policy&, CharmListStr attrs);
 	CharmListStr getAttributeList(Policy&);
 	CharmListZR genShares(PairingGroup & group, ZR secret, int k, int n);
+	CharmListZR genSharesForX(PairingGroup & group, ZR secret, CharmListZR & q, CharmListZR & x);
 	CharmDictZR calculateSharesDict(PairingGroup & group, ZR, Policy&);
 	CharmListZR calculateSharesList(PairingGroup & group, ZR, Policy&);
 	CharmDictZR getCoefficients(PairingGroup & group, Policy&);
-private:
-//	PairingGroup group;
+	CharmListZR recoverCoefficientsDict(PairingGroup & group, CharmListZR & list);
+	CharmListZR intersectionSubset(PairingGroup & group, CharmListStr&, CharmListStr&, int);
 };
 
 

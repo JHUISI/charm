@@ -71,15 +71,14 @@ builtInTypes["prune"] = types.listStr
 builtInTypes["getCoefficients"] = types.symmapZR
 builtInTypes["integer"] = types.int
 builtInTypes["isList"] = types.int
-builtInTypes["recoverCoefficients"] = types.symmap
-builtInTypes["recoverCoefficientsDict"] = types.symmap
+builtInTypes["recoverCoefficientsDict"] = types.symmapZR
 builtInTypes["genShares"] = types.symmapZR
-builtInTypes["intersection_subset"] = types.list
+builtInTypes["genSharesForX"] = types.listZR
+builtInTypes["intersectionSubset"] = types.listZR
 builtInTypes["GetString"] = types.str
 builtInTypes["hashToInt"] = types.int
 builtInTypes["getAcceptState"] = types.int
 builtInTypes["accept"] = types.int
-builtInTypes["intersectionSubset"] = types.list
 
 #TODO:  CHANGE THIS TO SYMMAP
 #builtInTypes["getTransitions"] = types.symmap
@@ -581,6 +580,9 @@ def getVarTypeFromVarName(varName, functionNameArg_TieBreaker, failSilently=Fals
                     continue
                 if (failSilently == True):
                     return types.NO_TYPE
+                if checkWhetherThesame(retVarType, currentVarType):
+                    continue
+                print("DEBUG: failed to find type for varName=", varName, ", retVarType=", retVarType, ", currenVarType=", currentVarType)
                 sys.exit("getVarTypeFromVarName in SDLParser.py:  found mismatching variable type information for variable name passed in.")
             if (retFunctionName == functionNameArg_TieBreaker):
                 continue
@@ -698,7 +700,7 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
 
     origName = str(node.left)
     varName = getFullVarName(node.left, True)
-#    print("DEBUG: varName=", varName, ", origName=", node.left)
+    #print("DEBUG: varName=", varName, ", origName=", node.left)
     if ( (varName in varTypes[currentFuncName]) and (varName != outputVarName) ):
         if (varTypes[currentFuncName][varName].getType() == newType): 
             return
@@ -1026,6 +1028,21 @@ def checkForIntAndZR(leftSideType, rightSideType):
 
     return False
 
+def checkWhetherThesame(firstType, secondType):
+    strFirst = str(firstType)
+    strSecond = str(secondType)
+    typeKeys = types.getList()
+    key1 = "list" + strFirst
+    key2 = "list" + strSecond
+    print("Result: type1=", strFirst, ", type2=", strSecond)
+    if firstType == secondType:
+        return True
+    elif "list" not in strFirst and key1 in typeKeys and types[key1] == secondType:
+        return True  
+    elif "list" not in strSecond and key2 in typeKeys and firstType == types[key2]:
+        return True    
+    return False
+
 def getVarTypeInfoRecursive(node, funcNameInputParam=currentFuncName):
     if (node.type == ops.RANDOM):
         retRandomType = node.left.attr
@@ -1132,6 +1149,11 @@ def postTypeCleanup():
                     curTypes[ii[0]] = []
                 curTypes[ii[0]].append(iType)
                 curTypes[ii[0]] = list(set(curTypes[ii[0]]))
+        elif iInList and iType == types.int:
+            if _listRawTypes.get(i) == None:
+                _listRawTypes[i] = []
+            _listRawTypes[i].append(types.listInt)
+            _listRawTypes[i] = list(set(_listRawTypes[i]))
         elif iInList and iType in [types.ZR, types.G1, types.G2, types.GT]:
             if _listRawTypes.get(i) == None:
                 _listRawTypes[i] = []
@@ -1217,7 +1239,7 @@ def getVarTypeInfo(node, i, varName):
     if Type(node.left) == Type(node.right) == ops.ATTR and Type(node) == ops.EQ: # see if we are mapping a new variable to an existing variable
         rhsVarTypeObj = varTypes[currentFuncName].get(str(node.right))
         lhsVarTypeObj = varTypes[currentFuncName].get(varName)
-        if varName.find(LIST_INDEX_SYMBOL) == -1: # no '#' in attr name
+        if varName.find(LIST_INDEX_SYMBOL) == -1 and varName != outputKeyword: # no '#' in attr name
             if lhsVarTypeObj != None and rhsVarTypeObj != None: # there exists VarType objects
                 lhsVarTypeObj.isInAList = rhsVarTypeObj.isInAList
                 #print("DEBUG: getVarTypeInfo retVarType=", retVarType, ", node=", node, ", isInAList=", lhsVarTypeObj.isInAList)

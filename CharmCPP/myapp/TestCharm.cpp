@@ -5,7 +5,7 @@ using namespace std;
 
 int main()
 {
-    PairingGroup group(SS512);
+    PairingGroup group(MNT160);
     CharmList list, list2, list3;
     CharmListG1 g1List, tmpList;
     G1 g1;
@@ -55,6 +55,40 @@ int main()
     cout << "tmpList:\n" << tmpList << endl;
 
     cout << "ONE: " << convert_str(tmpList["ONE"]) << endl;
+
+    int k = 4, n = attrs.length();
+    CharmListZR q, wHash, shares;
+    q.insert(0, secret);
+    for (int i = 1; i < k; i++)
+    {
+        q.insert(i, group.random(ZR_t));
+    }
+
+    cout << "q:\n" << q << endl;
+    for(int i = 0; i < n; i++)
+		wHash.insert(i, group.hashListToZR(attrs[i]));
+
+//    CharmListZR N;
+//    for (int i = 0; i < n+1; i++)
+//    {
+//    	N[i] = group.init(ZR_t, i+1); // fix this
+//    }
+    CharmListZR coeffs = util.recoverCoefficientsDict(group, wHash);
+    cout << "coeffs:\n" << coeffs << endl;
+
+    shares = util.genSharesForX(group, secret, q, wHash);
+    cout << "shares:\n" << shares << endl;
+
+    ZR res = 0;
+    for(int i = 0; i < k; i++) {
+    	cout << "coeff[" << i << "]: " << coeffs[i] << endl;
+    	cout << "shares[" << i << "]: " << shares[i] << endl << endl;
+    	res = group.add(res, group.mul(coeffs[i], shares[i]));
+    }
+
+    cout << "Orig s: " << secret << endl;
+    cout << "Rec  s: " << res << endl;
+    if( secret == res ) { cout << "Secret Sharing Success!!!" << endl; }
 //    CharmListStr listKeys;
 //    listKeys.append("ONE");
 //    listKeys.append("TWO");

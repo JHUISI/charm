@@ -50,14 +50,19 @@ void CharmList::append(string strs)
 	cur_index++;
 }
 
+void CharmList::insert(int index, CharmListStr & lStr)
+{
+	Element elem(lStr);
+	list[index] = elem;
+	cur_index++;
+}
+
 void CharmList::insert(int index, ZR & zr)
 {
 	Element elem(zr);
 	list[index] = elem;
 	cur_index++;
 }
-
-
 
 void CharmList::append(ZR & zr)
 {

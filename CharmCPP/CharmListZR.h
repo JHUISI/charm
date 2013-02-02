@@ -2,6 +2,7 @@
 #define CHARMLISTZR_H
 
 #include "CryptoLib.h"
+#include "CharmListStr.h"
 
 struct zr_cmp_str
 {
@@ -18,10 +19,12 @@ public:
     CharmListZR(const CharmListZR&); // copy constructor
     CharmListZR& operator=(const CharmListZR&);
 	void insert(int, ZR);
+	void insert(int, ZR, string);
 	void insert(string, ZR);
 	void append(ZR&);
 	void set(int index, ZR);
 	ZR& get(const int index);
+	CharmListStr strkeys();
 	int length(); // return length of lists
 	string printAtIndex(int index);
 	string printStrKeyIndex(int index);

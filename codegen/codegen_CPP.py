@@ -34,8 +34,8 @@ integerVars = []
 starRef = ""# "*"
 INSERT_FUNC_NAME = ".insert("
 UTIL_FUNC_NAME = "util"
-secretUtils = ['createPolicy', 'getAttributeList', 'calculateSharesDict', 'calculateSharesList', 'prune', 'getCoefficients']
-secretUtilsWithGroup = ['calculateSharesDict', 'calculateSharesList', 'getCoefficients']
+secretUtils = ['createPolicy', 'getAttributeList', 'calculateSharesDict', 'calculateSharesList', 'prune', 'getCoefficients', 'recoverCoefficientsDict', 'intersectionSubset']
+secretUtilsWithGroup = ['calculateSharesDict', 'calculateSharesList', 'getCoefficients', 'recoverCoefficientsDict', 'intersectionSubset']
 # default unless specified otherwise by caller
 transformOutputList = "transformOutputList" #None
 preprocessTypes = Enum('listWithinListAssign', 'dotProductAssign', 'NoMatch')
@@ -200,7 +200,7 @@ def makeTypeReplacementsForCPP(SDL_Type, isList=False):
     if (SDLTypeAsString == "listZR"):
         return "CharmListZR"
     if (SDLTypeAsString == "listInt"):
-        return "list<int>"
+        return "CharmListInt"
     if (SDLTypeAsString == "listStr"):
         return "CharmListStr"
     if (SDLTypeAsString == "metalistG1"):
@@ -558,7 +558,7 @@ def addGetTypeToAttrNode(inputString, variableType):
     if (variableType == types.symmapZR):
         return inputString
 
-    if (variableType in [types.str, types.listZR, types.listG1, types.listG2, types.listGT]):
+    if (variableType in [types.str, types.int, types.listZR, types.listG1, types.listG2, types.listGT]):
         return inputString # + ".strPtr"
     
     print(variableType)
@@ -709,7 +709,7 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
             variableType = getVarTypeInfoRecursive(node)
             if varIsAList:
                 varT = searchForRawType(node, currentFuncName)
-                if varT in [types.listZR, types.listG1, types.listG2, types.listGT]:
+                if varT in [types.listInt, types.listZR, types.listG1, types.listG2, types.listGT]:
                     pass
                 else:
                     returnString = addGetTypeToAttrNode(returnString, variableType)
@@ -871,6 +871,11 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
                  sys.exit("getAssignStmtAsString_CPP in codegen_CPP.py:  len() function called, but either less than or more than one parameter was passed in (only one parameter can be passed in for len().")
              nameOfVarForLen = getAssignStmtAsString_CPP(node.listNodes[0], replacementsDict, variableName, leftSideNameForInit)
              return nameOfVarForLen + ".length()"
+        elif (nodeName == STR_KEYS_FUNC_NAME):
+             if (len(node.listNodes) != 1):
+                 sys.exit("getAssignStmtAsString_CPP in codegen_CPP.py:  strkeys() function called, but either less than or more than one parameter was passed in (only one parameter can be passed in for strkeys().")
+             nameOfVarForLen = getAssignStmtAsString_CPP(node.listNodes[0], replacementsDict, variableName, leftSideNameForInit)
+             return nameOfVarForLen + ".strkeys()"
         elif (nodeName in builtInTypes.keys()) and (nodeName in secretUtils):
             funcOutputString = UTIL_FUNC_NAME + "." + nodeName + "("
             if nodeName in secretUtilsWithGroup:
@@ -958,6 +963,8 @@ def getCPPAsstStringForExpand(node, variableName, replacementsDict):
                     outputString += "getListZR()"
                 elif (listNodeType == types.list):
                     outputString += "getList()"
+                elif (listNodeType in [types.str, types.listStr]):
+                    outputString += "getListStr()"
                 else:
                     print(node)
                     print(variableName)
@@ -975,6 +982,8 @@ def getCPPAsstStringForExpand(node, variableName, replacementsDict):
                     outputString += "getZR()"
                 elif (listNodeType == types.str):
                     outputString += "strPtr"
+                elif (listNodeType == types.listStr):
+                    outputString += "getListStr()"
                 else:
                     print("listNodeType: ", listNodeType)
                     sys.exit("getCPPAsstStringForExpand in codegen.py:  one of the types of the listNodes is not one of the supported types (G1, G2, GT, ZR, or string), and is not a list.")
@@ -1002,12 +1011,15 @@ def getVarDeclForListVar(variableName):
         outputString_Types += "    CharmListGT " + trueVarName + ";\n"
     elif (listVarType == types.ZR):
         outputString_Types += "    CharmListZR " + trueVarName + ";\n"
+    elif (listVarType in [types.int, types.listInt]):
+        outputString_Types += "    CharmListInt " + trueVarName + ";\n"
     elif (listVarType == types.list):
         outputString_Types += "    CharmList " + trueVarName + ";\n"
     elif (listVarType == types.pol):
         outputString_Types += "    Policy " + trueVarName + ";\n"        
     else:
         outputString_Types += "    NO TYPE FOUND FOR " + trueVarName + "\n"
+        print("DEBUG: trueVarName=", trueVarName, ", type=", listVarType)
 
     return outputString_Types
 

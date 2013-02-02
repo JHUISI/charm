@@ -59,6 +59,7 @@ public:
 	void insert(int, const GT&);
 	void insert(int, CharmListGT);
 	void insert(int, CharmList);
+	void insert(int, CharmListStr&);
 	void insert(string, CharmList);
 	void insert(int, Element&);
 	void insert(int, const Element&);
@@ -95,6 +96,7 @@ public:
 	CharmListZR zrList;
 	CharmListG1 g1List;
 	CharmListGT gtList;
+	CharmListStr sList;
 	string strPtr;
 	Element();
 	~Element();
@@ -116,8 +118,9 @@ public:
 	Element(GT&);
 	Element(CharmListGT&);
 	Element(CharmList&);
+	Element(CharmListStr&);
  	Element(const Element& e);
- 	CharmList getList(); // TODO: test
+ 	CharmList getList();
  	ZR getZR(); // returns value (or copy)
  	ZR& getRefZR(); // returns reference for ZR (for cleanup)
  	CharmListZR getListZR(); // returns value (or copy)
@@ -128,6 +131,7 @@ public:
  	CharmListGT getListGT(); // returns value (or copy)
  	GT& getRefGT();
 	string str();
+	CharmListStr getListStr();
 
 	friend void deserialize(Element&, string);
 	friend string serialize(Element&);

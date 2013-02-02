@@ -159,12 +159,12 @@ CharmListStr SecretUtil::getAttributeList(Policy & pol)
 /*
  * Evaluate a polynomial: arguments are a list of coefficients and the value of x to evaluate
  */
-ZR _evalPoly(PairingGroup & group, CharmListZR & coeff, int x)
+ZR _evalPoly(PairingGroup & group, CharmListZR & coeff, ZR & x)
 {
 	int i, len = coeff.length();
 	ZR share(0);
 	for(i = 0; i < len; i++) {
-		share = group.add(share, group.mul(coeff[i], group.exp(ZR(x), i)));
+		share = group.add(share, group.mul(coeff[i], group.exp(x, i)));
 	}
 	return share;
 }
@@ -177,6 +177,7 @@ CharmListZR _genShares(PairingGroup & group, ZR secret, int k, int n)
 {
 	int i;
 	CharmListZR a, shares;
+	ZR z;
 	if(k <= n) {
 		a[0] = secret; // F(0) = secret
 		for(i = 1; i < k; i++) {
@@ -184,16 +185,35 @@ CharmListZR _genShares(PairingGroup & group, ZR secret, int k, int n)
 		}
 
 		for(i = 0; i <= n; i++) {
-			shares[i] = _evalPoly(group, a, i);
+			z = ZR(i);
+			shares[i] = _evalPoly(group, a, z);
 		}
 	}
 
 	return shares;
 }
 
+CharmListZR _genSharesForGivenX(PairingGroup & group, ZR secret, CharmListZR & q, CharmListZR & x)
+{
+	int i, n = x.length();
+	CharmListZR shares;
+
+	for(i = 0; i <= n; i++) {
+		shares[i] = _evalPoly(group, q, x[i]);
+	}
+
+	return shares;
+}
+
+
 CharmListZR SecretUtil::genShares(PairingGroup & group, ZR secret, int k, int n)
 {
 	return _genShares(group, secret, k, n);
+}
+
+CharmListZR SecretUtil::genSharesForX(PairingGroup & group, ZR secret, CharmListZR & q, CharmListZR & x)
+{
+	return _genSharesForGivenX(group, secret, q, x);
 }
 
 /*
@@ -304,8 +324,8 @@ CharmListZR SecretUtil::calculateSharesList(PairingGroup & group, ZR secret, Pol
 	return list;
 }
 
-
-CharmListZR _computelagrangeBasis(PairingGroup & group, int list[], int length)
+// with traditional ints
+CharmListZR _computelagrangeBasisInt(PairingGroup & group, int list[], int length)
 {
 	CharmListZR coeffs;
 	int i, ii, j, jj;
@@ -319,6 +339,31 @@ CharmListZR _computelagrangeBasis(PairingGroup & group, int list[], int length)
 			}
 		}
 		coeffs[ ii ] = result;
+	}
+
+	return coeffs;
+}
+
+// for ZR elements
+CharmListZR _computelagrangeBasisZR(PairingGroup & group, CharmListZR & list)
+{
+	CharmListZR coeffs;
+	CharmListStr strKeys = list.strkeys();
+	int strSize = strKeys.length();
+	int i, j, length = list.length();
+	ZR ii, jj;
+	for(i = 0; i < length; i++) {
+		ZR result = 1;
+		ii = list[i];
+		for(j = 0; j < length; j++) {
+			jj = list[j];
+			if( ii != jj) {
+				result = group.mul(result, group.div(group.sub(ZR(0), jj), group.sub(ii, jj)));
+			}
+		}
+		if(strSize == 0) coeffs[ i ] = result;
+		else coeffs.insert(i, result, strKeys[i]);
+//		cout << "i=" << i << ", list[" << i << "]=" << list[i] << endl << ", " << coeffs[i] << endl;
 	}
 
 	return coeffs;
@@ -358,7 +403,7 @@ CHARM_ERROR _getCoefficients(PairingGroup & group, charm_attribute_subtree *subt
 	}
 	int list[k];
 	for(i = 0; i < k; i++) list[i] = (i + 1);
-    CharmListZR coeffs = _computelagrangeBasis(group, list, k); // for subtree nodes
+    CharmListZR coeffs = _computelagrangeBasisInt(group, list, k); // for subtree nodes
 
 	/* recursively apply to subtrees from 1 to n */
 	for (i = 0; i < subtree->num_subnodes; i++) {
@@ -382,5 +427,38 @@ CharmDictZR SecretUtil::getCoefficients(PairingGroup & group, Policy& pol)
 	CharmDictZR coeffDict;
 	_getCoefficients(group, pol.p->root, ZR(1), coeffDict);
 	return coeffDict;
+}
+
+CharmListZR SecretUtil::recoverCoefficientsDict(PairingGroup & group, CharmListZR & list)
+{
+	return _computelagrangeBasisZR(group, list);
+}
+
+CharmListZR SecretUtil::intersectionSubset(PairingGroup & group, CharmListStr & w, CharmListStr & wPrime, int d)
+{
+    int wLen = w.length(), wPrimeLen = wPrime.length(), index = 0;
+    CharmListZR S;
+    ZR hash;
+
+    for (int i = 0; i < wLen; i++)
+    {
+        for (int j = 0; j < wPrimeLen; j++)
+        {
+            if ( isEqual(w[i], wPrime[j]) )
+            {
+            	hash = group.hashListToZR(w[i]);
+                S.insert(index, hash, w[i]);
+                index++;
+            }
+        }
+    }
+
+    if(S.length() < d) {
+    	cout << "Insufficient attributes in common to decrypt." << endl;
+    	CharmListZR tmp;
+    	return tmp; // return empty list
+    }
+
+    return S;
 }
 

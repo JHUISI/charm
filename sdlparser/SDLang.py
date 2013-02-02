@@ -59,6 +59,7 @@ COPY_FUNC_NAME = "copy"
 INIT_FUNC_NAME = "init"
 KEYS_FUNC_NAME = "keys"
 LEN_FUNC_NAME = "len"
+STR_KEYS_FUNC_NAME = "strkeys"
 PRUNE_FUNC_NAME = "prune"
 FUNC_SYMBOL = "def func :"
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
