@@ -425,7 +425,7 @@ def getKeygenElemToExponentsDictEntry(keygenOutputElem):
         return
 
     assignInfoVarEntry = assignInfo[keygenFuncName][keygenOutputElem]
-    baseElemsOnly = assignInfoVarEntry.getAssignBaseElemsOnly()
+    baseElemsOnly = assignInfoVarEntry.getAssignBaseElemsOnlyThisFunc()
     keygenElemToExponents[keygenOutputElem] = searchForExponents(baseElemsOnly)
 
     #if (baseElemsOnly.type == ops.EXP):
