@@ -431,13 +431,33 @@ def getKeygenElemToExponentsDictEntry(keygenOutputElem):
     #if (baseElemsOnly.type == ops.EXP):
         #keygenElemToExponents[keygenOutputElem] = baseElemsOnly.right
 
+def getAllKeygenElemsToExponentsDictEntries(keygenOutputElem):
+    global keygenElemToExponents
+
+    getKeygenElemToExponentsDictEntry(keygenOutputElem)
+
+    if (keygenOutputElem not in assignInfo[keygenFuncName]):
+        return
+
+    keygenOutputVarInfo = assignInfo[keygenFuncName][keygenOutputElem]
+
+    if ( (keygenOutputVarInfo.getIsList() == True) and (len(keygenOutputVarInfo.getListNodesList()) > 0) ):
+        listMembers = keygenOutputVarInfo.getListNodesList()
+        listMembersORIGINAL = listMembers
+        listMembers = rearrangeListWRTSecretVars(listMembers)
+
+        for listMember in listMembers:
+            getAllKeygenElemsToExponentsDictEntries(listMember)
+
 def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListDecls):
     global blindingFactors_NonLists, varsThatAreBlinded, varsNameToSecretVarsUsed
     global mappingOfSecretVarsToBlindingFactors, mappingOfSecretVarsToGroupType
-    global keygenElemToExponents
+    #global keygenElemToExponents
 
     #keygenElemToExponents[keygenOutputElem] = []
-    getKeygenElemToExponentsDictEntry(keygenOutputElem)
+    #getKeygenElemToExponentsDictEntry(keygenOutputElem)
+
+    #print(keygenElemToExponents)
 
     groupTypeOfThisElement = getVarTypeInfoRecursive(BinaryNode(keygenOutputElem), keygenFuncName)
     mappingOfSecretVarsToGroupType[keygenOutputElem] = groupTypeOfThisElement
@@ -579,6 +599,11 @@ def keygen(file):
 
     SDLLinesForKeygen.append(keygenBlindingExponent + " := random(ZR)\n")
     lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, None)
+
+    for keygenOutput_ind in keygenOutput:
+        getAllKeygenElemsToExponentsDictEntries(keygenOutput_ind)
+
+    print(keygenElemToExponents)
 
     for keygenOutput_ind in keygenOutput:
         blindKeygenOutputElement(keygenOutput_ind, varsToBlindList, varNamesForListDecls)
