@@ -46,6 +46,7 @@ class VarInfo:
         self.isExpandNode = False
         self.isBaseElement = False
         self.assignBaseElemsOnly = None
+        self.assignBaseElemsOnlyThisFunc = None
         self.assignInfo = None
         self.isResultOfPruneFunc = False
         self.topLevelNode = True
@@ -90,6 +91,7 @@ class VarInfo:
         v.isExpandNode = obj.isExpandNode
         v.isBaseElement = obj.isBaseElement
         v.assignBaseElemsOnly = obj.assignBaseElemsOnly
+        v.assignBaseElemsOnlyThisFunc = obj.assignBaseElemsOnlyThisFunc
         v.assignInfo = obj.assignInfo
         v.isResultOfPruneFunc = obj.isResultOfPruneFunc
         v.topLevelNode = obj.topLevelNode
@@ -229,6 +231,9 @@ class VarInfo:
     def getAssignBaseElemsOnly(self):
         return self.assignBaseElemsOnly
 
+    def getAssignBaseElemsOnlyThisFunc(self):
+        return self.assignBaseElemsOnlyThisFunc
+
     def getIsResultOfPruneFunc(self):
         return self.isResultOfPruneFunc
 
@@ -344,6 +349,8 @@ class VarInfo:
                     return node
                 else:
                     #self.addNonNumListIndicesString(retNode, getFullVarName(node, False))
+                    if (node.negated == True):
+                        retNode.negated = True
                     return retNode
         elif ( (node.type == ops.LIST) or (node.type == ops.SYMMAP) or (node.type == ops.EXPAND) or (node.type == ops.FUNC) ):
             newListNodesList = []
@@ -360,6 +367,7 @@ class VarInfo:
                     if (baseElemsReplacement == None):
                         newListNodesList.append(oldListItem)
                     else:
+                        #if (
                         newListNodesList.append(str(baseElemsReplacement))
             node.listNodes = newListNodesList
 
@@ -368,6 +376,48 @@ class VarInfo:
             node.left = retNodeLeft
         if (node.right != None):
             retNodeRight = self.traverseAssignBaseElemsOnlyRecursive(node.right)
+            node.right = retNodeRight
+
+        return node
+
+    def traverseAssignBaseElemsOnlyThisFuncRecursive(self, node):
+        if (node.type == ops.ATTR):
+            (retFuncName, retVarInfoObj) = self.getVarNameEntryFromAssignInfo_Wrapper(node, getFullVarName(node, False))
+            #if ( (retFuncName != None) and (retVarInfoObj != None) ):
+            if ( (retFuncName != None) and (retFuncName == self.funcName) ):
+                retNode = copy.deepcopy(retVarInfoObj.getAssignBaseElemsOnlyThisFunc())
+                if (retNode == None):
+                    return node
+                else:
+                    #self.addNonNumListIndicesString(retNode, getFullVarName(node, False))
+                    if (node.negated == True):
+                        retNode.negated = True
+                    return retNode
+            else:
+                return node
+        elif ( (node.type == ops.LIST) or (node.type == ops.SYMMAP) or (node.type == ops.EXPAND) or (node.type == ops.FUNC) ):
+            newListNodesList = []
+            for oldListItem in node.listNodes:
+                (retFuncName, retVarInfoObj) = self.getVarNameEntryFromAssignInfo_Wrapper(node, oldListItem)
+                if ( (retFuncName == None) or (retVarInfoObj == None) or (retFuncName != self.funcName) ):
+                    #if (oldListItem in namesOfFutureDeclVars):
+                        #newListNodesList.append(oldListItem)
+                    #else:
+                        #sys.exit("traverseAssignBaseElemsOnlyRecursive in VarInfo.py:  call to getVarNameEntryFromAssignInfo() for node.getListNodesList() failed.")
+                    newListNodesList.append(oldListItem)
+                else:
+                    baseElemsReplacement = retVarInfoObj.getAssignBaseElemsOnlyThisFunc()
+                    if (baseElemsReplacement == None):
+                        newListNodesList.append(oldListItem)
+                    else:
+                        newListNodesList.append(str(baseElemsReplacement))
+            node.listNodes = newListNodesList
+
+        if (node.left != None):
+            retNodeLeft = self.traverseAssignBaseElemsOnlyThisFuncRecursive(node.left)
+            node.left = retNodeLeft
+        if (node.right != None):
+            retNodeRight = self.traverseAssignBaseElemsOnlyThisFuncRecursive(node.right)
             node.right = retNodeRight
 
         return node
@@ -400,9 +450,11 @@ class VarInfo:
         elif (self.assignNode.right.type == ops.RANDOM):
             self.isBaseElement = True
             self.assignBaseElemsOnly = self.assignNode.left
+            self.assignBaseElemsOnlyThisFunc = self.assignNode.left
         elif (self.assignNode.right.type == ops.HASH):
             self.isBaseElement = True
             self.assignBaseElemsOnly = self.assignNode.left
+            self.assignBaseElemsOnlyThisFunc = self.assignNode.left
         elif (self.assignNode.right.type == ops.NOP):
             self.isNOP = True            
 # JAA: activates the awesome symbolic executor!
@@ -411,6 +463,10 @@ class VarInfo:
             assignNodeRightDeepCopy = copy.deepcopy(self.assignNode.right)
             newAssignBaseElemsOnlyNode = self.traverseAssignBaseElemsOnlyRecursive(assignNodeRightDeepCopy)
             self.assignBaseElemsOnly = newAssignBaseElemsOnlyNode
+
+            assignNodeRightDeepCopyThisFunc = copy.deepcopy(self.assignNode.right)
+            newAssignBaseElemsOnlyNodeThisFunc = self.traverseAssignBaseElemsOnlyThisFuncRecursive(assignNodeRightDeepCopyThisFunc)
+            self.assignBaseElemsOnlyThisFunc = newAssignBaseElemsOnlyNodeThisFunc
 
         self.traverseAssignNodeRecursive(self.assignNode.right, False)
 
