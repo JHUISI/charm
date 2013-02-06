@@ -1040,7 +1040,14 @@ def checkWhetherThesame(firstType, secondType):
     elif "list" not in strFirst and key1 in typeKeys and types[key1] == secondType:
         return True  
     elif "list" not in strSecond and key2 in typeKeys and firstType == types[key2]:
-        return True    
+        return True
+    elif (firstType == types.int and secondType == types.listInt) or (firstType == types.listInt and secondType == types.int):
+        return True
+    elif (firstType == types.str and secondType == types.listStr) or (firstType == types.listStr and secondType == types.str):
+        return True
+    elif (strFirst.lstrip("meta") == strSecond) or (strFirst == strSecond.lstrip("meta")):
+        # test for "metalist*" == "list*" or vice versa
+        return True
     return False
 
 def getVarTypeInfoRecursive(node, funcNameInputParam=currentFuncName):
@@ -1128,6 +1135,56 @@ def getVarTypeInfoRecursive(node, funcNameInputParam=currentFuncName):
     print(node.type)
     sys.exit("getVarTypeInfoRecursive in SDLParser.py:  error in logic.")
 
+def upgradeToNextListLevel(count, _list):
+    j = []
+    for i in _list:
+        if i in standardTypes:
+           j.append(types["list" + str(i)])
+        elif i == types.int:
+           j.append(types.listInt)
+        elif i == types.str:
+           j.append(types.listStr)
+        else:
+           j.append(i)
+    return j
+           
+
+def updateRefTypes(refDict, refList, varName, newType):
+    if type(refDict) != dict: print("updateRefTypes in SDLParser.py: invalid refDict. Need a dict."); sys.exit(-1)
+    if type(refList) != list: print("updateRefTypes in SDLParser.py: invalid refList. Need a list."); sys.exit(-1)
+    _refList = list(refList[1:]) # ignore the first element
+    # decision on type
+#    if len(_refList) == 1:
+#        finalType = "list" + str(newType)
+    if len(_refList) == 2 and newType in standardTypes:
+        finalType = "metalist" + str(newType)
+    elif len(_refList) == 2 and newType == [types.int, types.str]:        
+        print("updateRefTypes in SDLParser.py: can't handle int and str types as metalists."); sys.exit(-1)
+    else:
+        print("updateRefTypes in SDLParser.py: too many references. Consider breaking up structure. count=", len(_refList)); sys.exit(-1) 
+    _refList.reverse() # turn it into a stack
+    if refType in refDict.keys():
+        _refDict = refDict[refType]
+    else:
+        print("updateRefTypes in SDLParser.py: not a well-formed refDict."); sys.exit(-1)
+    
+    #print("DEBUG: varName=", varName, ", refDict=", refDict, ", keys=", refDict.keys())
+    finalLen = 0
+    while len(_refList) > 0:
+        a = str(_refList.pop()) # 'abstract or concrete value'
+        #print("popped: ", a)
+        if a.isdigit() and 'concrete' in list(refDict.keys()):
+            #print("dealing with CONCRETE: ", a, ", ref=", refDict['concrete'])
+            refDict['concrete'].append( types[finalType] )
+            refDict['concrete'] = list(set(refDict['concrete']))
+            finalLen = len(refDict['concrete'])
+        elif 'abstract' in list(refDict.keys()):
+            #print("dealing with ABSTRACT: ", a, ", ref=", refDict['abstract'])
+            refDict['abstract'].append( types[finalType] )
+            refDict['abstract'] = list(set(refDict['abstract']))
+            finalLen = len(refDict['abstract'])
+    return types[finalType], finalLen
+
 def postTypeCleanup():
     global varTypes, listRawTypes
     
@@ -1142,6 +1199,7 @@ def postTypeCleanup():
         iType = localTypes.get(i).getType()
         iInList = localTypes.get(i).isInAList
         #print("DEBUG: i=", i, iType, iInList)
+        if i.find(LIST_INDEX_END_SYMBOL) != -1: i = i.strip(LIST_INDEX_END_SYMBOL) # remove '?' if present...TODO: make sure to remove from right spot
         if i.find(LIST_INDEX_SYMBOL) != -1:
             ii = i.split(LIST_INDEX_SYMBOL)
             if len(ii) >= 2 and ii[1].isdigit():
@@ -1149,6 +1207,31 @@ def postTypeCleanup():
                     curTypes[ii[0]] = []
                 curTypes[ii[0]].append(iType)
                 curTypes[ii[0]] = list(set(curTypes[ii[0]]))
+            elif len(ii) >= 2:
+                if curTypes.get(ii[0]) == None:
+                    curTypes[ii[0]] = []
+                curTypes[ii[0]].append(iType)
+                curTypes[ii[0]] = list(set(curTypes[ii[0]]))                
+            
+            #print("RESULT1: ii=", ii, ", curTypes=", curTypes.get(ii[0]), ", iType=", iType)
+
+            if _listRawTypes.get(ii[0]) == None:
+                finalType = iType # keep original
+                iiLen = len(ii[1:])
+                if iiLen >= 2: finalType = types["metalist" + str(iType)]
+                _listRawTypes[ii[0]] = []
+                _listRawTypes[ii[0]].append(finalType)
+                _listRawTypes[ii[0]] = list(set(_listRawTypes[ii[0]]))
+            elif type(_listRawTypes.get(ii[0])) == dict: # existing entry, need to update
+                #print("UPDATE1: ii=", ii, ", needs to be updated accordingly.")
+                (finalType, finalLen) = updateRefTypes(_listRawTypes.get(ii[0]), ii, ii[0], iType)
+                if finalLen == 1: curTypes[ii[0]] = [finalType] # synchronize rawTypes and curTypes structures
+            elif type(_listRawTypes.get(ii[0])) == list:
+                _listRawTypes[ii[0]] = upgradeToNextListLevel(len(ii[1:]), _listRawTypes[ii[0]])
+                if len(_listRawTypes[ii[0]]) == 1 and len(ii[1:]) == 2: curTypes[ii[0]] = list(_listRawTypes[ii[0]])
+                #print("UPDATE2: ii=", ii, ", needs to be updated accordingly: ", _listRawTypes.get(ii[0]) )
+                
+            #print("RESULT2: rawType=", _listRawTypes.get(ii[0]))
         elif iInList and iType == types.int:
             if _listRawTypes.get(i) == None:
                 _listRawTypes[i] = []
@@ -1160,10 +1243,13 @@ def postTypeCleanup():
             _listRawTypes[i].append(types['list' + str(iType)])
             _listRawTypes[i] = list(set(_listRawTypes[i]))
         elif iInList and iType in [types.list]:
-            #print("DEBUG: handle this===> ", i, localTypes.get(i).getListNodesList())
+            #print("JAA-DEBUG: handle this===> ", i, localTypes.get(i).getListNodesList(), curTypes.get(i))
             listTypes = []
             for l in localTypes.get(i).getListNodesList():
                 listTypes.append(localTypes.get(l).getType())
+            if len(listTypes) == 0 and curTypes.get(i) != None: # check curTypes
+                listTypes = listTypes + [x for x in curTypes.get(i) if x in standardTypes ]
+                
             (iFuncName, iVarInfo) = getVarNameEntryFromAssignInfo(assignInfo, i)
             if(iFuncName == currentFuncName): # assignment in currentFunc
                 #print("FOUND: funcName=", iFuncName, ", assignNode=", iVarInfo.getAssignNode())
@@ -1175,19 +1261,21 @@ def postTypeCleanup():
                     if str(o[-1]).isdigit(): _refType = 'concrete'
                     else: _refType = 'abstract'
                     # JAA: upgrade type of variable
-                    varTypes[currentFuncName][i].setType(types.metalist)
-                    #print("DEBUG: name=", o[0], ", newType=", types.metalist, ", oldType=", varTypes[currentFuncName][i].getType())
+                    if _listRawTypes.get(i) == None: # create if nothing is there yet
+                        #print("JAA-DEBUG: name=", o[0], ", newType=", types.metalist, ", oldType=", varTypes[currentFuncName][i].getType())
+                        varTypes[currentFuncName][i].setType(types.metalist)
                 elif len(o) == 3: # x#y#z : two list refs
                     print("TODO: how to handle: ", o)
                 else:
                     pass # can't handle this many levels of lists
-                _listRawTypes[i] = { refType: _refType, _refType:listTypes }
+                if _listRawTypes.get(i) == None: # create if nothing is there yet
+                    _listRawTypes[i] = { refType: _refType, _refType:listTypes }
                 #print(i, ':', _listRawTypes)
                 isUpdated = True
 
     
     for i,j in _listRawTypes.items():
-        #print("DEBUG: ", i, ":", j)
+        #print("DEBUGS: ", i, ":", j)
         if len(j) > 1 and type(j) == list: # more than unique type in a list means that we should update the type to a list type.
             if varTypes[currentFuncName].get(i) == None:
                 # create new var type for i
@@ -1207,7 +1295,17 @@ def postTypeCleanup():
 
     # update the local type for all list variable
     for i,j in curTypes.items():
-        if len(j) > 1: # needs to be a list type
+        if len(j) > 1 and types.list in j:
+            if varTypes[currentFuncName].get(i) == None:
+                # create new var type for i
+                vt = VarType()
+                vt.setType(types.metalist)
+                varTypes[currentFuncName][i] = vt
+            else:
+                # update exisitng var type for i
+                varTypes[currentFuncName][i].setType(types.metalist)
+            #print("JAA-ADDED: i=", i, ", type=", j, ", newType=", varTypes[currentFuncName][i].getType())
+        elif len(j) > 1: # needs to be a list type
             # update in varTypes
             if varTypes[currentFuncName].get(i) == None:
                 # create new var type for i
@@ -1217,6 +1315,18 @@ def postTypeCleanup():
             else:
                 # update exisitng var type for i
                 varTypes[currentFuncName][i].setType(types.list)
+        elif len(j) == 1:
+            # update in varTypes
+            if varTypes[currentFuncName].get(i) == None:
+                # create new var type for i
+                vt = VarType()
+                vt.setType(j[0])
+                varTypes[currentFuncName][i] = vt
+            else:
+                # update exisitng var type for i
+                varTypes[currentFuncName][i].setType(j[0])
+            #print("DEBUG: curTypes i=", i, ", j=", j, "....what should be done!!!")
+            
 #    print("listRawTypes <=== %s ===> start" % currentFuncName)
 #    for i,j in listRawTypes.items():
 #        print(i, ": ", j)

@@ -558,7 +558,10 @@ def addGetTypeToAttrNode(inputString, variableType):
     if (variableType == types.symmapZR):
         return inputString
 
-    if (variableType in [types.str, types.int, types.listZR, types.listG1, types.listG2, types.listGT]):
+    if (variableType == types.list):
+        return inputString + ".getList()"
+
+    if (variableType in [types.str, types.int, types.listZR, types.listG1, types.listG2, types.listGT, types.metalistZR, types.metalistG1, types.metalistG2, types.metalistGT]):
         return inputString # + ".strPtr"
     
     print(variableType)
@@ -573,13 +576,14 @@ def exhaustSearchType(node, currentFuncName):
     _variableType = types.NO_TYPE
     if len(nodeParts) == 2: # pattern => var#ref1
         _rawType = searchForRawType(node, currentFuncName)
+        #print("JAA-DEBUG2: rawType=", _rawType)
         if _rawType == types.NO_TYPE: _variableType = getFinalVarType(varName, currentFuncName)
         else: _variableType = _rawType
         #print("DEBUG: varName=", varName, ", type=", _variableType, ", currentFunc=", currentFuncName)
     elif len(nodeParts) == 3: # pattern => var#ref1#ref2
         _variableType = searchForRawType(node, currentFuncName)
     else: # last chance
-        print("DEBUG: exhaustSearchType -> handle case: ", node)
+        #print("DEBUG: exhaustSearchType -> handle case: ", node)
         _variableType = getVarTypeInfoRecursive(node) # getFinalVarType(str(node), currentFuncName)
         #print("DEBUG: getVarTypeInfoRecursive=", _variableType)
     #print("updated var type: ", _variableType, ", name: ", node, ", rawType=", getRawListTypes()) # JAA: added to find types in "insert" situations
@@ -587,7 +591,10 @@ def exhaustSearchType(node, currentFuncName):
 
 # TODO: this function needs refinement to handle all possible cases...
 def searchForRawType(node, currentFuncName):
-    nodeParts = str(node).split(LIST_INDEX_SYMBOL)
+    name = str(node)
+    if LIST_INDEX_END_SYMBOL in name:
+        name = name[:-1]
+    nodeParts = name.split(LIST_INDEX_SYMBOL)
     rawTypes = getRawListTypes()
     #print("rawTypes: ", rawTypes)
     key = nodeParts[0]
@@ -602,9 +609,11 @@ def searchForRawType(node, currentFuncName):
         return types[str(typeInfo)]
     elif len(nodeParts) == 3:
         lastKey = nodeParts[-1]
-        #print("3=typeInfo: ", typeInfo, lastKey)
-        if lastKey.isdigit() and int(lastKey) < len(typeInfo): return typeInfo[ int(lastKey) ]
-        else: return typeInfo[0] # must be abstract reference
+#        print("3=typeInfo: ", typeInfo, lastKey, name)
+#        print("DEBUG: rawTypes=", rawTypes)
+        if lastKey.isdigit() and type(typeInfo) == list and int(lastKey) < len(typeInfo): return typeInfo[ int(lastKey) ]
+        elif type(typeInfo) == list: return typeInfo[0] # must be abstract reference
+        else: return typeInfo # must be a concrete reference
     return types.NO_TYPE
     
 def getCondStmtAsString_CPP(node, replacementsDict):
@@ -709,7 +718,9 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
             variableType = getVarTypeInfoRecursive(node)
             if varIsAList:
                 varT = searchForRawType(node, currentFuncName)
-                if varT in [types.listInt, types.listZR, types.listG1, types.listG2, types.listGT]:
+                variableType1 = exhaustSearchType(node, currentFuncName)
+                print("varT=", varT, ", nodeName=", node, ", type=", variableType1)
+                if varT in [types.listInt, types.listZR, types.listG1, types.listG2, types.listGT, types.metalistZR, types.metalistG1, types.metalistG2, types.metalistGT]:
                     pass
                 else:
                     returnString = addGetTypeToAttrNode(returnString, variableType)
@@ -756,40 +767,10 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
         rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
         return writeMathStatement(leftSide, rightSide, "exp")  
 
-#    elif (node.type == ops.AND):
-#        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
-#        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
-#        return "( (" + leftSide + ") && (" + rightSide + ") )"
-#    elif (node.type == ops.EQ_TST):
-#        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
-#        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
-#        if (rightSide == "False"):
-#            rightSide = "false"
-#        elif (rightSide == "True"):
-#            rightSide = "true"
-#        if (areBothSidesStringVars(leftSide, rightSide) == True):
-#            return "( isEqual(" + leftSide + ", " + rightSide + ") )"
-#        else:
-#            return "( (" + leftSide + ") == (" + rightSide + ") )"
-#    elif (node.type == ops.NON_EQ_TST):
-#        leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
-#        rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
-#        if (rightSide == "False"):
-#            rightSide = "false"
-#        elif (rightSide == "True"):
-#            rightSide = "true"
-#
-#        if (areBothSidesStringVars(leftSide, rightSide) == True):
-#            return "( isNotEqual(" + leftSide + ", " + rightSide + ") )"
-#        else:
-#            return "( (" + leftSide + ") != (" + rightSide + ") )"
     elif (node.type == ops.CONCAT):
         concatOutputString = "("
         for listNode in node.listNodes:
-            if (doesVarNeedStar(listNode) == True):
-                concatOutputString += elementName + "(*" + getAssignStmtAsString_CPP(listNode, replacementsDict, variableName, leftSideNameForInit) + ") + "
-            else:
-                concatOutputString += elementName + "(" + getAssignStmtAsString_CPP(listNode, replacementsDict, variableName, leftSideNameForInit) + ") + "
+            concatOutputString += elementName + "(" + getAssignStmtAsString_CPP(listNode, replacementsDict, variableName, leftSideNameForInit) + ") + "
         concatOutputString = concatOutputString[0:(len(concatOutputString) - len(" + "))]
         concatOutputString += ")"
         return concatOutputString
@@ -811,11 +792,8 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
         for listIndex, listNode in enumerate(node.listNodes):
             listOutputString += writeCurrentNumTabsToString()
 # JAA: modified append to use insert instead
-#            listOutputString += variableName + ".append("            
             listOutputString += variableName + ".insert("
             listNodeAsString = getAssignStmtAsString_CPP(listNode, replacementsDict, variableName, leftSideNameForInit)
-            #if (doesVarNeedStar(listNodeAsString) == True):
-            #    listNodeAsString = "*" + listNodeAsString
             listOutputString += str(listIndex) + ", " + listNodeAsString + ");\n"
         return listOutputString
     elif ( (node.type == ops.SYMMAP) ): #or ( (node.type == ops.EXPAND) and (variableType == types.symmap) ) ):
@@ -856,7 +834,7 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
                 return groupObjName + "." + INIT_FUNC_NAME + "(" + str(leftSideNameForInit) + ", 0)"
             elif (str(variableTypeForFuncNode) == "str"):
                 return variableName + " = \"\""
-            elif INSERT_FUNC_NAME in variableName:
+            elif INSERT_FUNC_NAME in variableName and types[str(node.listNodes[0])] in standardTypes:
                 return groupObjName + "." + INIT_FUNC_NAME + "(" + str(node.listNodes[0]) + "_t)"
             else:
                 return "//"
@@ -937,6 +915,7 @@ def getCPPAsstStringForExpand(node, variableName, replacementsDict):
         listNodeName = replacePoundsWithBrackets(listNodeName)
         listNodeType = getFinalVarType(listNodeName, currentFuncName)
         if (listNodeType == types.NO_TYPE):
+            print("variable=", variableName)
             sys.exit("getCPPAsstStringForExpand in codegen.py:  could not obtain one of the types for the variable names included in the expand node.")
         outputString += writeCurrentNumTabsToString()
 
@@ -953,7 +932,7 @@ def getCPPAsstStringForExpand(node, variableName, replacementsDict):
         if (variableType == types.list):
             outputString += "."
             if (isVarInSDLListVars(listNodeName) == True):
-                if (listNodeType == types.G1):
+                if (listNodeType in [types.G1, types.listG1]): # TODO: JAA revisit
                     outputString += "getListG1()"
                 elif (listNodeType == types.G2):
                     outputString += "getListG2()"
@@ -984,6 +963,8 @@ def getCPPAsstStringForExpand(node, variableName, replacementsDict):
                     outputString += "strPtr"
                 elif (listNodeType == types.listStr):
                     outputString += "getListStr()"
+                elif (listNodeType == types.listInt):
+                    outputString += "getListInt()"                    
                 else:
                     print("listNodeType: ", listNodeType)
                     sys.exit("getCPPAsstStringForExpand in codegen.py:  one of the types of the listNodes is not one of the supported types (G1, G2, GT, ZR, or string), and is not a list.")
@@ -1095,20 +1076,22 @@ def writeAssignStmt_CPP(outputFile, binNode):
     if ( (binNode.right.type != ops.EXPAND) and (variableName not in currentFuncOutputVars) and (variableName not in SDLListVars) and (variableName not in nonListVarsDeclaredInThisFunc) ):
         if (variableType == types.int):
             outputString_Types += variableName + " = 0;\n"
-        else:    
+        else:
             if (variableName.startswith(DOT_PROD_WORD) == True):
                 outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t, 1);\n"
             elif (variableName.startswith(SUM_PROD_WORD) == True):
                 outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t, 0);\n"
-            elif variableType in [types.str, types.listStr, types.pol, types.list, types.listZR, types.listG1, types.listG2, types.listGT, types.metalistZR, types.metalistG1, types.metalistG2, types.metalistGT, types.symmapZR]:
+            elif variableType in [types.str, types.listStr, types.pol, types.list, types.listInt, types.listZR, types.listG1, types.listG2, types.listGT, types.metalist, types.metalistZR, types.metalistG1, types.metalistG2, types.metalistGT, types.symmapZR]:
                 outputString_Types += variableName + ";\n"
             else:
                 outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t);\n"
         nonListVarsDeclaredInThisFunc.append(variableName)
 
     variableNamePounds = replacePoundsWithBrackets(variableName)
+    variableLen = len(variableName.split(LIST_INDEX_SYMBOL))
+    #print("DEBUG: variableNamePounds=", variableNamePounds, ", variableName=", variableName, ", variableLen=", variableLen)
     skipTheRest = False
-    if (variableName != variableNamePounds):
+    if (variableName != variableNamePounds) and variableLen < 3:
         variableNamePound = replacePoundsWithBrackets(variableName, True)
         #print("DEBUG: variableNamePound=", variableNamePound, ", variableName=", variableName)
         if(binNode.right.type != ops.LIST):
