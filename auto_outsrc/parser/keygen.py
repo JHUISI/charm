@@ -460,15 +460,18 @@ def getIndividualKeygenElemToSMTExpression(exponents):
 
     retExpression = {}
 
+    if (len(exponents) == 0):
+        return {}
+
     retExpression[rootNodeName] = []
 
     if ( (len(exponents) == 1) and (exponents[0].type == ops.ATTR) ):
         retExpression[rootNodeName].append(str(exponents[0]))
-        return
+        return retExpression
 
     if (len(exponents) == 1):
         getSMTExpressionForOneExponent(exponents[0], rootNodeName, retExpression)
-        return
+        return retExpression
 
     currentKey = addNodePrefix+str(SMTaddCounter)
     SMTaddCounter += 1
