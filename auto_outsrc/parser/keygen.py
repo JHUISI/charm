@@ -23,6 +23,9 @@ sharedBlindingFactorCounter = 0
 mappingOfSecretVarsToBlindingFactors = {}
 mappingOfSecretVarsToGroupType = {}
 keygenElemToExponents = {}
+keygenElemToSMTExp = {}
+SMTaddCounter = 0
+SMTmulCounter = 0
 
 def processListOrExpandNodes(binNode, origVarName, newVarName):
     binNodeRight = binNode.right
@@ -403,7 +406,7 @@ def getWhichNonListBFToShare():
 def searchForExponentsRecursive(node, exponentsList):
     if (node.type == ops.EXP):
         if (str(node.right) not in exponentsList):
-            exponentsList.append(str(node.right))
+            exponentsList.append((node.right))
     #else:
     if (node.left != None):
         searchForExponentsRecursive(node.left, exponentsList)
@@ -432,7 +435,7 @@ def getKeygenElemToExponentsDictEntry(keygenOutputElem):
         #keygenElemToExponents[keygenOutputElem] = baseElemsOnly.right
 
 def getAllKeygenElemsToExponentsDictEntries(keygenOutputElem):
-    global keygenElemToExponents
+    #global keygenElemToExponents
 
     getKeygenElemToExponentsDictEntry(keygenOutputElem)
 
@@ -448,6 +451,103 @@ def getAllKeygenElemsToExponentsDictEntries(keygenOutputElem):
 
         for listMember in listMembers:
             getAllKeygenElemsToExponentsDictEntries(listMember)
+
+def getIndividualKeygenElemToSMTExpression(exponents):
+    global SMTaddCounter, SMTmulCounter
+
+    SMTaddCounter = 0
+    SMTmulCounter = 0
+
+    retExpression = {}
+
+    retExpression[rootNodeName] = []
+
+    if ( (len(exponents) == 1) and (exponents[0].type == ops.ATTR) ):
+        retExpression[rootNodeName].append(str(exponents[0]))
+        return
+
+    if (len(exponents) == 1):
+        getSMTExpressionForOneExponent(exponents[0], rootNodeName, retExpression)
+        return
+
+    currentKey = addNodePrefix+str(SMTaddCounter)
+    SMTaddCounter += 1
+    retExpression[rootNodeName].append(currentKey)
+    retExpression[currentKey] = []
+
+    for exponent in exponents:
+        getSMTExpressionForOneExponent(exponent, currentKey, retExpression)
+
+    return retExpression
+
+def getSMTExpressionForOneExponent(exponent, parentKey, retExpression):
+    global SMTaddCounter, SMTmulCounter
+
+    if (exponent.type == ops.ADD):
+        currentKey = addNodePrefix+str(SMTaddCounter)
+        SMTaddCounter += 1
+        if (parentKey != None):
+            retExpression[parentKey].append(currentKey)
+        retExpression[currentKey] = []
+        getSMTExpressionForOneExponent(exponent.left, currentKey, retExpression)
+        getSMTExpressionForOneExponent(exponent.right, currentKey, retExpression)
+
+    if (exponent.type == ops.MUL):
+        currentKey = mulNodePrefix+str(SMTmulCounter)
+        SMTmulCounter += 1
+        if (parentKey != None):
+            retExpression[parentKey].append(currentKey)
+        retExpression[currentKey] = []
+        getSMTExpressionForOneExponent(exponent.left, currentKey, retExpression)
+        getSMTExpressionForOneExponent(exponent.right, currentKey, retExpression)
+
+    if (exponent.type == ops.ATTR):
+        retExpression[parentKey].append(str(exponent))
+
+'''
+def getSMTExpressionForOneExponent(exponent):
+    pass
+
+def getIndividualKeygenElemToSMTExpression(exponents):
+    retExpression = {}
+
+    #print(exponents)
+
+    if (len(exponents) == 0):
+        return {}
+
+    if (len(exponents) == 1):
+        if (exponents[0].type == ops.ATTR):
+            retExpression['root'] = str(exponents[0])
+        else:
+            retExpression['root'] = getSMTExpressionForOneExponent(exponents[0])
+
+        return retExpression
+
+    retExpression['root'] = 'ADD0'
+    retExpression['ADD0'] = []
+
+    for exponent in exponents:
+        if (exponent.type == ops.ATTR):
+            retExpression['ADD0'].append(str(exponent))
+            continue
+
+        nextExpToAdd = getSMTExpressionForOneExponent(exponent)
+        retExpression['ADD0'].append(nextExpToAdd)
+
+    return retExpression
+'''
+
+def getKeygenElemToSMTExpressions():
+    global keygenElemToSMTExp
+
+    for keygenElemToExp in keygenElemToExponents:
+        #print(keygenElemToExp)
+        #print(keygenElemToExponents[keygenElemToExp])
+        #print("\n\n")
+
+        exponents = keygenElemToExponents[keygenElemToExp]
+        keygenElemToSMTExp[keygenElemToExp] = getIndividualKeygenElemToSMTExpression(exponents)
 
 def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListDecls):
     global blindingFactors_NonLists, varsThatAreBlinded, varsNameToSecretVarsUsed
@@ -603,7 +703,9 @@ def keygen(file):
     for keygenOutput_ind in keygenOutput:
         getAllKeygenElemsToExponentsDictEntries(keygenOutput_ind)
 
-    print(keygenElemToExponents)
+    #print(keygenElemToExponents)
+
+    getKeygenElemToSMTExpressions()
 
     for keygenOutput_ind in keygenOutput:
         blindKeygenOutputElement(keygenOutput_ind, varsToBlindList, varNamesForListDecls)

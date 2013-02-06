@@ -392,6 +392,8 @@ class VarInfo:
                     #self.addNonNumListIndicesString(retNode, getFullVarName(node, False))
                     if (node.negated == True):
                         retNode.negated = True
+                    if (retNode.type == ops.FUNC):
+                        return node
                     return retNode
             else:
                 return node
@@ -412,6 +414,8 @@ class VarInfo:
                     else:
                         newListNodesList.append(str(baseElemsReplacement))
             node.listNodes = newListNodesList
+        #elif (node.type == ops.FUNC):
+            #return node
 
         if (node.left != None):
             retNodeLeft = self.traverseAssignBaseElemsOnlyThisFuncRecursive(node.left)
