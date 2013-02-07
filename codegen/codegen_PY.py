@@ -704,10 +704,14 @@ def getAssignStmtAsString(variableName, node, replacementsDict, dotProdObj, lamb
         return dotProdOutputString
     elif (node.type == ops.EXPAND):
         expandOutputString = ""
+        if (len(node.listNodes) == 1):
+            expandOutputString += "["
         for listNode in node.listNodes:
             expandOutputString += replacePoundsWithBrackets(str(listNode))
             expandOutputString += ", "
         expandOutputString = expandOutputString[0:(len(expandOutputString) - len(", "))]
+        if (len(node.listNodes) == 1):
+            expandOutputString += "]"
         expandOutputString += " = "
         return expandOutputString
 

@@ -26,6 +26,7 @@ keygenElemToExponents = {}
 keygenElemToSMTExp = {}
 SMTaddCounter = 0
 SMTmulCounter = 0
+secretKeyElements = []
 
 def processListOrExpandNodes(binNode, origVarName, newVarName):
     binNodeRight = binNode.right
@@ -87,6 +88,22 @@ def writeLinesToFuncAfterVarLastAssign(funcName, lineList, varName):
     appendToLinesOfCode(lineList, lineNo)
     updateCodeAndStructs()
     return (lineNo + (len(lineList)))
+
+def getLineNosOfAllAssigns(funcName, varNameToFind):
+    if (funcName not in assignInfo):
+        sys.exit("getLineNosOfAllAssigns in keygen.py:  funcName is not in assignInfo.")
+
+    lineNos = []
+
+    for currentVarName in assignInfo[funcName]:
+        currentVarName_NoIndices = removeListIndices(currentVarName)
+        if (currentVarName_NoIndices != varNameToFind):
+            continue
+
+        currentLineNo = assignInfo[funcName][currentVarName].getLineNo()
+        lineNos.append(currentLineNo)
+
+    return lineNos
 
 def getLineNoOfLastAssign(funcName, varNameToFind):
     if (funcName not in assignInfo):
@@ -486,7 +503,7 @@ def getIndividualKeygenElemToSMTExpression(exponents):
 def getSMTExpressionForOneExponent(exponent, parentKey, retExpression):
     global SMTaddCounter, SMTmulCounter
 
-    if (exponent.type == ops.ADD):
+    if ( (exponent.type == ops.ADD) or (exponent.type == ops.SUB) ):
         currentKey = addNodePrefix+str(SMTaddCounter)
         SMTaddCounter += 1
         if (parentKey != None):
@@ -495,7 +512,7 @@ def getSMTExpressionForOneExponent(exponent, parentKey, retExpression):
         getSMTExpressionForOneExponent(exponent.left, currentKey, retExpression)
         getSMTExpressionForOneExponent(exponent.right, currentKey, retExpression)
 
-    if (exponent.type == ops.MUL):
+    if ( (exponent.type == ops.MUL) or (exponent.type == ops.DIV) ):
         currentKey = mulNodePrefix+str(SMTmulCounter)
         SMTmulCounter += 1
         if (parentKey != None):
@@ -556,11 +573,15 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
     global blindingFactors_NonLists, varsThatAreBlinded, varsNameToSecretVarsUsed
     global mappingOfSecretVarsToBlindingFactors, mappingOfSecretVarsToGroupType
     #global keygenElemToExponents
+    global secretKeyElements
 
     #keygenElemToExponents[keygenOutputElem] = []
     #getKeygenElemToExponentsDictEntry(keygenOutputElem)
 
     #print(keygenElemToExponents)
+
+    if (keygenOutputElem not in secretKeyElements):
+        secretKeyElements.append(keygenOutputElem)
 
     groupTypeOfThisElement = getVarTypeInfoRecursive(BinaryNode(keygenOutputElem), keygenFuncName)
     mappingOfSecretVarsToGroupType[keygenOutputElem] = groupTypeOfThisElement
@@ -635,6 +656,13 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
 
     writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls, currentBlindingFactorName, repeatBlindingFactor)
     return keygenOutputElem
+
+def removeAssignmentOfOrigKeygenSecretKeyName(secretKeyName):
+    assignLineNos = getLineNosOfAllAssigns(keygenFuncName, secretKeyName)    
+    if (len(assignLineNos) == 0):
+        sys.exit("removeAssignmentOfOrigKeygenSecretKeyName in keygen.py:  could not locate any assignment statements for the secret key name passed in (" + secretKeyName + ").")
+
+    removeFromLinesOfCode(assignLineNos)
 
 def getBlindingFactorsLine():
     outputLine = ""
@@ -715,6 +743,8 @@ def keygen(file):
 
     secretKeyName = keygenSecVar
 
+    removeAssignmentOfOrigKeygenSecretKeyName(secretKeyName)
+
     #if (len(varsToBlindList) != 0):
         #sys.exit("keygen.py completed without blinding all of the variables passed to it by transform.py.")
 
@@ -742,7 +772,7 @@ def keygen(file):
 
 
     #varsThatAreBlinded = {"c":["zz"], "d0":["yy"], "d1":["aa", "bb"]}
-    transformNEW(mappingOfSecretVarsToBlindingFactors)
+    transformNEW(mappingOfSecretVarsToBlindingFactors, secretKeyElements)
 
 
 

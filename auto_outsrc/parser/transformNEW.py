@@ -1,6 +1,7 @@
 import sdlpath
 from sdlparser.SDLParser import *
 from outsrctechniques import *
+#from keygen import processListOrExpandNodes
 import sys
 
 transformListCounter = 0
@@ -12,6 +13,64 @@ forLoopsInnerStruct = None
 currentNumberOfForLoops = 0
 iterationNo = 0
 withinForLoop = False
+
+ctVarName = None
+
+def getCTVarName():
+    global ctVarName
+
+    assignInfo = getAssignInfo()
+
+    if (encryptFuncName not in assignInfo):
+        sys.exit("getCTVarName in transformNEW.py:  encryptFuncName not in assignInfo.")
+
+    if (outputVarName not in assignInfo[encryptFuncName]):
+        sys.exit("getCTVarName in transformNEW.py:  outputVarName not in assignInfo[encryptFuncName].")
+
+    encryptOutputAssignNode = assignInfo[encryptFuncName][outputVarName].getAssignNode()
+
+    possibleCTVarName = encryptOutputAssignNode.right
+    if (possibleCTVarName.type != ops.ATTR):
+        sys.exit("getCTVarName in transformNEW.py:  encryptOutputAssignNode.right isn't of type ops.ATTR.")
+
+    ctVarName = str(possibleCTVarName)
+
+#TODO:  right now, this function is verbatim the same as the one in keygen.py.
+#Consolidate so there's only one copy of the code.
+def processListOrExpandNodes(binNode, origVarName, newVarName):
+    binNodeRight = binNode.right
+    if (binNodeRight == None):
+        return
+
+    binNodeRightType = binNodeRight.type
+    if ( (binNodeRightType != ops.LIST) and (binNodeRightType != ops.EXPAND) ):
+        return
+
+    nodeListNodes = binNodeRight.listNodes
+    if (len(nodeListNodes) == 0):
+        return
+
+    retNodeList = []
+
+    for currentNode in nodeListNodes:
+        if (currentNode == origVarName):
+            retNodeList.append(newVarName)
+        else:
+            retNodeList.append(currentNode)
+
+    binNodeRight.listNodes = retNodeList
+
+def makeSecretKeyBlindedNameReplacements(node, secretKeyElements):
+    origVarName = keygenSecVar
+    newVarName = keygenSecVar + blindingSuffix
+    ASTVisitor(SubstituteVar(origVarName,newVarName)).preorder(node)
+    processListOrExpandNodes(node, origVarName, newVarName)
+
+    #print(secretKeyElements)
+
+    for element in secretKeyElements:
+        ASTVisitor(SubstituteVar(element, element+blindingSuffix)).preorder(node)
+        processListOrExpandNodes(node, element, element+blindingSuffix)
 
 def getOriginalVarNameFromBlindedName(blindedName):
     retName = blindedName.lstrip(blindingFactorPrefix)
@@ -128,7 +187,20 @@ def createDecoutInputLine(node, decoutLines):
 
     outputString = "input := list{"
 
+    pkBlindedList = []
+    for pubVar in keygenPubVar:
+        pkBlindedList.append(pubVar + blindingSuffix)
+
     for listNode in listNodes:
+        if (listNode == (keygenSecVar + blindingSuffix)):
+            continue
+
+        if (listNode == ctVarName):
+            continue
+
+        if (listNode in pkBlindedList):
+            continue
+
         outputString += str(listNode) + ", "
 
     outputString += str(transformOutputList)
@@ -507,8 +579,23 @@ def getForLoopIndexVarName(node):
 
     return str(node.left.left)
 
-def transformNEW(varsThatAreBlindedDict):
+def addBlindingSufficesToDict(dict):
+    retDict = {}
+
+    for key in dict:
+        retDict[key+blindingSuffix] = dict[key]
+
+    return retDict
+
+def transformNEW(varsThatAreBlindedDict, secretKeyElements):
     global currentNumberOfForLoops, withinForLoop, iterationNo
+
+    #print(varsThatAreBlindedDict)
+
+    varsThatAreBlindedDict = addBlindingSufficesToDict(varsThatAreBlindedDict)
+
+    getCTVarName()
+    #print(ctVarName)
 
     #addTransformFuncIntro()
     (stmtsDec, typesDec, depListDec, depListNoExponentsDec, infListDec, infListNoExponentsDec) = getFuncStmts(decryptFuncName)
@@ -532,21 +619,24 @@ def transformNEW(varsThatAreBlindedDict):
 
     # get knownVars
     for lineNo in range((firstLineOfDecryptFunc + 1), (lastLineOfTransform + 1)):
-        if (str(astNodes[lineNo - 1].left) == inputKeyword):
-            appendToKnownVars(astNodes[lineNo - 1].right, knownVars)
+        currentFullNode = astNodes[lineNo - 1]
+        makeSecretKeyBlindedNameReplacements(currentFullNode, secretKeyElements)
+        if (str(currentFullNode.left) == inputKeyword):
+            appendToKnownVars(currentFullNode.right, knownVars)
             startLineNoOfSearch = lineNo
-            transformLines.append(str(astNodes[lineNo - 1]) + "\n")
+            transformLines.append(str(currentFullNode) + "\n")
             #print(transformLines)
-            createDecoutInputLine(astNodes[lineNo - 1].right, decoutLines)
+            createDecoutInputLine(currentFullNode.right, decoutLines)
             #print(decoutLines)
             continue
-        currentNode = astNodes[lineNo - 1].right
+        currentNode = currentFullNode.right
         if (currentNode == None):
             continue
         if (currentNode.type == ops.EXPAND):
             appendToKnownVars(currentNode, knownVars)
-            transformLines.append(str(astNodes[lineNo - 1]) + "\n")
-            decoutLines.append(str(astNodes[lineNo - 1]) + "\n")
+            transformLines.append(str(currentFullNode) + "\n")
+            if ( (str(currentFullNode.left) != ctVarName) and (str(currentFullNode.left) != (keygenSecVar + blindingSuffix)) ):
+                decoutLines.append(str(currentFullNode) + "\n")
         else:
             startLineNoOfSearch = lineNo
             break
@@ -558,6 +648,7 @@ def transformNEW(varsThatAreBlindedDict):
 
     for lineNo in range(startLineNoOfSearch, (lastLineOfTransform + 1)):
         currentNode = astNodes[lineNo - 1]
+        makeSecretKeyBlindedNameReplacements(currentNode, secretKeyElements)
         if (currentNode.type == ops.NONE):
             continue
         path_applied = []

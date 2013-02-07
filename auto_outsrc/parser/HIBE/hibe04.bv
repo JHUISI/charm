@@ -38,7 +38,8 @@ g0b := gb ^ (alpha * beta)
 v := e(g, g0b)
     
 mpk := list{g, g1, h, gb, g1b, hb, v, l, z}
-mk := list{g0b, None}
+#mk := list{g0b, None}
+mk := list{g0b}
 output := list{mpk, mk}
 END :: func:setup
 
@@ -47,7 +48,7 @@ BEGIN :: func:keygen
 #input := list{mpk, mk, id, j}
 input := list{mpk, mk, id}
 mpk := expand{g, g1, h, gb, g1b, hb, v, l, z}
-mk := expand{g0b, dummyVar}
+mk := expand{g0b}
 
 #Id := stringToID(z, 5, id)
 Id := stringToInt(id, 5, 32)
@@ -61,8 +62,8 @@ END :: for
 d0DotProdCalc := { prod{y := 0, 5} on { (((g1b ^ Id#y) * hb#y) ^ r#y) }}
 d0 := g0b * d0DotProdCalc
 #pk := list{id, j}
-dummyVar3 := random(ZR)
-pk := list{id, dummyVar3}
+#dummyVar3 := random(ZR)
+pk := list{id}
 sk := list{d0, d}
 output := list{pk, sk}
 END :: func:keygen
@@ -72,7 +73,7 @@ BEGIN :: func:encrypt
 input := list{mpk, pk, M}        
 mpk := expand{g, g1, h, gb, g1b, hb, v, l, z}
 #pk := expand{id, j}
-pk := expand{id, dummyVar2}
+pk := expand{id}
 s := random(ZR)
 A := M * (v ^ s)
 B :=  g ^ s

@@ -74,6 +74,11 @@ currentUSaUSindex := init(0)
 BEGIN :: for
 for{i := 0, n}
 BEGIN :: if
+if { yVector#i == 2 }
+YVector#i := init(G2)
+LVector#i := init(G2)
+END :: if
+BEGIN :: if
 if { yVector#i == 0 }
 YVector#i := g2 ^ (a#currentUSaUSindex / r#i)
 LVector#i := g2 ^ (a#currentUSaUSindex / m#i)
@@ -84,11 +89,6 @@ if { yVector#i == 1 }
 YVector#i := g2 ^ (a#currentUSaUSindex / t#i)
 LVector#i := g2 ^ (a#currentUSaUSindex / v#i)
 currentUSaUSindex := currentUSaUSindex + 1
-END :: if
-BEGIN :: if
-if { yVector#i == 2 }
-YVector#i := init(G2)
-LVector#i := init(G2)
 END :: if
 END :: for
 
