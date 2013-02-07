@@ -34,8 +34,10 @@ integerVars = []
 starRef = ""# "*"
 INSERT_FUNC_NAME = ".insert("
 UTIL_FUNC_NAME = "util"
+DFA_UTIL_FUNC_NAME = "dfaUtil"
 secretUtils = ['createPolicy', 'getAttributeList', 'calculateSharesDict', 'calculateSharesList', 'prune', 'getCoefficients', 'recoverCoefficientsDict', 'intersectionSubset']
 secretUtilsWithGroup = ['calculateSharesDict', 'calculateSharesList', 'getCoefficients', 'recoverCoefficientsDict', 'intersectionSubset']
+dfaUtils = ['hashToKey', 'accept', 'getAcceptState', 'getTransitions', 'getString']
 # default unless specified otherwise by caller
 transformOutputList = "transformOutputList" #None
 preprocessTypes = Enum('listWithinListAssign', 'dotProductAssign', 'NoMatch')
@@ -132,6 +134,11 @@ def addBuiltinObjects():
     bFuncs = set(getUsedBuiltinList()).intersection(secretUtils)
     # JAA: TODO is to add one for the DFA class in C++
     if len(bFuncs) > 0: setupFile.write("SecretUtil %s;\n\n" % UTIL_FUNC_NAME)
+    
+    dFuncs = set(getUsedBuiltinList()).intersection(dfaUtils)
+    # JAA: TODO is to add one for the DFA class in C++
+    if len(dFuncs) > 0: setupFile.write("DFA %s;\n\n" % DFA_UTIL_FUNC_NAME)
+    
 
 def isFunctionStart(binNode):
     if (binNode.type != ops.BEGIN):
@@ -670,6 +677,8 @@ def getCondStmtAsString_CPP(node, replacementsDict):
             funcOutputString = UTIL_FUNC_NAME + "." + nodeName + "("
             if nodeName in secretUtilsWithGroup:
                 funcOutputString += groupObjName + ", "
+        elif (nodeName in builtInTypes.keys()) and (nodeName in dfaUtils):
+            funcOutputString = DFA_UTIL_FUNC_NAME + "." + nodeName + "("
         else:
             funcOutputString = nodeName + "("
         
@@ -859,6 +868,8 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
             funcOutputString = UTIL_FUNC_NAME + "." + nodeName + "("
             if nodeName in secretUtilsWithGroup:
                 funcOutputString += groupObjName + ", "            
+        elif (nodeName in builtInTypes.keys()) and (nodeName in dfaUtils):
+            funcOutputString = DFA_UTIL_FUNC_NAME + "." + nodeName + "("
         else:
             funcOutputString = nodeName + "("
         

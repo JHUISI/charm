@@ -76,13 +76,14 @@ builtInTypes["genShares"] = types.symmapZR
 builtInTypes["genSharesForX"] = types.listZR
 builtInTypes["intersectionSubset"] = types.listZR
 builtInTypes["GetString"] = types.str
-builtInTypes["hashToInt"] = types.int
-builtInTypes["getAcceptState"] = types.int
+builtInTypes["hashToKey"] = types.str
 builtInTypes["accept"] = types.int
+builtInTypes["getAcceptState"] = types.int
+builtInTypes["getString"] = types.str
+builtInTypes["getTransitions"] = types.metalistInt
 
 #TODO:  CHANGE THIS TO SYMMAP
 #builtInTypes["getTransitions"] = types.symmap
-builtInTypes["getTransitions"] = types.list
 
 def createNode(s, loc, toks):
     print('createNode => ', toks)
