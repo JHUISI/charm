@@ -701,9 +701,10 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
 
     origName = str(node.left)
     varName = getFullVarName(node.left, True)
-    #print("DEBUG: varName=", varName, ", origName=", node.left)
+    #print("DEBUG: varName=", varName, ", origName=", node.left) 
     if ( (varName in varTypes[currentFuncName]) and (varName != outputVarName) ):
         if (varTypes[currentFuncName][varName].getType() == newType): 
+            #print("DEBUG: common case newType is oldType=", newType)
             return
         elif (checkForIntAndZR(varTypes[currentFuncName][varName].getType(), newType) == True):
             varTypes[currentFuncName][varName].setType(types.ZR)
@@ -738,7 +739,7 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
         varTypeObj.setType(newType)
         varTypes[currentFuncName][varName] = varTypeObj
         return
-
+    
     varInfoObj = VarInfo()
     varInfoObj.setIsTypeEntryOnly(True)
     varInfoObj.setLineNo(i)
