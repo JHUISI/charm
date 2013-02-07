@@ -594,6 +594,31 @@ def getListNodes(node):
     listNodes = node.listNodes
     return listNodes
 
+def searchForCTVarsThatNeedBuckets(node, ctExpandListNodes, ctVarsThatNeedBuckets):
+    #see if we need to put any of the ciphertext elements into buckets for decout
+    varsOnThisLine = GetAttributeVars(node, True)
+    for varOnThisLine in varsOnThisLine:
+        if ( (varOnThisLine in ctExpandListNodes) and (varOnThisLine not in ctVarsThatNeedBuckets) ):
+            ctVarsThatNeedBuckets.append(varOnThisLine)
+
+def writeOutCTVarsThatNeedBuckets(ctVarsThatNeedBuckets, transformInputExpandNumStatements, decoutInputExpandNumStatements, transformLines, decoutLines):
+    global transformListCounter, decoutListCounter
+
+    for var in ctVarsThatNeedBuckets:
+        lineForTransform = ""
+        lineForDecout = ""
+        lineForTransform += transformOutputList + LIST_INDEX_SYMBOL + str(transformListCounter) + " := " + var + "\n"
+        lineForDecout += var + " := " + transformOutputList + LIST_INDEX_SYMBOL + str(transformListCounter) + "\n"
+
+        print(lineForTransform)
+        print(lineForDecout)
+
+        transformListCounter += 1
+        decoutListCounter += 1
+        #reverse order b/c we're not keeping a counter
+        transformLines.insert(transformInputExpandNumStatements, lineForTransform)
+        decoutLines.insert(decoutInputExpandNumStatements, lineForDecout)
+
 def transformNEW(varsThatAreBlindedDict, secretKeyElements):
     global currentNumberOfForLoops, withinForLoop, iterationNo
 
@@ -658,16 +683,25 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements):
     #transformLines += transformOutputList + " = []\n"
 
     ctVarsThatNeedBuckets = []
+    transformInputExpandNumStatements = len(transformLines)
+    decoutInputExpandNumStatements = len(decoutLines)
 
+    '''
     #see if we need to put any of the ciphertext elements into buckets for decout
     for lineNo in range(startLineNoOfSearch, (lastLineOfTransform + 1)):
         currentNode = astNodes[lineNo - 1]
         if (currentNode.type == ops.NONE):
             continue
-        varsOnThisLine = ddddddd
+        varsOnThisLine = GetAttributeVars(currentNode.right, True)
         for varOnThisLine in varsOnThisLine:
             if ( (varOnThisLine in ctExpandListNodes) and (varOnThisLine not in ctVarsThatNeedBuckets) ):
                 ctVarsThatNeedBuckets.append(varOnThisLine)
+        print(currentNode)
+        print(varsOnThisLine)
+        print("\n")
+
+    print(ctVarsThatNeedBuckets)
+    '''
 
     #main loop
     for lineNo in range(startLineNoOfSearch, (lastLineOfTransform + 1)):
@@ -701,8 +735,10 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements):
                 decoutLines.append(str(currentNode) + "\n")
         elif (str(currentNode.left) == M):
             decoutLines.append(str(currentNode) + "\n")
+            searchForCTVarsThatNeedBuckets(currentNode.right, ctExpandListNodes, ctVarsThatNeedBuckets)
         elif (str(currentNode.left) in doNotIncludeInTransformList):
             decoutLines.append(str(currentNode) + "\n")
+            searchForCTVarsThatNeedBuckets(currentNode.right, ctExpandListNodes, ctVarsThatNeedBuckets)
         elif ( (len(currentNodePairings) > 0) and (areAllVarsOnLineKnownByTransform == True) ):
             groupedPairings = groupPairings(currentNodePairings, varsThatAreBlindedDict)
             writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode, blindingVarsThatAreLists, lineNo, astNodes)
@@ -713,10 +749,16 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements):
             knownVars.append(str(currentNode.left))
         else:
             decoutLines.append(str(currentNode) + "\n")
+            searchForCTVarsThatNeedBuckets(currentNode.right, ctExpandListNodes, ctVarsThatNeedBuckets)
 
         if (currentNode.type == ops.FOR):
             forLoopIndexVarName = getForLoopIndexVarName(currentNode)
             knownVars.append(forLoopIndexVarName)
+
+    #print(ctVarsThatNeedBuckets)
+
+    if (len(ctVarsThatNeedBuckets) > 0):
+        writeOutCTVarsThatNeedBuckets(ctVarsThatNeedBuckets, transformInputExpandNumStatements, decoutInputExpandNumStatements, transformLines, decoutLines)
 
     transformLines.append("output := " + transformOutputList + "\n")
     transformLines.append("END :: func:" + transformFuncName + "\n")

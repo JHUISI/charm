@@ -1,5 +1,9 @@
 schemeName = "BGW"
 
+rootNodeName = 'root'
+addNodePrefix = 'ADD'
+mulNodePrefix = 'MUL'
+
 inputVarName = "input"
 outputVarName = "output"
 
