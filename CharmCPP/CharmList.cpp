@@ -289,6 +289,14 @@ void CharmList::insert(int index, CharmListGT c)
 
 Element& CharmList::operator[](const int index)
 {
+	if(index == cur_index) { // means we are creating reference.
+		cur_index++;
+		return list[index];
+	}
+	else if(index < MAX_LIST) {
+		return list[index];
+	}
+
 	int len = (int) list.size();
 	if(index >= 0 && index < len) {
 		return list[index];

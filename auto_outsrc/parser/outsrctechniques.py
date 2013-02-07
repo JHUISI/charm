@@ -1479,6 +1479,36 @@ class SanityCheckT6:
             self.foundError = True
 
 
+class GetAttrs:
+    def __init__(self, dropPounds=False):
+        self.varList = []
+        self.dropPounds = dropPounds
+        
+    def visit(self, node, data):
+        pass
+    
+    def visit_attr(self, node, data):
+        varName = node.getAttribute()
+        if varName.isdigit(): return
+        if varName.find(LIST_INDEX_SYMBOL) != -1:
+            newVarName = varName.split(LIST_INDEX_SYMBOL)
+            if self.dropPounds: addVarName = newVarName[0]
+            else: addVarName = varName
+            
+            if addVarName not in self.varList:
+                self.varList.append(addVarName)
+        else: # no pounds
+            if varName not in self.varList:
+                self.varList.append(varName)
+    
+    def getVarList(self):
+        return self.varList 
+
+def GetAttributeVars(binNode, dropPounds=False):
+    getAttrs = GetAttrs(dropPounds)
+    ASTVisitor(getAttrs).inorder(binNode)
+    return getAttrs.getVarList()
+
 class GetPairings:
     def __init__(self):
         self._list = []
@@ -1508,7 +1538,7 @@ def CombinePairings(nodeList, _verbose=False):
     ASTVisitor(getPair).preorder(equation)
     return getPair.getList()
 
-    
+
 
 
 if __name__ == "__main__":
@@ -1517,9 +1547,10 @@ if __name__ == "__main__":
     equationList = []
     for stmt in statements:
         node = parser.parse(stmt)
-        equationList.append(node)
-        ASTVisitor(SubstituteVar("d", "dBlinded")).preorder(node)
-        print("New node: ", node)
+        print("node=", node, "\nresult=", GetAttributeVars(node, True))
+#        equationList.append(node)
+#        ASTVisitor(SubstituteVar("d", "dBlinded")).preorder(node)
+#        print("New node: ", node)
 
     #combinedList = CombinePairings(equationList, True)
     #print("CombList:\t", combinedList)

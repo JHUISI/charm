@@ -95,9 +95,10 @@ void CharmListStr::insert(int index, string & s)
 string& CharmListStr::operator[](const int index)
 {
 	if(index == cur_index) { // means we are creating reference.
-		string s;
-		list[cur_index] = s; // create tmp value
 		cur_index++;
+		return list[index];
+	}
+	else if(index < MAX_LIST) {
 		return list[index];
 	}
 

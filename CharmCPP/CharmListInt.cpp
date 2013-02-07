@@ -145,9 +145,10 @@ void CharmMetaListInt::append(CharmListInt & zr)
 CharmListInt& CharmMetaListInt::operator[](const int index)
 {
 	if(index == cur_index) { // means we are creating reference.
-		CharmListInt tmp;
-		list[cur_index] = tmp;
 		cur_index++;
+		return list[index];
+	}
+	else if(index < MAX_LIST) {
 		return list[index];
 	}
 

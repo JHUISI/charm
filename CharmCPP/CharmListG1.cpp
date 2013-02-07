@@ -224,9 +224,10 @@ void CharmMetaListG1::append(CharmListG1 & zr)
 CharmListG1& CharmMetaListG1::operator[](const int index)
 {
 	if(index == cur_index) { // means we are creating reference.
-		CharmListG1 tmp;
-		list[cur_index] = tmp;
 		cur_index++;
+		return list[index];
+	}
+	else if(index < MAX_LIST) {
 		return list[index];
 	}
 

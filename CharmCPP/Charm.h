@@ -12,6 +12,7 @@
 #include "CharmListGT.h"
 #include "CharmCAPI.h"
 #include "SecretUtil.h"
+#include "DFA.h"
 
 
 /* sec-level identifiers for security equivalent to AES-80bit or 128-bit security*/
