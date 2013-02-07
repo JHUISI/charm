@@ -1034,7 +1034,7 @@ def checkWhetherThesame(firstType, secondType):
     typeKeys = types.getList()
     key1 = "list" + strFirst
     key2 = "list" + strSecond
-    print("Result: type1=", strFirst, ", type2=", strSecond)
+    #print("Result: type1=", strFirst, ", type2=", strSecond)
     if firstType == secondType:
         return True
     elif "list" not in strFirst and key1 in typeKeys and types[key1] == secondType:

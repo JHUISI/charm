@@ -64,6 +64,11 @@ Element::Element(CharmListStr & List)
 	sList    = List;
 }
 
+Element::Element(CharmListInt & List)
+{
+	type 	 = listInt_t;
+	iList    = List;
+}
 
 Element::Element(ZR & z)
 {
@@ -116,6 +121,8 @@ Element::Element(const Element& e)
 		strPtr = e.strPtr;
 	else if(type == listStr_t)
 		sList = e.sList;
+	else if(type == listInt_t)
+		iList = e.iList;
 	else if(type == ZR_t)
 		zr = e.zr;
 	else if(type == listZR_t)
@@ -220,6 +227,13 @@ CharmListStr Element::getListStr()
 	throw new string("invalid type.");
 }
 
+CharmListInt Element::getListInt()
+{
+	if(type == listInt_t) return iList;
+	throw new string("invalid type.");
+}
+
+
 string Element::str()
 {
 	stringstream ss;
@@ -229,6 +243,8 @@ string Element::str()
 		ss << zr;
 	else if(type == listStr_t)
 		ss << sList;
+	else if(type == listInt_t)
+		ss << iList;
 	else if(type == listZR_t)
 		ss << zrList;
 	else if(type == G1_t)
@@ -264,6 +280,8 @@ Element Element::operator=(const Element& e)
 		strPtr = e.strPtr;
 	else if(type == listStr_t)
 		sList = e.sList;
+	else if(type == listInt_t)
+		iList = e.iList;
 	else if(type == ZR_t)
 		zr = e.zr;
 	else if(type == listZR_t)

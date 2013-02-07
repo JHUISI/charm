@@ -38,4 +38,31 @@ private:
 	map<string, int, zr_cmp_str> strList;
 };
 
+class CharmMetaListZR
+{
+public:
+	CharmMetaListZR(void); // static list
+	~CharmMetaListZR();
+    CharmMetaListZR(const CharmMetaListZR&); // copy constructor
+    CharmMetaListZR& operator=(const CharmMetaListZR&);
+
+	// consider adding remove
+	void insert(int, CharmListZR);
+	void insert(string, CharmListZR);
+	void append(CharmListZR&);
+
+	int length(); // return length of lists
+	string printAtIndex(int index);
+	string printStrKeyIndex(int index);
+	// retrieve a particular index
+	CharmListZR& operator[](const int index);
+	CharmListZR& operator[](const string index);
+
+    friend ostream& operator<<(ostream&, const CharmMetaListZR&);
+private:
+	int cur_index;
+	map<int, CharmListZR> list;
+	map<string, int, zr_cmp_str> strList;
+};
+
 #endif

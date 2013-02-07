@@ -57,6 +57,14 @@ void CharmList::insert(int index, CharmListStr & lStr)
 	cur_index++;
 }
 
+void CharmList::insert(int index, CharmListInt & lInt)
+{
+	Element elem(lInt);
+	list[index] = elem;
+	cur_index++;
+}
+
+
 void CharmList::insert(int index, ZR & zr)
 {
 	Element elem(zr);
@@ -365,6 +373,12 @@ string CharmList::printAtIndex(int index)
 		int t = list[i].type;
 		if(t == Str_t) {
 			ss << list[i].strPtr;
+		}
+		else if(t == listStr_t) {
+			ss << "Str list\n" << list[i].sList;
+		}
+		else if(t == listInt_t) {
+			ss << "Int list\n" << list[i].iList;
 		}
 		else if(t == ZR_t) {
 			ss << list[i].zr;

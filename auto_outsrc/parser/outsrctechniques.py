@@ -911,10 +911,20 @@ class SubstituteVar:
         pass
     
     def visit_attr(self, node, data):
-        if str(node) == self.target:
+        nodeName = str(node)
+        if nodeName == self.target:
             if node.attr_index: 
                 del node.attr_index[:]; node.attr_index = None
             node.setAttribute(self.new_var)
+        elif nodeName.find(LIST_INDEX_SYMBOL) != -1:
+            nodeName2 = nodeName.split(LIST_INDEX_SYMBOL) 
+            if nodeName2[0] == self.target:
+                if node.attr_index: 
+                    del node.attr_index[:]; node.attr_index = None
+                newNodeName = str(self.new_var)
+                for i in nodeName2[1]:
+                    newNodeName += "#" + str(i)
+                node.setAttribute(newNodeName)
 
     def visit_list(self, node, data):
         found = False
@@ -1506,10 +1516,13 @@ if __name__ == "__main__":
     parser = SDLParser()
     equationList = []
     for stmt in statements:
-        equationList.append(parser.parse(stmt))
+        node = parser.parse(stmt)
+        equationList.append(node)
+        ASTVisitor(SubstituteVar("d", "dBlinded")).preorder(node)
+        print("New node: ", node)
 
-    combinedList = CombinePairings(equationList, True)
-    print("CombList:\t", combinedList)
+    #combinedList = CombinePairings(equationList, True)
+    #print("CombList:\t", combinedList)
 #    path_applied = []    
 #    print("Original: ", equation)
 #    equation2 = SimplifySDLNode(equation, path_applied)

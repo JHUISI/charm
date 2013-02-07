@@ -50,7 +50,7 @@ def preProcessCheck(binNode):
     if listCheck.isMatch():
         varCount = listCheck.getVarCount()
         getVarTypes()[TYPES_HEADER].update(listCheck.getNewVarTypes())
-#        print("New types: ", getVarTypes()[TYPES_HEADER].keys())
+        #print("New types: ", getVarTypes()[TYPES_HEADER].keys())
         return (preprocessTypes.listWithinListAssign, listCheck.getNewNodes())
 #    dotProdCheck = inlinePP.DotProdCheck(count)
 #    ASTVisitor(dotProdCheck).preorder(binNode)
@@ -211,8 +211,10 @@ def makeTypeReplacementsForCPP(SDL_Type, isList=False):
         return "CharmMetaListGT"
     if (SDLTypeAsString == "metalistZR"):
         return "CharmMetaListZR"
+    if (SDLTypeAsString == "metalistInt"):
+        return "CharmMetaListInt"
     if (SDLTypeAsString == "metalist"):
-        return "CharmMetaList"    
+        return "CharmMetaList"
     
     if ( (SDLTypeAsString == "G1") and (isList == True) ):
         return "CharmListG1"
@@ -561,7 +563,7 @@ def addGetTypeToAttrNode(inputString, variableType):
     if (variableType == types.list):
         return inputString + ".getList()"
 
-    if (variableType in [types.str, types.int, types.listZR, types.listG1, types.listG2, types.listGT, types.metalistZR, types.metalistG1, types.metalistG2, types.metalistGT]):
+    if (variableType in [types.str, types.int, types.listInt, types.listZR, types.listG1, types.listG2, types.listGT, types.metalistInt, types.metalistZR, types.metalistG1, types.metalistG2, types.metalistGT]):
         return inputString # + ".strPtr"
     
     print(variableType)
@@ -718,8 +720,7 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
             variableType = getVarTypeInfoRecursive(node)
             if varIsAList:
                 varT = searchForRawType(node, currentFuncName)
-                variableType1 = exhaustSearchType(node, currentFuncName)
-                print("varT=", varT, ", nodeName=", node, ", type=", variableType1)
+                #print("varT=", varT, ", nodeName=", node)
                 if varT in [types.listInt, types.listZR, types.listG1, types.listG2, types.listGT, types.metalistZR, types.metalistG1, types.metalistG2, types.metalistGT]:
                     pass
                 else:
@@ -1081,7 +1082,7 @@ def writeAssignStmt_CPP(outputFile, binNode):
                 outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t, 1);\n"
             elif (variableName.startswith(SUM_PROD_WORD) == True):
                 outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t, 0);\n"
-            elif variableType in [types.str, types.listStr, types.pol, types.list, types.listInt, types.listZR, types.listG1, types.listG2, types.listGT, types.metalist, types.metalistZR, types.metalistG1, types.metalistG2, types.metalistGT, types.symmapZR]:
+            elif variableType in [types.str, types.listStr, types.pol, types.list, types.listInt, types.listZR, types.listG1, types.listG2, types.listGT, types.metalist, types.metalistInt, types.metalistZR, types.metalistG1, types.metalistG2, types.metalistGT, types.symmapZR]:
                 outputString_Types += variableName + ";\n"
             else:
                 outputString_Types += variableName + " = " + groupObjName + "." + INIT_FUNC_NAME + "(" + makeTypeReplacementsForCPP(variableType) + "_t);\n"

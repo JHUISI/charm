@@ -28,7 +28,7 @@ enum ZR_type { ZR_t = 0, listZR_t = 1 };
 enum G1_type { G1_t = 2, listG1_t = 3 };
 enum G2_type { G2_t = 4, listG2_t = 5 };
 enum GT_type { GT_t = 6, listGT_t = 7 };
-enum Other_type { Str_t = 8, listStr_t = 9, list_t = 10, None_t = 11 };
+enum Other_type { Str_t = 8, listStr_t = 9, listInt_t = 10, list_t = 11, None_t = 12 };
 
 #define bn_inits(b) \
 		bn_null(b);	\

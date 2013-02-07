@@ -6,6 +6,7 @@
 #include <fstream>
 #include "CryptoLib.h"
 #include "CharmListStr.h"
+#include "CharmListInt.h"
 #include "CharmListZR.h"
 #include "CharmListG1.h"
 #include "CharmListG2.h"
@@ -60,6 +61,7 @@ public:
 	void insert(int, CharmListGT);
 	void insert(int, CharmList);
 	void insert(int, CharmListStr&);
+	void insert(int, CharmListInt&);
 	void insert(string, CharmList);
 	void insert(int, Element&);
 	void insert(int, const Element&);
@@ -97,6 +99,7 @@ public:
 	CharmListG1 g1List;
 	CharmListGT gtList;
 	CharmListStr sList;
+	CharmListInt iList;
 	string strPtr;
 	Element();
 	~Element();
@@ -119,6 +122,7 @@ public:
 	Element(CharmListGT&);
 	Element(CharmList&);
 	Element(CharmListStr&);
+	Element(CharmListInt&);
  	Element(const Element& e);
  	CharmList getList();
  	ZR getZR(); // returns value (or copy)
@@ -132,6 +136,7 @@ public:
  	GT& getRefGT();
 	string str();
 	CharmListStr getListStr();
+	CharmListInt getListInt();
 
 	friend void deserialize(Element&, string);
 	friend string serialize(Element&);
