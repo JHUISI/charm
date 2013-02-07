@@ -24,7 +24,7 @@ B := list{GT}
 Clist := list{G1, G1}
 C := list{Clist}
 D := list{G1}
-D#0 := G1
+#D#0 := G1
 h := list{G1}
 x := int
 t := list{int}
@@ -165,5 +165,4 @@ Bend := (B#l * result1)
 M := (Cm / Bend)
 output := M
 END :: func:decrypt
-#Klist := K#key
-#result0 := (e(C#j#1?,Klist#1?) * ((e(C#i#2?,Klist#2?)^-1) * e(C#i#1?,Klist#3?)))
+

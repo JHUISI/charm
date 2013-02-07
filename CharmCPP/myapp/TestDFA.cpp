@@ -175,7 +175,7 @@ bool decrypt(CharmList & sk, CharmMetaListG1 & K, CharmList & ct, GT & Cm, Charm
     G1 Cend2;
     CharmListStr w;
     int l = 0;
-    CharmMetaListInt Ti; // fix type in SDL
+    CharmMetaListInt Ti;
     CharmListGT B;
     string key;
     int j = 0;

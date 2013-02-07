@@ -15,7 +15,6 @@ def traceTypeInVarType(varName):
     if len(v1) > 0 and v1[0] in varTs.keys():
         v1Key = v1[0] # next level
         v2 = varTs[v1Key]
-        print(v2.getType(), ", ", )
         v2List = v2.getListNodesList()
         if v2.getType() == types.list and len(v2List) == 1:
             #print("v2List: ", str(types.list) + v2List[0])
@@ -56,7 +55,7 @@ class ListCheck:
             if lhs.find(LIST_INDEX_SYMBOL) != -1 and Type(node.right) == ops.FUNC:
                 if str(node.right).find(INIT_FUNC_NAME) != -1: #str(node.listNodes[0]) == types.list:
                     if str(node.right.listNodes[0]) == str(types.list):
-                        print("DEBUG: transform this: ", node)
+                        #print("DEBUG: transform this: ", node)
                         tmpAttrNode = BinaryNode(tmpList + str(self.varCount))
                         eqNode1 = BinaryNode(ops.EQ, tmpAttrNode, BinaryNode.copy(node.right))
                         eqNode2 = BinaryNode(ops.EQ, BinaryNode.copy(node.left), tmpAttrNode)
