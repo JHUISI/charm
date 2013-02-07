@@ -5,16 +5,11 @@ N := 2
 secparam := 80
 
 BEGIN :: types
-mpk := list
-mk := list
-pk := list
-sk := list
-d := list
+l := int
+z := int
+d := list{G2}
 id := str
 M := GT
-C := list
-ct := list
-#j := int
 END :: types
 
 BEGIN :: func:setup
