@@ -1,5 +1,9 @@
 schemeName = "BSW"
 
+rootNodeName = 'root'
+addNodePrefix = 'ADD'
+mulNodePrefix = 'MUL'
+
 finalSDLSuffix = ".FINAL_SDL"
 
 inputVarName = "input"

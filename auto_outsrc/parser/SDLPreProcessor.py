@@ -7,7 +7,7 @@ from SDLParser import *
 #ORIGINAL_LOOP_VAR_NAME = "originalLoopVarName"
 GET_STRING_SUFFIX = "GetStringSuffix"
 reservedVarNameNumber = 0
-RESERVED_VAR_NAME = "reservedVarName"
+RESERVED_VAR_NAME = "reserved_Var_Name"
 
 def hasPairingsSomewhereRecursive(astNode, pairingsList):
     if (astNode.left != None):
