@@ -1,0 +1,141 @@
+name := ibeckrs09
+setting := asymmetric
+
+N := 2
+secparam := 80
+
+BEGIN :: types
+n := ZR
+l := ZR
+M := GT
+mpk := list
+sk := list
+ct := list
+hl := list
+gl := list
+
+
+z := list
+
+id := str
+END :: types
+
+BEGIN :: func:setup
+input := list{n, l}
+alpha := random(ZR)
+t1 := random(ZR)
+t2 := random(ZR)
+t3 := random(ZR)
+t4 := random(ZR)
+g := random(G1)
+
+h := random(G2)
+omega := (e(g,h)^(t1 * (t2 * alpha)))
+BEGIN :: for
+for{y := 0,n}
+z#y := random(ZR)
+gl#y := (g^z#y)
+hl#y := (h^z#y)
+END :: for
+
+v1 := (g^t1)
+v2 := (g^t2)
+v3 := (g^t3)
+v4 := (g^t4)
+
+mpk := list{omega, g, h, gl, hl, v1, v2, v3, v4, n, l}
+msk := list{alpha, t1, t2, t3, t4}
+
+output := list{mpk, msk}
+END :: func:setup
+
+
+BEGIN :: func:extract
+input := list{mpk, msk, id}
+mpk := expand{omega, g, h, gl, hl, v1, v2, v3, v4, n, l}
+msk := expand{alpha, t1, t2, t3, t4}
+
+r1 := random(ZR)
+r2 := random(ZR)
+
+hID := stringToInt(id, 5, 32)
+reservedVarName0 := init(G2)
+BEGIN :: for
+for{y := 0, n}
+reservedVarName1 := (hl#y^hID#y)
+reservedVarName0 := reservedVarName0 * reservedVarName1
+END :: for
+hashIDDotProd := reservedVarName0
+hashID := (hl#0 * hashIDDotProd)
+
+
+d0 := (h^((r1 * (t1 * t2)) + (r2 * (t3 * t4))))
+
+halpha := (h^-alpha)
+hashID2r1 := (hashID^-r1)
+
+
+
+d1 := ((halpha^t2) * (hashID2r1^t2))
+
+
+d2 := ((halpha^t1) * (hashID2r1^t1))
+
+hashID2r2 := (hashID^-r2)
+
+
+d3 := (hashID2r2^t4)
+
+
+d4 := (hashID2r2^t3)
+
+
+
+
+
+
+
+sk := list{id, d0, d1, d2, d3, d4}
+output := sk
+END :: func:extract
+
+
+BEGIN :: func:encrypt
+input := list{mpk, M, id}
+mpk := expand{omega, g, h, gl, hl, v1, v2, v3, v4, n, l}
+
+s := random(ZR)
+s1 := random(ZR)
+s2 := random(ZR)
+
+
+hID1 := stringToInt(id, 5, 32)
+reservedVarName2 := init(G1)
+BEGIN :: for
+for{y := 0, n}
+reservedVarName3 := (gl#y^hID1#y)
+reservedVarName2 := reservedVarName2 * reservedVarName3
+END :: for
+hashID1DotProd := reservedVarName2
+hashID1 := (gl#0 * hashID1DotProd)
+
+cpr := ((omega^s) * M)
+c0 := (hashID1^s)
+c1 := (v1^(s - s1))
+c2 := (v2^s1)
+c3 := (v3^(s - s2))
+c4 := (v4^s2)
+
+ct := list{c0, c1, c2, c3, c4, cpr}
+output := ct
+END :: func:encrypt
+
+BEGIN :: func:decrypt
+input := list{sk, ct}
+sk := expand{id, d0, d1, d2, d3, d4}
+ct := expand{c0, c1, c2, c3, c4, cpr}
+
+result := (e(c0,d0) * (e(c1,d1) * (e(c2,d2) * (e(c3,d3) * e(c4,d4)))))
+M := (cpr * result)
+output := M
+END :: func:decrypt
