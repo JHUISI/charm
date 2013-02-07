@@ -587,6 +587,13 @@ def addBlindingSufficesToDict(dict):
 
     return retDict
 
+def getListNodes(node):
+    if ( (node.type != ops.LIST) and (node.type != ops.SYMMAP) and (node.type != ops.EXPAND) and (node.type != ops.FUNC) ):
+        return []
+
+    listNodes = node.listNodes
+    return listNodes
+
 def transformNEW(varsThatAreBlindedDict, secretKeyElements):
     global currentNumberOfForLoops, withinForLoop, iterationNo
 
@@ -617,6 +624,8 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements):
     transformLines = ["BEGIN :: func:" + transformFuncName + "\n"]
     decoutLines = ["BEGIN :: func:" + decOutFunctionName + "\n"]
 
+    ctExpandListNodes = []
+
     # get knownVars
     for lineNo in range((firstLineOfDecryptFunc + 1), (lastLineOfTransform + 1)):
         currentFullNode = astNodes[lineNo - 1]
@@ -637,6 +646,8 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements):
             transformLines.append(str(currentFullNode) + "\n")
             if ( (str(currentFullNode.left) != ctVarName) and (str(currentFullNode.left) != (keygenSecVar + blindingSuffix)) ):
                 decoutLines.append(str(currentFullNode) + "\n")
+            if (str(currentFullNode.left) == ctVarName):
+                ctExpandListNodes = getListNodes(currentFullNode.right)
         else:
             startLineNoOfSearch = lineNo
             break
@@ -646,6 +657,19 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements):
 
     #transformLines += transformOutputList + " = []\n"
 
+    ctVarsThatNeedBuckets = []
+
+    #see if we need to put any of the ciphertext elements into buckets for decout
+    for lineNo in range(startLineNoOfSearch, (lastLineOfTransform + 1)):
+        currentNode = astNodes[lineNo - 1]
+        if (currentNode.type == ops.NONE):
+            continue
+        varsOnThisLine = ddddddd
+        for varOnThisLine in varsOnThisLine:
+            if ( (varOnThisLine in ctExpandListNodes) and (varOnThisLine not in ctVarsThatNeedBuckets) ):
+                ctVarsThatNeedBuckets.append(varOnThisLine)
+
+    #main loop
     for lineNo in range(startLineNoOfSearch, (lastLineOfTransform + 1)):
         currentNode = astNodes[lineNo - 1]
         makeSecretKeyBlindedNameReplacements(currentNode, secretKeyElements)
