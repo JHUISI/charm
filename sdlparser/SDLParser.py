@@ -704,6 +704,8 @@ def countReferenceType(node):
 def downgradeType(curType):
     if str(curType) in downType.keys():
         return types[ downType[str(curType)] ]
+    elif curType in standardTypes:
+        pass
     else:
         print("DEBUG: this type not supported: ", curType)
     return curType
