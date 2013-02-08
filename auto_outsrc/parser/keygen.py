@@ -3,7 +3,7 @@ from sdlparser.SDLParser import *
 from transformNEW import *
 from secretListInKeygen import getSecretList
 from outsrctechniques import SubstituteVar
-import sys, importlib
+import sys
 
 linesOfCode = None
 assignInfo = None
