@@ -690,6 +690,24 @@ def setVarTypeObjForSymmap(varTypeObj, typeNode):
     varTypeObj.setType(types.symmap)
     addListNodesToList(typeNode, varTypeObj.getListNodesList())
 
+def countReferenceType(node):
+    """ count the number # that show up in a node ATTR. A#b#0 ==> count = 2, A#0 ==> coutn = 1, etc."""
+    if Type(node) not in [ops.ATTR]: return 0
+    nodeStr = str(node)
+    if nodeStr.count(LIST_INDEX_SYMBOL) > 0:
+        refs = nodeStr.split(LIST_INDEX_SYMBOL)
+        if refs.count(''): refs.remove('') # incase there are incomplete refs
+        refCount = len(refs)-1
+        return refCount
+    return 0 # by default
+
+def downgradeType(curType):
+    if str(curType) in downType.keys():
+        return types[ downType[str(curType)] ]
+    else:
+        print("DEBUG: this type not supported: ", curType)
+    return curType
+    
 def updateVarTypes(node, i, newType=types.NO_TYPE):
     global varTypes, assignInfo
 
@@ -717,7 +735,16 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
             print("oldType: ", varTypes[currentFuncName][varName].getType())
             print("newType: ", newType)
             sys.exit("updateVarTypes in SDLParser.py received as input a node whose full variable name is already in varTypes[%s]. Discrepancy in types, so check type section." % currentFuncName)
-
+         
+    refCount = countReferenceType(node.right)   
+    if (refCount == 0):
+        pass # leave type thesame
+    elif ( refCount == 1 ):
+        newType = downgradeType(newType) # down grade type by one
+    elif (refCount == 2 ):
+        newType = downgradeType(downgradeType(newType)) # down grade type by two
+    else:
+        pass # do nothing for now
     varTypeObj = VarType()
     varTypeObj.setLineNo(i)
     if origName.find(LIST_INDEX_SYMBOL) != -1: # definitely in a list

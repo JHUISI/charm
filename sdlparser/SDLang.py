@@ -64,7 +64,11 @@ PRUNE_FUNC_NAME = "prune"
 FUNC_SYMBOL = "def func :"
 START_TOKEN, BLOCK_SEP, END_TOKEN = 'BEGIN','::','END'
 types = Enum('NO_TYPE','G1', 'G2', 'GT', 'ZR', 'int', 'str', 'list', 'pol', 'listInt', 'listStr', 'listG1', 'listG2', 'listGT', 'listZR', 'metalist', 'metalistInt', 'metalistStr', 'metalistZR', 'metalistG1', 'metalistG2', 'metalistGT','symmap', 'symmapZR')
-listGroupTypes = ['listZR', 'listG1', 'listG2', 'listGT']
+listGroupTypes = ['listStr', 'listInt' , 'listZR', 'listG1', 'listG2', 'listGT']
+metaListGroupTypes = ['metalist', 'metalistInt', 'metalistStr', 'metalistZR', 'metalistG1', 'metalistG2', 'metalistGT']
+downType = {'listStr':'str', 'listInt':'int', 'listZR':'ZR', 'listG1':'G1', 'listG2':'G2', 'listGT':'GT', 
+            'metalist':'list', 'metalistInt':'listInt', 'metalistStr':'listStr', 'metalistZR':'listZR', 
+            'metalistG1':'listG1', 'metalistG2':'listG2', 'metalistGT':'listGT' }
 standardTypes = [ types.ZR, types.G1, types.G2, types.GT ] # types.int, types.str
 declarator = Enum('func', 'verify')
 ops = Enum('BEGIN', 'ERROR', 'TYPE','AND', 'OR', 'XOR', 'ADD', 'SUB', 'MUL', 'DIV', 'EXP', 'EQ', 'EQ_TST', 'NON_EQ_TST', 'PAIR', 'ATTR', 'HASH', 'RANDOM','FOR','DO', 'FORINNER', 'FORALL', 'PROD', 'SUM', 'ON', 'OF', 'STRCONCAT', 'CONCAT', 'LIST', 'SYMMAP', 'EXPAND', 'FUNC', 'SEQ', 'IF', 'ELSEIF', 'ELSE', 'NOP', 'END', 'NONE')
