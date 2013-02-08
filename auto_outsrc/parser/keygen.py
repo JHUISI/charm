@@ -1,9 +1,9 @@
 import sdlpath
 from sdlparser.SDLParser import *
 from transformNEW import *
-from secretListInKeygen import *
+from secretListInKeygen import getSecretList
 from outsrctechniques import SubstituteVar
-import sys
+import sys, importlib
 
 linesOfCode = None
 assignInfo = None
@@ -702,15 +702,18 @@ def writeOutputLineForKeygen(secretKeyName):
     appendToLinesOfCode(SDLLinesForKeygen, lineNoKeygenOutput)
     updateCodeAndStructs()
 
-def keygen(file):
+def keygen(file, config):
     SDLLinesForKeygen = []
 
     if ( (type(file) is not str) or (len(file) == 0) ):
         sys.exit("First argument passed to keygen.py is invalid.")
-
+        
+#    config = importlib.import_module(configName) # __import__('config')
+#    print("config: ", dir(config))
+#    print("masterKeys: ", config.masterPubVars)
+#    print("publicKeys: ", config.masterSecVars)
+    
     parseFile2(file, False)
-
-    config = __import__('config')
 
     varsToBlindList = getSecretList(config, False)
 

@@ -1,8 +1,8 @@
 name := hibe_bb04
 setting := asymmetric
 
-N := 2
-secparam := 80
+l := 5
+z := 32
 
 BEGIN :: types
 l := int
@@ -32,7 +32,7 @@ END :: for
 g0b := gb ^ (alpha * beta)
 v := e(g, g0b)
     
-mpk := list{g, g1, h, gb, g1b, hb, v, l, z}
+mpk := list{g, g1, h, gb, g1b, hb, v}
 #mk := list{g0b, None}
 mk := list{g0b}
 output := list{mpk, mk}
@@ -42,7 +42,7 @@ END :: func:setup
 BEGIN :: func:keygen
 #input := list{mpk, mk, id, j}
 input := list{mpk, mk, id}
-mpk := expand{g, g1, h, gb, g1b, hb, v, l, z}
+mpk := expand{g, g1, h, gb, g1b, hb, v}
 mk := expand{g0b}
 
 #Id := stringToID(z, 5, id)
@@ -56,8 +56,6 @@ END :: for
 #d0DotProdCalc := { prod{y := 1, j} on { (((g1b ^ Id#y) * hb#y) ^ r#y) }}
 d0DotProdCalc := { prod{y := 0, 5} on { (((g1b ^ Id#y) * hb#y) ^ r#y) }}
 d0 := g0b * d0DotProdCalc
-#pk := list{id, j}
-#dummyVar3 := random(ZR)
 pk := list{id}
 sk := list{d0, d}
 output := list{pk, sk}
@@ -66,7 +64,7 @@ END :: func:keygen
 
 BEGIN :: func:encrypt
 input := list{mpk, pk, M}        
-mpk := expand{g, g1, h, gb, g1b, hb, v, l, z}
+mpk := expand{g, g1, h, gb, g1b, hb, v}
 #pk := expand{id, j}
 pk := expand{id}
 s := random(ZR)
@@ -75,12 +73,8 @@ B :=  g ^ s
 
 Id := stringToInt(id, 5, 32)
 
-
 BEGIN :: for
 for{y := 0, 5}
-
-#use stringToInt call here for id#y (same as in keygen)
-
 C#y := (((g1 ^ Id#y) * h#y) ^ s)
 END :: for
             
