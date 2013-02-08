@@ -170,7 +170,7 @@ def SmallExp(bits=80):
 
 def main():
     global group
-    group = PairingGroup(secparam)
+    group = PairingGroup("SS512")
 
     (msk, pk) = setup()
     S = ['THREE', 'ONE', 'TWO']

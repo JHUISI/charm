@@ -89,7 +89,7 @@ def getUserGlobals():
 	global groupObjBuiltInFuncs, utilBuiltInFuncs
 
 	if (groupObjBuiltInFuncs == None):
-		groupObjBuiltInFuncs = PairingGroup(MNT160)
+		groupObjBuiltInFuncs = PairingGroup("SS512")
 
 	if (utilBuiltInFuncs == None):
 		utilBuiltInFuncs = SecretUtil(groupObjBuiltInFuncs, verbose=False)

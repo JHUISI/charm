@@ -15,4 +15,4 @@ def getUserGlobals():
     global groupUserFuncs
 
     if (groupUserFuncs == None):
-        groupUserFuncs = PairingGroup(MNT160)
+        groupUserFuncs = PairingGroup("SS512")

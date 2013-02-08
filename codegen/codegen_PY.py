@@ -1088,6 +1088,7 @@ def writeSDLToFiles(astNodes):
         elif ( (processedAsFunctionStart == True) or (isUnnecessaryNodeForCodegen(astNode) == True) ):
             continue
         else:
+            print(astNode)
             sys.exit("writeSDLToFiles in codegen.py:  unrecognized type of statement in SDL.")
 
 def getStringOfFirstFuncArgs(argsToFirstFunc):

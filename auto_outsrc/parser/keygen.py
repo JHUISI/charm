@@ -741,8 +741,8 @@ def keygen(file, config):
 
     getKeygenElemToSMTExpressions()
 
-    print(keygenElemToSMTExp)
-    sys.exit("test")
+    #print(keygenElemToSMTExp)
+    #sys.exit("test")
 
     for keygenOutput_ind in keygenOutput:
         blindKeygenOutputElement(keygenOutput_ind, varsToBlindList, varNamesForListDecls)

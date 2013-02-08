@@ -52,7 +52,8 @@ END :: forall
 Hdr2 := ((v * dotProdEncrypt)^t)
 Hdr1 := (g^t)
 Hdr := list{Hdr1, Hdr2}
-output := list{Hdr, K}
+ct := list{Hdr, K}
+output := ct
 END :: func:encrypt
 
 BEGIN :: func:decrypt
