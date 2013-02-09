@@ -3,6 +3,7 @@ schemeName = "BSW"
 rootNodeName = 'root'
 addNodePrefix = 'ADD'
 mulNodePrefix = 'MUL'
+leafNodeName = 'LEAF0'
 
 finalSDLSuffix = ".FINAL_SDL"
 

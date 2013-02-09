@@ -26,6 +26,7 @@ keygenElemToExponents = {}
 keygenElemToSMTExp = {}
 SMTaddCounter = 0
 SMTmulCounter = 0
+#SMTleafCounter = 0
 secretKeyElements = []
 
 def processListOrExpandNodes(binNode, origVarName, newVarName):
@@ -444,7 +445,7 @@ def arrangeExponentsForArithmetic(exponentsList):
         return []
 
     if (len(exponentsList) == 1):
-        return exponentsList
+        return [exponentsList[0][0]]
 
     exponent = exponentsList[0][0]
     previousLevelNumber = exponentsList[0][1]
@@ -499,6 +500,10 @@ def getKeygenElemToExponentsDictEntry(keygenOutputElem, keygenFuncName):
 
 def getAllKeygenElemsToExponentsDictEntries(keygenOutputElem, keygenFuncName):
     #global keygenElemToExponents
+    global secretKeyElements
+
+    if (keygenOutputElem not in secretKeyElements):
+        secretKeyElements.append(keygenOutputElem)
 
     getKeygenElemToExponentsDictEntry(keygenOutputElem, keygenFuncName)
 
@@ -520,6 +525,7 @@ def getIndividualKeygenElemToSMTExpression(exponents):
 
     SMTaddCounter = 0
     SMTmulCounter = 0
+    #SMTleafCounter = 0
 
     retExpression = {}
 
@@ -529,7 +535,9 @@ def getIndividualKeygenElemToSMTExpression(exponents):
     retExpression[rootNodeName] = []
 
     if ( (len(exponents) == 1) and (exponents[0].type == ops.ATTR) ):
-        retExpression[rootNodeName].append(str(exponents[0]))
+        retExpression[rootNodeName].append(leafNodeName)
+        retExpression[leafNodeName] = []
+        retExpression[leafNodeName].append(str(exponents[0]))
         return retExpression
 
     if (len(exponents) == 1):
@@ -612,8 +620,15 @@ def getKeygenElemToSMTExpressions():
         #print(keygenElemToExponents[keygenElemToExp])
         #print("\n\n")
 
-        exponents = keygenElemToExponents[keygenElemToExp]
-        keygenElemToSMTExp[keygenElemToExp] = getIndividualKeygenElemToSMTExpression(exponents)
+        if (keygenElemToExp == keygenSecVar):
+            secVarRetList = []
+            for secretKeyElem in secretKeyElements:
+                if (secretKeyElem != keygenSecVar):
+                    secVarRetList.append(secretKeyElem)
+            keygenElemToSMTExp[keygenElemToExp] = secVarRetList
+        else:
+            exponents = keygenElemToExponents[keygenElemToExp]
+            keygenElemToSMTExp[keygenElemToExp] = getIndividualKeygenElemToSMTExpression(exponents)
 
 def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListDecls, keygenFuncName):
     global blindingFactors_NonLists, varsThatAreBlinded, varsNameToSecretVarsUsed
