@@ -89,13 +89,13 @@ d3 := (hashID2r2^t4)
 
 d4 := (hashID2r2^t3)
 
+d5 := (h ^ t1) * (h ^ t2)
 
 
 
 
 
-
-sk := list{id, d0, d1, d2, d3, d4}
+sk := list{id, d0, d1, d2, d3, d4, d5}
 output := sk
 END :: func:extract
 
@@ -132,7 +132,7 @@ END :: func:encrypt
 
 BEGIN :: func:decrypt
 input := list{sk, ct}
-sk := expand{id, d0, d1, d2, d3, d4}
+sk := expand{id, d0, d1, d2, d3, d4, d5}
 ct := expand{c0, c1, c2, c3, c4, cpr}
 
 result := (e(c0,d0) * (e(c1,d1) * (e(c2,d2) * (e(c3,d3) * e(c4,d4)))))

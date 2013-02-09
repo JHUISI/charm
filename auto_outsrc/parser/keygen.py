@@ -230,7 +230,7 @@ def varListContainsParentDict(varList, parentDict):
 
     return False
 
-def getShouldThisElemBeUnblinded(keygenOutputElem, varsModifiedInKeygen):
+def getShouldThisElemBeUnblinded(keygenOutputElem, varsModifiedInKeygen, keygenFuncName):
     if (keygenOutputElem == keygenSecVar):
         return False
 
@@ -258,7 +258,7 @@ def getShouldThisElemBeUnblinded(keygenOutputElem, varsModifiedInKeygen):
 
     return True
 
-def getSecretVarsUsed(keygenOutputElem):
+def getSecretVarsUsed(keygenOutputElem, keygenFuncName):
     retList = []
 
     if keygenOutputElem not in varDepList[keygenFuncName]:
@@ -353,11 +353,11 @@ def getCurrentBlindingFactorName(keygenOutputElem):
 
     return (sharedBlindingFactorNames[secretVarForThisKeygenElem], False)
 
-def rearrangeListWRTSecretVars(inputList):
+def rearrangeListWRTSecretVars(inputList, keygenFuncName):
     mappingOfVarNameToSecretVarsUsedLocal = {}
 
     for element in inputList:
-        secretVarsUsed = getSecretVarsUsed(element)
+        secretVarsUsed = getSecretVarsUsed(element, keygenFuncName)
         mappingOfVarNameToSecretVarsUsedLocal[element] = secretVarsUsed
 
     outputList = []
@@ -420,23 +420,69 @@ def getWhichNonListBFToShare():
     for keyName in sharedBlindingFactorNames:
         return sharedBlindingFactorNames[keyName]
 
-def searchForExponentsRecursive(node, exponentsList):
+def searchForExponentsRecursive(node, exponentsList, levelNumber):
     if (node.type == ops.EXP):
         if (str(node.right) not in exponentsList):
-            exponentsList.append((node.right))
+            exponentsList.append((node.right, levelNumber + 1))
     #else:
     if (node.left != None):
-        searchForExponentsRecursive(node.left, exponentsList)
+        if (node.type == ops.EXP):
+            searchForExponentsRecursive(node.left, exponentsList, levelNumber - 1)
+        else:
+            searchForExponentsRecursive(node.left, exponentsList, levelNumber)
     if (node.right != None):
-        searchForExponentsRecursive(node.right, exponentsList)
+        if (node.type == ops.EXP):
+            searchForExponentsRecursive(node.right, exponentsList, levelNumber + 1)
+        else:
+            searchForExponentsRecursive(node.right, exponentsList, levelNumber)
+
+def arrangeExponentsForArithmetic(exponentsList):
+    expression = ""
+    previousLevelNumber = -9999
+
+    if (len(exponentsList) == 0):
+        return []
+
+    if (len(exponentsList) == 1):
+        return exponentsList
+
+    exponent = exponentsList[0][0]
+    previousLevelNumber = exponentsList[0][1]
+
+    expression += str(exponent)
+
+    firstOne = True
+
+    for indivEntry in exponentsList:
+        if (firstOne == True):
+            firstOne = False
+            continue
+
+        exponent = indivEntry[0]
+        currentLevelNumber = indivEntry[1]
+
+        if (previousLevelNumber <= currentLevelNumber):
+            expression += " + "
+        else:
+            expression += " * "
+
+        expression += str(exponent)
+
+        previousLevelNumber = currentLevelNumber
+
+    parser = SDLParser()
+    node = parser.parse(expression)
+
+    return [node]
 
 def searchForExponents(node):
     exponentsList = []
 
-    searchForExponentsRecursive(node, exponentsList)
-    return exponentsList
+    searchForExponentsRecursive(node, exponentsList, 0)
+    exponentsArrangedForArithmetic = arrangeExponentsForArithmetic(exponentsList)
+    return exponentsArrangedForArithmetic
 
-def getKeygenElemToExponentsDictEntry(keygenOutputElem):
+def getKeygenElemToExponentsDictEntry(keygenOutputElem, keygenFuncName):
     global keygenElemToExponents
 
     if (keygenOutputElem not in assignInfo[keygenFuncName]):
@@ -451,10 +497,10 @@ def getKeygenElemToExponentsDictEntry(keygenOutputElem):
     #if (baseElemsOnly.type == ops.EXP):
         #keygenElemToExponents[keygenOutputElem] = baseElemsOnly.right
 
-def getAllKeygenElemsToExponentsDictEntries(keygenOutputElem):
+def getAllKeygenElemsToExponentsDictEntries(keygenOutputElem, keygenFuncName):
     #global keygenElemToExponents
 
-    getKeygenElemToExponentsDictEntry(keygenOutputElem)
+    getKeygenElemToExponentsDictEntry(keygenOutputElem, keygenFuncName)
 
     if (keygenOutputElem not in assignInfo[keygenFuncName]):
         return
@@ -464,10 +510,10 @@ def getAllKeygenElemsToExponentsDictEntries(keygenOutputElem):
     if ( (keygenOutputVarInfo.getIsList() == True) and (len(keygenOutputVarInfo.getListNodesList()) > 0) ):
         listMembers = keygenOutputVarInfo.getListNodesList()
         listMembersORIGINAL = listMembers
-        listMembers = rearrangeListWRTSecretVars(listMembers)
+        listMembers = rearrangeListWRTSecretVars(listMembers, keygenFuncName)
 
         for listMember in listMembers:
-            getAllKeygenElemsToExponentsDictEntries(listMember)
+            getAllKeygenElemsToExponentsDictEntries(listMember, keygenFuncName)
 
 def getIndividualKeygenElemToSMTExpression(exponents):
     global SMTaddCounter, SMTmulCounter
@@ -569,7 +615,7 @@ def getKeygenElemToSMTExpressions():
         exponents = keygenElemToExponents[keygenElemToExp]
         keygenElemToSMTExp[keygenElemToExp] = getIndividualKeygenElemToSMTExpression(exponents)
 
-def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListDecls):
+def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListDecls, keygenFuncName):
     global blindingFactors_NonLists, varsThatAreBlinded, varsNameToSecretVarsUsed
     global mappingOfSecretVarsToBlindingFactors, mappingOfSecretVarsToGroupType
     #global keygenElemToExponents
@@ -591,7 +637,7 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
     varsModifiedInKeygen = list(assignInfo[keygenFuncName].keys())
     varsModifiedInKeygen = removeListIndicesAndDupsFromList(varsModifiedInKeygen)
 
-    shouldThisElemBeUnblinded = getShouldThisElemBeUnblinded(keygenOutputElem, varsModifiedInKeygen)
+    shouldThisElemBeUnblinded = getShouldThisElemBeUnblinded(keygenOutputElem, varsModifiedInKeygen, keygenFuncName)
 
     if (shouldThisElemBeUnblinded == True):
         #if (isGroupElement(keygenOutputElem) == False):
@@ -605,7 +651,7 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
         currentBlindingFactorName = getWhichNonListBFToShare()
         repeatBlindingFactor = True
     else:
-        secretVarsUsed = getSecretVarsUsed(keygenOutputElem)
+        secretVarsUsed = getSecretVarsUsed(keygenOutputElem, keygenFuncName)
         varsNameToSecretVarsUsed[keygenOutputElem] = secretVarsUsed
         (currentBlindingFactorName, repeatBlindingFactor) = getCurrentBlindingFactorName(keygenOutputElem)
 
@@ -638,11 +684,11 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
     if ( (keygenOutputVarInfo.getIsList() == True) and (len(keygenOutputVarInfo.getListNodesList()) > 0) ):
         listMembers = keygenOutputVarInfo.getListNodesList()
         listMembersORIGINAL = listMembers
-        listMembers = rearrangeListWRTSecretVars(listMembers)
+        listMembers = rearrangeListWRTSecretVars(listMembers, keygenFuncName)
         listMembersString = ""
         for listMember in listMembers:
             #listMembersString += listMember + blindingSuffix + ", "
-            blindKeygenOutputElement(listMember, varsToBlindList, varNamesForListDecls)
+            blindKeygenOutputElement(listMember, varsToBlindList, varNamesForListDecls, keygenFuncName)
         #listMembersString = listMembersString[0:(len(listMembersString)-2)]
         for listMember in listMembersORIGINAL:
             listMembersString += listMember + blindingSuffix + ", "
@@ -657,7 +703,7 @@ def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListD
     writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls, currentBlindingFactorName, repeatBlindingFactor)
     return keygenOutputElem
 
-def removeAssignmentOfOrigKeygenSecretKeyName(secretKeyName):
+def removeAssignmentOfOrigKeygenSecretKeyName(secretKeyName, keygenFuncName):
     assignLineNos = getLineNosOfAllAssigns(keygenFuncName, secretKeyName)    
     if (len(assignLineNos) == 0):
         sys.exit("removeAssignmentOfOrigKeygenSecretKeyName in keygen.py:  could not locate any assignment statements for the secret key name passed in (" + secretKeyName + ").")
@@ -677,7 +723,7 @@ def getBlindingFactorsLine():
 
     return outputLine
 
-def writeOutputLineForKeygen(secretKeyName):
+def writeOutputLineForKeygen(secretKeyName, keygenFuncName):
     SDLLinesForKeygen = []
 
     outputLine = ""
@@ -703,6 +749,8 @@ def writeOutputLineForKeygen(secretKeyName):
     updateCodeAndStructs()
 
 def keygen(file, config):
+    #print(config.keygenFuncName)
+ 
     SDLLinesForKeygen = []
 
     if ( (type(file) is not str) or (len(file) == 0) ):
@@ -721,6 +769,8 @@ def keygen(file, config):
 
     updateCodeAndStructs()
 
+    keygenFuncName = config.keygenFuncName
+
     if (keygenBlindingExponent in assignInfo[keygenFuncName]):
         sys.exit("keygen.py:  the variable used for keygenBlindingExponent in config.py already exists in the keygen function of the scheme being analyzed.")
 
@@ -735,7 +785,7 @@ def keygen(file, config):
     lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, None)
 
     for keygenOutput_ind in keygenOutput:
-        getAllKeygenElemsToExponentsDictEntries(keygenOutput_ind)
+        getAllKeygenElemsToExponentsDictEntries(keygenOutput_ind, keygenFuncName)
 
     #print(keygenElemToExponents)
 
@@ -745,11 +795,11 @@ def keygen(file, config):
     #sys.exit("test")
 
     for keygenOutput_ind in keygenOutput:
-        blindKeygenOutputElement(keygenOutput_ind, varsToBlindList, varNamesForListDecls)
+        blindKeygenOutputElement(keygenOutput_ind, varsToBlindList, varNamesForListDecls, keygenFuncName)
 
     secretKeyName = keygenSecVar
 
-    removeAssignmentOfOrigKeygenSecretKeyName(secretKeyName)
+    removeAssignmentOfOrigKeygenSecretKeyName(secretKeyName, keygenFuncName)
 
     #if (len(varsToBlindList) != 0):
         #sys.exit("keygen.py completed without blinding all of the variables passed to it by transform.py.")
@@ -763,7 +813,7 @@ def keygen(file, config):
     appendToLinesOfCode(SDLLinesForKeygen, inputLineOfKeygenFunc + 1)
     updateCodeAndStructs()
 
-    writeOutputLineForKeygen(secretKeyName)
+    writeOutputLineForKeygen(secretKeyName, keygenFuncName)
 
     for index_listVars in range(0, len(varNamesForListDecls)):
         varNamesForListDecls[index_listVars] = varNamesForListDecls[index_listVars] + blindingSuffix + " := list\n"

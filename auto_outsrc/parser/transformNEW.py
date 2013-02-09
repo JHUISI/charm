@@ -14,10 +14,8 @@ currentNumberOfForLoops = 0
 iterationNo = 0
 withinForLoop = False
 
-ctVarName = None
-
-def getCTVarName():
-    global ctVarName
+def getCTVarNames():
+    ctVarNames = []
 
     assignInfo = getAssignInfo()
 
@@ -29,11 +27,18 @@ def getCTVarName():
 
     encryptOutputAssignNode = assignInfo[encryptFuncName][outputVarName].getAssignNode()
 
-    possibleCTVarName = encryptOutputAssignNode.right
-    if (possibleCTVarName.type != ops.ATTR):
-        sys.exit("getCTVarName in transformNEW.py:  encryptOutputAssignNode.right isn't of type ops.ATTR.")
+    possibleCTVarNames = encryptOutputAssignNode.right
+    if (possibleCTVarNames.type == ops.ATTR):
+        if (str(possibleCTVarNames) not in ctVarNames):
+            ctVarNames.append(str(possibleCTVarNames))
+    elif (possibleCTVarNames.type == ops.LIST):
+        for listNode in possibleCTVarNames.listNodes:
+            if (listNode not in ctVarNames):
+                ctVarNames.append(listNode)
+    else:
+        sys.exit("getCTVarNames in transformNEW.py:  output of encrypt is neither an attribute nor a list.")
 
-    ctVarName = str(possibleCTVarName)
+    return ctVarNames
 
 #TODO:  right now, this function is verbatim the same as the one in keygen.py.
 #Consolidate so there's only one copy of the code.
@@ -177,7 +182,7 @@ def getLastLineOfTransform(stmtsDec):
 
     sys.exit("getLastLineOfTransform in transformNEW:  could not locate the line in decrypt where the message is assigned its value.")
 
-def createDecoutInputLine(node, decoutLines):
+def createDecoutInputLine(node, decoutLines, ctVarNames):
     listNodes = []
 
     try:
@@ -195,7 +200,7 @@ def createDecoutInputLine(node, decoutLines):
         if (listNode == (keygenSecVar + blindingSuffix)):
             continue
 
-        if (listNode == ctVarName):
+        if (listNode in ctVarNames):
             continue
 
         if (listNode in pkBlindedList):
@@ -619,6 +624,11 @@ def writeOutCTVarsThatNeedBuckets(ctVarsThatNeedBuckets, transformInputExpandNum
         transformLines.insert(transformInputExpandNumStatements, lineForTransform)
         decoutLines.insert(decoutInputExpandNumStatements, lineForDecout)
 
+def addListNodesForThisLineToCtExpandListNodes(ctExpandListNodes, ctExpandListNodesForThisLine):
+    for listNode in ctExpandListNodesForThisLine:
+        if (listNode not in ctExpandListNodes):
+            ctExpandListNodes.append(listNode)
+
 def transformNEW(varsThatAreBlindedDict, secretKeyElements):
     global currentNumberOfForLoops, withinForLoop, iterationNo
 
@@ -626,8 +636,9 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements):
 
     varsThatAreBlindedDict = addBlindingSufficesToDict(varsThatAreBlindedDict)
 
-    getCTVarName()
-    #print(ctVarName)
+    ctVarNames = getCTVarNames()
+    #print(ctVarNames)
+    #sys.exit("test")
 
     #addTransformFuncIntro()
     (stmtsDec, typesDec, depListDec, depListNoExponentsDec, infListDec, infListNoExponentsDec) = getFuncStmts(decryptFuncName)
@@ -660,7 +671,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements):
             startLineNoOfSearch = lineNo
             transformLines.append(str(currentFullNode) + "\n")
             #print(transformLines)
-            createDecoutInputLine(currentFullNode.right, decoutLines)
+            createDecoutInputLine(currentFullNode.right, decoutLines, ctVarNames)
             #print(decoutLines)
             continue
         currentNode = currentFullNode.right
@@ -669,13 +680,17 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements):
         if (currentNode.type == ops.EXPAND):
             appendToKnownVars(currentNode, knownVars)
             transformLines.append(str(currentFullNode) + "\n")
-            if ( (str(currentFullNode.left) != ctVarName) and (str(currentFullNode.left) != (keygenSecVar + blindingSuffix)) ):
+            if ( (str(currentFullNode.left) not in ctVarNames) and (str(currentFullNode.left) != (keygenSecVar + blindingSuffix)) ):
                 decoutLines.append(str(currentFullNode) + "\n")
-            if (str(currentFullNode.left) == ctVarName):
-                ctExpandListNodes = getListNodes(currentFullNode.right)
+            if (str(currentFullNode.left) in ctVarNames):
+                ctExpandListNodesForThisLine = getListNodes(currentFullNode.right)
+                addListNodesForThisLineToCtExpandListNodes(ctExpandListNodes, ctExpandListNodesForThisLine)
         else:
             startLineNoOfSearch = lineNo
             break
+
+    #print(ctExpandListNodes)
+    #sys.exit("test")
 
     if (startLineNoOfSearch == None):
         sys.exit("transformNEW in transformNEW.py:  couldn't locate either input statement or EXPAND nodes.")
