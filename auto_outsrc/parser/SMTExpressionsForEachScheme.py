@@ -26,4 +26,4 @@
 {'sk': {}, 'D': {'root': ['ADD0'], 'ADD0': ['shares#i', 'r']}, 'w': {}, 'd': {'root': ['r']}}
 
 #WATERS
-{'sk': {}, 'K': {'root': ['t']}, 'L': {'root': ['t']}, 'Kl': {'root': ['t']}}
+{'sk': ['K', 'L', 'Kl'], 'K': {'root': ['alpha','t']}, 'L': {'root': ['t']}, 'Kl': {'root': ['t']}}
