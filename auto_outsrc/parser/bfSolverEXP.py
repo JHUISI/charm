@@ -18,12 +18,15 @@ import string
 
 bfCount = 2
 mskVars = ['alpha']
-rndVars = ['t', 'beta', 's'] # try to capture ordering of instances of random vars.
+rndVars = ['t', 'beta'] # try to capture ordering of instances of random vars.
 
-info = {'sk': ['K', 'L', 'Kl'], 'K': {'root': ['ADD0'], 'ADD0': ['MUL0','MUL1'], 'MUL0':['alpha', 'beta'], 'MUL1':['s', 't']}, 'L': {'root':['LEAF0'], 'LEAF0':['t']}, 'Kl': {'root':['LEAF0'], 'LEAF0':['t']}}
+#info = {'sk': ['K', 'L', 'Kl'], 'K': {'root': ['MUL0'], 'ADD0':['alpha', 'beta'], 'MUL0':['ADD0','t']}, 'L': {'root':['LEAF0'], 'LEAF0':['t']}, 'Kl': {'root':['LEAF0'], 'LEAF0':['t']}}
+
+#rndVars = ['t', 'beta', 's'] # try to capture ordering of instances of random vars.
+#info = {'sk': ['K', 'L', 'Kl'], 'K': {'root': ['ADD0'], 'ADD0': ['MUL0','MUL1'], 'MUL0':['alpha', 'beta'], 'MUL1':['s', 't']}, 'L': {'root':['LEAF0'], 'LEAF0':['t']}, 'Kl': {'root':['LEAF0'], 'LEAF0':['t']}}
 
 #rndVars = ['t', 'beta']
-#info = {'sk': ['K', 'L', 'Kl'], 'K': {'root': ['ADD0'], 'ADD0': ['t','MUL0'], 'MUL0':['alpha', 'beta']}, 'L': {'root':['LEAF0'], 'LEAF0':['t']}, 'Kl': {'root':['LEAF0'], 'LEAF0':['t']}}
+info = {'sk': ['K', 'L', 'Kl'], 'K': {'root': ['ADD0'], 'ADD0': ['t','MUL0'], 'MUL0':['alpha', 'beta']}, 'L': {'root':['LEAF0'], 'LEAF0':['t']}, 'Kl': {'root':['LEAF0'], 'LEAF0':['t']}}
 #info = {'sk': ['K', 'L', 'Kl'], 'K': {'root': ['ADD0'], 'ADD0': ['alpha','t']}, 'L': {'root':['LEAF0'], 'LEAF0':['t']}, 'Kl': {'root':['LEAF0'], 'LEAF0':['t']}}
 skVars = 'sk'
 
@@ -100,8 +103,13 @@ class ConstructRule:
     def baseCase(self, dataList):
         """ returns True iff all elements in the list are in varMap which means they are attributes"""
         for i in dataList:
-            if i not in self.varMapKeys:
-                return False
+            if type(i) == list:
+                for j in i:
+                    if j not in self.varMapKeys:
+                        return False
+            else:
+                if i not in self.varMapKeys:
+                    return False
         return True
     
     def getFirstNonAttr(self, data):
@@ -120,7 +128,7 @@ class ConstructRule:
         for i in ruleType:
             if ADD in i:
                 if self.baseCase(data[i]):
-                    if retList: finalConstraints += (self.__addRule(data[i], excludeList), data[i])
+#                    if retList: finalConstraints += (self.__addRule(data[i], excludeList), data[i])
                     finalConstraints += self.__addRule(data[i], excludeList)
                 else:
                     newRuleList, attrList = self.getFirstNonAttr(data[i])
@@ -140,12 +148,30 @@ class ConstructRule:
 #                    sys.exit(0)
             elif MUL in i:
                 if self.baseCase(data[i]):
-                    if retList: finalConstraints += (self.__mulRule(data[i], excludeList), data[i])
+#                    if retList: finalConstraints += (self.__mulRule(data[i], excludeList), data[i])
                     finalConstraints += self.__mulRule(data[i], excludeList)
                 else:
-                    print("dealing with mix modes!!!")                    
+                    print("dealing with mix modes!!!")
+                    newRuleList, attrList = self.getFirstNonAttr(data[i])
+                    print("newDataList=", newRuleList)
+                    print("attrList=", attrList)
+                    if len(attrList) > 0:
+                        res = self.rule(newRuleList, data, True, excludeList)
+                        print("RESULT0: ", res[0])
+#                        print("RESULT1: ", res[1] + attrList)
+                        bindList = excludeList
+                        data[ i ] = [ res[1] ] + attrList # updating current ADD* key/value
+                        print("RESULT1: ", data[i])
+                        bindList += list(res[1])
+                        res2 = self.rule([ i ], data, bindList)
+#                        print("RESULT2: ", res2)
+                        finalConstraints += res2[0]  + res[0] 
+                        print("finalConstraints: ", finalConstraints)
+                    else:
+                        finalConstraints += self.rule(newRuleList, data, retList, excludeList)                        
             elif LEAF in i:
                 finalConstraints += self.__attrRule(data[i]) # base case
+        if retList: return finalConstraints, data[i]
         return finalConstraints
     
     def __attrRule(self, data):
@@ -157,22 +183,45 @@ class ConstructRule:
         print("Result:", Or(orObjects))
         return [ Or(orObjects) ]
 
-    def __mulRule(self, data, excludeList):
+    def __handleNotEqualToNil(self, jj):
+        if type(jj) == list:
+            return And([ self.varMap.get(j) != nil for j in jj])
+        else:
+            return self.varMap.get(jj) != nil
+
+    def __handleEqualToNil(self, jj):
+        if type(jj) == list:
+            return And([ self.varMap.get(j) == nil for j in jj])
+        else:
+            return self.varMap.get(jj) == nil
+
+
+    def __mulRule(self, data, bindList):
         """base rule: a * b ==> Or(And(a != nil, b == nil), And(a == nil, b != nil))"""
         print("MUL Rule: ", data)
         index = 0
         orObjects = []
+#        if len(bindList) == 0: # base rule
+#            for x in range(len(data)):
+#                objects = []
+#                for i,j in enumerate(data):
+#                    jj = self.varMap.get(j)
+#                    if index == i:
+#                        objects.append(jj != nil)
+#                    else:
+#                        objects.append(jj == nil)
+#                        #print(j, "== nil", end=" ")
+#        #            print("")
+#                orObjects.append( And(objects) )
+#                index += 1
+#        else:
         for x in range(len(data)):
             objects = []
             for i,j in enumerate(data):
-                jj = self.varMap.get(j)
                 if index == i:
-                    objects.append(jj != nil)
-                    #print(j, "!= nil", end=" ")
+                    objects.append(self.__handleNotEqualToNil(j))
                 else:
-                    objects.append(jj == nil)
-                    #print(j, "== nil", end=" ")
-#            print("")
+                    objects.append(self.__handleEqualToNil(j))
             orObjects.append( And(objects) )
             index += 1
         print("MUL Result: ", Or(orObjects))
@@ -199,15 +248,23 @@ class ConstructRule:
 # read the 'info' dict
 construct = ConstructRule(theVarMap)
 skList = info.get(skVars)
+constraintDict = {}
+unsatIDs = {}
 index = 0
 for i in skList:
     print("key=", i, ", dict=", info[i])
     constraints = construct.rule(info[i][root], info[i])
+    constraintDict[ i ] = constraints
+    unsatIDs[ i ] = []
     print("DEBUG: constraints=", constraints)
+    print("refs: ", end="")
     for j in range(len(constraints)):
-        s.assert_and_track(constraints[j], 'p' + str(index))
+        ref = 'p' + str(index)
+        unsatIDs[ i ].append(ref)
+        s.assert_and_track(constraints[j], ref)
+        print(ref, " ", end="")
         index += 1
-    print("\n")
+    print("\n\n")
 
 # TODO: map the sk vars to constraints to assert that each group element is blinded.
 
@@ -250,9 +307,13 @@ for i in skList:
 #s.assert_and_track( Or(And(r2 == nil, t3 == nil, t4 != nil), And(r2 == nil, t3 != nil, t4 != nil), And(r2 != nil, t3 == nil, t4 == nil)), 'p6' )
 #s.assert_and_track( And(Or(r1 == r2, r1 == t3, r1 == t4), Or(t1 == r2, t1 == t3, t1 == t4), Or(t2 == r2, t2 == t3, t2 == t4)), 'p7' )
 
+print("constraintDict=", constraintDict)
+print("unsatIDs=", unsatIDs, "\n")
+
 print(s, "\n")
 print(s.check())
 if s.check() != unsat:
   print(s.model())
 else:
   print(s.unsat_core())
+
