@@ -706,8 +706,8 @@ def downgradeType(curType):
         return types[ downType[str(curType)] ]
     elif curType in standardTypes:
         pass
-    else:
-        print("DEBUG: this type not supported: ", curType)
+    #else:
+        #print("DEBUG: this type not supported: ", curType)
     return curType
     
 def updateVarTypes(node, i, newType=types.NO_TYPE):

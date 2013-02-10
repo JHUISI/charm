@@ -2,7 +2,7 @@ import sdlpath
 from sdlparser.SDLParser import *
 from transformNEW import *
 from secretListInKeygen import getSecretList
-from outsrctechniques import SubstituteVar
+from outsrctechniques import SubstituteVar, GetAttributeVars
 import sys
 
 linesOfCode = None
@@ -28,6 +28,7 @@ SMTaddCounter = 0
 SMTmulCounter = 0
 #SMTleafCounter = 0
 secretKeyElements = []
+masterSecretKeyElements = []
 
 def processListOrExpandNodes(binNode, origVarName, newVarName):
     binNodeRight = binNode.right
@@ -483,7 +484,22 @@ def searchForExponents(node):
     exponentsArrangedForArithmetic = arrangeExponentsForArithmetic(exponentsList)
     return exponentsArrangedForArithmetic
 
-def getKeygenElemToExponentsDictEntry(keygenOutputElem, keygenFuncName):
+def shouldWeUseFullBaseElems(keygenOutputElem, config):
+    if (keygenOutputElem not in assignInfo[keygenFuncName]):
+        sys.exit("shouldWeUseFullBaseElems in keygen.py:  keygenOutputElem parameter passed in is not in assignInfo[keygenFuncName].")
+
+    assignInfoVarEntry = assignInfo[keygenFuncName][keygenOutputElem]
+    baseElemsOnlyNode = assignInfoVarEntry.getAssignBaseElemsOnlyThisFunc()
+    baseElemsOnly = GetAttributeVars(baseElemsOnlyNode, True)
+    for baseElem in baseElemsOnly:
+        if baseElem in masterSecretKeyElements:
+            groupTypeOfThisElem = getVarTypeInfoRecursive(BinaryNode(baseElem), config.setupFuncName)
+            if (groupTypeOfThisElem in [types.G1, types.G2, types.GT]):
+                return True
+
+    return False
+
+def getKeygenElemToExponentsDictEntry(keygenOutputElem, keygenFuncName, config):
     global keygenElemToExponents
 
     if (keygenOutputElem not in assignInfo[keygenFuncName]):
@@ -492,20 +508,84 @@ def getKeygenElemToExponentsDictEntry(keygenOutputElem, keygenFuncName):
         return
 
     assignInfoVarEntry = assignInfo[keygenFuncName][keygenOutputElem]
-    baseElemsOnly = assignInfoVarEntry.getAssignBaseElemsOnlyThisFunc()
+    useFullBaseElems = shouldWeUseFullBaseElems(keygenOutputElem, config)
+    if (useFullBaseElems == True):
+        baseElemsOnly = assignInfoVarEntry.getAssignBaseElemsOnly()
+    else:
+        baseElemsOnly = assignInfoVarEntry.getAssignBaseElemsOnlyThisFunc()
+
+    if (baseElemsOnly.type != ops.LIST):
+        baseElemsOnly = makeReplacementsForMasterPublicVars(baseElemsOnly, config)
+
     keygenElemToExponents[keygenOutputElem] = searchForExponents(baseElemsOnly)
 
-    #if (baseElemsOnly.type == ops.EXP):
-        #keygenElemToExponents[keygenOutputElem] = baseElemsOnly.right
+    #print(baseElemsOnly)
 
-def getAllKeygenElemsToExponentsDictEntries(keygenOutputElem, keygenFuncName):
+def getAllMasterPubVarsAsStrings(config):
+    if (config.setupFuncName not in assignInfo):
+        sys.exit("getAllMasterPubVarsAsStrings in keygen.py:  config.setupFuncName not in assignInfo.")
+
+    retList = {}
+
+    for mpk in config.masterPubVars:
+        if (mpk not in assignInfo[config.setupFuncName]):
+            sys.exit("getAllMasterPubVarsAsStrings in keygen.py:  one of the pub vars was not in assignInfo[config.setupFuncName].")
+
+        mpkVarInfoObj = assignInfo[config.setupFuncName][mpk]
+        mpkVarDeps = mpkVarInfoObj.getVarDeps()
+        for mpkVarDep in mpkVarDeps:
+            if (mpkVarDep not in assignInfo[config.setupFuncName]):
+                continue #I wanted to throw an error here, but LW would be a problem if I did, so continue is fine for now
+
+            if (mpkVarDep in retList):
+                continue
+
+            baseElemsOnly = assignInfo[config.setupFuncName][mpkVarDep].getAssignBaseElemsOnly()
+            retList[mpkVarDep] = str(baseElemsOnly)
+
+    return retList
+
+def ensureParenthesesAround(inputString):
+    if (inputString[0] != "("):
+        inputString = "(" + inputString
+
+    lenInputString = len(inputString)
+
+    if (inputString[(lenInputString - 1)] != ")"):
+        inputString = inputString + ")"
+
+    return inputString
+
+def makeReplacementsForMasterPublicVars(node, config):
+    nodeAsStr = str(node)
+    masterPubVarsAsStrings = getAllMasterPubVarsAsStrings(config)
+    for mpkString in masterPubVarsAsStrings:
+        whatToReplaceWith = mpkString
+        whatToLookFor = (masterPubVarsAsStrings[mpkString])
+        #putting parenthese around everything means we might not catch something, but so be it
+        whatToLookFor = ensureParenthesesAround(whatToLookFor)
+        #print("what to look for:  ", whatToLookFor)
+        #print("what to replace with:  ", whatToReplaceWith)
+        if (whatToLookFor == whatToReplaceWith):
+            continue
+
+        nodeAsStr = nodeAsStr.replace(whatToLookFor, whatToReplaceWith)
+
+    #print(node)
+    #print(nodeAsStr)
+
+    parser = SDLParser()
+    newNode = parser.parse(nodeAsStr)
+    return newNode
+
+def getAllKeygenElemsToExponentsDictEntries(keygenOutputElem, keygenFuncName, config):
     #global keygenElemToExponents
     global secretKeyElements
 
     if (keygenOutputElem not in secretKeyElements):
         secretKeyElements.append(keygenOutputElem)
 
-    getKeygenElemToExponentsDictEntry(keygenOutputElem, keygenFuncName)
+    getKeygenElemToExponentsDictEntry(keygenOutputElem, keygenFuncName, config)
 
     if (keygenOutputElem not in assignInfo[keygenFuncName]):
         return
@@ -518,9 +598,9 @@ def getAllKeygenElemsToExponentsDictEntries(keygenOutputElem, keygenFuncName):
         listMembers = rearrangeListWRTSecretVars(listMembers, keygenFuncName)
 
         for listMember in listMembers:
-            getAllKeygenElemsToExponentsDictEntries(listMember, keygenFuncName)
+            getAllKeygenElemsToExponentsDictEntries(listMember, keygenFuncName, config)
 
-def getIndividualKeygenElemToSMTExpression(exponents):
+def getIndividualKeygenElemToSMTExpression(exponents, rootNodeName, leafNodeName, config):
     global SMTaddCounter, SMTmulCounter
 
     SMTaddCounter = 0
@@ -541,39 +621,39 @@ def getIndividualKeygenElemToSMTExpression(exponents):
         return retExpression
 
     if (len(exponents) == 1):
-        getSMTExpressionForOneExponent(exponents[0], rootNodeName, retExpression)
+        getSMTExpressionForOneExponent(exponents[0], rootNodeName, retExpression, config)
         return retExpression
 
-    currentKey = addNodePrefix+str(SMTaddCounter)
+    currentKey = config.addNodePrefix+str(SMTaddCounter)
     SMTaddCounter += 1
     retExpression[rootNodeName].append(currentKey)
     retExpression[currentKey] = []
 
     for exponent in exponents:
-        getSMTExpressionForOneExponent(exponent, currentKey, retExpression)
+        getSMTExpressionForOneExponent(exponent, currentKey, retExpression, config)
 
     return retExpression
 
-def getSMTExpressionForOneExponent(exponent, parentKey, retExpression):
+def getSMTExpressionForOneExponent(exponent, parentKey, retExpression, config):
     global SMTaddCounter, SMTmulCounter
 
     if ( (exponent.type == ops.ADD) or (exponent.type == ops.SUB) ):
-        currentKey = addNodePrefix+str(SMTaddCounter)
+        currentKey = config.addNodePrefix+str(SMTaddCounter)
         SMTaddCounter += 1
         if (parentKey != None):
             retExpression[parentKey].append(currentKey)
         retExpression[currentKey] = []
-        getSMTExpressionForOneExponent(exponent.left, currentKey, retExpression)
-        getSMTExpressionForOneExponent(exponent.right, currentKey, retExpression)
+        getSMTExpressionForOneExponent(exponent.left, currentKey, retExpression, config)
+        getSMTExpressionForOneExponent(exponent.right, currentKey, retExpression, config)
 
     if ( (exponent.type == ops.MUL) or (exponent.type == ops.DIV) ):
-        currentKey = mulNodePrefix+str(SMTmulCounter)
+        currentKey = config.mulNodePrefix+str(SMTmulCounter)
         SMTmulCounter += 1
         if (parentKey != None):
             retExpression[parentKey].append(currentKey)
         retExpression[currentKey] = []
-        getSMTExpressionForOneExponent(exponent.left, currentKey, retExpression)
-        getSMTExpressionForOneExponent(exponent.right, currentKey, retExpression)
+        getSMTExpressionForOneExponent(exponent.left, currentKey, retExpression, config)
+        getSMTExpressionForOneExponent(exponent.right, currentKey, retExpression, config)
 
     if (exponent.type == ops.ATTR):
         retExpression[parentKey].append(str(exponent))
@@ -612,7 +692,7 @@ def getIndividualKeygenElemToSMTExpression(exponents):
     return retExpression
 '''
 
-def getKeygenElemToSMTExpressions():
+def getKeygenElemToSMTExpressions(rootNodeName, leafNodeName, config):
     global keygenElemToSMTExp
 
     for keygenElemToExp in keygenElemToExponents:
@@ -628,7 +708,7 @@ def getKeygenElemToSMTExpressions():
             keygenElemToSMTExp[keygenElemToExp] = secVarRetList
         else:
             exponents = keygenElemToExponents[keygenElemToExp]
-            keygenElemToSMTExp[keygenElemToExp] = getIndividualKeygenElemToSMTExpression(exponents)
+            keygenElemToSMTExp[keygenElemToExp] = getIndividualKeygenElemToSMTExpression(exponents, rootNodeName, leafNodeName, config)
 
 def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListDecls, keygenFuncName):
     global blindingFactors_NonLists, varsThatAreBlinded, varsNameToSecretVarsUsed
@@ -763,6 +843,28 @@ def writeOutputLineForKeygen(secretKeyName, keygenFuncName):
     appendToLinesOfCode(SDLLinesForKeygen, lineNoKeygenOutput)
     updateCodeAndStructs()
 
+def getMasterSecretKeyElements(config):
+    global masterSecretKeyElements
+
+    mskFunc = config.setupFuncName
+    if (mskFunc not in assignInfo):
+        sys.exit("getMasterSecretKeyElements in keygen.py:  setupFuncName from config file isn't in assignInfo.")
+
+    mskFuncAssignInfoEntry = assignInfo[mskFunc]
+
+    for mskElem in masterSecVars:
+        if (mskElem not in mskFuncAssignInfoEntry):
+            sys.exit("getMasterSecretKeyElements in keygen.py:  one of the var names in masterSecVars (from config file) isn't in assignInfo[name_of_setup_function_from_config_file].")
+
+        assignInfoVarEntry = mskFuncAssignInfoEntry[mskElem]
+        varDeps = assignInfoVarEntry.getVarDeps()
+        for varDep in varDeps:
+            if (varDep not in masterSecretKeyElements):
+                masterSecretKeyElements.append(varDep)
+
+    #print(masterSecretKeyElements)
+    #sys.exit("test")
+
 def keygen(file, config):
     #print(config.keygenFuncName)
  
@@ -784,6 +886,8 @@ def keygen(file, config):
 
     updateCodeAndStructs()
 
+    getMasterSecretKeyElements(config)
+
     keygenFuncName = config.keygenFuncName
 
     if (keygenBlindingExponent in assignInfo[keygenFuncName]):
@@ -800,11 +904,11 @@ def keygen(file, config):
     lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, None)
 
     for keygenOutput_ind in keygenOutput:
-        getAllKeygenElemsToExponentsDictEntries(keygenOutput_ind, keygenFuncName)
+        getAllKeygenElemsToExponentsDictEntries(keygenOutput_ind, keygenFuncName, config)
 
     #print(keygenElemToExponents)
 
-    getKeygenElemToSMTExpressions()
+    getKeygenElemToSMTExpressions(config.rootNodeName, config.leafNodeName, config)
 
     #print(keygenElemToSMTExp)
     #sys.exit("test")
@@ -843,7 +947,7 @@ def keygen(file, config):
 
 
     #varsThatAreBlinded = {"c":["zz"], "d0":["yy"], "d1":["aa", "bb"]}
-    transformNEW(mappingOfSecretVarsToBlindingFactors, secretKeyElements)
+    transformNEW(mappingOfSecretVarsToBlindingFactors, secretKeyElements, config)
 
 
 

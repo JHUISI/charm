@@ -491,7 +491,7 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
 
     decoutLines.append(lineForDecoutLines + "\n")
 
-def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, currentLineNo, astNodes):
+def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, currentLineNo, astNodes, config):
     global transformListCounter, decoutListCounter, iterationNo
 
     decoutListCounter = transformListCounter
@@ -500,7 +500,7 @@ def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, curre
     transformListIndex = getTransformListIndex(currentLineNo, astNodes)
     #decoutListIndex = getDecoutListIndex(currentLineNo)
 
-    currentNodeRightType = getVarTypeInfoRecursive(currentNode.right, decryptFuncName)
+    currentNodeRightType = getVarTypeInfoRecursive(currentNode.right, config.decryptFuncName)
 
     if (withinForLoop == True):
         lineForTransformLines = transformOutputList + LIST_INDEX_SYMBOL + str(transformListIndex) + "? := "
@@ -569,12 +569,12 @@ def getDotProdLoopVar(node):
 
     return str(dotProdLoopVar)
 
-def getBlindingVarsThatAreLists(varsThatAreBlindedDict):
+def getBlindingVarsThatAreLists(varsThatAreBlindedDict, config):
     retList = []
 
     for blindingVarName in varsThatAreBlindedDict:
         blindingVarListObj = varsThatAreBlindedDict[blindingVarName]
-        if (listNameIndicator in blindingVarListObj):
+        if (config.listNameIndicator in blindingVarListObj):
             if (blindingVarName not in retList):
                 retList.append(blindingVarName)
 
@@ -629,7 +629,7 @@ def addListNodesForThisLineToCtExpandListNodes(ctExpandListNodes, ctExpandListNo
         if (listNode not in ctExpandListNodes):
             ctExpandListNodes.append(listNode)
 
-def transformNEW(varsThatAreBlindedDict, secretKeyElements):
+def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     global currentNumberOfForLoops, withinForLoop, iterationNo
 
     #print(varsThatAreBlindedDict)
@@ -641,10 +641,10 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements):
     #sys.exit("test")
 
     #addTransformFuncIntro()
-    (stmtsDec, typesDec, depListDec, depListNoExponentsDec, infListDec, infListNoExponentsDec) = getFuncStmts(decryptFuncName)
+    (stmtsDec, typesDec, depListDec, depListNoExponentsDec, infListDec, infListNoExponentsDec) = getFuncStmts(config.decryptFuncName)
     astNodes = getAstNodes()
-    firstLineOfDecryptFunc = getStartLineNoOfFunc(decryptFuncName)
-    lastLineOfDecryptFunc = getEndLineNoOfFunc(decryptFuncName)
+    firstLineOfDecryptFunc = getStartLineNoOfFunc(config.decryptFuncName)
+    lastLineOfDecryptFunc = getEndLineNoOfFunc(config.decryptFuncName)
     lastLineOfTransform = getLastLineOfTransform(stmtsDec)
     getForLoopStructsInfo()
 
@@ -655,10 +655,10 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements):
     knownVars = []
     startLineNoOfSearch = None
 
-    blindingVarsThatAreLists = getBlindingVarsThatAreLists(varsThatAreBlindedDict)
+    blindingVarsThatAreLists = getBlindingVarsThatAreLists(varsThatAreBlindedDict, config)
 
-    transformLines = ["BEGIN :: func:" + transformFuncName + "\n"]
-    decoutLines = ["BEGIN :: func:" + decOutFunctionName + "\n"]
+    transformLines = ["BEGIN :: func:" + config.transformFuncName + "\n"]
+    decoutLines = ["BEGIN :: func:" + config.decOutFunctionName + "\n"]
 
     ctExpandListNodes = []
 
@@ -751,7 +751,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements):
         elif (str(currentNode.left) == M):
             decoutLines.append(str(currentNode) + "\n")
             searchForCTVarsThatNeedBuckets(currentNode.right, ctExpandListNodes, ctVarsThatNeedBuckets)
-        elif (str(currentNode.left) in doNotIncludeInTransformList):
+        elif (str(currentNode.left) in config.doNotIncludeInTransformList):
             decoutLines.append(str(currentNode) + "\n")
             searchForCTVarsThatNeedBuckets(currentNode.right, ctExpandListNodes, ctVarsThatNeedBuckets)
         elif ( (len(currentNodePairings) > 0) and (areAllVarsOnLineKnownByTransform == True) ):
@@ -760,7 +760,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements):
             if (groupedPairings[0][0] == []):
                 knownVars.append(str(currentNode.left))
         elif (areAllVarsOnLineKnownByTransform == True):
-            writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, lineNo, astNodes)
+            writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, lineNo, astNodes, config)
             knownVars.append(str(currentNode.left))
         else:
             decoutLines.append(str(currentNode) + "\n")
