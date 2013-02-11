@@ -189,7 +189,7 @@ def getLastLineOfTransform(stmtsDec):
 
     sys.exit("getLastLineOfTransform in transformNEW:  could not locate the line in decrypt where the message is assigned its value.")
 
-def createDecoutInputLine(node, ctVarNames):
+def createDecoutInputLine(node, ctVarNames, allPossibleBlindingFactors):
     listNodes = []
 
     try:
@@ -220,6 +220,9 @@ def createDecoutInputLine(node, ctVarNames):
     #outputString += "}\n"
 
     #decoutLines.append(outputString)
+
+    for bfName in allPossibleBlindingFactors:
+        outputString += ", " + bfName
 
     return outputString
 
@@ -672,6 +675,16 @@ def addListNodesForThisLineToCtExpandListNodes(ctExpandListNodes, ctExpandListNo
         if (listNode not in ctExpandListNodes):
             ctExpandListNodes.append(listNode)
 
+def getAllBlindingExponentsForDecoutLine(varsThatAreBlindedDict):
+    retList = []
+
+    for varName in varsThatAreBlindedDict:
+        possibleNewEntry = varsThatAreBlindedDict[varName][0]
+        if (possibleNewEntry not in retList):
+            retList.append(possibleNewEntry)
+
+    return retList
+
 def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     global currentNumberOfForLoops, withinForLoop, iterationNo
 
@@ -708,6 +721,8 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     transformRunningOutputLine = ""
     decoutRunningInputLine = ""
 
+    allPossibleBlindingFactors = getAllBlindingExponentsForDecoutLine(varsThatAreBlindedDict)
+
     # get knownVars
     for lineNo in range((firstLineOfDecryptFunc + 1), (lastLineOfTransform + 1)):
         currentFullNode = astNodes[lineNo - 1]
@@ -716,7 +731,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
             appendToKnownVars(currentFullNode.right, knownVars)
             startLineNoOfSearch = lineNo
             transformLines.append(str(currentFullNode) + "\n")
-            decoutRunningInputLine = createDecoutInputLine(currentFullNode.right, ctVarNames)
+            decoutRunningInputLine = createDecoutInputLine(currentFullNode.right, ctVarNames, allPossibleBlindingFactors)
             continue
         currentNode = currentFullNode.right
         if (currentNode == None):

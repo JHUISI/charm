@@ -29,6 +29,10 @@ SMTmulCounter = 0
 #SMTleafCounter = 0
 secretKeyElements = []
 masterSecretKeyElements = []
+allMskAndRndVars = []
+
+mskVars = "mskVars"
+rndVars = "rndVars"
 
 def processListOrExpandNodes(binNode, origVarName, newVarName):
     binNodeRight = binNode.right
@@ -422,10 +426,20 @@ def getWhichNonListBFToShare():
     for keyName in sharedBlindingFactorNames:
         return sharedBlindingFactorNames[keyName]
 
+def addExponentsToAllMskAndRndVarsList(node):
+    global allMskAndRndVars
+
+    allExponentNames = GetAttributeVars(node, True)
+
+    for exp in allExponentNames:
+        if (exp not in allMskAndRndVars):
+            allMskAndRndVars.append(exp)
+
 def searchForExponentsRecursive(node, exponentsList, levelNumber):
     if (node.type == ops.EXP):
         if (str(node.right) not in exponentsList):
             exponentsList.append((node.right, levelNumber + 1))
+            addExponentsToAllMskAndRndVarsList(node.right)
     #else:
     if (node.left != None):
         if (node.type == ops.EXP):
@@ -485,10 +499,10 @@ def searchForExponents(node):
     return exponentsArrangedForArithmetic
 
 def shouldWeUseFullBaseElems(keygenOutputElem, config):
-    if (keygenOutputElem not in assignInfo[keygenFuncName]):
+    if (keygenOutputElem not in assignInfo[config.keygenFuncName]):
         sys.exit("shouldWeUseFullBaseElems in keygen.py:  keygenOutputElem parameter passed in is not in assignInfo[keygenFuncName].")
 
-    assignInfoVarEntry = assignInfo[keygenFuncName][keygenOutputElem]
+    assignInfoVarEntry = assignInfo[config.keygenFuncName][keygenOutputElem]
     baseElemsOnlyNode = assignInfoVarEntry.getAssignBaseElemsOnlyThisFunc()
     baseElemsOnly = GetAttributeVars(baseElemsOnlyNode, True)
     for baseElem in baseElemsOnly:
@@ -692,6 +706,22 @@ def getIndividualKeygenElemToSMTExpression(exponents):
     return retExpression
 '''
 
+def addMskRndVars(config):
+    global keygenElemToSMTExp
+
+    keygenElemToSMTExp[mskVars] = []
+    keygenElemToSMTExp[rndVars] = []
+
+    for exp in allMskAndRndVars:
+        if ( (exp in assignInfo[config.setupFuncName]) and (exp not in assignInfo[config.keygenFuncName]) ):
+            if (exp not in keygenElemToSMTExp[mskVars]):
+                keygenElemToSMTExp[mskVars].append(exp)
+        elif ( (exp not in assignInfo[config.setupFuncName]) and (exp in assignInfo[config.keygenFuncName]) ):
+            if (exp not in keygenElemToSMTExp[rndVars]):
+                keygenElemToSMTExp[rndVars].append(exp)
+        else:
+            sys.exit("addMskRndVars in keygen.py:  exponent name is supposed to appear in either config.setupFuncName or config.keygenFuncName, but not both and not neither, which is what is happening here.")
+
 def getKeygenElemToSMTExpressions(rootNodeName, leafNodeName, config):
     global keygenElemToSMTExp
 
@@ -709,6 +739,8 @@ def getKeygenElemToSMTExpressions(rootNodeName, leafNodeName, config):
         else:
             exponents = keygenElemToExponents[keygenElemToExp]
             keygenElemToSMTExp[keygenElemToExp] = getIndividualKeygenElemToSMTExpression(exponents, rootNodeName, leafNodeName, config)
+
+    addMskRndVars(config)
 
 def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListDecls, keygenFuncName):
     global blindingFactors_NonLists, varsThatAreBlinded, varsNameToSecretVarsUsed

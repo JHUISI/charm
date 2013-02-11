@@ -37,6 +37,10 @@ def writeToFile(name, s):
 	fd.write(s)
 	fd.close()
 
+def GetString(GetString_Arg):
+    getUserGlobals()
+    return GetString_Arg.getAttribute()
+
 def createPolicy(policy_str):
 	getUserGlobals()
 	return utilBuiltInFuncs.createPolicy(policy_str)
@@ -51,7 +55,7 @@ def calculateSharesDict(s, policy):
 
 def calculateSharesList(s, policy):
 	getUserGlobals()
-	return utilBuiltInFuncs.calculateSharesList(s, policy)
+	return [ x[1] for x in utilBuiltInFuncs.calculateSharesList(s, policy) ]
 
 def prune(policy, S):
 	getUserGlobals()
