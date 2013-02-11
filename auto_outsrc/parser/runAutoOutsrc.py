@@ -11,8 +11,8 @@ import SDLParser
 
 PREPROCESSED_STRING = "_PREPROCESSED"
 
-def writeLOCFromKeygenToFile(LOCFromKeygen, inputSDLScheme):
-    f = open(inputSDLScheme + finalSDLSuffix, 'w')
+def writeLOCFromKeygenToFile(LOCFromKeygen, inputSDLScheme, config):
+    f = open(inputSDLScheme + config.finalSDLSuffix, 'w')
 
     for line in LOCFromKeygen:
         lenLine = len(line)
@@ -30,10 +30,10 @@ def main(inputSDLScheme, configName, outputFile, outputUserDefFile):
 
     SDLPreProcessor.SDLPreProcessor_main(inputSDLScheme, inputSDLScheme + PREPROCESSED_STRING)
     (linesOfCodeFromKeygen, blindingFactors_NonLists, blindingFactors_Lists) = keygen(inputSDLScheme + PREPROCESSED_STRING, config)
-    writeLOCFromKeygenToFile(linesOfCodeFromKeygen, inputSDLScheme + PREPROCESSED_STRING)
-    codegen_PY.codegen_PY_main(inputSDLScheme + PREPROCESSED_STRING + finalSDLSuffix, outputFile + ".py", outputUserDefFile + ".py")
+    writeLOCFromKeygenToFile(linesOfCodeFromKeygen, inputSDLScheme + PREPROCESSED_STRING, config)
+    codegen_PY.codegen_PY_main(inputSDLScheme + PREPROCESSED_STRING + config.finalSDLSuffix, outputFile + ".py", outputUserDefFile + ".py")
     codegen_CPP.transformOutputList = transformOutputList
-    codegen_CPP.codegen_CPP_main(inputSDLScheme + PREPROCESSED_STRING + finalSDLSuffix, outputFile + ".cpp")
+    codegen_CPP.codegen_CPP_main(inputSDLScheme + PREPROCESSED_STRING + config.finalSDLSuffix, outputFile + ".cpp")
 
 if __name__ == "__main__":
     lenSysArgv = len(sys.argv)
