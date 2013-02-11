@@ -922,7 +922,7 @@ class SubstituteVar:
                 if node.attr_index: 
                     del node.attr_index[:]; node.attr_index = None
                 newNodeName = str(self.new_var)
-                for i in nodeName2[1]:
+                for i in nodeName2[1:]:
                     newNodeName += "#" + str(i)
                 node.setAttribute(newNodeName)
 
@@ -1547,10 +1547,10 @@ if __name__ == "__main__":
     equationList = []
     for stmt in statements:
         node = parser.parse(stmt)
-        print("node=", node, "\nresult=", GetAttributeVars(node, True))
-#        equationList.append(node)
-#        ASTVisitor(SubstituteVar("d", "dBlinded")).preorder(node)
-#        print("New node: ", node)
+#        print("node=", node, "\nresult=", GetAttributeVars(node, True))
+        equationList.append(node)
+        ASTVisitor(SubstituteVar("Kl", "KlBlinded")).preorder(node)
+        print("New node: ", node)
 
     #combinedList = CombinePairings(equationList, True)
     #print("CombList:\t", combinedList)

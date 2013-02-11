@@ -242,26 +242,36 @@ class ConstructRule:
     
 
 class BFSolver:
-    def __init__(self, theSolver, skList, constraintsDict, unsatIDs):
-        self.theSolver = Solver() # theSolver # copy
-        self.theSolver.set(unsat_core=True)
-        self.theSolver.add( theSolver.assertions() )
+    def __init__(self, skList, constraintsDict, unsatIDs):
         self.skList = skList
         self.constraintsDict = constraintsDict
         self.unsatIDs = unsatIDs
 
-    def run(self, unsat_list=[]):
+    def run(self, theSolver, unsat_id=None):
+        self.theSolver = Solver() # theSolver # copy
+        self.theSolver.set(unsat_core=True)
+        self.theSolver.add( theSolver.assertions() )
+        
         for i in self.skList:
             print("BFSolver: key =", i, ", info =", info[i])
-            refs = self.unsatIDs[i]
+            refs = self.unsatIDs[i][0]
+            if unsat_id != None and unsat_id == refs: 
+                print("BFSolver: skipping :", unsat_id)
+                continue
             for j in range(len(self.constraintsDict[ i ])):
-                print("BFSolver: ref: ", refs[j], ", constraint: ", self.constraintsDict[i][j])
-                self.theSolver.assert_and_track(self.constraintsDict[i][j], refs[j])
+                print("BFSolver: ref: ", refs, ", constraint: ", self.constraintsDict[i][j])
+                self.theSolver.assert_and_track(self.constraintsDict[i][j], refs)
+            print("\n")
         
         print(self.theSolver, "\n")
         print(self.theSolver.check())
         if self.theSolver.check() != unsat:
-            print(self.theSolver.model())
+            print("<=== Traversing Model ===>")
+            model = self.theSolver.model()
+            print(model)
+            for i in model.decls():
+                print("%s = %s" % (i.name(), model[i]))
+            print("<=== Traversing Model ===>")
             return True, None
         else:
             unsat_list = self.theSolver.unsat_core()
@@ -282,25 +292,32 @@ unsatIDs = {}
 for i in skList:
     constraints = construct.rule(info[i][root], info[i])
     constraintsDict[ i ] = constraints
-    unsatIDs[ i ] = []
-    for j in range(len(constraints)):
-        ref = 'p' + str(index)
-        unsatIDs[ i ].append(ref)
-        index += 1
+    ref = 'p' + str(index)
+    unsatIDs[ i ] = [ref]
+    index += 1
+#    unsatIDs[ i ] = []
+#    for j in range(len(constraints)):
+#        ref = 'p' + str(index)
+#        unsatIDs[ i ].append(ref)
+#        index += 1
 
+
+# 3. Run the Solver and deal with unsatisfiable cores.
 satisfied = False
 unsat_list = []
-#while not satisfied:
-if True:
-    bf = BFSolver(theSolver, skList, constraintsDict, unsatIDs)
-    print("constraintDict=", constraintsDict)
-    print("unsatIDs=", unsatIDs, "\n")
-    satisfied, newList = bf.run()
-    print("<=== Summary ===>")
-    print(satisfied)
-    print(newList)
-    if satisfied == False:
-        unsat_list += newList
+bf = BFSolver(skList, constraintsDict, unsatIDs)
+
+print("constraintDict=", constraintsDict)
+print("unsatIDs=", unsatIDs, "\n")
+satisfied, newList = bf.run(theSolver)
+print("<=== Summary ===>")
+print("RESULTS: satisfied=", satisfied, "unsat_core=", newList)
+if satisfied == False:
+    for i in newList:
+        pID = str(i)
+        satisfied, newList = bf.run(theSolver, pID)
+        print("NEW RESULTS: satisfied=", satisfied, "unsat_core=", newList)
+
 #    print("Unsat: ", unsat_list)
 #    for i in unsat_list:
 #        print("Re-run w/o id: ", i)
