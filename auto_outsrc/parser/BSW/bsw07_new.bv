@@ -19,12 +19,11 @@ alpha := random(ZR)
 beta := random(ZR)
 
 h := (g^beta)
-f := (g^(1 / beta))
 i := (g^alpha)
 egg := (e(g,g)^alpha)
 
 mk := list{beta, i}
-pk := list{g, h, f, egg}
+pk := list{g, h, egg}
 
 output := list{mk, pk}
 END :: func:setup
@@ -33,7 +32,7 @@ END :: func:setup
 BEGIN :: func:keygen
 input := list{pk, mk, S}
 
-pk := expand{g, h, f, egg}
+pk := expand{g, h, egg}
 mk := expand{beta, i}
 
 r := random(ZR)

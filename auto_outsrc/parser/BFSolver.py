@@ -38,6 +38,90 @@ mskVarsKeyword = 'mskVars'
 rndVarsKeyword = 'rndVars'
 skVarsKeyword = 'skVar'
 
+class CleanInfo:
+    def __init__(self, info, skVars, verbose=False):
+        self.info = info
+        self.skVars = skVars
+        self.verbose = verbose
+        
+    def __handleOp(self, _list):
+        rmVar = None
+        for j in _list:
+            if j.isdigit(): 
+                rmVar = j; break
+        if rmVar != None: _list.remove(j)    
+        return _list
+    
+    def __similar(self, i, j):
+        m = i[:-1]
+        n = j[:-1]
+        if m == n: return True
+        else: return False
+        
+    def __inputPreprocessor(self, exprList, exprDict):
+        for i in exprList:
+            if ADD in i:
+                #print("Process ADD:", i, exprDict[i])
+                exprDict[i] = self.__handleOp(exprDict[i])            
+                self.__inputPreprocessor(exprDict[i], exprDict)
+            elif MUL in i:
+                #print("Process MUL:", i, exprDict[i])
+                exprDict[i] = self.__handleOp(exprDict[i])
+                self.__inputPreprocessor(exprDict[i], exprDict)
+            elif LEAF in i:
+                #print("Process LEAF:", i, exprDict[i])            
+                self.__inputPreprocessor(exprDict[i], exprDict)
+    
+    def __inputCleaner(self, exprList, exprDict):
+        for i in exprList:
+            if (ADD in i) or (MUL in i):
+                if self.verbose: print("Process:", i, exprDict[i])
+                self.__inputCleaner(exprDict[i], exprDict)
+                replaceWithChild = None
+                for j in exprDict[i]:
+                    if self.__similar(i, j): replaceWithChild = j; break
+                if replaceWithChild != None:
+                    exprDict[i].remove(replaceWithChild)
+                    exprDict[i].extend(exprDict[replaceWithChild])
+    
+    def __cleanDict(self, keyList, exprList, exprDict):
+        for i in exprList:
+            if (ADD in i) or (MUL in i):
+                keyList.append(i)
+                self.__cleanDict(keyList, exprDict[i], exprDict)
+            elif (LEAF in i):
+                keyList.append(i)
+        return 
+    
+    def __removeSymbols(self, exprDict):
+        symbols = ['-', '?']
+        for i in exprDict.keys():
+            if type(exprDict[i]) == list:
+                for j in range(len(exprDict[i])):
+                    tmpList = exprDict[i]
+                    if symbols[0] in tmpList[j]:    tmpList[j] = tmpList[j].strip(symbols[0])
+                    if symbols[1] in tmpList[j]: tmpList[j] = tmpList[j].strip(symbols[1])                
+            if type(exprDict[i]) == dict:
+                self.__removeSymbols(exprDict[i])
+            
+        return
+    
+    def clean(self):
+        for i in self.info[self.skVars]:
+            if self.verbose: print("Key:", i)
+            self.__inputPreprocessor(self.info[i][root], self.info[i])  
+            self.__inputCleaner(self.info[i][root], self.info[i])
+            keys = [root]
+            self.__cleanDict(keys, self.info[i][root], self.info[i])
+            for j in self.info[i].keys():
+                if j not in keys:
+                    del self.info[i][j]
+            self.__removeSymbols(self.info[i])
+            if self.verbose: print("RESULT: ", self.info[i])
+        
+    def getUpdatedInfo(self):
+        return self.info
+    
 def readConfig(filename):
     print("Importing file: ", filename)
     file = filename.split('.')[0]
@@ -68,6 +152,11 @@ def _readConfig(fileVars, fileKeys):
     elif skVars == None:
         print(skVarsKeyword, "was not defined in ", filename); sys.exit(-1)
     
+    #print("BEFORE: ", info)
+    ci = CleanInfo(info, skVars)
+    ci.clean()
+    info = ci.getUpdatedInfo()
+    #print("AFTER:  ", info)
     return (mskVars, rndVars, skVars, info)
 
 def clean(v):
@@ -239,7 +328,7 @@ class ConstructRule:
 
     def __handleNotEqualToNil(self, jj):
         if type(jj) == list:
-            self.usedVars = self.usedVars.union([jj])
+            self.usedVars = self.usedVars.union(jj)
             return And([ self.varMap.get(j) != self.nil for j in jj])
         else:
             self.usedVars = self.usedVars.union([jj])
@@ -247,7 +336,7 @@ class ConstructRule:
 
     def __handleEqualToNil(self, jj):
         if type(jj) == list:
-            self.usedVars = self.usedVars.union([jj])
+            self.usedVars = self.usedVars.union(jj)
             return And([ self.varMap.get(j) == self.nil for j in jj])
         else:
             self.usedVars = self.usedVars.union([jj])
@@ -285,7 +374,8 @@ class ConstructRule:
                     varCheck[ i ] = j
                     varCheck[ j ] = i
                     objects.append(ii == jj)
-                        
+        
+        print("OBJECTS: ", objects)
         print("ADD Result: ", Or(objects))
         return [ Or(objects) ]
     
@@ -341,12 +431,14 @@ class BFSolver:
             for i in self.skList:
                 print("SK: ", i, self.unsatIDs[i], )
                 refs = self.unsatIDs[i][0]
-                skSolution = {}
+                self.solution[ i ] = {}
+                self.finalMapOfBFs[ i ] = set()
                 if unsat_id != None and unsat_id == refs: 
                     print("unique blinding factor for: ", i, "\n")
                     bfNew = self.__getPlaceholder()
                     self.usedBFs = self.usedBFs.union([ bfNew ])
                     self.solution[ i ] = bfNew
+                    self.finalMapOfBFs[ i ] = self.finalMapOfBFs[ i ].union([ bfNew ])
                     continue
                 for k in self.constraintsDictVars[i]:
                     for l in model.decls():
@@ -356,8 +448,9 @@ class BFSolver:
                             lVal = str(model[l])
                             if lVal != 'nil':
                                 self.usedBFs = self.usedBFs.union([ lVal ])
-                                skSolution[ lKey ] = lVal
-                self.solution[ i ] = skSolution
+                                self.solution[ i ][ lKey ] = lVal
+                                self.finalMapOfBFs[ i ] = self.finalMapOfBFs[ i ].union([ lVal ])
+#                self.solution[ i ] = skSolution
                 print("")
             print("<=== Interpret Results ===>")
             print("Unique blinding factors: ", self.usedBFs)
@@ -367,8 +460,11 @@ class BFSolver:
 
         return False, unsat_list
     
-    def getSolution(self):
+    def getBFSolution(self):
         return self.solution
+    
+    def getSKSolution(self):
+        return self.finalMapOfBFs
     
 def isSubset(hashList, hashDict, unsatIDs):
     for i in hashDict.keys():
@@ -397,6 +493,7 @@ if __name__ == "__main__":
     unsatIDs = {}
     hashID = {}
     for i in skList:
+        print("key: ", i)
         constraints = construct.rule(info[i][root], info[i])
         constraintsDictVars[ i ] = construct.getUsedVars()
         constraintsDict[ i ] = constraints
@@ -429,10 +526,19 @@ if __name__ == "__main__":
     print("\n<=== Summary ===>")
     print("RESULTS: satisfied=", satisfied, "unsat_core=", newList)
     if satisfied: # iff satsified on the first go around.
-        print(bf.getSolution())
+        print("bfVarsMap = ", bf.getBFSolution())
+        print("skVarsMap = ", bf.getSKSolution())
         exit(0)
         # append results to the input filename
-    else: # satisfied == False
+    elif len(newList) == 1: # satisfied == False
+        pID = str(newList[0])
+        satisfied, newList = bf.run(theSolver, pID)
+        print("NEW RESULTS: satisfied=", satisfied, "unsat_core=", newList)
+        print("<=== END ===>")
+        print("bfVarsMap = ", bf.getBFSolution())
+        print("skVarsMap = ", bf.getSKSolution())
+        print("\n")
+    else:
         for i in newList:
             pID = str(i)
             satisfied, newList = bf.run(theSolver, pID)
