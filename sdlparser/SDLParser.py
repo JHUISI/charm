@@ -172,15 +172,17 @@ class SDLParser:
 
         # captures the binary operators allowed (and, ^, *, /, +, |, ==)        
         MulDivOp = MulOp | DivOp #| AddOp | SubOp
+        ADDSubOp = AddOp | SubOp
         #BinOp = MultiLine | AndOp | ExpOp | MulOp | DivOp | AddOp | SubOp | Equality
         # captures order of parsing token operators 
-        Operators = Equality | BoolOp | AddOp | SubOp | ForDo | ProdOf | SumOf | IfCond | Assignment | MultiLine  # ExpOp | MulOp | DivOp |
+        Operators = Assignment | Equality | BoolOp | ForDo | ProdOf | SumOf | IfCond # | MultiLine  # ExpOp | MulOp | DivOp | AddOp | SubOp
 
         # describes an individual leaf node
         leafNode = Word(alphanums + '_-+*#\\?').setParseAction( createNode )
         expr = Forward()
         term = Forward()
         factor = Forward()
+        foctor1 = Forward()
         factor2 = Forward()
         atom = (BeginAndEndBlock + BlockSep + blockName.setParseAction( pushFirst ) ).setParseAction( pushFirst ) | \
                (ErrorName + sglQuotedString + ')').setParseAction( pushError ) | \
@@ -206,8 +208,10 @@ class SDLParser:
         factor << atom + ZeroOrMore( (ExpOp + factor ).setParseAction( pushFirst ) )  
 
         factor2 = factor + ZeroOrMore( ( MulDivOp + factor ).setParseAction( pushFirst ) )
+        
+        factor1 = factor2 + ZeroOrMore( ( ADDSubOp + factor2 ).setParseAction( pushFirst ) )
 
-        term = factor2 + ZeroOrMore((Operators + factor2).setParseAction( pushFirst ))
+        term = factor1 + ZeroOrMore((Operators + factor1).setParseAction( pushFirst ))
         # define placeholder set earlier with a 'term' + Operator + another term, where there can be
         # more than zero or more of the latter. Once we find a term, we first push that into
         # the stack, then if ther's an operand + term, then we first push the term, then the Operator.

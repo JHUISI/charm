@@ -152,6 +152,7 @@ def _readConfig(fileVars, fileKeys):
     elif skVars == None:
         print(skVarsKeyword, "was not defined in ", filename); sys.exit(-1)
     
+    info[skVars].sort()
     #print("BEFORE: ", info)
     ci = CleanInfo(info, skVars)
     ci.clean()

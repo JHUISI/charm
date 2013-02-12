@@ -1588,7 +1588,7 @@ if __name__ == "__main__":
     equationList = []
     for stmt in statements:
         node = parser.parse(stmt)
-        print("BinNode: ", node, type(node))
+        print("BinNode: ", node, node.type)
         #evalStr = PEMDAS(node)
         #evalStrWOP = ''
         #for i in evalStr:
