@@ -590,6 +590,8 @@ def makeReplacementsForMasterPublicVars(node, config):
 
     parser = SDLParser()
     newNode = parser.parse(nodeAsStr)
+    if (type(newNode).__name__ == 'str'):
+        newNode = BinaryNode(newNode)
     return newNode
 
 def getAllKeygenElemsToExponentsDictEntries(keygenOutputElem, keygenFuncName, config):
@@ -984,7 +986,9 @@ def keygen(file, config):
     #sys.exit("test")
 
     resultDictionary = instantiateBFSolver(config)
-    sys.exit("test")
+    #sys.exit("test")
+
+    resultDictionary = {'sk':'bf0'}
 
     for keygenOutput_ind in keygenOutput:
         blindKeygenOutputElement(keygenOutput_ind, varsToBlindList, varNamesForListDecls, keygenFuncName)
