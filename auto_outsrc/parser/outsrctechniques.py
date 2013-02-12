@@ -1538,7 +1538,48 @@ def CombinePairings(nodeList, _verbose=False):
     ASTVisitor(getPair).preorder(equation)
     return getPair.getList()
 
+def PEMDAS(node):
+    if (type(node) is str):
+        return str(node)
+    elif ( (node.type == ops.ATTR)):
+        return str(node)
+    elif (node.type == ops.ADD):
+        leftString = PEMDAS(node.left)
+        rightString = PEMDAS(node.right)
+        return "(" + leftString + " + " + rightString + ")"
+    elif (node.type == ops.SUB):
+        leftString = PEMDAS(node.left)
+        rightString = PEMDAS(node.right)
+        return "(" + leftString + " - " + rightString + ")"
+    elif (node.type == ops.MUL):
+        leftString = PEMDAS(node.left)
+        rightString = PEMDAS(node.right)
+        return "(" + leftString + " * " + rightString + ")"
+    elif (node.type == ops.DIV):
+        leftString = PEMDAS(node.left)
+        rightString = PEMDAS(node.right)
+        return "(" + leftString + " / " + rightString + ")"
+    elif (node.type == ops.EXP):
+        leftString = PEMDAS(node.left)
+        rightString = PEMDAS(node.right)
+        return "(" + leftString + " ** " + rightString + ")"
+    
+    print("DEBUG: not supported!")
+    return ""
 
+#class PEMDAS:
+#    def __init__(self):
+#        self.result = None
+#        
+#    def visit(self, node, data):
+#        pass
+#    
+#    def visit_mul(self, node, data):
+#        Left = str(node.left)
+#        Right = str(node.right)
+#        if Left.isdigit() and Right.isdigit():
+#            if self.result == None: self.result = int(Left) * int(Right)
+#            else: self.result *= int(Left) 
 
 
 if __name__ == "__main__":
@@ -1547,10 +1588,17 @@ if __name__ == "__main__":
     equationList = []
     for stmt in statements:
         node = parser.parse(stmt)
+        evalStr = PEMDAS(node)
+        evalStrWOP = ''
+        for i in evalStr:
+            if i != '(' and i != ')': evalStrWOP += i
+        print("BinNode: ", node)
+        print("1: Expr w/ P: ", evalStr, "\t=>\t", eval(evalStr))
+        print("2: Expr w/o P: ", evalStrWOP, "\t=>\t", eval(evalStrWOP))
+
 #        print("node=", node, "\nresult=", GetAttributeVars(node, True))
-        equationList.append(node)
-        ASTVisitor(SubstituteVar("Kl", "KlBlinded")).preorder(node)
-        print("New node: ", node)
+#        equationList.append(node)
+#        ASTVisitor(SubstituteVar("Kl", "KlBlinded")).preorder(node)
 
     #combinedList = CombinePairings(equationList, True)
     #print("CombList:\t", combinedList)

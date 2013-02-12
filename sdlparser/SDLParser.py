@@ -165,10 +165,10 @@ class SDLParser:
         ErrorName  = Literal("error(") 
 
         # captures the binary operators allowed (and, ^, *, /, +, |, ==)        
-        BinOp = MultiLine | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | Equality
+        BinOp = ExpOp | MulOp | DivOp #| AddOp | SubOp
+        #BinOp = MultiLine | AndOp | ExpOp | MulOp | DivOp | AddOp | SubOp | Equality
         # captures order of parsing token operators
-        Token = Equality | AndOp | ExpOp | MulOp | DivOp | SubOp | AddOp | ForDo | ProdOf | SumOf | IfCond | Assignment | MultiLine
-        Operator = Token 
+        Operators = Equality | AndOp | ExpOp | MulOp | DivOp | AddOp | SubOp | ForDo | ProdOf | SumOf | IfCond | Assignment | MultiLine
         #Operator = OperatorAND | OperatorOR | Token
 
         # describes an individual leaf node
@@ -193,19 +193,21 @@ class SDLParser:
                (ElseCond ).setParseAction( pushFirst ) | \
                lpar + expr + rpar | (leafNode).setParseAction( pushFirst )
 
-        # Represents the order of operations (^, *, |, ==)
+        # Represents the order of operations (^, *, /)
         # Place more value on atom [ ^ factor}, so gets pushed on the stack before atom [ = factor], right?
         # In other words, adds order of precedence to how we parse the string. This means we are parsing from right
         # to left. a^b has precedence over b = c essentially
         #factor << atom + ZeroOrMore( ( ExpOp + factor ).setParseAction( pushFirst ) )
-        factor << atom + ZeroOrMore( ( BinOp + factor ).setParseAction( pushFirst ) )
+        factor << atom + ZeroOrMore( ( BinOp + atom ).setParseAction( pushFirst ) )
         
-        term = atom + ZeroOrMore((Operator + factor).setParseAction( pushFirst ))
+        # term = atom + ZeroOrMore((Operator + factor).setParseAction( pushFirst ))
+        term = factor + ZeroOrMore((Operators + factor).setParseAction( pushFirst ))
         # define placeholder set earlier with a 'term' + Operator + another term, where there can be
         # more than zero or more of the latter. Once we find a term, we first push that into
         # the stack, then if ther's an operand + term, then we first push the term, then the Operator.
         # so on and so forth (follows post fix notation).
-        expr << term + ZeroOrMore((Operator + term).setParseAction( pushFirst ))
+        expr << term + ZeroOrMore((Operators + term).setParseAction( pushFirst ))
+
         # final bnf object
         finalPol = expr#.setParseAction( debugParser )
         finalPol.ignore( Comment )
