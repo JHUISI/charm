@@ -3,7 +3,7 @@ from sdlparser.SDLParser import *
 from transformNEW import *
 from secretListInKeygen import getSecretList
 from outsrctechniques import SubstituteVar, GetAttributeVars
-import sys
+import os, sys, string, random
 
 linesOfCode = None
 assignInfo = None
@@ -897,6 +897,40 @@ def getMasterSecretKeyElements(config):
     #print(masterSecretKeyElements)
     #sys.exit("test")
 
+def instantiateBFSolver(config):
+    # get random file
+    name = ""
+    length = 5
+    for i in range(length):
+        name += random.choice(string.ascii_lowercase + string.digits)
+    name += ".py"
+    # prepare input configuration file
+    skVarsOutputVar = "skVar = '" + str(config.keygenSecVar) + "'\n"
+    mskVarsOutputVar = "mskVars = " + str(mskVars) + "\n"
+    rndVarsOutputVar = "rndVars = " + str(rndVars) + "\n"
+    infoOutputVar = "info = " + str(keygenElemToSMTExp) + "\n"
+    
+    f = open(name, 'w')
+    f.write(skVarsOutputVar)
+    f.write(mskVarsOutputVar)
+    f.write(rndVarsOutputVar)
+    f.write(infoOutputVar)
+    f.close()
+    
+    print("See: ", name)    
+    print("<================== BFSolver ==================>")
+    os.system("python2.7 BFSolver.py %s" % name)
+    print("<================== BFSolver ==================>")
+
+    #newName = name.split('.')[0]
+    #results = importlib.import_module(newName)
+    #os.system("rm -f " + name + " " + name + "c")
+    
+    #print(results.resultDictionary)
+    #os.system("rm -f " + name + "*")    
+    #return results.resultDictionary
+    return None
+
 def keygen(file, config):
     #print(config.keygenFuncName)
  
@@ -949,7 +983,8 @@ def keygen(file, config):
         #print(elem, " = ", keygenElemToSMTExp[elem])
     #sys.exit("test")
 
-    #AYO:  PUT IT HERE
+    resultDictionary = instantiateBFSolver(config)
+    sys.exit("test")
 
     for keygenOutput_ind in keygenOutput:
         blindKeygenOutputElement(keygenOutput_ind, varsToBlindList, varNamesForListDecls, keygenFuncName)

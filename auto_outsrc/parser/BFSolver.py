@@ -1,9 +1,8 @@
 from __future__ import print_function
 from z3 import *
-import string
+import string, sys, importlib
 
 # input for our BF solver
-#bfCount = 5
 #mskVars = ['alpha', 't1', 't2', 't3', 't4']
 #rndVars = ['r1', 'r2']
 #
@@ -16,11 +15,11 @@ import string
 #info = {'d3': {'root': ['ADD0'], 'ADD0': ['t4', '-r2', 'hID#y']}, 'sk': {}, 'd4': {'root': ['ADD0'], 'ADD0': ['t3', '-r2', 'hID#y']}, 'd2': {'root': ['ADD0'], 'ADD0': ['t1', '-alpha', 't1', '-r1', 'hID#y']}, 'id': {}, 'd0': {'ADD0': ['MUL0', 'MUL2'], 'MUL2': ['r2', 'MUL3'], 'MUL3': ['t3', 't4'], 'MUL0': ['r1', 'MUL1'], 'MUL1': ['t1', 't2'], 'root': ['ADD0']}, 'd1': {'root': ['ADD0'], 'ADD0': ['t2', '-alpha', 't2', '-r1', 'hID#y']}}
 #skVars = ['d0', 'd1', 'd2', 'd3', 'd4']
 
-bfCount = 2
-mskVars = ['alpha']
-rndVars = ['t', 'beta'] # try to capture ordering of instances of random vars.
+#mskVars = ['alpha']
+#rndVars = ['t']
 
-info = {'sk': ['K', 'L', 'Kl'], 'K': {'root': ['MUL0'], 'ADD0':['alpha', 'beta'], 'MUL0':['ADD0','t']}, 'L': {'root':['LEAF0'], 'LEAF0':['t']}, 'Kl': {'root':['LEAF0'], 'LEAF0':['t']}}
+#rndVars = ['t', 'beta'] # try to capture ordering of instances of random vars.
+#info = {'sk': ['K', 'L', 'Kl'], 'K': {'root': ['MUL0'], 'ADD0':['alpha', 'beta'], 'MUL0':['ADD0','t']}, 'L': {'root':['LEAF0'], 'LEAF0':['t']}, 'Kl': {'root':['LEAF0'], 'LEAF0':['t']}}
 
 #rndVars = ['t', 'beta', 's'] # try to capture ordering of instances of random vars.
 #info = {'sk': ['K', 'L', 'Kl'], 'K': {'root': ['ADD0'], 'ADD0': ['MUL0','MUL1'], 'MUL0':['alpha', 'beta'], 'MUL1':['s', 't']}, 'L': {'root':['LEAF0'], 'LEAF0':['t']}, 'Kl': {'root':['LEAF0'], 'LEAF0':['t']}}
@@ -28,12 +27,48 @@ info = {'sk': ['K', 'L', 'Kl'], 'K': {'root': ['MUL0'], 'ADD0':['alpha', 'beta']
 #rndVars = ['t', 'beta']
 #info = {'sk': ['K', 'L', 'Kl'], 'K': {'root': ['ADD0'], 'ADD0': ['t','MUL0'], 'MUL0':['alpha', 'beta']}, 'L': {'root':['LEAF0'], 'LEAF0':['t']}, 'Kl': {'root':['LEAF0'], 'LEAF0':['t']}}
 #info = {'sk': ['K', 'L', 'Kl'], 'K': {'root': ['ADD0'], 'ADD0': ['alpha','t']}, 'L': {'root':['LEAF0'], 'LEAF0':['t']}, 'Kl': {'root':['LEAF0'], 'LEAF0':['t']}}
-skVars = 'sk'
 
 ######################################################################################
+bfCount = 0
 root = 'root'
 ADD,MUL,LEAF='ADD','MUL','LEAF'
 nil = None
+infoKeyword = 'info'
+mskVarsKeyword = 'mskVars'
+rndVarsKeyword = 'rndVars'
+skVarsKeyword = 'skVar'
+
+def readConfig(filename):
+    print("Importing file: ", filename)
+    file = filename.split('.')[0]
+
+    fileVars = importlib.import_module(file)
+    fileKeys = dir(fileVars)
+    return _readConfig(fileVars, fileKeys)
+
+def _readConfig(fileVars, fileKeys):
+    info = None
+    skVars = None
+    mskVars = []
+    rndVars = []
+    
+    if infoKeyword in fileKeys:
+        info = getattr(fileVars, infoKeyword)
+    if mskVarsKeyword in fileKeys:
+        mskVars = getattr(fileVars, mskVarsKeyword)
+    if rndVarsKeyword in fileKeys:
+        rndVars = getattr(fileVars, rndVarsKeyword)
+    if skVarsKeyword in fileKeys:
+        skVars = getattr(fileVars, skVarsKeyword)
+    
+    if len(mskVars) == 0:
+        print(mskVarsKeyword, "was not defined in ", filename); sys.exit(-1)
+    elif info == None:
+        print(infoKeyword, "was not defined in ", filename); sys.exit(-1)
+    elif skVars == None:
+        print(skVarsKeyword, "was not defined in ", filename); sys.exit(-1)
+    
+    return (mskVars, rndVars, skVars, info)
 
 def clean(v):
     removeSymbols = ['-', '#', '?']
@@ -42,9 +77,9 @@ def clean(v):
             v.strip(i)
     return v
 
-
 class SetupBFSolver:
-    def __init__(self):
+    def __init__(self, bfCount):
+        self.bfCount = bfCount
         self.factorsList = None
         self.theVarMap = None
         self.varList = None
@@ -54,11 +89,12 @@ class SetupBFSolver:
     def construct(self, mskVars, rndVars):
         # Standard code below
         keygenVars = mskVars + rndVars
-        alphabet = string.ascii_lowercase
+        alphabet = 'bf' #string.ascii_lowercase
         factors = []
         
-        for i in range(bfCount):
-            factors.append(alphabet[i])
+        for i in range(self.bfCount):
+            factors.append(alphabet + str(i))
+#            factors.append(alphabet[i])
         factors.append('nil') # no blinding factor
         print("selected factors :", factors)
         
@@ -136,11 +172,17 @@ class ConstructRule:
                 attrList.append(i)
         return newData, attrList
     
+    def getUsedVars(self):
+        return self.usedVars
+    
     def rule(self, ruleType, data, retList=False, excludeList=[]):
+        self.usedVars = set()
         finalConstraints = []
+        newData = None
         for i in ruleType:
             if ADD in i:
                 if self.baseCase(data[i]):
+                    if retList: newData = data[i]
                     finalConstraints += self.__addRule(data[i], excludeList)
                 else:
                     newRuleList, attrList = self.getFirstNonAttr(data[i])
@@ -159,6 +201,7 @@ class ConstructRule:
                         finalConstraints += self.rule(newRuleList, data, retList, excludeList)
             elif MUL in i:
                 if self.baseCase(data[i]):
+                    if retList: newData = data[i]
                     finalConstraints += self.__mulRule(data[i], excludeList)
                 else:
                     print("dealing with mix modes!!!")
@@ -181,13 +224,14 @@ class ConstructRule:
                         finalConstraints += self.rule(newRuleList, data, retList, excludeList)                        
             elif LEAF in i:
                 finalConstraints += self.__attrRule(data[i]) # base case
-        if retList: return finalConstraints, data[i]
+        if retList: return finalConstraints, newData
         return finalConstraints
     
     def __attrRule(self, data):
         orObjects = []
         print("ATTR Rule: ", data)
         for i in data:
+            self.usedVars = self.usedVars.union([ i ])
             orObjects.append(self.varMap.get(i) != self.nil)
 #            orObjects.append(self.varMap.get(i) == nil)
         print("Result:", Or(orObjects))
@@ -195,14 +239,18 @@ class ConstructRule:
 
     def __handleNotEqualToNil(self, jj):
         if type(jj) == list:
+            self.usedVars = self.usedVars.union([jj])
             return And([ self.varMap.get(j) != self.nil for j in jj])
         else:
+            self.usedVars = self.usedVars.union([jj])
             return self.varMap.get(jj) != self.nil
 
     def __handleEqualToNil(self, jj):
         if type(jj) == list:
+            self.usedVars = self.usedVars.union([jj])
             return And([ self.varMap.get(j) == self.nil for j in jj])
         else:
+            self.usedVars = self.usedVars.union([jj])
             return self.varMap.get(jj) == self.nil
 
     def __mulRule(self, data, bindList):
@@ -228,6 +276,7 @@ class ConstructRule:
         varCheck = {}
         objects = []
         for i in data:
+            self.usedVars = self.usedVars.union([i])
             for j in data:
                 if i in excludeList and j in excludeList: continue
                 ii = self.varMap.get(i)
@@ -241,13 +290,33 @@ class ConstructRule:
         return [ Or(objects) ]
     
 
+
+# simultaneous solver over sk element variables.
+class SKSolver:
+    def __init__(self, skList):
+        self.skList = skList
+    
+    def run(self):
+        pass
+
 class BFSolver:
-    def __init__(self, skList, constraintsDict, unsatIDs):
+    def __init__(self, skList, constraintsDict, constraintsDictVars, unsatIDs):
         self.skList = skList
         self.constraintsDict = constraintsDict
+        self.constraintsDictVars = constraintsDictVars # shows variables that were used
         self.unsatIDs = unsatIDs
-
+        self.usedBFs = None
+#        self.allBFs = allBFs
+        self.finalMapOfBFs = {}
+        self.solution = {}
+        
+    def __getPlaceholder(self):
+        self.index += 1
+        return"uf" + str(self.index) 
+    
     def run(self, theSolver, unsat_id=None):
+        self.index = 0
+        self.usedBFs = set()
         self.theSolver = Solver() # theSolver # copy
         self.theSolver.set(unsat_core=True)
         self.theSolver.add( theSolver.assertions() )
@@ -256,7 +325,7 @@ class BFSolver:
             print("BFSolver: key =", i, ", info =", info[i])
             refs = self.unsatIDs[i][0]
             if unsat_id != None and unsat_id == refs: 
-                print("BFSolver: skipping :", unsat_id)
+                print("BFSolver: skipping :", unsat_id,"\n")
                 continue
             for j in range(len(self.constraintsDict[ i ])):
                 print("BFSolver: ref: ", refs, ", constraint: ", self.constraintsDict[i][j])
@@ -264,62 +333,111 @@ class BFSolver:
             print("\n")
         
         print(self.theSolver, "\n")
-        print(self.theSolver.check())
+        print(self.theSolver.check(), "\n")
         if self.theSolver.check() != unsat:
-            print("<=== Traversing Model ===>")
+            print("<=== Interpret Results ===>")
             model = self.theSolver.model()
             print(model)
-            for i in model.decls():
-                print("%s = %s" % (i.name(), model[i]))
-            print("<=== Traversing Model ===>")
+            for i in self.skList:
+                print("SK: ", i, self.unsatIDs[i], )
+                refs = self.unsatIDs[i][0]
+                skSolution = {}
+                if unsat_id != None and unsat_id == refs: 
+                    print("unique blinding factor for: ", i, "\n")
+                    bfNew = self.__getPlaceholder()
+                    self.usedBFs = self.usedBFs.union([ bfNew ])
+                    self.solution[ i ] = bfNew
+                    continue
+                for k in self.constraintsDictVars[i]:
+                    for l in model.decls():
+                        lKey = str(l.name())
+                        if lKey in k:
+                            print("%s = %s" % (l.name(), model[l]))
+                            lVal = str(model[l])
+                            if lVal != 'nil':
+                                self.usedBFs = self.usedBFs.union([ lVal ])
+                                skSolution[ lKey ] = lVal
+                self.solution[ i ] = skSolution
+                print("")
+            print("<=== Interpret Results ===>")
+            print("Unique blinding factors: ", self.usedBFs)
             return True, None
         else:
             unsat_list = self.theSolver.unsat_core()
 
         return False, unsat_list
-# 1. construct the SetupBF Solver w/ initial 
-setupBF = SetupBFSolver()
-theSolver = setupBF.construct(mskVars, rndVars)
-theVarMap = setupBF.theVarMap
-nil = setupBF.nil
-
-# 2. construct rule and store for each expression
-index = 0
-construct = ConstructRule(theVarMap, nil)
-skList = info.get(skVars)
-constraintsDict = {}
-unsatIDs = {}
-for i in skList:
-    constraints = construct.rule(info[i][root], info[i])
-    constraintsDict[ i ] = constraints
-    ref = 'p' + str(index)
-    unsatIDs[ i ] = [ref]
-    index += 1
-#    unsatIDs[ i ] = []
-#    for j in range(len(constraints)):
-#        ref = 'p' + str(index)
-#        unsatIDs[ i ].append(ref)
-#        index += 1
+    
+    def getSolution(self):
+        return self.solution
+    
+def isSubset(hashList, hashDict, unsatIDs):
+    for i in hashDict.keys():
+        if set(hashList).issubset( hashDict[i] ):
+            print("Found a subset. Existing reference = ", unsatIDs[i])
+            return unsatIDs[i]
+    return 
 
 
-# 3. Run the Solver and deal with unsatisfiable cores.
-satisfied = False
-unsat_list = []
-bf = BFSolver(skList, constraintsDict, unsatIDs)
+if __name__ == "__main__":
+    filename = sys.argv[1]
+    (mskVars, rndVars, skVars, info) = readConfig(filename)
+    # 1. construct the SetupBF Solver w/ initial 
+    bfCount = len(info.get(skVars))
+    setupBF = SetupBFSolver(bfCount)
+    theSolver = setupBF.construct(mskVars, rndVars)
+    theVarMap = setupBF.theVarMap
+    nil = setupBF.nil
+    
+    # 2. construct rule and store for each expression
+    index = 0
+    construct = ConstructRule(theVarMap, nil)
+    skList = info.get(skVars)
+    constraintsDict = {}
+    constraintsDictVars = {}
+    unsatIDs = {}
+    hashID = {}
+    for i in skList:
+        constraints = construct.rule(info[i][root], info[i])
+        constraintsDictVars[ i ] = construct.getUsedVars()
+        constraintsDict[ i ] = constraints
+        _hashID = []
+        unsatIDs[ i ] = []
+        for j in range(len(constraints)):
+            _hashID.append(constraints[j].hash())
+        
+        # determine if hashID list is a subset of another variable. 
+        # Replace the refID to minimize assert tracking issues associated with group element expressions
+        refVal = isSubset(_hashID, hashID, unsatIDs)
+        if refVal == None:
+            ref = 'p' + str(index)
+            unsatIDs[ i ].append(ref)
+            index += 1
+        else:
+            unsatIDs[ i ] = refVal
+        hashID[i] = _hashID
+                
+    # 3. Run the Solver and deal with unsatisfiable cores.
+    satisfied = False
+    unsat_list = []
+    bf = BFSolver(skList, constraintsDict, constraintsDictVars, unsatIDs)
+    
+    print("constraintsDictVars=", constraintsDictVars)
+    print("constraintDict=", constraintsDict)
+    print("unsatIDs=", unsatIDs, "\n")
 
-print("constraintDict=", constraintsDict)
-print("unsatIDs=", unsatIDs, "\n")
-satisfied, newList = bf.run(theSolver)
-print("<=== Summary ===>")
-print("RESULTS: satisfied=", satisfied, "unsat_core=", newList)
-if satisfied == False:
-    for i in newList:
-        pID = str(i)
-        satisfied, newList = bf.run(theSolver, pID)
-        print("NEW RESULTS: satisfied=", satisfied, "unsat_core=", newList)
-
-#    print("Unsat: ", unsat_list)
-#    for i in unsat_list:
-#        print("Re-run w/o id: ", i)
-
-# TODO: need a strategy to augment solver and keep skList consistent when constraints are unsatisfiable.
+    satisfied, newList = bf.run(theSolver)
+    print("\n<=== Summary ===>")
+    print("RESULTS: satisfied=", satisfied, "unsat_core=", newList)
+    if satisfied: # iff satsified on the first go around.
+        print(bf.getSolution())
+        exit(0)
+        # append results to the input filename
+    else: # satisfied == False
+        for i in newList:
+            pID = str(i)
+            satisfied, newList = bf.run(theSolver, pID)
+            print("NEW RESULTS: satisfied=", satisfied, "unsat_core=", newList)
+            print("<=== END ===>")
+            print("\n")
+    
+    # TODO: need a strategy to augment solver and keep skList consistent when constraints are unsatisfiable.
