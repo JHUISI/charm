@@ -103,6 +103,12 @@ def pushFirst( s, loc, toks ):
        print("Pushing first =>", toks[0])
     objStack.append( toks[0] )
 
+def pushLast( s, loc, toks ):
+    if debug >= levels.some:
+       print("Pushing last =>", toks)
+    objStack.append( toks[0] )
+
+
 def pushError(s, loc, toks ):
     if debug >= levels.some: print("Pushing all => ", toks)
     if len(toks) == 3:
@@ -127,7 +133,7 @@ class SDLParser:
         self.verbose = verbose
 
     def getBNF(self):
-        AndOp = Literal("and")
+        BoolOp = CaselessLiteral("and") | CaselessLiteral("or")
         lpar = Literal("(").suppress() | Literal("{").suppress()
         rpar = Literal(")").suppress() | Literal("}").suppress()
         rcurly = Literal("}").suppress()
@@ -165,17 +171,17 @@ class SDLParser:
         ErrorName  = Literal("error(") 
 
         # captures the binary operators allowed (and, ^, *, /, +, |, ==)        
-        BinOp = ExpOp | MulOp | DivOp #| AddOp | SubOp
+        MulDivOp = MulOp | DivOp #| AddOp | SubOp
         #BinOp = MultiLine | AndOp | ExpOp | MulOp | DivOp | AddOp | SubOp | Equality
-        # captures order of parsing token operators
-        Operators = Equality | AndOp | ExpOp | MulOp | DivOp | AddOp | SubOp | ForDo | ProdOf | SumOf | IfCond | Assignment | MultiLine
-        #Operator = OperatorAND | OperatorOR | Token
+        # captures order of parsing token operators 
+        Operators = Equality | BoolOp | AddOp | SubOp | ForDo | ProdOf | SumOf | IfCond | Assignment | MultiLine  # ExpOp | MulOp | DivOp |
 
         # describes an individual leaf node
         leafNode = Word(alphanums + '_-+*#\\?').setParseAction( createNode )
         expr = Forward()
         term = Forward()
         factor = Forward()
+        factor2 = Forward()
         atom = (BeginAndEndBlock + BlockSep + blockName.setParseAction( pushFirst ) ).setParseAction( pushFirst ) | \
                (ErrorName + sglQuotedString + ')').setParseAction( pushError ) | \
                (Hash + expr + ',' + expr + rpar).setParseAction( pushFirst ) | \
@@ -192,16 +198,16 @@ class SDLParser:
                (IfCond + expr + rpar).setParseAction( pushFirst ) | \
                (ElseCond ).setParseAction( pushFirst ) | \
                lpar + expr + rpar | (leafNode).setParseAction( pushFirst )
-
-        # Represents the order of operations (^, *, /)
-        # Place more value on atom [ ^ factor}, so gets pushed on the stack before atom [ = factor], right?
-        # In other words, adds order of precedence to how we parse the string. This means we are parsing from right
-        # to left. a^b has precedence over b = c essentially
-        #factor << atom + ZeroOrMore( ( ExpOp + factor ).setParseAction( pushFirst ) )
-        factor << atom + ZeroOrMore( ( BinOp + atom ).setParseAction( pushFirst ) )
         
-        # term = atom + ZeroOrMore((Operator + factor).setParseAction( pushFirst ))
-        term = factor + ZeroOrMore((Operators + factor).setParseAction( pushFirst ))
+        # fourFn.py example: 
+        # by defining exponentiation as "atom [ ^ factor ]..." instead of "atom [ ^ atom ]...", 
+        # we get right-to-left exponents, instead of left-to-right.
+        # e.g., 2^3^2 = 2^(3^2), not (2^3)^2.
+        factor << atom + ZeroOrMore( (ExpOp + factor ).setParseAction( pushFirst ) )  
+
+        factor2 = factor + ZeroOrMore( ( MulDivOp + factor ).setParseAction( pushFirst ) )
+
+        term = factor2 + ZeroOrMore((Operators + factor2).setParseAction( pushFirst ))
         # define placeholder set earlier with a 'term' + Operator + another term, where there can be
         # more than zero or more of the latter. Once we find a term, we first push that into
         # the stack, then if ther's an operand + term, then we first push the term, then the Operator.

@@ -580,8 +580,8 @@ class BinaryNode:
 			
 			if debug >= levels.some:
 			   print("Operation: ", self.type)
-			   print("Left operand: ", left, "type: ", self.left.type)
-			   print("Right operand: ", right, "type: ", self.right.type)
+			   print("Left operand: ", left) #, "type: ", leftType)
+			   print("Right operand: ", right) #, "type: ", rightType)
 			if(self.type == ops.BEGIN):
 				return (START_TOKEN + ' :: ' + left)
 			elif(self.type == ops.END):
@@ -712,8 +712,8 @@ class BinaryNode:
 			
 			if debug >= levels.some:
 			   print("Operation: ", self.type)
-			   print("Left operand: ", left, "type: ", self.left.type)
-			   print("Right operand: ", right, "type: ", self.right.type)
+			   print("Left operand: ", left) #, "type: ", self.left.type)
+			   print("Right operand: ", right) #, "type: ", self.right.type)
 			if(self.type == ops.BEGIN):
 				return (START_TOKEN + ' :: ' + left)
 			elif(self.type == ops.END):

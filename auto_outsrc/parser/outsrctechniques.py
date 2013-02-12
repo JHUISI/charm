@@ -1588,13 +1588,13 @@ if __name__ == "__main__":
     equationList = []
     for stmt in statements:
         node = parser.parse(stmt)
-        evalStr = PEMDAS(node)
-        evalStrWOP = ''
-        for i in evalStr:
-            if i != '(' and i != ')': evalStrWOP += i
-        print("BinNode: ", node)
-        print("1: Expr w/ P: ", evalStr, "\t=>\t", eval(evalStr))
-        print("2: Expr w/o P: ", evalStrWOP, "\t=>\t", eval(evalStrWOP))
+        print("BinNode: ", node, type(node))
+        #evalStr = PEMDAS(node)
+        #evalStrWOP = ''
+        #for i in evalStr:
+        #    if i != '(' and i != ')': evalStrWOP += i
+        #print("1: Expr w/ P: ", evalStr, "\t=>\t", eval(evalStr))
+        #print("2: Expr w/o P: ", evalStrWOP, "\t=>\t", eval(evalStrWOP))
 
 #        print("node=", node, "\nresult=", GetAttributeVars(node, True))
 #        equationList.append(node)
