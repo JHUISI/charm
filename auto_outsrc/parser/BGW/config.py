@@ -3,6 +3,7 @@ schemeName = "BGW"
 rootNodeName = 'root'
 addNodePrefix = 'ADD'
 mulNodePrefix = 'MUL'
+leafNodeName = 'LEAF0'
 
 inputVarName = "input"
 outputVarName = "output"

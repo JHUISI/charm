@@ -31,8 +31,8 @@ secretKeyElements = []
 masterSecretKeyElements = []
 allMskAndRndVars = []
 
-mskVars = "mskVars"
-rndVars = "rndVars"
+mskVars = []
+rndVars = []
 
 def processListOrExpandNodes(binNode, origVarName, newVarName):
     binNodeRight = binNode.right
@@ -707,18 +707,18 @@ def getIndividualKeygenElemToSMTExpression(exponents):
 '''
 
 def addMskRndVars(config):
-    global keygenElemToSMTExp
+    global keygenElemToSMTExp, mskVars, rndVars
 
-    keygenElemToSMTExp[mskVars] = []
-    keygenElemToSMTExp[rndVars] = []
+    #keygenElemToSMTExp[mskVars] = []
+    #keygenElemToSMTExp[rndVars] = []
 
     for exp in allMskAndRndVars:
         if ( (exp in assignInfo[config.setupFuncName]) and (exp not in assignInfo[config.keygenFuncName]) ):
-            if (exp not in keygenElemToSMTExp[mskVars]):
-                keygenElemToSMTExp[mskVars].append(exp)
+            if (exp not in mskVars):
+                mskVars.append(exp)
         elif ( (exp not in assignInfo[config.setupFuncName]) and (exp in assignInfo[config.keygenFuncName]) ):
-            if (exp not in keygenElemToSMTExp[rndVars]):
-                keygenElemToSMTExp[rndVars].append(exp)
+            if (exp not in rndVars):
+                rndVars.append(exp)
         else:
             sys.exit("addMskRndVars in keygen.py:  exponent name is supposed to appear in either config.setupFuncName or config.keygenFuncName, but not both and not neither, which is what is happening here.")
 
@@ -730,10 +730,10 @@ def getKeygenElemToSMTExpressions(rootNodeName, leafNodeName, config):
         #print(keygenElemToExponents[keygenElemToExp])
         #print("\n\n")
 
-        if (keygenElemToExp == keygenSecVar):
+        if (keygenElemToExp == config.keygenSecVar):
             secVarRetList = []
             for secretKeyElem in secretKeyElements:
-                if (secretKeyElem != keygenSecVar):
+                if (secretKeyElem != config.keygenSecVar):
                     secVarRetList.append(secretKeyElem)
             keygenElemToSMTExp[keygenElemToExp] = secVarRetList
         else:
@@ -884,7 +884,7 @@ def getMasterSecretKeyElements(config):
 
     mskFuncAssignInfoEntry = assignInfo[mskFunc]
 
-    for mskElem in masterSecVars:
+    for mskElem in config.masterSecVars:
         if (mskElem not in mskFuncAssignInfoEntry):
             sys.exit("getMasterSecretKeyElements in keygen.py:  one of the var names in masterSecVars (from config file) isn't in assignInfo[name_of_setup_function_from_config_file].")
 
@@ -943,7 +943,13 @@ def keygen(file, config):
     getKeygenElemToSMTExpressions(config.rootNodeName, config.leafNodeName, config)
 
     #print(keygenElemToSMTExp)
+    #print("mskVars = ", mskVars)
+    #print("rndVars = ", rndVars)
+    #for elem in keygenElemToSMTExp:
+        #print(elem, " = ", keygenElemToSMTExp[elem])
     #sys.exit("test")
+
+    #AYO:  PUT IT HERE
 
     for keygenOutput_ind in keygenOutput:
         blindKeygenOutputElement(keygenOutput_ind, varsToBlindList, varNamesForListDecls, keygenFuncName)

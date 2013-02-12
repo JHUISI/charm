@@ -2,7 +2,7 @@ name := bsw07
 setting := symmetric
 
 BEGIN :: types
-policy_str := str
+policyUSstr := str
 attrs := list{str}
 sh := symmap
 coeff := list
@@ -43,10 +43,10 @@ D := ((i * p0)^(1 / beta))
 Y := len(S)
 BEGIN :: for
 for{y := 0,Y}
-s_y := random(ZR)
+sUSy := random(ZR)
 y0 := S#y
-Dj#y0 := (p0 * (H(y0,G1)^s_y))
-Djp#y0 := (g^s_y)
+Dj#y0 := (p0 * (H(y0,G1)^sUSy))
+Djp#y0 := (g^sUSy)
 END :: for
 
 sk := list{D, Dj, Djp}
@@ -55,10 +55,10 @@ END :: func:keygen
 
 
 BEGIN :: func:encrypt
-input := list{pk, M, policy_str}
+input := list{pk, M, policyUSstr}
 pk := expand{g, h, f, egg}
 
-policy := createPolicy(policy_str)
+policy := createPolicy(policyUSstr)
 attrs := getAttributeList(policy)
 s := random(ZR)
 sh := calculateSharesDict(s, policy)
@@ -74,17 +74,17 @@ Cr#y1 := (g^sh#y1)
 Cpr#y1 := (H(y1,G1)^sh#y1)
 END :: for
 
-ct := list{policy_str, Ctl, C, Cr, Cpr}
+ct := list{policyUSstr, Ctl, C, Cr, Cpr}
 output := ct
 END :: func:encrypt
 
 
 BEGIN :: func:decrypt
 input := list{pk, sk, S, ct}
-ct := expand{policy_str, Ctl, C, Cr, Cpr}
+ct := expand{policyUSstr, Ctl, C, Cr, Cpr}
 sk := expand{D, Dj, Djp}
 
-policy := createPolicy(policy_str)
+policy := createPolicy(policyUSstr)
 attrs := prune(policy, S)
 coeff := getCoefficients(policy)
 
