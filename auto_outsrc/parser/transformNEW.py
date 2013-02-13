@@ -19,7 +19,22 @@ withinForLoop = False
 
 varsWithNonStandardTypes = []
 
-listOfStandardTypes = [types.G1, types.G2, types.GT, types.ZR, types.int, types.str, types.list, types.listInt, types.listStr, types.listG1, types.listG2, types.listGT, types.listZR]
+varsUsedInDecout = []
+
+listOfStandardTypes = [types.G1, types.G2, types.GT, types.ZR, types.listG1, types.listG2, types.listGT, types.listZR] #types.int, types.str, types.list, types.listInt, types.listStr, types.listG1, types.listG2, types.listGT, types.listZR]
+
+def addVarsUsedInDecoutToGlobalList(lineForDecout):
+    global varsUsedInDecout
+
+    if (type(lineForDecout).__name__) == "str":
+        parser = SDLParser()
+        lineForDecout = parser.parse(lineForDecout)
+
+    allAttrNodeNames = GetAttributeVars(lineForDecout, True)
+
+    for attrName in allAttrNodeNames:
+        if (attrName not in varsUsedInDecout) and (attrName != 'for'):
+            varsUsedInDecout.append(attrName)
 
 def getCTVarNames():
     ctVarNames = []
@@ -502,6 +517,7 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
     lineForDecoutLines += subLineForDecoutLines
 
     decoutLines.append(lineForDecoutLines + "\n")
+    addVarsUsedInDecoutToGlobalList(lineForDecoutLines)
 
 def makeListTypeReplacement(inputType):
     if (inputType == types.listInt):
@@ -595,6 +611,7 @@ def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, curre
         decoutListCounter += 1
 
     decoutLines.append(lineForDecoutLines + "\n")
+    addVarsUsedInDecoutToGlobalList(lineForDecoutLines)
 
 '''
 def writeOutNonPairingCalcs(currentNode, transformLines, decoutLines):
@@ -669,6 +686,7 @@ def writeOutCTVarsThatNeedBuckets(ctVarsThatNeedBuckets, transformInputExpandNum
         #reverse order b/c we're not keeping a counter
         transformLines.insert(transformInputExpandNumStatements, lineForTransform)
         decoutLines.insert(decoutInputExpandNumStatements, lineForDecout)
+        addVarsUsedInDecoutToGlobalList(lineForDecout)
 
 def addListNodesForThisLineToCtExpandListNodes(ctExpandListNodes, ctExpandListNodesForThisLine):
     for listNode in ctExpandListNodesForThisLine:
@@ -804,14 +822,18 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
             if ( (currentNode.type == ops.FOR) or (currentNode.type == ops.IF) ):
                 transformLines.append(str(currentNode) + "\nNOP\n")
                 decoutLines.append(str(currentNode) + "\nNOP\n")
+                addVarsUsedInDecoutToGlobalList(currentNode)
             else:
                 transformLines.append(str(currentNode) + "\n")
                 decoutLines.append(str(currentNode) + "\n")
+                addVarsUsedInDecoutToGlobalList(currentNode)
         elif (str(currentNode.left) == M):
             decoutLines.append(str(currentNode) + "\n")
+            addVarsUsedInDecoutToGlobalList(currentNode)
             searchForCTVarsThatNeedBuckets(currentNode.right, ctExpandListNodes, ctVarsThatNeedBuckets)
         elif (str(currentNode.left) in config.doNotIncludeInTransformList):
             decoutLines.append(str(currentNode) + "\n")
+            addVarsUsedInDecoutToGlobalList(currentNode)
             searchForCTVarsThatNeedBuckets(currentNode.right, ctExpandListNodes, ctVarsThatNeedBuckets)
         elif ( (len(currentNodePairings) > 0) and (areAllVarsOnLineKnownByTransform == True) ):
             groupedPairings = groupPairings(currentNodePairings, varsThatAreBlindedDict, config)
@@ -823,6 +845,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
             knownVars.append(str(currentNode.left))
         else:
             decoutLines.append(str(currentNode) + "\n")
+            addVarsUsedInDecoutToGlobalList(currentNode)
             searchForCTVarsThatNeedBuckets(currentNode.right, ctExpandListNodes, ctVarsThatNeedBuckets)
 
         if (currentNode.type == ops.FOR):
@@ -834,11 +857,20 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     if (len(ctVarsThatNeedBuckets) > 0):
         writeOutCTVarsThatNeedBuckets(ctVarsThatNeedBuckets, transformInputExpandNumStatements, decoutInputExpandNumStatements, transformLines, decoutLines)
 
-    if (len(varsWithNonStandardTypes) == 0):
+    #print(varsUsedInDecout)
+    #sys.exit("test")
+
+    varsToAddToTransformOutputAndDecoutInput = []
+
+    for varName in varsWithNonStandardTypes:
+        if (varName in varsUsedInDecout):
+            varsToAddToTransformOutputAndDecoutInput.append(varName)
+
+    if (len(varsToAddToTransformOutputAndDecoutInput) == 0):
         transformRunningOutputLine = "output := " + transformOutputList + "\n"
     else:
         transformRunningOutputLine = "output := list{" + transformOutputList
-        for varName in varsWithNonStandardTypes:
+        for varName in varsToAddToTransformOutputAndDecoutInput:
             transformRunningOutputLine += ", " + varName
         transformRunningOutputLine += "}\n"
 
@@ -847,7 +879,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
 
     transformLines.append("\n")
 
-    for varName in varsWithNonStandardTypes:
+    for varName in varsToAddToTransformOutputAndDecoutInput:
         decoutRunningInputLine += ", " + varName
 
     decoutRunningInputLine += "}\n"
