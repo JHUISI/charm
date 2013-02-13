@@ -30,9 +30,12 @@ SMTmulCounter = 0
 secretKeyElements = []
 masterSecretKeyElements = []
 allMskAndRndVars = []
+varNamesForListDecls = []
 
 mskVars = []
 rndVars = []
+
+nilType = 'nil'
 
 def processListOrExpandNodes(binNode, origVarName, newVarName):
     binNodeRight = binNode.right
@@ -170,21 +173,83 @@ def removeListIndicesAndDupsFromList(inputList):
 
     return retList
 
-def writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls, sharedBlindingFactorName, repeatBlindingFactor):
+def isLastCharThisChar(inputString, possibleLastChar):
+    lenString = len(inputString)
+    if (inputString[lenString - 1] == possibleLastChar):
+        return True
+
+    return False
+
+def writeForAllLoop(keygenOutputElem, resultDictionary, config):
+    global blindingFactors_Lists, varNamesForListDecls
+
+    listBlindingFactorName = config.blindingFactorPrefix + keygenOutputElem + config.blindingSuffix
+
+    sameBFForWholeList = False
+    currentBlindingFactorName = resultDictionary[keygenOutputElem]
+    if (isLastCharThisChar(currentBlindingFactorName, LIST_INDEX_SYMBOL) == True):
+        sameBFForWholeList = False
+        currentBlindingFactorName = currentBlindingFactorName[0:(len(currentBlindingFactorName)-1)]
+    else:
+        sameBFForWholeList = True
+
+    # if it's the same BF for whole list, we only need to grab the BF.  Otherwise, we need the whole
+    # list of BFs.
+    if (sameBFForWholeList == True):
+        if (currentBlindingFactorName not in blindingFactors_Lists):
+            blindingFactors_Lists.append(currentBlindingFactorName)
+    else:
+        if (listBlindingFactorName not in blindingFactors_Lists):
+            blindingFactors_Lists.append(listBlindingFactorName)
+
+    if (keygenOutputElem not in varNamesForListDecls):
+        varNamesForListDecls.append(keygenOutputElem)
+
+    SDLLinesForKeygen = []
+
+    SDLLinesForKeygen.append("BEGIN :: forall\n")
+    SDLLinesForKeygen.append("forall{" + config.blindingLoopVar + " := " + keygenOutputElem + "}\n")
+
+    if (sameBFForWholeList == True):
+        SDLLinesForKeygen.append(listBlindingFactorName + LIST_INDEX_SYMBOL + config.blindingLoopVar + " := " + currentBlindingFactorName + "\n")
+    else:
+        SDLLinesForKeygen.append(listBlindingFactorName + LIST_INDEX_SYMBOL + config.blindingLoopVar + " := random(ZR)\n")
+
+    SDLLinesForKeygen.append(keygenOutputElem + config.blindingSuffix + LIST_INDEX_SYMBOL + config.blindingLoopVar + " := " + keygenOutputElem + LIST_INDEX_SYMBOL + config.blindingLoopVar + " ^ (1/" + listBlindingFactorName + LIST_INDEX_SYMBOL + config.blindingLoopVar + ")\n")
+
+    SDLLinesForKeygen.append("END :: forall\n")
+
+    lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(config.keygenFuncName, SDLLinesForKeygen, keygenOutputElem)
+    replaceVarInstancesInLineNoRange(lineNoAfterThisAddition, getEndLineNoOfFunc(config.keygenFuncName), keygenOutputElem, (keygenOutputElem + config.blindingSuffix))
+
+'''
+#def writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls, sharedBlindingFactorName, repeatBlindingFactor):
+def writeForAllLoop(keygenOutputElem, resultDictionary, config):
     global blindingFactors_Lists, varsThatAreBlinded, blindingFactors_NonLists
     global mappingOfSecretVarsToBlindingFactors
 
-    sameMasterSecret = False
+    #sameMasterSecret = False
 
     listBlindingFactorName = blindingFactorPrefix + keygenOutputElem + blindingSuffix
     #(sharedBlindingFactorName, repeatBlindingFactor) = getCurrentBlindingFactorName(keygenOutputElem)
-    if (listBlindingFactorName != sharedBlindingFactorName):
-        sameMasterSecret = True
+    #if (listBlindingFactorName != sharedBlindingFactorName):
+        #sameMasterSecret = True
 
-    if (sameMasterSecret == False):
-        blindingFactors_Lists.append(listBlindingFactorName)
+    sameBFForWholeList = False
+    currentBlindingFactorName = resultDictionary[keygenOutputElem]
+    if (isLastCharThisChar(currentBlindingFactorName, LIST_INDEX_SYMBOL) == True):
+        sameBFForWholeList = False
+        currentBlindingFactorName = currentBlindingFactorName[0:(len(currentBlindingFactorName)-1)]
+    else:
+        sameBFForWholeList = True
 
-    varsThatAreBlinded.append(keygenOutputElem)
+    if (currentBlindingFactorName not in blindingFactors_Lists):
+        blindingFactors_Lists.append(currentBlindingFactorName)
+
+    #if (sameMasterSecret == False):
+    #blindingFactors_Lists.append(keygenOutputElem)
+
+    #varsThatAreBlinded.append(keygenOutputElem)
 
     SDLLinesForKeygen = []
 
@@ -200,17 +265,22 @@ def writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls, sha
 
     #SDLLinesForKeygen.append(keygenOutputElem + loopVarForKeygenElemKeys + " := " + keygenOutputElem + keysForKeygenElemSuffix + LIST_INDEX_SYMBOL + blindingLoopVar + "\n")
 
-    if (sameMasterSecret == True):
-        SDLLinesForKeygen.append(listBlindingFactorName + LIST_INDEX_SYMBOL + blindingLoopVar + " := " + sharedBlindingFactorName + "\n")
-        if (sharedBlindingFactorName not in blindingFactors_NonLists):
-            blindingFactors_NonLists.append(sharedBlindingFactorName)
+    #if (sameMasterSecret == True):
+        #SDLLinesForKeygen.append(listBlindingFactorName + LIST_INDEX_SYMBOL + blindingLoopVar + " := " + sharedBlindingFactorName + "\n")
+        #if (sharedBlindingFactorName not in blindingFactors_NonLists):
+            #blindingFactors_NonLists.append(sharedBlindingFactorName)
+    #else:
+
+    if (sameBFForWholeList == True):
+        SDLLinesForKeygen.append(listBlindingFactorName + LIST_INDEX_SYMBOL + blindingLoopVar + " := " + currentBlindingFactorName + "\n")
     else:
         SDLLinesForKeygen.append(listBlindingFactorName + LIST_INDEX_SYMBOL + blindingLoopVar + " := random(ZR)\n")
 
-    SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + LIST_INDEX_SYMBOL + blindingLoopVar + " := " + keygenOutputElem + LIST_INDEX_SYMBOL + blindingLoopVar + " ^ (1/" + listBlindingFactorName + LIST_INDEX_SYMBOL + blindingLoopVar + ")\n")
+    SDLLinesForKeygen.append(keygenOutputElem + blindingSuffix + LIST_INDEX_SYMBOL + blindingLoopVar + " := " + keygenOutputElem + LIST_INDEX_SYMBOL + blindingLoopVar + " ^ (1/" + listBlindingFactorName + LIST_INDEX_SYMBOL + config.blindingLoopVar + ")\n")
 
     SDLLinesForKeygen.append("END :: forall\n")
     #SDLLinesForKeygen.append("END :: for\n")
+
 
     if (sameMasterSecret == True):
         mappingOfSecretVarsToBlindingFactors[keygenOutputElem] = [sharedBlindingFactorName]
@@ -218,15 +288,17 @@ def writeForAllLoop(keygenOutputElem, varsToBlindList, varNamesForListDecls, sha
         mappingOfSecretVarsToBlindingFactors[keygenOutputElem] = [listBlindingFactorName]
         mappingOfSecretVarsToBlindingFactors[keygenOutputElem].append(listNameIndicator)
 
+
     #varsToBlindList.remove(keygenOutputElem)
-    if (keygenOutputElem in varNamesForListDecls):
-        sys.exit("writeForAllLoop in keygen.py attempted to add duplicate keygenOutputElem to varNamesForListDecls -- 2 of 2.")
+    #if (keygenOutputElem in varNamesForListDecls):
+        #sys.exit("writeForAllLoop in keygen.py attempted to add duplicate keygenOutputElem to varNamesForListDecls -- 2 of 2.")
 
     #if (sameMasterSecret == False):
-    varNamesForListDecls.append(keygenOutputElem)
+    #varNamesForListDecls.append(keygenOutputElem)
 
-    lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, keygenOutputElem)
-    replaceVarInstancesInLineNoRange(lineNoAfterThisAddition, getEndLineNoOfFunc(keygenFuncName), keygenOutputElem, (keygenOutputElem + blindingSuffix))
+    lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(config.keygenFuncName, SDLLinesForKeygen, keygenOutputElem)
+    replaceVarInstancesInLineNoRange(lineNoAfterThisAddition, getEndLineNoOfFunc(config.keygenFuncName), keygenOutputElem, (keygenOutputElem + blindingSuffix))
+'''
 
 def varListContainsParentDict(varList, parentDict):
     for varName in varList:
@@ -616,7 +688,7 @@ def getAllKeygenElemsToExponentsDictEntries(keygenOutputElem, keygenFuncName, co
         for listMember in listMembers:
             getAllKeygenElemsToExponentsDictEntries(listMember, keygenFuncName, config)
 
-def getIndividualKeygenElemToSMTExpression(exponents, rootNodeName, leafNodeName, config):
+def getIndividualKeygenElemToSMTExpression(exponents, config):
     global SMTaddCounter, SMTmulCounter
 
     SMTaddCounter = 0
@@ -628,21 +700,21 @@ def getIndividualKeygenElemToSMTExpression(exponents, rootNodeName, leafNodeName
     if (len(exponents) == 0):
         return {}
 
-    retExpression[rootNodeName] = []
+    retExpression[config.rootNodeName] = []
 
     if ( (len(exponents) == 1) and (exponents[0].type == ops.ATTR) ):
-        retExpression[rootNodeName].append(leafNodeName)
-        retExpression[leafNodeName] = []
-        retExpression[leafNodeName].append(str(exponents[0]))
+        retExpression[config.rootNodeName].append(config.leafNodeName)
+        retExpression[config.leafNodeName] = []
+        retExpression[config.leafNodeName].append(str(exponents[0]))
         return retExpression
 
     if (len(exponents) == 1):
-        getSMTExpressionForOneExponent(exponents[0], rootNodeName, retExpression, config)
+        getSMTExpressionForOneExponent(exponents[0], config.rootNodeName, retExpression, config)
         return retExpression
 
     currentKey = config.addNodePrefix+str(SMTaddCounter)
     SMTaddCounter += 1
-    retExpression[rootNodeName].append(currentKey)
+    retExpression[config.rootNodeName].append(currentKey)
     retExpression[currentKey] = []
 
     for exponent in exponents:
@@ -724,7 +796,7 @@ def addMskRndVars(config):
         else:
             sys.exit("addMskRndVars in keygen.py:  exponent name is supposed to appear in either config.setupFuncName or config.keygenFuncName, but not both and not neither, which is what is happening here.")
 
-def getKeygenElemToSMTExpressions(rootNodeName, leafNodeName, config):
+def getKeygenElemToSMTExpressions(config):
     global keygenElemToSMTExp
 
     for keygenElemToExp in keygenElemToExponents:
@@ -740,9 +812,153 @@ def getKeygenElemToSMTExpressions(rootNodeName, leafNodeName, config):
             keygenElemToSMTExp[keygenElemToExp] = secVarRetList
         else:
             exponents = keygenElemToExponents[keygenElemToExp]
-            keygenElemToSMTExp[keygenElemToExp] = getIndividualKeygenElemToSMTExpression(exponents, rootNodeName, leafNodeName, config)
+            keygenElemToSMTExp[keygenElemToExp] = getIndividualKeygenElemToSMTExpression(exponents, config)
 
     addMskRndVars(config)
+
+def getBFCountsDict(resultDictionary):
+    retDict = {}
+
+    for skElem in resultDictionary:
+        bfOfThisElem = resultDictionary[skElem]
+        if (bfOfThisElem not in retDict):
+            retDict[bfOfThisElem] = 0
+        countOfThisBF = retDict[bfOfThisElem]
+        retDict[bfOfThisElem] = countOfThisBF + 1
+
+    #we don't want nilType factoring into our counts during the apply group optimization
+    retDict[nilType] = 0
+
+    return retDict
+
+def applyGroupSharingOptimization(resultDictionary, config):
+    global mappingOfSecretVarsToGroupType
+
+    bfCountsDict = getBFCountsDict(resultDictionary)
+
+    for skElem in resultDictionary:
+        groupTypeOfSkElem = getVarTypeInfoRecursive(BinaryNode(skElem), config.keygenFuncName)
+        mappingOfSecretVarsToGroupType[skElem] = groupTypeOfSkElem
+
+    newResultDictionary = copy.deepcopy(resultDictionary)
+
+    for skElem in resultDictionary:
+        bfOfThisElem = newResultDictionary[skElem]
+        groupTypeOfThisElem = mappingOfSecretVarsToGroupType[skElem]
+        mappingOfSameGroupTypeElemToBFCount = {}
+        for skElem2 in resultDictionary:
+            if (skElem == skElem2):
+                continue
+
+            if (mappingOfSecretVarsToGroupType[skElem] != mappingOfSecretVarsToGroupType[skElem2]):
+                continue
+
+            if (newResultDictionary[skElem] == newResultDictionary[skElem2]):
+                continue
+
+            #mappingOfSameGroupTypeElemToBFCount[skElem2] = bfCountsDict[skElem2]
+
+            bfOfThisElem2 = newResultDictionary[skElem2]
+
+            if (bfOfThisElem2 == nilType):
+                continue
+
+            if (bfCountsDict[bfOfThisElem2] > bfCountsDict[bfOfThisElem]):
+                newResultDictionary[skElem] = bfOfThisElem2
+
+        #sameGroupTypeElemWithHighestBFCount = getSameGroupTypeElemWithHighestBFCount(mappingOfSameGroupTypeElemToBFCount)
+        #bfToUseForThisElem = resultDictionary[sameGroupTypeElemWithHighestBFCount]
+        #newResultDictionary[skElem] = bfToUseForThisElem
+
+    for skElem in resultDictionary:
+        if (skElem not in newResultDictionary):
+            newResultDictionary[skElem] = resultDictionary[skElem]
+
+    return newResultDictionary
+
+def getSameGroupTypeElemWithHighestBFCount(mappingOfSameGroupTypeElemToBFCount):
+    highestBFCountSoFar = -1
+    elemWithHighestBFCountSoFar = None
+
+    for elem in mappingOfSameGroupTypeElemToBFCount:
+        currentBFCount = mappingOfSameGroupTypeElemToBFCount[elem]
+        if (currentBFCount > highestBFCountSoFar):
+            highestBFCountSoFar = currentBFCount
+            elemWithHighestBFCountSoFar = elem
+
+    return elemWithHighestBFCountSoFar
+
+def applyBlindingFactorsToScheme(resultDictionary, config):
+    for skElem in resultDictionary:
+        applyBlindingFactorsToScheme_Individual(resultDictionary, skElem, config)
+
+def applyBlindingFactorsToScheme_Individual(resultDictionary, keygenOutputElem, config):
+    global blindingFactors_NonLists, secretKeyElements
+
+    if keygenOutputElem not in secretKeyElements:
+        secretKeyElements.append(keygenOutputElem)
+
+    SDLLinesForKeygen = []
+
+    if (resultDictionary[keygenOutputElem] == nilType):
+        SDLLinesForKeygen.append(keygenOutputElem + config.blindingSuffix + " := " + keygenOutputElem + "\n")
+        lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(config.keygenFuncName, SDLLinesForKeygen, keygenOutputElem)
+        replaceVarInstancesInLineNoRange(lineNoAfterThisAddition, getEndLineNoOfFunc(config.keygenFuncName), keygenOutputElem, (keygenOutputElem + config.blindingSuffix))
+        return
+
+    if (keygenOutputElem not in assignInfo[config.keygenFuncName]):
+        if (varListContainsParentDict(assignInfo[config.keygenFuncName].keys(), keygenOutputElem) == False):
+            sys.exit("keygen output element passed to applyBlindingFactorsToScheme_Individual in keygen.py is not in assignInfo[keygenFuncName], and is not a parent dictionary of one of the variables in assignInfo[keygenFuncName].")
+        writeForAllLoop(keygenOutputElem, resultDictionary, config)
+        return
+
+    keygenOutputVarInfo = assignInfo[config.keygenFuncName][keygenOutputElem]
+    isVarList = getIsVarList(keygenOutputElem, keygenOutputVarInfo)
+
+    currentBlindingFactorName = resultDictionary[keygenOutputElem]
+
+    if (isVarList == False):
+        if (isLastCharThisChar(currentBlindingFactorName, LIST_INDEX_SYMBOL) == True):
+            sys.exit("applyBlindingFactorsToScheme_Individual in keygen.py:  variable isn't supposed to be a list, but the blinding factor from resultDictionary has a pound sign at the end of it.")
+        if (currentBlindingFactorName not in blindingFactors_NonLists):
+            blindingFactors_NonLists.append(currentBlindingFactorName)
+        SDLLinesForKeygen.append(keygenOutputElem + config.blindingSuffix + " := " + keygenOutputElem + " ^ (1/" + currentBlindingFactorName + ")\n")
+        lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(config.keygenFuncName, SDLLinesForKeygen, keygenOutputElem)
+        replaceVarInstancesInLineNoRange(lineNoAfterThisAddition, getEndLineNoOfFunc(config.keygenFuncName), keygenOutputElem, (keygenOutputElem + config.blindingSuffix))
+        return
+
+    if ( (keygenOutputVarInfo.getIsList() == True) and (len(keygenOutputVarInfo.getListNodesList()) > 0) ):
+        listMembers = keygenOutputVarInfo.getListNodesList()
+        listMembersString = ""
+        for listMember in listMembers:
+            listMembersString += listMember + config.blindingSuffix + ", "
+        listMembersString = listMembersString[0:(len(listMembersString) - 2)]
+        SDLLinesForKeygen.append(keygenOutputElem + config.blindingSuffix + " := list{" + listMembersString + "}\n")
+        lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(config.keygenFuncName, SDLLinesForKeygen, keygenOutputElem)
+        replaceVarInstancesInLineNoRange(lineNoAfterThisAddition, getEndLineNoOfFunc(config.keygenFuncName), keygenOutputElem, (keygenOutputElem + config.blindingSuffix))
+        return
+
+    writeForAllLoop(keygenOutputElem, resultDictionary, config)
+    return
+
+def addAssignmentForSKBlinded(config):
+    skVarInfo = assignInfo[config.keygenFuncName][config.keygenSecVar]
+    skVarDeps = skVarInfo.getVarDeps()
+    if (len(skVarDeps) == 0):
+        sys.exit("addAssignmentForSKBlinded in keygen.py:  no variable dependencies found for secret key variable name given in config file.")
+
+    #print(skVarDeps)
+    #sys.exit("test")
+
+    outputString = ""
+    outputString += config.keygenSecVar + config.blindingSuffix + " := list{"
+    for varDep in skVarDeps:
+        outputString += varDep + ", "
+    outputString = outputString[0:(len(outputString) - len(", "))]
+    outputString += "}\n"
+
+    lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(config.keygenFuncName, [outputString], config.keygenSecVar)
+    replaceVarInstancesInLineNoRange(lineNoAfterThisAddition, getEndLineNoOfFunc(config.keygenFuncName), config.keygenSecVar, (config.keygenSecVar + config.blindingSuffix))
 
 def blindKeygenOutputElement(keygenOutputElem, varsToBlindList, varNamesForListDecls, keygenFuncName):
     global blindingFactors_NonLists, varsThatAreBlinded, varsNameToSecretVarsUsed
@@ -842,11 +1058,15 @@ def removeAssignmentOfOrigKeygenSecretKeyName(secretKeyName, keygenFuncName):
 def getBlindingFactorsLine():
     outputLine = ""
 
+    addedAlready = []
+
     for blindingFactor_NonList in blindingFactors_NonLists:
         outputLine += blindingFactor_NonList + ", "
+        addedAlready.append(blindingFactor_NonList)
 
     for blindingFactor_List in blindingFactors_Lists:
-        outputLine += blindingFactor_List + ", "
+        if (blindingFactor_List not in addedAlready):
+            outputLine += blindingFactor_List + ", "
 
     outputLine = outputLine[0:(len(outputLine) - len(", "))]
 
@@ -933,29 +1153,27 @@ def instantiateBFSolver(config):
     #return results.resultDictionary
     return None
 
+def prepareDictForTransform(resultDictionary):
+    retDict = {}
+
+    for skElem in resultDictionary:
+        retDict[skElem] = []
+        bfName = resultDictionary[skElem]
+        if (isLastCharThisChar(bfName, LIST_INDEX_SYMBOL) == True):
+            bfName = bfName[0:(len(bfName) - 1)]
+        retDict[skElem].append(bfName)
+
+    return retDict
+
 def keygen(file, config):
-    #print(config.keygenFuncName)
- 
     SDLLinesForKeygen = []
 
     if ( (type(file) is not str) or (len(file) == 0) ):
         sys.exit("First argument passed to keygen.py is invalid.")
-        
-#    config = importlib.import_module(configName) # __import__('config')
-#    print("config: ", dir(config))
-#    print("masterKeys: ", config.masterPubVars)
-#    print("publicKeys: ", config.masterSecVars)
     
     parseFile2(file, False)
-
-    varsToBlindList = getSecretList(config, False)
-
-    varNamesForListDecls = []
-
     updateCodeAndStructs()
-
     getMasterSecretKeyElements(config)
-
     keygenFuncName = config.keygenFuncName
 
     if (keygenBlindingExponent in assignInfo[keygenFuncName]):
@@ -968,48 +1186,29 @@ def keygen(file, config):
     if (len(keygenOutput) == 0):
         sys.exit("Variable dependencies obtained for output of keygen in keygen.py was of length zero.")
 
-    SDLLinesForKeygen.append(keygenBlindingExponent + " := random(ZR)\n")
-    lineNoAfterThisAddition = writeLinesToFuncAfterVarLastAssign(keygenFuncName, SDLLinesForKeygen, None)
-
     for keygenOutput_ind in keygenOutput:
         getAllKeygenElemsToExponentsDictEntries(keygenOutput_ind, keygenFuncName, config)
 
-    #print(keygenElemToExponents)
-
-    getKeygenElemToSMTExpressions(config.rootNodeName, config.leafNodeName, config)
-
-    #print(keygenElemToSMTExp)
-    #print("mskVars = ", mskVars)
-    #print("rndVars = ", rndVars)
-    #for elem in keygenElemToSMTExp:
-        #print(elem, " = ", keygenElemToSMTExp[elem])
-    #sys.exit("test")
+    getKeygenElemToSMTExpressions(config)
 
     resultDictionary = instantiateBFSolver(config)
-    #sys.exit("test")
 
-    resultDictionary = {'sk':'bf0'}
+    print(resultDictionary)
+    sys.exit("test")
 
-    for keygenOutput_ind in keygenOutput:
-        blindKeygenOutputElement(keygenOutput_ind, varsToBlindList, varNamesForListDecls, keygenFuncName)
-
-    secretKeyName = keygenSecVar
-
-    removeAssignmentOfOrigKeygenSecretKeyName(secretKeyName, keygenFuncName)
-
-    #if (len(varsToBlindList) != 0):
-        #sys.exit("keygen.py completed without blinding all of the variables passed to it by transform.py.")
+    resultDictionary = applyGroupSharingOptimization(resultDictionary, config)
+    applyBlindingFactorsToScheme(resultDictionary, config)
+    secretKeyName = config.keygenSecVar
+    addAssignmentForSKBlinded(config)
+    removeAssignmentOfOrigKeygenSecretKeyName(secretKeyName, config.keygenFuncName)
 
     SDLLinesForKeygen = []
     for nonListBlindingFactor in blindingFactors_NonLists:
         SDLLinesForKeygen.append(nonListBlindingFactor + " := random(ZR)\n")
-
-    inputLineOfKeygenFunc = getLineNoOfInputStatement(keygenFuncName)
-
+    inputLineOfKeygenFunc = getLineNoOfInputStatement(config.keygenFuncName)
     appendToLinesOfCode(SDLLinesForKeygen, inputLineOfKeygenFunc + 1)
     updateCodeAndStructs()
-
-    writeOutputLineForKeygen(secretKeyName, keygenFuncName)
+    writeOutputLineForKeygen(secretKeyName, config.keygenFuncName)
 
     for index_listVars in range(0, len(varNamesForListDecls)):
         varNamesForListDecls[index_listVars] = varNamesForListDecls[index_listVars] + blindingSuffix + " := list\n"
@@ -1021,17 +1220,10 @@ def keygen(file, config):
     appendToLinesOfCode(varNamesForListDecls, lineNoEndTypesSection)
     updateCodeAndStructs()
 
-
+    resultDictionaryForTransform = prepareDictForTransform(resultDictionary)
 
     #varsThatAreBlinded = {"c":["zz"], "d0":["yy"], "d1":["aa", "bb"]}
-    transformNEW(mappingOfSecretVarsToBlindingFactors, secretKeyElements, config)
-
-
-
-    #(varsToBlindList, rccaData) = (transform(varsThatAreBlinded))
-
-    #printLinesOfCode()
-    #sys.exit("test")
+    transformNEW(resultDictionaryForTransform, secretKeyElements, config)
 
     #rcca(rccaData)
 

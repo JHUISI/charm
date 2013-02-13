@@ -8,6 +8,7 @@ M = 'M'
 transformOutputList = "transformOutputList"
 
 blindingLoopVar = "y"
+blindingLoopVarLength = "yLength"
 
 blindingFactorPrefix = "blindingFactor"
 
