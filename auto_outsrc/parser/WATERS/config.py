@@ -12,7 +12,7 @@ finalSDLSuffix = ".FINAL_SDL"
 
 listNameIndicator = "LISTNAMEINDICATOR"
 
-doNotIncludeInTransformList = []
+doNotIncludeInTransformList = ["reservedVarName0"]
 
 forLoopSeed = 1000
 
