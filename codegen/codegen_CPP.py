@@ -32,6 +32,7 @@ listVarsDeclaredInThisFunc = []
 nonListVarsDeclaredInThisFunc = []
 integerVars = []
 starRef = ""# "*"
+NOP_STATEMENT = "NOP"
 INSERT_FUNC_NAME = ".insert("
 UTIL_FUNC_NAME = "util"
 DFA_UTIL_FUNC_NAME = "dfaUtil"
@@ -392,6 +393,11 @@ def isFuncCall(binNode):
     if (binNode.type == ops.FUNC):
         return True
 
+    return False
+
+def isNOP(binNode):
+    if (binNode.type == ops.NOP):
+        return True
     return False
 
 def isErrorFunc(binNode):
@@ -1039,7 +1045,10 @@ def writeAssignStmt_CPP(outputFile, binNode):
         CPP_funcBodyLines += writeCurrentNumTabsToString()
         CPP_funcBodyLines += "return;\n"
         return
-
+    elif(str(binNode) == NOP_STATEMENT):
+        CPP_funcBodyLines += "cout << "";\n"
+        return
+    
     variableName = getFullVarName(binNode.left, False)
     variableNameWOListIndices = getRidOfAllListIndices(getFullVarName(binNode.left, True))
 
@@ -1416,7 +1425,11 @@ def writeSDLToFiles(astNodes):
             writeFuncCall(astNode)
         elif ( (processedAsFunctionStart == True) or (isUnnecessaryNodeForCodegen(astNode) == True) ):
             continue
+        elif (isNOP(astNode) == True):
+            writeAssignStmt(astNode)
+            print("cout << "";")
         else:
+            print("BinNode: ", astNode)
             sys.exit("writeSDLToFiles in codegen.py:  unrecognized type of statement in SDL.")
 
 def getStringOfFirstFuncArgs(argsToFirstFunc):

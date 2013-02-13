@@ -3,7 +3,7 @@ from sdlparser.SDLParser import *
 from transformNEW import *
 from secretListInKeygen import getSecretList
 from outsrctechniques import SubstituteVar, GetAttributeVars
-import os, sys, string, random
+import os, sys, string, random, importlib
 
 linesOfCode = None
 assignInfo = None
@@ -36,6 +36,8 @@ mskVars = []
 rndVars = []
 
 nilType = 'nil'
+bfMapKeyword = 'bfMap'
+skBfMapKeyword = 'skBfMap'
 
 def processListOrExpandNodes(binNode, origVarName, newVarName):
     binNodeRight = binNode.right
@@ -1144,14 +1146,21 @@ def instantiateBFSolver(config):
     os.system("python2.7 BFSolver.py %s" % name)
     print("<================== BFSolver ==================>")
 
-    #newName = name.split('.')[0]
-    #results = importlib.import_module(newName)
+    newName = name.split('.')[0]
+    mapVars = importlib.import_module(newName)
+    
+    bfMap = None
+    skBfMap = None
+    if hasattr(mapVars, bfMapKeyword):
+        bfMap = getattr(mapVars, bfMapKeyword)
+    if hasattr(mapVars, skBfMapKeyword):
+        skBfMap = getattr(mapVars, skBfMapKeyword)
     #os.system("rm -f " + name + " " + name + "c")
     
     #print(results.resultDictionary)
     #os.system("rm -f " + name + "*")    
     #return results.resultDictionary
-    return None
+    return (bfMap, skBfMap)
 
 def prepareDictForTransform(resultDictionary):
     retDict = {}
@@ -1191,13 +1200,16 @@ def keygen(file, config):
 
     getKeygenElemToSMTExpressions(config)
 
-    resultDictionary = instantiateBFSolver(config)
-
+    bfMap, skBfMap = instantiateBFSolver(config)
+    
+    print("BFSolver Results: ", skBfMap)
+    # produce proof
+    # generateTKProof(bfMap, config)
     #print(resultDictionary)
     #sys.exit("test")
 
-    resultDictionary = applyGroupSharingOptimization(resultDictionary, config)
-    applyBlindingFactorsToScheme(resultDictionary, config)
+    skBfMap = applyGroupSharingOptimization(skBfMap, config)
+    applyBlindingFactorsToScheme(skBfMap, config)
     secretKeyName = config.keygenSecVar
     addAssignmentForSKBlinded(config)
     removeAssignmentOfOrigKeygenSecretKeyName(secretKeyName, config.keygenFuncName)
@@ -1220,7 +1232,7 @@ def keygen(file, config):
     appendToLinesOfCode(varNamesForListDecls, lineNoEndTypesSection)
     updateCodeAndStructs()
 
-    resultDictionaryForTransform = prepareDictForTransform(resultDictionary)
+    resultDictionaryForTransform = prepareDictForTransform(skBfMap)
 
     #varsThatAreBlinded = {"c":["zz"], "d0":["yy"], "d1":["aa", "bb"]}
     transformNEW(resultDictionaryForTransform, secretKeyElements, config)

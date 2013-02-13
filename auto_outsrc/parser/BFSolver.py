@@ -37,6 +37,8 @@ infoKeyword = 'info'
 mskVarsKeyword = 'mskVars'
 rndVarsKeyword = 'rndVars'
 skVarsKeyword = 'skVar'
+bfMapKeyword = 'bfMap'
+skBfMapKeyword = 'skBfMap'
 
 class CleanInfo:
     def __init__(self, info, skVars, verbose=False):
@@ -374,11 +376,14 @@ class ConstructRule:
                 if i != j and (j != varCheck.get(i) and i != varCheck.get(j)):
                     varCheck[ i ] = j
                     varCheck[ j ] = i
+                    print("DEBUG: ", i, "==", j)
                     objects.append(ii == jj)
         
         print("OBJECTS: ", objects)
-        print("ADD Result: ", Or(objects))
-        return [ Or(objects) ]
+#        print("ADD Result: ", Or(objects))
+#        return [ Or(objects) ]
+        print("ADD Result: ", And(objects))
+        return [ And(objects) ]
     
 
 
@@ -391,15 +396,15 @@ class SKSolver:
         pass
 
 class BFSolver:
-    def __init__(self, skList, constraintsDict, constraintsDictVars, unsatIDs):
+    def __init__(self, skList, constraintsDict, constraintsDictVars, unsatIDs, verbose=False):
         self.skList = skList
         self.constraintsDict = constraintsDict
         self.constraintsDictVars = constraintsDictVars # shows variables that were used
         self.unsatIDs = unsatIDs
         self.usedBFs = None
-#        self.allBFs = allBFs
         self.finalMapOfBFs = {}
         self.solution = {}
+        self.verbose = verbose
         
     def __getPlaceholder(self):
         self.index += 1
@@ -467,6 +472,22 @@ class BFSolver:
     def getSKSolution(self):
         return self.finalMapOfBFs
     
+    def writeToFile(self, filename):
+        assert len(self.solution) > 0, "BF solution is empty!"
+        assert len(self.finalMapOfBFs) > 0, "sk BF solution is empty!"
+        BFMapForProof = bfMapKeyword + " = " + str(self.solution) + "\n"
+        newDict = {}
+        for i,j in self.finalMapOfBFs.items():
+            newDict[i] = list(j)[0] # assume just one element in list
+        SKMapForKeygen = skBfMapKeyword + " = " + str(newDict) + "\n"
+        f = open(filename, 'a')
+        if self.verbose: print("BFSolver.writeToFile: ", BFMapForProof, end="")
+        f.write( BFMapForProof )
+        if self.verbose: print("BFSolver.writeToFile: ", SKMapForKeygen)
+        f.write( SKMapForKeygen )
+        f.close()
+        return
+    
 def isSubset(hashList, hashDict, unsatIDs):
     for i in hashDict.keys():
         if set(hashList).issubset( hashDict[i] ):
@@ -529,20 +550,23 @@ if __name__ == "__main__":
     if satisfied: # iff satsified on the first go around.
         print("bfVarsMap = ", bf.getBFSolution())
         print("skVarsMap = ", bf.getSKSolution())
+        bf.writeToFile(filename)
         exit(0)
         # append results to the input filename
     elif len(newList) == 1: # satisfied == False
         pID = str(newList[0])
         satisfied, newList = bf.run(theSolver, pID)
         print("NEW RESULTS: satisfied=", satisfied, "unsat_core=", newList)
-        print("<=== END ===>")
-        print("bfVarsMap = ", bf.getBFSolution())
-        print("skVarsMap = ", bf.getSKSolution())
-        print("\n")
+        if satisfied:
+            print("<=== END ===>")
+            print("bfVarsMap = ", bf.getBFSolution())
+            print("skVarsMap = ", bf.getSKSolution())
+            print("\n")
+            bf.writeToFile(filename)
     else:
         for i in newList:
             pID = str(i)
-            satisfied, newList = bf.run(theSolver, pID)
+            satisfied, newList2 = bf.run(theSolver, pID)
             print("NEW RESULTS: satisfied=", satisfied, "unsat_core=", newList)
             print("<=== END ===>")
             print("\n")
