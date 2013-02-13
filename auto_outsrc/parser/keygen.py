@@ -1193,8 +1193,8 @@ def keygen(file, config):
 
     resultDictionary = instantiateBFSolver(config)
 
-    print(resultDictionary)
-    sys.exit("test")
+    #print(resultDictionary)
+    #sys.exit("test")
 
     resultDictionary = applyGroupSharingOptimization(resultDictionary, config)
     applyBlindingFactorsToScheme(resultDictionary, config)
