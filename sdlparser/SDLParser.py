@@ -407,6 +407,8 @@ class SDLParser:
             object = self.evalStack(objStack, line_number)
             if len(objStack) > 0 or object == False:
                 raise TypeError("Invalid SDL Expression!")
+            if type(object) == str:
+                return BinaryNode(object)
             return object
         except:
             if not silentFail: 

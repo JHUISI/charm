@@ -24,6 +24,39 @@ skVarsKeyword = 'skVar'
 bfMapKeyword = 'bfMap'
 skBfMapKeyword = 'skBfMap'
 
+class CleanVarRefs:
+    def __init__(self, info, skVars, mskVars, verbose=False):
+        self.info = info
+        self.skVars = skVars
+        self.mskVars = list(mskVars)
+        self.verbose = verbose
+    
+    def __getVars(self, key, srcDict):
+        keyList = set()
+        for i,j in srcDict.items():
+            if type(j) == list:
+                for k in j:
+                    if key in k:
+                        keyList = keyList.union( [ k ] )
+        return keyList
+    
+    def clean(self):
+        newMskList = set()
+        for j in self.mskVars:
+            #if self.verbose: 
+            #print("Key:", j)
+            for i in self.info[self.skVars]:
+                matchKeyList = self.__getVars(j, self.info[i])
+                #print(i, ":", self.info[i], matchKeyList)
+                newMskList = newMskList.union( matchKeyList )
+        #print("newMskList: ", list(newMskList))
+        
+        if set(self.mskVars) == set(newMskList):
+            return self.mskVars
+        else:
+            return list(newMskList)
+
+        
 class CleanInfo:
     def __init__(self, info, skVars, verbose=False):
         self.info = info
@@ -95,15 +128,19 @@ class CleanInfo:
     def clean(self):
         for i in self.info[self.skVars]:
             if self.verbose: print("Key:", i)
-            self.__inputPreprocessor(self.info[i][root], self.info[i])  
-            self.__inputCleaner(self.info[i][root], self.info[i])
-            keys = [root]
-            self.__cleanDict(keys, self.info[i][root], self.info[i])
-            for j in self.info[i].keys():
-                if j not in keys:
-                    del self.info[i][j]
-            self.__removeSymbols(self.info[i])
-            if self.verbose: print("RESULT: ", self.info[i])
+            if self.info[i].get(root) != None:
+                self.__inputPreprocessor(self.info[i][root], self.info[i])  
+                self.__inputCleaner(self.info[i][root], self.info[i])
+                keys = [root]
+                self.__cleanDict(keys, self.info[i][root], self.info[i])
+                for j in self.info[i].keys():
+                    if j not in keys:
+                        del self.info[i][j]
+                self.__removeSymbols(self.info[i])
+                if self.verbose: print("RESULT: ", self.info[i])
+            else:
+                # if the original is empty, then create 
+                self.info[i] = {root:['LEAF0'], 'LEAF0':[ str(i) ]}
         
     def getUpdatedInfo(self):
         return self.info
@@ -144,6 +181,10 @@ def _readConfig(fileVars, fileKeys):
     ci.clean()
     info = ci.getUpdatedInfo()
     #print("AFTER:  ", info)
+    
+    cvr = CleanVarRefs(info, skVars, mskVars)
+    mskVars = cvr.clean()
+    #print("New MSK LIST: ", mskVars)
     return (mskVars, rndVars, skVars, info)
 
 def clean(v):
@@ -490,7 +531,7 @@ def searchForSolution(BFSolverObj, SolverRef, skipList):
     if satisfied:
         print("FINAL unsat_core=", skipList)
         return (True, skipList)
-    else:
+    elif satisfied == False and len(skipList2) > 0:
         skipList3 = list(skipList2)
         print("FAILED: ", skipList3) # new list of identifiers then recurse
         while len(skipList3) > 0:
@@ -506,6 +547,9 @@ def searchForSolution(BFSolverObj, SolverRef, skipList):
              if satisfied:
                  return (True, skipList + [ pID ])
         
+        return (False, None)
+    else:
+        print("TODO: handle this scenario.")
         return (False, None)
         #satisfied, newList2 = BFSolverObj.run(SolverRef, skipList2)
         
