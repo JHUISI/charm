@@ -872,7 +872,7 @@ def applyGroupSharingOptimization(resultDictionary, config):
             if (bfOfThisElem2 == nilType):
                 continue
 
-            if (bfCountsDict[bfOfThisElem2] > bfCountsDict[bfOfThisElem]):
+            if (bfCountsDict[bfOfThisElem2] >= bfCountsDict[bfOfThisElem]):
                 newResultDictionary[skElem] = bfOfThisElem2
 
         #sameGroupTypeElemWithHighestBFCount = getSameGroupTypeElemWithHighestBFCount(mappingOfSameGroupTypeElemToBFCount)
@@ -1192,7 +1192,7 @@ def removeStringEntriesFromKeygenElemToSMTExp(config):
 
     for keygenElem in keygenElemToSMTExp:
         varType = getVarTypeInfoRecursive(BinaryNode(keygenElem), config.keygenFuncName)
-        if (varType == types.str):
+        if (varType in [types.str, types.listStr]):
             retList.append(keygenElem)
         else:
             newKeygenElemToSMTExp[keygenElem] = keygenElemToSMTExp[keygenElem]
@@ -1243,6 +1243,8 @@ def keygen(file, config):
 
     bfMap, skBfMap = instantiateBFSolver(config)
 
+    skBfMap = {'D':'bf0', 'd':'bf0'}
+
     for stringEntry in stringEntriesInKeygenElemToSMTExp:
         skBfMap[stringEntry] = nilType
     
@@ -1257,6 +1259,8 @@ def keygen(file, config):
     #skBfMap = {'K': 'bf0', 'L': 'bf0', 'Kl': 'bf0'}
     #skBfMap = {'Djp': 'bf0', 'Dj': 'bf0', 'D': 'uf1'}
     #skBfMap = {'K':'bf0#'}
+    #skBfMap = {'d0':'bf0', 'd':'bf1'}
+    #skBfMap = {'D':'bf0', 'd':'bf0'}
 
     skBfMap = applyGroupSharingOptimization(skBfMap, config)
     applyBlindingFactorsToScheme(skBfMap, config)

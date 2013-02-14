@@ -23,6 +23,15 @@ varsUsedInDecout = []
 
 listOfStandardTypes = [types.G1, types.G2, types.GT, types.ZR, types.listG1, types.listG2, types.listGT, types.listZR] #types.int, types.str, types.list, types.listInt, types.listStr, types.listG1, types.listG2, types.listGT, types.listZR]
 
+nilType = 'nil'
+
+def getRightSideOfStringAssignStatement(inputString):
+    inputStringSeparated = inputString.split(" := ")
+    if (len(inputStringSeparated) != 2):
+        sys.exit("getRightSideOfStringAssignStatement in transformNEW.py:  inputStringSeparated isn't of length 2.")
+
+    return inputStringSeparated[1]
+
 def addVarsUsedInDecoutToGlobalList(lineForDecout):
     global varsUsedInDecout
 
@@ -30,6 +39,7 @@ def addVarsUsedInDecoutToGlobalList(lineForDecout):
         parser = SDLParser()
         lineForDecout = parser.parse(lineForDecout)
 
+    print(type(lineForDecout).__name__)
     allAttrNodeNames = GetAttributeVars(lineForDecout, True)
 
     for attrName in allAttrNodeNames:
@@ -238,7 +248,8 @@ def createDecoutInputLine(node, ctVarNames, allPossibleBlindingFactors):
     #decoutLines.append(outputString)
 
     for bfName in allPossibleBlindingFactors:
-        outputString += ", " + bfName
+        if (bfName != nilType):
+            outputString += ", " + bfName
 
     return outputString
 
@@ -518,7 +529,7 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
     lineForDecoutLines += subLineForDecoutLines
 
     decoutLines.append(lineForDecoutLines + "\n")
-    addVarsUsedInDecoutToGlobalList(lineForDecoutLines)
+    addVarsUsedInDecoutToGlobalList(getRightSideOfStringAssignStatement(lineForDecoutLines))
 
 def makeListTypeReplacement(inputType):
     if (inputType == types.listInt):
@@ -572,7 +583,7 @@ def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, curre
         # LW
         if (withinForLoop == True):
             decoutLines.append(str(currentNode) + "\n")
-            addVarsUsedInDecoutToGlobalList(currentNode)
+            addVarsUsedInDecoutToGlobalList(currentNode.right)
         return
 
         '''
@@ -616,7 +627,7 @@ def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, curre
         decoutListCounter += 1
 
     decoutLines.append(lineForDecoutLines + "\n")
-    addVarsUsedInDecoutToGlobalList(lineForDecoutLines)
+    addVarsUsedInDecoutToGlobalList(getRightSideOfStringAssignStatement(lineForDecoutLines))
 
 '''
 def writeOutNonPairingCalcs(currentNode, transformLines, decoutLines):
@@ -691,7 +702,7 @@ def writeOutCTVarsThatNeedBuckets(ctVarsThatNeedBuckets, transformInputExpandNum
         #reverse order b/c we're not keeping a counter
         transformLines.insert(transformInputExpandNumStatements, lineForTransform)
         decoutLines.insert(decoutInputExpandNumStatements, lineForDecout)
-        addVarsUsedInDecoutToGlobalList(lineForDecout)
+        addVarsUsedInDecoutToGlobalList(getRightSideOfStringAssignStatement(lineForDecout))
 
 def addListNodesForThisLineToCtExpandListNodes(ctExpandListNodes, ctExpandListNodesForThisLine):
     for listNode in ctExpandListNodesForThisLine:
@@ -827,18 +838,18 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
             if ( (currentNode.type == ops.FOR) or (currentNode.type == ops.IF) ):
                 transformLines.append(str(currentNode) + "\nNOP\n")
                 decoutLines.append(str(currentNode) + "\nNOP\n")
-                addVarsUsedInDecoutToGlobalList(currentNode)
+                addVarsUsedInDecoutToGlobalList(currentNode.right)
             else:
                 transformLines.append(str(currentNode) + "\n")
                 decoutLines.append(str(currentNode) + "\n")
-                addVarsUsedInDecoutToGlobalList(currentNode)
+                addVarsUsedInDecoutToGlobalList(currentNode.right)
         elif (str(currentNode.left) == M):
             decoutLines.append(str(currentNode) + "\n")
-            addVarsUsedInDecoutToGlobalList(currentNode)
+            addVarsUsedInDecoutToGlobalList(currentNode.right)
             searchForCTVarsThatNeedBuckets(currentNode.right, ctExpandListNodes, ctVarsThatNeedBuckets)
         elif (str(currentNode.left) in config.doNotIncludeInTransformList):
             decoutLines.append(str(currentNode) + "\n")
-            addVarsUsedInDecoutToGlobalList(currentNode)
+            addVarsUsedInDecoutToGlobalList(currentNode.right)
             searchForCTVarsThatNeedBuckets(currentNode.right, ctExpandListNodes, ctVarsThatNeedBuckets)
         elif ( (len(currentNodePairings) > 0) and (areAllVarsOnLineKnownByTransform == True) ):
             groupedPairings = groupPairings(currentNodePairings, varsThatAreBlindedDict, config)
@@ -850,7 +861,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
             knownVars.append(str(currentNode.left))
         else:
             decoutLines.append(str(currentNode) + "\n")
-            addVarsUsedInDecoutToGlobalList(currentNode)
+            addVarsUsedInDecoutToGlobalList(currentNode.right)
             searchForCTVarsThatNeedBuckets(currentNode.right, ctExpandListNodes, ctVarsThatNeedBuckets)
 
         if (currentNode.type == ops.FOR):
