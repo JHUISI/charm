@@ -800,6 +800,9 @@ def addMskRndVars(config):
             if (exp not in rndVars):
                 rndVars.append(exp)
         else:
+            print(exp)
+            print(mskVars)
+            print(rndVars)
             sys.exit("addMskRndVars in keygen.py:  exponent name is supposed to appear in either config.setupFuncName or config.keygenFuncName, but not both and not neither, which is what is happening here.")
 
 def getKeygenElemToSMTExpressions(config):
@@ -1181,7 +1184,32 @@ def prepareDictForTransform(resultDictionary, config):
 
     return retDict
 
+def removeStringEntriesFromKeygenElemToSMTExp(config):
+    global keygenElemToSMTExp
+
+    retList = []
+    newKeygenElemToSMTExp = {}
+
+    for keygenElem in keygenElemToSMTExp:
+        varType = getVarTypeInfoRecursive(BinaryNode(keygenElem), config.keygenFuncName)
+        if (varType == types.str):
+            retList.append(keygenElem)
+        else:
+            newKeygenElemToSMTExp[keygenElem] = keygenElemToSMTExp[keygenElem]
+
+    keygenElemToSMTExp = newKeygenElemToSMTExp
+    return retList
+
+def removeStringEntriesFromSKinKeygenElemToSMTExp(stringEntriesInKeygenElemToSMTExp, config):
+    global keygenElemToSMTExp
+
+    skListInKeygenElemToSMTExp = keygenElemToSMTExp[config.keygenSecVar]
+    for stringToRemove in stringEntriesInKeygenElemToSMTExp:
+        skListInKeygenElemToSMTExp.remove(stringToRemove)
+
 def keygen(file, config):
+    #global keygenElemToSMTExp
+
     SDLLinesForKeygen = []
 
     if ( (type(file) is not str) or (len(file) == 0) ):
@@ -1203,11 +1231,20 @@ def keygen(file, config):
         sys.exit("Variable dependencies obtained for output of keygen in keygen.py was of length zero.")
 
     for keygenOutput_ind in keygenOutput:
-        getAllKeygenElemsToExponentsDictEntries(keygenOutput_ind, keygenFuncName, config)
+        if (keygenOutput_ind not in keygenPubVar):
+            getAllKeygenElemsToExponentsDictEntries(keygenOutput_ind, keygenFuncName, config)
 
     getKeygenElemToSMTExpressions(config)
 
+    stringEntriesInKeygenElemToSMTExp = removeStringEntriesFromKeygenElemToSMTExp(config)
+    removeStringEntriesFromSKinKeygenElemToSMTExp(stringEntriesInKeygenElemToSMTExp, config)
+
+    print(keygenElemToSMTExp)
+
     bfMap, skBfMap = instantiateBFSolver(config)
+
+    for stringEntry in stringEntriesInKeygenElemToSMTExp:
+        skBfMap[stringEntry] = nilType
     
     print("BFSolver Results: ", skBfMap)
     # produce proof
@@ -1218,10 +1255,8 @@ def keygen(file, config):
     #skBfMap = {'sk':'bf0'}
     #skBfMap = {'sk': 'bf0'}
     #skBfMap = {'K': 'bf0', 'L': 'bf0', 'Kl': 'bf0'}
-
     #skBfMap = {'Djp': 'bf0', 'Dj': 'bf0', 'D': 'uf1'}
-
-    skBfMap = {'K':'bf0#'}
+    #skBfMap = {'K':'bf0#'}
 
     skBfMap = applyGroupSharingOptimization(skBfMap, config)
     applyBlindingFactorsToScheme(skBfMap, config)

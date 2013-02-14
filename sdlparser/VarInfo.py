@@ -351,6 +351,8 @@ class VarInfo:
                     #self.addNonNumListIndicesString(retNode, getFullVarName(node, False))
                     if (node.negated == True):
                         retNode.negated = True
+                    if (retNode.type == ops.FUNC):
+                        return node
                     return retNode
         elif ( (node.type == ops.LIST) or (node.type == ops.SYMMAP) or (node.type == ops.EXPAND) or (node.type == ops.FUNC) ):
             newListNodesList = []

@@ -3,6 +3,7 @@ schemeName = "LW"
 rootNodeName = 'root'
 addNodePrefix = 'ADD'
 mulNodePrefix = 'MUL'
+leafNodeName = 'LEAF0'
 
 inputVarName = "input"
 outputVarName = "output"
@@ -15,7 +16,8 @@ listNameIndicator = "LISTNAMEINDICATOR"
 
 transformOutputList = "transformOutputList"
 
-doNotIncludeInTransformList = ["reservedVarName0"]
+#doNotIncludeInTransformList = ["reservedVarName0"]
+doNotIncludeInTransformList = []
 
 M = 'M'
 
@@ -27,7 +29,7 @@ blindingLoopVar = "y"
 blindingFactorPrefix = "blindingFactor"
 
 blindingSuffix = "Blinded"
-setupFuncName = "authsetup"
+setupFuncName = "setup"
 keygenBlindingExponent = "zz"
 keygenBlindingExponentType = "ZR"
 keygenFuncName = "keygen"
@@ -44,7 +46,7 @@ masterSecVars = ["mk"]
 
 # superset of variables we have used to represent public parameters in
 # our crypto schemes
-keygenPubVar = ["pk", "gpk"]
+keygenPubVar = ["pk"]
 keygenSecVar = "sk"
 
 pySuffix = ".py"
