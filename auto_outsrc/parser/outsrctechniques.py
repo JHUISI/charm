@@ -1505,6 +1505,28 @@ class GetAttrs:
             if varName not in self.varList:
                 self.varList.append(varName)
     
+    def visit_func(self, node, data):
+        for i in node.listNodes:
+            if i.find(LIST_INDEX_SYMBOL) != -1:
+                newVarName = i.split(LIST_INDEX_SYMBOL)
+                for j in newVarName:
+                    if j not in self.varList: 
+                        self.varList.append(j)
+            else:
+                if i not in self.varList: 
+                    self.varList.append(i)
+
+    def visit_list(self, node, data):
+        for i in node.listNodes:
+            if i.find(LIST_INDEX_SYMBOL) != -1:
+                newVarName = i.split(LIST_INDEX_SYMBOL)
+                for j in newVarName:
+                    if j not in self.varList: 
+                        self.varList.append(j)
+            else:
+                if i not in self.varList: 
+                    self.varList.append(i)        
+            
     def getVarList(self):
         return self.varList 
 
