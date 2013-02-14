@@ -193,6 +193,7 @@ def writeForAllLoop(keygenOutputElem, resultDictionary, config):
     if (isLastCharThisChar(currentBlindingFactorName, LIST_INDEX_SYMBOL) == True):
         sameBFForWholeList = False
         currentBlindingFactorName = currentBlindingFactorName[0:(len(currentBlindingFactorName)-1)]
+        resultDictionary[keygenOutputElem] = listBlindingFactorName + LIST_INDEX_SYMBOL
     else:
         sameBFForWholeList = True
 
@@ -1165,7 +1166,7 @@ def instantiateBFSolver(config):
     #return results.resultDictionary
     return (bfMap, skBfMap)
 
-def prepareDictForTransform(resultDictionary):
+def prepareDictForTransform(resultDictionary, config):
     retDict = {}
 
     for skElem in resultDictionary:
@@ -1173,7 +1174,10 @@ def prepareDictForTransform(resultDictionary):
         bfName = resultDictionary[skElem]
         if (isLastCharThisChar(bfName, LIST_INDEX_SYMBOL) == True):
             bfName = bfName[0:(len(bfName) - 1)]
-        retDict[skElem].append(bfName)
+            retDict[skElem].append(bfName)
+            retDict[skElem].append(config.listNameIndicator)
+        else:
+            retDict[skElem].append(bfName)
 
     return retDict
 
@@ -1215,7 +1219,9 @@ def keygen(file, config):
     #skBfMap = {'sk': 'bf0'}
     #skBfMap = {'K': 'bf0', 'L': 'bf0', 'Kl': 'bf0'}
 
-    skBfMap = {'Djp': 'bf0', 'Dj': 'bf0', 'D': 'uf1'}
+    #skBfMap = {'Djp': 'bf0', 'Dj': 'bf0', 'D': 'uf1'}
+
+    skBfMap = {'K':'bf0#'}
 
     skBfMap = applyGroupSharingOptimization(skBfMap, config)
     applyBlindingFactorsToScheme(skBfMap, config)
@@ -1246,7 +1252,7 @@ def keygen(file, config):
     appendToLinesOfCode(varNamesForListDecls, lineNoEndTypesSection)
     updateCodeAndStructs()
 
-    resultDictionaryForTransform = prepareDictForTransform(skBfMap)
+    resultDictionaryForTransform = prepareDictForTransform(skBfMap, config)
 
     #varsThatAreBlinded = {"c":["zz"], "d0":["yy"], "d1":["aa", "bb"]}
     transformNEW(resultDictionaryForTransform, secretKeyElements, config)

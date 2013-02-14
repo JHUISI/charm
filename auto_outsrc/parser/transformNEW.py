@@ -101,7 +101,7 @@ def makeSecretKeyBlindedNameReplacements(node, secretKeyElements):
 
 def getOriginalVarNameFromBlindedName(blindedName):
     retName = blindedName.lstrip(blindingFactorPrefix)
-    retName = retName.rstrip(blindingSuffix)
+    #retName = retName.rstrip(blindingSuffix)
     return retName
 
 def getForLoopStructsInfo():
@@ -569,6 +569,9 @@ def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, curre
         if (str(currentNode.left) not in varsWithNonStandardTypes):
             varsWithNonStandardTypes.append(str(currentNode.left))
         transformLines.append(str(currentNode) + "\n")
+        # LW
+        if (withinForLoop == True):
+            decoutLines.append(str(currentNode) + "\n")
         return
 
         '''

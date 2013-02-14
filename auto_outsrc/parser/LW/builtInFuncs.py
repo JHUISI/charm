@@ -18,7 +18,7 @@ utilBuiltInFuncs = None
 listIndexNoOfN_StrToId = 9
 listIndexNoOfl_StrToId = 10
 
-MNT160 = 80
+MNT160 = "SS512"
 
 def isList(object):
     objectTypeName = None
