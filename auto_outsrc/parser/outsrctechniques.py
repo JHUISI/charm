@@ -1493,9 +1493,13 @@ class GetAttrs:
         if varName.find(LIST_INDEX_SYMBOL) != -1:
             newVarName = varName.split(LIST_INDEX_SYMBOL)
             if self.dropPounds: addVarName = newVarName[0]
-            else: addVarName = varName
-            
-            if addVarName not in self.varList:
+            else: 
+                addVarName = None
+                for i in newVarName:
+                    if not i.isdigit() and i not in self.varList:
+                        self.varList.append(i)
+                            
+            if addVarName != None and addVarName not in self.varList:
                 self.varList.append(addVarName)
         else: # no pounds
             if varName not in self.varList:
@@ -1596,8 +1600,8 @@ if __name__ == "__main__":
         #print("1: Expr w/ P: ", evalStr, "\t=>\t", eval(evalStr))
         #print("2: Expr w/o P: ", evalStrWOP, "\t=>\t", eval(evalStrWOP))
 
-#        print("node=", node, "\nresult=", GetAttributeVars(node, True))
-#        equationList.append(node)
+        print("node=", node, "\nresult=", GetAttributeVars(node))
+        equationList.append(node)
 #        ASTVisitor(SubstituteVar("Kl", "KlBlinded")).preorder(node)
 
     #combinedList = CombinePairings(equationList, True)

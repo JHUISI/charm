@@ -2,32 +2,16 @@ from __future__ import print_function
 from z3 import *
 import string, sys, importlib
 
-# input for our BF solver
+#input to BFSolver
+######################################################################################
+#skVar = 'sk'
 #mskVars = ['alpha', 't1', 't2', 't3', 't4']
 #rndVars = ['r1', 'r2']
-#
-## 4 : alpha * t2 + r1 * t2
-##d4 = {'MUL0':['alpha', 't2'], 'MUL1':['r1', 't2'], 'ADD0': ['MUL0', 'MUL1'], 'root':'ADD0' }
-## 5 : r1 * t1 * t2 + r2 * t3 * t4 => 
-##d5 = {'MUL0': [ 'r1', 't1', 't2' ],  'MUL1': [ 'r2', 't3', 't4' ], 'ADD0': ['MUL0', 'MUL1'], 'root':'ADD0' }
-#
 ##keywords: info, skVars, rndVars, mskVars and bfCount
-#info = {'d3': {'root': ['ADD0'], 'ADD0': ['t4', '-r2', 'hID#y']}, 'sk': {}, 'd4': {'root': ['ADD0'], 'ADD0': ['t3', '-r2', 'hID#y']}, 'd2': {'root': ['ADD0'], 'ADD0': ['t1', '-alpha', 't1', '-r1', 'hID#y']}, 'id': {}, 'd0': {'ADD0': ['MUL0', 'MUL2'], 'MUL2': ['r2', 'MUL3'], 'MUL3': ['t3', 't4'], 'MUL0': ['r1', 'MUL1'], 'MUL1': ['t1', 't2'], 'root': ['ADD0']}, 'd1': {'root': ['ADD0'], 'ADD0': ['t2', '-alpha', 't2', '-r1', 'hID#y']}}
-#skVars = ['d0', 'd1', 'd2', 'd3', 'd4']
-
-#mskVars = ['alpha']
-#rndVars = ['t']
-
-#rndVars = ['t', 'beta'] # try to capture ordering of instances of random vars.
-#info = {'sk': ['K', 'L', 'Kl'], 'K': {'root': ['MUL0'], 'ADD0':['alpha', 'beta'], 'MUL0':['ADD0','t']}, 'L': {'root':['LEAF0'], 'LEAF0':['t']}, 'Kl': {'root':['LEAF0'], 'LEAF0':['t']}}
-
-#rndVars = ['t', 'beta', 's'] # try to capture ordering of instances of random vars.
-#info = {'sk': ['K', 'L', 'Kl'], 'K': {'root': ['ADD0'], 'ADD0': ['MUL0','MUL1'], 'MUL0':['alpha', 'beta'], 'MUL1':['s', 't']}, 'L': {'root':['LEAF0'], 'LEAF0':['t']}, 'Kl': {'root':['LEAF0'], 'LEAF0':['t']}}
-
-#rndVars = ['t', 'beta']
-#info = {'sk': ['K', 'L', 'Kl'], 'K': {'root': ['ADD0'], 'ADD0': ['t','MUL0'], 'MUL0':['alpha', 'beta']}, 'L': {'root':['LEAF0'], 'LEAF0':['t']}, 'Kl': {'root':['LEAF0'], 'LEAF0':['t']}}
-#info = {'sk': ['K', 'L', 'Kl'], 'K': {'root': ['ADD0'], 'ADD0': ['alpha','t']}, 'L': {'root':['LEAF0'], 'LEAF0':['t']}, 'Kl': {'root':['LEAF0'], 'LEAF0':['t']}}
-
+#info = {'d3': {'root': ['ADD0'], 'ADD0': ['t4', '-r2', 'hID#y']}, 'sk': ['d0', 'd1', 'd2', 'd3', 'd4'], 
+#'d4': {'root': ['ADD0'], 'ADD0': ['t3', '-r2', 'hID#y']}, 'd2': {'root': ['ADD0'], 'ADD0': ['t1', '-alpha', 't1', '-r1', 'hID#y']}, 
+#'id': {}, 'd0': {'ADD0': ['MUL0', 'MUL2'], 'MUL2': ['r2', 'MUL3'], 'MUL3': ['t3', 't4'], 'MUL0': ['r1', 'MUL1'], 'MUL1': ['t1', 't2'], 'root': ['ADD0']}, 
+#'d1': {'root': ['ADD0'], 'ADD0': ['t2', '-alpha', 't2', '-r1', 'hID#y']}}
 ######################################################################################
 bfCount = 0
 root = 'root'
@@ -418,17 +402,17 @@ class BFSolver:
         self.theSolver.add( theSolver.assertions() )
         
         for i in self.skList:
-            print("BFSolver: key =", i, ", info =", info[i])
+            if self.verbose: print("BFSolver: key =", i, ", info =", info[i])
             refs = self.unsatIDs[i][0]
-            if unsat_id != None and unsat_id == refs: 
-                print("BFSolver: skipping :", unsat_id,"\n")
+            if unsat_id != None and refs in unsat_id: 
+                if self.verbose: print("BFSolver: skipping :", refs,"\n")
                 continue
             for j in range(len(self.constraintsDict[ i ])):
-                print("BFSolver: ref: ", refs, ", constraint: ", self.constraintsDict[i][j])
+                if self.verbose: print("BFSolver: ref: ", refs, ", constraint: ", self.constraintsDict[i][j])
                 self.theSolver.assert_and_track(self.constraintsDict[i][j], refs)
-            print("\n")
+            if self.verbose: print("\n")
         
-        print(self.theSolver, "\n")
+        if self.verbose: print(self.theSolver, "\n")
         print(self.theSolver.check(), "\n")
         if self.theSolver.check() != unsat:
             print("<=== Interpret Results ===>")
@@ -439,7 +423,7 @@ class BFSolver:
                 refs = self.unsatIDs[i][0]
                 self.solution[ i ] = {}
                 self.finalMapOfBFs[ i ] = set()
-                if unsat_id != None and unsat_id == refs: 
+                if unsat_id != None and refs in unsat_id: 
                     print("unique blinding factor for: ", i, "\n")
                     bfNew = self.__getPlaceholder()
                     self.usedBFs = self.usedBFs.union([ bfNew ])
@@ -495,6 +479,25 @@ def isSubset(hashList, hashDict, unsatIDs):
             return unsatIDs[i]
     return 
 
+def searchForSolution(BFSolverObj, SolverRef, skipList):
+    """description:
+    """
+    print("<=== START ===>")
+    skipList2 = list(skipList)
+    skipList2.append(pID)
+    print("skipList: ", skipList2)
+    satisfied, newList2 = BFSolverObj.run(SolverRef, skipList2)
+    if satisfied:
+        print("FINAL unsat_core=", skipList)
+    else:
+        print("FAILED: ", newList2) # new list of identifiers then recurse
+        satisfied, newList2 = BFSolverObj.run(SolverRef, skipList2)
+        
+#    print("NEW RESULTS: satisfied=", satisfied, "unsat_core=", newList2)
+#    print("<=== END ===>")
+    print("\n")
+    if satisfied == True: print("FINAL unsat_core=", skipList2)
+
 
 if __name__ == "__main__":
     filename = sys.argv[1]
@@ -538,37 +541,50 @@ if __name__ == "__main__":
     # 3. Run the Solver and deal with unsatisfiable cores.
     satisfied = False
     unsat_list = []
-    bf = BFSolver(skList, constraintsDict, constraintsDictVars, unsatIDs)
+    bf = BFSolver(skList, constraintsDict, constraintsDictVars, unsatIDs, True)
     
     print("constraintsDictVars=", constraintsDictVars)
     print("constraintDict=", constraintsDict)
     print("unsatIDs=", unsatIDs, "\n")
-
+    
+    skipList = []
     satisfied, newList = bf.run(theSolver)
     print("\n<=== Summary ===>")
     print("RESULTS: satisfied=", satisfied, "unsat_core=", newList)
     if satisfied: # iff satsified on the first go around.
         print("bfVarsMap = ", bf.getBFSolution())
         print("skVarsMap = ", bf.getSKSolution())
-        bf.writeToFile(filename)
+        bf.writeToFile(filename) # success!
         exit(0)
         # append results to the input filename
     elif len(newList) == 1: # satisfied == False
         pID = str(newList[0])
-        satisfied, newList = bf.run(theSolver, pID)
+        skipList.append(pID)
+        satisfied, newList = bf.run(theSolver, skipList)
         print("NEW RESULTS: satisfied=", satisfied, "unsat_core=", newList)
         if satisfied:
             print("<=== END ===>")
             print("bfVarsMap = ", bf.getBFSolution())
             print("skVarsMap = ", bf.getSKSolution())
             print("\n")
-            bf.writeToFile(filename)
-    else:
-        for i in newList:
-            pID = str(i)
-            satisfied, newList2 = bf.run(theSolver, pID)
-            print("NEW RESULTS: satisfied=", satisfied, "unsat_core=", newList)
-            print("<=== END ===>")
-            print("\n")
+            bf.writeToFile(filename) # success!
+            exit(0)
+
+    print("\n<=== UNSAT CORE PHASE 2 ===>")
+    # if execution makes it here then we
+    bf.verbose = False
+#    newList = ['p0', 'p7']
+    for i in newList:
+        skipList2 = list(skipList)
+        pID = str(i)
+        print("<=== START ===>")
+        skipList2.append(pID)
+        print("skipList: ", skipList2)
+        satisfied, newList2 = bf.run(theSolver, skipList2)
+        print("NEW RESULTS: satisfied=", satisfied, "unsat_core=", newList2)
+        print("<=== END ===>")
+        print("\n")
+        if satisfied == True: print("FINAL unsat_core=", skipList2)
+        #break
     
     # TODO: need a strategy to augment solver and keep skList consistent when constraints are unsatisfiable.

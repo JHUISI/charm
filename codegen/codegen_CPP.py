@@ -124,10 +124,10 @@ def addSecParam():
 
     setupFile.write("int " + str(secParamVarName) + " = " + str(secParam) + ";\n\n")
 
-def addGlobalPairingGroupObject():
+def addGlobalPairingGroupObject(groupParam):
     global setupFile
 
-    setupFile.write("PairingGroup group(AES_SECURITY);\n\n") # TODO: make AES_SECURITY a command line parameter
+    setupFile.write("PairingGroup group(%s);\n\n" % groupParam) # TODO: make AES_SECURITY a command line parameter
 
 def addBuiltinObjects():
     global setupFile
@@ -585,6 +585,7 @@ def addGetTypeToAttrNode(inputString, variableType):
     sys.exit("addGetTypeToAttrNode in codegen_CPP.py:  variable type passed in is not one of the supported types.")
 
 def exhaustSearchType(node, currentFuncName):
+    if type(node) == str: return
     if Type(node) != ops.ATTR: return
     nodeParts = str(node).split(LIST_INDEX_SYMBOL)
     varName = nodeParts[0]
@@ -1046,7 +1047,7 @@ def writeAssignStmt_CPP(outputFile, binNode):
         CPP_funcBodyLines += "return;\n"
         return
     elif(str(binNode) == NOP_STATEMENT):
-        CPP_funcBodyLines += "cout << "";\n"
+        CPP_funcBodyLines += "\t\t//NOP;\n"
         return
     
     variableName = getFullVarName(binNode.left, False)
@@ -1151,6 +1152,7 @@ def writeAssignStmt_CPP(outputFile, binNode):
 
 def writeAssignStmt(binNode):
     global setupFile    
+    print("DEBUG: ", binNode)
     # inline SDL assignment pre-processor
     resultPreType, binNodeList = preProcessCheck(binNode)
     if resultPreType == preprocessTypes.listWithinListAssign:
@@ -1427,7 +1429,6 @@ def writeSDLToFiles(astNodes):
             continue
         elif (isNOP(astNode) == True):
             writeAssignStmt(astNode)
-            print("cout << "";")
         else:
             print("BinNode: ", astNode)
             sys.exit("writeSDLToFiles in codegen.py:  unrecognized type of statement in SDL.")
@@ -1526,7 +1527,7 @@ def write_Main_Function():
     outputString = "int main()\n{\n    return 0;\n}\n"
     setupFile.write(outputString)
 
-def codegen_CPP_main(inputSDLScheme, outputFileName):
+def codegen_CPP_main(inputSDLScheme, outputFileName, groupParam='AES_SECURITY'):
     global setupFile, assignInfo, varNamesToFuncs_All
     global varNamesToFuncs_Assign, inputOutputVars, userFuncsCPPFile, functionNameOrder
     global blindingFactors_NonLists, blindingFactors_Lists
@@ -1548,7 +1549,7 @@ def codegen_CPP_main(inputSDLScheme, outputFileName):
     addNumSignatures()
     addNumSigners()
     addSecParam()
-    addGlobalPairingGroupObject()
+    addGlobalPairingGroupObject(groupParam)
     addBuiltinObjects()
     writeSDLToFiles(astNodes)
     write_Main_Function()
