@@ -46,7 +46,6 @@ for{y := 0,Y}
 z := S#y
 Kl#z := (H(z,G1)^t)
 END :: for
-
 sk := list{K, L, Kl}
 output := sk
 END :: func:keygen

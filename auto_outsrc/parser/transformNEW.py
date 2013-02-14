@@ -194,12 +194,13 @@ def addTransformFuncIntro():
     transformFuncIntro = ["BEGIN :: func:" + transformFuncName + "\n"]
     appendToLinesOfCode(transformFuncIntro, firstLineOfDecryptFunc)
 
-def getLastLineOfTransform(stmtsDec):
+def getLastLineOfTransform(stmtsDec, config):
     for lineNo in stmtsDec:
         stmt = stmtsDec[lineNo]
         #print(type(stmt).__name__)
+        print(stmt)
         if (type(stmt).__name__ == VAR_INFO_CLASS_NAME):
-            if (str(stmt.getAssignNode().left) == M):
+            if (str(stmt.getAssignNode().left) == config.M):
                 return lineNo
 
     sys.exit("getLastLineOfTransform in transformNEW:  could not locate the line in decrypt where the message is assigned its value.")
@@ -719,7 +720,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     astNodes = getAstNodes()
     firstLineOfDecryptFunc = getStartLineNoOfFunc(config.decryptFuncName)
     lastLineOfDecryptFunc = getEndLineNoOfFunc(config.decryptFuncName)
-    lastLineOfTransform = getLastLineOfTransform(stmtsDec)
+    lastLineOfTransform = getLastLineOfTransform(stmtsDec, config)
     getForLoopStructsInfo()
 
     #print("\n\n\n")
@@ -885,7 +886,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     decoutRunningInputLine += "}\n"
     decoutLines.insert(1, decoutRunningInputLine)
 
-    decoutLines.append("output := " + M + "\n")
+    decoutLines.append("output := " + config.M + "\n")
     decoutLines.append("END :: func:" + decOutFunctionName + "\n\n")
 
     transformPlusDecoutLines = transformLines + decoutLines

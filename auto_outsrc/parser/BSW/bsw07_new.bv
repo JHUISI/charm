@@ -55,7 +55,7 @@ END :: func:keygen
 
 BEGIN :: func:encrypt
 input := list{pk, M, policyUSstr}
-pk := expand{g, h, f, egg}
+pk := expand{g, h, egg}
 
 policy := createPolicy(policyUSstr)
 attrs := getAttributeList(policy)

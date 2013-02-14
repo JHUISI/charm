@@ -31,6 +31,7 @@ secretKeyElements = []
 masterSecretKeyElements = []
 allMskAndRndVars = []
 varNamesForListDecls = []
+bfsThatNeedRandomAssignments = []
 
 mskVars = []
 rndVars = []
@@ -137,7 +138,7 @@ def getLineNoOfLastAssign(funcName, varNameToFind):
 
     possibleNewLastLineNo = getEndLineNoOfForLoop(funcName, lastLineNo)
     if (possibleNewLastLineNo != 0):
-        lastLineNo = possibleNewLastLineNo + 1
+        lastLineNo = possibleNewLastLineNo
 
     return lastLineNo
 
@@ -183,7 +184,7 @@ def isLastCharThisChar(inputString, possibleLastChar):
     return False
 
 def writeForAllLoop(keygenOutputElem, resultDictionary, config):
-    global blindingFactors_Lists, varNamesForListDecls
+    global blindingFactors_Lists, varNamesForListDecls, bfsThatNeedRandomAssignments
 
     listBlindingFactorName = config.blindingFactorPrefix + keygenOutputElem + config.blindingSuffix
 
@@ -200,6 +201,8 @@ def writeForAllLoop(keygenOutputElem, resultDictionary, config):
     if (sameBFForWholeList == True):
         if (currentBlindingFactorName not in blindingFactors_Lists):
             blindingFactors_Lists.append(currentBlindingFactorName)
+        if (currentBlindingFactorName not in bfsThatNeedRandomAssignments):
+            bfsThatNeedRandomAssignments.append(currentBlindingFactorName)
     else:
         if (listBlindingFactorName not in blindingFactors_Lists):
             blindingFactors_Lists.append(listBlindingFactorName)
@@ -1074,7 +1077,7 @@ def getBlindingFactorsLine():
 
     return outputLine
 
-def writeOutputLineForKeygen(secretKeyName, keygenFuncName):
+def writeOutputLineForKeygen(secretKeyName, keygenFuncName, config):
     SDLLinesForKeygen = []
 
     outputLine = ""
@@ -1083,7 +1086,7 @@ def writeOutputLineForKeygen(secretKeyName, keygenFuncName):
 
     keygenOutput = assignInfo[keygenFuncName][outputKeyword].getVarDeps()
     for outputEntry in keygenOutput:
-        if ( (outputEntry == keygenSecVar) or (outputEntry == (keygenSecVar + blindingSuffix)) ):
+        if ( (outputEntry == config.keygenSecVar) or (outputEntry == (config.keygenSecVar + blindingSuffix)) ):
             continue
 
         outputLine += outputEntry + ", "
@@ -1208,6 +1211,12 @@ def keygen(file, config):
     #print(resultDictionary)
     #sys.exit("test")
 
+    #skBfMap = {'sk':'bf0'}
+    #skBfMap = {'sk': 'bf0'}
+    #skBfMap = {'K': 'bf0', 'L': 'bf0', 'Kl': 'bf0'}
+
+    skBfMap = {'Djp': 'bf0', 'Dj': 'bf0', 'D': 'uf1'}
+
     skBfMap = applyGroupSharingOptimization(skBfMap, config)
     applyBlindingFactorsToScheme(skBfMap, config)
     secretKeyName = config.keygenSecVar
@@ -1215,12 +1224,17 @@ def keygen(file, config):
     removeAssignmentOfOrigKeygenSecretKeyName(secretKeyName, config.keygenFuncName)
 
     SDLLinesForKeygen = []
+    for bfName in bfsThatNeedRandomAssignments:
+        SDLLinesForKeygen.append(bfName + " := random(ZR)\n")
+
     for nonListBlindingFactor in blindingFactors_NonLists:
-        SDLLinesForKeygen.append(nonListBlindingFactor + " := random(ZR)\n")
+        if (nonListBlindingFactor not in bfsThatNeedRandomAssignments):
+            SDLLinesForKeygen.append(nonListBlindingFactor + " := random(ZR)\n")
+
     inputLineOfKeygenFunc = getLineNoOfInputStatement(config.keygenFuncName)
     appendToLinesOfCode(SDLLinesForKeygen, inputLineOfKeygenFunc + 1)
     updateCodeAndStructs()
-    writeOutputLineForKeygen(secretKeyName, config.keygenFuncName)
+    writeOutputLineForKeygen(secretKeyName, config.keygenFuncName, config)
 
     for index_listVars in range(0, len(varNamesForListDecls)):
         varNamesForListDecls[index_listVars] = varNamesForListDecls[index_listVars] + blindingSuffix + " := list\n"
