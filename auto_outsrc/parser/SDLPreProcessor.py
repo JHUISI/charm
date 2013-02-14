@@ -91,7 +91,7 @@ def isDotProdLoopStartResultOfPruneFunc(assignInfo, lineNo, varName):
     varInfoObj = assignInfo[funcName][varName]
     return varInfoObj.getIsResultOfPruneFunc()
 
-def expandDotProdIntoForLoop(assignInfo, astNode, lineNo, outputFile):
+def expandDotProdIntoForLoop(assignInfo, astNode, lineNo, outputFile, config):
     global reservedVarNameNumber
 
     outputString = ""
@@ -153,12 +153,12 @@ def expandDotProdIntoForLoop(assignInfo, astNode, lineNo, outputFile):
     outputString += str(astNode.left) + " := "
     outputString += RESERVED_VAR_NAME + str(reservedVarNameNumber) + "\n"
 
-    doNotIncludeInTransformList.append(RESERVED_VAR_NAME + str(reservedVarNameNumber))
+    config.doNotIncludeInTransformList.append(RESERVED_VAR_NAME + str(reservedVarNameNumber))
 
     reservedVarNameNumber += 2
     outputFile.write(outputString)
 
-def SDLPreProcessor_main(inputFileName, outputFileName):
+def SDLPreProcessor_main(inputFileName, outputFileName, config):
     try:
         outputFile = open(outputFileName, 'w')
     except:
@@ -178,7 +178,7 @@ def SDLPreProcessor_main(inputFileName, outputFileName):
         elif (astNode.type == ops.NONE):
             outputFile.write("\n")
         elif ( (astNode.right != None) and (astNode.right.type == ops.ON) ):
-            expandDotProdIntoForLoop(assignInfo, astNode, lineNo, outputFile)
+            expandDotProdIntoForLoop(assignInfo, astNode, lineNo, outputFile, config)
         elif (hasPairingsMixedWithNonExpCalcs(astNode) == True):
             fixPairingsMixedWithNonExpCalcs(astNode, outputFile)
         else:

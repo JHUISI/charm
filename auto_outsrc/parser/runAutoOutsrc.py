@@ -28,7 +28,7 @@ def main(inputSDLScheme, configName, outputFile, outputUserDefFile):
     SDLParser.masterPubVars = config.masterPubVars
     SDLParser.masterSecVars = config.masterSecVars
 
-    SDLPreProcessor.SDLPreProcessor_main(inputSDLScheme, inputSDLScheme + PREPROCESSED_STRING)
+    SDLPreProcessor.SDLPreProcessor_main(inputSDLScheme, inputSDLScheme + PREPROCESSED_STRING, config)
     (linesOfCodeFromKeygen, blindingFactors_NonLists, blindingFactors_Lists) = keygen(inputSDLScheme + PREPROCESSED_STRING, config)
     writeLOCFromKeygenToFile(linesOfCodeFromKeygen, inputSDLScheme + PREPROCESSED_STRING, config)
     codegen_PY.codegen_PY_main(inputSDLScheme + PREPROCESSED_STRING + config.finalSDLSuffix, outputFile + ".py", outputUserDefFile + ".py")

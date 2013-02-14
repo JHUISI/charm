@@ -572,6 +572,7 @@ def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, curre
         # LW
         if (withinForLoop == True):
             decoutLines.append(str(currentNode) + "\n")
+            addVarsUsedInDecoutToGlobalList(currentNode)
         return
 
         '''

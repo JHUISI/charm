@@ -96,10 +96,10 @@ def transform(skBlinded, userS, ct):
         numerator = transformOutputList[1001+12*y]
         transformOutputList[1002+12*y] = pair(KBlinded[kDecrypt], C2[kDecrypt])
         denominator0 = transformOutputList[1002+12*y]
-    output = (transformOutputList, coeff, Y, attrs)
+    output = (transformOutputList, attrs, coeff, Y, kDecrypt)
     return output
 
-def decout(userS, transformOutputList, blindingFactorKBlinded, coeff, Y, attrs):
+def decout(userS, transformOutputList, blindingFactorKBlinded, attrs, coeff, Y, kDecrypt):
     C0 = transformOutputList[1]
     h_gid = transformOutputList[0]
     dotProd = group.init(GT)
@@ -130,8 +130,8 @@ def main():
     (blindingFactorKBlinded, skBlinded) = keygen(gpk, msk, "john@example.com", ['ONE', 'TWO', 'THREE'])
     M = group.random(GT)
     ct = encrypt(pk, gpk, M, '((four or three) and (two or one))')
-    (transformOutputList, coeff, Y, attrs) = transform(skBlinded, ['ONE', 'TWO', 'THREE'], ct)
-    M2 = decout(['ONE', 'TWO', 'THREE'], transformOutputList, blindingFactorKBlinded, coeff, Y, attrs)
+    (transformOutputList, attrs, coeff, Y, kDecrypt) = transform(skBlinded, ['ONE', 'TWO', 'THREE'], ct)
+    M2 = decout(['ONE', 'TWO', 'THREE'], transformOutputList, blindingFactorKBlinded, attrs, coeff, Y, kDecrypt)
     print(M)
     print("\n\n\n")
     print(M2)
