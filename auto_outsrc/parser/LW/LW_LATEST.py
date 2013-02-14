@@ -90,16 +90,12 @@ def transform(skBlinded, userS, ct):
     for y in range(0, Y):
         pass
         kDecrypt = GetString(attrs[y])
-        transformOutputList[1000+11*y] = pair(h_gid, C3[kDecrypt])
-        result0 = transformOutputList[1000+11*y]
-        transformOutputList[1001+11*y] = (result0 ** coeff[kDecrypt])
-        result1 = transformOutputList[1001+11*y]
-        transformOutputList[1002+11*y] = (C1[kDecrypt] ** coeff[kDecrypt])
-        result2 = transformOutputList[1002+11*y]
-        transformOutputList[1003+11*y] = (result1 * result2)
-        numerator = transformOutputList[1003+11*y]
-        transformOutputList[1004+11*y] = pair(KBlinded[kDecrypt], C2[kDecrypt])
-        denominator0 = transformOutputList[1004+11*y]
+        transformOutputList[1000+12*y] = pair(h_gid, C3[kDecrypt])
+        result0 = transformOutputList[1000+12*y]
+        transformOutputList[1001+12*y] = ((result0 ** coeff[kDecrypt]) * (C1[kDecrypt] ** coeff[kDecrypt]))
+        numerator = transformOutputList[1001+12*y]
+        transformOutputList[1002+12*y] = pair(KBlinded[kDecrypt], C2[kDecrypt])
+        denominator0 = transformOutputList[1002+12*y]
     output = (transformOutputList, coeff, Y, attrs)
     return output
 
@@ -110,11 +106,9 @@ def decout(userS, transformOutputList, blindingFactorKBlinded, coeff, Y, attrs):
     for y in range(0, Y):
         pass
         kDecrypt = GetString(attrs[y])
-        result0 = transformOutputList[1000+11*y]
-        result1 = transformOutputList[1001+11*y]
-        result2 = transformOutputList[1002+11*y]
-        numerator = transformOutputList[1003+11*y]
-        denominator0 = (transformOutputList[1004+11*y] ** blindingFactorKBlinded[kDecrypt])
+        result0 = transformOutputList[1000+12*y]
+        numerator = transformOutputList[1001+12*y]
+        denominator0 = (transformOutputList[1002+12*y] ** blindingFactorKBlinded[kDecrypt])
         denominator = (denominator0 ** coeff[kDecrypt])
         fraction = (numerator * (denominator ** -1))
         dotProd = (dotProd * fraction)
@@ -127,6 +121,8 @@ def SmallExp(bits=80):
 
 def main():
     global group
+    #group = PairingGroup(secparam)
+
     group = PairingGroup("SS512")
 
     gpk = setup()
