@@ -416,6 +416,8 @@ class BFSolver:
         print(self.theSolver.check(), "\n")
         if self.theSolver.check() != unsat:
             print("<=== Interpret Results ===>")
+            self.solution = {}
+            self.finalMapOfBFs = {}
             model = self.theSolver.model()
             print(model)
             for i in self.skList:
@@ -483,15 +485,29 @@ def searchForSolution(BFSolverObj, SolverRef, skipList):
     """description:
     """
     print("<=== START ===>")
-    skipList2 = list(skipList)
-    skipList2.append(pID)
-    print("skipList: ", skipList2)
-    satisfied, newList2 = BFSolverObj.run(SolverRef, skipList2)
+    print("skipList: ", skipList)
+    satisfied, skipList2 = BFSolverObj.run(SolverRef, skipList)
     if satisfied:
         print("FINAL unsat_core=", skipList)
+        return (True, skipList)
     else:
-        print("FAILED: ", newList2) # new list of identifiers then recurse
-        satisfied, newList2 = BFSolverObj.run(SolverRef, skipList2)
+        skipList3 = list(skipList2)
+        print("FAILED: ", skipList3) # new list of identifiers then recurse
+        while len(skipList3) > 0:
+            pID = str(skipList3.pop())
+            satisfied, newList3 = BFSolverObj.run(SolverRef, skipList + [ pID ])
+            if satisfied:
+                return (True, skipList + [ pID ])
+        
+        # if all combinations failed above, then continue to the next level
+        while len(skipList2) > 0:
+             pID = str(skipList2.pop())
+             satsified, newList4 = searchForSolution(BFSolverObj, SolverRef, skipList + [ pID ])
+             if satisfied:
+                 return (True, skipList + [ pID ])
+        
+        return (False, None)
+        #satisfied, newList2 = BFSolverObj.run(SolverRef, skipList2)
         
 #    print("NEW RESULTS: satisfied=", satisfied, "unsat_core=", newList2)
 #    print("<=== END ===>")
@@ -556,35 +572,45 @@ if __name__ == "__main__":
         print("skVarsMap = ", bf.getSKSolution())
         bf.writeToFile(filename) # success!
         exit(0)
-        # append results to the input filename
-    elif len(newList) == 1: # satisfied == False
-        pID = str(newList[0])
-        skipList.append(pID)
-        satisfied, newList = bf.run(theSolver, skipList)
-        print("NEW RESULTS: satisfied=", satisfied, "unsat_core=", newList)
-        if satisfied:
+    else:
+        print("\n<=== UNSAT CORE PHASE 2 ===>")
+        # if execution makes it here then we
+        bf.verbose = False
+        newList2 = [ str(i) for i in newList ]
+        satisfied, finalUnsatIDs = searchForSolution(bf, theSolver, newList2)
+        if satisfied: 
             print("<=== END ===>")
+            print("SUCCESS: unsat IDs= ", finalUnsatIDs)
+            satisfied, newList = bf.run(theSolver, finalUnsatIDs)
             print("bfVarsMap = ", bf.getBFSolution())
             print("skVarsMap = ", bf.getSKSolution())
             print("\n")
             bf.writeToFile(filename) # success!
             exit(0)
 
-    print("\n<=== UNSAT CORE PHASE 2 ===>")
-    # if execution makes it here then we
-    bf.verbose = False
-#    newList = ['p0', 'p7']
-    for i in newList:
-        skipList2 = list(skipList)
-        pID = str(i)
-        print("<=== START ===>")
-        skipList2.append(pID)
-        print("skipList: ", skipList2)
-        satisfied, newList2 = bf.run(theSolver, skipList2)
-        print("NEW RESULTS: satisfied=", satisfied, "unsat_core=", newList2)
-        print("<=== END ===>")
-        print("\n")
-        if satisfied == True: print("FINAL unsat_core=", skipList2)
-        #break
+        # append results to the input filename
+#    elif len(newList) == 1: # satisfied == False
+#        pID = str(newList[0])
+#        skipList.append(pID)
+#        satisfied, newList = bf.run(theSolver, skipList)
+#        print("NEW RESULTS: satisfied=", satisfied, "unsat_core=", newList)
+#        if satisfied:
+#            print("<=== END ===>")
+#            print("bfVarsMap = ", bf.getBFSolution())
+#            print("skVarsMap = ", bf.getSKSolution())
+#            print("\n")
+#            bf.writeToFile(filename) # success!
+#            exit(0)
+#    for i in newList:
+#        skipList2 = list(skipList)
+#        pID = str(i)
+#        print("<=== START ===>")
+#        skipList2.append(pID)
+#        print("skipList: ", skipList2)
+#        satisfied, newList2 = bf.run(theSolver, skipList2)
+#        print("NEW RESULTS: satisfied=", satisfied, "unsat_core=", newList2)
+#        print("<=== END ===>")
+#        print("\n")
+#        if satisfied == True: print("FINAL unsat_core=", skipList2)
     
     # TODO: need a strategy to augment solver and keep skList consistent when constraints are unsatisfiable.

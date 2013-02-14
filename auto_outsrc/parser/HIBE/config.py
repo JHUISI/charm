@@ -15,7 +15,7 @@ listNameIndicator = "LISTNAMEINDICATOR"
 
 transformOutputList = "transformOutputList"
 
-doNotIncludeInTransformList = []
+doNotIncludeInTransformList = ["reservedVarName0"]
 
 M = 'M'
 
