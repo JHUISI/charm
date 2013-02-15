@@ -39,7 +39,7 @@ def addVarsUsedInDecoutToGlobalList(lineForDecout):
         parser = SDLParser()
         lineForDecout = parser.parse(lineForDecout)
 
-    print(type(lineForDecout).__name__)
+    #print(type(lineForDecout).__name__)
     allAttrNodeNames = GetAttributeVars(lineForDecout, True)
 
     for attrName in allAttrNodeNames:
@@ -552,7 +552,7 @@ def makeListTypeReplacement(inputType):
 
     return str(inputType)
 
-def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, currentLineNo, astNodes, config):
+def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, currentLineNo, astNodes, config, ctExpandListNodes, ctVarsThatNeedBuckets):
     global transformListCounter, decoutListCounter, iterationNo, varsWithNonStandardTypes
 
     decoutListCounter = transformListCounter
@@ -584,6 +584,7 @@ def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, curre
         if (withinForLoop == True):
             decoutLines.append(str(currentNode) + "\n")
             addVarsUsedInDecoutToGlobalList(currentNode.right)
+            searchForCTVarsThatNeedBuckets(currentNode.right, ctExpandListNodes, ctVarsThatNeedBuckets)
         return
 
         '''
@@ -628,6 +629,7 @@ def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, curre
 
     decoutLines.append(lineForDecoutLines + "\n")
     addVarsUsedInDecoutToGlobalList(getRightSideOfStringAssignStatement(lineForDecoutLines))
+    searchForCTVarsThatNeedBuckets(getRightSideOfStringAssignStatement(lineForDecoutLines), ctExpandListNodes, ctVarsThatNeedBuckets)
 
 '''
 def writeOutNonPairingCalcs(currentNode, transformLines, decoutLines):
@@ -680,6 +682,11 @@ def getListNodes(node):
 
 def searchForCTVarsThatNeedBuckets(node, ctExpandListNodes, ctVarsThatNeedBuckets):
     #see if we need to put any of the ciphertext elements into buckets for decout
+
+    if (type(node).__name__) == "str":
+        parser = SDLParser()
+        node = parser.parse(node)
+
     varsOnThisLine = GetAttributeVars(node, True)
     for varOnThisLine in varsOnThisLine:
         if ( (varOnThisLine in ctExpandListNodes) and (varOnThisLine not in ctVarsThatNeedBuckets) ):
@@ -719,6 +726,24 @@ def getAllBlindingExponentsForDecoutLine(varsThatAreBlindedDict):
 
     return retList
 
+def getSkVarsThatDecoutNeeds(currentNode, skExpandListNodes):
+    retList = []
+
+    varsOnThisLine = GetAttributeVars(currentNode, True)
+    for var in varsOnThisLine:
+        if ( (var == "for") or (var == "if") ):
+            continue
+
+        if ( (var in skExpandListNodes) and (var not in retList) ):
+            retList.append(var)
+
+    return retList
+
+def combineListsNoDups(listToAddTo, listToAddFrom):
+    for varName in listToAddFrom:
+        if (varName not in listToAddTo):
+            listToAddTo.append(varName)
+
 def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     global currentNumberOfForLoops, withinForLoop, iterationNo
 
@@ -751,6 +776,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     decoutLines = ["BEGIN :: func:" + config.decOutFunctionName + "\n"]
 
     ctExpandListNodes = []
+    skExpandListNodes = []
 
     transformRunningOutputLine = ""
     decoutRunningInputLine = ""
@@ -778,11 +804,13 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
             if (str(currentFullNode.left) in ctVarNames):
                 ctExpandListNodesForThisLine = getListNodes(currentFullNode.right)
                 addListNodesForThisLineToCtExpandListNodes(ctExpandListNodes, ctExpandListNodesForThisLine)
+            if (str(currentFullNode.left) == (config.keygenSecVar + config.blindingSuffix)):
+                skExpandListNodes = getListNodes(currentFullNode.right)
         else:
             startLineNoOfSearch = lineNo
             break
 
-    #print(ctExpandListNodes)
+    #print(skExpandListNodes)
     #sys.exit("test")
 
     if (startLineNoOfSearch == None):
@@ -791,6 +819,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     #transformLines += transformOutputList + " = []\n"
 
     ctVarsThatNeedBuckets = []
+    skVarsThatDecoutNeeds = []
     transformInputExpandNumStatements = len(transformLines)
     decoutInputExpandNumStatements = len(decoutLines)
 
@@ -829,6 +858,8 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
         areAllVarsOnLineKnownByTransform = getAreAllVarsOnLineKnownByTransform(currentNode.right, knownVars, dotProdLoopVar)
 
         if (currentNode.type != ops.EQ):
+            skVarsThatDecoutNeedsForThisLine = getSkVarsThatDecoutNeeds(currentNode, skExpandListNodes)
+            combineListsNoDups(skVarsThatDecoutNeeds, skVarsThatDecoutNeedsForThisLine)
             if (currentNode.type == ops.FOR):
                 withinForLoop = True
                 currentNumberOfForLoops += 1
@@ -839,10 +870,12 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
                 transformLines.append(str(currentNode) + "\nNOP\n")
                 decoutLines.append(str(currentNode) + "\nNOP\n")
                 addVarsUsedInDecoutToGlobalList(currentNode)
+                searchForCTVarsThatNeedBuckets(currentNode, ctExpandListNodes, ctVarsThatNeedBuckets)
             else:
                 transformLines.append(str(currentNode) + "\n")
                 decoutLines.append(str(currentNode) + "\n")
                 addVarsUsedInDecoutToGlobalList(currentNode)
+                searchForCTVarsThatNeedBuckets(currentNode, ctExpandListNodes, ctVarsThatNeedBuckets)
         elif (str(currentNode.left) == M):
             decoutLines.append(str(currentNode) + "\n")
             addVarsUsedInDecoutToGlobalList(currentNode.right)
@@ -857,7 +890,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
             if (groupedPairings[0][0] == []):
                 knownVars.append(str(currentNode.left))
         elif (areAllVarsOnLineKnownByTransform == True):
-            writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, lineNo, astNodes, config)
+            writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, lineNo, astNodes, config, ctExpandListNodes, ctVarsThatNeedBuckets)
             knownVars.append(str(currentNode.left))
         else:
             decoutLines.append(str(currentNode) + "\n")
@@ -868,7 +901,8 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
             forLoopIndexVarName = getForLoopIndexVarName(currentNode)
             knownVars.append(forLoopIndexVarName)
 
-    #print(ctVarsThatNeedBuckets)
+    #print(skVarsThatDecoutNeeds)
+    #sys.exit("test")
 
     if (len(ctVarsThatNeedBuckets) > 0):
         writeOutCTVarsThatNeedBuckets(ctVarsThatNeedBuckets, transformInputExpandNumStatements, decoutInputExpandNumStatements, transformLines, decoutLines)
@@ -880,6 +914,10 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
 
     for varName in varsWithNonStandardTypes:
         if (varName in varsUsedInDecout):
+            varsToAddToTransformOutputAndDecoutInput.append(varName)
+
+    for varName in skVarsThatDecoutNeeds:
+        if (varName not in varsToAddToTransformOutputAndDecoutInput):
             varsToAddToTransformOutputAndDecoutInput.append(varName)
 
     if (len(varsToAddToTransformOutputAndDecoutInput) == 0):

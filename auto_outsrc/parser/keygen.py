@@ -1248,7 +1248,7 @@ def keygen(file, config):
 
     #skBfMap = {'d0':'bf0', 'd1':'bf1', 'd2':'bf2', 'd3':'bf3', 'd4':'bf4', 'd5':'bf5'}
 
-    skBfMap = {'YVector':'bf0', 'LVector':'bf1'}
+    #skBfMap = {'YVector':'bf0', 'LVector':'bf1'}
 
     for stringEntry in stringEntriesInKeygenElemToSMTExp:
         skBfMap[stringEntry] = nilType
