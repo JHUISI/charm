@@ -23,12 +23,15 @@ rndVarsKeyword = 'rndVars'
 skVarsKeyword = 'skVar'
 bfMapKeyword = 'bfMap'
 skBfMapKeyword = 'skBfMap'
+hashtag = '#'
+includeMskVarsInDict = False
+includeDict = {}
 
 class CleanVarRefs:
-    def __init__(self, info, skVars, mskVars, verbose=False):
+    def __init__(self, info, skVars, refVars, verbose=False):
         self.info = info
         self.skVars = skVars
-        self.mskVars = list(mskVars)
+        self.refVars = list(refVars)
         self.verbose = verbose
     
     def __getVars(self, key, srcDict):
@@ -36,25 +39,32 @@ class CleanVarRefs:
         for i,j in srcDict.items():
             if type(j) == list:
                 for k in j:
-                    if key in k:
-                        keyList = keyList.union( [ k ] )
+                    if k.find(hashtag) == -1:
+                        if key == k:
+                            keyList = keyList.union( [ k ] )
+                    else:
+                        if key == k.split(hashtag)[0]:
+                            keyList = keyList.union( [ k ] )                        
         return keyList
     
     def clean(self):
-        newMskList = set()
-        for j in self.mskVars:
+        global includeMskVarsInDict
+        newList = set()
+        for j in self.refVars:
             #if self.verbose: 
             #print("Key:", j)
             for i in self.info[self.skVars]:
                 matchKeyList = self.__getVars(j, self.info[i])
                 #print(i, ":", self.info[i], matchKeyList)
-                newMskList = newMskList.union( matchKeyList )
-        #print("newMskList: ", list(newMskList))
+                newList = newList.union( matchKeyList )
         
-        if set(self.mskVars) == set(newMskList):
-            return self.mskVars
+        if set(self.refVars) == set(newList):
+            return self.refVars
+        elif len(newList) == 0:
+            includeMskVarsInDict = True # meaning there were no references to mk variables in
+            return self.refVars
         else:
-            return list(newMskList)
+            return list(newList)
 
         
 class CleanInfo:
@@ -182,8 +192,12 @@ def _readConfig(fileVars, fileKeys):
     info = ci.getUpdatedInfo()
     #print("AFTER:  ", info)
     
-    cvr = CleanVarRefs(info, skVars, mskVars)
-    mskVars = cvr.clean()
+    if len(mskVars) > 0:
+        cvr = CleanVarRefs(info, skVars, mskVars)
+        mskVars = cvr.clean()
+    if len(rndVars) > 0:
+        cvr = CleanVarRefs(info, skVars, rndVars)
+        rndVars = cvr.clean()
     #print("New MSK LIST: ", mskVars)
     return (mskVars, rndVars, skVars, info)
 
@@ -345,6 +359,8 @@ class ConstructRule:
         return finalConstraints
     
     def __attrRule(self, data):
+        """base rule: a ==> Or(a != nil). In other words, if attr is part of LEAF, then certainly needs to be blinded. 
+        We do not allow any sk element to go unblinded."""
         orObjects = []
         print("ATTR Rule: ", data)
         for i in data:
@@ -404,25 +420,14 @@ class ConstructRule:
                     print("DEBUG: ", i, "==", j)
                     objects.append(ii == jj)
         
-        print("OBJECTS: ", objects)
-#        print("ADD Result: ", Or(objects))
-#        return [ Or(objects) ]
         print("ADD Result: ", And(objects))
         return [ And(objects) ]
     
 
-
-# simultaneous solver over sk element variables.
-class SKSolver:
-    def __init__(self, skList):
-        self.skList = skList
-    
-    def run(self):
-        pass
-
 class BFSolver:
-    def __init__(self, skList, constraintsDict, constraintsDictVars, unsatIDs, verbose=False):
+    def __init__(self, skList, mskVars, constraintsDict, constraintsDictVars, unsatIDs, verbose=False):
         self.skList = skList
+        self.mskVars = mskVars
         self.constraintsDict = constraintsDict
         self.constraintsDictVars = constraintsDictVars # shows variables that were used
         self.unsatIDs = unsatIDs
@@ -432,10 +437,12 @@ class BFSolver:
         self.verbose = verbose
         
     def __getPlaceholder(self):
+        newUF ="uf" + str(self.index) 
         self.index += 1
-        return"uf" + str(self.index) 
+        return newUF
     
     def run(self, theSolver, unsat_id=None):
+        global includeMskVarsInDict
         self.index = 0
         self.usedBFs = set()
         self.theSolver = Solver() # theSolver # copy
@@ -460,7 +467,7 @@ class BFSolver:
             self.solution = {}
             self.finalMapOfBFs = {}
             model = self.theSolver.model()
-            print(model)
+            print(model)            
             for i in self.skList:
                 print("SK: ", i, self.unsatIDs[i], )
                 refs = self.unsatIDs[i][0]
@@ -485,6 +492,16 @@ class BFSolver:
                                 self.finalMapOfBFs[ i ] = self.finalMapOfBFs[ i ].union([ lVal ])
 #                self.solution[ i ] = skSolution
                 print("")
+            if includeMskVarsInDict: 
+                # rare cases where msk does not show up directly in any sk elements. 
+                # We just include in dictionary to be safe 
+                for i in self.mskVars:
+                    for l in model.decls():
+                        lKey = str(l.name())
+                        lVal = str(model[l])
+                        if lKey == i:
+                            self.solution[ i ] = lVal
+                            self.finalMapOfBFs[ i ] = set([ lVal ])
             print("<=== Interpret Results ===>")
             print("Unique blinding factors: ", self.usedBFs)
             return True, None
@@ -523,7 +540,7 @@ def isSubset(hashList, hashDict, unsatIDs):
     return 
 
 def searchForSolution(BFSolverObj, SolverRef, skipList):
-    """description:
+    """description: flush out this algorithm better
     """
     print("<=== START ===>")
     print("skipList: ", skipList)
@@ -541,29 +558,24 @@ def searchForSolution(BFSolverObj, SolverRef, skipList):
                 return (True, skipList + [ pID ])
         
         # if all combinations failed above, then continue to the next level
-        while len(skipList2) > 0:
-             pID = str(skipList2.pop())
-             satsified, newList4 = searchForSolution(BFSolverObj, SolverRef, skipList + [ pID ])
+        skipList3 = list(skipList2)
+        while len(skipList3) > 0:
+             pID = str(skipList3.pop())
+             satisfied, newList4 = searchForSolution(BFSolverObj, SolverRef, skipList + [ pID ])
              if satisfied:
-                 return (True, skipList + [ pID ])
+                 return (True, newList4) # skipList + [ pID ])
         
-        return (False, None)
+        return (satisfied, None)
     else:
         print("TODO: handle this scenario.")
-        return (False, None)
-        #satisfied, newList2 = BFSolverObj.run(SolverRef, skipList2)
+        return (satisfied, skipList)
         
-#    print("NEW RESULTS: satisfied=", satisfied, "unsat_core=", newList2)
-#    print("<=== END ===>")
-    print("\n")
-    if satisfied == True: print("FINAL unsat_core=", skipList2)
-
-
 if __name__ == "__main__":
     filename = sys.argv[1]
     (mskVars, rndVars, skVars, info) = readConfig(filename)
     # 1. construct the SetupBF Solver w/ initial 
-    bfCount = len(info.get(skVars))
+    # compute upper bound on number of possible blinding factors
+    bfCount = max(len(info.get(skVars)), len(mskVars))
     setupBF = SetupBFSolver(bfCount)
     theSolver = setupBF.construct(mskVars, rndVars)
     theVarMap = setupBF.theVarMap
@@ -601,7 +613,7 @@ if __name__ == "__main__":
     # 3. Run the Solver and deal with unsatisfiable cores.
     satisfied = False
     unsat_list = []
-    bf = BFSolver(skList, constraintsDict, constraintsDictVars, unsatIDs, True)
+    bf = BFSolver(skList, mskVars, constraintsDict, constraintsDictVars, unsatIDs, True)
     
     print("constraintsDictVars=", constraintsDictVars)
     print("constraintDict=", constraintsDict)
@@ -631,30 +643,3 @@ if __name__ == "__main__":
             print("\n")
             bf.writeToFile(filename) # success!
             exit(0)
-
-        # append results to the input filename
-#    elif len(newList) == 1: # satisfied == False
-#        pID = str(newList[0])
-#        skipList.append(pID)
-#        satisfied, newList = bf.run(theSolver, skipList)
-#        print("NEW RESULTS: satisfied=", satisfied, "unsat_core=", newList)
-#        if satisfied:
-#            print("<=== END ===>")
-#            print("bfVarsMap = ", bf.getBFSolution())
-#            print("skVarsMap = ", bf.getSKSolution())
-#            print("\n")
-#            bf.writeToFile(filename) # success!
-#            exit(0)
-#    for i in newList:
-#        skipList2 = list(skipList)
-#        pID = str(i)
-#        print("<=== START ===>")
-#        skipList2.append(pID)
-#        print("skipList: ", skipList2)
-#        satisfied, newList2 = bf.run(theSolver, skipList2)
-#        print("NEW RESULTS: satisfied=", satisfied, "unsat_core=", newList2)
-#        print("<=== END ===>")
-#        print("\n")
-#        if satisfied == True: print("FINAL unsat_core=", skipList2)
-    
-    # TODO: need a strategy to augment solver and keep skList consistent when constraints are unsatisfiable.
