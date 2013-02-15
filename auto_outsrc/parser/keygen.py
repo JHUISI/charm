@@ -1243,7 +1243,12 @@ def keygen(file, config):
 
     bfMap, skBfMap = instantiateBFSolver(config)
 
-    skBfMap = {'D':'bf0', 'd':'bf0'}
+    #skBfMap = {'D':'bf0', 'd':'bf0'}
+    #skBfMap = {'D1':'bf0', 'D2':'bf1', 'D3':'bf2', 'D4':'bf3', 'D5':'bf4', 'D6':'bf5', 'D7':'bf6', 'K':'bf7', 'tagUSk':'bf8'}
+
+    #skBfMap = {'d0':'bf0', 'd1':'bf1', 'd2':'bf2', 'd3':'bf3', 'd4':'bf4', 'd5':'bf5'}
+
+    skBfMap = {'YVector':'bf0', 'LVector':'bf1'}
 
     for stringEntry in stringEntriesInKeygenElemToSMTExp:
         skBfMap[stringEntry] = nilType

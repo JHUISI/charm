@@ -838,11 +838,11 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
             if ( (currentNode.type == ops.FOR) or (currentNode.type == ops.IF) ):
                 transformLines.append(str(currentNode) + "\nNOP\n")
                 decoutLines.append(str(currentNode) + "\nNOP\n")
-                addVarsUsedInDecoutToGlobalList(currentNode.right)
+                addVarsUsedInDecoutToGlobalList(currentNode)
             else:
                 transformLines.append(str(currentNode) + "\n")
                 decoutLines.append(str(currentNode) + "\n")
-                addVarsUsedInDecoutToGlobalList(currentNode.right)
+                addVarsUsedInDecoutToGlobalList(currentNode)
         elif (str(currentNode.left) == M):
             decoutLines.append(str(currentNode) + "\n")
             addVarsUsedInDecoutToGlobalList(currentNode.right)

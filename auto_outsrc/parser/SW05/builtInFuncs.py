@@ -10,7 +10,7 @@ from charm.core.math.pairing import hashPair as DeriveKey
 from charm.core.engine.util import objectToBytes, bytesToObject
 #from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from charm.toolbox.conversion import Conversion
-from charm.toolbox.bitstring import Bytes
+#from charm.toolbox.bitstring import Bytes
 #import hashlib
 
 groupObjBuiltInFuncs = None
@@ -76,18 +76,64 @@ def getCoefficients(policy):
 	getUserGlobals()
 	return utilBuiltInFuncs.getCoefficients(policy)
 
+def strkeys(var):
+	keys = []
+	for i in range(len(var)):
+	    keys.append( var[i][0] ) 
+	return keys
+
 def recoverCoefficientsDict(inputDict):
 	getUserGlobals()
-	#print("it got here")
-	return shareBuiltInFuncs.recoverCoefficientsDict(inputDict)
+	newDict = {}
+	_inputDict = {}
+	if type(inputDict[0]) == int:
+		for i,j in inputDict.items():
+		    _inputDict[ i ] = groupObjBuiltInFuncs.init(ZR, j)
+		resultDict = shareBuiltInFuncs.recoverCoefficientsDict(_inputDict)
+		for i,j in resultDict.items():
+		    newDict[ int(i) ] = j	
+		return newDict
+
+	length = len(inputDict)
+	for i in range(length):
+	    _inputDict[ inputDict[i][0] ] = inputDict[i][1]
+	resultDict = shareBuiltInFuncs.recoverCoefficientsDict(_inputDict)
+	for i in range(length):
+	    key = inputDict[i][1] 
+	    if resultDict.get(key) != None:
+	       newDict[ inputDict[i][0] ] = resultDict[key]
+	return newDict
 
 def genShares(mk0, dOver, n, q, wHash):
 	getUserGlobals()
 	return shareBuiltInFuncs.genShares(mk0, dOver, n, q, wHash)
 
-def intersection_subset(w, CT0, d):
+def genSharesForX(mk0, q, wHash):
 	getUserGlobals()
-	return shareBuiltInFuncs.intersection_subset(w, CT0, d)
+	newX = []
+	x = shareBuiltInFuncs.genShares(mk0, 1, 1, q, wHash) 
+	for i in range(len(x)):
+		newX.append(x[i][1])
+	return newX
+	#return utilBuiltInFuncs.genShares(mk0, q, wHash)
+
+def intersectionSubset(w, wPrime, d):
+    getUserGlobals()	
+    SSub = {}
+    S = {}
+
+    wLen = len(w)
+    wPrimeLen = len(wPrime)
+    SIndex = 0
+    for i in range(0, wLen):
+        for j in range(0, wPrimeLen):
+            if ( ( (w[i]) == (wPrime[j]) ) ):
+                S[SIndex] = (w[i], groupObjBuiltInFuncs.hash(w[i]))
+                SIndex = (SIndex + 1)
+    #for k in range(0, d):
+    #    SSub[k] = (S[k][0]], S[k][1])
+    output = S
+    return output
 
 def sha1(message):
 	getUserGlobals()
@@ -117,7 +163,7 @@ def getUserGlobals():
 	global groupObjBuiltInFuncs, utilBuiltInFuncs, shareBuiltInFuncs
 
 	if (groupObjBuiltInFuncs == None):
-		groupObjBuiltInFuncs = PairingGroup(MNT160)
+		groupObjBuiltInFuncs = PairingGroup("SS512")
 
 	if (utilBuiltInFuncs == None):
 		utilBuiltInFuncs = SecretUtil(groupObjBuiltInFuncs, verbose=False)

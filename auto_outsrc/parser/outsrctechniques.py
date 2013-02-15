@@ -940,6 +940,13 @@ class SubstituteVar:
             del node.listNodes[:] # remove previous argument
             node.listNodes.append(self.new_var) # add new one
 #            print("node: ", node.attr, node.listNodes)
+        found = False
+        if node.listNodes != None:
+            for i in node.listNodes:
+                if str(i) == self.target: found = True; break
+        if found:
+            ind = node.listNodes.index(self.target)
+            node.listNodes[ind] = self.new_var
 
 class SubstitutePairings:
     def __init__(self, this, this_new, side='left'):
