@@ -130,7 +130,7 @@ class CleanInfo:
             elif (LIST in i):
                 keyList.append(i)
                 self.__cleanDict(keyList, exprDict[i], exprDict)
-            elif exprDict.get(i).get(root) != None:
+            elif type(exprDict.get(i)) == dict and exprDict.get(i).get(root) != None:
                 keyList.append(i)
         return 
     
@@ -212,6 +212,27 @@ def _readConfig(fileVars, fileKeys):
     #myLog.info("New MSK LIST: ", mskVars)
     return (mskVars, rndVars, skVars, info)
 
+def checkForLists(mskVars):
+    isList = []
+    for i in mskVars:
+        if i.find(hashtag) != -1:
+            j = i.split(hashtag)[1:] # skip the name
+            for k in j:
+                if not k.isdigit():
+                    isList.append(i)
+    return isList
+                    
+def checkMskListMix(usedVars, isPartOfList):
+    if len(isPartOfList) > 0:
+        resultVars = list(usedVars.difference(isPartOfList))
+        interVars = list(usedVars.intersection(isPartOfList))
+        if len(resultVars) > 0 and len(interVars) > 0:
+            myLog.info("checkMskListMix: mixing msk list vars with non-msk: automatically give it a unique BF.")
+            return True
+        elif len(resultVars) == 0:
+            myLog.info("good case: can continue as before and no need to do anything special.")
+    return False
+
 def clean(v):
     removeSymbols = ['-', '#', '?']
     for i in removeSymbols:
@@ -286,9 +307,10 @@ class SetupBFSolver:
 ######################################################################################
 
 class ConstructRule:
-    def __init__(self, theVarMap, nil):
+    def __init__(self, theVarMap, isPartOfList, nil):
         self.varMap = theVarMap
         self.varMapKeys = list(self.varMap.keys())
+        self.isPartOfList = isPartOfList
         self.nil = nil
     
     def baseCase(self, dataList):
@@ -363,15 +385,13 @@ class ConstructRule:
                         finalConstraints += res2[0]  + res[0] 
                         myLog.info("finalConstraints: ", finalConstraints)
                     else:
-                        finalConstraints += self.rule(newRuleList, data, retList, excludeList)                        
+                        finalConstraints += self.rule(newRuleList, data, retList, excludeList)
             elif LEAF in i:
                 finalConstraints += self.__attrRule(data[i]) # base case
             elif LIST in i:
-                print("Handle LIST: ", data[i])
                 for i in data[i]:
-                    print('i: ', i)
+                    #print('i: ', i)
                     finalConstraints += self.rule(data[i].get(root), data[i])
-                    print("Result: ", finalConstraints)
         if retList: return finalConstraints, newData
         return finalConstraints
     
@@ -442,12 +462,13 @@ class ConstructRule:
     
 
 class BFSolver:
-    def __init__(self, skList, mskVars, constraintsDict, constraintsDictVars, unsatIDs, verbose=False):
+    def __init__(self, skList, mskVars, constraintsDict, constraintsDictVars, unsatIDs, isPartOfList, verbose=False):
         self.skList = skList
         self.mskVars = mskVars
         self.constraintsDict = constraintsDict
         self.constraintsDictVars = constraintsDictVars # shows variables that were used
         self.unsatIDs = unsatIDs
+        self.isPartOfList = isPartOfList
         self.usedBFs = None
         self.finalMapOfBFs = {}
         self.solution = {}
@@ -507,7 +528,6 @@ class BFSolver:
                                 self.usedBFs = self.usedBFs.union([ lVal ])
                                 self.solution[ i ][ lKey ] = lVal
                                 self.finalMapOfBFs[ i ] = self.finalMapOfBFs[ i ].union([ lVal ])
-#                self.solution[ i ] = skSolution
                 myLog.info("")
             if includeMskVarsInDict: 
                 # rare cases where msk does not show up directly in any sk elements. 
@@ -535,12 +555,25 @@ class BFSolver:
     
     def writeToFile(self, filename):
         assert len(self.solution) > 0, "BF solution is empty!"
-        assert len(self.finalMapOfBFs) > 0, "sk BF solution is empty!"
-        BFMapForProof = bfMapKeyword + " = " + str(self.solution) + "\n"
+        assert len(self.finalMapOfBFs) > 0, "sk BF solution is empty!"  
+        # strip the set from each value      
         newDict = {}
         for i,j in self.finalMapOfBFs.items():
             newDict[i] = list(j)[0] # assume just one element in list
+                        
+        # pass information to keygenOut regarding whether to treat the 'bfNum' as one value 
+        # or a list of values as in 'bfNum#0' ... 'bfNum#N'
+        # note that this is determined by the contents of isPartOfList list
+        for k in self.isPartOfList:
+            for i,j in self.constraintsDictVars.items():
+                if k in j:
+                    newDict[ i ] += hashtag
+                    self.solution[ i ] += hashtag
+
+        BFMapForProof = bfMapKeyword + " = " + str(self.solution) + "\n"
         SKMapForKeygen = skBfMapKeyword + " = " + str(newDict) + "\n"
+        
+        # finally, write the contents of the dictionary back to the config file and close
         f = open(filename, 'a')
         if self.verbose: myLog.info("BFSolver.writeToFile: ", BFMapForProof)
         f.write( BFMapForProof )
@@ -600,19 +633,22 @@ if __name__ == "__main__":
     theSolver = setupBF.construct(mskVars, rndVars)
     theVarMap = setupBF.theVarMap
     nil = setupBF.nil
+    isPartOfList = checkForLists(mskVars)
+    print("isPartOfList: ", isPartOfList)
     
     # 2. construct rule and store for each expression
     index = 0
-    construct = ConstructRule(theVarMap, nil)
+    construct = ConstructRule(theVarMap, isPartOfList, nil)
     skList = info.get(skVars)
     constraintsDict = {}
     constraintsDictVars = {}
     unsatIDs = {}
     hashID = {}
+    skipList = []
     for i in skList:
         myLog.info("key: ", i)
         constraints = construct.rule(info[i][root], info[i])
-        constraintsDictVars[ i ] = construct.getUsedVars()
+        constraintsDictVars[ i ] = construct.getUsedVars()            
         constraintsDict[ i ] = constraints
         _hashID = []
         unsatIDs[ i ] = []
@@ -629,18 +665,19 @@ if __name__ == "__main__":
         else:
             unsatIDs[ i ] = refVal
         hashID[i] = _hashID
+        if checkMskListMix(constraintsDictVars[ i ], isPartOfList):
+            skipList += unsatIDs[i]
                 
     # 3. Run the Solver and deal with unsatisfiable cores.
     satisfied = False
     unsat_list = []
-    bf = BFSolver(skList, mskVars, constraintsDict, constraintsDictVars, unsatIDs, True)
+    bf = BFSolver(skList, mskVars, constraintsDict, constraintsDictVars, unsatIDs, isPartOfList, True)
     
     myLog.info("constraintsDictVars=", constraintsDictVars)
     myLog.info("constraintDict=", constraintsDict)
     myLog.info("unsatIDs=", unsatIDs, "\n")
     
-    skipList = []
-    satisfied, newList = bf.run(theSolver)
+    satisfied, newList = bf.run(theSolver, skipList)
     myLog.info("\n<=== Summary ===>")
     myLog.info("RESULTS: satisfied=", satisfied, "unsat_core=", newList)
     if satisfied: # iff satsified on the first go around.
