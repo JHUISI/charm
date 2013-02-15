@@ -1,6 +1,7 @@
 from __future__ import print_function
 from z3 import *
 import string, sys, importlib
+import myLog
 
 #input to BFSolver
 ######################################################################################
@@ -52,10 +53,10 @@ class CleanVarRefs:
         newList = set()
         for j in self.refVars:
             #if self.verbose: 
-            #print("Key:", j)
+            #myLog.info("Key:", j)
             for i in self.info[self.skVars]:
                 matchKeyList = self.__getVars(j, self.info[i])
-                #print(i, ":", self.info[i], matchKeyList)
+                #myLog.info(i, ":", self.info[i], matchKeyList)
                 newList = newList.union( matchKeyList )
         
         if set(self.refVars) == set(newList):
@@ -90,21 +91,21 @@ class CleanInfo:
     def __inputPreprocessor(self, exprList, exprDict):
         for i in exprList:
             if ADD in i:
-                #print("Process ADD:", i, exprDict[i])
+                #myLog.info("Process ADD:", i, exprDict[i])
                 exprDict[i] = self.__handleOp(exprDict[i])            
                 self.__inputPreprocessor(exprDict[i], exprDict)
             elif MUL in i:
-                #print("Process MUL:", i, exprDict[i])
+                #myLog.info("Process MUL:", i, exprDict[i])
                 exprDict[i] = self.__handleOp(exprDict[i])
                 self.__inputPreprocessor(exprDict[i], exprDict)
             elif LEAF in i:
-                #print("Process LEAF:", i, exprDict[i])            
+                #myLog.info("Process LEAF:", i, exprDict[i])            
                 self.__inputPreprocessor(exprDict[i], exprDict)
     
     def __inputCleaner(self, exprList, exprDict):
         for i in exprList:
             if (ADD in i) or (MUL in i):
-                if self.verbose: print("Process:", i, exprDict[i])
+                if self.verbose: myLog.info("Process:", i, exprDict[i])
                 self.__inputCleaner(exprDict[i], exprDict)
                 replaceWithChild = None
                 for j in exprDict[i]:
@@ -137,7 +138,7 @@ class CleanInfo:
     
     def clean(self):
         for i in self.info[self.skVars]:
-            if self.verbose: print("Key:", i)
+            if self.verbose: myLog.info("Key:", i)
             if self.info[i].get(root) != None:
                 self.__inputPreprocessor(self.info[i][root], self.info[i])  
                 self.__inputCleaner(self.info[i][root], self.info[i])
@@ -147,7 +148,7 @@ class CleanInfo:
                     if j not in keys:
                         del self.info[i][j]
                 self.__removeSymbols(self.info[i])
-                if self.verbose: print("RESULT: ", self.info[i])
+                if self.verbose: myLog.info("RESULT: ", self.info[i])
             else:
                 # if the original is empty, then create 
                 self.info[i] = {root:['LEAF0'], 'LEAF0':[ str(i) ]}
@@ -156,7 +157,7 @@ class CleanInfo:
         return self.info
     
 def readConfig(filename):
-    print("Importing file: ", filename)
+    myLog.info("Importing file: ", filename)
     file = filename.split('.')[0]
 
     fileVars = importlib.import_module(file)
@@ -179,18 +180,16 @@ def _readConfig(fileVars, fileKeys):
         skVars = getattr(fileVars, skVarsKeyword)
     
     if len(mskVars) == 0:
-        print(mskVarsKeyword, "was not defined in ", filename); sys.exit(-1)
+        myLog.error(mskVarsKeyword, "was not defined in ", filename); sys.exit(-1)
     elif info == None:
-        print(infoKeyword, "was not defined in ", filename); sys.exit(-1)
+        myLog.error(infoKeyword, "was not defined in ", filename); sys.exit(-1)
     elif skVars == None:
-        print(skVarsKeyword, "was not defined in ", filename); sys.exit(-1)
+        myLog.error(skVarsKeyword, "was not defined in ", filename); sys.exit(-1)
     
     info[skVars].sort()
-    #print("BEFORE: ", info)
     ci = CleanInfo(info, skVars)
     ci.clean()
     info = ci.getUpdatedInfo()
-    #print("AFTER:  ", info)
     
     if len(mskVars) > 0:
         cvr = CleanVarRefs(info, skVars, mskVars)
@@ -198,7 +197,7 @@ def _readConfig(fileVars, fileKeys):
     if len(rndVars) > 0:
         cvr = CleanVarRefs(info, skVars, rndVars)
         rndVars = cvr.clean()
-    #print("New MSK LIST: ", mskVars)
+    #myLog.info("New MSK LIST: ", mskVars)
     return (mskVars, rndVars, skVars, info)
 
 def clean(v):
@@ -227,11 +226,11 @@ class SetupBFSolver:
             factors.append(alphabet + str(i))
 #            factors.append(alphabet[i])
         factors.append('nil') # no blinding factor
-        print("selected factors :", factors)
+        myLog.info("selected factors :", factors)
         
         # blinding factors
         Factors, self.factorsList = EnumSort('Factors', factors)
-        print("factorList :", self.factorsList)
+        myLog.info("factorList :", self.factorsList)
         self.nil = nil = self.factorsList[-1]
         
         # target variables
@@ -317,16 +316,16 @@ class ConstructRule:
                     finalConstraints += self.__addRule(data[i], excludeList)
                 else:
                     newRuleList, attrList = self.getFirstNonAttr(data[i])
-                    print("newDataList=", newRuleList)
-                    print("attrList=", attrList)
+                    myLog.info("newDataList=", newRuleList)
+                    myLog.info("attrList=", attrList)
                     if len(attrList) > 0:
                         res = self.rule(newRuleList, data, True, excludeList)
-#                        print("RESULT0: ", res[0])
-#                        print("RESULT1: ", res[1] + attrList)
+#                        myLog.info("RESULT0: ", res[0])
+#                        myLog.info("RESULT1: ", res[1] + attrList)
                         data[ i ] = res[1] + attrList # updating current ADD* key/value
                         excludeList += list(res[1])
                         res2 = self.rule([ i ], data, excludeList)
-#                        print("RESULT2: ", res[0], res2[0])
+#                        myLog.info("RESULT2: ", res[0], res2[0])
                         finalConstraints += res[0] + res2[0]
                     else:
                         finalConstraints += self.rule(newRuleList, data, retList, excludeList)
@@ -335,22 +334,22 @@ class ConstructRule:
                     if retList: newData = data[i]
                     finalConstraints += self.__mulRule(data[i], excludeList)
                 else:
-                    print("dealing with mix modes!!!")
+                    myLog.info("dealing with mix modes!!!")
                     newRuleList, attrList = self.getFirstNonAttr(data[i])
-                    print("newDataList=", newRuleList)
-                    print("attrList=", attrList)
+                    myLog.info("newDataList=", newRuleList)
+                    myLog.info("attrList=", attrList)
                     if len(attrList) > 0:
                         res = self.rule(newRuleList, data, True, excludeList)
-                        print("RESULT0: ", res[0])
-#                        print("RESULT1: ", res[1] + attrList)
+                        myLog.info("RESULT0: ", res[0])
+#                        myLog.info("RESULT1: ", res[1] + attrList)
                         bindList = excludeList
                         data[ i ] = [ res[1] ] + attrList # updating current ADD* key/value
-                        print("RESULT1: ", data[i])
+                        myLog.info("RESULT1: ", data[i])
                         bindList += list(res[1])
                         res2 = self.rule([ i ], data, bindList)
-#                        print("RESULT2: ", res2)
+#                        myLog.info("RESULT2: ", res2)
                         finalConstraints += res2[0]  + res[0] 
-                        print("finalConstraints: ", finalConstraints)
+                        myLog.info("finalConstraints: ", finalConstraints)
                     else:
                         finalConstraints += self.rule(newRuleList, data, retList, excludeList)                        
             elif LEAF in i:
@@ -362,12 +361,12 @@ class ConstructRule:
         """base rule: a ==> Or(a != nil). In other words, if attr is part of LEAF, then certainly needs to be blinded. 
         We do not allow any sk element to go unblinded."""
         orObjects = []
-        print("ATTR Rule: ", data)
+        myLog.info("ATTR Rule: ", data)
         for i in data:
             self.usedVars = self.usedVars.union([ i ])
             orObjects.append(self.varMap.get(i) != self.nil)
 #            orObjects.append(self.varMap.get(i) == nil)
-        print("Result:", Or(orObjects))
+        myLog.info("Result:", Or(orObjects))
         return [ Or(orObjects) ]
 
     def __handleNotEqualToNil(self, jj):
@@ -388,7 +387,7 @@ class ConstructRule:
 
     def __mulRule(self, data, bindList):
         """base rule: a * b ==> Or(And(a != nil, b == nil), And(a == nil, b != nil))"""
-        print("MUL Rule: ", data)
+        myLog.info("MUL Rule: ", data)
         index = 0
         orObjects = []
         for x in range(len(data)):
@@ -400,12 +399,12 @@ class ConstructRule:
                     objects.append(self.__handleEqualToNil(j))
             orObjects.append( And(objects) )
             index += 1
-        print("MUL Result: ", Or(orObjects))
+        myLog.info("MUL Result: ", Or(orObjects))
         return [ Or(orObjects) ]
     
     def __addRule(self, data, excludeList):
         """base rule: a + b ==> And(a == b), a + b + c ==> And(a == b, a == c, b == c), etc"""        
-        print("ADD Rule: ", data)
+        myLog.info("ADD Rule: ", data)
         varCheck = {}
         objects = []
         for i in data:
@@ -417,10 +416,10 @@ class ConstructRule:
                 if i != j and (j != varCheck.get(i) and i != varCheck.get(j)):
                     varCheck[ i ] = j
                     varCheck[ j ] = i
-                    print("DEBUG: ", i, "==", j)
+                    myLog.info("DEBUG: ", i, "==", j)
                     objects.append(ii == jj)
         
-        print("ADD Result: ", And(objects))
+        myLog.info("ADD Result: ", And(objects))
         return [ And(objects) ]
     
 
@@ -450,31 +449,31 @@ class BFSolver:
         self.theSolver.add( theSolver.assertions() )
         
         for i in self.skList:
-            if self.verbose: print("BFSolver: key =", i, ", info =", info[i])
+            if self.verbose: myLog.info("BFSolver: key =", i, ", info =", info[i])
             refs = self.unsatIDs[i][0]
             if unsat_id != None and refs in unsat_id: 
-                if self.verbose: print("BFSolver: skipping :", refs,"\n")
+                if self.verbose: myLog.info("BFSolver: skipping :", refs,"\n")
                 continue
             for j in range(len(self.constraintsDict[ i ])):
-                if self.verbose: print("BFSolver: ref: ", refs, ", constraint: ", self.constraintsDict[i][j])
+                if self.verbose: myLog.info("BFSolver: ref: ", refs, ", constraint: ", self.constraintsDict[i][j])
                 self.theSolver.assert_and_track(self.constraintsDict[i][j], refs)
-            if self.verbose: print("\n")
+            if self.verbose: myLog.info("\n")
         
-        if self.verbose: print(self.theSolver, "\n")
-        print(self.theSolver.check(), "\n")
+        if self.verbose: myLog.info(self.theSolver, "\n")
+        myLog.info(self.theSolver.check(), "\n")
         if self.theSolver.check() != unsat:
-            print("<=== Interpret Results ===>")
+            myLog.info("<=== Interpret Results ===>")
             self.solution = {}
             self.finalMapOfBFs = {}
             model = self.theSolver.model()
-            print(model)            
+            myLog.info(model)            
             for i in self.skList:
-                print("SK: ", i, self.unsatIDs[i], )
+                myLog.info("SK: ", i, self.unsatIDs[i], )
                 refs = self.unsatIDs[i][0]
                 self.solution[ i ] = {}
                 self.finalMapOfBFs[ i ] = set()
                 if unsat_id != None and refs in unsat_id: 
-                    print("unique blinding factor for: ", i, "\n")
+                    myLog.info("unique blinding factor for: ", i, "\n")
                     bfNew = self.__getPlaceholder()
                     self.usedBFs = self.usedBFs.union([ bfNew ])
                     self.solution[ i ] = bfNew
@@ -484,14 +483,14 @@ class BFSolver:
                     for l in model.decls():
                         lKey = str(l.name())
                         if lKey in k:
-                            print("%s = %s" % (l.name(), model[l]))
+                            myLog.info("%s = %s" % (l.name(), model[l]))
                             lVal = str(model[l])
                             if lVal != 'nil':
                                 self.usedBFs = self.usedBFs.union([ lVal ])
                                 self.solution[ i ][ lKey ] = lVal
                                 self.finalMapOfBFs[ i ] = self.finalMapOfBFs[ i ].union([ lVal ])
 #                self.solution[ i ] = skSolution
-                print("")
+                myLog.info("")
             if includeMskVarsInDict: 
                 # rare cases where msk does not show up directly in any sk elements. 
                 # We just include in dictionary to be safe 
@@ -502,8 +501,8 @@ class BFSolver:
                         if lKey == i:
                             self.solution[ i ] = lVal
                             self.finalMapOfBFs[ i ] = set([ lVal ])
-            print("<=== Interpret Results ===>")
-            print("Unique blinding factors: ", self.usedBFs)
+            myLog.info("<=== Interpret Results ===>")
+            myLog.info("Unique blinding factors: ", self.usedBFs)
             return True, None
         else:
             unsat_list = self.theSolver.unsat_core()
@@ -525,9 +524,9 @@ class BFSolver:
             newDict[i] = list(j)[0] # assume just one element in list
         SKMapForKeygen = skBfMapKeyword + " = " + str(newDict) + "\n"
         f = open(filename, 'a')
-        if self.verbose: print("BFSolver.writeToFile: ", BFMapForProof, end="")
+        if self.verbose: myLog.info("BFSolver.writeToFile: ", BFMapForProof)
         f.write( BFMapForProof )
-        if self.verbose: print("BFSolver.writeToFile: ", SKMapForKeygen)
+        if self.verbose: myLog.info("BFSolver.writeToFile: ", SKMapForKeygen)
         f.write( SKMapForKeygen )
         f.close()
         return
@@ -535,22 +534,22 @@ class BFSolver:
 def isSubset(hashList, hashDict, unsatIDs):
     for i in hashDict.keys():
         if set(hashList).issubset( hashDict[i] ):
-            print("Found a subset. Existing reference = ", unsatIDs[i])
+            myLog.info("Found a subset. Existing reference = ", unsatIDs[i])
             return unsatIDs[i]
     return 
 
 def searchForSolution(BFSolverObj, SolverRef, skipList):
     """description: flush out this algorithm better
     """
-    print("<=== START ===>")
-    print("skipList: ", skipList)
+    myLog.info("<=== START ===>")
+    myLog.info("skipList: ", skipList)
     satisfied, skipList2 = BFSolverObj.run(SolverRef, skipList)
     if satisfied:
-        print("FINAL unsat_core=", skipList)
+        myLog.info("FINAL unsat_core=", skipList)
         return (True, skipList)
     elif satisfied == False and len(skipList2) > 0:
         skipList3 = list(skipList2)
-        print("FAILED: ", skipList3) # new list of identifiers then recurse
+        myLog.error("FAILED: ", skipList3) # new list of identifiers then recurse
         while len(skipList3) > 0:
             pID = str(skipList3.pop())
             satisfied, newList3 = BFSolverObj.run(SolverRef, skipList + [ pID ])
@@ -567,11 +566,14 @@ def searchForSolution(BFSolverObj, SolverRef, skipList):
         
         return (satisfied, None)
     else:
-        print("TODO: handle this scenario.")
+        myLog.error("TODO: handle this scenario.")
         return (satisfied, skipList)
         
 if __name__ == "__main__":
     filename = sys.argv[1]
+    logname = filename.split('.')[0]
+    myLog.logger = myLog.setup(logname, "/var/tmp/" + logname + ".log")
+    myLog.print2screen = True
     (mskVars, rndVars, skVars, info) = readConfig(filename)
     # 1. construct the SetupBF Solver w/ initial 
     # compute upper bound on number of possible blinding factors
@@ -590,7 +592,7 @@ if __name__ == "__main__":
     unsatIDs = {}
     hashID = {}
     for i in skList:
-        print("key: ", i)
+        myLog.info("key: ", i)
         constraints = construct.rule(info[i][root], info[i])
         constraintsDictVars[ i ] = construct.getUsedVars()
         constraintsDict[ i ] = constraints
@@ -615,31 +617,31 @@ if __name__ == "__main__":
     unsat_list = []
     bf = BFSolver(skList, mskVars, constraintsDict, constraintsDictVars, unsatIDs, True)
     
-    print("constraintsDictVars=", constraintsDictVars)
-    print("constraintDict=", constraintsDict)
-    print("unsatIDs=", unsatIDs, "\n")
+    myLog.info("constraintsDictVars=", constraintsDictVars)
+    myLog.info("constraintDict=", constraintsDict)
+    myLog.info("unsatIDs=", unsatIDs, "\n")
     
     skipList = []
     satisfied, newList = bf.run(theSolver)
-    print("\n<=== Summary ===>")
-    print("RESULTS: satisfied=", satisfied, "unsat_core=", newList)
+    myLog.info("\n<=== Summary ===>")
+    myLog.info("RESULTS: satisfied=", satisfied, "unsat_core=", newList)
     if satisfied: # iff satsified on the first go around.
-        print("bfVarsMap = ", bf.getBFSolution())
-        print("skVarsMap = ", bf.getSKSolution())
+        myLog.info("bfVarsMap = ", bf.getBFSolution())
+        myLog.info("skVarsMap = ", bf.getSKSolution())
         bf.writeToFile(filename) # success!
         exit(0)
     else:
-        print("\n<=== UNSAT CORE PHASE 2 ===>")
+        myLog.info("\n<=== UNSAT CORE PHASE 2 ===>")
         # if execution makes it here then we
         bf.verbose = False
         newList2 = [ str(i) for i in newList ]
         satisfied, finalUnsatIDs = searchForSolution(bf, theSolver, newList2)
         if satisfied: 
-            print("<=== END ===>")
-            print("SUCCESS: unsat IDs= ", finalUnsatIDs)
+            myLog.info("<=== END ===>")
+            myLog.info("SUCCESS: unsat IDs= ", finalUnsatIDs)
             satisfied, newList = bf.run(theSolver, finalUnsatIDs)
-            print("bfVarsMap = ", bf.getBFSolution())
-            print("skVarsMap = ", bf.getSKSolution())
-            print("\n")
+            myLog.info("bfVarsMap = ", bf.getBFSolution())
+            myLog.info("skVarsMap = ", bf.getSKSolution())
+            myLog.info("\n")
             bf.writeToFile(filename) # success!
             exit(0)
