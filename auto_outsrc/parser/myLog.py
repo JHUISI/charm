@@ -21,7 +21,7 @@ def info(*args):
     
     #assert logger != None, "logger not set. Call setup first."
     if logger == None or print2screen:
-        print(outputStr)
+        print(*args)
 
     logger.info(outputStr)
     return
@@ -33,7 +33,7 @@ def error(*args):
     
     #assert logger != None, "logger not set. Call setup first."
     if logger == None or print2screen:
-        print(outputStr)
+        print(*args)
 
     logger.info(outputStr)
     return

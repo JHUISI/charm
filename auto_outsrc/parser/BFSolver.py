@@ -16,7 +16,7 @@ import myLog
 ######################################################################################
 bfCount = 0
 root = 'root'
-ADD,MUL,LEAF='ADD','MUL','LEAF'
+ADD,MUL,LEAF,LIST='ADD','MUL','LEAF','LIST'
 nil = None
 infoKeyword = 'info'
 mskVarsKeyword = 'mskVars'
@@ -33,11 +33,17 @@ class CleanVarRefs:
         self.info = info
         self.skVars = skVars
         self.refVars = list(refVars)
+        self.isMsk = False
         self.verbose = verbose
+    
+    def setIsMsk(self):
+        self.isMsk = True
     
     def __getVars(self, key, srcDict):
         keyList = set()
         for i,j in srcDict.items():
+            if type(j) == dict:
+                return self.__getVars(key, j)
             if type(j) == list:
                 for k in j:
                     if k.find(hashtag) == -1:
@@ -62,7 +68,7 @@ class CleanVarRefs:
         if set(self.refVars) == set(newList):
             return self.refVars
         elif len(newList) == 0:
-            includeMskVarsInDict = True # meaning there were no references to mk variables in
+            if self.isMsk: includeMskVarsInDict = True # meaning there were no references to mk variables in
             return self.refVars
         else:
             return list(newList)
@@ -120,6 +126,11 @@ class CleanInfo:
                 keyList.append(i)
                 self.__cleanDict(keyList, exprDict[i], exprDict)
             elif (LEAF in i):
+                keyList.append(i)
+            elif (LIST in i):
+                keyList.append(i)
+                self.__cleanDict(keyList, exprDict[i], exprDict)
+            elif exprDict.get(i).get(root) != None:
                 keyList.append(i)
         return 
     
@@ -193,6 +204,7 @@ def _readConfig(fileVars, fileKeys):
     
     if len(mskVars) > 0:
         cvr = CleanVarRefs(info, skVars, mskVars)
+        cvr.setIsMsk()
         mskVars = cvr.clean()
     if len(rndVars) > 0:
         cvr = CleanVarRefs(info, skVars, rndVars)
@@ -354,6 +366,12 @@ class ConstructRule:
                         finalConstraints += self.rule(newRuleList, data, retList, excludeList)                        
             elif LEAF in i:
                 finalConstraints += self.__attrRule(data[i]) # base case
+            elif LIST in i:
+                print("Handle LIST: ", data[i])
+                for i in data[i]:
+                    print('i: ', i)
+                    finalConstraints += self.rule(data[i].get(root), data[i])
+                    print("Result: ", finalConstraints)
         if retList: return finalConstraints, newData
         return finalConstraints
     
