@@ -23,6 +23,8 @@ MNT160 = 80
 def stringToInt(strID, zz, ll):
     getUserGlobals()
 
+    #print("strID is:  ", strID)
+
     '''Hash the identity string and break it up in to l bit pieces'''
     h = hashlib.new('sha1')
     h.update(bytes(strID, 'utf-8'))
@@ -121,10 +123,11 @@ def strToId(pk, strID):
 	return v
 
 def getUserGlobals():
-	global groupObjBuiltInFuncs, utilBuiltInFuncs
+	pass
+	#global groupObjBuiltInFuncs, utilBuiltInFuncs
 
-	if (groupObjBuiltInFuncs == None):
-		groupObjBuiltInFuncs = PairingGroup(MNT160)
+	#if (groupObjBuiltInFuncs == None):
+	#	groupObjBuiltInFuncs = PairingGroup("SS512")
 
-	if (utilBuiltInFuncs == None):
-		utilBuiltInFuncs = SecretUtil(groupObjBuiltInFuncs, verbose=False)
+	#if (utilBuiltInFuncs == None):
+	#	utilBuiltInFuncs = SecretUtil(groupObjBuiltInFuncs, verbose=False)

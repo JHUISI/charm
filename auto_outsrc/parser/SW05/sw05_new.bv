@@ -37,16 +37,15 @@ pk := expand{g, g1, g2, t}
 
 BEGIN :: for
 for{i := 0, n+1}
-N#i := init(ZR,i+1)
-Nint#i := i + 1
+N#i := i + 1
 END :: for
 
 coeffs := recoverCoefficientsDict(N)
 prodResult := init(G2)
-lenNint := len(Nint)
+lenN := len(N)
 BEGIN :: for
-for{i := 0, lenNint}
-loopVarEvalT := Nint#i
+for{i := 0, lenN}
+loopVarEvalT := N#i
 loopVarM1 := loopVarEvalT - 1
 prodResult := prodResult * (t#loopVarM1 ^ coeffs#loopVarEvalT)
 END :: for
@@ -118,7 +117,7 @@ input := list{pk, sk, CT, dParam}
 CT := expand{wPrime, Eprime, Eprimeprime, E}
 sk := expand{w, D, d}
 
-S := intersectionSubset(wHash, wPrimeHash, dParam)
+S := intersectionSubset(w, wPrime, dParam)
 coeffs := recoverCoefficientsDict(S)
 prod := init(GT)
 SKeys := strkeys(S)

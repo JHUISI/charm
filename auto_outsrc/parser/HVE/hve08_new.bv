@@ -32,14 +32,14 @@ R#i := g1 ^ r#i
 M#i := g1 ^ m#i
 END :: for
 
-pk := list{g1, g2, Y, T, V, R, M}
+pk := list{g1, g2, Y, T, V, R, M, n}
 msk := list{y, t, v, r, m}
 output := list{pk, msk}
 END :: func:setup
 
 BEGIN :: func:keygen
 input := list{pk, msk, yVector}
-pk := expand{g1, g2, Y, T, V, R, M}
+pk := expand{g1, g2, Y, T, V, R, M, n}
 msk := expand{y, t, v, r, m}
 
 numNonDontCares := init(0)
@@ -99,7 +99,7 @@ END :: func:keygen
 
 BEGIN :: func:encrypt
 input := list{Message, xVector, pk}
-pk := expand{g1, g2, Y, T, V, R, M}
+pk := expand{g1, g2, Y, T, V, R, M, n}
 
 s := random(ZR)
 
