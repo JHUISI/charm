@@ -786,6 +786,28 @@ def getIndividualKeygenElemToSMTExpression(exponents):
     return retExpression
 '''
 
+def isResultOfFunctionWithZRRetType(exp, config):
+    if (exp not in assignInfo[config.keygenFuncName]):
+        return False
+
+    varInfoObj = assignInfo[config.keygenFuncName][exp]
+    assignNodeRight = varInfoObj.getAssignNode().right
+
+    if (assignNodeRight.type != ops.FUNC):
+        return False
+
+    funcName = str(assignNodeRight.attr)
+
+    if (funcName not in builtInTypes):
+        return False
+
+    retType = builtInTypes[funcName]
+
+    if (retType in [types.ZR, types.listZR, types.symmapZR]):
+        return True
+
+    return False
+
 def addMskRndVars(config):
     global keygenElemToSMTExp, mskVars, rndVars
 
@@ -794,6 +816,9 @@ def addMskRndVars(config):
 
     for exp in allMskAndRndVars:
         if ( (exp in assignInfo[config.setupFuncName]) and (exp not in assignInfo[config.keygenFuncName]) ):
+            if (exp not in mskVars):
+                mskVars.append(exp)
+        elif (isResultOfFunctionWithZRRetType(exp, config) == True):
             if (exp not in mskVars):
                 mskVars.append(exp)
         elif ( (exp not in assignInfo[config.setupFuncName]) and (exp in assignInfo[config.keygenFuncName]) ):
@@ -840,8 +865,17 @@ def getBFCountsDict(resultDictionary):
 
     return retDict
 
+def turnListBFsIntoSingleBFs(resultDictionary):
+    for key in resultDictionary:
+        value = resultDictionary[key]
+        if (isLastCharThisChar(value, LIST_INDEX_SYMBOL) == True):
+            value = value[0:(len(value) - 1)]
+            resultDictionary[key] = value
+
 def applyGroupSharingOptimization(resultDictionary, config):
     global mappingOfSecretVarsToGroupType
+
+    turnListBFsIntoSingleBFs(resultDictionary)
 
     bfCountsDict = getBFCountsDict(resultDictionary)
 
@@ -1249,6 +1283,8 @@ def keygen(file, config):
     #skBfMap = {'d0':'bf0', 'd1':'bf1', 'd2':'bf2', 'd3':'bf3', 'd4':'bf4', 'd5':'bf5'}
 
     #skBfMap = {'YVector':'bf0', 'LVector':'bf1'}
+
+    #skBfMap = {'K':'bf0#'}
 
     for stringEntry in stringEntriesInKeygenElemToSMTExp:
         skBfMap[stringEntry] = nilType
