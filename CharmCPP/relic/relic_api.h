@@ -149,8 +149,11 @@ public:
 class PairingGroup
 {
 public:
+	PairingGroup();
 	PairingGroup(int);
 	~PairingGroup();
+	void setCurve(int sec_level);
+
 	void init(ZR&, char*);
 	void init(ZR&, int);
 	void init(G1&, int);

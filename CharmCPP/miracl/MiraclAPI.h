@@ -40,6 +40,7 @@ public:
 	PairingGroup();
 	PairingGroup(int);
 	~PairingGroup();
+	void setCurve(int sec_level);
 	// generate random
 	void init(ZR&, char*);
 	void init(ZR&, int);

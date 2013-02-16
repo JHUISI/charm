@@ -45,7 +45,12 @@ PairingGroup::PairingGroup()
 
 PairingGroup::PairingGroup(int sec_level)
 {
-	cout << "Initializing underlying curve." << endl;
+	this->setCurve(sec_level);
+}
+
+void PairingGroup::setCurve(int sec_level)
+{
+	cout << "Initializing PairingGroup: MIRACL" << endl;
 	pfcObject = new PFC(sec_level);
 	miracl *mip=get_mip();  // get handle on mip (Miracl Instance Pointer)
 	mip->IOBASE = 10;

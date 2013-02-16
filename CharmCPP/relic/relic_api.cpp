@@ -487,7 +487,17 @@ ostream& operator<<(ostream& s, const GT& gt)
 }
 
 
+PairingGroup::PairingGroup()
+{
+	isInit = false; // user needs to call setCurve after construction
+}
+
 PairingGroup::PairingGroup(int sec_level)
+{
+	this->setCurve(sec_level);
+}
+
+void PairingGroup::setCurve(int sec_level)
 {
 	cout << "Initializing PairingGroup: RELIC" << endl;
 	int err_code = core_init();

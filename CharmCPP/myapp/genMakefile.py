@@ -11,7 +11,7 @@ CXXFLAGS := %s
 INCLUDES := -I. -I.. -I../builtin -I%s %s
 
 NAME := %s
-OBJECTS := $(NAME).o
+OBJECTS := $(NAME).o %s
 LIB  := %s
 
 .PHONY: $(NAME)
@@ -36,10 +36,10 @@ def ReadConfig(file):
     f.close()
     return config_key
 
-def buildMakefile(config_file, cppFile, makefileName):
+def buildMakefile(config_file, cppFiles, makefileName):
     options = ReadConfig(config_file)
     timestamp = datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
-    cppFileName = cppFile.strip(".cpp")
+    cppFileName = cppFiles[0].strip(".cpp") # first will be used as target name as well
     charmLib = options['CHARM_LIB'][3:]
     if(options['BUILD_MIRACL'] == YES):
         charmLibOpt = "-l" + charmLib
@@ -51,7 +51,11 @@ def buildMakefile(config_file, cppFile, makefileName):
         sys.exit("Unrecognized crypto library to build.")
         
     cmd = "%.o: %.cpp"
-    makefileStr = makefile % (timestamp, options['prefix'], options['CXX'], options['CXXFLAGS'], options['incdir'], localPathToHeaders, cppFileName, charmLibOpt, cmd)
+    if len(cppFiles) > 1:
+        cppFileName1 = cppFiles[1].strip(".cpp") + ".o" # to specify object file
+        makefileStr = makefile % (timestamp, options['prefix'], options['CXX'], options['CXXFLAGS'], options['incdir'], localPathToHeaders, cppFileName, cppFileName1, charmLibOpt, cmd)
+    else:
+        makefileStr = makefile % (timestamp, options['prefix'], options['CXX'], options['CXXFLAGS'], options['incdir'], localPathToHeaders, cppFileName, "", charmLibOpt, cmd)        
     print(makefileStr)
     f = open(makefileName, 'w')
     f.write(makefileStr)
@@ -60,12 +64,13 @@ def buildMakefile(config_file, cppFile, makefileName):
 
 if __name__ == "__main__":
     print(sys.argv[1:])
-    if(len(sys.argv) != 4):
+    if(len(sys.argv) < 4):
         print("Insufficient arguments!")
-        sys.exit("\tpython %s [ path to config ] [ C++ filename ] [ optional: makefile name ]" % sys.argv[0])
+        sys.exit("\tpython %s [ path to config ] [ makefile name ] [ C++ files in order ]" % sys.argv[0])
     config = sys.argv[1]
-    file = sys.argv[2]
-    makefileName = sys.argv[3]
+    makefileName = sys.argv[2]
+    file = sys.argv[3:]
+    print("C++ files: ", file)
     #buildMakefile("../config.mk", "TestCharm.cpp", "MakefileTmp")
     buildMakefile(config, file, makefileName)
     os.system("make -f %s" % makefileName)
