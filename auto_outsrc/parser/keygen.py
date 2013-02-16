@@ -1200,6 +1200,9 @@ def getMasterSecretKeyElements(config):
         if (mskElem not in mskFuncAssignInfoEntry):
             sys.exit("getMasterSecretKeyElements in keygen.py:  one of the var names in masterSecVars (from config file) isn't in assignInfo[name_of_setup_function_from_config_file].")
 
+        if (mskElem not in masterSecretKeyElements):
+            masterSecretKeyElements.append(mskElem)
+
         assignInfoVarEntry = mskFuncAssignInfoEntry[mskElem]
         varDeps = assignInfoVarEntry.getVarDeps()
         for varDep in varDeps:
@@ -1321,7 +1324,7 @@ def keygen(file, config):
     removeStringEntriesFromSKinKeygenElemToSMTExp(stringEntriesInKeygenElemToSMTExp, config)
 
     print(keygenElemToSMTExp)
-    sys.exit("testddddd")
+    #sys.exit("testddddd")
 
     bfMap, skBfMap = instantiateBFSolver(config)
 
