@@ -513,9 +513,18 @@ def addExponentsToAllMskAndRndVarsList(node):
         if (exp not in allMskAndRndVars):
             allMskAndRndVars.append(exp)
 
+def stringIsNumber(inputString):
+    if (inputString[0] == "-"):
+        inputString = inputString[1:len(inputString)]
+
+    if (inputString.isdigit() == True):
+        return True
+
+    return False
+
 def searchForExponentsRecursive(node, exponentsList, levelNumber):
     if (node.type == ops.EXP):
-        if (str(node.right) not in exponentsList):
+        if ( (str(node.right) not in exponentsList) and (stringIsNumber(str(node.right)) == False) ):
             exponentsList.append((node.right, levelNumber + 1))
             addExponentsToAllMskAndRndVarsList(node.right)
     #else:
@@ -591,15 +600,8 @@ def shouldWeUseFullBaseElems(keygenOutputElem, config):
 
     return False
 
-def getKeygenElemToExponentsDictEntry(keygenOutputElem, keygenFuncName, config):
-    global keygenElemToExponents
-
-    if (keygenOutputElem not in assignInfo[keygenFuncName]):
-        #sys.exit("getKeygenElemToExponentsDictEntry in keygen.py:  keygenOutputElem parameter passed in is not in assignInfo[keygenFuncName].")
-        keygenElemToExponents[keygenOutputElem] = []
-        return
-
-    assignInfoVarEntry = assignInfo[keygenFuncName][keygenOutputElem]
+def getWhichBaseElemsOnlyToUse(keygenOutputElem, config):
+    assignInfoVarEntry = assignInfo[config.keygenFuncName][keygenOutputElem]
     useFullBaseElems = shouldWeUseFullBaseElems(keygenOutputElem, config)
     if (useFullBaseElems == True):
         baseElemsOnly = assignInfoVarEntry.getAssignBaseElemsOnly()
@@ -609,9 +611,38 @@ def getKeygenElemToExponentsDictEntry(keygenOutputElem, keygenFuncName, config):
     if (baseElemsOnly.type != ops.LIST):
         baseElemsOnly = makeReplacementsForMasterPublicVars(baseElemsOnly, config)
 
-    keygenElemToExponents[keygenOutputElem] = searchForExponents(baseElemsOnly)
+    return baseElemsOnly
 
-    #print(baseElemsOnly)
+def getListElementsOfKeygenOutputElem(keygenOutputElem, config):
+    retList = []
+
+    for varInfoObj in assignInfo[config.keygenFuncName]:
+        if (varInfoObj.startswith(keygenOutputElem + LIST_INDEX_SYMBOL) == True):
+            retList.append(varInfoObj)
+
+    return retList
+
+def getKeygenElemToExponentsDictEntry(keygenOutputElem, keygenFuncName, config):
+    global keygenElemToExponents
+
+    if (keygenOutputElem not in assignInfo[config.keygenFuncName]):
+        #sys.exit("getKeygenElemToExponentsDictEntry in keygen.py:  keygenOutputElem parameter passed in is not in assignInfo[keygenFuncName].")
+        keygenElemToExponents[keygenOutputElem] = []
+        return
+
+    listElementsOfThisElem = getListElementsOfKeygenOutputElem(keygenOutputElem, config)
+    #print(listElementsOfThisElem)
+
+    if (len(listElementsOfThisElem) == 0):
+        baseElemsOnly = getWhichBaseElemsOnlyToUse(keygenOutputElem, config)
+        keygenElemToExponents[keygenOutputElem] = searchForExponents(baseElemsOnly)
+        return
+
+    keygenElemToExponents[keygenOutputElem] = 'placeholder_so_it_is_picked_up_later_as_having_list_entries'
+
+    for listElem in listElementsOfThisElem:
+        baseElemsOnly = getWhichBaseElemsOnlyToUse(listElem, config)
+        keygenElemToExponents[listElem] = searchForExponents(baseElemsOnly)
 
 def getAllMasterPubVarsAsStrings(config):
     if (config.setupFuncName not in assignInfo):
@@ -830,14 +861,31 @@ def addMskRndVars(config):
             print(rndVars)
             sys.exit("addMskRndVars in keygen.py:  exponent name is supposed to appear in either config.setupFuncName or config.keygenFuncName, but not both and not neither, which is what is happening here.")
 
+def getKeygenElemToSMTExpressions_Ind(keygenElemToExp, config):
+    global keygenElemToSMTExp
+
+    listElementsOfThisElem = getListElementsOfKeygenOutputElem(keygenElemToExp, config)
+
+    if (len(listElementsOfThisElem) == 0):
+        exponents = keygenElemToExponents[keygenElemToExp]
+        keygenElemToSMTExp[keygenElemToExp] = getIndividualKeygenElemToSMTExpression(exponents, config)
+        return
+
+    keygenElemToSMTExp[keygenElemToExp] = {}
+    keygenElemToSMTExp[keygenElemToExp][config.rootNodeName] = [config.listNodeName]
+    keygenElemToSMTExp[keygenElemToExp][config.listNodeName] = listElementsOfThisElem
+
+    for listElem in listElementsOfThisElem:
+        exponents = keygenElemToExponents[listElem]
+        keygenElemToSMTExp[keygenElemToExp][listElem] = getIndividualKeygenElemToSMTExpression(exponents, config)
+
 def getKeygenElemToSMTExpressions(config):
     global keygenElemToSMTExp
 
     for keygenElemToExp in keygenElemToExponents:
-        #print(keygenElemToExp)
-        #print(keygenElemToExponents[keygenElemToExp])
-        #print("\n\n")
-
+        # DFA.  If it has a LIST_INDEX_SYMBOL, it's actually a subelement, which we'll handle later.
+        if (keygenElemToExp.count(LIST_INDEX_SYMBOL) > 0):
+            continue
         if (keygenElemToExp == config.keygenSecVar):
             secVarRetList = []
             for secretKeyElem in secretKeyElements:
@@ -845,8 +893,7 @@ def getKeygenElemToSMTExpressions(config):
                     secVarRetList.append(secretKeyElem)
             keygenElemToSMTExp[keygenElemToExp] = secVarRetList
         else:
-            exponents = keygenElemToExponents[keygenElemToExp]
-            keygenElemToSMTExp[keygenElemToExp] = getIndividualKeygenElemToSMTExpression(exponents, config)
+            getKeygenElemToSMTExpressions_Ind(keygenElemToExp, config)
 
     addMskRndVars(config)
 
@@ -1274,6 +1321,7 @@ def keygen(file, config):
     removeStringEntriesFromSKinKeygenElemToSMTExp(stringEntriesInKeygenElemToSMTExp, config)
 
     print(keygenElemToSMTExp)
+    sys.exit("testddddd")
 
     bfMap, skBfMap = instantiateBFSolver(config)
 

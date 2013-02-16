@@ -4,6 +4,7 @@ rootNodeName = 'root'
 addNodePrefix = 'ADD'
 mulNodePrefix = 'MUL'
 leafNodeName = 'LEAF0'
+listNodeName = 'LIST0'
 
 inputVarName = "input"
 outputVarName = "output"
