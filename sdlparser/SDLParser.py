@@ -766,6 +766,9 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
     varTypeObj.setLineNo(i)
     if origName.find(LIST_INDEX_SYMBOL) != -1: # definitely in a list
         varTypeObj.isInAList = True
+        refCount2 = countReferenceType(node.left)
+        refCount2Name = origName.split(LIST_INDEX_SYMBOL)[1:]
+        #print("DEBUG: refCount2Name: ", refCount2Name[0])        
     if (type(newType).__name__ == BINARY_NODE_CLASS_NAME):
         if (newType.type != ops.LIST):
             sys.exit("updateVarTypes in SDLParser.py received newType that is a Binary Node, but not of type ops.LIST.")
@@ -2177,7 +2180,7 @@ def parseLinesOfCode(code, verbosity, ignoreCloudSourcing=False):
     lineNumberInCode = 0 
     for line in code:
         lineNumberInCode += 1
-        if (lineNumberInCode == 160):
+        if (lineNumberInCode == 55):
             pass
         if len(line.strip()) > 0 and line[0] != '#':
             if currentFuncName not in [LATEX_HEADER]: # only concerned about latex section b/c parsing is slightly different

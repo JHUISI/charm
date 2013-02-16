@@ -1238,7 +1238,9 @@ def writeForLoopDecl_CPP(outputFile, binNode):
 
     outputString = ""
     outputString += writeCurrentNumTabsToString()
-
+    
+    theVarTypes = getVarTypes()
+    
     if ( (binNode.type == ops.FOR) or (binNode.type == ops.FORINNER) ):
         outputString += "for (int "
         currentLoopIncVarName = getAssignStmtAsString_CPP(binNode.left.left, None, None)

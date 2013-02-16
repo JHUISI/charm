@@ -135,7 +135,7 @@ class CleanInfo:
         return 
     
     def __removeSymbols(self, exprDict):
-        symbols = ['-', '?']
+        symbols = ['-']
         for i in exprDict.keys():
             if type(exprDict[i]) == list:
                 for j in range(len(exprDict[i])):
@@ -234,7 +234,7 @@ def checkMskListMix(usedVars, isPartOfList):
     return False
 
 def clean(v):
-    removeSymbols = ['-', '#', '?']
+    removeSymbols = ['-']
     for i in removeSymbols:
         if v.find(i) != -1:
             v.strip(i)
