@@ -218,11 +218,11 @@ def writeForAllLoop(keygenOutputElem, resultDictionary, config):
     SDLLinesForKeygen.append("forall{" + config.blindingLoopVar + " := " + keygenOutputElem + "}\n")
 
     if (sameBFForWholeList == True):
-        SDLLinesForKeygen.append(listBlindingFactorName + LIST_INDEX_SYMBOL + config.blindingLoopVar + " := " + currentBlindingFactorName + "\n")
+        #SDLLinesForKeygen.append(listBlindingFactorName + LIST_INDEX_SYMBOL + config.blindingLoopVar + " := " + currentBlindingFactorName + "\n")
+        SDLLinesForKeygen.append(keygenOutputElem + config.blindingSuffix + LIST_INDEX_SYMBOL + config.blindingLoopVar + " := " + keygenOutputElem + LIST_INDEX_SYMBOL + config.blindingLoopVar + " ^ (1/" + currentBlindingFactorName + ")\n")
     else:
         SDLLinesForKeygen.append(listBlindingFactorName + LIST_INDEX_SYMBOL + config.blindingLoopVar + " := random(ZR)\n")
-
-    SDLLinesForKeygen.append(keygenOutputElem + config.blindingSuffix + LIST_INDEX_SYMBOL + config.blindingLoopVar + " := " + keygenOutputElem + LIST_INDEX_SYMBOL + config.blindingLoopVar + " ^ (1/" + listBlindingFactorName + LIST_INDEX_SYMBOL + config.blindingLoopVar + ")\n")
+        SDLLinesForKeygen.append(keygenOutputElem + config.blindingSuffix + LIST_INDEX_SYMBOL + config.blindingLoopVar + " := " + keygenOutputElem + LIST_INDEX_SYMBOL + config.blindingLoopVar + " ^ (1/" + listBlindingFactorName + LIST_INDEX_SYMBOL + config.blindingLoopVar + ")\n")
 
     SDLLinesForKeygen.append("END :: forall\n")
 
@@ -1342,7 +1342,9 @@ def keygen(file, config):
 
     #skBfMap = {'KendList2': 'bf0', 'K': 'bf0', 'KendList1': 'bf0', 'Kstart2': 'bf0', 'Kstart1': 'bf0'}
 
-    skBfMap = {'K3': 'bf0', 'K2': 'bf0', 'K1': 'bf0', 'Kstart1': 'bf0', 'Kstart2': 'bf0', 'KendList2': 'bf0', 'KendList1': 'bf0'}
+    #skBfMap = {'K3': 'bf0', 'K2': 'bf0', 'K1': 'bf0', 'Kstart1': 'bf0', 'Kstart2': 'bf0', 'KendList2': 'bf0', 'KendList1': 'bf0'}
+
+    skBfMap = {'K': 'bf0', 'L': 'bf0', 'Kl': 'bf0'}
 
     for stringEntry in stringEntriesInKeygenElemToSMTExp:
         skBfMap[stringEntry] = nilType
