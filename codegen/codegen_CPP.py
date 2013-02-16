@@ -1257,8 +1257,10 @@ def writeForLoopDecl_CPP(outputFile, binNode):
         if varNameTypeObj != None:
             if varNameTypeObj.getRefType() == types.str:
                 outputString += "CharmListStr " + curLoopVarName + KeysListSuffix_CPP + " = " + curLoopVarName + ".strkeys();\n"
+                curLoopIncVarType = "string"
             elif varNameTypeObj.getRefType() == types.int:
                 outputString += "CharmListInt " + curLoopVarName + KeysListSuffix_CPP + " = " + curLoopVarName + ".keys();\n"
+                curLoopIncVarType = "int"
             else:
                 outputString += str(varNameTypeObj.getRefType()) + " " + curLoopVarName + ";\n"
         outputString += writeCurrentNumTabsToString()
@@ -1271,7 +1273,7 @@ def writeForLoopDecl_CPP(outputFile, binNode):
         outputString += "{\n"
         #outputString += writeCurrentNumTabsToString() + "\t"
         outputString += writeCurrentNumTabsToString() + "    "
-        outputString += curLoopIncVarName + " = " + curLoopVarName + KeysListSuffix_CPP + "[" + curLoopIncVarName + TempLoopVar_CPP + "];\n"
+        outputString += curLoopIncVarType + " " + curLoopIncVarName + " = " + curLoopVarName + KeysListSuffix_CPP + "[" + curLoopIncVarName + TempLoopVar_CPP + "];\n"
     else:
         sys.exit("writeForLoopDecl_CPP in codegen.py:  encounted node that is neither type ops.FOR nor ops.FORALL (unsupported).")
 
