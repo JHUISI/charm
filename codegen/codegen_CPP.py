@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, string
 
 sys.path.extend(['../', '../sdlparser']) 
 
@@ -79,7 +79,7 @@ def writeCurrentNumTabsIn(outputFile):
 
     outputFile.write(outputString)
 
-def addImportLines():
+def addImportLines(defineAsClass, outputFileName):
     global setupFile
 
     cppImportLines = ""
@@ -89,10 +89,13 @@ def addImportLines():
     cppImportLines += "#include <string>\n"
     cppImportLines += "#include <list>\n"
     cppImportLines += "using namespace std;\n"
-    #cppImportLines += "#define DEBUG  true\n"
     cppImportLines += "\n"
-
-    setupFile.write(cppImportLines)
+    if defineAsClass:
+        setupFile.write("#include \"%s\"\n\n" % outputFileName)
+        return cppImportLines
+    else:
+        setupFile.write(cppImportLines)
+        return ""
 
 def addNumSignatures():
     global setupFile
@@ -124,22 +127,33 @@ def addSecParam():
 
     setupFile.write("int " + str(secParamVarName) + " = " + str(secParam) + ";\n\n")
 
-def addGlobalPairingGroupObject(groupParam):
+def addGlobalPairingGroupObject(defineAsClass, groupParam):
     global setupFile
+    if defineAsClass:
+        return "PairingGroup group;";
+    else:
+        setupFile.write("PairingGroup group(%s);\n\n" % groupParam) # TODO: make AES_SECURITY a command line parameter
+        return ""
 
-    setupFile.write("PairingGroup group(%s);\n\n" % groupParam) # TODO: make AES_SECURITY a command line parameter
-
-def addBuiltinObjects():
+def addBuiltinObjects(defineAsClass):
     global setupFile
-    
+    outputObjectLines = ""
     bFuncs = set(getUsedBuiltinList()).intersection(secretUtils)
     # JAA: TODO is to add one for the DFA class in C++
-    if len(bFuncs) > 0: setupFile.write("SecretUtil %s;\n\n" % UTIL_FUNC_NAME)
-    
+    if len(bFuncs) > 0: 
+        if defineAsClass:
+            outputObjectLines += "SecretUtil %s;\n" % UTIL_FUNC_NAME
+        else:
+            setupFile.write("SecretUtil %s;\n\n" % UTIL_FUNC_NAME)
+            
     dFuncs = set(getUsedBuiltinList()).intersection(dfaUtils)
     # JAA: TODO is to add one for the DFA class in C++
-    if len(dFuncs) > 0: setupFile.write("DFA %s;\n\n" % DFA_UTIL_FUNC_NAME)
-    
+    if len(dFuncs) > 0: 
+        if defineAsClass:
+            outputObjectLines += "DFA %s;\n" % DFA_UTIL_FUNC_NAME
+        else:
+            setupFile.write("DFA %s;\n\n" % DFA_UTIL_FUNC_NAME)
+    return outputObjectLines
 
 def isFunctionStart(binNode):
     if (binNode.type != ops.BEGIN):
@@ -325,16 +339,23 @@ def isFuncDeclVarAListAndSameType(variableName, functionName):
     return False
 
 
-def writeFunctionDecl_CPP(outputFile, functionName):
+def writeFunctionDecl_CPP(outputFile, functionName, defineAsClass, className):
     global currentFuncOutputVars, currentFuncNonOutputVars
 
     currentFuncOutputVars = []
     currentFuncNonOutputVars = []
-
-    if (functionName in [verifyFuncName, membershipFuncName, batchVerifyFuncName, precheckFuncName]):
-        outputString = "bool " + functionName + "("
+    if defineAsClass:
+        classNameStr = str(className) + "::"
     else:
-        outputString = "void " + functionName + "("
+        classNameStr = "" # do nothing
+    
+    outputString = ""
+    if (functionName in [verifyFuncName, membershipFuncName, batchVerifyFuncName, precheckFuncName]):
+        outputStringHead = "bool " + classNameStr + functionName + "("
+        outputString2Head = "bool " + functionName + "("
+    else:
+        outputStringHead = "void " + classNameStr + functionName + "("
+        outputString2Head = "void " + functionName + "("
 
     inputVariables = getInputVariablesList(functionName)
     outputVariables = getOutputVariablesList(functionName)
@@ -363,14 +384,20 @@ def writeFunctionDecl_CPP(outputFile, functionName):
 
     if ( (inputVariables != []) or (outputVariables != []) ):
         outputString = outputString[0:(len(outputString) - len(", "))]
+    outputString2 = outputString2Head + outputString + ");\n" # different ending b/c it's a class definition
     outputString += ")\n{\n"
 
-    outputFile.write(outputString)
+    outputFile.write(outputStringHead + outputString)
+    return outputString2
 
-def writeFunctionDecl(functionName):
+def writeFunctionDecl(functionName, defineAsClass, className):
     global setupFile
 
-    writeFunctionDecl_CPP(setupFile, functionName)
+    functionHeader = writeFunctionDecl_CPP(setupFile, functionName, defineAsClass, className)
+    if defineAsClass:
+        return functionHeader
+    else:
+        return ""
 
 def writeFunctionEnd_CPP(outputFile, functionName):
     global returnValues, CPP_funcBodyLines
@@ -1386,17 +1413,20 @@ def isUnnecessaryNodeForCodegen(astNode):
 
     return False
 
-def writeSDLToFiles(astNodes):
+def writeSDLToFiles(astNodes, defineAsClass, className):
     global currentFuncName, numTabsIn, setupFile, lineNoBeingProcessed
     global CPP_varTypesLines, CPP_funcBodyLines, listVarsDeclaredInThisFunc, nonListVarsDeclaredInThisFunc
-
+    
+    functionHeaders = []
+    
     for astNode in astNodes:
         lineNoBeingProcessed += 1
         processedAsFunctionStart = False
 
         if (isFunctionStart(astNode) == True):
             currentFuncName = getFuncNameFromBinNode(astNode)
-            writeFunctionDecl(currentFuncName)
+            functionHeader = writeFunctionDecl(currentFuncName, defineAsClass, className)
+            functionHeaders.append(functionHeader)
             CPP_varTypesLines = ""
             CPP_funcBodyLines = ""
             listVarsDeclaredInThisFunc = []
@@ -1444,7 +1474,9 @@ def writeSDLToFiles(astNodes):
         else:
             print("BinNode: ", astNode)
             sys.exit("writeSDLToFiles in codegen.py:  unrecognized type of statement in SDL.")
-
+    
+    return functionHeaders
+    
 def getStringOfFirstFuncArgs(argsToFirstFunc):
     if (type(argsToFirstFunc) is not list):
         sys.exit("getStringOfFirstFuncArgs in codegen_CPP.py:  argsToFirstFunc is not of type list.")
@@ -1539,7 +1571,29 @@ def write_Main_Function():
     outputString = "int main()\n{\n    return 0;\n}\n"
     setupFile.write(outputString)
 
-def codegen_CPP_main(inputSDLScheme, outputFileName, groupParam='AES_SECURITY'):
+def writeHeaderFile(outputFileNameHdr, className, groupParam, importLines, pairingDefLines, builtinDefLines, functionHeaderList):
+    outputString = ""
+    outputString += "#ifndef " + className.upper() + "_H\n"
+    outputString += "#define " + className.upper() + "_H\n\n"
+    outputString += importLines
+    outputString += "\n"
+    outputString += "class " + className + "\n{\npublic:\n"
+    outputString += "\t" + pairingDefLines + "\n"
+    outputString += "\t" + className + "() { group.setCurve(" + groupParam + "); };\n"
+    outputString += "\t~" + className + "() {};\n"
+    for i in functionHeaderList:
+        outputString += "\t" + i
+    outputString += "\nprivate:\n"
+    outputString += "\t" + builtinDefLines
+    outputString += "};\n"
+    outputString += "\n\n#endif"
+
+    f = open(outputFileNameHdr, "w")
+    f.write(outputString)
+    f.close()
+    return    
+
+def codegen_CPP_main(inputSDLScheme, outputFileName, defineAsClass=True, groupParam='AES_SECURITY'):
     global setupFile, assignInfo, varNamesToFuncs_All
     global varNamesToFuncs_Assign, inputOutputVars, userFuncsCPPFile, functionNameOrder
     global blindingFactors_NonLists, blindingFactors_Lists
@@ -1548,26 +1602,32 @@ def codegen_CPP_main(inputSDLScheme, outputFileName, groupParam='AES_SECURITY'):
 
     astNodes = getAstNodes()
     assignInfo = getAssignInfo()
+    className = assignInfo[NONE_FUNC_NAME][BV_NAME].getAssignNode().getRight().getAttribute()
+    className = string.capwords(className)
+    
     inputOutputVars = getInputOutputVars()
     functionNameOrder = getFunctionNameOrder()
     varNamesToFuncs_All = getVarNamesToFuncs_All()
     varNamesToFuncs_Assign = getVarNamesToFuncs_Assign()
 
     setupFile = open(outputFileName, 'w')
-    userFuncsCPPFile = open("userFuncsCPPFile.h", 'w')
+    outputFileNameHdr = outputFileName.strip(".cpp") + ".h" # in case it has .cpp in the extension
 
     getGlobalVarNames()
-    addImportLines()
+    importLines = addImportLines(defineAsClass, outputFileNameHdr)
     addNumSignatures()
     addNumSigners()
     addSecParam()
-    addGlobalPairingGroupObject(groupParam)
-    addBuiltinObjects()
-    writeSDLToFiles(astNodes)
-    write_Main_Function()
+    pairingDefLines = addGlobalPairingGroupObject(defineAsClass, groupParam)
+    builtinDefLines = addBuiltinObjects(defineAsClass)
+    functionHeaderList = writeSDLToFiles(astNodes, defineAsClass, className)
 
+    if defineAsClass == False:
+        write_Main_Function()
+    else:
+        writeHeaderFile(outputFileNameHdr, className, groupParam, importLines, pairingDefLines, builtinDefLines, functionHeaderList)
     setupFile.close()
-    userFuncsCPPFile.close()
+    #userFuncsCPPFile.close()
 
 if __name__ == "__main__":
     lenSysArgv = len(sys.argv)
