@@ -1342,6 +1342,8 @@ def keygen(file, config):
 
     #skBfMap = {'KendList2': 'bf0', 'K': 'bf0', 'KendList1': 'bf0', 'Kstart2': 'bf0', 'Kstart1': 'bf0'}
 
+    skBfMap = {'K3': 'bf0', 'K2': 'bf0', 'K1': 'bf0', 'Kstart1': 'bf0', 'Kstart2': 'bf0', 'KendList2': 'bf0', 'KendList1': 'bf0'}
+
     for stringEntry in stringEntriesInKeygenElemToSMTExp:
         skBfMap[stringEntry] = nilType
     
