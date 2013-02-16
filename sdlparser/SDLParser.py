@@ -890,10 +890,15 @@ def checkPairingInputTypes(node):
     if (node.type != ops.PAIR):
         sys.exit("checkPairingInputTypes in SDLParser was passed a node that is not of type " + str(ops.PAIR))
 
+    if (str(node.right) == "KBlinded#key#1?"):
+        pass
+
     leftType = getVarTypeInfoRecursive(node.left)
     rightType = getVarTypeInfoRecursive(node.right)
 
     if (algebraicSetting == SYMMETRIC_SETTING):
+        if (rightType == types.metalist):
+            pass
         checkPairingInputTypes_Symmetric(leftType, rightType)
     elif (algebraicSetting == ASYMMETRIC_SETTING):
         if leftType == types.NO_TYPE or rightType == types.NO_TYPE:

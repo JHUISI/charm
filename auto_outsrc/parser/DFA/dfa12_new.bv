@@ -14,15 +14,20 @@ T := list{Tlist}
 Ti := list{int}
 q0 := list{int}
 F := list{int}
-Klist := list{G1, G1, G1}
+#Klist := list{G1, G1, G1}
 key := int
-K := list{Klist}
+#K := list{Klist}
 KendList1 := list{G1}
 KendList2 := list{G1}
+K1 := list{G1}
+K2 := list{G1}
+K3 := list{G1}
 w := list{str}
 B := list{GT}
-Clist := list{G1, G1}
-C := list{Clist}
+#Clist := list{G1, G1}
+#C := list{Clist}
+C1 := list{G1}
+C2 := list{G1}
 D := list{G1}
 #D#0 := G1
 h := list{G1}
@@ -83,10 +88,10 @@ t1 := t#1
 t2 := getString(t#2)
 key := hashToKey(t)
 
-K#key := init(list)
-K#key#1? := ((D#t0^-1) * (z^r))
-K#key#2? := (g^r)
-K#key#3? := (D#t1 * (h#t2^r))
+#K#key := init(list)
+K1#key := ((D#t0^-1) * (z^r))
+K2#key := (g^r)
+K3#key := (D#t1 * (h#t2^r))
 
 END :: for
 
@@ -100,8 +105,8 @@ KendList2#x := (g^rx)
 
 END :: for
 
-sk := list{Kstart1, Kstart2, KendList1, KendList2}
-output := list{sk, K}
+sk := list{Kstart1, Kstart2, KendList1, KendList2, K1, K2, K3}
+output := sk
 END :: func:keygen
 
 
@@ -117,31 +122,31 @@ END :: for
 
 Cm := (M * (egg^s#l))
 
-C#0 := init(list)
-C#0#1? := (g^s#0)
-C#0#2? := (hstart^s#0)
+#C#0 := init(list)
+C1#0 := (g^s#0)
+C2#0 := (hstart^s#0)
 
 BEGIN :: for
 for{i := 1,l+1}
 a := getString(w#i)
-C#i := init(list)
-C#i#1? := (g^s#i)
-C#i#2? := ((h#a^s#i) * (z^s#i-1?))
+#C#i := init(list)
+C1#i := (g^s#i)
+C2#i := ((h#a^s#i) * (z^s#i-1?))
 END :: for
 
 Cend1 := (g^s#l)
 Cend2 := (hend^s#l)
 
-ct := list{Cend1, Cend2, w}
-output := list{ct, Cm, C}
+ct := list{Cend1, Cend2, w, C1, C2, Cm}
+output := ct
 END :: func:encrypt
 
 
 
 BEGIN :: func:decrypt
-input := list{sk, K, ct, Cm, C}
-sk := expand{Kstart1, Kstart2, KendList1, KendList2}
-ct := expand{Cend1, Cend2, w}
+input := list{sk, ct}
+sk := expand{Kstart1, Kstart2, KendList1, KendList2, K1, K2, K3}
+ct := expand{Cend1, Cend2, w, C1, C2, Cm}
 l := len(w)
 
 BEGIN :: if
@@ -150,12 +155,12 @@ output := False
 END :: if
 
 Ti := getTransitions(w)
-B#0 := (e(C#0#1?,Kstart1) * (e(C#0#2?,Kstart2)^-1))
+B#0 := (e(C1#0,Kstart1) * (e(C2#0,Kstart2)^-1))
 BEGIN :: for
 for{i := 1,l+1}
 key := hashToKey(Ti#i)
 j := (i - 1)
-result0 := (e(C#j#1?,K#key#1?) * ((e(C#i#2?,K#key#2?)^-1) * e(C#i#1?,K#key#3?)))
+result0 := (e(C1#j,K1#key) * ((e(C2#i,K2#key)^-1) * e(C1#i,K3#key)))
 B#i? := (B#i-1? * result0)
 END :: for
 x := getAcceptState(Ti)

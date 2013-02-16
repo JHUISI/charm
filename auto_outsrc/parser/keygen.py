@@ -1,4 +1,5 @@
 import sdlpath
+#from __future__ import print_function
 from sdlparser.SDLParser import *
 from transformNEW import *
 from secretListInKeygen import getSecretList
@@ -1336,6 +1337,10 @@ def keygen(file, config):
     #skBfMap = {'YVector':'bf0', 'LVector':'bf1'}
 
     #skBfMap = {'K':'bf0#'}
+
+    #skBfMap = {'K': {'K#key#3?': {'root': ['LEAF0'], 'LEAF0': ['r']}, 'root': ['LIST0'], 'LIST0': ['K#key#1?', 'K#key#3?', 'K#key#2?'], 'K#key#1?': {'root': ['LEAF0'], 'LEAF0': ['r']}, 'K#key#2?': {'root': ['LEAF0'], 'LEAF0': ['r']}}, 'sk': ['KendList1', 'KendList2', 'Kstart1', 'Kstart2', 'K'], 'Kstart1': {'root': ['LEAF0'], 'LEAF0': ['rstart']}, 'Kstart2': {'root': ['LEAF0'], 'LEAF0': ['rstart']}, 'KendList2': {'root': ['LEAF0'], 'LEAF0': ['rx']}, 'KendList1': {'root': ['ADD0'], 'ADD0': ['-alpha', 'rx']}}
+
+    #skBfMap = {'KendList2': 'bf0', 'K': 'bf0', 'KendList1': 'bf0', 'Kstart2': 'bf0', 'Kstart1': 'bf0'}
 
     for stringEntry in stringEntriesInKeygenElemToSMTExp:
         skBfMap[stringEntry] = nilType
