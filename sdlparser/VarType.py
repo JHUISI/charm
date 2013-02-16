@@ -7,7 +7,8 @@ class VarType:
         self.listNodesList = []
         self.lineNo = None
         self.isInAList = False
-
+        self.listRefType = types.NO_TYPE
+        
     def getType(self):
         return self.type
 
@@ -28,4 +29,13 @@ class VarType:
             sys.exit("setType in VarType.py received as input a line number that is invalid.")
         
         self.type = type
-        
+    
+    def setRefType(self, _type):
+        if str(_type) in types.getList():
+            self.listRefType = _type
+            return
+        print("Specified an invalid type: ", _type)
+        return
+    
+    def getRefType(self):
+        return self.listRefType

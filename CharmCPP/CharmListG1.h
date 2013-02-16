@@ -2,6 +2,7 @@
 #define CHARMLISTG1_H
 
 #include "CryptoLib.h"
+#include "CharmListStr.h"
 
 struct g_cmp_str
 {
@@ -21,6 +22,7 @@ public:
 	void append(G1&);
 	void set(int index, G1);
 //	G1& get(const int index);
+	CharmListStr strkeys();
 	int length(); // return length of lists
 	string printAtIndex(int index);
 	string printStrKeyIndex(int index);

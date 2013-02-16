@@ -766,9 +766,14 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
     varTypeObj.setLineNo(i)
     if origName.find(LIST_INDEX_SYMBOL) != -1: # definitely in a list
         varTypeObj.isInAList = True
-        refCount2 = countReferenceType(node.left)
         refCount2Name = origName.split(LIST_INDEX_SYMBOL)[1:]
-        #print("DEBUG: refCount2Name: ", refCount2Name[0])        
+        value = varTypes[currentFuncName].get(refCount2Name[0])
+        #print("DEBUG: refCount2Name: ", refCount2Name[0], value)
+        if refCount2Name[0].isdigit():
+            varTypeObj.setRefType( types.int )
+        elif value != None:
+            #print("refCount2Name: ", refCount2Name[0], ", type: ", value.getType())            
+            varTypeObj.setRefType( value.getType() )
     if (type(newType).__name__ == BINARY_NODE_CLASS_NAME):
         if (newType.type != ops.LIST):
             sys.exit("updateVarTypes in SDLParser.py received newType that is a Binary Node, but not of type ops.LIST.")

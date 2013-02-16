@@ -1238,9 +1238,7 @@ def writeForLoopDecl_CPP(outputFile, binNode):
 
     outputString = ""
     outputString += writeCurrentNumTabsToString()
-    
-    theVarTypes = getVarTypes()
-    
+        
     if ( (binNode.type == ops.FOR) or (binNode.type == ops.FORINNER) ):
         outputString += "for (int "
         currentLoopIncVarName = getAssignStmtAsString_CPP(binNode.left.left, None, None)
@@ -1252,19 +1250,28 @@ def writeForLoopDecl_CPP(outputFile, binNode):
         outputString += writeCurrentNumTabsToString()
         outputString += "{\n"
     elif (binNode.type == ops.FORALL): # JAA: fix this
-        currentLoopVariableName = getAssignStmtAsString_CPP(binNode.left.right, None, None)
-        outputString += charmListType + " " + currentLoopVariableName + KeysListSuffix_CPP + " = " + currentLoopVariableName + ".keys();\n"
+        theVarTypes = getVarTypes()[currentFuncName]
+
+        curLoopVarName = getAssignStmtAsString_CPP(binNode.left.right, None, None)
+        varNameTypeObj = theVarTypes.get(curLoopVarName)
+        if varNameTypeObj != None:
+            if varNameTypeObj.getRefType() == types.str:
+                outputString += "CharmListStr " + curLoopVarName + KeysListSuffix_CPP + " = " + curLoopVarName + ".strkeys();\n"
+            elif varNameTypeObj.getRefType() == types.int:
+                outputString += "CharmListInt " + curLoopVarName + KeysListSuffix_CPP + " = " + curLoopVarName + ".keys();\n"
+            else:
+                outputString += str(varNameTypeObj.getRefType()) + " " + curLoopVarName + ";\n"
         outputString += writeCurrentNumTabsToString()
-        outputString += "int " + currentLoopVariableName + ListLengthSuffix_CPP + " = " + currentLoopVariableName + ".length();\n"
+        outputString += "int " + curLoopVarName + ListLengthSuffix_CPP + " = " + curLoopVarName + ".length();\n"
         outputString += writeCurrentNumTabsToString()
         outputString += "for (int "
-        currentLoopIncVarName = getAssignStmtAsString_CPP(binNode.left.left, None, None)
-        outputString += currentLoopIncVarName + TempLoopVar_CPP + " = 0; " + currentLoopIncVarName + TempLoopVar_CPP + " < " + currentLoopVariableName + ListLengthSuffix_CPP + "; " + currentLoopIncVarName + TempLoopVar_CPP + "++)\n"
+        curLoopIncVarName = getAssignStmtAsString_CPP(binNode.left.left, None, None)
+        outputString += curLoopIncVarName + TempLoopVar_CPP + " = 0; " + curLoopIncVarName + TempLoopVar_CPP + " < " + curLoopVarName + ListLengthSuffix_CPP + "; " + curLoopIncVarName + TempLoopVar_CPP + "++)\n"
         outputString += writeCurrentNumTabsToString()
         outputString += "{\n"
         #outputString += writeCurrentNumTabsToString() + "\t"
         outputString += writeCurrentNumTabsToString() + "    "
-        outputString += currentLoopIncVarName + " = " + currentLoopVariableName + KeysListSuffix_CPP + "[" + currentLoopIncVarName + TempLoopVar_CPP + "];\n"
+        outputString += curLoopIncVarName + " = " + curLoopVarName + KeysListSuffix_CPP + "[" + curLoopIncVarName + TempLoopVar_CPP + "];\n"
     else:
         sys.exit("writeForLoopDecl_CPP in codegen.py:  encounted node that is neither type ops.FOR nor ops.FORALL (unsupported).")
 
