@@ -342,20 +342,21 @@ def writeFunctionDecl_CPP(outputFile, functionName):
     for inputVariable in inputVariables:
         varIsAList = isFuncDeclVarAList(inputVariable, functionName)
         currentType = getFinalVarType(inputVariable, currentFuncName)
-        if (str(currentType) in ["int"]):
+        if (currentType in [types.int]):
             outputString += makeTypeReplacementsForCPP(currentType) + " " + inputVariable + ", "
         else:
             outputString += makeTypeReplacementsForCPP(currentType, varIsAList) + " & " + inputVariable + ", "
         currentFuncOutputVars.append(inputVariable)
-
+    
+    # JAA: fix this to address user defined functions with one type
     for outputVariable in outputVariables:
         if (outputVariable in inputVariables):
             continue
         if ( (outputVariable != "True") and (outputVariable != "False") ):
             varIsAList = isFuncDeclVarAList(outputVariable, functionName)
             currentType = getFinalVarType(outputVariable, currentFuncName)
-            if (str(currentType) in ["int"]):
-                outputString += makeTypeReplacementsForCPP(currentType) + " " + outputVariable + ", "
+            if (currentType in [types.int]):
+                outputString += makeTypeReplacementsForCPP(currentType) + " & " + outputVariable + ", "
             else:
                 outputString += makeTypeReplacementsForCPP(currentType, varIsAList) + " & " + outputVariable + ", "
             currentFuncOutputVars.append(outputVariable)

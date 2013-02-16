@@ -1378,23 +1378,27 @@ def postTypeCleanup():
             # update in varTypes
             if varTypes[currentFuncName].get(i) == None:
                 # create new var type for i
-                vt = VarType()
-                vt.setType(j[0])
-                varTypes[currentFuncName][i] = vt
+                if varTypes[TYPES_HEADER].get(i) == None:
+                    vt = VarType()
+                    vt.setType(j[0])
+                    varTypes[currentFuncName][i] = vt
+                else:
+                    #varTypes[TYPES_HEADER][i].setType(types["list" + j[0]]) # BANDAID ALERT
+                    pass
             else:
                 # update exisitng var type for i
                 varTypes[currentFuncName][i].setType(j[0])
             #print("DEBUG: curTypes i=", i, ", j=", j, "....what should be done!!!")
             
-#    print("listRawTypes <=== %s ===> start" % currentFuncName)
-#    for i,j in listRawTypes.items():
-#        print(i, ": ", j)
-#    print("listRawTypes <=== %s ===> end" % currentFuncName)
-#
-#    print("varTypes <=== %s ===> start" % currentFuncName)
-#    for i,j in varTypes[currentFuncName].items():
-#        print(i, ":", j.getType())
-#    print("varTypes <=== %s ===> end" % currentFuncName)
+    print("listRawTypes <=== %s ===> start" % currentFuncName)
+    for i,j in listRawTypes.items():
+        print(i, ": ", j)
+    print("listRawTypes <=== %s ===> end" % currentFuncName)
+
+    print("varTypes <=== %s ===> start" % currentFuncName)
+    for i,j in varTypes[currentFuncName].items():
+        print(i, ":", j.getType())
+    print("varTypes <=== %s ===> end" % currentFuncName)
     return
 
 def getVarTypeInfo(node, i, varName):
