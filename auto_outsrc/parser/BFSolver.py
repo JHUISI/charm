@@ -141,7 +141,7 @@ class CleanInfo:
                 for j in range(len(exprDict[i])):
                     tmpList = exprDict[i]
                     if symbols[0] in tmpList[j]:    tmpList[j] = tmpList[j].strip(symbols[0])
-                    if symbols[1] in tmpList[j]: tmpList[j] = tmpList[j].strip(symbols[1])                
+#                    if symbols[1] in tmpList[j]: tmpList[j] = tmpList[j].strip(symbols[1])                
             if type(exprDict[i]) == dict:
                 self.__removeSymbols(exprDict[i])
             
