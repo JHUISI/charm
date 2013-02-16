@@ -4,6 +4,8 @@ from outsrctechniques import *
 #from keygen import processListOrExpandNodes
 import sys
 
+transformOutputListForLoop = "transformOutputListForLoop"
+
 transformListCounter = 0
 decoutListCounter = 0
 
@@ -24,6 +26,8 @@ varsUsedInDecout = []
 listOfStandardTypes = [types.G1, types.G2, types.GT, types.ZR, types.listG1, types.listG2, types.listGT, types.listZR] #types.int, types.str, types.list, types.listInt, types.listStr, types.listG1, types.listG2, types.listGT, types.listZR]
 
 nilType = 'nil'
+
+singleBF = False
 
 def getRightSideOfStringAssignStatement(inputString):
     inputStringSeparated = inputString.split(" := ")
@@ -744,6 +748,23 @@ def combineListsNoDups(listToAddTo, listToAddFrom):
         if (varName not in listToAddTo):
             listToAddTo.append(varName)
 
+def seeIfSingleBF(varsThatAreBlindedDict):
+    global singleBF
+
+    firstOne = True
+
+    for varName in varsThatAreBlindedDict:
+        if (firstOne == True):
+            firstBF = varsThatAreBlindedDict[varName]
+            firstOne = False
+            continue
+
+        currentBF = varsThatAreBlindedDict[varName]
+        if (firstBF != currentBF):
+            singleBF = False
+
+    singleBF = True
+
 def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     global currentNumberOfForLoops, withinForLoop, iterationNo
 
@@ -782,6 +803,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     decoutRunningInputLine = ""
 
     allPossibleBlindingFactors = getAllBlindingExponentsForDecoutLine(varsThatAreBlindedDict)
+    seeIfSingleBF(varsThatAreBlindedDict)
 
     # get knownVars
     for lineNo in range((firstLineOfDecryptFunc + 1), (lastLineOfTransform + 1)):

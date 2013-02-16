@@ -1508,6 +1508,31 @@ class GetAttrs:
                             
             if addVarName != None and addVarName not in self.varList:
                 self.varList.append(addVarName)
+        elif varName.find("+") != -1:
+            newVarNames = varName.split("+")
+            for newVarName in newVarNames:
+                if (not newVarName.isdigit()) and (newVarName not in self.varList):
+                    self.varList.append(newVarName)
+        elif varName.find("-") != -1:
+            newVarNames = varName.split("-")
+            for newVarName in newVarNames:
+                if (not newVarName.isdigit()) and (newVarName not in self.varList):
+                    self.varList.append(newVarName)
+        elif varName.find("*") != -1:
+            newVarNames = varName.split("*")
+            for newVarName in newVarNames:
+                if (not newVarName.isdigit()) and (newVarName not in self.varList):
+                    self.varList.append(newVarName)
+        elif varName.find("/") != -1:
+            newVarNames = varName.split("/")
+            for newVarName in newVarNames:
+                if (not newVarName.isdigit()) and (newVarName not in self.varList):
+                    self.varList.append(newVarName)
+        elif varName.find("^") != -1:
+            newVarNames = varName.split("^")
+            for newVarName in newVarNames:
+                if (not newVarName.isdigit()) and (newVarName not in self.varList):
+                    self.varList.append(newVarName)
         else: # no pounds
             if varName not in self.varList:
                 self.varList.append(varName)
