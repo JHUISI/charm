@@ -1543,7 +1543,11 @@ def updateAssignInfo(node, i):
     currentForLoopObj = None
     if (startLineNo_ForLoop != None):
         lenForLoops = len(forLoops[currentFuncName])
-        currentForLoopObj = forLoops[currentFuncName][lenForLoops - 1]
+        try:
+            currentForLoopObj = forLoops[currentFuncName][lenForLoops - 1]
+        except:
+            printLinesOfCode()
+            sys.exit("test")
 
     currentForLoopInnerObj = None
     if (startLineNo_ForLoopInner != None):
