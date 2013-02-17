@@ -32,6 +32,8 @@ nilType = 'nil'
 
 singleBF = False
 
+canCollapseForLoopsInDecout = False
+
 def getRightSideOfStringAssignStatement(inputString):
     inputStringSeparated = inputString.split(" := ")
     if (len(inputStringSeparated) != 2):
@@ -637,7 +639,7 @@ def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, curre
 
     if (writeToDecout == True):
 
-        if ( (regDotProdVar != None) and (str(currentNode.right) == regDotProdVar) and (singleBF == True) ):
+        if ( (canCollapseForLoopsInDecout == True) and (regDotProdVar != None) and (str(currentNode.right) == regDotProdVar) and (singleBF == True) ):
             decoutLines.append(lineForDecoutLines + " ^ " + allPossibleBlindingFactors[0] + "\n")
         else:
             decoutLines.append(lineForDecoutLines + "\n")
@@ -765,12 +767,19 @@ def seeIfSingleBF(varsThatAreBlindedDict):
     for varName in varsThatAreBlindedDict:
         if (firstOne == True):
             firstBF = varsThatAreBlindedDict[varName]
+            if (firstBF[0].find(LIST_INDEX_SYMBOL) != -1):
+                singleBF = False
+                return
             firstOne = False
             continue
 
         currentBF = varsThatAreBlindedDict[varName]
+        if (currentBF[0].find(LIST_INDEX_SYMBOL) != -1):
+            singleBF = False
+            return
         if (firstBF != currentBF):
             singleBF = False
+            return
 
     singleBF = True
 
@@ -791,12 +800,93 @@ def getRegDotProdVar(currentNode):
 
     return str(currentNode.left)
 
+def getIsForLoopStart(node):
+    if (node.type != ops.BEGIN):
+        return False
+
+    if (str(node.left) != "for"):
+        return False
+
+    return True
+
+def getIsForLoopEnd(node):
+    if (node.type != ops.END):
+        return False
+
+    if (str(node.left) != "for"):
+        return False
+
+    return True
+
+def getPairingAttrNamesRecursive(astNode, attrNames):
+    if (astNode.left != None):
+        getPairingAttrNamesRecursive(astNode.left, attrNames)
+
+    if (astNode.right != None):
+        getPairingAttrNamesRecursive(astNode.right, attrNames)
+
+    if (astNode.type == ops.PAIR):
+        allAttrNodeNames = GetAttributeVars(astNode, True)
+        attrNames.append(allAttrNodeNames)
+        '''
+        for attrNodeName in allAttrNodeNames:
+            if (attrNodeName not in attrNames):
+                attrNames.append(attrNodeName)
+        '''
+
+def getPairingAttrNames(astNode):
+    attrNames = []
+    getPairingAttrNamesRecursive(astNode, attrNames)
+    return attrNames
+
+def determineIfWeCanCollapseForLoopsInDecout(astNodes, firstLineOfDecryptFunc, lastLineOfDecryptFunc, varsThatAreBlindedDict, config):
+    global canCollapseForLoopsInDecout
+
+    withinForLoopLocalVar = False
+
+    #print(firstLineOfDecryptFunc)
+    #print(lastLineOfDecryptFunc)
+
+    for lineNumber in range(firstLineOfDecryptFunc, (lastLineOfDecryptFunc + 1)):
+        currentNode = astNodes[lineNumber - 1]
+
+        isForLoopStart = getIsForLoopStart(currentNode)
+        if (isForLoopStart == True):
+            withinForLoopLocalVar = True
+            continue
+
+        isForLoopEnd = getIsForLoopEnd(currentNode)
+        if (isForLoopEnd == True):
+            withinForLoopLocalVar = False
+            continue
+
+        if (withinForLoopLocalVar == False):
+            continue
+
+        pairingAttrNamesLists = getPairingAttrNames(currentNode)
+        if (len(pairingAttrNamesLists) == 0):
+            continue
+
+        for pairingAttrNameList in pairingAttrNamesLists:
+            foundOneWithBlindedVar = False
+            for pairingAttrName in pairingAttrNameList:
+                nameWithBlindingSuffix = pairingAttrName + config.blindingSuffix
+                if (nameWithBlindingSuffix in varsThatAreBlindedDict):
+                    foundOneWithBlindedVar = True
+            if (foundOneWithBlindedVar == False):
+                canCollapseForLoopsInDecout = False
+                return 
+
+    canCollapseForLoopsInDecout = True
+
 def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     global currentNumberOfForLoops, withinForLoop, iterationNo, atLeastOneForLoop, writeToDecout
 
     #print(varsThatAreBlindedDict)
 
     varsThatAreBlindedDict = addBlindingSufficesToDict(varsThatAreBlindedDict)
+
+    seeIfSingleBF(varsThatAreBlindedDict)
 
     ctVarNames = getCTVarNames()
     #print(ctVarNames)
@@ -809,6 +899,8 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     lastLineOfDecryptFunc = getEndLineNoOfFunc(config.decryptFuncName)
     lastLineOfTransform = getLastLineOfTransform(stmtsDec, config)
     getForLoopStructsInfo()
+
+    determineIfWeCanCollapseForLoopsInDecout(astNodes, firstLineOfDecryptFunc, lastLineOfDecryptFunc, varsThatAreBlindedDict, config)
 
     #print("\n\n\n")
     #printLinesOfCode()
@@ -829,7 +921,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     decoutRunningInputLine = ""
 
     allPossibleBlindingFactors = getAllBlindingExponentsForDecoutLine(varsThatAreBlindedDict)
-    seeIfSingleBF(varsThatAreBlindedDict)
+    #seeIfSingleBF(varsThatAreBlindedDict)
 
     regDotProdVar = None
 
@@ -918,7 +1010,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
             #if (currentNode.type == ops.FOR):
             if ( (currentNode.type == ops.BEGIN) and (str(currentNode.left) == "for") ):
                 withinForLoop = True
-                if (singleBF == True):
+                if ( (canCollapseForLoopsInDecout == True) and (singleBF == True) ):
                     writeToDecout = False
                 currentNumberOfForLoops += 1
                 iterationNo = 0
@@ -960,9 +1052,9 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
         elif (areAllVarsOnLineKnownByTransform == True):
             writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, lineNo, astNodes, config, ctExpandListNodes, ctVarsThatNeedBuckets, regDotProdVar, allPossibleBlindingFactors)
             knownVars.append(str(currentNode.left))
-        elif ( (regDotProdVarOnThisLine != None) and (singleBF == True) ):
+        elif ( (regDotProdVarOnThisLine != None) and (singleBF == True) and (canCollapseForLoopsInDecout == True) ):
             writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, lineNo, astNodes, config, ctExpandListNodes, ctVarsThatNeedBuckets, regDotProdVar, allPossibleBlindingFactors)
-            #knownVars.append(str(currentNode.left))
+            knownVars.append(str(currentNode.left))
         #elif ( (regDotProdVar != None) and (str(currentNode.right) == regDotProdVar) and (singleBF == True) ):
             #decoutLines.append(str(currentNode) + " ^ " + allPossibleBlindingFactors[0])
         else:
@@ -1002,7 +1094,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
             #transformRunningOutputLine += ", " + transformOutputListForLoop
         for varName in varsToAddToTransformOutputAndDecoutInput:
             transformRunningOutputLine += ", " + varName
-        if ( (atLeastOneForLoop == True) and (singleBF == False) ):
+        if ( (atLeastOneForLoop == True) and (singleBF == False) and (canCollapseForLoopsInDecout == False) ):
             transformRunningOutputLine += ", " + transformOutputListForLoop
         transformRunningOutputLine += "}\n"
 
@@ -1014,7 +1106,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     for varName in varsToAddToTransformOutputAndDecoutInput:
         decoutRunningInputLine += ", " + varName
 
-    if ( (atLeastOneForLoop == True) and (singleBF == False) ):
+    if ( (atLeastOneForLoop == True) and (singleBF == False) and (canCollapseForLoopsInDecout == False) ):
         decoutRunningInputLine += ", " + transformOutputListForLoop
 
     decoutRunningInputLine += "}\n"
