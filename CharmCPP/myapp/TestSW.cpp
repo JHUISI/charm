@@ -34,7 +34,7 @@ void setup(int n, CharmList & pk, ZR & mk) // good to go
 
 G2 evalT(CharmList & pk, int n, ZR x)
 {
-	G2 T;
+    G2 T;
     G1 g;
     G1 g1;
     G2 g2;

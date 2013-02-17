@@ -13,6 +13,7 @@ varNamesToFuncs_All = None
 varNamesToFuncs_Assign = None
 setupFile = None
 userFuncsCPPFile = None
+userFuncsListNames = []
 currentFuncName = NONE_FUNC_NAME
 numTabsIn = 1
 returnValues = {}
@@ -36,6 +37,8 @@ NOP_STATEMENT = "NOP"
 INSERT_FUNC_NAME = ".insert("
 UTIL_FUNC_NAME = "util"
 DFA_UTIL_FUNC_NAME = "dfaUtil"
+cppSuffix = ".cpp"
+cppHdrSuffix = ".h"
 secretUtils = ['createPolicy', 'getAttributeList', 'calculateSharesDict', 'calculateSharesList', 'prune', 'getCoefficients', 'recoverCoefficientsDict', 'intersectionSubset']
 secretUtilsWithGroup = ['calculateSharesDict', 'calculateSharesList', 'getCoefficients', 'recoverCoefficientsDict', 'intersectionSubset']
 dfaUtils = ['hashToKey', 'accept', 'getAcceptState', 'getTransitions', 'getString']
@@ -338,6 +341,57 @@ def isFuncDeclVarAListAndSameType(variableName, functionName):
 
     return False
 
+def writeUserFunctionDecl_CPP(outputFile, functionName):
+    global currentFuncOutputVars, currentFuncNonOutputVars
+
+    currentFuncOutputVars = []
+    currentFuncNonOutputVars = []
+    
+    inputVariables = getInputVariablesList(functionName)
+    outputVariables = getOutputVariablesList(functionName)
+
+    if len(outputVariables) > 1:
+        outputString = "void " + functionName + "(" # in this case, we need to rewrite every call to this function
+    elif len(outputVariables) == 1:
+        outputVariable = outputVariables[0]
+        varIsAList = isFuncDeclVarAList(outputVariable, functionName)
+        currentType = getFinalVarType(outputVariable, currentFuncName)
+        if (currentType in [types.int]):
+            outputString = "int " + functionName + "(" # probably an error?
+        else:
+            outputString = makeTypeReplacementsForCPP(currentType, varIsAList) + " " + functionName + "("
+    else:
+        outputString = "void " + functionName + "(" # probably an error?
+        
+    for inputVariable in inputVariables:
+        varIsAList = isFuncDeclVarAList(inputVariable, functionName)
+        currentType = getFinalVarType(inputVariable, currentFuncName)
+        if (currentType in [types.int]):
+            outputString += makeTypeReplacementsForCPP(currentType) + " " + inputVariable + ", "
+        else:
+            outputString += makeTypeReplacementsForCPP(currentType, varIsAList) + " & " + inputVariable + ", "
+        currentFuncOutputVars.append(inputVariable)
+    
+    # JAA: fix this to address user defined functions with one type
+    if len(outputVariables) > 1:
+        for outputVariable in outputVariables:
+            if (outputVariable in inputVariables):
+                continue
+            if ( (outputVariable != "True") and (outputVariable != "False") ):
+                varIsAList = isFuncDeclVarAList(outputVariable, functionName)
+                currentType = getFinalVarType(outputVariable, currentFuncName)
+                if (currentType in [types.int]):
+                    outputString += makeTypeReplacementsForCPP(currentType) + " & " + outputVariable + ", "
+                else:
+                    outputString += makeTypeReplacementsForCPP(currentType, varIsAList) + " & " + outputVariable + ", "
+                currentFuncOutputVars.append(outputVariable)
+
+    if ( (inputVariables != []) or (outputVariables != []) ):
+        outputString = outputString[0:(len(outputString) - len(", "))]
+    outputString += ")\n{\n"
+
+    outputFile.write(outputString)
+    return ""
 
 def writeFunctionDecl_CPP(outputFile, functionName, defineAsClass, className):
     global currentFuncOutputVars, currentFuncNonOutputVars
@@ -369,7 +423,6 @@ def writeFunctionDecl_CPP(outputFile, functionName, defineAsClass, className):
             outputString += makeTypeReplacementsForCPP(currentType, varIsAList) + " & " + inputVariable + ", "
         currentFuncOutputVars.append(inputVariable)
     
-    # JAA: fix this to address user defined functions with one type
     for outputVariable in outputVariables:
         if (outputVariable in inputVariables):
             continue
@@ -393,14 +446,27 @@ def writeFunctionDecl_CPP(outputFile, functionName, defineAsClass, className):
 def writeFunctionDecl(functionName, defineAsClass, className):
     global setupFile
 
-    functionHeader = writeFunctionDecl_CPP(setupFile, functionName, defineAsClass, className)
-    if defineAsClass:
-        return functionHeader
+    if functionName in userFuncsListNames:
+        return writeUserFunctionDecl_CPP(setupFile, functionName)
     else:
-        return ""
+        functionHeader = writeFunctionDecl_CPP(setupFile, functionName, defineAsClass, className)
+        if defineAsClass:
+            return functionHeader
+        else:
+            return ""
 
 def writeFunctionEnd_CPP(outputFile, functionName):
     global returnValues, CPP_funcBodyLines
+
+    if functionName in userFuncsListNames:
+        outputVariables = getOutputVariablesList(functionName)
+        if len(outputVariables) == 1: # only care about functions that return a single type
+            outputVariable = outputVariables[0]
+#            if ( (outputVariable != "True") and (outputVariable != "False") ):
+            CPP_funcBodyLines += "    return %s;\n}\n\n" % outputVariable
+            outputFile.write(CPP_varTypesLines)
+            outputFile.write(CPP_funcBodyLines)
+            return
 
     if (functionName not in [verifyFuncName, membershipFuncName, batchVerifyFuncName, precheckFuncName]):
         CPP_funcBodyLines += "    return;\n}\n\n"
@@ -643,7 +709,8 @@ def searchForRawType(node, currentFuncName):
     #print("rawTypes: ", rawTypes)
     key = nodeParts[0]
     typeDict = rawTypes.get(key)
-    if typeDict != None:
+    #print("typeDict: ", typeDict)
+    if typeDict != None and type(typeDict) == dict:
         typeRef = typeDict[refType]
         typeInfo = typeDict[typeRef]
     else:
@@ -788,21 +855,33 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
             return returnThisString
 
     elif (node.type == ops.ADD):
+        testLeftSide = getFinalVarType(str(node.left), currentFuncName)
+        testRightSide = getFinalVarType(str(node.right), currentFuncName)
+        if testLeftSide == types.int or testRightSide == types.int: return str(node) # literally keep it thesame
         leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
         rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
         return writeMathStatement(leftSide, rightSide, "add")
 
     elif (node.type == ops.SUB):
+        testLeftSide = getFinalVarType(str(node.left), currentFuncName)
+        testRightSide = getFinalVarType(str(node.right), currentFuncName)
+        if testLeftSide == types.int or testRightSide == types.int: return str(node) # literally keep it thesame
         leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
         rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
         return writeMathStatement(leftSide, rightSide, "sub")
 
     elif (node.type == ops.MUL):
+        testLeftSide = getFinalVarType(str(node.left), currentFuncName)
+        testRightSide = getFinalVarType(str(node.right), currentFuncName)
+        if testLeftSide == types.int or testRightSide == types.int: return str(node) # literally keep it thesame        
         leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
         rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
         return writeMathStatement(leftSide, rightSide, "mul")
 
     elif (node.type == ops.DIV):
+        testLeftSide = getFinalVarType(str(node.left), currentFuncName)
+        testRightSide = getFinalVarType(str(node.right), currentFuncName)
+        if testLeftSide == types.int or testRightSide == types.int: return str(node) # literally keep it thesame        
         leftSide = getAssignStmtAsString_CPP(node.left, replacementsDict, variableName, leftSideNameForInit)
         rightSide = getAssignStmtAsString_CPP(node.right, replacementsDict, variableName, leftSideNameForInit)
         return writeMathStatement(leftSide, rightSide, "div")
@@ -918,13 +997,15 @@ def getAssignStmtAsString_CPP(node, replacementsDict, variableName, leftSideName
             funcOutputForUser = funcOutputString
             funcOutputForUser = funcOutputForUser.replace("[", "")
             funcOutputForUser = funcOutputForUser.replace("]", "")
-            userFuncsOutputString = ""
-            userFuncsOutputString += "void " + funcOutputForUser + "\n{\n"
-            #userFuncsOutputString += "\t" + userGlobalsFuncName + "();\n"
-            userFuncsOutputString += "    " + userGlobalsFuncName + "();\n"
-            #userFuncsOutputString += "\treturn;\n}\n\n"
-            userFuncsOutputString += "    return;\n}\n\n"
-            userFuncsCPPFile.write(userFuncsOutputString)
+#            print("funcOutputForUser:\n", funcOutputForUser)
+#            userFuncsOutputString = ""
+#            userFuncsOutputString += "void " + funcOutputForUser + "\n{\n"
+#            #userFuncsOutputString += "\t" + userGlobalsFuncName + "();\n"
+#            userFuncsOutputString += "    " + userGlobalsFuncName + "();\n"
+#            #userFuncsOutputString += "\treturn;\n}\n\n"
+#            userFuncsOutputString += "    return;\n}\n\n"
+#            print("userFuncsOutputString:\n", userFuncsOutputString)
+#            #userFuncsCPPFile.write(userFuncsOutputString)
         return funcOutputString
     elif (node.type == ops.EXPAND):
         if (variableName == None):
@@ -1180,7 +1261,7 @@ def writeAssignStmt_CPP(outputFile, binNode):
 
 def writeAssignStmt(binNode):
     global setupFile    
-    print("DEBUG: ", binNode)
+    #print("DEBUG: ", binNode)
     # inline SDL assignment pre-processor
     resultPreType, binNodeList = preProcessCheck(binNode)
     if resultPreType == preprocessTypes.listWithinListAssign:
@@ -1422,6 +1503,8 @@ def writeSDLToFiles(astNodes, defineAsClass, className):
     for astNode in astNodes:
         lineNoBeingProcessed += 1
         processedAsFunctionStart = False
+        if (lineNoBeingProcessed == 158):
+            pass
 
         if (isFunctionStart(astNode) == True):
             currentFuncName = getFuncNameFromBinNode(astNode)
@@ -1582,7 +1665,8 @@ def writeHeaderFile(outputFileNameHdr, className, groupParam, importLines, pairi
     outputString += "\t" + className + "() { group.setCurve(" + groupParam + "); };\n"
     outputString += "\t~" + className + "() {};\n"
     for i in functionHeaderList:
-        outputString += "\t" + i
+        if i != "":
+            outputString += "\t" + i
     outputString += "\nprivate:\n"
     outputString += "\t" + builtinDefLines
     outputString += "};\n"
@@ -1593,9 +1677,9 @@ def writeHeaderFile(outputFileNameHdr, className, groupParam, importLines, pairi
     f.close()
     return    
 
-def codegen_CPP_main(inputSDLScheme, outputFileName, defineAsClass=True, groupParam='AES_SECURITY'):
+def codegen_CPP_main(inputSDLScheme, outputFileName, userFuncList=[], defineAsClass=True, groupParam='AES_SECURITY'):
     global setupFile, assignInfo, varNamesToFuncs_All
-    global varNamesToFuncs_Assign, inputOutputVars, userFuncsCPPFile, functionNameOrder
+    global varNamesToFuncs_Assign, inputOutputVars, userFuncsListNames, functionNameOrder
     global blindingFactors_NonLists, blindingFactors_Lists
 
     parseFile2(inputSDLScheme, False, True)
@@ -1607,11 +1691,12 @@ def codegen_CPP_main(inputSDLScheme, outputFileName, defineAsClass=True, groupPa
     
     inputOutputVars = getInputOutputVars()
     functionNameOrder = getFunctionNameOrder()
+    userFuncsListNames = list(userFuncList)
     varNamesToFuncs_All = getVarNamesToFuncs_All()
     varNamesToFuncs_Assign = getVarNamesToFuncs_Assign()
 
     setupFile = open(outputFileName, 'w')
-    outputFileNameHdr = outputFileName.strip(".cpp") + ".h" # in case it has .cpp in the extension
+    outputFileNameHdr = outputFileName.strip(cppSuffix) + cppHdrSuffix # in case it has .cpp in the extension
 
     getGlobalVarNames()
     importLines = addImportLines(defineAsClass, outputFileNameHdr)
@@ -1627,7 +1712,6 @@ def codegen_CPP_main(inputSDLScheme, outputFileName, defineAsClass=True, groupPa
     else:
         writeHeaderFile(outputFileNameHdr, className, groupParam, importLines, pairingDefLines, builtinDefLines, functionHeaderList)
     setupFile.close()
-    #userFuncsCPPFile.close()
 
 if __name__ == "__main__":
     lenSysArgv = len(sys.argv)
@@ -1638,4 +1722,4 @@ if __name__ == "__main__":
     if ( (sys.argv[1] == "-help") or (sys.argv[1] == "--help") ):
         sys.exit("Usage:  python " + sys.argv[0] + " [name of input SDL file] [name of output C++ file]")
 
-    codegen_CPP_main(sys.argv[1], sys.argv[2])
+    codegen_CPP_main(sys.argv[1], sys.argv[2], ['evalT'])

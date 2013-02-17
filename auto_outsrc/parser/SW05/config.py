@@ -1,5 +1,5 @@
 schemeName = "LW"
-
+ 
 rootNodeName = 'root'
 addNodePrefix = 'ADD'
 mulNodePrefix = 'MUL'
@@ -10,13 +10,14 @@ outputVarName = "output"
 
 finalSDLSuffix = ".FINAL_SDL"
 
+userFuncList = ['evalT']
 doNotIncludeInTransformList = ["prod"]
 
 transformOutputList = "transformOutputList"
 
 M = 'M'
 
-forLoopSeed = 1000
+forLoopSeed = 10
 
 listNameIndicator = "LISTNAMEINDICATOR"
 
@@ -71,9 +72,6 @@ userFuncsName = "userFuncs_" + schemeName
 userFuncsFileName = userFuncsName + pySuffix
 userFuncsCPPFileName = userFuncsName + cppHeaderSuffix
 outputSDLFileName = "outsourcedSDL_" + schemeName + pySuffix
-makefileFolderName = "../cppCompilation/"
-makefileFileName = "Makefile"
-makefileTemplateFileName = "../cppCompilation/Makefile_Template"
 
 errorFuncName = "userErrorFunction"
 errorFuncArgString = "userErrorFunctionArgString"
