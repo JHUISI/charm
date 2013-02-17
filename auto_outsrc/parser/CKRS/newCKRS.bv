@@ -1,22 +1,17 @@
 name := ibeckrs09
 setting := asymmetric
-
-N := 2
-secparam := 80
+n := 5
+l := 32
 
 BEGIN :: types
-n := ZR
-l := ZR
+n := int
+l := int
 M := GT
 mpk := list
 sk := list
 ct := list
 hl := list
 gl := list
-
-
-z := list
-
 id := str
 END :: types
 
@@ -43,7 +38,7 @@ v2 := (g^t2)
 v3 := (g^t3)
 v4 := (g^t4)
 
-mpk := list{omega, g, h, gl, hl, v1, v2, v3, v4, n, l}
+mpk := list{omega, g, h, gl, hl, v1, v2, v3, v4}
 msk := list{alpha, t1, t2, t3, t4}
 
 output := list{mpk, msk}
@@ -52,13 +47,13 @@ END :: func:setup
 
 BEGIN :: func:extract
 input := list{mpk, msk, id}
-mpk := expand{omega, g, h, gl, hl, v1, v2, v3, v4, n, l}
+mpk := expand{omega, g, h, gl, hl, v1, v2, v3, v4}
 msk := expand{alpha, t1, t2, t3, t4}
 
 r1 := random(ZR)
 r2 := random(ZR)
 
-hID := stringToInt(id, 5, 32)
+hID := stringToInt(id, n, l)
 reservedVarName0 := init(G2)
 BEGIN :: for
 for{y := 0, n}
@@ -102,14 +97,13 @@ END :: func:extract
 
 BEGIN :: func:encrypt
 input := list{mpk, M, id}
-mpk := expand{omega, g, h, gl, hl, v1, v2, v3, v4, n, l}
+mpk := expand{omega, g, h, gl, hl, v1, v2, v3, v4}
 
 s := random(ZR)
 s1 := random(ZR)
 s2 := random(ZR)
 
-
-hID1 := stringToInt(id, 5, 32)
+hID1 := stringToInt(id, n, l)
 reservedVarName2 := init(G1)
 BEGIN :: for
 for{y := 0, n}
