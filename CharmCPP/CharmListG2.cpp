@@ -50,6 +50,21 @@ void CharmListG2::append(G2 & g)
 	cur_index++;
 }
 
+CharmListStr CharmListG2::strkeys()
+{
+	CharmListStr s;
+	map<string, int, g2_cmp_str>::iterator it;
+	if(((int) strList.size()) > 0) {
+		//cout << "iterate over length: " << strList.size() << endl;
+		for(it = strList.begin(); it != strList.end(); ++it) {
+			// cout << "Compare: " << it->second << " == " << it->second << " => " << it->first << endl;
+			s.insert((int) it->second, it->first);
+			// index++;
+		}
+	}
+	return s;
+}
+
 G2& CharmListG2::operator[](const int index)
 {
 	if(index == cur_index) { // means we are creating reference.

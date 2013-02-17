@@ -1,7 +1,7 @@
 #ifndef CRYPTOLIB_H
 #define CRYPTOLIB_H
 
-#define MAX_LIST 	1000
+#define MAX_LIST 	10000
 
 #if BUILD_RELIC == 1
 #define ASYMMETRIC	1 // meaningless for RELIC

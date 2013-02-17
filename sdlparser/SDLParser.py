@@ -567,6 +567,8 @@ def getVarTypeFromVarName(varName, functionNameArg_TieBreaker, failSilently=Fals
     retVarType = types.NO_TYPE
     retFunctionName = None
     isInAList = None
+    # JAA strip any negation symbols
+    if varName.find(NEGATION_SYMBOL) != -1: varName = varName.strip(NEGATION_SYMBOL)
     
     outputKeywordDisagreement = False
 

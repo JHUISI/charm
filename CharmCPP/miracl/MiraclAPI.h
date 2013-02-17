@@ -83,6 +83,7 @@ public:
 	G2 exp(G2, int);
 	G2 inv(G2);
 	GT pair(G1, G2);
+	GT pair(G2, G1);
 	G2 hashListToG2(string);
 	G2 hashListToG2(CharmList);
 #endif

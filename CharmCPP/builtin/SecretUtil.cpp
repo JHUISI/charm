@@ -97,7 +97,7 @@ CharmListStr SecretUtil::prune(Policy& pol, CharmListStr attrs)
 	}
 	str.erase(str.size()-1);
 	str += ")";
-	cout << "ATTR string: " << str << endl;
+	//cout << "ATTR string: " << str << endl;
 
 	int str_size = str.size();
 	char attributes[str_size+1];

@@ -318,6 +318,12 @@ GT PairingGroup::pair(G1 g, G2 h)
 	return gt;
 }
 
+GT PairingGroup::pair(G2 h, G1 g)
+{
+	GT gt = pfcObject->pairing(h, g);
+	return gt;
+}
+
 #else
 GT PairingGroup::pair(G1 g, G1 h)
 {

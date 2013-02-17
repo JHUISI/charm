@@ -1503,7 +1503,7 @@ def writeSDLToFiles(astNodes, defineAsClass, className):
     for astNode in astNodes:
         lineNoBeingProcessed += 1
         processedAsFunctionStart = False
-        if (lineNoBeingProcessed == 158):
+        if (lineNoBeingProcessed == 102):
             pass
 
         if (isFunctionStart(astNode) == True):
