@@ -1,7 +1,7 @@
 -- Master public values, master secret values, and secret values must be returned as lists of items.  Use
 dummy variables if only one variable in a given scheme.
 
--- each line with at least one pairing contains only pairings, no other calculations
+-- each line with at least one pairing contains only pairings and exponentiations, no other calculations
 
 -- last line of decrypt is assignment of message itself, and the calculation can only be an operation
 on at most two variables
@@ -17,3 +17,7 @@ is the name of a variable that stores the results of a dot product computed in a
 
 -- elements of the secret key shouldn't be given as lists if they have a predetermined number of entries
 (e.g., D#0, D#1, and D#2).  Instead, break them up into separate variables (e.g., D0, D1, and D2).
+
+-- if you have a dot product, the first statement after the dot product must be an assignment of the dot
+product variable to a different variable.  All references to the dot product variable must be changed to
+refer to the new variable that gets the assignment after the dot product finishes.

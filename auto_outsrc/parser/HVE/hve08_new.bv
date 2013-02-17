@@ -155,7 +155,8 @@ intermediateResults := e(XVector#i, YVector#i) * e(WVector#i, LVector#i)
 dotProd := dotProd * intermediateResults
 END :: if
 END :: for
+newDotProdVar := dotProd
 
-Message2 := omega * dotProd
+Message2 := omega * newDotProdVar
 output := Message2
 END :: func:decrypt

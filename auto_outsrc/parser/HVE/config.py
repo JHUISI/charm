@@ -11,7 +11,8 @@ finalSDLSuffix = ".FINAL_SDL"
 
 transformOutputList = "transformOutputList"
 
-doNotIncludeInTransformList = ["dotProd"]
+#doNotIncludeInTransformList = ["dotProd"]
+doNotIncludeInTransformList = []
 
 forLoopSeed = 1000
 

@@ -1040,7 +1040,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
                 writeToDecout = True
 
 
-        elif (str(currentNode.left) == M):
+        elif (str(currentNode.left) == config.M):
             if (writeToDecout == True):
                 decoutLines.append(str(currentNode) + "\n")
                 addVarsUsedInDecoutToGlobalList(currentNode.right)
@@ -1089,7 +1089,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
             varsToAddToTransformOutputAndDecoutInput.append(varName)
 
     for varName in skVarsThatDecoutNeeds:
-        if (varName not in varsToAddToTransformOutputAndDecoutInput):
+        if ( (varName in varsUsedInDecout) and (varName not in varsToAddToTransformOutputAndDecoutInput) ):
             varsToAddToTransformOutputAndDecoutInput.append(varName)
 
     if ( (len(varsToAddToTransformOutputAndDecoutInput) == 0) and (atLeastOneForLoop == False) ):
