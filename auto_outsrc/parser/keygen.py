@@ -1293,8 +1293,6 @@ def removeStringEntriesFromSKinKeygenElemToSMTExp(stringEntriesInKeygenElemToSMT
         skListInKeygenElemToSMTExp.remove(stringToRemove)
 
 def keygen(file, config):
-    #global keygenElemToSMTExp
-
     SDLLinesForKeygen = []
 
     if ( (type(file) is not str) or (len(file) == 0) ):
@@ -1324,29 +1322,7 @@ def keygen(file, config):
     stringEntriesInKeygenElemToSMTExp = removeStringEntriesFromKeygenElemToSMTExp(config)
     removeStringEntriesFromSKinKeygenElemToSMTExp(stringEntriesInKeygenElemToSMTExp, config)
 
-    print(keygenElemToSMTExp)
-    #sys.exit("testddddd")
-
     bfMap, skBfMap = instantiateBFSolver(config)
-
-    #skBfMap = {'D':'bf0', 'd':'bf0'}
-    #skBfMap = {'D1':'bf0', 'D2':'bf1', 'D3':'bf2', 'D4':'bf3', 'D5':'bf4', 'D6':'bf5', 'D7':'bf6', 'K':'bf7', 'tagUSk':'bf8'}
-
-    #skBfMap = {'d0':'bf0', 'd1':'bf1', 'd2':'bf2', 'd3':'bf3', 'd4':'bf4', 'd5':'bf5'}
-
-    #skBfMap = {'YVector':'bf0', 'LVector':'bf1'}
-
-    #skBfMap = {'K':'bf0#'}
-
-    #skBfMap = {'K': {'K#key#3?': {'root': ['LEAF0'], 'LEAF0': ['r']}, 'root': ['LIST0'], 'LIST0': ['K#key#1?', 'K#key#3?', 'K#key#2?'], 'K#key#1?': {'root': ['LEAF0'], 'LEAF0': ['r']}, 'K#key#2?': {'root': ['LEAF0'], 'LEAF0': ['r']}}, 'sk': ['KendList1', 'KendList2', 'Kstart1', 'Kstart2', 'K'], 'Kstart1': {'root': ['LEAF0'], 'LEAF0': ['rstart']}, 'Kstart2': {'root': ['LEAF0'], 'LEAF0': ['rstart']}, 'KendList2': {'root': ['LEAF0'], 'LEAF0': ['rx']}, 'KendList1': {'root': ['ADD0'], 'ADD0': ['-alpha', 'rx']}}
-
-    #skBfMap = {'KendList2': 'bf0', 'K': 'bf0', 'KendList1': 'bf0', 'Kstart2': 'bf0', 'Kstart1': 'bf0'}
-
-    #skBfMap = {'K3': 'bf0', 'K2': 'bf0', 'K1': 'bf0', 'Kstart1': 'bf0', 'Kstart2': 'bf0', 'KendList2': 'bf0', 'KendList1': 'bf0'}
-
-    #skBfMap = {'K': 'bf0', 'L': 'bf0', 'Kl': 'bf0'}
-
-    #skBfMap = {'Djp': 'bf0', 'Dj': 'bf0', 'D': 'uf1'}
 
     for stringEntry in stringEntriesInKeygenElemToSMTExp:
         skBfMap[stringEntry] = nilType
@@ -1354,16 +1330,6 @@ def keygen(file, config):
     print("BFSolver Results: ", skBfMap)
     # produce proof
     # generateTKProof(bfMap, config)
-    #print(resultDictionary)
-    #sys.exit("test")
-
-    #skBfMap = {'sk':'bf0'}
-    #skBfMap = {'sk': 'bf0'}
-    #skBfMap = {'K': 'bf0', 'L': 'bf0', 'Kl': 'bf0'}
-    #skBfMap = {'Djp': 'bf0', 'Dj': 'bf0', 'D': 'uf1'}
-    #skBfMap = {'K':'bf0#'}
-    #skBfMap = {'d0':'bf0', 'd':'bf1'}
-    #skBfMap = {'D':'bf0', 'd':'bf0'}
 
     skBfMap = applyGroupSharingOptimization(skBfMap, config)
     applyBlindingFactorsToScheme(skBfMap, config)

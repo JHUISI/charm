@@ -95,8 +95,7 @@ for{y := 0,Y}
 kDecrypt := GetString(attrs#y)
 result0 := e(h_gid,C3#kDecrypt)
 numerator := ((result0^coeff#kDecrypt) * (C1#kDecrypt^coeff#kDecrypt))
-denominator0 := e(K#kDecrypt,C2#kDecrypt)
-denominator := (denominator0^coeff#kDecrypt)
+denominator := ((e(K#kDecrypt,C2#kDecrypt))^coeff#kDecrypt)
 fraction := (numerator / denominator)
 dotProd := (dotProd * fraction)
 END :: for
