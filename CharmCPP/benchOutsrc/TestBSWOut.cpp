@@ -71,14 +71,14 @@ void Bsw07::keygen(CharmList & pk, CharmList & mk, CharmListStr & S, ZR & bf0, C
         Djp.insert(y0, group.exp(gG2, sUSy));
     }
     CharmListStr Dj_keys = Dj.strkeys();
-    int Dj_len = Dj.length();
+    int Dj_len = Dj_keys.length();
     for (int y_var = 0; y_var < Dj_len; y_var++)
     {
         string y = Dj_keys[y_var];
         DjBlinded.insert(y, group.exp(Dj[y], group.div(1, bf0)));
     }
     CharmListStr Djp_keys = Djp.strkeys();
-    int Djp_len = Djp.length();
+    int Djp_len = Djp_keys.length();
     for (int y_var = 0; y_var < Djp_len; y_var++)
     {
         string y = Djp_keys[y_var];

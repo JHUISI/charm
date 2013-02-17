@@ -70,7 +70,7 @@ void Waters09::keygen(CharmList & pk, CharmList & msk, CharmListStr & S, ZR & bf
         Kl.insert(z, group.exp(group.hashListToG1(z), t));
     }
     CharmListStr Kl_keys = Kl.strkeys();
-    int Kl_len = Kl.length();
+    int Kl_len = Kl_keys.length();
     for (int y_var = 0; y_var < Kl_len; y_var++)
     {
         string y = Kl_keys[y_var];

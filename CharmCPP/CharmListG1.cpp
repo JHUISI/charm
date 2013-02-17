@@ -65,6 +65,22 @@ void CharmListG1::set(int index, G1 g1)
 //	}
 //}
 
+CharmListInt CharmListG1::keys()
+{
+	CharmListInt j;
+	int count = 0;
+	G1 tmp;
+	for(int i = 0; i < (int) list.size(); i++)
+	{
+		if(list[i] != tmp) {
+			j[count] = i;
+			count++;
+		}
+	}
+
+	return j;
+}
+
 CharmListStr CharmListG1::strkeys()
 {
 	CharmListStr s;

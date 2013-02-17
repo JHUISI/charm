@@ -1363,17 +1363,23 @@ def writeForLoopDecl_CPP(outputFile, binNode):
 
         curLoopVarName = getAssignStmtAsString_CPP(binNode.left.right, None, None)
         varNameTypeObj = theVarTypes.get(curLoopVarName)
+        if varNameTypeObj == None: # let's check the type header in case user defined the type for us
+            varNameTypeObj = getVarTypes()[TYPES_HEADER].get(curLoopVarName)
+        
         if varNameTypeObj != None:
-            if varNameTypeObj.getRefType() == types.str:
+            if varNameTypeObj.getRefType() == types.str or varNameTypeObj.getType() == types.listStr:
                 outputString += "CharmListStr " + curLoopVarName + KeysListSuffix_CPP + " = " + curLoopVarName + ".strkeys();\n"
                 curLoopIncVarType = "string"
-            elif varNameTypeObj.getRefType() == types.int:
+            elif varNameTypeObj.getRefType() == types.int or varNameTypeObj.getType() == types.listInt:
                 outputString += "CharmListInt " + curLoopVarName + KeysListSuffix_CPP + " = " + curLoopVarName + ".keys();\n"
                 curLoopIncVarType = "int"
             else:
                 outputString += str(varNameTypeObj.getRefType()) + " " + curLoopVarName + ";\n"
+        else:
+            print("DEBUG: cannot find for variable: ", curLoopVarName, " in FORALL statement.")
+            return
         outputString += writeCurrentNumTabsToString()
-        outputString += "int " + curLoopVarName + ListLengthSuffix_CPP + " = " + curLoopVarName + ".length();\n"
+        outputString += "int " + curLoopVarName + ListLengthSuffix_CPP + " = " + curLoopVarName + KeysListSuffix_CPP + ".length();\n"
         outputString += writeCurrentNumTabsToString()
         outputString += "for (int "
         curLoopIncVarName = getAssignStmtAsString_CPP(binNode.left.left, None, None)

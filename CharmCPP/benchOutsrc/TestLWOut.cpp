@@ -70,7 +70,7 @@ void Lw10::keygen(CharmList & gpk, CharmMetaList & msk, string & gid, CharmListS
         K.insert(z, group.mul(group.exp(gG1, msk[z][0].getZR()), group.exp(h, msk[z][1].getZR())));
     }
     CharmListStr K_keys = K.strkeys();
-    int K_len = K.length();
+    int K_len = K_keys.length();
     for (int y_var = 0; y_var < K_len; y_var++)
     {
         string y = K_keys[y_var];
