@@ -1,5 +1,6 @@
 name := bsw07
 setting := symmetric
+short := keys
 
 BEGIN :: types
 policyUSstr := str

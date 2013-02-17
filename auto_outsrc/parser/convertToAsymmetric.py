@@ -569,7 +569,7 @@ def main(sdlFile, config, sdlVerbose=False):
         
     newLinesSe = []
     newLinesS = []
-#    entireSDL = sdl.getLinesOfCode()
+    entireSDL = sdl.getLinesOfCode()
     if hasattr(config, "extraSetupFuncName"):
         print("<===== transforming %s =====>" % config.extraSetupFuncName)
         newLinesSe = transformFunction(entireSDL, config.extraSetupFuncName, stmtSe, groupInfo, noChangeList, generatorLines)
@@ -755,7 +755,7 @@ def buildMap(generators, varTypes, varList, var, constraintList):
 #                    varList.append(i)
             elif typeI in [types.G1]:
                 varList.append(i)
-            elif typeI in [types.ZR, types.str, types.list, types.object]:
+            elif typeI in [types.ZR, types.str, types.list, types.pol]:
                 (name, varInf) = getVarNameEntryFromAssignInfo(assignInfo, i)
                 if varInf.getIsUsedInHashCalc():
                     print("adding", i, "to the list")
