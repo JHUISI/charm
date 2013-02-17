@@ -1326,6 +1326,8 @@ def keygen(file, config):
 
     for stringEntry in stringEntriesInKeygenElemToSMTExp:
         skBfMap[stringEntry] = nilType
+
+    skBfMap = {'sk': 'bf0'}
     
     print("BFSolver Results: ", skBfMap)
     # produce proof

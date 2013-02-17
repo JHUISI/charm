@@ -143,7 +143,9 @@ def getPairingNodesRecursive(node, pairingNodesList):
 def getNumPairingsInForLoopFromLineNo(lineNo, astNodes):
     forLoopIndivStruct = getForLoopStructFromLineNo(lineNo)
     if (forLoopIndivStruct == None):
-        sys.exit("getNumPairingsInForLoopFromLineNo in transformNEW.py:  couldn't get for loop structure from getForLoopStructFromLineNo.")
+        #TODO:  ADD FORALL PARSING TO SDLPARSER.PY.  THIS IS A NASTY HACK INSTEAD.
+        return 10
+        #sys.exit("getNumPairingsInForLoopFromLineNo in transformNEW.py:  couldn't get for loop structure from getForLoopStructFromLineNo.")
 
     startLineNo = forLoopIndivStruct.getStartLineNo()
     endLineNo = forLoopIndivStruct.getEndLineNo()
@@ -183,7 +185,9 @@ def getNumStatementsInForLoopFromLineNo(lineNo):
 
     forLoopIndivStruct = getForLoopStructFromLineNo(lineNo)
     if (forLoopIndivStruct == None):
-        sys.exit("getNumStatementsInForLoopFromLineNo in transformNEW.py:  couldn't get for loop structure from getForLoopStructFromLineNo.")
+        #TODO:  ADD FORALL PARSING TO SDLPARSER.PY.  THIS IS A NASTY HACK INSTEAD.
+        return 10
+        #sys.exit("getNumStatementsInForLoopFromLineNo in transformNEW.py:  couldn't get for loop structure from getForLoopStructFromLineNo.")
 
     # the "- 2" is b/c of how we structure for loops in SDLParser (3 statements for the for loop itself,
     # but you have to add 1 b/c the # of total lines is end line no - start line no + 1
@@ -746,7 +750,7 @@ def getSkVarsThatDecoutNeeds(currentNode, skExpandListNodes):
 
     varsOnThisLine = GetAttributeVars(currentNode, True)
     for var in varsOnThisLine:
-        if ( (var == "for") or (var == "if") ):
+        if ( (var == "for") or (var == "if") or (var == "forall") ):
             continue
 
         if ( (var in skExpandListNodes) and (var not in retList) ):
@@ -804,7 +808,7 @@ def getIsForLoopStart(node):
     if (node.type != ops.BEGIN):
         return False
 
-    if (str(node.left) != "for"):
+    if ( (str(node.left) != "for") and (str(node.left) != "forall") ):
         return False
 
     return True
@@ -813,7 +817,7 @@ def getIsForLoopEnd(node):
     if (node.type != ops.END):
         return False
 
-    if (str(node.left) != "for"):
+    if ( (str(node.left) != "for") and (str(node.left) != "forall") ):
         return False
 
     return True
@@ -901,6 +905,8 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     getForLoopStructsInfo()
 
     determineIfWeCanCollapseForLoopsInDecout(astNodes, firstLineOfDecryptFunc, lastLineOfDecryptFunc, varsThatAreBlindedDict, config)
+    #print(canCollapseForLoopsInDecout)
+    #sys.exit("test")
 
     #print("\n\n\n")
     #printLinesOfCode()
@@ -1008,7 +1014,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
             skVarsThatDecoutNeedsForThisLine = getSkVarsThatDecoutNeeds(currentNode, skExpandListNodes)
             combineListsNoDups(skVarsThatDecoutNeeds, skVarsThatDecoutNeedsForThisLine)
             #if (currentNode.type == ops.FOR):
-            if ( (currentNode.type == ops.BEGIN) and (str(currentNode.left) == "for") ):
+            if ( (currentNode.type == ops.BEGIN) and ( (str(currentNode.left) == "for") or (str(currentNode.left) == "forall"))):
                 withinForLoop = True
                 if ( (canCollapseForLoopsInDecout == True) and (singleBF == True) ):
                     writeToDecout = False
@@ -1029,7 +1035,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
                     addVarsUsedInDecoutToGlobalList(currentNode)
                     searchForCTVarsThatNeedBuckets(currentNode, ctExpandListNodes, ctVarsThatNeedBuckets)
 
-            if ( (currentNode.type == ops.END) and (str(currentNode.left) == "for") and (withinForLoop == True) ):
+            if ( (currentNode.type == ops.END) and ( (str(currentNode.left) == "for") or (str(currentNode.left) == "forall")) and (withinForLoop == True) ):
                 withinForLoop = False
                 writeToDecout = True
 

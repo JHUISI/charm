@@ -65,13 +65,19 @@ skComplete := expand{sk}
 numerator := e(giValues#i,Hdr2)
 
 dotProdDecrypt := init(G1)
-BEGIN :: forall
-forall{jDecrypt := S}
+lenS := len(S)
+#keysS := keys(S)
+#BEGIN :: forall
+#forall{jDecrypt := S}
+BEGIN :: for
+for{decryptLoopVar := 0, lenS}
+jDecrypt := S#decryptLoopVar
 BEGIN :: if
 if {jDecrypt != i}
 dotProdDecrypt := (dotProdDecrypt * giValues#n+1-jDecrypt+i?)
 END :: if
-END :: forall
+#END :: forall
+END :: for
 denominator := e((sk#i * dotProdDecrypt),Hdr1)
 KDecrypt := (numerator / denominator)
 output := KDecrypt
