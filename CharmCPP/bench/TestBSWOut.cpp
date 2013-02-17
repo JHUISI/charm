@@ -1,4 +1,4 @@
-#include "TestBSW.h"
+#include "TestBSWOut.h"
 
 void Bsw07::setup(CharmList & mk, CharmList & pk)
 {

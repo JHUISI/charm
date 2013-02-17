@@ -1,4 +1,5 @@
-#include "TestWATERS.h"
+#include "TestBSWOut.h"
+#include <fstream>
 
 string createString(int i)
 {
@@ -32,37 +33,37 @@ string getPolicy(int max)
 	return policystr;
 }
 
-void benchmarkWATERS(Waters09 & waters, ofstream & outfile1, ofstream & outfile2, int attributeCount, int iterationCount, CharmListStr & transformResults, CharmListStr & decoutResults)
+void benchmarkBSW(Bsw07 & bsw, ofstream & outfile1, ofstream & outfile2, int attributeCount, int iterationCount, CharmListStr & transformResults, CharmListStr & decoutResults)
 {
 	Benchmark benchT, benchD;
-    CharmList msk, pk, skBlinded, ct, transformOutputList;
+    CharmList mk, pk, skBlinded, ct, transformOutputList;
     CharmListStr S;
     GT M, newM;
     ZR bf0;
+
     double tf_in_ms, de_in_ms;
 
-    waters.setup(msk, pk);
+    bsw.setup(mk, pk);
     getAttributes(S, attributeCount);
-    waters.keygen(pk, msk, S, bf0, skBlinded);
+    bsw.keygen(pk, mk, S, bf0, skBlinded);
 
-    M = waters.group.random(GT_t);
+    M = bsw.group.random(GT_t);
     string policy_str =  getPolicy(attributeCount); // get a policy string
-    waters.encrypt(pk, M, policy_str, ct);
+    bsw.encrypt(pk, M, policy_str, ct);
 
     stringstream s1, s2;
 
     //cout << "ct =\n" << ct << endl;
-    sum_in_ms = 0.0;
 	for(int i = 0; i < iterationCount; i++) {
+		// run TRANSFORM
 		benchT.start();
-		waters.transform(pk, skBlinded, S, ct, transformOutputList);
+		bsw.transform(pk, skBlinded, S, ct, transformOutputList);
 		benchT.stop();
 		//cout << "transformCT =\n" << transformOutputList << endl;
-
 		tf_in_ms = benchT.computeTimeInMilliseconds();
 
 		benchD.start();
-		waters.decout(pk, S, transformOutputList, bf0, newM);
+		bsw.decout(pk, S, transformOutputList, bf0, newM);
 		benchD.stop();
 		de_in_ms = benchD.computeTimeInMilliseconds();
 	}
@@ -76,6 +77,7 @@ void benchmarkWATERS(Waters09 & waters, ofstream & outfile1, ofstream & outfile2
 	s2 << attributeCount << " " << benchD.getAverage() << endl;
 	outfile2 << s2.str();
 	decoutResults[attributeCount] = benchD.getRawResultString();
+
 //    cout << convert_str(M) << endl;
 //    cout << convert_str(newM) << endl;
     if(M == newM) {
@@ -87,9 +89,9 @@ void benchmarkWATERS(Waters09 & waters, ofstream & outfile1, ofstream & outfile2
     return;
 }
 
-int main()
+int main(int argc, const char *argv[])
 {
-	Waters09 waters;
+	Bsw07 bsw;
 	string filename = "test";
 	ofstream outfile1, outfile2;
 	string f1 = filename + "_tra.dat";
@@ -102,18 +104,18 @@ int main()
 	CharmListStr transformResults, decoutResults;
 	for(int i = 2; i <= attributeCount; i++) {
 		cout << "Benchmark with " << i << " attributes." << endl;
-		benchmarkWATERS(waters, outfile1, outfile2, i, iterationCount, transformResults, decoutResults);
+		benchmarkBSW(bsw, outfile1, outfile2, i, iterationCount, transformResults, decoutResults);
 	}
 
 	outfile1.close();
 	outfile2.close();
-	cout << "<=== Transform benchmarkWATERS breakdown ===>" << endl;
+	cout << "<=== Transform benchmarkBSW breakdown ===>" << endl;
 	cout << transformResults << endl;
-	cout << "<=== Transform benchmarkWATERS breakdown ===>" << endl;
+	cout << "<=== Transform benchmarkBSW breakdown ===>" << endl;
 
-	cout << "<=== Decout benchmarkWATERS breakdown ===>" << endl;
+	cout << "<=== Decout benchmarkBSW breakdown ===>" << endl;
 	cout << decoutResults << endl;
-	cout << "<=== Decout benchmarkWATERS breakdown ===>" << endl;
+	cout << "<=== Decout benchmarkBSW breakdown ===>" << endl;
 
 	return 0;
 }

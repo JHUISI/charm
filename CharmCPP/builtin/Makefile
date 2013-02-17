@@ -2,7 +2,7 @@ include ../config.mk
 
 INCLUDES += -I. -I.. -I../$(underlib)
 
-objects := util.o SecretUtil.o policy.tab.o DFA.o
+objects := util.o SecretUtil.o policy.tab.o DFA.o Benchmark.o
 
 .PHONY: all
 all: $(objects)

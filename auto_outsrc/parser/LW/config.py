@@ -14,7 +14,7 @@ transformOutputList = "transformOutputList"
 
 doNotIncludeInTransformList = ["dotProd"]
 
-forLoopSeed = 1000
+forLoopSeed = 10
 
 M = 'M'
 
