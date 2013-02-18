@@ -101,7 +101,7 @@ int main(int argc, const char *argv[])
 	CharmListStr transformResults, decoutResults;
 	if(isEqual(fixOrRange, RANGE)) {
 		for(int i = 2; i <= ID_string_len; i++) {
-			benchmarkHIBE(hibe, outfile1, outfile2, ID_string_len, iterationCount, transformResults, decoutResults);
+			benchmarkHIBE(hibe, outfile1, outfile2, i, iterationCount, transformResults, decoutResults);
 		}
 		s3 << transformResults << endl;
 		s4 << decoutResults << endl;
