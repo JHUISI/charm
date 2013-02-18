@@ -48,6 +48,7 @@ public:
 	void append(const Element&);
 	void append(const CharmList&);
 
+	void insert(int, int);
 	void insert(int, const char *);
 	void insert(int, string);
 	void insert(int, ZR&);
@@ -91,6 +92,7 @@ class Element
 public:
 	// public values for now
 	int type;
+	int z;
 	ZR zr;
 	G1 g1;
 	GT gt;
@@ -103,6 +105,7 @@ public:
 	string strPtr;
 	Element();
 	~Element();
+	Element(int);
 	Element(const char *);
 	Element(string);
 	Element(ZR&);
@@ -136,6 +139,7 @@ public:
  	GT& getRefGT();
 	string str();
 	CharmListStr getListStr();
+ 	int getInt();
 	CharmListInt getListInt();
 
 	friend void deserialize(Element&, string);

@@ -21,6 +21,13 @@ CharmList::CharmList(const CharmList& cList)
 	list = cList.list;
 }
 
+void CharmList::insert(int index, int value)
+{
+	Element elem(value);
+	list[index] = elem;
+	cur_index++;
+}
+
 void CharmList::insert(int index, const char *s)
 {
 	Element elem(s);

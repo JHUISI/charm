@@ -40,6 +40,12 @@ Element::Element()
 	type = None_t;
 }
 
+Element::Element(int i)
+{
+	type = int_t;
+	z = i;
+}
+
 Element::Element(const char *s)
 {
 	type = Str_t;
@@ -117,7 +123,9 @@ Element::Element(GT & g)
 Element::Element(const Element& e)
 {
 	type = e.type;
-	if(type == Str_t)
+	if(type == int_t)
+		z = e.z;
+	else if(type == Str_t)
 		strPtr = e.strPtr;
 	else if(type == listStr_t)
 		sList = e.sList;
@@ -148,18 +156,21 @@ Element::Element(const Element& e)
 CharmList Element::getList()
 {   // only successful if the Element type is of list_t
 	if(type == list_t) return aList;
+	cout << "getList: incorrect type. Do you mean: " << type << endl;
 	throw new string("invalid type.");
 }
 
 ZR Element::getZR()
 {
 	if(type == ZR_t) return zr;
+	cout << "getZR: incorrect type. Do you mean: " << type << endl;
 	throw new string("invalid type.");
 }
 
 CharmListZR Element::getListZR()
 {
 	if(type == listZR_t) return zrList;
+	cout << "getListZR: incorrect type. Do you mean: " << type << endl;
 	throw new string("invalid type.");
 }
 
@@ -173,12 +184,14 @@ ZR & Element::getRefZR()
 G1 Element::getG1()
 {
 	if(type == G1_t) return g1;
+	cout << "getG1: incorrect type. Do you mean: " << type << endl;
 	throw new string("invalid type.");
 }
 
 CharmListG1 Element::getListG1()
 {
 	if(type == listG1_t) return g1List;
+	cout << "getListG1: incorrect type. Do you mean: " << type << endl;
 	throw new string("invalid type.");
 }
 
@@ -193,12 +206,14 @@ Element::Element(CharmListG2 & gList)
 G2 Element::getG2()
 {
 	if(type == G2_t) return g2;
+	cout << "getG2: incorrect type. Do you mean: " << type << endl;
 	throw new string("invalid type.");
 }
 
 CharmListG2 Element::getListG2()
 {
 	if(type == listG2_t) return g2List;
+	cout << "getListG2: incorrect type. Do you mean: " << type << endl;
 	throw new string("invalid type.");
 }
 
@@ -212,24 +227,35 @@ G2 & Element::getRefG2()
 GT Element::getGT()
 {
 	if(type == GT_t) return gt;
+	cout << "Element: incorrect type. Do you mean: " << type << endl;
 	throw new string("invalid type.");
 }
 
 CharmListGT Element::getListGT()
 {
 	if(type == listGT_t) return gtList;
+	cout << "getListGT: incorrect type. Do you mean: " << type << endl;
 	throw new string("invalid type.");
 }
 
 CharmListStr Element::getListStr()
 {
 	if(type == listStr_t) return sList;
+	cout << "getListStr: incorrect type. Do you mean: " << type << endl;
+	throw new string("invalid type.");
+}
+
+int Element::getInt()
+{
+	if(type == int_t) return z;
+	cout << "getInt: incorrect type. Do you mean: " << type << endl;
 	throw new string("invalid type.");
 }
 
 CharmListInt Element::getListInt()
 {
 	if(type == listInt_t) return iList;
+	cout << "getListInt: incorrect type. Do you mean: " << type << endl;
 	throw new string("invalid type.");
 }
 
@@ -237,7 +263,9 @@ CharmListInt Element::getListInt()
 string Element::str()
 {
 	stringstream ss;
-	if(type == Str_t)
+	if(type == int_t)
+		ss << z;
+	else if(type == Str_t)
 		ss << strPtr;
 	else if(type == ZR_t)
 		ss << zr;
@@ -276,7 +304,9 @@ Element Element::operator=(const Element& e)
 		return *this;
 
 	type = e.type;
-	if(type == Str_t)
+	if(type == int_t)
+		z = e.z;
+	else if(type == Str_t)
 		strPtr = e.strPtr;
 	else if(type == listStr_t)
 		sList = e.sList;
@@ -353,7 +383,9 @@ ostream& operator<<(ostream& s, const Element& e)
 {
 	Element e2 = e;
 	int t = e2.type;
-	if(t == Str_t)
+	if(t == int_t)
+		s << "int: ";
+	else if(t == Str_t)
 		s << "str: ";
 	else if(t == ZR_t)
 		s << "ZR: ";

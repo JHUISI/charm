@@ -1091,6 +1091,8 @@ def getCPPAsstStringForExpand(node, variableName, replacementsDict):
                     outputString += "strPtr"
                 elif (listNodeType == types.listStr):
                     outputString += "getListStr()"
+                elif (listNodeType == types.int):
+                    outputString += "getInt()"                    
                 elif (listNodeType == types.listInt):
                     outputString += "getListInt()"                    
                 else:
