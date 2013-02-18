@@ -50,6 +50,22 @@ void CharmListG2::append(G2 & g)
 	cur_index++;
 }
 
+CharmListInt CharmListG2::keys()
+{
+	CharmListInt j;
+	int count = 0;
+	G2 tmp;
+	for(int i = 0; i < (int) list.size(); i++)
+	{
+		if(list[i] != tmp) {
+			j[count] = i;
+			count++;
+		}
+	}
+
+	return j;
+}
+
 CharmListStr CharmListG2::strkeys()
 {
 	CharmListStr s;

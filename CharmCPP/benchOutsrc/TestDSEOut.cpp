@@ -1,30 +1,30 @@
-#include "TestDSE.h"
+#include "TestDSEOut.h"
 
 void Dsewaters09::setup(CharmList & mpk, CharmList & msk)
 {
-    G1 g = group.init(G1_t);
-    G1 w = group.init(G1_t);
-    G1 u = group.init(G1_t);
-    G1 h = group.init(G1_t);
-    G1 v = group.init(G1_t);
-    G1 v1 = group.init(G1_t);
-    G1 v2 = group.init(G1_t);
-    ZR a1 = group.init(ZR_t);
-    ZR a2 = group.init(ZR_t);
-    ZR b = group.init(ZR_t);
-    ZR alpha = group.init(ZR_t);
-    G1 gb = group.init(G1_t);
-    G1 ga1 = group.init(G1_t);
-    G1 ga2 = group.init(G1_t);
-    G1 gba1 = group.init(G1_t);
-    G1 gba2 = group.init(G1_t);
-    G1 tau1 = group.init(G1_t);
-    G1 tau2 = group.init(G1_t);
-    G1 tau1b = group.init(G1_t);
-    G1 tau2b = group.init(G1_t);
+    G1 g;
+    G1 w;
+    G1 u;
+    G1 h;
+    G1 v;
+    G1 v1;
+    G1 v2;
+    ZR a1;
+    ZR a2;
+    ZR b;
+    ZR alpha;
+    G1 gb;
+    G1 ga1;
+    G1 ga2;
+    G1 gba1;
+    G1 gba2;
+    G1 tau1;
+    G1 tau2;
+    G1 tau1b;
+    G1 tau2b;
     GT egga = group.init(GT_t);
-    G1 galpha = group.init(G1_t);
-    G1 galphaUSa1 = group.init(G1_t);
+    G1 galpha;
+    G1 galphaUSa1;
     g = group.random(G1_t);
     w = group.random(G1_t);
     u = group.random(G1_t);
@@ -71,8 +71,9 @@ void Dsewaters09::setup(CharmList & mpk, CharmList & msk)
     return;
 }
 
-void Dsewaters09::keygen(CharmList & mpk, CharmList & msk, string & id, CharmList & sk)
+void Dsewaters09::keygen(CharmList & mpk, CharmList & msk, string & id, ZR & bf0, CharmList & skBlinded)
 {
+    string idBlinded;
     G1 g;
     G1 gb;
     G1 ga1;
@@ -93,21 +94,32 @@ void Dsewaters09::keygen(CharmList & mpk, CharmList & msk, string & id, CharmLis
     G1 v1;
     G1 v2;
     ZR alpha;
-    ZR r1 = group.init(ZR_t);
-    ZR r2 = group.init(ZR_t);
-    ZR z1 = group.init(ZR_t);
-    ZR z2 = group.init(ZR_t);
-    ZR tagUSk = group.init(ZR_t);
-    ZR r = group.init(ZR_t);
-    ZR idUShash = group.init(ZR_t);
-    G1 D1 = group.init(G1_t);
-    G1 D2 = group.init(G1_t);
-    G1 D3 = group.init(G1_t);
-    G1 D4 = group.init(G1_t);
-    G1 D5 = group.init(G1_t);
-    G1 D6 = group.init(G1_t);
-    G1 D7 = group.init(G1_t);
-    G1 K = group.init(G1_t);
+    ZR r1;
+    ZR r2;
+    ZR z1;
+    ZR z2;
+    ZR tagUSk;
+    ZR tagUSkBlinded;
+    ZR r;
+    ZR idUShash;
+    G1 D1;
+    G1 D1Blinded;
+    G1 D2;
+    G1 D2Blinded;
+    G1 D3;
+    G1 D3Blinded;
+    G1 D4;
+    G1 D4Blinded;
+    G1 D5;
+    G1 D5Blinded;
+    G1 D6;
+    G1 D6Blinded;
+    G1 D7;
+    G1 D7Blinded;
+    G1 K;
+    G1 KBlinded;
+    bf0 = group.random(ZR_t);
+    idBlinded = id;
     
     g = mpk[0].getG1();
     gb = mpk[1].getG1();
@@ -135,26 +147,35 @@ void Dsewaters09::keygen(CharmList & mpk, CharmList & msk, string & id, CharmLis
     z1 = group.random(ZR_t);
     z2 = group.random(ZR_t);
     tagUSk = group.random(ZR_t);
+    tagUSkBlinded = group.mul(tagUSk, group.div(1, bf0)); // TODO: investigate
     r = group.add(r1, r2);
-    idUShash = group.hashListToZR(id);
+    idUShash = group.hashListToZR(idBlinded);
     D1 = group.mul(galphaUSa1, group.exp(v, r));
+    D1Blinded = group.exp(D1, group.div(1, bf0));
     D2 = group.mul(group.mul(group.exp(g, group.neg(alpha)), group.exp(v1, r)), group.exp(g, z1));
+    D2Blinded = group.exp(D2, group.div(1, bf0));
     D3 = group.exp(gb, group.neg(z1));
+    D3Blinded = group.exp(D3, group.div(1, bf0));
     D4 = group.mul(group.exp(v2, r), group.exp(g, z2));
+    D4Blinded = group.exp(D4, group.div(1, bf0));
     D5 = group.exp(gb, group.neg(z2));
+    D5Blinded = group.exp(D5, group.div(1, bf0));
     D6 = group.exp(gb, r2);
+    D6Blinded = group.exp(D6, group.div(1, bf0));
     D7 = group.exp(g, r1);
-    K = group.exp(group.mul(group.mul(group.exp(u, idUShash), group.exp(w, tagUSk)), h), r1);
-    sk.insert(0, id);
-    sk.insert(1, D1);
-    sk.insert(2, D2);
-    sk.insert(3, D3);
-    sk.insert(4, D4);
-    sk.insert(5, D5);
-    sk.insert(6, D6);
-    sk.insert(7, D7);
-    sk.insert(8, K);
-    sk.insert(9, tagUSk);
+    D7Blinded = group.exp(D7, group.div(1, bf0));
+    K = group.exp(group.mul(group.mul(group.exp(u, idUShash), group.exp(w, tagUSkBlinded)), h), r1);
+    KBlinded = group.exp(K, group.div(1, bf0));
+    skBlinded.insert(0, idBlinded);
+    skBlinded.insert(1, D1Blinded);
+    skBlinded.insert(2, D2Blinded);
+    skBlinded.insert(3, D3Blinded);
+    skBlinded.insert(4, D4Blinded);
+    skBlinded.insert(5, D5Blinded);
+    skBlinded.insert(6, D6Blinded);
+    skBlinded.insert(7, D7Blinded);
+    skBlinded.insert(8, KBlinded);
+    skBlinded.insert(9, tagUSkBlinded);
     return;
 }
 
@@ -174,22 +195,22 @@ void Dsewaters09::encrypt(CharmList & mpk, GT & M, string & id, CharmList & ct)
     G1 u;
     G1 h;
     GT egga;
-    ZR s1 = group.init(ZR_t);
-    ZR s2 = group.init(ZR_t);
-    ZR t = group.init(ZR_t);
-    ZR tagUSc = group.init(ZR_t);
-    ZR s = group.init(ZR_t);
-    ZR idUShash2 = group.init(ZR_t);
+    ZR s1;
+    ZR s2;
+    ZR t;
+    ZR tagUSc;
+    ZR s;
+    ZR idUShash2;
     GT C0 = group.init(GT_t);
-    G1 C1 = group.init(G1_t);
-    G1 C2 = group.init(G1_t);
-    G1 C3 = group.init(G1_t);
-    G1 C4 = group.init(G1_t);
-    G1 C5 = group.init(G1_t);
-    G1 C6 = group.init(G1_t);
-    G1 C7 = group.init(G1_t);
-    G1 E1 = group.init(G1_t);
-    G1 E2 = group.init(G1_t);
+    G1 C1;
+    G1 C2;
+    G1 C3;
+    G1 C4;
+    G1 C5;
+    G1 C6;
+    G1 C7;
+    G1 E1;
+    G1 E2;
     
     g = mpk[0].getG1();
     gb = mpk[1].getG1();
@@ -235,18 +256,18 @@ void Dsewaters09::encrypt(CharmList & mpk, GT & M, string & id, CharmList & ct)
     return;
 }
 
-void Dsewaters09::decrypt(CharmList & ct, CharmList & sk, GT & M)
+void Dsewaters09::transform(CharmList & ct, CharmList & skBlinded, CharmList & transformOutputList)
 {
-    string id;
-    G1 D1;
-    G1 D2;
-    G1 D3;
-    G1 D4;
-    G1 D5;
-    G1 D6;
-    G1 D7;
-    G1 K;
-    ZR tagUSk;
+    string idBlinded;
+    G1 D1Blinded;
+    G1 D2Blinded;
+    G1 D3Blinded;
+    G1 D4Blinded;
+    G1 D5Blinded;
+    G1 D6Blinded;
+    G1 D7Blinded;
+    G1 KBlinded;
+    ZR tagUSkBlinded;
     GT C0;
     G1 C1;
     G1 C2;
@@ -258,24 +279,21 @@ void Dsewaters09::decrypt(CharmList & ct, CharmList & sk, GT & M)
     G1 E1;
     G1 E2;
     ZR tagUSc;
-    ZR tag = group.init(ZR_t);
+    ZR tag;
     GT A1 = group.init(GT_t);
     GT A2 = group.init(GT_t);
-    GT A3 = group.init(GT_t);
     GT A4 = group.init(GT_t);
-    GT result0 = group.init(GT_t);
-    GT result1 = group.init(GT_t);
     
-    id = sk[0].strPtr;
-    D1 = sk[1].getG1();
-    D2 = sk[2].getG1();
-    D3 = sk[3].getG1();
-    D4 = sk[4].getG1();
-    D5 = sk[5].getG1();
-    D6 = sk[6].getG1();
-    D7 = sk[7].getG1();
-    K = sk[8].getG1();
-    tagUSk = sk[9].getZR();
+    idBlinded = skBlinded[0].strPtr;
+    D1Blinded = skBlinded[1].getG1();
+    D2Blinded = skBlinded[2].getG1();
+    D3Blinded = skBlinded[3].getG1();
+    D4Blinded = skBlinded[4].getG1();
+    D5Blinded = skBlinded[5].getG1();
+    D6Blinded = skBlinded[6].getG1();
+    D7Blinded = skBlinded[7].getG1();
+    KBlinded = skBlinded[8].getG1();
+    tagUSkBlinded = skBlinded[9].getZR();
     
     C0 = ct[0].getGT();
     C1 = ct[1].getG1();
@@ -288,14 +306,37 @@ void Dsewaters09::decrypt(CharmList & ct, CharmList & sk, GT & M)
     E1 = ct[8].getG1();
     E2 = ct[9].getG1();
     tagUSc = ct[10].getZR();
-    tag = group.exp(group.sub(tagUSc, tagUSk), -1);
-    A1 = group.mul(group.pair(C1, D1), group.mul(group.pair(C2, D2), group.mul(group.pair(C3, D3), group.mul(group.pair(C4, D4), group.pair(C5, D5)))));
-    A2 = group.mul(group.pair(C6, D6), group.pair(C7, D7));
-    A3 = group.div(A1, A2);
-    A4 = group.div(group.pair(E1, D7), group.pair(E2, K));
+    transformOutputList.insert(4, C0);
+    transformOutputList.insert(0, group.exp(group.sub(tagUSc, tagUSkBlinded), -1));
+    tag = transformOutputList[0].getZR();
+    transformOutputList.insert(1, group.mul(group.mul(group.mul(group.mul(group.pair(C1, D1Blinded), group.pair(C2, D2Blinded)), group.pair(C3, D3Blinded)), group.pair(C4, D4Blinded)), group.pair(C5, D5Blinded)));
+    A1 = transformOutputList[1].getGT();
+    transformOutputList.insert(2, group.mul(group.pair(C6, D6Blinded), group.pair(C7, D7Blinded)));
+    A2 = transformOutputList[2].getGT();
+    transformOutputList.insert(3, group.mul(group.pair(E1, D7Blinded), group.pair(group.exp(E2, -1), KBlinded)));
+    A4 = transformOutputList[3].getGT();
+    return;
+}
+
+void Dsewaters09::decout(CharmList & transformOutputList, ZR & bf0, GT & M)
+{
+    GT C0 = group.init(GT_t);
+    ZR tag;
+    GT A1 = group.init(GT_t);
+    GT A2 = group.init(GT_t);
+    GT A3 = group.init(GT_t);
+    GT A4 = group.init(GT_t);
+    GT result0 = group.init(GT_t);
+    GT result1 = group.init(GT_t);
+    C0 = transformOutputList[4].getGT();
+    tag = transformOutputList[0].getZR();
+    A1 = group.exp(transformOutputList[1].getGT(), bf0);
+    A2 = group.exp(transformOutputList[2].getGT(), bf0);
+    A3 = group.mul(A1, group.exp(A2, -1));
+    A4 = group.exp(transformOutputList[3].getGT(), bf0);
     result0 = group.exp(A4, tag);
-    result1 = group.div(A3, result0);
-    M = group.div(C0, result1);
+    result1 = group.mul(A3, group.exp(result0, -1));
+    M = group.mul(C0, group.exp(result1, -1));
     return;
 }
 

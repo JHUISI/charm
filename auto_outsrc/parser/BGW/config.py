@@ -15,7 +15,7 @@ transformOutputList = "transformOutputList"
 #doNotIncludeInTransformList = ["dotProdDecrypt"]
 doNotIncludeInTransformList = []
 
-forLoopSeed = 1000
+forLoopSeed = 10
 
 M = 'KDecrypt'
 

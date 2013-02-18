@@ -5,7 +5,16 @@ using namespace std;
 
 int main()
 {
-    PairingGroup group(MNT160);
+    PairingGroup group(SS512);
+    string id = "somebody@example.com";
+    string id2 = id; // "somebody@example.com";
+
+    ZR a = group.hashListToZR(id);
+    ZR b = group.hashListToZR(id2);
+    cout << "a: " << a << endl;
+    cout << "b: " << b << endl;
+
+/*
     CharmList list, list2, list3;
     CharmListG1 g1List, tmpList;
     G1 g1;
@@ -89,6 +98,7 @@ int main()
     cout << "Orig s: " << secret << endl;
     cout << "Rec  s: " << res << endl;
     if( secret == res ) { cout << "Secret Sharing Success!!!" << endl; }
+*/
 //    CharmListStr listKeys;
 //    listKeys.append("ONE");
 //    listKeys.append("TWO");

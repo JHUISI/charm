@@ -16,10 +16,10 @@ public:
 	Hibe() { group.setCurve(AES_SECURITY); };
 	~Hibe() {};
 	void setup(int l, int z, CharmList & mpk, CharmList & mk);
-	void keygen(CharmList & mpk, CharmList & mk, string & id, CharmList & pkBlinded, ZR & blindingFactor0Blinded, CharmList & skBlinded);
+	void keygen(CharmList & mpk, CharmList & mk, string & id, CharmList & pk, ZR & uf0, CharmList & skBlinded);
 	void encrypt(CharmList & mpk, CharmList & pk, GT & M, CharmList & ct);
 	void transform(CharmList & pk, CharmList & skBlinded, CharmList & ct, CharmList & transformOutputList);
-	void decout(CharmList & pk, CharmList & transformOutputList, ZR & blindingFactor0Blinded, GT & M);
+	void decout(CharmList & pk, CharmList & transformOutputList, ZR & uf0, GT & M);
 
 private:
 	};

@@ -2,6 +2,7 @@
 #define CHARMLISTG2_H
 
 #include "CryptoLib.h"
+#include "CharmListInt.h"
 #include "CharmListStr.h"
 
 #if ASYMMETRIC == 1
@@ -23,6 +24,7 @@ public:
 	void insert(int, G2);
 	void insert(string, G2);
 	void append(G2&);
+	CharmListInt keys();
 	CharmListStr strkeys();
 	int length(); // return length of lists
 	string printAtIndex(int index);

@@ -10,7 +10,7 @@ outputVarName = "output"
 
 finalSDLSuffix = ".FINAL_SDL"
 
-forLoopSeed = 1000
+forLoopSeed = 10
 
 listNameIndicator = "LISTNAMEINDICATOR"
 

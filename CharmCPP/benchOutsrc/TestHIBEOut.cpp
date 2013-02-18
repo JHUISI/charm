@@ -41,9 +41,8 @@ void Hibe::setup(int l, int z, CharmList & mpk, CharmList & mk)
     return;
 }
 
-void Hibe::keygen(CharmList & mpk, CharmList & mk, string & id, CharmList & pkBlinded, ZR & blindingFactor0Blinded, CharmList & skBlinded)
+void Hibe::keygen(CharmList & mpk, CharmList & mk, string & id, CharmList & pk, ZR & uf0, CharmList & skBlinded)
 {
-    ZR zz = group.init(ZR_t);
     G1 g;
     G1 g1;
     CharmListG1 h;
@@ -55,13 +54,13 @@ void Hibe::keygen(CharmList & mpk, CharmList & mk, string & id, CharmList & pkBl
     CharmListZR Id;
     CharmListZR r;
     CharmListG2 d;
-    G2 dBlinded = group.init(G2_t);
+    CharmListG2 dBlinded;
+    G2 resVarName0 = group.init(G2_t);
+    G2 resVarName1 = group.init(G2_t);
     G2 d0DotProdCalc = group.init(G2_t);
     G2 d0 = group.init(G2_t);
     G2 d0Blinded = group.init(G2_t);
-    CharmList pk;
-    blindingFactor0Blinded = group.random(ZR_t);
-    zz = group.random(ZR_t);
+    uf0 = group.random(ZR_t);
     
     g = mpk[0].getG1();
     g1 = mpk[1].getG1();
@@ -78,16 +77,24 @@ void Hibe::keygen(CharmList & mpk, CharmList & mk, string & id, CharmList & pkBl
         r.insert(y, group.random(ZR_t));
         d.insert(y, group.exp(gb, r[y]));
     }
+    CharmListInt d_keys = d.keys();
+    int d_len = d_keys.length();
+    for (int y_var = 0; y_var < d_len; y_var++)
+    {
+//        int y = d_keys[y_var];
+//        dBlinded.insert(y, group.exp(d[y], group.div(1, uf0)));
+    }
     dBlinded = d;
     //;
     for (int y = 0; y < 5; y++)
     {
-        d0DotProdCalc = group.mul(d0DotProdCalc, group.exp(group.mul(group.exp(g1b, Id[y]), hb[y]), r[y]));
+        resVarName1 = group.exp(group.mul(group.exp(g1b, Id[y]), hb[y]), r[y]);
+        resVarName0 = group.mul(resVarName0, resVarName1);
     }
+    d0DotProdCalc = resVarName0;
     d0 = group.mul(g0b, d0DotProdCalc);
-    d0Blinded = group.exp(d0, group.div(1, blindingFactor0Blinded));
+    d0Blinded = group.exp(d0, group.div(1, uf0));
     pk.insert(0, id);
-    pkBlinded = pk;
     skBlinded.insert(0, d0Blinded);
     skBlinded.insert(1, dBlinded);
     return;
@@ -106,7 +113,7 @@ void Hibe::encrypt(CharmList & mpk, CharmList & pk, GT & M, CharmList & ct)
     ZR s = group.init(ZR_t);
     GT A = group.init(GT_t);
     G1 B = group.init(G1_t);
-    CharmListZR Id2;
+    CharmListZR Id;
     CharmListG1 C;
     
     g = mpk[0].getG1();
@@ -121,10 +128,10 @@ void Hibe::encrypt(CharmList & mpk, CharmList & pk, GT & M, CharmList & ct)
     s = group.random(ZR_t);
     A = group.mul(M, group.exp(v, s));
     B = group.exp(g, s);
-    Id2 = stringToInt(group, id, z, l);
+    Id = stringToInt(group, id, z, l);
     for (int y = 0; y < 5; y++)
     {
-        C.insert(y, group.exp(group.mul(group.exp(g1, Id2[y]), h[y]), s));
+        C.insert(y, group.exp(group.mul(group.exp(g1, Id[y]), h[y]), s));
     }
     ct.insert(0, A);
     ct.insert(1, B);
@@ -135,32 +142,43 @@ void Hibe::encrypt(CharmList & mpk, CharmList & pk, GT & M, CharmList & ct)
 void Hibe::transform(CharmList & pk, CharmList & skBlinded, CharmList & ct, CharmList & transformOutputList)
 {
     G2 d0Blinded;
-    G2 dBlinded;
+    CharmListG2 dBlinded;
     GT A;
     G1 B;
     CharmListG1 C;
+    CharmList transformOutputListForLoop;
+    GT resVarName3 = group.init(GT_t);
+    GT denominator = group.init(GT_t);
     
     d0Blinded = skBlinded[0].getG2();
-    dBlinded = skBlinded[1].getG2();
+    dBlinded = skBlinded[1].getListG2();
     
     A = ct[0].getGT();
     B = ct[1].getG1();
     C = ct[2].getListG1();
-    transformOutputList.insert(0, group.mul(group.mul(group.mul(group.mul(group.pair(C[0], dBlinded[0]), group.pair(C[1], dBlinded[1])), group.pair(C[2], dBlinded[2])), group.pair(C[3], dBlinded[3])), group.pair(C[4], dBlinded[4])));
-    transformOutputList.insert(1, group.pair(B, d0Blinded));
-    transformOutputList.insert(2, A);
+    transformOutputList.insert(1, A);
+    for (int y = 0; y < 5; y++)
+    {
+		//NOP;
+        transformOutputListForLoop.insert(10+3*y, group.pair(C[y], dBlinded[y]));
+        resVarName3 = transformOutputListForLoop[10+3*y].getGT();
+    }
+    transformOutputList.insert(0, group.pair(B, d0Blinded));
+    denominator = transformOutputList[0].getGT();
     return;
 }
 
-void Hibe::decout(CharmList & pk, CharmList & transformOutputList, ZR & blindingFactor0Blinded, GT & M)
+void Hibe::decout(CharmList & pk, CharmList & transformOutputList, ZR & uf0, GT & M)
 {
-    GT D = group.init(GT_t);
     GT A = group.init(GT_t);
+    GT resVarName2 = group.init(GT_t);
+    GT D = group.init(GT_t);
     GT denominator = group.init(GT_t);
     GT fraction = group.init(GT_t);
-    D = transformOutputList[0].getGT();
-    A = transformOutputList[2].getGT();
-    denominator = group.exp(transformOutputList[1].getGT(), blindingFactor0Blinded);
+    A = transformOutputList[1].getGT();
+    //;
+    D = resVarName2;
+    denominator = group.exp(transformOutputList[0].getGT(), uf0);
     fraction = group.mul(D, group.exp(denominator, -1));
     M = group.mul(A, fraction);
     return;
