@@ -144,17 +144,17 @@ END :: func:encrypt
 
 
 BEGIN :: func:decrypt
-input := list{sk, ct}
+input := list{sk, ct, dfaM}
 sk := expand{Kstart1, Kstart2, KendList1, KendList2, K1, K2, K3}
 ct := expand{Cend1, Cend2, w, C1, C2, Cm}
 l := len(w)
 
 BEGIN :: if
-if {accept(w) == False}
+if {accept(dfaM, w) == False}
 output := False
 END :: if
 
-Ti := getTransitions(w)
+Ti := getTransitions(dfaM, w)
 B#0 := (e(C1#0,Kstart1) * (e(C2#0,Kstart2)^-1))
 BEGIN :: for
 for{i := 1,l+1}
