@@ -45,14 +45,14 @@ void benchmarkLW(Lw10 & lw, ofstream & outfile1, ofstream & outfile2, int attrib
 	CharmList transformOutputList, transformOutputListForLoop;
 	GT M, newM;
 
-	string gid = "jhu@authority.com", policy_str = "((ATTR4 or ATTR3) and (ATTR2 or ATTR1))"; // set this
+	string gid = "jhu@authority.com"; // , policy_str = "((ATTR4 or ATTR3) and (ATTR2 or ATTR1))"; // set this
 
     double tf_in_ms, de_in_ms;
 
-    getAttributes(authS, 4);
-    getAttributes(userS, 3);
+    getAttributes(authS, attributeCount);
+    getAttributes(userS, attributeCount);
     // getAttributes(authS, attributeCount);
-    //string policy_str =  getPolicy(attributeCount); // get a policy string
+    string policy_str =  getPolicy(attributeCount); // get a policy string
 
     lw.setup(gpk);
     lw.authsetup(gpk, authS, msk, pk);
@@ -83,12 +83,12 @@ void benchmarkLW(Lw10 & lw, ofstream & outfile1, ofstream & outfile2, int attrib
 		//cout << i << ": Raw DE: " << de_in_ms << endl;
 	}
 
-	cout << "Transform avg: " << benchT.getAverage() << endl;
+	cout << "Transform avg: " << benchT.getAverage() << " ms" << endl;
 	s1 << attributeCount << " " << benchT.getAverage() << endl;
 	outfile1 << s1.str();
     transformResults[attributeCount] = benchT.getRawResultString();
 
-	cout << "Decout avg: " << benchD.getAverage() << endl;
+	cout << "Decout avg: " << benchD.getAverage() << " ms" << endl;
 	s2 << attributeCount << " " << benchD.getAverage() << endl;
 	outfile2 << s2.str();
 	decoutResults[attributeCount] = benchD.getRawResultString();
