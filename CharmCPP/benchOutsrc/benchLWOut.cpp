@@ -1,5 +1,8 @@
-#include "TestWATERS.h"
+#include "TestLWOut.h"
+#include <sys/time.h>
+#include <fstream>
 
+typedef struct timeval timeval_t;
 string createString(int i)
 {
 	stringstream ss;
@@ -32,37 +35,52 @@ string getPolicy(int max)
 	return policystr;
 }
 
-void benchmarkWATERS(Waters09 & waters, ofstream & outfile1, ofstream & outfile2, int attributeCount, int iterationCount, CharmListStr & transformResults, CharmListStr & decoutResults)
+void benchmarkLW(Lw10 & lw, ofstream & outfile1, ofstream & outfile2, int attributeCount, int iterationCount, CharmListStr & transformResults, CharmListStr & decoutResults)
 {
 	Benchmark benchT, benchD;
-    CharmList msk, pk, skBlinded, ct, transformOutputList;
-    CharmListStr S;
-    GT M, newM;
-    ZR bf0;
+	CharmMetaList msk, pk;
+	CharmList gpk, skBlinded, ct;
+	CharmListStr authS, userS; // set this
+	CharmListZR blindingFactorKBlinded;
+	CharmList transformOutputList, transformOutputListForLoop;
+	GT M, newM;
+
+	string gid = "jhu@authority.com", policy_str = "((ATTR4 or ATTR3) and (ATTR2 or ATTR1))"; // set this
+
     double tf_in_ms, de_in_ms;
 
-    waters.setup(msk, pk);
-    getAttributes(S, attributeCount);
-    waters.keygen(pk, msk, S, bf0, skBlinded);
+    getAttributes(authS, 4);
+    getAttributes(userS, 3);
+    // getAttributes(authS, attributeCount);
+    //string policy_str =  getPolicy(attributeCount); // get a policy string
 
-    M = waters.group.random(GT_t);
-    string policy_str =  getPolicy(attributeCount); // get a policy string
-    waters.encrypt(pk, M, policy_str, ct);
+    lw.setup(gpk);
+    lw.authsetup(gpk, authS, msk, pk);
+
+    lw.keygen(gpk, msk, gid, userS, blindingFactorKBlinded, skBlinded);
+
+    M = lw.group.random(GT_t);
+    lw.encrypt(pk, gpk, M, policy_str, ct);
 
     stringstream s1, s2;
 
-    //cout << "ct =\n" << ct << endl;
 	for(int i = 0; i < iterationCount; i++) {
+		// run TRANSFORM & Decout
+		CharmListStr attrs;
+		int Y;
 		benchT.start();
-		waters.transform(pk, skBlinded, S, ct, transformOutputList);
+		lw.transform(skBlinded, userS, ct, transformOutputList, attrs, Y, transformOutputListForLoop);
 		benchT.stop();
+
 		tf_in_ms = benchT.computeTimeInMilliseconds();
-		//cout << "transformCT =\n" << transformOutputList << endl;
+		//cout << i << ": Raw TF: " << tf_in_ms << endl;
 
 		benchD.start();
-		waters.decout(pk, S, transformOutputList, bf0, newM);
+		lw.decout(userS, transformOutputList, blindingFactorKBlinded, attrs, Y, transformOutputListForLoop, newM);
 		benchD.stop();
+
 		de_in_ms = benchD.computeTimeInMilliseconds();
+		//cout << i << ": Raw DE: " << de_in_ms << endl;
 	}
 
 	cout << "Transform avg: " << benchT.getAverage() << endl;
@@ -74,6 +92,7 @@ void benchmarkWATERS(Waters09 & waters, ofstream & outfile1, ofstream & outfile2
 	s2 << attributeCount << " " << benchD.getAverage() << endl;
 	outfile2 << s2.str();
 	decoutResults[attributeCount] = benchD.getRawResultString();
+
 //    cout << convert_str(M) << endl;
 //    cout << convert_str(newM) << endl;
     if(M == newM) {
@@ -97,7 +116,7 @@ int main(int argc, const char *argv[])
 	cout << "attributeCount: " << attributeCount << endl;
 	cout << "measurement: " << fixOrRange << endl;
 
-	Waters09 waters;
+	Lw10 lw;
 	string filename = string(argv[0]);
 	stringstream s3, s4;
 	ofstream outfile1, outfile2, outfile3, outfile4;
@@ -114,14 +133,14 @@ int main(int argc, const char *argv[])
 	if(isEqual(fixOrRange, RANGE)) {
 		for(int i = 2; i <= attributeCount; i++) {
 			cout << "Benchmark with " << i << " attributes." << endl;
-			benchmarkWATERS(waters, outfile1, outfile2, i, iterationCount, transformResults, decoutResults);
+			benchmarkLW(lw, outfile1, outfile2, i, iterationCount, transformResults, decoutResults);
 		}
 		s3 << transformResults << endl;
 		s4 << decoutResults << endl;
 	}
 	else if(isEqual(fixOrRange, FIXED)) {
 		cout << "Benchmark with " << attributeCount << " attributes." << endl;
-		benchmarkWATERS(waters, outfile1, outfile2, attributeCount, iterationCount, transformResults, decoutResults);
+		benchmarkLW(lw, outfile1, outfile2, attributeCount, iterationCount, transformResults, decoutResults);
 		s3 << attributeCount << " " << transformResults[attributeCount] << endl;
 		s4 << attributeCount << " " << decoutResults[attributeCount] << endl;
 	}

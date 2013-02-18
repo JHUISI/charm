@@ -7,9 +7,9 @@ bool isEqual(string value1, string value2)
     string s1 = value1;
     string s2 = value2;
     if (strcmp(s1.c_str(), s2.c_str()) == 0)
-	return true;
+    	return true;
     else
-	return false;
+    	return false;
 }
 
 /* test inequality for two strings */

@@ -91,31 +91,62 @@ void benchmarkBSW(Bsw07 & bsw, ofstream & outfile1, ofstream & outfile2, int att
 
 int main(int argc, const char *argv[])
 {
+	string FIXED = "fixed", RANGE = "range";
+	if(argc != 4) { cout << "Usage " << argv[0] << ": [ iterationCount => 10 ] [ attributeCount => 100 ] [ 'fixed' or 'range' ]" << endl; return -1; }
+
+	int iterationCount = atoi( argv[1] );
+	int attributeCount = atoi( argv[2] );
+	string fixOrRange = string(argv[3]);
+	cout << "iterationCount: " << iterationCount << endl;
+	cout << "attributeCount: " << attributeCount << endl;
+	cout << "measurement: " << fixOrRange << endl;
+
 	Bsw07 bsw;
-	string filename = "test";
-	ofstream outfile1, outfile2;
-	string f1 = filename + "_tra.dat";
-	string f2 = filename + "_dec.dat";
+	string filename = string(argv[0]);
+	stringstream s3, s4;
+	ofstream outfile1, outfile2, outfile3, outfile4;
+	string f1 = filename + "_transform.dat";
+	string f2 = filename + "_decout.dat";
+	string f3 = filename + "_transform_raw.txt";
+	string f4 = filename + "_decout_raw.txt";
 	outfile1.open(f1.c_str());
 	outfile2.open(f2.c_str());
+	outfile3.open(f3.c_str());
+	outfile4.open(f4.c_str());
 
-	int iterationCount = 10;
-	int attributeCount = 10;
 	CharmListStr transformResults, decoutResults;
-	for(int i = 2; i <= attributeCount; i++) {
-		cout << "Benchmark with " << i << " attributes." << endl;
-		benchmarkBSW(bsw, outfile1, outfile2, i, iterationCount, transformResults, decoutResults);
+	if(isEqual(fixOrRange, RANGE)) {
+		for(int i = 2; i <= attributeCount; i++) {
+			cout << "Benchmark with " << i << " attributes." << endl;
+			benchmarkBSW(bsw, outfile1, outfile2, i, iterationCount, transformResults, decoutResults);
+		}
+		s3 << transformResults << endl;
+		s4 << decoutResults << endl;
+	}
+	else if(isEqual(fixOrRange, FIXED)) {
+		cout << "Benchmark with " << attributeCount << " attributes." << endl;
+		benchmarkBSW(bsw, outfile1, outfile2, attributeCount, iterationCount, transformResults, decoutResults);
+		s3 << attributeCount << " " << transformResults[attributeCount] << endl;
+		s4 << attributeCount << " " << decoutResults[attributeCount] << endl;
+	}
+	else {
+		cout << "invalid option." << endl;
+		return -1;
 	}
 
+	outfile3 << s3.str();
+	outfile4 << s4.str();
 	outfile1.close();
 	outfile2.close();
-	cout << "<=== Transform benchmarkBSW breakdown ===>" << endl;
-	cout << transformResults << endl;
-	cout << "<=== Transform benchmarkBSW breakdown ===>" << endl;
-
-	cout << "<=== Decout benchmarkBSW breakdown ===>" << endl;
-	cout << decoutResults << endl;
-	cout << "<=== Decout benchmarkBSW breakdown ===>" << endl;
+	outfile3.close();
+	outfile4.close();
+//	cout << "<=== Transform benchmarkBSW breakdown ===>" << endl;
+//	cout << transformResults << endl;
+//	cout << "<=== Transform benchmarkBSW breakdown ===>" << endl;
+//
+//	cout << "<=== Decout benchmarkBSW breakdown ===>" << endl;
+//	cout << decoutResults << endl;
+//	cout << "<=== Decout benchmarkBSW breakdown ===>" << endl;
 
 	return 0;
 }
