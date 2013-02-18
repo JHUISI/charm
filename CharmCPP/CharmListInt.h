@@ -21,6 +21,7 @@ public:
 	int length(); // return length of lists
 	string printAtIndex(int index);
 	void init(int list[], int length);
+	bool contains(int value);
 
 	int& operator[](const int index);
     friend ostream& operator<<(ostream&, const CharmListInt&);

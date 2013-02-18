@@ -33,6 +33,16 @@ void CharmListInt::init(int list[], int length)
 	}
 }
 
+bool CharmListInt::contains(int value)
+{
+	int i;
+	for(i = 0; i < (int) intList.size(); i++) {
+		if(intList[i] == value)
+			return true;
+	}
+	return false;
+}
+
 string CharmListInt::printAtIndex(int index)
 {
 	stringstream ss;
