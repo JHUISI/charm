@@ -81,23 +81,23 @@ static Benchmark *dBench;
 
 #define PyElement_Check(obj) PyObject_TypeCheck(obj, &ElementType)
 #define PyPairing_Check(obj) PyObject_TypeCheck(obj, &PairingType)
-#if PY_MAJOR_VERSION >= 3
-/* check for both unicode and bytes objects */
-#define PyBytes_CharmCheck(obj) PyUnicode_Check(obj) || PyBytes_Check(obj)
-#else
-/* check for just unicode stuff */
-#define PyBytes_CharmCheck(obj)	PyUnicode_Check(obj) || PyString_Check(obj)
-#endif
+//#if PY_MAJOR_VERSION >= 3
+///* check for both unicode and bytes objects */
+//#define PyBytes_CharmCheck(obj) PyUnicode_Check(obj) || PyBytes_Check(obj)
+//#else
+///* check for just unicode stuff */
+//#define PyBytes_CharmCheck(obj)	PyUnicode_Check(obj) || PyString_Check(obj)
+//#endif
 
-#if PY_MAJOR_VERSION >= 3
-/* if unicode then add extra conversion step. two possibilities: unicode or bytes */
-#define PyBytes_ToString(a, obj) \
-	if(PyUnicode_Check(obj)) { PyObject *_obj = PyUnicode_AsUTF8String(obj); a = PyBytes_AS_STRING(_obj); Py_DECREF(_obj); }	\
-	else { a = PyBytes_AS_STRING(obj); }
-#else
-/* treat everything as string in 2.x */
-#define PyBytes_ToString(a, obj) a = PyString_AsString(obj);
-#endif
+//#if PY_MAJOR_VERSION >= 3
+///* if unicode then add extra conversion step. two possibilities: unicode or bytes */
+//#define PyBytes_ToString(a, obj) \
+//	if(PyUnicode_Check(obj)) { PyObject *_obj = PyUnicode_AsUTF8String(obj); a = PyBytes_AS_STRING(_obj); Py_DECREF(_obj); }	\
+//	else { a = PyBytes_AS_STRING(obj); }
+//#else
+///* treat everything as string in 2.x */
+//#define PyBytes_ToString(a, obj) a = PyString_AsString(obj);
+//#endif
 
 PyMethodDef Element_methods[];
 PyMethodDef pairing_methods[];

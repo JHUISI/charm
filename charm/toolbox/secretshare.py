@@ -13,7 +13,7 @@ class SecretShare:
             share += (coeff[i] * (x ** i))
         return share
 
-    def genShares(self, secret, k, n, q=None, x_points=None):
+    def genShares(self, secret, k=0, n=0, q=None, x_points=None):
         if(k <= n):
             if q == None: 
                 q = [self.elem.random(ZR) for i in range(0, k)]

@@ -1,0 +1,23 @@
+--- ssp_pair.cpp	2013-02-18 01:07:01.000000000 -0500
++++ ssp_pair_new.cpp	2013-02-18 01:02:28.000000000 -0500
+@@ -42,7 +42,7 @@
+ 
+ Big H1(char *string)
+ { // Hash a zero-terminated string to a number < modulus
+-    Big h,p;
++    Big g,h,p;
+     char s[HASH_LEN];
+     int i,j; 
+     sha256 sh;
+@@ -64,8 +64,9 @@
+         else         h+=s[j++];
+         if (h>=p) break;
+     }
+-    h%=p;
+-    return h;
++
++    g = h % p;
++    return g;
+ }
+ 
+ void PFC::start_hash(void)

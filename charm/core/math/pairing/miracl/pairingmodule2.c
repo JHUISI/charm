@@ -1168,6 +1168,7 @@ static PyObject *Element_hash(Element *self, PyObject *args)
 {
 	Element *newObject = NULL, *object = NULL, *group = NULL;
 	PyObject *objList = NULL, *tmpObject = NULL;
+	PyObject *tmp_obj = NULL;
 	Group_t type = pyZR_t;
 	int i;
 
@@ -1182,19 +1183,20 @@ static PyObject *Element_hash(Element *self, PyObject *args)
 	// first case: is a string and type may or may not be set
 	if(PyBytes_CharmCheck(objList)) {
 		str = NULL;
-		PyBytes_ToString(str, objList);
 		if(type >= pyZR_t && type < pyGT_t) {
+			PyBytes_ToString2(str, objList, tmp_obj);
+			int len = strlen(str);
 			debug("Hashing string '%s' to Zr...\n", str);
 			// create an element of Zr
 			// hash bytes using SHA1
-
 			newObject = createNewElement(NONE_G, group->pairing);
 			newObject->element_type = type;
 
 			element_init_hash(group);
-			element_add_str_hash(group, (char *) str, strlen((char *) str));
+			debug("Hashing string '%s' to Zr...: size=%d, newsize=%d\n", str, len, strlen(str));
+			element_add_str_hash(group, str, len);
 			element_finish_hash(newObject, type);
-
+			Py_DECREF(tmp_obj);
 		}
 		else {
 			// not supported, right?
@@ -1219,7 +1221,7 @@ static PyObject *Element_hash(Element *self, PyObject *args)
 				str = NULL;
 				PyBytes_ToString(str, tmpObject);
 
-				element_add_str_hash(group, (char *) str, strlen((char *) str));
+				element_add_str_hash(group, str, strlen(str));
 
 			}
 			Py_DECREF(tmpObject);
@@ -1237,7 +1239,7 @@ static PyObject *Element_hash(Element *self, PyObject *args)
 					str = NULL;
 					PyBytes_ToString(str, tmpObject);
 
-					element_add_str_hash(group, (char *) str, strlen((char *) str));
+					element_add_str_hash(group, str, strlen(str));
 
 				}
 				Py_DECREF(tmpObject);
@@ -1289,7 +1291,7 @@ static PyObject *Element_hash(Element *self, PyObject *args)
 
 cleanup:
 	PyErr_SetString(ElementError, tmp);
-	if(newObject != NULL) PyObject_Del(newObject);
+	if(newObject != NULL) Py_DECREF(newObject);
 	return NULL;
 }
 

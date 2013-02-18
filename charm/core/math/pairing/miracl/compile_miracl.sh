@@ -28,6 +28,7 @@ if [ $curve = "ss" ]; then
    curve=ss
    echo "Building SS curve in miracl."
    patch -N < pairing1.patch
+   patch -N < ssp_pair.patch
    rm -f *.rej
 fi
 

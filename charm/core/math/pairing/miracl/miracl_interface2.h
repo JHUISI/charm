@@ -109,7 +109,7 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 void element_delete(Group_t type, element_t *e);
 
 void _init_hash(const pairing_t *pairing);
-void _element_add_str_hash(const pairing_t *pairing, void *data, int len);
+void _element_add_str_hash(const pairing_t *pairing, char *data, int len);
 void _element_add_to_hash(Group_t type, const pairing_t *pairing, const element_t *e);
 element_t *finish_hash(Group_t type, const pairing_t *pairing);
 

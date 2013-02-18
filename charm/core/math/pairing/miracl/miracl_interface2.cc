@@ -337,9 +337,9 @@ void _element_sub(Group_t type, element_t *c, const element_t *a, const element_
 		Big *z = (Big *) c;
 		Big *o1 = (Big *) o;
 		*z = ((*x - *y) % *o1);
-		if(*z < 0) {
-			*z = (*z + *o1) % *o1;
-		}
+//		if(*z < 0) {
+//			*z = (*z + *o1) % *o1;
+//		}
 
 	}
 	else if(type == pyG1_t) {
@@ -368,7 +368,8 @@ void _element_mul(Group_t type, element_t *c, const element_t *a, const element_
 //			*z = *x;
 //		}
 //		else {
-		*z = modmult(*x, *y, *o1);
+			*z = modmult(*x, *y, *o1);
+//		}
 		if(*z < 0) {
 			*z = (*z + *o1) % *o1;
 		}
@@ -669,12 +670,17 @@ void _init_hash(const pairing_t *pairing)
 	pfc->start_hash();
 }
 
-void _element_add_str_hash(const pairing_t *pairing, void *data, int len)
+void _element_add_str_hash(const pairing_t *pairing, char *data, int len)
 {
 	PFC *pfc = (PFC *) pairing;
-	string s((char *) data);
-	if(s.size() == (size_t) len) {
+	//string s(data, len);
+	if(strlen(data) == (size_t) len) {
+//		printf("hash string: '%s'\n", data);
+		string s(data, len);
+//		cout << "hash string: " << s << endl;
 		Big b = pfc->hash_to_group((char *) s.c_str());
+		// Big *b = new Big(pfc->hash_to_group(data));
+//		cout << "Result: " << b << endl;
 		pfc->add_to_hash(b);
 	}
 }
