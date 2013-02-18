@@ -66,7 +66,7 @@ typedef enum _CHARM_ATTRIBUTE_NODE_TYPE {
 } CHARM_ATTRIBUTE_NODE_TYPE;
 
 /* Number of ciphertext attributes (maximum)	*/
-#define	MAX_CIPHERTEXT_ATTRIBUTES	100
+#define	MAX_CIPHERTEXT_ATTRIBUTES	1000
 
 /* Maximum attribute string length in bytes (this includes a NULL termination byte.) */
 #define MAX_ATTRIBUTE_STR	256
