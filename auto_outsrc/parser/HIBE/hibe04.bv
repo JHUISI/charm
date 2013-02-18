@@ -91,7 +91,16 @@ sk := expand{d0, d}
 ct := expand{A, B, C}
 
 #D := {prod{y := 1, j} on { e(C#y, d#y) }}
-D := {prod{y := 0, 5} on { e(C#y, d#y) }}
+#D := {prod{y := 0, 5} on { e(C#y, d#y) }}
+
+finalLoopVar := init(GT)
+BEGIN :: for
+for{y := 0, 5}
+intermedLoopVar := e(C#y,d#y)
+finalLoopVar := finalLoopVar * intermedLoopVar
+END :: for
+D := finalLoopVar
+
 denominator := e(B, d0)
 fraction := (D / denominator)
 M := A * fraction
