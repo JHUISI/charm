@@ -38,7 +38,7 @@ v2 := (g^t2)
 v3 := (g^t3)
 v4 := (g^t4)
 
-mpk := list{omega, g, h, gl, hl, v1, v2, v3, v4}
+mpk := list{omega, g, h, gl, hl, v1, v2, v3, v4, n, l}
 msk := list{alpha, t1, t2, t3, t4}
 
 output := list{mpk, msk}
@@ -47,7 +47,7 @@ END :: func:setup
 
 BEGIN :: func:extract
 input := list{mpk, msk, id}
-mpk := expand{omega, g, h, gl, hl, v1, v2, v3, v4}
+mpk := expand{omega, g, h, gl, hl, v1, v2, v3, v4, n, l}
 msk := expand{alpha, t1, t2, t3, t4}
 
 r1 := random(ZR)
@@ -97,7 +97,7 @@ END :: func:extract
 
 BEGIN :: func:encrypt
 input := list{mpk, M, id}
-mpk := expand{omega, g, h, gl, hl, v1, v2, v3, v4}
+mpk := expand{omega, g, h, gl, hl, v1, v2, v3, v4, n, l}
 
 s := random(ZR)
 s1 := random(ZR)
