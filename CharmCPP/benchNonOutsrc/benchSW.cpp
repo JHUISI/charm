@@ -1,4 +1,4 @@
-#include "TestSWOut.h"
+#include "TestSW.h"
 #include <fstream>
 
 string createString(int i)
@@ -33,23 +33,23 @@ string getPolicy(int max)
 	return policystr;
 }
 
-void benchmarkSW(Sw05 & sw, ofstream & outfile1, ofstream & outfile2, int attributeCount, int iterationCount, CharmListStr & transformResults, CharmListStr & decoutResults)
+void benchmarkSW(Sw05 & sw, ofstream & outfile1, ofstream & outfile2, int attributeCount, int iterationCount, CharmListStr & decryptResults)
 {
 	Benchmark benchT, benchD;
-    CharmList pk, skBlinded, CT, transformOutputList, transformOutputListForLoop;
+    CharmList pk, sk, CT;
     CharmListStr w, wPrime;
     GT M, newM;
     ZR bf0, uf0, mk;
-    int n = attributeCount, dParam = 1;
+    int n = attributeCount, dParam = attributeCount;
 
-    double tf_in_ms, de_in_ms;
+    double de_in_ms;
 
     sw.setup(n, pk, mk);
     getAttributes(w, attributeCount);
     //cout << "w :\n" << w << endl;
     getAttributes(wPrime, attributeCount);
     //cout << "wPrime :\n" << wPrime << endl;
-    sw.extract(mk, w, pk, dParam, n, uf0, bf0, skBlinded);
+    sw.extract(mk, w, pk, dParam, n, sk);
 
     M = sw.group.random(GT_t);
 
@@ -59,29 +59,16 @@ void benchmarkSW(Sw05 & sw, ofstream & outfile1, ofstream & outfile2, int attrib
 
     //cout << "ct =\n" << CT << endl;
 	for(int i = 0; i < iterationCount; i++) {
-		// run TRANSFORM
-		CharmListStr SKeys;
-		int SLen;
-		benchT.start();
-		sw.transform(pk, skBlinded, CT, dParam, transformOutputList, SKeys, SLen, transformOutputListForLoop);
-		benchT.stop();
-		tf_in_ms = benchT.computeTimeInMilliseconds();
-
 		benchD.start();
-		sw.decout(pk, dParam, transformOutputList, bf0, uf0, SKeys, SLen, transformOutputListForLoop, newM);
+		sw.decrypt(pk, sk, CT, dParam, newM);
 		benchD.stop();
 		de_in_ms = benchD.computeTimeInMilliseconds();
 	}
 
-	cout << "Transform avg: " << benchT.getAverage() << endl;
-	s1 << attributeCount << " " << benchT.getAverage() << endl;
-	outfile1 << s1.str();
-    transformResults[attributeCount] = benchT.getRawResultString();
-
-	cout << "Decout avg: " << benchD.getAverage() << endl;
+	cout << "Decrypt avg: " << benchD.getAverage() << " ms" << endl;
 	s2 << attributeCount << " " << benchD.getAverage() << endl;
 	outfile2 << s2.str();
-	decoutResults[attributeCount] = benchD.getRawResultString();
+	decryptResults[attributeCount] = benchD.getRawResultString();
 
 //    cout << convert_str(M) << endl;
 //    cout << convert_str(newM) << endl;
@@ -104,24 +91,20 @@ int main(int argc, const char *argv[])
 	outfile1.open(f1.c_str());
 	outfile2.open(f2.c_str());
 
-	int iterationCount = 10;
+	int iterationCount = 1;
 	int attributeCount = 100;
 	int i = attributeCount;
-	CharmListStr transformResults, decoutResults;
+	CharmListStr decryptResults;
 //	for(int i = 2; i <= attributeCount; i++) {
 		cout << "Benchmark with " << i << " attributes." << endl;
-		benchmarkSW(sw, outfile1, outfile2, i, iterationCount, transformResults, decoutResults);
+		benchmarkSW(sw, outfile1, outfile2, i, iterationCount, decryptResults);
 //	}
 
 	outfile1.close();
 	outfile2.close();
-	cout << "<=== Transform benchmarkBSW breakdown ===>" << endl;
-	cout << transformResults << endl;
-	cout << "<=== Transform benchmarkBSW breakdown ===>" << endl;
-
-	cout << "<=== Decout benchmarkBSW breakdown ===>" << endl;
-	cout << decoutResults << endl;
-	cout << "<=== Decout benchmarkBSW breakdown ===>" << endl;
+	cout << "<=== Decrypt benchmarkBSW breakdown ===>" << endl;
+	cout << decryptResults << endl;
+	cout << "<=== Decrypt benchmarkBSW breakdown ===>" << endl;
 
 	return 0;
 }

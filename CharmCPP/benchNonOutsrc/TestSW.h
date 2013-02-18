@@ -16,6 +16,7 @@ public:
 	Sw05() { group.setCurve(AES_SECURITY); };
 	~Sw05() {};
 	void setup(int n, CharmList & pk, ZR & mk);
+	G2 evalT(CharmList & pk, int n, ZR & x);
 	void extract(ZR & mk, CharmListStr & w, CharmList & pk, int dParam, int n, CharmList & sk);
 	void encrypt(CharmList & pk, CharmListStr & wPrime, GT & M, int n, CharmList & CT);
 	void decrypt(CharmList & pk, CharmList & sk, CharmList & CT, int dParam, GT & M);

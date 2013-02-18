@@ -39,7 +39,7 @@ UTIL_FUNC_NAME = "util"
 DFA_UTIL_FUNC_NAME = "dfaUtil"
 cppSuffix = ".cpp"
 cppHdrSuffix = ".h"
-secretUtils = ['createPolicy', 'getAttributeList', 'calculateSharesDict', 'calculateSharesList', 'prune', 'getCoefficients', 'recoverCoefficientsDict', 'intersectionSubset']
+secretUtils = ['createPolicy', 'getAttributeList', 'calculateSharesDict', 'calculateSharesList', 'prune', 'getCoefficients', 'recoverCoefficientsDict', 'intersectionSubset', 'genSharesForX']
 secretUtilsWithGroup = ['calculateSharesDict', 'calculateSharesList', 'getCoefficients', 'recoverCoefficientsDict', 'intersectionSubset', 'genSharesForX']
 dfaUtils = ['hashToKey', 'accept', 'getAcceptState', 'getTransitions', 'getString']
 # default unless specified otherwise by caller

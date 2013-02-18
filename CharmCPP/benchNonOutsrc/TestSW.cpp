@@ -2,10 +2,10 @@
 
 void Sw05::setup(int n, CharmList & pk, ZR & mk)
 {
-    G1 g = group.init(G1_t);
-    ZR y = group.init(ZR_t);
-    G1 g1 = group.init(G1_t);
-    G2 g2 = group.init(G2_t);
+    G1 g;
+    ZR y;
+    G1 g1;
+    G2 g2;
     CharmListG2 t;
     g = group.random(G1_t);
     y = group.random(ZR_t);
@@ -23,20 +23,19 @@ void Sw05::setup(int n, CharmList & pk, ZR & mk)
     return;
 }
 
-G2 evalT(CharmList & pk, int n, ZR & x)
+G2 Sw05::evalT(CharmList & pk, int n, ZR & x) // fix "Sw05" should appear
 {
     G1 g;
     G1 g1;
     G2 g2;
     CharmListG2 t;
-    CharmListZR N;
-    CharmListInt Nint;
-    CharmDictZR coeffs;
-    G2 prodResult = group.init(G2_t);
-    int lenNint = 0;
+    CharmListInt N;
+    CharmListZR coeffs;
+    G2 prodResult;
+    int lenN = 0;
     int loopVarEvalT = 0;
     int loopVarM1 = 0;
-    G2 T = group.init(G2_t);
+    G2 T;
     
     g = pk[0].getG1();
     g1 = pk[1].getG1();
@@ -44,15 +43,14 @@ G2 evalT(CharmList & pk, int n, ZR & x)
     t = pk[3].getListG2();
     for (int i = 0; i < n+1; i++)
     {
-        N.insert(i, group.init(ZR_t));
-        Nint.insert(i, (i + 1));
+        N[i] = (i + 1); // fix this to not use insert
     }
     coeffs = util.recoverCoefficientsDict(group, N);
     //;
-    lenNint = Nint.length();
-    for (int i = 0; i < lenNint; i++)
+    lenN = N.length();
+    for (int i = 0; i < lenN; i++)
     {
-        loopVarEvalT = Nint[i];
+        loopVarEvalT = N[i];
         loopVarM1 = (loopVarEvalT - 1);
         prodResult = group.mul(prodResult, group.exp(t[loopVarM1], coeffs[loopVarEvalT]));
     }
@@ -69,13 +67,13 @@ void Sw05::extract(ZR & mk, CharmListStr & w, CharmList & pk, int dParam, int n,
     int lenw = 0;
     string loopVar1;
     CharmListZR wHash;
-    ZR r = group.init(ZR_t);
+    ZR r;
     CharmListZR q;
     CharmListZR shares;
     int wHashLen = 0;
-    ZR loopVar2 = group.init(ZR_t);
+    ZR loopVar2;
     string loopVar2Str;
-    G2 evalTVar = group.init(G2_t);
+    G2 evalTVar;
     CharmListG2 D;
     CharmListG1 d;
     
@@ -95,7 +93,7 @@ void Sw05::extract(ZR & mk, CharmListStr & w, CharmList & pk, int dParam, int n,
     {
         q.insert(i, group.random(ZR_t));
     }
-    shares = genSharesForX(mk, q, wHash);
+    shares = util.genSharesForX(group, mk, q, wHash);
     wHashLen = wHash.length();
     for (int i = 0; i < wHashLen; i++)
     {
@@ -117,13 +115,13 @@ void Sw05::encrypt(CharmList & pk, CharmListStr & wPrime, GT & M, int n, CharmLi
     G1 g1;
     G2 g2;
     CharmListG2 t;
-    ZR s = group.init(ZR_t);
+    ZR s;
     GT Eprime = group.init(GT_t);
-    G1 Eprimeprime = group.init(G1_t);
+    G1 Eprimeprime;
     int wPrimeLen = 0;
-    ZR loopVar = group.init(ZR_t);
+    ZR loopVar;
     string loopVarStr;
-    G2 evalTVar = group.init(G2_t);
+    G2 evalTVar;
     CharmListG2 E;
     
     g = pk[0].getG1();
@@ -158,7 +156,7 @@ void Sw05::decrypt(CharmList & pk, CharmList & sk, CharmList & CT, int dParam, G
     CharmListG2 D;
     CharmListG1 d;
     CharmListZR S;
-    CharmDictZR coeffs;
+    CharmListZR coeffs;
     GT prod = group.init(GT_t);
     CharmListStr SKeys;
     int SLen = 0;
@@ -173,7 +171,7 @@ void Sw05::decrypt(CharmList & pk, CharmList & sk, CharmList & CT, int dParam, G
     w = sk[0].getListStr();
     D = sk[1].getListG2();
     d = sk[2].getListG1();
-    S = util.intersectionSubset(group, wHash, wPrimeHash, dParam);
+    S = util.intersectionSubset(group, w, wPrime, dParam);
     coeffs = util.recoverCoefficientsDict(group, S);
     //;
     SKeys = S.strkeys();
