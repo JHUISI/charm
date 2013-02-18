@@ -16,11 +16,11 @@ void getRandomReceivers(CharmListInt & recs, int numRecs)
 			continue;
 		}
 	}
-	cout << "Recs:\n" << recs << endl;
+	//cout << "Recs:\n" << recs << endl;
 	return;
 }
 
-void benchmarkBGW(Bgw05 & bgw, ofstream & outfile1, ofstream & outfile2, int numOfRecs, int iterationCount, CharmListStr & decryptResults)
+void benchmarkBGW(Bgw05 & bgw, ofstream & outfile2, int numOfRecs, int iterationCount, CharmListStr & decryptResults)
 {
 	Benchmark benchT, benchD;
 	CharmList pk, msk, Hdr, ct;
@@ -32,7 +32,7 @@ void benchmarkBGW(Bgw05 & bgw, ofstream & outfile1, ofstream & outfile2, int num
 	GT K, KDecrypt;
 	ZR bf0;
 	getRandomReceivers(S, numOfRecs);
-	int n = numOfRecs, i = S[2];
+	int n = numOfRecs, i = S[(rand() % numOfRecs)];
 
 	bgw.setup(n, pk, msk);
 //	cout << "pk: " << pk << endl;
@@ -71,29 +71,45 @@ void benchmarkBGW(Bgw05 & bgw, ofstream & outfile1, ofstream & outfile2, int num
 
 int main(int argc, const char *argv[])
 {
+	string FIXED = "fixed", RANGE = "range";
+	if(argc != 4) { cout << "Usage " << argv[0] << ": [ iterationCount => 10 ] [ numReceivers => 100 ] [ 'fixed' or 'range' ]" << endl; return -1; }
+
+	int iterationCount = atoi( argv[1] );
+	int numRecs = atoi( argv[2] );
+	string fixOrRange = string(argv[3]);
+	cout << "iterationCount: " << iterationCount << endl;
+	cout << "numReceivers: " << numRecs << endl;
+	cout << "measurement: " << fixOrRange << endl;
+
 	Bgw05 bgw;
 	srand(time(NULL));
-
-	string filename = "bgw"; // fill in
-	ofstream outfile1, outfile2;
-	string f1 = filename + "_tra.dat";
-	string f2 = filename + "_dec.dat";
-	outfile1.open(f1.c_str());
+	string filename = string(argv[0]);
+	stringstream s4;
+	ofstream outfile2, outfile4;
+	string f2 = filename + "_decrypt.dat";
+	string f4 = filename + "_decrypt_raw.txt";
 	outfile2.open(f2.c_str());
+	outfile4.open(f4.c_str());
 
-	int iterationCount = 10; // fill in
-	int numberOfReceivers = 15; // fill in
-	int i = numberOfReceivers;
 	CharmListStr decryptResults;
-	//for(int i = 2; i <= attributeCount; i++) {
-		cout << "Benchmark with group of " << i << " recipients." << endl;
-		benchmarkBGW(bgw, outfile1, outfile2, i, iterationCount, decryptResults);
-	//}
+	if(isEqual(fixOrRange, RANGE)) {
+		for(int i = 2; i <= numRecs; i++) {
+			cout << "Benchmark with group of " << i << " recipients." << endl;
+			benchmarkBGW(bgw, outfile2, i, iterationCount, decryptResults);
+		}
+		s4 << decryptResults << endl;
+	}
+	else if(isEqual(fixOrRange, FIXED)) {
+		benchmarkBGW(bgw, outfile2, numRecs, iterationCount, decryptResults);
+		s4 << numRecs << " " << decryptResults[numRecs] << endl;
+	}
+	else {
+		cout << "invalid option." << endl;
+		return -1;
+	}
 
-	outfile1.close();
+	outfile4 << s4.str();
 	outfile2.close();
-	cout << "<=== Decrypt benchmarkBGW breakdown ===>" << endl;
-	cout << decryptResults << endl;
-	cout << "<=== Decrypt benchmarkBGW breakdown ===>" << endl;
-    return 0;
+	outfile4.close();
+	return 0;
 }

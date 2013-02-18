@@ -33,7 +33,7 @@ string getPolicy(int max)
 	return policystr;
 }
 
-void benchmarkBSW(Bsw07 & bsw, ofstream & outfile1, ofstream & outfile2, int attributeCount, int iterationCount, CharmListStr & decryptResults)
+void benchmarkBSW(Bsw07 & bsw, ofstream & outfile2, int attributeCount, int iterationCount, CharmListStr & decryptResults)
 {
 	Benchmark benchT, benchD;
     CharmList mk, pk, sk, ct;
@@ -77,28 +77,46 @@ void benchmarkBSW(Bsw07 & bsw, ofstream & outfile1, ofstream & outfile2, int att
 
 int main(int argc, const char *argv[])
 {
-	Bsw07 bsw;
-	string filename = "bsw";
-	ofstream outfile1, outfile2;
-	string f1 = filename + "_tra.dat";
-	string f2 = filename + "_dec.dat";
-	outfile1.open(f1.c_str());
-	outfile2.open(f2.c_str());
+	string FIXED = "fixed", RANGE = "range";
+	if(argc != 4) { cout << "Usage " << argv[0] << ": [ iterationCount => 10 ] [ attributeCount => 100 ] [ 'fixed' or 'range' ]" << endl; return -1; }
 
-	int iterationCount = 10;
-	int attributeCount = 10;
+	int iterationCount = atoi( argv[1] );
+	int attributeCount = atoi( argv[2] );
+	string fixOrRange = string(argv[3]);
+	cout << "iterationCount: " << iterationCount << endl;
+	cout << "attributeCount: " << attributeCount << endl;
+	cout << "measurement: " << fixOrRange << endl;
+
+	Bsw07 bsw;
+	string filename = string(argv[0]);
+	stringstream s3, s4;
+	ofstream outfile2, outfile4;
+	string f2 = filename + "_decrypt.dat";
+	string f4 = filename + "_decrypt_raw.txt";
+	outfile2.open(f2.c_str());
+	outfile4.open(f4.c_str());
+
 	CharmListStr decryptResults;
-	for(int i = 2; i <= attributeCount; i++) {
-		cout << "Benchmark with " << i << " attributes." << endl;
-		benchmarkBSW(bsw, outfile1, outfile2, i, iterationCount, decryptResults);
+	if(isEqual(fixOrRange, RANGE)) {
+		for(int i = 2; i <= attributeCount; i++) {
+			cout << "Benchmark with " << i << " attributes." << endl;
+			benchmarkBSW(bsw, outfile2, i, iterationCount, decryptResults);
+		}
+		s4 << decryptResults << endl;
+	}
+	else if(isEqual(fixOrRange, FIXED)) {
+		cout << "Benchmark with " << attributeCount << " attributes." << endl;
+		benchmarkBSW(bsw, outfile2, attributeCount, iterationCount, decryptResults);
+		s4 << attributeCount << " " << decryptResults[attributeCount] << endl;
+	}
+	else {
+		cout << "invalid option." << endl;
+		return -1;
 	}
 
-	outfile1.close();
+	outfile4 << s4.str();
 	outfile2.close();
-	cout << "<=== Decrypt benchmarkBSW breakdown ===>" << endl;
-	cout << decryptResults << endl;
-	cout << "<=== Decrypt benchmarkBSW breakdown ===>" << endl;
-
+	outfile4.close();
 	return 0;
 }
 

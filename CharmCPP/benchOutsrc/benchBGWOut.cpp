@@ -16,7 +16,7 @@ void getRandomReceivers(CharmListInt & recs, int numRecs)
 			continue;
 		}
 	}
-	cout << "Recs:\n" << recs << endl;
+	//cout << "Recs:\n" << recs << endl;
 	return;
 }
 
