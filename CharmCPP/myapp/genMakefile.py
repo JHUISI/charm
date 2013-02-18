@@ -2,6 +2,7 @@ import os, sys
 import datetime
 
 YES = "yes"
+defaultMakeName = "Makefile"
 makefile = """
 # Auto-generated makefile on %s
 prefix := %s
@@ -69,7 +70,7 @@ if __name__ == "__main__":
         sys.exit("\tpython %s [ path to config ] [ makefile name ] [ C++ files in order ]" % sys.argv[0])
     config = sys.argv[1]
     makefileName = sys.argv[2]
-    if "Makefile" not in makefileName: sys.exit("Did you forget to specify Makefile filename?")
+    if makefileName.find(defaultMakeName) == -1: sys.exit("Did you forget to specify Makefile filename?")
     file = sys.argv[3:]
     print("C++ files: ", file)
     #buildMakefile("../config.mk", "TestCharm.cpp", "MakefileTmp")
