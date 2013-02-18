@@ -1324,6 +1324,12 @@ def keygen(file, config):
 
     bfMap, skBfMap = instantiateBFSolver(config)
 
+    print("First BFSolver Result:  ", skBfMap)
+
+    #skBfMap = {'D': 'uf0#', 'd': 'bf0'}
+    #skBfMap = {'d': 'bf0', 'd0': 'uf0#'}
+    #skBfMap = {'w': 'nil', 'd': 'bf0', 'd0': 'uf0#'}
+
     for stringEntry in stringEntriesInKeygenElemToSMTExp:
         skBfMap[stringEntry] = nilType
     

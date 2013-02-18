@@ -1100,7 +1100,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
             #transformRunningOutputLine += ", " + transformOutputListForLoop
         for varName in varsToAddToTransformOutputAndDecoutInput:
             transformRunningOutputLine += ", " + varName
-        if ( (atLeastOneForLoop == True) and (singleBF == False) and (canCollapseForLoopsInDecout == False) ):
+        if ( (atLeastOneForLoop == True) and ((singleBF == False) or (canCollapseForLoopsInDecout == False)) ):
             transformRunningOutputLine += ", " + transformOutputListForLoop
         transformRunningOutputLine += "}\n"
 
@@ -1112,7 +1112,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     for varName in varsToAddToTransformOutputAndDecoutInput:
         decoutRunningInputLine += ", " + varName
 
-    if ( (atLeastOneForLoop == True) and (singleBF == False) and (canCollapseForLoopsInDecout == False) ):
+    if ( (atLeastOneForLoop == True) and ((singleBF == False) or (canCollapseForLoopsInDecout == False)) ):
         decoutRunningInputLine += ", " + transformOutputListForLoop
 
     decoutRunningInputLine += "}\n"
