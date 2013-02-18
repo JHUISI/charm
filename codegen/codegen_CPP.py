@@ -40,7 +40,7 @@ DFA_UTIL_FUNC_NAME = "dfaUtil"
 cppSuffix = ".cpp"
 cppHdrSuffix = ".h"
 secretUtils = ['createPolicy', 'getAttributeList', 'calculateSharesDict', 'calculateSharesList', 'prune', 'getCoefficients', 'recoverCoefficientsDict', 'intersectionSubset']
-secretUtilsWithGroup = ['calculateSharesDict', 'calculateSharesList', 'getCoefficients', 'recoverCoefficientsDict', 'intersectionSubset']
+secretUtilsWithGroup = ['calculateSharesDict', 'calculateSharesList', 'getCoefficients', 'recoverCoefficientsDict', 'intersectionSubset', 'genSharesForX']
 dfaUtils = ['hashToKey', 'accept', 'getAcceptState', 'getTransitions', 'getString']
 # default unless specified otherwise by caller
 transformOutputList = "transformOutputList" #None
@@ -1156,7 +1156,7 @@ def writeAssignStmt_CPP(outputFile, binNode):
         CPP_funcBodyLines += "return;\n"
         return
     elif(str(binNode) == NOP_STATEMENT):
-        CPP_funcBodyLines += "\t\t//NOP;\n"
+        CPP_funcBodyLines += "\n" # NOP
         return
     
     variableName = getFullVarName(binNode.left, False)

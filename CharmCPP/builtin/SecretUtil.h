@@ -9,6 +9,7 @@ extern "C" {
 #include "util.h"
 #include "policy.h"
 }
+#include "CharmListInt.h"
 #include "CharmListZR.h"
 #include "CharmListStr.h"
 #include "Charm.h"
@@ -41,6 +42,7 @@ public:
 	CharmDictZR calculateSharesDict(PairingGroup & group, ZR, Policy&);
 	CharmListZR calculateSharesList(PairingGroup & group, ZR, Policy&);
 	CharmDictZR getCoefficients(PairingGroup & group, Policy&);
+	CharmListZR recoverCoefficientsDict(PairingGroup & group, CharmListInt & list);
 	CharmListZR recoverCoefficientsDict(PairingGroup & group, CharmListZR & list);
 	CharmListZR intersectionSubset(PairingGroup & group, CharmListStr&, CharmListStr&, int);
 };

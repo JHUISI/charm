@@ -434,6 +434,16 @@ CharmListZR SecretUtil::recoverCoefficientsDict(PairingGroup & group, CharmListZ
 	return _computelagrangeBasisZR(group, list);
 }
 
+CharmListZR SecretUtil::recoverCoefficientsDict(PairingGroup & group, CharmListInt & list)
+{
+	int newLen = list.length();
+	int newList[ newLen ];
+	for(int i = 0; i < newLen; i++) {
+		newList[i] = list[i];
+	}
+	return _computelagrangeBasisInt(group, newList, newLen);
+}
+
 CharmListZR SecretUtil::intersectionSubset(PairingGroup & group, CharmListStr & w, CharmListStr & wPrime, int d)
 {
     int wLen = w.length(), wPrimeLen = wPrime.length(), index = 0;

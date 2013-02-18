@@ -4,16 +4,16 @@ int l = 5;
 
 void Hibe::setup(int l, int z, CharmList & mpk, CharmList & mk)
 {
-    ZR alpha = group.init(ZR_t);
-    ZR beta = group.init(ZR_t);
-    G1 g = group.init(G1_t);
-    G2 gb = group.init(G2_t);
-    G1 g1 = group.init(G1_t);
-    G2 g1b = group.init(G2_t);
+    ZR alpha;
+    ZR beta;
+    G1 g;
+    G2 gb;
+    G1 g1;
+    G2 g1b;
     CharmListZR delta;
     CharmListG1 h;
     CharmListG2 hb;
-    G2 g0b = group.init(G2_t);
+    G2 g0b;
     GT v = group.init(GT_t);
     alpha = group.random(ZR_t);
     beta = group.random(ZR_t);
@@ -53,10 +53,10 @@ void Hibe::keygen(CharmList & mpk, CharmList & mk, string & id, CharmList & pk, 
     CharmListZR Id;
     CharmListZR r;
     CharmListG2 d;
-    G2 resVarName0 = group.init(G2_t);
-    G2 resVarName1 = group.init(G2_t);
-    G2 d0DotProdCalc = group.init(G2_t);
-    G2 d0 = group.init(G2_t);
+    G2 resVarName0;
+    G2 resVarName1;
+    G2 d0DotProdCalc;
+    G2 d0;
     
     g = mpk[0].getG1();
     g1 = mpk[1].getG1();
@@ -97,9 +97,9 @@ void Hibe::encrypt(CharmList & mpk, CharmList & pk, GT & M, CharmList & ct)
     CharmListG2 hb;
     GT v;
     string id;
-    ZR s = group.init(ZR_t);
+    ZR s;
     GT A = group.init(GT_t);
-    G1 B = group.init(G1_t);
+    G1 B;
     CharmListZR Id;
     CharmListG1 C;
     

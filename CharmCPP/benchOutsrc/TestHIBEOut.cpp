@@ -5,16 +5,16 @@ int z = 32;
 
 void Hibe::setup(int l, int z, CharmList & mpk, CharmList & mk)
 {
-    ZR alpha = group.init(ZR_t);
-    ZR beta = group.init(ZR_t);
-    G1 g = group.init(G1_t);
-    G2 gb = group.init(G2_t);
-    G1 g1 = group.init(G1_t);
-    G2 g1b = group.init(G2_t);
+    ZR alpha;
+    ZR beta;
+    G1 g;
+    G2 gb;
+    G1 g1;
+    G2 g1b;
     CharmListZR delta;
     CharmListG1 h;
     CharmListG2 hb;
-    G2 g0b = group.init(G2_t);
+    G2 g0b;
     GT v = group.init(GT_t);
     alpha = group.random(ZR_t);
     beta = group.random(ZR_t);
@@ -55,11 +55,11 @@ void Hibe::keygen(CharmList & mpk, CharmList & mk, string & id, CharmList & pk, 
     CharmListZR r;
     CharmListG2 d;
     CharmListG2 dBlinded;
-    G2 resVarName0 = group.init(G2_t);
-    G2 resVarName1 = group.init(G2_t);
-    G2 d0DotProdCalc = group.init(G2_t);
-    G2 d0 = group.init(G2_t);
-    G2 d0Blinded = group.init(G2_t);
+    G2 resVarName0;
+    G2 resVarName1;
+    G2 d0DotProdCalc;
+    G2 d0;
+    G2 d0Blinded;
     uf0 = group.random(ZR_t);
     
     g = mpk[0].getG1();
@@ -81,10 +81,9 @@ void Hibe::keygen(CharmList & mpk, CharmList & mk, string & id, CharmList & pk, 
     int d_len = d_keys.length();
     for (int y_var = 0; y_var < d_len; y_var++)
     {
-//        int y = d_keys[y_var];
-//        dBlinded.insert(y, group.exp(d[y], group.div(1, uf0)));
+        int y = d_keys[y_var];
+        dBlinded.insert(y, group.exp(d[y], group.div(1, uf0)));
     }
-    dBlinded = d;
     //;
     for (int y = 0; y < 5; y++)
     {
@@ -110,9 +109,9 @@ void Hibe::encrypt(CharmList & mpk, CharmList & pk, GT & M, CharmList & ct)
     CharmListG2 hb;
     GT v;
     string id;
-    ZR s = group.init(ZR_t);
+    ZR s;
     GT A = group.init(GT_t);
-    G1 B = group.init(G1_t);
+    G1 B;
     CharmListZR Id;
     CharmListG1 C;
     
@@ -146,8 +145,10 @@ void Hibe::transform(CharmList & pk, CharmList & skBlinded, CharmList & ct, Char
     GT A;
     G1 B;
     CharmListG1 C;
+    GT finalLoopVar = group.init(GT_t);
     CharmList transformOutputListForLoop;
-    GT resVarName3 = group.init(GT_t);
+    GT intermedLoopVar = group.init(GT_t);
+    GT D = group.init(GT_t);
     GT denominator = group.init(GT_t);
     
     d0Blinded = skBlinded[0].getG2();
@@ -156,29 +157,35 @@ void Hibe::transform(CharmList & pk, CharmList & skBlinded, CharmList & ct, Char
     A = ct[0].getGT();
     B = ct[1].getG1();
     C = ct[2].getListG1();
-    transformOutputList.insert(1, A);
+    transformOutputList.insert(3, A);
+    transformOutputList.insert(0, group.init(GT_t));
+    finalLoopVar = transformOutputList[0].getGT();
     for (int y = 0; y < 5; y++)
     {
-		//NOP;
+
         transformOutputListForLoop.insert(10+3*y, group.pair(C[y], dBlinded[y]));
-        resVarName3 = transformOutputListForLoop[10+3*y].getGT();
+        intermedLoopVar = transformOutputListForLoop[10+3*y].getGT();
+        transformOutputListForLoop.insert(11+3*y, group.mul(finalLoopVar, intermedLoopVar));
+        finalLoopVar = transformOutputListForLoop[11+3*y].getGT();
     }
-    transformOutputList.insert(0, group.pair(B, d0Blinded));
-    denominator = transformOutputList[0].getGT();
+    transformOutputList.insert(1, finalLoopVar);
+    D = transformOutputList[1].getGT();
+    transformOutputList.insert(2, group.pair(B, d0Blinded));
+    denominator = transformOutputList[2].getGT();
     return;
 }
 
 void Hibe::decout(CharmList & pk, CharmList & transformOutputList, ZR & uf0, GT & M)
 {
     GT A = group.init(GT_t);
-    GT resVarName2 = group.init(GT_t);
+    GT finalLoopVar = group.init(GT_t);
     GT D = group.init(GT_t);
     GT denominator = group.init(GT_t);
     GT fraction = group.init(GT_t);
-    A = transformOutputList[1].getGT();
-    //;
-    D = resVarName2;
-    denominator = group.exp(transformOutputList[0].getGT(), uf0);
+    A = transformOutputList[3].getGT();
+    finalLoopVar = transformOutputList[0].getGT();
+    D = group.exp(transformOutputList[1].getGT(), uf0);
+    denominator = group.exp(transformOutputList[2].getGT(), uf0);
     fraction = group.mul(D, group.exp(denominator, -1));
     M = group.mul(A, fraction);
     return;

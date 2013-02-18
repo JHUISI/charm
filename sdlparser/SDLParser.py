@@ -46,6 +46,7 @@ endLineNos_Functions = {}
 functionNameOrder = []
 inputOutputVars = []
 linesOfCode = None
+userFuncListName = "userFuncList"
 getVarDepInfListsCalled = getVarsThatProtectMCalled = False
 TYPE, CONST, PRECOMP, OTHER, TRANSFORM = 'types', 'constant', 'precompute', 'other', 'transform'
 ARBITRARY_FUNC = 'func:'
@@ -71,7 +72,7 @@ builtInTypes["prune"] = types.listStr
 builtInTypes["getCoefficients"] = types.symmapZR
 builtInTypes["integer"] = types.int
 builtInTypes["isList"] = types.int
-builtInTypes["recoverCoefficientsDict"] = types.symmapZR
+builtInTypes["recoverCoefficientsDict"] = types.listZR
 builtInTypes["genShares"] = types.symmapZR
 builtInTypes["genSharesForX"] = types.listZR
 builtInTypes["intersectionSubset"] = types.listZR

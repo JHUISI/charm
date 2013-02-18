@@ -27,13 +27,17 @@ def main(inputSDLScheme, configName, outputFile, outputUserDefFile):
     config = importlib.import_module(configName) # pkg.config
     SDLParser.masterPubVars = config.masterPubVars
     SDLParser.masterSecVars = config.masterSecVars
+    if hasattr(config, userFuncListName):
+       userFuncList = getattr(config, userFuncListName)
+    else:
+       userFuncList = []
 
     SDLPreProcessor.SDLPreProcessor_main(inputSDLScheme, inputSDLScheme + PREPROCESSED_STRING, config)
     (linesOfCodeFromKeygen, blindingFactors_NonLists, blindingFactors_Lists) = keygen(inputSDLScheme + PREPROCESSED_STRING, config)
     writeLOCFromKeygenToFile(linesOfCodeFromKeygen, inputSDLScheme + PREPROCESSED_STRING, config)
     codegen_PY.codegen_PY_main(inputSDLScheme + PREPROCESSED_STRING + config.finalSDLSuffix, outputFile + ".py", outputUserDefFile + ".py")
     codegen_CPP.transformOutputList = transformOutputList
-    codegen_CPP.codegen_CPP_main(inputSDLScheme + PREPROCESSED_STRING + config.finalSDLSuffix, outputFile + ".cpp")
+    codegen_CPP.codegen_CPP_main(inputSDLScheme + PREPROCESSED_STRING + config.finalSDLSuffix, outputFile + ".cpp", userFuncList)
 
 if __name__ == "__main__":
     lenSysArgv = len(sys.argv)

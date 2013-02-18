@@ -13,7 +13,7 @@ class Dsewaters09
 {
 public:
 	PairingGroup group;
-	Dsewaters09() { group.setCurve(AES_SECURITY); };
+	Dsewaters09() { group.setCurve(SS512); };
 	~Dsewaters09() {};
 	void setup(CharmList & mpk, CharmList & msk);
 	void keygen(CharmList & mpk, CharmList & msk, string & id, CharmList & sk);
