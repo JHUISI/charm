@@ -1,28 +1,41 @@
 #include "TestDSEOut.h"
 #include <fstream>
+#include <time.h>
 
-void benchmarkDSE(ofstream & outfile1, ofstream & outfile2, int iterationCount, string & transformResults, string & decoutResults)
+string getID(int len)
 {
-	Dsewaters09 dse;
+	string alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	string id = "";
+	int val, alpha_len = alphabet.size();
+	for(int i = 0; i < len; i++)
+	{
+		val = (int) (rand() % alpha_len);
+		id +=  alphabet[val];
+	}
+	cout << "Rand selected ID: '" << id << "'" << endl;
+	return id;
+}
+
+void benchmarkDSE(Dsewaters09 & dse, ofstream & outfile1, ofstream & outfile2, int ID_string_len, int iterationCount, CharmListStr & transformResults, CharmListStr & decoutResults)
+{
 	Benchmark benchT, benchD;
     CharmList msk, mpk, pk, skBlinded, ct, transformOutputList;
-//    CharmListStr S;
     GT M, newM;
     ZR bf0;
-    string id = "somebody@example.com and other people!!!!!";
+    string id = getID(ID_string_len); // "somebody@example.com and other people!!!!!";
     double tf_in_ms, de_in_ms;
 
 	dse.setup(mpk, msk);
 	dse.keygen(mpk, msk, id, bf0, skBlinded);
 
     M = dse.group.random(GT_t);
-    cout << "M: " << convert_str(M) << endl;
+    //cout << "M: " << convert_str(M) << endl;
     dse.encrypt(mpk, M, id, ct);
 
     stringstream s1, s2;
 
     //cout << "ct =\n" << ct << endl;
-//	for(int i = 0; i < iterationCount; i++) {
+	for(int i = 0; i < iterationCount; i++) {
 		// run TRANSFORM
 		benchT.start();
 		dse.transform(ct, skBlinded, transformOutputList);
@@ -33,17 +46,17 @@ void benchmarkDSE(ofstream & outfile1, ofstream & outfile2, int iterationCount, 
 		dse.decout(transformOutputList, bf0, newM);
 		benchD.stop();
 		de_in_ms = benchD.computeTimeInMilliseconds();
-//	}
+	}
 
-	cout << "Transform avg: " << benchT.getAverage() << endl;
+	cout << "Transform avg: " << benchT.getAverage() << " ms" << endl;
 	s1 << iterationCount << " " << benchT.getAverage() << endl;
 	outfile1 << s1.str();
-    transformResults = benchT.getRawResultString();
+    transformResults[ID_string_len] = benchT.getRawResultString();
 
-	cout << "Decout avg: " << benchD.getAverage() << endl;
+	cout << "Decout avg: " << benchD.getAverage() << " ms" << endl;
 	s2 << iterationCount << " " << benchD.getAverage() << endl;
 	outfile2 << s2.str();
-	decoutResults = benchD.getRawResultString();
+	decoutResults[ID_string_len] = benchD.getRawResultString();
 
 //    cout << convert_str(M) << endl;
 //    cout << convert_str(newM) << endl;
@@ -58,29 +71,54 @@ void benchmarkDSE(ofstream & outfile1, ofstream & outfile2, int iterationCount, 
 
 int main(int argc, const char *argv[])
 {
-	string filename = "test";
-	ofstream outfile1, outfile2;
-	string f1 = filename + "_tra.dat";
-	string f2 = filename + "_dec.dat";
+	string FIXED = "fixed", RANGE = "range";
+	if(argc != 4) { cout << "Usage " << argv[0] << ": [ iterationCount => 10 ] [ ID-string => 100 ] [ 'fixed' or 'range' ]" << endl; return -1; }
+
+	int iterationCount = atoi( argv[1] );
+	int ID_string_len = atoi( argv[2] );
+	string fixOrRange = string(argv[3]);
+	cout << "iterationCount: " << iterationCount << endl;
+	cout << "ID-string: " << ID_string_len << endl;
+	cout << "measurement: " << fixOrRange << endl;
+
+	srand(time(NULL));
+	Dsewaters09 dse;
+	string filename = string(argv[0]);
+	stringstream s3, s4;
+	ofstream outfile1, outfile2, outfile3, outfile4;
+	string f1 = filename + "_transform.dat";
+	string f2 = filename + "_decout.dat";
+	string f3 = filename + "_transform_raw.txt";
+	string f4 = filename + "_decout_raw.txt";
 	outfile1.open(f1.c_str());
 	outfile2.open(f2.c_str());
+	outfile3.open(f3.c_str());
+	outfile4.open(f4.c_str());
 
-	int iterationCount = 1;
-	string transformResults, decoutResults;
+	CharmListStr transformResults, decoutResults;
+	if(isEqual(fixOrRange, RANGE)) {
+		for(int i = 2; i <= ID_string_len; i++) {
+			benchmarkDSE(dse, outfile1, outfile2, i, iterationCount, transformResults, decoutResults);
+		}
+		s3 << transformResults << endl;
+		s4 << decoutResults << endl;
+	}
+	else if(isEqual(fixOrRange, FIXED)) {
+		benchmarkDSE(dse, outfile1, outfile2, ID_string_len, iterationCount, transformResults, decoutResults);
+		s3 << ID_string_len << " " << transformResults[ID_string_len] << endl;
+		s4 << ID_string_len << " " << decoutResults[ID_string_len] << endl;
+	}
+	else {
+		cout << "invalid option." << endl;
+		return -1;
+	}
 
-	cout << "Benchmark iterations: " << iterationCount << endl;
-	benchmarkDSE(outfile1, outfile2, iterationCount, transformResults, decoutResults);
-
+	outfile3 << s3.str();
+	outfile4 << s4.str();
 	outfile1.close();
 	outfile2.close();
-//	cout << "<=== Transform benchmarkBSW breakdown ===>" << endl;
-//	cout << transformResults << endl;
-//	cout << "<=== Transform benchmarkBSW breakdown ===>" << endl;
-//
-//	cout << "<=== Decout benchmarkBSW breakdown ===>" << endl;
-//	cout << decoutResults << endl;
-//	cout << "<=== Decout benchmarkBSW breakdown ===>" << endl;
-
+	outfile3.close();
+	outfile4.close();
 	return 0;
 }
 

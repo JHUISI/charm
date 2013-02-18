@@ -31,7 +31,7 @@ void benchmarkBGW(Bgw05 & bgw, ofstream & outfile1, ofstream & outfile2, int num
 	GT K, KDecrypt;
 	ZR bf0;
 	getRandomReceivers(S, numOfRecs);
-	int n = numOfRecs, i = S[2];
+	int n = numOfRecs, i = S[(rand() % numOfRecs)];
 
 	bgw.setup(n, pk, msk);
 //	cout << "pk: " << pk << endl;
@@ -80,33 +80,62 @@ void benchmarkBGW(Bgw05 & bgw, ofstream & outfile1, ofstream & outfile2, int num
 
 int main(int argc, const char *argv[])
 {
+	string FIXED = "fixed", RANGE = "range";
+	if(argc != 4) { cout << "Usage " << argv[0] << ": [ iterationCount => 10 ] [ numReceivers => 100 ] [ 'fixed' or 'range' ]" << endl; return -1; }
+
+	int iterationCount = atoi( argv[1] );
+	int numRecs = atoi( argv[2] );
+	string fixOrRange = string(argv[3]);
+	cout << "iterationCount: " << iterationCount << endl;
+	cout << "numReceivers: " << numRecs << endl;
+	cout << "measurement: " << fixOrRange << endl;
+
 	Bgw05 bgw;
 	srand(time(NULL));
-
-	string filename = "bgw"; // fill in
-	ofstream outfile1, outfile2;
-	string f1 = filename + "_tra.dat";
-	string f2 = filename + "_dec.dat";
+	string filename = string(argv[0]);
+	stringstream s3, s4;
+	ofstream outfile1, outfile2, outfile3, outfile4;
+	string f1 = filename + "_transform.dat";
+	string f2 = filename + "_decout.dat";
+	string f3 = filename + "_transform_raw.txt";
+	string f4 = filename + "_decout_raw.txt";
 	outfile1.open(f1.c_str());
 	outfile2.open(f2.c_str());
+	outfile3.open(f3.c_str());
+	outfile4.open(f4.c_str());
 
-	int iterationCount = 10; // fill in
-	int numberOfReceivers = 15; // fill in
-	int i = numberOfReceivers;
 	CharmListStr transformResults, decoutResults;
-	//for(int i = 2; i <= attributeCount; i++) {
-		cout << "Benchmark with group of " << i << " recipients." << endl;
-		benchmarkBGW(bgw, outfile1, outfile2, i, iterationCount, transformResults, decoutResults);
-	//}
+	if(isEqual(fixOrRange, RANGE)) {
+		for(int i = 2; i <= numRecs; i++) {
+			cout << "Benchmark with group of " << i << " recipients." << endl;
+			benchmarkBGW(bgw, outfile1, outfile2, i, iterationCount, transformResults, decoutResults);
+		}
+		s3 << transformResults << endl;
+		s4 << decoutResults << endl;
+	}
+	else if(isEqual(fixOrRange, FIXED)) {
+		benchmarkBGW(bgw, outfile1, outfile2, numRecs, iterationCount, transformResults, decoutResults);
+		s3 << numRecs << " " << transformResults[numRecs] << endl;
+		s4 << numRecs << " " << decoutResults[numRecs] << endl;
+	}
+	else {
+		cout << "invalid option." << endl;
+		return -1;
+	}
 
+	outfile3 << s3.str();
+	outfile4 << s4.str();
 	outfile1.close();
 	outfile2.close();
-	cout << "<=== Transform benchmarkBGW breakdown ===>" << endl;
-	cout << transformResults << endl;
-	cout << "<=== Transform benchmarkBGW breakdown ===>" << endl;
-
-	cout << "<=== Decout benchmarkBGW breakdown ===>" << endl;
-	cout << decoutResults << endl;
-	cout << "<=== Decout benchmarkBGW breakdown ===>" << endl;
-    return 0;
+	outfile3.close();
+	outfile4.close();
+//	cout << "<=== Transform benchmarkBGW breakdown ===>" << endl;
+//	cout << transformResults << endl;
+//	cout << "<=== Transform benchmarkBGW breakdown ===>" << endl;
+//
+//	cout << "<=== Decout benchmarkBGW breakdown ===>" << endl;
+//	cout << decoutResults << endl;
+//	cout << "<=== Decout benchmarkBGW breakdown ===>" << endl;
+	return 0;
 }
+
