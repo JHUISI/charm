@@ -2,10 +2,10 @@
 
 void Hve08::setup(int n, CharmList & pk, CharmList & msk)
 {
-    G1 g1 = group.init(G1_t);
-    G2 g2 = group.init(G2_t);
+    G1 g1;
+    G2 g2;
     GT egg = group.init(GT_t);
-    ZR y = group.init(ZR_t);
+    ZR y;
     GT Y = group.init(GT_t);
     CharmListZR t;
     CharmListZR v;
@@ -38,6 +38,7 @@ void Hve08::setup(int n, CharmList & pk, CharmList & msk)
     pk.insert(4, V);
     pk.insert(5, R);
     pk.insert(6, M);
+    pk.insert(7, n);
     msk.insert(0, y);
     msk.insert(1, t);
     msk.insert(2, v);
@@ -55,6 +56,7 @@ void Hve08::keygen(CharmList & pk, CharmList & msk, CharmListInt & yVector, Char
     CharmListG1 V;
     CharmListG1 R;
     CharmListG1 M;
+    int n;
     ZR y;
     CharmListZR t;
     CharmListZR v;
@@ -75,6 +77,7 @@ void Hve08::keygen(CharmList & pk, CharmList & msk, CharmListInt & yVector, Char
     V = pk[4].getListG1();
     R = pk[5].getListG1();
     M = pk[6].getListG1();
+    n = pk[7].getInt();
     
     y = msk[0].getZR();
     t = msk[1].getListZR();
@@ -132,10 +135,11 @@ void Hve08::encrypt(GT & Message, CharmListInt & xVector, CharmList & pk, CharmL
     CharmListG1 V;
     CharmListG1 R;
     CharmListG1 M;
-    ZR s = group.init(ZR_t);
+    int n;
+    ZR s;
     CharmListZR sUSi;
     GT omega = group.init(GT_t);
-    G1 C0 = group.init(G1_t);
+    G1 C0;
     CharmListG1 XVector;
     CharmListG1 WVector;
     
@@ -146,6 +150,7 @@ void Hve08::encrypt(GT & Message, CharmListInt & xVector, CharmList & pk, CharmL
     V = pk[4].getListG1();
     R = pk[5].getListG1();
     M = pk[6].getListG1();
+    n = pk[7].getInt();
     s = group.random(ZR_t);
     for (int i = 0; i < n; i++)
     {
@@ -182,9 +187,10 @@ void Hve08::decrypt(CharmList & CT, CharmList & sk, GT & Message2)
     CharmListG2 YVector;
     CharmListG2 LVector;
     GT dotProd = group.init(GT_t, 1);
-    G2 g2Id = group.init(G2_t);
+    G2 g2Id;
     int nn = 0;
     GT intermediateResults = group.init(GT_t);
+    GT newDotProdVar = group.init(GT_t);
     
     omega = CT[0].getGT();
     C0 = CT[1].getG1();
@@ -204,7 +210,8 @@ void Hve08::decrypt(CharmList & CT, CharmList & sk, GT & Message2)
             dotProd = group.mul(dotProd, intermediateResults);
         }
     }
-    Message2 = group.mul(omega, dotProd);
+    newDotProdVar = dotProd;
+    Message2 = group.mul(omega, newDotProdVar);
     return;
 }
 

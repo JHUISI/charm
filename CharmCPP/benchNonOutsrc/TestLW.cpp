@@ -15,8 +15,8 @@ void Lw10::authsetup(CharmList & gpk, CharmListStr & authS, CharmMetaList & msk,
 {
     G1 gG1 = group.init(G1_t);
     G2 gG2 = group.init(G2_t);
-    G1 gG1;
-    G2 gG2;
+//    G1 gG1;
+//    G2 gG2;
     int Y = 0;
     ZR alpha = group.init(ZR_t);
     ZR y = group.init(ZR_t);

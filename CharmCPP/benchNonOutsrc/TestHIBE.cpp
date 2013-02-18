@@ -1,6 +1,7 @@
 #include "TestHIBE.h"
 
 int l = 5;
+int z = 32;
 
 void Hibe::setup(int l, int z, CharmList & mpk, CharmList & mk)
 {
@@ -67,7 +68,7 @@ void Hibe::keygen(CharmList & mpk, CharmList & mk, string & id, CharmList & pk, 
     v = mpk[6].getGT();
     
     g0b = mk[0].getG2();
-    Id = stringToInt(group, id, 5, 32);
+    Id = stringToInt(group, id, z, l);
     for (int y = 0; y < 5; y++)
     {
         r.insert(y, group.random(ZR_t));
@@ -115,7 +116,7 @@ void Hibe::encrypt(CharmList & mpk, CharmList & pk, GT & M, CharmList & ct)
     s = group.random(ZR_t);
     A = group.mul(M, group.exp(v, s));
     B = group.exp(g, s);
-    Id = stringToInt(group, id, 5, 32);
+    Id = stringToInt(group, id, z, l);
     for (int y = 0; y < 5; y++)
     {
         C.insert(y, group.exp(group.mul(group.exp(g1, Id[y]), h[y]), s));
@@ -133,8 +134,8 @@ void Hibe::decrypt(CharmList & pk, CharmList & sk, CharmList & ct, GT & M)
     GT A;
     G1 B;
     CharmListG1 C;
-    GT resVarName2 = group.init(GT_t);
-    GT resVarName3 = group.init(GT_t);
+    GT finalLoopVar = group.init(GT_t);
+    GT intermedLoopVar = group.init(GT_t);
     GT D = group.init(GT_t);
     GT denominator = group.init(GT_t);
     GT fraction = group.init(GT_t);
@@ -148,10 +149,10 @@ void Hibe::decrypt(CharmList & pk, CharmList & sk, CharmList & ct, GT & M)
     //;
     for (int y = 0; y < 5; y++)
     {
-        resVarName3 = group.pair(C[y], d[y]);
-        resVarName2 = group.mul(resVarName2, resVarName3);
+        intermedLoopVar = group.pair(C[y], d[y]);
+        finalLoopVar = group.mul(finalLoopVar, intermedLoopVar);
     }
-    D = resVarName2;
+    D = finalLoopVar;
     denominator = group.pair(B, d0);
     fraction = group.div(D, denominator);
     M = group.mul(A, fraction);

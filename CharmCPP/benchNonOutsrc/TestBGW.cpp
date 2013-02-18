@@ -63,7 +63,7 @@ void Bgw05::encrypt(CharmListInt & S, CharmList & pk, int n, CharmList & ct)
     t = group.random(ZR_t);
     K = group.exp(group.pair(giValues[n], giValues[1]), t);
     group.init(dotProdEncrypt, 1);
-    CharmListInt S_keys = S.keys();
+    CharmListInt S_keys = S; //.keys();
     int S_len = S_keys.length();
     for (int jEncrypt_var = 0; jEncrypt_var < S_len; jEncrypt_var++)
     {
