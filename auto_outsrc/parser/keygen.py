@@ -8,6 +8,7 @@ import os, sys, string, random, importlib
 
 linesOfCode = None
 assignInfo = None
+overflowAssignInfo = None
 varTypes = None
 astNodes = None
 forLoops = None
@@ -24,6 +25,7 @@ sharedBlindingFactorCounter = 0
 mappingOfSecretVarsToBlindingFactors = {}
 mappingOfSecretVarsToGroupType = {}
 keygenElemToExponents = {}
+overflowKeygenElemToExponents = {}
 keygenElemToSMTExp = {}
 SMTaddCounter = 0
 SMTmulCounter = 0
@@ -79,10 +81,12 @@ def replaceVarInstancesInLineNoRange(startLineNo, endLineNo, origVarName, newVar
 
 def updateCodeAndStructs():
     global linesOfCode, assignInfo, varTypes, astNodes, forLoops, publicVarNames, secretVarNames, varDepList
+    global overflowAssignInfo
 
     parseLinesOfCode(getLinesOfCode(), False)
     linesOfCode = getLinesOfCode()
     assignInfo = getAssignInfo()
+    overflowAssignInfo = getOverflowAssignInfo()
     varTypes = getVarTypes()
     astNodes = getAstNodes()
     forLoops = getForLoops()
@@ -1326,7 +1330,7 @@ def keygen(file, config):
 
     print("First BFSolver Result:  ", skBfMap)
 
-
+    skBfMap = {'LVector': 'uf0#', 'YVector': 'uf1#'}
 
     for stringEntry in stringEntriesInKeygenElemToSMTExp:
         skBfMap[stringEntry] = nilType

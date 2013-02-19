@@ -24,6 +24,7 @@ objStack = []
 currentFuncName = NONE_FUNC_NAME
 ASSIGN_KEYWORDS = ['input', 'output']
 astNodes = []
+overflowAssignInfo = {}
 assignInfo = {}
 assignVarInfo = {} # global dict for all var info in SDL. keys are line no
 varNamesToFuncs_All = {}
@@ -1538,6 +1539,14 @@ def updateHashArgNames_Entries(resultingHashInputArgNames):
 
             assignInfo[funcName][varName].setIsUsedInHashCalc(True)
 
+def saveOriginalAssignInfoEntry(varName):
+    global overflowAssignInfo
+
+    if (varName not in overflowAssignInfo[currentFuncName]):
+        overflowAssignInfo[currentFuncName][varName] = []
+
+    overflowAssignInfo[currentFuncName][varName].append(copy.deepcopy(assignInfo[currentFuncName][varName]))
+
 def updateAssignInfo(node, i):
     global assignInfo, assignVarInfo, forLoops, ifElseBranches, varNamesToFuncs_All, varNamesToFuncs_Assign
 
@@ -1574,6 +1583,9 @@ def updateAssignInfo(node, i):
     if (varName in assignInfo_Func):
         if ( (assignInfo_Func[varName].hasBeenSet() == True) and (varName != outputVarName) and (startLineNo_IfBranch == None) and (startLineNo_ForLoop == None) and (startLineNo_ForLoopInner == None) and (varName != blindingLoopVarLength) ):
             sys.exit("Found multiple assignments of same variable name within same function.")
+
+        saveOriginalAssignInfoEntry(varName)
+
         assignInfo_Func[varName].setLineNo(i)
         (resultingVarDeps, resultingHashInputArgNames) = assignInfo_Func[varName].setAssignNode(assignInfo, varTypes, node, currentFuncName, currentForLoopObj, currentIfElseBranch)
         # figure out whether this node is top level
@@ -2080,6 +2092,9 @@ def parseFile2(filename, verbosity, ignoreCloudSourcing=False):
 def getAstNodes():
     return astNodes
 
+def getOverflowAssignInfo():
+    return overflowAssignInfo
+
 def getInputOutputVars():
     return inputOutputVars
 
@@ -2166,9 +2181,10 @@ def parseLinesOfCode(code, verbosity, ignoreCloudSourcing=False):
     global getVarDepInfListsCalled, getVarsThatProtectMCalled, astNodes, varNamesToFuncs_All
     global varNamesToFuncs_Assign, ifElseBranches, startLineNo_IfBranch, startLineNo_ElseBranch
     global inputOutputVars, varDepListNoExponents, varInfListNoExponents, functionNameOrder
-    global publicVarNames, secretVarNames, assignVarInfo
+    global publicVarNames, secretVarNames, assignVarInfo, overflowAssignInfo
 
     astNodes = []
+    overflowAssignInfo = {}
     varTypes = {}
     assignInfo = {}
     assignVarInfo = {}
@@ -2237,6 +2253,9 @@ def parseLinesOfCode(code, verbosity, ignoreCloudSourcing=False):
 
                 if (currentFuncName not in ifElseBranches):
                     ifElseBranches[currentFuncName] = []
+
+                if (currentFuncName not in overflowAssignInfo):
+                    overflowAssignInfo[currentFuncName] = {}
 
                 if (currentFuncName == TYPES_HEADER):
                     updateVarTypes(node, lineNumberInCode)
