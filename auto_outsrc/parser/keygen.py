@@ -1330,7 +1330,7 @@ def keygen(file, config):
 
     print("First BFSolver Result:  ", skBfMap)
 
-    skBfMap = {'LVector': 'uf0#', 'YVector': 'uf1#'}
+
 
     for stringEntry in stringEntriesInKeygenElemToSMTExp:
         skBfMap[stringEntry] = nilType
