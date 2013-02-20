@@ -1,5 +1,5 @@
 
-#include "TestDFAOut2.h"
+#include "TestDFAOut.h"
 
 string getRandomHexString(int len)
 {
@@ -23,7 +23,7 @@ string getRandomHexString(int len)
 
 }
 
-void benchmarkDFA(Dfa12 & dfa12, ofstream & outfile1, ofstream & outfile2, int wStringCount, int iterationCount, int increment, CharmListStr & transformResults, CharmListStr & decoutResults)
+void benchmarkDFA(Dfa12 & dfa12, ofstream & outfile1, ofstream & outfile2, int wStringCount, int iterationCount, CharmListStr & transformResults, CharmListStr & decoutResults)
 {
 	Benchmark benchT, benchD;
 	string letters = "xABCDEFabcdef0123456789";
@@ -61,7 +61,7 @@ void benchmarkDFA(Dfa12 & dfa12, ofstream & outfile1, ofstream & outfile2, int w
 		int x = dfa12.dfaUtil.getAcceptState(Ti); // 2
 		int l = 0;
 		stringstream s1, s2;
-		for(int i = 0; i < iterationCount; i += increment) {
+		for(int i = 0; i < iterationCount; i++) {
 			benchT.start();
 			dfa12.transform(skBlinded, ct, transformOutputList, l, Ti, x, transformOutputListForLoop);
 			benchT.stop();
@@ -125,16 +125,16 @@ int main(int argc, const char *argv[])
 
 	CharmListStr transformResults, decoutResults;
 	if(isEqual(fixOrRange, RANGE)) {
-		for(int i = 2; i <= wStringCount; i++) {
+		for(int i = 2; i <= wStringCount; i += incrementCount) {
 			cout << "Benchmark with " << i << " wStringCount." << endl;
-			benchmarkDFA(dfa12, outfile1, outfile2, i, iterationCount, incrementCount, transformResults, decoutResults);
+			benchmarkDFA(dfa12, outfile1, outfile2, i, iterationCount, transformResults, decoutResults);
 		}
 		s3 << transformResults << endl;
 		s4 << decoutResults << endl;
 	}
 	else if(isEqual(fixOrRange, FIXED)) {
 		cout << "Benchmark with " << wStringCount << " wStringCount." << endl;
-		benchmarkDFA(dfa12, outfile1, outfile2, wStringCount, iterationCount, incrementCount, transformResults, decoutResults);
+		benchmarkDFA(dfa12, outfile1, outfile2, wStringCount, iterationCount, transformResults, decoutResults);
 		s3 << wStringCount << " " << transformResults[wStringCount] << endl;
 		s4 << wStringCount << " " << decoutResults[wStringCount] << endl;
 	}
