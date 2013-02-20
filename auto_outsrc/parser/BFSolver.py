@@ -255,16 +255,19 @@ class SetupBFSolver:
         alphabet = 'bf' #string.ascii_lowercase
         factors = []
         
+        # determine all possible mappings of blinding factors to keygen variables
+        # as a starting point, we choose an upper bound on the number blinding factors. 
+        # idea is to let Solver tell us the minimum required that satisfies our constraints
         for i in range(self.bfCount):
             factors.append(alphabet + str(i))
 #            factors.append(alphabet[i])
         factors.append('nil') # no blinding factor
         myLog.info("selected factors :", factors)
         
-        # blinding factors
+        # select the blinding factors 
         Factors, self.factorsList = EnumSort('Factors', factors)
         myLog.info("factorList :", self.factorsList)
-        self.nil = nil = self.factorsList[-1]
+        self.nil = nil = self.factorsList[-1] # nil represents that a variable does not need to be blinded
         
         # target variables
         self.theVarMap = {}
@@ -295,6 +298,7 @@ class SetupBFSolver:
         andObjVarMap = And(orObjs)
     
         s = Solver()
+        # enable the unsatisfiable core tracking in the solver
         s.set(unsat_core=True)
         # add vars for possible blinding factor mappings for msk
         s.add(andObjVarMap)
