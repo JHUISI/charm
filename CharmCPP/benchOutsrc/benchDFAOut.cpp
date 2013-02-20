@@ -112,7 +112,6 @@ int main(int argc, const char *argv[])
 
 	Dfa12 dfa12;
 	string filename = string(argv[0]);
-	stringstream s3, s4;
 	ofstream outfile1, outfile2, outfile3, outfile4;
 	string f1 = filename + "_transform.dat";
 	string f2 = filename + "_decout.dat";
@@ -128,23 +127,29 @@ int main(int argc, const char *argv[])
 		for(int i = 2; i <= wStringCount; i += incrementCount) {
 			cout << "Benchmark with " << i << " wStringCount." << endl;
 			benchmarkDFA(dfa12, outfile1, outfile2, i, iterationCount, transformResults, decoutResults);
+			stringstream s3, s4;
+			s3 << transformResults[i] << endl;
+			s4 << decoutResults[i] << endl;
+			outfile3 << s3.str();
+			outfile3.flush();
+			outfile4 << s4.str();
+			outfile4.flush();
 		}
-		s3 << transformResults << endl;
-		s4 << decoutResults << endl;
 	}
 	else if(isEqual(fixOrRange, FIXED)) {
 		cout << "Benchmark with " << wStringCount << " wStringCount." << endl;
 		benchmarkDFA(dfa12, outfile1, outfile2, wStringCount, iterationCount, transformResults, decoutResults);
+		stringstream s3, s4;
 		s3 << wStringCount << " " << transformResults[wStringCount] << endl;
 		s4 << wStringCount << " " << decoutResults[wStringCount] << endl;
+		outfile3 << s3.str();
+		outfile4 << s4.str();
 	}
 	else {
 		cout << "invalid option." << endl;
 		return -1;
 	}
 
-	outfile3 << s3.str();
-	outfile4 << s4.str();
 	outfile1.close();
 	outfile2.close();
 	outfile3.close();
