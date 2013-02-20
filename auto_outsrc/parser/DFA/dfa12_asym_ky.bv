@@ -1,6 +1,5 @@
 name := dfa12
-setting := symmetric
-short := keys
+setting := asymmetric
 
 BEGIN :: types
 M := GT
@@ -15,9 +14,7 @@ T := list{Tlist}
 Ti := list{int}
 q0 := list{int}
 F := list{int}
-#Klist := list{G1, G1, G1}
 key := int
-#K := list{Klist}
 KendList1 := list{G1}
 KendList2 := list{G1}
 K1 := list{G1}
@@ -25,60 +22,59 @@ K2 := list{G1}
 K3 := list{G1}
 w := list{str}
 B := list{GT}
-#Clist := list{G1, G1}
-#C := list{Clist}
-C1 := list{G1}
-C2 := list{G1}
+C1 := list{G2}
+C2 := list{G2}
 D := list{G1}
-#D#0 := G1
 h := list{G1}
 x := int
-#t := list{int}
 t0 := int
 t1 := int
 st := int
 j := int
 END :: types
 
-
 BEGIN :: func:setup
 input := list{alphabet}
-g := random(G1)
-z := random(G1)
-hstart := random(G1)
-hend := random(G1)
+gG1 := random(G1)
+gG2 := random(G2)
+z := random(ZR)
+zG1 := gG1 ^ z
+zG2 := gG2 ^ z
+hstart := random(ZR)
+hstartG1 := gG1 ^ hstart
+hstartG2 := gG2 ^ hstart
+hend := random(ZR)
+hendG1 := gG1 ^ hend
+hendG2 := gG2 ^ hend
 
 A := len(alphabet)
 BEGIN :: for
 for{i := 0,A}
 a := getString(alphabet#i)
-h#a? := random(G1)
+ha := random(ZR)
+hG1#a? := gG1 ^ ha
+hG2#a? := gG2 ^ ha
 END :: for
 
 alpha := random(ZR)
-egg := (e(g,g)^alpha)
-msk := (g^-alpha)
-mpk := list{egg, g, z, h, hstart, hend}
-
+egg := (e(gG1,gG2)^alpha)
+msk := (gG1^-alpha)
+mpk := list{egg, gG1, gG2, zG1, zG2, h, hstartG1, hstartG2, hendG1, hendG2}
 output := list{mpk, msk}
 END :: func:setup
 
 
 BEGIN :: func:keygen
 input := list{mpk, msk, Q, T, F}
-mpk := expand{egg, g, z, h, hstart, hend}
-#dfaM := expand{Q, S, T, q0, F}
-
+mpk := expand{egg, gG1, gG2, zG1, zG2, h, hstartG1, hstartG2, hendG1, hendG2}
 qlen := len(Q)
 BEGIN :: for
 for{i := 0,qlen+1}
 D#i := random(G1)
 END :: for
-
 rstart := random(ZR)
-Kstart1 := (D#0 * (hstart^rstart))
-Kstart2 := (g^rstart)
-
+Kstart1 := (DG1#0 * (hstartG1^rstart))
+Kstart2 := (gG1^rstart)
 Tlen := len(T)
 BEGIN :: for
 for{i := 0,Tlen}
@@ -88,32 +84,25 @@ t0 := t#0
 t1 := t#1
 t2 := getString(t#2)
 key := hashToKey(t)
-
-#K#key := init(list)
-K1#key := ((D#t0^-1) * (z^r))
-K2#key := (g^r)
-K3#key := (D#t1 * (h#t2^r))
-
+K1#key := ((DG1#t0^-1) * (zG1^r))
+K2#key := (gG1^r)
+K3#key := (DG1#t1 * (hG1#t2^r))
 END :: for
-
 Flen := len(F)
 BEGIN :: for
 for{i := 0,Flen}
 x := F#i
 rx := random(ZR)
-KendList1#x := (msk * (D#x * (hend^rx)))
-KendList2#x := (g^rx)
-
+KendList1#x := (msk * (DG1#x * (hendG1^rx)))
+KendList2#x := (gG1^rx)
 END :: for
-
 sk := list{Kstart1, Kstart2, KendList1, KendList2, K1, K2, K3}
 output := sk
 END :: func:keygen
 
-
 BEGIN :: func:encrypt
 input := list{mpk, w, M}
-mpk := expand{egg, g, z, h, hstart, hend}
+mpk := expand{egg, gG1, gG2, zG1, zG2, h, hstartG1, hstartG2, hendG1, hendG2}
 l := len(w)
 
 BEGIN :: for
@@ -122,34 +111,27 @@ s#i := random(ZR)
 END :: for
 
 Cm := (M * (egg^s#l))
-
-#C#0 := init(list)
-C1#0 := (g^s#0)
-C2#0 := (hstart^s#0)
+C1#0 := (gG2^s#0)
+C2#0 := (hstartG2^s#0)
 
 BEGIN :: for
 for{i := 1,l+1}
 a := getString(w#i)
-#C#i := init(list)
-C1#i := (g^s#i)
-C2#i := ((h#a^s#i) * (z^s#i-1?))
+C1#i := (gG2^s#i)
+C2#i := ((hG2#a^s#i) * (zG2^s#i-1?))
 END :: for
 
-Cend1 := (g^s#l)
-Cend2 := (hend^s#l)
-
+Cend1 := (gG2^s#l)
+Cend2 := (hendG2^s#l)
 ct := list{Cend1, Cend2, w, C1, C2, Cm}
 output := ct
 END :: func:encrypt
-
-
 
 BEGIN :: func:decrypt
 input := list{sk, ct, dfaM}
 sk := expand{Kstart1, Kstart2, KendList1, KendList2, K1, K2, K3}
 ct := expand{Cend1, Cend2, w, C1, C2, Cm}
 l := len(w)
-
 BEGIN :: if
 if {accept(dfaM, w) == False}
 output := False
@@ -157,6 +139,7 @@ END :: if
 
 Ti := getTransitions(dfaM, w)
 B#0 := (e(C1#0,Kstart1) * (e(C2#0,Kstart2)^-1))
+
 BEGIN :: for
 for{i := 1,l+1}
 key := hashToKey(Ti#i)
@@ -164,8 +147,8 @@ j := (i - 1)
 result0 := (e(C1#j,K1#key) * ((e(C2#i,K2#key)^-1) * e(C1#i,K3#key)))
 B#i? := (B#i-1? * result0)
 END :: for
-x := getAcceptState(Ti)
 
+x := getAcceptState(Ti)
 result1 := ((e(Cend1,KendList1#x)^-1) * e(Cend2,KendList2#x))
 Bend := (B#l * result1)
 M := (Cm / Bend)

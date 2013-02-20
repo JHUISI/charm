@@ -913,8 +913,9 @@ def handleListTypeRefs(varTypes, ref, info, isForBoth, groupType):
     else:
         print("JAA: can't handle reference lists of length %s yet." % length)
         return False
-
-    oldVar = oldListTypeRefs.get(refName)[refNum]
+    oldVar = oldListTypeRefs.get(refName)
+    if(oldVar != None): oldVar = oldVar[refNum]
+    else: return ref
     
     if assignVarIsGenerator(oldVar, info) or assignVarOccursInBoth(oldVar, info):
        # look for either G1 or G2
