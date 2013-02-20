@@ -60,7 +60,7 @@ void benchmarkDFA(Dfa12 & dfa12, ofstream & outfile1, ofstream & outfile2, int w
 		cout << "transitions to decrypt: " << Ti.length() << endl;
 		int x = dfa12.dfaUtil.getAcceptState(Ti); // 2
 		stringstream s1, s2;
-		for(int i = 0; i < iterationCount; i += increment) {
+		for(int i = 0; i < iterationCount; i ++) {
 			benchD.start();
 			dfa12.decrypt(sk, ct, newM, Ti, x);
 			benchD.stop();
@@ -101,7 +101,6 @@ int main(int argc, const char *argv[])
 
 	Dfa12 dfa12;
 	string filename = string(argv[0]);
-	stringstream s4;
 	ofstream outfile1, outfile2, outfile3, outfile4;
 	string f2 = filename + "_decrypt.dat";
 	string f4 = filename + "_decrypt_raw.txt";
@@ -110,23 +109,28 @@ int main(int argc, const char *argv[])
 
 	CharmListStr decryptResults;
 	if(isEqual(fixOrRange, RANGE)) {
-		for(int i = 2; i <= wStringCount; i++) {
+		for(int i = 2; i <= wStringCount; i += incrementCount) {
 			cout << "Benchmark with " << i << " wStringCount." << endl;
 			benchmarkDFA(dfa12, outfile1, outfile2, i, iterationCount, incrementCount, decryptResults);
+			stringstream s4;
+			s4 << i << " " << decryptResults[i] << endl;
+			outfile4 << s4.str();
+			outfile4.flush();
 		}
-		s4 << decryptResults << endl;
 	}
 	else if(isEqual(fixOrRange, FIXED)) {
 		cout << "Benchmark with " << wStringCount << " wStringCount." << endl;
 		benchmarkDFA(dfa12, outfile1, outfile2, wStringCount, iterationCount, incrementCount, decryptResults);
+		stringstream s4;
 		s4 << wStringCount << " " << decryptResults[wStringCount] << endl;
+		outfile4 << s4.str();
+		outfile4.flush();
 	}
 	else {
 		cout << "invalid option." << endl;
 		return -1;
 	}
 
-	outfile4 << s4.str();
 	outfile2.close();
 	outfile4.close();
 //	cout << "<=== Transform benchmarkWATERS breakdown ===>" << endl;
