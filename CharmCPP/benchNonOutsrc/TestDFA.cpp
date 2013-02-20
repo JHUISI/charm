@@ -155,7 +155,7 @@ void Dfa12::encrypt(CharmList & mpk, CharmListStr & w, GT & M, CharmList & ct)
     return;
 }
 
-void Dfa12::decrypt(CharmList & sk, CharmList & ct, GT & M) // NO_TYPE & dfaM,
+void Dfa12::decrypt(CharmList & sk, CharmList & ct, GT & M, CharmMetaListInt & Ti, int & x) // NO_TYPE & dfaM,
 {
     G1 Kstart1;
     G1 Kstart2;
@@ -171,12 +171,12 @@ void Dfa12::decrypt(CharmList & sk, CharmList & ct, GT & M) // NO_TYPE & dfaM,
     CharmListG1 C2;
     GT Cm;
     int l = 0;
-    CharmMetaListInt Ti;
+//    CharmMetaListInt Ti;
     CharmListGT B;
     string key;
     int j = 0;
     GT result0 = group.init(GT_t);
-    int x = 0;
+//    int x = 0;
     GT result1 = group.init(GT_t);
     GT Bend = group.init(GT_t);
     
@@ -195,11 +195,11 @@ void Dfa12::decrypt(CharmList & sk, CharmList & ct, GT & M) // NO_TYPE & dfaM,
     C2 = ct[4].getListG1();
     Cm = ct[5].getGT();
     l = w.length();
-    if ( ( (dfaUtil.accept(w)) == (false) ) ) // dfaM,
-    {
-        return;
-    }
-    Ti = dfaUtil.getTransitions(w); // dfaM,
+//    if ( ( (dfaUtil.accept(w)) == (false) ) ) // dfaM,
+//    {
+//        return;
+//    }
+//    Ti = dfaUtil.getTransitions(w); // dfaM,
     B.insert(0, group.mul(group.pair(C1[0], Kstart1), group.exp(group.pair(C2[0], Kstart2), -1)));
     for (int i = 1; i < l+1; i++)
     {
@@ -208,7 +208,7 @@ void Dfa12::decrypt(CharmList & sk, CharmList & ct, GT & M) // NO_TYPE & dfaM,
         result0 = group.mul(group.pair(C1[j], K1[key]), group.mul(group.exp(group.pair(C2[i], K2[key]), -1), group.pair(C1[i], K3[key])));
         B.insert(i, group.mul(B[i-1], result0));
     }
-    x = dfaUtil.getAcceptState(Ti);
+//    x = dfaUtil.getAcceptState(Ti);
     result1 = group.mul(group.exp(group.pair(Cend1, KendList1[x]), -1), group.pair(Cend2, KendList2[x]));
     Bend = group.mul(B[l], result1);
     M = group.div(Cm, Bend);
