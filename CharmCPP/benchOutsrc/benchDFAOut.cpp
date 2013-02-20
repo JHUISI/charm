@@ -75,11 +75,13 @@ void benchmarkDFA(Dfa12 & dfa12, ofstream & outfile1, ofstream & outfile2, int w
 		cout << "Transform avg: " << benchT.getAverage() << " ms" << endl;
 		s1 << wStringCount << " " << benchT.getAverage() << endl;
 		outfile1 << s1.str();
+                outfile1.flush();
 	    transformResults[wStringCount] = benchT.getRawResultString();
 
 		cout << "Decout avg: " << benchD.getAverage() << " ms" << endl;
 		s2 << wStringCount << " " << benchD.getAverage() << endl;
 		outfile2 << s2.str();
+                outfile2.flush();
 		decoutResults[wStringCount] = benchD.getRawResultString();
 //		cout << convert_str(M) << endl;
 //		cout << convert_str(newM) << endl;
