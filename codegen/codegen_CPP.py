@@ -1062,11 +1062,11 @@ def getCPPAsstStringForExpand(node, variableName, replacementsDict):
             if (isVarInSDLListVars(listNodeName) == True):
                 if (listNodeType in [types.G1, types.listG1]): # TODO: JAA revisit
                     outputString += "getListG1()"
-                elif (listNodeType == types.G2):
+                elif (listNodeType in [types.G2, types.listG2]):
                     outputString += "getListG2()"
-                elif (listNodeType == types.GT):
+                elif (listNodeType in [types.GT, types.listGT]):
                     outputString += "getListGT()"
-                elif (listNodeType == types.ZR):
+                elif (listNodeType in [types.ZR, types.listZR]):
                     outputString += "getListZR()"
                 elif (listNodeType == types.list):
                     outputString += "getList()"

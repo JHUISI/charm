@@ -103,7 +103,7 @@ END :: func:keygen
 
 BEGIN :: func:encrypt
 input := list{mpk, w, M}
-mpk := expand{egg, gG1, gG2, zG1, zG2, h, hstartG1, hstartG2, hendG1, hendG2}
+mpk := expand{egg, gG1, gG2, zG1, zG2, hG1, hG2, hstartG1, hstartG2, hendG1, hendG2}
 l := len(w)
 
 BEGIN :: for

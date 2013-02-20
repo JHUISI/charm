@@ -1,5 +1,5 @@
 
-#include "TestDFAOut.h"
+#include "TestDFAOut2.h"
 
 string getRandomHexString(int len)
 {
