@@ -15,6 +15,7 @@ public:
 	void insert(int, string);
 	int length(); // return length of lists
 	string printAtIndex(int index);
+	int searchKey(string index);
 
 	// retrieve a particular index
 	string& operator[](const int index);

@@ -275,7 +275,7 @@ void Dfa12::decout(NO_TYPE & dfaM, CharmList & transformOutputList, ZR & bf0, in
     w = transformOutputList[2];
     if ( ( (dfaUtil.accept(dfaM, w)) == (false) ) )
     {
-
+	return;
     }
     B.insert(0, group.exp(transformOutputList[0], bf0));
     for (int i = 1; i < l+1; i++)

@@ -91,6 +91,13 @@ void CharmListStr::insert(int index, string & s)
 	cur_index++;
 }
 
+int CharmListStr::searchKey(string index)
+{
+	for(int i = 0; i < (int) list.size(); i++) {
+		if(isEqual(index, list[i])) { return i; }
+	}
+	return -1;
+}
 
 string& CharmListStr::operator[](const int index)
 {

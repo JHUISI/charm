@@ -1114,13 +1114,13 @@ def getVarDeclForListVar(variableName):
 
     listVarType = getFinalVarType(trueVarName, currentFuncName)
 
-    if (listVarType == types.G1):
+    if (listVarType in [types.G1, types.listG1]):
         outputString_Types += "    CharmListG1 " + trueVarName + ";\n"
-    elif (listVarType == types.G2):
+    elif (listVarType in [types.G2, types.listG2]):
         outputString_Types += "    CharmListG2 " + trueVarName + ";\n"
-    elif (listVarType == types.GT):
+    elif (listVarType in [types.GT, types.listGT]):
         outputString_Types += "    CharmListGT " + trueVarName + ";\n"
-    elif (listVarType == types.ZR):
+    elif (listVarType in [types.ZR, types.listZR]):
         outputString_Types += "    CharmListZR " + trueVarName + ";\n"
     elif (listVarType in [types.int, types.listInt]):
         outputString_Types += "    CharmListInt " + trueVarName + ";\n"
@@ -1672,11 +1672,11 @@ def writeHeaderFile(outputFileNameHdr, className, groupParam, importLines, pairi
     outputString += "\t" + pairingDefLines + "\n"
     outputString += "\t" + className + "() { group.setCurve(" + groupParam + "); };\n"
     outputString += "\t~" + className + "() {};\n"
+    outputString += "\t" + builtinDefLines + "\n"
     for i in functionHeaderList:
         if i != "":
             outputString += "\t" + i
-    outputString += "\nprivate:\n"
-    outputString += "\t" + builtinDefLines
+#    outputString += "\nprivate:\n"
     outputString += "};\n"
     outputString += "\n\n#endif"
 
