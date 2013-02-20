@@ -25,7 +25,8 @@ B := list{GT}
 C1 := list{G2}
 C2 := list{G2}
 D := list{G1}
-h := list{G1}
+hG1 := list{G1}
+hG2 := list{G2}
 x := int
 t0 := int
 t1 := int
@@ -59,18 +60,18 @@ END :: for
 alpha := random(ZR)
 egg := (e(gG1,gG2)^alpha)
 msk := (gG1^-alpha)
-mpk := list{egg, gG1, gG2, zG1, zG2, h, hstartG1, hstartG2, hendG1, hendG2}
+mpk := list{egg, gG1, gG2, zG1, zG2, hG1, hG2, hstartG1, hstartG2, hendG1, hendG2}
 output := list{mpk, msk}
 END :: func:setup
 
 
 BEGIN :: func:keygen
 input := list{mpk, msk, Q, T, F}
-mpk := expand{egg, gG1, gG2, zG1, zG2, h, hstartG1, hstartG2, hendG1, hendG2}
+mpk := expand{egg, gG1, gG2, zG1, zG2, hG1, hG2, hstartG1, hstartG2, hendG1, hendG2}
 qlen := len(Q)
 BEGIN :: for
 for{i := 0,qlen+1}
-D#i := random(G1)
+DG1#i := random(G1)
 END :: for
 rstart := random(ZR)
 Kstart1 := (DG1#0 * (hstartG1^rstart))
