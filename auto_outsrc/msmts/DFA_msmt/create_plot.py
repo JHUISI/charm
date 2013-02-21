@@ -2,7 +2,7 @@ import os
 
 SS512ones = ["DSE", "BGW", "DFA"]
 
-files = {'BSW':2500, 'LW':2500}
+files = {'DFA':16000}
 
 intro = """\n
 #!/bin/sh
@@ -16,10 +16,10 @@ config_MNT_160 = """
 set terminal postscript eps enhanced color 'Helvetica' 10;
 set size 0.425,0.425;
 set output '%s_MNT_160_CloudSource.eps';
-set yrange [0 : %d]; set xrange[1 : 100]; set xtics autofreq 20;
+set yrange [0 : %d]; set xrange[1 : 802]; set xtics autofreq 20;
 set title 'MNT160 Threshold Estimator' font 'Helvetica,10';
 set xlabel 'Number of attributes in access-control policy';
-set ylabel 'Decryption time (ms)';
+set ylabel 'Encryption time (ms)';
 plot '%s' w lines lw 6 title '%s', \\
  '%s' w lines lw 6 title '%s', \\
  '%s' w lines lw 6 title '%s';
@@ -29,9 +29,9 @@ config_SS_512 = """
 set terminal postscript eps enhanced color 'Helvetica' 10;
 set size 0.425,0.425;
 set output '%s_SS_512_CloudSource.eps';
-set yrange [0 : %d]; set xrange[1 : 100]; set xtics autofreq 20;
+set yrange [0 : %d]; set xrange[1 : 802]; set xtics autofreq 100;
 set title 'SS512 Threshold Estimator' font 'Helvetica,10';
-set xlabel 'Number of attributes in access-control policy';
+set xlabel 'Size of input string (bytes)';
 set ylabel 'Decryption time (ms)';
 plot '%s' w lines lw 6 title '%s', \\
  '%s' w lines lw 6 title '%s', \\
