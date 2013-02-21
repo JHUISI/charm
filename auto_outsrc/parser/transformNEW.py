@@ -221,7 +221,7 @@ def getLastLineOfTransform(stmtsDec, config):
     for lineNo in stmtsDec:
         stmt = stmtsDec[lineNo]
         #print(type(stmt).__name__)
-        print(stmt)
+        #print(stmt)
         if (type(stmt).__name__ == VAR_INFO_CLASS_NAME):
             if (str(stmt.getAssignNode().left) == config.M):
                 return lineNo

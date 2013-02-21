@@ -4,7 +4,7 @@ from sdlparser.SDLParser import *
 from transformNEW import *
 from secretListInKeygen import getSecretList
 from outsrctechniques import SubstituteVar, GetAttributeVars
-import os, sys, string, random, importlib
+import os, sys, string, random, importlib, time
 
 linesOfCode = None
 assignInfo = None
@@ -1328,14 +1328,14 @@ def keygen(file, config):
 
     bfMap, skBfMap = instantiateBFSolver(config)
 
-    print("First BFSolver Result:  ", skBfMap)
+    #print("First BFSolver Result:  ", skBfMap)
 
 
 
     for stringEntry in stringEntriesInKeygenElemToSMTExp:
         skBfMap[stringEntry] = nilType
     
-    print("BFSolver Results: ", skBfMap)
+    #print("BFSolver Results: ", skBfMap)
     # produce proof
     # generateTKProof(bfMap, config)
 
@@ -1371,7 +1371,14 @@ def keygen(file, config):
     resultDictionaryForTransform = prepareDictForTransform(skBfMap, config)
 
     #varsThatAreBlinded = {"c":["zz"], "d0":["yy"], "d1":["aa", "bb"]}
+
+
+    startTime = time.clock()
     transformNEW(resultDictionaryForTransform, secretKeyElements, config)
+    endTime = time.clock()
+    runningTime = (endTime - startTime) * 1000
+    print("Running time for TransformNew in ms is ", runningTime) 
+
 
     #rcca(rccaData)
 
@@ -1387,7 +1394,7 @@ def keygen(file, config):
 
     updateCodeAndStructs()
 
-    printLinesOfCode()
+    #printLinesOfCode()
 
     #print(newDecOutInputLine)
     #sys.exit("TESTTEST")
