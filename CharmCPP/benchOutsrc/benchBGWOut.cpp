@@ -20,10 +20,10 @@ void getRandomReceivers(CharmListInt & recs, int numRecs)
 	return;
 }
 
-void benchmarkBGW(Bgw05 & bgw, ofstream & outfile1, ofstream & outfile2, int numOfRecs, int iterationCount, CharmListStr & transformResults, CharmListStr & decoutResults)
+void benchmarkBGW(Bgw05 & bgw, ofstream & outfile0, ofstream & outfile1, ofstream & outfile2, int numOfRecs, int iterationCount, CharmListStr & keygenResults, CharmListStr & transformResults, CharmListStr & decoutResults)
 {
-	Benchmark benchT, benchD;
-	CharmList pk, msk, Hdr, ct, skCompleteBlinded, transformOutputList;
+	Benchmark benchT, benchD, benchK;
+	CharmList pk, msk, Hdr, ct, skCompleteBlinded, skCompleteBlinded2, transformOutputList;
 	CharmListInt S;
 //	int receivers[] = {1, 3, 5, 12, 14};
 // 	S.init(receivers, 5);
@@ -32,12 +32,26 @@ void benchmarkBGW(Bgw05 & bgw, ofstream & outfile1, ofstream & outfile2, int num
 	ZR bf0;
 	getRandomReceivers(S, numOfRecs);
 	int n = numOfRecs, i = S[(rand() % numOfRecs)];
+	double kg_in_ms;
 
 	bgw.setup(n, pk, msk);
 //	cout << "pk: " << pk << endl;
 //	cout << "msk: " << msk << endl;
-
+	// BENCHMARK KEYGEN SETUP
+	for(int i = 0; i < iterationCount; i++) {
+		benchK.start();
+		bgw.keygen(pk, msk, n, bf0, skCompleteBlinded2);
+		benchK.stop();
+		kg_in_ms = benchK.computeTimeInMilliseconds();
+	}
+	cout << "Keygen avg: " << benchK.getAverage() << " ms" << endl;
+    stringstream s0;
+	s0 << numOfRecs << " " << benchK.getAverage() << endl;
+	outfile0 << s0.str();
+    keygenResults[numOfRecs] = benchK.getRawResultString();
+	// BENCHMARK KEYGEN SETUP
 	bgw.keygen(pk, msk, n, bf0, skCompleteBlinded);
+
 //	cout << "tk: " <<  skCompleteBlinded << endl;
 //	cout << "bf: " << bf0 << endl;
 	cout << "receiver: " << i << endl;
@@ -68,6 +82,10 @@ void benchmarkBGW(Bgw05 & bgw, ofstream & outfile1, ofstream & outfile2, int num
 	s2 << numOfRecs << " " << benchD.getAverage() << endl;
 	outfile2 << s2.str();
 	decoutResults[numOfRecs] = benchD.getRawResultString();
+	// measure ciphertext size
+	cout << "CT size: " << measureSize(ct) << " bytes" << endl;
+	cout << "CTOut size: " << measureSize(transformOutputList) << " bytes" << endl;
+
 //    cout << convert_str(K) << endl;
 //    cout << convert_str(KDecrypt) << endl;
     if(K == KDecrypt) {
@@ -93,30 +111,35 @@ int main(int argc, const char *argv[])
 	Bgw05 bgw;
 	srand(time(NULL));
 	string filename = string(argv[0]);
-	stringstream s3, s4;
-	ofstream outfile1, outfile2, outfile3, outfile4;
+	stringstream s3, s4, s5;
+	ofstream outfile0, outfile1, outfile2, outfile3, outfile4, outfile5;
+	string f0 = filename + "_keygenout.dat";
 	string f1 = filename + "_transform.dat";
 	string f2 = filename + "_decout.dat";
 	string f3 = filename + "_transform_raw.txt";
 	string f4 = filename + "_decout_raw.txt";
+	string f5 = filename + "_keygenout_raw.txt";
+	outfile0.open(f0.c_str());
 	outfile1.open(f1.c_str());
 	outfile2.open(f2.c_str());
 	outfile3.open(f3.c_str());
 	outfile4.open(f4.c_str());
+	outfile5.open(f5.c_str());
 
-	CharmListStr transformResults, decoutResults;
+	CharmListStr keygenResults, transformResults, decoutResults;
 	if(isEqual(fixOrRange, RANGE)) {
 		for(int i = 2; i <= numRecs; i++) {
 			cout << "Benchmark with group of " << i << " recipients." << endl;
-			benchmarkBGW(bgw, outfile1, outfile2, i, iterationCount, transformResults, decoutResults);
+			benchmarkBGW(bgw, outfile0, outfile1, outfile2, i, iterationCount, keygenResults, transformResults, decoutResults);
 		}
 		s3 << transformResults << endl;
 		s4 << decoutResults << endl;
 	}
 	else if(isEqual(fixOrRange, FIXED)) {
-		benchmarkBGW(bgw, outfile1, outfile2, numRecs, iterationCount, transformResults, decoutResults);
+		benchmarkBGW(bgw, outfile0, outfile1, outfile2, numRecs, iterationCount, keygenResults, transformResults, decoutResults);
 		s3 << numRecs << " " << transformResults[numRecs] << endl;
 		s4 << numRecs << " " << decoutResults[numRecs] << endl;
+		s5 << numRecs << " " << keygenResults[numRecs] << endl;
 	}
 	else {
 		cout << "invalid option." << endl;
@@ -125,10 +148,13 @@ int main(int argc, const char *argv[])
 
 	outfile3 << s3.str();
 	outfile4 << s4.str();
+	outfile5 << s5.str();
+	outfile0.close();
 	outfile1.close();
 	outfile2.close();
 	outfile3.close();
 	outfile4.close();
+	outfile5.close();
 //	cout << "<=== Transform benchmarkBGW breakdown ===>" << endl;
 //	cout << transformResults << endl;
 //	cout << "<=== Transform benchmarkBGW breakdown ===>" << endl;

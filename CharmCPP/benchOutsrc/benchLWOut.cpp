@@ -48,7 +48,6 @@ void benchmarkLW(Lw10 & lw, ofstream & outfile0, ofstream & outfile1, ofstream &
 	string gid = "jhu@authority.com"; // , policy_str = "((ATTR4 or ATTR3) and (ATTR2 or ATTR1))"; // set this
 
     double tf_in_ms, de_in_ms, kg_in_ms;
-    stringstream s0;
 
     getAttributes(authS, attributeCount);
     getAttributes(userS, attributeCount);
@@ -66,6 +65,7 @@ void benchmarkLW(Lw10 & lw, ofstream & outfile0, ofstream & outfile1, ofstream &
 		kg_in_ms = benchK.computeTimeInMilliseconds();
 	}
 	cout << "Keygen avg: " << benchK.getAverage() << " ms" << endl;
+    stringstream s0;
 	s0 << attributeCount << " " << benchK.getAverage() << endl;
 	outfile0 << s0.str();
     keygenResults[attributeCount] = benchK.getRawResultString();

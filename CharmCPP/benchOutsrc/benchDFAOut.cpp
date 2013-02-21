@@ -23,12 +23,12 @@ string getRandomHexString(int len)
 
 }
 
-void benchmarkDFA(Dfa12 & dfa12, ofstream & outfile1, ofstream & outfile2, int wStringCount, int iterationCount, CharmListStr & transformResults, CharmListStr & decoutResults)
+void benchmarkDFA(Dfa12 & dfa12, ofstream & outfile0, ofstream & outfile1, ofstream & outfile2, int wStringCount, int iterationCount, CharmListStr & keygenResults, CharmListStr & transformResults, CharmListStr & decoutResults)
 {
-	Benchmark benchT, benchD;
+	Benchmark benchT, benchD, benchK;
 	string letters = "xABCDEFabcdef0123456789";
 	dfa12.dfaUtil.constructDFA("0x(0|1|2|3|4|5|6|7|8|9|a|b|c|d|e|f|A|B|C|D|E|F)*", letters);
-	CharmList mpk, skBlinded, ct, transformOutputList, transformOutputListForLoop;
+	CharmList mpk, skBlinded, skBlinded2, ct, transformOutputList, transformOutputListForLoop;
 	CharmListStr alphabet = dfa12.dfaUtil.getAlphabet();
 	CharmListStr w;
 	CharmListInt Q = dfa12.dfaUtil.getStates(), F = dfa12.dfaUtil.getAcceptStates(); // get all states, and all accept states
@@ -45,6 +45,20 @@ void benchmarkDFA(Dfa12 & dfa12, ofstream & outfile1, ofstream & outfile2, int w
 
 	//cout << "MPK:\n" << mpk << endl;
 	//cout << "MSK:\n" << convert_str(msk) << endl;
+	double kg_in_ms;
+	// BENCHMARK KEYGEN SETUP
+	for(int i = 0; i < iterationCount; i++) {
+		benchK.start();
+		dfa12.keygen(mpk, msk, Q, T, F, bf0, skBlinded2);
+		benchK.stop();
+		kg_in_ms = benchK.computeTimeInMilliseconds();
+	}
+	cout << "Keygen avg: " << benchK.getAverage() << " ms" << endl;
+    stringstream s0;
+	s0 << wStringCount << " " << benchK.getAverage() << endl;
+	outfile0 << s0.str();
+    keygenResults[wStringCount] = benchK.getRawResultString();
+	// BENCHMARK KEYGEN SETUP
 	dfa12.keygen(mpk, msk, Q, T, F, bf0, skBlinded);
 
 	//cout << "SK:\n" << skBlinded << endl;
@@ -81,8 +95,11 @@ void benchmarkDFA(Dfa12 & dfa12, ofstream & outfile1, ofstream & outfile2, int w
 		cout << "Decout avg: " << benchD.getAverage() << " ms" << endl;
 		s2 << wStringCount << " " << benchD.getAverage() << endl;
 		outfile2 << s2.str();
-                outfile2.flush();
+        outfile2.flush();
 		decoutResults[wStringCount] = benchD.getRawResultString();
+		cout << "CT size: " << measureSize(ct) << " bytes" << endl;
+		cout << "CTOut size: " << measureSize(transformOutputList) + measureSize(transformOutputListForLoop) << " bytes" << endl;
+
 //		cout << convert_str(M) << endl;
 //		cout << convert_str(newM) << endl;
 		if(M == newM) {
@@ -114,21 +131,26 @@ int main(int argc, const char *argv[])
 
 	Dfa12 dfa12;
 	string filename = string(argv[0]);
-	ofstream outfile1, outfile2, outfile3, outfile4;
+	stringstream s3, s4, s5;
+	ofstream outfile0, outfile1, outfile2, outfile3, outfile4, outfile5;
+	string f0 = filename + "_keygenout.dat";
 	string f1 = filename + "_transform.dat";
 	string f2 = filename + "_decout.dat";
 	string f3 = filename + "_transform_raw.txt";
 	string f4 = filename + "_decout_raw.txt";
+	string f5 = filename + "_keygenout_raw.txt";
+	outfile0.open(f0.c_str());
 	outfile1.open(f1.c_str());
 	outfile2.open(f2.c_str());
 	outfile3.open(f3.c_str());
 	outfile4.open(f4.c_str());
+	outfile5.open(f5.c_str());
 
-	CharmListStr transformResults, decoutResults;
+	CharmListStr keygenResults, transformResults, decoutResults;
 	if(isEqual(fixOrRange, RANGE)) {
 		for(int i = 2; i <= wStringCount; i += incrementCount) {
 			cout << "Benchmark with " << i << " wStringCount." << endl;
-			benchmarkDFA(dfa12, outfile1, outfile2, i, iterationCount, transformResults, decoutResults);
+			benchmarkDFA(dfa12, outfile0, outfile1, outfile2, i, iterationCount, keygenResults, transformResults, decoutResults);
 			stringstream s3, s4;
 			s3 << i << " " << transformResults[i] << endl;
 			s4 << i << " " << decoutResults[i] << endl;
@@ -140,22 +162,26 @@ int main(int argc, const char *argv[])
 	}
 	else if(isEqual(fixOrRange, FIXED)) {
 		cout << "Benchmark with " << wStringCount << " wStringCount." << endl;
-		benchmarkDFA(dfa12, outfile1, outfile2, wStringCount, iterationCount, transformResults, decoutResults);
+		benchmarkDFA(dfa12, outfile0, outfile1, outfile2, wStringCount, iterationCount, keygenResults, transformResults, decoutResults);
 		stringstream s3, s4;
 		s3 << wStringCount << " " << transformResults[wStringCount] << endl;
 		s4 << wStringCount << " " << decoutResults[wStringCount] << endl;
+		s5 << wStringCount << " " << keygenResults[wStringCount] << endl;
 		outfile3 << s3.str();
 		outfile4 << s4.str();
+		outfile5 << s5.str();
 	}
 	else {
 		cout << "invalid option." << endl;
 		return -1;
 	}
 
+	outfile0.close();
 	outfile1.close();
 	outfile2.close();
 	outfile3.close();
 	outfile4.close();
+	outfile5.close();
 //	cout << "<=== Transform benchmarkWATERS breakdown ===>" << endl;
 //	cout << transformResults << endl;
 //	cout << "<=== Transform benchmarkWATERS breakdown ===>" << endl;

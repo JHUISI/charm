@@ -33,22 +33,35 @@ string getPolicy(int max)
 	return policystr;
 }
 
-void benchmarkSW(Sw05 & sw, ofstream & outfile1, ofstream & outfile2, int attributeCount, int iterationCount, CharmListStr & transformResults, CharmListStr & decoutResults)
+void benchmarkSW(Sw05 & sw, ofstream & outfile0, ofstream & outfile1, ofstream & outfile2, int attributeCount, int iterationCount, CharmListStr & keygenResults, CharmListStr & transformResults, CharmListStr & decoutResults)
 {
-	Benchmark benchT, benchD;
-    CharmList pk, skBlinded, CT, transformOutputList, transformOutputListForLoop;
+	Benchmark benchT, benchD, benchK;
+    CharmList pk, skBlinded, skBlinded2, CT, transformOutputList, transformOutputListForLoop;
     CharmListStr w, wPrime;
     GT M, newM;
     ZR bf0, uf0, mk;
     int n = attributeCount, dParam = 1;
 
-    double tf_in_ms, de_in_ms;
+    double tf_in_ms, de_in_ms, kg_in_ms;
 
     sw.setup(n, pk, mk);
     getAttributes(w, attributeCount);
     //cout << "w :\n" << w << endl;
     getAttributes(wPrime, attributeCount);
     //cout << "wPrime :\n" << wPrime << endl;
+	// BENCHMARK KEYGEN SETUP
+	for(int i = 0; i < iterationCount; i++) {
+		benchK.start();
+	    sw.extract(mk, w, pk, dParam, n, uf0, bf0, skBlinded2);
+		benchK.stop();
+		kg_in_ms = benchK.computeTimeInMilliseconds();
+	}
+	cout << "Keygen avg: " << benchK.getAverage() << " ms" << endl;
+    stringstream s0;
+	s0 << attributeCount << " " << benchK.getAverage() << endl;
+	outfile0 << s0.str();
+    keygenResults[attributeCount] = benchK.getRawResultString();
+	// BENCHMARK KEYGEN SETUP
     sw.extract(mk, w, pk, dParam, n, uf0, bf0, skBlinded);
 
     M = sw.group.random(GT_t);
@@ -83,6 +96,9 @@ void benchmarkSW(Sw05 & sw, ofstream & outfile1, ofstream & outfile2, int attrib
 	outfile2 << s2.str();
 	decoutResults[attributeCount] = benchD.getRawResultString();
 
+	cout << "CT size: " << measureSize(CT) << " bytes" << endl;
+	cout << "CTOut size: " << measureSize(transformOutputList) + measureSize(transformOutputListForLoop) << " bytes" << endl;
+
 //    cout << convert_str(M) << endl;
 //    cout << convert_str(newM) << endl;
     if(M == newM) {
@@ -108,31 +124,36 @@ int main(int argc, const char *argv[])
 
 	Sw05 sw;
 	string filename = string(argv[0]);
-	stringstream s3, s4;
-	ofstream outfile1, outfile2, outfile3, outfile4;
+	stringstream s3, s4, s5;
+	ofstream outfile0, outfile1, outfile2, outfile3, outfile4, outfile5;
+	string f0 = filename + "_keygenout.dat";
 	string f1 = filename + "_transform.dat";
 	string f2 = filename + "_decout.dat";
 	string f3 = filename + "_transform_raw.txt";
 	string f4 = filename + "_decout_raw.txt";
+	string f5 = filename + "_keygenout_raw.txt";
+	outfile0.open(f0.c_str());
 	outfile1.open(f1.c_str());
 	outfile2.open(f2.c_str());
 	outfile3.open(f3.c_str());
 	outfile4.open(f4.c_str());
+	outfile5.open(f5.c_str());
 
-	CharmListStr transformResults, decoutResults;
+	CharmListStr keygenResults, transformResults, decoutResults;
 	if(isEqual(fixOrRange, RANGE)) {
 		for(int i = 2; i <= attributeCount; i++) {
 			cout << "Benchmark with " << i << " attributes." << endl;
-			benchmarkSW(sw, outfile1, outfile2, i, iterationCount, transformResults, decoutResults);
+			benchmarkSW(sw, outfile0, outfile1, outfile2, i, iterationCount, keygenResults, transformResults, decoutResults);
 		}
 		s3 << transformResults << endl;
 		s4 << decoutResults << endl;
 	}
 	else if(isEqual(fixOrRange, FIXED)) {
 		cout << "Benchmark with " << attributeCount << " attributes." << endl;
-		benchmarkSW(sw, outfile1, outfile2, attributeCount, iterationCount, transformResults, decoutResults);
+		benchmarkSW(sw, outfile0, outfile1, outfile2, attributeCount, iterationCount, keygenResults, transformResults, decoutResults);
 		s3 << attributeCount << " " << transformResults[attributeCount] << endl;
 		s4 << attributeCount << " " << decoutResults[attributeCount] << endl;
+		s5 << attributeCount << " " << keygenResults[attributeCount] << endl;
 	}
 	else {
 		cout << "invalid option." << endl;
@@ -141,8 +162,13 @@ int main(int argc, const char *argv[])
 
 	outfile3 << s3.str();
 	outfile4 << s4.str();
+	outfile5 << s5.str();
+	outfile0.close();
+	outfile1.close();
+	outfile2.close();
 	outfile3.close();
 	outfile4.close();
+	outfile5.close();
 
 //	cout << "<=== Transform benchmarkBSW breakdown ===>" << endl;
 //	cout << transformResults << endl;
