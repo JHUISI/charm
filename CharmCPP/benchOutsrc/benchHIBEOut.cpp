@@ -139,6 +139,7 @@ int main(int argc, const char *argv[])
 
 	outfile3 << s3.str();
 	outfile4 << s4.str();
+	outfile5 << s5.str();
 	outfile0.close();
 	outfile1.close();
 	outfile2.close();
