@@ -16,16 +16,29 @@ string getID(int len)
 	return id;
 }
 
-void benchmarkDSE(Dsewaters09 & dse, ofstream & outfile1, ofstream & outfile2, int ID_string_len, int iterationCount, CharmListStr & transformResults, CharmListStr & decoutResults)
+void benchmarkDSE(Dsewaters09 & dse, ofstream & outfile0, ofstream & outfile1, ofstream & outfile2, int ID_string_len, int iterationCount, CharmListStr & keygenResults, CharmListStr & transformResults, CharmListStr & decoutResults)
 {
-	Benchmark benchT, benchD;
-    CharmList msk, mpk, pk, skBlinded, ct, transformOutputList;
+	Benchmark benchT, benchD, benchK;
+    CharmList msk, mpk, pk, skBlinded, skBlinded2, ct, transformOutputList;
     GT M, newM;
     ZR bf0;
     string id = getID(ID_string_len); // "somebody@example.com and other people!!!!!";
-    double tf_in_ms, de_in_ms;
+    double tf_in_ms, de_in_ms, kg_in_ms;
+    stringstream s0;
 
 	dse.setup(mpk, msk);
+	// BENCHMARK KEYGEN SETUP
+	for(int i = 0; i < iterationCount; i++) {
+		benchK.start();
+		dse.keygen(mpk, msk, id, bf0, skBlinded2);
+		benchK.stop();
+		kg_in_ms = benchK.computeTimeInMilliseconds();
+	}
+	cout << "Keygen avg: " << benchK.getAverage() << " ms" << endl;
+	s0 << ID_string_len << " " << benchK.getAverage() << endl;
+	outfile0 << s0.str();
+    keygenResults[ID_string_len] = benchK.getRawResultString();
+	// BENCHMARK KEYGEN SETUP
 	dse.keygen(mpk, msk, id, bf0, skBlinded);
 
     M = dse.group.random(GT_t);
@@ -57,6 +70,9 @@ void benchmarkDSE(Dsewaters09 & dse, ofstream & outfile1, ofstream & outfile2, i
 	s2 << iterationCount << " " << benchD.getAverage() << endl;
 	outfile2 << s2.str();
 	decoutResults[ID_string_len] = benchD.getRawResultString();
+	// measure ciphertext size
+	cout << "CT size: " << measureSize(ct) << " bytes" << endl;
+	cout << "CTOut size: " << measureSize(transformOutputList) << " bytes" << endl;
 
 //    cout << convert_str(M) << endl;
 //    cout << convert_str(newM) << endl;
@@ -84,29 +100,34 @@ int main(int argc, const char *argv[])
 	srand(time(NULL));
 	Dsewaters09 dse;
 	string filename = string(argv[0]);
-	stringstream s3, s4;
-	ofstream outfile1, outfile2, outfile3, outfile4;
+	stringstream s3, s4, s5;
+	ofstream outfile0, outfile1, outfile2, outfile3, outfile4, outfile5;
+	string f0 = filename + "_keygenout.dat";
 	string f1 = filename + "_transform.dat";
 	string f2 = filename + "_decout.dat";
 	string f3 = filename + "_transform_raw.txt";
 	string f4 = filename + "_decout_raw.txt";
+	string f5 = filename + "_keygenout_raw.txt";
+	outfile0.open(f0.c_str());
 	outfile1.open(f1.c_str());
 	outfile2.open(f2.c_str());
 	outfile3.open(f3.c_str());
 	outfile4.open(f4.c_str());
+	outfile5.open(f5.c_str());
 
-	CharmListStr transformResults, decoutResults;
+	CharmListStr keygenResults, transformResults, decoutResults;
 	if(isEqual(fixOrRange, RANGE)) {
 		for(int i = 2; i <= ID_string_len; i++) {
-			benchmarkDSE(dse, outfile1, outfile2, i, iterationCount, transformResults, decoutResults);
+			benchmarkDSE(dse, outfile0, outfile1, outfile2, i, iterationCount, keygenResults, transformResults, decoutResults);
 		}
 		s3 << transformResults << endl;
 		s4 << decoutResults << endl;
 	}
 	else if(isEqual(fixOrRange, FIXED)) {
-		benchmarkDSE(dse, outfile1, outfile2, ID_string_len, iterationCount, transformResults, decoutResults);
+		benchmarkDSE(dse, outfile0, outfile1, outfile2, ID_string_len, iterationCount, keygenResults, transformResults, decoutResults);
 		s3 << ID_string_len << " " << transformResults[ID_string_len] << endl;
 		s4 << ID_string_len << " " << decoutResults[ID_string_len] << endl;
+		s5 << ID_string_len << " " << keygenResults[ID_string_len] << endl;
 	}
 	else {
 		cout << "invalid option." << endl;
@@ -119,6 +140,7 @@ int main(int argc, const char *argv[])
 	outfile2.close();
 	outfile3.close();
 	outfile4.close();
+	outfile5.close();
 	return 0;
 }
 
