@@ -35,11 +35,11 @@ string getPolicy(int max)
 	return policystr;
 }
 
-void benchmarkLW(Lw10 & lw, ofstream & outfile1, ofstream & outfile2, int attributeCount, int iterationCount, CharmListStr & transformResults, CharmListStr & decoutResults)
+void benchmarkLW(Lw10 & lw, ofstream & outfile0, ofstream & outfile1, ofstream & outfile2, int attributeCount, int iterationCount, CharmListStr & keygenResults, CharmListStr & transformResults, CharmListStr & decoutResults)
 {
-	Benchmark benchT, benchD;
+	Benchmark benchT, benchD, benchK;
 	CharmMetaList msk, pk;
-	CharmList gpk, skBlinded, ct;
+	CharmList gpk, skBlinded, skBlinded2, ct;
 	CharmListStr authS, userS; // set this
 	CharmListZR blindingFactorKBlinded;
 	CharmList transformOutputList, transformOutputListForLoop;
@@ -47,7 +47,8 @@ void benchmarkLW(Lw10 & lw, ofstream & outfile1, ofstream & outfile2, int attrib
 
 	string gid = "jhu@authority.com"; // , policy_str = "((ATTR4 or ATTR3) and (ATTR2 or ATTR1))"; // set this
 
-    double tf_in_ms, de_in_ms;
+    double tf_in_ms, de_in_ms, kg_in_ms;
+    stringstream s0;
 
     getAttributes(authS, attributeCount);
     getAttributes(userS, attributeCount);
@@ -57,6 +58,18 @@ void benchmarkLW(Lw10 & lw, ofstream & outfile1, ofstream & outfile2, int attrib
     lw.setup(gpk);
     lw.authsetup(gpk, authS, msk, pk);
 
+	// BENCHMARK KEYGEN SETUP
+	for(int i = 0; i < iterationCount; i++) {
+		benchK.start();
+	    lw.keygen(gpk, msk, gid, userS, blindingFactorKBlinded, skBlinded2);
+		benchK.stop();
+		kg_in_ms = benchK.computeTimeInMilliseconds();
+	}
+	cout << "Keygen avg: " << benchK.getAverage() << " ms" << endl;
+	s0 << attributeCount << " " << benchK.getAverage() << endl;
+	outfile0 << s0.str();
+    keygenResults[attributeCount] = benchK.getRawResultString();
+	// BENCHMARK KEYGEN SETUP
     lw.keygen(gpk, msk, gid, userS, blindingFactorKBlinded, skBlinded);
 
     M = lw.group.random(GT_t);
@@ -92,6 +105,9 @@ void benchmarkLW(Lw10 & lw, ofstream & outfile1, ofstream & outfile2, int attrib
 	s2 << attributeCount << " " << benchD.getAverage() << endl;
 	outfile2 << s2.str();
 	decoutResults[attributeCount] = benchD.getRawResultString();
+	// measure ciphertext size
+	cout << "CT size: " << measureSize(ct) << " bytes" << endl;
+	cout << "CTOut size: " << measureSize(transformOutputList) + measureSize(transformOutputListForLoop) << " bytes" << endl;
 
 //    cout << convert_str(M) << endl;
 //    cout << convert_str(newM) << endl;
@@ -118,31 +134,36 @@ int main(int argc, const char *argv[])
 
 	Lw10 lw;
 	string filename = string(argv[0]);
-	stringstream s3, s4;
-	ofstream outfile1, outfile2, outfile3, outfile4;
+	stringstream s3, s4, s5;
+	ofstream outfile0, outfile1, outfile2, outfile3, outfile4, outfile5;
+	string f0 = filename + "_keygenout.dat";
 	string f1 = filename + "_transform.dat";
 	string f2 = filename + "_decout.dat";
 	string f3 = filename + "_transform_raw.txt";
 	string f4 = filename + "_decout_raw.txt";
+	string f5 = filename + "_keygenout_raw.txt";
+	outfile0.open(f0.c_str());
 	outfile1.open(f1.c_str());
 	outfile2.open(f2.c_str());
 	outfile3.open(f3.c_str());
 	outfile4.open(f4.c_str());
+	outfile5.open(f5.c_str());
 
-	CharmListStr transformResults, decoutResults;
+	CharmListStr keygenResults, transformResults, decoutResults;
 	if(isEqual(fixOrRange, RANGE)) {
 		for(int i = 2; i <= attributeCount; i++) {
 			cout << "Benchmark with " << i << " attributes." << endl;
-			benchmarkLW(lw, outfile1, outfile2, i, iterationCount, transformResults, decoutResults);
+			benchmarkLW(lw, outfile0, outfile1, outfile2, i, iterationCount, keygenResults, transformResults, decoutResults);
 		}
 		s3 << transformResults << endl;
 		s4 << decoutResults << endl;
 	}
 	else if(isEqual(fixOrRange, FIXED)) {
 		cout << "Benchmark with " << attributeCount << " attributes." << endl;
-		benchmarkLW(lw, outfile1, outfile2, attributeCount, iterationCount, transformResults, decoutResults);
+		benchmarkLW(lw, outfile0, outfile1, outfile2, attributeCount, iterationCount, keygenResults, transformResults, decoutResults);
 		s3 << attributeCount << " " << transformResults[attributeCount] << endl;
 		s4 << attributeCount << " " << decoutResults[attributeCount] << endl;
+		s5 << attributeCount << " " << keygenResults[attributeCount] << endl;
 	}
 	else {
 		cout << "invalid option." << endl;
@@ -151,10 +172,14 @@ int main(int argc, const char *argv[])
 
 	outfile3 << s3.str();
 	outfile4 << s4.str();
+	outfile5 << s5.str();
+	outfile0.close();
 	outfile1.close();
 	outfile2.close();
 	outfile3.close();
 	outfile4.close();
+	outfile5.close();
+
 //	cout << "<=== Transform benchmarkWATERS breakdown ===>" << endl;
 //	cout << transformResults << endl;
 //	cout << "<=== Transform benchmarkWATERS breakdown ===>" << endl;

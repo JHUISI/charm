@@ -636,8 +636,8 @@ int measureSize(Element & e)
 		return measureSize(e.sList);
 	else if(e.type == listInt_t)
 		return 0; // not focusing on integers
-	else
-		cout << "Invalid type: " << e.type << endl;
+//	else
+//		cout << "Invalid type: " << e.type << endl;
 	return 0;
 }
 
