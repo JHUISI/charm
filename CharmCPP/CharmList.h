@@ -185,5 +185,14 @@ bool is_base64(unsigned char c);
 
 extern string Element_ToBytes(Element &e);
 extern int Element_FromBytes(Element &e, int type, unsigned char *data);
+int measureSize(CharmList & c);
+int measureSize(CharmListStr & c);
+int measureSize(CharmListZR & c);
+int measureSize(CharmListG1 & c);
+#if ASYMMETRIC == 1
+int measureSize(CharmListG2 & c);
+#endif
+int measureSize(CharmListGT & c);
+int measureSize(Element & e);
 
 #endif

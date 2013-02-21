@@ -5,14 +5,19 @@ using namespace std;
 
 int main()
 {
-    PairingGroup group(SS512);
+    PairingGroup group(MNT160);
+    CharmList ct;
     string id = "somebody@example.com";
     string id2 = id; // "somebody@example.com";
 
     ZR a = group.hashListToZR(id);
     ZR b = group.hashListToZR(id2);
+    ct.insert(0, a);
+    string s = serialize(ct[0]);
+//    ct.insert(1, group.mul(a, b));
     cout << "a: " << a << endl;
     cout << "b: " << b << endl;
+    cout << "serialized: " << s << " len: " << s.size() << endl;
 
 /*
     CharmList list, list2, list3;

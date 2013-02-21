@@ -589,3 +589,114 @@ CharmMetaList& CharmMetaList::operator=(const CharmMetaList& cList)
 }
 
 
+int measureSize(CharmList & c)
+{
+	int len = c.length();
+	int byteCount = 0;
+	for(int i = 0; i < len; i++) {
+		if(c[i].type == ZR_t || c[i].type == G1_t || c[i].type == GT_t) {
+			string tmp = serialize(c[i]);
+			byteCount += tmp.size();
+		}
+#if ASYMMETRIC == 1
+		else if(c[i].type == G2_t) {
+			string tmp = serialize(c[i]);
+			byteCount += tmp.size();
+		}
+#endif
+		else if(c[i].type == Str_t) {
+			byteCount += c[i].strPtr.size();
+		}
+		else if(c[i].type == int_t) {
+			continue;
+		}
+		else {
+			byteCount += measureSize(c[i]);
+		}
+	}
+
+	return byteCount;
+}
+
+int measureSize(Element & e)
+{
+	if(e.type == list_t)
+		return measureSize(e.aList);
+	else if(e.type == listZR_t)
+		return measureSize(e.zrList);
+	else if(e.type == listG1_t)
+		return measureSize(e.g1List);
+#if ASYMMETRIC == 1
+	else if(e.type == listG2_t)
+		return measureSize(e.g2List);
+#endif
+	else if(e.type == listGT_t)
+		return measureSize(e.gtList);
+	else if(e.type == listStr_t)
+		return measureSize(e.sList);
+	else if(e.type == listInt_t)
+		return 0; // not focusing on integers
+	else
+		cout << "Invalid type: " << e.type << endl;
+	return 0;
+}
+
+int measureSize(CharmListZR & c)
+{
+	int len = c.length();
+	int byteCount = 0;
+	for(int i = 0; i < len; i++) {
+		Element e(c[i]);
+		string tmp = serialize(e);
+		byteCount += tmp.size();
+	}
+	return byteCount;
+}
+
+int measureSize(CharmListG1 & c)
+{
+	int len = c.length();
+	int byteCount = 0;
+	for(int i = 0; i < len; i++) {
+		Element e(c[i]);
+		string tmp = serialize(e);
+		byteCount += tmp.size();
+	}
+	return byteCount;
+}
+
+#if ASYMMETRIC == 1
+int measureSize(CharmListG2 & c)
+{
+	int len = c.length();
+	int byteCount = 0;
+	for(int i = 0; i < len; i++) {
+		Element e(c[i]);
+		string tmp = serialize(e);
+		byteCount += tmp.size();
+	}
+	return byteCount;
+}
+#endif
+
+int measureSize(CharmListGT & c)
+{
+	int len = c.length();
+	int byteCount = 0;
+	for(int i = 0; i < len; i++) {
+		Element e(c[i]);
+		string tmp = serialize(e);
+		byteCount += tmp.size();
+	}
+	return byteCount;
+}
+
+int measureSize(CharmListStr & c)
+{
+	int len = c.length();
+	int byteCount = 0;
+	for(int i = 0; i < len; i++) {
+		byteCount += c[i].size();
+	}
+	return byteCount;
+}

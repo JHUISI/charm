@@ -65,6 +65,7 @@ void benchmarkDFA(Dfa12 & dfa12, ofstream & outfile1, ofstream & outfile2, int w
 			dfa12.decrypt(sk, ct, newM, Ti, x);
 			benchD.stop();
 			de_in_ms = benchD.computeTimeInMilliseconds();
+//			benchD.estimateSize(ct);
 		}
 		cout << "Decrypt avg: " << benchD.getAverage() << " ms" << endl;
 		s2 << wStringCount << " " << benchD.getAverage() << endl;
