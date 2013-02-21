@@ -130,8 +130,8 @@ int main(int argc, const char *argv[])
 			cout << "Benchmark with " << i << " wStringCount." << endl;
 			benchmarkDFA(dfa12, outfile1, outfile2, i, iterationCount, transformResults, decoutResults);
 			stringstream s3, s4;
-			s3 << transformResults[i] << endl;
-			s4 << decoutResults[i] << endl;
+			s3 << i << " " << transformResults[i] << endl;
+			s4 << i << " " << decoutResults[i] << endl;
 			outfile3 << s3.str();
 			outfile3.flush();
 			outfile4 << s4.str();
