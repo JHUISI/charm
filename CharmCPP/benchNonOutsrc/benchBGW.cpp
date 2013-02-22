@@ -20,11 +20,11 @@ void getRandomReceivers(CharmListInt & recs, int numRecs)
 	return;
 }
 
-void benchmarkBGW(Bgw05 & bgw, ofstream & outfile2, int numOfRecs, int iterationCount, CharmListStr & decryptResults)
+void benchmarkBGW(Bgw05 & bgw, ofstream & outfile1, ofstream & outfile2, int numOfRecs, int iterationCount, CharmListStr & keygenResults, CharmListStr & decryptResults)
 {
-	Benchmark benchT, benchD;
+	Benchmark benchT, benchD, benchK;
 	CharmList pk, msk, Hdr, ct;
-	CharmMetaListG1 skComplete;
+	CharmMetaListG1 skComplete, skComplete2;
 	CharmListInt S;
 //	int receivers[] = {1, 3, 5, 12, 14};
 // 	S.init(receivers, 5);
@@ -33,10 +33,23 @@ void benchmarkBGW(Bgw05 & bgw, ofstream & outfile2, int numOfRecs, int iteration
 	ZR bf0;
 	getRandomReceivers(S, numOfRecs);
 	int n = numOfRecs, i = S[(rand() % numOfRecs)];
-
+	double kg_in_ms;
 	bgw.setup(n, pk, msk);
 //	cout << "pk: " << pk << endl;
 //	cout << "msk: " << msk << endl;
+	// BENCHMARK KEYGEN SETUP
+	for(int i = 0; i < iterationCount; i++) {
+		benchK.start();
+		bgw.keygen(pk, msk, n, skComplete2);
+		benchK.stop();
+		kg_in_ms = benchK.computeTimeInMilliseconds();
+	}
+	cout << "Keygen avg: " << benchK.getAverage() << " ms" << endl;
+    stringstream s1;
+	s1 << numOfRecs << " " << benchK.getAverage() << endl;
+	outfile1 << s1.str();
+    keygenResults[numOfRecs] = benchK.getRawResultString();
+	// BENCHMARK KEYGEN SETUP
 
 	bgw.keygen(pk, msk, n, skComplete);
 //	cout << "tk: " <<  skCompleteBlinded << endl;
@@ -48,7 +61,7 @@ void benchmarkBGW(Bgw05 & bgw, ofstream & outfile2, int numOfRecs, int iteration
 	K = ct[1].getGT();
 
 	double de_in_ms;
-	stringstream s1, s2;
+	stringstream s2;
 	for(int j = 0; j < iterationCount; j++) {
 		benchD.start();
 		bgw.decrypt(S, i, n, Hdr, pk, skComplete, KDecrypt);
@@ -84,24 +97,29 @@ int main(int argc, const char *argv[])
 	Bgw05 bgw;
 	srand(time(NULL));
 	string filename = string(argv[0]);
-	stringstream s4;
-	ofstream outfile2, outfile4;
+	stringstream s4, s5;
+	ofstream outfile1, outfile2, outfile3, outfile4;
+	string f1 = filename + "_keygen.dat";
 	string f2 = filename + "_decrypt.dat";
+	string f3 = filename + "_keygen_raw.txt";
 	string f4 = filename + "_decrypt_raw.txt";
+	outfile1.open(f1.c_str());
 	outfile2.open(f2.c_str());
+	outfile3.open(f3.c_str());
 	outfile4.open(f4.c_str());
 
-	CharmListStr decryptResults;
+	CharmListStr keygenResults, decryptResults;
 	if(isEqual(fixOrRange, RANGE)) {
 		for(int i = 2; i <= numRecs; i++) {
 			cout << "Benchmark with group of " << i << " recipients." << endl;
-			benchmarkBGW(bgw, outfile2, i, iterationCount, decryptResults);
+			benchmarkBGW(bgw, outfile1, outfile2, i, iterationCount, keygenResults, decryptResults);
 		}
 		s4 << decryptResults << endl;
 	}
 	else if(isEqual(fixOrRange, FIXED)) {
-		benchmarkBGW(bgw, outfile2, numRecs, iterationCount, decryptResults);
+		benchmarkBGW(bgw, outfile1, outfile2, numRecs, iterationCount, keygenResults, decryptResults);
 		s4 << numRecs << " " << decryptResults[numRecs] << endl;
+		s5 << numRecs << " " << keygenResults[numRecs] << endl;
 	}
 	else {
 		cout << "invalid option." << endl;
@@ -109,6 +127,8 @@ int main(int argc, const char *argv[])
 	}
 
 	outfile4 << s4.str();
+	outfile1 << s5.str();
+	outfile1.close();
 	outfile2.close();
 	outfile4.close();
 	return 0;

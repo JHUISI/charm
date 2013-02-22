@@ -16,23 +16,34 @@ string getID(int len)
 	return id;
 }
 
-void benchmarkDSE(Dsewaters09 & dse, ofstream & outfile2, int ID_string_len, int iterationCount, CharmListStr & decryptResults)
+void benchmarkDSE(Dsewaters09 & dse, ofstream & outfile1, ofstream & outfile2, int ID_string_len, int iterationCount, CharmListStr & keygenResults, CharmListStr & decryptResults)
 {
-	Benchmark benchT, benchD;
-    CharmList msk, mpk, pk, sk, ct;
+	Benchmark benchT, benchD, benchK;
+    CharmList msk, mpk, pk, sk, sk2, ct;
     GT M, newM;
     ZR bf0;
     string id = getID(ID_string_len); // "somebody@example.com and other people!!!!!";
-    double de_in_ms;
+    double de_in_ms, kg_in_ms;
 
 	dse.setup(mpk, msk);
-	dse.keygen(mpk, msk, id, sk);
+	for(int i = 0; i < iterationCount; i++) {
+		benchK.start();
+		dse.keygen(mpk, msk, id, sk2);
+		benchK.stop();
+		kg_in_ms = benchK.computeTimeInMilliseconds();
+	}
+	cout << "Keygen avg: " << benchK.getAverage() << " ms" << endl;
+    stringstream s1;
+	s1 << ID_string_len << " " << benchK.getAverage() << endl;
+	outfile1 << s1.str();
+    keygenResults[ID_string_len] = benchK.getRawResultString();
 
+	dse.keygen(mpk, msk, id, sk);
     M = dse.group.random(GT_t);
     //cout << "M: " << convert_str(M) << endl;
     dse.encrypt(mpk, M, id, ct);
 
-    stringstream s1, s2;
+    stringstream s2;
 
     //cout << "ct =\n" << ct << endl;
 	for(int i = 0; i < iterationCount; i++) {
@@ -74,22 +85,27 @@ int main(int argc, const char *argv[])
 	srand(time(NULL));
 	Dsewaters09 dse;
 	string filename = string(argv[0]);
-	stringstream s4;
+	stringstream s3, s4;
 	ofstream outfile1, outfile2, outfile3, outfile4;
+	string f1 = filename + "_keygen.dat";
 	string f2 = filename + "_decrypt.dat";
+	string f3 = filename + "_keygen_raw.txt";
 	string f4 = filename + "_decrypt_raw.txt";
+	outfile1.open(f1.c_str());
 	outfile2.open(f2.c_str());
+	outfile3.open(f3.c_str());
 	outfile4.open(f4.c_str());
 
-	CharmListStr decryptResults;
+	CharmListStr keygenResults, decryptResults;
 	if(isEqual(fixOrRange, RANGE)) {
 		for(int i = 2; i <= ID_string_len; i++) {
-			benchmarkDSE(dse, outfile2, i, iterationCount, decryptResults);
+			benchmarkDSE(dse, outfile1, outfile2, i, iterationCount, keygenResults, decryptResults);
 		}
 		s4 << decryptResults << endl;
 	}
 	else if(isEqual(fixOrRange, FIXED)) {
-		benchmarkDSE(dse, outfile2, ID_string_len, iterationCount, decryptResults);
+		benchmarkDSE(dse, outfile1, outfile2, ID_string_len, iterationCount, keygenResults, decryptResults);
+		s3 << ID_string_len << " " << keygenResults[ID_string_len] << endl;
 		s4 << ID_string_len << " " << decryptResults[ID_string_len] << endl;
 	}
 	else {
@@ -97,8 +113,11 @@ int main(int argc, const char *argv[])
 		return -1;
 	}
 
+	outfile3 << s3.str();
 	outfile4 << s4.str();
+	outfile1.close();
 	outfile2.close();
+	outfile3.close();
 	outfile4.close();
 	return 0;
 }

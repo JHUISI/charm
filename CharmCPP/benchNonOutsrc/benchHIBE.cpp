@@ -15,24 +15,35 @@ string getID(int len)
 	return id;
 }
 
-void benchmarkHIBE(Hibe & hibe, ofstream & outfile2, int ID_string_len, int iterationCount, CharmListStr & decryptResults)
+void benchmarkHIBE(Hibe & hibe, ofstream & outfile1, ofstream & outfile2, int ID_string_len, int iterationCount, CharmListStr & keygenResults, CharmListStr & decryptResults)
 {
 	int l = 5;
 	int z = 32;
-	Benchmark benchT, benchD;
-    CharmList mk, mpk, pk, sk, ct;
+	Benchmark benchT, benchD, benchK;
+    CharmList mk, mpk, pk, sk, sk2, ct;
     GT M, newM;
     ZR uf0;
     string id = getID(ID_string_len); // "somebody@example.com"; // make this longer?
-    double de_in_ms;
+    double de_in_ms, kg_in_ms;
 
 	hibe.setup(l, z, mpk, mk);
-	hibe.keygen(mpk, mk, id, pk, sk);
+	for(int i = 0; i < iterationCount; i++) {
+		benchK.start();
+		hibe.keygen(mpk, mk, id, pk, sk2);
+		benchK.stop();
+		kg_in_ms = benchK.computeTimeInMilliseconds();
+	}
+	cout << "Keygen avg: " << benchK.getAverage() << " ms" << endl;
+    stringstream s1;
+	s1 << ID_string_len << " " << benchK.getAverage() << endl;
+	outfile1 << s1.str();
+    keygenResults[ID_string_len] = benchK.getRawResultString();
 
+	hibe.keygen(mpk, mk, id, pk, sk);
     M = hibe.group.random(GT_t);
     hibe.encrypt(mpk, pk, M, ct);
 
-    stringstream s1, s2;
+    stringstream s2;
 
     //cout << "ct =\n" << ct << endl;
 	for(int i = 0; i < iterationCount; i++) {
@@ -73,22 +84,27 @@ int main(int argc, const char *argv[])
 	srand(time(NULL));
 	Hibe hibe;
 	string filename = string(argv[0]);
-	stringstream s4;
-	ofstream outfile2, outfile4;
+	stringstream s3, s4;
+	ofstream outfile1, outfile2, outfile3, outfile4;
+	string f1 = filename + "_keygen.dat";
 	string f2 = filename + "_decrypt.dat";
+	string f3 = filename + "_keygen_raw.txt";
 	string f4 = filename + "_decrypt_raw.txt";
+	outfile1.open(f1.c_str());
 	outfile2.open(f2.c_str());
+	outfile3.open(f3.c_str());
 	outfile4.open(f4.c_str());
 
-	CharmListStr decryptResults;
+	CharmListStr keygenResults, decryptResults;
 	if(isEqual(fixOrRange, RANGE)) {
 		for(int i = 2; i <= ID_string_len; i++) {
-			benchmarkHIBE(hibe, outfile2, i, iterationCount, decryptResults);
+			benchmarkHIBE(hibe, outfile1, outfile2, i, iterationCount, keygenResults, decryptResults);
 		}
 		s4 << decryptResults << endl;
 	}
 	else if(isEqual(fixOrRange, FIXED)) {
-		benchmarkHIBE(hibe, outfile2, ID_string_len, iterationCount, decryptResults);
+		benchmarkHIBE(hibe, outfile1, outfile2, ID_string_len, iterationCount, keygenResults, decryptResults);
+		s3 << ID_string_len << " " << keygenResults[ID_string_len] << endl;
 		s4 << ID_string_len << " " << decryptResults[ID_string_len] << endl;
 	}
 	else {
@@ -96,8 +112,11 @@ int main(int argc, const char *argv[])
 		return -1;
 	}
 
+	outfile3 << s3.str();
 	outfile4 << s4.str();
+	outfile1.close();
 	outfile2.close();
+	outfile3.close();
 	outfile4.close();
 	return 0;
 }

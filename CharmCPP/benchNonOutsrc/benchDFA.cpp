@@ -23,12 +23,12 @@ string getRandomHexString(int len)
 
 }
 
-void benchmarkDFA(Dfa12 & dfa12, ofstream & outfile1, ofstream & outfile2, int wStringCount, int iterationCount, int increment, CharmListStr & decryptResults)
+void benchmarkDFA(Dfa12 & dfa12, ofstream & outfile1, ofstream & outfile2, int wStringCount, int iterationCount, int increment, CharmListStr & keygenResults, CharmListStr & decryptResults)
 {
-	Benchmark benchT, benchD;
+	Benchmark benchT, benchD, benchK;
 	string letters = "xABCDEFabcdef0123456789";
 	dfa12.dfaUtil.constructDFA("0x(0|1|2|3|4|5|6|7|8|9|a|b|c|d|e|f|A|B|C|D|E|F)*", letters);
-	CharmList mpk, sk, ct;
+	CharmList mpk, sk, sk2, ct;
 	CharmListStr alphabet = dfa12.dfaUtil.getAlphabet();
 	CharmListStr w;
 	CharmListInt Q = dfa12.dfaUtil.getStates(), F = dfa12.dfaUtil.getAcceptStates(); // get all states, and all accept states
@@ -36,6 +36,7 @@ void benchmarkDFA(Dfa12 & dfa12, ofstream & outfile1, ofstream & outfile2, int w
 	ZR bf0;
 	G1 msk;
 	GT M, newM, Cm;
+	double kg_in_ms;
 
 	//cout << "Q:\n" << Q << endl;
 	//cout << "F:\n" << F << endl;
@@ -45,7 +46,19 @@ void benchmarkDFA(Dfa12 & dfa12, ofstream & outfile1, ofstream & outfile2, int w
 
 	//cout << "MPK:\n" << mpk << endl;
 	//cout << "MSK:\n" << convert_str(msk) << endl;
-	dfa12.keygen(mpk, msk, Q, T, F, sk);
+	for(int i = 0; i < iterationCount; i++) {
+		benchK.start();
+		dfa12.keygen(mpk, msk, Q, T, F, sk2);
+		benchK.stop();
+		kg_in_ms = benchK.computeTimeInMilliseconds();
+	}
+	cout << "Keygen avg: " << benchK.getAverage() << " ms" << endl;
+    stringstream s1;
+	s1 << wStringCount << " " << benchK.getAverage() << endl;
+	outfile1 << s1.str();
+    keygenResults[wStringCount] = benchK.getRawResultString();
+
+    dfa12.keygen(mpk, msk, Q, T, F, sk);
 
 	//cout << "SK:\n" << skBlinded << endl;
 
@@ -65,7 +78,6 @@ void benchmarkDFA(Dfa12 & dfa12, ofstream & outfile1, ofstream & outfile2, int w
 			dfa12.decrypt(sk, ct, newM, Ti, x);
 			benchD.stop();
 			de_in_ms = benchD.computeTimeInMilliseconds();
-//			benchD.estimateSize(ct);
 		}
 		cout << "Decrypt avg: " << benchD.getAverage() << " ms" << endl;
 		s2 << wStringCount << " " << benchD.getAverage() << endl;
@@ -103,16 +115,20 @@ int main(int argc, const char *argv[])
 	Dfa12 dfa12;
 	string filename = string(argv[0]);
 	ofstream outfile1, outfile2, outfile3, outfile4;
+	string f1 = filename + "_keygen.dat";
 	string f2 = filename + "_decrypt.dat";
+	string f3 = filename + "_keygen_raw.txt";
 	string f4 = filename + "_decrypt_raw.txt";
+	outfile1.open(f1.c_str());
 	outfile2.open(f2.c_str());
+	outfile3.open(f3.c_str());
 	outfile4.open(f4.c_str());
 
-	CharmListStr decryptResults;
+	CharmListStr keygenResults, decryptResults;
 	if(isEqual(fixOrRange, RANGE)) {
 		for(int i = 2; i <= wStringCount; i += incrementCount) {
 			cout << "Benchmark with " << i << " wStringCount." << endl;
-			benchmarkDFA(dfa12, outfile1, outfile2, i, iterationCount, incrementCount, decryptResults);
+			benchmarkDFA(dfa12, outfile1, outfile2, i, iterationCount, incrementCount, keygenResults, decryptResults);
 			stringstream s4;
 			s4 << i << " " << decryptResults[i] << endl;
 			outfile4 << s4.str();
@@ -121,8 +137,11 @@ int main(int argc, const char *argv[])
 	}
 	else if(isEqual(fixOrRange, FIXED)) {
 		cout << "Benchmark with " << wStringCount << " wStringCount." << endl;
-		benchmarkDFA(dfa12, outfile1, outfile2, wStringCount, iterationCount, incrementCount, decryptResults);
-		stringstream s4;
+		benchmarkDFA(dfa12, outfile1, outfile2, wStringCount, iterationCount, incrementCount, keygenResults, decryptResults);
+		stringstream s3, s4;
+		s3 << wStringCount << " " << keygenResults[wStringCount] << endl;
+		outfile3 << s3.str();
+		outfile3.flush();
 		s4 << wStringCount << " " << decryptResults[wStringCount] << endl;
 		outfile4 << s4.str();
 		outfile4.flush();
@@ -131,8 +150,9 @@ int main(int argc, const char *argv[])
 		cout << "invalid option." << endl;
 		return -1;
 	}
-
+	outfile1.close();
 	outfile2.close();
+	outfile3.close();
 	outfile4.close();
 //	cout << "<=== Transform benchmarkWATERS breakdown ===>" << endl;
 //	cout << transformResults << endl;

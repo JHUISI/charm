@@ -35,11 +35,11 @@ string getPolicy(int max)
 	return policystr;
 }
 
-void benchmarkLW(Lw10 & lw, ofstream & outfile2, int attributeCount, int iterationCount, CharmListStr & decryptResults)
+void benchmarkLW(Lw10 & lw, ofstream & outfile1, ofstream & outfile2, int attributeCount, int iterationCount, CharmListStr & keygenResults, CharmListStr & decryptResults)
 {
-	Benchmark benchT, benchD;
+	Benchmark benchT, benchD, benchK;
 	CharmMetaList msk, pk;
-	CharmList gpk, sk, ct;
+	CharmList gpk, sk, sk2, ct;
 	CharmListStr authS, userS; // set this
 	GT M, newM;
 
@@ -54,12 +54,23 @@ void benchmarkLW(Lw10 & lw, ofstream & outfile2, int attributeCount, int iterati
 
     lw.setup(gpk);
     lw.authsetup(gpk, authS, msk, pk);
+	for(int i = 0; i < iterationCount; i++) {
+		benchK.start();
+	    lw.keygen(gpk, msk, gid, userS, sk2);
+		benchK.stop();
+		double kg_in_ms = benchK.computeTimeInMilliseconds();
+	}
+	cout << "Keygen avg: " << benchK.getAverage() << " ms" << endl;
+    stringstream s1;
+	s1 << attributeCount << " " << benchK.getAverage() << endl;
+	outfile1 << s1.str();
+    keygenResults[attributeCount] = benchK.getRawResultString();
 
     lw.keygen(gpk, msk, gid, userS, sk);
     M = lw.group.random(GT_t);
     lw.encrypt(pk, gpk, M, policy_str, ct);
 
-    stringstream s1, s2;
+    stringstream s2;
 
 	for(int i = 0; i < iterationCount; i++) {
 		// run Decrypt
@@ -102,23 +113,28 @@ int main(int argc, const char *argv[])
 	Lw10 lw;
 	string filename = string(argv[0]);
 	stringstream s3, s4;
-	ofstream outfile2, outfile4;
+	ofstream outfile1, outfile2, outfile3, outfile4;
+	string f1 = filename + "_keygen.dat";
 	string f2 = filename + "_decrypt.dat";
+	string f3 = filename + "_keygen_raw.txt";
 	string f4 = filename + "_decrypt_raw.txt";
+	outfile1.open(f1.c_str());
 	outfile2.open(f2.c_str());
+	outfile3.open(f3.c_str());
 	outfile4.open(f4.c_str());
 
-	CharmListStr decryptResults;
+	CharmListStr keygenResults, decryptResults;
 	if(isEqual(fixOrRange, RANGE)) {
 		for(int i = 2; i <= attributeCount; i++) {
 			cout << "Benchmark with " << i << " attributes." << endl;
-			benchmarkLW(lw, outfile2, i, iterationCount, decryptResults);
+			benchmarkLW(lw, outfile1, outfile2, i, iterationCount, keygenResults, decryptResults);
 		}
 		s4 << decryptResults << endl;
 	}
 	else if(isEqual(fixOrRange, FIXED)) {
 		cout << "Benchmark with " << attributeCount << " attributes." << endl;
-		benchmarkLW(lw, outfile2, attributeCount, iterationCount, decryptResults);
+		benchmarkLW(lw, outfile1, outfile2, attributeCount, iterationCount, keygenResults, decryptResults);
+		s3 << attributeCount << " " << keygenResults[attributeCount] << endl;
 		s4 << attributeCount << " " << decryptResults[attributeCount] << endl;
 	}
 	else {
@@ -126,8 +142,11 @@ int main(int argc, const char *argv[])
 		return -1;
 	}
 
+	outfile3 << s3.str();
 	outfile4 << s4.str();
+	outfile1.close();
 	outfile2.close();
+	outfile3.close();
 	outfile4.close();
 	return 0;
 }

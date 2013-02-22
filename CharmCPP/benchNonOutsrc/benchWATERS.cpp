@@ -32,23 +32,34 @@ string getPolicy(int max)
 	return policystr;
 }
 
-void benchmarkWATERS(Waters09 & waters, ofstream & outfile2, int attributeCount, int iterationCount, CharmListStr & decryptResults)
+void benchmarkWATERS(Waters09 & waters, ofstream & outfile1, ofstream & outfile2, int attributeCount, int iterationCount, CharmListStr & keygenResults, CharmListStr & decryptResults)
 {
-	Benchmark benchT, benchD;
-    CharmList msk, pk, sk, ct;
+	Benchmark benchT, benchD, benchK;
+    CharmList msk, pk, sk, sk2, ct;
     CharmListStr S;
     GT M, newM;
-    double de_in_ms;
+    double de_in_ms, kg_in_ms;
 
     waters.setup(msk, pk);
     getAttributes(S, attributeCount);
-    waters.keygen(pk, msk, S, sk);
+	for(int i = 0; i < iterationCount; i++) {
+		benchK.start();
+	    waters.keygen(pk, msk, S, sk2);
+		benchK.stop();
+		kg_in_ms = benchK.computeTimeInMilliseconds();
+	}
+	cout << "Keygen avg: " << benchK.getAverage() << " ms" << endl;
+    stringstream s1;
+	s1 << attributeCount << " " << benchK.getAverage() << endl;
+	outfile1 << s1.str();
+    keygenResults[attributeCount] = benchK.getRawResultString();
 
+    waters.keygen(pk, msk, S, sk);
     M = waters.group.random(GT_t);
     string policy_str =  getPolicy(attributeCount); // get a policy string
     waters.encrypt(pk, M, policy_str, ct);
 
-    stringstream s1, s2;
+    stringstream s2;
 
     //cout << "ct =\n" << ct << endl;
 	for(int i = 0; i < iterationCount; i++) {
@@ -88,23 +99,28 @@ int main(int argc, const char *argv[])
 	Waters09 waters;
 	string filename = string(argv[0]);
 	stringstream s3, s4;
-	ofstream outfile2, outfile4;
+	ofstream outfile1, outfile2, outfile3, outfile4;
+	string f1 = filename + "_keygen.dat";
 	string f2 = filename + "_decrypt.dat";
+	string f3 = filename + "_keygen_raw.txt";
 	string f4 = filename + "_decrypt_raw.txt";
+	outfile1.open(f1.c_str());
 	outfile2.open(f2.c_str());
+	outfile3.open(f3.c_str());
 	outfile4.open(f4.c_str());
 
-	CharmListStr decryptResults;
+	CharmListStr keygenResults, decryptResults;
 	if(isEqual(fixOrRange, RANGE)) {
 		for(int i = 2; i <= attributeCount; i++) {
 			cout << "Benchmark with " << i << " attributes." << endl;
-			benchmarkWATERS(waters, outfile2, i, iterationCount, decryptResults);
+			benchmarkWATERS(waters, outfile1, outfile2, i, iterationCount, keygenResults, decryptResults);
 		}
 		s4 << decryptResults << endl;
 	}
 	else if(isEqual(fixOrRange, FIXED)) {
 		cout << "Benchmark with " << attributeCount << " attributes." << endl;
-		benchmarkWATERS(waters, outfile2, attributeCount, iterationCount, decryptResults);
+		benchmarkWATERS(waters, outfile1, outfile2, attributeCount, iterationCount, keygenResults, decryptResults);
+		s3 << attributeCount << " " << keygenResults[attributeCount] << endl;
 		s4 << attributeCount << " " << decryptResults[attributeCount] << endl;
 	}
 	else {
@@ -112,8 +128,11 @@ int main(int argc, const char *argv[])
 		return -1;
 	}
 
+	outfile3 << s3.str();
 	outfile4 << s4.str();
+	outfile1.close();
 	outfile2.close();
+	outfile3.close();
 	outfile4.close();
 	return 0;
 }
