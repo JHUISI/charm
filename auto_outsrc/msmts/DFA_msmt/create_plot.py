@@ -30,8 +30,8 @@ set terminal postscript eps enhanced color 'Helvetica' 10;
 set size 0.425,0.425;
 set output '%s_SS_512_CloudSource.eps';
 set yrange [0 : %d]; set xrange[1 : 802]; set xtics autofreq 100;
-set title 'SS512 Threshold Estimator' font 'Helvetica,10';
-set xlabel 'Size of input string (bytes)';
+set title 'SS512 Curve' font 'Helvetica,10';
+set xlabel 'Size of input string (symbols)';
 set ylabel 'Decryption time (ms)';
 plot '%s' w lines lw 6 title '%s', \\
  '%s' w lines lw 6 title '%s', \\
