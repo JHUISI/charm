@@ -17,7 +17,7 @@ set terminal postscript eps enhanced color 'Helvetica' 10;
 set size 0.425,0.425;
 set output '%s_MNT_160_CloudSource.eps';
 set yrange [0 : %d]; set xrange[1 : 100]; set xtics autofreq 20;
-set title 'MNT160 Threshold Estimator' font 'Helvetica,10';
+set title 'MNT160 Curve' font 'Helvetica,10';
 set xlabel 'Number of attributes in access-control policy';
 set ylabel 'Decryption time (ms)';
 plot '%s' w lines lw 6 title '%s', \\
