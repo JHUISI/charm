@@ -1969,9 +1969,23 @@ static PyObject *toInt(PyObject *self, PyObject *args) {
 		return (PyObject *) rop;
 	}
 
-	EXIT_IF(TRUE, "invalid type.");
+	EXIT_IF(TRUE, "not a charm integer type.");
 }
 
+static PyObject *getMod(PyObject *self, PyObject *args) {
+	Integer *intObj = NULL;
+
+	if (PyInteger_Check(args)) {
+		intObj = (Integer *) args;
+		Integer *rop = createNewInteger();
+		mpz_init_set(rop->e, intObj->m);
+		mpz_init(rop->m);
+
+		return (PyObject *) rop;
+	}
+
+	EXIT_IF(TRUE, "not a charm integer type.");
+}
 
 static PyObject *Integer_xor(PyObject *self, PyObject *other) {
 	Integer *rop = NULL, *op1 = NULL, *op2 = NULL;
@@ -2214,8 +2228,9 @@ PyMethodDef module_methods[] = {
 	{ "GetGeneralBenchmarks", (PyCFunction) int_get_all_results, METH_VARARGS, "Retrieve general benchmark info as a dictionary."},
 	{ "ClearBenchmark", (PyCFunction) int_clear_benchmark, METH_VARARGS, "Clears content of benchmark object"},
 #endif
-	{ "int2Bytes", (PyCFunction) toBytes, METH_O, "convert an integer object to a bytes object." },
+	{ "int2Bytes", (PyCFunction) toBytes, METH_O, "convert an integer object to a bytes object."},
 	{ "toInt", (PyCFunction) toInt, METH_O, "convert modular integer into an integer object."},
+	{ "getMod", (PyCFunction) getMod, METH_O, "get the modulus of a given modular integer object."},
 	{ NULL, NULL }
 };
 
