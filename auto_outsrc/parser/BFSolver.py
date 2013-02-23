@@ -571,8 +571,8 @@ class BFSolver:
         for k in self.isPartOfList:
             for i,j in self.constraintsDictVars.items():
                 if k in j:
-                    newDict[ i ] += hashtag
-                    self.solution[ i ] += hashtag
+                    if newDict[ i ].find(hashtag) == -1: newDict[ i ] += hashtag
+                    if self.solution[ i ].find(hashtag) == -1: self.solution[ i ] += hashtag
 
         BFMapForProof = bfMapKeyword + " = " + str(self.solution) + "\n"
         SKMapForKeygen = skBfMapKeyword + " = " + str(newDict) + "\n"
