@@ -344,7 +344,16 @@ int Integer_init(Integer *self, PyObject *args, PyObject *kwds) {
 
 	if (mod != NULL) {
 		if (_PyLong_Check(mod)) {
-			longObjToMPZ(self->m, mod);
+			mpz_t m;
+			mpz_init(m);
+			longObjToMPZ(m, mod);
+			if(mpz_sgn(m) > 0) mpz_set(self->m, m);
+			else {
+				mpz_clear(m);
+				PyErr_SetString(IntegerError, "negative modulus not allowed.");
+				return -1;
+			}
+			mpz_clear(m);
 		}
 		else if(PyInteger_Check(mod)) {
 			Integer *mod1 = (Integer *) mod;
@@ -512,26 +521,45 @@ static PyObject *Integer_set(Integer *self, PyObject *args) {
 static PyObject *Integer_add(PyObject *o1, PyObject *o2) {
 	// determine type of each side
 	Integer *lhs = NULL, *rhs = NULL, *rop = NULL;
-	int foundLHS = FALSE, foundRHS = FALSE;
-	unsigned long int lhs_value = 0, rhs_value = 0;
+	int foundLHS = FALSE, foundRHS = FALSE, errorOccured = FALSE;
+	mpz_t lhs_mpz, rhs_mpz;
+	mpz_init(lhs_mpz);
+	mpz_init(rhs_mpz);
 
-	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value);
+	Convert_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_mpz, rhs_mpz, errorOccured);
 	// perform operation
-	if (foundLHS) {
-		// debug("foundLHS\n");
-		rop = createNewInteger();
-		mpz_init(rop->e);
-		mpz_init_set(rop->m, rhs->m);
-		mpz_add_ui(rop->e, rhs->e, lhs_value);
+	if(errorOccured == TRUE) {
+		mpz_clear(lhs_mpz);
+		mpz_clear(rhs_mpz);
+		ErrorMsg("invalid left or right operand type.");
+	}
+	else if (foundLHS) {
+		//debug("foundLHS\n");
+		if(mpz_sgn(rhs->m) == 0) { // mpz_sgn(lhs_mpz) > 0
+			rop = createNewInteger();
+			mpz_init(rop->e);
+			mpz_init(rop->m);
+			mpz_add(rop->e, lhs_mpz, rhs->e);
+		}
+		else {
+			// operation: a + b % n = c... no longer allowed
+			ErrorMsg("unsupported operation.");
+		}
 	} else if (foundRHS) {
 		// debug("foundRHS!\n");
-		rop = createNewInteger();
-		mpz_init(rop->e);
-		mpz_init_set(rop->m, lhs->m);
-		mpz_add_ui(rop->e, lhs->e, rhs_value);
+		if(mpz_sgn(lhs->m) == 0) {
+			rop = createNewInteger();
+			mpz_init(rop->e);
+			mpz_init(rop->m);
+			mpz_add(rop->e, lhs->e, rhs_mpz);
+		}
+		else {
+			// operation: a % n + b ... are no longer allowed
+			ErrorMsg("unsupported operation.");
+		}
 	} else {
 		if (lhs->initialized && rhs->initialized) {
-			debug("Modulus equal? %d =?= 0\n", mpz_cmp(lhs->m, rhs->m));
+			// debug("Modulus equal? %d =?= 0\n", mpz_cmp(lhs->m, rhs->m));
 			if (mpz_cmp(lhs->m, rhs->m) == 0) {
 				rop = createNewInteger();
 				mpz_init(rop->e);
@@ -556,26 +584,45 @@ static PyObject *Integer_add(PyObject *o1, PyObject *o2) {
 static PyObject *Integer_sub(PyObject *o1, PyObject *o2) {
 	// determine type of each side
 	Integer *lhs = NULL, *rhs = NULL, *rop = NULL;
-	int foundLHS = FALSE, foundRHS = FALSE;
-	unsigned long int lhs_value = 0, rhs_value = 0;
+	int foundLHS = FALSE, foundRHS = FALSE, errorOccured = FALSE;
+	mpz_t lhs_mpz, rhs_mpz;
+	mpz_init(lhs_mpz);
+	mpz_init(rhs_mpz);
 
-	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value);
+	Convert_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_mpz, rhs_mpz, errorOccured);
 	// perform operation
-	if (foundLHS) {
+	if(errorOccured == TRUE) {
+		mpz_clear(lhs_mpz);
+		mpz_clear(rhs_mpz);
+		ErrorMsg("invalid left or right operand type.");
+	}
+	else if (foundLHS) {
 		// debug("foundLHS\n");
-		rop = createNewInteger();
-		mpz_init(rop->e);
-		mpz_init_set(rop->m, rhs->m);
-		mpz_ui_sub(rop->e, lhs_value, rhs->e);
+		if(mpz_sgn(rhs->m) == 0) { // mpz_sgn(lhs_mpz) > 0
+			rop = createNewInteger();
+			mpz_init(rop->e);
+			mpz_init(rop->m);
+			mpz_sub(rop->e, lhs_mpz, rhs->e);
+		}
+		else {
+			// operation: a - b % n = c... no longer allowed
+			ErrorMsg("unsupported operation.");
+		}
 	} else if (foundRHS) {
 		// debug("foundRHS!\n");
-		rop = createNewInteger();
-		mpz_init(rop->e);
-		mpz_init_set(rop->m, lhs->m);
-		mpz_sub_ui(rop->e, lhs->e, rhs_value);
+		if(mpz_sgn(lhs->m) == 0) {
+			rop = createNewInteger();
+			mpz_init(rop->e);
+			mpz_init(rop->m);
+			mpz_sub(rop->e, lhs->e, rhs_mpz);
+		}
+		else {
+			// operation: a % n - b ... are no longer allowed
+			ErrorMsg("unsupported operation.");
+		}
 	} else {
 		if (lhs->initialized && rhs->initialized) {
-			debug("Modulus equal? %d =?= 0\n", mpz_cmp(lhs->m, rhs->m));
+			// debug("Modulus equal? %d =?= 0\n", mpz_cmp(lhs->m, rhs->m));
 			if (mpz_cmp(lhs->m, rhs->m) == 0) {
 				rop = createNewInteger();
 				mpz_init(rop->e);
@@ -587,8 +634,10 @@ static PyObject *Integer_sub(PyObject *o1, PyObject *o2) {
 		}
 	}
 
+	mpz_clear(lhs_mpz);
+	mpz_clear(rhs_mpz);
 	if(mpz_sgn(rop->e) < 0) {
-		_reduce(rop);
+		mpz_add(rop->e, rop->e, rop->m);
 	}
 #ifdef BENCHMARK_ENABLED
 	UPDATE_BENCHMARK(SUBTRACTION, dBench);
@@ -599,48 +648,62 @@ static PyObject *Integer_sub(PyObject *o1, PyObject *o2) {
 static PyObject *Integer_mul(PyObject *o1, PyObject *o2) {
 	// determine type of each side
 	Integer *lhs = NULL, *rhs = NULL, *rop = NULL;
-	int foundLHS = FALSE, foundRHS = FALSE;
-	unsigned long int lhs_value = 0, rhs_value = 0;
+	int foundLHS = FALSE, foundRHS = FALSE, errorOccured = FALSE;
+	// long lhs_value = 0, rhs_value = 0;
+	mpz_t lhs_mpz, rhs_mpz;
+	mpz_init(lhs_mpz);
+	mpz_init(rhs_mpz);
 
-	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value);
+	Convert_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_mpz, rhs_mpz, errorOccured);
 	// perform operation
-	if (foundLHS) {
-		// debug("foundLHS\n");
-		rop = createNewInteger();
-		mpz_init(rop->e);
-		mpz_init_set(rop->m, rhs->m);
-		mpz_mul_ui(rop->e, rhs->e, lhs_value);
+	if(errorOccured) {
+		mpz_clear(lhs_mpz);
+		mpz_clear(rhs_mpz);
+		ErrorMsg("invalid left or right operand type.");
+	}
+	else if (foundLHS) {
+		//debug("foundLHS\n");
+		if(mpz_sgn(rhs->m) == 0) { // mpz_sgn(lhs_mpz) > 0
+			rop = createNewInteger();
+			mpz_init(rop->e);
+			mpz_init(rop->m);
+			mpz_mul(rop->e, lhs_mpz, rhs->e);
+		}
+		else {
+			// operation: a * b % n = c... no longer allowed
+			ErrorMsg("unsupported operation.");
+		}
 	} else if (foundRHS) {
 		// debug("foundRHS!\n");
-		rop = createNewInteger();
-		mpz_init(rop->e);
-		mpz_init_set(rop->m, lhs->m);
-		mpz_mul_ui(rop->e, lhs->e, rhs_value);
+		if(mpz_sgn(lhs->m) == 0) {
+			rop = createNewInteger();
+			mpz_init(rop->e);
+			mpz_init(rop->m);
+			mpz_mul(rop->e, lhs->e, rhs_mpz);
+		}
+		else {
+			// operation: a % n * b ... are no longer allowed
+			ErrorMsg("unsupported operation.");
+		}
 	} else {
 		if (lhs->initialized && rhs->initialized) {
-			debug("Modulus equal? %d =?= 0\n", mpz_cmp(lhs->m, rhs->m));
+			// debug("Modulus equal? %d =?= 0\n", mpz_cmp(lhs->m, rhs->m));
+			// if modulus is equal
 			if (mpz_cmp(lhs->m, rhs->m) == 0) {
 				// compute ((lhs % m) * (rhs % m)) % m (reduce before)
 				rop = createNewInteger();
-				mpz_t e;
 				mpz_init_set(rop->e, lhs->e);
 				mpz_init_set(rop->m, lhs->m);
-//				_reduce(rop);
-//				if(mpz_cmp(rhs->e, rhs->m) < 0) {
 				mpz_mul(rop->e, rop->e, rhs->e);
-//				}
-//				else {
-//					mpz_init_set(e, lhs->e);
-//					if(mpz_sgn(lhs->m) > 0) mpz_mod(e, e, lhs->m);
-//					mpz_mul(rop->e, rop->e, e);
-//					mpz_clear(e);
-//				}
-			} else {
-				EXIT_IF(TRUE, "cannot multiply integers with different modulus.");
+			}
+			else {
+				EXIT_IF(TRUE, "invalid operation - integers with different or no modulus.");
 			}
 		}
 	}
 
+	mpz_clear(lhs_mpz);
+	mpz_clear(rhs_mpz);
 //	_reduce(rop);
 #ifdef BENCHMARK_ENABLED
 	UPDATE_BENCHMARK(MULTIPLICATION, dBench);

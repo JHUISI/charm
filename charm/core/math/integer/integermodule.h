@@ -57,6 +57,21 @@
 
 #if PY_MAJOR_VERSION >= 3
 
+#define Convert_Types(left, right, lhs, rhs, foundLHS, foundRHS, lhs_mpz, rhs_mpz, errorOccured)  \
+	if(PyInteger_Check(left)) { \
+		lhs = (Integer *) left; } \
+	else if(PyLong_Check(left)) { \
+		longObjToMPZ(lhs_mpz, left);	\
+		foundLHS = TRUE;  } \
+	else { errorOccured = TRUE; } \
+						\
+	if(PyInteger_Check(right)) {  \
+		rhs = (Integer *) right; } \
+	else if(PyLong_Check(right)) {  \
+		longObjToMPZ(rhs_mpz, right);	\
+		foundRHS = TRUE;  } \
+	else { errorOccured = TRUE; }
+
 #define Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value)  \
 	if(PyInteger_Check(o1)) { \
 		lhs = (Integer *) o1; } \
