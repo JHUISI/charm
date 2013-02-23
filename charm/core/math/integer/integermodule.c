@@ -1885,7 +1885,11 @@ static PyObject *deserialize(PyObject *self, PyObject *args) {
 		EXIT_IF(TRUE, "invalid argument.");
 	}
 
-	unsigned char *serial_buf = (unsigned char *) PyBytes_AsString(bytesObj);
+	uint8_t *serial_buf2 = (uint8_t *) PyBytes_AsString(bytesObj);
+	int serial_buf2_len = strlen((char *) serial_buf2);
+	uint8_t serial_buf[serial_buf2_len + 1];
+	memset(serial_buf, 0, serial_buf2_len);
+	memcpy(serial_buf, serial_buf2, serial_buf2_len);
 	/* get integer value */
 	char delim[] = ":";
 	char *token = NULL;
