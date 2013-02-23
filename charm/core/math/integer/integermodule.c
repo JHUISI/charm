@@ -371,35 +371,37 @@ int Integer_init(Integer *self, PyObject *args, PyObject *kwds) {
 
 static PyObject *Integer_equals(PyObject *o1, PyObject *o2, int opid) {
 	Integer *lhs = NULL, *rhs = NULL;
-	int foundLHS = FALSE, foundRHS = FALSE, result = -1;
-	unsigned long int lhs_value = 0, rhs_value = 0;
+	int foundLHS = FALSE, foundRHS = FALSE, result = -1, errorOccured = FALSE;
+	mpz_t lhs_mpz, rhs_mpz, l, r;
+	mpz_init(lhs_mpz);
+	mpz_init(rhs_mpz);
 
-//	if(opid != Py_EQ && opid != Py_NE && opid != Py_LT && ) {
-//		ErrorMsg("only comparison supported is '==' or '!='");
-//		return NULL;
-//	}
-
-	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value);
-	mpz_t l, r;
-	if (foundLHS) {
+	Convert_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_mpz, rhs_mpz, errorOccured);
+	// perform operation
+	if(errorOccured) {
+		mpz_clear(lhs_mpz);
+		mpz_clear(rhs_mpz);
+		ErrorMsg("invalid left or right operand type.");
+	}
+	else if (foundLHS) {
 		debug("foundLHS\n");
 		if (mpz_sgn(rhs->m) == 0) {
-			result = mpz_cmp_ui(rhs->e, lhs_value);
+			result = mpz_cmp(lhs_mpz, rhs->e);
 		} else {
 			mpz_init(r);
 			mpz_mod(r, rhs->e, rhs->m);
-			result = mpz_cmp_ui(r, lhs_value);
+			result = mpz_cmp(r, lhs_mpz);
 			mpz_clear(r);
 		}
 	} else if (foundRHS) {
 		debug("foundRHS!\n");
 
 		if (mpz_sgn(lhs->m) == 0) {
-			result = mpz_cmp_ui(lhs->e, rhs_value);
+			result = mpz_cmp(lhs->e, rhs_mpz);
 		} else {
 			mpz_init(l);
 			mpz_mod(l, lhs->e, lhs->m);
-			result = mpz_cmp_ui(l, rhs_value);
+			result = mpz_cmp(l, rhs_mpz);
 			mpz_clear(l);
 		}
 	} else {
@@ -420,10 +422,14 @@ static PyObject *Integer_equals(PyObject *o1, PyObject *o2, int opid) {
 				mpz_clear(r);
 			}
 			else {
+				mpz_clear(lhs_mpz);
+				mpz_clear(rhs_mpz);
 				ErrorMsg("cannot compare integers with different modulus.");
 			}
 		}
 	}
+	mpz_clear(lhs_mpz);
+	mpz_clear(rhs_mpz);
 
 	if(opid == Py_EQ) {
 		if(result == 0) Py_RETURN_TRUE;
@@ -528,7 +534,7 @@ static PyObject *Integer_add(PyObject *o1, PyObject *o2) {
 
 	Convert_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_mpz, rhs_mpz, errorOccured);
 	// perform operation
-	if(errorOccured == TRUE) {
+	if(errorOccured) {
 		mpz_clear(lhs_mpz);
 		mpz_clear(rhs_mpz);
 		ErrorMsg("invalid left or right operand type.");
@@ -591,7 +597,7 @@ static PyObject *Integer_sub(PyObject *o1, PyObject *o2) {
 
 	Convert_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_mpz, rhs_mpz, errorOccured);
 	// perform operation
-	if(errorOccured == TRUE) {
+	if(errorOccured) {
 		mpz_clear(lhs_mpz);
 		mpz_clear(rhs_mpz);
 		ErrorMsg("invalid left or right operand type.");
@@ -747,28 +753,30 @@ static PyObject *Integer_long(PyObject *o1) {
  */
 static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 	Integer *lhs = NULL, *rhs = NULL, *rop = NULL;
-	int foundLHS = FALSE, foundRHS = FALSE;
-	unsigned long int lhs_value = 0, rhs_value = 0;
+	int foundLHS = FALSE, foundRHS = FALSE, errorOccured = FALSE;
+	mpz_t lhs_mpz, rhs_mpz;
+	mpz_init(lhs_mpz);
+	mpz_init(rhs_mpz);
 
-	Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value);
-
-	if (foundRHS && rhs_value > 0) {
+	Convert_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_mpz, rhs_mpz, errorOccured);
+	// perform operation
+	if(errorOccured) {
+		mpz_clear(lhs_mpz);
+		mpz_clear(rhs_mpz);
+		ErrorMsg("invalid left or right operand type.");
+	}
+	else if (foundRHS && mpz_sgn(rhs_mpz) > 0) {
 		/* Let d = gcd(a, n). The congruence equation ax = b (mod n) has a solution x if and only if d divides b,
 		 * in which case there are exactly d solutions between [0, n-1] these solutions are all congruent modulo n/d. */
-		//mpz_t tmp;
 		rop = createNewInteger();
-		mpz_init(rop->e);
 		mpz_init_set(rop->e, lhs->e);
 		mpz_init_set(rop->m, lhs->m);
-		if (mpz_divisible_ui_p(lhs->e, rhs_value) != 0) {
+		if (mpz_divisible_p(lhs->e, rhs_mpz) != 0) {
 			if (mpz_sgn(lhs->m) == 0) {
-				rop = createNewInteger();
-				mpz_init(rop->e);
-				mpz_init_set(rop->m, lhs->m);
-				mpz_divexact_ui(rop->e, lhs->e, rhs_value);
+				mpz_divexact(rop->e, lhs->e, rhs_mpz);
 			}
 		}
-		else if(mpz_sgn(rop->m) > 0 && rhs_value > 1) {
+		else if(mpz_sgn(rop->m) > 0 && mpz_cmp_ui(rhs_mpz, 1) == 0) {
 			mpz_mod(rop->e, rop->e, rop->m);
 			if(mpz_cmp(rop->e, rop->m) < 0) { // check if e < m, then divide e / rhs_value.
 				printf("Unimplemented.\n");
@@ -778,10 +786,7 @@ static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 //				mpz_clear(tmp);
 			}
 		}
-	} else if (foundLHS && lhs_value > 0) {
-		//printf("foundLHS + lhs_value > 0.");
-		mpz_t tmp;
-		mpz_init_set_ui(tmp, lhs_value);
+	} else if (foundLHS && mpz_sgn(lhs_mpz) > 0) {
 		rop = createNewInteger();
 		mpz_init(rop->e);
 		int rhs_mod = mpz_sgn(rhs->m);
@@ -789,24 +794,23 @@ static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 			mpz_init_set(rop->m, rhs->m);
 			int errcode = mpz_invert(rop->e, rhs->e, rhs->m);
 			if(errcode == 0) {
-				mpz_clear(tmp);
 				Py_DECREF(rop);
-				printf("division failed: could not find modular inverse.\n");
-				return NULL;
+				mpz_clear(lhs_mpz);
+				mpz_clear(rhs_mpz);
+				ErrorMsg("division failed: could not find modular inverse.\n");
 			}
 
-			if(lhs_value != 1) {
-				mpz_mul(rop->e, tmp, rop->e);
+			if(mpz_cmp_ui(lhs_mpz, 1) != 0) {
+				mpz_mul(rop->e, lhs_mpz, rop->e);
 				mpz_mod(rop->e, rop->e, rop->m);
 			}
 		}
-		else if(rhs_mod == 0 && mpz_divisible_p(tmp, rhs->e) != 0) {
+		else if(rhs_mod == 0 && mpz_divisible_p(lhs_mpz, rhs->e) != 0) {
 			rop = createNewInteger();
 			mpz_init(rop->e);
 			mpz_init_set(rop->m, rhs->m);
-			mpz_divexact(rop->e, tmp, rhs->e);
+			mpz_divexact(rop->e, lhs_mpz, rhs->e);
 		}
-		mpz_clear(tmp);
 	} else {
 		//		printf("lhs and rhs init? => ");
 		if (lhs->initialized && rhs->initialized) {
@@ -832,6 +836,8 @@ static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 		}
 	}
 
+	mpz_clear(lhs_mpz);
+	mpz_clear(rhs_mpz);
 	if (rop != NULL && mpz_sgn(rop->e) == 0) {
 		//PyObject_Del(rop);
 		Py_XDECREF(rop);
@@ -846,29 +852,37 @@ static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 	Integer *lhs = NULL, *rhs = NULL, *rop = NULL;
 	int foundLHS = FALSE, foundRHS = FALSE;
+	mpz_t exponent;
+	mpz_init(exponent);
 
-	Check_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS);
-
+	Convert_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS);
 	// TODO: handle foundLHS (e.g. 2 ** <int.Elem>)
 	if (foundRHS) {
 		debug("foundRHS!\n");
-		long rhs = PyLong_AsLong(o2);
-		if(PyErr_Occurred() || rhs >= 0) {
+//		long rhs = PyLong_AsLong(o2);
+#if PY_MAJOR_VERSION < 3
+		PyObject *_o2 = PyNumber_Long(o2);
+		longObjToMPZ(exponent, _o2);
+		Py_XDECREF(_o2);
+#else
+		longObjToMPZ(exponent, o2);
+#endif
+
+		if(PyErr_Occurred() || mpz_sgn(exponent) >= 0) {
 			//PyErr_Print(); // for debug purposes
 			PyErr_Clear();
 			debug("exponent is positive\n");
 			int sgn = mpz_sgn(lhs->m);
 			if(sgn > 0)  {
 				if(mpz_odd_p(lhs->m) > 0) {
-					mpz_t exp;
- 					mpz_init(exp);
-					longObjToMPZ(exp, o2);
-					print_mpz(exp, 10);
+//					mpz_t exp;
+// 					mpz_init(exp);
+//					longObjToMPZ(exp, o2);
+//					print_mpz(exp, 10);
 					rop = createNewInteger();
 					mpz_init(rop->e);
 					mpz_init_set(rop->m, lhs->m);
-					mpz_powm_sec(rop->e, lhs->e, exp, rop->m);
-					mpz_clear(exp);
+					mpz_powm_sec(rop->e, lhs->e, exponent, rop->m);
 				 }
 			}
 			else if(sgn == 0) { // no modulus
@@ -880,10 +894,11 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 				mpz_pow_ui(rop->e, lhs->e, exp);
 			}
 			else {
+				mpz_clear(exponent);
 				EXIT_IF(TRUE, "cannot exponentiate integers without modulus.");
 			}
 		}
-		else if(rhs == -1) {
+		else if(mpz_cmp_si(exponent, -1) == 0) {
 			debug("find modular inverse.\n");
 			rop = createNewInteger();
 			mpz_init(rop->e);
@@ -891,6 +906,7 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 			int errcode = mpz_invert(rop->e, lhs->e, lhs->m);
 			if(errcode == 0) {
 				Py_XDECREF(rop);
+				mpz_clear(exponent);
 				ErrorMsg("failed to find modular inverse.\n");
 			}
 		}
@@ -901,27 +917,19 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 			mpz_init_set(rop->m, lhs->m);
 			int errcode = mpz_invert(rop->e, lhs->e, rop->m);
 			if(errcode > 0) {
-				mpz_t exp;
-				mpz_init(exp);
-				longObjToMPZ(exp, o2);
-				mpz_neg(exp, exp);
-				mpz_powm_sec(rop->e, rop->e, exp, rop->m);
-				mpz_clear(exp);
+				mpz_neg(exponent, exponent);
+				mpz_powm_sec(rop->e, rop->e, exponent, rop->m);
 			}
 			else {
+				mpz_clear(exponent);
 				Py_XDECREF(rop);
 				ErrorMsg("failed to find modular inverse.\n");
 			}
 		}
+		mpz_clear(exponent);
 	} else if (foundLHS) {
-		// find modular inverse
-		//		debug("find modular inverse?\n");
-		//		PyObject *obj = Integer_invert((PyObject *) lhs);
-		//		if(obj == NULL) {
-		//			return NULL;
-		//		}
-		//		rop = (Integer *) obj;
-		ErrorMsg("left operand should be a charm.integer type.");
+		mpz_clear(exponent);
+		ErrorMsg("unsupported operation: left operand expected to be a charm.integer type.");
 	} else {
 		if (lhs->initialized && rhs->initialized) {
 			// if rhs has negative exponent
@@ -941,6 +949,7 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 						goto leave;
 					}
 					else {
+						mpz_clear(exponent);
 						Py_XDECREF(rop);
 						ErrorMsg("failed to find modular inverse.\n");
 					}
@@ -1239,9 +1248,8 @@ static PyObject *Integer_remainder(PyObject *o1, PyObject *o2) {
 
 	Integer *lhs = NULL, *rhs = NULL, *rop;
 	int foundLHS = FALSE, foundRHS = FALSE;
-	// unsigned long int lhs_value, rhs_value;
 
-	Check_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS); // , lhs_value, rhs_value);
+	Convert_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS);
 
 	if (foundLHS) {
 		rop = createNewInteger();
