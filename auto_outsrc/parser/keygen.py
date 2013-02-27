@@ -1339,7 +1339,14 @@ def keygen(file, config):
     # produce proof
     # generateTKProof(bfMap, config)
 
+    print("skBfMap before group is ", skBfMap)
+
+
     skBfMap = applyGroupSharingOptimization(skBfMap, config)
+
+
+    print("skBfMap after group is ", skBfMap)
+
     applyBlindingFactorsToScheme(skBfMap, config)
     secretKeyName = config.keygenSecVar
     addAssignmentForSKBlinded(config)
