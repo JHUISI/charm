@@ -3,8 +3,9 @@ import sdlpath
 from sdlparser.SDLParser import *
 from transformNEW import *
 from secretListInKeygen import getSecretList
-from outsrctechniques import SubstituteVar, GetAttributeVars
-import os, sys, string, random, importlib, time
+from outsrctechniques import SubstituteVar, GetAttributeVars, InPlaceReplaceAttr
+from outsrcproof import GenerateProof
+import os, re, sys, string, random, importlib, time
 
 linesOfCode = None
 assignInfo = None
@@ -27,6 +28,10 @@ mappingOfSecretVarsToGroupType = {}
 keygenElemToExponents = {}
 overflowKeygenElemToExponents = {}
 keygenElemToSMTExp = {}
+latexVars = {'alpha':'\\alpha', 'beta':'\beta', 'gamma':'\gamma', 'delta':'\delta', 'epsilon':'\epsilon',
+             'zeta':'\zeta', 'eta':'\eta', 'Gamma':'\Gamma', 'Delta':'\Delta', 'theta':'\theta', 
+             'kappa':'\kappa', 'lambda':'\lambda', 'mu':'\mu', 'nu':'\\nu', 'xi':'\\xi', 'sigma':'\\sigma',
+             'tau':'\\tau', 'phi':'\phi', 'chi':'\\chi', 'psi':'\psi', 'omega':'\omega'}
 SMTaddCounter = 0
 SMTmulCounter = 0
 #SMTleafCounter = 0
@@ -42,6 +47,8 @@ rndVars = []
 nilType = 'nil'
 bfMapKeyword = 'bfMap'
 skBfMapKeyword = 'skBfMap'
+parser = SDLParser()
+
 
 def processListOrExpandNodes(binNode, origVarName, newVarName):
     binNodeRight = binNode.right
@@ -578,7 +585,7 @@ def arrangeExponentsForArithmetic(exponentsList):
 
         previousLevelNumber = currentLevelNumber
 
-    parser = SDLParser()
+    #parser = SDLParser()
     node = parser.parse(expression)
 
     return [node]
@@ -702,10 +709,11 @@ def makeReplacementsForMasterPublicVars(node, config):
     #print(node)
     #print(nodeAsStr)
 
-    parser = SDLParser()
+    #parser = SDLParser()
+    #newNode = parser.parse(nodeAsStr)
+    #if (type(newNode).__name__ == 'str'):
+    #    newNode = BinaryNode(newNode)
     newNode = parser.parse(nodeAsStr)
-    if (type(newNode).__name__ == 'str'):
-        newNode = BinaryNode(newNode)
     return newNode
 
 def getAllKeygenElemsToExponentsDictEntries(keygenOutputElem, keygenFuncName, config):
@@ -1217,7 +1225,19 @@ def getMasterSecretKeyElements(config):
     #print(masterSecretKeyElements)
     #sys.exit("test")
 
-def instantiateBFSolver(config):
+def getLatexVar(index):
+    global latexVars
+    
+    if index not in latexVars.keys():
+        return index
+    else:
+        res = re.findall(r"[a-zA-Z]+|\d+", index)
+        if len(res) == 2:
+            return res[0] + "_" + res[1]
+        return latexVars.get(index)
+
+
+def instantiateBFSolver(config, assignInfo):
     # get random file
     name = ""
     length = 5
@@ -1239,7 +1259,7 @@ def instantiateBFSolver(config):
     
     print("See: ", name)    
     print("<================== BFSolver ==================>")
-    os.system("python2.7 BFSolver.py %s" % name)
+    os.system("/opt/local/bin/python2.7 BFSolver.py %s" % name)
     print("<================== BFSolver ==================>")
 
     newName = name.split('.')[0]
@@ -1252,10 +1272,34 @@ def instantiateBFSolver(config):
     if hasattr(mapVars, skBfMapKeyword):
         skBfMap = getattr(mapVars, skBfMapKeyword)
     #os.system("rm -f " + name + " " + name + "c")
+    # PRELIMINARY PROOF GEN CODE FOR TRANSFORM KEY
+    skList = keygenElemToSMTExp[ str(config.keygenSecVar) ]
+    keyDefs = []
+    originalKeyNodes = []
+    transformKeyNodes = []
+    for i in skList:
+        skElem = bfMap[ i ]
+        for j, k in skElem.items():
+            J = getLatexVar(j)
+            keyDefs.append( J + "' = {" + J + " \cdot " + k + "}" )
+        (funcName, varInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, i)
+        resNode = varInfoObj.getAssignBaseElemsOnly()
+        resNode2 = BinaryNode.copy(resNode) 
+        for j, k in skElem.items():
+            InPlaceReplaceAttr(resNode2, j, j + "'")
+        originalKeyNodes.append( BinaryNode(ops.EQ, BinaryNode(i), resNode) ) # I + " = " + str(resNode) )
+        transformKeyNodes.append( BinaryNode(ops.EQ, BinaryNode(i + "'"), resNode2) ) # I + " = " + str(resNode2) )
+        print("node: ", resNode, type(resNode)) # need the symbolic executed version! 
+        
     
+    print("\keydefinitions =", keyDefs, "\n")
+    print("\originalkey = ", originalKeyNodes, "\n")
+    print("\\transformkey = ", transformKeyNodes, "\n")
+    proof = GenerateProof()
+    proof.initLCG(mskVars, rndVars, keyDefs, originalKeyNodes, transformKeyNodes)
+    proof.compileProof('test')
     #print(results.resultDictionary)
-    #os.system("rm -f " + name + "*")    
-    #return results.resultDictionary
+    os.system("rm -f " + name + "*")
     return (bfMap, skBfMap)
 
 def prepareDictForTransform(resultDictionary, config):
@@ -1326,7 +1370,7 @@ def keygen(file, config):
     stringEntriesInKeygenElemToSMTExp = removeStringEntriesFromKeygenElemToSMTExp(config)
     removeStringEntriesFromSKinKeygenElemToSMTExp(stringEntriesInKeygenElemToSMTExp, config)
 
-    bfMap, skBfMap = instantiateBFSolver(config)
+    bfMap, skBfMap = instantiateBFSolver(config, assignInfo)
 
     #print("First BFSolver Result:  ", skBfMap)
 

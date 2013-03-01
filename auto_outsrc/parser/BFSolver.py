@@ -545,6 +545,7 @@ class BFSolver:
                             self.finalMapOfBFs[ i ] = set([ lVal ])
             myLog.info("<=== Interpret Results ===>")
             myLog.info("Unique blinding factors: ", self.usedBFs)
+            myLog.info("Count: ", len(self.usedBFs))
             return True, None
         else:
             unsat_list = self.theSolver.unsat_core()
