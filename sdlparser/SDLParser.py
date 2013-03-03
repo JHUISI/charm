@@ -1251,13 +1251,21 @@ def updateRefTypes(refDict, refList, varName, newType):
 def postTypeCleanup():
     global varTypes, listRawTypes
     
+#    if currentFuncName == "encrypt":
+#        pass
     #globalTypes = varTypes[TYPES_HEADER]
     localTypes = varTypes[currentFuncName]
     _listRawTypes = {}; isUpdated = False
     
     allTypes = localTypes.keys()
     curTypes = {};
-
+    
+    # first step is to go through each variable type and 
+    # see how many different type instances show up from ZR to GT.
+    # We build up a list for each variable such that 
+    # if Varx : ['G1'] and is a list, means Varx should receive a listG1 type
+    # if Varx : ['G1', 'G2'] and is a list, then VarX should receive a list type b/c
+    # it points to two different types.
     for i in allTypes:
         iType = localTypes.get(i).getType()
         iInList = localTypes.get(i).isInAList
@@ -1277,19 +1285,11 @@ def postTypeCleanup():
                 curTypes[ii[0]] = list(set(curTypes[ii[0]]))                
             
             #print("RESULT1: ii=", ii, ", curTypes=", curTypes.get(ii[0]), ", iType=", iType)
-
-            if _listRawTypes.get(ii[0]) == None:
-                finalType = iType # keep original
-                iiLen = len(ii[1:])
-                if iiLen >= 2: finalType = types["metalist" + str(iType)]
-                _listRawTypes[ii[0]] = []
-                _listRawTypes[ii[0]].append(finalType)
-                _listRawTypes[ii[0]] = list(set(_listRawTypes[ii[0]]))
-            elif type(_listRawTypes.get(ii[0])) == dict: # existing entry, need to update
+            if type(_listRawTypes.get(ii[0])) == dict: # existing entry, need to update
                 #print("UPDATE1: ii=", ii, ", needs to be updated accordingly.")
                 (finalType, finalLen) = updateRefTypes(_listRawTypes.get(ii[0]), ii, ii[0], iType)
                 if finalLen == 1: curTypes[ii[0]] = [finalType] # synchronize rawTypes and curTypes structures
-            elif type(_listRawTypes.get(ii[0])) == list:
+            elif type(_listRawTypes.get(ii[0])) == list: # existing entry, need to update
                 _listRawTypes[ii[0]] = upgradeToNextListLevel(len(ii[1:]), _listRawTypes[ii[0]])
                 if len(_listRawTypes[ii[0]]) == 1 and len(ii[1:]) == 2: curTypes[ii[0]] = list(_listRawTypes[ii[0]])
                 #print("UPDATE2: ii=", ii, ", needs to be updated accordingly: ", _listRawTypes.get(ii[0]) )

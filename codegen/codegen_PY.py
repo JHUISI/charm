@@ -759,12 +759,13 @@ def writeLambdaFuncAssignStmt(outputFile, binNode):
 
 def writeAssignStmt_Python(outputFile, binNode):
     writeCurrentNumTabsIn(outputFile)
-
-    if (str(binNode) == RETURN_STATEMENT):
+    strNode = str(binNode).lower()
+    
+    if (strNode == RETURN_STATEMENT):
         outputFile.write("return\n")
         return
 
-    if (str(binNode) == "return := output"):
+    if (strNode == "return := output"):
         outputFile.write("return output\n")
         return
 
@@ -779,10 +780,9 @@ def writeAssignStmt_Python(outputFile, binNode):
     variableName = replacePoundsWithBrackets(getFullVarName(binNode.left, False))
 
     if (variableName == outputKeyword):
-        if ( (str(binNode) == "output := False") or (str(binNode) == "output := false") ):
-            falseOutputString = "output = False\n"
+        if ( strNode == "output := false" ):
             falseOutputString += writeCurrentNumTabsToString()
-            falseOutputString += "return output\n"
+            falseOutputString += "return False\n"
             outputFile.write(falseOutputString)
             return
 
@@ -837,9 +837,7 @@ def writeErrorFunc_Python(outputFile, binNode):
         userFuncsList.append(errorFuncName)
         userFuncsOutputString = ""
         userFuncsOutputString += "def " + errorFuncName + "(" + errorFuncArgString + "):\n"
-        #userFuncsOutputString += "\t" + userGlobalsFuncName + "()\n"
         userFuncsOutputString += "    " + userGlobalsFuncName + "()\n"
-        #userFuncsOutputString += "\treturn\n\n"
         userFuncsOutputString += "    return\n\n"
         userFuncsFile.write(userFuncsOutputString)
 
@@ -1150,9 +1148,7 @@ def writeGroupObjToMain():
         sys.exit("writeMainFuncOfSetup in codegen.py:  groupArg from config.py is invalid.")
 
     outputString = ""
-    #outputString += "\tglobal " + groupObjName + "\n"
     outputString += "    global " + groupObjName + "\n"
-    #outputString += "\t" + groupObjName + " = PairingGroup(" + groupArg + ")\n\n"
     outputString += "    " + groupObjName + " = PairingGroup(" + groupArg + ")\n\n"
 
     return outputString

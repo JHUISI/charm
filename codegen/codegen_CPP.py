@@ -341,25 +341,29 @@ def isFuncDeclVarAListAndSameType(variableName, functionName):
 
     return False
 
-def writeUserFunctionDecl_CPP(outputFile, functionName):
+def writeUserFunctionDecl_CPP(outputFile, functionName, defineAsClass, className):
     global currentFuncOutputVars, currentFuncNonOutputVars
 
     currentFuncOutputVars = []
     currentFuncNonOutputVars = []
+    if defineAsClass:
+        classNameStr = className + "::"
+    else:
+        classNameStr = ""         
     
     inputVariables = getInputVariablesList(functionName)
     outputVariables = getOutputVariablesList(functionName)
 
     if len(outputVariables) > 1:
-        outputString = "void " + functionName + "(" # in this case, we need to rewrite every call to this function
+        outputString = "void " + classNameStr + functionName + "(" # in this case, we need to rewrite every call to this function
     elif len(outputVariables) == 1:
         outputVariable = outputVariables[0]
         varIsAList = isFuncDeclVarAList(outputVariable, functionName)
         currentType = getFinalVarType(outputVariable, currentFuncName)
         if (currentType in [types.int]):
-            outputString = "int " + functionName + "(" # probably an error?
+            outputString = "int " + classNameStr + functionName + "(" # probably an error?
         else:
-            outputString = makeTypeReplacementsForCPP(currentType, varIsAList) + " " + functionName + "("
+            outputString = makeTypeReplacementsForCPP(currentType, varIsAList) + " " + classNameStr + functionName + "("
     else:
         outputString = "void " + functionName + "(" # probably an error?
         
@@ -388,10 +392,13 @@ def writeUserFunctionDecl_CPP(outputFile, functionName):
 
     if ( (inputVariables != []) or (outputVariables != []) ):
         outputString = outputString[0:(len(outputString) - len(", "))]
+    
+    outputStringHdr = outputString + ");\n"
+    outputStringHdr = outputStringHdr.replace(classNameStr, "")
     outputString += ")\n{\n"
 
     outputFile.write(outputString)
-    return ""
+    return outputStringHdr
 
 def writeFunctionDecl_CPP(outputFile, functionName, defineAsClass, className):
     global currentFuncOutputVars, currentFuncNonOutputVars
@@ -447,7 +454,7 @@ def writeFunctionDecl(functionName, defineAsClass, className):
     global setupFile
 
     if functionName in userFuncsListNames:
-        return writeUserFunctionDecl_CPP(setupFile, functionName)
+        return writeUserFunctionDecl_CPP(setupFile, functionName, defineAsClass, className)
     else:
         functionHeader = writeFunctionDecl_CPP(setupFile, functionName, defineAsClass, className)
         if defineAsClass:
@@ -1148,16 +1155,23 @@ def isInitCall(binNode):
 
     return False
 
+def hasSpecificListType(s):
+    stdTypes = ["CharmListStr", "CharmListInt", "CharmListZR", "CharmListG1", "CharmListG2", "CharmListGT", "CharmMetaListInt", "CharmMetaListZR", "CharmMetaListG1", "CharmMetaListG2", "CharmMetaListGT"]
+    if s in stdTypes:
+        return True
+    return False
+
 # TODO: clean-up need for "*"
 def writeAssignStmt_CPP(outputFile, binNode):
     global CPP_varTypesLines, CPP_funcBodyLines, setupFile, currentFuncNonOutputVars, SDLListVars, integerVars
     global listVarsDeclaredInThisFunc, nonListVarsDeclaredInThisFunc
+    strNode = str(binNode)
 
-    if (str(binNode) == RETURN_STATEMENT):
+    if (strNode == RETURN_STATEMENT):
         CPP_funcBodyLines += writeCurrentNumTabsToString()
         CPP_funcBodyLines += "return;\n"
         return
-    elif(str(binNode) == NOP_STATEMENT):
+    elif(strNode == NOP_STATEMENT):
         CPP_funcBodyLines += "\n" # NOP
         return
     
@@ -1171,19 +1185,27 @@ def writeAssignStmt_CPP(outputFile, binNode):
         SDLListVars.append(variableName)
 
     if (variableName == outputKeyword):
-        if ( (str(binNode) == "output := True") or (str(binNode) == "output := true") ):
+        lowerStrNode = strNode.lower()
+        if (lowerStrNode == "output := true"):
             trueOutputString = writeCurrentNumTabsToString()
             trueOutputString += "return true;\n"
             CPP_funcBodyLines += trueOutputString
             return
-        elif ( (str(binNode) == "output := False") or (str(binNode) == "output := false") ):
+        elif (lowerStrNode == "output := false"):
             falseOutputString = writeCurrentNumTabsToString()
             falseOutputString += "return false;\n"
             CPP_funcBodyLines += falseOutputString
             return
+        elif (lowerStrNode == "output := error"):
+            errorOutputString = writeCurrentNumTabsToString()
+            errorOutputString += "cout << 'Error occurred!' << endl;\n"
+            errorOutputString = writeCurrentNumTabsToString()
+            errorOutputString += "return;\n"
+            CPP_funcBodyLines += errorOutputString
+            return        
         else:
             return
-
+    _outputString_Types = ""
     outputString_Types = ""
     outputString_Body = ""
 
@@ -1198,12 +1220,15 @@ def writeAssignStmt_CPP(outputFile, binNode):
 
     if ( (variableName.find(LIST_INDEX_SYMBOL) == -1) and (binNode.right.type != ops.EXPAND) and (variableName not in nonListVarsDeclaredInThisFunc) ):
         if ( (variableName not in currentFuncOutputVars) and (variableType != types.int) ):
-            outputString_Types += "    " + makeTypeReplacementsForCPP(variableType) + " " + starRef
+            outputString_Types += "    " + makeTypeReplacementsForCPP(variableType) + " "
+            _outputString_Types = outputString_Types.strip(" ").split(' ')[0] # cleanup empty strings
         elif ( (variableName not in currentFuncOutputVars) and (variableType == types.int) ):
             outputString_Types += "    int "
-
+            _outputString_Types = outputString_Types.strip(" ").split(' ')[0] # cleanup empty strings
+        
     if ( (variableName in SDLListVars) and (variableNameWOListIndices not in currentFuncOutputVars) and (variableNameWOListIndices not in listVarsDeclaredInThisFunc) ):
         outputString_Types += getVarDeclForListVar(variableName)
+        _outputString_Types = outputString_Types.strip(" ").split(' ')[0] # cleanup empty strings
         listVarsDeclaredInThisFunc.append(variableNameWOListIndices)
 
     if ( (binNode.right.type != ops.EXPAND) and (variableName not in currentFuncOutputVars) and (variableName not in SDLListVars) and (variableName not in nonListVarsDeclaredInThisFunc) ):
@@ -1224,7 +1249,7 @@ def writeAssignStmt_CPP(outputFile, binNode):
     variableLen = len(variableName.split(LIST_INDEX_SYMBOL))
     #print("DEBUG: variableNamePounds=", variableNamePounds, ", variableName=", variableName, ", variableLen=", variableLen)
     skipTheRest = False
-    if (variableName != variableNamePounds) and variableLen < 3:
+    if (variableName != variableNamePounds) and not hasSpecificListType(_outputString_Types):
         variableNamePound = replacePoundsWithBrackets(variableName, True)
         #print("DEBUG: variableNamePound=", variableNamePound, ", variableName=", variableName)
         if(binNode.right.type != ops.LIST):
