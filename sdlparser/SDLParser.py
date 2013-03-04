@@ -2288,6 +2288,23 @@ def parseLinesOfCode(code, verbosity, ignoreCloudSourcing=False):
     if (ignoreCloudSourcing == False):
         updatePublicVarNames()
         updateSecretVarNames()
+    return
+
+def cleanParseLinesOfCode():
+    global varTypes, assignInfo, forLoops, forLoopsInner, currentFuncName, varDepList, varInfList, varsThatProtectM
+    global algebraicSetting, startLineNo_ForLoop, startLineNo_ForLoopInner, startLineNos_Functions, endLineNos_Functions
+    global getVarDepInfListsCalled, getVarsThatProtectMCalled, astNodes, varNamesToFuncs_All
+    global varNamesToFuncs_Assign, ifElseBranches, startLineNo_IfBranch, startLineNo_ElseBranch
+    global inputOutputVars, varDepListNoExponents, varInfListNoExponents, functionNameOrder
+    global publicVarNames, secretVarNames, assignVarInfo, overflowAssignInfo
+
+    del astNodes, overflowAssignInfo, varTypes, assignInfo, assignVarInfo, varNamesToFuncs_All, varNamesToFuncs_Assign
+    del forLoops, forLoopsInner, ifElseBranches, currentFuncName, varDepList, varDepListNoExponents, varInfList, varInfListNoExponents
+    del varsThatProtectM, algebraicSetting, startLineNo_ForLoop, startLineNo_ForLoopInner, startLineNo_IfBranch, startLineNo_ElseBranch 
+    del startLineNos_Functions, endLineNos_Functions, functionNameOrder, inputOutputVars, getVarDepInfListsCalled, getVarsThatProtectMCalled
+    del publicVarNames, secretVarNames
+    return
+
 
 def getFuncStmts(funcName):
     if getVarDepInfListsCalled == False: 

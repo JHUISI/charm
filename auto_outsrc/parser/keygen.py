@@ -5,7 +5,7 @@ from transformNEW import *
 from secretListInKeygen import getSecretList
 from outsrctechniques import SubstituteVar, GetAttributeVars, InPlaceReplaceAttr
 from outsrcproof import GenerateProof
-import os, re, sys, string, random, importlib, time
+import os, gc, re, sys, string, random, importlib, time
 
 linesOfCode = None
 assignInfo = None
@@ -84,11 +84,14 @@ def replaceVarInstancesInLineNoRange(startLineNo, endLineNo, origVarName, newVar
             binNodeAsString = "\n"
         substituteOneLineOfCode(binNodeAsString, lineNoIndex)
 
-    updateCodeAndStructs()
+    #updateCodeAndStructs() # JAA commented out
 
 def updateCodeAndStructs():
     global linesOfCode, assignInfo, varTypes, astNodes, forLoops, publicVarNames, secretVarNames, varDepList
     global overflowAssignInfo
+    cleanParseLinesOfCode()
+    cleanCodeAndStructs()
+    gc.collect() 
 
     parseLinesOfCode(getLinesOfCode(), False)
     linesOfCode = getLinesOfCode()
@@ -100,6 +103,14 @@ def updateCodeAndStructs():
     publicVarNames = getPublicVarNames()
     secretVarNames = getSecretVarNames()
     varDepList = externalGetVarDepList()
+
+def cleanCodeAndStructs():
+    global linesOfCode, assignInfo, varTypes, astNodes, forLoops, publicVarNames, secretVarNames, varDepList
+    global overflowAssignInfo
+    
+    del linesOfCode, assignInfo, varTypes, astNodes, forLoops, publicVarNames, secretVarNames, varDepList
+    del overflowAssignInfo
+    return
 
 def writeLinesToFuncAfterVarLastAssign(funcName, lineList, varName):
     if (varName == None):
@@ -1198,7 +1209,7 @@ def writeOutputLineForKeygen(secretKeyName, keygenFuncName, config):
     lineNoKeygenOutput = getLineNoOfOutputStatement(keygenFuncName)
     removeFromLinesOfCode([lineNoKeygenOutput])
     appendToLinesOfCode(SDLLinesForKeygen, lineNoKeygenOutput)
-    updateCodeAndStructs()
+    #updateCodeAndStructs() # JAA commented out
 
 def getMasterSecretKeyElements(config):
     global masterSecretKeyElements
@@ -1346,7 +1357,7 @@ def keygen(file, config):
     if ( (type(file) is not str) or (len(file) == 0) ):
         sys.exit("First argument passed to keygen.py is invalid.")
     
-    parseFile2(file, False)
+    #parseFile2(file, False)
     updateCodeAndStructs()
     getMasterSecretKeyElements(config)
     keygenFuncName = config.keygenFuncName
@@ -1406,7 +1417,7 @@ def keygen(file, config):
 
     inputLineOfKeygenFunc = getLineNoOfInputStatement(config.keygenFuncName)
     appendToLinesOfCode(SDLLinesForKeygen, inputLineOfKeygenFunc + 1)
-    updateCodeAndStructs()
+    #updateCodeAndStructs() # JAA commented out
     writeOutputLineForKeygen(secretKeyName, config.keygenFuncName, config)
 
     for index_listVars in range(0, len(varNamesForListDecls)):
@@ -1443,7 +1454,7 @@ def keygen(file, config):
 
     substituteOneLineOfCode(newDecOutInputLine, existingDecOutInputLineNo + 1)
 
-    updateCodeAndStructs()
+    #updateCodeAndStructs() # JAA commented out
 
     #printLinesOfCode()
 

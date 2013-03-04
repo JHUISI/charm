@@ -381,7 +381,8 @@ def writeUserFunctionDecl_CPP(outputFile, functionName, defineAsClass, className
         for outputVariable in outputVariables:
             if (outputVariable in inputVariables):
                 continue
-            if ( (outputVariable != "True") and (outputVariable != "False") ):
+            #if ( (outputVariable != "True") and (outputVariable != "False") ):
+            if ( (outputVariable not in ["True", "False", "Error"]) ):            
                 varIsAList = isFuncDeclVarAList(outputVariable, functionName)
                 currentType = getFinalVarType(outputVariable, currentFuncName)
                 if (currentType in [types.int]):
@@ -433,7 +434,7 @@ def writeFunctionDecl_CPP(outputFile, functionName, defineAsClass, className):
     for outputVariable in outputVariables:
         if (outputVariable in inputVariables):
             continue
-        if ( (outputVariable != "True") and (outputVariable != "False") ):
+        if ( (outputVariable not in ["True", "False", "Error"]) ):            
             varIsAList = isFuncDeclVarAList(outputVariable, functionName)
             currentType = getFinalVarType(outputVariable, currentFuncName)
             if (currentType in [types.int]):
@@ -1199,7 +1200,7 @@ def writeAssignStmt_CPP(outputFile, binNode):
         elif (lowerStrNode == "output := error"):
             errorOutputString = writeCurrentNumTabsToString()
             errorOutputString += "cout << 'Error occurred!' << endl;\n"
-            errorOutputString = writeCurrentNumTabsToString()
+            errorOutputString += writeCurrentNumTabsToString()
             errorOutputString += "return;\n"
             CPP_funcBodyLines += errorOutputString
             return        

@@ -1,5 +1,6 @@
 name := dfa12
 setting := symmetric
+short := keys
 
 BEGIN :: types
 M := GT
@@ -14,9 +15,9 @@ T := list{Tlist}
 Ti := list{int}
 q0 := list{int}
 F := list{int}
-
+#Klist := list{G1, G1, G1}
 key := int
-
+#K := list{Klist}
 KendList1 := list{G1}
 KendList2 := list{G1}
 K1 := list{G1}
@@ -24,15 +25,15 @@ K2 := list{G1}
 K3 := list{G1}
 w := list{str}
 B := list{GT}
-
-
+#Clist := list{G1, G1}
+#C := list{Clist}
 C1 := list{G1}
 C2 := list{G1}
 D := list{G1}
-
+#D#0 := G1
 h := list{G1}
 x := int
-
+#t := list{int}
 t0 := int
 t1 := int
 st := int
@@ -44,7 +45,7 @@ KendList2Blinded := list
 KendList1Blinded := list
 bf0 := list
 transformOutputList#0 := GT
-transformOutputListForLoop#1000+7*i? := GT
+transformOutputListForLoop#10+7*i? := GT
 transformOutputList#1 := GT
 transformOutputList := list
 transformOutputListForLoop := list
@@ -78,7 +79,7 @@ BEGIN :: func:keygen
 input := list{mpk, msk, Q, T, F}
 bf0 := random(ZR)
 mpk := expand{egg, g, z, h, hstart, hend}
-
+#dfaM := expand{Q, S, T, q0, F}
 
 qlen := len(Q)
 BEGIN :: for
@@ -139,7 +140,7 @@ forall{y := KendList2}
 KendList2Blinded#y := (KendList2#y^(1 / bf0))
 END :: forall
 
-skBlinded := list{Kstart1Blinded, Kstart2Blinded, KendList1Blinded, KendList2Blinded, K1Blinded, K2Blinded, K3Blinded}
+skBlinded := list{Kstart1Blinded, Kstart2Blinded, KendList1, KendList2Blinded, K1Blinded, K2Blinded, K3Blinded}
 output := list{bf0, skBlinded}
 END :: func:keygen
 
@@ -156,14 +157,14 @@ END :: for
 
 Cm := (M * (egg^s#l))
 
-
+#C#0 := init(list)
 C1#0 := (g^s#0)
 C2#0 := (hstart^s#0)
 
 BEGIN :: for
 for{i := 1,l+1}
 a := getString(w#i)
-
+#C#i := init(list)
 C1#i := (g^s#i)
 C2#i := ((h#a^s#i) * (z^s#i-1?))
 END :: for
@@ -178,18 +179,17 @@ END :: func:encrypt
 
 
 BEGIN :: func:transform
-input := list{skBlinded, ct, dfaM}
+input := list{skBlinded, ct}
 skBlinded := expand{Kstart1Blinded, Kstart2Blinded, KendList1Blinded, KendList2Blinded, K1Blinded, K2Blinded, K3Blinded}
 ct := expand{Cend1, Cend2, w, C1, C2, Cm}
 transformOutputList#3 := Cm
 transformOutputList#2 := w
 l := len(w)
 BEGIN :: if
-if {accept(dfaM, w) == False}
+if {accept(w) == False}
 NOP
-output := False
 END :: if
-Ti := getTransitions(dfaM, w)
+Ti := getTransitions(w)
 transformOutputList#0 := e(C1#0,Kstart1Blinded) * e((C2#0^-1),Kstart2Blinded)
 B#0 := transformOutputList#0
 BEGIN :: for
@@ -197,8 +197,8 @@ for{i := 1,l+1}
 NOP
 key := hashToKey(Ti#i)
 j := (i - 1)
-transformOutputListForLoop#1000+7*i? := e(C1#j,K1Blinded#key) * e((C2#i^-1),K2Blinded#key) * e(C1#i,K3Blinded#key)
-result0 := transformOutputListForLoop#1000+7*i?
+transformOutputListForLoop#10+7*i? := e(C1#j,K1Blinded#key) * e((C2#i^-1),K2Blinded#key) * e(C1#i,K3Blinded#key)
+result0 := transformOutputListForLoop#10+7*i?
 END :: for
 x := getAcceptState(Ti)
 transformOutputList#1 := e((Cend1^-1),KendList1Blinded#x) * e(Cend2,KendList2Blinded#x)
@@ -207,12 +207,13 @@ output := list{transformOutputList, l, Ti, transformOutputListForLoop}
 END :: func:transform
 
 BEGIN :: func:decout
-input := list{dfaM, transformOutputList, bf0, l, Ti, transformOutputListForLoop}
+input := list{transformOutputList, bf0, l, Ti, transformOutputListForLoop}
 Cm := transformOutputList#3
 w := transformOutputList#2
 BEGIN :: if
-if {accept(dfaM, w) == False}
+if {accept(w) == False}
 NOP
+output := Error
 END :: if
 B#0 := (transformOutputList#0 ^ (bf0) ) 
 BEGIN :: for
@@ -220,7 +221,7 @@ for{i := 1,l+1}
 NOP
 key := hashToKey(Ti#i)
 j := (i - 1)
-result0 := (transformOutputListForLoop#1000+7*i? ^ (bf0) ) 
+result0 := (transformOutputListForLoop#10+7*i? ^ (bf0) ) 
 B#i? := (B#i-1? * result0)
 END :: for
 result1 := (transformOutputList#1 ^ (bf0) ) 

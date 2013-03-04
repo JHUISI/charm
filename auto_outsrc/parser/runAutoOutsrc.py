@@ -1,7 +1,7 @@
 from keygen import *
 #from config import *
 import SDLPreProcessor
-import sys, os, importlib, time
+import sys, os, importlib, time, gc
 
 sys.path.extend(['../../', '../../codegen'])
 
@@ -33,7 +33,7 @@ def main(inputSDLScheme, configName, outputFile, outputUserDefFile):
        userFuncList = []
 
     SDLPreProcessor.SDLPreProcessor_main(inputSDLScheme, inputSDLScheme + PREPROCESSED_STRING, config)
-
+    
     startTime = time.clock()
     (linesOfCodeFromKeygen, blindingFactors_NonLists, blindingFactors_Lists) = keygen(inputSDLScheme + PREPROCESSED_STRING, config)
     endTime = time.clock()
@@ -42,14 +42,13 @@ def main(inputSDLScheme, configName, outputFile, outputUserDefFile):
 
 
     writeLOCFromKeygenToFile(linesOfCodeFromKeygen, inputSDLScheme + PREPROCESSED_STRING, config)
-
+    cleanParseLinesOfCode()
 
     startTime = time.clock()
     codegen_PY.codegen_PY_main(inputSDLScheme + PREPROCESSED_STRING + config.finalSDLSuffix, outputFile + ".py", outputUserDefFile + ".py")
     endTime = time.clock()
     runningTime = (endTime - startTime) * 1000
     print("running time for codegen python is ", runningTime)
-
 
     codegen_CPP.transformOutputList = transformOutputList
 
@@ -58,7 +57,6 @@ def main(inputSDLScheme, configName, outputFile, outputUserDefFile):
     endTime = time.clock()
     runningTime = (endTime - startTime) * 1000
     print("running time for codegen CPP is ", runningTime)
-
 
 if __name__ == "__main__":
     lenSysArgv = len(sys.argv)

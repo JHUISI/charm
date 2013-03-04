@@ -50,7 +50,7 @@ def removeDirectoryName(path):
     lenPathSplit = len(pathSplit)
     return pathSplit[lenPathSplit - 1]
 
-def addImportLines(userFuncsFileArg):
+def addImportLines(userFuncsFileArg, incNumSig):
     global setupFile, userFuncsFile
 
     userFuncsLibName = userFuncsFileArg
@@ -71,8 +71,8 @@ def addImportLines(userFuncsFileArg):
 
     setupFile.write(pythonImportLines)
     setupFile.write("from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair\n")
-    setupFile.write("from charm.core.engine.util import *\n")
-    setupFile.write("from charm.core.math.integer import randomBits\n\n")
+    #setupFile.write("from charm.core.engine.util import *\n")
+    if incNumSig != None: setupFile.write("from charm.core.math.integer import randomBits\n\n")
 
     userFuncsFile.write("from builtInFuncs import *\n\n")
 
@@ -1230,7 +1230,7 @@ def writeMainFuncOfSetup():
 
     setupFile.write(outputString)
 
-def writeMainFunc_IgnoreCloudSourcing():
+def writeMainFunc():
     global setupFile
 
     outputString = "def main():\n"
@@ -1239,8 +1239,8 @@ def writeMainFunc_IgnoreCloudSourcing():
     outputString += "    main()\n\n"
     setupFile.write(outputString)
 
-def writeMainFuncs():
-    writeMainFuncOfSetup()
+#def writeMainFuncs():
+#    writeMainFuncOfSetup()
 
 def getGlobalVarNames():
     global globalVarNames
@@ -1270,7 +1270,7 @@ def addGetGlobalsToUserFuncs():
 
     userFuncsFile.write(outputString)
 
-def codegen_PY_main(SDL_Scheme, setupFileArg, userFuncsFileArg):
+def codegen_PY_main(SDL_Scheme, setupFileArg, userFuncsFileArg, codegenOpts={}):
     global setupFile, userFuncsFile, assignInfo, varNamesToFuncs_All
     global varNamesToFuncs_Assign, inputOutputVars, functionNameOrder
     global blindingFactors_NonLists, blindingFactors_Lists
@@ -1283,7 +1283,9 @@ def codegen_PY_main(SDL_Scheme, setupFileArg, userFuncsFileArg):
 
     if ( (type(userFuncsFileArg) is not str) or (len(userFuncsFileArg) == 0) ):
         sys.exit("codegen.py:  sys.argv[3] argument (user funcs file) passed in was invalid.")
-
+        
+    incNumSig = codegenOpts.get('NumSigs')
+    incSmallExp = codegenOpts.get('SmallExp')
     parseFile2(SDL_Scheme, False, True)
 
     astNodes = getAstNodes()
@@ -1298,17 +1300,19 @@ def codegen_PY_main(SDL_Scheme, setupFileArg, userFuncsFileArg):
 
     getGlobalVarNames()
 
-    addImportLines(userFuncsFileArg)
+    addImportLines(userFuncsFileArg, incNumSig)
     addGroupObjGlobalVar()
-    addNumSignatures()
-    addNumSigners()
+    if incNumSig != None:
+        addNumSignatures()
+        addNumSigners()
     addSecParamValue()
 
     writeSDLToFiles(astNodes)
 
-    addSmallExpFunc()
+    if incSmallExp != None:
+        addSmallExpFunc()
 
-    writeMainFunc_IgnoreCloudSourcing()
+    writeMainFunc()
 
     addGetGlobalsToUserFuncs()
 
