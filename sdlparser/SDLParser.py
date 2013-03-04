@@ -574,11 +574,12 @@ def getVarTypeFromVarName(varName, functionNameArg_TieBreaker, failSilently=Fals
     
     outputKeywordDisagreement = False
 
-    for funcName in varTypes:
-        for currentVarName in varTypes[funcName]:
-            if (currentVarName != varName):
-                continue
-
+    for funcName in varTypes.keys():
+#        for currentVarName in varTypes[funcName]:
+#            if (currentVarName != varName):
+#                continue
+        if varName in varTypes[funcName].keys():
+            currentVarName = varName
             currentVarType = varTypes[funcName][currentVarName].getType()
             if (retVarType == types.NO_TYPE):
                 retVarType = currentVarType
@@ -756,14 +757,20 @@ def updateVarTypes(node, i, newType=types.NO_TYPE):
             print("oldType: ", varTypes[currentFuncName][varName].getType())
             print("newType: ", newType)
             sys.exit("updateVarTypes in SDLParser.py received as input a node whose full variable name is already in varTypes[%s]. Discrepancy in types, so check type section." % currentFuncName)
-         
-    refCount = countReferenceType(node.right)   
+    
+    refCount = countReferenceType(node.right)
     if (refCount == 0):
         pass # leave type thesame
     elif ( refCount == 1 ):
-        newType = downgradeType(newType) # down grade type by one
+        varNameRight = str(node.right).split(LIST_INDEX_SYMBOL)[0]
+        varRightType = getVarTypeFromVarName(varNameRight, TYPES_HEADER)
+        if varRightType != types.list:
+            newType = downgradeType(newType) # down grade type by one, only if it is not a list type
     elif (refCount == 2 ):
-        newType = downgradeType(downgradeType(newType)) # down grade type by two
+        varNameRight = str(node.right).split(LIST_INDEX_SYMBOL)[0]
+        varRightType = getVarTypeFromVarName(varNameRight, TYPES_HEADER)
+        if varRightType != types.list:        
+            newType = downgradeType(downgradeType(newType)) # down grade type by two
     else:
         pass # do nothing for now
     varTypeObj = VarType()
@@ -980,10 +987,10 @@ def getVarTypeFromVarTypesDict(possibleFuncName, nodeAttrFullName):
         return types.G2
     elif typeDef in [types.listGT, types.metalistGT]:
         return types.GT
-    elif typeDef in [types.listStr, types.metalistStr]:
-        return types.str
-    elif typeDef in [types.listInt, types.metalistInt]:
-        return types.int
+#    elif typeDef in [types.listStr, types.metalistStr]:
+#        return types.str
+#    elif typeDef in [types.listInt, types.metalistInt]:
+#        return types.int
     
     return typeDef
 
@@ -1251,8 +1258,8 @@ def updateRefTypes(refDict, refList, varName, newType):
 def postTypeCleanup():
     global varTypes, listRawTypes
     
-#    if currentFuncName == "encrypt":
-#        pass
+    if currentFuncName == "decout":
+        pass
     #globalTypes = varTypes[TYPES_HEADER]
     localTypes = varTypes[currentFuncName]
     _listRawTypes = {}; isUpdated = False
@@ -2217,7 +2224,7 @@ def parseLinesOfCode(code, verbosity, ignoreCloudSourcing=False):
     lineNumberInCode = 0 
     for line in code:
         lineNumberInCode += 1
-        if (lineNumberInCode == 55):
+        if (lineNumberInCode == 212):
             pass
         if len(line.strip()) > 0 and line[0] != '#':
             if currentFuncName not in [LATEX_HEADER]: # only concerned about latex section b/c parsing is slightly different

@@ -678,6 +678,9 @@ def addGetTypeToAttrNode(inputString, variableType):
     if (variableType == types.list):
         return inputString + ".getList()"
 
+    if (variableType == types.listStr):
+        return inputString + ".getListStr()"
+
     if (variableType in [types.str, types.int, types.listInt, types.listZR, types.listG1, types.listG2, types.listGT, types.metalistInt, types.metalistZR, types.metalistG1, types.metalistG2, types.metalistGT]):
         return inputString # + ".strPtr"
     
@@ -1199,7 +1202,7 @@ def writeAssignStmt_CPP(outputFile, binNode):
             return
         elif (lowerStrNode == "output := error"):
             errorOutputString = writeCurrentNumTabsToString()
-            errorOutputString += "cout << 'Error occurred!' << endl;\n"
+            errorOutputString += "cout << \"Error occurred!\" << endl;\n"
             errorOutputString += writeCurrentNumTabsToString()
             errorOutputString += "return;\n"
             CPP_funcBodyLines += errorOutputString

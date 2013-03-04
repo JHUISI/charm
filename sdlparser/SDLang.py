@@ -207,42 +207,44 @@ def getVarNameEntryFromAssignInfo(assignInfo, varName):
     currentRetVarInfoObjIsExpandNode = False
 
     for funcName in assignInfo:
-        for currentVarName in assignInfo[funcName]:
-            if (currentVarName == varName):
-                if ( (retVarInfoObj != None) or (retFuncName != None) ):
-                    if (funcName != TYPES_HEADER):
-                        if ( (assignInfo[funcName][currentVarName].getIsExpandNode() == True) and (currentRetVarInfoObjIsExpandNode == True) ):
-                            pass
-                        elif ( (assignInfo[funcName][currentVarName].getIsExpandNode() == True) and (currentRetVarInfoObjIsExpandNode == False) ):
-                            pass
-                        elif ( (assignInfo[funcName][currentVarName].getIsExpandNode() == False) and (currentRetVarInfoObjIsExpandNode == True) ):
-                            retFuncName = funcName
-                            retVarInfoObj = assignInfo[funcName][currentVarName]
-                            currentRetVarInfoObjIsExpandNode = False
-                        elif ( (assignInfo[funcName][currentVarName].getIsExpandNode() == False) and (currentRetVarInfoObjIsExpandNode == False) ):
-                            retFuncName = funcName
-                            retVarInfoObj = assignInfo[funcName][currentVarName]
-                            currentRetVarInfoObjIsExpandNode = False
-                    elif (retFuncName != TYPES_HEADER):
+#        for currentVarName in assignInfo[funcName]:
+#        if (currentVarName == varName):
+        if varName in assignInfo[funcName].keys():
+            currentVarName = varName
+            if ( (retVarInfoObj != None) or (retFuncName != None) ):
+                if (funcName != TYPES_HEADER):
+                    if ( (assignInfo[funcName][currentVarName].getIsExpandNode() == True) and (currentRetVarInfoObjIsExpandNode == True) ):
                         pass
-                    elif ( (retVarInfoObj.hasBeenSet() == False) and (assignInfo[funcName][currentVarName].hasBeenSet() == True) ):
+                    elif ( (assignInfo[funcName][currentVarName].getIsExpandNode() == True) and (currentRetVarInfoObjIsExpandNode == False) ):
+                        pass
+                    elif ( (assignInfo[funcName][currentVarName].getIsExpandNode() == False) and (currentRetVarInfoObjIsExpandNode == True) ):
                         retFuncName = funcName
                         retVarInfoObj = assignInfo[funcName][currentVarName]
-                        if (retVarInfoObj.getIsExpandNode() == True):
-                            currentRetVarInfoObjIsExpandNode = True
-                        else:
-                            currentRetVarInfoObjIsExpandNode = False
-                    elif ( (retVarInfoObj.hasBeenSet() == True) and (assignInfo[funcName][currentVarName].hasBeenSet() == False) ):
-                        pass
-                    else:
-                        sys.exit("getVarNameEntryFromAssignInfo in SDLParser.py found multiple assignments of the same variable is assignInfo in which neither of the functions is " + str(TYPES_HEADER))
-                else:
+                        currentRetVarInfoObjIsExpandNode = False
+                    elif ( (assignInfo[funcName][currentVarName].getIsExpandNode() == False) and (currentRetVarInfoObjIsExpandNode == False) ):
+                        retFuncName = funcName
+                        retVarInfoObj = assignInfo[funcName][currentVarName]
+                        currentRetVarInfoObjIsExpandNode = False
+                elif (retFuncName != TYPES_HEADER):
+                    pass
+                elif ( (retVarInfoObj.hasBeenSet() == False) and (assignInfo[funcName][currentVarName].hasBeenSet() == True) ):
                     retFuncName = funcName
                     retVarInfoObj = assignInfo[funcName][currentVarName]
                     if (retVarInfoObj.getIsExpandNode() == True):
                         currentRetVarInfoObjIsExpandNode = True
                     else:
                         currentRetVarInfoObjIsExpandNode = False
+                elif ( (retVarInfoObj.hasBeenSet() == True) and (assignInfo[funcName][currentVarName].hasBeenSet() == False) ):
+                    pass
+                else:
+                    sys.exit("getVarNameEntryFromAssignInfo in SDLParser.py found multiple assignments of the same variable is assignInfo in which neither of the functions is " + str(TYPES_HEADER))
+            else:
+                retFuncName = funcName
+                retVarInfoObj = assignInfo[funcName][currentVarName]
+                if (retVarInfoObj.getIsExpandNode() == True):
+                    currentRetVarInfoObjIsExpandNode = True
+                else:
+                    currentRetVarInfoObjIsExpandNode = False
 
     #if ( (retVarInfoObj == None) or (retFuncName == None) ):
         #sys.exit("getVarNameEntryFromAssignInfo in SDLParser.py could not locate entry in assignInfo of the name passed in.")
