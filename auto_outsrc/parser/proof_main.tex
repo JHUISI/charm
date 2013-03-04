@@ -1,0 +1,95 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% STATIC LATEX CONTENT FOR MACHINE-GENERATED PROOFS
+%
+% THIS FILE IS NOT GENERATED. IT INCLUDES THE FILE "proof_schemename.tex"
+% WHICH CONTAINS THE MACROS FOR THE GUTS OF THE PROOF.
+%
+% YOU SHOULDN'T NEED TO EDIT THIS FILE EXCEPT FOR STYLISTIC
+% REASONS, I.E., YOU DON'T NEED TO CUSTOMIZE IT FOR A GIVEN SCHEME
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt]{article}
+\usepackage{fullpage,amsthm,amsmath}
+\usepackage{latexsym,amssymb,xspace}
+
+\begin{document}
+% input for automatically generated outsource proof
+\input{proof_genwaters09}
+
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newcommand{\Oracle}{\mathcal{O}}
+\newcommand{\Adv}{\mathcal{A}}
+\newcommand{\Bdv}{\mathcal{B}}
+\newcommand{\MS}{\mathcal{M}}
+\newcommand{\Psetup}{\mathsf{PSetup}}
+\newcommand{\Msetup}{\mathsf{Setup}}
+\newcommand{\params}{\mathit{params}}
+\newcommand{\brk}[1]{\langle #1 \rangle}
+\newcommand{\ait}[1]{#1}
+\newcommand{\Ga}{\ait{\mathbb{G}}_1}
+\newcommand{\ga}{\ait{g}_1}
+\newcommand{\ha}{\ait{h}_1}
+\newcommand{\poly}{\mathrm{poly}}
+
+\newcommand{\bit}[1]{#1}
+\newcommand{\Gb}{\bit{\mathbb{G}}_2}
+\newcommand{\gb}{\bit{g}_2}
+\newcommand{\hb}{\bit{h}_2}
+
+\newcommand{\cit}[1]{#1}
+\newcommand{\Gc}{\cit{\Group_T}}
+\newcommand{\gc}{\cit{g}}
+\newcommand{\hc}{\cit{h}}
+\newcommand{\Zp}{\mathbb{Z}_p}
+
+\newcommand{\Group}{\ensuremath{\mathbb{G}}\xspace}
+\newcommand{\Hroup}{\ensuremath{\mathbb{H}}\xspace}
+\newcommand{\map}{\mathbf{e}}
+
+\newcommand{\prot}{\mathsf{Prot}}
+\newcommand{\auxext}{\mathit{auxext}}
+\newcommand{\auxsim}{\mathit{auxsim}}
+\newcommand{\aux}{\mathit{aux}}
+\newcommand{\state}{\mathit{state}}
+\newcommand{\Alg}{\mathsf{Alg}}
+\newcommand{\A}{\mathcal{A}}
+
+\newcommand{\Sig}{\mathsf{Sig}}
+\newcommand{\G}{\mathsf{Gen}}
+\newcommand{\SK}{\mathsf{SK}}
+\newcommand{\Screen}{\mathsf{Screen}}
+\newcommand{\Setup}{\mathsf{Setup}}
+\newcommand{\Keygen}{\mathsf{Keygen}}
+\newcommand{\KeygenOut}{\mathsf{KeygenOut}}
+\newcommand{\Transform}{\mathsf{Transform}}
+\newcommand{\Decrypt}{\mathsf{Decrypt}}
+\newcommand{\compareequals}{\stackrel{?}{=}}
+\newcommand{\numsigs}{\eta}
+
+\title{A machine-generated proof of security for {\schemename}}
+\author{}
+\date{}
+\maketitle
+
+\section{$\KeygenOut$ Proof}
+
+Let $\listofmskvalues$ be the MSK variable(s) and $\listofrandomvalues$ be randomness selected in the $\Keygen$ algorithm. The $\Keygen$ algorithm runs to obtain the secret key, $\SK$ and is computed as follows:
+
+\begin{description}
+\item {\sf SK}: \begin{equation}  \originalkey \end{equation}
+\end{description}
+
+\noindent
+The $\KeygenOut$ algorithm selects blinding factors, $\listofbfs \in \Zp^*$. Let $\keydefinitions$ be the new MSK variables and random values selected in $\KeygenOut$ and let the new $\SK'$ be computed as follows:
+
+\begin{description}
+\item {\sf SK'}: \begin{equation}  \transformkey \end{equation}
+\end{description}
+
+\noindent
+The new $\SK'$ has the same uniform distribution as a randomly generated pseudo-key ($\pseudokey$) without knowledge of the original $\Keygen$. Therefore, the $\SK'$ provides no benefit to an adversary.
+
+\section{$\Transform$ Proof}
+
+\end{document}

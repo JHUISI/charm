@@ -1239,13 +1239,14 @@ def getMasterSecretKeyElements(config):
 def getLatexVar(index):
     global latexVars
     
-    if index not in latexVars.keys():
-        return index
+    if index in latexVars.keys():
+        return latexVars.get(index)
     else:
         res = re.findall(r"[a-zA-Z]+|\d+", index)
         if len(res) == 2:
             return res[0] + "_" + res[1]
-        return latexVars.get(index)
+    
+    return index
 
 
 def instantiateBFSolver(config, assignInfo):
@@ -1255,6 +1256,7 @@ def instantiateBFSolver(config, assignInfo):
     for i in range(length):
         name += random.choice(string.ascii_lowercase + string.digits)
     name += ".py"
+    sdlName = assignInfo[NONE_FUNC_NAME][BV_NAME].getAssignNode().getRight().getAttribute()
     # prepare input configuration file
     skVarsOutputVar = "skVar = '" + str(config.keygenSecVar) + "'\n"
     mskVarsOutputVar = "mskVars = " + str(mskVars) + "\n"
@@ -1286,29 +1288,37 @@ def instantiateBFSolver(config, assignInfo):
     # PRELIMINARY PROOF GEN CODE FOR TRANSFORM KEY
     skList = keygenElemToSMTExp[ str(config.keygenSecVar) ]
     keyDefs = []
+    bfList = []
     originalKeyNodes = []
     transformKeyNodes = []
+    pseudoKey = []
     for i in skList:
         skElem = bfMap[ i ]
+        thePseudoKey =  i + "''"
         for j, k in skElem.items():
             J = getLatexVar(j)
-            keyDefs.append( J + "' = {" + J + " \cdot " + k + "}" )
+            bfStr = "{\sf " + getLatexVar(k) + "}"
+            theDef = J + "' = {" + J + " \cdot " + bfStr + "}"
+            if theDef not in keyDefs: keyDefs.append( theDef )
+            if bfStr not in bfList: bfList.append( bfStr )
+        if thePseudoKey not in pseudoKey: pseudoKey.append( thePseudoKey )
         (funcName, varInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, i)
         resNode = varInfoObj.getAssignBaseElemsOnly()
-        resNode2 = BinaryNode.copy(resNode) 
+        resNode2 = BinaryNode.copy(resNode)
         for j, k in skElem.items():
             InPlaceReplaceAttr(resNode2, j, j + "'")
         originalKeyNodes.append( BinaryNode(ops.EQ, BinaryNode(i), resNode) ) # I + " = " + str(resNode) )
         transformKeyNodes.append( BinaryNode(ops.EQ, BinaryNode(i + "'"), resNode2) ) # I + " = " + str(resNode2) )
         print("node: ", resNode, type(resNode)) # need the symbolic executed version! 
         
-    
-    print("\keydefinitions =", keyDefs, "\n")
-    print("\originalkey = ", originalKeyNodes, "\n")
-    print("\\transformkey = ", transformKeyNodes, "\n")
+    print("\\blindingfactors = ", bfList)
+    print("\keydefinitions =", keyDefs)
+    print("\originalkey = ", originalKeyNodes)
+    print("\\transformkey = ", transformKeyNodes)
+    print("\pseudokey = ", pseudoKey, "\n")
     proof = GenerateProof()
-    proof.initLCG(mskVars, rndVars, keyDefs, originalKeyNodes, transformKeyNodes)
-    proof.compileProof('test')
+    proof.initLCG(bfList, mskVars, rndVars, keyDefs, originalKeyNodes, transformKeyNodes, pseudoKey)
+    proof.writeProof(sdlName)
     #print(results.resultDictionary)
     os.system("rm -f " + name + "*")
     return (bfMap, skBfMap)

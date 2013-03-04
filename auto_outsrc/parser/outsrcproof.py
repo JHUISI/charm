@@ -1,5 +1,5 @@
 # This class generates the latex macros for the batch verification proofs of security
-import sdlpath, re
+import sdlpath, re, string
 from SDLang import *
 
 hashtag = '#'
@@ -10,12 +10,13 @@ header = """\n
 \\newcommand{\schemename}{{\sf %s}}
 \\newcommand{\schemeref}{%s_proof}
 \\newcommand{\schemecite}{\cite{REF}}
+\\newcommand{\listofbfs}{ %s }
 \\newcommand{\listofmskvalues}{ %s }
 \\newcommand{\listofrandomvalues}{ %s }
 \\newcommand{\keydefinitions}{ %s }
 \\newcommand{\originalkey}{ %s }
-
 \\newcommand{\\transformkey}{ %s }
+\\newcommand{\pseudokey}{ %s }
 """
 # schemename - title
 # schemeref - title
@@ -169,14 +170,16 @@ class GenerateProof:
         self.stepPrefix = prefixStr
         return
         
-    def initLCG(self, mskList, randList, keyDefsList, originalKeyNodes, transformKeyNodes):
+    def initLCG(self, bfList, mskList, randList, keyDefsList, originalKeyNodes, transformKeyNodes, pseudoKey):
         if self.lcg == None:
             self.lcg = LatexCodeGenerator()
+            self.bfList = bfList
             self.mskList = mskList
             self.randList = randList
             self.keyDefsList = keyDefsList
             self.originalKeyList = originalKeyNodes
             self.transformKeyList = transformKeyNodes
+            self.pseudoKey = pseudoKey
             return True
         else:
             # init'ed already
@@ -217,8 +220,13 @@ class GenerateProof:
 #        return
     
     # starting point
-    def proofHeader(self, title, list_msk, list_rand, key_defs, original_key, transform_key):
-        list_msk_str = ""; list_rand_str = ""; key_defs_str = ""; original_key_str = ""; transform_key_str = ""
+    def proofHeader(self, title, list_bfs, list_msk, list_rand, key_defs, original_key, transform_key, pseudo_key):
+        list_bfs_str = ""; list_msk_str = ""; list_rand_str = ""; key_defs_str = ""; 
+        original_key_str = ""; transform_key_str = ""; pseudo_key_str = ""
+        # list of msk values
+        for i in list_bfs:
+            list_bfs_str += i + ","
+        list_bfs_str = list_bfs_str[:len(list_bfs_str)-1]
         # list of msk values
         for i in list_msk:
             list_msk_str += self.lcg.getLatexVersion(i) + ","
@@ -239,8 +247,12 @@ class GenerateProof:
         for i in transform_key:
             transform_key_str += self.lcg.print_statement(i) + ","
         transform_key_str = transform_key_str[:len(transform_key_str)-1]
+        # pseudo key definition
+        for i in pseudo_key:
+            pseudo_key_str += i + ","
+        pseudo_key_str = pseudo_key_str[:len(pseudo_key_str)-1]
         
-        result = header % (title, title, list_msk_str, list_rand_str, key_defs_str, original_key_str, transform_key_str)
+        result = header % (title, title, list_bfs_str, list_msk_str, list_rand_str, key_defs_str, original_key_str, transform_key_str, pseudo_key_str)
         return result
 
     def proofBody(self, step, data):
@@ -255,15 +267,15 @@ class GenerateProof:
         return result
 
     def writeConfig(self, latex_file):
-        title = latex_file.upper()
-        outputStr = self.proofHeader(title, self.mskList, self.randList, self.keyDefsList, self.originalKeyList, self.transformKeyList)        
+        title = string.capwords(latex_file)
+        outputStr = self.proofHeader(title, self.bfList, self.mskList, self.randList, self.keyDefsList, self.originalKeyList, self.transformKeyList, self.pseudoKey)        
 #        outputStr = self.proofHeader(title, self.constants, self.sig_vars, self.lcg_data['indiv'], self.lcg_data['batch'])
 #        for i in range(self.__lcg_steps):
 #            outputStr += self.proofBody(i+1, self.lcg_data[i])
 #        outputStr += footer
         return outputStr
     
-    def compileProof(self, latex_file):
+    def writeProof(self, latex_file):
         f = open('proof_gen' + latex_file + '.tex', 'w')
         output = self.writeConfig(latex_file)
         f.write(output)
