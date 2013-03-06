@@ -2933,5 +2933,5 @@ if __name__ == "__main__":
         getVarDepInfLists()
         getVarsThatProtectM()
         printFinalOutput()
-        (retFuncStmts, retFuncTypes, retVarDepList, retVarDepListNoExponents, retVarInfList, retVarInfListNoExponents) = getFuncStmts("intersectionSubset")
-        print(retFuncStmts)
+        #(retFuncStmts, retFuncTypes, retVarDepList, retVarDepListNoExponents, retVarInfList, retVarInfListNoExponents) = getFuncStmts("intersectionSubset")
+        #print(retFuncStmts)
