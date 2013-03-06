@@ -1420,13 +1420,13 @@ def keygen(file, config):
     # produce proof
     # generateTKProof(bfMap, config)
 
-    print("skBfMap before group is ", skBfMap)
+    #print("skBfMap before group is ", skBfMap)
 
 
     skBfMap = applyGroupSharingOptimization(skBfMap, config)
 
 
-    print("skBfMap after group is ", skBfMap)
+    #print("skBfMap after group is ", skBfMap)
 
     applyBlindingFactorsToScheme(skBfMap, config)
     secretKeyName = config.keygenSecVar
@@ -1465,7 +1465,7 @@ def keygen(file, config):
     transformNEW(resultDictionaryForTransform, secretKeyElements, config)
     endTime = time.clock()
     runningTime = (endTime - startTime) * 1000
-    print("Running time for TransformNew in ms is ", runningTime) 
+    #print("Running time for TransformNew in ms is ", runningTime) 
 
 
     #rcca(rccaData)

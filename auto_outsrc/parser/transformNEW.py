@@ -2,6 +2,9 @@ import sdlpath
 from sdlparser.SDLParser import *
 from outsrctechniques import *
 #from keygen import processListOrExpandNodes
+
+from SDLPreProcessor import hasPairingsSomewhere
+
 import sys
 
 transformOutputListForLoop = "transformOutputListForLoop"
@@ -496,6 +499,7 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
 
         listOfPairings = groupedPairing[1]
         listOfPairings = CombinePairings(listOfPairings)
+        print("Combined pairings for blinding factor ", groupedPairing[0], ":  ", listOfPairings)
         for pairing in listOfPairings:
             lineForTransformLines += str(pairing) + " * " 
 
@@ -505,6 +509,7 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
             lineForTransformLines += " ) }"
 
         transformLines.append(lineForTransformLines + "\n")
+        print("Line for transform:  ", lineForTransformLines)
 
         if (len(groupedPairings) == 1):
             if (withinForLoop == True):
@@ -562,6 +567,7 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
     if (writeToDecout == True):
         decoutLines.append(lineForDecoutLines + "\n")
         addVarsUsedInDecoutToGlobalList(getRightSideOfStringAssignStatement(lineForDecoutLines))
+        print("Line for decout:  ", lineForDecoutLines)
 
 def makeListTypeReplacement(inputType):
     if (inputType == types.listInt):
@@ -663,6 +669,7 @@ def writeOutLineKnownByTransform(currentNode, transformLines, decoutLines, curre
 
         if ( (canCollapseThisForLoop == True) and (regDotProdVar != None) and (str(currentNode.right) == regDotProdVar) and (singleBF == True) ):
             decoutLines.append(lineForDecoutLines + " ^ " + allPossibleBlindingFactors[0] + "\n")
+            print("Line for decout:  ", lineForDecoutLines + " ^ " + allPossibleBlindingFactors[0] + "\n")
         else:
             decoutLines.append(lineForDecoutLines + "\n")
         addVarsUsedInDecoutToGlobalList(getRightSideOfStringAssignStatement(lineForDecoutLines))
@@ -1030,11 +1037,26 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
         if (currentNode.type == ops.NONE):
             continue
         path_applied = []
+        if (hasPairingsSomewhere(currentNode) == True):
+            print("Unsimplified node:  ", currentNode)
+
         currentNode = SimplifySDLNode(currentNode, path_applied)
+        if (hasPairingsSomewhere(currentNode) == True):
+            print("Simplified node:  ", currentNode)
+
         currentNodeTechnique11RightSide = applyTechnique11(currentNode)
         if (currentNodeTechnique11RightSide != None):
             currentNode.right = currentNodeTechnique11RightSide
+
+        if (hasPairingsSomewhere(currentNode) == True):
+            print("After Technique 11:  ", currentNode)
+
         currentNodePairings = getNodePairingObjs(currentNode)
+        if (hasPairingsSomewhere(currentNode) == True):
+            print("Pairings:  ")
+            for currentNodePairingInd in currentNodePairings:
+                print(currentNodePairingInd)
+
         dotProdLoopVar = None
         if ( (currentNode.right != None) and (currentNode.right.type == ops.ON) ):
             dotProdLoopVar = getDotProdLoopVar(currentNode)
@@ -1086,6 +1108,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
                 searchForCTVarsThatNeedBuckets(currentNode.right, ctExpandListNodes, ctVarsThatNeedBuckets)
         elif ( (len(currentNodePairings) > 0) and (areAllVarsOnLineKnownByTransform == True) ):
             groupedPairings = groupPairings(currentNodePairings, varsThatAreBlindedDict, config)
+            print("Grouped pairings:  ", groupedPairings)
             writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode, blindingVarsThatAreLists, lineNo, astNodes, config)
             if (groupedPairings[0][0] == []):
                 knownVars.append(str(currentNode.left))
@@ -1106,6 +1129,9 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
         if (currentNode.type == ops.FOR):
             forLoopIndexVarName = getForLoopIndexVarName(currentNode)
             knownVars.append(forLoopIndexVarName)
+
+        if (hasPairingsSomewhere(currentNode) == True):
+            print("\n\n")
 
     #print(skVarsThatDecoutNeeds)
     #sys.exit("test")

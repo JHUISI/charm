@@ -38,7 +38,7 @@ def main(inputSDLScheme, configName, outputFile, outputUserDefFile):
     (linesOfCodeFromKeygen, blindingFactors_NonLists, blindingFactors_Lists) = keygen(inputSDLScheme + PREPROCESSED_STRING, config)
     endTime = time.clock()
     runningTime = (endTime - startTime) * 1000
-    print("running time for keygen is ", runningTime)
+    #print("running time for keygen is ", runningTime)
 
 
     writeLOCFromKeygenToFile(linesOfCodeFromKeygen, inputSDLScheme + PREPROCESSED_STRING, config)
@@ -48,7 +48,7 @@ def main(inputSDLScheme, configName, outputFile, outputUserDefFile):
     codegen_PY.codegen_PY_main(inputSDLScheme + PREPROCESSED_STRING + config.finalSDLSuffix, outputFile + ".py", outputUserDefFile + ".py")
     endTime = time.clock()
     runningTime = (endTime - startTime) * 1000
-    print("running time for codegen python is ", runningTime)
+    #print("running time for codegen python is ", runningTime)
 
     codegen_CPP.transformOutputList = transformOutputList
 
@@ -56,7 +56,7 @@ def main(inputSDLScheme, configName, outputFile, outputUserDefFile):
     codegen_CPP.codegen_CPP_main(inputSDLScheme + PREPROCESSED_STRING + config.finalSDLSuffix, outputFile + ".cpp", userFuncList)
     endTime = time.clock()
     runningTime = (endTime - startTime) * 1000
-    print("running time for codegen CPP is ", runningTime)
+    #print("running time for codegen CPP is ", runningTime)
 
 if __name__ == "__main__":
     lenSysArgv = len(sys.argv)
